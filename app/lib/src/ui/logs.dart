@@ -297,7 +297,9 @@ class _LogsScreenState extends State<LogsScreen> {
           ),
           options: CallOptions(timeout: const Duration(seconds: 30)),
         );
-        setState(() => _capture = request);
+        setState(() {
+          _capture = request;
+        });
         final answer = await request;
         if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
         data = answer.archive;

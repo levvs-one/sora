@@ -3,6 +3,7 @@ package diagnostics_test
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"os"
 	"sync"
@@ -12,6 +13,7 @@ import (
 	"github.com/gopacket/gopacket"
 	"github.com/gopacket/gopacket/layers"
 	"github.com/gopacket/gopacket/pcapgo"
+
 	"github.com/levvs-one/sora-client/core/diagnostics"
 )
 
@@ -24,7 +26,7 @@ func checkPackets(t *testing.T, data []byte) {
 	count := 0
 	for {
 		packet, info, err := reader.ReadPacketData()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {

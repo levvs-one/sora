@@ -9,6 +9,7 @@ import (
 
 	"github.com/gopacket/gopacket/layers"
 	"github.com/gopacket/gopacket/pcapgo"
+
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
@@ -19,7 +20,7 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	if err != nil {
 		return nil, errs.Wrap(err, errs.CodeUnavailable, errs.KeyDiagnosticsFailed)
 	}
-	defer handle.Close()
+	defer func() { _ = handle.Close() }()
 	if err := handle.SetCaptureLength(256); err != nil {
 		return nil, err
 	}

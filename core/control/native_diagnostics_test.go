@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 )
 
 func TestNativeDiagnosticsRequireAuthenticationAndTheOwnedSession(t *testing.T) {

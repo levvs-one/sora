@@ -18,8 +18,9 @@ import (
 	"github.com/gopacket/gopacket"
 	"github.com/gopacket/gopacket/layers"
 	"github.com/gopacket/gopacket/pcapgo"
-	"github.com/levvs-one/sora-client/core/errs"
 	"golang.org/x/sys/windows"
+
+	"github.com/levvs-one/sora-client/core/errs"
 )
 
 // These layouts are the documented Pktmon streaming ABI. Handles belong only

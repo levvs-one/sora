@@ -102,12 +102,23 @@ class Palette extends ThemeExtension<Palette> {
 
 /// Inter text styles with optical sizing and tighter tracking at larger sizes.
 abstract final class Styles {
-  /// Prefer colour emoji fonts for server flags to avoid monochrome glyphs.
-  static const _emoji = ['Noto Color Emoji', 'Segoe UI Emoji', 'Apple Color Emoji'];
+  /// Bundled script fonts keep localization readable without optional OS packs.
+  static const _fallback = [
+    'Noto Sans Arabic',
+    'Noto Sans Bengali',
+    'Noto Sans Devanagari',
+    'Noto Sans Thai',
+    'Noto Sans Armenian',
+    'Noto Sans Georgian',
+    'Sora CJK',
+    'Noto Color Emoji',
+    'Segoe UI Emoji',
+    'Apple Color Emoji',
+  ];
 
   static TextStyle _inter(double size, double weight, double tracking, double height) => TextStyle(
     fontFamily: 'Inter',
-    fontFamilyFallback: _emoji,
+    fontFamilyFallback: _fallback,
     fontSize: size,
     fontWeight: weight == 400
         ? FontWeight.w400
@@ -170,6 +181,7 @@ ThemeData buildTheme(Brightness brightness) {
     brightness: brightness,
     useMaterial3: true,
     fontFamily: 'Inter',
+    fontFamilyFallback: Styles._fallback,
     scaffoldBackgroundColor: palette.background,
     colorScheme: ColorScheme.fromSeed(
       seedColor: palette.ink,

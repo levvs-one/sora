@@ -164,6 +164,7 @@ void main() {
     for (final package in [
       'Sora',
       'Inter',
+      'Noto Sans / Sora CJK',
       'Country Flags',
       'sing-box',
       'mihomo',

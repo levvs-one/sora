@@ -9,8 +9,9 @@ import (
 	"path/filepath"
 	"unsafe"
 
-	"github.com/levvs-one/sora-client/core/errs"
 	"golang.org/x/sys/windows"
+
+	"github.com/levvs-one/sora-client/core/errs"
 )
 
 // ExportWindowsEvents asks Windows for a genuine EVTX file, without clearing
@@ -23,7 +24,7 @@ func ExportWindowsEvents(ctx context.Context) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(dir)
+	defer func() { _ = os.RemoveAll(dir) }()
 	path := filepath.Join(dir, "events.evtx")
 	channel, _ := windows.UTF16PtrFromString("Application")
 	query, _ := windows.UTF16PtrFromString("*[System[Provider[@Name='SoraCore'] and TimeCreated[timediff(@SystemTime) <= 86400000]]]")
@@ -43,7 +44,7 @@ func ExportWindowsEvents(ctx context.Context) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	data, err := io.ReadAll(io.LimitReader(file, DefaultMaxArchiveBytes+1))
 	if err != nil {
 		return nil, err

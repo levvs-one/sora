@@ -182,7 +182,7 @@ WebviewBridge::WebviewBridge(flutter::BinaryMessenger *messenger,
               const std::weak_ptr<int> lifetime(lifetime_);
               status = receiver->add_DevToolsProtocolEventReceived(
                   Microsoft::WRL::Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
-                      [this, lifetime, method](ICoreWebView2DevToolsProtocolEventReceiver *,
+                      [this, lifetime, method](ICoreWebView2 *,
                           ICoreWebView2DevToolsProtocolEventReceivedEventArgs *args) -> HRESULT {
                         if (lifetime.expired()) return S_OK;
                         wil::unique_cotaskmem_string json;

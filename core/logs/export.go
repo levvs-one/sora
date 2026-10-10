@@ -13,8 +13,10 @@ import (
 	"time"
 )
 
+// Format identifies a journal serialization format.
 type Format int
 
+// Stable export identifiers preserve older RPC format meanings.
 const (
 	FormatText Format = iota + 1
 	FormatJSONLines
@@ -26,6 +28,7 @@ const (
 	FormatGZIP
 )
 
+// MaxExportBytes bounds an export and its uncompressed diagnostic contents.
 const MaxExportBytes = 32 << 20
 
 // Export preserves the original messages and their order in every format.

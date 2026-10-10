@@ -341,7 +341,10 @@ class _LanguageButtonState extends State<LanguageButton> {
               ),
               const SizedBox(height: 8),
               SizedBox(
-                height: (MediaQuery.sizeOf(context).height * .45).clamp(120.0, 360.0),
+                height: (shown.length * 56.0 + (query.isEmpty ? 40 : 0)).clamp(
+                  64.0,
+                  (MediaQuery.sizeOf(context).height * .45).clamp(120.0, 360.0),
+                ),
                 child: ListView(
                   primary: false,
                   padding: EdgeInsets.zero,

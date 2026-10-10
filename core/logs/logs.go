@@ -51,7 +51,7 @@ func ParseLevel(s string) (Level, bool) {
 // the engine kind.
 const SourceCore = "core"
 
-// Subscription events contain only operation names, error keys and local IDs.
+// SourceSubscription identifies events containing only operation names, error keys and local IDs.
 const SourceSubscription = "subscription"
 
 // Entry is one log record. Message is already masked when it is stored.

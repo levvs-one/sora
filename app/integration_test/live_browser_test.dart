@@ -30,6 +30,7 @@ void main() {
     final settings = await Settings.load();
     await settings.completeTour();
     settings.animations = false;
+    settings.language = 'ru';
     final sora = Sora(settings);
     try {
       await tester.pumpWidget(SoraApp(sora: sora));
@@ -69,6 +70,8 @@ void main() {
                     '-y',
                     '-f',
                     'x11grab',
+                    '-draw_mouse',
+                    '0',
                     '-video_size',
                     '1120x760',
                     '-i',

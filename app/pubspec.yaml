@@ -85,3 +85,24 @@ flutter:
     - family: Inter
       fonts:
         - asset: assets/fonts/InterVariable.ttf
+    - family: Noto Sans Arabic
+      fonts:
+        - asset: assets/fonts/NotoSansArabic-Regular.ttf
+    - family: Noto Sans Bengali
+      fonts:
+        - asset: assets/fonts/NotoSansBengali-Regular.ttf
+    - family: Noto Sans Devanagari
+      fonts:
+        - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
+    - family: Noto Sans Thai
+      fonts:
+        - asset: assets/fonts/NotoSansThai-Regular.ttf
+    - family: Noto Sans Armenian
+      fonts:
+        - asset: assets/fonts/NotoSansArmenian-Regular.ttf
+    - family: Noto Sans Georgian
+      fonts:
+        - asset: assets/fonts/NotoSansGeorgian-Regular.ttf
+    - family: Sora CJK
+      fonts:
+        - asset: assets/fonts/SoraCJK.otf

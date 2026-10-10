@@ -12,8 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/levvs-one/sora-client/core/diagnostics"
 	"golang.org/x/sys/unix"
+
+	"github.com/levvs-one/sora-client/core/diagnostics"
 )
 
 func TestNativeLinuxOwnedTunCapture(t *testing.T) {
@@ -35,7 +36,7 @@ func TestNativeLinuxOwnedTunCapture(t *testing.T) {
 		t.Fatal(err)
 	}
 	file := os.NewFile(uintptr(descriptor), "sora0")
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	request, err := unix.NewIfreq("sora0")
 	if err != nil {
 		t.Fatal(err)
@@ -45,7 +46,7 @@ func TestNativeLinuxOwnedTunCapture(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, args := range [][]string{{"address", "add", "10.241.0.1/24", "dev", "sora0"}, {"link", "set", "sora0", "up"}} {
-		if output, err := exec.Command("ip", args...).CombinedOutput(); err != nil {
+		if output, err := exec.CommandContext(context.Background(), "ip", args...).CombinedOutput(); err != nil {
 			t.Fatalf("ip %v: %s, %v", args, output, err)
 		}
 	}
@@ -55,7 +56,7 @@ func TestNativeLinuxOwnedTunCapture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	sending, cancelSending := context.WithCancel(context.Background())
 	defer cancelSending()
 	sent := make(chan struct{})

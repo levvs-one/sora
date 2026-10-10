@@ -47,7 +47,7 @@ func TestStructuredAndCompressedExportsPreserveRecords(t *testing.T) {
 				t.Fatal(err)
 			}
 			content, err := io.ReadAll(reader)
-			reader.Close()
+			_ = reader.Close()
 			if err != nil || !bytes.Equal(content, raw) {
 				t.Fatalf("ZIP log = %q, %v", content, err)
 			}
@@ -57,7 +57,7 @@ func TestStructuredAndCompressedExportsPreserveRecords(t *testing.T) {
 				t.Fatal(err)
 			}
 			content, err := io.ReadAll(reader)
-			reader.Close()
+			_ = reader.Close()
 			if err != nil || !bytes.Equal(content, raw) {
 				t.Fatalf("GZ = %q, %v", content, err)
 			}

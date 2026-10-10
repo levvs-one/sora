@@ -14,6 +14,7 @@ import 'package:sora/src/generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
 import 'package:sora/src/ui/logs.dart';
+import 'package:sora/src/ui/kit.dart' show RoundButton;
 
 import 'desktop_shell_test.dart' show section;
 
@@ -50,6 +51,10 @@ class _Core extends CoreControlServiceBase {
   final logQueries = <LogFilter>[];
   final logPages = <QueryLogsRequest>[];
   final logWatches = <LogFilter>[];
+  final exportRequests = <ExportLogsRequest>[];
+  final diagnosticCalls = <ServiceCall>[];
+  final diagnosticRequests = <ExportDiagnosticsRequest>[];
+  Completer<void>? diagnosticGate;
   List<LogEntry> logPage = [
     LogEntry(sequence: Int64(1), source: 'core', message: 'Service started', level: LogLevel.LOG_LEVEL_INFO),
   ];
@@ -73,8 +78,25 @@ class _Core extends CoreControlServiceBase {
   }
 
   @override
-  Future<GetAboutResponse> getAbout(ServiceCall call, GetAboutRequest request) async =>
-      GetAboutResponse(about: About(contract: apiVersion.deepCopy()..capabilities.add('serverless')));
+  Future<GetAboutResponse> getAbout(ServiceCall call, GetAboutRequest request) async => GetAboutResponse(
+    about: About(
+      contract: apiVersion.deepCopy()..capabilities.addAll(['serverless', 'log-export-formats', 'native-diagnostics']),
+    ),
+  );
+
+  @override
+  Future<ExportLogsResponse> exportLogs(ServiceCall call, ExportLogsRequest request) async {
+    exportRequests.add(request.deepCopy());
+    return ExportLogsResponse();
+  }
+
+  @override
+  Future<ExportDiagnosticsResponse> exportDiagnostics(ServiceCall call, ExportDiagnosticsRequest request) async {
+    diagnosticRequests.add(request.deepCopy());
+    diagnosticCalls.add(call);
+    await diagnosticGate?.future;
+    return ExportDiagnosticsResponse();
+  }
 
   @override
   Future<GetStatusResponse> getStatus(ServiceCall call, GetStatusRequest request) async =>
@@ -191,6 +213,7 @@ void main() {
     if (core.gate case final gate? when !gate.isCompleted) gate.complete();
     if (core.handshakeGate case final gate? when !gate.isCompleted) gate.complete();
     if (core.probeGate case final gate? when !gate.isCompleted) gate.complete();
+    if (core.diagnosticGate case final gate? when !gate.isCompleted) gate.complete();
     if (!disposed) sora.dispose();
     try {
       await running.timeout(const Duration(seconds: 10));
@@ -202,6 +225,137 @@ void main() {
   });
 
   group('commands over an isolated RPC socket', () {
+    testWidgets('exports carry the selected category, search and format; old cores cannot mislabel data', (
+      tester,
+    ) async {
+      await sora.settings.completeTour();
+      sora.settings.animations = false;
+      final saves = <String>[];
+      const chooser = MethodChannel('plugins.flutter.io/file_selector');
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(chooser, (call) async {
+        saves.add((call.arguments as Map)['suggestedName'] as String);
+        return null;
+      });
+      addTearDown(
+        () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(chooser, null),
+      );
+      try {
+        await tester.pumpWidget(SoraApp(sora: sora));
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('logs-section-dns')));
+        await tester.enterText(
+          find.descendant(of: find.byType(LogsScreen), matching: find.byType(EditableText)),
+          'resolver',
+        );
+        await tester.pump(const Duration(milliseconds: 300));
+        for (final extension in ['log', 'txt', 'json', 'jsonl', 'csv', 'xml', 'zip', 'gz']) {
+          final before = core.exportRequests.length;
+          await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.export));
+          await tester.pump(const Duration(milliseconds: 250));
+          await tester.tap(find.byWidgetPredicate((w) => w is Text && (w.data?.endsWith('.$extension') ?? false)));
+          await tester.pump();
+          for (var i = 0; i < 30 && saves.length == before; i++) {
+            await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+            await tester.pump(const Duration(milliseconds: 100));
+          }
+          final request = core.exportRequests.last;
+          expect(request.category, 'dns');
+          expect(request.filter.contains, 'resolver');
+          expect(request.filter.pattern, contains('dns'));
+          expect(saves.last, matches(RegExp('^sora-log_dns_[0-9]{2}_[0-9]{2}_[0-9]{4}\\.$extension\$')));
+        }
+        expect(core.exportRequests.map((r) => r.format), [
+          LogExportFormat.LOG_EXPORT_FORMAT_LOG,
+          LogExportFormat.LOG_EXPORT_FORMAT_UNSPECIFIED,
+          LogExportFormat.LOG_EXPORT_FORMAT_JSON,
+          LogExportFormat.LOG_EXPORT_FORMAT_JSON_LINES,
+          LogExportFormat.LOG_EXPORT_FORMAT_CSV,
+          LogExportFormat.LOG_EXPORT_FORMAT_XML,
+          LogExportFormat.LOG_EXPORT_FORMAT_ZIP,
+          LogExportFormat.LOG_EXPORT_FORMAT_GZIP,
+        ]);
+        sora.coreCapabilities.remove('log-export-formats');
+        await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.export));
+        await tester.pump(const Duration(milliseconds: 250));
+        await tester.tap(find.byWidgetPredicate((w) => w is Text && (w.data?.endsWith('.json') ?? false)));
+        await tester.pump(const Duration(milliseconds: 250));
+        expect(core.exportRequests, hasLength(8));
+        expect(saves, hasLength(8));
+        expect(sora.history, hasLength(1));
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        disposed = true;
+        await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
+      }
+    });
+
+    testWidgets('packet capture requires TUN; cancel and leaving logs suppress late replies', (tester) async {
+      await sora.settings.completeTour();
+      sora.settings.animations = false;
+      core.diagnosticGate = Completer<void>();
+      Future<void> packetMenu() async {
+        await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.export));
+        await tester.pump(const Duration(milliseconds: 250));
+        await tester.tap(find.byWidgetPredicate((w) => w is Text && (w.data?.endsWith('.pcapng') ?? false)));
+        await tester.pump();
+      }
+
+      Future<void> waitFor(bool Function() ready) async {
+        for (var i = 0; i < 50 && !ready(); i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        expect(ready(), isTrue);
+      }
+
+      try {
+        await tester.pumpWidget(SoraApp(sora: sora));
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+        await packetMenu();
+        expect(core.diagnosticRequests, isEmpty);
+        expect(sora.history.single.body, sora.strings.diagnosticRequiresTun);
+        await tester.runAsync(sora.clearNotifications);
+        await tester.pump(const Duration(seconds: 6));
+        await tester.pump();
+        await tester.runAsync(sora.connect);
+        await tester.pump();
+        await packetMenu();
+        await waitFor(() => core.diagnosticRequests.length == 1);
+        expect(core.diagnosticRequests.single.sessionId, sora.sessionId);
+        expect(core.diagnosticRequests.single.controlAuthenticator, isNotEmpty);
+        expect(core.diagnosticRequests.single.format, DiagnosticFormat.DIAGNOSTIC_FORMAT_PCAPNG);
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.cancel));
+        await waitFor(() => core.diagnosticCalls.single.isCanceled);
+        await packetMenu();
+        await waitFor(() => core.diagnosticRequests.length == 2);
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+        await waitFor(() => core.diagnosticCalls.last.isCanceled);
+        core.diagnosticGate!.complete();
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+        await tester.pump();
+        expect(sora.history, isEmpty);
+        expect(sora.phase, Phase.connected);
+        expect(tester.takeException(), isNull);
+      } finally {
+        if (!core.diagnosticGate!.isCompleted) core.diagnosticGate!.complete();
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        disposed = true;
+        await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
+      }
+    });
+
     for (final initiallyConnected in [false, true]) {
       testWidgets(
         'connect orb remains clickable after reset while ${initiallyConnected ? "connected" : "disconnected"}',

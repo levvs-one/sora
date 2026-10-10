@@ -227,6 +227,7 @@ func (s *Server) ExportLogs(ctx context.Context, req *corev1.ExportLogsRequest) 
 func mergeDiagnosticArchive(events, report []byte) ([]byte, error) {
 	var output bytes.Buffer
 	writer := zip.NewWriter(&output)
+	remaining := int64(logs.MaxExportBytes)
 	for i, content := range [][]byte{events, report} {
 		reader, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
 		if err != nil {
@@ -245,8 +246,16 @@ func mergeDiagnosticArchive(events, report []byte) ([]byte, error) {
 			if err != nil {
 				return nil, err
 			}
-			_, err = io.Copy(entry, source)
-			source.Close()
+			copied, copyErr := io.Copy(entry, io.LimitReader(source, remaining+1))
+			closeErr := source.Close()
+			if copied > remaining {
+				return nil, io.ErrShortBuffer
+			}
+			remaining -= copied
+			err = copyErr
+			if err == nil {
+				err = closeErr
+			}
 			if err != nil {
 				return nil, err
 			}
