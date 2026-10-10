@@ -16,18 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  windows-diagnostics:
-    name: Windows diagnostic contract
-    runs-on: windows-latest
-    steps:
-      - name: Inspect native packet-monitor metadata
-        shell: pwsh
-        run: |
-          pktmon list --json
-          pktmon status
-          Get-NetAdapter -IncludeHidden | Select-Object Name,InterfaceGuid,InterfaceDescription,ifIndex | ConvertTo-Json -Depth 5
-          logman query -ets
-
   workflow:
     name: Workflow lint
     runs-on: ubuntu-latest
@@ -108,6 +96,12 @@ jobs:
         run: go vet ./...
       - name: Test
         run: go test -race ./...
+      - name: Real packet capture in a private network
+        run: |
+          go test -race -c -o "$RUNNER_TEMP/sora-packet-tests" ./diagnostics
+          original=$(readlink /proc/self/ns/net)
+          sudo unshare --net env SORA_ISOLATED_PACKET_TEST=1 SORA_ORIGINAL_NETNS="$original" \
+            "$RUNNER_TEMP/sora-packet-tests" -test.v -test.run '^TestNativeLinuxOwnedTunCapture$' -test.timeout 15s
       - name: Lint
         uses: golangci/golangci-lint-action@v8
         with:
@@ -287,7 +281,10 @@ jobs:
           }
       - name: Real websites in WebView2
         working-directory: app
-        run: flutter test integration_test/live_browser_test.dart -d windows
+        run: |
+          flutter test integration_test/browser_language_test.dart -d windows
+          if ($LASTEXITCODE -ne 0) { throw 'Native browser language or HAR failed' }
+          flutter test integration_test/live_browser_test.dart -d windows
       - name: Real traffic through the tunnel and the system proxy
         # A VLESS server on this machine, Xray from the installed engines; its
         # access log shows the traffic reached it through Sora.

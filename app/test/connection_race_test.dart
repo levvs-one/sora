@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/material.dart' show SizedBox;
+import 'package:flutter/services.dart';
+import 'package:flutter/material.dart' show SizedBox, Text, EditableText, Scrollable, ScrollableState, ValueKey;
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart' show Server, ServiceCall;
 import 'package:sora/main.dart';
@@ -19,6 +20,8 @@ import 'desktop_shell_test.dart' show section;
 class _Core extends CoreControlServiceBase {
   ConnectionState state = ConnectionState(value: ConnectionStateValue.CONNECTION_STATE_VALUE_DISCONNECTED);
   Completer<void>? gate;
+  Completer<void>? handshakeGate;
+  int handshakes = 0;
   bool reject = false;
   bool failCleanup = false;
   bool failStartCleanup = false;
@@ -44,6 +47,12 @@ class _Core extends CoreControlServiceBase {
   SessionPlan? plan;
   final events = StreamController<CoreEvent>.broadcast();
   final logs = StreamController<LogEntry>.broadcast();
+  final logQueries = <LogFilter>[];
+  final logPages = <QueryLogsRequest>[];
+  final logWatches = <LogFilter>[];
+  List<LogEntry> logPage = [
+    LogEntry(sequence: Int64(1), source: 'core', message: 'Service started', level: LogLevel.LOG_LEVEL_INFO),
+  ];
 
   Future<void> close() async {
     await events.close();
@@ -54,10 +63,14 @@ class _Core extends CoreControlServiceBase {
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError('${invocation.memberName}');
 
   @override
-  Future<HandshakeResponse> handshake(ServiceCall call, HandshakeRequest request) async => HandshakeResponse(
-    negotiatedVersion: apiVersion.deepCopy()..minor = minor,
-    controlAuthenticator: List.filled(32, 1),
-  );
+  Future<HandshakeResponse> handshake(ServiceCall call, HandshakeRequest request) async {
+    handshakes++;
+    await handshakeGate?.future;
+    return HandshakeResponse(
+      negotiatedVersion: apiVersion.deepCopy()..minor = minor,
+      controlAuthenticator: List.filled(32, 1),
+    );
+  }
 
   @override
   Future<GetAboutResponse> getAbout(ServiceCall call, GetAboutRequest request) async =>
@@ -90,15 +103,23 @@ class _Core extends CoreControlServiceBase {
 
   @override
   Future<QueryLogsResponse> queryLogs(ServiceCall call, QueryLogsRequest request) async {
+    logQueries.add(request.filter.deepCopy());
+    logPages.add(request.deepCopy());
+    final candidates = logPage
+        .where((entry) => request.beforeSequence == Int64.ZERO || entry.sequence < request.beforeSequence)
+        .toList();
+    final entries = candidates.take(request.limit == 0 ? 500 : request.limit).toList();
     return QueryLogsResponse(
-      entries: [
-        LogEntry(sequence: Int64(1), source: 'core', message: 'Service started', level: LogLevel.LOG_LEVEL_INFO),
-      ],
+      entries: entries,
+      beforeSequence: candidates.length > entries.length ? entries.last.sequence : Int64.ZERO,
     );
   }
 
   @override
-  Stream<LogEntry> watchLogs(ServiceCall call, WatchLogsRequest request) => logs.stream;
+  Stream<LogEntry> watchLogs(ServiceCall call, WatchLogsRequest request) {
+    logWatches.add(request.filter.deepCopy());
+    return logs.stream;
+  }
 
   @override
   Future<ConnectResponse> connect(ServiceCall call, ConnectRequest request) async {
@@ -168,6 +189,7 @@ void main() {
   tearDown(() async {
     if (!isolated) return;
     if (core.gate case final gate? when !gate.isCompleted) gate.complete();
+    if (core.handshakeGate case final gate? when !gate.isCompleted) gate.complete();
     if (core.probeGate case final gate? when !gate.isCompleted) gate.complete();
     if (!disposed) sora.dispose();
     try {
@@ -180,6 +202,105 @@ void main() {
   });
 
   group('commands over an isolated RPC socket', () {
+    for (final initiallyConnected in [false, true]) {
+      testWidgets(
+        'connect orb remains clickable after reset while ${initiallyConnected ? "connected" : "disconnected"}',
+        (tester) async {
+          await sora.settings.completeTour();
+          sora.settings.animations = false;
+          if (initiallyConnected) await tester.runAsync(sora.connect);
+          try {
+            await tester.pumpWidget(SoraApp(sora: sora));
+            await tester.pump();
+            await tester.runAsync(sora.reset);
+            await tester.pump(const Duration(milliseconds: 250));
+            final connect = find.byKey(const ValueKey('connect-control'));
+            expect(connect, findsOneWidget);
+            await tester.runAsync(() => tester.tap(connect));
+            for (var i = 0; i < 50 && sora.phase != (initiallyConnected ? Phase.off : Phase.connected); i++) {
+              await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+              await tester.pump(const Duration(milliseconds: 100));
+            }
+            await tester.pump(const Duration(milliseconds: 250));
+            expect(sora.phase, initiallyConnected ? Phase.off : Phase.connected);
+            expect(sora.settings.tourDone, isTrue);
+            if (initiallyConnected) {
+              await tester.runAsync(() => tester.tap(connect));
+              for (var i = 0; i < 50 && sora.phase != Phase.connected; i++) {
+                await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+                await tester.pump(const Duration(milliseconds: 100));
+              }
+              await tester.pump(const Duration(milliseconds: 250));
+              expect(sora.phase, Phase.connected);
+            }
+            expect(tester.takeException(), isNull);
+          } finally {
+            await tester.pumpWidget(const SizedBox());
+            sora.dispose();
+            disposed = true;
+            await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
+          }
+        },
+      );
+    }
+
+    testWidgets('log sections combine with severity and search in both history and stream', (tester) async {
+      await sora.settings.completeTour();
+      sora.settings.animations = false;
+      try {
+        await tester.pumpWidget(SoraApp(sora: sora));
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+        for (var i = 0; i < 30 && core.logWatches.isEmpty; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        expect(core.logWatches, isNotEmpty);
+        for (final category in ['engine', 'tun', 'dns', 'subscriptions', 'core', 'all']) {
+          final count = core.logWatches.length;
+          await tester.tap(find.byKey(ValueKey('logs-section-$category')));
+          await tester.pump();
+          for (var i = 0; i < 30 && core.logWatches.length == count; i++) {
+            await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+            await tester.pump(const Duration(milliseconds: 100));
+          }
+          expect(core.logWatches.length, count + 1);
+          expect(core.logWatches.last, core.logQueries.last);
+          final filter = core.logQueries.last;
+          expect(filter.sources, switch (category) {
+            'engine' => ['sing-box', 'xray', 'mihomo', 'zapret'],
+            'subscriptions' => ['subscription'],
+            'core' => ['core'],
+            _ => <String>[],
+          });
+          expect(filter.pattern.isNotEmpty, category == 'tun' || category == 'dns');
+        }
+        await tester.tap(find.byKey(const ValueKey('logs-section-tun')));
+        await tester.tap(find.text(sora.strings.logsErrors));
+        await tester.enterText(
+          find.descendant(of: find.byType(LogsScreen), matching: find.byType(EditableText)),
+          'adapter',
+        );
+        await tester.pump(const Duration(milliseconds: 300));
+        for (var i = 0; i < 30 && core.logWatches.last.contains != 'adapter'; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        final filter = core.logQueries.last;
+        expect(filter, core.logWatches.last);
+        expect(filter.contains, 'adapter');
+        expect(filter.minLevel, LogLevel.LOG_LEVEL_ERROR);
+        expect(filter.pattern, contains('tun'));
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        disposed = true;
+        await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
+      }
+    });
+
     testWidgets('logs opened before the service link arrives load and continue streaming', (tester) async {
       final waiting = Sora(sora.settings);
       await waiting.settings.completeTour();
@@ -215,6 +336,118 @@ void main() {
         await tester.pumpWidget(const SizedBox());
         waiting.dispose();
         await tester.runAsync(() async => await waitingWork?.timeout(const Duration(seconds: 10)));
+      }
+    });
+
+    testWidgets('new log entries preserve the visible text until the reader returns to the top', (tester) async {
+      core.logPage = List.generate(80, (i) => LogEntry(sequence: Int64(80 - i), source: 'core', message: 'History $i'));
+      await sora.settings.completeTour();
+      sora.settings.animations = false;
+      try {
+        await tester.pumpWidget(SoraApp(sora: sora));
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+        for (var i = 0; i < 30 && !core.logs.hasListener; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        expect(core.logs.hasListener, isTrue);
+        final scrollable = find.descendant(of: find.byType(LogsScreen), matching: find.byType(Scrollable)).last;
+        await tester.drag(scrollable, const Offset(0, -450));
+        await tester.pumpAndSettle();
+        final bounds = tester.getRect(scrollable);
+        final visible = find
+            .byWidgetPredicate((w) => w is Text && (w.data?.startsWith('History ') ?? false))
+            .evaluate();
+        final anchor =
+            visible.firstWhere((element) {
+                  final point = tester.getTopLeft(find.byWidget(element.widget));
+                  return point.dy > bounds.top + 40 && point.dy < bounds.bottom - 80;
+                }).widget
+                as Text;
+        final anchored = find.text(anchor.data!);
+        final before = tester.getTopLeft(anchored);
+        await tester.runAsync(() async {
+          for (var i = 0; i < 30; i++) {
+            core.logs.add(
+              LogEntry(
+                sequence: Int64(81 + i),
+                source: 'xray',
+                message: 'New $i${i.isEven ? '\nSecond line\nThird line' : ''}',
+              ),
+            );
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+        });
+        await tester.pumpAndSettle();
+        expect(tester.getTopLeft(anchored), before);
+        final position = tester.state<ScrollableState>(scrollable).position;
+        position.jumpTo(position.minScrollExtent);
+        await tester.pumpAndSettle();
+        await tester.runAsync(() async {
+          core.logs.add(LogEntry(sequence: Int64(111), source: 'core', message: 'Latest entry'));
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+        });
+        await tester.pumpAndSettle();
+        expect(find.text('Latest entry'), findsOneWidget);
+        expect(position.pixels, position.minScrollExtent);
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        disposed = true;
+        await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
+      }
+    });
+
+    testWidgets('scrolling through history loads older pages without moving the reader', (tester) async {
+      core.logPage = List.generate(
+        700,
+        (i) => LogEntry(sequence: Int64(700 - i), source: 'core', message: 'History $i'),
+      );
+      await sora.settings.completeTour();
+      sora.settings.animations = false;
+      try {
+        await tester.pumpWidget(SoraApp(sora: sora));
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+        for (var i = 0; i < 30 && !core.logs.hasListener; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        expect(core.logPages.single.limit, 500);
+        final scrollable = find.descendant(of: find.byType(LogsScreen), matching: find.byType(Scrollable)).last;
+        final position = tester.state<ScrollableState>(scrollable).position;
+        // SliverList estimates the height of unseen variable-height entries.
+        for (var i = 0; i < 30 && core.logPages.length == 1; i++) {
+          position.jumpTo(position.maxScrollExtent);
+          await tester.pump(const Duration(milliseconds: 100));
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        expect(core.logPages.last.beforeSequence, Int64(201));
+        for (var i = 0; i < 10; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          position.jumpTo(position.maxScrollExtent);
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        expect(find.text('History 699'), findsOneWidget);
+        expect(core.logPages.length, 2);
+        final before = tester.getTopLeft(find.text('History 699'));
+        await tester.runAsync(() async {
+          core.logs.add(LogEntry(sequence: Int64(701), source: 'core', message: 'New entry'));
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+        });
+        await tester.pump();
+        expect(tester.getTopLeft(find.text('History 699')), before);
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        disposed = true;
+        await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
       }
     });
 
@@ -331,6 +564,47 @@ void main() {
       expect(sora.phase, Phase.off);
       expect(sora.history, isEmpty);
     });
+
+    test('the latest location survives replacement of the service link', () async {
+      await sora.select('a');
+      await sora.connect();
+      final previous = sora.link!;
+      final close = previous.close();
+      final choice = sora.select('b');
+      await Future.wait([close, choice]);
+      await until(() => sora.link != null && sora.link != previous && sora.phase == Phase.connected);
+      await until(() => core.connects == 2);
+      await until(() => !sora.busy && !sora.needsReconnect);
+      expect(core.plan!.groups.single.members.first, 'b');
+      expect(sora.needsReconnect, isFalse);
+    });
+
+    for (final stop in [false, true]) {
+      test(
+        'a selection while the link is missing ${stop ? 'is cancelled by disconnect' : 'is replayed after recovery'}',
+        () async {
+          await sora.select('a');
+          await sora.connect();
+          core.handshakeGate = Completer<void>();
+          await sora.link!.close();
+          await until(() => core.handshakes == 2);
+          expect(sora.link, isNull);
+          await sora.select('c');
+          if (stop) await sora.disconnect();
+          core.handshakeGate!.complete();
+          await until(() => sora.link != null && sora.serverlessAvailable && sora.phase == Phase.connected);
+          if (stop) {
+            await Future<void>.delayed(const Duration(milliseconds: 50));
+            expect(core.connects, 1);
+          } else {
+            await until(() => core.connects == 2);
+            await until(() => !sora.busy && !sora.needsReconnect);
+            expect(core.plan!.groups.single.members.first, 'c');
+            expect(sora.needsReconnect, isFalse);
+          }
+        },
+      );
+    }
 
     test('a location selected during the first connection applies automatically', () async {
       await sora.select('a');

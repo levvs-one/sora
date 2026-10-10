@@ -947,10 +947,9 @@ packages:
   webview_all_windows:
     dependency: "direct main"
     description:
-      name: webview_all_windows
-      sha256: "1716e52da42a6c67bc00ec48b4626d46e3672bcf368220cb30c630ecec3b2f7b"
-      url: "https://pub.dev"
-    source: hosted
+      path: "third_party/webview_all_windows"
+      relative: true
+    source: path
     version: "1.4.4"
   webview_all_wkwebview:
     dependency: transitive

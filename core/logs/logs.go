@@ -51,6 +51,9 @@ func ParseLevel(s string) (Level, bool) {
 // the engine kind.
 const SourceCore = "core"
 
+// Subscription events contain only operation names, error keys and local IDs.
+const SourceSubscription = "subscription"
+
 // Entry is one log record. Message is already masked when it is stored.
 type Entry struct {
 	Seq     uint64
@@ -91,9 +94,9 @@ const (
 	foldWindow = 30 * time.Second
 )
 
-// DefaultSettings captures info and higher levels and masks destinations.
+// DefaultSettings captures info and higher levels, including destinations.
 func DefaultSettings() Settings {
-	return Settings{CaptureLevel: LevelInfo, MaxEntries: DefaultMaxEntries, MaxBytes: DefaultMaxBytes}
+	return Settings{CaptureLevel: LevelInfo, RecordDestinations: true, MaxEntries: DefaultMaxEntries, MaxBytes: DefaultMaxBytes}
 }
 
 func (s Settings) normalized() Settings {
@@ -162,7 +165,7 @@ func (c *Center) Write(at time.Time, level Level, source, message string) {
 	if level < c.settings.CaptureLevel {
 		return
 	}
-	if !c.settings.RecordDestinations && source != SourceCore {
+	if !c.settings.RecordDestinations && source != SourceCore && source != SourceSubscription {
 		message = HideDestinations(message)
 	}
 	if n := len(c.entries); n > 0 {

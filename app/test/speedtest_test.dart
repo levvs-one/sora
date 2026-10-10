@@ -90,6 +90,26 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  for (final scale in [1.0, 2.0]) {
+    testWidgets('a narrow service panel contains its full name at text scale $scale', (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = scale;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await start(tester, width: 360);
+      final service = find.byKey(const ValueKey('speedtest-service-https://yandex.ru/internet'));
+      final name = find.descendant(of: service, matching: find.byType(Text));
+      final buttonBounds = tester.getRect(service);
+      final textBounds = tester.getRect(name);
+      expect(textBounds.top, greaterThanOrEqualTo(buttonBounds.top));
+      expect(textBounds.bottom, lessThanOrEqualTo(buttonBounds.bottom));
+      expect(textBounds.left, greaterThanOrEqualTo(buttonBounds.left));
+      expect(textBounds.right, lessThanOrEqualTo(buttonBounds.right));
+      expect(tester.widget<Text>(name).maxLines, isNull);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
+    });
+  }
+
   testWidgets('a saved removed service falls back to the first available service', (tester) async {
     final sora = await start(tester);
     await sora.settings.saveSpeedtestService('https://speed.cloudflare.com/');
@@ -154,9 +174,11 @@ void main() {
     Completer<void>? release;
 
     Future<void> flush(WidgetTester tester) async {
-      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
       for (var i = 0; i < 8; i++) {
         await tester.pump();
+        // EventChannel cancellation can cross back into the real async zone
+        // after the metadata subscription has finished cancelling.
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 5)));
       }
     }
 

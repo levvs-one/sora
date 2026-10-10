@@ -3621,11 +3621,15 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
     ApiVersion? apiVersion,
     $core.String? requestId,
     $core.String? sessionId,
+    DiagnosticFormat? format,
+    $core.List<$core.int>? controlAuthenticator,
   }) {
     final result = ExportDiagnosticsRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
     if (requestId != null) result.requestId = requestId;
     if (sessionId != null) result.sessionId = sessionId;
+    if (format != null) result.format = format;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
     return result;
   }
 
@@ -3644,6 +3648,8 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
     ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
     ..aOS(2, _omitFieldNames ? '' : 'requestId')
     ..aOS(3, _omitFieldNames ? '' : 'sessionId')
+    ..aE<DiagnosticFormat>(4, _omitFieldNames ? '' : 'format', enumValues: DiagnosticFormat.values)
+    ..a<$core.List<$core.int>>(5, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3694,6 +3700,24 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
   $core.bool hasSessionId() => $_has(2);
   @$pb.TagNumber(3)
   void clearSessionId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  DiagnosticFormat get format => $_getN(3);
+  @$pb.TagNumber(4)
+  set format(DiagnosticFormat value) => $_setField(4, value);
+  @$pb.TagNumber(4)
+  $core.bool hasFormat() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearFormat() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<$core.int> get controlAuthenticator => $_getN(4);
+  @$pb.TagNumber(5)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasControlAuthenticator() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearControlAuthenticator() => $_clearField(5);
 }
 
 class ExportDiagnosticsResponse extends $pb.GeneratedMessage {
@@ -5305,12 +5329,14 @@ class ExportLogsRequest extends $pb.GeneratedMessage {
     $core.List<$core.int>? controlAuthenticator,
     LogFilter? filter,
     LogExportFormat? format,
+    $core.String? category,
   }) {
     final result = ExportLogsRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
     if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
     if (filter != null) result.filter = filter;
     if (format != null) result.format = format;
+    if (category != null) result.category = category;
     return result;
   }
 
@@ -5330,6 +5356,7 @@ class ExportLogsRequest extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
     ..aOM<LogFilter>(3, _omitFieldNames ? '' : 'filter', subBuilder: LogFilter.$_createMessage)
     ..aE<LogExportFormat>(4, _omitFieldNames ? '' : 'format', enumValues: LogExportFormat.values)
+    ..aOS(5, _omitFieldNames ? '' : 'category')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -5391,6 +5418,16 @@ class ExportLogsRequest extends $pb.GeneratedMessage {
   $core.bool hasFormat() => $_has(3);
   @$pb.TagNumber(4)
   void clearFormat() => $_clearField(4);
+
+  /// Optional filename category: all, engine, tun, dns, subscriptions or core.
+  @$pb.TagNumber(5)
+  $core.String get category => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set category($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasCategory() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearCategory() => $_clearField(5);
 }
 
 class ExportLogsResponse extends $pb.GeneratedMessage {

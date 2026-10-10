@@ -302,7 +302,19 @@ enum ProbeMethod {
 }
 message RunDiagnosticsRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; }
 message RunDiagnosticsResponse { DiagnosticReport report = 1; SoraError error = 2; }
-message ExportDiagnosticsRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; }
+// Native captures require the authenticator and the native-diagnostics capability.
+enum DiagnosticFormat {
+  DIAGNOSTIC_FORMAT_UNSPECIFIED = 0;
+  DIAGNOSTIC_FORMAT_PCAPNG = 1;
+  DIAGNOSTIC_FORMAT_EVTX = 2;
+}
+message ExportDiagnosticsRequest {
+  ApiVersion api_version = 1;
+  string request_id = 2;
+  string session_id = 3;
+  DiagnosticFormat format = 4;
+  bytes control_authenticator = 5;
+}
 message ExportDiagnosticsResponse { bytes archive = 1; SoraError error = 2; }
 message SetKillSwitchRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bool enabled = 4; }
 message SetKillSwitchResponse { bool enabled = 1; SoraError error = 2; }
@@ -413,12 +425,19 @@ enum LogExportFormat {
   LOG_EXPORT_FORMAT_UNSPECIFIED = 0;
   LOG_EXPORT_FORMAT_JSON_LINES = 1;
   LOG_EXPORT_FORMAT_CSV = 2;
+  LOG_EXPORT_FORMAT_LOG = 3;
+  LOG_EXPORT_FORMAT_JSON = 4;
+  LOG_EXPORT_FORMAT_XML = 5;
+  LOG_EXPORT_FORMAT_ZIP = 6;
+  LOG_EXPORT_FORMAT_GZIP = 7;
 }
 message ExportLogsRequest {
   ApiVersion api_version = 1;
   bytes control_authenticator = 2;
   LogFilter filter = 3;
   LogExportFormat format = 4;
+  // Optional filename category: all, engine, tun, dns, subscriptions or core.
+  string category = 5;
 }
 message ExportLogsResponse {
   bytes data = 1;

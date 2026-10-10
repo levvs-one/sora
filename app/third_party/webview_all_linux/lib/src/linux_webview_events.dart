@@ -8,6 +8,9 @@ extension LinuxWebViewControllerEventHandling on LinuxWebViewController {
 
     final String? type = event['type'] as String?;
     switch (type) {
+      case 'networkResource':
+        _networkEvents.add(Map<String, dynamic>.from(event));
+        break;
       case 'urlChanged':
         final String url = '${event['url'] ?? ''}';
         _currentUrl = url;

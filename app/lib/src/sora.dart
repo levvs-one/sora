@@ -11,6 +11,7 @@ import 'package:retry/retry.dart';
 import '../l10n/strings.dart';
 
 import 'core/link.dart';
+import 'browser_diagnostics.dart';
 import 'generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'groups.dart';
 import 'rules.dart';
@@ -65,6 +66,7 @@ final class ServerReturned extends Notice {
 /// rebuild on notifications.
 class Sora extends ChangeNotifier {
   Sora(this.settings) : history = settings.notificationHistory;
+  final browserDiagnostics = BrowserDiagnostics();
 
   AppUpdater get updates => _updates;
   late final _updates = AppUpdater(
@@ -103,11 +105,10 @@ class Sora extends ChangeNotifier {
   Stream<AppNotification> get messages => _messages.stream;
   final _reported = <String, String>{};
   bool serverlessAvailable = false;
+  Set<String> coreCapabilities = {};
 
   S get strings {
-    final chosen = settings.language == 'system'
-        ? WidgetsBinding.instance.platformDispatcher.locale
-        : Locale(settings.language);
+    final chosen = settings.locale ?? WidgetsBinding.instance.platformDispatcher.locale;
     return lookupS(S.delegate.isSupported(chosen) ? chosen : const Locale('en'));
   }
 
@@ -163,10 +164,7 @@ class Sora extends ChangeNotifier {
   }
 
   AppNotification notificationFor(Notice notice) {
-    final chosen = settings.language == 'system'
-        ? WidgetsBinding.instance.platformDispatcher.locale
-        : Locale(settings.language);
-    final s = lookupS(S.delegate.isSupported(chosen) ? chosen : const Locale('en'));
+    final s = strings;
     final server = switch (selected) {
       'auto' => s.serverAuto,
       'bypass' => s.serverBypass,
@@ -216,6 +214,7 @@ class Sora extends ChangeNotifier {
   SessionPlan? _activePlan;
   Future<void> _locationWork = Future.value();
   int _selectionRevision = 0;
+  int? _pendingSelection;
   bool needsReconnect = false;
   bool cleanupPending = false;
 
@@ -373,13 +372,15 @@ class Sora extends ChangeNotifier {
         await _readStatus(report: false);
         final about = await link.stub.getAbout(GetAboutRequest(apiVersion: apiVersion));
         if (about.hasError()) throw CoreFailure(about.error.userMessageKey);
-        serverlessAvailable = about.about.contract.capabilities.contains('serverless');
+        coreCapabilities = about.about.contract.capabilities.toSet();
+        serverlessAvailable = coreCapabilities.contains('serverless');
         localProxy = about.about.hasLocalProxy() ? about.about.localProxy : null;
         if (failure?.key == CoreFailure.unavailable.key) failure = null;
         recovered('core');
         _watchSubscriptions();
         _watchSession();
         notifyListeners();
+        if (_pendingSelection != null) unawaited(_applySelection());
         if ((settings.connectOnStart || settings.resumeAfterUpdate) && !_startedOnce && phase == Phase.off) {
           // Auto-connect only once per launch so core reconnection cannot undo
           // an explicit disconnect.
@@ -405,6 +406,7 @@ class Sora extends ChangeNotifier {
       await _cancelWatches();
       _link = null;
       serverlessAvailable = false;
+      coreCapabilities = {};
       await link.close();
       phase = Phase.offline;
       stats = null;
@@ -698,6 +700,7 @@ class Sora extends ChangeNotifier {
 
   Future<void> disconnect() async {
     _selectionRevision++;
+    _pendingSelection = null;
     final link = _link;
     if (link == null || _stopping) return;
     failure = null;
@@ -751,20 +754,35 @@ class Sora extends ChangeNotifier {
     await _replan();
     if (_stopping ||
         _disposed ||
-        (phase != Phase.connected && phase != Phase.reconnecting && _connectionWork == null)) {
+        (phase != Phase.connected && phase != Phase.reconnecting && _connectionWork == null && sessionId == null)) {
       return;
     }
-    final revision = ++_selectionRevision;
+    _pendingSelection = ++_selectionRevision;
+    await _applySelection();
+  }
+
+  Future<void> _applySelection() {
+    final revision = _pendingSelection;
     final link = _link;
     // Collapse queued clicks to the last selection. Core Connect validates
     // the replacement before stopping the old session.
-    await (_locationWork = _locationWork.then((_) async {
+    return _locationWork = _locationWork.then((_) async {
       await _connectionWork?.future;
-      if (_disposed || _stopping || link != _link || revision != _selectionRevision) return;
+      if (_disposed ||
+          _stopping ||
+          link == null ||
+          link != _link ||
+          revision == null ||
+          revision != _selectionRevision) {
+        return;
+      }
       if ((phase == Phase.connected || phase == Phase.reconnecting) && currentPlan != _activePlan) {
         await connect();
       }
-    }));
+      if (link == _link && revision == _selectionRevision && failure?.key != CoreFailure.unavailable.key) {
+        _pendingSelection = null;
+      }
+    });
   }
 
   /// Applies settings and stages connection changes. Disable [replan] for
@@ -983,6 +1001,7 @@ class Sora extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    browserDiagnostics.clear();
     unawaited(_probeCall?.cancel());
     _drop(CoreFailure.unavailable);
     _statsTimer?.cancel();

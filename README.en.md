@@ -37,8 +37,8 @@ The scripts download the latest release, verify checksums and install the app an
 - Blocks internet access when the VPN drops if the kill switch is enabled.
 - Routes selected sites, IP addresses and apps directly, through the VPN, or blocks them.
 - On Linux, bypasses some blocks without a server using zapret. This mode does not hide your IP address or replace a VPN.
-- Opens speed test services inside the app, keeps notification history and shows logs and active connections.
-- Runs in the tray, starts at login and installs updates from the app. Includes Russian and English, light and dark themes.
+- Opens speed test services inside the app, keeps notification history and shows categorized logs with export.
+- Runs in the tray, starts at login and installs updates from the app. Includes 31 interface languages, light and dark themes.
 
 ## Documentation
 
@@ -51,6 +51,7 @@ These guides are in Russian.
 - [Architecture](docs/architecture.md)
 - [Development and building](docs/development.md)
 - [Changelog](CHANGELOG.md)
+- [Plans](PLANS.md)
 
 ## License
 

@@ -12,6 +12,7 @@ import '../groups.dart';
 import '../core/link.dart';
 import '../sora.dart';
 import 'kit.dart';
+import 'language.dart';
 import 'servers.dart';
 import 'tour.dart';
 import 'modes.dart';
@@ -59,10 +60,12 @@ class _ConnectionPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const Align(alignment: Alignment.centerRight, child: LanguageButton()),
+          const SizedBox(height: 8),
           const _Status(),
           if (SoraScope.of(context).cleanupPending)
             TextButton(

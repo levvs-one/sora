@@ -67,6 +67,8 @@ dev_dependencies:
 dependency_overrides:
   webview_all_linux:
     path: third_party/webview_all_linux
+  webview_all_windows:
+    path: third_party/webview_all_windows
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

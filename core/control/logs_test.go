@@ -179,3 +179,25 @@ func TestConnectionCenterListsAndCloses(t *testing.T) {
 		t.Fatalf("close = %v, closed %v", err, eng.closed)
 	}
 }
+
+func TestExportCategoryAndFilterApplyToEveryFormat(t *testing.T) {
+	server, center, _ := newLogServer(t, newStubEngine())
+	center.Write(time.Now(), logs.LevelError, "xray", "TUN failed: wanted")
+	center.Write(time.Now(), logs.LevelInfo, "xray", "TUN ready")
+	center.Write(time.Now(), logs.LevelError, "mihomo", "TUN failed: other")
+	for _, format := range []corev1.LogExportFormat{corev1.LogExportFormat_LOG_EXPORT_FORMAT_UNSPECIFIED, corev1.LogExportFormat_LOG_EXPORT_FORMAT_LOG, corev1.LogExportFormat_LOG_EXPORT_FORMAT_JSON, corev1.LogExportFormat_LOG_EXPORT_FORMAT_JSON_LINES, corev1.LogExportFormat_LOG_EXPORT_FORMAT_CSV, corev1.LogExportFormat_LOG_EXPORT_FORMAT_XML, corev1.LogExportFormat_LOG_EXPORT_FORMAT_ZIP, corev1.LogExportFormat_LOG_EXPORT_FORMAT_GZIP} {
+		answer, err := server.ExportLogs(context.Background(), &corev1.ExportLogsRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken, Format: format, Category: "tun", Filter: &corev1.LogFilter{MinLevel: corev1.LogLevel_LOG_LEVEL_ERROR, Sources: []string{"xray"}, Contains: "wanted", Pattern: "tun"}})
+		if err != nil || answer.GetError() != nil || !strings.HasPrefix(answer.GetFileName(), "sora-log_tun_") || len(answer.GetData()) == 0 {
+			t.Fatalf("format %v = %+v, %v", format, answer, err)
+		}
+		if format != corev1.LogExportFormat_LOG_EXPORT_FORMAT_ZIP && format != corev1.LogExportFormat_LOG_EXPORT_FORMAT_GZIP {
+			if !strings.Contains(string(answer.GetData()), "wanted") || strings.Contains(string(answer.GetData()), "other") || strings.Contains(string(answer.GetData()), "ready") {
+				t.Fatalf("filter ignored in %v: %s", format, answer.GetData())
+			}
+		}
+	}
+	bad, err := server.ExportLogs(context.Background(), &corev1.ExportLogsRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken, Category: "../secret"})
+	if err != nil || bad.GetError() == nil {
+		t.Fatalf("unsafe category = %+v, %v", bad, err)
+	}
+}

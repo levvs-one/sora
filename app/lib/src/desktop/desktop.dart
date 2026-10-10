@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ffi';
 import 'dart:isolate';
-import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:app_links/app_links.dart';
 import 'package:dbus/dbus.dart';
@@ -105,11 +104,7 @@ class Desktop with WindowListener {
     _changed();
   }
 
-  S get _s {
-    final chosen = sora.settings.language;
-    final locale = chosen == 'system' ? PlatformDispatcher.instance.locale : Locale(chosen);
-    return lookupS(S.delegate.isSupported(locale) ? locale : const Locale('en'));
-  }
+  S get _s => sora.strings;
 
   // Showing a hidden window does not guarantee focus; request both.
 

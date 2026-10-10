@@ -51,7 +51,7 @@ void main() {
             try {
               final result = await controller
                   .runJavaScriptReturningResult(
-                    "location.href !== 'about:blank' && document.readyState === 'complete' && document.body.innerText.length > 40",
+                    "location.hostname === ${jsonEncode(Uri.parse(url).host)} && document.readyState === 'complete' && document.body.innerText.length > 40",
                   )
                   .timeout(const Duration(seconds: 5));
               final current = await controller.currentUrl();
@@ -60,6 +60,25 @@ void main() {
                 previous = controller;
                 final title = await controller.getTitle();
                 debugPrint('Browser cycle $reopen: $current — $title');
+                if (Platform.isLinux && reopen == 0 && Platform.environment['SORA_SHOTS'] != null) {
+                  final output = '${Platform.environment['HOME']!}/.local/share/sora-dev/shots';
+                  await Directory(output).create(recursive: true);
+                  final capture = await Process.run('ffmpeg', [
+                    '-loglevel',
+                    'error',
+                    '-y',
+                    '-f',
+                    'x11grab',
+                    '-video_size',
+                    '1120x760',
+                    '-i',
+                    Platform.environment['DISPLAY']!,
+                    '-frames:v',
+                    '1',
+                    '$output/browser-native-${Uri.parse(url).host}.png',
+                  ]);
+                  expect(capture.exitCode, 0, reason: '${capture.stderr}');
+                }
                 loaded = true;
                 break;
               }

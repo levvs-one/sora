@@ -1,0 +1,477 @@
+{
+  "@@locale": "bn",
+  "stateOff": "সংযুক্ত নয়",
+  "stateConnecting": "সংযোগ করা হচ্ছে",
+  "stateConnected": "সংযুক্ত",
+  "stateReconnecting": "পুনরায় সংযোগ করা হচ্ছে",
+  "stateDisconnecting": "সংযোগ বিচ্ছিন্ন করা হচ্ছে",
+  "stateFailed": "সংযুক্ত নয়",
+  "coreMissing": "Sora পরিষেবা সাড়া দিচ্ছে না৷",
+  "serverAuto": "দ্রুততম",
+  "serverBypass": "সার্ভার নেই",
+  "addSubscription": "সদস্যতা যোগ করুন",
+  "servers": "সার্ভার",
+  "settings": "সেটিংস",
+  "subscription": "সাবস্ক্রিপশন",
+  "subscriptionLink": "সাবস্ক্রিপশন লিঙ্ক",
+  "add": "যোগ করুন",
+  "refresh": "আপডেট",
+  "rename": "নাম পরিবর্তন করুন",
+  "delete": "মুছে দিন",
+  "cancel": "বাতিল করুন",
+  "save": "সংরক্ষণ করুন",
+  "name": "নাম",
+  "deleteSubscription": "\"{name}\" মুছবেন?",
+  "routes": "রুট",
+  "presetGlobal": "VPN এর মাধ্যমে সবকিছু",
+  "presetRu": "সরাসরি রাশিয়া",
+  "presetIr": "সরাসরি ইরান",
+  "presetCn": "চীন সরাসরি",
+  "blockAds": "বিজ্ঞাপন ব্লক করুন",
+  "killSwitch": "শুধুমাত্র VPN এর মাধ্যমে ইন্টারনেট",
+  "engine": "ইঞ্জিন",
+  "engineAuto": "অটো",
+  "animations": "অ্যানিমেশন",
+  "logs": "লগ",
+  "about": "সম্পর্কে",
+  "logsAll": "সব",
+  "logsImportant": "গুরুত্বপূর্ণ",
+  "logsErrors": "ত্রুটি",
+  "search": "অনুসন্ধান করুন",
+  "export": "ফাইলে সংরক্ষণ করুন",
+  "clear": "পরিষ্কার",
+  "logsEmpty": "এখানে কিছুই নেই",
+  "appVersion": "সংস্করণ {version}",
+  "notInstalled": "ইনস্টল করা হয়নি",
+  "sourceCode": "সোর্স কোড",
+  "license": "লাইসেন্স",
+  "usage": "{total} এর {used}",
+  "until": "{date} পর্যন্ত",
+  "expired": "মেয়াদ শেষ",
+  "milliseconds": "{n} ms",
+  "bytesB": "{n} বি",
+  "bytesKB": "{n} KB",
+  "bytesMB": "{n} MB",
+  "bytesGB": "{n} জিবি",
+  "bytesTB": "{n} টিবি",
+  "errGeneric": "কিছু ভুল হয়েছে",
+  "errCore": "Sora পরিষেবা সাড়া দিচ্ছে না৷",
+  "errAuth": "Sora পরিষেবাতে কোনও অ্যাক্সেস নেই৷",
+  "errVersion": "Sora আপডেট করুন: অ্যাপ এবং পরিষেবাটি ভিন্ন সংস্করণ",
+  "errBusy": "অপেক্ষা করুন, আগের কমান্ডটি এখনও চলছে",
+  "errEngineMissing": "এই সার্ভারের জন্য কোনো ইঞ্জিন পাওয়া যায়নি",
+  "errEngineStart": "ইঞ্জিন চালু হয়নি",
+  "errEngineStopped": "ইঞ্জিন থেমে গেল",
+  "errTunnel": "ভিপিএন সংযোগ তৈরি করার অনুমতি নেই",
+  "errServers": "সার্ভারটি একটি ত্রুটির সাথে কনফিগার করা হয়েছে৷",
+  "errNetwork": "সার্ভারে পৌঁছানো যাচ্ছে না",
+  "errTimeout": "সার্ভার সময়মত উত্তর দেয়নি",
+  "errFirewall": "VPN এর বাইরে ইন্টারনেট ব্লক করা যায়নি",
+  "errSubFetch": "সদস্যতা লোড করা যায়নি",
+  "errSubFormat": "এটি একটি সাবস্ক্রিপশন লিঙ্ক নয়",
+  "errSubEmpty": "সাবস্ক্রিপশনের কোনো সার্ভার নেই",
+  "errSubDuplicate": "এই সদস্যতা ইতিমধ্যে যোগ করা হয়েছে",
+  "errSubLimit": "অনেক বেশি সদস্যতা",
+  "errSubScheme": "লিঙ্কটি অবশ্যই https:// দিয়ে শুরু হবে",
+  "errSecretStore": "Sora স্টোরেজ ক্ষতিগ্রস্ত বা অনুপলব্ধ",
+  "errNoServers": "সংযোগ করতে একটি সদস্যতা যোগ করুন",
+  "exportText": "পাঠ্য",
+  "connections": "সংযোগ",
+  "close": "বন্ধ",
+  "chainDirect": "সরাসরি",
+  "chainBlocked": "অবরুদ্ধ",
+  "theme": "থিম",
+  "themeSystem": "System",
+  "themeLight": "আলো",
+  "themeDark": "অন্ধকার",
+  "language": "ভাষা",
+  "languageSystem": "System",
+  "sectionConnection": "সংযোগ",
+  "sectionNoServer": "সার্ভার নেই",
+  "sectionPing": "পিং",
+  "sectionLog": "ডায়াগনস্টিকস",
+  "ipv6": "IPv6",
+  "dns": "ডিএনএস",
+  "dnsAuto": "অটো",
+  "dnsHint": "ঠিকানা, কমা পৃথক",
+  "fragment": "TLS ফ্র্যাগমেন্টেশন",
+  "fragmentPackets": "কি বিভক্ত করা",
+  "fragmentLength": "টুকরা আকার",
+  "fragmentInterval": "টুকরা মধ্যে বিরতি",
+  "byDefault": "ডিফল্ট",
+  "rangeHint": "উদাহরণস্বরূপ, 100-200",
+  "splitPos": "বিভক্ত অবস্থান",
+  "splitPosHint": "উদাহরণস্বরূপ, 1, midsld",
+  "disorder": "টুকরা পুনর্বিন্যাস",
+  "tlsRecord": "TLS রেকর্ড বিভক্ত করুন",
+  "tlsRecordNo": "না",
+  "tlsRecordSni": "সাইটের নামে",
+  "tlsRecordFirst": "প্রথম বাইট পরে",
+  "hostCase": "হোস্ট কেস পরিবর্তন করুন",
+  "probeMethod": "পদ্ধতি",
+  "probeAuto": "অটো",
+  "probeEngine": "ইঞ্জিনের মাধ্যমে",
+  "probeConnect": "শুধুমাত্র সংযোগ",
+  "probeUrl": "পরীক্ষার ঠিকানা",
+  "probeTimeout": "অপেক্ষা করুন",
+  "seconds": "{n} s",
+  "subscriptions": "সদস্যতা",
+  "subscriptionSettings": "সেটিংস",
+  "userAgent": "ব্যবহারকারী-এজেন্ট",
+  "autoUpdate": "স্বয়ংক্রিয়ভাবে আপডেট করুন",
+  "updateInterval": "কত ঘন ঘন",
+  "intervalProvider": "প্রদানকারী জিজ্ঞাসা হিসাবে",
+  "hours": "{n} জ",
+  "updateNow": "এখনই আপডেট করুন",
+  "logLevel": "কি রেকর্ড করতে হবে",
+  "levelDebug": "সবকিছু",
+  "levelInfo": "স্বাভাবিক",
+  "levelWarning": "গুরুত্বপূর্ণ",
+  "levelError": "শুধুমাত্র ত্রুটি",
+  "recordDestinations": "সাইটের ঠিকানা রেকর্ড করুন",
+  "reset": "সেটিংস রিসেট করুন",
+  "resetConfirm": "সব সেটিংস রিসেট করবেন?",
+  "resetAction": "রিসেট করুন",
+  "invalidValue": "এই মান কাজ করবে না",
+  "website": "সদস্যতা পৃষ্ঠা",
+  "providerWebsite": "প্রদানকারী ওয়েবসাইট",
+  "support": "সমর্থন",
+  "controlPortQuestion": "{engine} এই কম্পিউটারে একটি পোর্টের মাধ্যমে নিয়ন্ত্রিত হয়। অন্যান্য প্রোগ্রাম বলতে সক্ষম হবে যে একটি VPN চালু আছে।",
+  "chooseEngine": "{engine} বেছে নিন",
+  "rules": "কাস্টম নিয়ম",
+  "ruleAdd": "নতুন নিয়ম",
+  "ruleHint": "সাইট, আইপি বা প্রোগ্রাম",
+  "ruleDirect": "সরাসরি",
+  "ruleProxy": "ভিপিএন এর মাধ্যমে",
+  "ruleBlock": "ব্লক",
+  "failover": "ব্যর্থতা চালু করুন",
+  "connectOnStart": "শুরুতে সংযোগ করুন",
+  "trafficLow": "{name}: {left} বাকি",
+  "ruleInvalid": "এটি একটি সাইট, একটি আইপি বা একটি প্রোগ্রাম মত দেখায় না",
+  "tunnelMode": "মোড",
+  "tunnelTun": "সমস্ত ট্রাফিক",
+  "tunnelProxy": "System প্রক্সি",
+  "proxyAddress": "প্রক্সি ঠিকানা",
+  "copied": "কপি করা হয়েছে",
+  "launchAtLogin": "সিস্টেম দিয়ে শুরু করুন",
+  "closeToTray": "বন্ধ হয়ে গেলে ট্রেতে রাখুন",
+  "notifications": "বিজ্ঞপ্তি",
+  "trayOpen": "Sora খুলুন",
+  "trayConnect": "সংযোগ করুন",
+  "trayDisconnect": "সংযোগ বিচ্ছিন্ন করুন",
+  "trayServer": "সার্ভার",
+  "trayQuit": "Sora প্রস্থান করুন",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora: {state}, {server}",
+  "noticeInTray": "Sora এখনও ট্রেতে আছে",
+  "noticeInTrayBody": "এর আইকনের মেনু থেকে প্রস্থান করুন",
+  "noticeLost": "সংযোগ বিচ্ছিন্ন",
+  "noticeLostBody": "Sora পুনরায় সংযোগ করা হচ্ছে৷",
+  "noticeRestored": "আবার সংযুক্ত",
+  "noticeFailed": "সংযোগ করা যায়নি",
+  "noticeBackup": "প্রধান সার্ভার উত্তর দেয়নি; ব্যাকআপ ট্রাফিক বহন করে",
+  "noticeNext": "সার্ভার উত্তর দেয়নি; পরেরটি ট্রাফিক বহন করে",
+  "noticeMainBack": "প্রধান সার্ভার আবার উত্তর দেয় এবং ট্রাফিক বহন করে",
+  "noticeSubscription": "সাবস্ক্রিপশন",
+  "importTitle": "এই সদস্যতা যোগ করবেন?",
+  "importSealed": "এই লিঙ্কটি Happ এর জন্য এনক্রিপ্ট করা হয়েছে এবং শুধুমাত্র Happ এটি পড়তে পারে৷ প্লেইন সাবস্ক্রিপশন লিঙ্কের জন্য আপনার প্রদানকারীকে জিজ্ঞাসা করুন।",
+  "understood": "ঠিক আছে",
+  "noAnswer": "কোন উত্তর নেই",
+  "home": "বাড়ি",
+  "navRules": "নিয়ম",
+  "navConnections": "সংযোগ",
+  "navLogs": "লগ",
+  "navAbout": "সম্পর্কে",
+  "sidebarToggle": "সাইডবার টগল করুন",
+  "more": "আরও",
+  "less": "কম",
+  "currentServer": "বর্তমান সার্ভার",
+  "trafficDown": "ডাউনলোড করা হয়েছে",
+  "trafficUp": "আপলোড করা হয়েছে",
+  "perSecond": "{value}/s",
+  "activeRules": "সক্রিয় নিয়ম: {count}",
+  "recentNotifications": "সাম্প্রতিক বিজ্ঞপ্তি",
+  "notificationsEmpty": "সংযোগ এবং সদস্যতা ইভেন্ট এখানে প্রদর্শিত হবে",
+  "retryConnect": "সংযোগ পুনরায় চেষ্টা করুন",
+  "openLogs": "লগ খুলুন",
+  "tourReplay": "আবার গাইড দেখান",
+  "tourStep": "5 এর মধ্যে {step} ধাপ",
+  "tourBack": "ব্যাক",
+  "tourNext": "পরবর্তী",
+  "tourSkip": "এড়িয়ে যান",
+  "tourFinish": "সম্পন্ন",
+  "tourAdd": "আপনার প্রদানকারীর সদস্যতা লিঙ্ক যোগ করুন.",
+  "tourServer": "একটি সার্ভার চয়ন করুন। \"দ্রুততম\" আপনার জন্য একটি নির্বাচন করে।",
+  "tourConnect": "সংযোগ বা সংযোগ বিচ্ছিন্ন করতে এখানে ক্লিক করুন.",
+  "tourMode": "একটি মোড চয়ন করুন. VPN কমে গেলে কিল সুইচ ইন্টারনেট ব্লক করে।",
+  "tourSettings": "সেটিংস খুলুন। আপনি সেখানে এই নির্দেশিকা পুনরায় চালাতে পারেন।",
+  "chooseProgram": "একটি প্রোগ্রাম চয়ন করুন",
+  "installedApps": "ইনস্টল করা অ্যাপ্লিকেশন",
+  "runningProcesses": "চলমান প্রক্রিয়া",
+  "programsFailed": "অ্যাপ্লিকেশন লোড করা যায়নি",
+  "programsEmpty": "কোন অ্যাপ্লিকেশন পাওয়া যায়নি. অন্য নাম চেষ্টা করুন.",
+  "selectExe": "একটি .exe ফাইল নির্বাচন করুন",
+  "trafficUnavailable": "কাউন্টার এখনও উপলব্ধ নেই",
+  "speedtest": "গতি",
+  "speedtestCheck": "গতি পরীক্ষা করুন",
+  "speedtestSearch": "একটি পরিষেবা খুঁজুন",
+  "speedtestEmpty": "কোন মিল নেই। অনুসন্ধান পরিবর্তন করুন.",
+  "speedtestBackToList": "পরিষেবাগুলিতে ফিরে যান",
+  "speedtestOpenBrowser": "ব্রাউজারে খুলুন",
+  "speedtestUnavailable": "এমবেড করা ব্রাউজারটি শুরু করা যায়নি। আপনার সিস্টেম ব্রাউজারে পরিষেবাটি খুলুন।",
+  "speedtestPageFailed": "পৃষ্ঠাটি লোড করা যায়নি। এটি পুনরায় লোড করুন বা আপনার সিস্টেম ব্রাউজারে পরিষেবাটি খুলুন।",
+  "speedtestExternalFailed": "সিস্টেম ব্রাউজার খুলতে পারেনি. আবার চেষ্টা করুন",
+  "modes": "মোড",
+  "proxyShort": "প্রক্সি",
+  "tunMode": "সমস্ত ট্রাফিক (TUN)",
+  "checkUpdates": "আপডেটের জন্য চেক করুন",
+  "updates": "অ্যাপ আপডেট",
+  "updateAvailable": "{version} সংস্করণ উপলব্ধ",
+  "updateOpenAbout": "আপডেট দেখুন",
+  "updateNotes": "{version} এ পরিবর্তন",
+  "updateCheck": "আপডেটের জন্য চেক করুন",
+  "updateChecking": "পরীক্ষা করা হচ্ছে...",
+  "updateNoNotes": "রিলিজ কোন নোট আছে.",
+  "updateDropWarning": "Sora এবং এর মূল আপডেটের সময় VPN সংযোগটি কয়েক সেকেন্ডের জন্য নেমে যাবে। চালিয়ে যান?",
+  "updateWaitConnection": "ভিপিএন সংযোগ এবং কোর প্রস্তুত হওয়ার জন্য অপেক্ষা করুন।",
+  "updateDownloading": "ফাইল ডাউনলোড এবং যাচাই করা হচ্ছে...",
+  "updateInstalling": "আপডেট প্রস্তুত করা হচ্ছে বা প্রশাসকের প্রমাণীকরণের জন্য অপেক্ষা করা হচ্ছে...",
+  "updateNetworkError": "আপডেট ডাউনলোড করা যায়নি. আবার চেষ্টা করুন",
+  "updateReleaseError": "রিলিজ ডেটা বা প্রয়োজনীয় ফাইলগুলি অনুপস্থিত বা অবৈধ৷",
+  "updateChecksumError": "ডাউনলোডটি SHA256SUMS-এর সাথে মেলে না৷ কিছুই ইনস্টল করা হয়নি।",
+  "updateInstallError": "আপডেট শেষ হয়নি। প্রমাণীকরণ বাতিল করা হতে পারে.",
+  "updateUnsupported": "এই এক্সিকিউটেবল একটি সমর্থিত Sora প্যাকেজ জোড়ার মালিকানাধীন নয়। রিলিজ ইনস্টলেশন নির্দেশাবলী ব্যবহার করুন.",
+  "updateManual": "উভয় যাচাইকৃত প্যাকেজ ইনস্টল করতে একটি টার্মিনালে এই কমান্ডটি চালান, তারপর Sora পুনরায় খুলুন। ফাইলগুলি ডাউনলোড ডিরেক্টরিতে থাকে। ভিপিএন কানেকশন বন্ধ হয়ে যাবে।",
+  "updateCopyCommand": "কমান্ড অনুলিপি করুন",
+  "updateChecksDisabled": "সেটিংসে স্বয়ংক্রিয় চেক অক্ষম করা হয়েছে৷",
+  "updateInstalled": "আপডেট ইনস্টল করা হয়েছে। Sora আবার খুলুন।",
+  "projectLinks": "প্রকল্প",
+  "githubReleases": "রিলিজ এবং ডাউনলোড",
+  "telegramChannel": "Telegram চ্যানেল",
+  "licenses": "লাইসেন্স",
+  "componentLicenses": "কম্পোনেন্ট লাইসেন্স",
+  "appCopyright": "© 2026 levvs-one এবং অবদানকারী",
+  "collapseServers": "সার্ভার সঙ্কুচিত করুন",
+  "expandServers": "সার্ভার প্রসারিত করুন",
+  "hideDescription": "বর্ণনা লুকান",
+  "showDescription": "বর্ণনা দেখান",
+  "pendingConnectionChanges": "এই পরিবর্তনগুলি প্রয়োগ করতে পুনরায় সংযোগ করুন৷",
+  "reconnectNow": "আবেদন করুন এবং পুনরায় সংযোগ করুন",
+  "bypassLimitations": "এই মোডটি শুধুমাত্র HTTP এবং TLS-এর জন্য DPI বাইপাস করে, UDP সমর্থন করে না বা আপনার IP পরিবর্তন করে না। Discord ভয়েস, কল এবং ব্লক করা Telegram ঠিকানাগুলির জন্য একটি VPN সার্ভার ব্যবহার করুন৷",
+  "errEngineUnsupported": "নির্বাচিত ইঞ্জিন এই প্রোফাইল বা সেটিংস সমর্থন করে না। অটো বা একটি সামঞ্জস্যপূর্ণ ইঞ্জিন চয়ন করুন.",
+  "errRestore": "সংযোগ পরিষ্কার অসম্পূর্ণ ছিল. সংযোগ বিচ্ছিন্ন করার পুনরায় চেষ্টা করুন; বিস্তারিত জানার জন্য লগ দেখুন।",
+  "errSessionEnded": "এই অধিবেশন ইতিমধ্যে শেষ হয়েছে. সংযোগের অবস্থা রিফ্রেশ করুন।",
+  "retryDisconnect": "সংযোগ বিচ্ছিন্ন করার পুনরায় চেষ্টা করুন",
+  "tunStack": "TUN স্ট্যাক",
+  "modesInfo": "মোড সম্পর্কে",
+  "modesGuideTitle": "মোড এবং ইঞ্জিন",
+  "probeServers": "সার্ভার চেক করুন",
+  "expiresIn": "{name}: {days, plural, =0{সাবস্ক্রিপশন কয়েক ঘন্টার মধ্যে শেষ হয়} one{সদস্যতা # দিনে শেষ হয়} other{সদস্যতা # দিনের মধ্যে শেষ হয়}}",
+  "groupOrdered": "{count, plural, one{# সার্ভার, ঘুরে} other{# সার্ভার, ঘুরে}}",
+  "groupBest": "{count, plural, one{# সার্ভার, দ্রুততম} other{# সার্ভার, দ্রুততম}}",
+  "modesGuide": "আপনার সার্ভারের কোন ইঞ্জিনের প্রয়োজন তা আপনি নিশ্চিত না হলে অটো বেছে নিন। Sora সংযোগ করার আগে প্রোফাইল এবং সেটিংস পরীক্ষা করে। একটি ইঞ্জিন আপনার পরিকল্পনার ব্যান্ডউইথ বাড়াতে পারে না: কর্মক্ষমতা সার্ভার, রুট, প্রোটোকল এবং নেটওয়ার্কের উপর নির্ভর করে।\n\n## মোড\n\n### সমস্ত ট্রাফিক (TUN)\n\nSora একটি ভার্চুয়াল নেটওয়ার্ক ইন্টারফেস তৈরি করে এবং TCP এবং UDP সহ এর মাধ্যমে অ্যাপ্লিকেশন ট্র্যাফিককে রুট করে। Telegram, গেমস এবং Discord ভয়েসের জন্য এই মোডটি ব্যবহার করুন। নিয়ম নির্দিষ্ট সাইট বা প্রোগ্রাম সরাসরি পাঠাতে বা তাদের ব্লক করতে পারে। নেটওয়ার্ক পরিষেবার অনুমতি প্রয়োজন এবং একটি সার্ভার যা প্রয়োজনীয় প্রোটোকল সমর্থন করে৷\n\n### System প্রক্সি\n\nSora একটি স্থানীয় HTTP/SOCKS প্রক্সি কনফিগার করে। যে অ্যাপ্লিকেশনগুলি সিস্টেম প্রক্সি সেটিংসকে সম্মান করে তারা এটি ব্যবহার করে। তাদের নিজস্ব নেটওয়ার্ক স্ট্যাকের সাথে অ্যাপ্লিকেশন সরাসরি সংযুক্ত হতে পারে; UDP এবং ভয়েস কলের জন্য সাধারণত TUN প্রয়োজন। এই মোডটি প্রক্সি সমর্থন সহ ব্রাউজার এবং অ্যাপ্লিকেশনগুলির জন্য উপযুক্ত৷\n\n### সার্ভার নেই\n\nLinux-এ, Sora HTTP/TLS অনুরোধগুলিকে বিভক্ত ও পুনরায় আকার দিতে এবং কিছু DPI চেক বাইপাস করতে [zapret](https://github.com/bol-van/zapret) ব্যবহার করে। আপনার আইপি একই থাকে এবং সংযোগগুলি সরাসরি ওয়েবসাইটে যায়। ফলাফল আপনার প্রদানকারী এবং ব্লকিং পদ্ধতির উপর নির্ভর করে।\n\nবর্তমান ইন্টিগ্রেশন টিসিপির উপর HTTP এবং TLS এর জন্য tpws ব্যবহার করে। এটি আইপি ব্লকিং বা রিলে ইউডিপি বাইপাস করে না এবং Telegram এর MTProto সংযোগের গ্যারান্টি দিতে পারে না। Discord ভয়েস, Telegram কল এবং এই ধরনের বিধিনিষেধের জন্য TUN সহ একটি VPN সার্ভার ব্যবহার করুন৷\n\n## ইঞ্জিন\n\n### অটো\n\nSora একটি ইনস্টল করা ইঞ্জিন নির্বাচন করে যা সম্পূর্ণ সংযোগ পরিকল্পনা সমর্থন করে: সার্ভার প্রোটোকল, পরিবহন, গ্রুপ, ফ্র্যাগমেন্টেশন এবং মোড। বর্তমান সংযোগ বন্ধ করার আগে একটি বেমানান ম্যানুয়াল পছন্দ প্রত্যাখ্যান করা হয়। অটো বা অন্য ইঞ্জিন নির্বাচন করুন এবং সেটিংস আবার প্রয়োগ করুন।\n\n### sing-box\n\nনতুন Sora প্যাকেজগুলির মধ্যে রয়েছে [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) এর একটি কাঁটা, ক্লায়েন্ট-সাইড XHTTP এবং VLESS Encryption যোগ করা। Sora বিল্ড এবং এর ক্ষমতাকে স্বীকৃতি দেয়। XHTTP ছাড়া একটি আপস্ট্রিম বিল্ড শুধুমাত্র তার নাম থেকে এই ক্ষমতা অর্জন করে না।\n\nসমর্থিত প্রোটোকলগুলির মধ্যে রয়েছে VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard এবং AmneziaWG 1.x/2.x-এর সেই প্যারামিটারগুলি যা Sora আমদানি করতে পারে। সম্পূর্ণ Xray JSON প্রোফাইলের জন্য Xray প্রয়োজন। নতুন AWG 3.x ফিল্ড এখনও আমদানি করা যায় না। sing-box একটি পাসওয়ার্ড-সুরক্ষিত স্থানীয় নিয়ন্ত্রণ পোর্ট ব্যবহার করে, যা কম্পিউটারের অন্য অ্যাপ্লিকেশনগুলি শনাক্ত করতে পারে।\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption এবং TLS ফ্র্যাগমেন্টেশন সমর্থন করে। এটি সম্পূর্ণ প্রদানকারী Xray প্রোফাইলগুলিকে তাদের রাউটিং এবং গোষ্ঠীগুলি সংরক্ষণ করে চালায়। এই ধরনের প্রোফাইলগুলি তাদের আচরণ পরিবর্তন না করে স্বয়ংক্রিয়ভাবে অন্য ইঞ্জিনে রূপান্তরিত হতে পারে না।\n\nবান্ডেল করা Xray সেটিংটি সরিয়ে দিয়েছে যা TLS শংসাপত্র যাচাইকরণ (`allowInsecure`) অক্ষম করে। স্বয়ংক্রিয়ভাবে sing-box বা mihomo সাধারণ সার্ভারগুলির জন্য এই সেটিং প্রয়োজন। Xray নির্বাচন করা বর্তমান সংযোগ বন্ধ করার আগে ম্যানুয়ালি অসামঞ্জস্যতার প্রতিবেদন করে। পুরানো সম্পূর্ণ JSON প্রোফাইলগুলির একটি যাচাইযোগ্য শংসাপত্র বা শংসাপত্র পিন সহ একটি আপডেট প্রদানকারী প্রোফাইল প্রয়োজন৷\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) অর্ডার করা ফলব্যাক এবং লোড-ব্যালেন্সিং গ্রুপ, XHTTP এবং AmneziaWG সমর্থন করে। ব্যাকআপ সার্ভারে স্বয়ংক্রিয়ভাবে ব্যর্থ হলে এটি নির্বাচন করুন। Sora এর TLS ফ্র্যাগমেন্টেশন সেটিং এই ইঞ্জিনের সাথে অনুপলব্ধ৷\n\n## Sora এ সামঞ্জস্যপূর্ণ\n\n| বৈশিষ্ট্য | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN এবং TCP/UDP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| XHTTP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| VLESS Encryption | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| সম্পূর্ণ Xray প্রোফাইল | না | হ্যাঁ | না |\n| TUIC / AnyTLS | উভয় | না | TUIC |\n| TLS ফ্র্যাগমেন্টেশন | হ্যাঁ | হ্যাঁ | না |\n| AmneziaWG 1.x/2.x | হ্যাঁ¹ | না | হ্যাঁ |\n| অর্ডার ফলব্যাক গ্রুপ | না | No² | হ্যাঁ |\n\nJ1/J2/J3/Itime সহ প্রোফাইল mihomo ব্যবহার করে; এই ক্ষেত্রগুলি কখনই নীরবে বাতিল করা উচিত নয়। ² সম্পূর্ণ Xray প্রোফাইলের একটি গোষ্ঠীর জন্য, অ্যাপটি একটি ব্যাকআপ প্রোফাইল নির্বাচন করে। সমর্থন ইনস্টল করা বিল্ড উপর নির্ভর করে; সম্পর্কে এর সংস্করণ পরীক্ষা করুন।\n\n## TUN স্ট্যাক\n\nস্ট্যাক ভার্চুয়াল ইন্টারফেসের ভিতরে TCP এবং UDP পরিচালনা করে। মোড প্যানেলে, Xray এবং mihomo gVisor, System, Mixed এবং MIPS অফার করে। প্রতিটি ইঞ্জিন তার নিজস্ব পছন্দ সংরক্ষণ করে। System প্রক্সি এবং সার্ভারহীন মোড এই পছন্দ ব্যবহার করে না।\n\n- **Mixed** — TCP সিস্টেম স্ট্যাক ব্যবহার করে, যখন gVisor UDP পরিচালনা করে। এটি mihomo এর জন্য ডিফল্ট।\n- **System** — সিস্টেম স্ট্যাক ব্যবহার করে। নেটওয়ার্ক অ্যাপ্লিকেশন সমস্যা সম্মুখীন হলে অন্য বিকল্প চেষ্টা করুন.\n- **gVisor** — ইউজারস্পেসে ট্রাফিক পরিচালনা করে।\n- **MIPS** — mihomo এর নিজস্ব আইপি স্ট্যাক, বান্ডেল করা সংস্করণ 1.19.32-এ উপলব্ধ৷\n\nLinux-এ, Xray ডিফল্টরূপে এর অন্তর্নির্মিত gVisor ব্যবহার করে। System, Mixed এবং Linux-এ MIPS TUN ইঞ্জিন হিসাবে mihomo ব্যবহার করে, একটি প্রমাণীকৃত স্থানীয় SOCKS লিঙ্কের মাধ্যমে TCP এবং UDPকে Xray-এ ফরওয়ার্ড করে৷ Xray প্রোটোকল, প্রদানকারীর প্রোফাইল এবং রাউটিং ধরে রাখে। এই তিনটি বিকল্পের জন্য একটি ইনস্টল করা mihomo প্রয়োজন৷ Windows-এ, TUN বর্তমানে sing-box বা mihomo ব্যবহার করে; Xray সিস্টেম প্রক্সি মোডে চলে।\n\nসেতুটি একটি দ্বিতীয় প্রক্রিয়া চালায়। Linux-এ তিনটি নিষ্ক্রিয় পরিমাপে, এটি নেটিভ Xray TUN থেকে প্রায় 32-36 MiB বেশি শারীরিক মেমরি ব্যবহার করেছে। এটি ডাউনলোড লোড পরিমাপ করে না: CPU এবং মেমরি খরচ সংযোগের উপর নির্ভর করে। আপনার অন্য স্ট্যাকের প্রয়োজন না হলে gVisor রাখুন। sing-box কোনো স্ট্যাক নির্বাচক নেই। কোনও স্ট্যাক প্রতিটি নেটওয়ার্কে আরও ভাল পারফরম্যান্সের গ্যারান্টি দেয় না। একটি স্ট্যাক চয়ন করুন এবং আপনার নেটওয়ার্কে চেষ্টা করতে প্রয়োগ করুন এবং পুনরায় সংযোগ করুন নির্বাচন করুন৷\n\n## সেটিংস প্রয়োগ করা হচ্ছে\n\nএকটি সার্ভার নির্বাচন স্বয়ংক্রিয়ভাবে পুনরায় সংযোগ. মোড, ইঞ্জিন, DNS এবং নিয়ম সেটিংস অবিলম্বে সংরক্ষিত হয়; একটি সক্রিয় সংযোগের সময়, প্রয়োগ ক্লিক করুন এবং সেগুলি ব্যবহার করতে পুনরায় সংযোগ করুন৷ একটি ইঞ্জিন রিস্টার্ট করলে ডাউনলোড এবং কল বাধাগ্রস্ত হতে পারে। বারবার ক্লিক সমান্তরাল সংযোগ শুরু করে না; সংযোগ বিচ্ছিন্ন করা রূপান্তর শেষ করে এবং সংযোগটি ছেড়ে দেয়।\n\nএকটি টানেল নেমে গেলে শুধুমাত্র VPN এর মাধ্যমে ইন্টারনেট সরাসরি ট্রাফিক ব্লক করে। এটি পুরো মেশিনকে প্রভাবিত করে। একটি সুস্পষ্ট সংযোগ বিচ্ছিন্ন হলে Sora এর নিয়মগুলি সরিয়ে দেওয়া হয়। যদি ক্লিনআপ শেষ না হয়, আবার সংযোগ বিচ্ছিন্ন করার চেষ্টা করুন এবং লগটি খুলুন।\n\n## প্রকল্প ডকুমেন্টেশন\n\n- [sing-box-lx: কনফিগারেশন এবং সমর্থন](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ডকুমেন্টেশন](https://sing-box.sagernet.org/)\n- [Xray ডকুমেন্টেশন](https://xtls.github.io/)\n- [mihomo ডকুমেন্টেশন](https://wiki.metacubex.one/)\n- [zapret: অপারেশন এবং সীমাবদ্ধতা](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosticPackets": "প্যাকেট ক্যাপচার",
+  "diagnosticCapture": "10 সেকেন্ডের জন্য ক্যাপচার করুন",
+  "diagnosticHttp": "HTTP ডায়াগনস্টিকস",
+  "diagnosticNoData": "এখনও কোন রেকর্ড করা অনুরোধ. প্রথমে একটি গতি পরীক্ষার ওয়েবসাইট খুলুন।",
+  "diagnosticEvents": "উইন্ডোজ ইভেন্ট",
+  "extensionsSoon": "শীঘ্রই আসছে",
+  "extensions": "এক্সটেনশন",
+  "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.",
+  "diagnosticRequiresTun": "প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।",
+  "exportLogFile": "ফাইলে {name}",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}

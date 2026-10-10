@@ -146,16 +146,14 @@ class _SpeedtestScreenState extends State<SpeedtestScreen> {
                               key: ValueKey('speedtest-service-${service.url}'),
                               borderRadius: BorderRadius.circular(8),
                               onTap: () => _choose(service),
-                              child: SizedBox(
-                                height: 56,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(minHeight: 28),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                   child: Center(
                                     child: Text(
                                       service.name,
                                       textAlign: TextAlign.center,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
                                       style: Styles.bodyStrong.copyWith(color: palette.ink),
                                     ),
                                   ),
@@ -214,6 +212,12 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
   bool _ready = false;
   String? _failure;
   String? _mainUrl;
+  String? _language;
+  // _release awaits cancellation after taking ownership of this field.
+  // ignore: cancel_subscriptions
+  StreamSubscription<Map<String, dynamic>>? _network;
+  String? _networkOwner;
+  Sora? _sora;
   Timer? _deadline;
   Timer? _retryDelay;
   int _automaticRetries = 0;
@@ -228,6 +232,27 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(_start());
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sora = SoraScope.read(context);
+    final language = Localizations.localeOf(context).toLanguageTag();
+    if (_language == language) return;
+    final previous = _language;
+    _language = language;
+    if (previous != null) {
+      _generation++;
+      _deadline?.cancel();
+      _retryDelay?.cancel();
+      _retryDelay = null;
+      _automaticRetries = 0;
+      _failure = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_start());
+      });
+    }
   }
 
   @override
@@ -248,21 +273,32 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
   Future<void> _release() async {
     final controller = _controller;
     _controller = null;
+    final network = _network, previous = _releaseWork;
+    _network = null;
+    if (_networkOwner != null) _sora?.browserDiagnostics.detach(_networkOwner!);
+    _networkOwner = null;
     if (controller == null) {
-      await _releaseWork;
+      // Closing during an in-progress release must consume its failure too.
+      // The owner of that release reports the native error once.
+      await previous?.catchError((Object error) => debugPrint('Speedtest browser cleanup failed: $error'));
       return;
     }
-    try {
-      _releaseWork = (switch (controller.platform) {
+    final work = () async {
+      await previous?.catchError((Object error) => debugPrint('Speedtest browser cleanup failed: $error'));
+      await network?.cancel();
+      await switch (controller.platform) {
         final LinuxWebViewController platform => platform.dispose(),
         final WindowsWebViewController platform => platform.dispose(),
-        _ => null,
-      })?.catchError((Object error) => debugPrint('Speedtest browser cleanup failed: $error'));
-      await _releaseWork;
+        _ => Future<void>.value(),
+      };
+    }();
+    _releaseWork = work;
+    try {
+      await work;
     } catch (error) {
       debugPrint('Speedtest browser cleanup failed: $error');
     } finally {
-      _releaseWork = null;
+      if (identical(_releaseWork, work)) _releaseWork = null;
     }
   }
 
@@ -325,6 +361,25 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
           : WebViewController();
       // Attach the initialization error handler before other asynchronous calls.
       await controller.setJavaScriptMode(JavaScriptMode.unrestricted).timeout(const Duration(seconds: 25));
+      if (!mounted || generation != _generation) return;
+      final languages = [_language ?? 'en', if (_language != 'en') 'en'];
+      final platform = controller.platform;
+      switch (platform) {
+        case final LinuxWebViewController native:
+          await native.setPreferredLanguages(languages);
+          if (_network == null) {
+            _network = native.networkEvents.listen(_sora!.browserDiagnostics.webkit);
+            await native.enableNetworkEvents();
+          }
+        case final WindowsWebViewController native:
+          await native.setPreferredLanguages(languages);
+          if (_network == null) {
+            final owner = '${DateTime.now().microsecondsSinceEpoch}-${identityHashCode(native)}';
+            _networkOwner = owner;
+            _network = native.networkEvents.listen((event) => _sora!.browserDiagnostics.webview2(owner, event));
+            await native.enableNetworkEvents();
+          }
+      }
       if (!mounted || generation != _generation) return;
       await controller.setNavigationDelegate(
         NavigationDelegate(
@@ -428,6 +483,15 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context), palette = Palette.of(context);
+    final actionStyle = FilledButton.styleFrom(
+      minimumSize: const Size(0, 40),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      textStyle: Styles.secondary.copyWith(fontWeight: FontWeight.w600),
+      backgroundColor: palette.field,
+      foregroundColor: palette.ink,
+      elevation: 0,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -455,16 +519,30 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
                           style: Styles.secondary.copyWith(color: palette.ink2),
                         ),
                         const SizedBox(height: 16),
-                        TextButton(
-                          key: const ValueKey('speedtest-reload'),
-                          onPressed: () => unawaited(_retry()),
-                          child: Text(s.refresh),
-                        ),
-                        TextButton.icon(
-                          key: const ValueKey('speedtest-fallback'),
-                          onPressed: () => unawaited(_open()),
-                          icon: const Icon(Symbols.open_in_new_rounded, size: 18),
-                          label: Text(s.speedtestOpenBrowser),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            FilledButton.icon(
+                              key: const ValueKey('speedtest-reload'),
+                              style: actionStyle.copyWith(
+                                backgroundColor: WidgetStatePropertyAll(palette.ink),
+                                foregroundColor: WidgetStatePropertyAll(palette.surface),
+                                overlayColor: WidgetStatePropertyAll(palette.surface.withValues(alpha: 0.12)),
+                              ),
+                              onPressed: () => unawaited(_retry()),
+                              icon: const Icon(Symbols.refresh_rounded, size: 18),
+                              label: Text(s.refresh),
+                            ),
+                            FilledButton.icon(
+                              key: const ValueKey('speedtest-fallback'),
+                              style: actionStyle,
+                              onPressed: () => unawaited(_open()),
+                              icon: const Icon(Symbols.open_in_new_rounded, size: 18),
+                              label: Text(s.speedtestOpenBrowser),
+                            ),
+                          ],
                         ),
                       ],
                     ),

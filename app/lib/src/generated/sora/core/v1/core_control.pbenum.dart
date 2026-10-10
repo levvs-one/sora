@@ -113,6 +113,27 @@ class ProbeMethod extends $pb.ProtobufEnum {
   const ProbeMethod._(super.value, super.name);
 }
 
+/// Native captures require the authenticator and the native-diagnostics capability.
+class DiagnosticFormat extends $pb.ProtobufEnum {
+  static const DiagnosticFormat DIAGNOSTIC_FORMAT_UNSPECIFIED =
+      DiagnosticFormat._(0, _omitEnumNames ? '' : 'DIAGNOSTIC_FORMAT_UNSPECIFIED');
+  static const DiagnosticFormat DIAGNOSTIC_FORMAT_PCAPNG =
+      DiagnosticFormat._(1, _omitEnumNames ? '' : 'DIAGNOSTIC_FORMAT_PCAPNG');
+  static const DiagnosticFormat DIAGNOSTIC_FORMAT_EVTX =
+      DiagnosticFormat._(2, _omitEnumNames ? '' : 'DIAGNOSTIC_FORMAT_EVTX');
+
+  static const $core.List<DiagnosticFormat> values = <DiagnosticFormat>[
+    DIAGNOSTIC_FORMAT_UNSPECIFIED,
+    DIAGNOSTIC_FORMAT_PCAPNG,
+    DIAGNOSTIC_FORMAT_EVTX,
+  ];
+
+  static final $core.List<DiagnosticFormat?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 2);
+  static DiagnosticFormat? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
+
+  const DiagnosticFormat._(super.value, super.name);
+}
+
 class SoraErrorCode extends $pb.ProtobufEnum {
   static const SoraErrorCode SORA_ERROR_CODE_UNSPECIFIED =
       SoraErrorCode._(0, _omitEnumNames ? '' : 'SORA_ERROR_CODE_UNSPECIFIED');
@@ -189,14 +210,29 @@ class LogExportFormat extends $pb.ProtobufEnum {
       LogExportFormat._(1, _omitEnumNames ? '' : 'LOG_EXPORT_FORMAT_JSON_LINES');
   static const LogExportFormat LOG_EXPORT_FORMAT_CSV =
       LogExportFormat._(2, _omitEnumNames ? '' : 'LOG_EXPORT_FORMAT_CSV');
+  static const LogExportFormat LOG_EXPORT_FORMAT_LOG =
+      LogExportFormat._(3, _omitEnumNames ? '' : 'LOG_EXPORT_FORMAT_LOG');
+  static const LogExportFormat LOG_EXPORT_FORMAT_JSON =
+      LogExportFormat._(4, _omitEnumNames ? '' : 'LOG_EXPORT_FORMAT_JSON');
+  static const LogExportFormat LOG_EXPORT_FORMAT_XML =
+      LogExportFormat._(5, _omitEnumNames ? '' : 'LOG_EXPORT_FORMAT_XML');
+  static const LogExportFormat LOG_EXPORT_FORMAT_ZIP =
+      LogExportFormat._(6, _omitEnumNames ? '' : 'LOG_EXPORT_FORMAT_ZIP');
+  static const LogExportFormat LOG_EXPORT_FORMAT_GZIP =
+      LogExportFormat._(7, _omitEnumNames ? '' : 'LOG_EXPORT_FORMAT_GZIP');
 
   static const $core.List<LogExportFormat> values = <LogExportFormat>[
     LOG_EXPORT_FORMAT_UNSPECIFIED,
     LOG_EXPORT_FORMAT_JSON_LINES,
     LOG_EXPORT_FORMAT_CSV,
+    LOG_EXPORT_FORMAT_LOG,
+    LOG_EXPORT_FORMAT_JSON,
+    LOG_EXPORT_FORMAT_XML,
+    LOG_EXPORT_FORMAT_ZIP,
+    LOG_EXPORT_FORMAT_GZIP,
   ];
 
-  static final $core.List<LogExportFormat?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 2);
+  static final $core.List<LogExportFormat?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 7);
   static LogExportFormat? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
 
   const LogExportFormat._(super.value, super.name);

@@ -1,0 +1,931 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+
+import 'strings.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Azerbaijani (`az`).
+class SAz extends S {
+  SAz([String locale = 'az']) : super(locale);
+
+  @override
+  String get stateOff => 'Qoşulmayıb';
+
+  @override
+  String get stateConnecting => 'Qoşulur';
+
+  @override
+  String get stateConnected => 'Qoşuldu';
+
+  @override
+  String get stateReconnecting => 'Yenidən qoşulur';
+
+  @override
+  String get stateDisconnecting => 'Bağlantı kəsilir';
+
+  @override
+  String get stateFailed => 'Qoşulmayıb';
+
+  @override
+  String get coreMissing => 'Sora xidməti cavab vermir';
+
+  @override
+  String get serverAuto => 'Ən sürətli';
+
+  @override
+  String get serverBypass => 'Server yoxdur';
+
+  @override
+  String get addSubscription => 'Abunəlik əlavə edin';
+
+  @override
+  String get servers => 'Serverlər';
+
+  @override
+  String get settings => 'Parametrlər';
+
+  @override
+  String get subscription => 'Abunəlik';
+
+  @override
+  String get subscriptionLink => 'Abunə keçidi';
+
+  @override
+  String get add => 'əlavə et';
+
+  @override
+  String get refresh => 'Yeniləyin';
+
+  @override
+  String get rename => 'Adını dəyişdirin';
+
+  @override
+  String get delete => 'Sil';
+
+  @override
+  String get cancel => 'Ləğv et';
+
+  @override
+  String get save => 'Saxla';
+
+  @override
+  String get name => 'ad';
+
+  @override
+  String deleteSubscription(String name) {
+    return '“$name” silinsin?';
+  }
+
+  @override
+  String get routes => 'Marşrutlar';
+
+  @override
+  String get presetGlobal => 'Hər şey VPN vasitəsilə';
+
+  @override
+  String get presetRu => 'Rusiya birbaşa';
+
+  @override
+  String get presetIr => 'İran birbaşa';
+
+  @override
+  String get presetCn => 'Çin birbaşa';
+
+  @override
+  String get blockAds => 'Reklamları bloklayın';
+
+  @override
+  String get killSwitch => 'İnternet yalnız VPN vasitəsilə';
+
+  @override
+  String get engine => 'Mühərrik';
+
+  @override
+  String get engineAuto => 'Avtomatik';
+
+  @override
+  String get animations => 'Animasiyalar';
+
+  @override
+  String get logs => 'Giriş';
+
+  @override
+  String get about => 'Haqqında';
+
+  @override
+  String get logsAll => 'Hamısı';
+
+  @override
+  String get logsImportant => 'Əhəmiyyətli';
+
+  @override
+  String get logsErrors => 'Səhvlər';
+
+  @override
+  String get search => 'Axtar';
+
+  @override
+  String get export => 'Faylda saxla';
+
+  @override
+  String get clear => 'Təmiz';
+
+  @override
+  String get logsEmpty => 'Burada heç nə';
+
+  @override
+  String appVersion(String version) {
+    return 'Versiya $version';
+  }
+
+  @override
+  String get notInstalled => 'Quraşdırılmayıb';
+
+  @override
+  String get sourceCode => 'Mənbə kodu';
+
+  @override
+  String get license => 'Lisenziya';
+
+  @override
+  String usage(String used, String total) {
+    return '$used və $total';
+  }
+
+  @override
+  String until(String date) {
+    return '$date qədər';
+  }
+
+  @override
+  String get expired => 'İstifadə müddəti bitdi';
+
+  @override
+  String milliseconds(int n) {
+    return '$n ms';
+  }
+
+  @override
+  String bytesB(String n) {
+    return '$n B';
+  }
+
+  @override
+  String bytesKB(String n) {
+    return '$n KB';
+  }
+
+  @override
+  String bytesMB(String n) {
+    return '$n MB';
+  }
+
+  @override
+  String bytesGB(String n) {
+    return '$n GB';
+  }
+
+  @override
+  String bytesTB(String n) {
+    return '$n TB';
+  }
+
+  @override
+  String get errGeneric => 'Nəsə xəta baş verdi';
+
+  @override
+  String get errCore => 'Sora xidməti cavab vermir';
+
+  @override
+  String get errAuth => 'Sora xidmətinə giriş yoxdur';
+
+  @override
+  String get errVersion => 'Sora-ni yeniləyin: proqram və xidmət fərqli versiyalardır';
+
+  @override
+  String get errBusy => 'Gözləyin, əvvəlki əmr hələ də işləyir';
+
+  @override
+  String get errEngineMissing => 'Bu server üçün heç bir mühərrik tapılmadı';
+
+  @override
+  String get errEngineStart => 'Mühərrik işə düşmədi';
+
+  @override
+  String get errEngineStopped => 'Mühərrik dayandı';
+
+  @override
+  String get errTunnel => 'VPN bağlantısı yaratmaq icazəsi yoxdur';
+
+  @override
+  String get errServers => 'Server xəta ilə konfiqurasiya edilib';
+
+  @override
+  String get errNetwork => 'Serverə daxil olmaq mümkün deyil';
+
+  @override
+  String get errTimeout => 'Server vaxtında cavab vermədi';
+
+  @override
+  String get errFirewall => 'VPN xaricində interneti bloklamaq mümkün olmadı';
+
+  @override
+  String get errSubFetch => 'Abunəliyi yükləmək mümkün olmadı';
+
+  @override
+  String get errSubFormat => 'Bu abunə keçidi deyil';
+
+  @override
+  String get errSubEmpty => 'Abunəliyin serverləri yoxdur';
+
+  @override
+  String get errSubDuplicate => 'Bu abunəlik artıq əlavə olunub';
+
+  @override
+  String get errSubLimit => 'Həddindən artıq abunəlik';
+
+  @override
+  String get errSubScheme => 'Link https:// ilə başlamalıdır';
+
+  @override
+  String get errSecretStore => 'Sora yaddaşı zədələnib və ya əlçatan deyil';
+
+  @override
+  String get errNoServers => 'Qoşulmaq üçün abunə əlavə edin';
+
+  @override
+  String get exportText => 'Mətn';
+
+  @override
+  String get connections => 'Əlaqələr';
+
+  @override
+  String get close => 'Bağlayın';
+
+  @override
+  String get chainDirect => 'Birbaşa';
+
+  @override
+  String get chainBlocked => 'Blok edilib';
+
+  @override
+  String get theme => 'Mövzu';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'İşıq';
+
+  @override
+  String get themeDark => 'Qaranlıq';
+
+  @override
+  String get language => 'Dil';
+
+  @override
+  String get languageSystem => 'System';
+
+  @override
+  String get sectionConnection => 'Əlaqə';
+
+  @override
+  String get sectionNoServer => 'Server yoxdur';
+
+  @override
+  String get sectionPing => 'Ping';
+
+  @override
+  String get sectionLog => 'Diaqnostika';
+
+  @override
+  String get ipv6 => 'IPv6';
+
+  @override
+  String get dns => 'DNS';
+
+  @override
+  String get dnsAuto => 'Avtomatik';
+
+  @override
+  String get dnsHint => 'Ünvanlar, vergüllə ayrılmış';
+
+  @override
+  String get fragment => 'TLS parçalanması';
+
+  @override
+  String get fragmentPackets => 'Nə bölmək';
+
+  @override
+  String get fragmentLength => 'Parça ölçüsü';
+
+  @override
+  String get fragmentInterval => 'Parçalar arasında fasilə';
+
+  @override
+  String get byDefault => 'Defolt';
+
+  @override
+  String get rangeHint => 'Məsələn, 100-200';
+
+  @override
+  String get splitPos => 'Bölünmüş mövqelər';
+
+  @override
+  String get splitPosHint => 'Məsələn, 1, midsld';
+
+  @override
+  String get disorder => 'Parçaları yenidən sıralayın';
+
+  @override
+  String get tlsRecord => 'TLS qeydini bölün';
+
+  @override
+  String get tlsRecordNo => 'yox';
+
+  @override
+  String get tlsRecordSni => 'Saytın adında';
+
+  @override
+  String get tlsRecordFirst => 'Birinci baytdan sonra';
+
+  @override
+  String get hostCase => 'Host işini dəyişdirin';
+
+  @override
+  String get probeMethod => 'Metod';
+
+  @override
+  String get probeAuto => 'Avtomatik';
+
+  @override
+  String get probeEngine => 'Mühərrik vasitəsilə';
+
+  @override
+  String get probeConnect => 'Yalnız əlaqə';
+
+  @override
+  String get probeUrl => 'Test ünvanı';
+
+  @override
+  String get probeTimeout => 'gözləyin';
+
+  @override
+  String seconds(int n) {
+    return '$n s';
+  }
+
+  @override
+  String get subscriptions => 'Abunəliklər';
+
+  @override
+  String get subscriptionSettings => 'Parametrlər';
+
+  @override
+  String get userAgent => 'İstifadəçi-Agent';
+
+  @override
+  String get autoUpdate => 'Avtomatik olaraq yeniləyin';
+
+  @override
+  String get updateInterval => 'Nə qədər tez-tez';
+
+  @override
+  String get intervalProvider => 'Provayderin soruşduğu kimi';
+
+  @override
+  String hours(int n) {
+    return '$n h';
+  }
+
+  @override
+  String get updateNow => 'İndi yeniləyin';
+
+  @override
+  String get logLevel => 'Nə qeyd etmək';
+
+  @override
+  String get levelDebug => 'Hər şey';
+
+  @override
+  String get levelInfo => 'Adi';
+
+  @override
+  String get levelWarning => 'Əhəmiyyətli';
+
+  @override
+  String get levelError => 'Yalnız səhvlər';
+
+  @override
+  String get recordDestinations => 'Sayt ünvanlarını qeyd edin';
+
+  @override
+  String get reset => 'Parametrləri sıfırlayın';
+
+  @override
+  String get resetConfirm => 'Bütün parametrlər sıfırlansın?';
+
+  @override
+  String get resetAction => 'Sıfırlayın';
+
+  @override
+  String get invalidValue => 'Bu dəyər işləməyəcək';
+
+  @override
+  String get website => 'Abunə səhifəsi';
+
+  @override
+  String get providerWebsite => 'Provayder veb saytı';
+
+  @override
+  String get support => 'Dəstək';
+
+  @override
+  String controlPortQuestion(String engine) {
+    return '$engine bu kompüterdəki port vasitəsilə idarə olunur. Digər proqramlar VPN-in aktiv olduğunu söyləyə biləcək.';
+  }
+
+  @override
+  String chooseEngine(String engine) {
+    return '$engine seçin';
+  }
+
+  @override
+  String get rules => 'Fərdi qaydalar';
+
+  @override
+  String get ruleAdd => 'Yeni qayda';
+
+  @override
+  String get ruleHint => 'Sayt, IP və ya proqram';
+
+  @override
+  String get ruleDirect => 'Birbaşa';
+
+  @override
+  String get ruleProxy => 'VPN vasitəsilə';
+
+  @override
+  String get ruleBlock => 'Blok';
+
+  @override
+  String get failover => 'Uğursuzluğu yandırın';
+
+  @override
+  String get connectOnStart => 'Başlanğıcda qoşulun';
+
+  @override
+  String expiresIn(String name, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'abunə # günlərində başa çatır',
+      one: 'abunə # günündə başa çatır',
+      zero: 'abunə bir neçə saat ərzində başa çatır',
+    );
+    return '$name: $_temp0';
+  }
+
+  @override
+  String trafficLow(String name, String left) {
+    return '$name: $left sol';
+  }
+
+  @override
+  String get ruleInvalid => 'Bu sayta, IP-yə və ya proqrama bənzəmir';
+
+  @override
+  String groupOrdered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# serverləri öz növbəsində',
+      one: '# server, öz növbəsində',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String groupBest(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# serverləri, ən sürətli',
+      one: '# server, ən sürətli',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get tunnelMode => 'Rejim';
+
+  @override
+  String get tunnelTun => 'Bütün trafik';
+
+  @override
+  String get tunnelProxy => 'System proxy';
+
+  @override
+  String get proxyAddress => 'Proksi ünvanı';
+
+  @override
+  String get copied => 'Kopyalandı';
+
+  @override
+  String get launchAtLogin => 'Sistemdən başlayın';
+
+  @override
+  String get closeToTray => 'Bağlı halda nimçədə saxlayın';
+
+  @override
+  String get notifications => 'Bildirişlər';
+
+  @override
+  String get trayOpen => 'Sora-ni açın';
+
+  @override
+  String get trayConnect => 'Qoşun';
+
+  @override
+  String get trayDisconnect => 'Bağlantını kəsin';
+
+  @override
+  String get trayServer => 'Server';
+
+  @override
+  String get trayQuit => 'Sora-dən çıxın';
+
+  @override
+  String trayTooltip(String state) {
+    return 'Sora: $state';
+  }
+
+  @override
+  String trayTooltipServer(String state, String server) {
+    return 'Sora: $state, $server';
+  }
+
+  @override
+  String get noticeInTray => 'Sora hələ də qabdadır';
+
+  @override
+  String get noticeInTrayBody => 'Onun simvolunun menyusundan çıxın';
+
+  @override
+  String get noticeLost => 'Bağlantı itdi';
+
+  @override
+  String get noticeLostBody => 'Sora yenidən qoşulur';
+
+  @override
+  String get noticeRestored => 'Yenidən qoşuldu';
+
+  @override
+  String get noticeFailed => 'Qoşulmaq mümkün olmadı';
+
+  @override
+  String get noticeBackup => 'Əsas server cavab vermədi; ehtiyat trafiki daşıyır';
+
+  @override
+  String get noticeNext => 'Server cavab vermədi; növbətisi trafiki daşıyır';
+
+  @override
+  String get noticeMainBack => 'Əsas server yenidən cavab verir və trafiki daşıyır';
+
+  @override
+  String get noticeSubscription => 'Abunəlik';
+
+  @override
+  String get importTitle => 'Bu abunə əlavə edilsin?';
+
+  @override
+  String get importSealed =>
+      'Bu keçid Happ üçün şifrələnib və yalnız Happ onu oxuya bilər. Provayderinizdən sadə abunə linkini soruşun.';
+
+  @override
+  String get understood => 'OK';
+
+  @override
+  String get noAnswer => 'cavab yoxdur';
+
+  @override
+  String get home => 'Ev';
+
+  @override
+  String get navRules => 'Qaydalar';
+
+  @override
+  String get navConnections => 'Əlaqələr';
+
+  @override
+  String get navLogs => 'Qeydlər';
+
+  @override
+  String get navAbout => 'Haqqında';
+
+  @override
+  String get sidebarToggle => 'Yan panelə keçin';
+
+  @override
+  String get more => 'Daha çox';
+
+  @override
+  String get less => 'Daha az';
+
+  @override
+  String get currentServer => 'Cari server';
+
+  @override
+  String get trafficDown => 'Endirildi';
+
+  @override
+  String get trafficUp => 'Yükləndi';
+
+  @override
+  String perSecond(String value) {
+    return '$value/s';
+  }
+
+  @override
+  String activeRules(int count) {
+    return 'Aktiv qaydalar: $count';
+  }
+
+  @override
+  String get recentNotifications => 'Son bildirişlər';
+
+  @override
+  String get notificationsEmpty => 'Bağlantı və abunə hadisələri burada görünəcək';
+
+  @override
+  String get retryConnect => 'Bağlantıya yenidən cəhd edin';
+
+  @override
+  String get openLogs => 'Qeydləri açın';
+
+  @override
+  String get tourReplay => 'Bələdçini yenidən göstərin';
+
+  @override
+  String tourStep(int step) {
+    return '5 addımdan $step';
+  }
+
+  @override
+  String get tourBack => 'Geri';
+
+  @override
+  String get tourNext => 'Sonrakı';
+
+  @override
+  String get tourSkip => 'Keç';
+
+  @override
+  String get tourFinish => 'Bitdi';
+
+  @override
+  String get tourAdd => 'Provayderinizin abunə linkini əlavə edin.';
+
+  @override
+  String get tourServer => 'Bir server seçin. “Ən sürətli” sizin üçün birini seçir.';
+
+  @override
+  String get tourConnect => 'Qoşulmaq və ya əlaqəni kəsmək üçün bura klikləyin.';
+
+  @override
+  String get tourMode => 'Bir rejim seçin. VPN düşərsə, keçid bloklarını öldürün.';
+
+  @override
+  String get tourSettings => 'Parametrləri açın. Bu təlimatı orada təkrarlaya bilərsiniz.';
+
+  @override
+  String get chooseProgram => 'Proqram seçin';
+
+  @override
+  String get installedApps => 'Quraşdırılmış proqramlar';
+
+  @override
+  String get runningProcesses => 'Çalışan proseslər';
+
+  @override
+  String get programsFailed => 'Proqramları yükləmək mümkün olmadı';
+
+  @override
+  String get programsEmpty => 'Heç bir tətbiq tapılmadı. Başqa bir ad sınayın.';
+
+  @override
+  String get selectExe => '.exe faylı seçin';
+
+  @override
+  String get trafficUnavailable => 'Sayğaclar hələ mövcud deyil';
+
+  @override
+  String get speedtest => 'Sürət';
+
+  @override
+  String get speedtestCheck => 'Sürəti yoxlayın';
+
+  @override
+  String get speedtestSearch => 'Xidmət tapın';
+
+  @override
+  String get speedtestEmpty => 'Uyğunluq yoxdur. Axtarışı dəyişdirin.';
+
+  @override
+  String get speedtestBackToList => 'Xidmətlərə qayıt';
+
+  @override
+  String get speedtestOpenBrowser => 'Brauzerdə açın';
+
+  @override
+  String get speedtestUnavailable => 'Quraşdırılmış brauzer başlaya bilmədi. Xidməti sistem brauzerinizdə açın.';
+
+  @override
+  String get speedtestPageFailed =>
+      'Səhifəni yükləmək mümkün olmadı. Onu yenidən yükləyin və ya xidməti sistem brauzerinizdə açın.';
+
+  @override
+  String get speedtestExternalFailed => 'Sistem brauzeri aça bilmədi. Yenidən cəhd edin.';
+
+  @override
+  String get modes => 'Rejimlər';
+
+  @override
+  String get proxyShort => 'Proksi';
+
+  @override
+  String get tunMode => 'Bütün trafik (TUN)';
+
+  @override
+  String get checkUpdates => 'Yeniləmələri yoxlayın';
+
+  @override
+  String get updates => 'Proqram yeniləmələri';
+
+  @override
+  String updateAvailable(String version) {
+    return '$version versiyası mövcuddur';
+  }
+
+  @override
+  String get updateOpenAbout => 'Yeniləmə baxın';
+
+  @override
+  String updateNotes(String version) {
+    return '$version-də dəyişikliklər';
+  }
+
+  @override
+  String get updateCheck => 'Yeniləmələri yoxlayın';
+
+  @override
+  String get updateChecking => 'Yoxlanır...';
+
+  @override
+  String get updateNoNotes => 'Buraxılışda qeydlər yoxdur.';
+
+  @override
+  String get updateDropWarning =>
+      'Sora və onun əsas yeniləməsi zamanı VPN bağlantısı bir neçə saniyə kəsiləcək. Davam edilsin?';
+
+  @override
+  String get updateWaitConnection => 'VPN bağlantısı və nüvənin hazır olmasını gözləyin.';
+
+  @override
+  String get updateDownloading => 'Fayllar endirilir və təsdiqlənir...';
+
+  @override
+  String get updateInstalling => 'Güncəlləmə hazırlanır və ya administrator autentifikasiyası gözlənilir...';
+
+  @override
+  String get updateNetworkError => 'Güncəlləməni endirmək mümkün olmadı. Yenidən cəhd edin.';
+
+  @override
+  String get updateReleaseError => 'Buraxılış məlumatları və ya tələb olunan fayllar yoxdur və ya etibarsızdır.';
+
+  @override
+  String get updateChecksumError => 'Endirmə SHA256SUMS ilə uyğun gəlmir. Heç nə quraşdırılmayıb.';
+
+  @override
+  String get updateInstallError => 'Yeniləmə tamamlanmadı. Doğrulama ləğv edilmiş ola bilər.';
+
+  @override
+  String get updateUnsupported =>
+      'Bu icra olunan fayl dəstəklənən Sora paket cütlüyünə məxsus deyil. Buraxılış quraşdırma təlimatlarından istifadə edin.';
+
+  @override
+  String get updateManual =>
+      'Hər iki təsdiqlənmiş paketi quraşdırmaq üçün bu əmri terminalda işə salın, sonra Sora-i yenidən açın. Fayllar yükləmə qovluğunda qalır. VPN bağlantısı kəsiləcək.';
+
+  @override
+  String get updateCopyCommand => 'Kopyalama əmri';
+
+  @override
+  String get updateChecksDisabled => 'Avtomatik yoxlamalar Parametrlərdə deaktiv edilib.';
+
+  @override
+  String get updateInstalled => 'Yeniləmə quraşdırılıb. Sora-ni yenidən açın.';
+
+  @override
+  String get projectLinks => 'Layihə';
+
+  @override
+  String get githubReleases => 'Buraxılışlar və yükləmələr';
+
+  @override
+  String get telegramChannel => 'Telegram kanalı';
+
+  @override
+  String get licenses => 'Lisenziyalar';
+
+  @override
+  String get componentLicenses => 'Komponent lisenziyaları';
+
+  @override
+  String get appCopyright => '© 2026 levvs-one və ianəçilər';
+
+  @override
+  String get collapseServers => 'Serverləri yığışdırın';
+
+  @override
+  String get expandServers => 'Serverləri genişləndirin';
+
+  @override
+  String get hideDescription => 'Təsviri gizlədin';
+
+  @override
+  String get showDescription => 'Təsviri göstərin';
+
+  @override
+  String get pendingConnectionChanges => 'Bu dəyişiklikləri tətbiq etmək üçün yenidən qoşulun.';
+
+  @override
+  String get reconnectNow => 'Tətbiq edin və yenidən qoşulun';
+
+  @override
+  String get bypassLimitations =>
+      'Bu rejim yalnız HTTP və TLS üçün DPI-dən yan keçir, UDP-ni dəstəkləmir və ya IP-ni dəyişdirmir. Discord səs, zənglər və bloklanmış Telegram ünvanları üçün VPN serverindən istifadə edin.';
+
+  @override
+  String get errEngineUnsupported =>
+      'Seçilmiş mühərrik bu profili və ya parametrləri dəstəkləmir. Avtomatik və ya uyğun mühərriki seçin.';
+
+  @override
+  String get errRestore =>
+      'Bağlantının təmizlənməsi tamamlanmadı. Bağlantını kəsməyə yenidən cəhd edin; təfərrüatlar üçün jurnala baxın.';
+
+  @override
+  String get errSessionEnded => 'Bu sessiya artıq başa çatıb. Bağlantı vəziyyətini yeniləyin.';
+
+  @override
+  String get retryDisconnect => 'Bağlantını kəsməyə yenidən cəhd edin';
+
+  @override
+  String get tunStack => 'TUN yığını';
+
+  @override
+  String get modesInfo => 'Rejimlər haqqında';
+
+  @override
+  String get modesGuideTitle => 'Rejimlər və mühərriklər';
+
+  @override
+  String get modesGuide =>
+      'Serverinizin hansı mühərrikə ehtiyacı olduğuna əmin deyilsinizsə, Avtomatik seçin. Sora qoşulmazdan əvvəl profili və parametrləri yoxlayır. Mühərrik planınızın bant genişliyini artıra bilməz: performans serverdən, marşrutdan, protokoldan və şəbəkədən asılıdır.\n\n## Rejimlər\n\n### Bütün trafik (TUN)\n\nSora virtual şəbəkə interfeysi yaradır və TCP və UDP daxil olmaqla proqram trafikini onun vasitəsilə yönləndirir. Telegram, oyunlar və Discord səsi üçün bu rejimi istifadə edin. Qaydalar xüsusi saytları və ya proqramları birbaşa göndərə və ya onları bloklaya bilər. Şəbəkə xidmətinə icazə və tələb olunan protokolu dəstəkləyən server lazımdır.\n\n### System proksi\n\nSora yerli HTTP/SOCKS proksisini konfiqurasiya edir. Sistem proxy parametrlərinə hörmət edən proqramlar ondan istifadə edir. Öz şəbəkə yığını olan proqramlar birbaşa qoşula bilər; UDP və səsli zənglər üçün ümumiyyətlə TUN lazımdır. Bu rejim proxy dəstəyi olan brauzerlər və proqramlar üçün uyğundur.\n\n### Server yoxdur\n\nLinux-də Sora HTTP/TLS sorğularını bölmək və yenidən formalaşdırmaq və bəzi DPI yoxlamalarını keçmək üçün [zapret](https://github.com/bol-van/zapret) istifadə edir. IP-niz eyni qalır və bağlantılar birbaşa vebsayta keçir. Nəticələr provayderinizdən və bloklama metodunuzdan asılıdır.\n\nCari inteqrasiya TCP üzərindən HTTP və TLS üçün tpws istifadə edir. O, IP-nin bloklanmasını və ya UDP-nin ötürülməsini keçmir və Telegram-nin MTProto bağlantılarına zəmanət verə bilməz. Discord səs, Telegram zəngləri və bu cür məhdudiyyətlər üçün TUN ilə VPN serverindən istifadə edin.\n\n## Mühərriklər\n\n### Avtomatik\n\nSora bütün qoşulma planını dəstəkləyən quraşdırılmış mühərriki seçir: server protokolları, daşımalar, qruplar, parçalanma və rejim. Uyğun olmayan əl seçimi cari əlaqəni dayandırmazdan əvvəl rədd edilir. Avtomatik və ya başqa mühərriki seçin və parametrləri yenidən tətbiq edin.\n\n### sing-box\n\nYeni Sora paketlərinə müştəri tərəfi XHTTP və VLESS Encryption əlavə edən [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) çəngəl daxildir. Sora quruluşu və onun imkanlarını tanıyır. XHTTP olmadan yuxarı axın quruluşu bu qabiliyyəti təkcə adından əldə etmir.\n\nDəstəklənən protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard və ZX0/parametrləri daxildir. Sora idxal edə bilər. Tam Xray JSON profilləri üçün Xray tələb olunur. Yeni AWG 3.x sahələri hələ idxal edilə bilməz. sing-box, kompüterdəki digər proqramların aşkarlaya biləcəyi parolla qorunan yerli idarəetmə portundan istifadə edir.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption və TLS fraqmentasiyasını dəstəkləyir. O, həmçinin marşrutlaşdırma və qruplarını qoruyarkən Xray tam provayder profillərini idarə edir. Bu cür profillər davranışlarını dəyişdirmədən avtomatik olaraq başqa bir mühərrikə çevrilə bilməz.\n\nBirləşdirilmiş Xray TLS sertifikatının doğrulamasını deaktiv edən ayarı sildi (`allowInsecure`). Bu parametri tələb edən adi serverlər üçün avtomatik sing-box və ya mihomo seçir. Xray seçimi cari əlaqəni dayandırmazdan əvvəl uyğunsuzluğu əl ilə bildirir. Köhnə tam JSON profilləri təsdiq edilə bilən sertifikat və ya sertifikat pininə malik yenilənmiş provayder profilinə ehtiyac duyur.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) sifarişli ehtiyat və yük balanslaşdırma qruplarını, XHTTP və AmneziaWG-ni dəstəkləyir. Yedək serverə avtomatik keçid vacib olduqda onu seçin. Sora-nin TLS parçalanma parametri bu mühərriklə əlçatan deyil.\n\n## Sora-də uyğunluq\n\n| Xüsusiyyət | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN və TCP/UDP | Bəli | Bəli | Bəli |\n| XHTTP | Bəli | Bəli | Bəli |\n| VLESS Encryption | Bəli | Bəli | Bəli |\n| Tam Xray profili | Yox | Bəli | Yox |\n| TUIC / AnyTLS | Hər ikisi | Yox | TUIC |\n| TLS parçalanması | Bəli | Bəli | Yox |\n| AmneziaWG 1.x/2.x | Bəli¹ | Yox | Bəli |\n| Sifarişli ehtiyat qrupu | Yox | No² | Bəli |\n\n¹ J1/J2/J3/Itime ilə profillər mihomo istifadə edir; bu sahələr heç vaxt səssizcə atılmamalıdır. ² Tam Xray profilləri qrupu üçün proqram ehtiyat profili seçir. Dəstək quraşdırılmış quruluşdan asılıdır; Haqqında onun versiyasını yoxlayın.\n\n## TUN yığını\n\nYığın virtual interfeys daxilində TCP və UDP-ni idarə edir. Rejimlər panelində Xray və mihomo gVisor, System, Mixed və MIPS təklif edir. Hər bir mühərrik öz üstünlüklərini saxlayır. System proxy və Serversiz rejimlər bu üstünlükdən istifadə etmir.\n\n- **Mixed** — TCP sistem yığınından istifadə edir, gVisor isə UDP-ni idarə edir. Bu mihomo üçün standartdır.\n- **System** — sistem yığınından istifadə edir. Şəbəkə proqramlarında problem yaranarsa, başqa variantı sınayın.\n- **gVisor** — istifadəçi məkanında trafiki idarə edir.\n- **MIPS** — mihomo-nin 1.19.32 paket versiyasında mövcud olan öz IP yığını.\n\nLinux-də Xray standart olaraq daxili gVisor-dən istifadə edir. Linux-də System, Mixed və MIPS TUN mühərriki kimi mihomo-dən istifadə edir, TCP və UDP-ni təsdiqlənmiş yerli SOCKS linki üzərindən Xray-ə yönləndirir. Xray protokolu, provayder profilini və marşrutu saxlayır. Bu üç seçim quraşdırılmış mihomo tələb edir. Windows-də TUN hazırda sing-box və ya mihomo istifadə edir; Xray sistem proxy rejimində işləyir.\n\nKörpü ikinci prosesi həyata keçirir. Linux-də üç boş ölçmədə o, yerli Xray TUN-dan təxminən 32-36 MiB daha çox fiziki yaddaş istifadə etdi. Bu, yükləmə yükünü ölçmür: CPU və yaddaş xərcləri bağlantılardan asılıdır. Başqa yığın lazım deyilsə, gVisor-ni saxlayın. sing-box-də yığın seçicisi yoxdur. Heç bir yığın hər şəbəkədə daha yaxşı performansa zəmanət vermir. Yığın seçin və onu şəbəkənizdə sınamaq üçün Tətbiq edin və yenidən qoşulun seçin.\n\n## Parametrlər tətbiq edilir\n\nServerin seçilməsi avtomatik olaraq yenidən qoşulur. Rejim, mühərrik, DNS və qayda parametrləri dərhal saxlanılır; aktiv əlaqə zamanı Tətbiq et üzərinə klikləyin və onlardan istifadə etmək üçün yenidən qoşulun. Mühərrikin yenidən işə salınması endirmələri və zəngləri dayandıra bilər. Təkrarlanan kliklər paralel əlaqələri başlatmır; əlaqənin kəsilməsi keçidi bitirir və əlaqəni buraxır.\n\nTunel düşdükdə yalnız VPN vasitəsilə İnternet birbaşa trafiki bloklayır. Bütün maşına təsir edir. Açıq-aşkar əlaqənin kəsilməsi Sora qaydalarını aradan qaldırır. Təmizləmə başa çatmazsa, yenidən ayırmağa cəhd edin və jurnalı açın.\n\n## Layihə sənədləri\n\n- [sing-box-lx: konfiqurasiya və dəstək](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box sənədləri](https://sing-box.sagernet.org/)\n- [Xray sənədləri](https://xtls.github.io/)\n- [mihomo sənədləri](https://wiki.metacubex.one/)\n- [zapret: əməliyyat və məhdudiyyətlər](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+
+  @override
+  String get probeServers => 'Serverləri yoxlayın';
+
+  @override
+  String get extensions => 'Genişləndiricilər';
+
+  @override
+  String get extensionsSoon => 'Tezliklə';
+
+  @override
+  String exportLogFile(String name) {
+    return 'Fayla $name';
+  }
+
+  @override
+  String get diagnosticHttp => 'HTTP diaqnostikası';
+
+  @override
+  String get diagnosticPackets => 'Paket tutma';
+
+  @override
+  String get diagnosticEvents => 'Windows hadisələri';
+
+  @override
+  String get diagnosticCapture => '10 saniyə çəkin';
+
+  @override
+  String get diagnosticNoData => 'Hələ qeydə alınmış sorğu yoxdur. Əvvəlcə sürət testi veb saytını açın.';
+
+  @override
+  String get diagnosticRequiresTun => 'Paket ələ keçirmək üçün aktiv Sora TUN bağlantısı lazımdır.';
+
+  @override
+  String get diagnosticUnavailable => 'Bu diaqnostika bu platformada əlçatan deyil.';
+}

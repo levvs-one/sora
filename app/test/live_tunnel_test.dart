@@ -3,10 +3,27 @@
 // through both the tunnel and system proxy.
 import 'dart:io';
 
+import 'package:flutter/widgets.dart' show SizedBox, ValueKey;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:sora/main.dart';
 import 'package:sora/src/core/link.dart';
 import 'package:sora/src/desktop/system_proxy.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pbgrpc.dart';
+import 'package:sora/src/settings.dart';
+import 'package:sora/src/sora.dart';
+
+// The import comes from the installed core's parser and encrypted credential
+// store; the UI can exercise reset without creating a provider subscription.
+class _ImportedSora extends Sora {
+  _ImportedSora(super.settings, this.source);
+
+  final List<OutboundSpec> source;
+
+  @override
+  List<OutboundSpec> get servers => source;
+}
 
 void main() {
   final server = Platform.environment['SORA_TUNNEL_LIVE'];
@@ -73,6 +90,69 @@ void main() {
     return false;
   }
 
+  Future<String> fetch(String url) async {
+    final curl = await Process.run('curl.exe', ['-s', '-o', 'NUL', '-m', '20', '-w', '%{http_code}', url]);
+    return '${curl.stdout}${curl.stderr}';
+  }
+
+  for (final initiallyConnected in [false, true]) {
+    testWidgets(
+      'installed Windows service accepts the orb after reset while ${initiallyConnected ? "connected" : "disconnected"}',
+      (tester) async {
+        SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+        final settings = await Settings.load();
+        await settings.completeTour();
+        settings
+          ..animations = false
+          ..rules = ['direct process:xray.exe'];
+        final sora = _ImportedSora(settings, imported.outbounds);
+        late Future<void> running;
+        Future<void> until(Phase expected) async {
+          final limit = DateTime.now().add(const Duration(seconds: 30));
+          while (sora.phase != expected) {
+            if (DateTime.now().isAfter(limit)) fail('expected $expected, got ${sora.phase}, ${sora.failure}');
+            await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+            await tester.pump(const Duration(milliseconds: 100));
+          }
+        }
+
+        try {
+          await tester.runAsync(() async {
+            running = sora.run();
+            final limit = DateTime.now().add(const Duration(seconds: 30));
+            while (sora.link == null || sora.phase != Phase.off) {
+              if (DateTime.now().isAfter(limit)) fail('the installed service did not answer');
+              await Future<void>.delayed(const Duration(milliseconds: 50));
+            }
+            if (initiallyConnected) await sora.connect();
+          });
+          if (initiallyConnected) await until(Phase.connected);
+          await tester.pumpWidget(SoraApp(sora: sora));
+          await tester.pump();
+          await tester.runAsync(sora.reset);
+          await tester.pump(const Duration(milliseconds: 250));
+          final orb = find.byKey(const ValueKey('connect-control'));
+          expect(orb, findsOneWidget);
+          await tester.runAsync(() => tester.tap(orb));
+          await until(initiallyConnected ? Phase.off : Phase.connected);
+          expect(settings.tourDone, isTrue);
+          if (initiallyConnected) {
+            await tester.runAsync(() => tester.tap(orb));
+            await until(Phase.connected);
+          }
+          expect(tester.takeException(), isNull);
+        } finally {
+          await tester.runAsync(sora.disconnect);
+          await tester.pumpWidget(const SizedBox());
+          sora.dispose();
+          await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
+        }
+      },
+      skip: server == null,
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
+  }
+
   test(
     'the tunnel carries a program that knows nothing about proxies',
     () async {
@@ -104,10 +184,77 @@ void main() {
     timeout: const Timeout(Duration(minutes: 2)),
   );
 
-  Future<String> fetch(String url) async {
-    final curl = await Process.run('curl.exe', ['-s', '-o', 'NUL', '-m', '20', '-w', '%{http_code}', url]);
-    return '${curl.stdout}${curl.stderr}';
-  }
+  test(
+    'native PCAPNG and EVTX export real diagnostics without stopping the tunnel',
+    () async {
+      await connect(TunnelMode.TUNNEL_MODE_SYSTEM);
+      try {
+        final status = await link.stub.getStatus(GetStatusRequest(apiVersion: apiVersion));
+        final session = status.status.connection.sessionId;
+        final packet = link.stub.exportDiagnostics(
+          ExportDiagnosticsRequest(
+            apiVersion: apiVersion,
+            controlAuthenticator: link.token,
+            sessionId: session,
+            format: DiagnosticFormat.DIAGNOSTIC_FORMAT_PCAPNG,
+          ),
+        );
+        final neighbour = await Process.start(
+          'go',
+          ['test', '-v', './diagnostics', '-run', r'^TestNativeIndependentCaptures$'],
+          workingDirectory: '../core',
+          environment: {'SORA_CAPTURE_DEVICE': 'sora0'},
+        );
+        final neighbourOutput = neighbour.stdout.transform(const SystemEncoding().decoder).join();
+        final neighbourErrors = neighbour.stderr.transform(const SystemEncoding().decoder).join();
+        for (var i = 0; i < 12; i++) {
+          expect(await fetch('https://example.com/'), '200');
+          await Future<void>.delayed(const Duration(milliseconds: 300));
+        }
+        final answer = await packet;
+        expect(answer.hasError(), isFalse, reason: '${answer.error.userMessageKey} ${answer.error.detailRedacted}');
+        expect(await neighbour.exitCode, 0, reason: '${await neighbourOutput}\n${await neighbourErrors}');
+        final directory = await Directory.systemTemp.createTemp('sora-native-diagnostics-');
+        try {
+          final path = '${directory.path}${Platform.pathSeparator}packets.pcapng';
+          await File(path).writeAsBytes(answer.archive);
+          final read = await Process.run(
+            'go',
+            ['test', '-v', './diagnostics', '-run', r'^TestNativePacketArchive$'],
+            workingDirectory: '../core',
+            environment: {'SORA_PACKET_ARCHIVE': path},
+          );
+          expect(read.exitCode, 0, reason: '${read.stdout}\n${read.stderr}');
+          final events = await link.stub.exportDiagnostics(
+            ExportDiagnosticsRequest(
+              apiVersion: apiVersion,
+              controlAuthenticator: link.token,
+              format: DiagnosticFormat.DIAGNOSTIC_FORMAT_EVTX,
+            ),
+          );
+          expect(events.hasError(), isFalse, reason: '${events.error.userMessageKey} ${events.error.detailRedacted}');
+          final eventPath = '${directory.path}${Platform.pathSeparator}events.evtx';
+          await File(eventPath).writeAsBytes(events.archive);
+          final parsed = await Process.run('powershell.exe', [
+            '-NoProfile',
+            '-Command',
+            "Get-WinEvent -Path '${eventPath.replaceAll("'", "''")}' | ForEach-Object { if (\$_.ProviderName -ne \"SoraCore\") { throw \"Foreign provider\" }; \$_.ProviderName }",
+          ]);
+          expect(parsed.exitCode, 0, reason: '${parsed.stdout}\n${parsed.stderr}');
+          expect('${parsed.stdout}', contains('SoraCore'));
+        } finally {
+          await directory.delete(recursive: true);
+        }
+        final after = await link.stub.getStatus(GetStatusRequest(apiVersion: apiVersion));
+        expect(after.status.connection.sessionId, session);
+        expect(after.status.connection.value, ConnectionStateValue.CONNECTION_STATE_VALUE_CONNECTED);
+      } finally {
+        await disconnect();
+      }
+    },
+    skip: skip,
+    timeout: const Timeout(Duration(minutes: 3)),
+  );
 
   test(
     'a kill switch armed with Connect lets the tunnel through and leaves with the session',

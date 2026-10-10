@@ -358,7 +358,10 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
       } else {
         // Include the year for expiry dates outside the current year to avoid
         // ambiguous dates.
-        final format = expire.year == DateTime.now().year ? DateFormat.MMMMd(locale) : DateFormat.yMMMMd(locale);
+        final dateLocale = Intl.verifiedLocale(locale, DateFormat.localeExists, onFailure: (_) => 'en');
+        final format = expire.year == DateTime.now().year
+            ? DateFormat.MMMMd(dateLocale)
+            : DateFormat.yMMMMd(dateLocale);
         facts.add(s.until(format.format(expire)));
       }
     }
@@ -521,7 +524,8 @@ Future<void> deleteSubscription(BuildContext context, SubscriptionState state) a
 /// Formats a localized byte count with a unit and up to one decimal place.
 String formatBytes(S s, Int64 bytes, String locale) {
   final (value, unit) = Sora.scaleBytes(bytes);
-  final number = NumberFormat(value >= 100 || unit == 0 ? '0' : '0.#', locale).format(value);
+  final supported = Intl.verifiedLocale(locale, NumberFormat.localeExists, onFailure: (_) => 'en');
+  final number = NumberFormat(value >= 100 || unit == 0 ? '0' : '0.#', supported).format(value);
   return switch (unit) {
     0 => s.bytesB(number),
     1 => s.bytesKB(number),

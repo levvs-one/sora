@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <vector>
 
 namespace {
 
@@ -886,6 +887,29 @@ void instance_method_call_cb(FlMethodChannel *channel,
     WebKitSettings *settings = webkit_web_view_get_settings(webview->web_view);
     const gchar *user_agent = map_lookup_string(args, "userAgent");
     webkit_settings_set_user_agent(settings, user_agent);
+    respond(method_call, success_response());
+    return;
+  }
+
+  if (strcmp(method, "setPreferredLanguages") == 0) {
+    FlValue *values = map_lookup(args, "languages");
+    if (values == nullptr || fl_value_get_type(values) != FL_VALUE_TYPE_LIST) {
+      respond(method_call, error_response("invalid_arguments", "languages must be a list"));
+      return;
+    }
+    std::vector<const gchar *> languages;
+    for (size_t i = 0; i < fl_value_get_length(values); ++i) {
+      const gchar *value = fl_value_to_string_or_null(fl_value_get_list_value(values, i));
+      if (value != nullptr) languages.push_back(value);
+    }
+    languages.push_back(nullptr);
+    webkit_web_context_set_preferred_languages(webkit_web_view_get_context(webview->web_view), languages.data());
+    respond(method_call, success_response());
+    return;
+  }
+
+  if (strcmp(method, "enableNetworkEvents") == 0) {
+    g_object_set_data(G_OBJECT(webview->web_view), "sora_network_events", GINT_TO_POINTER(1));
     respond(method_call, success_response());
     return;
   }
