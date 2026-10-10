@@ -194,6 +194,7 @@ class _LogsScreenState extends State<LogsScreen> {
   }
 
   Future<void> _export(LogExportFormat format, String extension) async {
+    if (!mounted) return;
     final link = SoraScope.read(context).link;
     if (link == null) return;
     if (!SoraScope.read(context).coreCapabilities.contains('log-export-formats') &&
@@ -218,6 +219,7 @@ class _LogsScreenState extends State<LogsScreen> {
         ),
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      if (!mounted) return;
       final place = await getSaveLocation(suggestedName: name);
       if (place == null) return;
       await File(place.path).writeAsBytes(answer.data, flush: true);
@@ -247,6 +249,7 @@ class _LogsScreenState extends State<LogsScreen> {
   }
 
   Future<void> _diagnostic(String extension) async {
+    if (!mounted) return;
     final sora = SoraScope.read(context), s = S.of(context);
     final name =
         'sora-log_${switch (extension) {

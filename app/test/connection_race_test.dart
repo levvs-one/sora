@@ -53,6 +53,7 @@ class _Core extends CoreControlServiceBase {
   final logPages = <QueryLogsRequest>[];
   final logWatches = <LogFilter>[];
   final exportRequests = <ExportLogsRequest>[];
+  Completer<void>? exportGate;
   final diagnosticCalls = <ServiceCall>[];
   final diagnosticRequests = <ExportDiagnosticsRequest>[];
   Completer<void>? diagnosticGate;
@@ -88,6 +89,7 @@ class _Core extends CoreControlServiceBase {
   @override
   Future<ExportLogsResponse> exportLogs(ServiceCall call, ExportLogsRequest request) async {
     exportRequests.add(request.deepCopy());
+    await exportGate?.future;
     return ExportLogsResponse();
   }
 
@@ -215,6 +217,7 @@ void main() {
     if (core.handshakeGate case final gate? when !gate.isCompleted) gate.complete();
     if (core.probeGate case final gate? when !gate.isCompleted) gate.complete();
     if (core.diagnosticGate case final gate? when !gate.isCompleted) gate.complete();
+    if (core.exportGate case final gate? when !gate.isCompleted) gate.complete();
     if (!disposed) sora.dispose();
     try {
       await running.timeout(const Duration(seconds: 10));
@@ -278,12 +281,50 @@ void main() {
           LogExportFormat.LOG_EXPORT_FORMAT_ZIP,
           LogExportFormat.LOG_EXPORT_FORMAT_GZIP,
         ]);
+        core.exportGate = Completer<void>();
+        await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.export));
+        await tester.pump(const Duration(milliseconds: 250));
+        await tester.tap(find.byWidgetPredicate((w) => w is Text && (w.data?.endsWith('.json') ?? false)));
+        await tester.pump();
+        await tester.runAsync(() => until(() => core.exportRequests.length == 9));
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+        expect(find.byType(LogsScreen), findsNothing);
+        core.exportGate!.complete();
+        for (var i = 0; i < 20 && saves.length == 8; i++) {
+          await tester.pump(const Duration(milliseconds: 100));
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+        }
+        expect(saves, hasLength(8), reason: 'Leaving logs must suppress the late save dialog');
+        for (final extension in ['json', 'har', 'pcapng']) {
+          await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+          await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+          await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+          await tester.pump();
+          await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.export));
+          await tester.pump(const Duration(milliseconds: 250));
+          await tester.tap(find.byWidgetPredicate((w) => w is Text && (w.data?.endsWith('.$extension') ?? false)));
+          await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+          await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+          await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+          await tester.pump();
+          expect(tester.takeException(), isNull);
+          expect(sora.history, isEmpty);
+          expect(core.exportRequests, hasLength(9));
+          expect(core.diagnosticRequests, isEmpty);
+        }
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
         sora.coreCapabilities.remove('log-export-formats');
         await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.export));
         await tester.pump(const Duration(milliseconds: 250));
         await tester.tap(find.byWidgetPredicate((w) => w is Text && (w.data?.endsWith('.json') ?? false)));
         await tester.pump(const Duration(milliseconds: 250));
-        expect(core.exportRequests, hasLength(8));
+        expect(core.exportRequests, hasLength(9));
         expect(saves, hasLength(8));
         expect(sora.history, hasLength(1));
       } finally {
