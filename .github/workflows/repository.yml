@@ -16,6 +16,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  windows-diagnostics:
+    name: Windows diagnostic contract
+    runs-on: windows-latest
+    steps:
+      - name: Inspect native packet-monitor metadata
+        shell: pwsh
+        run: |
+          pktmon list --json
+          pktmon status
+          Get-NetAdapter -IncludeHidden | Select-Object Name,InterfaceGuid,InterfaceDescription,ifIndex | ConvertTo-Json -Depth 5
+          logman query -ets
+
   workflow:
     name: Workflow lint
     runs-on: ubuntu-latest
