@@ -1,0 +1,477 @@
+{
+  "@@locale": "zh_Hant",
+  "stateOff": "未連接",
+  "stateConnecting": "正在連接",
+  "stateConnected": "已連接",
+  "stateReconnecting": "重新連接",
+  "stateDisconnecting": "斷開連接",
+  "stateFailed": "未連接",
+  "coreMissing": "Sora 服務沒有回應",
+  "serverAuto": "最快",
+  "serverBypass": "沒有伺服器",
+  "addSubscription": "新增訂閱",
+  "servers": "伺服器",
+  "settings": "設定",
+  "subscription": "訂閱",
+  "subscriptionLink": "訂閱連結",
+  "add": "添加",
+  "refresh": "更新",
+  "rename": "重新命名",
+  "delete": "刪除",
+  "cancel": "取消",
+  "save": "節省",
+  "name": "姓名",
+  "deleteSubscription": "刪除“{name}”？",
+  "routes": "路線",
+  "presetGlobal": "一切都透過 VPN",
+  "presetRu": "俄羅斯直達",
+  "presetIr": "伊朗直飛",
+  "presetCn": "中國直達",
+  "blockAds": "封鎖廣告",
+  "killSwitch": "只能透過 VPN 上網",
+  "engine": "引擎",
+  "engineAuto": "汽車",
+  "animations": "動畫",
+  "logs": "紀錄",
+  "about": "關於",
+  "logsAll": "全部",
+  "logsImportant": "重要的",
+  "logsErrors": "錯誤",
+  "search": "搜尋",
+  "export": "儲存到文件",
+  "clear": "清除",
+  "logsEmpty": "這裡什麼都沒有",
+  "appVersion": "版本 {version}",
+  "notInstalled": "未安裝",
+  "sourceCode": "原始碼",
+  "license": "執照",
+  "usage": "{used} {total}",
+  "until": "直到{date}",
+  "expired": "已到期",
+  "milliseconds": "{n} 女士",
+  "bytesB": "{n} B",
+  "bytesKB": "{n} 知識庫",
+  "bytesMB": "{n} MB",
+  "bytesGB": "{n}國標",
+  "bytesTB": "{n} TB",
+  "errGeneric": "出了點問題",
+  "errCore": "Sora 服務沒有回應",
+  "errAuth": "無法存取Sora服務",
+  "errVersion": "更新Sora：應用程式和服務是不同版本",
+  "errBusy": "等待，先前的命令仍在運行",
+  "errEngineMissing": "找不到該伺服器的引擎",
+  "errEngineStart": "引擎沒有啟動",
+  "errEngineStopped": "引擎停了",
+  "errTunnel": "無權建立 VPN 連接",
+  "errServers": "伺服器配置有錯誤",
+  "errNetwork": "無法到達伺服器",
+  "errTimeout": "伺服器沒有及時回复",
+  "errFirewall": "無法阻止 VPN 以外的互聯網",
+  "errSubFetch": "無法加載訂閱",
+  "errSubFormat": "這不是訂閱鏈接",
+  "errSubEmpty": "訂閱沒有伺服器",
+  "errSubDuplicate": "此訂閱已新增",
+  "errSubLimit": "訂閱數量太多",
+  "errSubScheme": "連結必須以 https:// 開頭",
+  "errSecretStore": "Sora 儲存損壞或無法使用",
+  "errNoServers": "新增訂閱以連接",
+  "exportText": "文字",
+  "connections": "連接",
+  "close": "關閉",
+  "chainDirect": "直接的",
+  "chainBlocked": "被阻止",
+  "theme": "主題",
+  "themeSystem": "System",
+  "themeLight": "光",
+  "themeDark": "黑暗的",
+  "language": "語言",
+  "languageSystem": "System",
+  "sectionConnection": "聯繫",
+  "sectionNoServer": "沒有伺服器",
+  "sectionPing": "平",
+  "sectionLog": "診斷",
+  "ipv6": "IPv6",
+  "dns": "域名系統",
+  "dnsAuto": "汽車",
+  "dnsHint": "地址，逗號分隔",
+  "fragment": "TLS 碎片",
+  "fragmentPackets": "分割什麼",
+  "fragmentLength": "件數",
+  "fragmentInterval": "片段之間的停頓",
+  "byDefault": "預設",
+  "rangeHint": "例如，100-200",
+  "splitPos": "分割部位",
+  "splitPosHint": "例如，1、midsld",
+  "disorder": "重新排序件",
+  "tlsRecord": "拆分 TLS 記錄",
+  "tlsRecordNo": "不",
+  "tlsRecordSni": "在網站名稱處",
+  "tlsRecordFirst": "第一個位元組之後",
+  "hostCase": "更改主機大小寫",
+  "probeMethod": "方法",
+  "probeAuto": "汽車",
+  "probeEngine": "透過發動機",
+  "probeConnect": "僅連接",
+  "probeUrl": "測試地址",
+  "probeTimeout": "等待",
+  "seconds": "{n} S",
+  "subscriptions": "訂閱",
+  "subscriptionSettings": "設定",
+  "userAgent": "使用者代理",
+  "autoUpdate": "自動更新",
+  "updateInterval": "多常",
+  "intervalProvider": "正如提供者所要求的",
+  "hours": "{n} h",
+  "updateNow": "立即更新",
+  "logLevel": "記錄什麼",
+  "levelDebug": "一切",
+  "levelInfo": "通常",
+  "levelWarning": "重要的",
+  "levelError": "僅錯誤",
+  "recordDestinations": "記錄站址",
+  "reset": "重置設定",
+  "resetConfirm": "重置所有設定？",
+  "resetAction": "重置",
+  "invalidValue": "這個值不會起作用",
+  "website": "訂閱頁面",
+  "providerWebsite": "提供者網站",
+  "support": "支援",
+  "controlPortQuestion": "{engine} 透過此電腦上的連接埠進行控制。 其他程式將能夠判斷 VPN 是否已開啟。",
+  "chooseEngine": "選擇{engine}",
+  "rules": "自訂規則",
+  "ruleAdd": "新規則",
+  "ruleHint": "站點、IP 或程式",
+  "ruleDirect": "直接的",
+  "ruleProxy": "透過VPN",
+  "ruleBlock": "堵塞",
+  "failover": "開機失敗",
+  "connectOnStart": "啟動時連接",
+  "trafficLow": "{name}：{left} 左",
+  "ruleInvalid": "這看起來不像一個網站、IP 或程式",
+  "tunnelMode": "模式",
+  "tunnelTun": "所有流量",
+  "tunnelProxy": "System代理",
+  "proxyAddress": "代理地址",
+  "copied": "已複製",
+  "launchAtLogin": "從系統入手",
+  "closeToTray": "關閉時保留在托盤中",
+  "notifications": "通知",
+  "trayOpen": "開啟Sora",
+  "trayConnect": "連接",
+  "trayDisconnect": "斷開",
+  "trayServer": "伺服器",
+  "trayQuit": "退出 Sora",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora：{state}、{server}",
+  "noticeInTray": "Sora 仍在托盤中",
+  "noticeInTrayBody": "從其圖標的選單中退出",
+  "noticeLost": "連線遺失",
+  "noticeLostBody": "Sora 正在重新連接",
+  "noticeRestored": "再次連接",
+  "noticeFailed": "無法連接",
+  "noticeBackup": "主伺服器沒有應答；備份承載流量",
+  "noticeNext": "服務員沒有回答；下一個承載流量",
+  "noticeMainBack": "主伺服器再次應答並承載流量",
+  "noticeSubscription": "訂閱",
+  "importTitle": "新增此訂閱？",
+  "importSealed": "此連結針對Happ進行了加密，只有Happ可以讀取。 向您的提供者詢問簡單的訂閱連結。",
+  "understood": "好的",
+  "noAnswer": "沒有答案",
+  "home": "家",
+  "navRules": "規則",
+  "navConnections": "連接",
+  "navLogs": "紀錄",
+  "navAbout": "關於",
+  "sidebarToggle": "切換側邊欄",
+  "more": "更多的",
+  "less": "較少的",
+  "currentServer": "目前伺服器",
+  "trafficDown": "已下載",
+  "trafficUp": "已上傳",
+  "perSecond": "{value}/秒",
+  "activeRules": "有效規則：{count}",
+  "recentNotifications": "最近的通知",
+  "notificationsEmpty": "連接和訂閱事件將出現在這裡",
+  "retryConnect": "重試連接",
+  "openLogs": "打開日誌",
+  "tourReplay": "再次顯示指南",
+  "tourStep": "第 5 步 {step}",
+  "tourBack": "後退",
+  "tourNext": "下一個",
+  "tourSkip": "跳過",
+  "tourFinish": "完畢",
+  "tourAdd": "新增您的提供者的訂閱連結。",
+  "tourServer": "選擇一個伺服器。 “最快”為您選擇一個。",
+  "tourConnect": "按一下此處連接或斷開連接。",
+  "tourMode": "選擇一種模式。 如果 VPN 斷線，終止開關會阻止網路。",
+  "tourSettings": "打開設定。 您可以在那裡重播本指南。",
+  "chooseProgram": "選擇一個程序",
+  "installedApps": "已安裝的應用程式",
+  "runningProcesses": "正在運行的進程",
+  "programsFailed": "無法載入應用程式",
+  "programsEmpty": "沒有找到應用程式。 嘗試另一個名字。",
+  "selectExe": "選擇一個 .exe 檔案",
+  "trafficUnavailable": "櫃檯尚未可用",
+  "speedtest": "速度",
+  "speedtestCheck": "檢查速度",
+  "speedtestSearch": "尋找服務",
+  "speedtestEmpty": "沒有匹配項。 更改搜尋。",
+  "speedtestBackToList": "返回服務",
+  "speedtestOpenBrowser": "在瀏覽器中開啟",
+  "speedtestUnavailable": "嵌入式瀏覽器無法啟動。 在系統瀏覽器中開啟該服務。",
+  "speedtestPageFailed": "頁面無法載入。 重新載入它或在系統瀏覽器中開啟該服務。",
+  "speedtestExternalFailed": "系統瀏覽器無法開啟。 再試一次。",
+  "modes": "模式",
+  "proxyShort": "代理人",
+  "tunMode": "所有流量 (TUN)",
+  "checkUpdates": "檢查更新",
+  "updates": "應用程式更新",
+  "updateAvailable": "版本 {version} 可用",
+  "updateOpenAbout": "查看更新",
+  "updateNotes": "{version}的變化",
+  "updateCheck": "檢查更新",
+  "updateChecking": "檢查...",
+  "updateNoNotes": "該版本沒有註解。",
+  "updateDropWarning": "當 Sora 及其核心更新時，VPN 連線將斷開幾秒鐘。 繼續？",
+  "updateWaitConnection": "等待 VPN 連線和核心準備就緒。",
+  "updateDownloading": "正在下載並驗證文件...",
+  "updateInstalling": "正在準備更新或等待管理員身份驗證...",
+  "updateNetworkError": "無法下載更新。 再試一次。",
+  "updateReleaseError": "發布資料或所需文件遺失或無效。",
+  "updateChecksumError": "下載的內容與 SHA256SUMS 不符。 沒有安裝任何東西。",
+  "updateInstallError": "更新沒有完成。 身份驗證可能已被取消。",
+  "updateUnsupported": "此可執行檔不屬於受支援的 Sora 軟體包對。 使用發行版安裝說明。",
+  "updateManual": "在終端機中執行此命令以安裝兩個經過驗證的軟體包，然後重新開啟 Sora。 檔案保留在下載目錄中。 VPN 連線將會中斷。",
+  "updateCopyCommand": "複製指令",
+  "updateChecksDisabled": "在「設定」中停用自動檢查。",
+  "updateInstalled": "已安裝更新。 重新開啟 Sora。",
+  "projectLinks": "專案",
+  "githubReleases": "發佈和下載",
+  "telegramChannel": "Telegram通道",
+  "licenses": "許可證",
+  "componentLicenses": "組件許可證",
+  "appCopyright": "© 2026 levvs-one 和貢獻者",
+  "collapseServers": "崩潰伺服器",
+  "expandServers": "擴充伺服器",
+  "hideDescription": "隱藏描述",
+  "showDescription": "顯示說明",
+  "pendingConnectionChanges": "重新連接以套用這些變更。",
+  "reconnectNow": "應用並重新連接",
+  "bypassLimitations": "此模式僅針對 HTTP 和 TLS 繞過 DPI，不支援 UDP 或變更您的 IP。 使用 VPN 伺服器進行 Discord 語音、呼叫和封鎖的 Telegram 位址。",
+  "errEngineUnsupported": "所選引擎不支援此設定檔或設定。 選擇自動或相容的引擎。",
+  "errRestore": "連線清理不完整。 重試斷開連線；詳細資訊請參閱日誌。",
+  "errSessionEnded": "本次會議已經結束。 刷新連線狀態。",
+  "retryDisconnect": "重試斷開連接",
+  "tunStack": "TUN堆疊",
+  "modesInfo": "關於模式",
+  "modesGuideTitle": "模式和引擎",
+  "probeServers": "檢查伺服器",
+  "expiresIn": "{name}: {days, plural, =0{訂閱將在幾個小時後結束} one{訂閱於 # 天結束} other{訂閱將在 # 天後結束}}",
+  "groupOrdered": "{count, plural, one{# 伺服器依序} other{依序為 # 伺服器}}",
+  "groupBest": "{count, plural, one{#伺服器，最快} other{#伺服器，最快}}",
+  "modesGuide": "如果您不確定您的伺服器需要哪個引擎，請選擇自動。 Sora 在連接前檢查設定檔和設定。 引擎無法增加計劃的頻寬：效能取決於伺服器、路由、協定和網路。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 建立虛擬網路介面並透過它路由應用程式流量，包括 TCP 和 UDP。 Telegram、遊戲和Discord語音使用此模式。 規則可以直接發送或封鎖特定網站或程式。 網路服務需要權限和支援所需協定的伺服器。\n\n### System 代理\n\nSora 設定本機 HTTP/SOCKS 代理程式。 尊重系統代理設定的應用程式使用它。 擁有自己的網路堆疊的應用程式可以直接連接； UDP和語音通話一般需要TUN。 此模式適合具有代理支援的瀏覽器和應用程式。\n\n### 沒有伺服器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 來拆分和重塑 HTTP/TLS 請求並繞過一些 DPI 檢查。 您的 IP 保持不變，連線直接進入網站。 結果取決於您的提供者和阻止方法。\n\n目前整合使用 tpws 進行 HTTP 和 TCP 上的 TLS。 它不繞過IP阻塞或中繼UDP，也不能保證Telegram的MTProto連線。 使用具有 TUN 的 VPN 伺服器進行 Discord 語音、Telegram 通話和此類限制。\n\n## 引擎\n\n＃＃＃ 汽車\n\nSora 選擇支援整個連線計畫的已安裝引擎：伺服器協定、傳輸、群組、分段和模式。 在停止目前連線之前，不相容的手動選擇將被拒絕。 選擇自動或其他引擎並再次套用設定。\n\n### sing-box\n\n新的 Sora 軟體包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，增加了客戶端 XHTTP Sora 認可此構建及其功能。 沒有 XHTTP 的上游版本無法僅從其名稱中獲得此功能。\n\n支援的協定包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可匯入的 AmneziaWG 1.x/2.x 參數。完整的 Xray JSON 設定需要 Xray。目前尚無法匯入新的 AWG 3.x 欄位。sing-box 使用受密碼保護的本機控制連接埠，電腦上的其他應用程式可以偵測到該連接埠。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支援 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它還運行完整的供應商 Xray 配置文件，同時保留其路由和群組。 此類設定檔無法在不改變其行為的情況下自動轉換為另一個引擎。\n\n捆綁的 Xray 刪除了停用 TLS 憑證驗證的設定（「allowInsecure」）。 對於需要此設定的普通伺服器，自動選擇sing-box或mihomo。 在停止目前連線之前選擇 Xray 手動報告不相容性。 較舊的完整 JSON 設定檔需要更新的提供者設定檔以及可驗證的憑證或憑證 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支援有序回退和負載平衡組 XHTTP 和 AmneziaWG。 當自動故障轉移到備份伺服器很重要時選擇它。 Sora 的 TLS 碎片設定在此引擎上不可用。\n\n## Sora 的兼容性\n\n|特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN 和 TCP/UDP |是的 |是的 |是的 |\n| XHTTP |是的 |是的 |是的 |\n| VLESS Encryption |是的 |是的 |是的 |\n| Xray 完整簡介 |沒有 |是的 |沒有 |\n| TUIC / AnyTLS |兩者 |沒有 | TUIC |\n| TLS 碎片 |是的 |是的 |沒有 |\n| AmneziaWG 1.x/2.x |是的 1 |沒有 |是的 |\n|有順序後備組 |沒有 |沒有² |是的 |\n\n1 附 J1/J2/J3/Itime 的型材使用 mihomo；這些欄位絕不能被默默地丟棄。 ² 對於一組完整的 Xray 設定文件，應用程式會選擇一個備份設定檔。 支援取決於安裝的版本；在「關於」中檢查其版本。\n\n## TUN 堆疊\n\n此堆疊在虛擬介面內處理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每個引擎都會保存自己的首選項。 System 代理程式和無伺服器模式不使用此首選項。\n\n- **Mixed** — TCP 使用系統堆疊，而 gVisor 處理 UDP。 這是 mihomo 的預設值。\n- **System** — 使用系統堆疊。 如果網頁應用程式遇到問題，請嘗試其他選項。\n- **gVisor** — 處理用戶空間中的流量。\n- **MIPS** — mihomo 自己的 IP 堆疊，在捆綁版本 1.19.32 中提供。\n\n在Linux上，Xray預設使用其內建的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作為 TUN 引擎，透過經過驗證的本機 SOCKS 連結將 TCP 和 UDP 轉送到 Xray。 Xray 保留協定、提供者設定檔和路由。 這三個選項需要安裝 mihomo。 在Windows上，TUN目前使用sing-box或mihomo；Xray以系統代理模式運作。\n\n橋接器運行第二個進程。 在 Linux 上的三個空閒測量中，它比本機 Xray TUN 多使用了約 32-36 MiB 的實體記憶體。 這不會測量下載負載：CPU 和記憶體成本取決於連接。 保留 gVisor 除非您需要另一個堆疊。 sing-box沒有堆疊選擇器。 沒有任何堆疊可以保證每個網路都有更好的效能。 選擇一個堆疊並選擇“應用並重新連接”以在您的網路中進行嘗試。\n\n## 應用程式設定\n\n選擇伺服器會自動重新連線。 模式、引擎、DNS和規則設定立即儲存；在活動連線期間，按一下應用並重新連線即可使用它們。 重新啟動引擎可能會中斷下載和呼叫。 重複點擊不會啟動並行連接；斷開連接結束轉換並釋放連接。\n\n當隧道斷開時，僅透過 VPN 的 Internet 會阻止直接流量。 它影響整個機器。 明確斷開連線會刪除 Sora 的規則。 如果清理未完成，請重試斷開連線並開啟日誌。\n\n## 專案文檔\n\n- [sing-box-lx：設定與支援](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文件](https://sing-box.sagernet.org/)\n- [Xray 文件](https://xtls.github.io/)\n- [mihomo 文件](https://wiki.metacubex.one/)\n- [zapret：操作與限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extensionsSoon": "即將推出",
+  "diagnosticUnavailable": "此診斷在此平台上不可用。",
+  "extensions": "擴充",
+  "diagnosticPackets": "抓包",
+  "exportLogFile": "儲存為 {name}",
+  "diagnosticCapture": "捕捉10秒",
+  "diagnosticHttp": "HTTP 診斷",
+  "diagnosticEvents": "Windows 事件",
+  "diagnosticRequiresTun": "封包擷取需要活動的 Sora TUN 連線。",
+  "diagnosticNoData": "尚未記錄請求。 首先打開一個速度測試網站。",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}

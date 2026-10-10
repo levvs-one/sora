@@ -1,4 +1,4 @@
-import 'dart:ui' show PlatformDispatcher;
+import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -109,6 +109,13 @@ class Settings {
   /// Language selection: system or a supported locale code.
   String get language => _store.getString('language') ?? 'system';
   set language(String value) => _store.setString('language', value);
+
+  Locale? get locale => switch (language) {
+    'system' => null,
+    'zh_Hans' => const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hans'),
+    'zh_Hant' => const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
+    _ => Locale(language),
+  };
 
   /// Enables TLS ClientHello fragmentation for proxy connections. Empty options
   /// use core defaults for packets (tlshello), segment lengths and delays.

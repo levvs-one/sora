@@ -96,6 +96,12 @@ jobs:
         run: go vet ./...
       - name: Test
         run: go test -race ./...
+      - name: Real packet capture in a private network
+        run: |
+          go test -race -c -o "$RUNNER_TEMP/sora-packet-tests" ./diagnostics
+          original=$(readlink /proc/self/ns/net)
+          sudo unshare --net env SORA_ISOLATED_PACKET_TEST=1 SORA_ORIGINAL_NETNS="$original" \
+            "$RUNNER_TEMP/sora-packet-tests" -test.v -test.run '^TestNativeLinuxOwnedTunCapture$' -test.timeout 15s
       - name: Lint
         uses: golangci/golangci-lint-action@v8
         with:
@@ -125,6 +131,8 @@ jobs:
         run: flutter analyze
       - name: Test
         run: flutter test
+      - name: Connection and export races over an isolated RPC socket
+        run: SORA_CORE_SOCKET="/tmp/sora-race-$GITHUB_RUN_ID.sock" flutter test test/connection_race_test.dart
       - name: Build for Linux
         run: flutter build linux --release
       - name: Check the Linux update helper
@@ -243,6 +251,42 @@ jobs:
           SORA_CORE_LIVE: "1"
           SORA_CORE_ENGINES: sing-box,xray,mihomo
         run: flutter test test/live_core_test.dart
+      - name: The pipe works without administrator rights
+        working-directory: app
+        shell: pwsh
+        run: |
+          $flutter = (Get-Command flutter).Source
+          $script = "$env:RUNNER_TEMP\sora-user-check.ps1"
+          $result = "$env:RUNNER_TEMP\sora-user-result.txt"
+          $output = "$env:RUNNER_TEMP\sora-user-output.txt"
+          # runas disables the administrator SID, including inherited build
+          # directory access; the ordinary Users group must own test outputs.
+          foreach ($path in @($PWD.Path, $env:FLUTTER_ROOT, $env:PUB_CACHE, $env:RUNNER_TEMP)) {
+            & icacls.exe $path /grant '*S-1-5-32-545:(OI)(CI)M' /T /Q | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Cannot prepare ordinary-user access to $path" }
+          }
+          @"
+          Set-Location '$PWD'
+          `$env:SORA_CORE_LIVE = '1'
+          `$env:SORA_CORE_ENGINES = 'sing-box,xray,mihomo'
+          `$env:SORA_CORE_UNELEVATED = '1'
+          & '$flutter' test test/live_core_test.dart *> '$output'
+          `$LASTEXITCODE | Set-Content '$result'
+          "@ | Set-Content $script
+          Start-Service seclogon
+          $command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$script`""
+          & runas.exe /trustlevel:0x20000 $command
+          for ($i = 0; $i -lt 120 -and -not (Test-Path $result); $i++) { Start-Sleep -Seconds 1 }
+          Get-Content $output -ErrorAction SilentlyContinue
+          if (-not (Test-Path $result) -or (Get-Content $result) -ne '0') {
+            throw 'The ordinary Windows user cannot reach SoraCore'
+          }
+      - name: Real websites in WebView2
+        working-directory: app
+        run: |
+          flutter test integration_test/browser_language_test.dart -d windows
+          if ($LASTEXITCODE -ne 0) { throw 'Native browser language or HAR failed' }
+          flutter test integration_test/live_browser_test.dart -d windows
       - name: Real traffic through the tunnel and the system proxy
         # A VLESS server on this machine, Xray from the installed engines; its
         # access log shows the traffic reached it through Sora.

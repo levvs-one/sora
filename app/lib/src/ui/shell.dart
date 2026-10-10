@@ -43,7 +43,7 @@ class DesktopShell extends StatefulWidget {
 }
 
 class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver {
-  static const _sectionOrder = [0, 6, 4, 1, 3, 5, 7, 2];
+  static const _sectionOrder = [0, 6, 8, 4, 1, 3, 5, 7];
   final _scaffold = GlobalKey<ScaffoldState>();
   final _tourKeys = List.generate(5, (_) => GlobalKey());
   final _focus = FocusNode();
@@ -266,6 +266,13 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
       const SettingsScreen(),
       const SpeedtestScreen(),
       const AboutScreen(),
+      Screen(
+        title: S.of(context).extensions,
+        fill: Center(
+          child: Text(S.of(context).extensionsSoon, style: Styles.heading.copyWith(color: palette.ink)),
+        ),
+        children: const [],
+      ),
     ];
     final page = pages[_section];
     final content = KeyedSubtree(
@@ -375,6 +382,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
       s.settings,
       s.speedtest,
       s.navAbout,
+      s.extensions,
     ];
     const icons = [
       Symbols.home_rounded,
@@ -385,6 +393,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
       Symbols.settings_rounded,
       Symbols.speed_rounded,
       Symbols.info_rounded,
+      Symbols.category_rounded,
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -428,7 +437,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
           ),
         ),
         const SizedBox(height: 20),
-        for (final index in _sectionOrder.take(6))
+        for (final index in _sectionOrder.take(7))
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             child: index == 5 && !drawer

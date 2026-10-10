@@ -15,6 +15,9 @@ typedef struct {
   gchar *method;
   FlValue *headers;
   gboolean is_main_frame;
+  gint64 started;
+  gint64 wall_time;
+  gchar *error;
 } ResourceRequestDetails;
 
 enum class PendingRequestType {
@@ -61,6 +64,7 @@ static void destroy_resource_request_details(gpointer data) {
     return;
   }
   g_free(details->method);
+  g_free(details->error);
   if (details->headers != nullptr) {
     fl_value_unref(details->headers);
   }
@@ -473,11 +477,65 @@ static void resource_response_cb(WebKitWebResource *resource, GParamSpec *pspec,
   send_event(webview, event);
 }
 
+static void resource_finished_cb(WebKitWebResource *resource, gpointer user_data) {
+  WebKitWebView *widget = WEBKIT_WEB_VIEW(user_data);
+  LinuxWebView *webview = static_cast<LinuxWebView *>(
+      g_object_get_data(G_OBJECT(widget), kLinuxWebViewInstanceKey));
+  if (webview == nullptr || !webview->event_listening ||
+      g_object_get_data(G_OBJECT(widget), "sora_network_events") == nullptr) return;
+  const auto *details = static_cast<ResourceRequestDetails *>(
+      g_object_get_data(G_OBJECT(resource), kResourceRequestDetailsKey));
+  if (details == nullptr) return;
+  WebKitURIResponse *response = webkit_web_resource_get_response(resource);
+  const gchar *url = webkit_web_resource_get_uri(resource);
+  FlValue *event = make_event("networkResource");
+  fl_value_set_string_take(event, "url", fl_value_new_string(url == nullptr ? "" : url));
+  fl_value_set_string_take(event, "method", fl_value_new_string(details->method));
+  fl_value_set_string_take(event, "started", fl_value_new_int(details->wall_time));
+  fl_value_set_string_take(event, "elapsed", fl_value_new_float((g_get_monotonic_time() - details->started) / 1000.0));
+  fl_value_set_string_take(event, "requestHeaders", fl_value_ref(details->headers));
+  fl_value_set_string_take(event, "status", fl_value_new_int(response == nullptr ? 0 : webkit_uri_response_get_status_code(response)));
+  FlValue *headers = fl_value_new_map();
+  if (response != nullptr) {
+    const gchar *mime = webkit_uri_response_get_mime_type(response);
+    fl_value_set_string_take(event, "mimeType", fl_value_new_string(mime == nullptr ? "" : mime));
+    fl_value_set_string_take(event, "size", fl_value_new_int(webkit_uri_response_get_content_length(response)));
+    SoupMessageHeaders *raw = webkit_uri_response_get_http_headers(response);
+    if (raw != nullptr) soup_message_headers_foreach(raw, copy_response_header, headers);
+  }
+  fl_value_set_string_take(event, "headers", headers);
+  if (details->error != nullptr) fl_value_set_string_take(event, "error", fl_value_new_string(details->error));
+  send_event(webview, event);
+}
+
+static void resource_failed_cb(WebKitWebResource *resource, GError *error, gpointer) {
+  auto *details = static_cast<ResourceRequestDetails *>(g_object_get_data(G_OBJECT(resource), kResourceRequestDetailsKey));
+  if (details != nullptr && error != nullptr) {
+    g_free(details->error);
+    details->error = g_strdup(error->message);
+  }
+}
+
+static void resource_sent_request_cb(WebKitWebResource *resource, WebKitURIRequest *request,
+                                     WebKitURIResponse *, gpointer) {
+  auto *details = static_cast<ResourceRequestDetails *>(g_object_get_data(G_OBJECT(resource), kResourceRequestDetailsKey));
+  if (details == nullptr) return;
+  g_free(details->method);
+  const gchar *method = webkit_uri_request_get_http_method(request);
+  details->method = g_strdup(method == nullptr ? "" : method);
+  fl_value_unref(details->headers);
+  details->headers = fl_value_new_map();
+  SoupMessageHeaders *headers = webkit_uri_request_get_http_headers(request);
+  if (headers != nullptr) soup_message_headers_foreach(headers, copy_response_header, details->headers);
+}
+
 static void resource_load_started_cb(WebKitWebView *widget,
                                      WebKitWebResource *resource,
                                      WebKitURIRequest *request,
                                      gpointer user_data) {
   ResourceRequestDetails *details = g_new0(ResourceRequestDetails, 1);
+  details->started = g_get_monotonic_time();
+  details->wall_time = g_get_real_time();
   const gchar *method = webkit_uri_request_get_http_method(request);
   details->method = g_strdup(method != nullptr ? method : "");
   details->headers = fl_value_new_map();
@@ -494,6 +552,9 @@ static void resource_load_started_cb(WebKitWebView *widget,
   g_signal_connect_object(resource, "notify::response",
                           G_CALLBACK(resource_response_cb), widget,
                           static_cast<GConnectFlags>(0));
+  g_signal_connect_object(resource, "finished", G_CALLBACK(resource_finished_cb), widget, static_cast<GConnectFlags>(0));
+  g_signal_connect_object(resource, "failed", G_CALLBACK(resource_failed_cb), widget, static_cast<GConnectFlags>(0));
+  g_signal_connect_object(resource, "sent-request", G_CALLBACK(resource_sent_request_cb), widget, static_cast<GConnectFlags>(0));
 }
 
 static gboolean authenticate_cb(WebKitWebView *widget,

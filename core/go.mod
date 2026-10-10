@@ -5,6 +5,7 @@ go 1.26.9
 require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/godbus/dbus/v5 v5.2.2
+	github.com/gopacket/gopacket v1.7.4
 	github.com/tailscale/wf v0.0.0-20240214030419-6fbb0a674ee6
 	github.com/txthinking/socks5 v0.0.0-20260601051520-339b044ab0eb
 	golang.org/x/net v0.60.0

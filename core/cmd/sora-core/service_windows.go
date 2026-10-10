@@ -56,6 +56,15 @@ func (h *handler) Execute(_ []string, requests <-chan svc.ChangeRequest, status 
 	done := make(chan error, 1)
 	go func() { done <- run(ctx, h.arguments) }()
 	status <- svc.Status{State: svc.Running, Accepts: svc.AcceptStop | svc.AcceptShutdown}
+	if events, err := eventlog.Open(serviceName); err == nil {
+		_ = events.Info(2, "Sora core service started: "+buildVersion)
+		defer func() {
+			if h.err == nil {
+				_ = events.Info(3, "Sora core service stopped normally")
+			}
+			_ = events.Close()
+		}()
+	}
 	for {
 		select {
 		case change := <-requests:

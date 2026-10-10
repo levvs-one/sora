@@ -1,0 +1,477 @@
+{
+  "@@locale": "ja",
+  "stateOff": "接続されていません",
+  "stateConnecting": "接続中",
+  "stateConnected": "接続済み",
+  "stateReconnecting": "再接続中",
+  "stateDisconnecting": "切断中",
+  "stateFailed": "接続されていません",
+  "coreMissing": "Sora サービスが応答していません",
+  "serverAuto": "最速",
+  "serverBypass": "サーバーがありません",
+  "addSubscription": "サブスクリプションの追加",
+  "servers": "サーバー",
+  "settings": "設定",
+  "subscription": "サブスクリプション",
+  "subscriptionLink": "購読リンク",
+  "add": "追加",
+  "refresh": "アップデート",
+  "rename": "名前の変更",
+  "delete": "消去",
+  "cancel": "キャンセル",
+  "save": "保存",
+  "name": "名前",
+  "deleteSubscription": "「{name}」を削除しますか?",
+  "routes": "ルート",
+  "presetGlobal": "すべてVPN経由",
+  "presetRu": "ロシア直接",
+  "presetIr": "イラン直接",
+  "presetCn": "中国直接",
+  "blockAds": "広告をブロックする",
+  "killSwitch": "インターネットはVPN経由のみ",
+  "engine": "エンジン",
+  "engineAuto": "自動",
+  "animations": "アニメーション",
+  "logs": "ログ",
+  "about": "について",
+  "logsAll": "全て",
+  "logsImportant": "重要",
+  "logsErrors": "エラー",
+  "search": "検索",
+  "export": "ファイルに保存",
+  "clear": "クリア",
+  "logsEmpty": "ここには何もありません",
+  "appVersion": "バージョン {version}",
+  "notInstalled": "インストールされていません",
+  "sourceCode": "ソースコード",
+  "license": "ライセンス",
+  "usage": "{used}/{total}",
+  "until": "{date}まで",
+  "expired": "期限切れ",
+  "milliseconds": "{n} ミリ秒",
+  "bytesB": "{n} B",
+  "bytesKB": "{n} KB",
+  "bytesMB": "{n} MB",
+  "bytesGB": "{n} GB",
+  "bytesTB": "{n} TB",
+  "errGeneric": "何か問題が発生しました",
+  "errCore": "Sora サービスが応答していません",
+  "errAuth": "Sora サービスにアクセスできません",
+  "errVersion": "Sora を更新: アプリとサービスのバージョンが異なります",
+  "errBusy": "待ってください、前のコマンドはまだ実行中です",
+  "errEngineMissing": "このサーバー用のエンジンが見つかりません",
+  "errEngineStart": "エンジンが始動しなかった",
+  "errEngineStopped": "エンジンが止まってしまった",
+  "errTunnel": "VPN接続を作成する権限がありません",
+  "errServers": "サーバーの構成にエラーがあります",
+  "errNetwork": "サーバーにアクセスできません",
+  "errTimeout": "サーバーは時間内に応答しませんでした",
+  "errFirewall": "VPN の外部でインターネットをブロックできませんでした",
+  "errSubFetch": "サブスクリプションを読み込めませんでした",
+  "errSubFormat": "これは購読リンクではありません",
+  "errSubEmpty": "サブスクリプションにはサーバーがありません",
+  "errSubDuplicate": "このサブスクリプションはすでに追加されています",
+  "errSubLimit": "サブスクリプションが多すぎます",
+  "errSubScheme": "リンクは https:// で始まる必要があります",
+  "errSecretStore": "Sora ストレージが破損しているか使用できません",
+  "errNoServers": "接続するサブスクリプションを追加する",
+  "exportText": "文章",
+  "connections": "接続",
+  "close": "近い",
+  "chainDirect": "直接",
+  "chainBlocked": "ブロックされました",
+  "theme": "テーマ",
+  "themeSystem": "System",
+  "themeLight": "ライト",
+  "themeDark": "暗い",
+  "language": "言語",
+  "languageSystem": "System",
+  "sectionConnection": "繋がり",
+  "sectionNoServer": "サーバーがありません",
+  "sectionPing": "ピン",
+  "sectionLog": "診断",
+  "ipv6": "IPv6",
+  "dns": "DNS",
+  "dnsAuto": "自動",
+  "dnsHint": "アドレス、カンマ区切り",
+  "fragment": "TLS フラグメンテーション",
+  "fragmentPackets": "何を分割するか",
+  "fragmentLength": "ピースサイズ",
+  "fragmentInterval": "作品間で一時停止する",
+  "byDefault": "デフォルト",
+  "rangeHint": "たとえば、100 ～ 200",
+  "splitPos": "スプリットポジション",
+  "splitPosHint": "たとえば、1、midsld",
+  "disorder": "作品を並べ替える",
+  "tlsRecord": "TLS レコードを分割する",
+  "tlsRecordNo": "いいえ",
+  "tlsRecordSni": "サイト名のところに",
+  "tlsRecordFirst": "最初のバイトの後",
+  "hostCase": "ホストケースの変更",
+  "probeMethod": "方法",
+  "probeAuto": "自動",
+  "probeEngine": "エンジンを通して",
+  "probeConnect": "接続のみ",
+  "probeUrl": "テストアドレス",
+  "probeTimeout": "待って",
+  "seconds": "{n}",
+  "subscriptions": "定期購入",
+  "subscriptionSettings": "設定",
+  "userAgent": "ユーザーエージェント",
+  "autoUpdate": "自動更新",
+  "updateInterval": "どのくらいの頻度で",
+  "intervalProvider": "プロバイダーの要望通り",
+  "hours": "{n}h",
+  "updateNow": "今すぐアップデートしてください",
+  "logLevel": "何を記録するか",
+  "levelDebug": "すべて",
+  "levelInfo": "いつもの",
+  "levelWarning": "重要",
+  "levelError": "エラーのみ",
+  "recordDestinations": "サイトアドレスを記録する",
+  "reset": "設定をリセットする",
+  "resetConfirm": "すべての設定をリセットしますか?",
+  "resetAction": "リセット",
+  "invalidValue": "この値は機能しません",
+  "website": "購読ページ",
+  "providerWebsite": "プロバイダーのウェブサイト",
+  "support": "サポート",
+  "controlPortQuestion": "{engine} は、このコンピューターのポートを通じて制御されます。 他のプログラムは、VPN がオンになっていることを認識できます。",
+  "chooseEngine": "{engine}を選択してください",
+  "rules": "カスタムルール",
+  "ruleAdd": "新しいルール",
+  "ruleHint": "サイト、IP、またはプログラム",
+  "ruleDirect": "直接",
+  "ruleProxy": "VPN経由",
+  "ruleBlock": "ブロック",
+  "failover": "スイッチオンの失敗",
+  "connectOnStart": "起動時に接続する",
+  "trafficLow": "{name}: {left} 左",
+  "ruleInvalid": "これはサイト、IP、プログラムのようには見えません",
+  "tunnelMode": "モード",
+  "tunnelTun": "すべてのトラフィック",
+  "tunnelProxy": "System プロキシ",
+  "proxyAddress": "プロキシアドレス",
+  "copied": "コピーされました",
+  "launchAtLogin": "システムから始める",
+  "closeToTray": "閉じた状態でトレイに保管してください",
+  "notifications": "通知",
+  "trayOpen": "Soraを開く",
+  "trayConnect": "接続する",
+  "trayDisconnect": "切断する",
+  "trayServer": "サーバ",
+  "trayQuit": "Soraを終了する",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora: {state}、{server}",
+  "noticeInTray": "Sora はまだトレイ内にあります",
+  "noticeInTrayBody": "アイコンのメニューから終了します",
+  "noticeLost": "接続が失われました",
+  "noticeLostBody": "Sora が再接続中です",
+  "noticeRestored": "再び接続されました",
+  "noticeFailed": "接続できませんでした",
+  "noticeBackup": "メインサーバーは応答しませんでした。 バックアップはトラフィックを伝送します",
+  "noticeNext": "サーバーは応答しませんでした。 次のものがトラフィックを運ぶ",
+  "noticeMainBack": "メインサーバーが再度応答し、トラフィックを伝送します",
+  "noticeSubscription": "サブスクリプション",
+  "importTitle": "このサブスクリプションを追加しますか?",
+  "importSealed": "このリンクは Happ に対して暗号化されており、Happ のみが読み取ることができます。 プロバイダーにプレーンなサブスクリプション リンクを問い合わせてください。",
+  "understood": "わかりました",
+  "noAnswer": "答えはありません",
+  "home": "家",
+  "navRules": "ルール",
+  "navConnections": "接続",
+  "navLogs": "ログ",
+  "navAbout": "について",
+  "sidebarToggle": "サイドバーの切り替え",
+  "more": "もっと",
+  "less": "少ない",
+  "currentServer": "現在のサーバー",
+  "trafficDown": "ダウンロード済み",
+  "trafficUp": "アップロードされました",
+  "perSecond": "{value}/秒",
+  "activeRules": "アクティブなルール: {count}",
+  "recentNotifications": "最近のお知らせ",
+  "notificationsEmpty": "接続イベントとサブスクリプション イベントがここに表示されます",
+  "retryConnect": "接続を再試行します",
+  "openLogs": "ログを開く",
+  "tourReplay": "ガイドを再度表示する",
+  "tourStep": "ステップ {step}/5",
+  "tourBack": "戻る",
+  "tourNext": "次",
+  "tourSkip": "スキップ",
+  "tourFinish": "終わり",
+  "tourAdd": "プロバイダーのサブスクリプション リンクを追加します。",
+  "tourServer": "サーバーを選択します。 「最速」では、1 つが選択されます。",
+  "tourConnect": "ここをクリックして接続または切断します。",
+  "tourMode": "モードを選択します。 VPN が切断された場合、キルスイッチはインターネットをブロックします。",
+  "tourSettings": "設定を開きます。 そこでこのガイドを再生できます。",
+  "chooseProgram": "プログラムを選択してください",
+  "installedApps": "インストールされているアプリケーション",
+  "runningProcesses": "実行中のプロセス",
+  "programsFailed": "アプリケーションをロードできませんでした",
+  "programsEmpty": "アプリケーションが見つかりませんでした。 別の名前を試してください。",
+  "selectExe": ".exe ファイルを選択してください",
+  "trafficUnavailable": "カウンターはまだ利用できません",
+  "speedtest": "スピード",
+  "speedtestCheck": "速度をチェックする",
+  "speedtestSearch": "サービスを探す",
+  "speedtestEmpty": "一致はありません。 検索を変更します。",
+  "speedtestBackToList": "サービスに戻る",
+  "speedtestOpenBrowser": "ブラウザで開く",
+  "speedtestUnavailable": "組み込みブラウザを起動できませんでした。 システムブラウザでサービスを開きます。",
+  "speedtestPageFailed": "ページを読み込めませんでした。 リロードするか、システム ブラウザでサービスを開きます。",
+  "speedtestExternalFailed": "システムブラウザを開けませんでした。 もう一度やり直してください。",
+  "modes": "モード",
+  "proxyShort": "プロキシ",
+  "tunMode": "すべてのトラフィック (TUN)",
+  "checkUpdates": "アップデートをチェックする",
+  "updates": "アプリのアップデート",
+  "updateAvailable": "バージョン {version} が利用可能です",
+  "updateOpenAbout": "更新を見る",
+  "updateNotes": "{version}の変更点",
+  "updateCheck": "アップデートをチェックする",
+  "updateChecking": "チェック中...",
+  "updateNoNotes": "リリースにはメモがありません。",
+  "updateDropWarning": "Sora とそのコアの更新中に、VPN 接続が数秒間切断されます。 続く？",
+  "updateWaitConnection": "VPN 接続とコアの準備が整うまで待ちます。",
+  "updateDownloading": "ファイルをダウンロードして確認しています...",
+  "updateInstalling": "アップデートを準備中または管理者の認証を待っています...",
+  "updateNetworkError": "アップデートをダウンロードできませんでした。 もう一度やり直してください。",
+  "updateReleaseError": "リリース データまたは必要なファイルが欠落しているか無効です。",
+  "updateChecksumError": "ダウンロードは SHA256SUMS と一致しません。 何もインストールされていませんでした。",
+  "updateInstallError": "アップデートが完了しませんでした。 認証がキャンセルされた可能性があります。",
+  "updateUnsupported": "この実行可能ファイルは、サポートされている Sora パッケージ ペアによって所有されていません。 リリースのインストール手順を使用してください。",
+  "updateManual": "ターミナルでこのコマンドを実行して両方の検証済みパッケージをインストールし、Sora を再度開きます。 ファイルはダウンロード ディレクトリに残ります。 VPN 接続が切断されます。",
+  "updateCopyCommand": "コピーコマンド",
+  "updateChecksDisabled": "自動チェックは設定で無効になっています。",
+  "updateInstalled": "アップデートがインストールされました。 Soraを再度開きます。",
+  "projectLinks": "プロジェクト",
+  "githubReleases": "リリースとダウンロード",
+  "telegramChannel": "Telegram チャンネル",
+  "licenses": "ライセンス",
+  "componentLicenses": "コンポーネントライセンス",
+  "appCopyright": "© 2026 levvs-one および貢献者",
+  "collapseServers": "サーバーを折りたたむ",
+  "expandServers": "サーバーを拡張する",
+  "hideDescription": "説明を隠す",
+  "showDescription": "説明を表示",
+  "pendingConnectionChanges": "これらの変更を適用するには、再接続してください。",
+  "reconnectNow": "適用して再接続する",
+  "bypassLimitations": "このモードは HTTP と TLS に対してのみ DPI をバイパスし、UDP をサポートしたり、IP を変更したりすることはありません。 Discord 音声、通話、およびブロックされた Telegram アドレスには VPN サーバーを使用します。",
+  "errEngineUnsupported": "選択したエンジンは、このプロファイルまたは設定をサポートしていません。 自動または互換性のあるエンジンを選択します。",
+  "errRestore": "接続のクリーンアップが不完全でした。 切断を再試行してください。 詳細についてはログを参照してください。",
+  "errSessionEnded": "このセッションはすでに終了しています。 接続状態を更新します。",
+  "retryDisconnect": "切断を再試行してください",
+  "tunStack": "TUNスタック",
+  "modesInfo": "モードについて",
+  "modesGuideTitle": "モードとエンジン",
+  "probeServers": "サーバーを確認する",
+  "expiresIn": "{name}: {days, plural, =0{サブスクリプションは数時間後に終了します} one{サブスクリプションは # 日に終了します} other{サブスクリプションはあと # 日で終了します}}",
+  "groupOrdered": "{count, plural, one{# サーバー、順番に} other{# サーバー、順番に}}",
+  "groupBest": "{count, plural, one{# サーバー、最速} other{# サーバー、最速}}",
+  "modesGuide": "サーバーにどのエンジンが必要かわからない場合は、「自動」を選択してください。 Sora は接続前にプロファイルと設定を確認します。 エンジンはプランの帯域幅を増やすことはできません。パフォーマンスはサーバー、ルート、プロトコル、ネットワークに依存します。\n\n## モード\n\n### すべてのトラフィック (TUN)\n\nSora は、仮想ネットワーク インターフェイスを作成し、TCP や UDP などのアプリケーション トラフィックをそのインターフェイス経由でルーティングします。 このモードは、Telegram、ゲーム、および Discord 音声に使用します。 ルールでは、特定のサイトやプログラムを直接送信したり、ブロックしたりできます。 ネットワーク サービスには、許可と、必要なプロトコルをサポートするサーバーが必要です。\n\n### System プロキシ\n\nSora は、ローカル HTTP/SOCKS プロキシを構成します。 システムのプロキシ設定を尊重するアプリケーションはこれを使用します。 独自のネットワーク スタックを持つアプリケーションは直接接続できます。 UDP および音声通話には通常、TUN が必要です。 このモードは、プロキシをサポートするブラウザとアプリケーションに適しています。\n\n### サーバーがありません\n\nLinux では、Sora は [zapret](https://github.com/bol-van/zapret) を使用して HTTP/TLS リクエストを分割および再形成し、一部の DPI チェックをバイパスします。 IP は変更されず、接続は Web サイトに直接接続されます。 結果はプロバイダーとブロック方法によって異なります。\n\n現在の統合では、HTTP および TLS over TCP に tpws を使用します。 IP ブロッキングや UDP の中継はバイパスせず、Telegram の MTProto 接続を保証することはできません。 Discord 音声、Telegram 通話、およびこれらの種類の制限には、TUN を備えた VPN サーバーを使用します。\n\n## エンジン\n\n### 自動\n\nSora は、接続プラン全体 (サーバー プロトコル、トランスポート、グループ、フラグメンテーション、モード) をサポートする、インストールされているエンジンを選択します。 互換性のない手動選択は、現在の接続を停止する前に拒否されます。 [自動] または別のエンジンを選択し、設定を再度適用します。\n\n### sing-box\n\n新しい Sora パッケージには、[sing-box](https://github.com/SagerNet/sing-box) のフォークである [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) が含まれており、クライアント側 XHTTP および VLESS Encryption が追加されています。 Sora は、ビルドとその機能を認識します。 XHTTP のないアップストリーム ビルドでは、名前だけではこの機能が得られません。\n\n対応するプロトコルは VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard、および Sora が読み込める AmneziaWG 1.x/2.x のパラメーターです。完全な Xray JSON プロファイルには Xray が必要です。新しい AWG 3.x のフィールドはまだ読み込めません。sing-box はパスワードで保護されたローカル制御ポートを使用し、このポートは同じコンピューターの他のアプリから検出できます。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) は、VLESS、REALITY、XHTTP、VLESS Encryption、および TLS フラグメンテーションをサポートします。 また、ルーティングとグループを維持しながら、完全なプロバイダー Xray プロファイルを実行します。 このようなプロファイルは、動作を変更せずに別のエンジンに自動的に変換できません。\n\nバンドルされている Xray では、TLS 証明書の検証を無効にする設定 (`allowInsecure`) が削除されました。 この設定が必要な通常のサーバーでは、sing-box または mihomo が自動的に選択されます。 Xray を選択すると、現在の接続を停止する前に非互換性が手動で報告されます。 古い完全な JSON プロファイルには、検証可能な証明書または証明書 PIN を含む更新されたプロバイダー プロファイルが必要です。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) は、順序付けされたフォールバックおよび負荷分散グループ、XHTTP および AmneziaWG をサポートします。 バックアップ サーバーへの自動フェイルオーバーが重要な場合に選択してください。 Sora の TLS フラグメンテーション設定は、このエンジンでは使用できません。\n\n## Sora の互換性\n\n| 特集 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN と TCP/UDP | はい | はい | はい |\n| XHTTP | はい | はい | はい |\n| VLESS Encryption | はい | はい | はい |\n| Xray の全プロフィール | いいえ | はい | いいえ |\n| TUIC / AnyTLS | 両方 | いいえ | TUIC |\n| TLS フラグメンテーション | はい | はい | いいえ |\n| AmneziaWG 1.x/2.x | はい¹ | いいえ | はい |\n| 順序付けされたフォールバック グループ | いいえ | いいえ² | はい |\n\n¹ J1/J2/J3/Itime のプロファイルは mihomo を使用します。 これらのフィールドは決して黙って破棄してはなりません。 ² 完全な Xray プロファイルのグループの場合、アプリはバックアップ プロファイルを選択します。 サポートはインストールされているビルドによって異なります。 「バージョン情報」でバージョンを確認してください。\n\n## TUN スタック\n\nスタックは仮想インターフェイス内で TCP と UDP を処理します。 モード パネルでは、Xray および mihomo は、gVisor、System、Mixed、および MIPS を提供します。 各エンジンは独自の設定を保存します。 System プロキシ モードとサーバーレス モードでは、この設定は使用されません。\n\n- **Mixed** - TCP はシステム スタックを使用し、gVisor は UDP を処理します。 これは、mihomo のデフォルトです。\n- **System** — システム スタックを使用します。 ネットワーク アプリケーションに問題が発生した場合は、別のオプションを試してください。\n- **gVisor** — ユーザー空間のトラフィックを処理します。\n- **MIPS** — mihomo 独自の IP スタック。バンドルされたバージョン 1.19.32 で利用可能。\n\nLinux では、Xray はデフォルトで組み込みの gVisor を使用します。 Linux の System、Mixed、および MIPS は、TUN エンジンとして mihomo を使用し、認証されたローカル SOCKS リンク経由で TCP と UDP を Xray に転送します。 Xray は、プロトコル、プロバイダー プロファイル、およびルーティングを保持します。 これら 3 つのオプションには、mihomo がインストールされている必要があります。 Windows では、TUN は現在 sing-box または mihomo を使用しています。 Xray はシステム プロキシ モードで実行されます。\n\nブリッジは 2 番目のプロセスを実行します。 Linux での 3 つのアイドル状態の測定では、ネイティブ Xray TUN よりも約 32 ～ 36 MiB 多くの物理メモリを使用しました。 これはダウンロードの負荷を測定するものではありません。CPU とメモリのコストは接続によって異なります。 別のスタックが必要でない限り、gVisor を保持してください。 sing-box にはスタック セレクターがありません。 すべてのネットワークでより優れたパフォーマンスを保証するスタックはありません。 スタックを選択し、[適用して再接続] を選択して、ネットワーク内で試してください。\n\n## 設定を適用する\n\nサーバーを選択すると、自動的に再接続されます。 モード、エンジン、DNS、ルールの設定はすぐに保存されます。 アクティブな接続中に、[適用] をクリックして再接続し、それらを使用します。 エンジンを再起動すると、ダウンロードと通話が中断される場合があります。 クリックを繰り返しても並列接続は開始されません。 切断すると遷移が終了し、接続が解放されます。\n\nVPN 経由のみのインターネットは、トンネルが切断されたときに直接トラフィックをブロックします。 マシン全体に影響します。 明示的に切断すると、Sora のルールが削除されます。 クリーンアップが完了しない場合は、切断を再試行してログを開きます。\n\n## プロジェクトのドキュメント\n\n- [sing-box-lx: 構成とサポート](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ドキュメント](https://sing-box.sagernet.org/)\n- [Xray ドキュメント](https://xtls.github.io/)\n- [mihomo ドキュメント](https://wiki.metacubex.one/)\n- [zapret: 操作と制限事項](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extensionsSoon": "近日公開",
+  "diagnosticRequiresTun": "パケット キャプチャには、アクティブな Sora TUN 接続が必要です。",
+  "extensions": "拡張機能",
+  "diagnosticHttp": "HTTP 診断",
+  "diagnosticCapture": "10秒間のキャプチャ",
+  "diagnosticEvents": "Windowsイベント",
+  "diagnosticPackets": "パケットキャプチャ",
+  "exportLogFile": "保存先: {name}",
+  "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。",
+  "diagnosticNoData": "記録されたリクエストはまだありません。 まずスピードテストのWebサイトを開きます。",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}

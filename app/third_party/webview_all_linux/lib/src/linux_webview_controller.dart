@@ -57,6 +57,9 @@ class LinuxWebViewController extends PlatformWebViewController {
   MethodChannel? _channel;
   EventChannel? _eventChannel;
   StreamSubscription<dynamic>? _eventSubscription;
+  final _networkEvents = StreamController<Map<String, dynamic>>.broadcast();
+  Stream<Map<String, dynamic>> get networkEvents => _networkEvents.stream;
+  Future<void> enableNetworkEvents() => _invoke<void>('enableNetworkEvents');
   _LinuxWebViewDisposal? _nativeDisposal;
 
   LinuxNavigationDelegate? _navigationDelegate;
@@ -469,6 +472,10 @@ class LinuxWebViewController extends PlatformWebViewController {
     return _userAgent ?? await _channel!.invokeMethod<String>('getUserAgent');
   }
 
+  /// Sets the language of HTTP requests, navigator and JavaScript Intl.
+  Future<void> setPreferredLanguages(List<String> languages) =>
+      _invoke<void>('setPreferredLanguages', {'languages': languages});
+
   @override
   Future<void> setOnPlatformPermissionRequest(
     void Function(PlatformWebViewPermissionRequest request) onPermissionRequest,
@@ -644,6 +651,7 @@ class LinuxWebViewController extends PlatformWebViewController {
     }
     await _nativeDisposal?.dispose();
     _eventSubscription = null;
+    unawaited(_networkEvents.close());
     _javaScriptChannels.clear();
     _userScriptIdentifiers.clear();
     _navigationDelegate = null;

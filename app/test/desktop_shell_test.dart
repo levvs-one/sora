@@ -19,10 +19,16 @@ import 'package:sora/src/sora.dart';
 import 'package:sora/src/ui/kit.dart';
 import 'package:sora/src/ui/about.dart';
 import 'package:sora/src/ui/tour.dart';
+import 'package:sora/src/ui/shell.dart';
 
 import 'fixtures/desktop_state.dart';
 
 Future<void> section(WidgetTester tester, int number) async {
+  if (number == 3) {
+    tester.widget<ShellScope>(find.byType(ShellScope)).select(2);
+    await tester.pumpAndSettle();
+    return;
+  }
   final key = [
     LogicalKeyboardKey.digit1,
     LogicalKeyboardKey.digit2,
@@ -32,7 +38,7 @@ Future<void> section(WidgetTester tester, int number) async {
     LogicalKeyboardKey.digit6,
     LogicalKeyboardKey.digit7,
     LogicalKeyboardKey.digit8,
-  ][const [0, 3, 7, 4, 2, 5, 1, 6][number - 1]];
+  ][const [0, 4, 0, 5, 3, 6, 1, 7][number - 1]];
   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
   await tester.sendKeyEvent(key);
   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
@@ -81,10 +87,10 @@ void main() {
     await tester.tap(travelCollapse);
     await tester.pumpAndSettle();
     expect(find.text('Нидерланды, работа'), findsOneWidget);
-    expect(find.text('🇩🇪 Германия, Франкфурт'), findsNothing);
+    expect(find.text('￼Германия, Франкфурт'), findsNothing);
     await tester.tap(travelCollapse);
     await tester.pumpAndSettle();
-    expect(find.text('🇩🇪 Германия, Франкфурт'), findsOneWidget);
+    expect(find.text('￼Германия, Франкфурт'), findsOneWidget);
     await tester.enterText(find.byKey(const ValueKey('server-search')), 'Нидерланды');
     await tester.pumpAndSettle();
     final travel = find.byKey(const ValueKey('refresh-subscription-travel'));
@@ -134,6 +140,7 @@ void main() {
       'Sora',
       'Главная',
       'Скорость',
+      'Расширения',
       'Уведомления',
       'Правила',
       'Логи',
@@ -157,7 +164,8 @@ void main() {
     for (final package in [
       'Sora',
       'Inter',
-      'Noto Sans Mono',
+      'Noto Sans / Sora CJK',
+      'Country Flags',
       'sing-box',
       'mihomo',
       'Xray',

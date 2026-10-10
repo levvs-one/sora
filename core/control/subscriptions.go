@@ -22,6 +22,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/parser"
 	"github.com/levvs-one/sora-client/core/subscription"
 )
@@ -275,7 +276,7 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 	}
 	b.records[rec.ID] = &rec
 	state := b.stateLocked(rec.ID)
-	b.notifyLocked(state)
+	b.notifyLocked(state, logs.LevelInfo, "Subscription saved")
 	if fetchNow {
 		go func() { _, _ = b.refresh(context.Background(), rec.ID) }()
 	}
@@ -313,7 +314,7 @@ func (b *subscriptionBook) delete(id string) error {
 	}
 	delete(b.records, id)
 	delete(b.lists, id)
-	b.notifyLocked(&corev1.SubscriptionState{Settings: &corev1.SubscriptionSettings{Id: id}, Deleted: true})
+	b.notifyLocked(&corev1.SubscriptionState{Settings: &corev1.SubscriptionSettings{Id: id}, Deleted: true}, logs.LevelInfo, "Subscription removed")
 	return nil
 }
 
@@ -337,7 +338,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	}
 	b.updating[id] = true
 	link, agent := rec.URL, rec.UserAgent
-	b.notifyLocked(b.stateLocked(id))
+	b.notifyLocked(b.stateLocked(id), logs.LevelInfo, "Subscription update started")
 	b.mu.Unlock()
 
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
@@ -379,7 +380,11 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	}
 	b.records[id] = &next
 	state := b.stateLocked(id)
-	b.notifyLocked(state)
+	if err != nil {
+		b.notifyLocked(state, logs.LevelError, "Subscription update failed: "+string(errs.KeyOf(err)))
+	} else {
+		b.notifyLocked(state, logs.LevelInfo, fmt.Sprintf("Subscription updated: %d servers", len(state.GetOutbounds())))
+	}
 	b.poke()
 	return state, err
 }
@@ -592,7 +597,10 @@ func (b *subscriptionBook) watch() (chan *corev1.SubscriptionState, func()) {
 	}
 }
 
-func (b *subscriptionBook) notifyLocked(state *corev1.SubscriptionState) {
+func (b *subscriptionBook) notifyLocked(state *corev1.SubscriptionState, level logs.Level, message string) {
+	if b.srv.logs != nil {
+		b.srv.logs.Write(b.now(), level, logs.SourceSubscription, message+" id="+state.GetSettings().GetId())
+	}
 	for ch := range b.watchers {
 		select {
 		case ch <- state:

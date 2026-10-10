@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart' show CupertinoLocalizations;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -75,7 +76,7 @@ class _SoraAppState extends State<SoraApp> {
               'dark' => ThemeMode.dark,
               _ => ThemeMode.system,
             },
-            locale: sora.settings.language == 'system' ? null : Locale(sora.settings.language),
+            locale: sora.settings.locale,
             themeAnimationDuration:
                 sora.settings.animations &&
                     !WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations
@@ -83,8 +84,8 @@ class _SoraAppState extends State<SoraApp> {
                 : Duration.zero,
             localizationsDelegates: const [
               S.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
+              _LanguageDelegate<MaterialLocalizations>(GlobalMaterialLocalizations.delegate),
+              _LanguageDelegate<CupertinoLocalizations>(GlobalCupertinoLocalizations.delegate),
               GlobalWidgetsLocalizations.delegate,
             ],
             supportedLocales: S.supportedLocales,
@@ -97,4 +98,17 @@ class _SoraAppState extends State<SoraApp> {
     );
     return desktop == null ? app : DesktopScope(desktop: desktop, child: app);
   }
+}
+
+// Flutter has no built-in Material/Cupertino translations for Tajik and
+// Turkmen. Only those system controls fall back; Sora's strings stay localized.
+class _LanguageDelegate<T> extends LocalizationsDelegate<T> {
+  const _LanguageDelegate(this.delegate);
+  final LocalizationsDelegate<T> delegate;
+  @override
+  bool isSupported(Locale locale) => S.supportedLocales.any((x) => x.languageCode == locale.languageCode);
+  @override
+  Future<T> load(Locale locale) => delegate.load(delegate.isSupported(locale) ? locale : const Locale('en'));
+  @override
+  bool shouldReload(_LanguageDelegate<T> old) => false;
 }

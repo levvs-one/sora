@@ -102,12 +102,23 @@ class Palette extends ThemeExtension<Palette> {
 
 /// Inter text styles with optical sizing and tighter tracking at larger sizes.
 abstract final class Styles {
-  /// Prefer colour emoji fonts for server flags to avoid monochrome glyphs.
-  static const _emoji = ['Noto Color Emoji', 'Segoe UI Emoji', 'Apple Color Emoji'];
+  /// Bundled script fonts keep localization readable without optional OS packs.
+  static const _fallback = [
+    'Noto Sans Arabic',
+    'Noto Sans Bengali',
+    'Noto Sans Devanagari',
+    'Noto Sans Thai',
+    'Noto Sans Armenian',
+    'Noto Sans Georgian',
+    'Sora CJK',
+    'Noto Color Emoji',
+    'Segoe UI Emoji',
+    'Apple Color Emoji',
+  ];
 
   static TextStyle _inter(double size, double weight, double tracking, double height) => TextStyle(
     fontFamily: 'Inter',
-    fontFamilyFallback: _emoji,
+    fontFamilyFallback: _fallback,
     fontSize: size,
     fontWeight: weight == 400
         ? FontWeight.w400
@@ -131,7 +142,7 @@ abstract final class Styles {
   static final row = _inter(15, 500, -0.1, 1.2);
   static final secondary = _inter(13, 400, 0, 1.3);
   static final caption = _inter(12, 400, 0, 1.3);
-  static const timestamp = TextStyle(fontFamily: 'NotoSansMono', fontSize: 12, height: 4 / 3);
+  static final timestamp = figures(_inter(12, 600, 0, 4 / 3));
 }
 
 /// Shared animation durations and curves that respect the motion setting.
@@ -170,6 +181,7 @@ ThemeData buildTheme(Brightness brightness) {
     brightness: brightness,
     useMaterial3: true,
     fontFamily: 'Inter',
+    fontFamilyFallback: Styles._fallback,
     scaffoldBackgroundColor: palette.background,
     colorScheme: ColorScheme.fromSeed(
       seedColor: palette.ink,

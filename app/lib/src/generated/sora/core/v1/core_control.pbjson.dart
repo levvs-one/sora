@@ -84,6 +84,21 @@ final $typed_data.Uint8List probeMethodDescriptor =
     $convert.base64Decode('CgtQcm9iZU1ldGhvZBIcChhQUk9CRV9NRVRIT0RfVU5TUEVDSUZJRUQQABIXChNQUk9CRV9NRV'
         'RIT0RfRU5HSU5FEAESGAoUUFJPQkVfTUVUSE9EX0NPTk5FQ1QQAg==');
 
+@$core.Deprecated('Use diagnosticFormatDescriptor instead')
+const DiagnosticFormat$json = {
+  '1': 'DiagnosticFormat',
+  '2': [
+    {'1': 'DIAGNOSTIC_FORMAT_UNSPECIFIED', '2': 0},
+    {'1': 'DIAGNOSTIC_FORMAT_PCAPNG', '2': 1},
+    {'1': 'DIAGNOSTIC_FORMAT_EVTX', '2': 2},
+  ],
+};
+
+/// Descriptor for `DiagnosticFormat`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List diagnosticFormatDescriptor =
+    $convert.base64Decode('ChBEaWFnbm9zdGljRm9ybWF0EiEKHURJQUdOT1NUSUNfRk9STUFUX1VOU1BFQ0lGSUVEEAASHA'
+        'oYRElBR05PU1RJQ19GT1JNQVRfUENBUE5HEAESGgoWRElBR05PU1RJQ19GT1JNQVRfRVZUWBAC');
+
 @$core.Deprecated('Use soraErrorCodeDescriptor instead')
 const SoraErrorCode$json = {
   '1': 'SoraErrorCode',
@@ -140,6 +155,11 @@ const LogExportFormat$json = {
     {'1': 'LOG_EXPORT_FORMAT_UNSPECIFIED', '2': 0},
     {'1': 'LOG_EXPORT_FORMAT_JSON_LINES', '2': 1},
     {'1': 'LOG_EXPORT_FORMAT_CSV', '2': 2},
+    {'1': 'LOG_EXPORT_FORMAT_LOG', '2': 3},
+    {'1': 'LOG_EXPORT_FORMAT_JSON', '2': 4},
+    {'1': 'LOG_EXPORT_FORMAT_XML', '2': 5},
+    {'1': 'LOG_EXPORT_FORMAT_ZIP', '2': 6},
+    {'1': 'LOG_EXPORT_FORMAT_GZIP', '2': 7},
   ],
 };
 
@@ -147,7 +167,9 @@ const LogExportFormat$json = {
 final $typed_data.Uint8List logExportFormatDescriptor =
     $convert.base64Decode('Cg9Mb2dFeHBvcnRGb3JtYXQSIQodTE9HX0VYUE9SVF9GT1JNQVRfVU5TUEVDSUZJRUQQABIgCh'
         'xMT0dfRVhQT1JUX0ZPUk1BVF9KU09OX0xJTkVTEAESGQoVTE9HX0VYUE9SVF9GT1JNQVRfQ1NW'
-        'EAI=');
+        'EAISGQoVTE9HX0VYUE9SVF9GT1JNQVRfTE9HEAMSGgoWTE9HX0VYUE9SVF9GT1JNQVRfSlNPTh'
+        'AEEhkKFUxPR19FWFBPUlRfRk9STUFUX1hNTBAFEhkKFUxPR19FWFBPUlRfRk9STUFUX1pJUBAG'
+        'EhoKFkxPR19FWFBPUlRfRk9STUFUX0daSVAQBw==');
 
 @$core.Deprecated('Use apiVersionDescriptor instead')
 const ApiVersion$json = {
@@ -879,6 +901,8 @@ const ExportDiagnosticsRequest$json = {
     {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
     {'1': 'request_id', '3': 2, '4': 1, '5': 9, '10': 'requestId'},
     {'1': 'session_id', '3': 3, '4': 1, '5': 9, '10': 'sessionId'},
+    {'1': 'format', '3': 4, '4': 1, '5': 14, '6': '.sora.core.v1.DiagnosticFormat', '10': 'format'},
+    {'1': 'control_authenticator', '3': 5, '4': 1, '5': 12, '10': 'controlAuthenticator'},
   ],
 };
 
@@ -886,7 +910,9 @@ const ExportDiagnosticsRequest$json = {
 final $typed_data.Uint8List exportDiagnosticsRequestDescriptor =
     $convert.base64Decode('ChhFeHBvcnREaWFnbm9zdGljc1JlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLm'
         'NvcmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIdCgpyZXF1ZXN0X2lkGAIgASgJUglyZXF1'
-        'ZXN0SWQSHQoKc2Vzc2lvbl9pZBgDIAEoCVIJc2Vzc2lvbklk');
+        'ZXN0SWQSHQoKc2Vzc2lvbl9pZBgDIAEoCVIJc2Vzc2lvbklkEjYKBmZvcm1hdBgEIAEoDjIeLn'
+        'NvcmEuY29yZS52MS5EaWFnbm9zdGljRm9ybWF0UgZmb3JtYXQSMwoVY29udHJvbF9hdXRoZW50'
+        'aWNhdG9yGAUgASgMUhRjb250cm9sQXV0aGVudGljYXRvcg==');
 
 @$core.Deprecated('Use exportDiagnosticsResponseDescriptor instead')
 const ExportDiagnosticsResponse$json = {
@@ -1214,6 +1240,7 @@ const ExportLogsRequest$json = {
     {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
     {'1': 'filter', '3': 3, '4': 1, '5': 11, '6': '.sora.core.v1.LogFilter', '10': 'filter'},
     {'1': 'format', '3': 4, '4': 1, '5': 14, '6': '.sora.core.v1.LogExportFormat', '10': 'format'},
+    {'1': 'category', '3': 5, '4': 1, '5': 9, '10': 'category'},
   ],
 };
 
@@ -1223,7 +1250,7 @@ final $typed_data.Uint8List exportLogsRequestDescriptor =
         '5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEoDFIU'
         'Y29udHJvbEF1dGhlbnRpY2F0b3ISLwoGZmlsdGVyGAMgASgLMhcuc29yYS5jb3JlLnYxLkxvZ0'
         'ZpbHRlclIGZmlsdGVyEjUKBmZvcm1hdBgEIAEoDjIdLnNvcmEuY29yZS52MS5Mb2dFeHBvcnRG'
-        'b3JtYXRSBmZvcm1hdA==');
+        'b3JtYXRSBmZvcm1hdBIaCghjYXRlZ29yeRgFIAEoCVIIY2F0ZWdvcnk=');
 
 @$core.Deprecated('Use exportLogsResponseDescriptor instead')
 const ExportLogsResponse$json = {

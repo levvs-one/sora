@@ -1,0 +1,477 @@
+{
+  "@@locale": "uk",
+  "stateOff": "Не підключено",
+  "stateConnecting": "Підключення",
+  "stateConnected": "Підключено",
+  "stateReconnecting": "Повторне підключення",
+  "stateDisconnecting": "Відключення",
+  "stateFailed": "Не підключено",
+  "coreMissing": "Служба Sora не відповідає",
+  "serverAuto": "Найшвидший",
+  "serverBypass": "Немає сервера",
+  "addSubscription": "Додати підписку",
+  "servers": "Сервери",
+  "settings": "Налаштування",
+  "subscription": "Підписка",
+  "subscriptionLink": "Посилання на підписку",
+  "add": "додати",
+  "refresh": "оновлення",
+  "rename": "Перейменувати",
+  "delete": "Видалити",
+  "cancel": "Скасувати",
+  "save": "зберегти",
+  "name": "Ім'я",
+  "deleteSubscription": "Видалити “{name}”?",
+  "routes": "Маршрути",
+  "presetGlobal": "Все через VPN",
+  "presetRu": "Росія пряма",
+  "presetIr": "Іран прямо",
+  "presetCn": "Китай прямо",
+  "blockAds": "Блокувати рекламу",
+  "killSwitch": "Інтернет тільки через VPN",
+  "engine": "Двигун",
+  "engineAuto": "Авто",
+  "animations": "анімації",
+  "logs": "Журнал",
+  "about": "про",
+  "logsAll": "все",
+  "logsImportant": "важливо",
+  "logsErrors": "Помилки",
+  "search": "Пошук",
+  "export": "Зберегти у файл",
+  "clear": "ясно",
+  "logsEmpty": "Тут нічого немає",
+  "appVersion": "Версія {version}",
+  "notInstalled": "Не встановлено",
+  "sourceCode": "Вихідний код",
+  "license": "Ліцензія",
+  "usage": "{used} з {total}",
+  "until": "до {date}",
+  "expired": "Термін дії минув",
+  "milliseconds": "{n} мс",
+  "bytesB": "{n} B",
+  "bytesKB": "{n} KB",
+  "bytesMB": "{n} MB",
+  "bytesGB": "{n} GB",
+  "bytesTB": "{n} ТБ",
+  "errGeneric": "Щось пішло не так",
+  "errCore": "Служба Sora не відповідає",
+  "errAuth": "Немає доступу до служби Sora",
+  "errVersion": "Оновлення Sora: додаток і сервіс мають різні версії",
+  "errBusy": "Зачекайте, попередня команда все ще виконується",
+  "errEngineMissing": "Для цього сервера не знайдено механізму",
+  "errEngineStart": "Двигун не заводився",
+  "errEngineStopped": "Мотор зупинився",
+  "errTunnel": "Немає дозволу на створення VPN-з’єднання",
+  "errServers": "Сервер налаштовано з помилкою",
+  "errNetwork": "Не вдається підключитися до сервера",
+  "errTimeout": "Сервер не відповів вчасно",
+  "errFirewall": "Не вдалося заблокувати Інтернет за межами VPN",
+  "errSubFetch": "Не вдалося завантажити підписку",
+  "errSubFormat": "Це не посилання для підписки",
+  "errSubEmpty": "Підписка не має серверів",
+  "errSubDuplicate": "Ця підписка вже додана",
+  "errSubLimit": "Забагато підписок",
+  "errSubScheme": "Посилання має починатися з https://",
+  "errSecretStore": "Пам’ять Sora пошкоджена або недоступна",
+  "errNoServers": "Щоб підключитися, додайте підписку",
+  "exportText": "текст",
+  "connections": "Зв'язки",
+  "close": "Закрити",
+  "chainDirect": "Прямий",
+  "chainBlocked": "заблоковано",
+  "theme": "Тема",
+  "themeSystem": "System",
+  "themeLight": "світло",
+  "themeDark": "Темний",
+  "language": "Мова",
+  "languageSystem": "System",
+  "sectionConnection": "Підключення",
+  "sectionNoServer": "Немає сервера",
+  "sectionPing": "Пінг",
+  "sectionLog": "діагностика",
+  "ipv6": "IPv6",
+  "dns": "DNS",
+  "dnsAuto": "Авто",
+  "dnsHint": "Адреси, розділені комами",
+  "fragment": "TLS фрагментація",
+  "fragmentPackets": "Що розділити",
+  "fragmentLength": "Розмір шматка",
+  "fragmentInterval": "Пауза між частинами",
+  "byDefault": "За замовчуванням",
+  "rangeHint": "Наприклад, 100-200",
+  "splitPos": "Розділ позицій",
+  "splitPosHint": "Наприклад, 1, midsld",
+  "disorder": "Змініть порядок частин",
+  "tlsRecord": "Розділіть запис TLS",
+  "tlsRecordNo": "немає",
+  "tlsRecordSni": "На назву сайту",
+  "tlsRecordFirst": "Після першого байту",
+  "hostCase": "Змінити регістр хоста",
+  "probeMethod": "метод",
+  "probeAuto": "Авто",
+  "probeEngine": "Через двигун",
+  "probeConnect": "Тільки підключення",
+  "probeUrl": "Тестова адреса",
+  "probeTimeout": "Зачекайте",
+  "seconds": "{n} s",
+  "subscriptions": "Підписки",
+  "subscriptionSettings": "Налаштування",
+  "userAgent": "Користувач-Агент",
+  "autoUpdate": "Автоматичне оновлення",
+  "updateInterval": "Як часто",
+  "intervalProvider": "Як запитує провайдер",
+  "hours": "{n} h",
+  "updateNow": "Оновіть зараз",
+  "logLevel": "Що записувати",
+  "levelDebug": "все",
+  "levelInfo": "Звичайний",
+  "levelWarning": "важливо",
+  "levelError": "Лише помилки",
+  "recordDestinations": "Записати адреси сайтів",
+  "reset": "Скидання налаштувань",
+  "resetConfirm": "Скинути всі налаштування?",
+  "resetAction": "Скинути",
+  "invalidValue": "Це значення не працюватиме",
+  "website": "Сторінка підписки",
+  "providerWebsite": "Сайт провайдера",
+  "support": "Підтримка",
+  "controlPortQuestion": "{engine} керується через порт на цьому комп’ютері. Інші програми зможуть визначити, що VPN увімкнено.",
+  "chooseEngine": "Виберіть {engine}",
+  "rules": "Спеціальні правила",
+  "ruleAdd": "Нове правило",
+  "ruleHint": "Сайт, IP або програма",
+  "ruleDirect": "Прямий",
+  "ruleProxy": "Через VPN",
+  "ruleBlock": "Блокувати",
+  "failover": "Помилка ввімкнення",
+  "connectOnStart": "Підключитися при запуску",
+  "trafficLow": "{name}: {left} ліворуч",
+  "ruleInvalid": "Це не схоже на сайт, IP чи програму",
+  "tunnelMode": "Режим",
+  "tunnelTun": "Весь трафік",
+  "tunnelProxy": "Проксі System",
+  "proxyAddress": "Адреса проксі",
+  "copied": "Скопійовано",
+  "launchAtLogin": "Почніть із системи",
+  "closeToTray": "Зберігати в закритому лотку",
+  "notifications": "Сповіщення",
+  "trayOpen": "Відкрийте Sora",
+  "trayConnect": "Підключитися",
+  "trayDisconnect": "Відключити",
+  "trayServer": "Сервер",
+  "trayQuit": "Вийти з Sora",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora: {state}, {server}",
+  "noticeInTray": "Sora все ще в треї",
+  "noticeInTrayBody": "Вийдіть із меню його значка",
+  "noticeLost": "З'єднання втрачено",
+  "noticeLostBody": "Sora повторно підключається",
+  "noticeRestored": "Знову підключено",
+  "noticeFailed": "Не вдалося підключитися",
+  "noticeBackup": "Головний сервер не відповідає; резервна копія переносить трафік",
+  "noticeNext": "Сервер не відповідає; наступний несе рух",
+  "noticeMainBack": "Головний сервер знову відповідає і переносить трафік",
+  "noticeSubscription": "Підписка",
+  "importTitle": "Додати цю підписку?",
+  "importSealed": "Це посилання зашифровано для Happ, і лише Happ може його прочитати. Попросіть свого провайдера надати просте посилання для підписки.",
+  "understood": "добре",
+  "noAnswer": "немає відповіді",
+  "home": "додому",
+  "navRules": "правила",
+  "navConnections": "Зв'язки",
+  "navLogs": "Журнали",
+  "navAbout": "про",
+  "sidebarToggle": "Перемкнути бічну панель",
+  "more": "більше",
+  "less": "менше",
+  "currentServer": "Поточний сервер",
+  "trafficDown": "Завантажено",
+  "trafficUp": "Завантажено",
+  "perSecond": "{value}/s",
+  "activeRules": "Активні правила: {count}",
+  "recentNotifications": "Останні сповіщення",
+  "notificationsEmpty": "Тут відображатимуться події підключення та підписки",
+  "retryConnect": "Повторити підключення",
+  "openLogs": "Відкриті журнали",
+  "tourReplay": "Знову показати посібник",
+  "tourStep": "Крок {step} із 5",
+  "tourBack": "Назад",
+  "tourNext": "Далі",
+  "tourSkip": "Пропустити",
+  "tourFinish": "Готово",
+  "tourAdd": "Додайте посилання на підписку вашого постачальника.",
+  "tourServer": "Виберіть сервер. «Найшвидший» вибере для вас один.",
+  "tourConnect": "Натисніть тут, щоб підключитися або відключитися.",
+  "tourMode": "Виберіть режим. Kill Switch блокує Інтернет, якщо VPN переривається.",
+  "tourSettings": "Відкрийте налаштування. Ви можете відтворити цей посібник там.",
+  "chooseProgram": "Виберіть програму",
+  "installedApps": "Встановлені програми",
+  "runningProcesses": "Запущені процеси",
+  "programsFailed": "Не вдалося завантажити програми",
+  "programsEmpty": "Додатків не знайдено. Спробуйте інше ім'я.",
+  "selectExe": "Виберіть файл .exe",
+  "trafficUnavailable": "Лічильників ще немає",
+  "speedtest": "швидкість",
+  "speedtestCheck": "Перевірте швидкість",
+  "speedtestSearch": "Знайдіть послугу",
+  "speedtestEmpty": "Немає збігів. Змінити пошук.",
+  "speedtestBackToList": "Назад до послуг",
+  "speedtestOpenBrowser": "Відкрити в браузері",
+  "speedtestUnavailable": "Не вдалося запустити вбудований браузер. Відкрийте службу в системному браузері.",
+  "speedtestPageFailed": "Не вдалося завантажити сторінку. Перезавантажте його або відкрийте службу в системному браузері.",
+  "speedtestExternalFailed": "Не вдалося відкрити системний браузер. Спробуйте знову.",
+  "modes": "Режими",
+  "proxyShort": "Проксі",
+  "tunMode": "Весь трафік (TUN)",
+  "checkUpdates": "Перевірте наявність оновлень",
+  "updates": "Оновлення програми",
+  "updateAvailable": "Доступна версія {version}",
+  "updateOpenAbout": "Переглянути оновлення",
+  "updateNotes": "Зміни в {version}",
+  "updateCheck": "Перевірте наявність оновлень",
+  "updateChecking": "Перевірка...",
+  "updateNoNotes": "Реліз не має приміток.",
+  "updateDropWarning": "Під час оновлення Sora та його основного з’єднання VPN-з’єднання припиниться на кілька секунд. Продовжити?",
+  "updateWaitConnection": "Зачекайте, поки VPN-з’єднання та ядро ​​будуть готові.",
+  "updateDownloading": "Завантаження та перевірка файлів...",
+  "updateInstalling": "Підготовка оновлення або очікування автентифікації адміністратора...",
+  "updateNetworkError": "Не вдалося завантажити оновлення. Спробуйте знову.",
+  "updateReleaseError": "Дані випуску або необхідні файли відсутні або недійсні.",
+  "updateChecksumError": "Завантаження не відповідає SHA256SUMS. Нічого не встановлено.",
+  "updateInstallError": "Оновлення не завершено. Можливо, автентифікацію скасовано.",
+  "updateUnsupported": "Цей виконуваний файл не належить підтримуваній парі пакетів Sora. Використовуйте інструкції з встановлення випуску.",
+  "updateManual": "Виконайте цю команду в терміналі, щоб інсталювати обидва перевірені пакети, а потім повторно відкрийте Sora. Файли залишаються в каталозі завантаження. З’єднання VPN припиниться.",
+  "updateCopyCommand": "Копіювати команду",
+  "updateChecksDisabled": "Автоматичні перевірки вимкнено в налаштуваннях.",
+  "updateInstalled": "Оновлення встановлено. Повторно відкрийте Sora.",
+  "projectLinks": "Демонструвати",
+  "githubReleases": "Релізи та завантаження",
+  "telegramChannel": "Канал Telegram",
+  "licenses": "Ліцензії",
+  "componentLicenses": "Ліцензії на компоненти",
+  "appCopyright": "© 2026 levvs-one та співавтори",
+  "collapseServers": "Згорнути сервери",
+  "expandServers": "Розгорнути сервери",
+  "hideDescription": "Приховати опис",
+  "showDescription": "Показати опис",
+  "pendingConnectionChanges": "Повторно підключіться, щоб застосувати ці зміни.",
+  "reconnectNow": "Застосуйте та повторно підключіться",
+  "bypassLimitations": "Цей режим обходить DPI лише для HTTP та TLS, не підтримує UDP і не змінює ваш IP. Використовуйте сервер VPN для голосу Discord, дзвінків і заблокованих адрес Telegram.",
+  "errEngineUnsupported": "Вибраний механізм не підтримує цей профіль або налаштування. Виберіть Авто або сумісний двигун.",
+  "errRestore": "Очищення підключення не завершено. Повторити відключення; подробиці дивіться в журналі.",
+  "errSessionEnded": "Ця сесія вже закінчилася. Оновіть стан підключення.",
+  "retryDisconnect": "Повторіть спробу відключення",
+  "tunStack": "стек TUN",
+  "modesInfo": "Про режими",
+  "modesGuideTitle": "Режими і двигуни",
+  "probeServers": "Перевірити сервери",
+  "expiresIn": "{name}: {days, plural, =0{підписка закінчується через кілька годин} one{підписка закінчується через день #} other{термін дії підписки закінчується через # днів}}",
+  "groupOrdered": "{count, plural, one{Сервер #, у свою чергу} other{Сервери #, у свою чергу}}",
+  "groupBest": "{count, plural, one{Сервер #, найшвидший} other{Сервери #, найшвидші}}",
+  "modesGuide": "Виберіть «Авто», якщо ви не впевнені, яка система потрібна вашому серверу. Sora перевіряє профіль і налаштування перед підключенням. Механізм не може збільшити пропускну здатність вашого плану: продуктивність залежить від сервера, маршруту, протоколу та мережі.\n\n## Режими\n\n### Весь трафік (TUN)\n\nSora створює віртуальний мережевий інтерфейс і направляє через нього трафік додатків, включаючи TCP і UDP. Використовуйте цей режим для Telegram, ігор і голосу Discord. Правила можуть безпосередньо надсилати певні сайти чи програми або блокувати їх. Службі мережі потрібен дозвіл і сервер, який підтримує необхідний протокол.\n\n### System проксі\n\nSora налаштовує локальний проксі HTTP/SOCKS. Програми, які поважають системні налаштування проксі-сервера, використовують його. Програми з власним мережевим стеком можуть підключатися безпосередньо; Для UDP і голосових викликів зазвичай потрібен TUN. Цей режим підходить для браузерів і програм з підтримкою проксі.\n\n### Немає сервера\n\nНа Linux Sora використовує [zapret](https://github.com/bol-van/zapret) для розділення та зміни форми запитів HTTP/TLS та обходу деяких перевірок DPI. Ваша IP-адреса залишається незмінною, а з’єднання йдуть безпосередньо на веб-сайт. Результати залежать від вашого провайдера та методу блокування.\n\nПоточна інтеграція використовує tpws для HTTP та TLS через TCP. Він не обходить IP-блокування та не ретранслює UDP і не може гарантувати з’єднання MTProto Telegram. Використовуйте сервер VPN із TUN для голосу Discord, дзвінків Telegram і подібних обмежень.\n\n## Двигуни\n\n### Авто\n\nSora вибирає встановлений механізм, який підтримує весь план підключення: протоколи сервера, транспорти, групи, фрагментацію та режим. Несумісний вибір вручну відхиляється перед припиненням поточного підключення. Виберіть «Авто» або інший механізм і знову застосуйте налаштування.\n\n### sing-box\n\nНові пакети Sora включають [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), розгалуження [sing-box](https://github.com/SagerNet/sing-box), додавання XHTTP і VLESS Encryption на стороні клієнта. Sora розпізнає конструкцію та її можливості. Вихідна збірка без XHTTP не отримує цю можливість лише через назву.\n\nПідтримувані протоколи включають VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard і параметри AmneziaWG 1.x/2.x Sora може імпортувати. Повні профілі Xray JSON потребують Xray. Нові поля AWG 3.x ще не можна імпортувати. sing-box використовує локальний порт керування, захищений паролем, який можуть виявити інші програми на комп’ютері.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) підтримує фрагментацію VLESS, REALITY, XHTTP, VLESS Encryption і TLS. Він також запускає повні профілі постачальника Xray, зберігаючи їх маршрутизацію та групи. Такі профілі не можна автоматично конвертувати в інший механізм без зміни їхньої поведінки.\n\nУ комплекті Xray видалено параметр, який вимикає перевірку сертифіката TLS (`allowInsecure`). Автоматично вибирає sing-box або mihomo для звичайних серверів, які потребують цього параметра. Вибір Xray вручну повідомляє про несумісність перед припиненням поточного з’єднання. Старіші повні профілі JSON потребують оновленого профілю постачальника з сертифікатом, який можна перевірити, або PIN-кодом сертифіката.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) підтримує впорядковані резервні групи та групи балансування навантаження, XHTTP і AmneziaWG. Виберіть його, коли автоматичне перемикання після відмови на резервний сервер має значення. Налаштування фрагментації TLS Sora недоступне з цим механізмом.\n\n## Сумісність у Sora\n\n| Особливість | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN і TCP/UDP | Так | Так | Так |\n| XHTTP | Так | Так | Так |\n| VLESS Encryption | Так | Так | Так |\n| Повний профіль Xray | Ні | Так | Ні |\n| TUIC / AnyTLS | Обидва | Ні | TUIC |\n| Фрагментація TLS | Так | Так | Ні |\n| AmneziaWG 1.x/2.x | Так¹ | Ні | Так |\n| Замовлена ​​резервна група | Ні | №² | Так |\n\n¹ Профілі з J1/J2/J3/Itime використовують mihomo; ці поля ніколи не можна мовчки відкидати. ² Для групи повних профілів Xray програма вибирає резервний профіль. Підтримка залежить від встановленої збірки; перевірте його версію в Про програму.\n\n## Стек TUN\n\nСтек обробляє TCP і UDP у віртуальному інтерфейсі. На панелі режимів Xray і mihomo пропонують gVisor, System, Mixed і MIPS. Кожен двигун зберігає власні переваги. Режими проксі System і режим без сервера не використовують цей параметр.\n\n- **Mixed** — TCP використовує системний стек, тоді як gVisor обробляє UDP. Це значення за замовчуванням для mihomo.\n- **System** — використовує системний стек. Спробуйте інший варіант, якщо мережеві програми стикаються з проблемами.\n- **gVisor** — обробляє трафік у просторі користувача.\n- **MIPS** — власний IP-стек mihomo, доступний у пакетній версії 1.19.32.\n\nНа Linux Xray використовує свій вбудований gVisor за замовчуванням. System, Mixed і MIPS на Linux використовують mihomo як механізм TUN, пересилаючи TCP і UDP на Xray через автентифіковане локальне посилання SOCKS. Xray зберігає протокол, профіль провайдера та маршрутизацію. Для цих трьох опцій потрібен встановлений mihomo. На Windows TUN наразі використовує sing-box або mihomo; Xray працює в системному режимі проксі.\n\nМіст запускає другий процес. У трьох вимірюваннях бездіяльності на Linux він використовував приблизно на 32–36 МБ більше фізичної пам’яті, ніж рідний Xray TUN. Це не вимірює навантаження на завантаження: вартість процесора та пам’яті залежить від з’єднань. Зберігайте gVisor, якщо вам не потрібен інший стек. sing-box не має селектора стека. Жоден стек не гарантує кращої продуктивності в кожній мережі. Виберіть стек, виберіть «Застосувати» та повторно підключіться, щоб спробувати його у своїй мережі.\n\n## Застосування налаштувань\n\nВибір сервера повторює підключення автоматично. Налаштування режиму, механізму, DNS і правил зберігаються негайно; під час активного підключення натисніть «Застосувати» та підключіться повторно, щоб використовувати їх. Перезапуск двигуна може перервати завантаження та дзвінки. Повторні клацання не запускають паралельні підключення; від'єднання завершує перехід і розриває з'єднання.\n\nІнтернет лише через VPN блокує прямий трафік у разі обриву тунелю. Це впливає на всю машину. Явне відключення видаляє правила Sora. Якщо очищення не завершується, повторіть спробу від’єднання та відкрийте журнал.\n\n## Проектна документація\n\n- [sing-box-lx: налаштування та підтримка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Документація sing-box](https://sing-box.sagernet.org/)\n- [Документація Xray](https://xtls.github.io/)\n- [Документація mihomo](https://wiki.metacubex.one/)\n- [zapret: робота та обмеження] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosticPackets": "Перехоплення пакетів",
+  "exportLogFile": "У {name}",
+  "extensionsSoon": "Скоро буде",
+  "diagnosticHttp": "HTTP діагностика",
+  "diagnosticEvents": "Події Windows",
+  "diagnosticCapture": "Зробіть знімок на 10 секунд",
+  "extensions": "Розширення",
+  "diagnosticNoData": "Ще немає записаних запитів. Спочатку відкрийте сайт тесту швидкості.",
+  "diagnosticUnavailable": "Ця діагностика недоступна на цій платформі.",
+  "diagnosticRequiresTun": "Для захоплення пакетів потрібне активне з’єднання Sora TUN.",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}

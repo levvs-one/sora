@@ -1,10 +1,14 @@
 package control
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
+	"io"
 	"maps"
 	"math"
 	"slices"
+	"strings"
 	"time"
 
 	"google.golang.org/grpc"
@@ -170,11 +174,16 @@ var exportFormats = map[corev1.LogExportFormat]logs.Format{
 	corev1.LogExportFormat_LOG_EXPORT_FORMAT_UNSPECIFIED: logs.FormatText,
 	corev1.LogExportFormat_LOG_EXPORT_FORMAT_JSON_LINES:  logs.FormatJSONLines,
 	corev1.LogExportFormat_LOG_EXPORT_FORMAT_CSV:         logs.FormatCSV,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_LOG:         logs.FormatLog,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_JSON:        logs.FormatJSON,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_XML:         logs.FormatXML,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_ZIP:         logs.FormatZIP,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_GZIP:        logs.FormatGZIP,
 }
 
 // ExportLogs renders matching entries in memory. The client saves the result;
 // the core does not write a file.
-func (s *Server) ExportLogs(_ context.Context, req *corev1.ExportLogsRequest) (*corev1.ExportLogsResponse, error) {
+func (s *Server) ExportLogs(ctx context.Context, req *corev1.ExportLogsRequest) (*corev1.ExportLogsResponse, error) {
 	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
 		return nil, err
 	}
@@ -191,12 +200,74 @@ func (s *Server) ExportLogs(_ context.Context, req *corev1.ExportLogsRequest) (*
 		err := errs.Newf(errs.CodeInvalidArgument, errs.KeyLogFilterInvalid, "control: unknown export format")
 		return &corev1.ExportLogsResponse{Error: toWire(err, nil, "")}, nil
 	}
+	category := req.GetCategory()
+	switch category {
+	case "", "all", "engine", "tun", "dns", "subscriptions", "core":
+	default:
+		return &corev1.ExportLogsResponse{Error: toWire(errs.Newf(errs.CodeInvalidArgument, errs.KeyLogFilterInvalid, "control: unknown log category"), nil, "")}, nil
+	}
 	data, name, media, err := logs.Export(center.Matching(filter), format, time.Now())
+	if err == nil && format == logs.FormatZIP && s.diagnostics != nil {
+		var report []byte
+		report, err = s.diagnostics.Export(ctx, s.sessions.Status())
+		if err == nil {
+			data, err = mergeDiagnosticArchive(data, report)
+		}
+	}
 	if err != nil {
 		err = errs.Newf(errs.CodeResourceExhausted, errs.KeyLogExportFailed, "control: %v", err)
 		return &corev1.ExportLogsResponse{Error: toWire(err, nil, "")}, nil
 	}
+	if category != "" {
+		name = strings.Replace(name, "sora-log_", "sora-log_"+category+"_", 1)
+	}
 	return &corev1.ExportLogsResponse{Data: data, FileName: name, MediaType: media}, nil
+}
+
+func mergeDiagnosticArchive(events, report []byte) ([]byte, error) {
+	var output bytes.Buffer
+	writer := zip.NewWriter(&output)
+	remaining := int64(logs.MaxExportBytes)
+	for i, content := range [][]byte{events, report} {
+		reader, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
+		if err != nil {
+			return nil, err
+		}
+		for _, file := range reader.File {
+			name := file.Name
+			if i == 1 {
+				name = "diagnostics/" + name
+			}
+			entry, err := writer.Create(name)
+			if err != nil {
+				return nil, err
+			}
+			source, err := file.Open()
+			if err != nil {
+				return nil, err
+			}
+			copied, copyErr := io.Copy(entry, io.LimitReader(source, remaining+1))
+			closeErr := source.Close()
+			if copied > remaining {
+				return nil, io.ErrShortBuffer
+			}
+			remaining -= copied
+			err = copyErr
+			if err == nil {
+				err = closeErr
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	if err := writer.Close(); err != nil {
+		return nil, err
+	}
+	if output.Len() > logs.MaxExportBytes {
+		return nil, io.ErrShortBuffer
+	}
+	return output.Bytes(), nil
 }
 
 // ClearLogs empties the record.

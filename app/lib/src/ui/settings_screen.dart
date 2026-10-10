@@ -13,6 +13,7 @@ import '../sora.dart';
 import 'about.dart';
 import 'connections.dart';
 import 'kit.dart';
+import 'language.dart';
 import 'logs.dart';
 import 'rules_screen.dart';
 import 'subscription.dart';
@@ -209,14 +210,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               choices: {'system': s.themeSystem, 'light': s.themeLight, 'dark': s.themeDark},
               onChanged: (v) => set((x) => x.theme = v, replan: false),
             ),
-            ChoiceTile<String>(
-              title: s.language,
-              value: settings.language,
-              // Use native language names so the current UI language does not
-              // prevent selection.
-              choices: {'system': s.languageSystem, 'ru': 'Русский', 'en': 'English'},
-              onChanged: (v) => set((x) => x.language = v, replan: false),
-            ),
+            Tile(title: s.language, trailing: const LanguageButton()),
             SwitchTile(
               title: s.animations,
               value: settings.animations,
@@ -345,9 +339,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const SizedBox(height: 12),
         Group(
           children: [
-            LinkTile(
+            Tile(
               title: s.subscriptions,
-              value: sora.subscriptions.isEmpty ? null : '${sora.subscriptions.length}',
+              titleStyle: Styles.bodyStrong,
+              trailing: Icon(Icons.chevron_right_rounded, size: 20, color: palette.ink),
               onTap: () => push<void>(context, const SubscriptionsScreen()),
             ),
           ],
