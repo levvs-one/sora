@@ -20,7 +20,7 @@ jobs:
     name: Workflow lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install actionlint
         run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7
       - name: Run actionlint
@@ -30,10 +30,10 @@ jobs:
     name: Proto
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version: '1.23'
           cache: false
@@ -63,10 +63,10 @@ jobs:
       run:
         working-directory: core
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version-file: core/go.mod
           cache: false
@@ -103,7 +103,7 @@ jobs:
           sudo unshare --net env SORA_ISOLATED_PACKET_TEST=1 SORA_ORIGINAL_NETNS="$original" \
             "$RUNNER_TEMP/sora-packet-tests" -test.v -test.run '^TestNativeLinuxOwnedTunCapture$' -test.timeout 15s
       - name: Lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         with:
           # Built with a Go new enough for the go directive of core/go.mod.
           version: v2.14.0
@@ -116,7 +116,7 @@ jobs:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.6
@@ -151,8 +151,8 @@ jobs:
     # installer, reach it from the app over the named pipe, uninstall.
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: core/go.mod
           cache: false
@@ -323,7 +323,7 @@ jobs:
           [System.Drawing.Graphics]::FromImage($shot).CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
           $shot.Save("screenshots\app.png")
           Stop-Process -Id $app.Id -Force
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: windows-screenshots
@@ -335,7 +335,7 @@ jobs:
           Start-Process "${env:ProgramFiles}\Sora\unins000.exe" -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES' -Wait
           Start-Sleep -Seconds 3
           if (Get-Service SoraCore -ErrorAction SilentlyContinue) { throw "the service outlived the uninstaller" }
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: sora-windows-x64
           path: dist/Sora-Setup-*.exe
@@ -356,8 +356,8 @@ jobs:
           - arch: arm64
             runner: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: core/go.mod
           cache: false
@@ -391,7 +391,7 @@ jobs:
           for job in $(jobs -p); do wait "$job" || status=1; done
           cat coexist-*.log
           exit $status
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always() && matrix.arch == 'amd64'
         with:
           name: coexistence-logs
@@ -456,7 +456,7 @@ jobs:
             sh -c 'dnf -y -q install systemd >/dev/null && sh packaging/install/install.sh && rpm -q sora sora-core'
           retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION archlinux:latest \
             sh -c 'pacman -Sy --noconfirm >/dev/null && sh packaging/install/install.sh && pacman -Q sora sora-core'
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: sora-linux-${{ matrix.arch }}
           path: |
@@ -475,7 +475,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
           pattern: sora-*
