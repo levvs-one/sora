@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/material.dart' show SizedBox, Text, EditableText, Scrollable, ScrollableState, ValueKey;
+import 'package:flutter/material.dart'
+    show SizedBox, Text, EditableText, Scrollable, ScrollableState, ValueKey, Semantics;
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart' show Server, ServiceCall;
 import 'package:sora/main.dart';
@@ -322,7 +323,9 @@ void main() {
         expect(core.diagnosticRequests, isEmpty);
         expect(sora.history.single.body, sora.strings.diagnosticRequiresTun);
         await tester.runAsync(sora.clearNotifications);
-        await tester.pump(const Duration(seconds: 6));
+        final close = find.byWidgetPredicate((w) => w is Semantics && w.properties.label == sora.strings.close);
+        await waitFor(() => close.evaluate().isNotEmpty);
+        await tester.tap(close);
         await tester.pump();
         await tester.runAsync(sora.connect);
         await tester.pump();

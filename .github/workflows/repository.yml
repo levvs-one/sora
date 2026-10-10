@@ -131,6 +131,8 @@ jobs:
         run: flutter analyze
       - name: Test
         run: flutter test
+      - name: Connection and export races over an isolated RPC socket
+        run: SORA_CORE_SOCKET="/tmp/sora-race-$GITHUB_RUN_ID.sock" flutter test test/connection_race_test.dart
       - name: Build for Linux
         run: flutter build linux --release
       - name: Check the Linux update helper
