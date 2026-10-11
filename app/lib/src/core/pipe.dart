@@ -94,6 +94,7 @@ class _Pipe {
   final SendPort _writes;
   final Stream<List<int>> incoming;
   final _outgoing = StreamController<List<int>>();
+  late final StreamSubscription<List<int>> _writeSubscription;
   final _closed = Completer<void>();
   bool _closing = false;
 
@@ -134,7 +135,7 @@ class _Pipe {
       }
     });
     pipe = _Pipe._(handle, reader, writer, writes, incoming.stream);
-    pipe._outgoing.stream.listen(
+    pipe._writeSubscription = pipe._outgoing.stream.listen(
       (chunk) => writes.send(TransferableTypedData.fromList([Uint8List.fromList(chunk)])),
       onDone: () => unawaited(pipe.close()),
     );
@@ -170,6 +171,9 @@ class _Pipe {
     _reader.kill(priority: Isolate.immediate);
     _writer.kill(priority: Isolate.immediate);
     CloseHandle(handle);
+    // HTTP/2 owns an active addStream. Cancelling its consumer ends that
+    // operation before the controller can be closed.
+    await _writeSubscription.cancel();
     unawaited(_outgoing.close());
     if (!_closed.isCompleted) _closed.complete();
   }
