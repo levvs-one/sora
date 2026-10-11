@@ -43,6 +43,7 @@ void main() {
         for (final url in ['https://www.speedtest.net/', 'https://yandex.ru/internet']) {
           await tester.tap(find.byKey(ValueKey('speedtest-service-$url')));
           var loaded = false;
+          String? document;
           final deadline = Stopwatch()..start();
           while (deadline.elapsed < const Duration(seconds: 90)) {
             await tester.pump(const Duration(milliseconds: 250));
@@ -50,6 +51,15 @@ void main() {
             if (views.evaluate().isEmpty) continue;
             final controller = tester.widget<WebViewWidget>(views.first).platform.params.controller;
             try {
+              final snapshot = await controller
+                  .runJavaScriptReturningResult(
+                    'JSON.stringify({url:location.href,title:document.title,state:document.readyState,text:document.body?.innerText.slice(0,240)})',
+                  )
+                  .timeout(const Duration(seconds: 5));
+              if (snapshot != document) {
+                document = '$snapshot';
+                debugPrint('Browser navigation: $document');
+              }
               final result = await controller
                   .runJavaScriptReturningResult(
                     "location.hostname === ${jsonEncode(Uri.parse(url).host)} && document.readyState === 'complete' && document.body.innerText.length > 40",
@@ -89,7 +99,7 @@ void main() {
               debugPrint('Waiting for the website: $error');
             }
           }
-          expect(loaded, isTrue, reason: '$url must load without a manual refresh');
+          expect(loaded, isTrue, reason: '$url must load without a manual refresh; last document: $document');
         }
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
         await tester.sendKeyEvent(LogicalKeyboardKey.digit1);

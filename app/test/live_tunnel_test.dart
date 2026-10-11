@@ -216,6 +216,11 @@ void main() {
             await Future<void>.delayed(const Duration(milliseconds: 300));
           }
         }();
+        addTearDown(() async {
+          generating = false;
+          neighbour.kill();
+          await traffic.timeout(const Duration(seconds: 25));
+        });
         late ExportDiagnosticsResponse answer;
         late int neighbourExit;
         try {
