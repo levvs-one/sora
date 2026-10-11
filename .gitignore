@@ -13,6 +13,8 @@
 /legacy/Control/obj/
 /legacy/tests/ControlInterop/bin/
 /legacy/tests/ControlInterop/obj/
+/legacy/tests/ServiceInterop/bin/
+/legacy/tests/ServiceInterop/obj/
 .vs/
 *.user
 *.pdb

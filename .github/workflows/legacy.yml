@@ -64,7 +64,11 @@ jobs:
           "GOROOT=$sdk" >> $env:GITHUB_ENV
           'GOTOOLCHAIN=local' >> $env:GITHUB_ENV
       - name: Build .NET Framework control client
-        run: dotnet build legacy/tests/ControlInterop/ControlInterop.csproj -c Release -p:PlatformTarget=${{ matrix.platform }} --nologo
+        run: |
+          dotnet build legacy/tests/ControlInterop/ControlInterop.csproj -c Release -p:PlatformTarget=${{ matrix.platform }} --nologo
+          if ($LASTEXITCODE -ne 0) { throw 'Control client build failed' }
+          dotnet build legacy/tests/ServiceInterop/ServiceInterop.csproj -c Release -p:PlatformTarget=${{ matrix.platform }} --nologo
+          if ($LASTEXITCODE -ne 0) { throw 'Service client build failed' }
       - name: Exercise native named pipes and x86 ABI
         working-directory: core
         env:
@@ -77,6 +81,43 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Legacy contract failed' }
           go build -trimpath -ldflags '-s -w -X main.buildVersion=legacy-dev' -o ../legacy/artifacts/sora-legacy-core-${{ matrix.platform }}.exe ./cmd/sora-core
           if ($LASTEXITCODE -ne 0) { throw 'Legacy core build failed' }
+      - name: Verify the service from an ordinary Windows account
+        shell: pwsh
+        run: |
+          $core = (Resolve-Path 'legacy/artifacts/sora-legacy-core-${{ matrix.platform }}.exe').Path
+          $client = (Resolve-Path 'legacy/tests/ServiceInterop/bin/Release/net48/ServiceInterop.exe').Path
+          $data = Join-Path $env:RUNNER_TEMP 'sora-legacy-service-data'
+          $checks = Join-Path $env:RUNNER_TEMP 'sora-legacy-user-checks'
+          New-Item -ItemType Directory $checks | Out-Null
+          $script = Join-Path $checks 'sora-legacy-user.ps1'
+          $result = Join-Path $checks 'sora-legacy-user-result.txt'
+          $output = Join-Path $checks 'sora-legacy-user-output.txt'
+          try {
+            & $core --install-service --data-dir $data
+            if ($LASTEXITCODE -ne 0) { throw 'Legacy service installation failed' }
+            Stop-Service SoraLegacyCore
+            & $client --spoof
+            if ($LASTEXITCODE -ne 0) { throw 'Legacy pipe spoof was not rejected' }
+            Start-Service SoraLegacyCore
+            foreach ($path in @((Split-Path $client), $checks)) {
+              & icacls.exe $path /grant '*S-1-5-32-545:(OI)(CI)M' /T /Q | Out-Null
+              if ($LASTEXITCODE -ne 0) { throw 'Cannot prepare ordinary-user test outputs' }
+            }
+            @"
+          & '$client' *> '$output'
+          `$LASTEXITCODE | Set-Content '$result'
+          "@ | Set-Content $script
+            Start-Service seclogon
+            & runas.exe /trustlevel:0x20000 "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$script`""
+            for ($i = 0; $i -lt 60 -and -not (Test-Path $result); $i++) { Start-Sleep -Seconds 1 }
+            Get-Content $output -ErrorAction SilentlyContinue
+            if (-not (Test-Path $result) -or (Get-Content $result) -ne '0') {
+              throw 'The ordinary Windows user cannot reach SoraLegacyCore'
+            }
+          } finally {
+            & $core --uninstall-service
+            if ($LASTEXITCODE -ne 0) { throw 'Legacy service removal failed' }
+          }
       - uses: actions/upload-artifact@v6
         with:
           name: sora-legacy-core-${{ matrix.platform }}

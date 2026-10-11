@@ -10,6 +10,7 @@
     <PackageReference Include="StreamJsonRpc" Version="2.25.29" />
     <PackageReference Include="Grpc.Tools" Version="2.84.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.360" PrivateAssets="all" />
     <Protobuf Include="../../proto/sora/core/v1/core_control.proto" ProtoRoot="../../proto" GrpcServices="None" />
   </ItemGroup>
 </Project>
