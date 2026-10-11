@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Sora.Legacy</AssemblyName>
+    <Product>Sora Legacy</Product>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <ApplicationIcon>../v2rayN/v2rayN/Assets/Sora/sora.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Configuration" />
+    <ProjectReference Include="../Control/Sora.Legacy.Control.csproj" />
+    <PackageReference Include="AntdUI" Version="2.4.12" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <EmbeddedResource Include="Assets/**/*" />
+    <EmbeddedResource Include="../v2rayN/v2rayN/Assets/Sora/sora-logo-black.png" Link="Assets/logo.png" />
+    <EmbeddedResource Include="../v2rayN/v2rayN/Assets/Phosphor/svg/*-bold.svg" Link="Assets/Icons/%(Filename)%(Extension)" />
+    <None Include="../v2rayN/v2rayN/Assets/Phosphor/LICENSE" Link="Licenses/Phosphor.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

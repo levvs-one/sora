@@ -1,0 +1,477 @@
+{
+  "@@locale": "id",
+  "stateOff": "Tidak terhubung",
+  "stateConnecting": "Menghubungkan",
+  "stateConnected": "Terhubung",
+  "stateReconnecting": "Menghubungkan kembali",
+  "stateDisconnecting": "Memutuskan sambungan",
+  "stateFailed": "Tidak terhubung",
+  "coreMissing": "Layanan Sora tidak merespons",
+  "serverAuto": "Tercepat",
+  "serverBypass": "Tidak ada server",
+  "addSubscription": "Tambahkan langganan",
+  "servers": "Server",
+  "settings": "Pengaturan",
+  "subscription": "Berlangganan",
+  "subscriptionLink": "Tautan berlangganan",
+  "add": "Menambahkan",
+  "refresh": "Memperbarui",
+  "rename": "Ganti nama",
+  "delete": "Menghapus",
+  "cancel": "Membatalkan",
+  "save": "Menyimpan",
+  "name": "Nama",
+  "deleteSubscription": "Hapus “{name}”?",
+  "routes": "Rute",
+  "presetGlobal": "Semuanya melalui VPN",
+  "presetRu": "Rusia langsung",
+  "presetIr": "Iran langsung",
+  "presetCn": "Cina langsung",
+  "blockAds": "Blokir iklan",
+  "killSwitch": "Internet hanya melalui VPN",
+  "engine": "Mesin",
+  "engineAuto": "Mobil",
+  "animations": "Animasi",
+  "logs": "Catatan",
+  "about": "Tentang",
+  "logsAll": "Semua",
+  "logsImportant": "Penting",
+  "logsErrors": "Kesalahan",
+  "search": "Mencari",
+  "export": "Simpan ke file",
+  "clear": "Jernih",
+  "logsEmpty": "Tidak ada apa pun di sini",
+  "appVersion": "Versi {version}",
+  "notInstalled": "Tidak dipasang",
+  "sourceCode": "Kode sumber",
+  "license": "Lisensi",
+  "usage": "{used} dari {total}",
+  "until": "sampai {date}",
+  "expired": "Kedaluwarsa",
+  "milliseconds": "{n} ms",
+  "bytesB": "{n} B",
+  "bytesKB": "{n} KB",
+  "bytesMB": "{n}MB",
+  "bytesGB": "{n}GB",
+  "bytesTB": "{n}TB",
+  "errGeneric": "Ada yang tidak beres",
+  "errCore": "Layanan Sora tidak merespons",
+  "errAuth": "Tidak ada akses ke layanan Sora",
+  "errVersion": "Perbarui Sora: aplikasi dan layanan memiliki versi yang berbeda",
+  "errBusy": "Tunggu, perintah sebelumnya masih berjalan",
+  "errEngineMissing": "Tidak ada mesin yang ditemukan untuk server ini",
+  "errEngineStart": "Mesinnya tidak menyala",
+  "errEngineStopped": "Mesinnya berhenti",
+  "errTunnel": "Tidak ada izin untuk membuat koneksi VPN",
+  "errServers": "Server dikonfigurasi dengan kesalahan",
+  "errNetwork": "Tidak dapat menjangkau server",
+  "errTimeout": "Server tidak menjawab tepat waktu",
+  "errFirewall": "Tidak dapat memblokir internet di luar VPN",
+  "errSubFetch": "Tidak dapat memuat langganan",
+  "errSubFormat": "Ini bukan tautan berlangganan",
+  "errSubEmpty": "Langganan tidak memiliki server",
+  "errSubDuplicate": "Langganan ini sudah ditambahkan",
+  "errSubLimit": "Terlalu banyak langganan",
+  "errSubScheme": "Tautan harus dimulai dengan https://",
+  "errSecretStore": "Penyimpanan Sora rusak atau tidak tersedia",
+  "errNoServers": "Tambahkan langganan untuk terhubung",
+  "exportText": "Teks",
+  "connections": "Koneksi",
+  "close": "Menutup",
+  "chainDirect": "Langsung",
+  "chainBlocked": "Diblokir",
+  "theme": "Tema",
+  "themeSystem": "System",
+  "themeLight": "Lampu",
+  "themeDark": "Gelap",
+  "language": "Bahasa",
+  "languageSystem": "System",
+  "sectionConnection": "Koneksi",
+  "sectionNoServer": "Tidak ada server",
+  "sectionPing": "Ping",
+  "sectionLog": "Diagnostik",
+  "ipv6": "IPv6",
+  "dns": "DNS",
+  "dnsAuto": "Mobil",
+  "dnsHint": "Alamat, dipisahkan koma",
+  "fragment": "Fragmentasi TLS",
+  "fragmentPackets": "Apa yang harus dibagi",
+  "fragmentLength": "Ukuran potongan",
+  "fragmentInterval": "Jeda antar bagian",
+  "byDefault": "Bawaan",
+  "rangeHint": "Misalnya 100-200",
+  "splitPos": "Pisahkan posisi",
+  "splitPosHint": "Misalnya, 1, menengah",
+  "disorder": "Susun ulang potongan",
+  "tlsRecord": "Pisahkan data TLS",
+  "tlsRecordNo": "TIDAK",
+  "tlsRecordSni": "Atas nama situs",
+  "tlsRecordFirst": "Setelah byte pertama",
+  "hostCase": "Ubah kasus Host",
+  "probeMethod": "Metode",
+  "probeAuto": "Mobil",
+  "probeEngine": "Melalui mesin",
+  "probeConnect": "Koneksi saja",
+  "probeUrl": "Alamat tes",
+  "probeTimeout": "Tunggu",
+  "seconds": "{n} s",
+  "subscriptions": "Langganan",
+  "subscriptionSettings": "Pengaturan",
+  "userAgent": "Agen-Pengguna",
+  "autoUpdate": "Perbarui secara otomatis",
+  "updateInterval": "seberapa sering",
+  "intervalProvider": "Seperti yang diminta penyedia",
+  "hours": "{n} jam",
+  "updateNow": "Perbarui sekarang",
+  "logLevel": "Apa yang harus direkam",
+  "levelDebug": "Semuanya",
+  "levelInfo": "Biasa",
+  "levelWarning": "Penting",
+  "levelError": "Hanya kesalahan",
+  "recordDestinations": "Catat alamat situs",
+  "reset": "Atur ulang pengaturan",
+  "resetConfirm": "Reset semua pengaturan?",
+  "resetAction": "Mengatur ulang",
+  "invalidValue": "Nilai ini tidak akan berfungsi",
+  "website": "Halaman berlangganan",
+  "providerWebsite": "Situs web penyedia",
+  "support": "Mendukung",
+  "controlPortQuestion": "{engine} dikontrol melalui port di komputer ini. Program lain akan dapat mengetahui bahwa VPN aktif.",
+  "chooseEngine": "Pilih {engine}",
+  "rules": "Aturan adat",
+  "ruleAdd": "Aturan baru",
+  "ruleHint": "Situs, IP atau program",
+  "ruleDirect": "Langsung",
+  "ruleProxy": "Melalui VPN",
+  "ruleBlock": "Memblokir",
+  "failover": "Aktifkan kegagalan",
+  "connectOnStart": "Hubungkan di awal",
+  "trafficLow": "{name}: {left} kiri",
+  "ruleInvalid": "Ini tidak terlihat seperti situs, IP, atau program",
+  "tunnelMode": "Mode",
+  "tunnelTun": "Semua lalu lintas",
+  "tunnelProxy": "Proksi System",
+  "proxyAddress": "Alamat proksi",
+  "copied": "Disalin",
+  "launchAtLogin": "Mulailah dengan sistem",
+  "closeToTray": "Simpan di dalam baki dalam keadaan tertutup",
+  "notifications": "Pemberitahuan",
+  "trayOpen": "Buka Sora",
+  "trayConnect": "Menghubungkan",
+  "trayDisconnect": "Memutuskan",
+  "trayServer": "pelayan",
+  "trayQuit": "Keluar dari Sora",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora: {state}, {server}",
+  "noticeInTray": "Sora masih ada di baki",
+  "noticeInTrayBody": "Keluar dari menu ikonnya",
+  "noticeLost": "Koneksi terputus",
+  "noticeLostBody": "Sora tersambung kembali",
+  "noticeRestored": "Terhubung lagi",
+  "noticeFailed": "Tidak dapat terhubung",
+  "noticeBackup": "Server utama tidak menjawab; cadangan membawa lalu lintas",
+  "noticeNext": "Server tidak menjawab; yang berikutnya membawa lalu lintas",
+  "noticeMainBack": "Server utama menjawab lagi dan membawa lalu lintas",
+  "noticeSubscription": "Berlangganan",
+  "importTitle": "Tambahkan langganan ini?",
+  "importSealed": "Tautan ini dienkripsi untuk Happ, dan hanya Happ yang dapat membacanya. Tanyakan penyedia Anda untuk tautan berlangganan biasa.",
+  "understood": "OKE",
+  "noAnswer": "tidak ada jawaban",
+  "home": "Rumah",
+  "navRules": "Aturan",
+  "navConnections": "Koneksi",
+  "navLogs": "Log",
+  "navAbout": "Tentang",
+  "sidebarToggle": "Alihkan bilah sisi",
+  "more": "Lagi",
+  "less": "Lebih sedikit",
+  "currentServer": "Server saat ini",
+  "trafficDown": "Diunduh",
+  "trafficUp": "Diunggah",
+  "perSecond": "{value}/dtk",
+  "activeRules": "Aturan aktif: {count}",
+  "recentNotifications": "Pemberitahuan terkini",
+  "notificationsEmpty": "Peristiwa koneksi dan langganan akan muncul di sini",
+  "retryConnect": "Coba lagi koneksi",
+  "openLogs": "Buka log",
+  "tourReplay": "Tampilkan panduan lagi",
+  "tourStep": "Langkah {step} dari 5",
+  "tourBack": "Kembali",
+  "tourNext": "Berikutnya",
+  "tourSkip": "Melewati",
+  "tourFinish": "Selesai",
+  "tourAdd": "Tambahkan tautan berlangganan penyedia Anda.",
+  "tourServer": "Pilih server. “Tercepat” memilih satu untuk Anda.",
+  "tourConnect": "Klik di sini untuk menghubungkan atau memutuskan sambungan.",
+  "tourMode": "Pilih mode. Tombol pemutus memblokir internet jika VPN terputus.",
+  "tourSettings": "Buka pengaturan. Anda dapat memutar ulang panduan ini di sana.",
+  "chooseProgram": "Pilih sebuah program",
+  "installedApps": "Aplikasi yang diinstal",
+  "runningProcesses": "Proses yang berjalan",
+  "programsFailed": "Tidak dapat memuat aplikasi",
+  "programsEmpty": "Tidak ada aplikasi yang ditemukan. Coba nama lain.",
+  "selectExe": "Pilih file .exe",
+  "trafficUnavailable": "Counter belum tersedia",
+  "speedtest": "Kecepatan",
+  "speedtestCheck": "Periksa kecepatan",
+  "speedtestSearch": "Temukan layanan",
+  "speedtestEmpty": "Tidak ada kecocokan. Ubah pencarian.",
+  "speedtestBackToList": "Kembali ke layanan",
+  "speedtestOpenBrowser": "Buka di peramban",
+  "speedtestUnavailable": "Browser yang tertanam tidak dapat dijalankan. Buka layanan di browser sistem Anda.",
+  "speedtestPageFailed": "Halaman tidak dapat dimuat. Muat ulang atau buka layanan di browser sistem Anda.",
+  "speedtestExternalFailed": "Browser sistem tidak dapat dibuka. Coba lagi.",
+  "modes": "Mode",
+  "proxyShort": "Proksi",
+  "tunMode": "Semua lalu lintas (TUN)",
+  "checkUpdates": "Periksa pembaruan",
+  "updates": "Pembaruan aplikasi",
+  "updateAvailable": "Versi {version} tersedia",
+  "updateOpenAbout": "Lihat pembaruan",
+  "updateNotes": "Perubahan pada {version}",
+  "updateCheck": "Periksa pembaruan",
+  "updateChecking": "Memeriksa...",
+  "updateNoNotes": "Rilisan ini tidak memiliki catatan.",
+  "updateDropWarning": "Koneksi VPN akan terputus selama beberapa detik saat Sora dan pembaruan intinya. Melanjutkan?",
+  "updateWaitConnection": "Tunggu hingga koneksi dan inti VPN siap.",
+  "updateDownloading": "Mengunduh dan memverifikasi file...",
+  "updateInstalling": "Mempersiapkan pembaruan atau menunggu otentikasi administrator...",
+  "updateNetworkError": "Tidak dapat mengunduh pembaruan. Coba lagi.",
+  "updateReleaseError": "Data rilis atau file yang diperlukan hilang atau tidak valid.",
+  "updateChecksumError": "Unduhan tidak cocok dengan SHA256SUMS. Tidak ada yang dipasang.",
+  "updateInstallError": "Pembaruan tidak selesai. Otentikasi mungkin telah dibatalkan.",
+  "updateUnsupported": "Eksekusi ini tidak dimiliki oleh pasangan paket Sora yang didukung. Gunakan petunjuk instalasi rilis.",
+  "updateManual": "Jalankan perintah ini di terminal untuk menginstal kedua paket terverifikasi, lalu buka kembali Sora. File-file tersebut tetap berada di direktori unduhan. Koneksi VPN akan terputus.",
+  "updateCopyCommand": "Salin perintah",
+  "updateChecksDisabled": "Pemeriksaan otomatis dinonaktifkan di Pengaturan.",
+  "updateInstalled": "Pembaruan diinstal. Buka kembali Sora.",
+  "projectLinks": "Proyek",
+  "githubReleases": "Rilis dan unduhan",
+  "telegramChannel": "saluran Telegram",
+  "licenses": "Lisensi",
+  "componentLicenses": "Lisensi komponen",
+  "appCopyright": "© 2026 levvs-one dan kontributor",
+  "collapseServers": "Ciutkan server",
+  "expandServers": "Perluas server",
+  "hideDescription": "Sembunyikan deskripsi",
+  "showDescription": "Tampilkan deskripsi",
+  "pendingConnectionChanges": "Hubungkan kembali untuk menerapkan perubahan ini.",
+  "reconnectNow": "Terapkan dan sambungkan kembali",
+  "bypassLimitations": "Mode ini melewati DPI hanya untuk HTTP dan TLS, tidak mendukung UDP atau mengubah IP Anda. Gunakan server VPN untuk suara Discord, panggilan, dan alamat Telegram yang diblokir.",
+  "errEngineUnsupported": "Mesin yang dipilih tidak mendukung profil atau pengaturan ini. Pilih Otomatis atau mesin yang kompatibel.",
+  "errRestore": "Pembersihan koneksi tidak lengkap. Coba lagi memutuskan sambungan; lihat log untuk detailnya.",
+  "errSessionEnded": "Sesi ini telah berakhir. Segarkan status koneksi.",
+  "retryDisconnect": "Coba lagi putuskan sambungan",
+  "tunStack": "tumpukan TUN",
+  "modesInfo": "Tentang mode",
+  "modesGuideTitle": "Mode dan mesin",
+  "probeServers": "Periksa server",
+  "expiresIn": "{name}: {days, plural, =0{langganan berakhir dalam beberapa jam} one{langganan berakhir pada hari #} other{langganan berakhir dalam # hari}}",
+  "groupOrdered": "{count, plural, one{Server #, pada gilirannya} other{Server #, pada gilirannya}}",
+  "groupBest": "{count, plural, one{Server #, tercepat} other{Server #, tercepat}}",
+  "modesGuide": "Pilih Otomatis jika Anda tidak yakin mesin mana yang dibutuhkan server Anda. Sora memeriksa profil dan pengaturan sebelum menghubungkan. Mesin tidak dapat meningkatkan bandwidth paket Anda: kinerja bergantung pada server, rute, protokol, dan jaringan.\n\n## Mode\n\n### Semua lalu lintas (TUN)\n\nSora membuat antarmuka jaringan virtual dan merutekan lalu lintas aplikasi melaluinya, termasuk TCP dan UDP. Gunakan mode ini untuk Telegram, game, dan suara Discord. Aturan dapat mengirim situs atau program tertentu secara langsung atau memblokirnya. Layanan jaringan memerlukan izin dan server yang mendukung protokol yang diperlukan.\n\n### Proksi System\n\nSora mengonfigurasi proksi HTTP/SOCKS lokal. Aplikasi yang menghormati pengaturan proxy sistem menggunakannya. Aplikasi dengan tumpukan jaringannya sendiri dapat terhubung secara langsung; UDP dan panggilan suara umumnya memerlukan TUN. Mode ini cocok untuk browser dan aplikasi dengan dukungan proxy.\n\n### Tidak ada server\n\nDi Linux, Sora menggunakan [zapret](https://github.com/bol-van/zapret) untuk membagi dan membentuk ulang permintaan HTTP/TLS dan melewati beberapa pemeriksaan DPI. IP Anda tetap sama dan koneksi langsung ke situs web. Hasil bergantung pada penyedia Anda dan metode pemblokiran.\n\nIntegrasi saat ini menggunakan tpws untuk HTTP dan TLS melalui TCP. Ini tidak melewati pemblokiran IP atau menyampaikan UDP, dan tidak dapat menjamin koneksi MTProto MTProto. Gunakan server VPN dengan TUN untuk suara Discord, panggilan Telegram dan pembatasan semacam ini.\n\n## Mesin\n\n### Otomatis\n\nSora memilih mesin terinstal yang mendukung seluruh paket koneksi: protokol server, transport, grup, fragmentasi, dan mode. Pilihan manual yang tidak kompatibel ditolak sebelum menghentikan koneksi saat ini. Pilih Otomatis atau mesin lain dan terapkan kembali pengaturannya.\n\n### sing-box\n\nPaket Sora baru mencakup [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), fork dari [sing-box](https://github.com/SagerNet/sing-box), menambahkan XHTTP dan VLESS Encryption sisi klien. Sora mengenali build dan kemampuannya. Build upstream tanpa XHTTP tidak mendapatkan kemampuan ini hanya dari namanya saja.\n\nProtokol yang didukung mencakup parameter VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard dan AmneziaWG 1.x/2.x Sora dapat mengimpor. Profil JSON Xray lengkap memerlukan Xray. Bidang AWG 3.x baru belum dapat diimpor. sing-box menggunakan port kontrol lokal yang dilindungi kata sandi, yang dapat dideteksi oleh aplikasi lain di komputer.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) mendukung fragmentasi VLESS, REALITY, XHTTP, VLESS Encryption dan TLS. Ini juga menjalankan profil lengkap penyedia Xray sambil mempertahankan perutean dan grupnya. Profil tersebut tidak dapat secara otomatis dikonversi ke mesin lain tanpa mengubah perilakunya.\n\nXray yang dibundel menghapus pengaturan yang menonaktifkan verifikasi sertifikat TLS (`allowInsecure`). Otomatis memilih sing-box atau mihomo untuk server biasa yang memerlukan pengaturan ini. Memilih Xray secara manual melaporkan ketidakcocokan sebelum menghentikan koneksi saat ini. Profil JSON lengkap yang lebih lama memerlukan profil penyedia yang diperbarui dengan sertifikat atau pin sertifikat yang dapat diverifikasi.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) mendukung grup fallback dan penyeimbang beban yang dipesan, XHTTP dan AmneziaWG. Pilih ketika failover otomatis ke server cadangan penting. Pengaturan fragmentasi TLS Sora tidak tersedia dengan mesin ini.\n\n## Kompatibilitas di Sora\n\n| Fitur | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN dan TCP/UDP | Ya | Ya | Ya |\n| XHTTP | Ya | Ya | Ya |\n| VLESS Encryption | Ya | Ya | Ya |\n| Profil lengkap Xray | Tidak | Ya | Tidak |\n| TUIC / AnyTLS | Keduanya | Tidak | TUIC |\n| Fragmentasi TLS | Ya | Ya | Tidak |\n| AmneziaWG 1.x/2.x | Ya¹ | Tidak | Ya |\n| Grup cadangan yang dipesan | Tidak | Tidak² | Ya |\n\n¹ Profil dengan J1/J2/J3/Itime menggunakan mihomo; bidang-bidang ini tidak boleh dibuang secara diam-diam. ² Untuk grup profil Xray lengkap, aplikasi memilih profil cadangan. Dukungan bergantung pada build yang diinstal; periksa versinya di Tentang.\n\n## Tumpukan TUN\n\nTumpukan menangani TCP dan UDP di dalam antarmuka virtual. Di panel mode, Xray dan mihomo menawarkan gVisor, System, Mixed dan MIPS. Setiap mesin menyimpan preferensinya sendiri. Proksi System dan mode Tanpa Server tidak menggunakan preferensi ini.\n\n- **Mixed** — TCP menggunakan tumpukan sistem, sedangkan gVisor menangani UDP. Ini adalah default untuk mihomo.\n- **System** — menggunakan tumpukan sistem. Coba opsi lain jika aplikasi jaringan mengalami masalah.\n- **gVisor** — menangani lalu lintas di ruang pengguna.\n- **MIPS** — tumpukan IP milik mihomo, tersedia dalam paket versi 1.19.32.\n\nPada Linux, Xray menggunakan gVisor bawaannya secara default. System, Mixed dan MIPS di Linux menggunakan mihomo sebagai mesin TUN, meneruskan TCP dan UDP ke Xray melalui tautan SOCKS lokal yang diautentikasi. Xray mempertahankan protokol, profil penyedia, dan perutean. Ketiga opsi ini memerlukan mihomo yang diinstal. Pada Windows, TUN saat ini menggunakan sing-box atau mihomo; Xray berjalan dalam mode proksi sistem.\n\nJembatan menjalankan proses kedua. Dalam tiga pengukuran idle di Linux, memori fisik menggunakan sekitar 32–36 MiB lebih banyak daripada Xray TUN asli. Ini tidak mengukur beban pengunduhan: biaya CPU dan memori bergantung pada koneksi. Simpan gVisor kecuali Anda memerlukan tumpukan lain. sing-box tidak memiliki pemilih tumpukan. Tidak ada tumpukan yang menjamin kinerja lebih baik di setiap jaringan. Pilih tumpukan dan pilih Terapkan dan sambungkan kembali untuk mencobanya di jaringan Anda.\n\n## Menerapkan pengaturan\n\nMemilih server akan terhubung kembali secara otomatis. Pengaturan mode, mesin, DNS, dan aturan segera disimpan; selama koneksi aktif, klik Terapkan dan sambungkan kembali untuk menggunakannya. Memulai ulang mesin dapat mengganggu pengunduhan dan panggilan. Klik berulang kali tidak memulai koneksi paralel; pemutusan mengakhiri transisi dan melepaskan koneksi.\n\nInternet hanya melalui VPN memblokir lalu lintas langsung ketika terowongan terputus. Ini mempengaruhi keseluruhan mesin. Pemutusan hubungan secara eksplisit menghapus aturan Sora. Jika pembersihan tidak selesai, coba lagi putuskan sambungan dan buka log.\n\n## Dokumentasi proyek\n\n- [sing-box-lx: konfigurasi dan dukungan](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [dokumentasi sing-box](https://sing-box.sagernet.org/)\n- [dokumentasi Xray](https://xtls.github.io/)\n- [dokumentasi mihomo](https://wiki.metacubex.one/)\n- [zapret: pengoperasian dan batasan](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extensions": "Ekstensi",
+  "extensionsSoon": "Segera hadir",
+  "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini.",
+  "diagnosticCapture": "Tangkap selama 10 detik",
+  "diagnosticEvents": "Acara Windows",
+  "exportLogFile": "Ke {name}",
+  "diagnosticHttp": "Diagnostik HTTP",
+  "diagnosticRequiresTun": "Pengambilan paket memerlukan koneksi Sora TUN yang aktif.",
+  "diagnosticNoData": "Belum ada permintaan yang tercatat. Buka situs tes kecepatan terlebih dahulu.",
+  "diagnosticPackets": "Penangkapan paket",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}

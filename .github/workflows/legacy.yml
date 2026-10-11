@@ -69,6 +69,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Control client build failed' }
           dotnet build legacy/tests/ServiceInterop/ServiceInterop.csproj -c Release -p:PlatformTarget=${{ matrix.platform }} --nologo
           if ($LASTEXITCODE -ne 0) { throw 'Service client build failed' }
+          dotnet build legacy/tests/ClientInterop/ClientInterop.csproj -c Release -p:PlatformTarget=${{ matrix.platform }} --nologo
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy GUI build failed' }
       - name: Exercise native named pipes and x86 ABI
         working-directory: core
         env:
@@ -86,6 +88,7 @@ jobs:
         run: |
           $core = (Resolve-Path 'legacy/artifacts/sora-legacy-core-${{ matrix.platform }}.exe').Path
           $client = (Resolve-Path 'legacy/tests/ServiceInterop/bin/Release/net48/ServiceInterop.exe').Path
+          $gui = (Resolve-Path 'legacy/tests/ClientInterop/bin/Release/net48/ClientInterop.exe').Path
           $data = Join-Path $env:RUNNER_TEMP 'sora-legacy-service-data'
           $checks = Join-Path $env:RUNNER_TEMP 'sora-legacy-user-checks'
           New-Item -ItemType Directory $checks | Out-Null
@@ -99,17 +102,19 @@ jobs:
             & $client --spoof
             if ($LASTEXITCODE -ne 0) { throw 'Legacy pipe spoof was not rejected' }
             Start-Service SoraLegacyCore
-            foreach ($path in @((Split-Path $client), $checks)) {
+            foreach ($path in @((Split-Path $client), (Split-Path $gui), $checks)) {
               & icacls.exe $path /grant '*S-1-5-32-545:(OI)(CI)M' /T /Q | Out-Null
               if ($LASTEXITCODE -ne 0) { throw 'Cannot prepare ordinary-user test outputs' }
             }
             @"
           & '$client' *> '$output'
+          if (`$LASTEXITCODE -ne 0) { `$LASTEXITCODE | Set-Content '$result'; exit }
+          & '$gui' '$checks' *>> '$output'
           `$LASTEXITCODE | Set-Content '$result'
           "@ | Set-Content $script
             Start-Service seclogon
             & runas.exe /trustlevel:0x20000 "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$script`""
-            for ($i = 0; $i -lt 60 -and -not (Test-Path $result); $i++) { Start-Sleep -Seconds 1 }
+            for ($i = 0; $i -lt 150 -and -not (Test-Path $result); $i++) { Start-Sleep -Seconds 1 }
             Get-Content $output -ErrorAction SilentlyContinue
             if (-not (Test-Path $result) -or (Get-Content $result) -ne '0') {
               throw 'The ordinary Windows user cannot reach SoraLegacyCore'
@@ -122,6 +127,14 @@ jobs:
         with:
           name: sora-legacy-core-${{ matrix.platform }}
           path: legacy/artifacts/sora-legacy-core-${{ matrix.platform }}.exe
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: sora-legacy-client-development-${{ matrix.platform }}
+          path: |
+            legacy/Client/bin/Release/net48
+            ${{ runner.temp }}/sora-legacy-user-checks
           if-no-files-found: error
 
   windows-x86:

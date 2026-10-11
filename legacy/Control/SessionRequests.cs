@@ -35,9 +35,8 @@ public sealed class SessionRequests
         {
             if (stopped) throw new ObjectDisposedException(nameof(SessionRequests));
             var command = new Command(++version, plan?.Clone(), killSwitch);
-            // A new choice cancels connecting, but never interrupts cleanup of
-            // the previous session. The core owns the actual rollback.
-            connecting?.Cancel();
+            // Wait for the current RPC result before issuing its replacement.
+            // Cancelling the client future would hide ongoing core cleanup.
             if (!commands.Writer.TryWrite(command)) command.Completion.TrySetCanceled();
             return command.Completion.Task;
         }
@@ -64,24 +63,28 @@ public sealed class SessionRequests
 
     private async Task<SessionStatus> ApplyAsync(Command command)
     {
-        using var cleanup = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
-        cleanup.CancelAfter(TimeSpan.FromSeconds(25));
-        var disconnected = await core.CallAsync(new DisconnectRequest
-        {
-            ApiVersion = core.Version, ControlAuthenticator = core.Authenticator,
-            RequestId = Guid.NewGuid().ToString("N")
-        }, DisconnectResponse.Parser, cleanup.Token).ConfigureAwait(false);
-        if (disconnected.Error != null) throw new InvalidOperationException(disconnected.Error.UserMessageKey);
         using var attempt = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
         attempt.CancelAfter(TimeSpan.FromSeconds(45));
         lock (gate)
         {
             if (stopped || command.Version != version) throw new OperationCanceledException();
-            if (command.Plan == null) return disconnected.Status ?? throw new InvalidDataException("Missing session status.");
             connecting = attempt;
         }
         try
         {
+            if (command.Plan == null)
+            {
+                attempt.CancelAfter(TimeSpan.FromSeconds(25));
+                var disconnected = await core.CallAsync(new DisconnectRequest
+                {
+                    ApiVersion = core.Version, ControlAuthenticator = core.Authenticator,
+                    RequestId = Guid.NewGuid().ToString("N")
+                }, DisconnectResponse.Parser, attempt.Token).ConfigureAwait(false);
+                if (disconnected.Error != null) throw new InvalidOperationException(disconnected.Error.UserMessageKey);
+                return disconnected.Status ?? throw new InvalidDataException("Missing session status.");
+            }
+            // Connect validates the new plan before releasing the old session.
+            // An explicit Disconnect here would defeat that protection.
             var connected = await core.CallAsync(new ConnectRequest
             {
                 ApiVersion = core.Version, ControlAuthenticator = core.Authenticator,

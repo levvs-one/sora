@@ -89,6 +89,10 @@ await connection.CallAsync(new GetStatusRequest { ApiVersion = connection.Versio
 Console.WriteLine("PASS 100 concurrent calls, eight live watches, cancellation and disconnect");
 
 var requests = new SessionRequests(connection);
+var beforeRejectedPlan = await connection.CallAsync(new GetStatusRequest
+{
+    ApiVersion = connection.Version
+}, GetStatusResponse.Parser, timeout.Token);
 try
 {
     await requests.SetAsync(imported.SessionPlan);
@@ -98,6 +102,13 @@ catch (InvalidOperationException error) when (error.Message.StartsWith("core.", 
 {
     Console.WriteLine("PASS a backend start failure reaches the session caller");
 }
+var afterRejectedPlan = await connection.CallAsync(new GetStatusRequest
+{
+    ApiVersion = connection.Version
+}, GetStatusResponse.Parser, timeout.Token);
+if (!beforeRejectedPlan.Status.Equals(afterRejectedPlan.Status))
+    throw new Exception("An unsupported choice changed the existing core session state.");
+Console.WriteLine("PASS an unsupported session choice preserves core state");
 var rapid = new List<Task<SessionStatus>>();
 for (var index = 0; index < 200; index++)
 {
