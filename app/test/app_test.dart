@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -142,7 +144,11 @@ void main() {
       settings.mihomoTunStack = 'mips';
       for (final engine in ['', 'sing-box', 'xray', 'mihomo']) {
         settings.engine = engine;
-        expect(buildPlan(servers: servers, choice: 'a', settings: settings).tunStack, engine == 'mihomo' ? 'mips' : '');
+        expect(buildPlan(servers: servers, choice: 'a', settings: settings).tunStack, switch (engine) {
+          'mihomo' => 'mips',
+          'xray' when Platform.isWindows => 'gvisor',
+          _ => '',
+        });
       }
       settings.tunnel = 'proxy';
       expect(buildPlan(servers: servers, choice: 'a', settings: settings).tunStack, isEmpty);
@@ -153,10 +159,10 @@ void main() {
       expect(settings.mihomoTunStack, 'mixed');
     });
 
-    test('Xray stacks stay isolated and native gVisor works with older cores', () {
+    test('Xray stacks stay isolated and Windows sends the chosen gVisor preference', () {
       expect(settings.xrayTunStack, 'gvisor');
       settings.engine = 'xray';
-      expect(buildPlan(servers: servers, choice: 'a', settings: settings).tunStack, isEmpty);
+      expect(buildPlan(servers: servers, choice: 'a', settings: settings).tunStack, Platform.isWindows ? 'gvisor' : '');
       settings.xrayTunStack = 'system';
       settings.mihomoTunStack = 'mips';
       for (final engine in ['', 'sing-box', 'xray', 'mihomo']) {

@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"path/filepath"
+	"runtime"
 	"slices"
 	"sync"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/mihomo"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/xray"
+	"github.com/levvs-one/sora-client/core/errs"
 )
 
 const bridgeID = "sora-xray-bridge"
@@ -25,6 +28,7 @@ type Engine struct {
 	tun      engine.Engine
 	port     int
 	password string
+	xrayName string
 	bus      *engine.EventBus
 	op       sync.Mutex
 	close    sync.Once
@@ -53,7 +57,8 @@ func New(xcfg, tcfg supervise.Config) (*Engine, error) {
 		_ = x.Close()
 		return nil, err
 	}
-	e := &Engine{Engine: x, tun: tun, port: port, password: secret, bus: engine.NewEventBus(128)}
+	e := &Engine{Engine: x, tun: tun, port: port, password: secret,
+		xrayName: filepath.Base(xcfg.Binary.Path), bus: engine.NewEventBus(128)}
 	for _, child := range []engine.Engine{x, tun} {
 		ch, unsub := child.Events().Subscribe()
 		e.unsub = append(e.unsub, unsub)
@@ -93,6 +98,7 @@ func (e *Engine) Events() *engine.EventBus { return e.bus }
 func (e *Engine) Capabilities() engine.Capabilities {
 	caps := e.Engine.Capabilities()
 	caps.Features = maps.Clone(caps.Features)
+	caps.Features[engine.FeatureTun] = e.tun.Capabilities().Supports(engine.FeatureTun)
 	caps.Features[engine.FeatureFakeIP] = e.tun.Capabilities().Supports(engine.FeatureFakeIP)
 	return caps
 }
@@ -104,8 +110,17 @@ func (e *Engine) plans(p *engine.Plan) (*engine.Plan, *engine.Plan, error) {
 	if err := p.Validate(); err != nil {
 		return nil, nil, err
 	}
-	if !p.Tun.Enabled || !slices.Contains([]string{"system", "mixed", "mips"}, p.Tun.Stack) {
+	if !p.Tun.Enabled || !slices.Contains([]string{"", "gvisor", "system", "mixed", "mips"}, p.Tun.Stack) {
 		return nil, nil, fmt.Errorf("xray TUN: unsupported bridge stack %q", p.Tun.Stack)
+	}
+	for _, rule := range p.Rules {
+		if rule.Type == engine.RuleProcess &&
+			(runtime.GOOS != "windows" || !slices.Contains([]string{"direct", "reject"}, rule.Target)) {
+			// SOCKS carries destinations but loses the originating process.
+			// Reject rules we cannot preserve rather than silently bypassing VPN.
+			return nil, nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanEngineUnsupported,
+				"xray TUN bridge: this process rule needs another engine or Linux native gvisor")
+		}
 	}
 	x := *p
 	x.Tun = engine.Tun{}
@@ -123,6 +138,19 @@ func (e *Engine) plans(p *engine.Plan) (*engine.Plan, *engine.Plan, error) {
 		Server: "127.0.0.1", Port: uint16(e.port), UserID: bridgeID, Password: e.password, SOCKSUDP: true}} //nolint:gosec // FreePort returns a TCP port
 	tun.Groups = nil
 	tun.Rules = []engine.Rule{{Type: engine.RuleMatchAll, Target: bridgeID}}
+	if runtime.GOOS == "windows" {
+		// Linux excludes the core UID through policy routing. Windows needs
+		// the packet engine to send Xray's own sockets to the real interface.
+		// Process rules also belong here, before SOCKS loses their identity.
+		tun.Rules = []engine.Rule{{Type: engine.RuleProcess, Value: e.xrayName, Target: "direct"}}
+		for _, rule := range p.Rules {
+			if !slices.Contains([]string{"direct", "reject", "pass", "dns"}, rule.Target) {
+				rule.Target = bridgeID
+			}
+			tun.Rules = append(tun.Rules, rule)
+		}
+		tun.Rules = append(tun.Rules, engine.Rule{Type: engine.RuleMatchAll, Target: bridgeID})
+	}
 	tun.Options.Mode = "rule"
 	tun.Options.Fragment = engine.Fragment{}
 	tun.DNS.Servers = slices.Clone(p.DNS.Servers)

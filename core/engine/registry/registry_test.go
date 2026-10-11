@@ -188,7 +188,10 @@ func TestXrayBridgeRequiresTheInstalledPacketEngineBeforeConstruction(t *testing
 	p := enginetest.Plan(engine.ProtocolVLESS)
 	p.Engines = []engine.Kind{engine.KindXray}
 	p.Tun = engine.Tun{Enabled: true, Stack: "mips"}
-	r := &Registry{preference: engine.DefaultPreference, binaries: map[engine.Kind]supervise.Binary{}}
+	r := &Registry{preference: engine.DefaultPreference,
+		binaries: map[engine.Kind]supervise.Binary{engine.KindXray: {}},
+		availability: []engine.Availability{{Kind: engine.KindXray, Usable: true,
+			Version: engine.Version{Major: 26, Minor: 3, Patch: 27}}}}
 	if _, err := r.Factory()(t.Context(), p); errs.KeyOf(err) != errs.KeyEngineBinaryMissing {
 		t.Fatalf("missing packet engine: %v", err)
 	}
@@ -198,5 +201,28 @@ func TestXrayBridgeRequiresTheInstalledPacketEngineBeforeConstruction(t *testing
 	}
 	if p.Tun.Stack != "mips" {
 		t.Fatal("factory mutated the caller's TUN stack")
+	}
+}
+
+func TestAutomaticSelectionCarriesProviderProfilesThroughTheTunBridge(t *testing.T) {
+	r := &Registry{binaries: map[engine.Kind]supervise.Binary{
+		engine.KindXray: {}, engine.KindMihomo: {Version: engine.Version{Major: 1, Minor: 19, Patch: 32}},
+	}, availability: []engine.Availability{
+		{Kind: engine.KindSingBox, Usable: true, Version: engine.Version{Major: 1, Minor: 14, Patch: 3}},
+		{Kind: engine.KindXray, Usable: true, Version: engine.Version{Major: 26, Minor: 3, Patch: 27}},
+		{Kind: engine.KindMihomo, Usable: true, Version: engine.Version{Major: 1, Minor: 19, Patch: 32}},
+	}}
+	p := &engine.Plan{Outbounds: []engine.Outbound{{ID: "provider", Protocol: engine.ProtocolXrayProfile}},
+		Tun: engine.Tun{Enabled: true, Stack: "mixed"}, DNS: engine.DNS{Mode: string(engine.DNSFakeIP)}}
+	sel, bridge, err := r.selectPlan(p, engine.DefaultPreference)
+	if err != nil || sel.Kind != engine.KindXray || !bridge || len(sel.Rejected) != 1 {
+		t.Fatalf("automatic provider selection: %+v, bridge=%v, err=%v", sel, bridge, err)
+	}
+	if !p.Tun.Enabled || p.Tun.Stack != "mixed" || p.DNS.Mode != string(engine.DNSFakeIP) {
+		t.Fatal("selection changed the caller's packet or DNS settings")
+	}
+	delete(r.binaries, engine.KindMihomo)
+	if _, _, err := r.selectPlan(p, engine.DefaultPreference); errs.KeyOf(err) != errs.KeyPlanEngineUnsupported {
+		t.Fatalf("provider without its packet engine: %v", err)
 	}
 }

@@ -312,6 +312,13 @@ jobs:
             Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
             Get-Content $log -Tail 20 -ErrorAction SilentlyContinue
           }
+      - name: TCP and UDP through every Windows TUN stack
+        working-directory: core
+        shell: pwsh
+        run: |
+          $env:SORA_WINDOWS_TUN_INTEGRATION = '1'
+          $env:SORA_ENGINES_DIR = "${env:ProgramFiles}\Sora\core\engines"
+          go test -count=1 -v ./engine/interop -run '^TestWindowsTunSwitchesCarryTCPAndUDP$' -timeout 10m
       - name: Screenshot of the app
         shell: pwsh
         run: |

@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -166,36 +167,12 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		// Select capabilities against the SOCKS5 plan produced by
 		// bypass rewriting.
 		selectPlan := bypass.Rewrite(p, nil)
-		bridge := len(order) == 1 && order[0] == engine.KindXray && p.Tun.Enabled &&
-			slices.Contains([]string{"system", "mixed", "mips"}, p.Tun.Stack)
-		if bridge {
-			packetEngine, installed := r.binaries[engine.KindMihomo]
-			if !installed {
-				return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
-					"registry: Xray's selected TUN stack needs mihomo in the engines directory")
-			}
-			if packetEngine.Version.Less(engine.Version{Major: 1, Minor: 19, Patch: 32}) {
-				return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanEngineUnsupported,
-					"registry: Xray's selected TUN stack needs mihomo 1.19.32 or newer")
-			}
-			// Admit Xray's actual transports and routing independently of the
-			// packet stack supplied by the second installed engine.
-			selectPlan.Tun.Stack = "gvisor"
-			if selectPlan.DNS.Mode == string(engine.DNSFakeIP) {
-				selectPlan.DNS.Mode = "rule"
-			}
-		}
-		sel, err := engine.SelectEngine(selectPlan, r.availability, order)
+		sel, bridge, err := r.selectPlan(selectPlan, order)
 		r.mu.Lock()
 		r.last = sel
 		r.mu.Unlock()
 		if err != nil {
-			for _, kind := range order {
-				if _, installed := r.binaries[kind]; installed {
-					return nil, errs.Wrap(err, errs.CodeFailedPrecondition, errs.KeyPlanEngineUnsupported)
-				}
-			}
-			return nil, errs.Wrap(err, errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing)
+			return nil, err
 		}
 		cfg := r.base
 		cfg.Binary = r.binaries[sel.Kind]
@@ -214,6 +191,54 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		}
 		return bypass.Wrap(built, r.tpws, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs), nil
 	}
+}
+
+// selectPlan checks Xray's routing independently of its installed packet
+// engine. Automatic selection must also carry provider-only Xray profiles.
+func (r *Registry) selectPlan(p *engine.Plan, order []engine.Kind) (engine.Selection, bool, error) {
+	var selection engine.Selection
+	key := errs.KeyEngineBinaryMissing
+	for _, kind := range order {
+		candidate := *p
+		bridge := kind == engine.KindXray && p.Tun.Enabled &&
+			(runtime.GOOS != "linux" || slices.Contains([]string{"system", "mixed", "mips"}, p.Tun.Stack))
+		if bridge {
+			candidate.Tun = engine.Tun{}
+			if candidate.DNS.Mode == string(engine.DNSFakeIP) {
+				candidate.DNS.Mode = "rule"
+			}
+		}
+		if _, installed := r.binaries[kind]; installed {
+			key = errs.KeyPlanEngineUnsupported
+		}
+		picked, err := engine.SelectEngine(&candidate, r.availability, []engine.Kind{kind})
+		if err != nil {
+			selection.Rejected = append(selection.Rejected, picked.Rejected...)
+			continue
+		}
+		if bridge {
+			packet, installed := r.binaries[engine.KindMihomo]
+			var packetErr error
+			if !installed {
+				packetErr = errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
+					"registry: Xray's selected TUN stack needs mihomo in the engines directory")
+			} else if packet.Version.Less(engine.Version{Major: 1, Minor: 19, Patch: 32}) {
+				packetErr = errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanEngineUnsupported,
+					"registry: Xray's selected TUN stack needs mihomo 1.19.32 or newer")
+			}
+			if packetErr != nil {
+				selection.Rejected = append(selection.Rejected, packetErr.Error())
+				if len(order) == 1 {
+					return selection, false, packetErr
+				}
+				continue
+			}
+		}
+		selection.Kind, selection.Reason = picked.Kind, picked.Reason
+		return selection, bridge, nil
+	}
+	return selection, false, errs.Newf(errs.CodeFailedPrecondition, key,
+		"registry: no engine can carry this plan (%s)", strings.Join(selection.Rejected, "; "))
 }
 
 // Measure streams request timings through each outbound's first compatible
