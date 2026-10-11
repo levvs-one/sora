@@ -196,3 +196,47 @@ func TestOversizedFrameClosesConnection(t *testing.T) {
 		t.Fatal("oversized request retained its connection")
 	}
 }
+
+func TestServiceCancellationClosesActiveConnection(t *testing.T) {
+	service, _ := testService(t)
+	serverSide, clientSide := net.Pipe()
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	finished := make(chan error, 1)
+	go func() { finished <- serveConnection(ctx, serverSide, service) }()
+	seen := make(chan struct{}, 1)
+	client := jrpc2.NewClient(channel.Line(clientSide, clientSide), &jrpc2.ClientOptions{
+		OnNotify: func(request *jrpc2.Request) {
+			if request.Method() == "CoreEvent" {
+				seen <- struct{}{}
+			}
+		},
+	})
+	defer func() { _ = client.Close() }()
+	version, token := handshake(t, client)
+	request, err := protojson.Marshal(&corev1.WatchLogsRequest{ApiVersion: version, ControlAuthenticator: token})
+	if err != nil {
+		t.Fatal(err)
+	}
+	watch := make(chan error, 1)
+	go func() {
+		var result any
+		watch <- client.CallResult(t.Context(), "WatchLogs", parameters{Payload: string(request), StreamID: "shutdown"}, &result)
+	}()
+	select {
+	case <-seen:
+	case <-time.After(2 * time.Second):
+		t.Fatal("watch did not start")
+	}
+	cancel()
+	select {
+	case <-finished:
+	case <-time.After(2 * time.Second):
+		t.Fatal("service cancellation retained the connection")
+	}
+	select {
+	case <-watch:
+	case <-time.After(2 * time.Second):
+		t.Fatal("service cancellation retained the watch")
+	}
+}

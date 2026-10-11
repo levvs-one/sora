@@ -112,9 +112,11 @@ func serveConnection(ctx context.Context, connection net.Conn, service corev1.Co
 		return err
 	}
 	server.Start(&frames{connection: connection, scanner: scanner})
-	stop := context.AfterFunc(ctx, server.Stop)
+	// Let the receiver stop the RPC server after transport closure. Calling
+	// jrpc2.Stop concurrently with a buffered receive can close its work queue
+	// before that receive is dispatched (jrpc2 v1.3.5).
+	stop := context.AfterFunc(ctx, func() { _ = connection.Close() })
 	defer stop()
-	defer server.Stop()
 	return server.Wait()
 }
 
