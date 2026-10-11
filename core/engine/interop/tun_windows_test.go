@@ -100,7 +100,8 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 				Rules: []engine.Rule{{Type: engine.RuleMatchAll, Target: "out"}},
 				Tun: engine.Tun{Enabled: true, DeviceName: engine.TunDevice, Stack: tc.stack, AutoRoute: true,
 					RouteAddressSets: []string{"203.0.113.0/24"}},
-				DNS: engine.DNS{Enabled: true, Servers: []engine.DNSServer{{Tag: "resolver", Address: "1.1.1.1", Transport: engine.DNSPlain}}}}
+				Options: engine.Options{LogLevel: "debug"},
+				DNS:     engine.DNS{Enabled: true, Servers: []engine.DNSServer{{Tag: "resolver", Address: "1.1.1.1", Transport: engine.DNSPlain}}}}
 			if tc.profile {
 				p.Engines = nil
 				raw, err := json.Marshal(map[string]any{"outbounds": []any{map[string]any{
