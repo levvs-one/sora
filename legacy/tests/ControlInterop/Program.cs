@@ -88,6 +88,39 @@ foreach (var watch in watches)
 await connection.CallAsync(new GetStatusRequest { ApiVersion = connection.Version }, GetStatusResponse.Parser, timeout.Token);
 Console.WriteLine("PASS 100 concurrent calls, eight live watches, cancellation and disconnect");
 
+var requests = new SessionRequests(connection);
+try
+{
+    await requests.SetAsync(imported.SessionPlan);
+    throw new Exception("The transport-only fixture unexpectedly started an engine.");
+}
+catch (InvalidOperationException error) when (error.Message.StartsWith("core.", StringComparison.Ordinal))
+{
+    Console.WriteLine("PASS a backend start failure reaches the session caller");
+}
+var rapid = new List<Task<SessionStatus>>();
+for (var index = 0; index < 200; index++)
+{
+    var plan = imported.SessionPlan.Clone();
+    plan.Engines.Clear();
+    plan.Engines.Add(new[] { "sing-box", "xray", "mihomo" }[index % 3]);
+    plan.TunnelMode = index % 2 == 0 ? TunnelMode.System : TunnelMode.Application;
+    rapid.Add(requests.SetAsync(index % 5 == 0 ? null : plan));
+}
+var final = await requests.SetAsync(null);
+if (final.Connection.Value != ConnectionStateValue.Disconnected)
+    throw new Exception("The last requested disconnect did not win.");
+foreach (var task in rapid)
+{
+    try { await task; }
+    catch (OperationCanceledException) { continue; }
+    catch (InvalidOperationException error) when (error.Message.StartsWith("core.", StringComparison.Ordinal)) { continue; }
+}
+await requests.StopAsync();
+await requests.StopAsync();
+try { _ = requests.SetAsync(null); throw new Exception("A stopped queue accepted another command."); }
+catch (ObjectDisposedException) { Console.WriteLine("PASS bounded session queue: 200 mixed choices, final disconnect, idempotent shutdown"); }
+
 static async Task<Stream> OpenEndpoint(string endpoint, CancellationToken cancellation)
 {
     if (endpoint.StartsWith(@"\\.\pipe\", StringComparison.Ordinal))
