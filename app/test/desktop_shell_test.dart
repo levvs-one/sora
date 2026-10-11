@@ -155,9 +155,9 @@ void main() {
       await tester.pumpAndSettle();
     }
     expect(opened, [
-      'https://github.com/levvs-one/sora-client/releases',
+      'https://github.com/levvs-one/sora/releases',
       'https://t.me/sora_client',
-      'https://github.com/levvs-one/sora-client',
+      'https://github.com/levvs-one/sora',
     ]);
     expect(find.text('GPL-3.0-only'), findsOneWidget);
     final licenses = await tester.runAsync(() => LicenseRegistry.licenses.toList());

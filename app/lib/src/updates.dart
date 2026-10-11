@@ -11,7 +11,7 @@ import 'package:pub_semver/pub_semver.dart';
 import 'settings.dart';
 
 const appVersion = String.fromEnvironment('SORA_VERSION', defaultValue: 'dev');
-const releaseRepository = 'https://github.com/levvs-one/sora-client';
+const releaseRepository = 'https://github.com/levvs-one/sora';
 const updateHelper = '/usr/lib/sora/sora-update';
 const updatePolicy = '/usr/share/polkit-1/actions/io.github.levvs-one.sora.update.policy';
 
@@ -251,7 +251,7 @@ class AppUpdater extends ChangeNotifier {
     notifyListeners();
     try {
       final bytes = await _fetch(
-        Uri.parse('https://api.github.com/repos/levvs-one/sora-client/releases/latest'),
+        Uri.parse('https://api.github.com/repos/levvs-one/sora/releases/latest'),
         limit: 2 * 1024 * 1024,
       );
       final release = SoraRelease.parse(utf8.decode(bytes));

@@ -57,7 +57,7 @@ class UpdateSora extends Sora {
         : UpdateConnection.changing,
     client: () => MockClient((request) async {
       requests++;
-      expect(request.url.path, '/repos/levvs-one/sora-client/releases/latest');
+      expect(request.url.path, '/repos/levvs-one/sora/releases/latest');
       return http.Response(response, 200, headers: {'content-type': 'application/json; charset=utf-8'});
     }),
     available: (release) => recordNotification(
@@ -151,6 +151,10 @@ void main() {
     );
     expect(() => SoraRelease.parse('{}'), throwsA(isA<UpdateFailure>()));
     expect(() => SoraRelease.parse('not json'), throwsA(isA<UpdateFailure>()));
+    expect(
+      () => SoraRelease.parse(recorded.replaceAll('/levvs-one/sora/', '/levvs-one/sora-legacy/')),
+      throwsA(isA<UpdateFailure>()),
+    );
   });
 
   test('recorded release script matches SHA256SUMS, corruption and ambiguity fail', () async {

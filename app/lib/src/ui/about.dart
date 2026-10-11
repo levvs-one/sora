@@ -247,7 +247,7 @@ class _AboutScreenState extends State<AboutScreen> {
             LinkTile(
               title: s.githubReleases,
               value: 'GitHub',
-              onTap: () => unawaited(openLink(context, 'https://github.com/levvs-one/sora-client/releases')),
+              onTap: () => unawaited(openLink(context, 'https://github.com/levvs-one/sora/releases')),
             ),
             LinkTile(
               title: s.telegramChannel,
@@ -257,7 +257,7 @@ class _AboutScreenState extends State<AboutScreen> {
             LinkTile(
               title: s.sourceCode,
               value: 'GitHub',
-              onTap: () => unawaited(openLink(context, 'https://github.com/levvs-one/sora-client')),
+              onTap: () => unawaited(openLink(context, 'https://github.com/levvs-one/sora')),
             ),
           ],
         ),

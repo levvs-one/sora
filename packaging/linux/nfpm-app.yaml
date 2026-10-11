@@ -13,7 +13,7 @@ description: |
   the fastest server picked for you, and DPI bypass without a server. Runs on
   the Sora core service, which this package brings in.
 vendor: Sora
-homepage: https://github.com/levvs-one/sora-client
+homepage: https://github.com/levvs-one/sora
 license: GPL-3.0-only
 
 depends:

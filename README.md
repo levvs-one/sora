@@ -18,16 +18,16 @@ VPN-клиент Sora с открытым исходным кодом работ
 Windows 10 1809+ или Windows 11, x64. В PowerShell:
 
 ```powershell
-irm https://github.com/levvs-one/sora-client/releases/latest/download/install.ps1 | iex
+irm https://github.com/levvs-one/sora/releases/latest/download/install.ps1 | iex
 ```
 
 Linux x64: Debian, Ubuntu, Fedora, openSUSE, Arch. В терминале:
 
 ```sh
-curl -fsSL https://github.com/levvs-one/sora-client/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
 ```
 
-Скрипты скачивают последний релиз, проверяют контрольные суммы и устанавливают приложение со службой. Установка требует прав администратора. Для ручной установки скачайте установщик или пакеты со страницы [релизов](https://github.com/levvs-one/sora-client/releases).
+Скрипты скачивают последний релиз, проверяют контрольные суммы и устанавливают приложение со службой. Установка требует прав администратора. Для ручной установки скачайте установщик или пакеты со страницы [релизов](https://github.com/levvs-one/sora/releases).
 
 ## Что умеет Sora
 
@@ -39,6 +39,8 @@ curl -fsSL https://github.com/levvs-one/sora-client/releases/latest/download/ins
 - На Linux обходит часть блокировок через zapret без сервера. Этот режим не скрывает IP-адрес и не заменяет VPN.
 - Открывает сервисы проверки скорости внутри приложения, сохраняет историю уведомлений и показывает журнал с категориями и экспортом.
 - Работает из трея, запускается при входе в систему и обновляется из приложения. Есть 31 вариант языка интерфейса, светлая и тёмная темы.
+
+Legacy-клиент для старых Windows разрабатывается отдельно в [sora-legacy](https://github.com/levvs-one/sora-legacy).
 
 ## Документация
 

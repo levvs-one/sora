@@ -10,7 +10,7 @@
 -->
 <policyconfig>
   <vendor>Sora</vendor>
-  <vendor_url>https://github.com/levvs-one/sora-client</vendor_url>
+  <vendor_url>https://github.com/levvs-one/sora</vendor_url>
   <action id="io.github.levvs-one.sora.control">
     <description>Control the Sora tunnel</description>
     <description xml:lang="ru">Управление туннелем Sora</description>

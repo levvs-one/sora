@@ -293,7 +293,7 @@ func (a *App) about() *corev1.About {
 		Platform:    runtime.GOOS + "/" + runtime.GOARCH,
 		GoVersion:   runtime.Version(),
 		License:     "GPL-3.0-only",
-		SourceUrl:   "https://github.com/levvs-one/sora-client",
+		SourceUrl:   "https://github.com/levvs-one/sora",
 	}
 	if port, err := portOf(a.local); err == nil {
 		out.LocalProxy = &corev1.Endpoint{Host: "127.0.0.1", Port: uint32(port)}

@@ -7,12 +7,12 @@
 Проще всего в PowerShell:
 
 ```powershell
-irm https://github.com/levvs-one/sora-client/releases/latest/download/install.ps1 | iex
+irm https://github.com/levvs-one/sora/releases/latest/download/install.ps1 | iex
 ```
 
 Скрипт скачает последний установщик, сверит его с `SHA256SUMS` из того же релиза и установит без вопросов. Windows один раз попросит права администратора: служба Sora ставится в систему.
 
-Можно и вручную: скачайте `Sora-Setup-<версия>-x64.exe` со страницы [релизов](https://github.com/levvs-one/sora-client/releases) и запустите. Установщик спросит про ярлык на рабочем столе и про ссылки `happ://`. Второй пункт появляется, только если ссылки Happ ещё никто не открывает, поэтому установленный Happ Sora не трогает.
+Можно и вручную: скачайте `Sora-Setup-<версия>-x64.exe` со страницы [релизов](https://github.com/levvs-one/sora/releases) и запустите. Установщик спросит про ярлык на рабочем столе и про ссылки `happ://`. Второй пункт появляется, только если ссылки Happ ещё никто не открывает, поэтому установленный Happ Sora не трогает.
 
 Что ставится:
 
@@ -33,14 +33,14 @@ Get-FileHash .\Sora-Setup-1.0.6-x64.exe
 
 Удаление: «Параметры», «Приложения», Sora. Служба удаляется вместе с программой. Данные в `C:\ProgramData\Sora` остаются, их можно удалить вручную.
 
-Windows 7 новой версией не поддерживается, для неё есть старый клиент в ветке [`legacy`](https://github.com/levvs-one/sora-client/tree/legacy).
+Windows 7 новой версией не поддерживается, отдельный клиент для старых Windows разрабатывается в [`sora-legacy`](https://github.com/levvs-one/sora-legacy).
 
 ## Linux
 
 Пакеты собираются для Debian и Ubuntu (.deb), Fedora и openSUSE (.rpm) и Arch (.pkg.tar.zst).
 
 ```sh
-curl -fsSL https://github.com/levvs-one/sora-client/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
 ```
 
 Скрипт определит менеджер пакетов (apt, dnf, zypper или pacman), скачает два пакета, сверит их с `SHA256SUMS` и установит через `sudo`. Если хотя бы одна сумма не совпала, ничего не ставится.
