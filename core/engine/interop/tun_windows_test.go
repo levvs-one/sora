@@ -81,77 +81,86 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 	t.Cleanup(func() { _ = manager.Disconnect(context.Background()) })
 	_, targetPort, _ := net.SplitHostPort(address)
 	destination := net.JoinHostPort("203.0.113.10", targetPort)
-	for _, tc := range []struct {
-		kind    engine.Kind
-		stack   string
-		profile bool
-	}{
-		{engine.KindSingBox, "", false},
-		{engine.KindXray, "gvisor", false}, {engine.KindXray, "system", false},
-		{engine.KindXray, "mixed", false}, {engine.KindXray, "mips", false},
-		{engine.KindMihomo, "gvisor", false}, {engine.KindMihomo, "system", false},
-		{engine.KindMihomo, "mixed", false}, {engine.KindMihomo, "mips", false},
-		{"", "", true},
-	} {
-		t.Run(fmt.Sprintf("%s/%s/provider=%v", tc.kind, tc.stack, tc.profile), func(t *testing.T) {
-			p := &engine.Plan{SessionID: "windows-tun", Engines: []engine.Kind{tc.kind},
-				Outbounds: []engine.Outbound{{ID: "out", Protocol: engine.ProtocolShadowsocks,
-					Server: "127.0.0.1", Port: uint16(serverPort), Cipher: "aes-256-gcm", Password: password}},
-				Rules: []engine.Rule{{Type: engine.RuleMatchAll, Target: "out"}},
-				Tun: engine.Tun{Enabled: true, DeviceName: engine.TunDevice, Stack: tc.stack, AutoRoute: true,
-					RouteAddressSets: []string{"203.0.113.0/24"}},
-				Options: engine.Options{LogLevel: "debug"},
-				DNS:     engine.DNS{Enabled: true, Servers: []engine.DNSServer{{Tag: "resolver", Address: "1.1.1.1", Transport: engine.DNSPlain}}}}
-			if tc.profile {
-				p.Engines = nil
-				raw, err := json.Marshal(map[string]any{"outbounds": []any{map[string]any{
-					"protocol": "shadowsocks", "settings": map[string]any{"servers": []any{map[string]any{
-						"address": "127.0.0.1", "port": serverPort, "method": "aes-256-gcm", "password": password,
-					}}},
-				}}})
+	for round := range 3 {
+		for _, tc := range []struct {
+			kind    engine.Kind
+			stack   string
+			profile bool
+		}{
+			{engine.KindSingBox, "", false},
+			{engine.KindXray, "gvisor", false}, {engine.KindXray, "system", false},
+			{engine.KindXray, "mixed", false}, {engine.KindXray, "mips", false},
+			{engine.KindMihomo, "gvisor", false}, {engine.KindMihomo, "system", false},
+			{engine.KindMihomo, "mixed", false}, {engine.KindMihomo, "mips", false},
+			{"", "", true},
+		} {
+			t.Run(fmt.Sprintf("%d/%s/%s/provider=%v", round, tc.kind, tc.stack, tc.profile), func(t *testing.T) {
+				t.Cleanup(func() {
+					if t.Failed() {
+						for _, entry := range journal.Query(logs.Filter{}, 0, 300).Entries {
+							t.Logf("%s %s: %s", entry.Time.Format(time.RFC3339Nano), entry.Source, entry.Message)
+						}
+					}
+				})
+				p := &engine.Plan{SessionID: "windows-tun", Engines: []engine.Kind{tc.kind},
+					Outbounds: []engine.Outbound{{ID: "out", Protocol: engine.ProtocolShadowsocks,
+						Server: "127.0.0.1", Port: uint16(serverPort), Cipher: "aes-256-gcm", Password: password}},
+					Rules: []engine.Rule{{Type: engine.RuleMatchAll, Target: "out"}},
+					Tun: engine.Tun{Enabled: true, DeviceName: engine.TunDevice, Stack: tc.stack, AutoRoute: true,
+						RouteAddressSets: []string{"203.0.113.0/24"}},
+					Options: engine.Options{LogLevel: "debug"},
+					DNS:     engine.DNS{Enabled: true, Servers: []engine.DNSServer{{Tag: "resolver", Address: "1.1.1.1", Transport: engine.DNSPlain}}}}
+				if tc.profile {
+					p.Engines = nil
+					raw, err := json.Marshal(map[string]any{"outbounds": []any{map[string]any{
+						"protocol": "shadowsocks", "settings": map[string]any{"servers": []any{map[string]any{
+							"address": "127.0.0.1", "port": serverPort, "method": "aes-256-gcm", "password": password,
+						}}},
+					}}})
+					if err != nil {
+						t.Fatal(err)
+					}
+					p.Outbounds = []engine.Outbound{{ID: "out", Protocol: engine.ProtocolXrayProfile, Profile: raw,
+						Server: "127.0.0.1", Port: uint16(serverPort)}}
+				}
+				ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
+				defer cancel()
+				if _, err := manager.Connect(ctx, p, session.Settings{}); err != nil {
+					t.Fatal(err)
+				}
+				if _, err := net.InterfaceByName(engine.TunDevice); err != nil {
+					t.Fatal(err)
+				}
+				transport := &http.Transport{DisableKeepAlives: true}
+				defer transport.CloseIdleConnections()
+				client := &http.Client{Transport: transport, Timeout: 5 * time.Second}
+				response, err := client.Get("http://" + destination)
+				if err != nil {
+					t.Fatalf("TCP packet through TUN: %v", err)
+				}
+				body, err := io.ReadAll(response.Body)
+				_ = response.Body.Close()
+				if err != nil || string(body) != reply {
+					t.Fatalf("TCP packet reply: %q %v", body, err)
+				}
+				packet, err := (&net.Dialer{Timeout: 5 * time.Second}).DialContext(ctx, "udp", destination)
 				if err != nil {
 					t.Fatal(err)
 				}
-				p.Outbounds = []engine.Outbound{{ID: "out", Protocol: engine.ProtocolXrayProfile, Profile: raw,
-					Server: "127.0.0.1", Port: uint16(serverPort)}}
-			}
-			ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
-			defer cancel()
-			if _, err := manager.Connect(ctx, p, session.Settings{}); err != nil {
-				t.Fatal(err)
-			}
-			if _, err := net.InterfaceByName(engine.TunDevice); err != nil {
-				t.Fatal(err)
-			}
-			transport := &http.Transport{DisableKeepAlives: true}
-			defer transport.CloseIdleConnections()
-			client := &http.Client{Transport: transport, Timeout: 5 * time.Second}
-			response, err := client.Get("http://" + destination)
-			if err != nil {
-				t.Fatalf("TCP packet through TUN: %v", err)
-			}
-			body, err := io.ReadAll(response.Body)
-			_ = response.Body.Close()
-			if err != nil || string(body) != reply {
-				t.Fatalf("TCP packet reply: %q %v", body, err)
-			}
-			packet, err := (&net.Dialer{Timeout: 5 * time.Second}).DialContext(ctx, "udp", destination)
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer func() { _ = packet.Close() }()
-			_ = packet.SetDeadline(time.Now().Add(5 * time.Second))
-			payload := fmt.Sprintf("windows-tun-%s-%s", tc.kind, tc.stack)
-			_, err = packet.Write([]byte(payload))
-			buffer := make([]byte, 4096)
-			var n int
-			if err == nil {
-				n, err = packet.Read(buffer)
-			}
-			if err != nil || string(buffer[:n]) != payload {
-				t.Fatalf("UDP packet reply: %q %v", buffer[:n], err)
-			}
-		})
+				defer func() { _ = packet.Close() }()
+				_ = packet.SetDeadline(time.Now().Add(5 * time.Second))
+				payload := fmt.Sprintf("windows-tun-%d-%s-%s", round, tc.kind, tc.stack)
+				_, err = packet.Write([]byte(payload))
+				buffer := make([]byte, 4096)
+				var n int
+				if err == nil {
+					n, err = packet.Read(buffer)
+				}
+				if err != nil || string(buffer[:n]) != payload {
+					t.Fatalf("UDP packet reply: %q %v", buffer[:n], err)
+				}
+			})
+		}
 	}
 	if err := manager.Disconnect(t.Context()); err != nil {
 		t.Fatal(err)

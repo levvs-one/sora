@@ -64,6 +64,12 @@ type Driver interface {
 	Reload(ctx context.Context, rt Runtime, cfg []byte) error
 }
 
+// StartupSynchronizer confirms traffic readiness when the controller opens
+// before the engine finishes applying its initial configuration.
+type StartupSynchronizer interface {
+	ConfirmStart(ctx context.Context, rt Runtime, cfg []byte) error
+}
+
 // PrivateController supplies a Unix socket or named pipe instead of a loopback
 // controller.
 type PrivateController interface {
@@ -385,6 +391,13 @@ func (s *Supervisor) start(ctx context.Context, p *engine.Plan) error {
 		return err
 	}
 	reported, err := s.waitReady(ctx, rt, proc)
+	if err == nil {
+		if synchronizer, ok := s.driver.(StartupSynchronizer); ok {
+			readyCtx, cancel := context.WithTimeout(ctx, s.cfg.StartTimeout)
+			err = synchronizer.ConfirmStart(readyCtx, rt, cfg)
+			cancel()
+		}
+	}
 	if err == nil && p.Tun.Enabled {
 		if r, ok := s.driver.(Router); ok {
 			err = r.Route(ctx, p)
