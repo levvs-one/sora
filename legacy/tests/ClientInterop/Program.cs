@@ -61,7 +61,8 @@ internal static class Program
                             using var reader = new StreamReader(stream);
                             var expected = (string)JObject.Parse(reader.ReadToEnd())["stateOff"]!;
                             if (state.Text != expected) throw new Exception("Language was not applied: " + code);
-                            if (cycle == 0 && code is "ru" or "zh_TW")
+                            if (language.Prefix == null) throw new Exception("The selected language has no flag: " + code);
+                            if (cycle == 0 && code is "ru" or "zh_Hant")
                             {
                                 form.Refresh();
                                 using var screenshot = new Bitmap(form.Width, form.Height);

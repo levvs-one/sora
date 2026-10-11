@@ -116,12 +116,15 @@ internal sealed class MainForm : Form
 
     private AntdUI.Select MakeLanguageSelect()
     {
-        var select = new AntdUI.Select { Width = 240, Height = 40, Radius = 8, Font = body, BackColor = Color.White, ForeColor = ForeColor, MaxCount = 8 };
+        var select = new AntdUI.Select { Width = 240, Height = 40, Radius = 8, Font = body, BackColor = Color.White,
+            ForeColor = ForeColor, BorderColor = Field, BorderHover = ForeColor, BorderActive = ForeColor,
+            PrefixWidth = 24, MaxCount = 8 };
         var items = text.Languages.Cast<JObject>().Select(language => new AntdUI.SelectItem(
             text.Image("flags." + language["country"] + ".png"), (string)language["native"]!, (string)language["code"]!)
         { SubText = (string?)language["english"] }).ToArray();
         foreach (var item in items) select.Items.Add(item);
         select.SelectedValue = settings.Language;
+        select.Prefix = text.Image("flags." + text.Languages.Single(language => (string?)language["code"] == settings.Language)["country"] + ".png");
         select.FilterChanged += (_, query) => text.Languages.Cast<JObject>()
             .Where(language => string.Join(" ", language.Properties().Select(value => value.Value.ToString()))
                 .IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
@@ -131,6 +134,7 @@ internal sealed class MainForm : Form
             if (choice.Value is not string code || !text.Languages.Any(language => (string?)language["code"] == code)) return;
             settings.Language = code;
             settings.Save();
+            select.Prefix = text.Image("flags." + text.Languages.Single(language => (string?)language["code"] == code)["country"] + ".png");
             text.SetLanguage(code);
             ApplyText();
         };
