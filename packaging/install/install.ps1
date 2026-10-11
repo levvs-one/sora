@@ -1,6 +1,6 @@
 # Installs Sora on Windows in one command, from PowerShell:
 #
-#   irm https://github.com/levvs-one/sora-client/releases/latest/download/install.ps1 | iex
+#   irm https://github.com/levvs-one/sora/releases/latest/download/install.ps1 | iex
 #
 # It finds the latest release, downloads the installer, checks it against the
 # release's SHA256SUMS and runs it without questions; Windows asks once for
@@ -16,7 +16,7 @@ $ProgressPreference = 'SilentlyContinue'
 # Windows PowerShell 5.1 offers TLS 1.0 by default, which GitHub refuses.
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$repo = 'https://github.com/levvs-one/sora-client'
+$repo = 'https://github.com/levvs-one/sora'
 
 if (-not [Environment]::Is64BitOperatingSystem) {
     throw 'Sora for Windows needs 64-bit Windows 10 1809 or later.'
@@ -26,7 +26,7 @@ $version = $env:SORA_VERSION
 if ($env:SORA_DIST) {
     if (-not $version) { throw 'SORA_VERSION is needed with SORA_DIST.' }
 } elseif (-not $version) {
-    $latest = Invoke-RestMethod -UseBasicParsing 'https://api.github.com/repos/levvs-one/sora-client/releases/latest'
+    $latest = Invoke-RestMethod -UseBasicParsing 'https://api.github.com/repos/levvs-one/sora/releases/latest'
     $version = $latest.tag_name -replace '^v', ''
 }
 if ($version -notmatch '^\d+(\.\d+){2,3}$') { throw "'$version' is not a release of Sora." }

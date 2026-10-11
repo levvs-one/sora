@@ -1,6 +1,6 @@
 [Unit]
 Description=Sora core service
-Documentation=https://github.com/levvs-one/sora-client/tree/main/service/linux
+Documentation=https://github.com/levvs-one/sora/tree/main/service/linux
 After=network-online.target nss-lookup.target
 Wants=network-online.target
 

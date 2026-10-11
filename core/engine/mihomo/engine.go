@@ -103,6 +103,13 @@ func (driver) Handshake(ctx context.Context, rt supervise.Runtime) (string, erro
 	return info.Version, nil
 }
 
+// The controller and proxies exist while mihomo still rejects incoming TCP
+// in its suspended startup state. PUT waits on ApplyConfig's mutex and returns
+// after OnRunning; equal named listeners retain the existing TUN adapter.
+func (driver) ConfirmStart(ctx context.Context, rt supervise.Runtime, cfg []byte) error {
+	return clashapi.For(rt).ReloadPayload(ctx, string(cfg))
+}
+
 // Reload replaces live configuration without restarting the tunnel or
 // listeners.
 func (driver) Reload(ctx context.Context, rt supervise.Runtime, cfg []byte) error {

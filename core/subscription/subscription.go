@@ -30,7 +30,7 @@ const (
 	MaxBodyBytes = 16 << 20
 	// UserAgent identifies Sora when no override is set, allowing
 	// provider-specific handling without browser impersonation.
-	UserAgent = "sora-core/1 (+https://github.com/levvs-one/sora-client)"
+	UserAgent = "sora-core/1 (+https://github.com/levvs-one/sora)"
 	// MaxUserAgent bounds the User-Agent a subscription may set.
 	MaxUserAgent = 256
 )

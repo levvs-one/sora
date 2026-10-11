@@ -47,11 +47,13 @@ void main() {
 
   /// Connects the imported server in [mode] and returns time to connected
   /// state.
-  Future<Duration> connect(TunnelMode mode, {bool killSwitch = false}) async {
+  Future<Duration> connect(TunnelMode mode, {bool killSwitch = false, String? engine, String? stack}) async {
     final out = imported.outbounds.single;
     final plan = SessionPlan(
       tunnelMode: mode,
       outbounds: [out],
+      engines: engine == null ? [] : [engine],
+      tunStack: stack,
       // Route the local server process directly to avoid looping its outbound
       // traffic back through its own tunnel.
       routes: [RoutingRule(destination: 'process:xray.exe', outboundId: 'direct')],
@@ -93,6 +95,23 @@ void main() {
   Future<String> fetch(String url) async {
     final curl = await Process.run('curl.exe', ['-s', '-o', 'NUL', '-m', '20', '-w', '%{http_code}', url]);
     return '${curl.stdout}${curl.stderr}';
+  }
+
+  for (final stack in ['gvisor', 'system', 'mixed', 'mips']) {
+    test(
+      'Xray carries a real Windows request through the $stack TUN stack',
+      () async {
+        await connect(TunnelMode.TUNNEL_MODE_SYSTEM, engine: 'xray', stack: stack);
+        try {
+          expect(await fetch('https://example.com/'), '200');
+          expect(await serverSaw('example.com'), isTrue);
+        } finally {
+          await disconnect();
+        }
+      },
+      skip: skip,
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
   }
 
   for (final initiallyConnected in [false, true]) {

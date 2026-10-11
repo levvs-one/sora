@@ -18,16 +18,16 @@ Sora is an open source VPN client for Windows and Linux. Use it with a subscript
 Windows 10 1809+ or Windows 11, x64. In PowerShell:
 
 ```powershell
-irm https://github.com/levvs-one/sora-client/releases/latest/download/install.ps1 | iex
+irm https://github.com/levvs-one/sora/releases/latest/download/install.ps1 | iex
 ```
 
 Linux x64: Debian, Ubuntu, Fedora, openSUSE, Arch. In a terminal:
 
 ```sh
-curl -fsSL https://github.com/levvs-one/sora-client/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
 ```
 
-The scripts download the latest release, verify checksums and install the app and its service. Installation requires administrator rights. For manual installation, download the installer or packages from [releases](https://github.com/levvs-one/sora-client/releases).
+The scripts download the latest release, verify checksums and install the app and its service. Installation requires administrator rights. For manual installation, download the installer or packages from [releases](https://github.com/levvs-one/sora/releases).
 
 ## What Sora does
 
@@ -39,6 +39,8 @@ The scripts download the latest release, verify checksums and install the app an
 - On Linux, bypasses some blocks without a server using zapret. This mode does not hide your IP address or replace a VPN.
 - Opens speed test services inside the app, keeps notification history and shows categorized logs with export.
 - Runs in the tray, starts at login and installs updates from the app. Includes 31 interface languages, light and dark themes.
+
+The legacy client for older Windows is developed separately in [sora-legacy](https://github.com/levvs-one/sora-legacy).
 
 ## Documentation
 

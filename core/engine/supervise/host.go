@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 	"net"
 	"os"
 	"strings"
@@ -57,16 +58,35 @@ func (t *Tail) Last(n int) string {
 	return strings.Join(lines, "\n")
 }
 
-// FreePort reserves and releases a loopback port for the engine. Another
-// process can claim it before binding; the restart budget covers this race.
+// FreePort checks a loopback port for both protocols. Mixed listeners need UDP
+// too, and Windows reserves different port ranges for TCP and UDP.
 func FreePort() (int, error) {
 	var lc net.ListenConfig
-	listener, err := lc.Listen(context.Background(), "tcp", "127.0.0.1:0")
-	if err != nil {
-		return 0, fmt.Errorf("supervise: pick a free port: %w", err)
+	var lastErr error
+	for range 32 {
+		// Windows can assign consecutive UDP ports inside a TCP-only reserved
+		// range. Sample the entire unprivileged range instead of that sequence.
+		candidate, err := rand.Int(rand.Reader, big.NewInt(65536-1024))
+		if err != nil {
+			return 0, fmt.Errorf("supervise: choose a loopback port: %w", err)
+		}
+		port := 1024 + int(candidate.Int64())
+		address := fmt.Sprintf("127.0.0.1:%d", port)
+		packet, err := lc.ListenPacket(context.Background(), "udp", address)
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		listener, err := lc.Listen(context.Background(), "tcp", address)
+		_ = packet.Close()
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		_ = listener.Close()
+		return port, nil
 	}
-	defer func() { _ = listener.Close() }()
-	return listener.Addr().(*net.TCPAddr).Port, nil
+	return 0, fmt.Errorf("supervise: no shared TCP/UDP port: %w", lastErr)
 }
 
 // SecretBytes is the length of a controller secret before hex encoding.

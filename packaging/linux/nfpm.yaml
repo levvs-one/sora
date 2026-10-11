@@ -14,7 +14,7 @@ description: |
   center and engine control that no other application can reach. Includes
   zapret (tpws, nfqws) by bol-van for DPI bypass without a server.
 vendor: Sora
-homepage: https://github.com/levvs-one/sora-client
+homepage: https://github.com/levvs-one/sora
 license: GPL-3.0-only
 
 # tpws and nfqws link zlib, nfqws also libnetfilter_queue; libcap is used for

@@ -1029,7 +1029,7 @@ SessionPlan buildPlan({
     tunStack: settings.tunnel == 'tun' && choice != 'bypass'
         ? switch (settings.engine) {
             'mihomo' => settings.mihomoTunStack,
-            'xray' when settings.xrayTunStack != 'gvisor' => settings.xrayTunStack,
+            'xray' when Platform.isWindows || settings.xrayTunStack != 'gvisor' => settings.xrayTunStack,
             _ => '',
           }
         : '',

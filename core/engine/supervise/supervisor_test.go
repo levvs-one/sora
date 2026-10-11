@@ -324,3 +324,54 @@ func TestOnlyTunOwnerRemovesRouting(t *testing.T) {
 		})
 	}
 }
+
+type synchronizingDriver struct {
+	routingDriver
+	entered chan struct{}
+	release chan struct{}
+	err     error
+}
+
+func (d *synchronizingDriver) ConfirmStart(ctx context.Context, _ Runtime, _ []byte) error {
+	close(d.entered)
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-d.release:
+		return d.err
+	}
+}
+
+func TestStartupAcknowledgementPrecedesRoutingAndConnectedState(t *testing.T) {
+	for _, failure := range []bool{false, true} {
+		t.Run(fmt.Sprint(failure), func(t *testing.T) {
+			sup := newFake(t, fakeConfig{}, 1)
+			driver := &synchronizingDriver{entered: make(chan struct{}), release: make(chan struct{})}
+			if failure {
+				driver.err = errors.New("startup acknowledgement failed")
+			}
+			sup.driver = driver
+			p := plan()
+			p.Tun.Enabled = true
+			finished := make(chan error, 1)
+			go func() { finished <- sup.Apply(t.Context(), p) }()
+			select {
+			case <-driver.entered:
+			case <-time.After(10 * time.Second):
+				t.Fatal("the controller never reached startup confirmation")
+			}
+			if sup.State() != engine.StateStarting || driver.routes != 0 {
+				t.Fatal("traffic readiness was reported before the acknowledgement")
+			}
+			close(driver.release)
+			err := <-finished
+			if failure {
+				if !errors.Is(err, driver.err) || sup.State() != engine.StateFailed || driver.routes != 0 {
+					t.Fatalf("failed acknowledgement: %v state=%s routes=%d", err, sup.State(), driver.routes)
+				}
+			} else if err != nil || sup.State() != engine.StateRunning || driver.routes != 1 {
+				t.Fatalf("successful acknowledgement: %v state=%s routes=%d", err, sup.State(), driver.routes)
+			}
+		})
+	}
+}

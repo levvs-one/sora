@@ -86,4 +86,4 @@ sudo -u sora sora-core -check -data-dir /var/lib/sora -engines-dir /usr/lib/sora
 
 ## Если не помогло
 
-Создайте [issue](https://github.com/levvs-one/sora-client/issues): версию Sora, систему, что делали и что увидели. Приложите журнал. Не прикладывайте ссылку на подписку.
+Создайте [issue](https://github.com/levvs-one/sora/issues): версию Sora, систему, что делали и что увидели. Приложите журнал. Не прикладывайте ссылку на подписку.

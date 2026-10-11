@@ -172,6 +172,15 @@ jobs:
       - name: Fetch and verify the engines
         shell: bash
         run: packaging/engines/fetch.sh windows-amd64 dist/windows/engines
+      - name: TCP and UDP through every Windows TUN stack
+        working-directory: core
+        shell: pwsh
+        run: |
+          netsh interface ipv4 show excludedportrange protocol=tcp
+          netsh interface ipv4 show excludedportrange protocol=udp
+          $env:SORA_WINDOWS_TUN_INTEGRATION = '1'
+          $env:SORA_ENGINES_DIR = (Resolve-Path '../dist/windows/engines').Path
+          go test -count=1 -v ./engine/interop -run '^TestWindowsTunSwitchesCarryTCPAndUDP$' -timeout 10m
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.6

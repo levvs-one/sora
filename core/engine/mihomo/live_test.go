@@ -192,7 +192,8 @@ func TestLiveFallbackReportsTheBackupByPlanID(t *testing.T) {
 			t.Fatalf("Groups: %v", err)
 		}
 		for _, g := range last {
-			if g.Name == "sora:failover" && g.Selected == "spare" {
+			// Restoring the selected backup can precede its asynchronous check.
+			if g.Name == "sora:failover" && g.Selected == "spare" && g.LatencyMS["spare"] > 0 {
 				// The session passes over a member whose check failed.
 				if g.LatencyMS["dead"] != 0 || g.LatencyMS["spare"] <= 0 {
 					t.Errorf("latency = %v, want the dead server at 0 and the spare above", g.LatencyMS)
