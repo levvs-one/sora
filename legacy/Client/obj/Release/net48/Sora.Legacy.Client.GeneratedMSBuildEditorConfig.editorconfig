@@ -1,7 +1,0 @@
-is_global = true
-build_property.EnableStreamJsonRpcInterceptors = 
-build_property.PublicRpcMarshalableInterfaceExtensions = 
-build_property.RootNamespace = Sora.Legacy.Client
-build_property.ProjectDir = /home/levvs/Projects/sora-wt-legacy/legacy/Client/
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
