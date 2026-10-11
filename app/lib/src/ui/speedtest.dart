@@ -422,10 +422,7 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
                 _sora!.browserDiagnostics.completeNavigation(
                   owner,
                   error.request!.uri.toString(),
-                  response: {
-                    'status': error.response?.statusCode,
-                    'headers': error.response?.headers,
-                  },
+                  response: {'status': error.response?.statusCode, 'headers': error.response?.headers},
                 );
               }
               _failed(s.speedtestPageFailed);
