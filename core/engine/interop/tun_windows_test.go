@@ -143,7 +143,7 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 				if err != nil || string(body) != reply {
 					t.Fatalf("TCP packet reply: %q %v", body, err)
 				}
-				packet, err := (&net.Dialer{Timeout: 5 * time.Second}).DialContext(ctx, "udp", destination)
+				packet, err := (&net.Dialer{Timeout: 5 * time.Second}).DialContext(t.Context(), "udp", destination)
 				if err != nil {
 					t.Fatal(err)
 				}

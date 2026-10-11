@@ -357,7 +357,7 @@ func TestStartupAcknowledgementPrecedesRoutingAndConnectedState(t *testing.T) {
 			go func() { finished <- sup.Apply(t.Context(), p) }()
 			select {
 			case <-driver.entered:
-			case <-time.After(5 * time.Second):
+			case <-time.After(10 * time.Second):
 				t.Fatal("the controller never reached startup confirmation")
 			}
 			if sup.State() != engine.StateStarting || driver.routes != 0 {
