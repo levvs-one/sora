@@ -377,6 +377,12 @@ void Webview::RegisterEventHandlers() {
             if (ConsumeApprovedNavigation(url) ||
                 !navigation_request_callbacks_enabled_ ||
                 !navigation_requested_callback_) {
+              args->get_NavigationId(&active_navigation_id_);
+              active_navigation_url_ = url;
+              if (url_changed_callback_) url_changed_callback_(url);
+              if (loading_state_changed_callback_) {
+                loading_state_changed_callback_(WebviewLoadingState::Loading);
+              }
               return S_OK;
             }
 
@@ -435,15 +441,19 @@ void Webview::RegisterEventHandlers() {
               return S_OK;
             }
 
-            BOOL is_success;
+            // A superseded request must not complete the current page.
+            if (navigation_id != active_navigation_id_) return S_OK;
+
+            BOOL is_success = FALSE;
             args->get_IsSuccess(&is_success);
             if (!is_success && on_load_error_callback_) {
-              COREWEBVIEW2_WEB_ERROR_STATUS web_error_status;
+              if (url_changed_callback_) url_changed_callback_(active_navigation_url_);
+              COREWEBVIEW2_WEB_ERROR_STATUS web_error_status = COREWEBVIEW2_WEB_ERROR_STATUS_UNKNOWN;
               args->get_WebErrorStatus(&web_error_status);
               on_load_error_callback_(web_error_status);
             }
 
-            if (loading_state_changed_callback_) {
+            if (is_success && loading_state_changed_callback_) {
               loading_state_changed_callback_(
                   WebviewLoadingState::NavigationCompleted);
             }

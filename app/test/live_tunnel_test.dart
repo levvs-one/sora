@@ -207,13 +207,31 @@ void main() {
         );
         final neighbourOutput = neighbour.stdout.transform(const SystemEncoding().decoder).join();
         final neighbourErrors = neighbour.stderr.transform(const SystemEncoding().decoder).join();
-        for (var i = 0; i < 12; i++) {
-          expect(await fetch('https://example.com/'), '200');
-          await Future<void>.delayed(const Duration(milliseconds: 300));
+        // Compiling the neighbour's Go test may outlast a fixed request burst.
+        // Keep real traffic flowing until both independent captures finish.
+        var generating = true;
+        final traffic = () async {
+          while (generating) {
+            expect(await fetch('https://example.com/'), '200');
+            await Future<void>.delayed(const Duration(milliseconds: 300));
+          }
+        }();
+        addTearDown(() async {
+          generating = false;
+          neighbour.kill();
+          await traffic.timeout(const Duration(seconds: 25));
+        });
+        late ExportDiagnosticsResponse answer;
+        late int neighbourExit;
+        try {
+          answer = await packet;
+          neighbourExit = await neighbour.exitCode;
+        } finally {
+          generating = false;
+          await traffic;
         }
-        final answer = await packet;
         expect(answer.hasError(), isFalse, reason: '${answer.error.userMessageKey} ${answer.error.detailRedacted}');
-        expect(await neighbour.exitCode, 0, reason: '${await neighbourOutput}\n${await neighbourErrors}');
+        expect(neighbourExit, 0, reason: '${await neighbourOutput}\n${await neighbourErrors}');
         final directory = await Directory.systemTemp.createTemp('sora-native-diagnostics-');
         try {
           final path = '${directory.path}${Platform.pathSeparator}packets.pcapng';

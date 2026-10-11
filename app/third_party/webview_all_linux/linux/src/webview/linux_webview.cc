@@ -18,7 +18,10 @@ typedef struct {
   gint64 started;
   gint64 wall_time;
   gchar *error;
+  gboolean recorded;
 } ResourceRequestDetails;
+
+static void resource_finished_cb(WebKitWebResource *resource, gpointer user_data);
 
 enum class PendingRequestType {
   kNavigation,
@@ -362,6 +365,16 @@ static gboolean load_failed_cb(WebKitWebView *widget,
       error->code == WEBKIT_NETWORK_ERROR_CANCELLED) {
     return FALSE;
   }
+  WebKitWebResource *resource = webkit_web_view_get_main_resource(widget);
+  if (resource != nullptr) {
+    auto *details = static_cast<ResourceRequestDetails *>(
+        g_object_get_data(G_OBJECT(resource), kResourceRequestDetailsKey));
+    if (details != nullptr && error != nullptr) {
+      g_free(details->error);
+      details->error = g_strdup(error->message);
+      resource_finished_cb(resource, widget);
+    }
+  }
   emit_load_error(static_cast<LinuxWebView *>(user_data), error, failing_url);
   return FALSE;
 }
@@ -473,6 +486,9 @@ static void resource_response_cb(WebKitWebResource *resource, GParamSpec *pspec,
                                  : fl_value_ref(request_details->headers));
     fl_value_set_string_take(event, "isForMainFrame",
                              fl_value_new_bool(request_details->is_main_frame));
+    // The application can dispose the view immediately after this error.
+    // Preserve the observed response before delivering that callback.
+    if (request_details->is_main_frame) resource_finished_cb(resource, web_view);
   }
   send_event(webview, event);
 }
@@ -483,9 +499,10 @@ static void resource_finished_cb(WebKitWebResource *resource, gpointer user_data
       g_object_get_data(G_OBJECT(widget), kLinuxWebViewInstanceKey));
   if (webview == nullptr || !webview->event_listening ||
       g_object_get_data(G_OBJECT(widget), "sora_network_events") == nullptr) return;
-  const auto *details = static_cast<ResourceRequestDetails *>(
+  auto *details = static_cast<ResourceRequestDetails *>(
       g_object_get_data(G_OBJECT(resource), kResourceRequestDetailsKey));
-  if (details == nullptr) return;
+  if (details == nullptr || details->recorded) return;
+  details->recorded = TRUE;
   WebKitURIResponse *response = webkit_web_resource_get_response(resource);
   const gchar *url = webkit_web_resource_get_uri(resource);
   FlValue *event = make_event("networkResource");
