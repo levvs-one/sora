@@ -18,8 +18,7 @@ import (
 	"github.com/levvs-one/sora-client/core/subscription"
 )
 
-// stubEngine is an engine that answers without touching the system, so the tests
-// exercise the control plane and not the tunnel.
+// stubEngine exercises control-plane behavior without system changes.
 type stubEngine struct {
 	bus     *engine.EventBus
 	state   engine.State
@@ -57,8 +56,8 @@ func (e *stubEngine) Counters(context.Context) (engine.Counters, error) {
 	return engine.Counters{BytesUp: 10, BytesDown: 20, ActiveConnections: 1}, nil
 }
 
-// newTestServer builds a control plane over a stub engine and a real store in a
-// temporary directory. The token is fixed across tests so a failure reproduces.
+// newTestServer creates a control plane with a stub engine, temporary store,
+// and fixed token for reproducibility.
 func newTestServer(t *testing.T) (*control.Server, *secret.Store) {
 	t.Helper()
 	store, err := secret.Open(t.TempDir(), secret.Options{Protector: secret.FileProtector{}})
@@ -72,11 +71,10 @@ func newTestServer(t *testing.T) (*control.Server, *secret.Store) {
 		t.Fatalf("NewAuthenticator() error = %v", err)
 	}
 	manager := session.NewManager(session.ManagerConfig{
+		TunUp: noAdapter,
 		Factory: func(context.Context, *engine.Plan) (engine.Engine, error) {
 			return newStubEngine(), nil
 		},
-		Backoff: engine.Backoff{Initial: time.Millisecond, Max: time.Millisecond, Factor: 1},
-		Budget:  func() *engine.RestartBudget { return engine.NewRestartBudget(2, time.Minute, nil) },
 	})
 	server, err := control.New(control.Config{
 		Version:       control.Version{Major: 1, Minor: 2, MinSupportedMinor: 1},
@@ -90,8 +88,7 @@ func newTestServer(t *testing.T) (*control.Server, *secret.Store) {
 	return server, store
 }
 
-// testToken is the token every test presents. It protects nothing but a temporary
-// directory, and being fixed makes a failure reproducible.
+// testToken is a fixed test token used only with temporary data directories.
 var testToken = func() []byte {
 	out := make([]byte, control.TokenLen)
 	for i := range out {
@@ -100,11 +97,15 @@ var testToken = func() []byte {
 	return out
 }()
 
+// noAdapter skips TUN checks for fake engines. Session tests cover real adapter
+// checks.
+func noAdapter(context.Context, string) error { return nil }
+
 func clientVersion() *corev1.ApiVersion {
 	return &corev1.ApiVersion{Major: 1, Minor: 2, MinSupportedMinor: 1}
 }
 
-// validPlan is a plan with one server and one reference that the store knows.
+// validPlan returns a single-server plan with a reference present in the store.
 func validPlan(t *testing.T, store *secret.Store) *corev1.SessionPlan {
 	t.Helper()
 	reference, err := secret.NewReference()
@@ -128,9 +129,6 @@ func validPlan(t *testing.T, store *secret.Store) *corev1.SessionPlan {
 	}
 }
 
-// Compile-time proof that the fetcher of the subscription package is what the
-// control plane asks for. If the two ever drift, this fails next to the change
-// rather than in a service.
 var _ control.Fetcher = (*subscription.Fetcher)(nil)
 
 func TestNewRequiresItsCollaborators(t *testing.T) {
@@ -142,6 +140,7 @@ func TestNewRequiresItsCollaborators(t *testing.T) {
 		t.Errorf("without sessions = %v, key = %q", err, errs.KeyOf(err))
 	}
 	manager := session.NewManager(session.ManagerConfig{
+		TunUp:   noAdapter,
 		Factory: func(context.Context, *engine.Plan) (engine.Engine, error) { return newStubEngine(), nil },
 	})
 	if _, err := control.New(control.Config{Sessions: manager}); errs.KeyOf(err) != errs.KeyUnauthenticated {
@@ -324,8 +323,8 @@ func TestGetStatsWithoutASessionIsNotAFailure(t *testing.T) {
 
 func TestParseImportStoresSecretsAndReturnsOnlyReferences(t *testing.T) {
 	server, store := newTestServer(t)
-	// A share link with a password in the query, the way a subscription carries
-	// one. The uuid is the credential the core must keep for itself.
+	// The share link's UUID is a credential and must remain inside the
+	// core.
 	const link = "vless://11111111-1111-4111-8111-111111111111@de1.example.com:443" +
 		"?encryption=none&security=tls&sni=de1.example.com#Berlin"
 	response, err := server.ParseImport(context.Background(), &corev1.ParseImportRequest{
@@ -430,7 +429,7 @@ func TestSecretLifecycle(t *testing.T) {
 	if store.Has(reference) {
 		t.Error("the secret survived its deletion")
 	}
-	// Deleting twice is a cleanup path that runs again, and it must succeed.
+	// Repeated deletion must succeed because cleanup may run twice.
 	again, err := server.DeleteSecret(context.Background(), &corev1.DeleteSecretRequest{
 		ApiVersion:  clientVersion(),
 		Credentials: &corev1.CredentialsRef{Reference: reference},
@@ -440,11 +439,8 @@ func TestSecretLifecycle(t *testing.T) {
 	}
 }
 
-// TestRepeatedImportsDoNotGrowTheStore is the test for the promise the reference
-// scheme makes: importing the same subscription again must leave the store with
-// the same secrets, not a second copy of each one. A store that grows on every
-// refresh is a store that eventually refuses to start, and the credentials in it
-// are copies nobody chose to keep.
+// TestRepeatedImportsDoNotGrowTheStore checks that repeated imports reuse
+// secret references instead of accumulating duplicate credentials.
 func TestRepeatedImportsDoNotGrowTheStore(t *testing.T) {
 	server, store := newTestServer(t)
 	const link = "vless://11111111-1111-4111-8111-111111111111@de1.example.com:443" +
@@ -474,8 +470,8 @@ func TestRepeatedImportsDoNotGrowTheStore(t *testing.T) {
 	if refs := store.Refs(); len(refs) != 1 || refs[0] != references[0] {
 		t.Errorf("the store holds %v, want only %s", refs, references[0])
 	}
-	// The reference is derived from the server, so it must not carry its host or
-	// its name in clear: a reference is written to disk and copied around.
+	// Stable references must not reveal hosts or names when persisted or
+	// shared.
 	if strings.Contains(references[0], "de1.example.com") || strings.Contains(references[0], "Berlin") {
 		t.Errorf("the reference %q names the server", references[0])
 	}

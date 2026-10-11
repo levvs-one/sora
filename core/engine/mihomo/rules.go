@@ -2,6 +2,7 @@ package mihomo
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -23,8 +24,8 @@ var ruleTypes = map[engine.RuleType]string{
 	engine.RuleProtocol:      "NETWORK",
 }
 
-// buildRules renders the rule list. mihomo evaluates rules top to bottom, so
-// the order of the plan is kept exactly as the user arranged it.
+// buildRules preserves plan order because mihomo evaluates rules from top to
+// bottom.
 func buildRules(rules []engine.Rule, byID map[string]string) ([]string, error) {
 	out := make([]string, 0, len(rules)+1)
 	for _, r := range rules {
@@ -78,9 +79,9 @@ func ruleTarget(target string, byID map[string]string) (string, error) {
 	return name, nil
 }
 
-// buildDNS renders the resolver block. default-nameserver resolves the
-// hostnames of the other resolvers, so it must never point at a proxy.
-func buildDNS(d engine.DNS, o engine.Options) *dnsConfig {
+// buildDNS renders resolvers. default-nameserver bootstraps resolver hostnames
+// and must never use a proxy.
+func buildDNS(d engine.DNS, o engine.Options, byID map[string]string) (*dnsConfig, error) {
 	out := &dnsConfig{
 		Enable:         true,
 		IPv6:           &o.IPv6,
@@ -94,13 +95,15 @@ func buildDNS(d engine.DNS, o engine.Options) *dnsConfig {
 	default:
 		out.EnhancedMode = "redir-host"
 	}
-	var direct, remote, system []string
+	var direct, remote, system, bootstrap []string
 	for _, s := range d.Servers {
 		addr := s.Address
 		if s.Port != 0 && s.Transport != engine.DNSSystem {
 			addr = fmt.Sprintf("%s:%d", s.Address, s.Port)
 		}
 		switch s.Transport {
+		case engine.DNSTCP:
+			addr = "tcp://" + addr
 		case engine.DNSTLS:
 			addr = "tls://" + addr
 		case engine.DNSHTTPS:
@@ -110,17 +113,26 @@ func buildDNS(d engine.DNS, o engine.Options) *dnsConfig {
 		case engine.DNSSystem:
 			system = append(system, "system")
 		}
+		if s.Dialer == "" || s.Dialer == "direct" {
+			bootstrap = append(bootstrap, addr)
+		} else {
+			name, ok := byID[s.Dialer]
+			if !ok {
+				return nil, fmt.Errorf("mihomo: DNS resolver %q references unknown outbound %q", s.Tag, s.Dialer)
+			}
+			addr += "#" + name
+		}
 		if s.ProxyOnly {
 			remote = append(remote, addr)
 		} else {
 			direct = append(direct, addr)
 		}
 	}
-	out.Nameserver = direct
-	// mihomo uses proxy-server-nameserver to resolve the hostnames of the proxies
-	// themselves, which is exactly what a proxy-only server of the plan is for.
+	out.Nameserver = firstNonEmpty(direct, remote, system, []string{"223.5.5.5"})
+	// Map proxy-only resolvers to proxy-server-nameserver for proxy
+	// hostname resolution.
 	out.ProxyServerNameserver = firstNonEmpty(remote, direct, system, []string{"223.5.5.5"})
-	out.DefaultNameserver = firstNonEmpty(system, direct, []string{"223.5.5.5"})
+	out.DefaultNameserver = firstNonEmpty(system, bootstrap, []string{"223.5.5.5"})
 	out.DirectNameserver = firstNonEmpty(system, direct)
 	if len(d.NameserverPolicy) > 0 {
 		out.NameserverPolicy = d.NameserverPolicy
@@ -128,35 +140,44 @@ func buildDNS(d engine.DNS, o engine.Options) *dnsConfig {
 	if len(d.HijackTun) > 0 {
 		out.Listen = strings.Join(d.HijackTun, ",")
 	}
-	return out
+	return out, nil
 }
 
-// buildTun renders the tun block. Sora asks for the mixed stack by default:
-// TCP goes through the system stack and UDP through gVisor, which is the
-// combination the upstream documentation recommends.
+// buildTun defaults to the upstream-recommended mixed stack: system TCP and
+// gVisor UDP.
 func buildTun(t engine.Tun, d engine.DNS) *tunConfig {
 	stack := orDefault(t.Stack, "mixed")
 	out := &tunConfig{
-		Enable:    true,
+		Name:      "sora-tun",
+		Type:      "tun",
 		Stack:     stack,
 		Device:    t.DeviceName,
 		MTU:       orDefaultInt(t.MTU, 1500),
 		DNSHijack: orDefaultList(d.HijackTun, []string{"any:53"}),
 	}
-	auto := t.AutoRoute
+	auto := t.AutoRoute && runtime.GOOS != "linux"
 	out.AutoRoute = &auto
-	detect := true
+	detect := runtime.GOOS != "linux"
 	out.AutoDetectInterface = &detect
 	strict := t.StrictRoute
 	out.StrictRoute = &strict
+	addresses := t.Addresses()
+	out.Inet4Address = addresses[:1]
+	out.Inet6Address = addresses[1:]
+	if runtime.GOOS == "linux" {
+		// Its IPv6 bound-interface rule exists even with auto-route=false;
+		// keep it in Sora's table so crash cleanup can identify it exactly.
+		out.IPRoute2TableIndex = 5340
+	}
+
 	out.RouteAddress = t.RouteAddressSets
 	out.IncludePackage = t.IncludeApps
 	out.ExcludePackage = t.ExcludeApps
 	return out
 }
 
-// findProcessMode keeps process lookup off unless the plan routes by process:
-// looking up the owning process is slow on Windows and useless without rules.
+// findProcessMode enables process lookup only for process rules; Windows lookup
+// is slow and otherwise unnecessary.
 func findProcessMode(p *engine.Plan) string {
 	if p.Options.FindProcess {
 		return "strict"

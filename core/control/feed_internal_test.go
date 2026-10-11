@@ -6,14 +6,9 @@ import (
 	"github.com/levvs-one/sora-client/core/session"
 )
 
-// TestEventFeedLosesNothingAndRepeatsNothing is the test for the rule that makes
-// the event stream trustworthy: a client that reconnects with the sequence it last
-// saw must see every later event exactly once, including the ones that arrive
-// while the history is still being written out.
-//
-// It is an internal test because the rule belongs to the seam between the journal
-// and the stream, and a seam that is only reachable from outside is a seam that
-// nobody checks.
+// TestEventFeedLosesNothingAndRepeatsNothing checks that reconnecting clients
+// receive every later event once, including arrivals during replay. It tests
+// the journal-to-stream boundary directly.
 func TestEventFeedLosesNothingAndRepeatsNothing(t *testing.T) {
 	journal := session.NewJournal(64)
 	for range 5 {
@@ -24,8 +19,7 @@ func TestEventFeedLosesNothingAndRepeatsNothing(t *testing.T) {
 	feed := newEventFeed(journal, 3, nil)
 	defer feed.close()
 
-	// Events appended after the subscription and after the head was read are the
-	// ones a naive implementation loses between replay and live streaming.
+	// Events arriving between subscription and replay must not be lost.
 	appended := make([]uint64, 0, gap)
 	for i := 0; i < gap; i++ {
 		appended = append(appended, journal.Append(session.Event{
@@ -59,8 +53,33 @@ func TestEventFeedLosesNothingAndRepeatsNothing(t *testing.T) {
 	}
 }
 
-// TestEventFeedRespectsTheSequenceTheClientNamed proves the other half of the
-// rule: a client that resumes from a sequence gets only what it has not seen.
+// TestEventFeedSendsAnEventCaughtByBothOnce appends an event between the
+// subscription and the head read, as a busy session can, and checks that the
+// live side drops what the replay already sent.
+func TestEventFeedSendsAnEventCaughtByBothOnce(t *testing.T) {
+	journal := session.NewJournal(64)
+	feed := newEventFeed(journal, 0, nil)
+	defer feed.close()
+	caught := journal.Append(session.Event{Kind: session.EventGroup, Switch: &session.GroupSwitch{Group: "auto", Selected: "out-2"}})
+	feed.head = journal.Latest()
+	later := journal.Append(session.Event{Kind: session.EventState, State: session.StateConnected})
+
+	sent := map[uint64]int{}
+	for _, event := range feed.history() {
+		sent[event.Sequence]++
+	}
+	for range 2 {
+		if event := <-feed.live; feed.unsent(event) {
+			sent[event.Sequence]++
+		}
+	}
+	if sent[caught.Sequence] != 1 || sent[later.Sequence] != 1 {
+		t.Errorf("sent = %v, want sequences %d and %d once each", sent, caught.Sequence, later.Sequence)
+	}
+}
+
+// TestEventFeedRespectsTheSequenceTheClientNamed checks that replay excludes
+// events at or before the client's cursor.
 func TestEventFeedRespectsTheSequenceTheClientNamed(t *testing.T) {
 	journal := session.NewJournal(64)
 	for i := range 10 {

@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -9,28 +10,20 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
-// Factory builds the engine that will carry a plan. The control plane injects
-// one so the session package never has to know which engine build a machine
-// has, and so a test can run a session with an engine that does nothing.
+// Factory creates an engine for a plan, keeping discovery and test engines
+// outside the session package.
 type Factory func(ctx context.Context, plan *engine.Plan) (engine.Engine, error)
 
-// ManagerConfig configures a Manager. Every field except the factory has a
-// default, and the defaults are the ones a desktop core wants.
+// ManagerConfig requires Factory; other fields default to desktop core
+// settings.
 type ManagerConfig struct {
 	// Factory builds the engine for a plan. It is required.
 	Factory Factory
-	// Guard owns the system settings while a session runs. A new session gets
-	// the same guard, and the session restores it on every exit path, so two
-	// sessions can never hold system settings at the same time.
+	// Guard is shared across sequential sessions and restored on every exit
+	// path. Two sessions cannot own system settings concurrently.
 	Guard Guard
 	// JournalCapacity is the history size of each session journal.
 	JournalCapacity int
-	// Backoff schedules reconnect attempts.
-	Backoff engine.Backoff
-	// Budget builds the restart budget of one session. Each session gets its
-	// own budget: a budget shared between sessions would let the attempts of a
-	// session that failed ten minutes ago block the next connection.
-	Budget func() *engine.RestartBudget
 	// StatsInterval samples the engine counters.
 	StatsInterval time.Duration
 	// StopGrace bounds the engine shutdown.
@@ -39,13 +32,14 @@ type ManagerConfig struct {
 	Redactor *engine.Redactor
 	// Now supplies timestamps.
 	Now func() time.Time
+	// TunUp waits for the adapter of a tun plan; see Config.TunUp.
+	TunUp func(ctx context.Context, device string) error
+	// Network fingerprints the networks of the machine; see Config.Network.
+	Network func() string
 }
 
-// Manager owns at most one session. The invariant is simple and absolute: a
-// machine has one tunnel, and the core decides which. A second Connect replaces
-// the first, and the first is stopped and restored before the second touches the
-// system, because two sessions would fight over the proxy, the firewall and the
-// tun device.
+// Manager owns at most one session. Connect stops and restores the old session
+// before the new one changes proxy, firewall, or TUN settings.
 type Manager struct {
 	cfg ManagerConfig
 
@@ -55,8 +49,8 @@ type Manager struct {
 	busy    bool
 }
 
-// NewManager returns a manager. The factory is validated here, so a
-// misconfigured core fails at startup instead of on the first connection.
+// NewManager validates the required factory at construction rather than on
+// first connection.
 func NewManager(cfg ManagerConfig) *Manager {
 	if cfg.Factory == nil {
 		panic("session: manager needs an engine factory")
@@ -70,17 +64,8 @@ func NewManager(cfg ManagerConfig) *Manager {
 	if cfg.StopGrace <= 0 {
 		cfg.StopGrace = DefaultStopGrace
 	}
-	if cfg.Backoff.Initial <= 0 {
-		cfg.Backoff = engine.DefaultBackoff()
-	}
 	if cfg.Now == nil {
 		cfg.Now = time.Now
-	}
-	if cfg.Budget == nil {
-		now := cfg.Now
-		cfg.Budget = func() *engine.RestartBudget {
-			return engine.NewRestartBudget(5, 10*time.Minute, now)
-		}
 	}
 	if cfg.Guard == nil {
 		cfg.Guard = NoopGuard{}
@@ -88,8 +73,8 @@ func NewManager(cfg ManagerConfig) *Manager {
 	return &Manager{cfg: cfg, last: Status{State: StateDisconnected, ChangedAt: cfg.Now()}}
 }
 
-// Connect starts a session for the plan. Any previous session is stopped first
-// and its system settings are restored, so the machine is never configured twice.
+// Connect stops any previous session and restores its settings before starting
+// the new plan.
 func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Settings) (*Session, error) {
 	m.mu.Lock()
 	if m.busy {
@@ -99,19 +84,13 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 	}
 	m.busy = true
 	previous := m.current
-	m.current = nil
 	m.mu.Unlock()
 
 	defer m.release()
 
-	stopCtx := context.WithoutCancel(ctx)
-	if previous != nil {
-		if err := previous.Stop(stopCtx); err != nil {
-			m.setLast(previous.Status())
-			return nil, err
-		}
+	if err := engine.PrepareTun(plan); err != nil {
+		return nil, errs.Wrap(err, errs.CodeFailedPrecondition, errs.KeyPlanTunnel)
 	}
-
 	built, err := m.cfg.Factory(ctx, plan)
 	if err != nil {
 		return nil, err
@@ -121,25 +100,50 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 		Engine:        built,
 		Guard:         m.cfg.Guard,
 		Journal:       NewJournal(m.cfg.JournalCapacity),
-		Backoff:       m.cfg.Backoff,
-		RestartBudget: m.cfg.Budget(),
 		StatsInterval: m.cfg.StatsInterval,
 		StopGrace:     m.cfg.StopGrace,
 		Redactor:      m.cfg.Redactor,
 		Settings:      settings,
 		Now:           m.cfg.Now,
+		TunUp:         m.cfg.TunUp,
+		Network:       m.cfg.Network,
 	})
 	if err != nil {
 		_ = built.Close()
 		return nil, err
 	}
+	if err := built.Validate(ctx, plan); err != nil {
+		_ = built.Close()
+		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+	}
+	if err := ctx.Err(); err != nil {
+		_ = built.Close()
+		return nil, err
+	}
+	stopCtx := context.WithoutCancel(ctx)
+	if previous != nil {
+		if err := previous.Stop(stopCtx); err != nil {
+			_ = built.Close()
+			m.setLast(previous.Status())
+			return nil, err
+		}
+		m.setLast(previous.Status())
+	}
+	m.mu.Lock()
+	m.current = nil
+	m.mu.Unlock()
 	if err := created.Start(ctx); err != nil {
-		// A session that failed to start may still own an engine that created
-		// a device, so it is stopped rather than dropped on the floor. The
-		// status is read before the stop, because the failure is the answer a
-		// client asked for and a stopped session reports only that it is gone.
+		// Stop failed startups because they may still own an engine or
+		// device. Capture the failure status before Stop replaces it
+		// with disconnected.
 		status := created.Status()
-		_ = created.Stop(stopCtx)
+		cleanupErr := created.Stop(stopCtx)
+		if cleanupErr != nil {
+			m.mu.Lock()
+			m.current = created
+			m.mu.Unlock()
+			err = errs.Wrap(errors.Join(err, cleanupErr), errs.CodeOf(cleanupErr), errs.KeyOf(cleanupErr))
+		}
 		m.setLast(status)
 		return nil, err
 	}
@@ -151,8 +155,7 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 	return created, nil
 }
 
-// Disconnect stops the current session. It succeeds when there is none, so a
-// client may call it defensively at startup.
+// Disconnect stops the current session and succeeds if none exists.
 func (m *Manager) Disconnect(ctx context.Context) error {
 	m.mu.Lock()
 	if m.busy {
@@ -162,16 +165,21 @@ func (m *Manager) Disconnect(ctx context.Context) error {
 	}
 	m.busy = true
 	current := m.current
-	m.current = nil
 	m.mu.Unlock()
 
 	defer m.release()
 
 	if current == nil {
+		m.setLast(Status{State: StateDisconnected, ChangedAt: m.cfg.Now()})
 		return nil
 	}
 	err := current.Stop(ctx)
 	m.setLast(current.Status())
+	if err == nil {
+		m.mu.Lock()
+		m.current = nil
+		m.mu.Unlock()
+	}
 	return err
 }
 
@@ -182,16 +190,22 @@ func (m *Manager) Current() *Session {
 	return m.current
 }
 
-// Status returns the state of the last session the manager saw. It answers
-// GetStatus even after the session has ended.
+// Status returns current or last-session state, remaining available after
+// session termination.
 func (m *Manager) Status() Status {
 	m.mu.Lock()
-	defer m.mu.Unlock()
-	return m.last
+	current, last := m.current, m.last
+	m.mu.Unlock()
+	// Read live state so failure or reconnection is not reported as an old
+	// connected snapshot.
+	if current != nil {
+		return current.Status()
+	}
+	return last
 }
 
-// Shutdown stops everything and returns once the machine is back to normal. The
-// core calls it on service stop, on SIGTERM and before a self-update.
+// Shutdown stops the session and restores system settings for service stop,
+// SIGTERM, or self-update.
 func (m *Manager) Shutdown(ctx context.Context) error {
 	return m.Disconnect(ctx)
 }

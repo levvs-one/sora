@@ -43,12 +43,15 @@ service CoreControl {
 
   // Since 1.3. Subscriptions the core keeps and updates by itself, so they stay
   // current while the interface is closed. The link of a subscription is its
-  // credential: the core stores it encrypted and never sends it back.
+  // credential: the core stores it encrypted and omits it from states.
   rpc SaveSubscription(SaveSubscriptionRequest) returns (SaveSubscriptionResponse);
   rpc ListSubscriptions(ListSubscriptionsRequest) returns (ListSubscriptionsResponse);
   rpc DeleteSubscription(DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
   rpc RefreshSubscription(RefreshSubscriptionRequest) returns (RefreshSubscriptionResponse);
   rpc WatchSubscriptions(WatchSubscriptionsRequest) returns (stream SubscriptionState);
+  // Since 1.6. Returns the stored subscription link only on an authenticated
+  // explicit request to open its page. Clients must not cache or log it.
+  rpc GetSubscriptionLink(GetSubscriptionLinkRequest) returns (GetSubscriptionLinkResponse);
   // PutSecret and DeleteSecret manage the credential material the core keeps.
   // They exist because the rest of the contract carries only references: a plan
   // names a secret, and these two calls are the only way a secret ever reaches
@@ -71,6 +74,9 @@ message ConnectRequest {
   string session_id = 3;
   SessionPlan session_plan = 4;
   bytes control_authenticator = 5;
+  // Since 1.5. Arms the kill switch before the engine starts, so no traffic
+  // leaves outside the tunnel between connecting and a later SetKillSwitch.
+  bool kill_switch = 6;
 }
 message ConnectResponse { SessionStatus status = 1; SoraError error = 2; }
 message DisconnectRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bytes control_authenticator = 4; }
@@ -104,6 +110,14 @@ message SessionPlan {
   repeated GroupSpec groups = 11;
   // Since 1.3. A routing preset applied after the routes above.
   RoutingOptions routing = 12;
+  // Since 1.3. Resolves and connects over IPv6 as well; off resolves IPv4
+  // only, which avoids leaks on networks where IPv6 bypasses the tunnel.
+  bool ipv6 = 13;
+  // Since 1.7. Empty keeps the engine default. mihomo accepts system, gvisor,
+  // mixed and mips. Xray uses native gvisor or a mihomo TUN bridge for other
+  // stacks. Clients must negotiate 1.7 before
+  // sending an explicit value, so an older core cannot silently ignore it.
+  string tun_stack = 14;
 }
 
 // GroupSpec is one group of outbounds.
@@ -172,10 +186,19 @@ message OutboundSpec {
   string security = 5;
   Endpoint endpoint = 6;
   CredentialsRef credentials = 7;
+  // Display metadata for full profiles; protocol still selects the adapter.
+  string display_protocol = 9;
 }
 message Endpoint { string host = 1; uint32 port = 2; }
 message CredentialsRef { string reference = 1; }
+// RoutingRule sends a destination to an outbound, a group, "direct" or
+// "reject". The destination is "domain:" (the site and everything under it),
+// "full:", "geosite:", "geoip:", "ruleset:", "process:" (a program by name,
+// since 1.3), a network such as "203.0.113.0/24", or a port.
 message RoutingRule { string destination = 1; string outbound_id = 2; }
+// DnsPolicy names the resolvers of the session. A tun session that names none
+// uses DNS over HTTPS to 1.1.1.1 and 8.8.8.8, since the adapter carries every
+// lookup of the machine.
 message DnsPolicy { repeated string servers = 1; bool block_private = 2; }
 message BypassSettings { bool enabled = 1; repeated string rules = 2; }
 enum TunnelMode { TUNNEL_MODE_UNSPECIFIED = 0; TUNNEL_MODE_SYSTEM = 1; TUNNEL_MODE_APPLICATION = 2; }
@@ -185,8 +208,12 @@ message GetStatsRequest { ApiVersion api_version = 1; string session_id = 2; }
 message GetStatsResponse { StatsTick stats = 1; SoraError error = 2; }
 message ConnectionState { ConnectionStateValue value = 1; string session_id = 2; SoraErrorCode reason = 3; google.protobuf.Timestamp changed_at = 4; google.protobuf.Duration retry_after = 5; }
 enum ConnectionStateValue { CONNECTION_STATE_VALUE_UNSPECIFIED = 0; CONNECTION_STATE_VALUE_DISCONNECTED = 1; CONNECTION_STATE_VALUE_CONNECTING = 2; CONNECTION_STATE_VALUE_CONNECTED = 3; CONNECTION_STATE_VALUE_RECONNECTING = 4; CONNECTION_STATE_VALUE_FAILED = 5; }
-message CoreEvent { uint64 sequence = 1; string session_id = 2; google.protobuf.Timestamp emitted_at = 3; oneof payload { StateChanged state_changed = 4; StatsTick stats_tick = 5; BypassStrategyChanged bypass_strategy_changed = 6; ProbeResult probe_result = 7; LogBatch log_batch = 8; SoraError error = 9; KillSwitchChanged kill_switch_changed = 10; } }
+message CoreEvent { uint64 sequence = 1; string session_id = 2; google.protobuf.Timestamp emitted_at = 3; oneof payload { StateChanged state_changed = 4; StatsTick stats_tick = 5; BypassStrategyChanged bypass_strategy_changed = 6; ProbeResult probe_result = 7; LogBatch log_batch = 8; SoraError error = 9; KillSwitchChanged kill_switch_changed = 10; GroupSwitched group_switched = 11; } }
 message StateChanged { ConnectionState state = 1; }
+// Since 1.5. A fallback group moved to another member on its own: the member
+// it used stopped answering, or one before it answers again. Members are
+// outbound ids or names of nested groups.
+message GroupSwitched { string group = 1; string selected = 2; string previous = 3; }
 message StatsTick { uint64 bytes_up = 1; uint64 bytes_down = 2; uint64 active_connections = 3; }
 message BypassStrategyChanged { string strategy = 1; }
 message ProbeResult {
@@ -275,13 +302,33 @@ enum ProbeMethod {
 }
 message RunDiagnosticsRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; }
 message RunDiagnosticsResponse { DiagnosticReport report = 1; SoraError error = 2; }
-message ExportDiagnosticsRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; }
+// Native captures require the authenticator and the native-diagnostics capability.
+enum DiagnosticFormat {
+  DIAGNOSTIC_FORMAT_UNSPECIFIED = 0;
+  DIAGNOSTIC_FORMAT_PCAPNG = 1;
+  DIAGNOSTIC_FORMAT_EVTX = 2;
+}
+message ExportDiagnosticsRequest {
+  ApiVersion api_version = 1;
+  string request_id = 2;
+  string session_id = 3;
+  DiagnosticFormat format = 4;
+  bytes control_authenticator = 5;
+}
 message ExportDiagnosticsResponse { bytes archive = 1; SoraError error = 2; }
 message SetKillSwitchRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bool enabled = 4; }
 message SetKillSwitchResponse { bool enabled = 1; SoraError error = 2; }
 message DiagnosticReport { repeated string lines = 1; }
 message HandshakeRequest { ApiVersion client_version = 1; }
-message HandshakeResponse { ApiVersion negotiated_version = 1; SoraError error = 2; }
+message HandshakeResponse {
+  ApiVersion negotiated_version = 1;
+  SoraError error = 2;
+  // Since 1.3. The token the other calls present. The transport admits only
+  // the core's own account, the service group and the person in the active
+  // local session, so whoever reaches Handshake may hold it; a system
+  // installation keeps the token file where that person cannot read it.
+  bytes control_authenticator = 3;
+}
 
 // PutSecretRequest hands one piece of credential material to the core. The
 // interface keeps the material only until the call is confirmed; the core keeps
@@ -378,12 +425,19 @@ enum LogExportFormat {
   LOG_EXPORT_FORMAT_UNSPECIFIED = 0;
   LOG_EXPORT_FORMAT_JSON_LINES = 1;
   LOG_EXPORT_FORMAT_CSV = 2;
+  LOG_EXPORT_FORMAT_LOG = 3;
+  LOG_EXPORT_FORMAT_JSON = 4;
+  LOG_EXPORT_FORMAT_XML = 5;
+  LOG_EXPORT_FORMAT_ZIP = 6;
+  LOG_EXPORT_FORMAT_GZIP = 7;
 }
 message ExportLogsRequest {
   ApiVersion api_version = 1;
   bytes control_authenticator = 2;
   LogFilter filter = 3;
   LogExportFormat format = 4;
+  // Optional filename category: all, engine, tun, dns, subscriptions or core.
+  string category = 5;
 }
 message ExportLogsResponse {
   bytes data = 1;
@@ -449,7 +503,7 @@ message SubscriptionSettings {
   google.protobuf.Duration update_interval = 6;
 }
 
-// SubscriptionState is a subscription as the core holds it.
+// SubscriptionState omits settings.url because it carries a bearer token.
 message SubscriptionState {
   SubscriptionSettings settings = 1;
   SubscriptionInfo info = 2;
@@ -477,6 +531,10 @@ message RefreshSubscriptionRequest { ApiVersion api_version = 1; bytes control_a
 message RefreshSubscriptionResponse { SubscriptionState state = 1; SoraError error = 2; }
 message WatchSubscriptionsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; }
 
+// Since 1.6. The link is available only through this authenticated request.
+message GetSubscriptionLinkRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string id = 3; }
+message GetSubscriptionLinkResponse { string url = 1; SoraError error = 2; }
+
 message GetAboutRequest { ApiVersion api_version = 1; }
 message GetAboutResponse { About about = 1; SoraError error = 2; }
 // About describes the running core.
@@ -495,6 +553,9 @@ message About {
   // SPDX identifier.
   string license = 8;
   string source_url = 9;
+  // Since 1.4. Where the local proxy listens. A session in the application
+  // tunnel mode opens it, and the interface points the system proxy at it.
+  Endpoint local_proxy = 10;
 }
 // EngineBuild is one engine as this machine has it.
 message EngineBuild {

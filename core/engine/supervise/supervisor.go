@@ -14,34 +14,43 @@ import (
 	"github.com/levvs-one/sora-client/core/logs"
 )
 
-// ErrReloadUnsupported is returned by a Driver that cannot move a running
-// engine onto a new configuration. The supervisor then restarts the engine,
-// which drops open flows but always converges to the plan.
+// ErrReloadUnsupported makes the supervisor restart the engine to apply a plan.
+// Existing flows are lost during restart.
 var ErrReloadUnsupported = errors.New("supervise: engine cannot reload a running configuration")
 
 // ErrNotRunning is returned by controller calls while no engine is running.
 var ErrNotRunning = errors.New("supervise: engine is not running")
 
-// Runtime holds the values the supervisor chooses for one start. They are
-// separate from the plan because one plan is applied many times.
+// Runtime holds supervisor-selected values for one start, separate from the
+// reusable plan.
 type Runtime struct {
 	HomeDir string
-	// LocalPort is the loopback mixed (HTTP and SOCKS5) listener of the tunnel.
+	// LocalPort is the loopback mixed (HTTP and SOCKS5) listener of the
+	// tunnel.
 	LocalPort int
-	// ControlAddr is host:port of the loopback controller or metrics endpoint.
+	// LocalProxy indicates whether LocalPort is open, allowing
+	// controller-free drivers to check readiness through the listener.
+	LocalProxy bool
+	// TunDevice is the adapter that must exist before TUN routing is installed.
+	TunDevice string
+	// ProxyNames lets readiness check the loaded plan rather than just the API.
+	ProxyNames []string
+	// ControlAddr is host:port of the loopback controller or metrics
+	// endpoint.
 	ControlAddr string
-	// Secret authorizes the controller. A loopback port is reachable by every
-	// local user, so Sora never runs a controller without one.
+	// Secret authenticates controller requests because every local user can
+	// reach loopback.
 	Secret string
 	// ProbeURL is the default latency endpoint for groups without one.
 	ProbeURL string
 }
 
-// Driver is the engine specific part of supervision: the configuration
-// grammar, the command line and the control API handshake.
+// Driver supplies engine-specific configuration, arguments, and the readiness
+// handshake.
 type Driver interface {
 	Kind() engine.Kind
-	// Render turns the plan into the configuration the engine reads on stdin.
+	// Render turns the plan into the configuration the engine reads on
+	// stdin.
 	Render(p *engine.Plan, rt Runtime) ([]byte, error)
 	// RunArgs and CheckArgs are the command lines that run and validate a
 	// configuration read from stdin.
@@ -55,32 +64,49 @@ type Driver interface {
 	Reload(ctx context.Context, rt Runtime, cfg []byte) error
 }
 
-// PrivateController is implemented by a Driver whose engine can serve its
-// controller on a unix socket or a named pipe instead of a loopback port.
+// PrivateController supplies a Unix socket or named pipe instead of a loopback
+// controller.
 type PrivateController interface {
-	ControlAddress(rt Runtime) (string, error)
+	// ControlAddress returns the address for one start. private forbids
+	// discoverable controllers; empty disables the controller.
+	ControlAddress(rt Runtime, private bool) (string, error)
 }
 
-// LogParser is implemented by a Driver that knows the output format of its
-// engine. A line it cannot read is recorded as it is, at info level.
+// Router installs routes for engines that create only a TUN adapter. Route runs
+// after every start because restarts recreate adapters; Unroute runs after
+// final shutdown.
+type Router interface {
+	Route(ctx context.Context, p *engine.Plan) error
+	Unroute(ctx context.Context) error
+}
+
+// Namer maps renderer-assigned engine names to plan outbound IDs and group
+// names through PlanNames.
+type Namer interface {
+	PlanNames(p *engine.Plan) map[string]string
+}
+
+// LogParser parses engine output. Unrecognized lines are recorded unchanged at
+// info level.
 type LogParser interface {
 	ParseLog(line string) (at time.Time, level logs.Level, message string)
 }
 
-// Preparer is implemented by a Driver that puts files into the engine home
-// before the engine sees a configuration, such as the databases it would
-// otherwise download.
+// Preparer installs engine-home files before configuration, including databases
+// that would otherwise be downloaded.
 type Preparer interface {
 	Prepare(rt Runtime, b Binary) error
+	// PrepareStart may reset persistent state; validation must never do so.
+	PrepareStart(p *engine.Plan, rt Runtime) error
 }
 
-// Config is what one supervised engine needs from the core service.
+// Config configures one supervised engine instance.
 type Config struct {
 	Binary  Binary
 	HomeDir string
-	// LocalPort is reserved by the core, because the system proxy is pointed at
-	// it before the engine starts. Zero lets the supervisor choose one per start,
-	// which only a caller that never points a proxy at the engine should ask for.
+	// LocalPort is reserved before system proxy configuration. Zero selects
+	// a port per start and is suitable only when no proxy points to a fixed
+	// port.
 	LocalPort     int
 	ProbeURL      string
 	StartTimeout  time.Duration
@@ -92,9 +118,8 @@ type Config struct {
 	Logs *logs.Center
 }
 
-// Supervisor runs one engine binary through a Driver and implements the
-// lifecycle half of engine.Engine. Engines embed it and add the control half
-// (groups, selection, latency, counters) on top of Runtime.
+// Supervisor implements engine lifecycle through a Driver. Engines add groups,
+// selection, latency, and counters using Runtime.
 type Supervisor struct {
 	cfg      Config
 	driver   Driver
@@ -102,6 +127,9 @@ type Supervisor struct {
 	redactor *engine.Redactor
 	backoff  engine.Backoff
 	budget   *engine.RestartBudget
+	// Lifecycle operations and a scheduled restart must not race: a late
+	// restart otherwise recreates a process after Stop released its routes.
+	lifecycle sync.Mutex
 
 	mu       sync.Mutex
 	state    engine.State
@@ -110,12 +138,13 @@ type Supervisor struct {
 	plan     *engine.Plan
 	proc     *Process
 	stopping bool
+	routed   bool
 
 	ctx    context.Context
 	cancel context.CancelFunc
 }
 
-// New builds a supervisor. Nothing is started: Apply does the work.
+// New creates a supervisor without starting it. Apply starts the engine.
 func New(cfg Config, driver Driver) (*Supervisor, error) {
 	kind := driver.Kind()
 	if cfg.Binary.Path == "" {
@@ -162,20 +191,20 @@ func (s *Supervisor) Kind() engine.Kind { return s.driver.Kind() }
 
 // Capabilities returns the capability matrix of the engine.
 func (s *Supervisor) Capabilities() engine.Capabilities {
-	caps := engine.Catalog[s.driver.Kind()]
+	caps := engine.BuildCapabilities(s.driver.Kind(), s.cfg.Binary.Version, s.cfg.Binary.BuildTags)
 	caps.MinVersion = s.Version().String()
 	return caps
 }
 
-// State is the current lifecycle state.
+// State returns the current lifecycle state.
 func (s *Supervisor) State() engine.State {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.state
 }
 
-// Version is the engine version, as reported by the running engine once it
-// answered the handshake and as probed before that.
+// Version returns the handshake version, or the probed version before a
+// successful handshake.
 func (s *Supervisor) Version() engine.Version {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -208,7 +237,18 @@ func (s *Supervisor) Plan() *engine.Plan {
 	return s.plan
 }
 
-// Validate renders the plan and lets the engine binary judge it.
+// PlanNames maps live engine names to plan IDs and groups. Nil means no engine
+// is running or names already match plan IDs.
+func (s *Supervisor) PlanNames() map[string]string {
+	n, ok := s.driver.(Namer)
+	p := s.Plan()
+	if !ok || p == nil {
+		return nil
+	}
+	return n.PlanNames(p)
+}
+
+// Validate renders the plan and checks it with the engine binary.
 func (s *Supervisor) Validate(ctx context.Context, p *engine.Plan) error {
 	if err := s.admit(p); err != nil {
 		return err
@@ -221,9 +261,8 @@ func (s *Supervisor) Validate(ctx context.Context, p *engine.Plan) error {
 	return s.redactor.Err(s.check(ctx, rt, cfg))
 }
 
-// admit refuses a plan before any engine sees it: a malformed plan, or one
-// this engine cannot carry, which would otherwise show a connected state that
-// silently drops traffic.
+// admit rejects malformed or unsupported plans before startup to avoid
+// reporting connected while dropping traffic.
 func (s *Supervisor) admit(p *engine.Plan) error {
 	if p == nil {
 		return fmt.Errorf("%s: nil plan", s.driver.Kind())
@@ -231,7 +270,7 @@ func (s *Supervisor) admit(p *engine.Plan) error {
 	if err := p.Validate(); err != nil {
 		return s.redactor.Err(err)
 	}
-	if missing := engine.Catalog[s.driver.Kind()].Missing(p); len(missing) > 0 {
+	if missing := s.Capabilities().Missing(p); len(missing) > 0 {
 		return fmt.Errorf("%s: this engine cannot carry %s", s.driver.Kind(), strings.Join(missing, ", "))
 	}
 	return nil
@@ -250,12 +289,16 @@ func (s *Supervisor) check(ctx context.Context, rt Runtime, cfg []byte) error {
 		Args: s.driver.CheckArgs(rt), Dir: s.cfg.HomeDir, Config: cfg})
 }
 
-// Apply starts the engine with the plan or moves a running engine onto it. A
-// running engine is reloaded in place where the engine supports it, so a user
-// who adds a subscription does not lose the flows they already have.
+// Apply starts or reconfigures the engine. Supported live reloads preserve
+// existing flows.
 func (s *Supervisor) Apply(ctx context.Context, p *engine.Plan) error {
+	s.lifecycle.Lock()
+	defer s.lifecycle.Unlock()
 	if err := s.admit(p); err != nil {
 		return err
+	}
+	if err := engine.PrepareTun(p); err != nil {
+		return s.redactor.Err(err)
 	}
 	s.mu.Lock()
 	s.redactor.Add(p.Secrets()...)
@@ -279,6 +322,9 @@ func (s *Supervisor) Apply(ctx context.Context, p *engine.Plan) error {
 	if err := s.start(ctx, p); err != nil {
 		masked := s.redactor.Err(err)
 		s.setState(engine.StateFailed)
+		if s.cfg.Logs != nil {
+			s.cfg.Logs.Write(time.Time{}, logs.LevelError, string(s.driver.Kind()), masked.Error())
+		}
 		s.bus.Publish(engine.Event{Kind: engine.EventFatal, State: engine.StateFailed, Err: masked})
 		return masked
 	}
@@ -304,7 +350,16 @@ func (s *Supervisor) reload(ctx context.Context, rt Runtime, p *engine.Plan) err
 
 // start brings the engine up from nothing and begins supervision.
 func (s *Supervisor) start(ctx context.Context, p *engine.Plan) error {
-	rt, err := s.reserve()
+	rt, err := s.reserve(p.PrivateControl)
+	rt.LocalProxy = p.LocalProxy.Enabled
+	if namer, ok := s.driver.(Namer); ok {
+		for name := range namer.PlanNames(p) {
+			rt.ProxyNames = append(rt.ProxyNames, name)
+		}
+	}
+	if p.Tun.Enabled {
+		rt.TunDevice = p.Tun.DeviceName
+	}
 	if err != nil {
 		return err
 	}
@@ -316,6 +371,12 @@ func (s *Supervisor) start(ctx context.Context, p *engine.Plan) error {
 		return err
 	}
 
+	if preparer, ok := s.driver.(Preparer); ok {
+		if err := preparer.PrepareStart(p, rt); err != nil {
+			return fmt.Errorf("%s: prepare persistent state: %w", s.driver.Kind(), err)
+		}
+	}
+
 	s.setState(engine.StateStarting)
 	kind := s.driver.Kind()
 	proc, err := Start(s.ctx, Spec{Name: string(kind), Path: s.cfg.Binary.Path,
@@ -324,9 +385,24 @@ func (s *Supervisor) start(ctx context.Context, p *engine.Plan) error {
 		return err
 	}
 	reported, err := s.waitReady(ctx, rt, proc)
+	if err == nil && p.Tun.Enabled {
+		if r, ok := s.driver.(Router); ok {
+			err = r.Route(ctx, p)
+			if err == nil {
+				s.mu.Lock()
+				s.routed = true
+				s.mu.Unlock()
+			}
+		}
+	}
 	if err != nil {
-		_ = proc.Stop(context.WithoutCancel(ctx), s.cfg.StopGrace)
-		return err
+		stopErr := proc.Stop(context.WithoutCancel(ctx), s.cfg.StopGrace)
+		if stopErr != nil && !proc.Exited() {
+			s.mu.Lock()
+			s.proc = proc
+			s.mu.Unlock()
+		}
+		return errors.Join(err, stopErr, s.unroute(context.WithoutCancel(ctx)))
 	}
 
 	s.mu.Lock()
@@ -344,8 +420,7 @@ func (s *Supervisor) start(ctx context.Context, p *engine.Plan) error {
 	return nil
 }
 
-// logLine records one engine output line in the log center, masked of every
-// secret of the applied plans.
+// logLine records engine output after masking secrets from applied plans.
 func (s *Supervisor) logLine(line string) {
 	if s.cfg.Logs == nil {
 		return
@@ -358,7 +433,7 @@ func (s *Supervisor) logLine(line string) {
 }
 
 // reserve picks the ports and the secret of one start.
-func (s *Supervisor) reserve() (Runtime, error) {
+func (s *Supervisor) reserve(privateControl bool) (Runtime, error) {
 	local := s.cfg.LocalPort
 	if local == 0 {
 		free, err := FreePort()
@@ -383,7 +458,7 @@ func (s *Supervisor) reserve() (Runtime, error) {
 		if err := os.MkdirAll(rt.HomeDir, 0o700); err != nil {
 			return Runtime{}, err
 		}
-		addr, err := private.ControlAddress(rt)
+		addr, err := private.ControlAddress(rt, privateControl)
 		if err != nil {
 			return Runtime{}, err
 		}
@@ -392,9 +467,8 @@ func (s *Supervisor) reserve() (Runtime, error) {
 	return rt, nil
 }
 
-// waitReady polls the handshake until it answers, the deadline passes or the
-// process dies. A dead child is reported with its own output, because "the API
-// did not come up" tells a user nothing.
+// waitReady polls until handshake success, timeout, or process exit. Dead-child
+// errors include engine output instead of a generic readiness failure.
 func (s *Supervisor) waitReady(ctx context.Context, rt Runtime, proc *Process) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, s.cfg.StartTimeout)
 	defer cancel()
@@ -407,7 +481,11 @@ func (s *Supervisor) waitReady(ctx context.Context, rt Runtime, proc *Process) (
 			return version, nil
 		}
 		lastErr = err
-		if reason := proc.Err(); reason != nil {
+		if proc.Exited() {
+			reason := proc.Err()
+			if reason == nil {
+				reason = fmt.Errorf("%s: engine exited with status 0 before readiness: %s", s.driver.Kind(), proc.Output().Last(8))
+			}
 			return "", reason
 		}
 		select {
@@ -418,33 +496,48 @@ func (s *Supervisor) waitReady(ctx context.Context, rt Runtime, proc *Process) (
 	}
 }
 
-// watch keeps one process supervised: when it dies unexpectedly, the plan is
-// applied again with backoff inside the restart budget. A budget that runs out
-// is a failed state, not an endless loop.
+// watch restarts unexpected exits with backoff within the restart budget.
+// Exhaustion sets the failed state.
 func (s *Supervisor) watch(proc *Process) {
 	err := proc.Wait(s.ctx)
+	s.lifecycle.Lock()
 	s.mu.Lock()
 	current, stopping, plan := s.proc == proc, s.stopping, s.plan
 	s.mu.Unlock()
 	if !current || stopping {
+		s.lifecycle.Unlock()
 		return
 	}
-	if err == nil || errors.Is(err, context.Canceled) {
+	if errors.Is(err, context.Canceled) {
 		s.setState(engine.StateStopped)
+		s.lifecycle.Unlock()
 		return
 	}
 
+	if err == nil {
+		err = fmt.Errorf("%s: engine exited unexpectedly with status 0", s.driver.Kind())
+	}
 	masked := s.redactor.Err(err)
+	if s.cfg.Logs != nil {
+		s.cfg.Logs.Write(time.Time{}, logs.LevelError, string(s.driver.Kind()),
+			fmt.Sprintf("engine exited unexpectedly: %s", proc.cmd.ProcessState.String()))
+		for _, line := range strings.Split(proc.Output().Last(8), "\n") {
+			s.cfg.Logs.Write(time.Time{}, logs.LevelError, string(s.driver.Kind()), s.redactor.String(line))
+		}
+	}
 	s.bus.Publish(engine.Event{Kind: engine.EventEngineDown, State: engine.StateRecovering,
 		Err: masked, Message: s.redactor.String(proc.Output().Last(5))})
 	if plan == nil {
 		s.setState(engine.StateStopped)
+		s.lifecycle.Unlock()
 		return
 	}
 	if !s.budget.Allow() {
+		masked = s.redactor.Err(errors.Join(err, s.unroute(context.WithoutCancel(s.ctx))))
 		s.setState(engine.StateFailed)
 		s.bus.Publish(engine.Event{Kind: engine.EventFatal, State: engine.StateFailed, Err: masked,
 			Message: fmt.Sprintf("more than %d restarts within %s", s.cfg.RestartBudget, s.cfg.RestartWindow)})
+		s.lifecycle.Unlock()
 		return
 	}
 
@@ -452,6 +545,7 @@ func (s *Supervisor) watch(proc *Process) {
 	delay := s.backoff.Delay(s.budget.Used() - 1)
 	s.bus.Publish(engine.Event{Kind: engine.EventRestart, State: engine.StateRecovering,
 		Message: "restarting in " + delay.String()})
+	s.lifecycle.Unlock()
 	timer := time.NewTimer(delay)
 	defer timer.Stop()
 	select {
@@ -459,7 +553,18 @@ func (s *Supervisor) watch(proc *Process) {
 		return
 	case <-timer.C:
 	}
+	s.lifecycle.Lock()
+	defer s.lifecycle.Unlock()
+	s.mu.Lock()
+	current, stopping = s.proc == proc, s.stopping
+	s.mu.Unlock()
+	if !current || stopping || s.ctx.Err() != nil {
+		return
+	}
 	if restartErr := s.start(s.ctx, plan); restartErr != nil {
+		if s.cfg.Logs != nil {
+			s.cfg.Logs.Write(time.Time{}, logs.LevelError, string(s.driver.Kind()), s.redactor.String(restartErr.Error()))
+		}
 		s.setState(engine.StateFailed)
 		s.bus.Publish(engine.Event{Kind: engine.EventFatal, State: engine.StateFailed, Err: s.redactor.Err(restartErr)})
 	}
@@ -467,6 +572,8 @@ func (s *Supervisor) watch(proc *Process) {
 
 // Stop shuts the engine down and forgets the plan.
 func (s *Supervisor) Stop(ctx context.Context) error {
+	s.lifecycle.Lock()
+	defer s.lifecycle.Unlock()
 	s.mu.Lock()
 	s.stopping = true
 	proc := s.proc
@@ -476,9 +583,43 @@ func (s *Supervisor) Stop(ctx context.Context) error {
 	var err error
 	if proc != nil {
 		err = proc.Stop(ctx, s.cfg.StopGrace)
+		if err != nil && !proc.Exited() {
+			s.mu.Lock()
+			s.proc = proc
+			s.mu.Unlock()
+		}
 	}
-	s.setState(engine.StateStopped)
+	err = errors.Join(err, s.unroute(ctx))
+	if err == nil {
+		s.setState(engine.StateStopped)
+	} else {
+		s.setState(engine.StateFailed)
+	}
 	return s.redactor.Err(err)
+}
+
+// unroute retains ownership on failure so shutdown can retry route cleanup.
+func (s *Supervisor) unroute(ctx context.Context) error {
+	s.mu.Lock()
+	routed := s.routed
+	s.mu.Unlock()
+	if !routed {
+		return nil
+	}
+	r, ok := s.driver.(Router)
+	if !ok {
+		return nil
+	}
+	if err := r.Unroute(ctx); err != nil {
+		if s.cfg.Logs != nil {
+			s.cfg.Logs.Write(time.Time{}, logs.LevelWarning, string(s.driver.Kind()), s.redactor.String(err.Error()))
+		}
+		return err
+	}
+	s.mu.Lock()
+	s.routed = false
+	s.mu.Unlock()
+	return nil
 }
 
 // Close stops the engine and releases the supervision context.

@@ -2,14 +2,11 @@ package errs
 
 import "sort"
 
-// Key is a stable identifier of one line of the catalog. It is the only part
-// of an error the interface is allowed to read, so keys are part of the public
-// contract: a summary may be reworded and a key may be added, but an existing
-// key is never given a new meaning.
+// Key is a stable localization identifier and public contract. Summaries may
+// change and keys may be added; existing keys must retain their meaning.
 type Key string
 
-// Catalog keys, grouped by the subsystem that raises them. The dot-separated
-// prefix is the subsystem and the rest names the condition.
+// Catalog keys use subsystem prefixes followed by condition names.
 const (
 	// Contract and transport.
 	KeyAPIVersionMismatch Key = "core.api.version_mismatch"
@@ -25,17 +22,18 @@ const (
 	KeyDeadlineExceeded   Key = "core.request.deadline_exceeded"
 
 	// Plans.
-	KeyPlanEmpty         Key = "core.plan.empty"
-	KeyPlanTooLarge      Key = "core.plan.too_large"
-	KeyPlanOutbounds     Key = "core.plan.outbounds_invalid"
-	KeyPlanDuplicateID   Key = "core.plan.duplicate_id"
-	KeyPlanUnknownTarget Key = "core.plan.unknown_target"
-	KeyPlanRuleInvalid   Key = "core.plan.rule_invalid"
-	KeyPlanTunnel        Key = "core.plan.tunnel_unsupported"
-	KeyPlanDNSInvalid    Key = "core.plan.dns_invalid"
-	KeyPlanBypassInvalid Key = "core.plan.bypass_invalid"
-	KeyPlanGroupsInvalid Key = "core.plan.groups_invalid"
-	KeyPlanLocalProxy    Key = "core.plan.local_proxy_invalid"
+	KeyPlanEmpty             Key = "core.plan.empty"
+	KeyPlanTooLarge          Key = "core.plan.too_large"
+	KeyPlanOutbounds         Key = "core.plan.outbounds_invalid"
+	KeyPlanDuplicateID       Key = "core.plan.duplicate_id"
+	KeyPlanUnknownTarget     Key = "core.plan.unknown_target"
+	KeyPlanRuleInvalid       Key = "core.plan.rule_invalid"
+	KeyPlanTunnel            Key = "core.plan.tunnel_unsupported"
+	KeyPlanDNSInvalid        Key = "core.plan.dns_invalid"
+	KeyPlanBypassInvalid     Key = "core.plan.bypass_invalid"
+	KeyPlanGroupsInvalid     Key = "core.plan.groups_invalid"
+	KeyPlanLocalProxy        Key = "core.plan.local_proxy_invalid"
+	KeyPlanEngineUnsupported Key = "core.plan.engine_unsupported"
 
 	KeyLogsUnavailable        Key = "core.logs.unavailable"
 	KeyLogFilterInvalid       Key = "core.logs.filter_invalid"
@@ -83,7 +81,8 @@ const (
 	KeyDiagnosticsFailed    Key = "core.diagnostics.failed"
 	KeyDiagnosticsTooLarge  Key = "core.diagnostics.too_large"
 
-	// Generic conditions raised while classifying an error that arrived from
+	// Generic conditions raised while classifying an error that arrived
+	// from
 	// the network, the filesystem or the standard library.
 	KeyNotFound          Key = "core.generic.not_found"
 	KeyNetworkFailed     Key = "core.network.failed"
@@ -92,9 +91,8 @@ const (
 	KeyTLSCertificate    Key = "core.tls.certificate"
 )
 
-// Entry documents one catalog line. Summary is written for auditors and for
-// translators; it is never shown to a user, because the interface owns the
-// wording and ships it in its own resources.
+// Entry documents a catalog key. Summary serves audits and translation; clients
+// supply localized user-facing text.
 type Entry struct {
 	Code      Code
 	Retryable bool
@@ -116,17 +114,18 @@ var catalog = map[Key]Entry{
 	KeyDeadlineExceeded:   {CodeDeadlineExceeded, true, "the request ran out of its deadline"},
 
 	// Plans.
-	KeyPlanEmpty:         {CodeInvalidArgument, false, "the plan has no outbounds"},
-	KeyPlanTooLarge:      {CodeResourceExhausted, false, "the plan is larger than the contract allows"},
-	KeyPlanOutbounds:     {CodeInvalidArgument, false, "an outbound is missing fields or holds impossible values"},
-	KeyPlanDuplicateID:   {CodeInvalidArgument, false, "two outbounds share one id"},
-	KeyPlanUnknownTarget: {CodeInvalidArgument, false, "a rule points at an outbound or group that does not exist"},
-	KeyPlanRuleInvalid:   {CodeInvalidArgument, false, "a rule has an unknown type or an unsafe value"},
-	KeyPlanTunnel:        {CodeInvalidArgument, false, "the requested tunnel mode is not supported"},
-	KeyPlanDNSInvalid:    {CodeInvalidArgument, false, "a resolver address or transport is not usable"},
-	KeyPlanBypassInvalid: {CodeInvalidArgument, false, "a bypass entry is not a domain, address or CIDR"},
-	KeyPlanGroupsInvalid: {CodeInvalidArgument, false, "a group is empty, cyclic or measures latency without a url"},
-	KeyPlanLocalProxy:    {CodeInvalidArgument, false, "the local proxy needs a login the system proxy cannot carry, or half a login"},
+	KeyPlanEmpty:             {CodeInvalidArgument, false, "the plan has no outbounds"},
+	KeyPlanTooLarge:          {CodeResourceExhausted, false, "the plan is larger than the contract allows"},
+	KeyPlanOutbounds:         {CodeInvalidArgument, false, "an outbound is missing fields or holds impossible values"},
+	KeyPlanDuplicateID:       {CodeInvalidArgument, false, "two outbounds share one id"},
+	KeyPlanUnknownTarget:     {CodeInvalidArgument, false, "a rule points at an outbound or group that does not exist"},
+	KeyPlanRuleInvalid:       {CodeInvalidArgument, false, "a rule has an unknown type or an unsafe value"},
+	KeyPlanTunnel:            {CodeInvalidArgument, false, "the requested tunnel mode is not supported"},
+	KeyPlanDNSInvalid:        {CodeInvalidArgument, false, "a resolver address or transport is not usable"},
+	KeyPlanBypassInvalid:     {CodeInvalidArgument, false, "a bypass entry is not a domain, address or CIDR"},
+	KeyPlanGroupsInvalid:     {CodeInvalidArgument, false, "a group is empty, cyclic or measures latency without a url"},
+	KeyPlanLocalProxy:        {CodeInvalidArgument, false, "the local proxy needs a login the system proxy cannot carry, or half a login"},
+	KeyPlanEngineUnsupported: {CodeFailedPrecondition, false, "installed engines in the requested order cannot carry this plan"},
 
 	KeyLogsUnavailable:        {CodeUnsupported, false, "this core keeps no log record"},
 	KeyLogFilterInvalid:       {CodeInvalidArgument, false, "the log filter has an invalid expression or range"},
@@ -187,8 +186,7 @@ func Lookup(key Key) (Entry, bool) {
 	return entry, ok
 }
 
-// Keys returns every catalog key in sorted order. Contract tests and the
-// diagnostics report use it to prove that code and catalog agree.
+// Keys returns sorted catalog keys for contract checks and diagnostics.
 func Keys() []Key {
 	out := make([]Key, 0, len(catalog))
 	for key := range catalog {
@@ -198,8 +196,7 @@ func Keys() []Key {
 	return out
 }
 
-// DefaultKey reports the catalog key a bare code maps to, so a caller that has
-// nothing more specific can build an error from the code alone.
+// DefaultKey returns the fallback catalog key for a bare error code.
 func DefaultKey(code Code) Key {
 	for _, key := range Keys() {
 		if catalog[key].Code == code {

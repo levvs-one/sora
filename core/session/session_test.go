@@ -11,9 +11,8 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
-// fakeEngine is an engine.Engine that records what it was asked to do and can be
-// told to fail, so the session logic is tested without a process, a device or a
-// network.
+// fakeEngine records engine requests and injects failures without processes,
+// devices, or network access.
 type fakeEngine struct {
 	mu       sync.Mutex
 	bus      *engine.EventBus
@@ -25,6 +24,7 @@ type fakeEngine struct {
 	apply    error
 	stopErr  error
 	counters engine.Counters
+	groups   []engine.GroupStatus
 }
 
 func newFakeEngine() *fakeEngine {
@@ -80,8 +80,18 @@ func (f *fakeEngine) Close() error {
 	return nil
 }
 
-func (f *fakeEngine) Groups(context.Context) ([]engine.GroupStatus, error) { return nil, nil }
-func (f *fakeEngine) Select(context.Context, string, string) error         { return nil }
+func (f *fakeEngine) Groups(context.Context) ([]engine.GroupStatus, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return append([]engine.GroupStatus(nil), f.groups...), nil
+}
+
+func (f *fakeEngine) setGroups(groups ...engine.GroupStatus) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.groups = groups
+}
+func (f *fakeEngine) Select(context.Context, string, string) error { return nil }
 func (f *fakeEngine) Delay(context.Context, string, string, time.Duration) (time.Duration, error) {
 	return 0, nil
 }
@@ -166,8 +176,6 @@ func testConfig(eng engine.Engine, guard Guard) Config {
 		Plan:          testPlan("session-1"),
 		Engine:        eng,
 		Guard:         guard,
-		Backoff:       engine.Backoff{Initial: time.Millisecond, Max: 2 * time.Millisecond, Factor: 1, Rand: func() float64 { return 0 }},
-		RestartBudget: engine.NewRestartBudget(3, time.Minute, nil),
 		StatsInterval: 5 * time.Millisecond,
 	}
 }
@@ -274,33 +282,7 @@ func TestSessionRestoresTheSystemWhenTheEngineWillNotStart(t *testing.T) {
 	}
 }
 
-func TestSessionReconnectsAndRecovers(t *testing.T) {
-	eng, guard := newFakeEngine(), &fakeGuard{}
-	session, err := New(testConfig(eng, guard))
-	if err != nil {
-		t.Fatalf("New() error = %v", err)
-	}
-	if err := session.Start(context.Background()); err != nil {
-		t.Fatalf("Start() error = %v", err)
-	}
-	eng.bus.Publish(engine.Event{Kind: engine.EventEngineDown, Err: errors.New("process exited")})
-
-	waitFor(t, 2*time.Second, func() bool {
-		applies, _, _ := eng.counts()
-		return session.State() == StateConnected && applies >= 2
-	})
-	if applies, _, _ := eng.counts(); applies < 2 {
-		t.Errorf("the engine was applied %d times, want a reconnect", applies)
-	}
-	if !containsState(stateSequence(session), StateReconnecting) {
-		t.Errorf("the session never reported reconnecting, states = %v", stateSequence(session))
-	}
-	if err := session.Stop(context.Background()); err != nil {
-		t.Fatalf("Stop() error = %v", err)
-	}
-}
-
-func TestSessionGivesUpWhenTheRestartBudgetIsSpent(t *testing.T) {
+func TestSessionFollowsTheSupervisorThroughARestart(t *testing.T) {
 	eng, guard := newFakeEngine(), &fakeGuard{}
 	session, err := New(testConfig(eng, guard))
 	if err != nil {
@@ -310,25 +292,53 @@ func TestSessionGivesUpWhenTheRestartBudgetIsSpent(t *testing.T) {
 		t.Fatalf("Start() error = %v", err)
 	}
 	defer func() { _ = session.Stop(context.Background()) }()
-	// The engine answers the first apply and then always fails, which is what a
-	// binary that dies on the first packet looks like from here.
-	eng.mu.Lock()
-	eng.apply = errors.New("the engine exited with status 2")
-	eng.mu.Unlock()
+	eng.bus.Publish(engine.Event{Kind: engine.EventEngineDown, Err: errors.New("process exited")})
+	waitFor(t, 2*time.Second, func() bool { return session.State() == StateReconnecting })
+	// The supervisor brings the engine back; the session only follows.
+	eng.bus.Publish(engine.Event{Kind: engine.EventState, State: engine.StateRunning})
+	waitFor(t, 2*time.Second, func() bool { return session.State() == StateConnected })
+	if applies, _, _ := eng.counts(); applies != 1 {
+		t.Errorf("the session applied the engine %d times; a restart is the supervisor's, not a second process", applies)
+	}
+}
 
-	deadline := time.Now().Add(3 * time.Second)
-	for time.Now().Before(deadline) {
-		if session.State() == StateFailed {
-			break
+func TestSessionFailsWhenTheSupervisorGivesUp(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	session, err := New(testConfig(eng, guard))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := session.Start(context.Background()); err != nil {
+		t.Fatalf("Start() error = %v", err)
+	}
+	defer func() { _ = session.Stop(context.Background()) }()
+	eng.bus.Publish(engine.Event{Kind: engine.EventEngineDown, Err: errors.New("process exited")})
+	eng.bus.Publish(engine.Event{Kind: engine.EventFatal, State: engine.StateFailed, Err: errors.New("more than 5 restarts")})
+	waitFor(t, 2*time.Second, func() bool { return session.State() == StateFailed })
+}
+
+func TestAnEngineStateIsNoSessionState(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	session, err := New(testConfig(eng, guard))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := session.Start(context.Background()); err != nil {
+		t.Fatalf("Start() error = %v", err)
+	}
+	defer func() { _ = session.Stop(context.Background()) }()
+	// Hot reload engine states must not change the session's connected
+	// state in the journal.
+	eng.bus.Publish(engine.Event{Kind: engine.EventState, State: engine.StateApplying})
+	eng.bus.Publish(engine.Event{Kind: engine.EventState, State: engine.StateRunning, Message: "plan applied"})
+	time.Sleep(50 * time.Millisecond)
+	for _, ev := range session.Journal().Since(0, 64) {
+		if ev.Kind == EventState && ev.State != StateConnecting && ev.State != StateConnected {
+			t.Errorf("the journal reports the session %s after an engine state", ev.State)
 		}
-		eng.bus.Publish(engine.Event{Kind: engine.EventEngineDown, Err: errors.New("process exited")})
-		time.Sleep(10 * time.Millisecond)
 	}
-	if session.State() != StateFailed {
-		t.Fatalf("state = %s, want failed once the budget is spent", session.State())
-	}
-	if key := session.Status().Key; key != errs.KeyEngineRestartSpent {
-		t.Errorf("status key = %q, want %q", key, errs.KeyEngineRestartSpent)
+	if session.State() != StateConnected {
+		t.Errorf("state = %s, want connected", session.State())
 	}
 }
 
@@ -357,7 +367,7 @@ func TestSessionReportsEngineEventsInTheJournal(t *testing.T) {
 func TestKillSwitchFollowsTheSession(t *testing.T) {
 	eng, guard := newFakeEngine(), &fakeGuard{}
 	cfg := testConfig(eng, guard)
-	cfg.Settings = Settings{KillSwitch: true, SystemProxy: true, TunnelMode: "system", Bypass: []string{"localhost"}}
+	cfg.Settings = Settings{KillSwitch: true, TunnelMode: "system", Bypass: []string{"localhost"}}
 	session, err := New(cfg)
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
@@ -365,8 +375,14 @@ func TestKillSwitchFollowsTheSession(t *testing.T) {
 	if err := session.Start(context.Background()); err != nil {
 		t.Fatalf("Start() error = %v", err)
 	}
+	guard.mu.Lock()
+	armedFirst := guard.applied[0].KillSwitch
+	guard.mu.Unlock()
+	if !armedFirst {
+		t.Error("the kill switch must be armed by the first guard change, before the engine starts")
+	}
 	status := session.Status()
-	if !status.KillSwitch || !status.SystemProxy || status.TunnelMode != "system" {
+	if !status.KillSwitch || status.TunnelMode != "system" {
 		t.Errorf("status = %+v, want the requested settings", status)
 	}
 	if err := session.SetKillSwitch(context.Background(), false); err != nil {
@@ -383,8 +399,122 @@ func TestKillSwitchFollowsTheSession(t *testing.T) {
 	}
 }
 
-// waitFor polls until cond holds or the budget runs out. A session runs its own
-// goroutine, so the tests wait for the machine instead of reaching into it.
+func TestKillSwitchRefusalPreservesTheReportedProtection(t *testing.T) {
+	for _, armed := range []bool{false, true} {
+		eng, guard := newFakeEngine(), &fakeGuard{}
+		cfg := testConfig(eng, guard)
+		cfg.Settings.KillSwitch = armed
+		session, err := New(cfg)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := session.Start(context.Background()); err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { _ = session.Stop(context.Background()) })
+		guard.mu.Lock()
+		guard.applyErr = errors.New("firewall transaction refused")
+		guard.mu.Unlock()
+		if err := session.SetKillSwitch(context.Background(), !armed); errs.KeyOf(err) != errs.KeyGuardFirewallFail {
+			t.Fatalf("toggle error = %v, want firewall refusal", err)
+		}
+		if session.Status().KillSwitch != guard.Current().KillSwitch {
+			t.Fatalf("reported protection changed after a refused firewall transaction: armed=%v", armed)
+		}
+		guard.mu.Lock()
+		guard.applyErr = nil
+		guard.mu.Unlock()
+		if err := session.SetKillSwitch(context.Background(), !armed); err != nil {
+			t.Fatal(err)
+		}
+		if session.Status().KillSwitch != !armed || guard.Current().KillSwitch != !armed {
+			t.Fatal("successful retry did not update protection and its reported state")
+		}
+	}
+}
+
+func TestFallbackMovesAreJournaled(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	cfg := testConfig(eng, guard)
+	cfg.Plan.Outbounds = append(cfg.Plan.Outbounds, engine.Outbound{
+		ID: "out-2", Name: "Paris", Protocol: engine.ProtocolVLESS, Server: "fr1.example.com", Port: 443,
+	})
+	cfg.Plan.Groups = []engine.Group{
+		{Name: "auto", Type: engine.GroupFallback, Outbounds: []string{"out-1", "out-2"}, URL: "https://cp.cloudflare.com/generate_204"},
+		{Name: "pick", Type: engine.GroupSelect, Outbounds: []string{"out-1", "out-2"}},
+	}
+	// at says which member a group uses and that it answers, unless dead.
+	at := func(group, member string, kind engine.GroupType, dead ...string) engine.GroupStatus {
+		latency := map[string]int{"out-1": 40, "out-2": 60}
+		for _, d := range dead {
+			latency[d] = 0
+		}
+		return engine.GroupStatus{Name: group, Type: kind, Selected: member, LatencyMS: latency}
+	}
+	eng.setGroups(at("auto", "out-1", engine.GroupFallback), at("pick", "out-1", engine.GroupSelect))
+	session, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := session.Start(context.Background()); err != nil {
+		t.Fatalf("Start() error = %v", err)
+	}
+	defer func() { _ = session.Stop(context.Background()) }()
+
+	moves := func() []GroupSwitch {
+		var out []GroupSwitch
+		for _, ev := range session.Journal().Since(0, 0) {
+			if ev.Kind == EventGroup {
+				out = append(out, *ev.Switch)
+			}
+		}
+		return out
+	}
+	settle := func() { time.Sleep(20 * groupLooks * cfg.StatsInterval) }
+	// Several looks pass before the change, and none of them reports the
+	// member the group started on.
+	settle()
+	if got := moves(); len(got) != 0 {
+		t.Fatalf("moves before any change = %v", got)
+	}
+	eng.setGroups(at("auto", "out-2", engine.GroupFallback, "out-1"), at("pick", "out-2", engine.GroupSelect))
+	waitFor(t, time.Second, func() bool { return len(moves()) == 1 })
+
+	// Both servers are down: mihomo shows the first member, which is not the
+	// main server coming back.
+	eng.setGroups(at("auto", "out-1", engine.GroupFallback, "out-1", "out-2"))
+	settle()
+	if got := moves(); len(got) != 1 {
+		t.Fatalf("a group with no server answering was reported as a move: %v", got)
+	}
+	eng.setGroups(at("auto", "out-1", engine.GroupFallback))
+	waitFor(t, time.Second, func() bool { return len(moves()) == 2 })
+	want := []GroupSwitch{
+		{Group: "auto", Previous: "out-1", Selected: "out-2"},
+		{Group: "auto", Previous: "out-2", Selected: "out-1"},
+	}
+	if got := moves(); got[0] != want[0] || got[1] != want[1] {
+		t.Errorf("moves = %v, want %v", got, want)
+	}
+
+	// The engine restarts and comes back on the backup; the first look
+	// after that only records it.
+	eng.bus.Publish(engine.Event{Kind: engine.EventEngineDown})
+	waitFor(t, time.Second, func() bool { return session.State() == StateReconnecting })
+	eng.setGroups(at("auto", "out-2", engine.GroupFallback, "out-1"))
+	settle()
+	eng.bus.Publish(engine.Event{Kind: engine.EventState, State: engine.StateRunning})
+	waitFor(t, time.Second, func() bool { return session.State() == StateConnected })
+	settle()
+	if got := moves(); len(got) != 2 {
+		t.Errorf("a restart was reported as a move: %v", got)
+	}
+	eng.setGroups(at("auto", "out-1", engine.GroupFallback))
+	waitFor(t, time.Second, func() bool { return len(moves()) == 3 })
+}
+
+// waitFor polls until cond succeeds or times out, allowing the session
+// goroutine to update state independently.
 func waitFor(t *testing.T, budget time.Duration, cond func() bool) {
 	t.Helper()
 	deadline := time.Now().Add(budget)
@@ -397,22 +527,36 @@ func waitFor(t *testing.T, budget time.Duration, cond func() bool) {
 	t.Fatalf("condition did not hold within %s", budget)
 }
 
-func stateSequence(s *Session) []State {
-	events := s.Journal().Since(0, 0)
-	out := make([]State, 0, len(events))
-	for _, ev := range events {
-		if ev.Kind == EventState {
-			out = append(out, ev.State)
-		}
+func TestSessionRefusesAnEngineThatRunsWithoutItsAdapter(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	cfg := testConfig(eng, guard)
+	cfg.Plan.Tun = engine.Tun{Enabled: true, DeviceName: engine.TunDevice}
+	var asked string
+	cfg.TunUp = func(_ context.Context, device string) error {
+		asked = device
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanTunnel, "no adapter")
 	}
-	return out
-}
-
-func containsState(states []State, want State) bool {
-	for _, state := range states {
-		if state == want {
-			return true
-		}
+	session, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
 	}
-	return false
+	err = session.Start(context.Background())
+	if errs.KeyOf(err) != errs.KeyPlanTunnel {
+		t.Fatalf("Start() = %v, want the tunnel refusal", err)
+	}
+	if asked != engine.TunDevice {
+		t.Errorf("the session waited for %q, want %q", asked, engine.TunDevice)
+	}
+	if session.State() == StateConnected {
+		t.Error("a session without its adapter must not report connected")
+	}
+	eng.mu.Lock()
+	stops := eng.stops
+	eng.mu.Unlock()
+	if stops == 0 {
+		t.Error("the engine kept running after the adapter failed to come up")
+	}
+	if _, restored := guard.snapshot(); restored == 0 {
+		t.Error("the guard was not restored")
+	}
 }

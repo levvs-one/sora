@@ -3,24 +3,25 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"maps"
+	"slices"
 	"sort"
 	"strings"
 )
 
 // Availability describes an engine build found on this machine.
 type Availability struct {
-	Kind    Kind
-	Path    string
-	Version Version
-	Usable  bool
-	Reason  string
+	Kind      Kind
+	Path      string
+	Version   Version
+	Usable    bool
+	Reason    string
+	BuildTags []string
 }
 
-// Catalog holds the capability matrix of the engines Sora knows about. The
-// matrix is static knowledge about upstream engines; Availability is what the
-// machine actually has. Every entry was checked against the engine's own
-// validator: mihomo v1.19.32 (-t), sing-box v1.14.2 (check) and Xray-core
-// v26.3.27 (run -test). See docs/architecture/engines.md.
+// Catalog holds upstream engine capabilities, separate from installed
+// Availability. Entries were validated with mihomo v1.19.32 (-t), sing-box
+// v1.14.2 (check), and Xray v26.3.27 (run -test).
 var Catalog = map[Kind]Capabilities{
 	KindMihomo: {
 		Kind:       KindMihomo,
@@ -41,8 +42,8 @@ var Catalog = map[Kind]Capabilities{
 	},
 	KindSingBox: {
 		Kind: KindSingBox,
-		// 1.12 introduced the DNS server and rule action formats the renderer
-		// writes; the legacy formats are gone in 1.14.
+		// The renderer requires DNS and rule-action formats added in
+		// 1.12; 1.14 removes the legacy formats.
 		MinVersion: "1.12.0",
 		Protocols: map[Protocol]bool{
 			ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
@@ -58,30 +59,48 @@ var Catalog = map[Kind]Capabilities{
 	},
 	KindXray: {
 		Kind: KindXray,
-		// Hysteria2, XHTTP and VLESS Encryption are recent; the floor is the
-		// build they were verified on, and Sora ships that build itself.
+		// The minimum version is the shipped build verified for
+		// Hysteria2, XHTTP, and VLESS Encryption.
 		MinVersion: "26.3.27",
 		Protocols: map[Protocol]bool{
 			ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 			ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolWireGuard: true,
-			ProtocolSOCKS5: true, ProtocolHTTP: true, ProtocolDirect: true,
+			ProtocolSOCKS5: true, ProtocolHTTP: true, ProtocolDirect: true, ProtocolXrayProfile: true,
 		},
 		Features: map[Feature]bool{
-			// Xray has a tun inbound but no automatic routes; tun sessions go to
-			// sing-box or mihomo, which own the routing table themselves.
+			// Xray TUN does not install routes; engine/tunroute
+			// supplies them on supported platforms (see
+			// catalog_*.go).
 			FeatureURLTest: true, FeatureLoadBalance: true, FeatureLatencyTest: true,
 			FeatureGeoData: true, FeatureTLSFragment: true,
-			FeatureXHTTP: true, FeatureVLESSEncrypt: true,
+			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
 		},
 	},
 }
 
-// DefaultPreference is the engine order Sora tries when the user has not
-// pinned one. sing-box comes first: the smallest memory footprint, a tun
-// stack that works the same on every platform and a native Android build.
-// Xray carries what nobody else does (XHTTP, VLESS Encryption). mihomo is the
-// most complete rule engine and carries fallback groups and providers.
+// BuildCapabilities keeps upstream and downstream builds distinct. A version
+// suffix alone cannot prove that an optional transport was compiled in.
+func BuildCapabilities(kind Kind, version Version, tags []string) Capabilities {
+	caps := Catalog[kind]
+	if kind == KindSingBox && strings.HasPrefix(version.PreRelease, "lx.") &&
+		!version.Less(Version{Major: 1, Minor: 14, Patch: 3}) {
+		caps.Features = maps.Clone(caps.Features)
+		caps.Features[FeatureXHTTP] = slices.Contains(tags, "with_xhttp")
+		caps.Features[FeatureVLESSEncrypt] = true
+		caps.Features[FeatureAmneziaWG] = slices.Contains(tags, "with_awg")
+	}
+	return caps
+}
+
+// DefaultPreference tries sing-box for low memory use, cross-platform TUN, and
+// native Android support, then Xray for XHTTP and VLESS Encryption, then mihomo
+// for fallback groups, providers, and routing.
 var DefaultPreference = []Kind{KindSingBox, KindXray, KindMihomo}
+
+// PrivatePreference prioritizes controllers inaccessible to other programs.
+// mihomo retains counters and connection tracking over a private socket; Xray
+// runs without a controller.
+var PrivatePreference = []Kind{KindSingBox, KindMihomo, KindXray}
 
 // ErrNoEngine reports that no available engine carries an outbound or a plan.
 var ErrNoEngine = errors.New("engine: no available engine carries this")
@@ -90,15 +109,13 @@ var ErrNoEngine = errors.New("engine: no available engine carries this")
 type Selection struct {
 	Kind   Kind
 	Reason string
-	// Rejected explains every engine that was skipped, in preference order.
-	// The interface shows it when the user wonders why another engine was
-	// picked or why an engine cannot be chosen at all.
+	// Rejected lists skipped engines in preference order so clients can
+	// explain selection failures.
 	Rejected []string
 }
 
-// SelectEngine picks the first engine in preference order that can carry the
-// whole plan. The reason and the missing capabilities are returned so the
-// interface can explain the choice instead of showing a bare error.
+// SelectEngine chooses the first available engine supporting the whole plan. It
+// returns rejection reasons and missing capabilities for clients.
 func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selection, error) {
 	if p == nil {
 		return Selection{}, fmt.Errorf("engine: nil plan")
@@ -126,6 +143,7 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 			rejected = append(rejected, string(kind)+": no capability matrix")
 			continue
 		}
+		caps = BuildCapabilities(kind, avail.Version, avail.BuildTags)
 		if lowest, err := ParseVersion(caps.MinVersion); err == nil && avail.Version.Less(lowest) {
 			rejected = append(rejected, fmt.Sprintf("%s: version %s is older than %s", kind, avail.Version, caps.MinVersion))
 			continue
@@ -144,10 +162,31 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 	return Selection{Rejected: rejected}, fmt.Errorf("engine: no engine can carry this plan (%s)", strings.Join(rejected, "; "))
 }
 
-// Missing lists, sorted, every protocol and feature of p this engine cannot
-// carry. An empty answer means the engine can run the whole plan.
+// Missing returns sorted protocols and features the engine cannot support.
+// Empty means the whole plan is supported.
 func (c Capabilities) Missing(p *Plan) []string {
 	var missing []string
+	if p.Tun.Enabled && p.Tun.Stack != "" {
+		if (c.Kind == KindXray && p.Tun.Stack != "gvisor") || (c.Kind == KindSingBox && p.Tun.Stack == "mips") {
+			missing = append(missing, "TUN stack "+p.Tun.Stack)
+		}
+	}
+	if c.Kind == KindXray {
+		for _, o := range p.Outbounds {
+			if o.TLS.Insecure && !o.TLS.Reality && (o.TLS.Enabled || o.Protocol == ProtocolTrojan || o.Protocol == ProtocolHysteria2) {
+				missing = append(missing, "TLS verification disabled (removed by Xray)")
+				break
+			}
+		}
+	}
+	if c.Kind == KindSingBox {
+		for _, o := range p.Outbounds {
+			if a := o.Amnezia; a != nil && (a.J1 != "" || a.J2 != "" || a.J3 != "" || a.Itime != 0) {
+				missing = append(missing, "AmneziaWG J1/J2/J3/Itime parameters")
+				break
+			}
+		}
+	}
 	for proto := range p.Protocols() {
 		if !c.SupportsProtocol(proto) {
 			missing = append(missing, "protocol "+string(proto))

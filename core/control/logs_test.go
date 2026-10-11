@@ -33,6 +33,11 @@ func (e *trackingEngine) CloseConnection(_ context.Context, id string) error {
 	return nil
 }
 
+func (e *trackingEngine) CloseConnections(context.Context) error {
+	e.closed = append(e.closed, "*")
+	return nil
+}
+
 func newLogServer(t *testing.T, eng engine.Engine) (*control.Server, *logs.Center, *secret.Store) {
 	t.Helper()
 	store, err := secret.Open(t.TempDir(), secret.Options{Protector: secret.FileProtector{}})
@@ -48,9 +53,8 @@ func newLogServer(t *testing.T, eng engine.Engine) (*control.Server, *logs.Cente
 	server, err := control.New(control.Config{
 		Version: control.Version{Major: 1, Minor: 2, MinSupportedMinor: 1}, Authenticator: auth, Secrets: store, Logs: center,
 		Sessions: session.NewManager(session.ManagerConfig{
+			TunUp:   noAdapter,
 			Factory: func(context.Context, *engine.Plan) (engine.Engine, error) { return eng, nil },
-			Backoff: engine.Backoff{Initial: time.Millisecond, Max: time.Millisecond, Factor: 1},
-			Budget:  func() *engine.RestartBudget { return engine.NewRestartBudget(2, time.Minute, nil) },
 		}),
 	})
 	if err != nil {
@@ -173,5 +177,27 @@ func TestConnectionCenterListsAndCloses(t *testing.T) {
 	}
 	if _, err := server.CloseConnection(ctx, &corev1.CloseConnectionRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken, ConnectionId: "c1"}); err != nil || len(eng.closed) != 1 {
 		t.Fatalf("close = %v, closed %v", err, eng.closed)
+	}
+}
+
+func TestExportCategoryAndFilterApplyToEveryFormat(t *testing.T) {
+	server, center, _ := newLogServer(t, newStubEngine())
+	center.Write(time.Now(), logs.LevelError, "xray", "TUN failed: wanted")
+	center.Write(time.Now(), logs.LevelInfo, "xray", "TUN ready")
+	center.Write(time.Now(), logs.LevelError, "mihomo", "TUN failed: other")
+	for _, format := range []corev1.LogExportFormat{corev1.LogExportFormat_LOG_EXPORT_FORMAT_UNSPECIFIED, corev1.LogExportFormat_LOG_EXPORT_FORMAT_LOG, corev1.LogExportFormat_LOG_EXPORT_FORMAT_JSON, corev1.LogExportFormat_LOG_EXPORT_FORMAT_JSON_LINES, corev1.LogExportFormat_LOG_EXPORT_FORMAT_CSV, corev1.LogExportFormat_LOG_EXPORT_FORMAT_XML, corev1.LogExportFormat_LOG_EXPORT_FORMAT_ZIP, corev1.LogExportFormat_LOG_EXPORT_FORMAT_GZIP} {
+		answer, err := server.ExportLogs(context.Background(), &corev1.ExportLogsRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken, Format: format, Category: "tun", Filter: &corev1.LogFilter{MinLevel: corev1.LogLevel_LOG_LEVEL_ERROR, Sources: []string{"xray"}, Contains: "wanted", Pattern: "tun"}})
+		if err != nil || answer.GetError() != nil || !strings.HasPrefix(answer.GetFileName(), "sora-log_tun_") || len(answer.GetData()) == 0 {
+			t.Fatalf("format %v = %+v, %v", format, answer, err)
+		}
+		if format != corev1.LogExportFormat_LOG_EXPORT_FORMAT_ZIP && format != corev1.LogExportFormat_LOG_EXPORT_FORMAT_GZIP {
+			if !strings.Contains(string(answer.GetData()), "wanted") || strings.Contains(string(answer.GetData()), "other") || strings.Contains(string(answer.GetData()), "ready") {
+				t.Fatalf("filter ignored in %v: %s", format, answer.GetData())
+			}
+		}
+	}
+	bad, err := server.ExportLogs(context.Background(), &corev1.ExportLogsRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken, Category: "../secret"})
+	if err != nil || bad.GetError() == nil {
+		t.Fatalf("unsafe category = %+v, %v", bad, err)
 	}
 }

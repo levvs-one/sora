@@ -1,6 +1,7 @@
 package guard_test
 
 import (
+	"net/netip"
 	"runtime"
 	"strings"
 	"testing"
@@ -8,10 +9,9 @@ import (
 	"github.com/levvs-one/sora-client/core/guard"
 )
 
-// TestNftRulesetKeepsTheEngineAndCutsEverythingElse is the property the whole
-// package exists for, written down where it can be read on any machine: the
-// engine keeps its own traffic, the local network stays reachable, and everything
-// else going out is dropped.
+// TestNftRulesetKeepsTheEngineAndCutsEverythingElse checks engine and
+// local-network exemptions followed by a final output drop without host
+// privileges.
 func TestNftRulesetKeepsTheEngineAndCutsEverythingElse(t *testing.T) {
 	ruleset := guard.NftRuleset(999, []string{"192.168.0.0/16"})
 	wants := []string{
@@ -19,8 +19,9 @@ func TestNftRulesetKeepsTheEngineAndCutsEverythingElse(t *testing.T) {
 		"chain output {",
 		"policy accept;",
 		"meta skuid 999 accept",
-		"iif lo accept",
-		"ct state established,related accept",
+		"oif lo accept",
+		`oifname "sora0" accept`,
+		"ct direction reply ct state established,related accept",
 		"ip daddr 192.168.0.0/16 accept",
 		"counter drop",
 	}
@@ -29,9 +30,9 @@ func TestNftRulesetKeepsTheEngineAndCutsEverythingElse(t *testing.T) {
 			t.Errorf("the ruleset does not contain %q:\n%s", want, ruleset)
 		}
 	}
-	// The drop must come after every exception: a kill switch whose counter line
-	// sits above the engine rule would cut the tunnel off with everything else.
-	if strings.Index(ruleset, "counter drop") < strings.Index(ruleset, "meta skuid 999 accept") {
+	// The final drop must follow every exception to keep tunnel traffic
+	// working.
+	if strings.LastIndex(ruleset, "counter drop") < strings.Index(ruleset, "meta skuid 999 accept") {
 		t.Error("the drop rule comes before the engine exception")
 	}
 }
@@ -46,9 +47,8 @@ func TestNftRulesetKeepsPrivateSpaceByDefault(t *testing.T) {
 }
 
 func TestNftRemoveIsSafeToRunTwice(t *testing.T) {
-	// Deleting a table that is not there is an error in nft, and the firewall must
-	// turn that into success, because a restore runs on every exit path and a
-	// second restore has to be a no-op rather than a failure a user would see.
+	// Treat nft's missing-table error as success because every exit path
+	// can restore more than once.
 	if !strings.HasPrefix(strings.TrimSpace(guard.NftRemove()), "delete table inet sora") {
 		t.Errorf("the remove ruleset is %q", guard.NftRemove())
 	}
@@ -64,31 +64,59 @@ func TestFirstLineKeepsAnNftMessageShort(t *testing.T) {
 }
 
 func TestPlatformFirewallRefusesAnEngineWithoutAUser(t *testing.T) {
-	if _, err := guard.PlatformFirewall(-1, nil); err == nil {
+	if runtime.GOOS != "linux" {
+		// Validate UIDs only on Linux; os.Getuid returns -1 on other
+		// platforms.
+		t.Skip("the engine is matched by user id on Linux only")
+	}
+	if _, err := guard.PlatformFirewall(guard.FirewallOptions{EngineUID: -1}); err == nil {
 		t.Error("a kill switch accepted an engine without a user id")
 	}
 }
 
 func TestPlatformFirewallIsUsable(t *testing.T) {
-	if runtime.GOOS == "linux" {
-		// On Linux the platform firewall is the nftables table: arming it needs
-		// root and changes the firewall of the machine running the tests. The
-		// ruleset itself is covered by the rendering tests in this file.
+	switch runtime.GOOS {
+	case "linux":
+		// Skip host firewall changes requiring Linux root; rendering
+		// tests cover the ruleset.
 		t.Skip("the Linux kill switch is nftables; arming it in a test would change this machine")
+	case "windows":
+		t.Skip("the Windows kill switch blocks for real; firewall_windows_test.go checks what it lets through")
 	}
-	firewall, err := guard.PlatformFirewall(1000, nil)
+	firewall, err := guard.PlatformFirewall(guard.FirewallOptions{EngineUID: 1000})
 	if err != nil {
 		t.Fatalf("PlatformFirewall() error = %v", err)
 	}
 	if firewall == nil {
 		t.Fatal("PlatformFirewall() returned nothing")
 	}
-	// Arming and disarming must both succeed on a platform that has no blocking
-	// mechanism, because a session on Android asks for it on every connect.
+	// Noop arm and disarm must succeed because Android sessions invoke them
+	// on every connection.
 	if err := firewall.Arm(testContext(), []uint16{7890}); err != nil {
 		t.Errorf("Arm() on a platform without a firewall = %v", err)
 	}
 	if err := firewall.Disarm(testContext()); err != nil {
 		t.Errorf("Disarm() = %v", err)
+	}
+}
+
+func TestDNSAndTunnelDestinationsPrecedeLANPermits(t *testing.T) {
+	rules := guard.NftRuleset(999, []string{"0.0.0.0/0", "::/0"},
+		netip.MustParsePrefix("192.0.2.0/30"), netip.MustParsePrefix("2001:db8:5340::/126"), netip.MustParsePrefix("198.18.0.0/16"))
+	permit := strings.Index(rules, "ip daddr 0.0.0.0/0 accept")
+	tunnel := strings.Index(rules, `oifname "sora0" accept`)
+	for _, block := range []string{"th dport 53 counter drop", "ip daddr 192.0.2.0/30 counter drop", "ip6 daddr 2001:db8:5340::/126 counter drop", "ip daddr 198.18.0.0/16 counter drop"} {
+		i := strings.Index(rules, block)
+		if i <= tunnel || i >= permit {
+			t.Fatalf("missing or misplaced block: %s", block)
+		}
+	}
+}
+
+func TestLegacyFakeIPCannotUseEngineOrLANPermits(t *testing.T) {
+	rules := guard.NftRuleset(999, []string{"0.0.0.0/0"})
+	block := strings.Index(rules, "ip daddr 172.19.0.0/16 counter drop")
+	if block <= strings.Index(rules, `oifname "sora0" accept`) || block >= strings.Index(rules, "meta skuid 999 accept") || block >= strings.Index(rules, "ip daddr 0.0.0.0/0 accept") {
+		t.Fatal("legacy fake addresses must leave only through Sora TUN")
 	}
 }

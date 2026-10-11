@@ -5,11 +5,15 @@ on:
     branches: [legacy]
     paths:
       - 'legacy/**'
+      - 'core/**'
+      - 'proto/**'
       - '.github/workflows/legacy.yml'
   pull_request:
     branches: [legacy]
     paths:
       - 'legacy/**'
+      - 'core/**'
+      - 'proto/**'
       - '.github/workflows/legacy.yml'
 
 permissions:
@@ -20,6 +24,65 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  control-windows:
+    name: Legacy RPC (${{ matrix.platform }})
+    runs-on: windows-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: '386'
+            platform: x86
+          - arch: amd64
+            platform: x64
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.9
+          cache: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.424
+      - name: Build verified Windows 7 SDK
+        shell: pwsh
+        run: |
+          $env:GOROOT_BOOTSTRAP = go env GOROOT
+          $sdk = Join-Path $env:RUNNER_TEMP 'go-win7-1.26.9'
+          $archive = Join-Path $env:RUNNER_TEMP 'go-win7.zip'
+          Invoke-WebRequest 'https://github.com/XTLS/go-win7/releases/download/current/go-win7-win6-1.26.zip' -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne '4a8ea74640bcdf608fbe351b3eaa5715685b18ec0b0d27e8d59608ade86c8397') { throw 'Unverified Go SDK source' }
+          Expand-Archive $archive $sdk
+          if ((Get-Content "$sdk\VERSION" -First 1) -ne 'go1.26.9') { throw 'Unexpected Go SDK version' }
+          $env:CGO_ENABLED = '0'
+          $env:GOTOOLCHAIN = 'local'
+          Push-Location "$sdk\src"
+          try { cmd /c make.bat; if ($LASTEXITCODE -ne 0) { throw 'Windows 7 SDK build failed' } }
+          finally { Pop-Location }
+          "$sdk\bin" >> $env:GITHUB_PATH
+          "GOROOT=$sdk" >> $env:GITHUB_ENV
+          'GOTOOLCHAIN=local' >> $env:GITHUB_ENV
+      - name: Build .NET Framework control client
+        run: dotnet build legacy/tests/ControlInterop/ControlInterop.csproj -c Release -p:PlatformTarget=${{ matrix.platform }} --nologo
+      - name: Exercise native named pipes and x86 ABI
+        working-directory: core
+        env:
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: '0'
+        shell: pwsh
+        run: |
+          $env:SORA_INTEROP_CLIENT = (Resolve-Path '../legacy/tests/ControlInterop/bin/Release/net48/ControlInterop.exe').Path
+          go test -v ./legacycontrol ./ipc ./diagnostics ./cmd/sora-core
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy contract failed' }
+          go build -trimpath -ldflags '-s -w -X main.buildVersion=legacy-dev' -o ../legacy/artifacts/sora-legacy-core-${{ matrix.platform }}.exe ./cmd/sora-core
+          if ($LASTEXITCODE -ne 0) { throw 'Legacy core build failed' }
+      - uses: actions/upload-artifact@v6
+        with:
+          name: sora-legacy-core-${{ matrix.platform }}
+          path: legacy/artifacts/sora-legacy-core-${{ matrix.platform }}.exe
+          if-no-files-found: error
+
   windows-x86:
     name: ${{ matrix.executable }}
     runs-on: windows-latest

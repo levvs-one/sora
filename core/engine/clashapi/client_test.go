@@ -12,8 +12,7 @@ import (
 	"time"
 )
 
-// recorded keeps the last request seen by the fake controller so that tests can
-// assert on real wire details instead of on the client's internals.
+// recorded stores the fake controller's last request for wire-level assertions.
 type recorded struct {
 	method, path, escapedPath, query, body, auth string
 }
@@ -84,6 +83,37 @@ func TestSelectSendsTheDocumentedRequest(t *testing.T) {
 	}
 }
 
+// TestGroupsTakeEachMembersOwnCheck feeds the shape mihomo 1.19.32 returns:
+// a group's history has no member names, each member keeps its own, and checks
+// against the group's URL sit under extra.
+func TestGroupsTakeEachMembersOwnCheck(t *testing.T) {
+	const url = "http://127.0.0.1:18099/"
+	client, _ := newTestServer(t, func(w http.ResponseWriter, _ *http.Request) {
+		check := func(delay int) []map[string]any {
+			return []map[string]any{{"time": "2026-10-08T08:07:08Z", "delay": delay}}
+		}
+		jsonReply(w, http.StatusOK, map[string]any{"proxies": map[string]any{
+			"fb":     map[string]any{"type": "Fallback", "now": "dead", "all": []string{"dead", "spare", "near", "other"}, "testUrl": url, "history": check(40)},
+			"dead":   map[string]any{"type": "Shadowsocks", "alive": true, "history": check(90), "extra": map[string]any{url: map[string]any{"alive": false, "history": check(0)}}},
+			"spare":  map[string]any{"type": "Shadowsocks", "alive": false, "extra": map[string]any{url: map[string]any{"alive": true, "history": check(52)}}},
+			"near":   map[string]any{"type": "Direct", "alive": true, "extra": map[string]any{url: map[string]any{"alive": true, "history": check(0)}}},
+			"other":  map[string]any{"type": "Shadowsocks", "history": check(70)},
+			"GLOBAL": map[string]any{"type": "Selector", "now": "fb", "all": []string{"fb"}},
+		}})
+	})
+	groups, err := client.Groups(context.Background())
+	if err != nil {
+		t.Fatalf("Groups: %v", err)
+	}
+	if len(groups) != 1 {
+		t.Fatalf("groups = %+v, want only fb", groups)
+	}
+	got := groups[0].LatencyMS
+	if got["dead"] != 0 || got["spare"] != 52 || got["near"] != 1 || got["other"] != 70 {
+		t.Errorf("latency = %v, want dead 0 by the group's URL, spare 52, near 1, other 70 by default", got)
+	}
+}
+
 func TestDelaySendsMillisecondsAndMapsFailures(t *testing.T) {
 	delayReply := 137
 	client, rec := newTestServer(t, func(w http.ResponseWriter, _ *http.Request) {
@@ -137,7 +167,8 @@ func TestReloadPayloadUsesForceAndPayload(t *testing.T) {
 	}
 }
 
-// The bodies are real answers of mihomo 1.19.32 and sing-box 1.14.2.
+// TestListConnectionsReadsBothEngines checks real mihomo 1.19.32 and sing-box
+// 1.14.2 responses.
 func TestListConnectionsReadsBothEngines(t *testing.T) {
 	for name, body := range map[string]string{
 		"mihomo":   `{"downloadTotal":206756,"uploadTotal":1785,"connections":[{"id":"d86b2537","metadata":{"network":"tcp","type":"Socks5","sourceIP":"127.0.0.1","destinationIP":"","sourcePort":"47524","destinationPort":"443","host":"speed.cloudflare.com","process":"","processPath":"/usr/bin/curl","sniffHost":""},"upload":1785,"download":206756,"start":"2026-10-06T15:16:05.577928007+03:00","chains":["Tokyo","Proxy"],"rule":"Match","rulePayload":""}]}`,

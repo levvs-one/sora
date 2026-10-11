@@ -154,6 +154,19 @@ func TestDestinationsAreHiddenUnlessRecorded(t *testing.T) {
 	}
 }
 
+func TestDefaultRecordsDestinationsAndCanBeDisabled(t *testing.T) {
+	c := New(DefaultSettings())
+	c.Write(t0, LevelInfo, "xray", "dial www.example.org:443")
+	settings := c.Settings()
+	settings.RecordDestinations = false
+	c.SetSettings(settings)
+	c.Write(t0.Add(time.Minute), LevelInfo, "xray", "dial www.example.org:443")
+	entries := c.Query(Filter{}, 0, 10).Entries
+	if len(entries) != 2 || entries[0].Message != "dial [destination]" || entries[1].Message != "dial www.example.org:443" {
+		t.Fatalf("destination recording = %+v", entries)
+	}
+}
+
 func TestExportFormats(t *testing.T) {
 	entries := []Entry{
 		{Seq: 1, Time: t0, Level: LevelError, Source: "xray", Message: "=HYPERLINK(\"x\")", Repeat: 3},

@@ -1,5 +1,10 @@
 package engine
 
+import (
+	"encoding/json"
+	"net/netip"
+)
+
 // Limits mirror the sora.core.v1 contract. A plan that exceeds them is
 // rejected before any engine sees it.
 const (
@@ -28,10 +33,14 @@ const (
 	ProtocolSOCKS5      Protocol = "socks5"
 	ProtocolHTTP        Protocol = "http"
 	ProtocolAnyTLS      Protocol = "anytls"
-	// ProtocolBypass reaches sites directly, with the TLS and HTTP handshake
-	// reshaped by zapret so that DPI does not recognise the site. No server.
+	// ProtocolBypass reshapes direct TLS and HTTP handshakes with zapret to
+	// evade DPI. It requires no server.
 	ProtocolBypass Protocol = "bypass"
-	ProtocolDirect Protocol = "direct"
+	// ProtocolXrayProfile runs a provider's full Xray configuration within
+	// the session, preserving outbounds, balancers, and routing. Only Xray
+	// supports it.
+	ProtocolXrayProfile Protocol = "xray-profile"
+	ProtocolDirect      Protocol = "direct"
 )
 
 // GroupType is how the engine chooses between the members of a group.
@@ -53,8 +62,8 @@ type TLS struct {
 	Fingerprint string
 	Insecure    bool
 	Reality     bool
-	// Reality parameters. None of them is a secret, but they are still
-	// masked in logs because they identify one server.
+	// RealityPublicKey and other REALITY parameters are public but masked
+	// because they identify a server.
 	RealityPublicKey string
 	RealityShortID   string
 	SpiderX          string
@@ -91,11 +100,14 @@ type Outbound struct {
 	Protocol  Protocol
 	Transport Transport
 	TLS       TLS
+	// SOCKSUDP enables UDP on a SOCKS5 peer known to support associations.
+	SOCKSUDP bool
 
 	Server string
 	Port   uint16
 
-	// Everything below is secret material and is masked in logs and events.
+	// UUID and the following credential fields must be masked in logs and
+	// events.
 	UUID       string
 	Password   string
 	Cipher     string
@@ -106,8 +118,8 @@ type Outbound struct {
 	PrivateKey string
 	PublicKey  string
 	ShortID    string
-	// Encryption is the VLESS encryption setting. Empty and "none" mean
-	// none; anything else is the post-quantum VLESS Encryption of Xray.
+	// Encryption configures VLESS. Empty or "none" disables it; other
+	// values use Xray's post-quantum VLESS Encryption.
 	Encryption string
 
 	Peers []WireGuardPeer
@@ -116,8 +128,11 @@ type Outbound struct {
 	Amnezia *AmneziaWG
 	// Bypass is the strategy of a bypass outbound.
 	Bypass *BypassStrategy
-	// Addresses are the interface addresses of a WireGuard outbound, in CIDR
-	// form. A WireGuard tunnel cannot carry traffic without them.
+	// Profile contains a provider's Xray configuration and credentials, so
+	// the entire value is secret.
+	Profile json.RawMessage
+	// Addresses lists WireGuard interface CIDRs, required for the tunnel to
+	// carry traffic.
 	Addresses []string
 
 	// Tags come from subscriptions and drive grouping in the interface.
@@ -208,10 +223,15 @@ type DNS struct {
 	HijackTun        []string
 }
 
+// TunDevice names Sora's adapter to avoid collisions and allow startup checks.
+const TunDevice = "sora0"
+
 // Tun is the virtual network interface setup of the plan.
 type Tun struct {
+	IPv4             netip.Prefix
+	IPv6             netip.Prefix
 	Enabled          bool
-	Stack            string // system, gvisor, mixed
+	Stack            string // system, gvisor, mixed, mips (mihomo or Xray bridge)
 	DeviceName       string
 	MTU              int
 	StrictRoute      bool
@@ -221,13 +241,13 @@ type Tun struct {
 	ExcludeApps      []string
 }
 
-// AmneziaWG holds the obfuscation parameters of an AmneziaWG tunnel, named as
-// the AmneziaWG configuration file names them. Every value must match the
-// server; zero values are not written, so the engine keeps its own default.
+// AmneziaWG holds configuration-file obfuscation parameters that must match the
+// server. Zero values are omitted to retain engine defaults.
 type AmneziaWG struct {
 	Jc, Jmin, Jmax int
 	S1, S2, S3, S4 int
-	// H1..H4 are message type headers: a number, or a range in AmneziaWG 2.0.
+	// H1..H4 are message type headers: a number, or a range in AmneziaWG
+	// 2.0.
 	H1, H2, H3, H4 string
 	// I1..I5 are the signature packets of AmneziaWG 1.5 and 2.0.
 	I1, I2, I3, I4, I5 string
@@ -235,9 +255,9 @@ type AmneziaWG struct {
 	Itime              int
 }
 
-// BypassStrategy is how zapret reshapes a handshake. Positions follow zapret:
-// a number of bytes, negative from the end, or a marker (method, host,
-// endhost, sld, midsld, endsld, sniext) with an optional +N or -N.
+// BypassStrategy defines zapret handshake shaping. Positions are byte offsets,
+// negative from the end, or markers (method, host, endhost, sld, midsld,
+// endsld, sniext) with optional +N or -N.
 type BypassStrategy struct {
 	SplitPos []string
 	// Disorder sends the second part of a split first.
@@ -246,27 +266,26 @@ type BypassStrategy struct {
 	OOB bool
 	// TLSRecord splits the ClientHello into two TLS records at a position.
 	TLSRecord string
-	// HostCase, DomainCase and MethodEOL reshape plain HTTP requests.
+	// HostCase reshapes HTTP header casing; DomainCase and MethodEOL also
+	// reshape plain HTTP requests.
 	HostCase   bool
 	DomainCase bool
 	MethodEOL  bool
 }
 
-// Fragment splits the TLS ClientHello of proxy connections into several TCP
-// segments. It defeats DPI boxes that match the SNI of a single segment, which
-// is how most SNI blocking in Russia, Iran and China works today.
+// Fragment splits proxy TLS ClientHello messages across TCP segments to evade
+// SNI matching on a single segment.
 type Fragment struct {
 	Enabled bool
-	// Packets, Length and Interval follow Xray: "tlshello" or a range of TCP
-	// segments such as "1-3", the segment length in bytes ("100-200") and
-	// the pause between segments in milliseconds ("10-20"). Engines that only
-	// know an on/off switch use Enabled alone.
+	// Packets selects Xray segments ("tlshello" or "1-3"); Length sets
+	// bytes ("100-200") and Interval sets milliseconds ("10-20"). Engines
+	// with only a switch use Enabled.
 	Packets  string
 	Length   string
 	Interval string
 }
 
-// Options are the engine-wide switches of a plan.
+// Options configures engine-wide plan settings.
 type Options struct {
 	LogLevel       string
 	Mode           string // rule, global, direct
@@ -282,15 +301,13 @@ type Options struct {
 	Fragment       Fragment
 }
 
-// LocalProxy is the loopback HTTP and SOCKS5 listener of a session. Any
-// application on the machine can reach a loopback port, send traffic through
-// it and learn the address of the server behind it, which is how apps find
-// and report VPN servers. The listener therefore exists only when the session
-// needs it (system proxy mode) or the user asked for it.
+// LocalProxy opens a loopback HTTP/SOCKS5 listener only for system proxy mode
+// or explicit requests. Other local applications can use it and discover the
+// upstream server address.
 type LocalProxy struct {
 	Enabled bool
-	// Username and Password require a login. A system proxy cannot carry one,
-	// so a login fits a listener the user hands to chosen applications.
+	// Username and Password restrict the listener to authenticated
+	// applications. System proxies cannot supply a login.
 	Username string
 	Password string
 }
@@ -301,9 +318,8 @@ type Plan struct {
 	// Engines is the engine preference of this session, best first. Empty
 	// uses the core default; a single entry pins that engine.
 	Engines []Kind
-	// PrivateControl keeps every engine control channel off the network: the
-	// session runs only on an engine controlled through a unix socket or a
-	// named pipe, so a port scan finds nothing that answers.
+	// PrivateControl requires Unix sockets, named pipes, or no controller,
+	// preventing discovery through listening network ports.
 	PrivateControl bool
 	LocalProxy     LocalProxy
 

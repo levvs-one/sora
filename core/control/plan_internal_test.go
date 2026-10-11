@@ -12,12 +12,11 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	"github.com/levvs-one/sora-client/core/parser"
+	"github.com/levvs-one/sora-client/core/session"
 )
 
-// TestRealityAndTransportSurviveTheVault follows one share link from import to
-// the engine plan. Before the fix the REALITY key, the transport path and the
-// XHTTP mode were stored but never read back, so every REALITY server failed
-// to connect on every engine.
+// TestRealityAndTransportSurviveTheVault checks that REALITY keys, transport
+// paths, and XHTTP mode survive import and credential resolution.
 func TestRealityAndTransportSurviveTheVault(t *testing.T) {
 	link := "vless://b831381d-6324-4d53-ad4f-8cda48b30811@edge.example.com:443?type=xhttp&security=reality" +
 		"&pbk=Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw&sid=6ba85179e30d4fc2&sni=www.example.com&fp=chrome" +
@@ -220,7 +219,8 @@ func TestEveryEngineAcceptsAPlanWithGroupsAndAPreset(t *testing.T) {
 			in := &corev1.SessionPlan{
 				TunnelMode: corev1.TunnelMode_TUNNEL_MODE_APPLICATION,
 				Engines:    []string{kind},
-				// sing-box and Xray are controlled over loopback ports only.
+				// sing-box and Xray are controlled over
+				// loopback ports only.
 				NetworkControlAllowed: kind != "mihomo",
 				Outbounds:             []*corev1.OutboundSpec{{Id: "a", Protocol: "direct"}, {Id: "b", Protocol: "direct"}},
 				Groups: []*corev1.GroupSpec{
@@ -262,5 +262,146 @@ func TestPlanCarriesABypassOutbound(t *testing.T) {
 	in.Outbounds[0].Bypass = &corev1.BypassStrategy{SplitPos: []string{"1 --debug=@/tmp/x"}}
 	if _, err := planFromProto(in, "s", nil); err == nil {
 		t.Fatal("a split position carrying an option must be refused")
+	}
+}
+
+func TestTunPlanGetsResolversWhenItNamesNone(t *testing.T) {
+	plan := func(mode corev1.TunnelMode, servers ...string) *corev1.SessionPlan {
+		return &corev1.SessionPlan{
+			TunnelMode: mode,
+			Outbounds:  []*corev1.OutboundSpec{{Id: "a", Protocol: "direct"}},
+			DnsPolicy:  &corev1.DnsPolicy{Servers: servers},
+		}
+	}
+	p, err := planFromProto(plan(corev1.TunnelMode_TUNNEL_MODE_SYSTEM), "s", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !p.DNS.Enabled || len(p.DNS.Servers) != 2 || p.DNS.Servers[0].Transport != engine.DNSHTTPS {
+		t.Fatalf("a tun plan without resolvers must get the defaults: %+v", p.DNS)
+	}
+	p, err = planFromProto(plan(corev1.TunnelMode_TUNNEL_MODE_SYSTEM, "tls://dns.example:853"), "s", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(p.DNS.Servers) != 1 || p.DNS.Servers[0].Address != "dns.example" {
+		t.Fatalf("the person's resolver replaces the defaults: %+v", p.DNS)
+	}
+	p, err = planFromProto(plan(corev1.TunnelMode_TUNNEL_MODE_APPLICATION), "s", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.DNS.Enabled {
+		t.Fatalf("a proxy plan resolves through the system unless asked: %+v", p.DNS)
+	}
+}
+
+func TestPlanCarriesTheIPv6Choice(t *testing.T) {
+	in := &corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_APPLICATION,
+		Outbounds:  []*corev1.OutboundSpec{{Id: "a", Protocol: "direct"}},
+	}
+	p, err := planFromProto(in, "s", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.Options.IPv6 {
+		t.Fatal("IPv6 is off unless asked for")
+	}
+	in.Ipv6 = true
+	if p, _ = planFromProto(in, "s", nil); !p.Options.IPv6 {
+		t.Fatal("the IPv6 choice must reach the engine options")
+	}
+}
+
+func TestTunStackReachesTheEngineAndRejectsInvalidChoices(t *testing.T) {
+	in := &corev1.SessionPlan{TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		Outbounds: []*corev1.OutboundSpec{{Id: "out", Protocol: "direct"}}}
+	for _, stack := range []string{"", "system", "gvisor", "mixed", "mips"} {
+		in.TunStack = stack
+		p, err := planFromProto(in, "stack", nil)
+		if err != nil || p.Tun.Stack != stack {
+			t.Fatalf("stack %q was lost: %+v, %v", stack, p, err)
+		}
+	}
+	in.TunStack = "unknown"
+	if _, err := planFromProto(in, "stack", nil); err == nil {
+		t.Fatal("an unknown stack must be refused")
+	}
+	in.TunStack, in.TunnelMode = "system", corev1.TunnelMode_TUNNEL_MODE_APPLICATION
+	if _, err := planFromProto(in, "stack", nil); err == nil {
+		t.Fatal("a stack cannot be silently ignored in proxy mode")
+	}
+}
+
+func TestAProfileSurvivesTheVault(t *testing.T) {
+	profile := `{"remarks":"x","outbounds":[{"protocol":"vless","tag":"proxy"}],"routing":{"rules":[]}}`
+	packed, err := packProfile(profile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	back, err := unpackProfile(packed)
+	if err != nil || string(back) != profile {
+		t.Fatalf("round trip = %q, %v", back, err)
+	}
+	if _, err := unpackProfile("not base64"); err == nil {
+		t.Fatal("an unreadable profile must be refused")
+	}
+}
+
+func TestARuleCanNameAProgram(t *testing.T) {
+	in := &corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		Outbounds:  []*corev1.OutboundSpec{{Id: "a", Protocol: "direct"}},
+		Routes:     []*corev1.RoutingRule{{Destination: "process:telegram-desktop", OutboundId: "direct"}},
+	}
+	p, err := planFromProto(in, "s", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r := p.Rules[0]; r.Type != engine.RuleProcess || r.Value != "telegram-desktop" {
+		t.Fatalf("rule = %+v", r)
+	}
+}
+
+func TestConnectCarriesTheKillSwitchToTheSession(t *testing.T) {
+	plan := &corev1.SessionPlan{TunnelMode: corev1.TunnelMode_TUNNEL_MODE_APPLICATION}
+	if got := sessionSettings(&corev1.ConnectRequest{SessionPlan: plan, KillSwitch: true}); !got.KillSwitch || got.TunnelMode != "application" {
+		t.Errorf("settings = %+v, want the kill switch armed in application mode", got)
+	}
+	if sessionSettings(&corev1.ConnectRequest{SessionPlan: plan}).KillSwitch {
+		t.Error("a Connect without the flag must leave the kill switch off")
+	}
+}
+
+func TestGroupSwitchReachesTheWire(t *testing.T) {
+	out := toWireEvent(session.Event{Sequence: 7, Kind: session.EventGroup,
+		Switch: &session.GroupSwitch{Group: "auto", Previous: "out-1", Selected: "out-2"}}, nil)
+	moved := out.GetGroupSwitched()
+	if moved.GetGroup() != "auto" || moved.GetPrevious() != "out-1" || moved.GetSelected() != "out-2" || out.GetSequence() != 7 {
+		t.Errorf("event = %v", out)
+	}
+}
+
+func TestProfileDisplayMetadataKeepsAdapterAndCredentialsPrivate(t *testing.T) {
+	payload := `{"remarks":"Edge","outbounds":[{"protocol":"vless","settings":{"vnext":[{"address":"edge.example.com","port":443,"users":[{"id":"b831381d-6324-4d53-ad4f-8cda48b30811"}]}]},"streamSettings":{"network":"xhttp","security":"reality"}},{"protocol":"freedom"}]}`
+	result, err := parser.LinkParser{}.Parse([]byte(payload))
+	if err != nil || len(result.Servers) != 1 {
+		t.Fatalf("Parse = %+v, %v", result, err)
+	}
+	wire := outboundToProto(result.Servers[0], "vault:edge")
+	if wire.Protocol != "xray-profile" || wire.DisplayProtocol != "vless" || wire.Transport != "xhttp" || wire.Security != "reality" {
+		t.Fatalf("display metadata = %v", wire)
+	}
+	if wire.Credentials.Reference != "vault:edge" {
+		t.Fatal("the display model must retain only the credential reference")
+	}
+	encoded, err := proto.Marshal(wire)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var decoded corev1.OutboundSpec
+	if err := proto.Unmarshal(encoded, &decoded); err != nil || !proto.Equal(wire, &decoded) {
+		t.Fatalf("display metadata round trip: %v, %v", &decoded, err)
 	}
 }

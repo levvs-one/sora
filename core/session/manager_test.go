@@ -16,8 +16,6 @@ func testManager(t *testing.T, guard Guard) (*Manager, *fakeEngine) {
 	manager := NewManager(ManagerConfig{
 		Factory: func(context.Context, *engine.Plan) (engine.Engine, error) { return eng, nil },
 		Guard:   guard,
-		Backoff: engine.Backoff{Initial: time.Millisecond, Max: time.Millisecond, Factor: 1, Rand: func() float64 { return 0 }},
-		Budget:  func() *engine.RestartBudget { return engine.NewRestartBudget(2, time.Minute, nil) },
 	})
 	return manager, eng
 }
@@ -104,17 +102,94 @@ func TestManagerSurvivesAnEngineFactoryFailure(t *testing.T) {
 	}
 }
 
+func TestManagerKeepsTheTunnelWhenAnEngineSwitchIsRejected(t *testing.T) {
+	eng := newFakeEngine()
+	manager := NewManager(ManagerConfig{
+		Factory: func(_ context.Context, p *engine.Plan) (engine.Engine, error) {
+			if p.SessionID == "unsupported" {
+				return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing, "sing-box cannot carry XHTTP")
+			}
+			return eng, nil
+		},
+	})
+	ctx := context.Background()
+	first, err := manager.Connect(ctx, testPlan("running"), Settings{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = manager.Disconnect(ctx) })
+	if _, err := manager.Connect(ctx, testPlan("unsupported"), Settings{}); errs.KeyOf(err) != errs.KeyEngineBinaryMissing {
+		t.Fatalf("switch = %v", err)
+	}
+	if manager.Current() != first || first.State() != StateConnected {
+		t.Fatal("a rejected engine switch lost the running tunnel")
+	}
+	if err := manager.Disconnect(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if manager.Status().State != StateDisconnected || eng.State() != engine.StateStopped {
+		t.Fatal("disconnect after a rejected switch did not stop the tunnel")
+	}
+}
+
+func TestManagerRetriesRestorationAfterAFailedDisconnect(t *testing.T) {
+	guard := &fakeGuard{}
+	manager, _ := testManager(t, guard)
+	ctx := context.Background()
+	first, err := manager.Connect(ctx, testPlan("running"), Settings{KillSwitch: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	guard.restoreEr = errors.New("temporary firewall failure")
+	if err := manager.Disconnect(ctx); err == nil {
+		t.Fatal("a failed restoration must be reported")
+	}
+	if manager.Current() != first {
+		t.Fatal("failed cleanup lost the session that owns the firewall")
+	}
+	guard.restoreEr = nil
+	if err := manager.Disconnect(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if manager.Current() != nil || guard.Current().KillSwitch {
+		t.Fatal("the second disconnect did not release the firewall")
+	}
+}
+
+func TestInvalidReplacementKeepsTheCurrentSession(t *testing.T) {
+	old, next := newFakeEngine(), newFakeEngine()
+	next.validate = errors.New("invalid replacement configuration")
+	manager := NewManager(ManagerConfig{Factory: func(_ context.Context, p *engine.Plan) (engine.Engine, error) {
+		if p.SessionID == "bad" {
+			return next, nil
+		}
+		return old, nil
+	}})
+	ctx := context.Background()
+	first, err := manager.Connect(ctx, testPlan("running"), Settings{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = manager.Disconnect(ctx) })
+	if _, err := manager.Connect(ctx, testPlan("bad"), Settings{}); err == nil {
+		t.Fatal("an invalid replacement must fail")
+	}
+	if manager.Current() != first || old.State() != engine.StateRunning {
+		t.Fatal("validation of a replacement stopped the current engine")
+	}
+}
+
 func TestManagerRejectsConcurrentCommands(t *testing.T) {
 	release = make(chan struct{})
 	manager := NewManager(ManagerConfig{
 		Factory: func(context.Context, *engine.Plan) (engine.Engine, error) {
-			// The factory blocks until the test releases it, which is the window
-			// a second command must not be able to enter.
+			// Block the factory to check that concurrent commands
+			// cannot enter the active operation.
 			<-release
 			return newFakeEngine(), nil
 		},
 	})
-	// busy is read under the lock the manager writes it under.
+	// Read busy under the same lock used for writes.
 	busy := func() bool {
 		manager.mu.Lock()
 		defer manager.mu.Unlock()
@@ -132,6 +207,26 @@ func TestManagerRejectsConcurrentCommands(t *testing.T) {
 	}
 	close(release)
 	waitFor(t, time.Second, func() bool { return !busy() })
+}
+
+func TestFailedStartupKeepsTheOwnerOfUnrestoredSettings(t *testing.T) {
+	guard := &fakeGuard{restoreEr: errors.New("temporary cleanup failure")}
+	manager, eng := testManager(t, guard)
+	eng.apply = errors.New("startup failure")
+	ctx := context.Background()
+	if _, err := manager.Connect(ctx, testPlan("failed"), Settings{KillSwitch: true}); errs.KeyOf(err) != errs.KeyGuardRestoreFailed {
+		t.Fatalf("cleanup failure must remain actionable: %v", err)
+	}
+	if manager.Current() == nil || !guard.Current().KillSwitch {
+		t.Fatal("failed startup lost ownership of remaining settings")
+	}
+	guard.restoreEr = nil
+	if err := manager.Disconnect(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if manager.Current() != nil || guard.Current().KillSwitch {
+		t.Fatal("disconnect did not restore settings left by failed startup")
+	}
 }
 
 // release gates the blocking engine factory of the concurrency test.

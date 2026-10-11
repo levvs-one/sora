@@ -9,6 +9,10 @@
 /legacy/installer-output/
 /legacy/outputs/
 /legacy/artifacts/
+/legacy/Control/bin/
+/legacy/Control/obj/
+/legacy/tests/ControlInterop/bin/
+/legacy/tests/ControlInterop/obj/
 .vs/
 *.user
 *.pdb

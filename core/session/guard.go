@@ -2,36 +2,36 @@ package session
 
 import (
 	"context"
+	"errors"
+	"net/netip"
 	"sync"
 
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
-// Settings are the system-wide changes a session owns while it runs. They are
-// values, not actions: the session decides what it needs, the platform guard
-// decides how to do it, and the previous state is restored on every exit.
+// Settings describes session-owned system changes. The platform guard applies
+// them and restores prior state on every exit path.
 type Settings struct {
-	// KillSwitch blocks traffic that does not belong to the session. It stays
-	// armed while the engine is down, which is the entire reason it exists.
+	TunNetworks []netip.Prefix
+	FakeIPRange netip.Prefix
+	// KillSwitch blocks non-session traffic and stays armed while the
+	// engine is down.
 	KillSwitch bool
-	// SystemProxy points the system proxy settings at the local engine.
-	SystemProxy bool
 	// Bypass lists destinations that must skip the tunnel.
 	Bypass []string
-	// TunnelMode is the tunnel the plan asked for: system, application or none.
+	// TunnelMode is the tunnel the plan asked for: system, application or
+	// none.
 	TunnelMode string
 }
 
-// Guard applies and reverts the system changes of a session.
-//
-// The contract is strict on purpose. Apply is idempotent, Restore must be safe
-// to call more than once, and a session may never assume a setting survived a
-// crash: a guard that cannot restore what it changed must report the failure
-// rather than leave the machine in a half-configured state.
+// Guard applies and restores session system changes. Apply is idempotent;
+// Restore tolerates repeated calls. Restoration failures must be reported, and
+// settings must not be assumed to survive crashes.
 type Guard interface {
 	// Apply brings the system to the requested settings.
 	Apply(ctx context.Context, s Settings) error
-	// Restore returns the system to the state it had before Apply. Calling it
+	// Restore returns the system to the state it had before Apply. Calling
+	// it
 	// without a prior Apply must succeed and change nothing.
 	Restore(ctx context.Context) error
 	// Current reports the settings the guard believes are in force.
@@ -40,9 +40,8 @@ type Guard interface {
 	Name() string
 }
 
-// NoopGuard is the guard of a platform that has no system-wide settings to
-// change, such as an Android tunnel owned by the system. It keeps the session
-// code free of nil checks and reports honestly that nothing is owned.
+// NoopGuard supports system-owned tunnels such as Android, where this process
+// manages no system settings.
 type NoopGuard struct{}
 
 // Apply records nothing and succeeds.
@@ -57,11 +56,9 @@ func (NoopGuard) Current() Settings { return Settings{} }
 // Name identifies the implementation in diagnostics.
 func (NoopGuard) Name() string { return "noop" }
 
-// compositeGuard applies several guards as one, so a platform can combine, for
-// example, a proxy guard with a firewall guard and still be restored in reverse
-// order. Restoration runs in reverse because a later guard may depend on an
-// earlier one: removing the firewall before the proxy would leave a window
-// where traffic is proxied but unfiltered.
+// compositeGuard applies guards in order and restores in reverse to respect
+// dependencies. Restoring firewall before proxy could leave proxied traffic
+// unfiltered.
 type compositeGuard struct {
 	mu     sync.Mutex
 	parts  []Guard
@@ -86,18 +83,23 @@ func NewCompositeGuard(parts ...Guard) Guard {
 	return &compositeGuard{parts: kept}
 }
 
-// Apply applies every guard in order and rolls back the ones already applied if
-// a later guard fails, so a failed session never leaves half a configuration.
+// Apply runs guards in order and rolls back earlier guards if a later one
+// fails.
 func (c *compositeGuard) Apply(ctx context.Context, s Settings) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	applied := 0
 	for _, part := range c.parts {
+		c.active = applied + 1
 		if err := part.Apply(ctx, s); err != nil {
-			for i := applied - 1; i >= 0; i-- {
-				_ = c.parts[i].Restore(ctx)
+			var rollback error
+			for i := c.active - 1; i >= 0; i-- {
+				rollback = errors.Join(rollback, c.parts[i].Restore(context.WithoutCancel(ctx)))
 			}
-			return errs.Wrap(err, errs.CodeOf(err), errs.KeyOf(err))
+			if rollback == nil {
+				c.active = 0
+			}
+			return errs.Wrap(errors.Join(err, rollback), errs.CodeOf(err), errs.KeyOf(err))
 		}
 		applied++
 	}
@@ -105,9 +107,8 @@ func (c *compositeGuard) Apply(ctx context.Context, s Settings) error {
 	return nil
 }
 
-// Restore restores every applied guard in reverse order and reports the first
-// failure after trying them all: a machine left with a proxy pointing at a dead
-// port is worse than a reported error, so every part is attempted.
+// Restore tries all applied guards in reverse order and returns the first
+// failure, ensuring one error does not skip remaining cleanup.
 func (c *compositeGuard) Restore(ctx context.Context) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -117,12 +118,14 @@ func (c *compositeGuard) Restore(ctx context.Context) error {
 			first = err
 		}
 	}
-	c.active = 0
+	if first == nil {
+		c.active = 0
+	}
 	return first
 }
 
-// Current reports the settings of the first guard, which is the one that owns
-// the outermost system change.
+// Current returns the first guard's settings, representing the outermost system
+// change.
 func (c *compositeGuard) Current() Settings {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -132,7 +135,7 @@ func (c *compositeGuard) Current() Settings {
 	return c.parts[0].Current()
 }
 
-// Name names every guard, in apply order, for a diagnostics line.
+// Name lists guard names in apply order for diagnostics.
 func (c *compositeGuard) Name() string {
 	name := ""
 	for i, part := range c.parts {

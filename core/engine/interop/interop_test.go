@@ -1,15 +1,16 @@
-// Package interop_test sends real traffic through every engine Sora drives.
-//
-// An engine validator proves that a configuration parses; mihomo even accepts
-// keys it then ignores. This test proves that a rendered plan carries
-// traffic: a local Xray server terminates each protocol and transport, every
-// client engine connects through it, and an HTTP request reaches a local
-// target. It needs SORA_ENGINES_DIR with sing-box, xray and mihomo.
+// Package interop_test checks real traffic through all engines using a local
+// Xray server and HTTP target. Validators alone miss ignored keys, including in
+// mihomo. SORA_ENGINES_DIR must contain sing-box, xray, and mihomo.
 package interop_test
 
 import (
 	"context"
+	"crypto/ecdh"
+	"crypto/rand"
+	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"io"
 	"net"
@@ -24,6 +25,7 @@ import (
 	"time"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/enginetest"
 	"github.com/levvs-one/sora-client/core/engine/registry"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/xray"
@@ -76,6 +78,47 @@ func services(t *testing.T) []service {
 		engine.Outbound{Protocol: engine.ProtocolVLESS, UUID: uuid, Transport: engine.Transport{Type: "httpupgrade", Path: "/up"}})
 	add("vless-xhttp", vless(map[string]any{"network": "xhttp", "xhttpSettings": map[string]any{"path": "/x", "mode": "packet-up"}}),
 		engine.Outbound{Protocol: engine.ProtocolVLESS, UUID: uuid, Transport: engine.Transport{Type: "xhttp", Path: "/x", Mode: "packet-up"}})
+	encryptionKey, err := ecdh.X25519().GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, transport := range []string{"raw", "xhttp"} {
+		stream := map[string]any{"network": transport}
+		o := engine.Outbound{Protocol: engine.ProtocolVLESS, UUID: uuid,
+			Encryption: "mlkem768x25519plus.native.0rtt." + base64.RawURLEncoding.EncodeToString(encryptionKey.PublicKey().Bytes())}
+		if transport == "xhttp" {
+			stream["xhttpSettings"] = map[string]any{"path": "/encrypted", "mode": "packet-up"}
+			o.Transport = engine.Transport{Type: "xhttp", Path: "/encrypted", Mode: "packet-up"}
+		}
+		inbound := vless(stream)
+		inbound["settings"].(map[string]any)["decryption"] = "mlkem768x25519plus.native.600s." + base64.RawURLEncoding.EncodeToString(encryptionKey.Bytes())
+		add("vless-encryption-"+transport, inbound, o)
+	}
+	tlsServer := httptest.NewTLSServer(http.NotFoundHandler())
+	certificate := tlsServer.TLS.Certificates[0]
+	tlsServer.Close()
+	key, err := x509.MarshalPKCS8PrivateKey(certificate.PrivateKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	certPath, keyPath := filepath.Join(dir, "cert.pem"), filepath.Join(dir, "key.pem")
+	if err := os.WriteFile(certPath, pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: certificate.Certificate[0]}), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(keyPath, pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: key}), 0600); err != nil {
+		t.Fatal(err)
+	}
+	enginetest.TrustCertificate(t, certPath)
+	for _, mode := range []string{"auto", "packet-up", "stream-up", "stream-one"} {
+		add("vless-xhttp-tls-"+mode, vless(map[string]any{
+			"network": "xhttp", "security": "tls",
+			"tlsSettings":   map[string]any{"alpn": []string{"h2"}, "certificates": []any{map[string]any{"certificateFile": certPath, "keyFile": keyPath}}},
+			"xhttpSettings": map[string]any{"path": "/x", "mode": mode},
+		}), engine.Outbound{Protocol: engine.ProtocolVLESS, UUID: uuid,
+			TLS:       engine.TLS{Enabled: true, ServerName: "example.com", ALPN: []string{"h2"}},
+			Transport: engine.Transport{Type: "xhttp", Path: "/x", Mode: mode}})
+	}
 	add("vmess-ws", map[string]any{"protocol": "vmess", "settings": map[string]any{"clients": []any{map[string]any{"id": uuid}}},
 		"streamSettings": map[string]any{"network": "ws", "wsSettings": map[string]any{"path": "/vm"}}},
 		engine.Outbound{Protocol: engine.ProtocolVMess, UUID: uuid, Transport: engine.Transport{Type: "ws", Path: "/vm"}})
@@ -84,16 +127,20 @@ func services(t *testing.T) []service {
 	return out
 }
 
-func startServer(t *testing.T, b supervise.Binary, svcs []service) {
+func startServer(t *testing.T, b supervise.Binary, svcs []service, redirect ...string) {
 	t.Helper()
 	inbounds := make([]any, 0, len(svcs))
 	for _, s := range svcs {
 		inbounds = append(inbounds, s.inbound)
 	}
+	freedom := map[string]any{"protocol": "freedom"}
+	if len(redirect) > 0 {
+		freedom["settings"] = map[string]any{"redirect": redirect[0]}
+	}
 	cfg, err := json.Marshal(map[string]any{
 		"log":       map[string]any{"loglevel": "warning"},
 		"inbounds":  inbounds,
-		"outbounds": []any{map[string]any{"protocol": "freedom"}},
+		"outbounds": []any{freedom},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -127,16 +174,29 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 	}
 	svcs := services(t)
 	startServer(t, server, svcs)
+	availability := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir()}).Availability()
 
-	// A wrong credential must fail on every engine; otherwise a passing case
-	// could be traffic that went around the proxy.
+	// Wrong credentials must fail to rule out traffic bypassing the proxy.
 	wrong := svcs[0]
 	wrong.outbound.UUID = "00000000-0000-4000-8000-000000000000"
 	wrong.name = "wrong-uuid"
 	wrong.outbound.ID = wrong.name
+	var encryptedWrong service
+	for _, svc := range svcs {
+		if svc.name == "vless-encryption-raw" {
+			encryptedWrong = svc
+			break
+		}
+	}
+	wrongKey, err := ecdh.X25519().GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encryptedWrong.name, encryptedWrong.outbound.ID = "wrong-encryption-key", "wrong-encryption-key"
+	encryptedWrong.outbound.Encryption = "mlkem768x25519plus.native.0rtt." + base64.RawURLEncoding.EncodeToString(wrongKey.PublicKey().Bytes())
 
 	for _, kind := range []engine.Kind{engine.KindSingBox, engine.KindXray, engine.KindMihomo} {
-		for _, svc := range append(svcs, wrong) {
+		for _, svc := range append(svcs, wrong, encryptedWrong) {
 			plan := &engine.Plan{
 				SessionID:  "interop",
 				LocalProxy: engine.LocalProxy{Enabled: true},
@@ -144,7 +204,7 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 				Rules:      []engine.Rule{{Type: engine.RuleMatchAll, Target: svc.name}},
 				Options:    engine.Options{LogLevel: "warning", TestURL: engine.TestURLProduction},
 			}
-			if missing := engine.Catalog[kind].Missing(plan); len(missing) > 0 {
+			if _, err := engine.SelectEngine(plan, availability, []engine.Kind{kind}); err != nil {
 				continue
 			}
 			t.Run(string(kind)+"/"+svc.name, func(t *testing.T) {
@@ -164,9 +224,9 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 					t.Fatalf("Apply: %v", err)
 				}
 				body, err := fetch(ctx, local, target.URL)
-				if svc.name == wrong.name {
+				if svc.name == wrong.name || svc.name == encryptedWrong.name {
 					if err == nil {
-						t.Fatalf("a wrong uuid reached the target through %s: the request bypassed the proxy", kind)
+						t.Fatalf("invalid credentials reached the target through %s: the request bypassed the proxy", kind)
 					}
 					return
 				}
@@ -176,7 +236,8 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 				if body != reply {
 					t.Fatalf("got %q", body)
 				}
-				// The engine log reached the center, and no credential did.
+				// Engine logs must reach the center without
+				// credentials.
 				page := center.Query(logs.Filter{Sources: []string{string(kind)}}, 0, 0)
 				if len(page.Entries) == 0 {
 					t.Fatalf("%s wrote nothing to the log center", kind)
@@ -218,9 +279,8 @@ func fetch(ctx context.Context, local int, target string) (string, error) {
 	return "", last
 }
 
-// TestLocalProxyIsClosedOrLockedOnEveryEngine proves the two properties that
-// keep other applications out of the tunnel: without a local proxy in the
-// plan nothing listens on the port, and with a login nothing passes without it.
+// TestLocalProxyIsClosedOrLockedOnEveryEngine checks that absent proxies do not
+// listen and authenticated proxies reject requests without login.
 func TestLocalProxyIsClosedOrLockedOnEveryEngine(t *testing.T) {
 	dir := os.Getenv("SORA_ENGINES_DIR")
 	if dir == "" {
@@ -293,11 +353,9 @@ func fetchAs(ctx context.Context, local int, user, password, target string) (str
 	return string(body), err
 }
 
-// TestBypassCarriesTrafficThroughZapret sends a request through a bypass
-// outbound on every engine: the engine hands it to a real tpws, which reaches
-// the target directly. tpws refuses loopback and private destinations by
-// design, so the target is a public endpoint and the test needs the network.
-// SORA_TPWS_BIN names a tpws built from third_party/zapret.
+// TestBypassCarriesTrafficThroughZapret checks real tpws traffic on every
+// engine. It requires network access because tpws rejects private and loopback
+// destinations. SORA_TPWS_BIN selects third_party/zapret's binary.
 func TestBypassCarriesTrafficThroughZapret(t *testing.T) {
 	dir, tpws := os.Getenv("SORA_ENGINES_DIR"), os.Getenv("SORA_TPWS_BIN")
 	if dir == "" || tpws == "" {

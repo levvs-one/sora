@@ -9,9 +9,12 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// peerOf reads the identity of the other end from the kernel. Linux answers
-// SO_PEERCRED on a unix socket, so the uid and the pid here are the kernel's word
-// and not a value the client sent.
+// socketMode permits connections from polkit users outside the service group.
+// Accept enforces kernel-verified peer identity before admitting them.
+const socketMode = 0o666
+
+// peerOf obtains UID and PID from Linux SO_PEERCRED, never client-supplied
+// values.
 func peerOf(connection net.Conn) Peer {
 	unixConn, ok := connection.(*net.UnixConn)
 	if !ok {

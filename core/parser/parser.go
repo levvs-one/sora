@@ -1,10 +1,7 @@
-// Package parser turns subscription payloads (link lists, base64 blobs,
-// sing-box/xray JSON, Clash YAML and WireGuard configs) into the canonical
-// OutboundSpec model that the rest of libsora hands to an engine.
-//
-// Detection is separated from parsing so the UI can explain what was dropped:
-// items that are unsupported or malformed are counted and reported instead of
-// failing the whole import.
+// Package parser converts links, base64 lists, sing-box/Xray JSON, Clash YAML,
+// and WireGuard configs to OutboundSpec. Detection is separate from parsing;
+// unsupported or malformed items are reported without failing the entire
+// import.
 package parser
 
 import (
@@ -34,8 +31,8 @@ const (
 	DefaultMaxItems = 20000
 )
 
-// Sentinel errors reported by the parser. Callers compare them with errors.Is;
-// the messages carry no user data, so they are safe to log.
+// Parser sentinel errors support errors.Is and contain no user data, making
+// them safe to log.
 var (
 	ErrEmptySource   = errors.New("parser: empty source")
 	ErrInputTooLarge = errors.New("parser: input exceeds 16 MiB")
@@ -46,8 +43,7 @@ var (
 // Format names a subscription payload shape recognised by ImportDetector.
 type Format string
 
-// Payload formats the detector can identify. A format is only a detection
-// result: it does not guarantee that every item inside can be parsed.
+// Detected formats do not guarantee that every contained item is parseable.
 const (
 	FormatUnknown          Format = "unknown"
 	FormatSubscription     Format = "https-subscription"
@@ -62,21 +58,18 @@ const (
 	FormatPlainList        Format = "plain-list"
 )
 
-// Detection is the outcome of sniffing a payload: the detected Format plus a
-// short Reason used in import diagnostics.
+// Detection records the detected Format and a short diagnostic Reason.
 type Detection struct {
 	Format Format
 	Reason string
 }
 
-// ImportDetector identifies the format of a subscription payload without
-// parsing it. MaxItems caps list-like expansions; zero means DefaultMaxItems.
-// ImportDetector is safe for concurrent use.
+// ImportDetector identifies formats without parsing. MaxItems bounds list
+// expansion; zero uses DefaultMaxItems. Concurrent use is safe.
 type ImportDetector struct{ MaxItems int }
 
-// Detect sniffs src and reports its format. ErrEmptySource and
-// ErrInputTooLarge come back with an empty Detection; other errors carry the
-// best guess so callers can still explain what they were looking at.
+// Detect identifies src's format. Empty or oversized input returns an empty
+// Detection; other errors include the best format guess.
 func (d ImportDetector) Detect(src []byte) (Detection, error) {
 	if len(src) == 0 || strings.TrimSpace(string(src)) == "" {
 		return Detection{}, ErrEmptySource
@@ -178,10 +171,11 @@ func decodeBase64(s string) ([]byte, bool) {
 	return nil, false
 }
 
-// OutboundSpec is the canonical, engine-agnostic description of one proxy
-// server produced by the parser. Options keeps fields an engine may not
-// support today so nothing is silently dropped during import.
+// OutboundSpec describes a parsed server independently of engines. Options
+// retains additional fields to avoid silently losing unsupported settings
+// during import.
 type OutboundSpec struct {
+	DisplayProtocol                                                                                 string
 	ID, DisplayName, Protocol, Transport, Security                                                  string
 	Host                                                                                            string
 	Port                                                                                            uint16
@@ -202,16 +196,22 @@ type WireGuardPeer struct {
 	PersistentKeepalive               int
 }
 
-// StableKey returns the identity of a server across re-imports: protocol,
-// endpoint and credentials, with the sensitive part hashed so the key never
-// carries a password in clear.
+// StableKey hashes protocol, endpoint, ID, and user to identify a server across
+// imports without exposing IDs.
 func (o OutboundSpec) StableKey() string {
-	h := sha256.Sum256([]byte(o.Protocol + "\x00" + o.Host + "\x00" + strconv.Itoa(int(o.Port)) + "\x00" + o.UUID + "\x00" + o.Password + "\x00" + o.User))
+	// Exclude passwords from identity to avoid storing password hashes.
+	material := o.Protocol + "\x00" + o.Host + "\x00" + strconv.Itoa(int(o.Port)) + "\x00" + o.UUID + "\x00" + o.User
+	// Names distinguish profiles sharing an endpoint. Exclude mutable
+	// provider rules so updates preserve saved selections.
+	if o.Protocol == "xray-profile" {
+		material += "\x00" + o.DisplayName
+	}
+	h := sha256.Sum256([]byte(material))
 	return o.Protocol + ":" + o.Host + ":" + strconv.Itoa(int(o.Port)) + ":" + hex.EncodeToString(h[:8])
 }
 func (o *OutboundSpec) validate() error {
-	// Port is a uint16, so zero is the only out-of-range value that can reach
-	// here: anything larger is rejected earlier, when the port is read.
+	// uint16 permits only zero as an invalid port here; larger values are
+	// rejected during parsing.
 	if o.Protocol == "" || o.Host == "" || o.Port < 1 {
 		return ErrInvalid
 	}
@@ -225,39 +225,38 @@ func (o *OutboundSpec) validate() error {
 
 var uuidRE = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$`)
 
-// ToProto converts a validated canonical specification to the stable fields of the control-plane model.
+// ToProto converts a validated canonical specification to the stable fields of
+// the control-plane model.
 func (o OutboundSpec) ToProto() (*corev1.OutboundSpec, error) {
 	if err := o.validate(); err != nil {
 		return nil, err
 	}
-	return &corev1.OutboundSpec{Id: o.ID, DisplayName: o.DisplayName, Protocol: o.Protocol, Transport: o.Transport, Security: o.Security, Endpoint: &corev1.Endpoint{Host: o.Host, Port: uint32(o.Port)}, Credentials: &corev1.CredentialsRef{Reference: o.UUID}}, nil
+	return &corev1.OutboundSpec{Id: o.ID, DisplayName: o.DisplayName, Protocol: o.Protocol, DisplayProtocol: o.DisplayProtocol, Transport: o.Transport, Security: o.Security, Endpoint: &corev1.Endpoint{Host: o.Host, Port: uint32(o.Port)}, Credentials: &corev1.CredentialsRef{Reference: o.UUID}}, nil
 }
 
-// ItemReason points at one skipped payload line: Index is its position in the
-// source and Reason is a stable, human-readable explanation.
+// ItemReason identifies a skipped source position and a stable readable reason.
 type ItemReason struct {
 	Index  int
 	Reason string
 }
 
-// ImportReport explains what an import did. Counters always add up to the
-// number of candidate items, so the UI can show a complete summary.
+// ImportReport counts all candidate items, including skipped entries, for a
+// complete import summary.
 type ImportReport struct {
 	Imported, SkippedDuplicates, Unsupported, Invalid int
 	UnsupportedItems, InvalidItems, DuplicateItems    []ItemReason
 }
 
-// ImportResult is the outcome of Parse: the detected format, the outbounds that
-// passed validation and the report describing what was skipped.
+// ImportResult holds the detected format, validated outbounds, and skipped-item
+// report.
 type ImportResult struct {
 	Format  Format
 	Servers []OutboundSpec
 	Report  ImportReport
 }
 
-// LinkParser converts a subscription payload into outbounds. MaxItems bounds
-// the result; zero means DefaultMaxItems. LinkParser is safe for concurrent
-// use and never mutates src.
+// LinkParser parses without mutating src and is safe for concurrent use.
+// MaxItems bounds results; zero uses DefaultMaxItems.
 type LinkParser struct{ MaxItems int }
 
 func (p LinkParser) limit() int {
@@ -267,10 +266,8 @@ func (p LinkParser) limit() int {
 	return p.MaxItems
 }
 
-// Parse converts src into outbounds. Items that cannot be understood are
-// reported in ImportResult.Report rather than aborting the import; the error
-// is non-nil only when the whole payload is unusable (empty, oversized or of a
-// format this build cannot consume).
+// Parse returns valid outbounds and reports skipped items. Errors indicate an
+// unusable whole payload: empty, oversized, or unsupported format.
 func (p LinkParser) Parse(src []byte) (ImportResult, error) {
 	if len(src) > MaxInputSize {
 		return ImportResult{}, ErrInputTooLarge
@@ -407,6 +404,22 @@ func parseLink(raw string) (OutboundSpec, error) {
 			o.Options[k] = v
 		}
 	}
+	if o.Security == "" {
+		// Default security follows protocol semantics: trojan,
+		// hysteria2, and HTTPS use TLS; others do not. Empty security
+		// would incorrectly enable TLS for plain SOCKS downstream.
+		switch proto {
+		case "trojan", "hysteria2", "hy2", "https":
+			o.Security = "tls"
+		default:
+			o.Security = "none"
+		}
+	}
+	// Normalize link schemes to engine protocol names.
+	o.Protocol = map[string]string{"ss": "shadowsocks", "socks": "socks5", "hy2": "hysteria2", "https": "http"}[proto]
+	if o.Protocol == "" {
+		o.Protocol = proto
+	}
 	o.DisplayName = fragmentName(u.Fragment)
 	o.CountryCode = countryCode(o.DisplayName)
 	return o, o.validate()
@@ -534,8 +547,8 @@ func stringValue(v any) string {
 	return ""
 }
 
-// portNumber reads a port field. Values outside 1..65535 become 0 so the
-// caller's validation rejects the entry instead of importing a truncated port.
+// portNumber returns zero outside 1..65535 so validation rejects invalid ports
+// instead of truncating them.
 func portNumber(v any) uint16 {
 	n := number(v)
 	if n < 1 || n > math.MaxUint16 {
@@ -544,8 +557,8 @@ func portNumber(v any) uint16 {
 	return uint16(n)
 }
 
-// number normalises the JSON number shapes a decoder may produce. Anything that
-// cannot be represented as an int yields 0 rather than an overflowed value.
+// number converts JSON number representations to int, returning zero for
+// invalid or overflowing values.
 func number(v any) int {
 	switch n := v.(type) {
 	case float64:
@@ -589,9 +602,24 @@ func (p LinkParser) parseJSON(b []byte, f Format) (ImportResult, error) {
 		}
 	}
 	r := ImportResult{Format: f}
+	// Treat full Xray configurations, including Remnawave lists, as
+	// separate provider profiles.
+	if m, ok := v.(map[string]any); ok && isXrayConfig(m) {
+		items = []any{m}
+	}
 	for _, it := range items {
 		m, ok := it.(map[string]any)
 		if !ok {
+			continue
+		}
+		if isXrayConfig(m) {
+			o, e := profileSpec(m)
+			if e != nil {
+				r.Report.Invalid++
+				continue
+			}
+			r.Servers = append(r.Servers, o)
+			r.Report.Imported++
 			continue
 		}
 		o, e := mapJSONSpec(m, "")
@@ -608,6 +636,80 @@ func (p LinkParser) parseJSON(b []byte, f Format) (ImportResult, error) {
 	}
 	return r, nil
 }
+
+// isXrayConfig distinguishes full configurations by Xray-shaped outbounds with
+// protocol and settings fields.
+func isXrayConfig(m map[string]any) bool {
+	outs, ok := m["outbounds"].([]any)
+	if !ok || len(outs) == 0 {
+		return false
+	}
+	first, ok := outs[0].(map[string]any)
+	if !ok {
+		return false
+	}
+	_, hasProtocol := first["protocol"]
+	return hasProtocol
+}
+
+// profileSpec stores compacted configuration in Options["profile"]. The default
+// outbound supplies endpoint, transport, and security for display and
+// measurement.
+func profileSpec(m map[string]any) (OutboundSpec, error) {
+	raw, err := json.Marshal(m)
+	if err != nil {
+		return OutboundSpec{}, ErrInvalid
+	}
+	o := OutboundSpec{Protocol: "xray-profile", Options: map[string]string{"profile": string(raw)}}
+	o.DisplayName = strings.TrimSpace(stringValue(m["remarks"]))
+	for _, it := range m["outbounds"].([]any) {
+		ob, ok := it.(map[string]any)
+		if !ok {
+			continue
+		}
+		switch stringValue(ob["protocol"]) {
+		case "freedom", "blackhole", "dns", "loopback", "":
+			continue
+		}
+		o.Host, o.Port = xrayEndpoint(ob)
+		o.DisplayProtocol = stringValue(ob["protocol"])
+		if ss, ok := ob["streamSettings"].(map[string]any); ok {
+			o.Transport = stringValue(ss["network"])
+			o.Security = stringValue(ss["security"])
+		}
+		break
+	}
+	if o.Transport == "" {
+		o.Transport = "tcp"
+	}
+	if o.Security == "" {
+		o.Security = "none"
+	}
+	if o.DisplayName == "" {
+		o.DisplayName = o.Host
+	}
+	o.CountryCode = countryCode(o.DisplayName)
+	return o, o.validate()
+}
+
+// xrayEndpoint reads settings.vnext, settings.servers, or newer flat
+// settings.address endpoints.
+func xrayEndpoint(ob map[string]any) (string, uint16) {
+	settings, _ := ob["settings"].(map[string]any)
+	for _, key := range []string{"vnext", "servers", "peers"} {
+		if list, ok := settings[key].([]any); ok && len(list) > 0 {
+			if first, ok := list[0].(map[string]any); ok {
+				host := stringValue(first["address"])
+				if host == "" {
+					host = stringValue(first["endpoint"])
+				}
+				return host, portNumber(first["port"])
+			}
+		}
+	}
+	return stringValue(settings["address"]), portNumber(settings["port"])
+}
+
 func xrayItems(m map[string]any) []any {
 	if a, ok := m["outbounds"].([]any); ok {
 		return a

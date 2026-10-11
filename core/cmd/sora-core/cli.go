@@ -15,26 +15,38 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
-// flags are what an operator sets once. Everything else has a default that works
-// on a normal installation, because a service that needs eight options to start is
-// a service nobody starts.
+// flags holds operator settings with defaults for a standard installation.
 type flags struct {
-	dataDir     string
-	enginesDir  string
-	engine      string
-	localPort   int
-	bypass      string
-	logLevel    string
-	check       bool
-	fileKeys    bool
-	showVersion bool
-	showToken   bool
+	dataDir       string
+	enginesDir    string
+	engine        string
+	localPort     int
+	bypass        string
+	socket        string
+	logLevel      string
+	check         bool
+	fileKeys      bool
+	showVersion   bool
+	install       bool
+	uninstall     bool
+	showToken     bool
+	legacyControl bool
 }
 
 func main() {
-	if err := run(os.Args[1:]); err != nil {
-		// The exit code is what a script reads, so it says what kind of failure
-		// this was; the key says which one, and the detail says in one line why.
+	// Windows services must respond to SCM instead of using the console.
+	if handled, err := runService(os.Args[1:]); handled {
+		if err != nil {
+			os.Exit(1)
+		}
+		return
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	err := run(ctx, os.Args[1:])
+	stop()
+	if err != nil {
+		// Exit codes identify failure classes for scripts; the key and
+		// detail identify the cause.
 		code := 1
 		if errs.CodeOf(err) == errs.CodeInvalidArgument {
 			code = 2
@@ -44,7 +56,7 @@ func main() {
 	}
 }
 
-func run(arguments []string) error {
+func run(ctx context.Context, arguments []string) error {
 	set := flag.NewFlagSet("sora-core", flag.ContinueOnError)
 	var f flags
 	set.StringVar(&f.dataDir, "data-dir", defaultDataDir(), "where the token, the secrets and the engine state live")
@@ -52,13 +64,32 @@ func run(arguments []string) error {
 	set.StringVar(&f.engine, "engine", "", "pin one engine: sing-box, xray or mihomo; empty picks one per plan")
 	set.IntVar(&f.localPort, "tunnel-port", 0, "loopback port the tunnel is served on; 0 picks a free one")
 	set.StringVar(&f.bypass, "bypass", "", "comma separated destinations that skip the tunnel")
+	set.StringVar(&f.socket, "socket", "", "control plane socket; empty is the platform address")
 	set.StringVar(&f.logLevel, "log-level", "info", "debug, info, warn or error")
 	set.BoolVar(&f.check, "check", false, "build everything, report on it and exit without serving")
 	set.BoolVar(&f.fileKeys, "allow-file-keys", false, "fall back to a key file when the machine key store is unavailable")
 	set.BoolVar(&f.showVersion, "version", false, "print the contract and build version and exit")
+	set.BoolVar(&f.install, "install-service", false, "Windows: register this executable as the SoraLegacyCore service with the other flags, start it and exit")
+	set.BoolVar(&f.uninstall, "uninstall-service", false, "Windows: stop and remove the SoraLegacyCore service and exit")
 	set.BoolVar(&f.showToken, "print-token", false, "print the control plane token and exit")
+	set.BoolVar(&f.legacyControl, "legacy-control", true, "serve JSON-RPC for the .NET Framework legacy client")
 	if err := set.Parse(arguments); err != nil {
 		return errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyUnauthenticated)
+	}
+	if f.uninstall {
+		return uninstallService()
+	}
+	if f.install {
+		// Pass persistent service settings without forwarding the
+		// install flag.
+		arguments := []string{"-data-dir", f.dataDir, "-engines-dir", f.enginesDir}
+		if f.socket != "" {
+			arguments = append(arguments, "-socket", f.socket)
+		}
+		if f.legacyControl {
+			arguments = append(arguments, "-legacy-control")
+		}
+		return installService(arguments)
 	}
 	if f.showVersion {
 		fmt.Printf("sora-core %s (contract %d.%d, min supported %d, %s/%s)\n",
@@ -66,28 +97,35 @@ func run(arguments []string) error {
 		return nil
 	}
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
+	if f.showToken {
+		token, err := printToken(f.dataDir)
+		if err != nil {
+			return err
+		}
+		fmt.Println(token)
+		return nil
+	}
 	logger, err := newLogger(f.logLevel)
 	if err != nil {
 		return err
 	}
 	options := Options{
+		LegacyControl: f.legacyControl,
+		Diagnostic:    f.check,
 		DataDir:       f.dataDir,
 		EnginesDir:    f.enginesDir,
 		Engine:        engine.Kind(f.engine),
 		LocalPort:     f.localPort,
 		Bypass:        splitList(f.bypass),
+		Socket:        f.socket,
 		Log:           logger,
 		AllowFileKeys: f.fileKeys,
 	}
 	app, err := New(ctx, options)
 	if err != nil {
 		if f.check {
-			// A check exists for the case where the installation is broken, so it
-			// reports the failure instead of repeating it as an error. An operator
-			// reading this learns what is wrong and where; an operator reading a
-			// stack of wrapped errors learns that something is.
+			// A readiness check must report build failures even on
+			// a broken installation.
 			fmt.Println("result: the core cannot be built on this machine")
 			fmt.Println("problem: " + string(errs.KeyOf(err)) + ": " + errs.Detail(err))
 			return nil
@@ -99,23 +137,14 @@ func run(arguments []string) error {
 			logger.Error("shutdown was not clean", "error", errs.Detail(closeErr))
 		}
 	}()
-	if f.showToken {
-		token, err := printToken(f.dataDir)
-		if err != nil {
-			return err
-		}
-		fmt.Println(token)
-		return nil
-	}
 	if f.check {
 		lines, ok := checkReport(app)
 		for _, line := range lines {
 			fmt.Println(line)
 		}
 		if !ok {
-			// The report is on the screen and the exit code is the answer a script
-			// reads. A check that exits 0 while saying "not ready" is a check nobody
-			// can run in a pipeline.
+			// A nonzero exit code lets scripts detect an unready
+			// installation.
 			return errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineStartFailed,
 				"core: the installation is not ready")
 		}
@@ -124,25 +153,22 @@ func run(arguments []string) error {
 	return app.Serve(ctx)
 }
 
-// buildVersion is stamped by the build; an unstamped build says so rather than
-// claiming a version nobody set.
+// buildVersion is set at build time; unstamped builds report "dev".
 var buildVersion = "dev"
 
-// defaultDataDir is the per-user data directory of the core. A service runs as
-// its own account and is told where its data is; this is what a person running it
-// by hand gets.
+// defaultDataDir returns the per-user directory for manual runs. Services
+// receive an explicit directory.
 func defaultDataDir() string {
-	if dir := strings.TrimSpace(os.Getenv("SORA_DATA_DIR")); dir != "" {
+	if dir := strings.TrimSpace(os.Getenv("SORA_LEGACY_DATA_DIR")); dir != "" {
 		return dir
 	}
 	if dir, err := os.UserConfigDir(); err == nil {
-		return filepath.Join(dir, "sora", "core")
+		return filepath.Join(dir, "sora-legacy", "core")
 	}
-	return filepath.Join(".", ".sora-core")
+	return filepath.Join(".", ".sora-legacy-core")
 }
 
-// splitList reads a comma separated list and drops the empty entries, so a value
-// with a trailing comma is not a destination.
+// splitList parses a comma-separated list and skips empty entries.
 func splitList(value string) []string {
 	var out []string
 	for _, part := range strings.Split(value, ",") {

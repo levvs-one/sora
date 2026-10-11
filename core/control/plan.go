@@ -1,15 +1,22 @@
 package control
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
 	"net/url"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/net/idna"
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
@@ -18,30 +25,26 @@ import (
 	"github.com/levvs-one/sora-client/core/routing"
 )
 
-// Limits of one request, taken from the comments of the contract. They are
-// checked before anything is allocated, so a hostile or broken client cannot make
-// the core build a plan of any size it likes.
+// Enforce contract request limits before allocating plan data.
 const (
 	// MaxPlanBytes is the largest plan the contract accepts.
 	MaxPlanBytes = 4 << 20
 	// MaxImportBytes is the largest payload ParseImport accepts.
 	MaxImportBytes = 16 << 20
-	// MaxProbeEndpoints is the largest number of endpoints one probe request
+	// MaxProbeEndpoints is the largest number of endpoints one probe
+	// request
 	// may carry.
 	MaxProbeEndpoints = 256
 )
 
-// resolver turns a reference from the plan into the credential material behind
-// it. The control plane never sees the material of a plan it did not resolve, and
-// the interface never receives it back.
+// resolver resolves plan references to credentials for the engine. Resolved
+// material is never returned to the client.
 type resolver interface {
 	Get(reference string) ([]byte, error)
 }
 
-// parseCredential reads the stored material of one outbound. The document is a
-// flat map written by the import pipeline; a document the core cannot read is
-// refused rather than partially applied, because half a credential is a
-// connection that fails for a reason the user cannot see.
+// parseCredential reads the import pipeline's flat credential map. Invalid
+// documents are rejected in full to avoid partially configured connections.
 func parseCredential(material []byte) map[string]string {
 	out := make(map[string]string, 12)
 	if len(material) == 0 {
@@ -51,9 +54,7 @@ func parseCredential(material []byte) map[string]string {
 	return out
 }
 
-// credentialDocument renders the material of one outbound for storage. Only the
-// fields the core understands are written, so a future field cannot leak into a
-// vault by accident.
+// credentialDocument serializes only supported credential fields for storage.
 func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 	values := map[string]string{
 		"uuid":         spec.UUID,
@@ -74,11 +75,8 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 		"security":     spec.Security,
 		"encryption":   spec.Options["encryption"],
 	}
-	// Obfuscation parameters travel in the free-form options of a parsed link,
-	// because only some protocols have them. They are copied explicitly instead
-	// of being merged wholesale: a link is untrusted input and a wholesale copy
-	// would let a subscription write arbitrary keys into the vault. Links spell
-	// the obfuscation password three ways; the vault knows one.
+	// Copy only known obfuscation options from untrusted links. Normalize
+	// the three password aliases to one vault key.
 	values["obfs"] = spec.Options["obfs"]
 	for _, key := range []string{"obfs_param", "obfs-password", "obfs_password"} {
 		if value := spec.Options[key]; value != "" {
@@ -108,6 +106,13 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 	if spec.AllowInsecure {
 		values["insecure"] = "1"
 	}
+	if profile := spec.Options["profile"]; profile != "" {
+		packed, err := packProfile(profile)
+		if err != nil {
+			return nil, err
+		}
+		values["xray_profile"] = packed
+	}
 	for key, value := range values {
 		if value == "" {
 			delete(values, key)
@@ -128,12 +133,9 @@ func kinds(names []string) []engine.Kind {
 	return out
 }
 
-// planFromProto converts the plan of a Connect request into the engine plan.
-//
-// Two things happen here that a client cannot be trusted to do. Every outbound is
-// checked against the limits and against the plan it belongs to, and every
-// credential is resolved from the secret store into the engine plan, which is the
-// only place the material exists.
+// planFromProto validates the request's outbounds and limits, then resolves
+// credential references into the engine plan. Credentials remain inside the
+// core.
 func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (*engine.Plan, error) {
 	if in == nil {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanEmpty, "control: the request carries no plan")
@@ -154,22 +156,31 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 	plan := &engine.Plan{
 		SessionID: sessionID,
 		Engines:   kinds(in.GetEngines()),
-		// Engines always run at debug level and the log center drops what is
-		// below its capture level, so changing the level takes effect at once on
-		// every engine, without a restart that would cut the user's connections.
-		Options: engine.Options{Mode: "rule", LogLevel: "debug", TestURL: engine.TestURLProduction, Fragment: engine.Fragment{
+		// Keep engines at debug level so capture-level changes apply
+		// immediately without restarting connections.
+		Options: engine.Options{Mode: "rule", LogLevel: "debug", TestURL: engine.TestURLProduction, IPv6: in.GetIpv6(), Fragment: engine.Fragment{
 			Enabled:  defences.GetTlsFragment(),
 			Packets:  defences.GetFragmentPackets(),
 			Length:   defences.GetFragmentLength(),
 			Interval: defences.GetFragmentInterval(),
 		}},
+		// A TUN adapter needs routes to carry traffic.
 		Tun: engine.Tun{
-			Enabled: in.GetTunnelMode() == corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+			Enabled:    in.GetTunnelMode() == corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+			Stack:      in.GetTunStack(),
+			AutoRoute:  true,
+			DeviceName: engine.TunDevice,
+			// Windows races DNS across adapters; strict routing
+			// blocks other adapters' DNS to prevent leaks.
+			StrictRoute: runtime.GOOS == "windows",
 		},
 		PrivateControl: !in.GetNetworkControlAllowed(),
 	}
-	// The system proxy mode needs the listener the system proxy points at, and a
-	// system proxy cannot carry a login.
+	if plan.Tun.Stack != "" && !plan.Tun.Enabled {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanTunnel, "control: selecting a stack requires TUN mode")
+	}
+	// System proxy mode requires the configured listener and cannot use
+	// proxy authentication.
 	local := in.GetLocalProxy()
 	plan.LocalProxy = engine.LocalProxy{
 		Enabled:  local.GetEnabled() || !plan.Tun.Enabled,
@@ -209,10 +220,8 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 	for _, g := range groups {
 		seen[g.Name] = struct{}{}
 	}
-	// The rules of the contract carry only a destination and a target, which is
-	// what a client can express without knowing the grammar of an engine. The
-	// type is derived from the shape of the destination so that one rule means
-	// the same thing in every engine and in every future client.
+	// Derive rule types from destinations so the contract's
+	// destination/target pairs have consistent semantics across engines.
 	for _, route := range in.GetRoutes() {
 		rule, err := ruleFromProto(route)
 		if err != nil {
@@ -237,7 +246,7 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 	if err != nil {
 		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanRuleInvalid)
 	}
-	plan.DNS = dnsFromProto(in.GetDnsPolicy())
+	plan.DNS = dnsFromProto(in.GetDnsPolicy(), plan.Tun.Enabled)
 	if err := checkDNS(plan.DNS); err != nil {
 		return nil, err
 	}
@@ -260,9 +269,8 @@ var groupTypes = map[corev1.GroupType]engine.GroupType{
 	corev1.GroupType_GROUP_TYPE_LOAD_BALANCE: engine.GroupLoadBalance,
 }
 
-// groupsFromProto converts the groups of a plan. Members are checked once all
-// group names are known, because a group may contain a group listed after it;
-// cycles are refused by the plan check.
+// groupsFromProto converts groups after collecting all names, allowing forward
+// references. Plan validation rejects cycles.
 func groupsFromProto(in []*corev1.GroupSpec, outbounds map[string]struct{}) ([]engine.Group, error) {
 	if len(in) > engine.MaxGroups {
 		return nil, errs.Newf(errs.CodeResourceExhausted, errs.KeyPlanTooLarge,
@@ -305,8 +313,8 @@ func groupsFromProto(in []*corev1.GroupSpec, outbounds map[string]struct{}) ([]e
 	return out, nil
 }
 
-// isBuiltInTarget reports whether a rule may point at a destination that the
-// engine owns rather than at something the plan lists.
+// isBuiltInTarget reports whether a target is provided by the engine instead of
+// the plan.
 func isBuiltInTarget(target string) bool {
 	switch target {
 	case "direct", "block", "reject":
@@ -316,8 +324,7 @@ func isBuiltInTarget(target string) bool {
 	}
 }
 
-// checkDNS refuses a resolver the engine could not use, with the key that names
-// the problem instead of a general "the plan is invalid".
+// checkDNS validates resolvers and returns a problem-specific error key.
 func checkDNS(dns engine.DNS) error {
 	for _, server := range dns.Servers {
 		if server.Address == "" {
@@ -342,7 +349,8 @@ func checkBypass(entry string) error {
 	return nil
 }
 
-// outboundFromProto converts one outbound and resolves its credential reference.
+// outboundFromProto converts one outbound and resolves its credential
+// reference.
 func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (engine.Outbound, error) {
 	id := strings.TrimSpace(spec.GetId())
 	if id == "" {
@@ -365,7 +373,6 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 		},
 		TLS: engine.TLS{Enabled: !strings.EqualFold(spec.GetSecurity(), "none")},
 	}
-	// An outbound without a name makes a list unreadable, so the id is used.
 	if outbound.Name == "" {
 		outbound.Name = id
 	}
@@ -392,9 +399,8 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 	return outbound, nil
 }
 
-// applyCredential fills the credential fields of an outbound from stored
-// material. The keys are the ones credentialDocument writes and nothing else is
-// read: a material document is data from the store, not a set of instructions.
+// applyCredential restores only fields written by credentialDocument from
+// stored material.
 func applyCredential(outbound *engine.Outbound, values map[string]string) error {
 	outbound.UUID = values["uuid"]
 	outbound.Password = values["password"]
@@ -414,8 +420,8 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	if alpn := values["alpn"]; alpn != "" {
 		outbound.TLS.ALPN = strings.Split(alpn, ",")
 	}
-	// REALITY is a security mode of its own: the engines need the public key
-	// and short id in the TLS block, not as loose credential fields.
+	// REALITY requires its public key and short ID in the engine's TLS
+	// block.
 	if strings.EqualFold(values["security"], "reality") {
 		outbound.TLS.Enabled = true
 		outbound.TLS.Reality = true
@@ -432,9 +438,16 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 		outbound.Addresses = strings.Split(addresses, ",")
 	}
 	if peers := values["peers"]; peers != "" {
-		// A document that does not decode leaves the outbound without peers,
-		// and the plan validation names the outbound that cannot connect.
+		// Invalid peer documents leave no peers; plan validation
+		// identifies the failing outbound.
 		_ = json.Unmarshal([]byte(peers), &outbound.Peers)
+	}
+	if packed := values["xray_profile"]; packed != "" {
+		profile, err := unpackProfile(packed)
+		if err != nil {
+			return err
+		}
+		outbound.Profile = profile
 	}
 	if raw := values["amneziawg"]; raw != "" {
 		awg, err := amneziaFrom(raw)
@@ -446,13 +459,12 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	return nil
 }
 
-// amneziaKeys are the AmneziaWG parameters of a configuration file, in the
-// lower case the parser stores interface keys in.
+// amneziaKeys lists supported AmneziaWG parameters using the parser's lowercase
+// interface keys.
 var amneziaKeys = []string{"jc", "jmin", "jmax", "s1", "s2", "s3", "s4", "h1", "h2", "h3", "h4",
 	"i1", "i2", "i3", "i4", "i5", "j1", "j2", "j3", "itime"}
 
-// amneziaMaterial keeps the AmneziaWG parameters of an import and nothing
-// else: an import is untrusted input, so only known keys reach the vault.
+// amneziaMaterial copies only known AmneziaWG keys from an untrusted import.
 func amneziaMaterial(options map[string]string) map[string]string {
 	out := map[string]string{}
 	for _, key := range amneziaKeys {
@@ -463,9 +475,7 @@ func amneziaMaterial(options map[string]string) map[string]string {
 	return out
 }
 
-// amneziaFrom restores the AmneziaWG parameters from the vault. A value that
-// is not a number where the protocol wants one fails the plan instead of
-// connecting with a parameter the server does not expect.
+// amneziaFrom restores AmneziaWG parameters and rejects invalid numeric values.
 func amneziaFrom(raw string) (*engine.AmneziaWG, error) {
 	var v map[string]string
 	if err := json.Unmarshal([]byte(raw), &v); err != nil {
@@ -494,9 +504,8 @@ func amneziaFrom(raw string) (*engine.AmneziaWG, error) {
 	return a, nil
 }
 
-// wireguardMaterial collects the private key, the interface addresses and the
-// peers of a WireGuard import. A .conf file carries them in its sections; a
-// wireguard:// link carries the key as user info and the rest as query.
+// wireguardMaterial collects keys, addresses, and peers from .conf sections or
+// wireguard:// user info and query fields.
 func wireguardMaterial(spec parser.OutboundSpec) (key string, addresses []string, peers []engine.WireGuardPeer) {
 	key = spec.Options["privatekey"]
 	if key == "" {
@@ -553,8 +562,19 @@ func ruleFromProto(route *corev1.RoutingRule) (engine.Rule, error) {
 			"control: rule %q has no target", destination)
 	}
 	kind := ruleTypeOf(destination)
-	return engine.Rule{Type: kind, Value: ruleValue(kind, destination), Target: target}, nil
+	value := ruleValue(kind, destination)
+	if kind == engine.RuleDomain || kind == engine.RuleDomainSuffix {
+		ascii, err := ruleIDNA.ToASCII(value)
+		if err != nil {
+			return engine.Rule{}, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanRuleInvalid)
+		}
+		value = ascii
+	}
+	return engine.Rule{Type: kind, Value: value, Target: target}, nil
 }
+
+// Convert only exact and suffix domains, preserving process names and patterns.
+var ruleIDNA = idna.New(idna.MapForLookup(), idna.StrictDomainName(true), idna.ValidateLabels(true), idna.VerifyDNSLength(true), idna.BidiRule())
 
 // ruleValue strips the type prefix: the engines add their own.
 func ruleValue(kind engine.RuleType, destination string) string {
@@ -564,14 +584,15 @@ func ruleValue(kind engine.RuleType, destination string) string {
 	return destination
 }
 
-// rulePrefixes follow the Xray routing vocabulary that subscriptions use:
-// "domain:" matches a domain and its subdomains, "full:" one exact name.
+// rulePrefixes follows Xray syntax: "domain:" includes subdomains; "full:"
+// matches one exact name.
 var rulePrefixes = map[engine.RuleType]string{
 	engine.RuleGeoSite:      "geosite:",
 	engine.RuleGeoIP:        "geoip:",
 	engine.RuleRuleSet:      "ruleset:",
 	engine.RuleDomainSuffix: "domain:",
 	engine.RuleDomain:       "full:",
+	engine.RuleProcess:      "process:",
 }
 
 // ruleTypeOf derives the rule type from the shape of a destination.
@@ -587,6 +608,8 @@ func ruleTypeOf(destination string) engine.RuleType {
 		return engine.RuleDomainSuffix
 	case strings.HasPrefix(destination, "full:"):
 		return engine.RuleDomain
+	case strings.HasPrefix(destination, "process:"):
+		return engine.RuleProcess
 	case strings.Contains(destination, "/"):
 		return engine.RuleIPCIDR
 	case strings.Contains(destination, ":"):
@@ -596,9 +619,18 @@ func ruleTypeOf(destination string) engine.RuleType {
 	}
 }
 
+// defaultTunResolvers supplies DNS for TUN plans without resolvers.
+// Address-based DNS over HTTPS avoids bootstrap resolution and encrypts
+// lookups.
+var defaultTunResolvers = []string{"https://1.1.1.1/dns-query", "https://8.8.8.8/dns-query"}
+
 // dnsFromProto converts the resolver settings of a request.
-func dnsFromProto(policy *corev1.DnsPolicy) engine.DNS {
-	if policy == nil || len(policy.GetServers()) == 0 {
+func dnsFromProto(policy *corev1.DnsPolicy, tun bool) engine.DNS {
+	servers := policy.GetServers()
+	if len(servers) == 0 && tun {
+		servers = defaultTunResolvers
+	}
+	if len(servers) == 0 {
 		return engine.DNS{}
 	}
 	out := engine.DNS{
@@ -606,7 +638,7 @@ func dnsFromProto(policy *corev1.DnsPolicy) engine.DNS {
 		Mode:    "rule",
 		Sniff:   true,
 	}
-	for index, address := range policy.GetServers() {
+	for index, address := range servers {
 		if len(out.Servers) >= engine.MaxDNSServers {
 			break
 		}
@@ -621,8 +653,8 @@ func dnsFromProto(policy *corev1.DnsPolicy) engine.DNS {
 	return out
 }
 
-// splitDNSServer reads "tls://dns.example.com:853" into its parts. A port that is
-// not a number is not a port, and the address is then used as it is.
+// splitDNSServer splits a resolver such as "tls://dns.example.com:853". Invalid
+// numeric ports leave the address unchanged.
 func splitDNSServer(address string) (host string, port uint16, transport engine.DNSTransport) {
 	transport = engine.DNSPlain
 	rest := strings.TrimSpace(address)
@@ -659,36 +691,59 @@ func orDefault(value, fallback string) string {
 	return value
 }
 
-// referenceOf is the reference a stored secret lives under.
-//
-// It is derived from the identity of the server, not minted at random, and that
-// choice is what keeps the store from growing without bound. A subscription
-// imported every morning would otherwise write a second, third and fourth copy of
-// the same credential under a new name each time, and nothing would ever remove
-// them: the core cannot tell a reference the user still uses from one an earlier
-// import invented. With a reference that follows the server, a re-import
-// overwrites the material and the number of secrets stays the number of servers
-// the user actually has.
+// referenceOf derives a stable secret reference from server identity.
+// Re-imports overwrite credentials instead of accumulating duplicate entries
+// that cannot be safely removed.
 func referenceOf(spec parser.OutboundSpec) (string, error) {
 	sum := sha256.Sum256([]byte(spec.StableKey()))
-	// The prefix says what the reference is, the digest says which server it
-	// belongs to, and neither carries a name or a host: a reference is stored,
-	// logged and compared, and a reference that identifies its server in clear
-	// would be the leak this package exists to prevent.
+	// The digest avoids exposing host or server names in references that
+	// may be stored or logged.
 	return "s1_" + hex.EncodeToString(sum[:16]), nil
 }
 
-// outboundToProto renders one parsed server for the interface. The credential
-// never appears here: the reference is the only thing that crosses the wire, and
-// the core resolves it when the plan is applied.
+// outboundToProto converts a parsed server for the client, exposing only a
+// credential reference. The core resolves it when applying the plan.
 func outboundToProto(spec parser.OutboundSpec, reference string) *corev1.OutboundSpec {
 	return &corev1.OutboundSpec{
-		Id:          spec.StableKey(),
-		DisplayName: spec.DisplayName,
-		Protocol:    spec.Protocol,
-		Transport:   spec.Transport,
-		Security:    spec.Security,
-		Endpoint:    &corev1.Endpoint{Host: spec.Host, Port: uint32(spec.Port)},
-		Credentials: &corev1.CredentialsRef{Reference: reference},
+		Id:              spec.StableKey(),
+		DisplayName:     spec.DisplayName,
+		Protocol:        spec.Protocol,
+		DisplayProtocol: spec.DisplayProtocol,
+		Transport:       spec.Transport,
+		Security:        spec.Security,
+		Endpoint:        &corev1.Endpoint{Host: spec.Host, Port: uint32(spec.Port)},
+		Credentials:     &corev1.CredentialsRef{Reference: reference},
 	}
+}
+
+// packProfile compresses provider configuration to fit the secret store's 64
+// KiB entry limit.
+func packProfile(profile string) (string, error) {
+	var b bytes.Buffer
+	w := gzip.NewWriter(&b)
+	if _, err := w.Write([]byte(profile)); err != nil {
+		return "", errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
+	}
+	if err := w.Close(); err != nil {
+		return "", errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
+	}
+	return base64.StdEncoding.EncodeToString(b.Bytes()), nil
+}
+
+// unpackProfile decompresses a stored profile and rejects output above the plan
+// limit before reading it all into memory.
+func unpackProfile(packed string) (json.RawMessage, error) {
+	raw, err := base64.StdEncoding.DecodeString(packed)
+	if err != nil {
+		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+	}
+	r, err := gzip.NewReader(bytes.NewReader(raw))
+	if err != nil {
+		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+	}
+	profile, err := io.ReadAll(io.LimitReader(r, MaxPlanBytes+1))
+	if err != nil || len(profile) > MaxPlanBytes {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds, "control: a stored Xray profile is unreadable or too large")
+	}
+	return profile, nil
 }

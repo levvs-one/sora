@@ -1,10 +1,14 @@
 package control
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
+	"io"
 	"maps"
 	"math"
 	"slices"
+	"strings"
 	"time"
 
 	"google.golang.org/grpc"
@@ -18,12 +22,10 @@ import (
 	"github.com/levvs-one/sora-client/core/logs"
 )
 
-// Every method of this file needs the control authenticator: the log record
-// and the connection list say where a person goes, and the transport alone
-// lets every process of the same account in.
+// Logs and connection lists expose destinations, so these methods require a
+// token even on the account-restricted transport.
 
-// authorize checks the version and the authenticator, in that order, and
-// answers with a transport status, as Connect does.
+// authorize checks the API version, then the token, returning transport errors.
 func (s *Server) authorize(version *corev1.ApiVersion, token []byte) error {
 	if _, err := s.checkVersion(version); err != nil {
 		return transportStatus(err)
@@ -94,7 +96,7 @@ func statsToWire(st logs.Stats) *corev1.LogStats {
 	return out
 }
 
-// count converts a size for the wire; sizes are never negative.
+// count converts a non-negative size to the wire type.
 func count(n int) uint64 {
 	if n < 0 {
 		return 0
@@ -102,18 +104,18 @@ func count(n int) uint64 {
 	return uint64(n)
 }
 
-// bound converts a setting for the uint32 of the wire, saturating.
+// bound clamps a setting to the wire uint32 range.
 func bound(n int) uint32 {
 	switch {
 	case n < 0:
 		return 0
-	case n > math.MaxUint32:
+	case int64(n) > math.MaxUint32:
 		return math.MaxUint32
 	}
 	return uint32(n)
 }
 
-// QueryLogs answers one page of the record, newest first.
+// QueryLogs returns one log page, newest first.
 func (s *Server) QueryLogs(_ context.Context, req *corev1.QueryLogsRequest) (*corev1.QueryLogsResponse, error) {
 	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
 		return nil, err
@@ -134,9 +136,9 @@ func (s *Server) QueryLogs(_ context.Context, req *corev1.QueryLogsRequest) (*co
 	return out, nil
 }
 
-// WatchLogs replays the entries after the cursor and follows new ones. A
-// client that cannot keep up gets RESOURCE_EXHAUSTED and resumes with the last
-// sequence it saw, instead of slowing the engines down.
+// WatchLogs replays entries after the cursor and follows new entries. Slow
+// clients receive RESOURCE_EXHAUSTED and resume from their last sequence
+// without blocking engines.
 func (s *Server) WatchLogs(req *corev1.WatchLogsRequest, stream grpc.ServerStreamingServer[corev1.LogEntry]) error {
 	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
 		return err
@@ -172,12 +174,16 @@ var exportFormats = map[corev1.LogExportFormat]logs.Format{
 	corev1.LogExportFormat_LOG_EXPORT_FORMAT_UNSPECIFIED: logs.FormatText,
 	corev1.LogExportFormat_LOG_EXPORT_FORMAT_JSON_LINES:  logs.FormatJSONLines,
 	corev1.LogExportFormat_LOG_EXPORT_FORMAT_CSV:         logs.FormatCSV,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_LOG:         logs.FormatLog,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_JSON:        logs.FormatJSON,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_XML:         logs.FormatXML,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_ZIP:         logs.FormatZIP,
+	corev1.LogExportFormat_LOG_EXPORT_FORMAT_GZIP:        logs.FormatGZIP,
 }
 
-// ExportLogs renders the matching entries in the requested format. The file
-// is built in memory and handed to the interface, which saves it where the
-// user chose; the core never writes it to disk.
-func (s *Server) ExportLogs(_ context.Context, req *corev1.ExportLogsRequest) (*corev1.ExportLogsResponse, error) {
+// ExportLogs renders matching entries in memory. The client saves the result;
+// the core does not write a file.
+func (s *Server) ExportLogs(ctx context.Context, req *corev1.ExportLogsRequest) (*corev1.ExportLogsResponse, error) {
 	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
 		return nil, err
 	}
@@ -194,12 +200,74 @@ func (s *Server) ExportLogs(_ context.Context, req *corev1.ExportLogsRequest) (*
 		err := errs.Newf(errs.CodeInvalidArgument, errs.KeyLogFilterInvalid, "control: unknown export format")
 		return &corev1.ExportLogsResponse{Error: toWire(err, nil, "")}, nil
 	}
+	category := req.GetCategory()
+	switch category {
+	case "", "all", "engine", "tun", "dns", "subscriptions", "core":
+	default:
+		return &corev1.ExportLogsResponse{Error: toWire(errs.Newf(errs.CodeInvalidArgument, errs.KeyLogFilterInvalid, "control: unknown log category"), nil, "")}, nil
+	}
 	data, name, media, err := logs.Export(center.Matching(filter), format, time.Now())
+	if err == nil && format == logs.FormatZIP && s.diagnostics != nil {
+		var report []byte
+		report, err = s.diagnostics.Export(ctx, s.sessions.Status())
+		if err == nil {
+			data, err = mergeDiagnosticArchive(data, report)
+		}
+	}
 	if err != nil {
 		err = errs.Newf(errs.CodeResourceExhausted, errs.KeyLogExportFailed, "control: %v", err)
 		return &corev1.ExportLogsResponse{Error: toWire(err, nil, "")}, nil
 	}
+	if category != "" {
+		name = strings.Replace(name, "sora-log_", "sora-log_"+category+"_", 1)
+	}
 	return &corev1.ExportLogsResponse{Data: data, FileName: name, MediaType: media}, nil
+}
+
+func mergeDiagnosticArchive(events, report []byte) ([]byte, error) {
+	var output bytes.Buffer
+	writer := zip.NewWriter(&output)
+	remaining := int64(logs.MaxExportBytes)
+	for i, content := range [][]byte{events, report} {
+		reader, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
+		if err != nil {
+			return nil, err
+		}
+		for _, file := range reader.File {
+			name := file.Name
+			if i == 1 {
+				name = "diagnostics/" + name
+			}
+			entry, err := writer.Create(name)
+			if err != nil {
+				return nil, err
+			}
+			source, err := file.Open()
+			if err != nil {
+				return nil, err
+			}
+			copied, copyErr := io.Copy(entry, io.LimitReader(source, remaining+1))
+			closeErr := source.Close()
+			if copied > remaining {
+				return nil, io.ErrShortBuffer
+			}
+			remaining -= copied
+			err = copyErr
+			if err == nil {
+				err = closeErr
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	if err := writer.Close(); err != nil {
+		return nil, err
+	}
+	if output.Len() > logs.MaxExportBytes {
+		return nil, io.ErrShortBuffer
+	}
+	return output.Bytes(), nil
 }
 
 // ClearLogs empties the record.
@@ -220,14 +288,13 @@ func settingsToWire(st logs.Settings) *corev1.LogSettings {
 		MaxEntries: bound(st.MaxEntries), MaxBytes: bound(st.MaxBytes)}
 }
 
-// Upper bounds a client may set, so a request cannot make the core hold
-// gigabytes of log in memory.
+// Limit client settings to bound log memory usage.
 const (
 	maxLogEntries = 200000
 	maxLogBytes   = 64 << 20
 )
 
-// GetLogSettings answers the switches of the log center.
+// GetLogSettings returns the log center settings.
 func (s *Server) GetLogSettings(_ context.Context, req *corev1.GetLogSettingsRequest) (*corev1.GetLogSettingsResponse, error) {
 	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
 		return nil, err
@@ -239,7 +306,7 @@ func (s *Server) GetLogSettings(_ context.Context, req *corev1.GetLogSettingsReq
 	return &corev1.GetLogSettingsResponse{Settings: settingsToWire(center.Settings())}, nil
 }
 
-// SetLogSettings changes the switches; they apply to the next entry.
+// SetLogSettings updates settings starting with the next entry.
 func (s *Server) SetLogSettings(_ context.Context, req *corev1.SetLogSettingsRequest) (*corev1.SetLogSettingsResponse, error) {
 	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
 		return nil, err
@@ -258,7 +325,7 @@ func (s *Server) SetLogSettings(_ context.Context, req *corev1.SetLogSettingsReq
 	return &corev1.SetLogSettingsResponse{Settings: settingsToWire(applied)}, nil
 }
 
-// ListConnections answers the live connections of the running session.
+// ListConnections returns the running session's live connections.
 func (s *Server) ListConnections(ctx context.Context, req *corev1.ListConnectionsRequest) (*corev1.ListConnectionsResponse, error) {
 	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
 		return nil, err
@@ -293,7 +360,7 @@ func (s *Server) CloseConnection(ctx context.Context, req *corev1.CloseConnectio
 	return &corev1.CloseConnectionResponse{}, nil
 }
 
-// connectionSession is the part of a session the connection center uses.
+// connectionSession exposes session operations needed by the connection center.
 type connectionSession interface {
 	Connections(ctx context.Context) ([]engine.Connection, error)
 	CloseConnection(ctx context.Context, id string) error
