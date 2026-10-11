@@ -113,6 +113,7 @@ class ConnectRequest extends $pb.GeneratedMessage {
     $core.String? sessionId,
     SessionPlan? sessionPlan,
     $core.List<$core.int>? controlAuthenticator,
+    $core.bool? killSwitch,
   }) {
     final $result = create();
     if (apiVersion != null) {
@@ -130,6 +131,9 @@ class ConnectRequest extends $pb.GeneratedMessage {
     if (controlAuthenticator != null) {
       $result.controlAuthenticator = controlAuthenticator;
     }
+    if (killSwitch != null) {
+      $result.killSwitch = killSwitch;
+    }
     return $result;
   }
   ConnectRequest._() : super();
@@ -142,6 +146,7 @@ class ConnectRequest extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'sessionId')
     ..aOM<SessionPlan>(4, _omitFieldNames ? '' : 'sessionPlan', subBuilder: SessionPlan.create)
     ..a<$core.List<$core.int>>(5, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOB(6, _omitFieldNames ? '' : 'killSwitch')
     ..hasRequiredFields = false
   ;
 
@@ -214,6 +219,17 @@ class ConnectRequest extends $pb.GeneratedMessage {
   $core.bool hasControlAuthenticator() => $_has(4);
   @$pb.TagNumber(5)
   void clearControlAuthenticator() => clearField(5);
+
+  /// Since 1.5. Arms the kill switch before the engine starts, so no traffic
+  /// leaves outside the tunnel between connecting and a later SetKillSwitch.
+  @$pb.TagNumber(6)
+  $core.bool get killSwitch => $_getBF(5);
+  @$pb.TagNumber(6)
+  set killSwitch($core.bool v) { $_setBool(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasKillSwitch() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearKillSwitch() => clearField(6);
 }
 
 class ConnectResponse extends $pb.GeneratedMessage {
@@ -674,6 +690,8 @@ class SessionPlan extends $pb.GeneratedMessage {
     LocalProxy? localProxy,
     $core.Iterable<GroupSpec>? groups,
     RoutingOptions? routing,
+    $core.bool? ipv6,
+    $core.String? tunStack,
   }) {
     final $result = create();
     if (tunnelMode != null) {
@@ -712,6 +730,12 @@ class SessionPlan extends $pb.GeneratedMessage {
     if (routing != null) {
       $result.routing = routing;
     }
+    if (ipv6 != null) {
+      $result.ipv6 = ipv6;
+    }
+    if (tunStack != null) {
+      $result.tunStack = tunStack;
+    }
     return $result;
   }
   SessionPlan._() : super();
@@ -731,6 +755,8 @@ class SessionPlan extends $pb.GeneratedMessage {
     ..aOM<LocalProxy>(10, _omitFieldNames ? '' : 'localProxy', subBuilder: LocalProxy.create)
     ..pc<GroupSpec>(11, _omitFieldNames ? '' : 'groups', $pb.PbFieldType.PM, subBuilder: GroupSpec.create)
     ..aOM<RoutingOptions>(12, _omitFieldNames ? '' : 'routing', subBuilder: RoutingOptions.create)
+    ..aOB(13, _omitFieldNames ? '' : 'ipv6')
+    ..aOS(14, _omitFieldNames ? '' : 'tunStack')
     ..hasRequiredFields = false
   ;
 
@@ -860,6 +886,30 @@ class SessionPlan extends $pb.GeneratedMessage {
   void clearRouting() => clearField(12);
   @$pb.TagNumber(12)
   RoutingOptions ensureRouting() => $_ensure(11);
+
+  /// Since 1.3. Resolves and connects over IPv6 as well; off resolves IPv4
+  /// only, which avoids leaks on networks where IPv6 bypasses the tunnel.
+  @$pb.TagNumber(13)
+  $core.bool get ipv6 => $_getBF(12);
+  @$pb.TagNumber(13)
+  set ipv6($core.bool v) { $_setBool(12, v); }
+  @$pb.TagNumber(13)
+  $core.bool hasIpv6() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearIpv6() => clearField(13);
+
+  /// Since 1.7. Empty keeps the engine default. mihomo accepts system, gvisor,
+  /// mixed and mips. Xray uses native gvisor or a mihomo TUN bridge for other
+  /// stacks. Clients must negotiate 1.7 before
+  /// sending an explicit value, so an older core cannot silently ignore it.
+  @$pb.TagNumber(14)
+  $core.String get tunStack => $_getSZ(13);
+  @$pb.TagNumber(14)
+  set tunStack($core.String v) { $_setString(13, v); }
+  @$pb.TagNumber(14)
+  $core.bool hasTunStack() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearTunStack() => clearField(14);
 }
 
 /// GroupSpec is one group of outbounds.
@@ -1254,6 +1304,7 @@ class OutboundSpec extends $pb.GeneratedMessage {
     Endpoint? endpoint,
     CredentialsRef? credentials,
     BypassStrategy? bypass,
+    $core.String? displayProtocol,
   }) {
     final $result = create();
     if (id != null) {
@@ -1280,6 +1331,9 @@ class OutboundSpec extends $pb.GeneratedMessage {
     if (bypass != null) {
       $result.bypass = bypass;
     }
+    if (displayProtocol != null) {
+      $result.displayProtocol = displayProtocol;
+    }
     return $result;
   }
   OutboundSpec._() : super();
@@ -1295,6 +1349,7 @@ class OutboundSpec extends $pb.GeneratedMessage {
     ..aOM<Endpoint>(6, _omitFieldNames ? '' : 'endpoint', subBuilder: Endpoint.create)
     ..aOM<CredentialsRef>(7, _omitFieldNames ? '' : 'credentials', subBuilder: CredentialsRef.create)
     ..aOM<BypassStrategy>(8, _omitFieldNames ? '' : 'bypass', subBuilder: BypassStrategy.create)
+    ..aOS(9, _omitFieldNames ? '' : 'displayProtocol')
     ..hasRequiredFields = false
   ;
 
@@ -1398,6 +1453,16 @@ class OutboundSpec extends $pb.GeneratedMessage {
   void clearBypass() => clearField(8);
   @$pb.TagNumber(8)
   BypassStrategy ensureBypass() => $_ensure(7);
+
+  /// Display metadata for full profiles; protocol still selects the adapter.
+  @$pb.TagNumber(9)
+  $core.String get displayProtocol => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set displayProtocol($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasDisplayProtocol() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearDisplayProtocol() => clearField(9);
 }
 
 class Endpoint extends $pb.GeneratedMessage {
@@ -1514,6 +1579,10 @@ class CredentialsRef extends $pb.GeneratedMessage {
   void clearReference() => clearField(1);
 }
 
+/// RoutingRule sends a destination to an outbound, a group, "direct" or
+/// "reject". The destination is "domain:" (the site and everything under it),
+/// "full:", "geosite:", "geoip:", "ruleset:", "process:" (a program by name,
+/// since 1.3), a network such as "203.0.113.0/24", or a port.
 class RoutingRule extends $pb.GeneratedMessage {
   factory RoutingRule({
     $core.String? destination,
@@ -1578,6 +1647,9 @@ class RoutingRule extends $pb.GeneratedMessage {
   void clearOutboundId() => clearField(2);
 }
 
+/// DnsPolicy names the resolvers of the session. A tun session that names none
+/// uses DNS over HTTPS to 1.1.1.1 and 8.8.8.8, since the adapter carries every
+/// lookup of the machine.
 class DnsPolicy extends $pb.GeneratedMessage {
   factory DnsPolicy({
     $core.Iterable<$core.String>? servers,
@@ -2014,6 +2086,7 @@ enum CoreEvent_Payload {
   logBatch, 
   error, 
   killSwitchChanged, 
+  groupSwitched, 
   notSet
 }
 
@@ -2029,6 +2102,7 @@ class CoreEvent extends $pb.GeneratedMessage {
     LogBatch? logBatch,
     SoraError? error,
     KillSwitchChanged? killSwitchChanged,
+    GroupSwitched? groupSwitched,
   }) {
     final $result = create();
     if (sequence != null) {
@@ -2061,6 +2135,9 @@ class CoreEvent extends $pb.GeneratedMessage {
     if (killSwitchChanged != null) {
       $result.killSwitchChanged = killSwitchChanged;
     }
+    if (groupSwitched != null) {
+      $result.groupSwitched = groupSwitched;
+    }
     return $result;
   }
   CoreEvent._() : super();
@@ -2075,10 +2152,11 @@ class CoreEvent extends $pb.GeneratedMessage {
     8 : CoreEvent_Payload.logBatch,
     9 : CoreEvent_Payload.error,
     10 : CoreEvent_Payload.killSwitchChanged,
+    11 : CoreEvent_Payload.groupSwitched,
     0 : CoreEvent_Payload.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CoreEvent', package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'), createEmptyInstance: create)
-    ..oo(0, [4, 5, 6, 7, 8, 9, 10])
+    ..oo(0, [4, 5, 6, 7, 8, 9, 10, 11])
     ..a<$fixnum.Int64>(1, _omitFieldNames ? '' : 'sequence', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(2, _omitFieldNames ? '' : 'sessionId')
     ..aOM<$2.Timestamp>(3, _omitFieldNames ? '' : 'emittedAt', subBuilder: $2.Timestamp.create)
@@ -2089,6 +2167,7 @@ class CoreEvent extends $pb.GeneratedMessage {
     ..aOM<LogBatch>(8, _omitFieldNames ? '' : 'logBatch', subBuilder: LogBatch.create)
     ..aOM<SoraError>(9, _omitFieldNames ? '' : 'error', subBuilder: SoraError.create)
     ..aOM<KillSwitchChanged>(10, _omitFieldNames ? '' : 'killSwitchChanged', subBuilder: KillSwitchChanged.create)
+    ..aOM<GroupSwitched>(11, _omitFieldNames ? '' : 'groupSwitched', subBuilder: GroupSwitched.create)
     ..hasRequiredFields = false
   ;
 
@@ -2221,6 +2300,17 @@ class CoreEvent extends $pb.GeneratedMessage {
   void clearKillSwitchChanged() => clearField(10);
   @$pb.TagNumber(10)
   KillSwitchChanged ensureKillSwitchChanged() => $_ensure(9);
+
+  @$pb.TagNumber(11)
+  GroupSwitched get groupSwitched => $_getN(10);
+  @$pb.TagNumber(11)
+  set groupSwitched(GroupSwitched v) { setField(11, v); }
+  @$pb.TagNumber(11)
+  $core.bool hasGroupSwitched() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearGroupSwitched() => clearField(11);
+  @$pb.TagNumber(11)
+  GroupSwitched ensureGroupSwitched() => $_ensure(10);
 }
 
 class StateChanged extends $pb.GeneratedMessage {
@@ -2273,6 +2363,87 @@ class StateChanged extends $pb.GeneratedMessage {
   void clearState() => clearField(1);
   @$pb.TagNumber(1)
   ConnectionState ensureState() => $_ensure(0);
+}
+
+/// Since 1.5. A fallback group moved to another member on its own: the member
+/// it used stopped answering, or one before it answers again. Members are
+/// outbound ids or names of nested groups.
+class GroupSwitched extends $pb.GeneratedMessage {
+  factory GroupSwitched({
+    $core.String? group,
+    $core.String? selected,
+    $core.String? previous,
+  }) {
+    final $result = create();
+    if (group != null) {
+      $result.group = group;
+    }
+    if (selected != null) {
+      $result.selected = selected;
+    }
+    if (previous != null) {
+      $result.previous = previous;
+    }
+    return $result;
+  }
+  GroupSwitched._() : super();
+  factory GroupSwitched.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GroupSwitched.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GroupSwitched', package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'group')
+    ..aOS(2, _omitFieldNames ? '' : 'selected')
+    ..aOS(3, _omitFieldNames ? '' : 'previous')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GroupSwitched clone() => GroupSwitched()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GroupSwitched copyWith(void Function(GroupSwitched) updates) => super.copyWith((message) => updates(message as GroupSwitched)) as GroupSwitched;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static GroupSwitched create() => GroupSwitched._();
+  GroupSwitched createEmptyInstance() => create();
+  static $pb.PbList<GroupSwitched> createRepeated() => $pb.PbList<GroupSwitched>();
+  @$core.pragma('dart2js:noInline')
+  static GroupSwitched getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GroupSwitched>(create);
+  static GroupSwitched? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get group => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set group($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasGroup() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearGroup() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get selected => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set selected($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasSelected() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSelected() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get previous => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set previous($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasPrevious() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearPrevious() => clearField(3);
 }
 
 class StatsTick extends $pb.GeneratedMessage {
@@ -3508,6 +3679,8 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
     ApiVersion? apiVersion,
     $core.String? requestId,
     $core.String? sessionId,
+    DiagnosticFormat? format,
+    $core.List<$core.int>? controlAuthenticator,
   }) {
     final $result = create();
     if (apiVersion != null) {
@@ -3519,6 +3692,12 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
     if (sessionId != null) {
       $result.sessionId = sessionId;
     }
+    if (format != null) {
+      $result.format = format;
+    }
+    if (controlAuthenticator != null) {
+      $result.controlAuthenticator = controlAuthenticator;
+    }
     return $result;
   }
   ExportDiagnosticsRequest._() : super();
@@ -3529,6 +3708,8 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
     ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.create)
     ..aOS(2, _omitFieldNames ? '' : 'requestId')
     ..aOS(3, _omitFieldNames ? '' : 'sessionId')
+    ..e<DiagnosticFormat>(4, _omitFieldNames ? '' : 'format', $pb.PbFieldType.OE, defaultOrMaker: DiagnosticFormat.DIAGNOSTIC_FORMAT_UNSPECIFIED, valueOf: DiagnosticFormat.valueOf, enumValues: DiagnosticFormat.values)
+    ..a<$core.List<$core.int>>(5, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
     ..hasRequiredFields = false
   ;
 
@@ -3581,6 +3762,24 @@ class ExportDiagnosticsRequest extends $pb.GeneratedMessage {
   $core.bool hasSessionId() => $_has(2);
   @$pb.TagNumber(3)
   void clearSessionId() => clearField(3);
+
+  @$pb.TagNumber(4)
+  DiagnosticFormat get format => $_getN(3);
+  @$pb.TagNumber(4)
+  set format(DiagnosticFormat v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasFormat() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearFormat() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<$core.int> get controlAuthenticator => $_getN(4);
+  @$pb.TagNumber(5)
+  set controlAuthenticator($core.List<$core.int> v) { $_setBytes(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasControlAuthenticator() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearControlAuthenticator() => clearField(5);
 }
 
 class ExportDiagnosticsResponse extends $pb.GeneratedMessage {
@@ -3909,6 +4108,7 @@ class HandshakeResponse extends $pb.GeneratedMessage {
   factory HandshakeResponse({
     ApiVersion? negotiatedVersion,
     SoraError? error,
+    $core.List<$core.int>? controlAuthenticator,
   }) {
     final $result = create();
     if (negotiatedVersion != null) {
@@ -3916,6 +4116,9 @@ class HandshakeResponse extends $pb.GeneratedMessage {
     }
     if (error != null) {
       $result.error = error;
+    }
+    if (controlAuthenticator != null) {
+      $result.controlAuthenticator = controlAuthenticator;
     }
     return $result;
   }
@@ -3926,6 +4129,7 @@ class HandshakeResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'HandshakeResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'), createEmptyInstance: create)
     ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'negotiatedVersion', subBuilder: ApiVersion.create)
     ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.create)
+    ..a<$core.List<$core.int>>(3, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
     ..hasRequiredFields = false
   ;
 
@@ -3971,6 +4175,19 @@ class HandshakeResponse extends $pb.GeneratedMessage {
   void clearError() => clearField(2);
   @$pb.TagNumber(2)
   SoraError ensureError() => $_ensure(1);
+
+  /// Since 1.3. The token the other calls present. The transport admits only
+  /// the core's own account, the service group and the person in the active
+  /// local session, so whoever reaches Handshake may hold it; a system
+  /// installation keeps the token file where that person cannot read it.
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get controlAuthenticator => $_getN(2);
+  @$pb.TagNumber(3)
+  set controlAuthenticator($core.List<$core.int> v) { $_setBytes(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasControlAuthenticator() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearControlAuthenticator() => clearField(3);
 }
 
 /// PutSecretRequest hands one piece of credential material to the core. The
@@ -5191,6 +5408,7 @@ class ExportLogsRequest extends $pb.GeneratedMessage {
     $core.List<$core.int>? controlAuthenticator,
     LogFilter? filter,
     LogExportFormat? format,
+    $core.String? category,
   }) {
     final $result = create();
     if (apiVersion != null) {
@@ -5205,6 +5423,9 @@ class ExportLogsRequest extends $pb.GeneratedMessage {
     if (format != null) {
       $result.format = format;
     }
+    if (category != null) {
+      $result.category = category;
+    }
     return $result;
   }
   ExportLogsRequest._() : super();
@@ -5216,6 +5437,7 @@ class ExportLogsRequest extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
     ..aOM<LogFilter>(3, _omitFieldNames ? '' : 'filter', subBuilder: LogFilter.create)
     ..e<LogExportFormat>(4, _omitFieldNames ? '' : 'format', $pb.PbFieldType.OE, defaultOrMaker: LogExportFormat.LOG_EXPORT_FORMAT_UNSPECIFIED, valueOf: LogExportFormat.valueOf, enumValues: LogExportFormat.values)
+    ..aOS(5, _omitFieldNames ? '' : 'category')
     ..hasRequiredFields = false
   ;
 
@@ -5279,6 +5501,16 @@ class ExportLogsRequest extends $pb.GeneratedMessage {
   $core.bool hasFormat() => $_has(3);
   @$pb.TagNumber(4)
   void clearFormat() => clearField(4);
+
+  /// Optional filename category: all, engine, tun, dns, subscriptions or core.
+  @$pb.TagNumber(5)
+  $core.String get category => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set category($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasCategory() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearCategory() => clearField(5);
 }
 
 class ExportLogsResponse extends $pb.GeneratedMessage {
@@ -6466,7 +6698,7 @@ class SubscriptionSettings extends $pb.GeneratedMessage {
   $1.Duration ensureUpdateInterval() => $_ensure(5);
 }
 
-/// SubscriptionState is a subscription as the core holds it.
+/// SubscriptionState omits settings.url because it carries a bearer token.
 class SubscriptionState extends $pb.GeneratedMessage {
   factory SubscriptionState({
     SubscriptionSettings? settings,
@@ -7260,6 +7492,153 @@ class WatchSubscriptionsRequest extends $pb.GeneratedMessage {
   void clearControlAuthenticator() => clearField(2);
 }
 
+/// Since 1.6. The link is available only through this authenticated request.
+class GetSubscriptionLinkRequest extends $pb.GeneratedMessage {
+  factory GetSubscriptionLinkRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.String? id,
+  }) {
+    final $result = create();
+    if (apiVersion != null) {
+      $result.apiVersion = apiVersion;
+    }
+    if (controlAuthenticator != null) {
+      $result.controlAuthenticator = controlAuthenticator;
+    }
+    if (id != null) {
+      $result.id = id;
+    }
+    return $result;
+  }
+  GetSubscriptionLinkRequest._() : super();
+  factory GetSubscriptionLinkRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetSubscriptionLinkRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetSubscriptionLinkRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'), createEmptyInstance: create)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.create)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOS(3, _omitFieldNames ? '' : 'id')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GetSubscriptionLinkRequest clone() => GetSubscriptionLinkRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GetSubscriptionLinkRequest copyWith(void Function(GetSubscriptionLinkRequest) updates) => super.copyWith((message) => updates(message as GetSubscriptionLinkRequest)) as GetSubscriptionLinkRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static GetSubscriptionLinkRequest create() => GetSubscriptionLinkRequest._();
+  GetSubscriptionLinkRequest createEmptyInstance() => create();
+  static $pb.PbList<GetSubscriptionLinkRequest> createRepeated() => $pb.PbList<GetSubscriptionLinkRequest>();
+  @$core.pragma('dart2js:noInline')
+  static GetSubscriptionLinkRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetSubscriptionLinkRequest>(create);
+  static GetSubscriptionLinkRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> v) { $_setBytes(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get id => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set id($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearId() => clearField(3);
+}
+
+class GetSubscriptionLinkResponse extends $pb.GeneratedMessage {
+  factory GetSubscriptionLinkResponse({
+    $core.String? url,
+    SoraError? error,
+  }) {
+    final $result = create();
+    if (url != null) {
+      $result.url = url;
+    }
+    if (error != null) {
+      $result.error = error;
+    }
+    return $result;
+  }
+  GetSubscriptionLinkResponse._() : super();
+  factory GetSubscriptionLinkResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetSubscriptionLinkResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetSubscriptionLinkResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'url')
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GetSubscriptionLinkResponse clone() => GetSubscriptionLinkResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GetSubscriptionLinkResponse copyWith(void Function(GetSubscriptionLinkResponse) updates) => super.copyWith((message) => updates(message as GetSubscriptionLinkResponse)) as GetSubscriptionLinkResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static GetSubscriptionLinkResponse create() => GetSubscriptionLinkResponse._();
+  GetSubscriptionLinkResponse createEmptyInstance() => create();
+  static $pb.PbList<GetSubscriptionLinkResponse> createRepeated() => $pb.PbList<GetSubscriptionLinkResponse>();
+  @$core.pragma('dart2js:noInline')
+  static GetSubscriptionLinkResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetSubscriptionLinkResponse>(create);
+  static GetSubscriptionLinkResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get url => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set url($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUrl() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUrl() => clearField(1);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
 class GetAboutRequest extends $pb.GeneratedMessage {
   factory GetAboutRequest({
     ApiVersion? apiVersion,
@@ -7392,6 +7771,7 @@ class About extends $pb.GeneratedMessage {
     $core.Iterable<EngineBuild>? engines,
     $core.String? license,
     $core.String? sourceUrl,
+    Endpoint? localProxy,
   }) {
     final $result = create();
     if (coreVersion != null) {
@@ -7421,6 +7801,9 @@ class About extends $pb.GeneratedMessage {
     if (sourceUrl != null) {
       $result.sourceUrl = sourceUrl;
     }
+    if (localProxy != null) {
+      $result.localProxy = localProxy;
+    }
     return $result;
   }
   About._() : super();
@@ -7437,6 +7820,7 @@ class About extends $pb.GeneratedMessage {
     ..pc<EngineBuild>(7, _omitFieldNames ? '' : 'engines', $pb.PbFieldType.PM, subBuilder: EngineBuild.create)
     ..aOS(8, _omitFieldNames ? '' : 'license')
     ..aOS(9, _omitFieldNames ? '' : 'sourceUrl')
+    ..aOM<Endpoint>(10, _omitFieldNames ? '' : 'localProxy', subBuilder: Endpoint.create)
     ..hasRequiredFields = false
   ;
 
@@ -7544,6 +7928,19 @@ class About extends $pb.GeneratedMessage {
   $core.bool hasSourceUrl() => $_has(8);
   @$pb.TagNumber(9)
   void clearSourceUrl() => clearField(9);
+
+  /// Since 1.4. Where the local proxy listens. A session in the application
+  /// tunnel mode opens it, and the interface points the system proxy at it.
+  @$pb.TagNumber(10)
+  Endpoint get localProxy => $_getN(9);
+  @$pb.TagNumber(10)
+  set localProxy(Endpoint v) { setField(10, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasLocalProxy() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearLocalProxy() => clearField(10);
+  @$pb.TagNumber(10)
+  Endpoint ensureLocalProxy() => $_ensure(9);
 }
 
 /// EngineBuild is one engine as this machine has it.

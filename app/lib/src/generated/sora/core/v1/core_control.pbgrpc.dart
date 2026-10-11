@@ -129,6 +129,10 @@ class CoreControlClient extends $grpc.Client {
       '/sora.core.v1.CoreControl/WatchSubscriptions',
       ($0.WatchSubscriptionsRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.SubscriptionState.fromBuffer(value));
+  static final _$getSubscriptionLink = $grpc.ClientMethod<$0.GetSubscriptionLinkRequest, $0.GetSubscriptionLinkResponse>(
+      '/sora.core.v1.CoreControl/GetSubscriptionLink',
+      ($0.GetSubscriptionLinkRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.GetSubscriptionLinkResponse.fromBuffer(value));
   static final _$putSecret = $grpc.ClientMethod<$0.PutSecretRequest, $0.PutSecretResponse>(
       '/sora.core.v1.CoreControl/PutSecret',
       ($0.PutSecretRequest value) => value.writeToBuffer(),
@@ -250,6 +254,10 @@ class CoreControlClient extends $grpc.Client {
 
   $grpc.ResponseStream<$0.SubscriptionState> watchSubscriptions($0.WatchSubscriptionsRequest request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$watchSubscriptions, $async.Stream.fromIterable([request]), options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetSubscriptionLinkResponse> getSubscriptionLink($0.GetSubscriptionLinkRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getSubscriptionLink, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.PutSecretResponse> putSecret($0.PutSecretRequest request, {$grpc.CallOptions? options}) {
@@ -455,6 +463,13 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $0.WatchSubscriptionsRequest.fromBuffer(value),
         ($0.SubscriptionState value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetSubscriptionLinkRequest, $0.GetSubscriptionLinkResponse>(
+        'GetSubscriptionLink',
+        getSubscriptionLink_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetSubscriptionLinkRequest.fromBuffer(value),
+        ($0.GetSubscriptionLinkResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.PutSecretRequest, $0.PutSecretResponse>(
         'PutSecret',
         putSecret_Pre,
@@ -579,6 +594,10 @@ abstract class CoreControlServiceBase extends $grpc.Service {
     yield* watchSubscriptions(call, await request);
   }
 
+  $async.Future<$0.GetSubscriptionLinkResponse> getSubscriptionLink_Pre($grpc.ServiceCall call, $async.Future<$0.GetSubscriptionLinkRequest> request) async {
+    return getSubscriptionLink(call, await request);
+  }
+
   $async.Future<$0.PutSecretResponse> putSecret_Pre($grpc.ServiceCall call, $async.Future<$0.PutSecretRequest> request) async {
     return putSecret(call, await request);
   }
@@ -614,6 +633,7 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   $async.Future<$0.DeleteSubscriptionResponse> deleteSubscription($grpc.ServiceCall call, $0.DeleteSubscriptionRequest request);
   $async.Future<$0.RefreshSubscriptionResponse> refreshSubscription($grpc.ServiceCall call, $0.RefreshSubscriptionRequest request);
   $async.Stream<$0.SubscriptionState> watchSubscriptions($grpc.ServiceCall call, $0.WatchSubscriptionsRequest request);
+  $async.Future<$0.GetSubscriptionLinkResponse> getSubscriptionLink($grpc.ServiceCall call, $0.GetSubscriptionLinkRequest request);
   $async.Future<$0.PutSecretResponse> putSecret($grpc.ServiceCall call, $0.PutSecretRequest request);
   $async.Future<$0.DeleteSecretResponse> deleteSecret($grpc.ServiceCall call, $0.DeleteSecretRequest request);
 }

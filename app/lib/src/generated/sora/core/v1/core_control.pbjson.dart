@@ -82,6 +82,21 @@ final $typed_data.Uint8List probeMethodDescriptor = $convert.base64Decode(
     'CgtQcm9iZU1ldGhvZBIcChhQUk9CRV9NRVRIT0RfVU5TUEVDSUZJRUQQABIXChNQUk9CRV9NRV'
     'RIT0RfRU5HSU5FEAESGAoUUFJPQkVfTUVUSE9EX0NPTk5FQ1QQAg==');
 
+@$core.Deprecated('Use diagnosticFormatDescriptor instead')
+const DiagnosticFormat$json = {
+  '1': 'DiagnosticFormat',
+  '2': [
+    {'1': 'DIAGNOSTIC_FORMAT_UNSPECIFIED', '2': 0},
+    {'1': 'DIAGNOSTIC_FORMAT_PCAPNG', '2': 1},
+    {'1': 'DIAGNOSTIC_FORMAT_EVTX', '2': 2},
+  ],
+};
+
+/// Descriptor for `DiagnosticFormat`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List diagnosticFormatDescriptor = $convert.base64Decode(
+    'ChBEaWFnbm9zdGljRm9ybWF0EiEKHURJQUdOT1NUSUNfRk9STUFUX1VOU1BFQ0lGSUVEEAASHA'
+    'oYRElBR05PU1RJQ19GT1JNQVRfUENBUE5HEAESGgoWRElBR05PU1RJQ19GT1JNQVRfRVZUWBAC');
+
 @$core.Deprecated('Use soraErrorCodeDescriptor instead')
 const SoraErrorCode$json = {
   '1': 'SoraErrorCode',
@@ -138,6 +153,11 @@ const LogExportFormat$json = {
     {'1': 'LOG_EXPORT_FORMAT_UNSPECIFIED', '2': 0},
     {'1': 'LOG_EXPORT_FORMAT_JSON_LINES', '2': 1},
     {'1': 'LOG_EXPORT_FORMAT_CSV', '2': 2},
+    {'1': 'LOG_EXPORT_FORMAT_LOG', '2': 3},
+    {'1': 'LOG_EXPORT_FORMAT_JSON', '2': 4},
+    {'1': 'LOG_EXPORT_FORMAT_XML', '2': 5},
+    {'1': 'LOG_EXPORT_FORMAT_ZIP', '2': 6},
+    {'1': 'LOG_EXPORT_FORMAT_GZIP', '2': 7},
   ],
 };
 
@@ -145,7 +165,9 @@ const LogExportFormat$json = {
 final $typed_data.Uint8List logExportFormatDescriptor = $convert.base64Decode(
     'Cg9Mb2dFeHBvcnRGb3JtYXQSIQodTE9HX0VYUE9SVF9GT1JNQVRfVU5TUEVDSUZJRUQQABIgCh'
     'xMT0dfRVhQT1JUX0ZPUk1BVF9KU09OX0xJTkVTEAESGQoVTE9HX0VYUE9SVF9GT1JNQVRfQ1NW'
-    'EAI=');
+    'EAISGQoVTE9HX0VYUE9SVF9GT1JNQVRfTE9HEAMSGgoWTE9HX0VYUE9SVF9GT1JNQVRfSlNPTh'
+    'AEEhkKFUxPR19FWFBPUlRfRk9STUFUX1hNTBAFEhkKFUxPR19FWFBPUlRfRk9STUFUX1pJUBAG'
+    'EhoKFkxPR19FWFBPUlRfRk9STUFUX0daSVAQBw==');
 
 @$core.Deprecated('Use apiVersionDescriptor instead')
 const ApiVersion$json = {
@@ -173,6 +195,7 @@ const ConnectRequest$json = {
     {'1': 'session_id', '3': 3, '4': 1, '5': 9, '10': 'sessionId'},
     {'1': 'session_plan', '3': 4, '4': 1, '5': 11, '6': '.sora.core.v1.SessionPlan', '10': 'sessionPlan'},
     {'1': 'control_authenticator', '3': 5, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'kill_switch', '3': 6, '4': 1, '5': 8, '10': 'killSwitch'},
   ],
 };
 
@@ -182,7 +205,8 @@ final $typed_data.Uint8List connectRequestDescriptor = $convert.base64Decode(
     'lWZXJzaW9uUgphcGlWZXJzaW9uEh0KCnJlcXVlc3RfaWQYAiABKAlSCXJlcXVlc3RJZBIdCgpz'
     'ZXNzaW9uX2lkGAMgASgJUglzZXNzaW9uSWQSPAoMc2Vzc2lvbl9wbGFuGAQgASgLMhkuc29yYS'
     '5jb3JlLnYxLlNlc3Npb25QbGFuUgtzZXNzaW9uUGxhbhIzChVjb250cm9sX2F1dGhlbnRpY2F0'
-    'b3IYBSABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9y');
+    'b3IYBSABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9yEh8KC2tpbGxfc3dpdGNoGAYgASgIUgpraW'
+    'xsU3dpdGNo');
 
 @$core.Deprecated('Use connectResponseDescriptor instead')
 const ConnectResponse$json = {
@@ -293,6 +317,8 @@ const SessionPlan$json = {
     {'1': 'local_proxy', '3': 10, '4': 1, '5': 11, '6': '.sora.core.v1.LocalProxy', '10': 'localProxy'},
     {'1': 'groups', '3': 11, '4': 3, '5': 11, '6': '.sora.core.v1.GroupSpec', '10': 'groups'},
     {'1': 'routing', '3': 12, '4': 1, '5': 11, '6': '.sora.core.v1.RoutingOptions', '10': 'routing'},
+    {'1': 'ipv6', '3': 13, '4': 1, '5': 8, '10': 'ipv6'},
+    {'1': 'tun_stack', '3': 14, '4': 1, '5': 9, '10': 'tunStack'},
   ],
 };
 
@@ -310,7 +336,7 @@ final $typed_data.Uint8List sessionPlanDescriptor = $convert.base64Decode(
     'xvd2VkEjkKC2xvY2FsX3Byb3h5GAogASgLMhguc29yYS5jb3JlLnYxLkxvY2FsUHJveHlSCmxv'
     'Y2FsUHJveHkSLwoGZ3JvdXBzGAsgAygLMhcuc29yYS5jb3JlLnYxLkdyb3VwU3BlY1IGZ3JvdX'
     'BzEjYKB3JvdXRpbmcYDCABKAsyHC5zb3JhLmNvcmUudjEuUm91dGluZ09wdGlvbnNSB3JvdXRp'
-    'bmc=');
+    'bmcSEgoEaXB2NhgNIAEoCFIEaXB2NhIbCgl0dW5fc3RhY2sYDiABKAlSCHR1blN0YWNr');
 
 @$core.Deprecated('Use groupSpecDescriptor instead')
 const GroupSpec$json = {
@@ -393,6 +419,7 @@ const OutboundSpec$json = {
     {'1': 'security', '3': 5, '4': 1, '5': 9, '10': 'security'},
     {'1': 'endpoint', '3': 6, '4': 1, '5': 11, '6': '.sora.core.v1.Endpoint', '10': 'endpoint'},
     {'1': 'credentials', '3': 7, '4': 1, '5': 11, '6': '.sora.core.v1.CredentialsRef', '10': 'credentials'},
+    {'1': 'display_protocol', '3': 9, '4': 1, '5': 9, '10': 'displayProtocol'},
   ],
 };
 
@@ -403,7 +430,8 @@ final $typed_data.Uint8List outboundSpecDescriptor = $convert.base64Decode(
     'UgZieXBhc3MSGgoIcHJvdG9jb2wYAyABKAlSCHByb3RvY29sEhwKCXRyYW5zcG9ydBgEIAEoCV'
     'IJdHJhbnNwb3J0EhoKCHNlY3VyaXR5GAUgASgJUghzZWN1cml0eRIyCghlbmRwb2ludBgGIAEo'
     'CzIWLnNvcmEuY29yZS52MS5FbmRwb2ludFIIZW5kcG9pbnQSPgoLY3JlZGVudGlhbHMYByABKA'
-    'syHC5zb3JhLmNvcmUudjEuQ3JlZGVudGlhbHNSZWZSC2NyZWRlbnRpYWxz');
+    'syHC5zb3JhLmNvcmUudjEuQ3JlZGVudGlhbHNSZWZSC2NyZWRlbnRpYWxzEikKEGRpc3BsYXlf'
+    'cHJvdG9jb2wYCSABKAlSD2Rpc3BsYXlQcm90b2NvbA==');
 
 @$core.Deprecated('Use endpointDescriptor instead')
 const Endpoint$json = {
@@ -551,6 +579,7 @@ const CoreEvent$json = {
     {'1': 'log_batch', '3': 8, '4': 1, '5': 11, '6': '.sora.core.v1.LogBatch', '9': 0, '10': 'logBatch'},
     {'1': 'error', '3': 9, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '9': 0, '10': 'error'},
     {'1': 'kill_switch_changed', '3': 10, '4': 1, '5': 11, '6': '.sora.core.v1.KillSwitchChanged', '9': 0, '10': 'killSwitchChanged'},
+    {'1': 'group_switched', '3': 11, '4': 1, '5': 11, '6': '.sora.core.v1.GroupSwitched', '9': 0, '10': 'groupSwitched'},
   ],
   '8': [
     {'1': 'payload'},
@@ -569,8 +598,9 @@ final $typed_data.Uint8List coreEventDescriptor = $convert.base64Decode(
     'JvYmVSZXN1bHRIAFILcHJvYmVSZXN1bHQSNQoJbG9nX2JhdGNoGAggASgLMhYuc29yYS5jb3Jl'
     'LnYxLkxvZ0JhdGNoSABSCGxvZ0JhdGNoEi8KBWVycm9yGAkgASgLMhcuc29yYS5jb3JlLnYxLl'
     'NvcmFFcnJvckgAUgVlcnJvchJRChNraWxsX3N3aXRjaF9jaGFuZ2VkGAogASgLMh8uc29yYS5j'
-    'b3JlLnYxLktpbGxTd2l0Y2hDaGFuZ2VkSABSEWtpbGxTd2l0Y2hDaGFuZ2VkQgkKB3BheWxvYW'
-    'Q=');
+    'b3JlLnYxLktpbGxTd2l0Y2hDaGFuZ2VkSABSEWtpbGxTd2l0Y2hDaGFuZ2VkEkQKDmdyb3VwX3'
+    'N3aXRjaGVkGAsgASgLMhsuc29yYS5jb3JlLnYxLkdyb3VwU3dpdGNoZWRIAFINZ3JvdXBTd2l0'
+    'Y2hlZEIJCgdwYXlsb2Fk');
 
 @$core.Deprecated('Use stateChangedDescriptor instead')
 const StateChanged$json = {
@@ -584,6 +614,21 @@ const StateChanged$json = {
 final $typed_data.Uint8List stateChangedDescriptor = $convert.base64Decode(
     'CgxTdGF0ZUNoYW5nZWQSMwoFc3RhdGUYASABKAsyHS5zb3JhLmNvcmUudjEuQ29ubmVjdGlvbl'
     'N0YXRlUgVzdGF0ZQ==');
+
+@$core.Deprecated('Use groupSwitchedDescriptor instead')
+const GroupSwitched$json = {
+  '1': 'GroupSwitched',
+  '2': [
+    {'1': 'group', '3': 1, '4': 1, '5': 9, '10': 'group'},
+    {'1': 'selected', '3': 2, '4': 1, '5': 9, '10': 'selected'},
+    {'1': 'previous', '3': 3, '4': 1, '5': 9, '10': 'previous'},
+  ],
+};
+
+/// Descriptor for `GroupSwitched`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List groupSwitchedDescriptor = $convert.base64Decode(
+    'Cg1Hcm91cFN3aXRjaGVkEhQKBWdyb3VwGAEgASgJUgVncm91cBIaCghzZWxlY3RlZBgCIAEoCV'
+    'IIc2VsZWN0ZWQSGgoIcHJldmlvdXMYAyABKAlSCHByZXZpb3Vz');
 
 @$core.Deprecated('Use statsTickDescriptor instead')
 const StatsTick$json = {
@@ -831,6 +876,8 @@ const ExportDiagnosticsRequest$json = {
     {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
     {'1': 'request_id', '3': 2, '4': 1, '5': 9, '10': 'requestId'},
     {'1': 'session_id', '3': 3, '4': 1, '5': 9, '10': 'sessionId'},
+    {'1': 'format', '3': 4, '4': 1, '5': 14, '6': '.sora.core.v1.DiagnosticFormat', '10': 'format'},
+    {'1': 'control_authenticator', '3': 5, '4': 1, '5': 12, '10': 'controlAuthenticator'},
   ],
 };
 
@@ -838,7 +885,9 @@ const ExportDiagnosticsRequest$json = {
 final $typed_data.Uint8List exportDiagnosticsRequestDescriptor = $convert.base64Decode(
     'ChhFeHBvcnREaWFnbm9zdGljc1JlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLm'
     'NvcmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIdCgpyZXF1ZXN0X2lkGAIgASgJUglyZXF1'
-    'ZXN0SWQSHQoKc2Vzc2lvbl9pZBgDIAEoCVIJc2Vzc2lvbklk');
+    'ZXN0SWQSHQoKc2Vzc2lvbl9pZBgDIAEoCVIJc2Vzc2lvbklkEjYKBmZvcm1hdBgEIAEoDjIeLn'
+    'NvcmEuY29yZS52MS5EaWFnbm9zdGljRm9ybWF0UgZmb3JtYXQSMwoVY29udHJvbF9hdXRoZW50'
+    'aWNhdG9yGAUgASgMUhRjb250cm9sQXV0aGVudGljYXRvcg==');
 
 @$core.Deprecated('Use exportDiagnosticsResponseDescriptor instead')
 const ExportDiagnosticsResponse$json = {
@@ -917,6 +966,7 @@ const HandshakeResponse$json = {
   '2': [
     {'1': 'negotiated_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'negotiatedVersion'},
     {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+    {'1': 'control_authenticator', '3': 3, '4': 1, '5': 12, '10': 'controlAuthenticator'},
   ],
 };
 
@@ -924,7 +974,8 @@ const HandshakeResponse$json = {
 final $typed_data.Uint8List handshakeResponseDescriptor = $convert.base64Decode(
     'ChFIYW5kc2hha2VSZXNwb25zZRJHChJuZWdvdGlhdGVkX3ZlcnNpb24YASABKAsyGC5zb3JhLm'
     'NvcmUudjEuQXBpVmVyc2lvblIRbmVnb3RpYXRlZFZlcnNpb24SLQoFZXJyb3IYAiABKAsyFy5z'
-    'b3JhLmNvcmUudjEuU29yYUVycm9yUgVlcnJvcg==');
+    'b3JhLmNvcmUudjEuU29yYUVycm9yUgVlcnJvchIzChVjb250cm9sX2F1dGhlbnRpY2F0b3IYAy'
+    'ABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9y');
 
 @$core.Deprecated('Use putSecretRequestDescriptor instead')
 const PutSecretRequest$json = {
@@ -1164,6 +1215,7 @@ const ExportLogsRequest$json = {
     {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
     {'1': 'filter', '3': 3, '4': 1, '5': 11, '6': '.sora.core.v1.LogFilter', '10': 'filter'},
     {'1': 'format', '3': 4, '4': 1, '5': 14, '6': '.sora.core.v1.LogExportFormat', '10': 'format'},
+    {'1': 'category', '3': 5, '4': 1, '5': 9, '10': 'category'},
   ],
 };
 
@@ -1173,7 +1225,7 @@ final $typed_data.Uint8List exportLogsRequestDescriptor = $convert.base64Decode(
     '5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEoDFIU'
     'Y29udHJvbEF1dGhlbnRpY2F0b3ISLwoGZmlsdGVyGAMgASgLMhcuc29yYS5jb3JlLnYxLkxvZ0'
     'ZpbHRlclIGZmlsdGVyEjUKBmZvcm1hdBgEIAEoDjIdLnNvcmEuY29yZS52MS5Mb2dFeHBvcnRG'
-    'b3JtYXRSBmZvcm1hdA==');
+    'b3JtYXRSBmZvcm1hdBIaCghjYXRlZ29yeRgFIAEoCVIIY2F0ZWdvcnk=');
 
 @$core.Deprecated('Use exportLogsResponseDescriptor instead')
 const ExportLogsResponse$json = {
@@ -1573,6 +1625,36 @@ final $typed_data.Uint8List watchSubscriptionsRequestDescriptor = $convert.base6
     '5jb3JlLnYxLkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50aWNhdG9y'
     'GAIgASgMUhRjb250cm9sQXV0aGVudGljYXRvcg==');
 
+@$core.Deprecated('Use getSubscriptionLinkRequestDescriptor instead')
+const GetSubscriptionLinkRequest$json = {
+  '1': 'GetSubscriptionLinkRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'id', '3': 3, '4': 1, '5': 9, '10': 'id'},
+  ],
+};
+
+/// Descriptor for `GetSubscriptionLinkRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getSubscriptionLinkRequestDescriptor = $convert.base64Decode(
+    'ChpHZXRTdWJzY3JpcHRpb25MaW5rUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcm'
+    'EuY29yZS52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRv'
+    'chgCIAEoDFIUY29udHJvbEF1dGhlbnRpY2F0b3ISDgoCaWQYAyABKAlSAmlk');
+
+@$core.Deprecated('Use getSubscriptionLinkResponseDescriptor instead')
+const GetSubscriptionLinkResponse$json = {
+  '1': 'GetSubscriptionLinkResponse',
+  '2': [
+    {'1': 'url', '3': 1, '4': 1, '5': 9, '10': 'url'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `GetSubscriptionLinkResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getSubscriptionLinkResponseDescriptor = $convert.base64Decode(
+    'ChtHZXRTdWJzY3JpcHRpb25MaW5rUmVzcG9uc2USEAoDdXJsGAEgASgJUgN1cmwSLQoFZXJyb3'
+    'IYAiABKAsyFy5zb3JhLmNvcmUudjEuU29yYUVycm9yUgVlcnJvcg==');
+
 @$core.Deprecated('Use getAboutRequestDescriptor instead')
 const GetAboutRequest$json = {
   '1': 'GetAboutRequest',
@@ -1613,6 +1695,7 @@ const About$json = {
     {'1': 'engines', '3': 7, '4': 3, '5': 11, '6': '.sora.core.v1.EngineBuild', '10': 'engines'},
     {'1': 'license', '3': 8, '4': 1, '5': 9, '10': 'license'},
     {'1': 'source_url', '3': 9, '4': 1, '5': 9, '10': 'sourceUrl'},
+    {'1': 'local_proxy', '3': 10, '4': 1, '5': 11, '6': '.sora.core.v1.Endpoint', '10': 'localProxy'},
   ],
 };
 
@@ -1624,7 +1707,8 @@ final $typed_data.Uint8List aboutDescriptor = $convert.base64Decode(
     'JzaW9uUghjb250cmFjdBIaCghwbGF0Zm9ybRgFIAEoCVIIcGxhdGZvcm0SHQoKZ29fdmVyc2lv'
     'bhgGIAEoCVIJZ29WZXJzaW9uEjMKB2VuZ2luZXMYByADKAsyGS5zb3JhLmNvcmUudjEuRW5naW'
     '5lQnVpbGRSB2VuZ2luZXMSGAoHbGljZW5zZRgIIAEoCVIHbGljZW5zZRIdCgpzb3VyY2VfdXJs'
-    'GAkgASgJUglzb3VyY2VVcmw=');
+    'GAkgASgJUglzb3VyY2VVcmwSNwoLbG9jYWxfcHJveHkYCiABKAsyFi5zb3JhLmNvcmUudjEuRW'
+    '5kcG9pbnRSCmxvY2FsUHJveHk=');
 
 @$core.Deprecated('Use engineBuildDescriptor instead')
 const EngineBuild$json = {
