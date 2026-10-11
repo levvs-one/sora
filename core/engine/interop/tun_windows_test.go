@@ -19,6 +19,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/registry"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/xray"
+	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/session"
 )
 
@@ -64,7 +65,18 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 		"listen": "127.0.0.1", "port": serverPort, "protocol": "shadowsocks",
 		"settings": map[string]any{"method": "aes-256-gcm", "password": password, "network": "tcp,udp"},
 	}}}, address)
-	reg := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir(), StartTimeout: 15 * time.Second})
+	settings := logs.DefaultSettings()
+	settings.CaptureLevel = logs.LevelDebug
+	settings.RecordDestinations = true
+	journal := logs.New(settings)
+	t.Cleanup(func() {
+		if t.Failed() {
+			for _, entry := range journal.Query(logs.Filter{}, 0, 1000).Entries {
+				t.Logf("%s %s: %s", entry.Time.Format(time.RFC3339Nano), entry.Source, entry.Message)
+			}
+		}
+	})
+	reg := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir(), StartTimeout: 15 * time.Second, Logs: journal})
 	manager := session.NewManager(session.ManagerConfig{Factory: reg.Factory()})
 	t.Cleanup(func() { _ = manager.Disconnect(context.Background()) })
 	_, targetPort, _ := net.SplitHostPort(address)
@@ -139,9 +151,6 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 				t.Fatalf("UDP packet reply: %q %v", buffer[:n], err)
 			}
 		})
-		if t.Failed() {
-			break
-		}
 	}
 	if err := manager.Disconnect(t.Context()); err != nil {
 		t.Fatal(err)
