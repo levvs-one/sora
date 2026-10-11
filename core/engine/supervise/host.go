@@ -57,16 +57,27 @@ func (t *Tail) Last(n int) string {
 	return strings.Join(lines, "\n")
 }
 
-// FreePort reserves and releases a loopback port for the engine. Another
-// process can claim it before binding; the restart budget covers this race.
+// FreePort checks a loopback port for both protocols. Mixed listeners need UDP
+// too, and Windows reserves different port ranges for TCP and UDP.
 func FreePort() (int, error) {
 	var lc net.ListenConfig
-	listener, err := lc.Listen(context.Background(), "tcp", "127.0.0.1:0")
-	if err != nil {
-		return 0, fmt.Errorf("supervise: pick a free port: %w", err)
+	var lastErr error
+	for range 32 {
+		packet, err := lc.ListenPacket(context.Background(), "udp", "127.0.0.1:0")
+		if err != nil {
+			return 0, fmt.Errorf("supervise: pick a free UDP port: %w", err)
+		}
+		port := packet.LocalAddr().(*net.UDPAddr).Port
+		listener, err := lc.Listen(context.Background(), "tcp", packet.LocalAddr().String())
+		_ = packet.Close()
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		_ = listener.Close()
+		return port, nil
 	}
-	defer func() { _ = listener.Close() }()
-	return listener.Addr().(*net.TCPAddr).Port, nil
+	return 0, fmt.Errorf("supervise: no shared TCP/UDP port: %w", lastErr)
 }
 
 // SecretBytes is the length of a controller secret before hex encoding.
