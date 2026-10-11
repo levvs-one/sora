@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 	"net"
 	"os"
 	"strings"
@@ -63,12 +64,20 @@ func FreePort() (int, error) {
 	var lc net.ListenConfig
 	var lastErr error
 	for range 32 {
-		packet, err := lc.ListenPacket(context.Background(), "udp", "127.0.0.1:0")
+		// Windows can assign consecutive UDP ports inside a TCP-only reserved
+		// range. Sample the entire unprivileged range instead of that sequence.
+		candidate, err := rand.Int(rand.Reader, big.NewInt(65536-1024))
 		if err != nil {
-			return 0, fmt.Errorf("supervise: pick a free UDP port: %w", err)
+			return 0, fmt.Errorf("supervise: choose a loopback port: %w", err)
 		}
-		port := packet.LocalAddr().(*net.UDPAddr).Port
-		listener, err := lc.Listen(context.Background(), "tcp", packet.LocalAddr().String())
+		port := 1024 + int(candidate.Int64())
+		address := fmt.Sprintf("127.0.0.1:%d", port)
+		packet, err := lc.ListenPacket(context.Background(), "udp", address)
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		listener, err := lc.Listen(context.Background(), "tcp", address)
 		_ = packet.Close()
 		if err != nil {
 			lastErr = err

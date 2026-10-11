@@ -176,6 +176,8 @@ jobs:
         working-directory: core
         shell: pwsh
         run: |
+          netsh interface ipv4 show excludedportrange protocol=tcp
+          netsh interface ipv4 show excludedportrange protocol=udp
           $env:SORA_WINDOWS_TUN_INTEGRATION = '1'
           $env:SORA_ENGINES_DIR = (Resolve-Path '../dist/windows/engines').Path
           go test -count=1 -v ./engine/interop -run '^TestWindowsTunSwitchesCarryTCPAndUDP$' -timeout 10m
