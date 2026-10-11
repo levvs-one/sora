@@ -406,11 +406,28 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
             if (generation == _generation &&
                 error.isForMainFrame == true &&
                 (error.url == null || error.url == (_mainUrl ?? _url))) {
+              if (_networkOwner case final String owner) {
+                _sora!.browserDiagnostics.completeNavigation(
+                  owner,
+                  error.url ?? _mainUrl ?? _url,
+                  error: error.description,
+                );
+              }
               _failed(s.speedtestPageFailed, retry: error.errorType != WebResourceErrorType.failedSslHandshake);
             }
           },
           onHttpError: (error) {
             if (generation == _generation && error.request?.uri.toString() == (_mainUrl ?? _url)) {
+              if (_networkOwner case final String owner) {
+                _sora!.browserDiagnostics.completeNavigation(
+                  owner,
+                  error.request!.uri.toString(),
+                  response: {
+                    'status': error.response?.statusCode,
+                    'headers': error.response?.headers,
+                  },
+                );
+              }
               _failed(s.speedtestPageFailed);
             }
           },

@@ -124,6 +124,8 @@ class BrowserDiagnostics {
         _pending[key] = {
           'started': (params['wallTime'] as num).toDouble(),
           'timestamp': params['timestamp'],
+          'clock': Stopwatch()..start(),
+          'type': params['type'],
           'request': _request(request['url'], request['method'], request['headers']),
         };
         while (_pending.length > 256) {
@@ -151,6 +153,16 @@ class BrowserDiagnostics {
       response as Map<String, Object?>? ?? _response({}),
       error: error,
     );
+  }
+
+  void completeNavigation(String owner, String url, {Object? error, Map<String, Object?>? response}) {
+    for (final key in _pending.keys.where((key) => key.startsWith('$owner:')).toList()) {
+      final pending = _pending[key]!;
+      if (pending['type'] != 'Document' || (pending['request'] as Map)['url'] != _url(url)) continue;
+      final clock = pending['clock'] as Stopwatch;
+      _pending.remove(key);
+      _finish(pending, (pending['timestamp'] as num) + clock.elapsedMicroseconds / 1000000, response, error: error);
+    }
   }
 
   void detach(String owner) => _pending.removeWhere((key, _) => key.startsWith('$owner:'));

@@ -40,16 +40,25 @@ void main() {
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
         Object? previous;
+        var loadedSites = 0;
         for (final url in ['https://www.speedtest.net/', 'https://yandex.ru/internet']) {
+          final selectedAt = DateTime.now().toUtc().subtract(const Duration(seconds: 1));
           await tester.tap(find.byKey(ValueKey('speedtest-service-$url')));
           var loaded = false;
+          var recovered = false;
           String? document;
           final deadline = Stopwatch()..start();
-          while (deadline.elapsed < const Duration(seconds: 90)) {
+          while (deadline.elapsed < const Duration(seconds: 150)) {
             await tester.pump(const Duration(milliseconds: 250));
+            if (find.byKey(const ValueKey('speedtest-reload')).evaluate().isNotEmpty) break;
             final views = find.byType(WebViewWidget);
-            if (views.evaluate().isEmpty) continue;
+            if (views.evaluate().isEmpty) {
+              recovered = true;
+              continue;
+            }
             final controller = tester.widget<WebViewWidget>(views.first).platform.params.controller;
+            String? current;
+            var complete = false;
             try {
               final snapshot = await controller
                   .runJavaScriptReturningResult(
@@ -65,42 +74,67 @@ void main() {
                     "location.hostname === ${jsonEncode(Uri.parse(url).host)} && document.readyState === 'complete' && document.body.innerText.length > 40",
                   )
                   .timeout(const Duration(seconds: 5));
-              final current = await controller.currentUrl();
-              if ((result == true || result == 'true') && Uri.tryParse(current ?? '')?.host == Uri.parse(url).host) {
-                if (previous != null) expect(identical(controller, previous), isTrue);
-                previous = controller;
-                final title = await controller.getTitle();
-                debugPrint('Browser cycle $reopen: $current — $title');
-                if (Platform.isLinux && reopen == 0 && Platform.environment['SORA_SHOTS'] != null) {
-                  final output = '${Platform.environment['HOME']!}/.local/share/sora-dev/shots';
-                  await Directory(output).create(recursive: true);
-                  final capture = await Process.run('ffmpeg', [
-                    '-loglevel',
-                    'error',
-                    '-y',
-                    '-f',
-                    'x11grab',
-                    '-draw_mouse',
-                    '0',
-                    '-video_size',
-                    '1120x760',
-                    '-i',
-                    Platform.environment['DISPLAY']!,
-                    '-frames:v',
-                    '1',
-                    '$output/browser-native-${Uri.parse(url).host}.png',
-                  ]);
-                  expect(capture.exitCode, 0, reason: '${capture.stderr}');
-                }
-                loaded = true;
-                break;
-              }
+              current = await controller.currentUrl();
+              complete =
+                  (result == true || result == 'true') && Uri.tryParse(current ?? '')?.host == Uri.parse(url).host;
             } catch (error) {
               debugPrint('Waiting for the website: $error');
             }
+            if (complete) {
+              if (previous != null && !recovered) expect(identical(controller, previous), isTrue);
+              previous = controller;
+              final title = await controller.getTitle();
+              debugPrint('Browser cycle $reopen: $current — $title');
+              if (Platform.isLinux && reopen == 0 && Platform.environment['SORA_SHOTS'] != null) {
+                final output = '${Platform.environment['HOME']!}/.local/share/sora-dev/shots';
+                await Directory(output).create(recursive: true);
+                final capture = await Process.run('ffmpeg', [
+                  '-loglevel',
+                  'error',
+                  '-y',
+                  '-f',
+                  'x11grab',
+                  '-draw_mouse',
+                  '0',
+                  '-video_size',
+                  '1120x760',
+                  '-i',
+                  Platform.environment['DISPLAY']!,
+                  '-frames:v',
+                  '1',
+                  '$output/browser-native-${Uri.parse(url).host}.png',
+                ]);
+                expect(capture.exitCode, 0, reason: '${capture.stderr}');
+              }
+              loaded = true;
+              break;
+            }
           }
-          expect(loaded, isTrue, reason: '$url must load without a manual refresh; last document: $document');
+          if (loaded) {
+            loadedSites++;
+          } else {
+            expect(find.byKey(const ValueKey('speedtest-reload')), findsOneWidget);
+            expect(find.byKey(const ValueKey('speedtest-fallback')), findsOneWidget);
+            expect(find.byType(WebViewWidget), findsNothing);
+            final har = jsonDecode(utf8.decode(sora.browserDiagnostics.export())) as Map;
+            final failures = ((har['log'] as Map)['entries'] as List).cast<Map<dynamic, dynamic>>().where((entry) {
+              final request = entry['request'] as Map;
+              return Uri.tryParse('${request['url']}')?.host == Uri.parse(url).host &&
+                  DateTime.parse('${entry['startedDateTime']}').isAfter(selectedAt) &&
+                  (entry['_error'] != null || ((entry['response'] as Map)['status'] as num) >= 400);
+            }).toList();
+            expect(
+              failures,
+              isNotEmpty,
+              reason: 'A failed website needs a native HTTP/network cause; last document: $document',
+            );
+            debugPrint(
+              'Browser cycle $reopen: $url failed remotely; ${failures.length} native failures; ${failures.last['_error']}',
+            );
+            previous = null;
+          }
         }
+        expect(loadedSites, greaterThan(0), reason: 'Each browser reopening must load a real speed-test website.');
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
         await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);

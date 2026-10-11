@@ -88,4 +88,35 @@ void main() {
     diagnostics.clear();
     expect(diagnostics.length, 0);
   });
+
+  test('main-frame failure preserves the native response before disposal without duplicating it', () {
+    final diagnostics = BrowserDiagnostics();
+    for (final owner in ['http', 'network']) {
+      diagnostics.webview2(owner, {
+        'method': 'Network.requestWillBeSent',
+        'params': {
+          'requestId': 'main',
+          'type': 'Document',
+          'wallTime': 1,
+          'timestamp': 1,
+          'request': {'url': 'https://example.com/$owner', 'method': 'GET'},
+        },
+      });
+      diagnostics.completeNavigation(
+        owner,
+        'https://example.com/$owner',
+        response: owner == 'http' ? {'status': 503} : null,
+        error: owner == 'network' ? 'WebErrorStatusConnectionReset' : null,
+      );
+      diagnostics.detach(owner);
+      diagnostics.webview2(owner, {
+        'method': 'Network.loadingFailed',
+        'params': {'requestId': 'main', 'timestamp': 2, 'errorText': 'late error'},
+      });
+    }
+    final entries = (((jsonDecode(utf8.decode(diagnostics.export())) as Map)['log'] as Map)['entries'] as List)
+        .cast<Map<dynamic, dynamic>>();
+    expect(entries.map((e) => (e['response'] as Map)['status']), [503, 0]);
+    expect(entries.last['_error'], 'WebErrorStatusConnectionReset');
+  });
 }

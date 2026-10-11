@@ -5,7 +5,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:sora/l10n/strings.dart';
 import 'package:sora/src/browser_diagnostics.dart';
+import 'package:sora/src/design/theme.dart';
+import 'package:sora/src/settings.dart';
+import 'package:sora/src/sora.dart';
+import 'package:sora/src/speedtest_services.dart';
+import 'package:sora/src/ui/speedtest.dart';
 import 'package:webview_all/webview_all.dart';
 import 'package:webview_all_linux/webview_all_linux.dart';
 import 'package:webview_all_windows/webview_all_windows.dart';
@@ -110,4 +116,91 @@ void main() {
       await server.close(force: true);
     }
   }, timeout: const Timeout(Duration(minutes: 5)));
+
+  testWidgets('native browser automatically recovers from HTTP failures and bounds retries', (tester) async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    final requests = <String, int>{};
+    final listener = server.listen((request) async {
+      await request.drain<void>();
+      final path = request.uri.path;
+      final count = requests.update(path, (value) => value + 1, ifAbsent: () => 1);
+      request.response.headers.contentType = ContentType.html;
+      request.response.statusCode = path == '/recovery' && count >= 3 ? 200 : 503;
+      request.response.write('<!doctype html><html><body>Native HTTP recovery response $count</body></html>');
+      await request.response.close();
+    });
+    final settings = await Settings.load();
+    settings.language = 'ru';
+    final sora = Sora(settings);
+    try {
+      for (final path in ['/recovery', '/unavailable']) {
+        final url = 'http://127.0.0.1:${server.port}$path';
+        await tester.pumpWidget(
+          SoraScope(
+            sora: sora,
+            child: MaterialApp(
+              theme: buildTheme(Brightness.light),
+              locale: const Locale('ru'),
+              supportedLocales: S.supportedLocales,
+              localizationsDelegates: S.localizationsDelegates,
+              home: Scaffold(
+                body: SpeedtestBrowser(
+                  key: ValueKey(path),
+                  service: SpeedtestService(
+                    name: 'Native HTTP recovery',
+                    url: url,
+                    regions: const [],
+                    measures: '',
+                    operator: '',
+                    note: '',
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        final clock = Stopwatch()..start();
+        var completed = false;
+        while (clock.elapsed < const Duration(seconds: 30)) {
+          await tester.pump(const Duration(milliseconds: 100));
+          if (path == '/unavailable') {
+            completed = find.byKey(const ValueKey('speedtest-reload')).evaluate().isNotEmpty;
+          } else if (find.byType(WebViewWidget).evaluate().isNotEmpty) {
+            final controller = tester.widget<WebViewWidget>(find.byType(WebViewWidget)).platform.params.controller;
+            try {
+              final result = await controller
+                  .runJavaScriptReturningResult(
+                    "location.pathname === '/recovery' && document.body.innerText.includes('response 3')",
+                  )
+                  .timeout(const Duration(seconds: 2));
+              completed = result == true || result == 'true';
+            } catch (error) {
+              debugPrint('Waiting for native HTTP recovery: $error');
+            }
+          }
+          if (completed) break;
+        }
+        expect(completed, isTrue, reason: '$path did not finish automatically');
+        expect(requests[path], 3, reason: 'Two retries must recover or stop with usable actions.');
+        if (path == '/unavailable') {
+          expect(find.byKey(const ValueKey('speedtest-fallback')), findsOneWidget);
+          expect(find.byType(WebViewWidget), findsNothing);
+          await tester.pump(const Duration(seconds: 3));
+          expect(requests[path], 3, reason: 'A permanent failure must not restart forever.');
+        }
+        debugPrint('Native HTTP $path: ${requests[path]} attempts, completed without a manual refresh');
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump(const Duration(seconds: 1));
+      }
+      final har = jsonDecode(utf8.decode(sora.browserDiagnostics.export())) as Map;
+      final entries = ((har['log'] as Map)['entries'] as List).cast<Map<dynamic, dynamic>>();
+      expect(entries.where((e) => (e['response'] as Map)['status'] == 503).length, greaterThanOrEqualTo(5));
+      expect(entries.any((e) => (e['response'] as Map)['status'] == 200), isTrue);
+    } finally {
+      await tester.pumpWidget(const SizedBox());
+      sora.dispose();
+      await listener.cancel();
+      await server.close(force: true);
+    }
+  }, timeout: const Timeout(Duration(minutes: 3)));
 }

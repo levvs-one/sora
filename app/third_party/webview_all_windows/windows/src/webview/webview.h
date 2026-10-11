@@ -401,6 +401,8 @@ private:
   bool downloads_enabled_ = true;
   HRESULT download_handler_result_ = E_NOINTERFACE;
   uint64_t latest_navigation_request_id_ = 0;
+  uint64_t active_navigation_id_ = 0;
+  std::string active_navigation_url_;
   size_t bypass_next_navigation_count_ = 0;
   std::unordered_multiset<std::string> approved_navigation_urls_;
   std::unordered_set<uint64_t> policy_cancelled_navigation_ids_;
