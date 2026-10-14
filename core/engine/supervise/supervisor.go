@@ -255,12 +255,30 @@ func (s *Supervisor) PlanNames() map[string]string {
 }
 
 // Validate renders the plan and checks it with the engine binary.
-func (s *Supervisor) Validate(ctx context.Context, p *engine.Plan) error {
+func (s *Supervisor) Validate(ctx context.Context, p *engine.Plan) (err error) {
+	if p != nil {
+		s.redactor.Add(p.Secrets()...)
+	}
+	defer func() {
+		if err != nil && s.cfg.Logs != nil {
+			s.cfg.Logs.Write(time.Time{}, logs.LevelError, string(s.driver.Kind()), s.redactor.String(err.Error()))
+		}
+	}()
 	if err := s.admit(p); err != nil {
 		return err
 	}
 	rt := Runtime{HomeDir: s.cfg.HomeDir, LocalPort: 1, ControlAddr: "127.0.0.1:1", Secret: "validation-only", ProbeURL: s.cfg.ProbeURL}
-	cfg, err := s.driver.Render(p, rt)
+	checked := *p
+	if checked.Tun.Enabled {
+		// Xray -test opens the adapter. Validate on a separate device so a
+		// replacement cannot collide with or detach the working tunnel.
+		token, err := RandomSecret()
+		if err != nil {
+			return err
+		}
+		checked.Tun.DeviceName = "sora-c" + token[:9]
+	}
+	cfg, err := s.driver.Render(&checked, rt)
 	if err != nil {
 		return s.redactor.Err(err)
 	}

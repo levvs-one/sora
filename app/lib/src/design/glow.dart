@@ -6,8 +6,8 @@ import 'package:flutter/widgets.dart';
 import 'theme.dart';
 
 /// An Apple Intelligence-style border with four progressively wider, softer
-/// strokes. [energy] sets intensity (0 to 1); [busy] rotates faster and shifts
-/// colours every 0.4 s. Disabled motion keeps it static.
+/// strokes. [energy] sets intensity (0 to 1); [busy] animates a connection
+/// transition. Established connections and disabled motion keep it static.
 class Glow extends StatefulWidget {
   const Glow({
     super.key,
@@ -84,7 +84,7 @@ class _GlowState extends State<Glow> with SingleTickerProviderStateMixin {
   }
 
   void _sync() {
-    final move = widget.energy > 0 && Motion.enabled(context);
+    final move = widget.busy && widget.energy > 0 && Motion.enabled(context);
     if (move == _moving) return;
     _moving = move;
     if (move) {
@@ -98,6 +98,7 @@ class _GlowState extends State<Glow> with SingleTickerProviderStateMixin {
           ..to = _Layer.even();
       }
       _turn = 0;
+      _nextShuffle = 0;
       _clock.value = 0;
     }
   }
@@ -106,9 +107,9 @@ class _GlowState extends State<Glow> with SingleTickerProviderStateMixin {
     final dt = (elapsed - _last).inMicroseconds / 1e6;
     _last = elapsed;
     final now = _clock.value + dt;
-    _turn += dt * 2 * math.pi / (widget.busy ? 2.6 : 16);
+    _turn += dt * 2 * math.pi / 2.6;
     if (now >= _nextShuffle) {
-      _nextShuffle = now + (widget.busy ? _interval : _interval * 4);
+      _nextShuffle = now + _interval;
       for (final layer in _layers) {
         layer
           ..from = layer.at(now)

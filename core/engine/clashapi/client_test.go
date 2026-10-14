@@ -5,11 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/levvs-one/sora-client/core/engine/supervise"
 )
 
 // recorded stores the fake controller's last request for wire-level assertions.
@@ -149,6 +153,44 @@ func TestCountersComeFromConnections(t *testing.T) {
 	}
 	if counters.BytesUp != 1024 || counters.BytesDown != 2048 || counters.ActiveConnections != 2 || counters.MemoryBytes != 4096 {
 		t.Errorf("unexpected counters: %+v", counters)
+	}
+}
+
+func TestPollingReleasesOneShotControllerSockets(t *testing.T) {
+	const polls = 64
+	var live atomic.Int32
+	closed := make(chan struct{}, polls)
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		jsonReply(w, http.StatusOK, map[string]any{"downloadTotal": 2048, "connections": []any{}})
+	}))
+	server.Config.ConnState = func(_ net.Conn, state http.ConnState) {
+		switch state {
+		case http.StateNew:
+			live.Add(1)
+		case http.StateClosed:
+			live.Add(-1)
+			closed <- struct{}{}
+		}
+	}
+	server.Start()
+	t.Cleanup(server.Close)
+	rt := supervise.Runtime{ControlAddr: strings.TrimPrefix(server.URL, "http://"), Secret: "test-controller"}
+	for range polls {
+		if _, err := For(rt).Counters(t.Context()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	deadline := time.NewTimer(time.Second)
+	defer deadline.Stop()
+	for range polls {
+		select {
+		case <-closed:
+		case <-deadline.C:
+			t.Fatalf("%d polls left %d controller sockets open", polls, live.Load())
+		}
+	}
+	if got := live.Load(); got != 0 {
+		t.Fatalf("controller sockets after polling = %d", got)
 	}
 }
 

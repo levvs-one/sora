@@ -69,8 +69,10 @@ func NewClient(addr, secret string, timeout time.Duration) *Client {
 		host:   host,
 		secret: secret,
 		http: &http.Client{
-			Timeout:   timeout,
-			Transport: &http.Transport{DialContext: dial, MaxIdleConnsPerHost: 4},
+			Timeout: timeout,
+			// For creates a short-lived client for each controller operation;
+			// its private transport must not retain an unreachable idle pool.
+			Transport: &http.Transport{DialContext: dial, DisableKeepAlives: true},
 		},
 	}
 }

@@ -178,8 +178,12 @@ void main() {
       expect(entries.single.paragraphs, isNotEmpty);
     }
     await tester.tap(find.text('Лицензии компонентов'));
-    await tester.pump();
-    expect(find.byType(LicensePage), findsOneWidget);
+    for (var i = 0; i < 100 && find.byKey(const ValueKey('license-components')).evaluate().isEmpty; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.pump();
+    }
+    expect(find.byKey(const ValueKey('license-Sora')), findsOneWidget);
+    expect(find.text('Powered by Flutter'), findsNothing);
     await tester.pumpWidget(const SizedBox());
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);

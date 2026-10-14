@@ -49,7 +49,11 @@ func fakeEngine(mode string) int {
 		return 2
 	}
 	if cfg.Reject {
-		_, _ = os.Stderr.WriteString("fake: rejected key\n")
+		message := cfg.CrashMessage
+		if message == "" {
+			message = "fake: rejected key"
+		}
+		_, _ = os.Stderr.WriteString(message + "\n")
 		return 1
 	}
 	if mode == "check" {
@@ -373,5 +377,23 @@ func TestStartupAcknowledgementPrecedesRoutingAndConnectedState(t *testing.T) {
 				t.Fatalf("successful acknowledgement: %v state=%s routes=%d", err, sup.State(), driver.routes)
 			}
 		})
+	}
+}
+
+func TestValidationFailuresAreLoggedWithTheRejectedPlansSecretsMasked(t *testing.T) {
+	const password = "rejected-plan-password"
+	sup := newFake(t, fakeConfig{Reject: true, CrashMessage: "invalid setting " + password}, 1)
+	sup.cfg.Logs = logs.New(logs.DefaultSettings())
+	p := plan()
+	p.Outbounds[0].Password = password
+	if err := sup.Validate(t.Context(), p); err == nil {
+		t.Fatal("invalid configuration was accepted")
+	}
+	entries := sup.cfg.Logs.Query(logs.Filter{}, 0, 0).Entries
+	if len(entries) != 1 || entries[0].Level != logs.LevelError || entries[0].Source != "mihomo" {
+		t.Fatalf("validation failure missing from the journal: %+v", entries)
+	}
+	if strings.Contains(entries[0].Message, password) || !strings.Contains(entries[0].Message, "invalid setting [masked]") {
+		t.Fatalf("rejected plan credentials were not masked: %s", entries[0].Message)
 	}
 }
