@@ -23,6 +23,7 @@ void main() {
           child: Center(
             child: Glow(
               energy: 1,
+              busy: true,
               radius: 90,
               child: SizedBox(width: 180, height: 180, child: CustomPaint(painter: content)),
             ),
@@ -37,6 +38,25 @@ void main() {
     }
     expect(page.paints - initialPage, 0, reason: 'The page must stay cached during glow animation.');
     expect(content.paints - initialContent, 0, reason: 'The connection button must stay cached.');
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('an established connection stops scheduling glow frames', (tester) async {
+    Widget glow(bool busy) => Directionality(
+      textDirection: TextDirection.ltr,
+      child: Center(
+        child: Glow(energy: 0.75, busy: busy, radius: 88, child: const SizedBox.square(dimension: 176)),
+      ),
+    );
+    await tester.pumpWidget(glow(false));
+    await tester.pump(const Duration(seconds: 1));
+    expect(tester.binding.transientCallbackCount, 0, reason: 'Connected idle must not render every refresh.');
+    await tester.pumpWidget(glow(true));
+    await tester.pump(const Duration(seconds: 1));
+    expect(tester.binding.transientCallbackCount, greaterThan(0));
+    await tester.pumpWidget(glow(false));
+    await tester.pump(const Duration(seconds: 1));
+    expect(tester.binding.transientCallbackCount, 0);
     await tester.pumpWidget(const SizedBox());
   });
 }

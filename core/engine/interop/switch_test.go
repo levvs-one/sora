@@ -159,3 +159,74 @@ func TestRealEngineSwitchesKeepTCPAndUDPAndReleaseTun(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestNativeXrayTunReplacementKeepsTheWorkingAdapterDuringValidation(t *testing.T) {
+	dir := os.Getenv("SORA_ENGINES_DIR")
+	if dir == "" || os.Getenv("SORA_TUN_INTEGRATION") != "1" {
+		t.Skip("requires installed engines and an isolated TUN namespace")
+	}
+	current, err := os.Readlink("/proc/self/ns/net")
+	if parent := os.Getenv("SORA_PARENT_NETNS"); err != nil || parent == "" || parent == current {
+		t.Fatal("TUN replacement tests require an isolated network namespace")
+	}
+	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { _, _ = io.WriteString(w, reply) }))
+	t.Cleanup(target.Close)
+	local := port(t)
+	reg := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir(), LocalPort: local, StartTimeout: 10 * time.Second})
+	manager := session.NewManager(session.ManagerConfig{Factory: reg.Factory()})
+	t.Cleanup(func() { _ = manager.Disconnect(context.Background()) })
+	p := &engine.Plan{
+		SessionID: "native-first", Engines: []engine.Kind{engine.KindXray}, PrivateControl: true,
+		LocalProxy: engine.LocalProxy{Enabled: true},
+		Outbounds:  []engine.Outbound{{ID: "local", Protocol: engine.ProtocolDirect}},
+		Rules:      []engine.Rule{{Type: engine.RuleMatchAll, Target: "local"}},
+		Tun:        engine.Tun{Enabled: true, Stack: "gvisor", DeviceName: engine.TunDevice},
+	}
+	first, err := manager.Connect(t.Context(), p, session.Settings{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 9; i++ {
+		next := *p
+		next.SessionID = fmt.Sprintf("native-replacement-%d", i)
+		if i%3 == 1 {
+			next.Outbounds = []engine.Outbound{{ID: "local", Protocol: engine.ProtocolXrayProfile, Server: "127.0.0.1", Port: 80,
+				Profile: []byte(`{"outbounds":[{"tag":"provider-direct","protocol":"freedom"}]}`)}}
+		}
+		if i%3 == 2 {
+			next.Tun = engine.Tun{}
+		}
+		bad := next
+		bad.Outbounds = []engine.Outbound{{ID: "local", Protocol: engine.ProtocolXrayProfile, Server: "127.0.0.1", Port: 80,
+			Profile: []byte(`{"outbounds":[{"protocol":"not-a-protocol"}]}`)}}
+		if _, err := manager.Connect(t.Context(), &bad, session.Settings{}); err == nil {
+			t.Fatal("malformed replacement was accepted")
+		}
+		if manager.Current() != first || first.State() != session.StateConnected {
+			t.Fatal("validation touched the working session")
+		}
+		if body, err := fetch(t.Context(), local, target.URL); err != nil || body != reply {
+			t.Fatalf("TCP while replacement was rejected: %q %v", body, err)
+		}
+		started, err := manager.Connect(t.Context(), &next, session.Settings{})
+		if err != nil {
+			t.Fatalf("valid replacement rejected while TUN is occupied: %v", err)
+		}
+		if first.State() != session.StateDisconnected || started.State() != session.StateConnected {
+			t.Fatal("replacement did not move the session ownership")
+		}
+		if body, err := fetch(t.Context(), local, target.URL); err != nil || body != reply {
+			t.Fatalf("TCP after native replacement: %q %v", body, err)
+		}
+		interfaces, err := net.Interfaces()
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, iface := range interfaces {
+			if iface.Name != "lo" && (iface.Name != engine.TunDevice || !next.Tun.Enabled) {
+				t.Fatalf("validation left an adapter: %s", iface.Name)
+			}
+		}
+		first = started
+	}
+}

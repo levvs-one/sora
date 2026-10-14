@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoSearchTextField;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
@@ -265,32 +267,7 @@ class _AboutScreenState extends State<AboutScreen> {
         Group(
           children: [
             Tile(title: 'Sora', trailing: _value(context, 'GPL-3.0-only')),
-            LinkTile(
-              title: s.componentLicenses,
-              onTap: () => unawaited(
-                push(
-                  context,
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      textTheme: Theme.of(context).textTheme.copyWith(
-                        headlineSmall: Styles.heading.copyWith(color: palette.ink),
-                        titleLarge: Styles.heading.copyWith(color: palette.ink),
-                        titleMedium: Styles.bodyStrong.copyWith(color: palette.ink),
-                        bodyLarge: Styles.body.copyWith(color: palette.ink),
-                        bodyMedium: Styles.secondary.copyWith(color: palette.ink2),
-                        bodySmall: Styles.caption.copyWith(color: palette.ink2),
-                      ),
-                    ),
-                    child: LicensePage(
-                      applicationName: 'Sora',
-                      applicationVersion: updates.version,
-                      applicationIcon: SoraMark(size: 40, color: palette.ink),
-                      applicationLegalese: s.appCopyright,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            LinkTile(title: s.componentLicenses, onTap: () => unawaited(push(context, const _LicensesScreen()))),
           ],
         ),
       ],
@@ -299,4 +276,170 @@ class _AboutScreenState extends State<AboutScreen> {
 
   Widget _value(BuildContext context, String text) =>
       Text(text, style: Styles.secondary.copyWith(color: Palette.of(context).ink));
+}
+
+class _LicensesScreen extends StatefulWidget {
+  const _LicensesScreen();
+
+  @override
+  State<_LicensesScreen> createState() => _LicensesScreenState();
+}
+
+class _LicensesScreenState extends State<_LicensesScreen> {
+  final _search = TextEditingController();
+  late Future<Map<String, List<LicenseEntry>>> _licenses = _load();
+
+  Future<Map<String, List<LicenseEntry>>> _load() =>
+      LicenseRegistry.licenses.fold(<String, List<LicenseEntry>>{}, (components, entry) {
+        for (final name in entry.packages) {
+          (components[name] ??= []).add(entry);
+        }
+        return components;
+      });
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context), palette = Palette.of(context);
+    return Screen(
+      title: s.componentLicenses,
+      fill: FutureBuilder(
+        future: _licenses,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: TextButton.icon(
+                onPressed: () => setState(() => _licenses = _load()),
+                icon: const Icon(Symbols.refresh_rounded),
+                label: Text('${s.errGeneric}. ${s.refresh}'),
+              ),
+            );
+          }
+          final data = snapshot.data;
+          if (data == null) return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+          final query = _search.text.trim().toLowerCase();
+          final names = data.keys.where((name) => name.toLowerCase().contains(query)).toList()
+            ..sort(
+              (a, b) => a == b
+                  ? 0
+                  : a == 'Sora'
+                  ? -1
+                  : b == 'Sora'
+                  ? 1
+                  : a.toLowerCase().compareTo(b.toLowerCase()),
+            );
+          if (names.isEmpty) {
+            return Center(
+              child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
+            );
+          }
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.sizeOf(context).width < 720 ? 72 : 20),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: ColoredBox(
+                color: palette.surface,
+                child: ListView.separated(
+                  key: const ValueKey('license-components'),
+                  padding: const EdgeInsets.all(4),
+                  itemCount: names.length,
+                  separatorBuilder: (_, _) =>
+                      Divider(height: 1, thickness: 0.5, indent: 12, endIndent: 12, color: palette.field),
+                  itemBuilder: (_, i) => LinkTile(
+                    key: ValueKey('license-${names[i]}'),
+                    title: names[i],
+                    onTap: () => unawaited(push(context, _LicenseText(name: names[i], entries: data[names[i]]!))),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+      children: [
+        CupertinoSearchTextField(
+          key: const ValueKey('license-search'),
+          controller: _search,
+          placeholder: s.search,
+          style: Styles.body.copyWith(color: palette.ink),
+          placeholderStyle: Styles.body.copyWith(color: palette.ink3),
+          backgroundColor: palette.field,
+          borderRadius: BorderRadius.circular(12),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
+          itemColor: palette.ink3,
+          onChanged: (_) => setState(() {}),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+}
+
+class _LicenseText extends StatefulWidget {
+  const _LicenseText({required this.name, required this.entries});
+  final String name;
+  final List<LicenseEntry> entries;
+
+  @override
+  State<_LicenseText> createState() => _LicenseTextState();
+}
+
+class _LicenseTextState extends State<_LicenseText> {
+  // Long GPL/MPL texts are parsed off the UI isolate, only after selection.
+  static List<LicenseParagraph> _paragraphs(List<LicenseEntry> entries) => [
+    for (final entry in entries) ...entry.paragraphs,
+  ];
+
+  late final _text = compute(_paragraphs, widget.entries);
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return Screen(
+      title: widget.name,
+      fill: FutureBuilder(
+        future: _text,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return Center(child: Text(S.of(context).errGeneric, style: Styles.body));
+          final paragraphs = snapshot.data;
+          if (paragraphs == null) return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.sizeOf(context).width < 720 ? 72 : 20),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 640),
+                child: SelectionArea(
+                  child: ListView.separated(
+                    key: const ValueKey('license-text'),
+                    padding: const EdgeInsets.fromLTRB(4, 0, 4, 24),
+                    itemCount: paragraphs.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (_, i) {
+                      final paragraph = paragraphs[i];
+                      final centered = paragraph.indent == LicenseParagraph.centeredIndent;
+                      return Padding(
+                        padding: EdgeInsetsDirectional.only(start: centered ? 0 : paragraph.indent.clamp(0, 4) * 12.0),
+                        child: Text(
+                          paragraph.text,
+                          textAlign: centered ? TextAlign.center : TextAlign.start,
+                          style: Styles.secondary.copyWith(color: palette.ink, height: 1.5),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+      children: const [],
+    );
+  }
 }
