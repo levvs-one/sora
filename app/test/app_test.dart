@@ -146,7 +146,7 @@ void main() {
         settings.engine = engine;
         expect(buildPlan(servers: servers, choice: 'a', settings: settings).tunStack, switch (engine) {
           'mihomo' => 'mips',
-          'xray' when Platform.isWindows => 'gvisor',
+          'xray' when Platform.isWindows => 'mips',
           _ => '',
         });
       }
@@ -156,12 +156,14 @@ void main() {
       expect(buildPlan(servers: servers, choice: 'bypass', settings: settings).tunStack, isEmpty);
       expect(settings.mihomoTunStack, 'mips');
       settings.mihomoTunStack = 'unsupported';
-      expect(settings.mihomoTunStack, 'mixed');
+      expect(settings.mihomoTunStack, Platform.isWindows ? 'mips' : 'mixed');
     });
 
-    test('Xray stacks stay isolated and Windows sends the chosen gVisor preference', () {
-      expect(settings.xrayTunStack, 'gvisor');
+    test('Xray stacks stay isolated and Windows defaults to MIPS', () {
+      expect(settings.xrayTunStack, Platform.isWindows ? 'mips' : 'gvisor');
       settings.engine = 'xray';
+      expect(buildPlan(servers: servers, choice: 'a', settings: settings).tunStack, Platform.isWindows ? 'mips' : '');
+      settings.xrayTunStack = 'gvisor';
       expect(buildPlan(servers: servers, choice: 'a', settings: settings).tunStack, Platform.isWindows ? 'gvisor' : '');
       settings.xrayTunStack = 'system';
       settings.mihomoTunStack = 'mips';
@@ -179,7 +181,7 @@ void main() {
       settings.tunnel = 'tun';
       expect(buildPlan(servers: servers, choice: 'bypass', settings: settings).tunStack, isEmpty);
       settings.xrayTunStack = 'unknown';
-      expect(settings.xrayTunStack, 'gvisor');
+      expect(settings.xrayTunStack, Platform.isWindows ? 'mips' : 'gvisor');
     });
   });
 
@@ -193,6 +195,7 @@ void main() {
       expect(settings.killSwitch, isFalse);
       expect(settings.animations, isTrue);
       expect(settings.engine, isEmpty);
+      expect(settings.mihomoTunStack, Platform.isWindows ? 'mips' : 'mixed');
       expect(['global', 'ru', 'ir', 'cn'], contains(settings.preset));
     });
 
@@ -212,12 +215,16 @@ void main() {
       first
         ..preset = 'cn'
         ..server = 'b'
-        ..animations = false;
+        ..animations = false
+        ..xrayTunStack = 'gvisor'
+        ..mihomoTunStack = 'system';
       await Future<void>.delayed(Duration.zero);
       final second = await Settings.load();
       expect(second.preset, 'cn');
       expect(second.server, 'b');
       expect(second.animations, isFalse);
+      expect(second.xrayTunStack, 'gvisor');
+      expect(second.mihomoTunStack, 'system');
     });
   });
 

@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -188,13 +189,13 @@ class Settings {
 
   String get mihomoTunStack => switch (_store.getString('mihomoTunStack')) {
     final value? when const ['system', 'gvisor', 'mixed', 'mips'].contains(value) => value,
-    _ => 'mixed',
+    _ => Platform.isWindows ? 'mips' : 'mixed',
   };
   set mihomoTunStack(String value) => _store.setString('mihomoTunStack', value);
 
   String get xrayTunStack => switch (_store.getString('xrayTunStack')) {
     final value? when const ['system', 'gvisor', 'mixed', 'mips'].contains(value) => value,
-    _ => 'gvisor',
+    _ => Platform.isWindows ? 'mips' : 'gvisor',
   };
   set xrayTunStack(String value) => _store.setString('xrayTunStack', value);
 

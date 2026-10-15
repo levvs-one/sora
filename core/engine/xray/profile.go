@@ -66,7 +66,7 @@ func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 
 	var ours []any
 	if p.Tun.Enabled {
-		ours = append(ours, obj{"inboundTag": []string{tagTun}, "network": "udp", "port": "53", "outboundTag": profileDNS})
+		ours = append(ours, obj{"inboundTag": []string{tagTun}, "network": "tcp,udp", "port": "53", "outboundTag": profileDNS})
 	}
 	for _, rule := range p.Rules {
 		var target string
