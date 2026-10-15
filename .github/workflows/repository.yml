@@ -196,6 +196,8 @@ jobs:
         working-directory: app
         run: |
           flutter pub get
+          flutter test test/app_test.dart
+          if ($LASTEXITCODE -ne 0) { throw 'Windows defaults and plan tests failed' }
           flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: Build the installer
         shell: pwsh
@@ -391,14 +393,14 @@ jobs:
         run: CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.buildVersion=$SORA_VERSION" -o ../dist/sora-core ./cmd/sora-core
       - name: Fetch and verify the engines
         run: packaging/engines/fetch.sh ${{ matrix.arch }} dist/engines
-      - name: Xray TUN replacement and TCP/UDP DNS in a private network
+      - name: Xray TUN replacement and TCP/UDP DNS through every engine
         if: matrix.arch == 'amd64'
         working-directory: core
         run: |
           go test -race -c -o "$RUNNER_TEMP/sora-replacement-tests" ./engine/interop
           original=$(readlink /proc/self/ns/net)
           sudo unshare --net env SORA_PARENT_NETNS="$original" SORA_TUN_INTEGRATION=1 SORA_ENGINES_DIR="$PWD/../dist/engines" \
-            sh -c 'ip link set lo up; exec "$1" -test.v -test.run "^Test(NativeXrayTunReplacementKeepsTheWorkingAdapterDuringValidation|XrayTunInterceptsDNSOverUDPAndTCP)$" -test.timeout 2m' sh "$RUNNER_TEMP/sora-replacement-tests"
+            sh -c 'ip link set lo up; exec "$1" -test.v -test.run "^Test(NativeXrayTunReplacementKeepsTheWorkingAdapterDuringValidation|TunInterceptsDNSOverUDPAndTCP)$" -test.timeout 2m' sh "$RUNNER_TEMP/sora-replacement-tests"
       - name: VPN coexistence in isolated namespaces
         if: matrix.arch == 'amd64'
         timeout-minutes: 30

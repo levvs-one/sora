@@ -143,10 +143,13 @@ func buildDNS(d engine.DNS, o engine.Options, byID map[string]string) (*dnsConfi
 	return out, nil
 }
 
-// buildTun defaults to the upstream-recommended mixed stack: system TCP and
-// gVisor UDP.
+// Windows loopback transfer tests show substantially less packet overhead with
+// MIPS. Keep the existing mixed default on other platforms.
 func buildTun(t engine.Tun, d engine.DNS) *tunConfig {
 	stack := orDefault(t.Stack, "mixed")
+	if t.Stack == "" && runtime.GOOS == "windows" {
+		stack = "mips"
+	}
 	out := &tunConfig{
 		Name:      "sora-tun",
 		Type:      "tun",

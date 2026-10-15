@@ -4,8 +4,10 @@ package interop_test
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -30,7 +32,7 @@ import (
 	"github.com/levvs-one/sora-client/core/logs"
 )
 
-func TestXrayTunInterceptsDNSOverUDPAndTCP(t *testing.T) {
+func TestTunInterceptsDNSOverUDPAndTCP(t *testing.T) {
 	if os.Getenv("SORA_TUN_INTEGRATION") != "1" {
 		t.Skip("requires the isolated TUN integration namespace")
 	}
@@ -44,6 +46,9 @@ func TestXrayTunInterceptsDNSOverUDPAndTCP(t *testing.T) {
 	var queries atomic.Int32
 	doh := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(io.LimitReader(r.Body, 65536))
+		if r.Method == http.MethodGet {
+			body, err = base64.RawURLEncoding.DecodeString(r.URL.Query().Get("dns"))
+		}
 		var query dnsmessage.Message
 		if err != nil || query.Unpack(body) != nil || len(query.Questions) != 1 {
 			http.Error(w, "invalid DNS request", http.StatusBadRequest)
@@ -113,8 +118,17 @@ func TestXrayTunInterceptsDNSOverUDPAndTCP(t *testing.T) {
 		"listen": "127.0.0.1", "port": proxyPort, "protocol": "shadowsocks",
 		"settings": map[string]any{"method": "aes-256-gcm", "password": password},
 	}}}, unreachable.Addr().String())
-	for _, profile := range []bool{false, true} {
-		t.Run(strconv.FormatBool(profile), func(t *testing.T) {
+	for _, tc := range []struct {
+		kind    engine.Kind
+		stack   string
+		profile bool
+	}{
+		{engine.KindSingBox, "", false},
+		{engine.KindXray, "gvisor", false}, {engine.KindXray, "gvisor", true},
+		{engine.KindXray, "system", false}, {engine.KindXray, "system", true},
+		{engine.KindMihomo, "gvisor", false}, {engine.KindMihomo, "system", false},
+	} {
+		t.Run(fmt.Sprintf("%s/%s/profile=%v", tc.kind, tc.stack, tc.profile), func(t *testing.T) {
 			journal := logs.New(logs.Settings{CaptureLevel: logs.LevelDebug, RecordDestinations: true})
 			t.Cleanup(func() {
 				if t.Failed() {
@@ -124,8 +138,8 @@ func TestXrayTunInterceptsDNSOverUDPAndTCP(t *testing.T) {
 				}
 			})
 			plan := &engine.Plan{
-				SessionID: "dns-fallback", Engines: []engine.Kind{engine.KindXray}, PrivateControl: true,
-				Tun: engine.Tun{Enabled: true, DeviceName: engine.TunDevice, Stack: "gvisor"},
+				SessionID: "dns-fallback", Engines: []engine.Kind{tc.kind}, PrivateControl: tc.kind != engine.KindSingBox,
+				Tun: engine.Tun{Enabled: true, DeviceName: engine.TunDevice, Stack: tc.stack},
 				Outbounds: []engine.Outbound{{ID: "out", Protocol: engine.ProtocolShadowsocks,
 					Server: "127.0.0.1", Port: uint16(proxyPort), Cipher: "aes-256-gcm", Password: password}},
 				Rules:   []engine.Rule{{Type: engine.RuleMatchAll, Target: "out"}},
@@ -133,7 +147,7 @@ func TestXrayTunInterceptsDNSOverUDPAndTCP(t *testing.T) {
 				DNS: engine.DNS{Enabled: true, Servers: []engine.DNSServer{{Tag: "resolver", Address: "127.0.0.1",
 					Port: uint16(portNumber), Transport: engine.DNSHTTPS}}},
 			}
-			if profile {
+			if tc.profile {
 				raw, err := json.Marshal(map[string]any{"outbounds": []any{map[string]any{
 					"tag": "provider", "protocol": "shadowsocks", "settings": map[string]any{"servers": []any{map[string]any{
 						"address": "127.0.0.1", "port": proxyPort, "method": "aes-256-gcm", "password": password,
