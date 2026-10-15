@@ -388,9 +388,9 @@ func (r *renderer) observed() []string {
 func (r *renderer) routing() (obj, error) {
 	var rules []obj
 	if r.plan.Tun.Enabled {
-		// Route machine DNS into TUN for Xray to answer using plan
-		// resolvers.
-		rules = append(rules, obj{"inboundTag": []string{tagTun}, "network": "udp", "port": "53", "outboundTag": tagDNS})
+		// TCP carries retries after truncated UDP responses and must use the
+		// same resolver instead of forwarding the machine's DNS address abroad.
+		rules = append(rules, obj{"inboundTag": []string{tagTun}, "network": "tcp,udp", "port": "53", "outboundTag": tagDNS})
 	}
 	final := obj{"network": "tcp,udp", "outboundTag": tagDirect}
 	for _, rule := range r.plan.Rules {
