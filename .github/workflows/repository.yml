@@ -180,7 +180,14 @@ jobs:
           netsh interface ipv4 show excludedportrange protocol=udp
           $env:SORA_WINDOWS_TUN_INTEGRATION = '1'
           $env:SORA_ENGINES_DIR = (Resolve-Path '../dist/windows/engines').Path
-          go test -count=1 -v ./engine/interop -run '^TestWindowsTunSwitchesCarryTCPAndUDP$' -timeout 10m
+          go test -count=1 -v ./engine/interop -run '^TestWindowsTunSwitchesCarryTCPAndUDP$' -timeout 10m 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\windows-tun-throughput.log"
+          if ($LASTEXITCODE -ne 0) { throw 'Windows TUN packet or throughput checks failed' }
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-tun-throughput
+          path: ${{ runner.temp }}/windows-tun-throughput.log
+          if-no-files-found: ignore
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.6
