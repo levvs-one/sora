@@ -192,6 +192,14 @@ func (s *Session) Start(ctx context.Context) error {
 		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
 			"session: already %s", state)
 	}
+	// The supervise loop, the done channel, and the engine subscription are
+	// single-use. A stop in flight (or finished) poisons the session, so a
+	// second Start is refused instead of corrupting them (SORA-M12).
+	if s.stopping {
+		s.mu.Unlock()
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
+			"session: a stop is in progress or has completed")
+	}
 	s.ctx, s.cancel = context.WithCancel(context.WithoutCancel(ctx))
 	s.status.SessionID = s.ID()
 	s.setStateLocked(StateConnecting, errs.Code(""), errs.Key(""), "")
@@ -270,6 +278,11 @@ func (s *Session) Stop(ctx context.Context) error {
 		if err := s.restoreGuard(context.WithoutCancel(ctx)); err != nil {
 			return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
 		}
+		return nil
+	}
+	// A session that never started owns nothing; leave it usable.
+	if s.cancel == nil {
+		s.mu.Unlock()
 		return nil
 	}
 	s.stopping = true
