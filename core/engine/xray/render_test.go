@@ -202,6 +202,207 @@ func TestLiveEngineLifecycle(t *testing.T) {
 	}
 }
 
+func xhttpVLESS() *engine.Plan {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	o := &p.Outbounds[0]
+	o.Flow = "" // XTLS Vision is TCP-only; it would (correctly) refuse xhttp.
+	o.Transport = engine.Transport{
+		Type: "xhttp", Path: "/up", Mode: "stream-up",
+		DownloadAddress: "down.example.com", DownloadPort: 8443,
+	}
+	return p
+}
+
+func TestRenderPassesXHTTPDownloadSettings(t *testing.T) {
+	raw, err := Render(xhttpVLESS(), testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cfg struct {
+		Outbounds []struct {
+			StreamSettings struct {
+				XHTTP struct {
+					Download struct {
+						Address       string `json:"address"`
+						Port          int    `json:"port"`
+						Network       string `json:"network"`
+						Security      string `json:"security"`
+						XHTTPSettings struct {
+							Path string `json:"path"`
+						} `json:"xhttpSettings"`
+						RealitySettings struct {
+							ServerName string `json:"serverName"`
+						} `json:"realitySettings"`
+					} `json:"downloadSettings"`
+				} `json:"xhttpSettings"`
+			} `json:"streamSettings"`
+		} `json:"outbounds"`
+	}
+	if err := json.Unmarshal(raw, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	d := cfg.Outbounds[0].StreamSettings.XHTTP.Download
+	if d.Address != "down.example.com" || d.Port != 8443 {
+		t.Errorf("downloadSettings = %+v, want down.example.com:8443", d)
+	}
+	if d.Network != "xhttp" || d.Security != "reality" {
+		t.Errorf("downloadSettings = %+v, want an xhttp stream mirroring the main security", d)
+	}
+	if d.XHTTPSettings.Path != "/up" {
+		t.Errorf("downlink path = %q, want the uplink path", d.XHTTPSettings.Path)
+	}
+	// The downlink SNI must name the downlink host, not the uplink one.
+	if d.RealitySettings.ServerName != "down.example.com" {
+		t.Errorf("downlink SNI = %q, want down.example.com", d.RealitySettings.ServerName)
+	}
+}
+
+func TestRenderRefusesBrokenXHTTPDownloadSettings(t *testing.T) {
+	cases := map[string]func(*engine.Transport){
+		"address without port": func(tr *engine.Transport) { tr.DownloadPort = 0 },
+		"port without address": func(tr *engine.Transport) { tr.DownloadAddress = "" },
+		"stream-one mode":      func(tr *engine.Transport) { tr.Mode = "stream-one" },
+	}
+	for name, mutate := range cases {
+		p := xhttpVLESS()
+		mutate(&p.Outbounds[0].Transport)
+		if _, err := Render(p, testRuntime, nil); err == nil {
+			t.Errorf("%s: must be refused, not rendered", name)
+		}
+	}
+	// Download fields on a non-XHTTP transport must not be silently dropped.
+	p := xhttpVLESS()
+	tr := p.Outbounds[0].Transport
+	tr.Type = "ws"
+	p.Outbounds[0].Transport = tr
+	if _, err := Render(p, testRuntime, nil); err == nil {
+		t.Error("downloadSettings on websocket: must be refused, not silently dropped")
+	}
+}
+
+func TestRenderRefusesIncompatibleTransportPairs(t *testing.T) {
+	// REALITY is documented as unsupported with websocket and httpupgrade;
+	// XTLS Vision only under TCP+TLS/REALITY.
+	// https://xtls.github.io/en/config/transport.html
+	// https://xtls.github.io/en/config/outbounds/vless.html
+	cases := map[string]func(*engine.Plan){
+		"websocket+reality": func(p *engine.Plan) {
+			p.Outbounds[0].Flow = ""
+			p.Outbounds[0].Transport = engine.Transport{Type: "ws", Path: "/ws"}
+		},
+		"httpupgrade+reality": func(p *engine.Plan) {
+			p.Outbounds[0].Flow = ""
+			p.Outbounds[0].Transport = engine.Transport{Type: "httpupgrade", Path: "/up"}
+		},
+		"xhttp+vision": func(p *engine.Plan) {
+			p.Outbounds[0].Transport = engine.Transport{Type: "xhttp", Path: "/x"}
+		},
+		"grpc+vision": func(p *engine.Plan) {
+			p.Outbounds[0].Transport = engine.Transport{Type: "grpc", Service: "tun"}
+		},
+	}
+	for name, mutate := range cases {
+		p := enginetest.Plan(engine.ProtocolVLESS) // reality + vision by default
+		mutate(p)
+		if _, err := Render(p, testRuntime, nil); err == nil {
+			t.Errorf("%s: must be refused instead of rendering a config that fails at runtime", name)
+		}
+	}
+}
+
+func TestRenderAcceptsCompatibleTransportPairs(t *testing.T) {
+	// Positive controls for the refusals above: these pairs are supported.
+	cases := map[string]func(*engine.Plan){
+		"xhttp+reality": func(p *engine.Plan) {
+			p.Outbounds[0].Flow = ""
+			p.Outbounds[0].Transport = engine.Transport{Type: "xhttp", Path: "/x"}
+		},
+		"grpc+reality": func(p *engine.Plan) {
+			p.Outbounds[0].Flow = ""
+			p.Outbounds[0].Transport = engine.Transport{Type: "grpc", Service: "tun"}
+		},
+		"websocket+tls": func(p *engine.Plan) {
+			o := &p.Outbounds[0]
+			o.Flow, o.TLS.Reality = "", false
+			o.TLS = engine.TLS{Enabled: true, ServerName: "cdn.example.com"}
+			o.Transport = engine.Transport{Type: "ws", Path: "/ws"}
+		},
+		"tcp+vision+reality": func(p *engine.Plan) {},
+	}
+	for name, mutate := range cases {
+		p := enginetest.Plan(engine.ProtocolVLESS)
+		mutate(p)
+		if _, err := Render(p, testRuntime, nil); err != nil {
+			t.Errorf("%s: supported pair must render, got %v", name, err)
+		}
+	}
+}
+
+func TestRenderPinsHysteria2NativeMapping(t *testing.T) {
+	// Xray's "hysteria" outbound IS the native Hysteria2 implementation
+	// (upstream requires settings.version == 2); this pins the mapping so it
+	// can never silently regress to a legacy wrapper.
+	p := hysteriaWithoutObfs(enginetest.Plan(engine.ProtocolHysteria2))
+	raw, err := Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cfg struct {
+		Outbounds []struct {
+			Protocol string `json:"protocol"`
+			Settings struct {
+				Version int    `json:"version"`
+				Address string `json:"address"`
+				Port    int    `json:"port"`
+			} `json:"settings"`
+		} `json:"outbounds"`
+	}
+	if err := json.Unmarshal(raw, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	ob := cfg.Outbounds[0]
+	if ob.Protocol != "hysteria" {
+		t.Errorf("protocol = %q, want hysteria", ob.Protocol)
+	}
+	if ob.Settings.Version != 2 || ob.Settings.Address != "edge.example.com" || ob.Settings.Port != 443 {
+		t.Errorf("settings = %+v, want version 2 on edge.example.com:443", ob.Settings)
+	}
+}
+
+func TestRenderPassesHysteria2BandwidthToBrutal(t *testing.T) {
+	p := hysteriaWithoutObfs(enginetest.Plan(engine.ProtocolHysteria2))
+	p.Outbounds[0].UpMbps, p.Outbounds[0].DownMbps = 100, 500
+	raw, err := Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cfg struct {
+		Outbounds []struct {
+			StreamSettings struct {
+				HysteriaSettings map[string]any `json:"hysteriaSettings"`
+			} `json:"streamSettings"`
+		} `json:"outbounds"`
+	}
+	if err := json.Unmarshal(raw, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	hy := cfg.Outbounds[0].StreamSettings.HysteriaSettings
+	if hy["up_mbps"] != float64(100) || hy["down_mbps"] != float64(500) {
+		t.Errorf("hysteriaSettings = %v, want up_mbps=100 down_mbps=500 (brutal CC)", hy)
+	}
+
+	// Zero caps must stay absent: an explicit 0 would pin brutal to
+	// nothing; the engine default (BBR) applies instead.
+	p = hysteriaWithoutObfs(enginetest.Plan(engine.ProtocolHysteria2))
+	raw, err = Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(raw), "up_mbps") || strings.Contains(string(raw), "down_mbps") {
+		t.Errorf("zero bandwidth caps must not render: %s", raw)
+	}
+}
+
 func realityFingerprintOf(t *testing.T, raw []byte) string {
 	t.Helper()
 	var cfg struct {
@@ -230,8 +431,8 @@ func TestRenderRealityFingerprintDefaultsToAuto(t *testing.T) {
 		t.Fatal(err)
 	}
 	fp := realityFingerprintOf(t, raw)
-	if fp != defaultXrayFingerprint {
-		t.Fatalf("reality fingerprint = %q, want the auto default %q", fp, defaultXrayFingerprint)
+	if fp != engine.DefaultXrayFingerprint {
+		t.Fatalf("reality fingerprint = %q, want the auto default %q", fp, engine.DefaultXrayFingerprint)
 	}
 	if fp == "chrome" {
 		t.Fatal("the pinned chrome alias (Chrome 133, TSPU-blocked) must not be the default")
@@ -307,3 +508,13 @@ func TestRealityWithoutVision(t *testing.T) {
 // TestRenderRejectsDoH3WithGuidance locks the honest failure: Xray has no
 // DNS-over-HTTP/3 transport, so an h3:// resolver must fail the render
 // with an actionable message instead of a bare "not supported".
+func TestRenderRejectsDoH3WithGuidance(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS = engine.DNS{Enabled: true, Servers: []engine.DNSServer{
+		{Tag: "dns-1", Transport: engine.DNSH3, Address: "1.1.1.1"},
+	}}
+	_, err := Render(p, testRuntime, nil)
+	if err == nil || !strings.Contains(err.Error(), "DNS-over-HTTP/3") {
+		t.Fatalf("h3 render must fail naming DNS-over-HTTP/3, got: %v", err)
+	}
+}

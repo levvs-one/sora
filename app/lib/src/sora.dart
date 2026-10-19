@@ -530,7 +530,7 @@ class Sora extends ChangeNotifier {
   final SyncDaemon syncDaemon = SyncDaemon();
 
   /// Fingerprint of the currently joined network. Unknown until the core
-  /// RPC GetNetworkFingerprint lands (F5).
+  /// RPC GetNetworkFingerprint is reachable from Dart (F5).
   NetworkFingerprint networkFingerprint = const NetworkFingerprint.unknown();
 
   /// True when the core advertises proxy-chain support for the active
@@ -1092,10 +1092,12 @@ class Sora extends ChangeNotifier {
 
   /// Refreshes the current network fingerprint (F5).
   ///
-  /// TODO(core): wire to the GetNetworkFingerprint RPC and the
-  /// ProfileMatched core event once the Go agent lands
-  /// `core/profiles/profiles.go`. Until then the fingerprint stays unknown
-  /// and the UI says so instead of guessing.
+  /// TODO(stubs): wire to the GetNetworkFingerprint RPC and dispatch the
+  /// ProfileMatched core event in _watchSession once the generated Dart
+  /// stubs (`lib/src/generated/sora/core/v1/`) are regenerated for the 1.10
+  /// profile RPCs — the Go side has already landed
+  /// (`core/control/profiles.go`, `core/profiles/`). Until then the
+  /// fingerprint stays unknown and the UI says so instead of guessing.
   Future<void> refreshFingerprint() async {
     networkFingerprint = const NetworkFingerprint.unknown();
     final matched = profiles.match(networkFingerprint);
@@ -1125,7 +1127,9 @@ class Sora extends ChangeNotifier {
   Future<void> toggle() async {
     if (cleanupPending) {
       await disconnect();
-    } else if (phase == Phase.off) {
+    } else if (phase == Phase.off || phase == Phase.offline) {
+      // Offline means the core link is down: connect() then reports
+      // app.core_unavailable honestly instead of silently ignoring the tap.
       await connect();
     } else if (phase == Phase.disconnecting) {
       _connectQueued = true;
@@ -1159,6 +1163,23 @@ class Sora extends ChangeNotifier {
     }
     final choice = selected;
     final entry = choice.startsWith(groupPrefix) ? entryOf(choice, _subscriptions.values) : null;
+    // A plain reconnect during a chain session keeps the chain (F8): via is
+    // only set for a fresh chain connect, while select()/disconnect() clear
+    // the tracked chain explicitly. A hop deleted mid-session breaks the
+    // chain: fail loudly with chainHopMissing instead of silently connecting
+    // a single server the user did not ask for, or crashing the plan builder
+    // on firstWhere.
+    final keepChain = via ?? _activeChain;
+    if (keepChain != null) {
+      final broken = ProxyChain.validateHops(keepChain.hops) != null ||
+          keepChain.hops.any((id) => !servers.any((o) => o.id == id));
+      if (broken) {
+        failure = const CoreFailure('chainHopMissing');
+        _emit(ConnectionFailed(failure!));
+        notifyListeners();
+        return;
+      }
+    }
     final plan = via == null
         ? currentPlan
         : buildPlan(
@@ -1203,8 +1224,9 @@ class Sora extends ChangeNotifier {
     phase = Phase.connecting;
     // Remember the intent so a crash can offer to restore the session (F7).
     // Chain connects are recorded by chain id and restored through
-    // connectChain rather than the server selector.
-    _writeSessionIntent(via == null ? choice : 'chain:${via.id}');
+    // connectChain rather than the server selector; a plain reconnect during
+    // a chain session keeps the chain id too (F8).
+    _writeSessionIntent(keepChain == null ? choice : 'chain:${keepChain.id}');
     notifyListeners();
     // Include events emitted during these requests, before the watch opens.
     final started = DateTime.now();
@@ -1221,7 +1243,8 @@ class Sora extends ChangeNotifier {
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
       _applyState(answer.status.connection);
       _activePlan = plan;
-      _activeChain = via;
+      // via == null on a plain reconnect keeps the tracked chain (F8).
+      _activeChain = keepChain;
       needsReconnect = currentPlan != plan;
       connected = true;
       // Swapped together with the watch, so events of the previous session
@@ -1238,6 +1261,10 @@ class Sora extends ChangeNotifier {
       await _readStatus().catchError((Object _) {});
       if (phase == Phase.connecting) phase = Phase.off;
       if (!_stopping && _emitted == before) _emit(ConnectionFailed(failure!));
+      // The session never came up: this was a failed connect, not a crash,
+      // so no restore intent may linger for the next startup (F7 honesty).
+      // Profile-group failover re-runs connect() and re-writes its intent.
+      _clearSessionIntent();
     } finally {
       _connectionWork = null;
       work.complete();
@@ -2161,6 +2188,11 @@ int? freshBandwidthOf(Map<String, ({int bps, DateTime at})> bandwidth, String id
   if (DateTime.now().difference(measurement.at) > Sora.bandwidthTtl) return null;
   return measurement.bps;
 }
+
+/// Benchmark goodput is stored in bytes per second; the UI labels it
+/// megabits per second, so the bytes-to-bits scaling lives here instead of
+/// at every call site.
+double mbpsOf(int bytesPerSec) => bytesPerSec * 8 / 1000000;
 
 /// Smart score in [0, 1] (higher is better): ping 40%, speed 40%,
 /// measurement freshness 20%, scaled by [reliability] when known — a server

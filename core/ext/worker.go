@@ -17,8 +17,10 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
+	"net/http"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/levvs-one/sora-client/core/errs"
@@ -32,6 +34,12 @@ const (
 	MaxWorkerInterval = 7 * 24 * time.Hour
 	// WorkerRunTimeout bounds one worker execution.
 	WorkerRunTimeout = 5 * time.Minute
+	// maxConsecutiveWorkerFailures is the circuit breaker: a task whose run
+	// keeps failing is unregistered (stopped) after this many consecutive
+	// failures. A permanently broken worker must not burn CPU, log volume
+	// and battery forever; the next app start re-registers it from the
+	// stored manifest, so a fixed extension recovers on its own.
+	maxConsecutiveWorkerFailures = 10
 )
 
 // ClampWorkerInterval maps a declared interval in minutes to the effective
@@ -87,6 +95,11 @@ type WorkerTask struct {
 
 	run     WorkerFunc
 	fetcher *Fetcher
+	// running guards against overlapping runs: when a run overruns the
+	// interval, the next tick is skipped instead of piling up.
+	running atomic.Bool
+	// fails counts consecutive failed runs for the circuit breaker.
+	fails atomic.Int32
 	// ctx is the task loop's context, derived from the scheduler's run
 	// context. It is canceled when the task is unregistered, replaced, or
 	// the scheduler stops, so no ticker loop outlives its task.
@@ -102,6 +115,13 @@ type Scheduler struct {
 	runCtx context.Context // non-nil while Start..Stop is active
 	stop   context.CancelFunc
 	wg     sync.WaitGroup
+	// fetchTransport, when set, supplies the HTTP transport for an
+	// extension's net.fetch. Production wiring must return a transport
+	// bound to the core's tunnel (local proxy), so extension traffic
+	// follows the VPN instead of leaking direct. Nil (tests, dev) means
+	// direct dials. Set before Start/Register; not safe to change while
+	// running.
+	fetchTransport func(extensionID string) http.RoundTripper
 }
 
 // NewScheduler returns a scheduler writing to hub. A nil hub gets a fresh
@@ -115,6 +135,26 @@ func NewScheduler(hub *LogHub) *Scheduler {
 
 // Hub exposes the log sink the scheduler writes to.
 func (s *Scheduler) Hub() *LogHub { return s.hub }
+
+// SetFetchTransport installs the hook that supplies the HTTP transport for
+// an extension's net.fetch (see the fetchTransport field). Call before
+// Start/Register.
+func (s *Scheduler) SetFetchTransport(fn func(extensionID string) http.RoundTripper) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.fetchTransport = fn
+}
+
+// fetchTransportFor returns the configured transport for extID, or nil for
+// direct dials.
+func (s *Scheduler) fetchTransportFor(extID string) http.RoundTripper {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.fetchTransport == nil {
+		return nil
+	}
+	return s.fetchTransport(extID)
+}
 
 // Register validates the manifest pair and installs the task. It requires
 // the "background" capability and permission plus a declared
@@ -139,7 +179,7 @@ func (s *Scheduler) Register(m *Manifest, x *ManifestExt, run WorkerFunc) error 
 	}
 	var fetcher *Fetcher
 	if hasPermission(m, "net.fetch") {
-		f, err := NewFetcherForExtension(m.ID, x, FetchLimits{}, s.hub)
+		f, err := NewFetcherForExtensionWithTransport(m.ID, x, FetchLimits{}, s.fetchTransportFor(m.ID), s.hub)
 		if err != nil {
 			return err
 		}
@@ -259,7 +299,21 @@ func (s *Scheduler) startLoopWith(task *WorkerTask) {
 
 // runOnce executes one task run with a timeout, recovers panics, and logs
 // the outcome to the extension's log.
+//
+// Two guards keep one bad worker from hurting the host:
+//   - overlap: a run that overruns the interval makes the next tick skip
+//     instead of piling concurrent runs onto the device;
+//   - circuit breaker: after maxConsecutiveWorkerFailures consecutive
+//     failures the task is unregistered (stopped) with an error in the log.
+//     The extension itself stays installed and enabled; the next app start
+//     re-registers its worker from the stored manifest.
 func (s *Scheduler) runOnce(task *WorkerTask) {
+	if !task.running.CompareAndSwap(false, true) {
+		s.hub.Log(task.ExtensionID).Append(LogWarn,
+			"background worker run skipped: the previous run is still in flight")
+		return
+	}
+	defer task.running.Store(false)
 	ctx, cancel := context.WithTimeout(context.Background(), WorkerRunTimeout)
 	defer cancel()
 	env := &WorkerEnv{extID: task.ExtensionID, log: s.hub.Log(task.ExtensionID), fetcher: task.fetcher}
@@ -275,10 +329,17 @@ func (s *Scheduler) runOnce(task *WorkerTask) {
 	}()
 	elapsed := time.Since(start).Truncate(time.Millisecond)
 	if err != nil {
+		n := task.fails.Add(1)
 		s.hub.Log(task.ExtensionID).Append(LogError,
 			fmt.Sprintf("background worker run failed after %s: %v", elapsed, oneLine(err, 300)))
+		if n >= maxConsecutiveWorkerFailures {
+			s.hub.Log(task.ExtensionID).Append(LogError,
+				fmt.Sprintf("background worker stopped after %d consecutive failures; it will be re-registered on the next start", n))
+			s.Unregister(task.ExtensionID)
+		}
 		return
 	}
+	task.fails.Store(0)
 	s.hub.Log(task.ExtensionID).Append(LogInfo,
 		fmt.Sprintf("background worker run ok (%s)", elapsed))
 }

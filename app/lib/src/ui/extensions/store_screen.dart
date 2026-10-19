@@ -9,7 +9,9 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart' as crypto;
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'dart:math' as math;
 
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
@@ -140,21 +142,18 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   /// Downloads a .soraext with a hard byte cap enforced while streaming, so
   /// a rogue URL cannot exhaust memory before [ExtPackage.open] runs its own
   /// structural checks. Throws on HTTP errors, timeouts and over-limit
-  /// bodies; callers map every failure to a network error.
-  static Future<Uint8List> _downloadCapped(Uri url, {required int limit}) async {
-    final client = http.Client();
-    try {
-      final response = await client.send(http.Request('GET', url));
-      if (response.statusCode != 200) throw Exception('http ${response.statusCode}');
-      final body = <int>[];
-      await for (final chunk in response.stream) {
-        body.addAll(chunk);
-        if (body.length > limit) throw Exception('download exceeds $limit bytes');
-      }
-      return Uint8List.fromList(body);
-    } finally {
-      client.close();
+  /// bodies; callers map every failure to a network error. Closing [client]
+  /// aborts the download (used by the cancel button).
+  static Future<Uint8List> _downloadCapped(http.Client client, Uri url,
+      {required int limit}) async {
+    final response = await client.send(http.Request('GET', url));
+    if (response.statusCode != 200) throw Exception('http ${response.statusCode}');
+    final body = <int>[];
+    await for (final chunk in response.stream) {
+      body.addAll(chunk);
+      if (body.length > limit) throw Exception('download exceeds $limit bytes');
     }
+    return Uint8List.fromList(body);
   }
 
   /// Verifies and installs raw .soraext bytes with the permission prompt.

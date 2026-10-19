@@ -37,6 +37,11 @@ func (d DNS) validate() error {
 			errs = append(errs, fmt.Errorf("dns: fake-ip range %q is not a CIDR", d.FakeIPRange))
 		}
 	}
+	if d.Mode == string(DNSFakeIP) && d.FakeIPRange6 != "" {
+		if ip, _, err := net.ParseCIDR(d.FakeIPRange6); err != nil || ip.To4() != nil {
+			errs = append(errs, fmt.Errorf("dns: fake-ip IPv6 range %q is not an IPv6 CIDR", d.FakeIPRange6))
+		}
+	}
 	if d.FakeIPTTL < 0 || d.FakeIPTTL > 86400 {
 		errs = append(errs, fmt.Errorf("dns: fake-ip TTL %d is out of range 0-86400", d.FakeIPTTL))
 	}

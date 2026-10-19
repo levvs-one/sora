@@ -180,6 +180,12 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 		return nil, errs.Newf(errs.CodeResourceExhausted, errs.KeyPlanTooLarge,
 			"control: the plan carries %d rules, the limit is %d", len(in.GetRoutes()), engine.MaxRules)
 	}
+	// session_identity is a reserved contract field the core does not
+	// implement; accepting it would lie to the client about the session.
+	if id := strings.TrimSpace(in.GetSessionIdentity()); id != "" {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyInvalidRequest,
+			"control: session_identity is not implemented")
+	}
 
 	defences := in.GetAntiCensorship()
 	plan := &engine.Plan{
@@ -274,6 +280,13 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 	})
 	if err != nil {
 		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanRuleInvalid)
+	}
+	// block_private is a contract field no engine implements; accepting it
+	// would let a client believe private DNS answers are filtered while the
+	// core resolves them plainly.
+	if in.GetDnsPolicy().GetBlockPrivate() {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanDNSInvalid,
+			"control: dns block_private is not implemented")
 	}
 	plan.DNS = dnsFromProto(in.GetDnsPolicy(), plan.Tun.Enabled)
 	if err := checkDNS(plan.DNS); err != nil {

@@ -8,6 +8,7 @@
 package stealth
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/levvs-one/sora-client/core/engine"

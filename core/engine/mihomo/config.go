@@ -97,6 +97,10 @@ type proxy struct {
 	Obfs          string `yaml:"obfs,omitempty"`
 	ObfsParam     string `yaml:"obfs-param,omitempty"`
 	ObfsPassword  string `yaml:"obfs-password,omitempty"`
+	// SSPlugin selects a Shadowsocks SIP002 obfuscation plugin
+	// (v2ray-plugin, ...); SSPluginOpts is its translated option map.
+	SSPlugin     string         `yaml:"plugin,omitempty"`
+	SSPluginOpts map[string]any `yaml:"plugin-opts,omitempty"`
 	Protocol      string `yaml:"protocol,omitempty"`
 	ProtocolParam string `yaml:"protocol-param,omitempty"`
 	TLS           *bool  `yaml:"tls,omitempty"`
@@ -152,6 +156,9 @@ type wsOpts struct {
 	Path             string            `yaml:"path,omitempty"`
 	Headers          map[string]string `yaml:"headers,omitempty"`
 	V2RayHTTPUpgrade bool              `yaml:"v2ray-http-upgrade,omitempty"`
+	// MaxEarlyData caps WebSocket 0-RTT: the first payload bytes ride
+	// the handshake. Zero disables it.
+	MaxEarlyData int `yaml:"max-early-data,omitempty"`
 }
 
 type grpcOpts struct {

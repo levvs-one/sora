@@ -2,10 +2,13 @@
 library;
 
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:crypto/crypto.dart';
 
+import 'manifest.dart';
 import 'permissions.dart';
 import 'verifier.dart';
 
@@ -36,11 +39,15 @@ class CatalogEntry {
     required this.installs,
     required this.badges,
     required this.categories,
+    required this.capabilities,
     required this.permissions,
     required this.downloadUrl,
     required this.sha256,
     required this.size,
     required this.minAppVersion,
+    required this.rolloutFraction,
+    required this.screenshotUrls,
+    required this.changelog,
   });
 
   final String id;
@@ -56,11 +63,25 @@ class CatalogEntry {
   final int installs;
   final List<String> badges;
   final List<String> categories;
+
+  /// Manifest capabilities (theme, network-hook, routing, ui-panel,
+  /// background, widget): the store filters on these.
+  final List<String> capabilities;
+
   final List<String> permissions;
   final String downloadUrl;
   final String sha256;
   final int size;
   final String minAppVersion;
+
+  /// Staged-rollout fraction 0..1; 0 (or absent) means fully rolled out.
+  final double rolloutFraction;
+
+  /// https screenshot URLs (<= 8) for the detail page.
+  final List<String> screenshotUrls;
+
+  /// Recent versions, newest first.
+  final List<CatalogChangelogEntry> changelog;
 
   factory CatalogEntry.fromJson(Map<String, dynamic> json) {
     return CatalogEntry(
@@ -77,21 +98,67 @@ class CatalogEntry {
       installs: (json['installs'] as num? ?? 0).toInt(),
       badges: (json['badges'] as List? ?? []).map((e) => e.toString()).toList(),
       categories: (json['categories'] as List? ?? []).map((e) => e.toString()).toList(),
+      capabilities: (json['capabilities'] as List? ?? []).map((e) => e.toString()).toList(),
       permissions: (json['permissions'] as List? ?? []).map((e) => e.toString()).toList(),
       downloadUrl: json['download_url'] as String? ?? '',
       sha256: (json['sha256'] as String? ?? '').toLowerCase(),
       size: (json['size'] as num? ?? 0).toInt(),
       minAppVersion: json['min_app_version'] as String? ?? '',
+      rolloutFraction: (json['rollout_fraction'] as num? ?? 0).toDouble(),
+      screenshotUrls: (json['screenshots'] as List? ?? []).map((e) => e.toString()).toList(),
+      changelog: (json['changelog'] as List? ?? [])
+          .whereType<Map<String, dynamic>>()
+          .map(CatalogChangelogEntry.fromJson)
+          .toList(),
     );
   }
 
   bool get isVerified => badges.contains('verified');
+
+  /// Effective rollout fraction: 1 when the catalog omits it or sets <= 0.
+  double get effectiveRollout => rolloutFraction <= 0 ? 1.0 : rolloutFraction;
+
+  /// Whether [installId] falls inside this version's staged-rollout bucket.
+  /// Mirrors core/ext RolloutEligible: sha256(installId | id | version),
+  /// big-endian first 8 bytes mod 10000 < fraction * 10000. Deterministic
+  /// per device, so eligibility never flaps between catalog syncs.
+  bool rolloutEligible(String installId) {
+    final f = effectiveRollout;
+    if (f >= 1) return true;
+    final digest = sha256
+        .convert(utf8.encode('$installId\x00$id\x00$version'))
+        .bytes;
+    var bucket = 0;
+    for (var i = 0; i < 8; i++) {
+      bucket = (bucket << 8) | digest[i];
+    }
+    return bucket % 10000 < (f * 10000).floor();
+  }
+}
+
+/// One changelog row: a released version and its notes.
+class CatalogChangelogEntry {
+  CatalogChangelogEntry({required this.version, required this.date, required this.notes});
+  final String version;
+  final DateTime date;
+  final String notes;
+
+  factory CatalogChangelogEntry.fromJson(Map<String, dynamic> json) {
+    return CatalogChangelogEntry(
+      version: json['version'] as String? ?? '',
+      date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0),
+      notes: json['notes'] as String? ?? '',
+    );
+  }
 }
 
 class ExtensionCatalog {
-  ExtensionCatalog({required this.updatedAt, required this.entries});
+  ExtensionCatalog({required this.updatedAt, required this.entries, required this.maxAge});
   final DateTime updatedAt;
   final List<CatalogEntry> entries;
+
+  /// Server's freshness promise, seconds (default 3600 when omitted).
+  final int maxAge;
 
   CatalogEntry? find(String id) {
     for (final e in entries) {
@@ -99,6 +166,10 @@ class ExtensionCatalog {
     }
     return null;
   }
+
+  /// True while the catalog is within its max_age freshness promise.
+  bool fresh(DateTime fetchedAt, DateTime now) =>
+      !now.isAfter(fetchedAt.add(Duration(seconds: maxAge)));
 
   static ExtensionCatalog parse(Uint8List data) {
     if (data.isEmpty || data.length > 4 * 1024 * 1024) {
@@ -116,6 +187,10 @@ class ExtensionCatalog {
     }
     final updatedAt = DateTime.tryParse(decoded['updated_at'] as String? ?? '');
     if (updatedAt == null) throw CatalogError('catalog updated_at is not a date');
+    final maxAge = decoded['max_age'] as num?;
+    if (maxAge != null && (maxAge < 300 || maxAge > 604800)) {
+      throw CatalogError('catalog max_age is outside 300..604800');
+    }
     final entries = <CatalogEntry>[];
     final seen = <String>{};
     for (final raw in (decoded['extensions'] as List? ?? [])) {
@@ -124,7 +199,10 @@ class ExtensionCatalog {
       if (!seen.add(e.id)) throw CatalogError('catalog lists "${e.id}" twice');
       entries.add(e);
     }
-    return ExtensionCatalog(updatedAt: updatedAt, entries: entries);
+    return ExtensionCatalog(
+        updatedAt: updatedAt,
+        entries: entries,
+        maxAge: (maxAge ?? 3600).toInt());
   }
 
   static void _validateEntry(CatalogEntry e) {
@@ -154,12 +232,38 @@ class ExtensionCatalog {
     for (final p in e.permissions) {
       if (!isKnownPermission(p)) throw CatalogError('entry "${e.id}" wants unknown permission "$p"');
     }
+    if (e.rolloutFraction.isNaN || e.rolloutFraction < 0 || e.rolloutFraction > 1) {
+      throw CatalogError('entry "${e.id}" has a bad rollout_fraction');
+    }
+    if (e.screenshotUrls.length > 8) {
+      throw CatalogError('entry "${e.id}" lists too many screenshots');
+    }
+    for (final u in e.screenshotUrls) {
+      if (u.isEmpty || !u.startsWith('https://')) {
+        throw CatalogError('entry "${e.id}" has a non-https screenshot');
+      }
+    }
+    for (final c in e.changelog) {
+      if (c.version.isEmpty || c.notes.trim().isEmpty || c.notes.length > 2000) {
+        throw CatalogError('entry "${e.id}" has a bad changelog row');
+      }
+    }
+    for (final c in e.capabilities) {
+      if (!isKnownCapability(c)) throw CatalogError('entry "${e.id}" has unknown capability "$c"');
+    }
   }
 }
 
 /// Downloads catalog.json and its .minisig, verifies the team signature and
 /// returns the parsed catalog. https only.
 Future<ExtensionCatalog> fetchCatalog({http.Client? client, String url = defaultCatalogUrl}) async {
+  final raw = await fetchRawCatalog(client: client, url: url);
+  return ExtensionCatalog.parse(raw);
+}
+
+/// Downloads catalog.json and its .minisig and verifies the team
+/// signature, returning the raw verified bytes (for the offline cache).
+Future<Uint8List> fetchRawCatalog({http.Client? client, String url = defaultCatalogUrl}) async {
   if (!url.startsWith('https://')) throw CatalogError('catalog URL must be https');
   final c = client ?? http.Client();
   final owned = client == null;
@@ -171,7 +275,7 @@ Future<ExtensionCatalog> fetchCatalog({http.Client? client, String url = default
     } on SignatureError catch (e) {
       throw CatalogError(e.message);
     }
-    return ExtensionCatalog.parse(body);
+    return body;
   } finally {
     if (owned) c.close();
   }
@@ -182,4 +286,67 @@ Future<Uint8List> _get(http.Client c, String url) async {
   if (resp.statusCode != 200) throw CatalogError('catalog answered ${resp.statusCode}');
   if (resp.bodyBytes.length > 4 * 1024 * 1024) throw CatalogError('catalog is too large');
   return resp.bodyBytes;
+}
+
+/// Offline catalog cache: the last verified catalog.json plus its fetch
+/// time, under [dir]. Served when the network or the signature check fails;
+/// the UI shows the "cached - <date>" state instead of an error. Only
+/// verified bytes are ever stored.
+class CatalogCache {
+  CatalogCache(this.dir);
+  final String dir;
+
+  File get _rawFile => File('$dir${Platform.pathSeparator}catalog.json');
+  File get _metaFile => File('$dir${Platform.pathSeparator}catalog.json.meta');
+
+  /// Stores verified catalog bytes (parse-checked before writing).
+  Future<void> store(Uint8List raw) async {
+    ExtensionCatalog.parse(raw); // throws when not a valid catalog
+    await Directory(dir).create(recursive: true);
+    final tmp = File('${_rawFile.path}.tmp');
+    await tmp.writeAsBytes(raw, flush: true);
+    await tmp.rename(_rawFile.path);
+    await _metaFile.writeAsString(
+        jsonEncode({'fetched_at': DateTime.now().toUtc().toIso8601String()}),
+        flush: true);
+  }
+
+  /// Loads the cached catalog, or null when absent or corrupt (a corrupt
+  /// cache is "no cache", never a crash).
+  Future<({ExtensionCatalog catalog, DateTime fetchedAt})?> load() async {
+    try {
+      final raw = await _rawFile.readAsBytes();
+      final catalog = ExtensionCatalog.parse(raw);
+      final meta = jsonDecode(await _metaFile.readAsString()) as Map<String, dynamic>;
+      final fetchedAt = DateTime.tryParse(meta['fetched_at'] as String? ?? '');
+      if (fetchedAt == null) return null;
+      return (catalog: catalog, fetchedAt: fetchedAt);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Fetches the team catalog and updates the cache. On any fetch or
+  /// verification failure falls back to the cached catalog when one exists
+  /// ([fromCache] is then true and the UI must say so). With no network
+  /// and no cache, the fetch error is rethrown.
+  Future<({ExtensionCatalog catalog, bool fromCache, DateTime fetchedAt})> refresh(
+      {http.Client? client, String url = defaultCatalogUrl}) async {
+    try {
+      final raw = await fetchRawCatalog(client: client, url: url);
+      final catalog = ExtensionCatalog.parse(raw);
+      try {
+        await store(raw);
+      } catch (_) {
+        // A cache write failure must not fail the refresh.
+      }
+      return (catalog: catalog, fromCache: false, fetchedAt: DateTime.now().toUtc());
+    } catch (_) {
+      final cached = await load();
+      if (cached != null) {
+        return (catalog: cached.catalog, fromCache: true, fetchedAt: cached.fetchedAt);
+      }
+      rethrow;
+    }
+  }
 }

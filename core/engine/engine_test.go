@@ -156,6 +156,65 @@ func TestSingBoxCapabilitiesFollowTheBuildRatherThanTheName(t *testing.T) {
 	}
 }
 
+// TestSingBoxPin115KeepsTheLXFork: the 1.15 pin must reject outdated
+// upstream builds, but never the shipped lx. fork, which tracks the 1.14
+// base and keeps its own 1.14.3 floor.
+func TestSingBoxPin115KeepsTheLXFork(t *testing.T) {
+	p := validPlan()
+	p.Outbounds = p.Outbounds[:1]
+	for _, tc := range []struct {
+		version string
+		tags    []string
+		want    bool
+	}{
+		{"1.14.3", nil, false}, // outdated upstream: below the 1.15 pin
+		{"1.15.0", nil, true},  // current upstream
+		// Less ignores the pre-release, like the fork floor does.
+		{"1.15.0-alpha.12", nil, true},
+		{"1.14.3-lx.14", []string{"with_awg"}, true},  // shipped fork
+		{"1.14.2-lx.14", []string{"with_awg"}, false}, // fork below its own floor
+	} {
+		_, err := SelectEngine(p, []Availability{{
+			Kind: KindSingBox, Usable: true,
+			Version:   mustVersion(t, tc.version),
+			BuildTags: tc.tags,
+		}}, []Kind{KindSingBox})
+		if (err == nil) != tc.want {
+			t.Errorf("version %s, tags %v: selected=%v, want %v (err=%v)", tc.version, tc.tags, err == nil, tc.want, err)
+		}
+	}
+}
+
+// TestTunStackNeverSilentlyDroppedOnSingBox115: sing-box 1.15+ ignores the
+// TUN stack option, so an explicit stack must be reported missing rather
+// than silently dropped; the 1.14-based lx. fork still honors it (except
+// "mips", which no sing-box build knows).
+func TestTunStackNeverSilentlyDroppedOnSingBox115(t *testing.T) {
+	p := validPlan()
+	p.Outbounds = p.Outbounds[:1]
+	p.Tun.Enabled = true
+	for _, tc := range []struct {
+		version     string
+		stack       string
+		wantMissing bool
+	}{
+		{"1.15.0", "gvisor", true},
+		{"1.15.0", "mixed", true},
+		{"1.15.0", "", false},
+		{"1.14.3-lx.14", "gvisor", false},
+		{"1.14.3-lx.14", "mips", true},
+		{"1.14.3-lx.14", "", false},
+	} {
+		p.Tun.Stack = tc.stack
+		caps := BuildCapabilities(KindSingBox, mustVersion(t, tc.version), nil)
+		missing := caps.Missing(p)
+		if got := len(missing) != 0; got != tc.wantMissing {
+			t.Errorf("version %s stack %q: missing=%v, want missing=%v (%v)",
+				tc.version, tc.stack, got, tc.wantMissing, missing)
+		}
+	}
+}
+
 func TestTLSVerificationSettingSelectsCompatibleEngine(t *testing.T) {
 	p := validPlan()
 	p.Outbounds = p.Outbounds[:1]
@@ -213,5 +272,70 @@ func TestPlanValidateRejectsUnknownProtocolAndTransport(t *testing.T) {
 	good := validPlan()
 	if err := good.Validate(); err != nil {
 		t.Fatalf("good plan rejected: %v", err)
+	}
+}
+
+// TestDoH3ResolverRequiresDoH3Feature locks the DoH3 gate: a plan naming
+// an h3:// resolver requires FeatureDoH3, so automatic selection routes it
+// to sing-box/mihomo and never to Xray (whose render cannot speak H3).
+func TestDoH3ResolverRequiresDoH3Feature(t *testing.T) {
+	p := validPlan()
+	p.DNS = DNS{Enabled: true, Servers: []DNSServer{
+		{Tag: "dns-1", Transport: DNSH3, Address: "1.1.1.1"},
+	}}
+	if !p.RequiredFeatures()[FeatureDoH3] {
+		t.Fatal("an h3:// resolver must require FeatureDoH3")
+	}
+	p.DNS.Servers[0].Transport = DNSHTTPS
+	if p.RequiredFeatures()[FeatureDoH3] {
+		t.Fatal("a plain DoH resolver must not require FeatureDoH3")
+	}
+}
+
+// TestDoH3PlanAvoidsXray locks selection: with Xray pinned the h3 plan is
+// rejected naming the missing feature; with a choice the selector prefers
+// an engine that actually speaks DoH3.
+func TestDoH3PlanAvoidsXray(t *testing.T) {
+	p := validPlan()
+	p.DNS = DNS{Enabled: true, Servers: []DNSServer{
+		{Tag: "dns-1", Transport: DNSH3, Address: "1.1.1.1"},
+	}}
+	available := []Availability{
+		{Kind: KindXray, Usable: true, Version: mustVersion(t, "26.3.27")},
+		{Kind: KindSingBox, Usable: true, Version: mustVersion(t, "1.14.3-lx.14"), BuildTags: []string{"with_xhttp"}},
+	}
+	if _, err := SelectEngine(p, available, []Kind{KindXray}); err == nil || !strings.Contains(err.Error(), "doh3") {
+		t.Fatalf("pinned Xray must reject the h3 plan naming doh3, got: %v", err)
+	}
+	sel, err := SelectEngine(p, available, []Kind{KindXray, KindSingBox})
+	if err != nil || sel.Kind != KindSingBox {
+		t.Fatalf("selection should route the h3 plan to sing-box: %+v, %v", sel, err)
+	}
+}
+
+// TestFakeIPRange6Validation locks the IPv6 fake pool: it must be an IPv6
+// CIDR when set, and a v4 CIDR or garbage fails plan validation.
+func TestFakeIPRange6Validation(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		pool string
+		want string // "" means valid
+	}{
+		{"unset", "", ""},
+		{"valid v6", "fd00::/48", ""},
+		{"garbage", "not-a-cidr", "IPv6"},
+		{"v4 in v6 field", "198.18.0.0/16", "IPv6"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			p := validPlan()
+			p.DNS = DNS{Enabled: true, Mode: string(DNSFakeIP), FakeIPRange6: tc.pool}
+			err := p.Validate()
+			if tc.want == "" && err != nil {
+				t.Fatalf("valid range rejected: %v", err)
+			}
+			if tc.want != "" && (err == nil || !strings.Contains(err.Error(), tc.want)) {
+				t.Fatalf("range %q must fail validation naming %q, got: %v", tc.pool, tc.want, err)
+			}
+		})
 	}
 }

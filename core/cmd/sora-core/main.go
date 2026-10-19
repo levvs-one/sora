@@ -350,7 +350,20 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		_ = store.Close()
 		return nil, err
 	}
-	extv1.RegisterExtensionHostServer(app.server, ext.NewHost(extStore.Issuer(), plane.ExtHostDeps()))
+	// GrantedPermissions closes the mint hole: without it Host.MintToken
+	// trusts the app's permission list, so a confused control plane could
+	// mint tokens for disabled extensions or with ungranted permissions.
+	// With it, the core mints only for installed+enabled extensions and
+	// only within the user-granted set.
+	extDeps := plane.ExtHostDeps()
+	extDeps.GrantedPermissions = func(id string) ([]string, bool) {
+		inst, ok := extStore.Get(id)
+		if !ok || !inst.Enabled {
+			return nil, false
+		}
+		return inst.Granted, true
+	}
+	extv1.RegisterExtensionHostServer(app.server, ext.NewHost(extStore.Issuer(), extDeps))
 	built = true
 	return app, nil
 }

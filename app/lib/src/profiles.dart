@@ -7,8 +7,12 @@ import 'package:flutter/foundation.dart';
 ///
 /// The Go core owns trigger matching on network change
 /// (`core/profiles/profiles.go`, RPCs `ListProfiles`/`SaveProfile`/
-/// `DeleteProfile`/`GetNetworkFingerprint`); this store is the app-side cache
-/// and the source of truth for the editor UI until the core sync lands.
+/// `DeleteProfile`/`GetNetworkFingerprint`, `ProfileMatched` events); this
+/// store is the app-side cache and the source of truth for the editor UI.
+/// NOTE: the generated Dart stubs (`lib/src/generated/sora/core/v1/`)
+/// predate the 1.10 profile RPCs, so the app cannot call them yet — pushing
+/// profiles to the core and dispatching `ProfileMatched` need the stubs
+/// regenerated with protoc first. Until then matching stays app-side only.
 class NetworkProfile {
   NetworkProfile({
     required this.id,
@@ -91,8 +95,10 @@ class NetworkProfile {
 
 /// Fingerprint of the currently joined network.
 ///
-/// Filled by the core RPC `GetNetworkFingerprint` once the Go side lands;
-/// until then the app shows the "unavailable" state instead of guessing.
+/// Filled by the core RPC `GetNetworkFingerprint` once the generated Dart
+/// stubs are regenerated for the 1.10 profile RPCs (the Go side has landed
+/// in `core/profiles/profiles.go`); until then the app shows the
+/// "unavailable" state instead of guessing.
 class NetworkFingerprint {
   const NetworkFingerprint({this.ssid, this.gateway, this.asn});
 

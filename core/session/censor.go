@@ -83,7 +83,11 @@ func (w *censorshipWatcher) onEvent(ev Event) {
 	case censorRefused:
 		// No probe needed: the RST answer is the evidence. A server that
 		// answers and refuses is alive — report it so the user stops
-		// blaming the path.
+		// blaming the path. Still rate-limited: a flapping closed port
+		// must not flood the journal with identical verdicts.
+		if !w.claimProbeSlot() {
+			return
+		}
 		w.publish(censor.Verdict{
 			Kind:        censor.KindNoInterference,
 			Confidence:  0.85,
@@ -137,8 +141,9 @@ func (w *censorshipWatcher) knownGood() bool {
 	return false
 }
 
-// claimProbeSlot rate-limits active probes: at most one per interval per
-// session. Only the watcher's goroutine calls it, the mutex is for
+// claimProbeSlot rate-limits verdict publications: at most one per interval
+// per session, whether the verdict cost an active probe or was answered
+// directly. Only the watcher's goroutine calls it, the mutex is for
 // discipline.
 func (w *censorshipWatcher) claimProbeSlot() bool {
 	w.mu.Lock()

@@ -48,6 +48,9 @@ contents:
     dst: /usr/lib/sora/engines/geoip.dat
   - src: ./dist/engines/geosite.dat
     dst: /usr/lib/sora/engines/geosite.dat
+  # Required by core/engine/supervise: without it every engine is refused.
+  - src: ./dist/engines/engines.digests
+    dst: /usr/lib/sora/engines/engines.digests
   # zapret by bol-van (MIT), built from third_party/zapret unchanged.
   - src: ./dist/engines/tpws
     dst: /usr/lib/sora/engines/tpws

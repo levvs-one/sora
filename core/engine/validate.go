@@ -32,7 +32,13 @@ func (p *Plan) Secrets() []string {
 // Secrets lists the secret fields of one outbound. Values shorter than four
 // characters are skipped: masking them would destroy ordinary log text.
 func (o Outbound) Secrets() []string {
-	candidates := []string{o.UUID, o.Password, o.UserID, o.ObfsParam, o.Token, o.PrivateKey, o.OriginalLink}
+	candidates := []string{o.UUID, o.Password, o.UserID, o.ObfsParam, o.PluginOpts, o.Token, o.PrivateKey, o.OriginalLink}
+	if o.Amnezia != nil {
+		// The header-protection key is key material like the private
+		// key: it must never reach a log, an event or a diagnostic
+		// archive.
+		candidates = append(candidates, o.Amnezia.HeaderProtectionKey)
+	}
 	if o.Encryption != "none" {
 		candidates = append(candidates, o.Encryption)
 	}
@@ -98,6 +104,8 @@ func (o Outbound) Warnings() []string {
 		out = append(out, "websocket-without-tls")
 	}
 	out = append(out, o.shadowsocksWarnings()...)
+	// REALITY hardening (T002): vision/TLS-in-TLS and dest-shape warnings.
+	out = append(out, o.RealityWarnings()...)
 	return out
 }
 
@@ -167,6 +175,14 @@ func (o Outbound) Validate() error {
 	if len(o.Transport.Headers) > MaxHeaderCount {
 		errs = append(errs, fmt.Errorf("outbound %s: more than %d headers", o.ID, MaxHeaderCount))
 	}
+	// WebSocket 0-RTT rides the handshake; other transports have no
+	// handshake to ride, so a stray value is a config bug, not a hint.
+	if o.Transport.EarlyData < 0 {
+		errs = append(errs, fmt.Errorf("outbound %s: early data %d must not be negative", o.ID, o.Transport.EarlyData))
+	}
+	if o.Transport.EarlyData > 0 && o.Transport.Type != "ws" {
+		errs = append(errs, fmt.Errorf("outbound %s: early data needs the ws transport, not %q", o.ID, o.Transport.Type))
+	}
 	for k, v := range o.Transport.Headers {
 		if !validHeaderToken(k) || strings.ContainsAny(v, "\r\n") {
 			errs = append(errs, fmt.Errorf("outbound %s: header %q is not a safe HTTP header", o.ID, k))
@@ -178,6 +194,11 @@ func (o Outbound) Validate() error {
 		} else {
 			errs = append(errs, validateAmneziaWG(o.ID, o.Amnezia)...)
 		}
+	}
+	// REALITY hardening (T002): malformed keys or shortIds fail here, not
+	// at the engine.
+	if err := o.ValidateReality(); err != nil {
+		errs = append(errs, err)
 	}
 	return errors.Join(errs...)
 }
@@ -200,8 +221,8 @@ const (
 
 // validateAmneziaWG rejects obfuscation parameters an engine would silently
 // misapply or drop: every engine derives from the same upstream device, so
-// the checks stay engine-independent. I1-I5 are CPS tag scripts (engine and
-// version specific) and are left to the renderer.
+// the checks stay engine-independent. I1-I5 get structural CPS validation
+// here; the engine stays the authority on unknown tags.
 func validateAmneziaWG(id string, a *AmneziaWG) []error {
 	var errs []error
 	bad := func(format string, args ...any) {
@@ -301,6 +322,17 @@ func validateAmneziaWG(id string, a *AmneziaWG) []error {
 			bad("%s %q is not a range<uint16> (\"a-b\" or \"a\"): %v", r[0], r[1], err)
 		}
 	}
+	// I1..I5 are CPS tag scripts: a malformed script is rejected by the
+	// engine at load, so catch it here with the plan context attached.
+	for i, raw := range []string{a.I1, a.I2, a.I3, a.I4, a.I5} {
+		if raw == "" {
+			continue
+		}
+		if err := validateAWGCPS(raw); err != nil {
+			bad("i%d %q is not a valid CPS script: %v", i+1, raw, err)
+		}
+	}
+	errs = append(errs, validateAWGMasquerade(id, a)...)
 	// T012: published example parameters are censor-signatured verbatim.
 	// docs.amnezia.org itself warns its CPS example "is not an example of
 	// a signature. Do not use it as the value". Every client/server pair
@@ -378,6 +410,139 @@ func decodeAWGKey(raw string) ([]byte, error) {
 		return b, nil
 	}
 	return nil, fmt.Errorf("not base64 or hex")
+}
+
+// validateAWGMasquerade checks the sing-box-lx id/ip/ib decoy sugar against
+// the fork's own rules: the protocol set, the browser set, the domain the
+// decoy embeds, and the mutual exclusion with a hand-written I1.
+func validateAWGMasquerade(id string, a *AmneziaWG) []error {
+	var errs []error
+	bad := func(format string, args ...any) {
+		args = append([]any{id}, args...)
+		errs = append(errs, fmt.Errorf("outbound %s: amneziawg "+format, args...))
+	}
+	proto, domain, browser := a.MasqueradeProtocol, a.MasqueradeDomain, a.MasqueradeBrowser
+	if proto == "" && domain == "" && browser == "" {
+		return nil
+	}
+	if a.I1 != "" && proto != "" {
+		bad("id/ip/ib masquerade conflicts with an explicit i1; use one or the other")
+	}
+	switch proto {
+	case "quic", "dns", "stun", "sip":
+	case "":
+		bad("ip (masquerade protocol) is required when id/ib is set; one of quic|dns|stun|sip")
+	default:
+		bad("unknown masquerade protocol %q; one of quic|dns|stun|sip", proto)
+	}
+	switch browser {
+	case "", "chrome", "firefox", "curl":
+	case "chrome-full":
+		// Experimental in the fork and not for client UIs: refuse
+		// rather than silently fall back to the generic ClientHello.
+		bad("masquerade browser %q is experimental and not for client use; one of chrome|firefox|curl", browser)
+	default:
+		bad("unknown masquerade browser %q; one of chrome|firefox|curl", browser)
+	}
+	if browser != "" && proto != "" && proto != "quic" {
+		bad("ib (browser) is only meaningful with ip=quic, got ip=%q", proto)
+	}
+	if proto == "quic" && domain == "" {
+		bad("id (masquerade domain) is required for ip=quic (it becomes the ClientHello SNI)")
+	}
+	if domain != "" {
+		if err := validateAWGDomain(domain); err != nil {
+			bad("invalid masquerade domain %q: %v", domain, err)
+		}
+	}
+	return errs
+}
+
+// validateAWGDomain applies the fork's strict LDH check: the domain lands
+// in SIP text and DNS QNAMEs, so this is an injection boundary.
+func validateAWGDomain(domain string) error {
+	if len(domain) > 253 {
+		return fmt.Errorf("longer than 253 bytes")
+	}
+	name := strings.TrimSuffix(domain, ".")
+	if name == "" || strings.HasPrefix(domain, ".") {
+		return fmt.Errorf("empty or leading dot")
+	}
+	for _, label := range strings.Split(name, ".") {
+		if len(label) == 0 || len(label) > 63 {
+			return fmt.Errorf("label %q is empty or longer than 63 bytes", label)
+		}
+		if label[0] == '-' || label[len(label)-1] == '-' {
+			return fmt.Errorf("label %q has a leading or trailing hyphen", label)
+		}
+		for i := 0; i < len(label); i++ {
+			c := label[i]
+			if c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '-' || c == '_' {
+				continue
+			}
+			return fmt.Errorf("illegal character %q (only a-z A-Z 0-9 - _ allowed)", string(c))
+		}
+	}
+	return nil
+}
+
+// validateAWGCPS checks the structural shape of a CPS decoy script: a
+// whitespace-separated sequence of <tag> elements using the tag set the
+// engines implement (b/c/t/r/rc/rd). Unknown tags are left to the engine:
+// being stricter here than the engine would reject configs the engine
+// accepts.
+func validateAWGCPS(raw string) error {
+	rest := strings.TrimSpace(raw)
+	for rest != "" {
+		if !strings.HasPrefix(rest, "<") {
+			return fmt.Errorf("text outside <...> tags")
+		}
+		end := strings.IndexByte(rest, '>')
+		if end < 0 {
+			return fmt.Errorf("unclosed <...> tag")
+		}
+		tag := strings.TrimSpace(rest[1:end])
+		rest = strings.TrimSpace(rest[end+1:])
+		fields := strings.Fields(tag)
+		if len(fields) == 0 {
+			return fmt.Errorf("empty <...> tag")
+		}
+		switch fields[0] {
+		case "b":
+			// <b 0xHEX>: static bytes, always even-sized hex.
+			if len(fields) != 2 || !strings.HasPrefix(fields[1], "0x") {
+				return fmt.Errorf("<b ...> needs one 0x-prefixed hex argument")
+			}
+			hex := fields[1][2:]
+			if len(hex) == 0 || len(hex)%2 != 0 {
+				return fmt.Errorf("<b ...> hex must be non-empty and even-sized")
+			}
+			for i := 0; i < len(hex); i++ {
+				c := hex[i]
+				if c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F' {
+					continue
+				}
+				return fmt.Errorf("<b ...> hex has a non-hex character")
+			}
+		case "c", "t":
+			// <c> counter, <t> timestamp: no arguments.
+			if len(fields) != 1 {
+				return fmt.Errorf("<%s> takes no arguments", fields[0])
+			}
+		case "r", "rc", "rd":
+			// <r N> / <rc N> / <rd N>: N random bytes/chars/digits.
+			if len(fields) != 2 {
+				return fmt.Errorf("<%s ...> needs one size argument", fields[0])
+			}
+			n, err := strconv.Atoi(fields[1])
+			if err != nil || n < 0 || n > 1000 {
+				return fmt.Errorf("<%s ...> size must be 0-1000", fields[0])
+			}
+		default:
+			// Unknown tag: the engine is the authority.
+		}
+	}
+	return nil
 }
 
 // parseAmneziaMagic parses a 2.0 magic header: a single number or an "x-y"

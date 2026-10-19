@@ -145,7 +145,7 @@ func buildProxies(p *engine.Plan) (map[string]string, []proxy, error) {
 		px := proxy{Type: "direct"}
 		if o.Protocol != engine.ProtocolDirect {
 			var err error
-			if px, err = buildProxy(o); err != nil {
+			if px, err = buildProxy(o, p.Options.Mux); err != nil {
 				return nil, nil, err
 			}
 		}

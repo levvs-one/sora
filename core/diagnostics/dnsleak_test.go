@@ -15,9 +15,10 @@ func leakInput() diagnostics.DnsLeakInput {
 		TunnelResolvers: []diagnostics.TunnelResolver{
 			{Address: "1.1.1.1", Transport: "udp"},
 		},
-		SystemResolvers: []string{"1.1.1.1"},
-		CanaryHost:      "canary.example",
-		Resolve: func(ctx context.Context, resolverAddr, host string) ([]string, error) {
+		SystemResolvers:    []string{"1.1.1.1"},
+		SystemEncryptedDNS: []string{},
+		CanaryHost:         "canary.example",
+		Probe: func(ctx context.Context, network, addr, host string) ([]string, error) {
 			return []string{"203.0.113.7"}, nil
 		},
 	}
@@ -34,8 +35,8 @@ func findCheck(checks []diagnostics.DnsLeakCheck, id string) *diagnostics.DnsLea
 
 func TestCheckDnsLeaks_Clean(t *testing.T) {
 	checks := diagnostics.CheckDnsLeaks(context.Background(), leakInput())
-	if len(checks) != 3 {
-		t.Fatalf("expected 3 checks, got %d", len(checks))
+	if len(checks) != 4 {
+		t.Fatalf("expected 4 checks, got %d", len(checks))
 	}
 	for _, c := range checks {
 		if c.Leaked {
@@ -48,6 +49,9 @@ func TestCheckDnsLeaks_Clean(t *testing.T) {
 	tunnel := findCheck(checks, diagnostics.DnsLeakTunnelDNS)
 	if tunnel == nil || !strings.Contains(tunnel.Actual, "203.0.113.7") {
 		t.Errorf("tunnel-dns should report the canary answer, got %+v", tunnel)
+	}
+	if enc := findCheck(checks, diagnostics.DnsLeakEncryptedDNS); enc == nil {
+		t.Error("missing encrypted-dns check")
 	}
 }
 
@@ -119,13 +123,13 @@ func TestCheckDnsLeaks_NoTunnelResolvers(t *testing.T) {
 		t.Errorf("missing tunnel DNS must leak, got %+v", tunnel)
 	}
 	if tunnel.FixHint != diagnostics.DnsLeakFixConfigureTunnel {
-		t.Errorf("expected configure hint, got %q", tunnel.FixHint)
+		t.Errorf("expected configure hint, got %+v", tunnel)
 	}
 }
 
 func TestCheckDnsLeaks_CanaryFailureIsNotALeak(t *testing.T) {
 	in := leakInput()
-	in.Resolve = func(ctx context.Context, resolverAddr, host string) ([]string, error) {
+	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
 		return nil, errors.New("no route to host")
 	}
 	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
@@ -138,15 +142,75 @@ func TestCheckDnsLeaks_CanaryFailureIsNotALeak(t *testing.T) {
 	}
 }
 
-func TestCheckDnsLeaks_CanaryUsesFirstPlainResolver(t *testing.T) {
+func TestCheckDnsLeaks_CanaryHonorsTransport(t *testing.T) {
+	for _, tc := range []struct {
+		transport, network, addr string
+	}{
+		{"udp", "udp", "9.9.9.9"},
+		{"tcp", "tcp", "9.9.9.9"},
+		{"tls", "tls", "9.9.9.9"},
+		{"https", "https", "https://dns.example/dns-query"},
+	} {
+		in := leakInput()
+		in.TunnelResolvers = []diagnostics.TunnelResolver{
+			{Address: tc.addr, Transport: tc.transport},
+		}
+		var gotNetwork, gotAddr string
+		in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
+			gotNetwork, gotAddr = network, addr
+			return []string{"203.0.113.7"}, nil
+		}
+		diagnostics.CheckDnsLeaks(context.Background(), in)
+		if gotNetwork != tc.network {
+			t.Errorf("transport %q: probe network = %q, want %q", tc.transport, gotNetwork, tc.network)
+		}
+		if !strings.Contains(gotAddr, strings.TrimPrefix(strings.TrimPrefix(tc.addr, "https://"), "http://")) {
+			t.Errorf("transport %q: probe addr = %q, want it to carry %q", tc.transport, gotAddr, tc.addr)
+		}
+	}
+}
+
+// TestCheckDnsLeaks_ProbesEveryResolver locks the completeness fix: a
+// broken second resolver behind a working first one must show up in the
+// report instead of passing silently.
+func TestCheckDnsLeaks_ProbesEveryResolver(t *testing.T) {
+	in := leakInput()
+	in.TunnelResolvers = []diagnostics.TunnelResolver{
+		{Address: "1.1.1.1", Transport: "udp"},
+		{Address: "9.9.9.9", Transport: "udp"},
+	}
+	var probed []string
+	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
+		probed = append(probed, addr)
+		if addr == "9.9.9.9" {
+			return nil, errors.New("refused")
+		}
+		return []string{"203.0.113.7"}, nil
+	}
+	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
+	tunnel := findCheck(checks, diagnostics.DnsLeakTunnelDNS)
+	if tunnel == nil {
+		t.Fatal("missing tunnel-dns check")
+	}
+	if len(probed) != 2 {
+		t.Errorf("expected both resolvers probed, got %q", probed)
+	}
+	if !strings.Contains(tunnel.Actual, "1.1.1.1: 203.0.113.7") || !strings.Contains(tunnel.Actual, "9.9.9.9: unreachable") {
+		t.Errorf("per-resolver results not reported, got %q", tunnel.Actual)
+	}
+	if tunnel.Leaked {
+		t.Errorf("probe failure is an outage, not a leak: %+v", tunnel)
+	}
+}
+
+func TestCheckDnsLeaks_CanaryUsesNonDefaultPort(t *testing.T) {
 	in := leakInput()
 	in.TunnelResolvers = []diagnostics.TunnelResolver{
 		{Address: "9.9.9.9", Port: 5353, Transport: "udp"},
-		{Address: "1.1.1.1", Transport: "udp"},
 	}
 	var gotAddr, gotHost string
-	in.Resolve = func(ctx context.Context, resolverAddr, host string) ([]string, error) {
-		gotAddr, gotHost = resolverAddr, host
+	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
+		gotAddr, gotHost = addr, host
 		return []string{"203.0.113.7"}, nil
 	}
 	diagnostics.CheckDnsLeaks(context.Background(), in)
@@ -158,23 +222,73 @@ func TestCheckDnsLeaks_CanaryUsesFirstPlainResolver(t *testing.T) {
 	}
 }
 
-func TestCheckDnsLeaks_EncryptedTransportNotProbed(t *testing.T) {
+// TestCheckDnsLeaks_DoHIsProbed locks the encrypted-transport fix: a DoH
+// tunnel resolver gets a real probe, not a silent "not probed" pass.
+func TestCheckDnsLeaks_DoHIsProbed(t *testing.T) {
 	in := leakInput()
 	in.TunnelResolvers = []diagnostics.TunnelResolver{
-		{Address: "https://dns.google/dns-query", Transport: "https"},
+		{Address: "https://dns.example/dns-query", Transport: "https"},
 	}
 	probed := false
-	in.Resolve = func(ctx context.Context, resolverAddr, host string) ([]string, error) {
+	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
+		if network != "https" {
+			t.Errorf("DoH resolver must be probed as https, got %q", network)
+		}
+		probed = true
+		return []string{"203.0.113.7"}, nil
+	}
+	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
+	if !probed {
+		t.Error("DoH tunnel resolver was not probed")
+	}
+	tunnel := findCheck(checks, diagnostics.DnsLeakTunnelDNS)
+	if tunnel == nil || tunnel.Leaked {
+		t.Errorf("working DoH resolver is not a leak: %+v", tunnel)
+	}
+	if !strings.Contains(tunnel.Actual, "203.0.113.7") {
+		t.Errorf("DoH canary answer not reported, got %q", tunnel.Actual)
+	}
+}
+
+func TestCheckDnsLeaks_BrokenDoHIsOutageNotLeak(t *testing.T) {
+	in := leakInput()
+	in.TunnelResolvers = []diagnostics.TunnelResolver{
+		{Address: "https://dns.example/dns-query", Transport: "https"},
+	}
+	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
+		return nil, errors.New("500")
+	}
+	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
+	tunnel := findCheck(checks, diagnostics.DnsLeakTunnelDNS)
+	if tunnel == nil || tunnel.Leaked {
+		t.Errorf("broken DoH is an outage, not a leak: %+v", tunnel)
+	}
+	if !strings.Contains(tunnel.Actual, "unreachable") {
+		t.Errorf("broken DoH should be reported honestly, got %q", tunnel.Actual)
+	}
+}
+
+func TestCheckDnsLeaks_UnprobableTransportsReported(t *testing.T) {
+	in := leakInput()
+	in.TunnelResolvers = []diagnostics.TunnelResolver{
+		{Address: "1.1.1.1", Transport: "h3"},
+		{Address: "2.2.2.2", Transport: "fakeip"},
+	}
+	probed := false
+	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
 		probed = true
 		return []string{"203.0.113.7"}, nil
 	}
 	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
 	if probed {
-		t.Error("encrypted transports must not be probed with plain DNS")
+		t.Error("h3/fakeip transports must not be probed")
 	}
 	tunnel := findCheck(checks, diagnostics.DnsLeakTunnelDNS)
 	if tunnel == nil || tunnel.Leaked {
-		t.Errorf("configured (if unprobable) tunnel DNS is not a leak: %+v", tunnel)
+		t.Errorf("unprobable transports are not a leak: %+v", tunnel)
+	}
+	if !strings.Contains(tunnel.Actual, "no QUIC prober") || !strings.Contains(tunnel.Actual, "synthetic answers") {
+		t.Errorf("skip reasons must be reported, got %q", tunnel.Actual)
 	}
 }
 
@@ -196,8 +310,8 @@ func TestCheckDnsLeaks_BracketedIPv6(t *testing.T) {
 	}
 	in.SystemResolvers = []string{"[2001:db8::1]"}
 	var gotAddr string
-	in.Resolve = func(ctx context.Context, resolverAddr, host string) ([]string, error) {
-		gotAddr = resolverAddr
+	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
+		gotAddr = addr
 		return []string{"203.0.113.7"}, nil
 	}
 	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
@@ -216,8 +330,8 @@ func TestCheckDnsLeaks_IPv6WithPort(t *testing.T) {
 		{Address: "2001:db8::1", Port: 5353, Transport: "udp"},
 	}
 	var gotAddr string
-	in.Resolve = func(ctx context.Context, resolverAddr, host string) ([]string, error) {
-		gotAddr = resolverAddr
+	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
+		gotAddr = addr
 		return []string{"203.0.113.7"}, nil
 	}
 	diagnostics.CheckDnsLeaks(context.Background(), in)
@@ -226,25 +340,59 @@ func TestCheckDnsLeaks_IPv6WithPort(t *testing.T) {
 	}
 }
 
-// TestCheckDnsLeaks_H3IsNotProbedWithPlainDNS locks the canary policy for
-// DoH3: an encrypted transport must be reported, never probed with a plain
-// UDP query that would misreport its reachability.
-func TestCheckDnsLeaks_H3IsNotProbedWithPlainDNS(t *testing.T) {
+// TestCheckDnsLeaks_EncryptedBypassLeak locks the DoH-past-the-tunnel
+// vector: OS-configured DoT bypasses plain-DNS hijacking, so DnsHijacked
+// must not suppress this check.
+func TestCheckDnsLeaks_EncryptedBypassLeak(t *testing.T) {
 	in := leakInput()
-	in.TunnelResolvers = []diagnostics.TunnelResolver{{Address: "1.1.1.1", Transport: "h3"}}
-	in.Resolve = func(ctx context.Context, resolverAddr, host string) ([]string, error) {
-		t.Error("encrypted transports must not be probed with plain DNS")
-		return nil, errors.New("must not be called")
-	}
+	in.SystemEncryptedDNS = []string{"8.8.8.8"}
+	in.DnsHijacked = true // hijack covers port 53 only; must not hide DoT
 	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
-	tunnel := findCheck(checks, diagnostics.DnsLeakTunnelDNS)
-	if tunnel == nil {
-		t.Fatal("missing tunnel-dns check")
+	enc := findCheck(checks, diagnostics.DnsLeakEncryptedDNS)
+	if enc == nil {
+		t.Fatal("missing encrypted-dns check")
 	}
-	if tunnel.Leaked {
-		t.Errorf("an unprobed h3 resolver is not a leak: %+v", tunnel)
+	if !enc.Leaked {
+		t.Errorf("OS DoT outside the tunnel must leak even with hijack: %+v", enc)
 	}
-	if !strings.Contains(tunnel.Actual, "encrypted transport") {
-		t.Errorf("h3 canary must be reported as skipped, got %q", tunnel.Actual)
+	if enc.FixHint != diagnostics.DnsLeakFixReviewEncrypted {
+		t.Errorf("expected encrypted review hint, got %q", enc.FixHint)
+	}
+}
+
+func TestCheckDnsLeaks_EncryptedBypassCoveredByTunnel(t *testing.T) {
+	in := leakInput()
+	in.TunnelResolvers = []diagnostics.TunnelResolver{
+		{Address: "8.8.8.8", Transport: "tls"},
+	}
+	in.SystemEncryptedDNS = []string{"8.8.8.8"}
+	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
+	enc := findCheck(checks, diagnostics.DnsLeakEncryptedDNS)
+	if enc == nil || enc.Leaked {
+		t.Errorf("tunnel's own DoT endpoint is not a bypass: %+v", enc)
+	}
+}
+
+func TestCheckDnsLeaks_EncryptedBypassKillSwitch(t *testing.T) {
+	in := leakInput()
+	in.SystemEncryptedDNS = []string{"8.8.8.8"}
+	in.KillSwitchArmed = true
+	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
+	enc := findCheck(checks, diagnostics.DnsLeakEncryptedDNS)
+	if enc == nil || enc.Leaked {
+		t.Errorf("armed kill switch blocks the bypass: %+v", enc)
+	}
+}
+
+func TestCheckDnsLeaks_EncryptedNoneConfigured(t *testing.T) {
+	in := leakInput()
+	in.SystemEncryptedDNS = []string{}
+	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
+	enc := findCheck(checks, diagnostics.DnsLeakEncryptedDNS)
+	if enc == nil || enc.Leaked {
+		t.Errorf("no OS encrypted DNS must be clean: %+v", enc)
+	}
+	if !strings.Contains(enc.Actual, "(none)") {
+		t.Errorf("empty encrypted DNS should show (none), got %q", enc.Actual)
 	}
 }

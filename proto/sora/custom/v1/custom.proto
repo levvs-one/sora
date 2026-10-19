@@ -12,9 +12,6 @@ option go_package = "github.com/levvs-one/sora-client/core/gen/sora/custom/v1;cu
 // control-only), and each request carries the control authenticator plus an
 // API version for the contract check.
 //
-// Since 1.11. Older cores answer these methods with UNIMPLEMENTED; clients
-// must treat that as "custom servers unavailable", not as a failure.
-//
 // Credentials are write-only: SaveCustomServer accepts them, List and the
 // other RPCs never return them, and TestCustomServer never sends them.
 service CustomServers {

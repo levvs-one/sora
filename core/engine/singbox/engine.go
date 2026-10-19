@@ -28,14 +28,18 @@ var Prober = supervise.Prober{
 
 // New creates a sing-box engine without starting it. Apply starts it.
 func New(cfg supervise.Config) (*clashapi.Engine, error) {
-	sup, err := supervise.New(cfg, driver{})
+	sup, err := supervise.New(cfg, driver{version: cfg.Binary.Version})
 	if err != nil {
 		return nil, err
 	}
 	return clashapi.NewEngine(sup), nil
 }
 
-type driver struct{}
+// driver carries the probed binary version so Render can drop options
+// the running build deprecated (sing-box 1.15 TUN rewrite).
+type driver struct {
+	version engine.Version
+}
 
 func (driver) Kind() engine.Kind { return engine.KindSingBox }
 
@@ -52,7 +56,9 @@ func (driver) PlanNames(p *engine.Plan) map[string]string {
 	return out
 }
 
-func (driver) Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) { return Render(p, rt) }
+func (d driver) Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
+	return renderVersioned(p, rt, d.version)
+}
 
 func (driver) RunArgs(rt supervise.Runtime) []string {
 	return []string{"run", "-c", "stdin", "-D", rt.HomeDir, "--disable-color"}

@@ -278,6 +278,68 @@ class CoreControlClient extends $grpc.Client {
     return $createUnaryCall(_$checkDnsLeaks, request, options: options);
   }
 
+  /// Since 1.9. Returns the stored benchmark history (see BenchmarkServers).
+  $grpc.ResponseFuture<$0.GetBenchmarksResponse> getBenchmarks(
+    $0.GetBenchmarksRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getBenchmarks, request, options: options);
+  }
+
+  /// Since 1.9. User overrides on top of a subscription: renames, hidden
+  /// servers, extra rules and pinned order survive subscription refreshes.
+  $grpc.ResponseFuture<$0.SaveSubscriptionOverrideResponse> saveSubscriptionOverride(
+    $0.SaveSubscriptionOverrideRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$saveSubscriptionOverride, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetSubscriptionOverrideResponse> getSubscriptionOverride(
+    $0.GetSubscriptionOverrideRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getSubscriptionOverride, request, options: options);
+  }
+
+  /// Since 1.10. Network profiles with automatic matching.
+  $grpc.ResponseFuture<$0.ListProfilesResponse> listProfiles(
+    $0.ListProfilesRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$listProfiles, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.SaveProfileResponse> saveProfile(
+    $0.SaveProfileRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$saveProfile, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.DeleteProfileResponse> deleteProfile(
+    $0.DeleteProfileRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$deleteProfile, request, options: options);
+  }
+
+  /// Since 1.10. The machine's current network fingerprint for profile editing.
+  $grpc.ResponseFuture<$0.GetNetworkFingerprintResponse> getNetworkFingerprint(
+    $0.GetNetworkFingerprintRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getNetworkFingerprint, request, options: options);
+  }
+
+  /// Since 1.10. Probes a proxy chain of 2-3 servers: per-hop reachability,
+  /// the summed latency estimate, and which installed engines can carry it.
+  $grpc.ResponseFuture<$0.ProbeChainResponse> probeChain(
+    $0.ProbeChainRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$probeChain, request, options: options);
+  }
   // method descriptors
 
   static final _$connect = $grpc.ClientMethod<$0.ConnectRequest, $0.ConnectResponse>(
@@ -410,6 +472,39 @@ class CoreControlClient extends $grpc.Client {
           '/sora.core.v1.CoreControl/CheckDnsLeaks',
           ($0.CheckDnsLeaksRequest value) => value.writeToBuffer(),
           $0.CheckDnsLeaksResponse.fromBuffer);
+}
+  static final _$getBenchmarks = $grpc.ClientMethod<$0.GetBenchmarksRequest, $0.GetBenchmarksResponse>(
+      '/sora.core.v1.CoreControl/GetBenchmarks',
+      ($0.GetBenchmarksRequest value) => value.writeToBuffer(),
+      $0.GetBenchmarksResponse.fromBuffer);
+  static final _$saveSubscriptionOverride = $grpc.ClientMethod<$0.SaveSubscriptionOverrideRequest, $0.SaveSubscriptionOverrideResponse>(
+      '/sora.core.v1.CoreControl/SaveSubscriptionOverride',
+      ($0.SaveSubscriptionOverrideRequest value) => value.writeToBuffer(),
+      $0.SaveSubscriptionOverrideResponse.fromBuffer);
+  static final _$getSubscriptionOverride = $grpc.ClientMethod<$0.GetSubscriptionOverrideRequest, $0.GetSubscriptionOverrideResponse>(
+      '/sora.core.v1.CoreControl/GetSubscriptionOverride',
+      ($0.GetSubscriptionOverrideRequest value) => value.writeToBuffer(),
+      $0.GetSubscriptionOverrideResponse.fromBuffer);
+  static final _$listProfiles = $grpc.ClientMethod<$0.ListProfilesRequest, $0.ListProfilesResponse>(
+      '/sora.core.v1.CoreControl/ListProfiles',
+      ($0.ListProfilesRequest value) => value.writeToBuffer(),
+      $0.ListProfilesResponse.fromBuffer);
+  static final _$saveProfile = $grpc.ClientMethod<$0.SaveProfileRequest, $0.SaveProfileResponse>(
+      '/sora.core.v1.CoreControl/SaveProfile',
+      ($0.SaveProfileRequest value) => value.writeToBuffer(),
+      $0.SaveProfileResponse.fromBuffer);
+  static final _$deleteProfile = $grpc.ClientMethod<$0.DeleteProfileRequest, $0.DeleteProfileResponse>(
+      '/sora.core.v1.CoreControl/DeleteProfile',
+      ($0.DeleteProfileRequest value) => value.writeToBuffer(),
+      $0.DeleteProfileResponse.fromBuffer);
+  static final _$getNetworkFingerprint = $grpc.ClientMethod<$0.GetNetworkFingerprintRequest, $0.GetNetworkFingerprintResponse>(
+      '/sora.core.v1.CoreControl/GetNetworkFingerprint',
+      ($0.GetNetworkFingerprintRequest value) => value.writeToBuffer(),
+      $0.GetNetworkFingerprintResponse.fromBuffer);
+  static final _$probeChain = $grpc.ClientMethod<$0.ProbeChainRequest, $0.ProbeChainResponse>(
+      '/sora.core.v1.CoreControl/ProbeChain',
+      ($0.ProbeChainRequest value) => value.writeToBuffer(),
+      $0.ProbeChainResponse.fromBuffer);
 }
 
 @$pb.GrpcServiceName('sora.core.v1.CoreControl')
@@ -642,6 +737,62 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.CheckDnsLeaksRequest.fromBuffer(value),
         ($0.CheckDnsLeaksResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetBenchmarksRequest, $0.GetBenchmarksResponse>(
+        'GetBenchmarks',
+        getBenchmarks_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetBenchmarksRequest.fromBuffer(value),
+        ($0.GetBenchmarksResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SaveSubscriptionOverrideRequest, $0.SaveSubscriptionOverrideResponse>(
+        'SaveSubscriptionOverride',
+        saveSubscriptionOverride_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.SaveSubscriptionOverrideRequest.fromBuffer(value),
+        ($0.SaveSubscriptionOverrideResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetSubscriptionOverrideRequest, $0.GetSubscriptionOverrideResponse>(
+        'GetSubscriptionOverride',
+        getSubscriptionOverride_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetSubscriptionOverrideRequest.fromBuffer(value),
+        ($0.GetSubscriptionOverrideResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.ListProfilesRequest, $0.ListProfilesResponse>(
+        'ListProfiles',
+        listProfiles_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.ListProfilesRequest.fromBuffer(value),
+        ($0.ListProfilesResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SaveProfileRequest, $0.SaveProfileResponse>(
+        'SaveProfile',
+        saveProfile_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.SaveProfileRequest.fromBuffer(value),
+        ($0.SaveProfileResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.DeleteProfileRequest, $0.DeleteProfileResponse>(
+        'DeleteProfile',
+        deleteProfile_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.DeleteProfileRequest.fromBuffer(value),
+        ($0.DeleteProfileResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetNetworkFingerprintRequest, $0.GetNetworkFingerprintResponse>(
+        'GetNetworkFingerprint',
+        getNetworkFingerprint_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetNetworkFingerprintRequest.fromBuffer(value),
+        ($0.GetNetworkFingerprintResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.ProbeChainRequest, $0.ProbeChainResponse>(
+        'ProbeChain',
+        probeChain_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.ProbeChainRequest.fromBuffer(value),
+        ($0.ProbeChainResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.ConnectResponse> connect_Pre(
@@ -876,4 +1027,52 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.CheckDnsLeaksResponse> checkDnsLeaks($grpc.ServiceCall call, $0.CheckDnsLeaksRequest request);
+  $async.Future<$0.GetBenchmarksResponse> getBenchmarks_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetBenchmarksRequest> $request) async {
+    return getBenchmarks($call, await $request);
+  }
+
+  $async.Future<$0.GetBenchmarksResponse> getBenchmarks($grpc.ServiceCall call, $0.GetBenchmarksRequest request);
+  $async.Future<$0.SaveSubscriptionOverrideResponse> saveSubscriptionOverride_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.SaveSubscriptionOverrideRequest> $request) async {
+    return saveSubscriptionOverride($call, await $request);
+  }
+
+  $async.Future<$0.SaveSubscriptionOverrideResponse> saveSubscriptionOverride($grpc.ServiceCall call, $0.SaveSubscriptionOverrideRequest request);
+  $async.Future<$0.GetSubscriptionOverrideResponse> getSubscriptionOverride_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetSubscriptionOverrideRequest> $request) async {
+    return getSubscriptionOverride($call, await $request);
+  }
+
+  $async.Future<$0.GetSubscriptionOverrideResponse> getSubscriptionOverride($grpc.ServiceCall call, $0.GetSubscriptionOverrideRequest request);
+  $async.Future<$0.ListProfilesResponse> listProfiles_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.ListProfilesRequest> $request) async {
+    return listProfiles($call, await $request);
+  }
+
+  $async.Future<$0.ListProfilesResponse> listProfiles($grpc.ServiceCall call, $0.ListProfilesRequest request);
+  $async.Future<$0.SaveProfileResponse> saveProfile_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.SaveProfileRequest> $request) async {
+    return saveProfile($call, await $request);
+  }
+
+  $async.Future<$0.SaveProfileResponse> saveProfile($grpc.ServiceCall call, $0.SaveProfileRequest request);
+  $async.Future<$0.DeleteProfileResponse> deleteProfile_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.DeleteProfileRequest> $request) async {
+    return deleteProfile($call, await $request);
+  }
+
+  $async.Future<$0.DeleteProfileResponse> deleteProfile($grpc.ServiceCall call, $0.DeleteProfileRequest request);
+  $async.Future<$0.GetNetworkFingerprintResponse> getNetworkFingerprint_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetNetworkFingerprintRequest> $request) async {
+    return getNetworkFingerprint($call, await $request);
+  }
+
+  $async.Future<$0.GetNetworkFingerprintResponse> getNetworkFingerprint($grpc.ServiceCall call, $0.GetNetworkFingerprintRequest request);
+  $async.Future<$0.ProbeChainResponse> probeChain_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.ProbeChainRequest> $request) async {
+    return probeChain($call, await $request);
+  }
+
+  $async.Future<$0.ProbeChainResponse> probeChain($grpc.ServiceCall call, $0.ProbeChainRequest request);
 }

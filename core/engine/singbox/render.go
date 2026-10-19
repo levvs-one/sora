@@ -62,11 +62,20 @@ func (o obj) set(key string, value any) obj {
 
 // Render produces credential-bearing JSON for engine stdin. The output must
 // never enter diagnostic archives.
+//
+// Render targets the oldest supported build: options a newer engine
+// deprecated are still emitted. Drivers that know the probed version use
+// renderVersioned to drop them.
 func Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
+	return renderVersioned(p, rt, engine.Version{})
+}
+
+// renderVersioned renders for one concrete engine build.
+func renderVersioned(p *engine.Plan, rt supervise.Runtime, ver engine.Version) ([]byte, error) {
 	if p == nil {
 		return nil, errors.New("singbox: nil plan")
 	}
-	r := renderer{plan: p, tags: map[string]string{}, used: map[string]bool{"direct": true}}
+	r := renderer{plan: p, ver: ver, tags: map[string]string{}, used: map[string]bool{"direct": true}}
 	if err := r.assignTags(); err != nil {
 		return nil, err
 	}
@@ -99,7 +108,7 @@ func Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 		inbounds = append(inbounds, mixed)
 	}
 	if p.Tun.Enabled {
-		inbounds = append(inbounds, tun(p.Tun))
+		inbounds = append(inbounds, r.tun(p.Tun))
 	}
 
 	cfg := obj{
@@ -122,7 +131,10 @@ func Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 }
 
 type renderer struct {
-	plan     *engine.Plan
+	plan *engine.Plan
+	// ver is the engine build the config is for; the zero value keeps
+	// every legacy option (Render's contract for unknown builds).
+	ver      engine.Version
 	tags     map[string]string // plan id or group name -> sing-box tag
 	used     map[string]bool
 	final    string
@@ -214,8 +226,21 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		needsTLS = true
 	case engine.ProtocolShadowsocks:
 		out.set("type", "shadowsocks").set("method", orDefault(o.Cipher, "aes-256-gcm")).set("password", o.Password)
-		if o.Obfs != "" {
-			out.set("plugin", "obfs-local").set("plugin_opts", "obfs="+o.Obfs+";obfs-host="+o.ObfsParam)
+		// An explicit SIP002 plugin wins over the legacy obfs-local
+		// mapping; sing-box passes plugin/plugin_opts to the plugin
+		// binary verbatim.
+		switch {
+		case o.Plugin != "":
+			out.set("plugin", o.Plugin)
+			if o.PluginOpts != "" {
+				out.set("plugin_opts", o.PluginOpts)
+			}
+		case o.Obfs != "":
+			opts := "obfs=" + o.Obfs
+			if o.ObfsParam != "" {
+				opts += ";obfs-host=" + o.ObfsParam
+			}
+			out.set("plugin", "obfs-local").set("plugin_opts", opts)
 		}
 	case engine.ProtocolHysteria2:
 		out.set("type", "hysteria2").set("password", o.Password)
@@ -286,6 +311,13 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	if err != nil {
 		return nil, fmt.Errorf("singbox: outbound %s: %w", o.ID, err)
 	}
+	if engine.RealityMux(o, r.plan.Options.Mux) {
+		// sing-box has no vision flow, so mux is always applicable to
+		// REALITY here. One TLS connection carrying many streams keeps
+		// the parallel-handshake count at one (T007).
+		out["multiplex"] = obj{"enabled": true, "protocol": "smux",
+			"max_streams": engine.MuxConcurrency(r.plan.Options.Mux)}
+	}
 	return out.set("transport", transport), nil
 }
 
@@ -294,8 +326,11 @@ func (r *renderer) tls(o engine.Outbound) obj {
 	t.set("server_name", o.TLS.ServerName).set("insecure", o.TLS.Insecure).set("alpn", o.TLS.ALPN)
 	fingerprint := o.TLS.Fingerprint
 	if o.TLS.Reality {
-		// REALITY only works behind a uTLS fingerprint.
-		fingerprint = orDefault(fingerprint, "chrome")
+		// REALITY only works behind a uTLS fingerprint. DefaultFingerprint
+		// is the "chrome" alias, which sing-box resolves to
+		// utls.HelloChrome_Auto — the newest verified Chrome parrot of
+		// sing-box's vendored uTLS.
+		fingerprint = orDefault(fingerprint, engine.DefaultFingerprint)
 		t["reality"] = obj{"enabled": true, "public_key": o.TLS.RealityPublicKey}.set("short_id", o.TLS.RealityShortID)
 	}
 	if fingerprint != "" {
@@ -303,12 +338,14 @@ func (r *renderer) tls(o engine.Outbound) obj {
 	}
 	if o.TLS.ECH.Enabled {
 		// Without a pinned config the engine fetches the ECHConfigList
-		// from the server's HTTPS DNS record (query_server_name needs
-		// sing-box >= 1.13, above our 1.12 minimum, so it stays unset).
+		// from the server's HTTPS DNS record. query_server_name exists
+		// since sing-box 1.13, below the 1.14.3/1.15 floor, so it is
+		// always safe to emit.
 		ech := obj{"enabled": true}
 		if len(o.TLS.ECH.Config) > 0 {
 			ech["config"] = o.TLS.ECH.Config
 		}
+		ech.set("query_server_name", o.TLS.ECH.QueryServerName)
 		t["ech"] = ech
 	}
 	if r.plan.Options.Fragment.Enabled && o.Protocol != engine.ProtocolHysteria2 && o.Protocol != engine.ProtocolTUIC {
@@ -329,7 +366,12 @@ func transport(t engine.Transport) (obj, error) {
 	case "", "tcp":
 		return nil, nil
 	case "ws":
-		return obj{"type": "ws"}.set("path", t.Path).set("headers", host()), nil
+		out := obj{"type": "ws"}.set("path", t.Path).set("headers", host())
+		if t.EarlyData > 0 {
+			// 0-RTT: the first payload bytes ride the handshake.
+			out["max_early_data"] = t.EarlyData
+		}
+		return out, nil
 	case "grpc":
 		return obj{"type": "grpc"}.set("service_name", t.Service), nil
 	case "h2":
@@ -365,6 +407,20 @@ func wireguard(out obj, o engine.Outbound) (obj, error) {
 			set("s1", a.S1).set("s2", a.S2).set("s3", a.S3).set("s4", a.S4).
 			set("h1", a.H1).set("h2", a.H2).set("h3", a.H3).set("h4", a.H4).
 			set("i1", a.I1).set("i2", a.I2).set("i3", a.I3).set("i4", a.I4).set("i5", a.I5)
+		// AmneziaWG 3.x (sing-box-lx with_awg): header protection,
+		// content padding, trailers, ranged timings, and the id/ip/ib
+		// masquerade sugar. Range parameters stay numbers when they
+		// are plain ints and "min-max" strings otherwise, both forms
+		// the engine accepts.
+		out.set("header_protection_key", a.HeaderProtectionKey)
+		awgRange(out, "content_padding_addition", a.ContentPaddingAddition)
+		out.set("random_trailers", a.RandomTrailers).set("disable_cookies", a.DisableCookies)
+		awgRange(out, "rekey_after_time", a.RekeyAfterTime)
+		awgRange(out, "rekey_timeout", a.RekeyTimeout)
+		awgRange(out, "reject_after_time", a.RejectAfterTime)
+		awgRange(out, "keepalive_timeout", a.KeepaliveTimeout)
+		awgRange(out, "max_handshake_attempts", a.MaxHandshakeAttempts)
+		out.set("id", a.MasqueradeDomain).set("ip", a.MasqueradeProtocol).set("ib", a.MasqueradeBrowser)
 	}
 	peers := make([]obj, 0, len(o.Peers))
 	for _, peer := range o.Peers {
@@ -385,6 +441,19 @@ func wireguard(out obj, o engine.Outbound) (obj, error) {
 	}
 	out["peers"] = peers
 	return out, nil
+}
+
+// awgRange renders an AmneziaWG int-or-"min-max" parameter: a plain
+// integer stays a JSON number, a range passes through as a string.
+func awgRange(out obj, key, raw string) {
+	if raw == "" {
+		return
+	}
+	if n, err := strconv.Atoi(strings.TrimSpace(raw)); err == nil {
+		out[key] = n
+		return
+	}
+	out[key] = raw
 }
 
 func (r *renderer) group(g engine.Group) (obj, error) {
@@ -626,7 +695,15 @@ func (r *renderer) dns() (obj, string, error) {
 		rules = append(rules, obj{"domain_suffix": []string{suffix}, "server": tag})
 	}
 	if d.Mode == string(engine.DNSFakeIP) {
-		servers = append(servers, obj{"type": "fakeip", "tag": "fakeip", "inet4_range": orDefault(d.FakeIPRange, "198.18.0.0/16")})
+		fakeip := obj{"type": "fakeip", "tag": "fakeip", "inet4_range": orDefault(d.FakeIPRange, "198.18.0.0/16")}
+		if r.plan.Options.IPv6 {
+			// Without an IPv6 pool the fakeip server answers AAAA with
+			// nothing while the query_type rule still steers AAAA at it,
+			// so IPv6-capable apps stall on resolution instead of
+			// falling back. The pool is mandatory whenever IPv6 is on.
+			fakeip["inet6_range"] = orDefault(d.FakeIPRange6, "fc00::/18")
+		}
+		servers = append(servers, fakeip)
 		// mihomo's fake-ip-filter equivalent: LAN/mDNS names, NTP and OS
 		// connectivity checks must resolve to real addresses, or printers,
 		// router panels and time sync break behind fake answers.
@@ -693,20 +770,24 @@ func tunMTU(mtu int) int {
 	return mtu
 }
 
-func tun(t engine.Tun) obj {
-	return obj{
-		"type": "tun", "tag": "tun-in",
+func (r *renderer) tun(t engine.Tun) obj {
+	out := obj{
+		"type":         "tun", "tag": "tun-in",
 		"address":      t.Addresses(),
 		"auto_route":   runtime.GOOS != "linux",
 		"strict_route": t.StrictRoute,
-		// sing-box 1.15 deprecated the `stack` option (removed in 1.17):
-		// the migration is to drop it and use sing-tun's own TCP/IP
-		// stack, which outperforms every previous implementation.
-		// Omitting it also matches the engine default on 1.12-1.14, so
-		// nothing changes there. The plan's Stack stays for engines that
-		// still honor it (mihomo, Xray bridge).
-		"mtu": tunMTU(t.MTU),
-	}.set("interface_name", t.DeviceName).
+		"mtu":          tunMTU(t.MTU),
+	}
+	// sing-box 1.15 rewrote TUN around its own TCP/IP stack: the stack
+	// option is deprecated there (removed in 1.17) and must not be
+	// emitted. Older builds (the 1.14-based lx. fork) still honor an
+	// explicit stack, so it stays for them; their default is "mixed".
+	// The zero version (Render without a probed build) keeps the legacy
+	// spelling.
+	if r.ver.Less(engine.Version{Major: 1, Minor: 15}) {
+		out["stack"] = orDefault(t.Stack, "mixed")
+	}
+	return out.set("interface_name", t.DeviceName).
 		// Custom routes replace the default route when auto_route installs
 		// them (Windows/macOS; Linux routing belongs to tunroute). Same
 		// field mihomo renders as route-address; the values are CIDRs, so

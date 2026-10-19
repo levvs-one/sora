@@ -249,17 +249,29 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	if err != nil {
 		return nil, fmt.Errorf("xray: outbound %s: %w", o.ID, err)
 	}
-	return obj{"tag": tag, "protocol": protocol, "settings": settings}.set("streamSettings", stream), nil
+	ob := obj{"tag": tag, "protocol": protocol, "settings": settings}.set("streamSettings", stream)
+	if engine.RealityMux(o, r.plan.Options.Mux) && o.Flow != "xtls-rprx-vision" {
+		// Vision and mux are mutually exclusive in Xray: upstream
+		// silently ignores mux under xtls-rprx-vision, so emitting it
+		// would be a lie in the config (T002 architectural decision:
+		// vision wins). Under vision the anti-parallelism role belongs
+		// to XHTTP+xmux, not to outbound mux.
+		ob["mux"] = obj{"enabled": true, "concurrency": engine.MuxConcurrency(r.plan.Options.Mux)}
+	}
+	return ob, nil
 }
 
 func (r *renderer) stream(o engine.Outbound) (obj, error) {
 	s := obj{}
 	t := o.Transport
+	if err := checkStreamCompat(o); err != nil {
+		return nil, err
+	}
 	switch t.Type {
 	case "", "tcp":
 	case "ws":
 		s["network"] = "ws"
-		s["wsSettings"] = obj{}.set("path", t.Path).set("host", t.Host)
+		s["wsSettings"] = obj{}.set("path", t.Path).set("host", t.Host).set("maxEarlyData", t.EarlyData)
 	case "grpc":
 		s["network"] = "grpc"
 		s["grpcSettings"] = obj{}.set("serviceName", t.Service)
@@ -268,7 +280,15 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 		s["httpupgradeSettings"] = obj{}.set("path", t.Path).set("host", t.Host)
 	case "xhttp":
 		s["network"] = "xhttp"
-		s["xhttpSettings"] = obj{"mode": orDefault(t.Mode, "auto")}.set("path", t.Path).set("host", t.Host)
+		xs := obj{"mode": orDefault(t.Mode, "auto")}.set("path", t.Path).set("host", t.Host)
+		if t.DownloadAddress != "" || t.DownloadPort != 0 {
+			ds, err := r.xhttpDownloadSettings(o)
+			if err != nil {
+				return nil, err
+			}
+			xs["downloadSettings"] = ds
+		}
+		s["xhttpSettings"] = xs
 	default:
 		// Xray removed the h2 transport in favour of XHTTP.
 		return nil, fmt.Errorf("transport %q is not supported by Xray", t.Type)
@@ -294,20 +314,13 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 	return s, nil
 }
 
-// defaultXrayFingerprint is the uTLS name rendered for Xray REALITY when
-// the plan provides none. The explicit "hellochrome_auto" spelling always
-// resolves to the newest verified Chrome parrot of the engine's vendored
-// uTLS (utls.HelloChrome_Auto), while Xray's pinned "chrome" alias sends
-// Chrome 133, which TSPU fingerprints and blocks (XTLS/Xray-core#7131, Oct
-// 2026). This mirrors engine.DefaultXrayFingerprint of the canonical
-// fingerprint module (core/engine/fingerprint.go); it is spelled out here
-// until that module lands, so this package does not depend on uncommitted
-// work.
-const defaultXrayFingerprint = "hellochrome_auto"
-
 // realityFingerprint resolves the uTLS fingerprint of a REALITY outbound:
 // the plan's explicit value (normalized) wins, then a probe-discovered
-// working fingerprint, then the canonical default.
+// working fingerprint, then the canonical default. The default is the
+// "hellochrome_auto" alias — always the newest verified Chrome parrot of
+// the engine's vendored uTLS — because Xray's pinned "chrome" alias sends
+// Chrome 133, which TSPU fingerprints and blocks (see
+// engine.DefaultXrayFingerprint).
 func (r *renderer) realityFingerprint(o engine.Outbound) string {
 	if fp := engine.NormalizeFingerprint(o.TLS.Fingerprint); fp != "" {
 		return fp
@@ -315,19 +328,18 @@ func (r *renderer) realityFingerprint(o engine.Outbound) string {
 	if fp := r.fpHints[o.ID]; fp != "" {
 		return fp
 	}
-	return defaultXrayFingerprint
+	return engine.DefaultXrayFingerprint
 }
 
 // fingerprintRotation is the uTLS fingerprint try-order for Xray probes.
-// Index 0 is the render default (defaultXrayFingerprint); when a
+// Index 0 is the render default (engine.DefaultXrayFingerprint); when a
 // probe times out, the next entries are tried in order so one blocked
 // template does not mark a working server dead. Real browser templates go
 // first: randomized fingerprints match no browser population and are more
-// detectable than exact imitation of a current browser, so "randomized"
-// stays last, with the TSPU-flagged pinned "chrome" (Chrome 133) just
-// before it.
+// detectable (see engine.IsRandomizedFingerprint), so "randomized" stays
+// last, with the TSPU-flagged pinned "chrome" (Chrome 133) just before it.
 var fingerprintRotation = []string{
-	defaultXrayFingerprint,
+	engine.DefaultXrayFingerprint,
 	"firefox",
 	"safari",
 	"chrome",
@@ -349,8 +361,78 @@ func realityWithoutVision(o engine.Outbound) bool {
 	return true
 }
 
+// checkStreamCompat refuses transport/security combinations that Xray
+// documents as unsupported, instead of rendering a config that fails at
+// runtime. Compatibility matrix:
+// https://xtls.github.io/en/config/transport.html
+func checkStreamCompat(o engine.Outbound) error {
+	t := o.Transport.Type
+	if (o.Transport.DownloadAddress != "" || o.Transport.DownloadPort != 0) && t != "xhttp" {
+		return fmt.Errorf("xray: outbound %s: downloadSettings is an XHTTP-only option, not %q", o.ID, t)
+	}
+	if o.TLS.Reality && (t == "ws" || t == "httpupgrade") {
+		return fmt.Errorf("xray: outbound %s: REALITY does not support the %s transport (use tcp, xhttp or grpc)", o.ID, t)
+	}
+	if o.Flow != "" && t != "" && t != "tcp" {
+		// Upstream: XTLS is available only under TCP+TLS/REALITY.
+		// https://xtls.github.io/en/config/outbounds/vless.html
+		return fmt.Errorf("xray: outbound %s: flow %q requires the TCP transport, not %q", o.ID, o.Flow, t)
+	}
+	return nil
+}
+
+// xhttpDownloadSettings renders the XHTTP downlink detour: the downlink
+// rides a separate server, so uplink and downlink can use different
+// domains. Xray dials it as an independent stream, so it carries its own
+// address, port and security; the security mirrors the main stream with
+// the SNI pointed at the downlink host.
+func (r *renderer) xhttpDownloadSettings(o engine.Outbound) (obj, error) {
+	t := o.Transport
+	if t.DownloadAddress == "" || t.DownloadPort == 0 {
+		return nil, fmt.Errorf("xray: outbound %s: XHTTP downloadSettings needs both a download address and a download port", o.ID)
+	}
+	if t.Mode == "stream-one" {
+		// stream-one carries both directions on one connection, so a
+		// separate downlink is contradictory; stream-up is the two-leg mode.
+		return nil, fmt.Errorf("xray: outbound %s: XHTTP downloadSettings is incompatible with mode stream-one (use stream-up)", o.ID)
+	}
+	ds := obj{"address": t.DownloadAddress, "port": int(t.DownloadPort), "network": "xhttp"}.
+		set("xhttpSettings", obj{}.set("path", t.Path))
+	switch {
+	case o.TLS.Reality:
+		ds["security"] = "reality"
+		ds["realitySettings"] = obj{
+			"serverName": t.DownloadAddress, "publicKey": o.TLS.RealityPublicKey,
+			"fingerprint": r.realityFingerprint(o),
+		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")) // "/" is the documented safe default path
+	case o.TLS.Enabled || o.Protocol == engine.ProtocolTrojan:
+		ds["security"] = "tls"
+		ds["tlsSettings"] = obj{"serverName": t.DownloadAddress}.
+			set("alpn", o.TLS.ALPN).set("fingerprint", engine.NormalizeFingerprint(o.TLS.Fingerprint))
+	}
+	return ds, nil
+}
+
 func (*renderer) hysteria(o engine.Outbound, tag string) obj {
+	// Xray's "hysteria" outbound is the native Hysteria2 implementation:
+	// upstream requires settings.version == 2 and rejects anything else,
+	// so there is no legacy v1 mapping here.
+	// https://xtls.github.io/en/config/outbounds/hysteria.html
+	// Salamander obfs is refused in outbound() because Xray's hysteria
+	// transport config exposes no obfs option.
+	// Bandwidth hints switch the client from BBR to Brutal congestion
+	// control; zero means auto (BBR). The hints live in hysteriaSettings,
+	// the transport config Xray documents for brutal:
+	// https://xtls.github.io/en/config/outbounds/hysteria.html
 	hy := obj{"version": 2, "auth": o.Password}
+	if o.UpMbps > 0 {
+		hy["up_mbps"] = o.UpMbps
+	}
+	if o.DownMbps > 0 {
+		hy["down_mbps"] = o.DownMbps
+	}
+	// Port hopping has no Xray spelling: plans that hop never reach this
+	// renderer (FeatureHy2PortHop in the engine catalog).
 	tls := obj{}.set("serverName", o.TLS.ServerName).set("alpn", o.TLS.ALPN)
 	stream := obj{"network": "hysteria", "hysteriaSettings": hy, "security": "tls", "tlsSettings": tls}
 	return obj{
@@ -545,6 +627,9 @@ func (r *renderer) dns() (obj, error) {
 		case engine.DNSQUIC:
 			servers = append(servers, "quic+local://"+addr)
 		default:
+			if s.Transport == engine.DNSH3 {
+				return nil, fmt.Errorf("xray: dns transport %q is not supported (xray has no DNS-over-HTTP/3); use https:// for DNS over HTTPS, or the sing-box/mihomo engine for DoH3", s.Transport)
+			}
 			return nil, fmt.Errorf("xray: dns transport %q is not supported", s.Transport)
 		}
 	}

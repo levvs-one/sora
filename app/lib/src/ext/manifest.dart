@@ -65,6 +65,9 @@ class ExtManifest {
     this.settingsSchema,
     this.networkHosts = const [],
     this.backgroundTask,
+    this.themeEntry,
+    this.networkHookEntry,
+    this.routingEntry,
   });
 
   final String id;
@@ -91,6 +94,15 @@ class ExtManifest {
   /// settings.
   final ExtBackgroundTask? backgroundTask;
 
+  /// Capability contract pointers (v0, proposed — mirrors core/ext's
+  /// ManifestExt): entry files for the theme / network-hook / routing
+  /// contracts. Null when not declared. Only the pointer (capability +
+  /// permission cross-check, safe path) is validated here; the asset
+  /// files' own schemas are proposals, see docs/extensions.md.
+  final String? themeEntry;
+  final String? networkHookEntry;
+  final String? routingEntry;
+
   static final _idPattern = RegExp(r'^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$');
   static final _panelIdPattern = RegExp(r'^[a-zA-Z0-9_-]{1,64}$');
   static final _semverPattern =
@@ -110,7 +122,7 @@ class ExtManifest {
     const known = {
       'manifest_version', 'id', 'name', 'version', 'min_app_version',
       'description', 'author', 'permissions', 'capabilities', 'ui', 'settings_schema',
-      'network_hosts', 'background_task',
+      'network_hosts', 'background_task', 'theme', 'network_hook', 'routing',
     };
     for (final key in decoded.keys) {
       if (!known.contains(key)) throw ManifestError('unknown field "$key"');
@@ -133,6 +145,9 @@ class ExtManifest {
       settingsSchema: decoded['settings_schema'] as Map<String, dynamic>?,
       networkHosts: _parseNetworkHosts(decoded['network_hosts']),
       backgroundTask: _parseBackgroundTask(decoded['background_task']),
+      themeEntry: _parseAssetRef(decoded['theme'], 'theme'),
+      networkHookEntry: _parseAssetRef(decoded['network_hook'], 'network_hook'),
+      routingEntry: _parseAssetRef(decoded['routing'], 'routing'),
     );
     m.validate();
     return m;
@@ -178,6 +193,9 @@ class ExtManifest {
       }
     }
     backgroundTask?.validate(this);
+    _checkAssetRef('theme', themeEntry, 'theme', 'theme.apply');
+    _checkAssetRef('network_hook', networkHookEntry, 'network-hook', 'net.hooks');
+    _checkAssetRef('routing', routingEntry, 'routing', 'routing.rules');
     final panelIds = <String>{};
     for (final p in panels) {
       if (!_panelIdPattern.hasMatch(p.id)) throw ManifestError('bad panel id "${p.id}"');
@@ -189,6 +207,26 @@ class ExtManifest {
       }
     }
     if (settingsSchema != null) validateSettingsSchema(settingsSchema!);
+  }
+
+  /// Cross-checks one capability contract pointer (theme / network_hook /
+  /// routing): the matching capability and permission must be declared and
+  /// the entry must be a safe relative .json path. Mirrors core/ext's
+  /// validateAssetRef.
+  void _checkAssetRef(String field, String? entry, String capability, String permission) {
+    if (entry == null) return;
+    if (!capabilities.contains(capability)) {
+      throw ManifestError('$field requires the "$capability" capability');
+    }
+    if (!permissions.contains(permission)) {
+      throw ManifestError('$field requires the "$permission" permission');
+    }
+    if (!_assetEntryPattern.hasMatch(entry) ||
+        entry.contains('..') ||
+        entry.startsWith('/')) {
+      throw ManifestError(
+          '$field entry "$entry" must be a relative .json path without traversal');
+    }
   }
 
   Map<String, dynamic> toJson() => {
@@ -207,6 +245,9 @@ class ExtManifest {
         if (settingsSchema != null) 'settings_schema': settingsSchema,
         if (networkHosts.isNotEmpty) 'network_hosts': networkHosts,
         if (backgroundTask != null) 'background_task': backgroundTask!.toJson(),
+        if (themeEntry != null) 'theme': {'entry': themeEntry},
+        if (networkHookEntry != null) 'network_hook': {'entry': networkHookEntry},
+        if (routingEntry != null) 'routing': {'entry': routingEntry},
       };
 }
 
@@ -261,6 +302,26 @@ class ExtBackgroundTask {
 /// Worker script names: relative .js path, no traversal (mirrors core/ext).
 final _workerEntryPattern =
     RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.js$');
+
+/// Capability-contract asset names: relative .json path, no traversal
+/// (mirrors core/ext's isSafeAssetPath).
+final _assetEntryPattern =
+    RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.json$');
+
+/// Parses one capability contract pointer ({entry: ...}). Null when the
+/// field is absent. Rejects non-objects and unknown inner fields, mirroring
+/// core/ext's DisallowUnknownFields.
+String? _parseAssetRef(dynamic raw, String field) {
+  if (raw == null) return null;
+  if (raw is! Map<String, dynamic>) {
+    throw ManifestError('$field must be an object');
+  }
+  const known = {'entry'};
+  for (final key in raw.keys) {
+    if (!known.contains(key)) throw ManifestError('unknown $field field "$key"');
+  }
+  return (raw['entry'] as String? ?? '').trim();
+}
 
 ExtBackgroundTask? _parseBackgroundTask(dynamic raw) {
   if (raw == null) return null;

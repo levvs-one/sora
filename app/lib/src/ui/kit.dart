@@ -716,6 +716,10 @@ String describe(S s, CoreFailure failure) {
     'app.benchmark_unsupported' => s.errBenchmarkUnsupported,
     'app.obfs_unsupported' => s.errObfsUnsupported,
     'chainUnsupported' => s.chainUnsupported,
+    'chainHopMissing' => s.chainHopMissing,
+    'chainTooFew' => s.chainTooFew,
+    'chainTooMany' => s.chainTooMany,
+    'chainDuplicate' => s.chainDuplicate,
     _ when key.startsWith('core.plan.') => s.errServers,
     _ => s.errGeneric,
   };

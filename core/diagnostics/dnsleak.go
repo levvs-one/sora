@@ -6,6 +6,7 @@ import (
 	"net/netip"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -13,11 +14,17 @@ import (
 // UI: the interface switches on them, never on free text.
 const (
 	// DnsLeakTunnelDNS verifies the session routes DNS through its own
-	// resolvers and sanity-probes the tunnel DNS path.
+	// resolvers and canary-probes every probeable tunnel DNS path: plain
+	// UDP/TCP as well as encrypted DoT and DoH.
 	DnsLeakTunnelDNS = "tunnel-dns"
 	// DnsLeakSystemResolvers compares the OS resolvers against the tunnel
 	// resolvers. A mismatch outside the tunnel is a leak.
 	DnsLeakSystemResolvers = "system-resolvers"
+	// DnsLeakEncryptedDNS flags OS-configured encrypted DNS (DoT/DoH)
+	// endpoints that bypass the tunnel's DNS path. Plain-DNS hijacking
+	// does not cover them, so unlike system-resolvers this check is not
+	// suppressed by DnsHijacked; only an armed kill switch does.
+	DnsLeakEncryptedDNS = "encrypted-dns"
 	// DnsLeakKillSwitchDNS reports whether the kill switch covers DNS. It
 	// is a warning, never a leak by itself.
 	DnsLeakKillSwitchDNS = "killswitch-dns"
@@ -27,6 +34,7 @@ const (
 const (
 	DnsLeakLabelTunnelDNS       = "dnsLeak.check.tunnelDns"
 	DnsLeakLabelSystemResolvers = "dnsLeak.check.systemResolvers"
+	DnsLeakLabelEncryptedDNS    = "dnsLeak.check.encryptedDns"
 	DnsLeakLabelKillSwitchDNS   = "dnsLeak.check.killSwitchDns"
 )
 
@@ -35,24 +43,28 @@ const (
 const (
 	DnsLeakFixConfigureTunnel  = "dnsLeak.fix.configureTunnelDns"
 	DnsLeakFixReviewResolvers  = "dnsLeak.fix.reviewSystemResolvers"
+	DnsLeakFixReviewEncrypted  = "dnsLeak.fix.reviewEncryptedDns"
 	DnsLeakFixEnableKillSwitch = "dnsLeak.fix.enableKillSwitch"
 )
 
 // canaryHost is the fixed, documented name used to sanity-probe the tunnel
-// DNS path. It is a stable public anycast name; resolving it issues a single
-// DNS query and no other network traffic.
+// DNS path. It is a stable public anycast name; resolving it issues DNS
+// queries and no other network traffic.
 const canaryHost = "one.one.one.one"
 
-// defaultResolveTimeout bounds one canary query.
+// defaultResolveTimeout bounds one canary probe. Probes run in parallel,
+// so the whole tunnel-dns check costs about one timeout in the worst case,
+// well inside the control plane's check budget.
 const defaultResolveTimeout = 3 * time.Second
 
 // TunnelResolver is one resolver the session routes DNS through.
 type TunnelResolver struct {
-	// Address is the resolver address as configured (IP or name).
+	// Address is the resolver address as configured (IP, name, or a DoH URL).
 	Address string
-	// Port is the resolver port; 0 means the transport default (53).
+	// Port is the resolver port; 0 means the transport default (53/853/443).
 	Port uint16
-	// Transport is "udp", "tcp", "tls", "https", "quic", "system" or "".
+	// Transport is "udp", "tcp", "tls", "https", "quic", "h3", "system",
+	// "fakeip" or "".
 	Transport string
 }
 
@@ -62,20 +74,26 @@ type DnsLeakInput struct {
 	// taken from the session plan.
 	TunnelResolvers []TunnelResolver
 	// DnsHijacked reports whether the tunnel captures plain DNS traffic,
-	// so OS resolvers cannot leak around it.
+	// so OS resolvers cannot leak around it. It covers port 53 only:
+	// encrypted DNS bypasses it (see DnsLeakEncryptedDNS).
 	DnsHijacked bool
 	// KillSwitchArmed reports whether the firewall currently blocks
 	// non-tunnel traffic, including DNS.
 	KillSwitchArmed bool
 	// SystemResolvers overrides OS detection (tests). Nil means detect.
 	SystemResolvers []string
+	// SystemEncryptedDNS overrides OS encrypted-DNS detection (tests).
+	// Nil means detect; pass an empty slice for "detected, none".
+	SystemEncryptedDNS []string
 	// CanaryHost overrides the default canary (tests).
 	CanaryHost string
-	// ResolveTimeout bounds one canary query; zero selects the default.
+	// ResolveTimeout bounds one canary probe; zero selects the default.
 	ResolveTimeout time.Duration
-	// Resolve probes host through resolverAddr ("ip" or "ip:port"); nil
-	// selects the stdlib prober. Tests inject failures here.
-	Resolve func(ctx context.Context, resolverAddr, host string) ([]string, error)
+	// Probe queries host through one tunnel resolver: network is "udp",
+	// "tcp", "tls" (DoT) or "https" (DoH); addr is "ip", "ip:port", or a
+	// DoH URL. Nil selects the standard probers. Tests inject failures
+	// here.
+	Probe func(ctx context.Context, network, addr, host string) ([]string, error)
 }
 
 // DnsLeakCheck is one check result. Label and FixHint are localization keys
@@ -121,9 +139,26 @@ func displayList(values []string) string {
 	return strings.Join(values, ", ")
 }
 
+// probeVia dispatches one canary probe to the prober for its network.
+func probeVia(ctx context.Context, network, addr, host string) ([]string, error) {
+	switch network {
+	case "tcp":
+		return resolveVia(ctx, "tcp", addr, host)
+	case "tls":
+		return dotVia(ctx, addr, host)
+	case "https":
+		return dohVia(ctx, addr, host)
+	case "udp", "":
+		return resolveVia(ctx, "udp", addr, host)
+	default:
+		return nil, &net.DNSError{Err: "diagnostics: no prober for network " + network, IsNotFound: true}
+	}
+}
+
 // CheckDnsLeaks compares the session's DNS path against the OS resolvers and
-// the kill switch state. It performs no network I/O except a single canary
-// query through the tunnel resolver to sanity-probe that path.
+// the kill switch state, and flags OS-level encrypted DNS that bypasses the
+// tunnel. It performs DNS probes only: one canary query per probeable
+// tunnel resolver, in parallel.
 func CheckDnsLeaks(ctx context.Context, in DnsLeakInput) []DnsLeakCheck {
 	if in.CanaryHost == "" {
 		in.CanaryHost = canaryHost
@@ -131,9 +166,9 @@ func CheckDnsLeaks(ctx context.Context, in DnsLeakInput) []DnsLeakCheck {
 	if in.ResolveTimeout <= 0 {
 		in.ResolveTimeout = defaultResolveTimeout
 	}
-	resolve := in.Resolve
-	if resolve == nil {
-		resolve = resolveVia
+	probe := in.Probe
+	if probe == nil {
+		probe = probeVia
 	}
 
 	tunnel := make([]string, 0, len(in.TunnelResolvers))
@@ -153,16 +188,74 @@ func CheckDnsLeaks(ctx context.Context, in DnsLeakInput) []DnsLeakCheck {
 		}
 	}
 
-	checks := make([]DnsLeakCheck, 0, 3)
-	checks = append(checks, checkTunnelDNS(ctx, in, tunnel, resolve))
+	checks := make([]DnsLeakCheck, 0, 4)
+	checks = append(checks, checkTunnelDNS(ctx, in, tunnel, probe))
 	checks = append(checks, checkSystemResolvers(tunnel, normalizedSystem, in.DnsHijacked, in.KillSwitchArmed))
+	checks = append(checks, checkEncryptedDNS(in))
 	checks = append(checks, checkKillSwitchDNS(in.KillSwitchArmed))
 	return checks
 }
 
+// canaryTarget maps a tunnel resolver to the probe that can exercise it.
+// A non-empty skip explains honestly why the resolver cannot be probed
+// instead of silently passing it.
+func canaryTarget(r TunnelResolver) (network, addr, skip string) {
+	switch t := strings.ToLower(strings.TrimSpace(r.Transport)); t {
+	case "", "udp", "system":
+		return "udp", hostPort(r.Address, r.Port, 53), ""
+	case "tcp":
+		return "tcp", hostPort(r.Address, r.Port, 53), ""
+	case "tls":
+		return "tls", hostPort(r.Address, r.Port, 853), ""
+	case "https":
+		return "https", dohEndpoint(r), ""
+	case "quic", "h3":
+		return "", "", "no QUIC prober"
+	case "fakeip":
+		return "", "", "synthetic answers"
+	default:
+		return "", "", "unknown transport " + t
+	}
+}
+
+// hostPort joins a resolver address with its port, applying the transport
+// default when the port is 0 and omitting the default port for display.
+func hostPort(address string, port, def uint16) string {
+	host := strings.Trim(strings.TrimSpace(address), "[]")
+	if ip, err := netip.ParseAddr(host); err == nil {
+		host = ip.String()
+	}
+	if port == 0 {
+		port = def
+	}
+	if port == def {
+		return host
+	}
+	return net.JoinHostPort(host, strconv.Itoa(int(port)))
+}
+
+// dohEndpoint builds the DoH URL for a tunnel resolver: a configured URL
+// is used as-is, a bare address becomes https://addr/dns-query.
+func dohEndpoint(r TunnelResolver) string {
+	a := strings.TrimSpace(r.Address)
+	if strings.Contains(a, "://") {
+		return a
+	}
+	host := strings.Trim(a, "[]")
+	if ip, err := netip.ParseAddr(host); err == nil {
+		host = ip.String()
+	}
+	if r.Port != 0 && r.Port != 443 {
+		return "https://" + net.JoinHostPort(host, strconv.Itoa(int(r.Port))) + "/dns-query"
+	}
+	return "https://" + host + "/dns-query"
+}
+
 // checkTunnelDNS verifies the session configures its own resolvers and
-// sanity-probes the tunnel DNS path with the canary host.
-func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, resolve func(context.Context, string, string) ([]string, error)) DnsLeakCheck {
+// canary-probes every probeable one in parallel: a broken second resolver
+// behind a working first one must not pass silently. Probe failures are
+// outages, not leaks, and are reported as such without raising the flag.
+func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, probe func(context.Context, string, string, string) ([]string, error)) DnsLeakCheck {
 	check := DnsLeakCheck{
 		ID:       DnsLeakTunnelDNS,
 		Label:    DnsLeakLabelTunnelDNS,
@@ -174,7 +267,26 @@ func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, resol
 		check.FixHint = DnsLeakFixConfigureTunnel
 		return check
 	}
-	probeAddr, probed := canaryResolver(in.TunnelResolvers)
+	type target struct {
+		network, addr, name string
+	}
+	var targets []target
+	var skipped []string
+	for _, r := range in.TunnelResolvers {
+		network, addr, skip := canaryTarget(r)
+		name := strings.TrimSpace(r.Address)
+		if name == "" {
+			name = "(empty)"
+		}
+		switch {
+		case skip != "":
+			skipped = append(skipped, name+" (not probed: "+skip+")")
+		case addr == "":
+			skipped = append(skipped, name+" (not probed: empty address)")
+		default:
+			targets = append(targets, target{network: network, addr: addr, name: name})
+		}
+	}
 	timeout := in.ResolveTimeout
 	if deadline, ok := ctx.Deadline(); ok {
 		if left := time.Until(deadline); left < timeout {
@@ -185,48 +297,32 @@ func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, resol
 		check.Actual = "canary skipped: no time left"
 		return check
 	}
-	if !probed {
-		check.Actual = displayList(tunnel) + " (canary not probed: encrypted transport)"
+	if len(targets) == 0 {
+		check.Actual = displayList(tunnel) + " (canary not probed: " + strings.Join(skipped, "; ") + ")"
 		return check
 	}
-	qctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-	ips, err := resolve(qctx, probeAddr, in.CanaryHost)
-	if err != nil {
-		// A failing tunnel resolver is an outage, not a leak: report it
-		// honestly without raising the leak flag.
-		check.Actual = "canary " + in.CanaryHost + " via " + probeAddr + ": unreachable"
-		return check
+	results := make([]string, len(targets))
+	var wg sync.WaitGroup
+	for i, tg := range targets {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			qctx, cancel := context.WithTimeout(ctx, timeout)
+			defer cancel()
+			ips, err := probe(qctx, tg.network, tg.addr, in.CanaryHost)
+			if err != nil {
+				// A failing tunnel resolver is an outage, not a leak:
+				// report it honestly without raising the leak flag.
+				results[i] = tg.name + ": unreachable"
+				return
+			}
+			results[i] = tg.name + ": " + displayList(ips)
+		}()
 	}
-	check.Actual = "canary " + in.CanaryHost + " via " + probeAddr + ": " + displayList(ips)
+	wg.Wait()
+	parts := append(results, skipped...)
+	check.Actual = "canary " + in.CanaryHost + ": " + strings.Join(parts, "; ")
 	return check
-}
-
-// canaryResolver picks a tunnel resolver that can be probed with a plain
-// DNS query. Encrypted transports are reported, not probed.
-func canaryResolver(resolvers []TunnelResolver) (addr string, probed bool) {
-	for _, r := range resolvers {
-		switch strings.ToLower(strings.TrimSpace(r.Transport)) {
-		case "", "udp", "tcp", "system":
-		default:
-			continue
-		}
-		host := strings.TrimSpace(r.Address)
-		if strings.HasPrefix(host, "[") && strings.HasSuffix(host, "]") {
-			host = host[1 : len(host)-1]
-		}
-		if host == "" {
-			continue
-		}
-		if ip, err := netip.ParseAddr(host); err == nil {
-			host = ip.String()
-		}
-		if r.Port != 0 && r.Port != 53 {
-			host = net.JoinHostPort(host, strconv.Itoa(int(r.Port)))
-		}
-		return host, true
-	}
-	return "", false
 }
 
 // checkSystemResolvers flags OS resolvers that would answer outside the
@@ -264,6 +360,100 @@ func checkSystemResolvers(tunnel, system []string, hijacked, killSwitchArmed boo
 	return check
 }
 
+// encryptedEndpoint normalizes one tunnel resolver's encrypted-DNS endpoint
+// to a comparable form ("tls:1.1.1.1", "https:dns.google"), or "" when the
+// transport is not encrypted DNS.
+func encryptedEndpoint(r TunnelResolver) string {
+	switch strings.ToLower(strings.TrimSpace(r.Transport)) {
+	case "tls":
+		host := strings.Trim(strings.TrimSpace(r.Address), "[]")
+		if ip, err := netip.ParseAddr(host); err == nil {
+			host = ip.String()
+		}
+		if r.Port != 0 && r.Port != 853 {
+			return "tls:" + net.JoinHostPort(host, strconv.Itoa(int(r.Port)))
+		}
+		return "tls:" + host
+	case "https":
+		u := strings.TrimSpace(r.Address)
+		if !strings.Contains(u, "://") {
+			u = "https://" + strings.Trim(u, "[]")
+		}
+		h := u
+		if i := strings.Index(h, "://"); i >= 0 {
+			h = h[i+3:]
+		}
+		if i := strings.Index(h, "/"); i >= 0 {
+			h = h[:i]
+		}
+		if hh, pp, err := net.SplitHostPort(h); err == nil && pp == "443" {
+			h = hh
+		}
+		h = strings.ToLower(strings.Trim(h, "[]"))
+		if ip, err := netip.ParseAddr(h); err == nil {
+			h = ip.String()
+		}
+		return "https:" + h
+	default:
+		return ""
+	}
+}
+
+// checkEncryptedDNS flags OS-configured encrypted DNS (DoT/DoH) endpoints
+// that answer outside the tunnel's DNS path. Plain-DNS hijacking captures
+// port 53 only, so DnsHijacked deliberately does not suppress this check:
+// an OS with DNSOverTLS enabled leaks around a hijacked tunnel while
+// system-resolvers reports clean. An armed kill switch blocks the bypass,
+// so it suppresses the leak.
+func checkEncryptedDNS(in DnsLeakInput) DnsLeakCheck {
+	check := DnsLeakCheck{
+		ID:    DnsLeakEncryptedDNS,
+		Label: DnsLeakLabelEncryptedDNS,
+	}
+	var tunnelEnc []string
+	for _, r := range in.TunnelResolvers {
+		if e := encryptedEndpoint(r); e != "" {
+			tunnelEnc = append(tunnelEnc, e)
+		}
+	}
+	check.Expected = displayList(tunnelEnc)
+	sys := in.SystemEncryptedDNS
+	if sys == nil {
+		sys = SystemEncryptedDNS()
+	}
+	if sys == nil {
+		// Detection is not implemented on this OS; say so instead of
+		// pretending the bypass does not exist.
+		check.Actual = "(unknown: OS encrypted DNS not detected)"
+		return check
+	}
+	normalized := make([]string, 0, len(sys))
+	for _, s := range sys {
+		if e := encryptedEndpoint(TunnelResolver{Address: s, Transport: "tls"}); e != "" {
+			normalized = append(normalized, e)
+		}
+	}
+	check.Actual = displayList(normalized)
+	if len(normalized) == 0 || in.KillSwitchArmed {
+		return check
+	}
+	inTunnel := make(map[string]bool, len(tunnelEnc))
+	for _, t := range tunnelEnc {
+		inTunnel[t] = true
+	}
+	var outside []string
+	for _, s := range normalized {
+		if !inTunnel[s] {
+			outside = append(outside, s)
+		}
+	}
+	if len(outside) > 0 {
+		check.Leaked = true
+		check.FixHint = DnsLeakFixReviewEncrypted
+	}
+	return check
+}
+
 // checkKillSwitchDNS reports whether the kill switch covers DNS. An
 // unarmed kill switch is a warning, not a leak.
 func checkKillSwitchDNS(armed bool) DnsLeakCheck {
@@ -278,30 +468,4 @@ func checkKillSwitchDNS(armed bool) DnsLeakCheck {
 		check.FixHint = DnsLeakFixEnableKillSwitch
 	}
 	return check
-}
-
-// resolveVia performs a plain DNS query for host through resolverAddr
-// ("ip" or "ip:port", default port 53) using only the standard library.
-func resolveVia(ctx context.Context, resolverAddr, host string) ([]string, error) {
-	addr := resolverAddr
-	if _, _, err := net.SplitHostPort(addr); err != nil {
-		// Bare address: JoinHostPort adds brackets for IPv6 itself.
-		addr = net.JoinHostPort(strings.Trim(addr, "[]"), "53")
-	}
-	r := &net.Resolver{
-		PreferGo: true,
-		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-			d := &net.Dialer{}
-			return d.DialContext(ctx, "udp", addr)
-		},
-	}
-	addrs, err := r.LookupIPAddr(ctx, host)
-	if err != nil {
-		return nil, err
-	}
-	ips := make([]string, 0, len(addrs))
-	for _, a := range addrs {
-		ips = append(ips, a.IP.String())
-	}
-	return ips, nil
 }

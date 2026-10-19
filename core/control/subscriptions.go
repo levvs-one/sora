@@ -44,10 +44,6 @@ const (
 	// older versions when adding formats to preserve subscriptions across
 	// upgrades.
 	recordVersion = 1
-	// refPrefix namespaces every subscription-owned secret reference so
-	// provider servers can be identified and removed without touching
-	// manual imports.
-	refPrefix = "u1_"
 	// listChunkBytes keeps every stored piece of a server list under the
 	// vault's limit for one entry.
 	listChunkBytes = 60 << 10
@@ -55,15 +51,15 @@ const (
 
 // recordRef derives a subscription record reference. The 16-hex-character ID
 // keeps all subscription references within the vault's 64-byte limit.
-func recordRef(id string) string         { return refPrefix + id + "_rec" }
-func listRef(id string, part int) string { return refPrefix + id + "_l" + strconv.Itoa(part) }
+func recordRef(id string) string         { return "u1_" + id + "_rec" }
+func listRef(id string, part int) string { return "u1_" + id + "_l" + strconv.Itoa(part) }
 
 // serverRefFor derives subscription-owned server references. Removed provider
 // servers can then be deleted without affecting manual imports.
 func serverRefFor(id string) func(parser.OutboundSpec) (string, error) {
 	return func(spec parser.OutboundSpec) (string, error) {
 		sum := sha256.Sum256([]byte(spec.StableKey()))
-		return refPrefix + id + "_" + hex.EncodeToString(sum[:12]), nil
+		return "u1_" + id + "_" + hex.EncodeToString(sum[:12]), nil
 	}
 }
 
@@ -152,7 +148,7 @@ func (b *subscriptionBook) load() {
 		return
 	}
 	for _, ref := range b.srv.secrets.Refs() {
-		if !strings.HasPrefix(ref, refPrefix) || !strings.HasSuffix(ref, "_rec") {
+		if !strings.HasPrefix(ref, "u1_") || !strings.HasSuffix(ref, "_rec") {
 			continue
 		}
 		raw, err := b.srv.secrets.Get(ref)

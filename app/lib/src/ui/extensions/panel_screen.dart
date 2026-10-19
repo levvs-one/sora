@@ -33,6 +33,16 @@ import '../../generated/sora/core/v1/core_control.pbgrpc.dart';
 ///
 /// The panel entry HTML gets the soraExt bootstrap injected right after
 /// <head>, so `window.soraExt` exists before any page script runs.
+///
+/// Every served response carries `Content-Security-Policy: connect-src
+/// 'none'`: panel documents must never make their own network requests —
+/// the panel's only sanctioned way out is the soraExt JS channel (net.fetch
+/// through the core exists for background workers, not panels; neither is
+/// governed by connect-src).
+/// The entry HTML additionally carries the CSP meta tag injected at install
+/// time (core/ext extract); the header here also covers non-entry HTML
+/// files, which the navigation delegate would otherwise let the panel load
+/// without any policy.
 class _LocalPanelServer {
   _LocalPanelServer(this.root, {required this.entry, required this.bootstrap});
   final String root;
@@ -81,6 +91,10 @@ class _LocalPanelServer {
         'woff2' => ContentType('font', 'woff2'),
         _ => ContentType.binary,
       };
+      // Panel isolation (see class docs): no network for panel documents.
+      // Set before the body is written; error responses above carry no body
+      // and need no policy.
+      req.response.headers.set('Content-Security-Policy', "connect-src 'none'");
       if (ext == 'html' && _isEntry(canonical)) {
         final html = await file.readAsString();
         req.response.write(_injectBootstrap(html));

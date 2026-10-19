@@ -39,12 +39,44 @@ const (
 	FeatureLoadBalance    Feature = "load-balance"
 	FeatureTLSFragment    Feature = "tls-fragment"
 	FeatureXHTTP          Feature = "xhttp"
+	// FeatureXHTTPDownloadSplit marks engines that can split the XHTTP
+	// downlink onto a separate server (Xray downloadSettings, mihomo
+	// download-settings). sing-box (including the lx fork) has no such
+	// option: routing a split plan to it would silently send downloads
+	// over the uplink server.
+	FeatureXHTTPDownloadSplit Feature = "xhttp-download-split"
+	// FeatureXHTTPXmux marks engines that honour XHTTP connection-reuse
+	// tuning (Xray xmux, mihomo reuse-settings). sing-box-lx exposes only
+	// x_padding_bytes; xmux values handed to it would be silently
+	// dropped.
+	FeatureXHTTPXmux      Feature = "xhttp-xmux"
 	FeatureVLESSEncrypt   Feature = "vless-encryption"
 	FeatureAmneziaWG      Feature = "amneziawg"
+	// FeatureAmneziaWG3 marks engines whose AmneziaWG stack implements
+	// the 3.x parameters (header_protection_key, content padding,
+	// trailers, ranged timings). mihomo only knows the 1.x/2.0 keys, so
+	// a 3.x plan must never be routed to it: the parameters would be
+	// silently dropped while the UI promises obfuscation.
+	FeatureAmneziaWG3 Feature = "amneziawg3"
+	// FeatureAmneziaMasquerade marks engines that generate the I1 decoy
+	// from the id/ip/ib masquerade sugar (sing-box-lx with_awg). Other
+	// engines would silently send no decoy at all.
+	FeatureAmneziaMasquerade Feature = "amneziawg-masquerade"
 	FeaturePrivateControl Feature = "private-control"
 	// FeatureChains marks engines able to dial one outbound through another
 	// (sing-box dialer_proxy, mihomo dialer-proxy, Xray dialerProxy).
 	FeatureChains Feature = "chains"
+	// FeatureHy2PortHop marks engines whose Hysteria2 outbound supports
+	// port hopping (sing-box server_ports, mihomo ports). Xray's hysteria2
+	// outbound has no port-hopping support, so a hopping plan must never
+	// be routed to it: hopping rendered nowhere would silently pin the
+	// client to one port.
+	FeatureHy2PortHop Feature = "hy2-port-hop"
+	// FeatureDoH3 marks engines whose DNS stack can speak DNS over
+	// HTTP/3 (sing-box h3:// servers, mihomo ?h3=true). Xray has no
+	// DoH3 transport, so a plan naming an h3:// resolver must never be
+	// routed to it: the render would fail the whole session instead.
+	FeatureDoH3 Feature = "doh3"
 )
 
 // Capabilities describes the protocols and features supported by an engine
@@ -54,6 +86,12 @@ type Capabilities struct {
 	MinVersion string
 	Protocols  map[Protocol]bool
 	Features   map[Feature]bool
+	// tunStackIgnored marks builds whose TUN rewrite ignores the stack
+	// option (sing-box 1.15+): an explicit plan stack would silently do
+	// nothing there, so Missing reports it. Set by BuildCapabilities
+	// from the probed version; the zero value keeps the legacy
+	// stack-selecting behavior for raw catalog entries.
+	tunStackIgnored bool
 }
 
 // SupportsProtocol reports whether the engine can build an outbound for p.

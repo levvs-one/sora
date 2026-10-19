@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"io"
+	"os"
 	"path"
 	"sort"
 	"strings"
@@ -31,6 +32,10 @@ type Package struct {
 	Files map[string][]byte
 	// Manifest is the parsed sora-extension.json.
 	Manifest *Manifest
+	// ManifestExt holds the optional v2-runtime manifest fields
+	// (background_task, network_hosts); nil when the manifest declares
+	// none. Needed to restore them on rollback (see Store.Rollback).
+	ManifestExt *ManifestExt
 }
 
 // Open reads a .soraext file with strict limits and structural checks.
@@ -54,6 +59,15 @@ func OpenBytes(data []byte) (*Package, error) {
 }
 
 func openArchive(p string) (*Package, error) {
+	// Reject an oversized file before touching the zip parser: the archive
+	// limit applies to the container too, not just in-memory downloads.
+	if fi, err := os.Stat(p); err != nil {
+		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
+			"ext: cannot stat the package: %v", err)
+	} else if fi.Size() > maxPackageBytes {
+		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
+			"ext: the package exceeds %d bytes", maxPackageBytes)
+	}
 	zr, err := zip.OpenReader(p)
 	if err != nil {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
@@ -85,11 +99,12 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 		if f.FileInfo().IsDir() {
 			continue
 		}
-		total += int64(f.UncompressedSize64)
-		if total > maxUncompressedBytes {
-			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
-				"ext: the package content exceeds %d bytes", maxUncompressedBytes)
-		}
+		// The header-declared UncompressedSize64 above is a fast path, and the
+		// stdlib itself refuses to decompress past the declared size (fail
+		// closed on a lying header). The accounting below still counts the
+		// bytes that actually came out of the decompressor — the honest
+		// memory metric — so the total limit bounds real allocations no
+		// matter which layer stops a bomb first.
 		rc, err := f.Open()
 		if err != nil {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
@@ -100,6 +115,19 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 		if err != nil {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
 				"ext: cannot read %q: %v", name, err)
+		}
+		// Second layer behind the stdlib's own declared-size cap: a file
+		// that expands past the per-file cap is rejected, never truncated.
+		if int64(len(data)) > maxSingleFile {
+			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
+				"ext: file %q expands beyond %d bytes", name, maxSingleFile)
+		}
+		// The total limit is enforced on actual bytes, not on declared
+		// sizes: many small-declared files must not smuggle a huge payload.
+		total += int64(len(data))
+		if total > maxUncompressedBytes {
+			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
+				"ext: the package content exceeds %d bytes", maxUncompressedBytes)
 		}
 		if _, dup := files[name]; dup {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
@@ -113,18 +141,26 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 				"ext: the package is missing %q", need)
 		}
 	}
-	m, err := ParseManifest(files[manifestName])
+	m, x, err := ParseManifestFull(files[manifestName])
 	if err != nil {
 		return nil, err
 	}
-	return &Package{Files: files, Manifest: m}, nil
+	return &Package{Files: files, Manifest: m, ManifestExt: x}, nil
 }
 
 func isSafeArchivePath(name string) bool {
 	if name == "" || len(name) > 512 {
 		return false
 	}
-	if !strings.HasPrefix(name, "./") && (path.IsAbs(name) || strings.HasPrefix(name, "/") || strings.HasPrefix(name, "\\")) {
+	// The package format mandates forward slashes (§1). A backslash is
+	// never legitimate in an archive path, and on the Windows extractor
+	// it is a separator: "..\..\evil" or "C:\evil" would escape the
+	// target directory there. Colons are rejected for the same reason
+	// (drive letters, NTFS alternate data streams like "panel.html:evil").
+	if strings.ContainsAny(name, "\\:") {
+		return false
+	}
+	if !strings.HasPrefix(name, "./") && (path.IsAbs(name) || strings.HasPrefix(name, "/")) {
 		return false
 	}
 	clean := path.Clean(name)

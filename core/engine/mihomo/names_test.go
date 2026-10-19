@@ -46,7 +46,7 @@ func TestAnHTTPSProxyKeepsItsTLS(t *testing.T) {
 		ID: "p", Protocol: engine.ProtocolHTTP, Server: "proxy.example", Port: 443,
 		UserID: "user", Password: "secret",
 		TLS: engine.TLS{Enabled: true, ServerName: "proxy.example"},
-	})
+	}, engine.MuxOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -202,3 +202,33 @@ func TestDetectCensorshipBadProbeTarget(t *testing.T) {
 		t.Fatal("want an INVALID_ARGUMENT response error for an empty probe target")
 	}
 }
+
+// Events without offsets carry no timing. The server must not invent it:
+// anchoring everything to "now" would read as an instant reset and let the
+// time-windowed signatures claim on ordering alone.
+func TestDetectCensorshipEventsWithoutOffsetsStayUnknown(t *testing.T) {
+	client, stop := censorClient(t)
+	defer stop()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	req := censorBaseRequest()
+	for _, e := range sniBlockEvents() {
+		e.OffsetMs = 0
+		req.Events = append(req.Events, e)
+	}
+	resp, err := client.DetectCensorship(ctx, req)
+	if err != nil {
+		t.Fatalf("DetectCensorship() transport error = %v", err)
+	}
+	if resp.GetError() != nil {
+		t.Fatalf("response error = %v", resp.GetError())
+	}
+	v := resp.GetVerdict()
+	if v.GetKind() != censorv1.CensorshipKind_CENSORSHIP_KIND_UNKNOWN {
+		t.Fatalf("kind = %v, want UNKNOWN: timing-free input must not feed timing-based claims", v.GetKind())
+	}
+	if v.GetConfidence() >= 0.35 {
+		t.Fatalf("confidence = %v, must stay below the claim floor", v.GetConfidence())
+	}
+}

@@ -98,8 +98,31 @@ type Transport struct {
 	Headers     map[string]string
 	Prefix      string
 	IdleTimeout int
+	// EarlyData caps WebSocket 0-RTT: the first payload bytes ride the
+	// handshake instead of waiting for it. Zero disables it; only the
+	// ws transport honours it.
+	EarlyData int
 	// Mode is the XHTTP mode: auto, packet-up, stream-up or stream-one.
 	Mode string
+	// DownloadAddress and DownloadPort split the XHTTP downlink onto a
+	// separate server, so uplink and downlink can ride different domains.
+	// Both must be set together; the fields are ignored by other
+	// transports and rejected there by the engines.
+	DownloadAddress string
+	DownloadPort    uint16
+	// Xmux tunes XHTTP connection reuse. MaxConcurrency (streams per
+	// connection) and MaxConnections are mutually exclusive. Zero keeps
+	// the engine default. Xray renders xmux, mihomo renders
+	// reuse-settings; sing-box cannot honour them (see
+	// FeatureXHTTPXmux).
+	XmuxMaxConcurrency int
+	XmuxMaxConnections int
+	XmuxMaxReuseTimes  int
+	XmuxMaxRequestTimes int
+	// XPaddingBytes is the random XHTTP padding range, "min-max" or a
+	// single number, e.g. "100-1000". Xray, mihomo and sing-box-lx all
+	// accept the range spelling.
+	XPaddingBytes string
 }
 
 // WireGuardPeer is one WireGuard peer of an outbound.
@@ -134,6 +157,13 @@ type Outbound struct {
 	Flow       string
 	Obfs       string
 	ObfsParam  string
+	// Plugin and PluginOpts carry a Shadowsocks SIP002 obfuscation plugin
+	// (e.g. v2ray-plugin) and its raw option string, verbatim from the
+	// import link. When set, Plugin wins over the legacy Obfs/ObfsParam
+	// obfs-local mapping. Like the other credential fields, PluginOpts
+	// must be masked in logs and events.
+	Plugin     string
+	PluginOpts string
 	PrivateKey string
 	PublicKey  string
 	ShortID    string
@@ -266,6 +296,7 @@ type DNS struct {
 	Enabled          bool
 	Mode             string // rule, fakeip, redir-host
 	FakeIPRange      string
+	FakeIPRange6     string   // IPv6 fake-address pool; rendered only when IPv6 is on
 	FakeIPFilter     []string // domains that never receive a fake address
 	FakeIPTTL        int      // seconds; 0 leaves the engine default in place
 	Servers          []DNSServer
@@ -346,6 +377,16 @@ type AmneziaWG struct {
 	// DisableCookies stops sending Cookie Reply messages; incoming
 	// cookies and the rest of the cookie machinery keep working.
 	DisableCookies bool
+	// Masquerade* carry the sing-box-lx id/ip/ib decoy sugar: the engine
+	// generates the I1 signature packet mimicking the given protocol
+	// instead of a hand-written I1 (see FeatureAmneziaMasquerade).
+	// Protocol is quic, dns, stun or sip; Domain is the decoy domain
+	// (ClientHello SNI, DNS QNAME or SIP host); Browser selects the
+	// QUIC decoy's ClientHello fingerprint (chrome, firefox or curl).
+	// Setting a protocol is mutually exclusive with I1.
+	MasqueradeProtocol string
+	MasqueradeDomain   string
+	MasqueradeBrowser  string
 }
 
 // awg31Ranges lists the AmneziaWG 3.1 fields that carry range<uint16>
@@ -385,6 +426,13 @@ func (a *AmneziaWG) UsesAWG31() bool {
 		}
 	}
 	return false
+}
+
+// UsesMasquerade reports whether the id/ip/ib decoy sugar is requested.
+// Only sing-box-lx implements it (see FeatureAmneziaMasquerade): other
+// engines would silently drop the decoy.
+func (a *AmneziaWG) UsesMasquerade() bool {
+	return a != nil && (a.MasqueradeProtocol != "" || a.MasqueradeDomain != "" || a.MasqueradeBrowser != "")
 }
 
 // BypassStrategy defines zapret handshake shaping. Positions are byte offsets,
@@ -495,6 +543,10 @@ type Options struct {
 	GeoSiteURL     string
 	GeoIPURL       string
 	Fragment       Fragment
+	// Mux configures multiplexing of REALITY outbounds. The zero value
+	// keeps the default: mux on for REALITY, off everywhere else. See
+	// mux.go for the policy and the vision↔mux decision.
+	Mux MuxOptions
 }
 
 // LocalProxy opens a loopback HTTP/SOCKS5 listener only for system proxy mode

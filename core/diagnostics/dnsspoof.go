@@ -79,9 +79,12 @@ type SpoofInput struct {
 	// TunnelResolvers are the session's resolvers; only plain
 	// UDP/TCP transports are probed, exactly like the canary check.
 	TunnelResolvers []TunnelResolver
-	// Resolve probes host through resolverAddr ("ip" or "ip:port"); nil
-	// selects the stdlib prober. Tests inject failures here.
-	Resolve func(ctx context.Context, resolverAddr, host string) ([]string, error)
+	// Probe probes host through resolverAddr ("ip" or "ip:port"); nil
+	// selects the standard probers. Tests inject failures here. Only
+	// plain UDP/TCP probes are used: the spoof detector compares plain
+	// answers, and an encrypted tunnel path is covered by the leak
+	// check's own canary.
+	Probe func(ctx context.Context, network, resolverAddr, host string) ([]string, error)
 	// Timeout bounds one resolver query; zero selects the default.
 	Timeout time.Duration
 }
@@ -132,9 +135,9 @@ func DetectDnsSpoof(ctx context.Context, in SpoofInput) SpoofReport {
 	if host == "" {
 		host = canaryHost
 	}
-	resolve := in.Resolve
-	if resolve == nil {
-		resolve = resolveVia
+	probe := in.Probe
+	if probe == nil {
+		probe = probeVia
 	}
 	timeout := in.Timeout
 	if timeout <= 0 {
@@ -147,7 +150,7 @@ func DetectDnsSpoof(ctx context.Context, in SpoofInput) SpoofReport {
 	}
 
 	type target struct {
-		side, addr string
+		side, addr, network string
 	}
 	var targets []target
 	system := in.SystemResolvers
@@ -159,8 +162,13 @@ func DetectDnsSpoof(ctx context.Context, in SpoofInput) SpoofReport {
 			targets = append(targets, target{side: "system", addr: n})
 		}
 	}
-	if probeAddr, probed := canaryResolver(in.TunnelResolvers); probed {
-		targets = append(targets, target{side: "tunnel", addr: probeAddr})
+	for _, r := range in.TunnelResolvers {
+		network, addr, _ := canaryTarget(r)
+		if network != "udp" && network != "tcp" {
+			continue
+		}
+		targets = append(targets, target{side: "tunnel", addr: addr, network: network})
+		break
 	}
 	if len(targets) == 0 {
 		return SpoofReport{Verdict: SpoofUnresolved, Detail: "no resolvers to probe"}
@@ -175,7 +183,7 @@ func DetectDnsSpoof(ctx context.Context, in SpoofInput) SpoofReport {
 		wg.Add(1)
 		go func(i int, tg target) {
 			defer wg.Done()
-			answers[i] = queryRounds(ctx, resolve, timeout, tg.side, tg.addr, host)
+			answers[i] = queryRounds(ctx, probe, timeout, tg.network, tg.side, tg.addr, host)
 		}(i, tg)
 	}
 	wg.Wait()
@@ -186,13 +194,13 @@ func DetectDnsSpoof(ctx context.Context, in SpoofInput) SpoofReport {
 // queryRounds queries one resolver spoofRounds times and unions the
 // answers, so round-robin rotation converges instead of looking like
 // disagreement.
-func queryRounds(ctx context.Context, resolve func(context.Context, string, string) ([]string, error), timeout time.Duration, side, addr, host string) SpoofAnswer {
+func queryRounds(ctx context.Context, probe func(context.Context, string, string, string) ([]string, error), timeout time.Duration, network, side, addr, host string) SpoofAnswer {
 	answer := SpoofAnswer{Resolver: addr, Side: side}
 	union := map[string]bool{}
 	nxRounds, answered := 0, 0
 	for range spoofRounds {
 		qctx, cancel := context.WithTimeout(ctx, timeout)
-		ips, err := resolve(qctx, addr, host)
+		ips, err := probe(qctx, network, addr, host)
 		cancel()
 		var dnsErr *net.DNSError
 		switch {

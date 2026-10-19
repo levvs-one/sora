@@ -1,15 +1,22 @@
-// Manifest v1 schema extension: background workers and net.fetch.
+// Manifest v1 schema extension: background workers, net.fetch, and the
+// capability contract pointers (theme, network-hook, routing).
 //
 // The v1 decoder in manifest.go is frozen: it rejects unknown top-level
-// fields (DisallowUnknownFields). These v2-runtime fields stay optional and
-// additive, so manifest_version remains 1 and old manifests parse exactly as
-// before:
+// fields (DisallowUnknownFields). These optional fields stay additive, so
+// manifest_version remains 1 and old manifests parse exactly as before:
 //
 //   - "background_task": periodic background work (capability "background",
 //     permission "background").
 //   - "network_hosts": host allowlist for net.fetch (permission "net.fetch").
+//   - "theme": theme asset contract (capability "theme", permission
+//     "theme.apply"). Asset schema is v0/proposed; only the entry path and
+//     the capability/permission cross-checks are enforced.
+//   - "network_hook": DPI-bypass module contract (capability "network-hook",
+//     permission "net.hooks"). Same enforcement level as "theme".
+//   - "routing": routing-rules contract (capability "routing", permission
+//     "routing.rules"). Same enforcement level as "theme".
 //
-// ParseManifestFull is the entry point: it splits the v2-runtime keys out of
+// ParseManifestFull is the entry point: it splits the extension keys out of
 // the raw JSON, runs the frozen v1 decoder on the remainder, then validates
 // the extension keys against the parsed manifest. Callers that only need v1
 // keep using ParseManifest.
@@ -33,11 +40,14 @@ const (
 	KeyNetFetchDenied      errs.Key = "ext.netfetch.denied"
 	KeyNetFetchFailed      errs.Key = "ext.netfetch.failed"
 	KeyWorkerFailed        errs.Key = "ext.worker.failed"
+	KeyThemeInvalid        errs.Key = "ext.theme.invalid"
+	KeyNetworkHookInvalid  errs.Key = "ext.network_hook.invalid"
+	KeyRoutingInvalid      errs.Key = "ext.routing.invalid"
 )
 
 // Top-level manifest keys owned by this extension file. ParseManifestFull
 // strips these before handing the document to the frozen v1 decoder.
-var manifestExtKeys = []string{"background_task", "network_hosts"}
+var manifestExtKeys = []string{"background_task", "network_hosts", "theme", "network_hook", "routing"}
 
 // BackgroundTask declares one periodic background task for an extension.
 // The declared interval is a wish: the runtime clamps it into
@@ -49,11 +59,35 @@ type BackgroundTask struct {
 	Entry string `json:"entry"`
 }
 
-// ManifestExt holds the optional v2-runtime manifest fields. A nil
-// Background and an empty NetworkHosts mean "not declared".
+// ManifestExt holds the optional v2-runtime and capability-contract
+// manifest fields. A nil Background and empty NetworkHosts mean "not
+// declared"; same for the three capability contracts.
 type ManifestExt struct {
 	Background   *BackgroundTask `json:"background_task,omitempty"`
 	NetworkHosts []string        `json:"network_hosts,omitempty"`
+	Theme        *ThemeExt       `json:"theme,omitempty"`
+	NetworkHook  *NetworkHookExt `json:"network_hook,omitempty"`
+	Routing      *RoutingExt     `json:"routing,omitempty"`
+}
+
+// ThemeExt points at the theme asset file (theme contract v0, proposed).
+type ThemeExt struct {
+	// Entry is the theme descriptor inside the package, e.g. "theme.json".
+	Entry string `json:"entry"`
+}
+
+// NetworkHookExt points at the DPI-bypass module descriptor (network-hook
+// contract v0, proposed).
+type NetworkHookExt struct {
+	// Entry is the hook descriptor inside the package, e.g. "hook.json".
+	Entry string `json:"entry"`
+}
+
+// RoutingExt points at the routing-rules file (routing contract v0,
+// proposed).
+type RoutingExt struct {
+	// Entry is the rules file inside the package, e.g. "rules.json".
+	Entry string `json:"entry"`
 }
 
 var (
@@ -61,6 +95,8 @@ var (
 	dnsLabelPattern = regexp.MustCompile(`^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`)
 	// Worker script file names: relative .js path, no traversal.
 	scriptNamePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_.\-/]{0,255}\.js$`)
+	// Capability-contract asset file names: relative .json path, no traversal.
+	assetNamePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_.\-/]{0,255}\.json$`)
 )
 
 // MaxNetworkHosts caps the allowlist so a manifest cannot smuggle an
@@ -156,6 +192,21 @@ func (x *ManifestExt) Validate(m *Manifest) error {
 			seen[norm] = true
 		}
 	}
+	if x.Theme != nil {
+		if err := x.Theme.validate(m); err != nil {
+			return err
+		}
+	}
+	if x.NetworkHook != nil {
+		if err := x.NetworkHook.validate(m); err != nil {
+			return err
+		}
+	}
+	if x.Routing != nil {
+		if err := x.Routing.validate(m); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -179,6 +230,46 @@ func (b *BackgroundTask) validate(m *Manifest) error {
 			"ext: background_task entry %q must be a relative .js path without traversal", b.Entry)
 	}
 	return nil
+}
+
+// validate cross-checks one capability contract pointer: the matching
+// capability and permission must be declared, and the entry must be a safe
+// relative .json path. The asset file's own schema is v0/proposed and is
+// NOT validated here — only the pointer is.
+func (t *ThemeExt) validate(m *Manifest) error {
+	return validateAssetRef("theme", t.Entry, "theme", "theme.apply", KeyThemeInvalid, m)
+}
+
+func (n *NetworkHookExt) validate(m *Manifest) error {
+	return validateAssetRef("network_hook", n.Entry, "network-hook", "net.hooks", KeyNetworkHookInvalid, m)
+}
+
+func (r *RoutingExt) validate(m *Manifest) error {
+	return validateAssetRef("routing", r.Entry, "routing", "routing.rules", KeyRoutingInvalid, m)
+}
+
+func validateAssetRef(field, entry, capability, permission string, key errs.Key, m *Manifest) error {
+	if !hasCapability(m, capability) {
+		return errs.Newf(errs.CodeInvalidArgument, key,
+			"ext: %s requires the %q capability", field, capability)
+	}
+	if !hasPermission(m, permission) {
+		return errs.Newf(errs.CodeInvalidArgument, key,
+			"ext: %s requires the %q permission", field, permission)
+	}
+	if !isSafeAssetPath(entry) {
+		return errs.Newf(errs.CodeInvalidArgument, key,
+			"ext: %s entry %q must be a relative .json path without traversal", field, entry)
+	}
+	return nil
+}
+
+// isSafeAssetPath allows only relative .json paths without traversal,
+// mirroring the worker script rule (scriptNamePattern) for contract files.
+func isSafeAssetPath(entry string) bool {
+	return assetNamePattern.MatchString(entry) &&
+		!strings.Contains(entry, "..") &&
+		!strings.HasPrefix(entry, "/")
 }
 
 func hasPermission(m *Manifest, id string) bool {

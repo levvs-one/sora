@@ -196,3 +196,47 @@ func TestWatcherIgnoresLocalFailures(t *testing.T) {
 		}
 	}
 }
+
+// A flapping closed port must not flood the journal: the direct refused
+// verdict shares the one-per-minute budget with probes.
+func TestWatcherRefusedVerdictIsRateLimited(t *testing.T) {
+	s, err := New(testConfig(newFakeEngine(), &fakeGuard{}))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	ctx := context.Background()
+	if err := s.Start(ctx); err != nil {
+		t.Fatalf("Start() error = %v", err)
+	}
+	defer func() { _ = s.Stop(ctx) }()
+
+	s.WatchCensorshipFailures(&censor.Detector{}, &censor.Prober{})
+	before := s.Journal().Latest()
+	for i := 0; i < 3; i++ {
+		s.Journal().Append(Event{
+			Kind:   EventError,
+			Reason: errs.CodeUnavailable,
+			Key:    errs.KeyConnectionRefused,
+			Detail: "connection refused",
+		})
+	}
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		n := 0
+		for _, e := range s.Journal().Since(before, 64) {
+			if e.Kind == EventCensor {
+				n++
+			}
+		}
+		if n == 1 {
+			return // the first verdict landed; the rest must stay suppressed
+		}
+		if n > 1 {
+			t.Fatalf("got %d censor verdicts for 3 refused errors, want at most 1 per minute", n)
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("no censorship verdict published for the refused errors")
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+}

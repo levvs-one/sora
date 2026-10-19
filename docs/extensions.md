@@ -268,3 +268,12 @@ Host-side enforcement (`core/ext/netfetch.go`):
 - **every** request — allowed or denied — is written to the extension
   log: timestamp, method, URL, decision, status/bytes. It is the audit
   trail for extension network activity.
+- transport: the HTTP transport is injected by the host
+  (`NewFetcherForExtensionWithTransport`, wired via
+  `Scheduler.SetFetchTransport`). Production must pass a transport bound
+  to the core's tunnel (local proxy), so extension traffic follows the
+  VPN and never leaks direct; a nil transport dials direct and is only
+  for tests/dev.
+- diagnostics: per-extension counters (requests, denied, bytes out/in)
+  via `Fetcher.Stats()`, surfaced in the extension details screen next
+  to the log.

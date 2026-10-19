@@ -153,10 +153,34 @@ func censorLogEvents(j *session.Journal) []censor.LogEvent {
 }
 
 func censorEventsFromProto(evs []*censorv1.AttemptEvent) ([]censor.Event, time.Time) {
+	timed := false
+	for _, e := range evs {
+		if e != nil && e.GetOffsetMs() != 0 {
+			timed = true
+			break
+		}
+	}
+	out := make([]censor.Event, 0, len(evs))
+	if !timed {
+		// The client sent no timing at all. Do not invent it: anchoring
+		// every event to "now" would read as an instant reset and let the
+		// time-windowed signatures claim on ordering alone. Leave the
+		// attempt timing-free so those rules stay silent.
+		for _, e := range evs {
+			if e == nil {
+				continue
+			}
+			out = append(out, censor.Event{
+				Stage:  censorStageFromProto(e.GetStage()),
+				What:   censorWhatFromProto(e.GetKind()),
+				Detail: e.GetDetail(),
+			})
+		}
+		return out, time.Time{}
+	}
 	// Offset-only input: anchor every event to one base so the signatures
 	// using time-to-break keep working.
 	base := time.Now().UTC()
-	out := make([]censor.Event, 0, len(evs))
 	for _, e := range evs {
 		if e == nil {
 			continue

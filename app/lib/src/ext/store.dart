@@ -11,11 +11,13 @@ library;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter/widgets.dart';
 
+import 'catalog.dart';
 import 'manifest.dart';
 import 'package.dart';
 import 'permissions.dart';
@@ -111,6 +113,16 @@ class ExtensionStore extends ChangeNotifier {
   bool isInstalled(String id) => _installed.containsKey(id);
   bool isEnabled(String id) => _installed[id]?.enabled ?? false;
 
+  /// Stable install-scoped random id for staged-rollout bucketing. Created
+  /// once, stored next to the registry. Not a hardware id and never leaves
+  /// the device: it only feeds the local rollout hash.
+  String get installId => _installId;
+  String _installId = '';
+
+  /// Offline team-catalog cache (verified bytes + fetch time).
+  late final CatalogCache catalogCache =
+      CatalogCache('$_dir${Platform.pathSeparator}catalog_cache');
+
   String _contentDir(String id, String version) =>
       '$_dir${Platform.pathSeparator}$id@$version';
 
@@ -124,6 +136,7 @@ class ExtensionStore extends ChangeNotifier {
   Future<void> load() async {
     final d = Directory(_dir);
     await d.create(recursive: true);
+    _installId = await _loadOrCreateInstallId();
     final reg = File('${_dir}${Platform.pathSeparator}installed.json');
     if (await reg.exists()) {
       try {
@@ -150,6 +163,28 @@ class ExtensionStore extends ChangeNotifier {
         jsonEncode({for (final e in _installed.entries) e.key: e.value.toJson()}),
         flush: true);
     await tmp.rename(reg.path);
+  }
+
+  /// Reads the install id, creating and persisting a fresh random one.
+  /// A corrupt file is replaced, never fatal.
+  Future<String> _loadOrCreateInstallId() async {
+    final f = File('${_dir}${Platform.pathSeparator}store_id');
+    try {
+      final existing = (await f.readAsString()).trim();
+      if (RegExp(r'^[0-9a-f]{32}$').hasMatch(existing)) return existing;
+    } catch (_) {
+      // Missing or unreadable: create below.
+    }
+    final rnd = Random.secure();
+    final id = List.generate(16, (_) => rnd.nextInt(256))
+        .map((b) => b.toRadixString(16).padLeft(2, '0'))
+        .join();
+    try {
+      await f.writeAsString(id, flush: true);
+    } catch (_) {
+      // Best effort: bucketing still works for this session.
+    }
+    return id;
   }
 
   /// Installs a verified package. Returns the permissions added relative to

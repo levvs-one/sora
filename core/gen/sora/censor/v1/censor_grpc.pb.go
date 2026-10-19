@@ -31,9 +31,6 @@ const (
 // automatically on network-level failures and publishes the verdict to the
 // journal; this RPC re-runs it on demand, optionally with a fresh active
 // probe from the core.
-//
-// Since 1.11. Clients must negotiate 1.11 before calling: an older core has
-// no such service and fails the call at the transport.
 type CensorControlClient interface {
 	// DetectCensorship classifies one failed attempt. Requires the control
 	// authenticator: the request names servers and the response describes the
@@ -68,9 +65,6 @@ func (c *censorControlClient) DetectCensorship(ctx context.Context, in *DetectCe
 // automatically on network-level failures and publishes the verdict to the
 // journal; this RPC re-runs it on demand, optionally with a fresh active
 // probe from the core.
-//
-// Since 1.11. Clients must negotiate 1.11 before calling: an older core has
-// no such service and fails the call at the transport.
 type CensorControlServer interface {
 	// DetectCensorship classifies one failed attempt. Requires the control
 	// authenticator: the request names servers and the response describes the

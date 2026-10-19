@@ -36,6 +36,15 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 	if p.DNS.Mode == string(DNSFakeIP) {
 		out[FeatureFakeIP] = true
 	}
+	for _, s := range p.DNS.Servers {
+		if s.Transport == DNSH3 {
+			// An explicit h3:// resolver needs an engine with a DoH3
+			// transport; without the gate Xray would be selected and
+			// fail the render.
+			out[FeatureDoH3] = true
+			break
+		}
+	}
 	for _, r := range p.Rules {
 		if r.Type == RuleRuleSet {
 			out[FeatureRuleSets] = true
@@ -57,15 +66,36 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 	for _, o := range p.Outbounds {
 		if o.Transport.Type == "xhttp" {
 			out[FeatureXHTTP] = true
+			if o.Transport.DownloadAddress != "" {
+				out[FeatureXHTTPDownloadSplit] = true
+			}
+			if o.Transport.XmuxMaxConcurrency > 0 || o.Transport.XmuxMaxConnections > 0 ||
+				o.Transport.XmuxMaxReuseTimes > 0 || o.Transport.XmuxMaxRequestTimes > 0 {
+				out[FeatureXHTTPXmux] = true
+			}
 		}
 		if o.Encryption != "" && o.Encryption != "none" {
 			out[FeatureVLESSEncrypt] = true
 		}
 		if o.Amnezia != nil {
 			out[FeatureAmneziaWG] = true
+			if o.Amnezia.UsesAWG31() {
+				// Without the gate a 3.x plan could land on mihomo,
+				// which only knows the 1.x/2.0 keys.
+				out[FeatureAmneziaWG3] = true
+			}
+			if o.Amnezia.UsesMasquerade() {
+				out[FeatureAmneziaMasquerade] = true
+			}
 		}
 		if o.Via != "" {
 			out[FeatureChains] = true
+		}
+		if o.Protocol == ProtocolHysteria2 && o.HopPorts != "" {
+			// Xray's hysteria2 outbound cannot hop ports; without the
+			// feature gate a hopping plan would silently collapse to a
+			// single port on Xray.
+			out[FeatureHy2PortHop] = true
 		}
 	}
 	if p.Options.Fragment.Enabled {

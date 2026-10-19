@@ -216,3 +216,64 @@ func TestClampWorkerInterval(t *testing.T) {
 		}
 	}
 }
+
+func TestParseManifestFullThemeOK(t *testing.T) {
+	m := testManifest(t)
+	m.Permissions = []string{"theme.apply"}
+	m.Capabilities = []string{"theme"}
+	raw := rawManifestWith(t, m, map[string]any{
+		"theme": map[string]any{"entry": "theme.json"},
+	})
+	_, x, err := ParseManifestFull(raw)
+	if err != nil {
+		t.Fatalf("ParseManifestFull: %v", err)
+	}
+	if x.Theme == nil || x.Theme.Entry != "theme.json" {
+		t.Fatalf("bad theme: %+v", x.Theme)
+	}
+}
+
+func TestParseManifestFullThemeNeedsCapabilityAndPermission(t *testing.T) {
+	m := testManifest(t) // no theme capability/permission
+	raw := rawManifestWith(t, m, map[string]any{
+		"theme": map[string]any{"entry": "theme.json"},
+	})
+	if _, _, err := ParseManifestFull(raw); err == nil {
+		t.Fatal("theme without the capability must be rejected")
+	}
+	m.Permissions = []string{"theme.apply"}
+	m.Capabilities = []string{"theme"}
+	raw = rawManifestWith(t, m, map[string]any{
+		"theme": map[string]any{"entry": "../evil.json"},
+	})
+	if _, _, err := ParseManifestFull(raw); err == nil {
+		t.Fatal("theme entry with traversal must be rejected")
+	}
+}
+
+func TestParseManifestFullNetworkHookAndRoutingOK(t *testing.T) {
+	m := testManifest(t)
+	m.Permissions = []string{"net.hooks", "routing.rules"}
+	m.Capabilities = []string{"network-hook", "routing"}
+	raw := rawManifestWith(t, m, map[string]any{
+		"network_hook": map[string]any{"entry": "hook.json"},
+		"routing":      map[string]any{"entry": "rules.json"},
+	})
+	_, x, err := ParseManifestFull(raw)
+	if err != nil {
+		t.Fatalf("ParseManifestFull: %v", err)
+	}
+	if x.NetworkHook == nil || x.Routing == nil {
+		t.Fatalf("bad contracts: %+v", x)
+	}
+	// Missing permission for routing.
+	m2 := testManifest(t)
+	m2.Permissions = []string{"net.hooks"}
+	m2.Capabilities = []string{"network-hook", "routing"}
+	raw = rawManifestWith(t, m2, map[string]any{
+		"routing": map[string]any{"entry": "rules.json"},
+	})
+	if _, _, err := ParseManifestFull(raw); err == nil {
+		t.Fatal("routing without the permission must be rejected")
+	}
+}

@@ -21,7 +21,8 @@ type Availability struct {
 
 // Catalog holds upstream engine capabilities, separate from installed
 // Availability. Entries were validated with mihomo v1.19.32 (-t), sing-box
-// v1.14.2 (check), and Xray v26.3.27 (run -test).
+// v1.14.2 (check), sing-box-lx v1.14.3-lx.14 capability tags (unit), and
+// Xray v26.3.27 (run -test).
 var Catalog = map[Kind]Capabilities{
 	KindMihomo: {
 		Kind:       KindMihomo,
@@ -38,13 +39,19 @@ var Catalog = map[Kind]Capabilities{
 			FeatureHotApply: true, FeatureGeoData: true, FeatureFallbackGroup: true,
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
 			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureChains: true,
+			FeatureHy2PortHop: true, FeatureDoH3: true,
+			// mihomo 1.19.32 speaks download-settings and reuse-settings
+			// on xhttp-opts (verified against the pinned source).
+			FeatureXHTTPDownloadSplit: true, FeatureXHTTPXmux: true,
 		},
 	},
 	KindSingBox: {
 		Kind: KindSingBox,
-		// The renderer requires DNS and rule-action formats added in
-		// 1.12; 1.14 removes the legacy formats.
-		MinVersion: "1.12.0",
+		// 1.15 rewrote TUN around sing-tun's own TCP/IP stack, so the
+		// stack option is deprecated there (removed in 1.17) and the
+		// renderer only emits it for older builds. The renderer needs
+		// the DNS and rule-action formats added in 1.12.
+		MinVersion: "1.15.0",
 		Protocols: map[Protocol]bool{
 			ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 			ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
@@ -55,6 +62,10 @@ var Catalog = map[Kind]Capabilities{
 			FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
 			FeatureURLTest: true, FeatureLatencyTest: true, FeatureGeoData: true,
 			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureChains: true,
+			FeatureHy2PortHop: true, FeatureDoH3: true,
+			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux: the
+			// lx fork's xhttp transport has neither downlink splitting
+			// nor xmux reuse tuning (x_padding_bytes only).
 		},
 	},
 	KindXray: {
@@ -74,24 +85,54 @@ var Catalog = map[Kind]Capabilities{
 			FeatureURLTest: true, FeatureLoadBalance: true, FeatureLatencyTest: true,
 			FeatureGeoData: true, FeatureTLSFragment: true,
 			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
+			FeatureXHTTPDownloadSplit: true, FeatureXHTTPXmux: true,
 			// dialerProxy exists since long before the minimum
 			// version, so chains need no extra version gate.
 			FeatureChains: true,
+			// Deliberately no FeatureHy2PortHop: Xray's hysteria2
+			// outbound cannot hop ports (see FeatureHy2PortHop).
+			// Deliberately no FeatureDoH3: Xray has no DNS-over-HTTP/3
+			// transport (see FeatureDoH3).
 		},
 	},
+}
+
+// isLXFork reports whether version is the sing-box-lx fork (AmneziaWG,
+// XHTTP, VLESS Encryption), which versions itself as "<base>-lx.<n>".
+func isLXFork(version Version) bool {
+	return strings.HasPrefix(version.PreRelease, "lx.") &&
+		!version.Less(Version{Major: 1, Minor: 14, Patch: 3})
 }
 
 // BuildCapabilities keeps upstream and downstream builds distinct. A version
 // suffix alone cannot prove that an optional transport was compiled in.
 func BuildCapabilities(kind Kind, version Version, tags []string) Capabilities {
 	caps := Catalog[kind]
-	if kind == KindSingBox && strings.HasPrefix(version.PreRelease, "lx.") &&
-		!version.Less(Version{Major: 1, Minor: 14, Patch: 3}) {
+	if kind != KindSingBox {
+		return caps
+	}
+	if isLXFork(version) {
 		caps.Features = maps.Clone(caps.Features)
 		caps.Features[FeatureXHTTP] = slices.Contains(tags, "with_xhttp")
 		caps.Features[FeatureVLESSEncrypt] = true
-		caps.Features[FeatureAmneziaWG] = slices.Contains(tags, "with_awg")
+		if slices.Contains(tags, "with_awg") {
+			caps.Features[FeatureAmneziaWG] = true
+			// The fork's AWG stack is amneziawg-go v3.1: it renders the
+			// 3.x parameters and the id/ip/ib masquerade sugar.
+			caps.Features[FeatureAmneziaWG3] = true
+			caps.Features[FeatureAmneziaMasquerade] = true
+		}
+		// The lx. fork tracks sing-box 1.14, so its floor stays 1.14.3
+		// while upstream moved to 1.15: raising the pin must not reject
+		// the shipped fork (packaging/engines/engines.lock pins
+		// sing-box-lx v1.14.3-lx.14).
+		caps.MinVersion = "1.14.3"
 	}
+	// sing-box 1.15 rewrote TUN around its own TCP/IP stack: the stack
+	// option is deprecated there (removed in 1.17) and silently ignored.
+	// Less compares only the numeric triple, so fork builds compare by
+	// their base version.
+	caps.tunStackIgnored = !version.Less(Version{Major: 1, Minor: 15})
 	return caps
 }
 
@@ -170,7 +211,11 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 func (c Capabilities) Missing(p *Plan) []string {
 	var missing []string
 	if p.Tun.Enabled && p.Tun.Stack != "" {
-		if (c.Kind == KindXray && p.Tun.Stack != "gvisor") || (c.Kind == KindSingBox && p.Tun.Stack == "mips") {
+		// sing-box 1.15+ ignores the stack option outright (see
+		// tunStackIgnored): an explicit stack would silently do
+		// nothing, so it is reported missing instead.
+		if (c.Kind == KindXray && p.Tun.Stack != "gvisor") ||
+			(c.Kind == KindSingBox && (c.tunStackIgnored || p.Tun.Stack == "mips")) {
 			missing = append(missing, "TUN stack "+p.Tun.Stack)
 		}
 	}

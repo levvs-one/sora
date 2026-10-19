@@ -3,7 +3,9 @@ package ext
 import (
 	"context"
 	"errors"
+	"net/http"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -280,5 +282,131 @@ func TestRegisterReplacesTaskStopsOldLoop(t *testing.T) {
 	case <-cur.ctx.Done():
 		t.Fatal("the replacement task's loop must keep running")
 	default:
+	}
+}
+
+func TestWorkerRunSkipsOverlap(t *testing.T) {
+	s := NewScheduler(nil)
+	m, x := bgPair(t, 30)
+	entered := make(chan struct{})
+	release := make(chan struct{})
+	var calls atomic.Int32
+	run := func(ctx context.Context, env *WorkerEnv) error {
+		if calls.Add(1) == 1 {
+			close(entered)
+			<-release // hold the first run open
+		}
+		return nil
+	}
+	if err := s.Register(m, x, run); err != nil {
+		t.Fatal(err)
+	}
+	task, _ := s.Task(m.ID)
+
+	done := make(chan struct{})
+	go func() { s.runOnce(task); close(done) }()
+	<-entered       // first run is now in flight
+	s.runOnce(task) // must skip, not pile up
+	close(release)
+	<-done
+
+	if calls.Load() != 1 {
+		t.Fatalf("overlapping run executed: calls = %d, want 1", calls.Load())
+	}
+	found := false
+	for _, e := range s.Hub().Log(m.ID).Entries() {
+		if e.Level == LogWarn && strings.Contains(e.Message, "still in flight") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("skipped overlapping run must be logged as a warning")
+	}
+}
+
+func TestWorkerCircuitBreakerStopsAfterConsecutiveFailures(t *testing.T) {
+	s := NewScheduler(nil)
+	m, x := bgPair(t, 30)
+	boom := errors.New("always broken")
+	if err := s.Register(m, x, func(ctx context.Context, env *WorkerEnv) error { return boom }); err != nil {
+		t.Fatal(err)
+	}
+	task, _ := s.Task(m.ID)
+	for i := 0; i < maxConsecutiveWorkerFailures; i++ {
+		s.runOnce(task)
+	}
+	if _, ok := s.Task(m.ID); ok {
+		t.Fatalf("task must be unregistered after %d consecutive failures", maxConsecutiveWorkerFailures)
+	}
+	found := false
+	for _, e := range s.Hub().Log(m.ID).Entries() {
+		if e.Level == LogError && strings.Contains(e.Message, "consecutive failures") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("circuit breaker trip must be logged as an error")
+	}
+}
+
+func TestWorkerFailureCounterResetsOnSuccess(t *testing.T) {
+	s := NewScheduler(nil)
+	m, x := bgPair(t, 30)
+	fail := true
+	if err := s.Register(m, x, func(ctx context.Context, env *WorkerEnv) error {
+		if fail {
+			return errors.New("kaput")
+		}
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	task, _ := s.Task(m.ID)
+	s.runOnce(task) // 1 failure
+	fail = false
+	s.runOnce(task) // success resets the counter
+	if task.fails.Load() != 0 {
+		t.Fatalf("fails = %d after a successful run, want 0", task.fails.Load())
+	}
+	fail = true
+	for i := 0; i < maxConsecutiveWorkerFailures-1; i++ {
+		s.runOnce(task)
+	}
+	if _, ok := s.Task(m.ID); !ok {
+		t.Fatal("task must survive: the counter was reset by the success in the middle")
+	}
+}
+
+func TestSchedulerFetchTransportHook(t *testing.T) {
+	s := NewScheduler(nil)
+	sentinel := &http.Transport{}
+	s.SetFetchTransport(func(extensionID string) http.RoundTripper {
+		if extensionID != "com.example.hello" {
+			t.Errorf("hook got extension %q", extensionID)
+		}
+		return sentinel
+	})
+	m, x := bgPair(t, 30) // bgPair's manifest holds the net.fetch permission
+	if err := s.Register(m, x, okRun); err != nil {
+		t.Fatal(err)
+	}
+	task, _ := s.Task(m.ID)
+	if task.fetcher == nil {
+		t.Fatal("task with the net.fetch permission must own a fetcher")
+	}
+	if task.fetcher.client.Transport != sentinel {
+		t.Fatal("scheduler must wire the configured transport into the worker fetcher")
+	}
+}
+
+func TestSchedulerDefaultFetchTransportIsDirect(t *testing.T) {
+	s := NewScheduler(nil)
+	m, x := bgPair(t, 30)
+	if err := s.Register(m, x, okRun); err != nil {
+		t.Fatal(err)
+	}
+	task, _ := s.Task(m.ID)
+	if task.fetcher.client.Transport != http.DefaultTransport {
+		t.Fatal("without a hook the fetcher must dial direct (dev/test default)")
 	}
 }

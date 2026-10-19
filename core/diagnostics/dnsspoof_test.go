@@ -11,8 +11,8 @@ import (
 
 // spoofResolve builds a fake resolver: answers maps resolver address to
 // the IPs it returns, nx marks the resolvers answering NXDOMAIN.
-func spoofResolve(answers map[string][]string, nx map[string]bool) func(context.Context, string, string) ([]string, error) {
-	return func(ctx context.Context, resolverAddr, host string) ([]string, error) {
+func spoofResolve(answers map[string][]string, nx map[string]bool) func(context.Context, string, string, string) ([]string, error) {
+	return func(ctx context.Context, network, resolverAddr, host string) ([]string, error) {
 		if nx[resolverAddr] {
 			return nil, &net.DNSError{Err: "no such host", Name: host, IsNotFound: true}
 		}
@@ -23,12 +23,12 @@ func spoofResolve(answers map[string][]string, nx map[string]bool) func(context.
 	}
 }
 
-func spoofInput(resolve func(context.Context, string, string) ([]string, error)) diagnostics.SpoofInput {
+func spoofInput(probe func(context.Context, string, string, string) ([]string, error)) diagnostics.SpoofInput {
 	return diagnostics.SpoofInput{
 		Host:            "probe.example",
 		SystemResolvers: []string{"9.9.9.9", "8.8.8.8"},
 		TunnelResolvers: []diagnostics.TunnelResolver{{Address: "10.64.0.1", Transport: "udp"}},
-		Resolve:         resolve,
+		Probe:           probe,
 	}
 }
 

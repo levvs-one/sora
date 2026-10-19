@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/levvs-one/sora-client/core/gen/sora/ext/v1;extv1";
 
-// ExtensionHost is the core-side API for installed extensions. Since 1.10.
+// ExtensionHost is the core-side API for installed extensions.
 //
 // Panels run in a WebView inside the app and talk to the app over a JS
 // bridge. The app forwards the calls an extension is permitted to make to

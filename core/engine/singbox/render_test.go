@@ -102,14 +102,28 @@ func tunInbound(t *testing.T, cfg map[string]any) map[string]any {
 
 // TestTunDropsDeprecatedStack: sing-box 1.15 deprecated `stack` (removed in
 // 1.17); the migration is to drop it and use sing-tun's own fast TCP/IP
-// stack. Even an explicit plan stack must not reach the config.
+// stack. Even an explicit plan stack must not reach the config of a 1.15+
+// build. Older builds (the 1.14-based lx. fork) still need the option: see
+// TestTunStackFollowsEngineVersion.
 func TestTunDropsDeprecatedStack(t *testing.T) {
+	ver, err := engine.ParseVersion("1.15.0")
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, stack := range []string{"", "mixed", "system", "gvisor"} {
 		p := enginetest.Plan(engine.ProtocolVLESS)
 		p.Tun = engine.Tun{Enabled: true, Stack: stack}
-		inbound := tunInbound(t, render(t, p))
+		raw, err := renderVersioned(p, testRuntime, ver)
+		if err != nil {
+			t.Fatalf("renderVersioned: %v", err)
+		}
+		var cfg map[string]any
+		if err := json.Unmarshal(raw, &cfg); err != nil {
+			t.Fatalf("rendered config is not JSON: %v", err)
+		}
+		inbound := tunInbound(t, cfg)
 		if _, ok := inbound["stack"]; ok {
-			t.Fatalf("stack %q: deprecated `stack` must not be rendered, got %v", stack, inbound["stack"])
+			t.Fatalf("stack %q: deprecated `stack` must not be rendered on 1.15+, got %v", stack, inbound["stack"])
 		}
 	}
 }
@@ -639,5 +653,138 @@ func TestDNSSkipVerifyRendersInsecureTLS(t *testing.T) {
 	}
 	if _, ok := byTag["dot"]["tls"]; ok {
 		t.Error("plain dot server must not carry tls options")
+	}
+}
+
+// TestTunStackFollowsEngineVersion locks the 1.15 TUN rewrite handling:
+// sing-box 1.15 deprecated the stack option (removed in 1.17), so the
+// renderer must not emit it there; older builds, including the 1.14-based
+// lx. fork, still honor an explicit stack and keep the "mixed" default.
+// A silent stack change would reroute packets through the wrong TCP/IP
+// stack, so both directions are asserted.
+func TestTunStackFollowsEngineVersion(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		version string // "" means Render's legacy contract: unknown build
+		stack   string
+		want    string // "" means the stack key must be absent
+	}{
+		{"unknown build keeps legacy stack", "", "", "mixed"},
+		{"fork honors explicit stack", "1.14.3-lx.14", "gvisor", "gvisor"},
+		{"fork keeps mixed default", "1.14.3-lx.14", "", "mixed"},
+		{"1.15 drops explicit stack", "1.15.0", "gvisor", ""},
+		{"1.15 drops default stack", "1.15.0", "", ""},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			p := enginetest.Plan(engine.ProtocolVLESS)
+			p.Tun = engine.Tun{Enabled: true, Stack: tc.stack, IPv4: netip.MustParsePrefix("172.20.0.1/30")}
+			ver := engine.Version{}
+			if tc.version != "" {
+				var err error
+				if ver, err = engine.ParseVersion(tc.version); err != nil {
+					t.Fatalf("ParseVersion(%q): %v", tc.version, err)
+				}
+			}
+			raw, err := renderVersioned(p, testRuntime, ver)
+			if err != nil {
+				t.Fatalf("renderVersioned: %v", err)
+			}
+			var cfg map[string]any
+			if err := json.Unmarshal(raw, &cfg); err != nil {
+				t.Fatalf("rendered config is not JSON: %v", err)
+			}
+			var tun map[string]any
+			for _, in := range cfg["inbounds"].([]any) {
+				if in.(map[string]any)["type"] == "tun" {
+					tun = in.(map[string]any)
+				}
+			}
+			if tun == nil {
+				t.Fatal("no tun inbound rendered")
+			}
+			got, ok := tun["stack"]
+			if tc.want == "" {
+				if ok {
+					t.Fatalf("stack = %v on sing-box %q, want the key absent (deprecated)", got, tc.version)
+				}
+				return
+			}
+			if !ok || got != tc.want {
+				t.Fatalf("stack = %v on sing-box %q, want %q", got, tc.version, tc.want)
+			}
+		})
+	}
+}
+
+// TestRenderECHQueryServerName locks the 1.13+ ECH field: a configured
+// override must reach the engine, an empty one must stay unset.
+func TestRenderECHQueryServerName(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolTrojan)
+	p.Outbounds[0].TLS.ECH = engine.ECHConfig{Enabled: true, QueryServerName: "ech-query.example.com"}
+	ech, ok := trojanOutbound(t, render(t, p))["tls"].(map[string]any)["ech"].(map[string]any)
+	if !ok {
+		t.Fatal("tls block must carry ech when ECH is enabled")
+	}
+	if ech["query_server_name"] != "ech-query.example.com" {
+		t.Fatalf("ech.query_server_name = %v, want the configured override", ech["query_server_name"])
+	}
+
+	p.Outbounds[0].TLS.ECH = engine.ECHConfig{Enabled: true}
+	ech, ok = trojanOutbound(t, render(t, p))["tls"].(map[string]any)["ech"].(map[string]any)
+	if !ok {
+		t.Fatal("tls block must carry ech when ECH is enabled")
+	}
+	if _, has := ech["query_server_name"]; has {
+		t.Fatal("ech.query_server_name must stay unset when empty")
+	}
+}
+
+// fakeIPServer extracts the rendered fakeip DNS server.
+func fakeIPServer(t *testing.T, p *engine.Plan) map[string]any {
+	t.Helper()
+	cfg := render(t, p)
+	dns, ok := cfg["dns"].(map[string]any)
+	if !ok {
+		t.Fatal("rendered config has no dns block")
+	}
+	for _, s := range dns["servers"].([]any) {
+		if m, ok := s.(map[string]any); ok && m["tag"] == "fakeip" {
+			return m
+		}
+	}
+	t.Fatal("no fakeip server rendered")
+	return nil
+}
+
+// TestFakeIPRendersIPv6RangeWhenIPv6IsOn locks the mandatory inet6_range:
+// with IPv6 enabled the fakeip server must answer AAAA from its own pool,
+// otherwise IPv6-capable apps stall on resolution.
+func TestFakeIPRendersIPv6RangeWhenIPv6IsOn(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS.Mode = string(engine.DNSFakeIP)
+	p.Options.IPv6 = true
+	srv := fakeIPServer(t, p)
+	if srv["inet6_range"] != "fc00::/18" {
+		t.Fatalf("default inet6_range = %v, want fc00::/18", srv["inet6_range"])
+	}
+	if srv["inet4_range"] != "198.18.0.0/16" {
+		t.Fatalf("inet4_range = %v, want 198.18.0.0/16", srv["inet4_range"])
+	}
+	p.DNS.FakeIPRange6 = "fd00:face::/48"
+	if srv := fakeIPServer(t, p); srv["inet6_range"] != "fd00:face::/48" {
+		t.Fatalf("custom inet6_range = %v, want fd00:face::/48", srv["inet6_range"])
+	}
+}
+
+// TestFakeIPOmitsIPv6RangeWhenIPv6IsOff locks the negative: with IPv6
+// disabled a fake IPv6 pool would hand out unusable addresses, so the
+// server must stay v4-only and AAAA keeps getting NODATA.
+func TestFakeIPOmitsIPv6RangeWhenIPv6IsOff(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS.Mode = string(engine.DNSFakeIP)
+	p.Options.IPv6 = false
+	srv := fakeIPServer(t, p)
+	if _, ok := srv["inet6_range"]; ok {
+		t.Fatalf("inet6_range must be omitted with IPv6 off, got %v", srv["inet6_range"])
 	}
 }

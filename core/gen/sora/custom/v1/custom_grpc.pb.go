@@ -35,9 +35,6 @@ const (
 // control-only), and each request carries the control authenticator plus an
 // API version for the contract check.
 //
-// Since 1.11. Older cores answer these methods with UNIMPLEMENTED; clients
-// must treat that as "custom servers unavailable", not as a failure.
-//
 // Credentials are write-only: SaveCustomServer accepts them, List and the
 // other RPCs never return them, and TestCustomServer never sends them.
 type CustomServersClient interface {
@@ -48,10 +45,7 @@ type CustomServersClient interface {
 	// DeleteCustomServer removes a server together with its stored credentials.
 	DeleteCustomServer(ctx context.Context, in *DeleteCustomServerRequest, opts ...grpc.CallOption) (*DeleteCustomServerResponse, error)
 	// TestCustomServer checks reachability with a TCP handshake and a timeout.
-	// No credentials are sent or returned. The address is resolved with the
-	// system DNS resolver, outside any tunnel: probing a server discloses its
-	// address to the local network, which is expected for a user-initiated
-	// check.
+	// No credentials are sent or returned.
 	TestCustomServer(ctx context.Context, in *TestCustomServerRequest, opts ...grpc.CallOption) (*TestCustomServerResponse, error)
 }
 
@@ -113,9 +107,6 @@ func (c *customServersClient) TestCustomServer(ctx context.Context, in *TestCust
 // control-only), and each request carries the control authenticator plus an
 // API version for the contract check.
 //
-// Since 1.11. Older cores answer these methods with UNIMPLEMENTED; clients
-// must treat that as "custom servers unavailable", not as a failure.
-//
 // Credentials are write-only: SaveCustomServer accepts them, List and the
 // other RPCs never return them, and TestCustomServer never sends them.
 type CustomServersServer interface {
@@ -126,10 +117,7 @@ type CustomServersServer interface {
 	// DeleteCustomServer removes a server together with its stored credentials.
 	DeleteCustomServer(context.Context, *DeleteCustomServerRequest) (*DeleteCustomServerResponse, error)
 	// TestCustomServer checks reachability with a TCP handshake and a timeout.
-	// No credentials are sent or returned. The address is resolved with the
-	// system DNS resolver, outside any tunnel: probing a server discloses its
-	// address to the local network, which is expected for a user-initiated
-	// check.
+	// No credentials are sent or returned.
 	TestCustomServer(context.Context, *TestCustomServerRequest) (*TestCustomServerResponse, error)
 	mustEmbedUnimplementedCustomServersServer()
 }

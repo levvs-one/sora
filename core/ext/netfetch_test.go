@@ -37,11 +37,10 @@ func testTransport(t *testing.T, srv *httptest.Server) *http.Transport {
 func testFetcher(t *testing.T, srv *httptest.Server, hosts []string, limits FetchLimits) *Fetcher {
 	t.Helper()
 	hub := NewLogHub()
-	f, err := NewFetcherForExtension("com.example.hello", &ManifestExt{NetworkHosts: hosts}, limits, hub)
+	f, err := NewFetcherForExtensionWithTransport("com.example.hello", &ManifestExt{NetworkHosts: hosts}, limits, testTransport(t, srv), hub)
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.client.Transport = testTransport(t, srv)
 	return f
 }
 
@@ -333,5 +332,103 @@ func TestFetchRejectsIPLikeHosts(t *testing.T) {
 		if err := f.checkURL(u); err == nil {
 			t.Errorf("checkURL(%q) must reject IP-like host", raw)
 		}
+	}
+}
+
+// roundTripFunc is an http.RoundTripper as a function, for transport
+// injection tests.
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
+
+func TestFetchStats(t *testing.T) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("pong"))
+	}))
+	defer srv.Close()
+	f := testFetcher(t, srv, []string{"api.example.com"}, FetchLimits{})
+
+	if _, err := f.Fetch(context.Background(), FetchRequest{URL: "https://api.example.com/ping"}); err != nil {
+		t.Fatalf("Fetch: %v", err)
+	}
+	if _, err := f.Fetch(context.Background(), FetchRequest{
+		Method: "POST", URL: "https://api.example.com/up", Body: []byte("12345"),
+	}); err != nil {
+		t.Fatalf("Fetch POST: %v", err)
+	}
+	// Denied: off-allowlist host.
+	if _, err := f.Fetch(context.Background(), FetchRequest{URL: "https://evil.example.net/"}); err == nil {
+		t.Fatal("off-allowlist fetch must be denied")
+	}
+
+	st := f.Stats()
+	if st.Requests != 3 {
+		t.Fatalf("Requests = %d, want 3", st.Requests)
+	}
+	if st.Denied != 1 {
+		t.Fatalf("Denied = %d, want 1", st.Denied)
+	}
+	if st.BytesIn != 2*len("pong") {
+		t.Fatalf("BytesIn = %d, want %d", st.BytesIn, 2*len("pong"))
+	}
+	if st.BytesOut != 5 {
+		t.Fatalf("BytesOut = %d, want 5", st.BytesOut)
+	}
+}
+
+func TestFetchDeniedRateLimitCounts(t *testing.T) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	defer srv.Close()
+	f := testFetcher(t, srv, []string{"api.example.com"},
+		FetchLimits{RatePerMinute: 60, RateBurst: 1})
+	if _, err := f.Fetch(context.Background(), FetchRequest{URL: "https://api.example.com/"}); err != nil {
+		t.Fatalf("first fetch: %v", err)
+	}
+	if _, err := f.Fetch(context.Background(), FetchRequest{URL: "https://api.example.com/"}); err == nil {
+		t.Fatal("second fetch must hit the rate limit")
+	}
+	if st := f.Stats(); st.Denied != 1 || st.Requests != 2 {
+		t.Fatalf("bad stats after rate limit: %+v", st)
+	}
+}
+
+func TestFetcherTransportInjection(t *testing.T) {
+	// The injected transport answers without any network: this is the seam
+	// production uses to route extension traffic through the VPN tunnel.
+	var gotHost string
+	rt := roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		gotHost = r.URL.Host
+		return &http.Response{
+			StatusCode: 200,
+			Body:       http.NoBody,
+			Header:     make(http.Header),
+			Request:    r,
+		}, nil
+	})
+	f, err := NewFetcherForExtensionWithTransport("com.example.tun",
+		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, rt, NewLogHub())
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := f.Fetch(context.Background(), FetchRequest{URL: "https://api.example.com/x"})
+	if err != nil {
+		t.Fatalf("Fetch: %v", err)
+	}
+	if resp.Status != 200 {
+		t.Fatalf("status = %d, want 200", resp.Status)
+	}
+	if gotHost != "api.example.com" {
+		t.Fatalf("transport saw host %q, want api.example.com", gotHost)
+	}
+}
+
+func TestFetcherNilTransportDialsDirect(t *testing.T) {
+	f, err := NewFetcherForExtension("com.example.direct",
+		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, NewLogHub())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.client.Transport != http.DefaultTransport {
+		t.Fatal("nil transport must fall back to direct dials (http.DefaultTransport)")
 	}
 }

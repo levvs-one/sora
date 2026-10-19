@@ -25,6 +25,11 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
+// mihomoBridgeMinVersion is the oldest mihomo the Xray TUN bridge accepts.
+// The bridge pairs Xray routing with mihomo's packet path; keep this in
+// sync with the shipped mihomo build (packaging/engines/engines.lock).
+var mihomoBridgeMinVersion = engine.Version{Raw: "1.19.32", Major: 1, Minor: 19, Patch: 32}
+
 // measureFunc times a real request through every outbound with one engine.
 type measureFunc func(ctx context.Context, cfg supervise.Config, outbounds []engine.Outbound, opts engine.MeasureOptions, out chan<- engine.Measurement) error
 
@@ -210,6 +215,17 @@ func (r *Registry) selectPlan(p *engine.Plan, order []engine.Kind) (engine.Selec
 			if candidate.DNS.Mode == string(engine.DNSFakeIP) {
 				candidate.DNS.Mode = "rule"
 			}
+			// The bridge answers client DNS through the packet engine
+			// (which keeps h3); Xray's own leg steps h3 resolvers down
+			// to DoH (see xraytun.plans). Select against what Xray will
+			// actually render, or every h3 plan would be rejected here.
+			// Clone: candidate shares the plan's backing array.
+			candidate.DNS.Servers = slices.Clone(candidate.DNS.Servers)
+			for i, s := range candidate.DNS.Servers {
+				if s.Transport == engine.DNSH3 {
+					candidate.DNS.Servers[i].Transport = engine.DNSHTTPS
+				}
+			}
 		}
 		if _, installed := r.binaries[kind]; installed {
 			key = errs.KeyPlanEngineUnsupported
@@ -225,9 +241,9 @@ func (r *Registry) selectPlan(p *engine.Plan, order []engine.Kind) (engine.Selec
 			if !installed {
 				packetErr = errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
 					"registry: Xray's selected TUN stack needs mihomo in the engines directory")
-			} else if packet.Version.Less(engine.Version{Major: 1, Minor: 19, Patch: 32}) {
+			} else if packet.Version.Less(mihomoBridgeMinVersion) {
 				packetErr = errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanEngineUnsupported,
-					"registry: Xray's selected TUN stack needs mihomo 1.19.32 or newer")
+					"registry: Xray's selected TUN stack needs mihomo %s or newer", mihomoBridgeMinVersion)
 			}
 			if packetErr != nil {
 				selection.Rejected = append(selection.Rejected, packetErr.Error())

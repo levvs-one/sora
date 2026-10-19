@@ -108,8 +108,8 @@ func TestStrategiesAreChecked(t *testing.T) {
 	}
 	for name, s := range map[string]*engine.BypassStrategy{
 		"tamper window": {SplitPos: []string{"1"}, TamperStart: "n2", TamperCutoff: "sniext+200"},
-		"oob byte":     {SplitPos: []string{"1"}, OOB: true, OOBData: "0x00"},
-		"mss only":     {MSS: "1300"},
+		"oob byte":      {SplitPos: []string{"1"}, OOB: true, OOBData: "0x00"},
+		"mss only":      {MSS: "1300"},
 	} {
 		o := engine.Outbound{ID: "z", Protocol: engine.ProtocolBypass, Bypass: s}
 		if err := o.Validate(); err != nil {

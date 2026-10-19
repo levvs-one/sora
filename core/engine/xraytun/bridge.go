@@ -100,6 +100,9 @@ func (e *Engine) Capabilities() engine.Capabilities {
 	caps.Features = maps.Clone(caps.Features)
 	caps.Features[engine.FeatureTun] = e.tun.Capabilities().Supports(engine.FeatureTun)
 	caps.Features[engine.FeatureFakeIP] = e.tun.Capabilities().Supports(engine.FeatureFakeIP)
+	// DNS answers come from the packet engine, so DoH3 follows its
+	// capabilities, not Xray's (which has no H3 DNS transport).
+	caps.Features[engine.FeatureDoH3] = e.tun.Capabilities().Supports(engine.FeatureDoH3)
 	return caps
 }
 
@@ -129,6 +132,17 @@ func (e *Engine) plans(p *engine.Plan) (*engine.Plan, *engine.Plan, error) {
 	// recovered hostname through SOCKS and must not synthesize a second pool.
 	if x.DNS.Mode == string(engine.DNSFakeIP) {
 		x.DNS.Mode = "rule"
+	}
+	// Xray has no DNS-over-HTTP/3 transport. The packet engine answers
+	// client queries, so it keeps h3; Xray's own leg only resolves proxy
+	// hostnames and steps those resolvers down to DoH. Without this an
+	// h3:// resolver fails Xray's Validate and kills the session.
+	// Clone: x shares the plan's backing array through the shallow copy.
+	x.DNS.Servers = slices.Clone(x.DNS.Servers)
+	for i, s := range x.DNS.Servers {
+		if s.Transport == engine.DNSH3 {
+			x.DNS.Servers[i].Transport = engine.DNSHTTPS
+		}
 	}
 	x.Options.AllowLAN = false
 	tun := *p

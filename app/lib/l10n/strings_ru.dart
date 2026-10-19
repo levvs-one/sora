@@ -1485,12 +1485,4 @@ class SRu extends S {
   String get edit => 'Изменить';
   @override
   String get remove => 'Убрать';
-  @override
-  String get autoSwitchOnDegrade => 'Автопереключение при деградации';
-  @override
-  String get autoSwitchOnDegradeDetail => 'Если выбранный сервер перестал отвечать или стал заметно медленнее, Sora переключится на лучший из замеренных — не чаще раза в 10 минут.';
-  @override
-  String get tunStackMixed => 'Смешанный';
-  @override
-  String get tunStackSystem => 'Системный';
 }

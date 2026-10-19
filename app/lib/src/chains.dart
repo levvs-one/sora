@@ -126,6 +126,9 @@ class ChainsStore extends ChangeNotifier {
     if (hops.length < minChainHops) return 'chainTooFew';
     if (hops.length > maxChainHops) return 'chainTooMany';
     if (hops.toSet().length != hops.length) return 'chainDuplicate';
+    // An empty id names no server; without this a hand-built chain could be
+    // saved and only fail later at connect time.
+    if (hops.any((h) => h.isEmpty)) return 'chainHopMissing';
     return null;
   }
 }

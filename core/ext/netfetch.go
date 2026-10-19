@@ -24,6 +24,7 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/levvs-one/sora-client/core/errs"
@@ -136,8 +137,24 @@ func (l *rateLimiter) allow() bool {
 	return true
 }
 
+// FetchStats are the diagnostics counters for one extension's net.fetch.
+// The app surfaces them in the extension details screen next to the log.
+type FetchStats struct {
+	Requests uint64 // Fetch calls, allowed or not
+	Denied   uint64 // requests refused by policy (allowlist, rate limit, sizes)
+	BytesOut uint64 // request body bytes actually sent
+	BytesIn  uint64 // response body bytes actually read
+}
+
 // Fetcher is a per-extension HTTP client bound to that extension's
 // network_hosts allowlist. Use NewFetcherForExtension.
+//
+// The permission is enforced at construction: a Fetcher is only built for
+// an extension that holds "net.fetch", and a nil Fetcher fails closed in
+// WorkerEnv.Fetch. There is deliberately no per-call permission argument —
+// a caller-supplied grant list cannot be a security check. Disabling or
+// uninstalling the extension must unregister its worker (Scheduler), which
+// drops the Fetcher; no live Fetcher means no further requests.
 type Fetcher struct {
 	extID   string
 	allow   []string // normalized patterns from normalizeHostPattern
@@ -145,12 +162,30 @@ type Fetcher struct {
 	hub     *LogHub
 	limiter *rateLimiter
 	client  *http.Client
+
+	statRequests atomic.Uint64
+	statDenied   atomic.Uint64
+	statBytesOut atomic.Uint64
+	statBytesIn  atomic.Uint64
 }
 
 // NewFetcherForExtension builds the fetcher for one extension from its
 // validated v2 manifest fields. x may carry an empty allowlist: every
 // request is then denied (logged), which is the safe default.
+//
+// The transport dials direct. Production code must use
+// NewFetcherForExtensionWithTransport with a tunnel-bound transport (see
+// below); direct dials bypass the VPN.
 func NewFetcherForExtension(extID string, x *ManifestExt, limits FetchLimits, hub *LogHub) (*Fetcher, error) {
+	return NewFetcherForExtensionWithTransport(extID, x, limits, nil, hub)
+}
+
+// NewFetcherForExtensionWithTransport is NewFetcherForExtension with an
+// explicit HTTP transport. rt carries the request end to end: pass a
+// transport bound to the core's tunnel (local proxy / SOCKS5 dialer) so
+// extension traffic follows the VPN and never leaks direct. A nil rt
+// selects direct dials (tests and dev only).
+func NewFetcherForExtensionWithTransport(extID string, x *ManifestExt, limits FetchLimits, rt http.RoundTripper, hub *LogHub) (*Fetcher, error) {
 	if strings.TrimSpace(extID) == "" {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyNetFetchDenied, "ext: net.fetch needs an extension id")
 	}
@@ -169,6 +204,10 @@ func NewFetcherForExtension(extID string, x *ManifestExt, limits FetchLimits, hu
 			allow = append(allow, norm)
 		}
 	}
+	transport := rt
+	if transport == nil {
+		transport = http.DefaultTransport
+	}
 	f := &Fetcher{
 		extID:   extID,
 		allow:   allow,
@@ -179,7 +218,8 @@ func NewFetcherForExtension(extID string, x *ManifestExt, limits FetchLimits, hu
 	// The redirect policy re-validates every hop against the allowlist, so a
 	// 302 cannot smuggle the request off-allowlist.
 	f.client = &http.Client{
-		Timeout: 0, // deadline is enforced per-request via context
+		Transport: transport,
+		Timeout:   0, // deadline is enforced per-request via context
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) >= f.limits.MaxRedirects {
 				return errs.Newf(errs.CodeResourceExhausted, KeyNetFetchFailed,
@@ -192,6 +232,16 @@ func NewFetcherForExtension(extID string, x *ManifestExt, limits FetchLimits, hu
 		},
 	}
 	return f, nil
+}
+
+// Stats returns a snapshot of the fetcher's diagnostics counters.
+func (f *Fetcher) Stats() FetchStats {
+	return FetchStats{
+		Requests: f.statRequests.Load(),
+		Denied:   f.statDenied.Load(),
+		BytesOut: f.statBytesOut.Load(),
+		BytesIn:  f.statBytesIn.Load(),
+	}
 }
 
 // logf writes one audit line to the extension's log.
@@ -210,14 +260,20 @@ func (f *Fetcher) logf(level LogLevel, format string, args ...any) {
 // Fetcher fails closed in WorkerEnv.Fetch. There is deliberately no
 // per-call permission argument — a caller-supplied grant list cannot be a
 // security check.
+//
+// Every request — allowed or denied — is written to the extension's log,
+// which is the audit trail for extension network activity.
 func (f *Fetcher) Fetch(ctx context.Context, req FetchRequest) (*FetchResponse, error) {
+	f.statRequests.Add(1)
 	if !f.limiter.allow() {
+		f.statDenied.Add(1)
 		f.logf(LogWarn, "fetch DENIED %s: rate limit exceeded", safeMethodURL(req))
 		return nil, errs.Newf(errs.CodeResourceExhausted, KeyNetFetchDenied,
 			"ext: net.fetch rate limit exceeded").WithRetry(time.Minute)
 	}
 	u, err := f.parseRequest(req)
 	if err != nil {
+		f.statDenied.Add(1)
 		f.logf(LogWarn, "fetch DENIED %s: %v", safeMethodURL(req), err)
 		return nil, err
 	}
@@ -239,6 +295,7 @@ func (f *Fetcher) Fetch(ctx context.Context, req FetchRequest) (*FetchResponse, 
 		if urlErr, ok := err.(*url.Error); ok && urlErr != nil {
 			if denied, ok := urlErr.Err.(*errs.Error); ok {
 				// A redirect hop failed the allowlist check.
+				f.statDenied.Add(1)
 				f.logf(LogWarn, "fetch DENIED %s: redirect target rejected: %v", safeMethodURL(req), denied)
 				return nil, denied
 			}
@@ -253,10 +310,13 @@ func (f *Fetcher) Fetch(ctx context.Context, req FetchRequest) (*FetchResponse, 
 		return nil, errs.Newf(errs.CodeUnavailable, KeyNetFetchFailed, "ext: net.fetch: %v", shortErr(err))
 	}
 	if int64(len(body)) > f.limits.MaxResponseBody {
+		f.statDenied.Add(1)
 		f.logf(LogWarn, "fetch DENIED %s: response exceeds %d bytes", safeMethodURL(req), f.limits.MaxResponseBody)
 		return nil, errs.Newf(errs.CodeResourceExhausted, KeyNetFetchFailed,
 			"ext: net.fetch: response exceeds %d bytes", f.limits.MaxResponseBody)
 	}
+	f.statBytesOut.Add(uint64(len(req.Body)))
+	f.statBytesIn.Add(uint64(len(body)))
 	f.logf(LogInfo, "fetch %s -> %d (%d bytes)", safeMethodURL(req), resp.StatusCode, len(body))
 	return &FetchResponse{Status: resp.StatusCode, Headers: resp.Header.Clone(), Body: body}, nil
 }

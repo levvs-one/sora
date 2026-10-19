@@ -41,3 +41,36 @@ func TestBridgeDoesNotSilentlyDiscardProcessRouting(t *testing.T) {
 		}
 	}
 }
+
+// TestBridgeDowngradesDoH3ForTheXrayLeg locks the h3 split: the packet
+// engine keeps answering client queries over HTTP/3, while Xray's own
+// leg (proxy hostnames only) steps down to DoH — Xray has no H3 DNS
+// transport and would fail Validate on h3:// otherwise. The original
+// plan must stay untouched.
+func TestBridgeDowngradesDoH3ForTheXrayLeg(t *testing.T) {
+	e := &Engine{port: 12345, password: "test-private-password", xrayName: "xray"}
+	p := &engine.Plan{SessionID: "bridge-doh3",
+		Outbounds: []engine.Outbound{{ID: "out", Protocol: engine.ProtocolDirect}},
+		Tun:       engine.Tun{Enabled: true, Stack: "mixed"},
+		DNS: engine.DNS{Enabled: true, Servers: []engine.DNSServer{
+			{Tag: "dns-1", Transport: engine.DNSH3, Address: "1.1.1.1"},
+			{Tag: "dns-2", Transport: engine.DNSHTTPS, Address: "8.8.8.8"},
+		}},
+		Rules: []engine.Rule{{Type: engine.RuleMatchAll, Target: "out"}}}
+	x, packet, err := e.plans(p)
+	if err != nil {
+		t.Fatalf("plans: %v", err)
+	}
+	if got := x.DNS.Servers[0].Transport; got != engine.DNSHTTPS {
+		t.Fatalf("xray leg transport = %q, want https (downgraded from h3)", got)
+	}
+	if got := x.DNS.Servers[1].Transport; got != engine.DNSHTTPS {
+		t.Fatalf("xray leg must leave https alone, got %q", got)
+	}
+	if got := packet.DNS.Servers[0].Transport; got != engine.DNSH3 {
+		t.Fatalf("packet-engine leg transport = %q, want h3 (kept)", got)
+	}
+	if p.DNS.Servers[0].Transport != engine.DNSH3 {
+		t.Fatal("plans() mutated the caller's plan: h3 downgrade leaked out")
+	}
+}

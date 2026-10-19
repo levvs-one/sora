@@ -1,6 +1,10 @@
-// Package bypass runs zapret tpws to reshape direct TLS and HTTP handshakes
-// against DPI. It shares one loopback SOCKS5 proxy per strategy and rewrites
-// bypass outbounds to SOCKS5, supporting all engines, rules, and groups.
+// Package bypass runs zapret to reshape direct TLS, HTTP and QUIC
+// handshakes against DPI. Legacy strategies run on tpws, one loopback
+// SOCKS5 proxy per strategy, with bypass outbounds rewritten to SOCKS5;
+// strategies with desync methods need the nfqws backend (fake packets,
+// autottl, UDP/QUIC desync), which requires packet interception and is
+// not wired up yet — such strategies fail closed (see
+// NFQWS-MIGRATION.md). Supports all engines, rules, and groups.
 package bypass
 
 import (
