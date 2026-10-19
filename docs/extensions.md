@@ -93,6 +93,10 @@ Rules:
   (`string`, `integer`, `number`, `boolean`; optional `enum`, `minimum`,
   `maximum`, `minLength`, `maxLength`, `default`). The app auto-generates the
   settings form from it.
+- `background_task`, `network_hosts`: optional v2-runtime keys, see §7.
+  Manifest version stays `1`: they are additive, and old manifests without
+  them parse exactly as before. Unknown keys — including unknown keys
+  *inside* `background_task` — are still rejected.
 
 ## 3. Permissions (v1 registry)
 
@@ -197,3 +201,69 @@ the normal package verification.
   catalog checks fail closed until then.
 - Revocation: removing an entry from the catalog stops new installs; the app
   can additionally blocklist ids (wave 4: OCSP-style revocation list).
+
+## 7. Background workers & net.fetch (runtime v2)
+
+Manifest version stays `1`: these are additive optional keys parsed by
+`ParseManifestFull` (`core/ext/manifest_v1ext.go`); the frozen v1 decoder is
+untouched.
+
+```json
+{
+  "manifest_version": 1,
+  "id": "com.example.syncer",
+  "...": "...",
+  "capabilities": ["background"],
+  "permissions": ["background", "net.fetch"],
+  "background_task": {"interval_minutes": 60, "entry": "worker.js"},
+  "network_hosts": ["api.example.com", "*.cdn.example.com"]
+}
+```
+
+### 7.1 background_task
+
+Declares one periodic background task. Requires the `background`
+capability **and** the `background` permission; without either the manifest
+is rejected.
+
+- `interval_minutes`: desired period in whole minutes, 1..10080 (7 days).
+  The runtime **clamps** the effective interval into [15 min, 7 days]:
+  a manifest asking for 1 minute runs every 15 minutes. The 15-minute
+  floor keeps a buggy or hostile extension from hot-looping the device.
+- `entry`: the worker script inside the package — a relative `.js` path,
+  no traversal.
+
+The worker runs in a deliberately small environment (`WorkerEnv`): it can
+append to the extension log and — only when the extension also holds
+`net.fetch` — make allowlisted HTTP requests through its own `Fetcher`.
+No filesystem, no process control, no raw sockets. (The app-side JS runner
+executes `entry` inside this envelope; the Go `WorkerFunc` is the seam
+where the host plugs that runner in.)
+
+Every run's outcome — ok, failed, or panicked (recovered) — is written to
+the extension log, which the app shows in the extension details screen.
+
+### 7.2 network_hosts — the net.fetch allowlist
+
+Host allowlist for `net.fetch`. Requires the `net.fetch` permission (named
+`network` in the wave-4 plan; the v1 permission registry already reserves
+`net.fetch` for exactly this, so no new permission was added).
+
+- Entries are lowercase DNS names (`api.example.com`) or wildcards
+  (`*.example.com`). Max 64 entries, no duplicates, no IP literals, no
+  schemes/ports/paths.
+- Matching is strict: `api.example.com` matches **only itself** —
+  `sub.api.example.com` is denied. `*.example.com` matches subdomains
+  (`a.b.example.com`) but **not** the bare `example.com`, and not
+  lookalikes (`evilexample.com`).
+
+Host-side enforcement (`core/ext/netfetch.go`):
+
+- https only; no userinfo; no IP-literal hosts; no explicit ports;
+- redirects are re-checked against the allowlist (max 3 hops) — a 302
+  cannot smuggle the request off-allowlist;
+- limits: 30 s timeout, request body ≤ 1 MiB, response ≤ 8 MiB,
+  30 req/min sustained with burst 10, per extension;
+- **every** request — allowed or denied — is written to the extension
+  log: timestamp, method, URL, decision, status/bytes. It is the audit
+  trail for extension network activity.

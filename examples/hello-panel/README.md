@@ -6,7 +6,7 @@ API (`window.soraExt`). Install it from the Extensions section with
 
 Files:
 
-- `sora-extension.json` — manifest v1 (see `docs/extensions/manifest-v1.md`)
+- `sora-extension.json` — manifest v1 (see `docs/extensions.md`)
 - `panel.html` — the panel; uses only `window.soraExt`, no network
 - `checksums.txt` — sha256 of every content file
 - `signature.minisig` — minisign signature over `checksums.txt`
