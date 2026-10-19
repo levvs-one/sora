@@ -129,6 +129,29 @@ type Measurement struct {
 	Err        error
 }
 
+// BandwidthOptions controls a throughput benchmark through engines.
+type BandwidthOptions struct {
+	// URL is the download target; it should support range requests.
+	URL string
+	// Duration caps one server's measurement.
+	Duration time.Duration
+	// Timeout caps one server's whole attempt, including engine startup.
+	Timeout time.Duration
+	// Concurrency bounds parallel downloads through one server.
+	Concurrency int
+	// Engines is the preference order; empty uses the core default.
+	Engines []Kind
+}
+
+// BandwidthResult records measured download goodput through an engine.
+// ErrNoEngine indicates an unsupported outbound.
+type BandwidthResult struct {
+	OutboundID  string
+	Engine      Kind
+	BytesPerSec uint64
+	Err         error
+}
+
 // Connection describes a live session connection. Host is the requested name
 // when available, otherwise an address.
 type Connection struct {
