@@ -26,12 +26,31 @@ func sequence(values ...string) func() string {
 }
 
 func TestNetworkWatchSeesAnotherNetworkAndAReturn(t *testing.T) {
-	w := newNetworkWatch(sequence("wifi-a", "wifi-a", "wifi-b", "", "wifi-b"), time.Hour)
+	// A move counts only after two consecutive polls agree on it.
+	w := newNetworkWatch(sequence("wifi-a", "wifi-a", "wifi-b", "wifi-b", "wifi-b"), time.Hour)
 	var got []string
 	for range 4 {
 		got = append(got, w.changed())
 	}
-	want := []string{"", "the network changed", "", "the network changed"}
+	want := []string{"", "", "the network changed", ""}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("look %d = %q, want %q", i+1, got[i], want[i])
+		}
+	}
+}
+
+// TestNetworkWatchDebouncesAFlappingInterface locks SORA-M11: a transient
+// fingerprint that flips back before confirmation must not renew
+// connections.
+func TestNetworkWatchDebouncesAFlappingInterface(t *testing.T) {
+	w := newNetworkWatch(sequence("a", "b", "a", "b", "b"), time.Hour)
+	var got []string
+	for range 4 {
+		got = append(got, w.changed())
+	}
+	// b, a, b: none confirmed. The final b,b pair confirms the move.
+	want := []string{"", "", "", "the network changed"}
 	for i := range want {
 		if got[i] != want[i] {
 			t.Errorf("look %d = %q, want %q", i+1, got[i], want[i])

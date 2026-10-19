@@ -62,6 +62,10 @@ type networkWatch struct {
 	probe    func() string
 	interval time.Duration
 	last     string
+	// pending holds a fingerprint change until a second consecutive
+	// measurement confirms it, so flapping interfaces do not renew
+	// connections on every poll.
+	pending string
 	// Keep wall and monotonic observations separately to detect suspend
 	// gaps.
 	lastWall, lastMono time.Time
@@ -77,6 +81,9 @@ func newNetworkWatch(probe func() string, interval time.Duration) *networkWatch 
 }
 
 // changed reports why the session should renew its connections, or "".
+// A network move is reported only after two consecutive polls agree on the
+// new fingerprint, debouncing flapping interfaces (SORA-M11). Waking from
+// sleep is reported immediately: the old path is certainly dead.
 func (w *networkWatch) changed() string {
 	now := time.Now()
 	// The monotonic clock stops while the machine sleeps and the wall clock
@@ -85,14 +92,22 @@ func (w *networkWatch) changed() string {
 	w.lastWall, w.lastMono = now.Round(0), now
 	current := w.probe()
 	moved := current != w.last && current != ""
-	w.last = current
 	switch {
 	case slept:
+		w.last, w.pending = current, ""
 		return "the machine woke from sleep"
 	case moved:
-		return "the network changed"
+		if w.pending == current {
+			w.last, w.pending = current, ""
+			return "the network changed"
+		}
+		w.pending = current
+		return ""
+	default:
+		w.pending = ""
+		w.last = current
+		return ""
 	}
-	return ""
 }
 
 // renewConnections closes stale network flows so applications reconnect
