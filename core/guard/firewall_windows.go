@@ -7,6 +7,7 @@ import (
 	"net/netip"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/tailscale/wf"
@@ -254,6 +255,13 @@ func (w *WFP) executables() ([]string, error) {
 		return nil, err
 	}
 	files := []string{self}
+	// An empty enginesDir would turn the glob into "*.exe" and permit
+	// arbitrary executables from the working directory: fail closed
+	// instead (SORA-L20).
+	if strings.TrimSpace(w.enginesDir) == "" {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyGuardFirewallFail,
+			"wfp: the engines directory is not set")
+	}
 	engines, err := filepath.Glob(filepath.Join(w.enginesDir, "*.exe"))
 	if err != nil {
 		return nil, err
