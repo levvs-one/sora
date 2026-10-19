@@ -25,6 +25,9 @@ class _ChainsScreenState extends State<ChainsScreen> {
     final sora = SoraScope.read(context);
     try {
       await sora.connectChain(chain);
+      // A later identical failure must surface again; without this the
+      // failure pipeline would suppress it as a duplicate forever.
+      sora.recovered('chain-connect');
     } catch (error) {
       sora.reportFailure(error, source: 'chain-connect');
     }
@@ -158,6 +161,7 @@ class _ServerPickRow extends StatelessWidget {
     return Tile(
       title: name,
       detail: detail,
+      selected: selected,
       trailing: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(color: selected ? palette.ink : palette.ink3),
