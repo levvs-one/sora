@@ -53,11 +53,6 @@ type Prober struct {
 	// requests bounds concurrent calls so one-endpoint floods cannot create
 	// an unbounded queue.
 	requests chan struct{}
-	// freeze is the optional passive freeze detector; freezeInFlight
-	// counts in-flight TLS handshakes per SNI for it.
-	freeze         *FreezeDetector
-	freezeMu       sync.Mutex
-	freezeInFlight map[string]int
 }
 
 // MaxConcurrentRequests bounds how many measurements a prober runs at once.
@@ -79,45 +74,6 @@ func New(cfg Config) *Prober {
 		slots:       make(chan struct{}, cfg.Concurrency),
 		requests:    make(chan struct{}, MaxConcurrentRequests),
 	}
-}
-
-// SetFreezeDetector attaches the passive freeze detector: every TLS dial
-// this prober runs is observed with its per-SNI in-flight handshake count,
-// so the "parallel handshakes stall while sequential ones succeed" pattern
-// becomes visible without an active probe. Nil detaches. Safe for
-// concurrent use; swaps are not synchronized with in-flight dials, so
-// attach once at setup.
-func (p *Prober) SetFreezeDetector(d *FreezeDetector) {
-	p.freezeMu.Lock()
-	defer p.freezeMu.Unlock()
-	p.freeze = d
-}
-
-// freezeBegin counts one more in-flight handshake for sni. It returns nil
-// when no detector is attached, and freezeEnd is a no-op for nil.
-func (p *Prober) freezeBegin(sni string) (*FreezeDetector, int) {
-	p.freezeMu.Lock()
-	defer p.freezeMu.Unlock()
-	if p.freeze == nil {
-		return nil, 0
-	}
-	if p.freezeInFlight == nil {
-		p.freezeInFlight = map[string]int{}
-	}
-	p.freezeInFlight[sni]++
-	return p.freeze, p.freezeInFlight[sni]
-}
-
-// freezeEnd records the handshake outcome and releases the in-flight slot.
-// The raw dial error is classified here, before errs.From redacts it.
-func (p *Prober) freezeEnd(d *FreezeDetector, sni string, inflight int, err error) {
-	if d == nil {
-		return
-	}
-	p.freezeMu.Lock()
-	p.freezeInFlight[sni]--
-	p.freezeMu.Unlock()
-	d.ObserveFailure(sni, inflight, err, true)
 }
 
 // Probe streams one result per endpoint in completion order, then closes the
@@ -213,19 +169,11 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 	}
 	// Include TLS in the measurement to distinguish certificate failures
 	// from TCP reachability. The context cancels stalled handshakes.
-	sni := p.serverName
-	if sni == "" {
-		sni = host
-	}
-	freeze, inflight := p.freezeBegin(sni)
 	dialer := &tls.Dialer{
 		NetDialer: &net.Dialer{Timeout: timeout},
 		Config:    p.tlsConfig(host),
 	}
 	connection, err := dialer.DialContext(ctx, "tcp", address)
-	// freezeEnd classifies the raw error before errs.From redacts the
-	// operation; the phase signal does not survive wrapping.
-	p.freezeEnd(freeze, sni, inflight, err)
 	if err != nil {
 		return 0, errs.From(err)
 	}

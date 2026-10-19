@@ -42,13 +42,8 @@ const (
 	// historyTTL marks entries older than this as stale; readers decide how
 	// to display them.
 	historyTTL = 24 * time.Hour
-	// historyPruneAfter bounds restart persistence: entries older than
-	// this are dropped on load. Twice the TTL is safe because no scorer
-	// can use them (freshness decays to zero at the TTL) and the 24h
-	// stale rule for display is unchanged.
-	historyPruneAfter = 2 * historyTTL
-	historyDir        = "probe"
-	historyFile       = "history.json"
+	historyDir = "probe"
+	historyFile = "history.json"
 	// historySaveInterval bounds disk writes: a probe sweep records one
 	// latency per endpoint, and persisting the whole map per result would
 	// rewrite the file hundreds of times in a burst. The in-memory history
@@ -388,9 +383,6 @@ func (b *Benchmarker) recordBandwidth(serverID string, bps uint64, _ engine.Kind
 }
 
 // RecordLatency stores a latency probe result, keeping any known throughput.
-// A latency probe is a fresh measurement of the server, so it refreshes the
-// entry timestamp exactly like recordBandwidth does: freshness must reflect
-// the newest data of either kind, not just the newest bandwidth run.
 func (b *Benchmarker) RecordLatency(serverID string, latency time.Duration) {
 	if serverID == "" {
 		return
@@ -402,6 +394,8 @@ func (b *Benchmarker) RecordLatency(serverID string, latency time.Duration) {
 	ms := latency.Milliseconds()
 	if ms >= 0 && ms < 1<<32 {
 		e.LatencyMs = uint32(ms)
+	}
+	if e.MeasuredAt.IsZero() {
 		e.MeasuredAt = b.now()
 	}
 	b.history[serverID] = e
@@ -443,11 +437,7 @@ func (b *Benchmarker) loadHistory() {
 	if err := json.Unmarshal(raw, &stored); err != nil {
 		return // Corrupt history is dropped, never fatal.
 	}
-	now := b.now()
 	for id, e := range stored {
-		if now.Sub(e.MeasuredAt) > historyPruneAfter {
-			continue
-		}
 		e.ServerID = id
 		b.history[id] = e
 	}
