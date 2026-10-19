@@ -107,19 +107,33 @@ jobs:
       # The renderer must produce configs the pinned engine build accepts.
       # This gates the opt-in sing-box check suite (TestEngineAcceptsRenderedPlans)
       # on the pinned sing-box-lx build from packaging/engines/engines.lock.
+      # The build is cached by the lock-file digest: the ~30 MB download runs
+      # only when the pin changes; the SHA-256 pin below still guards the
+      # content on a cache miss.
+      - name: Restore pinned sing-box build
+        id: singbox-cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/sing-box-lx
+          key: sing-box-lx-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('packaging/engines/engines.lock') }}
       - name: Validate rendered configs with sing-box check
         run: |
           set -euo pipefail
-          line=$(grep -E '^sing-box[[:space:]]+amd64[[:space:]]' ../packaging/engines/engines.lock)
-          digest=$(printf '%s\n' "$line" | awk '{print $3}')
-          url=$(printf '%s\n' "$line" | awk '{print $4}')
-          archive="$RUNNER_TEMP/sing-box-lx.tar.gz"
-          curl -sSfL -o "$archive" "$url"
-          printf '%s  %s\n' "$digest" "$(basename "$archive")" > "$archive.sha256"
-          (cd "$RUNNER_TEMP" && sha256sum -c "$archive.sha256")
-          mkdir -p "$RUNNER_TEMP/sing-box-lx"
-          tar -xzf "$archive" -C "$RUNNER_TEMP/sing-box-lx"
-          binary=$(find "$RUNNER_TEMP/sing-box-lx" -name sing-box -type f | head -n 1)
+          dest="$RUNNER_TEMP/sing-box-lx"
+          if [ "${{ steps.singbox-cache.outputs.cache-hit }}" != 'true' ]; then
+            line=$(grep -E '^sing-box[[:space:]]+amd64[[:space:]]' ../packaging/engines/engines.lock)
+            digest=$(printf '%s\n' "$line" | awk '{print $3}')
+            url=$(printf '%s\n' "$line" | awk '{print $4}')
+            archive="$RUNNER_TEMP/sing-box-lx.tar.gz"
+            curl -sSfL -o "$archive" "$url"
+            printf '%s  %s\n' "$digest" "$(basename "$archive")" > "$archive.sha256"
+            (cd "$RUNNER_TEMP" && sha256sum -c "$archive.sha256")
+            rm -rf "$dest"
+            mkdir -p "$dest"
+            tar -xzf "$archive" -C "$dest"
+            rm -f "$archive" "$archive.sha256"
+          fi
+          binary=$(find "$dest" -name sing-box -type f | head -n 1)
           SORA_SINGBOX_BIN="$binary" go test -race -run '^TestEngineAcceptsRenderedPlans$' ./engine/singbox/
       - name: Real packet capture in a private network
         run: |
