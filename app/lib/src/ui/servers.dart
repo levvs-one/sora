@@ -146,7 +146,14 @@ class _ServersScreenState extends State<ServersScreen> {
           child: Padding(
             padding: const EdgeInsets.all(4),
             child: sora.servers.isNotEmpty
-                ? _ServerRow(id: 'auto', name: s.serverAuto)
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _ServerRow(id: 'auto', name: s.serverAuto),
+                      if (sora.selected == 'auto' && sora.settings.autoSelectMode == 'smart') const _SmartPickBadge(),
+                    ],
+                  )
                 : Tile(
                     title: s.addSubscription,
                     onTap: () => showSubscriptionSheet(context),
@@ -334,6 +341,7 @@ class _ServerRow extends StatelessWidget {
     final ms = sora.latency[measuredId];
     final bps = sora.freshBandwidth(measuredId);
     final staleBps = bps == null ? sora.bandwidth[measuredId]?.bps : null;
+    final reliability = sora.reliabilityOf(measuredId);
     final group = entry;
     final detail = group?.members.map(protocolLine).toSet().join(' | ');
     return Semantics(
@@ -386,14 +394,26 @@ class _ServerRow extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          !measured
-                              ? ''
-                              : ms == null
-                              ? s.noAnswer
-                              : s.milliseconds(ms),
-                          textAlign: TextAlign.right,
-                          style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (reliability != null) ...[
+                              Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: _ReliabilityDot(value: reliability),
+                              ),
+                              const SizedBox(width: 3),
+                            ],
+                            Text(
+                              !measured
+                                  ? ''
+                                  : ms == null
+                                  ? s.noAnswer
+                                  : s.milliseconds(ms),
+                              textAlign: TextAlign.right,
+                              style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                            ),
+                          ],
                         ),
                         if (bps != null || staleBps != null)
                           Text(
@@ -411,6 +431,69 @@ class _ServerRow extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Unobtrusive probe-reliability dot next to the ping: solid for steady
+/// servers, muted for middling ones, danger for flaky ones. The tooltip and
+/// semantics name the number; there is nothing to show without probe data.
+class _ReliabilityDot extends StatelessWidget {
+  const _ReliabilityDot({required this.value});
+
+  /// Share of recent probes the server answered, 0..1.
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    final label = S.of(context).serverReliability((value * 100).round());
+    final color = value >= 0.8 ? palette.ink : value >= 0.5 ? palette.ink3 : palette.danger;
+    return Semantics(
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+        ),
+      ),
+    );
+  }
+}
+
+/// Explains the smart auto-select pick: which metrics chose the server.
+/// Shown under the automatic row only when the user picked automatic + smart
+/// mode; [Sora.smartPick] returns null while nothing is measured, and the
+/// badge hides itself then.
+class _SmartPickBadge extends StatelessWidget {
+  const _SmartPickBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final sora = SoraScope.of(context);
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    final pick = sora.smartPick();
+    if (pick == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 2, 12, 10),
+      child: Row(
+        children: [
+          Icon(Symbols.auto_awesome_rounded, size: 14, color: palette.ink3),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              s.smartPickReason(
+                pick.ms == null ? s.noAnswer : s.milliseconds(pick.ms!),
+                pick.bps == null ? s.noAnswer : s.speedMbps(pick.bps! / 1000000),
+              ),
+              style: Styles.caption.copyWith(color: palette.ink2),
+            ),
+          ),
+        ],
       ),
     );
   }

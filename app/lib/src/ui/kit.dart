@@ -375,9 +375,12 @@ class Tile extends StatelessWidget {
 
 /// A switch row that toggles when any part of the row is tapped.
 class SwitchTile extends StatelessWidget {
-  const SwitchTile({super.key, required this.title, required this.value, required this.onChanged});
+  const SwitchTile({super.key, required this.title, this.detail, required this.value, required this.onChanged});
 
   final String title;
+
+  /// Honest one-line explanation shown under the title, e.g. a throttle bound.
+  final String? detail;
   final bool value;
   final ValueChanged<bool>? onChanged;
 
@@ -386,6 +389,7 @@ class SwitchTile extends StatelessWidget {
     final palette = Palette.of(context);
     return Tile(
       title: title,
+      detail: detail,
       onTap: onChanged == null ? null : () => onChanged!(!value),
       trailing: CupertinoSwitch(
         value: value,
