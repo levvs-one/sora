@@ -410,6 +410,7 @@ class Sora extends ChangeNotifier {
     latency: latency,
     bandwidth: bandwidth,
     entry: selected.startsWith(groupPrefix) ? entryOf(selected, _subscriptions.values) : null,
+    zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
   );
 
   @override
@@ -747,6 +748,12 @@ class Sora extends ChangeNotifier {
   Future<void> restoreCrashedSession() async {
     final choice = _pendingRestore;
     _clearSessionIntent();
+    if (choice != null && choice.startsWith('chain:')) {
+      final chain = chains.chains.where((c) => c.id == choice.substring(6)).firstOrNull;
+      notifyListeners();
+      if (chain != null) await connectChain(chain);
+      return;
+    }
     if (choice != null && choice != 'auto' && choice != 'bypass') settings.server = choice;
     notifyListeners();
     await connect();
@@ -888,13 +895,20 @@ class Sora extends ChangeNotifier {
     }
   }
 
-  /// Connects through a proxy chain (F8).
-  ///
-  /// The Go plan builder does not accept chains yet (F8 backend pending), so
-  /// connecting reports an honest, localized failure for now instead of a
-  /// raw error. Chain building, validation and management are fully usable.
+  /// Connects through a proxy chain (F8). The chain backend landed with core
+  /// API 1.10; older cores and engines without the chains capability get an
+  /// honest, localized failure instead of a silent misconnect.
   Future<void> connectChain(ProxyChain chain) async {
-    throw const CoreFailure('chainUnsupported');
+    if (!chainsSupported) {
+      throw const CoreFailure('chainUnsupported');
+    }
+    final error = ProxyChain.validateHops(chain.hops);
+    if (error != null) throw CoreFailure(error);
+    final missing = [for (final id in chain.hops) if (!servers.any((o) => o.id == id)) id];
+    if (missing.isNotEmpty) {
+      throw const CoreFailure('chainHopMissing');
+    }
+    await connect(via: chain);
   }
 
   Future<void> toggle() async {
@@ -911,7 +925,7 @@ class Sora extends ChangeNotifier {
 
   /// Connects using the current selection and settings. [retry] preserves the
   /// remaining attempt count during profile-group failover.
-  Future<void> connect({bool retry = false}) async {
+  Future<void> connect({bool retry = false, ProxyChain? via}) async {
     if (_disposed || updateBlocked || busy || _stopping) return;
     if (cleanupPending) {
       await disconnect();
@@ -934,8 +948,26 @@ class Sora extends ChangeNotifier {
     }
     final choice = selected;
     final entry = choice.startsWith(groupPrefix) ? entryOf(choice, _subscriptions.values) : null;
-    final plan = currentPlan;
+    final plan = via == null
+        ? currentPlan
+        : buildPlan(
+            servers: servers,
+            choice: 'auto',
+            settings: settings,
+            latency: latency,
+            bandwidth: bandwidth,
+            chain: via.hops,
+            zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
+          );
     if (plan.tunStack.isNotEmpty && link.minor < 7) {
+      failure = const CoreFailure('core.api.version_mismatch');
+      _emit(ConnectionFailed(failure!));
+      notifyListeners();
+      return;
+    }
+    // Chains and zapret-with-VPN need core API 1.10; an older core would
+    // silently ignore the fields and connect without them.
+    if ((plan.chain.isNotEmpty || plan.zapretWithVpn) && link.minor < 10) {
       failure = const CoreFailure('core.api.version_mismatch');
       _emit(ConnectionFailed(failure!));
       notifyListeners();
@@ -958,7 +990,9 @@ class Sora extends ChangeNotifier {
     final work = _connectionWork = Completer<void>();
     phase = Phase.connecting;
     // Remember the intent so a crash can offer to restore the session (F7).
-    _writeSessionIntent(choice);
+    // Chain connects are recorded by chain id and restored through
+    // connectChain rather than the server selector.
+    _writeSessionIntent(via == null ? choice : 'chain:${via.id}');
     notifyListeners();
     // Include events emitted during these requests, before the watch opens.
     final started = DateTime.now();
@@ -1498,6 +1532,8 @@ SessionPlan buildPlan({
   Map<String, int?> latency = const {},
   Map<String, ({int bps, DateTime at})> bandwidth = const {},
   Entry? entry,
+  List<String> chain = const [],
+  bool zapretWithVpn = false,
 }) {
   final plan = SessionPlan(
     tunnelMode: settings.tunnel == 'proxy' ? TunnelMode.TUNNEL_MODE_APPLICATION : TunnelMode.TUNNEL_MODE_SYSTEM,
@@ -1531,6 +1567,24 @@ SessionPlan buildPlan({
       };
       plan.routes.add(RoutingRule(destination: rule.destination, outboundId: target));
     }
+  }
+
+  // F11: zapret's tpws alongside the VPN tunnel (Linux only, needs tpws in
+  // the engines directory); never in serverless bypass mode.
+  if (zapretWithVpn && choice != 'bypass') {
+    plan.zapretWithVpn = true;
+  }
+
+  // F8: a proxy chain carries its hop outbounds and the ordered hop ids; the
+  // core renders each hop to dial through the next one. Traffic enters the
+  // first hop, so it becomes the routing target.
+  if (chain.isNotEmpty) {
+    final hops = [for (final id in chain) servers.firstWhere((o) => o.id == id)];
+    plan.outbounds.addAll(hops);
+    plan.chain.addAll(chain);
+    plan.routing.proxyTarget = chain.first;
+    addRules(chain.first);
+    return plan;
   }
 
   if (choice == 'bypass') {

@@ -1342,6 +1342,9 @@ Find one in the catalog or install from a file.';
   String get chainUnsupported => 'The current engine cannot build chains';
 
   @override
+  String get chainHopMissing => 'One of the chain servers is no longer available';
+
+  @override
   String chainHop(String n) => 'Hop ${n}';
 
   @override

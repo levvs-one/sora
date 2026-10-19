@@ -2118,6 +2118,9 @@ abstract class S {
   /// **'The current engine cannot build chains'**
   String get chainUnsupported;
 
+  /// **'One of the chain servers is no longer available'**
+  String get chainHopMissing;
+
   /// No description provided for @chainHop.
   ///
   /// In en, this message translates to:

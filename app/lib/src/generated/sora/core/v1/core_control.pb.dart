@@ -691,6 +691,9 @@ class SessionPlan extends $pb.GeneratedMessage {
     RoutingOptions? routing,
     $core.bool? ipv6,
     $core.String? tunStack,
+    $core.Iterable<$core.String>? chain,
+    $core.bool? zapretWithVpn,
+    BypassStrategy? zapretStrategy,
   }) {
     final result = SessionPlan._();
     if (tunnelMode != null) result.tunnelMode = tunnelMode;
@@ -707,6 +710,9 @@ class SessionPlan extends $pb.GeneratedMessage {
     if (routing != null) result.routing = routing;
     if (ipv6 != null) result.ipv6 = ipv6;
     if (tunStack != null) result.tunStack = tunStack;
+    if (chain != null) result.chain.addAll(chain);
+    if (zapretWithVpn != null) result.zapretWithVpn = zapretWithVpn;
+    if (zapretStrategy != null) result.zapretStrategy = zapretStrategy;
     return result;
   }
 
@@ -735,6 +741,10 @@ class SessionPlan extends $pb.GeneratedMessage {
     ..aOM<RoutingOptions>(12, _omitFieldNames ? '' : 'routing', subBuilder: RoutingOptions.$_createMessage)
     ..aOB(13, _omitFieldNames ? '' : 'ipv6')
     ..aOS(14, _omitFieldNames ? '' : 'tunStack')
+    ..pPS(15, _omitFieldNames ? '' : 'chain')
+    ..aOB(16, _omitFieldNames ? '' : 'zapretWithVpn')
+    ..aOM<BypassStrategy>(
+        17, _omitFieldNames ? '' : 'zapretStrategy', subBuilder: BypassStrategy.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -886,6 +896,33 @@ class SessionPlan extends $pb.GeneratedMessage {
   $core.bool hasTunStack() => $_has(13);
   @$pb.TagNumber(14)
   void clearTunStack() => $_clearField(14);
+
+  /// Since 1.10. Ordered server ids forming a proxy chain.
+  @$pb.TagNumber(15)
+  $pb.PbList<$core.String> get chain => $_getList(14);
+
+  /// Since 1.10. Runs zapret's tpws alongside the VPN tunnel. Linux only.
+  @$pb.TagNumber(16)
+  $core.bool get zapretWithVpn => $_getBF(15);
+  @$pb.TagNumber(16)
+  set zapretWithVpn($core.bool value) => $_setBool(15, value);
+  @$pb.TagNumber(16)
+  $core.bool hasZapretWithVpn() => $_has(15);
+  @$pb.TagNumber(16)
+  void clearZapretWithVpn() => $_clearField(16);
+
+  /// Since 1.10. The tpws strategy shaping direct traffic when
+  /// zapret_with_vpn is set.
+  @$pb.TagNumber(17)
+  BypassStrategy get zapretStrategy => $_getN(16);
+  @$pb.TagNumber(17)
+  set zapretStrategy(BypassStrategy value) => $_setField(17, value);
+  @$pb.TagNumber(17)
+  $core.bool hasZapretStrategy() => $_has(16);
+  @$pb.TagNumber(17)
+  void clearZapretStrategy() => $_clearField(17);
+  @$pb.TagNumber(17)
+  BypassStrategy ensureZapretStrategy() => $_ensure(16);
 }
 
 /// GroupSpec is one group of outbounds.

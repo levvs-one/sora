@@ -744,6 +744,7 @@
   "chainDelete": "Удалить цепочку",
   "chainDeleteConfirm": "Удалить цепочку «{name}»?",
   "chainUnsupported": "Текущий движок не умеет строить цепочки",
+  "chainHopMissing": "Один из серверов цепочки больше недоступен",
   "chainHop": "Хоп {n}",
   "chainEntry": "Вход",
   "chainExit": "Выход",

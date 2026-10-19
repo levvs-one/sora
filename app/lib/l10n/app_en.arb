@@ -592,6 +592,7 @@
   "chainDelete": "Delete chain",
   "chainDeleteConfirm": "Delete chain \"{name}\"?",
   "chainUnsupported": "The current engine cannot build chains",
+  "chainHopMissing": "One of the chain servers is no longer available",
   "chainHop": "Hop {n}",
   "chainEntry": "Entry",
   "chainExit": "Exit",

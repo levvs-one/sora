@@ -1342,6 +1342,9 @@ class SRu extends S {
   String get chainUnsupported => 'Текущий движок не умеет строить цепочки';
 
   @override
+  String get chainHopMissing => 'Один из серверов цепочки больше недоступен';
+
+  @override
   String chainHop(String n) => 'Хоп ${n}';
 
   @override
