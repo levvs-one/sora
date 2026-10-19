@@ -257,6 +257,20 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 	if err := checkDNS(plan.DNS); err != nil {
 		return nil, err
 	}
+	// Proxy chains (1.10): ordered outbound ids, traffic enters the first
+	// and exits the last.
+	if chain := in.GetChain(); len(chain) > 0 {
+		if err := applyChain(plan, chain); err != nil {
+			return nil, err
+		}
+	}
+	// zapret alongside the VPN tunnel (1.10, F11): direct traffic gets
+	// DPI-resistant handshakes while the tunnel carries the rest.
+	if in.GetZapretWithVpn() {
+		if err := applyZapretWithVPN(plan, in.GetZapretStrategy()); err != nil {
+			return nil, err
+		}
+	}
 	for _, entry := range in.GetBypassSettings().GetRules() {
 		if err := checkBypass(entry); err != nil {
 			return nil, err
@@ -329,6 +343,87 @@ func isBuiltInTarget(target string) bool {
 	default:
 		return false
 	}
+}
+
+// applyChain links ordered outbound ids so each dials through the next:
+// traffic enters chain[0] and exits the last hop.
+func applyChain(plan *engine.Plan, chain []string) error {
+	if len(chain) < 2 || len(chain) > engine.MaxChainHops {
+		return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+			"control: a proxy chain needs 2 to %d servers, got %d", engine.MaxChainHops, len(chain))
+	}
+	byID := make(map[string]int, len(plan.Outbounds))
+	for i := range plan.Outbounds {
+		byID[plan.Outbounds[i].ID] = i
+	}
+	seen := make(map[string]bool, len(chain))
+	for i, id := range chain {
+		if seen[id] {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+				"control: the proxy chain repeats %q", id)
+		}
+		seen[id] = true
+		idx, ok := byID[id]
+		if !ok {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanUnknownTarget,
+				"control: the proxy chain names %q, which is not an outbound of this plan", id)
+		}
+		if i+1 < len(chain) {
+			plan.Outbounds[idx].Via = chain[i+1]
+		}
+	}
+	return nil
+}
+
+// zapretDirectOutboundID is the synthetic bypass outbound carrying direct
+// traffic when zapret runs alongside the VPN tunnel (F11).
+const zapretDirectOutboundID = "sora-zapret-direct"
+
+// defaultZapretStrategy shapes direct traffic when the client enables
+// zapret_with_vpn without sending its own strategy: the TLS ClientHello is
+// split and the second part goes first, defeating basic SNI inspection.
+var defaultZapretStrategy = engine.BypassStrategy{
+	SplitPos: []string{"1", "2"},
+	Disorder: true,
+}
+
+// applyZapretWithVPN routes direct traffic through zapret's tpws while the
+// VPN tunnel carries the rest (F11). It appends a synthetic bypass outbound
+// and retargets "direct" rules at it; the engine factory then wraps the plan
+// with the tpws supervisor, failing honestly when tpws is not installed.
+func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) error {
+	if !plan.Tun.Enabled {
+		return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanTunnel,
+			"control: zapret_with_vpn needs TUN mode")
+	}
+	if runtime.GOOS != "linux" {
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
+			"control: zapret_with_vpn runs on Linux, where tpws is shipped")
+	}
+	for _, o := range plan.Outbounds {
+		if o.ID == zapretDirectOutboundID {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanDuplicateID,
+				"control: outbound id %q is reserved for zapret", zapretDirectOutboundID)
+		}
+	}
+	bs := defaultZapretStrategy
+	if strategy != nil {
+		bs = engine.BypassStrategy{
+			SplitPos: strategy.GetSplitPos(), Disorder: strategy.GetDisorder(), OOB: strategy.GetOob(),
+			TLSRecord: strategy.GetTlsRecord(), HostCase: strategy.GetHostCase(),
+			DomainCase: strategy.GetDomainCase(), MethodEOL: strategy.GetMethodEol(),
+		}
+	}
+	plan.Outbounds = append(plan.Outbounds, engine.Outbound{
+		ID: zapretDirectOutboundID, Name: "Zapret (direct traffic)",
+		Protocol: engine.ProtocolBypass, Bypass: &bs,
+	})
+	for i := range plan.Rules {
+		if plan.Rules[i].Target == "direct" {
+			plan.Rules[i].Target = zapretDirectOutboundID
+		}
+	}
+	return nil
 }
 
 // checkDNS validates resolvers and returns a problem-specific error key.

@@ -26,6 +26,7 @@ import (
 	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/parser"
 	"github.com/levvs-one/sora-client/core/probe"
+	"github.com/levvs-one/sora-client/core/profiles"
 	"github.com/levvs-one/sora-client/core/routing"
 	"github.com/levvs-one/sora-client/core/secret"
 	"github.com/levvs-one/sora-client/core/session"
@@ -153,6 +154,9 @@ type Server struct {
 	fetcher     Fetcher
 	dataDir     string
 	benchmarker Benchmarker
+	// profiles stores network profiles for automatic matching (F5). Nil
+	// disables the profile RPCs with explicit errors.
+	profiles *profiles.Store
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -211,6 +215,9 @@ type Config struct {
 	// Benchmarker measures server throughput; nil answers that
 	// benchmarking is unavailable.
 	Benchmarker Benchmarker
+	// Profiles stores network profiles for automatic matching (F5); nil
+	// disables the profile RPCs with explicit errors.
+	Profiles *profiles.Store
 }
 
 // New creates a control plane, supplying the default version when unset.
@@ -241,6 +248,7 @@ func New(cfg Config) (*Server, error) {
 		fetcher:     cfg.Fetcher,
 		dataDir:     cfg.DataDir,
 		benchmarker: cfg.Benchmarker,
+		profiles:    cfg.Profiles,
 	}
 	server.subs = newSubscriptionBook(server)
 	return server, nil
@@ -821,6 +829,16 @@ func toWireEvent(event session.Event, redactor *engine.Redactor) *corev1.CoreEve
 		out.Payload = &corev1.CoreEvent_LogBatch{LogBatch: &corev1.LogBatch{
 			Lines: []string{NetworkEventPrefix + maskText(mask, event.Detail)},
 		}}
+	case session.EventProfile:
+		// A saved network profile matched the current network; the client
+		// applies it (F5).
+		matched := &corev1.ProfileMatched{}
+		if event.Profile != nil {
+			matched.ProfileId = event.Profile.ProfileID
+			matched.ProfileName = event.Profile.Name
+			matched.AutoApply = event.Profile.AutoApply
+		}
+		out.Payload = &corev1.CoreEvent_ProfileMatched{ProfileMatched: matched}
 	default:
 		out.Payload = &corev1.CoreEvent_LogBatch{LogBatch: &corev1.LogBatch{
 			Lines: []string{maskText(mask, event.Detail)},

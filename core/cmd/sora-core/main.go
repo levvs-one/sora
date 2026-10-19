@@ -34,6 +34,7 @@ import (
 	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/probe"
+	"github.com/levvs-one/sora-client/core/profiles"
 	"github.com/levvs-one/sora-client/core/secret"
 	"github.com/levvs-one/sora-client/core/session"
 	"github.com/levvs-one/sora-client/core/subscription"
@@ -41,7 +42,7 @@ import (
 
 // Version defines the API contract served by this build. Contract changes must
 // update this value and the generated code together.
-var Version = control.Version{Major: 1, Minor: 9, MinSupportedMinor: 1}
+var Version = control.Version{Major: 1, Minor: 10, MinSupportedMinor: 1}
 
 // Options configures a core instance.
 type Options struct {
@@ -232,11 +233,19 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		return nil, err
 	}
 	redactor := engine.NewRedactor()
+	// Network profiles are auxiliary: a corrupt file disables matching with
+	// a warning instead of failing the core.
+	profStore, err := profiles.NewStore(opts.DataDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "sora-core: network profiles disabled: %v\n", err)
+		profStore, _ = profiles.NewStore("")
+	}
 	manager := session.NewManager(session.ManagerConfig{
 		Factory:  factory,
 		Guard:    system,
 		Redactor: redactor,
 		Network:  session.NetworkFingerprint,
+		Profiles: profStore,
 	})
 	app.sessions = manager
 
@@ -285,6 +294,7 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		Measurer:      measurer,
 		Benchmarker:   benchmarker,
 		DataDir:       opts.DataDir,
+		Profiles:      profStore,
 		Logs:          center,
 		About:         app.about,
 		Fetcher:       subscription.New(subscription.Options{}),
