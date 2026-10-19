@@ -2,6 +2,7 @@ package mihomo
 
 import (
 	"fmt"
+	"net/url"
 	"runtime"
 	"strconv"
 	"strings"
@@ -92,16 +93,24 @@ func buildRules(rules []engine.Rule, byID map[string]string) ([]string, map[stri
 // registerRuleProvider registers a remote rule-provider for a RuleRuleSet
 // value and returns its tag. A value must be the provider's https URL,
 // mirroring the sing-box renderer; a bare provider name would reference
-// nothing because sora never defines local providers.
+// nothing because sora never defines local providers. The wire format is
+// validated against the URL path so the provider's declared behavior matches
+// content mihomo can actually ingest: a sing-box .srs binary or any other
+// undecodable payload is rejected at render time instead of failing inside
+// the engine at startup.
 func registerRuleProvider(providers map[string]ruleProvider, tags map[string]string, value string) (string, error) {
-	if !strings.HasPrefix(value, "https://") {
+	u, err := url.Parse(value)
+	if err != nil || u.Scheme != "https" || u.Host == "" {
 		return "", fmt.Errorf("mihomo: rule set %q must be an https URL", value)
 	}
 	if tag, ok := tags[value]; ok {
 		return tag, nil
 	}
 	tag := "sora-ruleset-" + strconv.Itoa(len(providers)+1)
-	format, ext := ruleSetFormat(value)
+	format, ext, err := ruleSetFormat(u)
+	if err != nil {
+		return "", err
+	}
 	providers[tag] = ruleProvider{
 		Type:     "http",
 		Behavior: "classical",
@@ -114,17 +123,23 @@ func registerRuleProvider(providers map[string]ruleProvider, tags map[string]str
 	return tag, nil
 }
 
-// ruleSetFormat maps the download extension onto mihomo's provider format.
+// ruleSetFormat maps the URL path extension onto mihomo's provider format.
 // Binary mrs is the compact wire format; yaml and plain text lists fall back
-// to their named formats; anything else is plain text.
-func ruleSetFormat(url string) (format, ext string) {
-	switch {
-	case strings.HasSuffix(url, ".mrs"):
-		return "mrs", ".mrs"
-	case strings.HasSuffix(url, ".yaml"), strings.HasSuffix(url, ".yml"):
-		return "yaml", ".yaml"
+// to their named formats; extensionless links are plain text. The query
+// string is stripped first so versioned download links (ads.mrs?v=2) keep
+// their format. A .srs link is sing-box's binary rule-set encoding, which
+// mihomo cannot parse; rejecting it here is behavior↔content validation —
+// emitting format "text" for it would only fail later inside the engine.
+func ruleSetFormat(u *url.URL) (format, ext string, err error) {
+	switch path := strings.ToLower(u.Path); {
+	case strings.HasSuffix(path, ".mrs"):
+		return "mrs", ".mrs", nil
+	case strings.HasSuffix(path, ".yaml"), strings.HasSuffix(path, ".yml"):
+		return "yaml", ".yaml", nil
+	case strings.HasSuffix(path, ".srs"):
+		return "", "", fmt.Errorf("mihomo: rule set %q is a sing-box binary rule set (.srs); mihomo reads .mrs", u.String())
 	default:
-		return "text", ".txt"
+		return "text", ".txt", nil
 	}
 }
 

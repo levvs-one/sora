@@ -320,6 +320,20 @@ func TestRenderOmitsECHByDefault(t *testing.T) {
 	}
 }
 
+func TestRenderHysteria2OmitsZeroBandwidth(t *testing.T) {
+	// No caps: the engine stays on BBR and no up/down keys may appear.
+	out, err := Render(testPlan(), testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, line := range strings.Split(out, "\n") {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "up:") || strings.HasPrefix(trimmed, "down:") {
+			t.Fatalf("rendered hysteria2 proxy must not carry zero bandwidth caps, got %q", trimmed)
+		}
+	}
+}
+
 func TestRenderHysteria2BandwidthAndHopping(t *testing.T) {
 	p := testPlan()
 	p.Outbounds[1].UpMbps, p.Outbounds[1].DownMbps = 20, 100

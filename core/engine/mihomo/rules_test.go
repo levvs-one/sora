@@ -41,6 +41,42 @@ func TestBuildRulesRendersRemoteRuleProviders(t *testing.T) {
 	}
 }
 
+func TestBuildRulesStripsQueryFromRuleSetFormat(t *testing.T) {
+	rules := []engine.Rule{
+		// Versioned download links carry a query string; the wire format
+		// still comes from the path extension.
+		{Type: engine.RuleRuleSet, Value: "https://example.com/rules/ads.mrs?v=2", Target: "reject"},
+		{Type: engine.RuleRuleSet, Value: "https://example.com/rules/ips.MRS", Target: "direct"},
+		{Type: engine.RuleRuleSet, Value: "https://example.com/rules/plain", Target: "direct"},
+	}
+	_, providers, err := buildRules(rules, ruleTargetMap())
+	if err != nil {
+		t.Fatalf("buildRules: %v", err)
+	}
+	if got := providers["sora-ruleset-1"]; got.Format != "mrs" || got.Path != "./rules/sora-ruleset-1.mrs" {
+		t.Fatalf("query string hid the mrs format: %+v", got)
+	}
+	if got := providers["sora-ruleset-2"]; got.Format != "mrs" {
+		t.Fatalf("uppercase extension not recognized: %+v", got)
+	}
+	if got := providers["sora-ruleset-3"]; got.Format != "text" || got.Path != "./rules/sora-ruleset-3.txt" {
+		t.Fatalf("extensionless URL must fall back to text: %+v", got)
+	}
+}
+
+func TestBuildRulesRejectsSingBoxBinaryRuleSet(t *testing.T) {
+	rules := []engine.Rule{
+		{Type: engine.RuleRuleSet, Value: "https://example.com/rules/ads.srs", Target: "reject"},
+	}
+	_, _, err := buildRules(rules, ruleTargetMap())
+	if err == nil {
+		t.Fatal("expected an error for a sing-box .srs rule set mihomo cannot parse")
+	}
+	if !strings.Contains(err.Error(), ".mrs") {
+		t.Fatalf("error should point at the mihomo format, got: %v", err)
+	}
+}
+
 func TestBuildRulesRejectsNonHTTPSRuleSetURL(t *testing.T) {
 	rules := []engine.Rule{
 		{Type: engine.RuleRuleSet, Value: "http://example.com/rules/ads.yaml", Target: "reject"},
