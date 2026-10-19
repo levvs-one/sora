@@ -1,17 +1,20 @@
-# Sora
+<p align="center">
+  <img src="docs/images/logo-512.png" width="96" alt="Sora logo">
+</p>
+<h1 align="center">Sora</h1>
 
 [Русский](README.md)
 
-Sora is an open source VPN client for Windows and Linux. Use it with a subscription from your VPN provider: add the link, choose a server and connect.
+[![Release](https://img.shields.io/github/v/release/levvs-one/sora)](https://github.com/levvs-one/sora/releases)
+[![Downloads](https://img.shields.io/github/downloads/levvs-one/sora/total)](https://github.com/levvs-one/sora/releases)
+[![License](https://img.shields.io/github/license/levvs-one/sora)](LICENSE)
 
-![Sora main window in the light theme](docs/images/home-1440x900-light.png)
+An open source VPN client for Windows and Linux. Works with your VPN provider's subscription: paste the link, pick a server, connect.
 
-<details>
-<summary>Dark theme</summary>
-
-![Sora main window in the dark theme](docs/images/home-1440x900-dark.png)
-
-</details>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/home-1440x900-dark.png">
+  <img src="docs/images/home-1440x900-light.png" alt="Sora main window" width="1440">
+</picture>
 
 ## Install
 
@@ -27,33 +30,45 @@ Linux x64: Debian, Ubuntu, Fedora, openSUSE, Arch. In a terminal:
 curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
 ```
 
-The scripts download the latest release, verify checksums and install the app and its service. Installation requires administrator rights. For manual installation, download the installer or packages from [releases](https://github.com/levvs-one/sora/releases).
+The scripts verify checksums and install the app with its service. Administrator rights are required. For manual installation, see the [releases](https://github.com/levvs-one/sora/releases) page.
 
-## What Sora does
+For older systems, there is a separate client: [sora-legacy](https://github.com/levvs-one/sora-legacy).
 
-- Imports subscriptions by link, including Xray JSON subscriptions. Updates servers on a schedule and shows traffic usage, expiry dates and announcements when the provider supplies them.
-- Picks the server with the lowest latency and supports backup servers when a connection fails.
-- Connects apps through a virtual network adapter (TUN) or the system proxy.
-- Blocks internet access when the VPN drops if the kill switch is enabled.
-- Routes selected sites, IP addresses and apps directly, through the VPN, or blocks them.
-- On Linux, bypasses some blocks without a server using zapret. This mode does not hide your IP address or replace a VPN.
-- Opens speed test services inside the app, keeps notification history and shows categorized logs with export.
-- Runs in the tray, starts at login and installs updates from the app. Includes 31 interface languages, light and dark themes.
+## Quick start
 
-The legacy client for older Windows is developed separately in [sora-legacy](https://github.com/levvs-one/sora-legacy).
+1. Paste your subscription link.
+2. Pick a server.
+3. Click Connect.
+
+## Features
+
+- Censorship-circumvention protocols: REALITY, XHTTP, AmneziaWG, Hysteria2; DPI fragmentation.
+- Three engines to choose from: sing-box, Xray, mihomo.
+- Subscriptions with auto-update: lowest-latency server selection, traffic usage, expiry dates, provider announcements.
+- TUN adapter or system proxy; kill switch; split tunneling by site, IP address and app.
+- On Linux, a serverless zapret mode for some blocks. It does not hide your IP address or replace a VPN.
+- One-click diagnostics: HAR, PCAPNG, Windows event logs; in-app updates; 31 interface languages.
+- Extensions: signed add-ons that extend the client.
+
+## Security
+
+- Releases ship with `SHA256SUMS` — the install scripts verify checksums before installing.
+- Release authenticity: minisign signature (`SHA256SUMS`) plus file checksums; without a valid signature, installation and updates refuse to proceed.
+- In-app updates verify checksums of downloaded files.
+- No telemetry: Sora sends nothing to developers or third parties.
+
+Details — in [docs/security.md](docs/security.md).
 
 ## Documentation
 
-These guides are in Russian.
+All guides are in Russian.
 
-- [Installation, updates and removal](docs/install.md)
-- [Using Sora](docs/usage.md)
-- [Subscription formats and provider guide](docs/providers.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Architecture](docs/architecture.md)
-- [Development and building](docs/development.md)
-- [Changelog](CHANGELOG.md)
-- [Plans](PLANS.md)
+- Users: [installation](docs/install.md), [usage](docs/usage.md), [troubleshooting](docs/troubleshooting.md).
+- Providers: [subscription formats](docs/providers.md).
+- Developers: [architecture](docs/architecture.md), [building from source](docs/development.md).
+- Security: [privacy model and data](docs/security.md).
+
+The full documentation index is in [docs/](docs/).
 
 ## License
 
