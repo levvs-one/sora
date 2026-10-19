@@ -122,6 +122,11 @@ type Config struct {
 	RestartWindow time.Duration
 	// Logs receives the engine output, masked, when set.
 	Logs *logs.Center
+	// AllowEnvBin honors the SORA_*_BIN environment overrides during
+	// discovery. It is a discovery-only knob: set it only from an explicit
+	// operator flag (--allow-env-bin). The operator takes responsibility
+	// for the pointed-at binary (SORA-H5).
+	AllowEnvBin bool
 }
 
 // Supervisor implements engine lifecycle through a Driver. Engines add groups,

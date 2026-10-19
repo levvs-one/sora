@@ -71,7 +71,7 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 			_, _ = udp.WriteTo(buffer[:n], addr)
 		}
 	}()
-	server, err := xray.Prober.Discover(t.Context(), dir)
+	server, err := xray.Prober.Discover(t.Context(), dir, supervise.DiscoveryOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}

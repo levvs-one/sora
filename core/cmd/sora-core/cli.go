@@ -26,6 +26,7 @@ type flags struct {
 	logLevel    string
 	check       bool
 	fileKeys    bool
+	envBin      bool
 	showVersion bool
 	install     bool
 	uninstall   bool
@@ -67,6 +68,7 @@ func run(ctx context.Context, arguments []string) error {
 	set.StringVar(&f.logLevel, "log-level", "info", "debug, info, warn or error")
 	set.BoolVar(&f.check, "check", false, "build everything, report on it and exit without serving")
 	set.BoolVar(&f.fileKeys, "allow-file-keys", false, "fall back to a key file when the machine key store is unavailable")
+	set.BoolVar(&f.envBin, "allow-env-bin", false, "honor SORA_*_BIN engine overrides during discovery; the operator takes responsibility for the pointed-at binary")
 	set.BoolVar(&f.showVersion, "version", false, "print the contract and build version and exit")
 	set.BoolVar(&f.install, "install-service", false, "Windows: register this executable as the SoraCore service with the other flags, start it and exit")
 	set.BoolVar(&f.uninstall, "uninstall-service", false, "Windows: stop and remove the SoraCore service and exit")
@@ -110,6 +112,7 @@ func run(ctx context.Context, arguments []string) error {
 		Socket:        f.socket,
 		Log:           logger,
 		AllowFileKeys: f.fileKeys,
+		AllowEnvBin:   f.envBin,
 	}
 	app, err := New(ctx, options)
 	if err != nil {

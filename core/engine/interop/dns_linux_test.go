@@ -109,7 +109,7 @@ func TestTunInterceptsDNSOverUDPAndTCP(t *testing.T) {
 		}
 	}()
 	dir := os.Getenv("SORA_ENGINES_DIR")
-	binary, err := xray.Prober.Discover(t.Context(), dir)
+	binary, err := xray.Prober.Discover(t.Context(), dir, supervise.DiscoveryOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}

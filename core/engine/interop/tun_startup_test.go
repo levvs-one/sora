@@ -58,7 +58,7 @@ func TestEveryEngineStartsTun(t *testing.T) {
 			_, _ = udp.WriteTo(buffer[:n], addr)
 		}
 	}()
-	server, err := xray.Prober.Discover(t.Context(), os.Getenv("SORA_ENGINES_DIR"))
+	server, err := xray.Prober.Discover(t.Context(), os.Getenv("SORA_ENGINES_DIR"), supervise.DiscoveryOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}

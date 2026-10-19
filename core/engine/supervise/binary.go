@@ -78,38 +78,107 @@ func (pr Prober) Probe(ctx context.Context, path string) (Binary, error) {
 	return b, nil
 }
 
-// Discover checks the environment override, engines directory, then PATH. It
-// does not download; the updater ships engines and verifies checksums.
-func (pr Prober) Discover(ctx context.Context, enginesDir string) (Binary, error) {
-	var candidates []string
-	if fromEnv := os.Getenv(pr.EnvVar); pr.EnvVar != "" && fromEnv != "" {
-		candidates = append(candidates, fromEnv)
+// digestsFile is the manifest fetch.sh writes next to the installed engine
+// binaries: "<sha256>  <name>" lines (sha256sum format) over the binaries
+// themselves, not the download archives.
+const digestsFile = "engines.digests"
+
+// DiscoveryOptions tunes engine discovery.
+type DiscoveryOptions struct {
+	// AllowEnvBin honors the SORA_*_BIN environment overrides. Only set it
+	// from an explicit operator flag (--allow-env-bin): the operator takes
+	// responsibility for the pointed-at binary. Without it, discovery
+	// trusts only the digest-verified engines directory.
+	AllowEnvBin bool
+}
+
+// Discover checks the environment override (only with
+// DiscoveryOptions.AllowEnvBin) and then the engines directory. It never
+// consults PATH: a planted binary earlier in PATH must not become the VPN
+// engine (SORA-H5). Every candidate from the engines directory must match
+// the digest in engines.digests; candidates that fail verification are
+// rejected instead of executed.
+func (pr Prober) Discover(ctx context.Context, enginesDir string, opts DiscoveryOptions) (Binary, error) {
+	type candidate struct {
+		path   string
+		fromEnv bool
+	}
+	var candidates []candidate
+	if opts.AllowEnvBin {
+		if fromEnv := os.Getenv(pr.EnvVar); pr.EnvVar != "" && fromEnv != "" {
+			candidates = append(candidates, candidate{path: fromEnv, fromEnv: true})
+		}
 	}
 	file := pr.Name
 	if runtime.GOOS == "windows" {
 		file += ".exe"
 	}
 	if enginesDir != "" {
-		candidates = append(candidates, filepath.Join(enginesDir, file))
+		candidates = append(candidates, candidate{path: filepath.Join(enginesDir, file)})
 	}
-	if found, err := exec.LookPath(pr.Name); err == nil {
-		candidates = append(candidates, found)
+	if len(candidates) == 0 {
+		return Binary{}, fmt.Errorf("%s: no candidate: set %s with --allow-env-bin or install the engine into %q", pr.Kind, pr.EnvVar, enginesDir)
 	}
+	digests, digestsErr := loadDigests(enginesDir)
 	lastErr := errors.New("no candidate")
-	for _, candidate := range candidates {
-		info, err := os.Stat(candidate) //nolint:gosec // candidates are the Sora engines dir, PATH and an operator-set env var
+	for _, c := range candidates {
+		info, err := os.Stat(c.path) //nolint:gosec // candidates are the Sora engines dir or an operator-set env var
 		if err != nil || info.IsDir() {
-			lastErr = fmt.Errorf("%s is not a file", candidate)
+			lastErr = fmt.Errorf("%s is not a file", c.path)
 			continue
 		}
-		probed, err := pr.Probe(ctx, candidate)
+		probed, err := pr.Probe(ctx, c.path)
 		if err != nil {
+			lastErr = err
+			continue
+		}
+		if err := checkDigest(probed, digests, digestsErr, c.fromEnv); err != nil {
 			lastErr = err
 			continue
 		}
 		return probed, nil
 	}
-	return Binary{}, fmt.Errorf("%s: no usable engine binary (%w); set %s or install it into %q", pr.Kind, lastErr, pr.EnvVar, enginesDir)
+	return Binary{}, fmt.Errorf("%s: no usable engine binary (%w); set %s with --allow-env-bin or install it into %q", pr.Kind, lastErr, pr.EnvVar, enginesDir)
+}
+
+// checkDigest enforces the digest manifest for engines-directory candidates.
+// Environment-override candidates are the operator's explicit trust, but are
+// still verified when the manifest knows their binary name.
+func checkDigest(b Binary, digests map[string]string, digestsErr error, fromEnv bool) error {
+	name := strings.ToLower(strings.TrimSuffix(filepath.Base(b.Path), ".exe"))
+	if expected, ok := digests[name]; ok {
+		return b.VerifyDigest(expected)
+	}
+	if fromEnv {
+		// The operator explicitly pointed at this binary with
+		// --allow-env-bin; no manifest entry to check it against.
+		return nil
+	}
+	if digestsErr != nil {
+		return fmt.Errorf("%s: refusing %s: %v", b.Kind, b.Path, digestsErr)
+	}
+	return fmt.Errorf("%s: refusing %s: no digest for %q in engines.digests", b.Kind, b.Path, name)
+}
+
+// loadDigests reads the engines.digests manifest from the engines directory.
+// It returns the underlying error so callers can fail closed with context.
+func loadDigests(enginesDir string) (map[string]string, error) {
+	if enginesDir == "" {
+		return nil, errors.New("no engines directory")
+	}
+	raw, err := os.ReadFile(filepath.Join(enginesDir, digestsFile))
+	if err != nil {
+		return nil, fmt.Errorf("cannot read engines.digests: %w; refresh the engines with the updater or packaging/engines/fetch.sh", err)
+	}
+	out := map[string]string{}
+	for _, line := range strings.Split(string(raw), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 2 || len(fields[0]) != 64 {
+			continue
+		}
+		out[strings.ToLower(strings.TrimSuffix(fields[1], ".exe"))] = strings.ToLower(fields[0])
+	}
+	return out, nil
 }
 
 // VerifyDigest compares the binary against the checksum the updater recorded.

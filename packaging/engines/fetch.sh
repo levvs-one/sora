@@ -14,6 +14,15 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$dest"
 
+# engines.digests records the SHA-256 of the installed binaries (not the
+# download archives). The core verifies every discovered engine binary
+# against this manifest and refuses to execute anything unverified (SORA-H5).
+digests="$dest/engines.digests"
+: >"$digests"
+record_digest() {
+	sha256sum "$1" | sed "s|$1|$(basename "$1")|" >>"$digests"
+}
+
 found=0
 while read -r engine line_arch digest url; do
 	[[ -z "$engine" || "$engine" == \#* || "$line_arch" != "$arch" ]] && continue
@@ -28,6 +37,7 @@ while read -r engine line_arch digest url; do
 		exe=$(find "$work/$engine" -iname "${engine}*.exe" ! -iname 'wxray.exe' | head -1)
 		[[ -n "$exe" ]] || { echo "engines.lock: no executable in $(basename "$url")" >&2; exit 1; }
 		install -m 0755 "$exe" "$dest/$engine.exe"
+		record_digest "$dest/$engine.exe"
 		if [[ "$engine" == xray ]]; then
 			install -m 0644 "$work/xray/geoip.dat" "$work/xray/geosite.dat" "$dest/"
 		fi
@@ -38,15 +48,18 @@ while read -r engine line_arch digest url; do
 	sing-box)
 		tar --extract --gzip --file "$file" --directory "$work" --wildcards '*/sing-box'
 		install -m 0755 "$work"/sing-box-*/sing-box "$dest/sing-box"
+		record_digest "$dest/sing-box"
 		;;
 	xray)
 		unzip -o -q "$file" xray geoip.dat geosite.dat -d "$work/xray"
 		install -m 0755 "$work/xray/xray" "$dest/xray"
 		install -m 0644 "$work/xray/geoip.dat" "$work/xray/geosite.dat" "$dest/"
+		record_digest "$dest/xray"
 		;;
 	mihomo)
 		gunzip --stdout "$file" >"$work/mihomo"
 		install -m 0755 "$work/mihomo" "$dest/mihomo"
+		record_digest "$dest/mihomo"
 		;;
 	*)
 		echo "engines.lock: unknown engine $engine" >&2

@@ -63,9 +63,11 @@ type Registry struct {
 	last engine.Selection
 }
 
-// Discover searches environment overrides, enginesDir, and PATH for each
-// engine. Missing builds are recorded without failing discovery. Instances
-// inherit base and use separate directories under base.HomeDir.
+// Discover searches environment overrides (only with an explicit operator
+// opt-in), then the digest-verified engines directory, for each engine.
+// Missing builds are recorded without failing discovery. Instances inherit
+// base and use separate directories under base.HomeDir. PATH is never
+// consulted: a planted binary must not become the VPN engine (SORA-H5).
 func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Registry {
 	r := &Registry{binaries: map[engine.Kind]supervise.Binary{}, preference: engine.DefaultPreference, base: base}
 	if enginesDir != "" {
@@ -74,8 +76,9 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 			r.tpws = candidate
 		}
 	}
+	discovery := supervise.DiscoveryOptions{AllowEnvBin: base.AllowEnvBin}
 	for _, kind := range engine.DefaultPreference {
-		b, err := drivers[kind].prober.Discover(ctx, enginesDir)
+		b, err := drivers[kind].prober.Discover(ctx, enginesDir, discovery)
 		if err != nil {
 			// Probe errors contain local paths; expose them only
 			// through sora-core -check, not diagnostics.

@@ -168,7 +168,7 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { _, _ = io.WriteString(w, reply) }))
 	defer target.Close()
 
-	server, err := xray.Prober.Discover(context.Background(), dir)
+	server, err := xray.Prober.Discover(context.Background(), dir, supervise.DiscoveryOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
