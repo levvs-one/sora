@@ -659,7 +659,6 @@
   "extSettings": "Settings",
   "extSaveSettings": "Save settings",
   "extSaving": "Saving…",
-  "extOpenPanel": "Open panel",
   "extUpdateTo": "Update to {version}",
   "@extUpdateTo": {"placeholders": {"version": {"type": {"type": "String"}}}},
   "extEnabled": "Enabled",

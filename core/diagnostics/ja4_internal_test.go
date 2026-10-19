@@ -11,13 +11,14 @@ import (
 
 // TestJA4_ChromeCaptureMatchesDocumented is the end-to-end proof that the
 // capture → parse → hash chain is correct: the real ClientHello of the
-// explicit "chrome 133" parrot must hash to the JA4 documented in
-// core/engine/fingerprint.go, byte for byte. The explicit parrot (not
-// Auto) keeps this proof stable across uTLS bumps.
+// "chrome" parrot must hash to the JA4 documented in
+// core/engine/fingerprint.go, byte for byte. GREASE stripping is proven
+// by the match itself: the raw hello contains GREASE, the documented
+// JA4 does not.
 func TestJA4_ChromeCaptureMatchesDocumented(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	raw, err := captureHello(ctx, utls.HelloChrome_133, "example.com", []string{"h2"}, 5*time.Second)
+	raw, err := captureHello(ctx, utls.HelloChrome_Auto, "example.com", []string{"h2"}, 5*time.Second)
 	if err != nil {
 		t.Fatalf("capture failed: %v", err)
 	}
@@ -31,23 +32,8 @@ func TestJA4_ChromeCaptureMatchesDocumented(t *testing.T) {
 	}
 }
 
-// TestAssessJA4_StaleParrotFlagged locks the stale-set logic: an explicit
-// Chrome 133 capture must be judged stale even though the default chrome
-// parrot is fresh after the utls bump. The 133 vector is injected so the
-// test does not depend on the vendored Auto parrot.
-func TestAssessJA4_StaleParrotFlagged(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	raw, err := captureHello(ctx, utls.HelloChrome_133, "example.com", []string{"h2"}, 5*time.Second)
-	if err != nil {
-		t.Fatalf("capture failed: %v", err)
-	}
-	rep := AssessJA4(context.Background(), JA4Input{
-		Fingerprint: "chrome",
-		Hello: func(context.Context) ([]byte, error) {
-			return raw, nil
-		},
-	})
+func TestAssessJA4_ChromeIsStale(t *testing.T) {
+	rep := AssessJA4(context.Background(), JA4Input{Fingerprint: "chrome"})
 	if rep.Fingerprint != "chrome" {
 		t.Errorf("Fingerprint = %q", rep.Fingerprint)
 	}

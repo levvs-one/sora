@@ -1871,7 +1871,6 @@ abstract class S {
   String get extSettings;
   String get extSaveSettings;
   String get extSaving;
-  String get extOpenPanel;
   String extUpdateTo(String version);
   String get extEnabled;
   String extRollbackTo(String version);

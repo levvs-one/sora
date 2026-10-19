@@ -1134,7 +1134,6 @@ class SRu extends S {
   @override
   String get extSaving => 'Сохранение…';
   @override
-  String get extOpenPanel => 'Открыть панель';
   @override
   String extUpdateTo(String version) => 'Обновить до $version';
   @override

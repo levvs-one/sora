@@ -1117,7 +1117,6 @@ Find one in the catalog or install from a file.';
   @override
   String get extSaving => 'Saving…';
   @override
-  String get extOpenPanel => 'Open panel';
   @override
   String extUpdateTo(String version) => 'Update to $version';
   @override

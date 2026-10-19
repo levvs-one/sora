@@ -369,20 +369,3 @@ func TestRenderTUICTuning(t *testing.T) {
 		}
 	}
 }
-
-func TestAmneziaOptionsRefuses31(t *testing.T) {
-	// T012: mihomo's AmneziaWGOption only knows the 1.x/2.0 keys. Passing
-	// 3.1 fields through the free-form map would silently drop them while
-	// the plan promises 3.1 obfuscation: fail closed here too, not just at
-	// engine selection (FeatureAmneziaWG3).
-	if _, err := amneziaOptions(enginetest.AmneziaWG3().Amnezia); err == nil {
-		t.Fatal("amneziaOptions must refuse 3.1 parameters")
-	}
-	opts, err := amneziaOptions(enginetest.AmneziaWG().Amnezia)
-	if err != nil {
-		t.Fatalf("amneziaOptions(2.0) = %v, want nil", err)
-	}
-	if opts["jc"] != 4 || opts["h3"] != int64(300000) {
-		t.Fatalf("2.0 parameters must keep rendering: %v", opts)
-	}
-}

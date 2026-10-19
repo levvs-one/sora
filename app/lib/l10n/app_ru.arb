@@ -614,7 +614,6 @@
   "extSettings": "Настройки",
   "extSaveSettings": "Сохранить настройки",
   "extSaving": "Сохранение…",
-  "extOpenPanel": "Открыть панель",
   "extUpdateTo": "Обновить до {version}",
   "@extUpdateTo": {
     "placeholders": {

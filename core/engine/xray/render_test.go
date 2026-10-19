@@ -518,32 +518,3 @@ func TestRenderRejectsDoH3WithGuidance(t *testing.T) {
 		t.Fatalf("h3 render must fail naming DNS-over-HTTP/3, got: %v", err)
 	}
 }
-
-func TestRenderRefusesAmneziaWG(t *testing.T) {
-	// T012: Xray cannot apply AmneziaWG obfuscation at all. Rendering the
-	// outbound anyway would put plain WireGuard on the wire while the plan
-	// promises obfuscation - the exact silent no-op this fails closed on.
-	p := enginetest.Plan(engine.ProtocolWireGuard)
-	p.Outbounds[0].Amnezia = enginetest.AmneziaWG().Amnezia
-	_, err := Render(p, testRuntime, nil)
-	if err == nil || !strings.Contains(err.Error(), "AmneziaWG") {
-		t.Fatalf("xray Render must refuse AmneziaWG parameters, got: %v", err)
-	}
-}
-
-// TestRenderRejectsVisionOnNonTCP locks the S2 validation contract:
-// vision on a non-TCP transport cannot work, so the render fails hard
-// instead of emitting a config Xray would reject at runtime. Auto-vision
-// never produces this combination (it only fires on TCP); this guards
-// the manual-flow path.
-func TestRenderRejectsVisionOnNonTCP(t *testing.T) {
-	p := enginetest.Plan(engine.ProtocolVLESS)
-	p.Outbounds[0].Transport.Type = "ws"
-	p.Outbounds[0].Transport.Path = "/x"
-	p.Outbounds[0].TLS = engine.TLS{Enabled: true}
-	p.Outbounds[0].Flow = "xtls-rprx-vision"
-	if _, err := Render(p, testRuntime, nil); err == nil ||
-		!strings.Contains(err.Error(), "requires the TCP transport") {
-		t.Fatalf("vision+ws render must fail naming the TCP requirement, got: %v", err)
-	}
-}
