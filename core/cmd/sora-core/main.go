@@ -214,6 +214,16 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		_ = store.Close()
 		return nil, err
 	}
+	// A crashed core can leave the kill-switch table behind, which would
+	// keep blocking traffic with no live session. We hold the instance
+	// lock from here on, so no other core owns the table (SORA-M4).
+	if cleaner, ok := firewall.(interface {
+		CleanupStale(context.Context) error
+	}); ok {
+		if err := cleaner.CleanupStale(ctx); err != nil {
+			log.Warn("core: stale firewall cleanup failed", "err", err)
+		}
+	}
 	system, err := guard.New(guard.Options{
 		EnginePorts: []uint16{tunnelPort},
 	}, firewall)

@@ -58,6 +58,12 @@ func (n *Nftables) Arm(ctx context.Context, _ []uint16) error {
 		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail,
 			"guard: refusing to arm the kill switch as root: the engine exception would match every root process; run the core as an unprivileged user")
 	}
+	// Remove any previous table first (stale after a crash, or a repeated
+	// Arm): installing over an existing table fails with "File exists"
+	// (SORA-M4).
+	if err := n.deleteTable(ctx); err != nil {
+		return err
+	}
 	if err := n.apply(ctx, NftRuleset(n.uid, n.bypass, n.blocked...)); err != nil {
 		return err
 	}
@@ -65,15 +71,42 @@ func (n *Nftables) Arm(ctx context.Context, _ []uint16) error {
 	return nil
 }
 
-// Disarm removes the table and succeeds if already removed.
+// Disarm removes the table and succeeds if already removed (SORA-M5).
 func (n *Nftables) Disarm(ctx context.Context) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	if err := n.apply(ctx, NftRemove()); err != nil {
+	if err := n.deleteTable(ctx); err != nil {
 		return err
 	}
 	n.armed = false
 	return nil
+}
+
+// CleanupStale removes a table left behind by a crashed core. Call it once
+// at startup while holding the instance lock: with no live session owning
+// the table, leftover rules would keep blocking traffic (SORA-M4).
+func (n *Nftables) CleanupStale(ctx context.Context) error {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	return n.deleteTable(ctx)
+}
+
+// deleteTable removes the owned table, treating a missing table as success
+// so repeated restores and crash recovery are safe.
+func (n *Nftables) deleteTable(ctx context.Context) error {
+	if err := n.apply(ctx, NftRemove()); err != nil {
+		if isMissingTable(err) {
+			return nil
+		}
+		return err
+	}
+	return nil
+}
+
+// isMissingTable reports nft's "the table does not exist" failure, which is
+// not an error for idempotent cleanup.
+func isMissingTable(err error) bool {
+	return err != nil && strings.Contains(err.Error(), "No such file or directory")
 }
 
 // Armed reports whether this process installed the table.

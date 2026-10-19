@@ -2,6 +2,7 @@ package guard_test
 
 import (
 	"net/netip"
+	"os"
 	"runtime"
 	"strings"
 	"testing"
@@ -139,5 +140,70 @@ func TestArmRefusesRootUid(t *testing.T) {
 	}
 	if armed, err := firewall.Armed(testContext()); err != nil || armed {
 		t.Fatalf("Armed() = %v, %v after a refused Arm", armed, err)
+	}
+}
+
+// TestArmAndDisarmAreIdempotent locks SORA-M4/SORA-M5: a repeated Arm
+// replaces the table instead of failing, and Disarm tolerates an already
+// missing table. A fake nft binary simulates kernel state.
+func TestArmAndDisarmAreIdempotent(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("nftables is Linux-only")
+	}
+	dir := t.TempDir()
+	state := dir + "/table.state"
+	script := `#!/bin/sh
+# Fake nft: reads a ruleset on stdin, keeps "table state" in $SORA_FAKE_STATE.
+input=$(cat)
+case "$input" in
+*delete\ table\ inet\ sora*)
+	if [ -f "$SORA_FAKE_STATE" ]; then
+		rm -f "$SORA_FAKE_STATE"
+		exit 0
+	fi
+	echo "Error: Could not process rule: No such file or directory" >&2
+	exit 1
+	;;
+*)
+	touch "$SORA_FAKE_STATE"
+	exit 0
+	;;
+esac
+`
+	nft := dir + "/nft"
+	if err := os.WriteFile(nft, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", dir+":"+os.Getenv("PATH"))
+	t.Setenv("SORA_FAKE_STATE", state)
+
+	firewall, err := guard.NewNftables(1000, nil)
+	if err != nil {
+		t.Fatalf("NewNftables() error = %v", err)
+	}
+	ctx := testContext()
+	if err := firewall.Arm(ctx, nil); err != nil {
+		t.Fatalf("first Arm() error = %v", err)
+	}
+	// A repeated Arm must replace, not fail with "File exists".
+	if err := firewall.Arm(ctx, nil); err != nil {
+		t.Fatalf("second Arm() error = %v", err)
+	}
+	if err := firewall.Disarm(ctx); err != nil {
+		t.Fatalf("first Disarm() error = %v", err)
+	}
+	// Disarming an already removed table must succeed.
+	if err := firewall.Disarm(ctx); err != nil {
+		t.Fatalf("second Disarm() error = %v", err)
+	}
+	// Crash recovery: a stale table left behind is cleaned on the next Arm.
+	if err := os.WriteFile(state, []byte("stale"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := firewall.CleanupStale(ctx); err != nil {
+		t.Fatalf("CleanupStale() error = %v", err)
+	}
+	if _, err := os.Stat(state); !os.IsNotExist(err) {
+		t.Fatal("CleanupStale() left the stale table behind")
 	}
 }
