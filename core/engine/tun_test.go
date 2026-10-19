@@ -133,6 +133,26 @@ func TestTunValidateRejectsEvilDeviceName(t *testing.T) {
 	}
 }
 
+// TestTunValidateMTURange locks the widened TUN MTU bound: a plan that pins
+// MTU 9000 explicitly must pass validation, because the TUN MTU is a
+// local-device value that never reaches a wire limit (mihomo defaults to
+// 9000; sing-box renders an explicit pin unchanged). Values below 576 or
+// above 9000 stay rejected.
+func TestTunValidateMTURange(t *testing.T) {
+	for _, mtu := range []int{576, 1400, 1500, 9000} {
+		tun := Tun{Enabled: true, MTU: mtu}
+		if err := tun.validate(); err != nil {
+			t.Errorf("Tun.validate() with MTU %d = %v, want nil", mtu, err)
+		}
+	}
+	for _, mtu := range []int{-1, 1, 575, 9001, 65536} {
+		tun := Tun{Enabled: true, MTU: mtu}
+		if err := tun.validate(); err == nil {
+			t.Errorf("Tun.validate() with MTU %d = nil, want an error", mtu)
+		}
+	}
+}
+
 // TestPrepareTunRejectsExplicitPrefixOverlappingLAN locks SORA-L19:
 // caller-provided adapter prefixes must be checked against LAN interfaces,
 // not just auto-selected ones. 127.0.0.0/8 is always present via loopback.

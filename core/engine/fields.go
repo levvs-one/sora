@@ -49,6 +49,19 @@ func (d DNS) validate() error {
 	return errors.Join(errs...)
 }
 
+// tunMinMTU and tunMaxMTU bound an explicit TUN MTU. The TUN device is
+// local-only: its MTU never reaches a wire limit, so jumbo values are valid
+// — mihomo's upstream default is 9000. Renderers that prefer a smaller one
+// (sing-box defaults to 1500 because a 9000-byte TUN MTU negotiates MSS
+// 8960, which breaks across shrunken tunnel/PPPoE paths with filtered ICMP
+// killing PMTUD) apply that as a default, not as a validity bound: an
+// explicitly pinned MTU renders unchanged. Below 576 even IPv6's minimum
+// MTU breaks.
+const (
+	tunMinMTU = 576
+	tunMaxMTU = 9000
+)
+
 func (t Tun) validate() error {
 	if !t.Enabled {
 		return nil
@@ -59,8 +72,8 @@ func (t Tun) validate() error {
 	default:
 		errs = append(errs, fmt.Errorf("tun: unknown stack %q", t.Stack))
 	}
-	if t.MTU != 0 && (t.MTU < 576 || t.MTU > 1500) {
-		errs = append(errs, fmt.Errorf("tun: mtu %d out of range 576..1500", t.MTU))
+	if t.MTU != 0 && (t.MTU < tunMinMTU || t.MTU > tunMaxMTU) {
+		errs = append(errs, fmt.Errorf("tun: mtu %d out of range %d..%d", t.MTU, tunMinMTU, tunMaxMTU))
 	}
 	// The device name reaches privileged `ip` invocations; validate it as a
 	// kernel interface name, not a display name (SORA-M2). Empty is filled

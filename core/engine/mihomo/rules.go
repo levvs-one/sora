@@ -252,8 +252,9 @@ func buildDNS(d engine.DNS, o engine.Options, byID map[string]string) (*dnsConfi
 
 // buildTun matches the upstream mihomo MTU default (9000): the TUN device
 // never touches a wire MTU limit, so larger packets only cut the packet rate
-// through the userspace stack. sing-box in Sora already uses 9000; keep the
-// engines consistent. Windows loopback transfer tests show substantially
+// through the userspace stack. sing-box defaults to 1500 instead (MSS/PMTUD
+// safety); both honor an explicitly pinned MTU, which the validator allows
+// up to 9000. Windows loopback transfer tests show substantially
 // less packet overhead with MIPS. Keep the existing mixed default on other
 // platforms.
 func buildTun(t engine.Tun, d engine.DNS) *tunConfig {
