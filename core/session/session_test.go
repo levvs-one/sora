@@ -593,3 +593,40 @@ func TestStopBoundsAHungEngine(t *testing.T) {
 		t.Fatal("Stop() did not return after StopGrace with a hung engine")
 	}
 }
+
+// TestSessionRefusesASecondStartAfterStop locks SORA-M12: the supervise
+// loop, the done channel, and the engine subscription are single-use, so a
+// Start after Stop must fail instead of corrupting them.
+func TestSessionRefusesASecondStartAfterStop(t *testing.T) {
+	s, err := New(testConfig(newFakeEngine(), &fakeGuard{}))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := s.Start(context.Background()); err != nil {
+		t.Fatalf("first Start() error = %v", err)
+	}
+	if err := s.Stop(context.Background()); err != nil {
+		t.Fatalf("Stop() error = %v", err)
+	}
+	if err := s.Start(context.Background()); err == nil {
+		t.Fatal("second Start() succeeded after Stop; the session is single-use")
+	} else if errs.CodeOf(err) != errs.CodeFailedPrecondition {
+		t.Fatalf("second Start() = %v, want FailedPrecondition", err)
+	}
+}
+
+// TestStopOnAFreshSessionLeavesItUsable ensures stopping a session that
+// never started does not poison it.
+func TestStopOnAFreshSessionLeavesItUsable(t *testing.T) {
+	s, err := New(testConfig(newFakeEngine(), &fakeGuard{}))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := s.Stop(context.Background()); err != nil {
+		t.Fatalf("Stop() on a fresh session error = %v", err)
+	}
+	if err := s.Start(context.Background()); err != nil {
+		t.Fatalf("Start() after a no-op Stop error = %v", err)
+	}
+	t.Cleanup(func() { _ = s.Stop(context.Background()) })
+}
