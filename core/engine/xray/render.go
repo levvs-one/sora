@@ -62,6 +62,14 @@ type Selection map[string]string
 // overlapping balancer prefixes and exposing display names in logs; names
 // remain in the plan.
 func Render(p *engine.Plan, rt supervise.Runtime, sel Selection) ([]byte, error) {
+	return render(p, rt, sel, nil)
+}
+
+// render is Render with probe-discovered fingerprint hints: a hint overrides
+// the default uTLS fingerprint of its outbound (an explicit plan fingerprint
+// still wins). The driver feeds hints from latency probes that only passed
+// with a rotated fingerprint.
+func render(p *engine.Plan, rt supervise.Runtime, sel Selection, fpHints map[string]string) ([]byte, error) {
 	if p == nil {
 		return nil, errors.New("xray: nil plan")
 	}
@@ -71,7 +79,7 @@ func Render(p *engine.Plan, rt supervise.Runtime, sel Selection) ([]byte, error)
 	if len(p.Outbounds) == 1 && p.Outbounds[0].Protocol == engine.ProtocolXrayProfile {
 		return renderProfile(p, rt)
 	}
-	r := renderer{plan: p, sel: sel, tags: map[string]string{}, groups: map[string]engine.Group{}, byGroup: map[string]string{}}
+	r := renderer{plan: p, sel: sel, fpHints: fpHints, tags: map[string]string{}, groups: map[string]engine.Group{}, byGroup: map[string]string{}}
 	for i, o := range p.Outbounds {
 		r.tags[o.ID] = outboundTag(i)
 	}
@@ -162,6 +170,7 @@ type renderer struct {
 	groups   map[string]engine.Group
 	balancer []obj
 	byGroup  map[string]string // group name -> balancer tag
+	fpHints  map[string]string // outbound ID -> probe-discovered uTLS fingerprint
 }
 
 func (r *renderer) outbounds() ([]obj, error) {
@@ -270,12 +279,12 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 		s["security"] = "reality"
 		s["realitySettings"] = obj{
 			"serverName": o.TLS.ServerName, "publicKey": o.TLS.RealityPublicKey,
-			"fingerprint": orDefault(o.TLS.Fingerprint, "chrome"),
-		}.set("shortId", o.TLS.RealityShortID).set("spiderX", o.TLS.SpiderX)
+			"fingerprint": r.realityFingerprint(o),
+		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")) // "/" is the documented safe default path
 	case o.TLS.Enabled || needsTLS:
 		s["security"] = "tls"
 		s["tlsSettings"] = obj{}.set("serverName", o.TLS.ServerName).set("alpn", o.TLS.ALPN).
-			set("fingerprint", o.TLS.Fingerprint)
+			set("fingerprint", engine.NormalizeFingerprint(o.TLS.Fingerprint))
 	}
 	if r.plan.Options.Fragment.Enabled && s["security"] != nil {
 		// Dial proxy connections through the fragment outbound to split
@@ -283,6 +292,61 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 		s["sockopt"] = obj{"dialerProxy": tagFragment}
 	}
 	return s, nil
+}
+
+// defaultXrayFingerprint is the uTLS name rendered for Xray REALITY when
+// the plan provides none. The explicit "hellochrome_auto" spelling always
+// resolves to the newest verified Chrome parrot of the engine's vendored
+// uTLS (utls.HelloChrome_Auto), while Xray's pinned "chrome" alias sends
+// Chrome 133, which TSPU fingerprints and blocks (XTLS/Xray-core#7131, Oct
+// 2026). This mirrors engine.DefaultXrayFingerprint of the canonical
+// fingerprint module (core/engine/fingerprint.go); it is spelled out here
+// until that module lands, so this package does not depend on uncommitted
+// work.
+const defaultXrayFingerprint = "hellochrome_auto"
+
+// realityFingerprint resolves the uTLS fingerprint of a REALITY outbound:
+// the plan's explicit value (normalized) wins, then a probe-discovered
+// working fingerprint, then the canonical default.
+func (r *renderer) realityFingerprint(o engine.Outbound) string {
+	if fp := engine.NormalizeFingerprint(o.TLS.Fingerprint); fp != "" {
+		return fp
+	}
+	if fp := r.fpHints[o.ID]; fp != "" {
+		return fp
+	}
+	return defaultXrayFingerprint
+}
+
+// fingerprintRotation is the uTLS fingerprint try-order for Xray probes.
+// Index 0 is the render default (defaultXrayFingerprint); when a
+// probe times out, the next entries are tried in order so one blocked
+// template does not mark a working server dead. Real browser templates go
+// first: randomized fingerprints match no browser population and are more
+// detectable than exact imitation of a current browser, so "randomized"
+// stays last, with the TSPU-flagged pinned "chrome" (Chrome 133) just
+// before it.
+var fingerprintRotation = []string{
+	defaultXrayFingerprint,
+	"firefox",
+	"safari",
+	"chrome",
+	"randomized",
+}
+
+// realityWithoutVision reports a VLESS+REALITY outbound without an XTLS
+// vision flow. Without vision the inner TLS session runs inside the outer
+// REALITY TLS — TLS-in-TLS, a detectable signal — while vision lets Xray
+// strip the inner handshake. Warning-only: the connection still works.
+func realityWithoutVision(o engine.Outbound) bool {
+	if o.Protocol != engine.ProtocolVLESS || !o.TLS.Reality {
+		return false
+	}
+	switch o.Flow {
+	case "xtls-rprx-vision", "xtls-rprx-vision-udp443":
+		return false
+	}
+	return true
 }
 
 func (*renderer) hysteria(o engine.Outbound, tag string) obj {

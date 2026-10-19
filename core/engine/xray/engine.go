@@ -58,6 +58,7 @@ func New(cfg supervise.Config) (*Engine, error) {
 type driver struct {
 	mu  sync.Mutex
 	sel Selection
+	fp  map[string]string // outbound ID -> probe-discovered working uTLS fingerprint
 }
 
 func (*driver) Kind() engine.Kind { return engine.KindXray }
@@ -71,7 +72,27 @@ func (*driver) Route(ctx context.Context, p *engine.Plan) error {
 func (*driver) Unroute(ctx context.Context) error { return tunroute.Unroute(ctx) }
 
 func (d *driver) Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
-	return Render(p, rt, d.selection())
+	return render(p, rt, d.selection(), d.fingerprintHints())
+}
+
+// noteFingerprint remembers a uTLS fingerprint that probing proved working
+// for an outbound; the next render uses it instead of the default.
+func (d *driver) noteFingerprint(id, fp string) {
+	if id == "" || fp == "" {
+		return
+	}
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.fp == nil {
+		d.fp = make(map[string]string)
+	}
+	d.fp[id] = fp
+}
+
+func (d *driver) fingerprintHints() map[string]string {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return maps.Clone(d.fp)
 }
 
 func (d *driver) selection() Selection {
@@ -278,6 +299,32 @@ func (e *Engine) Select(ctx context.Context, group, target string) error {
 	return nil
 }
 
+// Apply warns about VLESS+REALITY outbounds without a vision flow, then
+// starts the engine as usual. The warning is journal-only: without vision
+// the inner TLS runs inside the outer REALITY TLS (TLS-in-TLS), a
+// detectable signal, but the connection itself still works.
+func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
+	e.warnRealityWithoutVision(p)
+	return e.Supervisor.Apply(ctx, p)
+}
+
+// warnRealityWithoutVision publishes one journal warning per VLESS+REALITY
+// outbound that lacks a vision flow.
+func (e *Engine) warnRealityWithoutVision(p *engine.Plan) {
+	if p == nil {
+		return
+	}
+	for i := range p.Outbounds {
+		o := &p.Outbounds[i]
+		if !realityWithoutVision(*o) {
+			continue
+		}
+		e.Events().Publish(engine.Event{Kind: engine.EventLog, Message: fmt.Sprintf(
+			"xray: outbound %q uses VLESS+REALITY without a vision flow (TLS-in-TLS is detectable); set flow xtls-rprx-vision",
+			displayName(*o))})
+	}
+}
+
 func resolveMember(p *engine.Plan, group, target string) (string, error) {
 	for _, g := range p.Groups {
 		if g.Name != group {
@@ -320,15 +367,34 @@ func (e *Engine) Delay(ctx context.Context, name, testURL string, timeout time.D
 	}
 	results := make(chan engine.Measurement, 1)
 	opts := engine.MeasureOptions{URL: orDefault(testURL, e.ProbeURL()), Timeout: timeout, Concurrency: 1}
-	if err := Measure(ctx, e.cfg, []engine.Outbound{*target}, opts, results); err != nil {
+	hints, err := measure(ctx, e.cfg, []engine.Outbound{*target}, opts, results, runProbe)
+	if err != nil {
 		return 0, e.Redactor().Err(err)
 	}
 	m := <-results
+	if m.Err == nil {
+		// A probe that only passed with a rotated fingerprint leaves its
+		// working fingerprint for the session renderer.
+		if fp, ok := hints[target.ID]; ok {
+			e.driver.noteFingerprint(target.ID, fp)
+		}
+	}
 	return m.Latency, e.Redactor().Err(m.Err)
 }
 
 // probeBatch bounds the inbounds of one measuring process.
 const probeBatch = 128
+
+// probeResult is one outbound's timing through a temporary Xray.
+type probeResult struct {
+	latency time.Duration
+	err     error
+}
+
+// probeFunc runs one batch of outbounds through a temporary Xray,
+// returning one result per outbound in batch order. It is a parameter so
+// tests can simulate timeouts without network access.
+type probeFunc func(ctx context.Context, cfg supervise.Config, outbounds []engine.Outbound, opts engine.MeasureOptions) ([]probeResult, error)
 
 // Measure streams one timing per outbound in batches. Each temporary Xray
 // process exposes one SOCKS inbound per outbound.
@@ -345,55 +411,139 @@ func Measure(ctx context.Context, cfg supervise.Config, outbounds []engine.Outbo
 	if cfg.StartTimeout <= 0 {
 		cfg.StartTimeout = 10 * time.Second
 	}
+	_, err := measure(ctx, cfg, outbounds, opts, out, runProbe)
+	return err
+}
+
+// measure probes outbounds in batches and returns the uTLS fingerprints
+// that only worked after rotation, keyed by outbound ID. Probes that pass
+// with the default fingerprint leave no entry.
+func measure(ctx context.Context, cfg supervise.Config, outbounds []engine.Outbound, opts engine.MeasureOptions, out chan<- engine.Measurement, run probeFunc) (map[string]string, error) {
+	hints := make(map[string]string)
 	for start := 0; start < len(outbounds); start += probeBatch {
 		batch := outbounds[start:min(start+probeBatch, len(outbounds))]
-		if err := measureBatch(ctx, cfg, batch, opts, out); err != nil {
-			return err
+		if err := measureAttempts(ctx, cfg, batch, opts, out, run, 0, hints); err != nil {
+			return nil, err
 		}
+	}
+	return hints, nil
+}
+
+// measureAttempts probes one batch, retrying timed-out REALITY outbounds
+// with the next uTLS fingerprint instead of marking them dead. attempt
+// indexes fingerprintRotation; the working fingerprint of a rotated
+// success is recorded in hints for the session renderer.
+func measureAttempts(ctx context.Context, cfg supervise.Config, batch []engine.Outbound, opts engine.MeasureOptions, out chan<- engine.Measurement, run probeFunc, attempt int, hints map[string]string) error {
+	rotated := batch
+	if fp := retryFingerprint(attempt); fp != "" {
+		rotated = make([]engine.Outbound, len(batch))
+		for i, o := range batch {
+			rotated[i] = o
+			if fingerprintRotatable(o) {
+				rotated[i].TLS.Fingerprint = fp
+			}
+		}
+	}
+	results, err := run(ctx, cfg, rotated, opts)
+	if err != nil {
+		return err
+	}
+	var retry []engine.Outbound
+	for i := range results {
+		if i >= len(batch) {
+			break // defensive: run must return one result per outbound
+		}
+		o := batch[i]
+		r := results[i]
+		if r.err != nil && fingerprintRotatable(o) && isTimeout(r.err) && retryFingerprint(attempt+1) != "" {
+			retry = append(retry, o)
+			continue
+		}
+		if r.err == nil {
+			if fp := retryFingerprint(attempt); fp != "" && fingerprintRotatable(o) {
+				hints[o.ID] = fp
+			}
+		}
+		out <- engine.Measurement{OutboundID: o.ID, Engine: engine.KindXray, Latency: r.latency, Err: r.err}
+	}
+	if len(retry) > 0 {
+		return measureAttempts(ctx, cfg, retry, opts, out, run, attempt+1, hints)
 	}
 	return nil
 }
 
-func measureBatch(ctx context.Context, cfg supervise.Config, batch []engine.Outbound, opts engine.MeasureOptions, out chan<- engine.Measurement) error {
+// fingerprintRotatable reports whether probing may rotate the outbound's
+// uTLS fingerprint after a timeout: REALITY always handshakes with a
+// fingerprint, and an explicit plan value is the user's choice to respect.
+func fingerprintRotatable(o engine.Outbound) bool {
+	return o.TLS.Reality && engine.NormalizeFingerprint(o.TLS.Fingerprint) == ""
+}
+
+// retryFingerprint returns the fingerprint for probe retry attempt n: the
+// initial attempt renders the default ("" lets the renderer decide), later
+// attempts walk fingerprintRotation, and "" past its end stops retrying.
+func retryFingerprint(attempt int) string {
+	if attempt <= 0 || attempt >= len(fingerprintRotation) {
+		return ""
+	}
+	return fingerprintRotation[attempt]
+}
+
+// isTimeout reports whether err is a timeout. A stalled TLS handshake
+// surfaces here as a client-side deadline, whatever Xray logged.
+func isTimeout(err error) bool {
+	var uerr *url.Error
+	if errors.As(err, &uerr) {
+		return uerr.Timeout()
+	}
+	var nerr net.Error
+	return errors.As(err, &nerr) && nerr.Timeout()
+}
+
+// runProbe renders one temporary Xray for batch and times each outbound
+// through its loopback SOCKS inbound, returning one result per outbound in
+// batch order.
+func runProbe(ctx context.Context, cfg supervise.Config, batch []engine.Outbound, opts engine.MeasureOptions) ([]probeResult, error) {
 	ports := make([]int, len(batch))
 	for i := range ports {
 		p, err := supervise.FreePort()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		ports[i] = p
 	}
 	raw, err := RenderProbe(batch, ports)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	proc, err := supervise.Start(ctx, supervise.Spec{Name: "xray", Path: cfg.Binary.Path, Args: []string{"run", "-c", "stdin:"}, Dir: cfg.HomeDir, Config: raw})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() { _ = proc.Stop(context.WithoutCancel(ctx), 0) }()
 	ready, cancelReady := context.WithTimeout(ctx, cfg.StartTimeout)
 	defer cancelReady()
 	if err := waitListening(ready, proc, ports[len(ports)-1]); err != nil {
-		return err
+		return nil, err
 	}
 
+	results := make([]probeResult, len(batch))
 	sem := make(chan struct{}, opts.Concurrency)
 	var wg sync.WaitGroup
-	for i, o := range batch {
+	for i := range batch {
 		wg.Add(1)
 		sem <- struct{}{}
 		go func() {
 			defer wg.Done()
 			defer func() { <-sem }()
 			d, err := timeThrough(ctx, ports[i], opts)
-			out <- engine.Measurement{OutboundID: o.ID, Engine: engine.KindXray, Latency: d, Err: err}
+			results[i] = probeResult{latency: d, err: err}
 		}()
 	}
 	wg.Wait()
-	return nil
+	return results, nil
 }
 
 // timeThrough warms the proxy tunnel and target TLS session, then times a

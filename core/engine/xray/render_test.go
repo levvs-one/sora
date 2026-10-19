@@ -201,3 +201,109 @@ func TestLiveEngineLifecycle(t *testing.T) {
 		t.Fatalf("Stop: %v", err)
 	}
 }
+
+func realityFingerprintOf(t *testing.T, raw []byte) string {
+	t.Helper()
+	var cfg struct {
+		Outbounds []struct {
+			StreamSettings struct {
+				RealitySettings struct {
+					Fingerprint string `json:"fingerprint"`
+				} `json:"realitySettings"`
+			} `json:"streamSettings"`
+		} `json:"outbounds"`
+	}
+	if err := json.Unmarshal(raw, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	if len(cfg.Outbounds) == 0 {
+		t.Fatal("rendered config has no outbounds")
+	}
+	return cfg.Outbounds[0].StreamSettings.RealitySettings.Fingerprint
+}
+
+func TestRenderRealityFingerprintDefaultsToAuto(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Outbounds[0].TLS.Fingerprint = ""
+	raw, err := Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fp := realityFingerprintOf(t, raw)
+	if fp != defaultXrayFingerprint {
+		t.Fatalf("reality fingerprint = %q, want the auto default %q", fp, defaultXrayFingerprint)
+	}
+	if fp == "chrome" {
+		t.Fatal("the pinned chrome alias (Chrome 133, TSPU-blocked) must not be the default")
+	}
+}
+
+func TestRenderRealityFingerprintExplicitWins(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Outbounds[0].TLS.Fingerprint = "firefox"
+	raw, err := Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fp := realityFingerprintOf(t, raw); fp != "firefox" {
+		t.Fatalf("reality fingerprint = %q, want the explicit %q", fp, "firefox")
+	}
+}
+
+func TestRenderNormalizesFingerprintCase(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Outbounds[0].TLS.Fingerprint = "HelloChrome_Auto"
+	raw, err := Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fp := realityFingerprintOf(t, raw); fp != "hellochrome_auto" {
+		t.Fatalf("reality fingerprint = %q, want normalized %q", fp, "hellochrome_auto")
+	}
+}
+
+func TestRenderAppliesFingerprintHint(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Outbounds[0].TLS.Fingerprint = ""
+	raw, err := render(p, testRuntime, nil, map[string]string{"vless": "safari"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fp := realityFingerprintOf(t, raw); fp != "safari" {
+		t.Fatalf("reality fingerprint = %q, want the probe-discovered hint %q", fp, "safari")
+	}
+
+	// An explicit plan fingerprint still beats a stale hint.
+	p.Outbounds[0].TLS.Fingerprint = "firefox"
+	raw, err = render(p, testRuntime, nil, map[string]string{"vless": "safari"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fp := realityFingerprintOf(t, raw); fp != "firefox" {
+		t.Fatalf("reality fingerprint = %q, want the explicit %q over the hint", fp, "firefox")
+	}
+}
+
+func TestRealityWithoutVision(t *testing.T) {
+	cases := []struct {
+		name string
+		o    engine.Outbound
+		want bool
+	}{
+		{"vless reality without flow", engine.Outbound{Protocol: engine.ProtocolVLESS, TLS: engine.TLS{Reality: true}}, true},
+		{"vless reality with vision", engine.Outbound{Protocol: engine.ProtocolVLESS, Flow: "xtls-rprx-vision", TLS: engine.TLS{Reality: true}}, false},
+		{"vless reality with vision-udp443", engine.Outbound{Protocol: engine.ProtocolVLESS, Flow: "xtls-rprx-vision-udp443", TLS: engine.TLS{Reality: true}}, false},
+		{"vless tls without flow", engine.Outbound{Protocol: engine.ProtocolVLESS, TLS: engine.TLS{Enabled: true}}, false},
+		{"vmess reality without flow", engine.Outbound{Protocol: engine.ProtocolVMess, TLS: engine.TLS{Reality: true}}, false},
+		{"vless without reality", engine.Outbound{Protocol: engine.ProtocolVLESS}, false},
+	}
+	for _, tc := range cases {
+		if got := realityWithoutVision(tc.o); got != tc.want {
+			t.Errorf("%s: realityWithoutVision = %v, want %v", tc.name, got, tc.want)
+		}
+	}
+}
+
+// TestRenderRejectsDoH3WithGuidance locks the honest failure: Xray has no
+// DNS-over-HTTP/3 transport, so an h3:// resolver must fail the render
+// with an actionable message instead of a bare "not supported".
