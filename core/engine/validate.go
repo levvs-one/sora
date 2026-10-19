@@ -99,6 +99,25 @@ func (o Outbound) Warnings() []string {
 }
 
 // Validate checks one outbound on its own, without engine capabilities.
+// validProtocols whitelists the protocols a plan may hold, so an unknown
+// protocol fails validation with a clear error instead of surfacing late at
+// eng.Apply (SORA-L16).
+var validProtocols = map[Protocol]bool{
+	ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
+	ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
+	ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
+	ProtocolAnyTLS: true, ProtocolBypass: true, ProtocolXrayProfile: true,
+	ProtocolDirect: true,
+}
+
+// validTransports whitelists the stream transports a plan may hold. "h2" is
+// accepted at plan level for sing-box; engines that dropped it (Xray) reject
+// it when rendering.
+var validTransports = map[string]bool{
+	"": true, "tcp": true, "ws": true, "grpc": true,
+	"h2": true, "httpupgrade": true, "xhttp": true,
+}
+
 func (o Outbound) Validate() error {
 	var errs []error
 	if o.ID == "" {
@@ -109,8 +128,11 @@ func (o Outbound) Validate() error {
 	if err := validateDisplayName("outbound "+o.ID, o.Name); err != nil {
 		errs = append(errs, err)
 	}
-	if o.Protocol == "" {
-		errs = append(errs, fmt.Errorf("outbound %s: empty protocol", o.ID))
+	if !validProtocols[o.Protocol] {
+		errs = append(errs, fmt.Errorf("outbound %s: unknown protocol %q", o.ID, o.Protocol))
+	}
+	if !validTransports[o.Transport.Type] {
+		errs = append(errs, fmt.Errorf("outbound %s: unknown transport %q", o.ID, o.Transport.Type))
 	}
 	serverless := o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass
 	if !serverless && o.Port == 0 {
