@@ -1,0 +1,284 @@
+package probe
+
+// QUIC reachability probing and residual-ban tracking.
+//
+// FOCI 2026 measured the TSPU QUIC censor precisely: it decrypts the QUIC
+// Initial (RFC 9001 keys are public), extracts the SNI, and on a forbidden
+// domain drops the packet plus every later packet of the same 4-tuple for
+// ~420 seconds — each new packet resets the timer. If the first packet does
+// not trigger, the rest of the connection is residually cleared (not
+// inspected). Two consequences for the client:
+//
+//  1. Retrying a blocked QUIC handshake from the same UDP source port only
+//     extends the ban. The BanTracker below remembers banned 4-tuples so
+//     the dialer rotates the source port instead of hammering a dead one.
+//  2. A blind TCP fallback hurts on some destinations (P04-6: YouTube over
+//     TCP is worse than a working QUIC path, and a blocked QUIC path says
+//     nothing about TCP quality). ProbeQUIC reports facts; the Advice
+//     method tells the caller what they justify, which is never "just use
+//     TCP".
+//
+// The reachability trick: an Initial with a reserved grease version
+// (0x0a0a0a0a, RFC 9000 §6) forces any QUIC server to answer with a Version
+// Negotiation packet. A VN reply proves the UDP path is open end to end;
+// silence toward a host that serves QUIC, while TCP/443 answers, proves
+// the censor dropped the Initial.
+
+import (
+	"context"
+	"crypto/rand"
+	"encoding/binary"
+	"errors"
+	"fmt"
+	"net"
+	"strings"
+	"sync"
+	"time"
+)
+
+// residualBanTTL is the FOCI-2026 measured residual ban: 420 seconds on
+// the 4-tuple after a QUIC SNI drop, self-renewing while packets arrive.
+const residualBanTTL = 420 * time.Second
+
+// quicProbeTimeout bounds one reachability attempt.
+const quicProbeTimeout = 3 * time.Second
+
+// quicMinInitial is the minimum QUIC Initial datagram size (RFC 9000 §14);
+// padding to it keeps the probe shaped like a real handshake.
+const quicMinInitial = 1200
+
+// Verdict names what the QUIC probe established about the path.
+type Verdict int
+
+const (
+	// VerdictUnknown means the probe could not decide (e.g. no permission
+	// to send, resolver failure unrelated to the path).
+	VerdictUnknown Verdict = iota
+	// VerdictOpen means a Version Negotiation arrived: UDP reaches a QUIC
+	// server and comes back.
+	VerdictOpen
+	// VerdictBlocked means UDP/443 is silently dropped while TCP/443 to
+	// the same host answers: the QUIC censor signature.
+	VerdictBlocked
+	// VerdictFiltered means the port actively refused (ICMP unreachable):
+	// no QUIC server there, not necessarily censorship.
+	VerdictFiltered
+	// VerdictDown means neither QUIC nor TCP answered: host or network
+	// down, not a QUIC-specific verdict.
+	VerdictDown
+)
+
+// QUICResult is one reachability verdict with the 4-tuple it was measured
+// on, so the caller can feed the ban tracker exactly.
+type QUICResult struct {
+	Host      string
+	Port      int
+	Verdict   Verdict
+	RTT       time.Duration
+	LocalPort int
+	Remote    string
+}
+
+// Advice renders what the verdict justifies. It never recommends a blind
+// TCP fallback: a blocked QUIC path says nothing about TCP quality, and on
+// some destinations (YouTube) the fallback is worse than trying QUIC from
+// a fresh source port.
+func (r *QUICResult) Advice() string {
+	switch r.Verdict {
+	case VerdictOpen:
+		return "QUIC reaches the host: prefer it, no fallback needed."
+	case VerdictBlocked:
+		return "QUIC is dropped on this path while TCP answers: do not retry QUIC from UDP source port " +
+			fmt.Sprint(r.LocalPort) + " for 420s (the ban self-renews); rotate the source port for the next attempt, and measure TCP quality before falling back to it."
+	case VerdictFiltered:
+		return "the port refused the probe: no QUIC server there, or a firewall answered; not a censorship verdict."
+	case VerdictDown:
+		return "neither QUIC nor TCP answered: the host or the network is down, not a QUIC-specific problem."
+	default:
+		return "the probe could not decide; treat as unknown, not as blocked."
+	}
+}
+
+// ProbeQUIC checks whether a QUIC handshake can reach host:port over UDP.
+// It sends one Initial with a grease version and waits for Version
+// Negotiation; no real handshake is performed and nothing is retransmitted,
+// so a lost probe never extends a residual ban by itself.
+func ProbeQUIC(ctx context.Context, host string, port int) (*QUICResult, error) {
+	if host == "" {
+		return nil, errors.New("probe: quic probe needs a host")
+	}
+	if port <= 0 || port > 65535 {
+		return nil, fmt.Errorf("probe: %d is not a port", port)
+	}
+	raddr, err := resolveUDP(ctx, host, port)
+	if err != nil {
+		return nil, err
+	}
+	conn, err := net.DialUDP("udp", nil, raddr)
+	if err != nil {
+		return nil, fmt.Errorf("probe: dial udp: %w", err)
+	}
+	defer conn.Close()
+	laddr, ok := conn.LocalAddr().(*net.UDPAddr)
+	if !ok {
+		return nil, errors.New("probe: udp socket has no udp address")
+	}
+	localPort := laddr.Port
+	remote := raddr.String()
+
+	pkt, err := greaseInitial()
+	if err != nil {
+		return nil, err
+	}
+	deadline := time.Now().Add(quicProbeTimeout)
+	if dl, ok := ctx.Deadline(); ok && dl.Before(deadline) {
+		deadline = dl
+	}
+	_ = conn.SetDeadline(deadline)
+	start := time.Now()
+	if _, err := conn.Write(pkt); err != nil {
+		return nil, fmt.Errorf("probe: send initial: %w", err)
+	}
+	res := &QUICResult{Host: host, Port: port, LocalPort: localPort, Remote: remote}
+	buf := make([]byte, 1500)
+	for {
+		n, err := conn.Read(buf)
+		if err != nil {
+			if ctx.Err() != nil {
+				return nil, ctx.Err()
+			}
+			if isICMPUnreachable(err) {
+				res.Verdict = VerdictFiltered
+				return res, nil
+			}
+			if isTimeout(err) {
+				return res.withControl(ctx, host, port)
+			}
+			res.Verdict = VerdictUnknown
+			return res, nil
+		}
+		if isVersionNegotiation(buf[:n]) {
+			res.Verdict = VerdictOpen
+			res.RTT = time.Since(start)
+			return res, nil
+		}
+		// Not a VN packet (stray traffic): keep waiting for the real
+		// answer until the deadline.
+	}
+}
+
+// withControl runs the TCP/443 control after UDP silence: TCP answering
+// while QUIC stays silent is the censor signature; both silent is a down
+// host or network.
+func (r *QUICResult) withControl(ctx context.Context, host string, port int) (*QUICResult, error) {
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+	d := net.Dialer{Timeout: quicProbeTimeout}
+	tcpAddr := net.JoinHostPort(host, fmt.Sprint(port))
+	c, err := d.DialContext(ctx, "tcp", tcpAddr)
+	if err != nil {
+		r.Verdict = VerdictDown
+		return r, nil
+	}
+	_ = c.Close()
+	r.Verdict = VerdictBlocked
+	return r, nil
+}
+
+func resolveUDP(ctx context.Context, host string, port int) (*net.UDPAddr, error) {
+	r := net.Resolver{}
+	addrs, err := r.LookupIP(ctx, "ip", host)
+	if err != nil || len(addrs) == 0 {
+		return nil, fmt.Errorf("probe: resolve %s: %w", host, err)
+	}
+	return &net.UDPAddr{IP: addrs[0], Port: port}, nil
+}
+
+// greaseInitial builds a minimal QUIC Initial with a reserved version so
+// the server must answer Version Negotiation. The packet is well-formed
+// (long header, DCID, empty token, padding to 1200 bytes) but carries no
+// CRYPTO: it can never complete a handshake, which is the point — the
+// probe measures the path, not the server.
+func greaseInitial() ([]byte, error) {
+	dcid := make([]byte, 8)
+	if _, err := rand.Read(dcid); err != nil {
+		return nil, fmt.Errorf("probe: random dcid: %w", err)
+	}
+	pkt := []byte{0xC3} // long header, fixed bit, Initial, 1-byte packet number
+	pkt = append(pkt, 0x0A, 0x0A, 0x0A, 0x0A)
+	pkt = append(pkt, byte(len(dcid)))
+	pkt = append(pkt, dcid...)
+	pkt = append(pkt, 0x00) // empty SCID
+	pkt = append(pkt, 0x00) // empty token (varint)
+	// Length covers packet number + payload; computed below.
+	pkt = append(pkt, 0x00, 0x00)
+	pkt = append(pkt, 0x00) // packet number 0
+	payloadLen := quicMinInitial - len(pkt)
+	pkt = append(pkt, make([]byte, payloadLen)...) // PADDING frames
+	length := 1 + payloadLen
+	pkt[16] = 0x40 | byte(length>>8)
+	pkt[17] = byte(length)
+	return pkt, nil
+}
+
+// isVersionNegotiation reports a QUIC Version Negotiation packet: long
+// header with the version field zeroed (RFC 9000 §6.1).
+func isVersionNegotiation(pkt []byte) bool {
+	return len(pkt) >= 6 && pkt[0]&0x80 != 0 && binary.BigEndian.Uint32(pkt[1:5]) == 0
+}
+
+// isICMPUnreachable reports the ECONNREFUSED a connected UDP socket gets
+// when an ICMP port-unreachable arrives: the far port is closed, not
+// silently dropped.
+func isICMPUnreachable(err error) bool {
+	return strings.Contains(err.Error(), "connection refused")
+}
+
+func isTimeout(err error) bool {
+	var netErr net.Error
+	return errors.As(err, &netErr) && netErr.Timeout()
+}
+
+// BanTracker remembers 4-tuples in residual ban so the QUIC dialer rotates
+// the UDP source port instead of reusing a banned one. A banned tuple
+// self-renews while packets arrive at the censor, so the client must not
+// "wait it out" on the same port: rotate, don't retry.
+type BanTracker struct {
+	mu    sync.Mutex
+	until map[string]time.Time
+	ttl   time.Duration
+	now   func() time.Time
+}
+
+// NewBanTracker returns a tracker with the FOCI-measured 420s ban TTL.
+func NewBanTracker() *BanTracker {
+	return &BanTracker{until: map[string]time.Time{}, ttl: residualBanTTL, now: time.Now}
+}
+
+// NoteBlocked records that localPort→remote just ate a QUIC drop.
+func (b *BanTracker) NoteBlocked(localPort int, remote string) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.until[banKey(localPort, remote)] = b.now().Add(b.ttl)
+}
+
+// Banned reports whether localPort→remote is still inside its residual
+// ban. Expired entries are pruned on read.
+func (b *BanTracker) Banned(localPort int, remote string) bool {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	until, ok := b.until[banKey(localPort, remote)]
+	if !ok {
+		return false
+	}
+	if !b.now().Before(until) {
+		delete(b.until, banKey(localPort, remote))
+		return false
+	}
+	return true
+}
+
+func banKey(localPort int, remote string) string {
+	return fmt.Sprintf("%d->%s", localPort, remote)
+}
