@@ -22,25 +22,10 @@ Future<void> main(List<String> args) async {
   final sora = Sora(await Settings.load());
   unawaited(sora.run());
   final navigator = GlobalKey<NavigatorState>();
-  // A link passed on the command line launches the app (cold start).
-  // app_links only reports links received while the app runs, so the launch
-  // argument is extracted here and delivered after startup.
-  final launchLink = _launchLink(args);
   final desktop = Platform.isLinux || Platform.isWindows ? Desktop(sora, navigator) : null;
   await desktop?.start(hidden: args.contains('--hidden'));
   runApp(SoraApp(sora: sora, navigator: navigator, desktop: desktop));
   WidgetsBinding.instance.addPostFrameCallback((_) => sora.updates.start());
-  await desktop?.handleInitialLinks(launchLink);
-}
-
-/// First command-line argument that looks like a link; option flags are
-/// skipped. Mirrors the native runners' find_link_arg.
-String? _launchLink(List<String> args) {
-  for (final arg in args) {
-    if (arg.startsWith('-')) continue;
-    if (arg.contains('://')) return arg;
-  }
-  return null;
 }
 
 class SoraApp extends StatefulWidget {

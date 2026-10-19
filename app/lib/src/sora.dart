@@ -580,16 +580,26 @@ class Sora extends ChangeNotifier {
 
   bool get busy => _connectionWork != null || phase == Phase.connecting || phase == Phase.disconnecting;
 
-  SessionPlan get currentPlan => buildPlan(
-    servers: servers,
-    choice: selected,
-    settings: settings,
-    latency: latency,
-    bandwidth: bandwidth,
-    entry: selected.startsWith(groupPrefix) ? entryOf(selected, _subscriptions.values) : null,
-    zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
-    reliabilityOf: reliabilityOf,
-  );
+  SessionPlan get currentPlan {
+    // Hops that vanished (a server was deleted mid-session) are dropped
+    // instead of throwing inside a getter the UI calls on every rebuild;
+    // the mismatch then honestly reports as pending changes.
+    final chain = _activeChain;
+    final hops = chain == null
+        ? const <String>[]
+        : [for (final id in chain.hops) if (servers.any((o) => o.id == id)) id];
+    return buildPlan(
+      servers: servers,
+      choice: selected,
+      settings: settings,
+      latency: latency,
+      bandwidth: bandwidth,
+      entry: selected.startsWith(groupPrefix) ? entryOf(selected, _subscriptions.values) : null,
+      chain: hops,
+      zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
+      reliabilityOf: reliabilityOf,
+    );
+  }
 
   @override
   void notifyListeners() {
@@ -719,6 +729,7 @@ class Sora extends ChangeNotifier {
     if (phase == Phase.off) {
       sessionId = null;
       _activePlan = null;
+      _activeChain = null;
       needsReconnect = false;
     } else if (state.sessionId.isNotEmpty) {
       sessionId = state.sessionId;
@@ -1209,6 +1220,7 @@ class Sora extends ChangeNotifier {
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
       _applyState(answer.status.connection);
       _activePlan = plan;
+      _activeChain = via;
       needsReconnect = currentPlan != plan;
       connected = true;
       // Swapped together with the watch, so events of the previous session
@@ -1300,6 +1312,12 @@ class Sora extends ChangeNotifier {
   Future<void> select(String server) async {
     if (settings.server == server) return;
     settings.server = server;
+    if (_activeChain != null) {
+      // A manual server pick ends the chain session: the next plan is
+      // direct, so the comparison below reconnects to the chosen server
+      // instead of silently keeping the chain.
+      _activeChain = null;
+    }
     notifyListeners();
     await _replan();
     if (_stopping ||
