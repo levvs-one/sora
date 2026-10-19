@@ -36,7 +36,7 @@ verify_upstream_signature() {
 		;;
 	dgst-crosscheck)
 		dgst_file="$work/$(basename "$url").dgst"
-		curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$dgst_file" "$url.dgst" \
+		curl --fail --location --silent --show-error --retry 3 --connect-timeout 20 --max-time 600 --proto '=https' --output "$dgst_file" "$url.dgst" \
 			|| { echo "engines.sig: could not download $url.dgst" >&2; exit 1; }
 		published=$(awk '/^SHA2-256=/ {print $2}' "$dgst_file" | tr 'A-Z' 'a-z')
 		if [ -z "$published" ]; then
@@ -55,7 +55,7 @@ verify_upstream_signature() {
 		[ -n "$detail" ] || { echo "engines.sig: no identity declared for $engine" >&2; exit 1; }
 		asset="$work/$(basename "$url")"
 		sig_file="$asset.sig"
-		curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$sig_file" "$url.sig" \
+		curl --fail --location --silent --show-error --retry 3 --connect-timeout 20 --max-time 600 --proto '=https' --output "$sig_file" "$url.sig" \
 			|| { echo "engines.sig: could not download $url.sig" >&2; exit 1; }
 		case "$detail" in
 		keyless:*)
@@ -97,7 +97,7 @@ while read -r engine line_arch digest url; do
 	[[ -z "$engine" || "$engine" == \#* || "$line_arch" != "$arch" ]] && continue
 	found=$((found + 1))
 	file="$work/$(basename "$url")"
-	curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$file" "$url"
+	curl --fail --location --silent --show-error --retry 3 --connect-timeout 20 --max-time 600 --proto '=https' --output "$file" "$url"
 	echo "$digest  $file" | sha256sum --check --quiet --strict
 	# Enforce the upstream-signature declaration from engines.sig (SORA-M3).
 	verify_upstream_signature "$engine" "$digest" "$url"

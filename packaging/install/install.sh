@@ -64,7 +64,7 @@ fi
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT INT TERM
 
-fetch() { curl -fsSL --proto '=https' --tlsv1.2 -o "$2" "$1"; }
+fetch() { curl -fsSL --proto '=https' --tlsv1.2 --retry 3 --connect-timeout 20 --max-time 600 -o "$2" "$1"; }
 
 # Verifies the minisign signature of $1 (signed file) using $2 (signature
 # file) and the embedded release public key. Dies on any failure:
@@ -90,7 +90,7 @@ if [ -n "${SORA_DIST:-}" ]; then
 else
 	if [ -z "${SORA_VERSION:-}" ]; then
 		# The latest release redirects to its tag; no API call, no rate limit.
-		latest=$(curl -fsSLI --proto '=https' -o /dev/null -w '%{url_effective}' "$repo/releases/latest")
+		latest=$(curl -fsSLI --proto '=https' --retry 3 --connect-timeout 20 --max-time 60 -o /dev/null -w '%{url_effective}' "$repo/releases/latest")
 		version=${latest##*/v}
 		case "$version" in
 		[0-9]*.[0-9]*.[0-9]*) ;;
@@ -100,6 +100,18 @@ else
 		version=$SORA_VERSION
 	fi
 fi
+
+# A version from the environment is trusted no further than the redirect
+# above: it still has to look like a release before it becomes file names.
+# The first pattern rejects anything outside the version alphabet outright;
+# the second keeps the dotted-numeric shape the file names assume.
+case "$version" in
+*[!0-9A-Za-z.~+-]* | [!0-9]* | *[!0-9A-Za-z])
+	die "SORA_VERSION='$version' is not a release version"
+	;;
+[0-9]*.[0-9]*.[0-9]*) ;;
+*) die "SORA_VERSION='$version' is not a release version" ;;
+esac
 
 case "$manager" in
 apt) files="sora-core_${version}_${deb_arch}.deb" app="sora_${version}_${deb_arch}.deb" ;;

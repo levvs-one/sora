@@ -20,20 +20,28 @@ jobs:
     name: Workflow lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      # actionlint is fetched as a release archive and verified by SHA-256
+      # instead of executing a remote install script (supply-chain hardening).
       - name: Install actionlint
-        run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/actionlint_1.7.7_linux_amd64.tar.gz"
+          curl -sSfL -o "$archive" https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz
+          printf '%s  %s\n' '023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757' "$(basename "$archive")" > "$archive.sha256"
+          (cd "$RUNNER_TEMP" && sha256sum -c "$archive.sha256")
+          tar -xzf "$archive" -C "$RUNNER_TEMP" actionlint
       - name: Run actionlint
-        run: ./actionlint -color
+        run: '"$RUNNER_TEMP/actionlint" -color'
 
   proto:
     name: Proto
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version: '1.23'
           cache: false
@@ -63,10 +71,10 @@ jobs:
       run:
         working-directory: core
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version-file: core/go.mod
           cache: false
@@ -103,7 +111,7 @@ jobs:
           sudo unshare --net env SORA_ISOLATED_PACKET_TEST=1 SORA_ORIGINAL_NETNS="$original" \
             "$RUNNER_TEMP/sora-packet-tests" -test.v -test.run '^TestNativeLinuxOwnedTunCapture$' -test.timeout 15s
       - name: Lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@4afd733a84b1f43292c63897423277bb7f4313a9 # v8
         with:
           # Built with a Go new enough for the go directive of core/go.mod.
           version: v2.14.0
@@ -116,8 +124,8 @@ jobs:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v6
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: 3.47.6
           channel: stable
@@ -151,8 +159,8 @@ jobs:
     # installer, reach it from the app over the named pipe, uninstall.
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version-file: core/go.mod
           cache: false
@@ -182,13 +190,13 @@ jobs:
           $env:SORA_ENGINES_DIR = (Resolve-Path '../dist/windows/engines').Path
           go test -count=1 -v ./engine/interop -run '^TestWindowsTunSwitchesCarryTCPAndUDP$' -timeout 10m 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\windows-tun-throughput.log"
           if ($LASTEXITCODE -ne 0) { throw 'Windows TUN packet or throughput checks failed' }
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: windows-tun-throughput
           path: ${{ runner.temp }}/windows-tun-throughput.log
           if-no-files-found: ignore
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: 3.47.6
           channel: stable
@@ -236,8 +244,20 @@ jobs:
         shell: pwsh
         run: |
           # The same script people run, on the installer this job built.
+          # install.ps1 refuses to run while the release key is a placeholder
+          # (fail-closed, SORA-H1); CI signs with an ephemeral test key,
+          # exactly the SORA_DIST contract of install.ps1.
+          choco install minisign --no-progress -y
+          if ($LASTEXITCODE -ne 0) { throw 'minisign installation failed' }
+          $key = "$env:RUNNER_TEMP\sora-test.key"
+          $pub = "$env:RUNNER_TEMP\sora-test.pub"
+          & minisign -G -W -p $pub -s $key
+          if ($LASTEXITCODE -ne 0) { throw 'minisign key generation failed' }
+          $env:SORA_MINISIGN_PUBKEY = (Get-Content $pub)[1]
           $setup = Get-ChildItem dist\Sora-Setup-*.exe | Select-Object -First 1
           "$((Get-FileHash -Algorithm SHA256 $setup.FullName).Hash.ToLowerInvariant())  $($setup.Name)" | Set-Content -Encoding ascii dist\SHA256SUMS
+          & minisign -S -W -s $key -m dist\SHA256SUMS
+          if ($LASTEXITCODE -ne 0) { throw 'signing SHA256SUMS failed' }
           $env:SORA_DIST = "$PWD\dist"
           & .\packaging\install\install.ps1
           # Silent setup must reopen the app as well as install the service.
@@ -341,7 +361,7 @@ jobs:
           [System.Drawing.Graphics]::FromImage($shot).CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
           $shot.Save("screenshots\app.png")
           Stop-Process -Id $app.Id -Force
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: windows-screenshots
@@ -353,7 +373,7 @@ jobs:
           Start-Process "${env:ProgramFiles}\Sora\unins000.exe" -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES' -Wait
           Start-Sleep -Seconds 3
           if (Get-Service SoraCore -ErrorAction SilentlyContinue) { throw "the service outlived the uninstaller" }
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: sora-windows-x64
           path: dist/Sora-Setup-*.exe
@@ -374,8 +394,8 @@ jobs:
           - arch: arm64
             runner: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version-file: core/go.mod
           cache: false
@@ -417,7 +437,7 @@ jobs:
           for job in $(jobs -p); do wait "$job" || status=1; done
           cat coexist-*.log
           exit $status
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always() && matrix.arch == 'amd64'
         with:
           name: coexistence-logs
@@ -438,7 +458,7 @@ jobs:
           packaging/zapret/build.sh dist/engines
       # Flutter publishes no Linux SDK for arm64 hosts, so the desktop app is
       # packaged for amd64 only; the core and engines are built for both.
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         if: matrix.arch == 'amd64'
         with:
           flutter-version: 3.47.6
@@ -467,9 +487,15 @@ jobs:
         # The same script people run, on the packages this job built.
         run: |
           shellcheck packaging/install/install.sh
+          sudo apt-get install -y -qq minisign
+          # install.sh refuses to run while the release key is a placeholder
+          # (fail-closed, SORA-H1); CI signs the test packages with an
+          # ephemeral key, exactly the SORA_DIST contract of install.sh.
+          minisign -G -W -p "$RUNNER_TEMP/sora-test.pub" -s "$RUNNER_TEMP/sora-test.key"
+          export SORA_MINISIGN_PUBKEY="$(sed -n '2p' "$RUNNER_TEMP/sora-test.pub")"
           mkdir -p install-test
           cp dist/*.deb dist/*.rpm dist/*.pkg.tar.zst install-test/
-          (cd install-test && sha256sum -- * > SHA256SUMS)
+          (cd install-test && sha256sum -- * > SHA256SUMS && minisign -S -W -s "$RUNNER_TEMP/sora-test.key" -m SHA256SUMS)
           SORA_DIST=install-test sh packaging/install/install.sh
           for _ in $(seq 1 30); do systemctl is-active --quiet sora-core && break; sleep 1; done
           systemctl is-active sora-core
@@ -478,11 +504,11 @@ jobs:
           # Distribution mirrors drop a download now and then. A package that
           # does not install fails all three runs.
           retry() { for _ in 1 2; do "$@" && return; sleep 15; done; "$@"; }
-          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION fedora:latest \
-            sh -c 'dnf -y -q install systemd >/dev/null && sh packaging/install/install.sh && rpm -q sora sora-core'
-          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION archlinux:latest \
-            sh -c 'pacman -Sy --noconfirm >/dev/null && sh packaging/install/install.sh && pacman -Q sora sora-core'
-      - uses: actions/upload-artifact@v6
+          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION -e SORA_MINISIGN_PUBKEY fedora:latest \
+            sh -c 'dnf -y -q install systemd minisign >/dev/null && sh packaging/install/install.sh && rpm -q sora sora-core'
+          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION -e SORA_MINISIGN_PUBKEY archlinux:latest \
+            sh -c 'pacman -Sy --noconfirm >/dev/null && pacman -S --noconfirm minisign >/dev/null && sh packaging/install/install.sh && pacman -Q sora sora-core'
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: sora-linux-${{ matrix.arch }}
           path: |
@@ -501,8 +527,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           pattern: sora-*
           path: dist

@@ -1,7 +1,7 @@
 ; The Windows installer of Sora: the application, the core and its engines,
 ; and the core registered as the SoraCore service. Built in CI with Inno Setup 6
 ; from the repository root:
-;   iscc /DAppVersion=0.3.0 packaging\windows\sora.iss
+;   iscc /DAppVersion=1.0.6 packaging\windows\sora.iss
 ; after the app is built into app\build\windows\x64\runner\Release and the core
 ; and engines into dist\windows (see README.md).
 

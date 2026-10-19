@@ -1,4 +1,12 @@
-"""Exercise the privileged helper in a mount/user namespace with no host writes."""
+"""Exercise the privileged helper in a mount/user namespace with no host writes.
+
+The package managers, the package queries and minisign are faked inside the
+sandbox: the tests cover the helper's flow (one transaction per manager,
+downgrade protection, input validation, fail-closed signature handling), not
+the cryptography or the real package managers. minisign is faked because the
+helper must refuse to run while the release key is a placeholder (SORA-H1);
+TEST_MINISIGN_FAILURE=1 makes the fake fail to cover the bad-signature abort.
+"""
 
 import hashlib
 import pathlib
@@ -37,13 +45,30 @@ class UpdateHelperTest(unittest.TestCase):
         (self.downloads / "SHA256SUMS").write_text("".join(checksums))
         return files
 
-    def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False):
+    def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
+                   signature_failure=False):
         recorder = 'printf "%s\\n" "$@" > /tmp/test/calls'
         scripts = {
-            "dpkg-query": 'case "$1" in -S) echo "sora: /usr/lib/sora/app/sora";; -W) echo installed;; *) exit 1;; esac',
+            # The fakes answer the downgrade-protection queries too: -W with
+            # -f='${Version}' (deb), -q --qf (rpm) and -Q sora-core (arch) must
+            # report the installed version, or the helper refuses to proceed.
+            "dpkg-query": 'case "$1" in -S) echo "sora: /usr/lib/sora/app/sora";; -W) case "$2" in'
+                          " -f='${Version}') echo \"${TEST_VERSION:-1.0.5}\";; *) echo installed;; esac;;"
+                          " *) exit 1;; esac",
             "dpkg-deb": 'case "$3" in Package) name=${2##*/}; echo "${name%%_*}";; Version) echo "${TEST_VERSION:-1.0.5}";; Architecture) echo amd64;; esac',
-            "rpm": 'case "$1" in -qf) echo sora;; -q) printf "sora\\nsora-core\\n";; -qp) name=${4##*/}; printf "%s %s-1 x86_64\\n" "${name%-1.0.5-1.x86_64.rpm}" "${TEST_VERSION:-1.0.5}";; *) exit 1;; esac',
-            "pacman": 'case "$1" in -Qoq) echo sora;; -Q) printf "sora\\nsora-core\\n";; -Qp) name=${2##*/}; printf "%s %s-1\\n" "${name%-1.0.5-1-x86_64.pkg.tar.zst}" "${TEST_VERSION:-1.0.5}";; -S) printf "%s\\n" "$@" > /tmp/test/dependencies; [ "${TEST_DEPENDENCY_FAILURE:-0}" = 0 ];; -U) ' + recorder + ';; *) exit 1;; esac',
+            "rpm": 'case "$1" in -qf) echo sora;; -q) case "$2" in --qf) echo "${TEST_VERSION:-1.0.5}";;'
+                   ' *) printf "sora\\nsora-core\\n";; esac;; -qp) name=${4##*/};'
+                   ' printf "%s %s-1 x86_64\\n" "${name%-1.0.5-1.x86_64.rpm}" "${TEST_VERSION:-1.0.5}";;'
+                   " *) exit 1;; esac",
+            "pacman": 'case "$1" in -Qoq) echo sora;; -Q) if [ "$#" = 2 ]; then echo "sora-core ${TEST_VERSION:-1.0.5}-1";'
+                      ' else printf "sora\\nsora-core\\n"; fi;; -Qp) name=${2##*/};'
+                      ' printf "%s %s-1\\n" "${name%-1.0.5-1-x86_64.pkg.tar.zst}" "${TEST_VERSION:-1.0.5}";;'
+                      ' -S) printf "%s\\n" "$@" > /tmp/test/dependencies; [ "${TEST_DEPENDENCY_FAILURE:-0}" = 0 ];;'
+                      " -U) " + recorder + ";; *) exit 1;; esac",
+            # minisign is faked like the package managers: the sandbox tests
+            # the helper's flow, not Ed25519. A failing fake covers the
+            # fail-closed path (bad signature aborts the update).
+            "minisign": "exit ${TEST_MINISIGN_FAILURE:-0}",
             "apt-get": recorder,
             "zypper" if zypper else "dnf": recorder,
         }
@@ -52,6 +77,10 @@ class UpdateHelperTest(unittest.TestCase):
             "--ro-bind", "/", "/", "--tmpfs", "/run", "--tmpfs", "/tmp",
             "--dev", "/dev",
             "--tmpfs", "/var/tmp", "--tmpfs", "/usr/bin", "--bind", str(self.root), "/tmp/test",
+            # The helper refuses to run while the release key is a
+            # placeholder (fail-closed, SORA-H1); the sandbox uses a dummy
+            # key because minisign itself is faked above.
+            "--setenv", "SORA_MINISIGN_PUBKEY", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         ]
         for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum"]:
             command += ["--ro-bind", str(pathlib.Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
@@ -61,6 +90,8 @@ class UpdateHelperTest(unittest.TestCase):
             command += ["--setenv", "TEST_VERSION", "1.0.4"]
         if dependency_failure:
             command += ["--setenv", "TEST_DEPENDENCY_FAILURE", "1"]
+        if signature_failure:
+            command += ["--setenv", "TEST_MINISIGN_FAILURE", "1"]
         command += ["--", "/bin/sh", "/tmp/test/sora-update", format, version, "/tmp/test/downloads"]
         return subprocess.run(command, capture_output=True, text=True, timeout=10)
 
@@ -85,7 +116,7 @@ class UpdateHelperTest(unittest.TestCase):
         self.assertEqual(arguments, ["-S", "--noconfirm", "--needed", "gst-plugins-good"])
 
     def test_reject_corrupt_missing_duplicate_and_symlink_inputs(self):
-        for problem in ["corrupt", "missing", "duplicate", "symlink", "metadata", "version", "format"]:
+        for problem in ["corrupt", "missing", "duplicate", "symlink", "metadata", "version", "format", "badsig"]:
             with self.subTest(problem=problem):
                 for item in self.downloads.iterdir():
                     item.unlink()
@@ -105,6 +136,7 @@ class UpdateHelperTest(unittest.TestCase):
                     "unknown" if problem == "format" else "deb",
                     version="1.0.5;touch /tmp/test/escaped" if problem == "version" else "1.0.5",
                     bad_metadata=problem == "metadata",
+                    signature_failure=problem == "badsig",
                 )
                 self.assertNotIn("bwrap:", result.stderr)
                 self.assertNotEqual(result.returncode, 0, result.stdout)

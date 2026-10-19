@@ -27,11 +27,42 @@ if (-not [Environment]::Is64BitOperatingSystem) {
     throw 'Sora for Windows needs 64-bit Windows 10 1809 or later.'
 }
 
+# Downloads with retries and backoff: mirrors drop a connection now and then,
+# and a half-downloaded installer must never reach the signature check.
+function Invoke-SoraDownload {
+    param([string]$Uri, [string]$OutFile, [int]$TimeoutSec = 300)
+    $delay = 5
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+        try {
+            Invoke-WebRequest -UseBasicParsing $Uri -OutFile $OutFile -TimeoutSec $TimeoutSec
+            return
+        } catch {
+            if ($attempt -eq 3) { throw "sora: download failed after 3 attempts: $Uri" }
+            Write-Output "sora: download attempt $attempt failed, retrying in $delay s"
+            Start-Sleep -Seconds $delay
+            $delay *= 2
+        }
+    }
+}
+
 $version = $env:SORA_VERSION
 if ($env:SORA_DIST) {
     if (-not $version) { throw 'SORA_VERSION is needed with SORA_DIST.' }
 } elseif (-not $version) {
-    $latest = Invoke-RestMethod -UseBasicParsing 'https://api.github.com/repos/levvs-one/sora/releases/latest'
+    $latest = $null
+    $delay = 5
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+        try {
+            # The API is rate-limited for anonymous callers; install.sh reads
+            # the /releases/latest redirect instead, which is not.
+            $latest = Invoke-RestMethod -UseBasicParsing 'https://api.github.com/repos/levvs-one/sora/releases/latest' -TimeoutSec 60
+            break
+        } catch {
+            if ($attempt -eq 3) { throw "sora: could not reach the GitHub API: $($_.Exception.Message)" }
+            Start-Sleep -Seconds $delay
+            $delay *= 2
+        }
+    }
     $version = $latest.tag_name -replace '^v', ''
 }
 if ($version -notmatch '^\d+(\.\d+){2,3}$') { throw "'$version' is not a release of Sora." }
@@ -72,7 +103,7 @@ try {
         if ($env:SORA_DIST) {
             Copy-Item (Join-Path $env:SORA_DIST $file) $target
         } else {
-            Invoke-WebRequest -UseBasicParsing "$repo/releases/download/v$version/$file" -OutFile $target
+            Invoke-SoraDownload "$repo/releases/download/v$version/$file" $target
         }
     }
     # Authenticate the checksum manifest BEFORE trusting any hash in it.
