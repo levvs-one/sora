@@ -12,6 +12,7 @@ import '../generated/sora/core/v1/core_control.pb.dart';
 import '../groups.dart';
 import '../sora.dart';
 import 'kit.dart';
+import 'qr.dart';
 import 'subscription.dart';
 import 'subscription_sheet.dart';
 import 'tour.dart';
@@ -79,6 +80,11 @@ class _ServersScreenState extends State<ServersScreen> {
       _tourTarget(
         0,
         RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
+      ),
+      RoundButton(
+        icon: Symbols.qr_code_scanner_rounded,
+        label: s.qrScan,
+        onTap: () => push<void>(context, const QrScanScreen()),
       ),
     ];
     final search = Padding(
@@ -449,6 +455,7 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                     _item(context, s.providerWebsite, () => unawaited(openLink(context, info.webPageUrl))),
                   if (info.supportUrl.isNotEmpty)
                     _item(context, s.support, () => unawaited(openLink(context, info.supportUrl))),
+                  _item(context, s.qrShareTitle, () => unawaited(_shareQr(context, state))),
                   _item(
                     context,
                     s.subscriptionSettings,
@@ -512,9 +519,18 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
   }
 }
 
-/// Confirms deletion, then removes the subscription and its servers.
-Future<void> deleteSubscription(BuildContext context, SubscriptionState state) async {
+/// Fetches the subscription link and shows it as a QR code. Failures are
+/// reported through the standard failure pipeline; nothing raw is shown.
+Future<void> _shareQr(BuildContext context, SubscriptionState state) async {
   final sora = SoraScope.read(context);
+  final url = await sora.fetchSubscriptionLink(state.settings.id);
+  if (url != null && context.mounted) {
+    await push<void>(context, QrShareScreen(payload: url, title: state.displayName));
+  }
+}
+
+/// Confirms deletion, then removes the subscription and its servers.
+Future<void> deleteSubscription(BuildContext context, SubscriptionState state) async {  final sora = SoraScope.read(context);
   final s = S.of(context);
   if (await confirm(context, question: s.deleteSubscription(state.displayName), action: s.delete)) {
     await sora.deleteSubscription(state.settings.id);
