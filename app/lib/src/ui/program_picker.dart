@@ -141,7 +141,11 @@ class _ProgramPickerState extends State<_ProgramPicker> {
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: [TextButton(onPressed: _load, child: Text(s.refresh))],
+                          children: [
+                            Text(s.errGeneric, style: Styles.secondary.copyWith(color: palette.ink2)),
+                            const SizedBox(height: 8),
+                            TextButton(onPressed: _load, child: Text(s.refresh)),
+                          ],
                         ),
                       )
                     : shown == null
