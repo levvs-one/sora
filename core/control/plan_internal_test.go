@@ -491,3 +491,20 @@ func TestRuleTypeOfDetectsIPAddresses(t *testing.T) {
 		})
 	}
 }
+
+// TestApplyCredentialRejectsBrokenPeerJSON locks SORA-L17: a broken
+// WireGuard peer document must fail plan building, not silently produce a
+// peerless outbound.
+func TestApplyCredentialRejectsBrokenPeerJSON(t *testing.T) {
+	var o engine.Outbound
+	if err := applyCredential(&o, map[string]string{"peers": `[{broken`}); err == nil {
+		t.Fatal("broken peer JSON must fail the plan")
+	}
+	var ok engine.Outbound
+	if err := applyCredential(&ok, map[string]string{"peers": `[{"public_key":"abc=","allowed_ips":["0.0.0.0/0"]}]`}); err != nil {
+		t.Fatalf("valid peer JSON was rejected: %v", err)
+	}
+	if len(ok.Peers) != 1 {
+		t.Fatalf("got %d peers, want 1", len(ok.Peers))
+	}
+}

@@ -449,9 +449,11 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 		outbound.Addresses = strings.Split(addresses, ",")
 	}
 	if peers := values["peers"]; peers != "" {
-		// Invalid peer documents leave no peers; plan validation
-		// identifies the failing outbound.
-		_ = json.Unmarshal([]byte(peers), &outbound.Peers)
+		// Fail closed: a broken peer document must not silently become a
+		// peerless outbound (SORA-L17).
+		if err := json.Unmarshal([]byte(peers), &outbound.Peers); err != nil {
+			return fmt.Errorf("invalid WireGuard peers: %w", err)
+		}
 	}
 	if packed := values["xray_profile"]; packed != "" {
 		profile, err := unpackProfile(packed)
