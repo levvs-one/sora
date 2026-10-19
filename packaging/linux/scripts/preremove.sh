@@ -1,4 +1,5 @@
 #!/bin/sh
+set -eu
 # Stops the service before its files go. An upgrade keeps it: Debian passes
 # "upgrade", RPM passes the number of versions left (1); pacman runs this only
 # on removal.

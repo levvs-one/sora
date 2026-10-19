@@ -90,7 +90,8 @@ if [ -n "${SORA_DIST:-}" ]; then
 else
 	if [ -z "${SORA_VERSION:-}" ]; then
 		# The latest release redirects to its tag; no API call, no rate limit.
-		latest=$(curl -fsSLI --proto '=https' --retry 3 --connect-timeout 20 --max-time 60 -o /dev/null -w '%{url_effective}' "$repo/releases/latest")
+		latest=$(curl -fsSLI --proto '=https' --retry 3 --connect-timeout 20 --max-time 60 -o /dev/null -w '%{url_effective}' "$repo/releases/latest") \
+			|| die "could not reach $repo/releases/latest"
 		version=${latest##*/v}
 		case "$version" in
 		[0-9]*.[0-9]*.[0-9]*) ;;

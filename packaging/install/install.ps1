@@ -49,21 +49,22 @@ $version = $env:SORA_VERSION
 if ($env:SORA_DIST) {
     if (-not $version) { throw 'SORA_VERSION is needed with SORA_DIST.' }
 } elseif (-not $version) {
-    $latest = $null
     $delay = 5
     for ($attempt = 1; $attempt -le 3; $attempt++) {
         try {
-            # The API is rate-limited for anonymous callers; install.sh reads
-            # the /releases/latest redirect instead, which is not.
-            $latest = Invoke-RestMethod -UseBasicParsing 'https://api.github.com/repos/levvs-one/sora/releases/latest' -TimeoutSec 60
+            # The latest release redirects to its tag; no API call, no rate
+            # limit — the same source install.sh reads.
+            $response = Invoke-WebRequest -UseBasicParsing "$repo/releases/latest" -TimeoutSec 60
+            $tag = $response.BaseResponse.ResponseUri.Segments[-1].TrimEnd('/')
+            if (-not $tag) { throw 'no tag in the redirect target' }
+            $version = $tag -replace '^v', ''
             break
         } catch {
-            if ($attempt -eq 3) { throw "sora: could not reach the GitHub API: $($_.Exception.Message)" }
+            if ($attempt -eq 3) { throw "sora: could not tell the latest release: $($_.Exception.Message)" }
             Start-Sleep -Seconds $delay
             $delay *= 2
         }
     }
-    $version = $latest.tag_name -replace '^v', ''
 }
 if ($version -notmatch '^\d+(\.\d+){2,3}$') { throw "'$version' is not a release of Sora." }
 

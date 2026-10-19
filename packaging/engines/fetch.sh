@@ -4,7 +4,7 @@
 # for them: sing-box, xray, mihomo, geoip.dat and geosite.dat in one directory.
 # The geo databases come from the Xray archive, which is pinned like the rest.
 #
-#   packaging/engines/fetch.sh amd64|arm64 <destination>
+#   packaging/engines/fetch.sh amd64|arm64|windows-amd64|win7-386 <destination>
 set -euo pipefail
 
 arch=${1:?architecture: amd64, arm64, windows-amd64 or win7-386}

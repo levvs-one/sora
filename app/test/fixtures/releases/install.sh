@@ -1,7 +1,7 @@
 #!/bin/sh
 # Installs Sora on Linux in one command:
 #
-#   curl -fsSL https://github.com/levvs-one/sora-client/releases/latest/download/install.sh | sh
+#   curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
 #
 # It finds the latest release, downloads the packages for this distribution
 # and processor, checks them against the release's SHA256SUMS and installs
@@ -13,7 +13,7 @@
 # their SHA256SUMS; CI checks the packages it built this way.
 set -eu
 
-repo=https://github.com/levvs-one/sora-client
+repo=https://github.com/levvs-one/sora
 
 say() { printf '%s\n' "$*"; }
 die() {
