@@ -187,7 +187,10 @@ func (s *Scorer) pingScore(c Candidate, ctx ScoreContext) float64 {
 	if span == 0 {
 		return 1
 	}
-	return clamp01(1 - float64(c.LatencyMs-ctx.MinLatencyMs)/float64(span))
+	// Float arithmetic: a candidate scored against a foreign context (one
+	// it was not part of) may sit outside [min, max]; the uint32
+	// subtraction would wrap around. clamp01 keeps the result sane.
+	return clamp01(1 - (float64(c.LatencyMs) - float64(ctx.MinLatencyMs)) / float64(span))
 }
 
 // bandwidthScore is relative to the fastest measured candidate.

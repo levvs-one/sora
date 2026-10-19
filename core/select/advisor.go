@@ -58,10 +58,10 @@ func (c AdvisorConfig) clamped() AdvisorConfig {
 	if c.ConfirmWindows == 0 {
 		c.ConfirmWindows = d.ConfirmWindows
 	}
-	if c.LatencyFactor == 0 {
+	if c.LatencyFactor == 0 || math.IsNaN(c.LatencyFactor) {
 		c.LatencyFactor = d.LatencyFactor
 	}
-	if c.ErrorRate == 0 {
+	if c.ErrorRate == 0 || math.IsNaN(c.ErrorRate) {
 		c.ErrorRate = d.ErrorRate
 	}
 	if c.MinSwitchInterval == 0 {

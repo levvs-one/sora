@@ -51,11 +51,15 @@ class _QrShareScreenState extends State<QrShareScreen> {
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: QrImageView(
-                data: widget.payload,
-                version: QrVersions.auto,
-                errorCorrectionLevel: QrErrorCorrectLevel.H,
-                size: 260,
+              // A QR code carries no meaning for screen readers; the copy
+              // button below provides the same payload as text.
+              child: ExcludeSemantics(
+                child: QrImageView(
+                  data: widget.payload,
+                  version: QrVersions.auto,
+                  errorCorrectionLevel: QrErrorCorrectLevel.H,
+                  size: 260,
+                ),
               ),
             ),
           ),

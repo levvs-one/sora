@@ -177,6 +177,7 @@ class _WatchBanner extends StatelessWidget {
               Pressable(
                 onTap: () => unawaited(sora.repairWatch()),
                 radius: 8,
+                semanticButton: true,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   child: Text(s.watchReconnect, style: Styles.bodyStrong.copyWith(color: palette.ink)),
@@ -216,6 +217,7 @@ class _RestoreBanner extends StatelessWidget {
               Pressable(
                 onTap: () => unawaited(sora.restoreCrashedSession()),
                 radius: 8,
+                semanticButton: true,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   child: Text(s.crashRestore, style: Styles.bodyStrong.copyWith(color: palette.ink)),
@@ -224,6 +226,7 @@ class _RestoreBanner extends StatelessWidget {
               Pressable(
                 onTap: sora.dismissCrashRestore,
                 radius: 8,
+                semanticButton: true,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   child: Text(s.crashDismiss, style: Styles.secondary.copyWith(color: palette.ink2)),
@@ -359,6 +362,7 @@ class _ServerCard extends StatelessWidget {
         radius: 12,
         give: 0.98,
         wash: false,
+        semanticButton: true,
         onTap: offline
             ? null
             : () => empty ? showSubscriptionSheet(context) : push<void>(context, const ServersScreen()),

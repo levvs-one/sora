@@ -213,11 +213,12 @@ class _FieldSheetState extends State<_FieldSheet> {
                   Pressable(
                     onTap: () => Navigator.of(context).pop(),
                     radius: 22,
-                    child: SizedBox(
-                      height: 44,
-                      child: Center(
-                        child: Text(s.cancel, style: Styles.body.copyWith(color: palette.ink)),
-                      ),
+                    semanticButton: true,
+                    child: Container(
+                      // minHeight keeps large text scales from clipping the label.
+                      constraints: const BoxConstraints(minHeight: 44),
+                      alignment: Alignment.center,
+                      child: Text(s.cancel, style: Styles.body.copyWith(color: palette.ink)),
                     ),
                   ),
                 ],

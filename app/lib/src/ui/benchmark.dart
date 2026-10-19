@@ -73,10 +73,14 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
             style: Styles.secondary.copyWith(color: palette.ink2),
           ),
           const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: progress.total == 0 ? null : progress.done / progress.total,
-            color: palette.ink,
-            backgroundColor: palette.field,
+          // Decorative: the "done of total" text above already announces
+          // progress to screen readers.
+          ExcludeSemantics(
+            child: LinearProgressIndicator(
+              value: progress.total == 0 ? null : progress.done / progress.total,
+              color: palette.ink,
+              backgroundColor: palette.field,
+            ),
           ),
           const SizedBox(height: 16),
         ],
@@ -146,7 +150,12 @@ class _BenchmarkRow extends StatelessWidget {
                 ),
                 if (running && pct != null) ...[
                   const SizedBox(height: 6),
-                  LinearProgressIndicator(value: pct / 100, color: palette.ink, backgroundColor: palette.field),
+                  // Decorative: the overall progress text at the top of the
+                  // screen announces measurement progress.
+                  ExcludeSemantics(
+                    child: LinearProgressIndicator(
+                        value: pct / 100, color: palette.ink, backgroundColor: palette.field),
+                  ),
                 ],
               ],
             ),

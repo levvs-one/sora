@@ -21,6 +21,43 @@ class ToastVisibility extends InheritedWidget {
   bool updateShouldNotify(ToastVisibility oldWidget) => visible != oldWidget.visible;
 }
 
+/// Toast title that exposes button semantics when the notification carries
+/// an action (the whole toast is tappable in that case).
+class _ToastTitle extends StatelessWidget {
+  const _ToastTitle({required this.notice});
+
+  final AppNotification notice;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    final body = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          notice.title,
+          key: ObjectKey(notice),
+          style: Styles.bodyStrong.copyWith(color: palette.ink, height: 4 / 3),
+        ),
+        if (notice.body.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            notice.body,
+            style: Styles.secondary.copyWith(color: palette.ink2, height: 16 / 13),
+          ),
+        ],
+      ],
+    );
+    if (notice.action.isEmpty) return body;
+    return Semantics(
+      button: true,
+      onTap: () => runNotificationAction(context, notice),
+      child: body,
+    );
+  }
+}
+
 class NotificationToasts extends StatefulWidget {
   const NotificationToasts({super.key, required this.sora, required this.navigator, required this.child});
   final Sora sora;
@@ -62,24 +99,7 @@ class _NotificationToastsState extends State<NotificationToasts> {
         animationDuration: Motion.of(context, const Duration(milliseconds: 180)),
         animationBuilder: (_, animation, _, child) => FadeTransition(opacity: animation, child: child),
         style: ToastificationStyle.flat,
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              notice.title,
-              key: ObjectKey(notice),
-              style: Styles.bodyStrong.copyWith(color: palette.ink, height: 4 / 3),
-            ),
-            if (notice.body.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                notice.body,
-                style: Styles.secondary.copyWith(color: palette.ink2, height: 16 / 13),
-              ),
-            ],
-          ],
-        ),
+        title: _ToastTitle(notice: notice),
         showIcon: false,
         showProgressBar: false,
         backgroundColor: palette.raised,

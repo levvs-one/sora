@@ -148,33 +148,41 @@ class _InstallPromptState extends State<_InstallPrompt> {
                 style: Styles.body.copyWith(color: palette.ink),
               ),
               const SizedBox(height: 4),
-              for (final p in perms)
+              for (final p in perms) ...[
                 PermissionRow(
                   blurb: permissionBlurb(context, p),
                   dangerous: requiresExplicitConfirm(p),
                 ),
+                _permissionExtra(context, m, p),
+              ],
               if (dangerous.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                InkWell(
+                // A custom checkbox: expose the checked state to screen
+                // readers since the icon alone carries no semantics.
+                Semantics(
+                  checked: _dangerousAck,
                   onTap: () => setState(() => _dangerousAck = !_dangerousAck),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          _dangerousAck
-                              ? Symbols.check_box_rounded
-                              : Symbols.check_box_outline_blank_rounded,
-                          color: _dangerousAck ? palette.ink : palette.ink3,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(s.extDangerousAck,
-                              style: Styles.body.copyWith(color: palette.ink)),
-                        ),
-                      ],
+                  child: InkWell(
+                    onTap: () => setState(() => _dangerousAck = !_dangerousAck),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            _dangerousAck
+                                ? Symbols.check_box_rounded
+                                : Symbols.check_box_outline_blank_rounded,
+                            color: _dangerousAck ? palette.ink : palette.ink3,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(s.extDangerousAck,
+                                style: Styles.body.copyWith(color: palette.ink)),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

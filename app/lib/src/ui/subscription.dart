@@ -275,15 +275,18 @@ class _OverrideRow extends StatelessWidget {
             ),
           ),
           if (rename != null)
-            Pressable(
-              onTap: () {
-                final next = Map<String, String>.of(override.renames)..remove(serverId);
-                sora.overrides.put(subscriptionId, override.copyWith(renames: next));
-              },
-              radius: 8,
-              child: Padding(
-                padding: const EdgeInsets.all(6),
-                child: Icon(Symbols.close_rounded, size: 18, color: palette.ink2),
+            Tooltip(
+              message: s.remove,
+              child: Pressable(
+                onTap: () {
+                  final next = Map<String, String>.of(override.renames)..remove(serverId);
+                  sora.overrides.put(subscriptionId, override.copyWith(renames: next));
+                },
+                radius: 8,
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Icon(Symbols.close_rounded, size: 18, color: palette.ink2),
+                ),
               ),
             ),
         ],
@@ -409,6 +412,7 @@ class _ServerPickerState extends State<_ServerPicker> {
                 child: Pressable(
                   onTap: () => Navigator.of(context).pop(),
                   radius: 8,
+                  semanticButton: true,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Text(s.close, style: Styles.bodyStrong.copyWith(color: palette.ink)),

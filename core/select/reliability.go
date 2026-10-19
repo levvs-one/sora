@@ -214,7 +214,10 @@ func (s *ReliabilityStore) load() {
 	}
 }
 
-// saveLocked persists atomically: write temp, then rename.
+// saveLocked persists atomically: write temp, then rename. Expired
+// entries are pruned from the file (never from the in-memory map, where
+// Rate/Stats already treat them as expired), so the history cannot grow
+// past the size cap with dead entries.
 func (s *ReliabilityStore) saveLocked() {
 	path := s.path()
 	if path == "" {
@@ -223,7 +226,15 @@ func (s *ReliabilityStore) saveLocked() {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return
 	}
-	raw, err := json.Marshal(s.entries)
+	now := s.now()
+	kept := make(map[string]reliabilityEntry, len(s.entries))
+	for id, e := range s.entries {
+		if e.expired(now, s.cfg.TTL) {
+			continue
+		}
+		kept[id] = e
+	}
+	raw, err := json.Marshal(kept)
 	if err != nil {
 		return
 	}

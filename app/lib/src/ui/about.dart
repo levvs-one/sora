@@ -204,6 +204,7 @@ class _AboutScreenState extends State<AboutScreen> {
                             Pressable(
                               onTap: updates.cancel,
                               radius: 8,
+                              semanticButton: true,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 child: Text(s.cancel, style: Styles.caption.copyWith(color: palette.ink2)),
