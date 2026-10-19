@@ -75,8 +75,9 @@ message ObfuscationProfile {
   // fragment with their own sizes; engines with a range grammar (Xray)
   // get min-max of this list.
   repeated uint32 frag_sizes = 3;
-  // Pause between fragments in milliseconds, 0..10000. Zero means no
-  // artificial pause; engines without a delay knob ignore it.
+  // Pause between fragments in milliseconds, 0..10000. Zero keeps the
+  // engine default (Xray falls back to its 10-20 ms range); engines
+  // without a delay knob ignore it.
   uint32 frag_delay_ms = 4;
   // Random jitter added on top of frag_delay_ms, 0..10000. Needs
   // frag_delay_ms > 0. Engines without a jitter knob fold it into their

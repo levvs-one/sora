@@ -17,6 +17,7 @@ import (
 	obfsv1 "github.com/levvs-one/sora-client/core/gen/sora/obfs/v1"
 	"github.com/levvs-one/sora-client/core/secret"
 	"github.com/levvs-one/sora-client/core/session"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func applyReq(p *obfsv1.ObfuscationProfile) *obfsv1.ApplyObfsProfileRequest {
@@ -333,5 +334,53 @@ func TestObfsProfileMergesAtConnectAndPersists(t *testing.T) {
 	connectForObfs(t, server3, store3)
 	if got := rec3.get(); got != nil && got.Options.Fragment.Enabled {
 		t.Error("OFF profile still merged into the plan")
+	}
+}
+
+// TestApplyObfsProfileConcurrent hammers ApplyObfsProfile from several
+// goroutines: the file write and the in-memory swap are serialized by the
+// same mutex, so no call may deadlock, fail, or leave a half-written file.
+func TestApplyObfsProfileConcurrent(t *testing.T) {
+	dir := t.TempDir()
+	rec := &planRecorder{}
+	server, _ := newObfsTestServer(t, dir, rec)
+	ctx := context.Background()
+	presets := []obfsv1.ObfsPreset{
+		obfsv1.ObfsPreset_OBFS_PRESET_LIGHT,
+		obfsv1.ObfsPreset_OBFS_PRESET_AGGRESSIVE,
+	}
+	var wg sync.WaitGroup
+	for g := 0; g < 8; g++ {
+		wg.Add(1)
+		go func(g int) {
+			defer wg.Done()
+			for i := 0; i < 25; i++ {
+				res, err := server.ApplyObfsProfile(ctx, applyReq(&obfsv1.ObfuscationProfile{
+					Preset: presets[(g+i)%2],
+				}))
+				if err != nil {
+					t.Errorf("transport error = %v", err)
+					return
+				}
+				if res.GetError() != nil {
+					t.Errorf("wire error = %v", res.GetError())
+					return
+				}
+			}
+		}(g)
+	}
+	wg.Wait()
+	raw, err := os.ReadFile(filepath.Join(dir, "obfs_profile.json"))
+	if err != nil {
+		t.Fatalf("reading the persisted profile: %v", err)
+	}
+	stored := &obfsv1.ObfuscationProfile{}
+	if err := protojson.Unmarshal(raw, stored); err != nil {
+		t.Fatalf("persisted profile does not parse: %v", err)
+	}
+	switch stored.GetPreset() {
+	case obfsv1.ObfsPreset_OBFS_PRESET_LIGHT, obfsv1.ObfsPreset_OBFS_PRESET_AGGRESSIVE:
+	default:
+		t.Fatalf("persisted preset = %v, want one of the applied ones", stored.GetPreset())
 	}
 }

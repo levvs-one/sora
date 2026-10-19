@@ -371,13 +371,15 @@ func (s *Server) ApplyObfsProfile(_ context.Context, req *obfsv1.ApplyObfsProfil
 			return &obfsv1.ApplyObfsProfileResponse{Error: toWire(err, nil, id)}, nil
 		}
 	}
+	// The mutex covers the file write too: two racing Apply calls must not
+	// leave the persisted file holding a different profile than the memory.
+	s.obfsMu.Lock()
+	defer s.obfsMu.Unlock()
 	if err := s.saveObfsProfile(normalized); err != nil {
 		err = errs.Newf(errs.CodeInternal, errs.KeyInternal, "control: obfuscation: cannot persist the profile: %v", err)
 		return &obfsv1.ApplyObfsProfileResponse{Error: toWire(err, nil, id)}, nil
 	}
-	s.obfsMu.Lock()
 	s.obfs = normalized
-	s.obfsMu.Unlock()
 	return &obfsv1.ApplyObfsProfileResponse{
 		Applied:           proto.Clone(normalized).(*obfsv1.ObfuscationProfile),
 		CompatibleEngines: compatible,

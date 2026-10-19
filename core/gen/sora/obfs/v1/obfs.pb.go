@@ -177,8 +177,9 @@ type ObfuscationProfile struct {
 	// fragment with their own sizes; engines with a range grammar (Xray)
 	// get min-max of this list.
 	FragSizes []uint32 `protobuf:"varint,3,rep,packed,name=frag_sizes,json=fragSizes,proto3" json:"frag_sizes,omitempty"`
-	// Pause between fragments in milliseconds, 0..10000. Zero means no
-	// artificial pause; engines without a delay knob ignore it.
+	// Pause between fragments in milliseconds, 0..10000. Zero keeps the
+	// engine default (Xray falls back to its 10-20 ms range); engines
+	// without a delay knob ignore it.
 	FragDelayMs uint32 `protobuf:"varint,4,opt,name=frag_delay_ms,json=fragDelayMs,proto3" json:"frag_delay_ms,omitempty"`
 	// Random jitter added on top of frag_delay_ms, 0..10000. Needs
 	// frag_delay_ms > 0. Engines without a jitter knob fold it into their
