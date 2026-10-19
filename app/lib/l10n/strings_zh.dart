@@ -812,6 +812,8 @@ class SZh extends S {
 
   @override
   String get updateManual => '在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。';
+  String get updateSignaturePending => 'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+  String get updateManualSigWarning => 'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
 
   @override
   String get updateCopyCommand => '复制命令';
@@ -1487,7 +1489,6 @@ Find one in the catalog or install from a file.';
   String get syncWhatBody => 'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.';
 
   @override
-  String get updateStageVerify => 'Verifying';
 
   @override
   String get watchReconnect => 'Reconnect';
@@ -2304,6 +2305,8 @@ class SZhHans extends SZh {
 
   @override
   String get updateManual => '在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。';
+  String get updateSignaturePending => 'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+  String get updateManualSigWarning => 'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
 
   @override
   String get updateCopyCommand => '复制命令';
@@ -3303,6 +3306,8 @@ class SZhHant extends SZh {
 
   @override
   String get updateManual => '在終端機中執行此命令以安裝兩個經過驗證的軟體包，然後重新開啟 Sora。 檔案保留在下載目錄中。 VPN 連線將會中斷。';
+  String get updateSignaturePending => 'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+  String get updateManualSigWarning => 'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
 
   @override
   String get updateCopyCommand => '複製指令';
@@ -3520,7 +3525,6 @@ class SZhHant extends SZh {
   @override
   String get coreRestoringLink => 'Restoring the link to the core…';
   @override
-  String get updateStageVerify => 'Verifying';
   @override
   String get crashRestoreTitle => 'The last session was interrupted';
 

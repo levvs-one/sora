@@ -828,6 +828,8 @@ class SFa extends S {
   @override
   String get updateManual =>
       'این دستور را در ترمینال اجرا کنید تا هر دو بسته تایید شده نصب شوند، سپس Sora را دوباره باز کنید. فایل ها در دایرکتوری دانلود می مانند. اتصال VPN قطع می شود.';
+  String get updateSignaturePending => 'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+  String get updateManualSigWarning => 'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
 
   @override
   String get updateCopyCommand => 'دستور کپی';
@@ -1275,7 +1277,6 @@ Find one in the catalog or install from a file.';
   @override
   String get coreRestoringLink => 'Restoring the link to the core…';
   @override
-  String get updateStageVerify => 'Verifying';
   @override
   String get crashRestoreTitle => 'The last session was interrupted';
 

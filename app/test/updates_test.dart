@@ -303,7 +303,7 @@ void main() {
   });
 
   for (final manager in ['deb', 'rpm', 'zypper', 'arch', 'windows']) {
-    for (final scenario in ['success', 'hash', 'connecting', 'changed', 'cancel', 'manual', 'denied', 'missing']) {
+    for (final scenario in ['success', 'hash', 'connecting', 'changed', 'cancel', 'manual', 'denied', 'missing', 'nosig']) {
       if (manager == 'windows' && ['manual', 'denied'].contains(scenario)) continue;
       test('$manager install: $scenario', () async {
         final settings = await Settings.load();
@@ -332,6 +332,9 @@ void main() {
             name: ReleaseAsset(name, release.asset(name).url, data[name]!.length),
         };
         if (scenario == 'missing') assets.remove(names.last);
+        // No SHA256SUMS.minisig in the release JSON: the manifest signature
+        // cannot even be fetched, so the install must fail closed.
+        if (scenario == 'nosig') assets.remove('SHA256SUMS.minisig');
         final updater = AppUpdater(
           settings,
           version: '1.0.4',
@@ -406,10 +409,10 @@ void main() {
           expect(updater.error, switch (scenario) {
             'hash' => UpdateError.checksum,
             'connecting' || 'changed' => UpdateError.connecting,
-            'missing' => UpdateError.release,
+            'missing' || 'nosig' => UpdateError.release,
             _ => null,
           });
-          if (scenario == 'connecting' || scenario == 'missing') expect(requests, isEmpty);
+          if (['connecting', 'missing', 'nosig'].contains(scenario)) expect(requests, isEmpty);
           expect(settings.resumeAfterUpdate, isFalse);
         }
         // Test artifacts remain only when the product intentionally keeps a
