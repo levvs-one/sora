@@ -436,12 +436,16 @@ class Sora extends ChangeNotifier {
     if (chosen == 'auto') return chosen;
     if (chosen == 'bypass') return serverlessAvailable ? chosen : 'auto';
     if (chosen.startsWith(groupPrefix)) return entryOf(chosen, _subscriptions.values) != null ? chosen : 'auto';
-    return servers.any((o) => o.id == chosen) ? chosen : 'auto';
+    return servers.any((o) => o.id == chosen) || _customServers.any((s) => s.id == chosen) ? chosen : 'auto';
   }
 
-  String nameOf(String id) => id.startsWith(groupPrefix)
-      ? entryOf(id, _subscriptions.values)?.name ?? id
-      : servers.firstWhere((o) => o.id == id, orElse: () => OutboundSpec(displayName: id)).displayName;
+  String nameOf(String id) {
+    if (id.startsWith(groupPrefix)) return entryOf(id, _subscriptions.values)?.name ?? id;
+    for (final s in _customServers) {
+      if (s.id == id) return s.name;
+    }
+    return servers.firstWhere((o) => o.id == id, orElse: () => OutboundSpec(displayName: id)).displayName;
+  }
 
   bool get busy => _connectionWork != null || phase == Phase.connecting || phase == Phase.disconnecting;
 

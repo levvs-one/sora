@@ -9,8 +9,10 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../generated/sora/core/v1/core_control.pb.dart';
+import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../groups.dart';
 import '../sora.dart';
+import 'addserver.dart';
 import 'benchmark.dart';
 import 'kit.dart';
 import 'qr.dart';
@@ -65,7 +67,7 @@ class _ServersScreenState extends State<ServersScreen> {
     final sora = SoraScope.of(context);
     final s = S.of(context);
     final palette = Palette.of(context);
-    if (widget.embedded && sora.subscriptions.isEmpty) {
+    if (widget.embedded && sora.subscriptions.isEmpty && sora.customServers.isEmpty) {
       return widget.scrollable ? const SizedBox.expand() : const SliverToBoxAdapter();
     }
     final query = _search.text.trim().toLowerCase();
@@ -171,6 +173,7 @@ class _ServersScreenState extends State<ServersScreen> {
     final slivers = <Widget>[
       SliverToBoxAdapter(child: Column(children: [toolbar, const SizedBox(height: 8), search])),
       SliverToBoxAdapter(child: automatic),
+      const SliverToBoxAdapter(child: _CustomServersCard()),
     ];
     final separator = palette.ink3.withValues(alpha: 0.28);
     for (final subscription in sora.subscriptions) {
@@ -621,6 +624,200 @@ Future<void> deleteSubscription(BuildContext context, SubscriptionState state) a
   final s = S.of(context);
   if (await confirm(context, question: s.deleteSubscription(state.displayName), action: s.delete)) {
     await sora.deleteSubscription(state.settings.id);
+  }
+}
+
+/// Confirms deletion, then removes the user-added server.
+Future<void> _deleteCustomServer(BuildContext context, CustomServer server) async {
+  final sora = SoraScope.read(context);
+  final s = S.of(context);
+  if (await confirm(context, question: s.customServerDeleteConfirm(server.name), action: s.delete)) {
+    await sora.deleteCustomServer(server.id);
+  }
+}
+
+/// The user's own servers, stored by the core outside subscriptions. Always
+/// visible: the empty state is the discovery path to the add form.
+class _CustomServersCard extends StatelessWidget {
+  const _CustomServersCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final sora = SoraScope.of(context);
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    final servers = sora.customServers;
+    final separator = palette.ink3.withValues(alpha: 0.28);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: separator),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      s.customServers,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Styles.bodyStrong.copyWith(color: palette.ink),
+                    ),
+                  ),
+                  RoundButton(
+                    icon: Symbols.add_rounded,
+                    label: s.customServerAdd,
+                    onTap: () => unawaited(push<void>(context, const AddServerScreen())),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+              child: servers.isEmpty
+                  ? Tile(
+                      title: s.customServerAdd,
+                      detail: s.customServerEmptyHint,
+                      onTap: () => unawaited(push<void>(context, const AddServerScreen())),
+                      trailing: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
+                    )
+                  : Column(
+                      children: [
+                        for (var i = 0; i < servers.length; i++) ...[
+                          if (i > 0) Divider(height: 1, thickness: 1, indent: 8, endIndent: 8, color: separator),
+                          _CustomServerRow(server: servers[i]),
+                        ],
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CustomServerRow extends StatelessWidget {
+  const _CustomServerRow({required this.server});
+
+  final CustomServer server;
+
+  @override
+  Widget build(BuildContext context) {
+    final sora = SoraScope.of(context);
+    final palette = Palette.of(context);
+    final s = S.of(context);
+    final chosen = sora.selected == server.id;
+    final ms = sora.latency[server.id];
+    final measured = sora.latency.containsKey(server.id);
+    return Semantics(
+      selected: chosen,
+      button: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: chosen ? palette.field : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Pressable(
+          onTap: () => unawaited(sora.select(server.id)),
+          radius: 8,
+          give: 1,
+          child: SizedBox(
+            height: 56,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                server.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Styles.row.copyWith(color: palette.ink),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            _CustomBadge(label: s.customServerBadge),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 3),
+                          child: Text(
+                            '${server.protocol.toUpperCase()} | ${server.address}:${server.port}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Styles.caption.copyWith(color: palette.ink3),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 84,
+                    child: Text(
+                      !measured
+                          ? ''
+                          : ms == null
+                          ? s.noAnswer
+                          : s.milliseconds(ms),
+                      textAlign: TextAlign.right,
+                      style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                    ),
+                  ),
+                  Tooltip(
+                    message: s.delete,
+                    child: Pressable(
+                      onTap: () => unawaited(_deleteCustomServer(context, server)),
+                      radius: 8,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Symbols.delete_rounded, size: 18, color: palette.ink2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A small outlined pill marking a user-added server.
+class _CustomBadge extends StatelessWidget {
+  const _CustomBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(color: palette.ink3.withValues(alpha: 0.6)),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        child: Text(label, style: Styles.caption.copyWith(color: palette.ink2)),
+      ),
+    );
   }
 }
 
