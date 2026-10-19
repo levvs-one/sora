@@ -13,7 +13,11 @@ import (
 )
 
 // Nftables manages a Linux output-hook table, removing it when the session
-// ends.
+// ends. The engine is matched by its UID; when the core itself runs as root
+// the exception would degrade to "skuid 0 accept" and silently exempt every
+// root process (including DNS) from the kill switch, so Arm refuses in that
+// case instead of arming a switch that leaks (SORA-H4). Run the core as a
+// dedicated unprivileged user — the sora systemd service does.
 type Nftables struct {
 	mu      sync.Mutex
 	uid     int
@@ -44,9 +48,16 @@ func (n *Nftables) SetBlockedNetworks(networks []netip.Prefix) {
 }
 
 // Arm installs or replaces the table, making repeated calls idempotent.
+// It refuses when the core runs as root (uid 0): the engine exception would
+// become "meta skuid 0 accept" and silently let every root process bypass
+// the kill switch. Failing closed here is deliberate — see SORA-H4.
 func (n *Nftables) Arm(ctx context.Context, _ []uint16) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
+	if n.uid == 0 {
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail,
+			"guard: refusing to arm the kill switch as root: the engine exception would match every root process; run the core as an unprivileged user")
+	}
 	if err := n.apply(ctx, NftRuleset(n.uid, n.bypass, n.blocked...)); err != nil {
 		return err
 	}

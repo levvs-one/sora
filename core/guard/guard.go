@@ -40,7 +40,8 @@ type Firewall interface {
 // FirewallOptions configures kill-switch exemptions outside the tunnel.
 type FirewallOptions struct {
 	// EngineUID is the account the engines run as; Linux matches them by
-	// it.
+	// it. It must not be 0: arming the kill switch as root would exempt
+	// every root process, so Arm fails closed instead (SORA-H4).
 	EngineUID int
 	// EnginesDir holds the engine executables; Windows matches them by
 	// file.

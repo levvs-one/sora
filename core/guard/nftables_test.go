@@ -120,3 +120,24 @@ func TestLegacyFakeIPCannotUseEngineOrLANPermits(t *testing.T) {
 		t.Fatal("legacy fake addresses must leave only through Sora TUN")
 	}
 }
+
+// TestArmRefusesRootUid locks SORA-H4: arming the kill switch as root would
+// render "meta skuid 0 accept" and silently exempt every root process, so Arm
+// must fail closed before touching the system.
+func TestArmRefusesRootUid(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("the engine is matched by user id on Linux only")
+	}
+	firewall, err := guard.NewNftables(0, nil)
+	if err != nil {
+		t.Fatalf("NewNftables(0) error = %v", err)
+	}
+	if err := firewall.Arm(testContext(), []uint16{7890}); err == nil {
+		t.Fatal("Arm() as root succeeded; the kill switch would leak root traffic")
+	} else if !strings.Contains(err.Error(), "root") {
+		t.Fatalf("Arm() as root failed without explaining why: %v", err)
+	}
+	if armed, err := firewall.Armed(testContext()); err != nil || armed {
+		t.Fatalf("Armed() = %v, %v after a refused Arm", armed, err)
+	}
+}

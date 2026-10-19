@@ -199,6 +199,9 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	}
 
 	firewall, err := guard.PlatformFirewall(guard.FirewallOptions{
+		// The kill switch matches engines by UID. When the core runs as
+		// root the guard refuses to arm instead of silently exempting
+		// every root process (SORA-H4); prefer the sora systemd service.
 		EngineUID: os.Getuid(), EnginesDir: opts.EnginesDir, Bypass: opts.Bypass,
 	})
 	if err != nil {
