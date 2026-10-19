@@ -160,7 +160,11 @@ class Sora extends ChangeNotifier {
 
   Future<void> _saveHistory() {
     final snapshot = [...history];
-    return _historyWork = _historyWork.then((_) => settings.saveNotificationHistory(snapshot));
+    // A failed write must not poison the chain for all subsequent saves
+    // (audit L25): swallow the error and keep the chain usable.
+    return _historyWork = _historyWork
+        .then((_) => settings.saveNotificationHistory(snapshot))
+        .catchError((Object _) {});
   }
 
   AppNotification notificationFor(Notice notice) {
@@ -248,9 +252,11 @@ class Sora extends ChangeNotifier {
   StatsTick? stats;
   double? speedUp, speedDown;
   DateTime? _statsAt;
-  Timer? _statsTimer;
   bool _readingStats = false;
 
+  /// Reads core traffic statistics on demand. There is intentionally no
+  /// periodic polling: the UI currently has no consumer for these numbers
+  /// (audit M17), so a 1s timer would only burn IPC traffic and battery.
   Future<void> readStats() async {
     final link = _link, id = sessionId;
     if (link == null || id == null || _readingStats) return;
@@ -338,7 +344,6 @@ class Sora extends ChangeNotifier {
   /// Maintains the core connection and watches subscriptions and session state,
   /// reopening the connection after a drop until disposal.
   Future<void> run() async {
-    _statsTimer ??= Timer.periodic(const Duration(seconds: 1), (_) => unawaited(readStats()));
     while (!_disposed) {
       final opening = Stopwatch()..start();
       final CoreLink link;
@@ -604,11 +609,18 @@ class Sora extends ChangeNotifier {
       : {g.members.first};
 
   /// Connects when off; disconnects an active or connecting session.
+  ///
+  /// A tap during [Phase.disconnecting] is queued: [connect] runs once the
+  /// in-flight disconnect lands, instead of being swallowed (audit L24).
+  bool _connectQueued = false;
+
   Future<void> toggle() async {
     if (cleanupPending) {
       await disconnect();
     } else if (phase == Phase.off) {
       await connect();
+    } else if (phase == Phase.disconnecting) {
+      _connectQueued = true;
     } else if (phase == Phase.connected || phase == Phase.reconnecting || phase == Phase.connecting) {
       await disconnect();
     }
@@ -623,7 +635,13 @@ class Sora extends ChangeNotifier {
       if (cleanupPending || _disposed) return;
     }
     final link = _link;
-    if (link == null) return;
+    if (link == null) {
+      // The core is not up (e.g. "retry" tapped in a notification): say so
+      // instead of silently doing nothing (audit L23).
+      failure = CoreFailure.unavailable;
+      notifyListeners();
+      return;
+    }
     failure = null;
     if (selected != 'bypass' && servers.isEmpty) {
       failure = const CoreFailure('app.no_servers');
@@ -702,7 +720,13 @@ class Sora extends ChangeNotifier {
     _selectionRevision++;
     _pendingSelection = null;
     final link = _link;
-    if (link == null || _stopping) return;
+    if (link == null) return;
+    if (_stopping) {
+      // A redundant disconnect while one is in flight: the latest explicit
+      // intent is to stay disconnected, so drop any queued reconnect.
+      _connectQueued = false;
+      return;
+    }
     failure = null;
     recovered('disconnect');
     phase = Phase.disconnecting;
@@ -737,6 +761,11 @@ class Sora extends ChangeNotifier {
       _stopping = false;
     }
     notifyListeners();
+    // A toggle tap during disconnecting queues a reconnect (audit L24).
+    if (_connectQueued) {
+      _connectQueued = false;
+      if (!_disposed && phase == Phase.off) unawaited(connect());
+    }
   }
 
   /// Defers connection changes until the user explicitly reconnects.
@@ -939,6 +968,12 @@ class Sora extends ChangeNotifier {
   }
 
   /// Probes a subscription or all servers and publishes results as they arrive.
+  ///
+  /// Listener notifications are throttled: with hundreds of servers, one
+  /// [notifyListeners] per result rebuilds the whole UI and the tray tooltip
+  /// hundreds of times (audit M20).
+  static const _probeNotifyInterval = Duration(milliseconds: 300);
+
   Future<void> probe({String? subscriptionId}) async {
     final link = _link;
     final all = subscriptionId == null ? servers : _subscriptions[subscriptionId]?.outbounds.toList() ?? [];
@@ -963,10 +998,15 @@ class Sora extends ChangeNotifier {
         ),
       );
       notifyListeners();
+      var lastNotify = DateTime.now();
       await for (final r in call) {
         if (_disposed || link != _link || busy || (phase != Phase.off && phase != Phase.connected)) break;
         latency[r.serverId] = r.reachable ? r.latencyMs : null;
-        notifyListeners();
+        final now = DateTime.now();
+        if (now.difference(lastNotify) >= _probeNotifyInterval) {
+          lastNotify = now;
+          notifyListeners();
+        }
       }
     } catch (error) {
       if (!_disposed && link == _link && !(error is GrpcError && error.code == StatusCode.cancelled)) {
@@ -1004,7 +1044,6 @@ class Sora extends ChangeNotifier {
     browserDiagnostics.clear();
     unawaited(_probeCall?.cancel());
     _drop(CoreFailure.unavailable);
-    _statsTimer?.cancel();
     updates.dispose();
     unawaited(_notices.close());
     unawaited(_messages.close());
