@@ -1630,8 +1630,11 @@ class Sora extends ChangeNotifier {
   bool _degraded(String current, String best) {
     if (best == current) return false;
     final curMs = latency[current];
-    if (latency.containsKey(current) && curMs == null) return true;
     final bestMs = latency[best];
+    // The pinned server stopped answering: move only to a server with real
+    // measurements. Hopping to an unprobed candidate would trade a known-bad
+    // server for an unknown one — and a needless reconnect.
+    if (latency.containsKey(current) && curMs == null) return bestMs != null;
     if (curMs == null || bestMs == null) return false;
     return bestMs * 2 <= curMs && curMs - bestMs >= 100;
   }
