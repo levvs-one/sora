@@ -3,6 +3,7 @@ package engine
 import (
 	"encoding/json"
 	"net/netip"
+	"strings"
 )
 
 // Limits mirror the sora.core.v1 contract. A plan that exceeds them is
@@ -319,6 +320,71 @@ type AmneziaWG struct {
 	I1, I2, I3, I4, I5 string
 	J1, J2, J3         string
 	Itime              int
+	// AmneziaWG 3.1 parameters (2026, answer to AI/behavioral DPI). All
+	// optional; an untouched 3.1 section keeps 1.x/2.0 behavior. 3.1 needs
+	// an engine build with verified 3.1 support (see UsesAWG31): without
+	// one, plans using these fields fail engine selection instead of
+	// rendering a silently unobfuscated tunnel.
+	// HeaderProtectionKey is the 32-byte ChaCha20 key (base64 or hex in
+	// configs) hiding low-entropy header fields; it requires S1..S4 >= 12.
+	HeaderProtectionKey string
+	// ContentPaddingAddition is a range<uint16> ("a-b" or "a"): random
+	// bytes added to transport payloads, breaking the 16-byte multiple
+	// size pattern WireGuard leaks.
+	ContentPaddingAddition string
+	// Custom timings, each a range<uint16> ("a-b" or "a"): the engine
+	// picks a random value from the range whenever the timer is armed,
+	// so sessions stop looking repetitive.
+	RekeyAfterTime       string
+	RekeyTimeout         string
+	RejectAfterTime      string
+	KeepaliveTimeout     string
+	MaxHandshakeAttempts string
+	// RandomTrailers appends random trailers to packets (the 3.1 docs
+	// recommend S1==S2==S3==S4 alongside so types stay distinguishable).
+	RandomTrailers bool
+	// DisableCookies stops sending Cookie Reply messages; incoming
+	// cookies and the rest of the cookie machinery keep working.
+	DisableCookies bool
+}
+
+// awg31Ranges lists the AmneziaWG 3.1 fields that carry range<uint16>
+// values, for enablement checks and validation loops.
+func (a *AmneziaWG) awg31Ranges() [][2]string {
+	return [][2]string{
+		{"contentpaddingaddition", a.ContentPaddingAddition},
+		{"rekeyaftertime", a.RekeyAfterTime},
+		{"rekeytimeout", a.RekeyTimeout},
+		{"rejectaftertime", a.RejectAfterTime},
+		{"keepalivetimeout", a.KeepaliveTimeout},
+		{"maxhandshakeattempts", a.MaxHandshakeAttempts},
+	}
+}
+
+// awgRangeEnabled reports whether a range<uint16> value ("a-b" or "a")
+// enables its mechanism. Per the 3.1 spec, "0", "0-0" and "" disable it.
+func awgRangeEnabled(raw string) bool {
+	raw = strings.TrimSpace(raw)
+	return raw != "" && raw != "0" && raw != "0-0"
+}
+
+// UsesAWG31 reports whether any AmneziaWG 3.1 mechanism is enabled. Callers
+// use it to demand an engine build with verified 3.1 support: rendering
+// 3.1 fields to an engine that ignores them would put plain WireGuard on
+// the wire while the UI promises obfuscation.
+func (a *AmneziaWG) UsesAWG31() bool {
+	if a == nil {
+		return false
+	}
+	if strings.TrimSpace(a.HeaderProtectionKey) != "" || a.RandomTrailers || a.DisableCookies {
+		return true
+	}
+	for _, r := range a.awg31Ranges() {
+		if awgRangeEnabled(r[1]) {
+			return true
+		}
+	}
+	return false
 }
 
 // BypassStrategy defines zapret handshake shaping. Positions are byte offsets,
