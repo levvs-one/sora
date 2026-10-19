@@ -37,6 +37,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// Temporarily shows confirmation after copying the proxy address.
   bool _copied = false;
 
+  /// Generation counter so a second tap's timer cannot hide the first tap's
+  /// indicator early (audit L22).
+  int _copiedStamp = 0;
+
   // Match core validation to reject invalid settings before connection.
   static final _range = RegExp(r'^\d{1,5}-\d{1,5}$');
   static final _packets = RegExp(r'^(tlshello|\d{1,3}-\d{1,3})$');
@@ -159,9 +163,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: _copied ? s.copied : '${local.host}:${local.port}',
                 onTap: () async {
                   await Clipboard.setData(ClipboardData(text: '${local.host}:${local.port}'));
+                  final stamp = ++_copiedStamp;
                   setState(() => _copied = true);
                   await Future<void>.delayed(const Duration(milliseconds: 1500));
-                  if (mounted) setState(() => _copied = false);
+                  if (mounted && stamp == _copiedStamp) setState(() => _copied = false);
                 },
               ),
             SwitchTile(title: s.blockAds, value: settings.blockAds, onChanged: (v) => set((x) => x.blockAds = v)),

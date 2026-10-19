@@ -31,7 +31,8 @@ class PipeConnector implements ClientTransportConnector {
   }
 
   @override
-  Future<void> get done => _pipe!.closed;
+  // Null until connect() finishes; gRPC may read this first (audit L26).
+  Future<void> get done => _pipe?.closed ?? Future.value();
 
   @override
   void shutdown() => unawaited(_pipe?.close());
