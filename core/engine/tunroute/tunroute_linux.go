@@ -42,8 +42,10 @@ func route(ctx context.Context, tun engine.Tun, uid int) error {
 	}
 	for _, step := range routeSteps(tun, families()) {
 		if err := ip(ctx, step); err != nil {
-			_ = unroute(ctx)
-			return err
+			// Keep the rollback failure visible: a half-applied ruleset
+			// with a silent cleanup error is worse than a noisy one
+			// (SORA-M9).
+			return errors.Join(err, unroute(ctx))
 		}
 	}
 	return nil
@@ -90,30 +92,26 @@ func bypass(ctx context.Context, device string, uid int) error {
 		if iface.Flags&net.FlagPointToPoint != 0 {
 			addrs, err := iface.Addrs()
 			if err != nil {
-				_ = unroute(ctx)
-				return fmt.Errorf("tunroute: interface addresses: %w", err)
+				return errors.Join(fmt.Errorf("tunroute: interface addresses: %w", err), unroute(ctx))
 			}
 			for _, addr := range addrs {
 				prefix, err := netip.ParsePrefix(addr.String())
 				if err != nil {
-					_ = unroute(ctx)
-					return err
+					return errors.Join(err, unroute(ctx))
 				}
 				addresses = append(addresses, prefix)
 			}
 		}
 		for _, step := range bypassSteps(iface.Name, addresses, families()) {
 			if err := ip(ctx, step); err != nil {
-				_ = unroute(ctx)
-				return err
+				return errors.Join(err, unroute(ctx))
 			}
 		}
 	}
 	for _, family := range families() {
 		owner := strconv.Itoa(uid)
 		if err := ip(ctx, []string{family, "rule", "add", "uidrange", owner + "-" + owner, "lookup", "main", "priority", priorityEngine}); err != nil {
-			_ = unroute(ctx)
-			return err
+			return errors.Join(err, unroute(ctx))
 		}
 	}
 	return nil
