@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"regexp"
 	"strings"
 	"unicode"
 )
@@ -52,8 +53,26 @@ func (t Tun) validate() error {
 	if t.MTU != 0 && (t.MTU < 576 || t.MTU > 1500) {
 		errs = append(errs, fmt.Errorf("tun: mtu %d out of range 576..1500", t.MTU))
 	}
-	errs = append(errs, validateDisplayName("tun", t.DeviceName))
+	// The device name reaches privileged `ip` invocations; validate it as a
+	// kernel interface name, not a display name (SORA-M2). Empty is filled
+	// with the default by PrepareTun.
+	if t.DeviceName != "" {
+		errs = append(errs, validateInterfaceName("tun", t.DeviceName))
+	}
 	return errors.Join(errs...)
+}
+
+// interfaceNamePattern enforces kernel interface naming (IFNAMSIZ=16):
+// no spaces, slashes, or leading dashes that could smuggle extra arguments
+// into privileged commands.
+var interfaceNamePattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_.-]{0,14}$`)
+
+// validateInterfaceName rejects anything but a plain interface name.
+func validateInterfaceName(what, name string) error {
+	if !interfaceNamePattern.MatchString(name) {
+		return fmt.Errorf("%s: interface name %q is not a plain kernel interface name", what, name)
+	}
+	return nil
 }
 
 func (o Options) validate() error {
