@@ -250,12 +250,20 @@ func (s *Session) Done() <-chan struct{} { return s.done }
 
 // Stop shuts down the engine, restores the guard, and transitions to
 // disconnected. Repeated calls are safe from user, shutdown, and failure paths.
+// The engine shutdown is bounded by StopGrace and detached from the caller's
+// context: a cancelled Disconnect must not strand a half-stopped engine and
+// wedge the manager busy forever (SORA-H7).
 func (s *Session) Stop(ctx context.Context) error {
+	// Detach the shutdown budget from the caller: eng.Stop must run to
+	// completion (or the grace timeout) even if the Disconnect RPC that
+	// triggered it is cancelled.
+	stopCtx, stopCancel := context.WithTimeout(context.WithoutCancel(ctx), s.cfg.StopGrace)
+	defer stopCancel()
 	s.mu.Lock()
 	if s.stopping {
 		s.mu.Unlock()
 		if s.eng.State() != engine.StateStopped {
-			if err := s.eng.Stop(ctx); err != nil {
+			if err := s.eng.Stop(stopCtx); err != nil {
 				return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
 			}
 		}
@@ -273,7 +281,7 @@ func (s *Session) Stop(ctx context.Context) error {
 	}
 	// Stop the engine before restoring the guard to prevent packets using
 	// settings being removed.
-	stopErr := s.eng.Stop(ctx)
+	stopErr := s.eng.Stop(stopCtx)
 	if err := s.restoreGuard(context.WithoutCancel(ctx)); err != nil && stopErr == nil {
 		stopErr = errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
 	}

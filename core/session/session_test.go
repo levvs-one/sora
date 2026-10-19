@@ -560,3 +560,36 @@ func TestSessionRefusesAnEngineThatRunsWithoutItsAdapter(t *testing.T) {
 		t.Error("the guard was not restored")
 	}
 }
+
+// hangingEngine blocks in Stop until the passed context ends, simulating a
+// wedged engine binary that never shuts down on its own.
+type hangingEngine struct {
+	*fakeEngine
+}
+
+func (e *hangingEngine) Stop(ctx context.Context) error {
+	<-ctx.Done()
+	return ctx.Err()
+}
+
+// TestStopBoundsAHungEngine locks SORA-H7: Stop must return after StopGrace
+// even when the engine never stops on its own, instead of wedging the
+// manager busy forever.
+func TestStopBoundsAHungEngine(t *testing.T) {
+	eng := &hangingEngine{fakeEngine: newFakeEngine()}
+	cfg := testConfig(eng, &fakeGuard{})
+	cfg.StopGrace = 200 * time.Millisecond
+	s, err := New(cfg)
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	done := make(chan error, 1)
+	go func() { done <- s.Stop(context.Background()) }()
+	select {
+	case <-done:
+		// Stop returns (possibly with the hung engine's context error);
+		// the point is it does not hang forever.
+	case <-time.After(5 * time.Second):
+		t.Fatal("Stop() did not return after StopGrace with a hung engine")
+	}
+}
