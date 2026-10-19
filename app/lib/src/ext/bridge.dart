@@ -43,7 +43,7 @@ class PanelBridge {
   /// () -> [{id, process, host, up_bytes, down_bytes}]
   final Future<List<Map<String, dynamic>>> Function() getConnections;
 
-  /// () -> [{id, name, protocol}]
+  /// () -> [{id, name, country, latency_ms}]
   final List<Map<String, dynamic>> Function() servers;
 
   /// Shows a notification attributed to the extension.

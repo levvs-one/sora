@@ -6,6 +6,16 @@ LAN via mDNS, and exchanges VPN documents (subscriptions, rules, settings)
 over a Noise_XX-encrypted TCP channel. There is no cloud, no account, and no
 telemetry.
 
+> **Implementation status (2026-10-19).** The Go service (`service/sync`)
+> is implemented and tested. The app (`app/lib/src/ui/sync.dart`) does not
+> yet launch the service or call its local API: no pairing handshake and no
+> document sync happen from the app side, the screen is a local device
+> registry, and the app-side QR payload (`token` as hex, no device id / key /
+> port) does not match the `Invitation` format this document describes.
+> The "What the app must do" obligations below are therefore design
+> requirements, not current behavior. Wire the service (launch + packaging +
+> API client + QR format) before treating F9 as done.
+
 ## Assets
 
 | Asset | Sensitivity |

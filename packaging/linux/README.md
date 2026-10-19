@@ -29,7 +29,7 @@ packaging/engines/fetch.sh amd64 dist/engines
 packaging/zapret/build.sh dist/engines
 SORA_ARCH=amd64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm.yaml --packager deb --target dist/
 
-cd app && flutter build linux --release --dart-define=SORA_VERSION=1.0.6 && cd ..
+cd app && flutter build linux --release --dart-define=SORA_VERSION=1.0.6 --dart-define=APP_VERSION=1.0.6 && cd ..
 SORA_ARCH=amd64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm-app.yaml --packager deb --target dist/
 ```
 

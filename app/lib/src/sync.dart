@@ -11,9 +11,12 @@ const syncMdnsService = '_sora-sync._tcp';
 
 /// A device paired for end-to-end encrypted sync (F9).
 ///
-/// Secrets sync too, but only inside the Noise_XX-encrypted channel owned by
-/// the Go sync service (`core/sync/sync.go`, a separate service — not a
+/// Design: secrets sync too, but only inside the Noise_XX-encrypted channel
+/// owned by the Go sync service (`service/sync`, a separate service — not a
 /// control RPC). The threat model lives in `docs/sync-threat-model.md`.
+/// Status (2026-10-19): the Go service is implemented and tested, but the
+/// app neither launches it nor talks to its local API yet — nothing syncs
+/// from the app side; the sync screen is currently a local device registry.
 class SyncedDevice {
   SyncedDevice({required this.id, required this.name, this.lastSync});
 

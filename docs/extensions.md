@@ -22,7 +22,8 @@ Limits: archive ≤ 64 MiB, ≤ 4096 files, ≤ 256 MiB uncompressed, one file
 ### 1.1 checksums.txt
 
 One line per content file: `<lowercase sha256 hex><two spaces><path>`,
-sorted by path. It lists every file **except** itself and
+sorted by path (the reference packager emits sorted order; verification
+accepts any order). It lists every file **except** itself and
 `signature.minisig` (neither can checksum itself).
 
 ### 1.2 signature.minisig

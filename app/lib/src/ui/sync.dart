@@ -17,9 +17,12 @@ import 'subscription_sheet.dart';
 ///
 /// Pairing reuses the F1 QR flow: this device shows a code carrying a
 /// rendezvous token, the other side scans it. Discovery and the Noise_XX
-/// channel live in the Go sync service (`core/sync/sync.go`, a separate
-/// service — not a control RPC); the UI below is complete and honest about
-/// what is synced and what never is.
+/// channel are designed to live in the Go sync service (`service/sync`, a
+/// separate service — not a control RPC). Status (2026-10-19): the service
+/// is not launched or wired to the app yet, so this screen is a local
+/// device registry — no pairing handshake or document sync happens here.
+/// The "what syncs" section below describes the design target, not current
+/// behavior.
 class SyncScreen extends StatefulWidget {
   const SyncScreen({super.key});
 

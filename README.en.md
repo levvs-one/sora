@@ -47,7 +47,7 @@ For older systems, there is a separate client: [sora-legacy](https://github.com/
 - Subscriptions with auto-update: lowest-latency server selection, traffic usage, expiry dates, provider announcements.
 - TUN adapter or system proxy; kill switch; split tunneling by site, IP address and app.
 - On Linux, a serverless zapret mode for some blocks. It does not hide your IP address or replace a VPN.
-- One-click diagnostics: HAR, PCAPNG, Windows event logs; in-app updates; 31 interface languages.
+- One-click diagnostics: HAR, PCAPNG, Windows event logs; in-app updates; 32 interface languages.
 - Extensions: signed add-ons that extend the client.
 
 ## Security

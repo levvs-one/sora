@@ -17,7 +17,7 @@
 ```powershell
 cd core; go build -trimpath -ldflags '-s -w' -o ..\dist\windows\sora-core.exe .\cmd\sora-core; cd ..
 bash packaging/engines/fetch.sh windows-amd64 dist/windows/engines
-cd app; flutter build windows --release --dart-define=SORA_VERSION=1.0.6; cd ..
+cd app; flutter build windows --release --dart-define=SORA_VERSION=1.0.6 --dart-define=APP_VERSION=1.0.6; cd ..
 iscc /DAppVersion=1.0.6 "/SsoraSign=signtool sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f" packaging\windows\sora.iss
 ```
 
