@@ -372,6 +372,11 @@ class Sora extends ChangeNotifier {
     if (link == null || id == null) {
       return (checks: const <DnsLeakCheck>[], failure: CoreFailure.unavailable);
     }
+    // DNS leak diagnostics landed with API 1.8: an older core would answer
+    // UNIMPLEMENTED and the UI would show a misleading internal error.
+    if (link.minor < 8) {
+      return (checks: const <DnsLeakCheck>[], failure: const CoreFailure('core.api.version_mismatch'));
+    }
     try {
       final answer = await link.stub.checkDnsLeaks(
         CheckDnsLeaksRequest(apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: id),
@@ -932,8 +937,21 @@ class Sora extends ChangeNotifier {
     if (choice != null && choice.startsWith('chain:')) {
       final chain = chains.chains.where((c) => c.id == choice.substring(6)).firstOrNull;
       notifyListeners();
-      if (chain != null) await connectChain(chain);
-      return;
+      if (chain != null) {
+        // Chain preconditions (engine capability, hop validity) throw: surface
+        // them as a visible failure instead of an unhandled async error from
+        // the unawaited UI call.
+        try {
+          await connectChain(chain);
+        } on CoreFailure catch (error) {
+          failure = error;
+          reportFailure(error, source: 'restore');
+          notifyListeners();
+        }
+        return;
+      }
+      // The chain is gone (deleted after the crash): fall through and restore
+      // a plain session instead of silently doing nothing.
     }
     if (choice != null && choice != 'auto' && choice != 'bypass') settings.server = choice;
     notifyListeners();
@@ -1936,6 +1954,16 @@ SessionPlan buildPlan({
   // the engines directory); never in serverless bypass mode.
   if (zapretWithVpn && choice != 'bypass') {
     plan.zapretWithVpn = true;
+    // Carry the tuned handshake strategy with it: without it the core falls
+    // back to its own defaults and silently ignores the zapret settings
+    // (splitPos, disorder, tlsRecord, hostCase) the user configured for the
+    // bypass outbound.
+    plan.zapretStrategy = BypassStrategy(
+      splitPos: settings.splitPos,
+      disorder: settings.disorder,
+      tlsRecord: settings.tlsRecord,
+      hostCase: settings.hostCase,
+    );
   }
 
   // F8: a proxy chain carries its hop outbounds and the ordered hop ids; the
@@ -2096,11 +2124,6 @@ int? freshBandwidthOf(Map<String, ({int bps, DateTime at})> bandwidth, String id
   if (DateTime.now().difference(measurement.at) > Sora.bandwidthTtl) return null;
   return measurement.bps;
 }
-
-/// Benchmark goodput is stored in bytes per second; the UI labels it
-/// megabits per second, so the bytes-to-bits scaling lives here instead of
-/// at every call site.
-double mbpsOf(int bytesPerSec) => bytesPerSec * 8 / 1000000;
 
 /// Smart score in [0, 1] (higher is better): ping 40%, speed 40%,
 /// measurement freshness 20%, scaled by [reliability] when known — a server

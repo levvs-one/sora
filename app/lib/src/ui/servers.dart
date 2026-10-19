@@ -273,12 +273,9 @@ List<Entry> _sortEntries(List<Entry> entries, Sora sora) {
     entries.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     return entries;
   }
-  // Groups are represented by the prospective active member — the same one
-  // whose metrics the row shows — so the visible numbers match the sort order.
+  // Groups are represented by the member the sort mode would pick.
   String keyOf(Entry e) =>
-      e.isGroup
-          ? pickMember(e, sora.latency, bandwidth: sora.bandwidth, autoSelect: sora.settings.autoSelectMode).id
-          : e.id;
+      e.isGroup ? pickMember(e, sora.latency, bandwidth: sora.bandwidth, autoSelect: mode).id : e.id;
   entries.sort((a, b) => sora.compareServers(keyOf(a), keyOf(b), mode));
   return entries;
 }
@@ -403,7 +400,7 @@ class _ServerRow extends StatelessWidget {
                         ),
                         if (bps != null || staleBps != null)
                           Text(
-                            s.speedMbps(mbpsOf(bps ?? staleBps!)),
+                            s.speedMbps((bps ?? staleBps!) / 1000000),
                             textAlign: TextAlign.right,
                             style: Styles.figures(
                               Styles.caption,
