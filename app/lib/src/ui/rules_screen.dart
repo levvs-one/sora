@@ -11,6 +11,64 @@ import 'kit.dart';
 import 'subscription_sheet.dart';
 import 'program_picker.dart';
 
+/// Opens the rule editor sheet, optionally prefilling the destination field
+/// (e.g. from the connections screen).
+Future<void> addRuleSheet(BuildContext context, {String? initialDestination}) {
+  final s = S.of(context);
+  final sora = SoraScope.read(context);
+  final rules = sora.settings.rules.map(UserRule.parse).nonNulls.toList();
+  void save(List<UserRule> next) => unawaited(sora.change((x) => x.rules = [for (final r in next) r.stored]));
+  final target = ValueNotifier(RuleTarget.direct);
+  final field = TextEditingController(text: initialDestination ?? '');
+  String? program;
+  unawaited(
+    showFieldSheet(
+      context,
+      title: s.ruleAdd,
+      hint: s.ruleHint,
+      action: s.add,
+      keyboard: TextInputType.url,
+      controller: field,
+      extra: ValueListenableBuilder(
+        valueListenable: target,
+        builder: (context, value, _) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Segments<RuleTarget>(value: value, choices: _labels(s), onChanged: (t) => target.value = t),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              icon: const Icon(Symbols.apps_rounded, size: 18),
+              label: Text(s.chooseProgram),
+              onPressed: () async {
+                final selected = await chooseProgram(context);
+                if (selected != null) {
+                  program = selected;
+                  field.text = selected;
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+      submit: (text) async {
+        final destination = program != null && text == program ? 'process:$program' : UserRule.destinationOf(text);
+        if (destination == null) return s.ruleInvalid;
+        // Replace an existing destination so each destination has only one
+        // target.
+        save([
+          for (final r in rules)
+            if (r.destination != destination) r,
+          UserRule(target.value, destination),
+        ]);
+        return null;
+      },
+    ).whenComplete(() {
+      target.dispose();
+      field.dispose();
+    }),
+  );
+}
+
 /// Edits user rules for domains, addresses and processes. These rules take
 /// precedence over the routing preset.
 class RulesScreen extends StatelessWidget {
@@ -25,7 +83,7 @@ class RulesScreen extends StatelessWidget {
     void save(List<UserRule> next) => unawaited(sora.change((x) => x.rules = [for (final r in next) r.stored]));
     return Screen(
       title: s.rules,
-      actions: [RoundButton(icon: Symbols.add_rounded, label: s.ruleAdd, onTap: () => _add(context, rules, save))],
+      actions: [RoundButton(icon: Symbols.add_rounded, label: s.ruleAdd, onTap: () => addRuleSheet(context))],
       children: [
         Group(
           children: [
@@ -38,65 +96,12 @@ class RulesScreen extends StatelessWidget {
             if (rules.isEmpty)
               Tile(
                 title: s.ruleAdd,
-                onTap: () => _add(context, rules, save),
+                onTap: () => addRuleSheet(context),
                 trailing: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
               ),
           ],
         ),
       ],
-    );
-  }
-
-  void _add(BuildContext context, List<UserRule> rules, void Function(List<UserRule>) save) {
-    final s = S.of(context);
-    final target = ValueNotifier(RuleTarget.direct);
-    final field = TextEditingController();
-    String? program;
-    unawaited(
-      showFieldSheet(
-        context,
-        title: s.ruleAdd,
-        hint: s.ruleHint,
-        action: s.add,
-        keyboard: TextInputType.url,
-        controller: field,
-        extra: ValueListenableBuilder(
-          valueListenable: target,
-          builder: (context, value, _) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Segments<RuleTarget>(value: value, choices: _labels(s), onChanged: (t) => target.value = t),
-              const SizedBox(height: 8),
-              TextButton.icon(
-                icon: const Icon(Symbols.apps_rounded, size: 18),
-                label: Text(s.chooseProgram),
-                onPressed: () async {
-                  final selected = await chooseProgram(context);
-                  if (selected != null) {
-                    program = selected;
-                    field.text = selected;
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
-        submit: (text) async {
-          final destination = program != null && text == program ? 'process:$program' : UserRule.destinationOf(text);
-          if (destination == null) return s.ruleInvalid;
-          // Replace an existing destination so each destination has only one
-          // target.
-          save([
-            for (final r in rules)
-              if (r.destination != destination) r,
-            UserRule(target.value, destination),
-          ]);
-          return null;
-        },
-      ).whenComplete(() {
-        target.dispose();
-        field.dispose();
-      }),
     );
   }
 }

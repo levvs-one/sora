@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/strings.dart';
@@ -9,10 +12,12 @@ import '../design/theme.dart';
 import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../sora.dart';
 import 'kit.dart';
+import 'rules_screen.dart';
 import 'servers.dart';
 
 /// Lists live session connections with destination, process, outbound and byte
-/// counters. Supports closing individual connections.
+/// counters. Supports closing individual connections, grouping by process and
+/// per-connection actions (copy host, add a routing rule).
 class ConnectionsScreen extends StatefulWidget {
   const ConnectionsScreen({super.key});
 
@@ -28,6 +33,8 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   Timer? _timer;
   List<Connection> _list = [];
   bool _loaded = false;
+  bool _grouped = false;
+  final _collapsedGroups = <String>{};
 
   @override
   void initState() {
@@ -49,6 +56,9 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   Future<void> _read() async {
     if (!mounted) return;
     final sora = SoraScope.read(context);
+    // Speed counters are polled on demand only while this screen is open;
+    // there is intentionally no global polling (audit M17).
+    unawaited(sora.readStats());
     final link = sora.link, session = sora.sessionId;
     if (link == null || session == null) {
       setState(() {
@@ -99,6 +109,10 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     }
   }
 
+  Future<void> _copyHost(Connection c) => Clipboard.setData(ClipboardData(text: c.host));
+
+  void _addRule(Connection c) => addRuleSheet(context, initialDestination: c.host);
+
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
@@ -118,12 +132,20 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
           ? Center(
               child: Text(s.logsEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
             )
+          : _grouped
+          ? _groupedList(shown)
           : ListView.builder(
               padding: const EdgeInsets.only(bottom: 24),
               itemCount: shown.length,
-              itemBuilder: (context, i) => _Row(connection: shown[i], onClose: () => unawaited(_close(shown[i]))),
+              itemBuilder: (context, i) => _Row(
+                connection: shown[i],
+                onClose: () => unawaited(_close(shown[i])),
+                onCopyHost: () => unawaited(_copyHost(shown[i])),
+                onAddRule: () => _addRule(shown[i]),
+              ),
             ),
       children: [
+        _statsBar(context),
         CupertinoSearchTextField(
           controller: _search,
           placeholder: s.search,
@@ -134,17 +156,132 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
           itemColor: palette.ink3,
         ),
+        const SizedBox(height: 12),
+        Segments<bool>(
+          value: _grouped,
+          choices: {false: s.connListView, true: s.connGroupByProcess},
+          onChanged: (v) => setState(() => _grouped = v),
+        ),
         const SizedBox(height: 14),
       ],
+    );
+  }
+
+  /// Live throughput and connection count, polled only while this screen is
+  /// open.
+  Widget _statsBar(BuildContext context) {
+    final sora = SoraScope.of(context);
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final up = sora.speedUp, down = sora.speedDown;
+    final active = sora.stats?.activeConnections.toInt();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              up == null || down == null ? '—' : '↑ ${_speed(s, up, locale)}  ↓ ${_speed(s, down, locale)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Styles.figures(Styles.body).copyWith(color: palette.ink),
+            ),
+          ),
+          if (active != null)
+            Text('$active ${s.connConnections}', style: Styles.caption.copyWith(color: palette.ink2)),
+        ],
+      ),
+    );
+  }
+
+  String _speed(S s, double bps, String locale) => '${formatBytes(s, Int64(bps.round()), locale)}/s';
+
+  /// Groups connections by process, heaviest first, with collapsible headers.
+  Widget _groupedList(List<Connection> shown) {
+    final s = S.of(context);
+    final groups = <String, List<Connection>>{};
+    for (final c in shown) {
+      groups.putIfAbsent(c.process.isEmpty ? '—' : c.process, () => []).add(c);
+    }
+    final keys = groups.keys.toList()..sort((a, b) => _traffic(groups[b]!).compareTo(_traffic(groups[a]!)));
+    return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 24),
+      itemCount: keys.length,
+      itemBuilder: (context, i) {
+        final name = keys[i];
+        final items = groups[name]!;
+        final collapsed = _collapsedGroups.contains(name);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _GroupHeader(
+              name: name,
+              count: items.length,
+              collapsed: collapsed,
+              onToggle: () => setState(
+                () => collapsed ? _collapsedGroups.remove(name) : _collapsedGroups.add(name),
+              ),
+            ),
+            if (!collapsed)
+              for (final c in items)
+                _Row(
+                  connection: c,
+                  onClose: () => unawaited(_close(c)),
+                  onCopyHost: () => unawaited(_copyHost(c)),
+                  onAddRule: () => _addRule(c),
+                ),
+          ],
+        );
+      },
+    );
+  }
+
+  static int _traffic(List<Connection> items) {
+    var total = 0;
+    for (final c in items) {
+      total += c.upload.toInt() + c.download.toInt();
+    }
+    return total;
+  }
+}
+
+class _GroupHeader extends StatelessWidget {
+  const _GroupHeader({required this.name, required this.count, required this.collapsed, required this.onToggle});
+
+  final String name;
+  final int count;
+  final bool collapsed;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Tile(
+        title: name,
+        titleStyle: Styles.bodyStrong,
+        detail: '$count ${s.connConnections}',
+        onTap: onToggle,
+        trailing: Icon(
+          collapsed ? Symbols.keyboard_arrow_right_rounded : Symbols.keyboard_arrow_down_rounded,
+          size: 18,
+          color: palette.ink3,
+        ),
+      ),
     );
   }
 }
 
 class _Row extends StatelessWidget {
-  const _Row({required this.connection, required this.onClose});
+  const _Row({required this.connection, required this.onClose, required this.onCopyHost, required this.onAddRule});
 
   final Connection connection;
   final VoidCallback onClose;
+  final VoidCallback onCopyHost;
+  final VoidCallback onAddRule;
 
   @override
   Widget build(BuildContext context) {
@@ -186,9 +323,36 @@ class _Row extends StatelessWidget {
               ),
             ),
           ),
+          MenuAnchor(
+            alignmentOffset: const Offset(-140, 4),
+            menuChildren: [
+              _menuItem(context, s.close, onClose),
+              _menuItem(context, s.connCopyHost, onCopyHost),
+              _menuItem(context, s.connAddRule, onAddRule),
+            ],
+            builder: (context, controller, _) => RoundButton(
+              icon: Symbols.more_vert_rounded,
+              label: s.more,
+              onTap: () => controller.isOpen ? controller.close() : controller.open(),
+            ),
+          ),
           RoundButton(icon: Symbols.close_rounded, label: s.close, onTap: onClose),
         ],
       ),
+    );
+  }
+
+  Widget _menuItem(BuildContext context, String label, VoidCallback onTap) {
+    final palette = Palette.of(context);
+    return MenuItemButton(
+      onPressed: onTap,
+      style: ButtonStyle(
+        minimumSize: const WidgetStatePropertyAll(Size(190, 40)),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(9))),
+        overlayColor: WidgetStatePropertyAll(palette.hover),
+        padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 12)),
+      ),
+      child: Text(label, style: Styles.secondary.copyWith(color: palette.ink)),
     );
   }
 }
