@@ -49,6 +49,14 @@
   "until": "until {date}",
   "expired": "Expired",
   "milliseconds": "{n} ms",
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
   "bytesB": "{n} B",
   "bytesKB": "{n} KB",
   "bytesMB": "{n} MB",
@@ -359,5 +367,32 @@
   "dnsLeakFixEnableKillSwitch": "Enable the kill switch so DNS stays inside the tunnel.",
   "dnsCheckNeedsConnection": "Connect to the VPN first, then check for leaks.",
   "dnsExpected": "Expected",
-  "dnsActual": "Observed"
+  "dnsActual": "Observed",
+  "sortBy": "Sort by",
+  "sortPing": "Ping",
+  "sortSpeed": "Speed",
+  "sortName": "Name",
+  "measureSpeed": "Measure speed",
+  "benchmarkStale": "outdated",
+  "autoSelectMode": "Auto-select server",
+  "autoSelectPing": "Fastest ping",
+  "autoSelectSpeed": "Fastest speed",
+  "autoSelectSmart": "Smart choice",
+  "coreWatchUnstable": "The link to the core is unstable",
+  "watchReconnect": "Reconnect",
+  "coreRestoringLink": "Restoring the link to the core…",
+  "updateStageVerify": "Verifying",
+  "crashRestoreTitle": "The last session was interrupted",
+  "restoreOnCrash": "Restore session after a crash",
+  "crashRestore": "Restore",
+  "crashDismiss": "Not now",
+  "overrideTitle": "My edits",
+  "overrideEdit": "Edit servers",
+  "overrideHide": "Hide",
+  "overrideUnhide": "Show",
+  "overrideClear": "Clear edits",
+  "overrideEmpty": "No edits yet",
+  "overrideCustomRules": "Custom rules",
+  "errBenchmarkUnsupported": "Speed measurement needs a newer core",
+  "benchmarkProgress": "Measuring {done} of {total}…"
 }

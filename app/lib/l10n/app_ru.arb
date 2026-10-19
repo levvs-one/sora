@@ -80,6 +80,14 @@
   },
   "expired": "Срок истёк",
   "milliseconds": "{n} мс",
+  "speedMbps": "{value} Мбит/с",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
   "@milliseconds": {
     "placeholders": {
       "n": {
@@ -511,5 +519,32 @@
   "dnsLeakFixEnableKillSwitch": "Включите kill switch, чтобы DNS оставался в туннеле.",
   "dnsCheckNeedsConnection": "Сначала подключитесь к VPN, затем проверьте утечки.",
   "dnsExpected": "Ожидалось",
-  "dnsActual": "Обнаружено"
+  "dnsActual": "Обнаружено",
+  "sortBy": "Сортировать",
+  "sortPing": "Пинг",
+  "sortSpeed": "Скорость",
+  "sortName": "Имя",
+  "measureSpeed": "Замерить скорость",
+  "benchmarkStale": "устарело",
+  "autoSelectMode": "Автовыбор сервера",
+  "autoSelectPing": "Самый быстрый пинг",
+  "autoSelectSpeed": "Самая высокая скорость",
+  "autoSelectSmart": "Умный выбор",
+  "coreWatchUnstable": "Связь с ядром нестабильна",
+  "watchReconnect": "Переподключить",
+  "coreRestoringLink": "Восстанавливаю связь с ядром…",
+  "updateStageVerify": "Проверка",
+  "crashRestoreTitle": "Прошлое соединение оборвалось",
+  "restoreOnCrash": "Восстанавливать сессию после сбоя",
+  "crashRestore": "Восстановить",
+  "crashDismiss": "Не сейчас",
+  "overrideTitle": "Мои правки",
+  "overrideEdit": "Редактировать серверы",
+  "overrideHide": "Скрыть",
+  "overrideUnhide": "Показать",
+  "overrideClear": "Сбросить правки",
+  "overrideEmpty": "Пока нет правок",
+  "overrideCustomRules": "Свои правила",
+  "errBenchmarkUnsupported": "Для замера скорости нужна новая версия ядра",
+  "benchmarkProgress": "Замер {done} из {total}…"
 }

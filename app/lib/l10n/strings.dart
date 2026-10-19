@@ -447,6 +447,12 @@ abstract class S {
   /// **'{n} мс'**
   String milliseconds(int n);
 
+  /// No description provided for @speedMbps.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} Mbps'**
+  String speedMbps(double value);
+
   /// No description provided for @bytesB.
   ///
   /// In ru, this message translates to:
@@ -1870,6 +1876,43 @@ abstract class S {
   String get dnsLeakFound;
   String get dnsLastCheck;
   String get dnsNeverChecked;
+  String get sortBy;
+  String get sortPing;
+  String get sortSpeed;
+  String get sortName;
+  String get measureSpeed;
+  String get benchmarkStale;
+  String get autoSelectMode;
+  String get autoSelectPing;
+  String get autoSelectSpeed;
+  String get autoSelectSmart;
+  String get coreWatchUnstable;
+  String get watchReconnect;
+  String get coreRestoringLink;
+  String get updateStageVerify;
+  String get crashRestoreTitle;
+
+  /// No description provided for @restoreOnCrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore session after a crash'**
+  String get restoreOnCrash;
+  String get crashRestore;
+  String get crashDismiss;
+  String get overrideTitle;
+
+  /// No description provided for @overrideEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit servers'**
+  String get overrideEdit;
+  String get overrideHide;
+  String get overrideUnhide;
+  String get overrideClear;
+  String get overrideEmpty;
+  String get overrideCustomRules;
+  String get errBenchmarkUnsupported;
+  String benchmarkProgress(int done, int total);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

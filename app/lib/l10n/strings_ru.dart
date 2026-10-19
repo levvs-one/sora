@@ -167,6 +167,11 @@ class SRu extends S {
   }
 
   @override
+  String speedMbps(double value) {
+    return '${value.toStringAsFixed(1)} Мбит/с';
+  }
+
+  @override
   String bytesB(String n) {
     return '$n Б';
   }
@@ -1005,4 +1010,60 @@ class SRu extends S {
   String get dnsLastCheck => 'Последняя проверка';
   @override
   String get dnsNeverChecked => 'Ещё не проверялось';
+  @override
+  String get sortBy => 'Сортировать';
+  @override
+  String get sortPing => 'Пинг';
+  @override
+  String get sortSpeed => 'Скорость';
+  @override
+  String get sortName => 'Имя';
+  @override
+  String get measureSpeed => 'Замерить скорость';
+  @override
+  String get benchmarkStale => 'устарело';
+  @override
+  String get autoSelectMode => 'Автовыбор сервера';
+  @override
+  String get autoSelectPing => 'Самый быстрый пинг';
+  @override
+  String get autoSelectSpeed => 'Самая высокая скорость';
+  @override
+  String get autoSelectSmart => 'Умный выбор';
+  @override
+  String get coreWatchUnstable => 'Связь с ядром нестабильна';
+  @override
+  String get watchReconnect => 'Переподключить';
+  @override
+  String get coreRestoringLink => 'Восстанавливаю связь с ядром…';
+  @override
+  String get updateStageVerify => 'Проверка';
+  @override
+  String get crashRestoreTitle => 'Прошлое соединение оборвалось';
+
+  @override
+  String get restoreOnCrash => 'Восстанавливать сессию после сбоя';
+  @override
+  String get crashRestore => 'Восстановить';
+  @override
+  String get crashDismiss => 'Не сейчас';
+  @override
+  String get overrideTitle => 'Мои правки';
+
+  @override
+  String get overrideEdit => 'Редактировать серверы';
+  @override
+  String get overrideHide => 'Скрыть';
+  @override
+  String get overrideUnhide => 'Показать';
+  @override
+  String get overrideClear => 'Сбросить правки';
+  @override
+  String get overrideEmpty => 'Пока нет правок';
+  @override
+  String get overrideCustomRules => 'Свои правила';
+  @override
+  String get errBenchmarkUnsupported => 'Для замера скорости нужна новая версия ядра';
+  @override
+  String benchmarkProgress(int done, int total) => 'Замер $done из $total…';
 }

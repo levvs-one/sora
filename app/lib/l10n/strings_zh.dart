@@ -167,6 +167,11 @@ class SZh extends S {
   }
 
   @override
+  String speedMbps(double value) {
+    return '${value.toStringAsFixed(1)} Mbps';
+  }
+
+  @override
   String bytesB(String n) {
     return '$n B';
   }
@@ -1148,6 +1153,11 @@ class SZhHans extends SZh {
   @override
   String milliseconds(int n) {
     return '$n 女士';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '${value.toStringAsFixed(1)} Mbps';
   }
 
   @override
@@ -2135,6 +2145,11 @@ class SZhHant extends SZh {
   }
 
   @override
+  String speedMbps(double value) {
+    return '${value.toStringAsFixed(1)} Mbps';
+  }
+
+  @override
   String bytesB(String n) {
     return '$n B';
   }
@@ -2955,4 +2970,60 @@ class SZhHant extends SZh {
   String get dnsLastCheck => 'Last check';
   @override
   String get dnsNeverChecked => 'Not checked yet';
+  @override
+  String get sortBy => 'Sort by';
+  @override
+  String get sortPing => 'Ping';
+  @override
+  String get sortSpeed => 'Speed';
+  @override
+  String get sortName => 'Name';
+  @override
+  String get measureSpeed => 'Measure speed';
+  @override
+  String get benchmarkStale => 'outdated';
+  @override
+  String get autoSelectMode => 'Auto-select server';
+  @override
+  String get autoSelectPing => 'Fastest ping';
+  @override
+  String get autoSelectSpeed => 'Fastest speed';
+  @override
+  String get autoSelectSmart => 'Smart choice';
+  @override
+  String get coreWatchUnstable => 'The link to the core is unstable';
+  @override
+  String get watchReconnect => 'Reconnect';
+  @override
+  String get coreRestoringLink => 'Restoring the link to the core…';
+  @override
+  String get updateStageVerify => 'Verifying';
+  @override
+  String get crashRestoreTitle => 'The last session was interrupted';
+
+  @override
+  String get restoreOnCrash => 'Restore session after a crash';
+  @override
+  String get crashRestore => 'Restore';
+  @override
+  String get crashDismiss => 'Not now';
+  @override
+  String get overrideTitle => 'My edits';
+
+  @override
+  String get overrideEdit => 'Edit servers';
+  @override
+  String get overrideHide => 'Hide';
+  @override
+  String get overrideUnhide => 'Show';
+  @override
+  String get overrideClear => 'Clear edits';
+  @override
+  String get overrideEmpty => 'No edits yet';
+  @override
+  String get overrideCustomRules => 'Custom rules';
+  @override
+  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  @override
+  String benchmarkProgress(int done, int total) => 'Measuring $done of $total…';
 }
