@@ -538,6 +538,11 @@ jobs:
       - name: Checksums
         working-directory: dist
         run: sha256sum -- * > SHA256SUMS
+      # The release cannot be installed or applied as an in-app update until
+      # the owner signs SHA256SUMS with the release minisign key (key ceremony,
+      # FIX-PLAN.md section 9) and uploads SHA256SUMS.minisig to this draft:
+      # install.sh, install.ps1 and the sora-update helper all refuse to run
+      # without a valid manifest signature (fail-closed, SORA-H1).
       - name: Draft the release
         env:
           GH_TOKEN: ${{ github.token }}
