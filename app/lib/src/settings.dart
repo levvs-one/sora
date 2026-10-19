@@ -54,6 +54,7 @@ class Settings {
     'proxyChains',
     'syncedDevices',
     'zapretWithVpn',
+    'censorVerdicts',
   };
 
   final SharedPreferencesWithCache _store;
@@ -312,6 +313,9 @@ class Settings {
       .toList();
   Future<void> saveNotificationHistory(List<AppNotification> history) =>
       _store.setStringList('notificationHistory', history.take(100).map((n) => n.stored).toList());
+
+  String get censorVerdicts => _store.getString('censorVerdicts') ?? '';
+  set censorVerdicts(String value) => _store.setString('censorVerdicts', value);
 
   /// Resets preferences to defaults while preserving the proxy snapshot.
   Future<void> reset() async {

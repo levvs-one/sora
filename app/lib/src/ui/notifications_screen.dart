@@ -10,6 +10,7 @@ import '../notifications.dart';
 import '../sora.dart';
 import '../speedtest_services.dart';
 import 'kit.dart';
+import 'censor.dart';
 import 'logs.dart';
 import 'subscription.dart';
 import 'speedtest.dart';
@@ -61,6 +62,7 @@ class NotificationRow extends StatelessWidget {
       'update' => s.updateOpenAbout,
       'apply-profile' => s.profileApply,
       'undo-profile' => s.profileUndo,
+      'censor' => s.censorDetails,
       _ => null,
     };
     return Container(
@@ -87,6 +89,7 @@ class NotificationRow extends StatelessWidget {
               child: Pressable(
                 onTap: () => runNotificationAction(context, notice),
                 radius: 8,
+                semanticButton: true,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(action, style: Styles.secondary.copyWith(color: palette.ink)),
@@ -118,5 +121,7 @@ void runNotificationAction(BuildContext context, AppNotification notice) {
       if (profile != null) unawaited(sora.applyProfileWithUndo(profile));
     case 'undo-profile':
       unawaited(sora.undoProfileApply(notice.argument));
+    case 'censor':
+      unawaited(push<void>(context, const CensorScreen()));
   }
 }

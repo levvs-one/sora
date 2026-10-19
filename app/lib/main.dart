@@ -15,6 +15,7 @@ import 'src/settings.dart';
 import 'src/sora.dart';
 import 'src/ui/shell.dart';
 import 'src/ui/toasts.dart';
+import 'src/ui/censor.dart';
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,7 +91,11 @@ class _SoraAppState extends State<SoraApp> {
             ],
             supportedLocales: S.supportedLocales,
             navigatorKey: _navigator,
-            builder: (_, child) => NotificationToasts(sora: sora, navigator: _navigator, child: child!),
+            builder: (_, child) => NotificationToasts(
+              sora: sora,
+              navigator: _navigator,
+              child: CensorPromptHost(sora: sora, navigator: _navigator, child: child!),
+            ),
             home: const DesktopShell(),
           ),
         ),

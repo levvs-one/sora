@@ -13,9 +13,11 @@ import 'package:retry/retry.dart';
 import '../l10n/strings.dart';
 
 import 'core/link.dart';
+import 'core/censor.dart';
 import 'browser_diagnostics.dart';
 import 'chains.dart';
 import 'generated/sora/core/v1/core_control.pbgrpc.dart';
+import 'generated/sora/custom/v1/custom.pbgrpc.dart';
 import 'groups.dart';
 import 'overrides.dart';
 import 'profiles.dart';
@@ -84,7 +86,8 @@ class Sora extends ChangeNotifier {
       overrides = OverrideStore(() => settings.subscriptionOverrides, (v) => settings.subscriptionOverrides = v),
       profiles = ProfilesStore(() => settings.networkProfiles, (v) => settings.networkProfiles = v),
       chains = ChainsStore(() => settings.proxyChains, (v) => settings.proxyChains = v),
-      syncDevices = SyncDevices(() => settings.syncedDevices, (v) => settings.syncedDevices = v) {
+      syncDevices = SyncDevices(() => settings.syncedDevices, (v) => settings.syncedDevices = v),
+      censor = CensorDetector(() => settings.censorVerdicts, (v) => settings.censorVerdicts = v) {
     overrides.onChanged = () {
       notifyListeners();
       // Hiding a server changes the plan; renaming does not (IDs are stable).
@@ -96,6 +99,10 @@ class Sora extends ChangeNotifier {
     _loadBandwidth();
   }
   final browserDiagnostics = BrowserDiagnostics();
+
+  /// Censorship detector verdicts: history, prompt state and polling.
+  /// Wired in the constructor from [settings].
+  final CensorDetector censor;
 
   AppUpdater get updates => _updates;
   late final _updates = AppUpdater(
@@ -160,6 +167,23 @@ class Sora extends ChangeNotifier {
   }
 
   void recovered(String source) => _reported.remove(source);
+
+  /// Records a censorship detector verdict. An actionable one (the detector
+  /// believes the provider is blocking the connection) also posts the
+  /// friendly prompt notification and arms the in-app prompt sheet.
+  Future<void> ingestCensorVerdict(CensorVerdict verdict) async {
+    if (_disposed || !censor.ingest(verdict)) return;
+    final s = strings;
+    await recordNotification(
+      AppNotification(
+        time: DateTime.now(),
+        title: s.censorPromptTitle,
+        body: s.censorPromptBody(verdict.confidence),
+        action: 'censor',
+        argument: verdict.id,
+      ),
+    );
+  }
 
   final Settings settings;
   List<AppNotification> history;
@@ -269,6 +293,15 @@ class Sora extends ChangeNotifier {
     _emitted++;
     unawaited(recordNotification(notificationFor(notice)));
     _notices.add(notice);
+    if (notice is ConnectionFailed) {
+      // Ask the detector whether the failure looks like provider blocking.
+      // A no-op until the core detector API lands (CensorDetector.fetchVerdict).
+      unawaited(
+        censor.pollAfterFailure(_link).then((verdict) {
+          if (verdict != null && !_disposed) ingestCensorVerdict(verdict);
+        }),
+      );
+    }
   }
 
   /// The core's local proxy endpoint, used by system proxy mode. Null until
@@ -472,6 +505,7 @@ class Sora extends ChangeNotifier {
         recovered('core');
         _watchSubscriptions();
         _watchSession();
+        unawaited(loadCustomServers());
         notifyListeners();
         if (_pendingSelection != null) unawaited(_applySelection());
         if ((settings.connectOnStart || settings.resumeAfterUpdate) && !_startedOnce && phase == Phase.off) {
@@ -662,6 +696,9 @@ class Sora extends ChangeNotifier {
         _seenSession = id;
         _seenSequence = event.sequence;
         final fresh = !event.hasEmittedAt() || event.emittedAt.toDateTime().isAfter(opened);
+        // TODO(censor): ingest pushed detector verdicts here once
+        // proto/sora/censor/v1/censor.proto lands and the Dart stubs are
+        // regenerated (CoreEvent.censorVerdict).
         if (event.hasStateChanged()) {
           _applyState(event.stateChanged.state, report: fresh);
           notifyListeners();
@@ -1299,6 +1336,75 @@ class Sora extends ChangeNotifier {
     overrides.drop(id);
     notifyListeners();
   });
+
+  /// User-added servers, stored by the core outside subscriptions.
+  final List<CustomServer> _customServers = [];
+  List<CustomServer> get customServers => List.unmodifiable(_customServers);
+
+  /// Loads custom servers after the core link opens. The service lands with
+  /// the core update; until then the section simply stays empty.
+  Future<void> loadCustomServers() async {
+    final link = _link;
+    if (link == null) return;
+    try {
+      final answer = await link.custom.listCustomServers(
+        ListCustomServersRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
+      );
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      _customServers
+        ..clear()
+        ..addAll(answer.servers);
+      recovered('custom-servers');
+      notifyListeners();
+    } catch (error) {
+      if (error is GrpcError && error.code == StatusCode.unimplemented) return;
+      reportFailure(error, source: 'custom-servers');
+    }
+  }
+
+  /// Saves a new custom server; the core assigns its id. Returns null on
+  /// success; failures are reported through the notification stream.
+  Future<CoreFailure?> addCustomServer(CustomServer server) => _call(() async {
+    final link = _link!;
+    final answer = await link.custom.createCustomServer(
+      CreateCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, server: server),
+    );
+    if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+    _customServers.add(answer.server);
+    notifyListeners();
+  });
+
+  Future<CoreFailure?> deleteCustomServer(String id) => _call(() async {
+    final link = _link!;
+    final answer = await link.custom.deleteCustomServer(
+      DeleteCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, id: id),
+    );
+    if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+    _customServers.removeWhere((s) => s.id == id);
+    notifyListeners();
+  });
+
+  /// Tests reachability of an unsaved custom server draft. Returns the
+  /// outcome; failures are reported through the notification stream.
+  Future<({bool ok, int latencyMs, CoreFailure? failure})> testCustomServer(CustomServer server) async {
+    recovered('request');
+    final link = _link;
+    if (link == null) {
+      reportFailure(CoreFailure.unavailable);
+      return (ok: false, latencyMs: 0, failure: CoreFailure.unavailable);
+    }
+    try {
+      final answer = await link.custom.testCustomServer(
+        TestCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, server: server),
+      );
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      return (ok: answer.ok, latencyMs: answer.latencyMs, failure: null);
+    } catch (error) {
+      final failure = CoreFailure.from(error);
+      reportFailure(error);
+      return (ok: false, latencyMs: 0, failure: failure);
+    }
+  }
 
   /// Runs a core request; returns null on success or stores and returns its
   /// failure.
