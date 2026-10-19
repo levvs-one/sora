@@ -462,7 +462,6 @@
   "diagnosticEvents": "विंडोज़ घटनाएँ",
   "diagnosticPackets": "पैकेट पर कब्जा",
   "diagnosticUnavailable": "यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.",
-  "extensionsSoon": "जल्द आ रहा है",
   "exportLogFile": "फ़ाइल में {name}",
   "diagnosticRequiresTun": "पैकेट कैप्चर के लिए एक सक्रिय सोरा ट्यून कनेक्शन की आवश्यकता होती है।",
   "diagnosticCapture": "10 सेकंड के लिए कैप्चर करें",

@@ -466,7 +466,6 @@
   "diagnosticHttp": "HTTP диагностикасы",
   "diagnosticNoData": "Жазылған сұраулар әлі жоқ. Алдымен жылдамдықты тексеру веб-сайтын ашыңыз.",
   "diagnosticRequiresTun": "Пакеттерді түсіру үшін белсенді Sora TUN қосылымы қажет.",
-  "extensionsSoon": "Жақында",
   "@exportLogFile": {
     "placeholders": {
       "name": {

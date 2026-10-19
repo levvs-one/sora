@@ -459,7 +459,6 @@
   },
   "extensions": "Extensões",
   "diagnosticCapture": "Capture por 10 segundos",
-  "extensionsSoon": "Em breve",
   "diagnosticUnavailable": "Este diagnóstico não está disponível nesta plataforma.",
   "diagnosticNoData": "Nenhuma solicitação registrada ainda. Abra primeiro um site de teste de velocidade.",
   "exportLogFile": "Em {name}",

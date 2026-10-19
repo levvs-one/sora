@@ -168,7 +168,7 @@ class SId extends S {
 
   @override
   String speedMbps(double value) {
-    return '${value.toStringAsFixed(1)} Mbps';
+    return '${intl.NumberFormat('0.0', localeName).format(value)} Mbps';
   }
 
   @override
@@ -916,6 +916,8 @@ class SId extends S {
   @override
   String extInstallsCount(String count) => '$count installs';
   @override
+  String get extInstallOne => '1 install';
+  @override
   String get extBadgeVerified => 'Verified';
   @override
   String get extBadgeTop => 'Top this week';
@@ -1159,7 +1161,15 @@ Find one in the catalog or install from a file.';
   @override
   String get connAddRule => 'Add rule';
   @override
-  String get connConnections => 'connections';
+  String connConnectionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# connections',
+      one: '# connection',
+    );
+    return _temp0;
+  }
   @override
   String get dnsPreset => 'Preset';
   @override

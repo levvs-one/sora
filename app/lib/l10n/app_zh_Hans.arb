@@ -457,7 +457,6 @@
       }
     }
   },
-  "extensionsSoon": "即将推出",
   "diagnosticCapture": "捕捉10秒",
   "diagnosticRequiresTun": "数据包捕获需要活动的 Sora TUN 连接。",
   "exportLogFile": "保存为 {name}",

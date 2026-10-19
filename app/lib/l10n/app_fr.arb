@@ -459,7 +459,6 @@
   },
   "diagnosticUnavailable": "Ce diagnostic n'est pas disponible sur cette plateforme.",
   "diagnosticNoData": "Aucune demande enregistrée pour l'instant. Ouvrez d’abord un site Web de test de vitesse.",
-  "extensionsSoon": "À venir",
   "diagnosticRequiresTun": "La capture de paquets nécessite une connexion Sora TUN active.",
   "diagnosticEvents": "Événements Windows",
   "exportLogFile": "Dans {name}",

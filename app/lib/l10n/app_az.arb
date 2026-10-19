@@ -465,7 +465,6 @@
   "exportLogFile": "Fayla {name}",
   "diagnosticPackets": "Paket tutma",
   "diagnosticHttp": "HTTP diaqnostikası",
-  "extensionsSoon": "Tezliklə",
   "diagnosticNoData": "Hələ qeydə alınmış sorğu yoxdur. Əvvəlcə sürət testi veb saytını açın.",
   "@exportLogFile": {
     "placeholders": {

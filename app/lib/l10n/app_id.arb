@@ -458,7 +458,6 @@
     }
   },
   "extensions": "Ekstensi",
-  "extensionsSoon": "Segera hadir",
   "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini.",
   "diagnosticCapture": "Tangkap selama 10 detik",
   "diagnosticEvents": "Acara Windows",

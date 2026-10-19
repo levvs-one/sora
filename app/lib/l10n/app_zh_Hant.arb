@@ -457,7 +457,6 @@
       }
     }
   },
-  "extensionsSoon": "即將推出",
   "diagnosticUnavailable": "此診斷在此平台上不可用。",
   "extensions": "擴充",
   "diagnosticPackets": "抓包",

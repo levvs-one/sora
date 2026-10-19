@@ -461,7 +461,6 @@
   "exportLogFile": "Файлга {name}",
   "diagnosticHttp": "HTTP диагностикасы",
   "diagnosticUnavailable": "Бул диагностика бул платформада жеткиликсиз.",
-  "extensionsSoon": "Жакында келмекчи",
   "diagnosticEvents": "Windows окуялары",
   "diagnosticPackets": "Пакетти басып алуу",
   "diagnosticCapture": "10 секундга тартыңыз",

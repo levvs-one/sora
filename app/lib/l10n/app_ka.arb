@@ -464,7 +464,6 @@
   "diagnosticPackets": "პაკეტის დაჭერა",
   "diagnosticCapture": "გადაიღეთ 10 წამის განმავლობაში",
   "diagnosticEvents": "Windows-ის მოვლენები",
-  "extensionsSoon": "მალე მოვა",
   "extensions": "გაფართოებები",
   "exportLogFile": "ფაილში {name}",
   "@exportLogFile": {

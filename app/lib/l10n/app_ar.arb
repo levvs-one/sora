@@ -464,7 +464,6 @@
   "diagnosticPackets": "التقاط الحزمة",
   "diagnosticHttp": "تشخيصات HTTP",
   "diagnosticEvents": "أحداث ويندوز",
-  "extensionsSoon": "قريباً",
   "diagnosticNoData": "لا توجد طلبات مسجلة حتى الآن. افتح موقع اختبار السرعة أولاً.",
   "exportLogFile": "إلى {name}",
   "@exportLogFile": {

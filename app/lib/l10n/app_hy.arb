@@ -463,7 +463,6 @@
   "diagnosticHttp": "HTTP ախտորոշում",
   "diagnosticUnavailable": "Այս ախտորոշումն անհասանելի է այս հարթակում:",
   "diagnosticCapture": "Լուսանկարեք 10 վայրկյան",
-  "extensionsSoon": "Շուտով",
   "diagnosticPackets": "Փաթեթի գրավում",
   "diagnosticEvents": "Windows-ի իրադարձություններ",
   "diagnosticRequiresTun": "Փաթեթների գրավման համար անհրաժեշտ է ակտիվ Sora TUN կապ:",

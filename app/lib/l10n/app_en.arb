@@ -339,6 +339,7 @@
     }
   },
   "extInstallsCount": "{count} installs",
+  "extInstallOne": "1 install",
   "@extInstallsCount": {
     "placeholders": {
       "count": {
@@ -516,7 +517,13 @@
   "connListView": "As list",
   "connCopyHost": "Copy host",
   "connAddRule": "Add rule",
-  "connConnections": "connections",
+  "connConnectionsCount": "{count, plural, one{# connection} other{# connections}}",
+  "@connConnectionsCount": {
+    "description": "Connection count with plural, e.g. in the connections screen",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "dnsPreset": "Preset",
   "dnsPresetCloudflare": "Cloudflare",
   "dnsPresetGoogle": "Google",

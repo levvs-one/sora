@@ -1790,6 +1790,7 @@ abstract class S {
   String extRatingLabel(String rating);
   String extByAuthor(String author);
   String extInstallsCount(String count);
+  String get extInstallOne;
   String get extBadgeVerified;
   String get extBadgeTop;
   String get extBadgeNew;
@@ -1874,11 +1875,6 @@ abstract class S {
   String get extPermNetFetch;
   String get extPermBackground;
 
-  /// No description provided for @extensionsSoon.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скоро появится'**
-
   /// No description provided for @exportLogFile.
   ///
   /// In ru, this message translates to:
@@ -1951,7 +1947,7 @@ abstract class S {
   String get connListView;
   String get connCopyHost;
   String get connAddRule;
-  String get connConnections;
+  String connConnectionsCount(int count);
   String get dnsPreset;
   String get dnsPresetCloudflare;
   String get dnsPresetGoogle;

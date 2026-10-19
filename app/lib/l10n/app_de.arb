@@ -461,7 +461,6 @@
   "diagnosticCapture": "10 Sekunden lang einfangen",
   "diagnosticPackets": "Paketerfassung",
   "diagnosticEvents": "Windows-Ereignisse",
-  "extensionsSoon": "Kommt bald",
   "diagnosticRequiresTun": "Für die Paketerfassung ist eine aktive Sora TUN-Verbindung erforderlich.",
   "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar.",
   "diagnosticNoData": "Noch keine erfassten Anfragen. Öffnen Sie zunächst eine Website für Geschwindigkeitstests.",

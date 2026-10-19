@@ -457,7 +457,6 @@
       }
     }
   },
-  "extensionsSoon": "近日公開",
   "diagnosticRequiresTun": "パケット キャプチャには、アクティブな Sora TUN 接続が必要です。",
   "extensions": "拡張機能",
   "diagnosticHttp": "HTTP 診断",

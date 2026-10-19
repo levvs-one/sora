@@ -464,7 +464,6 @@
   "diagnosticEvents": "Zdarzenia Windowsa",
   "exportLogFile": "Do {name}",
   "diagnosticPackets": "Przechwytywanie pakietów",
-  "extensionsSoon": "Już wkrótce",
   "diagnosticHttp": "Diagnostyka HTTP",
   "diagnosticCapture": "Przechwytuj przez 10 sekund",
   "@exportLogFile": {

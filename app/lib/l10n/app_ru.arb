@@ -491,6 +491,7 @@
     }
   },
   "extInstallsCount": "установок: {count}",
+  "extInstallOne": "1 установка",
   "@extInstallsCount": {
     "placeholders": {
       "count": {
@@ -668,7 +669,7 @@
   "connListView": "Списком",
   "connCopyHost": "Скопировать хост",
   "connAddRule": "Добавить правило",
-  "connConnections": "соединения",
+  "connConnectionsCount": "{count, plural, one{# соединение} few{# соединения} other{# соединений}}",
   "dnsPreset": "Пресет",
   "dnsPresetCloudflare": "Cloudflare",
   "dnsPresetGoogle": "Google",
@@ -764,15 +765,15 @@
   "syncScanCode": "Сканировать код",
   "syncRevoke": "Отозвать",
   "syncRevokeConfirm": "Отозвать «{name}»?",
-  "syncLastSync": "Последний синк: {time}",
+  "syncLastSync": "Последняя синхронизация: {time}",
   "syncNever": "Никогда",
   "syncWhat": "Что синхронизируется",
   "syncWhatBody": "Подписки, правила, настройки и сетевые профили. Никогда не синхронизируются: локальные логи, IPC-токены.",
   "syncNoLan": "Устройства должны быть в одной локальной сети",
   "syncPaired": "Устройство спарено",
-  "syncPairingTitle": "Спарьтесь с этим устройством",
+  "syncPairingTitle": "Спарить с этим устройством",
   "syncWaiting": "Ожидание другого устройства…",
-  "syncSecureNote": "Канал зашифрован end-to-end. Никаких аккаунтов и облачных серверов.",
+  "syncSecureNote": "Канал защищён сквозным шифрованием. Никаких аккаунтов и облачных серверов.",
   "zapretWithVpn": "DPI-обход для прямого трафика",
   "zapretWithVpnHint": "Запускает zapret рядом с VPN-туннелем: туннелированный трафик идёт через VPN, прямой — через обход.",
   "chainDuplicate": "Каждый сервер — только один раз",

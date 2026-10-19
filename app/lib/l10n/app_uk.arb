@@ -459,7 +459,6 @@
   },
   "diagnosticPackets": "Перехоплення пакетів",
   "exportLogFile": "У {name}",
-  "extensionsSoon": "Скоро буде",
   "diagnosticHttp": "HTTP діагностика",
   "diagnosticEvents": "Події Windows",
   "diagnosticCapture": "Зробіть знімок на 10 секунд",

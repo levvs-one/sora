@@ -463,7 +463,6 @@
   "extensions": "Estensioni",
   "diagnosticRequiresTun": "L'acquisizione dei pacchetti richiede una connessione Sora TUN attiva.",
   "diagnosticHttp": "Diagnostica HTTP",
-  "extensionsSoon": "Prossimamente",
   "diagnosticEvents": "Eventi di Windows",
   "diagnosticNoData": "Nessuna richiesta registrata ancora. Apri prima un sito Web di test di velocità.",
   "diagnosticUnavailable": "Questa diagnostica non è disponibile su questa piattaforma.",

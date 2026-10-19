@@ -457,7 +457,6 @@
       }
     }
   },
-  "extensionsSoon": "Muy pronto",
   "diagnosticRequiresTun": "La captura de paquetes necesita una conexión Sora TUN activa.",
   "extensions": "Extensiones",
   "diagnosticPackets": "captura de paquetes",

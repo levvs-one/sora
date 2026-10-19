@@ -281,7 +281,7 @@ class _DnsScreenState extends State<DnsScreen> {
           ),
           if (check.expected.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(left: 24, top: 2),
+              padding: const EdgeInsetsDirectional.only(start: 24, top: 2),
               child: Text(
                 '${s.dnsExpected}: ${check.expected}',
                 style: Styles.caption.copyWith(color: palette.ink2),
@@ -289,7 +289,7 @@ class _DnsScreenState extends State<DnsScreen> {
             ),
           if (check.actual.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(left: 24, top: 2),
+              padding: const EdgeInsetsDirectional.only(start: 24, top: 2),
               child: Text(
                 '${s.dnsActual}: ${check.actual}',
                 style: Styles.caption.copyWith(color: palette.ink2),
@@ -297,7 +297,7 @@ class _DnsScreenState extends State<DnsScreen> {
             ),
           if (hasHint)
             Padding(
-              padding: const EdgeInsets.only(left: 24, top: 4),
+              padding: const EdgeInsetsDirectional.only(start: 24, top: 4),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

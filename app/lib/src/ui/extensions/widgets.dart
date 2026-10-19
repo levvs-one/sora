@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/strings.dart';
@@ -21,6 +22,9 @@ class StarRating extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
+    final ratingText =
+        NumberFormat('0.0', Localizations.localeOf(context).toLanguageTag())
+            .format(rating);
     final s = S.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -34,10 +38,10 @@ class StarRating extends StatelessWidget {
             color: palette.ink,
           ),
         const SizedBox(width: 4),
-        Text(rating.toStringAsFixed(1), style: Styles.caption.copyWith(color: palette.ink2)),
+        Text(ratingText, style: Styles.caption.copyWith(color: palette.ink2)),
         // Screen-reader text; visual users see the stars.
         Semantics(
-          label: s.extRatingLabel(rating.toStringAsFixed(1)),
+          label: s.extRatingLabel(ratingText),
           child: const SizedBox.shrink(),
         ),
       ],
@@ -182,7 +186,11 @@ class ExtensionCard extends StatelessWidget {
                         if (rating != null && rating! > 0) StarRating(rating: rating!),
                         ...badges,
                         if (installs != null && installs! > 0)
-                          Text(s.extInstallsCount(_compact(installs!)),
+                          Text(
+                              installs! == 1
+                                  ? s.extInstallOne
+                                  : s.extInstallsCount(
+                                      _compact(context, installs!)),
                               style: Styles.caption.copyWith(color: palette.ink2)),
                       ],
                     ),
@@ -197,10 +205,10 @@ class ExtensionCard extends StatelessWidget {
     );
   }
 
-  static String _compact(int n) {
-    if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(1)}M';
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
-    return '$n';
+  static String _compact(BuildContext context, int n) {
+    return NumberFormat.compact(
+            locale: Localizations.localeOf(context).toLanguageTag())
+        .format(n);
   }
 }
 

@@ -462,7 +462,6 @@
   "diagnosticHttp": "HTTP ডায়াগনস্টিকস",
   "diagnosticNoData": "এখনও কোন রেকর্ড করা অনুরোধ. প্রথমে একটি গতি পরীক্ষার ওয়েবসাইট খুলুন।",
   "diagnosticEvents": "উইন্ডোজ ইভেন্ট",
-  "extensionsSoon": "শীঘ্রই আসছে",
   "extensions": "এক্সটেনশন",
   "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.",
   "diagnosticRequiresTun": "প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।",

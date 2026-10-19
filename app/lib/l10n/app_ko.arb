@@ -466,7 +466,6 @@
   "diagnosticPackets": "패킷 캡처",
   "diagnosticNoData": "아직 기록된 요청이 없습니다. 먼저 속도 테스트 웹사이트를 열어보세요.",
   "diagnosticCapture": "10초 동안 캡처",
-  "extensionsSoon": "곧 출시 예정",
   "@exportLogFile": {
     "placeholders": {
       "name": {

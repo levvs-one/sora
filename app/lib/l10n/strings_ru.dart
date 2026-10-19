@@ -168,7 +168,7 @@ class SRu extends S {
 
   @override
   String speedMbps(double value) {
-    return '${value.toStringAsFixed(1)} Мбит/с';
+    return '${intl.NumberFormat('0.0', localeName).format(value)} Мбит/с';
   }
 
   @override
@@ -917,6 +917,8 @@ class SRu extends S {
   @override
   String extInstallsCount(String count) => 'установок: $count';
   @override
+  String get extInstallOne => '1 установка';
+  @override
   String get extBadgeVerified => 'Проверено';
   @override
   String get extBadgeTop => 'Топ недели';
@@ -1160,7 +1162,16 @@ class SRu extends S {
   @override
   String get connAddRule => 'Добавить правило';
   @override
-  String get connConnections => 'соединения';
+  String connConnectionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# соединений',
+      few: '# соединения',
+      one: '# соединение',
+    );
+    return _temp0;
+  }
   @override
   String get dnsPreset => 'Пресет';
   @override

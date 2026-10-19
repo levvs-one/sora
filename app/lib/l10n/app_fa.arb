@@ -463,7 +463,6 @@
   "diagnosticCapture": "به مدت 10 ثانیه عکس بگیرید",
   "diagnosticNoData": "هنوز درخواستی ثبت نشده است. ابتدا یک وب سایت تست سرعت باز کنید.",
   "diagnosticRequiresTun": "ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.",
-  "extensionsSoon": "به زودی",
   "exportLogFile": "در {name}",
   "diagnosticHttp": "تشخیص HTTP",
   "diagnosticPackets": "ضبط بسته",

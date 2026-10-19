@@ -457,7 +457,6 @@
       }
     }
   },
-  "extensionsSoon": "即将推出",
   "exportLogFile": "保存为 {name}",
   "diagnosticPackets": "抓包",
   "diagnosticCapture": "捕捉10秒",

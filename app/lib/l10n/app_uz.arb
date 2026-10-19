@@ -460,7 +460,6 @@
   "extensions": "Kengaytmalar",
   "exportLogFile": "Faylga {name}",
   "diagnosticRequiresTun": "Paketlarni yozib olish uchun faol Sora TUN ulanishi kerak.",
-  "extensionsSoon": "Tez kunlarda",
   "diagnosticCapture": "10 soniya davomida suratga oling",
   "diagnosticUnavailable": "Ushbu diagnostika ushbu platformada mavjud emas.",
   "diagnosticNoData": "Hozircha hech qanday soʻrov qayd etilmagan. Avval tezlikni tekshirish veb-saytini oching.",

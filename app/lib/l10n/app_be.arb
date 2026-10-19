@@ -466,7 +466,6 @@
   "diagnosticPackets": "Захоп пакета",
   "diagnosticNoData": "Пакуль няма запісаных запытаў. Спачатку адкрыйце вэб-сайт для праверкі хуткасці.",
   "diagnosticRequiresTun": "Для захопу пакетаў патрабуецца актыўнае злучэнне Sora TUN.",
-  "extensionsSoon": "Хутка будзе",
   "@exportLogFile": {
     "placeholders": {
       "name": {

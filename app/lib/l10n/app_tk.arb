@@ -460,7 +460,6 @@
   "diagnosticRequiresTun": "Paket almak üçin işjeň Sora TUN birikmesi gerek.",
   "diagnosticUnavailable": "Bu anyklaýyş bu platformada elýeterli däl.",
   "diagnosticNoData": "Entek ýazylan haýyş ýok. Ilki bilen tizlik synag web sahypasyny açyň.",
-  "extensionsSoon": "Soonakynda",
   "extensions": "Giňeldişler",
   "diagnosticCapture": "10 sekuntlap ​​surata düşüriň",
   "diagnosticEvents": "Windows wakalary",

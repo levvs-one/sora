@@ -189,7 +189,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
             ),
           ),
           if (active != null)
-            Text('$active ${s.connConnections}', style: Styles.caption.copyWith(color: palette.ink2)),
+            Text(s.connConnectionsCount(active), style: Styles.caption.copyWith(color: palette.ink2)),
         ],
       ),
     );
@@ -263,10 +263,14 @@ class _GroupHeader extends StatelessWidget {
       child: Tile(
         title: name,
         titleStyle: Styles.bodyStrong,
-        detail: '$count ${s.connConnections}',
+        detail: s.connConnectionsCount(count),
         onTap: onToggle,
         trailing: Icon(
-          collapsed ? Symbols.keyboard_arrow_right_rounded : Symbols.keyboard_arrow_down_rounded,
+          collapsed
+              ? (Directionality.of(context) == TextDirection.rtl
+                  ? Symbols.keyboard_arrow_left_rounded
+                  : Symbols.keyboard_arrow_right_rounded)
+              : Symbols.keyboard_arrow_down_rounded,
           size: 18,
           color: palette.ink3,
         ),
