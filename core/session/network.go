@@ -117,6 +117,9 @@ func (s *Session) renewConnections(ctx context.Context, why string) {
 	if s.State() != StateConnected {
 		return
 	}
+	// F7: surface the network move itself, not just the renewal, so the
+	// client can show the connection state while flows re-establish.
+	s.log.Append(Event{Kind: EventNetwork, Detail: why})
 	s.log.Append(Event{Kind: EventLog, Detail: why + "; connections reopen"})
 	if tracker, ok := s.eng.(engine.ConnectionTracker); ok {
 		if err := tracker.CloseConnections(ctx); err == nil {

@@ -763,6 +763,11 @@ func (f *eventFeed) close() {
 const streamBuffer = 128
 
 // toWireEvent converts a journal event to the contract format.
+// NetworkEventPrefix marks LogBatch lines that carry a network-move event
+// (session.EventNetwork). The client matches this prefix to surface the
+// connection state while flows re-establish.
+const NetworkEventPrefix = "network-changed: "
+
 func toWireEvent(event session.Event, redactor *engine.Redactor) *corev1.CoreEvent {
 	var mask func(string) string
 	if redactor != nil {
@@ -810,6 +815,12 @@ func toWireEvent(event session.Event, redactor *engine.Redactor) *corev1.CoreEve
 			moved.Group, moved.Previous, moved.Selected = event.Switch.Group, event.Switch.Previous, event.Switch.Selected
 		}
 		out.Payload = &corev1.CoreEvent_GroupSwitched{GroupSwitched: moved}
+	case session.EventNetwork:
+		// Network moves surface as a marked log line; the client matches
+		// NetworkEventPrefix to show the connection state.
+		out.Payload = &corev1.CoreEvent_LogBatch{LogBatch: &corev1.LogBatch{
+			Lines: []string{NetworkEventPrefix + maskText(mask, event.Detail)},
+		}}
 	default:
 		out.Payload = &corev1.CoreEvent_LogBatch{LogBatch: &corev1.LogBatch{
 			Lines: []string{maskText(mask, event.Detail)},

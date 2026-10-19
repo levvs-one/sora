@@ -107,6 +107,8 @@ type Session struct {
 	// guardMu serializes kill-switch changes and shutdown restoration.
 	guardMu   sync.Mutex
 	engineSub func()
+	// crashes watches engine crashes for the instability signal (F7).
+	crashes   *crashWatch
 	ctx       context.Context
 	cancel    context.CancelFunc
 	done      chan struct{}
@@ -157,6 +159,7 @@ func New(cfg Config) (*Session, error) {
 			Bypass:     append([]string(nil), cfg.Settings.Bypass...),
 			TunnelMode: cfg.Settings.TunnelMode,
 		},
+		crashes: newCrashWatch(),
 		done: make(chan struct{}),
 	}, nil
 }
@@ -256,6 +259,8 @@ func (s *Session) Start(ctx context.Context) error {
 	}
 
 	s.setState(StateConnected, errs.Code(""), errs.Key(""), "")
+	// A clean connect starts a fresh crash episode.
+	s.crashes.reset()
 
 	// Subscribe before returning so failures between Apply and the first
 	// poll cannot be lost.
@@ -495,6 +500,16 @@ func (s *Session) supervise(events <-chan engine.Event) {
 					reason, key = errs.CodeOf(ev.Err), errs.KeyOf(ev.Err)
 				}
 				s.setStateReconnecting(reason, key, 0)
+				// F7: report engine instability once per episode so the
+				// client can offer diagnostics.
+				if s.crashes.note() {
+					s.log.Append(Event{
+						Kind:   EventError,
+						Reason: errs.CodeUnavailable,
+						Key:    errs.KeyEngineUnstable,
+						Detail: "the engine keeps crashing",
+					})
+				}
 			case engine.EventState:
 				if ev.State == engine.StateRunning && s.State() == StateReconnecting {
 					// A restarted engine starts its fallback groups over
@@ -504,6 +519,9 @@ func (s *Session) supervise(events <-chan engine.Event) {
 						fallbacks[g] = ""
 					}
 					s.setState(StateConnected, errs.Code(""), errs.Key(""), "")
+					// The engine recovered: a later crash starts a new
+					// episode.
+					s.crashes.reset()
 				}
 			case engine.EventFatal:
 				s.fail(errs.Newf(errs.CodeUnavailable, errs.KeyEngineStopped,

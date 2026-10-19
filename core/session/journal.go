@@ -19,6 +19,9 @@ const (
 	EventProbe    EventKind = "probe"
 	EventError    EventKind = "error"
 	EventGroup    EventKind = "group"
+	// EventNetwork marks a detected network change (interface/gateway
+	// switch). Detail carries the new network fingerprint.
+	EventNetwork EventKind = "network"
 )
 
 // Event records a session change. Journal-assigned sequence numbers increase
