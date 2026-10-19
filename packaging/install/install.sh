@@ -4,16 +4,30 @@
 #   curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
 #
 # It finds the latest release, downloads the packages for this distribution
-# and processor, checks them against the release's SHA256SUMS and installs
+# and processor, verifies the release signature on SHA256SUMS (minisign),
+# checks the packages against the signed SHA256SUMS and installs
 # them with the system's package manager, so updates and removal stay the
-# package manager's too. Nothing is installed when a checksum does not match.
+# package manager's too. Nothing is installed when the signature or a
+# checksum does not match.
 #
 # SORA_VERSION=1.0.3 installs that release instead of the latest.
 # SORA_DIST=<directory> installs packages already in that directory, with
-# their SHA256SUMS; CI checks the packages it built this way.
+# their SHA256SUMS and SHA256SUMS.minisig; CI checks the packages it built
+# this way (CI must provide a .minisig made with its test key, or set
+# SORA_MINISIGN_PUBKEY to that test key).
+# SORA_MINISIGN_PUBKEY=<base64> overrides the embedded release public key
+# (useful for CI self-tests with an ephemeral key).
 set -eu
 
 repo=https://github.com/levvs-one/sora
+
+# --- Release signature trust anchor (SORA-H1) ---
+# Minisign public key of the release signer, embedded at release time.
+# PLACEHOLDER: the owner must run the key ceremony (see
+# FIX-PLAN.md section 9, "Key ceremony") and replace this value with the
+# real release public key. Until then installation refuses to proceed
+# (fail-closed) instead of pretending the downloads are authentic.
+SORA_RELEASE_PUBKEY=${SORA_MINISIGN_PUBKEY:-REPLACE-ME-AFTER-KEY-CEREMONY}
 
 say() { printf '%s\n' "$*"; }
 die() {
@@ -52,6 +66,25 @@ trap 'rm -rf "$work"' EXIT INT TERM
 
 fetch() { curl -fsSL --proto '=https' --tlsv1.2 -o "$2" "$1"; }
 
+# Verifies the minisign signature of $1 (signed file) using $2 (signature
+# file) and the embedded release public key. Dies on any failure:
+# a missing key, a missing minisign binary, or a bad signature all abort
+# the installation instead of silently skipping authentication (SORA-H1).
+verify_signature() {
+	_signed=$1 _sig=$2
+	case "$SORA_RELEASE_PUBKEY" in
+	'' | REPLACE-ME-AFTER-KEY-CEREMONY)
+		die 'release signing is not configured yet: the minisign public key is still a placeholder. The owner must complete the key ceremony (FIX-PLAN.md, section 9) before releases can be installed.'
+		;;
+	esac
+	command -v minisign >/dev/null 2>&1 || die 'minisign is required to verify the release signature but was not found in PATH'
+	printf 'untrusted comment: sora release signing key\n%s\n' "$SORA_RELEASE_PUBKEY" >"$work/release.pub"
+	chmod 600 "$work/release.pub"
+	minisign -V -q -p "$work/release.pub" -m "$_signed" -x "$_sig" \
+		|| die "signature verification failed for ${_signed##*/}; nothing was installed"
+	say "sora: release signature verified"
+}
+
 if [ -n "${SORA_DIST:-}" ]; then
 	version=${SORA_VERSION:?SORA_VERSION is needed with SORA_DIST}
 else
@@ -84,13 +117,16 @@ else
 fi
 
 say "sora: installing $version with $manager"
-for name in SHA256SUMS $files; do
+for name in SHA256SUMS SHA256SUMS.minisig $files; do
 	if [ -n "${SORA_DIST:-}" ]; then
 		cp "$SORA_DIST/$name" "$work/$name" || die "$name is not in $SORA_DIST"
 	else
 		fetch "$repo/releases/download/v$version/$name" "$work/$name" || die "could not download $name"
 	fi
 done
+
+# Authenticate the checksum manifest BEFORE trusting any hash in it.
+verify_signature "$work/SHA256SUMS" "$work/SHA256SUMS.minisig"
 
 (
 	cd "$work"
@@ -107,7 +143,10 @@ done
 case "$manager" in
 apt) $as_root apt-get install -y "$@" ;;
 dnf) $as_root dnf install -y "$@" ;;
-zypper) $as_root zypper --non-interactive install --allow-unsigned-rpm "$@" ;;
+# The packages' integrity is established by the signed SHA256SUMS above;
+# do not weaken the chain by telling the package manager to skip its
+# own signature check (SORA-H1).
+zypper) $as_root zypper --non-interactive install "$@" ;;
 pacman)
 	# Unlike apt/dnf, pacman -U does not fetch missing repository dependencies.
 	deps="nftables iproute2 polkit libnetfilter_queue zlib"

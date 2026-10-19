@@ -10,6 +10,33 @@ die() { printf 'sora-update: %s\n' "$*" >&2; exit 1; }
 [ "$(id -u)" -eq 0 ] || die 'administrator rights are required'
 [ "$#" -eq 3 ] || die 'expected format, version and download directory'
 format=$1 version=$2 source=$3
+
+# --- Release signature trust anchor (SORA-H1) ---
+# Minisign public key of the release signer, embedded at release time.
+# PLACEHOLDER: the owner must run the key ceremony (see FIX-PLAN.md
+# section 9, "Key ceremony") and replace this value with the real release
+# public key. The signature is verified here, as root, so a SHA256SUMS
+# smuggled into the user-writable download directory cannot be trusted
+# without a valid signature. Until the ceremony is done, updates refuse
+# to proceed (fail-closed) instead of pretending the downloads are authentic.
+SORA_RELEASE_PUBKEY=${SORA_MINISIGN_PUBKEY:-REPLACE-ME-AFTER-KEY-CEREMONY}
+verify_signature() {
+	_signed=$1 _sig=$2
+	case "$SORA_RELEASE_PUBKEY" in
+	'' | REPLACE-ME-AFTER-KEY-CEREMONY)
+		die 'release signing is not configured yet: the minisign public key is still a placeholder. The owner must complete the key ceremony (FIX-PLAN.md, section 9) before updates can be installed.'
+		;;
+	esac
+	command -v minisign >/dev/null 2>&1 || die 'minisign is required to verify the release signature but was not found in PATH'
+	_pubf=$(mktemp)
+	printf 'untrusted comment: sora release signing key\n%s\n' "$SORA_RELEASE_PUBKEY" >"$_pubf"
+	chmod 600 "$_pubf"
+	if ! minisign -V -q -p "$_pubf" -m "$_signed" -x "$_sig"; then
+		rm -f "$_pubf"
+		die "signature verification failed for ${_signed##*/}; nothing was installed"
+	fi
+	rm -f "$_pubf"
+}
 printf '%s\n' "$version" | LC_ALL=C grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' || die 'invalid version'
 case "$source" in /*) ;; *) die 'download directory must be absolute' ;; esac
 [ "$(uname -m)" = x86_64 ] || die 'the desktop update requires x86_64'
@@ -39,13 +66,17 @@ esac
 
 work=$(mktemp -d /var/tmp/sora-update.XXXXXXXX)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
-for name in SHA256SUMS $files; do
+for name in SHA256SUMS SHA256SUMS.minisig $files; do
     if [ ! -f "$source/$name" ] || [ -L "$source/$name" ]; then die 'downloads must be regular files'; fi
     cp -P -- "$source/$name" "$work/$name"
     # cp -P preserves a symlink raced into the source, which is then rejected.
     if [ ! -f "$work/$name" ] || [ -L "$work/$name" ]; then die 'a download changed during copying'; fi
 done
 cd "$work"
+# Authenticate the checksum manifest BEFORE trusting any hash in it (SORA-H1).
+# The signature is checked here as root with the embedded release key, so a
+# forged SHA256SUMS in the user-writable download directory is rejected.
+verify_signature "$work/SHA256SUMS" "$work/SHA256SUMS.minisig"
 for name in $files; do
     # Match the filename literally, including the dots in release versions.
     awk -v name="$name" 'length($1) == 64 && $1 !~ /[^0-9a-fA-F]/ && (substr($0, 67) == name || substr($0, 67) == "*" name) {print tolower($1) "  " name; count++} END {if (count != 1) exit 1}' SHA256SUMS >>expected || die 'missing or duplicate checksum'
@@ -79,7 +110,10 @@ rpm)
     if command -v dnf >/dev/null 2>&1; then
         dnf install -y "$@"
     elif command -v zypper >/dev/null 2>&1; then
-        zypper --non-interactive install --allow-unsigned-rpm "$@"
+        # The packages' integrity is established by the signed SHA256SUMS
+        # above; do not weaken the chain by telling the package manager
+        # to skip its own signature check (SORA-H1).
+        zypper --non-interactive install "$@"
     else
         die 'dnf or zypper is required'
     fi
