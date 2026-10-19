@@ -95,6 +95,7 @@ func (o Outbound) Warnings() []string {
 	if o.Transport.Type == "ws" && !o.TLS.Enabled {
 		out = append(out, "websocket-without-tls")
 	}
+	out = append(out, o.shadowsocksWarnings()...)
 	return out
 }
 
@@ -163,7 +164,129 @@ func (o Outbound) Validate() error {
 			errs = append(errs, fmt.Errorf("outbound %s: header %q is not a safe HTTP header", o.ID, k))
 		}
 	}
+	if o.Amnezia != nil {
+		if o.Protocol != ProtocolWireGuard {
+			errs = append(errs, fmt.Errorf("outbound %s: AmneziaWG parameters require the wireguard protocol", o.ID))
+		} else {
+			errs = append(errs, validateAmneziaWG(o.ID, o.Amnezia)...)
+		}
+	}
 	return errors.Join(errs...)
+}
+
+// AmneziaWG parameter bounds, matching the upstream kernel module and
+// amneziawg-go: Jc is 1-128 (0 disables junk), junk sizes stay below the
+// 1280-byte minimal IPv6 MTU so packets do not fragment, S1/S2 keep
+// 148+S1 != 92+S2 so init and response sizes cannot collide, and the four
+// magic headers must be distinct so packet types stay distinguishable.
+const (
+	awgMaxJunkCount = 128
+	awgMaxJunkSize  = 1280
+	awgMaxS1        = 1132
+	awgMaxS2        = 1188
+	awgMaxS3        = 1216
+	awgMaxS4        = 32
+	awgMinMagic     = 5
+	awgMaxMagic     = 2147483647
+)
+
+// validateAmneziaWG rejects obfuscation parameters an engine would silently
+// misapply or drop: every engine derives from the same upstream device, so
+// the checks stay engine-independent. I1-I5 are CPS tag scripts (engine and
+// version specific) and are left to the renderer.
+func validateAmneziaWG(id string, a *AmneziaWG) []error {
+	var errs []error
+	bad := func(format string, args ...any) {
+		args = append([]any{id}, args...)
+		errs = append(errs, fmt.Errorf("outbound %s: amneziawg "+format, args...))
+	}
+	if a.Jc < 0 || a.Jc > awgMaxJunkCount {
+		bad("jc %d is outside 0-%d", a.Jc, awgMaxJunkCount)
+	}
+	if a.Jmin < 0 || a.Jmin > awgMaxJunkSize {
+		bad("jmin %d is outside 0-%d", a.Jmin, awgMaxJunkSize)
+	}
+	if a.Jmax < 0 || a.Jmax > awgMaxJunkSize {
+		bad("jmax %d is outside 0-%d", a.Jmax, awgMaxJunkSize)
+	}
+	if a.Jmin > a.Jmax {
+		bad("jmin %d exceeds jmax %d", a.Jmin, a.Jmax)
+	}
+	pads := []struct {
+		name string
+		v    int
+		max  int
+	}{
+		{"s1", a.S1, awgMaxS1}, {"s2", a.S2, awgMaxS2},
+		{"s3", a.S3, awgMaxS3}, {"s4", a.S4, awgMaxS4},
+	}
+	for _, p := range pads {
+		if p.v < 0 || p.v > p.max {
+			bad("%s %d is outside 0-%d", p.name, p.v, p.max)
+		}
+	}
+	if a.S1+56 == a.S2 && (a.S1 != 0 || a.S2 != 0) {
+		bad("s1+56 must not equal s2, or padded init and response packets collide at %d bytes", a.S2+92)
+	}
+	type interval struct{ lo, hi int64 }
+	headers := [4]interval{}
+	names := []string{"h1", "h2", "h3", "h4"}
+	values := []string{a.H1, a.H2, a.H3, a.H4}
+	for i, raw := range values {
+		if raw == "" {
+			continue
+		}
+		lo, hi, err := parseAmneziaMagic(raw)
+		if err != nil {
+			bad("%s %q is not a header or header range: %v", names[i], raw, err)
+			continue
+		}
+		if lo < awgMinMagic || hi > awgMaxMagic {
+			bad("%s %q is outside %d-%d", names[i], raw, awgMinMagic, awgMaxMagic)
+			continue
+		}
+		headers[i] = interval{lo, hi}
+	}
+	for i := 0; i < 4; i++ {
+		if values[i] == "" {
+			continue
+		}
+		for j := i + 1; j < 4; j++ {
+			if values[j] == "" {
+				continue
+			}
+			if headers[i].lo <= headers[j].hi && headers[j].lo <= headers[i].hi {
+				bad("%s %q and %s %q overlap: packet types must stay distinguishable",
+					names[i], values[i], names[j], values[j])
+			}
+		}
+	}
+	return errs
+}
+
+// parseAmneziaMagic parses a 2.0 magic header: a single number or an "x-y"
+// range with x <= y.
+func parseAmneziaMagic(raw string) (lo, hi int64, err error) {
+	parts := strings.SplitN(raw, "-", 2)
+	if len(parts) == 1 {
+		n, err := strconv.ParseInt(strings.TrimSpace(parts[0]), 10, 64)
+		if err != nil {
+			return 0, 0, err
+		}
+		return n, n, nil
+	}
+	lo, err = strconv.ParseInt(strings.TrimSpace(parts[0]), 10, 64)
+	if err != nil {
+		return 0, 0, err
+	}
+	hi, err = strconv.ParseInt(strings.TrimSpace(parts[1]), 10, 64)
+	if err != nil {
+		return 0, 0, err
+	}
+	if lo > hi {
+		return 0, 0, fmt.Errorf("range %q has its lower bound above the upper bound", raw)
+	}
+	return lo, hi, nil
 }
 
 // Validate checks the plan as a whole: limits, identifiers, references between
