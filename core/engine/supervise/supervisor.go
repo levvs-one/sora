@@ -299,7 +299,9 @@ func (s *Supervisor) admit(p *engine.Plan) error {
 	if err := p.Validate(); err != nil {
 		return s.redactor.Err(err)
 	}
-	if missing := s.Capabilities().Missing(p); len(missing) > 0 {
+	missing := s.Capabilities().Missing(p)
+	missing = append(missing, s.Capabilities().XrayPlaintextMissing(p, s.Version())...)
+	if len(missing) > 0 {
 		return fmt.Errorf("%s: this engine cannot carry %s", s.driver.Kind(), strings.Join(missing, ", "))
 	}
 	return nil

@@ -215,6 +215,94 @@ func TestTunStackNeverSilentlyDroppedOnSingBox115(t *testing.T) {
 	}
 }
 
+func TestXrayPlaintextVLESSVersionGate(t *testing.T) {
+	mk := func(proto Protocol, tls TLS) *Plan {
+		return &Plan{
+			SessionID: "s-1",
+			Outbounds: []Outbound{{
+				ID: "o1", Name: "O1", Protocol: proto,
+				Server: "x.example.com", Port: 443, UUID: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", TLS: tls,
+			}},
+		}
+	}
+	tls := TLS{Enabled: true, ServerName: "x.example.com"}
+	reality := TLS{Reality: true, RealityPublicKey: "pubkey"}
+	for _, tc := range []struct {
+		name        string
+		kind        Kind
+		proto       Protocol
+		tls         TLS
+		version     string // "" = unknown build
+		wantMissing bool
+	}{
+		{"shipped pin keeps plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "26.3.27", false},
+		{"cutoff refuses plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "26.7.11", true},
+		{"newer build refuses plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "26.8.0", true},
+		{"TLS VLESS survives the cutoff", KindXray, ProtocolVLESS, tls, "26.7.11", false},
+		{"REALITY VLESS survives the cutoff", KindXray, ProtocolVLESS, reality, "26.7.11", false},
+		{"shipped pin keeps plaintext Trojan", KindXray, ProtocolTrojan, TLS{}, "26.3.27", false},
+		{"cutoff refuses plaintext Trojan", KindXray, ProtocolTrojan, TLS{}, "26.7.11", true},
+		{"TLS Trojan survives the cutoff", KindXray, ProtocolTrojan, tls, "26.7.11", false},
+		{"cutoff does not touch VMess", KindXray, ProtocolVMess, TLS{}, "26.7.11", false},
+		{"other engines are a no-op", KindSingBox, ProtocolVLESS, TLS{}, "26.7.11", false},
+		// Unknown (zero) version is fail-closed: treated as the cutoff
+		// build or newer rather than as the shipped pin.
+		{"unknown version fails closed on plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "", true},
+		{"unknown version keeps TLS VLESS", KindXray, ProtocolVLESS, tls, "", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var v Version
+			if tc.version != "" {
+				v = mustVersion(t, tc.version)
+			}
+			missing := Catalog[tc.kind].XrayPlaintextMissing(mk(tc.proto, tc.tls), v)
+			if got := len(missing) != 0; got != tc.wantMissing {
+				t.Errorf("version %q: missing=%v, want missing=%v (%v)",
+					tc.version, got, tc.wantMissing, missing)
+			}
+			if tc.wantMissing {
+				joined := strings.Join(missing, "; ")
+				if !strings.Contains(joined, "enable TLS or REALITY") {
+					t.Errorf("version %q: error must say how to fix it, got %q", tc.version, joined)
+				}
+			}
+		})
+	}
+}
+
+// TestXrayPlaintextGateInEngineSelection locks the end-to-end behavior:
+// the shipped 26.3.27 pin still carries plaintext VLESS, while a 26.7.11
+// build rejects the plan with an actionable message.
+func TestXrayPlaintextGateInEngineSelection(t *testing.T) {
+	p := &Plan{
+		SessionID: "s-1",
+		Outbounds: []Outbound{{
+			ID: "o1", Name: "O1", Protocol: ProtocolVLESS,
+			Server: "x.example.com", Port: 443, UUID: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+		}},
+	}
+	for _, tc := range []struct {
+		version    string
+		wantSelect bool
+	}{
+		{"26.3.27", true},
+		{"26.7.11", false},
+	} {
+		sel, err := SelectEngine(p,
+			[]Availability{{Kind: KindXray, Usable: true, Version: mustVersion(t, tc.version)}},
+			[]Kind{KindXray})
+		if (err == nil) != tc.wantSelect {
+			t.Errorf("version %s: selected=%v, want %v (err=%v)", tc.version, err == nil, tc.wantSelect, err)
+		}
+		if tc.wantSelect && sel.Kind != KindXray {
+			t.Errorf("version %s: selected %s, want xray", tc.version, sel.Kind)
+		}
+		if !tc.wantSelect && (err == nil || !strings.Contains(err.Error(), "enable TLS or REALITY")) {
+			t.Errorf("version %s: rejection must say how to fix it, got %v", tc.version, err)
+		}
+	}
+}
+
 func TestTLSVerificationSettingSelectsCompatibleEngine(t *testing.T) {
 	p := validPlan()
 	p.Outbounds = p.Outbounds[:1]

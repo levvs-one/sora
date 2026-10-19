@@ -104,6 +104,47 @@ func isLXFork(version Version) bool {
 		!version.Less(Version{Major: 1, Minor: 14, Patch: 3})
 }
 
+// xrayPlaintextCutoff is the first Xray release that refuses plaintext
+// (no TLS, no REALITY) VLESS/Trojan outbounds at config load instead of
+// silently connecting without encryption. The shipped pin (26.3.27, see
+// packaging/engines/engines.lock and Catalog[KindXray].MinVersion) predates
+// the cutoff, so the gate only bites once the engine is bumped or a
+// user-supplied build is selected.
+// Upstream policy behind the cut:
+// https://xtls.github.io/en/config/inbounds/trojan.html
+// ("Trojan must be used with transport-security TLS ...").
+var xrayPlaintextCutoff = Version{Raw: "26.7.11", Major: 26, Minor: 7, Patch: 11}
+
+// xrayCutsPlaintext reports whether an Xray build refuses plaintext
+// VLESS/Trojan outbounds (see xrayPlaintextCutoff). A zero Version means
+// the build is unknown (the legacy Missing contract): fail closed and
+// assume the cutoff applies — a rejected plan is fixed explicitly by
+// enabling TLS/REALITY, while a rendered config the engine refuses at
+// load costs a dead connection with no actionable error.
+func xrayCutsPlaintext(v Version) bool {
+	return v == Version{} || !v.Less(xrayPlaintextCutoff)
+}
+
+// XrayPlaintextMissing lists the plan's VLESS/Trojan outbounds that an
+// Xray build of version v refuses at config load: plaintext (no TLS, no
+// REALITY) on builds >= xrayPlaintextCutoff. It is a no-op for other
+// engines and for older builds, including the shipped 26.3.27 pin, so
+// current behavior is unchanged until the engine is bumped. Callers pass
+// the probed engine version (Availability.Version, Supervisor.Version) —
+// never a hardcoded string.
+func (c Capabilities) XrayPlaintextMissing(p *Plan, v Version) []string {
+	if c.Kind != KindXray || !xrayCutsPlaintext(v) {
+		return nil
+	}
+	for _, o := range p.Outbounds {
+		if (o.Protocol == ProtocolVLESS || o.Protocol == ProtocolTrojan) &&
+			!o.TLS.Enabled && !o.TLS.Reality {
+			return []string{fmt.Sprintf("plaintext %s (Xray %s+ refuses it; enable TLS or REALITY)", o.Protocol, xrayPlaintextCutoff)}
+		}
+	}
+	return nil
+}
+
 // BuildCapabilities keeps upstream and downstream builds distinct. A version
 // suffix alone cannot prove that an optional transport was compiled in.
 func BuildCapabilities(kind Kind, version Version, tags []string) Capabilities {
@@ -193,6 +234,7 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 			continue
 		}
 		missing := caps.Missing(p)
+		missing = append(missing, caps.XrayPlaintextMissing(p, avail.Version)...)
 		if len(missing) > 0 {
 			rejected = append(rejected, fmt.Sprintf("%s: cannot carry %s", kind, strings.Join(missing, ", ")))
 			continue
