@@ -36,6 +36,10 @@ class _LogsScreenState extends State<LogsScreen> {
   LogLevel _level = LogLevel.LOG_LEVEL_DEBUG;
   String _section = 'all';
   List<LogEntry> _entries = [];
+  // Sequences currently held in [_entries], for O(1) duplicate detection.
+  // A linear indexWhere per event janks on slow machines once the buffer
+  // grows towards [_keep] (audit M18).
+  final Set<Int64> _known = {};
   StreamSubscription<LogEntry>? _watch;
   Timer? _debounce;
   bool _loaded = false;
@@ -113,6 +117,9 @@ class _LogsScreenState extends State<LogsScreen> {
       if (!mounted || revision != _revision || link != SoraScope.read(context).link) return;
       setState(() {
         _entries = page.entries.toList();
+        _known
+          ..clear()
+          ..addAll(page.entries.map((e) => e.sequence));
         _before = page.beforeSequence;
         _olderLoading = false;
         _above = 0;
@@ -159,9 +166,10 @@ class _LogsScreenState extends State<LogsScreen> {
       );
       if (page.hasError()) throw CoreFailure(page.error.userMessageKey);
       if (!mounted || revision != _revision || _link != link) return;
-      final known = _entries.map((e) => e.sequence).toSet();
       setState(() {
-        _entries.addAll(page.entries.where((e) => !known.contains(e.sequence)));
+        for (final entry in page.entries) {
+          if (_known.add(entry.sequence)) _entries.add(entry);
+        }
         _before = page.beforeSequence;
       });
     } catch (error) {
@@ -179,13 +187,14 @@ class _LogsScreenState extends State<LogsScreen> {
     setState(() {
       if (atTop) _above = 0;
       // Repeated messages retain their sequence number and update the repeat
-      // count.
-      final index = _entries.indexWhere((e) => e.sequence == entry.sequence);
-      if (index >= 0) {
-        _entries[index] = entry;
+      // count. Membership is O(1); only the rare repeat path scans.
+      if (_known.contains(entry.sequence)) {
+        final index = _entries.indexWhere((e) => e.sequence == entry.sequence);
+        if (index >= 0) _entries[index] = entry;
       } else {
+        _known.add(entry.sequence);
         _entries.insert(0, entry);
-        if (_entries.length > _keep) _entries.removeLast();
+        if (_entries.length > _keep) _known.remove(_entries.removeLast().sequence);
         // New entries grow above the viewport anchor while older text is read.
         _above = atTop ? 0 : (_above + 1).clamp(0, _entries.length);
       }
@@ -239,6 +248,7 @@ class _LogsScreenState extends State<LogsScreen> {
       if (mounted) {
         setState(() {
           _entries = [];
+          _known.clear();
           _above = 0;
           _before = Int64.ZERO;
         });

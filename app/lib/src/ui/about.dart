@@ -155,14 +155,23 @@ class _AboutScreenState extends State<AboutScreen> {
                       onTap: canInstall && desktop != null
                           ? () => unawaited(
                               updates.install(
-                                confirmDrop: () => !mounted
-                                    ? Future.value(false)
-                                    : confirm(
-                                        context,
-                                        question: s.updateDropWarning,
-                                        action: s.refresh,
-                                        destructive: false,
-                                      ),
+                                confirmDrop: () {
+                                  // The download can outlive this screen; ask
+                                  // on the app-wide navigator so leaving About
+                                  // mid-download no longer silently discards
+                                  // the verified update (audit M19).
+                                  final context =
+                                      desktop?.navigator.currentContext;
+                                  if (context == null || !context.mounted) {
+                                    return Future.value(false);
+                                  }
+                                  return confirm(
+                                    context,
+                                    question: s.updateDropWarning,
+                                    action: s.refresh,
+                                    destructive: false,
+                                  );
+                                },
                                 launchWindows: desktop.launchUpdate,
                                 restartLinux: desktop.restartAfterUpdate,
                                 quit: desktop.quit,
