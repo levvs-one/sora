@@ -32,18 +32,27 @@ func newIngressBackend(inner Firewall, cfg IngressConfig) (ingressBackend, error
 	return &nftablesIngressBackend{nft: nft, cfg: cfg}, nil
 }
 
-// arm replaces the owned table, mirroring the idempotent delete-then-apply
-// of Nftables.Arm so a repeated Arm or a stale table from a crash never
-// fails with "File exists" (SORA-M4 pattern).
+// arm installs the table, replacing any stale copy in a single nft
+// transaction: the delete and the new table commit atomically, so a repeated
+// Arm or a crash can never leave a window with the ingress table absent (the
+// same guarantee Nftables.Arm gives the kill switch). A batch whose table
+// does not exist aborts, so the first install falls back to the table alone.
 func (b *nftablesIngressBackend) arm(ctx context.Context) error {
-	ruleset, err := NftIngressRuleset(b.cfg, b.nft.bypass)
+	replace, err := NftIngressReplace(b.cfg, b.nft.bypass)
 	if err != nil {
 		return err
 	}
-	if err := b.nft.apply(ctx, NftIngressRemove()); err != nil && !isMissingTable(err) {
-		return err
+	if err := b.nft.apply(ctx, replace); err != nil {
+		if !isMissingTable(err) {
+			return err
+		}
+		ruleset, err := NftIngressRuleset(b.cfg, b.nft.bypass)
+		if err != nil {
+			return err
+		}
+		return b.nft.apply(ctx, ruleset)
 	}
-	return b.nft.apply(ctx, ruleset)
+	return nil
 }
 
 // disarm removes the owned table, treating a missing table as success so

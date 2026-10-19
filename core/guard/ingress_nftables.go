@@ -87,3 +87,17 @@ func NftIngressRuleset(cfg IngressConfig, bypass []string) (string, error) {
 func NftIngressRemove() string {
 	return "delete table inet " + nftIngressTable + "\n"
 }
+
+// NftIngressReplace renders an atomic table replacement: the delete and the
+// new table travel in one nft batch, which the kernel commits as a single
+// transaction, so re-arming never leaves a window with the ingress table
+// absent (the same guarantee NftReplace gives the kill switch). The batch
+// aborts when the table does not exist yet; callers fall back to
+// NftIngressRuleset for the first install.
+func NftIngressReplace(cfg IngressConfig, bypass []string) (string, error) {
+	ruleset, err := NftIngressRuleset(cfg, bypass)
+	if err != nil {
+		return "", err
+	}
+	return NftIngressRemove() + ruleset, nil
+}

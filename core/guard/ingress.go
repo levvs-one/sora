@@ -122,29 +122,33 @@ func WithIngress(inner Firewall, cfg IngressConfig) *IngressFirewall {
 	return &IngressFirewall{inner: inner, cfg: cfg}
 }
 
-// Arm arms the kill switch first, then the ingress rules when enabled.
-// The kill switch refusing to arm (for example the Linux root-UID fail
-// closed) aborts before any ingress rule is touched.
+// Arm arms the kill switch first, then the ingress rules when enabled. The
+// config is validated before anything is armed, and the kill switch refusing
+// to arm (for example the Linux root-UID fail closed) aborts before any
+// ingress rule is installed. Re-arming re-applies the ingress rules so an
+// externally removed table is restored; both backends arm idempotently, so
+// a repeated Arm never duplicates rules.
 func (f *IngressFirewall) Arm(ctx context.Context, enginePorts []uint16) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	if err := f.inner.Arm(ctx, enginePorts); err != nil {
-		return err
-	}
-	if !f.cfg.Enabled || f.armed {
-		return nil
+	if !f.cfg.Enabled {
+		return f.inner.Arm(ctx, enginePorts)
 	}
 	if err := validateIngressConfig(f.cfg); err != nil {
 		return err
 	}
-	backend, err := newIngressBackend(f.inner, f.cfg)
-	if err != nil {
+	if err := f.inner.Arm(ctx, enginePorts); err != nil {
 		return err
 	}
-	f.backend = backend
-	if backend != nil {
-		if err := backend.arm(ctx); err != nil {
-			f.backend = nil
+	if f.backend == nil {
+		backend, err := newIngressBackend(f.inner, f.cfg)
+		if err != nil {
+			return err
+		}
+		f.backend = backend
+	}
+	if f.backend != nil {
+		if err := f.backend.arm(ctx); err != nil {
 			return err
 		}
 	}

@@ -142,3 +142,142 @@ func TestIngressFirewallAbortsWhenTheKillSwitchRefuses(t *testing.T) {
 		t.Error("IngressArmed() = true after the kill switch refused")
 	}
 }
+
+// fakeNftBatch is an nft stand-in with batch semantics: a batch that deletes
+// a missing table aborts like the real nft, otherwise the delete and the
+// install in one invocation commit atomically. Every stdin payload is
+// appended to calls.log for assertions.
+const fakeNftBatch = `#!/bin/sh
+input=$(cat)
+printf '%s\n====\n' "$input" >> "$SORA_FAKE_DIR/calls.log"
+has_del=0
+has_table=0
+case "$input" in *"delete table inet sora_ingress"*) has_del=1;; esac
+case "$input" in *"table inet sora_ingress {"*) has_table=1;; esac
+if [ "$has_del" = 1 ]; then
+	if [ ! -f "$SORA_FAKE_DIR/sora_ingress.state" ]; then
+		echo "Error: Could not process rule: No such file or directory" >&2
+		exit 1
+	fi
+	rm -f "$SORA_FAKE_DIR/sora_ingress.state"
+fi
+if [ "$has_table" = 1 ]; then
+	echo "$input" > "$SORA_FAKE_DIR/sora_ingress.state"
+fi
+case "$input" in *"table inet sora {"*)
+	case "$input" in *"sora_ingress"*) ;; *) echo "$input" > "$SORA_FAKE_DIR/sora.state";; esac;;
+esac
+exit 0
+`
+
+func writeFakeNftBatch(t *testing.T, dir string) {
+	t.Helper()
+	nft := dir + "/nft"
+	if err := os.WriteFile(nft, []byte(fakeNftBatch), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("SORA_FAKE_DIR", dir)
+	guard.NftBinForTest = nft
+	t.Cleanup(func() { guard.NftBinForTest = "" })
+}
+
+func readNftCalls(t *testing.T, dir string) []string {
+	t.Helper()
+	raw, err := os.ReadFile(dir + "/calls.log")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		t.Fatal(err)
+	}
+	var calls []string
+	for _, part := range strings.Split(string(raw), "\n====\n") {
+		if part != "" {
+			calls = append(calls, part)
+		}
+	}
+	return calls
+}
+
+// TestIngressArmReplacesAtomically pins the fail-open window shut: the
+// first arm falls back to a plain install when the table does not exist
+// yet, and every re-arm deletes and reinstalls the ingress table in a
+// single nft invocation.
+func TestIngressArmReplacesAtomically(t *testing.T) {
+	dir := t.TempDir()
+	writeFakeNftBatch(t, dir)
+
+	inner, err := guard.NewNftables(1000, []string{"192.168.0.0/16"})
+	if err != nil {
+		t.Fatalf("NewNftables() error = %v", err)
+	}
+	decorated := guard.WithIngress(inner, guard.DefaultIngressConfig())
+	ctx := testContext()
+
+	if err := decorated.Arm(ctx, nil); err != nil {
+		t.Fatalf("Arm() error = %v", err)
+	}
+	if _, err := os.Stat(dir + "/sora_ingress.state"); err != nil {
+		t.Fatalf("the ingress table was not installed: %v", err)
+	}
+
+	if err := os.Remove(dir + "/calls.log"); err != nil {
+		t.Fatal(err)
+	}
+	if err := decorated.Arm(ctx, nil); err != nil {
+		t.Fatalf("second Arm() error = %v", err)
+	}
+	calls := readNftCalls(t, dir)
+	// One call for the kill-switch replace, one for the ingress replace.
+	if len(calls) != 2 {
+		t.Fatalf("re-arm issued %d nft invocations, want 2 (kill switch + ingress): %q", len(calls), calls)
+	}
+	ingressCall := calls[1]
+	if !strings.Contains(ingressCall, "delete table inet sora_ingress") ||
+		!strings.Contains(ingressCall, "table inet sora_ingress {") {
+		t.Errorf("the ingress re-arm was not a single delete-then-install batch:\n%s", ingressCall)
+	}
+
+	if err := decorated.Disarm(ctx); err != nil {
+		t.Fatalf("Disarm() error = %v", err)
+	}
+	if _, err := os.Stat(dir + "/sora_ingress.state"); !os.IsNotExist(err) {
+		t.Error("the ingress table survived Disarm")
+	}
+}
+
+// TestIngressReArmRestoresExternallyRemovedTable covers the self-healing
+// contract: a repeated Arm reinstalls the ingress rules even when something
+// outside the decorator removed the table while armed.
+func TestIngressReArmRestoresExternallyRemovedTable(t *testing.T) {
+	dir := t.TempDir()
+	writeFakeNftBatch(t, dir)
+
+	inner, err := guard.NewNftables(1000, nil)
+	if err != nil {
+		t.Fatalf("NewNftables() error = %v", err)
+	}
+	decorated := guard.WithIngress(inner, guard.DefaultIngressConfig())
+	ctx := testContext()
+
+	if err := decorated.Arm(ctx, nil); err != nil {
+		t.Fatalf("Arm() error = %v", err)
+	}
+	// Simulate an external flush while the session is up.
+	if err := os.Remove(dir + "/sora_ingress.state"); err != nil {
+		t.Fatal(err)
+	}
+	if err := decorated.Arm(ctx, nil); err != nil {
+		t.Fatalf("re-Arm() error = %v", err)
+	}
+	installed, err := os.ReadFile(dir + "/sora_ingress.state")
+	if err != nil {
+		t.Fatalf("re-Arm did not restore the ingress table: %v", err)
+	}
+	if !strings.Contains(string(installed), "counter drop") {
+		t.Errorf("the restored table is not the ingress ruleset:\n%s", installed)
+	}
+	if err := decorated.Disarm(ctx); err != nil {
+		t.Fatalf("Disarm() error = %v", err)
+	}
+}

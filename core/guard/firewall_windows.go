@@ -290,13 +290,18 @@ func sameAccount() (*windows.SECURITY_DESCRIPTOR, error) {
 // applies restricts address conditions to matching-family layers; WFP rejects
 // cross-family networks.
 func applies(layer wf.LayerID, conditions []*wf.Match) bool {
+	// The outbound connect layers and the inbound receive-accept layers
+	// each come in a v4/v6 pair; the family gate must recognize either
+	// pair, otherwise inbound rules silently land on the wrong layer (or
+	// on no layer at all).
+	v4 := layer == wf.LayerALEAuthConnectV4 || layer == wf.LayerALEAuthRecvAcceptV4
 	for _, c := range conditions {
 		if prefix, ok := c.Value.(netip.Prefix); ok {
-			if prefix.Addr().Is4() != (layer == wf.LayerALEAuthConnectV4) {
+			if prefix.Addr().Is4() != v4 {
 				return false
 			}
 		}
-		if c.Value == wf.IPProtoICMPV6 && layer == wf.LayerALEAuthConnectV4 {
+		if c.Value == wf.IPProtoICMPV6 && v4 {
 			return false
 		}
 	}

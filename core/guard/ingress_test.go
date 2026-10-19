@@ -240,3 +240,41 @@ func TestIngressFirewallOnNoopPlatform(t *testing.T) {
 		t.Fatalf("Disarm() over NoopFirewall error = %v", err)
 	}
 }
+
+// TestNftIngressReplaceIsASingleBatch pins the atomic install: the delete
+// and the new table must travel in one nft batch so re-arming never leaves
+// a window with the ingress table absent.
+func TestNftIngressReplaceIsASingleBatch(t *testing.T) {
+	batch, err := guard.NftIngressReplace(guard.DefaultIngressConfig(), nil)
+	if err != nil {
+		t.Fatalf("NftIngressReplace() error = %v", err)
+	}
+	if !strings.Contains(batch, "delete table inet sora_ingress\ntable inet sora_ingress {") {
+		t.Errorf("the replace batch does not delete-then-install in one go:\n%s", batch)
+	}
+	if n := strings.Count(batch, "counter drop"); n != 1 {
+		t.Errorf("the replace batch has %d drops, want exactly the final one", n)
+	}
+}
+
+// TestIngressFirewallValidatesBeforeArmingInner locks the fail-closed
+// ordering: a bad endpoint must fail before the kill switch is touched, so
+// a config error can never leave the kill switch armed behind an error.
+func TestIngressFirewallValidatesBeforeArmingInner(t *testing.T) {
+	inner := &fakeFirewall{}
+	cfg := guard.DefaultIngressConfig()
+	cfg.VPNEndpoints = []string{"not-an-ip"}
+	decorated := guard.WithIngress(inner, cfg)
+	if err := decorated.Arm(context.Background(), nil); err == nil {
+		t.Fatal("Arm() succeeded with an invalid VPN endpoint")
+	}
+	if len(inner.armPorts) != 0 {
+		t.Error("the inner firewall was armed before the config was validated")
+	}
+	if decorated.IngressArmed() {
+		t.Error("IngressArmed() = true after a failed Arm")
+	}
+	if inner.armed {
+		t.Error("the kill switch stayed armed after a config failure")
+	}
+}
