@@ -289,7 +289,6 @@ Future<String?> _promptDialog(BuildContext context, {required CensorVerdict verd
       child: Material(
         color: palette.raised,
         elevation: 0,
-        shadowColor: palette.shadow,
         borderRadius: BorderRadius.circular(26),
         child: SizedBox(
           width: 340,

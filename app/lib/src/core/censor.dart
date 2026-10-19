@@ -129,8 +129,13 @@ class CensorDetector extends ChangeNotifier {
       if (decoded is List) {
         for (final item in decoded) {
           if (item is Map<String, dynamic>) {
-            final verdict = CensorVerdict.fromJson(item);
-            if (verdict != null) _history.add(verdict);
+            // One malformed entry must not wipe the rest of the history.
+            try {
+              final verdict = CensorVerdict.fromJson(item);
+              if (verdict != null) _history.add(verdict);
+            } catch (_) {
+              // Skip the bad entry; keep everything else.
+            }
           }
         }
       }
