@@ -10,9 +10,78 @@ set -euo pipefail
 arch=${1:?architecture: amd64, arm64, windows-amd64 or win7-386}
 dest=${2:?destination directory}
 lock="$(dirname "$0")/engines.lock"
+sigmanifest="$(dirname "$0")/engines.sig"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$dest"
+
+# signature_method prints the engines.sig method for an engine, defaulting to
+# "none" with a warning when the manifest has no entry.
+signature_method() {
+	awk -v e="$1" '$1 == e {print $2; found=1} END {if (!found) exit 1}' "$sigmanifest" 2>/dev/null || {
+		echo "engines.sig: no entry for $1; treating as unsigned" >&2
+		echo none
+	}
+}
+
+# verify_upstream_signature enforces the engines.sig declaration for one
+# downloaded asset. It fails closed: a declared signature that cannot be
+# checked aborts the fetch (SORA-M3).
+verify_upstream_signature() {
+	engine=$1 digest=$2 url=$3
+	method=$(signature_method "$engine")
+	case "$method" in
+	none)
+		echo "$engine: upstream publishes no signatures; lock digest is the only check (see engines.sig)" >&2
+		;;
+	dgst-crosscheck)
+		dgst_file="$work/$(basename "$url").dgst"
+		curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$dgst_file" "$url.dgst" \
+			|| { echo "engines.sig: could not download $url.dgst" >&2; exit 1; }
+		published=$(awk '/^SHA2-256=/ {print $2}' "$dgst_file" | tr 'A-Z' 'a-z')
+		if [ -z "$published" ]; then
+			echo "engines.sig: no SHA2-256 in $url.dgst" >&2
+			exit 1
+		fi
+		if [ "$published" != "$(printf '%s' "$digest" | tr 'A-Z' 'a-z')" ]; then
+			echo "engines.sig: lock digest for $engine does not match the upstream .dgst" >&2
+			exit 1
+		fi
+		echo "$engine: lock digest matches upstream .dgst"
+		;;
+	cosign)
+		detail=$(awk -v e="$engine" '$1 == e {print $3}' "$sigmanifest")
+		command -v cosign >/dev/null 2>&1 || { echo "engines.sig: cosign is required but not installed" >&2; exit 1; }
+		[ -n "$detail" ] || { echo "engines.sig: no identity declared for $engine" >&2; exit 1; }
+		asset="$work/$(basename "$url")"
+		sig_file="$asset.sig"
+		curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$sig_file" "$url.sig" \
+			|| { echo "engines.sig: could not download $url.sig" >&2; exit 1; }
+		case "$detail" in
+		keyless:*)
+			identity=${detail#keyless:}
+			cosign verify-blob --certificate-identity "$identity" \
+				--certificate-oidc-issuer https://token.actions.githubusercontent.com \
+				--signature "$sig_file" "$asset" >/dev/null \
+				|| { echo "engines.sig: cosign keyless verification failed for $engine" >&2; exit 1; }
+			;;
+		pubkey:*)
+			cosign verify-blob --key "${detail#pubkey:}" --signature "$sig_file" "$asset" >/dev/null \
+				|| { echo "engines.sig: cosign verification failed for $engine" >&2; exit 1; }
+			;;
+		*)
+			echo "engines.sig: bad cosign detail for $engine (want keyless:<id> or pubkey:<path>)" >&2
+			exit 1
+			;;
+		esac
+		echo "$engine: cosign signature verified ($detail)"
+		;;
+	*)
+		echo "engines.sig: unknown method $method for $engine" >&2
+		exit 1
+		;;
+	esac
+}
 
 # engines.digests records the SHA-256 of the installed binaries (not the
 # download archives). The core verifies every discovered engine binary
@@ -30,6 +99,8 @@ while read -r engine line_arch digest url; do
 	file="$work/$(basename "$url")"
 	curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$file" "$url"
 	echo "$digest  $file" | sha256sum --check --quiet --strict
+	# Enforce the upstream-signature declaration from engines.sig (SORA-M3).
+	verify_upstream_signature "$engine" "$digest" "$url"
 	if [[ "$arch" == windows-* || "$arch" == win7-* ]]; then
 		# Every Windows build is a zip with one executable named after its
 		# engine; Xray's also carries the geo databases.
