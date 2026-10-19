@@ -199,7 +199,12 @@ type WireGuardPeer struct {
 // StableKey hashes protocol, endpoint, ID, and user to identify a server across
 // imports without exposing IDs.
 func (o OutboundSpec) StableKey() string {
-	// Exclude passwords from identity to avoid storing password hashes.
+	// Identity covers protocol, host, port, UUID, and user. The UUID is a
+	// credential for vless/vmess/tuic, but it is intentionally included: on
+	// shared endpoints it distinguishes accounts, and re-imports must map
+	// to the same entry instead of duplicating it. Passwords are excluded
+	// so rotating a password does not orphan the saved entry (and to avoid
+	// storing password hashes).
 	material := o.Protocol + "\x00" + o.Host + "\x00" + strconv.Itoa(int(o.Port)) + "\x00" + o.UUID + "\x00" + o.User
 	// Names distinguish profiles sharing an endpoint. Exclude mutable
 	// provider rules so updates preserve saved selections.
