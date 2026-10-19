@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/netip"
 	"time"
@@ -144,14 +145,18 @@ func (d *Daemon) handlePairingConn(s *pairingSession, netConn net.Conn, self tra
 		return
 	}
 	defer c.Close()
-	d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
+	// Recorded early; the save is retried by the upsert after the first
+	// sync below, which reports a persistence failure to the daemon log.
+	_ = d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
 		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:]))
 	// Run the first sync immediately so the devices converge now.
 	if _, err := syncpkg.Sync(ctx, c, d.identity.ID, d.store, false); err != nil {
 		return
 	}
-	d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
-		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:]))
+	if err := d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
+		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:])); err != nil {
+		log.Printf("sync: save peers registry: %v", err)
+	}
 }
 
 // stopPairingSession closes s, but only if s is still the active session.
@@ -225,7 +230,9 @@ func (d *Daemon) Join(ctx context.Context, qrPayload string) (Peer, error) {
 		return Peer{}, fmt.Errorf("api: the first sync failed: %w", err)
 	}
 	peerKey := base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:])
-	d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName, peerKey)
+	if err := d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName, peerKey); err != nil {
+		return Peer{}, fmt.Errorf("api: pairing succeeded but the peer registry was not saved: %w", err)
+	}
 	d.mu.Lock()
 	p := *d.peers[c.Peer.DeviceID]
 	d.mu.Unlock()

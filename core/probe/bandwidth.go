@@ -120,7 +120,11 @@ type runtimeProvider interface {
 
 // Benchmark measures every outbound's download goodput, streaming progress
 // samples. The returned channel closes when all servers are done; each
-// server ends with exactly one Done sample (carrying Err on failure).
+// server ends with exactly one Done sample (carrying Err on failure), unless
+// ctx is cancelled first: then undelivered samples are dropped, but every
+// temporary engine is still torn down and the channel still closes.
+// A caller that stops reading must cancel ctx, otherwise producers stay
+// blocked on the full channel.
 func (b *Benchmarker) Benchmark(ctx context.Context, outbounds []engine.Outbound, opts engine.BandwidthOptions) (<-chan BandwidthSample, error) {
 	if len(outbounds) == 0 {
 		return nil, fmt.Errorf("probe: benchmark needs at least one outbound")
@@ -143,12 +147,29 @@ func (b *Benchmarker) Benchmark(ctx context.Context, outbounds []engine.Outbound
 
 	out := make(chan BandwidthSample, len(outbounds)*2)
 	sem := make(chan struct{}, opts.Concurrency)
+	// send prefers delivering the sample, but never wedges the producer:
+	// once the caller's context is done the consumer is gone (or going),
+	// so the sample is dropped and the caller unwinds. Engine teardown and
+	// the channel close stay guaranteed even when nobody drains.
+	send := func(s BandwidthSample) bool {
+		select {
+		case out <- s:
+			return true
+		default:
+		}
+		select {
+		case out <- s:
+			return true
+		case <-ctx.Done():
+			return false
+		}
+	}
 	var wg sync.WaitGroup
 	for _, o := range outbounds {
 		o := o
 		kind, err := b.cfg.SelectKind(o)
 		if err != nil {
-			out <- BandwidthSample{ServerID: o.ID, Done: true, Err: engine.ErrNoEngine}
+			send(BandwidthSample{ServerID: o.ID, Done: true, Err: engine.ErrNoEngine})
 			continue
 		}
 		wg.Add(1)
@@ -158,10 +179,10 @@ func (b *Benchmarker) Benchmark(ctx context.Context, outbounds []engine.Outbound
 			case sem <- struct{}{}:
 				defer func() { <-sem }()
 			case <-ctx.Done():
-				out <- BandwidthSample{ServerID: o.ID, Done: true, Err: ctx.Err()}
+				send(BandwidthSample{ServerID: o.ID, Done: true, Err: ctx.Err()})
 				return
 			}
-			b.benchmarkOne(ctx, o, kind, opts, out)
+			b.benchmarkOne(ctx, o, kind, opts, send)
 		}()
 	}
 	go func() {
@@ -172,13 +193,17 @@ func (b *Benchmarker) Benchmark(ctx context.Context, outbounds []engine.Outbound
 }
 
 // benchmarkOne runs a single server through a temporary engine session. The
-// engine is always torn down, even on failure or cancellation.
-func (b *Benchmarker) benchmarkOne(ctx context.Context, o engine.Outbound, kind engine.Kind, opts engine.BandwidthOptions, out chan<- BandwidthSample) {
+// engine is always torn down, even on failure or cancellation. Samples that
+// cannot be delivered after the caller's context ends are dropped so a gone
+// consumer never wedges the benchmark.
+func (b *Benchmarker) benchmarkOne(ctx context.Context, o engine.Outbound, kind engine.Kind, opts engine.BandwidthOptions, send func(BandwidthSample) bool) {
 	id := o.ID
 	fail := func(err error) {
-		out <- BandwidthSample{ServerID: id, Done: true, ProgressPct: 100, Err: err}
+		send(BandwidthSample{ServerID: id, Done: true, ProgressPct: 100, Err: err})
 	}
-	out <- BandwidthSample{ServerID: id, ProgressPct: 0}
+	if !send(BandwidthSample{ServerID: id, ProgressPct: 0}) {
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(ctx, opts.Timeout)
 	defer cancel()
@@ -221,14 +246,14 @@ func (b *Benchmarker) benchmarkOne(ctx context.Context, o engine.Outbound, kind 
 	}
 
 	bps, err := downloadGoodput(ctx, proxyAddr, opts.URL, opts.Duration, opts.Concurrency, func(pct uint32) {
-		out <- BandwidthSample{ServerID: id, ProgressPct: pct}
+		send(BandwidthSample{ServerID: id, ProgressPct: pct})
 	})
 	if err != nil {
 		fail(err)
 		return
 	}
 	b.recordBandwidth(id, bps, kind)
-	out <- BandwidthSample{ServerID: id, BytesPerSec: bps, ProgressPct: 100, Done: true}
+	send(BandwidthSample{ServerID: id, BytesPerSec: bps, ProgressPct: 100, Done: true})
 }
 
 // waitProxy polls a TCP dial until the loopback proxy accepts or ctx ends.
