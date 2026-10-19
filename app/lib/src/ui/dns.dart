@@ -11,6 +11,7 @@ import '../design/theme.dart';
 import '../generated/sora/core/v1/core_control.pb.dart';
 import '../sora.dart';
 import 'kit.dart';
+import 'leaktest.dart';
 import 'subscription_sheet.dart';
 
 /// Fixed resolver lists for the built-in presets. `auto` keeps the core
@@ -176,6 +177,10 @@ class _DnsScreenState extends State<DnsScreen> {
                 busy: _checking,
                 onTap: _checking ? null : _check,
               ),
+            ),
+            LinkTile(
+              title: s.leakTestTitle,
+              onTap: () => push<void>(context, const LeakTestScreen()),
             ),
           ],
         ),

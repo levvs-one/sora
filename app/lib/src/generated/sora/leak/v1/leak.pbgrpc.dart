@@ -21,21 +21,20 @@ import 'leak.pb.dart' as $0;
 export 'leak.pb.dart';
 
 // ---------------------------------------------------------------------------
-// HAND-WRITTEN per the assumed proto/sora/leak/v1/leak.proto contract
-// documented in leak.pb.dart (pending Go protoc codegen). Client side only:
-// this app never serves the leak service, so the generated ServiceBase is
-// deliberately omitted. RECONCILE BEFORE MERGE together with leak.pb.dart.
+// HAND-WRITTEN from proto/sora/leak/v1/leak.proto (protoc-gen-dart has not
+// run yet). Client side only: this app never serves the leak service, so
+// the generated ServiceBase is deliberately omitted. The method path and
+// message codecs match the proto file 1:1.
 // ---------------------------------------------------------------------------
 
-/// LeakService runs the network leak-test suite against the active session
-/// and streams one event per completed test.
+/// LeakService runs the core's egress self-tests and streams one
+/// LeakTestResult per test as it completes.
 @$pb.GrpcServiceName('sora.leak.v1.LeakService')
 class LeakServiceClient extends $grpc.Client {
   LeakServiceClient(super.channel, {super.options, super.interceptors});
 
-  /// HAND-WRITTEN (see above). Streams test events: started, then one
-  /// result per test, then finished.
-  $grpc.ResponseStream<$0.LeakTestEvent> runLeakTests(
+  /// HAND-WRITTEN (see above). Streams one result per completed test.
+  $grpc.ResponseStream<$0.LeakTestResult> runLeakTests(
     $0.RunLeakTestsRequest request, {
     $grpc.CallOptions? options,
   }) {
@@ -43,8 +42,8 @@ class LeakServiceClient extends $grpc.Client {
   }
 
   // HAND-WRITTEN (see above).
-  static final _$runLeakTests = $grpc.ClientMethod<$0.RunLeakTestsRequest, $0.LeakTestEvent>(
+  static final _$runLeakTests = $grpc.ClientMethod<$0.RunLeakTestsRequest, $0.LeakTestResult>(
       '/sora.leak.v1.LeakService/RunLeakTests',
       ($0.RunLeakTestsRequest value) => value.writeToBuffer(),
-      $0.LeakTestEvent.fromBuffer);
+      $0.LeakTestResult.fromBuffer);
 }

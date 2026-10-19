@@ -12,37 +12,31 @@ import '../generated/sora/leak/v1/leak.pb.dart';
 import '../sora.dart';
 import 'kit.dart';
 
-/// Resolves a core-provided check label key such as "dnsLeak.check.tunnelDns".
+/// Resolves a core-provided test label key such as "leakTest.check.directDns".
 /// Unknown keys fall through as-is so a newer core never renders a blank row.
-String _leakLabel(S s, String key) => switch (key) {
-      'dnsLeak.check.tunnelDns' => s.dnsLeakCheckTunnelDns,
-      'dnsLeak.check.systemResolvers' => s.dnsLeakCheckSystemResolvers,
-      'dnsLeak.check.killSwitchDns' => s.dnsLeakCheckKillSwitchDns,
+String _testLabel(S s, String key) => switch (key) {
+      'leakTest.check.directDns' => s.leakTestCheckDirectDns,
+      'leakTest.check.ipv6' => s.leakTestCheckIpv6,
+      'leakTest.check.icmpEcho' => s.leakTestCheckIcmpEcho,
+      'leakTest.check.systemResolvers' => s.leakTestCheckSystemResolvers,
       _ => key,
     };
 
-/// Resolves a core-provided fix hint key such as "dnsLeak.fix.enableKillSwitch".
-String _leakHint(S s, String key) => switch (key) {
-      'dnsLeak.fix.configureTunnelDns' => s.dnsLeakFixConfigureTunnelDns,
-      'dnsLeak.fix.reviewSystemResolvers' => s.dnsLeakFixReviewSystemResolvers,
-      'dnsLeak.fix.enableKillSwitch' => s.dnsLeakFixEnableKillSwitch,
-      _ => key,
-    };
-
-/// Maps a fix-hint key to the one-tap autofix the UI can apply, or null when
-/// the hint is guidance only and has no safe automatic fix.
-String? _fixAction(String fixHint) => switch (fixHint) {
-      'dnsLeak.fix.enableKillSwitch' => 'killSwitch',
-      _ => null,
-    };
+/// Test ids whose failure the kill switch directly mitigates: the core
+/// reports them as "kill switch disarmed, so nothing blocks it". The button
+/// is only offered while the kill switch is disarmed; an armed kill switch
+/// that still leaks is a firewall failure, not a setting to flip.
+bool _killSwitchFixApplies(LeakTestResult result, bool killSwitchOn) =>
+    !result.pass && !killSwitchOn && (result.test.id == 'direct-dns' || result.test.id == 'icmp-echo');
 
 /// Leak-test screen: runs the core's RunLeakTests stream against the active
 /// session and renders one row per test as results arrive.
 ///
 /// States: idle (intro + run button), running (live progress + cancel),
-/// done (summary + rows with autofix buttons), error (a neutral localized
-/// note via [CoreFailure], never a raw error). A cancelled run keeps its
-/// partial results; cancelling is a user action, not a failure.
+/// done (summary + rows with the kill-switch autofix where it applies),
+/// error (a neutral localized note via [CoreFailure], never a raw error).
+/// A cancelled run keeps its partial results; cancelling is a user action,
+/// not a failure.
 class LeakTestScreen extends StatefulWidget {
   const LeakTestScreen({super.key});
 
@@ -58,18 +52,14 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
   /// Results collected so far, in arrival order.
   List<LeakTestResult> _results = const [];
 
-  /// Expected test count from the started event; 0 until it arrives.
-  int _total = 0;
-
-  /// True once the finished event arrived (as opposed to a cancelled run).
+  /// True once the stream closed normally (as opposed to a cancelled run).
   bool _finished = false;
-  bool _allPassed = false;
 
-  /// Check ids the user already fixed: their rows show a confirmation note
+  /// Test ids the user already fixed: their rows show a confirmation note
   /// instead of the fix button.
   final Set<String> _fixed = {};
 
-  ResponseStream<LeakTestEvent>? _call;
+  ResponseStream<LeakTestResult>? _call;
 
   @override
   void dispose() {
@@ -85,9 +75,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
         _needsConnection = true;
         _failure = null;
         _results = [];
-        _total = 0;
         _finished = false;
-        _allPassed = false;
         _fixed.clear();
       });
       return;
@@ -105,36 +93,22 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
       _needsConnection = false;
       _failure = null;
       _results = [];
-      _total = 0;
       _finished = false;
-      _allPassed = false;
       _fixed.clear();
     });
     try {
       final call = _call = link.leak.runLeakTests(
         RunLeakTestsRequest(apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: id),
       );
-      await for (final event in call) {
+      await for (final result in call) {
         if (!mounted) break;
         final now = SoraScope.read(context);
         // The session changed mid-run: the results belong to a dead session.
         if (link != now.link || id != now.sessionId) throw CoreFailure.unavailable;
-        switch (event.whichPayload()) {
-          case LeakTestEvent_Payload.started:
-            setState(() => _total = event.started.total);
-          case LeakTestEvent_Payload.result:
-            setState(() => _results = [..._results, event.result]);
-          case LeakTestEvent_Payload.finished:
-            final done = event.finished;
-            if (done.hasError()) throw CoreFailure(done.error.userMessageKey);
-            setState(() {
-              _finished = true;
-              _allPassed = done.allPassed;
-            });
-          case LeakTestEvent_Payload.notSet:
-            break;
-        }
+        setState(() => _results = [..._results, result]);
       }
+      // The stream closed normally: the suite is done.
+      if (mounted) setState(() => _finished = true);
     } catch (error) {
       // Cancelling is a user action, not a failure: partial results stay.
       final cancelled = error is GrpcError && error.code == StatusCode.cancelled;
@@ -155,16 +129,14 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
 
   void _cancel() => unawaited(_call?.cancel());
 
-  /// Applies the one-tap autofix for a failed check. Only the kill switch
-  /// has a safe automatic fix; everything else stays guidance text.
+  /// Arms the kill switch as the one-tap fix for a failed direct probe.
   Future<void> _fix(LeakTestResult result) async {
-    if (_running || _fixed.contains(result.id)) return;
-    if (_fixAction(result.fixHint) != 'killSwitch') return;
+    if (_running || _fixed.contains(result.test.id)) return;
     final sora = SoraScope.read(context);
-    if (sora.settings.killSwitch) return;
+    if (!_killSwitchFixApplies(result, sora.settings.killSwitch)) return;
     await sora.setKillSwitch(true);
     if (!mounted) return;
-    setState(() => _fixed.add(result.id));
+    setState(() => _fixed.add(result.test.id));
   }
 
   @override
@@ -191,15 +163,16 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
         if (_running) _progress(context),
         if (_needsConnection) _note(context, Symbols.info_rounded, s.leakTestNeedsConnection),
         if (_failure != null) _note(context, Symbols.info_rounded, describe(s, _failure!)),
-        if (_finished || _results.isNotEmpty) _report(context),
+        if (_results.isNotEmpty) _report(context),
       ],
     );
   }
 
+  /// Live progress: the core streams bare results with no total, so the
+  /// honest progress is the completed count, not a fraction.
   Widget _progress(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
-    final text = _total > 0 ? s.leakTestProgress(_results.length, _total) : s.leakTestRunning;
     return Group(
       children: [
         Padding(
@@ -208,7 +181,12 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
             children: [
               CupertinoActivityIndicator(color: palette.ink),
               const SizedBox(width: 10),
-              Expanded(child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2))),
+              Expanded(
+                child: Text(
+                  s.leakTestProgress(_results.length),
+                  style: Styles.secondary.copyWith(color: palette.ink2),
+                ),
+              ),
             ],
           ),
         ),
@@ -240,7 +218,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
   Widget _report(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
-    final failed = [for (final r in _results) if (!r.passed) r];
+    final failed = [for (final r in _results) if (!r.pass) r];
     final clean = _finished && failed.isEmpty;
     return Group(
       children: [
@@ -270,18 +248,18 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
     );
   }
 
-  /// One test: status icon, title, observed values, the fix hint, and the
-  /// one-tap fix button where an autofix exists. Pass is a calm accent,
-  /// fail is a warning icon in calm ink — never red.
+  /// One test: status icon, title, what the probe observed, and the one-tap
+  /// fix where it applies. Pass is a calm accent, fail is a warning icon in
+  /// calm ink — never red. A skipped test passes by definition but is marked
+  /// so it is never mistaken for a verified pass.
   Widget _resultRow(BuildContext context, LeakTestResult result) {
     final s = S.of(context);
     final sora = SoraScope.of(context);
     final palette = Palette.of(context);
-    final failed = !result.passed;
-    final canFix = _fixAction(result.fixHint) == 'killSwitch' &&
+    final failed = !result.pass;
+    final canFix = _killSwitchFixApplies(result, sora.settings.killSwitch) &&
         !_running &&
-        !_fixed.contains(result.id) &&
-        !sora.settings.killSwitch;
+        !_fixed.contains(result.test.id);
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(44, 8, 12, 0),
       child: Column(
@@ -297,31 +275,23 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  _leakLabel(s, result.label),
+                  _testLabel(s, result.test.label),
                   style: Styles.body.copyWith(color: palette.ink),
                 ),
               ),
             ],
           ),
-          if (result.expected.isNotEmpty)
+          if (result.details.isNotEmpty)
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 24, top: 2),
               child: Text(
-                '${s.leakTestExpected}: ${result.expected}',
+                result.details,
                 style: Styles.caption.copyWith(color: palette.ink2),
               ),
             ),
-          if (result.actual.isNotEmpty)
+          if (result.skipped)
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 24, top: 2),
-              child: Text(
-                '${s.leakTestActual}: ${result.actual}',
-                style: Styles.caption.copyWith(color: palette.ink2),
-              ),
-            ),
-          if (result.fixHint.isNotEmpty)
-            Padding(
-              padding: const EdgeInsetsDirectional.only(start: 24, top: 4),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -329,7 +299,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      _leakHint(s, result.fixHint),
+                      s.leakTestSkipped,
                       style: Styles.caption.copyWith(color: palette.ink2),
                     ),
                   ),
@@ -341,7 +311,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
               padding: const EdgeInsetsDirectional.only(start: 24, top: 8),
               child: _FixButton(onTap: () => unawaited(_fix(result))),
             )
-          else if (_fixed.contains(result.id))
+          else if (_fixed.contains(result.test.id))
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 24, top: 8),
               child: Row(
