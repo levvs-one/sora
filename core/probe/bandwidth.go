@@ -19,6 +19,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -43,6 +44,11 @@ const (
 	historyTTL = 24 * time.Hour
 	historyDir = "probe"
 	historyFile = "history.json"
+	// historySaveInterval bounds disk writes: a probe sweep records one
+	// latency per endpoint, and persisting the whole map per result would
+	// rewrite the file hundreds of times in a burst. The in-memory history
+	// stays fresh; the file is only restart persistence.
+	historySaveInterval = 30 * time.Second
 )
 
 // BenchmarkerConfig wires a Benchmarker. NewEngine and SelectKind are
@@ -85,6 +91,9 @@ type Benchmarker struct {
 
 	mu      sync.Mutex
 	history map[string]HistoryEntry
+	// lastSave bounds history.json writes to historySaveInterval; the zero
+	// value means "never saved", so the first record always persists.
+	lastSave time.Time
 }
 
 // NewBenchmarker validates the config and loads persisted history.
@@ -376,12 +385,9 @@ func (b *Benchmarker) History() []HistoryEntry {
 	for _, e := range b.history {
 		out = append(out, e)
 	}
-	// Newest first; stable enough for UI sorting.
-	for i := 1; i < len(out); i++ {
-		for j := i; j > 0 && out[j].MeasuredAt.After(out[j-1].MeasuredAt); j-- {
-			out[j], out[j-1] = out[j-1], out[j]
-		}
-	}
+	// Newest first. The hand-rolled insertion sort was O(n^2); with
+	// thousands of servers that showed up on the GetBenchmarks RPC.
+	sort.SliceStable(out, func(i, j int) bool { return out[i].MeasuredAt.After(out[j].MeasuredAt) })
 	return out
 }
 
@@ -412,12 +418,19 @@ func (b *Benchmarker) loadHistory() {
 	}
 }
 
-// saveHistoryLocked persists atomically: write temp, then rename.
+// saveHistoryLocked persists atomically: write temp, then rename. Writes
+// are throttled to historySaveInterval because probe sweeps record one
+// result per endpoint; the in-memory history is always current.
 func (b *Benchmarker) saveHistoryLocked() {
 	path := b.historyPath()
 	if path == "" {
 		return
 	}
+	now := b.now()
+	if now.Sub(b.lastSave) < historySaveInterval {
+		return
+	}
+	b.lastSave = now
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return
 	}
