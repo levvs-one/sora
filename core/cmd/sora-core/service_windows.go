@@ -125,13 +125,19 @@ func installService(arguments []string) error {
 			return err
 		}
 		current.DisplayName, current.Description, current.StartType = config.DisplayName, config.Description, config.StartType
-		current.BinaryPathName = windows.ComposeCommandLine(append([]string{exe}, arguments...))
 		if err := s.UpdateConfig(current); err != nil {
 			_ = s.Close()
 			return err
 		}
 	} else if s, err = m.CreateService(serviceName, exe, config, arguments...); err != nil {
 		return fmt.Errorf("create the service: %w", err)
+	}
+	// Set the image path explicitly in both branches: quoting must not
+	// depend on mgr.CreateService internals, an unquoted ImagePath is a
+	// classic privilege-escalation vector (SORA-L6).
+	if err := setImagePath(s, exe, arguments); err != nil {
+		_ = s.Close()
+		return err
 	}
 	defer func() { _ = s.Close() }()
 	// The event source may exist from an earlier installation.
@@ -145,6 +151,20 @@ func installService(arguments []string) error {
 		return err
 	}
 	return s.Start()
+}
+
+// setImagePath writes the quoted service image path explicitly instead of
+// relying on mgr.CreateService internals (SORA-L6).
+func setImagePath(s *mgr.Service, exe string, arguments []string) error {
+	current, err := s.Config()
+	if err != nil {
+		return err
+	}
+	current.BinaryPathName = windows.ComposeCommandLine(append([]string{exe}, arguments...))
+	if err := s.UpdateConfig(current); err != nil {
+		return fmt.Errorf("set the service image path: %w", err)
+	}
+	return nil
 }
 
 // uninstallService stops and removes the service. It succeeds if no service is
