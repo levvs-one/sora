@@ -222,3 +222,170 @@ func TestValidateAcceptsNonExampleParameters(t *testing.T) {
 		t.Fatalf("Validate = %v, want nil", err)
 	}
 }
+
+func TestValidateAcceptsMasquerade(t *testing.T) {
+	for _, tc := range []struct {
+		name                   string
+		proto, domain, browser string
+	}{
+		{"quic chrome", "quic", "www.google.com", "chrome"},
+		{"quic no browser", "quic", "example.com", ""},
+		{"dns with domain", "dns", "example.com", ""},
+		{"dns pseudo domain", "dns", "", ""},
+		{"stun", "stun", "", ""},
+		{"sip", "sip", "", ""},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			a := goodAmnezia()
+			a.I1 = ""
+			a.MasqueradeProtocol, a.MasqueradeDomain, a.MasqueradeBrowser = tc.proto, tc.domain, tc.browser
+			if err := wireguardWithAmnezia(a).Validate(); err != nil {
+				t.Fatalf("Validate = %v, want nil", err)
+			}
+		})
+	}
+}
+
+func TestValidateRejectsBadMasquerade(t *testing.T) {
+	cases := []struct {
+		name                   string
+		proto, domain, browser string
+		i1                     string
+		want                   string
+	}{
+		{"unknown protocol", "ftp", "example.com", "", "", "unknown masquerade protocol"},
+		{"id without ip", "", "example.com", "", "", "ip (masquerade protocol) is required"},
+		{"ib without ip", "", "", "chrome", "", "ip (masquerade protocol) is required"},
+		{"quic without id", "quic", "", "", "", "id (masquerade domain) is required for ip=quic"},
+		{"unknown browser", "quic", "example.com", "safari", "", "unknown masquerade browser"},
+		{"browser with dns", "dns", "example.com", "chrome", "", "only meaningful with ip=quic"},
+		{"experimental browser", "quic", "example.com", "chrome-full", "", "experimental"},
+		{"masquerade with i1", "quic", "example.com", "", "<b 0x01>", "conflicts with an explicit i1"},
+		{"injection domain", "quic", "exa;mple.com", "", "", "invalid masquerade domain"},
+		{"newline domain", "dns", "exa\nmple.com", "", "", "invalid masquerade domain"},
+		{"leading hyphen label", "dns", "-example.com", "", "", "leading or trailing hyphen"},
+		{"leading dot", "dns", ".example.com", "", "", "leading dot"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			a := goodAmnezia()
+			a.I1 = tc.i1
+			a.MasqueradeProtocol, a.MasqueradeDomain, a.MasqueradeBrowser = tc.proto, tc.domain, tc.browser
+			err := wireguardWithAmnezia(a).Validate()
+			if err == nil {
+				t.Fatalf("Validate = nil, want error containing %q", tc.want)
+			}
+			if !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("Validate = %v, want error containing %q", err, tc.want)
+			}
+		})
+	}
+}
+
+func TestValidateAWGCPS(t *testing.T) {
+	for _, raw := range []string{
+		"<b 0xc000000001><r 64><t>",
+		"<b 0xf6ab3267fa><c><b 0xf6ab><t><r 10><wt 10>",
+		"<rc 8><rd 5><r 1000>",
+		"  <t>  <b 0x00>  ",
+	} {
+		if err := validateAWGCPS(raw); err != nil {
+			t.Errorf("validateAWGCPS(%q) = %v, want nil", raw, err)
+		}
+	}
+	for _, tc := range []struct {
+		raw  string
+		want string
+	}{
+		{"<b 0xc000000001", "unclosed"},
+		{"<b 0xzz>", "non-hex"},
+		{"<b 0xabc>", "even-sized"},
+		{"<b>", "0x-prefixed"},
+		{"<r>", "size"},
+		{"<r 1001>", "0-1000"},
+		{"<r -5>", "0-1000"},
+		{"<t 5>", "no arguments"},
+		{"plain text", "outside"},
+		{"<>", "empty"},
+	} {
+		if err := validateAWGCPS(tc.raw); err == nil {
+			t.Errorf("validateAWGCPS(%q) = nil, want error containing %q", tc.raw, tc.want)
+		} else if !strings.Contains(err.Error(), tc.want) {
+			t.Errorf("validateAWGCPS(%q) = %v, want error containing %q", tc.raw, err, tc.want)
+		}
+	}
+}
+
+func TestValidateRejectsBadCPSInPlan(t *testing.T) {
+	a := goodAmnezia()
+	a.I2 = "<r 99999>"
+	if err := wireguardWithAmnezia(a).Validate(); err == nil {
+		t.Fatal("Validate = nil, want CPS error")
+	} else if !strings.Contains(err.Error(), "i2") {
+		t.Fatalf("Validate = %v, want error naming i2", err)
+	}
+}
+
+func TestValidateEarlyData(t *testing.T) {
+	ws := func() Outbound {
+		o := wireguardWithAmnezia(nil)
+		o.Protocol = ProtocolVLESS
+		o.UUID = "11111111-1111-1111-1111-111111111111"
+		return o
+	}
+	o := ws()
+	o.Transport = Transport{Type: "ws", Path: "/ws", EarlyData: 2048}
+	if err := o.Validate(); err != nil {
+		t.Fatalf("Validate = %v, want nil", err)
+	}
+	o.Transport.EarlyData = -1
+	if err := o.Validate(); err == nil {
+		t.Fatal("Validate = nil, want negative early-data error")
+	}
+	o.Transport = Transport{Type: "grpc", Service: "s", EarlyData: 2048}
+	if err := o.Validate(); err == nil {
+		t.Fatal("Validate = nil, want non-ws early-data error")
+	} else if !strings.Contains(err.Error(), "early data needs the ws transport") {
+		t.Fatalf("Validate = %v, want ws-transport error", err)
+	}
+}
+
+func TestOutboundSecretsIncludeHeaderProtectionKey(t *testing.T) {
+	o := wireguardWithAmnezia(goodAmnezia31())
+	key := goodAmnezia31().HeaderProtectionKey
+	found := false
+	for _, s := range o.Secrets() {
+		if s == key {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("Secrets() does not include the header protection key")
+	}
+}
+
+func TestUsesAWG31AndMasquerade(t *testing.T) {
+	if (&AmneziaWG{}).UsesAWG31() {
+		t.Fatal("empty AmneziaWG must not need AWG 3.x")
+	}
+	if !goodAmnezia31().UsesAWG31() {
+		t.Fatal("3.1 parameters must need AWG 3.x")
+	}
+	a := goodAmnezia31()
+	a.ContentPaddingAddition = "0-0"
+	a.RekeyAfterTime, a.RekeyTimeout = "", ""
+	a.RejectAfterTime, a.KeepaliveTimeout = "", ""
+	a.MaxHandshakeAttempts = ""
+	a.HeaderProtectionKey = ""
+	a.RandomTrailers, a.DisableCookies = false, false
+	if a.UsesAWG31() {
+		t.Fatal("\"0-0\"/empty ranges must not need AWG 3.x")
+	}
+	if (&AmneziaWG{}).UsesMasquerade() {
+		t.Fatal("empty AmneziaWG must not use masquerade")
+	}
+	m := &AmneziaWG{MasqueradeProtocol: "dns"}
+	if !m.UsesMasquerade() {
+		t.Fatal("masquerade protocol must be detected")
+	}
+}

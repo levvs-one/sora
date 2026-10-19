@@ -171,18 +171,34 @@ func gradeWireGuard(o engine.Outbound, add func(string, Severity, string, string
 // amneziaZero reports whether the parameters leave stock WireGuard
 // behaviour: with everything at zero AmneziaWG speaks plain WireGuard.
 func amneziaZero(a *engine.AmneziaWG) bool {
+	hdrs := []string{a.H1, a.H2, a.H3, a.H4}
+	for i, h := range hdrs {
+		if h != "" && h != strconv.Itoa(i+1) {
+			return false
+		}
+	}
 	return a.Jc == 0 && a.Jmin == 0 && a.Jmax == 0 &&
 		a.S1 == 0 && a.S2 == 0 && a.S3 == 0 && a.S4 == 0 &&
-		a.H1 == "" && a.H2 == "" && a.H3 == "" && a.H4 == "" &&
 		a.I1 == "" && a.I2 == "" && a.I3 == "" && a.I4 == "" && a.I5 == "" &&
-		a.J1 == "" && a.J2 == "" && a.J3 == "" && a.Itime == 0
+		a.J1 == "" && a.J2 == "" && a.J3 == "" && a.Itime == 0 &&
+		a.HeaderProtectionKey == "" && a.ContentPaddingAddition == "" &&
+		!a.RandomTrailers && !a.DisableCookies &&
+		a.RekeyAfterTime == "" && a.RekeyTimeout == "" &&
+		a.RejectAfterTime == "" && a.KeepaliveTimeout == "" &&
+		a.MaxHandshakeAttempts == "" && !a.UsesMasquerade()
 }
 
 // staticHeaders reports whether any header is a single constant rather
 // than a 2.0-style range ("100000-800000").
 func staticHeaders(a *engine.AmneziaWG) bool {
-	for _, h := range []string{a.H1, a.H2, a.H3, a.H4} {
-		if h != "" && !strings.ContainsAny(h, "-,") {
+	if a.HeaderProtectionKey != "" {
+		return false
+	}
+	for i, h := range []string{a.H1, a.H2, a.H3, a.H4} {
+		if h == "" || h == strconv.Itoa(i+1) {
+			continue
+		}
+		if !strings.ContainsAny(h, "-,") {
 			return true
 		}
 	}

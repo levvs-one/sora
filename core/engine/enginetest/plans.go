@@ -2,6 +2,7 @@
 package enginetest
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -101,6 +102,32 @@ func AmneziaWG() engine.Outbound {
 		Jc: 4, Jmin: 40, Jmax: 70, S1: 15, S2: 25, S3: 10, S4: 5,
 		H1: "100000-100100", H2: "200000-200100", H3: "300000", H4: "400000",
 		I1: "<b 0xf6ab3267fa><c><b 0xf6ab><t><r 10><wt 10>",
+	}
+	return o
+}
+
+// AmneziaWG3 returns a WireGuard outbound with AmneziaWG 3.1 parameters:
+// header protection, content padding, ranged timings and a QUIC
+// masquerade decoy. The key is a fixed test vector, never a real secret.
+func AmneziaWG3() engine.Outbound {
+	o := Outbound(engine.ProtocolWireGuard)
+	o.ID, o.Name = "amneziawg3", "Test amneziawg 3.1"
+	key := base64.StdEncoding.EncodeToString([]byte("0123456789abcdef0123456789abcdef"))
+	o.Amnezia = &engine.AmneziaWG{
+		Jc: 8, Jmin: 40, Jmax: 70, S1: 15, S2: 25, S3: 12, S4: 12,
+		H1: "1", H2: "2", H3: "3", H4: "4",
+		HeaderProtectionKey:    key,
+		ContentPaddingAddition: "32-96",
+		RandomTrailers:         true,
+		DisableCookies:         true,
+		RekeyAfterTime:         "100-140",
+		RekeyTimeout:           "5",
+		RejectAfterTime:        "170-190",
+		KeepaliveTimeout:       "8-12",
+		MaxHandshakeAttempts:   "16-20",
+		MasqueradeProtocol:     "quic",
+		MasqueradeDomain:       "www.google.com",
+		MasqueradeBrowser:      "chrome",
 	}
 	return o
 }
