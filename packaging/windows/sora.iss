@@ -85,6 +85,14 @@ ru.Links=Ссылки:
 en.Links=Links:
 ru.WebViewMissing=Для встроенной проверки скорости нужен Microsoft Edge WebView2 Runtime. Скачайте Evergreen Standalone Installer (x64) с https://developer.microsoft.com/microsoft-edge/webview2/ и установите его. До этого используйте кнопку "Открыть в браузере".
 en.WebViewMissing=Embedded speed tests require Microsoft Edge WebView2 Runtime. Download and install the Evergreen Standalone Installer (x64) from https://developer.microsoft.com/microsoft-edge/webview2/. Until then, use "Open in browser".
+ru.DeleteDataTitle=Удаление данных
+en.DeleteDataTitle=Remove data
+ru.DeleteDataDescription=Удалить данные Sora?
+en.DeleteDataDescription=Delete Sora data?
+ru.DeleteDataSub=Каталог данных содержит зашифрованные подписки и токены.
+en.DeleteDataSub=The data directory holds encrypted subscriptions and tokens.
+ru.DeleteDataOption=Удалить каталог данных ({commonappdata}\Sora)
+en.DeleteDataOption=Delete the data directory ({commonappdata}\Sora)
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
@@ -129,6 +137,21 @@ Filename: "{app}\sora.exe"; Flags: nowait runasoriginaluser skipifnotsilent
 Filename: "{app}\core\sora-core.exe"; Parameters: "-uninstall-service"; Flags: runhidden waituntilterminated; RunOnceId: "RemoveSoraCore"
 
 [Code]
+// Whether the user asked to delete the data directory at uninstall.
+var
+  DeleteDataPage: TInputOptionWizardPage;
+
+procedure InitializeUninstall();
+begin
+  DeleteDataPage := CreateInputOptionPage(wpWelcome,
+    CustomMessage('DeleteDataTitle'), CustomMessage('DeleteDataDescription'),
+    CustomMessage('DeleteDataSub'), False, False);
+  DeleteDataPage.Add(CustomMessage('DeleteDataOption'));
+  // Off by default: reinstalling keeps subscriptions; silent uninstalls
+  // never show the page and keep the data as well.
+  DeleteDataPage.Values[0] := False;
+end;
+
 // Evergreen can be installed for the machine or for the current user.
 function WebViewRuntimePresent: Boolean;
 var
@@ -176,11 +199,20 @@ end;
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   Command: String;
+  DataDir: String;
 begin
   if (CurUninstallStep = usUninstall) and
      RegQueryStringValue(HKLM, 'Software\Classes\happ\shell\open\command', '', Command) and
      (Pos(Lowercase(ExpandConstant('{app}\sora.exe')), Lowercase(Command)) > 0) then
     RegDeleteKeyIncludingSubkeys(HKLM, 'Software\Classes\happ');
+  // Secrets must not survive uninstallation: delete the data directory only
+  // on explicit choice, so reinstalling keeps subscriptions (SORA-L7).
+  if (CurUninstallStep = usPostUninstall) and DeleteDataPage.Values[0] then
+  begin
+    DataDir := ExpandConstant('{commonappdata}\Sora');
+    Log('Deleting the data directory on request: ' + DataDir);
+    DelTree(DataDir, True, True, True);
+  end;
 end;
 
 // An upgrade replaces the core while the service holds it open, so the
