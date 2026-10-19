@@ -616,7 +616,8 @@ Future<void> _shareQr(BuildContext context, SubscriptionState state) async {
 }
 
 /// Confirms deletion, then removes the subscription and its servers.
-Future<void> deleteSubscription(BuildContext context, SubscriptionState state) async {  final sora = SoraScope.read(context);
+Future<void> deleteSubscription(BuildContext context, SubscriptionState state) async {
+  final sora = SoraScope.read(context);
   final s = S.of(context);
   if (await confirm(context, question: s.deleteSubscription(state.displayName), action: s.delete)) {
     await sora.deleteSubscription(state.settings.id);
