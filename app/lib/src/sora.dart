@@ -476,19 +476,20 @@ class Sora extends ChangeNotifier {
     if (preset != null) {
       changed = obfs.preset != preset;
       obfs.applyPreset(preset);
-    } else {
-      if (utls != null && obfs.utls != utls) {
-        obfs.utls = utls;
-        changed = true;
-      }
-      if (fragment != null && obfs.fragment != fragment) {
-        obfs.fragment = fragment;
-        changed = true;
-      }
-      if (jitter != null && obfs.jitter != jitter) {
-        obfs.jitter = jitter;
-        changed = true;
-      }
+    }
+    // Manual fields apply on top of the preset and flip it custom through
+    // the setters; a combined call must not silently drop them.
+    if (utls != null && obfs.utls != utls) {
+      obfs.utls = utls;
+      changed = true;
+    }
+    if (fragment != null && obfs.fragment != fragment) {
+      obfs.fragment = fragment;
+      changed = true;
+    }
+    if (jitter != null && obfs.jitter != jitter) {
+      obfs.jitter = jitter;
+      changed = true;
     }
     if (!changed) return (compatibleEngines: const <String>[], warnings: const <String>[]);
     return applyObfsProfile();
@@ -1659,8 +1660,11 @@ class Sora extends ChangeNotifier {
   bool _degraded(String current, String best) {
     if (best == current) return false;
     final curMs = latency[current];
-    if (latency.containsKey(current) && curMs == null) return true;
     final bestMs = latency[best];
+    // The pinned server stopped answering: move only to a server with real
+    // measurements. Hopping to an unprobed candidate would trade a known-bad
+    // server for an unknown one — and a needless reconnect.
+    if (latency.containsKey(current) && curMs == null) return bestMs != null;
     if (curMs == null || bestMs == null) return false;
     return bestMs * 2 <= curMs && curMs - bestMs >= 100;
   }
@@ -1966,9 +1970,15 @@ SessionPlan buildPlan({
       if (!isProfile(o)) o,
   ];
   if (entry != null && entry.members.any(isProfile)) {
-    // Profiles cannot share an engine. Select one reachable member by role
-    // priority or latency.
-    choice = pickMember(entry, latency, reliabilityOf: reliabilityOf).id;
+    // Profiles cannot share an engine. Select one reachable member using the
+    // same auto-select mode as every other pick, not a hardcoded 'ping'.
+    choice = pickMember(
+      entry,
+      latency,
+      bandwidth: bandwidth,
+      autoSelect: settings.autoSelectMode,
+      reliabilityOf: reliabilityOf,
+    ).id;
   } else if (entry != null) {
     // mihomo supports role-ordered fallback groups. Other engines compare only
     // main members by latency; unlabelled groups compare all members.
