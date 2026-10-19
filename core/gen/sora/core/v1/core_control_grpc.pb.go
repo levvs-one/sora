@@ -49,6 +49,7 @@ const (
 	CoreControl_GetSubscriptionLink_FullMethodName = "/sora.core.v1.CoreControl/GetSubscriptionLink"
 	CoreControl_PutSecret_FullMethodName           = "/sora.core.v1.CoreControl/PutSecret"
 	CoreControl_DeleteSecret_FullMethodName        = "/sora.core.v1.CoreControl/DeleteSecret"
+	CoreControl_CheckDnsLeaks_FullMethodName       = "/sora.core.v1.CoreControl/CheckDnsLeaks"
 )
 
 // CoreControlClient is the client API for CoreControl service.
@@ -104,6 +105,10 @@ type CoreControlClient interface {
 	// way to read a stored credential.
 	PutSecret(ctx context.Context, in *PutSecretRequest, opts ...grpc.CallOption) (*PutSecretResponse, error)
 	DeleteSecret(ctx context.Context, in *DeleteSecretRequest, opts ...grpc.CallOption) (*DeleteSecretResponse, error)
+	// Since 1.8. DNS leak diagnostics: which resolvers the session uses versus
+	// what the OS would use, and whether the kill switch covers DNS. Requires
+	// the control authenticator: the answers describe the machine's network.
+	CheckDnsLeaks(ctx context.Context, in *CheckDnsLeaksRequest, opts ...grpc.CallOption) (*CheckDnsLeaksResponse, error)
 }
 
 type coreControlClient struct {
@@ -450,6 +455,16 @@ func (c *coreControlClient) DeleteSecret(ctx context.Context, in *DeleteSecretRe
 	return out, nil
 }
 
+func (c *coreControlClient) CheckDnsLeaks(ctx context.Context, in *CheckDnsLeaksRequest, opts ...grpc.CallOption) (*CheckDnsLeaksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckDnsLeaksResponse)
+	err := c.cc.Invoke(ctx, CoreControl_CheckDnsLeaks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CoreControlServer is the server API for CoreControl service.
 // All implementations must embed UnimplementedCoreControlServer
 // for forward compatibility.
@@ -503,6 +518,10 @@ type CoreControlServer interface {
 	// way to read a stored credential.
 	PutSecret(context.Context, *PutSecretRequest) (*PutSecretResponse, error)
 	DeleteSecret(context.Context, *DeleteSecretRequest) (*DeleteSecretResponse, error)
+	// Since 1.8. DNS leak diagnostics: which resolvers the session uses versus
+	// what the OS would use, and whether the kill switch covers DNS. Requires
+	// the control authenticator: the answers describe the machine's network.
+	CheckDnsLeaks(context.Context, *CheckDnsLeaksRequest) (*CheckDnsLeaksResponse, error)
 	mustEmbedUnimplementedCoreControlServer()
 }
 
@@ -602,6 +621,9 @@ func (UnimplementedCoreControlServer) PutSecret(context.Context, *PutSecretReque
 }
 func (UnimplementedCoreControlServer) DeleteSecret(context.Context, *DeleteSecretRequest) (*DeleteSecretResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSecret not implemented")
+}
+func (UnimplementedCoreControlServer) CheckDnsLeaks(context.Context, *CheckDnsLeaksRequest) (*CheckDnsLeaksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckDnsLeaks not implemented")
 }
 func (UnimplementedCoreControlServer) mustEmbedUnimplementedCoreControlServer() {}
 func (UnimplementedCoreControlServer) testEmbeddedByValue()                     {}
@@ -1136,6 +1158,24 @@ func _CoreControl_DeleteSecret_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CoreControl_CheckDnsLeaks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckDnsLeaksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).CheckDnsLeaks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_CheckDnsLeaks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).CheckDnsLeaks(ctx, req.(*CheckDnsLeaksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CoreControl_ServiceDesc is the grpc.ServiceDesc for CoreControl service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1246,6 +1286,10 @@ var CoreControl_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteSecret",
 			Handler:    _CoreControl_DeleteSecret_Handler,
+		},
+		{
+			MethodName: "CheckDnsLeaks",
+			Handler:    _CoreControl_CheckDnsLeaks_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

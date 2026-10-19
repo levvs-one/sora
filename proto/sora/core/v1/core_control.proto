@@ -59,6 +59,11 @@ service CoreControl {
   // way to read a stored credential.
   rpc PutSecret(PutSecretRequest) returns (PutSecretResponse);
   rpc DeleteSecret(DeleteSecretRequest) returns (DeleteSecretResponse);
+
+  // Since 1.8. DNS leak diagnostics: which resolvers the session uses versus
+  // what the OS would use, and whether the kill switch covers DNS. Requires
+  // the control authenticator: the answers describe the machine's network.
+  rpc CheckDnsLeaks(CheckDnsLeaksRequest) returns (CheckDnsLeaksResponse);
 }
 
 message ApiVersion {
@@ -590,4 +595,33 @@ message BypassStrategy {
   bool host_case = 5;
   bool domain_case = 6;
   bool method_eol = 7;
+}
+
+// Since 1.8. One DNS leak check. label and fix_hint are localization keys
+// for the UI, never free text; expected and actual carry raw values such as
+// resolver addresses.
+message DnsLeakCheck {
+  // Stable machine id: "tunnel-dns", "system-resolvers", "killswitch-dns".
+  string id = 1;
+  // Localization key for the check title, e.g. "dnsLeak.check.tunnelDns".
+  string label = 2;
+  // What the core expects, e.g. the tunnel resolvers.
+  string expected = 3;
+  // What was actually observed, e.g. the OS resolvers.
+  string actual = 4;
+  // True when the check found a leak.
+  bool leaked = 5;
+  // Localization key for the suggested fix, e.g.
+  // "dnsLeak.fix.enableKillSwitch". Empty when nothing needs doing. A check
+  // can carry a hint without being a leak: the UI shows those as warnings.
+  string fix_hint = 6;
+}
+message CheckDnsLeaksRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string session_id = 3;
+}
+message CheckDnsLeaksResponse {
+  repeated DnsLeakCheck checks = 1;
+  SoraError error = 2;
 }
