@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/netip"
 	"strings"
@@ -532,8 +533,27 @@ func (s *Session) supervise(events <-chan engine.Event) {
 					s.crashes.reset()
 				}
 			case engine.EventFatal:
-				s.fail(errs.Newf(errs.CodeUnavailable, errs.KeyEngineStopped,
-					"session: the engine reported a fatal error"))
+				// Keep the supervisor's reason (restart budget exhausted,
+				// restart failure) in the failure status: a generic line
+				// here hides the actual cause from the client (F7 honesty).
+				fatal := ev.Err
+				if ev.Message != "" {
+					// The budget message ("more than 5 restarts within
+					// 10m0s") is not part of ev.Err; carry it along so the
+					// status detail names the real reason.
+					if fatal == nil {
+						fatal = errors.New(ev.Message)
+					} else {
+						fatal = errors.Join(fatal, errors.New(ev.Message))
+					}
+				}
+				if fatal == nil {
+					fatal = errs.Newf(errs.CodeUnavailable, errs.KeyEngineStopped,
+						"session: the engine reported a fatal error")
+				} else {
+					fatal = errs.Wrap(fatal, errs.CodeUnavailable, errs.KeyEngineStopped)
+				}
+				s.fail(fatal)
 				return
 			}
 		}

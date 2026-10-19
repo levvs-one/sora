@@ -318,6 +318,68 @@ func TestSessionFailsWhenTheSupervisorGivesUp(t *testing.T) {
 	waitFor(t, 2*time.Second, func() bool { return session.State() == StateFailed })
 }
 
+// maxCrashes engine crashes inside a minute must surface the instability
+// banner while the session is still alive and reconnecting: under the
+// supervisor's default budget (5 restarts per 10 minutes) the next crash
+// turns fatal, so the watchdog fires on the last crash it can observe.
+func TestSessionReportsInstabilityOnRepeatedEngineCrashes(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	session, err := New(testConfig(eng, guard))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := session.Start(context.Background()); err != nil {
+		t.Fatalf("Start() error = %v", err)
+	}
+	defer func() { _ = session.Stop(context.Background()) }()
+	for i := 0; i < maxCrashes-1; i++ {
+		eng.bus.Publish(engine.Event{Kind: engine.EventEngineDown, Err: errors.New("process exited")})
+	}
+	if unstable := journalHasUnstable(session); unstable {
+		t.Fatal("fewer than maxCrashes crashes must not report instability")
+	}
+	eng.bus.Publish(engine.Event{Kind: engine.EventEngineDown, Err: errors.New("process exited")})
+	waitFor(t, 2*time.Second, func() bool { return journalHasUnstable(session) })
+	if session.State() == StateFailed {
+		t.Fatal("the session must still be reconnecting when instability is reported")
+	}
+}
+
+func journalHasUnstable(s *Session) bool {
+	for _, ev := range s.Journal().Since(0, 256) {
+		if ev.Kind == EventError && ev.Key == errs.KeyEngineUnstable {
+			return true
+		}
+	}
+	return false
+}
+
+// The failure status must keep the supervisor's reason instead of a generic
+// line: after repeated crashes the user should see why the engine gave up,
+// not "the engine reported a fatal error".
+func TestSessionFatalKeepsTheSupervisorReason(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	session, err := New(testConfig(eng, guard))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := session.Start(context.Background()); err != nil {
+		t.Fatalf("Start() error = %v", err)
+	}
+	defer func() { _ = session.Stop(context.Background()) }()
+	eng.bus.Publish(engine.Event{Kind: engine.EventFatal, State: engine.StateFailed,
+		Err:     errors.New("sing-box: engine exited unexpectedly"),
+		Message: "more than 5 restarts within 10m0s"})
+	waitFor(t, 2*time.Second, func() bool { return session.State() == StateFailed })
+	status := session.Status()
+	if !strings.Contains(status.Detail, "more than 5 restarts") {
+		t.Fatalf("status detail = %q, want the supervisor's budget reason", status.Detail)
+	}
+	if status.Key != errs.KeyEngineStopped {
+		t.Fatalf("status key = %q, want %q", status.Key, errs.KeyEngineStopped)
+	}
+}
+
 func TestAnEngineStateIsNoSessionState(t *testing.T) {
 	eng, guard := newFakeEngine(), &fakeGuard{}
 	session, err := New(testConfig(eng, guard))

@@ -2,9 +2,16 @@ package session
 
 // Engine crash watchdog (F7). The supervisor restarts crashed engines with
 // backoff inside its own budget; this watchdog watches from the session
-// side and reports instability once: more than maxCrashes engine crashes
-// within crashWindow. The client shows an "engine unstable" banner with a
+// side and reports instability once: maxCrashes engine crashes within
+// crashWindow. The client shows an "engine unstable" banner with a
 // diagnostics shortcut on that signal.
+//
+// The threshold counts reaching maxCrashes, not exceeding it: the
+// supervisor's default restart budget (5 restarts per 10 minutes) turns the
+// next unexpected exit into EventFatal instead of EventEngineDown, so a
+// further crash in the window never reaches this watchdog — the signal must
+// fire on the last crash the session can still observe, while the session
+// is alive and reconnecting.
 
 import (
 	"sync"
@@ -17,7 +24,7 @@ const (
 )
 
 // crashWatch counts engine crashes in a rolling window. note returns true
-// exactly once per instability episode: when the threshold is crossed.
+// exactly once per instability episode: when the threshold is reached.
 // The episode resets after a quiet window.
 type crashWatch struct {
 	mu       sync.Mutex
@@ -31,7 +38,7 @@ func newCrashWatch() *crashWatch {
 }
 
 // note records one engine crash. It reports true the first time the crash
-// count inside the rolling window exceeds maxCrashes.
+// count inside the rolling window reaches maxCrashes.
 func (w *crashWatch) note() bool {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -48,7 +55,7 @@ func (w *crashWatch) note() bool {
 		w.reported = false
 	}
 	w.at = append(kept, now)
-	if len(w.at) <= maxCrashes {
+	if len(w.at) < maxCrashes {
 		return false
 	}
 	if w.reported {
