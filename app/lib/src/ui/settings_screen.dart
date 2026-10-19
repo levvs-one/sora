@@ -12,6 +12,7 @@ import '../settings.dart';
 import '../sora.dart';
 import 'about.dart';
 import 'connections.dart';
+import 'dns.dart';
 import 'kit.dart';
 import 'language.dart';
 import 'logs.dart';
@@ -45,7 +46,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static final _range = RegExp(r'^\d{1,5}-\d{1,5}$');
   static final _packets = RegExp(r'^(tlshello|\d{1,3}-\d{1,3})$');
   static final _position = RegExp(r'^(-?\d{1,4}|(method|host|endhost|sld|midsld|endsld|sniext)([+-]\d{1,4})?)$');
-  static final _resolver = RegExp(r'^[A-Za-z0-9\[\]:._/-]+$');
 
   @override
   void initState() {
@@ -126,6 +126,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     for (final p in value.split(RegExp(r'[,\s]+')))
       if (p.isNotEmpty) p,
   ];
+
+  /// Summarizes the DNS configuration for the settings row: preset name,
+  /// or the first custom resolver. Legacy installs with resolvers but no
+  /// preset read as custom.
+  static String _dnsSummary(S s, Settings settings) {
+    final preset = settings.dnsPreset;
+    if (preset == 'custom' || (preset == 'auto' && settings.dns.isNotEmpty)) {
+      return settings.dns.isEmpty ? s.dnsAuto : settings.dns.first;
+    }
+    return switch (preset) {
+      'cloudflare' => s.dnsPresetCloudflare,
+      'google' => s.dnsPresetGoogle,
+      'quad9' => s.dnsPresetQuad9,
+      'adguard' => s.dnsPresetAdGuard,
+      _ => s.dnsAuto,
+    };
+  }
 
   static bool _web(String value) {
     final uri = Uri.tryParse(value);
@@ -238,14 +255,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SwitchTile(title: s.ipv6, value: settings.ipv6, onChanged: (v) => set((x) => x.ipv6 = v)),
             LinkTile(
               title: s.dns,
-              value: settings.dns.isEmpty ? s.dnsAuto : settings.dns.first,
-              onTap: () => _edit(
-                title: s.dns,
-                hint: s.dnsHint,
-                initial: settings.dns.join(', '),
-                valid: (v) => _parts(v).every(_resolver.hasMatch),
-                apply: (x, v) => x.dns = _parts(v),
-              ),
+              value: _dnsSummary(s, settings),
+              onTap: () => push<void>(context, const DnsScreen()),
             ),
             SwitchTile(title: s.fragment, value: settings.fragment, onChanged: (v) => set((x) => x.fragment = v)),
             if (settings.fragment) ...[

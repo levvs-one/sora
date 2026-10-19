@@ -17,6 +17,7 @@ class Settings {
   static const _keys = {
     'format', 'server', 'preset', 'blockAds', 'killSwitch', 'engine', 'animations', 'theme', 'language', //
     'fragment', 'fragmentPackets', 'fragmentLength', 'fragmentInterval', 'ipv6', 'dns', //
+    'dnsPreset', 'dnsLeakLastCheck', //
     'probeMethod',
     'probeUrl',
     'probeTimeout',
@@ -135,6 +136,15 @@ class Settings {
   /// Session DNS resolvers; empty uses core defaults.
   List<String> get dns => _store.getStringList('dns') ?? const [];
   set dns(List<String> value) => _store.setStringList('dns', value);
+
+  /// DNS preset id: auto, cloudflare, google, quad9, adguard or custom.
+  /// Custom stores its resolvers in [dns]; presets resolve to fixed lists.
+  String get dnsPreset => _store.getString('dnsPreset') ?? 'auto';
+  set dnsPreset(String value) => _store.setString('dnsPreset', value);
+
+  /// Last leak-check timestamp in millis since epoch; zero means never checked.
+  int get dnsLeakLastCheck => _store.getInt('dnsLeakLastCheck') ?? 0;
+  set dnsLeakLastCheck(int value) => _store.setInt('dnsLeakLastCheck', value);
 
   /// Probe method: auto uses the server's engine when available; engine or
   /// connect pins the method.
