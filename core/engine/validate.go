@@ -330,7 +330,8 @@ func (s *BypassStrategy) validate(id string) error {
 	if s == nil {
 		return fmt.Errorf("outbound %s: a bypass outbound needs a strategy", id)
 	}
-	if len(s.SplitPos) == 0 && s.TLSRecord == "" && !s.HostCase && !s.DomainCase && !s.MethodEOL {
+	if len(s.SplitPos) == 0 && s.TLSRecord == "" && !s.HostCase && !s.DomainCase && !s.MethodEOL &&
+		!s.HostDot && !s.HostTab && !s.HostNoSpace && !s.MethodSpace && !s.UnixEOL {
 		return fmt.Errorf("outbound %s: the bypass strategy changes nothing", id)
 	}
 	if len(s.SplitPos) > 8 {
@@ -340,6 +341,17 @@ func (s *BypassStrategy) validate(id string) error {
 		if pos != "" && !bypassPosition.MatchString(pos) {
 			return fmt.Errorf("outbound %s: %q is not a split position", id, pos)
 		}
+	}
+	for _, scope := range []string{s.DisorderScope, s.OOBScope} {
+		if scope != "" && scope != "http" && scope != "tls" {
+			return fmt.Errorf("outbound %s: %q is not a protocol scope (http or tls)", id, scope)
+		}
+	}
+	if s.DisorderScope != "" && !s.Disorder {
+		return fmt.Errorf("outbound %s: a disorder scope needs disorder", id)
+	}
+	if s.OOBScope != "" && !s.OOB {
+		return fmt.Errorf("outbound %s: an out-of-band scope needs out-of-band", id)
 	}
 	if (s.Disorder || s.OOB) && len(s.SplitPos) == 0 {
 		return fmt.Errorf("outbound %s: disorder and out-of-band bytes need a split position", id)

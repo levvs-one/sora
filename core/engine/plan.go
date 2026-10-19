@@ -302,8 +302,14 @@ type BypassStrategy struct {
 	SplitPos []string
 	// Disorder sends the second part of a split first.
 	Disorder bool
+	// DisorderScope limits disorder to one protocol: "" (both), "http" or
+	// "tls". Needs Disorder.
+	DisorderScope string
 	// OOB sends an out-of-band byte with the split.
 	OOB bool
+	// OOBScope limits the out-of-band byte to one protocol: "" (both),
+	// "http" or "tls". Needs OOB.
+	OOBScope string
 	// TLSRecord splits the ClientHello into two TLS records at a position.
 	TLSRecord string
 	// HostCase reshapes HTTP header casing; DomainCase and MethodEOL also
@@ -311,6 +317,17 @@ type BypassStrategy struct {
 	HostCase   bool
 	DomainCase bool
 	MethodEOL  bool
+	// HostDot adds "." after the Host: name; HostTab and HostNoSpace
+	// reshape the space after Host:; MethodSpace adds an extra space
+	// after the HTTP method; UnixEOL replaces CRLF with LF in plain
+	// HTTP requests.
+	HostDot     bool
+	HostTab     bool
+	HostNoSpace bool
+	MethodSpace bool
+	UnixEOL     bool
+	// SplitAnyProtocol splits every protocol, not only HTTP and TLS.
+	SplitAnyProtocol bool
 }
 
 // Fragment splits proxy TLS ClientHello messages across TCP segments to evade

@@ -31,6 +31,33 @@ func TestRewriteTurnsBypassIntoTheLocalProxy(t *testing.T) {
 	}
 }
 
+func TestArgsCarryTheNewTamperOptions(t *testing.T) {
+	args := Args(engine.BypassStrategy{
+		SplitPos:         []string{"1"},
+		SplitAnyProtocol: true,
+		Disorder:         true, DisorderScope: "tls",
+		OOB: true, OOBScope: "http",
+		HostDot: true, HostTab: true, HostNoSpace: true,
+		MethodSpace: true, UnixEOL: true,
+	}, 4242)
+	want := []string{"--socks", "--bind-addr=127.0.0.1", "--port=4242",
+		"--split-pos=1", "--split-any-protocol",
+		"--disorder=tls", "--oob=http",
+		"--hostdot", "--hosttab", "--hostnospace", "--methodspace", "--unixeol"}
+	if !slices.Equal(args, want) {
+		t.Fatalf("args = %v", args)
+	}
+}
+
+func TestArgsKeepBareDisorderAndOOB(t *testing.T) {
+	args := Args(engine.BypassStrategy{SplitPos: []string{"1"}, Disorder: true, OOB: true}, 4242)
+	for _, flag := range []string{"--disorder", "--oob"} {
+		if !slices.Contains(args, flag) {
+			t.Fatalf("args = %v, missing %s", args, flag)
+		}
+	}
+}
+
 func TestStrategiesAreChecked(t *testing.T) {
 	for name, s := range map[string]*engine.BypassStrategy{
 		"none":              nil,
@@ -38,6 +65,8 @@ func TestStrategiesAreChecked(t *testing.T) {
 		"not a position":    {SplitPos: []string{"1;rm -rf"}},
 		"option smuggled":   {SplitPos: []string{"1 --debug=@/etc/passwd"}},
 		"disorder no split": {Disorder: true, TLSRecord: "sniext"},
+		"bad scope":         {SplitPos: []string{"1"}, Disorder: true, DisorderScope: "udp"},
+		"scope no disorder": {SplitPos: []string{"1"}, OOBScope: "tls"},
 	} {
 		o := engine.Outbound{ID: "z", Protocol: engine.ProtocolBypass, Bypass: s}
 		if err := o.Validate(); err == nil || !strings.Contains(err.Error(), "z") {

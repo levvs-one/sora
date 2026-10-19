@@ -34,10 +34,19 @@ func Args(s engine.BypassStrategy, port int) []string {
 	if len(s.SplitPos) > 0 {
 		args = append(args, "--split-pos="+strings.Join(s.SplitPos, ","))
 	}
-	if s.Disorder {
+	if s.SplitAnyProtocol {
+		args = append(args, "--split-any-protocol")
+	}
+	switch {
+	case s.Disorder && s.DisorderScope != "":
+		args = append(args, "--disorder="+s.DisorderScope)
+	case s.Disorder:
 		args = append(args, "--disorder")
 	}
-	if s.OOB {
+	switch {
+	case s.OOB && s.OOBScope != "":
+		args = append(args, "--oob="+s.OOBScope)
+	case s.OOB:
 		args = append(args, "--oob")
 	}
 	if s.TLSRecord != "" {
@@ -51,6 +60,21 @@ func Args(s engine.BypassStrategy, port int) []string {
 	}
 	if s.MethodEOL {
 		args = append(args, "--methodeol")
+	}
+	if s.HostDot {
+		args = append(args, "--hostdot")
+	}
+	if s.HostTab {
+		args = append(args, "--hosttab")
+	}
+	if s.HostNoSpace {
+		args = append(args, "--hostnospace")
+	}
+	if s.MethodSpace {
+		args = append(args, "--methodspace")
+	}
+	if s.UnixEOL {
+		args = append(args, "--unixeol")
 	}
 	return args
 }
