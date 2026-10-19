@@ -93,18 +93,20 @@ func (w *WFP) Arm(context.Context, []uint16) error {
 	return nil
 }
 
-// Disarm removes the filters by closing the session that owns them.
+// Disarm removes the filters by closing the session that owns them. The
+// session handle is cleared only after a successful close: on failure the
+// filters may still be installed, and dropping the handle would make them
+// unreachable while Armed() wrongly reports false (SORA-M10).
 func (w *WFP) Disarm(context.Context) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	if w.session == nil {
 		return nil
 	}
-	err := w.session.Close()
-	w.session = nil
-	if err != nil {
+	if err := w.session.Close(); err != nil {
 		return refused(err)
 	}
+	w.session = nil
 	return nil
 }
 
