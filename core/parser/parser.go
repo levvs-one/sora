@@ -20,8 +20,6 @@ import (
 	"unicode/utf8"
 
 	"gopkg.in/yaml.v3"
-
-	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 )
 
 const (
@@ -229,15 +227,6 @@ func (o *OutboundSpec) validate() error {
 }
 
 var uuidRE = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$`)
-
-// ToProto converts a validated canonical specification to the stable fields of
-// the control-plane model.
-func (o OutboundSpec) ToProto() (*corev1.OutboundSpec, error) {
-	if err := o.validate(); err != nil {
-		return nil, err
-	}
-	return &corev1.OutboundSpec{Id: o.ID, DisplayName: o.DisplayName, Protocol: o.Protocol, DisplayProtocol: o.DisplayProtocol, Transport: o.Transport, Security: o.Security, Endpoint: &corev1.Endpoint{Host: o.Host, Port: uint32(o.Port)}, Credentials: &corev1.CredentialsRef{Reference: o.UUID}}, nil
-}
 
 // ItemReason identifies a skipped source position and a stable readable reason.
 type ItemReason struct {
