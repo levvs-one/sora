@@ -1124,7 +1124,9 @@ class Sora extends ChangeNotifier {
   Future<void> toggle() async {
     if (cleanupPending) {
       await disconnect();
-    } else if (phase == Phase.off) {
+    } else if (phase == Phase.off || phase == Phase.offline) {
+      // Offline means the core link is down: connect() then reports
+      // app.core_unavailable honestly instead of silently ignoring the tap.
       await connect();
     } else if (phase == Phase.disconnecting) {
       _connectQueued = true;
