@@ -422,6 +422,80 @@ func TestRenderHysteria2BandwidthAndHopping(t *testing.T) {
 	}
 }
 
+// TestRenderHysteria2OmitsZeroBandwidth: unset caps mean BBR, so the
+// renderer must not emit zero up_mbps/down_mbps and accidentally switch
+// the engine to Brutal congestion control.
+func TestRenderHysteria2OmitsZeroBandwidth(t *testing.T) {
+	hy2 := findOutbound(render(t, enginetest.Plan(engine.ProtocolHysteria2)), "hysteria2")
+	if hy2 == nil {
+		t.Fatal("no hysteria2 outbound rendered")
+	}
+	if _, ok := hy2["up_mbps"]; ok {
+		t.Fatalf("zero up_mbps must be omitted: %v", hy2)
+	}
+	if _, ok := hy2["down_mbps"]; ok {
+		t.Fatalf("zero down_mbps must be omitted: %v", hy2)
+	}
+}
+
+func TestRenderNaiveOutbound(t *testing.T) {
+	p := enginetest.Plan(protocolNaive)
+	o := &p.Outbounds[0]
+	o.UserID, o.Password = "naive-user", "naive-test-password"
+	// Fingerprint and ALPN are valid plan knobs for other protocols;
+	// Cronet rejects them on naive, so they must not reach the config.
+	o.TLS = engine.TLS{Enabled: true, ServerName: "naive.example.com", Fingerprint: "chrome", ALPN: []string{"h2"}}
+	cfg := render(t, p)
+	nv := findOutbound(cfg, "naive")
+	if nv == nil {
+		t.Fatal("no naive outbound rendered")
+	}
+	if nv["username"] != "naive-user" || nv["password"] != "naive-test-password" {
+		t.Fatalf("credentials not rendered: %v", nv)
+	}
+	tls, ok := nv["tls"].(map[string]any)
+	if !ok || tls["enabled"] != true || tls["server_name"] != "naive.example.com" {
+		t.Fatalf("naive must carry a minimal tls block: %v", nv["tls"])
+	}
+	for _, key := range []string{"utls", "alpn", "insecure", "reality", "fragment"} {
+		if _, ok := tls[key]; ok {
+			t.Fatalf("naive must not render tls.%s (Cronet owns the handshake): %v", key, tls)
+		}
+	}
+	uot, ok := nv["udp_over_tcp"].(map[string]any)
+	if !ok || uot["enabled"] != true || uot["version"] != float64(2) {
+		t.Fatalf("naive must enable UDP-over-TCP v2: %v", nv["udp_over_tcp"])
+	}
+	if _, ok := nv["transport"]; ok {
+		t.Fatalf("naive carries no transport: %v", nv)
+	}
+}
+
+// TestRenderNaiveFallsBackToServerName: a naive+https link without an
+// explicit sni still needs SNI for Cronet's verification.
+func TestRenderNaiveFallsBackToServerName(t *testing.T) {
+	p := enginetest.Plan(protocolNaive)
+	o := &p.Outbounds[0]
+	o.UserID, o.Password = "naive-user", "naive-test-password"
+	tls := findOutbound(render(t, p), "naive")["tls"].(map[string]any)
+	if tls["server_name"] != "edge.example.com" {
+		t.Fatalf("server_name = %v, want the outbound server", tls["server_name"])
+	}
+}
+
+// TestRenderNaiveRefusesInsecureTLS: Cronet cannot skip verification, and
+// sing-box refuses the option, so the plan must be rejected at render
+// time instead of producing a config the engine cannot start.
+func TestRenderNaiveRefusesInsecureTLS(t *testing.T) {
+	p := enginetest.Plan(protocolNaive)
+	o := &p.Outbounds[0]
+	o.UserID, o.Password = "naive-user", "naive-test-password"
+	o.TLS = engine.TLS{Enabled: true, Insecure: true}
+	if _, err := Render(p, testRuntime); err == nil {
+		t.Fatal("naive with insecure TLS must be refused")
+	}
+}
+
 func TestRenderTUICTuning(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolTUIC)
 	p.Outbounds[0].CongestionControl = "cubic"

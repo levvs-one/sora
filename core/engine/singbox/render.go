@@ -21,6 +21,12 @@ const (
 	geoIPRuleSetURL   = "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-%s.srs"
 )
 
+// protocolNaive is the plan protocol string for NaiveProxy. It has no
+// engine.Protocol constant yet: the link parser, the credential vault and
+// plan validation still need to learn naive+https:// links. The renderer
+// matches it by string so this mapping starts working the moment they do.
+const protocolNaive = engine.Protocol("naive")
+
 // obj models configuration JSON. set omits zero values because some empty
 // values are explicit settings upstream.
 type obj map[string]any
@@ -248,6 +254,21 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	case engine.ProtocolAnyTLS:
 		out.set("type", "anytls").set("password", o.Password)
 		needsTLS = true
+	case protocolNaive:
+		// NaiveProxy speaks HTTPS CONNECT through Cronet, which owns the
+		// whole TLS handshake: sing-box rejects uTLS fingerprints, ALPN
+		// overrides, insecure mode and REALITY on this outbound, so the
+		// generic TLS block must not apply. Needs an engine build with
+		// the with_naive_outbound tag.
+		if o.TLS.Insecure {
+			return nil, fmt.Errorf("singbox: outbound %s: naive cannot skip certificate verification (Cronet manages its own TLS)", o.ID)
+		}
+		out.set("type", "naive").set("username", o.UserID).set("password", o.Password)
+		out["tls"] = obj{"enabled": true}.set("server_name", orDefault(o.TLS.ServerName, o.Server))
+		// UDP only survives as UDP-over-TCP on naive; version 2 is the
+		// current framing. Without it UDP is silently blackholed.
+		out["udp_over_tcp"] = obj{"enabled": true, "version": 2}
+		return out, nil
 	case engine.ProtocolSOCKS5:
 		out.set("type", "socks").set("version", "5").set("username", o.UserID).set("password", o.Password)
 		return out, nil
