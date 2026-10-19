@@ -679,5 +679,9 @@
   "zapretWithVpnHint": "Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.",
   "chainDuplicate": "Each server can appear only once",
   "edit": "Edit",
-  "remove": "Remove"
+  "remove": "Remove",
+  "autoSwitchOnDegrade": "Auto-switch on degradation",
+  "autoSwitchOnDegradeDetail": "If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.",
+  "tunStackMixed": "Mixed",
+  "tunStackSystem": "System"
 }

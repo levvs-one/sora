@@ -2308,6 +2308,18 @@ abstract class S {
   /// **'Remove'**
   String get remove;
 
+  /// **'Auto-switch on degradation'**
+  String get autoSwitchOnDegrade;
+
+  /// **'If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.'**
+  String get autoSwitchOnDegradeDetail;
+
+  /// **'Mixed'**
+  String get tunStackMixed;
+
+  /// **'System'**
+  String get tunStackSystem;
+
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

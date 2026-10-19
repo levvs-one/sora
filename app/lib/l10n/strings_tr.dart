@@ -1482,4 +1482,12 @@ Find one in the catalog or install from a file.';
   String get edit => 'Edit';
   @override
   String get remove => 'Remove';
+  @override
+  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  @override
+  String get autoSwitchOnDegradeDetail => 'If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.';
+  @override
+  String get tunStackMixed => 'Mixed';
+  @override
+  String get tunStackSystem => 'System';
 }
