@@ -157,9 +157,12 @@ type Outbound struct {
 	Flow       string
 	// FlowAuto records that Flow was assigned by plan-level auto-vision
 	// (Outbound.ApplyAutoVision) rather than by the import link or the
-	// user. Stable UI contract: the app shows an "auto" badge next to the
-	// flow when this is true. It is only ever set together with Flow by
-	// ApplyAutoVision; a manually configured flow always leaves it false.
+	// user. Intended UI contract: the app shows an "auto" badge next to
+	// the flow when this is true. (The plan proto does not expose the
+	// flow yet, so nothing consumes the flag today; it rides every
+	// struct copy and is ready for the wire field.) It is only ever set
+	// together with Flow by ApplyAutoVision; a manually configured flow
+	// always leaves it false.
 	FlowAuto   bool
 	Obfs       string
 	ObfsParam  string
