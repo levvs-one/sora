@@ -127,12 +127,14 @@ func (pr Prober) Discover(ctx context.Context, enginesDir string, opts Discovery
 			lastErr = fmt.Errorf("%s is not a file", c.path)
 			continue
 		}
-		probed, err := pr.Probe(ctx, c.path)
-		if err != nil {
+		// Verify the digest before executing anything: a candidate that
+		// fails verification is rejected instead of executed (SORA-H5).
+		if err := checkDigestPath(pr.Kind, c.path, digests, digestsErr, c.fromEnv); err != nil {
 			lastErr = err
 			continue
 		}
-		if err := checkDigest(probed, digests, digestsErr, c.fromEnv); err != nil {
+		probed, err := pr.Probe(ctx, c.path)
+		if err != nil {
 			lastErr = err
 			continue
 		}
@@ -141,13 +143,14 @@ func (pr Prober) Discover(ctx context.Context, enginesDir string, opts Discovery
 	return Binary{}, fmt.Errorf("%s: no usable engine binary (%w); set %s with --allow-env-bin or install it into %q", pr.Kind, lastErr, pr.EnvVar, enginesDir)
 }
 
-// checkDigest enforces the digest manifest for engines-directory candidates.
-// Environment-override candidates are the operator's explicit trust, but are
-// still verified when the manifest knows their binary name.
-func checkDigest(b Binary, digests map[string]string, digestsErr error, fromEnv bool) error {
-	name := strings.ToLower(strings.TrimSuffix(filepath.Base(b.Path), ".exe"))
+// checkDigestPath enforces the digest manifest for a candidate path before
+// the binary is executed. Environment-override candidates are the operator's
+// explicit trust, but are still verified when the manifest knows their binary
+// name.
+func checkDigestPath(kind engine.Kind, path string, digests map[string]string, digestsErr error, fromEnv bool) error {
+	name := strings.ToLower(strings.TrimSuffix(filepath.Base(path), ".exe"))
 	if expected, ok := digests[name]; ok {
-		return b.VerifyDigest(expected)
+		return verifyPathDigest(kind, path, expected)
 	}
 	if fromEnv {
 		// The operator explicitly pointed at this binary with
@@ -155,9 +158,28 @@ func checkDigest(b Binary, digests map[string]string, digestsErr error, fromEnv 
 		return nil
 	}
 	if digestsErr != nil {
-		return fmt.Errorf("%s: refusing %s: %v", b.Kind, b.Path, digestsErr)
+		return fmt.Errorf("%s: refusing %s: %v", kind, path, digestsErr)
 	}
-	return fmt.Errorf("%s: refusing %s: no digest for %q in engines.digests", b.Kind, b.Path, name)
+	return fmt.Errorf("%s: refusing %s: no digest for %q in engines.digests", kind, path, name)
+}
+
+// verifyPathDigest compares a file against an expected hex digest without
+// executing it.
+func verifyPathDigest(kind engine.Kind, path, expected string) error {
+	expected = strings.ToLower(strings.TrimSpace(expected))
+	if expected == "" {
+		return fmt.Errorf("%s: no expected digest", kind)
+	}
+	raw, err := os.ReadFile(path) //nolint:gosec // path is a discovery candidate checked above
+	if err != nil {
+		return fmt.Errorf("%s: read binary: %w", kind, err)
+	}
+	sum := sha256.Sum256(raw)
+	got := hex.EncodeToString(sum[:])
+	if subtle.ConstantTimeCompare([]byte(got), []byte(expected)) != 1 {
+		return fmt.Errorf("%s: digest mismatch: got %s", kind, got)
+	}
+	return nil
 }
 
 // loadDigests reads the engines.digests manifest from the engines directory.
@@ -183,17 +205,5 @@ func loadDigests(enginesDir string) (map[string]string, error) {
 
 // VerifyDigest compares the binary against the checksum the updater recorded.
 func (b Binary) VerifyDigest(expected string) error {
-	if expected == "" {
-		return fmt.Errorf("%s: no expected digest", b.Kind)
-	}
-	raw, err := os.ReadFile(b.Path)
-	if err != nil {
-		return fmt.Errorf("%s: read binary: %w", b.Kind, err)
-	}
-	sum := sha256.Sum256(raw)
-	got := hex.EncodeToString(sum[:])
-	if subtle.ConstantTimeCompare([]byte(got), []byte(strings.ToLower(strings.TrimSpace(expected)))) != 1 {
-		return fmt.Errorf("%s: digest mismatch: got %s", b.Kind, got)
-	}
-	return nil
+	return verifyPathDigest(b.Kind, b.Path, expected)
 }

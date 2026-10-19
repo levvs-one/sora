@@ -20,11 +20,24 @@ const (
 	legacyFakeIPNetwork = "172.19.0.0/16"
 )
 
+// parseBypassNetwork canonicalizes one bypass entry for nft. Only IP
+// addresses and prefixes are expressible in daddr; anything else (domains,
+// garbage, injection attempts) is rejected so the ruleset never
+// interpolates raw input.
+func parseBypassNetwork(entry string) (netip.Prefix, bool) {
+	if prefix, err := netip.ParsePrefix(entry); err == nil {
+		return prefix.Masked(), true
+	}
+	if addr, err := netip.ParseAddr(entry); err == nil {
+		return netip.PrefixFrom(addr, addr.BitLen()), true
+	}
+	return netip.Prefix{}, false
+}
+
 // NftRuleset renders testable kill-switch rules for the engine UID. Bypass
 // networks keep local resources reachable; empty uses private and link-local
 // ranges.
-func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string {
-	networks := bypass
+func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string {	networks := bypass
 	if len(networks) == 0 {
 		networks = DefaultBypassNetworks()
 	}
@@ -50,15 +63,21 @@ func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string 
 	// flows that could bypass TUN.
 	b.WriteString("\t\tct direction reply ct state established,related accept comment \"sora: replies to incoming connections\"\n")
 	for _, network := range networks {
+		prefix, ok := parseBypassNetwork(network)
+		if !ok {
+			// Not an address or prefix: nft cannot express it in daddr,
+			// and interpolating raw text would allow ruleset injection.
+			// Skip it; the kill switch then blocks it instead of
+			// bypassing it (fail closed).
+			continue
+		}
 		// Match each network only against its address family; nft
 		// rejects cross-family rules.
 		family := "ip"
-		if prefix, err := netip.ParsePrefix(network); err == nil && prefix.Addr().Is6() {
-			family = "ip6"
-		} else if addr, err := netip.ParseAddr(network); err == nil && addr.Is6() {
+		if prefix.Addr().Is6() {
 			family = "ip6"
 		}
-		b.WriteString("\t\t" + family + " daddr " + network + " accept comment \"sora: local network bypass\"\n")
+		b.WriteString("\t\t" + family + " daddr " + prefix.Masked().String() + " accept comment \"sora: local network bypass\"\n")
 	}
 	b.WriteString("\t\tcounter drop comment \"sora: kill switch\"\n")
 	b.WriteString("\t}\n")
