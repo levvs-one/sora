@@ -17,6 +17,7 @@ import '../kit.dart';
 import '../../ext/catalog.dart';
 import '../../ext/manifest.dart';
 import '../../ext/package.dart';
+import '../../ext/permissions.dart';
 import '../../ext/store.dart';
 import '../../ext/verifier.dart';
 import 'detail_screen.dart';
@@ -188,8 +189,16 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       }
       hideProgress();
       if (!context.mounted) return;
+      // A widening update shows exactly what is new — with the honest
+      // "Update" title — instead of the full list under "Install".
+      final existing = _store.get(pkg.manifest.id);
+      final added = existing == null
+          ? null
+          : diffPermissions(existing.granted, pkg.manifest.permissions).added;
       final granted = await showInstallPrompt(context,
-          manifest: pkg.manifest, sideload: source != 'catalog');
+          manifest: pkg.manifest,
+          sideload: source != 'catalog',
+          addedPermissions: added == null || added.isEmpty ? null : added);
       if (granted == null || !context.mounted) return;
       showProgress(s.extInstalling);
       try {

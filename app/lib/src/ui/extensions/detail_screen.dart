@@ -101,15 +101,19 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                 trailing: Text(m.author.name, style: Styles.body.copyWith(color: palette.ink2)),
               ),
               if (entry != null) ...[
-                Tile(
-                  title: s.extRating,
-                  trailing: StarRating(rating: entry.rating),
-                ),
-                Tile(
-                  title: s.extInstalls,
-                  trailing: Text('${entry.installs}',
-                      style: Styles.body.copyWith(color: palette.ink2)),
-                ),
+                // Like the cards: missing data is no row, never a fake
+                // 0.0 rating or a "0 installs" line.
+                if (entry.rating > 0)
+                  Tile(
+                    title: s.extRating,
+                    trailing: StarRating(rating: entry.rating),
+                  ),
+                if (entry.installs > 0)
+                  Tile(
+                    title: s.extInstalls,
+                    trailing: Text('${entry.installs}',
+                        style: Styles.body.copyWith(color: palette.ink2)),
+                  ),
               ],
               Tile(
                 title: s.extVersion,
@@ -210,7 +214,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                   runSpacing: 6,
                   children: [
                     if (entry != null) ...[
-                      StarRating(rating: entry.rating),
+                      if (entry.rating > 0) StarRating(rating: entry.rating),
                       ...catalogBadges(context, entry),
                     ] else if (widget.installed?.source != 'catalog')
                       ExtBadge(
