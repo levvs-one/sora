@@ -382,12 +382,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               choices: {'ping': s.autoSelectPing, 'speed': s.autoSelectSpeed, 'smart': s.autoSelectSmart},
               onChanged: (v) => set((x) => x.autoSelectMode = v),
             ),
-            SwitchTile(
-              title: s.autoSwitchOnDegrade,
-              detail: s.autoSwitchOnDegradeDetail,
-              value: settings.autoSwitchOnDegrade,
-              onChanged: (v) => set((x) => x.autoSwitchOnDegrade = v, replan: false),
-            ),
           ],
         ),
 

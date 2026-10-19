@@ -13,6 +13,10 @@ import '../design/theme.dart';
 
 /// A tappable surface with hover feedback and animated press scaling. A null
 /// callback disables interaction.
+///
+/// [semanticButton] exposes the button role to screen readers when the child
+/// is plain text (or an icon already labelled by a [Tooltip]); leave it off
+/// where the call site provides its own [Semantics].
 class Pressable extends StatefulWidget {
   const Pressable({
     super.key,
@@ -21,6 +25,7 @@ class Pressable extends StatefulWidget {
     this.radius = 14,
     this.give = 0.97,
     this.wash = true,
+    this.semanticButton = false,
   });
 
   final Widget child;
@@ -28,6 +33,9 @@ class Pressable extends StatefulWidget {
   final double radius;
   final double give;
   final bool wash;
+
+  /// Whether to wrap the control in `Semantics(button: true)`.
+  final bool semanticButton;
 
   @override
   State<Pressable> createState() => _PressableState();
@@ -49,7 +57,7 @@ class _PressableState extends State<Pressable> {
         : _hover || _focused
         ? palette.hover
         : Colors.transparent;
-    return FocusableActionDetector(
+    final control = FocusableActionDetector(
       enabled: enabled,
       onShowFocusHighlight: (value) => setState(() => _focused = value),
       shortcuts: const {
@@ -93,6 +101,8 @@ class _PressableState extends State<Pressable> {
         ),
       ),
     );
+    if (!widget.semanticButton) return control;
+    return Semantics(button: true, enabled: enabled, child: control);
   }
 }
 
@@ -275,7 +285,8 @@ Future<bool> confirm(
                   radius: 26,
                   wash: false,
                   child: Container(
-                    height: 52,
+                    // minHeight keeps large text scales from clipping the label.
+                    constraints: const BoxConstraints(minHeight: 52),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: destructive ? palette.danger : palette.ink,
@@ -292,11 +303,10 @@ Future<bool> confirm(
                   Pressable(
                     onTap: () => Navigator.of(context).pop(false),
                     radius: 22,
-                    child: SizedBox(
-                      height: 44,
-                      child: Center(
-                        child: Text(s.cancel, style: Styles.body.copyWith(color: palette.ink)),
-                      ),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      alignment: Alignment.center,
+                      child: Text(s.cancel, style: Styles.body.copyWith(color: palette.ink)),
                     ),
                   ),
                 ] else
@@ -312,6 +322,10 @@ Future<bool> confirm(
 }
 
 /// A tappable row with title, optional detail and trailing content.
+///
+/// When [onTap] is set the row exposes button semantics so screen readers
+/// announce it as actionable; [selected] marks toggle-style rows (e.g. the
+/// chain builder's server picker).
 class Tile extends StatelessWidget {
   const Tile({
     super.key,
@@ -322,6 +336,7 @@ class Tile extends StatelessWidget {
     this.detailColor,
     this.titleColor,
     this.titleStyle,
+    this.selected = false,
   });
 
   final String title;
@@ -332,10 +347,13 @@ class Tile extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onTap;
 
+  /// Whether a toggle-style row is currently selected.
+  final bool selected;
+
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    return Pressable(
+    final pressable = Pressable(
       onTap: onTap,
       radius: 8,
       give: 0.99,
@@ -370,17 +388,16 @@ class Tile extends StatelessWidget {
         ),
       ),
     );
+    if (onTap == null) return pressable;
+    return Semantics(button: true, selected: selected, child: pressable);
   }
 }
 
 /// A switch row that toggles when any part of the row is tapped.
 class SwitchTile extends StatelessWidget {
-  const SwitchTile({super.key, required this.title, this.detail, required this.value, required this.onChanged});
+  const SwitchTile({super.key, required this.title, required this.value, required this.onChanged});
 
   final String title;
-
-  /// Honest one-line explanation shown under the title, e.g. a throttle bound.
-  final String? detail;
   final bool value;
   final ValueChanged<bool>? onChanged;
 
@@ -389,7 +406,6 @@ class SwitchTile extends StatelessWidget {
     final palette = Palette.of(context);
     return Tile(
       title: title,
-      detail: detail,
       onTap: onChanged == null ? null : () => onChanged!(!value),
       trailing: CupertinoSwitch(
         value: value,
@@ -442,7 +458,14 @@ class ChoiceTile<T> extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(choices[value] ?? '', style: Styles.secondary.copyWith(color: palette.ink)),
+            Flexible(
+              child: Text(
+                choices[value] ?? '',
+                style: Styles.secondary.copyWith(color: palette.ink),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             const SizedBox(width: 6),
             Icon(Symbols.unfold_more_rounded, size: 14, color: palette.ink3),
           ],
@@ -493,7 +516,9 @@ class Segments<T> extends StatelessWidget {
     final keys = choices.keys.toList();
     final index = keys.indexOf(value);
     return Container(
-      height: 36,
+      // minHeight rather than a fixed height so large text scales grow the
+      // control instead of clipping.
+      constraints: const BoxConstraints(minHeight: 36),
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(11)),
       child: Stack(
@@ -541,6 +566,10 @@ class Segments<T> extends StatelessWidget {
 
 /// Displays the used share of subscription traffic; [alarm] colours it red for
 /// low remaining quota.
+///
+/// Purely decorative: the adjacent text already states the used and total
+/// amounts, so the bar is excluded from semantics to avoid duplicate
+/// announcements.
 class UsageBar extends StatelessWidget {
   const UsageBar({super.key, required this.share, this.alarm = false});
 
@@ -551,11 +580,12 @@ class UsageBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    return SizedBox(
-      height: 4,
-      width: double.infinity,
-      child: DecoratedBox(
-        decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(2)),
+    return ExcludeSemantics(
+      child: SizedBox(
+        height: 4,
+        width: double.infinity,
+        child: DecoratedBox(
+          decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(2)),
         child: TweenAnimationBuilder<double>(
           tween: Tween(end: share),
           duration: Motion.of(context, Motion.slow),
@@ -575,7 +605,7 @@ class UsageBar extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
