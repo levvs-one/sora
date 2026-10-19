@@ -44,7 +44,9 @@ class DesktopShell extends StatefulWidget {
 }
 
 class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver {
-  static const _sectionOrder = [0, 6, 8, 4, 1, 3, 5, 7];
+  // Connections (2) restored to its 1.0.7 slot: 8th item, Ctrl+8.
+  // About (7) stays last and is pinned at the sidebar bottom.
+  static const _sectionOrder = [0, 6, 8, 4, 1, 3, 5, 2, 7];
   final _scaffold = GlobalKey<ScaffoldState>();
   final _tourKeys = List.generate(5, (_) => GlobalKey());
   final _focus = FocusNode();
@@ -224,6 +226,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
       LogicalKeyboardKey.digit6,
       LogicalKeyboardKey.digit7,
       LogicalKeyboardKey.digit8,
+      LogicalKeyboardKey.digit9,
     ];
     final index = numbers.indexOf(key);
     if (index >= 0) {
@@ -432,7 +435,8 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
           ),
         ),
         const SizedBox(height: 20),
-        for (final index in _sectionOrder.take(7))
+        // The last section (About) is pinned at the sidebar bottom below.
+        for (final index in _sectionOrder.take(_sectionOrder.length - 1))
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             child: index == 5 && !drawer
