@@ -178,6 +178,18 @@ func TestConnectRefusesABadTokenBeforeTouchingAnything(t *testing.T) {
 	}
 }
 
+func TestExportDiagnosticsRefusesABadToken(t *testing.T) {
+	server, _ := newTestServer(t)
+	_, err := server.ExportDiagnostics(context.Background(), &corev1.ExportDiagnosticsRequest{
+		ApiVersion:           clientVersion(),
+		ControlAuthenticator: []byte("not the token at all, and long enough to compare"),
+		RequestId:            "req-diag-1",
+	})
+	if status.Code(err) != codes.Unauthenticated {
+		t.Fatalf("ExportDiagnostics() with a wrong token = %v, code = %s", err, status.Code(err))
+	}
+}
+
 func TestConnectRefusesAClientItCannotServe(t *testing.T) {
 	server, _ := newTestServer(t)
 	_, err := server.Connect(context.Background(), &corev1.ConnectRequest{

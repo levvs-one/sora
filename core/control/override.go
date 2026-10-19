@@ -130,7 +130,13 @@ func (s *Server) SaveSubscriptionOverride(ctx context.Context, req *corev1.SaveS
 		o.Hidden = append(o.Hidden, h)
 	}
 	// Extra rules ride the same file; the client merges them into the
-	// session plan it builds.
+	// session plan it builds. This request carries no extra_rules field,
+	// so preserve whatever is already stored instead of wiping it.
+	if !req.GetClear() {
+		if existing, err := s.subs.overrides.Load(id); err == nil && existing != nil {
+			o.ExtraRules = existing.ExtraRules
+		}
+	}
 	if req.GetClear() {
 		o = &subscription.Override{}
 	}

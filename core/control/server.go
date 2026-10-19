@@ -1288,6 +1288,9 @@ func (s *Server) ExportDiagnostics(ctx context.Context, req *corev1.ExportDiagno
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return nil, transportStatus(err)
 	}
+	if err := s.auth.Check(req.GetControlAuthenticator()); err != nil {
+		return nil, transportStatus(err)
+	}
 	if req.GetFormat() != corev1.DiagnosticFormat_DIAGNOSTIC_FORMAT_UNSPECIFIED {
 		err := errs.Newf(errs.CodeUnsupported, errs.KeyInvalidRequest,
 			"control: raw diagnostic formats are not available; the core only exports the redacted archive")

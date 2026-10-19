@@ -440,3 +440,63 @@ func TestSchedulerPausesWhileKillSwitchHolds(t *testing.T) {
 		time.Sleep(10 * time.Millisecond)
 	}
 }
+
+func TestSaveSubscriptionOverridePreservesExtraRules(t *testing.T) {
+	srv, _ := bookServer(t, t.TempDir(), &panel{body: servers("a")})
+	const subID = "0011223344556677"
+	srv.subs.records[subID] = &subscriptionRecord{ID: subID, URL: "https://panel.example/sub/abc"}
+	srv.subs.overrides = subscription.NewOverrideStore(t.TempDir())
+
+	seed := &subscription.Override{ExtraRules: []subscription.OverrideRule{
+		{Destination: "example.com", OutboundID: "s1"},
+	}}
+	if err := srv.subs.overrides.Save(subID, seed); err != nil {
+		t.Fatalf("seeding extra rules: %v", err)
+	}
+
+	ver := &corev1.ApiVersion{Major: 1, Minor: 0}
+	token := make([]byte, TokenLen)
+	resp, err := srv.SaveSubscriptionOverride(context.Background(), &corev1.SaveSubscriptionOverrideRequest{
+		ApiVersion:           ver,
+		ControlAuthenticator: token,
+		SubscriptionId:       subID,
+		Renames:              map[string]string{"s1": "Home"},
+	})
+	if err != nil {
+		t.Fatalf("SaveSubscriptionOverride() error = %v", err)
+	}
+	if resp.GetError() != nil {
+		t.Fatalf("SaveSubscriptionOverride() response error = %v", resp.GetError())
+	}
+	got, err := srv.subs.overrides.Load(subID)
+	if err != nil {
+		t.Fatalf("reloading override: %v", err)
+	}
+	if len(got.ExtraRules) != 1 || got.ExtraRules[0].Destination != "example.com" {
+		t.Fatalf("extra rules were not preserved: %+v", got.ExtraRules)
+	}
+	if got.Renames["s1"] != "Home" {
+		t.Fatalf("rename was not applied: %+v", got.Renames)
+	}
+
+	// Negative: Clear=true wipes everything, including extra rules.
+	resp, err = srv.SaveSubscriptionOverride(context.Background(), &corev1.SaveSubscriptionOverrideRequest{
+		ApiVersion:           ver,
+		ControlAuthenticator: token,
+		SubscriptionId:       subID,
+		Clear:                true,
+	})
+	if err != nil {
+		t.Fatalf("clear: error = %v", err)
+	}
+	if resp.GetError() != nil {
+		t.Fatalf("clear: response error = %v", resp.GetError())
+	}
+	got, err = srv.subs.overrides.Load(subID)
+	if err != nil {
+		t.Fatalf("reloading after clear: %v", err)
+	}
+	if len(got.ExtraRules) != 0 || len(got.Renames) != 0 {
+		t.Fatalf("clear must wipe everything, got %+v", got)
+	}
+}
