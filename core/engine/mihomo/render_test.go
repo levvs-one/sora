@@ -90,7 +90,7 @@ func TestRenderProducesEveryBlockTheEngineNeeds(t *testing.T) {
 		"IP-CIDR6,2001:db8::/32,Tokyo_01",
 		"MATCH,Berlin_H2",
 		"enhanced-mode: fake-ip",
-		"fake-ip-range: 198.18.0.1/16",
+		"fake-ip-range: 198.18.0.0/15",
 		"stack: mixed",
 		"mtu: 1420",
 		"geox-url:",

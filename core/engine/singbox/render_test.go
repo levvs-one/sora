@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/netip"
 	"os"
+	"regexp"
 	"runtime"
 	"strings"
 	"testing"
@@ -578,9 +579,26 @@ func TestFakeIPExcludesLANAndLocalDomains(t *testing.T) {
 			seen[s.(string)] = true
 		}
 	}
-	for _, want := range []string{"lan", "local", "home.arpa", "invalid", "localhost", "msftconnecttest.com", "msftncsi.com"} {
+	for _, want := range []string{"lan", "local", "home.arpa", "invalid", "localhost", "msftconnecttest.com", "msftncsi.com",
+		"time.windows.com", "time.google.com", "time.cloudflare.com", "time.apple.com", "pool.ntp.org",
+		"stun.l.google.com", "stun1.l.google.com", "stun.stunprotocol.org"} {
 		if !seen[want] {
 			t.Errorf("default fake-ip exclusion for %q missing before the fakeip rule", want)
+		}
+	}
+	// Interior wildcards (ntp.*.com, +.stun.*.*) must be expanded to
+	// domain_regex, never silently dropped (S7).
+	regexes := map[string]bool{}
+	for _, r := range rules[:fakeIdx] {
+		if res, ok := r["domain_regex"].([]any); ok && r["server"] != "fakeip" {
+			for _, re := range res {
+				regexes[re.(string)] = true
+			}
+		}
+	}
+	for _, want := range []string{`(?i)^ntp\..+\.com$`, `(?i)^(.+\.)?stun\..+\..+$`} {
+		if !regexes[want] {
+			t.Errorf("interior wildcard not expanded to domain_regex: want %q, got %v", want, regexes)
 		}
 	}
 	for _, r := range rules {
@@ -624,6 +642,105 @@ func TestFakeIPHonorsPlanFilter(t *testing.T) {
 	}
 	if lan {
 		t.Error("default filter leaked in despite a plan filter")
+	}
+}
+
+// TestFakeIPFilterPatternConversion pins the mihomo-syntax to sing-box
+// conversion: plain suffixes collapse, interior wildcards become anchored
+// regexes, and nothing is ever silently dropped (S7).
+func TestFakeIPFilterPatternConversion(t *testing.T) {
+	for _, tc := range []struct {
+		pattern    string
+		wantSuffix string
+		wantRegex  string
+	}{
+		{"*.lan", "lan", ""},
+		{"+.msftconnecttest.com", "msftconnecttest.com", ""},
+		{".example.com", "example.com", ""},
+		{"localhost", "localhost", ""},
+		{"time.windows.com", "time.windows.com", ""},
+		{"ntp.*.com", "", `(?i)^ntp\..+\.com$`},
+		{"+.stun.*.*", "", `(?i)^(.+\.)?stun\..+\..+$`},
+		{"*.stun.*.*", "", `(?i)^(.+\.)stun\..+\..+$`},
+		{"", "", ""},
+		{"   ", "", ""},
+	} {
+		suffix, regex := fakeIPFilterPattern(tc.pattern)
+		if suffix != tc.wantSuffix || regex != tc.wantRegex {
+			t.Errorf("fakeIPFilterPattern(%q) = (%q, %q), want (%q, %q)",
+				tc.pattern, suffix, regex, tc.wantSuffix, tc.wantRegex)
+		}
+		if regex != "" {
+			if _, err := regexp.Compile(regex); err != nil {
+				t.Errorf("fakeIPFilterPattern(%q) produced an invalid regex %q: %v", tc.pattern, regex, err)
+			}
+		}
+	}
+}
+
+// TestFakeIPWildcardMatchesHostsAndNotStrangers is the behavioral half of
+// the S7 expansion: the emitted matchers must catch real NTP/STUN hosts
+// and must not catch an unrelated domain.
+func TestFakeIPWildcardMatchesHostsAndNotStrangers(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS.Mode = string(engine.DNSFakeIP)
+	p.DNS.FakeIPFilter = []string{"ntp.*.com", "+.stun.*.*", "time.windows.com"}
+	rules := dnsRules(t, p)
+	var regexes []*regexp.Regexp
+	suffixes := map[string]bool{}
+	for _, r := range rules {
+		if r["server"] == "fakeip" {
+			continue
+		}
+		if ss, ok := r["domain_suffix"].([]any); ok {
+			for _, s := range ss {
+				suffixes[s.(string)] = true
+			}
+		}
+		if rs, ok := r["domain_regex"].([]any); ok {
+			for _, re := range rs {
+				compiled, err := regexp.Compile(re.(string))
+				if err != nil {
+					t.Fatalf("invalid domain_regex %q: %v", re, err)
+				}
+				regexes = append(regexes, compiled)
+			}
+		}
+	}
+	if len(regexes) != 2 {
+		t.Fatalf("interior wildcards dropped: got %d domain_regex rules, want 2", len(regexes))
+	}
+	if !suffixes["time.windows.com"] {
+		t.Error("time.windows.com not rendered as a suffix rule")
+	}
+	match := func(host string) bool {
+		for _, re := range regexes {
+			if re.MatchString(host) {
+				return true
+			}
+		}
+		return false
+	}
+	for _, host := range []string{"ntp.vendor.com", "a.stun.example.com", "stun.l.google.com"} {
+		if !match(host) {
+			t.Errorf("filter must match %q", host)
+		}
+	}
+	// NOTE: `*` compiles to `.+` (documented superset of mihomo's label
+	// wildcard), so ntp.evil.com.attacker.com still matches the ntp
+	// pattern — over-matching a filter entry is harmless, it only
+	// resolves for real.
+	for _, host := range []string{"example.com", "evilntp.com", "ntp.evil.org", "notstun.example.com"} {
+		if match(host) {
+			t.Errorf("filter must not match unrelated host %q", host)
+		}
+	}
+	// stun1.l.google.com is NOT matched by +.stun.*.* — the wildcard's
+	// first label is exactly "stun", not "stun1". The numbered Google
+	// hosts are covered by explicit entries in DefaultFakeIPFilter
+	// instead; this pins that contract.
+	if match("stun1.l.google.com") {
+		t.Error("+.stun.*.* must not match the stun1 label")
 	}
 }
 
@@ -767,8 +884,11 @@ func TestFakeIPRendersIPv6RangeWhenIPv6IsOn(t *testing.T) {
 	if srv["inet6_range"] != "fc00::/18" {
 		t.Fatalf("default inet6_range = %v, want fc00::/18", srv["inet6_range"])
 	}
-	if srv["inet4_range"] != "198.18.0.0/16" {
-		t.Fatalf("inet4_range = %v, want 198.18.0.0/16", srv["inet4_range"])
+	if srv["inet4_range"] != "198.18.0.0/15" {
+		t.Fatalf("inet4_range = %v, want 198.18.0.0/15", srv["inet4_range"])
+	}
+	if srv["inet4_range"] != engine.DefaultFakeIPRange {
+		t.Fatalf("inet4_range = %v, want the shared engine default %q", srv["inet4_range"], engine.DefaultFakeIPRange)
 	}
 	p.DNS.FakeIPRange6 = "fd00:face::/48"
 	if srv := fakeIPServer(t, p); srv["inet6_range"] != "fd00:face::/48" {
@@ -778,7 +898,8 @@ func TestFakeIPRendersIPv6RangeWhenIPv6IsOn(t *testing.T) {
 
 // TestFakeIPOmitsIPv6RangeWhenIPv6IsOff locks the negative: with IPv6
 // disabled a fake IPv6 pool would hand out unusable addresses, so the
-// server must stay v4-only and AAAA keeps getting NODATA.
+// server must stay v4-only and AAAA must not be steered at it either
+// (S7) — it resolves for real instead of stalling on NODATA.
 func TestFakeIPOmitsIPv6RangeWhenIPv6IsOff(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolVLESS)
 	p.DNS.Mode = string(engine.DNSFakeIP)
@@ -786,6 +907,50 @@ func TestFakeIPOmitsIPv6RangeWhenIPv6IsOff(t *testing.T) {
 	srv := fakeIPServer(t, p)
 	if _, ok := srv["inet6_range"]; ok {
 		t.Fatalf("inet6_range must be omitted with IPv6 off, got %v", srv["inet6_range"])
+	}
+	for _, r := range dnsRules(t, p) {
+		if r["server"] != "fakeip" {
+			continue
+		}
+		types, ok := r["query_type"].([]any)
+		if !ok {
+			t.Fatal("fakeip rule lost its query_type")
+		}
+		for _, qt := range types {
+			if qt.(string) == "AAAA" {
+				t.Fatal("AAAA must not reach the fakeip server with IPv6 off")
+			}
+		}
+	}
+}
+
+// TestFakeIPSteersAAAAWhenIPv6IsOn is the positive half of the S7 AAAA
+// gate: with IPv6 enabled both query types reach the fakeip server,
+// which then answers AAAA from its own pool.
+func TestFakeIPSteersAAAAWhenIPv6IsOn(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS.Mode = string(engine.DNSFakeIP)
+	p.Options.IPv6 = true
+	found := false
+	for _, r := range dnsRules(t, p) {
+		if r["server"] != "fakeip" {
+			continue
+		}
+		found = true
+		types, ok := r["query_type"].([]any)
+		if !ok {
+			t.Fatal("fakeip rule lost its query_type")
+		}
+		seen := map[string]bool{}
+		for _, qt := range types {
+			seen[qt.(string)] = true
+		}
+		if !seen["A"] || !seen["AAAA"] {
+			t.Fatalf("fakeip query_type = %v, want [A AAAA] with IPv6 on", types)
+		}
+	}
+	if !found {
+		t.Fatal("no fakeip catch-all rule rendered")
 	}
 }
 

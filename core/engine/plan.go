@@ -312,17 +312,59 @@ type DNS struct {
 	HijackTun        []string
 }
 
+// DefaultFakeIPRange is the fake-address pool every engine renders when the
+// plan does not pin one (S7): the full RFC 2544 benchmarking range
+// 198.18.0.0/15. One shared constant — sing-box, mihomo and the TUN
+// preparer can never desync, and mihomo's cache.db invalidation keys off
+// the masked pool, so a desync would silently mix stale mappings.
+const DefaultFakeIPRange = "198.18.0.0/15"
+
+// DefaultFakeIPRange6 is the IPv6 fake-address pool, rendered only when the
+// IPv6 option is on.
+const DefaultFakeIPRange6 = "fc00::/18"
+
 // DefaultFakeIPFilter is the plan-level fallback for domains that must get
-// real addresses: LAN/mDNS names, NTP, and OS connectivity checks. Renderers
-// apply it when DNS.FakeIPFilter is empty.
+// real addresses: LAN/mDNS names, NTP, STUN and OS connectivity checks.
+// Renderers apply it when DNS.FakeIPFilter is empty.
+//
+// The list is written in mihomo wildcard syntax, which both renderers
+// understand. sing-box has no domain_suffix spelling for interior
+// wildcards (ntp.*.com, +.stun.*.*), so the sing-box renderer converts
+// those to domain_regex — never silently dropping them (S7): a silent
+// drop hands NTP/STUN hosts fake IPs on sing-box while mihomo resolves
+// them for real, desyncing the engines and breaking time sync.
+//
+// time.*.com is expanded into explicit well-known public NTP servers
+// (S7: expand interior wildcards into explicit suffixes). The residual
+// ntp.*.com keeps exact wildcard semantics via domain_regex on sing-box:
+// vendor NTP hosts have no finite well-known list, and over-matching a
+// filter entry is harmless (the domain simply resolves for real).
 var DefaultFakeIPFilter = []string{
 	"*.lan",
 	"*.local",
 	"*.home.arpa",
 	"*.invalid",
 	"localhost",
-	"time.*.com",
+	// NTP, expanded from time.*.com (S7).
+	"time.windows.com",
+	"time.google.com",
+	"time.cloudflare.com",
+	"time.apple.com",
+	"time.nist.gov",
+	"ntp.ubuntu.com",
+	"+.pool.ntp.org",
 	"ntp.*.com",
+	// STUN: a fake IP breaks WebRTC connectivity checks (S7).
+	// +.stun.*.* covers stun.<host>.<tld>; the numbered Google hosts use
+	// a stun<N> label the wildcard cannot spell, so they are listed
+	// explicitly — same expansion principle as the NTP list above.
+	"stun.l.google.com",
+	"stun1.l.google.com",
+	"stun2.l.google.com",
+	"stun3.l.google.com",
+	"stun4.l.google.com",
+	"stun.stunprotocol.org",
+	"+.stun.*.*",
 	"+.msftconnecttest.com",
 	"+.msftncsi.com",
 }
