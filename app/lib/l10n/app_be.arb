@@ -1,0 +1,476 @@
+{
+  "@@locale": "be",
+  "stateOff": "Не падключана",
+  "stateConnecting": "Падключэнне",
+  "stateConnected": "Падключана",
+  "stateReconnecting": "Паўторнае падключэнне",
+  "stateDisconnecting": "Адключэнне",
+  "stateFailed": "Не падключана",
+  "coreMissing": "Служба Sora не адказвае",
+  "serverAuto": "Самы хуткі",
+  "serverBypass": "Няма сервера",
+  "addSubscription": "Дадаць падпіску",
+  "servers": "Серверы",
+  "settings": "Налады",
+  "subscription": "Падпіска",
+  "subscriptionLink": "Спасылка на падпіску",
+  "add": "Дадаць",
+  "refresh": "Абнаўленне",
+  "rename": "Перайменаваць",
+  "delete": "Выдаліць",
+  "cancel": "Адмяніць",
+  "save": "Захаваць",
+  "name": "Імя",
+  "deleteSubscription": "Выдаліць “{name}”?",
+  "routes": "Маршруты",
+  "presetGlobal": "Усё праз VPN",
+  "presetRu": "Расія прамая",
+  "presetIr": "Іран наўпрост",
+  "presetCn": "Кітай наўпрост",
+  "blockAds": "Блакіраваць рэкламу",
+  "killSwitch": "Інтэрнэт толькі праз VPN",
+  "engine": "Рухавік",
+  "engineAuto": "Аўто",
+  "animations": "Анімацыі",
+  "logs": "Журнал",
+  "about": "Аб",
+  "logsAll": "Усе",
+  "logsImportant": "Важны",
+  "logsErrors": "Памылкі",
+  "search": "Пошук",
+  "export": "Захаваць у файл",
+  "clear": "Ясна",
+  "logsEmpty": "Нічога тут",
+  "appVersion": "Версія {version}",
+  "notInstalled": "Не ўстаноўлены",
+  "sourceCode": "Зыходны код",
+  "license": "Ліцэнзія",
+  "usage": "{used} з {total}",
+  "until": "да {date}",
+  "expired": "Пратэрмінаваны",
+  "milliseconds": "{n} мс",
+  "bytesB": "{n} B",
+  "bytesKB": "{n} КБ",
+  "bytesMB": "{n} Мб",
+  "bytesGB": "{n} ГБ",
+  "bytesTB": "{n} ТБ",
+  "errGeneric": "Нешта пайшло не так",
+  "errCore": "Служба Sora не адказвае",
+  "errAuth": "Няма доступу да службы Sora",
+  "errVersion": "Абнаўленне Sora: праграма і сэрвіс маюць розныя версіі",
+  "errBusy": "Пачакайце, папярэдняя каманда ўсё яшчэ выконваецца",
+  "errEngineMissing": "Для гэтага сервера не знойдзены механізм",
+  "errEngineStart": "Рухавік не завёўся",
+  "errEngineStopped": "Рухавік спыніўся",
+  "errTunnel": "Няма дазволу на стварэнне злучэння VPN",
+  "errServers": "Сервер наладжаны з памылкай",
+  "errNetwork": "Немагчыма падключыцца да сервера",
+  "errTimeout": "Сервер не адказаў своечасова",
+  "errFirewall": "Немагчыма заблакіраваць інтэрнэт па-за VPN",
+  "errSubFetch": "Не атрымалася загрузіць падпіску",
+  "errSubFormat": "Гэта не спасылка для падпіскі",
+  "errSubEmpty": "Падпіска не мае сервераў",
+  "errSubDuplicate": "Гэта падпіска ўжо дададзена",
+  "errSubLimit": "Занадта шмат падпісак",
+  "errSubScheme": "Спасылка павінна пачынацца з https://",
+  "errSecretStore": "Назапашвальнік Sora пашкоджаны або недаступны",
+  "errNoServers": "Каб падключыцца, дадайце падпіску",
+  "exportText": "Тэкст",
+  "connections": "Сувязі",
+  "close": "Блізка",
+  "chainDirect": "Прамы",
+  "chainBlocked": "Заблакіраваны",
+  "theme": "Тэма",
+  "themeSystem": "System",
+  "themeLight": "Святло",
+  "themeDark": "Цёмны",
+  "language": "мова",
+  "languageSystem": "System",
+  "sectionConnection": "Злучэнне",
+  "sectionNoServer": "Няма сервера",
+  "sectionPing": "Пінг",
+  "sectionLog": "Дыягностыка",
+  "ipv6": "IPv6",
+  "dns": "DNS",
+  "dnsAuto": "Аўто",
+  "dnsHint": "Адрасы праз коску",
+  "fragment": "Фрагментацыя TLS",
+  "fragmentPackets": "Што падзяліць",
+  "fragmentLength": "Памер кавалка",
+  "fragmentInterval": "Паўза паміж часткамі",
+  "byDefault": "Па змаўчанні",
+  "rangeHint": "Напрыклад, 100-200",
+  "splitPos": "Раздзяленне пазіцый",
+  "splitPosHint": "Напрыклад, 1, midsld",
+  "disorder": "Змяніць парадак частак",
+  "tlsRecord": "Раздзяліць запіс TLS",
+  "tlsRecordNo": "няма",
+  "tlsRecordSni": "На назву сайта",
+  "tlsRecordFirst": "Пасля першага байта",
+  "hostCase": "Змяніць рэгістр хаста",
+  "probeMethod": "Метад",
+  "probeAuto": "Аўто",
+  "probeEngine": "Праз рухавік",
+  "probeConnect": "Толькі злучэнне",
+  "probeUrl": "Тэставы адрас",
+  "probeTimeout": "Пачакай",
+  "seconds": "{n} с",
+  "subscriptions": "Падпіскі",
+  "subscriptionSettings": "Налады",
+  "userAgent": "Карыстальніцкі агент",
+  "autoUpdate": "Аўтаматычнае абнаўленне",
+  "updateInterval": "Як часта",
+  "intervalProvider": "Як просіць правайдэр",
+  "hours": "{n} ч",
+  "updateNow": "Абнавіце зараз",
+  "logLevel": "Што запісаць",
+  "levelDebug": "усё",
+  "levelInfo": "Звычайны",
+  "levelWarning": "Важны",
+  "levelError": "Толькі памылкі",
+  "recordDestinations": "Запіс адрасоў сайтаў",
+  "reset": "Скінуць налады",
+  "resetConfirm": "Скінуць усе налады?",
+  "resetAction": "Скінуць",
+  "invalidValue": "Гэта значэнне не будзе працаваць",
+  "website": "Старонка падпіскі",
+  "providerWebsite": "Сайт правайдэра",
+  "support": "Падтрымка",
+  "controlPortQuestion": "{engine} кіруецца праз порт на гэтым кампутары. Іншыя праграмы змогуць вызначыць, што VPN уключаны.",
+  "chooseEngine": "Выберыце {engine}",
+  "rules": "Індывідуальныя правілы",
+  "ruleAdd": "Новае правіла",
+  "ruleHint": "Сайт, IP або праграма",
+  "ruleDirect": "Прамы",
+  "ruleProxy": "Праз VPN",
+  "ruleBlock": "Блок",
+  "failover": "Збой уключэння",
+  "connectOnStart": "Падключэнне пры запуску",
+  "trafficLow": "{name}: {left} злева",
+  "ruleInvalid": "Гэта не падобна на сайт, IP або праграму",
+  "tunnelMode": "Рэжым",
+  "tunnelTun": "Увесь трафік",
+  "tunnelProxy": "System проксі",
+  "proxyAddress": "Адрас проксі",
+  "copied": "Скапіравана",
+  "launchAtLogin": "Пачніце з сістэмы",
+  "closeToTray": "Захоўваць у латку ў закрытым выглядзе",
+  "notifications": "Апавяшчэнні",
+  "trayOpen": "Адкрыйце Sora",
+  "trayConnect": "Злучыцца",
+  "trayDisconnect": "Адключыцца",
+  "trayServer": "Сервер",
+  "trayQuit": "Выйсці з Sora",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora: {state}, {server}",
+  "noticeInTray": "Sora усё яшчэ ў трэі",
+  "noticeInTrayBody": "Выйдзіце з меню яго значка",
+  "noticeLost": "Злучэнне страчана",
+  "noticeLostBody": "Sora паўторна падключаецца",
+  "noticeRestored": "Зноў падключаны",
+  "noticeFailed": "Не ўдалося падключыцца",
+  "noticeBackup": "Галоўны сервер не адказваў; рэзервовая копія пераносіць трафік",
+  "noticeNext": "Сервер не адказаў; наступны нясе рух",
+  "noticeMainBack": "Галоўны сервер зноў адказвае і пераносіць трафік",
+  "noticeSubscription": "Падпіска",
+  "importTitle": "Дадаць гэту падпіску?",
+  "importSealed": "Гэта спасылка зашыфравана для Happ, і толькі Happ можа яе прачытаць. Спытайце ў свайго пастаўшчыка простую спасылку для падпіскі.",
+  "understood": "добра",
+  "noAnswer": "няма адказу",
+  "home": "дадому",
+  "navRules": "правілы",
+  "navConnections": "Сувязі",
+  "navLogs": "Лагі",
+  "navAbout": "Аб",
+  "sidebarToggle": "Пераключыць бакавую панэль",
+  "more": "больш",
+  "less": "менш",
+  "currentServer": "Бягучы сервер",
+  "trafficDown": "Спампавана",
+  "trafficUp": "Запампавана",
+  "perSecond": "{value}/с",
+  "activeRules": "Актыўныя правілы: {count}",
+  "recentNotifications": "Апошнія апавяшчэнні",
+  "notificationsEmpty": "Тут з'явяцца падзеі падключэння і падпіскі",
+  "retryConnect": "Паўтарыце падключэнне",
+  "openLogs": "Адкрытыя лагі",
+  "tourReplay": "Зноў паказаць кіраўніцтва",
+  "tourStep": "Крок {step} з 5",
+  "tourBack": "Назад",
+  "tourNext": "Далей",
+  "tourSkip": "Прапусціць",
+  "tourFinish": "Гатова",
+  "tourAdd": "Дадайце спасылку на падпіску вашага правайдэра.",
+  "tourServer": "Выберыце сервер. «Самы хуткі» выбірае для вас адзін.",
+  "tourConnect": "Націсніце тут, каб падключыцца або адключыцца.",
+  "tourMode": "Выберыце рэжым. Kill Switch блакуе Інтэрнэт, калі VPN падае.",
+  "tourSettings": "Адкрыйце налады. Вы можаце паўтарыць гэта кіраўніцтва там.",
+  "chooseProgram": "Выберыце праграму",
+  "installedApps": "Усталяваныя прыкладанні",
+  "runningProcesses": "Запушчаныя працэсы",
+  "programsFailed": "Не атрымалася загрузіць праграмы",
+  "programsEmpty": "Праграмы не знойдзены. Паспрабуйце іншую назву.",
+  "selectExe": "Выберыце файл .exe",
+  "trafficUnavailable": "Лічыльнікаў пакуль няма",
+  "speedtest": "хуткасць",
+  "speedtestCheck": "Праверце хуткасць",
+  "speedtestSearch": "Знайдзіце паслугу",
+  "speedtestEmpty": "Супадзенняў няма. Змяніць пошук.",
+  "speedtestBackToList": "Вярнуцца да паслуг",
+  "speedtestOpenBrowser": "Адкрыць у браўзеры",
+  "speedtestUnavailable": "Не атрымалася запусціць убудаваны браўзер. Адкрыйце службу ў сістэмным браўзеры.",
+  "speedtestPageFailed": "Не атрымалася загрузіць старонку. Перазагрузіце яго або адкрыйце службу ў сістэмным браўзеры.",
+  "speedtestExternalFailed": "Не ўдалося адкрыць сістэмны браўзер. Паспрабуйце яшчэ раз.",
+  "modes": "Рэжымы",
+  "proxyShort": "Проксі",
+  "tunMode": "Увесь рух (TUN)",
+  "checkUpdates": "Праверце наяўнасць абнаўленняў",
+  "updates": "Абнаўленні праграм",
+  "updateAvailable": "Даступная версія {version}",
+  "updateOpenAbout": "Паглядзець абнаўленне",
+  "updateNotes": "Змены ў {version}",
+  "updateCheck": "Праверце наяўнасць абнаўленняў",
+  "updateChecking": "Ідзе праверка...",
+  "updateNoNotes": "Рэліз не мае заўваг.",
+  "updateDropWarning": "VPN-злучэнне абарвецца на некалькі секунд, пакуль Sora і яго асноўнае абнаўленне. Працягнуць?",
+  "updateWaitConnection": "Пачакайце, пакуль VPN-злучэнне і ядро ​​будуць гатовыя.",
+  "updateDownloading": "Ідзе загрузка і праверка файлаў...",
+  "updateInstalling": "Падрыхтоўка абнаўлення або чаканне аўтэнтыфікацыі адміністратара...",
+  "updateNetworkError": "Не атрымалася спампаваць абнаўленне. Паспрабуйце яшчэ раз.",
+  "updateReleaseError": "Даныя выпуску або неабходныя файлы адсутнічаюць або несапраўдныя.",
+  "updateChecksumError": "Загрузка не адпавядае SHA256SUMS. Нічога не было ўстаноўлена.",
+  "updateInstallError": "Абнаўленне не завершана. Магчыма, аўтэнтыфікацыя была адменена.",
+  "updateUnsupported": "Гэты выкананы файл не належыць падтрымоўванай пары пакетаў Sora. Выкарыстоўвайце інструкцыі па ўсталёўцы выпуску.",
+  "updateManual": "Запусціце гэту каманду ў тэрмінале, каб усталяваць абодва правераныя пакеты, затым зноў адкрыйце Sora. Файлы застаюцца ў каталогу загрузкі. VPN-злучэнне абарвецца.",
+  "updateCopyCommand": "Капіяваць каманду",
+  "updateChecksDisabled": "Аўтаматычныя праверкі адключаны ў наладах.",
+  "updateInstalled": "Абнаўленне ўстаноўлена. Паўторна адкрыць Sora.",
+  "projectLinks": "Праект",
+  "githubReleases": "Рэлізы і спампоўкі",
+  "telegramChannel": "Канал Telegram",
+  "licenses": "Ліцэнзіі",
+  "componentLicenses": "Ліцэнзіі на кампаненты",
+  "appCopyright": "© 2026 levvs-one і ўдзельнікі",
+  "collapseServers": "Згарнуць серверы",
+  "expandServers": "Пашырыць серверы",
+  "hideDescription": "Схаваць апісанне",
+  "showDescription": "Паказаць апісанне",
+  "pendingConnectionChanges": "Падключыцеся паўторна, каб прымяніць гэтыя змены.",
+  "reconnectNow": "Падайце заяўку і паўторна падключыцеся",
+  "bypassLimitations": "Гэты рэжым абыходзіць DPI толькі для HTTP і TLS, не падтрымлівае UDP і не змяняе ваш IP. Выкарыстоўвайце сервер VPN для галасавых выклікаў, выклікаў і заблакіраваных адрасоў Telegram.",
+  "errEngineUnsupported": "Абраны механізм не падтрымлівае гэты профіль або налады. Выберыце Аўто або сумяшчальны рухавік.",
+  "errRestore": "Ачыстка злучэння была няпоўная. Паўтарыць адключэнне; падрабязнасці глядзіце ў журнале.",
+  "errSessionEnded": "Гэты сеанс ужо скончыўся. Абнавіць стан злучэння.",
+  "retryDisconnect": "Паўтарыце спробу адключэння",
+  "tunStack": "Стэк TUN",
+  "modesInfo": "Аб рэжымах",
+  "modesGuideTitle": "Рэжымы і рухавікі",
+  "probeServers": "Праверце серверы",
+  "expiresIn": "{name}: {days, plural, =0{падпіска заканчваецца праз некалькі гадзін} one{падпіска заканчваецца праз дзень #} other{падпіска заканчваецца праз # дзён}}",
+  "groupOrdered": "{count, plural, one{Сервер #, у сваю чаргу} other{Серверы #, у сваю чаргу}}",
+  "groupBest": "{count, plural, one{Сервер #, самы хуткі} other{Серверы #, самыя хуткія}}",
+  "modesGuide": "Выберыце «Аўта», калі вы не ўпэўненыя, які механізм патрэбны вашаму серверу. Sora правярае профіль і налады перад падключэннем. Механізм не можа павялічыць прапускную здольнасць вашага плана: прадукцыйнасць залежыць ад сервера, маршруту, пратакола і сеткі.\n\n## Рэжымы\n\n### Увесь трафік (TUN)\n\nSora стварае віртуальны сеткавы інтэрфейс і накіроўвае праз яго трафік прыкладанняў, уключаючы TCP і UDP. Выкарыстоўвайце гэты рэжым для Telegram, гульняў і голасу Discord. Правілы могуць адпраўляць пэўныя сайты або праграмы непасрэдна або блакіраваць іх. Сеткавай службе патрэбны дазвол і сервер, які падтрымлівае патрэбны пратакол.\n\n### System проксі\n\nSora канфігуруе лакальны проксі HTTP/SOCKS. Праграмы, якія выконваюць сістэмныя налады проксі, выкарыстоўваюць яго. Прыкладанні з уласным сеткавым стэкам могуць падключацца напрамую; UDP і галасавыя выклікі звычайна патрабуюць TUN. Гэты рэжым падыходзіць для браўзераў і праграм з падтрымкай проксі.\n\n### Няма сервера\n\nНа Linux Sora выкарыстоўвае [zapret](https://github.com/bol-van/zapret) для падзелу і змены формы запытаў HTTP/TLS і абыходу некаторых праверак DPI. Ваш IP-адрас застаецца ранейшым, і злучэнне ідзе непасрэдна на вэб-сайт. Вынікі залежаць ад вашага правайдэра і спосабу блакіроўкі.\n\nБягучая інтэграцыя выкарыстоўвае tpws для HTTP і TLS праз TCP. Ён не абыходзіць блакіроўку IP і не рэтранслюе UDP і не можа гарантаваць злучэнні MTProto Telegram. Выкарыстоўвайце сервер VPN з TUN для голасу Discord, выклікаў Telegram і такіх абмежаванняў.\n\n## Рухавікі\n\n### Аўта\n\nSora выбірае ўсталяваны механізм, які падтрымлівае ўвесь план злучэння: пратаколы сервера, транспарты, групы, фрагментацыю і рэжым. Несумяшчальны ручной выбар адхіляецца перад спыненнем бягучага злучэння. Выберыце «Аўта» або іншы механізм і прымяніце налады яшчэ раз.\n\n### sing-box\n\nНовыя пакеты Sora уключаюць [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box), дадаючы на ​​баку кліента XHTTP і VLESS Encryption. Sora распазнае зборку і яе магчымасці. Верхняя зборка без XHTTP не атрымлівае гэтай магчымасці толькі з-за назвы.\n\nПадтрымліваюцца пратаколы VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard і параметры AmneziaWG 1.x/2.x Sora можна імпартаваць. Поўныя профілі Xray JSON патрабуюць Xray. Новыя палі AWG 3.x пакуль нельга імпартаваць. sing-box выкарыстоўвае лакальны порт кіравання, абаронены паролем, які могуць выявіць іншыя прыкладанні на кампутары.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) падтрымлівае VLESS, REALITY, XHTTP, VLESS Encryption і фрагментацыю TLS. Ён таксама запускае поўныя профілі правайдэраў Xray, захоўваючы іх маршрутызацыю і групы. Такія профілі нельга аўтаматычна пераўтварыць у іншы рухавік без змены іх паводзін.\n\nУ камплекце Xray выдалена налада, якая адключае праверку сертыфіката TLS (`allowInsecure`). Аўтаматычна выбірае sing-box або mihomo для звычайных сервераў, якія патрабуюць гэтай налады. Выбар Xray паведамляе аб несумяшчальнасці ўручную перад спыненнем бягучага злучэння. Для старых поўных профіляў JSON патрабуецца абноўлены профіль пастаўшчыка з сертыфікатам, які можна правяраць, або PIN-кодам сертыфіката.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) падтрымлівае ўпарадкаваныя рэзервовыя групы і групы балансавання нагрузкі, XHTTP і AmneziaWG. Выберыце яго, калі важны аўтаматычны пераход на рэзервовы сервер. Налада фрагментацыі TLS Sora недаступная з гэтым рухавіком.\n\n## Сумяшчальнасць у Sora\n\n| Функцыя | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN і TCP/UDP | Так | Так | Так |\n| XHTTP | Так | Так | Так |\n| VLESS Encryption | Так | Так | Так |\n| Поўны профіль Xray | Няма | Так | Няма |\n| TUIC / AnyTLS | Абодва | Няма | TUIC |\n| Фрагментацыя TLS | Так | Так | Няма |\n| AmneziaWG 1.x/2.x | Так¹ | Няма | Так |\n| Упарадкаваная рэзервовая група | Няма | №² | Так |\n\n¹ Профілі з J1/J2/J3/Itime выкарыстоўваюць mihomo; гэтыя палі ніколі не павінны моўчкі адкідвацца. ² Для групы поўных профіляў Xray праграма выбірае рэзервовы профіль. Падтрымка залежыць ад усталяванай зборкі; праверце яго версію ў About.\n\n## Стэк TUN\n\nСтэк апрацоўвае TCP і UDP у віртуальным інтэрфейсе. На панэлі рэжымаў Xray і mihomo прапануюць gVisor, System, Mixed і MIPS. Кожны рухавік захоўвае свае перавагі. Рэжымы System проксі і бессерверны не выкарыстоўваюць гэты параметр.\n\n- **Mixed** — TCP выкарыстоўвае сістэмны стэк, а gVisor апрацоўвае UDP. Гэта варыянт па змаўчанні для mihomo у Linux. У Windows Xray і mihomo па змаўчанні выкарыстоўваюць MIPS.\n- **System** — выкарыстоўвае сістэмны стэк. Паспрабуйце іншы варыянт, калі сеткавыя праграмы сутыкнуцца з праблемамі.\n- **gVisor** — апрацоўвае трафік у карыстальніцкай прасторы.\n- **MIPS** — уласны IP-стэк mihomo, даступны ў камплектаванай версіі 1.19.32.\n\nНа Linux Xray выкарыстоўвае ўбудаваны gVisor па змаўчанні. System, Mixed і MIPS на Linux выкарыстоўваюць mihomo у якасці рухавіка TUN, перанакіроўваючы TCP і UDP на Xray па аўтэнтыфікаванай лакальнай спасылцы SOCKS. Xray захоўвае пратакол, профіль правайдэра і маршрутызацыю. Гэтыя тры варыянты патрабуюць усталяванага mihomo. На Windows Xray выкарыстоўвае mihomo 1.19.32 або навейшы для ўсіх чатырох стэкаў TUN. Пратаколы і маршрутызацыя застаюцца ў Xray. Правілы праграм у гэтай звязцы падтрымліваюць толькі прамое злучэнне і блакіроўку; на Linux яны патрабуюць убудаванага gVisor Xray.\n\nМост запускае другі працэс. У трох вымярэннях без працы на Linux ён выкарыстаў прыблізна на 32–36 МіБ больш фізічнай памяці, чым уласны Xray TUN. Гэта не вымярае загрузку загрузкі: кошт працэсара і памяці залежыць ад злучэнняў. sing-box не мае селектара стэка. Ні адзін стэк не гарантуе лепшай прадукцыйнасці ў любой сетцы. Выберыце стэк і выберыце «Ужыць» і паўторна падключыцеся, каб паспрабаваць яго ў вашай сетцы.\n\n## Прымяненне налад\n\nПры выбары сервера падключэнне адбываецца аўтаматычна. Налады рэжыму, рухавіка, DNS і правіл захоўваюцца неадкладна; падчас актыўнага злучэння націсніце \"Ужыць\" і паўторна падключыцеся, каб выкарыстоўваць іх. Перазапуск рухавіка можа перапыніць загрузку і выклікі. Паўторныя пстрычкі не запускаюць паралельныя злучэнні; адключэнне завяршае пераход і вызваляе злучэнне.\n\nІнтэрнэт толькі праз VPN блакуе прамы трафік пры абрыве тунэля. Гэта ўплывае на ўсю машыну. Яўнае адключэнне выдаляе правілы Sora. Калі ачыстка не завершана, паўтарыце спробу адключэння і адкрыйце журнал.\n\n## Праектная дакументацыя\n\n- [sing-box-lx: канфігурацыя і падтрымка] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box дакументацыя] (https://sing-box.sagernet.org/)\n- [Xray дакументацыя](https://xtls.github.io/)\n- [Дакументацыя mihomo] (https://wiki.metacubex.one/)\n- [zapret: праца і абмежаванні] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosticEvents": "Windows падзеі",
+  "extensions": "Пашырэнні",
+  "diagnosticUnavailable": "Гэтая дыягностыка недаступная на гэтай платформе.",
+  "exportLogFile": "У {name}",
+  "diagnosticCapture": "Захоп на 10 секунд",
+  "diagnosticHttp": "HTTP дыягностыка",
+  "diagnosticPackets": "Захоп пакета",
+  "diagnosticNoData": "Пакуль няма запісаных запытаў. Спачатку адкрыйце вэб-сайт для праверкі хуткасці.",
+  "diagnosticRequiresTun": "Для захопу пакетаў патрабуецца актыўнае злучэнне Sora TUN.",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}

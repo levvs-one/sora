@@ -1,0 +1,113 @@
+import 'dart:io';
+
+import 'package:grpc/grpc.dart';
+import 'package:grpc/service_api.dart' as api;
+import 'package:retry/retry.dart';
+
+import '../generated/sora/core/v1/core_control.pbgrpc.dart';
+import '../generated/sora/custom/v1/custom.pbgrpc.dart';
+import '../generated/sora/leak/v1/leak.pbgrpc.dart';
+import '../obfs.dart';
+import 'pipe.dart';
+
+/// API 1.11 adds the leak-test suite and the traffic obfuscation suite
+/// (ObfsControl: uTLS, fragmentation, jitter); 1.10 exposes proxy chains and
+/// zapret-with-VPN in SessionPlan, network profiles and chain probing; 1.9
+/// adds throughput benchmarks, 1.8 DNS leak diagnostics. 1.6 is required to
+/// open subscription pages without exposing links in states. The client offers
+/// the newest minor it speaks and the core negotiates down, so older cores
+/// keep working for the fields they know.
+final apiVersion = ApiVersion(major: 1, minor: 11, minSupportedMinor: 6);
+
+/// A gRPC channel to the core over a Unix socket or Windows named pipe, with
+/// the Handshake authentication token.
+class CoreLink {
+  CoreLink._(this._channel, this.stub, this.custom, this.leak, this.obfs, this.token, this.minor);
+
+  final api.ClientChannel _channel;
+  final CoreControlClient stub;
+
+  /// User-added servers (sora.custom.v1); the core may not implement it yet.
+  final CustomServersClient custom;
+
+  /// Leak-test suite (sora.leak.v1, API 1.11).
+  final LeakServiceClient leak;
+
+  /// Traffic obfuscation (sora.obfs.v1, API 1.11); the core may not
+  /// implement it yet.
+  final ObfsControlClient obfs;
+  final List<int> token;
+  final int minor;
+
+  /// The installed service endpoint: Unix socket on Linux, named pipe on
+  /// Windows. SORA_CORE_SOCKET overrides it for a manually started core using
+  /// -socket.
+  static String get socketPath =>
+      Platform.environment['SORA_CORE_SOCKET'] ??
+      (Platform.isWindows ? r'\\.\pipe\sora-core-v1' : '/run/sora/core.sock');
+
+  /// Opens a core connection with increasing retry delays while the service
+  /// starts or restarts after an update.
+  static Future<CoreLink> open({void Function(Exception)? onRetry, bool Function()? canceled}) {
+    return const RetryOptions(maxAttempts: 1 << 30, maxDelay: Duration(seconds: 5)).retry(
+      _openOnce,
+      retryIf: (e) => !(canceled?.call() ?? false) && e is GrpcError && e.code != StatusCode.permissionDenied,
+      onRetry: onRetry,
+    );
+  }
+
+  static Future<CoreLink> _openOnce() async {
+    const options = ChannelOptions(credentials: ChannelCredentials.insecure());
+    final api.ClientChannel channel = Platform.isWindows
+        ? ClientTransportConnectorChannel(
+            PipeConnector(socketPath, requireService: Platform.environment['SORA_CORE_SOCKET'] == null),
+            options: options,
+          )
+        : ClientChannel(InternetAddress(socketPath, type: InternetAddressType.unix), port: 0, options: options);
+    try {
+      final stub = CoreControlClient(channel);
+      final answer = await stub.handshake(
+        HandshakeRequest(clientVersion: apiVersion),
+        options: CallOptions(timeout: const Duration(seconds: 5)),
+      );
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      return CoreLink._(channel, stub, CustomServersClient(channel), LeakServiceClient(channel),
+          ObfsControlClient(channel), answer.controlAuthenticator, answer.negotiatedVersion.minor);
+    } catch (_) {
+      await channel.shutdown();
+      rethrow;
+    }
+  }
+
+  Future<void> close() => _channel.shutdown();
+}
+
+/// A core or app failure identified by a message catalog key.
+class CoreFailure implements Exception {
+  const CoreFailure(this.key);
+
+  /// A core catalog key, such as "core.engine.start_failed", or an app key
+  /// under "app.".
+  final String key;
+
+  static const unavailable = CoreFailure('app.core_unavailable');
+
+  /// Converts a request exception to a failure with a message catalog key.
+  static CoreFailure from(Object error) {
+    if (error is CoreFailure) return error;
+    if (error is GrpcError) {
+      // Transport errors from the core use "<code> <catalog key>".
+      final key = (error.message ?? '').split(' ').last;
+      if (key.startsWith('core.')) return CoreFailure(key);
+      return switch (error.code) {
+        StatusCode.unavailable || StatusCode.deadlineExceeded || StatusCode.cancelled => unavailable,
+        StatusCode.unauthenticated || StatusCode.permissionDenied => const CoreFailure('core.auth.unauthenticated'),
+        _ => const CoreFailure('core.internal.unexpected'),
+      };
+    }
+    return const CoreFailure('core.internal.unexpected');
+  }
+
+  @override
+  String toString() => key;
+}

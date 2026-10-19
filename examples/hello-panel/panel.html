@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hello Panel</title>
+<style>
+  :root { color-scheme: dark light; }
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  p.sub { opacity: .65; margin: 0 0 16px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid rgba(127,127,127,.25); }
+  th { opacity: .6; font-weight: 600; }
+  .empty { opacity: .6; padding: 24px 0; text-align: center; }
+  .err { color: #b3261e; padding: 12px; border: 1px solid currentColor; border-radius: 8px; }
+  .row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  button { padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(127,127,127,.4); background: transparent; color: inherit; cursor: pointer; }
+  button:hover { background: rgba(127,127,127,.15); }
+</style>
+</head>
+<body>
+<h1>Hello, Sora!</h1>
+<p class="sub">This panel reads live connections through the extension API.</p>
+<div class="row">
+  <button id="refresh">Refresh</button>
+  <button id="notify">Send test notification</button>
+</div>
+<div id="content"><div class="empty">Loading…</div></div>
+<script>
+  const content = document.getElementById('content');
+
+  function fmtBytes(n) {
+    if (n < 1024) return n + ' B';
+    const u = ['KB', 'MB', 'GB', 'TB'];
+    let i = -1;
+    do { n /= 1024; i++; } while (n >= 1024 && i < u.length - 1);
+    return n.toFixed(1) + ' ' + u[i];
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  async function load() {
+    try {
+      const conns = await window.soraExt.call('getConnections');
+      if (!conns || conns.length === 0) {
+        content.innerHTML = '<div class="empty">No active connections.</div>';
+        return;
+      }
+      let html = '<table><tr><th>Process</th><th>Host</th><th>Down</th><th>Up</th></tr>';
+      for (const c of conns) {
+        html += '<tr><td>' + esc(c.process || '—') + '</td><td>' + esc(c.host || '—') +
+          '</td><td>' + fmtBytes(c.down_bytes || 0) + '</td><td>' + fmtBytes(c.up_bytes || 0) + '</td></tr>';
+      }
+      content.innerHTML = html + '</table>';
+    } catch (e) {
+      content.innerHTML = '<div class="err">Could not load connections: ' + esc(e && e.message || e) + '</div>';
+    }
+  }
+
+  document.getElementById('refresh').addEventListener('click', load);
+  document.getElementById('notify').addEventListener('click', async () => {
+    try {
+      await window.soraExt.call('notify', {title: 'Hello Panel', body: 'The extension API works.'});
+    } catch (e) { /* surfaced in the panel console */ }
+  });
+
+  // Live updates when the session state changes.
+  if (window.soraExt && window.soraExt.onEvent) {
+    window.soraExt.onEvent((kind) => {
+      if (kind === 'session.connected' || kind === 'session.disconnected') load();
+    });
+  }
+
+  load();
+  setInterval(load, 5000);
+</script>
+</body>
+</html>

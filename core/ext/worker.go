@@ -1,0 +1,355 @@
+// Background workers (runtime v2): periodic tasks for extensions that
+// declare the "background" capability and hold the "background" permission.
+//
+// A worker runs in WorkerEnv, a deliberately small sandbox: it can append
+// to the extension log and, only when the extension also holds "net.fetch",
+// make allowlisted HTTP requests through the extension's own Fetcher. There
+// is no filesystem, no process control, no raw network. The app-side JS
+// runner executes the manifest's worker script inside this envelope; the
+// Go WorkerFunc below is the seam where the host plugs that runner in.
+//
+// Scheduling: the declared interval_minutes is clamped into
+// [MinWorkerInterval, MaxWorkerInterval]. Every run's outcome — success or
+// failure, including a recovered panic — is written to the extension log.
+package ext
+
+import (
+	"context"
+	"fmt"
+	"hash/fnv"
+	"net/http"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"time"
+
+	"github.com/levvs-one/sora-client/core/errs"
+)
+
+// Worker scheduling bounds. The 15-minute floor keeps a buggy or hostile
+// extension from hot-looping the device; the 7-day ceiling matches the
+// largest declarable manifest interval.
+const (
+	MinWorkerInterval = 15 * time.Minute
+	MaxWorkerInterval = 7 * 24 * time.Hour
+	// WorkerRunTimeout bounds one worker execution.
+	WorkerRunTimeout = 5 * time.Minute
+	// maxConsecutiveWorkerFailures is the circuit breaker: a task whose run
+	// keeps failing is unregistered (stopped) after this many consecutive
+	// failures. A permanently broken worker must not burn CPU, log volume
+	// and battery forever; the next app start re-registers it from the
+	// stored manifest, so a fixed extension recovers on its own.
+	maxConsecutiveWorkerFailures = 10
+)
+
+// ClampWorkerInterval maps a declared interval in minutes to the effective
+// schedule: at least MinWorkerInterval, at most MaxWorkerInterval.
+func ClampWorkerInterval(minutes int) time.Duration {
+	d := time.Duration(minutes) * time.Minute
+	if d < MinWorkerInterval {
+		return MinWorkerInterval
+	}
+	if d > MaxWorkerInterval {
+		return MaxWorkerInterval
+	}
+	return d
+}
+
+// WorkerEnv is the limited environment one worker run executes in. It is
+// intentionally narrow: logging plus optional allowlisted fetching. A nil
+// Fetcher means the extension was not granted "net.fetch", and Fetch then
+// reports a permission error instead of touching the network.
+type WorkerEnv struct {
+	extID   string
+	log     *ExtLog
+	fetcher *Fetcher
+}
+
+// Logf appends a formatted line to the extension's log.
+func (e *WorkerEnv) Logf(format string, args ...any) {
+	e.log.Append(LogInfo, fmt.Sprintf(format, args...))
+}
+
+// Fetch performs an allowlisted HTTP request on the worker's behalf. It
+// fails closed when the extension lacks the "net.fetch" permission.
+func (e *WorkerEnv) Fetch(ctx context.Context, req FetchRequest) (*FetchResponse, error) {
+	if e.fetcher == nil {
+		e.log.Append(LogWarn, "fetch DENIED: extension was not granted the \"net.fetch\" permission")
+		return nil, errs.Newf(errs.CodePermissionDenied, KeyNetFetchDenied,
+			"ext: net.fetch requires the %q permission", "net.fetch")
+	}
+	return e.fetcher.Fetch(ctx, req)
+}
+
+// WorkerFunc is one worker execution. A nil error means success; anything
+// else (or a panic) is recorded in the extension log as a failed run.
+type WorkerFunc func(ctx context.Context, env *WorkerEnv) error
+
+// WorkerTask is a registered periodic task.
+type WorkerTask struct {
+	ExtensionID string
+	// Interval is the effective, clamped schedule.
+	Interval time.Duration
+	// Entry is the manifest's worker script (for the app-side JS runner).
+	Entry string
+
+	run     WorkerFunc
+	fetcher *Fetcher
+	// running guards against overlapping runs: when a run overruns the
+	// interval, the next tick is skipped instead of piling up.
+	running atomic.Bool
+	// fails counts consecutive failed runs for the circuit breaker.
+	fails atomic.Int32
+	// ctx is the task loop's context, derived from the scheduler's run
+	// context. It is canceled when the task is unregistered, replaced, or
+	// the scheduler stops, so no ticker loop outlives its task.
+	ctx  context.Context
+	stop context.CancelFunc // cancels ctx; nil until the scheduler starts
+}
+
+// Scheduler owns background tasks for enabled extensions.
+type Scheduler struct {
+	mu     sync.Mutex
+	tasks  map[string]*WorkerTask
+	hub    *LogHub
+	runCtx context.Context // non-nil while Start..Stop is active
+	stop   context.CancelFunc
+	wg     sync.WaitGroup
+	// fetchTransport, when set, supplies the HTTP transport for an
+	// extension's net.fetch. Production wiring must return a transport
+	// bound to the core's tunnel (local proxy), so extension traffic
+	// follows the VPN instead of leaking direct. Nil (tests, dev) means
+	// direct dials. Set before Start/Register; not safe to change while
+	// running.
+	fetchTransport func(extensionID string) http.RoundTripper
+}
+
+// NewScheduler returns a scheduler writing to hub. A nil hub gets a fresh
+// one.
+func NewScheduler(hub *LogHub) *Scheduler {
+	if hub == nil {
+		hub = NewLogHub()
+	}
+	return &Scheduler{tasks: map[string]*WorkerTask{}, hub: hub}
+}
+
+// Hub exposes the log sink the scheduler writes to.
+func (s *Scheduler) Hub() *LogHub { return s.hub }
+
+// SetFetchTransport installs the hook that supplies the HTTP transport for
+// an extension's net.fetch (see the fetchTransport field). Call before
+// Start/Register.
+func (s *Scheduler) SetFetchTransport(fn func(extensionID string) http.RoundTripper) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.fetchTransport = fn
+}
+
+// fetchTransportFor returns the configured transport for extID, or nil for
+// direct dials.
+func (s *Scheduler) fetchTransportFor(extID string) http.RoundTripper {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.fetchTransport == nil {
+		return nil
+	}
+	return s.fetchTransport(extID)
+}
+
+// Register validates the manifest pair and installs the task. It requires
+// the "background" capability and permission plus a declared
+// background_task; the interval is clamped (see ClampWorkerInterval). A nil
+// run is rejected. Re-registering an extension replaces its task.
+func (s *Scheduler) Register(m *Manifest, x *ManifestExt, run WorkerFunc) error {
+	if m == nil || x == nil || x.Background == nil {
+		return errs.Newf(errs.CodeInvalidArgument, KeyBackgroundInvalid,
+			"ext: background worker needs a manifest with background_task")
+	}
+	if !hasCapability(m, "background") {
+		return errs.Newf(errs.CodeInvalidArgument, KeyBackgroundInvalid,
+			`ext: background worker requires the "background" capability`)
+	}
+	if !hasPermission(m, "background") {
+		return errs.Newf(errs.CodePermissionDenied, KeyBackgroundInvalid,
+			`ext: background worker requires the "background" permission`)
+	}
+	if run == nil {
+		return errs.Newf(errs.CodeInvalidArgument, KeyBackgroundInvalid,
+			"ext: background worker needs a run function")
+	}
+	var fetcher *Fetcher
+	if hasPermission(m, "net.fetch") {
+		f, err := NewFetcherForExtensionWithTransport(m.ID, x, FetchLimits{}, s.fetchTransportFor(m.ID), s.hub)
+		if err != nil {
+			return err
+		}
+		fetcher = f
+	}
+	task := &WorkerTask{
+		ExtensionID: m.ID,
+		Interval:    ClampWorkerInterval(x.Background.IntervalMinutes),
+		Entry:       x.Background.Entry,
+		run:         run,
+		fetcher:     fetcher,
+	}
+	s.mu.Lock()
+	if old, ok := s.tasks[m.ID]; ok && old.stop != nil {
+		// Replacing a running task: stop the old ticker loop first, or
+		// two loops would fire for the same extension.
+		old.stop()
+	}
+	s.tasks[m.ID] = task
+	var taskCtx context.Context
+	if s.runCtx != nil {
+		taskCtx, task.stop = context.WithCancel(s.runCtx)
+		task.ctx = taskCtx
+	}
+	s.mu.Unlock()
+	s.hub.Log(m.ID).Append(LogInfo,
+		fmt.Sprintf("background worker registered: every %s (declared %d min), entry %s",
+			task.Interval, x.Background.IntervalMinutes, task.Entry))
+	if taskCtx != nil {
+		s.startLoopWith(task)
+	}
+	return nil
+}
+
+// Unregister removes the extension's task, if any, and stops its ticker
+// loop.
+func (s *Scheduler) Unregister(extID string) {
+	s.mu.Lock()
+	task, ok := s.tasks[extID]
+	delete(s.tasks, extID)
+	s.mu.Unlock()
+	if ok && task.stop != nil {
+		task.stop()
+	}
+}
+
+// Task returns the registered task for extID.
+func (s *Scheduler) Task(extID string) (*WorkerTask, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	t, ok := s.tasks[extID]
+	return t, ok
+}
+
+// Start begins ticking all registered tasks. It is idempotent; tasks
+// registered while running start ticking immediately.
+func (s *Scheduler) Start(ctx context.Context) {
+	s.mu.Lock()
+	if s.runCtx != nil {
+		s.mu.Unlock()
+		return
+	}
+	runCtx, cancel := context.WithCancel(ctx)
+	s.runCtx = runCtx
+	s.stop = cancel
+	tasks := make([]*WorkerTask, 0, len(s.tasks))
+	for _, t := range s.tasks {
+		tasks = append(tasks, t)
+		t.ctx, t.stop = context.WithCancel(runCtx)
+	}
+	s.mu.Unlock()
+	for _, t := range tasks {
+		s.startLoopWith(t)
+	}
+}
+
+// Stop halts all task loops and waits for in-flight runs to finish.
+func (s *Scheduler) Stop() {
+	s.mu.Lock()
+	if s.runCtx == nil {
+		s.mu.Unlock()
+		return
+	}
+	stop := s.stop
+	s.runCtx = nil
+	s.stop = nil
+	s.mu.Unlock()
+	stop()
+	s.wg.Wait()
+}
+
+// startLoopWith runs the ticker loop for one task until the task's context
+// ends (unregistered, replaced, or scheduler stopped).
+func (s *Scheduler) startLoopWith(task *WorkerTask) {
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+		// Stagger the first run so N extensions enabled at once do not
+		// fire simultaneously; the stagger is deterministic per
+		// extension id and bounded by one minute.
+		h := fnv.New32a()
+		_, _ = h.Write([]byte(task.ExtensionID))
+		stagger := time.Duration(h.Sum32()%60) * time.Second
+		timer := time.NewTimer(stagger + task.Interval)
+		defer timer.Stop()
+		for {
+			select {
+			case <-task.ctx.Done():
+				return
+			case <-timer.C:
+				s.runOnce(task)
+				timer.Reset(task.Interval)
+			}
+		}
+	}()
+}
+
+// runOnce executes one task run with a timeout, recovers panics, and logs
+// the outcome to the extension's log.
+//
+// Two guards keep one bad worker from hurting the host:
+//   - overlap: a run that overruns the interval makes the next tick skip
+//     instead of piling concurrent runs onto the device;
+//   - circuit breaker: after maxConsecutiveWorkerFailures consecutive
+//     failures the task is unregistered (stopped) with an error in the log.
+//     The extension itself stays installed and enabled; the next app start
+//     re-registers its worker from the stored manifest.
+func (s *Scheduler) runOnce(task *WorkerTask) {
+	if !task.running.CompareAndSwap(false, true) {
+		s.hub.Log(task.ExtensionID).Append(LogWarn,
+			"background worker run skipped: the previous run is still in flight")
+		return
+	}
+	defer task.running.Store(false)
+	ctx, cancel := context.WithTimeout(context.Background(), WorkerRunTimeout)
+	defer cancel()
+	env := &WorkerEnv{extID: task.ExtensionID, log: s.hub.Log(task.ExtensionID), fetcher: task.fetcher}
+	start := time.Now()
+	err := func() (err error) {
+		defer func() {
+			if r := recover(); r != nil {
+				err = errs.Newf(errs.CodeInvalidArgument, KeyWorkerFailed,
+					"ext: background worker panicked: %v", r)
+			}
+		}()
+		return task.run(ctx, env)
+	}()
+	elapsed := time.Since(start).Truncate(time.Millisecond)
+	if err != nil {
+		n := task.fails.Add(1)
+		s.hub.Log(task.ExtensionID).Append(LogError,
+			fmt.Sprintf("background worker run failed after %s: %v", elapsed, oneLine(err, 300)))
+		if n >= maxConsecutiveWorkerFailures {
+			s.hub.Log(task.ExtensionID).Append(LogError,
+				fmt.Sprintf("background worker stopped after %d consecutive failures; it will be re-registered on the next start", n))
+			s.Unregister(task.ExtensionID)
+		}
+		return
+	}
+	task.fails.Store(0)
+	s.hub.Log(task.ExtensionID).Append(LogInfo,
+		fmt.Sprintf("background worker run ok (%s)", elapsed))
+}
+
+// oneLine collapses an error to a single bounded line for logs.
+func oneLine(err error, max int) string {
+	s := strings.ReplaceAll(strings.ReplaceAll(err.Error(), "\n", " "), "\r", " ")
+	s = strings.Join(strings.Fields(s), " ")
+	if len(s) > max {
+		s = s[:max] + "…"
+	}
+	return s
+}

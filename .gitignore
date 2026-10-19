@@ -1,0 +1,51 @@
+.vs/
+*.user
+*.pdb
+**/guiLogs/
+**/guiTemps/
+**/guiBackups/
+**/guiConfigs/
+**/guiNConfig.json
+**/statistics.json
+**/user-wininet.json
+
+# Go
+/core/bin/
+/core/dist/
+*.test
+*.out
+/core/coverage.*
+
+# Flutter and Dart
+/app/.dart_tool/
+/app/build/
+/app/.flutter-plugins
+/app/.flutter-plugins-dependencies
+/app/coverage/
+
+# Android and Gradle
+.gradle/
+local.properties
+/app/android/**/build/
+*.jks
+*.keystore
+key.properties
+
+# Build output
+/dist/
+/artifacts/
+
+# Secrets
+.env
+.env.*
+
+# Editors and operating systems
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Written by flutter pub get because android/ exists; the Android app is not set up yet.
+/app/android/app/

@@ -1,0 +1,860 @@
+syntax = "proto3";
+
+package sora.core.v1;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/levvs-one/sora-client/core/gen/sora/core/v1;corev1";
+
+// CoreControl is the local control-plane API for the Sora core service.
+service CoreControl {
+  rpc Connect(ConnectRequest) returns (ConnectResponse);
+  rpc Disconnect(DisconnectRequest) returns (DisconnectResponse);
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+  rpc WatchEvents(WatchEventsRequest) returns (stream CoreEvent);
+  rpc ParseImport(ParseImportRequest) returns (ParseImportResponse);
+  rpc FetchSubscription(FetchSubscriptionRequest) returns (FetchSubscriptionResponse);
+  rpc ProbeServers(ProbeServersRequest) returns (stream ProbeResult);
+  rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
+  rpc RunDiagnostics(RunDiagnosticsRequest) returns (RunDiagnosticsResponse);
+  rpc ExportDiagnostics(ExportDiagnosticsRequest) returns (ExportDiagnosticsResponse);
+  rpc SetKillSwitch(SetKillSwitchRequest) returns (SetKillSwitchResponse);
+  rpc Handshake(HandshakeRequest) returns (HandshakeResponse);
+  // Since 1.3. What the "About" screen shows about the core. Nothing in it is
+  // personal, so it needs no authenticator.
+  rpc GetAbout(GetAboutRequest) returns (GetAboutResponse);
+  // Since 1.3. The routing presets and what each of them sends direct.
+  rpc GetRoutingPresets(GetRoutingPresetsRequest) returns (GetRoutingPresetsResponse);
+
+  // Since 1.3. The log center: one bounded in-memory record of the core and
+  // every engine. Every call needs the control authenticator, because the
+  // record and the connection list describe where a person goes.
+  rpc QueryLogs(QueryLogsRequest) returns (QueryLogsResponse);
+  rpc WatchLogs(WatchLogsRequest) returns (stream LogEntry);
+  rpc ExportLogs(ExportLogsRequest) returns (ExportLogsResponse);
+  rpc ClearLogs(ClearLogsRequest) returns (ClearLogsResponse);
+  rpc GetLogSettings(GetLogSettingsRequest) returns (GetLogSettingsResponse);
+  rpc SetLogSettings(SetLogSettingsRequest) returns (SetLogSettingsResponse);
+
+  // Since 1.3. The connection center: live connections of the session.
+  rpc ListConnections(ListConnectionsRequest) returns (ListConnectionsResponse);
+  rpc CloseConnection(CloseConnectionRequest) returns (CloseConnectionResponse);
+
+  // Since 1.3. Subscriptions the core keeps and updates by itself, so they stay
+  // current while the interface is closed. The link of a subscription is its
+  // credential: the core stores it encrypted and omits it from states.
+  rpc SaveSubscription(SaveSubscriptionRequest) returns (SaveSubscriptionResponse);
+  rpc ListSubscriptions(ListSubscriptionsRequest) returns (ListSubscriptionsResponse);
+  rpc DeleteSubscription(DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
+  rpc RefreshSubscription(RefreshSubscriptionRequest) returns (RefreshSubscriptionResponse);
+  rpc WatchSubscriptions(WatchSubscriptionsRequest) returns (stream SubscriptionState);
+  // Since 1.6. Returns the stored subscription link only on an authenticated
+  // explicit request to open its page. Clients must not cache or log it.
+  rpc GetSubscriptionLink(GetSubscriptionLinkRequest) returns (GetSubscriptionLinkResponse);
+  // PutSecret and DeleteSecret manage the credential material the core keeps.
+  // They exist because the rest of the contract carries only references: a plan
+  // names a secret, and these two calls are the only way a secret ever reaches
+  // the core. Keeping them separate means no other method can be turned into a
+  // way to read a stored credential.
+  rpc PutSecret(PutSecretRequest) returns (PutSecretResponse);
+  rpc DeleteSecret(DeleteSecretRequest) returns (DeleteSecretResponse);
+
+  // Since 1.8. DNS leak diagnostics: which resolvers the session uses versus
+  // what the OS would use, and whether the kill switch covers DNS. Requires
+  // the control authenticator: the answers describe the machine's network.
+  rpc CheckDnsLeaks(CheckDnsLeaksRequest) returns (CheckDnsLeaksResponse);
+
+  // Since 1.9. Throughput benchmark: measures real download goodput through
+  // each server by spinning up a temporary engine session. Streams progress
+  // samples; each server reports done=true once. Requires the control
+  // authenticator: benchmarks burn traffic and spawn engine processes.
+  rpc BenchmarkServers(BenchmarkServersRequest) returns (stream BandwidthSample);
+  // Since 1.9. Returns the stored benchmark history (see BenchmarkServers).
+  rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksResponse);
+
+  // Since 1.9. User overrides on top of a subscription: renames, hidden
+  // servers, extra rules and pinned order survive subscription refreshes.
+  rpc SaveSubscriptionOverride(SaveSubscriptionOverrideRequest) returns (SaveSubscriptionOverrideResponse);
+  rpc GetSubscriptionOverride(GetSubscriptionOverrideRequest) returns (GetSubscriptionOverrideResponse);
+
+  // Since 1.10. Network profiles with automatic matching: the core watches
+  // the network fingerprint and reports ProfileMatched events when a saved
+  // profile matches the current network. Requires the control authenticator:
+  // profiles describe the machine's networks.
+  rpc ListProfiles(ListProfilesRequest) returns (ListProfilesResponse);
+  rpc SaveProfile(SaveProfileRequest) returns (SaveProfileResponse);
+  rpc DeleteProfile(DeleteProfileRequest) returns (DeleteProfileResponse);
+  rpc GetNetworkFingerprint(GetNetworkFingerprintRequest) returns (GetNetworkFingerprintResponse);
+
+  // Since 1.10. Probes a proxy chain of 2-3 servers: per-hop reachability,
+  // the summed latency estimate, and which installed engines can carry it.
+  // Requires the control authenticator: probes burn traffic.
+  rpc ProbeChain(ProbeChainRequest) returns (ProbeChainResponse);
+}
+
+message ApiVersion {
+  uint32 major = 1;
+  uint32 minor = 2;
+  uint32 min_supported_minor = 3;
+  repeated string capabilities = 4;
+}
+
+message ConnectRequest {
+  ApiVersion api_version = 1;
+  string request_id = 2;
+  string session_id = 3;
+  SessionPlan session_plan = 4;
+  bytes control_authenticator = 5;
+  // Since 1.5. Arms the kill switch before the engine starts, so no traffic
+  // leaves outside the tunnel between connecting and a later SetKillSwitch.
+  bool kill_switch = 6;
+}
+message ConnectResponse { SessionStatus status = 1; SoraError error = 2; }
+message DisconnectRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bytes control_authenticator = 4; }
+message DisconnectResponse { SessionStatus status = 1; SoraError error = 2; }
+message GetStatusRequest { ApiVersion api_version = 1; string session_id = 2; }
+message GetStatusResponse { SessionStatus status = 1; SoraError error = 2; }
+message WatchEventsRequest { ApiVersion api_version = 1; string session_id = 2; uint64 after_sequence = 3; }
+
+message SessionPlan {
+  TunnelMode tunnel_mode = 1;
+  repeated OutboundSpec outbounds = 2; // Limit: 1 to 5000 entries; total plan is at most 4 MiB.
+  repeated RoutingRule routes = 3; // Limit: 0 to 10000 entries in deterministic order.
+  DnsPolicy dns_policy = 4;
+  BypassSettings bypass_settings = 5;
+  string session_identity = 6;
+  // Since 1.3. Switches that change how connections look on the wire.
+  AntiCensorship anti_censorship = 7;
+  // Since 1.3. Engine preference for this session, best first: "sing-box",
+  // "xray", "mihomo". The core runs the first one that carries the whole
+  // plan. Empty uses the core default; a single entry pins that engine.
+  repeated string engines = 8;
+  // Since 1.3. Lets an engine controlled over a loopback port carry this
+  // session. Off by default: a port scan finds a loopback controller, so only
+  // an engine controlled through a unix socket or a named pipe is chosen.
+  bool network_control_allowed = 9;
+  // Since 1.3. The loopback HTTP and SOCKS5 listener. The system proxy mode
+  // always opens it, without a login; in tun mode it exists only when enabled.
+  LocalProxy local_proxy = 10;
+  // Since 1.3. Groups the user picks a server in, or the core picks one for
+  // them. A rule, a group member and the routing target may name a group.
+  repeated GroupSpec groups = 11;
+  // Since 1.3. A routing preset applied after the routes above.
+  RoutingOptions routing = 12;
+  // Since 1.3. Resolves and connects over IPv6 as well; off resolves IPv4
+  // only, which avoids leaks on networks where IPv6 bypasses the tunnel.
+  bool ipv6 = 13;
+  // Since 1.7. Empty keeps the engine default. mihomo accepts system, gvisor,
+  // mixed and mips. Xray uses native gvisor or a mihomo TUN bridge for other
+  // stacks. Clients must negotiate 1.7 before
+  // sending an explicit value, so an older core cannot silently ignore it.
+  string tun_stack = 14;
+  // Since 1.10. Ordered server ids forming a proxy chain: traffic enters the
+  // first and exits the last (egress IP of the last hop). 2 to 3 entries;
+  // empty means no chaining. Requires an engine with the "chains" feature.
+  repeated string chain = 15;
+  // Since 1.10. Runs zapret's tpws alongside the VPN tunnel so direct traffic
+  // (routing exceptions) gets DPI-resistant handshakes while VPN traffic uses
+  // the tunnel. Linux only; needs tpws in the engines directory.
+  bool zapret_with_vpn = 16;
+  // Since 1.10. The tpws strategy shaping direct traffic when zapret_with_vpn
+  // is set. Empty uses the core default strategy.
+  BypassStrategy zapret_strategy = 17;
+}
+
+// GroupSpec is one group of outbounds.
+message GroupSpec {
+  // Unique among the groups and different from every outbound id.
+  string name = 1;
+  GroupType type = 2;
+  // Outbound ids or names of other groups, in display order.
+  repeated string members = 3;
+  // How automatic groups measure their members; empty uses the core default.
+  string test_url = 4;
+  google.protobuf.Duration test_interval = 5;
+  // url-test switches only when another member is faster by this much.
+  uint32 tolerance_ms = 6;
+}
+
+enum GroupType {
+  GROUP_TYPE_UNSPECIFIED = 0;
+  // The user picks the member.
+  GROUP_TYPE_SELECT = 1;
+  // The fastest member that answers.
+  GROUP_TYPE_URL_TEST = 2;
+  // The first member, in order, that answers.
+  GROUP_TYPE_FALLBACK = 3;
+  // Connections spread over the members.
+  GROUP_TYPE_LOAD_BALANCE = 4;
+}
+
+// RoutingOptions apply a preset after the routes of the plan; see
+// GetRoutingPresets for what each preset sends direct.
+message RoutingOptions {
+  // A preset id from GetRoutingPresets; empty applies none.
+  string preset = 1;
+  // The outbound or group everything the routes and the preset leave goes to.
+  string proxy_target = 2;
+  // Rejects advertising and tracking domains before anything else.
+  bool block_ads = 3;
+}
+// LocalProxy is a listener other applications on the machine can use. Any of
+// them can reach it, send traffic through the tunnel and learn the server
+// address, so it is closed unless asked for, and a login is recommended.
+message LocalProxy {
+  bool enabled = 1;
+  string username = 2;
+  string password = 3;
+}
+// AntiCensorship holds the per-session defences against DPI.
+message AntiCensorship {
+  // Splits the TLS ClientHello of proxy connections into several TCP segments.
+  bool tls_fragment = 1;
+  // Xray grammar: "tlshello" or a segment range such as "1-3". Empty means "tlshello".
+  string fragment_packets = 2;
+  // Segment length range in bytes, for example "100-200".
+  string fragment_length = 3;
+  // Pause range between segments in milliseconds, for example "10-20".
+  string fragment_interval = 4;
+}
+message OutboundSpec {
+  string id = 1;
+  string display_name = 2; // Limit: 0 to 256 UTF-8 bytes.
+  // Since 1.3. For protocol "bypass": sites reached directly with the
+  // handshake reshaped by zapret against DPI; no endpoint, no credentials.
+  BypassStrategy bypass = 8;
+  string protocol = 3;
+  string transport = 4;
+  string security = 5;
+  Endpoint endpoint = 6;
+  CredentialsRef credentials = 7;
+  // Display metadata for full profiles; protocol still selects the adapter.
+  string display_protocol = 9;
+}
+message Endpoint { string host = 1; uint32 port = 2; }
+message CredentialsRef { string reference = 1; }
+// RoutingRule sends a destination to an outbound, a group, "direct" or
+// "reject". The destination is "domain:" (the site and everything under it),
+// "full:", "geosite:", "geoip:", "ruleset:", "process:" (a program by name,
+// since 1.3), a network such as "203.0.113.0/24", or a port.
+message RoutingRule { string destination = 1; string outbound_id = 2; }
+// DnsPolicy names the resolvers of the session. A tun session that names none
+// uses DNS over HTTPS to 1.1.1.1 and 8.8.8.8, since the adapter carries every
+// lookup of the machine.
+message DnsPolicy { repeated string servers = 1; bool block_private = 2; }
+message BypassSettings { bool enabled = 1; repeated string rules = 2; }
+enum TunnelMode { TUNNEL_MODE_UNSPECIFIED = 0; TUNNEL_MODE_SYSTEM = 1; TUNNEL_MODE_APPLICATION = 2; }
+
+message SessionStatus { ConnectionState connection = 1; ApiVersion negotiated_version = 2; }
+message GetStatsRequest { ApiVersion api_version = 1; string session_id = 2; }
+message GetStatsResponse { StatsTick stats = 1; SoraError error = 2; }
+message ConnectionState { ConnectionStateValue value = 1; string session_id = 2; SoraErrorCode reason = 3; google.protobuf.Timestamp changed_at = 4; google.protobuf.Duration retry_after = 5; }
+enum ConnectionStateValue { CONNECTION_STATE_VALUE_UNSPECIFIED = 0; CONNECTION_STATE_VALUE_DISCONNECTED = 1; CONNECTION_STATE_VALUE_CONNECTING = 2; CONNECTION_STATE_VALUE_CONNECTED = 3; CONNECTION_STATE_VALUE_RECONNECTING = 4; CONNECTION_STATE_VALUE_FAILED = 5; }
+message CoreEvent { uint64 sequence = 1; string session_id = 2; google.protobuf.Timestamp emitted_at = 3; oneof payload { StateChanged state_changed = 4; StatsTick stats_tick = 5; BypassStrategyChanged bypass_strategy_changed = 6; ProbeResult probe_result = 7; LogBatch log_batch = 8; SoraError error = 9; KillSwitchChanged kill_switch_changed = 10; GroupSwitched group_switched = 11; ProfileMatched profile_matched = 12; } }
+message StateChanged { ConnectionState state = 1; }
+// Since 1.5. A fallback group moved to another member on its own: the member
+// it used stopped answering, or one before it answers again. Members are
+// outbound ids or names of nested groups.
+message GroupSwitched { string group = 1; string selected = 2; string previous = 3; }
+message StatsTick { uint64 bytes_up = 1; uint64 bytes_down = 2; uint64 active_connections = 3; }
+message BypassStrategyChanged { string strategy = 1; }
+message ProbeResult {
+  string server_id = 1;
+  bool reachable = 2;
+  uint32 latency_ms = 3;
+  SoraError error = 4;
+  // Since 1.3. How the value was measured: "engine" is a real request through
+  // the server, "connect" only a TCP connection to it.
+  string method = 5;
+  // Since 1.3. The engine that carried an "engine" measurement.
+  string engine = 6;
+}
+message LogBatch { repeated string lines = 1; } // Limit: 200 lines, 256 KiB after batching, flush at least every 250 ms.
+// KillSwitchChanged reports the state of the kill switch of a session. Enforced
+// is separate from enabled on purpose: on a platform that cannot block traffic at
+// the packet filter the core still records the request, and the interface has to
+// be able to show a switch that is on but not blocking rather than a switch that
+// protects the user when it does not.
+message KillSwitchChanged { bool enabled = 1; bool enforced = 2; }
+
+message ParseImportRequest { ApiVersion api_version = 1; string request_id = 2; bytes payload = 3; }
+message ParseImportResponse { SessionPlan session_plan = 1; SoraError error = 2; }
+message FetchSubscriptionRequest {
+  ApiVersion api_version = 1;
+  string request_id = 2;
+  string reference = 3;
+  // Since 1.3. Replaces the default User-Agent for this subscription: panels
+  // choose the format of their answer by it. Printable ASCII, at most 256 bytes.
+  string user_agent = 4;
+}
+message FetchSubscriptionResponse {
+  repeated OutboundSpec outbounds = 1;
+  SoraError error = 2;
+  // Since 1.3. What the provider said about the subscription.
+  SubscriptionInfo info = 3;
+}
+// SubscriptionInfo is read from the panel headers (profile-title,
+// profile-update-interval, subscription-userinfo, profile-web-page-url,
+// support-url, announce) or from "#key: value" lines at the top of the body.
+message SubscriptionInfo {
+  string title = 1;
+  // How often the provider asks to be fetched; unset when it did not say.
+  google.protobuf.Duration update_interval = 2;
+  // Whether the provider sent traffic figures at all.
+  bool has_usage = 3;
+  uint64 upload_bytes = 4;
+  uint64 download_bytes = 5;
+  // Zero means unlimited.
+  uint64 total_bytes = 6;
+  // Unset when the subscription does not expire.
+  google.protobuf.Timestamp expire = 7;
+  // https, http or tg links only.
+  string web_page_url = 8;
+  string support_url = 9;
+  string announce = 10;
+}
+message ProbeServersRequest {
+  ApiVersion api_version = 1;
+  string request_id = 2;
+  // Measured with a TCP connection only.
+  repeated Endpoint endpoints = 3;
+  // Since 1.3. Measured as the options say; results carry the outbound id.
+  repeated OutboundSpec outbounds = 4;
+  ProbeOptions options = 5;
+}
+// ProbeOptions controls a latency measurement. Zero values take the core
+// defaults.
+message ProbeOptions {
+  ProbeMethod method = 1;
+  // The URL requested through each server; it should answer 204 or 200.
+  string url = 2;
+  uint32 timeout_ms = 3;
+  // How many servers are measured at once.
+  uint32 concurrency = 4;
+  // Engine preference for the measurement, as in SessionPlan.engines.
+  repeated string engines = 5;
+}
+enum ProbeMethod {
+  // Through an engine where one carries the server, otherwise a TCP connection.
+  PROBE_METHOD_UNSPECIFIED = 0;
+  // Only through an engine; servers no engine carries fail.
+  PROBE_METHOD_ENGINE = 1;
+  // Only a TCP connection, which is fast and needs no engine but proves less.
+  PROBE_METHOD_CONNECT = 2;
+}
+message RunDiagnosticsRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; }
+message RunDiagnosticsResponse { DiagnosticReport report = 1; SoraError error = 2; }
+// Native captures require the authenticator and the native-diagnostics capability.
+enum DiagnosticFormat {
+  DIAGNOSTIC_FORMAT_UNSPECIFIED = 0;
+  DIAGNOSTIC_FORMAT_PCAPNG = 1;
+  DIAGNOSTIC_FORMAT_EVTX = 2;
+}
+message ExportDiagnosticsRequest {
+  ApiVersion api_version = 1;
+  string request_id = 2;
+  string session_id = 3;
+  DiagnosticFormat format = 4;
+  bytes control_authenticator = 5;
+}
+message ExportDiagnosticsResponse { bytes archive = 1; SoraError error = 2; }
+message SetKillSwitchRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bool enabled = 4; }
+message SetKillSwitchResponse { bool enabled = 1; SoraError error = 2; }
+message DiagnosticReport { repeated string lines = 1; }
+message HandshakeRequest { ApiVersion client_version = 1; }
+message HandshakeResponse {
+  ApiVersion negotiated_version = 1;
+  SoraError error = 2;
+  // Since 1.3. The token the other calls present. The transport admits only
+  // the core's own account, the service group and the person in the active
+  // local session, so whoever reaches Handshake may hold it; a system
+  // installation keeps the token file where that person cannot read it.
+  bytes control_authenticator = 3;
+}
+
+// PutSecretRequest hands one piece of credential material to the core. The
+// interface keeps the material only until the call is confirmed; the core keeps
+// it encrypted at rest and hands it back only to a plan that names it.
+message PutSecretRequest {
+  ApiVersion api_version = 1;
+  string request_id = 2;
+  CredentialsRef credentials = 3; // The reference a plan will use. Max 64 bytes, opaque.
+  bytes material = 4;             // Limit: 1 to 65536 bytes.
+}
+message PutSecretResponse { CredentialsRef credentials = 1; SoraError error = 2; }
+
+// DeleteSecretRequest removes stored material. It is safe to call for a
+// reference that holds nothing, so a cleanup path may run twice.
+message DeleteSecretRequest { ApiVersion api_version = 1; string request_id = 2; CredentialsRef credentials = 3; }
+message DeleteSecretResponse { SoraError error = 1; }
+enum SoraErrorCode { SORA_ERROR_CODE_UNSPECIFIED = 0; SORA_ERROR_CODE_VERSION_MISMATCH = 1; SORA_ERROR_CODE_UNAUTHENTICATED = 2; SORA_ERROR_CODE_INVALID_ARGUMENT = 3; SORA_ERROR_CODE_FAILED_PRECONDITION = 4; SORA_ERROR_CODE_NOT_FOUND = 5; SORA_ERROR_CODE_RESOURCE_EXHAUSTED = 6; SORA_ERROR_CODE_DEADLINE_EXCEEDED = 7; SORA_ERROR_CODE_UNAVAILABLE = 8; SORA_ERROR_CODE_INTERNAL = 9; SORA_ERROR_CODE_PERMISSION_DENIED = 10; SORA_ERROR_CODE_CANCELLED = 11; }
+message SoraError { SoraErrorCode code = 1; string user_message_key = 2; string detail_redacted = 3; bool retryable = 4; string request_id = 5; google.protobuf.Duration retry_after = 6; }
+
+enum LogLevel {
+  LOG_LEVEL_UNSPECIFIED = 0;
+  LOG_LEVEL_DEBUG = 1;
+  LOG_LEVEL_INFO = 2;
+  LOG_LEVEL_WARNING = 3;
+  LOG_LEVEL_ERROR = 4;
+}
+
+// LogEntry is one record. The message is masked of credentials, and of the
+// destinations a person visits unless LogSettings.record_destinations is on.
+message LogEntry {
+  uint64 sequence = 1;
+  google.protobuf.Timestamp time = 2;
+  LogLevel level = 3;
+  // "core" for the service itself, otherwise the engine: sing-box, xray, mihomo.
+  string source = 4;
+  string message = 5;
+  // Identical consecutive messages fold into one entry; a watcher receives the
+  // entry again with the same sequence and a higher repeat.
+  uint32 repeat = 6;
+}
+
+// LogFilter selects entries; unset fields select everything.
+message LogFilter {
+  LogLevel min_level = 1;
+  repeated string sources = 2;
+  // Case-insensitive substring of the message.
+  string contains = 3;
+  // Case-insensitive regular expression (RE2), at most 512 bytes.
+  string pattern = 4;
+  google.protobuf.Timestamp since = 5;
+  google.protobuf.Timestamp until = 6;
+}
+
+message QueryLogsRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  LogFilter filter = 3;
+  // Entries older than this sequence; 0 starts at the newest.
+  uint64 before_sequence = 4;
+  // At most 1000; 0 means 1000.
+  uint32 limit = 5;
+}
+message QueryLogsResponse {
+  // Newest first.
+  repeated LogEntry entries = 1;
+  // Cursor of the next, older page; 0 when there is none.
+  uint64 before_sequence = 2;
+  LogStats stats = 3;
+  SoraError error = 4;
+}
+// LogStats describe the whole record, not only what the filter matched.
+message LogStats {
+  repeated LogLevelCount by_level = 1;
+  repeated LogSourceCount by_source = 2;
+  uint64 total = 3;
+  uint64 bytes = 4;
+  uint64 max_bytes = 5;
+  // Entries the bounds evicted since the core started.
+  uint64 dropped = 6;
+}
+message LogLevelCount { LogLevel level = 1; uint64 count = 2; }
+message LogSourceCount { string source = 1; uint64 count = 2; }
+
+message WatchLogsRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  LogFilter filter = 3;
+  // Replays the matching entries after this sequence, then follows.
+  uint64 after_sequence = 4;
+}
+
+enum LogExportFormat {
+  // Plain text.
+  LOG_EXPORT_FORMAT_UNSPECIFIED = 0;
+  LOG_EXPORT_FORMAT_JSON_LINES = 1;
+  LOG_EXPORT_FORMAT_CSV = 2;
+  LOG_EXPORT_FORMAT_LOG = 3;
+  LOG_EXPORT_FORMAT_JSON = 4;
+  LOG_EXPORT_FORMAT_XML = 5;
+  LOG_EXPORT_FORMAT_ZIP = 6;
+  LOG_EXPORT_FORMAT_GZIP = 7;
+}
+message ExportLogsRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  LogFilter filter = 3;
+  LogExportFormat format = 4;
+  // Optional filename category: all, engine, tun, dns, subscriptions or core.
+  string category = 5;
+}
+message ExportLogsResponse {
+  bytes data = 1;
+  string file_name = 2;
+  string media_type = 3;
+  SoraError error = 4;
+}
+
+message ClearLogsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; }
+message ClearLogsResponse { SoraError error = 1; }
+
+// LogSettings change at runtime and apply to the next entry.
+message LogSettings {
+  // Entries below it are dropped before they are stored. Engines run at debug
+  // level, so a change takes effect at once, without a reconnect.
+  LogLevel capture_level = 1;
+  // Keeps the hosts and addresses of visited sites in engine messages.
+  bool record_destinations = 2;
+  // Bounds of the record; 0 keeps the core default.
+  uint32 max_entries = 3;
+  uint32 max_bytes = 4;
+}
+message GetLogSettingsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; }
+message GetLogSettingsResponse { LogSettings settings = 1; SoraError error = 2; }
+message SetLogSettingsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; LogSettings settings = 3; }
+message SetLogSettingsResponse { LogSettings settings = 1; SoraError error = 2; }
+
+// Connection is one live connection of the session.
+message Connection {
+  string id = 1;
+  // tcp or udp.
+  string network = 2;
+  // What the application asked for: a name where one was seen, else an address.
+  string host = 3;
+  uint32 port = 4;
+  string process = 5;
+  string rule = 6;
+  // From the group the rule chose to the outbound that carried it.
+  repeated string chain = 7;
+  uint64 upload = 8;
+  uint64 download = 9;
+  google.protobuf.Timestamp start = 10;
+}
+message ListConnectionsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string session_id = 3; }
+message ListConnectionsResponse { repeated Connection connections = 1; SoraError error = 2; }
+message CloseConnectionRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string session_id = 3; string connection_id = 4; }
+message CloseConnectionResponse { SoraError error = 1; }
+
+// SubscriptionSettings are what the user chooses for one subscription.
+message SubscriptionSettings {
+  // Empty on the first save; the core assigns one and answers with it.
+  string id = 1;
+  // The https link. Required on the first save; empty on a later save keeps
+  // the stored link.
+  string url = 2;
+  // Overrides the provider title in the list; empty shows the provider title.
+  string name = 3;
+  // Empty sends the Sora User-Agent.
+  string user_agent = 4;
+  bool auto_update = 5;
+  // Overrides the interval the provider asks for; unset follows the provider,
+  // and 24 hours when the provider did not say. At least one hour.
+  google.protobuf.Duration update_interval = 6;
+}
+
+// SubscriptionState omits settings.url because it carries a bearer token.
+message SubscriptionState {
+  SubscriptionSettings settings = 1;
+  SubscriptionInfo info = 2;
+  repeated OutboundSpec outbounds = 3;
+  google.protobuf.Timestamp last_update = 4;
+  google.protobuf.Timestamp next_update = 5;
+  // The failure of the last attempt; unset after a success.
+  SoraError last_error = 6;
+  // Whether a fetch is running right now.
+  bool updating = 7;
+  // Set on a watched state when the subscription was deleted.
+  bool deleted = 8;
+  // What the list shows: the user's name, else the provider's title, else the
+  // file name the provider sent, else the host of the link. Never empty.
+  string display_name = 9;
+}
+
+message SaveSubscriptionRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; SubscriptionSettings settings = 3; }
+message SaveSubscriptionResponse { SubscriptionState state = 1; SoraError error = 2; }
+message ListSubscriptionsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; }
+message ListSubscriptionsResponse { repeated SubscriptionState subscriptions = 1; SoraError error = 2; }
+message DeleteSubscriptionRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string id = 3; }
+message DeleteSubscriptionResponse { SoraError error = 1; }
+message RefreshSubscriptionRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string id = 3; }
+message RefreshSubscriptionResponse { SubscriptionState state = 1; SoraError error = 2; }
+message WatchSubscriptionsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; }
+
+// Since 1.6. The link is available only through this authenticated request.
+message GetSubscriptionLinkRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string id = 3; }
+message GetSubscriptionLinkResponse { string url = 1; SoraError error = 2; }
+
+message GetAboutRequest { ApiVersion api_version = 1; }
+message GetAboutResponse { About about = 1; SoraError error = 2; }
+// About describes the running core.
+message About {
+  // The release version, or "dev" for a build that was not stamped.
+  string core_version = 1;
+  // The commit the core was built from and when, where the build recorded it.
+  string commit = 2;
+  google.protobuf.Timestamp commit_time = 3;
+  // The contract the core serves.
+  ApiVersion contract = 4;
+  // For example "linux/amd64".
+  string platform = 5;
+  string go_version = 6;
+  repeated EngineBuild engines = 7;
+  // SPDX identifier.
+  string license = 8;
+  string source_url = 9;
+  // Since 1.4. Where the local proxy listens. A session in the application
+  // tunnel mode opens it, and the interface points the system proxy at it.
+  Endpoint local_proxy = 10;
+}
+// EngineBuild is one engine as this machine has it.
+message EngineBuild {
+  // sing-box, xray or mihomo.
+  string kind = 1;
+  bool installed = 2;
+  string version = 3;
+}
+
+message GetRoutingPresetsRequest { ApiVersion api_version = 1; }
+message GetRoutingPresetsResponse { repeated RoutingPreset presets = 1; SoraError error = 2; }
+// RoutingPreset is one preset; the interface names it by id in its own words.
+message RoutingPreset {
+  string id = 1;
+  // Destinations sent direct, in the destination form of RoutingRule, for
+  // example "geosite:category-ru" or "geoip:ru".
+  repeated string direct = 2;
+}
+
+// BypassStrategy is how zapret reshapes a handshake. Positions are a number
+// of bytes, negative from the end, or a marker (method, host, endhost, sld,
+// midsld, endsld, sniext) with an optional +N or -N.
+message BypassStrategy {
+  repeated string split_pos = 1;
+  // Sends the second part of a split first.
+  bool disorder = 2;
+  // Sends an out-of-band byte with the split.
+  bool oob = 3;
+  // Splits the TLS ClientHello into two records at this position.
+  string tls_record = 4;
+  // Reshape plain HTTP requests.
+  bool host_case = 5;
+  bool domain_case = 6;
+  bool method_eol = 7;
+}
+
+// Since 1.8. One DNS leak check. label and fix_hint are localization keys
+// for the UI, never free text; expected and actual carry raw values such as
+// resolver addresses.
+message DnsLeakCheck {
+  // Stable machine id: "tunnel-dns", "system-resolvers", "killswitch-dns".
+  string id = 1;
+  // Localization key for the check title, e.g. "dnsLeak.check.tunnelDns".
+  string label = 2;
+  // What the core expects, e.g. the tunnel resolvers.
+  string expected = 3;
+  // What was actually observed, e.g. the OS resolvers.
+  string actual = 4;
+  // True when the check found a leak.
+  bool leaked = 5;
+  // Localization key for the suggested fix, e.g.
+  // "dnsLeak.fix.enableKillSwitch". Empty when nothing needs doing. A check
+  // can carry a hint without being a leak: the UI shows those as warnings.
+  string fix_hint = 6;
+}
+message CheckDnsLeaksRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string session_id = 3;
+}
+message CheckDnsLeaksResponse {
+  repeated DnsLeakCheck checks = 1;
+  SoraError error = 2;
+}
+
+// BenchmarkServersRequest starts a throughput benchmark for the listed
+// servers. At most 32 servers per call; duration_s is clamped to 5..60,
+// concurrency to 1..4.
+message BenchmarkServersRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string request_id = 3;
+  // Server ids as known to the client (subscription or manual ids).
+  repeated string server_ids = 4;
+  // Per-server measurement budget in seconds.
+  uint32 duration_s = 5;
+  // How many servers are benchmarked at once.
+  uint32 concurrency = 6;
+  // Speed-test URL; empty uses the core default (documented).
+  string url = 7;
+}
+// BandwidthSample is one progress or final sample of a benchmark.
+message BandwidthSample {
+  string server_id = 1;
+  // Measured goodput in bytes per second (meaningful when done=true).
+  uint64 bytes_per_sec = 2;
+  // 0..100 progress of this server's measurement.
+  uint32 progress_pct = 3;
+  // True on the final sample for this server.
+  bool done = 4;
+  SoraError error = 5;
+}
+// GetBenchmarksRequest reads the stored benchmark history.
+message GetBenchmarksRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  // Empty returns all entries.
+  repeated string server_ids = 3;
+}
+message GetBenchmarksResponse {
+  repeated BenchmarkRecord benchmarks = 1;
+  SoraError error = 2;
+}
+// BenchmarkRecord is one stored measurement (TTL 24h, see history docs).
+message BenchmarkRecord {
+  string server_id = 1;
+  uint64 bytes_per_sec = 2;
+  uint32 latency_ms = 3;
+  int64 measured_at_unix = 4;
+}
+
+// SaveSubscriptionOverrideRequest stores user edits on top of a subscription.
+// Only the fields present are replaced; omitted fields keep their values.
+message SaveSubscriptionOverrideRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string subscription_id = 3;
+  // server_id -> display name. Empty value clears the rename.
+  map<string, string> renames = 4;
+  // Complete hidden set; replaces the stored one.
+  repeated string hidden = 5;
+  // Complete pinned order; servers not listed keep their relative order after.
+  repeated string pinned_order = 6;
+  // If true, deletes the whole override file.
+  bool clear = 7;
+}
+message SaveSubscriptionOverrideResponse {
+  SoraError error = 1;
+  // The subscription state with overrides applied.
+  SubscriptionState state = 2;
+}
+message GetSubscriptionOverrideRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string subscription_id = 3;
+}
+message GetSubscriptionOverrideResponse {
+  map<string, string> renames = 1;
+  repeated string hidden = 2;
+  repeated string pinned_order = 3;
+  repeated OverrideRule extra_rules = 4;
+  SoraError error = 5;
+}
+// OverrideRule is one user routing rule bound to a subscription; the client
+// merges these into the session plan it builds.
+message OverrideRule {
+  string destination = 1;
+  string outbound_id = 2;
+}
+
+// Since 1.10. A network profile matched the current network. The client
+// applies the profile (automatically when auto_apply, otherwise it asks the
+// user) by rebuilding the session plan from the profile's apply settings.
+message ProfileMatched {
+  string profile_id = 1;
+  string profile_name = 2;
+  bool auto_apply = 3;
+}
+
+// Since 1.10. A saved network profile: triggers describe the networks it
+// matches (SSID, default gateway, ASN), apply describes the settings to use
+// there. A profile with no triggers never matches automatically.
+message NetworkProfile {
+  // Opaque id assigned by the core on first save; empty when creating.
+  string id = 1;
+  // Display name. Limit: 1 to 128 UTF-8 bytes.
+  string name = 2;
+  ProfileTriggers triggers = 3;
+  ProfileApply apply = 4;
+  // Apply without asking when the network matches.
+  bool auto_apply = 5;
+}
+message ProfileTriggers {
+  // Wi-Fi SSIDs, exact match, case-sensitive.
+  repeated string ssids = 1;
+  // Default gateway addresses, e.g. "192.168.1.1".
+  repeated string gateways = 2;
+  // Autonomous system numbers as strings, e.g. "12389". Matched against the
+  // optional local ASN table; empty when the table is absent.
+  repeated string asns = 3;
+}
+message ProfileApply {
+  // Tunnel mode: "tun" or "proxy".
+  string mode = 1;
+  // DNS servers to use on this network.
+  repeated string dns = 2;
+  // Routing preset id to apply.
+  string rules_preset = 3;
+  // Preferred server id for this network.
+  string server_id = 4;
+  // Preferred engine: "sing-box", "xray", "mihomo". Empty keeps the default.
+  string engine = 5;
+}
+message ListProfilesRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+}
+message ListProfilesResponse {
+  repeated NetworkProfile profiles = 1;
+  SoraError error = 2;
+}
+message SaveProfileRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  NetworkProfile profile = 3;
+}
+message SaveProfileResponse {
+  NetworkProfile profile = 1;
+  SoraError error = 2;
+}
+message DeleteProfileRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string profile_id = 3;
+}
+message DeleteProfileResponse {
+  SoraError error = 1;
+}
+// Since 1.10. The machine's current network fingerprint for profile editing.
+message GetNetworkFingerprintRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+}
+message GetNetworkFingerprintResponse {
+  NetworkFingerprint fingerprint = 1;
+  SoraError error = 2;
+}
+message NetworkFingerprint {
+  // Current Wi-Fi SSID; empty on wired networks or when unreadable.
+  string ssid = 1;
+  // Default gateway address; empty when offline.
+  string gateway = 2;
+  // ASN from the optional local table; empty when unknown.
+  string asn = 3;
+  // Stable string identifying the network (interface addresses), for display.
+  string fingerprint = 4;
+}
+
+// Since 1.10. Probes a proxy chain of 2-3 servers before connecting.
+message ProbeChainRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string request_id = 3;
+  // Ordered server ids: traffic enters the first, exits the last.
+  repeated string server_ids = 4;
+}
+message ProbeChainResponse {
+  repeated ChainHop hops = 1;
+  // Summed per-hop latency estimate in milliseconds.
+  uint32 total_latency_ms = 2;
+  // Installed engines able to carry a chain, best first.
+  repeated string engines = 3;
+  SoraError error = 4;
+}
+message ChainHop {
+  string server_id = 1;
+  bool reachable = 2;
+  uint32 latency_ms = 3;
+}

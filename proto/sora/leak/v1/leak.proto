@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package sora.leak.v1;
+
+import "sora/core/v1/core_control.proto";
+
+option go_package = "github.com/levvs-one/sora-client/core/gen/sora/leak/v1;leakv1";
+
+// LeakService runs the core's egress self-tests: active probes that verify
+// no byte leaves the machine outside the tunnel. Since 1.11.
+service LeakService {
+  // RunLeakTests streams one LeakTestResult per test as it completes.
+  // Requires the control authenticator: the results describe the machine's
+  // network path. Needs an active session; without one the call fails.
+  rpc RunLeakTests(RunLeakTestsRequest) returns (stream LeakTestResult);
+}
+
+message RunLeakTestsRequest {
+  sora.core.v1.ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string session_id = 3;
+  // Test ids to run; empty runs every test. Unknown ids are rejected.
+  repeated string test_ids = 4;
+}
+
+// LeakTest describes one self-test. The ids are a stable contract with the
+// UI: "direct-dns", "ipv6", "icmp-echo", "system-resolvers".
+message LeakTest {
+  string id = 1;
+  // Localization key for the test title, e.g. "leakTest.check.directDns".
+  string label = 2;
+}
+
+message LeakTestResult {
+  LeakTest test = 1;
+  // True when the test found no leak.
+  bool pass = 2;
+  // True when the test does not apply in this session (for example the IPv6
+  // test with an IPv6-capable tunnel). Skipped tests always pass.
+  bool skipped = 3;
+  // What the probe observed, in plain words. Never carries secrets.
+  string details = 4;
+  // How long the test took.
+  int64 duration_ms = 5;
+}

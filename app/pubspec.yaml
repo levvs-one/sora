@@ -1,0 +1,112 @@
+name: sora
+description: "Sora"
+publish_to: 'none'
+version: 1.0.12+13
+
+environment:
+  sdk: ^3.13.5
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  archive: ^4.0.7
+  crypto: 3.0.7
+  cryptography: ^2.8.1
+  app_links: ^7.2.2
+  cupertino_icons: ^2.0.0
+  dbus: ^0.7.15
+  ffi: ^2.2.0
+  file_selector: ^1.1.0
+  fixnum: ^1.1.1
+  flutter:
+    sdk: flutter
+  flutter_local_notifications: ^22.3.1
+  flutter_localizations:
+    sdk: flutter
+  flutter_markdown_plus: 1.0.12
+  grpc: ^5.1.0
+  http2: ^2.3.1
+  http: 1.6.0
+  intl: any
+  jovial_svg: 1.1.31
+  material_symbols_icons: 4.2960.0
+  mobile_scanner: ^5.2.3
+  nativeapi: ^0.3.0
+  protobuf: ^6.1.0
+  pub_semver: 2.2.1
+  qr_flutter: ^4.1.0
+  retry: ^3.1.2
+  shared_preferences: ^2.5.6
+  showcaseview: 5.1.0
+  toastification: 3.2.0
+  tray_manager: ^0.7.0
+  url_launcher: ^6.3.3
+  webview_all: 1.4.4
+  webview_all_linux: 1.4.4
+  webview_all_windows: 1.4.4
+  win32: ^6.4.0
+  window_manager: ^0.5.2
+  xdg_icons: 0.1.2
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^6.0.0
+  shared_preferences_platform_interface: ^2.4.2
+
+dependency_overrides:
+  webview_all_linux:
+    path: third_party/webview_all_linux
+  webview_all_windows:
+    path: third_party/webview_all_windows
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/tray/
+    - assets/flags/
+    - assets/licenses.json
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/InterVariable.ttf
+    - family: Noto Sans Arabic
+      fonts:
+        - asset: assets/fonts/NotoSansArabic-Regular.ttf
+    - family: Noto Sans Bengali
+      fonts:
+        - asset: assets/fonts/NotoSansBengali-Regular.ttf
+    - family: Noto Sans Devanagari
+      fonts:
+        - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
+    - family: Noto Sans Thai
+      fonts:
+        - asset: assets/fonts/NotoSansThai-Regular.ttf
+    - family: Noto Sans Armenian
+      fonts:
+        - asset: assets/fonts/NotoSansArmenian-Regular.ttf
+    - family: Noto Sans Georgian
+      fonts:
+        - asset: assets/fonts/NotoSansGeorgian-Regular.ttf
+    - family: Sora CJK
+      fonts:
+        - asset: assets/fonts/SoraCJK.otf

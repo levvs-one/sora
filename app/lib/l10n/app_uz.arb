@@ -1,0 +1,476 @@
+{
+  "@@locale": "uz",
+  "stateOff": "Ulanmagan",
+  "stateConnecting": "Ulanmoqda",
+  "stateConnected": "Ulangan",
+  "stateReconnecting": "Qayta ulanmoqda",
+  "stateDisconnecting": "Aloqa uzilmoqda",
+  "stateFailed": "Ulanmagan",
+  "coreMissing": "Sora xizmati javob bermayapti",
+  "serverAuto": "Eng tez",
+  "serverBypass": "Server yo'q",
+  "addSubscription": "Obuna qo'shing",
+  "servers": "Serverlar",
+  "settings": "Sozlamalar",
+  "subscription": "Obuna",
+  "subscriptionLink": "Obuna havolasi",
+  "add": "Qo'shish",
+  "refresh": "Yangilash",
+  "rename": "Nomini o'zgartirish",
+  "delete": "Oʻchirish",
+  "cancel": "Bekor qilish",
+  "save": "Saqlash",
+  "name": "Ism",
+  "deleteSubscription": "“{name}” oʻchirilsinmi?",
+  "routes": "Marshrutlar",
+  "presetGlobal": "Hammasi VPN orqali",
+  "presetRu": "Rossiya to'g'ridan-to'g'ri",
+  "presetIr": "Eron to'g'ridan-to'g'ri",
+  "presetCn": "Xitoy to'g'ridan-to'g'ri",
+  "blockAds": "Reklamalarni bloklash",
+  "killSwitch": "Internet faqat VPN orqali",
+  "engine": "Dvigatel",
+  "engineAuto": "Avtomatik",
+  "animations": "Animatsiyalar",
+  "logs": "Jurnal",
+  "about": "Haqida",
+  "logsAll": "Hammasi",
+  "logsImportant": "Muhim",
+  "logsErrors": "Xatolar",
+  "search": "Qidiruv",
+  "export": "Faylga saqlang",
+  "clear": "Toza",
+  "logsEmpty": "Bu yerda hech narsa",
+  "appVersion": "{version} versiyasi",
+  "notInstalled": "Oʻrnatilmagan",
+  "sourceCode": "Manba kodi",
+  "license": "Litsenziya",
+  "usage": "{used}, {total}",
+  "until": "{date} gacha",
+  "expired": "Muddati tugagan",
+  "milliseconds": "{n} milodiy",
+  "bytesB": "{n} B",
+  "bytesKB": "{n} KB",
+  "bytesMB": "{n} MB",
+  "bytesGB": "{n} GB",
+  "bytesTB": "{n} TB",
+  "errGeneric": "Nimadir xato ketdi",
+  "errCore": "Sora xizmati javob bermayapti",
+  "errAuth": "Sora xizmatiga kirish imkoni yo'q",
+  "errVersion": "Sora-ni yangilang: ilova va xizmat turli versiyalardir",
+  "errBusy": "Kutib turing, oldingi buyruq hali ham ishlamoqda",
+  "errEngineMissing": "Bu server uchun vosita topilmadi",
+  "errEngineStart": "Dvigatel ishga tushmadi",
+  "errEngineStopped": "Dvigatel to'xtadi",
+  "errTunnel": "VPN ulanishini yaratishga ruxsat yo'q",
+  "errServers": "Server xato bilan sozlangan",
+  "errNetwork": "Serverga ulanib boʻlmadi",
+  "errTimeout": "Server o'z vaqtida javob bermadi",
+  "errFirewall": "VPNdan tashqarida internetni bloklab bo‘lmadi",
+  "errSubFetch": "Obunani yuklab bo‘lmadi",
+  "errSubFormat": "Bu obuna havolasi emas",
+  "errSubEmpty": "Obunada serverlar yo'q",
+  "errSubDuplicate": "Bu obuna allaqachon qo‘shilgan",
+  "errSubLimit": "Juda koʻp obuna",
+  "errSubScheme": "Havola https:// bilan boshlanishi kerak",
+  "errSecretStore": "Sora xotirasi shikastlangan yoki mavjud emas",
+  "errNoServers": "Ulanish uchun obuna qo'shing",
+  "exportText": "Matn",
+  "connections": "Ulanishlar",
+  "close": "Yopish",
+  "chainDirect": "To'g'ridan-to'g'ri",
+  "chainBlocked": "Bloklangan",
+  "theme": "Mavzu",
+  "themeSystem": "System",
+  "themeLight": "Nur",
+  "themeDark": "Qorong'i",
+  "language": "Til",
+  "languageSystem": "System",
+  "sectionConnection": "Ulanish",
+  "sectionNoServer": "Server yo'q",
+  "sectionPing": "Ping",
+  "sectionLog": "Diagnostika",
+  "ipv6": "IPv6",
+  "dns": "DNS",
+  "dnsAuto": "Avtomatik",
+  "dnsHint": "Manzillar, vergul bilan ajratilgan",
+  "fragment": "TLS parchalanishi",
+  "fragmentPackets": "Nimani ajratish kerak",
+  "fragmentLength": "Parcha o'lchami",
+  "fragmentInterval": "Parchalar orasida pauza qiling",
+  "byDefault": "Standart",
+  "rangeHint": "Masalan, 100-200",
+  "splitPos": "Bo'lingan pozitsiyalar",
+  "splitPosHint": "Masalan, 1, midsld",
+  "disorder": "Parchalarni qayta tartiblash",
+  "tlsRecord": "TLS yozuvini ajrating",
+  "tlsRecordNo": "Yo'q",
+  "tlsRecordSni": "Sayt nomida",
+  "tlsRecordFirst": "Birinchi baytdan keyin",
+  "hostCase": "Xost holatini o'zgartiring",
+  "probeMethod": "Usul",
+  "probeAuto": "Avtomatik",
+  "probeEngine": "Dvigatel orqali",
+  "probeConnect": "Faqat ulanish",
+  "probeUrl": "Sinov manzili",
+  "probeTimeout": "Kutib turing",
+  "seconds": "{n} s",
+  "subscriptions": "Obunalar",
+  "subscriptionSettings": "Sozlamalar",
+  "userAgent": "Foydalanuvchi-Agent",
+  "autoUpdate": "Avtomatik yangilash",
+  "updateInterval": "Qancha vaqtda",
+  "intervalProvider": "Provayder so'raganidek",
+  "hours": "{n} h",
+  "updateNow": "Hozir yangilang",
+  "logLevel": "Nima yozish kerak",
+  "levelDebug": "Hamma narsa",
+  "levelInfo": "Odatdagidek",
+  "levelWarning": "Muhim",
+  "levelError": "Faqat xatolar",
+  "recordDestinations": "Sayt manzillarini yozib oling",
+  "reset": "Sozlamalarni tiklash",
+  "resetConfirm": "Barcha sozlamalar qayta tiklansinmi?",
+  "resetAction": "Qayta tiklash",
+  "invalidValue": "Bu qiymat ishlamaydi",
+  "website": "Obuna sahifasi",
+  "providerWebsite": "Provayder veb-sayti",
+  "support": "Qo'llab-quvvatlash",
+  "controlPortQuestion": "{engine} ushbu kompyuterdagi port orqali boshqariladi. Boshqa dasturlar VPN yoqilganligini aniqlay oladi.",
+  "chooseEngine": "{engine} ni tanlang",
+  "rules": "Maxsus qoidalar",
+  "ruleAdd": "Yangi qoida",
+  "ruleHint": "Sayt, IP yoki dastur",
+  "ruleDirect": "To'g'ridan-to'g'ri",
+  "ruleProxy": "VPN orqali",
+  "ruleBlock": "Bloklash",
+  "failover": "Muvaffaqiyatsizlikni yoqing",
+  "connectOnStart": "Boshida ulaning",
+  "trafficLow": "{name}: {left} qoldi",
+  "ruleInvalid": "Bu sayt, IP yoki dasturga o'xshamaydi",
+  "tunnelMode": "Rejim",
+  "tunnelTun": "Barcha trafik",
+  "tunnelProxy": "System proksi-server",
+  "proxyAddress": "Proksi manzili",
+  "copied": "Ko‘chirildi",
+  "launchAtLogin": "Tizimdan boshlang",
+  "closeToTray": "Yopiq holatda patnisda saqlang",
+  "notifications": "Bildirishnomalar",
+  "trayOpen": "Sora ni oching",
+  "trayConnect": "Ulanish",
+  "trayDisconnect": "Ulanishni uzing",
+  "trayServer": "Server",
+  "trayQuit": "Sora-dan chiqing",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora: {state}, {server}",
+  "noticeInTray": "Sora hali ham tagida",
+  "noticeInTrayBody": "Uning belgisi menyusidan chiqing",
+  "noticeLost": "Ulanish uzildi",
+  "noticeLostBody": "Sora qayta ulanmoqda",
+  "noticeRestored": "Qayta ulandi",
+  "noticeFailed": "Ulanib bo‘lmadi",
+  "noticeBackup": "Asosiy server javob bermadi; zaxira trafikni olib yuradi",
+  "noticeNext": "Server javob bermadi; keyingisi transportni olib boradi",
+  "noticeMainBack": "Asosiy server yana javob beradi va trafikni olib boradi",
+  "noticeSubscription": "Obuna",
+  "importTitle": "Bu obuna qo‘shilsinmi?",
+  "importSealed": "Bu havola Happ uchun shifrlangan va uni faqat Happ o‘qiy oladi. Provayderingizdan oddiy obuna havolasini so'rang.",
+  "understood": "KELISHDIKMI",
+  "noAnswer": "javob yo'q",
+  "home": "Uy",
+  "navRules": "Qoidalar",
+  "navConnections": "Ulanishlar",
+  "navLogs": "Jurnallar",
+  "navAbout": "Haqida",
+  "sidebarToggle": "Yon panelni almashtirish",
+  "more": "Ko'proq",
+  "less": "Ozroq",
+  "currentServer": "Joriy server",
+  "trafficDown": "Yuklab olingan",
+  "trafficUp": "Yuklangan",
+  "perSecond": "{value}/s",
+  "activeRules": "Faol qoidalar: {count}",
+  "recentNotifications": "Oxirgi bildirishnomalar",
+  "notificationsEmpty": "Ulanish va obuna hodisalari shu yerda paydo bo‘ladi",
+  "retryConnect": "Qayta ulanishni sinab ko'ring",
+  "openLogs": "Jurnallarni oching",
+  "tourReplay": "Yo‘riqnomani yana ko‘rsatish",
+  "tourStep": "{step}/5 qadam",
+  "tourBack": "Orqaga",
+  "tourNext": "Keyingisi",
+  "tourSkip": "Oʻtkazib yuborish",
+  "tourFinish": "Bajarildi",
+  "tourAdd": "Provayderingizning obuna havolasini qo'shing.",
+  "tourServer": "Serverni tanlang. “Eng tez” siz uchun birini tanlaydi.",
+  "tourConnect": "Ulanish yoki uzish uchun shu yerni bosing.",
+  "tourMode": "Tartibni tanlang. Agar VPN tushib qolsa, o'chirish kaliti internetni bloklaydi.",
+  "tourSettings": "Sozlamalarni oching. Siz ushbu qo'llanmani u erda takrorlashingiz mumkin.",
+  "chooseProgram": "Dasturni tanlang",
+  "installedApps": "O'rnatilgan ilovalar",
+  "runningProcesses": "Ishlayotgan jarayonlar",
+  "programsFailed": "Ilovalarni yuklab bo‘lmadi",
+  "programsEmpty": "Hech qanday ilova topilmadi. Boshqa nomni sinab ko'ring.",
+  "selectExe": "exe faylini tanlang",
+  "trafficUnavailable": "Hisoblagichlar hali mavjud emas",
+  "speedtest": "Tezlik",
+  "speedtestCheck": "Tezlikni tekshiring",
+  "speedtestSearch": "Xizmat toping",
+  "speedtestEmpty": "Mos kelmadi. Qidiruvni o'zgartiring.",
+  "speedtestBackToList": "Xizmatlarga qaytish",
+  "speedtestOpenBrowser": "Brauzerda oching",
+  "speedtestUnavailable": "O'rnatilgan brauzer ishga tushmadi. Tizim brauzerida xizmatni oching.",
+  "speedtestPageFailed": "Sahifa yuklanmadi. Uni qayta yuklang yoki tizim brauzerida xizmatni oching.",
+  "speedtestExternalFailed": "Tizim brauzeri ochilmadi. Qayta urinib ko'ring.",
+  "modes": "Tartiblar",
+  "proxyShort": "Proksi",
+  "tunMode": "Barcha trafik (TUN)",
+  "checkUpdates": "Yangilanishlarni tekshiring",
+  "updates": "Ilova yangilanishlari",
+  "updateAvailable": "{version} versiyasi mavjud",
+  "updateOpenAbout": "Yangilanishni ko'rish",
+  "updateNotes": "{version} dagi o'zgarishlar",
+  "updateCheck": "Yangilanishlarni tekshiring",
+  "updateChecking": "Tekshirilmoqda...",
+  "updateNoNotes": "Relizda hech qanday eslatma yo'q.",
+  "updateDropWarning": "Sora va uning asosiy yangilanishi vaqtida VPN ulanishi bir necha soniyaga uziladi. Davom ettirilsinmi?",
+  "updateWaitConnection": "VPN ulanishi va yadro tayyor bo'lishini kuting.",
+  "updateDownloading": "Fayllar yuklab olinmoqda va tekshirilmoqda...",
+  "updateInstalling": "Yangilanish tayyorlanmoqda yoki administrator autentifikatsiyasi kutilmoqda...",
+  "updateNetworkError": "Yangilanishni yuklab boʻlmadi. Qayta urinib ko'ring.",
+  "updateReleaseError": "Chiqarish ma'lumotlari yoki kerakli fayllar etishmayotgan yoki yaroqsiz.",
+  "updateChecksumError": "Yuklab olish SHA256SUMSga mos kelmaydi. Hech narsa o'rnatilmagan.",
+  "updateInstallError": "Yangilash tugamadi. Autentifikatsiya bekor qilingan bo'lishi mumkin.",
+  "updateUnsupported": "Bu bajariladigan fayl qoʻllab-quvvatlanadigan Sora paketlar juftligiga tegishli emas. Chiqarishni o'rnatish ko'rsatmalaridan foydalaning.",
+  "updateManual": "Ikkala tasdiqlangan paketni o'rnatish uchun ushbu buyruqni terminalda ishga tushiring, so'ngra Sora ni qayta oching. Fayllar yuklab olish katalogida qoladi. VPN ulanishi uziladi.",
+  "updateCopyCommand": "Nusxa ko'chirish buyrug'i",
+  "updateChecksDisabled": "Avtomatik tekshirish sozlamalarida o'chirib qo'yilgan.",
+  "updateInstalled": "Yangilash oʻrnatildi. Sora-ni qayta oching.",
+  "projectLinks": "Loyiha",
+  "githubReleases": "Chiqarishlar va yuklab olishlar",
+  "telegramChannel": "Telegram kanali",
+  "licenses": "Litsenziyalar",
+  "componentLicenses": "Komponent litsenziyalari",
+  "appCopyright": "© 2026 levvs-one va hissa qo'shuvchilar",
+  "collapseServers": "Serverlarni yig'ish",
+  "expandServers": "Serverlarni kengaytiring",
+  "hideDescription": "Tavsifni yashirish",
+  "showDescription": "Tavsifni ko'rsatish",
+  "pendingConnectionChanges": "Ushbu oʻzgarishlarni qoʻllash uchun qayta ulaning.",
+  "reconnectNow": "Qo'llash va qayta ulaning",
+  "bypassLimitations": "Ushbu rejim faqat HTTP va TLS uchun DPI ni chetlab o'tadi, UDP ni qo'llab-quvvatlamaydi yoki IP-ni o'zgartirmaydi. Discord ovozi, qo'ng'iroqlari va bloklangan Telegram manzillari uchun VPN serveridan foydalaning.",
+  "errEngineUnsupported": "Tanlangan vosita ushbu profil yoki sozlamalarni qo'llab-quvvatlamaydi. Avtomatik yoki mos dvigatelni tanlang.",
+  "errRestore": "Ulanishni tozalash tugallanmadi. Ulanishni qaytadan urinish; tafsilotlar uchun jurnalga qarang.",
+  "errSessionEnded": "Bu seans allaqachon tugagan. Ulanish holatini yangilang.",
+  "retryDisconnect": "Qaytadan uzib ko‘ring",
+  "tunStack": "TUN to'plami",
+  "modesInfo": "Rejimlar haqida",
+  "modesGuideTitle": "Dvigatellar va rejimlar",
+  "probeServers": "Serverlarni tekshiring",
+  "expiresIn": "{name}: {days, plural, =0{obuna bir necha soat ichida tugaydi} one{obuna # kunida tugaydi} other{obuna # kunlarda tugaydi}}",
+  "groupOrdered": "{count, plural, one{# server, o'z navbatida} other{# serverlari, o'z navbatida}}",
+  "groupBest": "{count, plural, one{# server, eng tezkor} other{# serverlari, eng tez}}",
+  "modesGuide": "Agar serveringizga qaysi dvigatel kerakligini bilmasangiz, Auto-ni tanlang. Sora ulanishdan oldin profil va sozlamalarni tekshiradi. Dvigatel rejangizning tarmoqli kengligini oshira olmaydi: ishlash server, marshrut, protokol va tarmoqqa bog'liq.\n\n## rejimlar\n\n### Barcha trafik (TUN)\n\nSora virtual tarmoq interfeysini yaratadi va u orqali dastur trafigini, jumladan TCP va UDP ni yo'naltiradi. Telegram, o'yinlar va Discord ovozi uchun ushbu rejimdan foydalaning. Qoidalar aniq saytlar yoki dasturlarni bevosita yuborishi yoki ularni bloklashi mumkin. Tarmoq xizmatiga ruxsat va kerakli protokolni qo'llab-quvvatlaydigan server kerak.\n\n### System proksi-server\n\nSora mahalliy HTTP/SOCKS proksi-serverini sozlaydi. Tizim proksi-server sozlamalarini hurmat qiladigan ilovalar undan foydalanadi. O'z tarmoq stekiga ega ilovalar to'g'ridan-to'g'ri ulanishi mumkin; UDP va ovozli qo'ng'iroqlar uchun odatda TUN kerak. Ushbu rejim proksi-serverni qo'llab-quvvatlaydigan brauzerlar va ilovalarga mos keladi.\n\n### Server yo'q\n\nLinux da Sora HTTP/TLS soʻrovlarini boʻlish va qayta shakllantirish hamda baʼzi DPI tekshiruvlarini chetlab oʻtish uchun [zapret](https://github.com/bol-van/zapret) dan foydalanadi. Sizning IP-manzilingiz bir xil bo'lib qoladi va ulanishlar to'g'ridan-to'g'ri veb-saytga o'tadi. Natijalar provayderingizga va blokirovka usuliga bog'liq.\n\nJoriy integratsiya TCP orqali HTTP va TLS uchun tpws dan foydalanadi. U IP blokirovkasini chetlab o'tmaydi yoki UDP o'tkazmaydi va Telegram MTProto ulanishlarini kafolatlay olmaydi. Discord ovozli, Telegram qo'ng'iroqlari va bunday cheklovlar uchun TUN bilan VPN serveridan foydalaning.\n\n## Dvigatellar\n\n### Avtomatik\n\nSora butun ulanish rejasini qo'llab-quvvatlaydigan o'rnatilgan dvigatelni tanlaydi: server protokollari, transportlar, guruhlar, parchalanish va rejim. Mos kelmaydigan qo'lda tanlov joriy ulanishni to'xtatishdan oldin rad etiladi. Avtomatik yoki boshqa dvigatelni tanlang va sozlamalarni qaytadan qo'llang.\n\n### sing-box\n\nYangi Sora paketlariga mijoz tomoni XHTTP va VLESS Encryption qo‘shilgan [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) vilkalari kiradi. Sora qurilish va uning imkoniyatlarini tan oladi. XHTTP bo'lmagan yuqori oqim bu imkoniyatni faqat o'z nomidan olmaydi.\n\nQo‘llab-quvvatlanadigan protokollar: VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard va Sora import qila oladigan AmneziaWG 1.x/2.x parametrlari. To‘liq Xray JSON profillari uchun Xray kerak. Yangi AWG 3.x maydonlarini hozircha import qilib bo‘lmaydi. sing-box parol bilan himoyalangan mahalliy boshqaruv portidan foydalanadi; kompyuterdagi boshqa ilovalar bu portni aniqlashi mumkin.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption va TLS parchalanishini qoʻllab-quvvatlaydi. Shuningdek, u Xray provayderi profillarini marshrutlash va guruhlarini saqlab qolgan holda boshqaradi. Bunday profillarni xatti-harakatlarini o'zgartirmasdan avtomatik ravishda boshqa dvigatelga aylantirib bo'lmaydi.\n\nTo‘plamdagi Xray TLS sertifikatini tekshirishni o‘chirib qo‘yuvchi sozlamani olib tashladi (`allowInsecure`). Ushbu sozlamani talab qiladigan oddiy serverlar uchun avtomatik sing-box yoki mihomo ni tanlaydi. Xray ni tanlash joriy ulanishni to'xtatishdan oldin nomuvofiqlik haqida qo'lda xabar beradi. Eski toʻliq JSON profillari tasdiqlanishi mumkin boʻlgan sertifikat yoki sertifikat PIN-kodi bilan yangilangan provayder profiliga muhtoj.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) buyurtma qilingan qayta tiklash va yukni muvozanatlash guruhlarini, XHTTP va AmneziaWGni qo'llab-quvvatlaydi. Zaxira serverga avtomatik o'tish muhim bo'lganda uni tanlang. Sora ning TLS parchalanish sozlamalari ushbu dvigatelda mavjud emas.\n\n## Sora da moslik\n\n| Xususiyat | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN va TCP/UDP | Ha | Ha | Ha |\n| XHTTP | Ha | Ha | Ha |\n| VLESS Encryption | Ha | Ha | Ha |\n| To'liq Xray profili | Yo'q | Ha | Yo'q |\n| TUIC / AnyTLS | Ikkala | Yo'q | TUIC |\n| TLS parchalanishi | Ha | Ha | Yo'q |\n| AmneziaWG 1.x/2.x | Ha¹ | Yo'q | Ha |\n| Buyurtma qilingan zaxira guruh | Yo'q | No² | Ha |\n\n¹ J1/J2/J3/Itime profillari mihomo dan foydalanadi; bu maydonlar hech qachon jimgina tashlanmasligi kerak. ² To‘liq Xray profillari guruhi uchun ilova zaxira profilini tanlaydi. Qo'llab-quvvatlash o'rnatilgan tuzilishga bog'liq; Haqida uning versiyasini tekshiring.\n\n## TUN to'plami\n\nStack virtual interfeys ichida TCP va UDP bilan ishlaydi. Tartiblar panelida Xray va mihomo gVisor, System, Mixed va MIPS ni taklif qiladi. Har bir dvigatel o'z afzalliklarini saqlaydi. System proksi-server va Serversiz rejimlar bu afzallikdan foydalanmaydi.\n\n- **Mixed** — TCP tizim stekidan foydalanadi, gVisor esa UDP bilan ishlaydi. Bu Linux tizimida mihomo uchun standart variant. Windows tizimida Xray va mihomo odatda MIPS dan foydalanadi.\n- **System** — tizim stekidan foydalanadi. Agar tarmoq ilovalari muammolarga duch kelsa, boshqa variantni sinab ko'ring.\n- **gVisor** — foydalanuvchilar maydonidagi trafikni boshqaradi.\n- **MIPS** — mihomo ning shaxsiy IP-stacki, 1.19.32. paketli versiyasida mavjud.\n\nLinux da Xray sukut bo'yicha o'rnatilgan gVisor dan foydalanadi. Linux da System, Mixed va MIPS TUN dvigateli sifatida mihomo dan foydalanadi, TCP va UDPni autentifikatsiya qilingan mahalliy SOCKS havolasi orqali Xray ga yo‘naltiradi. Xray protokol, provayder profili va marshrutni saqlab qoladi. Ushbu uchta variant o'rnatilgan mihomo ni talab qiladi. Windows da Xray barcha to‘rtta TUN steki uchun mihomo 1.19.32 yoki yangi versiyasidan foydalanadi. Protokollar va yo‘naltirish Xray ichida qoladi. Bu birikmada ilova qoidalari faqat to‘g‘ridan-to‘g‘ri ulanish va bloklashni qo‘llaydi; Linux da bu qoidalar Xray ichki gVisor stekini talab qiladi.\n\nKo'prik ikkinchi jarayonni amalga oshiradi. Linuxda uchta bo'sh o'lchovda u mahalliy Xray TUNga qaraganda 32–36 MiB ko'proq jismoniy xotira ishlatgan. Bu yuklab olish yukini o'lchamaydi: CPU va xotira narxi ulanishlarga bog'liq. sing-box da stek selektori yo'q. Hech qanday stek har bir tarmoqda yaxshiroq ishlashni kafolatlamaydi. Uni tarmoqda sinab ko'rish uchun stekni tanlang va Qo'llash va qayta ulanishni tanlang.\n\n## Sozlamalarni qo'llash\n\nServerni tanlash avtomatik ravishda qayta ulanadi. Rejim, vosita, DNS va qoida sozlamalari darhol saqlanadi; faol ulanish vaqtida ulardan foydalanish uchun Ilova tugmasini bosing va qayta ulaning. Dvigatelni qayta ishga tushirish yuklab olish va qo'ng'iroqlarni to'xtatishi mumkin. Takroriy bosish parallel ulanishlarni boshlamaydi; o'chirish o'tishni tugatadi va ulanishni bo'shatadi.\n\nTunnel qulaganda faqat VPN orqali Internet to'g'ridan-to'g'ri trafikni bloklaydi. Bu butun mashinaga ta'sir qiladi. Aniq uzilish Sora qoidalarini olib tashlaydi. Agar tozalash tugamasa, qaytadan uzib ko'ring va jurnalni oching.\n\n## Loyiha hujjatlari\n\n- [sing-box-lx: konfiguratsiya va qo'llab-quvvatlash](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box hujjatlari](https://sing-box.sagernet.org/)\n- [Xray hujjatlari](https://xtls.github.io/)\n- [mihomo hujjatlari](https://wiki.metacubex.one/)\n- [zapret: ishlash va cheklovlar](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extensions": "Kengaytmalar",
+  "exportLogFile": "Faylga {name}",
+  "diagnosticRequiresTun": "Paketlarni yozib olish uchun faol Sora TUN ulanishi kerak.",
+  "diagnosticCapture": "10 soniya davomida suratga oling",
+  "diagnosticUnavailable": "Ushbu diagnostika ushbu platformada mavjud emas.",
+  "diagnosticNoData": "Hozircha hech qanday soʻrov qayd etilmagan. Avval tezlikni tekshirish veb-saytini oching.",
+  "diagnosticPackets": "Paketni suratga olish",
+  "diagnosticEvents": "Windows voqealari",
+  "diagnosticHttp": "HTTP diagnostikasi",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}

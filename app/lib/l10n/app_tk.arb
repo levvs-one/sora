@@ -1,0 +1,476 @@
+{
+  "@@locale": "tk",
+  "stateOff": "Baglanmadyk",
+  "stateConnecting": "Birikdirmek",
+  "stateConnected": "Birikdirildi",
+  "stateReconnecting": "Birikdirmek",
+  "stateDisconnecting": "Aýyrmak",
+  "stateFailed": "Baglanmadyk",
+  "coreMissing": "Sora hyzmaty jogap bermeýär",
+  "serverAuto": "Iň çalt",
+  "serverBypass": "Serwer ýok",
+  "addSubscription": "Abuna ýazyň",
+  "servers": "Serwerler",
+  "settings": "Sazlamalar",
+  "subscription": "Abuna ýazylmak",
+  "subscriptionLink": "Abunalyk baglanyşygy",
+  "add": "Goş",
+  "refresh": "Täzelen",
+  "rename": "Adyny üýtgetmek",
+  "delete": "Öçür",
+  "cancel": "Elatyr",
+  "save": "Saklaň",
+  "name": "Ady",
+  "deleteSubscription": "“{name}” pozuň?",
+  "routes": ".Ollar",
+  "presetGlobal": "Hemme zat VPN arkaly",
+  "presetRu": "Russiýa göni",
+  "presetIr": "Eýran göni",
+  "presetCn": "Hytaý göni",
+  "blockAds": "Mahabatlary blokirläň",
+  "killSwitch": "Internet diňe VPN arkaly",
+  "engine": "Motor",
+  "engineAuto": "Awto",
+  "animations": "Animasiýa",
+  "logs": "Hasaba gir",
+  "about": "Takmynan",
+  "logsAll": "Hemmesi",
+  "logsImportant": "Möhüm",
+  "logsErrors": "Rorsalňyşlyklar",
+  "search": "Gözlemek",
+  "export": "Faýl ýazdyryň",
+  "clear": "Arassala",
+  "logsEmpty": "Bu ýerde hiç zat ýok",
+  "appVersion": "{version} wersiýasy",
+  "notInstalled": "Gurulmady",
+  "sourceCode": "Çeşme kody",
+  "license": "Ygtyýarnama",
+  "usage": "{total}-iň {used}",
+  "until": "{date} çenli",
+  "expired": "Möhleti gutardy",
+  "milliseconds": "{n} ms",
+  "bytesB": "{n} B.",
+  "bytesKB": "{n} KB",
+  "bytesMB": "{n} MB",
+  "bytesGB": "{n} GB",
+  "bytesTB": "{n} inçekeseli",
+  "errGeneric": "Bir zat nädogry boldy",
+  "errCore": "Sora hyzmaty jogap bermeýär",
+  "errAuth": "Sora hyzmatyna girip bolmaýar",
+  "errVersion": "Sora täzeläň: programma we hyzmat dürli wersiýalar",
+  "errBusy": "Duruň, öňki buýruk henizem işleýär",
+  "errEngineMissing": "Bu serwer üçin motor tapylmady",
+  "errEngineStart": "Motor başlamady",
+  "errEngineStopped": "Motor saklandy",
+  "errTunnel": "VPN birikmesini döretmäge rugsat ýok",
+  "errServers": "Serwer ýalňyşlyk bilen düzüldi",
+  "errNetwork": "Serwere baryp bolmaýar",
+  "errTimeout": "Serwer wagtynda jogap bermedi",
+  "errFirewall": "VPN-den başga internedi ýapyp bolmady",
+  "errSubFetch": "Abuna ýazylmady",
+  "errSubFormat": "Bu abuna ýazgy däl",
+  "errSubEmpty": "Abuna ýazylanda serwer ýok",
+  "errSubDuplicate": "Bu abuna ýazyldy",
+  "errSubLimit": "Abunalar gaty köp",
+  "errSubScheme": "Baglanyşyk https: // bilen başlamaly",
+  "errSecretStore": "Sora ammary zaýalanýar ýa-da elýeterli däl",
+  "errNoServers": "Birikdirmek üçin abuna ýazyň",
+  "exportText": "Tekst",
+  "connections": "Baglanyşyklar",
+  "close": ".Akyn",
+  "chainDirect": "Göni",
+  "chainBlocked": "Bloklandy",
+  "theme": "Mowzuk",
+  "themeSystem": "System",
+  "themeLight": "Lightagtylyk",
+  "themeDark": "Garaňky",
+  "language": "Dil",
+  "languageSystem": "System",
+  "sectionConnection": "Baglanyşyk",
+  "sectionNoServer": "Serwer ýok",
+  "sectionPing": "Ping",
+  "sectionLog": "Diagnostika",
+  "ipv6": "IPv6",
+  "dns": "DNS",
+  "dnsAuto": "Awto",
+  "dnsHint": "Salgylar, vergul aýry",
+  "fragment": "TLS bölekleri",
+  "fragmentPackets": "Näme bölmeli?",
+  "fragmentLength": "Bölümiň ululygy",
+  "fragmentInterval": "Bölekleriň arasynda duruň",
+  "byDefault": "Bellenen",
+  "rangeHint": "Mysal üçin, 100-200",
+  "splitPos": "Positionerleşýän ýerleri",
+  "splitPosHint": "Mysal üçin, 1, orta",
+  "disorder": "Bölekleri tertipläň",
+  "tlsRecord": "TLS ýazgysyny bölüň",
+  "tlsRecordNo": ".Ok",
+  "tlsRecordSni": "Sahypanyň adynda",
+  "tlsRecordFirst": "Birinji baýtdan soň",
+  "hostCase": "Host ýagdaýyny üýtgediň",
+  "probeMethod": "Usul",
+  "probeAuto": "Awto",
+  "probeEngine": "Motor arkaly",
+  "probeConnect": "Diňe birikme",
+  "probeUrl": "Synag salgysy",
+  "probeTimeout": "Garaş",
+  "seconds": "{n} s",
+  "subscriptions": "Abunalar",
+  "subscriptionSettings": "Sazlamalar",
+  "userAgent": "Ulanyjy-agent",
+  "autoUpdate": "Awtomatiki täzelen",
+  "updateInterval": "Näçe ýygy",
+  "intervalProvider": "Üpjün edijiniň soraşy ýaly",
+  "hours": "{n} sag",
+  "updateNow": "Häzir täzeläň",
+  "logLevel": "Näme ýazmaly",
+  "levelDebug": "Hemme zat",
+  "levelInfo": "Adaty",
+  "levelWarning": "Möhüm",
+  "levelError": "Diňe ýalňyşlyklar",
+  "recordDestinations": "Sahypanyň salgylaryny ýazga alyň",
+  "reset": "Sazlamalary täzeden düzmek",
+  "resetConfirm": "Settingshli sazlamalary täzeläňmi?",
+  "resetAction": "Täzeden düzmek",
+  "invalidValue": "Bu baha işlemez",
+  "website": "Abunalyk sahypasy",
+  "providerWebsite": "Üpjün edijiniň web sahypasy",
+  "support": "Goldaw",
+  "controlPortQuestion": "{engine} bu kompýuterdäki port arkaly dolandyrylýar. Beýleki programmalar bir VPN-iň açykdygyny aýdyp bilerler.",
+  "chooseEngine": "{engine} saýlaň",
+  "rules": "Omörite düzgünler",
+  "ruleAdd": "Täze düzgün",
+  "ruleHint": "Saýt, IP ýa-da programma",
+  "ruleDirect": "Göni",
+  "ruleProxy": "VPN arkaly",
+  "ruleBlock": "Blok",
+  "failover": "Şowsuzlygy açyň",
+  "connectOnStart": "Başda birikdiriň",
+  "trafficLow": "{name}: {left} galdy",
+  "ruleInvalid": "Bu sahypa, IP ýa-da programma ýaly däl",
+  "tunnelMode": "Reodeim",
+  "tunnelTun": "Traffichli traffik",
+  "tunnelProxy": "System proksi",
+  "proxyAddress": "Proksi salgysy",
+  "copied": "Göçürildi",
+  "launchAtLogin": "Ulgamdan başlaň",
+  "closeToTray": "Closedapylanda tarelde saklaň",
+  "notifications": "Duýduryşlar",
+  "trayOpen": "Sora açyň",
+  "trayConnect": "Birikdiriň",
+  "trayDisconnect": "Aýyr",
+  "trayServer": "Serwer",
+  "trayQuit": "Sora-den çykyň",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora: {state}, {server}",
+  "noticeInTray": "Sora henizem lagada",
+  "noticeInTrayBody": "Nyşanasynyň menýusyndan çykyň",
+  "noticeLost": "Baglanyşyk ýitdi",
+  "noticeLostBody": "Sora täzeden birikýär",
+  "noticeRestored": "Againene birikdirildi",
+  "noticeFailed": "Birikip bilmedim",
+  "noticeBackup": "Esasy serwer jogap bermedi; ätiýaçlyk trafigi alyp barýar",
+  "noticeNext": "Serwer jogap bermedi; indiki ulag gatnawyny amala aşyrýar",
+  "noticeMainBack": "Esasy serwer ýene jogap berýär we traffigi göterýär",
+  "noticeSubscription": "Abuna ýazylmak",
+  "importTitle": "Bu abuna ýazyňmy?",
+  "importSealed": "Bu baglanyşyk Happ üçin kodlanýar we ony diňe Happ okap biler. Adaty abuna baglanyşygy üçin üpjün edijiňizden soraň.",
+  "understood": "Bolýar",
+  "noAnswer": "Jogap ýok",
+  "home": "Öý",
+  "navRules": "Düzgünler",
+  "navConnections": "Baglanyşyklar",
+  "navLogs": "Surnallar",
+  "navAbout": "Takmynan",
+  "sidebarToggle": "Gapdal paneli çalyşyň",
+  "more": "Has köp",
+  "less": "Az",
+  "currentServer": "Häzirki serwer",
+  "trafficDown": "Göçürildi",
+  "trafficUp": "Edüklendi",
+  "perSecond": "{value} / s",
+  "activeRules": "Işjeň düzgünler: {count}",
+  "recentNotifications": "Soňky bildirişler",
+  "notificationsEmpty": "Baglanyşyk we abuna wakalary şu ýerde peýda bolar",
+  "retryConnect": "Birikdirmek",
+  "openLogs": "Surnallary açyň",
+  "tourReplay": "Guideene-de gollanma görkez",
+  "tourStep": "5-nji ädim {step}",
+  "tourBack": "Yzyna",
+  "tourNext": "Indiki",
+  "tourSkip": "Geçmek",
+  "tourFinish": "Boldy",
+  "tourAdd": "Üpjün edijiňiziň abuna baglanyşygyny goşuň.",
+  "tourServer": "Serwer saýlaň. “Iň çalt” siziň üçin birini saýlaýar.",
+  "tourConnect": "Birikdirmek ýa-da aýyrmak üçin şu ýere basyň.",
+  "tourMode": "Re modeimi saýlaň. VPN düşse, wyklýuçatel interneti bloklaýar.",
+  "tourSettings": "Sazlamalary açyň. Bu gollanmany şol ýerde gaýtadan ulanyp bilersiňiz.",
+  "chooseProgram": "Programma saýlaň",
+  "installedApps": "Gurlan programmalar",
+  "runningProcesses": "Işleýiş amallary",
+  "programsFailed": "Goýmalary ýükläp bolmady",
+  "programsEmpty": "Programmalar tapylmady Başga bir at synap görüň.",
+  "selectExe": ".Exe faýly saýlaň",
+  "trafficUnavailable": "Hasaplaýjylar entek elýeterli däl",
+  "speedtest": "Tizlik",
+  "speedtestCheck": "Tizligi barlaň",
+  "speedtestSearch": "Hyzmat tapyň",
+  "speedtestEmpty": "Gabat gelenok. Gözlegi üýtgediň.",
+  "speedtestBackToList": "Hyzmatlara dolan",
+  "speedtestOpenBrowser": "Brauzerde açyň",
+  "speedtestUnavailable": "Içerki brauzer başlap bilmedi. Hyzmaty ulgam brauzeriňizde açyň.",
+  "speedtestPageFailed": "Sahypa ýükläp bilmedi. Ony täzeden ýükläň ýa-da ulgam brauzeriňizde hyzmaty açyň.",
+  "speedtestExternalFailed": "Ulgam brauzeri açyp bilmedi. Gaýtadan synanyşyň.",
+  "modes": "Reesimler",
+  "proxyShort": "Proksi",
+  "tunMode": "Traffichli traffik (TUN)",
+  "checkUpdates": "Täzelenmeleri barlaň",
+  "updates": "Programma täzelenmeleri",
+  "updateAvailable": "{version} wersiýasy bar",
+  "updateOpenAbout": "Täzelenmäni görüň",
+  "updateNotes": "{version}-de üýtgeşmeler",
+  "updateCheck": "Täzelenmeleri barlaň",
+  "updateChecking": "Barlamak ...",
+  "updateNoNotes": "Neşirde hiç hili bellik ýok.",
+  "updateDropWarning": "Sora we esasy täzelenmesi bilen VPN birikmesi birnäçe sekuntlap ​​pese gaçar. Dowam et?",
+  "updateWaitConnection": "VPN birikmesiniň we ýadrosynyň taýýar bolmagyna garaşyň.",
+  "updateDownloading": "Faýllary göçürip almak we barlamak ...",
+  "updateInstalling": "Täzelenmäni taýýarlamak ýa-da administratoryň tassyklanmagyna garaşmak ...",
+  "updateNetworkError": "Täzelenmäni göçürip alyp bolmady Gaýtadan synanyşyň.",
+  "updateReleaseError": "Goýberilýän maglumatlar ýa-da zerur faýllar ýok ýa-da nädogry.",
+  "updateChecksumError": "Göçürip almak SHA256SUMS bilen gabat gelenok. Hiç zat gurulmady",
+  "updateInstallError": "Täzelenme gutarmady. Hakyky tanamaklyk ýatyrylan bolmagy mümkin.",
+  "updateUnsupported": "Bu ýerine ýetirip boljak, goldanýan Sora paket jübütine degişli däl. Goýberiş gurnama görkezmelerini ulanyň.",
+  "updateManual": "Barlanylan paketleri gurmak üçin bu buýrugy terminalda işlediň, soňra Sora açyň. Faýllar göçürip almak katalogynda galýarlar. VPN birikmesi peseler.",
+  "updateCopyCommand": "Buýrugy göçüriň",
+  "updateChecksDisabled": "Sazlamalarda awtomatiki barlaglar ýapylýar.",
+  "updateInstalled": "Täzelenme guruldy Sora açyň.",
+  "projectLinks": "Taslama",
+  "githubReleases": "Çykarýar we göçürip alýar",
+  "telegramChannel": "Telegram kanaly",
+  "licenses": "Ygtyýarnamalar",
+  "componentLicenses": "Komponent ygtyýarnamalary",
+  "appCopyright": "© 2026 levvs-one we goşant goşanlar",
+  "collapseServers": "Serwerleri ýykyň",
+  "expandServers": "Serwerleri giňeltmek",
+  "hideDescription": "Düşündirişi gizläň",
+  "showDescription": "Düşündiriş görkez",
+  "pendingConnectionChanges": "Bu üýtgeşmeleri ulanmak üçin gaýtadan birikdiriň.",
+  "reconnectNow": "Goşuň we gaýtadan birikdiriň",
+  "bypassLimitations": "Bu re DPim diňe HTTP we TLS üçin DPI-den geçýär, UDP-ni goldamaýar ýa-da IP-ni üýtgetmeýär. Discord sesi, jaňlary we bloklanan Telegram salgylary üçin VPN serwerini ulanyň.",
+  "errEngineUnsupported": "Saýlanan hereketlendiriji bu profili ýa-da sazlamalary goldamaýar. Awto ýa-da gabat gelýän dwigateli saýlaň.",
+  "errRestore": "Baglanyşygy arassalamak doly däldi. Aýyrmak üçin gaýtadan synanyşyň; jikme-jiklikler üçin gündelige serediň.",
+  "errSessionEnded": "Bu sessiýa eýýäm tamamlandy. Baglanyş ýagdaýyny täzeläň.",
+  "retryDisconnect": "Aýyrmagy gaýtadan synanyşyň",
+  "tunStack": "TUN stack",
+  "modesInfo": "Rejeler hakda",
+  "modesGuideTitle": "Reesimler we hereketlendirijiler",
+  "probeServers": "Serwerleri barlaň",
+  "expiresIn": "{name}: {days, plural, =0{abuna ýazylmak birnäçe sagatdan soň tamamlanýar} one{abunalyk # güni tamamlanýar} other{abunalyk # günlerinde tamamlanýar}}",
+  "groupOrdered": "{count, plural, one{# serweri hem öz gezeginde} other{# serwerleri hem öz gezeginde}}",
+  "groupBest": "{count, plural, one{# serweri, iň çalt} other{# serwerleri, iň çalt}}",
+  "modesGuide": "Serweriňiziň haýsy motora mätäçdigini bilmeýän bolsaňyz, Awto saýlaň. Sora birikmezden ozal profil we sazlamalary barlaýar. Dwigatel meýilnamaňyzyň geçiriş giňligini artdyryp bilmez: öndürijilik serwere, ugra, protokola we tora baglydyr.\n\n## Reesimler\n\n### traffichli traffik (TUN)\n\nSora wirtual tor interfeýsini döredýär we TCP we UDP ýaly programma trafigini ugrukdyrýar. Bu re modeimi Telegram, oýunlar we Discord sesi üçin ulanyň. Düzgünler belli bir saýtlary ýa-da programmalary gönüden-göni iberip ýa-da blokirläp biler. Tor hyzmaty, zerur protokoly goldaýan serwere we serwere mätäç.\n\n### System proksi\n\nSora ýerli HTTP / SOCKS proksi düzýär. Ulgam proksi sazlamalaryna hormat goýýan programmalar ony ulanýarlar. Öz torlary bilen goýmalar gönüden-göni birigip biler; UDP we sesli jaňlar adatça TUN gerek. Bu re modeim proksi goldawy bilen brauzerlere we programmalara laýyk gelýär.\n\n### Serwer ýok\n\nLinux-de, Sora HTTP / TLS haýyşlaryny bölmek we üýtgetmek we käbir DPI barlaglaryndan aýlanyp geçmek üçin [zapret] (https://github.com/bol-van/zapret) ulanýar. IP-iňiz şol bir ýagdaýda galýar we birikmeler göni web sahypasyna gidýär. Netijeler üpjün edijiňize we blokirleme usulyna baglydyr.\n\nHäzirki integrasiýa, TCP-den HTTP we TLS üçin tpws ulanýar. IP blokirlemesinden ýa-da UDP-den geçmeýär we Telegram-iň MTProto birikmelerini kepillendirip bilmeýär. Discord sesi, Telegram jaňlary we bu hili çäklendirmeler üçin TUN bilen VPN serwerini ulanyň.\n\n## Dwigateller\n\n### Awto\n\nSora ähli birikme meýilnamasyny goldaýan gurnalan hereketlendirijini saýlaýar: serwer protokollary, transportlar, toparlar, böleklere bölüniş we re modeim. Gabat gelmeýän el bilen saýlamak, häzirki baglanyşygy togtatmazdan ozal ret edilýär. Awto ýa-da başga dwigateli saýlaň we sazlamalary täzeden ulanyň.\n\n### sing-box\n\nTäze Sora paketleri [sing-box-lx] (https://github.com/Leadaxe/sing-box-lx), [sing-box] (https://github.com/SagerNet/sing-box), müşderi tarapyna XHTTP we VLESS Encryption goşýar. Sora gurluşy we mümkinçiliklerini ykrar edýär. XHTTP bolmazdan ýokary akym gurmak, diňe öz adyndan bu mümkinçiligi gazanyp bilmez.\n\nGoldaw berlen protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard we WireGuard we AmneziaWG AmneziaWG Doly Xray JSON profilleri Xray talap edýär. Täze AWG 3.x meýdanlaryny entek import edip bolmaýar. sing-box kompýuterdäki beýleki programmalaryň tapyp bilýän parol bilen goralýan ýerli dolandyryş portuny ulanýar.\n\n### Xray\n\n[Xray-core] (https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption we TLS böleklerini goldaýar. Şeýle hem, marşrutlaryny we toparlaryny gorap saklamak bilen doly üpjün ediji Xray profilini işleýär. Şeýle profilleri özlerini alyp barşyny üýtgetmän awtomatiki usulda başga motora öwrüp bolmaz.\n\nBaglanan Xray TLS şahadatnamasyny tassyklamagy (\"allowInsecure\") ýapýan sazlamany aýyrdy. Awto bu sazlamany talap edýän adaty serwerler üçin sing-box ýa-da mihomo saýlaýar. Xray saýlamak, häzirki birikmäni togtatmazdan ozal gabat gelmeýändigini habar berýär. Has köne JSON profillerinde barlanylýan şahadatnama ýa-da şahadatnama pin bilen täzelenen üpjün ediji profiline mätäç.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) ätiýaçlyk serwere yzygiderli geçiş toparlaryny, ýük paýlaşmagy, XHTTP we AmneziaWG goldaýar. Ätiýaçlyk serwere awtomatik geçmek möhüm bolsa, ony saýlaň. Sora-nyň TLS bölekleme sazlamasy bu ýadro bilen elýeterli däl.\n\n## Sora-de laýyklyk\n\n| Aýratynlyk | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN we TCP / UDP | Hawa | Hawa | Hawa |\n| XHTTP | Hawa | Hawa | Hawa |\n| VLESS Encryption | Hawa | Hawa | Hawa |\n| Doly Xray tertibi | | Ok | Hawa | | Ok |\n| TUIC / AnyTLS | Ikisi | | Ok | TUIC |\n| TLS bölekleri | Hawa | Hawa | | Ok |\n| AmneziaWG 1.x / 2.x | Hawa | | Ok | Hawa |\n| Yza gaýdyp gelen topar | | Ok | ²ok | Hawa |\n\nZ J1/J2/J3/Itime bolan profiller mihomo ulanýar; bu meýdanlar hiç haçan sessiz-üýnsüz taşlanmaly däldir. Complete Doly Xray profilleriniň topary üçin programma ätiýaçlyk profilini saýlaýar. Goldaw gurlan gurna baglydyr; hakda wersiýasyny barlaň.\n\n## TUN ýygyndysy\n\nStack wirtual interfeýsiň içinde TCP we UDP işleýär. Reesimler panelinde Xray we mihomo gVisor, System, Mixed we MIPS hödürleýär. Her hereketlendiriji öz islegini tygşytlaýar. System proksi we Serwersiz reesimler bu ileri tutmany ulanmaýarlar.\n\n- ** Mixed ** - TCP ulgam stakasyny ulanýar, gVisor bolsa UDP işleýär. Bu Linux-da mihomo üçin başlangyç görnüşdir. Windows-da Xray we mihomo başlangyç görnüş hökmünde MIPS ulanýar.\n- ** System ** - ulgam toplumyny ulanýar. Tor programmalarynda kynçylyklar ýüze çyksa, başga bir warianty synap görüň.\n- ** gVisor ** - ulanyjy giňişliginde traffigi dolandyrýar.\n- ** MIPS ** - mihomo-iň öz IP ýygyndysy, birleşdirilen 1.19.32 wersiýasynda bar.\n\nLinux-de, Xray gurnalan gVisor deslapky görnüşde ulanýar. Linux-de System, Mixed we MIPS mihomo-ni TUN hereketlendirijisi hökmünde ulanyp, TCP we UDP-ni tassyklanan ýerli SOCKS baglanyşygy arkaly Xray-e ugradýar. Xray protokoly, üpjün edijiniň profilini we marşrutyny saklaýar. Bu üç wariant gurnalan mihomo talap edýär. Windows-de Xray dört TUN stekiniň hemmesi üçin mihomo 1.19.32 ýa-da has täze wersiýany ulanýar. Protokollar we ugur kesgitlemek Xray-da galýar. Bu birleşmede programma düzgünleri diňe göni birikmäni we bloklamagy goldaýar; Linux-de bu düzgünler Xray-yň içindäki gVisor stekini talap edýär.\n\nKöprü ikinji gezek işleýär. Linux-de üç sany boş ölçegde, ýerli Xray TUN-dan has takmynan 32–36 MiB fiziki ýat ulanyldy. Bu göçürip almak ýüküni ölçemeýär: CPU we ýat çykdajylary birikmelere baglydyr. sing-box-de hiç hili saýlaýjy ýok. Hiç bir stak her ulgamda has gowy işlemegi kepillendirmeýär. Ackygyndy saýlaň we toruňyzda synap görmek üçin “Apply” -y täzeden birikdiriň.\n\n## Sazlamalary ulanmak\n\nSerwer saýlamak awtomatiki birikdirilýär. Reodeim, hereketlendiriji, DNS we düzgün sazlamalary derrew saklanýar; işjeň birikme wagtynda, \"Goý\" düwmesine basyň we olary ulanmak üçin gaýtadan birikdiriň. Dwigateli täzeden açmak ýüklemeleri we jaňlary kesip biler. Gaýtalanyp basmak parallel baglanyşyklara başlamaz; aýyrmak birikmäni tamamlaýar we baglanyşygy boşadýar.\n\nInternet diňe VPN arkaly tunel gaçanda göni traffigi bloklaýar. Tutuş maşyna täsir edýär. Açyk aýyrmak Sora düzgünlerini aýyrýar. Arassalamak gutarmasa, birikmäni täzeden synap görüň we gündeligi açyň.\n\n## Taslama resminamalary\n\n- [sing-box-lx: konfigurasiýa we goldaw] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box resminamalary] (https://sing-box.sagernet.org/)\n- [Xray resminamalary] (https://xtls.github.io/)\n- [mihomo resminamalary] (https://wiki.metacubex.one/)\n- [zapret: iş we çäklendirmeler] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosticRequiresTun": "Paket almak üçin işjeň Sora TUN birikmesi gerek.",
+  "diagnosticUnavailable": "Bu anyklaýyş bu platformada elýeterli däl.",
+  "diagnosticNoData": "Entek ýazylan haýyş ýok. Ilki bilen tizlik synag web sahypasyny açyň.",
+  "extensions": "Giňeldişler",
+  "diagnosticCapture": "10 sekuntlap ​​surata düşüriň",
+  "diagnosticEvents": "Windows wakalary",
+  "diagnosticHttp": "HTTP anyklaýyş",
+  "diagnosticPackets": "Paket almak",
+  "exportLogFile": "Faýla {name}",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}

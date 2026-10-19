@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package sora.ext.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/levvs-one/sora-client/core/gen/sora/ext/v1;extv1";
+
+// ExtensionHost is the core-side API for installed extensions.
+//
+// Panels run in a WebView inside the app and talk to the app over a JS
+// bridge. The app forwards the calls an extension is permitted to make to
+// this service. Every extension call carries a per-extension token minted by
+// MintToken; the token is scoped to the extension's granted permissions, so a
+// compromised or malicious panel cannot reach APIs it was not granted.
+//
+// MintToken and RevokeToken are app-only: they require the core control
+// token, exactly like Connect and Disconnect on CoreControl.
+service ExtensionHost {
+  // MintToken issues a scoped token for an enabled extension. App only.
+  rpc MintToken(MintTokenRequest) returns (MintTokenResponse);
+  // RevokeToken invalidates a previously minted token. App only.
+  rpc RevokeToken(RevokeTokenRequest) returns (RevokeTokenResponse);
+  // GetConnections needs the "connections.read" permission.
+  rpc GetConnections(GetConnectionsRequest) returns (GetConnectionsResponse);
+  // GetServers needs the "servers.read" permission.
+  rpc GetServers(GetServersRequest) returns (GetServersResponse);
+  // Notify needs the "notifications" permission.
+  rpc Notify(NotifyRequest) returns (NotifyResponse);
+  // WatchExtensionEvents streams lifecycle and network events. It needs no
+  // extra permission beyond a valid token: every enabled extension may know
+  // whether the session is up.
+  rpc WatchExtensionEvents(WatchExtensionEventsRequest) returns (stream ExtensionEvent);
+}
+
+message MintTokenRequest {
+  // The core control token. Proves the caller is the trusted app.
+  bytes control_token = 1;
+  // The extension id from its manifest, e.g. "com.example.speedstats".
+  string extension_id = 2;
+  // The permissions the user granted at install time. Must be a subset of
+  // the registry in core/ext/permissions.go; unknown ids are rejected.
+  repeated string permissions = 3;
+}
+
+message MintTokenResponse {
+  // Opaque 32-byte token. Pass it as extension_token on every other call.
+  bytes extension_token = 1;
+}
+
+message RevokeTokenRequest {
+  bytes control_token = 1;
+  bytes extension_token = 2;
+}
+
+message RevokeTokenResponse {}
+
+message GetConnectionsRequest {
+  bytes extension_token = 1;
+}
+
+message ExtensionConnection {
+  string id = 1;
+  // Process name only; no PIDs or paths leave the core towards extensions.
+  string process = 2;
+  string host = 3;
+  uint64 up_bytes = 4;
+  uint64 down_bytes = 5;
+}
+
+message GetConnectionsResponse {
+  repeated ExtensionConnection connections = 1;
+}
+
+message GetServersRequest {
+  bytes extension_token = 1;
+}
+
+message ExtensionServer {
+  string id = 1;
+  string name = 2;
+  string country = 3;
+  // -1 when unknown.
+  int64 latency_ms = 4;
+}
+
+message GetServersResponse {
+  repeated ExtensionServer servers = 1;
+}
+
+message NotifyRequest {
+  bytes extension_token = 1;
+  string title = 2;
+  string body = 3;
+}
+
+message NotifyResponse {}
+
+message WatchExtensionEventsRequest {
+  bytes extension_token = 1;
+}
+
+message ExtensionEvent {
+  // One of "session.connected", "session.disconnected", "network.changed",
+  // "extension.disabled". The app stops the stream on "extension.disabled".
+  string kind = 1;
+  string detail = 2;
+  google.protobuf.Timestamp at = 3;
+}

@@ -1,0 +1,476 @@
+{
+  "@@locale": "es",
+  "stateOff": "No conectada",
+  "stateConnecting": "Conectando",
+  "stateConnected": "Conectada",
+  "stateReconnecting": "Reconectando",
+  "stateDisconnecting": "Desconectando",
+  "stateFailed": "No conectada",
+  "coreMissing": "El servicio Sora no responde",
+  "serverAuto": "Más rápida",
+  "serverBypass": "Sin servidor",
+  "addSubscription": "Agregar suscripción",
+  "servers": "Servidoras",
+  "settings": "Ajustes",
+  "subscription": "Suscripción",
+  "subscriptionLink": "Enlace de suscripción",
+  "add": "Agregar",
+  "refresh": "Actualizar",
+  "rename": "Rebautizar",
+  "delete": "Borrar",
+  "cancel": "Cancelar",
+  "save": "Ahorrar",
+  "name": "Nombre",
+  "deleteSubscription": "¿Eliminar “{name}”?",
+  "routes": "Rutas",
+  "presetGlobal": "Todo a través de VPN",
+  "presetRu": "Rusia directa",
+  "presetIr": "Irán directo",
+  "presetCn": "China directa",
+  "blockAds": "Bloquear anuncios",
+  "killSwitch": "Internet solo a través de VPN",
+  "engine": "Motor",
+  "engineAuto": "Auto",
+  "animations": "animaciones",
+  "logs": "Registro",
+  "about": "Acerca de",
+  "logsAll": "Toda",
+  "logsImportant": "Importante",
+  "logsErrors": "Errores",
+  "search": "Buscar",
+  "export": "Guardar en archivo",
+  "clear": "Clara",
+  "logsEmpty": "Nada aquí",
+  "appVersion": "Versión {version}",
+  "notInstalled": "No instalado",
+  "sourceCode": "código fuente",
+  "license": "Licencia",
+  "usage": "{used} de {total}",
+  "until": "hasta {date}",
+  "expired": "Caducada",
+  "milliseconds": "{n} ms",
+  "bytesB": "{n} B",
+  "bytesKB": "{n}KB",
+  "bytesMB": "{n} MB",
+  "bytesGB": "{n} ES",
+  "bytesTB": "{n} TB",
+  "errGeneric": "algo salió mal",
+  "errCore": "El servicio Sora no responde",
+  "errAuth": "Sin acceso al servicio Sora",
+  "errVersion": "Actualización Sora: la aplicación y el servicio son versiones diferentes",
+  "errBusy": "Espera, el comando anterior todavía se está ejecutando.",
+  "errEngineMissing": "No se encontró ningún motor para este servidor",
+  "errEngineStart": "El motor no arrancó",
+  "errEngineStopped": "El motor se detuvo",
+  "errTunnel": "Sin permiso para crear la conexión VPN",
+  "errServers": "El servidor está configurado con un error.",
+  "errNetwork": "No se puede llegar al servidor",
+  "errTimeout": "El servidor no respondió a tiempo.",
+  "errFirewall": "No se pudo bloquear Internet fuera de la VPN",
+  "errSubFetch": "No se pudo cargar la suscripción",
+  "errSubFormat": "Este no es un enlace de suscripción.",
+  "errSubEmpty": "La suscripción no tiene servidores.",
+  "errSubDuplicate": "Esta suscripción ya está agregada.",
+  "errSubLimit": "Demasiadas suscripciones",
+  "errSubScheme": "El enlace debe comenzar con https://",
+  "errSecretStore": "El almacenamiento Sora está dañado o no está disponible",
+  "errNoServers": "Añade una suscripción para conectarte",
+  "exportText": "Texto",
+  "connections": "Conexiones",
+  "close": "Cerca",
+  "chainDirect": "Directa",
+  "chainBlocked": "Obstruida",
+  "theme": "Tema",
+  "themeSystem": "System",
+  "themeLight": "Ligera",
+  "themeDark": "Oscura",
+  "language": "Idioma",
+  "languageSystem": "System",
+  "sectionConnection": "Conexión",
+  "sectionNoServer": "Sin servidor",
+  "sectionPing": "Silbido",
+  "sectionLog": "Diagnóstica",
+  "ipv6": "IPv6",
+  "dns": "DNS",
+  "dnsAuto": "Auto",
+  "dnsHint": "Direcciones, separadas por comas",
+  "fragment": "fragmentación TLS",
+  "fragmentPackets": "que dividir",
+  "fragmentLength": "Tamaño de pieza",
+  "fragmentInterval": "Pausa entre piezas",
+  "byDefault": "Por defecto",
+  "rangeHint": "Por ejemplo, 100-200",
+  "splitPos": "Posiciones divididas",
+  "splitPosHint": "Por ejemplo, 1, medio",
+  "disorder": "Reordenar piezas",
+  "tlsRecord": "Dividir el registro TLS",
+  "tlsRecordNo": "No",
+  "tlsRecordSni": "En el nombre del sitio",
+  "tlsRecordFirst": "Después del primer byte",
+  "hostCase": "Cambiar caso de host",
+  "probeMethod": "Método",
+  "probeAuto": "Auto",
+  "probeEngine": "A través del motor",
+  "probeConnect": "Sólo conexión",
+  "probeUrl": "Dirección de prueba",
+  "probeTimeout": "Esperar",
+  "seconds": "{n} s",
+  "subscriptions": "Suscripciones",
+  "subscriptionSettings": "Ajustes",
+  "userAgent": "Agente de usuario",
+  "autoUpdate": "Actualizar automáticamente",
+  "updateInterval": "Con qué frecuencia",
+  "intervalProvider": "Como pregunta el proveedor",
+  "hours": "{n} h",
+  "updateNow": "Actualizar ahora",
+  "logLevel": "que grabar",
+  "levelDebug": "Toda",
+  "levelInfo": "Habitual",
+  "levelWarning": "Importante",
+  "levelError": "Sólo errores",
+  "recordDestinations": "Registrar direcciones de sitios",
+  "reset": "Restablecer configuración",
+  "resetConfirm": "¿Restablecer todas las configuraciones?",
+  "resetAction": "Reiniciar",
+  "invalidValue": "Este valor no funcionará",
+  "website": "Página de suscripción",
+  "providerWebsite": "Sitio web del proveedor",
+  "support": "Apoyo",
+  "controlPortQuestion": "{engine} se controla a través de un puerto en esta computadora. Otros programas podrán saber que hay una VPN activada.",
+  "chooseEngine": "Elija {engine}",
+  "rules": "Reglas personalizadas",
+  "ruleAdd": "Nueva regla",
+  "ruleHint": "Sitio, IP o programa",
+  "ruleDirect": "Directa",
+  "ruleProxy": "A través de VPN",
+  "ruleBlock": "Bloquear",
+  "failover": "Fallo de encendido",
+  "connectOnStart": "Conectar al inicio",
+  "trafficLow": "{name}: {left} izquierda",
+  "ruleInvalid": "Esto no parece un sitio, una IP o un programa.",
+  "tunnelMode": "Modo",
+  "tunnelTun": "Todo el tráfico",
+  "tunnelProxy": "Proxy System",
+  "proxyAddress": "dirección proxy",
+  "copied": "Copiada",
+  "launchAtLogin": "Comience con el sistema",
+  "closeToTray": "Mantener en la bandeja cuando esté cerrada.",
+  "notifications": "Notificaciones",
+  "trayOpen": "Abierto Sora",
+  "trayConnect": "Conectar",
+  "trayDisconnect": "Desconectar",
+  "trayServer": "Servidora",
+  "trayQuit": "Salir de Sora",
+  "trayTooltip": "Sora: {state}",
+  "trayTooltipServer": "Sora: {state}, {server}",
+  "noticeInTray": "Sora todavía está en la bandeja.",
+  "noticeInTrayBody": "Salir desde el menú de su icono",
+  "noticeLost": "Conexión perdida",
+  "noticeLostBody": "Sora se está reconectando",
+  "noticeRestored": "Conectada de nuevo",
+  "noticeFailed": "No se pudo conectar",
+  "noticeBackup": "El servidor principal no respondió; la copia de seguridad lleva el tráfico",
+  "noticeNext": "El servidor no respondió; el siguiente lleva el tráfico",
+  "noticeMainBack": "El servidor principal responde nuevamente y transporta el tráfico.",
+  "noticeSubscription": "Suscripción",
+  "importTitle": "¿Agregar esta suscripción?",
+  "importSealed": "Este enlace está cifrado para Happ y solo Happ puede leerlo. Pídale a su proveedor el enlace de suscripción simple.",
+  "understood": "DE ACUERDO",
+  "noAnswer": "sin respuesta",
+  "home": "Hogar",
+  "navRules": "Normas",
+  "navConnections": "Conexiones",
+  "navLogs": "Registros",
+  "navAbout": "Acerca de",
+  "sidebarToggle": "Alternar barra lateral",
+  "more": "Más",
+  "less": "Menos",
+  "currentServer": "Servidor actual",
+  "trafficDown": "Descargada",
+  "trafficUp": "subido",
+  "perSecond": "{value}/s",
+  "activeRules": "Reglas activas: {count}",
+  "recentNotifications": "Notificaciones recientes",
+  "notificationsEmpty": "Los eventos de conexión y suscripción aparecerán aquí",
+  "retryConnect": "Reintentar conexión",
+  "openLogs": "Abrir registros",
+  "tourReplay": "Mostrar guía nuevamente",
+  "tourStep": "Paso {step} de 5",
+  "tourBack": "Atrás",
+  "tourNext": "Próxima",
+  "tourSkip": "Saltar",
+  "tourFinish": "Hecho",
+  "tourAdd": "Agregue el enlace de suscripción de su proveedor.",
+  "tourServer": "Elige un servidor. \"Más rápido\" selecciona uno por usted.",
+  "tourConnect": "Haga clic aquí para conectarse o desconectarse.",
+  "tourMode": "Elige un modo. Kill Switch bloquea Internet si la VPN se cae.",
+  "tourSettings": "Abra la configuración. Puedes reproducir esta guía allí.",
+  "chooseProgram": "Elige un programa",
+  "installedApps": "Aplicaciones instaladas",
+  "runningProcesses": "Procesos en ejecución",
+  "programsFailed": "No se pudieron cargar aplicaciones",
+  "programsEmpty": "No se encontraron aplicaciones. Prueba con otro nombre.",
+  "selectExe": "Elija un archivo .exe",
+  "trafficUnavailable": "Los contadores aún no están disponibles",
+  "speedtest": "Velocidad",
+  "speedtestCheck": "comprobar velocidad",
+  "speedtestSearch": "encontrar un servicio",
+  "speedtestEmpty": "Sin coincidencias. Cambia la búsqueda.",
+  "speedtestBackToList": "Volver a servicios",
+  "speedtestOpenBrowser": "Abrir en el navegador",
+  "speedtestUnavailable": "El navegador integrado no pudo iniciarse. Abra el servicio en el navegador de su sistema.",
+  "speedtestPageFailed": "La página no se pudo cargar. Vuelva a cargarlo o abra el servicio en el navegador de su sistema.",
+  "speedtestExternalFailed": "El navegador del sistema no se pudo abrir. Intentar otra vez.",
+  "modes": "Modos",
+  "proxyShort": "Apoderada",
+  "tunMode": "Todo el tráfico (TUN)",
+  "checkUpdates": "Buscar actualizaciones",
+  "updates": "Actualizaciones de aplicaciones",
+  "updateAvailable": "La versión {version} está disponible",
+  "updateOpenAbout": "Ver actualización",
+  "updateNotes": "Cambios en {version}",
+  "updateCheck": "Buscar actualizaciones",
+  "updateChecking": "De cheques...",
+  "updateNoNotes": "El comunicado no tiene notas.",
+  "updateDropWarning": "La conexión VPN se cortará durante unos segundos mientras Sora y su actualización principal. ¿Continuar?",
+  "updateWaitConnection": "Espere a que la conexión VPN y el núcleo estén listos.",
+  "updateDownloading": "Descargando y verificando archivos...",
+  "updateInstalling": "Preparando la actualización o esperando la autenticación del administrador...",
+  "updateNetworkError": "No se pudo descargar la actualización. Intentar otra vez.",
+  "updateReleaseError": "Los datos de publicación o los archivos requeridos faltan o no son válidos.",
+  "updateChecksumError": "La descarga no coincide con SHA256SUMS. No se instaló nada.",
+  "updateInstallError": "La actualización no terminó. Es posible que se haya cancelado la autenticación.",
+  "updateUnsupported": "Este ejecutable no pertenece a ningún par de paquetes Sora compatible. Utilice las instrucciones de instalación de la versión.",
+  "updateManual": "Ejecute este comando en una terminal para instalar ambos paquetes verificados y luego vuelva a abrir Sora. Los archivos permanecen en el directorio de descarga. La conexión VPN se cortará.",
+  "updateCopyCommand": "comando copiar",
+  "updateChecksDisabled": "Las comprobaciones automáticas están deshabilitadas en Configuración.",
+  "updateInstalled": "Actualización instalada. Vuelva a abrir Sora.",
+  "projectLinks": "Proyecto",
+  "githubReleases": "Lanzamientos y descargas",
+  "telegramChannel": "Canal Telegram",
+  "licenses": "Licencias",
+  "componentLicenses": "Licencias de componentes",
+  "appCopyright": "© 2026 levvs-one y colaboradores",
+  "collapseServers": "Colapsar servidores",
+  "expandServers": "Ampliar servidores",
+  "hideDescription": "Ocultar descripción",
+  "showDescription": "Mostrar descripción",
+  "pendingConnectionChanges": "Vuelva a conectarse para aplicar estos cambios.",
+  "reconnectNow": "Aplicar y reconectar",
+  "bypassLimitations": "Este modo omite DPI solo para HTTP y TLS, no admite UDP ni cambia su IP. Utilice un servidor VPN para voz Discord, llamadas y direcciones Telegram bloqueadas.",
+  "errEngineUnsupported": "El motor seleccionado no admite este perfil o configuración. Elija Auto o un motor compatible.",
+  "errRestore": "La limpieza de la conexión fue incompleta. Vuelva a intentar desconectarse; consulte el registro para obtener más detalles.",
+  "errSessionEnded": "Esta sesión ya ha terminado. Actualiza el estado de la conexión.",
+  "retryDisconnect": "Reintentar desconectar",
+  "tunStack": "pila TUN",
+  "modesInfo": "Acerca de los modos",
+  "modesGuideTitle": "Modos y motores",
+  "probeServers": "comprobar servidores",
+  "expiresIn": "{name}: {days, plural, =0{la suscripción finaliza en unas horas} one{la suscripción finaliza el día #} other{la suscripción finaliza en días #}}",
+  "groupOrdered": "{count, plural, one{Servidor #, a su vez} other{Servidores #, a su vez}}",
+  "groupBest": "{count, plural, one{Servidor #, la más rápida} other{Servidores #, la más rápida}}",
+  "modesGuide": "Elija Auto si no está seguro de qué motor necesita su servidor. Sora comprueba el perfil y la configuración antes de conectarse. Un motor no puede aumentar el ancho de banda de su plan: el rendimiento depende del servidor, la ruta, el protocolo y la red.\n\n## Modos\n\n### Todo el tráfico (TUN)\n\nSora crea una interfaz de red virtual y enruta el tráfico de aplicaciones a través de ella, incluidos TCP y UDP. Utilice este modo para Telegram, juegos y voz Discord. Las reglas pueden enviar sitios o programas específicos directamente o bloquearlos. El servicio de red necesita permiso y un servidor que admita el protocolo requerido.\n\n### Proxy System\n\nSora configura un proxy HTTP/SOCKS local. Las aplicaciones que respetan la configuración del proxy del sistema lo utilizan. Las aplicaciones con su propia pila de red pueden conectarse directamente; UDP y las llamadas de voz generalmente necesitan TUN. Este modo se adapta a navegadores y aplicaciones compatibles con proxy.\n\n### Sin servidor\n\nEn Linux, Sora usa [zapret](https://github.com/bol-van/zapret) para dividir y remodelar solicitudes HTTP/TLS y omitir algunas comprobaciones de DPI. Su IP sigue siendo la misma y las conexiones van directamente al sitio web. Los resultados dependen de su proveedor y del método de bloqueo.\n\nLa integración actual utiliza tpws para HTTP y TLS sobre TCP. No evita el bloqueo de IP ni retransmite UDP y no puede garantizar las conexiones MTProto del Telegram. Utilice un servidor VPN con TUN para voz Discord, llamadas Telegram y este tipo de restricciones.\n\n## Motores\n\n### Automático\n\nSora selecciona un motor instalado que soporta todo el plan de conexión: protocolos de servidor, transportes, grupos, fragmentación y modo. Una elección manual incompatible se rechaza antes de detener la conexión actual. Elija Auto u otro motor y aplique la configuración nuevamente.\n\n### sing-box\n\nLos nuevos paquetes Sora incluyen [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), una bifurcación de [sing-box](https://github.com/SagerNet/sing-box), agregando XHTTP y VLESS Encryption del lado del cliente. Sora reconoce la construcción y sus capacidades. Una versión ascendente sin XHTTP no obtiene esta capacidad solo por su nombre.\n\nLos protocolos admitidos incluyen VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard y los parámetros AmneziaWG 1.x/2.x que Sora puede importar. Los perfiles JSON Xray completos requieren Xray. Aún no se pueden importar nuevos campos AWG 3.x. sing-box utiliza un puerto de control local protegido con contraseña, que otras aplicaciones de la computadora pueden detectar.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) admite fragmentación VLESS, REALITY, XHTTP, VLESS Encryption y TLS. También ejecuta perfiles completos del proveedor Xray conservando al mismo tiempo sus enrutamientos y grupos. Estos perfiles no se pueden convertir automáticamente a otro motor sin cambiar su comportamiento.\n\nEl Xray incluido eliminó la configuración que deshabilita la verificación del certificado TLS (`allowInsecure`). Selecciona automáticamente sing-box o mihomo para servidores normales que requieren esta configuración. Al seleccionar Xray manualmente se informa de incompatibilidad antes de detener la conexión actual. Los perfiles JSON completos más antiguos necesitan un perfil de proveedor actualizado con un certificado verificable o un PIN de certificado.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) admite grupos de equilibrio de carga y respaldo ordenados, XHTTP y AmneziaWG. Elíjalo cuando sea importante la conmutación por error automática a un servidor de respaldo. La configuración de fragmentación TLS de Sora no está disponible con este motor.\n\n## Compatibilidad en Sora\n\n| Característica | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN y TCP/UDP | Sí | Sí | Sí |\n| XHTTP | Sí | Sí | Sí |\n| VLESS Encryption | Sí | Sí | Sí |\n| Perfil completo Xray | No | Sí | No |\n| TUIC / AnyTLS | Ambos | No | TUIC |\n| Fragmentación TLS | Sí | Sí | No |\n| AmneziaWG 1.x/2.x | Sí¹ | No | Sí |\n| Grupo de reserva ordenado | No | No² | Sí |\n\n¹ Los perfiles con J1/J2/J3/Itime utilizan mihomo; estos campos nunca deben descartarse silenciosamente. ² Para un grupo de perfiles Xray completos, la aplicación selecciona un perfil de respaldo. El soporte depende de la compilación instalada; consulte su versión en Acerca de.\n\n## pila TUN\n\nLa pila maneja TCP y UDP dentro de la interfaz virtual. En el panel de modos, Xray y mihomo ofrecen gVisor, System, Mixed y MIPS. Cada motor guarda sus propias preferencias. Los modos System proxy y Serverless no utilizan esta preferencia.\n\n- **Mixed**: TCP utiliza la pila del sistema, mientras que gVisor maneja UDP. Este es el valor predeterminado para mihomo en Linux. En Windows, Xray y mihomo usan MIPS de forma predeterminada.\n- **System**: utiliza la pila del sistema. Pruebe otra opción si las aplicaciones de red encuentran problemas.\n- **gVisor**: maneja el tráfico en el espacio de usuario.\n- **MIPS**: pila de IP propia de mihomo, disponible en la versión incluida 1.19.32.\n\nEn Linux, Xray utiliza su gVisor integrado de forma predeterminada. System, Mixed y MIPS en Linux utilizan mihomo como motor TUN, reenviando TCP y UDP a Xray a través de un enlace SOCKS local autenticado. Xray conserva el protocolo, el perfil del proveedor y el enrutamiento. Estas tres opciones requieren un mihomo instalado. En Windows, Xray utiliza mihomo 1.19.32 o posterior para las cuatro pilas TUN. Los protocolos y el enrutamiento permanecen en Xray. Las reglas de aplicaciones en esta combinación solo admiten conexiones directas y bloqueo; en Linux requieren el gVisor integrado de Xray.\n\nEl puente ejecuta un segundo proceso. En tres mediciones inactivas en Linux, utilizó entre 32 y 36 MiB más de memoria física que el Xray TUN nativo. Esto no mide la carga de descarga: los costos de CPU y memoria dependen de las conexiones. sing-box no tiene selector de pila. Ninguna pila garantiza un mejor rendimiento en todas las redes. Elija una pila y seleccione Aplicar y volver a conectarse para probarla en su red.\n\n## Aplicar configuración\n\nAl seleccionar un servidor se vuelve a conectar automáticamente. La configuración de modo, motor, DNS y reglas se guarda inmediatamente; durante una conexión activa, haga clic en Aplicar y vuelva a conectarse para usarlos. Reiniciar un motor puede interrumpir las descargas y las llamadas. Los clics repetidos no inician conexiones paralelas; la desconexión finaliza la transición y libera la conexión.\n\nInternet solo a través de VPN bloquea el tráfico directo cuando cae un túnel. Afecta a toda la máquina. Una desconexión explícita elimina las reglas de Sora. Si la limpieza no finaliza, vuelva a intentar desconectarse y abra el registro.\n\n## Documentación del proyecto\n\n- [sing-box-lx: configuración y soporte](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Documentación sing-box](https://sing-box.sagernet.org/)\n- [Documentación Xray](https://xtls.github.io/)\n- [Documentación mihomo](https://wiki.metacubex.one/)\n- [zapret: funcionamiento y limitaciones](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "@deleteSubscription": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@usage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "@until": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@milliseconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@bytesB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesKB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesMB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesGB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@bytesTB": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@controlPortQuestion": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@chooseEngine": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      }
+    }
+  },
+  "@expiresIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "@trafficLow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupOrdered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@groupBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@trayTooltip": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "@trayTooltipServer": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "server": {
+        "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "@activeRules": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@perSecond": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateNotes": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosticRequiresTun": "La captura de paquetes necesita una conexión Sora TUN activa.",
+  "extensions": "Extensiones",
+  "diagnosticPackets": "captura de paquetes",
+  "diagnosticHttp": "Diagnóstico HTTP",
+  "diagnosticUnavailable": "Este diagnóstico no está disponible en esta plataforma.",
+  "diagnosticEvents": "Eventos de Windows",
+  "diagnosticNoData": "Aún no hay solicitudes registradas. Primero abra un sitio web de prueba de velocidad.",
+  "diagnosticCapture": "Captura durante 10 segundos",
+  "exportLogFile": "En {name}",
+  "@exportLogFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}
