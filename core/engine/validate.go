@@ -172,6 +172,7 @@ func (o Outbound) Validate() error {
 	if len(o.TLS.ALPN) > 8 {
 		errs = append(errs, fmt.Errorf("outbound %s: too many ALPN entries", o.ID))
 	}
+	errs = append(errs, o.TLS.validate("outbound "+o.ID)...)
 	if len(o.Transport.Headers) > MaxHeaderCount {
 		errs = append(errs, fmt.Errorf("outbound %s: more than %d headers", o.ID, MaxHeaderCount))
 	}
@@ -203,6 +204,47 @@ func (o Outbound) Validate() error {
 	return errors.Join(errs...)
 }
 
+// validate enforces the ECH honesty rules (T024, P13-3/P13-4):
+//   - ECH without TLS is meaningless;
+//   - ECH and REALITY are incompatible: REALITY owns the ClientHello, an
+//     ECH extension on top of it is misconfiguration, not stealth;
+//   - QueryServerName is accepted by the struct but rendered by no engine
+//     yet (needs sing-box >= 1.13): accepting it silently would lie about
+//     where the ECH config comes from.
+func (t TLS) validate(what string) []error {
+	ech := t.ECH
+	if !ech.Enabled {
+		return nil
+	}
+	var errs []error
+	if !t.Enabled {
+		errs = append(errs, fmt.Errorf("%s: ECH is enabled but TLS is not", what))
+	}
+	if t.Reality {
+		errs = append(errs, fmt.Errorf("%s: ECH and REALITY are incompatible", what))
+	}
+	if strings.TrimSpace(ech.QueryServerName) != "" {
+		errs = append(errs, fmt.Errorf("%s: ech query_server_name is not rendered yet (needs sing-box >= 1.13)", what))
+	}
+	return errs
+}
+
+// hasEncryptedServer reports whether the plan carries a DNS transport a
+// passive censor cannot read. ECH without a pinned config fetches the
+// ECHConfigList from the DNS HTTPS record; over plaintext or system DNS
+// that bootstrap query leaks the target domain before TLS even starts.
+func (d DNS) hasEncryptedServer() bool {
+	if !d.Enabled {
+		return false
+	}
+	for _, s := range d.Servers {
+		switch s.Transport {
+		case DNSHTTPS, DNSH3, DNSTLS, DNSQUIC:
+			return true
+		}
+	}
+	return false
+}
 // AmneziaWG parameter bounds, matching the upstream kernel module and
 // amneziawg-go: Jc is 1-128 (0 disables junk), junk sizes stay below the
 // 1280-byte minimal IPv6 MTU so packets do not fragment, S1/S2 keep
@@ -662,6 +704,17 @@ func (p *Plan) Validate() error {
 	errs = append(errs, validateChains(p.Outbounds, ids))
 
 	errs = append(errs, p.DNS.validate(), p.Tun.validate(), p.Options.validate())
+
+// ECH without a pinned config fetches the ECHConfigList from the DNS
+// HTTPS record (P13-3): over a plaintext or system DNS path that
+// bootstrap query leaks the target domain before TLS even starts,
+// which defeats the purpose of hiding the SNI. Fail closed with a
+// message that names the fix.
+for _, o := range p.Outbounds {
+	if o.TLS.ECH.Enabled && len(o.TLS.ECH.Config) == 0 && !p.DNS.hasEncryptedServer() {
+		errs = append(errs, fmt.Errorf("plan: outbound %s enables ECH without a pinned config, but the plan has no encrypted DNS transport; pin the ECH config or enable encrypted DNS", o.ID))
+	}
+}
 	return errors.Join(errs...)
 }
 
