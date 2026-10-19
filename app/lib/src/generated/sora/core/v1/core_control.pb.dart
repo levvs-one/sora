@@ -8534,16 +8534,20 @@ class BenchmarkServersRequest extends $pb.GeneratedMessage {
   factory BenchmarkServersRequest({
     ApiVersion? apiVersion,
     $core.List<$core.int>? controlAuthenticator,
+    $core.String? requestId,
     $core.Iterable<$core.String>? serverIds,
     $core.int? durationS,
     $core.int? concurrency,
+    $core.String? url,
   }) {
     final result = BenchmarkServersRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
     if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (requestId != null) result.requestId = requestId;
     if (serverIds != null) result.serverIds.addAll(serverIds);
     if (durationS != null) result.durationS = durationS;
     if (concurrency != null) result.concurrency = concurrency;
+    if (url != null) result.url = url;
     return result;
   }
 
@@ -8561,9 +8565,11 @@ class BenchmarkServersRequest extends $pb.GeneratedMessage {
       createEmptyInstance: BenchmarkServersRequest.$_createMessage)
     ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
     ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
-    ..pPS(3, _omitFieldNames ? '' : 'serverIds')
-    ..aI(4, _omitFieldNames ? '' : 'durationS', fieldType: $pb.PbFieldType.OU3)
-    ..aI(5, _omitFieldNames ? '' : 'concurrency', fieldType: $pb.PbFieldType.OU3)
+    ..aOS(3, _omitFieldNames ? '' : 'requestId')
+    ..pPS(4, _omitFieldNames ? '' : 'serverIds')
+    ..aI(5, _omitFieldNames ? '' : 'durationS', fieldType: $pb.PbFieldType.OU3)
+    ..aI(6, _omitFieldNames ? '' : 'concurrency', fieldType: $pb.PbFieldType.OU3)
+    ..aOS(7, _omitFieldNames ? '' : 'url')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -8607,25 +8613,43 @@ class BenchmarkServersRequest extends $pb.GeneratedMessage {
   void clearControlAuthenticator() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $core.List<$core.String> get serverIds => $_getList(2);
+  $core.String get requestId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set requestId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRequestId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRequestId() => $_clearField(3);
 
   @$pb.TagNumber(4)
-  $core.int get durationS => $_getIZ(3);
-  @$pb.TagNumber(4)
-  set durationS($core.int value) => $_setUnsignedInt32(3, value);
-  @$pb.TagNumber(4)
-  $core.bool hasDurationS() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearDurationS() => $_clearField(4);
+  $core.List<$core.String> get serverIds => $_getList(3);
 
   @$pb.TagNumber(5)
-  $core.int get concurrency => $_getIZ(4);
+  $core.int get durationS => $_getIZ(4);
   @$pb.TagNumber(5)
-  set concurrency($core.int value) => $_setUnsignedInt32(4, value);
+  set durationS($core.int value) => $_setUnsignedInt32(4, value);
   @$pb.TagNumber(5)
-  $core.bool hasConcurrency() => $_has(4);
+  $core.bool hasDurationS() => $_has(4);
   @$pb.TagNumber(5)
-  void clearConcurrency() => $_clearField(5);
+  void clearDurationS() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.int get concurrency => $_getIZ(5);
+  @$pb.TagNumber(6)
+  set concurrency($core.int value) => $_setUnsignedInt32(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasConcurrency() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearConcurrency() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get url => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set url($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasUrl() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearUrl() => $_clearField(7);
 }
 
 /// One throughput sample for a server; done marks the final sample.

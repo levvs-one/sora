@@ -1873,9 +1873,11 @@ const BenchmarkServersRequest$json = {
   '2': [
     {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
     {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
-    {'1': 'server_ids', '3': 3, '4': 3, '5': 9, '10': 'serverIds'},
-    {'1': 'duration_s', '3': 4, '4': 1, '5': 13, '10': 'durationS'},
-    {'1': 'concurrency', '3': 5, '4': 1, '5': 13, '10': 'concurrency'},
+    {'1': 'request_id', '3': 3, '4': 1, '5': 9, '10': 'requestId'},
+    {'1': 'server_ids', '3': 4, '4': 3, '5': 9, '10': 'serverIds'},
+    {'1': 'duration_s', '3': 5, '4': 1, '5': 13, '10': 'durationS'},
+    {'1': 'concurrency', '3': 6, '4': 1, '5': 13, '10': 'concurrency'},
+    {'1': 'url', '3': 7, '4': 1, '5': 9, '10': 'url'},
   ],
 };
 
@@ -1885,9 +1887,9 @@ final $typed_data.Uint8List benchmarkServersRequestDescriptor =
     $convert.base64Decode(
         'ChdCZW5jaG1hcmtTZXJ2ZXJzUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29y'
         'ZS52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEo'
-        'DFIUY29udHJvbEF1dGhlbnRpY2F0b3ISHQoKc2VydmVyX2lkcxgDIAMoCVIJc2VydmVySWRzEh0K'
-        'CmR1cmF0aW9uX3MYBCABKA1SCWR1cmF0aW9uUxIgCgtjb25jdXJyZW5jeRgFIAEoDVILY29uY3Vy'
-        'cmVuY3k=');
+        'DFIUY29udHJvbEF1dGhlbnRpY2F0b3ISHQoKcmVxdWVzdF9pZBgDIAEoCVIJcmVxdWVzdElkEh0K'
+        'CnNlcnZlcl9pZHMYBCADKAlSCXNlcnZlcklkcxIdCgpkdXJhdGlvbl9zGAUgASgNUglkdXJhdGlv'
+        'blMSIAoLY29uY3VycmVuY3kYBiABKA1SC2NvbmN1cnJlbmN5EhAKA3VybBgHIAEoCVIDdXJs');
 
 const BandwidthSample$json = {
   '1': 'BandwidthSample',
