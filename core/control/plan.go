@@ -43,15 +43,21 @@ type resolver interface {
 	Get(reference string) ([]byte, error)
 }
 
-// parseCredential reads the import pipeline's flat credential map. Invalid
-// documents are rejected in full to avoid partially configured connections.
-func parseCredential(material []byte) map[string]string {
-	out := make(map[string]string, 12)
-	if len(material) == 0 {
-		return out
+// parseCredential reads the import pipeline's flat credential map. Only the
+// JSON document produced by credentialDocument is accepted; anything else
+// (a raw proxy URL, truncated or foreign bytes) fails closed instead of
+// yielding an empty, partially configured credential (SORA-M8).
+func parseCredential(material []byte) (map[string]string, error) {
+	if len(bytes.TrimSpace(material)) == 0 {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+			"control: credential material is empty")
 	}
-	_ = json.Unmarshal(material, &out)
-	return out
+	out := make(map[string]string, 12)
+	if err := json.Unmarshal(material, &out); err != nil {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+			"control: credential material is not a credential document: %v", err)
+	}
+	return out, nil
 }
 
 // credentialDocument serializes only supported credential fields for storage.
@@ -391,7 +397,11 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 		if err != nil {
 			return engine.Outbound{}, errs.Wrap(err, errs.CodeNotFound, errs.KeySecretNotFound)
 		}
-		if err := applyCredential(&outbound, parseCredential(material)); err != nil {
+		values, err := parseCredential(material)
+		if err != nil {
+			return engine.Outbound{}, err
+		}
+		if err := applyCredential(&outbound, values); err != nil {
 			return engine.Outbound{}, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
 				"control: outbound %q: %v", id, err)
 		}
