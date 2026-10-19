@@ -1119,8 +1119,6 @@ Find one in the catalog or install from a file.';
   String get extBgDisabledNote =>
       'Enable the extension to manage its background task.';
   @override
-  String get extCapBackground => 'Runs scheduled tasks in the background';
-  @override
   String get extCapNetwork => 'Can reach the internet';
   @override
   String extCapNetworkHosts(String hosts) => 'Can reach: $hosts';

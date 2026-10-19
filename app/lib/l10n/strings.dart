@@ -1876,11 +1876,6 @@ abstract class S {
   String get extPermBackground;
   String get extPermBackgroundDetail;
 
-  /// No description provided for @extCapBackground.
-  ///
-  /// In ru, this message translates to:
-  ///
-  /// **'Фоновые задачи'**
   String get extCapBackground;
 
   /// No description provided for @extCapFilterTitle.
@@ -1981,7 +1976,6 @@ abstract class S {
   String extBgHours(int hours);
   String get extBgNote;
   String get extBgDisabledNote;
-  String get extCapBackground;
   String get extCapNetwork;
   String extCapNetworkHosts(String hosts);
 

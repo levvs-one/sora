@@ -1136,8 +1136,6 @@ class SRu extends S {
   String get extBgDisabledNote =>
       'Включите расширение, чтобы управлять фоновой задачей.';
   @override
-  String get extCapBackground => 'Выполняет задачи по расписанию в фоне';
-  @override
   String get extCapNetwork => 'Имеет доступ в интернет';
   @override
   String extCapNetworkHosts(String hosts) => 'Доступные хосты: $hosts';

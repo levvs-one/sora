@@ -676,7 +676,6 @@
   },
   "extBgNote": "Применяется сразу. Минимальный интервал — 15 минут.",
   "extBgDisabledNote": "Включите расширение, чтобы управлять фоновой задачей.",
-  "extCapBackground": "Выполняет задачи по расписанию в фоне",
   "extCapNetwork": "Имеет доступ в интернет",
   "extCapNetworkHosts": "Доступные хосты: {hosts}",
   "@extCapNetworkHosts": {

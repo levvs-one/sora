@@ -524,7 +524,6 @@
   },
   "extBgNote": "Applies immediately. The shortest allowed interval is 15 minutes.",
   "extBgDisabledNote": "Enable the extension to manage its background task.",
-  "extCapBackground": "Runs scheduled tasks in the background",
   "extCapNetwork": "Can reach the internet",
   "extCapNetworkHosts": "Can reach: {hosts}",
   "@extCapNetworkHosts": {
