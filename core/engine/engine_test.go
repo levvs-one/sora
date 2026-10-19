@@ -193,3 +193,25 @@ func TestTunStackNeverSilentlyChangesWithTheEngine(t *testing.T) {
 		}
 	}
 }
+
+// TestPlanValidateRejectsUnknownProtocolAndTransport locks SORA-L16: an
+// unknown protocol or transport must fail plan validation with a clear
+// error, not surface late at eng.Apply.
+func TestPlanValidateRejectsUnknownProtocolAndTransport(t *testing.T) {
+	plan := validPlan()
+	plan.Outbounds[0].Protocol = "foobar"
+	plan.Outbounds[0].Transport.Type = "quic"
+	err := plan.Validate()
+	if err == nil {
+		t.Fatal("a plan with an unknown protocol must not validate")
+	}
+	for _, want := range []string{`unknown protocol "foobar"`, `unknown transport "quic"`} {
+		if !strings.Contains(err.Error(), want) {
+			t.Errorf("error does not report %q:\n%s", want, err)
+		}
+	}
+	good := validPlan()
+	if err := good.Validate(); err != nil {
+		t.Fatalf("good plan rejected: %v", err)
+	}
+}
