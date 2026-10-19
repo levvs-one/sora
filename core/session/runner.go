@@ -112,10 +112,13 @@ type Session struct {
 	guardMu   sync.Mutex
 	engineSub func()
 	// crashes watches engine crashes for the instability signal (F7).
-	crashes   *crashWatch
-	ctx       context.Context
-	cancel    context.CancelFunc
-	done      chan struct{}
+	crashes *crashWatch
+	ctx     context.Context
+	cancel  context.CancelFunc
+	done    chan struct{}
+	// censorWatchOnce keeps the censorship failure watcher (SW4) attached
+	// at most once per session.
+	censorWatchOnce sync.Once
 }
 
 // New constructs a stopped session. Start changes the system after plan
@@ -164,7 +167,7 @@ func New(cfg Config) (*Session, error) {
 			TunnelMode: cfg.Settings.TunnelMode,
 		},
 		crashes: newCrashWatch(),
-		done: make(chan struct{}),
+		done:    make(chan struct{}),
 	}, nil
 }
 

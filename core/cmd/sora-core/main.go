@@ -30,8 +30,11 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/tunroute"
 	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/ext"
+	censorv1 "github.com/levvs-one/sora-client/core/gen/sora/censor/v1"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	extv1 "github.com/levvs-one/sora-client/core/gen/sora/ext/v1"
+	leakv1 "github.com/levvs-one/sora-client/core/gen/sora/leak/v1"
+	obfsv1 "github.com/levvs-one/sora-client/core/gen/sora/obfs/v1"
 	"github.com/levvs-one/sora-client/core/guard"
 	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
@@ -44,7 +47,7 @@ import (
 
 // Version defines the API contract served by this build. Contract changes must
 // update this value and the generated code together.
-var Version = control.Version{Major: 1, Minor: 10, MinSupportedMinor: 1}
+var Version = control.Version{Major: 1, Minor: 11, MinSupportedMinor: 1}
 
 // Options configures a core instance.
 type Options struct {
@@ -327,6 +330,18 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		}),
 	)
 	corev1.RegisterCoreControlServer(app.server, plane)
+	// Leak self-tests: active egress probes over the control socket. The
+	// service shares the socket's auth interceptors, so only control peers
+	// reach it; the handler additionally checks the control authenticator.
+	leakv1.RegisterLeakServiceServer(app.server, plane)
+	// Obfuscation suite: shares the control socket and its auth
+	// interceptors; ApplyObfsProfile stays control-only by default,
+	// GetObfsCapabilities is listed as read-only.
+	obfsv1.RegisterObfsControlServer(app.server, plane)
+	// Censorship diagnosis (SW4): shares the control socket and its auth
+	// interceptors; DetectCensorship additionally checks the control
+	// authenticator, because verdicts describe the machine's network.
+	censorv1.RegisterCensorControlServer(app.server, plane)
 	// Extensions: the host service shares the control socket and its auth
 	// interceptors, so only control peers reach it; per-extension tokens
 	// and permission scopes are enforced inside the host.

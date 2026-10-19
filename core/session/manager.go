@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/levvs-one/sora-client/core/censor"
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/profiles"
@@ -166,6 +167,9 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 	m.current = created
 	m.last = created.Status()
 	m.mu.Unlock()
+	// Diagnose network-level failures in the background: the watcher reacts
+	// to journal events only and never touches the session runner (SW4).
+	created.WatchCensorshipFailures(&censor.Detector{}, &censor.Prober{})
 	return created, nil
 }
 

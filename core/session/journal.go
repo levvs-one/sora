@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/levvs-one/sora-client/core/censor"
 	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/profiles"
 )
@@ -26,22 +27,29 @@ const (
 	// EventProfile marks a network profile matching the current network
 	// (F5). Profile carries the match; the client applies it.
 	EventProfile EventKind = "profile"
+	// EventCensor carries a censorship verdict for a failed connection
+	// attempt (SW4). Censor holds the structured verdict; Detail holds the
+	// user-facing line the control plane surfaces through the event stream.
+	EventCensor EventKind = "censor"
 )
 
 // Event records a session change. Journal-assigned sequence numbers increase
 // within the session so clients can resume streams after reconnecting.
 type Event struct {
-	Sequence   uint64
-	At         time.Time
-	Kind       EventKind
-	State      State
-	Reason     errs.Code
-	Key        errs.Key
-	Detail     string
-	Counters   Counters
-	Probe      *ProbeOutcome
-	Switch     *GroupSwitch
-	Profile    *profiles.Match
+	Sequence uint64
+	At       time.Time
+	Kind     EventKind
+	State    State
+	Reason   errs.Code
+	Key      errs.Key
+	Detail   string
+	Counters Counters
+	Probe    *ProbeOutcome
+	Switch   *GroupSwitch
+	Profile  *profiles.Match
+	// Censor is set for EventCensor: the detector's verdict about a failed
+	// connection attempt.
+	Censor     *censor.Verdict
 	RetryAfter time.Duration
 	LogLine    string
 }
