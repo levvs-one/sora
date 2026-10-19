@@ -208,10 +208,12 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 	}
 	// A hostname that resolves to several addresses races them Happy
 	// Eyeballs style (P0-9): the first successful dial wins instead of
-	// betting the whole budget on the first answer. IP literals and
-	// single-address hosts keep the historical single-dial path with no
-	// extra goroutines or DNS lookups.
-	if addrs := p.candidateAddrs(ctx, host, timeout); len(addrs) > 1 {
+	// betting the whole budget on the first answer. A resolved answer —
+	// even a single address — dials from the answer directly, so the
+	// race never pays for a second DNS lookup. IP literals and failed
+	// lookups keep the historical single-dial path, where the dialer
+	// resolves (or skips resolving) exactly as before.
+	if addrs, ok := p.candidateAddrs(ctx, host, timeout); ok {
 		return p.dialRace(ctx, host, port, addrs, timeout)
 	}
 	return p.dialSingle(ctx, host, port, timeout)
@@ -253,27 +255,28 @@ func (p *Prober) dialSingle(ctx context.Context, host string, port uint32, timeo
 }
 
 // candidateAddrs resolves host to the addresses a race would try, in
-// resolver order. It returns nil for IP literals (nothing to resolve)
-// and when resolution fails or yields fewer than two addresses, keeping
-// those cases on the single-dial path.
-func (p *Prober) candidateAddrs(ctx context.Context, host string, timeout time.Duration) []netip.Addr {
+// resolver order. It reports false for IP literals (nothing to resolve)
+// and when resolution fails, keeping those cases on the historical
+// single-dial path where the dialer resolves (or skips resolving) as
+// before. A resolved answer — even a single address — reports true, so
+// the caller dials from the answer directly instead of resolving twice.
+func (p *Prober) candidateAddrs(ctx context.Context, host string, timeout time.Duration) ([]netip.Addr, bool) {
 	if _, err := netip.ParseAddr(host); err == nil {
-		return nil
+		return nil, false
 	}
 	lookup := p.lookupIP
 	if lookup == nil {
 		lookup = systemLookupIP
 	}
 	// Bound the lookup well inside the endpoint budget so a slow
-	// resolver cannot starve the race; on failure the single-dial path
-	// resolves again through the dialer, as before.
+	// resolver cannot starve the race.
 	rctx, cancel := context.WithTimeout(ctx, min(timeout, 2*time.Second))
 	defer cancel()
 	addrs, err := lookup(rctx, host)
-	if err != nil || len(addrs) < 2 {
-		return nil
+	if err != nil || len(addrs) == 0 {
+		return nil, false
 	}
-	return addrs
+	return addrs, true
 }
 
 // systemLookupIP resolves host through the system resolver, keeping the

@@ -164,7 +164,7 @@ func runRace(ctx context.Context, candidates []Candidate, o Options) (Result, er
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			results <- attempt(raceCtx, i, candidates[i], o.AttemptTimeout)
+			results <- attemptGuarded(raceCtx, i, candidates[i], o.AttemptTimeout)
 		}()
 		// Re-arm the stagger for the candidate after this one,
 		// draining a timer that already fired.
@@ -216,6 +216,20 @@ func runRace(ctx context.Context, candidates []Candidate, o Options) (Result, er
 	}
 	wg.Wait()
 	return Result{}, joinFailures(failures)
+}
+
+// attemptGuarded runs one attempt, converting a panicking Dial into an
+// error outcome. A panic must fail its candidate, never hang the race:
+// without the guard the panicked goroutine would send no outcome and
+// drainLate would block on it forever, even after the caller cancels.
+func attemptGuarded(ctx context.Context, index int, c Candidate, attemptTimeout time.Duration) (out outcome) {
+	defer func() {
+		if p := recover(); p != nil {
+			out = outcome{index: index, err: errs.Newf(errs.CodeInternal, errs.KeyInternal,
+				"candidate %d panicked: %v", index, p)}
+		}
+	}()
+	return attempt(ctx, index, c, attemptTimeout)
 }
 
 // attempt dials one candidate. The error is classified before it leaves,

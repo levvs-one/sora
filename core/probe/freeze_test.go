@@ -423,3 +423,27 @@ func TestProberWithoutDetectorUnaffected(t *testing.T) {
 		t.Fatalf("expected a certificate failure, got %+v", r)
 	}
 }
+
+// TestObserveFailureIgnoresCancellation checks that a cancelled dial is
+// not recorded as a stall: cancellation carries no signal about the
+// network (someone stopped waiting), and connection racing cancels
+// losers routinely, so recording them would poison the detector with
+// false freeze evidence on every race.
+func TestObserveFailureIgnoresCancellation(t *testing.T) {
+	d := &FreezeDetector{}
+	d.ObserveFailure("a.example", 6, context.Canceled, true)
+	d.ObserveFailure("a.example", 6, context.Canceled, false)
+	v := d.Verdict("a.example")
+	if v.Frozen {
+		t.Fatalf("cancelled attempts must not freeze a verdict, evidence: %v", v.Evidence)
+	}
+	if v.ParallelTotal != 0 || v.ParallelStalled != 0 {
+		t.Fatalf("cancelled attempts recorded samples: %+v", v)
+	}
+	// A genuine timeout still records a stall.
+	d.ObserveFailure("a.example", 6, context.DeadlineExceeded, true)
+	v = d.Verdict("a.example")
+	if v.ParallelStalled != 1 {
+		t.Fatalf("deadline-exceeded attempts must still record stalls: %+v", v)
+	}
+}

@@ -261,9 +261,18 @@ func (d *FreezeDetector) Observe(s FreezeSample) {
 // ObserveFailure classifies a dial error and records it as a freeze sample.
 // Pass the raw dial error and whether a TLS handshake was attempted, the
 // same contract as ClassifyDialError: classify before any errs wrapping.
+//
+// A cancelled attempt carries no signal about the network — someone
+// stopped waiting, the handshake did not stall — so it is ignored. This
+// matters for connection racing: losers are cancelled routinely, and
+// recording them as stalls would poison the detector with false
+// evidence on every race.
 func (d *FreezeDetector) ObserveFailure(sni string, concurrent int, err error, tlsAttempted bool) {
 	if err == nil {
 		d.Observe(FreezeSample{SNI: sni, Concurrent: concurrent, Stalled: false})
+		return
+	}
+	if errors.Is(err, context.Canceled) {
 		return
 	}
 	f := ClassifyDialError(err, tlsAttempted)

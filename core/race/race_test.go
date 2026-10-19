@@ -331,6 +331,66 @@ func TestRaceStaggerSpacesCandidateStarts(t *testing.T) {
 	}
 }
 
+// TestRacePanickingDialFailsCandidate checks that a Dial which panics
+// fails its candidate instead of hanging the race: without the guard the
+// panicked goroutine would send no outcome and the race would wait for it
+// forever, even after the caller cancels.
+func TestRacePanickingDialFailsCandidate(t *testing.T) {
+	bad := race.Candidate{Label: "panics", Dial: func(context.Context) (net.Conn, error) {
+		panic("dial bug")
+	}}
+	good := candidate("good", newFake(10*time.Millisecond, nil))
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	res, err := race.Race(ctx, []race.Candidate{bad, good},
+		race.Options{Concurrency: 2, Stagger: time.Millisecond})
+	if err != nil {
+		t.Fatalf("Race() error = %v, want the healthy candidate to win", err)
+	}
+	_ = res.Conn.Close()
+	if res.Label != "good" {
+		t.Errorf("winner label = %q, want good", res.Label)
+	}
+
+	// A race of only panicking candidates fails instead of hanging.
+	ctx2, cancel2 := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel2()
+	_, err = race.Race(ctx2, []race.Candidate{bad, bad},
+		race.Options{Concurrency: 2, Stagger: time.Millisecond})
+	if err == nil {
+		t.Fatal("Race() error = nil, want the panic converted to a failure")
+	}
+	if got := errs.CodeOf(err); got != errs.CodeInternal {
+		t.Errorf("code = %q, want %q", got, errs.CodeInternal)
+	}
+}
+
+// TestRaceErrorTextNeverCarriesAddresses locks the SORA-M7 contract at
+// the race level: candidate labels may name addresses for telemetry, but
+// neither the label nor the dial target may reach error text.
+func TestRaceErrorTextNeverCarriesAddresses(t *testing.T) {
+	refused := func(ctx context.Context) (net.Conn, error) {
+		return nil, &net.OpError{Op: "dial", Net: "tcp",
+			Addr: &net.TCPAddr{IP: net.ParseIP("10.9.8.7"), Port: 443},
+			Err:  syscall.ECONNREFUSED}
+	}
+	candidates := []race.Candidate{
+		{Label: "tcp/10.9.8.7:443", Network: "tcp", Address: "10.9.8.7:443", Dial: refused},
+		{Label: "tcp/10.9.8.8:443", Network: "tcp", Address: "10.9.8.8:443", Dial: refused},
+	}
+	_, err := race.Race(context.Background(), candidates,
+		race.Options{Concurrency: 2, Stagger: time.Millisecond})
+	if err == nil {
+		t.Fatal("Race() error = nil, want refused")
+	}
+	if s := err.Error(); strings.Contains(s, "10.9.8") {
+		t.Errorf("Race() error leaks an address: %q", s)
+	}
+	if got := errs.CodeOf(err); got != errs.CodeUnavailable {
+		t.Errorf("code = %q, want %q (unanimous refusal)", got, errs.CodeUnavailable)
+	}
+}
+
 // TestRaceNoCandidatesIsAnError checks the empty input contract.
 func TestRaceNoCandidatesIsAnError(t *testing.T) {
 	_, err := race.Race(context.Background(), nil, race.Options{})

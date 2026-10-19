@@ -104,8 +104,8 @@ func TestCandidateAddrsReturnsNilOnResolutionFailure(t *testing.T) {
 	p.lookupIP = func(_ context.Context, _ string) ([]netip.Addr, error) {
 		return nil, &net.DNSError{Err: "no such host", Name: "example.invalid", IsNotFound: true}
 	}
-	if addrs := p.candidateAddrs(context.Background(), "example.com", 3*time.Second); addrs != nil {
-		t.Errorf("candidateAddrs() = %v, want nil on resolution failure", addrs)
+	if addrs, ok := p.candidateAddrs(context.Background(), "example.com", 3*time.Second); ok || addrs != nil {
+		t.Errorf("candidateAddrs() = (%v, %v), want (nil, false) on resolution failure", addrs, ok)
 	}
 }
 
@@ -118,8 +118,8 @@ func TestCandidateAddrsSkipsIPLiteral(t *testing.T) {
 		return nil, nil
 	}
 	for _, host := range []string{"127.0.0.1", "::1"} {
-		if addrs := p.candidateAddrs(context.Background(), host, 3*time.Second); addrs != nil {
-			t.Errorf("candidateAddrs(%q) = %v, want nil", host, addrs)
+		if addrs, ok := p.candidateAddrs(context.Background(), host, 3*time.Second); ok || addrs != nil {
+			t.Errorf("candidateAddrs(%q) = (%v, %v), want (nil, false)", host, addrs, ok)
 		}
 	}
 }
@@ -134,7 +134,10 @@ func TestCandidateAddrsKeepsResolverOrder(t *testing.T) {
 	}
 	p := New(Config{Timeout: 3 * time.Second})
 	p.lookupIP = func(_ context.Context, _ string) ([]netip.Addr, error) { return want, nil }
-	got := p.candidateAddrs(context.Background(), "example.com", 3*time.Second)
+	got, ok := p.candidateAddrs(context.Background(), "example.com", 3*time.Second)
+	if !ok {
+		t.Fatal("candidateAddrs() ok = false, want true for a resolved answer")
+	}
 	if len(got) != len(want) {
 		t.Fatalf("candidateAddrs() = %v, want %v", got, want)
 	}
@@ -142,5 +145,28 @@ func TestCandidateAddrsKeepsResolverOrder(t *testing.T) {
 		if got[i] != want[i] {
 			t.Fatalf("candidateAddrs()[%d] = %v, want %v (order changed)", i, got[i], want[i])
 		}
+	}
+}
+
+// TestDialSingleResolvedAddressSkipsSecondLookup checks that one
+// resolved address dials from the answer directly: the resolver runs
+// once, and the dialer never resolves again.
+func TestDialSingleResolvedAddressSkipsSecondLookup(t *testing.T) {
+	port := racingListener(t)
+	var lookups int
+	p := New(Config{Timeout: 5 * time.Second})
+	p.lookupIP = func(_ context.Context, _ string) ([]netip.Addr, error) {
+		lookups++
+		return []netip.Addr{netip.MustParseAddr("127.0.0.1")}, nil
+	}
+	latency, err := p.dial(context.Background(), "example.com", port)
+	if err != nil {
+		t.Fatalf("dial() error = %v", err)
+	}
+	if latency <= 0 {
+		t.Errorf("latency = %v, want positive", latency)
+	}
+	if lookups != 1 {
+		t.Errorf("resolver ran %d times, want exactly 1 (no second lookup)", lookups)
 	}
 }
