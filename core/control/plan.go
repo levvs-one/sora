@@ -20,6 +20,7 @@ import (
 	"golang.org/x/net/idna"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/bypass"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	"github.com/levvs-one/sora-client/core/parser"
@@ -401,12 +402,11 @@ func applyChain(plan *engine.Plan, chain []string) error {
 const zapretDirectOutboundID = "sora-zapret-direct"
 
 // defaultZapretStrategy shapes direct traffic when the client enables
-// zapret_with_vpn without sending its own strategy: the TLS ClientHello is
-// split and the second part goes first, defeating basic SNI inspection.
-var defaultZapretStrategy = engine.BypassStrategy{
-	SplitPos: []string{"1", "2"},
-	Disorder: true,
-}
+// zapret_with_vpn without sending its own strategy: the modern
+// nfqws/winws desync set (fake, split2, disorder2, multisplit with
+// autottl over TCP 80/443 and UDP 443, TLS and QUIC). It needs the nfqws
+// backend; see core/engine/bypass/NFQWS-MIGRATION.md.
+var defaultZapretStrategy = bypass.DefaultStrategy()
 
 // applyZapretWithVPN routes direct traffic through zapret's tpws while the
 // VPN tunnel carries the rest (F11). It appends a synthetic bypass outbound

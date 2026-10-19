@@ -435,6 +435,38 @@ type BypassStrategy struct {
 	// Last resort only: unlike the shaping options it throttles every
 	// connection the strategy touches, so it must never be a default.
 	MSS string
+	// Desync lists nfqws --dpi-desync methods in order, e.g. "fake",
+	// "split2", "disorder2", "multisplit". Any entry selects the nfqws
+	// backend; empty keeps the legacy tpws-compatible SplitPos,
+	// Disorder, OOB, TLSRecord and HTTP-shaping fields above. tpws
+	// cannot inject packets, so fake-based methods never run on it.
+	Desync []string
+	// FakeTLS and FakeQUIC name the fake payloads for the fake desync
+	// method: "tls"/"quic" keep zapret's built-ins, anything else is a
+	// file name under the zapret home directory (packaging/zapret
+	// ships files/fake/*.bin there). FakeQUIC needs FilterUDP covering
+	// 443; QUIC has no built-in fake, so FakeQUIC should name a file.
+	FakeTLS  string
+	FakeQUIC string
+	// Fooling degrades the fake/disorder packet so the censor's stack
+	// drops it while the real server tolerates it: "badseq", "badack",
+	// "md5sig", "ts", "badsum", "datanoack". Needs Desync.
+	Fooling string
+	// TTL fixes the fake packet TTL so it dies before the server;
+	// AutoTTL derives it from the path instead
+	// (nfqws --dpi-desync-autottl). Mutually exclusive. Need Desync.
+	TTL     int
+	AutoTTL bool
+	// Repeats duplicates the fake injection
+	// (nfqws --dpi-desync-repeats). Needs Desync.
+	Repeats int
+	// FilterTCP and FilterUDP select the intercepted ports, e.g.
+	// "80,443" and "443". FilterL7 limits desync to application
+	// layers, e.g. "tls,quic". Empty filters leave the backend default
+	// in place. UDP/QUIC desync needs FilterUDP.
+	FilterTCP string
+	FilterUDP string
+	FilterL7  string
 }
 
 // Fragment splits proxy TLS ClientHello messages across TCP segments to evade

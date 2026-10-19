@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -19,8 +20,100 @@ import (
 	"github.com/levvs-one/sora-client/core/logs"
 )
 
-// Source names tpws in the log center.
+// Source names zapret in the log center.
 const Source = "zapret"
+
+// Backend is the zapret binary a strategy runs on.
+type Backend int
+
+const (
+	// BackendTPWS is zapret's transparent SOCKS proxy: TCP only, no
+	// packet injection.
+	BackendTPWS Backend = iota
+	// BackendNFQWS is zapret's packet filter (nfqws on Linux, winws on
+	// Windows): fake packets, autottl, UDP/QUIC desync. It needs packet
+	// interception (NFQUEUE rules / WinDivert), wired up separately.
+	BackendNFQWS
+)
+
+// BackendOf reports which zapret binary a strategy needs. Any desync
+// method selects nfqws; the legacy split/disorder/oob/tlsrec/HTTP
+// shaping runs on tpws.
+func BackendOf(s engine.BypassStrategy) Backend {
+	if len(s.Desync) > 0 {
+		return BackendNFQWS
+	}
+	return BackendTPWS
+}
+
+// defaultQUICFake is the shipped QUIC Initial used when a strategy asks
+// for the "quic" fake keyword. QUIC has no built-in fake in zapret, so
+// the file (packaging/zapret ships it under fake/) is mandatory.
+const defaultQUICFake = "quic_initial_www_google_com.bin"
+
+// DefaultStrategy is the modern nfqws/winws desync set: fake, split2,
+// disorder2 and multisplit with autottl, applied to TCP 80/443 and UDP
+// 443 (TLS and QUIC), with a shipped QUIC Initial as the QUIC fake.
+// It needs the nfqws backend; see NFQWS-MIGRATION.md.
+func DefaultStrategy() engine.BypassStrategy {
+	return engine.BypassStrategy{
+		Desync:    []string{"fake", "split2", "disorder2", "multisplit"},
+		AutoTTL:   true,
+		FilterTCP: "80,443",
+		FilterUDP: "443",
+		FilterL7:  "tls,quic",
+		FakeQUIC:  defaultQUICFake,
+	}
+}
+
+// NFQWSArgs returns the nfqws (winws on Windows) arguments for a
+// strategy. home is the zapret home directory; fake payload files
+// resolve under its fake/ subdirectory. Strategies are validated
+// before this runs (engine.BypassStrategy validation), so names here
+// are already known-good.
+func NFQWSArgs(s engine.BypassStrategy, home string) []string {
+	var args []string
+	if len(s.Desync) > 0 {
+		args = append(args, "--dpi-desync="+strings.Join(s.Desync, ","))
+	}
+	if len(s.SplitPos) > 0 {
+		args = append(args, "--dpi-desync-split-pos="+strings.Join(s.SplitPos, ","))
+	}
+	if s.Fooling != "" {
+		args = append(args, "--dpi-desync-fooling="+s.Fooling)
+	}
+	switch {
+	case s.AutoTTL:
+		args = append(args, "--dpi-desync-autottl")
+	case s.TTL > 0:
+		args = append(args, "--dpi-desync-ttl="+strconv.Itoa(s.TTL))
+	}
+	if s.Repeats > 1 {
+		args = append(args, "--dpi-desync-repeats="+strconv.Itoa(s.Repeats))
+	}
+	// "tls" keeps zapret's built-in ClientHello; anything else is a
+	// shipped fake file.
+	if s.FakeTLS != "" && s.FakeTLS != "tls" {
+		args = append(args, "--dpi-desync-fake-tls="+filepath.Join(home, "fake", s.FakeTLS))
+	}
+	if s.FakeQUIC != "" {
+		name := s.FakeQUIC
+		if name == "quic" {
+			name = defaultQUICFake
+		}
+		args = append(args, "--dpi-desync-fake-quic="+filepath.Join(home, "fake", name))
+	}
+	if s.FilterTCP != "" {
+		args = append(args, "--filter-tcp="+s.FilterTCP)
+	}
+	if s.FilterUDP != "" {
+		args = append(args, "--filter-udp="+s.FilterUDP)
+	}
+	if s.FilterL7 != "" {
+		args = append(args, "--filter-l7="+s.FilterL7)
+	}
+	return args
+}
 
 // Has reports whether a plan carries a bypass outbound.
 func Has(p *engine.Plan) bool {
@@ -141,11 +234,16 @@ func (e *Engine) Validate(ctx context.Context, p *engine.Plan) error {
 }
 
 // Apply starts the tpws processes of the plan, stops the ones it no longer
-// needs, and applies the rewritten plan to the engine.
+// needs, and applies the rewritten plan to the engine. A strategy that
+// needs the nfqws backend fails closed: silently running it on tpws would
+// pretend to desync (e.g. QUIC) while doing nothing.
 func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 	needed := map[string]engine.BypassStrategy{}
 	for _, o := range p.Outbounds {
 		if o.Protocol == engine.ProtocolBypass && o.Bypass != nil {
+			if BackendOf(*o.Bypass) == BackendNFQWS {
+				return fmt.Errorf("bypass: outbound %s needs the nfqws backend (packet interception), which is not wired up yet; see core/engine/bypass/NFQWS-MIGRATION.md", o.ID)
+			}
 			needed[key(*o.Bypass)] = *o.Bypass
 		}
 	}

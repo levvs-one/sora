@@ -589,7 +589,7 @@ func (s *BypassStrategy) validate(id string) error {
 	if s == nil {
 		return fmt.Errorf("outbound %s: a bypass outbound needs a strategy", id)
 	}
-	if len(s.SplitPos) == 0 && s.TLSRecord == "" && s.MSS == "" && !s.HostCase && !s.DomainCase && !s.MethodEOL &&
+	if len(s.SplitPos) == 0 && s.TLSRecord == "" && s.MSS == "" && len(s.Desync) == 0 && !s.HostCase && !s.DomainCase && !s.MethodEOL &&
 		!s.HostDot && !s.HostTab && !s.HostNoSpace && !s.MethodSpace && !s.UnixEOL {
 		return fmt.Errorf("outbound %s: the bypass strategy changes nothing", id)
 	}
@@ -631,6 +631,128 @@ func (s *BypassStrategy) validate(id string) error {
 	}
 	if (s.Disorder || s.OOB) && len(s.SplitPos) == 0 {
 		return fmt.Errorf("outbound %s: disorder and out-of-band bytes need a split position", id)
+	}
+	if err := validateDesync(id, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// validDesyncModes mirrors desync_mode_from_string of the vendored zapret:
+// every --dpi-desync mode the nfqws binary understands.
+var validDesyncModes = map[string]bool{
+	"fake": true, "fakeknown": true, "rst": true, "rstack": true,
+	"synack": true, "syndata": true, "fakeddisorder": true, "disorder": true,
+	"fakedsplit": true, "split": true, "multisplit": true, "split2": true,
+	"multidisorder": true, "disorder2": true, "hostfakesplit": true,
+	"ipfrag2": true, "hopbyhop": true, "destopt": true, "ipfrag1": true,
+	"udplen": true, "tamper": true,
+}
+
+// validFooling mirrors parse_fooling of the vendored zapret.
+var validFooling = map[string]bool{
+	"md5sig": true, "ts": true, "badsum": true, "badseq": true,
+	"datanoack": true, "hopbyhop": true, "hopbyhop2": true, "none": true,
+}
+
+// validFilterL7 mirrors the --filter-l7 values of the vendored zapret.
+var validFilterL7 = map[string]bool{
+	"http": true, "tls": true, "quic": true, "wireguard": true,
+	"dht": true, "discord": true, "stun": true, "unknown": true,
+}
+
+// validFakeName keeps fake payload selectors inside the zapret home:
+// the "tls"/"quic" built-in keywords or a plain file name, never a path.
+var validFakeName = regexp.MustCompile(`^([A-Za-z0-9_.-]+|tls|quic)$`)
+
+// validFilterPorts is a comma-separated list of ports or port ranges.
+var validFilterPorts = regexp.MustCompile(`^([0-9]{1,5}(-[0-9]{1,5})?)(,([0-9]{1,5}(-[0-9]{1,5})?))*$`)
+
+func validateDesync(id string, s *BypassStrategy) error {
+	if len(s.Desync) > 8 {
+		return fmt.Errorf("outbound %s: more than 8 desync methods", id)
+	}
+	hasFake := false
+	for _, m := range s.Desync {
+		if !validDesyncModes[m] {
+			return fmt.Errorf("outbound %s: %q is not a dpi-desync method", id, m)
+		}
+		if m == "fake" {
+			hasFake = true
+		}
+	}
+	nfqws := len(s.Desync) > 0
+	if s.Fooling != "" {
+		if !nfqws {
+			return fmt.Errorf("outbound %s: fooling needs a desync method (nfqws-only)", id)
+		}
+		for _, f := range strings.Split(s.Fooling, ",") {
+			if !validFooling[f] {
+				return fmt.Errorf("outbound %s: %q is not a fooling mode", id, f)
+			}
+		}
+	}
+	if s.FakeTLS != "" || s.FakeQUIC != "" {
+		if !hasFake {
+			return fmt.Errorf("outbound %s: fake payloads need the fake desync method", id)
+		}
+		for _, fake := range []string{s.FakeTLS, s.FakeQUIC} {
+			if fake != "" && !validFakeName.MatchString(fake) {
+				return fmt.Errorf("outbound %s: %q is not a fake payload (built-in keyword or file name)", id, fake)
+			}
+		}
+	}
+	if s.FakeQUIC != "" && s.FilterUDP == "" {
+		return fmt.Errorf("outbound %s: a QUIC fake needs filter-udp (QUIC runs over UDP)", id)
+	}
+	switch {
+	case s.TTL < 0 || s.TTL > 255:
+		return fmt.Errorf("outbound %s: fake TTL %d is out of range (1-255)", id, s.TTL)
+	case s.TTL > 0 && !hasFake:
+		return fmt.Errorf("outbound %s: a fake TTL needs the fake desync method", id)
+	case s.TTL > 0 && s.AutoTTL:
+		return fmt.Errorf("outbound %s: a fake TTL and autottl are mutually exclusive", id)
+	case s.AutoTTL && !hasFake:
+		return fmt.Errorf("outbound %s: autottl needs the fake desync method", id)
+	}
+	if s.Repeats != 0 {
+		if !hasFake {
+			return fmt.Errorf("outbound %s: repeats need the fake desync method", id)
+		}
+		if s.Repeats < 1 || s.Repeats > 16 {
+			return fmt.Errorf("outbound %s: repeats %d is out of range (1-16)", id, s.Repeats)
+		}
+	}
+	for _, filter := range []struct {
+		name, value string
+	}{{"filter-tcp", s.FilterTCP}, {"filter-udp", s.FilterUDP}} {
+		if filter.value == "" {
+			continue
+		}
+		if !nfqws {
+			return fmt.Errorf("outbound %s: %s needs a desync method (nfqws-only)", id, filter.name)
+		}
+		if !validFilterPorts.MatchString(filter.value) {
+			return fmt.Errorf("outbound %s: %q is not a port list", id, filter.value)
+		}
+		for _, part := range strings.Split(filter.value, ",") {
+			for _, p := range strings.Split(part, "-") {
+				n, _ := strconv.Atoi(p)
+				if n < 1 || n > 65535 {
+					return fmt.Errorf("outbound %s: port %d is out of range (1-65535)", id, n)
+				}
+			}
+		}
+	}
+	if s.FilterL7 != "" {
+		if !nfqws {
+			return fmt.Errorf("outbound %s: filter-l7 needs a desync method (nfqws-only)", id)
+		}
+		for _, l7 := range strings.Split(s.FilterL7, ",") {
+			if !validFilterL7[l7] {
+				return fmt.Errorf("outbound %s: %q is not a filter-l7 protocol", id, l7)
+			}
+		}
 	}
 	return nil
 }
