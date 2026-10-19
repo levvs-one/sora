@@ -111,8 +111,7 @@ func (w *networkWatch) changed() string {
 }
 
 // renewConnections closes stale network flows so applications reconnect
-// promptly. Engines without bulk close, including Xray, reapply the plan by
-// restarting.
+// promptly.
 func (s *Session) renewConnections(ctx context.Context, why string) {
 	if s.State() != StateConnected {
 		return
@@ -121,6 +120,13 @@ func (s *Session) renewConnections(ctx context.Context, why string) {
 	// client can show the connection state while flows re-establish.
 	s.log.Append(Event{Kind: EventNetwork, Detail: why})
 	s.log.Append(Event{Kind: EventLog, Detail: why + "; connections reopen"})
+	s.reopenFlows(ctx)
+}
+
+// reopenFlows drops every live connection so applications reconnect on a
+// fresh path. Engines without bulk close, including Xray, reapply the plan
+// by restarting instead.
+func (s *Session) reopenFlows(ctx context.Context) {
 	if tracker, ok := s.eng.(engine.ConnectionTracker); ok {
 		if err := tracker.CloseConnections(ctx); err == nil {
 			return

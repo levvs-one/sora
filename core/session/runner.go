@@ -114,9 +114,12 @@ type Session struct {
 	engineSub func()
 	// crashes watches engine crashes for the instability signal (F7).
 	crashes *crashWatch
-	ctx     context.Context
-	cancel  context.CancelFunc
-	done    chan struct{}
+	// stall watches for an established-but-dead tunnel: zero payload
+	// bytes over a window while connections are open (S4).
+	stall  *stallWatch
+	ctx    context.Context
+	cancel context.CancelFunc
+	done   chan struct{}
 	// censorWatchOnce keeps the censorship failure watcher (SW4) attached
 	// at most once per session.
 	censorWatchOnce sync.Once
@@ -168,6 +171,7 @@ func New(cfg Config) (*Session, error) {
 			TunnelMode: cfg.Settings.TunnelMode,
 		},
 		crashes: newCrashWatch(),
+		stall:   newStallWatch(),
 		done:    make(chan struct{}),
 	}, nil
 }
@@ -269,6 +273,9 @@ func (s *Session) Start(ctx context.Context) error {
 	s.setState(StateConnected, errs.Code(""), errs.Key(""), "")
 	// A clean connect starts a fresh crash episode.
 	s.crashes.reset()
+	// ... and a fresh stall episode: zero bytes are expected while the
+	// tunnel warms up.
+	s.stall.markConnected()
 
 	// Subscribe before returning so failures between Apply and the first
 	// poll cannot be lost.
@@ -483,6 +490,7 @@ func (s *Session) supervise(events <-chan engine.Event) {
 			return
 		case <-ticker.C:
 			s.publishCounters(ctx)
+			s.checkStall(ctx)
 		case <-looksAt:
 			// While the engine restarts, a look may reach the process
 			// that is going away or one not yet checked.
@@ -531,6 +539,9 @@ func (s *Session) supervise(events <-chan engine.Event) {
 					// The engine recovered: a later crash starts a new
 					// episode.
 					s.crashes.reset()
+					// The path is new, so the stall detector gets a fresh
+					// warmup as well.
+					s.stall.markConnected()
 				}
 			case engine.EventFatal:
 				// Keep the supervisor's reason (restart budget exhausted,

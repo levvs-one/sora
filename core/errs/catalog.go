@@ -51,6 +51,7 @@ const (
 	KeyEngineStopped       Key = "core.engine.stopped"
 	KeyEngineRestartSpent  Key = "core.engine.restart_budget_spent"
 	KeyEngineUnstable      Key = "core.engine.unstable"
+	KeyEngineStalled       Key = "core.engine.stalled"
 
 	// Subscriptions and import.
 	KeySubscriptionEmpty     Key = "core.subscription.empty"
@@ -144,6 +145,7 @@ var catalog = map[Key]Entry{
 	KeyEngineStopped:       {CodeUnavailable, true, "the engine process exited"},
 	KeyEngineRestartSpent:  {CodeUnavailable, true, "the engine kept dying and the restart budget is spent"},
 	KeyEngineUnstable:      {CodeUnavailable, true, "the engine keeps crashing"},
+	KeyEngineStalled:       {CodeUnavailable, true, "the tunnel stopped moving traffic"},
 
 	// Subscriptions and import.
 	KeySubscriptionEmpty:     {CodeInvalidArgument, false, "the subscription body is empty"},
