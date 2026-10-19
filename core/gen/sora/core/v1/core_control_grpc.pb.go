@@ -19,37 +19,41 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CoreControl_Connect_FullMethodName             = "/sora.core.v1.CoreControl/Connect"
-	CoreControl_Disconnect_FullMethodName          = "/sora.core.v1.CoreControl/Disconnect"
-	CoreControl_GetStatus_FullMethodName           = "/sora.core.v1.CoreControl/GetStatus"
-	CoreControl_WatchEvents_FullMethodName         = "/sora.core.v1.CoreControl/WatchEvents"
-	CoreControl_ParseImport_FullMethodName         = "/sora.core.v1.CoreControl/ParseImport"
-	CoreControl_FetchSubscription_FullMethodName   = "/sora.core.v1.CoreControl/FetchSubscription"
-	CoreControl_ProbeServers_FullMethodName        = "/sora.core.v1.CoreControl/ProbeServers"
-	CoreControl_GetStats_FullMethodName            = "/sora.core.v1.CoreControl/GetStats"
-	CoreControl_RunDiagnostics_FullMethodName      = "/sora.core.v1.CoreControl/RunDiagnostics"
-	CoreControl_ExportDiagnostics_FullMethodName   = "/sora.core.v1.CoreControl/ExportDiagnostics"
-	CoreControl_SetKillSwitch_FullMethodName       = "/sora.core.v1.CoreControl/SetKillSwitch"
-	CoreControl_Handshake_FullMethodName           = "/sora.core.v1.CoreControl/Handshake"
-	CoreControl_GetAbout_FullMethodName            = "/sora.core.v1.CoreControl/GetAbout"
-	CoreControl_GetRoutingPresets_FullMethodName   = "/sora.core.v1.CoreControl/GetRoutingPresets"
-	CoreControl_QueryLogs_FullMethodName           = "/sora.core.v1.CoreControl/QueryLogs"
-	CoreControl_WatchLogs_FullMethodName           = "/sora.core.v1.CoreControl/WatchLogs"
-	CoreControl_ExportLogs_FullMethodName          = "/sora.core.v1.CoreControl/ExportLogs"
-	CoreControl_ClearLogs_FullMethodName           = "/sora.core.v1.CoreControl/ClearLogs"
-	CoreControl_GetLogSettings_FullMethodName      = "/sora.core.v1.CoreControl/GetLogSettings"
-	CoreControl_SetLogSettings_FullMethodName      = "/sora.core.v1.CoreControl/SetLogSettings"
-	CoreControl_ListConnections_FullMethodName     = "/sora.core.v1.CoreControl/ListConnections"
-	CoreControl_CloseConnection_FullMethodName     = "/sora.core.v1.CoreControl/CloseConnection"
-	CoreControl_SaveSubscription_FullMethodName    = "/sora.core.v1.CoreControl/SaveSubscription"
-	CoreControl_ListSubscriptions_FullMethodName   = "/sora.core.v1.CoreControl/ListSubscriptions"
-	CoreControl_DeleteSubscription_FullMethodName  = "/sora.core.v1.CoreControl/DeleteSubscription"
-	CoreControl_RefreshSubscription_FullMethodName = "/sora.core.v1.CoreControl/RefreshSubscription"
-	CoreControl_WatchSubscriptions_FullMethodName  = "/sora.core.v1.CoreControl/WatchSubscriptions"
-	CoreControl_GetSubscriptionLink_FullMethodName = "/sora.core.v1.CoreControl/GetSubscriptionLink"
-	CoreControl_PutSecret_FullMethodName           = "/sora.core.v1.CoreControl/PutSecret"
-	CoreControl_DeleteSecret_FullMethodName        = "/sora.core.v1.CoreControl/DeleteSecret"
-	CoreControl_CheckDnsLeaks_FullMethodName       = "/sora.core.v1.CoreControl/CheckDnsLeaks"
+	CoreControl_Connect_FullMethodName                  = "/sora.core.v1.CoreControl/Connect"
+	CoreControl_Disconnect_FullMethodName               = "/sora.core.v1.CoreControl/Disconnect"
+	CoreControl_GetStatus_FullMethodName                = "/sora.core.v1.CoreControl/GetStatus"
+	CoreControl_WatchEvents_FullMethodName              = "/sora.core.v1.CoreControl/WatchEvents"
+	CoreControl_ParseImport_FullMethodName              = "/sora.core.v1.CoreControl/ParseImport"
+	CoreControl_FetchSubscription_FullMethodName        = "/sora.core.v1.CoreControl/FetchSubscription"
+	CoreControl_ProbeServers_FullMethodName             = "/sora.core.v1.CoreControl/ProbeServers"
+	CoreControl_GetStats_FullMethodName                 = "/sora.core.v1.CoreControl/GetStats"
+	CoreControl_RunDiagnostics_FullMethodName           = "/sora.core.v1.CoreControl/RunDiagnostics"
+	CoreControl_ExportDiagnostics_FullMethodName        = "/sora.core.v1.CoreControl/ExportDiagnostics"
+	CoreControl_SetKillSwitch_FullMethodName            = "/sora.core.v1.CoreControl/SetKillSwitch"
+	CoreControl_Handshake_FullMethodName                = "/sora.core.v1.CoreControl/Handshake"
+	CoreControl_GetAbout_FullMethodName                 = "/sora.core.v1.CoreControl/GetAbout"
+	CoreControl_GetRoutingPresets_FullMethodName        = "/sora.core.v1.CoreControl/GetRoutingPresets"
+	CoreControl_QueryLogs_FullMethodName                = "/sora.core.v1.CoreControl/QueryLogs"
+	CoreControl_WatchLogs_FullMethodName                = "/sora.core.v1.CoreControl/WatchLogs"
+	CoreControl_ExportLogs_FullMethodName               = "/sora.core.v1.CoreControl/ExportLogs"
+	CoreControl_ClearLogs_FullMethodName                = "/sora.core.v1.CoreControl/ClearLogs"
+	CoreControl_GetLogSettings_FullMethodName           = "/sora.core.v1.CoreControl/GetLogSettings"
+	CoreControl_SetLogSettings_FullMethodName           = "/sora.core.v1.CoreControl/SetLogSettings"
+	CoreControl_ListConnections_FullMethodName          = "/sora.core.v1.CoreControl/ListConnections"
+	CoreControl_CloseConnection_FullMethodName          = "/sora.core.v1.CoreControl/CloseConnection"
+	CoreControl_SaveSubscription_FullMethodName         = "/sora.core.v1.CoreControl/SaveSubscription"
+	CoreControl_ListSubscriptions_FullMethodName        = "/sora.core.v1.CoreControl/ListSubscriptions"
+	CoreControl_DeleteSubscription_FullMethodName       = "/sora.core.v1.CoreControl/DeleteSubscription"
+	CoreControl_RefreshSubscription_FullMethodName      = "/sora.core.v1.CoreControl/RefreshSubscription"
+	CoreControl_WatchSubscriptions_FullMethodName       = "/sora.core.v1.CoreControl/WatchSubscriptions"
+	CoreControl_GetSubscriptionLink_FullMethodName      = "/sora.core.v1.CoreControl/GetSubscriptionLink"
+	CoreControl_PutSecret_FullMethodName                = "/sora.core.v1.CoreControl/PutSecret"
+	CoreControl_DeleteSecret_FullMethodName             = "/sora.core.v1.CoreControl/DeleteSecret"
+	CoreControl_CheckDnsLeaks_FullMethodName            = "/sora.core.v1.CoreControl/CheckDnsLeaks"
+	CoreControl_BenchmarkServers_FullMethodName         = "/sora.core.v1.CoreControl/BenchmarkServers"
+	CoreControl_GetBenchmarks_FullMethodName            = "/sora.core.v1.CoreControl/GetBenchmarks"
+	CoreControl_SaveSubscriptionOverride_FullMethodName = "/sora.core.v1.CoreControl/SaveSubscriptionOverride"
+	CoreControl_GetSubscriptionOverride_FullMethodName  = "/sora.core.v1.CoreControl/GetSubscriptionOverride"
 )
 
 // CoreControlClient is the client API for CoreControl service.
@@ -109,6 +113,17 @@ type CoreControlClient interface {
 	// what the OS would use, and whether the kill switch covers DNS. Requires
 	// the control authenticator: the answers describe the machine's network.
 	CheckDnsLeaks(ctx context.Context, in *CheckDnsLeaksRequest, opts ...grpc.CallOption) (*CheckDnsLeaksResponse, error)
+	// Since 1.9. Throughput benchmark: measures real download goodput through
+	// each server by spinning up a temporary engine session. Streams progress
+	// samples; each server reports done=true once. Requires the control
+	// authenticator: benchmarks burn traffic and spawn engine processes.
+	BenchmarkServers(ctx context.Context, in *BenchmarkServersRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BandwidthSample], error)
+	// Since 1.9. Returns the stored benchmark history (see BenchmarkServers).
+	GetBenchmarks(ctx context.Context, in *GetBenchmarksRequest, opts ...grpc.CallOption) (*GetBenchmarksResponse, error)
+	// Since 1.9. User overrides on top of a subscription: renames, hidden
+	// servers, extra rules and pinned order survive subscription refreshes.
+	SaveSubscriptionOverride(ctx context.Context, in *SaveSubscriptionOverrideRequest, opts ...grpc.CallOption) (*SaveSubscriptionOverrideResponse, error)
+	GetSubscriptionOverride(ctx context.Context, in *GetSubscriptionOverrideRequest, opts ...grpc.CallOption) (*GetSubscriptionOverrideResponse, error)
 }
 
 type coreControlClient struct {
@@ -465,6 +480,55 @@ func (c *coreControlClient) CheckDnsLeaks(ctx context.Context, in *CheckDnsLeaks
 	return out, nil
 }
 
+func (c *coreControlClient) BenchmarkServers(ctx context.Context, in *BenchmarkServersRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BandwidthSample], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &CoreControl_ServiceDesc.Streams[4], CoreControl_BenchmarkServers_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[BenchmarkServersRequest, BandwidthSample]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CoreControl_BenchmarkServersClient = grpc.ServerStreamingClient[BandwidthSample]
+
+func (c *coreControlClient) GetBenchmarks(ctx context.Context, in *GetBenchmarksRequest, opts ...grpc.CallOption) (*GetBenchmarksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBenchmarksResponse)
+	err := c.cc.Invoke(ctx, CoreControl_GetBenchmarks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreControlClient) SaveSubscriptionOverride(ctx context.Context, in *SaveSubscriptionOverrideRequest, opts ...grpc.CallOption) (*SaveSubscriptionOverrideResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SaveSubscriptionOverrideResponse)
+	err := c.cc.Invoke(ctx, CoreControl_SaveSubscriptionOverride_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreControlClient) GetSubscriptionOverride(ctx context.Context, in *GetSubscriptionOverrideRequest, opts ...grpc.CallOption) (*GetSubscriptionOverrideResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSubscriptionOverrideResponse)
+	err := c.cc.Invoke(ctx, CoreControl_GetSubscriptionOverride_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CoreControlServer is the server API for CoreControl service.
 // All implementations must embed UnimplementedCoreControlServer
 // for forward compatibility.
@@ -522,6 +586,17 @@ type CoreControlServer interface {
 	// what the OS would use, and whether the kill switch covers DNS. Requires
 	// the control authenticator: the answers describe the machine's network.
 	CheckDnsLeaks(context.Context, *CheckDnsLeaksRequest) (*CheckDnsLeaksResponse, error)
+	// Since 1.9. Throughput benchmark: measures real download goodput through
+	// each server by spinning up a temporary engine session. Streams progress
+	// samples; each server reports done=true once. Requires the control
+	// authenticator: benchmarks burn traffic and spawn engine processes.
+	BenchmarkServers(*BenchmarkServersRequest, grpc.ServerStreamingServer[BandwidthSample]) error
+	// Since 1.9. Returns the stored benchmark history (see BenchmarkServers).
+	GetBenchmarks(context.Context, *GetBenchmarksRequest) (*GetBenchmarksResponse, error)
+	// Since 1.9. User overrides on top of a subscription: renames, hidden
+	// servers, extra rules and pinned order survive subscription refreshes.
+	SaveSubscriptionOverride(context.Context, *SaveSubscriptionOverrideRequest) (*SaveSubscriptionOverrideResponse, error)
+	GetSubscriptionOverride(context.Context, *GetSubscriptionOverrideRequest) (*GetSubscriptionOverrideResponse, error)
 	mustEmbedUnimplementedCoreControlServer()
 }
 
@@ -624,6 +699,18 @@ func (UnimplementedCoreControlServer) DeleteSecret(context.Context, *DeleteSecre
 }
 func (UnimplementedCoreControlServer) CheckDnsLeaks(context.Context, *CheckDnsLeaksRequest) (*CheckDnsLeaksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckDnsLeaks not implemented")
+}
+func (UnimplementedCoreControlServer) BenchmarkServers(*BenchmarkServersRequest, grpc.ServerStreamingServer[BandwidthSample]) error {
+	return status.Errorf(codes.Unimplemented, "method BenchmarkServers not implemented")
+}
+func (UnimplementedCoreControlServer) GetBenchmarks(context.Context, *GetBenchmarksRequest) (*GetBenchmarksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBenchmarks not implemented")
+}
+func (UnimplementedCoreControlServer) SaveSubscriptionOverride(context.Context, *SaveSubscriptionOverrideRequest) (*SaveSubscriptionOverrideResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveSubscriptionOverride not implemented")
+}
+func (UnimplementedCoreControlServer) GetSubscriptionOverride(context.Context, *GetSubscriptionOverrideRequest) (*GetSubscriptionOverrideResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptionOverride not implemented")
 }
 func (UnimplementedCoreControlServer) mustEmbedUnimplementedCoreControlServer() {}
 func (UnimplementedCoreControlServer) testEmbeddedByValue()                     {}
@@ -1176,6 +1263,71 @@ func _CoreControl_CheckDnsLeaks_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CoreControl_BenchmarkServers_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(BenchmarkServersRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CoreControlServer).BenchmarkServers(m, &grpc.GenericServerStream[BenchmarkServersRequest, BandwidthSample]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CoreControl_BenchmarkServersServer = grpc.ServerStreamingServer[BandwidthSample]
+
+func _CoreControl_GetBenchmarks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBenchmarksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).GetBenchmarks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_GetBenchmarks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).GetBenchmarks(ctx, req.(*GetBenchmarksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreControl_SaveSubscriptionOverride_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveSubscriptionOverrideRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).SaveSubscriptionOverride(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_SaveSubscriptionOverride_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).SaveSubscriptionOverride(ctx, req.(*SaveSubscriptionOverrideRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreControl_GetSubscriptionOverride_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSubscriptionOverrideRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).GetSubscriptionOverride(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_GetSubscriptionOverride_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).GetSubscriptionOverride(ctx, req.(*GetSubscriptionOverrideRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CoreControl_ServiceDesc is the grpc.ServiceDesc for CoreControl service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1291,6 +1443,18 @@ var CoreControl_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "CheckDnsLeaks",
 			Handler:    _CoreControl_CheckDnsLeaks_Handler,
 		},
+		{
+			MethodName: "GetBenchmarks",
+			Handler:    _CoreControl_GetBenchmarks_Handler,
+		},
+		{
+			MethodName: "SaveSubscriptionOverride",
+			Handler:    _CoreControl_SaveSubscriptionOverride_Handler,
+		},
+		{
+			MethodName: "GetSubscriptionOverride",
+			Handler:    _CoreControl_GetSubscriptionOverride_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -1311,6 +1475,11 @@ var CoreControl_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "WatchSubscriptions",
 			Handler:       _CoreControl_WatchSubscriptions_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "BenchmarkServers",
+			Handler:       _CoreControl_BenchmarkServers_Handler,
 			ServerStreams: true,
 		},
 	},

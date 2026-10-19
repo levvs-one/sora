@@ -6986,6 +6986,638 @@ func (x *CheckDnsLeaksResponse) GetError() *SoraError {
 	return nil
 }
 
+// BenchmarkServersRequest starts a throughput benchmark for the listed
+// servers. At most 32 servers per call; duration_s is clamped to 5..60,
+// concurrency to 1..4.
+type BenchmarkServersRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	ApiVersion           *ApiVersion            `protobuf:"bytes,1,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
+	ControlAuthenticator []byte                 `protobuf:"bytes,2,opt,name=control_authenticator,json=controlAuthenticator,proto3" json:"control_authenticator,omitempty"`
+	RequestId            string                 `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	// Server ids as known to the client (subscription or manual ids).
+	ServerIds []string `protobuf:"bytes,4,rep,name=server_ids,json=serverIds,proto3" json:"server_ids,omitempty"`
+	// Per-server measurement budget in seconds.
+	DurationS uint32 `protobuf:"varint,5,opt,name=duration_s,json=durationS,proto3" json:"duration_s,omitempty"`
+	// How many servers are benchmarked at once.
+	Concurrency uint32 `protobuf:"varint,6,opt,name=concurrency,proto3" json:"concurrency,omitempty"`
+	// Speed-test URL; empty uses the core default (documented).
+	Url           string `protobuf:"bytes,7,opt,name=url,proto3" json:"url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BenchmarkServersRequest) Reset() {
+	*x = BenchmarkServersRequest{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[98]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BenchmarkServersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BenchmarkServersRequest) ProtoMessage() {}
+
+func (x *BenchmarkServersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[98]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BenchmarkServersRequest.ProtoReflect.Descriptor instead.
+func (*BenchmarkServersRequest) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{98}
+}
+
+func (x *BenchmarkServersRequest) GetApiVersion() *ApiVersion {
+	if x != nil {
+		return x.ApiVersion
+	}
+	return nil
+}
+
+func (x *BenchmarkServersRequest) GetControlAuthenticator() []byte {
+	if x != nil {
+		return x.ControlAuthenticator
+	}
+	return nil
+}
+
+func (x *BenchmarkServersRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *BenchmarkServersRequest) GetServerIds() []string {
+	if x != nil {
+		return x.ServerIds
+	}
+	return nil
+}
+
+func (x *BenchmarkServersRequest) GetDurationS() uint32 {
+	if x != nil {
+		return x.DurationS
+	}
+	return 0
+}
+
+func (x *BenchmarkServersRequest) GetConcurrency() uint32 {
+	if x != nil {
+		return x.Concurrency
+	}
+	return 0
+}
+
+func (x *BenchmarkServersRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+// BandwidthSample is one progress or final sample of a benchmark.
+type BandwidthSample struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	ServerId string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	// Measured goodput in bytes per second (meaningful when done=true).
+	BytesPerSec uint64 `protobuf:"varint,2,opt,name=bytes_per_sec,json=bytesPerSec,proto3" json:"bytes_per_sec,omitempty"`
+	// 0..100 progress of this server's measurement.
+	ProgressPct uint32 `protobuf:"varint,3,opt,name=progress_pct,json=progressPct,proto3" json:"progress_pct,omitempty"`
+	// True on the final sample for this server.
+	Done          bool       `protobuf:"varint,4,opt,name=done,proto3" json:"done,omitempty"`
+	Error         *SoraError `protobuf:"bytes,5,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BandwidthSample) Reset() {
+	*x = BandwidthSample{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[99]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BandwidthSample) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BandwidthSample) ProtoMessage() {}
+
+func (x *BandwidthSample) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[99]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BandwidthSample.ProtoReflect.Descriptor instead.
+func (*BandwidthSample) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{99}
+}
+
+func (x *BandwidthSample) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *BandwidthSample) GetBytesPerSec() uint64 {
+	if x != nil {
+		return x.BytesPerSec
+	}
+	return 0
+}
+
+func (x *BandwidthSample) GetProgressPct() uint32 {
+	if x != nil {
+		return x.ProgressPct
+	}
+	return 0
+}
+
+func (x *BandwidthSample) GetDone() bool {
+	if x != nil {
+		return x.Done
+	}
+	return false
+}
+
+func (x *BandwidthSample) GetError() *SoraError {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+// GetBenchmarksRequest reads the stored benchmark history.
+type GetBenchmarksRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	ApiVersion           *ApiVersion            `protobuf:"bytes,1,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
+	ControlAuthenticator []byte                 `protobuf:"bytes,2,opt,name=control_authenticator,json=controlAuthenticator,proto3" json:"control_authenticator,omitempty"`
+	// Empty returns all entries.
+	ServerIds     []string `protobuf:"bytes,3,rep,name=server_ids,json=serverIds,proto3" json:"server_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBenchmarksRequest) Reset() {
+	*x = GetBenchmarksRequest{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[100]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBenchmarksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBenchmarksRequest) ProtoMessage() {}
+
+func (x *GetBenchmarksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[100]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBenchmarksRequest.ProtoReflect.Descriptor instead.
+func (*GetBenchmarksRequest) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{100}
+}
+
+func (x *GetBenchmarksRequest) GetApiVersion() *ApiVersion {
+	if x != nil {
+		return x.ApiVersion
+	}
+	return nil
+}
+
+func (x *GetBenchmarksRequest) GetControlAuthenticator() []byte {
+	if x != nil {
+		return x.ControlAuthenticator
+	}
+	return nil
+}
+
+func (x *GetBenchmarksRequest) GetServerIds() []string {
+	if x != nil {
+		return x.ServerIds
+	}
+	return nil
+}
+
+type GetBenchmarksResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Benchmarks    []*BenchmarkRecord     `protobuf:"bytes,1,rep,name=benchmarks,proto3" json:"benchmarks,omitempty"`
+	Error         *SoraError             `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBenchmarksResponse) Reset() {
+	*x = GetBenchmarksResponse{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[101]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBenchmarksResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBenchmarksResponse) ProtoMessage() {}
+
+func (x *GetBenchmarksResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[101]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBenchmarksResponse.ProtoReflect.Descriptor instead.
+func (*GetBenchmarksResponse) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{101}
+}
+
+func (x *GetBenchmarksResponse) GetBenchmarks() []*BenchmarkRecord {
+	if x != nil {
+		return x.Benchmarks
+	}
+	return nil
+}
+
+func (x *GetBenchmarksResponse) GetError() *SoraError {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+// BenchmarkRecord is one stored measurement (TTL 24h, see history docs).
+type BenchmarkRecord struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ServerId       string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	BytesPerSec    uint64                 `protobuf:"varint,2,opt,name=bytes_per_sec,json=bytesPerSec,proto3" json:"bytes_per_sec,omitempty"`
+	LatencyMs      uint32                 `protobuf:"varint,3,opt,name=latency_ms,json=latencyMs,proto3" json:"latency_ms,omitempty"`
+	MeasuredAtUnix int64                  `protobuf:"varint,4,opt,name=measured_at_unix,json=measuredAtUnix,proto3" json:"measured_at_unix,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *BenchmarkRecord) Reset() {
+	*x = BenchmarkRecord{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[102]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BenchmarkRecord) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BenchmarkRecord) ProtoMessage() {}
+
+func (x *BenchmarkRecord) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[102]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BenchmarkRecord.ProtoReflect.Descriptor instead.
+func (*BenchmarkRecord) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{102}
+}
+
+func (x *BenchmarkRecord) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *BenchmarkRecord) GetBytesPerSec() uint64 {
+	if x != nil {
+		return x.BytesPerSec
+	}
+	return 0
+}
+
+func (x *BenchmarkRecord) GetLatencyMs() uint32 {
+	if x != nil {
+		return x.LatencyMs
+	}
+	return 0
+}
+
+func (x *BenchmarkRecord) GetMeasuredAtUnix() int64 {
+	if x != nil {
+		return x.MeasuredAtUnix
+	}
+	return 0
+}
+
+// SaveSubscriptionOverrideRequest stores user edits on top of a subscription.
+// Only the fields present are replaced; omitted fields keep their values.
+type SaveSubscriptionOverrideRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	ApiVersion           *ApiVersion            `protobuf:"bytes,1,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
+	ControlAuthenticator []byte                 `protobuf:"bytes,2,opt,name=control_authenticator,json=controlAuthenticator,proto3" json:"control_authenticator,omitempty"`
+	SubscriptionId       string                 `protobuf:"bytes,3,opt,name=subscription_id,json=subscriptionId,proto3" json:"subscription_id,omitempty"`
+	// server_id -> display name. Empty value clears the rename.
+	Renames map[string]string `protobuf:"bytes,4,rep,name=renames,proto3" json:"renames,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Complete hidden set; replaces the stored one.
+	Hidden []string `protobuf:"bytes,5,rep,name=hidden,proto3" json:"hidden,omitempty"`
+	// Complete pinned order; servers not listed keep their relative order after.
+	PinnedOrder []string `protobuf:"bytes,6,rep,name=pinned_order,json=pinnedOrder,proto3" json:"pinned_order,omitempty"`
+	// If true, deletes the whole override file.
+	Clear         bool `protobuf:"varint,7,opt,name=clear,proto3" json:"clear,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SaveSubscriptionOverrideRequest) Reset() {
+	*x = SaveSubscriptionOverrideRequest{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[103]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SaveSubscriptionOverrideRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SaveSubscriptionOverrideRequest) ProtoMessage() {}
+
+func (x *SaveSubscriptionOverrideRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[103]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SaveSubscriptionOverrideRequest.ProtoReflect.Descriptor instead.
+func (*SaveSubscriptionOverrideRequest) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{103}
+}
+
+func (x *SaveSubscriptionOverrideRequest) GetApiVersion() *ApiVersion {
+	if x != nil {
+		return x.ApiVersion
+	}
+	return nil
+}
+
+func (x *SaveSubscriptionOverrideRequest) GetControlAuthenticator() []byte {
+	if x != nil {
+		return x.ControlAuthenticator
+	}
+	return nil
+}
+
+func (x *SaveSubscriptionOverrideRequest) GetSubscriptionId() string {
+	if x != nil {
+		return x.SubscriptionId
+	}
+	return ""
+}
+
+func (x *SaveSubscriptionOverrideRequest) GetRenames() map[string]string {
+	if x != nil {
+		return x.Renames
+	}
+	return nil
+}
+
+func (x *SaveSubscriptionOverrideRequest) GetHidden() []string {
+	if x != nil {
+		return x.Hidden
+	}
+	return nil
+}
+
+func (x *SaveSubscriptionOverrideRequest) GetPinnedOrder() []string {
+	if x != nil {
+		return x.PinnedOrder
+	}
+	return nil
+}
+
+func (x *SaveSubscriptionOverrideRequest) GetClear() bool {
+	if x != nil {
+		return x.Clear
+	}
+	return false
+}
+
+type SaveSubscriptionOverrideResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Error         *SoraError             `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SaveSubscriptionOverrideResponse) Reset() {
+	*x = SaveSubscriptionOverrideResponse{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[104]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SaveSubscriptionOverrideResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SaveSubscriptionOverrideResponse) ProtoMessage() {}
+
+func (x *SaveSubscriptionOverrideResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[104]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SaveSubscriptionOverrideResponse.ProtoReflect.Descriptor instead.
+func (*SaveSubscriptionOverrideResponse) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{104}
+}
+
+func (x *SaveSubscriptionOverrideResponse) GetError() *SoraError {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type GetSubscriptionOverrideRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	ApiVersion           *ApiVersion            `protobuf:"bytes,1,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
+	ControlAuthenticator []byte                 `protobuf:"bytes,2,opt,name=control_authenticator,json=controlAuthenticator,proto3" json:"control_authenticator,omitempty"`
+	SubscriptionId       string                 `protobuf:"bytes,3,opt,name=subscription_id,json=subscriptionId,proto3" json:"subscription_id,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *GetSubscriptionOverrideRequest) Reset() {
+	*x = GetSubscriptionOverrideRequest{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[105]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSubscriptionOverrideRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSubscriptionOverrideRequest) ProtoMessage() {}
+
+func (x *GetSubscriptionOverrideRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[105]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSubscriptionOverrideRequest.ProtoReflect.Descriptor instead.
+func (*GetSubscriptionOverrideRequest) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{105}
+}
+
+func (x *GetSubscriptionOverrideRequest) GetApiVersion() *ApiVersion {
+	if x != nil {
+		return x.ApiVersion
+	}
+	return nil
+}
+
+func (x *GetSubscriptionOverrideRequest) GetControlAuthenticator() []byte {
+	if x != nil {
+		return x.ControlAuthenticator
+	}
+	return nil
+}
+
+func (x *GetSubscriptionOverrideRequest) GetSubscriptionId() string {
+	if x != nil {
+		return x.SubscriptionId
+	}
+	return ""
+}
+
+type GetSubscriptionOverrideResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Renames       map[string]string      `protobuf:"bytes,1,rep,name=renames,proto3" json:"renames,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Hidden        []string               `protobuf:"bytes,2,rep,name=hidden,proto3" json:"hidden,omitempty"`
+	PinnedOrder   []string               `protobuf:"bytes,3,rep,name=pinned_order,json=pinnedOrder,proto3" json:"pinned_order,omitempty"`
+	Error         *SoraError             `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSubscriptionOverrideResponse) Reset() {
+	*x = GetSubscriptionOverrideResponse{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[106]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSubscriptionOverrideResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSubscriptionOverrideResponse) ProtoMessage() {}
+
+func (x *GetSubscriptionOverrideResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[106]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSubscriptionOverrideResponse.ProtoReflect.Descriptor instead.
+func (*GetSubscriptionOverrideResponse) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{106}
+}
+
+func (x *GetSubscriptionOverrideResponse) GetRenames() map[string]string {
+	if x != nil {
+		return x.Renames
+	}
+	return nil
+}
+
+func (x *GetSubscriptionOverrideResponse) GetHidden() []string {
+	if x != nil {
+		return x.Hidden
+	}
+	return nil
+}
+
+func (x *GetSubscriptionOverrideResponse) GetPinnedOrder() []string {
+	if x != nil {
+		return x.PinnedOrder
+	}
+	return nil
+}
+
+func (x *GetSubscriptionOverrideResponse) GetError() *SoraError {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
 var File_sora_core_v1_core_control_proto protoreflect.FileDescriptor
 
 const file_sora_core_v1_core_control_proto_rawDesc = "" +
@@ -7526,7 +8158,69 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"session_id\x18\x03 \x01(\tR\tsessionId\"z\n" +
 	"\x15CheckDnsLeaksResponse\x122\n" +
 	"\x06checks\x18\x01 \x03(\v2\x1a.sora.core.v1.DnsLeakCheckR\x06checks\x12-\n" +
-	"\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error*\x8d\x01\n" +
+	"\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x9a\x02\n" +
+	"\x17BenchmarkServersRequest\x129\n" +
+	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\n" +
+	"apiVersion\x123\n" +
+	"\x15control_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x03 \x01(\tR\trequestId\x12\x1d\n" +
+	"\n" +
+	"server_ids\x18\x04 \x03(\tR\tserverIds\x12\x1d\n" +
+	"\n" +
+	"duration_s\x18\x05 \x01(\rR\tdurationS\x12 \n" +
+	"\vconcurrency\x18\x06 \x01(\rR\vconcurrency\x12\x10\n" +
+	"\x03url\x18\a \x01(\tR\x03url\"\xb8\x01\n" +
+	"\x0fBandwidthSample\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\"\n" +
+	"\rbytes_per_sec\x18\x02 \x01(\x04R\vbytesPerSec\x12!\n" +
+	"\fprogress_pct\x18\x03 \x01(\rR\vprogressPct\x12\x12\n" +
+	"\x04done\x18\x04 \x01(\bR\x04done\x12-\n" +
+	"\x05error\x18\x05 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xa5\x01\n" +
+	"\x14GetBenchmarksRequest\x129\n" +
+	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\n" +
+	"apiVersion\x123\n" +
+	"\x15control_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n" +
+	"\n" +
+	"server_ids\x18\x03 \x03(\tR\tserverIds\"\x85\x01\n" +
+	"\x15GetBenchmarksResponse\x12=\n" +
+	"\n" +
+	"benchmarks\x18\x01 \x03(\v2\x1d.sora.core.v1.BenchmarkRecordR\n" +
+	"benchmarks\x12-\n" +
+	"\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x9b\x01\n" +
+	"\x0fBenchmarkRecord\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\"\n" +
+	"\rbytes_per_sec\x18\x02 \x01(\x04R\vbytesPerSec\x12\x1d\n" +
+	"\n" +
+	"latency_ms\x18\x03 \x01(\rR\tlatencyMs\x12(\n" +
+	"\x10measured_at_unix\x18\x04 \x01(\x03R\x0emeasuredAtUnix\"\x9d\x03\n" +
+	"\x1fSaveSubscriptionOverrideRequest\x129\n" +
+	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\n" +
+	"apiVersion\x123\n" +
+	"\x15control_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12'\n" +
+	"\x0fsubscription_id\x18\x03 \x01(\tR\x0esubscriptionId\x12T\n" +
+	"\arenames\x18\x04 \x03(\v2:.sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntryR\arenames\x12\x16\n" +
+	"\x06hidden\x18\x05 \x03(\tR\x06hidden\x12!\n" +
+	"\fpinned_order\x18\x06 \x03(\tR\vpinnedOrder\x12\x14\n" +
+	"\x05clear\x18\a \x01(\bR\x05clear\x1a:\n" +
+	"\fRenamesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"Q\n" +
+	" SaveSubscriptionOverrideResponse\x12-\n" +
+	"\x05error\x18\x01 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xb9\x01\n" +
+	"\x1eGetSubscriptionOverrideRequest\x129\n" +
+	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\n" +
+	"apiVersion\x123\n" +
+	"\x15control_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12'\n" +
+	"\x0fsubscription_id\x18\x03 \x01(\tR\x0esubscriptionId\"\x9d\x02\n" +
+	"\x1fGetSubscriptionOverrideResponse\x12T\n" +
+	"\arenames\x18\x01 \x03(\v2:.sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntryR\arenames\x12\x16\n" +
+	"\x06hidden\x18\x02 \x03(\tR\x06hidden\x12!\n" +
+	"\fpinned_order\x18\x03 \x03(\tR\vpinnedOrder\x12-\n" +
+	"\x05error\x18\x04 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\x1a:\n" +
+	"\fRenamesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01*\x8d\x01\n" +
 	"\tGroupType\x12\x1a\n" +
 	"\x16GROUP_TYPE_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11GROUP_TYPE_SELECT\x10\x01\x12\x17\n" +
@@ -7581,7 +8275,7 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"\x16LOG_EXPORT_FORMAT_JSON\x10\x04\x12\x19\n" +
 	"\x15LOG_EXPORT_FORMAT_XML\x10\x05\x12\x19\n" +
 	"\x15LOG_EXPORT_FORMAT_ZIP\x10\x06\x12\x1a\n" +
-	"\x16LOG_EXPORT_FORMAT_GZIP\x10\a2\xca\x15\n" +
+	"\x16LOG_EXPORT_FORMAT_GZIP\x10\a2\xf3\x18\n" +
 	"\vCoreControl\x12F\n" +
 	"\aConnect\x12\x1c.sora.core.v1.ConnectRequest\x1a\x1d.sora.core.v1.ConnectResponse\x12O\n" +
 	"\n" +
@@ -7615,7 +8309,11 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"\x13GetSubscriptionLink\x12(.sora.core.v1.GetSubscriptionLinkRequest\x1a).sora.core.v1.GetSubscriptionLinkResponse\x12L\n" +
 	"\tPutSecret\x12\x1e.sora.core.v1.PutSecretRequest\x1a\x1f.sora.core.v1.PutSecretResponse\x12U\n" +
 	"\fDeleteSecret\x12!.sora.core.v1.DeleteSecretRequest\x1a\".sora.core.v1.DeleteSecretResponse\x12X\n" +
-	"\rCheckDnsLeaks\x12\".sora.core.v1.CheckDnsLeaksRequest\x1a#.sora.core.v1.CheckDnsLeaksResponseB?Z=github.com/levvs-one/sora-client/core/gen/sora/core/v1;corev1b\x06proto3"
+	"\rCheckDnsLeaks\x12\".sora.core.v1.CheckDnsLeaksRequest\x1a#.sora.core.v1.CheckDnsLeaksResponse\x12Z\n" +
+	"\x10BenchmarkServers\x12%.sora.core.v1.BenchmarkServersRequest\x1a\x1d.sora.core.v1.BandwidthSample0\x01\x12X\n" +
+	"\rGetBenchmarks\x12\".sora.core.v1.GetBenchmarksRequest\x1a#.sora.core.v1.GetBenchmarksResponse\x12y\n" +
+	"\x18SaveSubscriptionOverride\x12-.sora.core.v1.SaveSubscriptionOverrideRequest\x1a..sora.core.v1.SaveSubscriptionOverrideResponse\x12v\n" +
+	"\x17GetSubscriptionOverride\x12,.sora.core.v1.GetSubscriptionOverrideRequest\x1a-.sora.core.v1.GetSubscriptionOverrideResponseB?Z=github.com/levvs-one/sora-client/core/gen/sora/core/v1;corev1b\x06proto3"
 
 var (
 	file_sora_core_v1_core_control_proto_rawDescOnce sync.Once
@@ -7630,116 +8328,127 @@ func file_sora_core_v1_core_control_proto_rawDescGZIP() []byte {
 }
 
 var file_sora_core_v1_core_control_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
-var file_sora_core_v1_core_control_proto_msgTypes = make([]protoimpl.MessageInfo, 98)
+var file_sora_core_v1_core_control_proto_msgTypes = make([]protoimpl.MessageInfo, 109)
 var file_sora_core_v1_core_control_proto_goTypes = []any{
-	(GroupType)(0),                      // 0: sora.core.v1.GroupType
-	(TunnelMode)(0),                     // 1: sora.core.v1.TunnelMode
-	(ConnectionStateValue)(0),           // 2: sora.core.v1.ConnectionStateValue
-	(ProbeMethod)(0),                    // 3: sora.core.v1.ProbeMethod
-	(DiagnosticFormat)(0),               // 4: sora.core.v1.DiagnosticFormat
-	(SoraErrorCode)(0),                  // 5: sora.core.v1.SoraErrorCode
-	(LogLevel)(0),                       // 6: sora.core.v1.LogLevel
-	(LogExportFormat)(0),                // 7: sora.core.v1.LogExportFormat
-	(*ApiVersion)(nil),                  // 8: sora.core.v1.ApiVersion
-	(*ConnectRequest)(nil),              // 9: sora.core.v1.ConnectRequest
-	(*ConnectResponse)(nil),             // 10: sora.core.v1.ConnectResponse
-	(*DisconnectRequest)(nil),           // 11: sora.core.v1.DisconnectRequest
-	(*DisconnectResponse)(nil),          // 12: sora.core.v1.DisconnectResponse
-	(*GetStatusRequest)(nil),            // 13: sora.core.v1.GetStatusRequest
-	(*GetStatusResponse)(nil),           // 14: sora.core.v1.GetStatusResponse
-	(*WatchEventsRequest)(nil),          // 15: sora.core.v1.WatchEventsRequest
-	(*SessionPlan)(nil),                 // 16: sora.core.v1.SessionPlan
-	(*GroupSpec)(nil),                   // 17: sora.core.v1.GroupSpec
-	(*RoutingOptions)(nil),              // 18: sora.core.v1.RoutingOptions
-	(*LocalProxy)(nil),                  // 19: sora.core.v1.LocalProxy
-	(*AntiCensorship)(nil),              // 20: sora.core.v1.AntiCensorship
-	(*OutboundSpec)(nil),                // 21: sora.core.v1.OutboundSpec
-	(*Endpoint)(nil),                    // 22: sora.core.v1.Endpoint
-	(*CredentialsRef)(nil),              // 23: sora.core.v1.CredentialsRef
-	(*RoutingRule)(nil),                 // 24: sora.core.v1.RoutingRule
-	(*DnsPolicy)(nil),                   // 25: sora.core.v1.DnsPolicy
-	(*BypassSettings)(nil),              // 26: sora.core.v1.BypassSettings
-	(*SessionStatus)(nil),               // 27: sora.core.v1.SessionStatus
-	(*GetStatsRequest)(nil),             // 28: sora.core.v1.GetStatsRequest
-	(*GetStatsResponse)(nil),            // 29: sora.core.v1.GetStatsResponse
-	(*ConnectionState)(nil),             // 30: sora.core.v1.ConnectionState
-	(*CoreEvent)(nil),                   // 31: sora.core.v1.CoreEvent
-	(*StateChanged)(nil),                // 32: sora.core.v1.StateChanged
-	(*GroupSwitched)(nil),               // 33: sora.core.v1.GroupSwitched
-	(*StatsTick)(nil),                   // 34: sora.core.v1.StatsTick
-	(*BypassStrategyChanged)(nil),       // 35: sora.core.v1.BypassStrategyChanged
-	(*ProbeResult)(nil),                 // 36: sora.core.v1.ProbeResult
-	(*LogBatch)(nil),                    // 37: sora.core.v1.LogBatch
-	(*KillSwitchChanged)(nil),           // 38: sora.core.v1.KillSwitchChanged
-	(*ParseImportRequest)(nil),          // 39: sora.core.v1.ParseImportRequest
-	(*ParseImportResponse)(nil),         // 40: sora.core.v1.ParseImportResponse
-	(*FetchSubscriptionRequest)(nil),    // 41: sora.core.v1.FetchSubscriptionRequest
-	(*FetchSubscriptionResponse)(nil),   // 42: sora.core.v1.FetchSubscriptionResponse
-	(*SubscriptionInfo)(nil),            // 43: sora.core.v1.SubscriptionInfo
-	(*ProbeServersRequest)(nil),         // 44: sora.core.v1.ProbeServersRequest
-	(*ProbeOptions)(nil),                // 45: sora.core.v1.ProbeOptions
-	(*RunDiagnosticsRequest)(nil),       // 46: sora.core.v1.RunDiagnosticsRequest
-	(*RunDiagnosticsResponse)(nil),      // 47: sora.core.v1.RunDiagnosticsResponse
-	(*ExportDiagnosticsRequest)(nil),    // 48: sora.core.v1.ExportDiagnosticsRequest
-	(*ExportDiagnosticsResponse)(nil),   // 49: sora.core.v1.ExportDiagnosticsResponse
-	(*SetKillSwitchRequest)(nil),        // 50: sora.core.v1.SetKillSwitchRequest
-	(*SetKillSwitchResponse)(nil),       // 51: sora.core.v1.SetKillSwitchResponse
-	(*DiagnosticReport)(nil),            // 52: sora.core.v1.DiagnosticReport
-	(*HandshakeRequest)(nil),            // 53: sora.core.v1.HandshakeRequest
-	(*HandshakeResponse)(nil),           // 54: sora.core.v1.HandshakeResponse
-	(*PutSecretRequest)(nil),            // 55: sora.core.v1.PutSecretRequest
-	(*PutSecretResponse)(nil),           // 56: sora.core.v1.PutSecretResponse
-	(*DeleteSecretRequest)(nil),         // 57: sora.core.v1.DeleteSecretRequest
-	(*DeleteSecretResponse)(nil),        // 58: sora.core.v1.DeleteSecretResponse
-	(*SoraError)(nil),                   // 59: sora.core.v1.SoraError
-	(*LogEntry)(nil),                    // 60: sora.core.v1.LogEntry
-	(*LogFilter)(nil),                   // 61: sora.core.v1.LogFilter
-	(*QueryLogsRequest)(nil),            // 62: sora.core.v1.QueryLogsRequest
-	(*QueryLogsResponse)(nil),           // 63: sora.core.v1.QueryLogsResponse
-	(*LogStats)(nil),                    // 64: sora.core.v1.LogStats
-	(*LogLevelCount)(nil),               // 65: sora.core.v1.LogLevelCount
-	(*LogSourceCount)(nil),              // 66: sora.core.v1.LogSourceCount
-	(*WatchLogsRequest)(nil),            // 67: sora.core.v1.WatchLogsRequest
-	(*ExportLogsRequest)(nil),           // 68: sora.core.v1.ExportLogsRequest
-	(*ExportLogsResponse)(nil),          // 69: sora.core.v1.ExportLogsResponse
-	(*ClearLogsRequest)(nil),            // 70: sora.core.v1.ClearLogsRequest
-	(*ClearLogsResponse)(nil),           // 71: sora.core.v1.ClearLogsResponse
-	(*LogSettings)(nil),                 // 72: sora.core.v1.LogSettings
-	(*GetLogSettingsRequest)(nil),       // 73: sora.core.v1.GetLogSettingsRequest
-	(*GetLogSettingsResponse)(nil),      // 74: sora.core.v1.GetLogSettingsResponse
-	(*SetLogSettingsRequest)(nil),       // 75: sora.core.v1.SetLogSettingsRequest
-	(*SetLogSettingsResponse)(nil),      // 76: sora.core.v1.SetLogSettingsResponse
-	(*Connection)(nil),                  // 77: sora.core.v1.Connection
-	(*ListConnectionsRequest)(nil),      // 78: sora.core.v1.ListConnectionsRequest
-	(*ListConnectionsResponse)(nil),     // 79: sora.core.v1.ListConnectionsResponse
-	(*CloseConnectionRequest)(nil),      // 80: sora.core.v1.CloseConnectionRequest
-	(*CloseConnectionResponse)(nil),     // 81: sora.core.v1.CloseConnectionResponse
-	(*SubscriptionSettings)(nil),        // 82: sora.core.v1.SubscriptionSettings
-	(*SubscriptionState)(nil),           // 83: sora.core.v1.SubscriptionState
-	(*SaveSubscriptionRequest)(nil),     // 84: sora.core.v1.SaveSubscriptionRequest
-	(*SaveSubscriptionResponse)(nil),    // 85: sora.core.v1.SaveSubscriptionResponse
-	(*ListSubscriptionsRequest)(nil),    // 86: sora.core.v1.ListSubscriptionsRequest
-	(*ListSubscriptionsResponse)(nil),   // 87: sora.core.v1.ListSubscriptionsResponse
-	(*DeleteSubscriptionRequest)(nil),   // 88: sora.core.v1.DeleteSubscriptionRequest
-	(*DeleteSubscriptionResponse)(nil),  // 89: sora.core.v1.DeleteSubscriptionResponse
-	(*RefreshSubscriptionRequest)(nil),  // 90: sora.core.v1.RefreshSubscriptionRequest
-	(*RefreshSubscriptionResponse)(nil), // 91: sora.core.v1.RefreshSubscriptionResponse
-	(*WatchSubscriptionsRequest)(nil),   // 92: sora.core.v1.WatchSubscriptionsRequest
-	(*GetSubscriptionLinkRequest)(nil),  // 93: sora.core.v1.GetSubscriptionLinkRequest
-	(*GetSubscriptionLinkResponse)(nil), // 94: sora.core.v1.GetSubscriptionLinkResponse
-	(*GetAboutRequest)(nil),             // 95: sora.core.v1.GetAboutRequest
-	(*GetAboutResponse)(nil),            // 96: sora.core.v1.GetAboutResponse
-	(*About)(nil),                       // 97: sora.core.v1.About
-	(*EngineBuild)(nil),                 // 98: sora.core.v1.EngineBuild
-	(*GetRoutingPresetsRequest)(nil),    // 99: sora.core.v1.GetRoutingPresetsRequest
-	(*GetRoutingPresetsResponse)(nil),   // 100: sora.core.v1.GetRoutingPresetsResponse
-	(*RoutingPreset)(nil),               // 101: sora.core.v1.RoutingPreset
-	(*BypassStrategy)(nil),              // 102: sora.core.v1.BypassStrategy
-	(*DnsLeakCheck)(nil),                // 103: sora.core.v1.DnsLeakCheck
-	(*CheckDnsLeaksRequest)(nil),        // 104: sora.core.v1.CheckDnsLeaksRequest
-	(*CheckDnsLeaksResponse)(nil),       // 105: sora.core.v1.CheckDnsLeaksResponse
-	(*durationpb.Duration)(nil),         // 106: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),       // 107: google.protobuf.Timestamp
+	(GroupType)(0),                           // 0: sora.core.v1.GroupType
+	(TunnelMode)(0),                          // 1: sora.core.v1.TunnelMode
+	(ConnectionStateValue)(0),                // 2: sora.core.v1.ConnectionStateValue
+	(ProbeMethod)(0),                         // 3: sora.core.v1.ProbeMethod
+	(DiagnosticFormat)(0),                    // 4: sora.core.v1.DiagnosticFormat
+	(SoraErrorCode)(0),                       // 5: sora.core.v1.SoraErrorCode
+	(LogLevel)(0),                            // 6: sora.core.v1.LogLevel
+	(LogExportFormat)(0),                     // 7: sora.core.v1.LogExportFormat
+	(*ApiVersion)(nil),                       // 8: sora.core.v1.ApiVersion
+	(*ConnectRequest)(nil),                   // 9: sora.core.v1.ConnectRequest
+	(*ConnectResponse)(nil),                  // 10: sora.core.v1.ConnectResponse
+	(*DisconnectRequest)(nil),                // 11: sora.core.v1.DisconnectRequest
+	(*DisconnectResponse)(nil),               // 12: sora.core.v1.DisconnectResponse
+	(*GetStatusRequest)(nil),                 // 13: sora.core.v1.GetStatusRequest
+	(*GetStatusResponse)(nil),                // 14: sora.core.v1.GetStatusResponse
+	(*WatchEventsRequest)(nil),               // 15: sora.core.v1.WatchEventsRequest
+	(*SessionPlan)(nil),                      // 16: sora.core.v1.SessionPlan
+	(*GroupSpec)(nil),                        // 17: sora.core.v1.GroupSpec
+	(*RoutingOptions)(nil),                   // 18: sora.core.v1.RoutingOptions
+	(*LocalProxy)(nil),                       // 19: sora.core.v1.LocalProxy
+	(*AntiCensorship)(nil),                   // 20: sora.core.v1.AntiCensorship
+	(*OutboundSpec)(nil),                     // 21: sora.core.v1.OutboundSpec
+	(*Endpoint)(nil),                         // 22: sora.core.v1.Endpoint
+	(*CredentialsRef)(nil),                   // 23: sora.core.v1.CredentialsRef
+	(*RoutingRule)(nil),                      // 24: sora.core.v1.RoutingRule
+	(*DnsPolicy)(nil),                        // 25: sora.core.v1.DnsPolicy
+	(*BypassSettings)(nil),                   // 26: sora.core.v1.BypassSettings
+	(*SessionStatus)(nil),                    // 27: sora.core.v1.SessionStatus
+	(*GetStatsRequest)(nil),                  // 28: sora.core.v1.GetStatsRequest
+	(*GetStatsResponse)(nil),                 // 29: sora.core.v1.GetStatsResponse
+	(*ConnectionState)(nil),                  // 30: sora.core.v1.ConnectionState
+	(*CoreEvent)(nil),                        // 31: sora.core.v1.CoreEvent
+	(*StateChanged)(nil),                     // 32: sora.core.v1.StateChanged
+	(*GroupSwitched)(nil),                    // 33: sora.core.v1.GroupSwitched
+	(*StatsTick)(nil),                        // 34: sora.core.v1.StatsTick
+	(*BypassStrategyChanged)(nil),            // 35: sora.core.v1.BypassStrategyChanged
+	(*ProbeResult)(nil),                      // 36: sora.core.v1.ProbeResult
+	(*LogBatch)(nil),                         // 37: sora.core.v1.LogBatch
+	(*KillSwitchChanged)(nil),                // 38: sora.core.v1.KillSwitchChanged
+	(*ParseImportRequest)(nil),               // 39: sora.core.v1.ParseImportRequest
+	(*ParseImportResponse)(nil),              // 40: sora.core.v1.ParseImportResponse
+	(*FetchSubscriptionRequest)(nil),         // 41: sora.core.v1.FetchSubscriptionRequest
+	(*FetchSubscriptionResponse)(nil),        // 42: sora.core.v1.FetchSubscriptionResponse
+	(*SubscriptionInfo)(nil),                 // 43: sora.core.v1.SubscriptionInfo
+	(*ProbeServersRequest)(nil),              // 44: sora.core.v1.ProbeServersRequest
+	(*ProbeOptions)(nil),                     // 45: sora.core.v1.ProbeOptions
+	(*RunDiagnosticsRequest)(nil),            // 46: sora.core.v1.RunDiagnosticsRequest
+	(*RunDiagnosticsResponse)(nil),           // 47: sora.core.v1.RunDiagnosticsResponse
+	(*ExportDiagnosticsRequest)(nil),         // 48: sora.core.v1.ExportDiagnosticsRequest
+	(*ExportDiagnosticsResponse)(nil),        // 49: sora.core.v1.ExportDiagnosticsResponse
+	(*SetKillSwitchRequest)(nil),             // 50: sora.core.v1.SetKillSwitchRequest
+	(*SetKillSwitchResponse)(nil),            // 51: sora.core.v1.SetKillSwitchResponse
+	(*DiagnosticReport)(nil),                 // 52: sora.core.v1.DiagnosticReport
+	(*HandshakeRequest)(nil),                 // 53: sora.core.v1.HandshakeRequest
+	(*HandshakeResponse)(nil),                // 54: sora.core.v1.HandshakeResponse
+	(*PutSecretRequest)(nil),                 // 55: sora.core.v1.PutSecretRequest
+	(*PutSecretResponse)(nil),                // 56: sora.core.v1.PutSecretResponse
+	(*DeleteSecretRequest)(nil),              // 57: sora.core.v1.DeleteSecretRequest
+	(*DeleteSecretResponse)(nil),             // 58: sora.core.v1.DeleteSecretResponse
+	(*SoraError)(nil),                        // 59: sora.core.v1.SoraError
+	(*LogEntry)(nil),                         // 60: sora.core.v1.LogEntry
+	(*LogFilter)(nil),                        // 61: sora.core.v1.LogFilter
+	(*QueryLogsRequest)(nil),                 // 62: sora.core.v1.QueryLogsRequest
+	(*QueryLogsResponse)(nil),                // 63: sora.core.v1.QueryLogsResponse
+	(*LogStats)(nil),                         // 64: sora.core.v1.LogStats
+	(*LogLevelCount)(nil),                    // 65: sora.core.v1.LogLevelCount
+	(*LogSourceCount)(nil),                   // 66: sora.core.v1.LogSourceCount
+	(*WatchLogsRequest)(nil),                 // 67: sora.core.v1.WatchLogsRequest
+	(*ExportLogsRequest)(nil),                // 68: sora.core.v1.ExportLogsRequest
+	(*ExportLogsResponse)(nil),               // 69: sora.core.v1.ExportLogsResponse
+	(*ClearLogsRequest)(nil),                 // 70: sora.core.v1.ClearLogsRequest
+	(*ClearLogsResponse)(nil),                // 71: sora.core.v1.ClearLogsResponse
+	(*LogSettings)(nil),                      // 72: sora.core.v1.LogSettings
+	(*GetLogSettingsRequest)(nil),            // 73: sora.core.v1.GetLogSettingsRequest
+	(*GetLogSettingsResponse)(nil),           // 74: sora.core.v1.GetLogSettingsResponse
+	(*SetLogSettingsRequest)(nil),            // 75: sora.core.v1.SetLogSettingsRequest
+	(*SetLogSettingsResponse)(nil),           // 76: sora.core.v1.SetLogSettingsResponse
+	(*Connection)(nil),                       // 77: sora.core.v1.Connection
+	(*ListConnectionsRequest)(nil),           // 78: sora.core.v1.ListConnectionsRequest
+	(*ListConnectionsResponse)(nil),          // 79: sora.core.v1.ListConnectionsResponse
+	(*CloseConnectionRequest)(nil),           // 80: sora.core.v1.CloseConnectionRequest
+	(*CloseConnectionResponse)(nil),          // 81: sora.core.v1.CloseConnectionResponse
+	(*SubscriptionSettings)(nil),             // 82: sora.core.v1.SubscriptionSettings
+	(*SubscriptionState)(nil),                // 83: sora.core.v1.SubscriptionState
+	(*SaveSubscriptionRequest)(nil),          // 84: sora.core.v1.SaveSubscriptionRequest
+	(*SaveSubscriptionResponse)(nil),         // 85: sora.core.v1.SaveSubscriptionResponse
+	(*ListSubscriptionsRequest)(nil),         // 86: sora.core.v1.ListSubscriptionsRequest
+	(*ListSubscriptionsResponse)(nil),        // 87: sora.core.v1.ListSubscriptionsResponse
+	(*DeleteSubscriptionRequest)(nil),        // 88: sora.core.v1.DeleteSubscriptionRequest
+	(*DeleteSubscriptionResponse)(nil),       // 89: sora.core.v1.DeleteSubscriptionResponse
+	(*RefreshSubscriptionRequest)(nil),       // 90: sora.core.v1.RefreshSubscriptionRequest
+	(*RefreshSubscriptionResponse)(nil),      // 91: sora.core.v1.RefreshSubscriptionResponse
+	(*WatchSubscriptionsRequest)(nil),        // 92: sora.core.v1.WatchSubscriptionsRequest
+	(*GetSubscriptionLinkRequest)(nil),       // 93: sora.core.v1.GetSubscriptionLinkRequest
+	(*GetSubscriptionLinkResponse)(nil),      // 94: sora.core.v1.GetSubscriptionLinkResponse
+	(*GetAboutRequest)(nil),                  // 95: sora.core.v1.GetAboutRequest
+	(*GetAboutResponse)(nil),                 // 96: sora.core.v1.GetAboutResponse
+	(*About)(nil),                            // 97: sora.core.v1.About
+	(*EngineBuild)(nil),                      // 98: sora.core.v1.EngineBuild
+	(*GetRoutingPresetsRequest)(nil),         // 99: sora.core.v1.GetRoutingPresetsRequest
+	(*GetRoutingPresetsResponse)(nil),        // 100: sora.core.v1.GetRoutingPresetsResponse
+	(*RoutingPreset)(nil),                    // 101: sora.core.v1.RoutingPreset
+	(*BypassStrategy)(nil),                   // 102: sora.core.v1.BypassStrategy
+	(*DnsLeakCheck)(nil),                     // 103: sora.core.v1.DnsLeakCheck
+	(*CheckDnsLeaksRequest)(nil),             // 104: sora.core.v1.CheckDnsLeaksRequest
+	(*CheckDnsLeaksResponse)(nil),            // 105: sora.core.v1.CheckDnsLeaksResponse
+	(*BenchmarkServersRequest)(nil),          // 106: sora.core.v1.BenchmarkServersRequest
+	(*BandwidthSample)(nil),                  // 107: sora.core.v1.BandwidthSample
+	(*GetBenchmarksRequest)(nil),             // 108: sora.core.v1.GetBenchmarksRequest
+	(*GetBenchmarksResponse)(nil),            // 109: sora.core.v1.GetBenchmarksResponse
+	(*BenchmarkRecord)(nil),                  // 110: sora.core.v1.BenchmarkRecord
+	(*SaveSubscriptionOverrideRequest)(nil),  // 111: sora.core.v1.SaveSubscriptionOverrideRequest
+	(*SaveSubscriptionOverrideResponse)(nil), // 112: sora.core.v1.SaveSubscriptionOverrideResponse
+	(*GetSubscriptionOverrideRequest)(nil),   // 113: sora.core.v1.GetSubscriptionOverrideRequest
+	(*GetSubscriptionOverrideResponse)(nil),  // 114: sora.core.v1.GetSubscriptionOverrideResponse
+	nil,                                      // 115: sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
+	nil,                                      // 116: sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
+	(*durationpb.Duration)(nil),              // 117: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),            // 118: google.protobuf.Timestamp
 }
 var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	8,   // 0: sora.core.v1.ConnectRequest.api_version:type_name -> sora.core.v1.ApiVersion
@@ -7763,7 +8472,7 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	17,  // 18: sora.core.v1.SessionPlan.groups:type_name -> sora.core.v1.GroupSpec
 	18,  // 19: sora.core.v1.SessionPlan.routing:type_name -> sora.core.v1.RoutingOptions
 	0,   // 20: sora.core.v1.GroupSpec.type:type_name -> sora.core.v1.GroupType
-	106, // 21: sora.core.v1.GroupSpec.test_interval:type_name -> google.protobuf.Duration
+	117, // 21: sora.core.v1.GroupSpec.test_interval:type_name -> google.protobuf.Duration
 	102, // 22: sora.core.v1.OutboundSpec.bypass:type_name -> sora.core.v1.BypassStrategy
 	22,  // 23: sora.core.v1.OutboundSpec.endpoint:type_name -> sora.core.v1.Endpoint
 	23,  // 24: sora.core.v1.OutboundSpec.credentials:type_name -> sora.core.v1.CredentialsRef
@@ -7774,9 +8483,9 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	59,  // 29: sora.core.v1.GetStatsResponse.error:type_name -> sora.core.v1.SoraError
 	2,   // 30: sora.core.v1.ConnectionState.value:type_name -> sora.core.v1.ConnectionStateValue
 	5,   // 31: sora.core.v1.ConnectionState.reason:type_name -> sora.core.v1.SoraErrorCode
-	107, // 32: sora.core.v1.ConnectionState.changed_at:type_name -> google.protobuf.Timestamp
-	106, // 33: sora.core.v1.ConnectionState.retry_after:type_name -> google.protobuf.Duration
-	107, // 34: sora.core.v1.CoreEvent.emitted_at:type_name -> google.protobuf.Timestamp
+	118, // 32: sora.core.v1.ConnectionState.changed_at:type_name -> google.protobuf.Timestamp
+	117, // 33: sora.core.v1.ConnectionState.retry_after:type_name -> google.protobuf.Duration
+	118, // 34: sora.core.v1.CoreEvent.emitted_at:type_name -> google.protobuf.Timestamp
 	32,  // 35: sora.core.v1.CoreEvent.state_changed:type_name -> sora.core.v1.StateChanged
 	34,  // 36: sora.core.v1.CoreEvent.stats_tick:type_name -> sora.core.v1.StatsTick
 	35,  // 37: sora.core.v1.CoreEvent.bypass_strategy_changed:type_name -> sora.core.v1.BypassStrategyChanged
@@ -7794,8 +8503,8 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	21,  // 49: sora.core.v1.FetchSubscriptionResponse.outbounds:type_name -> sora.core.v1.OutboundSpec
 	59,  // 50: sora.core.v1.FetchSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
 	43,  // 51: sora.core.v1.FetchSubscriptionResponse.info:type_name -> sora.core.v1.SubscriptionInfo
-	106, // 52: sora.core.v1.SubscriptionInfo.update_interval:type_name -> google.protobuf.Duration
-	107, // 53: sora.core.v1.SubscriptionInfo.expire:type_name -> google.protobuf.Timestamp
+	117, // 52: sora.core.v1.SubscriptionInfo.update_interval:type_name -> google.protobuf.Duration
+	118, // 53: sora.core.v1.SubscriptionInfo.expire:type_name -> google.protobuf.Timestamp
 	8,   // 54: sora.core.v1.ProbeServersRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	22,  // 55: sora.core.v1.ProbeServersRequest.endpoints:type_name -> sora.core.v1.Endpoint
 	21,  // 56: sora.core.v1.ProbeServersRequest.outbounds:type_name -> sora.core.v1.OutboundSpec
@@ -7820,12 +8529,12 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	23,  // 75: sora.core.v1.DeleteSecretRequest.credentials:type_name -> sora.core.v1.CredentialsRef
 	59,  // 76: sora.core.v1.DeleteSecretResponse.error:type_name -> sora.core.v1.SoraError
 	5,   // 77: sora.core.v1.SoraError.code:type_name -> sora.core.v1.SoraErrorCode
-	106, // 78: sora.core.v1.SoraError.retry_after:type_name -> google.protobuf.Duration
-	107, // 79: sora.core.v1.LogEntry.time:type_name -> google.protobuf.Timestamp
+	117, // 78: sora.core.v1.SoraError.retry_after:type_name -> google.protobuf.Duration
+	118, // 79: sora.core.v1.LogEntry.time:type_name -> google.protobuf.Timestamp
 	6,   // 80: sora.core.v1.LogEntry.level:type_name -> sora.core.v1.LogLevel
 	6,   // 81: sora.core.v1.LogFilter.min_level:type_name -> sora.core.v1.LogLevel
-	107, // 82: sora.core.v1.LogFilter.since:type_name -> google.protobuf.Timestamp
-	107, // 83: sora.core.v1.LogFilter.until:type_name -> google.protobuf.Timestamp
+	118, // 82: sora.core.v1.LogFilter.since:type_name -> google.protobuf.Timestamp
+	118, // 83: sora.core.v1.LogFilter.until:type_name -> google.protobuf.Timestamp
 	8,   // 84: sora.core.v1.QueryLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	61,  // 85: sora.core.v1.QueryLogsRequest.filter:type_name -> sora.core.v1.LogFilter
 	60,  // 86: sora.core.v1.QueryLogsResponse.entries:type_name -> sora.core.v1.LogEntry
@@ -7850,18 +8559,18 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	72,  // 105: sora.core.v1.SetLogSettingsRequest.settings:type_name -> sora.core.v1.LogSettings
 	72,  // 106: sora.core.v1.SetLogSettingsResponse.settings:type_name -> sora.core.v1.LogSettings
 	59,  // 107: sora.core.v1.SetLogSettingsResponse.error:type_name -> sora.core.v1.SoraError
-	107, // 108: sora.core.v1.Connection.start:type_name -> google.protobuf.Timestamp
+	118, // 108: sora.core.v1.Connection.start:type_name -> google.protobuf.Timestamp
 	8,   // 109: sora.core.v1.ListConnectionsRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	77,  // 110: sora.core.v1.ListConnectionsResponse.connections:type_name -> sora.core.v1.Connection
 	59,  // 111: sora.core.v1.ListConnectionsResponse.error:type_name -> sora.core.v1.SoraError
 	8,   // 112: sora.core.v1.CloseConnectionRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	59,  // 113: sora.core.v1.CloseConnectionResponse.error:type_name -> sora.core.v1.SoraError
-	106, // 114: sora.core.v1.SubscriptionSettings.update_interval:type_name -> google.protobuf.Duration
+	117, // 114: sora.core.v1.SubscriptionSettings.update_interval:type_name -> google.protobuf.Duration
 	82,  // 115: sora.core.v1.SubscriptionState.settings:type_name -> sora.core.v1.SubscriptionSettings
 	43,  // 116: sora.core.v1.SubscriptionState.info:type_name -> sora.core.v1.SubscriptionInfo
 	21,  // 117: sora.core.v1.SubscriptionState.outbounds:type_name -> sora.core.v1.OutboundSpec
-	107, // 118: sora.core.v1.SubscriptionState.last_update:type_name -> google.protobuf.Timestamp
-	107, // 119: sora.core.v1.SubscriptionState.next_update:type_name -> google.protobuf.Timestamp
+	118, // 118: sora.core.v1.SubscriptionState.last_update:type_name -> google.protobuf.Timestamp
+	118, // 119: sora.core.v1.SubscriptionState.next_update:type_name -> google.protobuf.Timestamp
 	59,  // 120: sora.core.v1.SubscriptionState.last_error:type_name -> sora.core.v1.SoraError
 	8,   // 121: sora.core.v1.SaveSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	82,  // 122: sora.core.v1.SaveSubscriptionRequest.settings:type_name -> sora.core.v1.SubscriptionSettings
@@ -7881,7 +8590,7 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	8,   // 136: sora.core.v1.GetAboutRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	97,  // 137: sora.core.v1.GetAboutResponse.about:type_name -> sora.core.v1.About
 	59,  // 138: sora.core.v1.GetAboutResponse.error:type_name -> sora.core.v1.SoraError
-	107, // 139: sora.core.v1.About.commit_time:type_name -> google.protobuf.Timestamp
+	118, // 139: sora.core.v1.About.commit_time:type_name -> google.protobuf.Timestamp
 	8,   // 140: sora.core.v1.About.contract:type_name -> sora.core.v1.ApiVersion
 	98,  // 141: sora.core.v1.About.engines:type_name -> sora.core.v1.EngineBuild
 	22,  // 142: sora.core.v1.About.local_proxy:type_name -> sora.core.v1.Endpoint
@@ -7891,73 +8600,92 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	8,   // 146: sora.core.v1.CheckDnsLeaksRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	103, // 147: sora.core.v1.CheckDnsLeaksResponse.checks:type_name -> sora.core.v1.DnsLeakCheck
 	59,  // 148: sora.core.v1.CheckDnsLeaksResponse.error:type_name -> sora.core.v1.SoraError
-	9,   // 149: sora.core.v1.CoreControl.Connect:input_type -> sora.core.v1.ConnectRequest
-	11,  // 150: sora.core.v1.CoreControl.Disconnect:input_type -> sora.core.v1.DisconnectRequest
-	13,  // 151: sora.core.v1.CoreControl.GetStatus:input_type -> sora.core.v1.GetStatusRequest
-	15,  // 152: sora.core.v1.CoreControl.WatchEvents:input_type -> sora.core.v1.WatchEventsRequest
-	39,  // 153: sora.core.v1.CoreControl.ParseImport:input_type -> sora.core.v1.ParseImportRequest
-	41,  // 154: sora.core.v1.CoreControl.FetchSubscription:input_type -> sora.core.v1.FetchSubscriptionRequest
-	44,  // 155: sora.core.v1.CoreControl.ProbeServers:input_type -> sora.core.v1.ProbeServersRequest
-	28,  // 156: sora.core.v1.CoreControl.GetStats:input_type -> sora.core.v1.GetStatsRequest
-	46,  // 157: sora.core.v1.CoreControl.RunDiagnostics:input_type -> sora.core.v1.RunDiagnosticsRequest
-	48,  // 158: sora.core.v1.CoreControl.ExportDiagnostics:input_type -> sora.core.v1.ExportDiagnosticsRequest
-	50,  // 159: sora.core.v1.CoreControl.SetKillSwitch:input_type -> sora.core.v1.SetKillSwitchRequest
-	53,  // 160: sora.core.v1.CoreControl.Handshake:input_type -> sora.core.v1.HandshakeRequest
-	95,  // 161: sora.core.v1.CoreControl.GetAbout:input_type -> sora.core.v1.GetAboutRequest
-	99,  // 162: sora.core.v1.CoreControl.GetRoutingPresets:input_type -> sora.core.v1.GetRoutingPresetsRequest
-	62,  // 163: sora.core.v1.CoreControl.QueryLogs:input_type -> sora.core.v1.QueryLogsRequest
-	67,  // 164: sora.core.v1.CoreControl.WatchLogs:input_type -> sora.core.v1.WatchLogsRequest
-	68,  // 165: sora.core.v1.CoreControl.ExportLogs:input_type -> sora.core.v1.ExportLogsRequest
-	70,  // 166: sora.core.v1.CoreControl.ClearLogs:input_type -> sora.core.v1.ClearLogsRequest
-	73,  // 167: sora.core.v1.CoreControl.GetLogSettings:input_type -> sora.core.v1.GetLogSettingsRequest
-	75,  // 168: sora.core.v1.CoreControl.SetLogSettings:input_type -> sora.core.v1.SetLogSettingsRequest
-	78,  // 169: sora.core.v1.CoreControl.ListConnections:input_type -> sora.core.v1.ListConnectionsRequest
-	80,  // 170: sora.core.v1.CoreControl.CloseConnection:input_type -> sora.core.v1.CloseConnectionRequest
-	84,  // 171: sora.core.v1.CoreControl.SaveSubscription:input_type -> sora.core.v1.SaveSubscriptionRequest
-	86,  // 172: sora.core.v1.CoreControl.ListSubscriptions:input_type -> sora.core.v1.ListSubscriptionsRequest
-	88,  // 173: sora.core.v1.CoreControl.DeleteSubscription:input_type -> sora.core.v1.DeleteSubscriptionRequest
-	90,  // 174: sora.core.v1.CoreControl.RefreshSubscription:input_type -> sora.core.v1.RefreshSubscriptionRequest
-	92,  // 175: sora.core.v1.CoreControl.WatchSubscriptions:input_type -> sora.core.v1.WatchSubscriptionsRequest
-	93,  // 176: sora.core.v1.CoreControl.GetSubscriptionLink:input_type -> sora.core.v1.GetSubscriptionLinkRequest
-	55,  // 177: sora.core.v1.CoreControl.PutSecret:input_type -> sora.core.v1.PutSecretRequest
-	57,  // 178: sora.core.v1.CoreControl.DeleteSecret:input_type -> sora.core.v1.DeleteSecretRequest
-	104, // 179: sora.core.v1.CoreControl.CheckDnsLeaks:input_type -> sora.core.v1.CheckDnsLeaksRequest
-	10,  // 180: sora.core.v1.CoreControl.Connect:output_type -> sora.core.v1.ConnectResponse
-	12,  // 181: sora.core.v1.CoreControl.Disconnect:output_type -> sora.core.v1.DisconnectResponse
-	14,  // 182: sora.core.v1.CoreControl.GetStatus:output_type -> sora.core.v1.GetStatusResponse
-	31,  // 183: sora.core.v1.CoreControl.WatchEvents:output_type -> sora.core.v1.CoreEvent
-	40,  // 184: sora.core.v1.CoreControl.ParseImport:output_type -> sora.core.v1.ParseImportResponse
-	42,  // 185: sora.core.v1.CoreControl.FetchSubscription:output_type -> sora.core.v1.FetchSubscriptionResponse
-	36,  // 186: sora.core.v1.CoreControl.ProbeServers:output_type -> sora.core.v1.ProbeResult
-	29,  // 187: sora.core.v1.CoreControl.GetStats:output_type -> sora.core.v1.GetStatsResponse
-	47,  // 188: sora.core.v1.CoreControl.RunDiagnostics:output_type -> sora.core.v1.RunDiagnosticsResponse
-	49,  // 189: sora.core.v1.CoreControl.ExportDiagnostics:output_type -> sora.core.v1.ExportDiagnosticsResponse
-	51,  // 190: sora.core.v1.CoreControl.SetKillSwitch:output_type -> sora.core.v1.SetKillSwitchResponse
-	54,  // 191: sora.core.v1.CoreControl.Handshake:output_type -> sora.core.v1.HandshakeResponse
-	96,  // 192: sora.core.v1.CoreControl.GetAbout:output_type -> sora.core.v1.GetAboutResponse
-	100, // 193: sora.core.v1.CoreControl.GetRoutingPresets:output_type -> sora.core.v1.GetRoutingPresetsResponse
-	63,  // 194: sora.core.v1.CoreControl.QueryLogs:output_type -> sora.core.v1.QueryLogsResponse
-	60,  // 195: sora.core.v1.CoreControl.WatchLogs:output_type -> sora.core.v1.LogEntry
-	69,  // 196: sora.core.v1.CoreControl.ExportLogs:output_type -> sora.core.v1.ExportLogsResponse
-	71,  // 197: sora.core.v1.CoreControl.ClearLogs:output_type -> sora.core.v1.ClearLogsResponse
-	74,  // 198: sora.core.v1.CoreControl.GetLogSettings:output_type -> sora.core.v1.GetLogSettingsResponse
-	76,  // 199: sora.core.v1.CoreControl.SetLogSettings:output_type -> sora.core.v1.SetLogSettingsResponse
-	79,  // 200: sora.core.v1.CoreControl.ListConnections:output_type -> sora.core.v1.ListConnectionsResponse
-	81,  // 201: sora.core.v1.CoreControl.CloseConnection:output_type -> sora.core.v1.CloseConnectionResponse
-	85,  // 202: sora.core.v1.CoreControl.SaveSubscription:output_type -> sora.core.v1.SaveSubscriptionResponse
-	87,  // 203: sora.core.v1.CoreControl.ListSubscriptions:output_type -> sora.core.v1.ListSubscriptionsResponse
-	89,  // 204: sora.core.v1.CoreControl.DeleteSubscription:output_type -> sora.core.v1.DeleteSubscriptionResponse
-	91,  // 205: sora.core.v1.CoreControl.RefreshSubscription:output_type -> sora.core.v1.RefreshSubscriptionResponse
-	83,  // 206: sora.core.v1.CoreControl.WatchSubscriptions:output_type -> sora.core.v1.SubscriptionState
-	94,  // 207: sora.core.v1.CoreControl.GetSubscriptionLink:output_type -> sora.core.v1.GetSubscriptionLinkResponse
-	56,  // 208: sora.core.v1.CoreControl.PutSecret:output_type -> sora.core.v1.PutSecretResponse
-	58,  // 209: sora.core.v1.CoreControl.DeleteSecret:output_type -> sora.core.v1.DeleteSecretResponse
-	105, // 210: sora.core.v1.CoreControl.CheckDnsLeaks:output_type -> sora.core.v1.CheckDnsLeaksResponse
-	180, // [180:211] is the sub-list for method output_type
-	149, // [149:180] is the sub-list for method input_type
-	149, // [149:149] is the sub-list for extension type_name
-	149, // [149:149] is the sub-list for extension extendee
-	0,   // [0:149] is the sub-list for field type_name
+	8,   // 149: sora.core.v1.BenchmarkServersRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 150: sora.core.v1.BandwidthSample.error:type_name -> sora.core.v1.SoraError
+	8,   // 151: sora.core.v1.GetBenchmarksRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	110, // 152: sora.core.v1.GetBenchmarksResponse.benchmarks:type_name -> sora.core.v1.BenchmarkRecord
+	59,  // 153: sora.core.v1.GetBenchmarksResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 154: sora.core.v1.SaveSubscriptionOverrideRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	115, // 155: sora.core.v1.SaveSubscriptionOverrideRequest.renames:type_name -> sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
+	59,  // 156: sora.core.v1.SaveSubscriptionOverrideResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 157: sora.core.v1.GetSubscriptionOverrideRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	116, // 158: sora.core.v1.GetSubscriptionOverrideResponse.renames:type_name -> sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
+	59,  // 159: sora.core.v1.GetSubscriptionOverrideResponse.error:type_name -> sora.core.v1.SoraError
+	9,   // 160: sora.core.v1.CoreControl.Connect:input_type -> sora.core.v1.ConnectRequest
+	11,  // 161: sora.core.v1.CoreControl.Disconnect:input_type -> sora.core.v1.DisconnectRequest
+	13,  // 162: sora.core.v1.CoreControl.GetStatus:input_type -> sora.core.v1.GetStatusRequest
+	15,  // 163: sora.core.v1.CoreControl.WatchEvents:input_type -> sora.core.v1.WatchEventsRequest
+	39,  // 164: sora.core.v1.CoreControl.ParseImport:input_type -> sora.core.v1.ParseImportRequest
+	41,  // 165: sora.core.v1.CoreControl.FetchSubscription:input_type -> sora.core.v1.FetchSubscriptionRequest
+	44,  // 166: sora.core.v1.CoreControl.ProbeServers:input_type -> sora.core.v1.ProbeServersRequest
+	28,  // 167: sora.core.v1.CoreControl.GetStats:input_type -> sora.core.v1.GetStatsRequest
+	46,  // 168: sora.core.v1.CoreControl.RunDiagnostics:input_type -> sora.core.v1.RunDiagnosticsRequest
+	48,  // 169: sora.core.v1.CoreControl.ExportDiagnostics:input_type -> sora.core.v1.ExportDiagnosticsRequest
+	50,  // 170: sora.core.v1.CoreControl.SetKillSwitch:input_type -> sora.core.v1.SetKillSwitchRequest
+	53,  // 171: sora.core.v1.CoreControl.Handshake:input_type -> sora.core.v1.HandshakeRequest
+	95,  // 172: sora.core.v1.CoreControl.GetAbout:input_type -> sora.core.v1.GetAboutRequest
+	99,  // 173: sora.core.v1.CoreControl.GetRoutingPresets:input_type -> sora.core.v1.GetRoutingPresetsRequest
+	62,  // 174: sora.core.v1.CoreControl.QueryLogs:input_type -> sora.core.v1.QueryLogsRequest
+	67,  // 175: sora.core.v1.CoreControl.WatchLogs:input_type -> sora.core.v1.WatchLogsRequest
+	68,  // 176: sora.core.v1.CoreControl.ExportLogs:input_type -> sora.core.v1.ExportLogsRequest
+	70,  // 177: sora.core.v1.CoreControl.ClearLogs:input_type -> sora.core.v1.ClearLogsRequest
+	73,  // 178: sora.core.v1.CoreControl.GetLogSettings:input_type -> sora.core.v1.GetLogSettingsRequest
+	75,  // 179: sora.core.v1.CoreControl.SetLogSettings:input_type -> sora.core.v1.SetLogSettingsRequest
+	78,  // 180: sora.core.v1.CoreControl.ListConnections:input_type -> sora.core.v1.ListConnectionsRequest
+	80,  // 181: sora.core.v1.CoreControl.CloseConnection:input_type -> sora.core.v1.CloseConnectionRequest
+	84,  // 182: sora.core.v1.CoreControl.SaveSubscription:input_type -> sora.core.v1.SaveSubscriptionRequest
+	86,  // 183: sora.core.v1.CoreControl.ListSubscriptions:input_type -> sora.core.v1.ListSubscriptionsRequest
+	88,  // 184: sora.core.v1.CoreControl.DeleteSubscription:input_type -> sora.core.v1.DeleteSubscriptionRequest
+	90,  // 185: sora.core.v1.CoreControl.RefreshSubscription:input_type -> sora.core.v1.RefreshSubscriptionRequest
+	92,  // 186: sora.core.v1.CoreControl.WatchSubscriptions:input_type -> sora.core.v1.WatchSubscriptionsRequest
+	93,  // 187: sora.core.v1.CoreControl.GetSubscriptionLink:input_type -> sora.core.v1.GetSubscriptionLinkRequest
+	55,  // 188: sora.core.v1.CoreControl.PutSecret:input_type -> sora.core.v1.PutSecretRequest
+	57,  // 189: sora.core.v1.CoreControl.DeleteSecret:input_type -> sora.core.v1.DeleteSecretRequest
+	104, // 190: sora.core.v1.CoreControl.CheckDnsLeaks:input_type -> sora.core.v1.CheckDnsLeaksRequest
+	106, // 191: sora.core.v1.CoreControl.BenchmarkServers:input_type -> sora.core.v1.BenchmarkServersRequest
+	108, // 192: sora.core.v1.CoreControl.GetBenchmarks:input_type -> sora.core.v1.GetBenchmarksRequest
+	111, // 193: sora.core.v1.CoreControl.SaveSubscriptionOverride:input_type -> sora.core.v1.SaveSubscriptionOverrideRequest
+	113, // 194: sora.core.v1.CoreControl.GetSubscriptionOverride:input_type -> sora.core.v1.GetSubscriptionOverrideRequest
+	10,  // 195: sora.core.v1.CoreControl.Connect:output_type -> sora.core.v1.ConnectResponse
+	12,  // 196: sora.core.v1.CoreControl.Disconnect:output_type -> sora.core.v1.DisconnectResponse
+	14,  // 197: sora.core.v1.CoreControl.GetStatus:output_type -> sora.core.v1.GetStatusResponse
+	31,  // 198: sora.core.v1.CoreControl.WatchEvents:output_type -> sora.core.v1.CoreEvent
+	40,  // 199: sora.core.v1.CoreControl.ParseImport:output_type -> sora.core.v1.ParseImportResponse
+	42,  // 200: sora.core.v1.CoreControl.FetchSubscription:output_type -> sora.core.v1.FetchSubscriptionResponse
+	36,  // 201: sora.core.v1.CoreControl.ProbeServers:output_type -> sora.core.v1.ProbeResult
+	29,  // 202: sora.core.v1.CoreControl.GetStats:output_type -> sora.core.v1.GetStatsResponse
+	47,  // 203: sora.core.v1.CoreControl.RunDiagnostics:output_type -> sora.core.v1.RunDiagnosticsResponse
+	49,  // 204: sora.core.v1.CoreControl.ExportDiagnostics:output_type -> sora.core.v1.ExportDiagnosticsResponse
+	51,  // 205: sora.core.v1.CoreControl.SetKillSwitch:output_type -> sora.core.v1.SetKillSwitchResponse
+	54,  // 206: sora.core.v1.CoreControl.Handshake:output_type -> sora.core.v1.HandshakeResponse
+	96,  // 207: sora.core.v1.CoreControl.GetAbout:output_type -> sora.core.v1.GetAboutResponse
+	100, // 208: sora.core.v1.CoreControl.GetRoutingPresets:output_type -> sora.core.v1.GetRoutingPresetsResponse
+	63,  // 209: sora.core.v1.CoreControl.QueryLogs:output_type -> sora.core.v1.QueryLogsResponse
+	60,  // 210: sora.core.v1.CoreControl.WatchLogs:output_type -> sora.core.v1.LogEntry
+	69,  // 211: sora.core.v1.CoreControl.ExportLogs:output_type -> sora.core.v1.ExportLogsResponse
+	71,  // 212: sora.core.v1.CoreControl.ClearLogs:output_type -> sora.core.v1.ClearLogsResponse
+	74,  // 213: sora.core.v1.CoreControl.GetLogSettings:output_type -> sora.core.v1.GetLogSettingsResponse
+	76,  // 214: sora.core.v1.CoreControl.SetLogSettings:output_type -> sora.core.v1.SetLogSettingsResponse
+	79,  // 215: sora.core.v1.CoreControl.ListConnections:output_type -> sora.core.v1.ListConnectionsResponse
+	81,  // 216: sora.core.v1.CoreControl.CloseConnection:output_type -> sora.core.v1.CloseConnectionResponse
+	85,  // 217: sora.core.v1.CoreControl.SaveSubscription:output_type -> sora.core.v1.SaveSubscriptionResponse
+	87,  // 218: sora.core.v1.CoreControl.ListSubscriptions:output_type -> sora.core.v1.ListSubscriptionsResponse
+	89,  // 219: sora.core.v1.CoreControl.DeleteSubscription:output_type -> sora.core.v1.DeleteSubscriptionResponse
+	91,  // 220: sora.core.v1.CoreControl.RefreshSubscription:output_type -> sora.core.v1.RefreshSubscriptionResponse
+	83,  // 221: sora.core.v1.CoreControl.WatchSubscriptions:output_type -> sora.core.v1.SubscriptionState
+	94,  // 222: sora.core.v1.CoreControl.GetSubscriptionLink:output_type -> sora.core.v1.GetSubscriptionLinkResponse
+	56,  // 223: sora.core.v1.CoreControl.PutSecret:output_type -> sora.core.v1.PutSecretResponse
+	58,  // 224: sora.core.v1.CoreControl.DeleteSecret:output_type -> sora.core.v1.DeleteSecretResponse
+	105, // 225: sora.core.v1.CoreControl.CheckDnsLeaks:output_type -> sora.core.v1.CheckDnsLeaksResponse
+	107, // 226: sora.core.v1.CoreControl.BenchmarkServers:output_type -> sora.core.v1.BandwidthSample
+	109, // 227: sora.core.v1.CoreControl.GetBenchmarks:output_type -> sora.core.v1.GetBenchmarksResponse
+	112, // 228: sora.core.v1.CoreControl.SaveSubscriptionOverride:output_type -> sora.core.v1.SaveSubscriptionOverrideResponse
+	114, // 229: sora.core.v1.CoreControl.GetSubscriptionOverride:output_type -> sora.core.v1.GetSubscriptionOverrideResponse
+	195, // [195:230] is the sub-list for method output_type
+	160, // [160:195] is the sub-list for method input_type
+	160, // [160:160] is the sub-list for extension type_name
+	160, // [160:160] is the sub-list for extension extendee
+	0,   // [0:160] is the sub-list for field type_name
 }
 
 func init() { file_sora_core_v1_core_control_proto_init() }
@@ -7981,7 +8709,7 @@ func file_sora_core_v1_core_control_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sora_core_v1_core_control_proto_rawDesc), len(file_sora_core_v1_core_control_proto_rawDesc)),
 			NumEnums:      8,
-			NumMessages:   98,
+			NumMessages:   109,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

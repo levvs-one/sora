@@ -64,6 +64,19 @@ service CoreControl {
   // what the OS would use, and whether the kill switch covers DNS. Requires
   // the control authenticator: the answers describe the machine's network.
   rpc CheckDnsLeaks(CheckDnsLeaksRequest) returns (CheckDnsLeaksResponse);
+
+  // Since 1.9. Throughput benchmark: measures real download goodput through
+  // each server by spinning up a temporary engine session. Streams progress
+  // samples; each server reports done=true once. Requires the control
+  // authenticator: benchmarks burn traffic and spawn engine processes.
+  rpc BenchmarkServers(BenchmarkServersRequest) returns (stream BandwidthSample);
+  // Since 1.9. Returns the stored benchmark history (see BenchmarkServers).
+  rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksResponse);
+
+  // Since 1.9. User overrides on top of a subscription: renames, hidden
+  // servers, extra rules and pinned order survive subscription refreshes.
+  rpc SaveSubscriptionOverride(SaveSubscriptionOverrideRequest) returns (SaveSubscriptionOverrideResponse);
+  rpc GetSubscriptionOverride(GetSubscriptionOverrideRequest) returns (GetSubscriptionOverrideResponse);
 }
 
 message ApiVersion {
@@ -624,4 +637,80 @@ message CheckDnsLeaksRequest {
 message CheckDnsLeaksResponse {
   repeated DnsLeakCheck checks = 1;
   SoraError error = 2;
+}
+
+// BenchmarkServersRequest starts a throughput benchmark for the listed
+// servers. At most 32 servers per call; duration_s is clamped to 5..60,
+// concurrency to 1..4.
+message BenchmarkServersRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string request_id = 3;
+  // Server ids as known to the client (subscription or manual ids).
+  repeated string server_ids = 4;
+  // Per-server measurement budget in seconds.
+  uint32 duration_s = 5;
+  // How many servers are benchmarked at once.
+  uint32 concurrency = 6;
+  // Speed-test URL; empty uses the core default (documented).
+  string url = 7;
+}
+// BandwidthSample is one progress or final sample of a benchmark.
+message BandwidthSample {
+  string server_id = 1;
+  // Measured goodput in bytes per second (meaningful when done=true).
+  uint64 bytes_per_sec = 2;
+  // 0..100 progress of this server's measurement.
+  uint32 progress_pct = 3;
+  // True on the final sample for this server.
+  bool done = 4;
+  SoraError error = 5;
+}
+// GetBenchmarksRequest reads the stored benchmark history.
+message GetBenchmarksRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  // Empty returns all entries.
+  repeated string server_ids = 3;
+}
+message GetBenchmarksResponse {
+  repeated BenchmarkRecord benchmarks = 1;
+  SoraError error = 2;
+}
+// BenchmarkRecord is one stored measurement (TTL 24h, see history docs).
+message BenchmarkRecord {
+  string server_id = 1;
+  uint64 bytes_per_sec = 2;
+  uint32 latency_ms = 3;
+  int64 measured_at_unix = 4;
+}
+
+// SaveSubscriptionOverrideRequest stores user edits on top of a subscription.
+// Only the fields present are replaced; omitted fields keep their values.
+message SaveSubscriptionOverrideRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string subscription_id = 3;
+  // server_id -> display name. Empty value clears the rename.
+  map<string, string> renames = 4;
+  // Complete hidden set; replaces the stored one.
+  repeated string hidden = 5;
+  // Complete pinned order; servers not listed keep their relative order after.
+  repeated string pinned_order = 6;
+  // If true, deletes the whole override file.
+  bool clear = 7;
+}
+message SaveSubscriptionOverrideResponse {
+  SoraError error = 1;
+}
+message GetSubscriptionOverrideRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string subscription_id = 3;
+}
+message GetSubscriptionOverrideResponse {
+  map<string, string> renames = 1;
+  repeated string hidden = 2;
+  repeated string pinned_order = 3;
+  SoraError error = 4;
 }
