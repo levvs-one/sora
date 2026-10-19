@@ -79,6 +79,10 @@ type Fingerprint struct {
 	Gateway string
 	// ASN comes from the optional local table; empty when unknown.
 	ASN string
+	// Security is the Wi-Fi authentication family of the current network,
+	// detected best-effort; SecurityUnknown when unreadable. It never
+	// affects matching: it is advisory only.
+	Security Security
 	// Fingerprint is a stable string of the interface addresses, for
 	// display and change detection.
 	Fingerprint string
@@ -127,12 +131,18 @@ type Store struct {
 	// index. Empty when the table is absent.
 	asnNets   []netip.Prefix
 	asnValues []string
+	trust     *TrustStore
 }
 
 // NewStore loads the profiles file, creating the directory when needed. An
 // empty dir disables persistence: the store works in memory only.
 func NewStore(dir string) (*Store, error) {
 	s := &Store{}
+	trust, err := NewTrustStore(dir)
+	if err != nil {
+		return nil, err
+	}
+	s.trust = trust
 	if strings.TrimSpace(dir) == "" {
 		return s, nil
 	}
@@ -217,6 +227,26 @@ func (s *Store) Match(fp Fingerprint) *Match {
 		}
 	}
 	return nil
+}
+
+// SetTrust records the user's trust mark for a Wi-Fi network (SSID).
+// TrustNone removes the mark.
+func (s *Store) SetTrust(ssid string, t Trust) error {
+	return s.trust.Set(ssid, t)
+}
+
+// TrustOf returns the recorded mark for an SSID and whether one exists.
+// An SSID that was never marked reports (TrustNone, false).
+func (s *Store) TrustOf(ssid string) (Trust, bool) {
+	return s.trust.Lookup(ssid)
+}
+
+// NetworkTrust returns the trust to act on for the fingerprinted network:
+// TrustTrusted only for explicitly trusted SSIDs, TrustUntrusted for
+// untrusted and never-seen ones, TrustNone when there is no SSID (wired
+// or offline).
+func (s *Store) NetworkTrust(fp Fingerprint) Trust {
+	return s.trust.Effective(fp.SSID)
 }
 
 func (s *Store) hasLocked(id string) bool { return s.indexLocked(id) >= 0 }

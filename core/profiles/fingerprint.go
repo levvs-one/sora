@@ -11,9 +11,11 @@ import (
 // the parts it cannot read stay empty, and an empty gateway means offline.
 func Current() Fingerprint {
 	iface, gateway := defaultRoute()
+	ssid := currentSSID(iface)
 	return Fingerprint{
-		SSID:        currentSSID(iface),
+		SSID:        ssid,
 		Gateway:     gateway,
+		Security:    currentSecurity(iface, ssid),
 		Fingerprint: interfaceFingerprint(),
 	}
 }

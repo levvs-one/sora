@@ -65,3 +65,60 @@ func parseNetshWLAN(out []byte) string {
 	}
 	return ""
 }
+
+// currentSecurity reports the Wi-Fi authentication family of the connected
+// network, best-effort. The default-route helper reports no interface on
+// Windows, so an empty SSID cannot distinguish wired from offline:
+// SecurityUnknown. Anything unreadable is SecurityUnknown, never a guess.
+func currentSecurity(iface, ssid string) Security {
+	_ = iface
+	if ssid == "" {
+		return SecurityUnknown
+	}
+	netsh := filepath.Join(systemBinDir, "netsh.exe")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	//nolint:gosec // the binary comes from the trusted system directory
+	out, err := exec.CommandContext(ctx, netsh, "wlan", "show", "networks").Output()
+	if err != nil {
+		return SecurityUnknown
+	}
+	return parseNetshNetworks(out, ssid)
+}
+
+// parseNetshNetworks reads the Authentication field of one SSID from
+// `netsh wlan show networks` output: "Open" means open, "Shared" means WEP,
+// anything starting with "WPA" means the WPA family.
+func parseNetshNetworks(out []byte, ssid string) Security {
+	inBlock := false
+	for _, line := range strings.Split(string(out), "\n") {
+		t := strings.TrimSpace(line)
+		if strings.HasPrefix(t, "SSID") {
+			inBlock = false
+			if i := strings.Index(t, ":"); i >= 0 && strings.TrimSpace(t[i+1:]) == ssid {
+				inBlock = true
+			}
+			continue
+		}
+		if !inBlock {
+			continue
+		}
+		if strings.HasPrefix(t, "Authentication") {
+			i := strings.Index(t, ":")
+			if i < 0 {
+				return SecurityUnknown
+			}
+			switch auth := strings.TrimSpace(t[i+1:]); {
+			case auth == "Open":
+				return SecurityOpen
+			case auth == "Shared":
+				return SecurityWEP
+			case strings.HasPrefix(auth, "WPA"):
+				return SecurityWPA
+			default:
+				return SecurityUnknown
+			}
+		}
+	}
+	return SecurityUnknown
+}
