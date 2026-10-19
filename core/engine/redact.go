@@ -89,8 +89,8 @@ func (e *maskedError) Unwrap() error { return e.cause }
 
 var (
 	uuidPattern     = regexp.MustCompile(`(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`)
-	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private-key|preshared-key|pre-shared-key|obfs-password|psk)\b([=: ]+)(\S+)`)
-	userInfoPattern = regexp.MustCompile(`(?i)\b(https?|socks5|vless|vmess|trojan|ss)://[^/\s:@]+:[^@\s]+@`)
+	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|preshared[_-]?key|pre-shared-key|obfs[_-]?password|psk|public[_-]?key|short[_-]?id|spider[_-]?x)\b([=: ]+)(\S+)`)
+	userInfoPattern = regexp.MustCompile(`(?i)\b(https?|socks5|vless|vmess|trojan|ss|hysteria2|hy2|tuic|wireguard|wg)://[^/\s@]+@`)
 )
 
 // maskPatterns masks identifiers, credential pairs, and URL credentials whose

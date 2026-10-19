@@ -132,3 +132,34 @@ func TestAProfileHidesItsCredentials(t *testing.T) {
 		}
 	}
 }
+
+// TestRedactorMasksRealityAndModernSchemes locks SORA-L9: REALITY
+// parameters registered via Identifiers, key=value pairs, and userinfo in
+// hysteria2/tuic/wireguard URLs must all be masked.
+func TestRedactorMasksRealityAndModernSchemes(t *testing.T) {
+	plan := validPlan()
+	outbound := plan.Outbounds[0]
+	outbound.TLS.Reality = true
+	outbound.TLS.RealityPublicKey = "Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw"
+	outbound.TLS.RealityShortID = "6ba85179e30d4fc2"
+	outbound.TLS.SpiderX = "spider-secret-x"
+	plan.Outbounds[0] = outbound
+	redactor := NewRedactor(plan.Secrets()...)
+	redactor.Add(plan.Identifiers()...)
+	line := "dial hysteria2://s3cr3t-pw@de1.example.com:443 failed " +
+		"public_key=Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw short-id: 6ba85179e30d4fc2 spiderx=spider-secret-x " +
+		"tuic://uuid1:pw2@tu.example.com:443 wg://key3@wg.example.com"
+	masked := redactor.String(line)
+	for _, leak := range []string{
+		"s3cr3t-pw@",
+		"Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw",
+		"6ba85179e30d4fc2",
+		"spider-secret-x",
+		"uuid1:pw2@",
+		"key3@",
+	} {
+		if strings.Contains(masked, leak) {
+			t.Errorf("%q leaked into %q", leak, masked)
+		}
+	}
+}
