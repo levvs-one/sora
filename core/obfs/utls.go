@@ -38,6 +38,13 @@ func (p Profile) FingerprintID() (utls.ClientHelloID, error) {
 // fingerprint (the fingerprint comes from FingerprintID). It returns nil
 // when the profile disables uTLS.
 //
+// The fingerprint preset owns the ClientHello shape: at handshake time
+// uTLS derives the negotiated TLS versions, cipher suites and curves
+// from the parrot spec and overwrites the copied MinVersion/MaxVersion
+// (uTLS SetTLSVers), so pinning versions or ciphers via the base config
+// has no effect here. Likewise VerifyPeerCertificate, GetCertificate and
+// session/resumption state are not carried over.
+//
 // The caller must ensure base is non-nil; a nil base yields a config with
 // only the defaults.
 func (p Profile) UTLSConfig(base *tls.Config) *utls.Config {

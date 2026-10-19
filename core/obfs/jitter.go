@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	rand "math/rand/v2"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -29,15 +30,21 @@ func jitterDelay(rng *rand.Rand, max time.Duration) time.Duration {
 }
 
 // jitterConn is a net.Conn wrapper that sleeps a random uniform [0, max]
-// delay before every Write, spreading handshake packets in time.
+// delay before every Write, spreading handshake packets in time. The
+// delay applies to every Write for the connection's lifetime; see
+// Profile.Jitter.
 type jitterConn struct {
 	net.Conn
 	max time.Duration
+	mu  sync.Mutex // guards rng: net.Conn allows concurrent Writes
 	rng *rand.Rand
 }
 
 func (c *jitterConn) Write(p []byte) (int, error) {
-	if d := jitterDelay(c.rng, c.max); d > 0 {
+	c.mu.Lock()
+	d := jitterDelay(c.rng, c.max)
+	c.mu.Unlock()
+	if d > 0 {
 		time.Sleep(d)
 	}
 	return c.Conn.Write(p)

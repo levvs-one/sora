@@ -62,6 +62,8 @@ func TestValidate(t *testing.T) {
 		{"fake SNI leading hyphen", Profile{FakeSNI: "-bad.example.com"}, "valid hostname"},
 		{"fake SNI space", Profile{FakeSNI: "bad name.com"}, "valid hostname"},
 		{"fake SNI too long", Profile{FakeSNI: strings.Repeat("a", 64) + ".com"}, "valid hostname"},
+		{"fake SNI IPv4 literal", Profile{FakeSNI: "1.2.3.4"}, "valid hostname"},
+		{"fake SNI IPv6 literal", Profile{FakeSNI: "::1"}, "valid hostname"},
 	}
 	for _, tc := range invalid {
 		t.Run(tc.name, func(t *testing.T) {

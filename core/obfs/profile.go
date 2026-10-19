@@ -3,6 +3,7 @@ package obfs
 import (
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 )
@@ -41,6 +42,10 @@ type Profile struct {
 	// is the payload size of one leading fragment; the remainder of the
 	// record forms the final fragment. A non-nil but empty slice is
 	// rejected by Validate as ambiguous: use nil to disable.
+	//
+	// Sizes are hints, not guarantees: a ClientHello record shorter than
+	// the requested sizes is sent unfragmented at write time rather than
+	// failing (fragmentation must never break the write path).
 	FragSizes []int
 
 	// FragDelay is the pause between ClientHello fragments. Clamped to
@@ -50,6 +55,12 @@ type Profile struct {
 	// Jitter is the maximum random delay inserted between handshake
 	// packets. The actual delay per packet is uniform in [0, Jitter].
 	// Clamped to MaxJitter.
+	//
+	// The jitter wrapper cannot tell handshake bytes from application
+	// data, so the delay applies to every Write on the wrapped connection
+	// for its whole lifetime, not just the handshake. For the short-lived
+	// core-initiated connections this package targets that is the
+	// handshake in practice.
 	Jitter time.Duration
 
 	// FakeSNI, when set, replaces the SNI in the initial ClientHello with
@@ -142,8 +153,13 @@ func normalizeUTLS(s string) string {
 
 // validHostname reports whether s is a syntactically valid DNS hostname
 // (LDH labels, no leading/trailing hyphen, total length within limits).
+// IP literals are rejected: RFC 6066 forbids sending them in the
+// server_name extension, so they are useless as a (fake) SNI.
 func validHostname(s string) bool {
 	if len(s) == 0 || len(s) > 253 {
+		return false
+	}
+	if net.ParseIP(s) != nil {
 		return false
 	}
 	for _, label := range strings.Split(s, ".") {
