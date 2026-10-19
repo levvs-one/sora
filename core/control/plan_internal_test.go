@@ -2,6 +2,7 @@ package control
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
 
@@ -541,5 +542,79 @@ func TestShadowsocksPluginSurvivesTheVault(t *testing.T) {
 	}
 	if !masked {
 		t.Error("plugin_opts must be in the redaction set")
+	}
+}
+
+// testSecrets is a minimal resolver fake for plan-building tests.
+type testSecrets map[string][]byte
+
+func (m testSecrets) Get(reference string) ([]byte, error) {
+	if b, ok := m[reference]; ok {
+		return b, nil
+	}
+	return nil, errors.New("control: no such secret " + reference)
+}
+
+// planOutboundFromLink runs the full import path for one link: parse,
+// credential document, proto spec, plan-level outbound assembly.
+func planOutboundFromLink(t *testing.T, link string) engine.Outbound {
+	t.Helper()
+	result, err := parser.LinkParser{}.Parse([]byte(link))
+	if err != nil || len(result.Servers) != 1 {
+		t.Fatalf("Parse = %+v, %v", result, err)
+	}
+	spec := result.Servers[0]
+	document, err := credentialDocument(spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reference, err := referenceOf(spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	outbound, err := outboundFromProto(0, outboundToProto(spec, reference),
+		testSecrets{reference: document})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return outbound
+}
+
+// TestAutoVisionAtPlanLevel checks the S2 rule where it is implemented:
+// a VLESS+TCP+REALITY link without a flow gets xtls-rprx-vision in the
+// plan with FlowAuto set; a link with an explicit flow keeps it and
+// never gets the auto badge.
+func TestAutoVisionAtPlanLevel(t *testing.T) {
+	const base = "vless://b831381d-6324-4d53-ad4f-8cda48b30811@edge.example.com:443" +
+		"?type=tcp&security=reality&pbk=Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw" +
+		"&sid=6ba85179e30d4fc2&sni=www.example.com&fp=chrome&encryption=none"
+
+	auto := planOutboundFromLink(t, base+"#Edge")
+	if auto.Flow != engine.VisionFlow {
+		t.Errorf("plan flow = %q, want auto-vision %q", auto.Flow, engine.VisionFlow)
+	}
+	if !auto.FlowAuto {
+		t.Error("plan FlowAuto = false, want the auto badge recorded")
+	}
+
+	manual := planOutboundFromLink(t, base+"&flow=xtls-rprx-vision-udp443#Edge")
+	if manual.Flow != "xtls-rprx-vision-udp443" {
+		t.Errorf("manual plan flow = %q, want it respected", manual.Flow)
+	}
+	if manual.FlowAuto {
+		t.Error("manual plan FlowAuto = true, want no auto badge")
+	}
+}
+
+// TestAutoVisionSkipsNonTCPAtPlanLevel locks that the plan never assigns
+// vision to a non-TCP transport: that combination stays a hard render
+// error instead of being papered over.
+func TestAutoVisionSkipsNonTCPAtPlanLevel(t *testing.T) {
+	link := "vless://b831381d-6324-4d53-ad4f-8cda48b30811@edge.example.com:443" +
+		"?type=ws&security=reality&pbk=Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw" +
+		"&sid=6ba85179e30d4fc2&sni=www.example.com&fp=chrome&encryption=none&path=%2Fx#Edge"
+	o := planOutboundFromLink(t, link)
+	if o.Flow != "" || o.FlowAuto {
+		t.Errorf("ws plan flow = %q auto=%v, want untouched", o.Flow, o.FlowAuto)
 	}
 }

@@ -155,6 +155,12 @@ type Outbound struct {
 	Cipher     string
 	UserID     string
 	Flow       string
+	// FlowAuto records that Flow was assigned by plan-level auto-vision
+	// (Outbound.ApplyAutoVision) rather than by the import link or the
+	// user. Stable UI contract: the app shows an "auto" badge next to the
+	// flow when this is true. It is only ever set together with Flow by
+	// ApplyAutoVision; a manually configured flow always leaves it false.
+	FlowAuto   bool
 	Obfs       string
 	ObfsParam  string
 	// Plugin and PluginOpts carry a Shadowsocks SIP002 obfuscation plugin
