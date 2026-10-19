@@ -1832,6 +1832,15 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Эта диагностика недоступна на данной платформе.'**
   String get diagnosticUnavailable;
+  String get dnsExpected;
+  String get dnsActual;
+  String get dnsCheckNeedsConnection;
+  String get dnsLeakCheckTunnelDns;
+  String get dnsLeakCheckSystemResolvers;
+  String get dnsLeakCheckKillSwitchDns;
+  String get dnsLeakFixConfigureTunnelDns;
+  String get dnsLeakFixReviewSystemResolvers;
+  String get dnsLeakFixEnableKillSwitch;
   String get qrShareTitle;
   String get qrScanTitle;
   String get qrCopyLink;
@@ -1859,11 +1868,8 @@ abstract class S {
   String get dnsChecking;
   String get dnsNoLeak;
   String get dnsLeakFound;
-  String get dnsFix;
   String get dnsLastCheck;
   String get dnsNeverChecked;
-  String get dnsCheckPending;
-  String get dnsDetails;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

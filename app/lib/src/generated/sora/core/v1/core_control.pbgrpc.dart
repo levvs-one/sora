@@ -260,6 +260,15 @@ class CoreControlClient extends $grpc.Client {
     return $createUnaryCall(_$deleteSecret, request, options: options);
   }
 
+  /// Since 1.8. DNS leak diagnostics: which resolvers the session uses versus
+  /// what the OS would use, and whether the kill switch covers DNS.
+  $grpc.ResponseFuture<$0.CheckDnsLeaksResponse> checkDnsLeaks(
+    $0.CheckDnsLeaksRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$checkDnsLeaks, request, options: options);
+  }
+
   // method descriptors
 
   static final _$connect = $grpc.ClientMethod<$0.ConnectRequest, $0.ConnectResponse>(
@@ -382,6 +391,11 @@ class CoreControlClient extends $grpc.Client {
       '/sora.core.v1.CoreControl/DeleteSecret',
       ($0.DeleteSecretRequest value) => value.writeToBuffer(),
       $0.DeleteSecretResponse.fromBuffer);
+  static final _$checkDnsLeaks =
+      $grpc.ClientMethod<$0.CheckDnsLeaksRequest, $0.CheckDnsLeaksResponse>(
+          '/sora.core.v1.CoreControl/CheckDnsLeaks',
+          ($0.CheckDnsLeaksRequest value) => value.writeToBuffer(),
+          $0.CheckDnsLeaksResponse.fromBuffer);
 }
 
 @$pb.GrpcServiceName('sora.core.v1.CoreControl')
@@ -599,6 +613,13 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.DeleteSecretRequest.fromBuffer(value),
         ($0.DeleteSecretResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.CheckDnsLeaksRequest, $0.CheckDnsLeaksResponse>(
+        'CheckDnsLeaks',
+        checkDnsLeaks_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.CheckDnsLeaksRequest.fromBuffer(value),
+        ($0.CheckDnsLeaksResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.ConnectResponse> connect_Pre(
@@ -818,4 +839,11 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.DeleteSecretResponse> deleteSecret($grpc.ServiceCall call, $0.DeleteSecretRequest request);
+
+  $async.Future<$0.CheckDnsLeaksResponse> checkDnsLeaks_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.CheckDnsLeaksRequest> $request) async {
+    return checkDnsLeaks($call, await $request);
+  }
+
+  $async.Future<$0.CheckDnsLeaksResponse> checkDnsLeaks($grpc.ServiceCall call, $0.CheckDnsLeaksRequest request);
 }

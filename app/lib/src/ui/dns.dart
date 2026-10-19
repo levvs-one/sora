@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/strings.dart';
+import '../core/link.dart';
 import '../design/theme.dart';
+import '../generated/sora/core/v1/core_control.pb.dart';
 import '../sora.dart';
 import 'kit.dart';
 import 'subscription_sheet.dart';
@@ -19,35 +22,22 @@ const _presets = <String, List<String>>{
   'adguard': ['94.140.14.14', '94.140.15.15'],
 };
 
-/// One leak check result. [detail] is a human-readable, non-technical note.
-class DnsLeakCheck {
-  const DnsLeakCheck({required this.label, required this.leaked, this.detail = ''});
+/// Resolves a core-provided localization key such as "dnsLeak.check.tunnelDns".
+/// Unknown keys fall through as-is so a newer core never renders a blank row.
+String _checkLabel(S s, String key) => switch (key) {
+      'dnsLeak.check.tunnelDns' => s.dnsLeakCheckTunnelDns,
+      'dnsLeak.check.systemResolvers' => s.dnsLeakCheckSystemResolvers,
+      'dnsLeak.check.killSwitchDns' => s.dnsLeakCheckKillSwitchDns,
+      _ => key,
+    };
 
-  final String label;
-  final bool leaked;
-  final String detail;
-}
-
-/// Outcome of a leak check run. [available] is false while the core does not
-/// expose the check yet; the UI shows a friendly note instead of an error.
-class DnsLeakReport {
-  const DnsLeakReport.unavailable() : checks = const [], available = false;
-  const DnsLeakReport(this.checks) : available = true;
-
-  final bool available;
-  final List<DnsLeakCheck> checks;
-
-  bool get leaked => checks.any((c) => c.leaked);
-}
-
-/// Runs the DNS leak check.
-///
-/// Backend note: wire this to the `CheckDnsLeaks` core RPC once it exists;
-/// the screen is built against this interface so only this function changes.
-Future<DnsLeakReport> checkDnsLeaks(Sora sora) async {
-  // Core RPC not implemented yet — report unavailability, never a raw error.
-  return const DnsLeakReport.unavailable();
-}
+/// Resolves a core-provided fix hint key such as "dnsLeak.fix.enableKillSwitch".
+String _checkHint(S s, String key) => switch (key) {
+      'dnsLeak.fix.configureTunnelDns' => s.dnsLeakFixConfigureTunnelDns,
+      'dnsLeak.fix.reviewSystemResolvers' => s.dnsLeakFixReviewSystemResolvers,
+      'dnsLeak.fix.enableKillSwitch' => s.dnsLeakFixEnableKillSwitch,
+      _ => key,
+    };
 
 /// DNS manager: resolver presets, custom list and leak checking.
 class DnsScreen extends StatefulWidget {
@@ -61,7 +51,9 @@ class _DnsScreenState extends State<DnsScreen> {
   static final _resolver = RegExp(r'^[A-Za-z0-9\[\]:._/-]+$');
 
   bool _checking = false;
-  DnsLeakReport? _report;
+  List<DnsLeakCheck>? _checks;
+  CoreFailure? _failure;
+  bool _needsConnection = false;
 
   Future<void> _applyPreset(String id) async {
     final sora = SoraScope.read(context);
@@ -101,29 +93,31 @@ class _DnsScreenState extends State<DnsScreen> {
 
   Future<void> _check() async {
     if (_checking) return;
+    final sora = SoraScope.read(context);
+    if (sora.phase != Phase.connected) {
+      setState(() {
+        _checks = null;
+        _failure = null;
+        _needsConnection = true;
+      });
+      return;
+    }
     setState(() {
       _checking = true;
-      _report = null;
+      _checks = null;
+      _failure = null;
+      _needsConnection = false;
     });
-    final report = await checkDnsLeaks(SoraScope.read(context));
+    final result = await sora.checkDnsLeaks();
     if (!mounted) return;
-    if (report.available) {
-      SoraScope.read(context).settings.dnsLeakLastCheck = DateTime.now().millisecondsSinceEpoch;
+    if (result.failure == null) {
+      sora.settings.dnsLeakLastCheck = DateTime.now().millisecondsSinceEpoch;
     }
     setState(() {
       _checking = false;
-      _report = report;
+      _checks = result.checks;
+      _failure = result.failure;
     });
-  }
-
-  /// Applies the tunnel DNS again and re-runs the check.
-  Future<void> _fix() async {
-    final sora = SoraScope.read(context);
-    final preset = sora.settings.dnsPreset;
-    await sora.change((x) {
-      x.dns = preset == 'auto' ? const [] : preset == 'custom' ? x.dns : _presets[preset] ?? const [];
-    });
-    await _check();
   }
 
   @override
@@ -133,6 +127,7 @@ class _DnsScreenState extends State<DnsScreen> {
     final s = S.of(context);
     final palette = Palette.of(context);
     final last = settings.dnsLeakLastCheck;
+    final locale = Localizations.localeOf(context).languageCode;
     return Screen(
       title: s.dns,
       children: [
@@ -168,7 +163,11 @@ class _DnsScreenState extends State<DnsScreen> {
           children: [
             Tile(
               title: s.dnsLastCheck,
-              detail: last == 0 ? s.dnsNeverChecked : DateTime.fromMillisecondsSinceEpoch(last).toLocal().toString(),
+              detail: last == 0
+                  ? s.dnsNeverChecked
+                  : DateFormat.yMMMd(locale)
+                      .add_Hm()
+                      .format(DateTime.fromMillisecondsSinceEpoch(last).toLocal()),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
@@ -191,33 +190,41 @@ class _DnsScreenState extends State<DnsScreen> {
               ],
             ),
           )
-        else if (_report != null)
-          _result(context, _report!),
+        else if (_needsConnection)
+          _note(context, Symbols.info_rounded, s.dnsCheckNeedsConnection)
+        else if (_failure != null)
+          _note(context, Symbols.info_rounded, describe(s, _failure!))
+        else if (_checks != null)
+          _report(context, _checks!),
       ],
     );
   }
 
-  Widget _result(BuildContext context, DnsLeakReport report) {
+  /// A neutral note: info, not an error. Failures are localized through
+  /// [describe] and never shown raw or in red.
+  Widget _note(BuildContext context, IconData icon, String text) {
+    final palette = Palette.of(context);
+    return Group(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, size: 18, color: palette.ink2),
+              const SizedBox(width: 10),
+              Expanded(child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2))),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _report(BuildContext context, List<DnsLeakCheck> checks) {
     final s = S.of(context);
     final palette = Palette.of(context);
-    if (!report.available) {
-      return Group(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Symbols.info_rounded, size: 18, color: palette.ink2),
-                const SizedBox(width: 10),
-                Expanded(child: Text(s.dnsCheckPending, style: Styles.secondary.copyWith(color: palette.ink2))),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-    final leaked = report.leaked;
+    final leaked = checks.any((c) => c.leaked);
     return Group(
       children: [
         Padding(
@@ -239,39 +246,74 @@ class _DnsScreenState extends State<DnsScreen> {
             ],
           ),
         ),
-        for (final check in report.checks)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(44, 6, 12, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      check.leaked ? Symbols.warning_rounded : Symbols.check_circle_rounded,
-                      size: 16,
-                      color: palette.ink2,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(check.label, style: Styles.body.copyWith(color: palette.ink))),
-                  ],
-                ),
-                if (check.detail.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 24, top: 2),
-                    child: Text(check.detail, style: Styles.caption.copyWith(color: palette.ink2)),
-                  ),
-              ],
-            ),
-          ),
-        if (leaked)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-            child: PrimaryButton(label: s.dnsFix, onTap: _fix),
-          )
-        else
-          const SizedBox(height: 8),
+        for (final check in checks) _checkRow(context, check),
+        const SizedBox(height: 8),
       ],
+    );
+  }
+
+  /// One check: label, observed values, and the fix hint. A hint on a
+  /// non-leaking check is a warning (warning icon, calm ink), never an error.
+  Widget _checkRow(BuildContext context, DnsLeakCheck check) {
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    final hasHint = check.fixHint.isNotEmpty;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(44, 8, 12, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                check.leaked || hasHint ? Symbols.warning_rounded : Symbols.check_circle_rounded,
+                size: 16,
+                color: check.leaked ? palette.ink : palette.ink2,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _checkLabel(s, check.label),
+                  style: Styles.body.copyWith(color: palette.ink),
+                ),
+              ),
+            ],
+          ),
+          if (check.expected.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 24, top: 2),
+              child: Text(
+                '${s.dnsExpected}: ${check.expected}',
+                style: Styles.caption.copyWith(color: palette.ink2),
+              ),
+            ),
+          if (check.actual.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(left: 24, top: 2),
+              child: Text(
+                '${s.dnsActual}: ${check.actual}',
+                style: Styles.caption.copyWith(color: palette.ink2),
+              ),
+            ),
+          if (hasHint)
+            Padding(
+              padding: const EdgeInsets.only(left: 24, top: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Symbols.info_rounded, size: 14, color: palette.ink2),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _checkHint(s, check.fixHint),
+                      style: Styles.caption.copyWith(color: palette.ink2),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

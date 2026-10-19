@@ -501,9 +501,15 @@
   "dnsChecking": "Проверка...",
   "dnsNoLeak": "Утечек не найдено",
   "dnsLeakFound": "Обнаружена утечка",
-  "dnsFix": "Исправить",
   "dnsLastCheck": "Последняя проверка",
   "dnsNeverChecked": "Ещё не проверялось",
-  "dnsCheckPending": "Проверка утечек появится после обновления ядра.",
-  "dnsDetails": "Подробности"
+  "dnsLeakCheckTunnelDns": "Резолверы DNS туннеля",
+  "dnsLeakCheckSystemResolvers": "Системные резолверы",
+  "dnsLeakCheckKillSwitchDns": "Kill switch закрывает DNS",
+  "dnsLeakFixConfigureTunnelDns": "Задайте DNS туннеля в настройках выше.",
+  "dnsLeakFixReviewSystemResolvers": "Проверьте, какие резолверы система использует вне туннеля.",
+  "dnsLeakFixEnableKillSwitch": "Включите kill switch, чтобы DNS оставался в туннеле.",
+  "dnsCheckNeedsConnection": "Сначала подключитесь к VPN, затем проверьте утечки.",
+  "dnsExpected": "Ожидалось",
+  "dnsActual": "Обнаружено"
 }

@@ -912,6 +912,24 @@ class SZh extends S {
   @override
   String get diagnosticUnavailable => '此诊断在此平台上不可用。';
   @override
+  String get dnsExpected => 'Expected';
+  @override
+  String get dnsActual => 'Observed';
+  @override
+  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  @override
+  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  @override
+  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  @override
   String get qrShareTitle => 'Share via QR';
   @override
   String get qrScanTitle => 'Scan QR code';
@@ -966,15 +984,9 @@ class SZh extends S {
   @override
   String get dnsLeakFound => 'Leak detected';
   @override
-  String get dnsFix => 'Fix';
-  @override
   String get dnsLastCheck => 'Last check';
   @override
   String get dnsNeverChecked => 'Not checked yet';
-  @override
-  String get dnsCheckPending => 'Leak check will be available after the core update.';
-  @override
-  String get dnsDetails => 'Details';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1884,6 +1896,24 @@ class SZhHans extends SZh {
   @override
   String get diagnosticUnavailable => '此诊断在此平台上不可用。';
   @override
+  String get dnsExpected => 'Expected';
+  @override
+  String get dnsActual => 'Observed';
+  @override
+  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  @override
+  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  @override
+  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  @override
   String get qrShareTitle => 'Share via QR';
   @override
   String get qrScanTitle => 'Scan QR code';
@@ -1938,15 +1968,9 @@ class SZhHans extends SZh {
   @override
   String get dnsLeakFound => 'Leak detected';
   @override
-  String get dnsFix => 'Fix';
-  @override
   String get dnsLastCheck => 'Last check';
   @override
   String get dnsNeverChecked => 'Not checked yet';
-  @override
-  String get dnsCheckPending => 'Leak check will be available after the core update.';
-  @override
-  String get dnsDetails => 'Details';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2856,6 +2880,24 @@ class SZhHant extends SZh {
   @override
   String get diagnosticUnavailable => '此診斷在此平台上不可用。';
   @override
+  String get dnsExpected => 'Expected';
+  @override
+  String get dnsActual => 'Observed';
+  @override
+  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  @override
+  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  @override
+  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  @override
   String get qrShareTitle => 'Share via QR';
   @override
   String get qrScanTitle => 'Scan QR code';
@@ -2910,13 +2952,7 @@ class SZhHant extends SZh {
   @override
   String get dnsLeakFound => 'Leak detected';
   @override
-  String get dnsFix => 'Fix';
-  @override
   String get dnsLastCheck => 'Last check';
   @override
   String get dnsNeverChecked => 'Not checked yet';
-  @override
-  String get dnsCheckPending => 'Leak check will be available after the core update.';
-  @override
-  String get dnsDetails => 'Details';
 }

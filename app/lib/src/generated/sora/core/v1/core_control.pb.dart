@@ -8227,5 +8227,261 @@ class BypassStrategy extends $pb.GeneratedMessage {
   void clearMethodEol() => $_clearField(7);
 }
 
+class DnsLeakCheck extends $pb.GeneratedMessage {
+  factory DnsLeakCheck({
+    $core.String? id,
+    $core.String? label,
+    $core.String? expected,
+    $core.String? actual,
+    $core.bool? leaked,
+    $core.String? fixHint,
+  }) {
+    final result = DnsLeakCheck._();
+    if (id != null) result.id = id;
+    if (label != null) result.label = label;
+    if (expected != null) result.expected = expected;
+    if (actual != null) result.actual = actual;
+    if (leaked != null) result.leaked = leaked;
+    if (fixHint != null) result.fixHint = fixHint;
+    return result;
+  }
+
+  DnsLeakCheck._();
+
+  factory DnsLeakCheck.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DnsLeakCheck()..mergeFromBuffer(data, registry);
+  factory DnsLeakCheck.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DnsLeakCheck()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DnsLeakCheck',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: DnsLeakCheck.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'label')
+    ..aOS(3, _omitFieldNames ? '' : 'expected')
+    ..aOS(4, _omitFieldNames ? '' : 'actual')
+    ..aOB(5, _omitFieldNames ? '' : 'leaked')
+    ..aOS(6, _omitFieldNames ? '' : 'fixHint')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DnsLeakCheck clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DnsLeakCheck copyWith(void Function(DnsLeakCheck) updates) =>
+      super.copyWith((message) => updates(message as DnsLeakCheck)) as DnsLeakCheck;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DnsLeakCheck() / DnsLeakCheck.new instead')
+  static DnsLeakCheck create() => DnsLeakCheck._();
+  static $pb.GeneratedMessage $_createMessage() => DnsLeakCheck._();
+  @$core.override
+  DnsLeakCheck createEmptyInstance() => DnsLeakCheck._();
+  @$core.pragma('dart2js:noInline')
+  static DnsLeakCheck getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DnsLeakCheck>(DnsLeakCheck.$_createMessage);
+  static DnsLeakCheck? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get label => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set label($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasLabel() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLabel() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get expected => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set expected($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasExpected() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearExpected() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get actual => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set actual($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasActual() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearActual() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get leaked => $_getBF(4);
+  @$pb.TagNumber(5)
+  set leaked($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasLeaked() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearLeaked() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get fixHint => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set fixHint($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasFixHint() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearFixHint() => $_clearField(6);
+}
+
+class CheckDnsLeaksRequest extends $pb.GeneratedMessage {
+  factory CheckDnsLeaksRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.String? sessionId,
+  }) {
+    final result = CheckDnsLeaksRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (sessionId != null) result.sessionId = sessionId;
+    return result;
+  }
+
+  CheckDnsLeaksRequest._();
+
+  factory CheckDnsLeaksRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CheckDnsLeaksRequest()..mergeFromBuffer(data, registry);
+  factory CheckDnsLeaksRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CheckDnsLeaksRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CheckDnsLeaksRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: CheckDnsLeaksRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOS(3, _omitFieldNames ? '' : 'sessionId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CheckDnsLeaksRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CheckDnsLeaksRequest copyWith(void Function(CheckDnsLeaksRequest) updates) =>
+      super.copyWith((message) => updates(message as CheckDnsLeaksRequest)) as CheckDnsLeaksRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CheckDnsLeaksRequest() / CheckDnsLeaksRequest.new instead')
+  static CheckDnsLeaksRequest create() => CheckDnsLeaksRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CheckDnsLeaksRequest._();
+  @$core.override
+  CheckDnsLeaksRequest createEmptyInstance() => CheckDnsLeaksRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CheckDnsLeaksRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CheckDnsLeaksRequest>(CheckDnsLeaksRequest.$_createMessage);
+  static CheckDnsLeaksRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get sessionId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set sessionId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasSessionId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSessionId() => $_clearField(3);
+}
+
+class CheckDnsLeaksResponse extends $pb.GeneratedMessage {
+  factory CheckDnsLeaksResponse({
+    $core.Iterable<DnsLeakCheck>? checks,
+    SoraError? error,
+  }) {
+    final result = CheckDnsLeaksResponse._();
+    if (checks != null) result.checks.addAll(checks);
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  CheckDnsLeaksResponse._();
+
+  factory CheckDnsLeaksResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CheckDnsLeaksResponse()..mergeFromBuffer(data, registry);
+  factory CheckDnsLeaksResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CheckDnsLeaksResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CheckDnsLeaksResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: CheckDnsLeaksResponse.$_createMessage)
+    ..pPM<DnsLeakCheck>(1, _omitFieldNames ? '' : 'checks', subBuilder: DnsLeakCheck.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CheckDnsLeaksResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CheckDnsLeaksResponse copyWith(void Function(CheckDnsLeaksResponse) updates) =>
+      super.copyWith((message) => updates(message as CheckDnsLeaksResponse)) as CheckDnsLeaksResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CheckDnsLeaksResponse() / CheckDnsLeaksResponse.new instead')
+  static CheckDnsLeaksResponse create() => CheckDnsLeaksResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CheckDnsLeaksResponse._();
+  @$core.override
+  CheckDnsLeaksResponse createEmptyInstance() => CheckDnsLeaksResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CheckDnsLeaksResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CheckDnsLeaksResponse>(CheckDnsLeaksResponse.$_createMessage);
+  static CheckDnsLeaksResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<DnsLeakCheck> get checks => $_getList(0);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
 const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

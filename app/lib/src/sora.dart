@@ -287,6 +287,32 @@ class Sora extends ChangeNotifier {
     }
   }
 
+  /// Runs the DNS leak diagnostics on the core (API 1.8). Needs an active
+  /// session; without one it returns [CoreFailure.unavailable], which the UI
+  /// renders as a friendly note, never a raw error.
+  Future<({List<DnsLeakCheck> checks, CoreFailure? failure})> checkDnsLeaks() async {
+    final link = _link, id = sessionId;
+    if (link == null || id == null) {
+      return (checks: const <DnsLeakCheck>[], failure: CoreFailure.unavailable);
+    }
+    try {
+      final answer = await link.stub.checkDnsLeaks(
+        CheckDnsLeaksRequest(apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: id),
+      );
+      if (id != sessionId || link != _link) {
+        // The session changed mid-check: the results belong to a dead session.
+        return (checks: const <DnsLeakCheck>[], failure: CoreFailure.unavailable);
+      }
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      recovered('request');
+      return (checks: answer.checks, failure: null);
+    } catch (error) {
+      final failure = CoreFailure.from(error);
+      reportFailure(error, source: 'request');
+      return (checks: const <DnsLeakCheck>[], failure: failure);
+    }
+  }
+
   /// Last displayed failure, cleared by the next action.
   CoreFailure? failure;
 

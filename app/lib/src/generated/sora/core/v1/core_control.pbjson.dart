@@ -1812,3 +1812,50 @@ final $typed_data.Uint8List bypassStrategyDescriptor =
         'VyGAIgASgIUghkaXNvcmRlchIQCgNvb2IYAyABKAhSA29vYhIdCgp0bHNfcmVjb3JkGAQgASgJ'
         'Ugl0bHNSZWNvcmQSGwoJaG9zdF9jYXNlGAUgASgIUghob3N0Q2FzZRIfCgtkb21haW5fY2FzZR'
         'gGIAEoCFIKZG9tYWluQ2FzZRIdCgptZXRob2RfZW9sGAcgASgIUgltZXRob2RFb2w=');
+
+const DnsLeakCheck$json = {
+  '1': 'DnsLeakCheck',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'label', '3': 2, '4': 1, '5': 9, '10': 'label'},
+    {'1': 'expected', '3': 3, '4': 1, '5': 9, '10': 'expected'},
+    {'1': 'actual', '3': 4, '4': 1, '5': 9, '10': 'actual'},
+    {'1': 'leaked', '3': 5, '4': 1, '5': 8, '10': 'leaked'},
+    {'1': 'fix_hint', '3': 6, '4': 1, '5': 9, '10': 'fixHint'},
+  ],
+};
+
+/// Descriptor for `DnsLeakCheck`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List dnsLeakCheckDescriptor =
+    $convert.base64Decode('CgxEbnNMZWFrQ2hlY2sSDgoCaWQYASABKAlSAmlkEhQKBWxhYmVsGAIgASgJUgVsYWJlbBIaCghl'
+        'eHBlY3RlZBgDIAEoCVIIZXhwZWN0ZWQSFgoGYWN0dWFsGAQgASgJUgZhY3R1YWwSFgoGbGVha2Vk'
+        'GAUgASgIUgZsZWFrZWQSGQoIZml4X2hpbnQYBiABKAlSB2ZpeEhpbnQ=');
+
+const CheckDnsLeaksRequest$json = {
+  '1': 'CheckDnsLeaksRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'session_id', '3': 3, '4': 1, '5': 9, '10': 'sessionId'},
+  ],
+};
+
+/// Descriptor for `CheckDnsLeaksRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List checkDnsLeaksRequestDescriptor =
+    $convert.base64Decode('ChRDaGVja0Ruc0xlYWtzUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29yZS52'
+        'MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEoDFIU'
+        'Y29udHJvbEF1dGhlbnRpY2F0b3ISHQoKc2Vzc2lvbl9pZBgDIAEoCVIJc2Vzc2lvbklk');
+
+const CheckDnsLeaksResponse$json = {
+  '1': 'CheckDnsLeaksResponse',
+  '2': [
+    {'1': 'checks', '3': 1, '4': 3, '5': 11, '6': '.sora.core.v1.DnsLeakCheck', '10': 'checks'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `CheckDnsLeaksResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List checkDnsLeaksResponseDescriptor =
+    $convert.base64Decode('ChVDaGVja0Ruc0xlYWtzUmVzcG9uc2USMgoGY2hlY2tzGAEgAygLMhouc29yYS5jb3JlLnYxLkRu'
+        'c0xlYWtDaGVja1IGY2hlY2tzEi0KBWVycm9yGAIgASgLMhcuc29yYS5jb3JlLnYxLlNvcmFFcnJv'
+        'clIFZXJyb3I=');

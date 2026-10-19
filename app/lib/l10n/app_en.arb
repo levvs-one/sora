@@ -349,9 +349,15 @@
   "dnsChecking": "Checking...",
   "dnsNoLeak": "No leaks found",
   "dnsLeakFound": "Leak detected",
-  "dnsFix": "Fix",
   "dnsLastCheck": "Last check",
   "dnsNeverChecked": "Not checked yet",
-  "dnsCheckPending": "Leak check will be available after the core update.",
-  "dnsDetails": "Details"
+  "dnsLeakCheckTunnelDns": "Tunnel DNS resolvers",
+  "dnsLeakCheckSystemResolvers": "System resolvers",
+  "dnsLeakCheckKillSwitchDns": "Kill switch DNS cover",
+  "dnsLeakFixConfigureTunnelDns": "Set the tunnel DNS in the DNS settings above.",
+  "dnsLeakFixReviewSystemResolvers": "Check which resolvers your system would use outside the tunnel.",
+  "dnsLeakFixEnableKillSwitch": "Enable the kill switch so DNS stays inside the tunnel.",
+  "dnsCheckNeedsConnection": "Connect to the VPN first, then check for leaks.",
+  "dnsExpected": "Expected",
+  "dnsActual": "Observed"
 }

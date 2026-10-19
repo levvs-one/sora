@@ -930,6 +930,24 @@ class SRu extends S {
   @override
   String get diagnosticUnavailable => 'Эта диагностика недоступна на данной платформе.';
   @override
+  String get dnsExpected => 'Ожидалось';
+  @override
+  String get dnsActual => 'Обнаружено';
+  @override
+  String get dnsCheckNeedsConnection => 'Сначала подключитесь к VPN, затем проверьте утечки.';
+  @override
+  String get dnsLeakCheckTunnelDns => 'Резолверы DNS туннеля';
+  @override
+  String get dnsLeakCheckSystemResolvers => 'Системные резолверы';
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Kill switch закрывает DNS';
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Задайте DNS туннеля в настройках выше.';
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Проверьте, какие резолверы система использует вне туннеля.';
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Включите kill switch, чтобы DNS оставался в туннеле.';
+  @override
   String get qrShareTitle => 'Поделиться QR-кодом';
   @override
   String get qrScanTitle => 'Сканировать QR-код';
@@ -984,13 +1002,7 @@ class SRu extends S {
   @override
   String get dnsLeakFound => 'Обнаружена утечка';
   @override
-  String get dnsFix => 'Исправить';
-  @override
   String get dnsLastCheck => 'Последняя проверка';
   @override
   String get dnsNeverChecked => 'Ещё не проверялось';
-  @override
-  String get dnsCheckPending => 'Проверка утечек появится после обновления ядра.';
-  @override
-  String get dnsDetails => 'Подробности';
 }

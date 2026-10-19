@@ -9,7 +9,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../desktop/links.dart';
-import '../sora.dart';
 import 'kit.dart';
 import 'subscription_sheet.dart';
 
