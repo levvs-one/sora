@@ -42,6 +42,9 @@ const (
 	FeatureVLESSEncrypt   Feature = "vless-encryption"
 	FeatureAmneziaWG      Feature = "amneziawg"
 	FeaturePrivateControl Feature = "private-control"
+	// FeatureChains marks engines able to dial one outbound through another
+	// (sing-box dialer_proxy, mihomo dialer-proxy, Xray dialerProxy).
+	FeatureChains Feature = "chains"
 )
 
 // Capabilities describes the protocols and features supported by an engine

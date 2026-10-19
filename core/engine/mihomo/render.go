@@ -153,6 +153,18 @@ func buildProxies(p *engine.Plan) (map[string]string, []proxy, error) {
 		byID[o.ID] = name
 		out = append(out, px)
 	}
+	// Chains resolve after every name exists: a hop may dial through a later
+	// outbound of the plan.
+	for i, o := range p.Outbounds {
+		if o.Via == "" {
+			continue
+		}
+		name, ok := byID[o.Via]
+		if !ok {
+			return nil, nil, fmt.Errorf("mihomo: outbound %q dials through unknown outbound %q", o.ID, o.Via)
+		}
+		out[i].Dialer = name
+	}
 	return byID, out, nil
 }
 

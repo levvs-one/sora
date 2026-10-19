@@ -128,6 +128,10 @@ type Outbound struct {
 	Amnezia *AmneziaWG
 	// Bypass is the strategy of a bypass outbound.
 	Bypass *BypassStrategy
+	// Via is the id of the outbound this one dials through, forming a proxy
+	// chain: traffic enters this outbound and exits the last hop. Empty
+	// means a direct connection. Chains need the "chains" engine feature.
+	Via string
 	// Profile contains a provider's Xray configuration and credentials, so
 	// the entire value is secret.
 	Profile json.RawMessage

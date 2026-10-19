@@ -255,8 +255,55 @@ func (p *Plan) Validate() error {
 		}
 	}
 
+	errs = append(errs, validateChains(p.Outbounds, ids))
+
 	errs = append(errs, p.DNS.validate(), p.Tun.validate(), p.Options.validate())
 	return errors.Join(errs...)
+}
+
+// MaxChainHops bounds a proxy chain: the entry outbound plus its via links.
+// Longer chains multiply failure modes without meaningful privacy gains.
+const MaxChainHops = 3
+
+// validateChains checks Via links between outbounds: every link names an
+// existing outbound, no outbound links to itself, no cycles, and no chain is
+// longer than MaxChainHops.
+func validateChains(outbounds []Outbound, ids map[string]struct{}) error {
+	via := make(map[string]string, len(outbounds))
+	for _, o := range outbounds {
+		if o.Via == "" {
+			continue
+		}
+		if o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass {
+			return fmt.Errorf("outbound %s: a %s outbound cannot dial through another", o.ID, o.Protocol)
+		}
+		if o.Via == o.ID {
+			return fmt.Errorf("outbound %s: dials through itself", o.ID)
+		}
+		if _, ok := ids[o.Via]; !ok {
+			return fmt.Errorf("outbound %s: dials through unknown outbound %q", o.ID, o.Via)
+		}
+		via[o.ID] = o.Via
+	}
+	for _, o := range outbounds {
+		if o.Via == "" {
+			continue
+		}
+		seen := map[string]bool{o.ID: true}
+		depth := 1
+		for next := o.Via; next != ""; {
+			if seen[next] {
+				return fmt.Errorf("outbound %s: its chain loops back through %q", o.ID, next)
+			}
+			seen[next] = true
+			depth++
+			if depth > MaxChainHops {
+				return fmt.Errorf("outbound %s: its chain is longer than %d hops", o.ID, MaxChainHops)
+			}
+			next = via[next]
+		}
+	}
+	return nil
 }
 
 // groupCycle reports whether group reaches itself through nested groups.

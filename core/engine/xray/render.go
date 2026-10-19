@@ -171,6 +171,10 @@ func (r *renderer) outbounds() ([]obj, error) {
 		if err != nil {
 			return nil, err
 		}
+		if o.Via != "" {
+			// Proxy chains: dial this outbound through another one of the plan.
+			ob["dialerProxy"] = r.tags[o.Via]
+		}
 		out = append(out, ob)
 	}
 	out = append(out,

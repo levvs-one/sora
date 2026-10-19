@@ -37,7 +37,7 @@ var Catalog = map[Kind]Capabilities{
 			FeatureProxyProviders: true, FeatureURLTest: true, FeatureLatencyTest: true,
 			FeatureHotApply: true, FeatureGeoData: true, FeatureFallbackGroup: true,
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
-			FeatureAmneziaWG: true, FeaturePrivateControl: true,
+			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureChains: true,
 		},
 	},
 	KindSingBox: {
@@ -54,7 +54,7 @@ var Catalog = map[Kind]Capabilities{
 		Features: map[Feature]bool{
 			FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
 			FeatureURLTest: true, FeatureLatencyTest: true, FeatureGeoData: true,
-			FeaturePerAppRouting: true, FeatureTLSFragment: true,
+			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureChains: true,
 		},
 	},
 	KindXray: {
@@ -74,6 +74,9 @@ var Catalog = map[Kind]Capabilities{
 			FeatureURLTest: true, FeatureLoadBalance: true, FeatureLatencyTest: true,
 			FeatureGeoData: true, FeatureTLSFragment: true,
 			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
+			// dialerProxy exists since long before the minimum
+			// version, so chains need no extra version gate.
+			FeatureChains: true,
 		},
 	},
 }

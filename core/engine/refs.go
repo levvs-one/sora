@@ -64,6 +64,9 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 		if o.Amnezia != nil {
 			out[FeatureAmneziaWG] = true
 		}
+		if o.Via != "" {
+			out[FeatureChains] = true
+		}
 	}
 	if p.Options.Fragment.Enabled {
 		out[FeatureTLSFragment] = true
