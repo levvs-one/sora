@@ -1832,6 +1832,38 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Эта диагностика недоступна на данной платформе.'**
   String get diagnosticUnavailable;
+  String get qrShareTitle;
+  String get qrScanTitle;
+  String get qrCopyLink;
+  String get qrShowLink;
+  String get qrHideLink;
+  String get qrWarning;
+  String get qrScanHint;
+  String get qrFromClipboard;
+  String get qrNoCamera;
+  String get qrInvalid;
+  String get qrScan;
+  String get qrTorch;
+  String get connGroupByProcess;
+  String get connListView;
+  String get connCopyHost;
+  String get connAddRule;
+  String get connConnections;
+  String get dnsPreset;
+  String get dnsPresetCloudflare;
+  String get dnsPresetGoogle;
+  String get dnsPresetQuad9;
+  String get dnsPresetAdGuard;
+  String get dnsPresetCustom;
+  String get dnsCheck;
+  String get dnsChecking;
+  String get dnsNoLeak;
+  String get dnsLeakFound;
+  String get dnsFix;
+  String get dnsLastCheck;
+  String get dnsNeverChecked;
+  String get dnsCheckPending;
+  String get dnsDetails;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

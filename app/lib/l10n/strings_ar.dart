@@ -914,4 +914,68 @@ class SAr extends S {
 
   @override
   String get diagnosticUnavailable => 'هذا التشخيص غير متوفر على هذا النظام الأساسي.';
+  @override
+  String get qrShareTitle => 'Share via QR';
+  @override
+  String get qrScanTitle => 'Scan QR code';
+  @override
+  String get qrCopyLink => 'Copy link';
+  @override
+  String get qrShowLink => 'Show link';
+  @override
+  String get qrHideLink => 'Hide link';
+  @override
+  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  @override
+  String get qrScanHint => 'Point the camera at a QR code';
+  @override
+  String get qrFromClipboard => 'Paste from clipboard';
+  @override
+  String get qrNoCamera => 'Camera is unavailable. Paste the link from the clipboard instead.';
+  @override
+  String get qrInvalid => 'This QR code does not contain a valid link.';
+  @override
+  String get qrScan => 'Scan QR';
+  @override
+  String get qrTorch => 'Flashlight';
+  @override
+  String get connGroupByProcess => 'By process';
+  @override
+  String get connListView => 'As list';
+  @override
+  String get connCopyHost => 'Copy host';
+  @override
+  String get connAddRule => 'Add rule';
+  @override
+  String get connConnections => 'connections';
+  @override
+  String get dnsPreset => 'Preset';
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+  @override
+  String get dnsPresetGoogle => 'Google';
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+  @override
+  String get dnsPresetCustom => 'Custom';
+  @override
+  String get dnsCheck => 'Check for leaks';
+  @override
+  String get dnsChecking => 'Checking...';
+  @override
+  String get dnsNoLeak => 'No leaks found';
+  @override
+  String get dnsLeakFound => 'Leak detected';
+  @override
+  String get dnsFix => 'Fix';
+  @override
+  String get dnsLastCheck => 'Last check';
+  @override
+  String get dnsNeverChecked => 'Not checked yet';
+  @override
+  String get dnsCheckPending => 'Leak check will be available after the core update.';
+  @override
+  String get dnsDetails => 'Details';
 }

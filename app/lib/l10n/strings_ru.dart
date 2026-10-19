@@ -929,4 +929,68 @@ class SRu extends S {
 
   @override
   String get diagnosticUnavailable => 'Эта диагностика недоступна на данной платформе.';
+  @override
+  String get qrShareTitle => 'Поделиться QR-кодом';
+  @override
+  String get qrScanTitle => 'Сканировать QR-код';
+  @override
+  String get qrCopyLink => 'Скопировать ссылку';
+  @override
+  String get qrShowLink => 'Показать ссылку';
+  @override
+  String get qrHideLink => 'Скрыть ссылку';
+  @override
+  String get qrWarning => 'QR-код содержит данные для подключения. Не показывайте его посторонним.';
+  @override
+  String get qrScanHint => 'Наведите камеру на QR-код';
+  @override
+  String get qrFromClipboard => 'Вставить из буфера обмена';
+  @override
+  String get qrNoCamera => 'Камера недоступна. Вставьте ссылку из буфера обмена.';
+  @override
+  String get qrInvalid => 'В этом QR-коде нет корректной ссылки.';
+  @override
+  String get qrScan => 'Сканировать QR';
+  @override
+  String get qrTorch => 'Фонарик';
+  @override
+  String get connGroupByProcess => 'По процессам';
+  @override
+  String get connListView => 'Списком';
+  @override
+  String get connCopyHost => 'Скопировать хост';
+  @override
+  String get connAddRule => 'Добавить правило';
+  @override
+  String get connConnections => 'соединения';
+  @override
+  String get dnsPreset => 'Пресет';
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+  @override
+  String get dnsPresetGoogle => 'Google';
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+  @override
+  String get dnsPresetCustom => 'Свой';
+  @override
+  String get dnsCheck => 'Проверить утечки';
+  @override
+  String get dnsChecking => 'Проверка...';
+  @override
+  String get dnsNoLeak => 'Утечек не найдено';
+  @override
+  String get dnsLeakFound => 'Обнаружена утечка';
+  @override
+  String get dnsFix => 'Исправить';
+  @override
+  String get dnsLastCheck => 'Последняя проверка';
+  @override
+  String get dnsNeverChecked => 'Ещё не проверялось';
+  @override
+  String get dnsCheckPending => 'Проверка утечек появится после обновления ядра.';
+  @override
+  String get dnsDetails => 'Подробности';
 }
