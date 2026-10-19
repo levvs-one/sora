@@ -76,6 +76,18 @@ func Args(s engine.BypassStrategy, port int) []string {
 	if s.UnixEOL {
 		args = append(args, "--unixeol")
 	}
+	if s.TamperStart != "" {
+		args = append(args, "--tamper-start="+s.TamperStart)
+	}
+	if s.TamperCutoff != "" {
+		args = append(args, "--tamper-cutoff="+s.TamperCutoff)
+	}
+	if s.OOBData != "" {
+		args = append(args, "--oob-data="+s.OOBData)
+	}
+	if s.MSS != "" {
+		args = append(args, "--mss="+s.MSS)
+	}
 	return args
 }
 

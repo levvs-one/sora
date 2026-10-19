@@ -354,6 +354,21 @@ type BypassStrategy struct {
 	UnixEOL     bool
 	// SplitAnyProtocol splits every protocol, not only HTTP and TLS.
 	SplitAnyProtocol bool
+	// TamperStart limits handshake shaping to outbound stream positions at
+	// or after this point ("--tamper-start"); TamperCutoff stops shaping
+	// after it ("--tamper-cutoff"). Both use the same position syntax as
+	// SplitPos, with an optional leading "n" selecting a data block number
+	// instead of a byte offset. Shaping only the handshake keeps long-lived
+	// connections fast.
+	TamperStart  string
+	TamperCutoff string
+	// OOBData overrides the default 0x00 out-of-band byte: one character or
+	// 0xHEX ("--oob-data"). Needs OOB.
+	OOBData string
+	// MSS clamps the TCP maximum segment size ("--mss"), a plain byte count.
+	// Last resort only: unlike the shaping options it throttles every
+	// connection the strategy touches, so it must never be a default.
+	MSS string
 }
 
 // Fragment splits proxy TLS ClientHello messages across TCP segments to evade

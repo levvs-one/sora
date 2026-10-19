@@ -454,11 +454,32 @@ func groupCycle(group string, members map[string][]string, visiting map[string]b
 // marker with an optional offset.
 var bypassPosition = regexp.MustCompile(`^(-?[0-9]{1,4}|(method|host|endhost|sld|midsld|endsld|sniext)([+-][0-9]{1,4})?)$`)
 
+// bypassTamperPosition is a zapret tamper start/cutoff: like bypassPosition
+// with an optional leading "n" selecting a data block number instead of a
+// byte offset.
+var bypassTamperPosition = regexp.MustCompile(`^n?(-?[0-9]{1,4}|(method|host|endhost|sld|midsld|endsld|sniext)([+-][0-9]{1,4})?)$`)
+
+// validOOBData mirrors tpws: one byte, or 0x plus two hex digits.
+func validOOBData(v string) bool {
+	if len(v) == 1 {
+		return true
+	}
+	if len(v) == 4 && (v[0] == '0' && (v[1] == 'x' || v[1] == 'X')) {
+		for _, c := range v[2:] {
+			if !('0' <= c && c <= '9' || 'a' <= c && c <= 'f' || 'A' <= c && c <= 'F') {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
 func (s *BypassStrategy) validate(id string) error {
 	if s == nil {
 		return fmt.Errorf("outbound %s: a bypass outbound needs a strategy", id)
 	}
-	if len(s.SplitPos) == 0 && s.TLSRecord == "" && !s.HostCase && !s.DomainCase && !s.MethodEOL &&
+	if len(s.SplitPos) == 0 && s.TLSRecord == "" && s.MSS == "" && !s.HostCase && !s.DomainCase && !s.MethodEOL &&
 		!s.HostDot && !s.HostTab && !s.HostNoSpace && !s.MethodSpace && !s.UnixEOL {
 		return fmt.Errorf("outbound %s: the bypass strategy changes nothing", id)
 	}
@@ -468,6 +489,23 @@ func (s *BypassStrategy) validate(id string) error {
 	for _, pos := range append(slices.Clone(s.SplitPos), s.TLSRecord) {
 		if pos != "" && !bypassPosition.MatchString(pos) {
 			return fmt.Errorf("outbound %s: %q is not a split position", id, pos)
+		}
+	}
+	for _, pos := range []string{s.TamperStart, s.TamperCutoff} {
+		if pos != "" && !bypassTamperPosition.MatchString(pos) {
+			return fmt.Errorf("outbound %s: %q is not a tamper position", id, pos)
+		}
+	}
+	if s.OOBData != "" && !validOOBData(s.OOBData) {
+		return fmt.Errorf("outbound %s: %q is not an out-of-band byte (one character or 0xHEX)", id, s.OOBData)
+	}
+	if s.OOBData != "" && !s.OOB {
+		return fmt.Errorf("outbound %s: an out-of-band byte needs out-of-band", id)
+	}
+	if s.MSS != "" {
+		mss, err := strconv.Atoi(s.MSS)
+		if err != nil || mss < 64 || mss > 65495 {
+			return fmt.Errorf("outbound %s: %q is not a valid MSS (64-65495)", id, s.MSS)
 		}
 	}
 	for _, scope := range []string{s.DisorderScope, s.OOBScope} {
