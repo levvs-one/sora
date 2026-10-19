@@ -127,16 +127,32 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       return;
     }
     try {
-      final resp = await http
-          .get(Uri.parse(url))
+      final data = await _downloadCapped(Uri.parse(url), limit: maxPackageBytes)
           .timeout(const Duration(seconds: 60));
-      if (resp.statusCode != 200 || !context.mounted) {
-        if (context.mounted) _showError(context, s.extErrNetwork);
-        return;
-      }
-      await _installBytes(context, resp.bodyBytes, source: 'url', expectedSha256: null);
+      if (!context.mounted) return;
+      await _installBytes(context, data, source: 'url', expectedSha256: null);
     } catch (_) {
       if (context.mounted) _showError(context, s.extErrNetwork);
+    }
+  }
+
+  /// Downloads a .soraext with a hard byte cap enforced while streaming, so
+  /// a rogue URL cannot exhaust memory before [ExtPackage.open] runs its own
+  /// structural checks. Throws on HTTP errors, timeouts and over-limit
+  /// bodies; callers map every failure to a network error.
+  static Future<Uint8List> _downloadCapped(Uri url, {required int limit}) async {
+    final client = http.Client();
+    try {
+      final response = await client.send(http.Request('GET', url));
+      if (response.statusCode != 200) throw Exception('http ${response.statusCode}');
+      final body = <int>[];
+      await for (final chunk in response.stream) {
+        body.addAll(chunk);
+        if (body.length > limit) throw Exception('download exceeds $limit bytes');
+      }
+      return Uint8List.fromList(body);
+    } finally {
+      client.close();
     }
   }
 
@@ -434,7 +450,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
             children: [
               for (final c in _categories())
                 Padding(
-                  padding: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsetsDirectional.only(end: 8),
                   child: ChoiceChip(
                     label: Text(_categoryLabel(context, c)),
                     selected: _category == c,
@@ -543,6 +559,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       installs: e.installs,
       badges: catalogBadges(context, e),
       subtitle: e.description,
+      permissions: e.permissions,
       onTap: () => push(
           context,
           ExtensionDetailScreen(
@@ -569,13 +586,14 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     state._showProgress(context, s.extDownloading);
     progressOpen = true;
     try {
-      final resp =
-          await http.get(Uri.parse(e.downloadUrl)).timeout(const Duration(seconds: 120));
-      if (resp.statusCode != 200) throw Exception('http ${resp.statusCode}');
+      // The catalog entry carries the expected size; anything beyond it is
+      // not the advertised package.
+      final data = await _ExtensionsScreenState._downloadCapped(Uri.parse(e.downloadUrl), limit: e.size)
+          .timeout(const Duration(seconds: 120));
       if (!context.mounted) return;
       Navigator.of(context).pop();
       progressOpen = false;
-      await state._installBytes(context, resp.bodyBytes,
+      await state._installBytes(context, data,
           source: 'catalog', expectedSha256: e.sha256);
     } catch (_) {
       if (progressOpen && context.mounted) Navigator.of(context).pop();
@@ -626,6 +644,9 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
               ],
               subtitle: s.extVersionLabel(inst.version),
               enabled: inst.enabled,
+              capabilities: inst.manifest.capabilities,
+              permissions: inst.granted,
+              networkHosts: inst.manifest.networkHosts,
               onTap: () => push(context, ExtensionDetailScreen(installed: inst)),
               trailing: Switch(
                 value: inst.enabled,

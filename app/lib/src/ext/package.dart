@@ -17,7 +17,10 @@ class PackageError implements Exception {
   String toString() => 'PackageError: $message';
 }
 
-const int _maxPackageBytes = 64 * 1024 * 1024;
+/// Hard cap for a .soraext download: anything larger is rejected before the
+/// archive is even opened. Shared with the install UI so a rogue URL cannot
+/// exhaust memory ahead of the structural checks in [ExtPackage.open].
+const int maxPackageBytes = 64 * 1024 * 1024;
 const int _maxUncompressedBytes = 256 * 1024 * 1024;
 const int _maxPackageFiles = 4096;
 const int _maxSingleFile = 32 * 1024 * 1024;
@@ -34,8 +37,8 @@ class ExtPackage {
 
   /// Opens and structurally checks a .soraext. Call [verify] next.
   static ExtPackage open(Uint8List data) {
-    if (data.length > _maxPackageBytes) {
-      throw PackageError('package exceeds ${_maxPackageBytes} bytes');
+    if (data.length > maxPackageBytes) {
+      throw PackageError('package exceeds ${maxPackageBytes} bytes');
     }
     final Archive archive;
     try {
