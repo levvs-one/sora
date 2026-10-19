@@ -111,6 +111,7 @@ func Open(dir string, opts Options) (*Store, error) {
 	}
 	if err := s.read(); err != nil {
 		wipe(key)
+		wipe(id)
 		return nil, err
 	}
 	return s, nil
@@ -256,9 +257,17 @@ func (s *Store) Apply(puts map[string][]byte, deletes []string) error {
 		return err
 	}
 	// Wipe replaced and removed values; unchanged values are shared by both
-	// maps.
+	// maps and must survive. The touched set replaces the old pointer
+	// comparison, which panicked on empty values from a crafted vault.
+	touched := make(map[string]struct{}, len(puts)+len(deletes))
+	for _, reference := range deletes {
+		touched[reference] = struct{}{}
+	}
+	for reference := range puts {
+		touched[reference] = struct{}{}
+	}
 	for reference, material := range previous {
-		if kept, ok := next[reference]; !ok || &kept[0] != &material[0] {
+		if _, ok := touched[reference]; ok {
 			wipe(material)
 		}
 	}
@@ -313,21 +322,30 @@ func (s *Store) Close() error {
 	return nil
 }
 
-// read loads the vault, treating a missing file as an empty store.
+// read loads the vault, treating a missing file as an empty store. The size
+// is checked before reading: writes never exceed MaxVaultBytes, so a larger
+// file cannot be a vault this store wrote and is refused without allocating.
 func (s *Store) read() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	vaultPath := filepath.Join(s.dir, vaultFile)
-	if _, err := os.Stat(vaultPath); err == nil {
+	info, statErr := os.Stat(vaultPath)
+	switch {
+	case statErr == nil:
 		if err := checkOwnerOnly(vaultPath, fileMode); err != nil {
 			return err
 		}
+		if info.Size() > MaxVaultBytes {
+			return errs.Newf(errs.CodeInternal, errs.KeySecretStoreCorrupt,
+				"secret store: the vault is %d bytes, the limit is %d", info.Size(), MaxVaultBytes)
+		}
+	case errors.Is(statErr, fs.ErrNotExist):
+		return nil
+	default:
+		return errs.Wrap(statErr, errs.CodeInternal, errs.KeySecretStoreUnavailable)
 	}
 	raw, err := os.ReadFile(vaultPath)
 	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			return nil
-		}
 		return errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
 	}
 	items, err := s.unseal(raw)
@@ -352,12 +370,14 @@ func (s *Store) writeLocked() error {
 	return s.writeFile(filepath.Join(s.dir, vaultFile), sealed, fileMode)
 }
 
-// seal encrypts the item map into the on-disk format.
+// seal encrypts the item map into the on-disk format. The JSON plaintext is
+// wiped before returning: it holds every secret in the clear.
 func (s *Store) seal(items map[string][]byte) ([]byte, error) {
 	payload, err := json.Marshal(items)
 	if err != nil {
 		return nil, errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
 	}
+	defer wipe(payload)
 	aead, err := s.aead()
 	if err != nil {
 		return nil, err
@@ -397,10 +417,16 @@ func (s *Store) unseal(raw []byte) (map[string][]byte, error) {
 		return nil, errs.Newf(errs.CodeInternal, errs.KeySecretStoreCorrupt,
 			"secret store: the vault payload is not a reference map")
 	}
-	for reference := range items {
+	for reference, material := range items {
 		if ValidateReference(reference) != nil {
 			return nil, errs.Newf(errs.CodeInternal, errs.KeySecretStoreCorrupt,
 				"secret store: the vault holds an invalid reference")
+		}
+		// Empty values are rejected at every entry point; a crafted vault
+		// must not smuggle them in either.
+		if len(material) == 0 {
+			return nil, errs.Newf(errs.CodeInternal, errs.KeySecretStoreCorrupt,
+				"secret store: the vault holds an empty secret")
 		}
 	}
 	return items, nil

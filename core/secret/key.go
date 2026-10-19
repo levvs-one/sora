@@ -54,6 +54,9 @@ func loadOrCreateKey(dir string, prot Protector) (key, id []byte, err error) {
 		return nil, nil, err
 	}
 	wrapped, err := readMasterFile(filepath.Join(dir, masterFile))
+	// Wipe the wrapped key on every exit: the raw key (FileProtector) or its
+	// ciphertext must not linger in memory after the store is open.
+	defer func() { wipe(wrapped) }()
 	switch {
 	case err == nil:
 		key, err = prot.Unprotect(wrapped)
@@ -80,6 +83,9 @@ func loadOrCreateKey(dir string, prot Protector) (key, id []byte, err error) {
 	}
 	payload := append([]byte(masterHeader), protected...)
 	wipe(protected)
+	// The payload carries the (possibly cleartext) wrapped key; wipe it once
+	// written instead of leaving it for the GC.
+	defer wipe(payload)
 	if err := writeFileAtomic(filepath.Join(dir, masterFile), payload, fileMode); err != nil {
 		wipe(key)
 		return nil, nil, err
