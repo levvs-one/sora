@@ -7,6 +7,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	obfsv1 "github.com/levvs-one/sora-client/core/gen/sora/obfs/v1"
 	"github.com/levvs-one/sora-client/core/ipc"
 )
 
@@ -19,11 +20,13 @@ var readOnlyMethods = map[string]bool{
 	corev1.CoreControl_GetAbout_FullMethodName:          true,
 	corev1.CoreControl_GetRoutingPresets_FullMethodName: true,
 	corev1.CoreControl_GetStatus_FullMethodName:         true,
-	corev1.CoreControl_GetStats_FullMethodName:         true,
+	corev1.CoreControl_GetStats_FullMethodName:          true,
 	corev1.CoreControl_WatchEvents_FullMethodName:       true,
 	corev1.CoreControl_QueryLogs_FullMethodName:         true,
 	corev1.CoreControl_WatchLogs_FullMethodName:         true,
 	corev1.CoreControl_GetLogSettings_FullMethodName:    true,
+	// Obfuscation capabilities describe engines, not the user.
+	obfsv1.ObfsControl_GetObfsCapabilities_FullMethodName: true,
 }
 
 // peerLevel extracts the transport-verified privilege of the caller. Peers

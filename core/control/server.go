@@ -21,7 +21,9 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	censorv1 "github.com/levvs-one/sora-client/core/gen/sora/censor/v1"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	obfsv1 "github.com/levvs-one/sora-client/core/gen/sora/obfs/v1"
 	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/parser"
@@ -92,6 +94,7 @@ func Capabilities() []string {
 		"stats",
 		"engine-selection",
 		"tls-fragment",
+		"obfs-profiles",
 		"log-center",
 		"connection-center",
 		"native-diagnostics",
@@ -138,6 +141,12 @@ type Fetcher interface {
 // Server implements the control-plane service.
 type Server struct {
 	corev1.UnimplementedCoreControlServer
+	obfsv1.UnimplementedObfsControlServer
+	// CensorControl serves the parallel swarm agent's censorship
+	// classification service (core/control/censor.go); the embedding was
+	// missing while their handler was in flight, which broke the package
+	// build. See reports/featlog-swarm-sw1.md.
+	censorv1.UnimplementedCensorControlServer
 
 	version     Version
 	auth        *Authenticator
@@ -157,6 +166,10 @@ type Server struct {
 	// profiles stores network profiles for automatic matching (F5). Nil
 	// disables the profile RPCs with explicit errors.
 	profiles *profiles.Store
+	// obfsMu guards obfs, the active obfuscation profile stored by
+	// ApplyObfsProfile and merged into every later Connect.
+	obfsMu sync.Mutex
+	obfs   *obfsv1.ObfuscationProfile
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -251,6 +264,15 @@ func New(cfg Config) (*Server, error) {
 		profiles:    cfg.Profiles,
 	}
 	server.subs = newSubscriptionBook(server)
+	// Restore the obfuscation profile chosen earlier; a corrupt file is
+	// ignored so the core always starts.
+	if path := server.obfsProfilePath(); path != "" {
+		server.obfs = loadObfsProfile(path, func(msg string) {
+			if server.logs != nil {
+				server.logs.Write(time.Time{}, logs.LevelWarning, logs.SourceCore, msg)
+			}
+		})
+	}
 	return server, nil
 }
 
@@ -517,6 +539,11 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	plan, err := planFromProto(req.GetSessionPlan(), sessionID, s.secrets)
 	if err != nil {
 		return &corev1.ConnectResponse{Error: toWire(err, nil, id)}, nil
+	}
+	// The obfuscation suite merges here so every session carries the
+	// active profile without the client resending it.
+	if prof := s.activeObfsProfile(); prof != nil {
+		MergeObfsProfile(plan, prof)
 	}
 	mask := s.mask(plan)
 
