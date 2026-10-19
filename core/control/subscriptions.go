@@ -121,6 +121,13 @@ type subscriptionBook struct {
 	records  map[string]*subscriptionRecord
 	lists    map[string][]*corev1.OutboundSpec
 	updating map[string]bool
+	// expedited holds pending expedited refreshes (T042): subscription id
+	// -> request time, cleared when the refresh runs. expediteLast holds
+	// the last request time for the cooldown. Both are in-memory only; a
+	// restart falls back to the regular schedule, which is the
+	// conservative choice.
+	expedited    map[string]time.Time
+	expediteLast map[string]time.Time
 	watchers map[chan *corev1.SubscriptionState]struct{}
 	wake     chan struct{}
 }
@@ -134,6 +141,8 @@ func newSubscriptionBook(srv *Server) *subscriptionBook {
 		records:   map[string]*subscriptionRecord{},
 		lists:     map[string][]*corev1.OutboundSpec{},
 		updating:  map[string]bool{},
+		expedited: map[string]time.Time{},
+		expediteLast: map[string]time.Time{},
 		watchers:  map[chan *corev1.SubscriptionState]struct{}{},
 		wake:      make(chan struct{}, 1),
 	}
@@ -364,6 +373,10 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	delete(b.updating, id)
+	// The pending expedite was served; expediteLast keeps the cooldown
+	// running so a wave cannot turn into a fetch loop against the
+	// provider.
+	delete(b.expedited, id)
 	current, ok := b.records[id]
 	if !ok || current.URL != link {
 		// Discard results if the subscription was deleted or its link
@@ -458,20 +471,22 @@ func (rec *subscriptionRecord) interval() time.Duration {
 
 // nextUpdate returns zero when automatic updates are disabled. Failed updates
 // retry before the normal interval with increasing delays to limit provider
-// load.
+// load. A pending expedited refresh (T042) beats the regular schedule.
 func (b *subscriptionBook) nextUpdate(rec *subscriptionRecord) time.Time {
-	if !rec.AutoUpdate {
-		return time.Time{}
+	var at time.Time
+	if rec.AutoUpdate {
+		switch {
+		case rec.LastAttempt.IsZero():
+			at = rec.Created
+		case rec.Failures > 0:
+			retry := b.backoff
+			retry.Max = min(retry.Max, rec.interval())
+			at = rec.LastAttempt.Add(retry.Delay(rec.Failures - 1))
+		default:
+			at = rec.LastSuccess.Add(rec.interval())
+		}
 	}
-	if rec.LastAttempt.IsZero() {
-		return rec.Created
-	}
-	if rec.Failures > 0 {
-		retry := b.backoff
-		retry.Max = min(retry.Max, rec.interval())
-		return rec.LastAttempt.Add(retry.Delay(rec.Failures - 1))
-	}
-	return rec.LastSuccess.Add(rec.interval())
+	return b.expeditedDue(rec, at)
 }
 
 // run starts due updates and waits for the next deadline, change, or
