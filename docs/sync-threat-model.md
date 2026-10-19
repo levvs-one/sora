@@ -6,15 +6,35 @@ LAN via mDNS, and exchanges VPN documents (subscriptions, rules, settings)
 over a Noise_XX-encrypted TCP channel. There is no cloud, no account, and no
 telemetry.
 
-> **Implementation status (2026-10-19).** The Go service (`service/sync`)
-> is implemented and tested. The app (`app/lib/src/ui/sync.dart`) does not
-> yet launch the service or call its local API: no pairing handshake and no
-> document sync happen from the app side, the screen is a local device
-> registry, and the app-side QR payload (`token` as hex, no device id / key /
-> port) does not match the `Invitation` format this document describes.
-> The "What the app must do" obligations below are therefore design
-> requirements, not current behavior. Wire the service (launch + packaging +
-> API client + QR format) before treating F9 as done.
+> **Implementation status (2026-10-20).** The Go service (`service/sync`)
+> is implemented and its honesty properties are verified by tests, not just
+> by reading:
+> - QR wire format is pinned by fixed vectors (`pairing/pairing_test.go`:
+>   `TestVectorT1Decodes` positive T1 plus `TestVectorsReject` negatives —
+>   wrong scheme/host, v=2, 31-byte pub, 15-byte token, bad ports, empty id;
+>   the literals are copied into `reports/F9-SYNC-CONTRACT.md` for the Dart
+>   cross-check).
+> - The full contract flow is exercised over the real HTTP API
+>   (`api/e2e_test.go`: `TestHTTPAPIEndToEnd` — `POST /v1/pairing/start` →
+>   `qr_payload` decodes via `pairing.Decode` → `POST /v1/pairing/join`
+>   with the raw string → `GET /v1/peers` → `PUT /v1/documents/...` →
+>   `POST /v1/peers/{id}/sync` → the document arrives byte-identical;
+>   only mDNS discovery is stubbed, the pairing port comes from the QR).
+> - One instance per data dir: `sora-sync` probes `http_addr` + `GET
+>   /v1/status` with the dir's bearer token at startup and refuses to
+>   start a second daemon (exit 1); a stale `http_addr` from a crashed
+>   daemon does not block restart. The app uses the same probe to reuse a
+>   running daemon.
+> - `transport.Dial` rejects a peer whose presented device id differs from
+>   the QR's; `upsertPeer` replaces a peer's identity key on re-pairing so
+>   a reinstalled device does not leave a stale key that would fail every
+>   later sync.
+> The app (`app/lib`) side — launching the daemon, the API client, the QR
+> screen, and the Dart-side parser with byte-identical validation — is a
+> separate workstream (Dart agent); the "What the app must do" obligations
+> below are therefore still design requirements, not current behavior.
+> Wire the service (launch + packaging + API client + QR format) before
+> treating F9 as done.
 
 ## Assets
 

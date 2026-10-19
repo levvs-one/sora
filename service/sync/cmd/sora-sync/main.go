@@ -6,14 +6,20 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log"
+	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/levvs-one/sora-client/sync/api"
 )
@@ -39,11 +45,61 @@ func defaultDataDir() string {
 	return "sora-sync-data"
 }
 
+// liveInstance reports the address of a sora-sync daemon already serving
+// dataDir, or "" when none answers. It reads http_addr and probes
+// /v1/status with the data directory's bearer token; a stale http_addr
+// from a crashed daemon simply fails the probe and the new daemon takes
+// over and rewrites the file.
+func liveInstance(dataDir string) string {
+	addrRaw, err := os.ReadFile(filepath.Join(dataDir, "http_addr"))
+	if err != nil {
+		return ""
+	}
+	addr := strings.TrimSpace(string(addrRaw))
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil || host != "127.0.0.1" {
+		return ""
+	}
+	tokenRaw, err := os.ReadFile(filepath.Join(dataDir, "api_token"))
+	if err != nil {
+		return ""
+	}
+	token := strings.TrimSpace(string(tokenRaw))
+	if token == "" {
+		return ""
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+addr+"/v1/status", nil)
+	if err != nil {
+		return ""
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close()
+	_, _ = io.Copy(io.Discard, resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return ""
+	}
+	return addr
+}
+
 func main() {
 	dataDir := flag.String("data-dir", defaultDataDir(), "data directory")
 	flag.Parse()
-
 	log.SetPrefix("sora-sync: ")
+
+	// One instance per data directory: if a live daemon already serves
+	// this dir, refuse to start a second one that would steal its
+	// http_addr file. The app uses the same check to reuse the running
+	// daemon instead of spawning another.
+	if addr := liveInstance(*dataDir); addr != "" {
+		log.Fatalf("another sora-sync already serves %s at %s; not starting a second instance", *dataDir, addr)
+	}
+
 	d, err := api.New(*dataDir)
 	if err != nil {
 		log.Fatalf("init: %v", err)

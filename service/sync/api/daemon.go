@@ -247,15 +247,19 @@ func (d *Daemon) savePeersLocked() error {
 	return writeFileAtomic(d.peersPath(), raw, 0o600)
 }
 
-// upsertPeer adds or refreshes a paired device. The registry save error is
-// returned: a pairing the daemon cannot persist must not be reported as
-// complete to a caller with a response path.
+// upsertPeer adds or refreshes a paired device. A fresh pairing is an
+// explicit trust decision, so the identity key is replaced when the peer
+// presents a new one (e.g. after reinstalling); otherwise the registry
+// would keep a stale key and every later sync would fail the key check.
+// The registry save error is returned: a pairing the daemon cannot persist
+// must not be reported as complete to a caller with a response path.
 func (d *Daemon) upsertPeer(id, name, identityKey string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	now := time.Now().UnixMilli()
 	if p, ok := d.peers[id]; ok {
 		p.Name = name
+		p.IdentityKey = identityKey
 		p.LastSync = now
 	} else {
 		d.peers[id] = &Peer{

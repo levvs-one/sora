@@ -225,6 +225,13 @@ func exchangeIdentities(c *Conn, self Identity, sendFirst bool) (Identity, error
 	if strings.TrimSpace(peer.DeviceID) == "" {
 		return Identity{}, errors.New("transport: the peer sent no device id")
 	}
+	var zeroKey [32]byte
+	if peer.PublicKey == zeroKey {
+		// An all-zero public key is unreachable as an X25519 public key,
+		// so it can never complete a later DialKnown; recording it would
+		// only create a dead peer entry.
+		return Identity{}, errors.New("transport: the peer sent an empty public key")
+	}
 	return peer, nil
 }
 
@@ -232,6 +239,10 @@ func exchangeIdentities(c *Conn, self Identity, sendFirst bool) (Identity, error
 // key over netConn, checks the peer is the inviting device, confirms the
 // invitation token, and exchanges identities.
 func Dial(ctx context.Context, netConn net.Conn, inv *pairing.Invitation, self Identity) (*Conn, error) {
+	if inv == nil {
+		_ = netConn.Close()
+		return nil, errors.New("transport: nil invitation")
+	}
 	var epriv [32]byte
 	if _, err := rand.Read(epriv[:]); err != nil {
 		return nil, fmt.Errorf("transport: %w", err)
@@ -244,7 +255,18 @@ func Dial(ctx context.Context, netConn net.Conn, inv *pairing.Invitation, self I
 		}
 		return nil
 	}
-	return dial(ctx, netConn, epriv, self, check, &inv.Token, true)
+	c, err := dial(ctx, netConn, epriv, self, check, &inv.Token, true)
+	if err != nil {
+		return nil, err
+	}
+	// The identity the peer presents must name the device the QR named.
+	// The key check above authenticates the channel; this keeps the peers
+	// registry from recording a device under the wrong id.
+	if c.Peer.DeviceID != inv.DeviceID {
+		_ = c.Close()
+		return nil, errors.New("transport: the peer's device id does not match the invitation")
+	}
+	return c, nil
 }
 
 // Accept pairs as the inviter: it runs the XX handshake with the invitation

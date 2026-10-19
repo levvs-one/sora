@@ -101,7 +101,7 @@ func (d *Daemon) SyncPeer(ctx context.Context, id string) (pulled, pushed []sync
 	if err != nil {
 		return nil, nil, err
 	}
-	found, err := discovery.FindDevice(ctx, peer.ID, 20*time.Second)
+	found, err := resolveDevice(ctx, peer.ID, 20*time.Second)
 	if err != nil {
 		return nil, nil, err
 	}

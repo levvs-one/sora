@@ -45,6 +45,12 @@ func (d *Daemon) transportSelf() (transport.Identity, error) {
 	}, nil
 }
 
+// resolveDevice maps a device id to a dialable LAN address. It defaults to
+// mDNS discovery; tests override it because LAN multicast is unavailable in
+// sandboxes. The production path is always mDNS: the port for pairing comes
+// from the QR, the port for sync comes from the mDNS record.
+var resolveDevice = discovery.FindDevice
+
 // lanAddr reports whether addr is a LAN-scoped dial target. mDNS answers
 // arrive from the local network but are trivially spoofable there; a spoofed
 // answer must not make the daemon dial out to the internet — the Noise_XX
@@ -202,7 +208,7 @@ func (d *Daemon) Join(ctx context.Context, qrPayload string) (Peer, error) {
 		return Peer{}, err
 	}
 	// The port comes from the QR; only the IP is discovered.
-	found, err := discovery.FindDevice(ctx, inv.DeviceID, 20*time.Second)
+	found, err := resolveDevice(ctx, inv.DeviceID, 20*time.Second)
 	if err != nil {
 		return Peer{}, err
 	}

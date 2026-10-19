@@ -2,11 +2,16 @@ package api
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/levvs-one/sora-client/sync/discovery"
 	"github.com/levvs-one/sora-client/sync/pairing"
 	syncpkg "github.com/levvs-one/sora-client/sync/sync"
 	"github.com/levvs-one/sora-client/sync/transport"
@@ -92,4 +97,130 @@ func TestDaemonPairingEndToEnd(t *testing.T) {
 			t.Fatalf("rules did not converge on %s", d.identity.ID)
 		}
 	}
+}
+
+// TestHTTPAPIEndToEnd drives the full contract flow over the HTTP API the
+// app uses: POST /v1/pairing/start on A -> POST /v1/pairing/join on B with
+// the raw QR string -> GET /v1/peers -> PUT a document on A ->
+// POST /v1/peers/{id}/sync on B -> the document arrives on B. Discovery is
+// stubbed to loopback (the sandbox has no multicast); the pairing port
+// always comes from the QR, the sync port from the (stubbed) record.
+func TestHTTPAPIEndToEnd(t *testing.T) {
+	a, err := New(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(a.Shutdown)
+	b, err := New(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(b.Shutdown)
+
+	if err := a.StartSyncListener(); err != nil {
+		t.Fatal(err)
+	}
+	aSyncPort := a.syncListener.Addr().(*net.TCPAddr).Port
+	oldResolve := resolveDevice
+	resolveDevice = func(ctx context.Context, id string, timeout time.Duration) (discovery.Peer, error) {
+		return discovery.Peer{DeviceID: id, Addr: "127.0.0.1", Port: aSyncPort}, nil
+	}
+	t.Cleanup(func() { resolveDevice = oldResolve })
+
+	aAddr, err := a.ServeHTTP()
+	if err != nil {
+		t.Fatal(err)
+	}
+	bAddr, err := b.ServeHTTP()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// 1. A opens a pairing session; the QR payload decodes canonically.
+	code, raw := doAPI(t, "POST", aAddr, a.token, "/v1/pairing/start", "")
+	if code != http.StatusOK {
+		t.Fatalf("pairing/start: %d: %s", code, raw)
+	}
+	var started struct {
+		QRPayload string `json:"qr_payload"`
+	}
+	if err := json.Unmarshal(raw, &started); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := pairing.Decode(started.QRPayload); err != nil {
+		t.Fatalf("qr_payload does not decode: %v", err)
+	}
+
+	// 2. B joins with the raw QR string.
+	joinBody := `{"qr_payload":` + jsonQuote(started.QRPayload) + `}`
+	code, raw = doAPI(t, "POST", bAddr, b.token, "/v1/pairing/join", joinBody)
+	if code != http.StatusOK {
+		t.Fatalf("pairing/join: %d: %s", code, raw)
+	}
+	var joined struct {
+		Peer struct {
+			ID string `json:"id"`
+		} `json:"peer"`
+	}
+	if err := json.Unmarshal(raw, &joined); err != nil {
+		t.Fatal(err)
+	}
+	if joined.Peer.ID != a.identity.ID {
+		t.Fatalf("joined peer %q, want %q", joined.Peer.ID, a.identity.ID)
+	}
+
+	// 3. The daemon is the source of truth about peers.
+	code, raw = doAPI(t, "GET", bAddr, b.token, "/v1/peers", "")
+	if code != http.StatusOK {
+		t.Fatalf("peers: %d: %s", code, raw)
+	}
+	if !strings.Contains(string(raw), a.identity.ID) {
+		t.Fatalf("a missing from b's peers: %s", raw)
+	}
+
+	// 4. A publishes a subscription document.
+	payload := base64.StdEncoding.EncodeToString([]byte(`{"url":"https://vpn.example/sub"}`))
+	putBody := fmt.Sprintf(`{"payload":%q,"updated_at":%d}`, payload, time.Now().UnixMilli())
+	code, raw = doAPI(t, "PUT", aAddr, a.token, "/v1/documents/subscription/main", putBody)
+	if code != http.StatusOK {
+		t.Fatalf("doc put: %d: %s", code, raw)
+	}
+
+	// 5. B syncs with A; the document really moves over Noise_XX.
+	code, raw = doAPI(t, "POST", bAddr, b.token, "/v1/peers/"+a.identity.ID+"/sync", "")
+	if code != http.StatusOK {
+		t.Fatalf("peer sync: %d: %s", code, raw)
+	}
+	var rep struct {
+		Pulled []struct {
+			Kind string `json:"kind"`
+			Name string `json:"name"`
+		} `json:"pulled"`
+	}
+	if err := json.Unmarshal(raw, &rep); err != nil {
+		t.Fatal(err)
+	}
+	if len(rep.Pulled) != 1 || rep.Pulled[0].Kind != "subscription" || rep.Pulled[0].Name != "main" {
+		t.Fatalf("bad sync report: %s", raw)
+	}
+
+	// 6. The document is readable on B with the exact payload.
+	code, raw = doAPI(t, "GET", bAddr, b.token, "/v1/documents/subscription/main", "")
+	if code != http.StatusOK {
+		t.Fatalf("doc get: %d: %s", code, raw)
+	}
+	var doc struct {
+		Payload string `json:"payload"`
+	}
+	if err := json.Unmarshal(raw, &doc); err != nil {
+		t.Fatal(err)
+	}
+	if doc.Payload != payload {
+		t.Fatal("payload changed in transit")
+	}
+}
+
+func jsonQuote(s string) string {
+	raw, _ := json.Marshal(s)
+	return string(raw)
 }
