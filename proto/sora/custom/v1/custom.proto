@@ -22,7 +22,10 @@ service CustomServers {
   // DeleteCustomServer removes a server together with its stored credentials.
   rpc DeleteCustomServer(DeleteCustomServerRequest) returns (DeleteCustomServerResponse);
   // TestCustomServer checks reachability with a TCP handshake and a timeout.
-  // No credentials are sent or returned.
+  // No credentials are sent or returned. The address is resolved with the
+  // system DNS resolver, outside any tunnel: probing a server discloses its
+  // address to the local network, which is expected for a user-initiated
+  // check.
   rpc TestCustomServer(TestCustomServerRequest) returns (TestCustomServerResponse);
 }
 

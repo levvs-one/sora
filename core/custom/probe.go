@@ -39,6 +39,11 @@ func ClampProbeTimeout(d time.Duration) time.Duration {
 // reporting the handshake latency. It sends nothing, so secrets are never
 // involved. The address must already be validated; the timeout is clamped
 // to the probe bounds.
+//
+// Privacy note: a hostname is resolved through the system DNS resolver,
+// outside any tunnel, so probing a server discloses its address to the
+// local network. This is expected for a user-initiated reachability check,
+// but callers must not probe silently in the background.
 func ProbeTCP(ctx context.Context, address string, port uint16, timeout time.Duration) (time.Duration, error) {
 	timeout = ClampProbeTimeout(timeout)
 	ctx, cancel := context.WithTimeout(ctx, timeout)

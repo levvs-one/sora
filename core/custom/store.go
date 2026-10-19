@@ -140,7 +140,26 @@ func (s *Store) load() error {
 			"custom: the server list is too large")
 	}
 	for _, r := range records {
+		// Fail closed on any invalid field: the file is only ever written
+		// through the validated Save path, so a bad record means tampering
+		// or corruption, and its values must never reach the engine.
 		if err := ValidateID(r.ID); err != nil {
+			return errs.Newf(errs.CodeInternal, errs.KeyInternal,
+				"custom: the server list is corrupt")
+		}
+		if err := ValidateName(r.Name); err != nil {
+			return errs.Newf(errs.CodeInternal, errs.KeyInternal,
+				"custom: the server list is corrupt")
+		}
+		if err := ValidateProtocol(r.Protocol); err != nil {
+			return errs.Newf(errs.CodeInternal, errs.KeyInternal,
+				"custom: the server list is corrupt")
+		}
+		if err := ValidateAddress(r.Address); err != nil {
+			return errs.Newf(errs.CodeInternal, errs.KeyInternal,
+				"custom: the server list is corrupt")
+		}
+		if err := ValidatePort(uint32(r.Port)); err != nil {
 			return errs.Newf(errs.CodeInternal, errs.KeyInternal,
 				"custom: the server list is corrupt")
 		}
@@ -235,9 +254,16 @@ func (s *Store) Save(in Server, credentials []byte) (Server, error) {
 		return Server{}, err
 	}
 	ref := secretRefFor(in.ID)
+	var prev []byte // previous material, to roll back a failed persist below
 	if len(credentials) > 0 {
 		// ValidateReference-equivalent: the id charset is a subset of the
 		// vault's, and the total length stays within its 64-byte limit.
+		if !create {
+			// The update path only reaches here with a stored secret, so
+			// the reference exists; snapshot it to undo the vault write if
+			// the metadata persist fails. Best effort.
+			prev, _ = s.secrets.Get(ref)
+		}
 		if err := s.secrets.Put(ref, credentials); err != nil {
 			return Server{}, err
 		}
@@ -267,8 +293,13 @@ func (s *Store) Save(in Server, credentials []byte) (Server, error) {
 			s.order = s.order[:len(s.order)-1]
 			_ = s.secrets.Delete(ref)
 		} else {
-			// The vault write already succeeded; reload the metadata so
-			// memory matches disk instead of diverging silently.
+			// The vault write already succeeded; put the previous material
+			// back so the failed update changes nothing, then reload the
+			// metadata so memory matches disk instead of diverging
+			// silently.
+			if prev != nil {
+				_ = s.secrets.Put(ref, prev)
+			}
 			_ = s.reloadLocked()
 		}
 		return Server{}, err
@@ -303,25 +334,45 @@ func (s *Store) Delete(id string) error {
 	if !ok {
 		return nil
 	}
-	delete(s.servers, id)
-	for i, oid := range s.order {
-		if oid == id {
-			s.order = append(s.order[:i], s.order[i+1:]...)
-			break
-		}
-	}
-	if err := s.persistLocked(); err != nil {
-		return err
-	}
+	// Delete the vault secret before the metadata: a failed vault delete
+	// leaves the server (and a retryable delete) instead of an orphaned
+	// secret no API call could reach again.
+	var prev []byte // snapshot for rollback if the persist fails
 	if current.SecretRef != "" {
 		if s.secrets == nil {
 			return errs.Newf(errs.CodeFailedPrecondition, errs.KeySecretStoreUnavailable,
 				"custom: the secret store is unavailable")
 		}
+		prev, _ = s.secrets.Get(current.SecretRef) // best effort
 		// The vault's Delete is idempotent on missing references.
 		if err := s.secrets.Delete(current.SecretRef); err != nil {
 			return err
 		}
+	}
+	idx := -1
+	for i, oid := range s.order {
+		if oid == id {
+			idx = i
+			break
+		}
+	}
+	delete(s.servers, id)
+	if idx >= 0 {
+		s.order = append(s.order[:idx], s.order[idx+1:]...)
+	}
+	if err := s.persistLocked(); err != nil {
+		// Roll back to the on-disk state and restore the secret so the
+		// metadata and the vault agree again; the delete stays retryable.
+		s.servers[id] = current
+		if idx >= 0 {
+			s.order = append(s.order, "")
+			copy(s.order[idx+1:], s.order[idx:])
+			s.order[idx] = id
+		}
+		if prev != nil {
+			_ = s.secrets.Put(current.SecretRef, prev)
+		}
+		return err
 	}
 	return nil
 }

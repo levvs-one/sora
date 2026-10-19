@@ -86,6 +86,150 @@ func TestSaveRoundTrip(t *testing.T) {
 	}
 }
 
+// flakySecrets fails Delete on demand to simulate a vault outage.
+type flakySecrets struct {
+	*fakeSecrets
+	failDelete bool
+}
+
+func (f *flakySecrets) Delete(reference string) error {
+	if f.failDelete {
+		return errs.Newf(errs.CodeInternal, errs.KeyInternal, "vault outage")
+	}
+	return f.fakeSecrets.Delete(reference)
+}
+
+func TestDeleteVaultFailureKeepsServer(t *testing.T) {
+	vault := &flakySecrets{fakeSecrets: newFakeSecrets(), failDelete: true}
+	s := openTestStore(t, vault)
+	stored, err := s.Save(validServer(), []byte("cred"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Delete(stored.ID); err == nil {
+		t.Fatal("Delete with a failing vault succeeded, want an error")
+	}
+	// The server and its secret must survive for a retry: a failed vault
+	// delete must never orphan a secret the metadata no longer names.
+	if _, ok := s.Get(stored.ID); !ok {
+		t.Error("server lost after failed delete")
+	}
+	if _, err := vault.Get(stored.SecretRef); err != nil {
+		t.Error("secret lost after failed delete")
+	}
+	vault.failDelete = false
+	if err := s.Delete(stored.ID); err != nil {
+		t.Fatalf("retry Delete: %v", err)
+	}
+	if _, ok := s.Get(stored.ID); ok {
+		t.Error("server still present after retry")
+	}
+	if _, err := vault.Get(stored.SecretRef); err == nil {
+		t.Error("secret still in vault after retry")
+	}
+}
+
+// breakPersist blocks the temp file of the atomic rename in persistLocked,
+// so the write fails while the metadata file stays readable (reload paths
+// keep working). It returns a repair function.
+func breakPersist(t *testing.T, dir string) func() {
+	t.Helper()
+	tmp := filepath.Join(dir, fileName) + ".tmp"
+	if err := os.Mkdir(tmp, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	return func() {
+		if err := os.RemoveAll(tmp); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestDeletePersistFailureRestoresSecret(t *testing.T) {
+	dir := t.TempDir()
+	vault := newFakeSecrets()
+	s, err := Open(dir, vault)
+	if err != nil {
+		t.Fatal(err)
+	}
+	stored, err := s.Save(validServer(), []byte("cred"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	repair := breakPersist(t, dir)
+	if err := s.Delete(stored.ID); err == nil {
+		t.Fatal("Delete with a broken persist succeeded, want an error")
+	}
+	if _, ok := s.Get(stored.ID); !ok {
+		t.Error("server lost from memory after failed delete")
+	}
+	if material, err := vault.Get(stored.SecretRef); err != nil || string(material) != "cred" {
+		t.Errorf("secret not restored: %q, err %v", material, err)
+	}
+	repair()
+	if err := s.Delete(stored.ID); err != nil {
+		t.Fatalf("retry Delete: %v", err)
+	}
+	if _, ok := s.Get(stored.ID); ok {
+		t.Error("server still present after retry")
+	}
+}
+
+func TestSavePersistFailureRestoresCredentials(t *testing.T) {
+	dir := t.TempDir()
+	vault := newFakeSecrets()
+	s, err := Open(dir, vault)
+	if err != nil {
+		t.Fatal(err)
+	}
+	stored, err := s.Save(validServer(), []byte("old"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	repair := breakPersist(t, dir)
+	upd := stored
+	upd.Name = "Rotated"
+	if _, err := s.Save(upd, []byte("new")); err == nil {
+		t.Fatal("Save with a broken persist succeeded, want an error")
+	}
+	// The failed rotation must change nothing: the vault still holds the
+	// old material and the metadata still names the old server.
+	if material, err := vault.Get(stored.SecretRef); err != nil || string(material) != "old" {
+		t.Errorf("vault material = %q, err %v; want the pre-update secret", material, err)
+	}
+	if got, ok := s.Get(stored.ID); !ok || got.Name != "My server" {
+		t.Errorf("metadata diverged: %+v, %v", got, ok)
+	}
+	repair()
+	updated, err := s.Save(upd, []byte("new"))
+	if err != nil {
+		t.Fatalf("retry Save: %v", err)
+	}
+	if material, _ := vault.Get(updated.SecretRef); string(material) != "new" {
+		t.Errorf("vault material = %q, want new", material)
+	}
+}
+
+func TestOpenRejectsInvalidRecords(t *testing.T) {
+	cases := map[string]string{
+		"bad protocol": `[{"id":"srv1","name":"n","protocol":"socks5","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"bad address":  `[{"id":"srv1","name":"n","protocol":"vless","address":"999.1.1.1","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"bad port":     `[{"id":"srv1","name":"n","protocol":"vless","address":"example.com","port":0,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"empty name":   `[{"id":"srv1","name":"  ","protocol":"vless","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+	}
+	for name, raw := range cases {
+		t.Run(name, func(t *testing.T) {
+			dir := t.TempDir()
+			if err := os.WriteFile(filepath.Join(dir, fileName), []byte(raw), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := Open(dir, newFakeSecrets()); err == nil {
+				t.Error("Open of a file with an invalid record succeeded, want fail-closed")
+			}
+		})
+	}
+}
+
 func TestSaveRejectsInvalidAddress(t *testing.T) {
 	for _, addr := range []string{
 		"",
