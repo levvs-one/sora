@@ -18,10 +18,15 @@
 cd core; go build -trimpath -ldflags '-s -w' -o ..\dist\windows\sora-core.exe .\cmd\sora-core; cd ..
 bash packaging/engines/fetch.sh windows-amd64 dist/windows/engines
 cd app; flutter build windows --release --dart-define=SORA_VERSION=1.0.6; cd ..
-iscc /DAppVersion=1.0.6 packaging\windows\sora.iss
+iscc /DAppVersion=1.0.6 "/SsoraSign=signtool sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f" packaging\windows\sora.iss
 ```
 
-Установщик не подписан, SmartScreen показывает предупреждение. MSI не собирается: для обычной установки хватает EXE, тихая установка работает с ключами `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
+Установщик подписывается Authenticode через `SignTool=soraSign` в `sora.iss`
+(плюс `SignedUninstaller=yes` для деинсталлятора): сборка без определённого
+`soraSign` падает с ошибкой компиляции, так что неподписанный установщик не
+уедет в релиз случайно. Сам сертификат (Azure Trusted Signing) — действие
+владельца, см. FIX-PLAN.md, раздел 9. Без подписи SmartScreen показывает
+предупреждение. MSI не собирается: для обычной установки хватает EXE, тихая установка работает с ключами `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
 
 Тихая установка всегда открывает Sora после регистрации и запуска службы, с исходными правами пользователя. В приложении установщик запускается через ShellExecuteEx с действием `open`, чтобы загрузчик Inno сам запросил UAC и сохранил исходную учётную запись для `[Run]`. Контрольная сумма проверяется до запуска. `install.ps1` ждёт завершения установщика через `WaitForExit()`: `Start-Process -Wait` ждёт ещё и открытую Sora. CI проверяет появление процесса Sora после `install.ps1`.
 

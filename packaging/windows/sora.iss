@@ -26,6 +26,15 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.17763
 OutputDir=..\..\dist
 OutputBaseFilename=Sora-Setup-{#AppVersion}-x64
+; --- Code signing (SORA-L5) ---
+; The installer and its uninstaller must be Authenticode-signed. The SignTool
+; command is injected at build time:
+;   iscc /DAppVersion=1.0.6 "/SsoraSign=signtool sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f" packaging\windows\sora.iss
+; Compiling without defining soraSign fails, so an unsigned installer cannot
+; ship by accident. The certificate itself (Azure Trusted Signing) is the
+; owner's action, see FIX-PLAN.md section 9.
+SignTool=soraSign
+SignedUninstaller=yes
 SetupIconFile=..\..\app\windows\runner\resources\app_icon.ico
 UninstallDisplayIcon={app}\sora.exe
 UninstallDisplayName=Sora
