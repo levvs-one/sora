@@ -4,6 +4,8 @@
 /// remove / open panel).
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -306,8 +308,13 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       try {
         await action();
       } catch (_) {
-        // Store errors here are lifecycle edge cases; the section rebuilds
-        // from the registry either way.
+        // Lifecycle edge cases (disk, registry) must not fail silently: the
+        // confirm dialog is already gone, so say what happened.
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(s.extErrGeneric)));
+        }
       }
     }
   }
@@ -318,8 +325,15 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     try {
       await store.setSettings(id, _settings!);
     } catch (_) {
-      // Validation errors are shown inline by the form; persistence errors
-      // are rare and non-fatal.
+      // The form only produces type-correct values, so this is a persistence
+      // failure: say so and re-read the stored values instead of leaving the
+      // form showing values that were never saved.
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(S.of(context).extErrGeneric)));
+        unawaited(_loadSettings());
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -337,25 +351,32 @@ class _QuietButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    return Pressable(
-      onTap: onTap,
-      child: Container(
-        height: 52,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(color: palette.field),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 18, color: danger ? palette.danger : palette.ink2),
-            const SizedBox(width: 8),
-            Text(label,
-                style: Styles.bodyStrong
-                    .copyWith(color: danger ? palette.danger : palette.ink)),
-          ],
+    // Button role for screen readers; the visible text is the label.
+    return Semantics(
+      button: true,
+      child: Pressable(
+        onTap: onTap,
+        child: Container(
+          // minHeight keeps large text scales from clipping the label.
+          constraints: const BoxConstraints(minHeight: 52),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: palette.surface,
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: palette.field),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: danger ? palette.danger : palette.ink2),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(label,
+                    style: Styles.bodyStrong
+                        .copyWith(color: danger ? palette.danger : palette.ink)),
+              ),
+            ],
+          ),
         ),
       ),
     );
