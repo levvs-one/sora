@@ -163,6 +163,13 @@ type countedConn struct {
 	once sync.Once
 }
 
+// UnderlyingConn exposes the wrapped transport connection. Peer inspection
+// (SO_PEERCRED on Linux, named-pipe tokens on Windows) must see the real
+// endpoint: the wrapper's dynamic type would otherwise defeat the platform
+// type assertions in peerOf and make the transport credentials reject
+// legitimate peers.
+func (c *countedConn) UnderlyingConn() net.Conn { return c.Conn }
+
 // Close implements net.Conn.
 func (c *countedConn) Close() error {
 	c.once.Do(c.done)

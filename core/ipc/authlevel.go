@@ -82,11 +82,36 @@ func (peerCredentials) ClientHandshake(_ context.Context, _ string, _ net.Conn) 
 	return nil, nil, errors.New("ipc: sora peer credentials are server-side only")
 }
 
+// connUnwrapper is implemented by listener wrappers to expose the
+// underlying transport connection for peer inspection.
+type connUnwrapper interface {
+	UnderlyingConn() net.Conn
+}
+
+// unwrapConn strips listener accounting wrappers so peerOf inspects the
+// real transport connection. Without it, ServerHandshake would see the
+// wrapper (e.g. *countedConn from the SORA-M1 connection cap), fail the
+// platform type assertion in peerOf, treat a legitimate peer as
+// unverified, and refuse the handshake.
+func unwrapConn(c net.Conn) net.Conn {
+	for {
+		u, ok := c.(connUnwrapper)
+		if !ok || u == nil {
+			return c
+		}
+		next := u.UnderlyingConn()
+		if next == nil {
+			return c
+		}
+		c = next
+	}
+}
+
 // ServerHandshake implements credentials.TransportCredentials. It admits the
 // peer when the platform policy grants at least read access and records the
 // privilege level for the control plane's method checks.
 func (c peerCredentials) ServerHandshake(rawConn net.Conn) (net.Conn, credentials.AuthInfo, error) {
-	peer := peerOf(rawConn)
+	peer := peerOf(unwrapConn(rawConn))
 	level := c.authorize(peer)
 	if level == AuthNone {
 		return nil, nil, errors.New("ipc: the peer is not authorized")
