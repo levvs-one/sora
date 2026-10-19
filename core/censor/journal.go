@@ -62,15 +62,21 @@ func errorEvent(e LogEvent) (Event, bool) {
 		out.Stage, out.Detail = StageTLS, "certificate: "+trimDetail(e.Detail)
 		return out, true
 	case strings.Contains(d, "timeout") || strings.Contains(d, "deadline"):
-		out.Stage, out.What = StageTCP, WhatLocalTimeout
-		out.Detail = "timeout"
+		// Stage unknown: the journal does not record which leg stalled.
+		// Guessing TCP would manufacture an IP-blocking claim from a
+		// coarse line.
+		out.What, out.Detail = WhatLocalTimeout, "timeout"
 		return out, true
 	case strings.Contains(d, "reset"):
-		out.Stage, out.What = StageTCP, WhatRemoteReset
-		out.Detail = "reset"
+		// Stage unknown: a coarse "reset" line cannot say whether the SYN,
+		// the handshake, or the session died. Attributing it to TCP would
+		// manufacture an RST-injection claim.
+		out.What, out.Detail = WhatRemoteReset, "reset"
 		return out, true
 	case strings.Contains(d, "handshake") || strings.Contains(d, "tls"):
-		out.Stage = StageTLS
+		// Stage unknown: without wire detail this is only "something failed
+		// around TLS". It feeds the certificate rule's honest Unknown, and
+		// nothing else.
 		return out, true
 	}
 	return Event{}, false

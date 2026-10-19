@@ -88,11 +88,22 @@ var rules = []rule{
 }
 
 // failureScan reduces the event log to what the rules need: the first
-// terminal event, the furthest stage reached, and byte context.
+// terminal event, the furthest stage reached, byte context, and the timing
+// anchors the time-windowed rules measure against.
 type failureScan struct {
 	terminal *Event
 	furthest Stage
-	// sawBytesIn reports whether the far end ever sent payload bytes.
+	// tcpConnectedAt is when the last TCP connect completed; tlsSentAt is
+	// when the last ClientHello went out. The "immediate reset" rules
+	// anchor on these, not on the attempt start: "immediate" means right
+	// after the connect or the ClientHello. When the attempt carries no
+	// timestamps the anchors stay zero and those rules stay silent — a
+	// missing clock must never read as "instant".
+	tcpConnectedAt time.Time
+	tlsSentAt      time.Time
+	// sawBytesIn reports whether the far end ever sent anything: counted
+	// payload bytes, or an observed RECEIVED event. Zero inbound bytes at
+	// a reset is the SNI-block tell.
 	sawBytesIn bool
 	// resolvedTo records the last resolved address, if observed.
 	resolvedTo string
@@ -104,11 +115,17 @@ func scan(a Attempt) failureScan {
 		if e.Stage > s.furthest && e.What != WhatUnknown {
 			s.furthest = e.Stage
 		}
-		if e.BytesIn > 0 {
+		if e.BytesIn > 0 || e.What == WhatReceived {
 			s.sawBytesIn = true
 		}
 		if e.Stage == StageDNS && e.What == WhatResolved && e.Detail != "" {
 			s.resolvedTo = e.Detail
+		}
+		if e.Stage == StageTCP && e.What == WhatConnected && !e.At.IsZero() {
+			s.tcpConnectedAt = e.At
+		}
+		if e.Stage == StageTLS && e.What == WhatSent && !e.At.IsZero() {
+			s.tlsSentAt = e.At
 		}
 		if s.terminal == nil && isTerminal(e.What) {
 			ev := a.Events[i]
@@ -125,13 +142,6 @@ func isTerminal(w What) bool {
 	default:
 		return false
 	}
-}
-
-func offset(a Attempt, e *Event) time.Duration {
-	if a.StartedAt.IsZero() || e.At.IsZero() {
-		return 0
-	}
-	return e.At.Sub(a.StartedAt)
 }
 
 // dnsPoisoningRule fires on resolver lies: NXDOMAIN for a name known to have
@@ -198,16 +208,27 @@ func ipBlockingRule(a Attempt) (candidate, bool) {
 	}}, true
 }
 
-// tcpResetRule: RST immediately after connect, before any handshake bytes.
-// Middleboxes inject these; a real server stack rarely RSTs a fresh
-// connection it just accepted.
+// tcpResetRule: RST around the TCP leg. Two readings, kept apart on purpose:
+// a reset that lands while the dial is still in flight never saw an
+// established connection — that is weak evidence (a filtered port answers
+// this way too), so it claims little. A reset right after the connect, before
+// any handshake bytes, is the middlebox signature: a real server stack
+// rarely RSTs a fresh connection it just accepted.
 func tcpResetRule(a Attempt) (candidate, bool) {
 	s := scan(a)
 	t := s.terminal
 	if t == nil || t.Stage != StageTCP || t.What != WhatRemoteReset {
 		return candidate{}, false
 	}
-	if offset(a, t) > sniResetWindow {
+	if s.tcpConnectedAt.IsZero() || t.At.IsZero() {
+		// The reset landed during the dial: the connection was never
+		// established, so "right after connect" cannot be claimed.
+		return candidate{KindRSTInjection, 0.45, []string{
+			"the connection attempt was reset while connecting, before it was established",
+			"a filtered or closed port can also answer with a reset, so this is only suggestive",
+		}}, true
+	}
+	if dt := t.At.Sub(s.tcpConnectedAt); dt < 0 || dt > sniResetWindow {
 		return candidate{}, false
 	}
 	return candidate{KindRSTInjection, 0.6, []string{
@@ -231,16 +252,14 @@ func sniBlockingRule(a Attempt) (candidate, bool) {
 	if s.sawBytesIn || t.BytesIn > 0 {
 		return candidate{}, false
 	}
-	sent := false
-	for _, e := range a.Events {
-		if e.Stage == StageTLS && e.What == WhatSent {
-			sent = true
-		}
-	}
-	if !sent {
+	sent := !s.tlsSentAt.IsZero()
+	if !sent || t.At.IsZero() {
+		// Without a timed ClientHello there is no "right after the
+		// ClientHello": the window cannot be checked, so the rule stays
+		// silent instead of claiming on ordering alone.
 		return candidate{}, false
 	}
-	if offset(a, t) > sniResetWindow {
+	if dt := t.At.Sub(s.tlsSentAt); dt < 0 || dt > sniResetWindow {
 		// Late reset with no server bytes at all is stranger than SNI
 		// blocking; do not claim it.
 		return candidate{}, false

@@ -250,3 +250,76 @@ func TestDetectDataResetModest(t *testing.T) {
 		t.Fatalf("confidence = %v, want modest: NAT timeouts also kill idle sessions", v.Confidence)
 	}
 }
+
+// Negative: the SNI signature without any timing is ordering alone. A
+// missing clock must not read as "instant": the time-windowed rules stay
+// silent and the verdict is Unknown.
+func TestDetectSNISignatureWithoutTimingStaysUnknown(t *testing.T) {
+	a := mkAttempt() // no StartedAt, no event timestamps
+	a.Events = []Event{
+		{Stage: StageDNS, What: WhatResolved, Detail: "203.0.113.7"},
+		{Stage: StageTCP, What: WhatConnected},
+		{Stage: StageTLS, What: WhatSent, Detail: "client_hello"},
+		{Stage: StageTLS, What: WhatRemoteReset},
+	}
+	v := Detector{}.Detect(a)
+	if v.Kind != KindUnknown {
+		t.Fatalf("kind = %v, want unknown: no timing, no timing-based claim", v.Kind)
+	}
+}
+
+// A reset that lands while the dial is still in flight never saw an
+// established connection: the detector may note it, but modestly — a
+// filtered port answers this way too.
+func TestDetectDialTimeResetIsModest(t *testing.T) {
+	a := withStart(mkAttempt())
+	a.Events = []Event{
+		ev(0, StageDNS, WhatResolved, "203.0.113.7"),
+		ev(200*time.Millisecond, StageTCP, WhatRemoteReset, ""),
+	}
+	v := Detector{}.Detect(a)
+	if v.Kind != KindRSTInjection {
+		t.Fatalf("kind = %v, want rst_injection for a dial-time reset", v.Kind)
+	}
+	if v.Confidence < minClaimConfidence || v.Confidence >= 0.75 {
+		t.Fatalf("confidence = %v, want modest: above the claim floor, below high", v.Confidence)
+	}
+	if !strings.Contains(strings.ToLower(v.Explanation), "ordinary failure") {
+		t.Fatalf("explanation must hedge a dial-time reset, got %q", v.Explanation)
+	}
+}
+
+// The reset window is anchored at the connect, not at the attempt start: a
+// slow DNS lookup must not hide a fast post-connect reset.
+func TestDetectPostConnectResetWindowAnchoredAtConnect(t *testing.T) {
+	a := withStart(mkAttempt())
+	a.Events = []Event{
+		ev(0, StageDNS, WhatResolved, "203.0.113.7"),
+		ev(4*time.Second, StageTCP, WhatConnected, ""),
+		ev(4200*time.Millisecond, StageTCP, WhatRemoteReset, ""),
+	}
+	v := Detector{}.Detect(a)
+	if v.Kind != KindRSTInjection {
+		t.Fatalf("kind = %v, want rst_injection: the reset was immediate after the connect", v.Kind)
+	}
+	if v.Confidence < 0.5 {
+		t.Fatalf("confidence = %v, want the full post-connect reading, not the modest dial-time one", v.Confidence)
+	}
+}
+
+// If the server spoke before the reset, it is not SNI blocking — even with
+// no byte counts, a RECEIVED event means the far end answered.
+func TestDetectReceivedBeforeResetDefeatsSNIClaim(t *testing.T) {
+	a := withStart(mkAttempt())
+	a.Events = []Event{
+		ev(0, StageDNS, WhatResolved, "203.0.113.7"),
+		ev(100*time.Millisecond, StageTCP, WhatConnected, ""),
+		ev(120*time.Millisecond, StageTLS, WhatSent, "client_hello"),
+		ev(200*time.Millisecond, StageTLS, WhatReceived, "server_hello"),
+		ev(400*time.Millisecond, StageTLS, WhatRemoteReset, ""),
+	}
+	v := Detector{}.Detect(a)
+	if v.Kind == KindSNIBlocking {
+		t.Fatalf("kind = sni_blocking although the server sent bytes first: overreach")
+	}
+}
