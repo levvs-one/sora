@@ -274,8 +274,51 @@ class ExtensionStore extends ChangeNotifier {
     }
     final settings = File('$_dir${Platform.pathSeparator}$id.settings.json');
     if (await settings.exists()) await settings.delete();
+    final background = File(_backgroundFile(id));
+    if (await background.exists()) await background.delete();
     _installed.remove(id);
     await _save();
+    notifyListeners();
+  }
+
+  // --- Background task (runtime v2) ---
+
+  String _backgroundFile(String id) =>
+      '$_dir${Platform.pathSeparator}$id.background.json';
+
+  /// Reads the background task config. When never saved, the default seeds
+  /// the interval from the manifest's declared `background_task` (the
+  /// author's wish, clamped) so the settings show what the extension would
+  /// do out of the box.
+  Future<BackgroundTaskConfig> getBackgroundTask(String id) async {
+    final inst = _installed[id];
+    if (inst == null) throw ExtStoreError('"$id" is not installed');
+    final f = File(_backgroundFile(id));
+    if (await f.exists()) {
+      try {
+        final raw = jsonDecode(await f.readAsString()) as Map<String, dynamic>;
+        return BackgroundTaskConfig.fromJson(raw);
+      } catch (_) {
+        // Corrupt file falls back to defaults; the next save repairs it.
+      }
+    }
+    final declared = inst.manifest.backgroundTask?.intervalMinutes;
+    return BackgroundTaskConfig(
+      enabled: true,
+      intervalMinutes: BackgroundTaskConfig.clampInterval(
+          declared ?? BackgroundTaskConfig.defaultIntervalMinutes),
+    );
+  }
+
+  /// Saves the background task config, clamping the interval.
+  Future<void> setBackgroundTask(String id, BackgroundTaskConfig config) async {
+    if (!_installed.containsKey(id)) throw ExtStoreError('"$id" is not installed');
+    final clamped = BackgroundTaskConfig(
+      enabled: config.enabled,
+      intervalMinutes: BackgroundTaskConfig.clampInterval(config.intervalMinutes),
+    );
+    await File(_backgroundFile(id))
+        .writeAsString(jsonEncode(clamped.toJson()), flush: true);
     notifyListeners();
   }
 
@@ -361,6 +404,44 @@ class ExtensionStore extends ChangeNotifier {
     if (min != null && f < min) throw ExtStoreError('setting "$name" is too small');
     if (max != null && f > max) throw ExtStoreError('setting "$name" is too large');
   }
+}
+
+/// Background task configuration for an extension with the `background`
+/// permission/capability (runtime v2).
+///
+/// The interval is clamped to [minIntervalMinutes]..[maxIntervalMinutes] on
+/// both read and write, so a hand-edited file can never schedule runs more
+/// often than the platform allows.
+class BackgroundTaskConfig {
+  const BackgroundTaskConfig({required this.enabled, required this.intervalMinutes});
+
+  /// Shortest allowed interval: matches the platform background schedulers
+  /// and the core worker runtime.
+  static const int minIntervalMinutes = 15;
+
+  /// Longest allowed interval: 7 days, mirroring the core worker runtime's
+  /// MaxWorkerInterval.
+  static const int maxIntervalMinutes = 7 * 24 * 60;
+
+  static const int defaultIntervalMinutes = 60;
+
+  final bool enabled;
+  final int intervalMinutes;
+
+  static int clampInterval(int v) => v.clamp(minIntervalMinutes, maxIntervalMinutes);
+
+  factory BackgroundTaskConfig.defaults() =>
+      const BackgroundTaskConfig(enabled: true, intervalMinutes: defaultIntervalMinutes);
+
+  factory BackgroundTaskConfig.fromJson(Map<String, dynamic> json) {
+    return BackgroundTaskConfig(
+      enabled: json['enabled'] as bool? ?? true,
+      intervalMinutes: clampInterval(
+          (json['interval_minutes'] as num?)?.toInt() ?? defaultIntervalMinutes),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'enabled': enabled, 'interval_minutes': intervalMinutes};
 }
 
 /// Provides the [ExtensionStore] to the extensions section subtree.

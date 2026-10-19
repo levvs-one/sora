@@ -138,15 +138,25 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                       Text(s.extNoPermissions,
                           style: Styles.body.copyWith(color: palette.ink2))
                     else
-                      for (final p in m.permissions)
+                      for (final p in m.permissions) ...[
                         PermissionRow(
                           blurb: permissionBlurb(context, p),
                           dangerous: requiresExplicitConfirm(p),
                         ),
+                        if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 28, bottom: 4),
+                            child: NetworkHostsList(hosts: m.networkHosts),
+                          ),
+                      ],
                   ],
                 ),
               ),
             ]),
+            if (live != null && _hasBackgroundTask(live)) ...[
+              Heading(s.extBgTitle),
+              _BackgroundTaskSection(extensionId: live.id, interactive: live.enabled),
+            ],
             if (live != null && _settings != null && m.settingsSchema != null) ...[
               Heading(s.extSettings),
               _SettingsForm(
@@ -468,5 +478,135 @@ class _SettingsForm extends StatelessWidget {
       default:
         return const SizedBox.shrink();
     }
+  }
+}
+
+/// True when the extension can run background tasks: it declared the
+/// `background` capability or was granted the `background` permission.
+bool _hasBackgroundTask(InstalledExtension inst) =>
+    inst.manifest.capabilities.contains('background') ||
+    inst.granted.contains('background');
+
+/// Background task management for one installed extension: on/off plus the
+/// run interval, clamped by [BackgroundTaskConfig] to what the platform
+/// allows. Applies immediately, like the enable switch above it.
+class _BackgroundTaskSection extends StatefulWidget {
+  const _BackgroundTaskSection({required this.extensionId, required this.interactive});
+  final String extensionId;
+
+  /// False when the extension itself is disabled: the task cannot run, so
+  /// the controls are read-only until it is enabled again.
+  final bool interactive;
+
+  @override
+  State<_BackgroundTaskSection> createState() => _BackgroundTaskSectionState();
+}
+
+class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
+  BackgroundTaskConfig? _config;
+  bool _busy = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_config == null) _load();
+  }
+
+  Future<void> _load() async {
+    final store = ExtScope.of(context);
+    try {
+      final c = await store.getBackgroundTask(widget.extensionId);
+      if (mounted) setState(() => _config = c);
+    } catch (_) {
+      // A missing config simply means defaults; the section stays usable.
+      if (mounted) setState(() => _config = BackgroundTaskConfig.defaults());
+    }
+  }
+
+  Future<void> _apply(BackgroundTaskConfig next) async {
+    final store = ExtScope.of(context);
+    final prev = _config;
+    setState(() {
+      _config = next;
+      _busy = true;
+    });
+    try {
+      await store.setBackgroundTask(widget.extensionId, next);
+    } catch (_) {
+      // Revert the optimistic update and say so; a silent failure would
+      // leave the user believing the task was reconfigured.
+      if (!mounted) return;
+      setState(() {
+        _config = prev;
+        _busy = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(S.of(context).extErrGeneric)),
+      );
+      return;
+    }
+    if (mounted) setState(() => _busy = false);
+  }
+
+  Map<int, String> _intervalChoices(BuildContext context, int current) {
+    final s = S.of(context);
+    final choices = <int, String>{
+      15: s.extBgMinutes(15),
+      30: s.extBgMinutes(30),
+      60: s.extBgHours(1),
+      360: s.extBgHours(6),
+      720: s.extBgHours(12),
+      1440: s.extBgHours(24),
+    };
+    // A hand-edited config file may hold a non-preset interval; show it
+    // honestly instead of a blank row.
+    choices.putIfAbsent(current, () => s.extBgMinutes(current));
+    return choices;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context), palette = Palette.of(context);
+    final config = _config;
+    final editable = widget.interactive && !_busy;
+    return Group(children: [
+      if (config == null)
+        const Padding(
+          padding: EdgeInsets.all(14),
+          child: Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        )
+      else ...[
+        SwitchTile(
+          title: s.extBgEnabled,
+          value: config.enabled,
+          onChanged: editable
+              ? (v) => _apply(BackgroundTaskConfig(
+                  enabled: v, intervalMinutes: config.intervalMinutes))
+              : null,
+        ),
+        ChoiceTile<int>(
+          title: s.extBgInterval,
+          value: config.intervalMinutes,
+          choices: _intervalChoices(context, config.intervalMinutes),
+          onChanged: editable
+              ? (v) => _apply(BackgroundTaskConfig(
+                  enabled: config.enabled, intervalMinutes: v))
+              : null,
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
+          child: Text(
+            widget.interactive ? s.extBgNote : s.extBgDisabledNote,
+            style: Styles.caption.copyWith(color: palette.ink2),
+          ),
+        ),
+      ],
+    ]);
   }
 }

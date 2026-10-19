@@ -12,6 +12,7 @@ import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../kit.dart';
 import '../../ext/catalog.dart';
+import '../../ext/permissions.dart';
 
 /// 5-star rating display with the numeric value.
 class StarRating extends StatelessWidget {
@@ -117,6 +118,9 @@ class ExtensionCard extends StatelessWidget {
     this.subtitle,
     this.onTap,
     this.enabled = true,
+    this.capabilities = const [],
+    this.permissions = const [],
+    this.networkHosts = const [],
   });
 
   final String title;
@@ -128,6 +132,16 @@ class ExtensionCard extends StatelessWidget {
   final String? subtitle;
   final VoidCallback? onTap;
   final bool enabled;
+
+  /// Manifest capabilities (installed) — used for the human-language
+  /// capability lines below the badges.
+  final List<String> capabilities;
+
+  /// Granted (installed) or requested (catalog) permission ids.
+  final List<String> permissions;
+
+  /// Host allowlist for the network permission (manifest `network_hosts`).
+  final List<String> networkHosts;
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +208,10 @@ class ExtensionCard extends StatelessWidget {
                               style: Styles.caption.copyWith(color: palette.ink2)),
                       ],
                     ),
+                    ...capabilityLines(context,
+                        capabilities: capabilities,
+                        permissions: permissions,
+                        networkHosts: networkHosts),
                   ],
                 ),
               ),
@@ -241,6 +259,94 @@ class PermissionRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Human-language capability lines for an extension card: background mode
+/// and network access with the allowed hosts.
+///
+/// [capabilities] are manifest capabilities (installed extensions),
+/// [permissions] the granted/requested permission ids, [networkHosts] the
+/// manifest `network_hosts` allowlist. Returns an empty list when the
+/// extension declares neither — the card stays exactly as before.
+List<Widget> capabilityLines(
+  BuildContext context, {
+  required List<String> capabilities,
+  required List<String> permissions,
+  required List<String> networkHosts,
+}) {
+  final s = S.of(context);
+  final out = <Widget>[];
+  if (capabilities.contains('background') || permissions.contains('background')) {
+    out.add(_CapabilityLine(icon: Symbols.schedule_rounded, text: s.extCapBackground));
+  }
+  if (permissions.any(isNetworkPermission)) {
+    out.add(_CapabilityLine(
+      icon: Symbols.public_rounded,
+      text: networkHosts.isEmpty
+          ? s.extCapNetwork
+          : s.extCapNetworkHosts(networkHosts.join(', ')),
+    ));
+  }
+  return out;
+}
+
+class _CapabilityLine extends StatelessWidget {
+  const _CapabilityLine({required this.icon, required this.text});
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: palette.ink2),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              text,
+              style: Styles.caption.copyWith(color: palette.ink2),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The host allowlist for the network permission, one row per host.
+/// Callers add the surrounding padding/indentation.
+class NetworkHostsList extends StatelessWidget {
+  const NetworkHostsList({super.key, required this.hosts});
+  final List<String> hosts;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final h in hosts)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                Icon(Symbols.dns_rounded, size: 14, color: palette.ink3),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(h,
+                      style: Styles.caption.copyWith(color: palette.ink2)),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

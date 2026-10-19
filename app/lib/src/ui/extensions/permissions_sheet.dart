@@ -58,11 +58,28 @@ String permissionBlurb(BuildContext context, String id) {
     case 'net.hooks':
       return s.extPermNetHooks;
     case 'net.fetch':
+    case 'network':
       return s.extPermNetFetch;
     case 'background':
       return s.extPermBackground;
     default:
       return id;
+  }
+}
+
+/// Longer explanation shown under the short blurb on the install prompt,
+/// for the permissions whose one-liner does not say enough. Null for
+/// permissions whose blurb says it all.
+String? permissionDetail(BuildContext context, String id) {
+  final s = S.of(context);
+  switch (id) {
+    case 'background':
+      return s.extPermBackgroundDetail;
+    case 'net.fetch':
+    case 'network':
+      return s.extPermNetworkDetail;
+    default:
+      return null;
   }
 }
 
@@ -200,6 +217,30 @@ class _InstallPromptState extends State<_InstallPrompt> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// The plain-language explanation (and, for network access, the exact
+  /// host allowlist) rendered under a permission row. Empty when the blurb
+  /// says it all.
+  Widget _permissionExtra(BuildContext context, ExtManifest m, String permission) {
+    final detail = permissionDetail(context, permission);
+    final hosts = isNetworkPermission(permission) ? m.networkHosts : const <String>[];
+    if (detail == null && hosts.isEmpty) return const SizedBox.shrink();
+    final palette = Palette.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: 28, bottom: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (detail != null)
+            Text(detail, style: Styles.caption.copyWith(color: palette.ink2)),
+          if (hosts.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            NetworkHostsList(hosts: hosts),
+          ],
+        ],
       ),
     );
   }

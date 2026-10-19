@@ -37,6 +37,10 @@ ExtPermission? lookupPermission(String id) => _index[id];
 
 bool requiresExplicitConfirm(String id) => _index[id]?.risk == ExtRisk.dangerous;
 
+/// True for the permission(s) that grant internet access: `net.fetch` and
+/// its `network` alias. The manifest's host allowlist applies to these.
+bool isNetworkPermission(String id) => id == 'net.fetch' || id == 'network';
+
 /// Splits [wanted] into added/removed relative to [granted].
 ({List<String> added, List<String> removed}) diffPermissions(
     List<String> granted, List<String> wanted) {

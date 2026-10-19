@@ -63,6 +63,8 @@ class ExtManifest {
     required this.capabilities,
     required this.panels,
     this.settingsSchema,
+    this.networkHosts = const [],
+    this.backgroundTask,
   });
 
   final String id;
@@ -75,6 +77,19 @@ class ExtManifest {
   final List<String> capabilities;
   final List<ExtPanel> panels;
   final Map<String, dynamic>? settingsSchema;
+
+  /// Host allowlist for the `net.fetch` permission (runtime v2): the
+  /// extension may fetch only these hosts. Declared by the manifest so the
+  /// install prompt can show the exact list before anything is granted.
+  /// Empty when the manifest declares none. Stored lowercase, mirroring
+  /// core/ext's normalization.
+  final List<String> networkHosts;
+
+  /// The declared background task (runtime v2): the author's wished
+  /// interval and the worker script. Null when not declared. The runtime
+  /// clamps the interval; the user can override it in the extension
+  /// settings.
+  final ExtBackgroundTask? backgroundTask;
 
   static final _idPattern = RegExp(r'^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$');
   static final _panelIdPattern = RegExp(r'^[a-zA-Z0-9_-]{1,64}$');
@@ -95,6 +110,7 @@ class ExtManifest {
     const known = {
       'manifest_version', 'id', 'name', 'version', 'min_app_version',
       'description', 'author', 'permissions', 'capabilities', 'ui', 'settings_schema',
+      'network_hosts', 'background_task',
     };
     for (final key in decoded.keys) {
       if (!known.contains(key)) throw ManifestError('unknown field "$key"');
@@ -115,6 +131,8 @@ class ExtManifest {
           .map((e) => ExtPanel.fromJson(e as Map<String, dynamic>))
           .toList(),
       settingsSchema: decoded['settings_schema'] as Map<String, dynamic>?,
+      networkHosts: _parseNetworkHosts(decoded['network_hosts']),
+      backgroundTask: _parseBackgroundTask(decoded['background_task']),
     );
     m.validate();
     return m;
@@ -147,6 +165,19 @@ class ExtManifest {
     for (final c in capabilities) {
       if (!isKnownCapability(c)) throw ManifestError('unknown capability "$c"');
     }
+    if (networkHosts.isNotEmpty && !permissions.contains('net.fetch')) {
+      throw ManifestError('network_hosts requires the "net.fetch" permission');
+    }
+    final seenHosts = <String>{};
+    for (final h in networkHosts) {
+      if (!_networkHostPattern.hasMatch(h) || _isIpLiteral(h)) {
+        throw ManifestError('bad network host "$h"');
+      }
+      if (!seenHosts.add(h)) {
+        throw ManifestError('duplicate network host "$h"');
+      }
+    }
+    backgroundTask?.validate(this);
     final panelIds = <String>{};
     for (final p in panels) {
       if (!_panelIdPattern.hasMatch(p.id)) throw ManifestError('bad panel id "${p.id}"');
@@ -174,7 +205,103 @@ class ExtManifest {
           'panels': [for (final p in panels) p.toJson()],
         },
         if (settingsSchema != null) 'settings_schema': settingsSchema,
+        if (networkHosts.isNotEmpty) 'network_hosts': networkHosts,
+        if (backgroundTask != null) 'background_task': backgroundTask!.toJson(),
       };
+}
+
+/// One declared background task (runtime v2, mirrors core/ext's
+/// BackgroundTask): the author's wished interval and the worker script
+/// inside the package. The runtime clamps the interval; the user override
+/// lives in the extension settings, not here.
+class ExtBackgroundTask {
+  ExtBackgroundTask({required this.intervalMinutes, required this.entry});
+  final int intervalMinutes;
+  final String entry;
+
+  /// Largest declarable interval: 7 days (mirrors core/ext).
+  static const int maxIntervalMinutes = 7 * 24 * 60;
+
+  factory ExtBackgroundTask.fromJson(Map<String, dynamic> json) {
+    const known = {'interval_minutes', 'entry'};
+    for (final key in json.keys) {
+      if (!known.contains(key)) throw ManifestError('unknown background_task field "$key"');
+    }
+    final interval = json['interval_minutes'];
+    if (interval is! int) throw ManifestError('background_task interval_minutes must be an integer');
+    final entry = (json['entry'] as String? ?? '').trim();
+    return ExtBackgroundTask(intervalMinutes: interval, entry: entry);
+  }
+
+  /// Cross-checks against the manifest: the task needs the `background`
+  /// capability and permission, a sane interval and a safe script path.
+  void validate(ExtManifest m) {
+    if (!m.capabilities.contains('background')) {
+      throw ManifestError('background_task requires the "background" capability');
+    }
+    if (!m.permissions.contains('background')) {
+      throw ManifestError('background_task requires the "background" permission');
+    }
+    if (intervalMinutes < 1 || intervalMinutes > maxIntervalMinutes) {
+      throw ManifestError(
+          'background_task interval_minutes must be 1..$maxIntervalMinutes');
+    }
+    if (!_workerEntryPattern.hasMatch(entry) ||
+        entry.contains('..') ||
+        entry.startsWith('/')) {
+      throw ManifestError(
+          'background_task entry "$entry" must be a relative .js path without traversal');
+    }
+  }
+
+  Map<String, dynamic> toJson() =>
+      {'interval_minutes': intervalMinutes, 'entry': entry};
+}
+
+/// Worker script names: relative .js path, no traversal (mirrors core/ext).
+final _workerEntryPattern =
+    RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.js$');
+
+ExtBackgroundTask? _parseBackgroundTask(dynamic raw) {
+  if (raw == null) return null;
+  if (raw is! Map<String, dynamic>) {
+    throw ManifestError('background_task must be an object');
+  }
+  return ExtBackgroundTask.fromJson(raw);
+}
+
+/// Host allowlist for `net.fetch`: plain or wildcard (`*.example.com`)
+/// DNS names, at most 64 entries.
+final _networkHostPattern = RegExp(
+    r'^(\*\.)?([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$');
+
+List<String> _parseNetworkHosts(dynamic raw) {
+  if (raw == null) return const [];
+  if (raw is! List) throw ManifestError('network_hosts must be a list');
+  if (raw.length > 64) throw ManifestError('network_hosts exceeds 64 entries');
+  final out = <String>[];
+  for (final e in raw) {
+    // Normalized to lowercase like core/ext: the allowlist is DNS names
+    // only, and matching is case-insensitive.
+    final h = e.toString().trim().toLowerCase();
+    if (h.isEmpty || h.length > 253) throw ManifestError('bad network host "$h"');
+    out.add(h);
+  }
+  return out;
+}
+
+/// True for IPv4 literals, which the allowlist rejects: they are DNS names
+/// only (mirrors core/ext's isIPLiteral; IPv6 cannot pass the host pattern
+/// since ':' is not allowed there).
+bool _isIpLiteral(String h) {
+  final parts = h.split('.');
+  if (parts.length != 4) return false;
+  for (final p in parts) {
+    if (p.isEmpty || p.length > 3) return false;
+    final n = int.tryParse(p);
+    if (n == null || n > 255) return false;
+  }
+  return true;
 }
 
 /// Allows only relative .html paths without traversal.
