@@ -88,6 +88,11 @@ class SRu extends S {
 
   @override
   String get syncDaemonStarting => 'Starting sync service…';
+  String get syncErrAuth => 'Sync service rejected the request';
+  String get syncErrNotFound => 'Not found on the sync service';
+  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrUnreachable => 'The other device is unreachable';
+  String get syncError => 'Sync failed';
 
   @override
   String syncExpiresIn(String expires) {
@@ -1520,7 +1525,7 @@ class SRu extends S {
   String get syncDevices => 'Мои устройства';
 
   @override
-  String get syncEmpty => 'Нет спаренных устройств. Спарьте другое устройство, чтобы подписки, правила и настройки синхронизировались.';
+  String get syncEmpty => 'Пока нет спаренных устройств. Спарьте другое устройство, чтобы связать его с этим.';
 
   @override
   String get syncPair => 'Спарить устройство';

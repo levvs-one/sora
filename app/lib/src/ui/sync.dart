@@ -41,8 +41,12 @@ class _SyncScreenState extends State<SyncScreen> {
   String? _opError;
   bool _joining = false;
   bool _refreshing = false;
-  bool _booted = false;
   final _syncing = <String>{};
+
+  /// Whether the post-startup load (legacy migration + first refresh) ran.
+  /// The daemon can reach `running` after a retry, not just the first boot,
+  /// so the load is driven by the state transition, not by `initState`.
+  bool _loaded = false;
 
   SyncDaemon get _daemon => SoraScope.read(context).syncDaemon;
 
@@ -60,14 +64,26 @@ class _SyncScreenState extends State<SyncScreen> {
   }
 
   void _onDaemon() {
+    if (!mounted) return;
+    if (_daemon.state == SyncDaemonState.running && !_loaded) {
+      _loaded = true;
+      unawaited(_load());
+    }
     if (mounted) setState(() {});
   }
 
   Future<void> _boot() async {
     await _daemon.ensureRunning();
-    if (!mounted || _booted) return;
-    _booted = true;
-    if (_daemon.state != SyncDaemonState.running) return;
+    if (!mounted) return;
+    if (_daemon.state == SyncDaemonState.running && !_loaded) {
+      _loaded = true;
+      await _load();
+    }
+  }
+
+  /// Runs once per screen lifetime when the daemon becomes usable: clears
+  /// the pre-wiring registry a single time, then loads status and peers.
+  Future<void> _load() async {
     await _migrateLegacyRegistry();
     await _refresh();
   }
@@ -557,24 +573,26 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
     }
   }
 
-  /// Watches for the session's end: a new peer means the other side paired,
-  /// a closed session without one means the code expired.
+  /// Watches for the pairing outcome: a fresh peer means the other side
+  /// completed the Noise_XX handshake — success is shown immediately, not
+  /// after the TTL; a closed session without one means the code expired.
   Future<void> _poll() async {
     final client = _client;
     if (client == null || !mounted || _payload == null) return;
     try {
-      final status = await client.status();
-      if (!mounted || _payload == null) return;
-      if (status.pairingActive) return;
       final peers = await client.peers();
-      if (!mounted) return;
-      final fresh = peers.any((p) => !_knownPeers.contains(p.id));
-      _poller?.cancel();
-      _ticker?.cancel();
-      if (fresh) {
+      if (!mounted || _payload == null) return;
+      if (peers.any((p) => !_knownPeers.contains(p.id))) {
+        _poller?.cancel();
+        _ticker?.cancel();
         if (mounted) Navigator.of(context).pop(true);
         return;
       }
+      final status = await client.status();
+      if (!mounted || _payload == null) return;
+      if (status.pairingActive) return;
+      _poller?.cancel();
+      _ticker?.cancel();
       if (mounted) setState(() => _payload = null);
     } catch (_) {
       // Transient failure: keep polling until the TTL runs out.

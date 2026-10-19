@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 /// Pairing payload version. Bump when the QR format changes.
 const syncPairVersion = 1;
@@ -24,15 +23,6 @@ const syncMdnsService = '_sora-sync._tcp';
 class SyncPairing {
   SyncPairing._();
 
-  /// 16 cryptographically secure random bytes for the rendezvous token.
-  static List<int> newToken() {
-    final random = Random.secure();
-    return List<int>.generate(16, (_) => random.nextInt(256));
-  }
-
-  /// base64url without padding, exactly like Go's `base64.RawURLEncoding`.
-  static String _b64raw(List<int> bytes) => base64Url.encode(bytes).replaceAll('=', '');
-
   /// Decodes base64url without padding; null unless [s] uses only the
   /// URL-safe alphabet and decodes to exactly [length] bytes. Go's
   /// RawURLEncoding rejects padding, so this does too.
@@ -46,49 +36,49 @@ class SyncPairing {
     }
   }
 
-  /// Builds the QR payload. Every field comes from the sync service's
-  /// invitation; lengths are validated like the Go encoder's inputs, so a
-  /// malformed invitation fails here instead of in the scanner.
-  static String encodePairPayload({
-    required String deviceId,
-    required List<int> publicKey,
-    required List<int> token,
-    required int port,
-  }) {
-    if (deviceId.isEmpty || deviceId.length > 128) {
-      throw ArgumentError.value(deviceId, 'deviceId', 'must be 1..128 chars');
-    }
-    if (publicKey.length != 32) {
-      throw ArgumentError.value(publicKey.length, 'publicKey', 'must be 32 bytes');
-    }
-    if (token.length != 16) {
-      throw ArgumentError.value(token.length, 'token', 'must be 16 bytes');
-    }
-    if (port <= 0 || port > 65535) {
-      throw ArgumentError.value(port, 'port', 'must be 1..65535');
-    }
-    final query = <String, String>{
-      'v': '$syncPairVersion',
-      'id': deviceId,
-      'pub': _b64raw(publicKey),
-      'token': _b64raw(token),
-      'port': '$port',
-    }
-        .entries
-        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-        .join('&');
-    return 'sora-sync://pair?$query';
-  }
-
   /// Parses a scanned payload; null when it is not a valid pairing
-  /// invitation. Mirrors Go `pairing.Decode`: a wrong scheme, host or
-  /// version, and any malformed field, is rejected instead of being
-  /// half-accepted.
+  /// invitation. A byte-exact mirror of Go `pairing.Decode`
+  /// (F9-SYNC-CONTRACT.md §1): a wrong scheme, host or version, a fragment,
+  /// duplicated query keys, and any malformed field, are rejected instead
+  /// of being half-accepted. The raw string — not the parsed URI — is
+  /// checked for the fragment, the scheme/host case, and duplicates,
+  /// because Dart's [Uri] lowercases the host (Go keeps its case), drops a
+  /// bare trailing '#', and takes the last of duplicated keys (Go takes
+  /// the first, then rejects the payload outright).
   static ({String deviceId, List<int> publicKey, List<int> token, int port})? decodePairPayload(
     String raw,
   ) {
-    final uri = Uri.tryParse(raw.trim());
-    if (uri == null || uri.scheme != 'sora-sync' || uri.host != 'pair') return null;
+    final text = raw.trim();
+    // No fragment, not even an empty one: the canonical form never
+    // contains '#'.
+    if (text.contains('#')) return null;
+    // Scheme is matched case-insensitively (Go's url.Parse lowercases it),
+    // the host case-sensitively on the raw authority with userinfo
+    // stripped (Go keeps the host's case and drops userinfo; Dart's Uri
+    // would lowercase the host and silently drop a bare trailing '#').
+    final schemeEnd = text.indexOf('://');
+    if (schemeEnd < 0) return null;
+    if (text.substring(0, schemeEnd).toLowerCase() != 'sora-sync') return null;
+    final authStart = schemeEnd + 3;
+    var authEnd = text.length;
+    for (var i = authStart; i < text.length; i++) {
+      final c = text[i];
+      if (c == '/' || c == '?') {
+        authEnd = i;
+        break;
+      }
+    }
+    final authority = text.substring(authStart, authEnd);
+    final atSign = authority.lastIndexOf('@');
+    final host = atSign >= 0 ? authority.substring(atSign + 1) : authority;
+    if (host != 'pair') return null;
+    final uri = Uri.tryParse(text);
+    if (uri == null) return null;
+    // Duplicate keys are rejected: Go's Values.Get takes the first value,
+    // Dart's queryParameters the last, so a duplicated key could make the
+    // two sides disagree on the public key or token.
+    final all = uri.queryParametersAll;
+    if (all.values.any((values) => values.length != 1)) return null;
     final q = uri.queryParameters;
     if (q['v'] != '$syncPairVersion') return null;
     final deviceId = q['id'] ?? '';

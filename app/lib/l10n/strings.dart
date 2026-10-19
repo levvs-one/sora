@@ -2261,7 +2261,7 @@ abstract class S {
   /// **'My devices'**
   String get syncDevices;
 
-  /// **'No paired devices. Pair another device to keep subscriptions, rules and settings in sync.'**
+  /// **'No paired devices yet. Pair another device to link it with this one.'**
   String get syncEmpty;
 
   /// **'Pair a device'**
@@ -2578,6 +2578,21 @@ abstract class S {
 
   /// **'Starting sync service…'**
   String get syncDaemonStarting;
+
+  /// **'Sync service rejected the request'**
+  String get syncErrAuth;
+
+  /// **'Not found on the sync service'**
+  String get syncErrNotFound;
+
+  /// **'A pairing session is already open'**
+  String get syncErrPairingActive;
+
+  /// **'The other device is unreachable'**
+  String get syncErrUnreachable;
+
+  /// **'Sync failed'**
+  String get syncError;
 
   /// **'Expires in {expires}'**
   String syncExpiresIn(String expires);

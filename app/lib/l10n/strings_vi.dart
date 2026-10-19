@@ -88,6 +88,11 @@ class SVi extends S {
 
   @override
   String get syncDaemonStarting => 'Starting sync service…';
+  String get syncErrAuth => 'Sync service rejected the request';
+  String get syncErrNotFound => 'Not found on the sync service';
+  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrUnreachable => 'The other device is unreachable';
+  String get syncError => 'Sync failed';
 
   @override
   String syncExpiresIn(String expires) {
@@ -1518,7 +1523,7 @@ Find one in the catalog or install from a file.';
   String get syncDevices => 'My devices';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device to keep subscriptions, rules and settings in sync.';
+  String get syncEmpty => 'No paired devices yet. Pair another device to link it with this one.';
 
   @override
   String get syncPair => 'Pair a device';
