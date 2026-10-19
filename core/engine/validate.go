@@ -301,7 +301,37 @@ func validateAmneziaWG(id string, a *AmneziaWG) []error {
 			bad("%s %q is not a range<uint16> (\"a-b\" or \"a\"): %v", r[0], r[1], err)
 		}
 	}
+	// T012: published example parameters are censor-signatured verbatim.
+	// docs.amnezia.org itself warns its CPS example "is not an example of
+	// a signature. Do not use it as the value". Every client/server pair
+	// must run unique generated parameters (see wgobfusc.Generate).
+	if name := matchAWGPublicExample(a); name != "" {
+		bad("parameters match the published example %q: generate a unique set per server", name)
+	}
 	return errs
+}
+
+// matchAWGPublicExample names the publicly documented AmneziaWG parameter
+// set a matches, or "". This is a tripwire, not a wall: it blocks the
+// canonical published examples a censor can signature verbatim. It cannot
+// enumerate every blog-post config; uniqueness comes from generation.
+func matchAWGPublicExample(a *AmneziaWG) string {
+	// docs.amnezia.org/documentation/amnezia-wg, CPS section: the syntax
+	// demo, explicitly marked "do not use as the value".
+	if a.I1 == "<b 0xd100000001><rc 8><t><r 50>" {
+		return "docs.amnezia.org CPS syntax demo"
+	}
+	// The canonical QUIC preset quoted across AmneziaWG 2.0 publications.
+	if a.I1 == "<b 0xc700000001><rc 8><t><r 50>" {
+		return "AmneziaWG 2.0 canonical QUIC preset"
+	}
+	// amneziawg-windows configuration docs, worked example.
+	if a.Jc == 5 && a.Jmin == 40 && a.Jmax == 70 && a.S1 == 30 && a.S2 == 50 &&
+		a.H1 == "2155318676" && a.H2 == "1459039349" &&
+		a.H3 == "988890009" && a.H4 == "1862976214" {
+		return "amneziawg-windows documentation example"
+	}
+	return ""
 }
 
 // parseAWGRangeU16 parses an AmneziaWG 3.1 range<uint16>: "a-b" or a single

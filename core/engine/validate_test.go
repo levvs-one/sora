@@ -182,3 +182,43 @@ func TestParseAmneziaMagic(t *testing.T) {
 		t.Fatal("parseAmneziaMagic(garbage) = nil, want error")
 	}
 }
+
+func TestValidateRejectsPublicExampleParameters(t *testing.T) {
+	cases := []struct {
+		name   string
+		mutate func(a *AmneziaWG)
+		want   string
+	}{
+		{"docs CPS demo", func(a *AmneziaWG) { a.I1 = "<b 0xd100000001><rc 8><t><r 50>" }, "CPS syntax demo"},
+		{"canonical QUIC preset", func(a *AmneziaWG) { a.I1 = "<b 0xc700000001><rc 8><t><r 50>" }, "canonical QUIC preset"},
+		{"windows docs example", func(a *AmneziaWG) {
+			a.Jc, a.Jmin, a.Jmax = 5, 40, 70
+			a.S1, a.S2 = 30, 50
+			a.H1, a.H2, a.H3, a.H4 = "2155318676", "1459039349", "988890009", "1862976214"
+		}, "documentation example"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			a := goodAmnezia()
+			tc.mutate(a)
+			err := wireguardWithAmnezia(a).Validate()
+			if err == nil {
+				t.Fatalf("Validate = nil, want error containing %q", tc.want)
+			}
+			if !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("Validate = %v, want error containing %q", err, tc.want)
+			}
+		})
+	}
+}
+
+func TestValidateAcceptsNonExampleParameters(t *testing.T) {
+	// The ban is a tripwire for verbatim public examples, not a uniqueness
+	// proof: ordinary generated sets must keep validating.
+	if err := wireguardWithAmnezia(goodAmnezia()).Validate(); err != nil {
+		t.Fatalf("Validate = %v, want nil", err)
+	}
+	if err := wireguardWithAmnezia(goodAmnezia31()).Validate(); err != nil {
+		t.Fatalf("Validate = %v, want nil", err)
+	}
+}
