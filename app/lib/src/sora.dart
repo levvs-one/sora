@@ -230,7 +230,7 @@ class Sora extends ChangeNotifier {
     final server = switch (selected) {
       'auto' => s.serverAuto,
       'bypass' => s.serverBypass,
-      final id => nameOf(id),
+      final id => displayNameOf(id),
     };
     final (title, body, action) = switch (notice) {
       ConnectionLost() => (s.noticeLost, s.noticeLostBody, 'logs'),
@@ -567,7 +567,11 @@ class Sora extends ChangeNotifier {
     final chosen = settings.server;
     if (chosen == 'auto') return chosen;
     if (chosen == 'bypass') return serverlessAvailable ? chosen : 'auto';
-    if (chosen.startsWith(groupPrefix)) return entryOf(chosen, _subscriptions.values) != null ? chosen : 'auto';
+    if (chosen.startsWith(groupPrefix)) {
+      // A group whose members are all hidden no longer exists: fall back to
+      // auto instead of building a plan the core would reject.
+      return entryOf(chosen, _subscriptions.values)?.withoutHidden(hiddenServerIds) == null ? 'auto' : chosen;
+    }
     return servers.any((o) => o.id == chosen) || _customServers.any((s) => s.id == chosen) ? chosen : 'auto';
   }
 
@@ -595,7 +599,11 @@ class Sora extends ChangeNotifier {
       settings: settings,
       latency: latency,
       bandwidth: bandwidth,
-      entry: selected.startsWith(groupPrefix) ? entryOf(selected, _subscriptions.values) : null,
+      entry: selected.startsWith(groupPrefix)
+          // Hidden members must not reach the plan: the core rejects a group
+          // that names a server absent from the outbounds.
+          ? entryOf(selected, _subscriptions.values)?.withoutHidden(hiddenServerIds)
+          : null,
       chain: hops,
       zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
       reliabilityOf: reliabilityOf,

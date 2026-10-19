@@ -20,10 +20,39 @@ class Entry {
   bool get isGroup => members.length > 1;
   bool get ordered => roles.isNotEmpty;
 
-  /// Copy with the user-facing name replaced. Override renames apply to
-  /// single-server entries only; group titles keep the shared subscription
-  /// name so grouping stays stable.
+  /// Copy with the user-facing name replaced, keeping the entry id.
   Entry renamed(String name) => Entry._(id, name, members, roles);
+
+  /// Applies [renames] (server id -> display name), returning the entries to
+  /// display. A renamed member leaves its group and becomes a standalone
+  /// entry right after it: group titles keep the shared provider name so
+  /// grouping stays stable, and without the split the rename would be
+  /// silently swallowed. Single-member entries are renamed in place, keeping
+  /// their id.
+  List<Entry> applyRenames(Map<String, String> renames) {
+    if (members.length == 1) {
+      final name = renames[members.single.id];
+      return [name == null ? this : renamed(name)];
+    }
+    final splits = <Entry>[];
+    final rest = <OutboundSpec>[];
+    for (final member in members) {
+      final name = renames[member.id];
+      if (name == null) {
+        rest.add(member);
+      } else {
+        splits.add(Entry._(member.id, name, [member], const {}));
+      }
+    }
+    if (rest.isEmpty) return splits;
+    final group = rest.length == members.length
+        ? this
+        : Entry._(id, name, rest, {
+            for (final member in rest)
+              if (roles[member.id] != null) member.id: roles[member.id]!,
+          });
+    return [group, ...splits];
+  }
 
   /// Copy without [hidden] members, or null when none remain.
   Entry? withoutHidden(Set<String> hidden) {

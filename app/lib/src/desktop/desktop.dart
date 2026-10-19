@@ -346,11 +346,7 @@ class Desktop with WindowListener {
       for (final entry in entriesOf(sub)) {
         final visible = entry.withoutHidden(override.hidden);
         if (visible == null) continue;
-        out.add(
-          !visible.isGroup && override.renames.containsKey(visible.id)
-              ? visible.renamed(override.renames[visible.id]!)
-              : visible,
-        );
+        out.addAll(visible.applyRenames(override.renames));
       }
     }
     return out;

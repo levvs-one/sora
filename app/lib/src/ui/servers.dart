@@ -250,7 +250,9 @@ List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty
       ];
 
 /// Applies subscription overrides: hides servers the user hid and renames the
-/// ones they renamed (FEATURE-PLAN.md F6).
+/// ones they renamed (FEATURE-PLAN.md F6). A renamed group member splits out
+/// of its group so the rename stays visible instead of being swallowed by the
+/// shared group title.
 List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
   final override = sora.overrides.of(subscription.settings.id);
   if (override.isEmpty) return entriesOf(subscription);
@@ -258,10 +260,7 @@ List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
   for (final entry in entriesOf(subscription)) {
     final visible = entry.withoutHidden(override.hidden);
     if (visible == null) continue;
-    final renamed = !visible.isGroup && override.renames.containsKey(visible.id)
-        ? visible.renamed(override.renames[visible.id]!)
-        : visible;
-    out.add(renamed);
+    out.addAll(visible.applyRenames(override.renames));
   }
   return out;
 }
