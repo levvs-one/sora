@@ -120,36 +120,62 @@ func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 			delete(e.procs, k)
 		}
 	}
+	e.mu.Unlock()
+	// Start missing strategies without holding the lock: starting waits up
+	// to five seconds for the process to listen, and Stop must not wait
+	// behind that.
 	ports := map[string]int{}
 	var err error
 	for k, strategy := range needed {
-		px, ok := e.procs[k]
-		if !ok {
-			if px, err = e.start(strategy); err != nil {
+		px := e.current(k)
+		if px == nil {
+			if px, err = e.start(ctx, strategy); err != nil {
 				break
 			}
-			e.procs[k] = px
+			px = e.publish(k, px)
 		}
 		ports[k] = px.port
 	}
-	e.mu.Unlock()
 	if err != nil {
 		return err
 	}
 	return e.Engine.Apply(ctx, Rewrite(p, ports))
 }
 
+// current returns the running proxy for k, if any.
+func (e *Engine) current(k string) *proxy {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return e.procs[k]
+}
+
+// publish installs a freshly started proxy, or drops it in favour of one a
+// concurrent Apply installed first.
+func (e *Engine) publish(k string, px *proxy) *proxy {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	if cur, ok := e.procs[k]; ok {
+		px.stop()
+		return cur
+	}
+	e.procs[k] = px
+	return px
+}
+
 // start supervises one tpws process, restarting it on the same port with
 // increasing delays so engine outbounds remain valid.
-func (e *Engine) start(strategy engine.BypassStrategy) (*proxy, error) {
+func (e *Engine) start(ctx context.Context, strategy engine.BypassStrategy) (*proxy, error) {
 	port, err := supervise.FreePort()
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel := context.WithCancel(context.Background())
+	// The process lives on its own context, stopped by px.stop; the wait
+	// below honors the caller's context so a cancelled Apply does not sit
+	// out the full listening timeout.
+	pctx, cancel := context.WithCancel(context.Background())
 	px := &proxy{port: port, cancel: cancel}
 	spec := supervise.Spec{Name: "tpws", Path: e.tpws, Args: Args(strategy, port), Dir: e.home, Lines: e.logLine}
-	if px.proc, err = supervise.Start(ctx, spec); err != nil {
+	if px.proc, err = supervise.Start(pctx, spec); err != nil {
 		cancel()
 		return nil, err
 	}
@@ -157,7 +183,7 @@ func (e *Engine) start(strategy engine.BypassStrategy) (*proxy, error) {
 		px.stop()
 		return nil, err
 	}
-	go e.keep(ctx, px, spec)
+	go e.keep(pctx, px, spec)
 	return px, nil
 }
 
