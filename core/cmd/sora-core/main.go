@@ -41,7 +41,7 @@ import (
 
 // Version defines the API contract served by this build. Contract changes must
 // update this value and the generated code together.
-var Version = control.Version{Major: 1, Minor: 8, MinSupportedMinor: 1}
+var Version = control.Version{Major: 1, Minor: 9, MinSupportedMinor: 1}
 
 // Options configures a core instance.
 type Options struct {
@@ -264,6 +264,7 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		Secrets:       store,
 		Prober:        probe.New(probe.Config{}),
 		Measurer:      measurer,
+		DataDir:       opts.DataDir,
 		Logs:          center,
 		About:         app.about,
 		Fetcher:       subscription.New(subscription.Options{}),

@@ -702,6 +702,8 @@ message SaveSubscriptionOverrideRequest {
 }
 message SaveSubscriptionOverrideResponse {
   SoraError error = 1;
+  // The subscription state with overrides applied.
+  SubscriptionState state = 2;
 }
 message GetSubscriptionOverrideRequest {
   ApiVersion api_version = 1;
@@ -712,5 +714,12 @@ message GetSubscriptionOverrideResponse {
   map<string, string> renames = 1;
   repeated string hidden = 2;
   repeated string pinned_order = 3;
-  SoraError error = 4;
+  repeated OverrideRule extra_rules = 4;
+  SoraError error = 5;
+}
+// OverrideRule is one user routing rule bound to a subscription; the client
+// merges these into the session plan it builds.
+message OverrideRule {
+  string destination = 1;
+  string outbound_id = 2;
 }

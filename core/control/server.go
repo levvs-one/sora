@@ -139,6 +139,7 @@ type Server struct {
 	about       func() *corev1.About
 	diagnostics Diagnostics
 	fetcher     Fetcher
+	dataDir     string
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -191,6 +192,9 @@ type Config struct {
 	// Fetcher retrieves subscriptions; nil answers that fetching is
 	// unavailable.
 	Fetcher Fetcher
+	// DataDir is the owner-only core data directory. Empty disables
+	// features that persist files (benchmark history, overrides).
+	DataDir string
 }
 
 // New creates a control plane, supplying the default version when unset.
@@ -219,6 +223,7 @@ func New(cfg Config) (*Server, error) {
 		about:       cfg.About,
 		diagnostics: cfg.Diagnostics,
 		fetcher:     cfg.Fetcher,
+		dataDir:     cfg.DataDir,
 	}
 	server.subs = newSubscriptionBook(server)
 	return server, nil

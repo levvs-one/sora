@@ -114,6 +114,9 @@ type subscriptionBook struct {
 	backoff engine.Backoff
 	now     func() time.Time
 
+	// overrides reapplies user edits after every refresh.
+	overrides *subscription.OverrideStore
+
 	mu       sync.Mutex
 	records  map[string]*subscriptionRecord
 	lists    map[string][]*corev1.OutboundSpec
@@ -124,9 +127,10 @@ type subscriptionBook struct {
 
 func newSubscriptionBook(srv *Server) *subscriptionBook {
 	b := &subscriptionBook{
-		srv:      srv,
-		backoff:  engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
-		now:      time.Now,
+		srv:       srv,
+		backoff:   engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
+		now:       time.Now,
+		overrides: subscription.NewOverrideStore(srv.dataDir),
 		records:  map[string]*subscriptionRecord{},
 		lists:    map[string][]*corev1.OutboundSpec{},
 		updating: map[string]bool{},
@@ -311,6 +315,13 @@ func (b *subscriptionBook) delete(id string) error {
 	}
 	if err := b.srv.secrets.Apply(nil, deletes); err != nil {
 		return err
+	}
+	// User overrides die with the subscription.
+	if b.overrides != nil {
+		if err := b.overrides.Delete(id); err != nil && b.srv.logs != nil {
+			b.srv.logs.Write(b.now(), logs.LevelWarning, logs.SourceSubscription,
+				"subscription override cleanup failed id="+id)
+		}
 	}
 	delete(b.records, id)
 	delete(b.lists, id)
@@ -546,7 +557,7 @@ func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 	state := &corev1.SubscriptionState{
 		Settings:    settings,
 		Info:        subscriptionInfoToWire(rec.Info),
-		Outbounds:   b.lists[id],
+		Outbounds:   applySubscriptionOverride(b.lists[id], b.loadOverride(id)),
 		Updating:    b.updating[id],
 		DisplayName: displayName(rec),
 	}
