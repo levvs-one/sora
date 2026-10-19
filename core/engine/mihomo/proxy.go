@@ -121,7 +121,11 @@ func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
 			return proxy{}, fmt.Errorf("mihomo: wireguard outbound %s has no interface address", o.ID)
 		}
 		if o.Amnezia != nil {
-			px.Amnezia = amneziaOptions(o.Amnezia)
+			opts, err := amneziaOptions(o.Amnezia)
+			if err != nil {
+				return proxy{}, err
+			}
+			px.Amnezia = opts
 		}
 		peers, err := wireguardPeers(o)
 		if err != nil {
@@ -232,7 +236,15 @@ func wireguardPeers(o engine.Outbound) ([]wireguardPeer, error) {
 
 // amneziaOptions renders amnezia-wg-option keys. Numeric headers stay numbers
 // for 1.x; 2.0 also accepts ranges.
-func amneziaOptions(a *engine.AmneziaWG) map[string]any {
+func amneziaOptions(a *engine.AmneziaWG) (map[string]any, error) {
+	// T012: mihomo's AmneziaWGOption only knows the 1.x/2.0 keys. Passing
+	// 3.1 fields through the free-form map would silently drop them while
+	// the plan promises 3.1 obfuscation. Engine selection already keeps
+	// 3.1 plans away via FeatureAmneziaWG3; this is the last-mile guard
+	// for direct render calls.
+	if a.UsesAWG31() {
+		return nil, fmt.Errorf("mihomo: AmneziaWG 3.1 parameters are not implemented by mihomo's AmneziaWG stack: refusing to render a config that would silently drop them")
+	}
 	out := map[string]any{}
 	ints := map[string]int{"jc": a.Jc, "jmin": a.Jmin, "jmax": a.Jmax, "s1": a.S1, "s2": a.S2, "s3": a.S3, "s4": a.S4, "itime": a.Itime}
 	for key, v := range ints {
@@ -252,7 +264,7 @@ func amneziaOptions(a *engine.AmneziaWG) map[string]any {
 		}
 		out[key] = v
 	}
-	return out
+	return out, nil
 }
 
 // applyTLS writes TLS, SNI, ALPN, uTLS fingerprint and Reality parameters.

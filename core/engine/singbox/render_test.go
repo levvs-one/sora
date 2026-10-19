@@ -788,3 +788,31 @@ func TestFakeIPOmitsIPv6RangeWhenIPv6IsOff(t *testing.T) {
 		t.Fatalf("inet6_range must be omitted with IPv6 off, got %v", srv["inet6_range"])
 	}
 }
+
+func TestRenderEmitsAmneziaWG31(t *testing.T) {
+	// T012: the with_awg fork implements the 3.1 stack (snake_case keys),
+	// so 3.1 parameters must reach the endpoint verbatim. A plan routed
+	// here was selected for FeatureAmneziaWG3; dropping its fields would
+	// be the silent no-op the fail-closed gates exist to prevent.
+	p := enginetest.Plan(engine.ProtocolWireGuard)
+	p.Outbounds[0].Amnezia = enginetest.AmneziaWG3().Amnezia
+	cfg := render(t, p)
+	raw, _ := json.Marshal(cfg["endpoints"])
+	for _, want := range []string{`"header_protection_key"`, `"content_padding_addition"`, `"rekey_after_time"`, `"random_trailers":true`, `"disable_cookies":true`} {
+		if !strings.Contains(string(raw), want) {
+			t.Fatalf("3.1 parameter %s missing from endpoint: %s", want, raw)
+		}
+	}
+}
+
+func TestRenderKeepsAmneziaWG20(t *testing.T) {
+	// The 2.0 parameters must keep reaching the endpoint: the fail-closed
+	// gates above must not break what the fork demonstrably supports.
+	p := enginetest.Plan(engine.ProtocolWireGuard)
+	p.Outbounds[0].Amnezia = enginetest.AmneziaWG().Amnezia
+	cfg := render(t, p)
+	raw, _ := json.Marshal(cfg["endpoints"])
+	if !strings.Contains(string(raw), `"jc":4`) {
+		t.Fatalf("2.0 obfuscation parameters must reach the endpoint: %s", raw)
+	}
+}
