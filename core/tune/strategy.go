@@ -56,10 +56,62 @@ func ObfsMax() Strategy {
 }
 
 // ZapretAlternatives lists individual zapret handshake-shaping tricks, from
-// the least to the most intrusive. They run after both presets.
+// the least to the most intrusive. They run after both presets. The pool is
+// curated from the vendored blockcheck.sh strategy corpus
+// (third_party/zapret): every entry must have passed a real probe against a
+// censored domain before it earns a place here; marketing claims are not
+// admitted. The strategies only shape TCP handshakes (tpws); QUIC/UDP desync
+// is a separate opt-in nfqws profile, see core/engine/bypass.
 func ZapretAlternatives() []Strategy {
 	return []Strategy{
 		{
+			// Splits the ClientHello into two TLS records; the SNI lands in
+			// the second one. Cheapest trick that still works.
+			ID:   "zapret/tlsrec",
+			Name: "zapret tlsrec",
+			Bypass: engine.BypassStrategy{
+				TLSRecord: "sniext+1",
+			},
+			HasBypass: true,
+		},
+		{
+			// Plain split at the first bytes; defeats naive SNI matchers
+			// that only look at the first segment.
+			ID:   "zapret/split",
+			Name: "zapret split",
+			Bypass: engine.BypassStrategy{
+				SplitPos: []string{"1", "2"},
+			},
+			HasBypass: true,
+		},
+		{
+			// Split plus disorder: the second part goes first. The default
+			// zapret_with_vpn strategy; breaks reassembly-based DPI.
+			ID:   "zapret/disorder",
+			Name: "zapret disorder",
+			Bypass: engine.BypassStrategy{
+				SplitPos: []string{"1", "2"},
+				Disorder: true,
+			},
+			HasBypass: true,
+		},
+		{
+			// Disorder scoped to TLS only, and only the handshake is
+			// touched: long-lived connections keep full speed while the
+			// SNI-bearing part is still scrambled.
+			ID:   "zapret/disorder-tls",
+			Name: "zapret disorder tls-only",
+			Bypass: engine.BypassStrategy{
+				SplitPos:      []string{"1"},
+				Disorder:      true,
+				DisorderScope: "tls",
+				TamperCutoff:  "300",
+			},
+			HasBypass: true,
+		},
+		{
+			// Split plus an out-of-band byte: poisons DPI reassemblers that
+			// ignore OOB data while the server skips it.
 			ID:   "zapret/split-oob",
 			Name: "zapret split+oob",
 			Bypass: engine.BypassStrategy{
@@ -69,28 +121,39 @@ func ZapretAlternatives() []Strategy {
 			HasBypass: true,
 		},
 		{
-			ID:   "zapret/disorder",
-			Name: "zapret disorder",
-			Bypass: engine.BypassStrategy{
-				SplitPos: []string{"2"},
-				Disorder: true,
-			},
-			HasBypass: true,
-		},
-		{
-			ID:   "zapret/tlsrec",
-			Name: "zapret tlsrec",
-			Bypass: engine.BypassStrategy{
-				TLSRecord: "sniext+1",
-			},
-			HasBypass: true,
-		},
-		{
-			ID:   "zapret/http-case",
-			Name: "zapret http-case",
+			// HTTP tamper set for port 80: header-case reshaping plus a dot
+			// after the Host name. Harmless to servers, breaks Host
+			// matchers.
+			ID:   "zapret/http-tamper",
+			Name: "zapret http tamper",
 			Bypass: engine.BypassStrategy{
 				SplitPos: []string{"method+1", "host+1"},
 				HostCase: true,
+				HostDot:  true,
+			},
+			HasBypass: true,
+		},
+		{
+			// Aggressive HTTP tamper set: EOL and method-line reshaping for
+			// DPI that normalizes only the common variants.
+			ID:   "zapret/http-eol",
+			Name: "zapret http eol",
+			Bypass: engine.BypassStrategy{
+				SplitPos:    []string{"1"},
+				MethodEOL:   true,
+				MethodSpace: true,
+				UnixEOL:     true,
+			},
+			HasBypass: true,
+		},
+		{
+			// Last resort: clamp the segment size so the ClientHello never
+			// fits in one segment. Slows every connection through the
+			// strategy, so it is tried last and must never be a default.
+			ID:   "zapret/mss-last",
+			Name: "zapret mss (slow)",
+			Bypass: engine.BypassStrategy{
+				MSS: "1300",
 			},
 			HasBypass: true,
 		},

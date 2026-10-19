@@ -37,10 +37,11 @@ type Options struct {
 	TotalBudget time.Duration
 }
 
-// DefaultOptions is the recommended starting point: up to 8 strategies
-// (the full candidate list), 15 seconds each, 2 minutes total.
+// DefaultOptions is the recommended starting point: up to 12 strategies
+// (the full candidate list: current, both presets, all zapret
+// alternatives), 15 seconds each, 2 minutes total.
 func DefaultOptions() Options {
-	return Options{MaxStrategies: 8, AttemptTimeout: 15 * time.Second, TotalBudget: 2 * time.Minute}
+	return Options{MaxStrategies: 12, AttemptTimeout: 15 * time.Second, TotalBudget: 2 * time.Minute}
 }
 
 // Normalize clamps every option into its allowed range. The zero value is

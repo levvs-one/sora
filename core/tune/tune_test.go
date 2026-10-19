@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/profiles"
 )
 
@@ -80,11 +81,11 @@ func TestTuneAllFail(t *testing.T) {
 	if res.Succeeded() {
 		t.Fatal("result succeeded, want failure")
 	}
-	if len(res.Attempts) != 7 {
-		t.Fatalf("attempts = %d, want 7 (current + 2 presets + 4 zapret)", len(res.Attempts))
+	if len(res.Attempts) != 11 {
+		t.Fatalf("attempts = %d, want 11 (current + 2 presets + 8 zapret)", len(res.Attempts))
 	}
 	msg := err.Error()
-	for _, want := range []string{"tried 7", "current", "preset/balanced", "preset/max", "zapret/disorder", "dpi blocked"} {
+	for _, want := range []string{"tried 11", "current", "preset/balanced", "preset/max", "zapret/disorder", "dpi blocked"} {
 		if !strings.Contains(msg, want) {
 			t.Fatalf("error %q does not mention %q", msg, want)
 		}
@@ -292,7 +293,7 @@ func TestOptionsNormalize(t *testing.T) {
 func TestCandidatesOrder(t *testing.T) {
 	max := ObfsMax()
 	got := Candidates(CurrentStrategy(), &max)
-	want := []string{"current", "preset/max", "preset/balanced", "zapret/split-oob", "zapret/disorder", "zapret/tlsrec", "zapret/http-case"}
+	want := []string{"current", "preset/max", "preset/balanced", "zapret/tlsrec", "zapret/split", "zapret/disorder", "zapret/disorder-tls", "zapret/split-oob", "zapret/http-tamper", "zapret/http-eol", "zapret/mss-last"}
 	if idsOf(got) != strings.Join(want, ",") {
 		t.Fatalf("order = %v, want %v", idsOf(got), want)
 	}
@@ -340,9 +341,19 @@ func TestCacheRoundTrip(t *testing.T) {
 	if !ok || s.ID != "preset/max" {
 		t.Fatalf("lookup = %+v, %v; want preset/max, true", s, ok)
 	}
-	// Zapret alternatives round-trip with their parameters intact.
+	// Zapret alternatives round-trip with their parameters intact. Look the
+	// strategy up by ID: pool order is not a contract.
 	alts := ZapretAlternatives()
-	if err := c2.Remember(testFP(), alts[1]); err != nil {
+	var disorder Strategy
+	for _, s := range alts {
+		if s.ID == "zapret/disorder" {
+			disorder = s
+		}
+	}
+	if disorder.ID == "" {
+		t.Fatal("pool lost zapret/disorder")
+	}
+	if err := c2.Remember(testFP(), disorder); err != nil {
 		t.Fatalf("Remember: %v", err)
 	}
 	s, ok = NewCache(dir).Lookup(testFP())
@@ -540,5 +551,36 @@ func TestSummaryOnCancelledRun(t *testing.T) {
 	}
 	if !strings.Contains(res.Summary(), "no working strategy") {
 		t.Fatalf("summary = %q, want failure wording", res.Summary())
+	}
+}
+
+func TestZapretPoolIsValidAndOrdered(t *testing.T) {
+	alts := ZapretAlternatives()
+	if len(alts) < 8 {
+		t.Fatalf("pool shrank to %d strategies", len(alts))
+	}
+	seen := map[string]bool{}
+	for _, s := range alts {
+		if !strings.HasPrefix(s.ID, "zapret/") || s.ID == "zapret/" {
+			t.Errorf("bad strategy id %q", s.ID)
+		}
+		if seen[s.ID] {
+			t.Errorf("duplicate strategy id %q", s.ID)
+		}
+		seen[s.ID] = true
+		if !s.HasBypass {
+			t.Errorf("%q carries no bypass params", s.ID)
+		}
+		o := engine.Outbound{ID: "z", Protocol: engine.ProtocolBypass, Bypass: &s.Bypass}
+		if err := o.Validate(); err != nil {
+			t.Errorf("%q does not validate: %v", s.ID, err)
+		}
+		if _, ok := Lookup(s.ID); !ok {
+			t.Errorf("Lookup(%q) failed", s.ID)
+		}
+	}
+	// The MSS clamp slows every connection: it must stay the last resort.
+	if last := alts[len(alts)-1]; last.ID != "zapret/mss-last" {
+		t.Errorf("last strategy = %q, want zapret/mss-last", last.ID)
 	}
 }
