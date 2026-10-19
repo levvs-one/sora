@@ -22,8 +22,12 @@ final class SealedForHapp extends ImportLink {
 const ownSchemes = ['sora', 'happ'];
 
 /// Parses add, install-config, import and import-remote-profile links from
-/// Sora, Happ, v2rayn, Clash, Hiddify and sing-box. Requires an HTTP(S)
-/// subscription URL; returns null for invalid links or percent-encoding.
+/// Sora, Happ, v2rayn, Clash, Hiddify and sing-box, plus bare HTTP(S)
+/// subscription URLs. The share flow QR-encodes the raw subscription link
+/// from the core, and users paste raw links from messengers, so the scanner
+/// must accept them directly instead of failing with "invalid link".
+/// Requires an HTTP(S) subscription URL; returns null for invalid links or
+/// percent-encoding.
 ImportLink? parseImportLink(String text) {
   try {
     return _parse(text.trim());
@@ -64,6 +68,14 @@ ImportLink? _parse(String link) {
 
   final uri = Uri.tryParse(link);
   if (uri == null) return null;
+  // A bare subscription URL (https://…): the share flow QR-encodes the raw
+  // link, and users paste raw links too. The multi-line guard keeps a
+  // clipboard dump from becoming a subscription.
+  if ((scheme == 'http' || scheme == 'https') &&
+      uri.host.isNotEmpty &&
+      !RegExp(r'[\r\n]').hasMatch(link)) {
+    return _subscription(link, '');
+  }
   final query = uri.queryParameters;
   final known = switch (scheme) {
     'sora' => uri.host == 'add',

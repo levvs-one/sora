@@ -42,41 +42,92 @@ class SyncedDevice {
 
 /// Pairing handshake data (F9).
 ///
-/// The QR shown by "Show my code" carries the rendezvous token; the
-/// ephemeral X25519 public key is attached by the Go sync service once it
-/// lands (the Dart `crypto` package has no X25519, and inventing key
-/// material here would be dishonest). Scanning side parses the payload with
-/// [decodePairPayload].
+/// The QR payload is the Go `service/sync/pairing` Invitation, contract for
+/// contract: `sora-sync://pair?v=1&id=<device>&pub=<base64url 32B>
+/// &token=<base64url 16B>&port=<1..65535>`. The decoder below mirrors Go's
+/// `pairing.Decode` rule for rule, so a code the app accepts is a code the
+/// sync service accepts too. Invitations are minted by the sync service
+/// (`api.StartPairing`); Dart never invents key material, device ids or
+/// ports.
 class SyncPairing {
   SyncPairing._();
 
-  /// Cryptographically secure rendezvous token, hex-encoded.
-  static String newToken() {
+  /// 16 cryptographically secure random bytes for the rendezvous token.
+  static List<int> newToken() {
     final random = Random.secure();
-    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
-    return bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    return List<int>.generate(16, (_) => random.nextInt(256));
   }
 
-  /// Builds the QR payload. [ephemeralPub] is base64 X25519 public key bytes
-  /// when the sync service supplies them, null while it is pending.
-  static String encodePairPayload({required String token, String? ephemeralPub}) {
-    final params = <String, String>{'v': '$syncPairVersion', 'token': token};
-    if (ephemeralPub != null && ephemeralPub.isNotEmpty) params['key'] = ephemeralPub;
-    final query = params.entries
+  /// base64url without padding, exactly like Go's `base64.RawURLEncoding`.
+  static String _b64raw(List<int> bytes) => base64Url.encode(bytes).replaceAll('=', '');
+
+  /// Decodes base64url without padding; null unless [s] uses only the
+  /// URL-safe alphabet and decodes to exactly [length] bytes. Go's
+  /// RawURLEncoding rejects padding, so this does too.
+  static List<int>? _b64rawDecode(String s, int length) {
+    if (!RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(s)) return null;
+    try {
+      final bytes = base64Url.decode(s);
+      return bytes.length == length ? bytes : null;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// Builds the QR payload. Every field comes from the sync service's
+  /// invitation; lengths are validated like the Go encoder's inputs, so a
+  /// malformed invitation fails here instead of in the scanner.
+  static String encodePairPayload({
+    required String deviceId,
+    required List<int> publicKey,
+    required List<int> token,
+    required int port,
+  }) {
+    if (deviceId.isEmpty || deviceId.length > 128) {
+      throw ArgumentError.value(deviceId, 'deviceId', 'must be 1..128 chars');
+    }
+    if (publicKey.length != 32) {
+      throw ArgumentError.value(publicKey.length, 'publicKey', 'must be 32 bytes');
+    }
+    if (token.length != 16) {
+      throw ArgumentError.value(token.length, 'token', 'must be 16 bytes');
+    }
+    if (port <= 0 || port > 65535) {
+      throw ArgumentError.value(port, 'port', 'must be 1..65535');
+    }
+    final query = <String, String>{
+      'v': '$syncPairVersion',
+      'id': deviceId,
+      'pub': _b64raw(publicKey),
+      'token': _b64raw(token),
+      'port': '$port',
+    }
+        .entries
         .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
         .join('&');
     return 'sora-sync://pair?$query';
   }
 
-  /// Parses a scanned payload; null when it is not a sync pairing code.
-  /// Returns the rendezvous token and the ephemeral key (null while the
-  /// other side's sync service has not attached one yet).
-  static ({String token, String? key})? decodePairPayload(String raw) {
+  /// Parses a scanned payload; null when it is not a valid pairing
+  /// invitation. Mirrors Go `pairing.Decode`: a wrong scheme, host or
+  /// version, and any malformed field, is rejected instead of being
+  /// half-accepted.
+  static ({String deviceId, List<int> publicKey, List<int> token, int port})? decodePairPayload(
+    String raw,
+  ) {
     final uri = Uri.tryParse(raw.trim());
     if (uri == null || uri.scheme != 'sora-sync' || uri.host != 'pair') return null;
-    final token = uri.queryParameters['token'] ?? '';
-    if (token.isEmpty) return null;
-    return (token: token, key: uri.queryParameters['key']);
+    final q = uri.queryParameters;
+    if (q['v'] != '$syncPairVersion') return null;
+    final deviceId = q['id'] ?? '';
+    if (deviceId.isEmpty || deviceId.length > 128) return null;
+    final publicKey = _b64rawDecode(q['pub'] ?? '', 32);
+    if (publicKey == null) return null;
+    final token = _b64rawDecode(q['token'] ?? '', 16);
+    if (token == null) return null;
+    final port = int.tryParse(q['port'] ?? '');
+    if (port == null || port <= 0 || port > 65535) return null;
+    return (deviceId: deviceId, publicKey: publicKey, token: token, port: port);
   }
 }
 

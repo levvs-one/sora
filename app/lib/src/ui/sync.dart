@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
@@ -15,14 +14,15 @@ import 'subscription_sheet.dart';
 
 /// End-to-end encrypted device sync without cloud (FEATURE-PLAN.md F9).
 ///
-/// Pairing reuses the F1 QR flow: this device shows a code carrying a
-/// rendezvous token, the other side scans it. Discovery and the Noise_XX
-/// channel are designed to live in the Go sync service (`service/sync`, a
-/// separate service — not a control RPC). Status (2026-10-19): the service
-/// is not launched or wired to the app yet, so this screen is a local
-/// device registry — no pairing handshake or document sync happens here.
-/// The "what syncs" section below describes the design target, not current
-/// behavior.
+/// Pairing reuses the F1 QR flow: the inviting device's sync service mints
+/// the invitation QR (`sora-sync://pair?...`, see [SyncPairing]), this side
+/// scans it and decodes it with the same rules as the Go service, so a code
+/// the app accepts is a code the service accepts too.
+/// Status (2026-10-19): the service is not launched or wired to the app yet,
+/// so this screen is a local device registry — no pairing handshake or
+/// document sync happens here, and there is no "show my code" until the
+/// service mints real invitations. The "what syncs" section below describes
+/// the design target, not current behavior.
 class SyncScreen extends StatefulWidget {
   const SyncScreen({super.key});
 
@@ -37,6 +37,8 @@ class _SyncScreenState extends State<SyncScreen> {
       context,
       QrScanScreen(
         onScanned: (raw) {
+          // Strict decode: only a real service invitation registers a
+          // device. Anything else is not a pairing code.
           final parsed = SyncPairing.decodePairPayload(raw);
           if (parsed == null) {
             ScaffoldMessenger.of(context)
@@ -44,19 +46,19 @@ class _SyncScreenState extends State<SyncScreen> {
               ..showSnackBar(SnackBar(content: Text(s.qrInvalid)));
             return;
           }
-          unawaited(_nameAndAdd(parsed.token));
+          unawaited(_nameAndAdd(parsed.deviceId));
         },
       ),
     );
   }
 
   /// Names a freshly scanned device before adding it to the registry.
-  Future<void> _nameAndAdd(String token) async {
+  Future<void> _nameAndAdd(String deviceId) async {
     final sora = SoraScope.read(context);
     final s = S.of(context);
-    final short = token.substring(0, token.length < 6 ? token.length : 6);
+    final short = deviceId.substring(0, deviceId.length < 6 ? deviceId.length : 6);
     // The registry ignores duplicates; only claim "paired" when the device
-    // was actually added, not when the token was scanned before.
+    // was actually added, not when the code was scanned before.
     var added = false;
     await showFieldSheet(
       context,
@@ -66,8 +68,8 @@ class _SyncScreenState extends State<SyncScreen> {
       initial: short,
       submit: (value) async {
         if (value.trim().isEmpty) return s.syncPair;
-        added = !sora.syncDevices.devices.any((d) => d.id == token);
-        sora.syncDevices.add(SyncedDevice(id: token, name: value.trim()));
+        added = !sora.syncDevices.devices.any((d) => d.id == deviceId);
+        sora.syncDevices.add(SyncedDevice(id: deviceId, name: value.trim()));
         return null;
       },
     );
@@ -143,10 +145,9 @@ class _SyncScreenState extends State<SyncScreen> {
         Heading(s.syncPair),
         Group(
           children: [
-            LinkTile(
-              title: s.syncShowCode,
-              onTap: () => push<void>(context, const SyncShowCodeScreen()),
-            ),
+            // "Show my code" lives here once the sync service mints real
+            // invitations; until then the app shows no pairing QR because a
+            // code it cannot back with a handshake would be a lie.
             LinkTile(title: s.syncScanCode, onTap: _scan),
           ],
         ),
@@ -166,87 +167,6 @@ class _SyncScreenState extends State<SyncScreen> {
                   Text(s.syncSecureNote, style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5)),
                 ],
               ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-/// Shows this device's pairing code and waits for the other side (F9).
-class SyncShowCodeScreen extends StatefulWidget {
-  const SyncShowCodeScreen({super.key});
-
-  @override
-  State<SyncShowCodeScreen> createState() => _SyncShowCodeScreenState();
-}
-
-class _SyncShowCodeScreenState extends State<SyncShowCodeScreen> {
-  late final String _token;
-
-  @override
-  void initState() {
-    super.initState();
-    // One token per shown code; rescanning a stale screenshot pairs nothing.
-    _token = SyncPairing.newToken();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final s = S.of(context);
-    final palette = Palette.of(context);
-    final payload = SyncPairing.encodePairPayload(token: _token);
-    return Screen(
-      title: s.syncPairingTitle,
-      children: [
-        const SizedBox(height: 8),
-        Center(
-          child: DecoratedBox(
-            // White quiet zone keeps the code scannable in both themes.
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              // A QR code carries no meaning for screen readers; the token
-              // is intentionally not exposed as text (a screenshot must not
-              // be pairable), so the image is hidden from the semantics tree.
-              child: ExcludeSemantics(
-                child: QrImageView(
-                  data: payload,
-                  version: QrVersions.auto,
-                  errorCorrectionLevel: QrErrorCorrectLevel.H,
-                  size: 260,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        Group(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  const SizedBox.square(
-                    dimension: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(s.syncWaiting, style: Styles.secondary.copyWith(color: palette.ink2)),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Group(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              child: Text(s.syncSecureNote, style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5)),
             ),
           ],
         ),
