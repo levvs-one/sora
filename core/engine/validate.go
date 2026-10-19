@@ -30,7 +30,7 @@ func (p *Plan) Secrets() []string {
 // Secrets lists the secret fields of one outbound. Values shorter than four
 // characters are skipped: masking them would destroy ordinary log text.
 func (o Outbound) Secrets() []string {
-	candidates := []string{o.UUID, o.Password, o.UserID, o.ObfsParam, o.PrivateKey, o.OriginalLink}
+	candidates := []string{o.UUID, o.Password, o.UserID, o.ObfsParam, o.Token, o.PrivateKey, o.OriginalLink}
 	if o.Encryption != "none" {
 		candidates = append(candidates, o.Encryption)
 	}
@@ -144,6 +144,12 @@ func (o Outbound) Validate() error {
 	}
 	if o.Protocol == ProtocolBypass {
 		errs = append(errs, o.Bypass.validate(o.ID))
+	}
+	if o.Protocol == ProtocolHysteria2 {
+		errs = append(errs, validateHysteria2Tuning(o)...)
+	}
+	if o.Protocol == ProtocolTUIC {
+		errs = append(errs, validateTUICTuning(o)...)
 	}
 	if o.Protocol == ProtocolXrayProfile {
 		var profile struct {
@@ -479,4 +485,67 @@ func (s *BypassStrategy) validate(id string) error {
 		return fmt.Errorf("outbound %s: disorder and out-of-band bytes need a split position", id)
 	}
 	return nil
+}
+
+// validateHysteria2Tuning checks the bandwidth caps and port-hopping spec of
+// a Hysteria2 outbound. Engines pick BBR or Brutal congestion control and
+// the hopping behavior from these fields, so malformed values must fail here
+// instead of producing a config the engine silently misapplies.
+func validateHysteria2Tuning(o Outbound) []error {
+	var errs []error
+	if o.UpMbps < 0 || o.DownMbps < 0 {
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 bandwidth caps must not be negative", o.ID))
+	}
+	if err := validateHopPorts(o.ID, o.HopPorts); err != nil {
+		errs = append(errs, err)
+	}
+	switch {
+	case o.HopInterval < 0:
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval must not be negative", o.ID))
+	case o.HopInterval > 0 && o.HopInterval < 5:
+		// Hysteria2 requires at least 5s between hops.
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval must be at least 5s", o.ID))
+	case o.HopInterval > 0 && o.HopPorts == "":
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval needs hop ports", o.ID))
+	}
+	return errs
+}
+
+// validateHopPorts checks a Hysteria2 port-hopping spec such as
+// "20000-30000,40000": comma-separated single ports or ascending ranges.
+func validateHopPorts(id, spec string) error {
+	if spec == "" {
+		return nil
+	}
+	for _, part := range strings.Split(spec, ",") {
+		part = strings.TrimSpace(part)
+		lo, hi, hasRange := strings.Cut(part, "-")
+		if !hasRange {
+			lo, hi = part, part
+		}
+		a, errA := strconv.Atoi(strings.TrimSpace(lo))
+		b, errB := strconv.Atoi(strings.TrimSpace(hi))
+		if errA != nil || errB != nil || a < 1 || b > 65535 || a > b {
+			return fmt.Errorf("outbound %s: %q is not a valid hysteria2 hop port spec", id, spec)
+		}
+	}
+	return nil
+}
+
+// validTUICCongestion lists the congestion controllers every supported
+// engine (sing-box, mihomo) implements for TUIC.
+var validTUICCongestion = map[string]bool{"bbr": true, "cubic": true, "new_reno": true}
+
+// validateTUICTuning checks the congestion controller and UDP relay mode of
+// a TUIC outbound against what the engines implement, so an unknown value
+// fails validation instead of silently falling back to an engine default.
+func validateTUICTuning(o Outbound) []error {
+	var errs []error
+	if o.CongestionControl != "" && !validTUICCongestion[o.CongestionControl] {
+		errs = append(errs, fmt.Errorf("outbound %s: unknown tuic congestion control %q", o.ID, o.CongestionControl))
+	}
+	if o.UDPRelayMode != "" && o.UDPRelayMode != "native" && o.UDPRelayMode != "quic" {
+		errs = append(errs, fmt.Errorf("outbound %s: unknown tuic udp relay mode %q", o.ID, o.UDPRelayMode))
+	}
+	return errs
 }

@@ -317,3 +317,130 @@ func TestRenderTUICTuning(t *testing.T) {
 		t.Fatal("tuic default congestion control must stay bbr")
 	}
 }
+
+// dnsRules extracts the rendered DNS rules in order.
+func dnsRules(t *testing.T, p *engine.Plan) []map[string]any {
+	t.Helper()
+	cfg := render(t, p)
+	dns, ok := cfg["dns"].(map[string]any)
+	if !ok {
+		t.Fatal("rendered config has no dns block")
+	}
+	raw, ok := dns["rules"].([]any)
+	if !ok {
+		t.Fatal("dns block has no rules")
+	}
+	out := make([]map[string]any, 0, len(raw))
+	for _, r := range raw {
+		m, ok := r.(map[string]any)
+		if !ok {
+			t.Fatal("dns rule is not an object")
+		}
+		out = append(out, m)
+	}
+	return out
+}
+
+// TestFakeIPExcludesLANAndLocalDomains locks the sing-box equivalent of
+// mihomo's fake-ip-filter: default filter suffixes resolve through the real
+// resolver before the fakeip catch-all, so LAN names never get fake answers.
+func TestFakeIPExcludesLANAndLocalDomains(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS.Mode = string(engine.DNSFakeIP)
+	rules := dnsRules(t, p)
+	fakeIdx := -1
+	for i, r := range rules {
+		if r["server"] == "fakeip" {
+			fakeIdx = i
+		}
+	}
+	if fakeIdx < 0 {
+		t.Fatal("no fakeip catch-all rule rendered")
+	}
+	seen := map[string]bool{}
+	for _, r := range rules[:fakeIdx] {
+		suffixes, ok := r["domain_suffix"].([]any)
+		if !ok || r["server"] == "fakeip" {
+			continue
+		}
+		for _, s := range suffixes {
+			seen[s.(string)] = true
+		}
+	}
+	for _, want := range []string{"lan", "local", "home.arpa", "invalid", "localhost", "msftconnecttest.com", "msftncsi.com"} {
+		if !seen[want] {
+			t.Errorf("default fake-ip exclusion for %q missing before the fakeip rule", want)
+		}
+	}
+	for _, r := range rules {
+		if suffixes, ok := r["domain_suffix"].([]any); ok {
+			for _, s := range suffixes {
+				if strings.Contains(s.(string), "*") {
+					t.Errorf("unrenderable wildcard reached sing-box: %q", s)
+				}
+			}
+		}
+	}
+}
+
+// TestFakeIPHonorsPlanFilter ensures a plan filter replaces the defaults in
+// the sing-box renderer instead of being silently dropped.
+func TestFakeIPHonorsPlanFilter(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS.Mode = string(engine.DNSFakeIP)
+	p.DNS.FakeIPFilter = []string{"*.corp.example"}
+	rules := dnsRules(t, p)
+	found, lan := false, false
+	for _, r := range rules {
+		if r["server"] == "fakeip" {
+			continue
+		}
+		suffixes, ok := r["domain_suffix"].([]any)
+		if !ok {
+			continue
+		}
+		for _, s := range suffixes {
+			switch s.(string) {
+			case "corp.example":
+				found = true
+			case "lan":
+				lan = true
+			}
+		}
+	}
+	if !found {
+		t.Error("plan fake-ip filter *.corp.example not rendered")
+	}
+	if lan {
+		t.Error("default filter leaked in despite a plan filter")
+	}
+}
+
+// TestDNSSkipVerifyRendersInsecureTLS covers the corporate-MITM escape hatch
+// on the sing-box side: encrypted upstreams with SkipVerify carry
+// tls.insecure, plain resolvers are untouched.
+func TestDNSSkipVerifyRendersInsecureTLS(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS.Servers = append(p.DNS.Servers, engine.DNSServer{
+		Tag: "dot-skip", Transport: engine.DNSTLS, Address: "9.9.9.9", SkipVerify: true,
+	})
+	cfg := render(t, p)
+	dns := cfg["dns"].(map[string]any)
+	servers := dns["servers"].([]any)
+	byTag := map[string]map[string]any{}
+	for _, s := range servers {
+		m := s.(map[string]any)
+		byTag[m["tag"].(string)] = m
+	}
+	skip, ok := byTag["dot-skip"]
+	if !ok {
+		t.Fatal("dot-skip server missing")
+	}
+	tls, ok := skip["tls"].(map[string]any)
+	if !ok || tls["insecure"] != true {
+		t.Fatalf("dot-skip must carry tls.insecure, got %v", skip["tls"])
+	}
+	if _, ok := byTag["dot"]["tls"]; ok {
+		t.Error("plain dot server must not carry tls options")
+	}
+}

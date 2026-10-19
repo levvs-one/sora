@@ -319,3 +319,39 @@ func TestRenderOmitsECHByDefault(t *testing.T) {
 		t.Fatalf("rendered mihomo config must not mention ech unless enabled, got:\n%s", out)
 	}
 }
+
+func TestRenderHysteria2BandwidthAndHopping(t *testing.T) {
+	p := testPlan()
+	p.Outbounds[1].UpMbps, p.Outbounds[1].DownMbps = 20, 100
+	p.Outbounds[1].HopPorts = "20000-30000"
+	p.Outbounds[1].HopInterval = 30
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"up: 20 Mbps", "down: 100 Mbps", "ports: 20000-30000", "hop-interval: 30"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("rendered mihomo config is missing %q:\n%s", want, out)
+		}
+	}
+}
+
+func TestRenderTUICTuning(t *testing.T) {
+	p := testPlan()
+	p.Outbounds = append(p.Outbounds, engine.Outbound{
+		ID: "srv-3", Name: "TUIC", Protocol: engine.ProtocolTUIC,
+		Server: "tu.example.com", Port: 443,
+		UUID: "11111111-2222-3333-4444-555555555555", Password: "tuic-test-password",
+		CongestionControl: "cubic", UDPRelayMode: "quic", Token: "v4-token",
+		TLS: engine.TLS{Enabled: true, ServerName: "tu.example.com"},
+	})
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"type: tuic", "congestion-controller: cubic", "udp-relay-mode: quic", "token: v4-token"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("rendered mihomo config is missing %q:\n%s", want, out)
+		}
+	}
+}

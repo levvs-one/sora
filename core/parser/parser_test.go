@@ -108,3 +108,34 @@ func TestXrayConfigurationsBecomeProfiles(t *testing.T) {
 		t.Fatal("two profiles on one server must keep two identities")
 	}
 }
+
+func TestParseHysteria2TuningOptions(t *testing.T) {
+	r, err := (LinkParser{}).Parse([]byte("hysteria2://secret@example.com:443?upmbps=20&downmbps=100&mport=20000-30000%2C40000&hop-interval=30&sni=example.com#H2"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	o := r.Servers[0].Options
+	for k, want := range map[string]string{"upmbps": "20", "downmbps": "100", "mport": "20000-30000,40000", "hop-interval": "30"} {
+		if o[k] != want {
+			t.Errorf("Options[%q] = %q, want %q", k, o[k], want)
+		}
+	}
+}
+
+func TestParseTUICTuningOptions(t *testing.T) {
+	r, err := (LinkParser{}).Parse([]byte("tuic://123e4567-e89b-12d3-a456-426614174000:pass@example.com:443?congestion_control=cubic&udp_relay_mode=quic#TUIC"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	o := r.Servers[0].Options
+	if o["congestion_control"] != "cubic" || o["udp_relay_mode"] != "quic" {
+		t.Fatalf("unexpected tuic options: %#v", o)
+	}
+	r, err = (LinkParser{}).Parse([]byte("tuic://example.com:443?token=v4secret#TUICv4"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r.Servers[0].Options["token"] != "v4secret" {
+		t.Fatalf("v4 token not parsed: %#v", r.Servers[0].Options)
+	}
+}

@@ -213,12 +213,37 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		}
 	case engine.ProtocolHysteria2:
 		out.set("type", "hysteria2").set("password", o.Password)
+		// Bandwidth caps switch the engine from BBR to Hysteria (Brutal)
+		// congestion control; zero means auto (BBR).
+		if o.UpMbps > 0 {
+			out["up_mbps"] = o.UpMbps
+		}
+		if o.DownMbps > 0 {
+			out["down_mbps"] = o.DownMbps
+		}
+		// Port hopping: server_ports overrides server_port (sing-box
+		// >= 1.11 ignores server_port when server_ports is set).
+		if o.HopPorts != "" {
+			out["server_ports"] = strings.Split(o.HopPorts, ",")
+		}
+		if o.HopInterval > 0 {
+			out["hop_interval"] = strconv.Itoa(o.HopInterval) + "s"
+		}
 		if o.Obfs != "" {
 			out["obfs"] = obj{"type": o.Obfs, "password": o.ObfsParam}
 		}
 		needsTLS = true
 	case engine.ProtocolTUIC:
-		out.set("type", "tuic").set("uuid", o.UUID).set("password", o.Password).set("congestion_control", "bbr")
+		tuic := out.set("type", "tuic").set("uuid", o.UUID).set("password", o.Password)
+		// The engines default to BBR; an explicit link parameter wins.
+		if o.CongestionControl != "" {
+			tuic.set("congestion_control", o.CongestionControl)
+		} else {
+			tuic.set("congestion_control", "bbr")
+		}
+		if o.UDPRelayMode != "" {
+			tuic.set("udp_relay_mode", o.UDPRelayMode)
+		}
 		needsTLS = true
 	case engine.ProtocolAnyTLS:
 		out.set("type", "anytls").set("password", o.Password)
