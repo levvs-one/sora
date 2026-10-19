@@ -918,6 +918,26 @@ class Sora extends ChangeNotifier {
   });
 
   /// Fetches the bearer link only for this action, without retaining it in state.
+  Future<String?> fetchSubscriptionLink(String id) async {
+    final link = _link;
+    if (link == null) {
+      reportFailure(CoreFailure.unavailable);
+      return null;
+    }
+    try {
+      final answer = await link.stub.getSubscriptionLink(
+        GetSubscriptionLinkRequest(apiVersion: apiVersion, controlAuthenticator: link.token, id: id),
+      );
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      recovered('request');
+      return answer.url;
+    } catch (error) {
+      reportFailure(error, source: 'request');
+      return null;
+    }
+  }
+
+  /// Fetches the bearer link only for this action, without retaining it in state.
   Future<CoreFailure?> openSubscriptionPage(String id) => _call(() async {
     final link = _link!;
     final answer = await link.stub.getSubscriptionLink(
