@@ -28,9 +28,8 @@ type censorshipWatcher struct {
 	events      <-chan Event
 	unsubscribe func()
 
-	mu         sync.Mutex
-	lastProbe  time.Time
-	lastTarget string
+	mu        sync.Mutex
+	lastProbe time.Time
 }
 
 // WatchCensorshipFailures attaches the censorship failure watcher to the
@@ -99,7 +98,7 @@ func (w *censorshipWatcher) onEvent(ev Event) {
 	if !ok {
 		return
 	}
-	if !w.claimProbeSlot(target.Host) {
+	if !w.claimProbeSlot() {
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -138,8 +137,10 @@ func (w *censorshipWatcher) knownGood() bool {
 	return false
 }
 
-// claimProbeSlot rate-limits active probes; only one caller runs at a time.
-func (w *censorshipWatcher) claimProbeSlot(target string) bool {
+// claimProbeSlot rate-limits active probes: at most one per interval per
+// session. Only the watcher's goroutine calls it, the mutex is for
+// discipline.
+func (w *censorshipWatcher) claimProbeSlot() bool {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	now := time.Now()
@@ -147,7 +148,6 @@ func (w *censorshipWatcher) claimProbeSlot(target string) bool {
 		return false
 	}
 	w.lastProbe = now
-	w.lastTarget = target
 	return true
 }
 
