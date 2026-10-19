@@ -263,6 +263,41 @@ func TestEngineAcceptsRenderedPlans(t *testing.T) {
 		})
 	}
 }
+
+func TestRenderAnyTLSProxy(t *testing.T) {
+	p := testPlan()
+	p.Outbounds[0] = engine.Outbound{
+		ID: "srv-1", Name: "AnyTLS 01", Protocol: engine.ProtocolAnyTLS,
+		Server: "at.example.com", Port: 443, Password: "anytls-test-password",
+		TLS: engine.TLS{Enabled: true, ServerName: "at.example.com", Fingerprint: "chrome"},
+	}
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"type: anytls", "password: anytls-test-password", "client-fingerprint: chrome", "tls: true"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("rendered mihomo config must contain %q, got:\n%s", want, out)
+		}
+	}
+	var cfg struct {
+		Proxies []map[string]any `yaml:"proxies"`
+	}
+	if err := yaml.Unmarshal([]byte(out), &cfg); err != nil {
+		t.Fatal(err)
+	}
+	for _, px := range cfg.Proxies {
+		if px["type"] != "anytls" {
+			continue
+		}
+		if _, ok := px["network"]; ok {
+			t.Fatalf("anytls has no stream transport, got network: %v", px["network"])
+		}
+		return
+	}
+	t.Fatal("anytls proxy is missing from the rendered config")
+}
+
 func TestRenderECHProxyToggle(t *testing.T) {
 	p := testPlan()
 	p.Outbounds[0].TLS.ECH = engine.ECHConfig{Enabled: true}

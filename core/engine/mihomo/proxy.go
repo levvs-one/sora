@@ -53,10 +53,46 @@ func buildProxy(o engine.Outbound) (proxy, error) {
 			px.Obfs = o.Obfs
 			px.ObfsPassword = o.ObfsParam
 		}
+		// Bandwidth caps switch the engine from BBR to Brutal congestion
+		// control; zero means auto.
+		if o.UpMbps > 0 {
+			px.Up = strconv.Itoa(o.UpMbps) + " Mbps"
+		}
+		if o.DownMbps > 0 {
+			px.Down = strconv.Itoa(o.DownMbps) + " Mbps"
+		}
+		if o.HopPorts != "" {
+			px.Ports = o.HopPorts
+		}
+		if o.HopInterval > 0 {
+			px.HopInterval = o.HopInterval
+		}
 	case engine.ProtocolTUIC:
 		px.Type = "tuic"
 		px.UUID = o.UUID
 		px.Password = o.Password
+		// v4 servers authenticate with a token instead of uuid+password.
+		if o.Token != "" {
+			px.Token = o.Token
+		}
+		if o.CongestionControl != "" {
+			px.CongestionController = o.CongestionControl
+		}
+		if o.UDPRelayMode != "" {
+			px.UDPRelayMode = o.UDPRelayMode
+		}
+	case engine.ProtocolAnyTLS:
+		// AnyTLS mandates TLS on the wire; the plan carries the SNI and
+		// the uTLS client fingerprint in TLS. Stream transports do not
+		// apply to it.
+		px.Type = "anytls"
+		px.Password = o.Password
+		if err := applyTLS(&px, o); err != nil {
+			return proxy{}, err
+		}
+		tls := true
+		px.TLS = &tls
+		return px, nil
 	case engine.ProtocolWireGuard:
 		px.Type = "wireguard"
 		px.PrivateKey = o.PrivateKey

@@ -30,7 +30,7 @@ var Catalog = map[Kind]Capabilities{
 			ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 			ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
 			ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
-			ProtocolDirect: true,
+			ProtocolAnyTLS: true, ProtocolDirect: true,
 		},
 		Features: map[Feature]bool{
 			FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
