@@ -195,3 +195,28 @@ func TestFromUnknownAndCatalogErrors(t *testing.T) {
 		t.Error("classifying twice must be stable")
 	}
 }
+
+// TestFromDNSErrorHidesTheQueriedName locks SORA-M7: a DNS failure wrapped
+// in an *net.OpError must be classified as a DNS error first, so the
+// queried hostname never reaches the detail.
+func TestFromDNSErrorHidesTheQueriedName(t *testing.T) {
+	raw := &net.OpError{
+		Op:  "dial",
+		Net: "tcp",
+		Err: &net.DNSError{
+			Err:       "i/o timeout",
+			Name:      "secret-provider.example",
+			IsTimeout: true,
+		},
+	}
+	got := errs.From(raw)
+	if got.Code() != errs.CodeTimeout {
+		t.Errorf("classified as %q, want %q", got.Code(), errs.CodeTimeout)
+	}
+	if strings.Contains(got.Detail(), "secret-provider.example") {
+		t.Errorf("detail %q leaks the queried host name", got.Detail())
+	}
+	if !strings.Contains(got.Detail(), "lookup") {
+		t.Errorf("detail %q lost the DNS cause", got.Detail())
+	}
+}
