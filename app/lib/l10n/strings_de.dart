@@ -1052,6 +1052,10 @@ Find one in the catalog or install from a file.';
   @override
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
   @override
+  String get extCatalogSoonTitle => 'The team catalog is coming soon';
+  @override
+  String get extCatalogSoonBody => 'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
+  @override
   String get extPermConnectionsRead => 'See the list of active connections';
   @override
   String get extPermServersRead => 'See your server list';

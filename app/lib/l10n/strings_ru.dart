@@ -1051,6 +1051,10 @@ class SRu extends S {
   @override
   String get extPanelUnavailable => 'Панель недоступна. Возможно, расширение отключено или удалено.';
   @override
+  String get extCatalogSoonTitle => 'Каталог команды скоро появится';
+  @override
+  String get extCatalogSoonBody => 'А пока расширения можно устанавливать из файла или по ссылке — каждый пакет всё равно проверяется по подписи.';
+  @override
   String get extPermConnectionsRead => 'Видеть список активных соединений';
   @override
   String get extPermServersRead => 'Видеть список ваших серверов';

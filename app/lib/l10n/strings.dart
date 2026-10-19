@@ -1856,6 +1856,8 @@ abstract class S {
   String get extUninstall;
   String extUninstallConfirm(String name);
   String get extPanelUnavailable;
+  String get extCatalogSoonTitle;
+  String get extCatalogSoonBody;
   String get extPermConnectionsRead;
   String get extPermServersRead;
   String get extPermSettingsRead;

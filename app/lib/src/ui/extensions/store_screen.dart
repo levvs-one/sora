@@ -287,6 +287,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   int _tab = 0;
   ExtensionCatalog? _catalog;
   bool _loading = true;
+  bool _catalogSoon = false;
   String? _catalogError;
   String _query = '';
   String _category = 'all';
@@ -299,9 +300,21 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   }
 
   Future<void> _refreshCatalog() async {
+    // The team catalog URL and key are placeholders until the owner completes
+    // the signing key ceremony. Show an honest "coming soon" state instead of
+    // a permanent network error; sideloading stays fully working.
+    if (!teamSigningConfigured) {
+      setState(() {
+        _loading = false;
+        _catalogSoon = true;
+        _catalogError = null;
+      });
+      return;
+    }
     setState(() {
       _loading = true;
       _catalogError = null;
+      _catalogSoon = false;
     });
     try {
       final catalog = await fetchCatalog().timeout(const Duration(seconds: 45));
@@ -354,6 +367,27 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     final s = S.of(context), palette = Palette.of(context);
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
+    }
+    if (_catalogSoon) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Symbols.store_rounded, size: 40, color: palette.ink3),
+            const SizedBox(height: 12),
+            Text(s.extCatalogSoonTitle,
+                style: Styles.title.copyWith(color: palette.ink),
+                textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(s.extCatalogSoonBody,
+                  style: Styles.body.copyWith(color: palette.ink2),
+                  textAlign: TextAlign.center),
+            ),
+          ],
+        ),
+      );
     }
     if (_catalogError != null) {
       return Center(
