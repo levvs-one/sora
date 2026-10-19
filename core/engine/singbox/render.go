@@ -431,14 +431,35 @@ func (r *renderer) route() (obj, error) {
 	r.final = final
 	out := obj{"rules": rules, "final": final, "auto_detect_interface": !r.plan.Tun.Enabled || runtime.GOOS != "linux"}
 	if len(r.ruleSets) > 0 {
-		// Fetch rule sets through the default route to reach hosts
-		// blocked on the local network.
-		for _, rs := range r.ruleSets {
-			rs["download_detour"] = final
+		// Rule-set downloads must reach hosts the local network blocks
+		// (GitHub raw is filtered in some regions): send them through
+		// the default route when it leads through a proxy, otherwise
+		// through the first proxy of the plan. With no proxy at all the
+		// detour stays unset and sing-box downloads directly.
+		if detour := r.ruleSetDetour(); detour != "" {
+			for _, rs := range r.ruleSets {
+				rs["download_detour"] = detour
+			}
 		}
 		out["rule_set"] = r.ruleSets
 	}
 	return out, nil
+}
+
+// ruleSetDetour picks the outbound for remote rule-set downloads. The
+// default route wins when it leads through a proxy; otherwise the first
+// proxy outbound of the plan is used so geo data still downloads where
+// the direct path is filtered. Empty means direct: no detour is rendered.
+func (r *renderer) ruleSetDetour() string {
+	if r.final != "direct" {
+		return r.final
+	}
+	for _, o := range r.plan.Outbounds {
+		if o.Protocol != engine.ProtocolDirect {
+			return r.tags[o.ID]
+		}
+	}
+	return ""
 }
 
 func (r *renderer) match(rule engine.Rule) (obj, error) {
@@ -525,6 +546,14 @@ func (r *renderer) dns() (obj, string, error) {
 		default:
 			return nil, "", fmt.Errorf("singbox: dns transport %q is not supported", s.Transport)
 		}
+		// Corporate MITM proxies break DoT/DoH/DoQ validation; the plan
+		// can opt a server out of certificate verification.
+		if s.SkipVerify {
+			switch s.Transport {
+			case engine.DNSTLS, engine.DNSHTTPS, engine.DNSH3, engine.DNSQUIC:
+				server["tls"] = obj{"enabled": true, "insecure": true}
+			}
+		}
 		if s.ProxyOnly {
 			// Proxy-only DNS uses the default route to keep queries
 			// off the local network.
@@ -576,16 +605,46 @@ func (r *renderer) dns() (obj, string, error) {
 		rules = append(rules, obj{"domain_suffix": []string{suffix}, "server": tag})
 	}
 	if d.Mode == string(engine.DNSFakeIP) {
-		servers = append(servers, obj{"type": "fakeip", "tag": "fakeip", "inet4_range": orDefault(d.FakeIPRange, "198.18.0.0/15")})
+		servers = append(servers, obj{"type": "fakeip", "tag": "fakeip", "inet4_range": orDefault(d.FakeIPRange, "198.18.0.0/16")})
+		// mihomo's fake-ip-filter equivalent: LAN/mDNS names, NTP and OS
+		// connectivity checks must resolve to real addresses, or printers,
+		// router panels and time sync break behind fake answers.
+		final := orDefault(remote, direct)
+		for _, suffix := range fakeIPFilterSuffixes(d) {
+			rules = append(rules, obj{"domain_suffix": []string{suffix}, "server": final})
+		}
 		rules = append(rules, obj{"query_type": []string{"A", "AAAA"}, "server": "fakeip"})
 	}
 	strategy := "ipv4_only"
 	if r.plan.Options.IPv6 {
-		strategy = "prefer_ipv4"
+		// The user enabled IPv6: prefer it instead of pinning the
+		// engine default (prefer_ipv4), which would deprioritize the
+		// address family the flag just turned on.
+		strategy = "prefer_ipv6"
 	}
 	out := obj{"servers": servers, "final": orDefault(remote, direct), "strategy": strategy}.
 		set("rules", rules).set("disable_cache", d.DisableCache)
 	return out, bootstrap, nil
+}
+
+// fakeIPFilterSuffixes normalizes the plan's fake-IP filter patterns to
+// sing-box domain_suffix items. mihomo-style prefixes (*.lan, +.example)
+// collapse to their suffix; patterns with interior wildcards (time.*.com)
+// have no suffix spelling and are skipped.
+func fakeIPFilterSuffixes(d engine.DNS) []string {
+	filters := d.FakeIPFilter
+	if len(filters) == 0 {
+		filters = engine.DefaultFakeIPFilter
+	}
+	var out []string
+	for _, f := range filters {
+		f = strings.TrimPrefix(strings.TrimPrefix(strings.TrimPrefix(f, "*."), "+."), ".")
+		if f == "" || strings.Contains(f, "*") {
+			continue
+		}
+		out = append(out, f)
+	}
+	return out
 }
 
 // proxyFinal is the default route when it leads through a proxy, or empty.

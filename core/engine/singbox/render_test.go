@@ -200,6 +200,90 @@ func trojanOutbound(t *testing.T, cfg map[string]any) map[string]any {
 	return nil
 }
 
+// TestRuleSetDownloadDetourUsesProxyWhenFinalIsDirect: with a direct
+// default route, rule-set downloads must still go through a proxy when
+// the plan has one, or geo data never downloads where the direct path
+// to GitHub raw is filtered.
+func TestRuleSetDownloadDetourUsesProxyWhenFinalIsDirect(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Rules = []engine.Rule{
+		{Type: engine.RuleGeoSite, Value: "category-ads-all", Target: "reject"},
+		{Type: engine.RuleMatchAll, Target: "direct"},
+	}
+	cfg := render(t, p)
+	route := cfg["route"].(map[string]any)
+	if route["final"] != "direct" {
+		t.Fatalf("final = %v, want direct", route["final"])
+	}
+	sets, _ := route["rule_set"].([]any)
+	if len(sets) != 1 {
+		t.Fatalf("want one rule set, got %v", route["rule_set"])
+	}
+	rs := sets[0].(map[string]any)
+	if detour, _ := rs["download_detour"].(string); detour != "Test vless" {
+		t.Fatalf("download_detour = %q, want the proxy outbound tag", detour)
+	}
+}
+
+// TestRuleSetDownloadDetourOmittedWithoutProxies: a plan with no proxies
+// must not render a detour at all (direct is the engine default).
+func TestRuleSetDownloadDetourOmittedWithoutProxies(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolDirect)
+	p.Rules = []engine.Rule{
+		{Type: engine.RuleGeoSite, Value: "category-ads-all", Target: "reject"},
+		{Type: engine.RuleMatchAll, Target: "direct"},
+	}
+	route := render(t, p)["route"].(map[string]any)
+	sets, _ := route["rule_set"].([]any)
+	if len(sets) != 1 {
+		t.Fatalf("want one rule set, got %v", route["rule_set"])
+	}
+	if _, ok := sets[0].(map[string]any)["download_detour"]; ok {
+		t.Fatalf("download_detour must be omitted with no proxies, got %v", sets[0])
+	}
+}
+
+// TestRuleSetDownloadDetourFollowsProxyFinal locks the common case: the
+// default route through a proxy carries the rule-set downloads.
+func TestRuleSetDownloadDetourFollowsProxyFinal(t *testing.T) {
+	route := render(t, enginetest.Plan(engine.ProtocolVLESS))["route"].(map[string]any)
+	sets, _ := route["rule_set"].([]any)
+	if len(sets) != 1 {
+		t.Fatalf("want one rule set, got %v", route["rule_set"])
+	}
+	if detour, _ := sets[0].(map[string]any)["download_detour"].(string); detour != "Proxy" {
+		t.Fatalf("download_detour = %q, want the final route tag", detour)
+	}
+}
+
+// TestRenderDNSIPv6Strategy: the strategy must honor the plan's IPv6 flag.
+// Rendering the engine default (prefer_ipv4) when the user enabled IPv6
+// would deprioritize the family the flag just turned on.
+func TestRenderDNSIPv6Strategy(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Options.IPv6 = true
+	if s := render(t, p)["dns"].(map[string]any)["strategy"]; s != "prefer_ipv6" {
+		t.Fatalf("strategy = %v with IPv6 enabled, want prefer_ipv6", s)
+	}
+	p.Options.IPv6 = false
+	if s := render(t, p)["dns"].(map[string]any)["strategy"]; s != "ipv4_only" {
+		t.Fatalf("strategy = %v with IPv6 disabled, want ipv4_only", s)
+	}
+}
+
+// TestRenderNeverEmitsMultiplex: plans have no mux knob, so the renderer
+// must never emit one — including for QUIC outbounds, where multiplexing
+// is invalid and would fail silently or loudly downstream.
+func TestRenderNeverEmitsMultiplex(t *testing.T) {
+	raw, err := Render(enginetest.Plan(allProtocols...), testRuntime)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(raw), "multiplex") {
+		t.Fatal("rendered config must never contain multiplex")
+	}
+}
+
 func TestRenderECHOutboundTLS(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolTrojan)
 	p.Outbounds[0].TLS.ECH = engine.ECHConfig{
