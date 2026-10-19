@@ -584,3 +584,31 @@ func TestZapretPoolIsValidAndOrdered(t *testing.T) {
 		t.Errorf("last strategy = %q, want zapret/mss-last", last.ID)
 	}
 }
+
+func TestCacheSeparatesASNs(t *testing.T) {
+	// Strategies are ISP-specific (TSPU behavior differs per ASN); a
+	// strategy remembered on one ASN must never leak to another, even
+	// behind the same SSID and gateway (e.g. the uplink ISP changed).
+	dir := t.TempDir()
+	c := NewCache(dir)
+	home := testFP()
+	roaming := testFP()
+	roaming.ASN = "AS67890"
+	if err := c.Remember(home, ObfsMax()); err != nil {
+		t.Fatalf("Remember: %v", err)
+	}
+	if _, ok := c.Lookup(roaming); ok {
+		t.Fatal("strategy cached for AS12345 leaked to AS67890")
+	}
+	if err := c.Remember(roaming, ObfsBalanced()); err != nil {
+		t.Fatalf("Remember: %v", err)
+	}
+	s, ok := c.Lookup(home)
+	if !ok || s.ID != "preset/max" {
+		t.Fatalf("home lookup = %+v, %v; want preset/max", s, ok)
+	}
+	s, ok = c.Lookup(roaming)
+	if !ok || s.ID != "preset/balanced" {
+		t.Fatalf("roaming lookup = %+v, %v; want preset/balanced", s, ok)
+	}
+}
