@@ -510,3 +510,36 @@ func TestApplyCredentialRejectsBrokenPeerJSON(t *testing.T) {
 		t.Fatalf("got %d peers, want 1", len(ok.Peers))
 	}
 }
+
+func TestShadowsocksPluginSurvivesTheVault(t *testing.T) {
+	link := "ss://YWVzLTI1Ni1nY206cGFzcw@example.com:8388?plugin=v2ray-plugin%3Btls%3Bhost%3Dexample.com#SS"
+	result, err := parser.LinkParser{}.Parse([]byte(link))
+	if err != nil || len(result.Servers) != 1 {
+		t.Fatalf("Parse = %+v, %v", result, err)
+	}
+	document, err := credentialDocument(result.Servers[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	var o engine.Outbound
+	values, err := parseCredential(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := applyCredential(&o, values); err != nil {
+		t.Fatal(err)
+	}
+	if o.Plugin != "v2ray-plugin" || o.PluginOpts != "tls;host=example.com" {
+		t.Errorf("plugin lost on the way to the engine: %q %q", o.Plugin, o.PluginOpts)
+	}
+	// Secrets: plugin options must be masked like the other credentials.
+	masked := false
+	for _, s := range o.Secrets() {
+		if s == "tls;host=example.com" {
+			masked = true
+		}
+	}
+	if !masked {
+		t.Error("plugin_opts must be in the redaction set")
+	}
+}
