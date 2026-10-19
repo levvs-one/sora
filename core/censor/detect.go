@@ -88,11 +88,10 @@ var rules = []rule{
 }
 
 // failureScan reduces the event log to what the rules need: the first
-// terminal event, the furthest stage reached, and byte/time context.
+// terminal event, the furthest stage reached, and byte context.
 type failureScan struct {
-	terminal   *Event
-	furthest   Stage
-	timeToFail time.Duration
+	terminal *Event
+	furthest Stage
 	// sawBytesIn reports whether the far end ever sent payload bytes.
 	sawBytesIn bool
 	// resolvedTo records the last resolved address, if observed.
@@ -114,9 +113,6 @@ func scan(a Attempt) failureScan {
 		if s.terminal == nil && isTerminal(e.What) {
 			ev := a.Events[i]
 			s.terminal = &ev
-			if !a.StartedAt.IsZero() && !ev.At.IsZero() {
-				s.timeToFail = ev.At.Sub(a.StartedAt)
-			}
 		}
 	}
 	return s
