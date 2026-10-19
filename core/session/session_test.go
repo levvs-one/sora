@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -629,4 +630,34 @@ func TestStopOnAFreshSessionLeavesItUsable(t *testing.T) {
 		t.Fatalf("Start() after a no-op Stop error = %v", err)
 	}
 	t.Cleanup(func() { _ = s.Stop(context.Background()) })
+}
+
+// TestSessionLogsTheTeardownStopFailure locks SORA-M16: when the tunnel
+// never comes up, the engine is torn down and a failing Stop must be
+// visible in the journal instead of swallowed.
+func TestSessionLogsTheTeardownStopFailure(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	eng.stopErr = errs.Newf(errs.CodeInternal, errs.KeyEngineStopped, "stop exploded")
+	cfg := testConfig(eng, guard)
+	cfg.Plan.Tun = engine.Tun{Enabled: true, DeviceName: engine.TunDevice}
+	cfg.TunUp = func(_ context.Context, _ string) error {
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanTunnel, "no adapter")
+	}
+	s, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Start(context.Background()); err == nil {
+		t.Fatal("Start() succeeded without the tunnel adapter")
+	}
+	found := false
+	for _, event := range s.Journal().Since(0, 50) {
+		if event.Kind == EventError && event.Key == errs.KeyEngineStopped &&
+			strings.Contains(event.Detail, "stop exploded") {
+			found = true
+		}
+	}
+	if !found {
+		t.Error("the journal has no entry for the failed teardown Stop")
+	}
 }
