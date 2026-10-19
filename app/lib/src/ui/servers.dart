@@ -11,6 +11,7 @@ import '../design/theme.dart';
 import '../generated/sora/core/v1/core_control.pb.dart';
 import '../groups.dart';
 import '../sora.dart';
+import 'benchmark.dart';
 import 'kit.dart';
 import 'qr.dart';
 import 'subscription.dart';
@@ -68,6 +69,12 @@ class _ServersScreenState extends State<ServersScreen> {
       return widget.scrollable ? const SizedBox.expand() : const SliverToBoxAdapter();
     }
     final query = _search.text.trim().toLowerCase();
+    final sortMode = sora.settings.serverSortMode;
+    String sortLabel(String mode) => switch (mode) {
+      'speed' => s.sortSpeed,
+      'name' => s.sortName,
+      _ => s.sortPing,
+    };
     final actions = [
       if (sora.probing)
         SizedBox.square(dimension: 36, child: CupertinoActivityIndicator(color: palette.ink))
@@ -77,6 +84,31 @@ class _ServersScreenState extends State<ServersScreen> {
           label: s.probeServers,
           onTap: sora.canProbe ? () => unawaited(sora.probe()) : null,
         ),
+      if (sora.benchmarking)
+        SizedBox.square(dimension: 36, child: CupertinoActivityIndicator(color: palette.ink))
+      else
+        RoundButton(
+          icon: Symbols.gauge_rounded,
+          label: s.measureSpeed,
+          onTap: sora.canBenchmark ? () => push<void>(context, const BenchmarkScreen()) : null,
+        ),
+      MenuAnchor(
+        menuChildren: [
+          for (final mode in ['ping', 'speed', 'name'])
+            MenuItemButton(
+              onPressed: () => unawaited(sora.change((x) => x.serverSortMode = mode, replan: false)),
+              leadingIcon: sortMode == mode
+                  ? Icon(Symbols.check_rounded, size: 18, color: palette.ink)
+                  : const SizedBox(width: 18),
+              child: Text(sortLabel(mode)),
+            ),
+        ],
+        builder: (context, controller, child) => RoundButton(
+          icon: Symbols.sort_rounded,
+          label: '${s.sortBy}: ${sortLabel(sortMode)}',
+          onTap: () => controller.isOpen ? controller.close() : controller.open(),
+        ),
+      ),
       _tourTarget(
         0,
         RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
@@ -142,7 +174,7 @@ class _ServersScreenState extends State<ServersScreen> {
     ];
     final separator = palette.ink3.withValues(alpha: 0.28);
     for (final subscription in sora.subscriptions) {
-      final entries = _matching(entriesOf(subscription), query);
+      final entries = _sortEntries(_matching(_visibleEntries(subscription, sora), query), sora);
       if (query.isNotEmpty && entries.isEmpty) continue;
       slivers.add(
         SliverPadding(
@@ -214,6 +246,37 @@ List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty
           if (e.name.toLowerCase().contains(query)) e,
       ];
 
+/// Applies subscription overrides: hides servers the user hid and renames the
+/// ones they renamed (FEATURE-PLAN.md F6).
+List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
+  final override = sora.overrides.of(subscription.settings.id);
+  if (override.isEmpty) return entriesOf(subscription);
+  final out = <Entry>[];
+  for (final entry in entriesOf(subscription)) {
+    final visible = entry.withoutHidden(override.hidden);
+    if (visible == null) continue;
+    final renamed = !visible.isGroup && override.renames.containsKey(visible.id)
+        ? visible.renamed(override.renames[visible.id]!)
+        : visible;
+    out.add(renamed);
+  }
+  return out;
+}
+
+/// Sorts server entries by the user's sort mode (FEATURE-PLAN.md F2).
+List<Entry> _sortEntries(List<Entry> entries, Sora sora) {
+  final mode = sora.settings.serverSortMode;
+  if (mode == 'name') {
+    entries.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return entries;
+  }
+  // Groups are represented by the member the sort mode would pick.
+  String keyOf(Entry e) =>
+      e.isGroup ? pickMember(e, sora.latency, bandwidth: sora.bandwidth, autoSelect: mode).id : e.id;
+  entries.sort((a, b) => sora.compareServers(keyOf(a), keyOf(b), mode));
+  return entries;
+}
+
 final _flagPrefix = RegExp(r'^([\u{1F1E6}-\u{1F1FF}]{2})\s*', unicode: true);
 
 InlineSpan serverNameSpan(String name) {
@@ -259,9 +322,18 @@ class _ServerRow extends StatelessWidget {
     final s = S.of(context);
     final chosen = sora.selected == id;
     // Use the prospective active member's latency for a group row.
-    final measuredId = entry == null ? id : pickMember(entry!, sora.latency).id;
+    final measuredId = entry == null
+        ? id
+        : pickMember(
+            entry!,
+            sora.latency,
+            bandwidth: sora.bandwidth,
+            autoSelect: sora.settings.autoSelectMode,
+          ).id;
     final measured = sora.latency.containsKey(measuredId);
     final ms = sora.latency[measuredId];
+    final bps = sora.freshBandwidth(measuredId);
+    final staleBps = bps == null ? sora.bandwidth[measuredId]?.bps : null;
     final group = entry;
     final detail = group?.members.map(protocolLine).toSet().join(' | ');
     return Semantics(
@@ -277,7 +349,7 @@ class _ServerRow extends StatelessWidget {
           radius: 8,
           give: 1,
           child: SizedBox(
-            height: entry == null ? 40 : 52,
+            height: entry == null ? 48 : 56,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
@@ -309,15 +381,29 @@ class _ServerRow extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 76,
-                    child: Text(
-                      !measured
-                          ? ''
-                          : ms == null
-                          ? s.noAnswer
-                          : s.milliseconds(ms),
-                      textAlign: TextAlign.right,
-                      style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                    width: 84,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          !measured
+                              ? ''
+                              : ms == null
+                              ? s.noAnswer
+                              : s.milliseconds(ms),
+                          textAlign: TextAlign.right,
+                          style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                        ),
+                        if (bps != null || staleBps != null)
+                          Text(
+                            s.speedMbps((bps ?? staleBps!) / 1000000),
+                            textAlign: TextAlign.right,
+                            style: Styles.figures(
+                              Styles.caption,
+                            ).copyWith(color: bps != null ? palette.ink2 : palette.ink3),
+                          ),
+                      ],
                     ),
                   ),
                 ],

@@ -252,6 +252,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () => push<void>(context, const RulesScreen()),
             ),
             SwitchTile(title: s.failover, value: settings.failover, onChanged: (v) => set((x) => x.failover = v)),
+            SwitchTile(
+              title: s.restoreOnCrash,
+              value: settings.restoreOnCrash,
+              onChanged: (v) => set((x) => x.restoreOnCrash = v, replan: false),
+            ),
             SwitchTile(title: s.ipv6, value: settings.ipv6, onChanged: (v) => set((x) => x.ipv6 = v)),
             LinkTile(
               title: s.dns,
@@ -348,6 +353,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.probeTimeout,
               choices: {0: s.byDefault, 2000: s.seconds(2), 5000: s.seconds(5), 10000: s.seconds(10)},
               onChanged: (v) => set((x) => x.probeTimeout = v, replan: false),
+            ),
+            ChoiceTile<String>(
+              title: s.autoSelectMode,
+              value: settings.autoSelectMode,
+              choices: {'ping': s.autoSelectPing, 'speed': s.autoSelectSpeed, 'smart': s.autoSelectSmart},
+              onChanged: (v) => set((x) => x.autoSelectMode = v),
             ),
           ],
         ),
