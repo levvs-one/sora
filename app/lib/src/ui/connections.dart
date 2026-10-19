@@ -80,7 +80,12 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         _loaded = true;
       });
     } catch (error) {
-      if (mounted) SoraScope.read(context).reportFailure(error, source: 'connections');
+      if (!mounted) return;
+      SoraScope.read(context).reportFailure(error, source: 'connections');
+      // Never leave a permanent blank screen: the error itself is reported
+      // through the notification stream, so surface the empty state here
+      // (e.g. the xray engine cannot list connections at all).
+      setState(() => _loaded = true);
     }
   }
 
