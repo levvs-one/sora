@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"log"
 	"net"
 	"time"
 
@@ -82,8 +83,10 @@ func (d *Daemon) handleSyncConn(netConn net.Conn, self transport.Identity) {
 	if _, err := syncpkg.Sync(ctx, c, d.identity.ID, d.store, false); err != nil {
 		return
 	}
-	d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
-		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:]))
+	if err := d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
+		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:])); err != nil {
+		log.Printf("sync: save peers registry: %v", err)
+	}
 }
 
 // SyncPeer finds a paired device on the LAN and syncs with it.
@@ -126,8 +129,10 @@ func (d *Daemon) SyncPeer(ctx context.Context, id string) (pulled, pushed []sync
 	if err != nil {
 		return nil, nil, fmt.Errorf("api: sync failed: %w", err)
 	}
-	d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
-		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:]))
+	if err := d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
+		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:])); err != nil {
+		return nil, nil, fmt.Errorf("api: sync succeeded but the peer registry was not saved: %w", err)
+	}
 	return rep.Pulled, rep.Pushed, nil
 }
 

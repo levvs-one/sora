@@ -247,8 +247,10 @@ func (d *Daemon) savePeersLocked() error {
 	return writeFileAtomic(d.peersPath(), raw, 0o600)
 }
 
-// upsertPeer adds or refreshes a paired device.
-func (d *Daemon) upsertPeer(id, name, identityKey string) {
+// upsertPeer adds or refreshes a paired device. The registry save error is
+// returned: a pairing the daemon cannot persist must not be reported as
+// complete to a caller with a response path.
+func (d *Daemon) upsertPeer(id, name, identityKey string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	now := time.Now().UnixMilli()
@@ -261,7 +263,7 @@ func (d *Daemon) upsertPeer(id, name, identityKey string) {
 			PairedAt: now, LastSync: now,
 		}
 	}
-	_ = d.savePeersLocked()
+	return d.savePeersLocked()
 }
 
 // Peers returns the paired devices.
@@ -275,16 +277,19 @@ func (d *Daemon) Peers() []Peer {
 	return out
 }
 
-// RevokePeer forgets a paired device; its documents stay.
-func (d *Daemon) RevokePeer(id string) bool {
+// RevokePeer forgets a paired device; its documents stay. The second
+// result reports a registry save failure.
+func (d *Daemon) RevokePeer(id string) (bool, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if _, ok := d.peers[id]; !ok {
-		return false
+		return false, nil
 	}
 	delete(d.peers, id)
-	_ = d.savePeersLocked()
-	return true
+	if err := d.savePeersLocked(); err != nil {
+		return true, err
+	}
+	return true, nil
 }
 
 // peerKeys returns the identity keys of paired devices for AcceptKnown.

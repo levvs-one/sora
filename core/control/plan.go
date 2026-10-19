@@ -91,6 +91,27 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 			break
 		}
 	}
+	// Hysteria2 performance tuning: bandwidth caps enable Brutal congestion
+	// control in the engines instead of BBR. Hop ports arrive as mport
+	// (official hy2 links) or ports (mihomo-style links).
+	values["upmbps"] = spec.Options["upmbps"]
+	values["downmbps"] = spec.Options["downmbps"]
+	for _, key := range []string{"mport", "ports"} {
+		if value := spec.Options[key]; value != "" {
+			values["hop_ports"] = value
+			break
+		}
+	}
+	for _, key := range []string{"hop-interval", "hopinterval"} {
+		if value := spec.Options[key]; value != "" {
+			values["hop_interval"] = value
+			break
+		}
+	}
+	// TUIC tuning and the v4 token.
+	values["congestion_control"] = spec.Options["congestion_control"]
+	values["udp_relay_mode"] = spec.Options["udp_relay_mode"]
+	values["token"] = spec.Options["token"]
 	if strings.EqualFold(spec.Protocol, "wireguard") {
 		key, addresses, peers := wireguardMaterial(spec)
 		values["private_key"] = key
@@ -505,6 +526,18 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 	return outbound, nil
 }
 
+// atoiNonNegative parses an optional tuning value from a credential
+// document. Garbage and negatives become "unset" so a malformed link
+// parameter cannot wedge the engine config; hard validation happens in
+// engine.Outbound.Validate.
+func atoiNonNegative(s string) int {
+	n, err := strconv.Atoi(strings.TrimSpace(s))
+	if err != nil || n < 0 {
+		return 0
+	}
+	return n
+}
+
 // applyCredential restores only fields written by credentialDocument from
 // stored material.
 func applyCredential(outbound *engine.Outbound, values map[string]string) error {
@@ -515,6 +548,13 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	outbound.Flow = values["flow"]
 	outbound.Obfs = values["obfs"]
 	outbound.ObfsParam = values["obfs_param"]
+	outbound.UpMbps = atoiNonNegative(values["upmbps"])
+	outbound.DownMbps = atoiNonNegative(values["downmbps"])
+	outbound.HopPorts = values["hop_ports"]
+	outbound.HopInterval = atoiNonNegative(values["hop_interval"])
+	outbound.CongestionControl = values["congestion_control"]
+	outbound.UDPRelayMode = values["udp_relay_mode"]
+	outbound.Token = values["token"]
 	outbound.PublicKey = values["public_key"]
 	outbound.ShortID = values["short_id"]
 	outbound.Encryption = values["encryption"]
@@ -617,7 +657,13 @@ func amneziaFrom(raw string) (*engine.AmneziaWG, error) {
 func wireguardMaterial(spec parser.OutboundSpec) (key string, addresses []string, peers []engine.WireGuardPeer) {
 	key = spec.Options["privatekey"]
 	if key == "" {
-		key, _ = url.PathUnescape(spec.Password)
+		// A malformed escape must not silently empty the key: keep the
+		// raw password so the engine reports the real format problem.
+		if unescaped, err := url.PathUnescape(spec.Password); err == nil {
+			key = unescaped
+		} else {
+			key = spec.Password
+		}
 	}
 	for _, a := range strings.Split(spec.Options["address"], ",") {
 		a = strings.TrimSpace(a)

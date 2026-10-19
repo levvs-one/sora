@@ -132,7 +132,12 @@ func (d *Daemon) handlePeers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d *Daemon) handlePeerDelete(w http.ResponseWriter, r *http.Request) {
-	if !d.RevokePeer(r.PathValue("id")) {
+	revoked, err := d.RevokePeer(r.PathValue("id"))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if !revoked {
 		writeError(w, http.StatusNotFound, fmt.Errorf("unknown peer"))
 		return
 	}

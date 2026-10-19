@@ -178,8 +178,7 @@ func (h *Host) Notify(ctx context.Context, req *extv1.NotifyRequest) (*extv1.Not
 // withheld on purpose: journal details carry the LAN network fingerprint
 // (interface names and addresses), which no permission was granted for.
 func (h *Host) WatchExtensionEvents(req *extv1.WatchExtensionEventsRequest, stream extv1.ExtensionHost_WatchExtensionEventsServer) error {
-	g, err := h.check(req.GetExtensionToken(), "WatchExtensionEvents")
-	if err != nil {
+	if _, err := h.check(req.GetExtensionToken(), "WatchExtensionEvents"); err != nil {
 		return err
 	}
 	if h.deps.WatchEvents == nil {
@@ -202,7 +201,6 @@ func (h *Host) WatchExtensionEvents(req *extv1.WatchExtensionEventsRequest, stre
 			}); err != nil {
 				return err
 			}
-			_ = g
 		}
 	}
 }
