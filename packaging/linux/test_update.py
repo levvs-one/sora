@@ -43,6 +43,9 @@ class UpdateHelperTest(unittest.TestCase):
             (self.downloads / name).write_bytes(data)
             checksums.append(hashlib.sha256(data).hexdigest() + "  " + name + "\n")
         (self.downloads / "SHA256SUMS").write_text("".join(checksums))
+        # The helper requires the manifest signature in the download
+        # directory (SORA-H1); without it the run dies before minisign.
+        (self.downloads / "SHA256SUMS.minisig").write_text("fake minisign signature\n")
         return files
 
     def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
