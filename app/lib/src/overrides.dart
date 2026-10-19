@@ -4,11 +4,14 @@ import 'package:flutter/foundation.dart';
 
 /// User edits layered over a subscription: server renames and hidden servers.
 ///
-/// Stored locally in settings (`subscriptionOverrides`) until the core
-/// implements the SaveSubscriptionOverride/GetSubscriptionOverride RPCs
-/// (FEATURE-PLAN.md F6). The JSON shape mirrors the planned core format
-/// (`{renames: {id: name}, hidden: [id]}`) so the migration is a drop-in:
-/// the store below just needs to delegate to the RPCs.
+/// Stored locally in settings (`subscriptionOverrides`). The core has its own
+/// override store with the SaveSubscriptionOverride/GetSubscriptionOverride
+/// RPCs (`core/control/override.go`, `core/subscription/override.go`) —
+/// implemented, but the app never calls them: this local store is the source
+/// of truth the UI edits and the plan builder applies. Note the core still
+/// applies its (normally empty) overrides to the subscription states it
+/// serves (`subscriptionBook.stateLocked`), so the two stores must not be
+/// confused when debugging server lists.
 class SubscriptionOverride {
   const SubscriptionOverride({this.renames = const {}, this.hidden = const {}});
 

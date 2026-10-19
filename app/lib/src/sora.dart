@@ -1100,12 +1100,14 @@ class Sora extends ChangeNotifier {
 
   /// Refreshes the current network fingerprint (F5).
   ///
-  /// TODO(stubs): wire to the GetNetworkFingerprint RPC and dispatch the
-  /// ProfileMatched core event in _watchSession once the generated Dart
-  /// stubs (`lib/src/generated/sora/core/v1/`) are regenerated for the 1.10
-  /// profile RPCs — the Go side has already landed
-  /// (`core/control/profiles.go`, `core/profiles/`). Until then the
-  /// fingerprint stays unknown and the UI says so instead of guessing.
+  /// TODO(profiles): wire to the GetNetworkFingerprint RPC — the generated
+  /// Dart stubs already carry the 1.10 profile RPCs, no regeneration needed.
+  /// Core-side matching is wired end to end (network change → session
+  /// `checkProfile` → `ProfileMatched` event → `_watchSession`), but the
+  /// core store stays empty until the app pushes profiles via SaveProfile,
+  /// so this local fingerprint is the only live matcher. Until the RPC is
+  /// wired, the fingerprint stays unknown and the UI says so instead of
+  /// guessing.
   Future<void> refreshFingerprint() async {
     networkFingerprint = const NetworkFingerprint.unknown();
     final matched = profiles.match(networkFingerprint);

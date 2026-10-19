@@ -5,14 +5,16 @@ import 'package:flutter/foundation.dart';
 /// A network profile: triggers identifying a network plus a snapshot of the
 /// connection settings to apply when that network is joined (F5).
 ///
-/// The Go core owns trigger matching on network change
-/// (`core/profiles/profiles.go`, RPCs `ListProfiles`/`SaveProfile`/
-/// `DeleteProfile`/`GetNetworkFingerprint`, `ProfileMatched` events); this
-/// store is the app-side cache and the source of truth for the editor UI.
-/// NOTE: the generated Dart stubs (`lib/src/generated/sora/core/v1/`)
-/// predate the 1.10 profile RPCs, so the app cannot call them yet — pushing
-/// profiles to the core and dispatching `ProfileMatched` need the stubs
-/// regenerated with protoc first. Until then matching stays app-side only.
+/// Two stores exist for one concept. The Go core keeps its own profile store
+/// (`core/profiles/`) and matches it on network change
+/// (`session.Session.checkProfile`), emitting `ProfileMatched` events that
+/// the app dispatches (`Sora._watchSession` → `handleProfileMatched`). This
+/// Dart store is the source of truth for the editor UI and the app-side
+/// matcher. The management RPCs (`ListProfiles`/`SaveProfile`/
+/// `DeleteProfile`/`GetNetworkFingerprint`) exist on both sides of the wire —
+/// the generated Dart stubs already carry them — but the app does not call
+/// them yet, so the core store stays empty and live matches come from this
+/// store only.
 class NetworkProfile {
   NetworkProfile({
     required this.id,
