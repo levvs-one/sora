@@ -109,21 +109,30 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 		Network:       m.cfg.Network,
 	})
 	if err != nil {
-		_ = built.Close()
+		// Surface a failing Close instead of swallowing it (SORA-L13).
+		if closeErr := built.Close(); closeErr != nil {
+			err = errors.Join(err, closeErr)
+		}
 		return nil, err
 	}
 	if err := built.Validate(ctx, plan); err != nil {
-		_ = built.Close()
+		if closeErr := built.Close(); closeErr != nil {
+			err = errors.Join(err, closeErr)
+		}
 		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
 	}
 	if err := ctx.Err(); err != nil {
-		_ = built.Close()
+		if closeErr := built.Close(); closeErr != nil {
+			err = errors.Join(err, closeErr)
+		}
 		return nil, err
 	}
 	stopCtx := context.WithoutCancel(ctx)
 	if previous != nil {
 		if err := previous.Stop(stopCtx); err != nil {
-			_ = built.Close()
+			if closeErr := built.Close(); closeErr != nil {
+				err = errors.Join(err, closeErr)
+			}
 			m.setLast(previous.Status())
 			return nil, err
 		}

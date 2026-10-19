@@ -314,7 +314,16 @@ func (s *Session) Stop(ctx context.Context) error {
 		s.engineSub()
 		s.engineSub = nil
 	}
-	_ = s.eng.Close()
+	// A failing Close can leak descriptors; keep it visible in the journal
+	// instead of swallowing it (SORA-L13).
+	if closeErr := s.eng.Close(); closeErr != nil {
+		s.log.Append(Event{
+			Kind:   EventError,
+			Reason: errs.CodeOf(closeErr),
+			Key:    errs.KeyOf(closeErr),
+			Detail: s.mask(closeErr.Error()),
+		})
+	}
 	s.mu.Unlock()
 	if stopErr != nil {
 		return errs.Wrap(stopErr, errs.CodeInternal, errs.KeyGuardRestoreFailed)
