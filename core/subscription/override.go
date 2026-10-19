@@ -102,7 +102,12 @@ func (s *OverrideStore) Save(id string, o *Override) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if o == nil || (len(o.Renames) == 0 && len(o.Hidden) == 0 && len(o.ExtraRules) == 0 && len(o.PinnedOrder) == 0) {
-		_ = os.Remove(path)
+		// Report a failed removal like Delete does: a silent failure
+		// would keep stale renames, hides and pins applied while the
+		// user believes they cleared them.
+		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			return err
+		}
 		return nil
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {

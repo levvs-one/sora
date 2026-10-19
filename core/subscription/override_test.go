@@ -87,6 +87,18 @@ func TestOverrideEmptySaveRemovesFile(t *testing.T) {
 	}
 }
 
+func TestOverrideEmptySaveWithoutAFileIsFine(t *testing.T) {
+	s := NewOverrideStore(t.TempDir())
+	// Clearing overrides that were never stored must not fail: there is
+	// simply no file to remove.
+	if err := s.Save("0123456789abcdef", &Override{}); err != nil {
+		t.Fatalf("Save(empty) without a file = %v", err)
+	}
+	if err := s.Save("0123456789abcdef", nil); err != nil {
+		t.Fatalf("Save(nil) without a file = %v", err)
+	}
+}
+
 func TestOverrideNilStoreSafe(t *testing.T) {
 	var s *OverrideStore
 	if _, err := s.Load("0123456789abcdef"); err == nil {
