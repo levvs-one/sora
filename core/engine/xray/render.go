@@ -446,6 +446,14 @@ func wireguard(o engine.Outbound, tag string) (obj, error) {
 	if len(o.Addresses) == 0 {
 		return nil, fmt.Errorf("xray: wireguard outbound %s has no interface address", o.ID)
 	}
+	// T012: Xray has no AmneziaWG support at all. Rendering the outbound
+	// without its obfuscation parameters would put plain WireGuard on the
+	// wire while the plan promises obfuscation - the exact silent no-op
+	// this check exists to prevent. Fail closed: the caller must pick an
+	// engine with FeatureAmneziaWG instead.
+	if o.Amnezia != nil {
+		return nil, fmt.Errorf("xray: wireguard outbound %s sets AmneziaWG obfuscation parameters, which xray does not implement: refusing to render an unobfuscated outbound", o.ID)
+	}
 	peers := make([]obj, 0, len(o.Peers))
 	for _, p := range o.Peers {
 		peers = append(peers, obj{"publicKey": p.PublicKey, "endpoint": p.Endpoint}.

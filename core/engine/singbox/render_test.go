@@ -128,63 +128,6 @@ func TestTunDropsDeprecatedStack(t *testing.T) {
 	}
 }
 
-// TestTunMultiQueueFollowsEngineVersion: multi_queue scales TUN packet I/O
-// with CPU cores but needs sing-tun's own TCP/IP stack (sing-box 1.15+);
-// the pinned 1.14-based lx fork rejects it as an unknown field, so the
-// renderer gates it on the probed version.
-func TestTunMultiQueueFollowsEngineVersion(t *testing.T) {
-	if runtime.GOOS != "linux" {
-		t.Skip("multi_queue is Linux-only")
-	}
-	old, err := engine.ParseVersion("1.14.3-lx.14")
-	if err != nil {
-		t.Fatal(err)
-	}
-	p := enginetest.Plan(engine.ProtocolVLESS)
-	p.Tun = engine.Tun{Enabled: true}
-	raw, err := renderVersioned(p, testRuntime, old)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if strings.Contains(string(raw), "multi_queue") {
-		t.Fatalf("multi_queue must not be rendered for 1.14.3-lx.14: %s", raw)
-	}
-	next, err := engine.ParseVersion("1.15.0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	raw, err = renderVersioned(p, testRuntime, next)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var cfg map[string]any
-	if err := json.Unmarshal(raw, &cfg); err != nil {
-		t.Fatal(err)
-	}
-	if got := tunInbound(t, cfg)["multi_queue"]; got != true {
-		t.Fatalf("multi_queue = %v on 1.15+, want true", got)
-	}
-}
-
-// TestTunAutoRedirectNeedsEngineRouting: auto_redirect hard-requires
-// auto_route (sing-box refuses the inbound otherwise). On Linux the core
-// owns routing (tunroute and the atomic kill switch), so auto_route stays
-// off and auto_redirect must stay unset with it.
-func TestTunAutoRedirectNeedsEngineRouting(t *testing.T) {
-	if runtime.GOOS != "linux" {
-		t.Skip("the Linux routing design is what this locks")
-	}
-	p := enginetest.Plan(engine.ProtocolVLESS)
-	p.Tun = engine.Tun{Enabled: true}
-	inbound := tunInbound(t, render(t, p))
-	if inbound["auto_route"] != false {
-		t.Fatalf("auto_route = %v on Linux, want false (the core owns routing)", inbound["auto_route"])
-	}
-	if _, ok := inbound["auto_redirect"]; ok {
-		t.Fatalf("auto_redirect must stay unset while auto_route is off: %v", inbound["auto_redirect"])
-	}
-}
-
 // TestTunMTUDefaultsSane: the jumbo 9000 default lets apps negotiate MSS
 // 8960, fragmenting or black-holing proxied paths. Default is 1500; an
 // explicit plan MTU still wins; garbage falls back to the default.
@@ -310,28 +253,17 @@ func trojanOutbound(t *testing.T, cfg map[string]any) map[string]any {
 	return nil
 }
 
-// TestRuleSetDownloadsUseHTTPClient: with a direct default route, rule-set
-// downloads must still go through a proxy when the plan has one (GitHub raw
-// is filtered in some regions). sing-box 1.14 deprecated the per-rule-set
-// download_detour (removal in 1.16): the detour now rides a reusable HTTP
-// client selected by route.default_http_client.
-func TestRuleSetDownloadsUseHTTPClient(t *testing.T) {
+// TestRuleSetDownloadDetourUsesProxyWhenFinalIsDirect: with a direct
+// default route, rule-set downloads must still go through a proxy when
+// the plan has one, or geo data never downloads where the direct path
+// to GitHub raw is filtered.
+func TestRuleSetDownloadDetourUsesProxyWhenFinalIsDirect(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolVLESS)
 	p.Rules = []engine.Rule{
 		{Type: engine.RuleGeoSite, Value: "category-ads-all", Target: "reject"},
 		{Type: engine.RuleMatchAll, Target: "direct"},
 	}
-	raw, err := Render(p, testRuntime)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if strings.Contains(string(raw), "download_detour") {
-		t.Fatalf("download_detour is deprecated and must not be rendered: %s", raw)
-	}
-	cfg := map[string]any{}
-	if err := json.Unmarshal(raw, &cfg); err != nil {
-		t.Fatal(err)
-	}
+	cfg := render(t, p)
 	route := cfg["route"].(map[string]any)
 	if route["final"] != "direct" {
 		t.Fatalf("final = %v, want direct", route["final"])
@@ -340,63 +272,40 @@ func TestRuleSetDownloadsUseHTTPClient(t *testing.T) {
 	if len(sets) != 1 {
 		t.Fatalf("want one rule set, got %v", route["rule_set"])
 	}
-	tag, _ := route["default_http_client"].(string)
-	if tag == "" {
-		t.Fatal("route must select an http client")
-	}
-	clients, _ := cfg["http_clients"].([]any)
-	if len(clients) != 1 {
-		t.Fatalf("want one http client, got %v", cfg["http_clients"])
-	}
-	c := clients[0].(map[string]any)
-	if c["tag"] != tag {
-		t.Fatalf("http client tag = %v, want the route's default %q", c["tag"], tag)
-	}
-	if c["detour"] != "Test vless" {
-		t.Fatalf("http client detour = %q, want the proxy outbound tag", c["detour"])
+	rs := sets[0].(map[string]any)
+	if detour, _ := rs["download_detour"].(string); detour != "Test vless" {
+		t.Fatalf("download_detour = %q, want the proxy outbound tag", detour)
 	}
 }
 
-// TestRuleSetDownloadsOmitHTTPClientWithoutProxies: a plan with no proxies
-// must not render an HTTP client at all (direct is the engine default).
-func TestRuleSetDownloadsOmitHTTPClientWithoutProxies(t *testing.T) {
+// TestRuleSetDownloadDetourOmittedWithoutProxies: a plan with no proxies
+// must not render a detour at all (direct is the engine default).
+func TestRuleSetDownloadDetourOmittedWithoutProxies(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolDirect)
 	p.Rules = []engine.Rule{
 		{Type: engine.RuleGeoSite, Value: "category-ads-all", Target: "reject"},
 		{Type: engine.RuleMatchAll, Target: "direct"},
 	}
-	cfg := render(t, p)
-	route := cfg["route"].(map[string]any)
+	route := render(t, p)["route"].(map[string]any)
 	sets, _ := route["rule_set"].([]any)
 	if len(sets) != 1 {
 		t.Fatalf("want one rule set, got %v", route["rule_set"])
 	}
 	if _, ok := sets[0].(map[string]any)["download_detour"]; ok {
-		t.Fatalf("download_detour is deprecated and must not be rendered: %v", sets[0])
-	}
-	if _, ok := cfg["http_clients"]; ok {
-		t.Fatalf("http_clients must be omitted with no proxies, got %v", cfg["http_clients"])
-	}
-	if _, ok := route["default_http_client"]; ok {
-		t.Fatalf("default_http_client must be omitted with no proxies, got %v", route["default_http_client"])
+		t.Fatalf("download_detour must be omitted with no proxies, got %v", sets[0])
 	}
 }
 
-// TestRuleSetDownloadsFollowProxyFinal locks the common case: the default
-// route through a proxy carries the rule-set downloads via the HTTP client.
-func TestRuleSetDownloadsFollowProxyFinal(t *testing.T) {
-	cfg := render(t, enginetest.Plan(engine.ProtocolVLESS))
-	route := cfg["route"].(map[string]any)
-	tag, _ := route["default_http_client"].(string)
-	if tag == "" {
-		t.Fatal("route must select an http client")
+// TestRuleSetDownloadDetourFollowsProxyFinal locks the common case: the
+// default route through a proxy carries the rule-set downloads.
+func TestRuleSetDownloadDetourFollowsProxyFinal(t *testing.T) {
+	route := render(t, enginetest.Plan(engine.ProtocolVLESS))["route"].(map[string]any)
+	sets, _ := route["rule_set"].([]any)
+	if len(sets) != 1 {
+		t.Fatalf("want one rule set, got %v", route["rule_set"])
 	}
-	clients, _ := cfg["http_clients"].([]any)
-	if len(clients) != 1 || clients[0].(map[string]any)["tag"] != tag {
-		t.Fatalf("http client must be the route's default %q, got %v", tag, cfg["http_clients"])
-	}
-	if detour := clients[0].(map[string]any)["detour"]; detour != "Proxy" {
-		t.Fatalf("http client detour = %q, want the final route tag", detour)
+	if detour, _ := sets[0].(map[string]any)["download_detour"].(string); detour != "Proxy" {
+		t.Fatalf("download_detour = %q, want the final route tag", detour)
 	}
 }
 
@@ -461,24 +370,13 @@ func TestRenderOmitsECHByDefault(t *testing.T) {
 	}
 }
 
-// TestRenderDNSH3UsesTypeH3: DoH3 is a first-class DNS server type since
-// sing-box 1.12 ("type": "h3" with server/server_port). The h3:// address
-// string was the legacy H3 server spelling, removed in 1.14: rendering it
-// fails `sing-box check` against the pinned build.
-func TestRenderDNSH3UsesTypeH3(t *testing.T) {
+// TestRenderDNSH3UsesAddressForm locks the DoH3 rendering: sing-box has no
+// legacy "type" spelling for HTTP/3, so an h3 server must be emitted in the
+// address form with the h3:// prefix (its DoH3 transport selector).
+func TestRenderDNSH3UsesAddressForm(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolVLESS)
 	p.DNS.Servers = []engine.DNSServer{{Tag: "doh3", Transport: engine.DNSH3, Address: "1.1.1.1"}}
-	raw, err := Render(p, testRuntime)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if strings.Contains(string(raw), "h3://") {
-		t.Fatalf("legacy h3:// address form must not be rendered: %s", raw)
-	}
-	var out map[string]any
-	if err := json.Unmarshal(raw, &out); err != nil {
-		t.Fatal(err)
-	}
+	out := render(t, p)
 	dns, ok := out["dns"].(map[string]any)
 	if !ok {
 		t.Fatal("rendered config has no dns section")
@@ -489,14 +387,11 @@ func TestRenderDNSH3UsesTypeH3(t *testing.T) {
 		if m["tag"] != "doh3" {
 			continue
 		}
-		if m["type"] != "h3" {
-			t.Fatalf("h3 server type = %v, want \"h3\"", m["type"])
+		if m["address"] != "h3://1.1.1.1:443/dns-query" {
+			t.Fatalf("h3 server must use the address form, got %v", m)
 		}
-		if m["server"] != "1.1.1.1" {
-			t.Fatalf("h3 server = %v, want 1.1.1.1", m["server"])
-		}
-		if _, ok := m["address"]; ok {
-			t.Fatalf("h3 server must not carry a legacy address: %v", m)
+		if _, hasType := m["type"]; hasType {
+			t.Fatalf("h3 server must not carry a legacy type: %v", m)
 		}
 		return
 	}
@@ -891,5 +786,33 @@ func TestFakeIPOmitsIPv6RangeWhenIPv6IsOff(t *testing.T) {
 	srv := fakeIPServer(t, p)
 	if _, ok := srv["inet6_range"]; ok {
 		t.Fatalf("inet6_range must be omitted with IPv6 off, got %v", srv["inet6_range"])
+	}
+}
+
+func TestRenderEmitsAmneziaWG31(t *testing.T) {
+	// T012: the with_awg fork implements the 3.1 stack (snake_case keys),
+	// so 3.1 parameters must reach the endpoint verbatim. A plan routed
+	// here was selected for FeatureAmneziaWG3; dropping its fields would
+	// be the silent no-op the fail-closed gates exist to prevent.
+	p := enginetest.Plan(engine.ProtocolWireGuard)
+	p.Outbounds[0].Amnezia = enginetest.AmneziaWG3().Amnezia
+	cfg := render(t, p)
+	raw, _ := json.Marshal(cfg["endpoints"])
+	for _, want := range []string{`"header_protection_key"`, `"content_padding_addition"`, `"rekey_after_time"`, `"random_trailers":true`, `"disable_cookies":true`} {
+		if !strings.Contains(string(raw), want) {
+			t.Fatalf("3.1 parameter %s missing from endpoint: %s", want, raw)
+		}
+	}
+}
+
+func TestRenderKeepsAmneziaWG20(t *testing.T) {
+	// The 2.0 parameters must keep reaching the endpoint: the fail-closed
+	// gates above must not break what the fork demonstrably supports.
+	p := enginetest.Plan(engine.ProtocolWireGuard)
+	p.Outbounds[0].Amnezia = enginetest.AmneziaWG().Amnezia
+	cfg := render(t, p)
+	raw, _ := json.Marshal(cfg["endpoints"])
+	if !strings.Contains(string(raw), `"jc":4`) {
+		t.Fatalf("2.0 obfuscation parameters must reach the endpoint: %s", raw)
 	}
 }

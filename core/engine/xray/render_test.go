@@ -519,6 +519,18 @@ func TestRenderRejectsDoH3WithGuidance(t *testing.T) {
 	}
 }
 
+func TestRenderRefusesAmneziaWG(t *testing.T) {
+	// T012: Xray cannot apply AmneziaWG obfuscation at all. Rendering the
+	// outbound anyway would put plain WireGuard on the wire while the plan
+	// promises obfuscation - the exact silent no-op this fails closed on.
+	p := enginetest.Plan(engine.ProtocolWireGuard)
+	p.Outbounds[0].Amnezia = enginetest.AmneziaWG().Amnezia
+	_, err := Render(p, testRuntime, nil)
+	if err == nil || !strings.Contains(err.Error(), "AmneziaWG") {
+		t.Fatalf("xray Render must refuse AmneziaWG parameters, got: %v", err)
+	}
+}
+
 // TestRenderRejectsVisionOnNonTCP locks the S2 validation contract:
 // vision on a non-TCP transport cannot work, so the render fails hard
 // instead of emitting a config Xray would reject at runtime. Auto-vision
