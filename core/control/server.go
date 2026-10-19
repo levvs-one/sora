@@ -25,6 +25,7 @@ import (
 	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/parser"
+	"github.com/levvs-one/sora-client/core/probe"
 	"github.com/levvs-one/sora-client/core/routing"
 	"github.com/levvs-one/sora-client/core/secret"
 	"github.com/levvs-one/sora-client/core/session"
@@ -103,6 +104,17 @@ type Measurer interface {
 	Measure(ctx context.Context, outbounds []engine.Outbound, opts engine.MeasureOptions) (<-chan engine.Measurement, error)
 }
 
+// Benchmarker measures download throughput through compatible engines and
+// keeps a history of results. Unsupported outbounds yield a done sample
+// carrying engine.ErrNoEngine.
+type Benchmarker interface {
+	Benchmark(ctx context.Context, outbounds []engine.Outbound, opts engine.BandwidthOptions) (<-chan probe.BandwidthSample, error)
+	// History returns stored measurements, newest first.
+	History() []probe.HistoryEntry
+	// RecordLatency feeds latency probe results into the history.
+	RecordLatency(serverID string, latency time.Duration)
+}
+
 // Prober checks endpoint reachability. Implementations may dial directly or
 // through a platform tunnel.
 type Prober interface {
@@ -140,6 +152,7 @@ type Server struct {
 	diagnostics Diagnostics
 	fetcher     Fetcher
 	dataDir     string
+	benchmarker Benchmarker
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -195,6 +208,9 @@ type Config struct {
 	// DataDir is the owner-only core data directory. Empty disables
 	// features that persist files (benchmark history, overrides).
 	DataDir string
+	// Benchmarker measures server throughput; nil answers that
+	// benchmarking is unavailable.
+	Benchmarker Benchmarker
 }
 
 // New creates a control plane, supplying the default version when unset.
@@ -224,6 +240,7 @@ func New(cfg Config) (*Server, error) {
 		diagnostics: cfg.Diagnostics,
 		fetcher:     cfg.Fetcher,
 		dataDir:     cfg.DataDir,
+		benchmarker: cfg.Benchmarker,
 	}
 	server.subs = newSubscriptionBook(server)
 	return server, nil
@@ -1070,6 +1087,9 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		close(results)
 	}()
 	for result := range results {
+		if result.GetLatencyMs() > 0 && result.GetReachable() {
+			s.feedBenchmarkLatency(result.GetServerId(), time.Duration(result.GetLatencyMs())*time.Millisecond)
+		}
 		if err := stream.Send(result); err != nil {
 			return err
 		}

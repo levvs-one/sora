@@ -254,8 +254,27 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	// Keep a nil registry as a nil interface to avoid calling through a nil
 	// pointer.
 	var measurer control.Measurer
+	var benchmarker control.Benchmarker
 	if app.engines != nil {
 		measurer = app.engines
+		if b, err := probe.NewBenchmarker(probe.BenchmarkerConfig{
+			NewEngine: app.engines.Factory(),
+			SelectKind: func(o engine.Outbound) (engine.Kind, error) {
+				sel, err := engine.SelectEngine(
+					&engine.Plan{Outbounds: []engine.Outbound{o}},
+					app.engines.Availability(), nil)
+				if err != nil {
+					return "", err
+				}
+				return sel.Kind, nil
+			},
+			DataDir: opts.DataDir,
+		}); err != nil {
+			_ = store.Close()
+			return nil, err
+		} else {
+			benchmarker = b
+		}
 	}
 	plane, err := control.New(control.Config{
 		Version:       Version,
@@ -264,6 +283,7 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		Secrets:       store,
 		Prober:        probe.New(probe.Config{}),
 		Measurer:      measurer,
+		Benchmarker:   benchmarker,
 		DataDir:       opts.DataDir,
 		Logs:          center,
 		About:         app.about,
