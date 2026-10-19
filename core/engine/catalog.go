@@ -126,8 +126,11 @@ func xrayCutsPlaintext(v Version) bool {
 }
 
 // XrayPlaintextMissing lists the plan's VLESS/Trojan outbounds that an
-// Xray build of version v refuses at config load: plaintext (no TLS, no
-// REALITY) on builds >= xrayPlaintextCutoff. It is a no-op for other
+// Xray build of version v refuses at config load: unencrypted (no TLS, no
+// REALITY, and — for VLESS — no VLESS Encryption) on builds >=
+// xrayPlaintextCutoff. Upstream phrases the prohibition as "without TLS or
+// other encryption" (VLESS Encryption counts), so an encrypted VLESS
+// outbound is accepted without TLS/REALITY. It is a no-op for other
 // engines and for older builds, including the shipped 26.3.27 pin, so
 // current behavior is unchanged until the engine is bumped. Callers pass
 // the probed engine version (Availability.Version, Supervisor.Version) —
@@ -137,8 +140,12 @@ func (c Capabilities) XrayPlaintextMissing(p *Plan, v Version) []string {
 		return nil
 	}
 	for _, o := range p.Outbounds {
-		if (o.Protocol == ProtocolVLESS || o.Protocol == ProtocolTrojan) &&
-			!o.TLS.Enabled && !o.TLS.Reality {
+		if o.Protocol != ProtocolVLESS && o.Protocol != ProtocolTrojan {
+			continue
+		}
+		encrypted := o.TLS.Enabled || o.TLS.Reality ||
+			(o.Protocol == ProtocolVLESS && o.Encryption != "" && o.Encryption != "none")
+		if !encrypted {
 			return []string{fmt.Sprintf("plaintext %s (Xray %s+ refuses it; enable TLS or REALITY)", o.Protocol, xrayPlaintextCutoff)}
 		}
 	}

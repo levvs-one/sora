@@ -216,12 +216,13 @@ func TestTunStackNeverSilentlyDroppedOnSingBox115(t *testing.T) {
 }
 
 func TestXrayPlaintextVLESSVersionGate(t *testing.T) {
-	mk := func(proto Protocol, tls TLS) *Plan {
+	mk := func(proto Protocol, tls TLS, encryption string) *Plan {
 		return &Plan{
 			SessionID: "s-1",
 			Outbounds: []Outbound{{
 				ID: "o1", Name: "O1", Protocol: proto,
 				Server: "x.example.com", Port: 443, UUID: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", TLS: tls,
+				Encryption: encryption,
 			}},
 		}
 	}
@@ -232,30 +233,33 @@ func TestXrayPlaintextVLESSVersionGate(t *testing.T) {
 		kind        Kind
 		proto       Protocol
 		tls         TLS
+		encryption  string
 		version     string // "" = unknown build
 		wantMissing bool
 	}{
-		{"shipped pin keeps plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "26.3.27", false},
-		{"cutoff refuses plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "26.7.11", true},
-		{"newer build refuses plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "26.8.0", true},
-		{"TLS VLESS survives the cutoff", KindXray, ProtocolVLESS, tls, "26.7.11", false},
-		{"REALITY VLESS survives the cutoff", KindXray, ProtocolVLESS, reality, "26.7.11", false},
-		{"shipped pin keeps plaintext Trojan", KindXray, ProtocolTrojan, TLS{}, "26.3.27", false},
-		{"cutoff refuses plaintext Trojan", KindXray, ProtocolTrojan, TLS{}, "26.7.11", true},
-		{"TLS Trojan survives the cutoff", KindXray, ProtocolTrojan, tls, "26.7.11", false},
-		{"cutoff does not touch VMess", KindXray, ProtocolVMess, TLS{}, "26.7.11", false},
-		{"other engines are a no-op", KindSingBox, ProtocolVLESS, TLS{}, "26.7.11", false},
+		{"shipped pin keeps plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "", "26.3.27", false},
+		{"cutoff refuses plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "", "26.7.11", true},
+		{"newer build refuses plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "", "26.8.0", true},
+		{"TLS VLESS survives the cutoff", KindXray, ProtocolVLESS, tls, "", "26.7.11", false},
+		{"REALITY VLESS survives the cutoff", KindXray, ProtocolVLESS, reality, "", "26.7.11", false},
+		{"VLESS Encryption survives the cutoff", KindXray, ProtocolVLESS, TLS{}, "mlkem768x25519plus.native.600s", "26.7.11", false},
+		{"VLESS Encryption=none is still plaintext", KindXray, ProtocolVLESS, TLS{}, "none", "26.7.11", true},
+		{"shipped pin keeps plaintext Trojan", KindXray, ProtocolTrojan, TLS{}, "", "26.3.27", false},
+		{"cutoff refuses plaintext Trojan", KindXray, ProtocolTrojan, TLS{}, "", "26.7.11", true},
+		{"TLS Trojan survives the cutoff", KindXray, ProtocolTrojan, tls, "", "26.7.11", false},
+		{"cutoff does not touch VMess", KindXray, ProtocolVMess, TLS{}, "", "26.7.11", false},
+		{"other engines are a no-op", KindSingBox, ProtocolVLESS, TLS{}, "", "26.7.11", false},
 		// Unknown (zero) version is fail-closed: treated as the cutoff
 		// build or newer rather than as the shipped pin.
-		{"unknown version fails closed on plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "", true},
-		{"unknown version keeps TLS VLESS", KindXray, ProtocolVLESS, tls, "", false},
+		{"unknown version fails closed on plaintext VLESS", KindXray, ProtocolVLESS, TLS{}, "", "", true},
+		{"unknown version keeps TLS VLESS", KindXray, ProtocolVLESS, tls, "", "", false},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var v Version
 			if tc.version != "" {
 				v = mustVersion(t, tc.version)
 			}
-			missing := Catalog[tc.kind].XrayPlaintextMissing(mk(tc.proto, tc.tls), v)
+			missing := Catalog[tc.kind].XrayPlaintextMissing(mk(tc.proto, tc.tls, tc.encryption), v)
 			if got := len(missing) != 0; got != tc.wantMissing {
 				t.Errorf("version %q: missing=%v, want missing=%v (%v)",
 					tc.version, got, tc.wantMissing, missing)
