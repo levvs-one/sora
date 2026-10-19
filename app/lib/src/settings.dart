@@ -281,7 +281,10 @@ class Settings {
   String get proxyChains => _store.getString('proxyChains') ?? '';
   set proxyChains(String value) => _store.setString('proxyChains', value);
 
-  /// Paired sync devices as JSON: [{id, name, lastSync}] (F9).
+  /// Legacy pre-wiring sync device list (F9). The pre-2026-10-20 screen added
+  /// an entry per scanned code without any handshake, so the entries were
+  /// never paired; the sync screen clears this once with an explanation and
+  /// never writes it again. The daemon is the source of truth for peers.
   String get syncedDevices => _store.getString('syncedDevices') ?? '';
   set syncedDevices(String value) => _store.setString('syncedDevices', value);
 

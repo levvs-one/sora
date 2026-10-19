@@ -1,44 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
-
 /// Pairing payload version. Bump when the QR format changes.
 const syncPairVersion = 1;
 
 /// mDNS service type the Go sync service advertises in the LAN (F9).
 const syncMdnsService = '_sora-sync._tcp';
-
-/// A device paired for end-to-end encrypted sync (F9).
-///
-/// Design: secrets sync too, but only inside the Noise_XX-encrypted channel
-/// owned by the Go sync service (`service/sync`, a separate service — not a
-/// control RPC). The threat model lives in `docs/sync-threat-model.md`.
-/// Status (2026-10-19): the Go service is implemented and tested, but the
-/// app neither launches it nor talks to its local API yet — nothing syncs
-/// from the app side; the sync screen is currently a local device registry.
-class SyncedDevice {
-  SyncedDevice({required this.id, required this.name, this.lastSync});
-
-  final String id;
-  String name;
-  DateTime? lastSync;
-
-  factory SyncedDevice.fromJson(Map<String, dynamic> json) => SyncedDevice(
-        id: json['id'] as String? ?? '',
-        name: json['name'] as String? ?? '',
-        lastSync: switch (json['lastSync']) {
-          final String s => DateTime.tryParse(s),
-          _ => null,
-        },
-      );
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        if (lastSync != null) 'lastSync': lastSync!.toUtc().toIso8601String(),
-      };
-}
 
 /// Pairing handshake data (F9).
 ///
@@ -49,6 +16,11 @@ class SyncedDevice {
 /// sync service accepts too. Invitations are minted by the sync service
 /// (`api.StartPairing`); Dart never invents key material, device ids or
 /// ports.
+///
+/// Status (2026-10-20): wired — the app spawns the daemon ([SyncDaemon]),
+/// shows the daemon-minted QR, and joins through the daemon's HTTP API. The
+/// daemon is the source of truth for paired devices; the old app-side
+/// device registry is gone.
 class SyncPairing {
   SyncPairing._();
 
@@ -128,61 +100,5 @@ class SyncPairing {
     final port = int.tryParse(q['port'] ?? '');
     if (port == null || port <= 0 || port > 65535) return null;
     return (deviceId: deviceId, publicKey: publicKey, token: token, port: port);
-  }
-}
-
-/// App-side device registry, persisted as JSON in settings (F9).
-class SyncDevices extends ChangeNotifier {
-  SyncDevices(this._read, this._write) {
-    _load();
-  }
-
-  final String Function() _read;
-  final void Function(String) _write;
-
-  final List<SyncedDevice> _devices = [];
-  List<SyncedDevice> get devices => List.unmodifiable(_devices);
-
-  void _load() {
-    final raw = _read();
-    if (raw.isEmpty) return;
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is List) {
-        for (final item in decoded) {
-          if (item is Map<String, dynamic> && (item['id'] as String? ?? '').isNotEmpty) {
-            _devices.add(SyncedDevice.fromJson(item));
-          }
-        }
-      }
-    } catch (_) {
-      // Corrupt JSON starts empty; the next save overwrites it.
-    }
-  }
-
-  void _save() {
-    _write(jsonEncode([for (final d in _devices) d.toJson()]));
-    notifyListeners();
-  }
-
-  void add(SyncedDevice device) {
-    if (_devices.any((d) => d.id == device.id)) return;
-    _devices.add(device);
-    _save();
-  }
-
-  void revoke(String id) {
-    _devices.removeWhere((d) => d.id == id);
-    _save();
-  }
-
-  void markSynced(String id, DateTime when) {
-    for (final d in _devices) {
-      if (d.id == id) {
-        d.lastSync = when;
-        _save();
-        return;
-      }
-    }
   }
 }

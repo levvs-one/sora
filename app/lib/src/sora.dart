@@ -25,7 +25,7 @@ import 'rules.dart';
 import 'settings.dart';
 import 'notifications.dart';
 import 'obfs.dart';
-import 'sync.dart';
+import 'sync_daemon.dart';
 import 'updates.dart';
 import 'ui/kit.dart' show describe;
 
@@ -87,7 +87,6 @@ class Sora extends ChangeNotifier {
       overrides = OverrideStore(() => settings.subscriptionOverrides, (v) => settings.subscriptionOverrides = v),
       profiles = ProfilesStore(() => settings.networkProfiles, (v) => settings.networkProfiles = v),
       chains = ChainsStore(() => settings.proxyChains, (v) => settings.proxyChains = v),
-      syncDevices = SyncDevices(() => settings.syncedDevices, (v) => settings.syncedDevices = v),
       censor = CensorDetector(() => settings.censorVerdicts, (v) => settings.censorVerdicts = v),
       obfs = ObfsSettings(() => settings.obfs, (v) => settings.obfs = v) {
     overrides.onChanged = () {
@@ -97,7 +96,6 @@ class Sora extends ChangeNotifier {
     };
     profiles.addListener(notifyListeners);
     chains.addListener(notifyListeners);
-    syncDevices.addListener(notifyListeners);
     obfs.addListener(notifyListeners);
     _loadBandwidth();
   }
@@ -525,8 +523,11 @@ class Sora extends ChangeNotifier {
   /// Named proxy chains (FEATURE-PLAN.md F8).
   final ChainsStore chains;
 
-  /// Devices paired for E2E sync (FEATURE-PLAN.md F9).
-  final SyncDevices syncDevices;
+  /// Lifecycle manager for the sora-sync device-sync daemon (F9). The daemon
+  /// is spawned on demand (first opened sync screen) and stopped on app exit;
+  /// it is the source of truth for paired devices — the app keeps no device
+  /// registry of its own.
+  final SyncDaemon syncDaemon = SyncDaemon();
 
   /// Fingerprint of the currently joined network. Unknown until the core
   /// RPC GetNetworkFingerprint lands (F5).
@@ -1124,9 +1125,7 @@ class Sora extends ChangeNotifier {
   Future<void> toggle() async {
     if (cleanupPending) {
       await disconnect();
-    } else if (phase == Phase.off || phase == Phase.offline) {
-      // Offline means the core link is down: connect() then reports
-      // app.core_unavailable honestly instead of silently ignoring the tap.
+    } else if (phase == Phase.off) {
       await connect();
     } else if (phase == Phase.disconnecting) {
       _connectQueued = true;
@@ -1239,10 +1238,6 @@ class Sora extends ChangeNotifier {
       await _readStatus().catchError((Object _) {});
       if (phase == Phase.connecting) phase = Phase.off;
       if (!_stopping && _emitted == before) _emit(ConnectionFailed(failure!));
-      // The session never came up: this was a failed connect, not a crash,
-      // so no restore intent may linger for the next startup (F7 honesty).
-      // Profile-group failover re-runs connect() and re-writes its intent.
-      _clearSessionIntent();
     } finally {
       _connectionWork = null;
       work.complete();
@@ -1932,6 +1927,7 @@ class Sora extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     browserDiagnostics.clear();
+    unawaited(syncDaemon.stop());
     unawaited(_probeCall?.cancel());
     _drop(CoreFailure.unavailable);
     updates.dispose();

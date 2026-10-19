@@ -288,7 +288,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             LinkTile(
               title: s.sync,
-              value: sora.syncDevices.devices.isEmpty ? null : '${sora.syncDevices.devices.length}',
               onTap: () => push<void>(context, const SyncScreen()),
             ),
             SwitchTile(title: s.fragment, value: settings.fragment, onChanged: (v) => set((x) => x.fragment = v)),
