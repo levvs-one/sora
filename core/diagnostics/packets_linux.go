@@ -16,6 +16,9 @@ import (
 
 // CapturePackets reads only the interface owned by the authenticated session.
 // A short snap length keeps packet headers useful without retaining full bodies.
+// Note: the headers include IP addresses, so the capture is raw and sensitive —
+// it is not passed through the redactor. The package doc's "omits local
+// addresses" applies to the redacted event stream, not to captures.
 func CapturePackets(ctx context.Context, device string, duration time.Duration) ([]byte, error) {
 	handle, err := pcapgo.NewEthernetHandle(device)
 	if err != nil {
