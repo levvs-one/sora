@@ -107,7 +107,12 @@ class _QrShareScreenState extends State<QrShareScreen> {
 /// A scanned link flows into the existing import pipeline; nothing new is
 /// parsed here. Without a camera the screen degrades to clipboard import.
 class QrScanScreen extends StatefulWidget {
-  const QrScanScreen({super.key});
+  const QrScanScreen({super.key, this.onScanned});
+
+  /// When set, the raw scanned value is returned through [Navigator.pop]
+  /// instead of running the subscription import flow (used by device
+  /// pairing, FEATURE-PLAN.md F9).
+  final ValueChanged<String>? onScanned;
 
   @override
   State<QrScanScreen> createState() => _QrScanScreenState();
@@ -132,6 +137,13 @@ class _QrScanScreenState extends State<QrScanScreen> {
     final raw = barcodes.isEmpty ? null : barcodes.first.rawValue?.trim();
     if (raw == null || raw.isEmpty) return;
     _handled = true;
+    final onScanned = widget.onScanned;
+    if (onScanned != null) {
+      Navigator.of(context).pop();
+      // Let the scan route finish popping before the caller opens sheets.
+      Future.microtask(() => onScanned(raw));
+      return;
+    }
     unawaited(_import(raw));
   }
 
@@ -140,6 +152,12 @@ class _QrScanScreenState extends State<QrScanScreen> {
     final text = clip?.text?.trim() ?? '';
     if (text.isEmpty || !mounted) return;
     _handled = true;
+    final onScanned = widget.onScanned;
+    if (onScanned != null) {
+      Navigator.of(context).pop();
+      Future.microtask(() => onScanned(text));
+      return;
+    }
     await _import(text);
   }
 
