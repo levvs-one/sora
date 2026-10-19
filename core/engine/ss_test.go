@@ -7,8 +7,9 @@ import (
 )
 
 func ssOutbound(method, password string) Outbound {
+	// A non-default port: the well-known-port warning has its own test.
 	return Outbound{ID: "ss", Protocol: ProtocolShadowsocks,
-		Server: "ss.example.com", Port: 8388, Cipher: method, Password: password}
+		Server: "ss.example.com", Port: 4433, Cipher: method, Password: password}
 }
 
 func TestClassifyShadowsocksMethod(t *testing.T) {
@@ -77,8 +78,9 @@ func TestShadowsocksWarnings(t *testing.T) {
 		{"2022 wrong length", "2022-blake3-aes-256-gcm", key16, []string{WarnShadowsocks2022BadKey}},
 		{"2022 not base64", "2022-blake3-aes-256-gcm", "not-a-key!!", []string{WarnShadowsocks2022BadKey}},
 		{"2022 empty key", "2022-blake3-aes-128-gcm", "", []string{WarnShadowsocks2022BadKey}},
-		{"legacy aead strong password", "aes-256-gcm", "a-long-enough-password", nil},
-		{"legacy aead short password", "aes-256-gcm", "short", []string{WarnShadowsocksWeakPassword}},
+		{"legacy aead strong password", "aes-256-gcm", "a-long-enough-password", []string{WarnShadowsocksLegacyCipher}},
+		{"legacy aead short password", "aes-256-gcm", "short", []string{WarnShadowsocksLegacyCipher, WarnShadowsocksWeakPassword}},
+		{"legacy default cipher", "", "a-long-enough-password", []string{WarnShadowsocksLegacyCipher}},
 		{"stream cipher", "rc4-md5", "password", []string{WarnShadowsocksDeprecatedCipher}},
 		{"stream cipher cfb8", "aes-128-cfb8", "password", []string{WarnShadowsocksDeprecatedCipher}},
 		{"no encryption", "none", "password", []string{WarnShadowsocksNoEncryption}},
@@ -113,9 +115,73 @@ func TestOutboundWarningsIncludeShadowsocks(t *testing.T) {
 	for _, w := range good.Warnings() {
 		switch w {
 		case WarnShadowsocksNoEncryption, WarnShadowsocksDeprecatedCipher,
-			WarnShadowsocksWeakPassword, WarnShadowsocks2022BadKey,
-			WarnShadowsocksUnknownMethod:
+			WarnShadowsocksLegacyCipher, WarnShadowsocksWeakPassword,
+			WarnShadowsocks2022BadKey, WarnShadowsocksUnknownMethod,
+			WarnShadowsocksKnownPort:
 			t.Errorf("valid SS-2022 outbound unexpectedly warns %q", w)
+		}
+	}
+}
+
+func TestShadowsocksKnownPortWarning(t *testing.T) {
+	o := ssOutbound("2022-blake3-aes-256-gcm",
+		base64.StdEncoding.EncodeToString(make([]byte, 32)))
+	o.Port = 8388
+	if got := o.shadowsocksWarnings(); !slices.Equal(got, []string{WarnShadowsocksKnownPort}) {
+		t.Errorf("port 8388 warnings = %v, want [%q]", got, WarnShadowsocksKnownPort)
+	}
+	o.Port = 443
+	if got := o.shadowsocksWarnings(); len(got) != 0 {
+		t.Errorf("port 443 warnings = %v, want none", got)
+	}
+	// Non-SS outbounds never get the port warning.
+	v := Outbound{ID: "v", Protocol: ProtocolVLESS, Server: "v.example.com", Port: 8388}
+	if got := v.shadowsocksWarnings(); len(got) != 0 {
+		t.Errorf("non-SS warnings = %v, want none", got)
+	}
+}
+
+func TestGenerateShadowsocks2022PSK(t *testing.T) {
+	for method, want := range map[string]int{
+		"2022-blake3-aes-128-gcm": 16, "2022-blake3-aes-256-gcm": 32,
+		"2022-blake3-chacha20-poly1305": 32,
+	} {
+		key, err := GenerateShadowsocks2022PSK(method)
+		if err != nil {
+			t.Fatalf("GenerateShadowsocks2022PSK(%q): %v", method, err)
+		}
+		// The generated key must pass the same validation the
+		// migration target will face.
+		raw, ok := decodeShadowsocksPSK(key)
+		if !ok || len(raw) != want {
+			t.Errorf("GenerateShadowsocks2022PSK(%q) decoded to %d bytes, want %d", method, len(raw), want)
+		}
+	}
+	// Keys must be unique per call.
+	a, _ := GenerateShadowsocks2022PSK("2022-blake3-aes-256-gcm")
+	b, _ := GenerateShadowsocks2022PSK("2022-blake3-aes-256-gcm")
+	if a == b {
+		t.Error("two generated PSKs must differ")
+	}
+	// Negative cases: legacy and unknown methods are not 2022 targets.
+	for _, method := range []string{"aes-256-gcm", "rc4-md5", "none", "", "super-cipher"} {
+		if _, err := GenerateShadowsocks2022PSK(method); err == nil {
+			t.Errorf("GenerateShadowsocks2022PSK(%q) must fail", method)
+		}
+	}
+}
+
+func TestShadowsocks2022Methods(t *testing.T) {
+	methods := Shadowsocks2022Methods()
+	if len(methods) == 0 {
+		t.Fatal("no 2022 methods listed")
+	}
+	if methods[0] != DefaultNewShadowsocksMethod {
+		t.Errorf("first method %q must be the default %q", methods[0], DefaultNewShadowsocksMethod)
+	}
+	for _, m := range methods {
+		if classifyShadowsocksMethod(m) != ssClassAEAD2022 {
+			t.Errorf("listed method %q is not AEAD-2022", m)
 		}
 	}
 }

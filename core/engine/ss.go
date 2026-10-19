@@ -10,7 +10,9 @@ package engine
 // Outbound.Warnings). Nothing here changes the wire format; it only advises.
 
 import (
+	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"strings"
 )
 
@@ -133,11 +135,58 @@ const (
 	// WarnShadowsocksUnknownMethod: a method sora does not recognize; the
 	// selected engine may reject it.
 	WarnShadowsocksUnknownMethod = "shadowsocks-unknown-method"
+	// WarnShadowsocksLegacyCipher: a SIP004/SIP007 AEAD method. It works,
+	// but its first-packet length and fully-encrypted shape are passive-
+	// detectable by modern DPI (GFW since 11.2021, TSPU selectively). The
+	// client renders this as the "Legacy" badge; it never blocks or
+	// deletes the server — the user migrates explicitly.
+	WarnShadowsocksLegacyCipher = "shadowsocks-legacy-cipher"
+	// WarnShadowsocksKnownPort: the well-known default Shadowsocks port
+	// 8388. Trivially fingerprintable by port-oriented blocking; new
+	// servers should use a random high port (T020/P07-11).
+	WarnShadowsocksKnownPort = "shadowsocks-known-port"
 )
 
 // minShadowsocksPasswordLen is the password length below which a legacy
 // AEAD password is flagged as weak.
 const minShadowsocksPasswordLen = 16
+
+// wellKnownShadowsocksPort is the default SS port. Servers on it are
+// trivially enumerable by port-oriented blocking.
+const wellKnownShadowsocksPort = 8388
+
+// DefaultNewShadowsocksMethod is the cipher the client pre-selects when
+// the user creates a server by hand: SIP022, not the legacy AEAD. The
+// wire default for imported links without a cipher stays aes-256-gcm —
+// changing it would silently break existing servers.
+const DefaultNewShadowsocksMethod = "2022-blake3-aes-256-gcm"
+
+// Shadowsocks2022Methods lists the SIP022 ciphers for UI pickers, in
+// recommended order.
+func Shadowsocks2022Methods() []string {
+	return []string{
+		"2022-blake3-aes-256-gcm",
+		"2022-blake3-aes-128-gcm",
+		"2022-blake3-chacha20-poly1305",
+	}
+}
+
+// GenerateShadowsocks2022PSK creates a fresh random pre-shared key for a
+// SIP022 method, base64-encoded per SIP022. It backs the client's
+// "upgrade to 2022" migration: new key and new method on the same server
+// entry, no deletion. The caller must deliver the key to the server
+// operator out of band — sora cannot rotate a server-side key by itself.
+func GenerateShadowsocks2022PSK(method string) (string, error) {
+	n, ok := shadowsocks2022KeyLen[normalizeShadowsocksMethod(method)]
+	if !ok {
+		return "", fmt.Errorf("not a Shadowsocks-2022 method: %q", method)
+	}
+	key := make([]byte, n)
+	if _, err := rand.Read(key); err != nil {
+		return "", fmt.Errorf("generate SS-2022 PSK: %w", err)
+	}
+	return base64.StdEncoding.EncodeToString(key), nil
+}
 
 // shadowsocksWarnings classifies the outbound's method and key material
 // into warning codes. It never fails validation: engines differ in the
@@ -155,6 +204,7 @@ func (o Outbound) shadowsocksWarnings() []string {
 	case ssClassStream:
 		out = append(out, WarnShadowsocksDeprecatedCipher)
 	case ssClassAEAD:
+		out = append(out, WarnShadowsocksLegacyCipher)
 		if len(o.Password) < minShadowsocksPasswordLen {
 			out = append(out, WarnShadowsocksWeakPassword)
 		}
@@ -166,6 +216,9 @@ func (o Outbound) shadowsocksWarnings() []string {
 		}
 	case ssClassUnknown:
 		out = append(out, WarnShadowsocksUnknownMethod)
+	}
+	if o.Port == wellKnownShadowsocksPort {
+		out = append(out, WarnShadowsocksKnownPort)
 	}
 	return out
 }
