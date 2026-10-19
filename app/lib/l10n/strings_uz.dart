@@ -1083,6 +1083,62 @@ Find one in the catalog or install from a file.';
   String get extPermNetFetch => 'Fetch URLs from an allowlist';
   @override
   String get extPermBackground => 'Run background tasks';
+  @override
+  String get extPermBackgroundDetail =>
+      'Can wake up on a schedule and run code in the background.';
+
+  @override
+  String get extCapBackground => 'Background tasks';
+  @override
+  String get extCapFilterTitle => 'Capabilities';
+  @override
+  String get extCapNetHook => 'Bypasses & network hooks';
+  @override
+  String get extCapPanel => 'Panels';
+  @override
+  String get extCapRouting => 'Routing rules';
+  @override
+  String get extCapTheme => 'Themes';
+  @override
+  String get extCapWidget => 'Widgets';
+  @override
+  String extCatalogCached(String date) => 'Cached catalog · ${date}';
+  @override
+  String get extChangelog => 'Changelog';
+  @override
+  String get extImageFailed => 'Couldn\'t load the image';
+  @override
+  String get extRatingHow => 'How ratings work';
+  @override
+  String get extRatingHowBody => 'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+  @override
+  String get extScreenshots => 'Screenshots';
+  @override
+  String get extSortRelevance => 'Relevance';
+  @override
+  String get extPermNetworkDetail => 'Internet access is limited to these hosts:';
+  @override
+  String get extBgTitle => 'Background task';
+  @override
+  String get extBgEnabled => 'Run in background';
+  @override
+  String get extBgInterval => 'Run interval';
+  @override
+  String extBgMinutes(int minutes) => '$minutes min';
+  @override
+  String extBgHours(int hours) => '$hours h';
+  @override
+  String get extBgNote =>
+      'Applies immediately. The shortest allowed interval is 15 minutes.';
+  @override
+  String get extBgDisabledNote =>
+      'Enable the extension to manage its background task.';
+  @override
+  String get extCapBackground => 'Runs scheduled tasks in the background';
+  @override
+  String get extCapNetwork => 'Can reach the internet';
+  @override
+  String extCapNetworkHosts(String hosts) => 'Can reach: $hosts';
 
   @override
   String exportLogFile(String name) {

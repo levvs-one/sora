@@ -1085,6 +1085,62 @@ class SRu extends S {
   String get extPermNetFetch => 'Запрашивать URL из разрешённого списка';
   @override
   String get extPermBackground => 'Выполнять фоновые задачи';
+  @override
+  String get extPermBackgroundDetail =>
+      'Может запускаться по расписанию и выполнять код в фоне.';
+
+  @override
+  String get extCapBackground => 'Фоновые задачи';
+  @override
+  String get extCapFilterTitle => 'Возможности';
+  @override
+  String get extCapNetHook => 'Обходы и сетевые хуки';
+  @override
+  String get extCapPanel => 'Панели';
+  @override
+  String get extCapRouting => 'Правила маршрутизации';
+  @override
+  String get extCapTheme => 'Темы';
+  @override
+  String get extCapWidget => 'Виджеты';
+  @override
+  String extCatalogCached(String date) => 'Кэш каталога · ${date}';
+  @override
+  String get extChangelog => 'История версий';
+  @override
+  String get extImageFailed => 'Не удалось загрузить изображение';
+  @override
+  String get extRatingHow => 'Как считаются оценки';
+  @override
+  String get extRatingHowBody => 'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, — один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.';
+  @override
+  String get extScreenshots => 'Скриншоты';
+  @override
+  String get extSortRelevance => 'Сначала подходящие';
+  @override
+  String get extPermNetworkDetail => 'Доступ в интернет ограничен этими хостами:';
+  @override
+  String get extBgTitle => 'Фоновая задача';
+  @override
+  String get extBgEnabled => 'Выполнять в фоне';
+  @override
+  String get extBgInterval => 'Интервал запуска';
+  @override
+  String extBgMinutes(int minutes) => '$minutes мин';
+  @override
+  String extBgHours(int hours) => '$hours ч';
+  @override
+  String get extBgNote =>
+      'Применяется сразу. Минимальный интервал — 15 минут.';
+  @override
+  String get extBgDisabledNote =>
+      'Включите расширение, чтобы управлять фоновой задачей.';
+  @override
+  String get extCapBackground => 'Выполняет задачи по расписанию в фоне';
+  @override
+  String get extCapNetwork => 'Имеет доступ в интернет';
+  @override
+  String extCapNetworkHosts(String hosts) => 'Доступные хосты: $hosts';
 
   @override
   String exportLogFile(String name) {

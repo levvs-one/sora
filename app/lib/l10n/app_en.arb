@@ -486,6 +486,54 @@
   "extPermNetHooks": "Hook into the network path (DPI bypass modules)",
   "extPermNetFetch": "Fetch URLs from an allowlist",
   "extPermBackground": "Run background tasks",
+  "extPermBackgroundDetail": "Can wake up on a schedule and run code in the background.",
+  "extCapBackground": "Background tasks",
+  "extCapFilterTitle": "Capabilities",
+  "extCapNetHook": "Bypasses & network hooks",
+  "extCapPanel": "Panels",
+  "extCapRouting": "Routing rules",
+  "extCapTheme": "Themes",
+  "extCapWidget": "Widgets",
+  "extCatalogCached": "Cached catalog · {date}",
+  "@extCatalogCached": {"placeholders": {"date": {"type": "String"}}},
+  "extChangelog": "Changelog",
+  "extImageFailed": "Couldn't load the image",
+  "extRatingHow": "How ratings work",
+  "extRatingHowBody": "Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.",
+  "extScreenshots": "Screenshots",
+  "extSortRelevance": "Relevance",
+  "extPermNetworkDetail": "Internet access is limited to these hosts:",
+  "extBgTitle": "Background task",
+  "extBgEnabled": "Run in background",
+  "extBgInterval": "Run interval",
+  "extBgMinutes": "{minutes} min",
+  "@extBgMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{hours} h",
+  "@extBgHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Applies immediately. The shortest allowed interval is 15 minutes.",
+  "extBgDisabledNote": "Enable the extension to manage its background task.",
+  "extCapBackground": "Runs scheduled tasks in the background",
+  "extCapNetwork": "Can reach the internet",
+  "extCapNetworkHosts": "Can reach: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
   "exportLogFile": "To {name}",
   "@exportLogFile": {
     "placeholders": {

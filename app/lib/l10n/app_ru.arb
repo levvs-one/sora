@@ -638,6 +638,54 @@
   "extPermNetHooks": "Встраиваться в сетевой тракт (модули обхода DPI)",
   "extPermNetFetch": "Запрашивать URL из разрешённого списка",
   "extPermBackground": "Выполнять фоновые задачи",
+  "extPermBackgroundDetail": "Может запускаться по расписанию и выполнять код в фоне.",
+  "extCapBackground": "Фоновые задачи",
+  "extCapFilterTitle": "Возможности",
+  "extCapNetHook": "Обходы и сетевые хуки",
+  "extCapPanel": "Панели",
+  "extCapRouting": "Правила маршрутизации",
+  "extCapTheme": "Темы",
+  "extCapWidget": "Виджеты",
+  "extCatalogCached": "Кэш каталога · {date}",
+  "@extCatalogCached": {"placeholders": {"date": {"type": "String"}}},
+  "extChangelog": "История версий",
+  "extImageFailed": "Не удалось загрузить изображение",
+  "extRatingHow": "Как считаются оценки",
+  "extRatingHowBody": "Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, — один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.",
+  "extScreenshots": "Скриншоты",
+  "extSortRelevance": "Сначала подходящие",
+  "extPermNetworkDetail": "Доступ в интернет ограничен этими хостами:",
+  "extBgTitle": "Фоновая задача",
+  "extBgEnabled": "Выполнять в фоне",
+  "extBgInterval": "Интервал запуска",
+  "extBgMinutes": "{minutes} мин",
+  "@extBgMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{hours} ч",
+  "@extBgHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Применяется сразу. Минимальный интервал — 15 минут.",
+  "extBgDisabledNote": "Включите расширение, чтобы управлять фоновой задачей.",
+  "extCapBackground": "Выполняет задачи по расписанию в фоне",
+  "extCapNetwork": "Имеет доступ в интернет",
+  "extCapNetworkHosts": "Доступные хосты: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
   "exportLogFile": "В {name}",
   "@exportLogFile": {
     "placeholders": {

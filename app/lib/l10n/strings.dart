@@ -1874,6 +1874,116 @@ abstract class S {
   String get extPermNetHooks;
   String get extPermNetFetch;
   String get extPermBackground;
+  String get extPermBackgroundDetail;
+
+  /// No description provided for @extCapBackground.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Фоновые задачи'**
+  String get extCapBackground;
+
+  /// No description provided for @extCapFilterTitle.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Возможности'**
+  String get extCapFilterTitle;
+
+  /// No description provided for @extCapNetHook.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Обходы и сетевые хуки'**
+  String get extCapNetHook;
+
+  /// No description provided for @extCapPanel.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Панели'**
+  String get extCapPanel;
+
+  /// No description provided for @extCapRouting.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Правила маршрутизации'**
+  String get extCapRouting;
+
+  /// No description provided for @extCapTheme.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Темы'**
+  String get extCapTheme;
+
+  /// No description provided for @extCapWidget.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Виджеты'**
+  String get extCapWidget;
+
+  /// No description provided for @extCatalogCached.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Кэш каталога · {date}'**
+  String extCatalogCached(String date);
+
+  /// No description provided for @extChangelog.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'История версий'**
+  String get extChangelog;
+
+  /// No description provided for @extImageFailed.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Не удалось загрузить изображение'**
+  String get extImageFailed;
+
+  /// No description provided for @extRatingHow.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Как считаются оценки'**
+  String get extRatingHow;
+
+  /// No description provided for @extRatingHowBody.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, — один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.'**
+  String get extRatingHowBody;
+
+  /// No description provided for @extScreenshots.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Скриншоты'**
+  String get extScreenshots;
+
+  /// No description provided for @extSortRelevance.
+  ///
+  /// In ru, this message translates to:
+  ///
+  /// **'Сначала подходящие'**
+  String get extSortRelevance;
+  String get extPermNetworkDetail;
+  String get extBgTitle;
+  String get extBgEnabled;
+  String get extBgInterval;
+  String extBgMinutes(int minutes);
+  String extBgHours(int hours);
+  String get extBgNote;
+  String get extBgDisabledNote;
+  String get extCapBackground;
+  String get extCapNetwork;
+  String extCapNetworkHosts(String hosts);
 
   /// No description provided for @exportLogFile.
   ///
