@@ -15,10 +15,34 @@ import (
 )
 
 // Official SagerNet rule sets replace geoip and geosite databases removed in
-// sing-box 1.12.
+// sing-box 1.12. sing-box downloads them itself at runtime, so the commit SHA
+// pinned into the URL is the only integrity anchor: with a branch tip in the
+// URL, compromising either SagerNet repository would silently swap everyone's
+// routing rules (A20-16). The refs below are the heads of the rule-set
+// branches, pinned 2026-10-20:
+//
+//	sing-geosite: ea962e34bf255b69f3a66690e4a53900d48b48ea (2026-10-19, "Update rule-set")
+//	sing-geoip:   eb32cd6ed4a16fcb3bf9a36ccebf28e45716ae84 (2026-10-12, "Update rule-set")
+//
+// Source of truth: the "sha" of the head commit at
+// https://api.github.com/repos/SagerNet/{sing-geosite,sing-geoip}/commits/rule-set
+// (also visible at https://api.github.com/repos/SagerNet/<repo>/branches/rule-set).
+// To refresh: take the new head SHAs, verify each serves its files with
+// curl -o /dev/null -w "%{http_code}" \
+//   https://raw.githubusercontent.com/<repo>/<sha>/geosite-category-ads-all.srs
+// (files sit at the branch ROOT, not under a rule-set/ path — the rule-set/
+// segment in old URLs was the branch name, which no longer appears once a SHA
+// is pinned), then replace the refs below. Refresh cadence: together with the
+// geo databases in packaging/engines. The price of pinning is stale data
+// between refreshes; the gain is that no third party can move the data under us.
 const (
-	geoSiteRuleSetURL = "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-%s.srs"
-	geoIPRuleSetURL   = "https://raw.githubusercontent.com/SagerNet/sing-geoip/rule-set/geoip-%s.srs"
+	geoSiteRuleSetRef = "ea962e34bf255b69f3a66690e4a53900d48b48ea" // SagerNet/sing-geosite rule-set @ 2026-10-19
+	geoIPRuleSetRef   = "eb32cd6ed4a16fcb3bf9a36ccebf28e45716ae84" // SagerNet/sing-geoip rule-set @ 2026-10-12
+)
+
+const (
+	geoSiteRuleSetURL = "https://raw.githubusercontent.com/SagerNet/sing-geosite/" + geoSiteRuleSetRef + "/geosite-%s.srs"
+	geoIPRuleSetURL   = "https://raw.githubusercontent.com/SagerNet/sing-geoip/" + geoIPRuleSetRef + "/geoip-%s.srs"
 )
 
 // protocolNaive is the plan protocol string for NaiveProxy. It has no
