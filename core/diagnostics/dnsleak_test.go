@@ -225,3 +225,26 @@ func TestCheckDnsLeaks_IPv6WithPort(t *testing.T) {
 		t.Errorf("IPv6 with port must be bracketed once, got %q", gotAddr)
 	}
 }
+
+// TestCheckDnsLeaks_H3IsNotProbedWithPlainDNS locks the canary policy for
+// DoH3: an encrypted transport must be reported, never probed with a plain
+// UDP query that would misreport its reachability.
+func TestCheckDnsLeaks_H3IsNotProbedWithPlainDNS(t *testing.T) {
+	in := leakInput()
+	in.TunnelResolvers = []diagnostics.TunnelResolver{{Address: "1.1.1.1", Transport: "h3"}}
+	in.Resolve = func(ctx context.Context, resolverAddr, host string) ([]string, error) {
+		t.Error("encrypted transports must not be probed with plain DNS")
+		return nil, errors.New("must not be called")
+	}
+	checks := diagnostics.CheckDnsLeaks(context.Background(), in)
+	tunnel := findCheck(checks, diagnostics.DnsLeakTunnelDNS)
+	if tunnel == nil {
+		t.Fatal("missing tunnel-dns check")
+	}
+	if tunnel.Leaked {
+		t.Errorf("an unprobed h3 resolver is not a leak: %+v", tunnel)
+	}
+	if !strings.Contains(tunnel.Actual, "encrypted transport") {
+		t.Errorf("h3 canary must be reported as skipped, got %q", tunnel.Actual)
+	}
+}

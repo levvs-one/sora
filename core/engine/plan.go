@@ -211,12 +211,15 @@ type Rule struct {
 // DNSTransport is how a DNS server is reached.
 type DNSTransport string
 
-// Transports a DNS server of the plan can be reached by.
+// Transports a DNS server of the plan can be reached by. "h3" is DNS over
+// HTTPS carried by HTTP/3 (DoH3); engines render it with their own H3
+// spelling, never as plain DoH.
 const (
 	DNSPlain  DNSTransport = "udp"
 	DNSTCP    DNSTransport = "tcp"
 	DNSTLS    DNSTransport = "tls"
 	DNSHTTPS  DNSTransport = "https"
+	DNSH3     DNSTransport = "h3"
 	DNSQUIC   DNSTransport = "quic"
 	DNSSystem DNSTransport = "system"
 	DNSFakeIP DNSTransport = "fakeip"

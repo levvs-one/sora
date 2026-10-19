@@ -777,7 +777,7 @@ func splitDNSServer(address string) (host string, port uint16, transport engine.
 		transport engine.DNSTransport
 	}{
 		{"https://", engine.DNSHTTPS},
-		{"h3://", engine.DNSHTTPS},
+		{"h3://", engine.DNSH3},
 		{"tls://", engine.DNSTLS},
 		{"tcp://", engine.DNSTCP},
 		{"quic://", engine.DNSQUIC},

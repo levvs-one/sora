@@ -249,6 +249,7 @@ type dnsConfig struct {
 	EnhancedMode          string              `yaml:"enhanced-mode,omitempty"`
 	FakeIPRange           string              `yaml:"fake-ip-range,omitempty"`
 	FakeIPFilter          []string            `yaml:"fake-ip-filter,omitempty"`
+	FakeIPTTL             *int                `yaml:"fake-ip-ttl,omitempty"`
 	CacheAlgorithm        string              `yaml:"cache-algorithm,omitempty"`
 	RespectRules          *bool               `yaml:"respect-rules,omitempty"`
 	DefaultNameserver     []string            `yaml:"default-nameserver,omitempty"`

@@ -454,6 +454,8 @@ func TestSplitDNSServerParsesPortsSafely(t *testing.T) {
 		{"1.1.1.1:53", "1.1.1.1", 53, engine.DNSPlain},
 		{"tls://dns.example.com:853", "dns.example.com", 853, engine.DNSTLS},
 		{"https://1.1.1.1/dns-query", "1.1.1.1", 0, engine.DNSHTTPS},
+		{"h3://1.1.1.1/dns-query", "1.1.1.1", 0, engine.DNSH3},
+		{"h3://dns.example.com:443/dns-query", "dns.example.com", 443, engine.DNSH3},
 		{"[2001:db8::1]:853", "2001:db8::1", 853, engine.DNSPlain},
 		{"tls://[2001:db8::1]:853", "2001:db8::1", 853, engine.DNSTLS},
 		{"2001:db8::1", "2001:db8::1", 0, engine.DNSPlain},

@@ -260,3 +260,60 @@ func TestRenderDNSH3UsesAddressForm(t *testing.T) {
 	}
 	t.Fatalf("h3 server missing from rendered dns: %v", servers)
 }
+
+func findOutbound(cfg map[string]any, typ string) map[string]any {
+	for _, o := range cfg["outbounds"].([]any) {
+		m := o.(map[string]any)
+		if m["type"] == typ {
+			return m
+		}
+	}
+	return nil
+}
+
+func TestRenderHysteria2BandwidthAndHopping(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolHysteria2)
+	o := &p.Outbounds[0]
+	o.UpMbps, o.DownMbps = 20, 100
+	o.HopPorts = "20000-30000,40000"
+	o.HopInterval = 30
+	cfg := render(t, p)
+	hy2 := findOutbound(cfg, "hysteria2")
+	if hy2 == nil {
+		t.Fatal("no hysteria2 outbound rendered")
+	}
+	// up/down switch the engine from BBR to Brutal congestion control.
+	if hy2["up_mbps"] != float64(20) || hy2["down_mbps"] != float64(100) {
+		t.Fatalf("bandwidth caps not rendered: %v", hy2)
+	}
+	ports, ok := hy2["server_ports"].([]any)
+	if !ok || len(ports) != 2 || ports[0] != "20000-30000" || ports[1] != "40000" {
+		t.Fatalf("hop ports not rendered: %v", hy2["server_ports"])
+	}
+	if hy2["hop_interval"] != "30s" {
+		t.Fatalf("hop interval not rendered: %v", hy2["hop_interval"])
+	}
+	// Salamander obfuscation still renders alongside the tuning fields.
+	if obfs, ok := hy2["obfs"].(map[string]any); !ok || obfs["type"] != "salamander" {
+		t.Fatalf("obfs not rendered: %v", hy2["obfs"])
+	}
+}
+
+func TestRenderTUICTuning(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolTUIC)
+	p.Outbounds[0].CongestionControl = "cubic"
+	p.Outbounds[0].UDPRelayMode = "quic"
+	cfg := render(t, p)
+	tuic := findOutbound(cfg, "tuic")
+	if tuic == nil {
+		t.Fatal("no tuic outbound rendered")
+	}
+	if tuic["congestion_control"] != "cubic" || tuic["udp_relay_mode"] != "quic" {
+		t.Fatalf("tuic tuning not rendered: %v", tuic)
+	}
+	// Default stays BBR, as before.
+	cfg = render(t, enginetest.Plan(engine.ProtocolTUIC))
+	if findOutbound(cfg, "tuic")["congestion_control"] != "bbr" {
+		t.Fatal("tuic default congestion control must stay bbr")
+	}
+}

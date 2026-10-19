@@ -487,6 +487,14 @@ func (r *renderer) dns() (obj, string, error) {
 			server["type"] = "local"
 		case engine.DNSFakeIP:
 			continue
+		case engine.DNSH3:
+			// DoH3 has no legacy "type" spelling; sing-box picks its
+			// HTTP/3 transport from the h3:// address prefix.
+			port := int(s.Port)
+			if port == 0 {
+				port = 443
+			}
+			server["address"] = "h3://" + net.JoinHostPort(s.Address, strconv.Itoa(port)) + "/dns-query"
 		case engine.DNSPlain, engine.DNSTCP, engine.DNSTLS, engine.DNSHTTPS, engine.DNSQUIC, "":
 			server.set("type", orDefault(string(s.Transport), "udp")).set("server", s.Address).set("server_port", int(s.Port))
 		default:
