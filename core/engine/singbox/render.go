@@ -655,14 +655,36 @@ func (r *renderer) proxyFinal() string {
 	return r.final
 }
 
+// tunDefaultMTU replaces the jumbo 9000 default: a 9000-byte TUN MTU lets
+// local apps negotiate MSS 8960, and those segments must then cross the
+// proxied path, where MTUs shrink (tunnels, PPPoE) and filtered ICMP breaks
+// PMTUD, causing stalls and black holes. 1500 yields MSS 1460, sane on every
+// common path; 1400 is the PPPoE-safe alternative the plan may pin
+// explicitly. sing-box exposes no MSS-clamping knob, so the interface MTU is
+// the only renderer-side lever.
+const tunDefaultMTU = 1500
+
+// tunMTU honors an explicit plan MTU; zero or negative means "not set".
+func tunMTU(mtu int) int {
+	if mtu <= 0 {
+		return tunDefaultMTU
+	}
+	return mtu
+}
+
 func tun(t engine.Tun) obj {
 	return obj{
 		"type": "tun", "tag": "tun-in",
 		"address":      t.Addresses(),
 		"auto_route":   runtime.GOOS != "linux",
 		"strict_route": t.StrictRoute,
-		"stack":        orDefault(t.Stack, "mixed"),
-		"mtu":          orDefaultInt(t.MTU, 9000),
+		// sing-box 1.15 deprecated the `stack` option (removed in 1.17):
+		// the migration is to drop it and use sing-tun's own TCP/IP
+		// stack, which outperforms every previous implementation.
+		// Omitting it also matches the engine default on 1.12-1.14, so
+		// nothing changes there. The plan's Stack stays for engines that
+		// still honor it (mihomo, Xray bridge).
+		"mtu": tunMTU(t.MTU),
 	}.set("interface_name", t.DeviceName).
 		// Custom routes replace the default route when auto_route installs
 		// them (Windows/macOS; Linux routing belongs to tunroute). Same

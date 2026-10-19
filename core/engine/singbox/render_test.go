@@ -89,6 +89,45 @@ func TestRenderRefusesWhatSingBoxCannotCarry(t *testing.T) {
 	}
 }
 
+func tunInbound(t *testing.T, cfg map[string]any) map[string]any {
+	t.Helper()
+	for _, in := range cfg["inbounds"].([]any) {
+		if in.(map[string]any)["type"] == "tun" {
+			return in.(map[string]any)
+		}
+	}
+	t.Fatal("no tun inbound rendered")
+	return nil
+}
+
+// TestTunDropsDeprecatedStack: sing-box 1.15 deprecated `stack` (removed in
+// 1.17); the migration is to drop it and use sing-tun's own fast TCP/IP
+// stack. Even an explicit plan stack must not reach the config.
+func TestTunDropsDeprecatedStack(t *testing.T) {
+	for _, stack := range []string{"", "mixed", "system", "gvisor"} {
+		p := enginetest.Plan(engine.ProtocolVLESS)
+		p.Tun = engine.Tun{Enabled: true, Stack: stack}
+		inbound := tunInbound(t, render(t, p))
+		if _, ok := inbound["stack"]; ok {
+			t.Fatalf("stack %q: deprecated `stack` must not be rendered, got %v", stack, inbound["stack"])
+		}
+	}
+}
+
+// TestTunMTUDefaultsSane: the jumbo 9000 default lets apps negotiate MSS
+// 8960, fragmenting or black-holing proxied paths. Default is 1500; an
+// explicit plan MTU still wins; garbage falls back to the default.
+func TestTunMTUDefaultsSane(t *testing.T) {
+	for mtu, want := range map[int]int{0: 1500, -1: 1500, 1400: 1400, 1280: 1280} {
+		p := enginetest.Plan(engine.ProtocolVLESS)
+		p.Tun = engine.Tun{Enabled: true, MTU: mtu}
+		inbound := tunInbound(t, render(t, p))
+		if got, ok := inbound["mtu"].(float64); !ok || int(got) != want {
+			t.Fatalf("plan MTU %d: rendered mtu = %v, want %d", mtu, inbound["mtu"], want)
+		}
+	}
+}
+
 func TestTunUsesSessionAddressesAndLinuxPolicyRouting(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolVLESS)
 	p.Tun = engine.Tun{Enabled: true, IPv4: netip.MustParsePrefix("172.20.0.1/30"), IPv6: netip.MustParsePrefix("fdfe:dcba:9877::1/126")}
