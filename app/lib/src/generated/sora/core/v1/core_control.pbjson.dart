@@ -1859,3 +1859,44 @@ final $typed_data.Uint8List checkDnsLeaksResponseDescriptor =
     $convert.base64Decode('ChVDaGVja0Ruc0xlYWtzUmVzcG9uc2USMgoGY2hlY2tzGAEgAygLMhouc29yYS5jb3JlLnYxLkRu'
         'c0xlYWtDaGVja1IGY2hlY2tzEi0KBWVycm9yGAIgASgLMhcuc29yYS5jb3JlLnYxLlNvcmFFcnJv'
         'clIFZXJyb3I=');
+
+const BenchmarkServersRequest$json = {
+  '1': 'BenchmarkServersRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'server_ids', '3': 3, '4': 3, '5': 9, '10': 'serverIds'},
+    {'1': 'duration_s', '3': 4, '4': 1, '5': 13, '10': 'durationS'},
+    {'1': 'concurrency', '3': 5, '4': 1, '5': 13, '10': 'concurrency'},
+  ],
+};
+
+/// Descriptor for `BenchmarkServersRequest`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN per FEATURE-PLAN.md F2 spec (pending Go protoc codegen).
+final $typed_data.Uint8List benchmarkServersRequestDescriptor =
+    $convert.base64Decode(
+        'ChdCZW5jaG1hcmtTZXJ2ZXJzUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29y'
+        'ZS52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEo'
+        'DFIUY29udHJvbEF1dGhlbnRpY2F0b3ISHQoKc2VydmVyX2lkcxgDIAMoCVIJc2VydmVySWRzEh0K'
+        'CmR1cmF0aW9uX3MYBCABKA1SCWR1cmF0aW9uUxIgCgtjb25jdXJyZW5jeRgFIAEoDVILY29uY3Vy'
+        'cmVuY3k=');
+
+const BandwidthSample$json = {
+  '1': 'BandwidthSample',
+  '2': [
+    {'1': 'server_id', '3': 1, '4': 1, '5': 9, '10': 'serverId'},
+    {'1': 'bytes_per_sec', '3': 2, '4': 1, '5': 4, '10': 'bytesPerSec'},
+    {'1': 'progress_pct', '3': 3, '4': 1, '5': 13, '10': 'progressPct'},
+    {'1': 'done', '3': 4, '4': 1, '5': 8, '10': 'done'},
+    {'1': 'error', '3': 5, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `BandwidthSample`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN per FEATURE-PLAN.md F2 spec (pending Go protoc codegen).
+final $typed_data.Uint8List bandwidthSampleDescriptor =
+    $convert.base64Decode(
+        'Cg9CYW5kd2lkdGhTYW1wbGUSGwoJc2VydmVyX2lkGAEgASgJUghzZXJ2ZXJJZBIiCg1ieXRlc19w'
+        'ZXJfc2VjGAIgASgEUgtieXRlc1BlclNlYxIhCgxwcm9ncmVzc19wY3QYAyABKA1SC3Byb2dyZXNz'
+        'UGN0EhIKBGRvbmUYBCABKAhSBGRvbmUSLQoFZXJyb3IYBSABKAsyFy5zb3JhLmNvcmUudjEuU29y'
+        'YUVycm9yUgVlcnJvcg==');

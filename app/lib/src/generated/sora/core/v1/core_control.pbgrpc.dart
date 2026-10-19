@@ -82,6 +82,15 @@ class CoreControlClient extends $grpc.Client {
     return $createStreamingCall(_$probeServers, $async.Stream.fromIterable([request]), options: options);
   }
 
+  /// HAND-WRITTEN per FEATURE-PLAN.md F2 spec (pending Go protoc codegen).
+  /// Streams real-throughput measurements for the requested servers.
+  $grpc.ResponseStream<$0.BandwidthSample> benchmarkServers(
+    $0.BenchmarkServersRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createStreamingCall(_$benchmarkServers, $async.Stream.fromIterable([request]), options: options);
+  }
+
   $grpc.ResponseFuture<$0.GetStatsResponse> getStats(
     $0.GetStatsRequest request, {
     $grpc.CallOptions? options,
@@ -299,6 +308,11 @@ class CoreControlClient extends $grpc.Client {
       '/sora.core.v1.CoreControl/ProbeServers',
       ($0.ProbeServersRequest value) => value.writeToBuffer(),
       $0.ProbeResult.fromBuffer);
+  // HAND-WRITTEN per FEATURE-PLAN.md F2 spec (pending Go protoc codegen).
+  static final _$benchmarkServers = $grpc.ClientMethod<$0.BenchmarkServersRequest, $0.BandwidthSample>(
+      '/sora.core.v1.CoreControl/BenchmarkServers',
+      ($0.BenchmarkServersRequest value) => value.writeToBuffer(),
+      $0.BandwidthSample.fromBuffer);
   static final _$getStats = $grpc.ClientMethod<$0.GetStatsRequest, $0.GetStatsResponse>(
       '/sora.core.v1.CoreControl/GetStats',
       ($0.GetStatsRequest value) => value.writeToBuffer(),
@@ -452,6 +466,14 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $0.ProbeServersRequest.fromBuffer(value),
         ($0.ProbeResult value) => value.writeToBuffer()));
+    // HAND-WRITTEN per FEATURE-PLAN.md F2 spec (pending Go protoc codegen).
+    $addMethod($grpc.ServiceMethod<$0.BenchmarkServersRequest, $0.BandwidthSample>(
+        'BenchmarkServers',
+        benchmarkServers_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.BenchmarkServersRequest.fromBuffer(value),
+        ($0.BandwidthSample value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.GetStatsRequest, $0.GetStatsResponse>(
         'GetStats',
         getStats_Pre,
@@ -671,6 +693,14 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   }
 
   $async.Stream<$0.ProbeResult> probeServers($grpc.ServiceCall call, $0.ProbeServersRequest request);
+
+  // HAND-WRITTEN per FEATURE-PLAN.md F2 spec (pending Go protoc codegen).
+  $async.Stream<$0.BandwidthSample> benchmarkServers_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.BenchmarkServersRequest> $request) async* {
+    yield* benchmarkServers($call, await $request);
+  }
+
+  $async.Stream<$0.BandwidthSample> benchmarkServers($grpc.ServiceCall call, $0.BenchmarkServersRequest request);
 
   $async.Future<$0.GetStatsResponse> getStats_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.GetStatsRequest> $request) async {

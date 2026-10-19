@@ -8485,3 +8485,214 @@ class CheckDnsLeaksResponse extends $pb.GeneratedMessage {
 
 const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
+
+// ---------------------------------------------------------------------------
+// HAND-WRITTEN per FEATURE-PLAN.md F2 spec (pending Go protoc codegen for the
+// BenchmarkServers RPC). Follows the generated-code pattern exactly; replace
+// with generated output once `protoc-gen-dart` runs against the updated proto.
+// ---------------------------------------------------------------------------
+
+/// Request to benchmark servers by real throughput.
+class BenchmarkServersRequest extends $pb.GeneratedMessage {
+  factory BenchmarkServersRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.Iterable<$core.String>? serverIds,
+    $core.int? durationS,
+    $core.int? concurrency,
+  }) {
+    final result = BenchmarkServersRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (serverIds != null) result.serverIds.addAll(serverIds);
+    if (durationS != null) result.durationS = durationS;
+    if (concurrency != null) result.concurrency = concurrency;
+    return result;
+  }
+
+  BenchmarkServersRequest._();
+
+  factory BenchmarkServersRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BenchmarkServersRequest()..mergeFromBuffer(data, registry);
+  factory BenchmarkServersRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BenchmarkServersRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'BenchmarkServersRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: BenchmarkServersRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..pPS(3, _omitFieldNames ? '' : 'serverIds')
+    ..aI(4, _omitFieldNames ? '' : 'durationS', fieldType: $pb.PbFieldType.OU3)
+    ..aI(5, _omitFieldNames ? '' : 'concurrency', fieldType: $pb.PbFieldType.OU3)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BenchmarkServersRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BenchmarkServersRequest copyWith(void Function(BenchmarkServersRequest) updates) =>
+      super.copyWith((message) => updates(message as BenchmarkServersRequest)) as BenchmarkServersRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use BenchmarkServersRequest() / BenchmarkServersRequest.new instead')
+  static BenchmarkServersRequest create() => BenchmarkServersRequest._();
+  static $pb.GeneratedMessage $_createMessage() => BenchmarkServersRequest._();
+  @$core.override
+  BenchmarkServersRequest createEmptyInstance() => BenchmarkServersRequest._();
+  @$core.pragma('dart2js:noInline')
+  static BenchmarkServersRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<BenchmarkServersRequest>(BenchmarkServersRequest.$_createMessage);
+  static BenchmarkServersRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.String> get serverIds => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.int get durationS => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set durationS($core.int value) => $_setUnsignedInt32(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasDurationS() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearDurationS() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.int get concurrency => $_getIZ(4);
+  @$pb.TagNumber(5)
+  set concurrency($core.int value) => $_setUnsignedInt32(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasConcurrency() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearConcurrency() => $_clearField(5);
+}
+
+/// One throughput sample for a server; done marks the final sample.
+class BandwidthSample extends $pb.GeneratedMessage {
+  factory BandwidthSample({
+    $core.String? serverId,
+    $fixnum.Int64? bytesPerSec,
+    $core.int? progressPct,
+    $core.bool? done,
+    SoraError? error,
+  }) {
+    final result = BandwidthSample._();
+    if (serverId != null) result.serverId = serverId;
+    if (bytesPerSec != null) result.bytesPerSec = bytesPerSec;
+    if (progressPct != null) result.progressPct = progressPct;
+    if (done != null) result.done = done;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  BandwidthSample._();
+
+  factory BandwidthSample.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BandwidthSample()..mergeFromBuffer(data, registry);
+  factory BandwidthSample.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BandwidthSample()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'BandwidthSample',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: BandwidthSample.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'serverId')
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'bytesPerSec', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aI(3, _omitFieldNames ? '' : 'progressPct', fieldType: $pb.PbFieldType.OU3)
+    ..aOB(4, _omitFieldNames ? '' : 'done')
+    ..aOM<SoraError>(5, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BandwidthSample clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BandwidthSample copyWith(void Function(BandwidthSample) updates) =>
+      super.copyWith((message) => updates(message as BandwidthSample)) as BandwidthSample;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use BandwidthSample() / BandwidthSample.new instead')
+  static BandwidthSample create() => BandwidthSample._();
+  static $pb.GeneratedMessage $_createMessage() => BandwidthSample._();
+  @$core.override
+  BandwidthSample createEmptyInstance() => BandwidthSample._();
+  @$core.pragma('dart2js:noInline')
+  static BandwidthSample getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<BandwidthSample>(BandwidthSample.$_createMessage);
+  static BandwidthSample? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get serverId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set serverId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasServerId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearServerId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get bytesPerSec => $_getI64(1);
+  @$pb.TagNumber(2)
+  set bytesPerSec($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasBytesPerSec() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearBytesPerSec() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get progressPct => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set progressPct($core.int value) => $_setUnsignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasProgressPct() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearProgressPct() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get done => $_getBF(3);
+  @$pb.TagNumber(4)
+  set done($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasDone() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearDone() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  SoraError get error => $_getN(4);
+  @$pb.TagNumber(5)
+  set error(SoraError value) => $_setField(5, value);
+  @$pb.TagNumber(5)
+  $core.bool hasError() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearError() => $_clearField(5);
+  @$pb.TagNumber(5)
+  SoraError ensureError() => $_ensure(4);
+}
