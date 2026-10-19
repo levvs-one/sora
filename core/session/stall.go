@@ -86,10 +86,18 @@ func (w *stallWatch) observe(total uint64, demand bool) bool {
 		return false
 	}
 	if total != w.lastTotal {
-		// Bytes moved, or the counters reset under a restarted engine:
-		// either way the tunnel is alive and the episode ends.
+		if total > w.lastTotal {
+			// Bytes moved: the tunnel is alive, the episode ends, and
+			// the reconnect backoff relaxes.
+			w.backoff = stallBackoffBase
+		}
+		// A drop means the counters reset under a restarted engine or
+		// freshly dropped flows: rebaseline on the new counters but
+		// keep the backoff. A stall reconnect drops every flow, so
+		// relaxing the backoff on a drop would reset the loop
+		// protection on every trigger and the backoff could never
+		// compound.
 		w.lastTotal, w.lastProgress = total, now
-		w.backoff = stallBackoffBase
 		return false
 	}
 	if !demand {

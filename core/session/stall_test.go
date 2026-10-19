@@ -144,6 +144,34 @@ func TestStallWatchBackoff(t *testing.T) {
 	}
 }
 
+// A stall reconnect drops every flow, so the byte counters reset on the
+// next tick. That reset must not relax the backoff: consecutive stalls
+// without intervening traffic keep doubling, otherwise the loop
+// protection degrades to a fixed cadence.
+func TestStallWatchCounterResetKeepsBackoff(t *testing.T) {
+	w, c := newStallWatchAt(time.Now())
+	w.markConnected()
+	w.observe(100, true)
+	c.advance(stallWarmup + stallWindow)
+	if !w.observe(100, true) {
+		t.Fatal("the first stall must report")
+	}
+	// The stall reconnect dropped the flows: counters reset to zero.
+	if w.observe(0, true) {
+		t.Fatal("the post-reconnect counter reset must re-baseline, not report")
+	}
+	// The backoff doubled to 2m at the trigger and survived the reset:
+	// one base interval of silence is not enough.
+	c.advance(stallBackoffBase)
+	if w.observe(0, true) {
+		t.Fatal("the backoff must survive the post-reconnect counter reset")
+	}
+	c.advance(stallBackoffBase)
+	if !w.observe(0, true) {
+		t.Fatal("a stall past the surviving backoff must report again")
+	}
+}
+
 // Traffic between stalls proves the tunnel alive and resets the backoff
 // to the base.
 func TestStallWatchProgressResetsBackoff(t *testing.T) {
