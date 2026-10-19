@@ -112,6 +112,8 @@ void main() {
     expect(release.version, '1.0.5');
     expect(release.notes, contains('## Что нового'));
     expect(release.asset('SHA256SUMS').size, greaterThan(0));
+    // The staged update cannot run without the manifest signature.
+    expect(release.asset('SHA256SUMS.minisig').size, greaterThan(0));
     for (final format in PackageFormat.values) {
       for (final name in LinuxInstallation(format, '').filenames(release.version)) {
         expect(release.asset(name).url.host, 'github.com');
@@ -324,8 +326,9 @@ void main() {
           data[name] = utf8.encode('Test bytes for $name');
         }
         data['SHA256SUMS'] = utf8.encode([for (final name in names) '${sha256.convert(data[name]!)}  $name\n'].join());
+        data['SHA256SUMS.minisig'] = utf8.encode('Test minisign signature');
         final assets = {
-          for (final name in [...names, 'SHA256SUMS'])
+          for (final name in [...names, 'SHA256SUMS', 'SHA256SUMS.minisig'])
             name: ReleaseAsset(name, release.asset(name).url, data[name]!.length),
         };
         if (scenario == 'missing') assets.remove(names.last);

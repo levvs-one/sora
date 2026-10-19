@@ -382,13 +382,20 @@ class AppUpdater extends ChangeNotifier {
       // Resolve the whole pair before downloading or invoking any installer.
       final assets = [for (final name in names) release.asset(name)];
       final sums = release.asset('SHA256SUMS');
+      // The privileged helper re-verifies the SHA256SUMS signature as root
+      // before trusting any hash in it (SORA-H1); it refuses to run when the
+      // signature file is missing from the download directory, so the app
+      // must fetch it alongside the manifest.
+      final sumsSig = release.asset('SHA256SUMS.minisig');
       if (_work != null) await _work!.delete(recursive: true);
       final work = _work = await Directory.systemTemp.createTemp('sora-update-');
       final manifest = utf8.decode(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
+      final sigBytes = await _fetch(sumsSig.url, limit: 64 * 1024, size: sumsSig.size);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
       await File('${work.path}/SHA256SUMS').writeAsString(manifest, flush: true);
+      await File('${work.path}/SHA256SUMS.minisig').writeAsBytes(sigBytes, flush: true);
       for (final asset in assets) {
         final file = File('${work.path}/${asset.name}');
         stage = UpdateStage.downloading;
