@@ -271,7 +271,7 @@ func TestHistoryTTLAndPersistence(t *testing.T) {
 	if !hist[0].StaleAt(now.Add(25 * time.Hour)) {
 		t.Fatal("25h-old entry must be stale")
 	}
-	if !hist[0].StaleAt(now) {
+	if hist[0].StaleAt(now) {
 		t.Fatal("fresh entry must not be stale")
 	}
 	if _, err := os.Stat(filepath.Join(dir, historyDir, historyFile)); err != nil {
