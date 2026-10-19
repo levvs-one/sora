@@ -827,8 +827,6 @@ class SUk extends S {
   @override
   String get updateManual =>
       'Виконайте цю команду в терміналі, щоб інсталювати обидва перевірені пакети, а потім повторно відкрийте Sora. Файли залишаються в каталозі завантаження. З’єднання VPN припиниться.';
-  String get updateSignaturePending => 'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
-  String get updateManualSigWarning => 'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
 
   @override
   String get updateCopyCommand => 'Копіювати команду';
@@ -1276,6 +1274,7 @@ Find one in the catalog or install from a file.';
   @override
   String get coreRestoringLink => 'Restoring the link to the core…';
   @override
+  String get updateStageVerify => 'Verifying';
   @override
   String get crashRestoreTitle => 'The last session was interrupted';
 

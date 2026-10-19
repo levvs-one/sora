@@ -826,8 +826,6 @@ class SUr extends S {
   @override
   String get updateManual =>
       'دونوں تصدیق شدہ پیکیجز کو انسٹال کرنے کے لیے اس کمانڈ کو ٹرمینل میں چلائیں، پھر Sora کو دوبارہ کھولیں۔ فائلیں ڈاؤن لوڈ ڈائرکٹری میں رہتی ہیں۔ VPN کنکشن ختم ہو جائے گا۔';
-  String get updateSignaturePending => 'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
-  String get updateManualSigWarning => 'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
 
   @override
   String get updateCopyCommand => 'کمانڈ کاپی کریں۔';
@@ -1275,6 +1273,7 @@ Find one in the catalog or install from a file.';
   @override
   String get coreRestoringLink => 'Restoring the link to the core…';
   @override
+  String get updateStageVerify => 'Verifying';
   @override
   String get crashRestoreTitle => 'The last session was interrupted';
 

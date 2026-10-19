@@ -829,8 +829,6 @@ class SRu extends S {
   @override
   String get updateManual =>
       'Выполните команду в терминале для установки обоих проверенных пакетов, затем откройте Sora снова. Файлы сохранены в каталоге загрузки. VPN-соединение прервётся.';
-  String get updateSignaturePending => 'Подлинность релиза пока не проверяется подписью — церемония ключа подписи ещё не проведена. Файлы сверяются по SHA-256 с манифестом, полученным по TLS.';
-  String get updateManualSigWarning => 'Внимание: подпись манифеста не проверена — файлы ниже сверены только по хэшам. Выполняйте команду, только если доверяете каналу релиза.';
 
   @override
   String get updateCopyCommand => 'Скопировать команду';
@@ -1279,6 +1277,7 @@ class SRu extends S {
   @override
   String get coreRestoringLink => 'Восстанавливаю связь с ядром…';
   @override
+  String get updateStageVerify => 'Проверка';
   @override
   String get crashRestoreTitle => 'Прошлое соединение оборвалось';
 
