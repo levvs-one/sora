@@ -25,6 +25,9 @@ type censorshipWatcher struct {
 	det     *censor.Detector
 	prober  *censor.Prober
 
+	events      <-chan Event
+	unsubscribe func()
+
 	mu         sync.Mutex
 	lastProbe  time.Time
 	lastTarget string
@@ -33,26 +36,33 @@ type censorshipWatcher struct {
 // WatchCensorshipFailures attaches the censorship failure watcher to the
 // session. It is a no-op for nil arguments and attaches at most once per
 // session; the watcher stops with the session. Call it once, right after the
-// session starts.
+// session starts. The journal subscription happens synchronously, so no
+// event between the call and the watcher's first loop is missed.
 func (s *Session) WatchCensorshipFailures(det *censor.Detector, prober *censor.Prober) {
 	if det == nil || prober == nil {
 		return
 	}
 	s.censorWatchOnce.Do(func() {
-		w := &censorshipWatcher{session: s, det: det, prober: prober}
+		events, unsubscribe := s.log.Subscribe(64)
+		w := &censorshipWatcher{
+			session:     s,
+			det:         det,
+			prober:      prober,
+			events:      events,
+			unsubscribe: unsubscribe,
+		}
 		go w.run()
 	})
 }
 
 func (w *censorshipWatcher) run() {
-	events, unsubscribe := w.session.log.Subscribe(64)
-	defer unsubscribe()
+	defer w.unsubscribe()
 	done := w.session.Done()
 	for {
 		select {
 		case <-done:
 			return
-		case ev, ok := <-events:
+		case ev, ok := <-w.events:
 			if !ok {
 				return
 			}

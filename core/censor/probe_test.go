@@ -100,8 +100,8 @@ func TestProbeTCPResetAfterConnect(t *testing.T) {
 
 	a := testProber().Probe(context.Background(), Target{Host: "127.0.0.1", Port: localhostPort(l)})
 	ws := findWhat(a, StageTCP)
-	// A RST that lands during the connect surfaces as a dial error, not as
-	// connect-then-reset: the kernel never reports success.
+	// Whether the RST lands during the connect or just after it is a kernel
+	// race; either way the probe must observe the reset.
 	if !containsWhat(ws, WhatRemoteReset) {
 		t.Fatalf("tcp events = %v, want the reset observed", ws)
 	}
@@ -141,5 +141,10 @@ func TestProbePlainTCPNoTLS(t *testing.T) {
 		if e.Stage == StageTLS {
 			t.Fatalf("plain TCP probe must not fabricate TLS events: %+v", e)
 		}
+	}
+	// The listener closes cleanly: the probe observes the FIN rather than
+	// mistaking a quiet close for interference.
+	if ws := findWhat(a, StageTCP); !containsWhat(ws, WhatRemoteClose) {
+		t.Fatalf("tcp events = %v, want the orderly close observed", ws)
 	}
 }

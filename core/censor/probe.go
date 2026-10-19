@@ -20,6 +20,11 @@ const (
 	defaultHandshakeTimeout = 10 * time.Second
 	defaultResolveTimeout   = 5 * time.Second
 	probeBudget             = 30 * time.Second
+	// postConnectWatch bounds the read watching for an immediate
+	// post-connect teardown on non-TLS targets. Middlebox resets are
+	// immediate; a quietly-held connection is not a signal, so the wait
+	// stays short.
+	postConnectWatch = time.Second
 )
 
 // Prober performs the active measurement behind a verdict: one DNS lookup,
@@ -94,8 +99,13 @@ func (p *Prober) Probe(ctx context.Context, t Target) Attempt {
 	tcpConn := conn
 
 	if !t.TLS {
-		// No TLS on this target: the TCP outcome is the whole measurement.
-		// Do not improvise a handshake the server does not speak.
+		// The TCP leg alone cannot see a post-connect RST: the connect may
+		// succeed and the reset land a moment later. Watch briefly for an
+		// immediate teardown — for non-TLS protocols that RST is the whole
+		// signature. Do not improvise a handshake the server does not speak.
+		if what, detail := peekClose(tcpConn, postConnectWatch); what != WhatUnknown {
+			emit(StageTCP, what, detail)
+		}
 		_ = tcpConn.Close()
 		return a
 	}
@@ -123,6 +133,35 @@ func (p *Prober) Probe(ctx context.Context, t Target) Attempt {
 	emit(StageTLS, WhatReceived, "handshake_complete:"+tls.VersionName(cs.Version))
 	_ = tcpConn.Close()
 	return a
+}
+
+// peekClose watches a fresh connection briefly for an immediate teardown:
+// a RST (RemoteReset) or an orderly FIN (RemoteClose). A server that simply
+// holds the connection yields WhatUnknown — holding still is not a signal,
+// and the probe must not stall on it.
+func peekClose(conn net.Conn, wait time.Duration) (What, string) {
+	defer conn.SetReadDeadline(time.Time{})
+	_ = conn.SetReadDeadline(time.Now().Add(wait))
+	var b [1]byte
+	if _, err := conn.Read(b[:]); err == nil {
+		return WhatReceived, "server sent data first"
+	} else if isReset(err) {
+		return WhatRemoteReset, ""
+	} else if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+		return WhatRemoteClose, ""
+	} else if isTimeout(err) {
+		return WhatUnknown, ""
+	} else {
+		return WhatUnknown, ""
+	}
+}
+
+func isTimeout(err error) bool {
+	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, os.ErrDeadlineExceeded) {
+		return true
+	}
+	var opErr *net.OpError
+	return errors.As(err, &opErr) && opErr.Timeout()
 }
 
 // classifyConnError maps a dial error to who-closed semantics: a timeout is
