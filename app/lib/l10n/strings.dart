@@ -1913,6 +1913,210 @@ abstract class S {
   String get overrideCustomRules;
   String get errBenchmarkUnsupported;
   String benchmarkProgress(int done, int total);
+  /// **'Network profiles'**
+  String get profiles;
+
+  /// **'No profiles yet. Create one to apply settings automatically on known networks.'**
+  String get profilesEmpty;
+
+  /// **'Add profile'**
+  String get profileAdd;
+
+  /// **'Profile name'**
+  String get profileName;
+
+  /// **'Wi-Fi networks (SSID)'**
+  String get profileSsids;
+
+  /// **'Home, Office — comma separated'**
+  String get profileSsidsHint;
+
+  /// **'Gateways'**
+  String get profileGateways;
+
+  /// **'AS numbers'**
+  String get profileAsns;
+
+  /// **'Apply automatically'**
+  String get profileAutoApply;
+
+  /// **'Ask before applying when off'**
+  String get profileAutoApplyHint;
+
+  /// **'Remember current settings'**
+  String get profileSnapshot;
+
+  /// **'Current settings saved into the profile'**
+  String get profileSnapshotDone;
+
+  /// **'Delete profile'**
+  String get profileDelete;
+
+  /// No description provided for @profileDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete profile "{name}"?'**
+  String profileDeleteConfirm(String name);
+
+  /// No description provided for @profileApplyAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply profile "{name}"?'**
+  String profileApplyAsk(String name);
+
+  /// **'Apply'**
+  String get profileApply;
+
+  /// No description provided for @profileApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile "{name}" applied'**
+  String profileApplied(String name);
+
+  /// **'Undo'**
+  String get profileUndo;
+
+  /// **'Active'**
+  String get profileActive;
+
+  /// No description provided for @networkNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Now: {info}'**
+  String networkNow(String info);
+
+  /// **'Network info unavailable'**
+  String get networkUnknown;
+
+  /// **'Add at least one trigger: SSID, gateway or ASN'**
+  String get profileNoTriggers;
+
+  /// **'Proxy chains'**
+  String get chains;
+
+  /// **'No chains yet. Link 2–3 servers so traffic hops through each of them.'**
+  String get chainsEmpty;
+
+  /// **'New chain'**
+  String get chainAdd;
+
+  /// **'Chain name'**
+  String get chainName;
+
+  /// **'Pick 2–3 servers'**
+  String get chainPickServers;
+
+  /// **'Drag to reorder: traffic enters at the top and exits at the bottom.'**
+  String get chainOrderHint;
+
+  /// **'Pick at least 2 servers'**
+  String get chainTooFew;
+
+  /// **'A chain holds at most 3 servers'**
+  String get chainTooMany;
+
+  /// **'Estimated latency'**
+  String get chainEstimate;
+
+  /// **'Save chain'**
+  String get chainSave;
+
+  /// **'Delete chain'**
+  String get chainDelete;
+
+  /// No description provided for @chainDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete chain "{name}"?'**
+  String chainDeleteConfirm(String name);
+
+  /// **'The current engine cannot build chains'**
+  String get chainUnsupported;
+
+  /// No description provided for @chainHop.
+  ///
+  /// In en, this message translates to:
+  /// **'Hop {n}'**
+  String chainHop(String n);
+
+  /// **'Entry'**
+  String get chainEntry;
+
+  /// **'Exit'**
+  String get chainExit;
+
+  /// **'Device sync'**
+  String get sync;
+
+  /// **'My devices'**
+  String get syncDevices;
+
+  /// **'No paired devices. Pair another device to keep subscriptions, rules and settings in sync.'**
+  String get syncEmpty;
+
+  /// **'Pair a device'**
+  String get syncPair;
+
+  /// **'Show my code'**
+  String get syncShowCode;
+
+  /// **'Scan a code'**
+  String get syncScanCode;
+
+  /// **'Revoke'**
+  String get syncRevoke;
+
+  /// No description provided for @syncRevokeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke "{name}"?'**
+  String syncRevokeConfirm(String name);
+
+  /// No description provided for @syncLastSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync: {time}'**
+  String syncLastSync(String time);
+
+  /// **'Never'**
+  String get syncNever;
+
+  /// **'What syncs'**
+  String get syncWhat;
+
+  /// **'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.'**
+  String get syncWhatBody;
+
+  /// **'Devices must be on the same local network'**
+  String get syncNoLan;
+
+  /// **'Device paired'**
+  String get syncPaired;
+
+  /// **'Pair with this device'**
+  String get syncPairingTitle;
+
+  /// **'Waiting for the other device…'**
+  String get syncWaiting;
+
+  /// **'End-to-end encrypted channel. No accounts, no cloud servers.'**
+  String get syncSecureNote;
+
+  /// **'DPI bypass for direct traffic'**
+  String get zapretWithVpn;
+
+  /// **'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.'**
+  String get zapretWithVpnHint;
+
+  /// **'Each server can appear only once'**
+  String get chainDuplicate;
+
+  /// **'Edit'**
+  String get edit;
+
+  /// **'Remove'**
+  String get remove;
+
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

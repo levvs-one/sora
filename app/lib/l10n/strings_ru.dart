@@ -1066,4 +1066,180 @@ class SRu extends S {
   String get errBenchmarkUnsupported => 'Для замера скорости нужна новая версия ядра';
   @override
   String benchmarkProgress(int done, int total) => 'Замер $done из $total…';
+  @override
+  String get profiles => 'Сетевые профили';
+
+  @override
+  String get profilesEmpty => 'Профилей пока нет. Создайте профиль, чтобы настройки применялись автоматически в известных сетях.';
+
+  @override
+  String get profileAdd => 'Добавить профиль';
+
+  @override
+  String get profileName => 'Название профиля';
+
+  @override
+  String get profileSsids => 'Wi-Fi-сети (SSID)';
+
+  @override
+  String get profileSsidsHint => 'Дом, Офис — через запятую';
+
+  @override
+  String get profileGateways => 'Шлюзы';
+
+  @override
+  String get profileAsns => 'Номера AS';
+
+  @override
+  String get profileAutoApply => 'Применять автоматически';
+
+  @override
+  String get profileAutoApplyHint => 'Если выключено — спрашивать перед применением';
+
+  @override
+  String get profileSnapshot => 'Запомнить текущие настройки';
+
+  @override
+  String get profileSnapshotDone => 'Текущие настройки сохранены в профиль';
+
+  @override
+  String get profileDelete => 'Удалить профиль';
+
+  @override
+  String profileDeleteConfirm(String name) => 'Удалить профиль «${name}»?';
+
+  @override
+  String profileApplyAsk(String name) => 'Применить профиль «${name}»?';
+
+  @override
+  String get profileApply => 'Применить';
+
+  @override
+  String profileApplied(String name) => 'Профиль «${name}» применён';
+
+  @override
+  String get profileUndo => 'Отменить';
+
+  @override
+  String get profileActive => 'Активен';
+
+  @override
+  String networkNow(String info) => 'Сейчас: ${info}';
+
+  @override
+  String get networkUnknown => 'Нет данных о сети';
+
+  @override
+  String get profileNoTriggers => 'Добавьте хотя бы один триггер: SSID, шлюз или ASN';
+
+  @override
+  String get chains => 'Цепочки прокси';
+
+  @override
+  String get chainsEmpty => 'Цепочек пока нет. Свяжите 2–3 сервера, чтобы трафик шёл через каждый из них.';
+
+  @override
+  String get chainAdd => 'Новая цепочка';
+
+  @override
+  String get chainName => 'Название цепочки';
+
+  @override
+  String get chainPickServers => 'Выберите 2–3 сервера';
+
+  @override
+  String get chainOrderHint => 'Перетащите, чтобы изменить порядок: трафик входит сверху, выходит снизу.';
+
+  @override
+  String get chainTooFew => 'Выберите минимум 2 сервера';
+
+  @override
+  String get chainTooMany => 'В цепочке максимум 3 сервера';
+
+  @override
+  String get chainEstimate => 'Примерная задержка';
+
+  @override
+  String get chainSave => 'Сохранить цепочку';
+
+  @override
+  String get chainDelete => 'Удалить цепочку';
+
+  @override
+  String chainDeleteConfirm(String name) => 'Удалить цепочку «${name}»?';
+
+  @override
+  String get chainUnsupported => 'Текущий движок не умеет строить цепочки';
+
+  @override
+  String chainHop(String n) => 'Хоп ${n}';
+
+  @override
+  String get chainEntry => 'Вход';
+
+  @override
+  String get chainExit => 'Выход';
+
+  @override
+  String get sync => 'Синхронизация устройств';
+
+  @override
+  String get syncDevices => 'Мои устройства';
+
+  @override
+  String get syncEmpty => 'Нет спаренных устройств. Спарьте другое устройство, чтобы подписки, правила и настройки синхронизировались.';
+
+  @override
+  String get syncPair => 'Спарить устройство';
+
+  @override
+  String get syncShowCode => 'Показать мой код';
+
+  @override
+  String get syncScanCode => 'Сканировать код';
+
+  @override
+  String get syncRevoke => 'Отозвать';
+
+  @override
+  String syncRevokeConfirm(String name) => 'Отозвать «${name}»?';
+
+  @override
+  String syncLastSync(String time) => 'Последний синк: ${time}';
+
+  @override
+  String get syncNever => 'Никогда';
+
+  @override
+  String get syncWhat => 'Что синхронизируется';
+
+  @override
+  String get syncWhatBody => 'Подписки, правила, настройки и сетевые профили. Никогда не синхронизируются: локальные логи, IPC-токены.';
+
+  @override
+  String get syncNoLan => 'Устройства должны быть в одной локальной сети';
+
+  @override
+  String get syncPaired => 'Устройство спарено';
+
+  @override
+  String get syncPairingTitle => 'Спарьтесь с этим устройством';
+
+  @override
+  String get syncWaiting => 'Ожидание другого устройства…';
+
+  @override
+  String get syncSecureNote => 'Канал зашифрован end-to-end. Никаких аккаунтов и облачных серверов.';
+
+  @override
+  String get zapretWithVpn => 'DPI-обход для прямого трафика';
+
+  @override
+  String get zapretWithVpnHint => 'Запускает zapret рядом с VPN-туннелем: туннелированный трафик идёт через VPN, прямой — через обход.';
+  @override
+  String get chainDuplicate => 'Каждый сервер — только один раз';
+  @override
+  String get edit => 'Изменить';
+  @override
+  String get remove => 'Убрать';
 }

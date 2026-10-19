@@ -1047,4 +1047,180 @@ class SEn extends S {
   String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
   @override
   String benchmarkProgress(int done, int total) => 'Measuring $done of $total…';
+  @override
+  String get profiles => 'Network profiles';
+
+  @override
+  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+
+  @override
+  String get profileAdd => 'Add profile';
+
+  @override
+  String get profileName => 'Profile name';
+
+  @override
+  String get profileSsids => 'Wi-Fi networks (SSID)';
+
+  @override
+  String get profileSsidsHint => 'Home, Office — comma separated';
+
+  @override
+  String get profileGateways => 'Gateways';
+
+  @override
+  String get profileAsns => 'AS numbers';
+
+  @override
+  String get profileAutoApply => 'Apply automatically';
+
+  @override
+  String get profileAutoApplyHint => 'Ask before applying when off';
+
+  @override
+  String get profileSnapshot => 'Remember current settings';
+
+  @override
+  String get profileSnapshotDone => 'Current settings saved into the profile';
+
+  @override
+  String get profileDelete => 'Delete profile';
+
+  @override
+  String profileDeleteConfirm(String name) => 'Delete profile "${name}"?';
+
+  @override
+  String profileApplyAsk(String name) => 'Apply profile "${name}"?';
+
+  @override
+  String get profileApply => 'Apply';
+
+  @override
+  String profileApplied(String name) => 'Profile "${name}" applied';
+
+  @override
+  String get profileUndo => 'Undo';
+
+  @override
+  String get profileActive => 'Active';
+
+  @override
+  String networkNow(String info) => 'Now: ${info}';
+
+  @override
+  String get networkUnknown => 'Network info unavailable';
+
+  @override
+  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+
+  @override
+  String get chains => 'Proxy chains';
+
+  @override
+  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+
+  @override
+  String get chainAdd => 'New chain';
+
+  @override
+  String get chainName => 'Chain name';
+
+  @override
+  String get chainPickServers => 'Pick 2–3 servers';
+
+  @override
+  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+
+  @override
+  String get chainTooFew => 'Pick at least 2 servers';
+
+  @override
+  String get chainTooMany => 'A chain holds at most 3 servers';
+
+  @override
+  String get chainEstimate => 'Estimated latency';
+
+  @override
+  String get chainSave => 'Save chain';
+
+  @override
+  String get chainDelete => 'Delete chain';
+
+  @override
+  String chainDeleteConfirm(String name) => 'Delete chain "${name}"?';
+
+  @override
+  String get chainUnsupported => 'The current engine cannot build chains';
+
+  @override
+  String chainHop(String n) => 'Hop ${n}';
+
+  @override
+  String get chainEntry => 'Entry';
+
+  @override
+  String get chainExit => 'Exit';
+
+  @override
+  String get sync => 'Device sync';
+
+  @override
+  String get syncDevices => 'My devices';
+
+  @override
+  String get syncEmpty => 'No paired devices. Pair another device to keep subscriptions, rules and settings in sync.';
+
+  @override
+  String get syncPair => 'Pair a device';
+
+  @override
+  String get syncShowCode => 'Show my code';
+
+  @override
+  String get syncScanCode => 'Scan a code';
+
+  @override
+  String get syncRevoke => 'Revoke';
+
+  @override
+  String syncRevokeConfirm(String name) => 'Revoke "${name}"?';
+
+  @override
+  String syncLastSync(String time) => 'Last sync: ${time}';
+
+  @override
+  String get syncNever => 'Never';
+
+  @override
+  String get syncWhat => 'What syncs';
+
+  @override
+  String get syncWhatBody => 'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.';
+
+  @override
+  String get syncNoLan => 'Devices must be on the same local network';
+
+  @override
+  String get syncPaired => 'Device paired';
+
+  @override
+  String get syncPairingTitle => 'Pair with this device';
+
+  @override
+  String get syncWaiting => 'Waiting for the other device…';
+
+  @override
+  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+
+  @override
+  String get zapretWithVpn => 'DPI bypass for direct traffic';
+
+  @override
+  String get zapretWithVpnHint => 'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+  @override
+  String get chainDuplicate => 'Each server can appear only once';
+  @override
+  String get edit => 'Edit';
+  @override
+  String get remove => 'Remove';
 }
