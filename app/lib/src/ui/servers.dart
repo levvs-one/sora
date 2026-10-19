@@ -703,16 +703,35 @@ class _CustomServersCard extends StatelessWidget {
   }
 }
 
-class _CustomServerRow extends StatelessWidget {
+class _CustomServerRow extends StatefulWidget {
   const _CustomServerRow({required this.server});
 
   final CustomServer server;
+
+  @override
+  State<_CustomServerRow> createState() => _CustomServerRowState();
+}
+
+class _CustomServerRowState extends State<_CustomServerRow> {
+  bool _testing = false;
+
+  /// Runs the core reachability test for this saved server. The outcome
+  /// lands in [Sora.latency] (null when unreachable) and the row rebuilds
+  /// from it; RPC failures surface through the notification stream.
+  Future<void> _test() async {
+    if (_testing) return;
+    final sora = SoraScope.read(context);
+    setState(() => _testing = true);
+    await sora.testCustomServer(widget.server.id);
+    if (mounted) setState(() => _testing = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context);
     final palette = Palette.of(context);
     final s = S.of(context);
+    final server = widget.server;
     final chosen = sora.selected == server.id;
     final ms = sora.latency[server.id];
     final measured = sora.latency.containsKey(server.id);
@@ -756,7 +775,7 @@ class _CustomServerRow extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 3),
                           child: Text(
-                            '${server.protocol.toUpperCase()} | ${server.address}:${server.port}',
+                            '${customProtocolLabel(server.protocol)} | ${server.address}:${server.port}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: Styles.caption.copyWith(color: palette.ink3),
@@ -776,6 +795,23 @@ class _CustomServerRow extends StatelessWidget {
                           : s.milliseconds(ms),
                       textAlign: TextAlign.right,
                       style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                    ),
+                  ),
+                  Tooltip(
+                    message: s.customServerTest,
+                    child: Pressable(
+                      onTap: _testing ? null : () => unawaited(_test()),
+                      radius: 8,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: _testing
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CupertinoActivityIndicator(radius: 9),
+                              )
+                            : Icon(Symbols.network_check_rounded, size: 18, color: palette.ink2),
+                      ),
                     ),
                   ),
                   Tooltip(

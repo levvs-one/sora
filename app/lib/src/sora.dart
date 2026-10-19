@@ -1488,12 +1488,13 @@ class Sora extends ChangeNotifier {
     }
   }
 
-  /// Saves a new custom server; the core assigns its id. Returns null on
-  /// success; failures are reported through the notification stream.
+  /// Saves a new custom server; the core assigns its id (an empty id creates,
+  /// a set id updates). Returns null on success; failures are reported
+  /// through the notification stream.
   Future<CoreFailure?> addCustomServer(CustomServer server) => _call(() async {
     final link = _link!;
-    final answer = await link.custom.createCustomServer(
-      CreateCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, server: server),
+    final answer = await link.custom.saveCustomServer(
+      SaveCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, server: server),
     );
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
     _customServers.add(answer.server);
@@ -1510,25 +1511,31 @@ class Sora extends ChangeNotifier {
     notifyListeners();
   });
 
-  /// Tests reachability of an unsaved custom server draft. Returns the
-  /// outcome; failures are reported through the notification stream.
-  Future<({bool ok, int latencyMs, CoreFailure? failure})> testCustomServer(CustomServer server) async {
+  /// Tests reachability of a saved custom server by id; the core API has no
+  /// draft test, so the only path is save-then-test. On success the outcome
+  /// lands in [latency] (null when unreachable) and listeners are notified;
+  /// failures are reported through the notification stream.
+  Future<({bool reachable, int latencyMs, CoreFailure? failure})> testCustomServer(String id) async {
     recovered('request');
     final link = _link;
     if (link == null) {
       reportFailure(CoreFailure.unavailable);
-      return (ok: false, latencyMs: 0, failure: CoreFailure.unavailable);
+      return (reachable: false, latencyMs: 0, failure: CoreFailure.unavailable);
     }
     try {
       final answer = await link.custom.testCustomServer(
-        TestCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, server: server),
+        TestCustomServerRequest(
+            apiVersion: apiVersion, controlAuthenticator: link.token, id: id, timeoutMs: 5000),
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
-      return (ok: answer.ok, latencyMs: answer.latencyMs, failure: null);
+      final ms = answer.latencyMs.toInt();
+      latency[id] = answer.reachable ? ms : null;
+      notifyListeners();
+      return (reachable: answer.reachable, latencyMs: ms, failure: null);
     } catch (error) {
       final failure = CoreFailure.from(error);
       reportFailure(error);
-      return (ok: false, latencyMs: 0, failure: failure);
+      return (reachable: false, latencyMs: 0, failure: failure);
     }
   }
 
@@ -1652,11 +1659,8 @@ class Sora extends ChangeNotifier {
   bool _degraded(String current, String best) {
     if (best == current) return false;
     final curMs = latency[current];
+    if (latency.containsKey(current) && curMs == null) return true;
     final bestMs = latency[best];
-    // The pinned server stopped answering: move only to a server with real
-    // measurements. Hopping to an unprobed candidate would trade a known-bad
-    // server for an unknown one — and a needless reconnect.
-    if (latency.containsKey(current) && curMs == null) return bestMs != null;
     if (curMs == null || bestMs == null) return false;
     return bestMs * 2 <= curMs && curMs - bestMs >= 100;
   }

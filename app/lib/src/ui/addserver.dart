@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -10,15 +9,28 @@ import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../sora.dart';
 import 'kit.dart';
 
-/// Protocols the core can run for a user-added server.
-const _protocols = ['vless', 'vmess', 'trojan', 'shadowsocks', 'wireguard', 'hysteria2', 'tuic'];
+/// Protocols the core can run for a user-added server: the full
+/// [CustomProtocol] enum minus UNSPECIFIED, which the core rejects.
+const _protocols = [
+  CustomProtocol.CUSTOM_PROTOCOL_VLESS,
+  CustomProtocol.CUSTOM_PROTOCOL_VMESS,
+  CustomProtocol.CUSTOM_PROTOCOL_TROJAN,
+  CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS,
+  CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD,
+];
+
+/// Display name for a custom protocol: the generated enum keeps the
+/// CUSTOM_PROTOCOL_ prefix, the UI shows the bare name (VLESS, VMESS, ...).
+String customProtocolLabel(CustomProtocol protocol) =>
+    protocol.name.replaceFirst('CUSTOM_PROTOCOL_', '');
 
 /// Hostnames, IPv4 and bracketed IPv6: letters, digits and . : - _ [ ].
 final _addressPattern = RegExp(r'^[A-Za-z0-9][A-Za-z0-9.:\-_\[\]]*$');
 
-/// Adds a user-owned server: name, protocol, address, port and optional
-/// credentials. The draft can be reachability-tested before saving; the
-/// secret stays hidden until the user reveals it, like in QR sharing.
+/// Adds a user-owned server: name, protocol, address, port and an optional
+/// write-only secret (UUID, password, key — the core never returns it).
+/// Reachability is tested from the servers list after saving: the core API
+/// tests only saved servers, by id, so there is no pre-save test here.
 class AddServerScreen extends StatefulWidget {
   const AddServerScreen({super.key});
 
@@ -30,16 +42,13 @@ class _AddServerScreenState extends State<AddServerScreen> {
   final _name = TextEditingController();
   final _address = TextEditingController();
   final _port = TextEditingController();
-  final _username = TextEditingController();
-  final _password = TextEditingController();
-  String _protocol = _protocols.first;
+  final _credentials = TextEditingController();
+
+  CustomProtocol _protocol = _protocols.first;
   final _errors = <String, String>{};
 
-  bool _testing = false;
   bool _saving = false;
-  ({bool ok, int latencyMs, CoreFailure? failure})? _testResult;
   CoreFailure? _saveFailure;
-  bool get _busy => _testing || _saving;
 
   @override
   void initState() {
@@ -56,8 +65,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
     _name.dispose();
     _address.dispose();
     _port.dispose();
-    _username.dispose();
-    _password.dispose();
+    _credentials.dispose();
     super.dispose();
   }
 
@@ -78,7 +86,6 @@ class _AddServerScreenState extends State<AddServerScreen> {
       _errors
         ..clear()
         ..addAll(errors);
-      _testResult = null;
       _saveFailure = null;
     });
     return errors.isEmpty;
@@ -89,28 +96,12 @@ class _AddServerScreenState extends State<AddServerScreen> {
     protocol: _protocol,
     address: _address.text.trim(),
     port: int.parse(_port.text.trim()),
-    username: _username.text.trim(),
-    // Secrets are verbatim: never trim the password.
-    password: _password.text,
+    // Secrets are verbatim: never trim the credentials.
+    credentials: _credentials.text,
   );
 
-  Future<void> _test() async {
-    if (_busy || !_validate()) return;
-    final sora = SoraScope.read(context);
-    setState(() {
-      _testing = true;
-      _testResult = null;
-    });
-    final result = await sora.testCustomServer(_draft());
-    if (!mounted) return;
-    setState(() {
-      _testing = false;
-      _testResult = result;
-    });
-  }
-
   Future<void> _save() async {
-    if (_busy || !_validate()) return;
+    if (_saving || !_validate()) return;
     final sora = SoraScope.read(context);
     setState(() {
       _saving = true;
@@ -147,10 +138,10 @@ class _AddServerScreenState extends State<AddServerScreen> {
                 decoration: _decoration(s.customServerNameHint, palette),
               ),
             ),
-            ChoiceTile<String>(
+            ChoiceTile<CustomProtocol>(
               title: s.customServerProtocol,
               value: _protocol,
-              choices: {for (final p in _protocols) p: p.toUpperCase()},
+              choices: {for (final p in _protocols) p: customProtocolLabel(p)},
               onChanged: (p) => setState(() => _protocol = p),
             ),
             _LabeledField(
@@ -179,40 +170,13 @@ class _AddServerScreenState extends State<AddServerScreen> {
             ),
           ],
         ),
-        Heading(s.customServerCredentials),
         Group(
           children: [
-            _LabeledField(
-              label: s.customServerUsername,
+            _SecretField(
+              controller: _credentials,
+              label: s.customServerCredentials,
               hint: s.customServerOptional,
-              child: TextField(
-                controller: _username,
-                textInputAction: TextInputAction.next,
-                autocorrect: false,
-                style: Styles.secondary.copyWith(color: palette.ink),
-                decoration: _decoration(null, palette),
-              ),
             ),
-            _SecretField(controller: _password, label: s.customServerPassword, hint: s.customServerOptional),
-          ],
-        ),
-        Group(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-              child: PrimaryButton(
-                label: s.customServerTest,
-                busy: _testing,
-                onTap: _busy ? null : _test,
-              ),
-            ),
-            if (_testing)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Center(child: CupertinoActivityIndicator(color: palette.ink)),
-              )
-            else if (_testResult != null)
-              _testNote(s, _testResult!),
           ],
         ),
         Padding(
@@ -220,7 +184,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
           child: PrimaryButton(
             label: s.save,
             busy: _saving,
-            onTap: _busy ? null : _save,
+            onTap: _saving ? null : _save,
           ),
         ),
         if (_saveFailure != null) _note(context, Symbols.info_rounded, describe(s, _saveFailure!)),
@@ -230,13 +194,6 @@ class _AddServerScreenState extends State<AddServerScreen> {
 
   /// A neutral note: info, not an error. Failures are localized through
   /// [describe] and never shown raw or in red.
-  Widget _testNote(S s, ({bool ok, int latencyMs, CoreFailure? failure}) result) {
-    final failure = result.failure;
-    if (failure != null) return _note(context, Symbols.info_rounded, describe(s, failure));
-    if (result.ok) return _note(context, Symbols.check_rounded, s.customServerTestOk(s.milliseconds(result.latencyMs)));
-    return _note(context, Symbols.info_rounded, s.customServerUnreachable);
-  }
-
   Widget _note(BuildContext context, IconData icon, String text) {
     final palette = Palette.of(context);
     return Padding(
@@ -295,7 +252,7 @@ class _LabeledField extends StatelessWidget {
           if (error != null)
             Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Text(error!, style: Styles.caption.copyWith(color: palette.danger)),
+              child: Text(error!, style: Styles.dangerCaption(context)),
             ),
         ],
       ),

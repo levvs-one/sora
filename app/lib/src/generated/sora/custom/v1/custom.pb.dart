@@ -6,26 +6,31 @@
 //
 // Wire contract (must match proto/sora/custom/v1/custom.proto):
 //   package sora.custom.v1; imports sora/core/v1/core_control.proto
-//   message CustomServer {
-//     string id = 1;        // assigned by the core on create; empty on create requests
-//     string name = 2;
-//     string protocol = 3;  // vless | vmess | trojan | shadowsocks | wireguard | hysteria2 | tuic
-//     string address = 4;   // hostname or IP
-//     uint32 port = 5;
-//     string username = 6;  // optional
-//     string password = 7;  // write-only: accepted on create/update, never returned
-//     bool secret_stored = 8;  // response-only: a secret is stored for this server
+//   enum CustomProtocol {
+//     CUSTOM_PROTOCOL_UNSPECIFIED = 0;
+//     CUSTOM_PROTOCOL_VLESS = 1;
+//     CUSTOM_PROTOCOL_VMESS = 2;
+//     CUSTOM_PROTOCOL_TROJAN = 3;
+//     CUSTOM_PROTOCOL_SHADOWSOCKS = 4;
+//     CUSTOM_PROTOCOL_WIREGUARD = 5;
 //   }
+//   message CustomServer {
+//     string id = 1;            // empty on save-create; the core assigns an id
+//     string name = 2;
+//     CustomProtocol protocol = 3;
+//     string address = 4;       // hostname or IP
+//     uint32 port = 5;
+//     string credentials = 6;   // write-only: accepted on save, never returned
+//     bool has_credentials = 7; // read-only: the core holds credentials
+//   }
+//   message SaveCustomServerRequest  { ApiVersion api_version = 1; bytes control_authenticator = 2; CustomServer server = 3; }
+//   message SaveCustomServerResponse { CustomServer server = 1; SoraError error = 2; }
 //   message ListCustomServersRequest  { ApiVersion api_version = 1; bytes control_authenticator = 2; }
-//   message ListCustomServersResponse { SoraError error = 1; repeated CustomServer servers = 2; }
-//   message CreateCustomServerRequest  { ApiVersion api_version = 1; bytes control_authenticator = 2; CustomServer server = 3; }
-//   message CreateCustomServerResponse { SoraError error = 1; CustomServer server = 2; }
-//   message UpdateCustomServerRequest  { ApiVersion api_version = 1; bytes control_authenticator = 2; CustomServer server = 3; }
-//   message UpdateCustomServerResponse { SoraError error = 1; CustomServer server = 2; }
+//   message ListCustomServersResponse { repeated CustomServer servers = 1; SoraError error = 2; }
 //   message DeleteCustomServerRequest  { ApiVersion api_version = 1; bytes control_authenticator = 2; string id = 3; }
 //   message DeleteCustomServerResponse { SoraError error = 1; }
-//   message TestCustomServerRequest  { ApiVersion api_version = 1; bytes control_authenticator = 2; CustomServer server = 3; }
-//   message TestCustomServerResponse { SoraError error = 1; bool ok = 2; uint32 latency_ms = 3; }
+//   message TestCustomServerRequest  { ApiVersion api_version = 1; bytes control_authenticator = 2; string id = 3; uint32 timeout_ms = 4; }
+//   message TestCustomServerResponse { bool reachable = 1; uint64 latency_ms = 2; SoraError error = 3; }
 
 // @dart = 3.3
 
@@ -37,9 +42,14 @@
 
 import 'dart:core' as $core;
 
+import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import '../../core/v1/core_control.pb.dart' as $0;
+
+import 'custom.pbenum.dart';
+
+export 'custom.pbenum.dart';
 
 const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
@@ -49,12 +59,11 @@ class CustomServer extends $pb.GeneratedMessage {
   factory CustomServer({
     $core.String? id,
     $core.String? name,
-    $core.String? protocol,
+    CustomProtocol? protocol,
     $core.String? address,
     $core.int? port,
-    $core.String? username,
-    $core.String? password,
-    $core.bool? secretStored,
+    $core.String? credentials,
+    $core.bool? hasCredentials,
   }) {
     final result = CustomServer._();
     if (id != null) result.id = id;
@@ -62,9 +71,8 @@ class CustomServer extends $pb.GeneratedMessage {
     if (protocol != null) result.protocol = protocol;
     if (address != null) result.address = address;
     if (port != null) result.port = port;
-    if (username != null) result.username = username;
-    if (password != null) result.password = password;
-    if (secretStored != null) result.secretStored = secretStored;
+    if (credentials != null) result.credentials = credentials;
+    if (hasCredentials != null) result.hasCredentials = hasCredentials;
     return result;
   }
 
@@ -82,12 +90,11 @@ class CustomServer extends $pb.GeneratedMessage {
       createEmptyInstance: CustomServer.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'name')
-    ..aOS(3, _omitFieldNames ? '' : 'protocol')
+    ..aE<CustomProtocol>(3, _omitFieldNames ? '' : 'protocol', enumValues: CustomProtocol.values)
     ..aOS(4, _omitFieldNames ? '' : 'address')
     ..aI(5, _omitFieldNames ? '' : 'port', fieldType: $pb.PbFieldType.OU3)
-    ..aOS(6, _omitFieldNames ? '' : 'username')
-    ..aOS(7, _omitFieldNames ? '' : 'password')
-    ..aOB(8, _omitFieldNames ? '' : 'secretStored')
+    ..aOS(6, _omitFieldNames ? '' : 'credentials')
+    ..aOB(7, _omitFieldNames ? '' : 'hasCredentials')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -129,9 +136,9 @@ class CustomServer extends $pb.GeneratedMessage {
   void clearName() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get protocol => $_getSZ(2);
+  CustomProtocol get protocol => $_getN(2);
   @$pb.TagNumber(3)
-  set protocol($core.String value) => $_setString(2, value);
+  set protocol(CustomProtocol value) => $_setField(3, value);
   @$pb.TagNumber(3)
   $core.bool hasProtocol() => $_has(2);
   @$pb.TagNumber(3)
@@ -155,34 +162,177 @@ class CustomServer extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearPort() => $_clearField(5);
 
+  /// Write-only: accepted by SaveCustomServer, never returned by the core.
   @$pb.TagNumber(6)
-  $core.String get username => $_getSZ(5);
+  $core.String get credentials => $_getSZ(5);
   @$pb.TagNumber(6)
-  set username($core.String value) => $_setString(5, value);
+  set credentials($core.String value) => $_setString(5, value);
   @$pb.TagNumber(6)
-  $core.bool hasUsername() => $_has(5);
+  $core.bool hasCredentials() => $_has(5);
   @$pb.TagNumber(6)
-  void clearUsername() => $_clearField(6);
+  void clearCredentials() => $_clearField(6);
 
-  /// Write-only: accepted on create/update, never returned by the core.
+  /// Read-only: true when the core holds credentials for this server.
   @$pb.TagNumber(7)
-  $core.String get password => $_getSZ(6);
+  $core.bool get hasCredentials => $_getBF(6);
   @$pb.TagNumber(7)
-  set password($core.String value) => $_setString(6, value);
+  set hasCredentials($core.bool value) => $_setBool(6, value);
   @$pb.TagNumber(7)
-  $core.bool hasPassword() => $_has(6);
+  $core.bool hasHasCredentials() => $_has(6);
   @$pb.TagNumber(7)
-  void clearPassword() => $_clearField(7);
+  void clearHasCredentials() => $_clearField(7);
+}
 
-  /// Response-only: a secret is stored for this server.
-  @$pb.TagNumber(8)
-  $core.bool get secretStored => $_getBF(7);
-  @$pb.TagNumber(8)
-  set secretStored($core.bool value) => $_setBool(7, value);
-  @$pb.TagNumber(8)
-  $core.bool hasSecretStored() => $_has(7);
-  @$pb.TagNumber(8)
-  void clearSecretStored() => $_clearField(8);
+class SaveCustomServerRequest extends $pb.GeneratedMessage {
+  factory SaveCustomServerRequest({
+    $0.ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    CustomServer? server,
+  }) {
+    final result = SaveCustomServerRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (server != null) result.server = server;
+    return result;
+  }
+
+  SaveCustomServerRequest._();
+
+  factory SaveCustomServerRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SaveCustomServerRequest()..mergeFromBuffer(data, registry);
+  factory SaveCustomServerRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SaveCustomServerRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SaveCustomServerRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.custom.v1'),
+      createEmptyInstance: SaveCustomServerRequest.$_createMessage)
+    ..aOM<$0.ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: $0.ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOM<CustomServer>(3, _omitFieldNames ? '' : 'server', subBuilder: CustomServer.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SaveCustomServerRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SaveCustomServerRequest copyWith(void Function(SaveCustomServerRequest) updates) =>
+      super.copyWith((message) => updates(message as SaveCustomServerRequest)) as SaveCustomServerRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SaveCustomServerRequest() / SaveCustomServerRequest.new instead')
+  static SaveCustomServerRequest create() => SaveCustomServerRequest._();
+  static $pb.GeneratedMessage $_createMessage() => SaveCustomServerRequest._();
+  @$core.override
+  SaveCustomServerRequest createEmptyInstance() => SaveCustomServerRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SaveCustomServerRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SaveCustomServerRequest>(SaveCustomServerRequest.$_createMessage);
+  static SaveCustomServerRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $0.ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion($0.ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  $0.ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  CustomServer get server => $_getN(2);
+  @$pb.TagNumber(3)
+  set server(CustomServer value) => $_setField(3, value);
+  @$pb.TagNumber(3)
+  $core.bool hasServer() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearServer() => $_clearField(3);
+  @$pb.TagNumber(3)
+  CustomServer ensureServer() => $_ensure(2);
+}
+
+class SaveCustomServerResponse extends $pb.GeneratedMessage {
+  factory SaveCustomServerResponse({
+    CustomServer? server,
+    $0.SoraError? error,
+  }) {
+    final result = SaveCustomServerResponse._();
+    if (server != null) result.server = server;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  SaveCustomServerResponse._();
+
+  factory SaveCustomServerResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SaveCustomServerResponse()..mergeFromBuffer(data, registry);
+  factory SaveCustomServerResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SaveCustomServerResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SaveCustomServerResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.custom.v1'),
+      createEmptyInstance: SaveCustomServerResponse.$_createMessage)
+    ..aOM<CustomServer>(1, _omitFieldNames ? '' : 'server', subBuilder: CustomServer.$_createMessage)
+    ..aOM<$0.SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: $0.SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SaveCustomServerResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SaveCustomServerResponse copyWith(void Function(SaveCustomServerResponse) updates) =>
+      super.copyWith((message) => updates(message as SaveCustomServerResponse)) as SaveCustomServerResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SaveCustomServerResponse() / SaveCustomServerResponse.new instead')
+  static SaveCustomServerResponse create() => SaveCustomServerResponse._();
+  static $pb.GeneratedMessage $_createMessage() => SaveCustomServerResponse._();
+  @$core.override
+  SaveCustomServerResponse createEmptyInstance() => SaveCustomServerResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SaveCustomServerResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SaveCustomServerResponse>(SaveCustomServerResponse.$_createMessage);
+  static SaveCustomServerResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  CustomServer get server => $_getN(0);
+  @$pb.TagNumber(1)
+  set server(CustomServer value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasServer() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearServer() => $_clearField(1);
+  @$pb.TagNumber(1)
+  CustomServer ensureServer() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $0.SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error($0.SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  $0.SoraError ensureError() => $_ensure(1);
 }
 
 class ListCustomServersRequest extends $pb.GeneratedMessage {
@@ -276,8 +426,8 @@ class ListCustomServersResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ListCustomServersResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.custom.v1'),
       createEmptyInstance: ListCustomServersResponse.$_createMessage)
-    ..aOM<$0.SoraError>(1, _omitFieldNames ? '' : 'error', subBuilder: $0.SoraError.$_createMessage)
-    ..pPM<CustomServer>(2, _omitFieldNames ? '' : 'servers', subBuilder: CustomServer.$_createMessage)
+    ..pPM<CustomServer>(1, _omitFieldNames ? '' : 'servers', subBuilder: CustomServer.$_createMessage)
+    ..aOM<$0.SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: $0.SoraError.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -301,322 +451,18 @@ class ListCustomServersResponse extends $pb.GeneratedMessage {
   static ListCustomServersResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $0.SoraError get error => $_getN(0);
-  @$pb.TagNumber(1)
-  set error($0.SoraError value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasError() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearError() => $_clearField(1);
-  @$pb.TagNumber(1)
-  $0.SoraError ensureError() => $_ensure(0);
+  $pb.PbList<CustomServer> get servers => $_getList(0);
 
   @$pb.TagNumber(2)
-  $pb.PbList<CustomServer> get servers => $_getList(1);
-}
-
-class CreateCustomServerRequest extends $pb.GeneratedMessage {
-  factory CreateCustomServerRequest({
-    $0.ApiVersion? apiVersion,
-    $core.List<$core.int>? controlAuthenticator,
-    CustomServer? server,
-  }) {
-    final result = CreateCustomServerRequest._();
-    if (apiVersion != null) result.apiVersion = apiVersion;
-    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
-    if (server != null) result.server = server;
-    return result;
-  }
-
-  CreateCustomServerRequest._();
-
-  factory CreateCustomServerRequest.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      CreateCustomServerRequest()..mergeFromBuffer(data, registry);
-  factory CreateCustomServerRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      CreateCustomServerRequest()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateCustomServerRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.custom.v1'),
-      createEmptyInstance: CreateCustomServerRequest.$_createMessage)
-    ..aOM<$0.ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: $0.ApiVersion.$_createMessage)
-    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
-    ..aOM<CustomServer>(3, _omitFieldNames ? '' : 'server', subBuilder: CustomServer.$_createMessage)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  CreateCustomServerRequest clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  CreateCustomServerRequest copyWith(void Function(CreateCustomServerRequest) updates) =>
-      super.copyWith((message) => updates(message as CreateCustomServerRequest)) as CreateCustomServerRequest;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use CreateCustomServerRequest() / CreateCustomServerRequest.new instead')
-  static CreateCustomServerRequest create() => CreateCustomServerRequest._();
-  static $pb.GeneratedMessage $_createMessage() => CreateCustomServerRequest._();
-  @$core.override
-  CreateCustomServerRequest createEmptyInstance() => CreateCustomServerRequest._();
-  @$core.pragma('dart2js:noInline')
-  static CreateCustomServerRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CreateCustomServerRequest>(CreateCustomServerRequest.$_createMessage);
-  static CreateCustomServerRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $0.ApiVersion get apiVersion => $_getN(0);
-  @$pb.TagNumber(1)
-  set apiVersion($0.ApiVersion value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasApiVersion() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearApiVersion() => $_clearField(1);
-  @$pb.TagNumber(1)
-  $0.ApiVersion ensureApiVersion() => $_ensure(0);
-
+  $0.SoraError get error => $_getN(1);
   @$pb.TagNumber(2)
-  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  set error($0.SoraError value) => $_setField(2, value);
   @$pb.TagNumber(2)
-  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  $core.bool hasError() => $_has(1);
   @$pb.TagNumber(2)
-  $core.bool hasControlAuthenticator() => $_has(1);
+  void clearError() => $_clearField(2);
   @$pb.TagNumber(2)
-  void clearControlAuthenticator() => $_clearField(2);
-
-  @$pb.TagNumber(3)
-  CustomServer get server => $_getN(2);
-  @$pb.TagNumber(3)
-  set server(CustomServer value) => $_setField(3, value);
-  @$pb.TagNumber(3)
-  $core.bool hasServer() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearServer() => $_clearField(3);
-  @$pb.TagNumber(3)
-  CustomServer ensureServer() => $_ensure(2);
-}
-
-class CreateCustomServerResponse extends $pb.GeneratedMessage {
-  factory CreateCustomServerResponse({
-    $0.SoraError? error,
-    CustomServer? server,
-  }) {
-    final result = CreateCustomServerResponse._();
-    if (error != null) result.error = error;
-    if (server != null) result.server = server;
-    return result;
-  }
-
-  CreateCustomServerResponse._();
-
-  factory CreateCustomServerResponse.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      CreateCustomServerResponse()..mergeFromBuffer(data, registry);
-  factory CreateCustomServerResponse.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      CreateCustomServerResponse()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateCustomServerResponse',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.custom.v1'),
-      createEmptyInstance: CreateCustomServerResponse.$_createMessage)
-    ..aOM<$0.SoraError>(1, _omitFieldNames ? '' : 'error', subBuilder: $0.SoraError.$_createMessage)
-    ..aOM<CustomServer>(2, _omitFieldNames ? '' : 'server', subBuilder: CustomServer.$_createMessage)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  CreateCustomServerResponse clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  CreateCustomServerResponse copyWith(void Function(CreateCustomServerResponse) updates) =>
-      super.copyWith((message) => updates(message as CreateCustomServerResponse)) as CreateCustomServerResponse;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use CreateCustomServerResponse() / CreateCustomServerResponse.new instead')
-  static CreateCustomServerResponse create() => CreateCustomServerResponse._();
-  static $pb.GeneratedMessage $_createMessage() => CreateCustomServerResponse._();
-  @$core.override
-  CreateCustomServerResponse createEmptyInstance() => CreateCustomServerResponse._();
-  @$core.pragma('dart2js:noInline')
-  static CreateCustomServerResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CreateCustomServerResponse>(CreateCustomServerResponse.$_createMessage);
-  static CreateCustomServerResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $0.SoraError get error => $_getN(0);
-  @$pb.TagNumber(1)
-  set error($0.SoraError value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasError() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearError() => $_clearField(1);
-  @$pb.TagNumber(1)
-  $0.SoraError ensureError() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  CustomServer get server => $_getN(1);
-  @$pb.TagNumber(2)
-  set server(CustomServer value) => $_setField(2, value);
-  @$pb.TagNumber(2)
-  $core.bool hasServer() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearServer() => $_clearField(2);
-  @$pb.TagNumber(2)
-  CustomServer ensureServer() => $_ensure(1);
-}
-
-class UpdateCustomServerRequest extends $pb.GeneratedMessage {
-  factory UpdateCustomServerRequest({
-    $0.ApiVersion? apiVersion,
-    $core.List<$core.int>? controlAuthenticator,
-    CustomServer? server,
-  }) {
-    final result = UpdateCustomServerRequest._();
-    if (apiVersion != null) result.apiVersion = apiVersion;
-    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
-    if (server != null) result.server = server;
-    return result;
-  }
-
-  UpdateCustomServerRequest._();
-
-  factory UpdateCustomServerRequest.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      UpdateCustomServerRequest()..mergeFromBuffer(data, registry);
-  factory UpdateCustomServerRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      UpdateCustomServerRequest()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'UpdateCustomServerRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.custom.v1'),
-      createEmptyInstance: UpdateCustomServerRequest.$_createMessage)
-    ..aOM<$0.ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: $0.ApiVersion.$_createMessage)
-    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
-    ..aOM<CustomServer>(3, _omitFieldNames ? '' : 'server', subBuilder: CustomServer.$_createMessage)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  UpdateCustomServerRequest clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  UpdateCustomServerRequest copyWith(void Function(UpdateCustomServerRequest) updates) =>
-      super.copyWith((message) => updates(message as UpdateCustomServerRequest)) as UpdateCustomServerRequest;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use UpdateCustomServerRequest() / UpdateCustomServerRequest.new instead')
-  static UpdateCustomServerRequest create() => UpdateCustomServerRequest._();
-  static $pb.GeneratedMessage $_createMessage() => UpdateCustomServerRequest._();
-  @$core.override
-  UpdateCustomServerRequest createEmptyInstance() => UpdateCustomServerRequest._();
-  @$core.pragma('dart2js:noInline')
-  static UpdateCustomServerRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<UpdateCustomServerRequest>(UpdateCustomServerRequest.$_createMessage);
-  static UpdateCustomServerRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $0.ApiVersion get apiVersion => $_getN(0);
-  @$pb.TagNumber(1)
-  set apiVersion($0.ApiVersion value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasApiVersion() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearApiVersion() => $_clearField(1);
-  @$pb.TagNumber(1)
-  $0.ApiVersion ensureApiVersion() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  $core.List<$core.int> get controlAuthenticator => $_getN(1);
-  @$pb.TagNumber(2)
-  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasControlAuthenticator() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearControlAuthenticator() => $_clearField(2);
-
-  @$pb.TagNumber(3)
-  CustomServer get server => $_getN(2);
-  @$pb.TagNumber(3)
-  set server(CustomServer value) => $_setField(3, value);
-  @$pb.TagNumber(3)
-  $core.bool hasServer() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearServer() => $_clearField(3);
-  @$pb.TagNumber(3)
-  CustomServer ensureServer() => $_ensure(2);
-}
-
-class UpdateCustomServerResponse extends $pb.GeneratedMessage {
-  factory UpdateCustomServerResponse({
-    $0.SoraError? error,
-    CustomServer? server,
-  }) {
-    final result = UpdateCustomServerResponse._();
-    if (error != null) result.error = error;
-    if (server != null) result.server = server;
-    return result;
-  }
-
-  UpdateCustomServerResponse._();
-
-  factory UpdateCustomServerResponse.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      UpdateCustomServerResponse()..mergeFromBuffer(data, registry);
-  factory UpdateCustomServerResponse.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      UpdateCustomServerResponse()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'UpdateCustomServerResponse',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.custom.v1'),
-      createEmptyInstance: UpdateCustomServerResponse.$_createMessage)
-    ..aOM<$0.SoraError>(1, _omitFieldNames ? '' : 'error', subBuilder: $0.SoraError.$_createMessage)
-    ..aOM<CustomServer>(2, _omitFieldNames ? '' : 'server', subBuilder: CustomServer.$_createMessage)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  UpdateCustomServerResponse clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  UpdateCustomServerResponse copyWith(void Function(UpdateCustomServerResponse) updates) =>
-      super.copyWith((message) => updates(message as UpdateCustomServerResponse)) as UpdateCustomServerResponse;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use UpdateCustomServerResponse() / UpdateCustomServerResponse.new instead')
-  static UpdateCustomServerResponse create() => UpdateCustomServerResponse._();
-  static $pb.GeneratedMessage $_createMessage() => UpdateCustomServerResponse._();
-  @$core.override
-  UpdateCustomServerResponse createEmptyInstance() => UpdateCustomServerResponse._();
-  @$core.pragma('dart2js:noInline')
-  static UpdateCustomServerResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<UpdateCustomServerResponse>(UpdateCustomServerResponse.$_createMessage);
-  static UpdateCustomServerResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $0.SoraError get error => $_getN(0);
-  @$pb.TagNumber(1)
-  set error($0.SoraError value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasError() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearError() => $_clearField(1);
-  @$pb.TagNumber(1)
-  $0.SoraError ensureError() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  CustomServer get server => $_getN(1);
-  @$pb.TagNumber(2)
-  set server(CustomServer value) => $_setField(2, value);
-  @$pb.TagNumber(2)
-  $core.bool hasServer() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearServer() => $_clearField(2);
-  @$pb.TagNumber(2)
-  CustomServer ensureServer() => $_ensure(1);
+  $0.SoraError ensureError() => $_ensure(1);
 }
 
 class DeleteCustomServerRequest extends $pb.GeneratedMessage {
@@ -752,19 +598,21 @@ class DeleteCustomServerResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearError() => $_clearField(1);
   @$pb.TagNumber(1)
-  $0.SoraError ensureError() => $_ensure(0);
+  $0.SoraError ensureError() => $_ensure(1);
 }
 
 class TestCustomServerRequest extends $pb.GeneratedMessage {
   factory TestCustomServerRequest({
     $0.ApiVersion? apiVersion,
     $core.List<$core.int>? controlAuthenticator,
-    CustomServer? server,
+    $core.String? id,
+    $core.int? timeoutMs,
   }) {
     final result = TestCustomServerRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
     if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
-    if (server != null) result.server = server;
+    if (id != null) result.id = id;
+    if (timeoutMs != null) result.timeoutMs = timeoutMs;
     return result;
   }
 
@@ -782,7 +630,8 @@ class TestCustomServerRequest extends $pb.GeneratedMessage {
       createEmptyInstance: TestCustomServerRequest.$_createMessage)
     ..aOM<$0.ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: $0.ApiVersion.$_createMessage)
     ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
-    ..aOM<CustomServer>(3, _omitFieldNames ? '' : 'server', subBuilder: CustomServer.$_createMessage)
+    ..aOS(3, _omitFieldNames ? '' : 'id')
+    ..aI(4, _omitFieldNames ? '' : 'timeoutMs', fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -826,27 +675,34 @@ class TestCustomServerRequest extends $pb.GeneratedMessage {
   void clearControlAuthenticator() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  CustomServer get server => $_getN(2);
+  $core.String get id => $_getSZ(2);
   @$pb.TagNumber(3)
-  set server(CustomServer value) => $_setField(3, value);
+  set id($core.String value) => $_setString(2, value);
   @$pb.TagNumber(3)
-  $core.bool hasServer() => $_has(2);
+  $core.bool hasId() => $_has(2);
   @$pb.TagNumber(3)
-  void clearServer() => $_clearField(3);
-  @$pb.TagNumber(3)
-  CustomServer ensureServer() => $_ensure(2);
+  void clearId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get timeoutMs => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set timeoutMs($core.int value) => $_setUnsignedInt32(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasTimeoutMs() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearTimeoutMs() => $_clearField(4);
 }
 
 class TestCustomServerResponse extends $pb.GeneratedMessage {
   factory TestCustomServerResponse({
+    $core.bool? reachable,
+    $fixnum.Int64? latencyMs,
     $0.SoraError? error,
-    $core.bool? ok,
-    $core.int? latencyMs,
   }) {
     final result = TestCustomServerResponse._();
-    if (error != null) result.error = error;
-    if (ok != null) result.ok = ok;
+    if (reachable != null) result.reachable = reachable;
     if (latencyMs != null) result.latencyMs = latencyMs;
+    if (error != null) result.error = error;
     return result;
   }
 
@@ -862,9 +718,10 @@ class TestCustomServerResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TestCustomServerResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.custom.v1'),
       createEmptyInstance: TestCustomServerResponse.$_createMessage)
-    ..aOM<$0.SoraError>(1, _omitFieldNames ? '' : 'error', subBuilder: $0.SoraError.$_createMessage)
-    ..aOB(2, _omitFieldNames ? '' : 'ok')
-    ..aI(3, _omitFieldNames ? '' : 'latencyMs', fieldType: $pb.PbFieldType.OU3)
+    ..aOB(1, _omitFieldNames ? '' : 'reachable')
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'latencyMs', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOM<$0.SoraError>(3, _omitFieldNames ? '' : 'error', subBuilder: $0.SoraError.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -888,31 +745,31 @@ class TestCustomServerResponse extends $pb.GeneratedMessage {
   static TestCustomServerResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $0.SoraError get error => $_getN(0);
+  $core.bool get reachable => $_getBF(0);
   @$pb.TagNumber(1)
-  set error($0.SoraError value) => $_setField(1, value);
+  set reachable($core.bool value) => $_setBool(0, value);
   @$pb.TagNumber(1)
-  $core.bool hasError() => $_has(0);
+  $core.bool hasReachable() => $_has(0);
   @$pb.TagNumber(1)
-  void clearError() => $_clearField(1);
-  @$pb.TagNumber(1)
-  $0.SoraError ensureError() => $_ensure(0);
+  void clearReachable() => $_clearField(1);
 
   @$pb.TagNumber(2)
-  $core.bool get ok => $_getBF(1);
+  $fixnum.Int64 get latencyMs => $_getI64(1);
   @$pb.TagNumber(2)
-  set ok($core.bool value) => $_setBool(1, value);
+  set latencyMs($fixnum.Int64 value) => $_setInt64(1, value);
   @$pb.TagNumber(2)
-  $core.bool hasOk() => $_has(1);
+  $core.bool hasLatencyMs() => $_has(1);
   @$pb.TagNumber(2)
-  void clearOk() => $_clearField(2);
+  void clearLatencyMs() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $core.int get latencyMs => $_getIZ(2);
+  $0.SoraError get error => $_getN(2);
   @$pb.TagNumber(3)
-  set latencyMs($core.int value) => $_setUnsignedInt32(2, value);
+  set error($0.SoraError value) => $_setField(3, value);
   @$pb.TagNumber(3)
-  $core.bool hasLatencyMs() => $_has(2);
+  $core.bool hasError() => $_has(2);
   @$pb.TagNumber(3)
-  void clearLatencyMs() => $_clearField(3);
+  void clearError() => $_clearField(3);
+  @$pb.TagNumber(3)
+  $0.SoraError ensureError() => $_ensure(2);
 }

@@ -3,6 +3,14 @@
 // protoc is unavailable in this environment, so this client mirrors the
 // protoc-gen-dart output by hand and follows the layout of the generated
 // sora/core/v1 client. Replace with real generated code once the proto lands.
+//
+// Service contract (must match proto/sora/custom/v1/custom.proto):
+//   service CustomServers {
+//     rpc SaveCustomServer(SaveCustomServerRequest) returns (SaveCustomServerResponse);
+//     rpc ListCustomServers(ListCustomServersRequest) returns (ListCustomServersResponse);
+//     rpc DeleteCustomServer(DeleteCustomServerRequest) returns (DeleteCustomServerResponse);
+//     rpc TestCustomServer(TestCustomServerRequest) returns (TestCustomServerResponse);
+//   }
 
 // @dart = 3.3
 
@@ -35,25 +43,18 @@ class CustomServersClient extends $grpc.Client {
 
   CustomServersClient(super.channel, {super.options, super.interceptors});
 
+  $grpc.ResponseFuture<$0.SaveCustomServerResponse> saveCustomServer(
+    $0.SaveCustomServerRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$saveCustomServer, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.ListCustomServersResponse> listCustomServers(
     $0.ListCustomServersRequest request, {
     $grpc.CallOptions? options,
   }) {
     return $createUnaryCall(_$listCustomServers, request, options: options);
-  }
-
-  $grpc.ResponseFuture<$0.CreateCustomServerResponse> createCustomServer(
-    $0.CreateCustomServerRequest request, {
-    $grpc.CallOptions? options,
-  }) {
-    return $createUnaryCall(_$createCustomServer, request, options: options);
-  }
-
-  $grpc.ResponseFuture<$0.UpdateCustomServerResponse> updateCustomServer(
-    $0.UpdateCustomServerRequest request, {
-    $grpc.CallOptions? options,
-  }) {
-    return $createUnaryCall(_$updateCustomServer, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.DeleteCustomServerResponse> deleteCustomServer(
@@ -70,21 +71,16 @@ class CustomServersClient extends $grpc.Client {
     return $createUnaryCall(_$testCustomServer, request, options: options);
   }
 
+  static final _$saveCustomServer =
+      $grpc.ClientMethod<$0.SaveCustomServerRequest, $0.SaveCustomServerResponse>(
+          '/sora.custom.v1.CustomServers/SaveCustomServer',
+          ($0.SaveCustomServerRequest value) => value.writeToBuffer(),
+          $0.SaveCustomServerResponse.fromBuffer);
   static final _$listCustomServers =
       $grpc.ClientMethod<$0.ListCustomServersRequest, $0.ListCustomServersResponse>(
           '/sora.custom.v1.CustomServers/ListCustomServers',
           ($0.ListCustomServersRequest value) => value.writeToBuffer(),
           $0.ListCustomServersResponse.fromBuffer);
-  static final _$createCustomServer =
-      $grpc.ClientMethod<$0.CreateCustomServerRequest, $0.CreateCustomServerResponse>(
-          '/sora.custom.v1.CustomServers/CreateCustomServer',
-          ($0.CreateCustomServerRequest value) => value.writeToBuffer(),
-          $0.CreateCustomServerResponse.fromBuffer);
-  static final _$updateCustomServer =
-      $grpc.ClientMethod<$0.UpdateCustomServerRequest, $0.UpdateCustomServerResponse>(
-          '/sora.custom.v1.CustomServers/UpdateCustomServer',
-          ($0.UpdateCustomServerRequest value) => value.writeToBuffer(),
-          $0.UpdateCustomServerResponse.fromBuffer);
   static final _$deleteCustomServer =
       $grpc.ClientMethod<$0.DeleteCustomServerRequest, $0.DeleteCustomServerResponse>(
           '/sora.custom.v1.CustomServers/DeleteCustomServer',
