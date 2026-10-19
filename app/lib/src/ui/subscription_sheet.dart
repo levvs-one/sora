@@ -5,19 +5,29 @@ import 'package:flutter/services.dart';
 
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
+import '../desktop/links.dart';
 import '../sora.dart';
 import 'kit.dart';
 
 /// Prompts for a subscription URL. Prefills [link] from a browser or messenger
-/// import; otherwise checks the clipboard for a URL.
+/// import; otherwise checks the clipboard for a URL or an import link
+/// (sora://, v2rayn://, …) the user copied from a messenger — the QR import
+/// already routes those here, so the sheet accepts them too.
 Future<void> showSubscriptionSheet(BuildContext context, {String? link, String name = ''}) async {
   final sora = SoraScope.read(context);
   final s = S.of(context);
   var initial = link ?? '';
+  var presetName = name;
   if (link == null) {
     final clip = await Clipboard.getData(Clipboard.kTextPlain);
     final text = clip?.text?.trim() ?? '';
-    if (text.startsWith('https://') && !text.contains('\n')) initial = text;
+    final parsed = parseImportLink(text);
+    if (parsed is AddSubscription) {
+      initial = parsed.url.toString();
+      if (presetName.isEmpty) presetName = parsed.name;
+    } else if (text.startsWith('https://') && !text.contains('\n')) {
+      initial = text;
+    }
   }
   if (!context.mounted) return;
   await showFieldSheet(
@@ -28,7 +38,7 @@ Future<void> showSubscriptionSheet(BuildContext context, {String? link, String n
     initial: initial,
     keyboard: TextInputType.url,
     submit: (url) async {
-      final failure = await sora.addSubscription(url, name: name);
+      final failure = await sora.addSubscription(url, name: presetName);
       return failure == null ? null : '';
     },
   );
