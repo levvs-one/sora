@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/netip"
 	"net/url"
 	"runtime"
 	"strconv"
@@ -622,9 +623,15 @@ func ruleTypeOf(destination string) engine.RuleType {
 		return engine.RuleProcess
 	case strings.Contains(destination, "/"):
 		return engine.RuleIPCIDR
-	case strings.Contains(destination, ":"):
-		return engine.RulePort
 	default:
+		// An IP literal is an IP rule even though IPv6 literals contain
+		// colons; only a bare number is a port (SORA-M14).
+		if addr, err := netip.ParseAddr(destination); err == nil && addr.IsValid() {
+			return engine.RuleIPCIDR
+		}
+		if _, err := strconv.Atoi(destination); err == nil {
+			return engine.RulePort
+		}
 		return engine.RuleDomainKeyword
 	}
 }

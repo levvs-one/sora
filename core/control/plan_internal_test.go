@@ -423,10 +423,10 @@ func TestProfileDisplayMetadataKeepsAdapterAndCredentialsPrivate(t *testing.T) {
 // bytes fail closed instead of producing an empty credential.
 func TestParseCredentialRejectsForeignMaterial(t *testing.T) {
 	for name, material := range map[string][]byte{
-		"empty":       {},
-		"whitespace":  []byte("  \n "),
-		"proxy URL":   []byte("vless://11111111-1111-1111-1111-111111111111@example.com:443?security=reality#x"),
-		"truncated":   []byte(`{"uuid": "11111111-`),
+		"empty":         {},
+		"whitespace":    []byte("  \n "),
+		"proxy URL":     []byte("vless://11111111-1111-1111-1111-111111111111@example.com:443?security=reality#x"),
+		"truncated":     []byte(`{"uuid": "11111111-`),
 		"not an object": []byte(`["uuid"]`),
 	} {
 		t.Run(name, func(t *testing.T) {
@@ -465,6 +465,28 @@ func TestSplitDNSServerParsesPortsSafely(t *testing.T) {
 			if host != tc.host || port != tc.port || transport != tc.transport {
 				t.Errorf("splitDNSServer(%q) = %q, %d, %q; want %q, %d, %q",
 					tc.in, host, port, transport, tc.host, tc.port, tc.transport)
+			}
+		})
+	}
+}
+
+// TestRuleTypeOfDetectsIPAddresses locks SORA-M14: IPv6 literals contain
+// colons but are IP rules, not ports.
+func TestRuleTypeOfDetectsIPAddresses(t *testing.T) {
+	for destination, want := range map[string]engine.RuleType{
+		"2001:db8::1":        engine.RuleIPCIDR,
+		"::1":                engine.RuleIPCIDR,
+		"1.2.3.4":            engine.RuleIPCIDR,
+		"10.0.0.0/8":         engine.RuleIPCIDR,
+		"2001:db8::/32":      engine.RuleIPCIDR,
+		"443":                engine.RulePort,
+		"example.com":        engine.RuleDomainKeyword,
+		"domain:example.com": engine.RuleDomainSuffix,
+		"geosite:google":     engine.RuleGeoSite,
+	} {
+		t.Run(destination, func(t *testing.T) {
+			if got := ruleTypeOf(destination); got != want {
+				t.Errorf("ruleTypeOf(%q) = %q, want %q", destination, got, want)
 			}
 		})
 	}
