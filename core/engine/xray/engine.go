@@ -141,6 +141,21 @@ type traffic struct {
 	Downlink uint64 `json:"downlink"`
 }
 
+// metricsClient talks to the loopback metrics endpoint directly: it must
+// never honor HTTP_PROXY from the environment, or internal stats would be
+// sent to a proxy (SORA-L10).
+var metricsClient = &http.Client{Transport: directTransport()}
+
+// directTransport clones the default transport without its ProxyFromEnvironment.
+func directTransport() http.RoundTripper {
+	if t, ok := http.DefaultTransport.(*http.Transport); ok {
+		direct := t.Clone()
+		direct.Proxy = nil
+		return direct
+	}
+	return &http.Transport{}
+}
+
 func readVars(ctx context.Context, addr string) (vars, error) {
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
@@ -148,7 +163,7 @@ func readVars(ctx context.Context, addr string) (vars, error) {
 	if err != nil {
 		return vars{}, err
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := metricsClient.Do(req)
 	if err != nil {
 		return vars{}, fmt.Errorf("xray: metrics are not reachable: %w", err)
 	}
