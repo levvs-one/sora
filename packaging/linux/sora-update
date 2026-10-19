@@ -8,8 +8,29 @@ umask 077
 
 die() { printf 'sora-update: %s\n' "$*" >&2; exit 1; }
 [ "$(id -u)" -eq 0 ] || die 'administrator rights are required'
-[ "$#" -eq 3 ] || die 'expected format, version and download directory'
+allow_downgrade=
+case "$#" in
+3) ;;
+4)
+    [ "$4" = --allow-downgrade ] || die 'the fourth argument must be --allow-downgrade'
+    allow_downgrade=1
+    ;;
+*) die 'expected format, version, download directory and optional --allow-downgrade' ;;
+esac
 format=$1 version=$2 source=$3
+
+# version_ge reports whether dotted-numeric A >= B.
+version_ge() {
+    _i=1
+    while [ "$_i" -le 3 ]; do
+        _x=$(printf '%s' "$1" | cut -d. -f"$_i")
+        _y=$(printf '%s' "$2" | cut -d. -f"$_i")
+        [ "$_x" -gt "$_y" ] && return 0
+        [ "$_x" -lt "$_y" ] && return 1
+        _i=$((_i + 1))
+    done
+    return 0
+}
 
 # --- Release signature trust anchor (SORA-H1) ---
 # Minisign public key of the release signer, embedded at release time.
@@ -63,6 +84,23 @@ arch)
     ;;
 *) die 'unsupported package format' ;;
 esac
+
+# --- Downgrade protection (SORA-L4) ---
+# The privileged helper must not install an older release when invoked
+# directly: compare against the installed version and refuse a downgrade
+# without an explicit --allow-downgrade.
+installed_version() {
+    case "$format" in
+    deb) dpkg-query -W -f='${Version}' sora-core ;;
+    rpm) rpm -q --qf '%{VERSION}' sora-core ;;
+    arch) pacman -Q sora-core | awk '{print $2}' | sed 's/-[^-]*$//' ;;
+    esac
+}
+current=$(installed_version)
+printf '%s\n' "$current" | LC_ALL=C grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' || die "cannot determine the installed version ('$current')"
+if [ -z "$allow_downgrade" ] && ! version_ge "$version" "$current"; then
+    die "downgrade from $current to $version refused; pass --allow-downgrade to override"
+fi
 
 work=$(mktemp -d /var/tmp/sora-update.XXXXXXXX)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
