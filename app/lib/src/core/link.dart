@@ -30,7 +30,7 @@ class CoreLink {
   /// User-added servers (sora.custom.v1); the core may not implement it yet.
   final CustomServersClient custom;
 
-  /// Leak-test suite (sora.leak.v1); the core may not implement it yet.
+  /// Leak-test suite (sora.leak.v1, API 1.11).
   final LeakServiceClient leak;
 
   /// Traffic obfuscation (sora.obfs.v1, API 1.11); the core may not

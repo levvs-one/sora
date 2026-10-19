@@ -85,6 +85,9 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
       setState(() {
         _needsConnection = false;
         _failure = CoreFailure.unavailable;
+        _results = [];
+        _finished = false;
+        _fixed.clear();
       });
       return;
     }
@@ -257,6 +260,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
     final sora = SoraScope.of(context);
     final palette = Palette.of(context);
     final failed = !result.pass;
+    final skipped = result.skipped;
     final canFix = _killSwitchFixApplies(result, sora.settings.killSwitch) &&
         !_running &&
         !_fixed.contains(result.test.id);
@@ -268,9 +272,15 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
           Row(
             children: [
               Icon(
-                failed ? Symbols.warning_rounded : Symbols.check_circle_rounded,
+                // A skipped test passes by definition but is not a verified
+                // pass: it gets a neutral info mark, not the check mark.
+                failed
+                    ? Symbols.warning_rounded
+                    : skipped
+                        ? Symbols.info_rounded
+                        : Symbols.check_circle_rounded,
                 size: 16,
-                color: palette.ink,
+                color: skipped ? palette.ink2 : palette.ink,
               ),
               const SizedBox(width: 8),
               Expanded(
