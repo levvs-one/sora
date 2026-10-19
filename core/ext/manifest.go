@@ -78,7 +78,8 @@ var allowedCapabilities = map[string]bool{
 }
 
 var (
-	idPattern      = regexp.MustCompile(`^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)+$`)
+	// Reverse-DNS with at least two labels; hyphens allowed inside a label.
+	idPattern      = regexp.MustCompile(`^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$`)
 	panelIDPattern = regexp.MustCompile(`^[a-zA-Z0-9_-]{1,64}$`)
 	semverPattern  = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)([-+][0-9A-Za-z.-]+)?$`)
 )

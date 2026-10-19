@@ -109,6 +109,12 @@ func TestManifestValid(t *testing.T) {
 	if _, err := ParseManifest(raw); err != nil {
 		t.Fatalf("valid manifest rejected: %v", err)
 	}
+	// Hyphens inside labels are legal reverse-DNS.
+	m.ID = "org.sora.hello-panel"
+	raw, _ = json.Marshal(m)
+	if _, err := ParseManifest(raw); err != nil {
+		t.Fatalf("hyphenated id rejected: %v", err)
+	}
 }
 
 func TestManifestRejects(t *testing.T) {
