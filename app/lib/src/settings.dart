@@ -46,6 +46,7 @@ class Settings {
     'resumeAfterUpdate',
     'serverSortMode',
     'autoSelectMode',
+    'autoSwitchOnDegrade',
     'restoreOnCrash',
     'benchmarkHistory',
     'sessionIntent',

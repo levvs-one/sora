@@ -769,6 +769,8 @@ class ObfsSettings extends ChangeNotifier {
       if (fragment is bool) _fragment = fragment;
       final jitter = json['jitter'];
       if (jitter is bool) _jitter = jitter;
+      // Repair stores written before the jitter setter implied fragmentation.
+      if (_jitter && !_fragment) _fragment = true;
     } catch (_) {
       // Corrupt payload: keep defaults rather than crash the screen.
     }
@@ -808,7 +810,12 @@ class ObfsSettings extends ChangeNotifier {
   }
 
   set jitter(bool value) {
-    if (_jitter == value) return;
+    // Jitter is dead without fragmentation (jitter_ms needs frag_delay_ms >
+    // 0), so enabling jitter implies fragmentation — mirroring how disabling
+    // fragmentation clears jitter below. Without this, {jitter: true,
+    // fragment: false} persists a toggle the wire profile silently ignores.
+    if (_jitter == value && (!value || _fragment)) return;
+    if (value) _fragment = true;
     _jitter = value;
     _preset = obfsPresetCustom;
     _save();

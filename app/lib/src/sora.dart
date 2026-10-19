@@ -277,6 +277,13 @@ class Sora extends ChangeNotifier {
   bool _stopping = false;
   Completer<void>? _connectionWork;
   SessionPlan? _activePlan;
+
+  /// Chain the active session runs through; null for a direct session.
+  /// Included in [currentPlan] so that, while chain-connected, the settings
+  /// comparison sees the real session plan: the "pending changes" banner no
+  /// longer lies, and reconnecting keeps the chain instead of silently
+  /// dropping it.
+  ProxyChain? _activeChain;
   Future<void> _locationWork = Future.value();
   int _selectionRevision = 0;
   int? _pendingSelection;
