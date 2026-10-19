@@ -54,6 +54,11 @@ const (
 	CoreControl_GetBenchmarks_FullMethodName            = "/sora.core.v1.CoreControl/GetBenchmarks"
 	CoreControl_SaveSubscriptionOverride_FullMethodName = "/sora.core.v1.CoreControl/SaveSubscriptionOverride"
 	CoreControl_GetSubscriptionOverride_FullMethodName  = "/sora.core.v1.CoreControl/GetSubscriptionOverride"
+	CoreControl_ListProfiles_FullMethodName             = "/sora.core.v1.CoreControl/ListProfiles"
+	CoreControl_SaveProfile_FullMethodName              = "/sora.core.v1.CoreControl/SaveProfile"
+	CoreControl_DeleteProfile_FullMethodName            = "/sora.core.v1.CoreControl/DeleteProfile"
+	CoreControl_GetNetworkFingerprint_FullMethodName    = "/sora.core.v1.CoreControl/GetNetworkFingerprint"
+	CoreControl_ProbeChain_FullMethodName               = "/sora.core.v1.CoreControl/ProbeChain"
 )
 
 // CoreControlClient is the client API for CoreControl service.
@@ -124,6 +129,18 @@ type CoreControlClient interface {
 	// servers, extra rules and pinned order survive subscription refreshes.
 	SaveSubscriptionOverride(ctx context.Context, in *SaveSubscriptionOverrideRequest, opts ...grpc.CallOption) (*SaveSubscriptionOverrideResponse, error)
 	GetSubscriptionOverride(ctx context.Context, in *GetSubscriptionOverrideRequest, opts ...grpc.CallOption) (*GetSubscriptionOverrideResponse, error)
+	// Since 1.10. Network profiles with automatic matching: the core watches
+	// the network fingerprint and reports ProfileMatched events when a saved
+	// profile matches the current network. Requires the control authenticator:
+	// profiles describe the machine's networks.
+	ListProfiles(ctx context.Context, in *ListProfilesRequest, opts ...grpc.CallOption) (*ListProfilesResponse, error)
+	SaveProfile(ctx context.Context, in *SaveProfileRequest, opts ...grpc.CallOption) (*SaveProfileResponse, error)
+	DeleteProfile(ctx context.Context, in *DeleteProfileRequest, opts ...grpc.CallOption) (*DeleteProfileResponse, error)
+	GetNetworkFingerprint(ctx context.Context, in *GetNetworkFingerprintRequest, opts ...grpc.CallOption) (*GetNetworkFingerprintResponse, error)
+	// Since 1.10. Probes a proxy chain of 2-3 servers: per-hop reachability,
+	// the summed latency estimate, and which installed engines can carry it.
+	// Requires the control authenticator: probes burn traffic.
+	ProbeChain(ctx context.Context, in *ProbeChainRequest, opts ...grpc.CallOption) (*ProbeChainResponse, error)
 }
 
 type coreControlClient struct {
@@ -529,6 +546,56 @@ func (c *coreControlClient) GetSubscriptionOverride(ctx context.Context, in *Get
 	return out, nil
 }
 
+func (c *coreControlClient) ListProfiles(ctx context.Context, in *ListProfilesRequest, opts ...grpc.CallOption) (*ListProfilesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListProfilesResponse)
+	err := c.cc.Invoke(ctx, CoreControl_ListProfiles_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreControlClient) SaveProfile(ctx context.Context, in *SaveProfileRequest, opts ...grpc.CallOption) (*SaveProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SaveProfileResponse)
+	err := c.cc.Invoke(ctx, CoreControl_SaveProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreControlClient) DeleteProfile(ctx context.Context, in *DeleteProfileRequest, opts ...grpc.CallOption) (*DeleteProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteProfileResponse)
+	err := c.cc.Invoke(ctx, CoreControl_DeleteProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreControlClient) GetNetworkFingerprint(ctx context.Context, in *GetNetworkFingerprintRequest, opts ...grpc.CallOption) (*GetNetworkFingerprintResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetNetworkFingerprintResponse)
+	err := c.cc.Invoke(ctx, CoreControl_GetNetworkFingerprint_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreControlClient) ProbeChain(ctx context.Context, in *ProbeChainRequest, opts ...grpc.CallOption) (*ProbeChainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProbeChainResponse)
+	err := c.cc.Invoke(ctx, CoreControl_ProbeChain_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CoreControlServer is the server API for CoreControl service.
 // All implementations must embed UnimplementedCoreControlServer
 // for forward compatibility.
@@ -597,6 +664,18 @@ type CoreControlServer interface {
 	// servers, extra rules and pinned order survive subscription refreshes.
 	SaveSubscriptionOverride(context.Context, *SaveSubscriptionOverrideRequest) (*SaveSubscriptionOverrideResponse, error)
 	GetSubscriptionOverride(context.Context, *GetSubscriptionOverrideRequest) (*GetSubscriptionOverrideResponse, error)
+	// Since 1.10. Network profiles with automatic matching: the core watches
+	// the network fingerprint and reports ProfileMatched events when a saved
+	// profile matches the current network. Requires the control authenticator:
+	// profiles describe the machine's networks.
+	ListProfiles(context.Context, *ListProfilesRequest) (*ListProfilesResponse, error)
+	SaveProfile(context.Context, *SaveProfileRequest) (*SaveProfileResponse, error)
+	DeleteProfile(context.Context, *DeleteProfileRequest) (*DeleteProfileResponse, error)
+	GetNetworkFingerprint(context.Context, *GetNetworkFingerprintRequest) (*GetNetworkFingerprintResponse, error)
+	// Since 1.10. Probes a proxy chain of 2-3 servers: per-hop reachability,
+	// the summed latency estimate, and which installed engines can carry it.
+	// Requires the control authenticator: probes burn traffic.
+	ProbeChain(context.Context, *ProbeChainRequest) (*ProbeChainResponse, error)
 	mustEmbedUnimplementedCoreControlServer()
 }
 
@@ -711,6 +790,21 @@ func (UnimplementedCoreControlServer) SaveSubscriptionOverride(context.Context, 
 }
 func (UnimplementedCoreControlServer) GetSubscriptionOverride(context.Context, *GetSubscriptionOverrideRequest) (*GetSubscriptionOverrideResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptionOverride not implemented")
+}
+func (UnimplementedCoreControlServer) ListProfiles(context.Context, *ListProfilesRequest) (*ListProfilesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListProfiles not implemented")
+}
+func (UnimplementedCoreControlServer) SaveProfile(context.Context, *SaveProfileRequest) (*SaveProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveProfile not implemented")
+}
+func (UnimplementedCoreControlServer) DeleteProfile(context.Context, *DeleteProfileRequest) (*DeleteProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteProfile not implemented")
+}
+func (UnimplementedCoreControlServer) GetNetworkFingerprint(context.Context, *GetNetworkFingerprintRequest) (*GetNetworkFingerprintResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNetworkFingerprint not implemented")
+}
+func (UnimplementedCoreControlServer) ProbeChain(context.Context, *ProbeChainRequest) (*ProbeChainResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProbeChain not implemented")
 }
 func (UnimplementedCoreControlServer) mustEmbedUnimplementedCoreControlServer() {}
 func (UnimplementedCoreControlServer) testEmbeddedByValue()                     {}
@@ -1328,6 +1422,96 @@ func _CoreControl_GetSubscriptionOverride_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CoreControl_ListProfiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProfilesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).ListProfiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_ListProfiles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).ListProfiles(ctx, req.(*ListProfilesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreControl_SaveProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).SaveProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_SaveProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).SaveProfile(ctx, req.(*SaveProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreControl_DeleteProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).DeleteProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_DeleteProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).DeleteProfile(ctx, req.(*DeleteProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreControl_GetNetworkFingerprint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNetworkFingerprintRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).GetNetworkFingerprint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_GetNetworkFingerprint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).GetNetworkFingerprint(ctx, req.(*GetNetworkFingerprintRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreControl_ProbeChain_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProbeChainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).ProbeChain(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_ProbeChain_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).ProbeChain(ctx, req.(*ProbeChainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CoreControl_ServiceDesc is the grpc.ServiceDesc for CoreControl service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1454,6 +1638,26 @@ var CoreControl_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSubscriptionOverride",
 			Handler:    _CoreControl_GetSubscriptionOverride_Handler,
+		},
+		{
+			MethodName: "ListProfiles",
+			Handler:    _CoreControl_ListProfiles_Handler,
+		},
+		{
+			MethodName: "SaveProfile",
+			Handler:    _CoreControl_SaveProfile_Handler,
+		},
+		{
+			MethodName: "DeleteProfile",
+			Handler:    _CoreControl_DeleteProfile_Handler,
+		},
+		{
+			MethodName: "GetNetworkFingerprint",
+			Handler:    _CoreControl_GetNetworkFingerprint_Handler,
+		},
+		{
+			MethodName: "ProbeChain",
+			Handler:    _CoreControl_ProbeChain_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

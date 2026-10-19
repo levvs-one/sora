@@ -77,6 +77,20 @@ service CoreControl {
   // servers, extra rules and pinned order survive subscription refreshes.
   rpc SaveSubscriptionOverride(SaveSubscriptionOverrideRequest) returns (SaveSubscriptionOverrideResponse);
   rpc GetSubscriptionOverride(GetSubscriptionOverrideRequest) returns (GetSubscriptionOverrideResponse);
+
+  // Since 1.10. Network profiles with automatic matching: the core watches
+  // the network fingerprint and reports ProfileMatched events when a saved
+  // profile matches the current network. Requires the control authenticator:
+  // profiles describe the machine's networks.
+  rpc ListProfiles(ListProfilesRequest) returns (ListProfilesResponse);
+  rpc SaveProfile(SaveProfileRequest) returns (SaveProfileResponse);
+  rpc DeleteProfile(DeleteProfileRequest) returns (DeleteProfileResponse);
+  rpc GetNetworkFingerprint(GetNetworkFingerprintRequest) returns (GetNetworkFingerprintResponse);
+
+  // Since 1.10. Probes a proxy chain of 2-3 servers: per-hop reachability,
+  // the summed latency estimate, and which installed engines can carry it.
+  // Requires the control authenticator: probes burn traffic.
+  rpc ProbeChain(ProbeChainRequest) returns (ProbeChainResponse);
 }
 
 message ApiVersion {
@@ -136,6 +150,17 @@ message SessionPlan {
   // stacks. Clients must negotiate 1.7 before
   // sending an explicit value, so an older core cannot silently ignore it.
   string tun_stack = 14;
+  // Since 1.10. Ordered server ids forming a proxy chain: traffic enters the
+  // first and exits the last (egress IP of the last hop). 2 to 3 entries;
+  // empty means no chaining. Requires an engine with the "chains" feature.
+  repeated string chain = 15;
+  // Since 1.10. Runs zapret's tpws alongside the VPN tunnel so direct traffic
+  // (routing exceptions) gets DPI-resistant handshakes while VPN traffic uses
+  // the tunnel. Linux only; needs tpws in the engines directory.
+  bool zapret_with_vpn = 16;
+  // Since 1.10. The tpws strategy shaping direct traffic when zapret_with_vpn
+  // is set. Empty uses the core default strategy.
+  BypassStrategy zapret_strategy = 17;
 }
 
 // GroupSpec is one group of outbounds.
@@ -226,7 +251,7 @@ message GetStatsRequest { ApiVersion api_version = 1; string session_id = 2; }
 message GetStatsResponse { StatsTick stats = 1; SoraError error = 2; }
 message ConnectionState { ConnectionStateValue value = 1; string session_id = 2; SoraErrorCode reason = 3; google.protobuf.Timestamp changed_at = 4; google.protobuf.Duration retry_after = 5; }
 enum ConnectionStateValue { CONNECTION_STATE_VALUE_UNSPECIFIED = 0; CONNECTION_STATE_VALUE_DISCONNECTED = 1; CONNECTION_STATE_VALUE_CONNECTING = 2; CONNECTION_STATE_VALUE_CONNECTED = 3; CONNECTION_STATE_VALUE_RECONNECTING = 4; CONNECTION_STATE_VALUE_FAILED = 5; }
-message CoreEvent { uint64 sequence = 1; string session_id = 2; google.protobuf.Timestamp emitted_at = 3; oneof payload { StateChanged state_changed = 4; StatsTick stats_tick = 5; BypassStrategyChanged bypass_strategy_changed = 6; ProbeResult probe_result = 7; LogBatch log_batch = 8; SoraError error = 9; KillSwitchChanged kill_switch_changed = 10; GroupSwitched group_switched = 11; } }
+message CoreEvent { uint64 sequence = 1; string session_id = 2; google.protobuf.Timestamp emitted_at = 3; oneof payload { StateChanged state_changed = 4; StatsTick stats_tick = 5; BypassStrategyChanged bypass_strategy_changed = 6; ProbeResult probe_result = 7; LogBatch log_batch = 8; SoraError error = 9; KillSwitchChanged kill_switch_changed = 10; GroupSwitched group_switched = 11; ProfileMatched profile_matched = 12; } }
 message StateChanged { ConnectionState state = 1; }
 // Since 1.5. A fallback group moved to another member on its own: the member
 // it used stopped answering, or one before it answers again. Members are
@@ -722,4 +747,114 @@ message GetSubscriptionOverrideResponse {
 message OverrideRule {
   string destination = 1;
   string outbound_id = 2;
+}
+
+// Since 1.10. A network profile matched the current network. The client
+// applies the profile (automatically when auto_apply, otherwise it asks the
+// user) by rebuilding the session plan from the profile's apply settings.
+message ProfileMatched {
+  string profile_id = 1;
+  string profile_name = 2;
+  bool auto_apply = 3;
+}
+
+// Since 1.10. A saved network profile: triggers describe the networks it
+// matches (SSID, default gateway, ASN), apply describes the settings to use
+// there. A profile with no triggers never matches automatically.
+message NetworkProfile {
+  // Opaque id assigned by the core on first save; empty when creating.
+  string id = 1;
+  // Display name. Limit: 1 to 128 UTF-8 bytes.
+  string name = 2;
+  ProfileTriggers triggers = 3;
+  ProfileApply apply = 4;
+  // Apply without asking when the network matches.
+  bool auto_apply = 5;
+}
+message ProfileTriggers {
+  // Wi-Fi SSIDs, exact match, case-sensitive.
+  repeated string ssids = 1;
+  // Default gateway addresses, e.g. "192.168.1.1".
+  repeated string gateways = 2;
+  // Autonomous system numbers as strings, e.g. "12389". Matched against the
+  // optional local ASN table; empty when the table is absent.
+  repeated string asns = 3;
+}
+message ProfileApply {
+  // Tunnel mode: "tun" or "proxy".
+  string mode = 1;
+  // DNS servers to use on this network.
+  repeated string dns = 2;
+  // Routing preset id to apply.
+  string rules_preset = 3;
+  // Preferred server id for this network.
+  string server_id = 4;
+  // Preferred engine: "sing-box", "xray", "mihomo". Empty keeps the default.
+  string engine = 5;
+}
+message ListProfilesRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+}
+message ListProfilesResponse {
+  repeated NetworkProfile profiles = 1;
+  SoraError error = 2;
+}
+message SaveProfileRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  NetworkProfile profile = 3;
+}
+message SaveProfileResponse {
+  NetworkProfile profile = 1;
+  SoraError error = 2;
+}
+message DeleteProfileRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string profile_id = 3;
+}
+message DeleteProfileResponse {
+  SoraError error = 1;
+}
+// Since 1.10. The machine's current network fingerprint for profile editing.
+message GetNetworkFingerprintRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+}
+message GetNetworkFingerprintResponse {
+  NetworkFingerprint fingerprint = 1;
+  SoraError error = 2;
+}
+message NetworkFingerprint {
+  // Current Wi-Fi SSID; empty on wired networks or when unreadable.
+  string ssid = 1;
+  // Default gateway address; empty when offline.
+  string gateway = 2;
+  // ASN from the optional local table; empty when unknown.
+  string asn = 3;
+  // Stable string identifying the network (interface addresses), for display.
+  string fingerprint = 4;
+}
+
+// Since 1.10. Probes a proxy chain of 2-3 servers before connecting.
+message ProbeChainRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string request_id = 3;
+  // Ordered server ids: traffic enters the first, exits the last.
+  repeated string server_ids = 4;
+}
+message ProbeChainResponse {
+  repeated ChainHop hops = 1;
+  // Summed per-hop latency estimate in milliseconds.
+  uint32 total_latency_ms = 2;
+  // Installed engines able to carry a chain, best first.
+  repeated string engines = 3;
+  SoraError error = 4;
+}
+message ChainHop {
+  string server_id = 1;
+  bool reachable = 2;
+  uint32 latency_ms = 3;
 }
