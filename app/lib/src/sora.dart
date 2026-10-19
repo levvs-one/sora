@@ -1237,6 +1237,10 @@ class Sora extends ChangeNotifier {
       await _readStatus().catchError((Object _) {});
       if (phase == Phase.connecting) phase = Phase.off;
       if (!_stopping && _emitted == before) _emit(ConnectionFailed(failure!));
+      // The session never came up: this was a failed connect, not a crash,
+      // so no restore intent may linger for the next startup (F7 honesty).
+      // Profile-group failover re-runs connect() and re-writes its intent.
+      _clearSessionIntent();
     } finally {
       _connectionWork = null;
       work.complete();
