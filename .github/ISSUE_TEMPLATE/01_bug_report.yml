@@ -19,10 +19,36 @@ body:
     attributes:
       label: Система
       options:
-        - Windows 7 SP1 x86
-        - Другая версия Windows
+        - Windows 11
+        - Windows 10
+        - Debian / Ubuntu
+        - Fedora
+        - openSUSE
+        - Arch
+        - Другое
     validations:
       required: true
+  - type: input
+    id: kernel
+    attributes:
+      label: Версия ядра
+      description: Только для Linux.
+      placeholder: 6.8.0-…
+    validations:
+      required: false
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Движок
+      description: Какой движок выполнял подключение, когда всё сломалось.
+      options:
+        - Не знаю
+        - sing-box
+        - Xray-core
+        - mihomo
+        - Не связано с подключением
+    validations:
+      required: false
   - type: textarea
     id: problem
     attributes:
