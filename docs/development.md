@@ -132,7 +132,30 @@ Windows, из корня репозитория:
 cd core; go build -o ..\dist\windows\sora-core.exe .\cmd\sora-core; cd ..
 bash packaging/engines/fetch.sh windows-amd64 dist/windows/engines
 cd app; flutter build windows --release --dart-define=SORA_VERSION=<версия> --dart-define=APP_VERSION=<версия>; cd ..
-iscc /DAppVersion=<версия> packaging\windows\sora.iss
+iscc /DAppVersion=<версия> /DSoraUnsigned packaging\windows\sora.iss
+```
+
+## Подпись установщика Windows
+
+Authenticode-сертификата пока нет (действие владельца — Azure Trusted Signing,
+см. FIX-PLAN.md, раздел 9), поэтому CI собирает установщик без подписи: шаг
+«Build the installer» передаёт `iscc` явный `/DSoraUnsigned`, и сборка успешно
+даёт рабочий, но неподписанный `Sora-Setup-<версия>-x64.exe`.
+
+Что это значит:
+
+- SmartScreen покажет предупреждение при запуске (это уже честно сказано в
+  `docs/faq.md`); подлинность установщика проверяется по `SHA256SUMS` (и по
+  `SHA256SUMS.minisig` после ручной подписи релиза — см. «Выпуск» ниже).
+- Неподписанный установщик не появляется случайно: `sora.iss` по умолчанию
+  требует `SignTool=soraSign`, и сборка без `/DSoraUnsigned` и без
+  `/SsoraSign=...` падает с ошибкой компиляции (SORA-L5). `/DSoraUnsigned` —
+  осознанный отказ от гейта, а не тихий дефолт.
+
+Подписанная сборка локально — команда не изменилась:
+
+```powershell
+iscc /DAppVersion=<версия> "/SsoraSign=signtool sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f" packaging\windows\sora.iss
 ```
 
 ## CI
@@ -149,5 +172,6 @@ iscc /DAppVersion=<версия> packaging\windows\sora.iss
 
 1. Поднять версию в `app/pubspec.yaml` и запись в `CHANGELOG.md`.
 2. После слияния в `main` поставить тег `vX.Y.Z` и отправить его.
-3. CI соберёт всё с этой версией и создаст черновик релиза с пакетами, установщиком, `install.sh`, `install.ps1` и `SHA256SUMS`.
-4. Написать текст релиза и опубликовать черновик.
+3. CI соберёт всё с этой версией и создаст черновик релиза с пакетами, установщиком, `install.sh`, `install.ps1` и `SHA256SUMS`. Установщик Windows в черновике — без Authenticode-подписи (см. «Подпись установщика Windows» выше); подписать его можно только локально сертификатом владельца, после чего нужно пересчитать `SHA256SUMS`.
+4. Подписать `SHA256SUMS` ключом релиза (minisign) и загрузить `SHA256SUMS.minisig` в черновик — без этого апдейтер релиз не предложит, а скрипты установки откажутся работать (fail-closed).
+5. Написать текст релиза (по `CHANGELOG.md`) и опубликовать черновик.

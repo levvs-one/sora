@@ -249,7 +249,13 @@ jobs:
         shell: pwsh
         run: |
           choco install innosetup --version 6.7.1 --no-progress -y
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=${{ env.SORA_VERSION }} packaging\windows\sora.iss
+          # No Authenticode certificate in CI yet (owner action, FIX-PLAN.md
+          # section 9): build the installer unsigned so the Windows artifact
+          # exists at all. /DSoraUnsigned is the explicit opt-out of the
+          # fail-closed SignTool gate in sora.iss; the signed-vs-unsigned
+          # contract is documented in docs/development.md ("Windows installer
+          # signing").
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=${{ env.SORA_VERSION }} /DSoraUnsigned packaging\windows\sora.iss
       - name: Screenshots of the installer
         shell: pwsh
         run: |

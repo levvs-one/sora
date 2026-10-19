@@ -1,9 +1,11 @@
 ; The Windows installer of Sora: the application, the core and its engines,
 ; and the core registered as the SoraCore service. Built in CI with Inno Setup 6
-; from the repository root:
-;   iscc /DAppVersion=1.0.6 packaging\windows\sora.iss
+; from the repository root (unsigned: CI has no Authenticode certificate yet):
+;   iscc /DAppVersion=1.0.6 /DSoraUnsigned packaging\windows\sora.iss
 ; after the app is built into app\build\windows\x64\runner\Release and the core
-; and engines into dist\windows (see README.md).
+; and engines into dist\windows (see README.md). For the signed command and the
+; signed-vs-unsigned contract see the "Code signing" block below and
+; docs/development.md.
 
 #ifndef AppVersion
   #define AppVersion "0.0.0"
@@ -27,14 +29,20 @@ MinVersion=10.0.17763
 OutputDir=..\..\dist
 OutputBaseFilename=Sora-Setup-{#AppVersion}-x64
 ; --- Code signing (SORA-L5) ---
-; The installer and its uninstaller must be Authenticode-signed. The SignTool
-; command is injected at build time:
+; Release builds Authenticode-sign the installer and its uninstaller. The
+; SignTool command is injected at build time, exactly as before:
 ;   iscc /DAppVersion=1.0.6 "/SsoraSign=signtool sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f" packaging\windows\sora.iss
-; Compiling without defining soraSign fails, so an unsigned installer cannot
-; ship by accident. The certificate itself (Azure Trusted Signing) is the
-; owner's action, see FIX-PLAN.md section 9.
+; CI and unsigned dev builds pass /DSoraUnsigned instead: the compile succeeds
+; but the installer is unsigned (SmartScreen warns; authenticity comes from
+; SHA256SUMS — see docs/development.md, "Windows installer signing").
+; The certificate itself (Azure Trusted Signing) is the owner's action, see
+; FIX-PLAN.md section 9.
+; Compiling with neither soraSign defined nor /DSoraUnsigned fails, so an
+; unsigned installer cannot ship by accident.
+#ifndef SoraUnsigned
 SignTool=soraSign
 SignedUninstaller=yes
+#endif
 SetupIconFile=..\..\app\windows\runner\resources\app_icon.ico
 UninstallDisplayIcon={app}\sora.exe
 UninstallDisplayName=Sora
