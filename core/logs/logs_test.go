@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unicode/utf8"
 )
 
 var t0 = time.Date(2026, 10, 6, 15, 0, 0, 0, time.UTC)
@@ -205,5 +206,29 @@ func TestSlogRecordsTheCoreInTheCenter(t *testing.T) {
 	}
 	if out.Len() != 0 {
 		t.Fatalf("the service log keeps its own level: %q", out.String())
+	}
+}
+
+// TestWriteCutsAtARuneBoundary locks SORA-L15: a message cut at
+// MaxMessageBytes must stay valid UTF-8 even when multibyte runes straddle
+// the limit.
+func TestWriteCutsAtARuneBoundary(t *testing.T) {
+	c := New(DefaultSettings())
+	// "ж" is 2 bytes in UTF-8; pad so the limit falls inside a rune.
+	msg := strings.Repeat("a", MaxMessageBytes-1) + "жбв"
+	c.Write(time.Time{}, LevelInfo, "test", msg)
+	entries := c.Matching(Filter{})
+	if len(entries) != 1 {
+		t.Fatalf("got %d entries, want 1", len(entries))
+	}
+	got := entries[0].Message
+	if !utf8.ValidString(got) {
+		t.Errorf("truncated message is not valid UTF-8: %q", got)
+	}
+	if !strings.HasSuffix(got, " [cut]") {
+		t.Errorf("expected the [cut] marker, got %q", got)
+	}
+	if strings.Contains(got, "�") {
+		t.Errorf("replacement character leaked into %q", got)
 	}
 }

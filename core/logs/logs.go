@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 // Level is the severity of an entry. The zero value is not a level.
@@ -147,6 +148,19 @@ func (c *Center) SetSettings(s Settings) Settings {
 	return c.settings
 }
 
+// truncateUTF8 cuts s to at most n bytes at a UTF-8 rune boundary, so the
+// result is always valid UTF-8 (SORA-L15).
+func truncateUTF8(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	s = s[:n]
+	for !utf8.ValidString(s) {
+		s = s[:len(s)-1]
+	}
+	return s
+}
+
 // Write records core or engine messages. Callers must redact credentials before
 // writing.
 func (c *Center) Write(at time.Time, level Level, source, message string) {
@@ -155,7 +169,9 @@ func (c *Center) Write(at time.Time, level Level, source, message string) {
 		return
 	}
 	if len(message) > MaxMessageBytes {
-		message = message[:MaxMessageBytes] + " [cut]"
+		// Cut at a rune boundary so the stored text stays valid UTF-8
+		// (SORA-L15).
+		message = truncateUTF8(message, MaxMessageBytes) + " [cut]"
 	}
 	if at.IsZero() {
 		at = c.now()
