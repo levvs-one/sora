@@ -37,6 +37,15 @@ func (d DNS) validate() error {
 			errs = append(errs, fmt.Errorf("dns: fake-ip range %q is not a CIDR", d.FakeIPRange))
 		}
 	}
+	if d.FakeIPTTL < 0 || d.FakeIPTTL > 86400 {
+		errs = append(errs, fmt.Errorf("dns: fake-ip TTL %d is out of range 0-86400", d.FakeIPTTL))
+	}
+	for _, f := range d.FakeIPFilter {
+		if strings.TrimSpace(f) == "" {
+			errs = append(errs, fmt.Errorf("dns: fake-ip filter holds an empty pattern"))
+			break
+		}
+	}
 	return errors.Join(errs...)
 }
 

@@ -206,13 +206,14 @@ const (
 
 // DNSServer is one resolver of the plan.
 type DNSServer struct {
-	Tag       string
-	Transport DNSTransport
-	Address   string
-	Port      uint16
-	Dialer    string
-	Suffixes  []string
-	ProxyOnly bool
+	Tag        string
+	Transport  DNSTransport
+	Address    string
+	Port       uint16
+	Dialer     string
+	Suffixes   []string
+	ProxyOnly  bool
+	SkipVerify bool // skip TLS verification for DoT/DoH/DoQ upstreams (corporate MITM)
 }
 
 // DNS is the resolver setup of the plan.
@@ -220,11 +221,28 @@ type DNS struct {
 	Enabled          bool
 	Mode             string // rule, fakeip, redir-host
 	FakeIPRange      string
+	FakeIPFilter     []string // domains that never receive a fake address
+	FakeIPTTL        int      // seconds; 0 leaves the engine default in place
 	Servers          []DNSServer
 	NameserverPolicy map[string][]string
 	DisableCache     bool
 	Sniff            bool
 	HijackTun        []string
+}
+
+// DefaultFakeIPFilter is the plan-level fallback for domains that must get
+// real addresses: LAN/mDNS names, NTP, and OS connectivity checks. Renderers
+// apply it when DNS.FakeIPFilter is empty.
+var DefaultFakeIPFilter = []string{
+	"*.lan",
+	"*.local",
+	"*.home.arpa",
+	"*.invalid",
+	"localhost",
+	"time.*.com",
+	"ntp.*.com",
+	"+.msftconnecttest.com",
+	"+.msftncsi.com",
 }
 
 // TunDevice names Sora's adapter to avoid collisions and allow startup checks.
