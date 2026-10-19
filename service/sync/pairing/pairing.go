@@ -78,7 +78,14 @@ func (in *Invitation) Encode() string {
 // Decode parses a QR payload URI. It rejects wrong schemes, versions, and
 // malformed fields so a mistyped payload fails fast with a clear error.
 func Decode(s string) (*Invitation, error) {
-	u, err := url.Parse(strings.TrimSpace(s))
+	s = strings.TrimSpace(s)
+	if strings.Contains(s, "#") {
+		// No fragment, not even an empty one: url.Parse silently drops a
+		// bare trailing '#', so the raw string is checked. The canonical
+		// form (F9-SYNC-CONTRACT.md) never contains '#'.
+		return nil, errors.New("pairing: the payload must not have a fragment")
+	}
+	u, err := url.Parse(s)
 	if err != nil {
 		return nil, fmt.Errorf("pairing: not a URI: %w", err)
 	}
@@ -86,6 +93,16 @@ func Decode(s string) (*Invitation, error) {
 		return nil, fmt.Errorf("pairing: not a sora-sync pairing payload")
 	}
 	q := u.Query()
+	// Duplicate keys are rejected: url.Values.Get takes the first value,
+	// while other parsers (notably Dart's Uri.queryParameters) may take
+	// the last, so a duplicated key could make the two sides disagree on
+	// the public key or token. The contract (F9-SYNC-CONTRACT.md) forbids
+	// them.
+	for key, vals := range q {
+		if len(vals) != 1 {
+			return nil, fmt.Errorf("pairing: the payload repeats %q", key)
+		}
+	}
 	if q.Get("v") != "1" {
 		return nil, fmt.Errorf("pairing: unsupported version %q", q.Get("v"))
 	}

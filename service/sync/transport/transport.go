@@ -225,13 +225,6 @@ func exchangeIdentities(c *Conn, self Identity, sendFirst bool) (Identity, error
 	if strings.TrimSpace(peer.DeviceID) == "" {
 		return Identity{}, errors.New("transport: the peer sent no device id")
 	}
-	var zeroKey [32]byte
-	if peer.PublicKey == zeroKey {
-		// An all-zero public key is unreachable as an X25519 public key,
-		// so it can never complete a later DialKnown; recording it would
-		// only create a dead peer entry.
-		return Identity{}, errors.New("transport: the peer sent an empty public key")
-	}
 	return peer, nil
 }
 
