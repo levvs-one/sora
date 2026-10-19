@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -58,6 +59,9 @@ func main() {
 
 func run(ctx context.Context, arguments []string) error {
 	set := flag.NewFlagSet("sora-core", flag.ContinueOnError)
+	// Usage belongs on stdout so "sora-core -h | less" works; the
+	// formatted error below stays on stderr.
+	set.SetOutput(os.Stdout)
 	var f flags
 	set.StringVar(&f.dataDir, "data-dir", defaultDataDir(), "where the token, the secrets and the engine state live")
 	set.StringVar(&f.enginesDir, "engines-dir", filepath.Join(defaultDataDir(), "engines"), "where the engine binaries are looked for")
@@ -74,7 +78,15 @@ func run(ctx context.Context, arguments []string) error {
 	set.BoolVar(&f.uninstall, "uninstall-service", false, "Windows: stop and remove the SoraCore service and exit")
 	set.BoolVar(&f.showToken, "print-token", false, "print the control plane token and exit")
 	if err := set.Parse(arguments); err != nil {
-		return errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyUnauthenticated)
+		if errors.Is(err, flag.ErrHelp) {
+			// -h/--help: the usage is already printed above. A help
+			// request is neither a failure nor an authentication
+			// problem, so exit 0 without the error line.
+			return nil
+		}
+		// A malformed flag line is the operator's mistake, not an
+		// authentication failure.
+		return errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyInvalidRequest)
 	}
 	if f.uninstall {
 		return uninstallService()
