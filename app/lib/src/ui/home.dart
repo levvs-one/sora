@@ -74,6 +74,7 @@ class _ConnectionPane extends StatelessWidget {
             ),
           if (SoraScope.of(context).watchUnstable) const _WatchBanner(),
           if (SoraScope.of(context).pendingRestore != null) const _RestoreBanner(),
+          const ConnectionChanges(),
           const SizedBox(height: 24),
           const Center(child: TourTarget(step: 2, radius: 88, child: _Orb())),
           const SizedBox(height: 28),
