@@ -1,0 +1,376 @@
+/// Installed-extension lifecycle owned by the app.
+///
+/// Layout under the data dir:
+///   extensions/installed.json          # registry
+///   extensions/<id>@<version>/...      # extracted content
+///   extensions/<id>.settings.json      # per-extension settings
+///
+/// The previous version directory is kept for one-tap rollback.
+library;
+
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:crypto/crypto.dart' as crypto;
+import 'package:flutter/widgets.dart';
+
+import 'manifest.dart';
+import 'package.dart';
+import 'permissions.dart';
+
+class ExtStoreError implements Exception {
+  ExtStoreError(this.message);
+  final String message;
+  @override
+  String toString() => 'ExtStoreError: $message';
+}
+
+/// Where installed extensions live.
+String extensionsDir() {
+  if (Platform.isWindows) {
+    final appData = Platform.environment['APPDATA'];
+    if (appData != null && appData.isNotEmpty) {
+      return '$appData\\sora\\extensions';
+    }
+  }
+  final home = Platform.environment['HOME'];
+  final xdg = Platform.environment['XDG_DATA_HOME'];
+  final base = (xdg != null && xdg.isNotEmpty)
+      ? xdg
+      : (home != null && home.isNotEmpty ? '$home/.local/share' : Directory.systemTemp.path);
+  return '$base/sora/extensions';
+}
+
+class InstalledExtension {
+  InstalledExtension({
+    required this.manifest,
+    required this.enabled,
+    required this.source,
+    required this.installedAt,
+    required this.granted,
+    this.previous,
+  });
+
+  final ExtManifest manifest;
+  final bool enabled;
+  final String source; // catalog | sideload | url
+  final DateTime installedAt;
+  final List<String> granted;
+  final String? previous; // N-1 version kept for rollback
+
+  String get id => manifest.id;
+  String get version => manifest.version;
+
+  InstalledExtension copyWith({bool? enabled, String? previous, ExtManifest? manifest, List<String>? granted}) {
+    return InstalledExtension(
+      manifest: manifest ?? this.manifest,
+      enabled: enabled ?? this.enabled,
+      source: source,
+      installedAt: installedAt,
+      granted: granted ?? this.granted,
+      previous: previous,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'manifest': manifest.toJson(),
+        'enabled': enabled,
+        'source': source,
+        'installed_at': installedAt.toIso8601String(),
+        'granted': granted,
+        if (previous != null) 'previous': previous,
+      };
+
+  static InstalledExtension fromJson(Map<String, dynamic> json) {
+    return InstalledExtension(
+      manifest: ExtManifest.parse(jsonEncode(json['manifest'])),
+      enabled: json['enabled'] as bool? ?? true,
+      source: json['source'] as String? ?? 'sideload',
+      installedAt: DateTime.tryParse(json['installed_at'] as String? ?? '') ?? DateTime.now(),
+      granted: (json['granted'] as List? ?? []).map((e) => e.toString()).toList(),
+      previous: json['previous'] as String?,
+    );
+  }
+}
+
+/// App-side extension store. One instance per Extensions section subtree,
+/// provided through [ExtScope].
+class ExtensionStore extends ChangeNotifier {
+  ExtensionStore({String? dir}) : _dir = dir ?? extensionsDir();
+
+  final String _dir;
+  final _installed = <String, InstalledExtension>{};
+  bool _loaded = false;
+
+  bool get loaded => _loaded;
+  List<InstalledExtension> get installed =>
+      _installed.values.toList()..sort((a, b) => a.manifest.name.compareTo(b.manifest.name));
+  InstalledExtension? get(String id) => _installed[id];
+  bool isInstalled(String id) => _installed.containsKey(id);
+  bool isEnabled(String id) => _installed[id]?.enabled ?? false;
+
+  String _contentDir(String id, String version) =>
+      '$_dir${Platform.pathSeparator}$id@$version';
+
+  String contentDir(String id) {
+    final inst = _installed[id];
+    if (inst == null) return '';
+    return _contentDir(id, inst.version);
+  }
+
+  /// Loads the registry. Call once before use.
+  Future<void> load() async {
+    final d = Directory(_dir);
+    await d.create(recursive: true);
+    final reg = File('${_dir}${Platform.pathSeparator}installed.json');
+    if (await reg.exists()) {
+      try {
+        final raw = jsonDecode(await reg.readAsString()) as Map<String, dynamic>;
+        for (final e in raw.entries) {
+          try {
+            _installed[e.key] = InstalledExtension.fromJson(e.value as Map<String, dynamic>);
+          } catch (_) {
+            // One corrupt entry must not brick the whole registry.
+          }
+        }
+      } catch (_) {
+        // Corrupt registry: start empty rather than crash the section.
+      }
+    }
+    _loaded = true;
+    notifyListeners();
+  }
+
+  Future<void> _save() async {
+    final reg = File('${_dir}${Platform.pathSeparator}installed.json');
+    final tmp = File('${reg.path}.tmp');
+    await tmp.writeAsString(
+        jsonEncode({for (final e in _installed.entries) e.key: e.value.toJson()}),
+        flush: true);
+    await tmp.rename(reg.path);
+  }
+
+  /// Installs a verified package. Returns the permissions added relative to
+  /// the previously installed version (empty for a fresh install) so the UI
+  /// can re-prompt on widening updates.
+  ///
+  /// Throws [ExtStoreError] / [PackageError] with developer messages; the UI
+  /// maps them to localized text.
+  Future<List<String>> install(ExtPackage pkg,
+      {required String source, required List<String> granted}) async {
+    final m = pkg.manifest;
+    for (final g in granted) {
+      if (!isKnownPermission(g)) throw ExtStoreError('unknown granted permission "$g"');
+    }
+    final missing = [for (final p in m.permissions) if (!granted.contains(p)) p];
+    if (missing.isNotEmpty) {
+      throw ExtStoreError('install does not grant required permissions: ${missing.join(", ")}');
+    }
+    final cur = _installed[m.id];
+    if (cur != null && compareVersions(m.version, cur.version) <= 0) {
+      throw ExtStoreError('version ${m.version} is not newer than installed ${cur.version}');
+    }
+    // Extract to a staging dir first; only touch the registry when the
+    // content is fully on disk.
+    final dst = _contentDir(m.id, m.version);
+    await Directory(dst).create(recursive: true);
+    try {
+      for (final e in pkg.files.entries) {
+        final target = '$_dir${Platform.pathSeparator}${m.id}@${m.version}${Platform.pathSeparator}${e.key.replaceAll('/', Platform.pathSeparator)}';
+        final canonical = File(target).absolute.path;
+        if (!canonical.startsWith('${Directory(dst).absolute.path}${Platform.pathSeparator}')) {
+          throw ExtStoreError('unsafe extract path "${e.key}"');
+        }
+        await File(canonical).parent.create(recursive: true);
+        await File(canonical).writeAsBytes(e.value, flush: true);
+      }
+    } catch (e) {
+      await Directory(dst).delete(recursive: true);
+      rethrow;
+    }
+    final added = cur == null ? <String>[] : diffPermissions(cur.granted, granted).added;
+    // Drop the version that falls out of the N-1 window.
+    if (cur?.previous != null) {
+      final stale = Directory(_contentDir(m.id, cur!.previous!));
+      if (await stale.exists()) await stale.delete(recursive: true);
+    }
+    _installed[m.id] = InstalledExtension(
+      manifest: m,
+      enabled: cur?.enabled ?? true,
+      source: source,
+      installedAt: cur?.installedAt ?? DateTime.now(),
+      granted: List.of(granted),
+      previous: cur?.version,
+    );
+    await _save();
+    notifyListeners();
+    return added;
+  }
+
+  /// Opens, verifies and installs raw .soraext bytes (file picker / download).
+  Future<List<String>> installBytes(Uint8List data,
+      {required String source, required List<String> granted, String? expectedSha256}) async {
+    if (expectedSha256 != null) {
+      final sum = crypto.sha256.convert(data).toString();
+      if (sum != expectedSha256.toLowerCase()) {
+        throw ExtStoreError('download does not match the catalog sha256');
+      }
+    }
+    final ExtPackage pkg;
+    try {
+      pkg = ExtPackage.open(data);
+    } on PackageError catch (e) {
+      throw ExtStoreError(e.message);
+    }
+    try {
+      await pkg.verify();
+    } on PackageError catch (e) {
+      throw ExtStoreError(e.message);
+    }
+    return install(pkg, source: source, granted: granted);
+  }
+
+  /// One-tap enable/disable. Disabling takes effect immediately: the panel
+  /// host tears the WebView down and drops the bridge.
+  Future<void> setEnabled(String id, bool enabled) async {
+    final cur = _installed[id];
+    if (cur == null) throw ExtStoreError('"$id" is not installed');
+    _installed[id] = cur.copyWith(enabled: enabled);
+    await _save();
+    notifyListeners();
+  }
+
+  /// Restores the N-1 version kept at install time.
+  Future<void> rollback(String id) async {
+    final cur = _installed[id];
+    if (cur == null) throw ExtStoreError('"$id" is not installed');
+    final prev = cur.previous;
+    if (prev == null) throw ExtStoreError('"$id" has no previous version');
+    final prevDir = Directory(_contentDir(id, prev));
+    if (!await prevDir.exists()) throw ExtStoreError('previous version of "$id" is missing');
+    await Directory(_contentDir(id, cur.version)).delete(recursive: true);
+    // Re-read the previous manifest from disk (source of truth).
+    final manFile = File('${prevDir.path}${Platform.pathSeparator}$manifestName');
+    final prevManifest = ExtManifest.parse(await manFile.readAsString());
+    _installed[id] = InstalledExtension(
+      manifest: prevManifest,
+      enabled: cur.enabled,
+      source: cur.source,
+      installedAt: cur.installedAt,
+      granted: cur.granted,
+    );
+    await _save();
+    notifyListeners();
+  }
+
+  Future<void> uninstall(String id) async {
+    final cur = _installed[id];
+    if (cur == null) throw ExtStoreError('"$id" is not installed');
+    for (final v in [cur.version, if (cur.previous != null) cur.previous!]) {
+      final d = Directory(_contentDir(id, v));
+      if (await d.exists()) await d.delete(recursive: true);
+    }
+    final settings = File('$_dir${Platform.pathSeparator}$id.settings.json');
+    if (await settings.exists()) await settings.delete();
+    _installed.remove(id);
+    await _save();
+    notifyListeners();
+  }
+
+  // --- Settings (validated against settings_schema) ---
+
+  Map<String, dynamic> _schemaDefaults(ExtManifest m) {
+    final out = <String, dynamic>{};
+    final props = m.settingsSchema?['properties'] as Map<String, dynamic>?;
+    if (props == null) return out;
+    for (final e in props.entries) {
+      final prop = e.value as Map<String, dynamic>?;
+      if (prop != null && prop.containsKey('default')) out[e.key] = prop['default'];
+    }
+    return out;
+  }
+
+  Future<Map<String, dynamic>> getSettings(String id) async {
+    final inst = _installed[id];
+    if (inst == null) throw ExtStoreError('"$id" is not installed');
+    final out = _schemaDefaults(inst.manifest);
+    final f = File('$_dir${Platform.pathSeparator}$id.settings.json');
+    if (await f.exists()) {
+      try {
+        final stored = jsonDecode(await f.readAsString()) as Map<String, dynamic>;
+        out.addAll(stored);
+      } catch (_) {
+        // Corrupt settings fall back to defaults; the next save repairs.
+      }
+    }
+    return out;
+  }
+
+  Future<void> setSettings(String id, Map<String, dynamic> values) async {
+    final inst = _installed[id];
+    if (inst == null) throw ExtStoreError('"$id" is not installed');
+    _validateSettingsValues(inst.manifest.settingsSchema, values);
+    final f = File('$_dir${Platform.pathSeparator}$id.settings.json');
+    await f.writeAsString(jsonEncode(values), flush: true);
+    notifyListeners();
+  }
+
+  void _validateSettingsValues(Map<String, dynamic>? schema, Map<String, dynamic> values) {
+    if (schema == null) {
+      if (values.isNotEmpty) throw ExtStoreError('this extension has no settings');
+      return;
+    }
+    final props = schema['properties'] as Map<String, dynamic>? ?? {};
+    for (final e in values.entries) {
+      final prop = props[e.key] as Map<String, dynamic>?;
+      if (prop == null) throw ExtStoreError('unknown setting "${e.key}"');
+      _checkValue(e.key, prop, e.value);
+    }
+  }
+
+  void _checkValue(String name, Map<String, dynamic> prop, dynamic v) {
+    switch (prop['type'] as String?) {
+      case 'string':
+        if (v is! String) throw ExtStoreError('setting "$name" must be a string');
+        final min = (prop['minLength'] as num?)?.toInt();
+        final max = (prop['maxLength'] as num?)?.toInt();
+        if (min != null && v.length < min) throw ExtStoreError('setting "$name" is too short');
+        if (max != null && v.length > max) throw ExtStoreError('setting "$name" is too long');
+      case 'integer':
+        if (v is! int) throw ExtStoreError('setting "$name" must be an integer');
+        _checkRange(name, prop, (v as num).toDouble());
+      case 'number':
+        if (v is! num) throw ExtStoreError('setting "$name" must be a number');
+        _checkRange(name, prop, (v as num).toDouble());
+      case 'boolean':
+        if (v is! bool) throw ExtStoreError('setting "$name" must be true or false');
+      default:
+        throw ExtStoreError('setting "$name" has an unsupported type');
+    }
+    final en = prop['enum'] as List?;
+    if (en != null && !en.any((e) => '$e' == '$v')) {
+      throw ExtStoreError('setting "$name" has a disallowed value');
+    }
+  }
+
+  void _checkRange(String name, Map<String, dynamic> prop, double f) {
+    final min = (prop['minimum'] as num?)?.toDouble();
+    final max = (prop['maximum'] as num?)?.toDouble();
+    if (min != null && f < min) throw ExtStoreError('setting "$name" is too small');
+    if (max != null && f > max) throw ExtStoreError('setting "$name" is too large');
+  }
+}
+
+/// Provides the [ExtensionStore] to the extensions section subtree.
+class ExtScope extends InheritedNotifier<ExtensionStore> {
+  const ExtScope({super.key, required ExtensionStore store, required super.child})
+      : super(notifier: store);
+
+  static ExtensionStore of(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<ExtScope>();
+    assert(scope != null, 'ExtScope not found');
+    return scope!.notifier!;
+  }
+}

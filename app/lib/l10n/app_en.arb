@@ -314,7 +314,167 @@
   "modesGuide": "Choose Auto if you are unsure which engine your server needs. Sora checks the profile and settings before connecting. An engine cannot increase your plan’s bandwidth: performance depends on the server, route, protocol and network.\n\n## Modes\n\n### All traffic (TUN)\n\nSora creates a virtual network interface and routes application traffic through it, including TCP and UDP. Use this mode for Telegram, games and Discord voice. Rules can send specific sites or programs directly or block them. The network service needs permission and a server that supports the required protocol.\n\n### System proxy\n\nSora configures a local HTTP/SOCKS proxy. Applications that respect system proxy settings use it. Applications with their own network stack may connect directly; UDP and voice calls generally need TUN. This mode suits browsers and applications with proxy support.\n\n### No server\n\nOn Linux, Sora uses [zapret](https://github.com/bol-van/zapret) to split and reshape HTTP/TLS requests and bypass some DPI checks. Your IP stays the same and connections go directly to the website. Results depend on your provider and the blocking method.\n\nThe current integration uses tpws for HTTP and TLS over TCP. It does not bypass IP blocking or relay UDP, and cannot guarantee Telegram’s MTProto connections. Use a VPN server with TUN for Discord voice, Telegram calls and these kinds of restrictions.\n\n## Engines\n\n### Auto\n\nSora selects an installed engine that supports the entire connection plan: server protocols, transports, groups, fragmentation and mode. An incompatible manual choice is rejected before stopping the current connection. Choose Auto or another engine and apply the settings again.\n\n### sing-box\n\nNew Sora packages include [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), a fork of [sing-box](https://github.com/SagerNet/sing-box), adding client-side XHTTP and VLESS Encryption. Sora recognizes the build and its capabilities. An upstream build without XHTTP does not gain this capability from its name alone.\n\nSupported protocols include VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard and the AmneziaWG 1.x/2.x parameters Sora can import. Full Xray JSON profiles require Xray. New AWG 3.x fields cannot be imported yet. sing-box uses a password-protected local control port, which other applications on the computer can detect.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) supports VLESS, REALITY, XHTTP, VLESS Encryption and TLS fragmentation. It also runs complete provider Xray profiles while preserving their routing and groups. Such profiles cannot be automatically converted to another engine without changing their behavior.\n\nThe bundled Xray removed the setting that disables TLS certificate verification (`allowInsecure`). Auto selects sing-box or mihomo for ordinary servers requiring this setting. Selecting Xray manually reports incompatibility before stopping the current connection. Older full JSON profiles need an updated provider profile with a verifiable certificate or certificate pin.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) supports ordered fallback and load-balancing groups, XHTTP and AmneziaWG. Choose it when automatic failover to a backup server matters. Sora’s TLS fragmentation setting is unavailable with this engine.\n\n## Compatibility in Sora\n\n| Feature | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN and TCP/UDP | Yes | Yes | Yes |\n| XHTTP | Yes | Yes | Yes |\n| VLESS Encryption | Yes | Yes | Yes |\n| Full Xray profile | No | Yes | No |\n| TUIC / AnyTLS | Both | No | TUIC |\n| TLS fragmentation | Yes | Yes | No |\n| AmneziaWG 1.x/2.x | Yes¹ | No | Yes |\n| Ordered fallback group | No | No² | Yes |\n\n¹ Profiles with J1/J2/J3/Itime use mihomo; these fields must never be silently discarded. ² For a group of complete Xray profiles, the app selects a backup profile. Support depends on the installed build; check its version in About.\n\n## TUN stack\n\nThe stack handles TCP and UDP inside the virtual interface. In the modes panel, Xray and mihomo offer gVisor, System, Mixed and MIPS. Each engine saves its own preference. System proxy and Serverless modes do not use this preference.\n\n- **Mixed** — TCP uses the system stack, while gVisor handles UDP. This is the default for mihomo on Linux. On Windows, Xray and mihomo default to MIPS.\n- **System** — uses the system stack. Try another option if network applications encounter problems.\n- **gVisor** — handles traffic in userspace.\n- **MIPS** — mihomo’s own IP stack, available in the bundled version 1.19.32.\n\nOn Linux, Xray uses its built-in gVisor by default. System, Mixed and MIPS on Linux use mihomo as the TUN engine, forwarding TCP and UDP to Xray over an authenticated local SOCKS link. Xray retains the protocol, provider profile and routing. These three options require an installed mihomo. On Windows, Xray uses mihomo 1.19.32 or newer for all four TUN stacks. Protocols and routing remain in Xray. Application rules in this combination support only direct connections and blocking; on Linux these rules require Xray’s built-in gVisor.\n\nThe bridge runs a second process. In three idle measurements on Linux, it used about 32–36 MiB more physical memory than native Xray TUN. This does not measure download load: CPU and memory costs depend on connections. sing-box has no stack selector. No stack guarantees better performance in every network. Choose a stack and select Apply and reconnect to try it in your network.\n\n## Applying settings\n\nSelecting a server reconnects automatically. Mode, engine, DNS and rule settings are saved immediately; during an active connection, click Apply and reconnect to use them. Restarting an engine may interrupt downloads and calls. Repeated clicks do not start parallel connections; disconnecting ends the transition and releases the connection.\n\nInternet only through VPN blocks direct traffic when a tunnel drops. It affects the whole machine. An explicit disconnect removes Sora’s rules. If cleanup does not finish, retry disconnecting and open the log.\n\n## Project documentation\n\n- [sing-box-lx: configuration and support](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box documentation](https://sing-box.sagernet.org/)\n- [Xray documentation](https://xtls.github.io/)\n- [mihomo documentation](https://wiki.metacubex.one/)\n- [zapret: operation and limitations](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "probeServers": "Check servers",
   "extensions": "Extensions",
-  "extensionsSoon": "Coming soon",
+  "extRatingLabel": "Rating {rating} of 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "by {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "{count} installs",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extBadgeVerified": "Verified",
+  "extBadgeTop": "Top this week",
+  "extBadgeNew": "New",
+  "extBadgeStaff": "Sora team",
+  "extSideloadShort": "Not from catalog",
+  "extSideloadWarning": "Not from the team catalog. The author's key is self-attested: install only if you trust the author.",
+  "extInstallTitle": "Install {name}",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "Update {name}",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "This extension will be able to:",
+  "extPermissionsWidened": "The update asks for new permissions:",
+  "extDangerousAck": "I understand these permissions are powerful",
+  "extInstall": "Install",
+  "extUpdate": "Update",
+  "extCancel": "Cancel",
+  "extConfirm": "Confirm",
+  "extOk": "OK",
+  "extCatalog": "Catalog",
+  "extInstalled": "Installed",
+  "extSearchHint": "Search extensions",
+  "extCatAll": "All",
+  "extCatTools": "Tools",
+  "extCatThemes": "Themes",
+  "extCatAutomation": "Automation",
+  "extCatStats": "Statistics",
+  "extCatNetwork": "Network",
+  "extSortBy": "Sort by",
+  "extSortPopular": "Most popular",
+  "extSortRating": "Highest rated",
+  "extSortName": "Name",
+  "extCatalogError": "Could not load the catalog",
+  "extRetry": "Retry",
+  "extEmptySearch": "Nothing found",
+  "extEmptyInstalled": "No extensions installed yet.\nFind one in the catalog or install from a file.",
+  "extInstallFromFile": "Install from file",
+  "extInstallFromUrl": "Install from URL",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "Download",
+  "extDownloading": "Downloading…",
+  "extVerifying": "Verifying…",
+  "extInstalling": "Installing…",
+  "extInstallFailed": "Install failed",
+  "extErrSignature": "The signature check failed. The file may be damaged or tampered with.",
+  "extErrManifest": "The extension manifest is invalid.",
+  "extErrNetwork": "Network error. Check your connection and try again.",
+  "extErrHash": "The download does not match the catalog. It may have been tampered with.",
+  "extErrMinApp": "This extension needs app version {version} or newer.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "Only https:// links are allowed",
+  "extErrGeneric": "Something went wrong. Please try again.",
+  "extUpdateAvailable": "Update available",
+  "extDisabled": "Disabled",
+  "extVersionLabel": "Version {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "Author",
+  "extRating": "Rating",
+  "extInstalls": "Installs",
+  "extVersion": "Version",
+  "extAbout": "About",
+  "extPermissionsTitle": "Permissions",
+  "extNoPermissions": "No special permissions.",
+  "extSettings": "Settings",
+  "extSaveSettings": "Save settings",
+  "extSaving": "Saving…",
+  "extOpenPanel": "Open panel",
+  "extUpdateTo": "Update to {version}",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "Enabled",
+  "extRollbackTo": "Roll back to {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "Roll back to version {version}?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "Uninstall",
+  "extUninstallConfirm": "Remove “{name}” and its settings?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
+  "extPermConnectionsRead": "See the list of active connections",
+  "extPermServersRead": "See your server list",
+  "extPermSettingsRead": "Read app settings",
+  "extPermSettingsWrite": "Change app settings",
+  "extPermNotifications": "Show notifications",
+  "extPermTray": "Add tray menu entries",
+  "extPermUiPanel": "Show panels inside the app",
+  "extPermThemeApply": "Apply themes to the app",
+  "extPermRoutingRules": "Add routing rules (affects where traffic goes)",
+  "extPermNetHooks": "Hook into the network path (DPI bypass modules)",
+  "extPermNetFetch": "Fetch URLs from an allowlist",
+  "extPermBackground": "Run background tasks",
   "exportLogFile": "To {name}",
   "@exportLogFile": {
     "placeholders": {

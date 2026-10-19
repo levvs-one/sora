@@ -13,7 +13,9 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  archive: ^4.0.7
   crypto: 3.0.7
+  cryptography: ^2.8.1
   app_links: ^7.2.2
   cupertino_icons: ^2.0.0
   dbus: ^0.7.15

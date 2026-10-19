@@ -11,6 +11,7 @@ import '../design/theme.dart';
 import '../sora.dart';
 import 'about.dart';
 import 'connections.dart';
+import 'extensions/store_screen.dart';
 import 'home.dart';
 import 'logs.dart';
 import 'notifications_screen.dart';
@@ -266,13 +267,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
       const SettingsScreen(),
       const SpeedtestScreen(),
       const AboutScreen(),
-      Screen(
-        title: S.of(context).extensions,
-        fill: Center(
-          child: Text(S.of(context).extensionsSoon, style: Styles.heading.copyWith(color: palette.ink)),
-        ),
-        children: const [],
-      ),
+      const ExtensionsScreen(),
     ];
     final page = pages[_section];
     final content = KeyedSubtree(

@@ -904,9 +904,175 @@ class SKa extends S {
 
   @override
   String get extensions => 'გაფართოებები';
-
   @override
-  String get extensionsSoon => 'მალე მოვა';
+  String extRatingLabel(String rating) => 'Rating $rating of 5';
+  @override
+  String extByAuthor(String author) => 'by $author';
+  @override
+  String extInstallsCount(String count) => '$count installs';
+  @override
+  String get extBadgeVerified => 'Verified';
+  @override
+  String get extBadgeTop => 'Top this week';
+  @override
+  String get extBadgeNew => 'New';
+  @override
+  String get extBadgeStaff => 'Sora team';
+  @override
+  String get extSideloadShort => 'Not from catalog';
+  @override
+  String get extSideloadWarning => 'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+  @override
+  String extInstallTitle(String name) => 'Install $name';
+  @override
+  String extUpdateTitle(String name) => 'Update $name';
+  @override
+  String get extPermissionsIntro => 'This extension will be able to:';
+  @override
+  String get extPermissionsWidened => 'The update asks for new permissions:';
+  @override
+  String get extDangerousAck => 'I understand these permissions are powerful';
+  @override
+  String get extInstall => 'Install';
+  @override
+  String get extUpdate => 'Update';
+  @override
+  String get extCancel => 'Cancel';
+  @override
+  String get extConfirm => 'Confirm';
+  @override
+  String get extOk => 'OK';
+  @override
+  String get extCatalog => 'Catalog';
+  @override
+  String get extInstalled => 'Installed';
+  @override
+  String get extSearchHint => 'Search extensions';
+  @override
+  String get extCatAll => 'All';
+  @override
+  String get extCatTools => 'Tools';
+  @override
+  String get extCatThemes => 'Themes';
+  @override
+  String get extCatAutomation => 'Automation';
+  @override
+  String get extCatStats => 'Statistics';
+  @override
+  String get extCatNetwork => 'Network';
+  @override
+  String get extSortBy => 'Sort by';
+  @override
+  String get extSortPopular => 'Most popular';
+  @override
+  String get extSortRating => 'Highest rated';
+  @override
+  String get extSortName => 'Name';
+  @override
+  String get extCatalogError => 'Could not load the catalog';
+  @override
+  String get extRetry => 'Retry';
+  @override
+  String get extEmptySearch => 'Nothing found';
+  @override
+  String get extEmptyInstalled => 'No extensions installed yet.
+Find one in the catalog or install from a file.';
+  @override
+  String get extInstallFromFile => 'Install from file';
+  @override
+  String get extInstallFromUrl => 'Install from URL';
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+  @override
+  String get extDownload => 'Download';
+  @override
+  String get extDownloading => 'Downloading…';
+  @override
+  String get extVerifying => 'Verifying…';
+  @override
+  String get extInstalling => 'Installing…';
+  @override
+  String get extInstallFailed => 'Install failed';
+  @override
+  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  @override
+  String get extErrManifest => 'The extension manifest is invalid.';
+  @override
+  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  @override
+  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  @override
+  String extErrMinApp(String version) => 'This extension needs app version $version or newer.';
+  @override
+  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  @override
+  String get extErrGeneric => 'Something went wrong. Please try again.';
+  @override
+  String get extUpdateAvailable => 'Update available';
+  @override
+  String get extDisabled => 'Disabled';
+  @override
+  String extVersionLabel(String version) => 'Version $version';
+  @override
+  String get extAuthor => 'Author';
+  @override
+  String get extRating => 'Rating';
+  @override
+  String get extInstalls => 'Installs';
+  @override
+  String get extVersion => 'Version';
+  @override
+  String get extAbout => 'About';
+  @override
+  String get extPermissionsTitle => 'Permissions';
+  @override
+  String get extNoPermissions => 'No special permissions.';
+  @override
+  String get extSettings => 'Settings';
+  @override
+  String get extSaveSettings => 'Save settings';
+  @override
+  String get extSaving => 'Saving…';
+  @override
+  String get extOpenPanel => 'Open panel';
+  @override
+  String extUpdateTo(String version) => 'Update to $version';
+  @override
+  String get extEnabled => 'Enabled';
+  @override
+  String extRollbackTo(String version) => 'Roll back to $version';
+  @override
+  String extRollbackConfirm(String version) => 'Roll back to version $version?';
+  @override
+  String get extUninstall => 'Uninstall';
+  @override
+  String extUninstallConfirm(String name) => 'Remove “$name” and its settings?';
+  @override
+  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  @override
+  String get extPermConnectionsRead => 'See the list of active connections';
+  @override
+  String get extPermServersRead => 'See your server list';
+  @override
+  String get extPermSettingsRead => 'Read app settings';
+  @override
+  String get extPermSettingsWrite => 'Change app settings';
+  @override
+  String get extPermNotifications => 'Show notifications';
+  @override
+  String get extPermTray => 'Add tray menu entries';
+  @override
+  String get extPermUiPanel => 'Show panels inside the app';
+  @override
+  String get extPermThemeApply => 'Apply themes to the app';
+  @override
+  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  @override
+  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  @override
+  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  @override
+  String get extPermBackground => 'Run background tasks';
 
   @override
   String exportLogFile(String name) {

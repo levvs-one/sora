@@ -905,9 +905,175 @@ class SRu extends S {
 
   @override
   String get extensions => 'Расширения';
-
   @override
-  String get extensionsSoon => 'Скоро появится';
+  String extRatingLabel(String rating) => 'Оценка $rating из 5';
+  @override
+  String extByAuthor(String author) => '$author';
+  @override
+  String extInstallsCount(String count) => 'установок: $count';
+  @override
+  String get extBadgeVerified => 'Проверено';
+  @override
+  String get extBadgeTop => 'Топ недели';
+  @override
+  String get extBadgeNew => 'Новое';
+  @override
+  String get extBadgeStaff => 'Команда Sora';
+  @override
+  String get extSideloadShort => 'Не из каталога';
+  @override
+  String get extSideloadWarning => 'Не из каталога команды. Ключ автора не проверен: устанавливайте, только если доверяете автору.';
+  @override
+  String extInstallTitle(String name) => 'Установить «$name»';
+  @override
+  String extUpdateTitle(String name) => 'Обновить «$name»';
+  @override
+  String get extPermissionsIntro => 'Расширение сможет:';
+  @override
+  String get extPermissionsWidened => 'Обновление запрашивает новые разрешения:';
+  @override
+  String get extDangerousAck => 'Я понимаю, что эти разрешения серьёзные';
+  @override
+  String get extInstall => 'Установить';
+  @override
+  String get extUpdate => 'Обновить';
+  @override
+  String get extCancel => 'Отмена';
+  @override
+  String get extConfirm => 'Подтвердить';
+  @override
+  String get extOk => 'ОК';
+  @override
+  String get extCatalog => 'Каталог';
+  @override
+  String get extInstalled => 'Установленные';
+  @override
+  String get extSearchHint => 'Поиск расширений';
+  @override
+  String get extCatAll => 'Все';
+  @override
+  String get extCatTools => 'Инструменты';
+  @override
+  String get extCatThemes => 'Темы';
+  @override
+  String get extCatAutomation => 'Автоматизация';
+  @override
+  String get extCatStats => 'Статистика';
+  @override
+  String get extCatNetwork => 'Сеть';
+  @override
+  String get extSortBy => 'Сортировка';
+  @override
+  String get extSortPopular => 'По популярности';
+  @override
+  String get extSortRating => 'По рейтингу';
+  @override
+  String get extSortName => 'По названию';
+  @override
+  String get extCatalogError => 'Не удалось загрузить каталог';
+  @override
+  String get extRetry => 'Повторить';
+  @override
+  String get extEmptySearch => 'Ничего не найдено';
+  @override
+  String get extEmptyInstalled => 'Пока нет установленных расширений.
+Найдите в каталоге или установите из файла.';
+  @override
+  String get extInstallFromFile => 'Установить из файла';
+  @override
+  String get extInstallFromUrl => 'Установить по ссылке';
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+  @override
+  String get extDownload => 'Скачать';
+  @override
+  String get extDownloading => 'Скачивание…';
+  @override
+  String get extVerifying => 'Проверка…';
+  @override
+  String get extInstalling => 'Установка…';
+  @override
+  String get extInstallFailed => 'Не удалось установить';
+  @override
+  String get extErrSignature => 'Проверка подписи не пройдена. Файл может быть повреждён или подменён.';
+  @override
+  String get extErrManifest => 'Манифест расширения некорректен.';
+  @override
+  String get extErrNetwork => 'Ошибка сети. Проверьте соединение и попробуйте снова.';
+  @override
+  String get extErrHash => 'Скачанный файл не совпадает с каталогом. Возможно, он подменён.';
+  @override
+  String extErrMinApp(String version) => 'Расширению нужна версия приложения $version или новее.';
+  @override
+  String get extErrHttpsOnly => 'Разрешены только ссылки https://';
+  @override
+  String get extErrGeneric => 'Что-то пошло не так. Попробуйте снова.';
+  @override
+  String get extUpdateAvailable => 'Доступно обновление';
+  @override
+  String get extDisabled => 'Отключено';
+  @override
+  String extVersionLabel(String version) => 'Версия $version';
+  @override
+  String get extAuthor => 'Автор';
+  @override
+  String get extRating => 'Оценка';
+  @override
+  String get extInstalls => 'Установки';
+  @override
+  String get extVersion => 'Версия';
+  @override
+  String get extAbout => 'Описание';
+  @override
+  String get extPermissionsTitle => 'Разрешения';
+  @override
+  String get extNoPermissions => 'Особых разрешений не требуется.';
+  @override
+  String get extSettings => 'Настройки';
+  @override
+  String get extSaveSettings => 'Сохранить настройки';
+  @override
+  String get extSaving => 'Сохранение…';
+  @override
+  String get extOpenPanel => 'Открыть панель';
+  @override
+  String extUpdateTo(String version) => 'Обновить до $version';
+  @override
+  String get extEnabled => 'Включено';
+  @override
+  String extRollbackTo(String version) => 'Откатить до $version';
+  @override
+  String extRollbackConfirm(String version) => 'Откатить до версии $version?';
+  @override
+  String get extUninstall => 'Удалить';
+  @override
+  String extUninstallConfirm(String name) => 'Удалить «$name» и его настройки?';
+  @override
+  String get extPanelUnavailable => 'Панель недоступна. Возможно, расширение отключено или удалено.';
+  @override
+  String get extPermConnectionsRead => 'Видеть список активных соединений';
+  @override
+  String get extPermServersRead => 'Видеть список ваших серверов';
+  @override
+  String get extPermSettingsRead => 'Читать настройки приложения';
+  @override
+  String get extPermSettingsWrite => 'Изменять настройки приложения';
+  @override
+  String get extPermNotifications => 'Показывать уведомления';
+  @override
+  String get extPermTray => 'Добавлять пункты в меню трея';
+  @override
+  String get extPermUiPanel => 'Показывать панели в приложении';
+  @override
+  String get extPermThemeApply => 'Применять темы оформления';
+  @override
+  String get extPermRoutingRules => 'Добавлять правила маршрутизации (влияет на трафик)';
+  @override
+  String get extPermNetHooks => 'Встраиваться в сетевой тракт (модули обхода DPI)';
+  @override
+  String get extPermNetFetch => 'Запрашивать URL из разрешённого списка';
+  @override
+  String get extPermBackground => 'Выполнять фоновые задачи';
 
   @override
   String exportLogFile(String name) {

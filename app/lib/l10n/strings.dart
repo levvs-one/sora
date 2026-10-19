@@ -1784,12 +1784,95 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Расширения'**
   String get extensions;
+  String extRatingLabel(String rating);
+  String extByAuthor(String author);
+  String extInstallsCount(String count);
+  String get extBadgeVerified;
+  String get extBadgeTop;
+  String get extBadgeNew;
+  String get extBadgeStaff;
+  String get extSideloadShort;
+  String get extSideloadWarning;
+  String extInstallTitle(String name);
+  String extUpdateTitle(String name);
+  String get extPermissionsIntro;
+  String get extPermissionsWidened;
+  String get extDangerousAck;
+  String get extInstall;
+  String get extUpdate;
+  String get extCancel;
+  String get extConfirm;
+  String get extOk;
+  String get extCatalog;
+  String get extInstalled;
+  String get extSearchHint;
+  String get extCatAll;
+  String get extCatTools;
+  String get extCatThemes;
+  String get extCatAutomation;
+  String get extCatStats;
+  String get extCatNetwork;
+  String get extSortBy;
+  String get extSortPopular;
+  String get extSortRating;
+  String get extSortName;
+  String get extCatalogError;
+  String get extRetry;
+  String get extEmptySearch;
+  String get extEmptyInstalled;
+  String get extInstallFromFile;
+  String get extInstallFromUrl;
+  String get extUrlHint;
+  String get extDownload;
+  String get extDownloading;
+  String get extVerifying;
+  String get extInstalling;
+  String get extInstallFailed;
+  String get extErrSignature;
+  String get extErrManifest;
+  String get extErrNetwork;
+  String get extErrHash;
+  String extErrMinApp(String version);
+  String get extErrHttpsOnly;
+  String get extErrGeneric;
+  String get extUpdateAvailable;
+  String get extDisabled;
+  String extVersionLabel(String version);
+  String get extAuthor;
+  String get extRating;
+  String get extInstalls;
+  String get extVersion;
+  String get extAbout;
+  String get extPermissionsTitle;
+  String get extNoPermissions;
+  String get extSettings;
+  String get extSaveSettings;
+  String get extSaving;
+  String get extOpenPanel;
+  String extUpdateTo(String version);
+  String get extEnabled;
+  String extRollbackTo(String version);
+  String extRollbackConfirm(String version);
+  String get extUninstall;
+  String extUninstallConfirm(String name);
+  String get extPanelUnavailable;
+  String get extPermConnectionsRead;
+  String get extPermServersRead;
+  String get extPermSettingsRead;
+  String get extPermSettingsWrite;
+  String get extPermNotifications;
+  String get extPermTray;
+  String get extPermUiPanel;
+  String get extPermThemeApply;
+  String get extPermRoutingRules;
+  String get extPermNetHooks;
+  String get extPermNetFetch;
+  String get extPermBackground;
 
   /// No description provided for @extensionsSoon.
   ///
   /// In ru, this message translates to:
   /// **'Скоро появится'**
-  String get extensionsSoon;
 
   /// No description provided for @exportLogFile.
   ///

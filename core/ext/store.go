@@ -100,9 +100,11 @@ func (s *Store) extDir(id, version string) string {
 	return filepath.Join(s.dir, id+"@"+version)
 }
 
-// Install verifies pkg and installs it. For an update it returns the added
-// permissions so the caller can re-prompt; the update is staged but not
-// applied until ConfirmUpdate is called with the accepted set.
+// Install verifies pkg and installs it. granted must cover every permission
+// in the manifest; the caller is expected to have shown the permission
+// prompt (and any re-prompt for widened permissions) before calling.
+// For an update it returns the permissions added relative to the previous
+// version, so the caller can surface what changed.
 func (s *Store) Install(pkg *Package, source string, granted []string) (added []string, err error) {
 	if pkg == nil || pkg.Manifest == nil {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: no package")
@@ -154,7 +156,6 @@ func (s *Store) Install(pkg *Package, source string, granted []string) (added []
 		previous = cur.Version
 		enabled = cur.Enabled
 		installedAt = cur.InstalledAt
-		// An update keeps working until confirmed; stage under a temp name.
 	}
 	s.installed[m.ID] = &Installed{
 		Manifest:    *m,
