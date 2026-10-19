@@ -216,7 +216,7 @@ func runOne(ctx context.Context, in Input, t Test) Result {
 		}
 	}
 	if timeout <= 0 {
-		res.Details = "skipped: no time left in the run deadline"
+		res.Details = "not run: no time left in the run deadline"
 		return res
 	}
 	pctx, cancel := context.WithTimeout(ctx, timeout)
@@ -229,7 +229,11 @@ func runOne(ctx context.Context, in Input, t Test) Result {
 			res.Pass, res.Skipped, res.Details = judgeDirect(in, in.ProbeDirectDNS(pctx, in.DirectDNSTarget), "DNS", in.DirectDNSTarget)
 		}
 	case TestIPv6:
-		res.Pass, res.Skipped, res.Details = judgeIPv6(pctx, in)
+		if skip, why := directSkipped(in); skip {
+			res.Pass, res.Skipped, res.Details = true, true, why
+		} else {
+			res.Pass, res.Skipped, res.Details = judgeIPv6(pctx, in)
+		}
 	case TestICMPEcho:
 		if skip, why := directSkipped(in); skip {
 			res.Pass, res.Skipped, res.Details = true, true, why

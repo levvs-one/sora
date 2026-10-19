@@ -122,6 +122,28 @@ func TestIPv6PassesWhenBlocked(t *testing.T) {
 	}
 }
 
+func TestIPv6SkippedWhenTunnelCaptures(t *testing.T) {
+	// While the tunnel is up in TUN mode a direct IPv6 query travels
+	// inside the tunnel like any other direct socket: a tunnel-side DNS
+	// hijack would answer it and look like an IPv6 leak. The probe cannot
+	// distinguish, so it must skip, not fail.
+	called := false
+	in := baseInput()
+	in.TunnelUp = true
+	in.DirectCaptured = true
+	in.ProbeIPv6 = func(ctx context.Context, target string) Outcome {
+		called = true
+		return OutcomeOpen
+	}
+	res := runSingle(t, in, TestIPv6)
+	if !res.Pass || !res.Skipped {
+		t.Fatalf("ipv6 should skip while the tunnel captures: %+v", res)
+	}
+	if called {
+		t.Fatal("probe ran even though the test skipped it")
+	}
+}
+
 func TestIPv6SkippedWithIPv6Tunnel(t *testing.T) {
 	called := false
 	in := baseInput()
