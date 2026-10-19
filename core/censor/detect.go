@@ -85,6 +85,7 @@ var rules = []rule{
 	certRule,
 	appResetRule,
 	dataResetRule,
+	dataStallRule,
 }
 
 // failureScan reduces the event log to what the rules need: the first
@@ -384,6 +385,8 @@ func explain(k Kind, conf float64) string {
 		return "The connection is cut the moment the handshake reveals which server you are reaching. Your provider can see the destination and is blocking it." + hedge + " TLS camouflage or Encrypted Client Hello usually helps."
 	case KindIPBlocking:
 		return "The server does not answer at all. It may be down, or its address may be blocked from your network." + hedge + " Trying another server or port is the fastest next step."
+	case KindDataStall:
+		return "The connection worked at first, then froze mid-transfer: data arrived, then nothing until the timeout, with no reset. This is the throttling signature — the path holds the session instead of cutting it." + hedge + " A different server or transport usually helps; reshaping the handshake does not, the handshake already succeeded."
 	default:
 		return "The connection failed, but what was observed isn't enough to tell interference apart from an ordinary failure."
 	}

@@ -35,6 +35,14 @@ const (
 	// KindIPBlocking means the SYN went unanswered: the address:port is
 	// unreachable from here, whether filtered or simply down.
 	KindIPBlocking
+	// KindDataStall means an established session carried data and then went
+	// silent until our own deadline, with no RST or FIN: the 2026
+	// freeze/silent-drop signature (TSPU throttling after ~16 KB). It is
+	// distinct from KindHandshakeTimeout (the stall happened after data
+	// flowed, not during the handshake) and from KindRSTInjection (nobody
+	// tore the connection down; it just stopped). Appended last so the
+	// earlier Kind values never renumber.
+	KindDataStall
 )
 
 // String renders the kind for logs and UI.
@@ -52,6 +60,8 @@ func (k Kind) String() string {
 		return "sni_blocking"
 	case KindIPBlocking:
 		return "ip_blocking"
+	case KindDataStall:
+		return "data_stall"
 	default:
 		return "unknown"
 	}
