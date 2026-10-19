@@ -20,7 +20,11 @@ enum UpdateConnection { idle, connected, changing, unknown }
 enum UpdateError { network, release, checksum, installation, connecting, unsupported }
 
 /// Visible phase of an in-flight update flow (FEATURE-PLAN.md F7).
-enum UpdateStage { idle, checking, downloading, verifying, installing }
+/// There is deliberately no "verifying" stage: file hashes are checked
+/// against the manifest, but the manifest signature itself is not verified
+/// in-app (the release-signing key ceremony is still pending), so the UI
+/// must not claim verification.
+enum UpdateStage { idle, checking, downloading, installing }
 
 class UpdateFailure implements Exception {
   const UpdateFailure(this.reason);
@@ -401,8 +405,12 @@ class AppUpdater extends ChangeNotifier {
         stage = UpdateStage.downloading;
         notifyListeners();
         await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);
-        stage = UpdateStage.verifying;
-        notifyListeners();
+        // Integrity check only: the file hash must match the manifest, but
+        // the manifest signature (.minisig) is not verified in-app — the
+        // release-signing key ceremony is still pending, so only the TLS
+        // transport to GitHub authenticates it. The Linux privileged helper
+        // re-checks the signature as root before installing (SORA-H1); the
+        // UI must not present this step as signature verification.
         await verifyUpdateFile(file, manifest, asset.name);
       }
       _guard();

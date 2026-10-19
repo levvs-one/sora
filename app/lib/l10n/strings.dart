@@ -2077,7 +2077,8 @@ abstract class S {
   String get coreWatchUnstable;
   String get watchReconnect;
   String get coreRestoringLink;
-  String get updateStageVerify;
+  String get updateSignaturePending;
+  String get updateManualSigWarning;
   String get crashRestoreTitle;
 
   /// No description provided for @restoreOnCrash.

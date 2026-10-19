@@ -192,7 +192,6 @@ class _AboutScreenState extends State<AboutScreen> {
                           Expanded(
                             child: Text(
                               switch (updates.stage) {
-                                UpdateStage.verifying => s.updateStageVerify,
                                 UpdateStage.installing => s.updateInstalling,
                                 _ => s.updateDownloading,
                               },
@@ -212,6 +211,10 @@ class _AboutScreenState extends State<AboutScreen> {
                             ),
                         ],
                       ),
+                      const SizedBox(height: 4),
+                      // Honest limitation (D15): file hashes are checked, but
+                      // the release signature is not verified in-app yet.
+                      Text(s.updateSignaturePending, style: Styles.caption.copyWith(color: palette.ink2)),
                     ],
                     if (!canInstall) ...[
                       const SizedBox(height: 8),
@@ -238,6 +241,10 @@ class _AboutScreenState extends State<AboutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Honest fail-closed warning (D15): the manifest
+                    // signature was not verified, only the file hashes.
+                    Text(s.updateManualSigWarning, style: Styles.dangerSecondary(context)),
+                    const SizedBox(height: 8),
                     Text(s.updateManual, style: Styles.secondary.copyWith(color: palette.ink2)),
                     const SizedBox(height: 8),
                     SelectableText(
