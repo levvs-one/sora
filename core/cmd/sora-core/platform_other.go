@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"syscall"
 
 	"golang.org/x/sys/unix"
 
@@ -22,9 +23,29 @@ func platformProtector() secret.Protector { return secret.FileProtector{} }
 // platformName returns the platform name for reports.
 func platformName() string { return runtime.GOOS }
 
-// secureDataDir needs no changes: creation uses owner-only permissions and the
-// service unit assigns ownership.
-func secureDataDir(string) error { return nil }
+// secureDataDir fails closed when the data directory is not owner-only or
+// not owned by this user. MkdirAll does not repair the permissions of an
+// existing directory, so creation-time modes are not enough (SORA-L3).
+func secureDataDir(dir string) error {
+	info, err := os.Stat(dir)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("core: %s is not a directory", dir)
+	}
+	if perm := info.Mode().Perm(); perm != 0o700 {
+		return fmt.Errorf("core: data directory %s has permissions %o, want 700", dir, perm)
+	}
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return fmt.Errorf("core: cannot read ownership of %s", dir)
+	}
+	if int(stat.Uid) != os.Geteuid() {
+		return fmt.Errorf("core: data directory %s is not owned by this user", dir)
+	}
+	return nil
+}
 
 // Hold the inode through shutdown; unlinking it would let another process lock
 // a different inode while this service is still restoring its routes.

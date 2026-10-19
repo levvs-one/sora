@@ -91,6 +91,12 @@ func Open(dir string, opts Options) (*Store, error) {
 	if err := os.MkdirAll(dir, dirMode); err != nil {
 		return nil, errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
 	}
+	// Fail closed on weakened permissions: MkdirAll does not repair an
+	// existing directory, and the master key rests on file permissions
+	// (SORA-L3).
+	if err := checkDataDir(dir); err != nil {
+		return nil, err
+	}
 	key, id, err := loadOrCreateKey(dir, opts.Protector)
 	if err != nil {
 		return nil, err
@@ -311,7 +317,13 @@ func (s *Store) Close() error {
 func (s *Store) read() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	raw, err := os.ReadFile(filepath.Join(s.dir, vaultFile))
+	vaultPath := filepath.Join(s.dir, vaultFile)
+	if _, err := os.Stat(vaultPath); err == nil {
+		if err := checkOwnerOnly(vaultPath, fileMode); err != nil {
+			return err
+		}
+	}
+	raw, err := os.ReadFile(vaultPath)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			return nil

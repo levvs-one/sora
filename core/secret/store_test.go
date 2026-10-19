@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -22,6 +23,17 @@ type testProtector struct {
 func newTestProtector() *testProtector {
 	return &testProtector{blobs: make(map[string][]byte)}
 }
+// testDir returns an owner-only directory: Open fails closed on anything
+// weaker (SORA-L3).
+func testDir(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir()
+	if err := os.Chmod(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	return dir
+}
+
 
 func (p *testProtector) Name() string { return "test" }
 
@@ -51,7 +63,7 @@ func failingWrite(string, []byte, os.FileMode) error {
 
 func openTestStore(t *testing.T) (*Store, *testProtector, string) {
 	t.Helper()
-	dir := t.TempDir()
+	dir := testDir(t)
 	prot := newTestProtector()
 	store, err := Open(dir, Options{Protector: prot})
 	if err != nil {
@@ -109,7 +121,7 @@ func TestPutGetDeleteRoundTrip(t *testing.T) {
 }
 
 func TestSecretsSurviveReopen(t *testing.T) {
-	dir := t.TempDir()
+	dir := testDir(t)
 	prot := newTestProtector()
 
 	first, err := Open(dir, Options{Protector: prot})
@@ -203,7 +215,7 @@ func TestStoreRejectsBadInput(t *testing.T) {
 }
 
 func TestStoreKeepsFileAndMemoryInStep(t *testing.T) {
-	dir := t.TempDir()
+	dir := testDir(t)
 	prot := newTestProtector()
 	store, err := Open(dir, Options{Protector: prot})
 	if err != nil {
@@ -248,7 +260,7 @@ func TestStoreKeepsFileAndMemoryInStep(t *testing.T) {
 }
 
 func TestCorruptVaultIsRefused(t *testing.T) {
-	dir := t.TempDir()
+	dir := testDir(t)
 	prot := newTestProtector()
 	store, err := Open(dir, Options{Protector: prot})
 	if err != nil {
@@ -291,7 +303,7 @@ func TestCorruptVaultIsRefused(t *testing.T) {
 }
 
 func TestVaultCannotBeCombinedWithAForeignKeyOrID(t *testing.T) {
-	firstDir, secondDir := t.TempDir(), t.TempDir()
+	firstDir, secondDir := testDir(t), testDir(t)
 	prot := newTestProtector()
 
 	first, err := Open(firstDir, Options{Protector: prot})
@@ -323,7 +335,7 @@ func TestVaultCannotBeCombinedWithAForeignKeyOrID(t *testing.T) {
 	}
 
 	// Whole-directory backups must reopen with matching key, ID, and vault.
-	moved := t.TempDir()
+	moved := testDir(t)
 	copyStoreFiles(t, moved, firstDir, masterFile, idFile, vaultFile)
 	reopened, err := Open(moved, Options{Protector: prot})
 	if err != nil {
@@ -404,7 +416,7 @@ func TestNewReferenceIsUniqueAndValid(t *testing.T) {
 }
 
 func TestConcurrentUseKeepsTheVaultConsistent(t *testing.T) {
-	dir := t.TempDir()
+	dir := testDir(t)
 	prot := newTestProtector()
 	store, err := Open(dir, Options{Protector: prot})
 	if err != nil {
@@ -460,7 +472,7 @@ func TestVaultIsEncryptedOnDisk(t *testing.T) {
 }
 
 func TestApplyIsAllOrNothing(t *testing.T) {
-	store, err := Open(t.TempDir(), Options{Protector: FileProtector{}})
+	store, err := Open(testDir(t), Options{Protector: FileProtector{}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -492,5 +504,37 @@ func TestApplyIsAllOrNothing(t *testing.T) {
 	defer func() { _ = reopened.Close() }()
 	if got, _ := reopened.Get("new_b"); string(got) != "b" || reopened.Has("old") {
 		t.Fatalf("the change did not reach the disk: refs %v", reopened.Refs())
+	}
+}
+
+// TestOpenRefusesWeakenedPermissions locks SORA-L3: a store directory (or
+// key file) that is not owner-only fails closed instead of silently
+// trusting it.
+func TestOpenRefusesWeakenedPermissions(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("permission checks are !windows")
+	}
+	dir := testDir(t)
+	if _, err := Open(dir, Options{Protector: FileProtector{}}); err != nil {
+		t.Fatalf("Open() on a compliant dir error = %v", err)
+	}
+	if err := os.Chmod(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Open(dir, Options{Protector: FileProtector{}}); err == nil {
+		t.Error("Open() on a 0755 directory succeeded; want a permission error")
+	} else if errs.CodeOf(err) != errs.CodePermissionDenied {
+		t.Errorf("Open() = %v, want permission_denied", err)
+	}
+	// A weakened master key file is refused as well.
+	dir2 := testDir(t)
+	if _, err := Open(dir2, Options{Protector: FileProtector{}}); err != nil {
+		t.Fatalf("Open() error = %v", err)
+	}
+	if err := os.Chmod(filepath.Join(dir2, masterFile), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Open(dir2, Options{Protector: FileProtector{}}); err == nil {
+		t.Error("Open() with a 0644 master key succeeded; want a permission error")
 	}
 }

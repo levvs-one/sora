@@ -23,14 +23,18 @@ type Protector interface {
 	Name() string
 }
 
-// FileProtector uses owner-only key storage without requiring a desktop
-// session.
+// FileProtector keeps the master key in an owner-only file without requiring
+// a desktop session. The key is stored in the clear: owner-only file modes
+// (verified on every open) are the entire protection. Prefer DPAPI or a
+// keyring where the platform offers one.
 type FileProtector struct{}
 
-// Protect stores the key with owner-only permissions.
+// Protect returns the key unchanged; nothing is wrapped. The store relies on
+// the owner-only file it writes, not on this function.
 func (FileProtector) Protect(key []byte) ([]byte, error) { return append([]byte(nil), key...), nil }
 
-// Unprotect copies the key; the owning store checks file permissions.
+// Unprotect copies the key; the store verifies the file's owner-only
+// permissions and ownership before reading it.
 func (FileProtector) Unprotect(wrapped []byte) ([]byte, error) {
 	return append([]byte(nil), wrapped...), nil
 }
@@ -85,6 +89,11 @@ func loadOrCreateKey(dir string, prot Protector) (key, id []byte, err error) {
 
 // loadOrCreateID reads the store identifier, creating it when the store is new.
 func loadOrCreateID(path string) ([]byte, error) {
+	if _, err := os.Stat(path); err == nil {
+		if err := checkOwnerOnly(path, fileMode); err != nil {
+			return nil, err
+		}
+	}
 	//nolint:gosec // the path is the data directory of the core joined with a fixed file name
 	raw, err := os.ReadFile(path)
 	switch {
@@ -109,6 +118,9 @@ func loadOrCreateID(path string) ([]byte, error) {
 
 // readMasterFile reads the wrapped master key and strips the header.
 func readMasterFile(path string) ([]byte, error) {
+	if err := checkOwnerOnly(path, fileMode); err != nil {
+		return nil, err
+	}
 	//nolint:gosec // the path is the data directory of the core joined with a fixed file name
 	raw, err := os.ReadFile(path)
 	if err != nil {
