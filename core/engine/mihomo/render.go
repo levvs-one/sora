@@ -104,10 +104,11 @@ func Render(p *engine.Plan, rt Runtime) (string, error) {
 		c.ProxyGroups = append(c.ProxyGroups, grp)
 	}
 
-	rules, err := buildRules(p.Rules, byID)
+	rules, ruleProviders, err := buildRules(p.Rules, byID)
 	if err != nil {
 		return "", err
 	}
+	c.RuleProviders = ruleProviders
 	c.Rules = rules
 
 	if p.DNS.Enabled {

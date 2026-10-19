@@ -3,6 +3,7 @@ package mihomo
 import (
 	"fmt"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -24,31 +25,59 @@ var ruleTypes = map[engine.RuleType]string{
 	engine.RuleProtocol:      "NETWORK",
 }
 
+// ruleProvider is one remote mihomo rule-provider, rendered under
+// rule-providers. The contract rule carries no behavior hint, so the
+// behavior stays "classical" (domains and IP ranges) and the URL extension
+// decides the wire format.
+type ruleProvider struct {
+	Type     string `yaml:"type"`
+	Behavior string `yaml:"behavior"`
+	URL      string `yaml:"url"`
+	Path     string `yaml:"path"`
+	Interval int    `yaml:"interval"`
+	Format   string `yaml:"format,omitempty"`
+}
+
+// defaultRuleSetInterval refreshes remote rule sets daily, the cadence most
+// community clash rule collections use.
+const defaultRuleSetInterval = 86400
+
 // buildRules preserves plan order because mihomo evaluates rules from top to
-// bottom.
-func buildRules(rules []engine.Rule, byID map[string]string) ([]string, error) {
+// bottom. It also returns the remote rule-providers the RULE-SET lines
+// reference; callers must render them, otherwise the config fails to load.
+func buildRules(rules []engine.Rule, byID map[string]string) ([]string, map[string]ruleProvider, error) {
+	providers := map[string]ruleProvider{}
+	tags := map[string]string{}
 	out := make([]string, 0, len(rules)+1)
 	for _, r := range rules {
 		if r.Type == engine.RuleMatchAll {
 			target, err := ruleTarget(r.Target, byID)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			out = append(out, "MATCH,"+target)
 			continue
 		}
 		kind, ok := ruleTypes[r.Type]
 		if !ok {
-			return nil, fmt.Errorf("mihomo: rule type %q is not supported", r.Type)
+			return nil, nil, fmt.Errorf("mihomo: rule type %q is not supported", r.Type)
+		}
+		value := r.Value
+		if r.Type == engine.RuleRuleSet {
+			tag, err := registerRuleProvider(providers, tags, value)
+			if err != nil {
+				return nil, nil, err
+			}
+			value = tag
 		}
 		if r.Type == engine.RuleIPCIDR && strings.Contains(r.Value, ":") {
 			kind = "IP-CIDR6"
 		}
 		target, err := ruleTarget(r.Target, byID)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		line := kind + "," + r.Value + "," + target
+		line := kind + "," + value + "," + target
 		if r.NoResolve && (r.Type == engine.RuleIPCIDR || r.Type == engine.RuleIPSuffix || r.Type == engine.RuleGeoIP) {
 			line += ",no-resolve"
 		}
@@ -57,7 +86,46 @@ func buildRules(rules []engine.Rule, byID map[string]string) ([]string, error) {
 	if len(out) == 0 || !strings.HasPrefix(out[len(out)-1], "MATCH,") {
 		out = append(out, "MATCH,DIRECT")
 	}
-	return out, nil
+	return out, providers, nil
+}
+
+// registerRuleProvider registers a remote rule-provider for a RuleRuleSet
+// value and returns its tag. A value must be the provider's https URL,
+// mirroring the sing-box renderer; a bare provider name would reference
+// nothing because sora never defines local providers.
+func registerRuleProvider(providers map[string]ruleProvider, tags map[string]string, value string) (string, error) {
+	if !strings.HasPrefix(value, "https://") {
+		return "", fmt.Errorf("mihomo: rule set %q must be an https URL", value)
+	}
+	if tag, ok := tags[value]; ok {
+		return tag, nil
+	}
+	tag := "sora-ruleset-" + strconv.Itoa(len(providers)+1)
+	format, ext := ruleSetFormat(value)
+	providers[tag] = ruleProvider{
+		Type:     "http",
+		Behavior: "classical",
+		URL:      value,
+		Path:     "./rules/" + tag + ext,
+		Interval: defaultRuleSetInterval,
+		Format:   format,
+	}
+	tags[value] = tag
+	return tag, nil
+}
+
+// ruleSetFormat maps the download extension onto mihomo's provider format.
+// Binary mrs is the compact wire format; yaml and plain text lists fall back
+// to their named formats; anything else is plain text.
+func ruleSetFormat(url string) (format, ext string) {
+	switch {
+	case strings.HasSuffix(url, ".mrs"):
+		return "mrs", ".mrs"
+	case strings.HasSuffix(url, ".yaml"), strings.HasSuffix(url, ".yml"):
+		return "yaml", ".yaml"
+	default:
+		return "text", ".txt"
+	}
 }
 
 // ruleTarget maps a plan target onto the name mihomo knows.
@@ -91,7 +159,13 @@ func buildDNS(d engine.DNS, o engine.Options, byID map[string]string) (*dnsConfi
 	case string(engine.DNSFakeIP):
 		out.EnhancedMode = "fake-ip"
 		out.FakeIPRange = orDefault(d.FakeIPRange, "198.18.0.1/16")
-		out.FakeIPFilter = []string{"*.lan", "*.local"}
+		// The plan owns the filter list; fall back to the shared
+		// best-practice defaults (LAN/mDNS, NTP, OS connectivity checks).
+		out.FakeIPFilter = orDefaultList(d.FakeIPFilter, engine.DefaultFakeIPFilter)
+		if d.FakeIPTTL > 0 {
+			ttl := d.FakeIPTTL
+			out.FakeIPTTL = &ttl
+		}
 	default:
 		out.EnhancedMode = "redir-host"
 	}
@@ -108,10 +182,28 @@ func buildDNS(d engine.DNS, o engine.Options, byID map[string]string) (*dnsConfi
 			addr = "tls://" + addr
 		case engine.DNSHTTPS:
 			addr = "https://" + addr + "/dns-query"
+		case engine.DNSH3:
+			// DoH3: mihomo upgrades an https:// nameserver to HTTP/3
+			// when h3=true is present. It forces H3 with no fallback,
+			// which is what an explicit h3:// choice means: a failure
+			// surfaces instead of silently downgrading to H2.
+			addr = "https://" + addr + "/dns-query?h3=true"
 		case engine.DNSQUIC:
 			addr = "quic://" + addr
 		case engine.DNSSystem:
 			system = append(system, "system")
+		}
+		// Corporate MITM proxies break DoT/DoH/DoQ validation; the plan
+		// can opt a server out of certificate verification.
+		if s.SkipVerify {
+			switch s.Transport {
+			case engine.DNSTLS, engine.DNSHTTPS, engine.DNSH3, engine.DNSQUIC:
+				sep := "?"
+				if strings.Contains(addr, "?") {
+					sep = "&"
+				}
+				addr += sep + "skip-cert-verify=true"
+			}
 		}
 		if s.Dialer == "" || s.Dialer == "direct" {
 			bootstrap = append(bootstrap, addr)
@@ -143,8 +235,12 @@ func buildDNS(d engine.DNS, o engine.Options, byID map[string]string) (*dnsConfi
 	return out, nil
 }
 
-// Windows loopback transfer tests show substantially less packet overhead with
-// MIPS. Keep the existing mixed default on other platforms.
+// buildTun matches the upstream mihomo MTU default (9000): the TUN device
+// never touches a wire MTU limit, so larger packets only cut the packet rate
+// through the userspace stack. sing-box in Sora already uses 9000; keep the
+// engines consistent. Windows loopback transfer tests show substantially
+// less packet overhead with MIPS. Keep the existing mixed default on other
+// platforms.
 func buildTun(t engine.Tun, d engine.DNS) *tunConfig {
 	stack := orDefault(t.Stack, "mixed")
 	if t.Stack == "" && runtime.GOOS == "windows" {
@@ -155,7 +251,7 @@ func buildTun(t engine.Tun, d engine.DNS) *tunConfig {
 		Type:      "tun",
 		Stack:     stack,
 		Device:    t.DeviceName,
-		MTU:       orDefaultInt(t.MTU, 1500),
+		MTU:       orDefaultInt(t.MTU, 9000),
 		DNSHijack: orDefaultList(d.HijackTun, []string{"any:53"}),
 	}
 	auto := t.AutoRoute && runtime.GOOS != "linux"

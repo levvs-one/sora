@@ -64,6 +64,7 @@ type config struct {
 	Proxies            []proxy                  `yaml:"proxies,omitempty"`
 	ProxyGroups        []proxyGroup             `yaml:"proxy-groups,omitempty"`
 	ProxyProviders     map[string]proxyProvider `yaml:"proxy-providers,omitempty"`
+	RuleProviders      map[string]ruleProvider  `yaml:"rule-providers,omitempty"`
 	Rules              []string                 `yaml:"rules,omitempty"`
 }
 
