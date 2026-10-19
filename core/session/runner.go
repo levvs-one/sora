@@ -223,7 +223,17 @@ func (s *Session) Start(ctx context.Context) error {
 		err = errs.Wrap(err, errs.CodeUnavailable, errs.KeyEngineStartFailed)
 	} else if tun := s.cfg.Plan.Tun; tun.Enabled && tun.DeviceName != "" {
 		if err = s.cfg.TunUp(ctx, tun.DeviceName); err != nil {
-			_ = s.eng.Stop(context.WithoutCancel(ctx))
+			// The engine is torn down because the tunnel never came up;
+			// keep the stop failure visible instead of swallowing it
+			// (SORA-M16).
+			if stopErr := s.eng.Stop(context.WithoutCancel(ctx)); stopErr != nil {
+				s.log.Append(Event{
+					Kind:   EventError,
+					Reason: errs.CodeOf(stopErr),
+					Key:    errs.KeyEngineStopped,
+					Detail: s.mask(stopErr.Error()),
+				})
+			}
 		}
 	}
 	if err != nil {
