@@ -261,6 +261,12 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		// limit before allocating their payload.
 		grpc.MaxRecvMsgSize(control.MaxRecvMsgBytes),
 		grpc.MaxSendMsgSize(control.MaxSendMsgBytes),
+		// Peer credentials re-check the kernel-verified peer at connection
+		// setup and record its privilege level; the interceptors enforce
+		// per-method authorization from it (SORA-H2).
+		grpc.Creds(ipc.PeerCredentials(ipc.DefaultAuthorize(ipc.Options{Address: opts.Socket}))),
+		grpc.UnaryInterceptor(plane.UnaryAuthInterceptor()),
+		grpc.StreamInterceptor(plane.StreamAuthInterceptor()),
 	)
 	corev1.RegisterCoreControlServer(app.server, plane)
 	built = true

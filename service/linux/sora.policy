@@ -3,14 +3,28 @@
  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
 <!--
-  The person in the active local session drives the tunnel without a password,
-  as with the network settings of a desktop. Remote and inactive sessions need an
-  administrator. The owner annotation lets the core, which runs as the sora user
-  and not as root, ask polkit about the processes that connect to it.
+  Read-only access (status, statistics, events, logs) stays passwordless for
+  the active local session, as with the network settings of a desktop.
+  Anything that changes the tunnel or touches secrets and subscriptions
+  requires the user's own authentication. Remote and inactive sessions need an
+  administrator for both. The owner annotation lets the core, which runs as the
+  sora user and not as root, ask polkit about the processes that connect to it.
 -->
 <policyconfig>
   <vendor>Sora</vendor>
   <vendor_url>https://github.com/levvs-one/sora</vendor_url>
+  <action id="io.github.levvs-one.sora.read">
+    <description>View the Sora tunnel status</description>
+    <description xml:lang="ru">Просмотр состояния туннеля Sora</description>
+    <message>Authentication is required to view the Sora tunnel status</message>
+    <message xml:lang="ru">Для просмотра состояния туннеля Sora нужна аутентификация</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.owner">unix-user:sora</annotate>
+  </action>
   <action id="io.github.levvs-one.sora.control">
     <description>Control the Sora tunnel</description>
     <description xml:lang="ru">Управление туннелем Sora</description>
@@ -19,7 +33,7 @@
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>yes</allow_active>
+      <allow_active>auth_self</allow_active>
     </defaults>
     <annotate key="org.freedesktop.policykit.owner">unix-user:sora</annotate>
   </action>

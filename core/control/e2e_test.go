@@ -65,6 +65,12 @@ func TestClientTalksToTheCoreOverTheTransport(t *testing.T) {
 		// payload allocation.
 		grpc.MaxRecvMsgSize(8<<20),
 		grpc.MaxSendMsgSize(16<<20),
+		// Peer credentials and method checks mirror the real service:
+		// the test client runs as the same user, so it is
+		// control-authorized (SORA-H2).
+		grpc.Creds(ipc.PeerCredentials(ipc.DefaultAuthorize(ipc.Options{Address: address}))),
+		grpc.UnaryInterceptor(plane.UnaryAuthInterceptor()),
+		grpc.StreamInterceptor(plane.StreamAuthInterceptor()),
 	)
 	corev1.RegisterCoreControlServer(grpcServer, plane)
 	served := make(chan error, 1)

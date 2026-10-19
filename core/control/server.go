@@ -23,6 +23,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/parser"
 	"github.com/levvs-one/sora-client/core/routing"
@@ -445,8 +446,10 @@ const (
 
 // Handshake negotiates the API version without a token so clients can
 // initialize. Incompatible clients still receive the core's version to
-// determine the required update.
-func (s *Server) Handshake(_ context.Context, req *corev1.HandshakeRequest) (*corev1.HandshakeResponse, error) {
+// determine the required update. The control token is issued only to
+// control-authorized peers; read-only peers never receive it, so the token
+// cannot smuggle control rights past the method checks (SORA-H2).
+func (s *Server) Handshake(ctx context.Context, req *corev1.HandshakeRequest) (*corev1.HandshakeResponse, error) {
 	negotiated, err := s.checkVersion(req.GetClientVersion())
 	if err != nil {
 		return &corev1.HandshakeResponse{
@@ -456,7 +459,11 @@ func (s *Server) Handshake(_ context.Context, req *corev1.HandshakeRequest) (*co
 	}
 	answer := s.apiVersion()
 	answer.Minor = negotiated
-	return &corev1.HandshakeResponse{NegotiatedVersion: answer, ControlAuthenticator: s.auth.Token()}, nil
+	resp := &corev1.HandshakeResponse{NegotiatedVersion: answer}
+	if peerLevel(ctx) == ipc.AuthControl {
+		resp.ControlAuthenticator = s.auth.Token()
+	}
+	return resp, nil
 }
 
 // Connect starts a session after checking version, authentication, limits, and
