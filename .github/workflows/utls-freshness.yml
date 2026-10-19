@@ -1,0 +1,31 @@
+name: uTLS freshness
+
+# S3: fingerprint freshness is a process, not a flag. This workflow fails
+# loudly (a red job, never a silent warning) when the pinned utls lags
+# upstream or when Chrome stable moved past the reference JA4 fixture.
+on:
+  schedule:
+    # Daily is plenty: fingerprints move at Chrome-release cadence
+    # (~4 weeks). Pushes and PRs stay network-free and deterministic.
+    - cron: '43 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: utls-freshness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  freshness:
+    name: uTLS lag + reference JA4
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      # Stdlib-only Python: no dependencies to pin, no supply-chain surface.
+      - name: Check uTLS and JA4 freshness
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/utls-freshness/check.py
