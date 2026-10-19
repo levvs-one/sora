@@ -182,8 +182,8 @@ func TestIngressFirewallDelegatesToTheInnerFirewall(t *testing.T) {
 	if inner.disarms != 1 {
 		t.Errorf("inner Disarm calls = %d, want 1", inner.disarms)
 	}
-	if decorated.IngressArmed() {
-		t.Error("IngressArmed() = true after Disarm")
+	if armed, err := decorated.IngressArmed(ctx); err != nil || armed {
+		t.Errorf("IngressArmed() = %v, %v after Disarm", armed, err)
 	}
 }
 
@@ -202,8 +202,8 @@ func TestIngressFirewallDisabledSkipsTheRules(t *testing.T) {
 	if !inner.armed {
 		t.Error("the kill switch did not arm with ingress disabled")
 	}
-	if decorated.IngressArmed() {
-		t.Error("IngressArmed() = true with ingress disabled")
+	if armed, err := decorated.IngressArmed(ctx); err != nil || armed {
+		t.Errorf("IngressArmed() = %v, %v with ingress disabled", armed, err)
 	}
 	if err := decorated.Disarm(ctx); err != nil {
 		t.Fatalf("Disarm() error = %v", err)
@@ -222,7 +222,9 @@ func TestIngressFirewallInnerFailureArmsNothing(t *testing.T) {
 	if err := decorated.Arm(context.Background(), nil); err == nil {
 		t.Fatal("Arm() succeeded while the inner firewall failed")
 	}
-	if decorated.IngressArmed() {
+	// The fake firewall has no ingress backend on this platform, so only
+	// the "not armed" half of the answer is asserted.
+	if armed, _ := decorated.IngressArmed(context.Background()); armed {
 		t.Error("IngressArmed() = true after a failed Arm")
 	}
 }
@@ -271,7 +273,9 @@ func TestIngressFirewallValidatesBeforeArmingInner(t *testing.T) {
 	if len(inner.armPorts) != 0 {
 		t.Error("the inner firewall was armed before the config was validated")
 	}
-	if decorated.IngressArmed() {
+	// The fake firewall has no ingress backend on this platform, so only
+	// the "not armed" half of the answer is asserted.
+	if armed, _ := decorated.IngressArmed(context.Background()); armed {
 		t.Error("IngressArmed() = true after a failed Arm")
 	}
 	if inner.armed {

@@ -63,3 +63,9 @@ func (b *nftablesIngressBackend) disarm(ctx context.Context) error {
 	}
 	return nil
 }
+
+// armed probes the kernel for the owned table: after a crash the table
+// may still be installed while this process never armed it.
+func (b *nftablesIngressBackend) armed(ctx context.Context) (bool, error) {
+	return b.nft.tableExistsIn(ctx, nftIngressTable), nil
+}

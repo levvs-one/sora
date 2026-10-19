@@ -135,7 +135,7 @@ func TestArmRefusesRootUid(t *testing.T) {
 	// directories (audit R2): plant a fake through the test hook so the test
 	// does not depend on nft being installed.
 	dir := t.TempDir()
-	if err := os.WriteFile(dir+"/nft", []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+	if err := os.WriteFile(dir+"/nft", []byte("#!/bin/sh\nif [ \"$1\" = \"list\" ]; then exit 1; fi\nexit 0\n"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	t.Setenv("PATH", dir+":"+os.Getenv("PATH"))

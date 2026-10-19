@@ -98,6 +98,11 @@ func validateIngressConfig(cfg IngressConfig) error {
 type ingressBackend interface {
 	arm(ctx context.Context) error
 	disarm(ctx context.Context) error
+	// armed reports whether the platform rules are actually installed,
+	// checked against the platform rather than this process's memory, so
+	// a crash can never make the protection report itself absent while
+	// its rules are still in force (or vice versa).
+	armed(ctx context.Context) (bool, error)
 }
 
 // IngressFirewall decorates a Firewall with ingress protection. It
@@ -108,7 +113,6 @@ type IngressFirewall struct {
 	inner   Firewall
 	cfg     IngressConfig
 	backend ingressBackend
-	armed   bool
 }
 
 var _ Firewall = (*IngressFirewall)(nil)
@@ -140,35 +144,55 @@ func (f *IngressFirewall) Arm(ctx context.Context, enginePorts []uint16) error {
 	if err := f.inner.Arm(ctx, enginePorts); err != nil {
 		return err
 	}
-	if f.backend == nil {
-		backend, err := newIngressBackend(f.inner, f.cfg)
-		if err != nil {
-			return err
-		}
-		f.backend = backend
+	if err := f.ensureBackend(); err != nil {
+		return err
 	}
 	if f.backend != nil {
 		if err := f.backend.arm(ctx); err != nil {
 			return err
 		}
 	}
-	f.armed = true
+	return nil
+}
+
+// ensureBackend builds the platform backend on first use. A nil inner
+// (NoopFirewall) leaves the backend nil: there is nothing to install.
+func (f *IngressFirewall) ensureBackend() error {
+	if f.backend != nil {
+		return nil
+	}
+	backend, err := newIngressBackend(f.inner, f.cfg)
+	if err != nil {
+		return err
+	}
+	f.backend = backend
 	return nil
 }
 
 // Disarm removes the ingress rules first, then disarms the kill switch,
 // so inbound stays filtered until the last moment. It succeeds when
-// nothing is armed.
+// nothing is armed. The platform rules are removed whenever they are
+// actually installed — even when a crashed predecessor installed them
+// and this process never armed.
 func (f *IngressFirewall) Disarm(ctx context.Context) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	if f.armed && f.backend != nil {
-		if err := f.backend.disarm(ctx); err != nil {
+	// A backend that cannot be built never installed anything through
+	// this decorator; ignoring the error keeps Disarm a safe cleanup
+	// path after a failed Arm.
+	_ = f.ensureBackend()
+	if f.backend != nil {
+		armed, err := f.backend.armed(ctx)
+		if err != nil {
 			return err
 		}
+		if armed {
+			if err := f.backend.disarm(ctx); err != nil {
+				return err
+			}
+		}
+		f.backend = nil
 	}
-	f.backend = nil
-	f.armed = false
 	return f.inner.Disarm(ctx)
 }
 
@@ -177,12 +201,24 @@ func (f *IngressFirewall) Armed(ctx context.Context) (bool, error) {
 	return f.inner.Armed(ctx)
 }
 
-// IngressArmed reports whether the ingress rules are installed by this
-// decorator.
-func (f *IngressFirewall) IngressArmed() bool {
+// IngressArmed reports whether the ingress rules are actually installed,
+// checked against the platform rather than this process's memory. After a
+// crash the kernel tables may still be in force while this process never
+// armed them; IngressArmed reports that truthfully so diagnostics and the
+// UI never claim the inbound side is open when it is not.
+func (f *IngressFirewall) IngressArmed(ctx context.Context) (bool, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	return f.armed
+	if !f.cfg.Enabled {
+		return false, nil
+	}
+	if err := f.ensureBackend(); err != nil {
+		return false, err
+	}
+	if f.backend == nil {
+		return false, nil
+	}
+	return f.backend.armed(ctx)
 }
 
 // Inner exposes the wrapped firewall for diagnostics.

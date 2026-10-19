@@ -19,7 +19,11 @@ func TestIngressFirewallInstallsAndRemovesTheLinuxTable(t *testing.T) {
 	script := `#!/bin/sh
 # Fake nft: keeps one state file per table mentioned on stdin. Exact
 # command matches: the "sora" patterns must not prefix-match the
-# "sora_ingress" commands.
+# "sora_ingress" commands. A "list" invocation is the kernel-truth probe
+# used by Armed()/IngressArmed().
+if [ "$1" = "list" ]; then
+	if [ -f "$SORA_FAKE_DIR/$4.state" ]; then exit 0; else exit 1; fi
+fi
 input=$(cat)
 table=""
 deleting=0
@@ -72,8 +76,8 @@ exit 0
 	if err := decorated.Arm(ctx, nil); err != nil {
 		t.Fatalf("Arm() error = %v", err)
 	}
-	if !decorated.IngressArmed() {
-		t.Fatal("IngressArmed() = false after Arm")
+	if armed, err := decorated.IngressArmed(ctx); err != nil || !armed {
+		t.Fatalf("IngressArmed() = %v, %v after Arm", armed, err)
 	}
 	for _, table := range []string{"sora", "sora_ingress"} {
 		if _, err := os.Stat(dir + "/" + table + ".state"); err != nil {
@@ -104,8 +108,8 @@ exit 0
 	if err := decorated.Disarm(ctx); err != nil {
 		t.Fatalf("Disarm() error = %v", err)
 	}
-	if decorated.IngressArmed() {
-		t.Error("IngressArmed() = true after Disarm")
+	if armed, err := decorated.IngressArmed(ctx); err != nil || armed {
+		t.Errorf("IngressArmed() = %v, %v after Disarm", armed, err)
 	}
 	for _, table := range []string{"sora", "sora_ingress"} {
 		if _, err := os.Stat(dir + "/" + table + ".state"); !os.IsNotExist(err) {
@@ -124,7 +128,7 @@ exit 0
 func TestIngressFirewallAbortsWhenTheKillSwitchRefuses(t *testing.T) {
 	dir := t.TempDir()
 	nft := dir + "/nft"
-	if err := os.WriteFile(nft, []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+	if err := os.WriteFile(nft, []byte("#!/bin/sh\nif [ \"$1\" = \"list\" ]; then exit 1; fi\nexit 0\n"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	guard.NftBinForTest = nft
@@ -138,8 +142,8 @@ func TestIngressFirewallAbortsWhenTheKillSwitchRefuses(t *testing.T) {
 	if err := decorated.Arm(testContext(), nil); err == nil {
 		t.Fatal("Arm() succeeded while the kill switch refused uid 0")
 	}
-	if decorated.IngressArmed() {
-		t.Error("IngressArmed() = true after the kill switch refused")
+	if armed, err := decorated.IngressArmed(testContext()); armed {
+		t.Errorf("IngressArmed() = true after the kill switch refused (err = %v)", err)
 	}
 }
 
@@ -148,6 +152,11 @@ func TestIngressFirewallAbortsWhenTheKillSwitchRefuses(t *testing.T) {
 // install in one invocation commit atomically. Every stdin payload is
 // appended to calls.log for assertions.
 const fakeNftBatch = `#!/bin/sh
+# A "list" invocation is the kernel-truth probe used by
+# Armed()/IngressArmed().
+if [ "$1" = "list" ]; then
+	if [ -f "$SORA_FAKE_DIR/$4.state" ]; then exit 0; else exit 1; fi
+fi
 input=$(cat)
 printf '%s\n====\n' "$input" >> "$SORA_FAKE_DIR/calls.log"
 has_del=0

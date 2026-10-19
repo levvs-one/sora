@@ -88,6 +88,15 @@ func (b *wfpIngressBackend) disarm(ctx context.Context) error {
 	return nil
 }
 
+// armed reports whether this process holds the receive filters. WFP dynamic
+// sessions die with the process, so the in-process handle is the truth:
+// after a crash there is nothing left to probe.
+func (b *wfpIngressBackend) armed(context.Context) (bool, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.session != nil, nil
+}
+
 func (b *wfpIngressBackend) install(session *wf.Session, endpoints []netip.Addr) error {
 	guid, err := windows.GenerateGUID()
 	if err != nil {

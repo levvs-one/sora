@@ -155,11 +155,25 @@ func isMissingTable(err error) bool {
 	return err != nil && strings.Contains(err.Error(), "No such file or directory")
 }
 
-// Armed reports whether this process installed the table.
-func (n *Nftables) Armed(context.Context) (bool, error) {
+// Armed reports whether the block is in force. The in-process flag is only
+// half the truth: after a crash a new process starts with armed=false while
+// the kernel table is still installed. Armed therefore falls back to asking
+// the kernel, so callers (and the UI "Blocked" state) never report the
+// traffic as open while the table is actually in force.
+func (n *Nftables) Armed(ctx context.Context) (bool, error) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	return n.armed, nil
+	if n.armed {
+		return true, nil
+	}
+	return n.tableExistsIn(ctx, nftTable), nil
+}
+
+// tableExistsIn probes the kernel for a table without changing it.
+func (n *Nftables) tableExistsIn(ctx context.Context, table string) bool {
+	process := exec.CommandContext(ctx, n.command, "list", "table", "inet", table) //nolint:gosec // n.command is the absolute nft path resolved at construction
+	process.Stdin = strings.NewReader("")
+	return process.Run() == nil
 }
 
 // Name identifies the implementation in a diagnostics line.
