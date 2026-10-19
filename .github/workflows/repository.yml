@@ -200,13 +200,20 @@ jobs:
         with:
           flutter-version: 3.47.6
           channel: stable
+      - name: Read APP_VERSION from pubspec
+        # The extension store gates installs on min_app_version against the
+        # running app version; it is injected as a build-time define, exactly
+        # the recipe documented in docs/extensions.md.
+        shell: bash
+        working-directory: app
+        run: echo "APP_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d+ -f1)" >> "$GITHUB_ENV"
       - name: Build the app
         working-directory: app
         run: |
           flutter pub get
           flutter test test/app_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Windows defaults and plan tests failed' }
-          flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+          flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }} --dart-define=APP_VERSION=${{ env.APP_VERSION }}
       - name: Build the installer
         shell: pwsh
         run: |
@@ -463,13 +470,20 @@ jobs:
         with:
           flutter-version: 3.47.6
           channel: stable
+      - name: Read APP_VERSION from pubspec
+        # The extension store gates installs on min_app_version against the
+        # running app version; it is injected as a build-time define, exactly
+        # the recipe documented in docs/extensions.md.
+        if: matrix.arch == 'amd64'
+        working-directory: app
+        run: echo "APP_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d+ -f1)" >> "$GITHUB_ENV"
       - name: Build the app
         if: matrix.arch == 'amd64'
         working-directory: app
         run: |
           sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
           flutter pub get
-          flutter build linux --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+          flutter build linux --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }} --dart-define=APP_VERSION=${{ env.APP_VERSION }}
       - name: Package
         env:
           SORA_ARCH: ${{ matrix.arch }}
