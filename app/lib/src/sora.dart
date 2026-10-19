@@ -419,10 +419,18 @@ class Sora extends ChangeNotifier {
   /// plan of every later connect; while connected the reconnect banner takes
   /// over. Throws [CoreFailure] on failure so the UI can render it inline;
   /// with [silent] failures are only logged (used to heal the core profile
-  /// when the link opens).
+  /// when the link opens). A core older than 1.11 has no ObfsControl: the
+  /// settings stay local and a non-silent call throws 'app.obfs_unsupported'
+  /// instead of pretending the push happened.
   Future<ObfsApplyResult> applyObfsProfile({bool silent = false}) async {
     final link = _link;
-    if (link == null || link.minor < obfsMinApiMinor) {
+    if (link == null) {
+      // No core link yet: keep the settings local; they heal onto the core
+      // when the link opens.
+      return (compatibleEngines: const <String>[], warnings: const <String>[]);
+    }
+    if (link.minor < obfsMinApiMinor) {
+      if (!silent) throw const CoreFailure('app.obfs_unsupported');
       return (compatibleEngines: const <String>[], warnings: const <String>[]);
     }
     try {
@@ -459,16 +467,30 @@ class Sora extends ChangeNotifier {
 
   /// Edits the obfuscation settings, persists them and pushes the profile to
   /// the core. A named [preset] travels preset-only; any manual field flips
-  /// the profile custom. Throws [CoreFailure] when the push fails; the local
+  /// the profile custom. A no-op edit (re-tapping the current value) pushes
+  /// nothing, so the reconnect banner only appears when the wire profile
+  /// actually changes. Throws [CoreFailure] when the push fails; the local
   /// settings stay saved and sync on the next link or edit.
   Future<ObfsApplyResult> updateObfs({String? preset, String? utls, bool? fragment, bool? jitter}) async {
+    var changed = false;
     if (preset != null) {
+      changed = obfs.preset != preset;
       obfs.applyPreset(preset);
     } else {
-      if (utls != null) obfs.utls = utls;
-      if (fragment != null) obfs.fragment = fragment;
-      if (jitter != null) obfs.jitter = jitter;
+      if (utls != null && obfs.utls != utls) {
+        obfs.utls = utls;
+        changed = true;
+      }
+      if (fragment != null && obfs.fragment != fragment) {
+        obfs.fragment = fragment;
+        changed = true;
+      }
+      if (jitter != null && obfs.jitter != jitter) {
+        obfs.jitter = jitter;
+        changed = true;
+      }
     }
+    if (!changed) return (compatibleEngines: const <String>[], warnings: const <String>[]);
     return applyObfsProfile();
   }
 
