@@ -3,7 +3,12 @@ package subscription
 import "testing"
 
 func TestAFetchFromTheInternetNeverReachesALocalAddress(t *testing.T) {
-	for _, address := range []string{"127.0.0.1:443", "[::1]:443", "10.0.0.5:443", "192.168.1.1:443", "169.254.169.254:80", "[fe80::1]:443", "0.0.0.0:443"} {
+	for _, address := range []string{"127.0.0.1:443", "[::1]:443", "10.0.0.5:443", "192.168.1.1:443", "169.254.169.254:80", "[fe80::1]:443", "0.0.0.0:443",
+		// Special-use ranges are not public internet either: CGNAT,
+		// documentation, benchmarking, and reserved space must not be
+		// reachable through DNS rebinding.
+		"100.64.0.5:443", "192.0.2.1:443", "198.51.100.1:443", "203.0.113.1:443",
+		"198.18.0.1:443", "240.0.0.1:443", "[2001:db8::1]:443"} {
 		if checkDial(false, address) == nil {
 			t.Errorf("%s was dialled for a subscription on the internet", address)
 		}

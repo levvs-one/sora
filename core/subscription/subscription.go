@@ -302,7 +302,29 @@ func isPrivateHost(host string) bool {
 
 func publicAddr(addr netip.Addr) bool {
 	addr = addr.Unmap()
-	return addr.IsGlobalUnicast() && !addr.IsPrivate()
+	if !addr.IsGlobalUnicast() || addr.IsPrivate() {
+		return false
+	}
+	// IsGlobalUnicast still reports special-use ranges as global; none of
+	// them is a reachable public subscription host.
+	for _, p := range specialUsePrefixes {
+		if p.Contains(addr) {
+			return false
+		}
+	}
+	return true
+}
+
+// specialUsePrefixes are globally-unreachable ranges that IsGlobalUnicast
+// reports as global unicast.
+var specialUsePrefixes = []netip.Prefix{
+	netip.MustParsePrefix("100.64.0.0/10"),   // CGNAT (RFC 6598)
+	netip.MustParsePrefix("192.0.2.0/24"),    // documentation (RFC 5737)
+	netip.MustParsePrefix("198.51.100.0/24"), // documentation (RFC 5737)
+	netip.MustParsePrefix("203.0.113.0/24"),  // documentation (RFC 5737)
+	netip.MustParsePrefix("198.18.0.0/15"),   // benchmarking (RFC 2544)
+	netip.MustParsePrefix("240.0.0.0/4"),     // reserved (RFC 1112)
+	netip.MustParsePrefix("2001:db8::/32"),   // documentation (RFC 3849)
 }
 
 // dialChecked rejects private resolved addresses unless the subscription is

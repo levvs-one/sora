@@ -204,7 +204,14 @@ func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 func (e *Engine) Select(ctx context.Context, group, target string) error {
 	e.op.Lock()
 	defer e.op.Unlock()
-	if err := e.tun.(engine.ConnectionTracker).CloseConnections(ctx); err != nil {
+	// The TUN side is always a connection-tracking engine today, but assert
+	// defensively: a failed assertion must not panic the session.
+	tracker, ok := e.tun.(engine.ConnectionTracker)
+	if !ok {
+		return errs.Newf(errs.CodeInternal, errs.KeyEngineStartFailed,
+			"xraytun: the packet engine does not track connections")
+	}
+	if err := tracker.CloseConnections(ctx); err != nil {
 		return err
 	}
 	return e.Engine.Select(ctx, group, target)

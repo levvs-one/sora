@@ -133,9 +133,9 @@ func TestSlowWatcherLosesInsteadOfBlocking(t *testing.T) {
 }
 
 func TestDestinationsAreHiddenUnlessRecorded(t *testing.T) {
-	line := "from 127.0.0.1:38204 accepted tcp:www.example.org:443 [mixed-in >> o0001] via [2001:db8::1]:443 and 2001:db8:0:0::7 at 15:02:43"
+	line := "from 127.0.0.1:38204 accepted tcp:www.example.org:443 [mixed-in >> o0001] via [2001:db8::1]:443 and 2001:db8:0:0::7 at 15:02:43 dial ::1"
 	got := HideDestinations(line)
-	for _, leaked := range []string{"example.org", "127.0.0.1", "2001:db8"} {
+	for _, leaked := range []string{"example.org", "127.0.0.1", "2001:db8", "::1", "::7"} {
 		if strings.Contains(got, leaked) {
 			t.Errorf("%q leaked: %s", leaked, got)
 		}
