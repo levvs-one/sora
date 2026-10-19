@@ -127,6 +127,11 @@ func renderVersioned(p *engine.Plan, rt supervise.Runtime, ver engine.Version) (
 	if len(endpoints) > 0 {
 		cfg["endpoints"] = endpoints
 	}
+	if len(r.httpClients) > 0 {
+		// Remote rule-set downloads ride this client; route() sets
+		// route.default_http_client to its tag.
+		cfg["http_clients"] = r.httpClients
+	}
 	return json.Marshal(cfg)
 }
 
@@ -139,6 +144,10 @@ type renderer struct {
 	used     map[string]bool
 	final    string
 	ruleSets []obj
+	// httpClients carries the detour for remote rule-set downloads
+	// (route.default_http_client selects its tag); empty when the
+	// plan has no proxy to download through.
+	httpClients []obj
 }
 
 // assignTags gives outbounds and groups unique tags. Unique display names are
@@ -524,12 +533,21 @@ func (r *renderer) route() (obj, error) {
 		// Rule-set downloads must reach hosts the local network blocks
 		// (GitHub raw is filtered in some regions): send them through
 		// the default route when it leads through a proxy, otherwise
-		// through the first proxy of the plan. With no proxy at all the
-		// detour stays unset and sing-box downloads directly.
+		// through the first proxy of the plan.
+		//
+		// sing-box 1.14 deprecated the per-rule-set download_detour
+		// (removal in 1.16) in favor of reusable HTTP clients: one
+		// client carries the detour and route.default_http_client
+		// selects it for every remote rule-set. With no proxy at all
+		// no client is rendered and sing-box downloads directly.
 		if detour := r.ruleSetDetour(); detour != "" {
-			for _, rs := range r.ruleSets {
-				rs["download_detour"] = detour
+			tag := "rule-sets"
+			for n := 2; r.used[tag]; n++ {
+				tag = "rule-sets-" + strconv.Itoa(n)
 			}
+			r.used[tag] = true
+			r.httpClients = []obj{{"tag": tag, "detour": detour}}
+			out["default_http_client"] = tag
 		}
 		out["rule_set"] = r.ruleSets
 	}
@@ -623,15 +641,14 @@ func (r *renderer) dns() (obj, string, error) {
 			server["type"] = "local"
 		case engine.DNSFakeIP:
 			continue
-		case engine.DNSH3:
-			// DoH3 has no legacy "type" spelling; sing-box picks its
-			// HTTP/3 transport from the h3:// address prefix.
-			port := int(s.Port)
-			if port == 0 {
-				port = 443
-			}
-			server["address"] = "h3://" + net.JoinHostPort(s.Address, strconv.Itoa(port)) + "/dns-query"
-		case engine.DNSPlain, engine.DNSTCP, engine.DNSTLS, engine.DNSHTTPS, engine.DNSQUIC, "":
+		case engine.DNSPlain, engine.DNSTCP, engine.DNSTLS, engine.DNSHTTPS, engine.DNSH3, engine.DNSQUIC, "":
+			// DoH3 is a first-class server type since sing-box 1.12:
+			// "type": "h3" with server/server_port. The h3:// address
+			// string was the legacy H3 server spelling, removed in
+			// 1.14 (the old comment claiming there was no legacy
+			// "type" spelling was wrong). An unset port is omitted:
+			// sing-box defaults it per type (443 for https and h3,
+			// 853 for tls and quic, 53 for udp and tcp).
 			server.set("type", orDefault(string(s.Transport), "udp")).set("server", s.Address).set("server_port", int(s.Port))
 		default:
 			return nil, "", fmt.Errorf("singbox: dns transport %q is not supported", s.Transport)
@@ -771,21 +788,42 @@ func tunMTU(mtu int) int {
 }
 
 func (r *renderer) tun(t engine.Tun) obj {
+	autoRoute := runtime.GOOS != "linux"
 	out := obj{
-		"type":         "tun", "tag": "tun-in",
+		"type": "tun", "tag": "tun-in",
 		"address":      t.Addresses(),
-		"auto_route":   runtime.GOOS != "linux",
+		"auto_route":   autoRoute,
 		"strict_route": t.StrictRoute,
 		"mtu":          tunMTU(t.MTU),
 	}
 	// sing-box 1.15 rewrote TUN around its own TCP/IP stack: the stack
 	// option is deprecated there (removed in 1.17) and must not be
 	// emitted. Older builds (the 1.14-based lx. fork) still honor an
-	// explicit stack, so it stays for them; their default is "mixed".
+	// explicit stack, so it stays for them. "mixed" means the system
+	// TCP stack plus the gVisor UDP stack (not TCP on gVisor): the UDP
+	// path (QUIC, DNS, VoIP, games) is what suffers under "mixed".
 	// The zero version (Render without a probed build) keeps the legacy
 	// spelling.
 	if r.ver.Less(engine.Version{Major: 1, Minor: 15}) {
 		out["stack"] = orDefault(t.Stack, "mixed")
+	}
+	if runtime.GOOS == "linux" {
+		// multi_queue scales packet I/O with CPU cores but needs
+		// sing-tun's own TCP/IP stack (sing-box 1.15+): the pinned
+		// 1.14-based lx fork rejects it as an unknown field (verified
+		// with `sing-box check` against 1.14.3-lx.14).
+		if !r.ver.Less(engine.Version{Major: 1, Minor: 15}) {
+			out["multi_queue"] = true
+		}
+		// auto_redirect is upstream's recommended Linux routing, but it
+		// hard-requires auto_route: sing-box refuses the inbound
+		// otherwise. On Linux the core owns routing (tunroute and the
+		// atomic kill switch), so auto_route stays off and
+		// auto_redirect stays unset with it; it switches on
+		// automatically if Linux routing ever moves back to the engine.
+		if autoRoute {
+			out["auto_redirect"] = true
+		}
 	}
 	return out.set("interface_name", t.DeviceName).
 		// Custom routes replace the default route when auto_route installs

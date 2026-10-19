@@ -104,6 +104,23 @@ jobs:
         run: go vet ./...
       - name: Test
         run: go test -race ./...
+      # The renderer must produce configs the pinned engine build accepts.
+      # This gates the opt-in sing-box check suite (TestEngineAcceptsRenderedPlans)
+      # on the pinned sing-box-lx build from packaging/engines/engines.lock.
+      - name: Validate rendered configs with sing-box check
+        run: |
+          set -euo pipefail
+          line=$(grep -E '^sing-box[[:space:]]+amd64[[:space:]]' ../packaging/engines/engines.lock)
+          digest=$(printf '%s\n' "$line" | awk '{print $3}')
+          url=$(printf '%s\n' "$line" | awk '{print $4}')
+          archive="$RUNNER_TEMP/sing-box-lx.tar.gz"
+          curl -sSfL -o "$archive" "$url"
+          printf '%s  %s\n' "$digest" "$(basename "$archive")" > "$archive.sha256"
+          (cd "$RUNNER_TEMP" && sha256sum -c "$archive.sha256")
+          mkdir -p "$RUNNER_TEMP/sing-box-lx"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/sing-box-lx"
+          binary=$(find "$RUNNER_TEMP/sing-box-lx" -name sing-box -type f | head -n 1)
+          SORA_SINGBOX_BIN="$binary" go test -race -run '^TestEngineAcceptsRenderedPlans$' ./engine/singbox/
       - name: Real packet capture in a private network
         run: |
           go test -race -c -o "$RUNNER_TEMP/sora-packet-tests" ./diagnostics
