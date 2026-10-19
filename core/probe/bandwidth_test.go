@@ -268,7 +268,7 @@ func TestHistoryTTLAndPersistence(t *testing.T) {
 	if len(hist) != 1 || hist[0].LatencyMs != 42 {
 		t.Fatalf("history not persisted: %+v", hist)
 	}
-	if hist[0].StaleAt(now.Add(25 * time.Hour)) {
+	if !hist[0].StaleAt(now.Add(25 * time.Hour)) {
 		t.Fatal("25h-old entry must be stale")
 	}
 	if !hist[0].StaleAt(now) {
