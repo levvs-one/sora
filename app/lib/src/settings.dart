@@ -50,6 +50,10 @@ class Settings {
     'benchmarkHistory',
     'sessionIntent',
     'subscriptionOverrides',
+    'networkProfiles',
+    'proxyChains',
+    'syncedDevices',
+    'zapretWithVpn',
   };
 
   final SharedPreferencesWithCache _store;
@@ -258,6 +262,23 @@ class Settings {
   /// Subscription overrides as JSON: {subId: {renames: {id: name}, hidden: [id]}}.
   String get subscriptionOverrides => _store.getString('subscriptionOverrides') ?? '';
   set subscriptionOverrides(String value) => _store.setString('subscriptionOverrides', value);
+
+  /// Network profiles as JSON: [{id, name, ssids, gateways, asns, autoApply,
+  /// apply: {tunnel, preset, dns, dnsPreset, serverId, engine}}] (F5).
+  String get networkProfiles => _store.getString('networkProfiles') ?? '';
+  set networkProfiles(String value) => _store.setString('networkProfiles', value);
+
+  /// Named proxy chains as JSON: [{id, name, hops: [serverId, ...]}] (F8).
+  String get proxyChains => _store.getString('proxyChains') ?? '';
+  set proxyChains(String value) => _store.setString('proxyChains', value);
+
+  /// Paired sync devices as JSON: [{id, name, lastSync}] (F9).
+  String get syncedDevices => _store.getString('syncedDevices') ?? '';
+  set syncedDevices(String value) => _store.setString('syncedDevices', value);
+
+  /// Run zapret for direct traffic alongside the VPN tunnel (F11, Linux only).
+  bool get zapretWithVpn => _store.getBool('zapretWithVpn') ?? false;
+  set zapretWithVpn(bool value) => _store.setBool('zapretWithVpn', value);
 
   /// Original system proxy settings and Sora's endpoint, retained until
   /// restoration. Saving is awaited before proxy changes to allow crash

@@ -14,12 +14,15 @@ import '../l10n/strings.dart';
 
 import 'core/link.dart';
 import 'browser_diagnostics.dart';
+import 'chains.dart';
 import 'generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'groups.dart';
 import 'overrides.dart';
+import 'profiles.dart';
 import 'rules.dart';
 import 'settings.dart';
 import 'notifications.dart';
+import 'sync.dart';
 import 'updates.dart';
 import 'ui/kit.dart' show describe;
 
@@ -70,12 +73,18 @@ final class ServerReturned extends Notice {
 class Sora extends ChangeNotifier {
   Sora(this.settings)
     : history = settings.notificationHistory,
-      overrides = OverrideStore(() => settings.subscriptionOverrides, (v) => settings.subscriptionOverrides = v) {
+      overrides = OverrideStore(() => settings.subscriptionOverrides, (v) => settings.subscriptionOverrides = v),
+      profiles = ProfilesStore(() => settings.networkProfiles, (v) => settings.networkProfiles = v),
+      chains = ChainsStore(() => settings.proxyChains, (v) => settings.proxyChains = v),
+      syncDevices = SyncDevices(() => settings.syncedDevices, (v) => settings.syncedDevices = v) {
     overrides.onChanged = () {
       notifyListeners();
       // Hiding a server changes the plan; renaming does not (IDs are stable).
       unawaited(_replan());
     };
+    profiles.addListener(notifyListeners);
+    chains.addListener(notifyListeners);
+    syncDevices.addListener(notifyListeners);
     _loadBandwidth();
   }
   final browserDiagnostics = BrowserDiagnostics();
@@ -336,6 +345,24 @@ class Sora extends ChangeNotifier {
 
   /// User edits layered over subscriptions (FEATURE-PLAN.md F6).
   final OverrideStore overrides;
+
+  /// Network profiles with auto-apply triggers (FEATURE-PLAN.md F5).
+  final ProfilesStore profiles;
+
+  /// Named proxy chains (FEATURE-PLAN.md F8).
+  final ChainsStore chains;
+
+  /// Devices paired for E2E sync (FEATURE-PLAN.md F9).
+  final SyncDevices syncDevices;
+
+  /// Fingerprint of the currently joined network. Unknown until the core
+  /// RPC GetNetworkFingerprint lands (F5).
+  NetworkFingerprint networkFingerprint = const NetworkFingerprint.unknown();
+
+  /// True when the core advertises proxy-chain support for the active
+  /// engine. The engine registry sets the [chainCapability] flag per engine
+  /// (F8).
+  bool get chainsSupported => coreCapabilities.contains(chainCapability);
 
   /// Server IDs hidden by subscription overrides.
   Set<String> get hiddenServerIds => overrides.hiddenIds;
@@ -761,6 +788,114 @@ class Sora extends ChangeNotifier {
   /// A tap during [Phase.disconnecting] is queued: [connect] runs once the
   /// in-flight disconnect lands, instead of being swallowed (audit L24).
   bool _connectQueued = false;
+
+  /// Applies a network profile's settings snapshot (F5). Only snapshot
+  /// fields the profile captured are touched; the rest stays as-is.
+  Future<void> applyProfile(NetworkProfile profile) async {
+    await change((x) {
+      if (profile.tunnel != null) x.tunnel = profile.tunnel!;
+      if (profile.preset != null) x.preset = profile.preset!;
+      if (profile.dns != null) x.dns = profile.dns!;
+      if (profile.dnsPreset != null) x.dnsPreset = profile.dnsPreset!;
+      if (profile.engine != null) x.engine = profile.engine!;
+      if (profile.serverId != null && profile.serverId!.isNotEmpty) x.server = profile.serverId!;
+    });
+  }
+
+  /// Handles a core ProfileMatched event (F5): marks the profile active and
+  /// either applies it (auto-apply) or asks first. Applying posts an undo
+  /// snapshot so the previous settings are one tap away.
+  Future<void> handleProfileMatched(String profileId) async {
+    final profile = profiles.byId(profileId);
+    if (profile == null) return;
+    profiles.activeId = profileId;
+    if (profile.autoApply) {
+      await applyProfileWithUndo(profile);
+    } else {
+      await recordNotification(
+        AppNotification(
+          time: DateTime.now(),
+          title: strings.profileApplyAsk(profile.name),
+          body: '',
+          action: 'apply-profile',
+          argument: profileId,
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
+  /// Applies a profile and posts an undo snapshot so the previous settings
+  /// are one tap away (F5).
+  Future<void> applyProfileWithUndo(NetworkProfile profile) async {
+    final before = jsonEncode({
+      'tunnel': settings.tunnel,
+      'preset': settings.preset,
+      'dns': settings.dns,
+      'dnsPreset': settings.dnsPreset,
+      'server': settings.server,
+      'engine': settings.engine,
+    });
+    await applyProfile(profile);
+    await recordNotification(
+      AppNotification(
+        time: DateTime.now(),
+        title: strings.profileApplied(profile.name),
+        body: '',
+        action: 'undo-profile',
+        argument: before,
+      ),
+    );
+  }
+
+  /// Restores the settings snapshot saved by [applyProfileWithUndo] (F5).
+  Future<void> undoProfileApply(String snapshotJson) async {
+    try {
+      final before = jsonDecode(snapshotJson) as Map<String, dynamic>;
+      await change((x) {
+        final tunnel = before['tunnel'];
+        if (tunnel is String) x.tunnel = tunnel;
+        final preset = before['preset'];
+        if (preset is String) x.preset = preset;
+        final dns = before['dns'];
+        if (dns is List) x.dns = [for (final v in dns) v.toString()];
+        final dnsPreset = before['dnsPreset'];
+        if (dnsPreset is String) x.dnsPreset = dnsPreset;
+        final server = before['server'];
+        if (server is String) x.server = server;
+        final engine = before['engine'];
+        if (engine is String) x.engine = engine;
+      });
+    } catch (_) {
+      // A corrupt snapshot must not break the UI; there is nothing sane to
+      // restore, so the current settings simply stay.
+    }
+  }
+
+  /// Refreshes the current network fingerprint (F5).
+  ///
+  /// TODO(core): wire to the GetNetworkFingerprint RPC and the
+  /// ProfileMatched core event once the Go agent lands
+  /// `core/profiles/profiles.go`. Until then the fingerprint stays unknown
+  /// and the UI says so instead of guessing.
+  Future<void> refreshFingerprint() async {
+    networkFingerprint = const NetworkFingerprint.unknown();
+    final matched = profiles.match(networkFingerprint);
+    if (matched != null && matched.id != profiles.activeId) {
+      await handleProfileMatched(matched.id);
+    } else {
+      notifyListeners();
+    }
+  }
+
+  /// Connects through a proxy chain (F8).
+  ///
+  /// The Go plan builder does not accept chains yet (F8 backend pending), so
+  /// connecting reports an honest, localized failure for now instead of a
+  /// raw error. Chain building, validation and management are fully usable.
+  Future<void> connectChain(ProxyChain chain) async {
+    throw const CoreFailure('chainUnsupported');
+  }
 
   Future<void> toggle() async {
     if (cleanupPending) {
