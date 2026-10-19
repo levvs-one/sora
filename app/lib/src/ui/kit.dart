@@ -294,7 +294,7 @@ Future<bool> confirm(
                     ),
                     child: Text(
                       action,
-                      style: Styles.bodyStrong.copyWith(color: destructive ? Colors.white : palette.raised),
+                      style: Styles.bodyStrong.copyWith(color: destructive ? palette.onDanger : palette.raised),
                     ),
                   ),
                 ),

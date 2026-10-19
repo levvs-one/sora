@@ -382,8 +382,7 @@ class _QuietButton extends StatelessWidget {
               const SizedBox(width: 8),
               Flexible(
                 child: Text(label,
-                    style: Styles.bodyStrong
-                        .copyWith(color: danger ? palette.danger : palette.ink)),
+                    style: danger ? Styles.dangerStrong(context) : Styles.bodyStrong),
               ),
             ],
           ),

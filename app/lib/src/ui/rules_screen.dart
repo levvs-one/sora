@@ -143,7 +143,7 @@ class _RuleTile extends StatelessWidget {
         MenuItemButton(
           onPressed: onDelete,
           style: style(),
-          child: Text(s.delete, style: Styles.secondary.copyWith(color: palette.danger)),
+          child: Text(s.delete, style: Styles.dangerSecondary(context)),
         ),
       ],
       builder: (context, controller, _) => Tile(

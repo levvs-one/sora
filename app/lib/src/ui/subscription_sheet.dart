@@ -197,7 +197,7 @@ class _FieldSheetState extends State<_FieldSheet> {
                         ? const SizedBox(width: double.infinity)
                         : Padding(
                             padding: const EdgeInsets.fromLTRB(4, 10, 4, 0),
-                            child: Text(_failure!, style: Styles.caption.copyWith(color: palette.danger)),
+                            child: Text(_failure!, style: Styles.dangerCaption(context)),
                           ),
                   ),
                   const SizedBox(height: 18),

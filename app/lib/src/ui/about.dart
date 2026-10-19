@@ -230,7 +230,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   UpdateError.installation => s.updateInstallError,
                   UpdateError.connecting => s.updateWaitConnection,
                   UpdateError.unsupported => s.updateUnsupported,
-                }, style: Styles.secondary.copyWith(color: palette.danger)),
+                }, style: Styles.dangerSecondary(context)),
               ),
             if (updates.manualCommand case final command?)
               Padding(
