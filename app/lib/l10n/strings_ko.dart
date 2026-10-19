@@ -78,43 +78,48 @@ class SKo extends S {
   
 
   @override
-  String get syncCodeExpired => 'The pairing code expired';
+  String get syncCodeExpired => 'The code expired';
 
   @override
-  String get syncDaemonFailed => 'Sync service failed to start';
+  String get syncDaemonFailed => 'Couldn\'t start the sync service';
 
   @override
-  String get syncDaemonMissing => 'Sync service not found';
+  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
 
   @override
-  String get syncDaemonStarting => 'Starting sync service…';
-  String get syncErrAuth => 'Sync service rejected the request';
-  String get syncErrNotFound => 'Not found on the sync service';
+  String get syncDaemonStarting => 'Starting the sync service…';
+  @override
+  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  @override
+  String get syncErrNotFound => 'The device is no longer paired';
+  @override
   String get syncErrPairingActive => 'A pairing session is already open';
-  String get syncErrUnreachable => 'The other device is unreachable';
-  String get syncError => 'Sync failed';
+  @override
+  String get syncErrUnreachable => 'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+  @override
+  String get syncError => 'Sync error';
 
   @override
-  String syncExpiresIn(String expires) {
-    return 'Expires in $expires';
+  String syncExpiresIn(String duration) {
+    return 'Code expires in $duration';
   }
 
   @override
-  String get syncJoining => 'Joining…';
+  String get syncJoining => 'Pairing with the device…';
 
   @override
-  String get syncLegacyCleared => 'Old sync data cleared';
+  String get syncLegacyCleared => 'The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.';
 
   @override
   String get syncNewCode => 'New code';
 
   @override
   String syncPairedWith(String name) {
-    return 'Paired with $name';
+    return '$name paired';
   }
 
   @override
-  String get syncRetry => 'Retry';
+  String get syncRetry => 'Try again';
 
   @override
   String get syncStopShowing => 'Stop showing';
@@ -124,14 +129,14 @@ class SKo extends S {
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Pulled $pulled, pushed $pushed';
+    return 'Received $pulled · sent $pushed';
   }
 
   @override
   String get syncThisDevice => 'This device';
 
   @override
-  String get syncUnavailableAndroid => 'Sync is not available on Android';
+  String get syncUnavailableAndroid => 'Device sync isn\'t available on Android yet — the sync service can\'t run there.';
 }
 
   @override
@@ -1164,11 +1169,10 @@ Find one in the catalog or install from a file.';
   @override
   String get extPermBackground => 'Run background tasks';
   @override
-  String get extPermBackgroundDetail =>
-      'Can wake up on a schedule and run code in the background.';
+  String get extPermBackgroundDetail => 'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
 
   @override
-  String get extCapBackground => 'Background tasks';
+  String get extCapBackground => 'Runs in the background';
   @override
   String get extCapFilterTitle => 'Capabilities';
   @override
@@ -1196,27 +1200,43 @@ Find one in the catalog or install from a file.';
   @override
   String get extSortRelevance => 'Relevance';
   @override
-  String get extPermNetworkDetail => 'Internet access is limited to these hosts:';
+  String get extPermNetworkDetail => 'Fetches data from the internet. Only the hosts below are allowed — everything else is blocked.';
   @override
   String get extBgTitle => 'Background task';
   @override
-  String get extBgEnabled => 'Run in background';
+  String get extBgEnabled => 'Run in the background';
   @override
-  String get extBgInterval => 'Run interval';
+  String get extBgInterval => 'Run every';
   @override
-  String extBgMinutes(int minutes) => '$minutes min';
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# minutes',
+      one: '# minute',
+    );
+    return _temp0;
+  }
   @override
-  String extBgHours(int hours) => '$hours h';
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# hours',
+      one: '# hour',
+    );
+    return _temp0;
+  }
   @override
-  String get extBgNote =>
-      'Applies immediately. The shortest allowed interval is 15 minutes.';
+  String get extBgNote => 'The system may delay runs to save battery. The shortest interval is 15 minutes.';
   @override
-  String get extBgDisabledNote =>
-      'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
   @override
-  String get extCapNetwork => 'Can reach the internet';
+  String get extCapNetwork => 'Network access';
   @override
-  String extCapNetworkHosts(String hosts) => 'Can reach: $hosts';
+  String extCapNetworkHosts(String hosts) {
+    return 'Network: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -1506,7 +1526,7 @@ Find one in the catalog or install from a file.';
   String get syncDevices => 'My devices';
 
   @override
-  String get syncEmpty => 'No paired devices yet. Pair another device to link it with this one.';
+  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
 
   @override
   String get syncPair => 'Pair a device';
@@ -1564,26 +1584,26 @@ Find one in the catalog or install from a file.';
   @override
   String get autoSwitchOnDegrade => 'Auto-switch on degradation';
   @override
-  String get autoSwitchOnDegradeDetail => 'If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.';
+  String get autoSwitchOnDegradeDetail => 'If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.';
   @override
   String get tunStackMixed => 'Mixed';
   @override
   String get tunStackSystem => 'System';
 
   @override
-  String get censorTitle => 'Censorship detector';
+  String get censorTitle => 'Blocking diagnostics';
 
   @override
-  String get censorHistory => 'History';
+  String get censorHistory => 'Check history';
 
   @override
-  String get censorEmpty => 'No censorship checks yet';
+  String get censorEmpty => 'No checks yet. If a connection fails, the detector will check whether your provider is blocking it.';
 
   @override
-  String get censorExplainer => 'Your provider seems to be interfering with the connection. Applying the recommended profile may restore access.';
+  String get censorExplainer => 'This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.';
 
   @override
-  String get censorNoProfile => 'No recommended profile for this network yet';
+  String get censorNoProfile => 'No suitable profile for this verdict';
 
   @override
   String get censorApplyProfile => 'Apply recommended profile';
@@ -1598,53 +1618,53 @@ Find one in the catalog or install from a file.';
   String get censorNotNow => 'Not now';
 
   @override
-  String get censorPromptTitle => 'Possible censorship detected';
+  String get censorPromptTitle => 'Connection may be blocked';
 
   @override
   String censorPromptBody(int confidence) {
-    return 'Detected with $confidence% confidence';
+    return 'It looks like your provider is blocking the connection (confidence $confidence%). Try masking?';
   }
 
   @override
   String censorConfidence(int confidence) {
-    return '$confidence% confidence';
+    return 'Confidence: $confidence%';
   }
 
   @override
-  String get censorKindBlocked => 'Blocked';
+  String get censorKindBlocked => 'Blocking detected';
 
   @override
-  String get censorKindLikely => 'Likely blocked';
+  String get censorKindLikely => 'Looks like blocking';
 
   @override
-  String get censorKindClear => 'Not blocked';
+  String get censorKindClear => 'No blocking detected';
 
   @override
-  String get censorKindUnknown => 'Unknown';
+  String get censorKindUnknown => 'Could not determine';
 
   @override
-  String get censorReasonTlsReset => 'TLS reset';
+  String get censorReasonTlsReset => 'TLS connections are being reset — a typical sign of filtering';
 
   @override
-  String get censorReasonHttpBlock => 'HTTP block';
+  String get censorReasonHttpBlock => 'HTTP requests are being blocked';
 
   @override
-  String get censorReasonDnsSpoofed => 'DNS spoofing';
+  String get censorReasonDnsSpoofed => 'DNS responses are being spoofed';
 
   @override
-  String get censorReasonConnectTimeout => 'Connection timeout';
+  String get censorReasonConnectTimeout => 'Connections keep timing out';
 
   @override
   String get customServerAdd => 'Add custom server';
 
   @override
-  String get customServers => 'Custom servers';
+  String get customServers => 'My servers';
 
   @override
   String get customServerName => 'Name';
 
   @override
-  String get customServerNameHint => 'My server';
+  String get customServerNameHint => 'E.g. My VPS';
 
   @override
   String get customServerNameRequired => 'Enter a name';
@@ -1653,13 +1673,13 @@ Find one in the catalog or install from a file.';
   String get customServerAddress => 'Address';
 
   @override
-  String get customServerAddressHint => 'example.com or 1.2.3.4';
+  String get customServerAddressHint => 'example.com or 192.0.2.1';
 
   @override
   String get customServerAddressRequired => 'Enter the server address';
 
   @override
-  String get customServerAddressInvalid => 'This address does not look valid';
+  String get customServerAddressInvalid => 'Invalid address';
 
   @override
   String get customServerPort => 'Port';
@@ -1668,7 +1688,7 @@ Find one in the catalog or install from a file.';
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Enter a port between 1 and 65535';
+  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
 
   @override
   String get customServerProtocol => 'Protocol';
@@ -1680,33 +1700,33 @@ Find one in the catalog or install from a file.';
   String get customServerOptional => 'Optional';
 
   @override
-  String get customServerShowSecret => 'Show';
+  String get customServerShowSecret => 'Show secret';
 
   @override
-  String get customServerHideSecret => 'Hide';
+  String get customServerHideSecret => 'Hide secret';
 
   @override
-  String get customServerBadge => 'Custom';
+  String get customServerBadge => 'custom';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete “$name”?';
+    return 'Delete server “$name”?';
   }
 
   @override
-  String get customServerEmptyHint => 'No custom servers yet';
+  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
 
   @override
-  String get customServerTest => 'Test connection';
+  String get customServerTest => 'Test';
 
   @override
-  String get errObfsUnsupported => 'Traffic obfuscation is not supported here';
+  String get errObfsUnsupported => 'The installed core is too old for obfuscation profiles. Update Sora to apply them.';
 
   @override
   String get leakTestTitle => 'Leak test';
 
   @override
-  String get leakTestIntro => 'Check whether traffic leaks outside the tunnel: direct DNS, ICMP echo, IPv6 and system resolvers.';
+  String get leakTestIntro => 'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
 
   @override
   String get leakTestRun => 'Run test';
@@ -1715,11 +1735,11 @@ Find one in the catalog or install from a file.';
   String get leakTestCancel => 'Cancel';
 
   @override
-  String get leakTestNeedsConnection => 'Connect first to run the leak test';
+  String get leakTestNeedsConnection => 'Connect to run the leak test.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Checked $count…';
+    return 'Tests completed: $count';
   }
 
   @override
@@ -1730,19 +1750,20 @@ Find one in the catalog or install from a file.';
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# leaks found', one: '# leak found',
+      other: '# leaks found',
+      one: '# leak found',
     );
-    return '$_temp0';
+    return _temp0;
   }
 
   @override
-  String get leakTestSkipped => 'Skipped';
+  String get leakTestSkipped => 'Skipped — not applicable in this session';
 
   @override
   String get leakTestFix => 'Fix';
 
   @override
-  String get leakTestFixedNote => 'Fixed';
+  String get leakTestFixedNote => 'Kill switch is on — run the test again to verify.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';
@@ -1757,22 +1778,22 @@ Find one in the catalog or install from a file.';
   String get leakTestCheckSystemResolvers => 'System resolvers';
 
   @override
-  String get noticeDegraded => 'Current server is degraded';
+  String get noticeDegraded => 'The server slowed down — switched to the best measured one';
 
   @override
-  String get obfs => 'Obfuscation';
+  String get obfs => 'Traffic obfuscation';
 
   @override
   String get obfsPreset => 'Preset';
 
   @override
-  String get obfsPresetAggressive => 'Aggressive';
+  String get obfsPresetAggressive => 'Maximum obfuscation';
 
   @override
   String get obfsPresetBalanced => 'Balanced';
 
   @override
-  String get obfsPresetOff => 'Off';
+  String get obfsPresetOff => 'Speed';
 
   @override
   String get obfsPresetCustom => 'Custom';
@@ -1781,25 +1802,25 @@ Find one in the catalog or install from a file.';
   String get obfsManual => 'Manual settings';
 
   @override
-  String get obfsUtls => 'uTLS fingerprint';
+  String get obfsUtls => 'uTLS profile';
 
   @override
   String get obfsUtlsAuto => 'Auto';
 
   @override
-  String get obfsJitter => 'Jitter';
+  String get obfsJitter => 'Timing jitter';
 
   @override
-  String get obfsJitterNeedsFragment => 'Jitter needs fragmentation enabled';
+  String get obfsJitterNeedsFragment => 'Jitter only works with fragmentation enabled.';
 
   @override
-  String get obfsFineTune => 'Fine-tuning supported';
+  String get obfsFineTune => 'Sizes and delays';
 
   @override
   String get obfsDetecting => 'Detecting capabilities…';
 
   @override
-  String get obfsCapabilities => 'Capabilities';
+  String get obfsCapabilities => 'Engine capabilities';
 
   @override
   String obfsCompatibleEngines(String engines) {
@@ -1813,5 +1834,15 @@ Find one in the catalog or install from a file.';
   String get obfsUnsupported => 'Not supported';
 
   @override
-  String get obfsUnknown => 'Not detected yet';
+  String get obfsUnknown => 'Capabilities are still being detected.';
+
+  @override
+  String smartPickReason(String ping, String speed) {
+    return 'Picked by smart mode: ping $ping, speed $speed';
+  }
+
+  @override
+  String serverReliability(int pct) {
+    return 'Reliability $pct%';
+  }
 }

@@ -78,60 +78,65 @@ class SRu extends S {
   
 
   @override
-  String get syncCodeExpired => 'The pairing code expired';
+  String get syncCodeExpired => 'Срок действия кода истёк';
 
   @override
-  String get syncDaemonFailed => 'Sync service failed to start';
+  String get syncDaemonFailed => 'Не удалось запустить службу синхронизации';
 
   @override
-  String get syncDaemonMissing => 'Sync service not found';
+  String get syncDaemonMissing => 'Компонент sora-sync не найден. Переустановите приложение, чтобы включить синхронизацию устройств.';
 
   @override
-  String get syncDaemonStarting => 'Starting sync service…';
-  String get syncErrAuth => 'Sync service rejected the request';
-  String get syncErrNotFound => 'Not found on the sync service';
-  String get syncErrPairingActive => 'A pairing session is already open';
-  String get syncErrUnreachable => 'The other device is unreachable';
-  String get syncError => 'Sync failed';
+  String get syncDaemonStarting => 'Запуск службы синхронизации…';
+  @override
+  String get syncErrAuth => 'Служба синхронизации отклонила токен доступа. Перезапустите приложение и попробуйте снова.';
+  @override
+  String get syncErrNotFound => 'Устройство больше не спарено';
+  @override
+  String get syncErrPairingActive => 'Сессия спаривания уже открыта';
+  @override
+  String get syncErrUnreachable => 'Другое устройство не отвечает. Убедитесь, что оно в той же сети и показывает свой код.';
+  @override
+  String get syncError => 'Ошибка синхронизации';
 
   @override
-  String syncExpiresIn(String expires) {
-    return 'Expires in $expires';
+  String syncExpiresIn(String duration) {
+    return 'Код истечёт через $duration';
   }
 
   @override
-  String get syncJoining => 'Joining…';
+  String get syncJoining => 'Спаривание с устройством…';
 
   @override
-  String get syncLegacyCleared => 'Old sync data cleared';
+  String get syncLegacyCleared => 'Старый список устройств никогда не был по-настоящему спарен, поэтому он очищен. Спарьте устройства заново — теперь по-настоящему.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'Новый код';
 
   @override
   String syncPairedWith(String name) {
-    return 'Paired with $name';
+    return '«$name» спарено';
   }
 
   @override
-  String get syncRetry => 'Retry';
+  String get syncRetry => 'Повторить';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'Прекратить показ';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'Синхронизировать';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Pulled $pulled, pushed $pushed';
+    return 'Получено: $pulled · отправлено: $pushed';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'Это устройство';
 
   @override
-  String get syncUnavailableAndroid => 'Sync is not available on Android';
+  String get syncUnavailableAndroid => 'Синхронизация устройств пока недоступна на Android — там не может работать служба синхронизации.';
 }
 
   @override
@@ -1182,11 +1187,10 @@ class SRu extends S {
   @override
   String get extPermBackground => 'Выполнять фоновые задачи';
   @override
-  String get extPermBackgroundDetail =>
-      'Может запускаться по расписанию и выполнять код в фоне.';
+  String get extPermBackgroundDetail => 'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения.';
 
   @override
-  String get extCapBackground => 'Фоновые задачи';
+  String get extCapBackground => 'Работает в фоновом режиме';
   @override
   String get extCapFilterTitle => 'Возможности';
   @override
@@ -1214,27 +1218,45 @@ class SRu extends S {
   @override
   String get extSortRelevance => 'Сначала подходящие';
   @override
-  String get extPermNetworkDetail => 'Доступ в интернет ограничен этими хостами:';
+  String get extPermNetworkDetail => 'Загружает данные из интернета. Разрешены только хосты из списка ниже — всё остальное заблокировано.';
   @override
   String get extBgTitle => 'Фоновая задача';
   @override
   String get extBgEnabled => 'Выполнять в фоне';
   @override
-  String get extBgInterval => 'Интервал запуска';
+  String get extBgInterval => 'Запускать каждые';
   @override
-  String extBgMinutes(int minutes) => '$minutes мин';
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# минут',
+      few: '# минуты',
+      one: '# минуту',
+    );
+    return _temp0;
+  }
   @override
-  String extBgHours(int hours) => '$hours ч';
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# часов',
+      few: '# часа',
+      one: '# час',
+    );
+    return _temp0;
+  }
   @override
-  String get extBgNote =>
-      'Применяется сразу. Минимальный интервал — 15 минут.';
+  String get extBgNote => 'Система может откладывать запуски для экономии заряда. Минимальный интервал — 15 минут.';
   @override
-  String get extBgDisabledNote =>
-      'Включите расширение, чтобы управлять фоновой задачей.';
+  String get extBgDisabledNote => 'Включите расширение, чтобы управлять его фоновой задачей.';
   @override
-  String get extCapNetwork => 'Имеет доступ в интернет';
+  String get extCapNetwork => 'Доступ к сети';
   @override
-  String extCapNetworkHosts(String hosts) => 'Доступные хосты: $hosts';
+  String extCapNetworkHosts(String hosts) {
+    return 'Сеть: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -1525,7 +1547,7 @@ class SRu extends S {
   String get syncDevices => 'Мои устройства';
 
   @override
-  String get syncEmpty => 'Пока нет спаренных устройств. Спарьте другое устройство, чтобы связать его с этим.';
+  String get syncEmpty => 'Нет спаренных устройств. Спарьте другое устройство в локальной сети.';
 
   @override
   String get syncPair => 'Спарить устройство';
@@ -1583,188 +1605,190 @@ class SRu extends S {
   @override
   String get autoSwitchOnDegrade => 'Автопереключение при деградации';
   @override
-  String get autoSwitchOnDegradeDetail => 'Если выбранный сервер перестал отвечать или стал заметно медленнее, Sora переключится на лучший из замеренных — не чаще раза в 10 минут.';
+  String get autoSwitchOnDegradeDetail => 'Если выбранный сервер сильно замедлится или перестанет отвечать, Sora переключится на лучший из измеренных — не чаще одного раза в 10 минут.';
   @override
   String get tunStackMixed => 'Смешанный';
   @override
   String get tunStackSystem => 'Системный';
 
   @override
-  String get censorTitle => 'Censorship detector';
+  String get censorTitle => 'Диагностика блокировок';
 
   @override
-  String get censorHistory => 'History';
+  String get censorHistory => 'История проверок';
 
   @override
-  String get censorEmpty => 'No censorship checks yet';
+  String get censorEmpty => 'Проверок пока не было. Если соединение не удастся установить, детектор проверит, не блокирует ли его провайдер.';
 
   @override
-  String get censorExplainer => 'Your provider seems to be interfering with the connection. Applying the recommended profile may restore access.';
+  String get censorExplainer => 'Это не ошибка приложения: похоже, провайдер ограничивает соединение. Маскировка меняет способ подключения и часто помогает.';
 
   @override
-  String get censorNoProfile => 'No recommended profile for this network yet';
+  String get censorNoProfile => 'Для этого вердикта нет подходящего профиля';
 
   @override
-  String get censorApplyProfile => 'Apply recommended profile';
+  String get censorApplyProfile => 'Применить рекомендованный профиль';
 
   @override
-  String get censorEnable => 'Enable';
+  String get censorEnable => 'Включить';
 
   @override
-  String get censorDetails => 'Details';
+  String get censorDetails => 'Подробнее';
 
   @override
-  String get censorNotNow => 'Not now';
+  String get censorNotNow => 'Не сейчас';
 
   @override
-  String get censorPromptTitle => 'Possible censorship detected';
+  String get censorPromptTitle => 'Возможно, соединение блокируют';
 
   @override
   String censorPromptBody(int confidence) {
-    return 'Detected with $confidence% confidence';
+    return 'Похоже, провайдер блокирует соединение (уверенность $confidence%). Попробовать маскировку?';
   }
 
   @override
   String censorConfidence(int confidence) {
-    return '$confidence% confidence';
+    return 'Уверенность: $confidence%';
   }
 
   @override
-  String get censorKindBlocked => 'Blocked';
+  String get censorKindBlocked => 'Блокировка обнаружена';
 
   @override
-  String get censorKindLikely => 'Likely blocked';
+  String get censorKindLikely => 'Похоже на блокировку';
 
   @override
-  String get censorKindClear => 'Not blocked';
+  String get censorKindClear => 'Блокировка не обнаружена';
 
   @override
-  String get censorKindUnknown => 'Unknown';
+  String get censorKindUnknown => 'Не удалось определить';
 
   @override
-  String get censorReasonTlsReset => 'TLS reset';
+  String get censorReasonTlsReset => 'TLS-соединения сбрасываются — характерный признак фильтрации';
 
   @override
-  String get censorReasonHttpBlock => 'HTTP block';
+  String get censorReasonHttpBlock => 'HTTP-запросы блокируются';
 
   @override
-  String get censorReasonDnsSpoofed => 'DNS spoofing';
+  String get censorReasonDnsSpoofed => 'DNS-ответы подменяются';
 
   @override
-  String get censorReasonConnectTimeout => 'Connection timeout';
+  String get censorReasonConnectTimeout => 'Соединения обрываются по таймауту';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'Добавить свой сервер';
 
   @override
-  String get customServers => 'Custom servers';
+  String get customServers => 'Мои серверы';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'Название';
 
   @override
-  String get customServerNameHint => 'My server';
+  String get customServerNameHint => 'Например: мой VPS';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'Введите название';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'Адрес';
 
   @override
-  String get customServerAddressHint => 'example.com or 1.2.3.4';
+  String get customServerAddressHint => 'example.com или 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'Введите адрес сервера';
 
   @override
-  String get customServerAddressInvalid => 'This address does not look valid';
+  String get customServerAddressInvalid => 'Некорректный адрес';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => 'Порт';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Enter a port between 1 and 65535';
+  String get customServerPortInvalid => 'Порт — число от 1 до 65535';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'Протокол';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'Данные для входа';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'Необязательно';
 
   @override
-  String get customServerShowSecret => 'Show';
+  String get customServerShowSecret => 'Показать секрет';
 
   @override
-  String get customServerHideSecret => 'Hide';
+  String get customServerHideSecret => 'Скрыть секрет';
 
   @override
-  String get customServerBadge => 'Custom';
+  String get customServerBadge => 'свой';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete “$name”?';
+    return 'Удалить сервер «$name»?';
   }
 
   @override
-  String get customServerEmptyHint => 'No custom servers yet';
+  String get customServerEmptyHint => 'Добавьте сервер вручную: адрес, порт и протокол';
 
   @override
-  String get customServerTest => 'Test connection';
+  String get customServerTest => 'Проверить';
 
   @override
-  String get errObfsUnsupported => 'Traffic obfuscation is not supported here';
+  String get errObfsUnsupported => 'Установленный core слишком стар для профилей маскировки. Обновите Sora, чтобы применять их.';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'Проверка утечек';
 
   @override
-  String get leakTestIntro => 'Check whether traffic leaks outside the tunnel: direct DNS, ICMP echo, IPv6 and system resolvers.';
+  String get leakTestIntro => 'Проверяет, может ли трафик покинуть устройство в обход туннеля: прямые DNS- и ICMP-запросы, утечки IPv6 и системные резолверы. Запускайте при активном подключении.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'Проверить';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'Отмена';
 
   @override
-  String get leakTestNeedsConnection => 'Connect first to run the leak test';
+  String get leakTestNeedsConnection => 'Подключитесь, чтобы проверить утечки.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Checked $count…';
+    return 'Выполнено тестов: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'Утечек не найдено';
 
   @override
   String leakTestFound(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# leaks found', one: '# leak found',
+      other: 'Найдено # утечек',
+      few: 'Найдены # утечки',
+      one: 'Найдена # утечка',
     );
-    return '$_temp0';
+    return _temp0;
   }
 
   @override
-  String get leakTestSkipped => 'Skipped';
+  String get leakTestSkipped => 'Пропущен — неприменим в этой сессии';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'Исправить';
 
   @override
-  String get leakTestFixedNote => 'Fixed';
+  String get leakTestFixedNote => 'Kill switch включён — запустите проверку снова.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'Прямой DNS';
 
   @override
   String get leakTestCheckIcmpEcho => 'ICMP echo';
@@ -1773,64 +1797,74 @@ class SRu extends S {
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'Системные резолверы';
 
   @override
-  String get noticeDegraded => 'Current server is degraded';
+  String get noticeDegraded => 'Сервер замедлился — переключено на лучший из измеренных';
 
   @override
-  String get obfs => 'Obfuscation';
+  String get obfs => 'Маскировка трафика';
 
   @override
-  String get obfsPreset => 'Preset';
+  String get obfsPreset => 'Пресет';
 
   @override
-  String get obfsPresetAggressive => 'Aggressive';
+  String get obfsPresetAggressive => 'Максимальная маскировка';
 
   @override
-  String get obfsPresetBalanced => 'Balanced';
+  String get obfsPresetBalanced => 'Баланс';
 
   @override
-  String get obfsPresetOff => 'Off';
+  String get obfsPresetOff => 'Скорость';
 
   @override
-  String get obfsPresetCustom => 'Custom';
+  String get obfsPresetCustom => 'Вручную';
 
   @override
-  String get obfsManual => 'Manual settings';
+  String get obfsManual => 'Ручные настройки';
 
   @override
-  String get obfsUtls => 'uTLS fingerprint';
+  String get obfsUtls => 'uTLS-профиль';
 
   @override
-  String get obfsUtlsAuto => 'Auto';
+  String get obfsUtlsAuto => 'Авто';
 
   @override
-  String get obfsJitter => 'Jitter';
+  String get obfsJitter => 'Джиттер';
 
   @override
-  String get obfsJitterNeedsFragment => 'Jitter needs fragmentation enabled';
+  String get obfsJitterNeedsFragment => 'Джиттер работает только при включённой фрагментации.';
 
   @override
-  String get obfsFineTune => 'Fine-tuning supported';
+  String get obfsFineTune => 'Размеры и задержки';
 
   @override
-  String get obfsDetecting => 'Detecting capabilities…';
+  String get obfsDetecting => 'Определение возможностей…';
 
   @override
-  String get obfsCapabilities => 'Capabilities';
+  String get obfsCapabilities => 'Возможности движка';
 
   @override
   String obfsCompatibleEngines(String engines) {
-    return 'Compatible engines: $engines';
+    return 'Совместимые движки: $engines';
   }
 
   @override
-  String get obfsSupported => 'Supported';
+  String get obfsSupported => 'Поддерживается';
 
   @override
-  String get obfsUnsupported => 'Not supported';
+  String get obfsUnsupported => 'Не поддерживается';
 
   @override
-  String get obfsUnknown => 'Not detected yet';
+  String get obfsUnknown => 'Возможности пока определяются.';
+
+  @override
+  String smartPickReason(String ping, String speed) {
+    return 'Выбран умным режимом: пинг $ping, скорость $speed';
+  }
+
+  @override
+  String serverReliability(int pct) {
+    return 'Надёжность $pct%';
+  }
 }

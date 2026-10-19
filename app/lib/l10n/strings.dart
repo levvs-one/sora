@@ -2261,7 +2261,7 @@ abstract class S {
   /// **'My devices'**
   String get syncDevices;
 
-  /// **'No paired devices yet. Pair another device to link it with this one.'**
+  /// **'No paired devices. Pair another device over the local network.'**
   String get syncEmpty;
 
   /// **'Pair a device'**
@@ -2330,7 +2330,7 @@ abstract class S {
   /// **'Auto-switch on degradation'**
   String get autoSwitchOnDegrade;
 
-  /// **'If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.'**
+  /// **'If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.'**
   String get autoSwitchOnDegradeDetail;
 
   /// **'Mixed'**
@@ -2339,19 +2339,19 @@ abstract class S {
   /// **'System'**
   String get tunStackSystem;
 
-  /// **'Censorship detector'**
+  /// **'Blocking diagnostics'**
   String get censorTitle;
 
-  /// **'History'**
+  /// **'Check history'**
   String get censorHistory;
 
-  /// **'No censorship checks yet'**
+  /// **'No checks yet. If a connection fails, the detector will check whether your provider is blocking it.'**
   String get censorEmpty;
 
-  /// **'Your provider seems to be interfering with the connection. Applying the recommended profile may restore access.'**
+  /// **'This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.'**
   String get censorExplainer;
 
-  /// **'No recommended profile for this network yet'**
+  /// **'No suitable profile for this verdict'**
   String get censorNoProfile;
 
   /// **'Apply recommended profile'**
@@ -2366,49 +2366,49 @@ abstract class S {
   /// **'Not now'**
   String get censorNotNow;
 
-  /// **'Possible censorship detected'**
+  /// **'Connection may be blocked'**
   String get censorPromptTitle;
 
-  /// **'Detected with {confidence}% confidence'**
+  /// **'It looks like your provider is blocking the connection (confidence {confidence}%). Try masking?'**
   String censorPromptBody(int confidence);
 
-  /// **'{confidence}% confidence'**
+  /// **'Confidence: {confidence}%'**
   String censorConfidence(int confidence);
 
-  /// **'Blocked'**
+  /// **'Blocking detected'**
   String get censorKindBlocked;
 
-  /// **'Likely blocked'**
+  /// **'Looks like blocking'**
   String get censorKindLikely;
 
-  /// **'Not blocked'**
+  /// **'No blocking detected'**
   String get censorKindClear;
 
-  /// **'Unknown'**
+  /// **'Could not determine'**
   String get censorKindUnknown;
 
-  /// **'TLS reset'**
+  /// **'TLS connections are being reset — a typical sign of filtering'**
   String get censorReasonTlsReset;
 
-  /// **'HTTP block'**
+  /// **'HTTP requests are being blocked'**
   String get censorReasonHttpBlock;
 
-  /// **'DNS spoofing'**
+  /// **'DNS responses are being spoofed'**
   String get censorReasonDnsSpoofed;
 
-  /// **'Connection timeout'**
+  /// **'Connections keep timing out'**
   String get censorReasonConnectTimeout;
 
   /// **'Add custom server'**
   String get customServerAdd;
 
-  /// **'Custom servers'**
+  /// **'My servers'**
   String get customServers;
 
   /// **'Name'**
   String get customServerName;
 
-  /// **'My server'**
+  /// **'E.g. My VPS'**
   String get customServerNameHint;
 
   /// **'Enter a name'**
@@ -2417,13 +2417,13 @@ abstract class S {
   /// **'Address'**
   String get customServerAddress;
 
-  /// **'example.com or 1.2.3.4'**
+  /// **'example.com or 192.0.2.1'**
   String get customServerAddressHint;
 
   /// **'Enter the server address'**
   String get customServerAddressRequired;
 
-  /// **'This address does not look valid'**
+  /// **'Invalid address'**
   String get customServerAddressInvalid;
 
   /// **'Port'**
@@ -2432,7 +2432,7 @@ abstract class S {
   /// **'443'**
   String get customServerPortHint;
 
-  /// **'Enter a port between 1 and 65535'**
+  /// **'Port must be a number from 1 to 65535'**
   String get customServerPortInvalid;
 
   /// **'Protocol'**
@@ -2444,31 +2444,31 @@ abstract class S {
   /// **'Optional'**
   String get customServerOptional;
 
-  /// **'Show'**
+  /// **'Show secret'**
   String get customServerShowSecret;
 
-  /// **'Hide'**
+  /// **'Hide secret'**
   String get customServerHideSecret;
 
-  /// **'Custom'**
+  /// **'custom'**
   String get customServerBadge;
 
-  /// **'Delete “{name}”?'**
+  /// **'Delete server “{name}”?'**
   String customServerDeleteConfirm(String name);
 
-  /// **'No custom servers yet'**
+  /// **'Add a server manually: address, port and protocol'**
   String get customServerEmptyHint;
 
-  /// **'Test connection'**
+  /// **'Test'**
   String get customServerTest;
 
-  /// **'Traffic obfuscation is not supported here'**
+  /// **'The installed core is too old for obfuscation profiles. Update Sora to apply them.'**
   String get errObfsUnsupported;
 
   /// **'Leak test'**
   String get leakTestTitle;
 
-  /// **'Check whether traffic leaks outside the tunnel: direct DNS, ICMP echo, IPv6 and system resolvers.'**
+  /// **'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.'**
   String get leakTestIntro;
 
   /// **'Run test'**
@@ -2477,10 +2477,10 @@ abstract class S {
   /// **'Cancel'**
   String get leakTestCancel;
 
-  /// **'Connect first to run the leak test'**
+  /// **'Connect to run the leak test.'**
   String get leakTestNeedsConnection;
 
-  /// **'Checked {count}…'**
+  /// **'Tests completed: {count}'**
   String leakTestProgress(int count);
 
   /// **'No leaks found'**
@@ -2489,13 +2489,13 @@ abstract class S {
   /// **'{count, plural, one{# leak found} other{# leaks found}}'**
   String leakTestFound(int count);
 
-  /// **'Skipped'**
+  /// **'Skipped — not applicable in this session'**
   String get leakTestSkipped;
 
   /// **'Fix'**
   String get leakTestFix;
 
-  /// **'Fixed'**
+  /// **'Kill switch is on — run the test again to verify.'**
   String get leakTestFixedNote;
 
   /// **'Direct DNS'**
@@ -2510,22 +2510,22 @@ abstract class S {
   /// **'System resolvers'**
   String get leakTestCheckSystemResolvers;
 
-  /// **'Current server is degraded'**
+  /// **'The server slowed down — switched to the best measured one'**
   String get noticeDegraded;
 
-  /// **'Obfuscation'**
+  /// **'Traffic obfuscation'**
   String get obfs;
 
   /// **'Preset'**
   String get obfsPreset;
 
-  /// **'Aggressive'**
+  /// **'Maximum obfuscation'**
   String get obfsPresetAggressive;
 
   /// **'Balanced'**
   String get obfsPresetBalanced;
 
-  /// **'Off'**
+  /// **'Speed'**
   String get obfsPresetOff;
 
   /// **'Custom'**
@@ -2534,25 +2534,25 @@ abstract class S {
   /// **'Manual settings'**
   String get obfsManual;
 
-  /// **'uTLS fingerprint'**
+  /// **'uTLS profile'**
   String get obfsUtls;
 
   /// **'Auto'**
   String get obfsUtlsAuto;
 
-  /// **'Jitter'**
+  /// **'Timing jitter'**
   String get obfsJitter;
 
-  /// **'Jitter needs fragmentation enabled'**
+  /// **'Jitter only works with fragmentation enabled.'**
   String get obfsJitterNeedsFragment;
 
-  /// **'Fine-tuning supported'**
+  /// **'Sizes and delays'**
   String get obfsFineTune;
 
   /// **'Detecting capabilities…'**
   String get obfsDetecting;
 
-  /// **'Capabilities'**
+  /// **'Engine capabilities'**
   String get obfsCapabilities;
 
   /// **'Compatible engines: {engines}'**
@@ -2564,52 +2564,52 @@ abstract class S {
   /// **'Not supported'**
   String get obfsUnsupported;
 
-  /// **'Not detected yet'**
+  /// **'Capabilities are still being detected.'**
   String get obfsUnknown;
 
-  /// **'The pairing code expired'**
+  /// **'The code expired'**
   String get syncCodeExpired;
 
-  /// **'Sync service failed to start'**
+  /// **'Couldn't start the sync service'**
   String get syncDaemonFailed;
 
-  /// **'Sync service not found'**
+  /// **'The sora-sync component wasn't found. Reinstall the app to enable device sync.'**
   String get syncDaemonMissing;
 
-  /// **'Starting sync service…'**
+  /// **'Starting the sync service…'**
   String get syncDaemonStarting;
 
-  /// **'Sync service rejected the request'**
+  /// **'The sync service rejected the access token. Restart the app and try again.'**
   String get syncErrAuth;
 
-  /// **'Not found on the sync service'**
+  /// **'The device is no longer paired'**
   String get syncErrNotFound;
 
   /// **'A pairing session is already open'**
   String get syncErrPairingActive;
 
-  /// **'The other device is unreachable'**
+  /// **'The other device didn't answer. Make sure it's on the same network and showing its code.'**
   String get syncErrUnreachable;
 
-  /// **'Sync failed'**
+  /// **'Sync error'**
   String get syncError;
 
-  /// **'Expires in {expires}'**
+  /// **'Code expires in {duration}'**
   String syncExpiresIn(String expires);
 
-  /// **'Joining…'**
+  /// **'Pairing with the device…'**
   String get syncJoining;
 
-  /// **'Old sync data cleared'**
+  /// **'The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.'**
   String get syncLegacyCleared;
 
   /// **'New code'**
   String get syncNewCode;
 
-  /// **'Paired with {name}'**
+  /// **'{name} paired'**
   String syncPairedWith(String name);
 
-  /// **'Retry'**
+  /// **'Try again'**
   String get syncRetry;
 
   /// **'Stop showing'**
@@ -2618,14 +2618,19 @@ abstract class S {
   /// **'Sync now'**
   String get syncSyncNow;
 
-  /// **'Pulled {pulled}, pushed {pushed}'**
+  /// **'Received {pulled} · sent {pushed}'**
   String syncSyncResult(int pulled, int pushed);
 
   /// **'This device'**
   String get syncThisDevice;
 
-  /// **'Sync is not available on Android'**
+  /// **'Device sync isn't available on Android yet — the sync service can't run there.'**
   String get syncUnavailableAndroid;
+
+  /// **'Picked by smart mode: ping {ping}, speed {speed}'**
+  String smartPickReason(String ping, String speed);
+  /// **'Reliability {pct}%'**
+  String serverReliability(int pct);
 
 }
 
