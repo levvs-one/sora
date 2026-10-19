@@ -85,6 +85,17 @@ func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string 
 	return b.String()
 }
 
+// NftReplace renders an atomic table replacement: the delete and the new
+// table travel in one nft batch, which the kernel commits as a single
+// transaction. Re-arming therefore never leaves a window with no kill
+// switch installed — the previous delete-then-add used two separate nft
+// invocations, and a crash between them left traffic unguarded. The batch
+// aborts when the table does not exist yet; callers fall back to NftRuleset
+// for the first install.
+func NftReplace(engineUID int, bypass []string, blocked ...netip.Prefix) string {
+	return NftRemove() + NftRuleset(engineUID, bypass, blocked...)
+}
+
 // NftRemove renders table removal. Missing tables are treated as success so
 // repeated restores are safe.
 func NftRemove() string {

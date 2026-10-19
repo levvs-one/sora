@@ -155,7 +155,9 @@ func TestArmRefusesRootUid(t *testing.T) {
 
 // TestArmAndDisarmAreIdempotent locks SORA-M4/SORA-M5: a repeated Arm
 // replaces the table instead of failing, and Disarm tolerates an already
-// missing table. A fake nft binary simulates kernel state.
+// missing table. A fake nft binary simulates kernel state, including the
+// atomicity of a single nft batch: a combined delete+add either replaces
+// the table or aborts without applying anything.
 func TestArmAndDisarmAreIdempotent(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("nftables is Linux-only")
@@ -164,21 +166,28 @@ func TestArmAndDisarmAreIdempotent(t *testing.T) {
 	state := dir + "/table.state"
 	script := `#!/bin/sh
 # Fake nft: reads a ruleset on stdin, keeps "table state" in $SORA_FAKE_STATE.
+# A batch carrying both the delete and the new table is atomic: it replaces
+# the table when present and aborts (applying nothing) when absent.
 input=$(cat)
+echo "$input" > "$SORA_FAKE_LAST_INPUT"
+echo x >> "$SORA_FAKE_INVOCATIONS"
 case "$input" in
-*delete\ table\ inet\ sora*)
+*"delete table inet sora"*)
 	if [ -f "$SORA_FAKE_STATE" ]; then
 		rm -f "$SORA_FAKE_STATE"
-		exit 0
+	else
+		echo "Error: Could not process rule: No such file or directory" >&2
+		exit 1
 	fi
-	echo "Error: Could not process rule: No such file or directory" >&2
-	exit 1
 	;;
-*)
+esac
+case "$input" in
+*"table inet sora {"*)
 	touch "$SORA_FAKE_STATE"
 	exit 0
 	;;
 esac
+exit 0
 `
 	nft := dir + "/nft"
 	if err := os.WriteFile(nft, []byte(script), 0o755); err != nil {
@@ -186,6 +195,8 @@ esac
 	}
 	t.Setenv("PATH", dir+":"+os.Getenv("PATH"))
 	t.Setenv("SORA_FAKE_STATE", state)
+	t.Setenv("SORA_FAKE_LAST_INPUT", dir+"/last.input")
+	t.Setenv("SORA_FAKE_INVOCATIONS", dir+"/invocations")
 	// The production code resolves nft from the trusted system directories
 	// (audit R2); the fake binary is injected through the test hook.
 	guard.NftBinForTest = nft
@@ -219,5 +230,112 @@ esac
 	}
 	if _, err := os.Stat(state); !os.IsNotExist(err) {
 		t.Fatal("CleanupStale() left the stale table behind")
+	}
+}
+
+// invocations counts how many times the fake nft ran.
+func invocations(t *testing.T, path string) int {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 0
+		}
+		t.Fatal(err)
+	}
+	return len(strings.Split(strings.TrimRight(string(data), "\n"), "\n"))
+}
+
+// TestArmReplacesTableInOneTransaction locks the atomic replace: a repeated
+// Arm must delete and reinstall the table with a single nft invocation, so
+// no packet can slip through between two separate calls.
+func TestArmReplacesTableInOneTransaction(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("nftables is Linux-only")
+	}
+	dir := t.TempDir()
+	state := dir + "/table.state"
+	lastInput := dir + "/last.input"
+	countFile := dir + "/invocations"
+	script := `#!/bin/sh
+input=$(cat)
+echo "$input" > "$SORA_FAKE_LAST_INPUT"
+echo x >> "$SORA_FAKE_INVOCATIONS"
+case "$input" in
+*"delete table inet sora"*)
+	if [ -f "$SORA_FAKE_STATE" ]; then
+		rm -f "$SORA_FAKE_STATE"
+	else
+		echo "Error: Could not process rule: No such file or directory" >&2
+		exit 1
+	fi
+	;;
+esac
+case "$input" in
+*"table inet sora {"*)
+	touch "$SORA_FAKE_STATE"
+	exit 0
+	;;
+esac
+exit 0
+`
+	nft := dir + "/nft"
+	if err := os.WriteFile(nft, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("SORA_FAKE_STATE", state)
+	t.Setenv("SORA_FAKE_LAST_INPUT", lastInput)
+	t.Setenv("SORA_FAKE_INVOCATIONS", countFile)
+	guard.NftBinForTest = nft
+	t.Cleanup(func() { guard.NftBinForTest = "" })
+
+	firewall, err := guard.NewNftables(1000, nil)
+	if err != nil {
+		t.Fatalf("NewNftables() error = %v", err)
+	}
+	ctx := testContext()
+	// First install: the table is missing, so the combined batch aborts
+	// and Arm retries with the table alone — two invocations, ending
+	// armed.
+	if err := firewall.Arm(ctx, nil); err != nil {
+		t.Fatalf("first Arm() error = %v", err)
+	}
+	if got := invocations(t, countFile); got != 2 {
+		t.Fatalf("first Arm() used %d nft invocations, want 2 (aborted batch + retry)", got)
+	}
+	before := invocations(t, countFile)
+	// Repeated Arm: exactly one nft invocation carrying both the delete
+	// and the new table.
+	if err := firewall.Arm(ctx, nil); err != nil {
+		t.Fatalf("second Arm() error = %v", err)
+	}
+	if got := invocations(t, countFile) - before; got != 1 {
+		t.Fatalf("repeated Arm() used %d nft invocations, want 1 atomic batch", got)
+	}
+	input, err := os.ReadFile(lastInput)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(input), "delete table inet sora") ||
+		!strings.Contains(string(input), "table inet sora {") {
+		t.Fatalf("the atomic Arm batch does not delete and reinstall the table:\n%s", input)
+	}
+	if _, err := os.Stat(state); err != nil {
+		t.Fatal("the atomic Arm batch left no table behind")
+	}
+}
+
+// TestNftReplaceRendersDeleteThenTable checks the batch payload order: the
+// delete must precede the new table so the kernel replaces rather than
+// collides.
+func TestNftReplaceRendersDeleteThenTable(t *testing.T) {
+	batch := guard.NftReplace(999, []string{"192.168.0.0/16"})
+	del := strings.Index(batch, "delete table inet sora")
+	add := strings.Index(batch, "table inet sora {")
+	if del < 0 || add < 0 || del > add {
+		t.Fatalf("NftReplace() does not render delete-then-add:\n%s", batch)
+	}
+	if !strings.Contains(batch, "meta skuid 999 accept") {
+		t.Fatalf("NftReplace() lost the engine exception:\n%s", batch)
 	}
 }

@@ -86,10 +86,11 @@ func (n *Nftables) SetBlockedNetworks(networks []netip.Prefix) {
 	n.blocked = append([]netip.Prefix(nil), networks...)
 }
 
-// Arm installs or replaces the table, making repeated calls idempotent.
-// It refuses when the core runs as root (uid 0): the engine exception would
-// become "meta skuid 0 accept" and silently let every root process bypass
-// the kill switch. Failing closed here is deliberate — see SORA-H4.
+// Arm installs or replaces the table in a single nft transaction, making
+// repeated calls idempotent. It refuses when the core runs as root (uid 0):
+// the engine exception would become "meta skuid 0 accept" and silently let
+// every root process bypass the kill switch. Failing closed here is
+// deliberate — see SORA-H4.
 func (n *Nftables) Arm(ctx context.Context, _ []uint16) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
@@ -97,14 +98,20 @@ func (n *Nftables) Arm(ctx context.Context, _ []uint16) error {
 		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail,
 			"guard: refusing to arm the kill switch as root: the engine exception would match every root process; run the core as an unprivileged user")
 	}
-	// Remove any previous table first (stale after a crash, or a repeated
-	// Arm): installing over an existing table fails with "File exists"
-	// (SORA-M4).
-	if err := n.deleteTable(ctx); err != nil {
-		return err
-	}
-	if err := n.apply(ctx, NftRuleset(n.uid, n.bypass, n.blocked...)); err != nil {
-		return err
+	// Replace the table — stale after a crash, or a repeated Arm — in one
+	// nft batch. The kernel commits the delete and the new table as a
+	// single transaction, so there is no window with the kill switch
+	// absent (the previous two-invocation delete-then-add left traffic
+	// unguarded between the calls and on crash). A batch whose table does
+	// not exist aborts atomically, so the first install falls back to the
+	// table alone.
+	if err := n.apply(ctx, NftReplace(n.uid, n.bypass, n.blocked...)); err != nil {
+		if !isMissingTable(err) {
+			return err
+		}
+		if err := n.apply(ctx, NftRuleset(n.uid, n.bypass, n.blocked...)); err != nil {
+			return err
+		}
 	}
 	n.armed = true
 	return nil
