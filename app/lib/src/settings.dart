@@ -55,6 +55,7 @@ class Settings {
     'syncedDevices',
     'zapretWithVpn',
     'censorVerdicts',
+    'obfs',
   };
 
   final SharedPreferencesWithCache _store;
@@ -286,6 +287,10 @@ class Settings {
   /// Run zapret for direct traffic alongside the VPN tunnel (F11, Linux only).
   bool get zapretWithVpn => _store.getBool('zapretWithVpn') ?? false;
   set zapretWithVpn(bool value) => _store.setBool('zapretWithVpn', value);
+
+  /// Obfuscation suite settings as JSON: {preset, utls, fragment, jitter}.
+  String get obfs => _store.getString('obfs') ?? '';
+  set obfs(String value) => _store.setString('obfs', value);
 
   /// Original system proxy settings and Sora's endpoint, retained until
   /// restoration. Saving is awaited before proxy changes to allow crash

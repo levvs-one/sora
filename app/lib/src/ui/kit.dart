@@ -710,6 +710,7 @@ String describe(S s, CoreFailure failure) {
     'core.secret.store_corrupt' || 'core.secret.store_unavailable' => s.errSecretStore,
     'app.core_watch_unstable' => s.coreWatchUnstable,
     'app.benchmark_unsupported' => s.errBenchmarkUnsupported,
+    'app.obfs_unsupported' => s.errObfsUnsupported,
     'chainUnsupported' => s.chainUnsupported,
     _ when key.startsWith('core.plan.') => s.errServers,
     _ => s.errGeneric,

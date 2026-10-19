@@ -24,6 +24,7 @@ import 'subscription_sheet.dart';
 import 'shell.dart';
 import 'sync.dart';
 import 'modes.dart';
+import 'obfs.dart';
 
 /// App settings, with common options first and advanced options in named
 /// groups.
@@ -175,6 +176,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (v) => set((x) => x.preset = v),
             ),
             LinkTile(title: s.modes, onTap: () => showModes(context)),
+            LinkTile(
+              title: s.obfs,
+              value: obfsPresetLabel(s, sora.obfs.preset),
+              onTap: () => push<void>(context, const ObfsScreen()),
+            ),
             if (settings.tunnel == 'proxy' && local != null)
               // Expose the endpoint for manual configuration when apps or
               // desktops do not use the system proxy.
@@ -381,6 +387,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.autoSelectMode,
               choices: {'ping': s.autoSelectPing, 'speed': s.autoSelectSpeed, 'smart': s.autoSelectSmart},
               onChanged: (v) => set((x) => x.autoSelectMode = v),
+            ),
+            SwitchTile(
+              title: s.autoSwitchOnDegrade,
+              detail: s.autoSwitchOnDegradeDetail,
+              value: settings.autoSwitchOnDegrade,
+              onChanged: (v) => set((x) => x.autoSwitchOnDegrade = v, replan: false),
             ),
           ],
         ),

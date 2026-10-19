@@ -24,6 +24,7 @@ import 'profiles.dart';
 import 'rules.dart';
 import 'settings.dart';
 import 'notifications.dart';
+import 'obfs.dart';
 import 'sync.dart';
 import 'updates.dart';
 import 'ui/kit.dart' show describe;
@@ -87,7 +88,8 @@ class Sora extends ChangeNotifier {
       profiles = ProfilesStore(() => settings.networkProfiles, (v) => settings.networkProfiles = v),
       chains = ChainsStore(() => settings.proxyChains, (v) => settings.proxyChains = v),
       syncDevices = SyncDevices(() => settings.syncedDevices, (v) => settings.syncedDevices = v),
-      censor = CensorDetector(() => settings.censorVerdicts, (v) => settings.censorVerdicts = v) {
+      censor = CensorDetector(() => settings.censorVerdicts, (v) => settings.censorVerdicts = v),
+      obfs = ObfsSettings(() => settings.obfs, (v) => settings.obfs = v) {
     overrides.onChanged = () {
       notifyListeners();
       // Hiding a server changes the plan; renaming does not (IDs are stable).
@@ -96,6 +98,7 @@ class Sora extends ChangeNotifier {
     profiles.addListener(notifyListeners);
     chains.addListener(notifyListeners);
     syncDevices.addListener(notifyListeners);
+    obfs.addListener(notifyListeners);
     _loadBandwidth();
   }
   final browserDiagnostics = BrowserDiagnostics();
@@ -103,6 +106,10 @@ class Sora extends ChangeNotifier {
   /// Censorship detector verdicts: history, prompt state and polling.
   /// Wired in the constructor from [settings].
   final CensorDetector censor;
+
+  /// Traffic obfuscation settings (the ObfsControl suite: uTLS, TLS
+  /// fragmentation, jitter). Wired in the constructor from [settings].
+  final ObfsSettings obfs;
 
   AppUpdater get updates => _updates;
   late final _updates = AppUpdater(
@@ -376,6 +383,95 @@ class Sora extends ChangeNotifier {
     }
   }
 
+  /// Reports what the installed engines really support for the obfuscation
+  /// suite (uTLS, fragmentation, jitter), via ObfsControl.GetObfsCapabilities
+  /// (API 1.11). Null engines means unknown: no link yet, an older core, or
+  /// a core without the service (UNIMPLEMENTED) — the UI shows "detecting"
+  /// instead of an error; the miss is logged for diagnostics.
+  Future<({List<EngineObfsCapabilities>? engines, CoreFailure? failure})> getObfsCapabilities() async {
+    final link = _link;
+    if (link == null || link.minor < obfsMinApiMinor) {
+      return (engines: null, failure: null);
+    }
+    try {
+      final answer = await link.obfs.getObfsCapabilities(
+        GetObfsCapabilitiesRequest(apiVersion: apiVersion),
+        options: CallOptions(timeout: const Duration(seconds: 10)),
+      );
+      if (_disposed || link != _link) return (engines: null, failure: null);
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      recovered('obfs-caps');
+      return (engines: answer.engines.toList(), failure: null);
+    } catch (error) {
+      if (error is GrpcError && error.code == StatusCode.unimplemented) {
+        debugPrint('[obfs] GetObfsCapabilities is not implemented by this core build; capabilities unknown');
+        return (engines: null, failure: null);
+      }
+      final failure = CoreFailure.from(error);
+      if (!_disposed && link == _link) reportFailure(failure, source: 'obfs-caps');
+      return (engines: null, failure: failure);
+    }
+  }
+
+  /// Pushes the stored obfuscation profile to the core via
+  /// ObfsControl.ApplyObfsProfile (API 1.11). The core validates the profile
+  /// against the installed engines, stores it and merges it into the engine
+  /// plan of every later connect; while connected the reconnect banner takes
+  /// over. Throws [CoreFailure] on failure so the UI can render it inline;
+  /// with [silent] failures are only logged (used to heal the core profile
+  /// when the link opens).
+  Future<ObfsApplyResult> applyObfsProfile({bool silent = false}) async {
+    final link = _link;
+    if (link == null || link.minor < obfsMinApiMinor) {
+      return (compatibleEngines: const <String>[], warnings: const <String>[]);
+    }
+    try {
+      final answer = await link.obfs.applyObfsProfile(
+        ApplyObfsProfileRequest(apiVersion: apiVersion, profile: obfs.toProfile()),
+        options: CallOptions(timeout: const Duration(seconds: 10)),
+      );
+      if (_disposed || link != _link) throw CoreFailure.unavailable;
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      recovered('obfs');
+      if (phase == Phase.connected || phase == Phase.reconnecting) {
+        // The core merges the profile on the next connect, not live.
+        needsReconnect = true;
+      }
+      notifyListeners();
+      return (compatibleEngines: answer.compatibleEngines.toList(), warnings: answer.warnings.toList());
+    } on CoreFailure {
+      rethrow;
+    } catch (error) {
+      if (error is GrpcError && error.code == StatusCode.unimplemented) {
+        debugPrint('[obfs] ApplyObfsProfile is not implemented by this core build; profile kept locally');
+        if (!silent) throw const CoreFailure('app.obfs_unsupported');
+        return (compatibleEngines: const <String>[], warnings: const <String>[]);
+      }
+      final failure = CoreFailure.from(error);
+      if (silent) {
+        debugPrint('[obfs] apply failed: $failure');
+        return (compatibleEngines: const <String>[], warnings: const <String>[]);
+      }
+      if (!_disposed && link == _link) reportFailure(failure, source: 'obfs');
+      throw failure;
+    }
+  }
+
+  /// Edits the obfuscation settings, persists them and pushes the profile to
+  /// the core. A named [preset] travels preset-only; any manual field flips
+  /// the profile custom. Throws [CoreFailure] when the push fails; the local
+  /// settings stay saved and sync on the next link or edit.
+  Future<ObfsApplyResult> updateObfs({String? preset, String? utls, bool? fragment, bool? jitter}) async {
+    if (preset != null) {
+      obfs.applyPreset(preset);
+    } else {
+      if (utls != null) obfs.utls = utls;
+      if (fragment != null) obfs.fragment = fragment;
+      if (jitter != null) obfs.jitter = jitter;
+    }
+    return applyObfsProfile();
+  }
+
   /// Last displayed failure, cleared by the next action.
   CoreFailure? failure;
 
@@ -507,6 +603,10 @@ class Sora extends ChangeNotifier {
         localProxy = about.about.hasLocalProxy() ? about.about.localProxy : null;
         if (failure?.key == CoreFailure.unavailable.key) failure = null;
         recovered('core');
+        // Heal the core-side obfuscation profile: the app is the source of
+        // truth, the core only caches it. Silent: an old core keeps working
+        // with local-only settings.
+        unawaited(applyObfsProfile(silent: true));
         _watchSubscriptions();
         _watchSession();
         unawaited(loadCustomServers());

@@ -7,9 +7,11 @@ import 'package:retry/retry.dart';
 import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../generated/sora/leak/v1/leak.pbgrpc.dart';
+import '../obfs.dart';
 import 'pipe.dart';
 
-/// API 1.11 adds the leak-test suite; 1.10 exposes proxy chains and
+/// API 1.11 adds the leak-test suite and the traffic obfuscation suite
+/// (ObfsControl: uTLS, fragmentation, jitter); 1.10 exposes proxy chains and
 /// zapret-with-VPN in SessionPlan, network profiles and chain probing; 1.9
 /// adds throughput benchmarks, 1.8 DNS leak diagnostics. 1.6 is required to
 /// open subscription pages without exposing links in states. The client offers
@@ -20,7 +22,7 @@ final apiVersion = ApiVersion(major: 1, minor: 11, minSupportedMinor: 6);
 /// A gRPC channel to the core over a Unix socket or Windows named pipe, with
 /// the Handshake authentication token.
 class CoreLink {
-  CoreLink._(this._channel, this.stub, this.custom, this.leak, this.token, this.minor);
+  CoreLink._(this._channel, this.stub, this.custom, this.leak, this.obfs, this.token, this.minor);
 
   final api.ClientChannel _channel;
   final CoreControlClient stub;
@@ -30,6 +32,10 @@ class CoreLink {
 
   /// Leak-test suite (sora.leak.v1); the core may not implement it yet.
   final LeakServiceClient leak;
+
+  /// Traffic obfuscation (sora.obfs.v1, API 1.11); the core may not
+  /// implement it yet.
+  final ObfsControlClient obfs;
   final List<int> token;
   final int minor;
 
@@ -66,7 +72,7 @@ class CoreLink {
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
       return CoreLink._(channel, stub, CustomServersClient(channel), LeakServiceClient(channel),
-          answer.controlAuthenticator, answer.negotiatedVersion.minor);
+          ObfsControlClient(channel), answer.controlAuthenticator, answer.negotiatedVersion.minor);
     } catch (_) {
       await channel.shutdown();
       rethrow;
