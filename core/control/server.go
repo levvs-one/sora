@@ -19,7 +19,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/levvs-one/sora-client/core/diagnostics"
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
@@ -140,7 +139,6 @@ type Server struct {
 	about       func() *corev1.About
 	diagnostics Diagnostics
 	fetcher     Fetcher
-	captureMu   sync.Mutex
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -1197,48 +1195,18 @@ func (s *Server) RunDiagnostics(ctx context.Context, req *corev1.RunDiagnosticsR
 }
 
 // ExportDiagnostics returns an archive built from already-redacted core values.
-// Clients cannot expand its contents.
+// Clients cannot expand its contents. Raw capture formats (PCAPNG, EVTX) are
+// refused outright: packet payloads and event logs cannot be redacted to the
+// archive's guarantee, so the core will not produce them (SORA-H3).
 func (s *Server) ExportDiagnostics(ctx context.Context, req *corev1.ExportDiagnosticsRequest) (*corev1.ExportDiagnosticsResponse, error) {
 	id := requestID(req.GetRequestId())
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return nil, transportStatus(err)
 	}
 	if req.GetFormat() != corev1.DiagnosticFormat_DIAGNOSTIC_FORMAT_UNSPECIFIED {
-		if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
-			return nil, err
-		}
-		if !s.captureMu.TryLock() {
-			return &corev1.ExportDiagnosticsResponse{Error: toWire(errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy, "control: another native capture is running"), nil, id)}, nil
-		}
-		defer s.captureMu.Unlock()
-		var data []byte
-		var err error
-		switch req.GetFormat() {
-		case corev1.DiagnosticFormat_DIAGNOSTIC_FORMAT_PCAPNG:
-			running := s.sessions.Current()
-			if running == nil || running.State() != session.StateConnected || !running.Plan().Tun.Enabled || req.GetSessionId() != running.ID() {
-				err = errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanTunnel, "control: a packet capture requires the current connected Sora TUN")
-				break
-			}
-			capture, cancel := context.WithCancel(ctx)
-			defer cancel()
-			go func() {
-				select {
-				case <-running.Done():
-					cancel()
-				case <-capture.Done():
-				}
-			}()
-			data, err = diagnostics.CapturePackets(capture, engine.TunDevice, 10*time.Second)
-		case corev1.DiagnosticFormat_DIAGNOSTIC_FORMAT_EVTX:
-			data, err = diagnostics.ExportWindowsEvents(ctx)
-		default:
-			err = errs.Newf(errs.CodeInvalidArgument, errs.KeyInvalidRequest, "control: unknown diagnostic format")
-		}
-		if err != nil {
-			return &corev1.ExportDiagnosticsResponse{Error: toWire(err, nil, id)}, nil
-		}
-		return &corev1.ExportDiagnosticsResponse{Archive: data}, nil
+		err := errs.Newf(errs.CodeUnsupported, errs.KeyInvalidRequest,
+			"control: raw diagnostic formats are not available; the core only exports the redacted archive")
+		return &corev1.ExportDiagnosticsResponse{Error: toWire(err, nil, id)}, nil
 	}
 	if err := s.checkSession(req.GetSessionId()); err != nil {
 		return &corev1.ExportDiagnosticsResponse{Error: toWire(err, nil, id)}, nil
