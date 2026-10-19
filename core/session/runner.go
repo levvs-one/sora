@@ -72,6 +72,10 @@ const tunWait = 5 * time.Second
 func interfaceUp(ctx context.Context, device string) error {
 	ctx, cancel := context.WithTimeout(ctx, tunWait)
 	defer cancel()
+	// One ticker for the whole wait instead of a fresh time.After per
+	// iteration (SORA-L21).
+	ticker := time.NewTicker(50 * time.Millisecond)
+	defer ticker.Stop()
 	for {
 		if iface, err := net.InterfaceByName(device); err == nil && iface.Flags&net.FlagUp != 0 {
 			return nil
@@ -80,7 +84,7 @@ func interfaceUp(ctx context.Context, device string) error {
 		case <-ctx.Done():
 			return errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanTunnel,
 				"session: the engine is running but the adapter %s is not up; the core may lack CAP_NET_ADMIN", device)
-		case <-time.After(50 * time.Millisecond):
+		case <-ticker.C:
 		}
 	}
 }
