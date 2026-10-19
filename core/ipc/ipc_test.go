@@ -123,3 +123,84 @@ func TestDialFailsFastWhenNothingListens(t *testing.T) {
 		t.Error("Dial() succeeded although nothing is listening")
 	}
 }
+
+// TestConnectionCapRefusesExcessSilently locks SORA-M1: connections beyond
+// MaxConnections are refused without a reply, and released slots admit new
+// connections again.
+func TestConnectionCapRefusesExcessSilently(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	listener, err := ipc.Listen(ctx, ipc.Options{Address: endpointAddress(t), MaxConnections: 4})
+	if err != nil {
+		t.Fatalf("Listen() error = %v", err)
+	}
+	// Serve in the background; handlers return when the client goes away,
+	// like the gRPC server does, releasing the slot.
+	go func() {
+		_ = listener.Serve(ctx, func(_ context.Context, connection net.Conn) error {
+			_, _ = io.Copy(io.Discard, connection)
+			return nil
+		})
+	}()
+
+	dial := func() net.Conn {
+		t.Helper()
+		c, err := ipc.Dial(ctx, listener.Address())
+		if err != nil {
+			t.Fatalf("Dial() error = %v", err)
+		}
+		return c
+	}
+	waitFor := func(want int64) {
+		t.Helper()
+		deadline := time.Now().Add(3 * time.Second)
+		for listener.ActiveConnections() != want && time.Now().Before(deadline) {
+			time.Sleep(10 * time.Millisecond)
+		}
+		if got := listener.ActiveConnections(); got != want {
+			t.Fatalf("ActiveConnections() = %d, want %d", got, want)
+		}
+	}
+	held := make([]net.Conn, 0, 4)
+	for i := 0; i < 4; i++ {
+		held = append(held, dial())
+	}
+	waitFor(4)
+	// The fifth connection must be refused: the server closes it without a
+	// reply, so reading fails fast.
+	extra, err := ipc.Dial(ctx, listener.Address())
+	if err != nil {
+		t.Fatalf("Dial() error = %v", err)
+	}
+	func() {
+		defer func() { _ = extra.Close() }()
+		_ = extra.SetReadDeadline(time.Now().Add(3 * time.Second))
+		if _, err := extra.Read(make([]byte, 1)); err == nil {
+			t.Fatal("a connection beyond the cap was served")
+		}
+	}()
+	waitFor(4)
+	// Releasing a slot admits a new connection.
+	_ = held[0].Close()
+	held = held[1:]
+	waitFor(3)
+	replacement := dial()
+	held = append(held, replacement)
+	waitFor(4)
+	// The replacement is usable: the handler echoes nothing, but the
+	// connection stays open past the refusal path, so the read must time
+	// out instead of hitting EOF.
+	_ = replacement.SetReadDeadline(time.Now().Add(3 * time.Second))
+	if _, err := replacement.Read(make([]byte, 1)); err == nil {
+		t.Fatal("the replacement connection was served a reply it should not get")
+	} else {
+		var netErr net.Error
+		if !errors.As(err, &netErr) || !netErr.Timeout() {
+			t.Fatalf("replacement read: %v", err)
+		}
+	}
+	for _, c := range held {
+		_ = c.Close()
+	}
+}
