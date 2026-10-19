@@ -86,6 +86,86 @@ func TestValidateRejectsAmneziaWGOnNonWireGuard(t *testing.T) {
 	}
 }
 
+func goodAmnezia31() *AmneziaWG {
+	a := goodAmnezia()
+	a.S1, a.S2, a.S3, a.S4 = 15, 25, 20, 12
+	a.H1, a.H2, a.H3, a.H4 = "1", "2", "3", "4"
+	a.HeaderProtectionKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+	a.ContentPaddingAddition = "10-100"
+	a.RekeyAfterTime = "100-140"
+	a.RekeyTimeout = "5-10"
+	a.RejectAfterTime = "170-190"
+	a.KeepaliveTimeout = "20-30"
+	a.MaxHandshakeAttempts = "3"
+	a.RandomTrailers = true
+	a.DisableCookies = true
+	return a
+}
+
+func TestValidateAcceptsAmneziaWG31(t *testing.T) {
+	if err := wireguardWithAmnezia(goodAmnezia31()).Validate(); err != nil {
+		t.Fatalf("Validate = %v, want nil", err)
+	}
+}
+
+func TestValidateAcceptsDisabledMagicHeaders(t *testing.T) {
+	// H1=1..H4=4 are the per-index "disabled" sentinels from the 3.1 spec,
+	// recommended together with Header Protection.
+	a := goodAmnezia()
+	a.H1, a.H2, a.H3, a.H4 = "1", "2", "3", "4"
+	if err := wireguardWithAmnezia(a).Validate(); err != nil {
+		t.Fatalf("Validate = %v, want nil", err)
+	}
+}
+
+func TestValidateRejectsBadAmneziaWG31(t *testing.T) {
+	cases := []struct {
+		name   string
+		mutate func(a *AmneziaWG)
+		want   string
+	}{
+		{"key not 32 bytes", func(a *AmneziaWG) { a.HeaderProtectionKey = "AAAA" }, "headerprotectionkey"},
+		{"key not decodable", func(a *AmneziaWG) { a.HeaderProtectionKey = "!!!not-a-key!!!" }, "headerprotectionkey"},
+		{"key needs s1>=12", func(a *AmneziaWG) { a.S1 = 11 }, "requires s1 >= 12"},
+		{"key needs s4>=12", func(a *AmneziaWG) { a.S4 = 0 }, "requires s4 >= 12"},
+		{"padding range reversed", func(a *AmneziaWG) { a.ContentPaddingAddition = "100-10" }, "contentpaddingaddition"},
+		{"padding over uint16", func(a *AmneziaWG) { a.ContentPaddingAddition = "70000" }, "contentpaddingaddition"},
+		{"padding not a range", func(a *AmneziaWG) { a.ContentPaddingAddition = "lots" }, "contentpaddingaddition"},
+		{"rekey range reversed", func(a *AmneziaWG) { a.RekeyAfterTime = "140-100" }, "rekeyaftertime"},
+		{"keepalive negative", func(a *AmneziaWG) { a.KeepaliveTimeout = "-5" }, "keepalivetimeout"},
+		{"wrong magic sentinel", func(a *AmneziaWG) { a.H1 = "2" }, "h1"},
+		{"zero magic header", func(a *AmneziaWG) { a.H2 = "0" }, "h2"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			a := goodAmnezia31()
+			tc.mutate(a)
+			err := wireguardWithAmnezia(a).Validate()
+			if err == nil {
+				t.Fatalf("Validate = nil, want error containing %q", tc.want)
+			}
+			if !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("Validate = %v, want error containing %q", err, tc.want)
+			}
+		})
+	}
+}
+
+func TestParseAWGRangeU16(t *testing.T) {
+	lo, hi, err := parseAWGRangeU16("120-180")
+	if err != nil || lo != 120 || hi != 180 {
+		t.Fatalf("parseAWGRangeU16(range) = %d,%d,%v", lo, hi, err)
+	}
+	lo, hi, err = parseAWGRangeU16("25")
+	if err != nil || lo != 25 || hi != 25 {
+		t.Fatalf("parseAWGRangeU16(single) = %d,%d,%v", lo, hi, err)
+	}
+	for _, raw := range []string{"180-120", "65536", "-1", "abc", "1-", ""} {
+		if _, _, err := parseAWGRangeU16(raw); err == nil {
+			t.Fatalf("parseAWGRangeU16(%q) = nil, want error", raw)
+		}
+	}
+}
 func TestParseAmneziaMagic(t *testing.T) {
 	lo, hi, err := parseAmneziaMagic("12345")
 	if err != nil || lo != 12345 || hi != 12345 {

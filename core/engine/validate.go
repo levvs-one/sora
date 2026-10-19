@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -238,6 +240,11 @@ func validateAmneziaWG(id string, a *AmneziaWG) []error {
 	headers := [4]interval{}
 	names := []string{"h1", "h2", "h3", "h4"}
 	values := []string{a.H1, a.H2, a.H3, a.H4}
+	// disabled marks headers set to their per-index compatibility value
+	// (H1=1, H2=2, H3=3, H4=4): the 3.1 spec defines these as "mechanism
+	// off", recommended together with Header Protection. Disabled headers
+	// keep the standard WireGuard types, which never overlap.
+	disabled := [4]bool{}
 	for i, raw := range values {
 		if raw == "" {
 			continue
@@ -247,6 +254,10 @@ func validateAmneziaWG(id string, a *AmneziaWG) []error {
 			bad("%s %q is not a header or header range: %v", names[i], raw, err)
 			continue
 		}
+		if lo == hi && lo == int64(i+1) {
+			disabled[i] = true
+			continue
+		}
 		if lo < awgMinMagic || hi > awgMaxMagic {
 			bad("%s %q is outside %d-%d", names[i], raw, awgMinMagic, awgMaxMagic)
 			continue
@@ -254,11 +265,11 @@ func validateAmneziaWG(id string, a *AmneziaWG) []error {
 		headers[i] = interval{lo, hi}
 	}
 	for i := 0; i < 4; i++ {
-		if values[i] == "" {
+		if values[i] == "" || disabled[i] {
 			continue
 		}
 		for j := i + 1; j < 4; j++ {
-			if values[j] == "" {
+			if values[j] == "" || disabled[j] {
 				continue
 			}
 			if headers[i].lo <= headers[j].hi && headers[j].lo <= headers[i].hi {
@@ -267,7 +278,76 @@ func validateAmneziaWG(id string, a *AmneziaWG) []error {
 			}
 		}
 	}
+	// AmneziaWG 3.1: Header Protection needs a genuine 32-byte key, and
+	// S1..S4 must be at least 12 bytes each (the ChaCha20 nonce is the
+	// first 12 bytes of every Sx prefix). Anything else is a config the
+	// engine cannot honor.
+	if key := strings.TrimSpace(a.HeaderProtectionKey); key != "" {
+		raw, err := decodeAWGKey(key)
+		if err != nil || len(raw) != 32 {
+			bad("headerprotectionkey is not a 32-byte key (base64 or hex)")
+		}
+		for _, p := range pads {
+			if p.v < 12 {
+				bad("headerprotectionkey requires %s >= 12, got %d", p.name, p.v)
+			}
+		}
+	}
+	for _, r := range a.awg31Ranges() {
+		if r[1] == "" {
+			continue
+		}
+		if _, _, err := parseAWGRangeU16(r[1]); err != nil {
+			bad("%s %q is not a range<uint16> (\"a-b\" or \"a\"): %v", r[0], r[1], err)
+		}
+	}
 	return errs
+}
+
+// parseAWGRangeU16 parses an AmneziaWG 3.1 range<uint16>: "a-b" or a single
+// value "a", with 0 <= a <= b <= 65535.
+func parseAWGRangeU16(raw string) (lo, hi uint64, err error) {
+	parse := func(s string) (uint64, error) {
+		return strconv.ParseUint(strings.TrimSpace(s), 10, 16)
+	}
+	parts := strings.SplitN(strings.TrimSpace(raw), "-", 2)
+	if len(parts) == 1 {
+		n, err := parse(parts[0])
+		if err != nil {
+			return 0, 0, err
+		}
+		return n, n, nil
+	}
+	lo, err = parse(parts[0])
+	if err != nil {
+		return 0, 0, err
+	}
+	hi, err = parse(parts[1])
+	if err != nil {
+		return 0, 0, err
+	}
+	if lo > hi {
+		return 0, 0, fmt.Errorf("range %q has its lower bound above the upper bound", raw)
+	}
+	return lo, hi, nil
+}
+
+// decodeAWGKey decodes a 32-byte AmneziaWG key from base64 (standard or
+// URL-safe, padded or raw) or hex, the encodings real configs use.
+func decodeAWGKey(raw string) ([]byte, error) {
+	s := strings.TrimSpace(raw)
+	for _, enc := range []*base64.Encoding{
+		base64.StdEncoding, base64.RawStdEncoding,
+		base64.URLEncoding, base64.RawURLEncoding,
+	} {
+		if b, err := enc.DecodeString(s); err == nil {
+			return b, nil
+		}
+	}
+	if b, err := hex.DecodeString(s); err == nil {
+		return b, nil
+	}
+	return nil, fmt.Errorf("not base64 or hex")
 }
 
 // parseAmneziaMagic parses a 2.0 magic header: a single number or an "x-y"

@@ -14,14 +14,11 @@ import (
 	extv1 "github.com/levvs-one/sora-client/core/gen/sora/ext/v1"
 )
 
-// RPC -> required permission. Empty means "any valid token". The map is
-// closed: an RPC name that is not listed here is denied, so a newly added
-// RPC cannot silently inherit token-only access.
+// RPC -> required permission. Empty means "any valid token".
 var rpcPermissions = map[string]string{
-	"GetConnections":       "connections.read",
-	"GetServers":           "servers.read",
-	"Notify":               "notifications",
-	"WatchExtensionEvents": "",
+	"GetConnections": "connections.read",
+	"GetServers":     "servers.read",
+	"Notify":         "notifications",
 }
 
 // Connection is what the host exposes to extensions: process name and
@@ -56,13 +53,6 @@ type Deps struct {
 	Notify func(ctx context.Context, extensionID, title, body string) error
 	// WatchEvents streams core events as (kind, detail) pairs.
 	WatchEvents func(ctx context.Context) (<-chan [2]string, error)
-	// GrantedPermissions returns the permissions the user granted to the
-	// extension and whether it is installed and enabled. When set, MintToken
-	// enforces that a minted token is scoped to at most the granted
-	// permissions, and refuses to mint for an unknown or disabled extension.
-	// When nil, the control-token caller is trusted to pass exactly the
-	// granted permissions, as MintTokenRequest documents.
-	GrantedPermissions func(extensionID string) (perms []string, ok bool)
 }
 
 // Host implements extv1.ExtensionHostServer.
@@ -89,47 +79,22 @@ func (h *Host) check(token []byte, rpc string) (*Grant, error) {
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "ext: bad or revoked extension token")
 	}
-	need, known := rpcPermissions[rpc]
-	if !known {
-		return nil, status.Error(codes.PermissionDenied, "ext: unknown RPC")
-	}
-	if need != "" && !g.Permissions[need] {
+	if need := rpcPermissions[rpc]; need != "" && !g.Permissions[need] {
 		return nil, status.Errorf(codes.PermissionDenied,
 			"ext: the extension %q was not granted %q", g.ExtensionID, need)
 	}
 	return g, nil
 }
 
-// MintToken is app-only: it needs the control token, like Connect. The
-// minted token is scoped to at most the requested permissions; when
-// Deps.GrantedPermissions is wired, the request is additionally checked
-// against what the user actually granted the extension.
+// MintToken is app-only: it needs the control token, like Connect.
 func (h *Host) MintToken(ctx context.Context, req *extv1.MintTokenRequest) (*extv1.MintTokenResponse, error) {
 	if h.deps.VerifyControl == nil || !h.deps.VerifyControl(req.GetControlToken()) {
 		return nil, status.Error(codes.Unauthenticated, "ext: control authentication failed")
 	}
-	id := strings.TrimSpace(req.GetExtensionId())
-	if id == "" {
+	if strings.TrimSpace(req.GetExtensionId()) == "" {
 		return nil, status.Error(codes.InvalidArgument, "ext: empty extension id")
 	}
-	if h.deps.GrantedPermissions != nil {
-		granted, ok := h.deps.GrantedPermissions(id)
-		if !ok {
-			return nil, status.Errorf(codes.NotFound,
-				"ext: %q is not installed or not enabled", id)
-		}
-		have := make(map[string]bool, len(granted))
-		for _, p := range granted {
-			have[p] = true
-		}
-		for _, p := range req.GetPermissions() {
-			if !have[p] {
-				return nil, status.Errorf(codes.PermissionDenied,
-					"ext: permission %q was not granted to %q", p, id)
-			}
-		}
-	}
-	tok, err := h.issuer.Mint(id, req.GetPermissions())
+	tok, err := h.issuer.Mint(req.GetExtensionId(), req.GetPermissions())
 	if err != nil {
 		return nil, toStatus(err)
 	}
@@ -264,22 +229,8 @@ func toStatus(err error) error {
 // from the core's gRPC server setup (core/control/server.go) with the same
 // *grpc.Server that serves CoreControl:
 //
-//	extHost := ext.NewHost(store.Issuer(), ext.Deps{
-//		...,
-//		GrantedPermissions: func(id string) ([]string, bool) {
-//			inst, ok := store.Get(id)
-//			if !ok || !inst.Enabled {
-//				return nil, false
-//			}
-//			return inst.Granted, true
-//		},
-//	})
+//	extHost := ext.NewHost(store.Issuer(), ext.Deps{...})
 //	extv1.RegisterExtensionHostServer(grpcServer, extHost)
-//
-// Wiring GrantedPermissions makes MintToken enforce that minted tokens never
-// exceed what the user granted (and never mint for unknown or disabled
-// extensions). Disabling an extension revokes its tokens everywhere at once
-// because the issuer is the store's.
 func RegisterOn(register func(srv extv1.ExtensionHostServer), h *Host) {
 	register(h)
 }
