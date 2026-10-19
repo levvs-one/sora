@@ -49,6 +49,14 @@
   "until": "until {date}",
   "expired": "Expired",
   "milliseconds": "{n} ms",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
   "speedMbps": "{value} Mbps",
   "@speedMbps": {
     "placeholders": {

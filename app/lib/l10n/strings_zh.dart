@@ -172,6 +172,11 @@ class SZh extends S {
   }
 
   @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
   String bytesB(String n) {
     return '$n B';
   }
@@ -1331,6 +1336,11 @@ class SZhHans extends SZh {
   }
 
   @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
   String bytesB(String n) {
     return '$n B';
   }
@@ -2314,6 +2324,11 @@ class SZhHant extends SZh {
   @override
   String speedMbps(double value) {
     return '${value.toStringAsFixed(1)} Mbps';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
   }
 
   @override

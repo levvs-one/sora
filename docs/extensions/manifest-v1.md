@@ -82,6 +82,9 @@ Rules:
 - `manifest_version` must be `1`. Unknown top-level fields are rejected.
 - `id`: reverse-DNS, at least two labels (`com.example.stats`).
 - `version`, `min_app_version`: semver `MAJOR.MINOR.PATCH`.
+- The app enforces `min_app_version` against its own version, injected at
+  build time: `flutter build --dart-define=APP_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d+ -f1)`.
+  Dev builds without the define skip the gate instead of guessing.
 - `permissions`: subset of the registry below, no duplicates.
 - `capabilities`: subset of `theme`, `network-hook`, `routing`, `ui-panel`,
   `background`, `widget`.

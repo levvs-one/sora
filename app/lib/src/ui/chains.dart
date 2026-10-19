@@ -132,7 +132,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
 
   String _latencyLine(S s, Sora sora, ProxyChain chain) {
     final ms = chain.estimatedLatency(sora.latency);
-    return ms == null ? s.chainEstimate : '${s.chainEstimate}: ${ms}ms';
+    return ms == null ? s.chainEstimate : '${s.chainEstimate}: ${s.latencyMs(ms)}';
   }
 }
 
@@ -344,7 +344,7 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
             Tile(
               title: s.chainEstimate,
               trailing: Text(
-                estimate == null ? '—' : '${estimate}ms',
+                estimate == null ? '—' : s.latencyMs(estimate),
                 style: Styles.bodyStrong.copyWith(color: palette.ink),
               ),
             ),

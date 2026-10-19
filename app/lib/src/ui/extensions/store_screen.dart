@@ -167,7 +167,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       final pkg = ExtPackage.open(data);
       await pkg.verify();
       // min_app_version gate against the running app.
-      if (compareVersions(pkg.manifest.minAppVersion, _appVersion) > 0) {
+      if (_appVersion.isNotEmpty && compareVersions(pkg.manifest.minAppVersion, _appVersion) > 0) {
         throw PackageError('needs app ${pkg.manifest.minAppVersion}');
       }
       hideProgress();
@@ -273,8 +273,11 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   static String _sha256Hex(Uint8List data) => crypto.sha256.convert(data).toString();
 }
 
-/// The running app version for the min_app_version gate.
-const String _appVersion = '1.9.0';
+/// The running app version for the min_app_version gate, injected at build
+/// time with --dart-define=APP_VERSION=x.y.z (see docs/extensions/manifest-v1.md).
+/// Empty in dev builds: the gate is skipped rather than enforced against a
+/// hardcoded guess.
+const String _appVersion = String.fromEnvironment('APP_VERSION');
 
 class _ExtensionsBody extends StatefulWidget {
   const _ExtensionsBody();

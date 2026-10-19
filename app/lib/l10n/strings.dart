@@ -453,6 +453,9 @@ abstract class S {
   /// **'{value} Mbps'**
   String speedMbps(double value);
 
+  /// No description provided for @latencyMs.
+  String latencyMs(int value);
+
   /// No description provided for @bytesB.
   ///
   /// In ru, this message translates to:

@@ -80,6 +80,14 @@
   },
   "expired": "Срок истёк",
   "milliseconds": "{n} мс",
+  "latencyMs": "{value} мс",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
   "speedMbps": "{value} Мбит/с",
   "@speedMbps": {
     "placeholders": {

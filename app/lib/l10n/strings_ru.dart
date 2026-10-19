@@ -172,6 +172,11 @@ class SRu extends S {
   }
 
   @override
+  String latencyMs(int value) {
+    return '$value мс';
+  }
+
+  @override
   String bytesB(String n) {
     return '$n Б';
   }

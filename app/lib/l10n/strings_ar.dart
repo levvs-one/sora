@@ -172,6 +172,11 @@ class SAr extends S {
   }
 
   @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
   String bytesB(String n) {
     return '$n ب';
   }
