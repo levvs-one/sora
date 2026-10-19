@@ -29,6 +29,9 @@ type Nftables struct {
 
 // NewNftables permits engine traffic owned by uid and the supplied bypass
 // networks. Empty bypass uses private ranges to keep local resources reachable.
+// The nft binary is resolved to an absolute path at construction: a PATH-planted
+// "nft" must never run with the core's (possibly root) privileges (audit R2).
+// A missing nft fails closed here instead of later at Arm.
 func NewNftables(uid int, bypass []string) (*Nftables, error) {
 	if uid < 0 {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyGuardFirewallFail,
@@ -37,7 +40,12 @@ func NewNftables(uid int, bypass []string) (*Nftables, error) {
 	if len(bypass) == 0 {
 		bypass = DefaultBypassNetworks()
 	}
-	return &Nftables{uid: uid, bypass: bypass, command: "nft"}, nil
+	nftBin, err := exec.LookPath("nft")
+	if err != nil {
+		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail,
+			"guard: the nftables kill switch needs the nft binary installed: %v", err)
+	}
+	return &Nftables{uid: uid, bypass: bypass, command: nftBin}, nil
 }
 
 // SetBlockedNetworks retains session destinations across engine crashes.
@@ -122,7 +130,7 @@ func (n *Nftables) Name() string { return "nftables" }
 // apply sends nft rules on stdin to avoid command-line length limits and
 // exposing rules in process arguments.
 func (n *Nftables) apply(ctx context.Context, ruleset string) error {
-	process := exec.CommandContext(ctx, n.command, "-f", "-") //nolint:gosec // n.command is the nft binary found at construction; the ruleset arrives on stdin
+	process := exec.CommandContext(ctx, n.command, "-f", "-") //nolint:gosec // n.command is the absolute nft path resolved at construction; the ruleset arrives on stdin
 	process.Stdin = strings.NewReader(ruleset)
 	output, err := process.CombinedOutput()
 	if err != nil {

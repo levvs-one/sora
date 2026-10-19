@@ -134,9 +134,13 @@ func bypassSteps(device string, addresses []netip.Prefix, families []string) [][
 }
 
 func unroute(ctx context.Context) error {
+	bin, err := ipBin()
+	if err != nil {
+		return err
+	}
 	var errs []error
 	for _, family := range families() {
-		out, err := exec.CommandContext(ctx, "ip", family, "-d", "-j", "-N", "rule").Output() //nolint:gosec // family is the fixed -4/-6 set
+		out, err := exec.CommandContext(ctx, bin, family, "-d", "-j", "-N", "rule").Output() //nolint:gosec // bin is the absolute iproute2 path; family is the fixed -4/-6 set
 		if err != nil {
 			return fmt.Errorf("tunroute: read rules: %w", err)
 		}
@@ -160,7 +164,7 @@ func unroute(ctx context.Context) error {
 		}
 		// Reading first lets a proxy-only, unprivileged core start when there
 		// is no stale state, without attempting privileged mutations.
-		out, err = exec.CommandContext(ctx, "ip", family, "route", "show", "table", table).CombinedOutput() //nolint:gosec // fixed family and Sora table
+		out, err = exec.CommandContext(ctx, bin, family, "route", "show", "table", table).CombinedOutput() //nolint:gosec // bin is the absolute iproute2 path; fixed family and Sora table
 		if err != nil && !strings.Contains(string(out), "FIB table does not exist") {
 			errs = append(errs, fmt.Errorf("tunroute: read table: %w: %s", err, out))
 		} else if err == nil && len(out) != 0 {
@@ -286,14 +290,27 @@ func deleteMatches(want, older map[string]json.RawMessage) bool {
 	return (value(want, "goto") == "") == (value(older, "goto") == "")
 }
 
+// ipBin resolves iproute2 to an absolute path per call so a PATH-planted
+// "ip" can never execute with the core's (possibly root) privileges
+// (audit R2). Resolution is per call — not cached at init — so tests and
+// operators that adjust PATH keep working; a missing iproute2 fails closed
+// with the same message cleanup() reports.
+func ipBin() (string, error) {
+	if p, err := exec.LookPath("ip"); err != nil {
+		return "", fmt.Errorf("tunroute: TUN routing requires iproute2 (ip): %w", err)
+	} else {
+		return p, nil
+	}
+}
+
 // cleanup only touches the reserved table/priorities and the named Sora
 // adapter. Before installation, keep the current engine's selected addresses.
 func cleanup(ctx context.Context, tun engine.Tun) error {
-	if _, err := exec.LookPath("ip"); err != nil {
+	if _, err := ipBin(); err != nil {
 		if !tun.Enabled && errors.Is(err, exec.ErrNotFound) {
 			return nil
 		}
-		return fmt.Errorf("tunroute: TUN routing requires iproute2 (ip): %w", err)
+		return err
 	}
 	if err := unroute(ctx); err != nil {
 		return err
@@ -346,6 +363,10 @@ func families() []string {
 }
 
 func ip(ctx context.Context, args []string) error {
+	bin, err := ipBin()
+	if err != nil {
+		return err
+	}
 	// Tag our rules with the owner protocol, as before; the vector form
 	// keeps every element a single argument (SORA-M2).
 	full := args
@@ -355,7 +376,7 @@ func ip(ctx context.Context, args []string) error {
 			break
 		}
 	}
-	out, err := exec.CommandContext(ctx, "ip", full...).CombinedOutput() //nolint:gosec // fixed argument vector built above; no shell
+	out, err := exec.CommandContext(ctx, bin, full...).CombinedOutput() //nolint:gosec // bin is the absolute iproute2 path; fixed argument vector, no shell
 	if err != nil {
 		return fmt.Errorf("tunroute: ip %s: %w: %s", strings.Join(full, " "), err, strings.TrimSpace(string(out)))
 	}

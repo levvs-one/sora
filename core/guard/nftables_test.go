@@ -129,6 +129,13 @@ func TestArmRefusesRootUid(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("the engine is matched by user id on Linux only")
 	}
+	// NewNftables resolves nft at construction (absolute path, audit R2):
+	// plant a fake so the test does not depend on nft being installed.
+	dir := t.TempDir()
+	if err := os.WriteFile(dir+"/nft", []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PATH", dir+":"+os.Getenv("PATH"))
 	firewall, err := guard.NewNftables(0, nil)
 	if err != nil {
 		t.Fatalf("NewNftables(0) error = %v", err)
