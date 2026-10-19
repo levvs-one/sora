@@ -10,6 +10,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/profiles"
 )
 
 // Session deadlines bound readiness waits and shutdown for slow engines.
@@ -49,6 +50,9 @@ type Config struct {
 	Network func() string
 	// NetworkInterval is how often Network is read.
 	NetworkInterval time.Duration
+	// Profiles matches saved network profiles against the current network
+	// and reports matches as events. Nil disables profile matching (F5).
+	Profiles *profiles.Store
 	// Settings defines system state owned while running; fill it before
 	// Start.
 	Settings Settings
@@ -484,6 +488,7 @@ func (s *Session) supervise(events <-chan engine.Event) {
 		case <-network:
 			if why := watch.changed(); why != "" {
 				s.renewConnections(ctx, why)
+				s.checkProfile()
 			}
 		case ev, ok := <-events:
 			if !ok {
@@ -530,6 +535,29 @@ func (s *Session) supervise(events <-chan engine.Event) {
 			}
 		}
 	}
+}
+
+// checkProfile matches the current network against saved profiles (F5) and
+// journals the match so the client can apply it. It runs on network changes
+// only: the client owns the plan it just built, so an initial connect must
+// not immediately ask to rebuild it.
+func (s *Session) checkProfile() {
+	if s.cfg.Profiles == nil || s.State() != StateConnected {
+		return
+	}
+	s.matchProfile(s.cfg.Profiles.Fingerprint())
+}
+
+// matchProfile journals the profile matching fp, if any.
+func (s *Session) matchProfile(fp profiles.Fingerprint) {
+	if s.cfg.Profiles == nil {
+		return
+	}
+	m := s.cfg.Profiles.Match(fp)
+	if m == nil {
+		return
+	}
+	s.log.Append(Event{Kind: EventProfile, Profile: m})
 }
 
 // publishEngineEvent converts engine events and redacts again with session plan

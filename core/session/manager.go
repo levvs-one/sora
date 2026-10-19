@@ -8,6 +8,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/profiles"
 )
 
 // Factory creates an engine for a plan, keeping discovery and test engines
@@ -36,6 +37,9 @@ type ManagerConfig struct {
 	TunUp func(ctx context.Context, device string) error
 	// Network fingerprints the networks of the machine; see Config.Network.
 	Network func() string
+	// Profiles matches saved network profiles on network changes; see
+	// Config.Profiles. Nil disables profile matching.
+	Profiles *profiles.Store
 }
 
 // Manager owns at most one session. Connect stops and restores the old session
@@ -107,6 +111,7 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 		Now:           m.cfg.Now,
 		TunUp:         m.cfg.TunUp,
 		Network:       m.cfg.Network,
+		Profiles:      m.cfg.Profiles,
 	})
 	if err != nil {
 		// Surface a failing Close instead of swallowing it (SORA-L13).

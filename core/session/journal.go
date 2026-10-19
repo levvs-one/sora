@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/profiles"
 )
 
 // EventKind maps session events to CoreEvent oneof fields for control-plane
@@ -22,6 +23,9 @@ const (
 	// EventNetwork marks a detected network change (interface/gateway
 	// switch). Detail carries the new network fingerprint.
 	EventNetwork EventKind = "network"
+	// EventProfile marks a network profile matching the current network
+	// (F5). Profile carries the match; the client applies it.
+	EventProfile EventKind = "profile"
 )
 
 // Event records a session change. Journal-assigned sequence numbers increase
@@ -37,6 +41,7 @@ type Event struct {
 	Counters   Counters
 	Probe      *ProbeOutcome
 	Switch     *GroupSwitch
+	Profile    *profiles.Match
 	RetryAfter time.Duration
 	LogLine    string
 }
