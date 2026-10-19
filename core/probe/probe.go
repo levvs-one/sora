@@ -8,12 +8,14 @@ import (
 	"crypto/tls"
 	"math"
 	"net"
+	"net/netip"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	"github.com/levvs-one/sora-client/core/race"
 )
 
 // Short default timeouts bound list updates for unreachable endpoints.
@@ -58,6 +60,9 @@ type Prober struct {
 	freeze         *FreezeDetector
 	freezeMu       sync.Mutex
 	freezeInFlight map[string]int
+	// lookupIP resolves endpoint hosts for address racing; nil uses
+	// the system resolver. Tests override it to avoid the network.
+	lookupIP func(ctx context.Context, host string) ([]netip.Addr, error)
 }
 
 // MaxConcurrentRequests bounds how many measurements a prober runs at once.
@@ -191,7 +196,6 @@ func (p *Prober) measure(ctx context.Context, index int, endpoint *corev1.Endpoi
 // dial opens the connection, optionally completes a handshake, and reports how
 // long the whole thing took.
 func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Duration, error) {
-	address := net.JoinHostPort(host, strconv.FormatUint(uint64(port), 10))
 	timeout := p.timeout
 	if deadline, ok := ctx.Deadline(); ok {
 		if remaining := time.Until(deadline); remaining > 0 && remaining < timeout {
@@ -202,6 +206,21 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 		return 0, errs.Newf(errs.CodeDeadlineExceeded, errs.KeyProbeInvalidEndpoint,
 			"probe: the request has no time left")
 	}
+	// A hostname that resolves to several addresses races them Happy
+	// Eyeballs style (P0-9): the first successful dial wins instead of
+	// betting the whole budget on the first answer. IP literals and
+	// single-address hosts keep the historical single-dial path with no
+	// extra goroutines or DNS lookups.
+	if addrs := p.candidateAddrs(ctx, host, timeout); len(addrs) > 1 {
+		return p.dialRace(ctx, host, port, addrs, timeout)
+	}
+	return p.dialSingle(ctx, host, port, timeout)
+}
+
+// dialSingle is the historical one-address dial: one TCP connect, and one
+// TLS handshake when configured.
+func (p *Prober) dialSingle(ctx context.Context, host string, port uint32, timeout time.Duration) (time.Duration, error) {
+	address := net.JoinHostPort(host, strconv.FormatUint(uint64(port), 10))
 	start := time.Now()
 	if !p.tls {
 		connection, err := (&net.Dialer{Timeout: timeout}).DialContext(ctx, "tcp", address)
@@ -231,6 +250,106 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 	}
 	_ = connection.Close()
 	return time.Since(start), nil
+}
+
+// candidateAddrs resolves host to the addresses a race would try, in
+// resolver order. It returns nil for IP literals (nothing to resolve)
+// and when resolution fails or yields fewer than two addresses, keeping
+// those cases on the single-dial path.
+func (p *Prober) candidateAddrs(ctx context.Context, host string, timeout time.Duration) []netip.Addr {
+	if _, err := netip.ParseAddr(host); err == nil {
+		return nil
+	}
+	lookup := p.lookupIP
+	if lookup == nil {
+		lookup = systemLookupIP
+	}
+	// Bound the lookup well inside the endpoint budget so a slow
+	// resolver cannot starve the race; on failure the single-dial path
+	// resolves again through the dialer, as before.
+	rctx, cancel := context.WithTimeout(ctx, min(timeout, 2*time.Second))
+	defer cancel()
+	addrs, err := lookup(rctx, host)
+	if err != nil || len(addrs) < 2 {
+		return nil
+	}
+	return addrs
+}
+
+// systemLookupIP resolves host through the system resolver, keeping the
+// answer order: the race preference order is deterministic, never
+// shuffled.
+func systemLookupIP(ctx context.Context, host string) ([]netip.Addr, error) {
+	records, err := net.DefaultResolver.LookupIPAddr(ctx, host)
+	if err != nil {
+		return nil, err
+	}
+	addrs := make([]netip.Addr, 0, len(records))
+	for _, r := range records {
+		if addr, ok := netip.AddrFromSlice(r.IP); ok {
+			addrs = append(addrs, addr.Unmap())
+		}
+	}
+	return addrs, nil
+}
+
+// dialRace dials every resolved address of the endpoint in a Happy
+// Eyeballs race and reports the winner's latency. The winner's label
+// names its address for process-local telemetry; it never reaches the
+// wire result, where endpoint addresses stay redacted (SORA-M7).
+func (p *Prober) dialRace(ctx context.Context, host string, port uint32, addrs []netip.Addr, timeout time.Duration) (time.Duration, error) {
+	portStr := strconv.FormatUint(uint64(port), 10)
+	candidates := make([]race.Candidate, 0, len(addrs))
+	for _, addr := range addrs {
+		target := net.JoinHostPort(addr.String(), portStr)
+		candidates = append(candidates, race.Candidate{
+			Label:   "tcp/" + target,
+			Network: "tcp",
+			Address: target,
+			Dial: func(dialCtx context.Context) (net.Conn, error) {
+				return p.dialCandidate(dialCtx, host, target, timeout)
+			},
+		})
+	}
+	res, err := race.Race(ctx, candidates, race.Options{
+		Concurrency:    race.DefaultConcurrency,
+		Stagger:        race.DefaultStagger,
+		AttemptTimeout: timeout,
+	})
+	if err != nil {
+		return 0, err
+	}
+	_ = res.Conn.Close()
+	return res.Latency, nil
+}
+
+// dialCandidate dials one raced address: a TCP connect, plus the TLS
+// handshake when configured. Each attempt is observed by the freeze
+// detector exactly like the historical single dial, so in-flight counts
+// stay truthful; attempts cancelled as race losers carry
+// context.Canceled, which the detector deliberately ignores.
+func (p *Prober) dialCandidate(ctx context.Context, host, target string, timeout time.Duration) (net.Conn, error) {
+	if !p.tls {
+		return (&net.Dialer{Timeout: timeout}).DialContext(ctx, "tcp", target)
+	}
+	sni := p.serverName
+	if sni == "" {
+		sni = host
+	}
+	freeze, inflight := p.freezeBegin(sni)
+	raw, err := (&net.Dialer{Timeout: timeout}).DialContext(ctx, "tcp", target)
+	if err != nil {
+		p.freezeEnd(freeze, sni, inflight, err)
+		return nil, err
+	}
+	tlsConn := tls.Client(raw, p.tlsConfig(host))
+	if err := tlsConn.HandshakeContext(ctx); err != nil {
+		p.freezeEnd(freeze, sni, inflight, err)
+		_ = raw.Close()
+		return nil, err
+	}
+	p.freezeEnd(freeze, sni, inflight, nil)
+	return tlsConn, nil
 }
 
 // EndpointProber defines the interface required by the control plane, keeping
