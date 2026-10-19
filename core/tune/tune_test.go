@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -452,4 +453,92 @@ func idsOf(ss []Strategy) string {
 		out[i] = s.ID
 	}
 	return strings.Join(out, ",")
+}
+
+func TestTuneEmptyCurrentFallsBack(t *testing.T) {
+	// A zero Strategy as "current" (plan carries no obfuscation config)
+	// must retry as the "current" candidate, not vanish from the order.
+	tuner := New(DefaultOptions(), NewCache(t.TempDir()))
+	res, err := tuner.Tune(context.Background(), testFP(), Strategy{}, succeedOn("current"))
+	if err != nil {
+		t.Fatalf("Tune: %v", err)
+	}
+	if !res.Succeeded() || res.Winner.ID != "current" {
+		t.Fatalf("winner = %+v, want current (empty current must fall back)", res.Winner)
+	}
+	if len(res.Attempts) != 1 || res.Attempts[0].Strategy.ID != "current" {
+		t.Fatalf("attempts = %v, want single current", ids(res.Attempts))
+	}
+}
+
+func TestTuneCacheWriteFailureIsNonFatal(t *testing.T) {
+	dir := t.TempDir()
+	c := NewCache(dir)
+	// Block the cache file path with a directory: persistence must fail,
+	// but the tuning run must still succeed and record CacheErr.
+	if err := os.MkdirAll(c.Path(), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	tuner := New(DefaultOptions(), c)
+	res, err := tuner.Tune(context.Background(), testFP(), CurrentStrategy(), succeedOn("current"))
+	if err != nil {
+		t.Fatalf("Tune: %v", err)
+	}
+	if !res.Succeeded() {
+		t.Fatal("run must succeed even when the cache cannot be written")
+	}
+	if res.CacheErr == nil {
+		t.Fatal("CacheErr = nil, want the persistence failure recorded")
+	}
+	if !strings.Contains(res.Summary(), "cache not saved") {
+		t.Fatalf("summary = %q, want the cache failure mentioned", res.Summary())
+	}
+}
+
+func TestCacheVersionMismatchBehavesEmpty(t *testing.T) {
+	dir := t.TempDir()
+	c := NewCache(dir)
+	if err := os.MkdirAll(filepath.Dir(c.Path()), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	data, err := json.Marshal(cacheFile{Version: cacheVersion + 1, Entries: map[string]cacheEntry{
+		"key": {StrategyID: "preset/max", At: time.Now()},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(c.Path(), data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := NewCache(dir).Lookup(testFP()); ok {
+		t.Fatal("newer-version cache must be ignored, not misread")
+	}
+}
+
+func TestCacheConcurrentUse(t *testing.T) {
+	c := NewCache(t.TempDir())
+	var wg sync.WaitGroup
+	for i := 0; i < 8; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			fp := testFP()
+			_ = c.Remember(fp, ObfsMax())
+			_, _ = c.Lookup(fp)
+		}()
+	}
+	wg.Wait()
+}
+
+func TestSummaryOnCancelledRun(t *testing.T) {
+	tuner := New(DefaultOptions(), NewCache(t.TempDir()))
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	res, err := tuner.Tune(ctx, testFP(), CurrentStrategy(), succeedOn("current"))
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("err = %v, want context.Canceled", err)
+	}
+	if !strings.Contains(res.Summary(), "no working strategy") {
+		t.Fatalf("summary = %q, want failure wording", res.Summary())
+	}
 }
