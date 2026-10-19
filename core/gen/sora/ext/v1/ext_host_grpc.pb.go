@@ -31,7 +31,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ExtensionHost is the core-side API for installed extensions.
+// ExtensionHost is the core-side API for installed extensions. Since 1.10.
 //
 // Panels run in a WebView inside the app and talk to the app over a JS
 // bridge. The app forwards the calls an extension is permitted to make to
@@ -139,7 +139,7 @@ type ExtensionHost_WatchExtensionEventsClient = grpc.ServerStreamingClient[Exten
 // All implementations must embed UnimplementedExtensionHostServer
 // for forward compatibility.
 //
-// ExtensionHost is the core-side API for installed extensions.
+// ExtensionHost is the core-side API for installed extensions. Since 1.10.
 //
 // Panels run in a WebView inside the app and talk to the app over a JS
 // bridge. The app forwards the calls an extension is permitted to make to
