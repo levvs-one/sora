@@ -52,6 +52,9 @@ class _SyncScreenState extends State<SyncScreen> {
     final sora = SoraScope.read(context);
     final s = S.of(context);
     final short = token.substring(0, token.length < 6 ? token.length : 6);
+    // The registry ignores duplicates; only claim "paired" when the device
+    // was actually added, not when the token was scanned before.
+    var added = false;
     await showFieldSheet(
       context,
       title: s.syncPair,
@@ -60,11 +63,12 @@ class _SyncScreenState extends State<SyncScreen> {
       initial: short,
       submit: (value) async {
         if (value.trim().isEmpty) return s.syncPair;
+        added = !sora.syncDevices.devices.any((d) => d.id == token);
         sora.syncDevices.add(SyncedDevice(id: token, name: value.trim()));
         return null;
       },
     );
-    if (mounted && sora.syncDevices.devices.any((d) => d.id == token)) {
+    if (mounted && added) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(S.of(context).syncPaired)));
@@ -200,11 +204,16 @@ class _SyncShowCodeScreenState extends State<SyncShowCodeScreen> {
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: QrImageView(
-                data: payload,
-                version: QrVersions.auto,
-                errorCorrectionLevel: QrErrorCorrectLevel.H,
-                size: 260,
+              // A QR code carries no meaning for screen readers; the token
+              // is intentionally not exposed as text (a screenshot must not
+              // be pairable), so the image is hidden from the semantics tree.
+              child: ExcludeSemantics(
+                child: QrImageView(
+                  data: payload,
+                  version: QrVersions.auto,
+                  errorCorrectionLevel: QrErrorCorrectLevel.H,
+                  size: 260,
+                ),
               ),
             ),
           ),
