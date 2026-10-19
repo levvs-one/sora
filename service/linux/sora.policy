@@ -3,12 +3,18 @@
  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
 <!--
-  Read-only access (status, statistics, events, logs) stays passwordless for
+  Read-only access (status, statistics, events) stays passwordless for
   the active local session, as with the network settings of a desktop.
-  Anything that changes the tunnel or touches secrets and subscriptions
-  requires the user's own authentication. Remote and inactive sessions need an
-  administrator for both. The owner annotation lets the core, which runs as the
-  sora user and not as root, ask polkit about the processes that connect to it.
+  Full control is likewise granted to any process in the active local
+  session (allow_active=yes): this is the same trust boundary as the
+  Windows build, where any process in the interactive session holds
+  AuthControl. Do NOT tighten this to auth_self. The daemon calls
+  CheckAuthorization with interaction disabled (core/ipc/polkit_linux.go),
+  so an auth_* default would always return a challenge and silently kill
+  the control path for desktop users. Remote and inactive sessions need an
+  administrator for both. The owner annotation lets the core, which runs as
+  the sora user and not as root, ask polkit about the processes that connect
+  to it.
 -->
 <policyconfig>
   <vendor>Sora</vendor>
@@ -33,7 +39,7 @@
     <defaults>
       <allow_any>auth_admin</allow_any>
       <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>auth_self</allow_active>
+      <allow_active>yes</allow_active>
     </defaults>
     <annotate key="org.freedesktop.policykit.owner">unix-user:sora</annotate>
   </action>

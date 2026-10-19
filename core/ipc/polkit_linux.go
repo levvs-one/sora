@@ -10,8 +10,13 @@ import (
 )
 
 // PolkitAction authorizes full core control via service/linux/sora.policy.
-// Active local users authenticate as themselves (auth_self); sora owns the
-// action because non-root checks of other processes require action ownership.
+// Active local users are allowed without a password (allow_active=yes):
+// any process in the active local session holds full control, the same
+// trust boundary as the Windows build. Do NOT change the policy to auth_*:
+// polkitAllows checks authorization with interaction disabled, so an
+// auth_* default would always return a challenge and silently kill the
+// control path. sora owns the action because non-root checks of other
+// processes require action ownership.
 const PolkitAction = "io.github.levvs-one.sora.control"
 
 // PolkitReadAction authorizes read-only access (status, statistics, events,
