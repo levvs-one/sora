@@ -11,15 +11,18 @@ import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../settings.dart';
 import '../sora.dart';
 import 'about.dart';
+import 'chains.dart';
 import 'connections.dart';
 import 'dns.dart';
 import 'kit.dart';
 import 'language.dart';
 import 'logs.dart';
+import 'profiles.dart';
 import 'rules_screen.dart';
 import 'subscription.dart';
 import 'subscription_sheet.dart';
 import 'shell.dart';
+import 'sync.dart';
 import 'modes.dart';
 
 /// App settings, with common options first and advanced options in named
@@ -262,6 +265,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: s.dns,
               value: _dnsSummary(s, settings),
               onTap: () => push<void>(context, const DnsScreen()),
+            ),
+            LinkTile(
+              title: s.profiles,
+              value: sora.profiles.profiles.isEmpty
+                  ? null
+                  : sora.profiles.activeId == null
+                      ? '${sora.profiles.profiles.length}'
+                      : s.profileActive,
+              onTap: () => push<void>(context, const ProfilesScreen()),
+            ),
+            LinkTile(
+              title: s.chains,
+              value: sora.chains.chains.isEmpty ? null : '${sora.chains.chains.length}',
+              onTap: () => push<void>(context, const ChainsScreen()),
+            ),
+            LinkTile(
+              title: s.sync,
+              value: sora.syncDevices.devices.isEmpty ? null : '${sora.syncDevices.devices.length}',
+              onTap: () => push<void>(context, const SyncScreen()),
             ),
             SwitchTile(title: s.fragment, value: settings.fragment, onChanged: (v) => set((x) => x.fragment = v)),
             if (settings.fragment) ...[

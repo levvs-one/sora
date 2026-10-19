@@ -263,6 +263,18 @@ class _Modes extends StatelessWidget {
                 value: settings.killSwitch,
                 onChanged: (v) => unawaited(sora.setKillSwitch(v)),
               ),
+              if (Platform.isLinux && sora.serverlessAvailable) ...[
+                const SizedBox(height: 12),
+                SwitchTile(
+                  title: s.zapretWithVpn,
+                  value: settings.zapretWithVpn,
+                  onChanged: (v) => unawaited(sora.change((x) => x.zapretWithVpn = v)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                  child: Text(s.zapretWithVpnHint, style: Styles.secondary.copyWith(color: palette.ink2)),
+                ),
+              ],
               const SizedBox(height: 12),
               Wrap(
                 alignment: WrapAlignment.spaceBetween,
