@@ -159,6 +159,11 @@ class Desktop with WindowListener {
   Future<void> quit({bool disconnect = true}) async {
     _closing = true;
     _dropping = disconnect;
+    // A quit that reaches here is a clean shutdown, not a crash: never offer
+    // to "restore" this run's session on next launch (F7 honesty). This covers
+    // the paths disconnect() never sees — quit(disconnect: false) leaving the
+    // core session running, and the offline phase skipping the disconnect.
+    sora.noteCleanShutdown();
     // An off session may still hold the kill switch after failure; disconnect
     // releases it.
     if (disconnect && sora.phase != Phase.offline) await sora.disconnect();

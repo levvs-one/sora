@@ -673,7 +673,13 @@ class Sora extends ChangeNotifier {
           // Allow time for the initial server list to arrive through the
           // subscription watch.
           await Future<void>.delayed(const Duration(milliseconds: 600));
-          if (phase == Phase.off) {
+          // A pending crash-restore offer owns the connection decision: wait
+          // for it instead of connecting underneath the banner (F7 honesty).
+          // An explicit dismiss stands the auto-connect down for this launch.
+          while (_pendingRestore != null && !_disposed && phase == Phase.off) {
+            await Future<void>.delayed(const Duration(milliseconds: 200));
+          }
+          if (phase == Phase.off && _pendingRestore == null && !_restoreDeclined) {
             await settings.saveResumeAfterUpdate(false);
             unawaited(connect());
           }
@@ -912,12 +918,22 @@ class Sora extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Server choice saved before connecting; offered for restore when the app
-  /// restarts after a crash (FEATURE-PLAN.md F7).
+  /// How long a session intent stays restorable. An offer older than this
+  /// refers to a session the user has long forgotten, so the stored `at`
+  /// timestamp is read and stale intents are silently dropped (F7 honesty).
+  static const _sessionIntentTtl = Duration(hours: 24);
+
+  /// Server choice saved after a successful connect; offered for restore when
+  /// the app restarts after a crash (FEATURE-PLAN.md F7).
   String? _pendingRestore;
 
   /// A crashed session is waiting for the user's restore decision.
   String? get pendingRestore => _pendingRestore;
+
+  /// Set when the user explicitly dismisses the crash-restore offer: the
+  /// pending auto-connect stands down for this launch instead of connecting
+  /// right after the user's "not now" (F7 honesty).
+  bool _restoreDeclined = false;
 
   void _writeSessionIntent(String choice) {
     if (!settings.restoreOnCrash) return;
@@ -927,6 +943,15 @@ class Sora extends ChangeNotifier {
   void _clearSessionIntent() {
     _pendingRestore = null;
     if (settings.sessionIntent.isNotEmpty) settings.sessionIntent = '';
+  }
+
+  /// Marks a clean shutdown. A quit that reaches this point is not a crash,
+  /// so no restore may be offered for this run's session on next launch —
+  /// even when the core session is intentionally left running
+  /// (`quit(disconnect: false)`) or the disconnect is skipped because the
+  /// core is offline.
+  void noteCleanShutdown() {
+    _clearSessionIntent();
   }
 
   /// Checks for a session intent left by a crashed run; call once at startup.
@@ -940,6 +965,16 @@ class Sora extends ChangeNotifier {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is Map<String, dynamic> && decoded['server'] is String) {
+        final at = decoded['at'];
+        final age = at is int
+            ? DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(at))
+            : Duration.zero;
+        if (age > _sessionIntentTtl) {
+          // Too old to be a session worth restoring: drop it instead of
+          // offering to resurrect a choice the user made days ago.
+          _clearSessionIntent();
+          return;
+        }
         _pendingRestore = decoded['server'] as String;
         notifyListeners();
       } else {
@@ -980,7 +1015,12 @@ class Sora extends ChangeNotifier {
 
   /// Dismisses the crash-restore offer without connecting.
   void dismissCrashRestore() {
+    // The explicit "not now" wins: a pending auto-connect stands down for
+    // this launch, and a stale resume-after-update flag is consumed so the
+    // next launch does not reconnect behind the user's back.
+    _restoreDeclined = true;
     _clearSessionIntent();
+    unawaited(settings.saveResumeAfterUpdate(false));
     notifyListeners();
   }
 
@@ -1232,11 +1272,6 @@ class Sora extends ChangeNotifier {
     if (!retry) _memberSpare = entry == null ? 0 : entry.members.length - 1;
     final work = _connectionWork = Completer<void>();
     phase = Phase.connecting;
-    // Remember the intent so a crash can offer to restore the session (F7).
-    // Chain connects are recorded by chain id and restored through
-    // connectChain rather than the server selector; a plain reconnect during
-    // a chain session keeps the chain id too (F8).
-    _writeSessionIntent(keepChain == null ? choice : 'chain:${keepChain.id}');
     notifyListeners();
     // Include events emitted during these requests, before the watch opens.
     final started = DateTime.now();
@@ -1257,6 +1292,13 @@ class Sora extends ChangeNotifier {
       _activeChain = keepChain;
       needsReconnect = currentPlan != plan;
       connected = true;
+      // Remember the intent only once the session is truly up (F7): writing
+      // it before the RPC would offer to "restore" a session that never
+      // existed if the connect failed. Chain connects are recorded by chain
+      // id and restored through connectChain rather than the server
+      // selector; a plain reconnect during a chain session keeps the chain
+      // id too (F8).
+      _writeSessionIntent(keepChain == null ? choice : 'chain:${keepChain.id}');
       // Swapped together with the watch, so events of the previous session
       // never meet the groups of this one.
       _fallbacks = fallbacks;
