@@ -58,7 +58,6 @@ String permissionBlurb(BuildContext context, String id) {
     case 'net.hooks':
       return s.extPermNetHooks;
     case 'net.fetch':
-    case 'network':
       return s.extPermNetFetch;
     case 'background':
       return s.extPermBackground;
@@ -76,7 +75,6 @@ String? permissionDetail(BuildContext context, String id) {
     case 'background':
       return s.extPermBackgroundDetail;
     case 'net.fetch':
-    case 'network':
       return s.extPermNetworkDetail;
     default:
       return null;

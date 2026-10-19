@@ -481,11 +481,14 @@ class _SettingsForm extends StatelessWidget {
   }
 }
 
-/// True when the extension can run background tasks: it declared the
-/// `background` capability or was granted the `background` permission.
+/// True when the extension declares a background task. Only then can the
+/// runtime actually schedule one: it needs the `background` capability and
+/// permission plus a declared `background_task`, which the manifest
+/// validator already ties together. Gating on the declaration (rather than
+/// the capability/permission alone) keeps the section from offering
+/// controls for a task that could never run.
 bool _hasBackgroundTask(InstalledExtension inst) =>
-    inst.manifest.capabilities.contains('background') ||
-    inst.granted.contains('background');
+    inst.manifest.backgroundTask != null;
 
 /// Background task management for one installed extension: on/off plus the
 /// run interval, clamped by [BackgroundTaskConfig] to what the platform
@@ -590,15 +593,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
                   enabled: v, intervalMinutes: config.intervalMinutes))
               : null,
         ),
-        ChoiceTile<int>(
-          title: s.extBgInterval,
-          value: config.intervalMinutes,
-          choices: _intervalChoices(context, config.intervalMinutes),
-          onChanged: editable
-              ? (v) => _apply(BackgroundTaskConfig(
-                  enabled: config.enabled, intervalMinutes: v))
-              : null,
-        ),
+        _intervalTile(config, editable),
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
           child: Text(
@@ -608,5 +603,19 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
         ),
       ],
     ]);
+  }
+
+  /// The run-interval row. [ChoiceTile.onChanged] is non-nullable, so a
+  /// read-only section absorbs the taps instead of receiving a null
+  /// callback; the note below explains why the controls are inert.
+  Widget _intervalTile(BackgroundTaskConfig config, bool editable) {
+    final tile = ChoiceTile<int>(
+      title: S.of(context).extBgInterval,
+      value: config.intervalMinutes,
+      choices: _intervalChoices(context, config.intervalMinutes),
+      onChanged: (v) => _apply(BackgroundTaskConfig(
+          enabled: config.enabled, intervalMinutes: v)),
+    );
+    return editable ? tile : AbsorbPointer(child: tile);
   }
 }

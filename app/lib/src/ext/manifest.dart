@@ -170,7 +170,7 @@ class ExtManifest {
     }
     final seenHosts = <String>{};
     for (final h in networkHosts) {
-      if (!_networkHostPattern.hasMatch(h) || _isIpLiteral(h)) {
+      if (!_networkHostPattern.hasMatch(h) || _isIpLike(h)) {
         throw ManifestError('bad network host "$h"');
       }
       if (!seenHosts.add(h)) {
@@ -281,19 +281,50 @@ List<String> _parseNetworkHosts(dynamic raw) {
   if (raw.length > 64) throw ManifestError('network_hosts exceeds 64 entries');
   final out = <String>[];
   for (final e in raw) {
-    // Normalized to lowercase like core/ext: the allowlist is DNS names
-    // only, and matching is case-insensitive.
-    final h = e.toString().trim().toLowerCase();
+    // Mirrors core/ext (encoding/json rejects non-strings): entries must be
+    // strings. Normalized to lowercase like core/ext — the allowlist is DNS
+    // names only, and matching is case-insensitive.
+    if (e is! String) throw ManifestError('network_hosts entries must be strings');
+    final h = e.trim().toLowerCase();
     if (h.isEmpty || h.length > 253) throw ManifestError('bad network host "$h"');
     out.add(h);
   }
   return out;
 }
 
-/// True for IPv4 literals, which the allowlist rejects: they are DNS names
-/// only (mirrors core/ext's isIPLiteral; IPv6 cannot pass the host pattern
-/// since ':' is not allowed there).
-bool _isIpLiteral(String h) {
+/// True for IP-literal-like hosts, which the allowlist rejects: it holds DNS
+/// names only. Mirrors core/ext's isIPLike — plain IPv4 literals plus the
+/// notations some system resolvers still dial as IPs: hex (`0x7f000001`,
+/// `0x7f.1`), octal (`017700000001`) and all-digit (`2130706433`) forms.
+/// (IPv6 cannot pass the host pattern since ':' is not allowed there.)
+/// The input must already be lowercased, as in core/ext's
+/// normalizeHostPattern.
+bool _isIpLike(String h) {
+  if (_isIpv4Literal(h)) return true;
+  for (final label in h.split('.')) {
+    if (label.length > 2 && label.startsWith('0x')) {
+      var allHex = true;
+      for (var i = 2; i < label.length; i++) {
+        final c = label.codeUnitAt(i);
+        if (!((c >= 0x30 && c <= 0x39) || (c >= 0x61 && c <= 0x66))) {
+          allHex = false;
+          break;
+        }
+      }
+      if (allHex) return true;
+    }
+  }
+  final noDots = h.replaceAll('.', '');
+  if (noDots.isEmpty) return false;
+  for (var i = 0; i < noDots.length; i++) {
+    final c = noDots.codeUnitAt(i);
+    if (c < 0x30 || c > 0x39) return false;
+  }
+  return true;
+}
+
+/// Plain dotted-decimal IPv4 literal (`1.2.3.4`).
+bool _isIpv4Literal(String h) {
   final parts = h.split('.');
   if (parts.length != 4) return false;
   for (final p in parts) {
