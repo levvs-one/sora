@@ -23,6 +23,7 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 	censorv1 "github.com/levvs-one/sora-client/core/gen/sora/censor/v1"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	leakv1 "github.com/levvs-one/sora-client/core/gen/sora/leak/v1"
 	obfsv1 "github.com/levvs-one/sora-client/core/gen/sora/obfs/v1"
 	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
@@ -147,6 +148,9 @@ type Server struct {
 	// missing while their handler was in flight, which broke the package
 	// build. See reports/featlog-swarm-sw1.md.
 	censorv1.UnimplementedCensorControlServer
+	// LeakService serves the egress self-tests (core/control/leak.go).
+	// See reports/featlog-swarm-sw2.md.
+	leakv1.UnimplementedLeakServiceServer
 
 	version     Version
 	auth        *Authenticator

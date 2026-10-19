@@ -346,3 +346,97 @@ func TestSubscriptionPreservesDistinctProviderWebsite(t *testing.T) {
 	}
 }
 
+// quietEngine applies plans without touching the network, so tests can hold
+// a connected session.
+type quietEngine struct{ bus *engine.EventBus }
+
+func (e *quietEngine) Kind() engine.Kind                            { return engine.KindMihomo }
+func (e *quietEngine) Capabilities() engine.Capabilities            { return engine.Catalog[engine.KindMihomo] }
+func (e *quietEngine) State() engine.State                          { return engine.StateRunning }
+func (e *quietEngine) Version() engine.Version                      { return engine.Version{Raw: "test"} }
+func (e *quietEngine) Events() *engine.EventBus                     { return e.bus }
+func (e *quietEngine) Validate(context.Context, *engine.Plan) error { return nil }
+func (e *quietEngine) Apply(context.Context, *engine.Plan) error    { return nil }
+func (e *quietEngine) Stop(context.Context) error                   { return nil }
+func (e *quietEngine) Close() error                                 { return nil }
+func (e *quietEngine) Groups(context.Context) ([]engine.GroupStatus, error) {
+	return nil, nil
+}
+func (e *quietEngine) Select(context.Context, string, string) error { return nil }
+func (e *quietEngine) Delay(context.Context, string, string, time.Duration) (time.Duration, error) {
+	return 0, nil
+}
+func (e *quietEngine) Counters(context.Context) (engine.Counters, error) {
+	return engine.Counters{}, nil
+}
+
+// bookServerWithEngine is bookServer with a factory that actually starts
+// sessions, for tests that need a running session.
+func bookServerWithEngine(t *testing.T, dir string, fetcher Fetcher) *Server {
+	t.Helper()
+	if err := os.Chmod(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	store, err := secret.Open(dir, secret.Options{Protector: secret.FileProtector{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = store.Close() })
+	auth, err := NewAuthenticator(make([]byte, TokenLen))
+	if err != nil {
+		t.Fatal(err)
+	}
+	sessions := session.NewManager(session.ManagerConfig{
+		TunUp: func(context.Context, string) error { return nil },
+		Factory: func(context.Context, *engine.Plan) (engine.Engine, error) {
+			return &quietEngine{bus: engine.NewEventBus(8)}, nil
+		},
+	})
+	srv, err := New(Config{Authenticator: auth, Secrets: store, Fetcher: fetcher, Sessions: sessions})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return srv
+}
+
+func TestSchedulerPausesWhileKillSwitchHolds(t *testing.T) {
+	p := &panel{body: servers("a")}
+	srv := bookServerWithEngine(t, t.TempDir(), p)
+	saveAndWait(t, srv.subs, &corev1.SubscriptionSettings{Url: "https://panel.example/sub/abc", AutoUpdate: true})
+	p.calls.Store(0)
+
+	// A kill-switched session: background fetches use direct HTTPS, so the
+	// scheduler must not emit them while the firewall holds.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if _, err := srv.sessions.Connect(ctx, &engine.Plan{
+		SessionID: "sched-test",
+		Outbounds: []engine.Outbound{{ID: "o1", Protocol: engine.ProtocolVLESS, Server: "edge.example.com", Port: 443}},
+	}, session.Settings{KillSwitch: true, TunnelMode: "system"}); err != nil {
+		t.Fatalf("Connect() = %v", err)
+	}
+	defer func() { _ = srv.sessions.Disconnect(context.Background()) }()
+
+	// Make the record overdue and run the scheduler: no fetch may happen.
+	srv.subs.mu.Lock()
+	srv.subs.now = func() time.Time { return time.Now().Add(48 * time.Hour) }
+	srv.subs.mu.Unlock()
+	go srv.subs.run(ctx)
+	time.Sleep(300 * time.Millisecond)
+	if got := p.calls.Load(); got != 0 {
+		t.Fatalf("the scheduler fetched %d times with the kill switch armed", got)
+	}
+
+	// After disconnect the overdue update runs again.
+	if err := srv.sessions.Disconnect(context.Background()); err != nil {
+		t.Fatalf("Disconnect() = %v", err)
+	}
+	srv.subs.poke()
+	deadline := time.Now().Add(5 * time.Second)
+	for p.calls.Load() == 0 {
+		if time.Now().After(deadline) {
+			t.Fatal("the overdue update never ran after disconnect")
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}

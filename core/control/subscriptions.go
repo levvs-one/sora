@@ -131,11 +131,11 @@ func newSubscriptionBook(srv *Server) *subscriptionBook {
 		backoff:   engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
 		now:       time.Now,
 		overrides: subscription.NewOverrideStore(srv.dataDir),
-		records:  map[string]*subscriptionRecord{},
-		lists:    map[string][]*corev1.OutboundSpec{},
-		updating: map[string]bool{},
-		watchers: map[chan *corev1.SubscriptionState]struct{}{},
-		wake:     make(chan struct{}, 1),
+		records:   map[string]*subscriptionRecord{},
+		lists:     map[string][]*corev1.OutboundSpec{},
+		updating:  map[string]bool{},
+		watchers:  map[chan *corev1.SubscriptionState]struct{}{},
+		wake:      make(chan struct{}, 1),
 	}
 	b.load()
 	return b
@@ -495,6 +495,13 @@ func (b *subscriptionBook) run(ctx context.Context) {
 			}
 		}
 		b.mu.Unlock()
+		if len(due) > 0 && b.killSwitchHolding() {
+			// The kill switch promises no byte leaves outside the tunnel,
+			// and background subscription fetches use direct HTTPS. They
+			// wait for disconnect; explicit user refreshes still run on
+			// demand, and the overdue records fire on the next round.
+			due = nil
+		}
 		for _, id := range due {
 			select {
 			case slots <- struct{}{}:
@@ -516,6 +523,20 @@ func (b *subscriptionBook) run(ctx context.Context) {
 		}
 		timer.Stop()
 	}
+}
+
+// killSwitchHolding reports whether the running session currently blocks
+// non-tunnel traffic. Core-initiated background network activity must not
+// run then: it would either fail against the firewall or, worse, emit
+// packets outside the tunnel.
+func (b *subscriptionBook) killSwitchHolding() bool {
+	if b.srv == nil || b.srv.sessions == nil {
+		return false
+	}
+	if cur := b.srv.sessions.Current(); cur != nil {
+		return cur.Status().KillSwitch
+	}
+	return false
 }
 
 // poke wakes the scheduler after a change.
