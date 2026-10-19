@@ -25,7 +25,7 @@ func (f *recordingFetcher) Fetch(_ context.Context, _ string, opts subscription.
 }
 
 func TestFetchSubscriptionCarriesTheUserAgentAndThePanelInfo(t *testing.T) {
-	store, err := secret.Open(t.TempDir(), secret.Options{Protector: secret.FileProtector{}})
+	store, err := secret.Open(secretTestDir(t), secret.Options{Protector: secret.FileProtector{}})
 	if err != nil {
 		t.Fatal(err)
 	}

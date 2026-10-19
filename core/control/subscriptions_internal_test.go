@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -61,6 +62,11 @@ func servers(names ...string) string {
 
 func bookServer(t *testing.T, dir string, fetcher Fetcher) (*Server, *secret.Store) {
 	t.Helper()
+	// The secret store fails closed on weakened permissions (SORA-L3), so
+	// the test dir must be owner-only like a real data directory.
+	if err := os.Chmod(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
 	store, err := secret.Open(dir, secret.Options{Protector: secret.FileProtector{}})
 	if err != nil {
 		t.Fatal(err)
@@ -339,3 +345,4 @@ func TestSubscriptionPreservesDistinctProviderWebsite(t *testing.T) {
 		t.Fatal("distinct provider website must remain available")
 	}
 }
+

@@ -40,7 +40,7 @@ func (e *trackingEngine) CloseConnections(context.Context) error {
 
 func newLogServer(t *testing.T, eng engine.Engine) (*control.Server, *logs.Center, *secret.Store) {
 	t.Helper()
-	store, err := secret.Open(t.TempDir(), secret.Options{Protector: secret.FileProtector{}})
+	store, err := secret.Open(secretTestDir(t), secret.Options{Protector: secret.FileProtector{}})
 	if err != nil {
 		t.Fatal(err)
 	}

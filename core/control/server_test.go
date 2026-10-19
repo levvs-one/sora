@@ -60,7 +60,7 @@ func (e *stubEngine) Counters(context.Context) (engine.Counters, error) {
 // and fixed token for reproducibility.
 func newTestServer(t *testing.T) (*control.Server, *secret.Store) {
 	t.Helper()
-	store, err := secret.Open(t.TempDir(), secret.Options{Protector: secret.FileProtector{}})
+	store, err := secret.Open(secretTestDir(t), secret.Options{Protector: secret.FileProtector{}})
 	if err != nil {
 		t.Fatalf("opening the secret store: %v", err)
 	}
