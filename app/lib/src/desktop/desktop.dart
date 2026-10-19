@@ -6,6 +6,7 @@ import 'dart:isolate';
 
 import 'package:app_links/app_links.dart';
 import 'package:dbus/dbus.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:nativeapi/nativeapi.dart' show LaunchAtLogin;
@@ -42,6 +43,15 @@ class Desktop with WindowListener {
 
   final _notifications = FlutterLocalNotificationsPlugin();
   final _links = AppLinks();
+
+  /// Native runner channel carrying links opened while the app runs (Linux).
+  /// The app_links plugin may deliver the same link; [_open] dedups those.
+  static const _deepLinkChannel = MethodChannel('sora.linux/deep_link');
+
+  /// Last link passed to [_open] and when, to collapse duplicate deliveries.
+  String? _lastOpenedLink;
+  DateTime? _lastOpenedAt;
+
   final List<StreamSubscription<Object?>> _watches = [];
 
   tray.TrayIcon? _icon;
@@ -101,6 +111,7 @@ class Desktop with WindowListener {
     _watches
       ..add(sora.notices.listen(_notice))
       ..add(_links.stringLinkStream.listen(_open));
+    if (Platform.isLinux) _deepLinkChannel.setMethodCallHandler(_onDeepLinkCall);
     _changed();
   }
 
@@ -191,11 +202,15 @@ class Desktop with WindowListener {
   Future<void> restartAfterUpdate() async {
     // Wait for this process to release Flutter's shared libraries before loading
     // the newly installed ones. The watcher runs with the desktop user's UID.
+    // Relaunch the same binary that is running, not a hardcoded path: packed
+    // and unpacked installs live in different places (audit L28).
+    final executable = Platform.resolvedExecutable;
     await Process.start('/bin/sh', [
       '-c',
-      'while kill -0 "\$1" 2>/dev/null; do sleep 1; done; exec /usr/bin/sora',
+      'while kill -0 "\$1" 2>/dev/null; do sleep 1; done; exec "\$2"',
       'sora-restart',
       '$pid',
+      executable,
     ], mode: ProcessStartMode.detached);
   }
 
@@ -446,15 +461,20 @@ class Desktop with WindowListener {
     // Suppress duplicate notifications when the focused window already shows
     // the event.
     if (!sora.settings.notifications || (!always && _visible && _focused)) return;
-    await _notifications.show(
-      id: title.hashCode & 0x7fffffff,
-      title: title,
-      body: body,
-      notificationDetails: const NotificationDetails(
-        linux: LinuxNotificationDetails(),
-        windows: WindowsNotificationDetails(),
-      ),
-    );
+    try {
+      await _notifications.show(
+        id: title.hashCode & 0x7fffffff,
+        title: title,
+        body: body,
+        notificationDetails: const NotificationDetails(
+          linux: LinuxNotificationDetails(),
+          windows: WindowsNotificationDetails(),
+        ),
+      );
+    } catch (_) {
+      // A failing notification backend (e.g. D-Bus) must not surface as an
+      // unhandled async error (audit L27).
+    }
   }
 
   void _notice(Notice notice) {
@@ -479,7 +499,25 @@ class Desktop with WindowListener {
 
   // Show the window before presenting an import prompt.
 
+  /// Deep link forwarded by the Linux runner while the app runs.
+  Future<void> _onDeepLinkCall(MethodCall call) async {
+    if (call.method == 'onDeepLink') {
+      final link = call.arguments;
+      if (link is String && link.isNotEmpty) unawaited(_open(link));
+    }
+  }
+
   Future<void> _open(String text) async {
+    // The runner and the app_links plugin can both deliver the same link;
+    // collapse near-duplicate deliveries so one click opens one dialog.
+    final now = DateTime.now();
+    if (text == _lastOpenedLink &&
+        _lastOpenedAt != null &&
+        now.difference(_lastOpenedAt!) < const Duration(seconds: 5)) {
+      return;
+    }
+    _lastOpenedLink = text;
+    _lastOpenedAt = now;
     final link = parseImportLink(text);
     if (link == null) return;
     await show();

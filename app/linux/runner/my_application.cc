@@ -14,9 +14,48 @@ struct _MyApplication {
   char** dart_entrypoint_arguments;
   // A start at sign-in lives in the tray until the person opens the window.
   gboolean start_hidden;
+  // Forwards deep links received while running to the Dart side (audit H8).
+  FlMethodChannel* deep_link_channel;
+  // Link that arrived before the Flutter view (and channel) existed.
+  char* pending_link;
 };
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
+
+// Channel name the Dart side listens on for links forwarded while running.
+static const char kDeepLinkChannel[] = "sora.linux/deep_link";
+
+// Sends a link to Dart; queues it when the channel does not exist yet.
+static void my_application_forward_link(MyApplication* self, const char* link) {
+  if (link == nullptr || *link == '\0') {
+    return;
+  }
+  if (self->deep_link_channel != nullptr) {
+    g_autoptr(FlValue) value = fl_value_new_string(link);
+    fl_method_channel_invoke_method(self->deep_link_channel, "onDeepLink",
+                                    value, nullptr, nullptr, nullptr);
+  } else {
+    g_free(self->pending_link);
+    self->pending_link = g_strdup(link);
+  }
+}
+
+// First command-line argument that looks like a link (carries a URI scheme);
+// option flags are skipped.
+static const char* find_link_arg(char** args) {
+  if (args == nullptr) {
+    return nullptr;
+  }
+  for (char** arg = args; *arg != nullptr; ++arg) {
+    if ((*arg)[0] == '-') {
+      continue;
+    }
+    if (strstr(*arg, "://") != nullptr) {
+      return *arg;
+    }
+  }
+  return nullptr;
+}
 
 // Called when first Flutter frame received.
 static void first_frame_cb(MyApplication* self, FlView* view) {
@@ -87,6 +126,23 @@ static void my_application_activate(GApplication* application) {
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
 
+  // The app_links plugin delivers command-line links through its own
+  // channel; this second channel covers the GApplication::open path, which
+  // that plugin ignores, and the startup race before it registers.
+  if (self->deep_link_channel == nullptr) {
+    g_autoptr(FlPluginRegistrar) registrar =
+        fl_plugin_registry_get_registrar_for_plugin(FL_PLUGIN_REGISTRY(view),
+                                                    "SoraDeepLink");
+    FlBinaryMessenger* messenger = fl_plugin_registrar_get_messenger(registrar);
+    g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
+    self->deep_link_channel = fl_method_channel_new(
+        messenger, kDeepLinkChannel, FL_METHOD_CODEC(codec));
+    if (self->pending_link != nullptr) {
+      my_application_forward_link(self, self->pending_link);
+      g_clear_pointer(&self->pending_link, g_free);
+    }
+  }
+
   gtk_widget_grab_focus(GTK_WIDGET(view));
 }
 
@@ -106,12 +162,51 @@ static gboolean my_application_local_command_line(GApplication* application,
     return TRUE;
   }
 
-  g_application_activate(application);
+  // The command line goes on to the first instance, where it carries a link
+  // opened while Sora runs. Only the primary instance builds a window; a
+  // secondary one only forwards its command line and exits.
+  if (!g_application_get_is_remote(application)) {
+    g_application_activate(application);
+  }
   *exit_status = 0;
 
-  // The command line goes on to the first instance, where it carries a link
-  // opened while Sora runs.
   return FALSE;
+}
+
+// Implements GApplication::command_line.
+//
+// A second instance forwards its command line here over D-Bus. The app_links
+// plugin sees the same signal through its own hook; the Dart side dedups the
+// two deliveries, so a link is never lost and never opens twice.
+static int my_application_command_line(GApplication* application,
+                                       GApplicationCommandLine* command_line) {
+  MyApplication* self = MY_APPLICATION(application);
+  gint argc = 0;
+  g_auto(GStrv) argv =
+      g_application_command_line_get_arguments(command_line, &argc);
+  const char* link = find_link_arg(argv);
+  if (link != nullptr) {
+    my_application_forward_link(self, link);
+  }
+  // As the default handler would, bring the window forward.
+  my_application_activate(application);
+  return 0;
+}
+
+// Implements GApplication::open. The app_links plugin ignores this path.
+static void my_application_open(GApplication* application, GFile** files,
+                                gint n_files, const gchar* hint) {
+  MyApplication* self = MY_APPLICATION(application);
+  (void)hint;
+  for (gint i = 0; i < n_files; ++i) {
+    g_autofree char* scheme = g_file_get_uri_scheme(files[i]);
+    if (g_strcmp0(scheme, "file") == 0) {
+      continue;
+    }
+    g_autofree char* uri = g_file_get_uri(files[i]);
+    my_application_forward_link(self, uri);
+  }
+  my_application_activate(application);
 }
 
 // Implements GApplication::startup.
@@ -136,6 +231,8 @@ static void my_application_shutdown(GApplication* application) {
 static void my_application_dispose(GObject* object) {
   MyApplication* self = MY_APPLICATION(object);
   g_clear_pointer(&self->dart_entrypoint_arguments, g_strfreev);
+  g_clear_pointer(&self->deep_link_channel, g_object_unref);
+  g_clear_pointer(&self->pending_link, g_free);
   G_OBJECT_CLASS(my_application_parent_class)->dispose(object);
 }
 
@@ -143,6 +240,8 @@ static void my_application_class_init(MyApplicationClass* klass) {
   G_APPLICATION_CLASS(klass)->activate = my_application_activate;
   G_APPLICATION_CLASS(klass)->local_command_line =
       my_application_local_command_line;
+  G_APPLICATION_CLASS(klass)->command_line = my_application_command_line;
+  G_APPLICATION_CLASS(klass)->open = my_application_open;
   G_APPLICATION_CLASS(klass)->startup = my_application_startup;
   G_APPLICATION_CLASS(klass)->shutdown = my_application_shutdown;
   G_OBJECT_CLASS(klass)->dispose = my_application_dispose;
