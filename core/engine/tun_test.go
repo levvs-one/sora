@@ -3,6 +3,7 @@ package engine
 import (
 	"net/netip"
 	"slices"
+	"strings"
 	"testing"
 )
 
@@ -129,5 +130,19 @@ func TestTunValidateRejectsEvilDeviceName(t *testing.T) {
 	tun.DeviceName = "sora0"
 	if err := tun.validate(); err != nil {
 		t.Fatalf("Tun.validate() = %v, want nil", err)
+	}
+}
+
+// TestPrepareTunRejectsExplicitPrefixOverlappingLAN locks SORA-L19:
+// caller-provided adapter prefixes must be checked against LAN interfaces,
+// not just auto-selected ones. 127.0.0.0/8 is always present via loopback.
+func TestPrepareTunRejectsExplicitPrefixOverlappingLAN(t *testing.T) {
+	p := &Plan{Tun: Tun{Enabled: true, IPv4: netip.MustParsePrefix("127.0.0.1/30")}}
+	err := PrepareTun(p)
+	if err == nil {
+		t.Fatal("an explicit adapter prefix overlapping LAN was accepted")
+	}
+	if !strings.Contains(err.Error(), "overlaps an existing interface") {
+		t.Errorf("unexpected error: %v", err)
 	}
 }
