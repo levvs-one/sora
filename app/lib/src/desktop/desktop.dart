@@ -330,7 +330,7 @@ class Desktop with WindowListener {
   String _serverText(S s) => switch (sora.selected) {
     'auto' => s.serverAuto,
     'bypass' => s.serverBypass,
-    final id => sora.nameOf(id),
+    final id => sora.displayNameOf(id),
   };
 
   tray.Menu? _menu(S s, String state, String? server, List<Entry> entries) {
