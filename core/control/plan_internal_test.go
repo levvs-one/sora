@@ -30,7 +30,11 @@ func TestRealityAndTransportSurviveTheVault(t *testing.T) {
 		t.Fatal(err)
 	}
 	var o engine.Outbound
-	if err := applyCredential(&o, parseCredential(document)); err != nil {
+	values, err := parseCredential(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := applyCredential(&o, values); err != nil {
 		t.Fatal(err)
 	}
 
@@ -76,7 +80,11 @@ func TestWireGuardSurvivesTheVault(t *testing.T) {
 				t.Fatal(err)
 			}
 			var o engine.Outbound
-			if err := applyCredential(&o, parseCredential(document)); err != nil {
+			values, err := parseCredential(document)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := applyCredential(&o, values); err != nil {
 				t.Fatal(err)
 			}
 			if o.PrivateKey != "cKE7LmCF61IhqqABGhvJ44jWXp8fKymcMAEVAzLDYVk=" {
@@ -121,7 +129,11 @@ func TestAmneziaWGSurvivesTheVault(t *testing.T) {
 		t.Fatal(err)
 	}
 	var o engine.Outbound
-	if err := applyCredential(&o, parseCredential(document)); err != nil {
+	values, err := parseCredential(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := applyCredential(&o, values); err != nil {
 		t.Fatal(err)
 	}
 	want := engine.AmneziaWG{Jc: 4, Jmin: 40, Jmax: 70, S1: 15, S2: 25, S3: 10, S4: 5,
@@ -403,5 +415,27 @@ func TestProfileDisplayMetadataKeepsAdapterAndCredentialsPrivate(t *testing.T) {
 	var decoded corev1.OutboundSpec
 	if err := proto.Unmarshal(encoded, &decoded); err != nil || !proto.Equal(wire, &decoded) {
 		t.Fatalf("display metadata round trip: %v, %v", &decoded, err)
+	}
+}
+
+// TestParseCredentialRejectsForeignMaterial locks SORA-M8: only the JSON
+// credential document is accepted; raw proxy URLs, empty or truncated
+// bytes fail closed instead of producing an empty credential.
+func TestParseCredentialRejectsForeignMaterial(t *testing.T) {
+	for name, material := range map[string][]byte{
+		"empty":       {},
+		"whitespace":  []byte("  \n "),
+		"proxy URL":   []byte("vless://11111111-1111-1111-1111-111111111111@example.com:443?security=reality#x"),
+		"truncated":   []byte(`{"uuid": "11111111-`),
+		"not an object": []byte(`["uuid"]`),
+	} {
+		t.Run(name, func(t *testing.T) {
+			if _, err := parseCredential(material); err == nil {
+				t.Fatalf("parseCredential(%q) = nil, want an error", material)
+			}
+		})
+	}
+	if _, err := parseCredential([]byte(`{"uuid":"ok"}`)); err != nil {
+		t.Fatalf("parseCredential(valid document) = %v, want nil", err)
 	}
 }
