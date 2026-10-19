@@ -12,6 +12,9 @@ import (
 	"github.com/levvs-one/sora-client/sync/transport"
 )
 
+// maxSyncConns bounds concurrent sync handshakes on the persistent listener.
+const maxSyncConns = 8
+
 // StartSyncListener opens the persistent listener that paired devices sync
 // through, and advertises it on the LAN. It is best-effort: without LAN
 // multicast the daemon still serves its API.
@@ -38,14 +41,24 @@ func (d *Daemon) StartSyncListener() error {
 		defer d.wg.Done()
 		defer advertiser.Close()
 		defer listener.Close()
+		// Bound concurrent handshakes: each burns X25519 operations, and
+		// this listener is advertised on the LAN permanently.
+		sem := make(chan struct{}, maxSyncConns)
 		for {
 			conn, err := listener.Accept()
 			if err != nil {
 				return
 			}
+			select {
+			case sem <- struct{}{}:
+			default:
+				_ = conn.Close()
+				continue
+			}
 			d.wg.Add(1)
 			go func() {
 				defer d.wg.Done()
+				defer func() { <-sem }()
 				d.handleSyncConn(conn, self)
 			}()
 		}
@@ -88,6 +101,9 @@ func (d *Daemon) SyncPeer(ctx context.Context, id string) (pulled, pushed []sync
 	found, err := discovery.FindDevice(ctx, peer.ID, 20*time.Second)
 	if err != nil {
 		return nil, nil, err
+	}
+	if !lanAddr(found.Addr) {
+		return nil, nil, fmt.Errorf("api: the discovered peer %q resolved outside the LAN", peer.ID)
 	}
 	addr := net.JoinHostPort(found.Addr, fmt.Sprint(found.Port))
 	dialCtx, cancel := context.WithTimeout(ctx, 30*time.Second)

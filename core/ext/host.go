@@ -172,7 +172,11 @@ func (h *Host) Notify(ctx context.Context, req *extv1.NotifyRequest) (*extv1.Not
 	return &extv1.NotifyResponse{}, nil
 }
 
-// WatchExtensionEvents streams lifecycle and network events.
+// WatchExtensionEvents streams lifecycle and network events. It needs no
+// permission beyond a valid token: every enabled extension may know whether
+// the session is up. Only the event kind is forwarded — the detail is
+// withheld on purpose: journal details carry the LAN network fingerprint
+// (interface names and addresses), which no permission was granted for.
 func (h *Host) WatchExtensionEvents(req *extv1.WatchExtensionEventsRequest, stream extv1.ExtensionHost_WatchExtensionEventsServer) error {
 	g, err := h.check(req.GetExtensionToken(), "WatchExtensionEvents")
 	if err != nil {
@@ -194,7 +198,7 @@ func (h *Host) WatchExtensionEvents(req *extv1.WatchExtensionEventsRequest, stre
 				return nil
 			}
 			if err := stream.Send(&extv1.ExtensionEvent{
-				Kind: ev[0], Detail: ev[1], At: timestamppb.New(time.Now().UTC()),
+				Kind: ev[0], Detail: "", At: timestamppb.New(time.Now().UTC()),
 			}); err != nil {
 				return err
 			}

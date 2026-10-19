@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/netip"
 	"time"
 
 	"github.com/levvs-one/sora-client/sync/discovery"
@@ -16,6 +17,10 @@ import (
 
 // pairingTTL bounds how long a pairing invitation stays open.
 const pairingTTL = 5 * time.Minute
+
+// maxPairingConns bounds concurrent pairing handshakes: each burns X25519
+// operations, and the port is advertised on the LAN for the whole window.
+const maxPairingConns = 4
 
 type pairingSession struct {
 	inv        *pairing.Invitation
@@ -37,6 +42,21 @@ func (d *Daemon) transportSelf() (transport.Identity, error) {
 	return transport.Identity{
 		DeviceID: d.identity.ID, DeviceName: d.identity.Name, PublicKey: pub,
 	}, nil
+}
+
+// lanAddr reports whether addr is a LAN-scoped dial target. mDNS answers
+// arrive from the local network but are trivially spoofable there; a spoofed
+// answer must not make the daemon dial out to the internet — the Noise_XX
+// handshake would then disclose this device's long-term identity key to a
+// remote party, which is inherent to the XX pattern and cannot be fixed in
+// the transport.
+func lanAddr(addr string) bool {
+	ip, err := netip.ParseAddr(addr)
+	if err != nil {
+		return false
+	}
+	ip = ip.Unmap()
+	return ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast()
 }
 
 // StartPairing opens a pairing session: a LAN listener plus mDNS
@@ -76,13 +96,14 @@ func (d *Daemon) StartPairing() (qr string, expiresAt int64, err error) {
 	d.pairing = s
 	d.wg.Add(1)
 	go d.pairingLoop(s, self)
-	// Auto-close when the TTL elapses.
+	// Auto-close when the TTL elapses. The watcher stops only its own
+	// session: a stale timer must never kill the session that replaced it.
 	d.wg.Add(1)
 	go func() {
 		defer d.wg.Done()
 		select {
 		case <-time.After(pairingTTL):
-			_ = d.StopPairing()
+			_ = d.stopPairingSession(s)
 		case <-s.done:
 		case <-d.ctx.Done():
 		}
@@ -94,14 +115,22 @@ func (d *Daemon) StartPairing() (qr string, expiresAt int64, err error) {
 func (d *Daemon) pairingLoop(s *pairingSession, self transport.Identity) {
 	defer d.wg.Done()
 	defer close(s.done)
+	sem := make(chan struct{}, maxPairingConns)
 	for {
 		conn, err := s.listener.Accept()
 		if err != nil {
 			return
 		}
+		select {
+		case sem <- struct{}{}:
+		default:
+			_ = conn.Close()
+			continue
+		}
 		d.wg.Add(1)
 		go func() {
 			defer d.wg.Done()
+			defer func() { <-sem }()
 			d.handlePairingConn(s, conn, self)
 		}()
 	}
@@ -125,17 +154,29 @@ func (d *Daemon) handlePairingConn(s *pairingSession, netConn net.Conn, self tra
 		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:]))
 }
 
+// stopPairingSession closes s, but only if s is still the active session.
+// A stale TTL watcher must never kill the session that replaced s.
+func (d *Daemon) stopPairingSession(s *pairingSession) error {
+	d.mu.Lock()
+	if d.pairing != s {
+		d.mu.Unlock()
+		return nil
+	}
+	d.pairing = nil
+	d.mu.Unlock()
+	_ = s.advertiser.Close()
+	return s.listener.Close()
+}
+
 // StopPairing closes the active pairing session, if any.
 func (d *Daemon) StopPairing() error {
 	d.mu.Lock()
 	s := d.pairing
-	d.pairing = nil
 	d.mu.Unlock()
 	if s == nil {
 		return nil
 	}
-	_ = s.advertiser.Close()
-	return s.listener.Close()
+	return d.stopPairingSession(s)
 }
 
 // PairingActive reports whether a pairing session is open.
@@ -159,6 +200,9 @@ func (d *Daemon) Join(ctx context.Context, qrPayload string) (Peer, error) {
 	found, err := discovery.FindDevice(ctx, inv.DeviceID, 20*time.Second)
 	if err != nil {
 		return Peer{}, err
+	}
+	if !lanAddr(found.Addr) {
+		return Peer{}, fmt.Errorf("api: the discovered device %q resolved outside the LAN", inv.DeviceID)
 	}
 	addr := net.JoinHostPort(found.Addr, fmt.Sprint(inv.Port))
 	dialCtx, cancel := context.WithTimeout(ctx, 30*time.Second)

@@ -147,6 +147,10 @@ func (s *Store) Install(pkg *Package, source string, granted []string) (added []
 		added, _ = DiffPermissions(cur.Granted, granted)
 	}
 	if err := s.extractLocked(m, pkg); err != nil {
+		// A failed extract must not leave a half-written version behind:
+		// the registry still points at the previous version, and a later
+		// retry starts from a clean directory.
+		_ = os.RemoveAll(s.extDir(m.ID, m.Version))
 		return nil, err
 	}
 	previous := ""
