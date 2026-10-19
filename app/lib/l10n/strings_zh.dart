@@ -75,7 +75,59 @@ class SZh extends S {
   @override
   String deleteSubscription(String name) {
     return '删除“$name”？';
+  
+
+  @override
+  String get syncCodeExpired => 'The pairing code expired';
+
+  @override
+  String get syncDaemonFailed => 'Sync service failed to start';
+
+  @override
+  String get syncDaemonMissing => 'Sync service not found';
+
+  @override
+  String get syncDaemonStarting => 'Starting sync service…';
+
+  @override
+  String syncExpiresIn(String expires) {
+    return 'Expires in $expires';
   }
+
+  @override
+  String get syncJoining => 'Joining…';
+
+  @override
+  String get syncLegacyCleared => 'Old sync data cleared';
+
+  @override
+  String get syncNewCode => 'New code';
+
+  @override
+  String syncPairedWith(String name) {
+    return 'Paired with $name';
+  }
+
+  @override
+  String get syncRetry => 'Retry';
+
+  @override
+  String get syncStopShowing => 'Stop showing';
+
+  @override
+  String get syncSyncNow => 'Sync now';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Pulled $pulled, pushed $pushed';
+  }
+
+  @override
+  String get syncThisDevice => 'This device';
+
+  @override
+  String get syncUnavailableAndroid => 'Sync is not available on Android';
+}
 
   @override
   String get routes => '路线';
@@ -1004,6 +1056,44 @@ Find one in the catalog or install from a file.';
   @override
   String get extDisabled => 'Disabled';
   @override
+  String extToggleEnabled(String name) => 'Enable ${name}';
+  @override
+  String get extSearchInstalled => 'Search installed';
+  @override
+  String get extUpdateAll => 'Update all';
+  @override
+  String extUpdatesAvailable(int count) => '${count} updates available';
+  @override
+  String extUpdatedCount(int count) => '${count} updated';
+  @override
+  String get extRiskNormal => 'Normal';
+  @override
+  String get extRiskSensitive => 'Sensitive';
+  @override
+  String get extRiskDangerous => 'High risk';
+  @override
+  String get extPermissionsRemoved => 'No longer requested:';
+  @override
+  String get extUpdateFailedKept => 'The previous version is still installed.';
+  @override
+  String get extConflictsTitle => 'Extension conflicts';
+  @override
+  String get extConflictsIntro => 'These extensions want the same thing. Choose which one wins — the other stays installed, but its contested capability is paused.';
+  @override
+  String get extConflictRoutingRules => 'Routing rules';
+  @override
+  String get extConflictTheme => 'App theme';
+  @override
+  String get extConflictNetHooks => 'Network hooks';
+  @override
+  String extConflictWinner(String name) => '${name} wins';
+  @override
+  String extConflictsCount(int count) => '${count} conflicts need your decision';
+  @override
+  String get extConflictsResolve => 'Resolve';
+  @override
+  String get extConflictNote => 'Your choice is saved on this device and applied by the engine.';
+  @override
   String extVersionLabel(String version) => 'Version $version';
   @override
   String get extAuthor => 'Author';
@@ -1233,9 +1323,270 @@ Find one in the catalog or install from a file.';
   String get dnsLastCheck => 'Last check';
   @override
   String get dnsNeverChecked => 'Not checked yet';
-}
 
-/// The translations for Chinese, using the Han script (`zh_Hans`).
+  @override
+  String get censorTitle => 'Censorship detector';
+
+  @override
+  String get censorHistory => 'History';
+
+  @override
+  String get censorEmpty => 'No censorship checks yet';
+
+  @override
+  String get censorExplainer => 'Your provider seems to be interfering with the connection. Applying the recommended profile may restore access.';
+
+  @override
+  String get censorNoProfile => 'No recommended profile for this network yet';
+
+  @override
+  String get censorApplyProfile => 'Apply recommended profile';
+
+  @override
+  String get censorEnable => 'Enable';
+
+  @override
+  String get censorDetails => 'Details';
+
+  @override
+  String get censorNotNow => 'Not now';
+
+  @override
+  String get censorPromptTitle => 'Possible censorship detected';
+
+  @override
+  String censorPromptBody(int confidence) {
+    return 'Detected with $confidence% confidence';
+  }
+
+  @override
+  String censorConfidence(int confidence) {
+    return '$confidence% confidence';
+  }
+
+  @override
+  String get censorKindBlocked => 'Blocked';
+
+  @override
+  String get censorKindLikely => 'Likely blocked';
+
+  @override
+  String get censorKindClear => 'Not blocked';
+
+  @override
+  String get censorKindUnknown => 'Unknown';
+
+  @override
+  String get censorReasonTlsReset => 'TLS reset';
+
+  @override
+  String get censorReasonHttpBlock => 'HTTP block';
+
+  @override
+  String get censorReasonDnsSpoofed => 'DNS spoofing';
+
+  @override
+  String get censorReasonConnectTimeout => 'Connection timeout';
+
+  @override
+  String get customServerAdd => 'Add custom server';
+
+  @override
+  String get customServers => 'Custom servers';
+
+  @override
+  String get customServerName => 'Name';
+
+  @override
+  String get customServerNameHint => 'My server';
+
+  @override
+  String get customServerNameRequired => 'Enter a name';
+
+  @override
+  String get customServerAddress => 'Address';
+
+  @override
+  String get customServerAddressHint => 'example.com or 1.2.3.4';
+
+  @override
+  String get customServerAddressRequired => 'Enter the server address';
+
+  @override
+  String get customServerAddressInvalid => 'This address does not look valid';
+
+  @override
+  String get customServerPort => 'Port';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'Enter a port between 1 and 65535';
+
+  @override
+  String get customServerProtocol => 'Protocol';
+
+  @override
+  String get customServerCredentials => 'Credentials';
+
+  @override
+  String get customServerOptional => 'Optional';
+
+  @override
+  String get customServerShowSecret => 'Show';
+
+  @override
+  String get customServerHideSecret => 'Hide';
+
+  @override
+  String get customServerBadge => 'Custom';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'Delete “$name”?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'No custom servers yet';
+
+  @override
+  String get customServerTest => 'Test connection';
+
+  @override
+  String get errObfsUnsupported => 'Traffic obfuscation is not supported here';
+
+  @override
+  String get leakTestTitle => 'Leak test';
+
+  @override
+  String get leakTestIntro => 'Check whether traffic leaks outside the tunnel: direct DNS, ICMP echo, IPv6 and system resolvers.';
+
+  @override
+  String get leakTestRun => 'Run test';
+
+  @override
+  String get leakTestCancel => 'Cancel';
+
+  @override
+  String get leakTestNeedsConnection => 'Connect first to run the leak test';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'Checked $count…';
+  }
+
+  @override
+  String get leakTestAllClear => 'No leaks found';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# leaks found', one: '# leak found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped';
+
+  @override
+  String get leakTestFix => 'Fix';
+
+  @override
+  String get leakTestFixedNote => 'Fixed';
+
+  @override
+  String get leakTestCheckDirectDns => 'Direct DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP echo';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get noticeDegraded => 'Current server is degraded';
+
+  @override
+  String get obfs => 'Obfuscation';
+
+  @override
+  String get obfsPreset => 'Preset';
+
+  @override
+  String get obfsPresetAggressive => 'Aggressive';
+
+  @override
+  String get obfsPresetBalanced => 'Balanced';
+
+  @override
+  String get obfsPresetOff => 'Off';
+
+  @override
+  String get obfsPresetCustom => 'Custom';
+
+  @override
+  String get obfsManual => 'Manual settings';
+
+  @override
+  String get obfsUtls => 'uTLS fingerprint';
+
+  @override
+  String get obfsUtlsAuto => 'Auto';
+
+  @override
+  String get obfsJitter => 'Jitter';
+
+  @override
+  String get obfsJitterNeedsFragment => 'Jitter needs fragmentation enabled';
+
+  @override
+  String get obfsFineTune => 'Fine-tuning supported';
+
+  @override
+  String get obfsDetecting => 'Detecting capabilities…';
+
+  @override
+  String get obfsCapabilities => 'Capabilities';
+
+  @override
+  String obfsCompatibleEngines(String engines) {
+    return 'Compatible engines: $engines';
+  }
+
+  @override
+  String get obfsSupported => 'Supported';
+
+  @override
+  String get obfsUnsupported => 'Not supported';
+
+  @override
+  String get obfsUnknown => 'Not detected yet';
+
+  @override
+  String get sortBy => 'Sort by';
+
+  @override
+  String get sortPing => 'Ping';
+
+  @override
+  String get sortSpeed => 'Speed';
+
+  @override
+  String get sortName => 'Name';
+
+  @override
+  String get measureSpeed => 'Measure speed';
+
+  @override
+  String get benchmarkStale => 'outdated';
+
   @override
   String get autoSelectMode => 'Auto-select server';
 
@@ -1243,136 +1594,81 @@ Find one in the catalog or install from a file.';
   String get autoSelectPing => 'Fastest ping';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
-
-  @override
   String get autoSelectSpeed => 'Fastest speed';
 
   @override
-  String benchmarkProgress(int done, int total) => 'Measuring $done of $total…';
-
-  @override
-  String get benchmarkStale => 'outdated';
-
-  @override
-  String get chainAdd => 'New chain';
-
-  @override
-  String get chainDelete => 'Delete chain';
-
-  @override
-  String chainDeleteConfirm(String name) => 'Delete chain "${name}"?';
-
-  @override
-  String get chainDuplicate => 'Each server can appear only once';
-
-  @override
-  String get chainEntry => 'Entry';
-
-  @override
-  String get chainEstimate => 'Estimated latency';
-
-  @override
-  String get chainExit => 'Exit';
-
-  @override
-  String chainHop(String n) => 'Hop ${n}';
-
-  @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
-
-  @override
-  String get chainName => 'Chain name';
-
-  @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
-
-  @override
-  String get chainPickServers => 'Pick 2–3 servers';
-
-  @override
-  String get chainSave => 'Save chain';
-
-  @override
-  String get chainTooFew => 'Pick at least 2 servers';
-
-  @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
-
-  @override
-  String get chainUnsupported => 'The current engine cannot build chains';
-
-  @override
-  String get chains => 'Proxy chains';
-
-  @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
-
-  @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get autoSelectSmart => 'Smart choice';
 
   @override
   String get coreWatchUnstable => 'The link to the core is unstable';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get watchReconnect => 'Reconnect';
 
   @override
-  String get crashRestore => 'Restore';
+  String get coreRestoringLink => 'Restoring the link to the core…';
 
   @override
   String get crashRestoreTitle => 'The last session was interrupted';
 
   @override
-  String get edit => 'Edit';
+  String get restoreOnCrash => 'Restore session after a crash';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get crashRestore => 'Restore';
 
   @override
-  String get measureSpeed => 'Measure speed';
-
-  @override
-  String networkNow(String info) => 'Now: ${info}';
-
-  @override
-  String get networkUnknown => 'Network info unavailable';
-
-  @override
-  String get overrideClear => 'Clear edits';
-
-  @override
-  String get overrideCustomRules => 'Custom rules';
-
-  @override
-  String get overrideEdit => 'Edit servers';
-
-  @override
-  String get overrideEmpty => 'No edits yet';
-
-  @override
-  String get overrideHide => 'Hide';
+  String get crashDismiss => 'Not now';
 
   @override
   String get overrideTitle => 'My edits';
 
   @override
+  String get overrideEdit => 'Edit servers';
+
+  @override
+  String get overrideHide => 'Hide';
+
+  @override
   String get overrideUnhide => 'Show';
 
   @override
-  String get profileActive => 'Active';
+  String get overrideClear => 'Clear edits';
+
+  @override
+  String get overrideEmpty => 'No edits yet';
+
+  @override
+  String get overrideCustomRules => 'Custom rules';
+
+  @override
+  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+
+  @override
+  String benchmarkProgress(String done, String total) {
+    return 'Measuring $done of $total…';
+  }
+
+  @override
+  String get profiles => 'Network profiles';
+
+  @override
+  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
 
   @override
   String get profileAdd => 'Add profile';
 
   @override
-  String profileApplied(String name) => 'Profile "${name}" applied';
+  String get profileName => 'Profile name';
 
   @override
-  String get profileApply => 'Apply';
+  String get profileSsids => 'Wi-Fi networks (SSID)';
 
   @override
-  String profileApplyAsk(String name) => 'Apply profile "${name}"?';
+  String get profileSsidsHint => 'Home, Office — comma separated';
+
+  @override
+  String get profileGateways => 'Gateways';
 
   @override
   String get profileAsns => 'AS numbers';
@@ -1384,58 +1680,103 @@ Find one in the catalog or install from a file.';
   String get profileAutoApplyHint => 'Ask before applying when off';
 
   @override
-  String get profileDelete => 'Delete profile';
-
-  @override
-  String profileDeleteConfirm(String name) => 'Delete profile "${name}"?';
-
-  @override
-  String get profileGateways => 'Gateways';
-
-  @override
-  String get profileName => 'Profile name';
-
-  @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
-
-  @override
   String get profileSnapshot => 'Remember current settings';
 
   @override
   String get profileSnapshotDone => 'Current settings saved into the profile';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileDelete => 'Delete profile';
 
   @override
-  String get profileSsidsHint => 'Home, Office — comma separated';
+  String profileDeleteConfirm(String name) {
+    return 'Delete profile "$name"?';
+  }
+
+  @override
+  String profileApplyAsk(String name) {
+    return 'Apply profile "$name"?';
+  }
+
+  @override
+  String get profileApply => 'Apply';
+
+  @override
+  String profileApplied(String name) {
+    return 'Profile "$name" applied';
+  }
 
   @override
   String get profileUndo => 'Undo';
 
   @override
-  String get profiles => 'Network profiles';
+  String get profileActive => 'Active';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String networkNow(String info) {
+    return 'Now: $info';
+  }
 
   @override
-  String get remove => 'Remove';
+  String get networkUnknown => 'Network info unavailable';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
 
   @override
-  String get sortBy => 'Sort by';
+  String get chains => 'Proxy chains';
 
   @override
-  String get sortName => 'Name';
+  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
 
   @override
-  String get sortPing => 'Ping';
+  String get chainAdd => 'New chain';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get chainName => 'Chain name';
+
+  @override
+  String get chainPickServers => 'Pick 2–3 servers';
+
+  @override
+  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+
+  @override
+  String get chainTooFew => 'Pick at least 2 servers';
+
+  @override
+  String get chainTooMany => 'A chain holds at most 3 servers';
+
+  @override
+  String get chainEstimate => 'Estimated latency';
+
+  @override
+  String get chainSave => 'Save chain';
+
+  @override
+  String get chainDelete => 'Delete chain';
+
+  @override
+  String chainDeleteConfirm(String name) {
+    return 'Delete chain "$name"?';
+  }
+
+  @override
+  String get chainUnsupported => 'The current engine cannot build chains';
+
+  @override
+  String get chainHopMissing => 'One of the chain servers is no longer available';
+
+  @override
+  String chainHop(String n) {
+    return 'Hop $n';
+  }
+
+  @override
+  String get chainEntry => 'Entry';
+
+  @override
+  String get chainExit => 'Exit';
 
   @override
   String get sync => 'Device sync';
@@ -1447,40 +1788,29 @@ Find one in the catalog or install from a file.';
   String get syncEmpty => 'No paired devices. Pair another device to keep subscriptions, rules and settings in sync.';
 
   @override
-  String syncLastSync(String time) => 'Last sync: ${time}';
-
-  @override
-  String get syncNever => 'Never';
-
-  @override
-  String get syncNoLan => 'Devices must be on the same local network';
-
-  @override
   String get syncPair => 'Pair a device';
-
-  @override
-  String get syncPaired => 'Device paired';
-
-  @override
-  String get syncPairingTitle => 'Pair with this device';
-
-  @override
-  String get syncRevoke => 'Revoke';
-
-  @override
-  String syncRevokeConfirm(String name) => 'Revoke "${name}"?';
-
-  @override
-  String get syncScanCode => 'Scan a code';
-
-  @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
 
   @override
   String get syncShowCode => 'Show my code';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncScanCode => 'Scan a code';
+
+  @override
+  String get syncRevoke => 'Revoke';
+
+  @override
+  String syncRevokeConfirm(String name) {
+    return 'Revoke "$name"?';
+  }
+
+  @override
+  String syncLastSync(String time) {
+    return 'Last sync: $time';
+  }
+
+  @override
+  String get syncNever => 'Never';
 
   @override
   String get syncWhat => 'What syncs';
@@ -1489,9 +1819,19 @@ Find one in the catalog or install from a file.';
   String get syncWhatBody => 'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.';
 
   @override
+  String get syncNoLan => 'Devices must be on the same local network';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get syncPaired => 'Device paired';
+
+  @override
+  String get syncPairingTitle => 'Pair with this device';
+
+  @override
+  String get syncWaiting => 'Waiting for the other device…';
+
+  @override
+  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
 
   @override
   String get zapretWithVpn => 'DPI bypass for direct traffic';
@@ -1499,6 +1839,29 @@ Find one in the catalog or install from a file.';
   @override
   String get zapretWithVpnHint => 'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
 
+  @override
+  String get chainDuplicate => 'Each server can appear only once';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+
+  @override
+  String get autoSwitchOnDegradeDetail => 'If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.';
+
+  @override
+  String get tunStackMixed => 'Mixed';
+
+  @override
+  String get tunStackSystem => 'System';
+}
+
+/// The translations for Chinese, using the Han script (`zh_Hans`).
 class SZhHans extends SZh {
   SZhHans() : super('zh_Hans');
 
@@ -3732,4 +4095,12 @@ class SZhHant extends SZh {
   String get edit => 'Edit';
   @override
   String get remove => 'Remove';
+  @override
+  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  @override
+  String get autoSwitchOnDegradeDetail => 'If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.';
+  @override
+  String get tunStackMixed => 'Mixed';
+  @override
+  String get tunStackSystem => 'System';
 }

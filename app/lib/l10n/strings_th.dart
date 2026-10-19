@@ -75,7 +75,59 @@ class STh extends S {
   @override
   String deleteSubscription(String name) {
     return 'ลบ “$name” หรือไม่';
+  
+
+  @override
+  String get syncCodeExpired => 'The pairing code expired';
+
+  @override
+  String get syncDaemonFailed => 'Sync service failed to start';
+
+  @override
+  String get syncDaemonMissing => 'Sync service not found';
+
+  @override
+  String get syncDaemonStarting => 'Starting sync service…';
+
+  @override
+  String syncExpiresIn(String expires) {
+    return 'Expires in $expires';
   }
+
+  @override
+  String get syncJoining => 'Joining…';
+
+  @override
+  String get syncLegacyCleared => 'Old sync data cleared';
+
+  @override
+  String get syncNewCode => 'New code';
+
+  @override
+  String syncPairedWith(String name) {
+    return 'Paired with $name';
+  }
+
+  @override
+  String get syncRetry => 'Retry';
+
+  @override
+  String get syncStopShowing => 'Stop showing';
+
+  @override
+  String get syncSyncNow => 'Sync now';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Pulled $pulled, pushed $pushed';
+  }
+
+  @override
+  String get syncThisDevice => 'This device';
+
+  @override
+  String get syncUnavailableAndroid => 'Sync is not available on Android';
+}
 
   @override
   String get routes => 'เส้นทาง';
@@ -1019,6 +1071,44 @@ Find one in the catalog or install from a file.';
   @override
   String get extDisabled => 'Disabled';
   @override
+  String extToggleEnabled(String name) => 'Enable ${name}';
+  @override
+  String get extSearchInstalled => 'Search installed';
+  @override
+  String get extUpdateAll => 'Update all';
+  @override
+  String extUpdatesAvailable(int count) => '${count} updates available';
+  @override
+  String extUpdatedCount(int count) => '${count} updated';
+  @override
+  String get extRiskNormal => 'Normal';
+  @override
+  String get extRiskSensitive => 'Sensitive';
+  @override
+  String get extRiskDangerous => 'High risk';
+  @override
+  String get extPermissionsRemoved => 'No longer requested:';
+  @override
+  String get extUpdateFailedKept => 'The previous version is still installed.';
+  @override
+  String get extConflictsTitle => 'Extension conflicts';
+  @override
+  String get extConflictsIntro => 'These extensions want the same thing. Choose which one wins — the other stays installed, but its contested capability is paused.';
+  @override
+  String get extConflictRoutingRules => 'Routing rules';
+  @override
+  String get extConflictTheme => 'App theme';
+  @override
+  String get extConflictNetHooks => 'Network hooks';
+  @override
+  String extConflictWinner(String name) => '${name} wins';
+  @override
+  String extConflictsCount(int count) => '${count} conflicts need your decision';
+  @override
+  String get extConflictsResolve => 'Resolve';
+  @override
+  String get extConflictNote => 'Your choice is saved on this device and applied by the engine.';
+  @override
   String extVersionLabel(String version) => 'Version $version';
   @override
   String get extAuthor => 'Author';
@@ -1482,4 +1572,257 @@ Find one in the catalog or install from a file.';
   String get edit => 'Edit';
   @override
   String get remove => 'Remove';
+  @override
+  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  @override
+  String get autoSwitchOnDegradeDetail => 'If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.';
+  @override
+  String get tunStackMixed => 'Mixed';
+  @override
+  String get tunStackSystem => 'System';
+
+  @override
+  String get censorTitle => 'Censorship detector';
+
+  @override
+  String get censorHistory => 'History';
+
+  @override
+  String get censorEmpty => 'No censorship checks yet';
+
+  @override
+  String get censorExplainer => 'Your provider seems to be interfering with the connection. Applying the recommended profile may restore access.';
+
+  @override
+  String get censorNoProfile => 'No recommended profile for this network yet';
+
+  @override
+  String get censorApplyProfile => 'Apply recommended profile';
+
+  @override
+  String get censorEnable => 'Enable';
+
+  @override
+  String get censorDetails => 'Details';
+
+  @override
+  String get censorNotNow => 'Not now';
+
+  @override
+  String get censorPromptTitle => 'Possible censorship detected';
+
+  @override
+  String censorPromptBody(int confidence) {
+    return 'Detected with $confidence% confidence';
+  }
+
+  @override
+  String censorConfidence(int confidence) {
+    return '$confidence% confidence';
+  }
+
+  @override
+  String get censorKindBlocked => 'Blocked';
+
+  @override
+  String get censorKindLikely => 'Likely blocked';
+
+  @override
+  String get censorKindClear => 'Not blocked';
+
+  @override
+  String get censorKindUnknown => 'Unknown';
+
+  @override
+  String get censorReasonTlsReset => 'TLS reset';
+
+  @override
+  String get censorReasonHttpBlock => 'HTTP block';
+
+  @override
+  String get censorReasonDnsSpoofed => 'DNS spoofing';
+
+  @override
+  String get censorReasonConnectTimeout => 'Connection timeout';
+
+  @override
+  String get customServerAdd => 'Add custom server';
+
+  @override
+  String get customServers => 'Custom servers';
+
+  @override
+  String get customServerName => 'Name';
+
+  @override
+  String get customServerNameHint => 'My server';
+
+  @override
+  String get customServerNameRequired => 'Enter a name';
+
+  @override
+  String get customServerAddress => 'Address';
+
+  @override
+  String get customServerAddressHint => 'example.com or 1.2.3.4';
+
+  @override
+  String get customServerAddressRequired => 'Enter the server address';
+
+  @override
+  String get customServerAddressInvalid => 'This address does not look valid';
+
+  @override
+  String get customServerPort => 'Port';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'Enter a port between 1 and 65535';
+
+  @override
+  String get customServerProtocol => 'Protocol';
+
+  @override
+  String get customServerCredentials => 'Credentials';
+
+  @override
+  String get customServerOptional => 'Optional';
+
+  @override
+  String get customServerShowSecret => 'Show';
+
+  @override
+  String get customServerHideSecret => 'Hide';
+
+  @override
+  String get customServerBadge => 'Custom';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'Delete “$name”?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'No custom servers yet';
+
+  @override
+  String get customServerTest => 'Test connection';
+
+  @override
+  String get errObfsUnsupported => 'Traffic obfuscation is not supported here';
+
+  @override
+  String get leakTestTitle => 'Leak test';
+
+  @override
+  String get leakTestIntro => 'Check whether traffic leaks outside the tunnel: direct DNS, ICMP echo, IPv6 and system resolvers.';
+
+  @override
+  String get leakTestRun => 'Run test';
+
+  @override
+  String get leakTestCancel => 'Cancel';
+
+  @override
+  String get leakTestNeedsConnection => 'Connect first to run the leak test';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'Checked $count…';
+  }
+
+  @override
+  String get leakTestAllClear => 'No leaks found';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# leaks found', one: '# leak found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped';
+
+  @override
+  String get leakTestFix => 'Fix';
+
+  @override
+  String get leakTestFixedNote => 'Fixed';
+
+  @override
+  String get leakTestCheckDirectDns => 'Direct DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP echo';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get noticeDegraded => 'Current server is degraded';
+
+  @override
+  String get obfs => 'Obfuscation';
+
+  @override
+  String get obfsPreset => 'Preset';
+
+  @override
+  String get obfsPresetAggressive => 'Aggressive';
+
+  @override
+  String get obfsPresetBalanced => 'Balanced';
+
+  @override
+  String get obfsPresetOff => 'Off';
+
+  @override
+  String get obfsPresetCustom => 'Custom';
+
+  @override
+  String get obfsManual => 'Manual settings';
+
+  @override
+  String get obfsUtls => 'uTLS fingerprint';
+
+  @override
+  String get obfsUtlsAuto => 'Auto';
+
+  @override
+  String get obfsJitter => 'Jitter';
+
+  @override
+  String get obfsJitterNeedsFragment => 'Jitter needs fragmentation enabled';
+
+  @override
+  String get obfsFineTune => 'Fine-tuning supported';
+
+  @override
+  String get obfsDetecting => 'Detecting capabilities…';
+
+  @override
+  String get obfsCapabilities => 'Capabilities';
+
+  @override
+  String obfsCompatibleEngines(String engines) {
+    return 'Compatible engines: $engines';
+  }
+
+  @override
+  String get obfsSupported => 'Supported';
+
+  @override
+  String get obfsUnsupported => 'Not supported';
+
+  @override
+  String get obfsUnknown => 'Not detected yet';
 }

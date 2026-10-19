@@ -1841,6 +1841,25 @@ abstract class S {
   String get extErrGeneric;
   String get extUpdateAvailable;
   String get extDisabled;
+  String extToggleEnabled(String name);
+  String get extSearchInstalled;
+  String get extUpdateAll;
+  String extUpdatesAvailable(int count);
+  String extUpdatedCount(int count);
+  String get extRiskNormal;
+  String get extRiskSensitive;
+  String get extRiskDangerous;
+  String get extPermissionsRemoved;
+  String get extUpdateFailedKept;
+  String get extConflictsTitle;
+  String get extConflictsIntro;
+  String get extConflictRoutingRules;
+  String get extConflictTheme;
+  String get extConflictNetHooks;
+  String extConflictWinner(String name);
+  String extConflictsCount(int count);
+  String get extConflictsResolve;
+  String get extConflictNote;
   String extVersionLabel(String version);
   String get extAuthor;
   String get extRating;
@@ -2308,6 +2327,291 @@ abstract class S {
 
   /// **'Remove'**
   String get remove;
+
+  /// **'Auto-switch on degradation'**
+  String get autoSwitchOnDegrade;
+
+  /// **'If the pinned server stops answering or gets clearly slower, switch to the best measured alternative — at most once every 10 minutes.'**
+  String get autoSwitchOnDegradeDetail;
+
+  /// **'Mixed'**
+  String get tunStackMixed;
+
+  /// **'System'**
+  String get tunStackSystem;
+
+  /// **'Censorship detector'**
+  String get censorTitle;
+
+  /// **'History'**
+  String get censorHistory;
+
+  /// **'No censorship checks yet'**
+  String get censorEmpty;
+
+  /// **'Your provider seems to be interfering with the connection. Applying the recommended profile may restore access.'**
+  String get censorExplainer;
+
+  /// **'No recommended profile for this network yet'**
+  String get censorNoProfile;
+
+  /// **'Apply recommended profile'**
+  String get censorApplyProfile;
+
+  /// **'Enable'**
+  String get censorEnable;
+
+  /// **'Details'**
+  String get censorDetails;
+
+  /// **'Not now'**
+  String get censorNotNow;
+
+  /// **'Possible censorship detected'**
+  String get censorPromptTitle;
+
+  /// **'Detected with {confidence}% confidence'**
+  String censorPromptBody(int confidence);
+
+  /// **'{confidence}% confidence'**
+  String censorConfidence(int confidence);
+
+  /// **'Blocked'**
+  String get censorKindBlocked;
+
+  /// **'Likely blocked'**
+  String get censorKindLikely;
+
+  /// **'Not blocked'**
+  String get censorKindClear;
+
+  /// **'Unknown'**
+  String get censorKindUnknown;
+
+  /// **'TLS reset'**
+  String get censorReasonTlsReset;
+
+  /// **'HTTP block'**
+  String get censorReasonHttpBlock;
+
+  /// **'DNS spoofing'**
+  String get censorReasonDnsSpoofed;
+
+  /// **'Connection timeout'**
+  String get censorReasonConnectTimeout;
+
+  /// **'Add custom server'**
+  String get customServerAdd;
+
+  /// **'Custom servers'**
+  String get customServers;
+
+  /// **'Name'**
+  String get customServerName;
+
+  /// **'My server'**
+  String get customServerNameHint;
+
+  /// **'Enter a name'**
+  String get customServerNameRequired;
+
+  /// **'Address'**
+  String get customServerAddress;
+
+  /// **'example.com or 1.2.3.4'**
+  String get customServerAddressHint;
+
+  /// **'Enter the server address'**
+  String get customServerAddressRequired;
+
+  /// **'This address does not look valid'**
+  String get customServerAddressInvalid;
+
+  /// **'Port'**
+  String get customServerPort;
+
+  /// **'443'**
+  String get customServerPortHint;
+
+  /// **'Enter a port between 1 and 65535'**
+  String get customServerPortInvalid;
+
+  /// **'Protocol'**
+  String get customServerProtocol;
+
+  /// **'Credentials'**
+  String get customServerCredentials;
+
+  /// **'Optional'**
+  String get customServerOptional;
+
+  /// **'Show'**
+  String get customServerShowSecret;
+
+  /// **'Hide'**
+  String get customServerHideSecret;
+
+  /// **'Custom'**
+  String get customServerBadge;
+
+  /// **'Delete “{name}”?'**
+  String customServerDeleteConfirm(String name);
+
+  /// **'No custom servers yet'**
+  String get customServerEmptyHint;
+
+  /// **'Test connection'**
+  String get customServerTest;
+
+  /// **'Traffic obfuscation is not supported here'**
+  String get errObfsUnsupported;
+
+  /// **'Leak test'**
+  String get leakTestTitle;
+
+  /// **'Check whether traffic leaks outside the tunnel: direct DNS, ICMP echo, IPv6 and system resolvers.'**
+  String get leakTestIntro;
+
+  /// **'Run test'**
+  String get leakTestRun;
+
+  /// **'Cancel'**
+  String get leakTestCancel;
+
+  /// **'Connect first to run the leak test'**
+  String get leakTestNeedsConnection;
+
+  /// **'Checked {count}…'**
+  String leakTestProgress(int count);
+
+  /// **'No leaks found'**
+  String get leakTestAllClear;
+
+  /// **'{count, plural, one{# leak found} other{# leaks found}}'**
+  String leakTestFound(int count);
+
+  /// **'Skipped'**
+  String get leakTestSkipped;
+
+  /// **'Fix'**
+  String get leakTestFix;
+
+  /// **'Fixed'**
+  String get leakTestFixedNote;
+
+  /// **'Direct DNS'**
+  String get leakTestCheckDirectDns;
+
+  /// **'ICMP echo'**
+  String get leakTestCheckIcmpEcho;
+
+  /// **'IPv6'**
+  String get leakTestCheckIpv6;
+
+  /// **'System resolvers'**
+  String get leakTestCheckSystemResolvers;
+
+  /// **'Current server is degraded'**
+  String get noticeDegraded;
+
+  /// **'Obfuscation'**
+  String get obfs;
+
+  /// **'Preset'**
+  String get obfsPreset;
+
+  /// **'Aggressive'**
+  String get obfsPresetAggressive;
+
+  /// **'Balanced'**
+  String get obfsPresetBalanced;
+
+  /// **'Off'**
+  String get obfsPresetOff;
+
+  /// **'Custom'**
+  String get obfsPresetCustom;
+
+  /// **'Manual settings'**
+  String get obfsManual;
+
+  /// **'uTLS fingerprint'**
+  String get obfsUtls;
+
+  /// **'Auto'**
+  String get obfsUtlsAuto;
+
+  /// **'Jitter'**
+  String get obfsJitter;
+
+  /// **'Jitter needs fragmentation enabled'**
+  String get obfsJitterNeedsFragment;
+
+  /// **'Fine-tuning supported'**
+  String get obfsFineTune;
+
+  /// **'Detecting capabilities…'**
+  String get obfsDetecting;
+
+  /// **'Capabilities'**
+  String get obfsCapabilities;
+
+  /// **'Compatible engines: {engines}'**
+  String obfsCompatibleEngines(String engines);
+
+  /// **'Supported'**
+  String get obfsSupported;
+
+  /// **'Not supported'**
+  String get obfsUnsupported;
+
+  /// **'Not detected yet'**
+  String get obfsUnknown;
+
+  /// **'The pairing code expired'**
+  String get syncCodeExpired;
+
+  /// **'Sync service failed to start'**
+  String get syncDaemonFailed;
+
+  /// **'Sync service not found'**
+  String get syncDaemonMissing;
+
+  /// **'Starting sync service…'**
+  String get syncDaemonStarting;
+
+  /// **'Expires in {expires}'**
+  String syncExpiresIn(String expires);
+
+  /// **'Joining…'**
+  String get syncJoining;
+
+  /// **'Old sync data cleared'**
+  String get syncLegacyCleared;
+
+  /// **'New code'**
+  String get syncNewCode;
+
+  /// **'Paired with {name}'**
+  String syncPairedWith(String name);
+
+  /// **'Retry'**
+  String get syncRetry;
+
+  /// **'Stop showing'**
+  String get syncStopShowing;
+
+  /// **'Sync now'**
+  String get syncSyncNow;
+
+  /// **'Pulled {pulled}, pushed {pushed}'**
+  String syncSyncResult(int pulled, int pushed);
+
+  /// **'This device'**
+  String get syncThisDevice;
+
+  /// **'Sync is not available on Android'**
+  String get syncUnavailableAndroid;
 
 }
 
