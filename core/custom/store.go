@@ -163,6 +163,12 @@ func (s *Store) load() error {
 			return errs.Newf(errs.CodeInternal, errs.KeyInternal,
 				"custom: the server list is corrupt")
 		}
+		// The vault reference is derived deterministically from the id; a
+		// record pointing anywhere else breaks the package invariant.
+		if r.SecretRef != secretRefFor(r.ID) {
+			return errs.Newf(errs.CodeInternal, errs.KeyInternal,
+				"custom: the server list is corrupt")
+		}
 		if _, dup := s.servers[r.ID]; dup {
 			return errs.Newf(errs.CodeInternal, errs.KeyInternal,
 				"custom: the server list is corrupt")

@@ -212,10 +212,11 @@ func TestSavePersistFailureRestoresCredentials(t *testing.T) {
 
 func TestOpenRejectsInvalidRecords(t *testing.T) {
 	cases := map[string]string{
-		"bad protocol": `[{"id":"srv1","name":"n","protocol":"socks5","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
-		"bad address":  `[{"id":"srv1","name":"n","protocol":"vless","address":"999.1.1.1","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
-		"bad port":     `[{"id":"srv1","name":"n","protocol":"vless","address":"example.com","port":0,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
-		"empty name":   `[{"id":"srv1","name":"  ","protocol":"vless","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"bad protocol":       `[{"id":"srv1","name":"n","protocol":"socks5","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"bad address":        `[{"id":"srv1","name":"n","protocol":"vless","address":"999.1.1.1","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"bad port":           `[{"id":"srv1","name":"n","protocol":"vless","address":"example.com","port":0,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"empty name":         `[{"id":"srv1","name":"  ","protocol":"vless","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"foreign secret_ref": `[{"id":"srv1","name":"n","protocol":"vless","address":"example.com","port":443,"secret_ref":"u1_other_rec","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
 	}
 	for name, raw := range cases {
 		t.Run(name, func(t *testing.T) {
