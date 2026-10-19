@@ -50,7 +50,7 @@ func (o Outbound) Secrets() []string {
 // Identifiers returns the server host and host:port for privacy redaction.
 // These are not credentials but identify user connections and providers.
 func (o Outbound) Identifiers() []string {
-	out := make([]string, 0, 3)
+	out := make([]string, 0, 6)
 	if o.Server != "" {
 		out = append(out, o.Server)
 		if o.Port != 0 {
@@ -59,6 +59,12 @@ func (o Outbound) Identifiers() []string {
 	}
 	if o.TLS.ServerName != "" {
 		out = append(out, o.TLS.ServerName)
+	}
+	// REALITY parameters are public but identify the server (SORA-L9).
+	for _, id := range []string{o.TLS.RealityPublicKey, o.TLS.RealityShortID, o.TLS.SpiderX} {
+		if id != "" {
+			out = append(out, id)
+		}
 	}
 	out = append(out, o.Name)
 	return out
