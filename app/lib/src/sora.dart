@@ -2097,6 +2097,11 @@ int? freshBandwidthOf(Map<String, ({int bps, DateTime at})> bandwidth, String id
   return measurement.bps;
 }
 
+/// Benchmark goodput is stored in bytes per second; the UI labels it
+/// megabits per second, so the bytes-to-bits scaling lives here instead of
+/// at every call site.
+double mbpsOf(int bytesPerSec) => bytesPerSec * 8 / 1000000;
+
 /// Smart score in [0, 1] (higher is better): ping 40%, speed 40%,
 /// measurement freshness 20%, scaled by [reliability] when known — a server
 /// answering half of its recent probes keeps three quarters of its score.

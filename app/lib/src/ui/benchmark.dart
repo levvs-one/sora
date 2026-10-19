@@ -165,12 +165,12 @@ class _BenchmarkRow extends StatelessWidget {
             SizedBox.square(dimension: 20, child: CupertinoActivityIndicator(color: palette.ink2))
           else if (bps != null)
             Text(
-              s.speedMbps(bps / 1000000),
+              s.speedMbps(mbpsOf(bps)),
               style: Styles.figures(Styles.secondary).copyWith(color: palette.ink),
             )
           else if (stale != null)
             Text(
-              '${s.speedMbps(stale / 1000000)} · ${s.benchmarkStale}',
+              '${s.speedMbps(mbpsOf(stale))} · ${s.benchmarkStale}',
               style: Styles.figures(Styles.caption).copyWith(color: palette.ink3),
             )
           else
