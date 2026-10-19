@@ -1781,10 +1781,11 @@ class Sora extends ChangeNotifier {
   /// Streams real-throughput measurements for [serverIds] (all servers when
   /// null) and records them in [bandwidth].
   ///
-  /// The BenchmarkServers RPC is hand-wired per FEATURE-PLAN.md F2 while the
-  /// Go side is pending: a core without the RPC answers UNIMPLEMENTED and the
-  /// UI reports a friendly version message instead of a raw error.
-  /// Notifications are throttled like [probe]; cancel with [cancelBenchmark].
+  /// A failed server fails only itself: the core reports it as a done sample
+  /// with an error and keeps measuring the rest. A core without the RPC
+  /// answers UNIMPLEMENTED and the UI reports a friendly version message
+  /// instead of a raw error. Notifications are throttled like [probe];
+  /// cancel with [cancelBenchmark].
   Future<void> benchmarkServers({List<String>? serverIds}) async {
     final link = _link;
     final ids = serverIds ?? [for (final o in servers) o.id];
@@ -1806,10 +1807,19 @@ class Sora extends ChangeNotifier {
       );
       var lastNotify = DateTime.now();
       var done = 0;
+      var failed = 0;
+      CoreFailure? firstFailure;
       await for (final sample in call) {
         if (_disposed || link != _link) break;
-        if (sample.hasError()) throw CoreFailure(sample.error.userMessageKey);
-        if (!sample.done) {
+        if (sample.hasError()) {
+          // One failed server fails only itself, never the batch: the core
+          // sends a per-server error sample and keeps measuring the rest.
+          // Failed servers simply show no result ("—").
+          firstFailure ??= CoreFailure(sample.error.userMessageKey);
+          failed++;
+          done++;
+          benchmarkPct[sample.serverId] = 100;
+        } else if (!sample.done) {
           final pct = sample.progressPct;
           benchmarkPct[sample.serverId] = pct < 0 ? 0 : (pct > 100 ? 100 : pct);
         } else {
@@ -1825,7 +1835,11 @@ class Sora extends ChangeNotifier {
           notifyListeners();
         }
       }
-      _saveBandwidth();
+      if (!_disposed && link == _link && done > 0 && failed >= done) {
+        // Every server failed: the run measured nothing, so it says so
+        // instead of finishing in silence.
+        reportFailure(firstFailure ?? const CoreFailure('app.benchmark_unsupported'), source: 'benchmark');
+      }
     } catch (error) {
       if (!_disposed && link == _link && !(error is GrpcError && error.code == StatusCode.cancelled)) {
         if (error is GrpcError && error.code == StatusCode.unimplemented) {
@@ -1836,6 +1850,9 @@ class Sora extends ChangeNotifier {
       }
       // Keep partial results; unmeasured servers stay unknown.
     } finally {
+      // Persist even on cancel or error: partial results are kept, so they
+      // must survive a restart too.
+      _saveBandwidth();
       _benchmarkCall = null;
       benchmarking = false;
       benchmarkProgress = null;

@@ -16,13 +16,8 @@ struct _MyApplication {
   gboolean start_hidden;
   // Forwards deep links received while running to the Dart side (audit H8).
   FlMethodChannel* deep_link_channel;
-  // Link that arrived before Dart installed its link handler. Dart pulls it
-  // with getPendingLink once ready; invoking earlier would drop it because
-  // no handler exists yet on the Dart side.
+  // Link that arrived before the Flutter view (and channel) existed.
   char* pending_link;
-  // Set by Dart's getPendingLink call. Only then may links be invoked
-  // directly instead of queued.
-  gboolean dart_link_ready;
 };
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
@@ -30,13 +25,12 @@ G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 // Channel name the Dart side listens on for links forwarded while running.
 static const char kDeepLinkChannel[] = "sora.linux/deep_link";
 
-// Sends a link to Dart; queues it until Dart signals readiness, so a link
-// arriving while the Flutter engine is still starting is never lost.
+// Sends a link to Dart; queues it when the channel does not exist yet.
 static void my_application_forward_link(MyApplication* self, const char* link) {
   if (link == nullptr || *link == '\0') {
     return;
   }
-  if (self->dart_link_ready && self->deep_link_channel != nullptr) {
+  if (self->deep_link_channel != nullptr) {
     g_autoptr(FlValue) value = fl_value_new_string(link);
     fl_method_channel_invoke_method(self->deep_link_channel, "onDeepLink",
                                     value, nullptr, nullptr, nullptr);
@@ -44,29 +38,6 @@ static void my_application_forward_link(MyApplication* self, const char* link) {
     g_free(self->pending_link);
     self->pending_link = g_strdup(link);
   }
-}
-
-// Dart calls getPendingLink after installing its onDeepLink handler. Marks
-// Dart ready so later links are invoked directly, and returns the link
-// queued while Dart was starting, if any.
-static void deep_link_method_call_handler(FlMethodChannel* channel,
-                                           FlMethodCall* method_call,
-                                           gpointer user_data) {
-  (void)channel;
-  MyApplication* self = MY_APPLICATION(user_data);
-  if (g_strcmp0(fl_method_call_get_name(method_call), "getPendingLink") == 0) {
-    self->dart_link_ready = TRUE;
-    g_autoptr(FlValue) result = self->pending_link != nullptr
-        ? fl_value_new_string(self->pending_link)
-        : fl_value_new_null();
-    g_clear_pointer(&self->pending_link, g_free);
-    g_autoptr(GError) error = nullptr;
-    if (!fl_method_call_respond(method_call, result, &error)) {
-      g_warning("Failed to respond to getPendingLink: %s", error->message);
-    }
-    return;
-  }
-  fl_method_call_respond_not_implemented(method_call, nullptr);
 }
 
 // First command-line argument that looks like a link (carries a URI scheme);
@@ -155,11 +126,9 @@ static void my_application_activate(GApplication* application) {
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
 
-  // The app_links plugin delivers command-line links from secondary
-  // instances through its own channel; this second channel covers the
-  // GApplication::open path, which that plugin ignores, and links arriving
-  // before Dart is ready. Dart pulls the queued link with getPendingLink
-  // once its handler is installed, so nothing is invoked into the void.
+  // The app_links plugin delivers command-line links through its own
+  // channel; this second channel covers the GApplication::open path, which
+  // that plugin ignores, and the startup race before it registers.
   if (self->deep_link_channel == nullptr) {
     g_autoptr(FlPluginRegistrar) registrar =
         fl_plugin_registry_get_registrar_for_plugin(FL_PLUGIN_REGISTRY(view),
@@ -168,9 +137,10 @@ static void my_application_activate(GApplication* application) {
     g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
     self->deep_link_channel = fl_method_channel_new(
         messenger, kDeepLinkChannel, FL_METHOD_CODEC(codec));
-    fl_method_channel_set_method_call_handler(self->deep_link_channel,
-                                              deep_link_method_call_handler,
-                                              self, nullptr);
+    if (self->pending_link != nullptr) {
+      my_application_forward_link(self, self->pending_link);
+      g_clear_pointer(&self->pending_link, g_free);
+    }
   }
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
@@ -205,13 +175,9 @@ static gboolean my_application_local_command_line(GApplication* application,
 
 // Implements GApplication::command_line.
 //
-// Invoked for a secondary instance's command line forwarded over D-Bus, and
-// once locally for the primary instance's own command line: g_application_run
-// emits it after local_command_line returns FALSE (cold start with a link).
-// The app_links plugin sees the remote signal through its own hook; the Dart
-// side dedups the two deliveries, so a link is never lost and never opens
-// twice. A link arriving before Dart is ready stays queued in pending_link
-// until Dart pulls it with getPendingLink.
+// A second instance forwards its command line here over D-Bus. The app_links
+// plugin sees the same signal through its own hook; the Dart side dedups the
+// two deliveries, so a link is never lost and never opens twice.
 static int my_application_command_line(GApplication* application,
                                        GApplicationCommandLine* command_line) {
   MyApplication* self = MY_APPLICATION(application);
@@ -222,13 +188,8 @@ static int my_application_command_line(GApplication* application,
   if (link != nullptr) {
     my_application_forward_link(self, link);
   }
-  // Bring the window forward for links opened while Sora runs (remote
-  // command lines from a secondary instance). The primary instance already
-  // activated in local_command_line; presenting here as well would also
-  // break --hidden login starts.
-  if (g_application_command_line_get_is_remote(command_line)) {
-    my_application_activate(application);
-  }
+  // As the default handler would, bring the window forward.
+  my_application_activate(application);
   return 0;
 }
 

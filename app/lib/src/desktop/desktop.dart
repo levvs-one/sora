@@ -168,9 +168,6 @@ class Desktop with WindowListener {
     }
     sora.removeListener(_changed);
     await _bus?.close();
-    // Stop the sync daemon this run spawned (SIGTERM, wait, then SIGKILL); a
-    // daemon reused from a previous run is left alone.
-    await sora.syncDaemon.stop();
     _icon?.setVisible(false);
     await windowManager.setPreventClose(false);
     await windowManager.destroy();
@@ -298,7 +295,7 @@ class Desktop with WindowListener {
     final server = sora.phase == Phase.connected || sora.phase == Phase.reconnecting ? _serverText(s) : null;
     icon.setTooltip(server == null ? s.trayTooltip(state) : s.trayTooltipServer(state, server));
 
-    final entries = _trayEntries();
+    final entries = [for (final sub in sora.subscriptions) ...entriesOf(sub)];
     // Rebuilding an open menu closes it, so update only when its contents
     // change.
     final key = [
@@ -335,26 +332,6 @@ class Desktop with WindowListener {
     'bypass' => s.serverBypass,
     final id => sora.displayNameOf(id),
   };
-
-  /// Server entries for the tray menu, mirroring the main list: hidden
-  /// servers are dropped — selecting one would silently fall back to auto —
-  /// and subscription renames apply.
-  List<Entry> _trayEntries() {
-    final out = <Entry>[];
-    for (final sub in sora.subscriptions) {
-      final override = sora.overrides.of(sub.settings.id);
-      for (final entry in entriesOf(sub)) {
-        final visible = entry.withoutHidden(override.hidden);
-        if (visible == null) continue;
-        out.add(
-          !visible.isGroup && override.renames.containsKey(visible.id)
-              ? visible.renamed(override.renames[visible.id]!)
-              : visible,
-        );
-      }
-    }
-    return out;
-  }
 
   tray.Menu? _menu(S s, String state, String? server, List<Entry> entries) {
     final menu = tray.Menu.create();
@@ -521,35 +498,6 @@ class Desktop with WindowListener {
   }
 
   // Show the window before presenting an import prompt.
-
-  /// Delivers links that arrived before the UI was ready. Called once from
-  /// main() after startup: the command-line link that launched the app (cold
-  /// start — app_links only reports links received while the app runs) and
-  /// any link the native runner queued while Dart was starting.
-  Future<void> handleInitialLinks(String? launchLink) async {
-    final links = <String>[];
-    if (Platform.isLinux) {
-      try {
-        // Marks Dart ready on the native side, so later links are invoked
-        // directly instead of queued.
-        final pending = await _deepLinkChannel.invokeMethod<String>('getPendingLink');
-        if (pending != null && pending.isNotEmpty) links.add(pending);
-      } catch (_) {
-        // The runner predates the pull protocol; the launch argument below
-        // still covers cold start.
-      }
-    }
-    if (launchLink != null && launchLink.isNotEmpty) links.add(launchLink);
-    if (links.isEmpty) return;
-    // The root navigator mounts on the first frame; _open needs its context.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // _open dedups identical links, so the same cold-start link arriving
-      // through both channels opens a single dialog.
-      for (final link in links) {
-        unawaited(_open(link));
-      }
-    });
-  }
 
   /// Deep link forwarded by the Linux runner while the app runs.
   Future<void> _onDeepLinkCall(MethodCall call) async {
