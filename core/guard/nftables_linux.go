@@ -5,7 +5,9 @@ package guard
 import (
 	"context"
 	"net/netip"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -27,11 +29,37 @@ type Nftables struct {
 	blocked []netip.Prefix
 }
 
+// systemBinDirs are the trusted locations for the nft helper binary. A
+// privileged daemon must not resolve helpers through PATH: a PATH-planted
+// binary would otherwise execute with the core's (possibly root) privileges
+// (audit R2 follow-up: exec.LookPath consults PATH, so it cannot provide
+// this guarantee on its own).
+var systemBinDirs = []string{"/usr/sbin", "/sbin", "/usr/bin", "/bin"}
+
+// resolveSystemBin returns the absolute path of a privileged helper binary
+// from the trusted system directories, failing closed when absent.
+func resolveSystemBin(name string) (string, error) {
+	for _, dir := range systemBinDirs {
+		p := filepath.Join(dir, name)
+		if fi, err := os.Stat(p); err == nil && !fi.IsDir() && fi.Mode()&0o111 != 0 {
+			return p, nil
+		}
+	}
+	return "", errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail,
+		"guard: %s not found in the system directories (/usr/sbin, /sbin, /usr/bin, /bin)", name)
+}
+
+// NftBinForTest overrides the nft binary path used by NewNftables. It
+// exists so tests can plant a fake nft; production code must leave it empty
+// so the binary always comes from the trusted system directories.
+var NftBinForTest string
+
 // NewNftables permits engine traffic owned by uid and the supplied bypass
 // networks. Empty bypass uses private ranges to keep local resources reachable.
-// The nft binary is resolved to an absolute path at construction: a PATH-planted
-// "nft" must never run with the core's (possibly root) privileges (audit R2).
-// A missing nft fails closed here instead of later at Arm.
+// The nft binary is resolved to an absolute path at construction from the
+// trusted system directories: a PATH-planted "nft" must never run with the
+// core's (possibly root) privileges (audit R2). A missing nft fails closed
+// here instead of later at Arm.
 func NewNftables(uid int, bypass []string) (*Nftables, error) {
 	if uid < 0 {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyGuardFirewallFail,
@@ -40,10 +68,13 @@ func NewNftables(uid int, bypass []string) (*Nftables, error) {
 	if len(bypass) == 0 {
 		bypass = DefaultBypassNetworks()
 	}
-	nftBin, err := exec.LookPath("nft")
-	if err != nil {
-		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail,
-			"guard: the nftables kill switch needs the nft binary installed: %v", err)
+	nftBin := NftBinForTest
+	if nftBin == "" {
+		var err error
+		nftBin, err = resolveSystemBin("nft")
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &Nftables{uid: uid, bypass: bypass, command: nftBin}, nil
 }

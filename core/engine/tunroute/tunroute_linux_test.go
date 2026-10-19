@@ -4,6 +4,7 @@ package tunroute
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/netip"
 	"os"
 	"slices"
@@ -104,7 +105,12 @@ func TestBypassKeepsBoundSocketsAndForeignTunnelSources(t *testing.T) {
 }
 
 func TestMissingIPOnlyFailsRouting(t *testing.T) {
-	t.Setenv("PATH", t.TempDir())
+	// iproute2 is resolved from the trusted system directories (audit R2),
+	// not PATH: stub the resolver to report it missing.
+	ipBinForTest = func() (string, error) {
+		return "", fmt.Errorf("tunroute: TUN routing requires iproute2 (ip): %w", ErrBinNotFound)
+	}
+	t.Cleanup(func() { ipBinForTest = nil })
 	if err := Cleanup(t.Context()); err != nil {
 		t.Fatalf("proxy-only cleanup: %v", err)
 	}

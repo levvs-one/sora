@@ -11,6 +11,7 @@ import (
 	"net/netip"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -290,24 +291,55 @@ func deleteMatches(want, older map[string]json.RawMessage) bool {
 	return (value(want, "goto") == "") == (value(older, "goto") == "")
 }
 
+// systemBinDirs are the trusted locations for privileged helper binaries.
+// A privileged daemon must not resolve helpers through PATH: a
+// PATH-planted binary would otherwise execute with the core's (possibly
+// root) privileges. Only fixed system directories are trusted (audit R2
+// follow-up: exec.LookPath consults PATH, so it cannot provide this
+// guarantee on its own).
+var systemBinDirs = []string{"/usr/sbin", "/sbin", "/usr/bin", "/bin"}
+
+// ErrBinNotFound reports that a privileged helper binary is absent from
+// the trusted system directories. Callers use errors.Is to distinguish
+// "not installed" (fail closed or skip) from other failures.
+var ErrBinNotFound = errors.New("not found in system directories")
+
+// resolveSystemBin returns the absolute path of a privileged helper binary
+// from the trusted system directories. It fails closed when the binary is
+// absent instead of falling back to PATH.
+func resolveSystemBin(name string) (string, error) {
+	for _, dir := range systemBinDirs {
+		p := filepath.Join(dir, name)
+		if fi, err := os.Stat(p); err == nil && !fi.IsDir() && fi.Mode()&0o111 != 0 {
+			return p, nil
+		}
+	}
+	return "", fmt.Errorf("tunroute: %s %w (/usr/sbin, /sbin, /usr/bin, /bin)", name, ErrBinNotFound)
+}
+
+// ipBinForTest, when non-nil, replaces ipBin in tests.
+var ipBinForTest func() (string, error)
+
 // ipBin resolves iproute2 to an absolute path per call so a PATH-planted
 // "ip" can never execute with the core's (possibly root) privileges
-// (audit R2). Resolution is per call — not cached at init — so tests and
-// operators that adjust PATH keep working; a missing iproute2 fails closed
-// with the same message cleanup() reports.
+// (audit R2). Resolution is per call — not cached at init — so a missing
+// iproute2 fails closed with the same message cleanup() reports.
 func ipBin() (string, error) {
-	if p, err := exec.LookPath("ip"); err != nil {
-		return "", fmt.Errorf("tunroute: TUN routing requires iproute2 (ip): %w", err)
-	} else {
-		return p, nil
+	if ipBinForTest != nil {
+		return ipBinForTest()
 	}
+	p, err := resolveSystemBin("ip")
+	if err != nil {
+		return "", fmt.Errorf("tunroute: TUN routing requires iproute2 (ip): %w", err)
+	}
+	return p, nil
 }
 
 // cleanup only touches the reserved table/priorities and the named Sora
 // adapter. Before installation, keep the current engine's selected addresses.
 func cleanup(ctx context.Context, tun engine.Tun) error {
 	if _, err := ipBin(); err != nil {
-		if !tun.Enabled && errors.Is(err, exec.ErrNotFound) {
+		if !tun.Enabled && errors.Is(err, ErrBinNotFound) {
 			return nil
 		}
 		return err

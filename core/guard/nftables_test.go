@@ -129,13 +129,16 @@ func TestArmRefusesRootUid(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("the engine is matched by user id on Linux only")
 	}
-	// NewNftables resolves nft at construction (absolute path, audit R2):
-	// plant a fake so the test does not depend on nft being installed.
+	// NewNftables resolves nft at construction from the trusted system
+	// directories (audit R2): plant a fake through the test hook so the test
+	// does not depend on nft being installed.
 	dir := t.TempDir()
 	if err := os.WriteFile(dir+"/nft", []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	t.Setenv("PATH", dir+":"+os.Getenv("PATH"))
+	guard.NftBinForTest = dir + "/nft"
+	t.Cleanup(func() { guard.NftBinForTest = "" })
 	firewall, err := guard.NewNftables(0, nil)
 	if err != nil {
 		t.Fatalf("NewNftables(0) error = %v", err)
@@ -183,6 +186,10 @@ esac
 	}
 	t.Setenv("PATH", dir+":"+os.Getenv("PATH"))
 	t.Setenv("SORA_FAKE_STATE", state)
+	// The production code resolves nft from the trusted system directories
+	// (audit R2); the fake binary is injected through the test hook.
+	guard.NftBinForTest = nft
+	t.Cleanup(func() { guard.NftBinForTest = "" })
 
 	firewall, err := guard.NewNftables(1000, nil)
 	if err != nil {
