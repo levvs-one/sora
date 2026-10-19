@@ -224,6 +224,10 @@ func applyTLS(px *proxy, o engine.Outbound) error {
 	if o.TLS.Fingerprint != "" {
 		px.Fingerprint = o.TLS.Fingerprint
 	}
+	if o.TLS.ECH.Enabled {
+		ech := true
+		px.ECH = &ech
+	}
 	if o.TLS.Insecure {
 		skip := true
 		px.SkipCertVerify = &skip

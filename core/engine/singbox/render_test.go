@@ -187,3 +187,76 @@ func TestEngineAcceptsRenderedPlans(t *testing.T) {
 		})
 	}
 }
+
+func trojanOutbound(t *testing.T, cfg map[string]any) map[string]any {
+	t.Helper()
+	for _, ob := range cfg["outbounds"].([]any) {
+		m := ob.(map[string]any)
+		if m["type"] == "trojan" {
+			return m
+		}
+	}
+	t.Fatal("no trojan outbound rendered")
+	return nil
+}
+
+func TestRenderECHOutboundTLS(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolTrojan)
+	p.Outbounds[0].TLS.ECH = engine.ECHConfig{
+		Enabled: true,
+		Config:  []string{"AE7+DQA8NwAgACBwaW5uZWQtZWNoLXRlc3QtY29uZmln"},
+	}
+	tls, ok := trojanOutbound(t, render(t, p))["tls"].(map[string]any)
+	if !ok {
+		t.Fatal("trojan outbound must carry a tls block")
+	}
+	ech, ok := tls["ech"].(map[string]any)
+	if !ok {
+		t.Fatal("tls block must carry ech when ECH is enabled")
+	}
+	if ech["enabled"] != true {
+		t.Fatalf("ech.enabled = %v, want true", ech["enabled"])
+	}
+	got, _ := ech["config"].([]any)
+	if len(got) != 1 || got[0] != "AE7+DQA8NwAgACBwaW5uZWQtZWNoLXRlc3QtY29uZmln" {
+		t.Fatalf("ech.config = %v, want the pinned ECHConfigList", ech["config"])
+	}
+}
+
+func TestRenderOmitsECHByDefault(t *testing.T) {
+	tls, ok := trojanOutbound(t, render(t, enginetest.Plan(engine.ProtocolTrojan)))["tls"].(map[string]any)
+	if !ok {
+		t.Fatal("trojan outbound must carry a tls block")
+	}
+	if _, has := tls["ech"]; has {
+		t.Fatal("ech must not be rendered unless explicitly enabled")
+	}
+}
+
+// TestRenderDNSH3UsesAddressForm locks the DoH3 rendering: sing-box has no
+// legacy "type" spelling for HTTP/3, so an h3 server must be emitted in the
+// address form with the h3:// prefix (its DoH3 transport selector).
+func TestRenderDNSH3UsesAddressForm(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.DNS.Servers = []engine.DNSServer{{Tag: "doh3", Transport: engine.DNSH3, Address: "1.1.1.1"}}
+	out := render(t, p)
+	dns, ok := out["dns"].(map[string]any)
+	if !ok {
+		t.Fatal("rendered config has no dns section")
+	}
+	servers, _ := dns["servers"].([]any)
+	for _, s := range servers {
+		m, _ := s.(map[string]any)
+		if m["tag"] != "doh3" {
+			continue
+		}
+		if m["address"] != "h3://1.1.1.1:443/dns-query" {
+			t.Fatalf("h3 server must use the address form, got %v", m)
+		}
+		if _, hasType := m["type"]; hasType {
+			t.Fatalf("h3 server must not carry a legacy type: %v", m)
+		}
+		return
+	}
+	t.Fatalf("h3 server missing from rendered dns: %v", servers)
+}

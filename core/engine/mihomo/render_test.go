@@ -263,3 +263,24 @@ func TestEngineAcceptsRenderedPlans(t *testing.T) {
 		})
 	}
 }
+func TestRenderECHProxyToggle(t *testing.T) {
+	p := testPlan()
+	p.Outbounds[0].TLS.ECH = engine.ECHConfig{Enabled: true}
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "ech: true") {
+		t.Fatalf("rendered mihomo config must enable ech, got:\n%s", out)
+	}
+}
+
+func TestRenderOmitsECHByDefault(t *testing.T) {
+	out, err := Render(testPlan(), testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(out, "ech:") {
+		t.Fatalf("rendered mihomo config must not mention ech unless enabled, got:\n%s", out)
+	}
+}

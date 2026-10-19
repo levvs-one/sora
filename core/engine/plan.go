@@ -54,12 +54,30 @@ const (
 	GroupLoadBalance GroupType = "load-balance"
 )
 
+// ECHConfig holds Encrypted Client Hello (RFC 9849) parameters of an
+// outbound. The zero value disables ECH.
+type ECHConfig struct {
+	// Enabled turns ECH on. Without a pinned Config the engine fetches the
+	// ECHConfigList from the server's HTTPS DNS record, so a working
+	// (ideally encrypted) DNS path is required for the bootstrap.
+	Enabled bool
+	// Config pins PEM-encoded ECHConfigList lines, skipping the DNS
+	// lookup. Useful where encrypted DNS itself is blocked.
+	Config []string
+	// QueryServerName overrides the domain used for the ECH DNS query.
+	// Not rendered yet: it needs sing-box >= 1.13, above our 1.12 minimum.
+	QueryServerName string
+}
+
 // TLS holds transport security parameters of an outbound.
 type TLS struct {
 	Enabled     bool
 	ServerName  string
 	ALPN        []string
 	Fingerprint string
+	// ECH enables Encrypted Client Hello. Opt-in only: some censors drop
+	// ClientHellos carrying the ECH extension, so it must never default on.
+	ECH         ECHConfig
 	Insecure    bool
 	Reality     bool
 	// RealityPublicKey and other REALITY parameters are public but masked

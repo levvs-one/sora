@@ -113,7 +113,25 @@ type proxy struct {
 	SkipCertVerify *bool    `yaml:"skip-cert-verify,omitempty"`
 	Fingerprint    string   `yaml:"client-fingerprint,omitempty"`
 	ALPN           []string `yaml:"alpn,omitempty"`
+	// ECH enables Encrypted Client Hello; mihomo fetches the ECH config
+	// via DNS itself, so only the toggle is wired.
+	ECH            *bool    `yaml:"ech,omitempty"`
 	Reality        *reality `yaml:"reality-opts,omitempty"`
+
+	// Hysteria2 bandwidth caps ("100 Mbps"): positive values switch the
+	// engine from BBR to Brutal congestion control.
+	Up   string `yaml:"up,omitempty"`
+	Down string `yaml:"down,omitempty"`
+	// Hysteria2 port hopping: ranges list ("20000-30000,40000") and the
+	// hop interval in seconds (minimum 5).
+	Ports       string `yaml:"ports,omitempty"`
+	HopInterval int    `yaml:"hop-interval,omitempty"`
+	// TUIC v4 pre-shared token; v5 authenticates with uuid+password.
+	Token string `yaml:"token,omitempty"`
+	// TUIC congestion controller ("bbr", "cubic", "new_reno") and UDP
+	// relay mode ("native", "quic").
+	CongestionController string `yaml:"congestion-controller,omitempty"`
+	UDPRelayMode         string `yaml:"udp-relay-mode,omitempty"`
 
 	PrivateKey string          `yaml:"private-key,omitempty"`
 	IP         string          `yaml:"ip,omitempty"`

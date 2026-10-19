@@ -255,6 +255,16 @@ func (r *renderer) tls(o engine.Outbound) obj {
 	if fingerprint != "" {
 		t["utls"] = obj{"enabled": true, "fingerprint": fingerprint}
 	}
+	if o.TLS.ECH.Enabled {
+		// Without a pinned config the engine fetches the ECHConfigList
+		// from the server's HTTPS DNS record (query_server_name needs
+		// sing-box >= 1.13, above our 1.12 minimum, so it stays unset).
+		ech := obj{"enabled": true}
+		if len(o.TLS.ECH.Config) > 0 {
+			ech["config"] = o.TLS.ECH.Config
+		}
+		t["ech"] = ech
+	}
 	if r.plan.Options.Fragment.Enabled && o.Protocol != engine.ProtocolHysteria2 && o.Protocol != engine.ProtocolTUIC {
 		// QUIC protocols have no TCP ClientHello to split.
 		t["fragment"] = true
