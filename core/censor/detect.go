@@ -82,6 +82,7 @@ var rules = []rule{
 	sniBlockingRule,
 	tlsAlertRule,
 	handshakeTimeoutRule,
+	clientHelloStallRule,
 	certRule,
 	appResetRule,
 	dataResetRule,
@@ -308,6 +309,41 @@ func handshakeTimeoutRule(a Attempt) (candidate, bool) {
 	return candidate{KindHandshakeTimeout, 0.6, []string{
 		"the handshake started but stalled: no failure arrived, the deadline expired",
 	}}, true
+}
+
+// clientHelloStallRule: the ClientHello went out and then silence until
+// our own deadline, with zero bytes from the server. This is the
+// KZ-measured signature (OONI 2023-2024: sessions time out after the
+// ClientHello): the path read the handshake and stalled instead of
+// answering. Narrower and more confident than the generic
+// handshake-timeout rule — ordinary congestion usually still lets some
+// server bytes through, or stalls before the ClientHello is even sent.
+func clientHelloStallRule(a Attempt) (candidate, bool) {
+	s := scan(a)
+	t := s.terminal
+	if t == nil || t.What != WhatLocalTimeout || t.Stage != StageTLS {
+		return candidate{}, false
+	}
+	if s.sawBytesIn || t.BytesIn > 0 {
+		return candidate{}, false
+	}
+	sent := false
+	for _, e := range a.Events {
+		if e.Stage == StageTLS && e.What == WhatSent {
+			sent = true
+			break
+		}
+	}
+	if !sent {
+		return candidate{}, false
+	}
+	ev := []string{
+		"the client hello was sent and the server never answered: the path stalled right after the handshake started",
+	}
+	if a.Target.SNI != "" {
+		ev = append(ev, "the handshake carried SNI "+a.Target.SNI)
+	}
+	return candidate{KindHandshakeTimeout, 0.7, ev}, true
 }
 
 // certRule: a certificate failure is *not* claimed as censorship. It is a
