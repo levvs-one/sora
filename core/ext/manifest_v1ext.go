@@ -221,7 +221,7 @@ func normalizeHostPattern(entry string) (string, error) {
 			return "", errs.Newf(errs.CodeInvalidArgument, KeyNetworkHostsInvalid, "bad DNS label %q", label)
 		}
 	}
-	if isIPLiteral(e) {
+	if isIPLike(e) {
 		return "", errs.Newf(errs.CodeInvalidArgument, KeyNetworkHostsInvalid, "IP literals are not allowed")
 	}
 	if wildcard {
@@ -230,9 +230,40 @@ func normalizeHostPattern(entry string) (string, error) {
 	return e, nil
 }
 
-// isIPLiteral reports whether s is an IP address literal. The allowlist is
-// DNS names only; literals can never match because the Fetcher rejects
-// IP-literal hosts up front, so they are refused at manifest validation.
-func isIPLiteral(s string) bool {
-	return net.ParseIP(s) != nil
+// isIPLike reports whether s looks like an IP address literal, including
+// notations net.ParseIP does not understand: decimal ("2130706433"),
+// hex ("0x7f000001", "0x7f.1") and octal ("017700000001"). Some system
+// resolvers (cgo/glibc inet_aton) still dial such names as IPs, so the
+// allowlist policy treats them as IP literals everywhere: they can neither
+// be allowlisted nor fetched. All-digit dotted names are not valid public
+// DNS names (no numeric TLDs exist), so legitimate hosts are unaffected.
+func isIPLike(s string) bool {
+	if net.ParseIP(s) != nil {
+		return true
+	}
+	for _, label := range strings.Split(s, ".") {
+		low := strings.ToLower(label)
+		if len(low) > 2 && strings.HasPrefix(low, "0x") {
+			hex := true
+			for _, c := range low[2:] {
+				if !strings.ContainsRune("0123456789abcdef", c) {
+					hex = false
+					break
+				}
+			}
+			if hex {
+				return true
+			}
+		}
+	}
+	nodots := strings.ReplaceAll(s, ".", "")
+	if nodots == "" {
+		return false
+	}
+	for _, c := range nodots {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
+	return true
 }

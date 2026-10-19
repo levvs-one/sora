@@ -203,14 +203,14 @@ func (f *Fetcher) logf(level LogLevel, format string, args ...any) {
 	f.hub.Log(f.extID).Append(level, msg)
 }
 
-// Fetch performs one allowlisted HTTP request. granted is the extension's
-// granted permission list; without "net.fetch" the call is denied.
-func (f *Fetcher) Fetch(ctx context.Context, granted []string, req FetchRequest) (*FetchResponse, error) {
-	if !hasString(granted, "net.fetch") {
-		f.logf(LogWarn, "fetch DENIED %s: missing %q permission", safeMethodURL(req), "net.fetch")
-		return nil, errs.Newf(errs.CodePermissionDenied, KeyNetFetchDenied,
-			"ext: net.fetch requires the %q permission", "net.fetch")
-	}
+// Fetch performs one allowlisted HTTP request.
+//
+// The permission is enforced at construction: a Fetcher is only built for
+// an extension that holds "net.fetch" (see Scheduler.Register), and a nil
+// Fetcher fails closed in WorkerEnv.Fetch. There is deliberately no
+// per-call permission argument — a caller-supplied grant list cannot be a
+// security check.
+func (f *Fetcher) Fetch(ctx context.Context, req FetchRequest) (*FetchResponse, error) {
 	if !f.limiter.allow() {
 		f.logf(LogWarn, "fetch DENIED %s: rate limit exceeded", safeMethodURL(req))
 		return nil, errs.Newf(errs.CodeResourceExhausted, KeyNetFetchDenied,
@@ -306,7 +306,9 @@ func (f *Fetcher) checkURL(u *url.URL) error {
 	if host == "" {
 		return errs.Newf(errs.CodePermissionDenied, KeyNetFetchDenied, "ext: net.fetch: bad URL")
 	}
-	if ip := net.ParseIP(host); ip != nil {
+	if isIPLike(host) {
+		// IP literals in any notation (net.ParseIP misses decimal/hex/
+		// octal forms, but some system resolvers still dial them as IPs).
 		return errs.Newf(errs.CodePermissionDenied, KeyNetFetchDenied,
 			"ext: net.fetch: IP-literal hosts are not allowed")
 	}
@@ -341,23 +343,23 @@ func (f *Fetcher) hostAllowed(host string) bool {
 	return false
 }
 
-func hasString(list []string, want string) bool {
-	for _, s := range list {
-		if s == want {
-			return true
-		}
-	}
-	return false
-}
-
-// safeMethodURL renders "METHOD url" for logs without credentials (userinfo
-// is rejected anyway) and bounded length.
+// safeMethodURL renders "METHOD url" for logs. The query, fragment and any
+// userinfo are stripped: they routinely carry API keys and tokens, and the
+// extension's log is surfaced in the app UI.
 func safeMethodURL(req FetchRequest) string {
 	method := strings.ToUpper(strings.TrimSpace(req.Method))
 	if method == "" {
 		method = http.MethodGet
 	}
 	u := strings.TrimSpace(req.URL)
+	if parsed, err := url.Parse(u); err == nil {
+		parsed.User = nil
+		parsed.RawQuery = ""
+		parsed.ForceQuery = false
+		parsed.Fragment = ""
+		parsed.RawFragment = ""
+		u = parsed.String()
+	}
 	if len(u) > 200 {
 		u = u[:200] + "…"
 	}

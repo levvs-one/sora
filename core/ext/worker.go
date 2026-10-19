@@ -70,7 +70,7 @@ func (e *WorkerEnv) Fetch(ctx context.Context, req FetchRequest) (*FetchResponse
 		return nil, errs.Newf(errs.CodePermissionDenied, KeyNetFetchDenied,
 			"ext: net.fetch requires the %q permission", "net.fetch")
 	}
-	return e.fetcher.Fetch(ctx, []string{"net.fetch"}, req)
+	return e.fetcher.Fetch(ctx, req)
 }
 
 // WorkerFunc is one worker execution. A nil error means success; anything
@@ -87,6 +87,11 @@ type WorkerTask struct {
 
 	run     WorkerFunc
 	fetcher *Fetcher
+	// ctx is the task loop's context, derived from the scheduler's run
+	// context. It is canceled when the task is unregistered, replaced, or
+	// the scheduler stops, so no ticker loop outlives its task.
+	ctx  context.Context
+	stop context.CancelFunc // cancels ctx; nil until the scheduler starts
 }
 
 // Scheduler owns background tasks for enabled extensions.
@@ -148,23 +153,37 @@ func (s *Scheduler) Register(m *Manifest, x *ManifestExt, run WorkerFunc) error 
 		fetcher:     fetcher,
 	}
 	s.mu.Lock()
+	if old, ok := s.tasks[m.ID]; ok && old.stop != nil {
+		// Replacing a running task: stop the old ticker loop first, or
+		// two loops would fire for the same extension.
+		old.stop()
+	}
 	s.tasks[m.ID] = task
-	runCtx := s.runCtx
+	var taskCtx context.Context
+	if s.runCtx != nil {
+		taskCtx, task.stop = context.WithCancel(s.runCtx)
+		task.ctx = taskCtx
+	}
 	s.mu.Unlock()
 	s.hub.Log(m.ID).Append(LogInfo,
 		fmt.Sprintf("background worker registered: every %s (declared %d min), entry %s",
 			task.Interval, x.Background.IntervalMinutes, task.Entry))
-	if runCtx != nil {
-		s.startLoopWith(runCtx, task)
+	if taskCtx != nil {
+		s.startLoopWith(task)
 	}
 	return nil
 }
 
-// Unregister removes the extension's task, if any.
+// Unregister removes the extension's task, if any, and stops its ticker
+// loop.
 func (s *Scheduler) Unregister(extID string) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
+	task, ok := s.tasks[extID]
 	delete(s.tasks, extID)
+	s.mu.Unlock()
+	if ok && task.stop != nil {
+		task.stop()
+	}
 }
 
 // Task returns the registered task for extID.
@@ -189,10 +208,11 @@ func (s *Scheduler) Start(ctx context.Context) {
 	tasks := make([]*WorkerTask, 0, len(s.tasks))
 	for _, t := range s.tasks {
 		tasks = append(tasks, t)
+		t.ctx, t.stop = context.WithCancel(runCtx)
 	}
 	s.mu.Unlock()
 	for _, t := range tasks {
-		s.startLoopWith(runCtx, t)
+		s.startLoopWith(t)
 	}
 }
 
@@ -211,8 +231,9 @@ func (s *Scheduler) Stop() {
 	s.wg.Wait()
 }
 
-// startLoopWith runs the ticker loop for one task until ctx ends.
-func (s *Scheduler) startLoopWith(ctx context.Context, task *WorkerTask) {
+// startLoopWith runs the ticker loop for one task until the task's context
+// ends (unregistered, replaced, or scheduler stopped).
+func (s *Scheduler) startLoopWith(task *WorkerTask) {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
@@ -226,7 +247,7 @@ func (s *Scheduler) startLoopWith(ctx context.Context, task *WorkerTask) {
 		defer timer.Stop()
 		for {
 			select {
-			case <-ctx.Done():
+			case <-task.ctx.Done():
 				return
 			case <-timer.C:
 				s.runOnce(task)

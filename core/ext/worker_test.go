@@ -231,3 +231,54 @@ func TestExtLogBounded(t *testing.T) {
 		t.Fatal("Drop must forget the log")
 	}
 }
+
+func TestUnregisterStopsTaskLoop(t *testing.T) {
+	s := NewScheduler(nil)
+	m, x := bgPair(t, 30)
+	if err := s.Register(m, x, okRun); err != nil {
+		t.Fatal(err)
+	}
+	s.Start(context.Background())
+	defer s.Stop()
+	task, ok := s.Task(m.ID)
+	if !ok {
+		t.Fatal("task not registered")
+	}
+	if task.ctx == nil {
+		t.Fatal("running task must own a loop context")
+	}
+	s.Unregister(m.ID)
+	select {
+	case <-task.ctx.Done():
+	case <-time.After(2 * time.Second):
+		t.Fatal("task ticker loop was not stopped by Unregister")
+	}
+}
+
+func TestRegisterReplacesTaskStopsOldLoop(t *testing.T) {
+	s := NewScheduler(nil)
+	m, x := bgPair(t, 30)
+	if err := s.Register(m, x, okRun); err != nil {
+		t.Fatal(err)
+	}
+	s.Start(context.Background())
+	defer s.Stop()
+	old, _ := s.Task(m.ID)
+	if err := s.Register(m, x, okRun); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-old.ctx.Done():
+	case <-time.After(2 * time.Second):
+		t.Fatal("replaced task's ticker loop kept running: two loops would fire")
+	}
+	cur, _ := s.Task(m.ID)
+	if cur == old {
+		t.Fatal("expected a new task struct after re-register")
+	}
+	select {
+	case <-cur.ctx.Done():
+		t.Fatal("the replacement task's loop must keep running")
+	default:
+	}
+}
