@@ -29,7 +29,9 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/tunroute"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/ext"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	extv1 "github.com/levvs-one/sora-client/core/gen/sora/ext/v1"
 	"github.com/levvs-one/sora-client/core/guard"
 	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
@@ -325,6 +327,15 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		}),
 	)
 	corev1.RegisterCoreControlServer(app.server, plane)
+	// Extensions: the host service shares the control socket and its auth
+	// interceptors, so only control peers reach it; per-extension tokens
+	// and permission scopes are enforced inside the host.
+	extStore, err := ext.OpenStore(filepath.Join(opts.DataDir, "extensions"))
+	if err != nil {
+		_ = store.Close()
+		return nil, err
+	}
+	extv1.RegisterExtensionHostServer(app.server, ext.NewHost(extStore.Issuer(), plane.ExtHostDeps()))
 	built = true
 	return app, nil
 }
