@@ -186,3 +186,22 @@ func TestInterfaceLinesNeverListAnAddress(t *testing.T) {
 }
 
 var _ = errors.New
+
+// TestRunMasksEveryLine locks SORA-M6: Collector.Run promises to mask each
+// line before it leaves the core, including engine lines that may carry
+// hostnames or credentials.
+func TestRunMasksEveryLine(t *testing.T) {
+	source := plantedSource()
+	source.engine = append(source.engine, "last error: dial "+secretValues+" to "+serverHost+":443")
+	collector := newCollector(t, source, diagnostics.Options{
+		Redactor: engine.NewRedactor(secretValues, serverHost),
+	})
+	lines, err := collector.Run(context.Background(), session.Status{})
+	if err != nil {
+		t.Fatalf("Run() error = %v", err)
+	}
+	report := strings.Join(lines, "\n")
+	if strings.Contains(report, secretValues) || strings.Contains(report, serverHost) {
+		t.Errorf("Run() leaks planted values:\n%s", report)
+	}
+}
