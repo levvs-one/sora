@@ -68,7 +68,18 @@ final _role = RegExp(
 }
 
 /// Groups subscription servers by name, preserving their list order.
-List<Entry> entriesOf(SubscriptionState subscription) {
+///
+/// The grouping depends only on [subscription.outbounds], and subscription
+/// states are replaced wholesale (never mutated in place) when they change,
+/// so the result is cached per state object. Rebuilding it runs a Unicode
+/// regex per server; without the cache every server-list rebuild (probe ticks
+/// arrive every 300ms, plus home-screen builds) would redo all of them.
+final _groupedEntries = Expando<List<Entry>>('sora.groupedEntries');
+
+List<Entry> entriesOf(SubscriptionState subscription) =>
+    _groupedEntries[subscription] ??= _groupEntries(subscription);
+
+List<Entry> _groupEntries(SubscriptionState subscription) {
   final byName = <String, List<OutboundSpec>>{};
   final roles = <String, Role>{};
   for (final o in subscription.outbounds) {
