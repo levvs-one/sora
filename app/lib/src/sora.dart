@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/widgets.dart' hide ConnectionState;
@@ -14,6 +16,7 @@ import 'core/link.dart';
 import 'browser_diagnostics.dart';
 import 'generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'groups.dart';
+import 'overrides.dart';
 import 'rules.dart';
 import 'settings.dart';
 import 'notifications.dart';
@@ -65,7 +68,16 @@ final class ServerReturned extends Notice {
 /// App state and core operations. Screens access it through [SoraScope] and
 /// rebuild on notifications.
 class Sora extends ChangeNotifier {
-  Sora(this.settings) : history = settings.notificationHistory;
+  Sora(this.settings)
+    : history = settings.notificationHistory,
+      overrides = OverrideStore(() => settings.subscriptionOverrides, (v) => settings.subscriptionOverrides = v) {
+    overrides.onChanged = () {
+      notifyListeners();
+      // Hiding a server changes the plan; renaming does not (IDs are stable).
+      unawaited(_replan());
+    };
+    _loadBandwidth();
+  }
   final browserDiagnostics = BrowserDiagnostics();
 
   AppUpdater get updates => _updates;
@@ -321,6 +333,15 @@ class Sora extends ChangeNotifier {
 
   /// Server latency in milliseconds; null means the server did not respond.
   final Map<String, int?> latency = {};
+
+  /// User edits layered over subscriptions (FEATURE-PLAN.md F6).
+  final OverrideStore overrides;
+
+  /// Server IDs hidden by subscription overrides.
+  Set<String> get hiddenServerIds => overrides.hiddenIds;
+
+  /// Display name with the user's rename applied, if any.
+  String displayNameOf(String id) => overrides.renames[id] ?? nameOf(id);
   bool probing = false;
   String? probingSubscription;
   ResponseStream<ProbeResult>? _probeCall;
@@ -331,10 +352,11 @@ class Sora extends ChangeNotifier {
   /// All subscription servers in list order, deduplicated by ID.
   List<OutboundSpec> get servers {
     final seen = <String>{};
+    final hidden = hiddenServerIds;
     return [
       for (final s in _subscriptions.values)
         for (final o in s.outbounds)
-          if (seen.add(o.id)) o,
+          if (seen.add(o.id) && !hidden.contains(o.id)) o,
     ];
   }
 
@@ -359,6 +381,7 @@ class Sora extends ChangeNotifier {
     choice: selected,
     settings: settings,
     latency: latency,
+    bandwidth: bandwidth,
     entry: selected.startsWith(groupPrefix) ? entryOf(selected, _subscriptions.values) : null,
   );
 
@@ -370,6 +393,7 @@ class Sora extends ChangeNotifier {
   /// Maintains the core connection and watches subscriptions and session state,
   /// reopening the connection after a drop until disposal.
   Future<void> run() async {
+    checkCrashIntent();
     while (!_disposed) {
       final opening = Stopwatch()..start();
       final CoreLink link;
@@ -561,11 +585,12 @@ class Sora extends ChangeNotifier {
 
   /// Replaces the current session watch. Events before [since] update state
   /// without triggering notices or failover.
-  void _watchSession({DateTime? since}) {
+  void _watchSession({DateTime? since, bool resetFailures = true}) {
     unawaited(_sessionWatch?.cancel());
     _sessionWatch = null;
     final link = _link, id = sessionId;
     if (link == null || id == null) return;
+    if (resetFailures) _watchFailures = 0;
     // Refresh status because a closed watch may mean the session ended or was
     // replaced.
     void resync() {
@@ -591,6 +616,11 @@ class Sora extends ChangeNotifier {
             event.stateChanged.state.sessionId != id) {
           return;
         }
+        // A healthy event resets the watchdog streak (FEATURE-PLAN.md F7).
+        if (_watchFailures != 0) {
+          _watchFailures = 0;
+          if (failure?.key == 'app.core_watch_unstable') failure = null;
+        }
         _seenSession = id;
         _seenSequence = event.sequence;
         final fresh = !event.hasEmittedAt() || event.emittedAt.toDateTime().isAfter(opened);
@@ -603,10 +633,102 @@ class Sora extends ChangeNotifier {
       },
       onError: (Object error) {
         _drop(error);
+        _watchFailures++;
+        if (_watchFailures == 1) {
+          // First break in the streak: show the recovery attempt instead of
+          // retrying silently.
+          unawaited(recordNotification(AppNotification(time: DateTime.now(), title: strings.coreRestoringLink, body: '')));
+        }
+        if (_watchFailures >= _maxWatchFailures) {
+          // Stop auto-recovery and surface a visible error with a repair
+          // action instead of looping forever.
+          failure = const CoreFailure('app.core_watch_unstable');
+          notifyListeners();
+          return;
+        }
+        // Reopen the watch after a short pause; resync covers the gap.
+        unawaited(
+          Future<void>.delayed(const Duration(seconds: 2)).then((_) {
+            if (!_disposed && link == _link && id == sessionId && !watchUnstable) {
+              _watchSession(since: DateTime.now(), resetFailures: false);
+            }
+          }),
+        );
         resync();
       },
       onDone: resync,
     );
+  }
+
+  /// Consecutive WatchEvents failures; reset by any healthy event.
+  int _watchFailures = 0;
+
+  /// After this many consecutive watch failures the app stops silent retries
+  /// and asks the user to repair the link (FEATURE-PLAN.md F7).
+  static const _maxWatchFailures = 5;
+
+  /// Whether the session watch gave up auto-recovery.
+  bool get watchUnstable => _watchFailures >= _maxWatchFailures;
+
+  /// Re-establishes the session watch after [watchUnstable].
+  Future<void> repairWatch() async {
+    _watchFailures = 0;
+    if (failure?.key == 'app.core_watch_unstable') failure = null;
+    _watchSession();
+    notifyListeners();
+  }
+
+  /// Server choice saved before connecting; offered for restore when the app
+  /// restarts after a crash (FEATURE-PLAN.md F7).
+  String? _pendingRestore;
+
+  /// A crashed session is waiting for the user's restore decision.
+  String? get pendingRestore => _pendingRestore;
+
+  void _writeSessionIntent(String choice) {
+    if (!settings.restoreOnCrash) return;
+    settings.sessionIntent = jsonEncode({'server': choice, 'at': DateTime.now().millisecondsSinceEpoch});
+  }
+
+  void _clearSessionIntent() {
+    _pendingRestore = null;
+    if (settings.sessionIntent.isNotEmpty) settings.sessionIntent = '';
+  }
+
+  /// Checks for a session intent left by a crashed run; call once at startup.
+  void checkCrashIntent() {
+    if (!settings.restoreOnCrash) {
+      _clearSessionIntent();
+      return;
+    }
+    final raw = settings.sessionIntent;
+    if (raw.isEmpty) return;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic> && decoded['server'] is String) {
+        _pendingRestore = decoded['server'] as String;
+        notifyListeners();
+      } else {
+        settings.sessionIntent = '';
+      }
+    } on FormatException {
+      settings.sessionIntent = '';
+    }
+  }
+
+  /// Restores the crashed session: applies the saved choice and connects.
+  Future<void> restoreCrashedSession() async {
+    final choice = _pendingRestore;
+    _clearSessionIntent();
+    if (choice != null && choice != 'auto' && choice != 'bypass') settings.server = choice;
+    notifyListeners();
+    await connect();
+  }
+
+  /// Dismisses the crash-restore offer without connecting.
+  void dismissCrashRestore() {
+    _clearSessionIntent();
+    notifyListeners();
   }
 
   /// Tells the user that a fallback group of the core moved. The core tries
@@ -700,6 +822,8 @@ class Sora extends ChangeNotifier {
     if (!retry) _memberSpare = entry == null ? 0 : entry.members.length - 1;
     final work = _connectionWork = Completer<void>();
     phase = Phase.connecting;
+    // Remember the intent so a crash can offer to restore the session (F7).
+    _writeSessionIntent(choice);
     notifyListeners();
     // Include events emitted during these requests, before the watch opens.
     final started = DateTime.now();
@@ -759,6 +883,8 @@ class Sora extends ChangeNotifier {
     _stopping = true;
     cleanupPending = true;
     _lostAnnounced = false;
+    // A clean disconnect is not a crash: drop the restore intent (F7).
+    _clearSessionIntent();
     notifyListeners();
     try {
       await _probeCall?.cancel();
@@ -990,6 +1116,7 @@ class Sora extends ChangeNotifier {
     );
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
     _subscriptions.remove(id);
+    overrides.drop(id);
     notifyListeners();
   });
 
@@ -1072,6 +1199,133 @@ class Sora extends ChangeNotifier {
   /// logs. Null while the core is unavailable.
   CoreLink? get link => _link;
 
+  /// Measured throughput per server: server ID -> (bytes/sec, measured at).
+  /// Fed by [benchmarkServers]; persisted across restarts.
+  final Map<String, ({int bps, DateTime at})> bandwidth = {};
+
+  /// Bandwidth measurements older than this are shown as stale and ignored by
+  /// speed-based auto-selection.
+  static const bandwidthTtl = Duration(hours: 24);
+
+  void _loadBandwidth() {
+    try {
+      final raw = jsonDecode(settings.benchmarkHistory);
+      if (raw is Map<String, dynamic>) {
+        for (final entry in raw.entries) {
+          final value = entry.value;
+          if (value is Map<String, dynamic> && value['bps'] is int && value['at'] is int) {
+            bandwidth[entry.key] = (
+              bps: value['bps'] as int,
+              at: DateTime.fromMillisecondsSinceEpoch(value['at'] as int),
+            );
+          }
+        }
+      }
+    } on FormatException {
+      // Corrupt history: start empty rather than break startup.
+    }
+  }
+
+  void _saveBandwidth() {
+    settings.benchmarkHistory = jsonEncode({
+      for (final entry in bandwidth.entries)
+        entry.key: {'bps': entry.value.bps, 'at': entry.value.at.millisecondsSinceEpoch},
+    });
+  }
+
+  /// Fresh (non-stale) throughput for [id], or null when unknown or outdated.
+  int? freshBandwidth(String id) => freshBandwidthOf(bandwidth, id);
+
+  bool benchmarking = false;
+  ResponseStream<BandwidthSample>? _benchmarkCall;
+
+  /// Benchmark progress as (measured, total); null when idle.
+  ({int done, int total})? benchmarkProgress;
+
+  /// Per-server progress percent (0..100) while benchmarking.
+  final Map<String, int> benchmarkPct = {};
+
+  /// Whether a benchmark can run right now.
+  bool get canBenchmark =>
+      !_disposed && _link != null && !benchmarking && (phase == Phase.off || phase == Phase.connected);
+
+  /// Streams real-throughput measurements for [serverIds] (all servers when
+  /// null) and records them in [bandwidth].
+  ///
+  /// The BenchmarkServers RPC is hand-wired per FEATURE-PLAN.md F2 while the
+  /// Go side is pending: a core without the RPC answers UNIMPLEMENTED and the
+  /// UI reports a friendly version message instead of a raw error.
+  /// Notifications are throttled like [probe]; cancel with [cancelBenchmark].
+  Future<void> benchmarkServers({List<String>? serverIds}) async {
+    final link = _link;
+    final ids = serverIds ?? [for (final o in servers) o.id];
+    if (!canBenchmark || link == null || ids.isEmpty) return;
+    benchmarking = true;
+    benchmarkProgress = (done: 0, total: ids.length);
+    benchmarkPct.clear();
+    recovered('benchmark');
+    notifyListeners();
+    try {
+      final call = _benchmarkCall = link.stub.benchmarkServers(
+        BenchmarkServersRequest(
+          apiVersion: apiVersion,
+          controlAuthenticator: link.token,
+          serverIds: ids,
+          durationS: 10,
+          concurrency: 2,
+        ),
+      );
+      var lastNotify = DateTime.now();
+      var done = 0;
+      await for (final sample in call) {
+        if (_disposed || link != _link) break;
+        if (sample.hasError()) throw CoreFailure(sample.error.userMessageKey);
+        if (!sample.done) {
+          final pct = sample.progressPct;
+          benchmarkPct[sample.serverId] = pct < 0 ? 0 : (pct > 100 ? 100 : pct);
+        } else {
+          done++;
+          benchmarkPct[sample.serverId] = 100;
+          final bps = sample.bytesPerSec.toInt();
+          if (bps > 0) bandwidth[sample.serverId] = (bps: bps, at: DateTime.now());
+        }
+        benchmarkProgress = (done: done, total: ids.length);
+        final now = DateTime.now();
+        if (now.difference(lastNotify) >= _probeNotifyInterval) {
+          lastNotify = now;
+          notifyListeners();
+        }
+      }
+      _saveBandwidth();
+    } catch (error) {
+      if (!_disposed && link == _link && !(error is GrpcError && error.code == StatusCode.cancelled)) {
+        if (error is GrpcError && error.code == StatusCode.unimplemented) {
+          reportFailure(const CoreFailure('app.benchmark_unsupported'), source: 'benchmark');
+        } else {
+          reportFailure(error, source: 'benchmark');
+        }
+      }
+      // Keep partial results; unmeasured servers stay unknown.
+    } finally {
+      _benchmarkCall = null;
+      benchmarking = false;
+      benchmarkProgress = null;
+      benchmarkPct.clear();
+      notifyListeners();
+    }
+  }
+
+  /// Cancels an in-flight benchmark; partial results are kept.
+  Future<void> cancelBenchmark() => _benchmarkCall?.cancel() ?? Future.value();
+
+  /// Compares two servers for list sorting: ping, speed, smart or name.
+  int compareServers(String a, String b, String mode) {
+    if (mode == 'name') {
+      return displayNameOf(a).toLowerCase().compareTo(displayNameOf(b).toLowerCase());
+    }
+    return compareAutoSelect(a, b, mode, latency, bandwidth);
+  }
+
   /// Scales bytes by powers of 1024, returning the value and unit index (B to
   /// TB).
   static (double, int) scaleBytes(Int64 bytes) {
@@ -1107,6 +1361,7 @@ SessionPlan buildPlan({
   required String choice,
   required Settings settings,
   Map<String, int?> latency = const {},
+  Map<String, ({int bps, DateTime at})> bandwidth = const {},
   Entry? entry,
 }) {
   final plan = SessionPlan(
@@ -1200,7 +1455,7 @@ SessionPlan buildPlan({
   }
   final picked = profiles.where((o) => o.id == choice).firstOrNull;
   if (picked != null || (choice == 'auto' && ordinary.isEmpty && profiles.isNotEmpty)) {
-    final profile = picked ?? _fastest(profiles, latency);
+    final profile = picked ?? _fastest(profiles, latency, bandwidth: bandwidth, autoSelect: settings.autoSelectMode);
     plan.outbounds.add(profile);
     plan.routing.proxyTarget = profile.id;
     addRules(profile.id);
@@ -1243,26 +1498,101 @@ SessionPlan buildPlan({
 /// Picks a member not measured as unreachable: first by role priority,
 /// otherwise by latency. If all are down, uses the first by role or the fastest
 /// measured member.
-OutboundSpec pickMember(Entry entry, Map<String, int?> latency) {
+OutboundSpec pickMember(
+  Entry entry,
+  Map<String, int?> latency, {
+  Map<String, ({int bps, DateTime at})> bandwidth = const {},
+  String autoSelect = 'ping',
+}) {
   bool down(OutboundSpec o) => latency.containsKey(o.id) && latency[o.id] == null;
   if (entry.ordered) return entry.byRole.firstWhere((o) => !down(o), orElse: () => entry.byRole.first);
   final up = [
     for (final o in entry.members)
       if (!down(o)) o,
   ];
-  return _fastest(up.isEmpty ? entry.members : up, latency);
+  return _fastest(up.isEmpty ? entry.members : up, latency, bandwidth: bandwidth, autoSelect: autoSelect);
 }
 
 /// Checks whether a server is a full Xray profile from a JSON subscription.
 bool isProfile(OutboundSpec o) => o.protocol == 'xray-profile';
 
-/// Returns the lowest-latency profile, or the first if none has a measurement.
-/// Requires a nonempty list.
-OutboundSpec _fastest(List<OutboundSpec> profiles, Map<String, int?> latency) {
+/// Fresh (non-stale) throughput for [id] in [bandwidth], or null.
+int? freshBandwidthOf(Map<String, ({int bps, DateTime at})> bandwidth, String id) {
+  final measurement = bandwidth[id];
+  if (measurement == null) return null;
+  if (DateTime.now().difference(measurement.at) > Sora.bandwidthTtl) return null;
+  return measurement.bps;
+}
+
+/// Smart score in [0, 1] (higher is better): ping 40%, speed 40%,
+/// measurement freshness 20%.
+double smartScoreOf(String id, Map<String, int?> latency, Map<String, ({int bps, DateTime at})> bandwidth) {
+  var score = 0.0;
+  var measured = false;
+  final ms = latency[id];
+  if (ms != null) {
+    measured = true;
+    // Map 20ms..2000ms to 1..0.
+    score += 0.4 * (1.0 - ((ms - 20) / 1980).clamp(0.0, 1.0));
+  }
+  final bps = freshBandwidthOf(bandwidth, id);
+  if (bps != null) {
+    measured = true;
+    // Map 1..100 Mbps to 0..1 (sqrt softens the top end).
+    score += 0.4 * (sqrt(bps / 125000) / 10).clamp(0.0, 1.0);
+  }
+  if (measured) {
+    final at = bandwidth[id]?.at;
+    if (at != null) {
+      final ageHours = DateTime.now().difference(at).inHours;
+      score += 0.2 * (1.0 - (ageHours / Sora.bandwidthTtl.inHours).clamp(0.0, 1.0));
+    } else {
+      // Ping-only data: half freshness credit.
+      score += 0.1;
+    }
+  }
+  return score;
+}
+
+/// Compares two servers for auto-selection. [mode] is ping, speed or smart;
+/// unknown modes fall back to ping. Ties break by ping.
+int compareAutoSelect(
+  String a,
+  String b,
+  String mode,
+  Map<String, int?> latency,
+  Map<String, ({int bps, DateTime at})> bandwidth,
+) {
+  int byPing() => (latency[a] ?? 1 << 30).compareTo(latency[b] ?? 1 << 30);
+  switch (mode) {
+    case 'speed':
+      final x = freshBandwidthOf(bandwidth, a), y = freshBandwidthOf(bandwidth, b);
+      if (x != null || y != null) {
+        if (x == null) return 1;
+        if (y == null) return -1;
+        final bySpeed = y.compareTo(x);
+        if (bySpeed != 0) return bySpeed;
+      }
+      return byPing();
+    case 'smart':
+      final bySmart = smartScoreOf(b, latency, bandwidth).compareTo(smartScoreOf(a, latency, bandwidth));
+      return bySmart != 0 ? bySmart : byPing();
+    default:
+      return byPing();
+  }
+}
+
+/// Returns the best profile by auto-selection mode, or the first if the list
+/// has a single entry. Requires a nonempty list.
+OutboundSpec _fastest(
+  List<OutboundSpec> profiles,
+  Map<String, int?> latency, {
+  Map<String, ({int bps, DateTime at})> bandwidth = const {},
+  String autoSelect = 'ping',
+}) {
   var best = profiles.first;
   for (final o in profiles) {
-    final ms = latency[o.id], bestMs = latency[best.id];
-    if (ms != null && (bestMs == null || ms < bestMs)) best = o;
+    if (compareAutoSelect(o.id, best.id, autoSelect, latency, bandwidth) < 0) best = o;
   }
   return best;
 }

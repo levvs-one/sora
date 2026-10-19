@@ -20,6 +20,23 @@ class Entry {
   bool get isGroup => members.length > 1;
   bool get ordered => roles.isNotEmpty;
 
+  /// Copy with the user-facing name replaced. Override renames apply to
+  /// single-server entries only; group titles keep the shared subscription
+  /// name so grouping stays stable.
+  Entry renamed(String name) => Entry._(id, name, members, roles);
+
+  /// Copy without [hidden] members, or null when none remain.
+  Entry? withoutHidden(Set<String> hidden) {
+    if (hidden.isEmpty) return this;
+    final visible = [for (final o in members) if (!hidden.contains(o.id)) o];
+    if (visible.isEmpty) return null;
+    if (visible.length == members.length) return this;
+    return Entry._(id, name, visible, {
+      for (final o in visible)
+        if (roles[o.id] != null) o.id: roles[o.id]!,
+    });
+  }
+
   /// Returns main members first, then backups. Unlabelled members of a group
   /// with roles are treated as backups.
   List<OutboundSpec> get byRole => [

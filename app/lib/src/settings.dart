@@ -44,6 +44,12 @@ class Settings {
     'checkUpdates',
     'notifiedUpdate',
     'resumeAfterUpdate',
+    'serverSortMode',
+    'autoSelectMode',
+    'restoreOnCrash',
+    'benchmarkHistory',
+    'sessionIntent',
+    'subscriptionOverrides',
   };
 
   final SharedPreferencesWithCache _store;
@@ -227,6 +233,31 @@ class Settings {
   Future<void> saveNotifiedUpdate(String value) => _store.setString('notifiedUpdate', value);
   bool get resumeAfterUpdate => _store.getBool('resumeAfterUpdate') ?? false;
   Future<void> saveResumeAfterUpdate(bool value) => _store.setBool('resumeAfterUpdate', value);
+
+  /// Server list sort: ping, speed or name.
+  String get serverSortMode => _store.getString('serverSortMode') ?? 'ping';
+  set serverSortMode(String value) => _store.setString('serverSortMode', value);
+
+  /// Automatic server choice: ping, speed or smart (ping 40% + speed 40% +
+  /// measurement freshness 20%).
+  String get autoSelectMode => _store.getString('autoSelectMode') ?? 'ping';
+  set autoSelectMode(String value) => _store.setString('autoSelectMode', value);
+
+  /// Offer to restore the session when the app restarts after a crash.
+  bool get restoreOnCrash => _store.getBool('restoreOnCrash') ?? true;
+  set restoreOnCrash(bool value) => _store.setBool('restoreOnCrash', value);
+
+  /// Bandwidth history as JSON: {serverId: {bps, at}}.
+  String get benchmarkHistory => _store.getString('benchmarkHistory') ?? '';
+  set benchmarkHistory(String value) => _store.setString('benchmarkHistory', value);
+
+  /// Crash-recovery marker written on connect, cleared on clean disconnect.
+  String get sessionIntent => _store.getString('sessionIntent') ?? '';
+  set sessionIntent(String value) => _store.setString('sessionIntent', value);
+
+  /// Subscription overrides as JSON: {subId: {renames: {id: name}, hidden: [id]}}.
+  String get subscriptionOverrides => _store.getString('subscriptionOverrides') ?? '';
+  set subscriptionOverrides(String value) => _store.setString('subscriptionOverrides', value);
 
   /// Original system proxy settings and Sora's endpoint, retained until
   /// restoration. Saving is awaited before proxy changes to allow crash

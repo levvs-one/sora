@@ -674,6 +674,8 @@ String describe(S s, CoreFailure failure) {
     'core.subscription.no_servers' || 'core.subscription.empty' => s.errSubEmpty,
     'core.subscription.fetch_failed' || 'core.subscription.status' || 'core.subscription.too_large' => s.errSubFetch,
     'core.secret.store_corrupt' || 'core.secret.store_unavailable' => s.errSecretStore,
+    'app.core_watch_unstable' => s.coreWatchUnstable,
+    'app.benchmark_unsupported' => s.errBenchmarkUnsupported,
     _ when key.startsWith('core.plan.') => s.errServers,
     _ => s.errGeneric,
   };
