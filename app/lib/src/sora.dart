@@ -68,6 +68,14 @@ final class ServerReturned extends Notice {
   final String entry;
 }
 
+/// The pinned server degraded while auto-switch was on, so the app moved to
+/// the best measured alternative.
+final class ServerDegraded extends Notice {
+  const ServerDegraded(this.entry);
+
+  final String entry;
+}
+
 /// App state and core operations. Screens access it through [SoraScope] and
 /// rebuild on notifications.
 class Sora extends ChangeNotifier {
@@ -201,6 +209,7 @@ class Sora extends ChangeNotifier {
       ConnectionFailed(:final failure) => (s.noticeFailed, describe(s, failure), 'connect'),
       ServerSwitched(:final entry, :final backup) => (entry, backup ? s.noticeBackup : s.noticeNext, 'logs'),
       ServerReturned(:final entry) => (entry, s.noticeMainBack, ''),
+      ServerDegraded(:final entry) => (entry, s.noticeDegraded, 'logs'),
     };
     return AppNotification(time: DateTime.now(), title: title, body: body, action: action);
   }
@@ -411,6 +420,7 @@ class Sora extends ChangeNotifier {
     bandwidth: bandwidth,
     entry: selected.startsWith(groupPrefix) ? entryOf(selected, _subscriptions.values) : null,
     zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
+    reliabilityOf: reliabilityOf,
   );
 
   @override
@@ -958,6 +968,7 @@ class Sora extends ChangeNotifier {
             bandwidth: bandwidth,
             chain: via.hops,
             zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
+            reliabilityOf: reliabilityOf,
           );
     if (plan.tunStack.isNotEmpty && link.minor < 7) {
       failure = const CoreFailure('core.api.version_mismatch');
@@ -1344,6 +1355,7 @@ class Sora extends ChangeNotifier {
       await for (final r in call) {
         if (_disposed || link != _link || busy || (phase != Phase.off && phase != Phase.connected)) break;
         latency[r.serverId] = r.reachable ? r.latencyMs : null;
+        _recordProbe(r.serverId, r.reachable);
         final now = DateTime.now();
         if (now.difference(lastNotify) >= _probeNotifyInterval) {
           lastNotify = now;
@@ -1360,8 +1372,58 @@ class Sora extends ChangeNotifier {
       _probeCall = null;
       probing = false;
       probingSubscription = null;
+      _maybeAutoSwitch();
       notifyListeners();
     }
+  }
+
+  /// Auto-switch on degradation fires at most this often. Switching servers
+  /// reconnects the tunnel, so flapping would hurt more than help; the
+  /// settings text promises this bound, keep them in sync.
+  static const autoSwitchCooldown = Duration(minutes: 10);
+
+  /// Last degradation-driven switch; the cooldown above throttles switches,
+  /// not probes.
+  DateTime? _lastAutoSwitch;
+
+  /// Moves the pinned selection to the best measured alternative when the
+  /// selected server degrades. Runs after each probe; throttled by
+  /// [autoSwitchCooldown]. Never touches 'auto' (the core's url-test group
+  /// already switches there), groups, profiles or bypass.
+  void _maybeAutoSwitch() {
+    if (_disposed || !settings.autoSwitchOnDegrade) return;
+    if (phase != Phase.connected || _link == null) return;
+    final current = selected;
+    if (current == 'auto' || current == 'bypass' || current.startsWith(groupPrefix)) return;
+    final spec = servers.where((o) => o.id == current).firstOrNull;
+    if (spec == null || isProfile(spec)) return;
+    final now = DateTime.now();
+    if (_lastAutoSwitch != null && now.difference(_lastAutoSwitch!) < autoSwitchCooldown) return;
+    final candidates = [for (final o in servers) if (!isProfile(o) && o.id != current) o];
+    if (candidates.isEmpty) return;
+    final best = _fastest(
+      candidates,
+      latency,
+      bandwidth: bandwidth,
+      autoSelect: settings.autoSelectMode,
+      reliabilityOf: reliabilityOf,
+    );
+    if (!_degraded(current, best.id)) return;
+    _lastAutoSwitch = now;
+    _emit(ServerDegraded(displayNameOf(best.id)));
+    unawaited(select(best.id));
+  }
+
+  /// True when [current] stopped answering or is clearly slower than [best]:
+  /// at least twice the ping and 100 ms behind. Unknown measurements never
+  /// trigger a switch — no blind moves.
+  bool _degraded(String current, String best) {
+    if (best == current) return false;
+    final curMs = latency[current];
+    if (latency.containsKey(current) && curMs == null) return true;
+    final bestMs = latency[best];
+    if (curMs == null || bestMs == null) return false;
+    return bestMs * 2 <= curMs && curMs - bestMs >= 100;
   }
 
   /// Core client and authentication token for direct screen requests, such as
@@ -1404,6 +1466,36 @@ class Sora extends ChangeNotifier {
 
   /// Fresh (non-stale) throughput for [id], or null when unknown or outdated.
   int? freshBandwidth(String id) => freshBandwidthOf(bandwidth, id);
+
+  /// Recent probe outcomes per server: answered vs missed probes. In-memory
+  /// only — probes are cheap, so reliability always reflects fresh data and
+  /// needs no migration or persistence.
+  final Map<String, ({int ok, int fail})> probeStats = {};
+
+  /// How many recent probe outcomes bound each server's reliability.
+  static const probeHistoryDepth = 20;
+
+  /// Share of recent probes the server answered (0..1), or null when it has
+  /// no probe history yet. Feeds the smart score and the list indicator.
+  double? reliabilityOf(String id) {
+    final stats = probeStats[id];
+    if (stats == null) return null;
+    final total = stats.ok + stats.fail;
+    if (total == 0) return null;
+    return stats.ok / total;
+  }
+
+  /// Records one probe outcome, decaying old history instead of a hard
+  /// window so recent probes rule without cliff effects.
+  void _recordProbe(String id, bool ok) {
+    final stats = probeStats[id] ?? (ok: 0, fail: 0);
+    var good = stats.ok, bad = stats.fail;
+    if (good + bad >= probeHistoryDepth) {
+      good ~/= 2;
+      bad ~/= 2;
+    }
+    probeStats[id] = ok ? (ok: good + 1, fail: bad) : (ok: good, fail: bad + 1);
+  }
 
   bool benchmarking = false;
   ResponseStream<BandwidthSample>? _benchmarkCall;
@@ -1492,7 +1584,27 @@ class Sora extends ChangeNotifier {
     if (mode == 'name') {
       return displayNameOf(a).toLowerCase().compareTo(displayNameOf(b).toLowerCase());
     }
-    return compareAutoSelect(a, b, mode, latency, bandwidth);
+    return compareAutoSelect(a, b, mode, latency, bandwidth, reliabilityOf: reliabilityOf);
+  }
+
+  /// The server the smart auto-select ranks first right now, with the metrics
+  /// behind the choice. Null when there is nothing to rank or nothing
+  /// measured yet — the UI shows no "why" badge then.
+  ({String id, int? ms, int? bps})? smartPick() {
+    final ordinary = [for (final o in servers) if (!isProfile(o)) o];
+    if (ordinary.isEmpty) return null;
+    final anyMeasured = ordinary.any(
+      (o) => latency.containsKey(o.id) || bandwidth.containsKey(o.id) || probeStats.containsKey(o.id),
+    );
+    if (!anyMeasured) return null;
+    final best = _fastest(
+      ordinary,
+      latency,
+      bandwidth: bandwidth,
+      autoSelect: 'smart',
+      reliabilityOf: reliabilityOf,
+    );
+    return (id: best.id, ms: latency[best.id], bps: freshBandwidth(best.id));
   }
 
   /// Scales bytes by powers of 1024, returning the value and unit index (B to
@@ -1534,6 +1646,7 @@ SessionPlan buildPlan({
   Entry? entry,
   List<String> chain = const [],
   bool zapretWithVpn = false,
+  double? Function(String id)? reliabilityOf,
 }) {
   final plan = SessionPlan(
     tunnelMode: settings.tunnel == 'proxy' ? TunnelMode.TUNNEL_MODE_APPLICATION : TunnelMode.TUNNEL_MODE_SYSTEM,
@@ -1616,7 +1729,7 @@ SessionPlan buildPlan({
   if (entry != null && entry.members.any(isProfile)) {
     // Profiles cannot share an engine. Select one reachable member by role
     // priority or latency.
-    choice = pickMember(entry, latency).id;
+    choice = pickMember(entry, latency, reliabilityOf: reliabilityOf).id;
   } else if (entry != null) {
     // mihomo supports role-ordered fallback groups. Other engines compare only
     // main members by latency; unlabelled groups compare all members.
@@ -1644,7 +1757,15 @@ SessionPlan buildPlan({
   }
   final picked = profiles.where((o) => o.id == choice).firstOrNull;
   if (picked != null || (choice == 'auto' && ordinary.isEmpty && profiles.isNotEmpty)) {
-    final profile = picked ?? _fastest(profiles, latency, bandwidth: bandwidth, autoSelect: settings.autoSelectMode);
+    final profile =
+        picked ??
+        _fastest(
+          profiles,
+          latency,
+          bandwidth: bandwidth,
+          autoSelect: settings.autoSelectMode,
+          reliabilityOf: reliabilityOf,
+        );
     plan.outbounds.add(profile);
     plan.routing.proxyTarget = profile.id;
     addRules(profile.id);
@@ -1692,6 +1813,7 @@ OutboundSpec pickMember(
   Map<String, int?> latency, {
   Map<String, ({int bps, DateTime at})> bandwidth = const {},
   String autoSelect = 'ping',
+  double? Function(String id)? reliabilityOf,
 }) {
   bool down(OutboundSpec o) => latency.containsKey(o.id) && latency[o.id] == null;
   if (entry.ordered) return entry.byRole.firstWhere((o) => !down(o), orElse: () => entry.byRole.first);
@@ -1699,7 +1821,13 @@ OutboundSpec pickMember(
     for (final o in entry.members)
       if (!down(o)) o,
   ];
-  return _fastest(up.isEmpty ? entry.members : up, latency, bandwidth: bandwidth, autoSelect: autoSelect);
+  return _fastest(
+    up.isEmpty ? entry.members : up,
+    latency,
+    bandwidth: bandwidth,
+    autoSelect: autoSelect,
+    reliabilityOf: reliabilityOf,
+  );
 }
 
 /// Checks whether a server is a full Xray profile from a JSON subscription.
@@ -1714,8 +1842,14 @@ int? freshBandwidthOf(Map<String, ({int bps, DateTime at})> bandwidth, String id
 }
 
 /// Smart score in [0, 1] (higher is better): ping 40%, speed 40%,
-/// measurement freshness 20%.
-double smartScoreOf(String id, Map<String, int?> latency, Map<String, ({int bps, DateTime at})> bandwidth) {
+/// measurement freshness 20%, scaled by [reliability] when known — a server
+/// answering half of its recent probes keeps three quarters of its score.
+double smartScoreOf(
+  String id,
+  Map<String, int?> latency,
+  Map<String, ({int bps, DateTime at})> bandwidth, {
+  double? reliability,
+}) {
   var score = 0.0;
   var measured = false;
   final ms = latency[id];
@@ -1740,6 +1874,11 @@ double smartScoreOf(String id, Map<String, int?> latency, Map<String, ({int bps,
       score += 0.1;
     }
   }
+  if (reliability != null) {
+    // Flaky servers rank lower even with a good ping; unknown reliability
+    // keeps the score untouched rather than punished.
+    score *= 0.5 + 0.5 * reliability.clamp(0.0, 1.0);
+  }
   return score;
 }
 
@@ -1750,8 +1889,9 @@ int compareAutoSelect(
   String b,
   String mode,
   Map<String, int?> latency,
-  Map<String, ({int bps, DateTime at})> bandwidth,
-) {
+  Map<String, ({int bps, DateTime at})> bandwidth, {
+  double? Function(String id)? reliabilityOf,
+}) {
   int byPing() => (latency[a] ?? 1 << 30).compareTo(latency[b] ?? 1 << 30);
   switch (mode) {
     case 'speed':
@@ -1764,7 +1904,12 @@ int compareAutoSelect(
       }
       return byPing();
     case 'smart':
-      final bySmart = smartScoreOf(b, latency, bandwidth).compareTo(smartScoreOf(a, latency, bandwidth));
+      final bySmart = smartScoreOf(
+        b,
+        latency,
+        bandwidth,
+        reliability: reliabilityOf?.call(b),
+      ).compareTo(smartScoreOf(a, latency, bandwidth, reliability: reliabilityOf?.call(a)));
       return bySmart != 0 ? bySmart : byPing();
     default:
       return byPing();
@@ -1778,10 +1923,13 @@ OutboundSpec _fastest(
   Map<String, int?> latency, {
   Map<String, ({int bps, DateTime at})> bandwidth = const {},
   String autoSelect = 'ping',
+  double? Function(String id)? reliabilityOf,
 }) {
   var best = profiles.first;
   for (final o in profiles) {
-    if (compareAutoSelect(o.id, best.id, autoSelect, latency, bandwidth) < 0) best = o;
+    if (compareAutoSelect(o.id, best.id, autoSelect, latency, bandwidth, reliabilityOf: reliabilityOf) < 0) {
+      best = o;
+    }
   }
   return best;
 }

@@ -243,9 +243,15 @@ class Settings {
   set serverSortMode(String value) => _store.setString('serverSortMode', value);
 
   /// Automatic server choice: ping, speed or smart (ping 40% + speed 40% +
-  /// measurement freshness 20%).
+  /// measurement freshness 20%, scaled by probe reliability when known).
   String get autoSelectMode => _store.getString('autoSelectMode') ?? 'ping';
   set autoSelectMode(String value) => _store.setString('autoSelectMode', value);
+
+  /// Switches the pinned server to the best measured alternative when it
+  /// degrades (stops answering or gets clearly slower) — at most once every
+  /// 10 minutes. Never touches 'auto', groups, profiles or bypass.
+  bool get autoSwitchOnDegrade => _store.getBool('autoSwitchOnDegrade') ?? false;
+  set autoSwitchOnDegrade(bool value) => _store.setBool('autoSwitchOnDegrade', value);
 
   /// Offer to restore the session when the app restarts after a crash.
   bool get restoreOnCrash => _store.getBool('restoreOnCrash') ?? true;
