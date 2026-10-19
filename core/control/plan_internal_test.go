@@ -439,3 +439,33 @@ func TestParseCredentialRejectsForeignMaterial(t *testing.T) {
 		t.Fatalf("parseCredential(valid document) = %v, want nil", err)
 	}
 }
+
+// TestSplitDNSServerParsesPortsSafely locks SORA-M13: host:port and
+// [ipv6]:port go through net.SplitHostPort, and bare IPv6 literals are
+// never split on a colon.
+func TestSplitDNSServerParsesPortsSafely(t *testing.T) {
+	for _, tc := range []struct {
+		in        string
+		host      string
+		port      uint16
+		transport engine.DNSTransport
+	}{
+		{"1.1.1.1", "1.1.1.1", 0, engine.DNSPlain},
+		{"1.1.1.1:53", "1.1.1.1", 53, engine.DNSPlain},
+		{"tls://dns.example.com:853", "dns.example.com", 853, engine.DNSTLS},
+		{"https://1.1.1.1/dns-query", "1.1.1.1", 0, engine.DNSHTTPS},
+		{"[2001:db8::1]:853", "2001:db8::1", 853, engine.DNSPlain},
+		{"tls://[2001:db8::1]:853", "2001:db8::1", 853, engine.DNSTLS},
+		{"2001:db8::1", "2001:db8::1", 0, engine.DNSPlain},
+		{"2001:db8::53", "2001:db8::53", 0, engine.DNSPlain},
+		{"dns.example.com:notaport", "dns.example.com:notaport", 0, engine.DNSPlain},
+	} {
+		t.Run(tc.in, func(t *testing.T) {
+			host, port, transport := splitDNSServer(tc.in)
+			if host != tc.host || port != tc.port || transport != tc.transport {
+				t.Errorf("splitDNSServer(%q) = %q, %d, %q; want %q, %d, %q",
+					tc.in, host, port, transport, tc.host, tc.port, tc.transport)
+			}
+		})
+	}
+}

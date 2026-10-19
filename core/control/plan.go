@@ -685,9 +685,19 @@ func splitDNSServer(address string) (host string, port uint16, transport engine.
 		}
 	}
 	rest = strings.TrimSuffix(rest, "/dns-query")
-	if head, tail, found := strings.Cut(rest, ":"); found {
-		if parsed, err := strconv.ParseUint(tail, 10, 16); err == nil {
-			return head, uint16(parsed), transport
+	// Prefer net.SplitHostPort for host:port and [ipv6]:port; a naive cut
+	// on the first colon mangles IPv6 literals (SORA-M13).
+	if host, portStr, err := net.SplitHostPort(rest); err == nil {
+		if parsed, err := strconv.ParseUint(portStr, 10, 16); err == nil {
+			return host, uint16(parsed), transport
+		}
+		return rest, 0, transport
+	}
+	// Fall back to a trailing :port for bare names and addresses. A bare
+	// IPv6 literal holds more than one colon and must stay whole.
+	if i := strings.LastIndexByte(rest, ':'); i >= 0 && !strings.Contains(rest[:i], ":") {
+		if parsed, err := strconv.ParseUint(rest[i+1:], 10, 16); err == nil {
+			return rest[:i], uint16(parsed), transport
 		}
 	}
 	return rest, 0, transport
