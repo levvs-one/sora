@@ -562,6 +562,12 @@ func tun(t engine.Tun) obj {
 		"stack":        orDefault(t.Stack, "mixed"),
 		"mtu":          orDefaultInt(t.MTU, 9000),
 	}.set("interface_name", t.DeviceName).
+		// Custom routes replace the default route when auto_route installs
+		// them (Windows/macOS; Linux routing belongs to tunroute). Same
+		// field mihomo renders as route-address; the values are CIDRs, so
+		// sing-box gets route_address rather than the rule-set-tagged
+		// route_address_set added in 1.11.
+		set("route_address", t.RouteAddressSets).
 		// Package filters apply only on Android; desktop application
 		// routing uses process rules.
 		set("include_package", t.IncludeApps).set("exclude_package", t.ExcludeApps)

@@ -110,6 +110,34 @@ func TestTunUsesSessionAddressesAndLinuxPolicyRouting(t *testing.T) {
 	}
 }
 
+func TestTunRendersRouteAddressSets(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Tun = engine.Tun{Enabled: true, RouteAddressSets: []string{"10.0.0.0/8", "fd00::/8"}}
+	cfg := render(t, p)
+	var inbound map[string]any
+	for _, in := range cfg["inbounds"].([]any) {
+		if in.(map[string]any)["type"] == "tun" {
+			inbound = in.(map[string]any)
+		}
+	}
+	addrs, _ := inbound["route_address"].([]any)
+	if len(addrs) != 2 || addrs[0] != "10.0.0.0/8" || addrs[1] != "fd00::/8" {
+		t.Fatalf("route_address = %v, want the plan's RouteAddressSets", inbound["route_address"])
+	}
+	// Empty sets must stay unset so auto_route keeps installing the
+	// default route.
+	p.Tun.RouteAddressSets = nil
+	cfg = render(t, p)
+	for _, in := range cfg["inbounds"].([]any) {
+		if in.(map[string]any)["type"] == "tun" {
+			inbound = in.(map[string]any)
+		}
+	}
+	if _, ok := inbound["route_address"]; ok {
+		t.Fatalf("route_address must be omitted when unset, got %v", inbound["route_address"])
+	}
+}
+
 // TestEngineAcceptsRenderedPlans checks rendered grammar with "sing-box check"
 // whenever a binary is available.
 func TestEngineAcceptsRenderedPlans(t *testing.T) {

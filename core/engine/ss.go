@@ -127,7 +127,8 @@ const (
 	// password, cheap to brute force (Xray docs recommend 16+ chars).
 	WarnShadowsocksWeakPassword = "shadowsocks-weak-password"
 	// WarnShadowsocks2022BadKey: a SIP022 method whose password is not a
-	// base64 PSK of the required length; the engines will fail to dial.
+	// base64 PSK of the required length; strict engines (sing-box, mihomo)
+	// refuse to dial, so the key is almost certainly broken.
 	WarnShadowsocks2022BadKey = "shadowsocks-2022-bad-key"
 	// WarnShadowsocksUnknownMethod: a method sora does not recognize; the
 	// selected engine may reject it.
