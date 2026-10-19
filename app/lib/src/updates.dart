@@ -19,6 +19,9 @@ enum UpdateConnection { idle, connected, changing, unknown }
 
 enum UpdateError { network, release, checksum, installation, connecting, unsupported }
 
+/// Visible phase of an in-flight update flow (FEATURE-PLAN.md F7).
+enum UpdateStage { idle, checking, downloading, verifying, installing }
+
 class UpdateFailure implements Exception {
   const UpdateFailure(this.reason);
   final UpdateError reason;
@@ -224,6 +227,22 @@ class AppUpdater extends ChangeNotifier {
   final _clients = <http.Client>{};
   bool get hasUpdate => !installed && latest != null && newerRelease(latest!.version, version);
 
+  /// Visible phase of the update flow; idle when nothing is in flight.
+  UpdateStage stage = UpdateStage.idle;
+
+  Completer<void>? _abort;
+  bool _cancelled = false;
+
+  /// Cancels an in-flight update check or download. The install handoff
+  /// itself (package manager / setup launch) cannot be cancelled.
+  void cancel() {
+    if (_disposed) return;
+    _cancelled = true;
+    final abort = _abort;
+    if (abort != null && !abort.isCompleted) abort.complete();
+    notifyListeners();
+  }
+
   void start() {
     if (_started || _disposed) return;
     _started = true;
@@ -247,6 +266,8 @@ class AppUpdater extends ChangeNotifier {
   Future<void> check({bool manual = false}) async {
     if (_disposed || checking || busy || (!manual && !settings.checkUpdates)) return;
     checking = true;
+    stage = UpdateStage.checking;
+    _cancelled = false;
     if (manual) error = null;
     notifyListeners();
     try {
@@ -263,9 +284,14 @@ class AppUpdater extends ChangeNotifier {
         if (!_disposed) await available(release);
       }
     } catch (e) {
-      if (manual) error = e is UpdateFailure ? e.reason : UpdateError.network;
+      if (_cancelled) {
+        error = null;
+      } else if (manual) {
+        error = e is UpdateFailure ? e.reason : UpdateError.network;
+      }
     } finally {
       checking = false;
+      stage = UpdateStage.idle;
       if (!_disposed) notifyListeners();
     }
   }
@@ -275,7 +301,7 @@ class AppUpdater extends ChangeNotifier {
     _clients.add(client);
     IOSink? sink;
     final bytes = <int>[];
-    final abort = Completer<void>();
+    final abort = _abort = Completer<void>();
     final deadline = Timer(
       target == null ? const Duration(seconds: 20) : const Duration(minutes: 30),
       () => abort.complete(),
@@ -320,6 +346,7 @@ class AppUpdater extends ChangeNotifier {
       deadline.cancel();
       client.close();
       _clients.remove(client);
+      if (identical(_abort, abort)) _abort = null;
       await sink?.close();
     }
   }
@@ -342,6 +369,8 @@ class AppUpdater extends ChangeNotifier {
     manualCommand = null;
     busy = true;
     progress = null;
+    stage = UpdateStage.checking;
+    _cancelled = false;
     notifyListeners();
     bool handedOff = false;
     try {
@@ -362,7 +391,11 @@ class AppUpdater extends ChangeNotifier {
       await File('${work.path}/SHA256SUMS').writeAsString(manifest, flush: true);
       for (final asset in assets) {
         final file = File('${work.path}/${asset.name}');
+        stage = UpdateStage.downloading;
+        notifyListeners();
         await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);
+        stage = UpdateStage.verifying;
+        notifyListeners();
         await verifyUpdateFile(file, manifest, asset.name);
       }
       _guard();
@@ -371,6 +404,8 @@ class AppUpdater extends ChangeNotifier {
       if (_windows) {
         await settings.saveResumeAfterUpdate(connection() == UpdateConnection.connected);
         _guard();
+        stage = UpdateStage.installing;
+        notifyListeners();
         await launchWindows(File('${work.path}/${names.single}'));
         handedOff = true;
         await quit();
@@ -383,6 +418,8 @@ class AppUpdater extends ChangeNotifier {
         _guard();
         await settings.saveResumeAfterUpdate(connection() == UpdateConnection.connected);
         _guard();
+        stage = UpdateStage.installing;
+        notifyListeners();
         final result = await _run('/usr/bin/pkexec', [
           updateHelper,
           installation!.format.name,
@@ -398,10 +435,11 @@ class AppUpdater extends ChangeNotifier {
         await quit();
       }
     } catch (e) {
-      error = e is UpdateFailure ? e.reason : UpdateError.installation;
+      error = _cancelled ? null : (e is UpdateFailure ? e.reason : UpdateError.installation);
     } finally {
       busy = false;
       progress = null;
+      stage = UpdateStage.idle;
       if (!handedOff && !installed) await settings.saveResumeAfterUpdate(false);
       // Keep verified files for the manual command or a launched Windows setup.
       if (!handedOff && manualCommand == null && _work != null) {

@@ -187,9 +187,29 @@ class _AboutScreenState extends State<AboutScreen> {
                         backgroundColor: palette.field,
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        updates.progress == null ? s.updateInstalling : s.updateDownloading,
-                        style: Styles.caption.copyWith(color: palette.ink2),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              switch (updates.stage) {
+                                UpdateStage.verifying => s.updateStageVerify,
+                                UpdateStage.installing => s.updateInstalling,
+                                _ => s.updateDownloading,
+                              },
+                              style: Styles.caption.copyWith(color: palette.ink2),
+                            ),
+                          ),
+                          if (updates.stage == UpdateStage.downloading ||
+                              updates.stage == UpdateStage.checking)
+                            Pressable(
+                              onTap: updates.cancel,
+                              radius: 8,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                child: Text(s.cancel, style: Styles.caption.copyWith(color: palette.ink2)),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                     if (!canInstall) ...[
