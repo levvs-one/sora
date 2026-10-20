@@ -114,7 +114,7 @@ func (r *QUICResult) Advice() string {
 		return "QUIC reaches the host: prefer it, no fallback needed."
 	case VerdictBlocked:
 		return "QUIC is dropped on this path while TCP answers: do not retry QUIC from UDP source port " +
-			fmt.Sprint(r.LocalPort) + " for 420s (the ban self-renews); rotate the source port for the next attempt, and measure TCP quality before falling back to it."
+			strconv.Itoa(r.LocalPort) + " for 420s (the ban self-renews); rotate the source port for the next attempt, and measure TCP quality before falling back to it."
 	case VerdictFiltered:
 		return "the port refused the probe: no QUIC server there, or a firewall answered; not a censorship verdict."
 	case VerdictDown:
@@ -220,7 +220,7 @@ func (r *QUICResult) withControl(ctx context.Context, host string, port int) (*Q
 		return nil, ctx.Err()
 	}
 	d := net.Dialer{Timeout: quicProbeTimeout}
-	tcpAddr := net.JoinHostPort(host, fmt.Sprint(port))
+	tcpAddr := net.JoinHostPort(host, strconv.Itoa(port))
 	c, err := d.DialContext(ctx, "tcp", tcpAddr)
 	if err != nil {
 		r.Verdict = VerdictDown
