@@ -425,7 +425,12 @@ class AppUpdater extends ChangeNotifier {
         '[updates] install cohort $cohort is not included in the ${policy.percent}% rollout '
         'of ${release.version}; withholding the update for now',
       );
-      rolloutPending = true;
+      // Surface the "pending" note only when a newer release actually exists:
+      // if this install is already on (or ahead of) the rolled-out version —
+      // e.g. the user updated while percent was 100 and the owner later
+      // lowered it — the note would falsely claim a newer version is on its
+      // way. hasUpdate stays false either way.
+      rolloutPending = newerRelease(release.version, version);
       return;
     }
     debugPrint('[updates] install cohort $cohort is included in the ${policy.percent}% rollout of ${release.version}');
