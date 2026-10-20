@@ -46,6 +46,11 @@ type FetchOptions struct {
 	// fallback-url fragment on the reference itself is honoured too
 	// and is used when this field is empty.
 	FallbackURL string
+	// Device carries the provider device identity (C1, see device.go).
+	// It is attached to this fetch only — primary, fallback and every
+	// redirect hop — and to nothing else the client ever requests.
+	// The zero value sends no device headers (the user's opt-out).
+	Device DeviceHeaders
 }
 
 // Result is one retrieved subscription.
@@ -138,6 +143,10 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 	if err != nil {
 		return Result{}, err
 	}
+	device, err := opts.Device.validated()
+	if err != nil {
+		return Result{}, err
+	}
 	primary, fragmentFallback, err := SplitFallback(reference)
 	if err != nil {
 		return Result{}, err
@@ -151,14 +160,14 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 			return Result{}, err
 		}
 	}
-	result, err := f.fetch(ctx, primary, agent)
+	result, err := f.fetch(ctx, primary, agent, device)
 	if err == nil {
 		return result, nil
 	}
 	if fallback == "" || ctx.Err() != nil {
 		return Result{}, err
 	}
-	reserve, reserveErr := f.fetch(ctx, fallback, agent)
+	reserve, reserveErr := f.fetch(ctx, fallback, agent, device)
 	if reserveErr != nil {
 		return Result{}, err
 	}
@@ -169,7 +178,7 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 // fetch retrieves one reference, following validated redirects. The
 // fragment is cleared before the first request: fragments are client
 // side only and must never reach a provider.
-func (f *Fetcher) fetch(ctx context.Context, reference string, agent string) (Result, error) {
+func (f *Fetcher) fetch(ctx context.Context, reference string, agent string, device DeviceHeaders) (Result, error) {
 	target, err := ValidateReference(reference)
 	if err != nil {
 		return Result{}, err
@@ -184,7 +193,7 @@ func (f *Fetcher) fetch(ctx context.Context, reference string, agent string) (Re
 			return Result{}, errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionRedirect,
 				"subscription: the provider led the request more than %d times", f.maxRedirects)
 		}
-		body, header, location, err := f.hop(ctx, target, agent)
+		body, header, location, err := f.hop(ctx, target, agent, device)
 		if err != nil {
 			return Result{}, err
 		}
@@ -207,7 +216,7 @@ func (f *Fetcher) fetch(ctx context.Context, reference string, agent string) (Re
 }
 
 // hop returns one response's body and headers or its redirect target.
-func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string) ([]byte, http.Header, string, error) {
+func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string, device DeviceHeaders) ([]byte, http.Header, string, error) {
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, target.String(), nil)
 	if err != nil {
 		// HTTP errors include bearer URLs; rebuild details using only
@@ -216,6 +225,10 @@ func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string) ([]byt
 			"subscription: the reference is not a url this client can request")
 	}
 	request.Header.Set("User-Agent", agent)
+	// The device identity rides this request only; hop is called for
+	// the primary, the fallback and every redirect, and for nothing
+	// outside a subscription fetch.
+	device.apply(request.Header)
 	request.Header.Set("Accept", "text/plain, application/octet-stream, */*")
 	// Bound decompressed size so compressed responses cannot exceed the
 	// body limit.
