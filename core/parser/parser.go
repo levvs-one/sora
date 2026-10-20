@@ -349,7 +349,7 @@ func parseLink(raw string) (OutboundSpec, error) {
 	}
 	proto := strings.ToLower(u.Scheme)
 	if proto == "vmess" {
-		return parseVMess(u)
+		return parseVMess(raw, u)
 	}
 	if proto == "wireguard" || proto == "wg" {
 		return parseWireURL(u)
@@ -535,15 +535,26 @@ func countryCode(s string) string {
 	}
 	return ""
 }
-func parseVMess(u *url.URL) (OutboundSpec, error) {
-	raw := strings.TrimPrefix(u.Opaque, "//")
-	if raw == "" {
-		raw = strings.TrimPrefix(u.Path, "/")
-	}
-	if b, ok := decodeBase64(raw); ok {
-		var v map[string]any
-		if json.Unmarshal(b, &v) == nil {
-			return mapJSONSpec(v, "vmess")
+func parseVMess(raw string, u *url.URL) (OutboundSpec, error) {
+	// The classic VMess share link is vmess://<base64 JSON>. url.Parse
+	// puts the blob in u.Host (and splits it at any "/" into u.Path), so
+	// the payload must be recovered from the raw link text: the former
+	// code read u.Opaque/u.Path, which never hold the blob, and the
+	// base64 branch was unreachable — every classic VMess link failed
+	// validation and was silently dropped from mixed imports
+	// (WAVE-INTEGRATION E2E).
+	if blob, frag, ok := vmessBlob(raw); ok {
+		if b, isB64 := decodeBase64(blob); isB64 {
+			var v map[string]any
+			if json.Unmarshal(b, &v) == nil {
+				if _, classic := v["add"]; classic {
+					return mapVMessJSON(v, frag)
+				}
+				if _, classic := v["id"]; classic {
+					return mapVMessJSON(v, frag)
+				}
+				return mapJSONSpec(v, "vmess")
+			}
 		}
 	}
 	if u.Hostname() == "" {
@@ -572,6 +583,89 @@ func parseVMess(u *url.URL) (OutboundSpec, error) {
 	o.DisplayName = fragmentName(u.Fragment)
 	return o, o.validate()
 }
+// vmessBlob extracts the payload of a classic vmess://<base64> link:
+// everything after the scheme, minus an optional query and fragment.
+// The fragment is returned separately as a fallback display name. ok is
+// false when the link has no payload at all (the URL-style form, which
+// parseVMess handles from the parsed URL instead).
+func vmessBlob(raw string) (blob, frag string, ok bool) {
+	s := strings.TrimSpace(raw)
+	i := strings.Index(s, "://")
+	if i < 0 {
+		return "", "", false
+	}
+	rest := s[i+3:]
+	if j := strings.Index(rest, "#"); j >= 0 {
+		frag = fragmentName(rest[j+1:])
+		rest = rest[:j]
+	}
+	if j := strings.Index(rest, "?"); j >= 0 {
+		rest = rest[:j]
+	}
+	rest = strings.TrimSpace(rest)
+	if rest == "" {
+		return "", "", false
+	}
+	return rest, frag, true
+}
+
+// mapVMessJSON maps the classic VMess JSON document (the v2rayN field
+// set every provider emits) onto an OutboundSpec. "add"/"id" are the
+// dialect markers: the generic JSON mapper reads sing-box-style keys
+// (server/uuid) and would leave both empty here.
+func mapVMessJSON(m map[string]any, frag string) (OutboundSpec, error) {
+	o := OutboundSpec{Protocol: "vmess", Transport: "tcp", Security: "none", Options: map[string]string{}}
+	o.Host = stringValue(m["add"])
+	if o.Host == "" {
+		o.Host = stringValue(m["address"])
+	}
+	o.Port = portNumber(m["port"])
+	o.UUID = stringValue(m["id"])
+	o.DisplayName = stringValue(m["ps"])
+	if o.DisplayName == "" {
+		o.DisplayName = frag
+	}
+	o.Cipher = stringValue(m["scy"])
+	if o.Cipher == "" {
+		o.Cipher = "auto"
+	}
+	if net := stringValue(m["net"]); net != "" {
+		o.Transport = net
+	}
+	switch tls := stringValue(m["tls"]); tls {
+	case "":
+		// Security stays "none".
+	case "tls":
+		o.Security = "tls"
+	default:
+		o.Security = tls
+	}
+	o.ServerName = stringValue(m["sni"])
+	o.HostHeader = stringValue(m["host"])
+	o.Path = stringValue(m["path"])
+	o.Fingerprint = stringValue(m["fp"])
+	if a := stringValue(m["alpn"]); a != "" {
+		o.ALPN = strings.Split(a, ",")
+	}
+	o.AllowInsecure = jsonBool(m["insecure"]) || jsonBool(m["allowInsecure"])
+	o.CountryCode = countryCode(o.DisplayName)
+	return o, o.validate()
+}
+
+// jsonBool reads the loosely typed boolean flags of share-link JSON
+// (true, 1, "1", "true" in the wild).
+func jsonBool(v any) bool {
+	switch x := v.(type) {
+	case bool:
+		return x
+	case float64:
+		return x != 0
+	case string:
+		return x == "1" || strings.EqualFold(x, "true")
+	}
+	return false
+}
+
 func parseWireURL(u *url.URL) (OutboundSpec, error) {
 	p, e := parsePort(u.Port())
 	if e != nil {

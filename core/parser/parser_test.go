@@ -359,3 +359,69 @@ func TestParseJSONAndYAMLKeepDistinctServers(t *testing.T) {
 		t.Fatalf("identical profiles: servers = %d, report = %+v, want 1 kept and 1 skipped duplicate", len(r.Servers), r.Report)
 	}
 }
+
+// TestParseClassicVMessJSON pins the dominant real-world VMess share
+// form, vmess://<base64 JSON> with the v2rayN field set (add/port/id/
+// scy/net/tls/sni). The parser once read the blob from url.URL fields
+// that never contain it, so every classic link failed validation and
+// vanished from mixed imports without a trace (WAVE-INTEGRATION E2E).
+func TestParseClassicVMessJSON(t *testing.T) {
+	doc := `{"v":"2","ps":"🇩🇪 VMess Berlin","add":"vmess.example.com","port":"24444","id":"123e4567-e89b-12d3-a456-426614174000","aid":"0","scy":"aes-128-gcm","net":"ws","type":"none","host":"cdn.example.com","path":"/ws","tls":"tls","sni":"vmess.example.com","alpn":"h2,http/1.1","fp":"chrome"}`
+	link := "vmess://" + base64.StdEncoding.EncodeToString([]byte(doc))
+	r, err := (LinkParser{}).Parse([]byte(link))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 {
+		t.Fatalf("servers = %d, want 1 (report %+v)", len(r.Servers), r.Report)
+	}
+	o := r.Servers[0]
+	if o.Protocol != "vmess" || o.Host != "vmess.example.com" || o.Port != 24444 {
+		t.Fatalf("endpoint = %s %s:%d", o.Protocol, o.Host, o.Port)
+	}
+	if o.UUID != "123e4567-e89b-12d3-a456-426614174000" || o.Cipher != "aes-128-gcm" {
+		t.Fatalf("credentials = uuid %q cipher %q", o.UUID, o.Cipher)
+	}
+	if o.Transport != "ws" || o.Security != "tls" || o.ServerName != "vmess.example.com" {
+		t.Fatalf("transport/security/sni = %q %q %q", o.Transport, o.Security, o.ServerName)
+	}
+	if o.HostHeader != "cdn.example.com" || o.Path != "/ws" || o.Fingerprint != "chrome" {
+		t.Fatalf("ws fields = host %q path %q fp %q", o.HostHeader, o.Path, o.Fingerprint)
+	}
+	if len(o.ALPN) != 2 || o.DisplayName != "🇩🇪 VMess Berlin" {
+		t.Fatalf("alpn/name = %v %q", o.ALPN, o.DisplayName)
+	}
+
+	// Numeric port/aid and the plain (no-TLS) variant.
+	doc2 := `{"v":"2","ps":"plain","add":"192.0.2.5","port":443,"id":"123e4567-e89b-12d3-a456-426614174000","aid":0,"net":"tcp","tls":""}`
+	r2, err := (LinkParser{}).Parse([]byte("vmess://" + base64.RawURLEncoding.EncodeToString([]byte(doc2))))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r2.Servers) != 1 || r2.Servers[0].Port != 443 || r2.Servers[0].Security != "none" || r2.Servers[0].Cipher != "auto" {
+		t.Fatalf("numeric variant = %+v", r2.Servers)
+	}
+
+	// A classic link inside a mixed list must not be dropped silently.
+	mixed := link + "\n" + "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?security=tls#V"
+	r3, err := (LinkParser{}).Parse([]byte(mixed))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r3.Servers) != 2 {
+		t.Fatalf("mixed import servers = %d, want 2 (report %+v)", len(r3.Servers), r3.Report)
+	}
+}
+
+// TestParseVMessURLStyleStillWorks guards the Xray query form, the
+// only VMess dialect the suite exercised before the classic form was
+// restored.
+func TestParseVMessURLStyleStillWorks(t *testing.T) {
+	r, err := (LinkParser{}).Parse([]byte("vmess://123e4567-e89b-12d3-a456-426614174000@node.example.com:443?type=ws&security=tls&path=%2Fws&host=cdn.example.com&sni=cdn.example.com#VMess"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Servers[0].Protocol != "vmess" || r.Servers[0].Transport != "ws" || r.Servers[0].Security != "tls" {
+		t.Fatalf("url-style vmess = %+v", r.Servers)
+	}
+}
