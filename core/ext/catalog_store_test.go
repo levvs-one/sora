@@ -165,11 +165,11 @@ func TestRolloutEligiblePinnedVectors(t *testing.T) {
 		fraction             float64
 		want                 bool
 	}{
-		{"install-0001", "com.example.alpha", "1.0.0", 0.5, true},  // bucket 1113
-		{"install-0005", "com.example.alpha", "1.0.0", 0.5, false}, // bucket 5344
-		{"install-0008", "com.example.alpha", "1.0.0", 0.5, false}, // bucket 9757
-		{"install-0010", "com.example.alpha", "1.0.0", 0.5, true},  // bucket 4223
-		{"install-0004", "com.example.beta", "2.3.1", 0.25, false}, // bucket 4108
+		{"install-0001", "com.example.alpha", "1.0.0", 0.5, true},    // bucket 1113
+		{"install-0005", "com.example.alpha", "1.0.0", 0.5, false},   // bucket 5344
+		{"install-0008", "com.example.alpha", "1.0.0", 0.5, false},   // bucket 9757
+		{"install-0010", "com.example.alpha", "1.0.0", 0.5, true},    // bucket 4223
+		{"install-0004", "com.example.beta", "2.3.1", 0.25, false},   // bucket 4108
 		{"device-xyz", "org.sora.hello-panel", "1.1.0", 0.25, false}, // bucket 2831
 		{"device-xyz", "org.sora.hello-panel", "1.1.0", 0.5, true},   // bucket 2831
 	}
