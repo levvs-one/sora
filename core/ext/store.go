@@ -678,8 +678,11 @@ func (s *Store) SetSettings(id string, values map[string]any) error {
 	merged := map[string]any{}
 	if raw, err := os.ReadFile(s.settingsPath(id)); err == nil { //nolint:gosec // fixed suffix inside the store dir
 		// A corrupt stored file repairs like GetSettings: start from
-		// empty rather than bricking every future save.
-		if err := json.Unmarshal(raw, &merged); err != nil {
+		// empty rather than bricking every future save. A stored "null"
+		// is valid JSON but not a settings object: Unmarshal succeeds
+		// and leaves merged nil, and assigning into a nil map would
+		// panic the merge — it repairs to empty exactly like corruption.
+		if err := json.Unmarshal(raw, &merged); err != nil || merged == nil {
 			merged = map[string]any{}
 		}
 	}
