@@ -402,6 +402,26 @@ void main() {
     });
   });
 
+  group('API 1.13: LAN sharing (C7)', () {
+    test('LocalProxy tags', () {
+      expectFirstTag(() => LocalProxy(), (m) => (m as LocalProxy).enabled = true, 1, 0, 'LocalProxy.enabled');
+      expectFirstTag(() => LocalProxy(), (m) => (m as LocalProxy).username = 'sora', 2, 2, 'LocalProxy.username');
+      expectFirstTag(() => LocalProxy(), (m) => (m as LocalProxy).password = 'pw', 3, 2, 'LocalProxy.password');
+      expectFirstTag(() => LocalProxy(), (m) => (m as LocalProxy).allowLan = true, 4, 0, 'LocalProxy.allow_lan');
+    });
+    test('LocalProxy allow_lan round-trips', () {
+      final proxy = LocalProxy()
+        ..enabled = true
+        ..username = 'sora'
+        ..password = 'lan-sharing-password'
+        ..allowLan = true;
+      final back = LocalProxy.fromBuffer(proxy.writeToBuffer());
+      expect(back.allowLan, isTrue);
+      expect(back.username, 'sora');
+      expect(back.password, 'lan-sharing-password');
+    });
+  });
+
   group('API 1.13: device identity (C1)', () {
     test('GetDeviceIdentityRequest tags', () {
       expectFirstTag(() => GetDeviceIdentityRequest(),

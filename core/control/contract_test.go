@@ -133,6 +133,8 @@ func TestNewFieldTagsAreStable(t *testing.T) {
 			"reset": 4, "ver_os": 5, "device_model": 6,
 		},
 		"SetDeviceIdentityResponse": {"hwid": 1, "enabled": 2, "error": 3},
+		// Since 1.13 (C7): LAN sharing of the local proxy.
+		"LocalProxy": {"enabled": 1, "username": 2, "password": 3, "allow_lan": 4},
 	}
 	for msgName, fields := range want {
 		msg := file.Messages().ByName(protoreflect.Name(msgName))

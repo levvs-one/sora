@@ -1145,11 +1145,13 @@ class LocalProxy extends $pb.GeneratedMessage {
     $core.bool? enabled,
     $core.String? username,
     $core.String? password,
+    $core.bool? allowLan,
   }) {
     final result = LocalProxy._();
     if (enabled != null) result.enabled = enabled;
     if (username != null) result.username = username;
     if (password != null) result.password = password;
+    if (allowLan != null) result.allowLan = allowLan;
     return result;
   }
 
@@ -1167,6 +1169,7 @@ class LocalProxy extends $pb.GeneratedMessage {
     ..aOB(1, _omitFieldNames ? '' : 'enabled')
     ..aOS(2, _omitFieldNames ? '' : 'username')
     ..aOS(3, _omitFieldNames ? '' : 'password')
+    ..aOB(4, _omitFieldNames ? '' : 'allowLan')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1215,6 +1218,15 @@ class LocalProxy extends $pb.GeneratedMessage {
   $core.bool hasPassword() => $_has(2);
   @$pb.TagNumber(3)
   void clearPassword() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get allowLan => $_getBF(3);
+  @$pb.TagNumber(4)
+  set allowLan($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasAllowLan() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAllowLan() => $_clearField(4);
 }
 
 /// AntiCensorship holds the per-session defences against DPI.

@@ -1349,10 +1349,15 @@ func (x *RoutingOptions) GetBlockAds() bool {
 // them can reach it, send traffic through the tunnel and learn the server
 // address, so it is closed unless asked for, and a login is recommended.
 type LocalProxy struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Enabled  bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Username string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Password string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	// Since 1.13. Binds the listener on all interfaces instead of loopback
+	// only, so other devices on the local network can use it. The core
+	// refuses it without a username and password pair, and refuses it in
+	// the system proxy mode, whose listener cannot carry a login.
+	AllowLan      bool `protobuf:"varint,4,opt,name=allow_lan,json=allowLan,proto3" json:"allow_lan,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1406,6 +1411,13 @@ func (x *LocalProxy) GetPassword() string {
 		return x.Password
 	}
 	return ""
+}
+
+func (x *LocalProxy) GetAllowLan() bool {
+	if x != nil {
+		return x.AllowLan
+	}
+	return false
 }
 
 // AntiCensorship holds the per-session defences against DPI.
@@ -9599,12 +9611,13 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"\x0eRoutingOptions\x12\x16\n" +
 	"\x06preset\x18\x01 \x01(\tR\x06preset\x12!\n" +
 	"\fproxy_target\x18\x02 \x01(\tR\vproxyTarget\x12\x1b\n" +
-	"\tblock_ads\x18\x03 \x01(\bR\bblockAds\"^\n" +
+	"\tblock_ads\x18\x03 \x01(\bR\bblockAds\"{\n" +
 	"\n" +
 	"LocalProxy\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\"\xb4\x01\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x1b\n" +
+	"\tallow_lan\x18\x04 \x01(\bR\ballowLan\"\xb4\x01\n" +
 	"\x0eAntiCensorship\x12!\n" +
 	"\ftls_fragment\x18\x01 \x01(\bR\vtlsFragment\x12)\n" +
 	"\x10fragment_packets\x18\x02 \x01(\tR\x0ffragmentPackets\x12'\n" +

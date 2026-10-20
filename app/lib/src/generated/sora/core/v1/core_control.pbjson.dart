@@ -392,13 +392,15 @@ const LocalProxy$json = {
     {'1': 'enabled', '3': 1, '4': 1, '5': 8, '10': 'enabled'},
     {'1': 'username', '3': 2, '4': 1, '5': 9, '10': 'username'},
     {'1': 'password', '3': 3, '4': 1, '5': 9, '10': 'password'},
+    {'1': 'allow_lan', '3': 4, '4': 1, '5': 8, '10': 'allowLan'},
   ],
 };
 
 /// Descriptor for `LocalProxy`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List localProxyDescriptor =
-    $convert.base64Decode('CgpMb2NhbFByb3h5EhgKB2VuYWJsZWQYASABKAhSB2VuYWJsZWQSGgoIdXNlcm5hbWUYAiABKA'
-        'lSCHVzZXJuYW1lEhoKCHBhc3N3b3JkGAMgASgJUghwYXNzd29yZA==');
+    $convert.base64Decode('CgpMb2NhbFByb3h5EhgKB2VuYWJsZWQYASABKAhSB2VuYWJsZWQSGgoIdXNlcm5hbWUYAiABKAlS'
+        'CHVzZXJuYW1lEhoKCHBhc3N3b3JkGAMgASgJUghwYXNzd29yZBIbCglhbGxvd19sYW4YBCABKAhS'
+        'CGFsbG93TGFu');
 
 @$core.Deprecated('Use antiCensorshipDescriptor instead')
 const AntiCensorship$json = {
