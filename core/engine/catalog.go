@@ -174,10 +174,23 @@ func (c Capabilities) XrayPlaintextMissing(p *Plan, v Version) []string {
 	return nil
 }
 
+// mihomoAWG3Floor is the first mihomo release whose AmneziaWG stack
+// implements the 3.x parameters: v1.19.30 added "support AmneziaWG
+// v3.0" and "support AmneziaWG v3.1", v1.19.31 fixed RandomPadding
+// Addition and DisableCookies for v3 (release notes; the pin's
+// adapter/outbound/wireguard.go carries version, header-protection-
+// key, the ranged timings, random-trailers and disable-cookies —
+// PASS2 deep S1, read from the pinned source).
+var mihomoAWG3Floor = Version{Major: 1, Minor: 19, Patch: 30}
+
 // BuildCapabilities keeps upstream and downstream builds distinct. A version
 // suffix alone cannot prove that an optional transport was compiled in.
 func BuildCapabilities(kind Kind, version Version, tags []string) Capabilities {
 	caps := Catalog[kind]
+	if kind == KindMihomo && version != (Version{}) && !version.Less(mihomoAWG3Floor) {
+		caps.Features = maps.Clone(caps.Features)
+		caps.Features[FeatureAmneziaWG3] = true
+	}
 	if kind == KindSingBox && strings.HasPrefix(version.PreRelease, "lx.") &&
 		!version.Less(Version{Major: 1, Minor: 14, Patch: 3}) {
 		caps.Features = maps.Clone(caps.Features)

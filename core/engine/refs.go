@@ -86,8 +86,9 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 		if o.Amnezia != nil {
 			out[FeatureAmneziaWG] = true
 			if o.Amnezia.UsesAWG31() {
-				// Without the gate a 3.x plan could land on mihomo,
-				// which only knows the 1.x/2.0 keys.
+				// Without the gate a 3.x plan could land on an engine
+				// build without the 3.x stack (upstream sing-box,
+				// mihomo < 1.19.30) and lose its obfuscation silently.
 				out[FeatureAmneziaWG3] = true
 			}
 			if o.Amnezia.UsesMasquerade() {

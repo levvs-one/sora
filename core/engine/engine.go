@@ -62,9 +62,12 @@ const (
 	FeatureAmneziaWG    Feature = "amneziawg"
 	// FeatureAmneziaWG3 marks engines whose AmneziaWG stack implements
 	// the 3.x parameters (header_protection_key, content padding,
-	// trailers, ranged timings). mihomo only knows the 1.x/2.0 keys, so
-	// a 3.x plan must never be routed to it: the parameters would be
-	// silently dropped while the UI promises obfuscation.
+	// trailers, ranged timings). sing-box-lx with_awg implements them;
+	// mihomo implements them since 1.19.30 (the pin is 1.19.32), so
+	// its claim is version-gated in BuildCapabilities — a build older
+	// than 1.19.30, or one whose version is unknown, must never be
+	// routed a 3.x plan: the parameters would be silently dropped
+	// while the UI promises obfuscation (PASS2 deep S1, PASS3).
 	FeatureAmneziaWG3 Feature = "amneziawg3"
 	// FeatureAmneziaMasquerade marks engines that generate the I1 decoy
 	// from the id/ip/ib masquerade sugar (sing-box-lx with_awg). Other

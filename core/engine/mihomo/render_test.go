@@ -495,20 +495,77 @@ func TestRenderTUICTuning(t *testing.T) {
 	}
 }
 
-func TestAmneziaOptionsRefuses31(t *testing.T) {
-	// T012: mihomo's AmneziaWGOption only knows the 1.x/2.0 keys. Passing
-	// 3.1 fields through the free-form map would silently drop them while
-	// the plan promises 3.1 obfuscation: fail closed here too, not just at
-	// engine selection (FeatureAmneziaWG3).
-	if _, err := amneziaOptions(enginetest.AmneziaWG3().Amnezia); err == nil {
-		t.Fatal("amneziaOptions must refuse 3.1 parameters")
+// TestAmneziaOptionsRenders31 pins the corrected AWG matrix (PASS2
+// deep S1, PASS3): the pinned mihomo implements AWG 3.x since
+// 1.19.30, so a 3.1 parameter set renders — with version: 3, without
+// which mihomo would build the legacy device and silently ignore
+// every 3.x key. The enginetest 3.1 vector also carries masquerade
+// sugar, which mihomo has no fields for: that combination, and
+// 3.x + v1.5-only J*/Itime, still fail closed.
+func TestAmneziaOptionsRenders31(t *testing.T) {
+	a := *enginetest.AmneziaWG3().Amnezia
+	a.MasqueradeProtocol, a.MasqueradeDomain, a.MasqueradeBrowser = "", "", ""
+	opts, err := amneziaOptions(&a)
+	if err != nil {
+		t.Fatalf("amneziaOptions(3.1) = %v, want nil", err)
 	}
-	opts, err := amneziaOptions(enginetest.AmneziaWG().Amnezia)
+	if opts["version"] != 3 {
+		t.Fatalf("version = %v, want 3 (without it the 3.x keys are ignored)", opts["version"])
+	}
+	for key, want := range map[string]string{
+		"header-protection-key":    a.HeaderProtectionKey,
+		"content-padding-addition": "32-96",
+		"rekey-after-time":         "100-140",
+		"rekey-timeout":            "5",
+		"reject-after-time":        "170-190",
+		"keepalive-timeout":        "8-12",
+		"max-handshake-attempts":   "16-20",
+	} {
+		if opts[key] != want {
+			t.Errorf("opts[%q] = %v, want %q", key, opts[key], want)
+		}
+	}
+	if opts["random-trailers"] != true || opts["disable-cookies"] != true {
+		t.Errorf("trailers/cookies = %v/%v, want true/true", opts["random-trailers"], opts["disable-cookies"])
+	}
+	// The 1.x/2.0 base keys ride along unchanged.
+	if opts["jc"] != 8 || opts["h3"] != int64(3) {
+		t.Errorf("base keys must keep rendering under v3: %v", opts)
+	}
+
+	// Full render: the YAML carries the v3 block end to end.
+	p := enginetest.Plan(engine.ProtocolWireGuard)
+	p.Outbounds[0].Amnezia = &a
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"version: 3", "header-protection-key:", "content-padding-addition: 32-96", "random-trailers: true", "disable-cookies: true"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("rendered mihomo config is missing %q:\n%s", want, out)
+		}
+	}
+
+	// Masquerade sugar has no mihomo fields: fail closed, never drop.
+	if _, err := amneziaOptions(enginetest.AmneziaWG3().Amnezia); err == nil {
+		t.Fatal("amneziaOptions must refuse masquerade sugar for mihomo")
+	}
+	// J1 is v1.5-only and incompatible with version 3: fail closed.
+	b := a
+	b.J1 = "<b 0x00>"
+	if _, err := amneziaOptions(&b); err == nil {
+		t.Fatal("amneziaOptions must refuse 3.x + J1 for mihomo")
+	}
+	// 2.0 sets keep rendering exactly as before, with no version key.
+	opts, err = amneziaOptions(enginetest.AmneziaWG().Amnezia)
 	if err != nil {
 		t.Fatalf("amneziaOptions(2.0) = %v, want nil", err)
 	}
 	if opts["jc"] != 4 || opts["h3"] != int64(300000) {
 		t.Fatalf("2.0 parameters must keep rendering: %v", opts)
+	}
+	if _, ok := opts["version"]; ok {
+		t.Fatalf("a 2.0 set must not gain a version key: %v", opts)
 	}
 }
 

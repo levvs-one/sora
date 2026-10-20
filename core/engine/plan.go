@@ -446,8 +446,16 @@ type AmneziaWG struct {
 	// RandomTrailers appends random trailers to packets (the 3.1 docs
 	// recommend S1==S2==S3==S4 alongside so types stay distinguishable).
 	RandomTrailers bool
-	// DisableCookies stops sending Cookie Reply messages; incoming
-	// cookies and the rest of the cookie machinery keep working.
+	// DisableCookies stops sending Cookie Reply messages. The
+	// official 3.1 spec stops there (incoming cookies keep working),
+	// but the engines' v3 devices read the knob wider — sing-box-lx
+	// documents "never send or demand cookie replies" (the
+	// under-load mac2 gate), and mihomo's v3 fix line names the same
+	// field — so the honest promise is only "this client does not
+	// send cookie replies"; whether it also stops demanding them is
+	// the engine's semantics, wider than the spec (PASS2 deep A1).
+	// It is a client-side knob either way and does not affect
+	// client↔server compatibility.
 	DisableCookies bool
 	// Masquerade* carry the sing-box-lx id/ip/ib decoy sugar: the engine
 	// generates the I1 signature packet mimicking the given protocol

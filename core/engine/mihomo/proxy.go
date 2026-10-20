@@ -285,14 +285,29 @@ func wireguardPeers(o engine.Outbound) ([]wireguardPeer, error) {
 
 // amneziaOptions renders amnezia-wg-option keys. Numeric headers stay numbers
 // for 1.x; 2.0 also accepts ranges.
+//
+// AmneziaWG 3.x (PASS2 deep S1, PASS3): the pinned mihomo (1.19.32;
+// 3.0/3.1 support landed in 1.19.30, DisableCookies/RandomPadding
+// fixed in 1.19.31) implements the 3.x parameters in its
+// AmneziaWGOption — version, header-protection-key,
+// content-padding-addition, the ranged timings, random-trailers,
+// disable-cookies. The old blanket refusal ("mihomo only knows the
+// 1.x/2.0 keys") contradicted the pin and cost the AWG 3.1 failover
+// route. Two honest boundaries remain:
+//   - version: 3 is mandatory with any 3.x field: without it mihomo
+//     builds the legacy device and the 3.x fields do nothing — the
+//     exact silent downgrade the old refusal guarded against.
+//   - the id/ip/ib masquerade sugar has no mihomo fields at all
+//     (FeatureAmneziaMasquerade stays sing-box-lx-only), and the
+//     v1.5-only J1/J2/J3/Itime keys are incompatible with version 3;
+//     both combinations fail closed here, as they do at selection.
 func amneziaOptions(a *engine.AmneziaWG) (map[string]any, error) {
-	// T012: mihomo's AmneziaWGOption only knows the 1.x/2.0 keys. Passing
-	// 3.1 fields through the free-form map would silently drop them while
-	// the plan promises 3.1 obfuscation. Engine selection already keeps
-	// 3.1 plans away via FeatureAmneziaWG3; this is the last-mile guard
-	// for direct render calls.
-	if a.UsesAWG31() {
-		return nil, fmt.Errorf("mihomo: AmneziaWG 3.1 parameters are not implemented by mihomo's AmneziaWG stack: refusing to render a config that would silently drop them")
+	if a.UsesMasquerade() {
+		return nil, fmt.Errorf("mihomo: AmneziaWG id/ip/ib masquerade sugar is not implemented by mihomo's AmneziaWG stack: refusing to render a config that would silently drop the decoy")
+	}
+	v3 := a.UsesAWG31()
+	if v3 && (a.J1 != "" || a.J2 != "" || a.J3 != "" || a.Itime != 0) {
+		return nil, fmt.Errorf("mihomo: AmneziaWG J1/J2/J3/Itime are v1.5-only and incompatible with version 3: refusing the combination instead of dropping them silently")
 	}
 	out := map[string]any{}
 	ints := map[string]int{"jc": a.Jc, "jmin": a.Jmin, "jmax": a.Jmax, "s1": a.S1, "s2": a.S2, "s3": a.S3, "s4": a.S4, "itime": a.Itime}
@@ -312,6 +327,31 @@ func amneziaOptions(a *engine.AmneziaWG) (map[string]any, error) {
 			continue
 		}
 		out[key] = v
+	}
+	if v3 {
+		out["version"] = 3
+		if a.HeaderProtectionKey != "" {
+			out["header-protection-key"] = a.HeaderProtectionKey
+		}
+		ranges := map[string]string{
+			"content-padding-addition": a.ContentPaddingAddition,
+			"rekey-after-time":         a.RekeyAfterTime,
+			"rekey-timeout":            a.RekeyTimeout,
+			"reject-after-time":        a.RejectAfterTime,
+			"keepalive-timeout":        a.KeepaliveTimeout,
+			"max-handshake-attempts":   a.MaxHandshakeAttempts,
+		}
+		for key, v := range ranges {
+			if v != "" {
+				out[key] = v
+			}
+		}
+		if a.RandomTrailers {
+			out["random-trailers"] = true
+		}
+		if a.DisableCookies {
+			out["disable-cookies"] = true
+		}
 	}
 	return out, nil
 }
