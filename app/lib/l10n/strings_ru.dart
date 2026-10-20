@@ -940,19 +940,19 @@ class SRu extends S {
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return 'Откатываемся к версии $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return 'Обновление до $version не прошло проверку работоспособности, поэтому Sora откатилась к $fromVersion.';
   }
 
   @override
-  String get updateRollbackError => 'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+  String get updateRollbackError => 'Автоматический откат не удался. Если новая версия не работает, переустановите предыдущий релиз вручную.';
 
   @override
-  String get updateRollbackCacheError => 'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+  String get updateRollbackCacheError => 'Не удалось подготовить проверенную копию текущей версии для отката, поэтому обновление не установлено.';
 
   @override
   String get updateCopyCommand => 'Скопировать команду';
