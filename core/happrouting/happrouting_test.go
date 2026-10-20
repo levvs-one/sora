@@ -172,6 +172,59 @@ func TestEntryClassification(t *testing.T) {
 	}
 }
 
+// Boundary vectors the golden tests do not cover: overlap between
+// lists, duplicates inside one list, and the all-empty profile. The
+// expectations pin the converter's existing semantics, not new ones.
+func TestConversionBoundaries(t *testing.T) {
+	t.Run("same destination in direct and proxy keeps both, direct first", func(t *testing.T) {
+		// Dedup is per (destination, target): the same site listed for
+		// direct and for proxy yields two rules. Conversion order is
+		// block, direct, proxy and the engines match first-hit, so the
+		// direct rule is the one that takes effect.
+		p := &Profile{
+			DirectSites: []string{"both.example"},
+			ProxySites:  []string{"both.example"},
+		}
+		conv := p.Convert("")
+		if len(conv.Rules) != 2 {
+			t.Fatalf("rules = %+v, want the direct and proxy pair", conv.Rules)
+		}
+		if conv.Rules[0] != (Rule{Destination: "domain:both.example", OutboundID: TargetDirect}) ||
+			conv.Rules[1] != (Rule{Destination: "domain:both.example", OutboundID: "proxy"}) {
+			t.Errorf("rules = %+v, want direct first, then proxy", conv.Rules)
+		}
+	})
+
+	t.Run("duplicates inside one list collapse to one rule", func(t *testing.T) {
+		// Exact repeats — including repeats that only emerge after
+		// classification (case, wildcard prefix) — dedup to one rule.
+		p := &Profile{DirectSites: []string{"dup.example", "dup.example", "DUP.example", "*.dup.example"}}
+		conv := p.Convert("")
+		if len(conv.Rules) != 1 || conv.Rules[0].Destination != "domain:dup.example" {
+			t.Errorf("rules = %+v, want one domain:dup.example rule", conv.Rules)
+		}
+		if conv.Skipped != 0 {
+			t.Errorf("skipped = %d, want 0: duplicates are deduped, not skipped", conv.Skipped)
+		}
+	})
+
+	t.Run("all lists empty converts to zero rules and no list note", func(t *testing.T) {
+		conv := (&Profile{Name: "empty"}).Convert("")
+		if len(conv.Rules) != 0 {
+			t.Errorf("rules = %+v, want none", conv.Rules)
+		}
+		if conv.Skipped != 0 {
+			t.Errorf("skipped = %d, want 0", conv.Skipped)
+		}
+		// Honest accounting: with nothing carried by the document
+		// there is nothing to note — in particular no applied-lists
+		// note for lists that produced no rules.
+		if len(conv.Notes) != 0 {
+			t.Errorf("notes = %+v, want none for an empty profile", conv.Notes)
+		}
+	})
+}
+
 func TestInvalidPayloadsFailHonestly(t *testing.T) {
 	for name, payload := range map[string]string{
 		"empty":          "",

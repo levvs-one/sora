@@ -35,7 +35,7 @@ func (s *Server) BenchmarkServers(req *corev1.BenchmarkServersRequest, stream gr
 		return err
 	}
 	if s.benchmarker == nil {
-		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyProbeUnsupported,
+		return errs.Newf(errs.CodeUnsupported, errs.KeyProbeUnsupported,
 			"control: this core cannot benchmark throughput")
 	}
 	ids := req.GetServerIds()

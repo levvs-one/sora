@@ -310,6 +310,97 @@ func TestDeviceStorePlatformCompanions(t *testing.T) {
 	}
 }
 
+// Boundary records the lifecycle tests do not cover: an empty-string
+// HWID is "absent" (a fresh identity is generated and persisted over
+// it), a whitespace HWID is a stored value outside the accepted shape
+// (refused like any other invalid stored value — never silently
+// regenerated, which would register a new device at every provider),
+// and a record carrying only {"enabled": false} still generates the
+// identity while the opt-out keeps it off the wire.
+func TestDeviceStoreBoundaryRecords(t *testing.T) {
+	t.Run("empty string hwid generates and persists", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "device.json")
+		if err := os.WriteFile(path, []byte(`{"hwid": ""}`), 0o600); err != nil {
+			t.Fatalf("write record: %v", err)
+		}
+		store := subscription.NewDeviceStore(dir)
+		headers, err := store.Headers("Linux")
+		if err != nil {
+			t.Fatalf("Headers() error = %v", err)
+		}
+		if !subscription.ValidHWID(headers.HWID) {
+			t.Fatalf("Headers().HWID = %q, want a generated valid identifier", headers.HWID)
+		}
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("read record: %v", err)
+		}
+		if !strings.Contains(string(raw), headers.HWID) {
+			t.Errorf("record after generation = %s, want it to persist %q", raw, headers.HWID)
+		}
+	})
+
+	t.Run("whitespace hwid is refused, file untouched", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "device.json")
+		content := []byte(`{"hwid": "   "}`)
+		if err := os.WriteFile(path, content, 0o600); err != nil {
+			t.Fatalf("write record: %v", err)
+		}
+		store := subscription.NewDeviceStore(dir)
+		if _, err := store.Headers("Linux"); err == nil {
+			t.Error("Headers() accepted a whitespace HWID, want a refusal")
+		}
+		if _, err := store.HWID(); err == nil {
+			t.Error("HWID() accepted a whitespace HWID, want a refusal")
+		}
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("read record: %v", err)
+		}
+		if string(raw) != string(content) {
+			t.Errorf("record = %s, want the refused file left byte-for-byte intact", raw)
+		}
+	})
+
+	t.Run("enabled false without hwid generates but stays off the wire", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(dir, "device.json"), []byte(`{"enabled": false}`), 0o600); err != nil {
+			t.Fatalf("write record: %v", err)
+		}
+		store := subscription.NewDeviceStore(dir)
+		enabled, err := store.Enabled()
+		if err != nil {
+			t.Fatalf("Enabled() error = %v", err)
+		}
+		if enabled {
+			t.Error("Enabled() = true, want the explicit false respected")
+		}
+		headers, err := store.Headers("Linux")
+		if err != nil || headers != (subscription.DeviceHeaders{}) {
+			t.Errorf("Headers() = %+v, %v; want the zero set while disabled", headers, err)
+		}
+		// The settings surface can still show the identity: it is
+		// generated and persisted alongside the respected opt-out.
+		hwid, err := store.HWID()
+		if err != nil {
+			t.Fatalf("HWID() error = %v", err)
+		}
+		if !subscription.ValidHWID(hwid) {
+			t.Errorf("HWID() = %q, want a generated valid identifier", hwid)
+		}
+		reopened := subscription.NewDeviceStore(dir)
+		again, err := reopened.HWID()
+		if err != nil || again != hwid {
+			t.Errorf("HWID() after reopen = %q, %v; want the persisted %q", again, err, hwid)
+		}
+		if enabled, err := reopened.Enabled(); err != nil || enabled {
+			t.Errorf("Enabled() after reopen = %v, %v; want false, nil (generation must not clear the opt-out)", enabled, err)
+		}
+	})
+}
+
 // A nil store (no data directory) disables the identity quietly.
 func TestDeviceStoreNilIsDisabled(t *testing.T) {
 	var store *subscription.DeviceStore

@@ -232,6 +232,21 @@ func TestSplitFallbackForms(t *testing.T) {
 		"marker inside a later value": {primary + "#name=Mine&note=fallback-url=" + backup, primary, ""},
 		"empty fallback":              {primary + "#fallback-url=", primary, ""},
 		"fallback with own fragment":  {primary + "#fallback-url=" + backup + "#name", primary, backup},
+		// The fallback may be the primary itself: nothing in the form
+		// forbids it, and the fetcher then simply retries the same
+		// reference through the fallback hop.
+		"fallback equals primary": {primary + "#fallback-url=" + primary, primary, primary},
+		// Two markers: the FIRST boundary marker wins and everything
+		// after it is its value, so the second marker's text rides
+		// inside the first fallback's path instead of replacing it.
+		"two markers, first wins": {
+			primary + "#fallback-url=https://one.example/sub/a&fallback-url=https://two.example/sub/b",
+			primary, "https://one.example/sub/a&fallback-url=https://two.example/sub/b",
+		},
+		// A primary with no fragment at all, plus a bare '#': the
+		// empty fragment declares nothing and the reference is kept
+		// byte-for-byte (the '#' is not stripped on this path).
+		"bare hash only": {primary + "#", primary + "#", ""},
 	}
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -246,6 +261,15 @@ func TestSplitFallbackForms(t *testing.T) {
 	}
 	if _, _, err := subscription.SplitFallback(primary + "#fallback-url=http://backup.example/sub"); err == nil {
 		t.Error("SplitFallback must refuse a plain http fallback")
+	}
+	// An empty marker value followed by '&' is NOT the empty-fallback
+	// case: the marker owns the rest of the fragment, so the value is
+	// "&name=Mine" — not a URL at all — and the split refuses with the
+	// scheme key instead of silently dropping the declaration.
+	if _, _, err := subscription.SplitFallback(primary + "#fallback-url=&name=Mine"); err == nil {
+		t.Error("SplitFallback must refuse an empty marker value followed by more parameters")
+	} else if errs.KeyOf(err) != errs.KeySubscriptionScheme {
+		t.Errorf("empty marker before &: key = %q, want %q (err = %v)", errs.KeyOf(err), errs.KeySubscriptionScheme, err)
 	}
 	joined := subscription.JoinFallback(primary, backup)
 	gotPrimary, gotFallback, err := subscription.SplitFallback(joined)
