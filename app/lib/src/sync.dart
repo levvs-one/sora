@@ -28,12 +28,28 @@ class SyncPairing {
   /// RawURLEncoding rejects padding, so this does too.
   static List<int>? _b64rawDecode(String s, int length) {
     if (!RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(s)) return null;
-    try {
-      final bytes = base64Url.decode(s);
-      return bytes.length == length ? bytes : null;
-    } on FormatException {
-      return null;
+    // Hand-rolled, because neither stock decoder matches Go's
+    // RawURLEncoding exactly: base64Url.decode demands a padded length
+    // (multiple of 4) and throws on the raw form Go emits (43 chars for
+    // 32 bytes, 22 for 16), and even after normalize() it rejects the
+    // non-canonical trailing bits Go silently discards. Go's rules are:
+    // alphabet chars only (the regex above), a length mod 4 of 1 is an
+    // error, and leftover sub-byte bits at the end are ignored.
+    const alphabet =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    final out = <int>[];
+    var acc = 0;
+    var bits = 0;
+    for (var i = 0; i < s.length; i++) {
+      acc = (acc << 6) | alphabet.indexOf(s[i]);
+      bits += 6;
+      if (bits >= 8) {
+        bits -= 8;
+        out.add((acc >> bits) & 0xff);
+      }
     }
+    if (bits >= 6) return null; // length mod 4 == 1: Go rejects this too
+    return out.length == length ? out : null;
   }
 
   /// Parses a scanned payload; null when it is not a valid pairing
@@ -82,12 +98,19 @@ class SyncPairing {
     final q = uri.queryParameters;
     if (q['v'] != '$syncPairVersion') return null;
     final deviceId = q['id'] ?? '';
-    if (deviceId.isEmpty || deviceId.length > 128) return null;
+    // Go measures the id in bytes (len(id) > 128); a UTF-16 code-unit
+    // count would let multi-byte ids through that the daemon rejects.
+    if (deviceId.isEmpty || utf8.encode(deviceId).length > 128) return null;
     final publicKey = _b64rawDecode(q['pub'] ?? '', 32);
     if (publicKey == null) return null;
     final token = _b64rawDecode(q['token'] ?? '', 16);
     if (token == null) return null;
-    final port = int.tryParse(q['port'] ?? '');
+    // Go's strconv.Atoi grammar: an optional sign and digits, nothing
+    // else — in particular no whitespace, which a '+' or %20 in the
+    // query decodes to and int.tryParse would silently trim away.
+    final portText = q['port'] ?? '';
+    if (!RegExp(r'^[+-]?[0-9]+$').hasMatch(portText)) return null;
+    final port = int.tryParse(portText);
     if (port == null || port <= 0 || port > 65535) return null;
     return (deviceId: deviceId, publicKey: publicKey, token: token, port: port);
   }

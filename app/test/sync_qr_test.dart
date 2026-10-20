@@ -49,6 +49,25 @@ void main() {
     test('surrounding whitespace is tolerated', () {
       expect(SyncPairing.decodePairPayload('  $t1\n'), isNotNull);
     });
+
+    test('pub with non-canonical trailing bits is accepted like Go', () {
+      // The last pub char carries 4 payload bits and 2 spare bits; Go's
+      // RawURLEncoding discards the spare bits instead of demanding
+      // they be zero, so '...Hh9' decodes to the same 32 bytes as T1.
+      final inv = SyncPairing.decodePairPayload(
+          'sora-sync://pair?id=device-a&port=12345&pub=${pub32.substring(0, 42)}9&token=$tok16&v=1');
+      expect(inv, isNotNull);
+      expect(inv!.publicKey, List.generate(32, (i) => i));
+    });
+
+    test('port with an encoded plus sign is accepted (strconv.Atoi)', () {
+      // %2B decodes to '+', which Go's Atoi accepts; the raw '+' form
+      // decodes to a space and is rejected on both sides (see below).
+      final inv = SyncPairing.decodePairPayload(
+          'sora-sync://pair?id=device-a&port=%2B12345&pub=$pub32&token=$tok16&v=1');
+      expect(inv, isNotNull);
+      expect(inv!.port, 12345);
+    });
   });
 
   group('reject vectors', () {
@@ -83,6 +102,18 @@ void main() {
       'bare trailing fragment': '$t1#',
       'duplicated key': '$t1&port=1',
       'duplicated pub': '$t1&pub=$pub32',
+      // Go measures the id in UTF-8 bytes (len > 128 rejects); 65
+      // Cyrillic chars are 65 UTF-16 units here but 130 bytes there.
+      'id 65 cyrillic chars (130 bytes)':
+          'sora-sync://pair?id=${'я' * 65}&port=12345&pub=$pub32&token=$tok16&v=1',
+      // A '+' or %20 in the query decodes to a space; Go's Atoi rejects
+      // it where int.tryParse would have trimmed it away.
+      'port with leading space':
+          'sora-sync://pair?id=device-a&port=%2012345&pub=$pub32&token=$tok16&v=1',
+      'port with trailing space':
+          'sora-sync://pair?id=device-a&port=12345%20&pub=$pub32&token=$tok16&v=1',
+      'port written as +12345 (plus decodes to space)':
+          'sora-sync://pair?id=device-a&port=+12345&pub=$pub32&token=$tok16&v=1',
       'uppercase host is rejected':
           'sora-sync://PAIR?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1',
     };
