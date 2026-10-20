@@ -63,6 +63,38 @@ type SSPluginSpec struct {
 	// data, so two plans that differ only in option order render
 	// byte-identical plugin_opts (CENSOR-P4 "мелочи" §3).
 	Opts []ssPluginOpt
+	// Required lists option keys (a subset of Opts) that must be
+	// present for the plugin to work at all: without one the plan
+	// validates but dies inside the engine, or worse, runs with an
+	// engine default the plan never chose (kcptun's key). Plan
+	// validation refuses a plugin missing a required option, by
+	// name (CENSOR-P4 fix M2).
+	Required []string
+	// MihomoOpts maps a canonical option key onto the key mihomo's
+	// plugin-opts struct decodes it under, for every option mihomo
+	// carries. A catalog option ABSENT from this map has no mihomo
+	// spelling — mihomo's decode silently ignores map keys its
+	// struct lacks (measured on the pinned 1.19.32 binary: a bogus
+	// key passes `mihomo -t`) — so selection refuses the plan for
+	// mihomo and the mihomo renderer fails closed instead of
+	// dropping the option (CENSOR-P4 fix M3). Field sets follow the
+	// pinned adapter/outbound/shadowsocks.go option structs:
+	// simpleObfsOption carries mode/host only, the v2ray/gost
+	// structs mode/host/path/tls/mux, shadowTLSOption the
+	// sing-shadowtls fields, restlsOption password/host/
+	// version-hint/restls-script, kcpTunOption the kcptun config
+	// keys verbatim.
+	MihomoOpts map[string]string
+}
+
+// MihomoOptKey returns the mihomo plugin-opts key for a canonical
+// option key, and whether mihomo carries the option at all.
+func (s *SSPluginSpec) MihomoOptKey(key string) (string, bool) {
+	if s == nil {
+		return "", false
+	}
+	mk, ok := s.MihomoOpts[key]
+	return mk, ok
 }
 
 // ssPluginOpt is one schema entry: an option key and its value kind.
@@ -120,6 +152,13 @@ var ssPlugins = []SSPluginSpec{
 			{"obfs-uri", ssOptPath},
 			{"fast-open", ssOptFlag},
 		},
+		// Without a mode there is no obfuscation at all: the
+		// plugin binary refuses to start.
+		Required: []string{"obfs"},
+		// simpleObfsOption decodes mode and host only: obfs-uri
+		// (an http-mode request URI) and fast-open (TCP fast open)
+		// have no mihomo field and would be silently ignored.
+		MihomoOpts: map[string]string{"obfs": "mode", "obfs-host": "host"},
 	},
 	{
 		Name:    "v2ray-plugin",
@@ -135,6 +174,13 @@ var ssPlugins = []SSPluginSpec{
 			{"key", ssOptString},
 			{"certRaw", ssOptString},
 			{"keyRaw", ssOptString},
+		},
+		// v2rayObfsOption decodes mode/host/path/tls/mux (plus ECH
+		// and http-upgrade shapes sora's schema does not offer);
+		// the standalone binary's loglevel/cert/key options have
+		// no field in mihomo's native implementation.
+		MihomoOpts: map[string]string{
+			"tls": "tls", "mux": "mux", "mode": "mode", "host": "host", "path": "path",
 		},
 	},
 	{
@@ -154,6 +200,12 @@ var ssPlugins = []SSPluginSpec{
 			{"name-cert-verify", ssOptHost},
 			{"fingerprint", ssOptString},
 		},
+		// gostObfsOption decodes the same five fields as
+		// v2rayObfsOption; the verify/fingerprint keys have no
+		// field there.
+		MihomoOpts: map[string]string{
+			"tls": "tls", "mux": "mux", "mode": "mode", "host": "host", "path": "path",
+		},
 	},
 	{
 		// mihomo native. The standalone shadow-tls binary would be
@@ -168,6 +220,19 @@ var ssPlugins = []SSPluginSpec{
 			{"alpn", ssOptString},
 			{"skip-cert-verify", ssOptFlag},
 			{"name-cert-verify", ssOptHost},
+		},
+		// The password IS the shadow-tls authentication: without
+		// it the handshake cannot be keyed, the engine default is
+		// not a fallback sora may accept on the plan's behalf.
+		Required: []string{"password"},
+		// shadowTLSOption follows the sing-shadowtls client
+		// fields (password/host/version/alpn/fingerprint/
+		// skip-cert-verify); name-cert-verify has no field in
+		// the plugin struct (it exists only on mihomo's generic
+		// TLS options, not in plugin-opts).
+		MihomoOpts: map[string]string{
+			"host": "host", "password": "password", "version": "version",
+			"fingerprint": "fingerprint", "alpn": "alpn", "skip-cert-verify": "skip-cert-verify",
 		},
 	},
 	{
@@ -184,6 +249,15 @@ var ssPlugins = []SSPluginSpec{
 			{"fingerprint", ssOptString},
 			{"name-cert-verify", ssOptHost},
 		},
+		// Like shadow-tls, the password is the scheme's
+		// authentication secret; restls has no anonymous mode.
+		Required: []string{"password"},
+		// restlsOption decodes password/host/version-hint/
+		// restls-script only.
+		MihomoOpts: map[string]string{
+			"host": "host", "password": "password",
+			"version-hint": "version-hint", "restls-script": "restls-script",
+		},
 	},
 	{
 		Name: "jls-plugin", MihomoName: "jls",
@@ -193,6 +267,12 @@ var ssPlugins = []SSPluginSpec{
 			{"username", ssOptString},
 			{"password", ssOptSecret},
 			{"alpn", ssOptString},
+		},
+		// The JLS handshake authenticates with username+password
+		// against the fronting host; alpn has no field in
+		// mihomo's jls option struct.
+		MihomoOpts: map[string]string{
+			"host": "host", "username": "username", "password": "password",
 		},
 	},
 	{
@@ -220,6 +300,22 @@ var ssPlugins = []SSPluginSpec{
 			{"nc", ssOptFlag},
 			{"sockbuf", ssOptInt},
 			{"keepalive", ssOptInt},
+		},
+		// The key is kcptun's pre-shared secret: without it the
+		// client falls back to the kcptun library's built-in
+		// default key, which is public knowledge — a plan must
+		// never ride on it silently.
+		Required: []string{"key"},
+		// kcpTunOption mirrors the kcptun client config keys
+		// verbatim, so every catalog key carries over unchanged.
+		MihomoOpts: map[string]string{
+			"key": "key", "crypt": "crypt", "mode": "mode", "conn": "conn",
+			"autoexpire": "autoexpire", "scavengettl": "scavengettl", "mtu": "mtu",
+			"ratelimit": "ratelimit", "sndwnd": "sndwnd", "rcvwnd": "rcvwnd",
+			"datashard": "datashard", "parityshard": "parityshard", "dscp": "dscp",
+			"nocomp": "nocomp", "acknodelay": "acknodelay", "nodelay": "nodelay",
+			"interval": "interval", "resend": "resend", "nc": "nc",
+			"sockbuf": "sockbuf", "keepalive": "keepalive",
 		},
 	},
 }
@@ -366,6 +462,56 @@ func CanonicalSSPluginOpts(plugin, opts string) string {
 	return b.String()
 }
 
+// MihomoSSPluginOpts translates a canonical SIP002 option string
+// into mihomo's plugin-opts map, driven by the catalog's MihomoOpts
+// data — the mihomo renderer contains no per-plugin key knowledge
+// of its own. Every option in the string must have a mihomo
+// spelling: a key the catalog does not know, or a known key mihomo
+// does not carry, is a named error, never a silent drop (mihomo's
+// own decode ignores unknown map keys; CENSOR-P4 fix M3). Values
+// are typed the way mihomo's structs decode them: flags become
+// booleans, integers become ints, the shadow-tls version becomes
+// an int. For v2ray-plugin and gost-plugin the mode is forced to
+// "websocket" when the plan did not spell one: both mihomo
+// adapters accept no other mode and require the key present.
+func MihomoSSPluginOpts(plugin, opts string) (map[string]any, error) {
+	spec := SSPluginByName(plugin)
+	if spec == nil {
+		return nil, fmt.Errorf("unknown shadowsocks plugin %q", plugin)
+	}
+	pairs, err := parseSSPluginOpts(opts)
+	if err != nil {
+		return nil, fmt.Errorf("shadowsocks plugin %s: plugin_opts: %v", plugin, err)
+	}
+	out := make(map[string]any, len(pairs))
+	for _, kv := range pairs {
+		kind, known := spec.optKind(kv.key)
+		if !known {
+			return nil, fmt.Errorf("shadowsocks plugin %s: unknown option %q", plugin, kv.key)
+		}
+		mk, carried := spec.MihomoOptKey(kv.key)
+		if !carried {
+			return nil, fmt.Errorf("shadowsocks plugin %s: option %q has no mihomo spelling and mihomo does not render it", plugin, kv.key)
+		}
+		switch kind {
+		case ssOptFlag:
+			out[mk] = kv.val == "" || kv.val == "1" || kv.val == "yes" || strings.EqualFold(kv.val, "true")
+		case ssOptInt, ssOptTLSVersion:
+			n, err := strconv.Atoi(kv.val)
+			if err != nil {
+				return nil, fmt.Errorf("shadowsocks plugin %s: option %q value is not an integer", plugin, kv.key)
+			}
+			out[mk] = n
+		default:
+			out[mk] = kv.val
+		}
+	}
+	if (plugin == "v2ray-plugin" || plugin == "gost-plugin") && out["mode"] == nil {
+		out["mode"] = "websocket"
+	}
+	return out, nil
+}
+
 // validateSSPluginOptValue checks one option value against its kind.
 func validateSSPluginOptValue(plugin, key string, kind ssPluginOptKind, v string) error {
 	bad := func(format string, args ...any) error {
@@ -399,15 +545,15 @@ func validateSSPluginOptValue(plugin, key string, kind ssPluginOptKind, v string
 		}
 	case ssOptModeWS:
 		if v != "" && v != "websocket" {
-			return bad("mode %q is not supported by sora's renderers (only websocket)", v)
+			return bad("%q is not supported by sora's renderers (only websocket)", v)
 		}
 	case ssOptObfsMode:
 		if v != "http" && v != "tls" {
-			return bad("mode %q is not http or tls", v)
+			return bad("%q is not http or tls", v)
 		}
 	case ssOptTLSVersion:
 		if v != "2" && v != "3" {
-			return bad("version %q is not 2 or 3", v)
+			return bad("%q is not 2 or 3", v)
 		}
 	case ssOptString, ssOptSecret:
 		if v == "" {
@@ -448,7 +594,9 @@ func validateShadowsocksPlugin(o Outbound) []error {
 			bad("shadowsocks plugin %s: plugin_opts: %v", o.Plugin, err)
 			return errs
 		}
+		present := make(map[string]bool, len(pairs))
 		for _, kv := range pairs {
+			present[kv.key] = true
 			kind, ok := spec.optKind(kv.key)
 			if !ok {
 				bad("shadowsocks plugin %s: unknown option %q", o.Plugin, kv.key)
@@ -456,6 +604,16 @@ func validateShadowsocksPlugin(o Outbound) []error {
 			}
 			if err := validateSSPluginOptValue(o.Plugin, kv.key, kind, kv.val); err != nil {
 				bad("shadowsocks %v", err)
+			}
+		}
+		// Required options are catalog data (spec.Required): a
+		// plugin missing one validates its present values cleanly
+		// and still cannot work — it would die inside the engine
+		// or fall back to an engine default. Name the missing
+		// option; never echo any option VALUE (CENSOR-P4 fix M2).
+		for _, req := range spec.Required {
+			if !present[req] {
+				bad("shadowsocks plugin %s: option %q is required", o.Plugin, req)
 			}
 		}
 	}

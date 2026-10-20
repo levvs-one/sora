@@ -471,6 +471,40 @@ func (c Capabilities) MissingFor(p *Plan, v Version) []string {
 			break
 		}
 	}
+	if c.Kind == KindMihomo {
+		// Plugin OPTIONS are per-engine too: mihomo carries every
+		// catalog plugin but not every catalog option (its obfs
+		// struct decodes mode/host only, and its decode silently
+		// ignores map keys the struct lacks). A plan whose option
+		// has no mihomo spelling (spec.MihomoOpts) must not route
+		// here — the option would vanish on render (CENSOR-P4 fix
+		// M3). First offender only, mirroring the loops above; a
+		// malformed option string is plan validation's refusal,
+		// not selection's, so a parse error skips this gate.
+	outer:
+		for _, o := range p.Outbounds {
+			if o.Protocol != ProtocolShadowsocks || o.Plugin == "" {
+				continue
+			}
+			spec := SSPluginByName(o.Plugin)
+			if spec == nil || !SupportsSSPlugin(c.Kind, o.Plugin) {
+				continue // the plugin-level gate above already names it
+			}
+			pairs, err := parseSSPluginOpts(o.PluginOpts)
+			if err != nil {
+				continue
+			}
+			for _, kv := range pairs {
+				if _, known := spec.optKind(kv.key); !known {
+					continue // unknown keys are validation's refusal
+				}
+				if _, carried := spec.MihomoOptKey(kv.key); !carried {
+					missing = append(missing, "shadowsocks plugin "+o.Plugin+" option "+kv.key+" (no mihomo spelling)")
+					break outer
+				}
+			}
+		}
+	}
 	for proto := range p.Protocols() {
 		if !c.SupportsProtocol(proto) {
 			missing = append(missing, "protocol "+string(proto))

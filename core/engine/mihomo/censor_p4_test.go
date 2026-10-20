@@ -51,7 +51,10 @@ func TestBuildProxyPluginNameTranslation(t *testing.T) {
 // gost-plugin options get the websocket shape its mihomo adapter
 // requires (mode is mandatory there), like v2ray-plugin's.
 func TestSSPluginOptsGostShape(t *testing.T) {
-	got := ssPluginOpts("gost-plugin", "tls;host=example.com")
+	got, err := ssPluginOpts("gost-plugin", "tls;host=example.com")
+	if err != nil {
+		t.Fatalf("ssPluginOpts(gost-plugin): %v", err)
+	}
 	want := map[string]any{"mode": "websocket", "tls": true, "host": "example.com"}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("ssPluginOpts(gost-plugin) = %v, want %v", got, want)

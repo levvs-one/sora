@@ -57,7 +57,11 @@ func buildProxyPolicy(o engine.Outbound, mux engine.MuxOptions, policy engine.Fi
 			if px.SSPlugin == "" {
 				px.SSPlugin = spec.Name
 			}
-			if opts := ssPluginOpts(o.Plugin, o.PluginOpts); len(opts) > 0 {
+			opts, err := ssPluginOpts(o.Plugin, o.PluginOpts)
+			if err != nil {
+				return proxy{}, err
+			}
+			if len(opts) > 0 {
 				px.SSPluginOpts = opts
 			}
 		} else if o.Obfs != "" {
@@ -513,52 +517,19 @@ func mihomoECHConfig(lines []string) (string, error) {
 }
 
 // ssPluginOpts translates a SIP002 plugin option string ("k=v;k;flag")
-// into mihomo's plugin-opts map. obfs-local and v2ray-plugin get their
-// native key names; anything else passes through generically and mihomo
-// validates it (fail-closed on unknown plugins).
-func ssPluginOpts(plugin, opts string) map[string]any {
-	raw := map[string]string{}
-	for _, part := range strings.Split(opts, ";") {
-		if part = strings.TrimSpace(part); part == "" {
-			continue
-		}
-		k, v, _ := strings.Cut(part, "=")
-		raw[strings.TrimSpace(k)] = strings.TrimSpace(v)
+// into mihomo's plugin-opts map. All per-plugin key knowledge is
+// catalog data (engine.SSPluginSpec.MihomoOpts) consumed through
+// engine.MihomoSSPluginOpts: an option mihomo does not carry — or a
+// key the catalog does not know — fails the render closed with the
+// option named, because mihomo's own decode silently ignores map
+// keys its plugin structs lack, so passing one through would run
+// the plan without the option it named (CENSOR-P4 fix M3).
+func ssPluginOpts(plugin, opts string) (map[string]any, error) {
+	out, err := engine.MihomoSSPluginOpts(plugin, opts)
+	if err != nil {
+		return nil, fmt.Errorf("mihomo: %w", err)
 	}
-	switch plugin {
-	case "obfs-local":
-		// simple-obfs: "obfs=tls;obfs-host=example.com".
-		out := map[string]any{}
-		if m, ok := raw["obfs"]; ok {
-			out["mode"] = m
-		}
-		if h, ok := raw["obfs-host"]; ok {
-			out["host"] = h
-		}
-		return out
-	case "v2ray-plugin", "gost-plugin":
-		// gost-plugin's mihomo option shape mirrors v2ray-plugin's
-		// (its adapter decodes the same fields and likewise requires
-		// mode "websocket"); without the shared case it fell into the
-		// generic passthrough and never got the mandatory mode.
-		out := map[string]any{"mode": "websocket"}
-		for k, v := range raw {
-			switch k {
-			case "tls", "mux":
-				// Bare flags mean enabled; explicit values parse as bool.
-				out[k] = v == "" || v == "1" || strings.EqualFold(v, "true")
-			default:
-				out[k] = v
-			}
-		}
-		return out
-	default:
-		out := map[string]any{}
-		for k, v := range raw {
-			out[k] = v
-		}
-		return out
-	}
+	return out, nil
 }
 
 // sanitizeName removes unsafe display-name characters. Commas, slashes, and
