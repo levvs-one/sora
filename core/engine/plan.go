@@ -128,11 +128,11 @@ type Transport struct {
 	// Xmux tunes XHTTP connection reuse. MaxConcurrency (streams per
 	// connection) and MaxConnections are mutually exclusive. Zero keeps
 	// the engine default. The mihomo renderer emits these fields as
-	// reuse-settings (PASS3 deep A1); the Xray and sing-box renderers
-	// do not emit xmux yet, and — since no engine claims
-	// FeatureXHTTPXmux (mihomo's claim waits for `mihomo -t` on the
-	// pin) — a plan setting these fields reports the feature missing
-	// on every engine instead of silently dropping the tuning at
+	// reuse-settings (PASS3 deep A1) and mihomo claims
+	// FeatureXHTTPXmux (verified with `mihomo -t` on the pin,
+	// 2026-10-20); the Xray and sing-box renderers do not emit xmux,
+	// so a plan setting these fields reports the feature missing on
+	// those engines instead of silently dropping the tuning at
 	// selection time (see FeatureXHTTPXmux).
 	XmuxMaxConcurrency  int
 	XmuxMaxConnections  int
@@ -256,6 +256,15 @@ type Group struct {
 	Name      string
 	Type      GroupType
 	Outbounds []string
+	// Selected is the member a select group starts on (an outbound id or
+	// a nested group name, one of Outbounds). Empty starts on the first
+	// member. Every engine honours it at Apply time — sing-box renders it
+	// as the selector's default, Xray seeds its selection map from it,
+	// and the Clash-API engines apply it through the controller right
+	// after start — so a fresh session's effective selection is Selected
+	// on all engines (the fast-switch invariant). Meaningful only for
+	// GroupSelect; validation rejects it elsewhere.
+	Selected string
 	URL       string
 	Interval  int
 	Tolerance int

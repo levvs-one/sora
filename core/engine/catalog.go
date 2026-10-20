@@ -38,17 +38,19 @@ var Catalog = map[Kind]Capabilities{
 			FeatureProxyProviders: true, FeatureURLTest: true, FeatureLatencyTest: true,
 			FeatureHotApply: true, FeatureGeoData: true, FeatureFallbackGroup: true,
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
+			FeatureXHTTPDownloadSplit: true, FeatureXHTTPXmux: true,
 			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureChains: true,
 			FeatureHy2PortHop: true, FeatureDoH3: true, FeatureECH: true,
-			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux yet:
-			// the mihomo renderer now emits download-settings,
-			// reuse-settings and x-padding-bytes in xhttp-opts (PASS3
-			// deep A1), but a catalog claim is a routing promise, and
-			// the pinned docs' shapes are not yet verified with
-			// `mihomo -t` on the 1.19.32 binary. Until that dev-machine
-			// check lands, split/xmux plans keep routing Xray-only for
-			// the split and report xmux missing everywhere; the claims
-			// flip in the same commit as the -t verification.
+			// FeatureXHTTPDownloadSplit and FeatureXHTTPXmux are
+			// claimed as of the engine bump validation (2026-10-20):
+			// the mihomo renderer emits download-settings,
+			// reuse-settings and x-padding-bytes in xhttp-opts
+			// (PASS3 deep A1), and the pinned 1.19.32 binary accepts
+			// the rendered shapes — pinned by
+			// mihomo.TestBinaryAcceptsXHTTPDownloadSettings, which
+			// runs `mihomo -t` on the real binary. If a future
+			// mihomo renames these fields, that test fails before
+			// the claims can route plans into a refused config.
 		},
 	},
 	KindSingBox: {

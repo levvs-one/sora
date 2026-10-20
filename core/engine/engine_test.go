@@ -459,21 +459,25 @@ func TestXrayMissesNameserverPolicy(t *testing.T) {
 	}
 }
 
-// TestCatalogXmuxClaimMatchesRenderers pins PASS3 deep S1 as staged
-// by PASS3 deep A1: the mihomo renderer now emits reuse-settings and
-// x-padding-bytes, but no catalog entry may claim FeatureXHTTPXmux
-// until that render is verified with `mihomo -t` on the pin — and the
-// Xray/sing-box renderers still emit no xmux at all — so an
-// xmux-tuned plan must report the feature missing on every engine.
-// The paired feature FeatureXHTTPDownloadSplit was checked the same
-// way: the Xray renderer does emit downloadSettings, so Xray keeps
-// that claim and the other engines keep lacking it (mihomo renders
-// download-settings but likewise waits for the -t verification).
+// TestCatalogXmuxClaimMatchesRenderers pins the claim state after
+// the `mihomo -t` verification landed (engine bump validation,
+// 2026-10-20; the binary check itself is
+// mihomo.TestBinaryAcceptsXHTTPDownloadSettings): mihomo's renderer
+// emits reuse-settings, x-padding-bytes and download-settings and the
+// pinned binary accepts them, so mihomo claims FeatureXHTTPXmux and
+// FeatureXHTTPDownloadSplit. The Xray and sing-box renderers still
+// emit no xmux at all, so an xmux-tuned plan must report the feature
+// missing on those two engines; Xray keeps FeatureXHTTPDownloadSplit
+// (its renderer emits downloadSettings) and sing-box keeps lacking
+// both.
 func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
 	for kind, caps := range Catalog {
-		if caps.Supports(FeatureXHTTPXmux) {
-			t.Errorf("%s claims FeatureXHTTPXmux before the render is verified with the engine binary", kind)
+		if caps.Supports(FeatureXHTTPXmux) && kind != KindMihomo {
+			t.Errorf("%s claims FeatureXHTTPXmux but its renderer emits no xmux", kind)
 		}
+	}
+	if !Catalog[KindMihomo].Supports(FeatureXHTTPXmux) {
+		t.Error("mihomo must claim FeatureXHTTPXmux: render verified with mihomo -t on the pin")
 	}
 	xhttpPlan := func(mutate func(*Transport)) *Plan {
 		p := validPlan()
@@ -483,23 +487,26 @@ func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
 		return p
 	}
 	xmux := xhttpPlan(func(tr *Transport) { tr.XmuxMaxConcurrency = 8 })
-	for kind, caps := range Catalog {
-		missing := strings.Join(caps.Missing(xmux), " ")
+	for _, kind := range []Kind{KindXray, KindSingBox} {
+		missing := strings.Join(Catalog[kind].Missing(xmux), " ")
 		if !strings.Contains(missing, string(FeatureXHTTPXmux)) {
 			t.Errorf("%s: xmux plan must report %s missing, got %q", kind, FeatureXHTTPXmux, missing)
 		}
+	}
+	if missing := strings.Join(Catalog[KindMihomo].Missing(xmux), " "); strings.Contains(missing, string(FeatureXHTTPXmux)) {
+		t.Errorf("mihomo carries xmux tuning, it must not report it missing: %q", missing)
 	}
 	split := xhttpPlan(func(tr *Transport) {
 		tr.Mode = "stream-up"
 		tr.DownloadAddress = "dl.example.com"
 		tr.DownloadPort = 443
 	})
-	if missing := strings.Join(Catalog[KindXray].Missing(split), " "); strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
-		t.Errorf("xray renders downloadSettings, so it must keep FeatureXHTTPDownloadSplit: %q", missing)
-	}
-	for _, kind := range []Kind{KindSingBox, KindMihomo} {
-		if missing := strings.Join(Catalog[kind].Missing(split), " "); !strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
-			t.Errorf("%s does not render download-settings, split must stay missing: %q", kind, missing)
+	for _, kind := range []Kind{KindXray, KindMihomo} {
+		if missing := strings.Join(Catalog[kind].Missing(split), " "); strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
+			t.Errorf("%s renders the download leg, so it must keep FeatureXHTTPDownloadSplit: %q", kind, missing)
 		}
+	}
+	if missing := strings.Join(Catalog[KindSingBox].Missing(split), " "); !strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
+		t.Errorf("sing-box does not render a download leg, split must stay missing: %q", missing)
 	}
 }

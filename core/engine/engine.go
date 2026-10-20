@@ -40,23 +40,22 @@ const (
 	FeatureTLSFragment    Feature = "tls-fragment"
 	FeatureXHTTP          Feature = "xhttp"
 	// FeatureXHTTPDownloadSplit marks engines that can split the XHTTP
-	// downlink onto a separate server. Only Xray claims it: its
-	// renderer emits downloadSettings, and mihomo's renderer now
-	// emits download-settings too (PASS3 deep A1) — but mihomo's
-	// claim waits for `mihomo -t` verification of the pinned docs'
-	// shape on the binary. sing-box (including the lx fork) has no
-	// such option: routing a split plan to it would silently send
-	// downloads over the uplink server.
+	// downlink onto a separate server. Xray (downloadSettings) and
+	// mihomo (download-settings, PASS3 deep A1) claim it; mihomo's
+	// claim is verified with `mihomo -t` on the pinned binary
+	// (mihomo.TestBinaryAcceptsXHTTPDownloadSettings). sing-box
+	// (including the lx fork) has no such option: routing a split plan
+	// to it would silently send downloads over the uplink server.
 	FeatureXHTTPDownloadSplit Feature = "xhttp-download-split"
 	// FeatureXHTTPXmux marks engines that honour XHTTP connection-reuse
-	// tuning. No engine claims it today. The mihomo renderer emits
-	// reuse-settings and x-padding-bytes (PASS3 deep A1) but its
-	// catalog claim waits for `mihomo -t` on the pin; the Xray and
-	// sing-box renderers emit neither xmux nor x_padding yet. So a
-	// plan that requires xmux tuning honestly reports it missing on
-	// every engine instead of being routed to a silent loss (PASS3
-	// deep S1). A claim returns to a catalog entry only together
-	// with a renderer that emits the tuning AND a binary check.
+	// tuning. Only mihomo claims it: its renderer emits reuse-settings
+	// and x-padding-bytes (PASS3 deep A1) and the render is verified
+	// with `mihomo -t` on the pin; the Xray and sing-box renderers emit
+	// neither xmux nor x_padding. So a plan that requires xmux tuning
+	// reports it missing on those two engines instead of being routed
+	// to a silent loss (PASS3 deep S1). A claim belongs in a catalog
+	// entry only together with a renderer that emits the tuning AND a
+	// binary check.
 	FeatureXHTTPXmux    Feature = "xhttp-xmux"
 	FeatureVLESSEncrypt Feature = "vless-encryption"
 	FeatureAmneziaWG    Feature = "amneziawg"
