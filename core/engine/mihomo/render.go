@@ -79,10 +79,10 @@ func Render(p *engine.Plan, rt Runtime) (string, error) {
 		auto := true
 		c.GeoAutoUpdate = &auto
 		c.GeoUpdateInterval = 24
-		c.GeoX = sortedMap(map[string]string{
+		c.GeoX = map[string]string{
 			"geoip":   orDefault(p.Options.GeoIPURL, GeoIPDefaultURL),
 			"geosite": orDefault(p.Options.GeoSiteURL, GeoSiteDefaultURL),
-		})
+		}
 	}
 
 	byID, proxies, err := buildProxies(p)

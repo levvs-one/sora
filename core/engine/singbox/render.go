@@ -99,7 +99,13 @@ func renderVersioned(p *engine.Plan, rt supervise.Runtime, ver engine.Version) (
 	if p == nil {
 		return nil, errors.New("singbox: nil plan")
 	}
-	r := renderer{plan: p, ver: ver, tags: map[string]string{}, used: map[string]bool{"direct": true}}
+	// Capacity hints: the maps and slices below are sized for the plan so
+	// rendering does not grow them repeatedly.
+	n := len(p.Outbounds) + len(p.Groups)
+	r := renderer{plan: p, ver: ver,
+		tags: make(map[string]string, n),
+		used: make(map[string]bool, n+1)}
+	r.used["direct"] = true
 	if err := r.assignTags(); err != nil {
 		return nil, err
 	}
@@ -123,7 +129,7 @@ func renderVersioned(p *engine.Plan, rt supervise.Runtime, ver engine.Version) (
 	}
 	// Open only requested listeners because all local applications can
 	// reach loopback.
-	inbounds := []obj{}
+	inbounds := make([]obj, 0, 2)
 	if lp := p.LocalProxy; lp.Enabled {
 		mixed := obj{"type": "mixed", "tag": "mixed-in", "listen": listen, "listen_port": rt.LocalPort}
 		if lp.Username != "" {
@@ -212,6 +218,7 @@ func (r *renderer) target(id string) (string, error) {
 }
 
 func (r *renderer) outbounds() (outbounds, endpoints []obj, err error) {
+	outbounds = make([]obj, 0, len(r.plan.Outbounds)+len(r.plan.Groups)+1)
 	for _, o := range r.plan.Outbounds {
 		out, err := r.outbound(o)
 		if err != nil {
@@ -518,7 +525,8 @@ func (r *renderer) group(g engine.Group) (obj, error) {
 
 // route orders sniffing and DNS hijacking before the unchanged plan rule order.
 func (r *renderer) route() (obj, error) {
-	rules := []obj{{"action": "sniff"}, {"protocol": "dns", "action": "hijack-dns"}}
+	rules := make([]obj, 0, len(r.plan.Rules)+2)
+	rules = append(rules, obj{"action": "sniff"}, obj{"protocol": "dns", "action": "hijack-dns"})
 	final := "direct"
 	for _, rule := range r.plan.Rules {
 		if rule.Type == engine.RuleMatchAll {
@@ -653,9 +661,10 @@ func (r *renderer) remoteRuleSet(tag, url string) string {
 // resolves.
 func (r *renderer) dns() (obj, string, error) {
 	d := r.plan.DNS
-	var servers, rules []obj
+	// +2 servers: the local bootstrap fallback and the fakeip server.
+	servers := make([]obj, 0, len(d.Servers)+2)
 	direct, remote, bootstrap := "", "", ""
-	byAddress := map[string]string{}
+	byAddress := make(map[string]string, len(d.Servers))
 	var byHostname []obj
 	for i, s := range d.Servers {
 		tag := orDefault(s.Tag, "dns-"+strconv.Itoa(i+1))
@@ -718,6 +727,9 @@ func (r *renderer) dns() (obj, string, error) {
 	for _, server := range byHostname {
 		server["domain_resolver"] = bootstrap
 	}
+	// Capacity covers the nameserver policies, the fake-IP filter rules
+	// and the final query_type rule.
+	rules := make([]obj, 0, len(d.NameserverPolicy)+len(engine.DefaultFakeIPFilter)+1)
 	patterns := make([]string, 0, len(d.NameserverPolicy))
 	for pattern := range d.NameserverPolicy {
 		patterns = append(patterns, pattern)
@@ -770,6 +782,11 @@ func (r *renderer) dns() (obj, string, error) {
 		// address family the flag just turned on.
 		strategy = "prefer_ipv6"
 	}
+	if len(rules) == 0 {
+		// An empty rule list marshals as null, matching the
+		// pre-optimization output; sing-box accepts both spellings.
+		rules = nil
+	}
 	out := obj{"servers": servers, "final": orDefault(remote, direct), "strategy": strategy}.
 		set("rules", rules).set("disable_cache", d.DisableCache)
 	return out, bootstrap, nil
@@ -787,6 +804,8 @@ func fakeIPFilterRules(d engine.DNS) (suffixes, regexes []string) {
 	if len(filters) == 0 {
 		filters = engine.DefaultFakeIPFilter
 	}
+	suffixes = make([]string, 0, len(filters))
+	regexes = make([]string, 0, len(filters))
 	for _, f := range filters {
 		suffix, regex := fakeIPFilterPattern(strings.TrimSpace(f))
 		switch {

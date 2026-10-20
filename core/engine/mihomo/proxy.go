@@ -402,15 +402,3 @@ func orDefaultInt(v, fallback int) int {
 	}
 	return v
 }
-
-func sortedMap(m map[string]string) map[string]string {
-	out := make(map[string]string, len(m))
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	for _, k := range keys {
-		out[k] = m[k]
-	}
-	return out
-}

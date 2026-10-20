@@ -79,7 +79,12 @@ func render(p *engine.Plan, rt supervise.Runtime, sel Selection, fpHints map[str
 	if len(p.Outbounds) == 1 && p.Outbounds[0].Protocol == engine.ProtocolXrayProfile {
 		return renderProfile(p, rt)
 	}
-	r := renderer{plan: p, sel: sel, fpHints: fpHints, tags: map[string]string{}, groups: map[string]engine.Group{}, byGroup: map[string]string{}}
+	r := renderer{
+		plan: p, sel: sel, fpHints: fpHints,
+		tags:    make(map[string]string, len(p.Outbounds)),
+		groups:  make(map[string]engine.Group, len(p.Groups)),
+		byGroup: make(map[string]string, len(p.Groups)),
+	}
 	for i, o := range p.Outbounds {
 		r.tags[o.ID] = outboundTag(i)
 	}
@@ -122,7 +127,7 @@ func sessionInbounds(p *engine.Plan, rt supervise.Runtime) []obj {
 	}
 	// Xray's SOCKS inbound also handles HTTP. Open it only on request
 	// because any local application can reach loopback.
-	inbounds := []obj{}
+	inbounds := make([]obj, 0, 2)
 	if lp := p.LocalProxy; lp.Enabled {
 		settings := obj{"udp": true}
 		if lp.Username != "" {
@@ -549,11 +554,16 @@ func (r *renderer) balancerFor(g engine.Group) string {
 	}
 	tag := "b-" + strconv.Itoa(len(r.balancer)+1)
 	r.byGroup[g.Name] = tag
-	var members []string
+	members := make([]string, 0, len(g.Outbounds))
 	for _, id := range g.Outbounds {
 		if t, ok := r.tags[id]; ok {
 			members = append(members, t)
 		}
+	}
+	if len(members) == 0 {
+		// A group of only groups has no plain members: keep the
+		// selector nil so it marshals as null, as before.
+		members = nil
 	}
 	strategy := "leastPing"
 	if g.Type == engine.GroupLoadBalance {
@@ -569,8 +579,12 @@ func (r *renderer) balancerFor(g engine.Group) string {
 
 // observed lists automatic-group members measured by the observatory.
 func (r *renderer) observed() []string {
-	seen := map[string]bool{}
-	var out []string
+	n := 0
+	for _, b := range r.balancer {
+		n += len(b["selector"].([]string))
+	}
+	seen := make(map[string]bool, n)
+	out := make([]string, 0, n)
 	for _, b := range r.balancer {
 		for _, t := range b["selector"].([]string) {
 			if !seen[t] {
@@ -583,7 +597,8 @@ func (r *renderer) observed() []string {
 }
 
 func (r *renderer) routing() (obj, error) {
-	var rules []obj
+	// +2: the TUN DNS rule and the explicit final rule.
+	rules := make([]obj, 0, len(r.plan.Rules)+2)
 	if r.plan.Tun.Enabled {
 		// TCP carries retries after truncated UDP responses and must use the
 		// same resolver instead of forwarding the machine's DNS address abroad.
@@ -650,7 +665,8 @@ func match(rule engine.Rule) (obj, error) {
 // dns renders resolvers. Proxy-only DNS follows routing; other resolvers use
 // direct "+local" dialing.
 func (r *renderer) dns() (obj, error) {
-	var servers []any
+	// +1: the localhost fallback.
+	servers := make([]any, 0, len(r.plan.DNS.Servers)+1)
 	for _, s := range r.plan.DNS.Servers {
 		addr := s.Address
 		if s.Port != 0 {
@@ -713,7 +729,9 @@ func RenderProbe(outbounds []engine.Outbound, ports []int) ([]byte, error) {
 	if len(outbounds) != len(ports) {
 		return nil, errors.New("xray: one port per outbound is required")
 	}
-	r := renderer{plan: &engine.Plan{Outbounds: outbounds}, tags: map[string]string{}, groups: map[string]engine.Group{}, byGroup: map[string]string{}}
+	r := renderer{plan: &engine.Plan{Outbounds: outbounds},
+		tags:   make(map[string]string, len(outbounds)),
+		groups: map[string]engine.Group{}, byGroup: map[string]string{}}
 	inbounds := make([]obj, 0, len(outbounds))
 	rendered := make([]obj, 0, len(outbounds))
 	rules := make([]obj, 0, len(outbounds))
