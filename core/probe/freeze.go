@@ -36,9 +36,18 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
+
+// normalizeFreezeSNI canonicalizes a sample key: "Example.COM." and
+// "example.com" are the same throttle key for the censor, so they share
+// one track. Applied on both the write (Observe) and read (Verdict) side
+// so every feeder — prober, session, policy layer — agrees on the key.
+func normalizeFreezeSNI(sni string) string {
+	return strings.ToLower(strings.TrimSuffix(strings.TrimSpace(sni), "."))
+}
 
 // Freeze-detection tuning. The parallel threshold mirrors the observed
 // censor behavior: freezes begin above ~3 concurrent handshakes per SNI.
@@ -231,6 +240,7 @@ func (d *FreezeDetector) cooldown() time.Duration {
 // (FreezeProber) separates the phases precisely; feed it raw handshake
 // samples.
 func (d *FreezeDetector) Observe(s FreezeSample) {
+	s.SNI = normalizeFreezeSNI(s.SNI)
 	if s.SNI == "" {
 		return
 	}
@@ -303,6 +313,7 @@ func (d *FreezeDetector) ObserveFailure(sni string, concurrent int, err error, t
 
 // Verdict reads the current pattern for one SNI.
 func (d *FreezeDetector) Verdict(sni string) FreezeVerdict {
+	sni = normalizeFreezeSNI(sni)
 	v := FreezeVerdict{SNI: sni}
 	d.mu.Lock()
 	samples := d.samples[sni]
