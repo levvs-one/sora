@@ -438,7 +438,10 @@ class AppUpdater extends ChangeNotifier {
     }
     // Decode failures are content failures, not transport failures: an
     // undecodable body is malformed (fail-closed below), never "unreachable".
-    final String text;
+    // Not final: the FormatException fallback below assigns the empty
+    // string, and Dart counts the try-block assignment as a possible
+    // first assignment, so a final local cannot be assigned in the catch.
+    String text;
     try {
       text = utf8.decode(body);
     } on FormatException {
