@@ -223,7 +223,15 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     final store = ExtScope.of(context);
     _storeRef = store;
     final inst = store.get(widget.extensionId);
-    if (inst == null || !inst.enabled || inst.manifest.panels.isEmpty) {
+    // A revoked extension never serves a panel, even if this screen was
+    // already on the stack when the list landed: the store's sweep
+    // disables matches on load/refresh, and this gate covers the rest.
+    // (An expired list alone does not block here — already-running
+    // extensions keep running under stale intel, per revoke.dart.)
+    if (inst == null ||
+        !inst.enabled ||
+        inst.manifest.panels.isEmpty ||
+        store.isRevoked(inst.id, inst.version)) {
       setState(() => _failure = 'gone');
       return;
     }

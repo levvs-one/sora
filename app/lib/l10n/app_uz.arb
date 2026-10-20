@@ -647,6 +647,8 @@
   "extErrHttpsOnly": "Only https:// links are allowed",
   "extErrGeneric": "Something went wrong. Please try again.",
   "extErrAuthorKeyChanged": "This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.",
+  "extErrRevoked": "This extension was revoked by the Sora team and cannot be installed or enabled.",
+  "extErrRevocationStale": "The revocation list is out of date and cannot be refreshed right now, so installing and enabling extensions is blocked until it is renewed.",
   "extUpdateAvailable": "Update available",
   "extDisabled": "Disabled",
   "extToggleEnabled": "Enable {name}",

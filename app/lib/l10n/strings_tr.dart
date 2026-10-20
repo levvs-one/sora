@@ -1127,6 +1127,13 @@ class STr extends S {
       'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
 
   @override
+  String get extErrRevoked => 'This extension was revoked by the Sora team and cannot be installed or enabled.';
+
+  @override
+  String get extErrRevocationStale =>
+      'The revocation list is out of date and cannot be refreshed right now, so installing and enabling extensions is blocked until it is renewed.';
+
+  @override
   String get extUpdateAvailable => 'Update available';
 
   @override

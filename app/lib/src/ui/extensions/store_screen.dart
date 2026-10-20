@@ -21,6 +21,7 @@ import '../../ext/conflicts.dart';
 import '../../ext/manifest.dart';
 import '../../ext/package.dart';
 import '../../ext/permissions.dart';
+import '../../ext/revoke.dart';
 import '../../ext/store.dart';
 import '../../ext/verifier.dart';
 import 'conflicts_sheet.dart';
@@ -164,6 +165,27 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     return Uint8List.fromList(body);
   }
 
+  /// Best-effort revocation-list refresh before an install, mirroring
+  /// core/ext's Refresh policy: a verified list replaces the cache, any
+  /// failure falls back to the cached list, and with no cache the install
+  /// gate simply has no list (the package signature stays the primary
+  /// gate). Never blocks the install on the network for long and never
+  /// surfaces an error: the store's own gate decides with whatever list
+  /// is armed when install runs.
+  Future<void> _refreshRevocationsBeforeInstall() async {
+    if (!teamSigningConfigured) return;
+    try {
+      await _store.refreshRevocations().timeout(const Duration(seconds: 10));
+    } catch (_) {
+      // No new intel: the cached list (if any) still rules.
+    }
+  }
+
+  /// Localized message for a revocation refusal: the revoked and the
+  /// stale-list cases read differently, everything else is generic.
+  static String _revocationMessage(S s, RevocationError e) =>
+      e.kind == RevocationErrorKind.expired ? s.extErrRevocationStale : s.extErrRevoked;
+
   /// Verifies and installs raw .soraext bytes with the permission prompt.
   ///
   /// [changelog] lists the new versions' notes newest-first; shown on the
@@ -176,6 +198,8 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       List<CatalogChangelogEntry>? changelog,
       String? authorKeyPin}) async {
     final s = S.of(context);
+    if (!context.mounted) return false;
+    await _refreshRevocationsBeforeInstall();
     if (!context.mounted) return false;
     var progressOpen = false;
     void showProgress(String label) {
@@ -246,6 +270,8 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         hideProgress();
       }
       return true;
+    } on RevocationError catch (e) {
+      showFailure(context, _revocationMessage(s, e));
     } on PackageError catch (e) {
       showFailure(context, _mapInstallError(context, e.message));
     } on SignatureError {
@@ -449,6 +475,11 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       _catalogError = null;
       _catalogSoon = false;
     });
+    // A catalog sync is also a revocation sync (the spec's disable-on-sync
+    // point): refresh the list in the background — the cached list keeps
+    // ruling while the network is unreachable, and a failure here must
+    // never surface as a catalog error.
+    unawaited(ExtScope.of(context).refreshRevocations().then((_) {}, onError: (_) {}));
     try {
       final ExtensionCatalog catalog;
       final bool fromCache;
@@ -1046,7 +1077,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                   label: s.extToggleEnabled(inst.manifest.name),
                   child: Switch(
                     value: inst.enabled,
-                    onChanged: (v) => store.setEnabled(inst.id, v),
+                    onChanged: (v) => _toggleEnabled(context, store, inst, v),
                   ),
                 ),
               );
@@ -1055,6 +1086,32 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
         ),
       ],
     );
+  }
+
+  /// Enable/disable from the installed list. A revocation refusal (or a
+  /// stale-list block) is a real answer, not silence: the switch snaps
+  /// back on its own because the store never changed, and the snackbar
+  /// says why in localized words.
+  Future<void> _toggleEnabled(BuildContext context, ExtensionStore store,
+      InstalledExtension inst, bool v) async {
+    final s = S.of(context);
+    try {
+      await store.setEnabled(inst.id, v);
+    } on RevocationError catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(
+              content:
+                  Text(_ExtensionsScreenState._revocationMessage(s, e))));
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(s.extErrGeneric)));
+      }
+    }
   }
 
   /// Updates every outdated extension in sequence. Each widening update

@@ -17,6 +17,7 @@ import '../../ext/catalog.dart';
 import '../../ext/enforcement.dart';
 import '../../ext/manifest.dart';
 import '../../ext/permissions.dart';
+import '../../ext/revoke.dart';
 import '../../ext/store.dart';
 import 'panel_screen.dart';
 import 'permissions_sheet.dart';
@@ -333,7 +334,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
         SwitchTile(
           title: s.extEnabled,
           value: live.enabled,
-          onChanged: (v) => store.setEnabled(live.id, v),
+          onChanged: (v) => _setEnabled(context, store, live.id, v),
         ),
         if (live.previous != null) ...[
           const SizedBox(height: 8),
@@ -356,6 +357,32 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
         ),
       ],
     );
+  }
+
+  /// Enable/disable from the detail switch. A revocation refusal gets
+  /// its own localized snackbar (the switch itself snaps back because
+  /// the store never changed); any other failure is the generic one.
+  Future<void> _setEnabled(
+      BuildContext context, ExtensionStore store, String id, bool v) async {
+    final s = S.of(context);
+    try {
+      await store.setEnabled(id, v);
+    } on RevocationError catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(
+              content: Text(e.kind == RevocationErrorKind.expired
+                  ? s.extErrRevocationStale
+                  : s.extErrRevoked)));
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(s.extErrGeneric)));
+      }
+    }
   }
 
   Future<void> _confirm(

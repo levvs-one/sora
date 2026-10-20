@@ -2175,6 +2175,18 @@ abstract class S {
   /// **'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.'**
   String get extErrAuthorKeyChanged;
 
+  /// No description provided for @extErrRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это расширение отозвано командой Sora и не может быть установлено или включено.'**
+  String get extErrRevoked;
+
+  /// No description provided for @extErrRevocationStale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Список отзыва устарел и сейчас не может быть обновлён, поэтому установка и включение расширений заблокированы, пока он не будет продлён.'**
+  String get extErrRevocationStale;
+
   /// No description provided for @extUpdateAvailable.
   ///
   /// In ru, this message translates to:
