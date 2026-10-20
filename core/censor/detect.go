@@ -39,8 +39,12 @@ func (Detector) Detect(a Attempt) Verdict {
 	best := candidate{kind: KindUnknown, confidence: 0.15,
 		evidence: []string{"not enough was observed about this attempt to name a cause"}}
 
+	// One scan serves every rule: scan is a pure reduction of the
+	// event log, so sharing it cannot change any rule's reading —
+	// it only stops the detector from re-walking the log per rule.
+	s := scan(a)
 	for _, rule := range rules {
-		if c, ok := rule(a); ok && c.confidence > best.confidence {
+		if c, ok := rule(a, s); ok && c.confidence > best.confidence {
 			best = c
 		}
 	}
@@ -68,8 +72,9 @@ func (Detector) Detect(a Attempt) Verdict {
 	}
 }
 
-// rule reads the attempt and reports a candidate classification.
-type rule func(Attempt) (candidate, bool)
+// rule reads the attempt and reports a candidate classification. The
+// failureScan is computed once by Detect and shared by all rules.
+type rule func(Attempt, failureScan) (candidate, bool)
 
 // rules are tried in any order; the most confident candidate wins. Each rule
 // is narrow on purpose: a signature that also matches ordinary failures must
@@ -109,6 +114,17 @@ type failureScan struct {
 	sawBytesIn bool
 	// resolvedTo records the last resolved address, if observed.
 	resolvedTo string
+	// terminalDetail is the terminal event's Detail, lowercased once:
+	// three rules match on it case-insensitively and each used to pay
+	// for its own strings.ToLower.
+	terminalDetail string
+	// sawTLSSent reports whether any TLS-stage SENT event was observed,
+	// regardless of timestamps (clientHelloStallRule's "the ClientHello
+	// went out" check; tlsSentAt alone only records timed sends).
+	sawTLSSent bool
+	// maxBytesIn is the largest BytesIn any event reported
+	// (dataStallRule's fallback when the terminal event has no count).
+	maxBytesIn int64
 }
 
 func scan(a Attempt) failureScan {
@@ -117,8 +133,14 @@ func scan(a Attempt) failureScan {
 		if e.Stage > s.furthest && e.What != WhatUnknown {
 			s.furthest = e.Stage
 		}
+		if i == 0 || e.BytesIn > s.maxBytesIn {
+			s.maxBytesIn = e.BytesIn
+		}
 		if e.BytesIn > 0 || e.What == WhatReceived {
 			s.sawBytesIn = true
+		}
+		if e.Stage == StageTLS && e.What == WhatSent {
+			s.sawTLSSent = true
 		}
 		if e.Stage == StageDNS && e.What == WhatResolved && e.Detail != "" {
 			s.resolvedTo = e.Detail
@@ -133,6 +155,9 @@ func scan(a Attempt) failureScan {
 			ev := a.Events[i]
 			s.terminal = &ev
 		}
+	}
+	if s.terminal != nil {
+		s.terminalDetail = strings.ToLower(s.terminal.Detail)
 	}
 	return s
 }
@@ -151,13 +176,12 @@ func isTerminal(w What) bool {
 // NXDOMAIN for a name never seen working is only weak evidence — names die —
 // so without KnownGoodHost or an ExpectedIP mismatch it stays below the claim
 // floor and the verdict remains Unknown.
-func dnsPoisoningRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func dnsPoisoningRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.Stage != StageDNS {
 		return candidate{}, false
 	}
-	d := strings.ToLower(t.Detail)
+	d := s.terminalDetail
 	isNX := strings.Contains(d, "nxdomain") || strings.Contains(d, "no such host")
 	if s.resolvedTo != "" && a.ExpectedIP != "" && s.resolvedTo != a.ExpectedIP {
 		return candidate{KindDNSPoisoning, 0.8, []string{
@@ -181,13 +205,12 @@ func dnsPoisoningRule(a Attempt) (candidate, bool) {
 // port is closed. That is a dead or misconfigured server — a censor drops
 // packets, it does not run a connection-refusing stack. Evidence *against*
 // censorship, reported confidently so the user stops blaming the path.
-func tcpRefusedRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func tcpRefusedRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.Stage != StageTCP || t.What != WhatError {
 		return candidate{}, false
 	}
-	if !strings.Contains(strings.ToLower(t.Detail), "refus") {
+	if !strings.Contains(s.terminalDetail, "refus") {
 		return candidate{}, false
 	}
 	return candidate{KindNoInterference, 0.85, []string{
@@ -198,8 +221,7 @@ func tcpRefusedRule(a Attempt) (candidate, bool) {
 // ipBlockingRule: the SYN went unanswered until our deadline. IP-level
 // filtering, a dead host, and a dead route all look like this, so the claim
 // stays medium no matter what — the explanation says so.
-func ipBlockingRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func ipBlockingRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.Stage != StageTCP || t.What != WhatLocalTimeout {
 		return candidate{}, false
@@ -216,8 +238,7 @@ func ipBlockingRule(a Attempt) (candidate, bool) {
 // this way too), so it claims little. A reset right after the connect, before
 // any handshake bytes, is the middlebox signature: a real server stack
 // rarely RSTs a fresh connection it just accepted.
-func tcpResetRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func tcpResetRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.Stage != StageTCP || t.What != WhatRemoteReset {
 		return candidate{}, false
@@ -242,8 +263,7 @@ func tcpResetRule(a Attempt) (candidate, bool) {
 // ClientHello went out, and the path tore the connection down before a single
 // server byte arrived. Servers do not do this; filters reacting to the
 // handshake — almost always the SNI — do.
-func sniBlockingRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func sniBlockingRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.Stage != StageTLS || !a.Target.TLS {
 		return candidate{}, false
@@ -279,8 +299,7 @@ func sniBlockingRule(a Attempt) (candidate, bool) {
 // tlsAlertRule: the far end aborted the handshake with an alert. Alerts are
 // the server's voice, but a handshake_failure to a known-good SNI right after
 // the ClientHello is also how some filters answer. Medium at most.
-func tlsAlertRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func tlsAlertRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.Stage != StageTLS || t.What != WhatTLSAlert {
 		return candidate{}, false
@@ -297,8 +316,7 @@ func tlsAlertRule(a Attempt) (candidate, bool) {
 // handshakeTimeoutRule: the handshake stalled — packets flowed, then silence
 // until our deadline. The DPI stall signature. Kept medium: congested paths
 // stall too.
-func handshakeTimeoutRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func handshakeTimeoutRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.What != WhatLocalTimeout {
 		return candidate{}, false
@@ -318,8 +336,7 @@ func handshakeTimeoutRule(a Attempt) (candidate, bool) {
 // answering. Narrower and more confident than the generic
 // handshake-timeout rule — ordinary congestion usually still lets some
 // server bytes through, or stalls before the ClientHello is even sent.
-func clientHelloStallRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func clientHelloStallRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.What != WhatLocalTimeout || t.Stage != StageTLS {
 		return candidate{}, false
@@ -327,14 +344,7 @@ func clientHelloStallRule(a Attempt) (candidate, bool) {
 	if s.sawBytesIn || t.BytesIn > 0 {
 		return candidate{}, false
 	}
-	sent := false
-	for _, e := range a.Events {
-		if e.Stage == StageTLS && e.What == WhatSent {
-			sent = true
-			break
-		}
-	}
-	if !sent {
+	if !s.sawTLSSent {
 		return candidate{}, false
 	}
 	ev := []string{
@@ -350,13 +360,12 @@ func clientHelloStallRule(a Attempt) (candidate, bool) {
 // captive portal, a corporate MITM, or a misconfigured server — and this
 // package cannot tell which. Naming it interference would be a lie, so it
 // stays below the claim floor and surfaces as Unknown with an honest note.
-func certRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func certRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.What != WhatError {
 		return candidate{}, false
 	}
-	d := strings.ToLower(t.Detail)
+	d := s.terminalDetail
 	if !strings.Contains(d, "cert") && !strings.Contains(d, "tls") {
 		return candidate{}, false
 	}
@@ -368,8 +377,7 @@ func certRule(a Attempt) (candidate, bool) {
 // appResetRule: reset during the VPN protocol handshake, after TLS (or on a
 // non-TLS port) completed. The path let the lower layers through and killed
 // the application handshake: protocol-aware filtering.
-func appResetRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func appResetRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.Stage != StageApp {
 		return candidate{}, false
@@ -384,8 +392,7 @@ func appResetRule(a Attempt) (candidate, bool) {
 
 // dataResetRule: reset mid-session after traffic flowed. Kept modest: long
 // idle connections also die to NAT timeouts, and the explanation admits it.
-func dataResetRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func dataResetRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.Stage != StageData || t.What != WhatRemoteReset {
 		return candidate{}, false

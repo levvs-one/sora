@@ -26,8 +26,7 @@ const dataStallMinBytes = 1024
 // counts the rule stays silent — without byte evidence a data stall is
 // indistinguishable from a handshake stall, and an uncertain verdict must
 // read as uncertainty.
-func dataStallRule(a Attempt) (candidate, bool) {
-	s := scan(a)
+func dataStallRule(a Attempt, s failureScan) (candidate, bool) {
 	t := s.terminal
 	if t == nil || t.What != WhatLocalTimeout {
 		return candidate{}, false
@@ -41,12 +40,8 @@ func dataStallRule(a Attempt) (candidate, bool) {
 	bytesIn := t.BytesIn
 	if bytesIn <= 0 {
 		// Byte counts missing on the terminal event; fall back to the
-		// largest count any event reported.
-		for _, e := range a.Events {
-			if e.BytesIn > bytesIn {
-				bytesIn = e.BytesIn
-			}
-		}
+		// largest count any event reported (precomputed by scan).
+		bytesIn = s.maxBytesIn
 	}
 	if bytesIn < dataStallMinBytes {
 		return candidate{}, false
