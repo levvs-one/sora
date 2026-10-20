@@ -316,7 +316,9 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 
 // realityFingerprint resolves the uTLS fingerprint of a REALITY outbound:
 // the plan's explicit value (normalized) wins, then a probe-discovered
-// working fingerprint, then the canonical default. The default is the
+// working fingerprint (normalized, so it can never diverge from the XHTTP
+// downlink leg, which normalizes the same hint), then the canonical
+// default. The default is the
 // "hellochrome_auto" alias — always the newest verified Chrome parrot of
 // the engine's vendored uTLS — because Xray's pinned "chrome" alias sends
 // Chrome 133, which TSPU fingerprints and blocks (see
@@ -325,7 +327,7 @@ func (r *renderer) realityFingerprint(o engine.Outbound) string {
 	if fp := engine.NormalizeFingerprint(o.TLS.Fingerprint); fp != "" {
 		return fp
 	}
-	if fp := r.fpHints[o.ID]; fp != "" {
+	if fp := engine.NormalizeFingerprint(r.fpHints[o.ID]); fp != "" {
 		return fp
 	}
 	return engine.DefaultXrayFingerprint

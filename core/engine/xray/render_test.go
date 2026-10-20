@@ -384,6 +384,21 @@ func TestRenderXHTTPDownloadFingerprintProbeHintInherited(t *testing.T) {
 	}
 }
 
+func TestRenderXHTTPDownloadFingerprintProbeHintNormalized(t *testing.T) {
+	// A probe hint that is not already normalized (case/whitespace) must
+	// still land identically on both legs: the uplink normalizes the hint
+	// exactly like the downlink, so the two ClientHellos cannot diverge.
+	p := xhttpPlanWithFingerprint("", false)
+	raw, err := render(p, testRuntime, nil, map[string]string{p.Outbounds[0].ID: " HelloChrome_Auto "})
+	if err != nil {
+		t.Fatal(err)
+	}
+	up, down := xhttpFingerprints(t, raw)
+	if up != "hellochrome_auto" || down != "hellochrome_auto" {
+		t.Errorf("uplink=%q downlink=%q: both legs must render the normalized hint %q", up, down, "hellochrome_auto")
+	}
+}
+
 func TestRenderXHTTPDownloadFingerprintRefused(t *testing.T) {
 	// Empty or Xray-unknown fingerprints must fail at render time with a
 	// named error — never a silent default or a name Xray would reject at
