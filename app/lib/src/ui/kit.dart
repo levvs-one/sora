@@ -527,18 +527,29 @@ class Segments<T> extends StatelessWidget {
       decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(11)),
       child: Stack(
         children: [
-          AnimatedAlign(
-            alignment: Alignment(keys.length == 1 ? 0 : -1 + 2 * index / (keys.length - 1), 0),
-            duration: Motion.of(context, Motion.medium),
-            curve: Motion.curve,
-            child: FractionallySizedBox(
-              widthFactor: 1 / keys.length,
-              heightFactor: 1,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: palette.surface,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [BoxShadow(color: palette.shadow, blurRadius: 6, offset: const Offset(0, 1))],
+          // Positioned.fill, not a plain Stack child: the indicator must not
+          // take part in sizing the Stack. As a non-positioned child the
+          // AnimatedAlign passes the incoming height through to the
+          // FractionallySizedBox, and in an unbounded-height parent (a
+          // Column, a ListView, the field sheet) that height is infinite —
+          // "BoxConstraints forces an infinite height" on every layout.
+          // The Row below sizes the Stack (with the Container's minHeight
+          // as the floor, so large text scales still grow the control);
+          // the indicator then fills exactly that height.
+          Positioned.fill(
+            child: AnimatedAlign(
+              alignment: Alignment(keys.length == 1 ? 0 : -1 + 2 * index / (keys.length - 1), 0),
+              duration: Motion.of(context, Motion.medium),
+              curve: Motion.curve,
+              child: FractionallySizedBox(
+                widthFactor: 1 / keys.length,
+                heightFactor: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: palette.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [BoxShadow(color: palette.shadow, blurRadius: 6, offset: const Offset(0, 1))],
+                  ),
                 ),
               ),
             ),
