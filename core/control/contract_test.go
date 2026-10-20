@@ -51,7 +51,7 @@ func TestCoreEventPayloadKinds(t *testing.T) {
 }
 
 // TestNewFieldTagsAreStable pins the wire tags of every field added in
-// contract 1.8-1.10. Tags are the wire identity: renumbering one silently
+// contract 1.8-1.11. Tags are the wire identity: renumbering one silently
 // breaks hand-written clients (protoc-gen-dart is unavailable, the Dart
 // stubs are maintained by hand). Add new fields with new tags only.
 func TestNewFieldTagsAreStable(t *testing.T) {
