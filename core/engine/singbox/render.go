@@ -565,16 +565,6 @@ func (r *renderer) group(g engine.Group) (obj, error) {
 	switch g.Type {
 	case engine.GroupSelect:
 		out["type"] = "selector"
-		if g.Selected != "" {
-			// The selector's default is the member it starts on;
-			// without it sing-box starts on the first member and the
-			// plan's Selected would be silently dropped at Connect.
-			tag, err := r.target(g.Selected)
-			if err != nil {
-				return nil, err
-			}
-			out["default"] = tag
-		}
 	case engine.GroupURLTest:
 		out.set("type", "urltest").set("url", orDefault(g.URL, r.plan.Options.TestURL)).set("tolerance", g.Tolerance)
 		if g.Interval > 0 {
@@ -993,7 +983,7 @@ func (r *renderer) tun(t engine.Tun) obj {
 		// multi_queue scales packet I/O with CPU cores but needs
 		// sing-tun's own TCP/IP stack (sing-box 1.15+): the pinned
 		// 1.14-based lx fork rejects it as an unknown field (verified
-		// with `sing-box check` against 1.14.3-lx.22).
+		// with `sing-box check` against 1.14.3-lx.14).
 		if !r.ver.Less(engine.Version{Major: 1, Minor: 15}) {
 			out["multi_queue"] = true
 		}

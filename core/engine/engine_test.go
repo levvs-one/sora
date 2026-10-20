@@ -483,26 +483,23 @@ func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
 		return p
 	}
 	xmux := xhttpPlan(func(tr *Transport) { tr.XmuxMaxConcurrency = 8 })
-	for _, kind := range []Kind{KindXray, KindSingBox} {
-		missing := strings.Join(Catalog[kind].Missing(xmux), " ")
+	for kind, caps := range Catalog {
+		missing := strings.Join(caps.Missing(xmux), " ")
 		if !strings.Contains(missing, string(FeatureXHTTPXmux)) {
 			t.Errorf("%s: xmux plan must report %s missing, got %q", kind, FeatureXHTTPXmux, missing)
 		}
-	}
-	if missing := strings.Join(Catalog[KindMihomo].Missing(xmux), " "); strings.Contains(missing, string(FeatureXHTTPXmux)) {
-		t.Errorf("mihomo carries xmux tuning, it must not report it missing: %q", missing)
 	}
 	split := xhttpPlan(func(tr *Transport) {
 		tr.Mode = "stream-up"
 		tr.DownloadAddress = "dl.example.com"
 		tr.DownloadPort = 443
 	})
-	for _, kind := range []Kind{KindXray, KindMihomo} {
-		if missing := strings.Join(Catalog[kind].Missing(split), " "); strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
-			t.Errorf("%s renders the download leg, so it must keep FeatureXHTTPDownloadSplit: %q", kind, missing)
-		}
+	if missing := strings.Join(Catalog[KindXray].Missing(split), " "); strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
+		t.Errorf("xray renders downloadSettings, so it must keep FeatureXHTTPDownloadSplit: %q", missing)
 	}
-	if missing := strings.Join(Catalog[KindSingBox].Missing(split), " "); !strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
-		t.Errorf("sing-box does not render a download leg, split must stay missing: %q", missing)
+	for _, kind := range []Kind{KindSingBox, KindMihomo} {
+		if missing := strings.Join(Catalog[kind].Missing(split), " "); !strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
+			t.Errorf("%s does not render download-settings, split must stay missing: %q", kind, missing)
+		}
 	}
 }
