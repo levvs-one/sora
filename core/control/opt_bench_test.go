@@ -42,6 +42,7 @@ func (s *benchStream[T]) Send(*T) error            { s.sent++; return nil }
 // benchmarker.Benchmark call would deliver them through the channel.
 type benchBenchmarker struct {
 	samples []probe.BandwidthSample
+	history []probe.HistoryEntry
 }
 
 func (b *benchBenchmarker) Benchmark(ctx context.Context, outbounds []engine.Outbound, opts engine.BandwidthOptions) (<-chan probe.BandwidthSample, error) {
@@ -53,7 +54,7 @@ func (b *benchBenchmarker) Benchmark(ctx context.Context, outbounds []engine.Out
 	return out, nil
 }
 
-func (b *benchBenchmarker) History() []probe.HistoryEntry { return nil }
+func (b *benchBenchmarker) History() []probe.HistoryEntry { return b.history }
 func (b *benchBenchmarker) RecordLatency(string, time.Duration) {}
 
 // benchToken returns a valid control token for authorize.
@@ -135,6 +136,50 @@ func BenchmarkBandwidthStream1000Events(b *testing.B) {
 		}
 		if stream.sent != len(samples) {
 			b.Fatalf("sent %d samples, want %d", stream.sent, len(samples))
+		}
+	}
+}
+
+// BenchmarkGetBenchmarks200 reads 200 stored benchmark records through
+// the GetBenchmarks RPC: the slice conversion loop behind the history UI.
+func BenchmarkGetBenchmarks200(b *testing.B) {
+	token := benchToken(b)
+	history := make([]probe.HistoryEntry, 0, 200)
+	for i := 0; i < 200; i++ {
+		history = append(history, probe.HistoryEntry{
+			ServerID: fmt.Sprintf("srv-%d", i), BytesPerSec: uint64(1_000_000 + i),
+			LatencyMs: uint32(10 + i), MeasuredAt: time.Now(),
+		})
+	}
+	auth, err := NewAuthenticator(token)
+	if err != nil {
+		b.Fatal(err)
+	}
+	srv, err := New(Config{
+		Version:       Version{Major: 1, Minor: 3, MinSupportedMinor: 1},
+		Authenticator: auth,
+		Sessions: session.NewManager(session.ManagerConfig{
+			TunUp:   func(context.Context, string) error { return nil },
+			Factory: func(context.Context, *engine.Plan) (engine.Engine, error) { return nil, context.Canceled },
+		}),
+		Benchmarker: &benchBenchmarker{history: history},
+	})
+	if err != nil {
+		b.Fatal(err)
+	}
+	req := &corev1.GetBenchmarksRequest{
+		ApiVersion:           &corev1.ApiVersion{Major: 1, Minor: 3, MinSupportedMinor: 1},
+		ControlAuthenticator: token,
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		resp, err := srv.GetBenchmarks(context.Background(), req)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if len(resp.GetBenchmarks()) != 200 {
+			b.Fatalf("got %d records, want 200", len(resp.GetBenchmarks()))
 		}
 	}
 }
