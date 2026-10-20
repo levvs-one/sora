@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:intl/intl.dart';
 
-import '../../l10n/strings.dart';
-import '../design/theme.dart';
+import '../../../l10n/strings.dart';
+import '../../design/theme.dart';
 import '../kit.dart';
 import '../../ext/catalog.dart';
 import '../../ext/enforcement.dart';
@@ -290,7 +290,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                   children: [
                     if (entry != null) ...[
                       if (entry.rating > 0) StarRating(rating: entry.rating),
-                      ...catalogBadges(context, entry),
+                      ...catalogBadgeWidgets(context, entry),
                     ] else if (widget.installed?.source != 'catalog')
                       ExtBadge(
                           label: s.extSideloadShort,

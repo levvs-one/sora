@@ -17,10 +17,10 @@ import 'package:webview_all/webview_all.dart';
 import 'package:webview_all_linux/webview_all_linux.dart';
 import 'package:webview_all_windows/webview_all_windows.dart';
 
-import '../../l10n/strings.dart';
-import '../design/theme.dart';
+import '../../../l10n/strings.dart';
+import '../../design/theme.dart';
 import '../kit.dart';
-import '../sora.dart';
+import '../../sora.dart';
 import '../../ext/bridge.dart';
 import '../../ext/manifest.dart';
 import '../../ext/store.dart';
@@ -432,6 +432,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     final title = _failure == null ? _panel.title : s.extensions;
     return Screen(
       title: title,
+      children: const [],
       fill: _failure != null
           ? Center(
               child: Column(

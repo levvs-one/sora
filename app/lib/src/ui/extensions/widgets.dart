@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../l10n/strings.dart';
-import '../design/theme.dart';
+import '../../../l10n/strings.dart';
+import '../../design/theme.dart';
 import '../kit.dart';
 import '../../ext/catalog.dart';
 import '../../ext/permissions.dart';
@@ -89,7 +89,10 @@ class ExtBadge extends StatelessWidget {
 }
 
 /// Badges for a catalog entry: verified/top/new/staff.
-List<Widget> catalogBadges(BuildContext context, CatalogEntry e) {
+///
+/// Named distinctly from [catalogBadges] in ext/catalog.dart, which is the
+/// data constant (the set of allowed badge ids) — this is the UI renderer.
+List<Widget> catalogBadgeWidgets(BuildContext context, CatalogEntry e) {
   final s = S.of(context);
   final out = <Widget>[];
   for (final b in e.badges) {

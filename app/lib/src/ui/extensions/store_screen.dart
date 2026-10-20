@@ -13,8 +13,8 @@ import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:math' as math;
 
-import '../../l10n/strings.dart';
-import '../design/theme.dart';
+import '../../../l10n/strings.dart';
+import '../../design/theme.dart';
 import '../kit.dart';
 import '../../ext/catalog.dart';
 import '../../ext/conflicts.dart';
@@ -60,6 +60,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       store: _store,
       child: Screen(
         title: s.extensions,
+        children: const [],
         actions: [
           RoundButton(
             icon: Symbols.install_desktop_rounded,
@@ -831,7 +832,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       author: e.author,
       rating: e.rating,
       installs: e.installs,
-      badges: catalogBadges(context, e),
+      badges: catalogBadgeWidgets(context, e),
       subtitle: e.description,
       permissions: e.permissions,
       onTap: () => push(
@@ -1090,6 +1091,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
         ..showSnackBar(SnackBar(content: Text(s.extUpdatedCount(done))));
     }
   }
+}
 
 /// Banner over the installed list when extensions fight over an exclusive
 /// permission (routing rules, theme, network hooks). Tapping it opens the

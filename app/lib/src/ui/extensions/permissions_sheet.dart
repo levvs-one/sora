@@ -11,8 +11,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../l10n/strings.dart';
-import '../design/theme.dart';
+import '../../../l10n/strings.dart';
+import '../../design/theme.dart';
 import '../kit.dart';
 import '../../ext/catalog.dart';
 import '../../ext/enforcement.dart';
