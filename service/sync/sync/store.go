@@ -1,7 +1,6 @@
 package sync
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -29,9 +28,15 @@ func NewDirStore(dir string) (*DirStore, error) {
 }
 
 type storedDoc struct {
-	UpdatedAt int64  `json:"updated_at"`
-	Payload   string `json:"payload"` // base64
-	From      string `json:"from,omitempty"`
+	UpdatedAt int64 `json:"updated_at"`
+	// Payload is a []byte so encoding/json base64-encodes it directly:
+	// the on-disk form is the exact base64 string a string field held,
+	// but neither the writer (EncodeToString copy) nor the reader
+	// (string copy + DecodeString copy) pays for an extra full-size
+	// copy of the payload. A nil payload must be stored as []byte{}
+	// by callers: encoding/json renders a nil []byte as null, not "".
+	Payload []byte `json:"payload"` // base64 in JSON
+	From    string `json:"from,omitempty"`
 	// Hash is the cached hex sha256 of the payload, computed once by Put.
 	// Files written before the cache existed have no hash; readers fall
 	// back to decoding and hashing the payload.
@@ -103,15 +108,13 @@ func (d *DirStore) List() []Meta {
 			hash := sm.Hash
 			if hash == "" {
 				// Legacy file: decode and hash once, as List used to.
+				// storedDoc's []byte payload is already the decoded
+				// bytes (encoding/json base64-decodes it).
 				var sd storedDoc
 				if err := json.Unmarshal(raw, &sd); err != nil {
 					continue
 				}
-				payload, err := base64.StdEncoding.DecodeString(sd.Payload)
-				if err != nil {
-					continue
-				}
-				hash = HashOf(payload)
+				hash = HashOf(sd.Payload)
 			}
 			out = append(out, Meta{
 				Kind: k.Name(), Name: name,
@@ -138,10 +141,7 @@ func (d *DirStore) Get(kind, name string) (Document, bool) {
 	if err := json.Unmarshal(raw, &sd); err != nil {
 		return Document{}, false
 	}
-	payload, err := base64.StdEncoding.DecodeString(sd.Payload)
-	if err != nil {
-		return Document{}, false
-	}
+	payload := sd.Payload
 	// Get returns the payload, so the hash is recomputed from it: the
 	// Meta.Hash == sha256(payload) invariant (sync.go) must hold for
 	// every document Get hands out, even if the on-disk cache was
@@ -167,17 +167,25 @@ func (d *DirStore) Put(doc Document) (bool, error) {
 		return false, err
 	}
 	if raw, err := os.ReadFile(p); err == nil {
-		var sd storedDoc
-		if err := json.Unmarshal(raw, &sd); err == nil && sd.UpdatedAt >= doc.UpdatedAt {
+		// The last-write-wins check needs only the stored timestamp:
+		// unmarshal into storedMeta so the decoder skips the payload
+		// instead of materialising a full-size copy of a document that
+		// is about to be kept or replaced unread.
+		var sm storedMeta
+		if err := json.Unmarshal(raw, &sm); err == nil && sm.UpdatedAt >= doc.UpdatedAt {
 			return false, nil // stored copy wins (last-write-wins)
 		}
 	}
 	if err := os.MkdirAll(filepath.Dir(p), 0o700); err != nil {
 		return false, fmt.Errorf("sync: %w", err)
 	}
+	payload := doc.Payload
+	if payload == nil {
+		payload = []byte{} // keep "payload":"" on disk, never null
+	}
 	raw, err := json.Marshal(storedDoc{
 		UpdatedAt: doc.UpdatedAt,
-		Payload:   base64.StdEncoding.EncodeToString(doc.Payload),
+		Payload:   payload,
 		From:      doc.From,
 		// Cache the hash at write time so reads never decode and hash
 		// the payload; computed here rather than trusting doc.Hash.

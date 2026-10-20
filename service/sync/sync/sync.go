@@ -8,7 +8,6 @@ package sync
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -58,22 +57,30 @@ type wireDoc struct {
 	Kind      string `json:"kind"`
 	Name      string `json:"name"`
 	UpdatedAt int64  `json:"updated_at"`
-	Payload   string `json:"payload"` // base64
-	From      string `json:"from,omitempty"`
+	// Payload is a []byte so encoding/json base64-encodes it directly:
+	// the wire form is the exact base64 string a string field carried,
+	// but neither side pays for an extra full-size EncodeToString /
+	// DecodeString copy of the payload. A nil payload must be sent as
+	// []byte{} (see toWire): encoding/json renders nil as null, not "".
+	Payload []byte `json:"payload"` // base64 in JSON
+	From    string `json:"from,omitempty"`
 }
 
 func toWire(d Document) wireDoc {
+	payload := d.Payload
+	if payload == nil {
+		payload = []byte{} // keep "payload":"" on the wire, never null
+	}
 	return wireDoc{
 		Kind: d.Kind, Name: d.Name, UpdatedAt: d.UpdatedAt,
-		Payload: base64.StdEncoding.EncodeToString(d.Payload), From: d.From,
+		Payload: payload, From: d.From,
 	}
 }
 
 func fromWire(w wireDoc) (Document, error) {
-	payload, err := base64.StdEncoding.DecodeString(w.Payload)
-	if err != nil {
-		return Document{}, fmt.Errorf("sync: bad document payload: %w", err)
-	}
+	// encoding/json has already base64-decoded the payload; an invalid
+	// encoding fails the frame unmarshal in recv, before fromWire runs.
+	payload := w.Payload
 	if len(payload) > 16<<20 {
 		return Document{}, errors.New("sync: document exceeds 16 MiB")
 	}
