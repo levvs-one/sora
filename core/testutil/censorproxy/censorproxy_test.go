@@ -393,3 +393,67 @@ func TestReadPcap(t *testing.T) {
 		t.Fatal("expected error on garbage input")
 	}
 }
+
+// testPcapFrac builds a classic-pcap (LE) with the given magic and per-packet
+// timestamp fractions; both packets share the same tsSec so the gap is
+// exactly the fraction difference.
+func testPcapFrac(t *testing.T, magic uint32, fracs []uint32, pkts ...[]byte) *bytes.Buffer {
+	t.Helper()
+	if len(fracs) != len(pkts) {
+		t.Fatal("fracs/pkts length mismatch")
+	}
+	var buf bytes.Buffer
+	hdr := make([]byte, 24)
+	binary.LittleEndian.PutUint32(hdr[0:4], magic)
+	binary.LittleEndian.PutUint16(hdr[4:6], 2)
+	binary.LittleEndian.PutUint16(hdr[6:8], 4)
+	binary.LittleEndian.PutUint32(hdr[20:24], 1) // Ethernet
+	buf.Write(hdr)
+	for i, payload := range pkts {
+		frame := buildEthernetTCP(t, i%2 == 0, payload)
+		ph := make([]byte, 16)
+		binary.LittleEndian.PutUint32(ph[0:4], uint32(1_700_000_000))
+		binary.LittleEndian.PutUint32(ph[4:8], fracs[i])
+		binary.LittleEndian.PutUint32(ph[8:12], uint32(len(frame)))
+		binary.LittleEndian.PutUint32(ph[12:16], uint32(len(frame)))
+		buf.Write(ph)
+		buf.Write(frame)
+	}
+	return &buf
+}
+
+// TestReadPcapNanosecTimestamps checks that nanosec-magic pcaps get
+// nanosecond (not microsecond*1000) timestamp fractions: a 20ms gap must
+// read as 20ms, otherwise inter-arrival gaps inflate 1000x and the timing
+// heuristic flags every flow as "quiet".
+func TestReadPcapNanosecTimestamps(t *testing.T) {
+	cases := []struct {
+		name    string
+		magic   uint32
+		nanosec bool
+	}{
+		{"microsec", 0xd4c3b2a1, false},
+		{"nanosec", 0x4d3c2ba1, true},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			frac := uint32(20_000) // 20ms in microseconds
+			if c.nanosec {
+				frac = 20_000_000 // 20ms in nanoseconds
+			}
+			buf := testPcapFrac(t, c.magic, []uint32{0, frac},
+				[]byte("one"), []byte("two"))
+			flow, err := ReadPcap(buf)
+			if err != nil {
+				t.Fatalf("ReadPcap: %v", err)
+			}
+			if len(flow.Packets) != 2 {
+				t.Fatalf("expected 2 packets, got %d", len(flow.Packets))
+			}
+			gap := flow.Packets[1].At - flow.Packets[0].At
+			if gap != 20*time.Millisecond {
+				t.Fatalf("gap = %v, want 20ms", gap)
+			}
+		})
+	}
+}

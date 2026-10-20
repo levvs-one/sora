@@ -25,6 +25,7 @@ func ReadPcap(r io.Reader) (*Flow, error) {
 		return nil, fmt.Errorf("pcap: короткий глобальный заголовок: %w", err)
 	}
 	var bo binary.ByteOrder
+	var nanosec bool
 	switch binary.LittleEndian.Uint32(hdr[0:4]) {
 	case 0xa1b2c3d4:
 		bo = binary.BigEndian
@@ -32,8 +33,10 @@ func ReadPcap(r io.Reader) (*Flow, error) {
 		bo = binary.LittleEndian
 	case 0xa1b23c4d:
 		bo = binary.BigEndian // nanosec
+		nanosec = true
 	case 0x4d3c2ba1:
 		bo = binary.LittleEndian // nanosec
+		nanosec = true
 	default:
 		return nil, fmt.Errorf("pcap: неизвестная магия %x", hdr[0:4])
 	}
@@ -71,10 +74,10 @@ func ReadPcap(r io.Reader) (*Flow, error) {
 		}
 		if first {
 			client = src
-			t0 = time.Unix(int64(tsSec), int64(tsFrac)*1000)
+			t0 = time.Unix(int64(tsSec), fracToNanos(tsFrac, nanosec))
 			first = false
 		}
-		ts := time.Unix(int64(tsSec), int64(tsFrac)*1000)
+		ts := time.Unix(int64(tsSec), fracToNanos(tsFrac, nanosec))
 		dir := Inbound
 		if src.Equal(client) {
 			dir = Outbound
@@ -90,6 +93,18 @@ func ReadPcap(r io.Reader) (*Flow, error) {
 		return nil, fmt.Errorf("pcap: не найдено ни одного IPv4/TCP пакета")
 	}
 	return flow, nil
+}
+
+// fracToNanos converts the pcap packet-header fractional timestamp to
+// nanoseconds: the fraction is microseconds for classic pcap and already
+// nanoseconds for the nanosec magic variants. Getting this wrong inflates
+// inter-arrival gaps 1000x and makes every flow look "quiet" to the timing
+// heuristic.
+func fracToNanos(frac uint32, nanosec bool) int64 {
+	if nanosec {
+		return int64(frac)
+	}
+	return int64(frac) * 1000
 }
 
 // tcpPayload strips link + IPv4 + TCP headers, returning the source IP and
