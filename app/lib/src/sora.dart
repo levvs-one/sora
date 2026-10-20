@@ -1864,6 +1864,58 @@ class Sora extends ChangeNotifier {
     _noteSyncChanged();
   });
 
+  /// The provider device identity (C1, contract 1.13): the HWID the
+  /// core stores and whether subscription fetches carry it. Null when
+  /// the core is unreachable, predates 1.13, or has no identity store;
+  /// the settings section then simply stays hidden.
+  Future<({String hwid, bool enabled})?> getDeviceIdentity() async {
+    final link = _link;
+    if (link == null || link.minor < 13) return null;
+    try {
+      final answer = await link.stub.getDeviceIdentity(
+        GetDeviceIdentityRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
+      );
+      if (_disposed || link != _link) return null;
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      return (hwid: answer.hwid, enabled: answer.enabled);
+    } catch (error) {
+      reportFailure(error, source: 'device-identity');
+      return null;
+    }
+  }
+
+  /// Applies the device identity choice (contract 1.13): the toggle,
+  /// an optional reset, and the companion platform facts this app
+  /// honestly knows. Returns the resulting identity — after a reset
+  /// that is the NEW hwid — or null on failure.
+  Future<({String hwid, bool enabled})?> setDeviceIdentity({required bool enabled, bool reset = false}) async {
+    final link = _link;
+    if (link == null || link.minor < 13) {
+      reportFailure(CoreFailure.unavailable, source: 'device-identity');
+      return null;
+    }
+    try {
+      final answer = await link.stub.setDeviceIdentity(
+        SetDeviceIdentityRequest(
+          apiVersion: apiVersion,
+          controlAuthenticator: link.token,
+          enabled: enabled,
+          reset: reset,
+          verOs: deviceVerOs(),
+          deviceModel: '',
+        ),
+      );
+      if (_disposed || link != _link) return null;
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      recovered('device-identity');
+      notifyListeners();
+      return (hwid: answer.hwid, enabled: answer.enabled);
+    } catch (error) {
+      reportFailure(error, source: 'device-identity');
+      return null;
+    }
+  }
+
   /// User-added servers, stored by the core outside subscriptions.
   final List<CustomServer> _customServers = [];
   List<CustomServer> get customServers => List.unmodifiable(_customServers);
@@ -2761,6 +2813,19 @@ OutboundSpec _fastest(
     }
   }
   return best;
+}
+
+/// The OS version the platform itself reports, shaped for the
+/// x-ver-os device header (contract 1.13): trimmed, printable ASCII
+/// only, at most 128 characters (the core's companion bound). This is
+/// the one companion fact dart:io honestly provides
+/// ([Platform.operatingSystemVersion]); it exposes no device model,
+/// so SetDeviceIdentity sends an empty model and the core omits
+/// x-device-model rather than inventing one.
+String deviceVerOs() {
+  final raw = Platform.operatingSystemVersion.trim();
+  final clean = String.fromCharCodes(raw.codeUnits.where((c) => c >= 0x20 && c <= 0x7e)).trim();
+  return clean.length <= 128 ? clean : clean.substring(0, 128);
 }
 
 /// Provides [Sora] to descendants and rebuilds dependents when state changes.

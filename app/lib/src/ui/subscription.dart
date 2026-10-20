@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:protobuf/well_known_types/google/protobuf/duration.pb.dart' as pb;
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -39,6 +40,116 @@ class SubscriptionsScreen extends StatelessWidget {
               title: s.addSubscription,
               onTap: () => showSubscriptionSheet(context),
               trailing: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
+            ),
+          ],
+        ),
+        const _DeviceIdentitySection(),
+      ],
+    );
+  }
+}
+
+/// The provider device identity (C1, contract 1.13): one global setting
+/// for every subscription. The core stores the HWID and sends it on
+/// subscription fetches while the switch is on; the section loads the
+/// state from the core and stays hidden until the core answers (an
+/// older core or a missing identity store leaves it out entirely).
+class _DeviceIdentitySection extends StatefulWidget {
+  const _DeviceIdentitySection();
+
+  @override
+  State<_DeviceIdentitySection> createState() => _DeviceIdentitySectionState();
+}
+
+class _DeviceIdentitySectionState extends State<_DeviceIdentitySection> {
+  ({String hwid, bool enabled})? _identity;
+  bool _requested = false;
+  bool _busy = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_requested) return;
+    _requested = true;
+    unawaited(_load());
+  }
+
+  Future<void> _load() async {
+    final identity = await SoraScope.read(context).getDeviceIdentity();
+    if (!mounted) return;
+    setState(() => _identity = identity);
+  }
+
+  Future<void> _apply({required bool enabled, bool reset = false}) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final next = await SoraScope.read(context).setDeviceIdentity(enabled: enabled, reset: reset);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (next != null) _identity = next;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final identity = _identity;
+    if (identity == null) return const SizedBox.shrink();
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Heading(s.deviceIdTitle),
+        Group(
+          children: [
+            SwitchTile(
+              title: s.deviceIdSend,
+              detail: s.deviceIdSendDetail,
+              value: identity.enabled,
+              onChanged: _busy ? null : (v) => unawaited(_apply(enabled: v)),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(s.deviceIdCurrent, style: Styles.secondary.copyWith(color: palette.ink2)),
+                        const SizedBox(height: 4),
+                        SelectableText(
+                          identity.hwid,
+                          style: Styles.caption.copyWith(color: palette.ink, fontFamily: 'monospace'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Tooltip(
+                    message: s.deviceIdCopy,
+                    child: Pressable(
+                      onTap: () => unawaited(Clipboard.setData(ClipboardData(text: identity.hwid))),
+                      radius: 8,
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(Symbols.content_copy_rounded, size: 18, color: palette.ink2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Tile(
+              title: s.deviceIdReset,
+              titleColor: palette.danger,
+              onTap: _busy
+                  ? null
+                  : () async {
+                      if (await confirm(context, question: s.deviceIdResetConfirm, action: s.deviceIdReset)) {
+                        await _apply(enabled: identity.enabled, reset: true);
+                      }
+                    },
             ),
           ],
         ),

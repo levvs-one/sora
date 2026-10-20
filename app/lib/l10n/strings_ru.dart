@@ -2314,4 +2314,26 @@ class SRu extends S {
 
   @override
   String get errSubIntervalInvalid => 'Интервал обновления должен быть от одного часа до 30 дней';
+
+  @override
+  String get deviceIdTitle => 'Идентификатор устройства';
+
+  @override
+  String get deviceIdSend => 'Отправлять идентификатор устройства провайдерам подписок';
+
+  @override
+  String get deviceIdSendDetail => 'Провайдеры с лимитом устройств требуют идентификатор, иначе не отдают подписку.';
+
+  @override
+  String get deviceIdCurrent => 'Текущий идентификатор';
+
+  @override
+  String get deviceIdCopy => 'Копировать';
+
+  @override
+  String get deviceIdReset => 'Сбросить идентификатор';
+
+  @override
+  String get deviceIdResetConfirm =>
+      'Сбросить идентификатор устройства? Провайдер посчитает это устройство новым, и сброс может занять ещё один слот лимита устройств. Старый идентификатор не сохраняется.';
 }

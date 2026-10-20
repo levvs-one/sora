@@ -401,4 +401,60 @@ void main() {
       expect(back.filterL7, 'tls,quic');
     });
   });
+
+  group('API 1.13: device identity (C1)', () {
+    test('GetDeviceIdentityRequest tags', () {
+      expectFirstTag(() => GetDeviceIdentityRequest(),
+          (m) => (m as GetDeviceIdentityRequest).apiVersion = ApiVersion(), 1, 2,
+          'GetDeviceIdentityRequest.api_version');
+      expectFirstTag(() => GetDeviceIdentityRequest(),
+          (m) => (m as GetDeviceIdentityRequest).controlAuthenticator = [1, 2], 2, 2,
+          'GetDeviceIdentityRequest.control_authenticator');
+    });
+    test('GetDeviceIdentityResponse tags', () {
+      expectFirstTag(() => GetDeviceIdentityResponse(), (m) => (m as GetDeviceIdentityResponse).hwid = 'h1',
+          1, 2, 'GetDeviceIdentityResponse.hwid');
+      expectFirstTag(() => GetDeviceIdentityResponse(), (m) => (m as GetDeviceIdentityResponse).enabled = true,
+          2, 0, 'GetDeviceIdentityResponse.enabled');
+      expectFirstTag(() => GetDeviceIdentityResponse(), (m) => (m as GetDeviceIdentityResponse).error = SoraError(),
+          3, 2, 'GetDeviceIdentityResponse.error');
+    });
+    test('SetDeviceIdentityRequest tags', () {
+      expectFirstTag(() => SetDeviceIdentityRequest(),
+          (m) => (m as SetDeviceIdentityRequest).apiVersion = ApiVersion(), 1, 2,
+          'SetDeviceIdentityRequest.api_version');
+      expectFirstTag(() => SetDeviceIdentityRequest(),
+          (m) => (m as SetDeviceIdentityRequest).controlAuthenticator = [1, 2], 2, 2,
+          'SetDeviceIdentityRequest.control_authenticator');
+      expectFirstTag(() => SetDeviceIdentityRequest(), (m) => (m as SetDeviceIdentityRequest).enabled = true,
+          3, 0, 'SetDeviceIdentityRequest.enabled');
+      expectFirstTag(() => SetDeviceIdentityRequest(), (m) => (m as SetDeviceIdentityRequest).reset = true,
+          4, 0, 'SetDeviceIdentityRequest.reset');
+      expectFirstTag(() => SetDeviceIdentityRequest(), (m) => (m as SetDeviceIdentityRequest).verOs = '6.8',
+          5, 2, 'SetDeviceIdentityRequest.ver_os');
+      expectFirstTag(() => SetDeviceIdentityRequest(),
+          (m) => (m as SetDeviceIdentityRequest).deviceModel = 'Testbox', 6, 2,
+          'SetDeviceIdentityRequest.device_model');
+    });
+    test('SetDeviceIdentityResponse tags', () {
+      expectFirstTag(() => SetDeviceIdentityResponse(), (m) => (m as SetDeviceIdentityResponse).hwid = 'h1',
+          1, 2, 'SetDeviceIdentityResponse.hwid');
+      expectFirstTag(() => SetDeviceIdentityResponse(), (m) => (m as SetDeviceIdentityResponse).enabled = true,
+          2, 0, 'SetDeviceIdentityResponse.enabled');
+      expectFirstTag(() => SetDeviceIdentityResponse(), (m) => (m as SetDeviceIdentityResponse).error = SoraError(),
+          3, 2, 'SetDeviceIdentityResponse.error');
+    });
+    test('SetDeviceIdentityRequest round-trips', () {
+      final request = SetDeviceIdentityRequest()
+        ..enabled = true
+        ..reset = true
+        ..verOs = '6.8.0'
+        ..deviceModel = 'Testbox 3000';
+      final back = SetDeviceIdentityRequest.fromBuffer(request.writeToBuffer());
+      expect(back.enabled, isTrue);
+      expect(back.reset, isTrue);
+      expect(back.verOs, '6.8.0');
+      expect(back.deviceModel, 'Testbox 3000');
+    });
+  });
 }

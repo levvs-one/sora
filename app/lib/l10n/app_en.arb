@@ -924,5 +924,12 @@
   "errSecretReferenceInvalid": "The secret reference is not valid",
   "errSecretTooLarge": "The secret is too large to store",
   "errSubNotFound": "The subscription was not found",
-  "errSubIntervalInvalid": "The update interval must be between one hour and 30 days"
+  "errSubIntervalInvalid": "The update interval must be between one hour and 30 days",
+  "deviceIdTitle": "Device identity",
+  "deviceIdSend": "Send device identifier to subscription providers",
+  "deviceIdSendDetail": "Providers with a device limit require the identifier to return the subscription.",
+  "deviceIdCurrent": "Current identifier",
+  "deviceIdCopy": "Copy",
+  "deviceIdReset": "Reset identifier",
+  "deviceIdResetConfirm": "Reset the device identifier? The provider will count this as a new device, and the reset may take another slot of its device limit. The old identifier is not kept."
 }

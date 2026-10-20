@@ -4310,6 +4310,48 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Интервал обновления должен быть от одного часа до 30 дней'**
   String get errSubIntervalInvalid;
+
+  /// No description provided for @deviceIdTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Идентификатор устройства'**
+  String get deviceIdTitle;
+
+  /// No description provided for @deviceIdSend.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправлять идентификатор устройства провайдерам подписок'**
+  String get deviceIdSend;
+
+  /// No description provided for @deviceIdSendDetail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Провайдеры с лимитом устройств требуют идентификатор, иначе не отдают подписку.'**
+  String get deviceIdSendDetail;
+
+  /// No description provided for @deviceIdCurrent.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текущий идентификатор'**
+  String get deviceIdCurrent;
+
+  /// No description provided for @deviceIdCopy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копировать'**
+  String get deviceIdCopy;
+
+  /// No description provided for @deviceIdReset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить идентификатор'**
+  String get deviceIdReset;
+
+  /// No description provided for @deviceIdResetConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить идентификатор устройства? Провайдер посчитает это устройство новым, и сброс может занять ещё один слот лимита устройств. Старый идентификатор не сохраняется.'**
+  String get deviceIdResetConfirm;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -2292,4 +2292,26 @@ class SHy extends S {
 
   @override
   String get errSubIntervalInvalid => 'The update interval must be between one hour and 30 days';
+
+  @override
+  String get deviceIdTitle => 'Device identity';
+
+  @override
+  String get deviceIdSend => 'Send device identifier to subscription providers';
+
+  @override
+  String get deviceIdSendDetail => 'Providers with a device limit require the identifier to return the subscription.';
+
+  @override
+  String get deviceIdCurrent => 'Current identifier';
+
+  @override
+  String get deviceIdCopy => 'Copy';
+
+  @override
+  String get deviceIdReset => 'Reset identifier';
+
+  @override
+  String get deviceIdResetConfirm =>
+      'Reset the device identifier? The provider will count this as a new device, and the reset may take another slot of its device limit. The old identifier is not kept.';
 }
