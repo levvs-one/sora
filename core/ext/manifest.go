@@ -174,6 +174,21 @@ func (m *Manifest) Validate() error {
 					"ext: panel %q has an unsafe entry %q (must be a relative .html path)", p.ID, p.Entry)
 			}
 		}
+		// Panels embed the extension's UI inside the app, so they must be
+		// declared and consented like every other privileged surface: the
+		// "ui-panel" capability and the "ui.panel" permission. A panel
+		// that asked for neither would reach the user without the install
+		// prompt ever mentioning UI embedding.
+		if len(m.UI.Panels) > 0 {
+			if !hasCapability(m, "ui-panel") {
+				return errs.Newf(errs.CodeInvalidArgument, KeyManifestInvalid,
+					`ext: panels require the "ui-panel" capability`)
+			}
+			if !hasPermission(m, "ui.panel") {
+				return errs.Newf(errs.CodeInvalidArgument, KeyManifestInvalid,
+					`ext: panels require the "ui.panel" permission`)
+			}
+		}
 	}
 	if len(m.SettingsSchema) > 0 {
 		var v any

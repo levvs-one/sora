@@ -39,7 +39,7 @@ func testManifest(t *testing.T) *Manifest {
 		MinAppVersion:   "1.9.0",
 		Description:     "An example panel.",
 		Author:          Author{Name: "Example", Identity: "github:example", PublicKey: testPubKeyLine(t)},
-		Permissions:     []string{"connections.read", "notifications"},
+		Permissions:     []string{"connections.read", "notifications", "ui.panel"},
 		Capabilities:    []string{"ui-panel"},
 		UI:              &UIManifest{Panels: []Panel{{ID: "main", Title: "Hello", Entry: "panel.html"}}},
 	}
@@ -142,6 +142,12 @@ func TestManifestRejects(t *testing.T) {
 		{"absolute entry", func(m *Manifest) { m.UI.Panels[0].Entry = "/etc/panel.html" }},
 		{"non-html entry", func(m *Manifest) { m.UI.Panels[0].Entry = "panel.js" }},
 		{"bad author key", func(m *Manifest) { m.Author.PublicKey = "nope" }},
+		{"panels without the ui.panel permission", func(m *Manifest) {
+			m.Permissions = []string{"connections.read", "notifications"}
+		}},
+		{"panels without the ui-panel capability", func(m *Manifest) {
+			m.Capabilities = []string{}
+		}},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -158,6 +164,20 @@ func TestManifestRejects(t *testing.T) {
 				t.Fatalf("expected rejection for %s", tc.name)
 			}
 		})
+	}
+}
+
+// TestManifestWithoutPanelsNeedsNoUiPermission pins the positive side of
+// the panels gate: a manifest that embeds no UI must not be forced to ask
+// for the ui.panel permission.
+func TestManifestWithoutPanelsNeedsNoUiPermission(t *testing.T) {
+	m := testManifest(t)
+	m.UI = nil
+	m.Permissions = []string{"connections.read"}
+	m.Capabilities = []string{}
+	raw, _ := json.Marshal(m)
+	if _, err := ParseManifest(raw); err != nil {
+		t.Fatalf("a panel-less manifest must not need ui.panel: %v", err)
 	}
 }
 

@@ -27,7 +27,7 @@ func testManifestForFuzz() *Manifest {
 		MinAppVersion:   "1.9.0",
 		Description:     "An example panel.",
 		Author:          Author{Name: "Example", Identity: "github:example", PublicKey: testPubKeyLineForFuzz()},
-		Permissions:     []string{"connections.read", "notifications"},
+		Permissions:     []string{"connections.read", "notifications", "ui.panel"},
 		Capabilities:    []string{"ui-panel"},
 		UI:              &UIManifest{Panels: []Panel{{ID: "main", Title: "Hello", Entry: "panel.html"}}},
 	}
@@ -57,6 +57,19 @@ func FuzzParseManifest(f *testing.F) {
 		// Unicode tricks: lookalike dots, RTL overrides, zero-width chars.
 		[]byte("{\"manifest_version\":1,\"id\":\"com\u3002example\u200bx\",\"name\":\"\u202ex\",\"version\":\"1.0.0\",\"min_app_version\":\"1.0.0\",\"author\":{\"name\":\"a\",\"identity\":\"i\",\"public_key\":\"" + testPubKeyLineForFuzz() + "\"}}"),
 	}
+	// Real-case seeds (pass 1): a full v2-runtime manifest (background +
+	// net.fetch + panels), the dangerous-permission set, and panel-entry
+	// attack shapes (encoded traversal, ADS, backslashes) next to the one
+	// honest entry that must keep passing.
+	seeds = append(seeds,
+		[]byte(fullRuntimeManifestSeed()),
+		[]byte(dangerousPermissionsManifestSeed()),
+		[]byte(panelAttackManifestSeed("%2e%2e/panel.html")),
+		[]byte(panelAttackManifestSeed("..%2fpanel.html")),
+		[]byte(panelAttackManifestSeed("panel.html:evil")),
+		[]byte(panelAttackManifestSeed(`a\..\panel.html`)),
+		[]byte(panelAttackManifestSeed("panel.html")),
+	)
 	for _, s := range seeds {
 		f.Add(s)
 	}
@@ -99,6 +112,83 @@ func FuzzParseManifest(f *testing.F) {
 				if !isSafeEntry(p.Entry) {
 					t.Fatalf("accepted unsafe panel entry %q", p.Entry)
 				}
+			}
+		}
+	})
+}
+
+// fullRuntimeManifestSeed is a manifest exercising the whole v2-runtime
+// surface: background_task + network_hosts + panels. It must be accepted
+// by ParseManifestFull.
+func fullRuntimeManifestSeed() string {
+	return `{"manifest_version":1,"id":"com.example.worker","name":"Worker","version":"1.0.0","min_app_version":"1.9.0",` +
+		`"author":{"name":"Example","identity":"github:example","public_key":"` + testPubKeyLineForFuzz() + `"},` +
+		`"permissions":["background","net.fetch","ui.panel"],"capabilities":["background","ui-panel"],` +
+		`"ui":{"panels":[{"id":"main","title":"Main","entry":"panel.html"}]},` +
+		`"background_task":{"interval_minutes":60,"entry":"worker.js"},` +
+		`"network_hosts":["api.example.com","*.cdn.example.com"]}`
+}
+
+// dangerousPermissionsManifestSeed exercises the two RiskDangerous
+// permissions with their contract pointers.
+func dangerousPermissionsManifestSeed() string {
+	return `{"manifest_version":1,"id":"com.example.danger","name":"Danger","version":"1.0.0","min_app_version":"1.9.0",` +
+		`"author":{"name":"a","identity":"i","public_key":"` + testPubKeyLineForFuzz() + `"},` +
+		`"permissions":["routing.rules","net.hooks"],"capabilities":["routing","network-hook"],` +
+		`"routing":{"entry":"routing.json"},"network_hook":{"entry":"hook.json"}}`
+}
+
+// panelAttackManifestSeed builds a manifest with one panel whose entry is
+// an attack shape (except "panel.html", the honest entry that must pass).
+func panelAttackManifestSeed(entry string) string {
+	return `{"manifest_version":1,"id":"com.example.panel","name":"P","version":"1.0.0","min_app_version":"1.9.0",` +
+		`"author":{"name":"a","identity":"i","public_key":"` + testPubKeyLineForFuzz() + `"},` +
+		`"permissions":["ui.panel"],"capabilities":["ui-panel"],` +
+		`"ui":{"panels":[{"id":"main","title":"P","entry":"` + entry + `"}]}}`
+}
+
+// FuzzParseManifestFull throws hostile v2-runtime inputs at the full
+// manifest validator (manifest.go + manifest_v1ext.go): the v1 fuzz target
+// ignores unknown top-level keys, so it never reaches the
+// background/network-hosts/asset-pointer gates. Invariants: no panics, and
+// an accepted manifest must re-validate both halves.
+func FuzzParseManifestFull(f *testing.F) {
+	f.Add([]byte(fullRuntimeManifestSeed()))
+	f.Add([]byte(dangerousPermissionsManifestSeed()))
+	f.Add([]byte(panelAttackManifestSeed("panel.html")))
+	f.Add([]byte("{}"))
+	f.Add([]byte(`{"background_task":{"interval_minutes":0,"entry":"worker.js"}}`))
+	f.Add([]byte(`{"network_hosts":[".."]}`))
+
+	f.Fuzz(func(t *testing.T, data []byte) {
+		m, x, err := ParseManifestFull(data)
+		if err != nil {
+			return // rejection is always acceptable
+		}
+		if err := m.Validate(); err != nil {
+			t.Fatalf("ParseManifestFull accepted a manifest whose v1 half does not re-validate: %v\ninput: %.200q", err, data)
+		}
+		// The v2 half must re-validate too: a successful parse is only
+		// consistent if the declared fields satisfy their own rules.
+		if x != nil {
+			if x.Background != nil {
+				if !hasPermission(m, "background") || !hasCapability(m, "background") {
+					t.Fatalf("accepted background_task without capability+permission\ninput: %.200q", data)
+				}
+				if x.Background.IntervalMinutes < 1 {
+					t.Fatalf("accepted background interval %d\ninput: %.200q", x.Background.IntervalMinutes, data)
+				}
+			}
+			for _, h := range x.NetworkHosts {
+				if _, err := normalizeHostPattern(h); err != nil {
+					t.Fatalf("accepted network_hosts entry %q that does not normalize: %v\ninput: %.200q", h, err, data)
+				}
+			}
+		}
+		// The panels gate: accepted panels always carry the entitlement.
+		if m.UI != nil && len(m.UI.Panels) > 0 {
+			if !hasPermission(m, "ui.panel") || !hasCapability(m, "ui-panel") {
+				t.Fatalf("accepted panels without ui-panel capability+permission\ninput: %.200q", data)
 			}
 		}
 	})

@@ -29,7 +29,7 @@ func installHello(t *testing.T, s *Store, version string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "ui.panel"}, ""); err != nil {
 		t.Fatalf("install failed: %v", err)
 	}
 }
@@ -71,13 +71,13 @@ func TestStoreUpdateReportsAddedPermissions(t *testing.T) {
 	installHello(t, s, "1.0.0")
 	m := testManifest(t)
 	m.Version = "1.1.0"
-	m.Permissions = []string{"connections.read", "notifications", "servers.read"}
+	m.Permissions = []string{"connections.read", "notifications", "servers.read", "ui.panel"}
 	data := buildPackage(t, m, nil, nil)
 	pkg, err := OpenBytes(data)
 	if err != nil {
 		t.Fatal(err)
 	}
-	added, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "servers.read"}, "")
+	added, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "servers.read", "ui.panel"}, "")
 	if err != nil {
 		t.Fatalf("update failed: %v", err)
 	}
@@ -100,7 +100,7 @@ func TestStoreUpdateRejectsDowngrade(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err == nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "ui.panel"}, ""); err == nil {
 		t.Fatal("downgrade must be rejected")
 	}
 }
@@ -115,7 +115,7 @@ func TestStoreRollback(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "ui.panel"}, ""); err != nil {
 		t.Fatal(err)
 	}
 	if err := s.Rollback("com.example.hello"); err != nil {
@@ -140,7 +140,7 @@ func TestStoreRollbackTamperedPreviousRejects(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "ui.panel"}, ""); err != nil {
 		t.Fatal(err)
 	}
 	// Tamper with the N-1 files on disk: rollback must refuse and leave
@@ -206,7 +206,7 @@ func TestStoreSettingsValidation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "ui.panel"}, ""); err != nil {
 		t.Fatal(err)
 	}
 	// Defaults are visible before any save.

@@ -26,7 +26,7 @@ func pubKeyLineFor(t *testing.T, seed []byte) string {
 	return base64.StdEncoding.EncodeToString(raw)
 }
 
-var testGranted = []string{"connections.read", "notifications"}
+var testGranted = []string{"connections.read", "notifications", "ui.panel"}
 
 // openStoreForTest opens a fresh store in a temp dir.
 func openStoreForTest(t *testing.T) *Store {

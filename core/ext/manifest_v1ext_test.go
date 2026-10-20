@@ -30,11 +30,15 @@ func rawManifestWith(t *testing.T, m *Manifest, extra map[string]any) []byte {
 }
 
 // bgManifest returns a manifest entitled to background workers + net.fetch.
+// It has no panels (a worker-only extension embeds no UI, so it needs
+// neither the ui-panel capability nor the ui.panel permission — see the
+// panels gate in manifest.go Validate).
 func bgManifest(t *testing.T) *Manifest {
 	t.Helper()
 	m := testManifest(t)
 	m.Permissions = []string{"background", "net.fetch"}
 	m.Capabilities = []string{"background"}
+	m.UI = nil
 	return m
 }
 
@@ -222,6 +226,7 @@ func TestParseManifestFullThemeOK(t *testing.T) {
 	m := testManifest(t)
 	m.Permissions = []string{"theme.apply"}
 	m.Capabilities = []string{"theme"}
+	m.UI = nil // a theme extension embeds no panels
 	raw := rawManifestWith(t, m, map[string]any{
 		"theme": map[string]any{"entry": "theme.json"},
 	})
@@ -244,6 +249,7 @@ func TestParseManifestFullThemeNeedsCapabilityAndPermission(t *testing.T) {
 	}
 	m.Permissions = []string{"theme.apply"}
 	m.Capabilities = []string{"theme"}
+	m.UI = nil // keep the panels gate out of this test's way
 	raw = rawManifestWith(t, m, map[string]any{
 		"theme": map[string]any{"entry": "../evil.json"},
 	})
@@ -256,6 +262,7 @@ func TestParseManifestFullNetworkHookAndRoutingOK(t *testing.T) {
 	m := testManifest(t)
 	m.Permissions = []string{"net.hooks", "routing.rules"}
 	m.Capabilities = []string{"network-hook", "routing"}
+	m.UI = nil // a hooks/routing extension embeds no panels
 	raw := rawManifestWith(t, m, map[string]any{
 		"network_hook": map[string]any{"entry": "hook.json"},
 		"routing":      map[string]any{"entry": "rules.json"},
