@@ -9,6 +9,7 @@ import (
 	"net"
 	"regexp"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -62,6 +63,19 @@ func (o Outbound) appendSecrets(dst []string) []string {
 	if o.Encryption != "none" {
 		add(o.Encryption)
 	}
+	// A WebSocket/XHTTP path and custom header values are routinely
+	// used as bearer tokens by providers ("secret path" deployments);
+	// they were registered nowhere, so a dial error echoing the
+	// request line or headers leaked them (CENSOR-LEAK).
+	add(o.Transport.Path)
+	headerKeys := make([]string, 0, len(o.Transport.Headers))
+	for k := range o.Transport.Headers {
+		headerKeys = append(headerKeys, k)
+	}
+	sort.Strings(headerKeys)
+	for _, k := range headerKeys {
+		add(o.Transport.Headers[k])
+	}
 	for _, p := range o.Peers {
 		add(p.PreSharedKey)
 	}
@@ -97,10 +111,32 @@ func (o Outbound) appendIdentifiers(dst []string) []string {
 	if o.TLS.RealityShortID != "" {
 		dst = append(dst, o.TLS.RealityShortID)
 	}
+	if o.TLS.RealityMLDSA65Verify != "" {
+		dst = append(dst, o.TLS.RealityMLDSA65Verify)
+	}
 	if o.TLS.SpiderX != "" {
 		dst = append(dst, o.TLS.SpiderX)
 	}
-	return append(dst, o.Name)
+	dst = append(dst, o.Name)
+	if o.Transport.Host != "" {
+		dst = append(dst, o.Transport.Host)
+	}
+	if o.Transport.Service != "" {
+		dst = append(dst, o.Transport.Service)
+	}
+	if o.Transport.GRPCAuthority != "" {
+		dst = append(dst, o.Transport.GRPCAuthority)
+	}
+	if o.Transport.DownloadAddress != "" {
+		dst = append(dst, o.Transport.DownloadAddress)
+		if o.Transport.DownloadPort != 0 {
+			dst = append(dst, net.JoinHostPort(o.Transport.DownloadAddress, strconv.Itoa(int(o.Transport.DownloadPort))))
+		}
+	}
+	// An Xray profile carries its own server addresses, SNI names and
+	// REALITY dest inside the profile JSON; without extracting them
+	// here they were registered with no redactor at all (CENSOR-LEAK).
+	return append(dst, profileIdentifiers(o.Profile)...)
 }
 
 // Identifiers returns plan server identifiers for redaction alongside Secrets.

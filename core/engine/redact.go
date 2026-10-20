@@ -1,6 +1,10 @@
 package engine
 
 import (
+	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
+	"net/url"
 	"regexp"
 	"sort"
 	"strings"
@@ -63,6 +67,20 @@ func (r *Redactor) String(s string) string {
 		pairs := make([]string, 0, len(r.values)*2)
 		for _, v := range r.values {
 			pairs = append(pairs, v, "[masked]")
+			// A seed that reaches a log rarely arrives raw: engines
+			// and HTTP stacks re-encode it (percent-encoding in URLs
+			// and error strings, base64 in vmess-style blobs and
+			// subscription bodies, hex in WireGuard tooling, JSON
+			// \uXXXX escapes in rendered configs). Masking only the
+			// raw form left every one of those encodings readable —
+			// the encoded forms are part of the seed, so they are
+			// registered alongside it (CENSOR-LEAK: close the class,
+			// not the latest spelling).
+			for _, form := range derivedForms(v) {
+				if form != v && len(form) >= 4 {
+					pairs = append(pairs, form, "[masked]")
+				}
+			}
 		}
 		r.build = strings.NewReplacer(pairs...)
 	}
@@ -77,6 +95,59 @@ func (r *Redactor) Err(err error) error {
 		return nil
 	}
 	return &maskedError{Redactor: r, cause: err}
+}
+
+// derivedForms returns the re-encodings of a seed value that log
+// pipelines commonly produce: URL percent-encoding (query and path
+// flavours, upper- and lowercase hex digits), base64 (standard and
+// URL-safe, padded and raw), hex, and the JSON string escaping of the
+// value (\" \\ and \uXXXX forms). The list is computed once per
+// redactor rebuild, alongside the seeds themselves.
+func derivedForms(v string) []string {
+	forms := make([]string, 0, 10)
+	add := func(s string) {
+		for _, have := range forms {
+			if have == s {
+				return
+			}
+		}
+		forms = append(forms, s)
+	}
+	for _, esc := range []string{url.QueryEscape(v), url.PathEscape(v)} {
+		add(esc)
+		add(lowerPercentHex(esc))
+	}
+	raw := []byte(v)
+	for _, enc := range []*base64.Encoding{
+		base64.StdEncoding, base64.RawStdEncoding,
+		base64.URLEncoding, base64.RawURLEncoding,
+	} {
+		add(enc.EncodeToString(raw))
+	}
+	add(hex.EncodeToString(raw))
+	if marshalled, err := json.Marshal(v); err == nil && len(marshalled) >= 2 {
+		add(string(marshalled[1 : len(marshalled)-1]))
+	}
+	return forms
+}
+
+// lowerPercentHex lowercases the hex digits of %XX escapes: encoders
+// disagree on the case, and a seed masked as %2F must also be masked
+// as %2f.
+func lowerPercentHex(s string) string {
+	b := []byte(s)
+	for i := 0; i+2 < len(b); i++ {
+		if b[i] != '%' {
+			continue
+		}
+		for j := i + 1; j <= i+2; j++ {
+			if 'A' <= b[j] && b[j] <= 'F' {
+				b[j] += 'a' - 'A'
+			}
+		}
+		i += 2
+	}
+	return string(b)
 }
 
 type maskedError struct {
@@ -106,11 +177,18 @@ var (
 	// public[_-]?key is present on both sides.
 	// TestRedactorParityKeySpellings in both repos pins this list by
 	// execution.
-	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|(?:access|refresh|session|id|auth|api)[_-]?token|token|private[_-]?key|pre[_-]?shared[_-]?key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("[^"]*"|'[^']*'|\S+)`)
-	// strictKeyValuePattern masks short generic credential keys only with
-	// an explicit assignment: a bare space after "user" or "login" is
-	// usually prose ("user agent", "login failed"), not a credential pair.
-	strictKeyValuePattern = regexp.MustCompile(`(?i)\b(user|login)\b([\"']?\s*[:=]\s*)("[^"]*"|'[^']*'|\S+)`)
+	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|(?:access|refresh|session|id|auth|api)[_-]?token|token|private[_-]?key|pre[_-]?shared[_-]?key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\S+)`)
+	// strictKeyValuePattern masks keys whose names are also ordinary
+	// words only with an explicit assignment (":" or "="): a bare space
+	// after "user" or "login" is usually prose ("user agent", "login
+	// failed"), not a credential pair. The list carries the second ring
+	// the loose pattern cannot hold: bare key/code/session (subscription
+	// URL query parameters are exactly "?key=…&code=…"), hwid and
+	// device/session ids (provider HWID limits), seed and encryption
+	// (profile credentials), and the destination identifiers a censor
+	// cares about — sni, server_name, dest, host, serviceName — which
+	// are prose-safe only behind an explicit assignment.
+	strictKeyValuePattern = regexp.MustCompile(`(?i)\b(user|login|key|code|session|seed|hwid|device[_-]?id|session[_-]?id|sni|server[_-]?name|servername|dest|encryption|service[_-]?name|servicename|host)\b([\"']?\s*[:=]\s*)("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\S+)`)
 	// userInfoPattern masks the credentials of proxy links for every
 	// protocol the core parses. The password half is optional:
 	// trojan://token@host, hysteria2://secret@host and vless://id@host
@@ -124,7 +202,15 @@ var (
 	// (Authorization: Bearer/Basic ...): the keyValue alternation cannot
 	// see them — after "auth" in "Authorization" there is no word
 	// boundary, and the credential itself carries no key at all.
-	authHeaderPattern = regexp.MustCompile(`(?i)\b(authorization\s*[:=]\s*(?:bearer|basic)\s+)(\S+)`)
+	authHeaderPattern = regexp.MustCompile(`(?i)\b(authorization\s*[:=]\s*(?:bearer|basic|token)\s+)(\S+)`)
+	// subscriptionPathPattern masks the token segment of a subscription
+	// URL: providers hand out https://host/sub/<token> (and feed/token/
+	// link spellings) where the credential is a bare path segment with
+	// no key name and no userinfo, so neither the key patterns nor the
+	// userinfo pattern can see it. Only the segment after a
+	// subscription-shaped path element is masked; ordinary URLs (rule
+	// sets, documentation, engine downloads) keep readable paths.
+	subscriptionPathPattern = regexp.MustCompile(`(?i)\b(https?://[^\s/]+/(?:sub|subscribe|subscription|feed|token|link)/)[A-Za-z0-9._~%+/=-]{8,}`)
 	// bearerPattern masks a bare Bearer token (curl-style dumps, proxy
 	// logs) with no Authorization header around it. The value must look
 	// like a token (12+ token characters) so prose ("bearer of news",
@@ -147,6 +233,8 @@ var (
 var gateWords = []string{
 	"://", "uuid", "password", "passwd", "secret", "token", "key", "param",
 	"auth", "psk", "username", "user", "login", "spider", "short", "bearer",
+	"code", "session", "seed", "hwid", "device", "sni", "server", "dest",
+	"encryption", "service", "host",
 }
 
 // gateContains reports whether s holds any gate word, case-insensitively.
@@ -247,13 +335,17 @@ func gateFlagsASCII(s string) gateFlags {
 			if matchFoldAt(s, i, "secret") || matchFoldAt(s, i, "spider") || matchFoldAt(s, i, "short") {
 				f.key = true
 			}
+			if matchFoldAt(s, i, "session") || matchFoldAt(s, i, "seed") || matchFoldAt(s, i, "sni") ||
+				matchFoldAt(s, i, "server") || matchFoldAt(s, i, "service") {
+				f.strict = true
+			}
 		case 't':
 			if matchFoldAt(s, i, "token") {
 				f.key = true
 			}
 		case 'k':
 			if matchFoldAt(s, i, "key") {
-				f.key = true
+				f.key, f.strict = true, true
 			}
 		case 'a':
 			if matchFoldAt(s, i, "auth") {
@@ -268,6 +360,22 @@ func gateFlagsASCII(s string) gateFlags {
 			}
 		case 'l':
 			if matchFoldAt(s, i, "login") {
+				f.strict = true
+			}
+		case 'c':
+			if matchFoldAt(s, i, "code") {
+				f.strict = true
+			}
+		case 'h':
+			if matchFoldAt(s, i, "hwid") || matchFoldAt(s, i, "host") {
+				f.strict = true
+			}
+		case 'd':
+			if matchFoldAt(s, i, "device") || matchFoldAt(s, i, "dest") {
+				f.strict = true
+			}
+		case 'e':
+			if matchFoldAt(s, i, "encryption") {
 				f.strict = true
 			}
 		}
@@ -291,6 +399,7 @@ func maskPatterns(s string) string {
 		}
 		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
 		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+		s = subscriptionPathPattern.ReplaceAllString(s, "${1}[masked]")
 		s = authHeaderPattern.ReplaceAllString(s, "${1}[masked]")
 		s = bearerPattern.ReplaceAllString(s, "${1}[masked]")
 		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
@@ -320,6 +429,7 @@ func maskPatterns(s string) string {
 	if f.scheme {
 		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
 		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+		s = subscriptionPathPattern.ReplaceAllString(s, "${1}[masked]")
 	}
 	if f.bearer {
 		s = authHeaderPattern.ReplaceAllString(s, "${1}[masked]")

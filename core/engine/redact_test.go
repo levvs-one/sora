@@ -183,6 +183,7 @@ func TestMaskPatternsDifferential(t *testing.T) {
 	reference := func(s string) string {
 		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
 		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+		s = subscriptionPathPattern.ReplaceAllString(s, "${1}[masked]")
 		s = authHeaderPattern.ReplaceAllString(s, "${1}[masked]")
 		s = bearerPattern.ReplaceAllString(s, "${1}[masked]")
 		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
@@ -216,6 +217,14 @@ func TestMaskPatternsDifferential(t *testing.T) {
 		"ключ: значение",
 		"obfs_param: p",
 		"access_token=xyz123",
+		"sni: plainSNI.example",
+		"dest=secret-dest.example:443",
+		`"host": "secret-host.example"`,
+		"?key=QueryKeySecret123&code=QueryCodeSecret123",
+		"session=QuerySessionSecret123",
+		"hwid: HWIDSecret123456",
+		"https://provider.example/sub/AbCdEfGh12345678token",
+		`token: "a \"quoted\" tailword"`,
 		"Authorization: Bearer abcdefgh123456",
 		"Bearer abcdefgh12345678",
 		"psk: p",
