@@ -808,6 +808,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
         compareVersions(e.version, installed.version) > 0 &&
         e.rolloutEligible(store.installId);
     return ExtensionCard(
+      key: ValueKey(e.id),
       title: e.name,
       author: e.author,
       rating: e.rating,
@@ -986,6 +987,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
               final inst = list[i];
               final needsUpdate = _needsUpdate(store, inst);
               return ExtensionCard(
+                key: ValueKey(inst.id),
                 title: inst.manifest.name,
                 author: inst.manifest.author.name,
                 badges: [
