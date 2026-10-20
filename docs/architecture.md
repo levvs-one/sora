@@ -76,3 +76,46 @@ Windows: к каналу `\\.\pipe\sora-core-v1` пускается процес
 Из JSON-подписок Xray служба удаляет `inbounds`, `reverse`, настройки журнала и статистики и ключи с путями к файлам. Остальное работает как написал провайдер.
 
 Контракт 1.6: `GetSubscriptionLink` выдаёт сохранённую ссылку только с действительным токеном управления для открытия страницы подписки. Приложение не сохраняет её. Списки и поток `WatchSubscriptions` ссылку не передают; совпадающий с ней `web_page_url` также скрыт, отличающийся доступен как сайт провайдера.
+
+## Reserved for censorship and obfuscation
+
+Контракт управления поднят до 1.11. Детектор и обфускация не подключены.
+В proto сохраняются имена сообщений и резервируются их номера и имена полей:
+
+| Схема | Сообщение | Номера |
+| --- | --- | --- |
+| core | CoreEvent | 13 (`censorship_detected`) |
+| core | OutboundSpec | 10, 11 (`flow`, `flow_auto`) |
+| core | CensorshipDetected | 1-4 |
+| censor | AttemptEvent | 1-4 |
+| censor | ObfuscationProfileRef | 1-3 |
+| censor | CensorshipVerdict | 1-5 |
+| censor | DetectCensorshipRequest / Response | 1-12 / 1-3 |
+| obfs | ObfuscationProfile | 1-6 |
+| obfs | ApplyObfsProfileRequest / Response | 1-2 / 1-4 |
+| obfs | GetObfsCapabilitiesRequest / Response | 1 / 1-2 |
+| obfs | EngineObfsCapabilities | 1-8 |
+
+Значения enum также зарезервированы: `CensorshipKind` 1-8,
+`AttemptStage` 1-5, `AttemptEventKind` 1-9, `UtlsProfile` 1-10,
+`ObfsPreset` 1-4. Их исходные имена перечислены в соответствующих `.proto`.
+Нулевые значения UNSPECIFIED сохранены по требованиям proto3.
+
+В protobuf нет синтаксиса `reserved` для RPC. Полные имена сохранены
+комментариями в `.proto`, без регистрации сервисов и заглушек обработчиков:
+`/sora.censor.v1.CensorControl/DetectCensorship`,
+`/sora.obfs.v1.ObfsControl/ApplyObfsProfile`,
+`/sora.obfs.v1.ObfsControl/GetObfsCapabilities`.
+При возвращении подсистемы нужно снять соответствующие резервы и восстановить
+исходные имена и номера; перераспределять их другим фичам нельзя.
+
+Точки подключения сохранены существующими границами функций:
+`control.planFromProto` строит план, `outboundFromProto` разрешает секреты,
+`Server.Connect` передаёт готовый план менеджеру до `mask` и запуска сессии.
+`session.Manager.Connect` и `Session.Start` владеют запуском, `Session.supervise`
+получает отказы движка и смену сети, `Session.settings` собирает настройки.
+`cmd/sora-core.mountControlServices` регистрирует сервисы, `toWireEvent`
+преобразует события журнала. Фоновое обновление подписок остаётся в
+`subscriptionBook.nextUpdate/run`, без ускорения по вердиктам детектора.
+Существующие в базе TLS fragmentation и режим bypass сохранены, новые
+JA4, uTLS freshness, desync, freeze и planned re-handshake не добавлены.
