@@ -265,7 +265,7 @@ message GetStatsRequest { ApiVersion api_version = 1; string session_id = 2; }
 message GetStatsResponse { StatsTick stats = 1; SoraError error = 2; }
 message ConnectionState { ConnectionStateValue value = 1; string session_id = 2; SoraErrorCode reason = 3; google.protobuf.Timestamp changed_at = 4; google.protobuf.Duration retry_after = 5; }
 enum ConnectionStateValue { CONNECTION_STATE_VALUE_UNSPECIFIED = 0; CONNECTION_STATE_VALUE_DISCONNECTED = 1; CONNECTION_STATE_VALUE_CONNECTING = 2; CONNECTION_STATE_VALUE_CONNECTED = 3; CONNECTION_STATE_VALUE_RECONNECTING = 4; CONNECTION_STATE_VALUE_FAILED = 5; }
-message CoreEvent { uint64 sequence = 1; string session_id = 2; google.protobuf.Timestamp emitted_at = 3; oneof payload { StateChanged state_changed = 4; StatsTick stats_tick = 5; BypassStrategyChanged bypass_strategy_changed = 6; ProbeResult probe_result = 7; LogBatch log_batch = 8; SoraError error = 9; KillSwitchChanged kill_switch_changed = 10; GroupSwitched group_switched = 11; ProfileMatched profile_matched = 12; } }
+message CoreEvent { uint64 sequence = 1; string session_id = 2; google.protobuf.Timestamp emitted_at = 3; oneof payload { StateChanged state_changed = 4; StatsTick stats_tick = 5; BypassStrategyChanged bypass_strategy_changed = 6; ProbeResult probe_result = 7; LogBatch log_batch = 8; SoraError error = 9; KillSwitchChanged kill_switch_changed = 10; GroupSwitched group_switched = 11; ProfileMatched profile_matched = 12; CensorshipDetected censorship_detected = 13; } }
 message StateChanged { ConnectionState state = 1; }
 // Since 1.5. A fallback group moved to another member on its own: the member
 // it used stopped answering, or one before it answers again. Members are
@@ -875,4 +875,22 @@ message ChainHop {
   string server_id = 1;
   bool reachable = 2;
   uint32 latency_ms = 3;
+}
+
+// Since 1.11. The structured verdict of the on-failure censorship
+// diagnosis (the session's censorship watcher): what the detector
+// concluded about a failed attempt, in machine-readable form. Before
+// 1.11 the verdict reached the client only as a free-text journal line;
+// the client can now surface the explanation and act on the kind
+// without parsing text.
+message CensorshipDetected {
+  // Machine-readable verdict kind: "rst_injection", "data_stall", ...
+  // (the detector's Kind spelling). A kind the client does not know is
+  // still displayable via explanation.
+  string kind = 1;
+  double confidence = 2;
+  // Plain-language account of what happened and what helps. Never
+  // overstates the evidence.
+  string explanation = 3;
+  repeated string evidence = 4;
 }

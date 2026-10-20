@@ -623,6 +623,15 @@ const CoreEvent$json = {
       '9': 0,
       '10': 'profileMatched'
     },
+    {
+      '1': 'censorship_detected',
+      '3': 13,
+      '4': 1,
+      '5': 11,
+      '6': '.sora.core.v1.CensorshipDetected',
+      '9': 0,
+      '10': 'censorshipDetected'
+    },
   ],
   '8': [
     {'1': 'payload'},
@@ -635,17 +644,19 @@ final $typed_data.Uint8List coreEventDescriptor =
         'CglDb3JlRXZlbnQSGgoIc2VxdWVuY2UYASABKARSCHNlcXVlbmNlEh0KCnNlc3Npb25faWQYAiAB'
         'KAlSCXNlc3Npb25JZBI5CgplbWl0dGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVz'
         'dGFtcFIJZW1pdHRlZEF0EkEKDXN0YXRlX2NoYW5nZWQYBCABKAsyGi5zb3JhLmNvcmUudjEuU3Rh'
-        'dGVDaGFuZ2VkUgxzdGF0ZUNoYW5nZWRIABI4CgpzdGF0c190aWNrGAUgASgLMhcuc29yYS5jb3Jl'
-        'LnYxLlN0YXRzVGlja1IJc3RhdHNUaWNrSAASXQoXYnlwYXNzX3N0cmF0ZWd5X2NoYW5nZWQYBiAB'
-        'KAsyIy5zb3JhLmNvcmUudjEuQnlwYXNzU3RyYXRlZ3lDaGFuZ2VkUhVieXBhc3NTdHJhdGVneUNo'
-        'YW5nZWRIABI+Cgxwcm9iZV9yZXN1bHQYByABKAsyGS5zb3JhLmNvcmUudjEuUHJvYmVSZXN1bHRS'
-        'C3Byb2JlUmVzdWx0SAASNQoJbG9nX2JhdGNoGAggASgLMhYuc29yYS5jb3JlLnYxLkxvZ0JhdGNo'
-        'Ughsb2dCYXRjaEgAEi8KBWVycm9yGAkgASgLMhcuc29yYS5jb3JlLnYxLlNvcmFFcnJvclIFZXJy'
-        'b3JIABJRChNraWxsX3N3aXRjaF9jaGFuZ2VkGAogASgLMh8uc29yYS5jb3JlLnYxLktpbGxTd2l0'
-        'Y2hDaGFuZ2VkUhFraWxsU3dpdGNoQ2hhbmdlZEgAEkQKDmdyb3VwX3N3aXRjaGVkGAsgASgLMhsu'
-        'c29yYS5jb3JlLnYxLkdyb3VwU3dpdGNoZWRSDWdyb3VwU3dpdGNoZWRIABJHCg9wcm9maWxlX21h'
-        'dGNoZWQYDCABKAsyHC5zb3JhLmNvcmUudjEuUHJvZmlsZU1hdGNoZWRSDnByb2ZpbGVNYXRjaGVk'
-        'SABCCQoHcGF5bG9hZA==');
+        'dGVDaGFuZ2VkSABSDHN0YXRlQ2hhbmdlZBI4CgpzdGF0c190aWNrGAUgASgLMhcuc29yYS5jb3Jl'
+        'LnYxLlN0YXRzVGlja0gAUglzdGF0c1RpY2sSXQoXYnlwYXNzX3N0cmF0ZWd5X2NoYW5nZWQYBiAB'
+        'KAsyIy5zb3JhLmNvcmUudjEuQnlwYXNzU3RyYXRlZ3lDaGFuZ2VkSABSFWJ5cGFzc1N0cmF0ZWd5'
+        'Q2hhbmdlZBI+Cgxwcm9iZV9yZXN1bHQYByABKAsyGS5zb3JhLmNvcmUudjEuUHJvYmVSZXN1bHRI'
+        'AFILcHJvYmVSZXN1bHQSNQoJbG9nX2JhdGNoGAggASgLMhYuc29yYS5jb3JlLnYxLkxvZ0JhdGNo'
+        'SABSCGxvZ0JhdGNoEi8KBWVycm9yGAkgASgLMhcuc29yYS5jb3JlLnYxLlNvcmFFcnJvckgAUgVl'
+        'cnJvchJRChNraWxsX3N3aXRjaF9jaGFuZ2VkGAogASgLMh8uc29yYS5jb3JlLnYxLktpbGxTd2l0'
+        'Y2hDaGFuZ2VkSABSEWtpbGxTd2l0Y2hDaGFuZ2VkEkQKDmdyb3VwX3N3aXRjaGVkGAsgASgLMhsu'
+        'c29yYS5jb3JlLnYxLkdyb3VwU3dpdGNoZWRIAFINZ3JvdXBTd2l0Y2hlZBJHCg9wcm9maWxlX21h'
+        'dGNoZWQYDCABKAsyHC5zb3JhLmNvcmUudjEuUHJvZmlsZU1hdGNoZWRIAFIOcHJvZmlsZU1hdGNo'
+        'ZWQSUwoTY2Vuc29yc2hpcF9kZXRlY3RlZBgNIAEoCzIgLnNvcmEuY29yZS52MS5DZW5zb3JzaGlw'
+        'RGV0ZWN0ZWRIAFISY2Vuc29yc2hpcERldGVjdGVkQgkKB3BheWxvYWQ='
+);
 
 @$core.Deprecated('Use stateChangedDescriptor instead')
 const StateChanged$json = {
@@ -2342,3 +2353,23 @@ final $typed_data.Uint8List chainHopDescriptor =
         'CghDaGFpbkhvcBIbCglzZXJ2ZXJfaWQYASABKAlSCHNlcnZlcklkEhwKCXJlYWNoYWJsZRgCIAEo'
         'CFIJcmVhY2hhYmxlEh0KCmxhdGVuY3lfbXMYAyABKA1SCWxhdGVuY3lNcw==');
 
+@$core.Deprecated('Use censorshipDetectedDescriptor instead')
+const CensorshipDetected$json = {
+  '1': 'CensorshipDetected',
+  '2': [
+    {'1': 'kind', '3': 1, '4': 1, '5': 9, '10': 'kind'},
+    {'1': 'confidence', '3': 2, '4': 1, '5': 1, '10': 'confidence'},
+    {'1': 'explanation', '3': 3, '4': 1, '5': 9, '10': 'explanation'},
+    {'1': 'evidence', '3': 4, '4': 3, '5': 9, '10': 'evidence'},
+  ],
+};
+
+/// Descriptor for `CensorshipDetected`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN per SW4 fix (pending protoc-gen-dart codegen); bytes match
+/// core/gen/sora/core/v1 descriptor for the same message.
+final $typed_data.Uint8List censorshipDetectedDescriptor =
+    $convert.base64Decode(
+        'ChJDZW5zb3JzaGlwRGV0ZWN0ZWQSEgoEa2luZBgBIAEoCVIEa2luZBIeCgpjb25maWRlbmNlGAIg'
+        'ASgBUgpjb25maWRlbmNlEiAKC2V4cGxhbmF0aW9uGAMgASgJUgtleHBsYW5hdGlvbhIaCghldmlk'
+        'ZW5jZRgEIAMoCVIIZXZpZGVuY2U='
+    );

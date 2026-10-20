@@ -2111,6 +2111,7 @@ type CoreEvent struct {
 	//	*CoreEvent_KillSwitchChanged
 	//	*CoreEvent_GroupSwitched
 	//	*CoreEvent_ProfileMatched
+	//	*CoreEvent_CensorshipDetected
 	Payload       isCoreEvent_Payload `protobuf_oneof:"payload"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2255,6 +2256,15 @@ func (x *CoreEvent) GetProfileMatched() *ProfileMatched {
 	return nil
 }
 
+func (x *CoreEvent) GetCensorshipDetected() *CensorshipDetected {
+	if x != nil {
+		if x, ok := x.Payload.(*CoreEvent_CensorshipDetected); ok {
+			return x.CensorshipDetected
+		}
+	}
+	return nil
+}
+
 type isCoreEvent_Payload interface {
 	isCoreEvent_Payload()
 }
@@ -2295,6 +2305,10 @@ type CoreEvent_ProfileMatched struct {
 	ProfileMatched *ProfileMatched `protobuf:"bytes,12,opt,name=profile_matched,json=profileMatched,proto3,oneof"`
 }
 
+type CoreEvent_CensorshipDetected struct {
+	CensorshipDetected *CensorshipDetected `protobuf:"bytes,13,opt,name=censorship_detected,json=censorshipDetected,proto3,oneof"`
+}
+
 func (*CoreEvent_StateChanged) isCoreEvent_Payload() {}
 
 func (*CoreEvent_StatsTick) isCoreEvent_Payload() {}
@@ -2312,6 +2326,8 @@ func (*CoreEvent_KillSwitchChanged) isCoreEvent_Payload() {}
 func (*CoreEvent_GroupSwitched) isCoreEvent_Payload() {}
 
 func (*CoreEvent_ProfileMatched) isCoreEvent_Payload() {}
+
+func (*CoreEvent_CensorshipDetected) isCoreEvent_Payload() {}
 
 type StateChanged struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -8752,6 +8768,85 @@ func (x *ChainHop) GetLatencyMs() uint32 {
 	return 0
 }
 
+// Since 1.11. The structured verdict of the on-failure censorship
+// diagnosis (the session's censorship watcher): what the detector
+// concluded about a failed attempt, in machine-readable form. Before
+// 1.11 the verdict reached the client only as a free-text journal line;
+// the client can now surface the explanation and act on the kind
+// without parsing text.
+type CensorshipDetected struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Machine-readable verdict kind: "rst_injection", "data_stall", ...
+	// (the detector's Kind spelling). A kind the client does not know is
+	// still displayable via explanation.
+	Kind       string  `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`
+	Confidence float64 `protobuf:"fixed64,2,opt,name=confidence,proto3" json:"confidence,omitempty"`
+	// Plain-language account of what happened and what helps. Never
+	// overstates the evidence.
+	Explanation   string   `protobuf:"bytes,3,opt,name=explanation,proto3" json:"explanation,omitempty"`
+	Evidence      []string `protobuf:"bytes,4,rep,name=evidence,proto3" json:"evidence,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CensorshipDetected) Reset() {
+	*x = CensorshipDetected{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[124]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CensorshipDetected) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CensorshipDetected) ProtoMessage() {}
+
+func (x *CensorshipDetected) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[124]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CensorshipDetected.ProtoReflect.Descriptor instead.
+func (*CensorshipDetected) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{124}
+}
+
+func (x *CensorshipDetected) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *CensorshipDetected) GetConfidence() float64 {
+	if x != nil {
+		return x.Confidence
+	}
+	return 0
+}
+
+func (x *CensorshipDetected) GetExplanation() string {
+	if x != nil {
+		return x.Explanation
+	}
+	return ""
+}
+
+func (x *CensorshipDetected) GetEvidence() []string {
+	if x != nil {
+		return x.Evidence
+	}
+	return nil
+}
+
 var File_sora_core_v1_core_control_proto protoreflect.FileDescriptor
 
 const file_sora_core_v1_core_control_proto_rawDesc = "" +
@@ -8766,7 +8861,7 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"R\tsessionId\x12<\n\fsession_plan\x18\x04 \x01(\v2\x19.sora.core.v1" +
 	".SessionPlanR\vsessionPlan\x123\n\x15control_authenticat" +
 	"or\x18\x05 \x01(\fR\x14controlAuthenticator\x12\x1f\n\vkill_switch\x18\x06 " +
-	"\x01(\bR\nkillSwitch\"u\n\x0fConnectResponse\x123\n\x06status\x18\x01 \x01" +
+	"\x01(\x08R\nkillSwitch\"u\n\x0fConnectResponse\x123\n\x06status\x18\x01 \x01" +
 	"(\v2\x1b.sora.core.v1.SessionStatusR\x06status\x12-\n\x05error" +
 	"\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xc1\x01\n\x11Disco" +
 	"nnectRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1" +
@@ -8792,43 +8887,43 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"ora.core.v1.BypassSettingsR\x0ebypassSettings\x12)\n\x10se" +
 	"ssion_identity\x18\x06 \x01(\tR\x0fsessionIdentity\x12E\n\x0fanti_ce" +
 	"nsorship\x18\a \x01(\v2\x1c.sora.core.v1.AntiCensorshipR\x0ean" +
-	"tiCensorship\x12\x18\n\aengines\x18\b \x03(\tR\aengines\x126\n\x17networ" +
-	"k_control_allowed\x18\t \x01(\bR\x15networkControlAllowed\x129" +
+	"tiCensorship\x12\x18\n\aengines\x18\x08 \x03(\tR\aengines\x126\n\x17networ" +
+	"k_control_allowed\x18\t \x01(\x08R\x15networkControlAllowed\x129" +
 	"\n\vlocal_proxy\x18\n \x01(\v2\x18.sora.core.v1.LocalProxyR\nl" +
 	"ocalProxy\x12/\n\x06groups\x18\v \x03(\v2\x17.sora.core.v1.GroupSp" +
 	"ecR\x06groups\x126\n\arouting\x18\f \x01(\v2\x1c.sora.core.v1.Routi" +
-	"ngOptionsR\arouting\x12\x12\n\x04ipv6\x18\r \x01(\bR\x04ipv6\x12\x1b\n\ttun_st" +
-	"ack\x18\x0e \x01(\tR\btunStack\x12\x14\n\x05chain\x18\x0f \x03(\tR\x05chain\x12&\n\x0fzap" +
-	"ret_with_vpn\x18\x10 \x01(\bR\rzapretWithVpn\x12E\n\x0fzapret_stra" +
+	"ngOptionsR\arouting\x12\x12\n\x04ipv6\x18\r \x01(\x08R\x04ipv6\x12\x1b\n\ttun_st" +
+	"ack\x18\x0e \x01(\tR\x08tunStack\x12\x14\n\x05chain\x18\x0f \x03(\tR\x05chain\x12&\n\x0fzap" +
+	"ret_with_vpn\x18\x10 \x01(\x08R\rzapretWithVpn\x12E\n\x0fzapret_stra" +
 	"tegy\x18\x11 \x01(\v2\x1c.sora.core.v1.BypassStrategyR\x0ezapret" +
 	"Strategy\"\xe4\x01\n\tGroupSpec\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12+\n\x04ty" +
 	"pe\x18\x02 \x01(\x0e2\x17.sora.core.v1.GroupTypeR\x04type\x12\x18\n\amembe" +
-	"rs\x18\x03 \x03(\tR\amembers\x12\x19\n\btest_url\x18\x04 \x01(\tR\atestUrl\x12>\n\r" +
+	"rs\x18\x03 \x03(\tR\amembers\x12\x19\n\x08test_url\x18\x04 \x01(\tR\atestUrl\x12>\n\r" +
 	"test_interval\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\f" +
 	"testInterval\x12!\n\ftolerance_ms\x18\x06 \x01(\rR\vtoleranceMs\"" +
 	"h\n\x0eRoutingOptions\x12\x16\n\x06preset\x18\x01 \x01(\tR\x06preset\x12!\n\fpro" +
-	"xy_target\x18\x02 \x01(\tR\vproxyTarget\x12\x1b\n\tblock_ads\x18\x03 \x01(\bR" +
-	"\bblockAds\"^\n\nLocalProxy\x12\x18\n\aenabled\x18\x01 \x01(\bR\aenable" +
-	"d\x12\x1a\n\busername\x18\x02 \x01(\tR\busername\x12\x1a\n\bpassword\x18\x03 \x01(\tR" +
-	"\bpassword\"\xb4\x01\n\x0eAntiCensorship\x12!\n\ftls_fragment\x18\x01 \x01" +
-	"(\bR\vtlsFragment\x12)\n\x10fragment_packets\x18\x02 \x01(\tR\x0ffragm" +
+	"xy_target\x18\x02 \x01(\tR\vproxyTarget\x12\x1b\n\tblock_ads\x18\x03 \x01(\x08R" +
+	"\x08blockAds\"^\n\nLocalProxy\x12\x18\n\aenabled\x18\x01 \x01(\x08R\aenable" +
+	"d\x12\x1a\n\x08username\x18\x02 \x01(\tR\x08username\x12\x1a\n\x08password\x18\x03 \x01(\tR" +
+	"\x08password\"\xb4\x01\n\x0eAntiCensorship\x12!\n\ftls_fragment\x18\x01 \x01" +
+	"(\x08R\vtlsFragment\x12)\n\x10fragment_packets\x18\x02 \x01(\tR\x0ffragm" +
 	"entPackets\x12'\n\x0ffragment_length\x18\x03 \x01(\tR\x0efragmentLen" +
 	"gth\x12+\n\x11fragment_interval\x18\x04 \x01(\tR\x10fragmentInterval" +
 	"\"\x9d\x03\n\fOutboundSpec\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12!\n\fdisplay_nam" +
-	"e\x18\x02 \x01(\tR\vdisplayName\x124\n\x06bypass\x18\b \x01(\v2\x1c.sora.core" +
-	".v1.BypassStrategyR\x06bypass\x12\x1a\n\bprotocol\x18\x03 \x01(\tR\bpr" +
-	"otocol\x12\x1c\n\ttransport\x18\x04 \x01(\tR\ttransport\x12\x1a\n\bsecurity" +
-	"\x18\x05 \x01(\tR\bsecurity\x122\n\bendpoint\x18\x06 \x01(\v2\x16.sora.core.v" +
-	"1.EndpointR\bendpoint\x12>\n\vcredentials\x18\a \x01(\v2\x1c.sora" +
+	"e\x18\x02 \x01(\tR\vdisplayName\x124\n\x06bypass\x18\x08 \x01(\v2\x1c.sora.core" +
+	".v1.BypassStrategyR\x06bypass\x12\x1a\n\x08protocol\x18\x03 \x01(\tR\x08pr" +
+	"otocol\x12\x1c\n\ttransport\x18\x04 \x01(\tR\ttransport\x12\x1a\n\x08security" +
+	"\x18\x05 \x01(\tR\x08security\x122\n\x08endpoint\x18\x06 \x01(\v2\x16.sora.core.v" +
+	"1.EndpointR\x08endpoint\x12>\n\vcredentials\x18\a \x01(\v2\x1c.sora" +
 	".core.v1.CredentialsRefR\vcredentials\x12)\n\x10display_" +
 	"protocol\x18\t \x01(\tR\x0fdisplayProtocol\x12\x12\n\x04flow\x18\n \x01(\tR\x04f" +
-	"low\x12\x1b\n\tflow_auto\x18\v \x01(\bR\bflowAuto\"2\n\bEndpoint\x12\x12\n\x04" +
+	"low\x12\x1b\n\tflow_auto\x18\v \x01(\x08R\x08flowAuto\"2\n\x08Endpoint\x12\x12\n\x04" +
 	"host\x18\x01 \x01(\tR\x04host\x12\x12\n\x04port\x18\x02 \x01(\rR\x04port\".\n\x0eCredenti" +
 	"alsRef\x12\x1c\n\treference\x18\x01 \x01(\tR\treference\"P\n\vRoutingR" +
 	"ule\x12 \n\vdestination\x18\x01 \x01(\tR\vdestination\x12\x1f\n\voutboun" +
 	"d_id\x18\x02 \x01(\tR\noutboundId\"J\n\tDnsPolicy\x12\x18\n\aservers\x18\x01" +
-	" \x03(\tR\aservers\x12#\n\rblock_private\x18\x02 \x01(\bR\fblockPriva" +
-	"te\"@\n\x0eBypassSettings\x12\x18\n\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14" +
+	" \x03(\tR\aservers\x12#\n\rblock_private\x18\x02 \x01(\x08R\fblockPriva" +
+	"te\"@\n\x0eBypassSettings\x12\x18\n\aenabled\x18\x01 \x01(\x08R\aenabled\x12\x14" +
 	"\n\x05rules\x18\x02 \x03(\tR\x05rules\"\x97\x01\n\rSessionStatus\x12=\n\nconnec" +
 	"tion\x18\x01 \x01(\v2\x1d.sora.core.v1.ConnectionStateR\nconne" +
 	"ction\x12G\n\x12negotiated_version\x18\x02 \x01(\v2\x18.sora.core.v1" +
@@ -8843,7 +8938,7 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"a.core.v1.SoraErrorCodeR\x06reason\x129\n\nchanged_at\x18\x04 " +
 	"\x01(\v2\x1a.google.protobuf.TimestampR\tchangedAt\x12:\n\vre" +
 	"try_after\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\nretr" +
-	"yAfter\"\xf2\x05\n\tCoreEvent\x12\x1a\n\bsequence\x18\x01 \x01(\x04R\bsequence" +
+	"yAfter\"\xc7\x06\n\tCoreEvent\x12\x1a\n\x08sequence\x18\x01 \x01(\x04R\x08sequence" +
 	"\x12\x1d\n\nsession_id\x18\x02 \x01(\tR\tsessionId\x129\n\nemitted_at\x18\x03 " +
 	"\x01(\v2\x1a.google.protobuf.TimestampR\temittedAt\x12A\n\rst" +
 	"ate_changed\x18\x04 \x01(\v2\x1a.sora.core.v1.StateChangedH\x00R" +
@@ -8852,460 +8947,466 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"ed\x18\x06 \x01(\v2#.sora.core.v1.BypassStrategyChangedH\x00R" +
 	"\x15bypassStrategyChanged\x12>\n\fprobe_result\x18\a \x01(\v2\x19.s" +
 	"ora.core.v1.ProbeResultH\x00R\vprobeResult\x125\n\tlog_ba" +
-	"tch\x18\b \x01(\v2\x16.sora.core.v1.LogBatchH\x00R\blogBatch\x12/\n" +
+	"tch\x18\x08 \x01(\v2\x16.sora.core.v1.LogBatchH\x00R\x08logBatch\x12/\n" +
 	"\x05error\x18\t \x01(\v2\x17.sora.core.v1.SoraErrorH\x00R\x05error\x12Q" +
 	"\n\x13kill_switch_changed\x18\n \x01(\v2\x1f.sora.core.v1.KillS" +
 	"witchChangedH\x00R\x11killSwitchChanged\x12D\n\x0egroup_switc" +
 	"hed\x18\v \x01(\v2\x1b.sora.core.v1.GroupSwitchedH\x00R\rgroupS" +
 	"witched\x12G\n\x0fprofile_matched\x18\f \x01(\v2\x1c.sora.core.v1." +
-	"ProfileMatchedH\x00R\x0eprofileMatchedB\t\n\apayload\"C\n\fS" +
-	"tateChanged\x123\n\x05state\x18\x01 \x01(\v2\x1d.sora.core.v1.Connec" +
-	"tionStateR\x05state\"]\n\rGroupSwitched\x12\x14\n\x05group\x18\x01 \x01(\t" +
-	"R\x05group\x12\x1a\n\bselected\x18\x02 \x01(\tR\bselected\x12\x1a\n\bprevious\x18" +
-	"\x03 \x01(\tR\bprevious\"t\n\tStatsTick\x12\x19\n\bbytes_up\x18\x01 \x01(\x04R\a" +
-	"bytesUp\x12\x1d\n\nbytes_down\x18\x02 \x01(\x04R\tbytesDown\x12-\n\x12active" +
-	"_connections\x18\x03 \x01(\x04R\x11activeConnections\"3\n\x15BypassS" +
-	"trategyChanged\x12\x1a\n\bstrategy\x18\x01 \x01(\tR\bstrategy\"\xc6\x01\n\vP" +
-	"robeResult\x12\x1b\n\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1c\n\treach" +
-	"able\x18\x02 \x01(\bR\treachable\x12\x1d\n\nlatency_ms\x18\x03 \x01(\rR\tlaten" +
-	"cyMs\x12-\n\x05error\x18\x04 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05er" +
-	"ror\x12\x16\n\x06method\x18\x05 \x01(\tR\x06method\x12\x16\n\x06engine\x18\x06 \x01(\tR\x06eng" +
-	"ine\" \n\bLogBatch\x12\x14\n\x05lines\x18\x01 \x03(\tR\x05lines\"I\n\x11KillSwi" +
-	"tchChanged\x12\x18\n\aenabled\x18\x01 \x01(\bR\aenabled\x12\x1a\n\benforced" +
-	"\x18\x02 \x01(\bR\benforced\"\x88\x01\n\x12ParseImportRequest\x129\n\vapi_v" +
-	"ersion\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersi" +
-	"on\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x18\n\apayload\x18\x03 \x01" +
-	"(\fR\apayload\"\x82\x01\n\x13ParseImportResponse\x12<\n\fsession_p" +
-	"lan\x18\x01 \x01(\v2\x19.sora.core.v1.SessionPlanR\vsessionPla" +
-	"n\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error" +
-	"\"\xb1\x01\n\x18FetchSubscriptionRequest\x129\n\vapi_version\x18\x01 \x01" +
-	"(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x12\x1d\n\nrequ" +
-	"est_id\x18\x02 \x01(\tR\trequestId\x12\x1c\n\treference\x18\x03 \x01(\tR\trefe" +
-	"rence\x12\x1d\n\nuser_agent\x18\x04 \x01(\tR\tuserAgent\"\xb8\x01\n\x19FetchSu" +
-	"bscriptionResponse\x128\n\toutbounds\x18\x01 \x03(\v2\x1a.sora.cor" +
-	"e.v1.OutboundSpecR\toutbounds\x12-\n\x05error\x18\x02 \x01(\v2\x17.so" +
-	"ra.core.v1.SoraErrorR\x05error\x122\n\x04info\x18\x03 \x01(\v2\x1e.sora" +
-	".core.v1.SubscriptionInfoR\x04info\"\x87\x03\n\x10Subscription" +
-	"Info\x12\x14\n\x05title\x18\x01 \x01(\tR\x05title\x12B\n\x0fupdate_interval\x18\x02 " +
-	"\x01(\v2\x19.google.protobuf.DurationR\x0eupdateInterval\x12\x1b" +
-	"\n\thas_usage\x18\x03 \x01(\bR\bhasUsage\x12!\n\fupload_bytes\x18\x04 \x01(" +
-	"\x04R\vuploadBytes\x12%\n\x0edownload_bytes\x18\x05 \x01(\x04R\rdownload" +
-	"Bytes\x12\x1f\n\vtotal_bytes\x18\x06 \x01(\x04R\ntotalBytes\x122\n\x06expire" +
-	"\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\x06expire\x12 \n\fwe" +
-	"b_page_url\x18\b \x01(\tR\nwebPageUrl\x12\x1f\n\vsupport_url\x18\t \x01(" +
-	"\tR\nsupportUrl\x12\x1a\n\bannounce\x18\n \x01(\tR\bannounce\"\x95\x02\n\x13Pr" +
-	"obeServersRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.co" +
-	"re.v1.ApiVersionR\napiVersion\x12\x1d\n\nrequest_id\x18\x02 \x01(\t" +
-	"R\trequestId\x124\n\tendpoints\x18\x03 \x03(\v2\x16.sora.core.v1.En" +
-	"dpointR\tendpoints\x128\n\toutbounds\x18\x04 \x03(\v2\x1a.sora.core" +
-	".v1.OutboundSpecR\toutbounds\x124\n\aoptions\x18\x05 \x01(\v2\x1a.s" +
-	"ora.core.v1.ProbeOptionsR\aoptions\"\xae\x01\n\fProbeOptio" +
-	"ns\x121\n\x06method\x18\x01 \x01(\x0e2\x19.sora.core.v1.ProbeMethodR\x06m" +
-	"ethod\x12\x10\n\x03url\x18\x02 \x01(\tR\x03url\x12\x1d\n\ntimeout_ms\x18\x03 \x01(\rR\ttim" +
-	"eoutMs\x12 \n\vconcurrency\x18\x04 \x01(\rR\vconcurrency\x12\x18\n\aengi" +
-	"nes\x18\x05 \x03(\tR\aengines\"\x90\x01\n\x15RunDiagnosticsRequest\x129\n\v" +
-	"api_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napi" +
-	"Version\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x1d\n\nsessio" +
-	"n_id\x18\x03 \x01(\tR\tsessionId\"\x7f\n\x16RunDiagnosticsResponse\x12" +
-	"6\n\x06report\x18\x01 \x01(\v2\x1e.sora.core.v1.DiagnosticReportR" +
-	"\x06report\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR" +
-	"\x05error\"\x80\x02\n\x18ExportDiagnosticsRequest\x129\n\vapi_versi" +
-	"on\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x12\x1d" +
-	"\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x1d\n\nsession_id\x18\x03 \x01(" +
-	"\tR\tsessionId\x126\n\x06format\x18\x04 \x01(\x0e2\x1e.sora.core.v1.Diag" +
-	"nosticFormatR\x06format\x123\n\x15control_authenticator\x18\x05 " +
-	"\x01(\fR\x14controlAuthenticator\"d\n\x19ExportDiagnosticsRe" +
-	"sponse\x12\x18\n\aarchive\x18\x01 \x01(\fR\aarchive\x12-\n\x05error\x18\x02 \x01(\v2" +
-	"\x17.sora.core.v1.SoraErrorR\x05error\"\xa9\x01\n\x14SetKillSwitc" +
-	"hRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.Api" +
-	"VersionR\napiVersion\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequest" +
-	"Id\x12\x1d\n\nsession_id\x18\x03 \x01(\tR\tsessionId\x12\x18\n\aenabled\x18\x04 \x01" +
-	"(\bR\aenabled\"`\n\x15SetKillSwitchResponse\x12\x18\n\aenabled\x18" +
-	"\x01 \x01(\bR\aenabled\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.Sor" +
-	"aErrorR\x05error\"(\n\x10DiagnosticReport\x12\x14\n\x05lines\x18\x01 \x03(\t" +
-	"R\x05lines\"S\n\x10HandshakeRequest\x12?\n\x0eclient_version\x18\x01 " +
-	"\x01(\v2\x18.sora.core.v1.ApiVersionR\rclientVersion\"\xc0\x01\n" +
-	"\x11HandshakeResponse\x12G\n\x12negotiated_version\x18\x01 \x01(\v2\x18" +
-	".sora.core.v1.ApiVersionR\x11negotiatedVersion\x12-\n\x05e" +
-	"rror\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\x123\n\x15co" +
-	"ntrol_authenticator\x18\x03 \x01(\fR\x14controlAuthenticator\"" +
-	"\xc8\x01\n\x10PutSecretRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora" +
-	".core.v1.ApiVersionR\napiVersion\x12\x1d\n\nrequest_id\x18\x02 " +
-	"\x01(\tR\trequestId\x12>\n\vcredentials\x18\x03 \x01(\v2\x1c.sora.core." +
-	"v1.CredentialsRefR\vcredentials\x12\x1a\n\bmaterial\x18\x04 \x01(\f" +
-	"R\bmaterial\"\x82\x01\n\x11PutSecretResponse\x12>\n\vcredentials\x18" +
-	"\x01 \x01(\v2\x1c.sora.core.v1.CredentialsRefR\vcredentials" +
-	"\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"" +
-	"\xaf\x01\n\x13DeleteSecretRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.s" +
-	"ora.core.v1.ApiVersionR\napiVersion\x12\x1d\n\nrequest_id" +
-	"\x18\x02 \x01(\tR\trequestId\x12>\n\vcredentials\x18\x03 \x01(\v2\x1c.sora.co" +
-	"re.v1.CredentialsRefR\vcredentials\"E\n\x14DeleteSecre" +
-	"tResponse\x12-\n\x05error\x18\x01 \x01(\v2\x17.sora.core.v1.SoraErro" +
-	"rR\x05error\"\x88\x02\n\tSoraError\x12/\n\x04code\x18\x01 \x01(\x0e2\x1b.sora.core" +
-	".v1.SoraErrorCodeR\x04code\x12(\n\x10user_message_key\x18\x02 \x01(" +
-	"\tR\x0euserMessageKey\x12'\n\x0fdetail_redacted\x18\x03 \x01(\tR\x0edeta" +
-	"ilRedacted\x12\x1c\n\tretryable\x18\x04 \x01(\bR\tretryable\x12\x1d\n\nrequ" +
-	"est_id\x18\x05 \x01(\tR\trequestId\x12:\n\vretry_after\x18\x06 \x01(\v2\x19.g" +
-	"oogle.protobuf.DurationR\nretryAfter\"\xce\x01\n\bLogEntry" +
-	"\x12\x1a\n\bsequence\x18\x01 \x01(\x04R\bsequence\x12.\n\x04time\x18\x02 \x01(\v2\x1a.goo" +
-	"gle.protobuf.TimestampR\x04time\x12,\n\x05level\x18\x03 \x01(\x0e2\x16.so" +
-	"ra.core.v1.LogLevelR\x05level\x12\x16\n\x06source\x18\x04 \x01(\tR\x06sour" +
-	"ce\x12\x18\n\amessage\x18\x05 \x01(\tR\amessage\x12\x16\n\x06repeat\x18\x06 \x01(\rR\x06re" +
-	"peat\"\xf4\x01\n\tLogFilter\x123\n\tmin_level\x18\x01 \x01(\x0e2\x16.sora.cor" +
-	"e.v1.LogLevelR\bminLevel\x12\x18\n\asources\x18\x02 \x03(\tR\asource" +
-	"s\x12\x1a\n\bcontains\x18\x03 \x01(\tR\bcontains\x12\x18\n\apattern\x18\x04 \x01(\tR\a" +
-	"pattern\x120\n\x05since\x18\x05 \x01(\v2\x1a.google.protobuf.Timesta" +
-	"mpR\x05since\x120\n\x05until\x18\x06 \x01(\v2\x1a.google.protobuf.Times" +
-	"tampR\x05until\"\xf2\x01\n\x10QueryLogsRequest\x129\n\vapi_version\x18" +
+	"ProfileMatchedH\x00R\x0eprofileMatched\x12S\n\x13censorship_d" +
+	"etected\x18\r \x01(\v2 .sora.core.v1.CensorshipDetectedH" +
+	"\x00R\x12censorshipDetectedB\t\n\apayload\"C\n\fStateChanged" +
+	"\x123\n\x05state\x18\x01 \x01(\v2\x1d.sora.core.v1.ConnectionStateR\x05" +
+	"state\"]\n\rGroupSwitched\x12\x14\n\x05group\x18\x01 \x01(\tR\x05group\x12\x1a\n\x08" +
+	"selected\x18\x02 \x01(\tR\x08selected\x12\x1a\n\x08previous\x18\x03 \x01(\tR\x08prev" +
+	"ious\"t\n\tStatsTick\x12\x19\n\x08bytes_up\x18\x01 \x01(\x04R\abytesUp\x12\x1d\n\n" +
+	"bytes_down\x18\x02 \x01(\x04R\tbytesDown\x12-\n\x12active_connection" +
+	"s\x18\x03 \x01(\x04R\x11activeConnections\"3\n\x15BypassStrategyChan" +
+	"ged\x12\x1a\n\x08strategy\x18\x01 \x01(\tR\x08strategy\"\xc6\x01\n\vProbeResult\x12" +
+	"\x1b\n\tserver_id\x18\x01 \x01(\tR\x08serverId\x12\x1c\n\treachable\x18\x02 \x01(\x08R" +
+	"\treachable\x12\x1d\n\nlatency_ms\x18\x03 \x01(\rR\tlatencyMs\x12-\n\x05err" +
+	"or\x18\x04 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\x12\x16\n\x06meth" +
+	"od\x18\x05 \x01(\tR\x06method\x12\x16\n\x06engine\x18\x06 \x01(\tR\x06engine\" \n\x08LogB" +
+	"atch\x12\x14\n\x05lines\x18\x01 \x03(\tR\x05lines\"I\n\x11KillSwitchChanged\x12" +
+	"\x18\n\aenabled\x18\x01 \x01(\x08R\aenabled\x12\x1a\n\x08enforced\x18\x02 \x01(\x08R\x08enf" +
+	"orced\"\x88\x01\n\x12ParseImportRequest\x129\n\vapi_version\x18\x01 \x01(" +
+	"\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x12\x1d\n\nreque" +
+	"st_id\x18\x02 \x01(\tR\trequestId\x12\x18\n\apayload\x18\x03 \x01(\fR\apayload" +
+	"\"\x82\x01\n\x13ParseImportResponse\x12<\n\fsession_plan\x18\x01 \x01(\v2\x19" +
+	".sora.core.v1.SessionPlanR\vsessionPlan\x12-\n\x05error\x18" +
+	"\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xb1\x01\n\x18FetchS" +
+	"ubscriptionRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.c" +
+	"ore.v1.ApiVersionR\napiVersion\x12\x1d\n\nrequest_id\x18\x02 \x01(" +
+	"\tR\trequestId\x12\x1c\n\treference\x18\x03 \x01(\tR\treference\x12\x1d\n\nus" +
+	"er_agent\x18\x04 \x01(\tR\tuserAgent\"\xb8\x01\n\x19FetchSubscriptionR" +
+	"esponse\x128\n\toutbounds\x18\x01 \x03(\v2\x1a.sora.core.v1.Outbou" +
+	"ndSpecR\toutbounds\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1." +
+	"SoraErrorR\x05error\x122\n\x04info\x18\x03 \x01(\v2\x1e.sora.core.v1.Su" +
+	"bscriptionInfoR\x04info\"\x87\x03\n\x10SubscriptionInfo\x12\x14\n\x05tit" +
+	"le\x18\x01 \x01(\tR\x05title\x12B\n\x0fupdate_interval\x18\x02 \x01(\v2\x19.googl" +
+	"e.protobuf.DurationR\x0eupdateInterval\x12\x1b\n\thas_usage" +
+	"\x18\x03 \x01(\x08R\x08hasUsage\x12!\n\fupload_bytes\x18\x04 \x01(\x04R\vuploadBy" +
+	"tes\x12%\n\x0edownload_bytes\x18\x05 \x01(\x04R\rdownloadBytes\x12\x1f\n\vto" +
+	"tal_bytes\x18\x06 \x01(\x04R\ntotalBytes\x122\n\x06expire\x18\a \x01(\v2\x1a.go" +
+	"ogle.protobuf.TimestampR\x06expire\x12 \n\fweb_page_url\x18" +
+	"\x08 \x01(\tR\nwebPageUrl\x12\x1f\n\vsupport_url\x18\t \x01(\tR\nsupportU" +
+	"rl\x12\x1a\n\x08announce\x18\n \x01(\tR\x08announce\"\x95\x02\n\x13ProbeServersR" +
+	"equest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVe" +
+	"rsionR\napiVersion\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId" +
+	"\x124\n\tendpoints\x18\x03 \x03(\v2\x16.sora.core.v1.EndpointR\tend" +
+	"points\x128\n\toutbounds\x18\x04 \x03(\v2\x1a.sora.core.v1.Outboun" +
+	"dSpecR\toutbounds\x124\n\aoptions\x18\x05 \x01(\v2\x1a.sora.core.v1" +
+	".ProbeOptionsR\aoptions\"\xae\x01\n\fProbeOptions\x121\n\x06metho" +
+	"d\x18\x01 \x01(\x0e2\x19.sora.core.v1.ProbeMethodR\x06method\x12\x10\n\x03ur" +
+	"l\x18\x02 \x01(\tR\x03url\x12\x1d\n\ntimeout_ms\x18\x03 \x01(\rR\ttimeoutMs\x12 \n\vc" +
+	"oncurrency\x18\x04 \x01(\rR\vconcurrency\x12\x18\n\aengines\x18\x05 \x03(\tR\a" +
+	"engines\"\x90\x01\n\x15RunDiagnosticsRequest\x129\n\vapi_version" +
+	"\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x12\x1d\n\n" +
+	"request_id\x18\x02 \x01(\tR\trequestId\x12\x1d\n\nsession_id\x18\x03 \x01(\tR" +
+	"\tsessionId\"\x7f\n\x16RunDiagnosticsResponse\x126\n\x06report\x18\x01" +
+	" \x01(\v2\x1e.sora.core.v1.DiagnosticReportR\x06report\x12-\n\x05" +
+	"error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x80\x02\n\x18" +
+	"ExportDiagnosticsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18." +
+	"sora.core.v1.ApiVersionR\napiVersion\x12\x1d\n\nrequest_i" +
+	"d\x18\x02 \x01(\tR\trequestId\x12\x1d\n\nsession_id\x18\x03 \x01(\tR\tsessionI" +
+	"d\x126\n\x06format\x18\x04 \x01(\x0e2\x1e.sora.core.v1.DiagnosticForma" +
+	"tR\x06format\x123\n\x15control_authenticator\x18\x05 \x01(\fR\x14contro" +
+	"lAuthenticator\"d\n\x19ExportDiagnosticsResponse\x12\x18\n\aa" +
+	"rchive\x18\x01 \x01(\fR\aarchive\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core" +
+	".v1.SoraErrorR\x05error\"\xa9\x01\n\x14SetKillSwitchRequest\x129\n" +
+	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\nap" +
+	"iVersion\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\trequestId\x12\x1d\n\nsessi" +
+	"on_id\x18\x03 \x01(\tR\tsessionId\x12\x18\n\aenabled\x18\x04 \x01(\x08R\aenabled" +
+	"\"`\n\x15SetKillSwitchResponse\x12\x18\n\aenabled\x18\x01 \x01(\x08R\aenab" +
+	"led\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05err" +
+	"or\"(\n\x10DiagnosticReport\x12\x14\n\x05lines\x18\x01 \x03(\tR\x05lines\"S\n\x10" +
+	"HandshakeRequest\x12?\n\x0eclient_version\x18\x01 \x01(\v2\x18.sora." +
+	"core.v1.ApiVersionR\rclientVersion\"\xc0\x01\n\x11HandshakeR" +
+	"esponse\x12G\n\x12negotiated_version\x18\x01 \x01(\v2\x18.sora.core." +
+	"v1.ApiVersionR\x11negotiatedVersion\x12-\n\x05error\x18\x02 \x01(\v2" +
+	"\x17.sora.core.v1.SoraErrorR\x05error\x123\n\x15control_authe" +
+	"nticator\x18\x03 \x01(\fR\x14controlAuthenticator\"\xc8\x01\n\x10PutSecr" +
+	"etRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.Ap" +
+	"iVersionR\napiVersion\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\treques" +
+	"tId\x12>\n\vcredentials\x18\x03 \x01(\v2\x1c.sora.core.v1.Credenti" +
+	"alsRefR\vcredentials\x12\x1a\n\x08material\x18\x04 \x01(\fR\x08material\"" +
+	"\x82\x01\n\x11PutSecretResponse\x12>\n\vcredentials\x18\x01 \x01(\v2\x1c.sor" +
+	"a.core.v1.CredentialsRefR\vcredentials\x12-\n\x05error\x18\x02" +
+	" \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xaf\x01\n\x13DeleteS" +
+	"ecretRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1" +
+	".ApiVersionR\napiVersion\x12\x1d\n\nrequest_id\x18\x02 \x01(\tR\treq" +
+	"uestId\x12>\n\vcredentials\x18\x03 \x01(\v2\x1c.sora.core.v1.Crede" +
+	"ntialsRefR\vcredentials\"E\n\x14DeleteSecretResponse\x12-" +
+	"\n\x05error\x18\x01 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x88\x02" +
+	"\n\tSoraError\x12/\n\x04code\x18\x01 \x01(\x0e2\x1b.sora.core.v1.SoraErr" +
+	"orCodeR\x04code\x12(\n\x10user_message_key\x18\x02 \x01(\tR\x0euserMess" +
+	"ageKey\x12'\n\x0fdetail_redacted\x18\x03 \x01(\tR\x0edetailRedacted\x12" +
+	"\x1c\n\tretryable\x18\x04 \x01(\x08R\tretryable\x12\x1d\n\nrequest_id\x18\x05 \x01(" +
+	"\tR\trequestId\x12:\n\vretry_after\x18\x06 \x01(\v2\x19.google.proto" +
+	"buf.DurationR\nretryAfter\"\xce\x01\n\x08LogEntry\x12\x1a\n\x08sequenc" +
+	"e\x18\x01 \x01(\x04R\x08sequence\x12.\n\x04time\x18\x02 \x01(\v2\x1a.google.protobu" +
+	"f.TimestampR\x04time\x12,\n\x05level\x18\x03 \x01(\x0e2\x16.sora.core.v1." +
+	"LogLevelR\x05level\x12\x16\n\x06source\x18\x04 \x01(\tR\x06source\x12\x18\n\amessa" +
+	"ge\x18\x05 \x01(\tR\amessage\x12\x16\n\x06repeat\x18\x06 \x01(\rR\x06repeat\"\xf4\x01\n\tLo" +
+	"gFilter\x123\n\tmin_level\x18\x01 \x01(\x0e2\x16.sora.core.v1.LogLev" +
+	"elR\x08minLevel\x12\x18\n\asources\x18\x02 \x03(\tR\asources\x12\x1a\n\x08contai" +
+	"ns\x18\x03 \x01(\tR\x08contains\x12\x18\n\apattern\x18\x04 \x01(\tR\apattern\x120\n\x05" +
+	"since\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x05since\x120" +
+	"\n\x05until\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x05until" +
+	"\"\xf2\x01\n\x10QueryLogsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sor" +
+	"a.core.v1.ApiVersionR\napiVersion\x123\n\x15control_auth" +
+	"enticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12/\n\x06filter\x18" +
+	"\x03 \x01(\v2\x17.sora.core.v1.LogFilterR\x06filter\x12'\n\x0fbefore" +
+	"_sequence\x18\x04 \x01(\x04R\x0ebeforeSequence\x12\x14\n\x05limit\x18\x05 \x01(\rR\x05" +
+	"limit\"\xcb\x01\n\x11QueryLogsResponse\x120\n\aentries\x18\x01 \x03(\v2\x16.s" +
+	"ora.core.v1.LogEntryR\aentries\x12'\n\x0fbefore_sequence" +
+	"\x18\x02 \x01(\x04R\x0ebeforeSequence\x12,\n\x05stats\x18\x03 \x01(\v2\x16.sora.cor" +
+	"e.v1.LogStatsR\x05stats\x12-\n\x05error\x18\x04 \x01(\v2\x17.sora.core." +
+	"v1.SoraErrorR\x05error\"\xe0\x01\n\x08LogStats\x126\n\x08by_level\x18\x01 \x03" +
+	"(\v2\x1b.sora.core.v1.LogLevelCountR\abyLevel\x129\n\tby_s" +
+	"ource\x18\x02 \x03(\v2\x1c.sora.core.v1.LogSourceCountR\x08bySou" +
+	"rce\x12\x14\n\x05total\x18\x03 \x01(\x04R\x05total\x12\x14\n\x05bytes\x18\x04 \x01(\x04R\x05bytes\x12" +
+	"\x1b\n\tmax_bytes\x18\x05 \x01(\x04R\x08maxBytes\x12\x18\n\adropped\x18\x06 \x01(\x04R\ad" +
+	"ropped\"S\n\rLogLevelCount\x12,\n\x05level\x18\x01 \x01(\x0e2\x16.sora.co" +
+	"re.v1.LogLevelR\x05level\x12\x14\n\x05count\x18\x02 \x01(\x04R\x05count\">\n\x0eL" +
+	"ogSourceCount\x12\x16\n\x06source\x18\x01 \x01(\tR\x06source\x12\x14\n\x05count\x18\x02" +
+	" \x01(\x04R\x05count\"\xda\x01\n\x10WatchLogsRequest\x129\n\vapi_version\x18" +
 	"\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x123\n\x15c" +
 	"ontrol_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator" +
 	"\x12/\n\x06filter\x18\x03 \x01(\v2\x17.sora.core.v1.LogFilterR\x06filte" +
-	"r\x12'\n\x0fbefore_sequence\x18\x04 \x01(\x04R\x0ebeforeSequence\x12\x14\n\x05li" +
-	"mit\x18\x05 \x01(\rR\x05limit\"\xcb\x01\n\x11QueryLogsResponse\x120\n\aentrie" +
-	"s\x18\x01 \x03(\v2\x16.sora.core.v1.LogEntryR\aentries\x12'\n\x0fbefo" +
-	"re_sequence\x18\x02 \x01(\x04R\x0ebeforeSequence\x12,\n\x05stats\x18\x03 \x01(\v" +
-	"2\x16.sora.core.v1.LogStatsR\x05stats\x12-\n\x05error\x18\x04 \x01(\v2\x17" +
-	".sora.core.v1.SoraErrorR\x05error\"\xe0\x01\n\bLogStats\x126\n\bb" +
-	"y_level\x18\x01 \x03(\v2\x1b.sora.core.v1.LogLevelCountR\abyLe" +
-	"vel\x129\n\tby_source\x18\x02 \x03(\v2\x1c.sora.core.v1.LogSourceC" +
-	"ountR\bbySource\x12\x14\n\x05total\x18\x03 \x01(\x04R\x05total\x12\x14\n\x05bytes\x18\x04 " +
-	"\x01(\x04R\x05bytes\x12\x1b\n\tmax_bytes\x18\x05 \x01(\x04R\bmaxBytes\x12\x18\n\adropp" +
-	"ed\x18\x06 \x01(\x04R\adropped\"S\n\rLogLevelCount\x12,\n\x05level\x18\x01 \x01(" +
-	"\x0e2\x16.sora.core.v1.LogLevelR\x05level\x12\x14\n\x05count\x18\x02 \x01(\x04R" +
-	"\x05count\">\n\x0eLogSourceCount\x12\x16\n\x06source\x18\x01 \x01(\tR\x06source" +
-	"\x12\x14\n\x05count\x18\x02 \x01(\x04R\x05count\"\xda\x01\n\x10WatchLogsRequest\x129\n\va" +
-	"pi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiV" +
-	"ersion\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14controlAu" +
-	"thenticator\x12/\n\x06filter\x18\x03 \x01(\v2\x17.sora.core.v1.LogFi" +
-	"lterR\x06filter\x12%\n\x0eafter_sequence\x18\x04 \x01(\x04R\rafterSeque" +
-	"nce\"\x87\x02\n\x11ExportLogsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18" +
-	".sora.core.v1.ApiVersionR\napiVersion\x123\n\x15control_" +
-	"authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12/\n\x06fil" +
-	"ter\x18\x03 \x01(\v2\x17.sora.core.v1.LogFilterR\x06filter\x125\n\x06fo" +
-	"rmat\x18\x04 \x01(\x0e2\x1d.sora.core.v1.LogExportFormatR\x06forma" +
-	"t\x12\x1a\n\bcategory\x18\x05 \x01(\tR\bcategory\"\x93\x01\n\x12ExportLogsResp" +
-	"onse\x12\x12\n\x04data\x18\x01 \x01(\fR\x04data\x12\x1b\n\tfile_name\x18\x02 \x01(\tR\bfil" +
-	"eName\x12\x1d\n\nmedia_type\x18\x03 \x01(\tR\tmediaType\x12-\n\x05error\x18\x04 " +
-	"\x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x82\x01\n\x10ClearLog" +
-	"sRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.Api" +
-	"VersionR\napiVersion\x123\n\x15control_authenticator\x18\x02 \x01" +
-	"(\fR\x14controlAuthenticator\"B\n\x11ClearLogsResponse\x12-\n" +
-	"\x05error\x18\x01 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xb9\x01\n" +
-	"\vLogSettings\x12;\n\rcapture_level\x18\x01 \x01(\x0e2\x16.sora.core." +
-	"v1.LogLevelR\fcaptureLevel\x12/\n\x13record_destinations" +
-	"\x18\x02 \x01(\bR\x12recordDestinations\x12\x1f\n\vmax_entries\x18\x03 \x01(\rR" +
-	"\nmaxEntries\x12\x1b\n\tmax_bytes\x18\x04 \x01(\rR\bmaxBytes\"\x87\x01\n\x15Get" +
-	"LogSettingsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.c" +
-	"ore.v1.ApiVersionR\napiVersion\x123\n\x15control_authent" +
-	"icator\x18\x02 \x01(\fR\x14controlAuthenticator\"~\n\x16GetLogSett" +
-	"ingsResponse\x125\n\bsettings\x18\x01 \x01(\v2\x19.sora.core.v1.Lo" +
-	"gSettingsR\bsettings\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v" +
-	"1.SoraErrorR\x05error\"\xbe\x01\n\x15SetLogSettingsRequest\x129\n\v" +
-	"api_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napi" +
-	"Version\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14controlA" +
-	"uthenticator\x125\n\bsettings\x18\x03 \x01(\v2\x19.sora.core.v1.Lo" +
-	"gSettingsR\bsettings\"~\n\x16SetLogSettingsResponse\x125\n" +
-	"\bsettings\x18\x01 \x01(\v2\x19.sora.core.v1.LogSettingsR\bsett" +
-	"ings\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05er" +
-	"ror\"\x88\x02\n\nConnection\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n\anetwork\x18\x02 " +
-	"\x01(\tR\anetwork\x12\x12\n\x04host\x18\x03 \x01(\tR\x04host\x12\x12\n\x04port\x18\x04 \x01(\rR\x04" +
-	"port\x12\x18\n\aprocess\x18\x05 \x01(\tR\aprocess\x12\x12\n\x04rule\x18\x06 \x01(\tR\x04ru" +
-	"le\x12\x14\n\x05chain\x18\a \x03(\tR\x05chain\x12\x16\n\x06upload\x18\b \x01(\x04R\x06upload" +
-	"\x12\x1a\n\bdownload\x18\t \x01(\x04R\bdownload\x120\n\x05start\x18\n \x01(\v2\x1a.go" +
-	"ogle.protobuf.TimestampR\x05start\"\xa7\x01\n\x16ListConnectio" +
-	"nsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.Ap" +
+	"r\x12%\n\x0eafter_sequence\x18\x04 \x01(\x04R\rafterSequence\"\x87\x02\n\x11Exp" +
+	"ortLogsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core." +
+	"v1.ApiVersionR\napiVersion\x123\n\x15control_authenticat" +
+	"or\x18\x02 \x01(\fR\x14controlAuthenticator\x12/\n\x06filter\x18\x03 \x01(\v2\x17" +
+	".sora.core.v1.LogFilterR\x06filter\x125\n\x06format\x18\x04 \x01(\x0e2" +
+	"\x1d.sora.core.v1.LogExportFormatR\x06format\x12\x1a\n\x08catego" +
+	"ry\x18\x05 \x01(\tR\x08category\"\x93\x01\n\x12ExportLogsResponse\x12\x12\n\x04dat" +
+	"a\x18\x01 \x01(\fR\x04data\x12\x1b\n\tfile_name\x18\x02 \x01(\tR\x08fileName\x12\x1d\n\nme" +
+	"dia_type\x18\x03 \x01(\tR\tmediaType\x12-\n\x05error\x18\x04 \x01(\v2\x17.sora." +
+	"core.v1.SoraErrorR\x05error\"\x82\x01\n\x10ClearLogsRequest\x129\n" +
+	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\nap" +
+	"iVersion\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14control" +
+	"Authenticator\"B\n\x11ClearLogsResponse\x12-\n\x05error\x18\x01 \x01(" +
+	"\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xb9\x01\n\vLogSetting" +
+	"s\x12;\n\rcapture_level\x18\x01 \x01(\x0e2\x16.sora.core.v1.LogLevel" +
+	"R\fcaptureLevel\x12/\n\x13record_destinations\x18\x02 \x01(\x08R\x12rec" +
+	"ordDestinations\x12\x1f\n\vmax_entries\x18\x03 \x01(\rR\nmaxEntries" +
+	"\x12\x1b\n\tmax_bytes\x18\x04 \x01(\rR\x08maxBytes\"\x87\x01\n\x15GetLogSettings" +
+	"Request\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiV" +
+	"ersionR\napiVersion\x123\n\x15control_authenticator\x18\x02 \x01(" +
+	"\fR\x14controlAuthenticator\"~\n\x16GetLogSettingsRespons" +
+	"e\x125\n\x08settings\x18\x01 \x01(\v2\x19.sora.core.v1.LogSettingsR\x08" +
+	"settings\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraError" +
+	"R\x05error\"\xbe\x01\n\x15SetLogSettingsRequest\x129\n\vapi_version" +
+	"\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x123\n\x15" +
+	"control_authenticator\x18\x02 \x01(\fR\x14controlAuthenticato" +
+	"r\x125\n\x08settings\x18\x03 \x01(\v2\x19.sora.core.v1.LogSettingsR\x08" +
+	"settings\"~\n\x16SetLogSettingsResponse\x125\n\x08settings\x18\x01" +
+	" \x01(\v2\x19.sora.core.v1.LogSettingsR\x08settings\x12-\n\x05err" +
+	"or\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x88\x02\n\nCon" +
+	"nection\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n\anetwork\x18\x02 \x01(\tR\anetwor" +
+	"k\x12\x12\n\x04host\x18\x03 \x01(\tR\x04host\x12\x12\n\x04port\x18\x04 \x01(\rR\x04port\x12\x18\n\apro" +
+	"cess\x18\x05 \x01(\tR\aprocess\x12\x12\n\x04rule\x18\x06 \x01(\tR\x04rule\x12\x14\n\x05chain" +
+	"\x18\a \x03(\tR\x05chain\x12\x16\n\x06upload\x18\x08 \x01(\x04R\x06upload\x12\x1a\n\x08downloa" +
+	"d\x18\t \x01(\x04R\x08download\x120\n\x05start\x18\n \x01(\v2\x1a.google.protob" +
+	"uf.TimestampR\x05start\"\xa7\x01\n\x16ListConnectionsRequest\x129" +
+	"\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\na" +
+	"piVersion\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14contro" +
+	"lAuthenticator\x12\x1d\n\nsession_id\x18\x03 \x01(\tR\tsessionId\"\x84\x01" +
+	"\n\x17ListConnectionsResponse\x12:\n\vconnections\x18\x01 \x03(\v2\x18" +
+	".sora.core.v1.ConnectionR\vconnections\x12-\n\x05error\x18\x02" +
+	" \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xcc\x01\n\x16CloseCo" +
+	"nnectionRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core" +
+	".v1.ApiVersionR\napiVersion\x123\n\x15control_authentica" +
+	"tor\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n\nsession_id\x18\x03 " +
+	"\x01(\tR\tsessionId\x12#\n\rconnection_id\x18\x04 \x01(\tR\fconnectio" +
+	"nId\"H\n\x17CloseConnectionResponse\x12-\n\x05error\x18\x01 \x01(\v2\x17." +
+	"sora.core.v1.SoraErrorR\x05error\"\xd0\x01\n\x14SubscriptionSe" +
+	"ttings\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x10\n\x03url\x18\x02 \x01(\tR\x03url\x12\x12\n\x04name" +
+	"\x18\x03 \x01(\tR\x04name\x12\x1d\n\nuser_agent\x18\x04 \x01(\tR\tuserAgent\x12\x1f\n\va" +
+	"uto_update\x18\x05 \x01(\x08R\nautoUpdate\x12B\n\x0fupdate_interval\x18" +
+	"\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eupdateInterval" +
+	"\"\xcc\x03\n\x11SubscriptionState\x12>\n\x08settings\x18\x01 \x01(\v2\".sora." +
+	"core.v1.SubscriptionSettingsR\x08settings\x122\n\x04info\x18\x02" +
+	" \x01(\v2\x1e.sora.core.v1.SubscriptionInfoR\x04info\x128\n\tou" +
+	"tbounds\x18\x03 \x03(\v2\x1a.sora.core.v1.OutboundSpecR\toutbo" +
+	"unds\x12;\n\vlast_update\x18\x04 \x01(\v2\x1a.google.protobuf.Time" +
+	"stampR\nlastUpdate\x12;\n\vnext_update\x18\x05 \x01(\v2\x1a.google." +
+	"protobuf.TimestampR\nnextUpdate\x126\n\nlast_error\x18\x06 \x01" +
+	"(\v2\x17.sora.core.v1.SoraErrorR\tlastError\x12\x1a\n\x08updati" +
+	"ng\x18\a \x01(\x08R\x08updating\x12\x18\n\adeleted\x18\x08 \x01(\x08R\adeleted\x12!\n\f" +
+	"display_name\x18\t \x01(\tR\vdisplayName\"\xc9\x01\n\x17SaveSubscrip" +
+	"tionRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1." +
+	"ApiVersionR\napiVersion\x123\n\x15control_authenticator\x18" +
+	"\x02 \x01(\fR\x14controlAuthenticator\x12>\n\x08settings\x18\x03 \x01(\v2\"." +
+	"sora.core.v1.SubscriptionSettingsR\x08settings\"\x80\x01\n\x18" +
+	"SaveSubscriptionResponse\x125\n\x05state\x18\x01 \x01(\v2\x1f.sora.c" +
+	"ore.v1.SubscriptionStateR\x05state\x12-\n\x05error\x18\x02 \x01(\v2\x17" +
+	".sora.core.v1.SoraErrorR\x05error\"\x8a\x01\n\x18ListSubscript" +
+	"ionsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1." +
+	"ApiVersionR\napiVersion\x123\n\x15control_authenticator\x18" +
+	"\x02 \x01(\fR\x14controlAuthenticator\"\x91\x01\n\x19ListSubscription" +
+	"sResponse\x12E\n\rsubscriptions\x18\x01 \x03(\v2\x1f.sora.core.v1." +
+	"SubscriptionStateR\rsubscriptions\x12-\n\x05error\x18\x02 \x01(\v2" +
+	"\x17.sora.core.v1.SoraErrorR\x05error\"\x9b\x01\n\x19DeleteSubscr" +
+	"iptionRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v" +
+	"1.ApiVersionR\napiVersion\x123\n\x15control_authenticato" +
+	"r\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\"K\n" +
+	"\x1aDeleteSubscriptionResponse\x12-\n\x05error\x18\x01 \x01(\v2\x17.sor" +
+	"a.core.v1.SoraErrorR\x05error\"\x9c\x01\n\x1aRefreshSubscripti" +
+	"onRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.Ap" +
 	"iVersionR\napiVersion\x123\n\x15control_authenticator\x18\x02 " +
-	"\x01(\fR\x14controlAuthenticator\x12\x1d\n\nsession_id\x18\x03 \x01(\tR\ts" +
-	"essionId\"\x84\x01\n\x17ListConnectionsResponse\x12:\n\vconnecti" +
-	"ons\x18\x01 \x03(\v2\x18.sora.core.v1.ConnectionR\vconnections" +
-	"\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"" +
-	"\xcc\x01\n\x16CloseConnectionRequest\x129\n\vapi_version\x18\x01 \x01(\v2" +
-	"\x18.sora.core.v1.ApiVersionR\napiVersion\x123\n\x15control" +
-	"_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n\nse" +
-	"ssion_id\x18\x03 \x01(\tR\tsessionId\x12#\n\rconnection_id\x18\x04 \x01(\t" +
-	"R\fconnectionId\"H\n\x17CloseConnectionResponse\x12-\n\x05err" +
-	"or\x18\x01 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xd0\x01\n\x14Sub" +
-	"scriptionSettings\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x10\n\x03url\x18\x02 \x01(\tR\x03" +
-	"url\x12\x12\n\x04name\x18\x03 \x01(\tR\x04name\x12\x1d\n\nuser_agent\x18\x04 \x01(\tR\tuse" +
-	"rAgent\x12\x1f\n\vauto_update\x18\x05 \x01(\bR\nautoUpdate\x12B\n\x0fupdat" +
-	"e_interval\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eupd" +
-	"ateInterval\"\xcc\x03\n\x11SubscriptionState\x12>\n\bsettings\x18\x01 " +
-	"\x01(\v2\".sora.core.v1.SubscriptionSettingsR\bsetting" +
-	"s\x122\n\x04info\x18\x02 \x01(\v2\x1e.sora.core.v1.SubscriptionInfoR" +
-	"\x04info\x128\n\toutbounds\x18\x03 \x03(\v2\x1a.sora.core.v1.Outbound" +
-	"SpecR\toutbounds\x12;\n\vlast_update\x18\x04 \x01(\v2\x1a.google.pr" +
-	"otobuf.TimestampR\nlastUpdate\x12;\n\vnext_update\x18\x05 \x01(" +
-	"\v2\x1a.google.protobuf.TimestampR\nnextUpdate\x126\n\nlas" +
-	"t_error\x18\x06 \x01(\v2\x17.sora.core.v1.SoraErrorR\tlastErro" +
-	"r\x12\x1a\n\bupdating\x18\a \x01(\bR\bupdating\x12\x18\n\adeleted\x18\b \x01(\bR\a" +
-	"deleted\x12!\n\fdisplay_name\x18\t \x01(\tR\vdisplayName\"\xc9\x01\n\x17S" +
-	"aveSubscriptionRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.so" +
-	"ra.core.v1.ApiVersionR\napiVersion\x123\n\x15control_aut" +
-	"henticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12>\n\bsettin" +
-	"gs\x18\x03 \x01(\v2\".sora.core.v1.SubscriptionSettingsR\bse" +
-	"ttings\"\x80\x01\n\x18SaveSubscriptionResponse\x125\n\x05state\x18\x01 \x01" +
-	"(\v2\x1f.sora.core.v1.SubscriptionStateR\x05state\x12-\n\x05er" +
-	"ror\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x8a\x01\n\x18Li" +
-	"stSubscriptionsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.so" +
-	"ra.core.v1.ApiVersionR\napiVersion\x123\n\x15control_aut" +
-	"henticator\x18\x02 \x01(\fR\x14controlAuthenticator\"\x91\x01\n\x19ListS" +
-	"ubscriptionsResponse\x12E\n\rsubscriptions\x18\x01 \x03(\v2\x1f.so" +
-	"ra.core.v1.SubscriptionStateR\rsubscriptions\x12-\n\x05e" +
-	"rror\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x9b\x01\n\x19D" +
-	"eleteSubscriptionRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18." +
-	"sora.core.v1.ApiVersionR\napiVersion\x123\n\x15control_a" +
-	"uthenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x0e\n\x02id\x18\x03" +
-	" \x01(\tR\x02id\"K\n\x1aDeleteSubscriptionResponse\x12-\n\x05error\x18" +
-	"\x01 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x9c\x01\n\x1aRefres" +
-	"hSubscriptionRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora" +
-	".core.v1.ApiVersionR\napiVersion\x123\n\x15control_authe" +
-	"nticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x0e\n\x02id\x18\x03 \x01(\t" +
-	"R\x02id\"\x83\x01\n\x1bRefreshSubscriptionResponse\x125\n\x05state\x18\x01 " +
-	"\x01(\v2\x1f.sora.core.v1.SubscriptionStateR\x05state\x12-\n\x05e" +
-	"rror\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x8b\x01\n\x19W" +
-	"atchSubscriptionsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18." +
-	"sora.core.v1.ApiVersionR\napiVersion\x123\n\x15control_a" +
-	"uthenticator\x18\x02 \x01(\fR\x14controlAuthenticator\"\x9c\x01\n\x1aGet" +
-	"SubscriptionLinkRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.s" +
-	"ora.core.v1.ApiVersionR\napiVersion\x123\n\x15control_au" +
-	"thenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x0e\n\x02id\x18\x03 " +
-	"\x01(\tR\x02id\"^\n\x1bGetSubscriptionLinkResponse\x12\x10\n\x03url\x18\x01 " +
-	"\x01(\tR\x03url\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraError" +
-	"R\x05error\"L\n\x0fGetAboutRequest\x129\n\vapi_version\x18\x01 \x01(\v2" +
-	"\x18.sora.core.v1.ApiVersionR\napiVersion\"l\n\x10GetAbou" +
-	"tResponse\x12)\n\x05about\x18\x01 \x01(\v2\x13.sora.core.v1.AboutR\x05a" +
-	"bout\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05er" +
-	"ror\"\x97\x03\n\x05About\x12!\n\fcore_version\x18\x01 \x01(\tR\vcoreVersion" +
-	"\x12\x16\n\x06commit\x18\x02 \x01(\tR\x06commit\x12;\n\vcommit_time\x18\x03 \x01(\v2\x1a." +
-	"google.protobuf.TimestampR\ncommitTime\x124\n\bcontrac" +
-	"t\x18\x04 \x01(\v2\x18.sora.core.v1.ApiVersionR\bcontract\x12\x1a\n\bp" +
-	"latform\x18\x05 \x01(\tR\bplatform\x12\x1d\n\ngo_version\x18\x06 \x01(\tR\tgoV" +
-	"ersion\x123\n\aengines\x18\a \x03(\v2\x19.sora.core.v1.EngineBui" +
-	"ldR\aengines\x12\x18\n\alicense\x18\b \x01(\tR\alicense\x12\x1d\n\nsource_" +
-	"url\x18\t \x01(\tR\tsourceUrl\x127\n\vlocal_proxy\x18\n \x01(\v2\x16.sora" +
-	".core.v1.EndpointR\nlocalProxy\"Y\n\vEngineBuild\x12\x12\n\x04" +
-	"kind\x18\x01 \x01(\tR\x04kind\x12\x1c\n\tinstalled\x18\x02 \x01(\bR\tinstalled\x12\x18" +
-	"\n\aversion\x18\x03 \x01(\tR\aversion\"U\n\x18GetRoutingPresetsReq" +
-	"uest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVers" +
-	"ionR\napiVersion\"\x81\x01\n\x19GetRoutingPresetsResponse\x125\n" +
-	"\apresets\x18\x01 \x03(\v2\x1b.sora.core.v1.RoutingPresetR\apre" +
-	"sets\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05er" +
-	"ror\"7\n\rRoutingPreset\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n\x06direct\x18\x02" +
-	" \x03(\tR\x06direct\"\xd7\x01\n\x0eBypassStrategy\x12\x1b\n\tsplit_pos\x18\x01 \x03" +
-	"(\tR\bsplitPos\x12\x1a\n\bdisorder\x18\x02 \x01(\bR\bdisorder\x12\x10\n\x03oob\x18" +
-	"\x03 \x01(\bR\x03oob\x12\x1d\n\ntls_record\x18\x04 \x01(\tR\ttlsRecord\x12\x1b\n\thos" +
-	"t_case\x18\x05 \x01(\bR\bhostCase\x12\x1f\n\vdomain_case\x18\x06 \x01(\bR\ndom" +
-	"ainCase\x12\x1d\n\nmethod_eol\x18\a \x01(\bR\tmethodEol\"\x9b\x01\n\fDnsLe" +
-	"akCheck\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n" +
-	"\bexpected\x18\x03 \x01(\tR\bexpected\x12\x16\n\x06actual\x18\x04 \x01(\tR\x06actua" +
-	"l\x12\x16\n\x06leaked\x18\x05 \x01(\bR\x06leaked\x12\x19\n\bfix_hint\x18\x06 \x01(\tR\afix" +
-	"Hint\"\xa5\x01\n\x14CheckDnsLeaksRequest\x129\n\vapi_version\x18\x01 \x01" +
-	"(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x123\n\x15cont" +
-	"rol_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n" +
-	"\nsession_id\x18\x03 \x01(\tR\tsessionId\"z\n\x15CheckDnsLeaksRes" +
-	"ponse\x122\n\x06checks\x18\x01 \x03(\v2\x1a.sora.core.v1.DnsLeakChec" +
-	"kR\x06checks\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErro" +
-	"rR\x05error\"\x9a\x02\n\x17BenchmarkServersRequest\x129\n\vapi_vers" +
-	"ion\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x12" +
-	"3\n\x15control_authenticator\x18\x02 \x01(\fR\x14controlAuthentic" +
-	"ator\x12\x1d\n\nrequest_id\x18\x03 \x01(\tR\trequestId\x12\x1d\n\nserver_id" +
-	"s\x18\x04 \x03(\tR\tserverIds\x12\x1d\n\nduration_s\x18\x05 \x01(\rR\tduration" +
-	"S\x12 \n\vconcurrency\x18\x06 \x01(\rR\vconcurrency\x12\x10\n\x03url\x18\a \x01(\t" +
-	"R\x03url\"\xb8\x01\n\x0fBandwidthSample\x12\x1b\n\tserver_id\x18\x01 \x01(\tR\bse" +
-	"rverId\x12\"\n\rbytes_per_sec\x18\x02 \x01(\x04R\vbytesPerSec\x12!\n\fpr" +
-	"ogress_pct\x18\x03 \x01(\rR\vprogressPct\x12\x12\n\x04done\x18\x04 \x01(\bR\x04don" +
-	"e\x12-\n\x05error\x18\x05 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error" +
-	"\"\xa5\x01\n\x14GetBenchmarksRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18" +
-	".sora.core.v1.ApiVersionR\napiVersion\x123\n\x15control_" +
-	"authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n\nser" +
-	"ver_ids\x18\x03 \x03(\tR\tserverIds\"\x85\x01\n\x15GetBenchmarksRespon" +
-	"se\x12=\n\nbenchmarks\x18\x01 \x03(\v2\x1d.sora.core.v1.BenchmarkR" +
-	"ecordR\nbenchmarks\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1." +
-	"SoraErrorR\x05error\"\x9b\x01\n\x0fBenchmarkRecord\x12\x1b\n\tserver_i" +
-	"d\x18\x01 \x01(\tR\bserverId\x12\"\n\rbytes_per_sec\x18\x02 \x01(\x04R\vbytesP" +
-	"erSec\x12\x1d\n\nlatency_ms\x18\x03 \x01(\rR\tlatencyMs\x12(\n\x10measured" +
-	"_at_unix\x18\x04 \x01(\x03R\x0emeasuredAtUnix\"\x9d\x03\n\x1fSaveSubscript" +
-	"ionOverrideRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.c" +
+	"\x01(\fR\x14controlAuthenticator\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\"\x83\x01\n\x1bRe" +
+	"freshSubscriptionResponse\x125\n\x05state\x18\x01 \x01(\v2\x1f.sora." +
+	"core.v1.SubscriptionStateR\x05state\x12-\n\x05error\x18\x02 \x01(\v2" +
+	"\x17.sora.core.v1.SoraErrorR\x05error\"\x8b\x01\n\x19WatchSubscri" +
+	"ptionsRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v" +
+	"1.ApiVersionR\napiVersion\x123\n\x15control_authenticato" +
+	"r\x18\x02 \x01(\fR\x14controlAuthenticator\"\x9c\x01\n\x1aGetSubscriptio" +
+	"nLinkRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1" +
+	".ApiVersionR\napiVersion\x123\n\x15control_authenticator" +
+	"\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\"^\n\x1b" +
+	"GetSubscriptionLinkResponse\x12\x10\n\x03url\x18\x01 \x01(\tR\x03url\x12-\n" +
+	"\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"L\n\x0f" +
+	"GetAboutRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core" +
+	".v1.ApiVersionR\napiVersion\"l\n\x10GetAboutResponse\x12)" +
+	"\n\x05about\x18\x01 \x01(\v2\x13.sora.core.v1.AboutR\x05about\x12-\n\x05err" +
+	"or\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x97\x03\n\x05Abo" +
+	"ut\x12!\n\fcore_version\x18\x01 \x01(\tR\vcoreVersion\x12\x16\n\x06commit\x18" +
+	"\x02 \x01(\tR\x06commit\x12;\n\vcommit_time\x18\x03 \x01(\v2\x1a.google.prot" +
+	"obuf.TimestampR\ncommitTime\x124\n\x08contract\x18\x04 \x01(\v2\x18.s" +
+	"ora.core.v1.ApiVersionR\x08contract\x12\x1a\n\x08platform\x18\x05 \x01" +
+	"(\tR\x08platform\x12\x1d\n\ngo_version\x18\x06 \x01(\tR\tgoVersion\x123\n\ae" +
+	"ngines\x18\a \x03(\v2\x19.sora.core.v1.EngineBuildR\aengines" +
+	"\x12\x18\n\alicense\x18\x08 \x01(\tR\alicense\x12\x1d\n\nsource_url\x18\t \x01(\tR\t" +
+	"sourceUrl\x127\n\vlocal_proxy\x18\n \x01(\v2\x16.sora.core.v1.En" +
+	"dpointR\nlocalProxy\"Y\n\vEngineBuild\x12\x12\n\x04kind\x18\x01 \x01(\tR" +
+	"\x04kind\x12\x1c\n\tinstalled\x18\x02 \x01(\x08R\tinstalled\x12\x18\n\aversion\x18\x03" +
+	" \x01(\tR\aversion\"U\n\x18GetRoutingPresetsRequest\x129\n\vapi" +
+	"_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVer" +
+	"sion\"\x81\x01\n\x19GetRoutingPresetsResponse\x125\n\apresets\x18\x01 " +
+	"\x03(\v2\x1b.sora.core.v1.RoutingPresetR\apresets\x12-\n\x05err" +
+	"or\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"7\n\rRout" +
+	"ingPreset\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n\x06direct\x18\x02 \x03(\tR\x06direc" +
+	"t\"\xd7\x01\n\x0eBypassStrategy\x12\x1b\n\tsplit_pos\x18\x01 \x03(\tR\x08splitPo" +
+	"s\x12\x1a\n\x08disorder\x18\x02 \x01(\x08R\x08disorder\x12\x10\n\x03oob\x18\x03 \x01(\x08R\x03oob\x12" +
+	"\x1d\n\ntls_record\x18\x04 \x01(\tR\ttlsRecord\x12\x1b\n\thost_case\x18\x05 \x01(" +
+	"\x08R\x08hostCase\x12\x1f\n\vdomain_case\x18\x06 \x01(\x08R\ndomainCase\x12\x1d\n\n" +
+	"method_eol\x18\a \x01(\x08R\tmethodEol\"\x9b\x01\n\fDnsLeakCheck\x12\x0e\n\x02" +
+	"id\x18\x01 \x01(\tR\x02id\x12\x14\n\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n\x08expected\x18\x03" +
+	" \x01(\tR\x08expected\x12\x16\n\x06actual\x18\x04 \x01(\tR\x06actual\x12\x16\n\x06leaked" +
+	"\x18\x05 \x01(\x08R\x06leaked\x12\x19\n\x08fix_hint\x18\x06 \x01(\tR\afixHint\"\xa5\x01\n\x14Ch" +
+	"eckDnsLeaksRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.c" +
 	"ore.v1.ApiVersionR\napiVersion\x123\n\x15control_authent" +
-	"icator\x18\x02 \x01(\fR\x14controlAuthenticator\x12'\n\x0fsubscripti" +
-	"on_id\x18\x03 \x01(\tR\x0esubscriptionId\x12T\n\arenames\x18\x04 \x03(\v2:.s" +
-	"ora.core.v1.SaveSubscriptionOverrideRequest.Rena" +
-	"mesEntryR\arenames\x12\x16\n\x06hidden\x18\x05 \x03(\tR\x06hidden\x12!\n\fpin" +
-	"ned_order\x18\x06 \x03(\tR\vpinnedOrder\x12\x14\n\x05clear\x18\a \x01(\bR\x05cle" +
-	"ar\x1a:\n\fRenamesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 " +
-	"\x01(\tR\x05value:\x028\x01\"\x88\x01\n SaveSubscriptionOverrideRespo" +
-	"nse\x12-\n\x05error\x18\x01 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05err" +
-	"or\x125\n\x05state\x18\x02 \x01(\v2\x1f.sora.core.v1.SubscriptionSta" +
-	"teR\x05state\"\xb9\x01\n\x1eGetSubscriptionOverrideRequest\x129\n\v" +
-	"api_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napi" +
-	"Version\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14controlA" +
-	"uthenticator\x12'\n\x0fsubscription_id\x18\x03 \x01(\tR\x0esubscript" +
-	"ionId\"\xda\x02\n\x1fGetSubscriptionOverrideResponse\x12T\n\aren" +
-	"ames\x18\x01 \x03(\v2:.sora.core.v1.GetSubscriptionOverrid" +
-	"eResponse.RenamesEntryR\arenames\x12\x16\n\x06hidden\x18\x02 \x03(\tR" +
-	"\x06hidden\x12!\n\fpinned_order\x18\x03 \x03(\tR\vpinnedOrder\x12;\n\vex" +
-	"tra_rules\x18\x04 \x03(\v2\x1a.sora.core.v1.OverrideRuleR\next" +
-	"raRules\x12-\n\x05error\x18\x05 \x01(\v2\x17.sora.core.v1.SoraErrorR" +
-	"\x05error\x1a:\n\fRenamesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05valu" +
-	"e\x18\x02 \x01(\tR\x05value:\x028\x01\"Q\n\fOverrideRule\x12 \n\vdestinatio" +
-	"n\x18\x01 \x01(\tR\vdestination\x12\x1f\n\voutbound_id\x18\x02 \x01(\tR\noutbo" +
-	"undId\"q\n\x0eProfileMatched\x12\x1d\n\nprofile_id\x18\x01 \x01(\tR\tpro" +
-	"fileId\x12!\n\fprofile_name\x18\x02 \x01(\tR\vprofileName\x12\x1d\n\naut" +
-	"o_apply\x18\x03 \x01(\bR\tautoApply\"\xc0\x01\n\x0eNetworkProfile\x12\x0e\n\x02i" +
-	"d\x18\x01 \x01(\tR\x02id\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x129\n\btriggers\x18\x03 \x01(" +
-	"\v2\x1d.sora.core.v1.ProfileTriggersR\btriggers\x120\n\x05ap" +
-	"ply\x18\x04 \x01(\v2\x1a.sora.core.v1.ProfileApplyR\x05apply\x12\x1d\n\n" +
-	"auto_apply\x18\x05 \x01(\bR\tautoApply\"W\n\x0fProfileTriggers\x12\x14" +
-	"\n\x05ssids\x18\x01 \x03(\tR\x05ssids\x12\x1a\n\bgateways\x18\x02 \x03(\tR\bgateways" +
-	"\x12\x12\n\x04asns\x18\x03 \x03(\tR\x04asns\"\x8c\x01\n\fProfileApply\x12\x12\n\x04mode\x18\x01 " +
-	"\x01(\tR\x04mode\x12\x10\n\x03dns\x18\x02 \x03(\tR\x03dns\x12!\n\frules_preset\x18\x03 \x01(" +
-	"\tR\vrulesPreset\x12\x1b\n\tserver_id\x18\x04 \x01(\tR\bserverId\x12\x16\n\x06e" +
-	"ngine\x18\x05 \x01(\tR\x06engine\"\x85\x01\n\x13ListProfilesRequest\x129\n\va" +
-	"pi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiV" +
-	"ersion\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14controlAu" +
-	"thenticator\"\x7f\n\x14ListProfilesResponse\x128\n\bprofiles\x18" +
-	"\x01 \x03(\v2\x1c.sora.core.v1.NetworkProfileR\bprofiles\x12-\n" +
-	"\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xbc\x01\n" +
-	"\x12SaveProfileRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora." +
-	"core.v1.ApiVersionR\napiVersion\x123\n\x15control_authen" +
-	"ticator\x18\x02 \x01(\fR\x14controlAuthenticator\x126\n\aprofile\x18\x03" +
-	" \x01(\v2\x1c.sora.core.v1.NetworkProfileR\aprofile\"|\n\x13S" +
-	"aveProfileResponse\x126\n\aprofile\x18\x01 \x01(\v2\x1c.sora.core." +
-	"v1.NetworkProfileR\aprofile\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora" +
-	".core.v1.SoraErrorR\x05error\"\xa5\x01\n\x14DeleteProfileReque" +
-	"st\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersio" +
-	"nR\napiVersion\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14co" +
-	"ntrolAuthenticator\x12\x1d\n\nprofile_id\x18\x03 \x01(\tR\tprofileI" +
-	"d\"F\n\x15DeleteProfileResponse\x12-\n\x05error\x18\x01 \x01(\v2\x17.sora" +
-	".core.v1.SoraErrorR\x05error\"\x8e\x01\n\x1cGetNetworkFingerpr" +
-	"intRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.A" +
-	"piVersionR\napiVersion\x123\n\x15control_authenticator\x18\x02" +
-	" \x01(\fR\x14controlAuthenticator\"\x92\x01\n\x1dGetNetworkFingerp" +
-	"rintResponse\x12B\n\vfingerprint\x18\x01 \x01(\v2 .sora.core.v1" +
-	".NetworkFingerprintR\vfingerprint\x12-\n\x05error\x18\x02 \x01(\v2" +
-	"\x17.sora.core.v1.SoraErrorR\x05error\"v\n\x12NetworkFinger" +
-	"print\x12\x12\n\x04ssid\x18\x01 \x01(\tR\x04ssid\x12\x18\n\agateway\x18\x02 \x01(\tR\agate" +
-	"way\x12\x10\n\x03asn\x18\x03 \x01(\tR\x03asn\x12 \n\vfingerprint\x18\x04 \x01(\tR\vfing" +
-	"erprint\"\xc1\x01\n\x11ProbeChainRequest\x129\n\vapi_version\x18\x01 \x01" +
-	"(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x123\n\x15cont" +
-	"rol_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n" +
-	"\nrequest_id\x18\x03 \x01(\tR\trequestId\x12\x1d\n\nserver_ids\x18\x04 \x03(\t" +
-	"R\tserverIds\"\xb3\x01\n\x12ProbeChainResponse\x12*\n\x04hops\x18\x01 \x03(\v" +
-	"2\x16.sora.core.v1.ChainHopR\x04hops\x12(\n\x10total_latency_" +
-	"ms\x18\x02 \x01(\rR\x0etotalLatencyMs\x12\x18\n\aengines\x18\x03 \x03(\tR\aengin" +
-	"es\x12-\n\x05error\x18\x04 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05erro" +
-	"r\"d\n\bChainHop\x12\x1b\n\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1c\n\tre" +
-	"achable\x18\x02 \x01(\bR\treachable\x12\x1d\n\nlatency_ms\x18\x03 \x01(\rR\tla" +
-	"tencyMs*\x8d\x01\n\tGroupType\x12\x1a\n\x16GROUP_TYPE_UNSPECIFIED\x10" +
-	"\x00\x12\x15\n\x11GROUP_TYPE_SELECT\x10\x01\x12\x17\n\x13GROUP_TYPE_URL_TEST\x10" +
-	"\x02\x12\x17\n\x13GROUP_TYPE_FALLBACK\x10\x03\x12\x1b\n\x17GROUP_TYPE_LOAD_BA" +
-	"LANCE\x10\x04*^\n\nTunnelMode\x12\x1b\n\x17TUNNEL_MODE_UNSPECIFIED" +
-	"\x10\x00\x12\x16\n\x12TUNNEL_MODE_SYSTEM\x10\x01\x12\x1b\n\x17TUNNEL_MODE_APPLIC" +
-	"ATION\x10\x02*\x80\x02\n\x14ConnectionStateValue\x12&\n\"CONNECTION_S" +
-	"TATE_VALUE_UNSPECIFIED\x10\x00\x12'\n#CONNECTION_STATE_VAL" +
-	"UE_DISCONNECTED\x10\x01\x12%\n!CONNECTION_STATE_VALUE_CONN" +
-	"ECTING\x10\x02\x12$\n CONNECTION_STATE_VALUE_CONNECTED\x10\x03\x12'" +
-	"\n#CONNECTION_STATE_VALUE_RECONNECTING\x10\x04\x12!\n\x1dCONNE" +
-	"CTION_STATE_VALUE_FAILED\x10\x05*^\n\vProbeMethod\x12\x1c\n\x18PRO" +
-	"BE_METHOD_UNSPECIFIED\x10\x00\x12\x17\n\x13PROBE_METHOD_ENGINE\x10\x01" +
-	"\x12\x18\n\x14PROBE_METHOD_CONNECT\x10\x02*o\n\x10DiagnosticFormat\x12!" +
-	"\n\x1dDIAGNOSTIC_FORMAT_UNSPECIFIED\x10\x00\x12\x1c\n\x18DIAGNOSTIC_" +
-	"FORMAT_PCAPNG\x10\x01\x12\x1a\n\x16DIAGNOSTIC_FORMAT_EVTX\x10\x02*\xbd\x03\n\r" +
-	"SoraErrorCode\x12\x1f\n\x1bSORA_ERROR_CODE_UNSPECIFIED\x10\x00\x12$" +
-	"\n SORA_ERROR_CODE_VERSION_MISMATCH\x10\x01\x12#\n\x1fSORA_ERR" +
-	"OR_CODE_UNAUTHENTICATED\x10\x02\x12$\n SORA_ERROR_CODE_INV" +
-	"ALID_ARGUMENT\x10\x03\x12'\n#SORA_ERROR_CODE_FAILED_PRECON" +
-	"DITION\x10\x04\x12\x1d\n\x19SORA_ERROR_CODE_NOT_FOUND\x10\x05\x12&\n\"SORA_" +
-	"ERROR_CODE_RESOURCE_EXHAUSTED\x10\x06\x12%\n!SORA_ERROR_CO" +
-	"DE_DEADLINE_EXCEEDED\x10\a\x12\x1f\n\x1bSORA_ERROR_CODE_UNAVAI" +
-	"LABLE\x10\b\x12\x1c\n\x18SORA_ERROR_CODE_INTERNAL\x10\t\x12%\n!SORA_ER" +
-	"ROR_CODE_PERMISSION_DENIED\x10\n\x12\x1d\n\x19SORA_ERROR_CODE_" +
-	"CANCELLED\x10\v*z\n\bLogLevel\x12\x19\n\x15LOG_LEVEL_UNSPECIFIED" +
-	"\x10\x00\x12\x13\n\x0fLOG_LEVEL_DEBUG\x10\x01\x12\x12\n\x0eLOG_LEVEL_INFO\x10\x02\x12\x15\n\x11L" +
-	"OG_LEVEL_WARNING\x10\x03\x12\x13\n\x0fLOG_LEVEL_ERROR\x10\x04*\xfa\x01\n\x0fLogE" +
-	"xportFormat\x12!\n\x1dLOG_EXPORT_FORMAT_UNSPECIFIED\x10\x00\x12 " +
-	"\n\x1cLOG_EXPORT_FORMAT_JSON_LINES\x10\x01\x12\x19\n\x15LOG_EXPORT_F" +
-	"ORMAT_CSV\x10\x02\x12\x19\n\x15LOG_EXPORT_FORMAT_LOG\x10\x03\x12\x1a\n\x16LOG_EX" +
-	"PORT_FORMAT_JSON\x10\x04\x12\x19\n\x15LOG_EXPORT_FORMAT_XML\x10\x05\x12\x19\n" +
-	"\x15LOG_EXPORT_FORMAT_ZIP\x10\x06\x12\x1a\n\x16LOG_EXPORT_FORMAT_GZ" +
-	"IP\x10\a2\xbb\x1c\n\vCoreControl\x12F\n\aConnect\x12\x1c.sora.core.v1.C" +
-	"onnectRequest\x1a\x1d.sora.core.v1.ConnectResponse\x12O\n\n" +
-	"Disconnect\x12\x1f.sora.core.v1.DisconnectRequest\x1a .so" +
-	"ra.core.v1.DisconnectResponse\x12L\n\tGetStatus\x12\x1e.sor" +
-	"a.core.v1.GetStatusRequest\x1a\x1f.sora.core.v1.GetSta" +
-	"tusResponse\x12J\n\vWatchEvents\x12 .sora.core.v1.WatchE" +
-	"ventsRequest\x1a\x17.sora.core.v1.CoreEvent0\x01\x12R\n\vParse" +
-	"Import\x12 .sora.core.v1.ParseImportRequest\x1a!.sora." +
-	"core.v1.ParseImportResponse\x12d\n\x11FetchSubscription" +
-	"\x12&.sora.core.v1.FetchSubscriptionRequest\x1a'.sora." +
-	"core.v1.FetchSubscriptionResponse\x12N\n\fProbeServer" +
-	"s\x12!.sora.core.v1.ProbeServersRequest\x1a\x19.sora.core" +
-	".v1.ProbeResult0\x01\x12I\n\bGetStats\x12\x1d.sora.core.v1.Get" +
-	"StatsRequest\x1a\x1e.sora.core.v1.GetStatsResponse\x12[\n\x0e" +
-	"RunDiagnostics\x12#.sora.core.v1.RunDiagnosticsRequ" +
-	"est\x1a$.sora.core.v1.RunDiagnosticsResponse\x12d\n\x11Exp" +
-	"ortDiagnostics\x12&.sora.core.v1.ExportDiagnosticsR" +
-	"equest\x1a'.sora.core.v1.ExportDiagnosticsResponse\x12" +
-	"X\n\rSetKillSwitch\x12\".sora.core.v1.SetKillSwitchReq" +
-	"uest\x1a#.sora.core.v1.SetKillSwitchResponse\x12L\n\tHan" +
-	"dshake\x12\x1e.sora.core.v1.HandshakeRequest\x1a\x1f.sora.co" +
-	"re.v1.HandshakeResponse\x12I\n\bGetAbout\x12\x1d.sora.core." +
-	"v1.GetAboutRequest\x1a\x1e.sora.core.v1.GetAboutRespon" +
-	"se\x12d\n\x11GetRoutingPresets\x12&.sora.core.v1.GetRoutin" +
-	"gPresetsRequest\x1a'.sora.core.v1.GetRoutingPresets" +
-	"Response\x12L\n\tQueryLogs\x12\x1e.sora.core.v1.QueryLogsRe" +
-	"quest\x1a\x1f.sora.core.v1.QueryLogsResponse\x12E\n\tWatchL" +
-	"ogs\x12\x1e.sora.core.v1.WatchLogsRequest\x1a\x16.sora.core." +
-	"v1.LogEntry0\x01\x12O\n\nExportLogs\x12\x1f.sora.core.v1.Expor" +
-	"tLogsRequest\x1a .sora.core.v1.ExportLogsResponse\x12L" +
-	"\n\tClearLogs\x12\x1e.sora.core.v1.ClearLogsRequest\x1a\x1f.so" +
-	"ra.core.v1.ClearLogsResponse\x12[\n\x0eGetLogSettings\x12#" +
-	".sora.core.v1.GetLogSettingsRequest\x1a$.sora.core." +
-	"v1.GetLogSettingsResponse\x12[\n\x0eSetLogSettings\x12#.so" +
-	"ra.core.v1.SetLogSettingsRequest\x1a$.sora.core.v1." +
-	"SetLogSettingsResponse\x12^\n\x0fListConnections\x12$.sora" +
-	".core.v1.ListConnectionsRequest\x1a%.sora.core.v1.L" +
-	"istConnectionsResponse\x12^\n\x0fCloseConnection\x12$.sora" +
-	".core.v1.CloseConnectionRequest\x1a%.sora.core.v1.C" +
-	"loseConnectionResponse\x12a\n\x10SaveSubscription\x12%.sor" +
-	"a.core.v1.SaveSubscriptionRequest\x1a&.sora.core.v1" +
-	".SaveSubscriptionResponse\x12d\n\x11ListSubscriptions\x12&" +
-	".sora.core.v1.ListSubscriptionsRequest\x1a'.sora.co" +
-	"re.v1.ListSubscriptionsResponse\x12g\n\x12DeleteSubscri" +
-	"ption\x12'.sora.core.v1.DeleteSubscriptionRequest\x1a(" +
-	".sora.core.v1.DeleteSubscriptionResponse\x12j\n\x13Refr" +
-	"eshSubscription\x12(.sora.core.v1.RefreshSubscripti" +
-	"onRequest\x1a).sora.core.v1.RefreshSubscriptionResp" +
-	"onse\x12`\n\x12WatchSubscriptions\x12'.sora.core.v1.WatchS" +
-	"ubscriptionsRequest\x1a\x1f.sora.core.v1.SubscriptionS" +
-	"tate0\x01\x12j\n\x13GetSubscriptionLink\x12(.sora.core.v1.Get" +
-	"SubscriptionLinkRequest\x1a).sora.core.v1.GetSubscr" +
-	"iptionLinkResponse\x12L\n\tPutSecret\x12\x1e.sora.core.v1.P" +
-	"utSecretRequest\x1a\x1f.sora.core.v1.PutSecretResponse" +
-	"\x12U\n\fDeleteSecret\x12!.sora.core.v1.DeleteSecretRequ" +
-	"est\x1a\".sora.core.v1.DeleteSecretResponse\x12X\n\rCheck" +
-	"DnsLeaks\x12\".sora.core.v1.CheckDnsLeaksRequest\x1a#.s" +
-	"ora.core.v1.CheckDnsLeaksResponse\x12Z\n\x10BenchmarkSe" +
-	"rvers\x12%.sora.core.v1.BenchmarkServersRequest\x1a\x1d.s" +
-	"ora.core.v1.BandwidthSample0\x01\x12X\n\rGetBenchmarks\x12\"" +
-	".sora.core.v1.GetBenchmarksRequest\x1a#.sora.core.v" +
-	"1.GetBenchmarksResponse\x12y\n\x18SaveSubscriptionOverr" +
-	"ide\x12-.sora.core.v1.SaveSubscriptionOverrideReque" +
-	"st\x1a..sora.core.v1.SaveSubscriptionOverrideRespon" +
-	"se\x12v\n\x17GetSubscriptionOverride\x12,.sora.core.v1.Get" +
-	"SubscriptionOverrideRequest\x1a-.sora.core.v1.GetSu" +
-	"bscriptionOverrideResponse\x12U\n\fListProfiles\x12!.sor" +
-	"a.core.v1.ListProfilesRequest\x1a\".sora.core.v1.Lis" +
-	"tProfilesResponse\x12R\n\vSaveProfile\x12 .sora.core.v1." +
-	"SaveProfileRequest\x1a!.sora.core.v1.SaveProfileRes" +
-	"ponse\x12X\n\rDeleteProfile\x12\".sora.core.v1.DeleteProf" +
-	"ileRequest\x1a#.sora.core.v1.DeleteProfileResponse\x12" +
-	"p\n\x15GetNetworkFingerprint\x12*.sora.core.v1.GetNetwo" +
-	"rkFingerprintRequest\x1a+.sora.core.v1.GetNetworkFi" +
-	"ngerprintResponse\x12O\n\nProbeChain\x12\x1f.sora.core.v1.P" +
-	"robeChainRequest\x1a .sora.core.v1.ProbeChainRespon" +
-	"seB?Z=github.com/levvs-one/sora-client/core/gen/" +
-	"sora/core/v1;corev1b\x06proto3"
+	"icator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n\nsession_id" +
+	"\x18\x03 \x01(\tR\tsessionId\"z\n\x15CheckDnsLeaksResponse\x122\n\x06ch" +
+	"ecks\x18\x01 \x03(\v2\x1a.sora.core.v1.DnsLeakCheckR\x06checks\x12-" +
+	"\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\x9a\x02" +
+	"\n\x17BenchmarkServersRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18" +
+	".sora.core.v1.ApiVersionR\napiVersion\x123\n\x15control_" +
+	"authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n\nreq" +
+	"uest_id\x18\x03 \x01(\tR\trequestId\x12\x1d\n\nserver_ids\x18\x04 \x03(\tR\tse" +
+	"rverIds\x12\x1d\n\nduration_s\x18\x05 \x01(\rR\tdurationS\x12 \n\vconcur" +
+	"rency\x18\x06 \x01(\rR\vconcurrency\x12\x10\n\x03url\x18\a \x01(\tR\x03url\"\xb8\x01\n\x0fB" +
+	"andwidthSample\x12\x1b\n\tserver_id\x18\x01 \x01(\tR\x08serverId\x12\"\n\rb" +
+	"ytes_per_sec\x18\x02 \x01(\x04R\vbytesPerSec\x12!\n\fprogress_pct\x18" +
+	"\x03 \x01(\rR\vprogressPct\x12\x12\n\x04done\x18\x04 \x01(\x08R\x04done\x12-\n\x05error\x18" +
+	"\x05 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xa5\x01\n\x14GetBen" +
+	"chmarksRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core." +
+	"v1.ApiVersionR\napiVersion\x123\n\x15control_authenticat" +
+	"or\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n\nserver_ids\x18\x03 \x03" +
+	"(\tR\tserverIds\"\x85\x01\n\x15GetBenchmarksResponse\x12=\n\nbench" +
+	"marks\x18\x01 \x03(\v2\x1d.sora.core.v1.BenchmarkRecordR\nbenc" +
+	"hmarks\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05" +
+	"error\"\x9b\x01\n\x0fBenchmarkRecord\x12\x1b\n\tserver_id\x18\x01 \x01(\tR\x08se" +
+	"rverId\x12\"\n\rbytes_per_sec\x18\x02 \x01(\x04R\vbytesPerSec\x12\x1d\n\nla" +
+	"tency_ms\x18\x03 \x01(\rR\tlatencyMs\x12(\n\x10measured_at_unix\x18\x04 " +
+	"\x01(\x03R\x0emeasuredAtUnix\"\x9d\x03\n\x1fSaveSubscriptionOverride" +
+	"Request\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiV" +
+	"ersionR\napiVersion\x123\n\x15control_authenticator\x18\x02 \x01(" +
+	"\fR\x14controlAuthenticator\x12'\n\x0fsubscription_id\x18\x03 \x01(\t" +
+	"R\x0esubscriptionId\x12T\n\arenames\x18\x04 \x03(\v2:.sora.core.v1" +
+	".SaveSubscriptionOverrideRequest.RenamesEntryR\ar" +
+	"enames\x12\x16\n\x06hidden\x18\x05 \x03(\tR\x06hidden\x12!\n\fpinned_order\x18\x06" +
+	" \x03(\tR\vpinnedOrder\x12\x14\n\x05clear\x18\a \x01(\x08R\x05clear\x1a:\n\fRenam" +
+	"esEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:" +
+	"\x028\x01\"\x88\x01\n SaveSubscriptionOverrideResponse\x12-\n\x05erro" +
+	"r\x18\x01 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\x125\n\x05state" +
+	"\x18\x02 \x01(\v2\x1f.sora.core.v1.SubscriptionStateR\x05state\"\xb9" +
+	"\x01\n\x1eGetSubscriptionOverrideRequest\x129\n\vapi_version" +
+	"\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x123\n\x15" +
+	"control_authenticator\x18\x02 \x01(\fR\x14controlAuthenticato" +
+	"r\x12'\n\x0fsubscription_id\x18\x03 \x01(\tR\x0esubscriptionId\"\xda\x02\n\x1fG" +
+	"etSubscriptionOverrideResponse\x12T\n\arenames\x18\x01 \x03(\v2" +
+	":.sora.core.v1.GetSubscriptionOverrideResponse.R" +
+	"enamesEntryR\arenames\x12\x16\n\x06hidden\x18\x02 \x03(\tR\x06hidden\x12!\n\f" +
+	"pinned_order\x18\x03 \x03(\tR\vpinnedOrder\x12;\n\vextra_rules\x18\x04" +
+	" \x03(\v2\x1a.sora.core.v1.OverrideRuleR\nextraRules\x12-\n\x05" +
+	"error\x18\x05 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\x1a:\n\fR" +
+	"enamesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05va" +
+	"lue:\x028\x01\"Q\n\fOverrideRule\x12 \n\vdestination\x18\x01 \x01(\tR\vde" +
+	"stination\x12\x1f\n\voutbound_id\x18\x02 \x01(\tR\noutboundId\"q\n\x0ePr" +
+	"ofileMatched\x12\x1d\n\nprofile_id\x18\x01 \x01(\tR\tprofileId\x12!\n\fp" +
+	"rofile_name\x18\x02 \x01(\tR\vprofileName\x12\x1d\n\nauto_apply\x18\x03 \x01" +
+	"(\x08R\tautoApply\"\xc0\x01\n\x0eNetworkProfile\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id" +
+	"\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x129\n\x08triggers\x18\x03 \x01(\v2\x1d.sora.co" +
+	"re.v1.ProfileTriggersR\x08triggers\x120\n\x05apply\x18\x04 \x01(\v2\x1a" +
+	".sora.core.v1.ProfileApplyR\x05apply\x12\x1d\n\nauto_apply\x18" +
+	"\x05 \x01(\x08R\tautoApply\"W\n\x0fProfileTriggers\x12\x14\n\x05ssids\x18\x01 \x03" +
+	"(\tR\x05ssids\x12\x1a\n\x08gateways\x18\x02 \x03(\tR\x08gateways\x12\x12\n\x04asns\x18\x03 " +
+	"\x03(\tR\x04asns\"\x8c\x01\n\fProfileApply\x12\x12\n\x04mode\x18\x01 \x01(\tR\x04mode\x12\x10" +
+	"\n\x03dns\x18\x02 \x03(\tR\x03dns\x12!\n\frules_preset\x18\x03 \x01(\tR\vrulesPre" +
+	"set\x12\x1b\n\tserver_id\x18\x04 \x01(\tR\x08serverId\x12\x16\n\x06engine\x18\x05 \x01(\t" +
+	"R\x06engine\"\x85\x01\n\x13ListProfilesRequest\x129\n\vapi_version\x18" +
+	"\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersion\x123\n\x15c" +
+	"ontrol_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator" +
+	"\"\x7f\n\x14ListProfilesResponse\x128\n\x08profiles\x18\x01 \x03(\v2\x1c.sor" +
+	"a.core.v1.NetworkProfileR\x08profiles\x12-\n\x05error\x18\x02 \x01(" +
+	"\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xbc\x01\n\x12SaveProfil" +
+	"eRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.Api" +
+	"VersionR\napiVersion\x123\n\x15control_authenticator\x18\x02 \x01" +
+	"(\fR\x14controlAuthenticator\x126\n\aprofile\x18\x03 \x01(\v2\x1c.sora" +
+	".core.v1.NetworkProfileR\aprofile\"|\n\x13SaveProfileR" +
+	"esponse\x126\n\aprofile\x18\x01 \x01(\v2\x1c.sora.core.v1.NetworkP" +
+	"rofileR\aprofile\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.So" +
+	"raErrorR\x05error\"\xa5\x01\n\x14DeleteProfileRequest\x129\n\vapi_v" +
+	"ersion\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\napiVersi" +
+	"on\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14controlAuthen" +
+	"ticator\x12\x1d\n\nprofile_id\x18\x03 \x01(\tR\tprofileId\"F\n\x15Delete" +
+	"ProfileResponse\x12-\n\x05error\x18\x01 \x01(\v2\x17.sora.core.v1.So" +
+	"raErrorR\x05error\"\x8e\x01\n\x1cGetNetworkFingerprintRequest\x12" +
+	"9\n\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\n" +
+	"apiVersion\x123\n\x15control_authenticator\x18\x02 \x01(\fR\x14contr" +
+	"olAuthenticator\"\x92\x01\n\x1dGetNetworkFingerprintRespons" +
+	"e\x12B\n\vfingerprint\x18\x01 \x01(\v2 .sora.core.v1.NetworkFin" +
+	"gerprintR\vfingerprint\x12-\n\x05error\x18\x02 \x01(\v2\x17.sora.core" +
+	".v1.SoraErrorR\x05error\"v\n\x12NetworkFingerprint\x12\x12\n\x04ss" +
+	"id\x18\x01 \x01(\tR\x04ssid\x12\x18\n\agateway\x18\x02 \x01(\tR\agateway\x12\x10\n\x03asn\x18" +
+	"\x03 \x01(\tR\x03asn\x12 \n\vfingerprint\x18\x04 \x01(\tR\vfingerprint\"\xc1\x01\n" +
+	"\x11ProbeChainRequest\x129\n\vapi_version\x18\x01 \x01(\v2\x18.sora.c" +
+	"ore.v1.ApiVersionR\napiVersion\x123\n\x15control_authent" +
+	"icator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x1d\n\nrequest_id" +
+	"\x18\x03 \x01(\tR\trequestId\x12\x1d\n\nserver_ids\x18\x04 \x03(\tR\tserverIds" +
+	"\"\xb3\x01\n\x12ProbeChainResponse\x12*\n\x04hops\x18\x01 \x03(\v2\x16.sora.cor" +
+	"e.v1.ChainHopR\x04hops\x12(\n\x10total_latency_ms\x18\x02 \x01(\rR\x0et" +
+	"otalLatencyMs\x12\x18\n\aengines\x18\x03 \x03(\tR\aengines\x12-\n\x05error" +
+	"\x18\x04 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"d\n\x08ChainH" +
+	"op\x12\x1b\n\tserver_id\x18\x01 \x01(\tR\x08serverId\x12\x1c\n\treachable\x18\x02 \x01" +
+	"(\x08R\treachable\x12\x1d\n\nlatency_ms\x18\x03 \x01(\rR\tlatencyMs\"\x86\x01\n" +
+	"\x12CensorshipDetected\x12\x12\n\x04kind\x18\x01 \x01(\tR\x04kind\x12\x1e\n\nconfi" +
+	"dence\x18\x02 \x01(\x01R\nconfidence\x12 \n\vexplanation\x18\x03 \x01(\tR\vex" +
+	"planation\x12\x1a\n\x08evidence\x18\x04 \x03(\tR\x08evidence*\x8d\x01\n\tGroupT" +
+	"ype\x12\x1a\n\x16GROUP_TYPE_UNSPECIFIED\x10\x00\x12\x15\n\x11GROUP_TYPE_SE" +
+	"LECT\x10\x01\x12\x17\n\x13GROUP_TYPE_URL_TEST\x10\x02\x12\x17\n\x13GROUP_TYPE_FA" +
+	"LLBACK\x10\x03\x12\x1b\n\x17GROUP_TYPE_LOAD_BALANCE\x10\x04*^\n\nTunnelM" +
+	"ode\x12\x1b\n\x17TUNNEL_MODE_UNSPECIFIED\x10\x00\x12\x16\n\x12TUNNEL_MODE_" +
+	"SYSTEM\x10\x01\x12\x1b\n\x17TUNNEL_MODE_APPLICATION\x10\x02*\x80\x02\n\x14Connec" +
+	"tionStateValue\x12&\n\"CONNECTION_STATE_VALUE_UNSPECI" +
+	"FIED\x10\x00\x12'\n#CONNECTION_STATE_VALUE_DISCONNECTED\x10\x01\x12" +
+	"%\n!CONNECTION_STATE_VALUE_CONNECTING\x10\x02\x12$\n CONNEC" +
+	"TION_STATE_VALUE_CONNECTED\x10\x03\x12'\n#CONNECTION_STATE" +
+	"_VALUE_RECONNECTING\x10\x04\x12!\n\x1dCONNECTION_STATE_VALUE_" +
+	"FAILED\x10\x05*^\n\vProbeMethod\x12\x1c\n\x18PROBE_METHOD_UNSPECIF" +
+	"IED\x10\x00\x12\x17\n\x13PROBE_METHOD_ENGINE\x10\x01\x12\x18\n\x14PROBE_METHOD_C" +
+	"ONNECT\x10\x02*o\n\x10DiagnosticFormat\x12!\n\x1dDIAGNOSTIC_FORMA" +
+	"T_UNSPECIFIED\x10\x00\x12\x1c\n\x18DIAGNOSTIC_FORMAT_PCAPNG\x10\x01\x12\x1a\n" +
+	"\x16DIAGNOSTIC_FORMAT_EVTX\x10\x02*\xbd\x03\n\rSoraErrorCode\x12\x1f\n\x1bS" +
+	"ORA_ERROR_CODE_UNSPECIFIED\x10\x00\x12$\n SORA_ERROR_CODE_" +
+	"VERSION_MISMATCH\x10\x01\x12#\n\x1fSORA_ERROR_CODE_UNAUTHENTI" +
+	"CATED\x10\x02\x12$\n SORA_ERROR_CODE_INVALID_ARGUMENT\x10\x03\x12'\n" +
+	"#SORA_ERROR_CODE_FAILED_PRECONDITION\x10\x04\x12\x1d\n\x19SORA_E" +
+	"RROR_CODE_NOT_FOUND\x10\x05\x12&\n\"SORA_ERROR_CODE_RESOURC" +
+	"E_EXHAUSTED\x10\x06\x12%\n!SORA_ERROR_CODE_DEADLINE_EXCEED" +
+	"ED\x10\a\x12\x1f\n\x1bSORA_ERROR_CODE_UNAVAILABLE\x10\x08\x12\x1c\n\x18SORA_ER" +
+	"ROR_CODE_INTERNAL\x10\t\x12%\n!SORA_ERROR_CODE_PERMISSIO" +
+	"N_DENIED\x10\n\x12\x1d\n\x19SORA_ERROR_CODE_CANCELLED\x10\v*z\n\x08Log" +
+	"Level\x12\x19\n\x15LOG_LEVEL_UNSPECIFIED\x10\x00\x12\x13\n\x0fLOG_LEVEL_DE" +
+	"BUG\x10\x01\x12\x12\n\x0eLOG_LEVEL_INFO\x10\x02\x12\x15\n\x11LOG_LEVEL_WARNING\x10\x03" +
+	"\x12\x13\n\x0fLOG_LEVEL_ERROR\x10\x04*\xfa\x01\n\x0fLogExportFormat\x12!\n\x1dLOG" +
+	"_EXPORT_FORMAT_UNSPECIFIED\x10\x00\x12 \n\x1cLOG_EXPORT_FORMA" +
+	"T_JSON_LINES\x10\x01\x12\x19\n\x15LOG_EXPORT_FORMAT_CSV\x10\x02\x12\x19\n\x15LOG" +
+	"_EXPORT_FORMAT_LOG\x10\x03\x12\x1a\n\x16LOG_EXPORT_FORMAT_JSON\x10\x04" +
+	"\x12\x19\n\x15LOG_EXPORT_FORMAT_XML\x10\x05\x12\x19\n\x15LOG_EXPORT_FORMAT" +
+	"_ZIP\x10\x06\x12\x1a\n\x16LOG_EXPORT_FORMAT_GZIP\x10\a2\xbb\x1c\n\vCoreContr" +
+	"ol\x12F\n\aConnect\x12\x1c.sora.core.v1.ConnectRequest\x1a\x1d.so" +
+	"ra.core.v1.ConnectResponse\x12O\n\nDisconnect\x12\x1f.sora." +
+	"core.v1.DisconnectRequest\x1a .sora.core.v1.Disconn" +
+	"ectResponse\x12L\n\tGetStatus\x12\x1e.sora.core.v1.GetStatu" +
+	"sRequest\x1a\x1f.sora.core.v1.GetStatusResponse\x12J\n\vWat" +
+	"chEvents\x12 .sora.core.v1.WatchEventsRequest\x1a\x17.sor" +
+	"a.core.v1.CoreEvent0\x01\x12R\n\vParseImport\x12 .sora.core" +
+	".v1.ParseImportRequest\x1a!.sora.core.v1.ParseImpor" +
+	"tResponse\x12d\n\x11FetchSubscription\x12&.sora.core.v1.Fe" +
+	"tchSubscriptionRequest\x1a'.sora.core.v1.FetchSubsc" +
+	"riptionResponse\x12N\n\fProbeServers\x12!.sora.core.v1.P" +
+	"robeServersRequest\x1a\x19.sora.core.v1.ProbeResult0\x01\x12" +
+	"I\n\x08GetStats\x12\x1d.sora.core.v1.GetStatsRequest\x1a\x1e.sor" +
+	"a.core.v1.GetStatsResponse\x12[\n\x0eRunDiagnostics\x12#.s" +
+	"ora.core.v1.RunDiagnosticsRequest\x1a$.sora.core.v1" +
+	".RunDiagnosticsResponse\x12d\n\x11ExportDiagnostics\x12&.s" +
+	"ora.core.v1.ExportDiagnosticsRequest\x1a'.sora.core" +
+	".v1.ExportDiagnosticsResponse\x12X\n\rSetKillSwitch\x12\"" +
+	".sora.core.v1.SetKillSwitchRequest\x1a#.sora.core.v" +
+	"1.SetKillSwitchResponse\x12L\n\tHandshake\x12\x1e.sora.core" +
+	".v1.HandshakeRequest\x1a\x1f.sora.core.v1.HandshakeRes" +
+	"ponse\x12I\n\x08GetAbout\x12\x1d.sora.core.v1.GetAboutRequest" +
+	"\x1a\x1e.sora.core.v1.GetAboutResponse\x12d\n\x11GetRoutingPr" +
+	"esets\x12&.sora.core.v1.GetRoutingPresetsRequest\x1a'." +
+	"sora.core.v1.GetRoutingPresetsResponse\x12L\n\tQueryL" +
+	"ogs\x12\x1e.sora.core.v1.QueryLogsRequest\x1a\x1f.sora.core." +
+	"v1.QueryLogsResponse\x12E\n\tWatchLogs\x12\x1e.sora.core.v1" +
+	".WatchLogsRequest\x1a\x16.sora.core.v1.LogEntry0\x01\x12O\n\nE" +
+	"xportLogs\x12\x1f.sora.core.v1.ExportLogsRequest\x1a .sor" +
+	"a.core.v1.ExportLogsResponse\x12L\n\tClearLogs\x12\x1e.sora" +
+	".core.v1.ClearLogsRequest\x1a\x1f.sora.core.v1.ClearLo" +
+	"gsResponse\x12[\n\x0eGetLogSettings\x12#.sora.core.v1.GetL" +
+	"ogSettingsRequest\x1a$.sora.core.v1.GetLogSettingsR" +
+	"esponse\x12[\n\x0eSetLogSettings\x12#.sora.core.v1.SetLogS" +
+	"ettingsRequest\x1a$.sora.core.v1.SetLogSettingsResp" +
+	"onse\x12^\n\x0fListConnections\x12$.sora.core.v1.ListConne" +
+	"ctionsRequest\x1a%.sora.core.v1.ListConnectionsResp" +
+	"onse\x12^\n\x0fCloseConnection\x12$.sora.core.v1.CloseConn" +
+	"ectionRequest\x1a%.sora.core.v1.CloseConnectionResp" +
+	"onse\x12a\n\x10SaveSubscription\x12%.sora.core.v1.SaveSubs" +
+	"criptionRequest\x1a&.sora.core.v1.SaveSubscriptionR" +
+	"esponse\x12d\n\x11ListSubscriptions\x12&.sora.core.v1.List" +
+	"SubscriptionsRequest\x1a'.sora.core.v1.ListSubscrip" +
+	"tionsResponse\x12g\n\x12DeleteSubscription\x12'.sora.core." +
+	"v1.DeleteSubscriptionRequest\x1a(.sora.core.v1.Dele" +
+	"teSubscriptionResponse\x12j\n\x13RefreshSubscription\x12(." +
+	"sora.core.v1.RefreshSubscriptionRequest\x1a).sora.c" +
+	"ore.v1.RefreshSubscriptionResponse\x12`\n\x12WatchSubsc" +
+	"riptions\x12'.sora.core.v1.WatchSubscriptionsReques" +
+	"t\x1a\x1f.sora.core.v1.SubscriptionState0\x01\x12j\n\x13GetSubsc" +
+	"riptionLink\x12(.sora.core.v1.GetSubscriptionLinkRe" +
+	"quest\x1a).sora.core.v1.GetSubscriptionLinkResponse" +
+	"\x12L\n\tPutSecret\x12\x1e.sora.core.v1.PutSecretRequest\x1a\x1f." +
+	"sora.core.v1.PutSecretResponse\x12U\n\fDeleteSecret\x12!" +
+	".sora.core.v1.DeleteSecretRequest\x1a\".sora.core.v1" +
+	".DeleteSecretResponse\x12X\n\rCheckDnsLeaks\x12\".sora.co" +
+	"re.v1.CheckDnsLeaksRequest\x1a#.sora.core.v1.CheckD" +
+	"nsLeaksResponse\x12Z\n\x10BenchmarkServers\x12%.sora.core." +
+	"v1.BenchmarkServersRequest\x1a\x1d.sora.core.v1.Bandwi" +
+	"dthSample0\x01\x12X\n\rGetBenchmarks\x12\".sora.core.v1.GetB" +
+	"enchmarksRequest\x1a#.sora.core.v1.GetBenchmarksRes" +
+	"ponse\x12y\n\x18SaveSubscriptionOverride\x12-.sora.core.v1" +
+	".SaveSubscriptionOverrideRequest\x1a..sora.core.v1." +
+	"SaveSubscriptionOverrideResponse\x12v\n\x17GetSubscript" +
+	"ionOverride\x12,.sora.core.v1.GetSubscriptionOverri" +
+	"deRequest\x1a-.sora.core.v1.GetSubscriptionOverride" +
+	"Response\x12U\n\fListProfiles\x12!.sora.core.v1.ListProf" +
+	"ilesRequest\x1a\".sora.core.v1.ListProfilesResponse\x12" +
+	"R\n\vSaveProfile\x12 .sora.core.v1.SaveProfileRequest" +
+	"\x1a!.sora.core.v1.SaveProfileResponse\x12X\n\rDeletePro" +
+	"file\x12\".sora.core.v1.DeleteProfileRequest\x1a#.sora." +
+	"core.v1.DeleteProfileResponse\x12p\n\x15GetNetworkFinge" +
+	"rprint\x12*.sora.core.v1.GetNetworkFingerprintReque" +
+	"st\x1a+.sora.core.v1.GetNetworkFingerprintResponse\x12" +
+	"O\n\nProbeChain\x12\x1f.sora.core.v1.ProbeChainRequest\x1a " +
+	".sora.core.v1.ProbeChainResponseB?Z=github.com/l" +
+	"evvs-one/sora-client/core/gen/sora/core/v1;corev" +
+	"1b\x06proto3"
+
 var (
 	file_sora_core_v1_core_control_proto_rawDescOnce sync.Once
 	file_sora_core_v1_core_control_proto_rawDescData []byte
@@ -9319,7 +9420,7 @@ func file_sora_core_v1_core_control_proto_rawDescGZIP() []byte {
 }
 
 var file_sora_core_v1_core_control_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
-var file_sora_core_v1_core_control_proto_msgTypes = make([]protoimpl.MessageInfo, 126)
+var file_sora_core_v1_core_control_proto_msgTypes = make([]protoimpl.MessageInfo, 127)
 var file_sora_core_v1_core_control_proto_goTypes = []any{
 	(GroupType)(0),                           // 0: sora.core.v1.GroupType
 	(TunnelMode)(0),                          // 1: sora.core.v1.TunnelMode
@@ -9453,10 +9554,11 @@ var file_sora_core_v1_core_control_proto_goTypes = []any{
 	(*ProbeChainRequest)(nil),                // 129: sora.core.v1.ProbeChainRequest
 	(*ProbeChainResponse)(nil),               // 130: sora.core.v1.ProbeChainResponse
 	(*ChainHop)(nil),                         // 131: sora.core.v1.ChainHop
-	nil,                                      // 132: sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
-	nil,                                      // 133: sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
-	(*durationpb.Duration)(nil),              // 134: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),            // 135: google.protobuf.Timestamp
+	(*CensorshipDetected)(nil),               // 132: sora.core.v1.CensorshipDetected
+	nil,                                      // 133: sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
+	nil,                                      // 134: sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
+	(*durationpb.Duration)(nil),              // 135: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),            // 136: google.protobuf.Timestamp
 }
 var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	8,   // 0: sora.core.v1.ConnectRequest.api_version:type_name -> sora.core.v1.ApiVersion
@@ -9481,7 +9583,7 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	18,  // 19: sora.core.v1.SessionPlan.routing:type_name -> sora.core.v1.RoutingOptions
 	102, // 20: sora.core.v1.SessionPlan.zapret_strategy:type_name -> sora.core.v1.BypassStrategy
 	0,   // 21: sora.core.v1.GroupSpec.type:type_name -> sora.core.v1.GroupType
-	134, // 22: sora.core.v1.GroupSpec.test_interval:type_name -> google.protobuf.Duration
+	135, // 22: sora.core.v1.GroupSpec.test_interval:type_name -> google.protobuf.Duration
 	102, // 23: sora.core.v1.OutboundSpec.bypass:type_name -> sora.core.v1.BypassStrategy
 	22,  // 24: sora.core.v1.OutboundSpec.endpoint:type_name -> sora.core.v1.Endpoint
 	23,  // 25: sora.core.v1.OutboundSpec.credentials:type_name -> sora.core.v1.CredentialsRef
@@ -9492,9 +9594,9 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	59,  // 30: sora.core.v1.GetStatsResponse.error:type_name -> sora.core.v1.SoraError
 	2,   // 31: sora.core.v1.ConnectionState.value:type_name -> sora.core.v1.ConnectionStateValue
 	5,   // 32: sora.core.v1.ConnectionState.reason:type_name -> sora.core.v1.SoraErrorCode
-	135, // 33: sora.core.v1.ConnectionState.changed_at:type_name -> google.protobuf.Timestamp
-	134, // 34: sora.core.v1.ConnectionState.retry_after:type_name -> google.protobuf.Duration
-	135, // 35: sora.core.v1.CoreEvent.emitted_at:type_name -> google.protobuf.Timestamp
+	136, // 33: sora.core.v1.ConnectionState.changed_at:type_name -> google.protobuf.Timestamp
+	135, // 34: sora.core.v1.ConnectionState.retry_after:type_name -> google.protobuf.Duration
+	136, // 35: sora.core.v1.CoreEvent.emitted_at:type_name -> google.protobuf.Timestamp
 	32,  // 36: sora.core.v1.CoreEvent.state_changed:type_name -> sora.core.v1.StateChanged
 	34,  // 37: sora.core.v1.CoreEvent.stats_tick:type_name -> sora.core.v1.StatsTick
 	35,  // 38: sora.core.v1.CoreEvent.bypass_strategy_changed:type_name -> sora.core.v1.BypassStrategyChanged
@@ -9504,227 +9606,228 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	38,  // 42: sora.core.v1.CoreEvent.kill_switch_changed:type_name -> sora.core.v1.KillSwitchChanged
 	33,  // 43: sora.core.v1.CoreEvent.group_switched:type_name -> sora.core.v1.GroupSwitched
 	116, // 44: sora.core.v1.CoreEvent.profile_matched:type_name -> sora.core.v1.ProfileMatched
-	30,  // 45: sora.core.v1.StateChanged.state:type_name -> sora.core.v1.ConnectionState
-	59,  // 46: sora.core.v1.ProbeResult.error:type_name -> sora.core.v1.SoraError
-	8,   // 47: sora.core.v1.ParseImportRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	16,  // 48: sora.core.v1.ParseImportResponse.session_plan:type_name -> sora.core.v1.SessionPlan
-	59,  // 49: sora.core.v1.ParseImportResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 50: sora.core.v1.FetchSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	21,  // 51: sora.core.v1.FetchSubscriptionResponse.outbounds:type_name -> sora.core.v1.OutboundSpec
-	59,  // 52: sora.core.v1.FetchSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
-	43,  // 53: sora.core.v1.FetchSubscriptionResponse.info:type_name -> sora.core.v1.SubscriptionInfo
-	134, // 54: sora.core.v1.SubscriptionInfo.update_interval:type_name -> google.protobuf.Duration
-	135, // 55: sora.core.v1.SubscriptionInfo.expire:type_name -> google.protobuf.Timestamp
-	8,   // 56: sora.core.v1.ProbeServersRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	22,  // 57: sora.core.v1.ProbeServersRequest.endpoints:type_name -> sora.core.v1.Endpoint
-	21,  // 58: sora.core.v1.ProbeServersRequest.outbounds:type_name -> sora.core.v1.OutboundSpec
-	45,  // 59: sora.core.v1.ProbeServersRequest.options:type_name -> sora.core.v1.ProbeOptions
-	3,   // 60: sora.core.v1.ProbeOptions.method:type_name -> sora.core.v1.ProbeMethod
-	8,   // 61: sora.core.v1.RunDiagnosticsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	52,  // 62: sora.core.v1.RunDiagnosticsResponse.report:type_name -> sora.core.v1.DiagnosticReport
-	59,  // 63: sora.core.v1.RunDiagnosticsResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 64: sora.core.v1.ExportDiagnosticsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	4,   // 65: sora.core.v1.ExportDiagnosticsRequest.format:type_name -> sora.core.v1.DiagnosticFormat
-	59,  // 66: sora.core.v1.ExportDiagnosticsResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 67: sora.core.v1.SetKillSwitchRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	59,  // 68: sora.core.v1.SetKillSwitchResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 69: sora.core.v1.HandshakeRequest.client_version:type_name -> sora.core.v1.ApiVersion
-	8,   // 70: sora.core.v1.HandshakeResponse.negotiated_version:type_name -> sora.core.v1.ApiVersion
-	59,  // 71: sora.core.v1.HandshakeResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 72: sora.core.v1.PutSecretRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	23,  // 73: sora.core.v1.PutSecretRequest.credentials:type_name -> sora.core.v1.CredentialsRef
-	23,  // 74: sora.core.v1.PutSecretResponse.credentials:type_name -> sora.core.v1.CredentialsRef
-	59,  // 75: sora.core.v1.PutSecretResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 76: sora.core.v1.DeleteSecretRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	23,  // 77: sora.core.v1.DeleteSecretRequest.credentials:type_name -> sora.core.v1.CredentialsRef
-	59,  // 78: sora.core.v1.DeleteSecretResponse.error:type_name -> sora.core.v1.SoraError
-	5,   // 79: sora.core.v1.SoraError.code:type_name -> sora.core.v1.SoraErrorCode
-	134, // 80: sora.core.v1.SoraError.retry_after:type_name -> google.protobuf.Duration
-	135, // 81: sora.core.v1.LogEntry.time:type_name -> google.protobuf.Timestamp
-	6,   // 82: sora.core.v1.LogEntry.level:type_name -> sora.core.v1.LogLevel
-	6,   // 83: sora.core.v1.LogFilter.min_level:type_name -> sora.core.v1.LogLevel
-	135, // 84: sora.core.v1.LogFilter.since:type_name -> google.protobuf.Timestamp
-	135, // 85: sora.core.v1.LogFilter.until:type_name -> google.protobuf.Timestamp
-	8,   // 86: sora.core.v1.QueryLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	61,  // 87: sora.core.v1.QueryLogsRequest.filter:type_name -> sora.core.v1.LogFilter
-	60,  // 88: sora.core.v1.QueryLogsResponse.entries:type_name -> sora.core.v1.LogEntry
-	64,  // 89: sora.core.v1.QueryLogsResponse.stats:type_name -> sora.core.v1.LogStats
-	59,  // 90: sora.core.v1.QueryLogsResponse.error:type_name -> sora.core.v1.SoraError
-	65,  // 91: sora.core.v1.LogStats.by_level:type_name -> sora.core.v1.LogLevelCount
-	66,  // 92: sora.core.v1.LogStats.by_source:type_name -> sora.core.v1.LogSourceCount
-	6,   // 93: sora.core.v1.LogLevelCount.level:type_name -> sora.core.v1.LogLevel
-	8,   // 94: sora.core.v1.WatchLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	61,  // 95: sora.core.v1.WatchLogsRequest.filter:type_name -> sora.core.v1.LogFilter
-	8,   // 96: sora.core.v1.ExportLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	61,  // 97: sora.core.v1.ExportLogsRequest.filter:type_name -> sora.core.v1.LogFilter
-	7,   // 98: sora.core.v1.ExportLogsRequest.format:type_name -> sora.core.v1.LogExportFormat
-	59,  // 99: sora.core.v1.ExportLogsResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 100: sora.core.v1.ClearLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	59,  // 101: sora.core.v1.ClearLogsResponse.error:type_name -> sora.core.v1.SoraError
-	6,   // 102: sora.core.v1.LogSettings.capture_level:type_name -> sora.core.v1.LogLevel
-	8,   // 103: sora.core.v1.GetLogSettingsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	72,  // 104: sora.core.v1.GetLogSettingsResponse.settings:type_name -> sora.core.v1.LogSettings
-	59,  // 105: sora.core.v1.GetLogSettingsResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 106: sora.core.v1.SetLogSettingsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	72,  // 107: sora.core.v1.SetLogSettingsRequest.settings:type_name -> sora.core.v1.LogSettings
-	72,  // 108: sora.core.v1.SetLogSettingsResponse.settings:type_name -> sora.core.v1.LogSettings
-	59,  // 109: sora.core.v1.SetLogSettingsResponse.error:type_name -> sora.core.v1.SoraError
-	135, // 110: sora.core.v1.Connection.start:type_name -> google.protobuf.Timestamp
-	8,   // 111: sora.core.v1.ListConnectionsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	77,  // 112: sora.core.v1.ListConnectionsResponse.connections:type_name -> sora.core.v1.Connection
-	59,  // 113: sora.core.v1.ListConnectionsResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 114: sora.core.v1.CloseConnectionRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	59,  // 115: sora.core.v1.CloseConnectionResponse.error:type_name -> sora.core.v1.SoraError
-	134, // 116: sora.core.v1.SubscriptionSettings.update_interval:type_name -> google.protobuf.Duration
-	82,  // 117: sora.core.v1.SubscriptionState.settings:type_name -> sora.core.v1.SubscriptionSettings
-	43,  // 118: sora.core.v1.SubscriptionState.info:type_name -> sora.core.v1.SubscriptionInfo
-	21,  // 119: sora.core.v1.SubscriptionState.outbounds:type_name -> sora.core.v1.OutboundSpec
-	135, // 120: sora.core.v1.SubscriptionState.last_update:type_name -> google.protobuf.Timestamp
-	135, // 121: sora.core.v1.SubscriptionState.next_update:type_name -> google.protobuf.Timestamp
-	59,  // 122: sora.core.v1.SubscriptionState.last_error:type_name -> sora.core.v1.SoraError
-	8,   // 123: sora.core.v1.SaveSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	82,  // 124: sora.core.v1.SaveSubscriptionRequest.settings:type_name -> sora.core.v1.SubscriptionSettings
-	83,  // 125: sora.core.v1.SaveSubscriptionResponse.state:type_name -> sora.core.v1.SubscriptionState
-	59,  // 126: sora.core.v1.SaveSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 127: sora.core.v1.ListSubscriptionsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	83,  // 128: sora.core.v1.ListSubscriptionsResponse.subscriptions:type_name -> sora.core.v1.SubscriptionState
-	59,  // 129: sora.core.v1.ListSubscriptionsResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 130: sora.core.v1.DeleteSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	59,  // 131: sora.core.v1.DeleteSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 132: sora.core.v1.RefreshSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	83,  // 133: sora.core.v1.RefreshSubscriptionResponse.state:type_name -> sora.core.v1.SubscriptionState
-	59,  // 134: sora.core.v1.RefreshSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 135: sora.core.v1.WatchSubscriptionsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	8,   // 136: sora.core.v1.GetSubscriptionLinkRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	59,  // 137: sora.core.v1.GetSubscriptionLinkResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 138: sora.core.v1.GetAboutRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	97,  // 139: sora.core.v1.GetAboutResponse.about:type_name -> sora.core.v1.About
-	59,  // 140: sora.core.v1.GetAboutResponse.error:type_name -> sora.core.v1.SoraError
-	135, // 141: sora.core.v1.About.commit_time:type_name -> google.protobuf.Timestamp
-	8,   // 142: sora.core.v1.About.contract:type_name -> sora.core.v1.ApiVersion
-	98,  // 143: sora.core.v1.About.engines:type_name -> sora.core.v1.EngineBuild
-	22,  // 144: sora.core.v1.About.local_proxy:type_name -> sora.core.v1.Endpoint
-	8,   // 145: sora.core.v1.GetRoutingPresetsRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	101, // 146: sora.core.v1.GetRoutingPresetsResponse.presets:type_name -> sora.core.v1.RoutingPreset
-	59,  // 147: sora.core.v1.GetRoutingPresetsResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 148: sora.core.v1.CheckDnsLeaksRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	103, // 149: sora.core.v1.CheckDnsLeaksResponse.checks:type_name -> sora.core.v1.DnsLeakCheck
-	59,  // 150: sora.core.v1.CheckDnsLeaksResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 151: sora.core.v1.BenchmarkServersRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	59,  // 152: sora.core.v1.BandwidthSample.error:type_name -> sora.core.v1.SoraError
-	8,   // 153: sora.core.v1.GetBenchmarksRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	110, // 154: sora.core.v1.GetBenchmarksResponse.benchmarks:type_name -> sora.core.v1.BenchmarkRecord
-	59,  // 155: sora.core.v1.GetBenchmarksResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 156: sora.core.v1.SaveSubscriptionOverrideRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	132, // 157: sora.core.v1.SaveSubscriptionOverrideRequest.renames:type_name -> sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
-	59,  // 158: sora.core.v1.SaveSubscriptionOverrideResponse.error:type_name -> sora.core.v1.SoraError
-	83,  // 159: sora.core.v1.SaveSubscriptionOverrideResponse.state:type_name -> sora.core.v1.SubscriptionState
-	8,   // 160: sora.core.v1.GetSubscriptionOverrideRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	133, // 161: sora.core.v1.GetSubscriptionOverrideResponse.renames:type_name -> sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
-	115, // 162: sora.core.v1.GetSubscriptionOverrideResponse.extra_rules:type_name -> sora.core.v1.OverrideRule
-	59,  // 163: sora.core.v1.GetSubscriptionOverrideResponse.error:type_name -> sora.core.v1.SoraError
-	118, // 164: sora.core.v1.NetworkProfile.triggers:type_name -> sora.core.v1.ProfileTriggers
-	119, // 165: sora.core.v1.NetworkProfile.apply:type_name -> sora.core.v1.ProfileApply
-	8,   // 166: sora.core.v1.ListProfilesRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	117, // 167: sora.core.v1.ListProfilesResponse.profiles:type_name -> sora.core.v1.NetworkProfile
-	59,  // 168: sora.core.v1.ListProfilesResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 169: sora.core.v1.SaveProfileRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	117, // 170: sora.core.v1.SaveProfileRequest.profile:type_name -> sora.core.v1.NetworkProfile
-	117, // 171: sora.core.v1.SaveProfileResponse.profile:type_name -> sora.core.v1.NetworkProfile
-	59,  // 172: sora.core.v1.SaveProfileResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 173: sora.core.v1.DeleteProfileRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	59,  // 174: sora.core.v1.DeleteProfileResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 175: sora.core.v1.GetNetworkFingerprintRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	128, // 176: sora.core.v1.GetNetworkFingerprintResponse.fingerprint:type_name -> sora.core.v1.NetworkFingerprint
-	59,  // 177: sora.core.v1.GetNetworkFingerprintResponse.error:type_name -> sora.core.v1.SoraError
-	8,   // 178: sora.core.v1.ProbeChainRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	131, // 179: sora.core.v1.ProbeChainResponse.hops:type_name -> sora.core.v1.ChainHop
-	59,  // 180: sora.core.v1.ProbeChainResponse.error:type_name -> sora.core.v1.SoraError
-	9,   // 181: sora.core.v1.CoreControl.Connect:input_type -> sora.core.v1.ConnectRequest
-	11,  // 182: sora.core.v1.CoreControl.Disconnect:input_type -> sora.core.v1.DisconnectRequest
-	13,  // 183: sora.core.v1.CoreControl.GetStatus:input_type -> sora.core.v1.GetStatusRequest
-	15,  // 184: sora.core.v1.CoreControl.WatchEvents:input_type -> sora.core.v1.WatchEventsRequest
-	39,  // 185: sora.core.v1.CoreControl.ParseImport:input_type -> sora.core.v1.ParseImportRequest
-	41,  // 186: sora.core.v1.CoreControl.FetchSubscription:input_type -> sora.core.v1.FetchSubscriptionRequest
-	44,  // 187: sora.core.v1.CoreControl.ProbeServers:input_type -> sora.core.v1.ProbeServersRequest
-	28,  // 188: sora.core.v1.CoreControl.GetStats:input_type -> sora.core.v1.GetStatsRequest
-	46,  // 189: sora.core.v1.CoreControl.RunDiagnostics:input_type -> sora.core.v1.RunDiagnosticsRequest
-	48,  // 190: sora.core.v1.CoreControl.ExportDiagnostics:input_type -> sora.core.v1.ExportDiagnosticsRequest
-	50,  // 191: sora.core.v1.CoreControl.SetKillSwitch:input_type -> sora.core.v1.SetKillSwitchRequest
-	53,  // 192: sora.core.v1.CoreControl.Handshake:input_type -> sora.core.v1.HandshakeRequest
-	95,  // 193: sora.core.v1.CoreControl.GetAbout:input_type -> sora.core.v1.GetAboutRequest
-	99,  // 194: sora.core.v1.CoreControl.GetRoutingPresets:input_type -> sora.core.v1.GetRoutingPresetsRequest
-	62,  // 195: sora.core.v1.CoreControl.QueryLogs:input_type -> sora.core.v1.QueryLogsRequest
-	67,  // 196: sora.core.v1.CoreControl.WatchLogs:input_type -> sora.core.v1.WatchLogsRequest
-	68,  // 197: sora.core.v1.CoreControl.ExportLogs:input_type -> sora.core.v1.ExportLogsRequest
-	70,  // 198: sora.core.v1.CoreControl.ClearLogs:input_type -> sora.core.v1.ClearLogsRequest
-	73,  // 199: sora.core.v1.CoreControl.GetLogSettings:input_type -> sora.core.v1.GetLogSettingsRequest
-	75,  // 200: sora.core.v1.CoreControl.SetLogSettings:input_type -> sora.core.v1.SetLogSettingsRequest
-	78,  // 201: sora.core.v1.CoreControl.ListConnections:input_type -> sora.core.v1.ListConnectionsRequest
-	80,  // 202: sora.core.v1.CoreControl.CloseConnection:input_type -> sora.core.v1.CloseConnectionRequest
-	84,  // 203: sora.core.v1.CoreControl.SaveSubscription:input_type -> sora.core.v1.SaveSubscriptionRequest
-	86,  // 204: sora.core.v1.CoreControl.ListSubscriptions:input_type -> sora.core.v1.ListSubscriptionsRequest
-	88,  // 205: sora.core.v1.CoreControl.DeleteSubscription:input_type -> sora.core.v1.DeleteSubscriptionRequest
-	90,  // 206: sora.core.v1.CoreControl.RefreshSubscription:input_type -> sora.core.v1.RefreshSubscriptionRequest
-	92,  // 207: sora.core.v1.CoreControl.WatchSubscriptions:input_type -> sora.core.v1.WatchSubscriptionsRequest
-	93,  // 208: sora.core.v1.CoreControl.GetSubscriptionLink:input_type -> sora.core.v1.GetSubscriptionLinkRequest
-	55,  // 209: sora.core.v1.CoreControl.PutSecret:input_type -> sora.core.v1.PutSecretRequest
-	57,  // 210: sora.core.v1.CoreControl.DeleteSecret:input_type -> sora.core.v1.DeleteSecretRequest
-	104, // 211: sora.core.v1.CoreControl.CheckDnsLeaks:input_type -> sora.core.v1.CheckDnsLeaksRequest
-	106, // 212: sora.core.v1.CoreControl.BenchmarkServers:input_type -> sora.core.v1.BenchmarkServersRequest
-	108, // 213: sora.core.v1.CoreControl.GetBenchmarks:input_type -> sora.core.v1.GetBenchmarksRequest
-	111, // 214: sora.core.v1.CoreControl.SaveSubscriptionOverride:input_type -> sora.core.v1.SaveSubscriptionOverrideRequest
-	113, // 215: sora.core.v1.CoreControl.GetSubscriptionOverride:input_type -> sora.core.v1.GetSubscriptionOverrideRequest
-	120, // 216: sora.core.v1.CoreControl.ListProfiles:input_type -> sora.core.v1.ListProfilesRequest
-	122, // 217: sora.core.v1.CoreControl.SaveProfile:input_type -> sora.core.v1.SaveProfileRequest
-	124, // 218: sora.core.v1.CoreControl.DeleteProfile:input_type -> sora.core.v1.DeleteProfileRequest
-	126, // 219: sora.core.v1.CoreControl.GetNetworkFingerprint:input_type -> sora.core.v1.GetNetworkFingerprintRequest
-	129, // 220: sora.core.v1.CoreControl.ProbeChain:input_type -> sora.core.v1.ProbeChainRequest
-	10,  // 221: sora.core.v1.CoreControl.Connect:output_type -> sora.core.v1.ConnectResponse
-	12,  // 222: sora.core.v1.CoreControl.Disconnect:output_type -> sora.core.v1.DisconnectResponse
-	14,  // 223: sora.core.v1.CoreControl.GetStatus:output_type -> sora.core.v1.GetStatusResponse
-	31,  // 224: sora.core.v1.CoreControl.WatchEvents:output_type -> sora.core.v1.CoreEvent
-	40,  // 225: sora.core.v1.CoreControl.ParseImport:output_type -> sora.core.v1.ParseImportResponse
-	42,  // 226: sora.core.v1.CoreControl.FetchSubscription:output_type -> sora.core.v1.FetchSubscriptionResponse
-	36,  // 227: sora.core.v1.CoreControl.ProbeServers:output_type -> sora.core.v1.ProbeResult
-	29,  // 228: sora.core.v1.CoreControl.GetStats:output_type -> sora.core.v1.GetStatsResponse
-	47,  // 229: sora.core.v1.CoreControl.RunDiagnostics:output_type -> sora.core.v1.RunDiagnosticsResponse
-	49,  // 230: sora.core.v1.CoreControl.ExportDiagnostics:output_type -> sora.core.v1.ExportDiagnosticsResponse
-	51,  // 231: sora.core.v1.CoreControl.SetKillSwitch:output_type -> sora.core.v1.SetKillSwitchResponse
-	54,  // 232: sora.core.v1.CoreControl.Handshake:output_type -> sora.core.v1.HandshakeResponse
-	96,  // 233: sora.core.v1.CoreControl.GetAbout:output_type -> sora.core.v1.GetAboutResponse
-	100, // 234: sora.core.v1.CoreControl.GetRoutingPresets:output_type -> sora.core.v1.GetRoutingPresetsResponse
-	63,  // 235: sora.core.v1.CoreControl.QueryLogs:output_type -> sora.core.v1.QueryLogsResponse
-	60,  // 236: sora.core.v1.CoreControl.WatchLogs:output_type -> sora.core.v1.LogEntry
-	69,  // 237: sora.core.v1.CoreControl.ExportLogs:output_type -> sora.core.v1.ExportLogsResponse
-	71,  // 238: sora.core.v1.CoreControl.ClearLogs:output_type -> sora.core.v1.ClearLogsResponse
-	74,  // 239: sora.core.v1.CoreControl.GetLogSettings:output_type -> sora.core.v1.GetLogSettingsResponse
-	76,  // 240: sora.core.v1.CoreControl.SetLogSettings:output_type -> sora.core.v1.SetLogSettingsResponse
-	79,  // 241: sora.core.v1.CoreControl.ListConnections:output_type -> sora.core.v1.ListConnectionsResponse
-	81,  // 242: sora.core.v1.CoreControl.CloseConnection:output_type -> sora.core.v1.CloseConnectionResponse
-	85,  // 243: sora.core.v1.CoreControl.SaveSubscription:output_type -> sora.core.v1.SaveSubscriptionResponse
-	87,  // 244: sora.core.v1.CoreControl.ListSubscriptions:output_type -> sora.core.v1.ListSubscriptionsResponse
-	89,  // 245: sora.core.v1.CoreControl.DeleteSubscription:output_type -> sora.core.v1.DeleteSubscriptionResponse
-	91,  // 246: sora.core.v1.CoreControl.RefreshSubscription:output_type -> sora.core.v1.RefreshSubscriptionResponse
-	83,  // 247: sora.core.v1.CoreControl.WatchSubscriptions:output_type -> sora.core.v1.SubscriptionState
-	94,  // 248: sora.core.v1.CoreControl.GetSubscriptionLink:output_type -> sora.core.v1.GetSubscriptionLinkResponse
-	56,  // 249: sora.core.v1.CoreControl.PutSecret:output_type -> sora.core.v1.PutSecretResponse
-	58,  // 250: sora.core.v1.CoreControl.DeleteSecret:output_type -> sora.core.v1.DeleteSecretResponse
-	105, // 251: sora.core.v1.CoreControl.CheckDnsLeaks:output_type -> sora.core.v1.CheckDnsLeaksResponse
-	107, // 252: sora.core.v1.CoreControl.BenchmarkServers:output_type -> sora.core.v1.BandwidthSample
-	109, // 253: sora.core.v1.CoreControl.GetBenchmarks:output_type -> sora.core.v1.GetBenchmarksResponse
-	112, // 254: sora.core.v1.CoreControl.SaveSubscriptionOverride:output_type -> sora.core.v1.SaveSubscriptionOverrideResponse
-	114, // 255: sora.core.v1.CoreControl.GetSubscriptionOverride:output_type -> sora.core.v1.GetSubscriptionOverrideResponse
-	121, // 256: sora.core.v1.CoreControl.ListProfiles:output_type -> sora.core.v1.ListProfilesResponse
-	123, // 257: sora.core.v1.CoreControl.SaveProfile:output_type -> sora.core.v1.SaveProfileResponse
-	125, // 258: sora.core.v1.CoreControl.DeleteProfile:output_type -> sora.core.v1.DeleteProfileResponse
-	127, // 259: sora.core.v1.CoreControl.GetNetworkFingerprint:output_type -> sora.core.v1.GetNetworkFingerprintResponse
-	130, // 260: sora.core.v1.CoreControl.ProbeChain:output_type -> sora.core.v1.ProbeChainResponse
-	221, // [221:261] is the sub-list for method output_type
-	181, // [181:221] is the sub-list for method input_type
-	181, // [181:181] is the sub-list for extension type_name
-	181, // [181:181] is the sub-list for extension extendee
-	0,   // [0:181] is the sub-list for field type_name
+	132, // 45: sora.core.v1.CoreEvent.censorship_detected:type_name -> sora.core.v1.CensorshipDetected
+	30,  // 46: sora.core.v1.StateChanged.state:type_name -> sora.core.v1.ConnectionState
+	59,  // 47: sora.core.v1.ProbeResult.error:type_name -> sora.core.v1.SoraError
+	8,   // 48: sora.core.v1.ParseImportRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	16,  // 49: sora.core.v1.ParseImportResponse.session_plan:type_name -> sora.core.v1.SessionPlan
+	59,  // 50: sora.core.v1.ParseImportResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 51: sora.core.v1.FetchSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	21,  // 52: sora.core.v1.FetchSubscriptionResponse.outbounds:type_name -> sora.core.v1.OutboundSpec
+	59,  // 53: sora.core.v1.FetchSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
+	43,  // 54: sora.core.v1.FetchSubscriptionResponse.info:type_name -> sora.core.v1.SubscriptionInfo
+	135, // 55: sora.core.v1.SubscriptionInfo.update_interval:type_name -> google.protobuf.Duration
+	136, // 56: sora.core.v1.SubscriptionInfo.expire:type_name -> google.protobuf.Timestamp
+	8,   // 57: sora.core.v1.ProbeServersRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	22,  // 58: sora.core.v1.ProbeServersRequest.endpoints:type_name -> sora.core.v1.Endpoint
+	21,  // 59: sora.core.v1.ProbeServersRequest.outbounds:type_name -> sora.core.v1.OutboundSpec
+	45,  // 60: sora.core.v1.ProbeServersRequest.options:type_name -> sora.core.v1.ProbeOptions
+	3,   // 61: sora.core.v1.ProbeOptions.method:type_name -> sora.core.v1.ProbeMethod
+	8,   // 62: sora.core.v1.RunDiagnosticsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	52,  // 63: sora.core.v1.RunDiagnosticsResponse.report:type_name -> sora.core.v1.DiagnosticReport
+	59,  // 64: sora.core.v1.RunDiagnosticsResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 65: sora.core.v1.ExportDiagnosticsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	4,   // 66: sora.core.v1.ExportDiagnosticsRequest.format:type_name -> sora.core.v1.DiagnosticFormat
+	59,  // 67: sora.core.v1.ExportDiagnosticsResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 68: sora.core.v1.SetKillSwitchRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 69: sora.core.v1.SetKillSwitchResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 70: sora.core.v1.HandshakeRequest.client_version:type_name -> sora.core.v1.ApiVersion
+	8,   // 71: sora.core.v1.HandshakeResponse.negotiated_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 72: sora.core.v1.HandshakeResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 73: sora.core.v1.PutSecretRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	23,  // 74: sora.core.v1.PutSecretRequest.credentials:type_name -> sora.core.v1.CredentialsRef
+	23,  // 75: sora.core.v1.PutSecretResponse.credentials:type_name -> sora.core.v1.CredentialsRef
+	59,  // 76: sora.core.v1.PutSecretResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 77: sora.core.v1.DeleteSecretRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	23,  // 78: sora.core.v1.DeleteSecretRequest.credentials:type_name -> sora.core.v1.CredentialsRef
+	59,  // 79: sora.core.v1.DeleteSecretResponse.error:type_name -> sora.core.v1.SoraError
+	5,   // 80: sora.core.v1.SoraError.code:type_name -> sora.core.v1.SoraErrorCode
+	135, // 81: sora.core.v1.SoraError.retry_after:type_name -> google.protobuf.Duration
+	136, // 82: sora.core.v1.LogEntry.time:type_name -> google.protobuf.Timestamp
+	6,   // 83: sora.core.v1.LogEntry.level:type_name -> sora.core.v1.LogLevel
+	6,   // 84: sora.core.v1.LogFilter.min_level:type_name -> sora.core.v1.LogLevel
+	136, // 85: sora.core.v1.LogFilter.since:type_name -> google.protobuf.Timestamp
+	136, // 86: sora.core.v1.LogFilter.until:type_name -> google.protobuf.Timestamp
+	8,   // 87: sora.core.v1.QueryLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	61,  // 88: sora.core.v1.QueryLogsRequest.filter:type_name -> sora.core.v1.LogFilter
+	60,  // 89: sora.core.v1.QueryLogsResponse.entries:type_name -> sora.core.v1.LogEntry
+	64,  // 90: sora.core.v1.QueryLogsResponse.stats:type_name -> sora.core.v1.LogStats
+	59,  // 91: sora.core.v1.QueryLogsResponse.error:type_name -> sora.core.v1.SoraError
+	65,  // 92: sora.core.v1.LogStats.by_level:type_name -> sora.core.v1.LogLevelCount
+	66,  // 93: sora.core.v1.LogStats.by_source:type_name -> sora.core.v1.LogSourceCount
+	6,   // 94: sora.core.v1.LogLevelCount.level:type_name -> sora.core.v1.LogLevel
+	8,   // 95: sora.core.v1.WatchLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	61,  // 96: sora.core.v1.WatchLogsRequest.filter:type_name -> sora.core.v1.LogFilter
+	8,   // 97: sora.core.v1.ExportLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	61,  // 98: sora.core.v1.ExportLogsRequest.filter:type_name -> sora.core.v1.LogFilter
+	7,   // 99: sora.core.v1.ExportLogsRequest.format:type_name -> sora.core.v1.LogExportFormat
+	59,  // 100: sora.core.v1.ExportLogsResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 101: sora.core.v1.ClearLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 102: sora.core.v1.ClearLogsResponse.error:type_name -> sora.core.v1.SoraError
+	6,   // 103: sora.core.v1.LogSettings.capture_level:type_name -> sora.core.v1.LogLevel
+	8,   // 104: sora.core.v1.GetLogSettingsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	72,  // 105: sora.core.v1.GetLogSettingsResponse.settings:type_name -> sora.core.v1.LogSettings
+	59,  // 106: sora.core.v1.GetLogSettingsResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 107: sora.core.v1.SetLogSettingsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	72,  // 108: sora.core.v1.SetLogSettingsRequest.settings:type_name -> sora.core.v1.LogSettings
+	72,  // 109: sora.core.v1.SetLogSettingsResponse.settings:type_name -> sora.core.v1.LogSettings
+	59,  // 110: sora.core.v1.SetLogSettingsResponse.error:type_name -> sora.core.v1.SoraError
+	136, // 111: sora.core.v1.Connection.start:type_name -> google.protobuf.Timestamp
+	8,   // 112: sora.core.v1.ListConnectionsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	77,  // 113: sora.core.v1.ListConnectionsResponse.connections:type_name -> sora.core.v1.Connection
+	59,  // 114: sora.core.v1.ListConnectionsResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 115: sora.core.v1.CloseConnectionRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 116: sora.core.v1.CloseConnectionResponse.error:type_name -> sora.core.v1.SoraError
+	135, // 117: sora.core.v1.SubscriptionSettings.update_interval:type_name -> google.protobuf.Duration
+	82,  // 118: sora.core.v1.SubscriptionState.settings:type_name -> sora.core.v1.SubscriptionSettings
+	43,  // 119: sora.core.v1.SubscriptionState.info:type_name -> sora.core.v1.SubscriptionInfo
+	21,  // 120: sora.core.v1.SubscriptionState.outbounds:type_name -> sora.core.v1.OutboundSpec
+	136, // 121: sora.core.v1.SubscriptionState.last_update:type_name -> google.protobuf.Timestamp
+	136, // 122: sora.core.v1.SubscriptionState.next_update:type_name -> google.protobuf.Timestamp
+	59,  // 123: sora.core.v1.SubscriptionState.last_error:type_name -> sora.core.v1.SoraError
+	8,   // 124: sora.core.v1.SaveSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	82,  // 125: sora.core.v1.SaveSubscriptionRequest.settings:type_name -> sora.core.v1.SubscriptionSettings
+	83,  // 126: sora.core.v1.SaveSubscriptionResponse.state:type_name -> sora.core.v1.SubscriptionState
+	59,  // 127: sora.core.v1.SaveSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 128: sora.core.v1.ListSubscriptionsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	83,  // 129: sora.core.v1.ListSubscriptionsResponse.subscriptions:type_name -> sora.core.v1.SubscriptionState
+	59,  // 130: sora.core.v1.ListSubscriptionsResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 131: sora.core.v1.DeleteSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 132: sora.core.v1.DeleteSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 133: sora.core.v1.RefreshSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	83,  // 134: sora.core.v1.RefreshSubscriptionResponse.state:type_name -> sora.core.v1.SubscriptionState
+	59,  // 135: sora.core.v1.RefreshSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 136: sora.core.v1.WatchSubscriptionsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	8,   // 137: sora.core.v1.GetSubscriptionLinkRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 138: sora.core.v1.GetSubscriptionLinkResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 139: sora.core.v1.GetAboutRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	97,  // 140: sora.core.v1.GetAboutResponse.about:type_name -> sora.core.v1.About
+	59,  // 141: sora.core.v1.GetAboutResponse.error:type_name -> sora.core.v1.SoraError
+	136, // 142: sora.core.v1.About.commit_time:type_name -> google.protobuf.Timestamp
+	8,   // 143: sora.core.v1.About.contract:type_name -> sora.core.v1.ApiVersion
+	98,  // 144: sora.core.v1.About.engines:type_name -> sora.core.v1.EngineBuild
+	22,  // 145: sora.core.v1.About.local_proxy:type_name -> sora.core.v1.Endpoint
+	8,   // 146: sora.core.v1.GetRoutingPresetsRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	101, // 147: sora.core.v1.GetRoutingPresetsResponse.presets:type_name -> sora.core.v1.RoutingPreset
+	59,  // 148: sora.core.v1.GetRoutingPresetsResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 149: sora.core.v1.CheckDnsLeaksRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	103, // 150: sora.core.v1.CheckDnsLeaksResponse.checks:type_name -> sora.core.v1.DnsLeakCheck
+	59,  // 151: sora.core.v1.CheckDnsLeaksResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 152: sora.core.v1.BenchmarkServersRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 153: sora.core.v1.BandwidthSample.error:type_name -> sora.core.v1.SoraError
+	8,   // 154: sora.core.v1.GetBenchmarksRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	110, // 155: sora.core.v1.GetBenchmarksResponse.benchmarks:type_name -> sora.core.v1.BenchmarkRecord
+	59,  // 156: sora.core.v1.GetBenchmarksResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 157: sora.core.v1.SaveSubscriptionOverrideRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	133, // 158: sora.core.v1.SaveSubscriptionOverrideRequest.renames:type_name -> sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
+	59,  // 159: sora.core.v1.SaveSubscriptionOverrideResponse.error:type_name -> sora.core.v1.SoraError
+	83,  // 160: sora.core.v1.SaveSubscriptionOverrideResponse.state:type_name -> sora.core.v1.SubscriptionState
+	8,   // 161: sora.core.v1.GetSubscriptionOverrideRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	134, // 162: sora.core.v1.GetSubscriptionOverrideResponse.renames:type_name -> sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
+	115, // 163: sora.core.v1.GetSubscriptionOverrideResponse.extra_rules:type_name -> sora.core.v1.OverrideRule
+	59,  // 164: sora.core.v1.GetSubscriptionOverrideResponse.error:type_name -> sora.core.v1.SoraError
+	118, // 165: sora.core.v1.NetworkProfile.triggers:type_name -> sora.core.v1.ProfileTriggers
+	119, // 166: sora.core.v1.NetworkProfile.apply:type_name -> sora.core.v1.ProfileApply
+	8,   // 167: sora.core.v1.ListProfilesRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	117, // 168: sora.core.v1.ListProfilesResponse.profiles:type_name -> sora.core.v1.NetworkProfile
+	59,  // 169: sora.core.v1.ListProfilesResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 170: sora.core.v1.SaveProfileRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	117, // 171: sora.core.v1.SaveProfileRequest.profile:type_name -> sora.core.v1.NetworkProfile
+	117, // 172: sora.core.v1.SaveProfileResponse.profile:type_name -> sora.core.v1.NetworkProfile
+	59,  // 173: sora.core.v1.SaveProfileResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 174: sora.core.v1.DeleteProfileRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	59,  // 175: sora.core.v1.DeleteProfileResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 176: sora.core.v1.GetNetworkFingerprintRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	128, // 177: sora.core.v1.GetNetworkFingerprintResponse.fingerprint:type_name -> sora.core.v1.NetworkFingerprint
+	59,  // 178: sora.core.v1.GetNetworkFingerprintResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 179: sora.core.v1.ProbeChainRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	131, // 180: sora.core.v1.ProbeChainResponse.hops:type_name -> sora.core.v1.ChainHop
+	59,  // 181: sora.core.v1.ProbeChainResponse.error:type_name -> sora.core.v1.SoraError
+	9,   // 182: sora.core.v1.CoreControl.Connect:input_type -> sora.core.v1.ConnectRequest
+	11,  // 183: sora.core.v1.CoreControl.Disconnect:input_type -> sora.core.v1.DisconnectRequest
+	13,  // 184: sora.core.v1.CoreControl.GetStatus:input_type -> sora.core.v1.GetStatusRequest
+	15,  // 185: sora.core.v1.CoreControl.WatchEvents:input_type -> sora.core.v1.WatchEventsRequest
+	39,  // 186: sora.core.v1.CoreControl.ParseImport:input_type -> sora.core.v1.ParseImportRequest
+	41,  // 187: sora.core.v1.CoreControl.FetchSubscription:input_type -> sora.core.v1.FetchSubscriptionRequest
+	44,  // 188: sora.core.v1.CoreControl.ProbeServers:input_type -> sora.core.v1.ProbeServersRequest
+	28,  // 189: sora.core.v1.CoreControl.GetStats:input_type -> sora.core.v1.GetStatsRequest
+	46,  // 190: sora.core.v1.CoreControl.RunDiagnostics:input_type -> sora.core.v1.RunDiagnosticsRequest
+	48,  // 191: sora.core.v1.CoreControl.ExportDiagnostics:input_type -> sora.core.v1.ExportDiagnosticsRequest
+	50,  // 192: sora.core.v1.CoreControl.SetKillSwitch:input_type -> sora.core.v1.SetKillSwitchRequest
+	53,  // 193: sora.core.v1.CoreControl.Handshake:input_type -> sora.core.v1.HandshakeRequest
+	95,  // 194: sora.core.v1.CoreControl.GetAbout:input_type -> sora.core.v1.GetAboutRequest
+	99,  // 195: sora.core.v1.CoreControl.GetRoutingPresets:input_type -> sora.core.v1.GetRoutingPresetsRequest
+	62,  // 196: sora.core.v1.CoreControl.QueryLogs:input_type -> sora.core.v1.QueryLogsRequest
+	67,  // 197: sora.core.v1.CoreControl.WatchLogs:input_type -> sora.core.v1.WatchLogsRequest
+	68,  // 198: sora.core.v1.CoreControl.ExportLogs:input_type -> sora.core.v1.ExportLogsRequest
+	70,  // 199: sora.core.v1.CoreControl.ClearLogs:input_type -> sora.core.v1.ClearLogsRequest
+	73,  // 200: sora.core.v1.CoreControl.GetLogSettings:input_type -> sora.core.v1.GetLogSettingsRequest
+	75,  // 201: sora.core.v1.CoreControl.SetLogSettings:input_type -> sora.core.v1.SetLogSettingsRequest
+	78,  // 202: sora.core.v1.CoreControl.ListConnections:input_type -> sora.core.v1.ListConnectionsRequest
+	80,  // 203: sora.core.v1.CoreControl.CloseConnection:input_type -> sora.core.v1.CloseConnectionRequest
+	84,  // 204: sora.core.v1.CoreControl.SaveSubscription:input_type -> sora.core.v1.SaveSubscriptionRequest
+	86,  // 205: sora.core.v1.CoreControl.ListSubscriptions:input_type -> sora.core.v1.ListSubscriptionsRequest
+	88,  // 206: sora.core.v1.CoreControl.DeleteSubscription:input_type -> sora.core.v1.DeleteSubscriptionRequest
+	90,  // 207: sora.core.v1.CoreControl.RefreshSubscription:input_type -> sora.core.v1.RefreshSubscriptionRequest
+	92,  // 208: sora.core.v1.CoreControl.WatchSubscriptions:input_type -> sora.core.v1.WatchSubscriptionsRequest
+	93,  // 209: sora.core.v1.CoreControl.GetSubscriptionLink:input_type -> sora.core.v1.GetSubscriptionLinkRequest
+	55,  // 210: sora.core.v1.CoreControl.PutSecret:input_type -> sora.core.v1.PutSecretRequest
+	57,  // 211: sora.core.v1.CoreControl.DeleteSecret:input_type -> sora.core.v1.DeleteSecretRequest
+	104, // 212: sora.core.v1.CoreControl.CheckDnsLeaks:input_type -> sora.core.v1.CheckDnsLeaksRequest
+	106, // 213: sora.core.v1.CoreControl.BenchmarkServers:input_type -> sora.core.v1.BenchmarkServersRequest
+	108, // 214: sora.core.v1.CoreControl.GetBenchmarks:input_type -> sora.core.v1.GetBenchmarksRequest
+	111, // 215: sora.core.v1.CoreControl.SaveSubscriptionOverride:input_type -> sora.core.v1.SaveSubscriptionOverrideRequest
+	113, // 216: sora.core.v1.CoreControl.GetSubscriptionOverride:input_type -> sora.core.v1.GetSubscriptionOverrideRequest
+	120, // 217: sora.core.v1.CoreControl.ListProfiles:input_type -> sora.core.v1.ListProfilesRequest
+	122, // 218: sora.core.v1.CoreControl.SaveProfile:input_type -> sora.core.v1.SaveProfileRequest
+	124, // 219: sora.core.v1.CoreControl.DeleteProfile:input_type -> sora.core.v1.DeleteProfileRequest
+	126, // 220: sora.core.v1.CoreControl.GetNetworkFingerprint:input_type -> sora.core.v1.GetNetworkFingerprintRequest
+	129, // 221: sora.core.v1.CoreControl.ProbeChain:input_type -> sora.core.v1.ProbeChainRequest
+	10,  // 222: sora.core.v1.CoreControl.Connect:output_type -> sora.core.v1.ConnectResponse
+	12,  // 223: sora.core.v1.CoreControl.Disconnect:output_type -> sora.core.v1.DisconnectResponse
+	14,  // 224: sora.core.v1.CoreControl.GetStatus:output_type -> sora.core.v1.GetStatusResponse
+	31,  // 225: sora.core.v1.CoreControl.WatchEvents:output_type -> sora.core.v1.CoreEvent
+	40,  // 226: sora.core.v1.CoreControl.ParseImport:output_type -> sora.core.v1.ParseImportResponse
+	42,  // 227: sora.core.v1.CoreControl.FetchSubscription:output_type -> sora.core.v1.FetchSubscriptionResponse
+	36,  // 228: sora.core.v1.CoreControl.ProbeServers:output_type -> sora.core.v1.ProbeResult
+	29,  // 229: sora.core.v1.CoreControl.GetStats:output_type -> sora.core.v1.GetStatsResponse
+	47,  // 230: sora.core.v1.CoreControl.RunDiagnostics:output_type -> sora.core.v1.RunDiagnosticsResponse
+	49,  // 231: sora.core.v1.CoreControl.ExportDiagnostics:output_type -> sora.core.v1.ExportDiagnosticsResponse
+	51,  // 232: sora.core.v1.CoreControl.SetKillSwitch:output_type -> sora.core.v1.SetKillSwitchResponse
+	54,  // 233: sora.core.v1.CoreControl.Handshake:output_type -> sora.core.v1.HandshakeResponse
+	96,  // 234: sora.core.v1.CoreControl.GetAbout:output_type -> sora.core.v1.GetAboutResponse
+	100, // 235: sora.core.v1.CoreControl.GetRoutingPresets:output_type -> sora.core.v1.GetRoutingPresetsResponse
+	63,  // 236: sora.core.v1.CoreControl.QueryLogs:output_type -> sora.core.v1.QueryLogsResponse
+	60,  // 237: sora.core.v1.CoreControl.WatchLogs:output_type -> sora.core.v1.LogEntry
+	69,  // 238: sora.core.v1.CoreControl.ExportLogs:output_type -> sora.core.v1.ExportLogsResponse
+	71,  // 239: sora.core.v1.CoreControl.ClearLogs:output_type -> sora.core.v1.ClearLogsResponse
+	74,  // 240: sora.core.v1.CoreControl.GetLogSettings:output_type -> sora.core.v1.GetLogSettingsResponse
+	76,  // 241: sora.core.v1.CoreControl.SetLogSettings:output_type -> sora.core.v1.SetLogSettingsResponse
+	79,  // 242: sora.core.v1.CoreControl.ListConnections:output_type -> sora.core.v1.ListConnectionsResponse
+	81,  // 243: sora.core.v1.CoreControl.CloseConnection:output_type -> sora.core.v1.CloseConnectionResponse
+	85,  // 244: sora.core.v1.CoreControl.SaveSubscription:output_type -> sora.core.v1.SaveSubscriptionResponse
+	87,  // 245: sora.core.v1.CoreControl.ListSubscriptions:output_type -> sora.core.v1.ListSubscriptionsResponse
+	89,  // 246: sora.core.v1.CoreControl.DeleteSubscription:output_type -> sora.core.v1.DeleteSubscriptionResponse
+	91,  // 247: sora.core.v1.CoreControl.RefreshSubscription:output_type -> sora.core.v1.RefreshSubscriptionResponse
+	83,  // 248: sora.core.v1.CoreControl.WatchSubscriptions:output_type -> sora.core.v1.SubscriptionState
+	94,  // 249: sora.core.v1.CoreControl.GetSubscriptionLink:output_type -> sora.core.v1.GetSubscriptionLinkResponse
+	56,  // 250: sora.core.v1.CoreControl.PutSecret:output_type -> sora.core.v1.PutSecretResponse
+	58,  // 251: sora.core.v1.CoreControl.DeleteSecret:output_type -> sora.core.v1.DeleteSecretResponse
+	105, // 252: sora.core.v1.CoreControl.CheckDnsLeaks:output_type -> sora.core.v1.CheckDnsLeaksResponse
+	107, // 253: sora.core.v1.CoreControl.BenchmarkServers:output_type -> sora.core.v1.BandwidthSample
+	109, // 254: sora.core.v1.CoreControl.GetBenchmarks:output_type -> sora.core.v1.GetBenchmarksResponse
+	112, // 255: sora.core.v1.CoreControl.SaveSubscriptionOverride:output_type -> sora.core.v1.SaveSubscriptionOverrideResponse
+	114, // 256: sora.core.v1.CoreControl.GetSubscriptionOverride:output_type -> sora.core.v1.GetSubscriptionOverrideResponse
+	121, // 257: sora.core.v1.CoreControl.ListProfiles:output_type -> sora.core.v1.ListProfilesResponse
+	123, // 258: sora.core.v1.CoreControl.SaveProfile:output_type -> sora.core.v1.SaveProfileResponse
+	125, // 259: sora.core.v1.CoreControl.DeleteProfile:output_type -> sora.core.v1.DeleteProfileResponse
+	127, // 260: sora.core.v1.CoreControl.GetNetworkFingerprint:output_type -> sora.core.v1.GetNetworkFingerprintResponse
+	130, // 261: sora.core.v1.CoreControl.ProbeChain:output_type -> sora.core.v1.ProbeChainResponse
+	222, // [222:262] is the sub-list for method output_type
+	182, // [182:222] is the sub-list for method input_type
+	182, // [182:182] is the sub-list for extension type_name
+	182, // [182:182] is the sub-list for extension extendee
+	0,   // [0:182] is the sub-list for field type_name
 }
 
 func init() { file_sora_core_v1_core_control_proto_init() }
@@ -9742,6 +9845,7 @@ func file_sora_core_v1_core_control_proto_init() {
 		(*CoreEvent_KillSwitchChanged)(nil),
 		(*CoreEvent_GroupSwitched)(nil),
 		(*CoreEvent_ProfileMatched)(nil),
+		(*CoreEvent_CensorshipDetected)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -9749,7 +9853,7 @@ func file_sora_core_v1_core_control_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sora_core_v1_core_control_proto_rawDesc), len(file_sora_core_v1_core_control_proto_rawDesc)),
 			NumEnums:      8,
-			NumMessages:   126,
+			NumMessages:   127,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -8,6 +8,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
+	"github.com/levvs-one/sora-client/core/censor"
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/engine/registry"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
@@ -393,6 +394,37 @@ func TestGroupSwitchReachesTheWire(t *testing.T) {
 	moved := out.GetGroupSwitched()
 	if moved.GetGroup() != "auto" || moved.GetPrevious() != "out-1" || moved.GetSelected() != "out-2" || out.GetSequence() != 7 {
 		t.Errorf("event = %v", out)
+	}
+}
+
+func TestCensorVerdictReachesTheWire(t *testing.T) {
+	// SW4: a journal censor verdict must reach the client as the
+	// structured CensorshipDetected payload, not only as a free-text
+	// log line.
+	verdict := &censor.Verdict{
+		Kind:        censor.KindDataStall,
+		Confidence:  0.7,
+		Explanation: "session went silent after data flowed",
+		Evidence:    []string{"16 KiB received, then 8s of silence"},
+	}
+	out := toWireEvent(session.Event{Sequence: 9, Kind: session.EventCensor,
+		Detail: "censorship check: session went silent after data flowed", Censor: verdict}, nil)
+	got := out.GetCensorshipDetected()
+	if got == nil {
+		t.Fatalf("payload = %T, want CensorshipDetected", out.GetPayload())
+	}
+	if got.GetKind() != "data_stall" || got.GetConfidence() != 0.7 ||
+		got.GetExplanation() != "session went silent after data flowed" ||
+		len(got.GetEvidence()) != 1 || got.GetEvidence()[0] != "16 KiB received, then 8s of silence" {
+		t.Errorf("verdict = %+v", got)
+	}
+	if out.GetSequence() != 9 {
+		t.Errorf("sequence = %d, want 9", out.GetSequence())
+	}
+	// A censor event without a verdict keeps the free-text line.
+	out = toWireEvent(session.Event{Kind: session.EventCensor, Detail: "censorship check: something"}, nil)
+	if lines := out.GetLogBatch().GetLines(); len(lines) != 1 || lines[0] != "censorship check: something" {
+		t.Errorf("verdictless censor event = %v, want the text line", out.GetLogBatch())
 	}
 }
 

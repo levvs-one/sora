@@ -2111,6 +2111,7 @@ enum CoreEvent_Payload {
   killSwitchChanged,
   groupSwitched,
   profileMatched,
+  censorshipDetected,
   notSet
 }
 
@@ -2128,6 +2129,7 @@ class CoreEvent extends $pb.GeneratedMessage {
     KillSwitchChanged? killSwitchChanged,
     GroupSwitched? groupSwitched,
     ProfileMatched? profileMatched,
+    CensorshipDetected? censorshipDetected,
   }) {
     final result = CoreEvent._();
     if (sequence != null) result.sequence = sequence;
@@ -2142,6 +2144,7 @@ class CoreEvent extends $pb.GeneratedMessage {
     if (killSwitchChanged != null) result.killSwitchChanged = killSwitchChanged;
     if (groupSwitched != null) result.groupSwitched = groupSwitched;
     if (profileMatched != null) result.profileMatched = profileMatched;
+    if (censorshipDetected != null) result.censorshipDetected = censorshipDetected;
     return result;
   }
 
@@ -2163,12 +2166,13 @@ class CoreEvent extends $pb.GeneratedMessage {
     10: CoreEvent_Payload.killSwitchChanged,
     11: CoreEvent_Payload.groupSwitched,
     12: CoreEvent_Payload.profileMatched,
+    13: CoreEvent_Payload.censorshipDetected,
     0: CoreEvent_Payload.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CoreEvent',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
       createEmptyInstance: CoreEvent.$_createMessage)
-    ..oo(0, [4, 5, 6, 7, 8, 9, 10, 11, 12])
+    ..oo(0, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
     ..a<$fixnum.Int64>(1, _omitFieldNames ? '' : 'sequence', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(2, _omitFieldNames ? '' : 'sessionId')
     ..aOM<$2.Timestamp>(3, _omitFieldNames ? '' : 'emittedAt', subBuilder: $2.Timestamp.$_createMessage)
@@ -2184,6 +2188,8 @@ class CoreEvent extends $pb.GeneratedMessage {
     ..aOM<GroupSwitched>(11, _omitFieldNames ? '' : 'groupSwitched', subBuilder: GroupSwitched.$_createMessage)
     ..aOM<ProfileMatched>(12, _omitFieldNames ? '' : 'profileMatched',
         subBuilder: ProfileMatched.$_createMessage)
+    ..aOM<CensorshipDetected>(13, _omitFieldNames ? '' : 'censorshipDetected',
+        subBuilder: CensorshipDetected.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2215,6 +2221,7 @@ class CoreEvent extends $pb.GeneratedMessage {
   @$pb.TagNumber(10)
   @$pb.TagNumber(11)
   @$pb.TagNumber(12)
+  @$pb.TagNumber(13)
   CoreEvent_Payload whichPayload() => _CoreEvent_PayloadByTag[$_whichOneof(0)]!;
   @$pb.TagNumber(4)
   @$pb.TagNumber(5)
@@ -2225,6 +2232,7 @@ class CoreEvent extends $pb.GeneratedMessage {
   @$pb.TagNumber(10)
   @$pb.TagNumber(11)
   @$pb.TagNumber(12)
+  @$pb.TagNumber(13)
   void clearPayload() => $_clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
@@ -2354,6 +2362,17 @@ class CoreEvent extends $pb.GeneratedMessage {
   void clearProfileMatched() => $_clearField(12);
   @$pb.TagNumber(12)
   ProfileMatched ensureProfileMatched() => $_ensure(11);
+
+  @$pb.TagNumber(13)
+  CensorshipDetected get censorshipDetected => $_getN(12);
+  @$pb.TagNumber(13)
+  set censorshipDetected(CensorshipDetected value) => $_setField(13, value);
+  @$pb.TagNumber(13)
+  $core.bool hasCensorshipDetected() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearCensorshipDetected() => $_clearField(13);
+  @$pb.TagNumber(13)
+  CensorshipDetected ensureCensorshipDetected() => $_ensure(12);
 }
 
 class StateChanged extends $pb.GeneratedMessage {
@@ -10706,3 +10725,87 @@ class ChainHop extends $pb.GeneratedMessage {
 
 }
 
+
+class CensorshipDetected extends $pb.GeneratedMessage {
+  factory CensorshipDetected({
+    $core.String? kind,
+    $core.double? confidence,
+    $core.String? explanation,
+    $core.Iterable<$core.String>? evidence,
+  }) {
+    final result = CensorshipDetected._();
+    if (kind != null) result.kind = kind;
+    if (confidence != null) result.confidence = confidence;
+    if (explanation != null) result.explanation = explanation;
+    if (evidence != null) result.evidence.addAll(evidence);
+    return result;
+  }
+
+  CensorshipDetected._();
+
+  factory CensorshipDetected.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CensorshipDetected()..mergeFromBuffer(data, registry);
+  factory CensorshipDetected.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CensorshipDetected()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CensorshipDetected',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: CensorshipDetected.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'kind')
+    ..a<$core.double>(2, _omitFieldNames ? '' : 'confidence', $pb.PbFieldType.OD)
+    ..aOS(3, _omitFieldNames ? '' : 'explanation')
+    ..pPS(4, _omitFieldNames ? '' : 'evidence')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CensorshipDetected clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CensorshipDetected copyWith(void Function(CensorshipDetected) updates) =>
+      super.copyWith((message) => updates(message as CensorshipDetected)) as CensorshipDetected;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CensorshipDetected() / CensorshipDetected.new instead')
+  static CensorshipDetected create() => CensorshipDetected._();
+  static $pb.GeneratedMessage $_createMessage() => CensorshipDetected._();
+  @$core.override
+  CensorshipDetected createEmptyInstance() => CensorshipDetected._();
+  @$core.pragma('dart2js:noInline')
+  static CensorshipDetected getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CensorshipDetected>(CensorshipDetected.$_createMessage);
+  static CensorshipDetected? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get kind => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set kind($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasKind() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearKind() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.double get confidence => $_getN(1);
+  @$pb.TagNumber(2)
+  set confidence($core.double value) => $_setDouble(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasConfidence() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearConfidence() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get explanation => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set explanation($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasExplanation() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearExplanation() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $pb.PbList<$core.String> get evidence => $_getList(3);
+}

@@ -876,6 +876,23 @@ func toWireEvent(event session.Event, redactor *engine.Redactor) *corev1.CoreEve
 		out.Payload = &corev1.CoreEvent_ProbeResult{ProbeResult: probe}
 	case session.EventError:
 		out.Payload = &corev1.CoreEvent_Error{Error: toWire(errOrNil(event), mask, "")}
+	case session.EventCensor:
+		// The structured verdict travels as its own payload (SW4): the
+		// client surfaces the explanation and acts on the machine-readable
+		// kind without parsing free text. A censor event without a verdict
+		// keeps the old free-text line.
+		if event.Censor != nil {
+			out.Payload = &corev1.CoreEvent_CensorshipDetected{CensorshipDetected: &corev1.CensorshipDetected{
+				Kind:        event.Censor.Kind.String(),
+				Confidence:  event.Censor.Confidence,
+				Explanation: maskText(mask, event.Censor.Explanation),
+				Evidence:    event.Censor.Evidence,
+			}}
+			break
+		}
+		out.Payload = &corev1.CoreEvent_LogBatch{LogBatch: &corev1.LogBatch{
+			Lines: []string{maskText(mask, event.Detail)},
+		}}
 	case session.EventGroup:
 		moved := &corev1.GroupSwitched{}
 		if event.Switch != nil {
