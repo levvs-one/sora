@@ -27,6 +27,16 @@ import (
 // the fully discovered, pinned registry — exactly what the synchronous
 // discovery in New produced before. A discovery triggered concurrently
 // from several goroutines runs once; the rest wait for the same result.
+//
+// The once-for-the-process caching is deliberate for the BINARIES:
+// discovery hash-verifies and executes every engine build, far too
+// expensive to repeat per session. It does NOT extend to the host
+// facts discovery stamps (TUN device, kernel WireGuard): those are
+// two cheap syscalls to measure, the host changes under a long-lived
+// service, and the registry re-probes them on its own TTL
+// (registry.hostFactsTTL, CENSOR-P4 fix M4) behind this same cached
+// registry — so a device that appears after core start is seen
+// without a restart, while binaries stay discovered exactly once.
 type lazyEngines struct {
 	once sync.Once
 	reg  *registry.Registry

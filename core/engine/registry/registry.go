@@ -71,7 +71,25 @@ type Registry struct {
 
 	mu   sync.Mutex
 	last engine.Selection
+
+	// hostAt is when the HostFacts stamped into availability were
+	// last measured; Availability re-probes past hostFactsTTL.
+	hostMu sync.Mutex
+	hostAt time.Time
 }
+
+// hostFactsTTL bounds how long discovery's host facts (TUN device,
+// kernel WireGuard) are trusted. The probe itself is two cheap
+// syscalls (an open of /dev/net/tun, one generic-netlink query —
+// supervise.ProbeHost), while full discovery SHA-256-verifies and
+// executes every engine binary, so the binaries stay discovered
+// once per process (see lazyEngines in sora-core) but the host
+// facts do not: the core is a long-lived service and the host
+// changes under it — a TUN node appears when its module loads, a
+// container's devices are attached after start. Thirty seconds
+// keeps selection honest about the current host without probing
+// on every call (CENSOR-P4 fix M4).
+const hostFactsTTL = 30 * time.Second
 
 // Discover searches environment overrides (only with an explicit operator
 // opt-in), then the digest-verified engines directory, for each engine.
@@ -108,11 +126,13 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 		r.zapretAssets = filepath.Join(enginesDir, "zapret")
 	}
 	discovery := supervise.DiscoveryOptions{AllowEnvBin: base.AllowEnvBin}
-	// Probe the host once (TUN device, kernel WireGuard): the facts
+	// Probe the host (TUN device, kernel WireGuard): the facts
 	// are the same for every engine and selection gates on them, so
 	// they are stamped onto every Availability entry — measured here,
-	// never assumed from the pins (CENSOR-P4).
+	// never assumed from the pins (CENSOR-P4) — and re-measured on
+	// the hostFactsTTL cadence by Availability (CENSOR-P4 fix M4).
 	host := supervise.ProbeHost()
+	r.hostAt = time.Now()
 	for _, kind := range engine.DefaultPreference {
 		b, err := drivers[kind].prober.Discover(ctx, enginesDir, discovery)
 		if err != nil {
@@ -129,8 +149,34 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 	return r
 }
 
-// Availability returns discovery results for all known engines.
-func (r *Registry) Availability() []engine.Availability { return slices.Clone(r.availability) }
+// Availability returns discovery results for all known engines,
+// with host facts no older than hostFactsTTL: past the TTL the
+// cheap host probe runs again and the fresh facts are re-stamped
+// onto every entry, so a host change since discovery (a TUN device
+// appearing, a module loading) reaches selection without waiting
+// for a core restart (CENSOR-P4 fix M4).
+func (r *Registry) Availability() []engine.Availability {
+	r.hostMu.Lock()
+	defer r.hostMu.Unlock()
+	r.refreshHostFactsLocked()
+	return slices.Clone(r.availability)
+}
+
+// refreshHostFactsLocked re-probes the host when the stamped facts
+// are older than hostFactsTTL. The caller holds hostMu, so the
+// re-stamp and any Availability clone are one atomic step.
+func (r *Registry) refreshHostFactsLocked() {
+	if time.Since(r.hostAt) < hostFactsTTL {
+		return
+	}
+	host := supervise.ProbeHost()
+	r.hostAt = time.Now()
+	for i := range r.availability {
+		r.availability[i].HostProbed = host.Probed
+		r.availability[i].TUNDevice = host.TUNDevice
+		r.availability[i].KernelWireGuard = host.KernelWireGuard
+	}
+}
 
 // Binaries returns the usable builds in default preference order.
 func (r *Registry) Binaries() []supervise.Binary {
@@ -301,7 +347,7 @@ func (r *Registry) selectPlan(p *engine.Plan, order []engine.Kind) (engine.Selec
 		if _, installed := r.binaries[kind]; installed {
 			key = errs.KeyPlanEngineUnsupported
 		}
-		picked, err := engine.SelectEngine(&candidate, r.availability, []engine.Kind{kind})
+		picked, err := engine.SelectEngine(&candidate, r.Availability(), []engine.Kind{kind})
 		if err != nil {
 			selection.Rejected = append(selection.Rejected, picked.Rejected...)
 			continue
@@ -343,7 +389,7 @@ func (r *Registry) Measure(ctx context.Context, outbounds []engine.Outbound, opt
 	var orphans []engine.Outbound
 	for _, o := range outbounds {
 		single := &engine.Plan{Outbounds: []engine.Outbound{o}}
-		sel, err := engine.SelectEngine(single, r.availability, order)
+		sel, err := engine.SelectEngine(single, r.Availability(), order)
 		if err != nil {
 			orphans = append(orphans, o)
 			continue
