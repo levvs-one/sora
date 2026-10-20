@@ -2042,6 +2042,10 @@ abstract class S {
   String get dnsLeakFixConfigureTunnelDns;
   String get dnsLeakFixReviewSystemResolvers;
   String get dnsLeakFixEnableKillSwitch;
+  String get dnsLeakCheckEncryptedDns;
+  String get dnsLeakCheckDnsSpoof;
+  String get dnsLeakFixReviewEncryptedDns;
+  String get dnsLeakFixUseEncryptedDns;
   String get qrShareTitle;
   String get qrScanTitle;
   String get qrCopyLink;

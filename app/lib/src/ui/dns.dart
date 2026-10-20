@@ -37,7 +37,9 @@ const _presets = <String, List<String>>{
 String _checkLabel(S s, String key) => switch (key) {
       'dnsLeak.check.tunnelDns' => s.dnsLeakCheckTunnelDns,
       'dnsLeak.check.systemResolvers' => s.dnsLeakCheckSystemResolvers,
+      'dnsLeak.check.encryptedDns' => s.dnsLeakCheckEncryptedDns,
       'dnsLeak.check.killSwitchDns' => s.dnsLeakCheckKillSwitchDns,
+      'dnsLeak.check.dnsSpoof' => s.dnsLeakCheckDnsSpoof,
       _ => key,
     };
 
@@ -45,7 +47,9 @@ String _checkLabel(S s, String key) => switch (key) {
 String _checkHint(S s, String key) => switch (key) {
       'dnsLeak.fix.configureTunnelDns' => s.dnsLeakFixConfigureTunnelDns,
       'dnsLeak.fix.reviewSystemResolvers' => s.dnsLeakFixReviewSystemResolvers,
+      'dnsLeak.fix.reviewEncryptedDns' => s.dnsLeakFixReviewEncryptedDns,
       'dnsLeak.fix.enableKillSwitch' => s.dnsLeakFixEnableKillSwitch,
+      'dnsLeak.fix.useEncryptedDns' => s.dnsLeakFixUseEncryptedDns,
       _ => key,
     };
 

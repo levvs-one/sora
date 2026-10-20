@@ -1356,6 +1356,14 @@ class SRu extends S {
   @override
   String get dnsLeakFixEnableKillSwitch => 'Включите kill switch, чтобы DNS оставался в туннеле.';
   @override
+  String get dnsLeakCheckEncryptedDns => 'Зашифрованный DNS системы';
+  @override
+  String get dnsLeakCheckDnsSpoof => 'Подмена ответов DNS';
+  @override
+  String get dnsLeakFixReviewEncryptedDns => 'Проверьте, какие конечные точки зашифрованного DNS система использует вне туннеля.';
+  @override
+  String get dnsLeakFixUseEncryptedDns => 'Используйте зашифрованный DNS (DoT или DoH) в туннеле, чтобы резолверы не могли подделывать ответы.';
+  @override
   String get qrShareTitle => 'Поделиться QR-кодом';
   @override
   String get qrScanTitle => 'Сканировать QR-код';

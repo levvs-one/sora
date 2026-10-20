@@ -1336,6 +1336,14 @@ Find one in the catalog or install from a file.';
   @override
   String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
   @override
+  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  @override
+  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  @override
+  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  @override
+  String get dnsLeakFixUseEncryptedDns => 'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+  @override
   String get qrShareTitle => 'Share via QR';
   @override
   String get qrScanTitle => 'Scan QR code';
