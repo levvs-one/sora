@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // Format identifies a journal serialization format.
@@ -78,7 +79,9 @@ func writeTextEntry(buf *bytes.Buffer, e Entry) {
 	buf.WriteByte('[')
 	buf.WriteString(e.Source)
 	buf.WriteByte(']')
-	for i := len(e.Source) + 2; i < 8; i++ {
+	// Pad to the width fmt's %-8s used: runes, not bytes, so a
+	// non-ASCII source name renders exactly as before.
+	for i := utf8.RuneCountInString(e.Source) + 2; i < 8; i++ {
 		buf.WriteByte(' ')
 	}
 	buf.WriteByte(' ')

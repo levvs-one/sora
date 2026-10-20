@@ -222,13 +222,16 @@ func (c *Center) Write(at time.Time, level Level, source, message string) {
 	c.next++
 	grew := false
 	if len(c.entries) == cap(c.entries) {
-		if c.backing != nil && c.head > 0 {
+		if c.backing != nil && c.head >= 64 && c.head >= len(c.entries)/64 {
 			// The view ran off the end of its allocation, but eviction
 			// left dead slide space in front of it: move the live
 			// entries back to the front and clear the stale copies the
-			// move leaves behind, so appending reuses the allocation.
-			// The move copies exactly what the realloc it replaces
-			// would have copied; only the allocation is saved.
+			// move leaves behind, so appending reuses the allocation
+			// instead of paying for a fresh copying allocation. The
+			// head thresholds keep the move amortized: a slide too
+			// small to amortize the copy falls through to append
+			// growth, which widens the slide space, instead of
+			// copying the whole log every few writes.
 			n := copy(c.backing, c.entries)
 			clear(c.backing[n : c.head+n])
 			c.entries = c.backing[:n]
@@ -330,6 +333,9 @@ func foldContains(s, sub string) bool {
 	if len(sub) == 0 {
 		return true
 	}
+	if isASCII(sub) {
+		return foldContainsASCII(s, sub)
+	}
 	for i := 0; i < len(s); {
 		j, k := i, 0
 		for j < len(s) && k < len(sub) {
@@ -348,6 +354,97 @@ func foldContains(s, sub string) bool {
 		i += size
 	}
 	return false
+}
+
+func isASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= utf8.RuneSelf {
+			return false
+		}
+	}
+	return true
+}
+
+func foldASCII(b byte) byte {
+	if 'A' <= b && b <= 'Z' {
+		return b + 'a' - 'A'
+	}
+	return b
+}
+
+// foldContainsASCII is foldContains for a pure-ASCII needle, the shape
+// engine-log searches take. Candidate positions come from IndexByte
+// over the needle's first byte in both cases, so the scan runs at
+// strings.Contains speed instead of decoding every rune; the attempt
+// at a candidate folds ASCII bytes inline and non-ASCII runes through
+// unicode.ToLower. Exactly two non-ASCII runes lower to an ASCII
+// letter — U+0130 (İ) to 'i' and the Kelvin sign U+212A to 'k',
+// verified over the whole Unicode range — and both are candidate
+// starts when the needle opens with that letter.
+func foldContainsASCII(s, sub string) bool {
+	first := foldASCII(sub[0])
+	upper := first
+	if 'a' <= first && first <= 'z' {
+		upper = first - 'a' + 'A'
+	}
+	for i := 0; i < len(s); {
+		next := -1
+		if idx := strings.IndexByte(s[i:], first); idx >= 0 {
+			next = i + idx
+		}
+		if upper != first {
+			if idx := strings.IndexByte(s[i:], upper); idx >= 0 && (next < 0 || i+idx < next) {
+				next = i + idx
+			}
+		}
+		if first == 'k' {
+			if idx := strings.Index(s[i:], "K"); idx >= 0 && (next < 0 || i+idx < next) {
+				next = i + idx
+			}
+		}
+		if first == 'i' {
+			if idx := strings.Index(s[i:], "İ"); idx >= 0 && (next < 0 || i+idx < next) {
+				next = i + idx
+			}
+		}
+		if next < 0 {
+			return false
+		}
+		if foldMatchAtASCII(s, sub, next) {
+			return true
+		}
+		if s[next] < utf8.RuneSelf {
+			i = next + 1
+		} else {
+			_, size := utf8.DecodeRuneInString(s[next:])
+			i = next + size
+		}
+	}
+	return false
+}
+
+// foldMatchAtASCII reports whether sub matches s starting at byte
+// offset at, under the foldContainsASCII folding rules.
+func foldMatchAtASCII(s, sub string, at int) bool {
+	j, k := at, 0
+	for j < len(s) && k < len(sub) {
+		want := foldASCII(sub[k])
+		if b := s[j]; b < utf8.RuneSelf {
+			if foldASCII(b) != want {
+				return false
+			}
+			j++
+			k++
+			continue
+		}
+		r, size := utf8.DecodeRuneInString(s[j:])
+		if unicode.ToLower(r) != rune(want) {
+			return false
+		}
+		j += size
+		k++
+	}
+	return k == len(sub)
 }
 
 // Page holds one Query result.
@@ -396,6 +493,10 @@ func (c *Center) Query(f Filter, before uint64, limit int) Page {
 			break
 		}
 		page.Entries = append(page.Entries, e)
+	}
+	if len(page.Entries) == 0 {
+		// Preserve the pre-sized slice's nil-on-no-match result.
+		page.Entries = nil
 	}
 	return page
 }
