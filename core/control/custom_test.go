@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"testing"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -354,5 +355,141 @@ func TestCustomOutboundsHook(t *testing.T) {
 	}
 	if spec.GetCredentials().GetReference() == "" {
 		t.Error("no credentials reference")
+	}
+}
+
+// injectSubscription puts a fabricated subscription record into the book so
+// merge tests don't need a network fetch.
+func injectSubscription(t *testing.T, srv *Server, id string, specs ...*corev1.OutboundSpec) {
+	t.Helper()
+	srv.subs.mu.Lock()
+	defer srv.subs.mu.Unlock()
+	srv.subs.records[id] = &subscriptionRecord{
+		ID:      id,
+		URL:     "https://example.com/sub",
+		Created: time.Now(),
+	}
+	srv.subs.lists[id] = specs
+}
+
+func saveCustomForHook(t *testing.T, c *customServer, token []byte, name string) string {
+	t.Helper()
+	saved, err := c.SaveCustomServer(context.Background(), &customv1.SaveCustomServerRequest{
+		ApiVersion:           customVersion(),
+		ControlAuthenticator: token,
+		Server: &customv1.CustomServer{
+			Name:        name,
+			Protocol:    customv1.CustomProtocol_CUSTOM_PROTOCOL_VLESS,
+			Address:     "vpn.example.com",
+			Port:        443,
+			Credentials: "s3cr3t",
+		},
+	})
+	if err != nil || saved.GetError() != nil {
+		t.Fatalf("save: %v %v", err, saved.GetError())
+	}
+	return saved.GetServer().GetId()
+}
+
+func TestCustomOutboundsMergedIntoSubscriptionStates(t *testing.T) {
+	srv, token := customTestPlane(t)
+	injectSubscription(t, srv, "sub1",
+		&corev1.OutboundSpec{Id: "sub-server-1", DisplayName: "Sub Server", Protocol: "vless"})
+	c := customImpl(t, srv)
+
+	states := srv.subs.list()
+	if len(states) != 1 || len(states[0].GetOutbounds()) != 1 {
+		t.Fatalf("before save: states=%d outbounds=%d", len(states), len(states[0].GetOutbounds()))
+	}
+	id := saveCustomForHook(t, c, token, "Home")
+
+	states = srv.subs.list()
+	if len(states) != 1 {
+		t.Fatalf("states = %d, want 1", len(states))
+	}
+	got := states[0].GetOutbounds()
+	if len(got) != 2 {
+		t.Fatalf("outbounds = %d, want 2 (subscription + custom)", len(got))
+	}
+	if got[0].GetId() != "sub-server-1" {
+		t.Errorf("first outbound = %q, want the subscription's own server first", got[0].GetId())
+	}
+	if want := "custom/" + id; got[1].GetId() != want {
+		t.Errorf("second outbound = %q, want %q", got[1].GetId(), want)
+	}
+	// The merged slice must be fresh: rewriting a slot of the returned
+	// state must not corrupt the book's stored list.
+	got[0] = &corev1.OutboundSpec{Id: "mutated"}
+	again := srv.subs.list()[0].GetOutbounds()
+	if len(again) != 2 || again[0].GetId() != "sub-server-1" {
+		t.Errorf("book list corrupted through merged state: %+v", again)
+	}
+	// Deleting the custom server removes it from the merged states.
+	if _, err := c.DeleteCustomServer(context.Background(), &customv1.DeleteCustomServerRequest{
+		ApiVersion:           customVersion(),
+		ControlAuthenticator: token,
+		Id:                   id,
+	}); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	if n := len(srv.subs.list()[0].GetOutbounds()); n != 1 {
+		t.Errorf("after delete: outbounds = %d, want 1", n)
+	}
+}
+
+func TestCustomServerChangeBroadcastsToSubscriptionWatchers(t *testing.T) {
+	srv, token := customTestPlane(t)
+	injectSubscription(t, srv, "sub1")
+	c := customImpl(t, srv)
+	changes, stop := srv.subs.watch()
+	defer stop()
+
+	id := saveCustomForHook(t, c, token, "Home")
+	select {
+	case st := <-changes:
+		found := false
+		for _, o := range st.GetOutbounds() {
+			if o.GetId() == "custom/"+id {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("broadcast state lacks the new custom server: %+v", st.GetOutbounds())
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("no subscription broadcast after SaveCustomServer")
+	}
+}
+
+func TestExtHostListServersIncludesCustomsOnce(t *testing.T) {
+	srv, token := customTestPlane(t)
+	injectSubscription(t, srv, "sub1",
+		&corev1.OutboundSpec{Id: "sub-server-1", DisplayName: "Sub"})
+	injectSubscription(t, srv, "sub2",
+		&corev1.OutboundSpec{Id: "sub-server-2", DisplayName: "Sub2"})
+	c := customImpl(t, srv)
+	id := saveCustomForHook(t, c, token, "Home")
+
+	servers, err := srv.ExtHostDeps().ListServers(context.Background())
+	if err != nil {
+		t.Fatalf("ListServers: %v", err)
+	}
+	// Two subscription servers plus the custom one, each exactly once
+	// (the custom server reaches ListServers through the merged states,
+	// once per subscription, so dedup matters).
+	if len(servers) != 3 {
+		t.Fatalf("servers = %d, want 3: %+v", len(servers), servers)
+	}
+	seen := map[string]int{}
+	for _, s := range servers {
+		seen[s.ID]++
+		if s.ID == "custom/"+id && s.Name != "Home" {
+			t.Errorf("custom server name = %q, want Home", s.Name)
+		}
+	}
+	for sid, n := range seen {
+		if n != 1 {
+			t.Errorf("server %q listed %d times", sid, n)
+		}
 	}
 }

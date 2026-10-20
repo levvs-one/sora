@@ -329,26 +329,42 @@ func New(ctx context.Context, opts Options) (*App, error) {
 			MaxConnectionIdle: 10 * time.Minute,
 		}),
 	)
-	corev1.RegisterCoreControlServer(app.server, plane)
+	if err := mountControlServices(app.server, plane, opts.DataDir); err != nil {
+		_ = store.Close()
+		return nil, err
+	}
+	built = true
+	return app, nil
+}
+
+// mountControlServices registers every gRPC service the core exposes on
+// server. It is a separate function so the wiring test runs the exact mount
+// sequence the production binary uses: a proto service that is implemented
+// but not mounted here answers UNIMPLEMENTED on the wire.
+func mountControlServices(server *grpc.Server, plane *control.Server, dataDir string) error {
+	corev1.RegisterCoreControlServer(server, plane)
+	// User-added servers (SW7): shares the control socket and its auth
+	// interceptors; every RPC additionally checks the API version and the
+	// control authenticator, like the rest of the control plane.
+	plane.MountCustomServices(server)
 	// Leak self-tests: active egress probes over the control socket. The
 	// service shares the socket's auth interceptors, so only control peers
 	// reach it; the handler additionally checks the control authenticator.
-	leakv1.RegisterLeakServiceServer(app.server, plane)
+	leakv1.RegisterLeakServiceServer(server, plane)
 	// Obfuscation suite: shares the control socket and its auth
 	// interceptors; ApplyObfsProfile stays control-only by default,
 	// GetObfsCapabilities is listed as read-only.
-	obfsv1.RegisterObfsControlServer(app.server, plane)
+	obfsv1.RegisterObfsControlServer(server, plane)
 	// Censorship diagnosis (SW4): shares the control socket and its auth
 	// interceptors; DetectCensorship additionally checks the control
 	// authenticator, because verdicts describe the machine's network.
-	censorv1.RegisterCensorControlServer(app.server, plane)
+	censorv1.RegisterCensorControlServer(server, plane)
 	// Extensions: the host service shares the control socket and its auth
 	// interceptors, so only control peers reach it; per-extension tokens
 	// and permission scopes are enforced inside the host.
-	extStore, err := ext.OpenStore(filepath.Join(opts.DataDir, "extensions"))
+	extStore, err := ext.OpenStore(filepath.Join(dataDir, "extensions"))
 	if err != nil {
-		_ = store.Close()
-		return nil, err
+		return err
 	}
 	// GrantedPermissions closes the mint hole: without it Host.MintToken
 	// trusts the app's permission list, so a confused control plane could
@@ -363,9 +379,8 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		}
 		return inst.Granted, true
 	}
-	extv1.RegisterExtensionHostServer(app.server, ext.NewHost(extStore.Issuer(), extDeps))
-	built = true
-	return app, nil
+	extv1.RegisterExtensionHostServer(server, ext.NewHost(extStore.Issuer(), extDeps))
+	return nil
 }
 
 // protectorFor selects master-key protection and checks it during construction.

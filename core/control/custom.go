@@ -63,6 +63,15 @@ func (s *Server) MountCustomServices(gs *grpc.Server) {
 	customv1.RegisterCustomServersServer(gs, &customServer{srv: s})
 }
 
+// noteCustomServersChanged re-emits the merged subscription states after a
+// custom server is added or removed, so the client's combined server list
+// (and therefore the plan builder) sees the change without a restart.
+func (s *Server) noteCustomServersChanged() {
+	if s.subs != nil {
+		s.subs.broadcastCustomChange()
+	}
+}
+
 // store resolves the lazily opened custom-server store.
 func (c *customServer) store() (*custom.Store, error) {
 	st := customStateFor(c.srv)
@@ -106,6 +115,7 @@ func (c *customServer) SaveCustomServer(_ context.Context, req *customv1.SaveCus
 	if err != nil {
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
+	c.srv.noteCustomServersChanged()
 	return &customv1.SaveCustomServerResponse{Server: customServerToWire(stored)}, nil
 }
 
@@ -143,6 +153,7 @@ func (c *customServer) DeleteCustomServer(_ context.Context, req *customv1.Delet
 	if err := st.Delete(req.GetId()); err != nil {
 		return &customv1.DeleteCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
+	c.srv.noteCustomServersChanged()
 	return &customv1.DeleteCustomServerResponse{}, nil
 }
 
@@ -229,9 +240,9 @@ func customProtocolToWire(p custom.Protocol) customv1.CustomProtocol {
 
 // CustomOutbounds converts stored custom servers to OutboundSpec entries so
 // the client's combined server list can include them without touching the
-// subscription book. Wiring (see reports/featlog-swarm-sw7.md): merge the
-// result into the states returned by subscriptionBook.list/stateLocked and
-// into the extension host's ListServers.
+// subscription book. Wiring: merged into the states returned by
+// subscriptionBook.list/stateLocked (withCustomOutbounds) and into the
+// extension host's ListServers (deduplicated by id).
 func (s *Server) CustomOutbounds() []*corev1.OutboundSpec {
 	st := customStateFor(s)
 	if st.err != nil || st.store == nil {

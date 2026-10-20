@@ -584,6 +584,39 @@ func (b *subscriptionBook) list() []*corev1.SubscriptionState {
 	return out
 }
 
+// withCustomOutbounds appends the user's own servers (SW7) to a
+// subscription's outbound list so the client's combined server list — and
+// therefore the plan builder — sees them without touching the subscription
+// book. Subscription overrides (hide/rename/reorder) apply to the
+// subscription's servers only; custom servers travel as-is. The result is
+// always a fresh slice: the subscription list's backing array is shared
+// with the book and must not be rewritten by append.
+func withCustomOutbounds(b *subscriptionBook, specs []*corev1.OutboundSpec, o *subscription.Override) []*corev1.OutboundSpec {
+	sub := applySubscriptionOverride(specs, o)
+	if b.srv == nil {
+		return sub
+	}
+	custom := b.srv.CustomOutbounds()
+	if len(custom) == 0 {
+		return sub
+	}
+	out := make([]*corev1.OutboundSpec, 0, len(sub)+len(custom))
+	out = append(out, sub...)
+	return append(out, custom...)
+}
+
+// broadcastCustomChange re-emits every subscription state so watchers pick
+// up custom-server additions and removals without waiting for the next
+// subscription refresh: the merged states they already hold would otherwise
+// keep pointing at a stale custom list.
+func (b *subscriptionBook) broadcastCustomChange() {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	for id := range b.records {
+		b.notifyLocked(b.stateLocked(id), logs.LevelInfo, "Custom servers changed")
+	}
+}
+
 func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 	rec := b.records[id]
 	settings := &corev1.SubscriptionSettings{Id: rec.ID, Name: rec.Name, UserAgent: rec.UserAgent, AutoUpdate: rec.AutoUpdate}
@@ -593,7 +626,7 @@ func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 	state := &corev1.SubscriptionState{
 		Settings:    settings,
 		Info:        subscriptionInfoToWire(rec.Info),
-		Outbounds:   applySubscriptionOverride(b.lists[id], b.loadOverride(id)),
+		Outbounds:   withCustomOutbounds(b, b.lists[id], b.loadOverride(id)),
 		Updating:    b.updating[id],
 		DisplayName: displayName(rec),
 	}

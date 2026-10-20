@@ -41,11 +41,20 @@ func (s *Server) ExtHostDeps() ext.Deps {
 			return out, nil
 		},
 		ListServers: func(context.Context) ([]ext.Server, error) {
+			// Custom servers arrive through the merged subscription states
+			// (see withCustomOutbounds); dedup by id so each server —
+			// subscription or custom — is listed exactly once.
+			seen := make(map[string]struct{})
 			var out []ext.Server
 			for _, sub := range s.subs.list() {
 				for _, o := range sub.GetOutbounds() {
+					id := o.GetId()
+					if _, dup := seen[id]; dup {
+						continue
+					}
+					seen[id] = struct{}{}
 					out = append(out, ext.Server{
-						ID:        o.GetId(),
+						ID:        id,
 						Name:      o.GetDisplayName(),
 						LatencyMs: -1,
 					})
