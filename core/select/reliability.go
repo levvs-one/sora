@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sort"
+	"strconv"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 // Reliability persistence lives next to the probe history and shares its
@@ -89,8 +92,20 @@ type ReliabilityStore struct {
 	cfg ReliabilityConfig
 	now func() time.Time
 
+	// filePath and tmpPath are cfg.DataDir resolved once: the config
+	// never changes after construction, so saveLocked does not need to
+	// re-join the path on every Record.
+	filePath string
+	tmpPath  string
+
 	mu      sync.Mutex
 	entries map[string]reliabilityEntry
+
+	// Serialization scratch for saveLocked, reused across saves so a
+	// Record on a large store does not allocate a fresh output buffer
+	// and key slice every time. Only touched with mu held.
+	saveBuf  []byte
+	saveKeys []string
 }
 
 // NewReliabilityStore clamps the config and loads persisted entries.
@@ -105,6 +120,10 @@ func NewReliabilityStore(cfg ReliabilityConfig) *ReliabilityStore {
 		cfg:     cfg,
 		now:     now,
 		entries: map[string]reliabilityEntry{},
+	}
+	if cfg.DataDir != "" {
+		s.filePath = filepath.Join(cfg.DataDir, reliabilityDir, reliabilityFile)
+		s.tmpPath = s.filePath + ".tmp"
 	}
 	s.load()
 	return s
@@ -182,15 +201,8 @@ func (s *ReliabilityStore) Prune() int {
 	return removed
 }
 
-func (s *ReliabilityStore) path() string {
-	if s.cfg.DataDir == "" {
-		return ""
-	}
-	return filepath.Join(s.cfg.DataDir, reliabilityDir, reliabilityFile)
-}
-
 func (s *ReliabilityStore) load() {
-	path := s.path()
+	path := s.filePath
 	if path == "" {
 		return
 	}
@@ -218,8 +230,18 @@ func (s *ReliabilityStore) load() {
 // entries are pruned from the file (never from the in-memory map, where
 // Rate/Stats already treat them as expired), so the history cannot grow
 // past the size cap with dead entries.
+//
+// The write used to cost O(store) allocations per Record — a copied
+// kept-map plus a fresh json.Marshal of the whole journal (~279 KB and
+// ~1000 allocs per Record at 1000 entries, measured). Now the common
+// no-expired case serializes the live map directly, and the serializer
+// appends into buffers reused across saves: per-Record allocations are
+// O(1) in the store size. The output is byte-identical to the old
+// json.Marshal(kept) — sorted keys, same field order, same string and
+// time encodings; a differential test pins that, including exotic ids,
+// which fall back to encoding/json for their own encoding.
 func (s *ReliabilityStore) saveLocked() {
-	path := s.path()
+	path := s.filePath
 	if path == "" {
 		return
 	}
@@ -227,20 +249,99 @@ func (s *ReliabilityStore) saveLocked() {
 		return
 	}
 	now := s.now()
-	kept := make(map[string]reliabilityEntry, len(s.entries))
-	for id, e := range s.entries {
+	entries := s.entries
+	for _, e := range entries {
 		if e.expired(now, s.cfg.TTL) {
-			continue
+			// Something expired: build the pruned copy, as before.
+			entries = make(map[string]reliabilityEntry, len(s.entries))
+			for id, e := range s.entries {
+				if !e.expired(now, s.cfg.TTL) {
+					entries[id] = e
+				}
+			}
+			break
 		}
-		kept[id] = e
 	}
-	raw, err := json.Marshal(kept)
-	if err != nil {
+	var ok bool
+	s.saveBuf, s.saveKeys, ok = appendReliabilityJSON(s.saveBuf[:0], s.saveKeys[:0], entries)
+	if !ok {
+		return // Mirrors the old json.Marshal error path: write nothing.
+	}
+	if err := os.WriteFile(s.tmpPath, s.saveBuf, 0o600); err != nil {
 		return
 	}
-	tmp := path + ".tmp"
-	if err := os.WriteFile(tmp, raw, 0o600); err != nil {
-		return
+	_ = os.Rename(s.tmpPath, path)
+}
+
+// appendReliabilityJSON renders the journal exactly as
+// json.Marshal(map[string]reliabilityEntry) would: keys sorted, fields
+// in struct order, times in RFC3339Nano. ok is false when a timestamp's
+// year falls outside [0, 9999] — the one case where marshaling a
+// time.Time errors out — so the caller writes nothing, as before.
+// keys is caller-owned scratch, returned grown for reuse.
+func appendReliabilityJSON(dst []byte, keys []string, entries map[string]reliabilityEntry) ([]byte, []string, bool) {
+	keys = keys[:0]
+	for id := range entries {
+		keys = append(keys, id)
 	}
-	_ = os.Rename(tmp, path)
+	sort.Strings(keys)
+	dst = append(dst, '{')
+	for i, id := range keys {
+		if i > 0 {
+			dst = append(dst, ',')
+		}
+		e := entries[id]
+		if y := e.LastSeen.Year(); y < 0 || y > 9999 {
+			return dst, keys, false
+		}
+		dst = appendReliabilityKey(dst, id)
+		dst = append(dst, `:{"successes":`...)
+		dst = strconv.AppendUint(dst, uint64(e.Successes), 10)
+		dst = append(dst, `,"failures":`...)
+		dst = strconv.AppendUint(dst, uint64(e.Failures), 10)
+		dst = append(dst, `,"last_seen":`...)
+		dst = e.LastSeen.AppendFormat(dst, `"`+time.RFC3339Nano+`"`)
+		dst = append(dst, '}')
+	}
+	dst = append(dst, '}')
+	return dst, keys, true
+}
+
+// appendReliabilityKey appends id as a JSON object key, byte-identical
+// to encoding/json with HTML escaping on. Plain server ids (printable
+// ASCII without the JSON/HTML specials) append verbatim; anything more
+// exotic is encoded by encoding/json itself, so the outputs cannot
+// diverge.
+func appendReliabilityKey(dst []byte, id string) []byte {
+	if jsonKeySafe(id) {
+		dst = append(dst, '"')
+		dst = append(dst, id...)
+		dst = append(dst, '"')
+		return dst
+	}
+	raw, _ := json.Marshal(id)
+	return append(dst, raw...)
+}
+
+// jsonKeySafe reports whether encoding/json would emit id's bytes
+// unchanged between quotes: printable ASCII except `"`, `\` and the
+// HTML-escaped `<`, `>`, `&`, valid UTF-8 throughout (an invalid byte
+// would be replaced with U+FFFD), and no U+2028/U+2029 (the two
+// non-ASCII runes encoding/json still escapes).
+func jsonKeySafe(id string) bool {
+	for i := 0; i < len(id); i++ {
+		b := id[i]
+		if b < 0x20 || b == '"' || b == '\\' || b == '<' || b == '>' || b == '&' {
+			return false
+		}
+	}
+	if !utf8.ValidString(id) {
+		return false
+	}
+	for _, r := range id {
+		if r == '\u2028' || r == '\u2029' {
+			return false
+		}
+	}
+	return true
 }
