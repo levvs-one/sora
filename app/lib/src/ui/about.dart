@@ -421,7 +421,13 @@ class _LicensesScreenState extends State<_LicensesScreen> {
             valueListenable: _search,
             builder: (context, value, _) {
               final query = value.text.trim().toLowerCase();
-              final names = data.keys.where((name) => name.toLowerCase().contains(query)).toList()
+              // Lowercased keys are computed once per pass, not once per
+              // filter candidate and again per sort comparison (the
+              // benchmark screen's sort-keys pattern). The comparator's
+              // values are unchanged, so the order — Sora first, then
+              // case-insensitive — is identical.
+              final lower = {for (final name in data.keys) name: name.toLowerCase()};
+              final names = data.keys.where((name) => lower[name]!.contains(query)).toList()
                 ..sort(
                   (a, b) => a == b
                       ? 0
@@ -429,7 +435,7 @@ class _LicensesScreenState extends State<_LicensesScreen> {
                       ? -1
                       : b == 'Sora'
                       ? 1
-                      : a.toLowerCase().compareTo(b.toLowerCase()),
+                      : lower[a]!.compareTo(lower[b]!),
                 );
               if (names.isEmpty) {
                 return Center(
