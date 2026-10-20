@@ -176,13 +176,15 @@ func TestRedactorParityKeySpellings(t *testing.T) {
 }
 
 // TestMaskPatternsDifferential pins the [pass3-opt] per-pattern gates:
-// maskPatterns must stay byte-identical to the unconditional five-pattern
+// maskPatterns must stay byte-identical to the unconditional pattern
 // pipeline on every input, ASCII or not. The reference below is that
 // pipeline verbatim.
 func TestMaskPatternsDifferential(t *testing.T) {
 	reference := func(s string) string {
 		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
 		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+		s = authHeaderPattern.ReplaceAllString(s, "${1}[masked]")
+		s = bearerPattern.ReplaceAllString(s, "${1}[masked]")
 		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
 		s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
 		s = uuidPattern.ReplaceAllString(s, "[masked]")
@@ -213,6 +215,9 @@ func TestMaskPatternsDifferential(t *testing.T) {
 		"пароль token: y",
 		"ключ: значение",
 		"obfs_param: p",
+		"access_token=xyz123",
+		"Authorization: Bearer abcdefgh123456",
+		"Bearer abcdefgh12345678",
 		"psk: p",
 		"key",
 		"user",
@@ -230,6 +235,48 @@ func TestMaskPatternsDifferential(t *testing.T) {
 	for _, in := range inputs {
 		if got, want := maskPatterns(in), reference(in); got != want {
 			t.Errorf("maskPatterns differs from unconditional pipeline:\n in: %q\nwant: %q\n got: %q", in, want, got)
+		}
+	}
+}
+
+// TestRedactorParityCompoundTokens pins the S5 seams extension shared by
+// both repos' redactors: compound *_token keys (access_token and friends,
+// snake and camelCase) and HTTP Authorization/Bearer credentials were
+// invisible to the canonical key alternation — \btoken\b has no word
+// boundary inside access_token, and "Authorization" has none after
+// "auth" — so both forms leaked verbatim into logs in both cores.
+func TestRedactorParityCompoundTokens(t *testing.T) {
+	leaks := []string{
+		"access_token=CompoundSecret111",
+		`access_token: "CompoundSecret111 phrase tail"`,
+		"refresh_token=CompoundSecret222",
+		"session_token: CompoundSecret333",
+		"id_token=CompoundSecret444",
+		"auth_token=CompoundSecret555",
+		"api_token=CompoundSecret666",
+		`"accessToken": "CompoundSecret777"`,
+		"Authorization: Bearer CompoundSecret888token",
+		"Authorization: Basic CompoundSecret999",
+		"curl -H 'Bearer CompoundSecret000abcdefgh'",
+	}
+	for _, in := range leaks {
+		out := maskPatterns(in)
+		if strings.Contains(out, "CompoundSecret") || strings.Contains(out, "phrase tail") {
+			t.Errorf("compound secret leaked:\n in: %q\nout: %q", in, out)
+		}
+		if !strings.Contains(out, "[masked]") {
+			t.Errorf("nothing masked:\n in: %q\nout: %q", in, out)
+		}
+	}
+	// Prose must survive: "bearer" without a token-shaped value is not
+	// a credential.
+	for _, in := range []string{
+		"bearer of good news",
+		"the bearer instrument is payable at sight",
+		"tokens are counted per bucket, 45ms",
+	} {
+		if out := maskPatterns(in); out != in {
+			t.Errorf("benign text changed:\n in: %q\nout: %q", in, out)
 		}
 	}
 }

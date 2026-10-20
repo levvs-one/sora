@@ -106,7 +106,7 @@ var (
 	// public[_-]?key is present on both sides.
 	// TestRedactorParityKeySpellings in both repos pins this list by
 	// execution.
-	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|pre[_-]?shared[_-]?key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("[^"]*"|'[^']*'|\S+)`)
+	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|(?:access|refresh|session|id|auth|api)[_-]?token|token|private[_-]?key|pre[_-]?shared[_-]?key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("[^"]*"|'[^']*'|\S+)`)
 	// strictKeyValuePattern masks short generic credential keys only with
 	// an explicit assignment: a bare space after "user" or "login" is
 	// usually prose ("user agent", "login failed"), not a credential pair.
@@ -120,6 +120,16 @@ var (
 	// bare token with no userinfo, such as vmess://base64json. The
 	// fragment stays readable: it is the user's display name.
 	tokenLinkPattern = regexp.MustCompile(`(?i)\b(vmess|ssr)://[A-Za-z0-9+/_=-]+`)
+	// authHeaderPattern masks HTTP Authorization credentials
+	// (Authorization: Bearer/Basic ...): the keyValue alternation cannot
+	// see them — after "auth" in "Authorization" there is no word
+	// boundary, and the credential itself carries no key at all.
+	authHeaderPattern = regexp.MustCompile(`(?i)\b(authorization\s*[:=]\s*(?:bearer|basic)\s+)(\S+)`)
+	// bearerPattern masks a bare Bearer token (curl-style dumps, proxy
+	// logs) with no Authorization header around it. The value must look
+	// like a token (12+ token characters) so prose ("bearer of news",
+	// "bearer instrument") is never masked.
+	bearerPattern = regexp.MustCompile(`(?i)\b(bearer\s+)([A-Za-z0-9._~+/=-]{12,})`)
 )
 
 // gateWords is the conservative fast path for maskPatterns: every
@@ -136,7 +146,7 @@ var (
 // measured 24µs per line, nearly as slow as the patterns themselves.
 var gateWords = []string{
 	"://", "uuid", "password", "passwd", "secret", "token", "key", "param",
-	"auth", "psk", "username", "user", "login", "spider", "short",
+	"auth", "psk", "username", "user", "login", "spider", "short", "bearer",
 }
 
 // gateContains reports whether s holds any gate word, case-insensitively.
@@ -181,6 +191,7 @@ type gateFlags struct {
 	key    bool // a keyGateWords substring: keyValuePattern may match
 	strict bool // "user"/"login" present: strictKeyValuePattern may match
 	uuid   bool // at least four dashes: uuidPattern may match
+	bearer bool // "bearer"/"authorization" present: authHeaderPattern/bearerPattern may match
 }
 
 // matchFoldAt reports whether w (lowercase ASCII) occurs in s at i,
@@ -248,12 +259,19 @@ func gateFlagsASCII(s string) gateFlags {
 			if matchFoldAt(s, i, "auth") {
 				f.key = true
 			}
+			if matchFoldAt(s, i, "authorization") {
+				f.bearer = true
+			}
+		case 'b':
+			if matchFoldAt(s, i, "bearer") || matchFoldAt(s, i, "basic") {
+				f.bearer = true
+			}
 		case 'l':
 			if matchFoldAt(s, i, "login") {
 				f.strict = true
 			}
 		}
-		if f.scheme && f.key && f.strict && dashes >= 4 {
+		if f.scheme && f.key && f.strict && f.bearer && dashes >= 4 {
 			break
 		}
 	}
@@ -273,6 +291,8 @@ func maskPatterns(s string) string {
 		}
 		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
 		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+		s = authHeaderPattern.ReplaceAllString(s, "${1}[masked]")
+		s = bearerPattern.ReplaceAllString(s, "${1}[masked]")
 		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
 		s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
 		s = uuidPattern.ReplaceAllString(s, "[masked]")
@@ -294,12 +314,16 @@ func maskPatterns(s string) string {
 	// byte-identical to the unconditional pipeline (pinned by
 	// TestMaskPatternsDifferential).
 	f := gateFlagsASCII(s)
-	if !f.scheme && !f.key && !f.strict && !f.uuid {
+	if !f.scheme && !f.key && !f.strict && !f.uuid && !f.bearer {
 		return s
 	}
 	if f.scheme {
 		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
 		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+	}
+	if f.bearer {
+		s = authHeaderPattern.ReplaceAllString(s, "${1}[masked]")
+		s = bearerPattern.ReplaceAllString(s, "${1}[masked]")
 	}
 	if f.key {
 		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
