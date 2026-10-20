@@ -519,7 +519,19 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
-  Future<List<int>> _fetch(Uri uri, {required int limit, File? target, int? size}) async {
+  /// Fetches [uri] into memory or [target]. When [target] is given, [size]
+  /// drives the progress indicator: [progressBase] bytes were already
+  /// downloaded by earlier files of the same flow and [progressTotal] is the
+  /// sum of all their sizes, so the bar fills once across the whole download
+  /// instead of restarting for every file.
+  Future<List<int>> _fetch(
+    Uri uri, {
+    required int limit,
+    File? target,
+    int? size,
+    int progressBase = 0,
+    int? progressTotal,
+  }) async {
     final client = _client();
     _clients.add(client);
     IOSink? sink;
@@ -552,7 +564,8 @@ class AppUpdater extends ChangeNotifier {
           sink.add(chunk);
           // Flush each chunk to bound memory while fetching large core packages.
           await sink.flush();
-          final next = size == null ? null : received / size;
+          final total = progressTotal ?? size ?? 0;
+          final next = total <= 0 ? null : (progressBase + received).clamp(0, total) / total;
           if (next != null && (progress == null || (next * 100).floor() != (progress! * 100).floor())) {
             progress = next;
             notifyListeners();
@@ -634,11 +647,23 @@ class AppUpdater extends ChangeNotifier {
       }
       await File('${work.path}/SHA256SUMS').writeAsString(manifest, flush: true);
       await File('${work.path}/SHA256SUMS.minisig').writeAsBytes(sigBytes, flush: true);
+      // Progress spans the whole download phase, so the bar fills once across
+      // all package files instead of restarting at zero for every file.
+      final totalSize = assets.fold<int>(0, (sum, asset) => sum + asset.size);
+      var downloaded = 0;
       for (final asset in assets) {
         final file = File('${work.path}/${asset.name}');
         stage = UpdateStage.downloading;
         notifyListeners();
-        await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);
+        await _fetch(
+          asset.url,
+          limit: asset.size,
+          target: file,
+          size: asset.size,
+          progressBase: downloaded,
+          progressTotal: totalSize,
+        );
+        downloaded += asset.size;
         // Integrity check only: the file hash must match the manifest, but
         // the manifest signature (.minisig) is not verified in-app — the
         // release-signing key ceremony is still pending, so only the TLS
