@@ -318,6 +318,17 @@ func (c Capabilities) MissingFor(p *Plan, v Version) []string {
 		}
 	}
 	if c.Kind == KindXray {
+		if len(p.DNS.NameserverPolicy) > 0 {
+			// PASS3 deep A6: sing-box renders the policy as DNS
+			// rules and mihomo as nameserver-policy, but the Xray
+			// DNS renderer does not read it at all — a split-DNS
+			// plan routed here would silently resolve "direct"
+			// domains through the tunnel resolver. Report it
+			// missing until the policy is mapped onto Xray DNS
+			// server objects with `domains` (spec in
+			// PASS3-TRANSPORT.md; needs `xray run -test` on the pin).
+			missing = append(missing, "DNS nameserver policy (split DNS)")
+		}
 		for _, o := range p.Outbounds {
 			if o.TLS.Insecure && !o.TLS.Reality && (o.TLS.Enabled || o.Protocol == ProtocolTrojan || o.Protocol == ProtocolHysteria2) {
 				missing = append(missing, "TLS verification disabled (removed by Xray)")

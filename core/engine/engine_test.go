@@ -436,6 +436,28 @@ func TestFakeIPRange6Validation(t *testing.T) {
 	}
 }
 
+// TestXrayMissesNameserverPolicy pins PASS3 deep A6: the Xray DNS
+// renderer does not read DNS.NameserverPolicy at all, so a split-DNS
+// plan must report it missing there instead of being routed into a
+// silent loss; sing-box and mihomo render the policy and must not
+// report it.
+func TestXrayMissesNameserverPolicy(t *testing.T) {
+	p := validPlan()
+	p.DNS = DNS{Enabled: true, NameserverPolicy: map[string][]string{"+.ru": {"1.1.1.1"}}}
+	if missing := strings.Join(Catalog[KindXray].Missing(p), " "); !strings.Contains(missing, "nameserver policy") {
+		t.Errorf("xray must report the nameserver policy missing, got %q", missing)
+	}
+	for _, kind := range []Kind{KindSingBox, KindMihomo} {
+		if missing := strings.Join(Catalog[kind].Missing(p), " "); strings.Contains(missing, "nameserver policy") {
+			t.Errorf("%s renders the policy and must not report it missing, got %q", kind, missing)
+		}
+	}
+	p.DNS.NameserverPolicy = nil
+	if missing := strings.Join(Catalog[KindXray].Missing(p), " "); strings.Contains(missing, "nameserver policy") {
+		t.Errorf("a plan without a policy must not report it, got %q", missing)
+	}
+}
+
 // TestCatalogXmuxClaimMatchesRenderers pins PASS3 deep S1 as staged
 // by PASS3 deep A1: the mihomo renderer now emits reuse-settings and
 // x-padding-bytes, but no catalog entry may claim FeatureXHTTPXmux
