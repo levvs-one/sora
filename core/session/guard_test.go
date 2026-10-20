@@ -71,3 +71,52 @@ func TestCompositeGuardBlockedReportsAnyPart(t *testing.T) {
 		t.Fatalf("NoopGuard.Blocked() = %v, %v, want false", blocked, err)
 	}
 }
+
+// flakyHoldGuard is a BlockHolder whose release fails its first
+// attempt, staging a transient disarm failure in one composite part.
+type flakyHoldGuard struct {
+	fakeGuard
+	attempts int
+	released int
+}
+
+func (g *flakyHoldGuard) HoldBlock(context.Context) (func(context.Context) error, error) {
+	return func(context.Context) error {
+		g.attempts++
+		if g.attempts == 1 {
+			return errors.New("nftables busy")
+		}
+		g.released++
+		return nil
+	}, nil
+}
+
+// The composite release must be retryable the way its parts are: it
+// used to cache the joined result through a sync.Once, so one part's
+// transient failure made every composite retry return the cached
+// error without ever re-calling the failed part.
+func TestCompositeHoldReleaseRetriesAFailedPart(t *testing.T) {
+	part := &flakyHoldGuard{}
+	guard := NewCompositeGuard(part, &fakeGuard{})
+	release, err := guard.(BlockHolder).HoldBlock(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := release(context.Background()); err == nil {
+		t.Fatal("the part's failure was hidden by the composite release")
+	}
+	if err := release(context.Background()); err != nil {
+		t.Fatalf("retrying the composite release: %v", err)
+	}
+	if part.released != 1 {
+		t.Errorf("the failed part was released %d times, want 1 (its failure was never retried)", part.released)
+	}
+	// Success is final: a duplicate release must not call the part again.
+	attempts := part.attempts
+	if err := release(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if part.attempts != attempts {
+		t.Error("a duplicate composite release after success re-called the part")
+	}
+}

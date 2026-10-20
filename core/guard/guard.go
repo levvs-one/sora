@@ -84,6 +84,16 @@ type Guard struct {
 	// firewall armed, so a server switch with the kill switch wanted on
 	// both sides never opens a direct-traffic window.
 	holds int
+	// disarmPending records that releasing the last hold already tried
+	// to drop the block and the firewall refused: the block is still
+	// physically armed but no session and no hold wants it any more.
+	// The hold count is NOT finalised while it is set, so a retry of
+	// the same release — or a Restore, which would normally keep the
+	// block under an outstanding hold — repeats the Disarm instead of
+	// leaving the block stuck armed with no owner. This is the same
+	// rule Restore itself follows: retain armed state after a failed
+	// restore so subsequent cleanup can retry.
+	disarmPending bool
 }
 
 // New creates a guard. Nil uses NoopFirewall for platforms without a
@@ -135,6 +145,12 @@ func (g *Guard) Apply(ctx context.Context, settings session.Settings) error {
 	}
 	if err := g.applyKillSwitch(ctx, settings.KillSwitch); err != nil {
 		return err
+	}
+	if settings.KillSwitch {
+		// A block a failed hold release still owed a disarm for is
+		// wanted again: the pending disarm is cancelled, not carried
+		// into a session that asked for the block.
+		g.disarmPending = false
 	}
 	g.applied = settings
 	return nil
@@ -282,29 +298,69 @@ func (g *Guard) HoldBlock(ctx context.Context) (func(context.Context) error, err
 		}
 	}
 	g.holds++
-	var once sync.Once
-	var relErr error
+	// The release is idempotent only on success. A sync.Once that
+	// caches the first result would also cache a transient Disarm
+	// failure forever — the block stuck armed with nobody able to
+	// retry — so a failed release stays callable: each call re-enters
+	// releaseBlockHold until one succeeds, and only then is this
+	// hold's release final. A duplicate call after success returns
+	// nil without touching the hold count again, so it can never
+	// consume another hold's count.
+	var mu sync.Mutex
+	done := false
 	release := func(ctx context.Context) error {
-		once.Do(func() { relErr = g.releaseBlockHold(ctx) })
-		return relErr
+		mu.Lock()
+		defer mu.Unlock()
+		if done {
+			return nil
+		}
+		if err := g.releaseBlockHold(ctx); err != nil {
+			return err
+		}
+		done = true
+		return nil
 	}
 	return release, nil
 }
 
 // releaseBlockHold drops one hold and, for the last one, disarms the
 // block no session re-applied while switching. A block the new (or
-// rolled-back) session applied is left exactly as it was.
+// rolled-back) session applied is left exactly as it was. A failed
+// Disarm does not finalise the release: the hold count is kept and
+// disarmPending is set, so the next release call — or a Restore —
+// repeats the Disarm. A call that finds its hold already finalised by
+// a Restore retry (the count is gone and no disarm is pending) is a
+// no-op success.
 func (g *Guard) releaseBlockHold(ctx context.Context) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if g.holds > 0 {
-		g.holds--
-	}
-	if g.holds == 0 && g.mode == ModeStandard && !g.applied.KillSwitch {
-		if err := g.firewall.Disarm(ctx); err != nil {
-			return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
+	if g.holds == 0 {
+		if !g.disarmPending {
+			return nil
 		}
+		// A previous attempt left a pending disarm and a later path
+		// already dropped the count: this call owns the retry.
+		if g.mode == ModeStandard && !g.applied.KillSwitch {
+			if err := g.firewall.Disarm(ctx); err != nil {
+				return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
+			}
+		}
+		g.disarmPending = false
+		return nil
 	}
+	if g.holds > 1 || g.mode != ModeStandard || g.applied.KillSwitch {
+		g.holds--
+		return nil
+	}
+	// The last hold, standard mode, nothing re-applied the switch:
+	// dropping the block is the release. Only a successful Disarm
+	// finalises it.
+	if err := g.firewall.Disarm(ctx); err != nil {
+		g.disarmPending = true
+		return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
+	}
+	g.holds--
+	g.disarmPending = false
 	return nil
 }
 
@@ -321,6 +377,23 @@ func (g *Guard) Restore(ctx context.Context) error {
 	defer func() { g.restoring = false }()
 
 	if g.mode == modeStrict {
+		g.applied = session.Settings{}
+		return nil
+	}
+	if g.disarmPending && !g.applied.KillSwitch {
+		// A hold release already tried to drop this block and the
+		// firewall refused. The switch that held it is over — this
+		// Restore is the retry the failed release kept the state for,
+		// not a restore under a live hold, so it disarms instead of
+		// keeping the block. A failure keeps the pending state (and
+		// the count) so the next cleanup retries again.
+		if err := g.firewall.Disarm(ctx); err != nil {
+			return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
+		}
+		if g.holds > 0 {
+			g.holds--
+		}
+		g.disarmPending = false
 		g.applied = session.Settings{}
 		return nil
 	}

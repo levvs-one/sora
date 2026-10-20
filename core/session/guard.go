@@ -60,7 +60,11 @@ type Guard interface {
 // ownership of the settings without lifting the block itself. A hold is
 // a count, not the guard lock — implementations must return promptly and
 // let Apply/Restore run while a hold is outstanding. The returned
-// release is idempotent; releasing the last hold lifts the block only
+// release is idempotent on success — a duplicate call never consumes
+// another hold — but a release whose final disarm FAILED must stay
+// retryable: it must not cache the failure as final, and either a
+// retry of the same release or a later Restore must be able to repeat
+// the disarm. Releasing the last hold lifts the block only
 // when no applied settings want it any more. Guards that do not
 // implement BlockHolder keep the previous switch behaviour (a window
 // with no block between the old Restore and the new Apply).
@@ -241,15 +245,28 @@ func (c *compositeGuard) HoldBlock(ctx context.Context) (func(context.Context) e
 	if len(releases) == 0 {
 		return nil, errBlockHoldUnsupported
 	}
-	var once sync.Once
-	var relErr error
+	// Idempotent on success only, like the parts: caching a failure
+	// through a sync.Once would make a transient disarm failure of
+	// one part unretryable through the composite. Parts that already
+	// released successfully answer a retry with nil, so re-running
+	// the whole list only re-attempts the parts that failed.
+	var mu sync.Mutex
+	done := false
 	return func(ctx context.Context) error {
-		once.Do(func() {
-			for i := len(releases) - 1; i >= 0; i-- {
-				relErr = errors.Join(relErr, releases[i](ctx))
-			}
-		})
-		return relErr
+		mu.Lock()
+		defer mu.Unlock()
+		if done {
+			return nil
+		}
+		var relErr error
+		for i := len(releases) - 1; i >= 0; i-- {
+			relErr = errors.Join(relErr, releases[i](ctx))
+		}
+		if relErr != nil {
+			return relErr
+		}
+		done = true
+		return nil
 	}, nil
 }
 
