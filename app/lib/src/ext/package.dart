@@ -38,6 +38,13 @@ const String signatureName = 'signature.minisig';
 /// An opened, not yet trusted .soraext archive.
 class ExtPackage {
   ExtPackage._(this.files, this.manifest);
+
+  /// Rebuilds a package from files already extracted on disk (a previous
+  /// version kept for rollback) so its signature and checksums can be
+  /// re-verified before it is restored. The caller supplies the manifest
+  /// parsed from the same directory.
+  factory ExtPackage.fromFiles(Map<String, Uint8List> files, ExtManifest manifest) =>
+      ExtPackage._(Map.of(files), manifest);
   final Map<String, Uint8List> files;
   final ExtManifest manifest;
 

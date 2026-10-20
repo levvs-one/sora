@@ -208,9 +208,12 @@ class ExtensionStore extends ChangeNotifier {
   /// the previously installed version (empty for a fresh install) so the UI
   /// can re-prompt on widening updates.
   ///
-  /// [authorKeyPin] carries the catalog-pinned author key for catalog
+  /// Installs an already-opened package.
+  ///
+  /// The signature and checksums are verified here — this is the single
+  /// gate, so callers must not be relied upon to verify first.
   /// installs and is required then: the package signature is verified
-  /// against the pin (see [installBytes]), never against the manifest's
+  /// against the pin, never against the manifest's
   /// self-attested key, and the pin becomes the extension's trust anchor.
   /// For other sources the pin is ignored and the manifest's key is
   /// trusted on first use. An update whose author key differs from the
@@ -247,6 +250,12 @@ class ExtensionStore extends ChangeNotifier {
     if (source == 'catalog' && (authorKeyPin == null || authorKeyPin.trim().isEmpty)) {
       throw ExtStoreError('catalog install of "${m.id}" needs the catalog-pinned author key');
     }
+    // Single verification gate: install() verifies the signature and
+    // checksums itself instead of trusting every caller to have done it.
+    // Callers may still verify earlier (e.g. to fail before showing the
+    // install prompt), but no package reaches the disk unverified through
+    // here. Throws [PackageError] on any integrity/authenticity failure.
+    await pkg.verify(authorKeyLine: source == 'catalog' ? authorKeyPin : null);
     // Extract to a staging dir first; only touch the registry when the
     // content is fully on disk.
     final dst = _contentDir(m.id, m.version);
@@ -317,12 +326,14 @@ class ExtensionStore extends ChangeNotifier {
     } on PackageError catch (e) {
       throw ExtStoreError(e.message);
     }
+    // Signature/checksum verification is the gate inside install(); wrap
+    // its PackageError so this convenience entry point keeps reporting a
+    // uniform ExtStoreError.
     try {
-      await pkg.verify(authorKeyLine: authorKeyPin);
+      return await install(pkg, source: source, granted: granted, authorKeyPin: authorKeyPin);
     } on PackageError catch (e) {
       throw ExtStoreError(e.message);
     }
-    return install(pkg, source: source, granted: granted, authorKeyPin: authorKeyPin);
   }
 
   /// One-tap enable/disable. Disabling takes effect immediately: the panel
@@ -336,6 +347,11 @@ class ExtensionStore extends ChangeNotifier {
   }
 
   /// Restores the N-1 version kept at install time.
+  ///
+  /// The previous version's signature and checksums are re-verified
+  /// against the pinned author key before anything is touched: a tampered
+  /// N-1 fails the rollback (fail closed) instead of becoming the served
+  /// version.
   Future<void> rollback(String id) async {
     final cur = _installed[id];
     if (cur == null) throw ExtStoreError('"$id" is not installed');
@@ -343,10 +359,29 @@ class ExtensionStore extends ChangeNotifier {
     if (prev == null) throw ExtStoreError('"$id" has no previous version');
     final prevDir = Directory(_contentDir(id, prev));
     if (!await prevDir.exists()) throw ExtStoreError('previous version of "$id" is missing');
-    await Directory(_contentDir(id, cur.version)).delete(recursive: true);
     // Re-read the previous manifest from disk (source of truth).
     final manFile = File('${prevDir.path}${Platform.pathSeparator}$manifestName');
     final prevManifest = ExtManifest.parse(await manFile.readAsString());
+    if (prevManifest.id != id || prevManifest.version != prev) {
+      throw ExtStoreError('previous manifest of "$id" does not match version "$prev"');
+    }
+    // Re-verify the on-disk files against the pinned author key (the trust
+    // anchor), never against the on-disk manifest's self-attested key.
+    final files = <String, Uint8List>{};
+    final prefix = '${prevDir.path}${Platform.pathSeparator}';
+    await for (final e in prevDir.list(recursive: true, followLinks: false)) {
+      if (e is! File) continue;
+      if (!e.path.startsWith(prefix)) continue; // paranoia: stay inside prevDir
+      files[e.path.substring(prefix.length).replaceAll(Platform.pathSeparator, '/')] =
+          await e.readAsBytes();
+    }
+    try {
+      await ExtPackage.fromFiles(files, prevManifest)
+          .verify(authorKeyLine: cur.authorKey ?? cur.manifest.author.publicKey);
+    } on PackageError catch (e) {
+      throw ExtStoreError('previous version of "$id" failed its integrity re-check: ${e.message}');
+    }
+    await Directory(_contentDir(id, cur.version)).delete(recursive: true);
     _installed[id] = InstalledExtension(
       manifest: prevManifest,
       enabled: cur.enabled,
