@@ -73,6 +73,63 @@ func TestGradeTLSWithoutHardening(t *testing.T) {
 	}
 }
 
+func TestGradeStaleFingerprint(t *testing.T) {
+	// An explicitly pinned outdated Chrome parrot is a likely cause of
+	// blocking (TSPU field tests), not a cosmetic issue.
+	o := enginetest.Outbound(engine.ProtocolVMess)
+	o.TLS.Fingerprint = "hellochrome_133"
+	rep := Grade(planWith(o))
+	if got := codes(rep)["tls/fp-stale"]; got != SeverityHigh {
+		t.Fatalf("stale pinned parrot should be high risk, got %q", got)
+	}
+	// The fresh auto parrot must not warn.
+	o.TLS.Fingerprint = "hellochrome_auto"
+	if _, ok := codes(Grade(planWith(o)))["tls/fp-stale"]; ok {
+		t.Fatal("fresh auto parrot should not warn")
+	}
+	// The portable alias cannot be judged stale without measuring the
+	// engine's bytes (that is the JA4 self-test's job).
+	o.TLS.Fingerprint = "chrome"
+	if _, ok := codes(Grade(planWith(o)))["tls/fp-stale"]; ok {
+		t.Fatal("alias fingerprint should not be judged stale by name")
+	}
+}
+
+func TestGradeNoPQKeyShare(t *testing.T) {
+	o := enginetest.Outbound(engine.ProtocolVMess)
+	o.TLS.Fingerprint = "hellochrome_120"
+	if got := codes(Grade(planWith(o)))["tls/no-pq-keyshare"]; got != SeverityMedium {
+		t.Fatalf("pre-PQ parrot should warn, got %q", got)
+	}
+	o.TLS.Fingerprint = "hellochrome_131"
+	if _, ok := codes(Grade(planWith(o)))["tls/no-pq-keyshare"]; ok {
+		t.Fatal("Chrome 131+ parrot must not warn about PQ key share")
+	}
+}
+
+func TestGradeRandomizedFingerprint(t *testing.T) {
+	o := enginetest.Outbound(engine.ProtocolVMess)
+	o.TLS.Fingerprint = "randomized"
+	if got := codes(Grade(planWith(o)))["tls/fp-randomized"]; got != SeverityLow {
+		t.Fatalf("randomized fingerprint should warn low, got %q", got)
+	}
+	// Randomized is worse than exact imitation, better than nothing:
+	// it must not trigger the missing-fingerprint finding.
+	if _, ok := codes(Grade(planWith(o)))["tls/no-utls"]; ok {
+		t.Fatal("explicit fingerprint should not warn as missing")
+	}
+}
+
+func TestGradeStaleRealityFingerprint(t *testing.T) {
+	// REALITY's fingerprint is the decoy handshake DPI sees: a stale
+	// pinned parrot is just as bad there.
+	o := enginetest.Outbound(engine.ProtocolVLESS)
+	o.TLS.Fingerprint = "hellochrome_131"
+	if got := codes(Grade(planWith(o)))["tls/fp-stale"]; got != SeverityHigh {
+		t.Fatalf("stale REALITY parrot should be high risk, got %q", got)
+	}
+}
+
 func TestGradeFragmentClearsFinding(t *testing.T) {
 	p := planWith(enginetest.Outbound(engine.ProtocolVMess))
 	p.Options.Fragment = engine.Fragment{Enabled: true, Packets: "tlshello"}

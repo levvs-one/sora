@@ -177,6 +177,7 @@ func gradeWireGuard(o engine.Outbound, add func(string, Severity, string, string
 
 // amneziaZero reports whether the parameters leave stock WireGuard
 // behaviour: with everything at zero AmneziaWG speaks plain WireGuard.
+// The 3.x compatibility sentinels (H1=1..H4=4) also mean "off".
 func amneziaZero(a *engine.AmneziaWG) bool {
 	hdrs := []string{a.H1, a.H2, a.H3, a.H4}
 	for i, h := range hdrs {
@@ -196,7 +197,9 @@ func amneziaZero(a *engine.AmneziaWG) bool {
 }
 
 // staticHeaders reports whether any header is a single constant rather
-// than a 2.0-style range ("100000-800000").
+// than a 2.0-style range ("100000-800000"). With 3.x header protection
+// the type word is masked on the wire, so the header values (usually
+// the 1-4 compatibility sentinels) stop mattering.
 func staticHeaders(a *engine.AmneziaWG) bool {
 	if a.HeaderProtectionKey != "" {
 		return false
@@ -213,6 +216,37 @@ func staticHeaders(a *engine.AmneziaWG) bool {
 }
 
 func gradeTLS(o engine.Outbound, fragment bool, add func(string, Severity, string, string)) {
+	fp := engine.NormalizeFingerprint(o.TLS.Fingerprint)
+	if fp != "" {
+		// An explicitly pinned old Chrome parrot is not "old but
+		// working": per the Oct 2026 TSPU field tests, Chrome 133 and
+		// older are actively blocked, so this is a likely cause of
+		// connection failure, not a cosmetic issue.
+		if engine.IsStaleParrot(fp) {
+			add("tls/fp-stale", SeverityHigh,
+				"uTLS fingerprint "+fp+" pins an outdated Chrome parrot (TSPU blocks Chrome 133 and older)",
+				"use the fresh auto parrot (hellochrome_auto for Xray, chrome for sing-box/mihomo) instead of a pinned version")
+		}
+		// A "modern Chrome" ClientHello without the X25519MLKEM768 key
+		// share is a contradiction visible to DPI before any HTTP.
+		// Only a proven-missing key share warns (explicit pre-131
+		// Chrome parrot); for every other name sora has no claim and
+		// stays silent (see engine.KnownMissingPQKeyShare).
+		if engine.KnownMissingPQKeyShare(fp) {
+			add("tls/no-pq-keyshare", SeverityMedium,
+				"uTLS fingerprint "+fp+" predates the post-quantum key share (Chrome 131+); ~90% of real Chrome traffic has it",
+				"use a current Chrome parrot so the ClientHello offers X25519MLKEM768")
+		}
+		// Detector research (2025-2026) consensus: randomized TLS
+		// fingerprints match no real browser population and make the
+		// client more detectable, not less. Exact imitation of a
+		// current browser beats randomization.
+		if engine.IsRandomizedFingerprint(fp) {
+			add("tls/fp-randomized", SeverityLow,
+				"randomized uTLS fingerprint matches no real browser population (JA4 was designed to resist randomization)",
+				"prefer exact imitation of a current browser; keep randomized only as a manual fallback")
+		}
+	}
 	if o.TLS.Reality {
 		// REALITY completes a genuine TLS handshake with the decoy site:
 		// there is no proxy handshake on the wire at all.
@@ -231,7 +265,7 @@ func gradeTLS(o engine.Outbound, fragment bool, add func(string, Severity, strin
 	if o.TLS.Fingerprint == "" {
 		add("tls/no-utls", SeverityMedium,
 			"TLS ClientHello uses the engine default, which JA3-style fingerprinting distinguishes from browsers",
-			"set a uTLS fingerprint such as chrome")
+			"set a current uTLS fingerprint (chrome = newest verified Chrome parrot); never pin an outdated version")
 	}
 	if !fragment {
 		add("tls/no-fragment", SeverityMedium,
