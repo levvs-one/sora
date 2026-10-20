@@ -211,7 +211,7 @@ func TestTunStackNeverSilentlyDroppedOnSingBox115(t *testing.T) {
 	} {
 		p.Tun.Stack = tc.stack
 		caps := BuildCapabilities(KindSingBox, mustVersion(t, tc.version), nil)
-		missing := caps.Missing(p)
+		missing := caps.MissingFor(p, mustVersion(t, tc.version))
 		if got := len(missing) != 0; got != tc.wantMissing {
 			t.Errorf("version %s stack %q: missing=%v, want missing=%v (%v)",
 				tc.version, tc.stack, got, tc.wantMissing, missing)

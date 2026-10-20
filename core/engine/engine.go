@@ -64,7 +64,7 @@ const (
 	// from the id/ip/ib masquerade sugar (sing-box-lx with_awg). Other
 	// engines would silently send no decoy at all.
 	FeatureAmneziaMasquerade Feature = "amneziawg-masquerade"
-	FeaturePrivateControl Feature = "private-control"
+	FeaturePrivateControl    Feature = "private-control"
 	// FeatureChains marks engines able to dial one outbound through another
 	// (sing-box dialer_proxy, mihomo dialer-proxy, Xray dialerProxy).
 	FeatureChains Feature = "chains"
@@ -88,12 +88,6 @@ type Capabilities struct {
 	MinVersion string
 	Protocols  map[Protocol]bool
 	Features   map[Feature]bool
-	// tunStackIgnored marks builds whose TUN rewrite ignores the stack
-	// option (sing-box 1.15+): an explicit plan stack would silently do
-	// nothing there, so Missing reports it. Set by BuildCapabilities
-	// from the probed version; the zero value keeps the legacy
-	// stack-selecting behavior for raw catalog entries.
-	tunStackIgnored bool
 }
 
 // SupportsProtocol reports whether the engine can build an outbound for p.

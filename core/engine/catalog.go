@@ -104,13 +104,6 @@ var Catalog = map[Kind]Capabilities{
 	},
 }
 
-// isLXFork reports whether version is the sing-box-lx fork (AmneziaWG,
-// XHTTP, VLESS Encryption), which versions itself as "<base>-lx.<n>".
-func isLXFork(version Version) bool {
-	return strings.HasPrefix(version.PreRelease, "lx.") &&
-		!version.Less(Version{Major: 1, Minor: 14, Patch: 3})
-}
-
 // xrayPlaintextCutoff is the first Xray release that refuses plaintext
 // (no TLS, no REALITY) VLESS/Trojan outbounds at config load instead of
 // silently connecting without encryption. The shipped pin (26.3.27, see
@@ -171,10 +164,8 @@ func (c Capabilities) XrayPlaintextMissing(p *Plan, v Version) []string {
 // suffix alone cannot prove that an optional transport was compiled in.
 func BuildCapabilities(kind Kind, version Version, tags []string) Capabilities {
 	caps := Catalog[kind]
-	if kind != KindSingBox {
-		return caps
-	}
-	if isLXFork(version) {
+	if kind == KindSingBox && strings.HasPrefix(version.PreRelease, "lx.") &&
+		!version.Less(Version{Major: 1, Minor: 14, Patch: 3}) {
 		caps.Features = maps.Clone(caps.Features)
 		caps.Features[FeatureXHTTP] = slices.Contains(tags, "with_xhttp")
 		caps.Features[FeatureVLESSEncrypt] = true
@@ -185,17 +176,7 @@ func BuildCapabilities(kind Kind, version Version, tags []string) Capabilities {
 			caps.Features[FeatureAmneziaWG3] = true
 			caps.Features[FeatureAmneziaMasquerade] = true
 		}
-		// The lx. fork tracks sing-box 1.14, so its floor stays 1.14.3
-		// while upstream moved to 1.15: raising the pin must not reject
-		// the shipped fork (packaging/engines/engines.lock pins
-		// sing-box-lx v1.14.3-lx.14).
-		caps.MinVersion = "1.14.3"
 	}
-	// sing-box 1.15 rewrote TUN around its own TCP/IP stack: the stack
-	// option is deprecated there (removed in 1.17) and silently ignored.
-	// Less compares only the numeric triple, so fork builds compare by
-	// their base version.
-	caps.tunStackIgnored = !version.Less(Version{Major: 1, Minor: 15})
 	return caps
 }
 
@@ -219,6 +200,18 @@ type Selection struct {
 	// Rejected lists skipped engines in preference order so clients can
 	// explain selection failures.
 	Rejected []string
+}
+
+// singBoxFloor returns the minimum accepted sing-box version for a probed
+// build: 1.15.0 upstream, 1.14.3 for the 1.14-based lx. fork (which
+// versions itself as "<base>-lx.<n>"). Raising the upstream pin must not
+// reject the shipped fork (packaging/engines/engines.lock pins
+// sing-box-lx v1.14.3-lx.14).
+func singBoxFloor(v Version) string {
+	if strings.HasPrefix(v.PreRelease, "lx.") && !v.Less(Version{Major: 1, Minor: 14, Patch: 3}) {
+		return "1.14.3"
+	}
+	return Catalog[KindSingBox].MinVersion
 }
 
 // SelectEngine chooses the first available engine supporting the whole plan. It
@@ -251,11 +244,15 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 			continue
 		}
 		caps = BuildCapabilities(kind, avail.Version, avail.BuildTags)
-		if lowest, err := ParseVersion(caps.MinVersion); err == nil && avail.Version.Less(lowest) {
-			rejected = append(rejected, fmt.Sprintf("%s: version %s is older than %s", kind, avail.Version, caps.MinVersion))
+		floor := caps.MinVersion
+		if kind == KindSingBox {
+			floor = singBoxFloor(avail.Version)
+		}
+		if lowest, err := ParseVersion(floor); err == nil && avail.Version.Less(lowest) {
+			rejected = append(rejected, fmt.Sprintf("%s: version %s is older than %s", kind, avail.Version, floor))
 			continue
 		}
-		missing := caps.Missing(p)
+		missing := caps.MissingFor(p, avail.Version)
 		missing = append(missing, caps.XrayPlaintextMissing(p, avail.Version)...)
 		if len(missing) > 0 {
 			rejected = append(rejected, fmt.Sprintf("%s: cannot carry %s", kind, strings.Join(missing, ", ")))
@@ -273,13 +270,23 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 // Missing returns sorted protocols and features the engine cannot support.
 // Empty means the whole plan is supported.
 func (c Capabilities) Missing(p *Plan) []string {
+	return c.MissingFor(p, Version{})
+}
+
+// MissingFor is Missing against one concrete engine build. A zero version
+// keeps the legacy contract: the TUN stack option is assumed honored,
+// as on sing-box before 1.15 (including the 1.14-based lx. fork).
+func (c Capabilities) MissingFor(p *Plan, v Version) []string {
 	var missing []string
 	if p.Tun.Enabled && p.Tun.Stack != "" {
-		// sing-box 1.15+ ignores the stack option outright (see
-		// tunStackIgnored): an explicit stack would silently do
-		// nothing, so it is reported missing instead.
+		// sing-box 1.15 rewrote TUN around its own TCP/IP stack: the
+		// stack option is deprecated there (removed in 1.17) and
+		// silently ignored, so an explicit stack would do nothing.
+		// Less compares only the numeric triple, so fork builds
+		// compare by their base version.
+		stackIgnored := c.Kind == KindSingBox && !v.Less(Version{Major: 1, Minor: 15})
 		if (c.Kind == KindXray && p.Tun.Stack != "gvisor") ||
-			(c.Kind == KindSingBox && (c.tunStackIgnored || p.Tun.Stack == "mips")) {
+			(c.Kind == KindSingBox && (stackIgnored || p.Tun.Stack == "mips")) {
 			missing = append(missing, "TUN stack "+p.Tun.Stack)
 		}
 	}
@@ -287,6 +294,13 @@ func (c Capabilities) Missing(p *Plan) []string {
 		for _, o := range p.Outbounds {
 			if o.TLS.Insecure && !o.TLS.Reality && (o.TLS.Enabled || o.Protocol == ProtocolTrojan || o.Protocol == ProtocolHysteria2) {
 				missing = append(missing, "TLS verification disabled (removed by Xray)")
+				break
+			}
+			// Xray refuses these at config load: "REALITY only supports
+			// RAW, XHTTP and gRPC for now."
+			// https://xtls.github.io/en/config/transport.html
+			if o.TLS.Reality && (o.Transport.Type == "ws" || o.Transport.Type == "httpupgrade") {
+				missing = append(missing, "REALITY over "+o.Transport.Type+" (Xray supports REALITY only over tcp, xhttp and grpc)")
 				break
 			}
 		}
