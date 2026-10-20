@@ -47,6 +47,22 @@ contents:
     dst: /usr/share/applications/io.github.levvs_one.sora.desktop
   - src: ./packaging/linux/io.github.levvs_one.sora.svg
     dst: /usr/share/icons/hicolor/scalable/apps/io.github.levvs_one.sora.svg
+  # Raster icon sizes next to the scalable one: some panels and software
+  # centers still pick a fixed size, and the AppStream metadata below is
+  # what lets the centers present Sora with a description and screenshots
+  # at all. The PNGs are rendered from the same logo as the SVG.
+  - src: ./packaging/linux/icons/io.github.levvs_one.sora-48.png
+    dst: /usr/share/icons/hicolor/48x48/apps/io.github.levvs_one.sora.png
+  - src: ./packaging/linux/icons/io.github.levvs_one.sora-64.png
+    dst: /usr/share/icons/hicolor/64x64/apps/io.github.levvs_one.sora.png
+  - src: ./packaging/linux/icons/io.github.levvs_one.sora-128.png
+    dst: /usr/share/icons/hicolor/128x128/apps/io.github.levvs_one.sora.png
+  - src: ./packaging/linux/icons/io.github.levvs_one.sora-256.png
+    dst: /usr/share/icons/hicolor/256x256/apps/io.github.levvs_one.sora.png
+  - src: ./packaging/linux/icons/io.github.levvs_one.sora-512.png
+    dst: /usr/share/icons/hicolor/512x512/apps/io.github.levvs_one.sora.png
+  - src: ./packaging/linux/io.github.levvs_one.sora.metainfo.xml
+    dst: /usr/share/metainfo/io.github.levvs_one.sora.metainfo.xml
   - src: ./LICENSE
     dst: /usr/share/licenses/sora/LICENSE
   - src: ./app/assets/fonts/Inter-LICENSE.txt

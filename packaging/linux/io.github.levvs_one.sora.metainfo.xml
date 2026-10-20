@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AppStream metadata for software centers (GNOME Software, KDE Discover).
+  Without it the centers show Sora with no description and no screenshots.
+  The component id matches the desktop file name, the launchable and the
+  stock icon both resolve inside the same package.
+-->
+<component type="desktop-application">
+  <id>io.github.levvs_one.sora</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>Sora</name>
+  <summary>Open VPN client: connect through your subscription, or bypass blocking without a server</summary>
+  <summary xml:lang="ru">Открытый VPN-клиент: подключение через подписку или обход блокировок без сервера</summary>
+  <description>
+    <p>
+      Sora is an open VPN client for a subscription from your own provider:
+      paste the link, pick a server, connect. One core drives sing-box,
+      Xray-core and mihomo and runs each connection on the engine able to
+      carry it, with a kill switch that keeps traffic from leaking outside
+      the tunnel.
+    </p>
+    <p>
+      Subscriptions keep themselves current, the fastest server is picked
+      for you, and where no server is reachable at all, the built-in zapret
+      bypass (tpws and nfqws) opens blocked sites without one. Sora runs as
+      a small system service with a desktop application on top, so the
+      tunnel survives the window being closed.
+    </p>
+    <p xml:lang="ru">
+      Sora — открытый VPN-клиент для подписки вашего провайдера: вставьте
+      ссылку, выберите сервер, подключитесь. Одно ядро управляет sing-box,
+      Xray и mihomo и ведёт каждое соединение на движке, который способен
+      его нести, а kill switch не даёт трафику утечь мимо туннеля.
+    </p>
+    <p xml:lang="ru">
+      Подписки обновляются сами, быстрый сервер выбирается автоматически,
+      а где сервер недоступен вовсе, встроенный обход zapret (tpws и nfqws)
+      открывает заблокированные сайты без сервера. Sora работает системной
+      службой с настольным приложением поверх, поэтому туннель переживает
+      закрытие окна.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.levvs_one.sora.desktop</launchable>
+  <icon type="stock">io.github.levvs_one.sora</icon>
+  <categories>
+    <category>Network</category>
+  </categories>
+  <url type="homepage">https://github.com/levvs-one/sora</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/levvs-one/sora/main/docs/images/home-1440x900-light.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/levvs-one/sora/main/docs/images/home-1440x900-dark.png</image>
+    </screenshot>
+  </screenshots>
+</component>
