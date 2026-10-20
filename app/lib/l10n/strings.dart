@@ -2081,6 +2081,8 @@ abstract class S {
   String get updateManualSigWarning;
 
   String get updateWindowsSigBlocked;
+  String get updateVersionRevoked;
+  String get updateRolloutPending;
   String get crashRestoreTitle;
 
   /// No description provided for @restoreOnCrash.

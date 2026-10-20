@@ -1,0 +1,8 @@
+{
+  "format": 1,
+  "rollout": {
+    "version": "1.0.12",
+    "percent": 100
+  },
+  "blocked_versions": []
+}

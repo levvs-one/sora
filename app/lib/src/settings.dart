@@ -1,9 +1,21 @@
 import 'dart:io' show Platform;
+import 'dart:math' show Random;
 import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'notifications.dart';
+
+/// Random UUID v4 for the staged-rollout install cohort (S11a). Not a
+/// security token — only a stable, uniformly distributed install identity.
+String _newInstallUuid() {
+  final random = Random.secure();
+  final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+  bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 10xxxxxx
+  final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+  return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}';
+}
 
 /// Locally persisted app preferences. The core stores subscriptions and servers
 /// encrypted and updates them while the UI is closed.
@@ -44,6 +56,7 @@ class Settings {
     'checkUpdates',
     'notifiedUpdate',
     'resumeAfterUpdate',
+    'installUuid',
     'serverSortMode',
     'autoSelectMode',
     'autoSwitchOnDegrade',
@@ -75,6 +88,12 @@ class Settings {
       // Detect upgrades before migration writes its own defaults.
       final existing = _keys.where((key) => key != 'tourDone').any(_store.containsKey);
       await _store.setBool('tourDone', existing);
+    }
+    if (!_store.containsKey('installUuid')) {
+      // Stable per-install identifier for the staged-rollout cohort (S11a).
+      // Generated once; the cohort (SHA-256(uuid) mod 100) never changes
+      // while this value is stored.
+      await _store.setString('installUuid', _newInstallUuid());
     }
     final stored = _store.getInt('format') ?? 0;
     if (stored > format) {
@@ -245,6 +264,11 @@ class Settings {
   bool get resumeAfterUpdate => _store.getBool('resumeAfterUpdate') ?? false;
   Future<void> saveResumeAfterUpdate(bool value) => _store.setBool('resumeAfterUpdate', value);
 
+  /// Stable per-install UUID for the staged-rollout cohort (S11a). Generated
+  /// once in [_migrate] and preserved across [reset] so a settings reset
+  /// cannot re-roll the cohort to dodge a rollout or a kill-switch.
+  String get installUuid => _store.getString('installUuid') ?? '';
+
   /// Server list sort: ping, speed or name.
   String get serverSortMode => _store.getString('serverSortMode') ?? 'ping';
   set serverSortMode(String value) => _store.setString('serverSortMode', value);
@@ -337,10 +361,14 @@ class Settings {
     final snapshot = proxySnapshot;
     final history = notificationHistory;
     final notified = notifiedUpdate;
+    final uuid = installUuid;
     await _store.clear();
     await completeTour();
     await saveNotificationHistory(history);
     if (notified.isNotEmpty) await saveNotifiedUpdate(notified);
+    // Keep the rollout cohort stable: re-rolling the install UUID on reset
+    // would let a settings reset dodge a staged rollout or a kill-switch.
+    if (uuid.isNotEmpty) await _store.setString('installUuid', uuid);
     if (snapshot.isNotEmpty) await saveProxySnapshot(snapshot);
     await _migrate();
   }

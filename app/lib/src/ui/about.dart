@@ -91,6 +91,16 @@ class _AboutScreenState extends State<AboutScreen> {
         ),
         Group(
           children: [
+            // S11a: persistent, non-alarming notice when the installed
+            // version was recalled via the rollout policy's blocked_versions.
+            if (updates.versionRevoked)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                child: Text(
+                  s.updateVersionRevoked,
+                  style: Styles.secondary.copyWith(color: palette.danger),
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: LayoutBuilder(
@@ -108,6 +118,17 @@ class _AboutScreenState extends State<AboutScreen> {
                       ),
               ),
             ),
+            // S11a: a newer release exists but this install's cohort is not
+            // included in the staged rollout yet — say so honestly instead
+            // of silently showing nothing.
+            if (updates.rolloutPending && !updates.hasUpdate)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                child: Text(
+                  s.updateRolloutPending,
+                  style: Styles.secondary.copyWith(color: palette.ink2),
+                ),
+              ),
             if (release != null) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
