@@ -43,7 +43,9 @@ class PanelBridge {
   /// () -> [{id, process, host, up_bytes, down_bytes}]
   final Future<List<Map<String, dynamic>>> Function() getConnections;
 
-  /// () -> [{id, name, protocol}]
+  /// () -> [{id, name, country, latency_ms}] — the documented panel API
+  /// shape (docs/extensions-api.md); country is '' and latency_ms is -1
+  /// when the app has no value for them, never an invented one.
   final List<Map<String, dynamic>> Function() servers;
 
   /// Shows a notification attributed to the extension.
@@ -59,12 +61,12 @@ class PanelBridge {
     try {
       decoded = jsonDecode(raw);
     } catch (_) {
-      return _reply(null, false, 'bad-request');
+      return _reply(null, false, 'invalid-argument');
     }
     final msg = decoded as Map<String, dynamic>?;
     final id = msg?['id'];
     final method = msg?['method'] as String?;
-    if (method == null) return _reply(id, false, 'bad-request');
+    if (method == null) return _reply(id, false, 'invalid-argument');
     final need = _methodPermission[method];
     if (need != null && !granted.contains(need)) {
       return _reply(id, false, 'permission-denied');
@@ -90,7 +92,7 @@ class PanelBridge {
         final title = (args['title'] as String? ?? '').trim();
         final body = (args['body'] as String? ?? '').trim();
         if (title.isEmpty || title.length > 120 || body.length > 500) {
-          throw BridgeError('bad-args', 'bad notification text');
+          throw BridgeError('invalid-argument', 'bad notification text');
         }
         await notify(title, body);
         return null;
@@ -101,10 +103,18 @@ class PanelBridge {
         await setSettings(values);
         return null;
       default:
-        throw BridgeError('unknown-method', 'unknown method $method');
+        throw BridgeError('invalid-argument', 'unknown method $method');
     }
   }
 
+  /// Machine-readable error codes, matching sora-ext.d.ts SoraExtErrorCode
+  /// and the mock (sora-ext serve): 'permission-denied' (the extension was
+  /// not granted the method's permission), 'invalid-argument' (malformed
+  /// message, unknown method, bad args), 'not-connected' (getConnections
+  /// with no VPN session up), 'internal' (the host could not complete the
+  /// call). The JS shim rejects with an Error carrying the code on
+  /// `.code`, so `catch (e) { e.code }` works identically against the real
+  /// host and the mock.
   String _reply(dynamic id, bool ok, String? error, [dynamic result]) {
     return jsonEncode({
       'id': id,
@@ -143,7 +153,17 @@ window.soraExt = (() => {
       const p = pending[id];
       if (!p) return;
       delete pending[id];
-      if (ok) p.resolve(payload); else p.reject(new Error(payload));
+      if (ok) {
+        p.resolve(payload);
+      } else {
+        // The documented contract (sora-ext.d.ts): rejections are
+        // SoraExtError-shaped — an Error whose `code` is the stable
+        // machine-readable code, exactly like the mock's deny(). The
+        // payload here IS the code the host sent.
+        const e = new Error(payload);
+        e.code = payload;
+        p.reject(e);
+      }
     },
     _event(kind, detail) {
       for (const cb of listeners) { try { cb(kind, detail); } catch (e) {} }

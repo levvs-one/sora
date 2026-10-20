@@ -153,8 +153,11 @@ Available methods and their permissions:
 | `getSettings`      | —                  | the extension's own settings       |
 | `setSettings`      | —                  | validated against settings_schema  |
 
-Events: `session.connected`, `session.disconnected`, `network.changed`,
-`extension.disabled` (the panel is torn down right after).
+Events: `session.connected`, `session.disconnected` (the two the current
+panel bridge emits). `network.changed` and `extension.disabled` are
+reserved kinds in the spec: not emitted yet — when an extension is
+disabled, the panel is torn down without the event being delivered
+first.
 
 Calling a method without the permission rejects the promise. Navigation
 outside the package is blocked; `fetch`/`XMLHttpRequest` from panel JS have

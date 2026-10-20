@@ -288,9 +288,20 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
 
   List<Map<String, dynamic>> _servers() {
     final sora = SoraScope.read(context);
+    // The documented panel API shape (docs/extensions-api.md, mirrored by
+    // sora-ext.d.ts and the Go host): {id, name, country, latency_ms}.
+    // The app state has no country for a server, so country is '' (the
+    // Go host's proto default too) instead of an invented value; latency
+    // comes from the probe results keyed by canonical outbound id, and
+    // is -1 ("unknown") when unmeasured or unreachable (a null entry).
     return [
       for (final s in sora.servers)
-        {'id': s.id, 'name': s.displayName, 'protocol': s.protocol}
+        {
+          'id': s.id,
+          'name': s.displayName,
+          'country': '',
+          'latency_ms': sora.latency[s.id] ?? -1,
+        }
     ];
   }
 

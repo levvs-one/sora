@@ -47,7 +47,7 @@ Notes:
 |---|---|
 | `permission-denied` | permission not granted |
 | `invalid-argument` | unknown method or bad args |
-| `token-revoked` | extension disabled / token revoked |
+| `not-connected` | `getConnections` called with no VPN session up (panel bridge) |
 | `internal` | host could not complete the call |
 
 ## Events — `onEvent`
@@ -61,8 +61,8 @@ off(); // unsubscribe
 |---|---|
 | `session.connected` | VPN session came up |
 | `session.disconnected` | VPN session went down |
-| `network.changed` | underlying network changed |
-| `extension.disabled` | this extension was disabled — the panel is torn down right after |
+| `network.changed` | underlying network changed — reserved: not emitted by the current panel bridge yet |
+| `extension.disabled` | this extension was disabled — reserved: the current bridge tears the panel down without delivering this event first |
 
 Needs no permission: every enabled extension may know whether the session
 is up.

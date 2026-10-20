@@ -81,7 +81,7 @@ function humanize(e) {
   return {
     'permission-denied': 'This needs a permission the extension was not granted.',
     'invalid-argument': 'Bad request: ' + e.message,
-    'token-revoked': 'The extension was disabled.',
+    'not-connected': 'No VPN session is up right now.',
     'internal': 'Something went wrong on the host side.',
   }[e.code] || String(e && e.message || e);
 }

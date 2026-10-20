@@ -45,18 +45,29 @@ export interface SoraExtensionServer {
   id: string;
   /** Display name, e.g. "DE-01 · Frankfurt". */
   name: string;
-  /** ISO country code or country name as stored by the app. */
+  /** Country as stored by the app; '' when the app has none for it. */
   country: string;
-  /** Last measured latency in ms, or -1 when unknown. */
+  /** Last measured latency in ms, or -1 when unknown or unreachable. */
   latency_ms: number;
 }
 
-/** Lifecycle and network events delivered to `onEvent`. */
+/**
+ * Lifecycle and network events delivered to `onEvent`.
+ *
+ * Only `session.connected` / `session.disconnected` are emitted by the
+ * current panel bridge. The other two kinds are reserved by the spec:
+ * panels may subscribe for them, but must not depend on receiving them
+ * yet.
+ */
 export type SoraExtensionEventKind =
   | 'session.connected'
   | 'session.disconnected'
+  /** Reserved: not emitted by the current panel bridge yet. */
   | 'network.changed'
-  /** The extension was disabled or uninstalled. The panel is torn down right after. */
+  /**
+   * Reserved: when the extension is disabled, the current panel bridge
+   * tears the panel down without delivering this event first.
+   */
   | 'extension.disabled';
 
 /** Listener for extension events. `detail` carries extra context when present. */
@@ -65,14 +76,20 @@ export type SoraExtensionEventListener = (
   detail?: string,
 ) => void;
 
-/** Machine-readable error codes for rejected `call()` promises. */
+/**
+ * Machine-readable error codes for rejected `call()` promises. These are
+ * exactly the codes the panel bridge and the mock (`sora-ext serve`)
+ * emit — no others. (There is no 'token-revoked' code on the panel path:
+ * panels do not hold tokens, and a disabled extension's panel is simply
+ * torn down.)
+ */
 export type SoraExtErrorCode =
   /** The extension was not granted the permission the method needs. */
   | 'permission-denied'
   /** The method name is unknown or its arguments are invalid. */
   | 'invalid-argument'
-  /** The extension was disabled or its token was revoked. */
-  | 'token-revoked'
+  /** `getConnections` was called while no VPN session is up. */
+  | 'not-connected'
   /** Anything else the host could not complete. */
   | 'internal';
 

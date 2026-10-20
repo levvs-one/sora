@@ -145,8 +145,11 @@
           p = deny('invalid-argument', 'notify needs {title, body} strings');
           break;
         }
-        if (title.length > 120) { p = deny('invalid-argument', 'notify: title exceeds 120 characters'); break; }
-        if (body.length > 500) { p = deny('invalid-argument', 'notify: body exceeds 500 characters'); break; }
+        // Same text rules as the real hosts (bridge.dart, core/ext
+        // host.go): trimmed, title non-empty, title <= 120, body <= 500.
+        if (title.trim().length === 0) { p = deny('invalid-argument', 'notify: title must not be empty'); break; }
+        if (title.trim().length > 120) { p = deny('invalid-argument', 'notify: title exceeds 120 characters'); break; }
+        if (body.trim().length > 500) { p = deny('invalid-argument', 'notify: body exceeds 500 characters'); break; }
         // Visible in the desktop browser, like a real notification would be.
         // eslint-disable-next-line no-console
         console.info('[sora-ext mock] notify:', title, '—', body);
