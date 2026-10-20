@@ -498,8 +498,15 @@ func TestRealityThroughEveryEngine(t *testing.T) {
 			Rules:      []engine.Rule{{Type: engine.RuleMatchAll, Target: outbound.ID}},
 			Options:    engine.Options{LogLevel: "warning", TestURL: engine.TestURLProduction},
 		}
+		// No silent skips: this test's contract is "through EVERY
+		// engine". The matrix above may skip combinations an engine
+		// cannot carry, but all three engines carry REALITY, so a
+		// selection failure here means the pin would silently stop
+		// covering exactly the engine it exists for (review of
+		// 5ba2d079 demonstrated a green run with mihomo dropped from
+		// the catalog).
 		if _, err := engine.SelectEngine(plan, availability, []engine.Kind{kind}); err != nil {
-			continue
+			t.Fatalf("engine %s must carry the REALITY plan: %v", kind, err)
 		}
 		t.Run(string(kind), func(t *testing.T) {
 			local := port(t)
