@@ -103,17 +103,17 @@ func TestParrotFreshness(t *testing.T) {
 	}
 }
 
-func TestHasPQKeyShare(t *testing.T) {
-	// PQ key share arrived with Chrome 131; aliases resolve to >= 131.
-	for _, name := range []string{"chrome", "hellochrome_auto", "hellochrome_131", "hellochrome_133", "hellochrome_155"} {
-		if !HasPQKeyShare(name) {
-			t.Errorf("HasPQKeyShare(%q) = false, want true", name)
-		}
+func TestKnownMissingPQKeyShare(t *testing.T) {
+	// Only an explicit pre-131 Chrome parrot is a proven-missing key
+	// share. Everything else — aliases resolving to current parrots,
+	// Chrome 131+, and names sora cannot judge — is "no claim", false.
+	if !KnownMissingPQKeyShare("hellochrome_120") {
+		t.Error(`KnownMissingPQKeyShare("hellochrome_120") = false, want true (pre-PQ parrot)`)
 	}
-	// Explicit pre-131 Chrome is the one case sora can prove the key
-	// share is missing without measuring the wire.
-	if HasPQKeyShare("hellochrome_120") {
-		t.Error("HasPQKeyShare(hellochrome_120) = true, want false (pre-PQ parrot)")
+	for _, name := range []string{"chrome", "hellochrome_auto", "hellochrome_131", "hellochrome_133", "hellochrome_155", "firefox", "safari", "random", "hellochrome_999", "not-a-fingerprint"} {
+		if KnownMissingPQKeyShare(name) {
+			t.Errorf("KnownMissingPQKeyShare(%q) = true, want false (no claim)", name)
+		}
 	}
 }
 

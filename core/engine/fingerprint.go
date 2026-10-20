@@ -199,22 +199,21 @@ func IsStaleParrot(name string) bool {
 	return false
 }
 
-// HasPQKeyShare reports whether name is known to send the X25519MLKEM768
-// post-quantum hybrid key share: true for Chrome parrots >= 131 and for
-// the "chrome"/auto aliases (they resolve to a >= 131 parrot in every
-// uTLS sora has ever pinned). It returns false only for explicit pre-131
-// Chrome parrots — the one case where sora can know the key share is
-// missing without measuring the wire.
-func HasPQKeyShare(name string) bool {
-	normalized := NormalizeFingerprint(name)
-	if normalized == "chrome" || normalized == "hellochrome_auto" {
-		return true
+// KnownMissingPQKeyShare reports whether name is KNOWN to lack the
+// X25519MLKEM768 post-quantum hybrid key share. It returns true only
+// for the one case sora can prove without measuring the wire: an
+// explicit pre-131 Chrome parrot. Every other input — the
+// "chrome"/"hellochrome_auto" aliases, Chrome 131+ parrots, non-Chrome
+// and unknown names — returns false, meaning "no claim": presence of
+// the key share cannot be decided from a name at all (the measured
+// answer is diagnostics' wire-level hasPQKeyShare). Callers may warn on
+// a proven-missing key share; the absence of that signal must never be
+// read as "the key share is present".
+func KnownMissingPQKeyShare(name string) bool {
+	if v := ParrotVersion(name); v != 0 {
+		return v < minPQChromeVersion
 	}
-	if v := ParrotVersion(normalized); v != 0 {
-		return v >= minPQChromeVersion
-	}
-	// Unknown or non-Chrome names: no claim either way.
-	return true
+	return false
 }
 
 // IsRandomizedFingerprint reports whether name selects a randomized
