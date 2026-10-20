@@ -321,6 +321,15 @@ type clientHello struct {
 	// keyShareGroups are the named groups offered in the key_share
 	// extension (51), in wire order. Empty when the extension is absent.
 	keyShareGroups []uint16
+	// Byte-level facts for AnalyzeHello (hello.go): the legacy
+	// client_version as written (JA3's first field), the SNI string,
+	// supported_groups (10), ec_point_formats (11) and the padding
+	// extension (21) data length, -1 when absent.
+	legacyVersion uint16
+	sni           string
+	groups        []uint16
+	pointFormats  []uint8
+	paddingLen    int
 }
 
 // pqKeyShareGroup is X25519MLKEM768, the post-quantum hybrid key share
@@ -384,6 +393,8 @@ func parseClientHello(b []byte) (clientHello, error) {
 		return h, err
 	}
 	legacy := uint16(ver[0])<<8 | uint16(ver[1])
+	h.legacyVersion = legacy
+	h.paddingLen = -1
 	if _, err := take(32); err != nil { // random
 		return h, err
 	}
@@ -442,11 +453,20 @@ func parseClientHello(b []byte) (clientHello, error) {
 		case 0: // server_name
 			h.hasSNI = true
 			if name, ok := parseSNI(data); ok {
+				h.sni = name
 				_, err := netip.ParseAddr(name)
 				h.sniIsIP = err == nil
 			}
+		case 10: // supported_groups
+			h.groups = parseU16List(data, 2)
+		case 11: // ec_point_formats
+			if len(data) >= 1 && int(data[0]) == len(data)-1 {
+				h.pointFormats = append(h.pointFormats, data[1:]...)
+			}
 		case 16: // application_layer_protocol_negotiation
 			h.alpn = parseALPN(data)
+		case 21: // padding
+			h.paddingLen = dl
 		case 13: // signature_algorithms
 			h.sigAlgs = parseU16List(data, 2)
 		case 43: // supported_versions
