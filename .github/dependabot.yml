@@ -33,3 +33,30 @@ updates:
       actions:
         patterns: ['*']
     labels: ['dependencies', 'ci']
+
+  # The sync service is a separate Go module (service/sync/go.mod); without
+  # its own entry dependabot never proposes bumps for it.
+  - package-ecosystem: gomod
+    directory: /service/sync
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:45'
+    open-pull-requests-limit: 5
+    groups:
+      go-sync:
+        patterns: ['*']
+    labels: ['dependencies', 'sync']
+
+  # Flutter app: pub.dev packages from app/pubspec.yaml.
+  - package-ecosystem: pub
+    directory: /app
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:55'
+    open-pull-requests-limit: 5
+    groups:
+      app-pub:
+        patterns: ['*']
+    labels: ['dependencies', 'app']

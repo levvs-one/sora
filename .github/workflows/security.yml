@@ -20,20 +20,28 @@ jobs:
   vulnerabilities:
     name: Vulnerable dependencies
     runs-on: ubuntu-latest
+    # Every Go module in the monorepo gets its own scan: a vulnerability in the
+    # sync service must not hide behind the core's clean result.
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ['core', 'service/sync']
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Install Go
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
+          # Both modules pin the same toolchain (go 1.26.9), so one
+          # go-version-file is enough; govulncheck runs inside each module.
           go-version-file: core/go.mod
           cache: false
 
       # govulncheck reports what is reachable from the program, not what sits in
       # the module graph unused. A graph scan of this repository would drown the
       # real findings in test-only dependencies of the standard library.
-      - name: Check reachable vulnerabilities
-        working-directory: core
+      - name: Check reachable vulnerabilities (${{ matrix.module }})
+        working-directory: ${{ matrix.module }}
         run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 
   osv:
@@ -47,6 +55,8 @@ jobs:
           # extractor, and --skip-gitignore no longer exists.
           scan-args: |-
             --lockfile=go.mod:core/go.mod
+            --lockfile=go.mod:service/sync/go.mod
+            --lockfile=pubspec.lock:app/pubspec.lock
 
   codeql:
     name: Static analysis
