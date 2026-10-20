@@ -14,17 +14,22 @@
 
 ## Сборка
 
+# The version comes from pubspec.yaml (the single source, same as CI) —
+# never hardcode it here; a stale literal silently packages the wrong
+# release.
+$AppVersion = ((Select-String -Path app\pubspec.yaml -Pattern '^version:\s*(\S+)').Matches[0].Groups[1].Value).Split('+')[0]
+
 ```powershell
 cd core; go build -trimpath -ldflags '-s -w' -o ..\dist\windows\sora-core.exe .\cmd\sora-core; cd ..
 bash packaging/engines/fetch.sh windows-amd64 dist/windows/engines
-cd app; flutter build windows --release --dart-define=SORA_VERSION=1.0.6 --dart-define=APP_VERSION=1.0.6; cd ..
-iscc /DAppVersion=1.0.6 /DSoraUnsigned packaging\windows\sora.iss
+cd app; flutter build windows --release --dart-define=SORA_VERSION=$AppVersion --dart-define=APP_VERSION=$AppVersion; cd ..
+iscc /DAppVersion=$AppVersion /DSoraUnsigned packaging\windows\sora.iss
 ```
 
 Подписанная сборка (сертификат владельца) — команда как раньше:
 
 ```powershell
-iscc /DAppVersion=1.0.6 "/SsoraSign=signtool sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f" packaging\windows\sora.iss
+iscc /DAppVersion=$AppVersion "/SsoraSign=signtool sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 $f" packaging\windows\sora.iss
 ```
 
 В `sora.iss` подпись включается через `SignTool=soraSign` (плюс
