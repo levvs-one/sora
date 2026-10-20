@@ -45,6 +45,10 @@ const chunkSize = 32 * 1024
 // maxMessage caps a reassembled application message.
 const maxMessage = 64 << 20
 
+// aeadOverhead is the authentication tag the Noise cipher appends to every
+// chunk.
+const aeadOverhead = 16
+
 var suite = noise.NewCipherSuite(noise.DH25519, noise.CipherChaChaPoly, noise.HashSHA256)
 
 // Conn is an encrypted channel to a peer. WriteMsg and ReadMsg are safe for
@@ -55,6 +59,11 @@ type Conn struct {
 	decrypt *noise.CipherState
 	wmu     sync.Mutex
 	rmu     sync.Mutex
+	// wscratch is the reusable chunk buffer: flag byte + payload are
+	// assembled in it and sealed in place, so one buffer holds the frame
+	// header, the plaintext, and the ciphertext. Writers are serialized
+	// by wmu, so no pool is needed.
+	wscratch []byte
 	// Peer is the identity the peer presented after the handshake.
 	Peer Identity
 }
@@ -413,22 +422,18 @@ func withDeadlineErr(ctx context.Context, conn net.Conn, fn func() error) error 
 func (c *Conn) WriteMsg(p []byte) error {
 	c.wmu.Lock()
 	defer c.wmu.Unlock()
+	if c.wscratch == nil {
+		c.wscratch = make([]byte, 0, 2+1+chunkSize+aeadOverhead)
+	}
 	if len(p) == 0 {
-		return c.writeChunk([]byte{1})
+		return c.writeChunk(nil, true)
 	}
 	for len(p) > 0 {
 		n := len(p)
 		if n > chunkSize {
 			n = chunkSize
 		}
-		chunk := make([]byte, 0, n+1)
-		if len(p) == n {
-			chunk = append(chunk, 1)
-		} else {
-			chunk = append(chunk, 0)
-		}
-		chunk = append(chunk, p[:n]...)
-		if err := c.writeChunk(chunk); err != nil {
+		if err := c.writeChunk(p[:n], len(p) == n); err != nil {
 			return err
 		}
 		p = p[n:]
@@ -436,12 +441,26 @@ func (c *Conn) WriteMsg(p []byte) error {
 	return nil
 }
 
-func (c *Conn) writeChunk(plain []byte) error {
-	ct, err := c.encrypt.Encrypt(nil, nil, plain)
+// writeChunk frames one plaintext chunk as a 2-byte length header followed
+// by the ciphertext, sent in a single write. The flag byte and payload are
+// assembled in the reusable scratch buffer and sealed in place: the header
+// is the seal's destination prefix, so framing, encryption, and the header
+// share one allocation and the wire bytes are unchanged.
+func (c *Conn) writeChunk(plain []byte, last bool) error {
+	buf := c.wscratch[:2]
+	if last {
+		buf = append(buf, 1)
+	} else {
+		buf = append(buf, 0)
+	}
+	buf = append(buf, plain...)
+	ct, err := c.encrypt.Encrypt(buf[:2], nil, buf[2:])
 	if err != nil {
 		return err
 	}
-	return writeFrame(c.Conn, ct)
+	binary.BigEndian.PutUint16(ct[:2], uint16(len(ct)-2))
+	_, err = c.Conn.Write(ct)
+	return err
 }
 
 // ReadMsg reads one application message, reassembling chunks.
@@ -454,12 +473,19 @@ func (c *Conn) ReadMsg() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		plain, err := c.decrypt.Decrypt(nil, nil, frame)
+		// Decrypt in place into the frame buffer: once authenticated,
+		// the ciphertext is no longer needed.
+		plain, err := c.decrypt.Decrypt(frame[:0], nil, frame)
 		if err != nil {
 			return nil, err
 		}
 		if len(plain) == 0 {
 			return nil, errors.New("transport: empty chunk")
+		}
+		if plain[0] == 1 && out == nil {
+			// Single-chunk fast path: hand the caller the decrypted
+			// buffer instead of copying it into a fresh slice.
+			return plain[1:], nil
 		}
 		out = append(out, plain[1:]...)
 		if plain[0] == 1 {
