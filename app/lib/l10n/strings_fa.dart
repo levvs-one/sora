@@ -1268,22 +1268,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'تشخیص HTTP';
 
   @override
-  String get diagnosticPackets => 'ضبط بسته';
-
-  @override
-  String get diagnosticEvents => 'رویدادهای ویندوز';
-
-  @override
-  String get diagnosticCapture => 'به مدت 10 ثانیه عکس بگیرید';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'هنوز درخواستی ثبت نشده است. ابتدا یک وب سایت تست سرعت باز کنید.';
 
-  @override
-  String get diagnosticRequiresTun => 'ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.';
-
-  @override
-  String get diagnosticUnavailable => 'این تشخیص در این پلتفرم در دسترس نیست.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1797,6 +1786,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

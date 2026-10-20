@@ -458,15 +458,11 @@
       }
     }
   },
-  "diagnosticPackets": "Перехоплення пакетів",
   "exportLogFile": "У {name}",
   "diagnosticHttp": "HTTP діагностика",
-  "diagnosticEvents": "Події Windows",
-  "diagnosticCapture": "Зробіть знімок на 10 секунд",
+  "diagnosticArchive": "Core diagnostics archive",
   "extensions": "Розширення",
   "diagnosticNoData": "Ще немає записаних запитів. Спочатку відкрийте сайт тесту швидкості.",
-  "diagnosticUnavailable": "Ця діагностика недоступна на цій платформі.",
-  "diagnosticRequiresTun": "Для захоплення пакетів потрібне активне з’єднання Sora TUN.",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

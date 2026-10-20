@@ -460,12 +460,8 @@
   },
   "extensions": "एक्सटेंशन",
   "diagnosticHttp": "HTTP डायग्नोस्टिक्स",
-  "diagnosticEvents": "विंडोज़ घटनाएँ",
-  "diagnosticPackets": "पैकेट पर कब्जा",
-  "diagnosticUnavailable": "यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.",
+  "diagnosticArchive": "Core diagnostics archive",
   "exportLogFile": "फ़ाइल में {name}",
-  "diagnosticRequiresTun": "पैकेट कैप्चर के लिए एक सक्रिय सोरा ट्यून कनेक्शन की आवश्यकता होती है।",
-  "diagnosticCapture": "10 सेकंड के लिए कैप्चर करें",
   "diagnosticNoData": "अभी तक कोई रिकॉर्डेड अनुरोध नहीं. सबसे पहले एक स्पीड टेस्ट वेबसाइट खोलें।",
   "@exportLogFile": {
     "placeholders": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

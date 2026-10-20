@@ -458,15 +458,11 @@
       }
     }
   },
-  "diagnosticCapture": "捕捉10秒",
-  "diagnosticRequiresTun": "数据包捕获需要活动的 Sora TUN 连接。",
   "exportLogFile": "保存为 {name}",
   "extensions": "扩展",
-  "diagnosticEvents": "Windows 事件",
   "diagnosticHttp": "HTTP 诊断",
+  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "尚未记录请求。 首先打开一个速度测试网站。",
-  "diagnosticUnavailable": "此诊断在此平台上不可用。",
-  "diagnosticPackets": "抓包",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

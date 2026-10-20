@@ -1250,22 +1250,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP 诊断';
 
   @override
-  String get diagnosticPackets => '抓包';
-
-  @override
-  String get diagnosticEvents => 'Windows 事件';
-
-  @override
-  String get diagnosticCapture => '捕捉10秒';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => '尚未记录请求。 首先打开一个速度测试网站。';
 
-  @override
-  String get diagnosticRequiresTun => '数据包捕获需要活动的 Sora TUN 连接。';
-
-  @override
-  String get diagnosticUnavailable => '此诊断在此平台上不可用。';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1537,6 +1526,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';
@@ -2802,22 +2797,8 @@ class SZhHans extends SZh {
   String get diagnosticHttp => 'HTTP 诊断';
 
   @override
-  String get diagnosticPackets => '抓包';
-
-  @override
-  String get diagnosticEvents => 'Windows 事件';
-
-  @override
-  String get diagnosticCapture => '捕捉10秒';
-
-  @override
   String get diagnosticNoData => '尚未记录请求。 首先打开一个速度测试网站。';
 
-  @override
-  String get diagnosticRequiresTun => '数据包捕获需要活动的 Sora TUN 连接。';
-
-  @override
-  String get diagnosticUnavailable => '此诊断在此平台上不可用。';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -3806,22 +3787,8 @@ class SZhHant extends SZh {
   String get diagnosticHttp => 'HTTP 診斷';
 
   @override
-  String get diagnosticPackets => '抓包';
-
-  @override
-  String get diagnosticEvents => 'Windows 事件';
-
-  @override
-  String get diagnosticCapture => '捕捉10秒';
-
-  @override
   String get diagnosticNoData => '尚未記錄請求。 首先打開一個速度測試網站。';
 
-  @override
-  String get diagnosticRequiresTun => '封包擷取需要活動的 Sora TUN 連線。';
-
-  @override
-  String get diagnosticUnavailable => '此診斷在此平台上不可用。';
   @override
   String get dnsExpected => 'Expected';
   @override

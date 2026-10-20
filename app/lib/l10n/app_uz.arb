@@ -460,13 +460,9 @@
   },
   "extensions": "Kengaytmalar",
   "exportLogFile": "Faylga {name}",
-  "diagnosticRequiresTun": "Paketlarni yozib olish uchun faol Sora TUN ulanishi kerak.",
-  "diagnosticCapture": "10 soniya davomida suratga oling",
-  "diagnosticUnavailable": "Ushbu diagnostika ushbu platformada mavjud emas.",
   "diagnosticNoData": "Hozircha hech qanday soʻrov qayd etilmagan. Avval tezlikni tekshirish veb-saytini oching.",
-  "diagnosticPackets": "Paketni suratga olish",
-  "diagnosticEvents": "Windows voqealari",
   "diagnosticHttp": "HTTP diagnostikasi",
+  "diagnosticArchive": "Core diagnostics archive",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

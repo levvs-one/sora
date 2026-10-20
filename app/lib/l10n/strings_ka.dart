@@ -1268,22 +1268,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP დიაგნოსტიკა';
 
   @override
-  String get diagnosticPackets => 'პაკეტის დაჭერა';
-
-  @override
-  String get diagnosticEvents => 'Windows-ის მოვლენები';
-
-  @override
-  String get diagnosticCapture => 'გადაიღეთ 10 წამის განმავლობაში';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'ჯერ არ არის ჩაწერილი მოთხოვნა. ჯერ გახსენით სიჩქარის ტესტის ვებსაიტი.';
 
-  @override
-  String get diagnosticRequiresTun => 'პაკეტის დაჭერას სჭირდება აქტიური Sora TUN კავშირი.';
-
-  @override
-  String get diagnosticUnavailable => 'ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1797,6 +1786,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

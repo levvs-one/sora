@@ -1268,22 +1268,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'Chẩn đoán HTTP';
 
   @override
-  String get diagnosticPackets => 'Chụp gói';
-
-  @override
-  String get diagnosticEvents => 'Sự kiện Windows';
-
-  @override
-  String get diagnosticCapture => 'Chụp trong 10 giây';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'Chưa có yêu cầu nào được ghi lại. Trước tiên hãy mở một trang web kiểm tra tốc độ.';
 
-  @override
-  String get diagnosticRequiresTun => 'Việc chụp gói cần có kết nối Sora TUN đang hoạt động.';
-
-  @override
-  String get diagnosticUnavailable => 'Chẩn đoán này không có sẵn trên nền tảng này.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1797,6 +1786,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

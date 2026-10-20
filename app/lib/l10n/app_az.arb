@@ -458,14 +458,10 @@
       }
     }
   },
-  "diagnosticRequiresTun": "Paket ələ keçirmək üçün aktiv Sora TUN bağlantısı lazımdır.",
-  "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil.",
   "extensions": "Genişləndiricilər",
-  "diagnosticCapture": "10 saniyə çəkin",
-  "diagnosticEvents": "Windows hadisələri",
   "exportLogFile": "Fayla {name}",
-  "diagnosticPackets": "Paket tutma",
   "diagnosticHttp": "HTTP diaqnostikası",
+  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "Hələ qeydə alınmış sorğu yoxdur. Əvvəlcə sürət testi veb saytını açın.",
   "@exportLogFile": {
     "placeholders": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

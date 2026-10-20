@@ -1266,22 +1266,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP تشخیص';
 
   @override
-  String get diagnosticPackets => 'پیکٹ کی گرفتاری';
-
-  @override
-  String get diagnosticEvents => 'ونڈوز کے واقعات';
-
-  @override
-  String get diagnosticCapture => '10 سیکنڈ کے لیے کیپچر کریں۔';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'ابھی تک کوئی ریکارڈ شدہ درخواستیں نہیں ہیں۔ پہلے اسپیڈ ٹیسٹ کی ویب سائٹ کھولیں۔';
 
-  @override
-  String get diagnosticRequiresTun => 'پیکٹ کیپچر کو ایک فعال Sora TUN کنکشن کی ضرورت ہے۔';
-
-  @override
-  String get diagnosticUnavailable => 'یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1795,6 +1784,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

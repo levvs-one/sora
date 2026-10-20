@@ -458,15 +458,11 @@
       }
     }
   },
-  "diagnosticEvents": "Windows падзеі",
   "extensions": "Пашырэнні",
-  "diagnosticUnavailable": "Гэтая дыягностыка недаступная на гэтай платформе.",
   "exportLogFile": "У {name}",
-  "diagnosticCapture": "Захоп на 10 секунд",
   "diagnosticHttp": "HTTP дыягностыка",
-  "diagnosticPackets": "Захоп пакета",
+  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "Пакуль няма запісаных запытаў. Спачатку адкрыйце вэб-сайт для праверкі хуткасці.",
-  "diagnosticRequiresTun": "Для захопу пакетаў патрабуецца актыўнае злучэнне Sora TUN.",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

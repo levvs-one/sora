@@ -1251,22 +1251,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP 진단';
 
   @override
-  String get diagnosticPackets => '패킷 캡처';
-
-  @override
-  String get diagnosticEvents => '윈도우 이벤트';
-
-  @override
-  String get diagnosticCapture => '10초 동안 캡처';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => '아직 기록된 요청이 없습니다. 먼저 속도 테스트 웹사이트를 열어보세요.';
 
-  @override
-  String get diagnosticRequiresTun => '패킷 캡처에는 활성 Sora TUN 연결이 필요합니다.';
-
-  @override
-  String get diagnosticUnavailable => '이 플랫폼에서는 이 진단을 사용할 수 없습니다.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1780,6 +1769,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

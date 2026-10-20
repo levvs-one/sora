@@ -458,15 +458,11 @@
       }
     }
   },
-  "diagnosticUnavailable": "یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔",
-  "diagnosticPackets": "پیکٹ کی گرفتاری",
   "diagnosticHttp": "HTTP تشخیص",
-  "diagnosticCapture": "10 سیکنڈ کے لیے کیپچر کریں۔",
+  "diagnosticArchive": "Core diagnostics archive",
   "extensions": "ایکسٹینشنز",
-  "diagnosticRequiresTun": "پیکٹ کیپچر کو ایک فعال Sora TUN کنکشن کی ضرورت ہے۔",
   "diagnosticNoData": "ابھی تک کوئی ریکارڈ شدہ درخواستیں نہیں ہیں۔ پہلے اسپیڈ ٹیسٹ کی ویب سائٹ کھولیں۔",
   "exportLogFile": "فائل میں {name}",
-  "diagnosticEvents": "ونڈوز کے واقعات",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

@@ -1267,22 +1267,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP диагностикасы';
 
   @override
-  String get diagnosticPackets => 'Пакетті түсіру';
-
-  @override
-  String get diagnosticEvents => 'Windows оқиғалары';
-
-  @override
-  String get diagnosticCapture => '10 секундқа түсіріңіз';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'Жазылған сұраулар әлі жоқ. Алдымен жылдамдықты тексеру веб-сайтын ашыңыз.';
 
-  @override
-  String get diagnosticRequiresTun => 'Пакеттерді түсіру үшін белсенді Sora TUN қосылымы қажет.';
-
-  @override
-  String get diagnosticUnavailable => 'Бұл диагностика бұл платформада қолжетімді емес.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1796,6 +1785,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

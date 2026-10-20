@@ -459,13 +459,9 @@
     }
   },
   "extensions": "Tiện ích mở rộng",
-  "diagnosticRequiresTun": "Việc chụp gói cần có kết nối Sora TUN đang hoạt động.",
-  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này.",
   "diagnosticNoData": "Chưa có yêu cầu nào được ghi lại. Trước tiên hãy mở một trang web kiểm tra tốc độ.",
   "diagnosticHttp": "Chẩn đoán HTTP",
-  "diagnosticEvents": "Sự kiện Windows",
-  "diagnosticCapture": "Chụp trong 10 giây",
-  "diagnosticPackets": "Chụp gói",
+  "diagnosticArchive": "Core diagnostics archive",
   "exportLogFile": "Lưu vào {name}",
   "@exportLogFile": {
     "placeholders": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

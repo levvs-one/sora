@@ -461,11 +461,7 @@
   "extensions": "Кеңейтүүлөр",
   "exportLogFile": "Файлга {name}",
   "diagnosticHttp": "HTTP диагностикасы",
-  "diagnosticUnavailable": "Бул диагностика бул платформада жеткиликсиз.",
-  "diagnosticEvents": "Windows окуялары",
-  "diagnosticPackets": "Пакетти басып алуу",
-  "diagnosticCapture": "10 секундга тартыңыз",
-  "diagnosticRequiresTun": "Пакетти тартууга активдүү Sora TUN байланышы керек.",
+  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "Жазылган сурамдар азырынча жок. Адегенде ылдамдыкты текшерүү вебсайтын ачыңыз.",
   "@exportLogFile": {
     "placeholders": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

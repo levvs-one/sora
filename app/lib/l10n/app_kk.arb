@@ -458,15 +458,11 @@
       }
     }
   },
-  "diagnosticEvents": "Windows оқиғалары",
   "extensions": "Кеңейтімдер",
-  "diagnosticPackets": "Пакетті түсіру",
   "exportLogFile": "Файлға {name}",
-  "diagnosticUnavailable": "Бұл диагностика бұл платформада қолжетімді емес.",
-  "diagnosticCapture": "10 секундқа түсіріңіз",
   "diagnosticHttp": "HTTP диагностикасы",
+  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "Жазылған сұраулар әлі жоқ. Алдымен жылдамдықты тексеру веб-сайтын ашыңыз.",
-  "diagnosticRequiresTun": "Пакеттерді түсіру үшін белсенді Sora TUN қосылымы қажет.",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

@@ -352,7 +352,11 @@ enum ProbeMethod {
 }
 message RunDiagnosticsRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; }
 message RunDiagnosticsResponse { DiagnosticReport report = 1; SoraError error = 2; }
-// Native captures require the authenticator and the native-diagnostics capability.
+// The core only exports the redacted archive (DIAGNOSTIC_FORMAT_UNSPECIFIED).
+// DIAGNOSTIC_FORMAT_PCAPNG and DIAGNOSTIC_FORMAT_EVTX are retired: raw
+// captures cannot be redacted to the archive's guarantee, so the core
+// refuses them outright (SORA-H3). The values stay reserved for wire
+// compatibility and must not be sent.
 enum DiagnosticFormat {
   DIAGNOSTIC_FORMAT_UNSPECIFIED = 0;
   DIAGNOSTIC_FORMAT_PCAPNG = 1;

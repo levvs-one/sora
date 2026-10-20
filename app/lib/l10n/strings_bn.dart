@@ -1263,22 +1263,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP ডায়াগনস্টিকস';
 
   @override
-  String get diagnosticPackets => 'প্যাকেট ক্যাপচার';
-
-  @override
-  String get diagnosticEvents => 'উইন্ডোজ ইভেন্ট';
-
-  @override
-  String get diagnosticCapture => '10 সেকেন্ডের জন্য ক্যাপচার করুন';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'এখনও কোন রেকর্ড করা অনুরোধ. প্রথমে একটি গতি পরীক্ষার ওয়েবসাইট খুলুন।';
 
-  @override
-  String get diagnosticRequiresTun => 'প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।';
-
-  @override
-  String get diagnosticUnavailable => 'এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1792,6 +1781,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

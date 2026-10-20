@@ -458,14 +458,10 @@
       }
     }
   },
-  "diagnosticUnavailable": "此診斷在此平台上不可用。",
   "extensions": "擴充",
-  "diagnosticPackets": "抓包",
   "exportLogFile": "儲存為 {name}",
-  "diagnosticCapture": "捕捉10秒",
   "diagnosticHttp": "HTTP 診斷",
-  "diagnosticEvents": "Windows 事件",
-  "diagnosticRequiresTun": "封包擷取需要活動的 Sora TUN 連線。",
+  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "尚未記錄請求。 首先打開一個速度測試網站。",
   "@exportLogFile": {
     "placeholders": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

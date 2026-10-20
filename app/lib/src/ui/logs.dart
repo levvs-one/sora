@@ -258,19 +258,21 @@ class _LogsScreenState extends State<LogsScreen> {
     }
   }
 
-  Future<void> _diagnostic(String extension) async {
+  /// Exports one diagnostics bundle: the client-side HTTP archive ('har')
+  /// or the core's redacted diagnostics archive ('archive', a zip built by
+  /// ExportDiagnostics with the default format). Raw capture formats are
+  /// gone on purpose: the core refuses PCAPNG/EVTX outright (SORA-H3), so
+  /// the menu no longer offers what the core cannot produce.
+  Future<void> _diagnostic(String kind) async {
     if (!mounted) return;
     final sora = SoraScope.read(context), s = S.of(context);
+    final isHar = kind == 'har';
     final name =
-        'sora-log_${switch (extension) {
-          'har' => 'http',
-          'pcapng' => 'packets',
-          _ => 'windows-events',
-        }}_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.$extension';
+        'sora-log_${isHar ? 'http' : 'core'}_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.${isHar ? 'har' : 'zip'}';
     ResponseFuture<ExportDiagnosticsResponse>? request;
     try {
       List<int> data;
-      if (extension == 'har') {
+      if (isHar) {
         if (sora.browserDiagnostics.length == 0) {
           await sora.recordNotification(
             AppNotification(
@@ -286,27 +288,11 @@ class _LogsScreenState extends State<LogsScreen> {
       } else {
         final link = sora.link;
         if (link == null || _capture != null) return;
-        if (!sora.coreCapabilities.contains('native-diagnostics')) throw const CoreFailure('core.api.version_mismatch');
-        if (extension == 'evtx' && !Platform.isWindows) {
-          await sora.recordNotification(
-            AppNotification(time: DateTime.now(), title: s.diagnosticEvents, body: s.diagnosticUnavailable),
-          );
-          return;
-        }
-        if (extension == 'pcapng' && (sora.phase != Phase.connected || sora.settings.tunnel != 'tun')) {
-          await sora.recordNotification(
-            AppNotification(time: DateTime.now(), title: s.diagnosticPackets, body: s.diagnosticRequiresTun),
-          );
-          return;
-        }
         request = link.stub.exportDiagnostics(
           ExportDiagnosticsRequest(
             apiVersion: apiVersion,
             controlAuthenticator: link.token,
             sessionId: sora.sessionId,
-            format: extension == 'pcapng'
-                ? DiagnosticFormat.DIAGNOSTIC_FORMAT_PCAPNG
-                : DiagnosticFormat.DIAGNOSTIC_FORMAT_EVTX,
           ),
           options: CallOptions(timeout: const Duration(seconds: 30)),
         );
@@ -375,26 +361,18 @@ class _LogsScreenState extends State<LogsScreen> {
                 ),
               ),
             const Divider(height: 12),
-            for (final (extension, label, icon) in [
+            for (final (kind, label, icon) in [
               ('har', s.diagnosticHttp, Symbols.language_rounded),
-              ('pcapng', s.diagnosticPackets, Symbols.network_check_rounded),
-              if (Platform.isWindows) ('evtx', s.diagnosticEvents, Symbols.article_rounded),
+              ('archive', s.diagnosticArchive, Symbols.article_rounded),
             ])
               MenuItemButton(
-                onPressed: _capture == null ? () => unawaited(_diagnostic(extension)) : null,
+                onPressed: _capture == null ? () => unawaited(_diagnostic(kind)) : null,
                 leadingIcon: Icon(icon, size: 18, color: palette.ink),
-                child: Tooltip(
-                  message: extension == 'pcapng' ? '${s.diagnosticPackets}: ${s.diagnosticCapture}' : label,
-                  child: Text(
-                    s.exportLogFile(
-                      'sora-log_${switch (extension) {
-                        'har' => 'http',
-                        'pcapng' => 'packets',
-                        _ => 'windows-events',
-                      }}_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.$extension',
-                    ),
-                    style: Styles.secondary.copyWith(color: palette.ink),
+                child: Text(
+                  s.exportLogFile(
+                    'sora-log_${kind == 'har' ? 'http' : 'core'}_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.${kind == 'har' ? 'har' : 'zip'}',
                   ),
+                  style: Styles.secondary.copyWith(color: palette.ink),
                 ),
               ),
           ],

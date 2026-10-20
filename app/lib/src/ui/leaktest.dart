@@ -19,6 +19,8 @@ String _testLabel(S s, String key) => switch (key) {
       'leakTest.check.ipv6' => s.leakTestCheckIpv6,
       'leakTest.check.icmpEcho' => s.leakTestCheckIcmpEcho,
       'leakTest.check.systemResolvers' => s.leakTestCheckSystemResolvers,
+      'leakTest.check.tunnelConnectivity' => s.leakTestCheckTunnelConnectivity,
+      'leakTest.check.tunnelDns' => s.leakTestCheckTunnelDns,
       _ => key,
     };
 

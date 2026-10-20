@@ -1252,22 +1252,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP 診断';
 
   @override
-  String get diagnosticPackets => 'パケットキャプチャ';
-
-  @override
-  String get diagnosticEvents => 'Windowsイベント';
-
-  @override
-  String get diagnosticCapture => '10秒間のキャプチャ';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => '記録されたリクエストはまだありません。 まずスピードテストのWebサイトを開きます。';
 
-  @override
-  String get diagnosticRequiresTun => 'パケット キャプチャには、アクティブな Sora TUN 接続が必要です。';
-
-  @override
-  String get diagnosticUnavailable => 'この診断は、このプラットフォームでは使用できません。';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1781,6 +1770,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

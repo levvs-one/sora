@@ -458,14 +458,10 @@
       }
     }
   },
-  "diagnosticRequiresTun": "パケット キャプチャには、アクティブな Sora TUN 接続が必要です。",
   "extensions": "拡張機能",
   "diagnosticHttp": "HTTP 診断",
-  "diagnosticCapture": "10秒間のキャプチャ",
-  "diagnosticEvents": "Windowsイベント",
-  "diagnosticPackets": "パケットキャプチャ",
+  "diagnosticArchive": "Core diagnostics archive",
   "exportLogFile": "保存先: {name}",
-  "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。",
   "diagnosticNoData": "記録されたリクエストはまだありません。 まずスピードテストのWebサイトを開きます。",
   "@exportLogFile": {
     "placeholders": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

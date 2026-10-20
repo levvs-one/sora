@@ -1266,22 +1266,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP डायग्नोस्टिक्स';
 
   @override
-  String get diagnosticPackets => 'पैकेट पर कब्जा';
-
-  @override
-  String get diagnosticEvents => 'विंडोज़ घटनाएँ';
-
-  @override
-  String get diagnosticCapture => '10 सेकंड के लिए कैप्चर करें';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'अभी तक कोई रिकॉर्डेड अनुरोध नहीं. सबसे पहले एक स्पीड टेस्ट वेबसाइट खोलें।';
 
-  @override
-  String get diagnosticRequiresTun => 'पैकेट कैप्चर के लिए एक सक्रिय सोरा ट्यून कनेक्शन की आवश्यकता होती है।';
-
-  @override
-  String get diagnosticUnavailable => 'यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1795,6 +1784,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

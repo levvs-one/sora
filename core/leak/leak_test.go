@@ -2,6 +2,7 @@ package leak
 
 import (
 	"context"
+	"errors"
 	"net"
 	"strings"
 	"testing"
@@ -398,6 +399,223 @@ func TestNormalizeResolver(t *testing.T) {
 	for in, want := range cases {
 		if got := normalizeResolver(in); got != want {
 			t.Errorf("normalizeResolver(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+// tunnelInput is a session whose plain sockets are captured by the tunnel:
+// the only mode where a direct dial provably traverses the tunnel path.
+func tunnelInput() Input {
+	in := baseInput()
+	in.TunnelUp = true
+	in.DirectCaptured = true
+	return in
+}
+
+func TestTunnelConnectivityPassesOnHandshake(t *testing.T) {
+	in := tunnelInput()
+	in.TunnelTarget = "203.0.11.1:443"
+	in.ProbeTunnel = func(context.Context, string) (time.Duration, error) { return 84 * time.Millisecond, nil }
+	res := runSingle(t, in, TestTunnelConnectivity)
+	if !res.Pass || res.Skipped {
+		t.Fatalf("tunnel-connectivity should pass on a handshake: %+v", res)
+	}
+	if !strings.Contains(res.Details, "through the tunnel") || !strings.Contains(res.Details, "84ms") {
+		t.Fatalf("details do not report the tunnel path and the RTT: %q", res.Details)
+	}
+}
+
+func TestTunnelConnectivityFailsWithRealCause(t *testing.T) {
+	in := tunnelInput()
+	in.ProbeTunnel = func(context.Context, string) (time.Duration, error) {
+		return 0, errors.New("dial tcp 203.0.11.1:443: i/o timeout")
+	}
+	res := runSingle(t, in, TestTunnelConnectivity)
+	if res.Pass {
+		t.Fatalf("tunnel-connectivity passed on a failed dial: %+v", res)
+	}
+	for _, want := range []string{"i/o timeout", "connected does not mean traffic flows", troubleshootingURL} {
+		if !strings.Contains(res.Details, want) {
+			t.Fatalf("details %q do not name %q", res.Details, want)
+		}
+	}
+}
+
+func TestTunnelTestsSkippedInProxyMode(t *testing.T) {
+	in := tunnelInput()
+	in.DirectCaptured = false
+	for _, id := range []string{TestTunnelConnectivity, TestTunnelDNS} {
+		res := runSingle(t, in, id)
+		if !res.Pass || !res.Skipped {
+			t.Fatalf("%s should skip (passing) in proxy mode: %+v", id, res)
+		}
+		if !strings.Contains(res.Details, "proxy mode") {
+			t.Fatalf("%s skip does not name proxy mode: %q", id, res.Details)
+		}
+	}
+}
+
+func TestTunnelTestsSkippedWhenTunnelDown(t *testing.T) {
+	in := tunnelInput()
+	in.TunnelUp = false
+	for _, id := range []string{TestTunnelConnectivity, TestTunnelDNS} {
+		res := runSingle(t, in, id)
+		if !res.Pass || !res.Skipped {
+			t.Fatalf("%s should skip when the tunnel is down: %+v", id, res)
+		}
+	}
+}
+
+func TestTunnelDNSSkippedWithoutResolvers(t *testing.T) {
+	in := tunnelInput()
+	in.TunnelResolvers = nil
+	res := runSingle(t, in, TestTunnelDNS)
+	if !res.Pass || !res.Skipped {
+		t.Fatalf("tunnel-dns should skip without tunnel resolvers: %+v", res)
+	}
+}
+
+func TestTunnelDNSPassesWithAnswers(t *testing.T) {
+	in := tunnelInput()
+	in.ProbeTunnelDNS = func(context.Context, string, string) ([]string, error) {
+		return []string{"1.1.1.1", "1.0.0.1"}, nil
+	}
+	res := runSingle(t, in, TestTunnelDNS)
+	if !res.Pass || res.Skipped {
+		t.Fatalf("tunnel-dns should pass with answers: %+v", res)
+	}
+	if !strings.Contains(res.Details, "one.one.one.one") || !strings.Contains(res.Details, "10.0.0.1") {
+		t.Fatalf("details do not name the canary and the resolver: %q", res.Details)
+	}
+}
+
+func TestTunnelDNSFailsWithRealCause(t *testing.T) {
+	in := tunnelInput()
+	in.ProbeTunnelDNS = func(context.Context, string, string) ([]string, error) {
+		return nil, errors.New("read udp 10.0.0.1:53: i/o timeout")
+	}
+	res := runSingle(t, in, TestTunnelDNS)
+	if res.Pass {
+		t.Fatalf("tunnel-dns passed on a failed query: %+v", res)
+	}
+	if !strings.Contains(res.Details, "i/o timeout") || !strings.Contains(res.Details, troubleshootingURL) {
+		t.Fatalf("details do not name the cause and the doc: %q", res.Details)
+	}
+}
+
+func TestTunnelDNSFailsOnEmptyAnswer(t *testing.T) {
+	in := tunnelInput()
+	in.ProbeTunnelDNS = func(context.Context, string, string) ([]string, error) { return nil, nil }
+	res := runSingle(t, in, TestTunnelDNS)
+	if res.Pass {
+		t.Fatalf("tunnel-dns passed on an empty answer: %+v", res)
+	}
+}
+
+func TestTunnelConnectivityEndToEndOnLoopback(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = ln.Close() }()
+	go func() {
+		conn, err := ln.Accept()
+		if err == nil {
+			_ = conn.Close()
+		}
+	}()
+	in := tunnelInput()
+	in.TunnelTarget = ln.Addr().String()
+	in.ProbeTunnel = nil // production prober through the real judge
+	res := runSingle(t, in, TestTunnelConnectivity)
+	if !res.Pass || res.Skipped {
+		t.Fatalf("tunnel-connectivity should pass against a loopback listener: %+v", res)
+	}
+}
+
+func TestTunnelTCPProberHandshakeOnLoopback(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = ln.Close() }()
+	go func() {
+		conn, err := ln.Accept()
+		if err == nil {
+			_ = conn.Close()
+		}
+	}()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	rtt, err := probeTunnelTCP(ctx, ln.Addr().String())
+	if err != nil {
+		t.Fatalf("production TCP prober failed on loopback: %v", err)
+	}
+	if rtt <= 0 {
+		t.Fatalf("production TCP prober reported non-positive RTT: %v", rtt)
+	}
+}
+
+func TestTunnelTCPProberFailsOnClosedPort(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	target := ln.Addr().String()
+	_ = ln.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if _, err := probeTunnelTCP(ctx, target); err == nil {
+		t.Fatal("production TCP prober succeeded on a closed port")
+	}
+}
+
+func TestTunnelDNSProberFailsOnClosedPort(t *testing.T) {
+	pc, err := net.ListenPacket("udp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	target := pc.LocalAddr().String()
+	_ = pc.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if _, err := probeTunnelDNS(ctx, target, canaryHost); err == nil {
+		t.Fatal("production tunnel-DNS prober succeeded on a closed port")
+	}
+}
+
+// fakeDNSAnswer crafts a minimal response to query: one A record for ip,
+// with the answer name as a compression pointer to the question.
+func fakeDNSAnswer(query []byte, ip net.IP) []byte {
+	resp := make([]byte, 12)
+	copy(resp[:2], query[:2]) // ID
+	resp[2], resp[3] = 0x81, 0x80
+	resp[4], resp[5] = 0x00, 0x01
+	resp[6], resp[7] = 0x00, 0x01
+	resp = append(resp, query[12:]...)
+	resp = append(resp, 0xC0, 0x0C)             // name: pointer to the question
+	resp = append(resp, 0x00, 0x01)             // TYPE A
+	resp = append(resp, 0x00, 0x01)             // CLASS IN
+	resp = append(resp, 0x00, 0x00, 0x00, 0x3C) // TTL 60
+	v4 := ip.To4()
+	resp = append(resp, 0x00, byte(len(v4)))
+	resp = append(resp, v4...)
+	return resp
+}
+
+func TestDNSAnswerRoundTrip(t *testing.T) {
+	query := dnsQuery(canaryHost)
+	raw := fakeDNSAnswer(query, net.ParseIP("203.0.113.7"))
+	got := dnsAddresses(raw)
+	if len(got) != 1 || got[0] != "203.0.113.7" {
+		t.Fatalf("dnsAddresses parsed %v from a crafted answer", got)
+	}
+}
+
+func TestDNSAddressesRejectsGarbage(t *testing.T) {
+	for _, raw := range [][]byte{nil, {}, {1, 2, 3}, make([]byte, 12), dnsQuery(canaryHost)} {
+		if got := dnsAddresses(raw); len(got) != 0 {
+			t.Fatalf("dnsAddresses(%d bytes) = %v, want empty", len(raw), got)
 		}
 	}
 }

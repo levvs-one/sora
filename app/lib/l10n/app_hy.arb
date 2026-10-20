@@ -462,11 +462,7 @@
   "exportLogFile": "Դեպի {name}",
   "extensions": "Ընդլայնումներ",
   "diagnosticHttp": "HTTP ախտորոշում",
-  "diagnosticUnavailable": "Այս ախտորոշումն անհասանելի է այս հարթակում:",
-  "diagnosticCapture": "Լուսանկարեք 10 վայրկյան",
-  "diagnosticPackets": "Փաթեթի գրավում",
-  "diagnosticEvents": "Windows-ի իրադարձություններ",
-  "diagnosticRequiresTun": "Փաթեթների գրավման համար անհրաժեշտ է ակտիվ Sora TUN կապ:",
+  "diagnosticArchive": "Core diagnostics archive",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

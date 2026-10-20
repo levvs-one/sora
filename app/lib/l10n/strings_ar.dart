@@ -1254,22 +1254,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'تشخيصات HTTP';
 
   @override
-  String get diagnosticPackets => 'التقاط الحزمة';
-
-  @override
-  String get diagnosticEvents => 'أحداث ويندوز';
-
-  @override
-  String get diagnosticCapture => 'التقاط لمدة 10 ثانية';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'لا توجد طلبات مسجلة حتى الآن. افتح موقع اختبار السرعة أولاً.';
 
-  @override
-  String get diagnosticRequiresTun => 'يحتاج التقاط الحزم إلى اتصال Sora TUN نشط.';
-
-  @override
-  String get diagnosticUnavailable => 'هذا التشخيص غير متوفر على هذا النظام الأساسي.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1783,6 +1772,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

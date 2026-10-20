@@ -1271,22 +1271,11 @@ class SRu extends S {
   String get diagnosticHttp => 'HTTP-диагностика';
 
   @override
-  String get diagnosticPackets => 'Захват пакетов';
-
-  @override
-  String get diagnosticEvents => 'События Windows';
-
-  @override
-  String get diagnosticCapture => 'Записать 10 секунд';
+  String get diagnosticArchive => 'Архив диагностики ядра';
 
   @override
   String get diagnosticNoData => 'Запросов пока нет. Сначала откройте сайт проверки скорости.';
 
-  @override
-  String get diagnosticRequiresTun => 'Для захвата пакетов нужно активное TUN-подключение Sora.';
-
-  @override
-  String get diagnosticUnavailable => 'Эта диагностика недоступна на данной платформе.';
   @override
   String get dnsExpected => 'Ожидалось';
   @override
@@ -1802,6 +1791,12 @@ class SRu extends S {
 
   @override
   String get leakTestCheckSystemResolvers => 'Системные резолверы';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Связность туннеля';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS через туннель';
 
   @override
   String get noticeDegraded => 'Сервер замедлился — переключено на лучший из измеренных';

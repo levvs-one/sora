@@ -1269,22 +1269,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'Ташхиси HTTP';
 
   @override
-  String get diagnosticPackets => 'Гирифтани пакет';
-
-  @override
-  String get diagnosticEvents => 'Ҳодисаҳои Windows';
-
-  @override
-  String get diagnosticCapture => 'Барои 10 сония сабт кунед';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'Ҳанӯз ягон дархост сабт нашудааст. Аввал вебсайти санҷиши суръатро кушоед.';
 
-  @override
-  String get diagnosticRequiresTun => 'Забти баста ба пайвасти фаъоли Sora TUN ниёз дорад.';
-
-  @override
-  String get diagnosticUnavailable => 'Ин ташхис дар ин платформа дастрас нест.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1798,6 +1787,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

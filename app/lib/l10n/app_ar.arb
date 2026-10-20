@@ -459,12 +459,8 @@
     }
   },
   "extensions": "ملحقات",
-  "diagnosticUnavailable": "هذا التشخيص غير متوفر على هذا النظام الأساسي.",
-  "diagnosticRequiresTun": "يحتاج التقاط الحزم إلى اتصال Sora TUN نشط.",
-  "diagnosticCapture": "التقاط لمدة 10 ثانية",
-  "diagnosticPackets": "التقاط الحزمة",
   "diagnosticHttp": "تشخيصات HTTP",
-  "diagnosticEvents": "أحداث ويندوز",
+  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "لا توجد طلبات مسجلة حتى الآن. افتح موقع اختبار السرعة أولاً.",
   "exportLogFile": "إلى {name}",
   "@exportLogFile": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

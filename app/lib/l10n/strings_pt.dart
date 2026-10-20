@@ -1269,22 +1269,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'Diagnóstico HTTP';
 
   @override
-  String get diagnosticPackets => 'Captura de pacotes';
-
-  @override
-  String get diagnosticEvents => 'Eventos do Windows';
-
-  @override
-  String get diagnosticCapture => 'Capture por 10 segundos';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'Nenhuma solicitação registrada ainda. Abra primeiro um site de teste de velocidade.';
 
-  @override
-  String get diagnosticRequiresTun => 'A captura de pacotes precisa de uma conexão Sora TUN ativa.';
-
-  @override
-  String get diagnosticUnavailable => 'Este diagnóstico não está disponível nesta plataforma.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1798,6 +1787,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

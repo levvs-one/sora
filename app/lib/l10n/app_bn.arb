@@ -458,14 +458,10 @@
       }
     }
   },
-  "diagnosticPackets": "প্যাকেট ক্যাপচার",
-  "diagnosticCapture": "10 সেকেন্ডের জন্য ক্যাপচার করুন",
   "diagnosticHttp": "HTTP ডায়াগনস্টিকস",
+  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "এখনও কোন রেকর্ড করা অনুরোধ. প্রথমে একটি গতি পরীক্ষার ওয়েবসাইট খুলুন।",
-  "diagnosticEvents": "উইন্ডোজ ইভেন্ট",
   "extensions": "এক্সটেনশন",
-  "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.",
-  "diagnosticRequiresTun": "প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।",
   "exportLogFile": "ফাইলে {name}",
   "@exportLogFile": {
     "placeholders": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

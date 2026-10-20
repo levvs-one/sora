@@ -1267,22 +1267,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'HTTP anyklaýyş';
 
   @override
-  String get diagnosticPackets => 'Paket almak';
-
-  @override
-  String get diagnosticEvents => 'Windows wakalary';
-
-  @override
-  String get diagnosticCapture => '10 sekuntlap ​​surata düşüriň';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'Entek ýazylan haýyş ýok. Ilki bilen tizlik synag web sahypasyny açyň.';
 
-  @override
-  String get diagnosticRequiresTun => 'Paket almak üçin işjeň Sora TUN birikmesi gerek.';
-
-  @override
-  String get diagnosticUnavailable => 'Bu anyklaýyş bu platformada elýeterli däl.';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1796,6 +1785,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

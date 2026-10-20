@@ -459,14 +459,10 @@
     }
   },
   "extensions": "Extensões",
-  "diagnosticCapture": "Capture por 10 segundos",
-  "diagnosticUnavailable": "Este diagnóstico não está disponível nesta plataforma.",
   "diagnosticNoData": "Nenhuma solicitação registrada ainda. Abra primeiro um site de teste de velocidade.",
   "exportLogFile": "Em {name}",
-  "diagnosticRequiresTun": "A captura de pacotes precisa de uma conexão Sora TUN ativa.",
   "diagnosticHttp": "Diagnóstico HTTP",
-  "diagnosticPackets": "Captura de pacotes",
-  "diagnosticEvents": "Eventos do Windows",
+  "diagnosticArchive": "Core diagnostics archive",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",

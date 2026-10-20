@@ -1266,22 +1266,11 @@ Find one in the catalog or install from a file.';
   String get diagnosticHttp => 'การวินิจฉัย HTTP';
 
   @override
-  String get diagnosticPackets => 'การจับแพ็คเก็ต';
-
-  @override
-  String get diagnosticEvents => 'เหตุการณ์ของวินโดวส์';
-
-  @override
-  String get diagnosticCapture => 'จับภาพเป็นเวลา 10 วินาที';
+  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'ยังไม่มีการร้องขอที่บันทึกไว้ เปิดเว็บไซต์ทดสอบความเร็วก่อน';
 
-  @override
-  String get diagnosticRequiresTun => 'การจับแพ็คเก็ตจำเป็นต้องมีการเชื่อมต่อ Sora TUN ที่ใช้งานอยู่';
-
-  @override
-  String get diagnosticUnavailable => 'การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้';
   @override
   String get dnsExpected => 'Expected';
   @override
@@ -1795,6 +1784,12 @@ Find one in the catalog or install from a file.';
 
   @override
   String get leakTestCheckSystemResolvers => 'System resolvers';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+
+  @override
+  String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
   String get noticeDegraded => 'The server slowed down — switched to the best measured one';

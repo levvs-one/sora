@@ -2015,23 +2015,8 @@ abstract class S {
   /// **'HTTP-диагностика'**
   String get diagnosticHttp;
 
-  /// No description provided for @diagnosticPackets.
-  ///
-  /// In ru, this message translates to:
-  /// **'Захват пакетов'**
-  String get diagnosticPackets;
-
-  /// No description provided for @diagnosticEvents.
-  ///
-  /// In ru, this message translates to:
-  /// **'События Windows'**
-  String get diagnosticEvents;
-
-  /// No description provided for @diagnosticCapture.
-  ///
-  /// In ru, this message translates to:
-  /// **'Записать 10 секунд'**
-  String get diagnosticCapture;
+  /// **'Core diagnostics archive'**
+  String get diagnosticArchive;
 
   /// No description provided for @diagnosticNoData.
   ///
@@ -2039,17 +2024,6 @@ abstract class S {
   /// **'Запросов пока нет. Сначала откройте сайт проверки скорости.'**
   String get diagnosticNoData;
 
-  /// No description provided for @diagnosticRequiresTun.
-  ///
-  /// In ru, this message translates to:
-  /// **'Для захвата пакетов нужно активное TUN-подключение Sora.'**
-  String get diagnosticRequiresTun;
-
-  /// No description provided for @diagnosticUnavailable.
-  ///
-  /// In ru, this message translates to:
-  /// **'Эта диагностика недоступна на данной платформе.'**
-  String get diagnosticUnavailable;
   String get dnsExpected;
   String get dnsActual;
   String get dnsCheckNeedsConnection;
@@ -2517,6 +2491,12 @@ abstract class S {
 
   /// **'System resolvers'**
   String get leakTestCheckSystemResolvers;
+
+  /// **'Tunnel connectivity'**
+  String get leakTestCheckTunnelConnectivity;
+
+  /// **'Tunnel DNS'**
+  String get leakTestCheckTunnelDns;
 
   /// **'The server slowed down — switched to the best measured one'**
   String get noticeDegraded;

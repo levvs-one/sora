@@ -98,7 +98,6 @@ func Capabilities() []string {
 		"obfs-profiles",
 		"log-center",
 		"connection-center",
-		"native-diagnostics",
 		"log-export-formats",
 	}
 }

@@ -15,6 +15,7 @@ package leak
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -41,15 +42,32 @@ const (
 	TestICMPEcho = "icmp-echo"
 	// TestSystemResolvers verifies the OS resolvers point into the tunnel.
 	TestSystemResolvers = "system-resolvers"
+	// TestTunnelConnectivity dials a public canary over TCP through the
+	// tunnel path. While the tunnel is up in system (TUN) mode plain
+	// sockets are captured by the tunnel device, so a successful dial
+	// proves the tunnel carries payload end to end. A failure names the
+	// real error: "connected" never meant "traffic flows".
+	TestTunnelConnectivity = "tunnel-connectivity"
+	// TestTunnelDNS resolves the canary name through the session's tunnel
+	// resolvers. It answers "does DNS work through the tunnel", the
+	// classic "connected but nothing loads" cause.
+	TestTunnelDNS = "tunnel-dns"
 )
 
 // Localization keys for the test titles shown in the UI.
 const (
-	LabelDirectDNS       = "leakTest.check.directDns"
-	LabelIPv6            = "leakTest.check.ipv6"
-	LabelICMPEcho        = "leakTest.check.icmpEcho"
-	LabelSystemResolvers = "leakTest.check.systemResolvers"
+	LabelDirectDNS          = "leakTest.check.directDns"
+	LabelIPv6               = "leakTest.check.ipv6"
+	LabelICMPEcho           = "leakTest.check.icmpEcho"
+	LabelSystemResolvers    = "leakTest.check.systemResolvers"
+	LabelTunnelConnectivity = "leakTest.check.tunnelConnectivity"
+	LabelTunnelDNS          = "leakTest.check.tunnelDns"
 )
+
+// troubleshootingURL is appended to failed tunnel-path test details: the
+// doc section that explains what to do when the tunnel is up but traffic
+// does not flow. Kept as a const so the UI and the docs cannot drift.
+const troubleshootingURL = "https://github.com/levvs-one/sora/blob/main/docs/troubleshooting.md"
 
 // Outcome is what one direct probe observed on the wire.
 type Outcome int
@@ -109,6 +127,20 @@ type Input struct {
 	// default.
 	ICMPHost string
 
+	// TunnelTarget is the "ip:port" the tunnel-connectivity probe dials
+	// over TCP. Empty selects the public default. Tests point it at a
+	// loopback fixture.
+	TunnelTarget string
+
+	// ProbeTunnel dials target over TCP through the tunnel path and
+	// reports the handshake latency. Nil selects the real network
+	// prober. Tests inject fixed outcomes here.
+	ProbeTunnel func(ctx context.Context, target string) (time.Duration, error)
+	// ProbeTunnelDNS resolves host through one tunnel resolver ("ip" or
+	// "ip:port") and returns the answer addresses. Nil selects the real
+	// network prober. Tests inject fixed answers here.
+	ProbeTunnelDNS func(ctx context.Context, resolver, host string) ([]string, error)
+
 	// ProbeDirectDNS performs the direct DNS attempt. Nil selects the
 	// real network prober. Tests inject fixed outcomes here.
 	ProbeDirectDNS func(ctx context.Context, target string) Outcome
@@ -133,6 +165,8 @@ func Tests() []Test {
 		{ID: TestIPv6, Label: LabelIPv6},
 		{ID: TestICMPEcho, Label: LabelICMPEcho},
 		{ID: TestSystemResolvers, Label: LabelSystemResolvers},
+		{ID: TestTunnelConnectivity, Label: LabelTunnelConnectivity},
+		{ID: TestTunnelDNS, Label: LabelTunnelDNS},
 	}
 }
 
@@ -194,6 +228,9 @@ func withDefaults(in Input) Input {
 	if in.ICMPHost == "" {
 		in.ICMPHost = "9.9.9.9"
 	}
+	if in.TunnelTarget == "" {
+		in.TunnelTarget = "1.1.1.1:443"
+	}
 	if in.ProbeDirectDNS == nil {
 		in.ProbeDirectDNS = probeDNSReply
 	}
@@ -202,6 +239,12 @@ func withDefaults(in Input) Input {
 	}
 	if in.ProbeICMP == nil {
 		in.ProbeICMP = probeICMPReply
+	}
+	if in.ProbeTunnel == nil {
+		in.ProbeTunnel = probeTunnelTCP
+	}
+	if in.ProbeTunnelDNS == nil {
+		in.ProbeTunnelDNS = probeTunnelDNS
 	}
 	return in
 }
@@ -242,6 +285,10 @@ func runOne(ctx context.Context, in Input, t Test) Result {
 		}
 	case TestSystemResolvers:
 		res.Pass, res.Skipped, res.Details = judgeSystemResolvers(in)
+	case TestTunnelConnectivity:
+		res.Pass, res.Skipped, res.Details = judgeTunnelConnectivity(pctx, in)
+	case TestTunnelDNS:
+		res.Pass, res.Skipped, res.Details = judgeTunnelDNS(pctx, in)
 	}
 	return res
 }
@@ -329,6 +376,170 @@ func judgeSystemResolvers(in Input) (pass, skipped bool, details string) {
 		return false, false, "resolvers outside the tunnel: " + displayList(outside) + " (" + actual + ")"
 	}
 	return true, false, actual
+}
+
+// tunnelSkipped reports whether the tunnel-path probes are vacuous: they
+// need a tunnel that captures plain sockets (system/TUN mode). In proxy
+// mode a direct dial bypasses the tunnel, so the probe would test the
+// wrong path; it skips instead of guessing. A down tunnel has no path to
+// test either.
+func tunnelSkipped(in Input) (bool, string) {
+	if !in.TunnelUp {
+		return true, "tunnel is not up; there is no tunnel path to test"
+	}
+	if !in.DirectCaptured {
+		return true, "proxy mode does not capture plain sockets: a direct dial would bypass the tunnel, " +
+			"so this test cannot verify the tunnel path; re-run in TUN mode"
+	}
+	return false, ""
+}
+
+// judgeTunnelConnectivity judges the TCP dial through the tunnel path. A
+// completed handshake proves payload flows; anything else is the precise
+// failure the user feels as "connected but nothing loads".
+func judgeTunnelConnectivity(ctx context.Context, in Input) (pass, skipped bool, details string) {
+	if skip, why := tunnelSkipped(in); skip {
+		return true, true, why
+	}
+	rtt, err := in.ProbeTunnel(ctx, in.TunnelTarget)
+	if err != nil {
+		return false, false, "tunnel is up but TCP to " + in.TunnelTarget + " failed: " + err.Error() +
+			" (connected does not mean traffic flows; see " + troubleshootingURL + ")"
+	}
+	return true, false, "reached " + in.TunnelTarget + " through the tunnel in " + rtt.Round(time.Millisecond).String()
+}
+
+// judgeTunnelDNS judges the canary resolution through the session's tunnel
+// resolvers. No tunnel resolvers means nothing to query; an empty or
+// failed answer names the resolver that did not deliver.
+func judgeTunnelDNS(ctx context.Context, in Input) (pass, skipped bool, details string) {
+	if skip, why := tunnelSkipped(in); skip {
+		return true, true, why
+	}
+	resolvers := normalizeAll(in.TunnelResolvers)
+	if len(resolvers) == 0 {
+		return true, true, "session has no tunnel resolvers configured; nothing to query through the tunnel"
+	}
+	resolver := resolvers[0]
+	start := time.Now()
+	answers, err := in.ProbeTunnelDNS(ctx, resolver, canaryHost)
+	if err != nil {
+		return false, false, "DNS through tunnel resolver " + resolver + " failed: " + err.Error() +
+			" (see " + troubleshootingURL + ")"
+	}
+	if len(answers) == 0 {
+		return false, false, "tunnel resolver " + resolver + " returned no addresses for " + canaryHost +
+			" (see " + troubleshootingURL + ")"
+	}
+	return true, false, canaryHost + " resolved through " + resolver + " to " + displayList(answers) +
+		" in " + time.Since(start).Round(time.Millisecond).String()
+}
+
+// probeTunnelTCP opens a TCP connection to target ("ip:port") and reports
+// the handshake latency. In system (TUN) mode the dial traverses the
+// tunnel, so success proves the tunnel carries payload.
+func probeTunnelTCP(ctx context.Context, target string) (time.Duration, error) {
+	start := time.Now()
+	conn, err := (&net.Dialer{}).DialContext(ctx, "tcp", target)
+	if err != nil {
+		return 0, err
+	}
+	_ = conn.Close()
+	return time.Since(start), nil
+}
+
+// probeTunnelDNS resolves host through resolver ("ip" or "ip:port",
+// default port 53) over plain UDP and returns the answer addresses. Like
+// resolveVia in diagnostics it checks reachability and answer sanity, not
+// resolver identity.
+func probeTunnelDNS(ctx context.Context, resolver, host string) ([]string, error) {
+	addr := resolver
+	if _, _, err := net.SplitHostPort(addr); err != nil {
+		addr = net.JoinHostPort(strings.Trim(addr, "[]"), "53")
+	}
+	conn, err := (&net.Dialer{}).DialContext(ctx, "udp", addr)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = conn.Close() }()
+	if deadline, ok := ctx.Deadline(); ok {
+		_ = conn.SetDeadline(deadline)
+	}
+	if _, err := conn.Write(dnsQuery(host)); err != nil {
+		return nil, err
+	}
+	raw := make([]byte, 512)
+	n, err := conn.Read(raw)
+	if err != nil {
+		return nil, err
+	}
+	return dnsAddresses(raw[:n]), nil
+}
+
+// dnsAddresses extracts the A/AAAA addresses from a DNS response's answer
+// section. It is intentionally minimal: the probe only needs to know the
+// resolver answered with addresses.
+func dnsAddresses(raw []byte) []string {
+	if len(raw) < 12 {
+		return nil
+	}
+	qdCount := int(raw[4])<<8 | int(raw[5])
+	anCount := int(raw[6])<<8 | int(raw[7])
+	off := 12
+	for i := 0; i < qdCount; i++ {
+		var err error
+		if off, err = skipDNSName(raw, off); err != nil {
+			return nil
+		}
+		off += 4 // QTYPE + QCLASS
+		if off > len(raw) {
+			return nil
+		}
+	}
+	var out []string
+	for i := 0; i < anCount; i++ {
+		var err error
+		if off, err = skipDNSName(raw, off); err != nil {
+			return nil
+		}
+		if off+10 > len(raw) {
+			return nil
+		}
+		typ := int(raw[off])<<8 | int(raw[off+1])
+		rdLen := int(raw[off+8])<<8 | int(raw[off+9])
+		off += 10
+		if off+rdLen > len(raw) {
+			return nil
+		}
+		if (typ == 1 && rdLen == 4) || (typ == 28 && rdLen == 16) {
+			out = append(out, net.IP(raw[off:off+rdLen]).String())
+		}
+		off += rdLen
+	}
+	return out
+}
+
+// skipDNSName advances past a possibly compressed domain name in a DNS
+// message, returning the offset of the first byte after it.
+func skipDNSName(raw []byte, off int) (int, error) {
+	for {
+		if off >= len(raw) {
+			return 0, errors.New("leak: truncated DNS name")
+		}
+		b := raw[off]
+		switch {
+		case b&0xC0 == 0xC0:
+			// Compression pointer: two bytes, and the name ends here.
+			if off+1 >= len(raw) {
+				return 0, errors.New("leak: truncated DNS pointer")
+			}
+			return off + 2, nil
+		case b == 0:
+			return off + 1, nil
+		default:
+			off += 1 + int(b)
+		}
+	}
 }
 
 // normalizeAll canonicalizes resolver addresses for comparison.

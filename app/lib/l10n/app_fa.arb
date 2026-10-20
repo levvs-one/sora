@@ -459,14 +459,10 @@
     }
   },
   "extensions": "برنامه های افزودنی",
-  "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست.",
-  "diagnosticEvents": "رویدادهای ویندوز",
-  "diagnosticCapture": "به مدت 10 ثانیه عکس بگیرید",
   "diagnosticNoData": "هنوز درخواستی ثبت نشده است. ابتدا یک وب سایت تست سرعت باز کنید.",
-  "diagnosticRequiresTun": "ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.",
   "exportLogFile": "در {name}",
   "diagnosticHttp": "تشخیص HTTP",
-  "diagnosticPackets": "ضبط بسته",
+  "diagnosticArchive": "Core diagnostics archive",
   "@exportLogFile": {
     "placeholders": {
       "name": {
@@ -537,6 +533,8 @@
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
+  "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
+  "leakTestCheckTunnelDns": "Tunnel DNS",
   "noticeDegraded": "The server slowed down — switched to the best measured one",
   "obfs": "Traffic obfuscation",
   "obfsPreset": "Preset",
