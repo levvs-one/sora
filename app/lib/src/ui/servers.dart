@@ -759,9 +759,13 @@ class _CustomServerRowState extends State<_CustomServerRow> {
     final palette = Palette.of(context);
     final s = S.of(context);
     final server = widget.server;
-    final chosen = sora.selected == server.id;
-    final ms = sora.latency[server.id];
-    final measured = sora.latency.containsKey(server.id);
+    // Selection and latency live in the core's outbound namespace, where
+    // custom servers are `custom/<id>` (INT-1); the card's CustomServer
+    // carries the plain id, so it is canonicalized once here.
+    final customId = sora.canonicalServerId(server.id);
+    final chosen = sora.selected == customId;
+    final ms = sora.latency[customId];
+    final measured = sora.latency.containsKey(customId);
     return Semantics(
       selected: chosen,
       button: true,

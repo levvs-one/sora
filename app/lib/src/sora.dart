@@ -26,6 +26,7 @@ import 'settings.dart';
 import 'notifications.dart';
 import 'obfs.dart';
 import 'sync_daemon.dart';
+import 'sync_docs.dart';
 import 'updates.dart';
 import 'ui/kit.dart' show describe;
 
@@ -93,10 +94,14 @@ class Sora extends ChangeNotifier {
       notifyListeners();
       // Hiding a server changes the plan; renaming does not (IDs are stable).
       unawaited(_replan());
+      _noteSyncChanged();
     };
     profiles.addListener(notifyListeners);
+    profiles.addListener(_noteSyncChanged);
     chains.addListener(notifyListeners);
+    chains.addListener(_noteSyncChanged);
     obfs.addListener(notifyListeners);
+    obfs.addListener(_noteSyncChanged);
     _loadBandwidth();
   }
   final browserDiagnostics = BrowserDiagnostics();
@@ -533,6 +538,26 @@ class Sora extends ChangeNotifier {
   /// registry of its own.
   final SyncDaemon syncDaemon = SyncDaemon();
 
+  /// App ⇄ daemon document bridge (F9). Wired to the daemon's current API
+  /// client by [ensureSyncBridge]; null while the daemon is unavailable.
+  SyncDocumentBridge? _syncBridge;
+
+  /// Wires (or rewires) the document bridge to the daemon's current API
+  /// client. Safe to call repeatedly; a no-op without a client.
+  void ensureSyncBridge() {
+    final client = syncDaemon.client;
+    if (client == null) return;
+    if (_syncBridge?.client != client) {
+      _syncBridge = SyncDocumentBridge(sora: this, client: client);
+    }
+  }
+
+  /// Fire-and-forget republish hint after local data changes (subscriptions,
+  /// servers, settings stores). Debounced inside the bridge; a no-op when
+  /// sync is unavailable. The forced publish before every manual sync is
+  /// what guarantees nothing is missed.
+  void _noteSyncChanged() => _syncBridge?.noteChanged();
+
   /// Fingerprint of the currently joined network. Unknown until the core
   /// RPC GetNetworkFingerprint is reachable from Dart (F5).
   NetworkFingerprint networkFingerprint = const NetworkFingerprint.unknown();
@@ -566,7 +591,11 @@ class Sora extends ChangeNotifier {
   }
 
   /// Current selection; falls back to auto if the selected server or group is
-  /// no longer present.
+  /// no longer present. Always the canonical outbound id: custom servers are
+  /// stored with plain ids, but the core merges them into subscription
+  /// outbound lists as `custom/<id>` (INT-1), so the plain form is mapped on
+  /// read — and on write by [select] — keeping the plan builder, latency
+  /// keys and selection comparisons in one namespace.
   String get selected {
     final chosen = settings.server;
     if (chosen == 'auto') return chosen;
@@ -576,13 +605,24 @@ class Sora extends ChangeNotifier {
       // auto instead of building a plan the core would reject.
       return entryOf(chosen, _subscriptions.values)?.withoutHidden(hiddenServerIds) == null ? 'auto' : chosen;
     }
-    return servers.any((o) => o.id == chosen) || _customServers.any((s) => s.id == chosen) ? chosen : 'auto';
+    // Legacy plain custom ids (stored before INT-1 canonicalization) resolve
+    // here; everything else already lives in the outbound namespace.
+    final canonical = canonicalServerId(chosen);
+    return servers.any((o) => o.id == canonical) ? canonical : 'auto';
   }
+
+  /// Maps a selection to the core's outbound id namespace (INT-1):
+  /// `custom/<id>` for custom servers, everything else unchanged. See
+  /// [canonicalCustomId].
+  String canonicalServerId(String id) => canonicalCustomId(id, [for (final s in customServers) s.id]);
 
   String nameOf(String id) {
     if (id.startsWith(groupPrefix)) return entryOf(id, _subscriptions.values)?.name ?? id;
+    // Custom servers are keyed by plain id in _customServers but selected by
+    // their canonical `custom/<id>` outbound id.
+    final plain = id.startsWith(customServerPrefix) ? id.substring(customServerPrefix.length) : id;
     for (final s in _customServers) {
-      if (s.id == id) return s.name;
+      if (s.id == plain) return s.name;
     }
     return servers.firstWhere((o) => o.id == id, orElse: () => OutboundSpec(displayName: id)).displayName;
   }
@@ -1412,8 +1452,12 @@ class Sora extends ChangeNotifier {
   }
 
   Future<void> select(String server) async {
-    if (settings.server == server) return;
-    settings.server = server;
+    // Persist the canonical outbound id (INT-1): the plan builder, latency
+    // keys and selection checks all speak the core's `custom/<id>` namespace
+    // for custom servers, so the plain card id is mapped once, here.
+    final canonical = canonicalServerId(server);
+    if (settings.server == canonical) return;
+    settings.server = canonical;
     if (_activeChain != null) {
       // A manual server pick ends the chain session: the next plan is
       // direct, so the comparison below reconnects to the chosen server
@@ -1531,6 +1575,7 @@ class Sora extends ChangeNotifier {
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
       _subscriptions[answer.state.settings.id] = answer.state;
       notifyListeners();
+      _noteSyncChanged();
       return null;
     } catch (error) {
       reportFailure(error);
@@ -1547,6 +1592,7 @@ class Sora extends ChangeNotifier {
       SaveSubscriptionRequest(apiVersion: apiVersion, controlAuthenticator: link.token, settings: settings),
     );
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+    _noteSyncChanged();
   });
 
   /// Saves subscription settings without replacing the stored URL.
@@ -1556,6 +1602,7 @@ class Sora extends ChangeNotifier {
       SaveSubscriptionRequest(apiVersion: apiVersion, controlAuthenticator: link.token, settings: chosen..url = ''),
     );
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+    _noteSyncChanged();
   });
 
   /// Fetches the bearer link only for this action, without retaining it in state.
@@ -1607,6 +1654,7 @@ class Sora extends ChangeNotifier {
     _subscriptions.remove(id);
     overrides.drop(id);
     notifyListeners();
+    _noteSyncChanged();
   });
 
   /// User-added servers, stored by the core outside subscriptions.
@@ -1643,8 +1691,12 @@ class Sora extends ChangeNotifier {
       SaveCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, server: server),
     );
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+    // Upsert, not append: the sync bridge re-saves known ids (update path),
+    // and appending would duplicate the entry in the list.
+    _customServers.removeWhere((s) => s.id == answer.server.id);
     _customServers.add(answer.server);
     notifyListeners();
+    _noteSyncChanged();
   });
 
   Future<CoreFailure?> deleteCustomServer(String id) => _call(() async {
@@ -1655,6 +1707,7 @@ class Sora extends ChangeNotifier {
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
     _customServers.removeWhere((s) => s.id == id);
     notifyListeners();
+    _noteSyncChanged();
   });
 
   /// Tests reachability of a saved custom server by id; the core API has no
@@ -1669,13 +1722,19 @@ class Sora extends ChangeNotifier {
       return (reachable: false, latencyMs: 0, failure: CoreFailure.unavailable);
     }
     try {
+      // The core API takes the plain custom id; the latency map lives in the
+      // outbound namespace, where passive probes already key custom results
+      // by `custom/<id>` — one key for both, or the card never shows a manual
+      // test result.
+      final plain = id.startsWith(customServerPrefix) ? id.substring(customServerPrefix.length) : id;
+      final key = '$customServerPrefix$plain';
       final answer = await link.custom.testCustomServer(
         TestCustomServerRequest(
-            apiVersion: apiVersion, controlAuthenticator: link.token, id: id, timeoutMs: 5000),
+            apiVersion: apiVersion, controlAuthenticator: link.token, id: plain, timeoutMs: 5000),
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
       final ms = answer.latencyMs.toInt();
-      latency[id] = answer.reachable ? ms : null;
+      latency[key] = answer.reachable ? ms : null;
       notifyListeners();
       return (reachable: answer.reachable, latencyMs: ms, failure: null);
     } catch (error) {
