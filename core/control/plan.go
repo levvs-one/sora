@@ -586,6 +586,17 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 		},
 		TLS: engine.TLS{Enabled: !strings.EqualFold(spec.GetSecurity(), "none")},
 	}
+	if outbound.Protocol == engine.ProtocolWireGuard {
+		// WireGuard has no stream transport: the parser labels its
+		// specs "udp" (a datagram protocol, not an engine transport),
+		// and custom specs arrive with no transport at all, which the
+		// default above turns into "tcp". Both spellings failed plan
+		// validation ("unknown transport") or misdescribed the
+		// outbound, so a WireGuard server imported from a link or a
+		// .conf could never build a plan (B1 servers audit). The
+		// engine's WireGuard outbound carries no transport type.
+		outbound.Transport.Type = ""
+	}
 	if outbound.Name == "" {
 		outbound.Name = id
 	}

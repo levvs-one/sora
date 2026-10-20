@@ -183,6 +183,18 @@ func (s *Server) resolveBenchmarkServers(ids []string) (found []*corev1.Outbound
 			}
 		}
 	}
+	// Custom servers are first-class entries of the merged server list
+	// the client benchmarks and chains from (withCustomOutbounds), so
+	// they resolve here too. Before this scan existed, BenchmarkServers
+	// and ProbeChain — both routed through this resolver — reported
+	// every custom server as "unknown server" (B1 servers audit). Their
+	// "custom/…" ids cannot collide with subscription StableKey ids.
+	for _, spec := range s.CustomOutbounds() {
+		id := spec.GetId()
+		if _, ok := want[id]; ok {
+			matched[id] = spec
+		}
+	}
 	// At most len(ids) ids land in each bucket; duplicates in the
 	// request are answered per occurrence, in request order.
 	found = make([]*corev1.OutboundSpec, 0, len(ids))

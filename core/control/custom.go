@@ -1,8 +1,11 @@
 package control
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -42,8 +45,91 @@ func customStateFor(s *Server) *customStoreState {
 			return
 		}
 		st.store, st.err = custom.Open(filepath.Join(s.dataDir, "custom"), s.secrets)
+		if st.err == nil && st.store != nil && s.secrets != nil {
+			migrateCustomCredentials(s, st.store)
+		}
 	})
 	return st
+}
+
+// isCredentialDocument reports whether material already is one of the
+// vault's credential documents: a flat JSON object of strings, the only
+// shape planFromProto accepts (parseCredential fails closed on anything
+// else, SORA-M8).
+func isCredentialDocument(material []byte) bool {
+	trimmed := bytes.TrimSpace(material)
+	if len(trimmed) == 0 || trimmed[0] != '{' {
+		return false
+	}
+	var doc map[string]string
+	return json.Unmarshal(trimmed, &doc) == nil
+}
+
+// customCredentialDocument converts the write-only credential string a
+// user types for a manually added server (a bare UUID, password, or
+// WireGuard key) into the credential document the plan builder resolves
+// for every other server source. Before this conversion existed, custom
+// servers stored the raw string in the vault while outboundFromProto
+// demanded a credential document, so NO custom server could ever build
+// a plan — every protocol failed with "credential material is not a
+// credential document" (B1 servers audit). It returns nil when there is
+// nothing to convert: empty material, material that already is a
+// document (a client may send one, and migration must stay idempotent),
+// or an unknown protocol.
+//
+// Shadowsocks is the one two-part credential: the accepted form is
+// "method:password" (the SIP002 userinfo shape); a value without a
+// plausible method prefix is stored as a bare password.
+func customCredentialDocument(protocol custom.Protocol, raw []byte) []byte {
+	if len(raw) == 0 || isCredentialDocument(raw) {
+		return nil
+	}
+	cred := string(raw)
+	values := map[string]string{}
+	switch protocol {
+	case custom.ProtocolVLESS:
+		values["uuid"] = cred
+	case custom.ProtocolVMESS:
+		values["uuid"] = cred
+		values["method"] = "auto"
+	case custom.ProtocolTrojan:
+		values["password"] = cred
+	case custom.ProtocolShadowsocks:
+		if method, password, ok := strings.Cut(cred, ":"); ok && method != "" && !strings.ContainsAny(method, " \t") {
+			values["method"], values["password"] = method, password
+		} else {
+			values["password"] = cred
+		}
+	case custom.ProtocolWireGuard:
+		values["private_key"] = cred
+	default:
+		return nil
+	}
+	doc, err := json.Marshal(values)
+	if err != nil {
+		return nil
+	}
+	return doc
+}
+
+// migrateCustomCredentials rewrites vault entries stored before the
+// credential-document conversion existed (raw UUIDs, passwords, and keys
+// written by SaveCustomServer up to the B1 fix) into credential
+// documents, in place, under the same references. Best effort: an entry
+// that cannot be read or rewritten is left exactly as it was.
+func migrateCustomCredentials(s *Server, store *custom.Store) {
+	for _, srv := range store.List() {
+		if srv.SecretRef == "" {
+			continue
+		}
+		raw, err := s.secrets.Get(srv.SecretRef)
+		if err != nil {
+			continue
+		}
+		if doc := customCredentialDocument(srv.Protocol, raw); doc != nil {
+			_ = s.secrets.Put(srv.SecretRef, doc)
+		}
+	}
 }
 
 // customServer implements customv1.CustomServersServer on top of the
@@ -105,13 +191,17 @@ func (c *customServer) SaveCustomServer(_ context.Context, req *customv1.SaveCus
 	if err := custom.ValidatePort(in.GetPort()); err != nil {
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
+	credentials := []byte(in.GetCredentials())
+	if doc := customCredentialDocument(protocol, credentials); doc != nil {
+		credentials = doc
+	}
 	stored, err := st.Save(custom.Server{
 		ID:       in.GetId(),
 		Name:     in.GetName(),
 		Protocol: protocol,
 		Address:  in.GetAddress(),
 		Port:     uint16(in.GetPort()),
-	}, []byte(in.GetCredentials()))
+	}, credentials)
 	if err != nil {
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
@@ -254,7 +344,19 @@ func (s *Server) CustomOutbounds() []*corev1.OutboundSpec {
 			Id:          "custom/" + srv.ID,
 			DisplayName: srv.Name,
 			Protocol:    string(srv.Protocol),
+			Transport:   "tcp",
+			Security:    "none",
 			Endpoint:    &corev1.Endpoint{Host: srv.Address, Port: uint32(srv.Port)},
+		}
+		switch srv.Protocol {
+		case custom.ProtocolTrojan:
+			// Trojan always runs over TLS; the bare spec used to leave
+			// Security empty, which the plan builder happens to read as
+			// TLS-on, but clients and gates read it as unspecified.
+			spec.Security = "tls"
+		case custom.ProtocolWireGuard:
+			// No stream transport (see outboundFromProto).
+			spec.Transport = ""
 		}
 		if srv.SecretRef != "" {
 			spec.Credentials = &corev1.CredentialsRef{Reference: srv.SecretRef}
