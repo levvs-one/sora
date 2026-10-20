@@ -9,6 +9,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -40,7 +41,7 @@ type Document struct {
 // HashOf returns the hex sha256 of a payload.
 func HashOf(payload []byte) string {
 	sum := sha256.Sum256(payload)
-	return fmt.Sprintf("%x", sum)
+	return hex.EncodeToString(sum[:])
 }
 
 // Store keeps the local documents.
@@ -194,7 +195,7 @@ func (s *session) runInitiator(ctx context.Context) (Report, error) {
 	// Pull what the peer has newer, push what we have newer or the peer
 	// lacks.
 	for _, pm := range peer {
-		lm, ok := byLocal[key(pm.Kind, pm.Name)]
+		lm, ok := byLocal[docKey{pm.Kind, pm.Name}]
 		if !ok || pm.UpdatedAt > lm.UpdatedAt {
 			doc, err := s.pull(ctx, pm.Kind, pm.Name)
 			if err != nil {
@@ -212,7 +213,7 @@ func (s *session) runInitiator(ctx context.Context) (Report, error) {
 		}
 	}
 	for _, lm := range local {
-		pm, ok := byPeer[key(lm.Kind, lm.Name)]
+		pm, ok := byPeer[docKey{lm.Kind, lm.Name}]
 		if !ok || lm.UpdatedAt > pm.UpdatedAt {
 			doc, found := s.store.Get(lm.Kind, lm.Name)
 			if !found {
@@ -327,12 +328,17 @@ func (s *session) runResponder(ctx context.Context) (Report, error) {
 	}
 }
 
-func key(kind, name string) string { return kind + "\x00" + name }
+// docKey identifies a document without the string-concatenation allocation
+// of a "kind\x00name" key.
+type docKey struct {
+	kind string
+	name string
+}
 
-func index(metas []Meta) map[string]Meta {
-	out := make(map[string]Meta, len(metas))
+func index(metas []Meta) map[docKey]Meta {
+	out := make(map[docKey]Meta, len(metas))
 	for _, m := range metas {
-		out[key(m.Kind, m.Name)] = m
+		out[docKey{m.Kind, m.Name}] = m
 	}
 	return out
 }
