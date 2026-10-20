@@ -32,7 +32,7 @@ func (p *Plan) Secrets() []string {
 // Secrets lists the secret fields of one outbound. Values shorter than four
 // characters are skipped: masking them would destroy ordinary log text.
 func (o Outbound) Secrets() []string {
-	candidates := []string{o.UUID, o.Password, o.UserID, o.ObfsParam, o.PluginOpts, o.Token, o.PrivateKey, o.OriginalLink}
+	candidates := []string{o.UUID, o.Password, o.UserID, o.ObfsParam, o.PluginOpts, o.Token, o.PrivateKey}
 	if o.Amnezia != nil {
 		// The header-protection key is key material like the private
 		// key: it must never reach a log, an event or a diagnostic

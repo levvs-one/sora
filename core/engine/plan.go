@@ -91,13 +91,11 @@ type TLS struct {
 // Transport holds the stream transport of an outbound.
 type Transport struct {
 	// Type is tcp, ws, grpc, h2, httpupgrade or xhttp.
-	Type        string
-	Path        string
-	Host        string
-	Service     string
-	Headers     map[string]string
-	Prefix      string
-	IdleTimeout int
+	Type    string
+	Path    string
+	Host    string
+	Service string
+	Headers map[string]string
 	// EarlyData caps WebSocket 0-RTT: the first payload bytes ride the
 	// handshake instead of waiting for it. Zero disables it; only the
 	// ws transport honours it.
@@ -229,12 +227,6 @@ type Outbound struct {
 	// Addresses lists WireGuard interface CIDRs, required for the tunnel to
 	// carry traffic.
 	Addresses []string
-
-	// Tags come from subscriptions and drive grouping in the interface.
-	Tags         []string
-	CountryCode  string
-	ProviderID   string
-	OriginalLink string
 }
 
 // Group is a user-selectable set of outbounds.
@@ -249,8 +241,6 @@ type Group struct {
 	Hidden    bool
 	Icon      string
 	Provider  string
-	Include   []string
-	Exclude   []string
 }
 
 // RuleType is a rule matcher as named in the sora.core.v1 contract.
@@ -305,7 +295,6 @@ type DNSServer struct {
 	Address    string
 	Port       uint16
 	Dialer     string
-	Suffixes   []string
 	ProxyOnly  bool
 	SkipVerify bool // skip TLS verification for DoT/DoH/DoQ upstreams (corporate MITM)
 }
@@ -592,18 +581,16 @@ type Fragment struct {
 
 // Options configures engine-wide plan settings.
 type Options struct {
-	LogLevel       string
-	Mode           string // rule, global, direct
-	UnifiedDelay   bool
-	FindProcess    bool
-	GeoData        bool
-	AllowLAN       bool
-	IPv6           bool
-	ProfileStorage bool
-	TestURL        string
-	GeoSiteURL     string
-	GeoIPURL       string
-	Fragment       Fragment
+	LogLevel    string
+	Mode        string // rule, global, direct
+	FindProcess bool
+	GeoData     bool
+	AllowLAN    bool
+	IPv6        bool
+	TestURL     string
+	GeoSiteURL  string
+	GeoIPURL    string
+	Fragment    Fragment
 	// Mux configures multiplexing of REALITY outbounds. The zero value
 	// keeps the default: mux on for REALITY, off everywhere else. See
 	// mux.go for the policy and the vision↔mux decision.
