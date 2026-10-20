@@ -28,8 +28,10 @@ import (
 // https://api.github.com/repos/SagerNet/{sing-geosite,sing-geoip}/commits/rule-set
 // (also visible at https://api.github.com/repos/SagerNet/<repo>/branches/rule-set).
 // To refresh: take the new head SHAs, verify each serves its files with
-// curl -o /dev/null -w "%{http_code}" \
-//   https://raw.githubusercontent.com/<repo>/<sha>/geosite-category-ads-all.srs
+//
+//	curl -o /dev/null -w "%{http_code}" \
+//	  https://raw.githubusercontent.com/<repo>/<sha>/geosite-category-ads-all.srs
+//
 // (files sit at the branch ROOT, not under a rule-set/ path — the rule-set/
 // segment in old URLs was the branch name, which no longer appears once a SHA
 // is pinned), then replace the refs below. Refresh cadence: together with the
@@ -980,4 +982,3 @@ func orDefault(v, fallback string) string {
 	}
 	return v
 }
-
