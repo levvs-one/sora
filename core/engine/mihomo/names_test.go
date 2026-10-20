@@ -89,4 +89,18 @@ func TestBuildProxyRealitySmux(t *testing.T) {
 	if px.Smux != nil {
 		t.Fatal("smux default applies to REALITY only")
 	}
+	// PASS3 deep S3a: mihomo carries the vision flow, so vision
+	// suppresses smux here exactly as on the other engines.
+	vision := reality
+	vision.Flow = "xtls-rprx-vision"
+	px, err = buildProxy(vision, engine.MuxOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if px.Smux != nil {
+		t.Fatal("smux must not be emitted together with a vision flow")
+	}
+	if px.Flow != "xtls-rprx-vision" {
+		t.Fatalf("the vision flow itself must still render, got %q", px.Flow)
+	}
 }

@@ -367,9 +367,12 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		return nil, fmt.Errorf("singbox: outbound %s: %w", o.ID, err)
 	}
 	if engine.RealityMux(o, r.plan.Options.Mux) {
-		// sing-box has no vision flow, so mux is always applicable to
-		// REALITY here. One TLS connection carrying many streams keeps
-		// the parallel-handshake count at one (T007).
+		// sing-box DOES implement the vision flow (its VLESS outbound
+		// documents xtls-rprx-vision, emitted verbatim above), so mux
+		// is suppressed under vision here exactly as on the other
+		// engines — engine.RealityMux is flow-aware (PASS3 deep S3a).
+		// Without vision, one TLS connection carrying many streams
+		// keeps the parallel-handshake count at one (T007).
 		out["multiplex"] = obj{"enabled": true, "protocol": "smux",
 			"max_streams": engine.MuxConcurrency(r.plan.Options.Mux)}
 	}

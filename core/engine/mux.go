@@ -9,11 +9,18 @@ package engine
 // browser-like dest site expects connection reuse anyway; disabling it
 // must be a deliberate choice.
 //
-// Architectural decision for the vision↔mux conflict (T002): in Xray,
-// mux is inert under xtls-rprx-vision, so the renderer skips it there —
-// vision wins, mux is not emitted. The anti-parallelism role under vision
-// belongs to XHTTP+xmux (see the spec), not to outbound mux. sing-box and
-// mihomo have no vision flow, so mux stays on for their REALITY outbounds.
+// Architectural decision for the vision↔mux conflict (T002, corrected by
+// PASS3 deep S3a): ALL THREE engines implement the vision flow —
+// sing-box documents `flow: xtls-rprx-vision` on its VLESS outbound and
+// the renderer emits it verbatim, and mihomo passes flow through to its
+// VLESS stack. The earlier premise "sing-box and mihomo have no vision
+// flow, so mux stays on for their REALITY outbounds" was false, and it
+// produced configs that emitted multiplex+vision together on two of the
+// three engines — a combination with no defined semantics on the server
+// side (a vision user is not a mux user). The predicate below is now
+// flow-aware for every engine: a vision flow suppresses mux everywhere,
+// not just in the Xray renderer. Under vision the anti-parallelism role
+// belongs to XHTTP+xmux (see the spec), not to outbound mux.
 //
 // NOTE: Options.Mux is declared in plan.go (Options struct). The type
 // lives here to keep this file the single home of the mux policy.
@@ -40,9 +47,10 @@ func MuxConcurrency(o MuxOptions) int {
 }
 
 // RealityMux reports whether the outbound gets default multiplexing: a
-// REALITY outbound in a plan whose mux default is not disabled. Vision
-// flows are excluded by the renderers themselves (see the architectural
-// decision above), so this predicate stays engine-neutral.
+// REALITY outbound in a plan whose mux default is not disabled and whose
+// flow is not an XTLS vision flow. The vision exclusion lives here, in
+// the shared predicate, so no renderer can reintroduce mux+vision by
+// forgetting its own guard (PASS3 deep S3a).
 func RealityMux(o Outbound, mux MuxOptions) bool {
-	return o.TLS.Reality && !mux.Disabled
+	return o.TLS.Reality && !mux.Disabled && !IsVisionFlow(o.Flow)
 }

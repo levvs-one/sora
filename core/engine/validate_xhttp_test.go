@@ -51,6 +51,27 @@ func TestValidateXHTTP(t *testing.T) {
 		{"xhttp with vision flow", xhttp(func(o *Outbound) {
 			o.Flow = "xtls-rprx-vision"
 		}), true},
+		{"xhttp with vision flow and encryption none", xhttp(func(o *Outbound) {
+			o.Flow = "xtls-rprx-vision"
+			o.Encryption = "none"
+		}), true},
+		{"xhttp with vision flow and VLESS Encryption", xhttp(func(o *Outbound) {
+			// PASS3 deep S3b: under VLESS Encryption XTLS has no
+			// underlying transport restrictions, so the panels'
+			// encryption+xhttp+vision combination is legal.
+			o.Flow = "xtls-rprx-vision"
+			o.Encryption = "mlkem768x25519plus.native.0rtt.AAAA"
+		}), false},
+		{"xhttp with vision-udp443 flow and VLESS Encryption", xhttp(func(o *Outbound) {
+			o.Flow = "xtls-rprx-vision-udp443"
+			o.Encryption = "mlkem768x25519plus.native.0rtt.AAAA"
+		}), false},
+		{"xhttp with vision flow, REALITY and no Encryption stays refused", xhttp(func(o *Outbound) {
+			// REALITY is not VLESS Encryption: the exception must
+			// not leak to it.
+			o.Flow = "xtls-rprx-vision"
+			o.TLS.Reality = true
+		}), true},
 		{"download address without port", xhttp(func(o *Outbound) {
 			o.Transport.Mode = "stream-up"
 			o.Transport.DownloadAddress = "dl.example.com"

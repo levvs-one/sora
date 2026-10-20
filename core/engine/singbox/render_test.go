@@ -434,7 +434,30 @@ func TestRenderDNSIPv6Strategy(t *testing.T) {
 // (including QUIC outbounds, where multiplexing is invalid) and honors
 // Options.Mux.Disabled.
 func TestRenderMultiplexDefaultsToReality(t *testing.T) {
-	cfg := render(t, enginetest.Plan(allProtocols...))
+	// The shared enginetest VLESS outbound is REALITY+vision: vision
+	// suppresses mux on every engine (PASS3 deep S3a), so it must NOT
+	// carry multiplex. Clearing the flow restores the T007 default.
+	visionPlan := enginetest.Plan(allProtocols...)
+	cfg := render(t, visionPlan)
+	for _, ob := range cfg["outbounds"].([]any) {
+		m := ob.(map[string]any)
+		if m["type"] == "vless" {
+			if _, ok := m["multiplex"]; ok {
+				t.Fatal("multiplex must not be emitted together with a vision flow (PASS3 deep S3a)")
+			}
+			if m["flow"] != "xtls-rprx-vision" {
+				t.Fatalf("the vision flow itself must still render, got flow=%v", m["flow"])
+			}
+		}
+	}
+
+	plan := enginetest.Plan(allProtocols...)
+	for i := range plan.Outbounds {
+		if plan.Outbounds[i].Protocol == engine.ProtocolVLESS {
+			plan.Outbounds[i].Flow = ""
+		}
+	}
+	cfg = render(t, plan)
 	var vless map[string]any
 	for _, ob := range cfg["outbounds"].([]any) {
 		m := ob.(map[string]any)

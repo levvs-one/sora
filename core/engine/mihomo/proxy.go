@@ -166,9 +166,12 @@ func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
 		return proxy{}, err
 	}
 	if engine.RealityMux(o, mux) {
-		// mihomo has no vision flow, so mux is always applicable to
-		// REALITY here: one TLS connection instead of many parallel
-		// handshakes sharing one SNI (T007).
+		// mihomo DOES carry the vision flow (flow is passed through to
+		// its VLESS stack above), so mux is suppressed under vision
+		// here exactly as on the other engines — engine.RealityMux is
+		// flow-aware (PASS3 deep S3a). Without vision: one TLS
+		// connection instead of many parallel handshakes sharing one
+		// SNI (T007).
 		px.Smux = &smux{Enabled: true, Protocol: "smux"}
 	}
 	return px, nil

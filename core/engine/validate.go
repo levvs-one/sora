@@ -255,10 +255,14 @@ func validateXHTTP(o Outbound) []error {
 	if !validXHTTPModes[t.Mode] {
 		bad("mode %q is not one of auto, packet-up, stream-up, stream-one", t.Mode)
 	}
-	if strings.HasPrefix(o.Flow, "xtls-rprx-vision") {
-		// XTLS Vision is TCP-only; XHTTP's protection against
-		// TLS-in-TLS comes from xmux and the up/down split instead.
-		bad("flow %q cannot be combined with the xhttp transport (Vision needs TCP)", o.Flow)
+	if strings.HasPrefix(o.Flow, "xtls-rprx-vision") && !o.HasVLESSEncryption() {
+		// XTLS is available only under TCP+TLS/REALITY — or under
+		// VLESS Encryption, which carries the flow on any transport
+		// (https://xtls.github.io/en/config/outbounds/vless.html).
+		// Without Encryption, vision on XHTTP cannot work; XHTTP's
+		// protection against TLS-in-TLS comes from xmux and the
+		// up/down split instead (PASS3 deep S3b).
+		bad("flow %q cannot be combined with the xhttp transport (Vision needs TCP or VLESS Encryption)", o.Flow)
 	}
 	if t.DownloadAddress != "" || t.DownloadPort != 0 {
 		if t.DownloadAddress == "" || t.DownloadPort == 0 {

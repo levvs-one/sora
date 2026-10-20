@@ -6,6 +6,18 @@ package engine
 // renderers; this constant is the plan-level spelling of it.
 const VisionFlow = "xtls-rprx-vision"
 
+// HasVLESSEncryption reports whether the outbound carries an active
+// VLESS Encryption string — anything but "" or "none". The distinction
+// matters for the XTLS flow rules: upstream documents XTLS as available
+// only under TCP+TLS/REALITY, OR under VLESS Encryption with no
+// underlying transport restrictions at all
+// (https://xtls.github.io/en/config/outbounds/vless.html). A vision
+// flow on a non-TCP transport is therefore legal exactly when this
+// reports true (PASS3 deep S3b).
+func (o Outbound) HasVLESSEncryption() bool {
+	return o.Encryption != "" && o.Encryption != "none"
+}
+
 // ApplyAutoVision enables XTLS vision on an outbound that benefits from
 // it but did not ask for a flow explicitly: VLESS over TCP (""
 // counts as TCP — it is the default transport) with TLS or REALITY

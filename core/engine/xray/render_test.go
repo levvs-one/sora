@@ -466,6 +466,19 @@ func TestRenderAcceptsCompatibleTransportPairs(t *testing.T) {
 			o.Transport = engine.Transport{Type: "ws", Path: "/ws"}
 		},
 		"tcp+vision+reality": func(p *engine.Plan) {},
+		"xhttp+vision+vless-encryption": func(p *engine.Plan) {
+			// PASS3 deep S3b: under VLESS Encryption XTLS has no
+			// underlying transport restrictions, so the panels'
+			// encryption+xhttp+vision combination must render.
+			o := &p.Outbounds[0]
+			o.Encryption = "mlkem768x25519plus.native.0rtt.Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw"
+			o.Transport = engine.Transport{Type: "xhttp", Path: "/x", Mode: "packet-up"}
+		},
+		"grpc+vision+vless-encryption": func(p *engine.Plan) {
+			o := &p.Outbounds[0]
+			o.Encryption = "mlkem768x25519plus.native.0rtt.Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw"
+			o.Transport = engine.Transport{Type: "grpc", Service: "tun"}
+		},
 	}
 	for name, mutate := range cases {
 		p := enginetest.Plan(engine.ProtocolVLESS)

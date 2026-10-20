@@ -53,9 +53,11 @@ func (o Outbound) RealityWarnings() []string {
 		// surfaces it earlier, at import/validation time.
 		out = append(out, "reality-ws-transport")
 	}
-	if transport == "xhttp" && IsVisionFlow(o.Flow) {
-		// XHTTP is incompatible with XTLS-Vision; multiplexing there is
-		// xmux's job, not vision's.
+	if transport == "xhttp" && IsVisionFlow(o.Flow) && !o.HasVLESSEncryption() {
+		// REALITY+XHTTP+vision without VLESS Encryption is not a legal
+		// XTLS combination (REALITY is not Encryption); multiplexing
+		// there is xmux's job, not vision's. With VLESS Encryption the
+		// flow is legal on any transport, so no warning (PASS3 deep S3b).
 		out = append(out, "reality-xhttp-vision")
 	}
 	if dest := o.realityDest(); dest != "" {

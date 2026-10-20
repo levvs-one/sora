@@ -255,12 +255,14 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		return nil, fmt.Errorf("xray: outbound %s: %w", o.ID, err)
 	}
 	ob := obj{"tag": tag, "protocol": protocol, "settings": settings}.set("streamSettings", stream)
-	if engine.RealityMux(o, r.plan.Options.Mux) && o.Flow != "xtls-rprx-vision" {
-		// Vision and mux are mutually exclusive in Xray: upstream
-		// silently ignores mux under xtls-rprx-vision, so emitting it
-		// would be a lie in the config (T002 architectural decision:
-		// vision wins). Under vision the anti-parallelism role belongs
-		// to XHTTP+xmux, not to outbound mux.
+	if engine.RealityMux(o, r.plan.Options.Mux) {
+		// Vision and mux are mutually exclusive: upstream silently
+		// ignores mux under xtls-rprx-vision, so emitting it would be
+		// a lie in the config (T002 architectural decision: vision
+		// wins). The vision exclusion lives in engine.RealityMux
+		// itself, shared by all three renderers (PASS3 deep S3a).
+		// Under vision the anti-parallelism role belongs to
+		// XHTTP+xmux, not to outbound mux.
 		ob["mux"] = obj{"enabled": true, "concurrency": engine.MuxConcurrency(r.plan.Options.Mux)}
 	}
 	return ob, nil
@@ -380,10 +382,12 @@ func checkStreamCompat(o engine.Outbound) error {
 	if o.TLS.Reality && (t == "ws" || t == "httpupgrade") {
 		return fmt.Errorf("xray: outbound %s: REALITY does not support the %s transport (use tcp, xhttp or grpc)", o.ID, t)
 	}
-	if o.Flow != "" && t != "" && t != "tcp" {
-		// Upstream: XTLS is available only under TCP+TLS/REALITY.
+	if o.Flow != "" && t != "" && t != "tcp" && !o.HasVLESSEncryption() {
+		// Upstream: XTLS is available only under TCP+TLS/REALITY —
+		// or under VLESS Encryption, which imposes no underlying
+		// transport restrictions (PASS3 deep S3b).
 		// https://xtls.github.io/en/config/outbounds/vless.html
-		return fmt.Errorf("xray: outbound %s: flow %q requires the TCP transport, not %q", o.ID, o.Flow, t)
+		return fmt.Errorf("xray: outbound %s: flow %q requires the TCP transport or VLESS Encryption, not %q", o.ID, o.Flow, t)
 	}
 	return nil
 }
