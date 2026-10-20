@@ -142,11 +142,12 @@ func (d *DirStore) Get(kind, name string) (Document, bool) {
 	if err != nil {
 		return Document{}, false
 	}
-	hash := sd.Hash
-	if hash == "" {
-		// Legacy file without the cached hash.
-		hash = HashOf(payload)
-	}
+	// Get returns the payload, so the hash is recomputed from it: the
+	// Meta.Hash == sha256(payload) invariant (sync.go) must hold for
+	// every document Get hands out, even if the on-disk cache was
+	// edited or written by an older build. The cache stays only in
+	// List(), the one place that never decodes payloads.
+	hash := HashOf(payload)
 	return Document{
 		Meta:    Meta{Kind: kind, Name: name, UpdatedAt: sd.UpdatedAt, Hash: hash},
 		Payload: payload,
