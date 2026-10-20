@@ -128,7 +128,7 @@ func TestRevocationBlocksInstallAndEnable(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open package: %v", err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}); err == nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err == nil {
 		t.Fatal("install of a revoked version must fail")
 	}
 
@@ -139,7 +139,7 @@ func TestRevocationBlocksInstallAndEnable(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open package: %v", err)
 	}
-	if _, err := s.Install(pkg2, SourceSideload, []string{"connections.read", "notifications"}); err != nil {
+	if _, err := s.Install(pkg2, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
 		t.Fatalf("install of a non-revoked version: %v", err)
 	}
 
@@ -170,7 +170,7 @@ func TestExpiredRevocationListBlocksInstall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open package: %v", err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}); err == nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err == nil {
 		t.Fatal("an expired revocation list must fail installs closed")
 	}
 }
@@ -185,7 +185,7 @@ func TestNoRevocationListAllowsInstall(t *testing.T) {
 	if err != nil {
 		t.Fatalf("open package: %v", err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
 		t.Fatalf("no list cached: install must proceed (catalog is the gate): %v", err)
 	}
 }
