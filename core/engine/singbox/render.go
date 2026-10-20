@@ -300,7 +300,20 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		if o.HopInterval > 0 {
 			out["hop_interval"] = strconv.Itoa(o.HopInterval) + "s"
 		}
+		// Randomized hop interval (sing-box 1.14, Hysteria 2.8 server
+		// side): hop_interval_max >= hop_interval is enforced by plan
+		// validation; only a valid range reaches the render.
+		if o.HopIntervalMax > 0 {
+			out["hop_interval_max"] = strconv.Itoa(o.HopIntervalMax) + "s"
+		}
+		// BBR congestion profile (sing-box 1.14 bbr_profile). Emitted
+		// only when BBR is actually in charge: with bandwidth caps the
+		// client runs Brutal instead and the profile would be dead text.
+		if o.BBRProfile != "" && o.UpMbps == 0 && o.DownMbps == 0 {
+			out["bbr_profile"] = o.BBRProfile
+		}
 		if o.Obfs != "" {
+			// sing-box 1.14 Hysteria2 obfs types: salamander and gecko.
 			out["obfs"] = obj{"type": o.Obfs, "password": o.ObfsParam}
 		}
 		needsTLS = true

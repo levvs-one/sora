@@ -1099,8 +1099,25 @@ func validateHysteria2Tuning(o Outbound) []error {
 	case o.HopInterval > 0 && o.HopPorts == "":
 		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval needs hop ports", o.ID))
 	}
+	switch {
+	case o.HopIntervalMax < 0:
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval max must not be negative", o.ID))
+	case o.HopIntervalMax > 0 && o.HopPorts == "":
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval max needs hop ports", o.ID))
+	case o.HopIntervalMax > 0 && o.HopInterval > 0 && o.HopIntervalMax < o.HopInterval:
+		// sing-box renders hop_interval..hop_interval_max as the
+		// randomized hop range; an inverted range is a config bug.
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval max %ds is below the hop interval %ds", o.ID, o.HopIntervalMax, o.HopInterval))
+	}
+	if o.BBRProfile != "" && !validBBRProfiles[o.BBRProfile] {
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 bbr profile %q is not standard, conservative or aggressive", o.ID, o.BBRProfile))
+	}
 	return errs
 }
+
+// validBBRProfiles lists the BBR congestion profiles sing-box 1.14
+// accepts for Hysteria2 outbounds (bbr_profile).
+var validBBRProfiles = map[string]bool{"standard": true, "conservative": true, "aggressive": true}
 
 // validateHopPorts checks a Hysteria2 port-hopping spec such as
 // "20000-30000,40000": comma-separated single ports or ascending ranges.

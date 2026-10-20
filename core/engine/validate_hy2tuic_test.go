@@ -20,6 +20,39 @@ func TestValidateAcceptsHysteria2Tuning(t *testing.T) {
 	}
 }
 
+func TestValidateHysteria21_14Tuning(t *testing.T) {
+	// S4: sing-box 1.14 fields — randomized hop interval and BBR
+	// profile — validate like the base tuning does.
+	ok := hy2Outbound()
+	ok.HopPorts = "20000-30000"
+	ok.HopInterval, ok.HopIntervalMax = 30, 90
+	ok.BBRProfile = "conservative"
+	if err := ok.Validate(); err != nil {
+		t.Fatalf("Validate = %v, want nil", err)
+	}
+	bad := []struct {
+		name string
+		mut  func(*Outbound)
+	}{
+		{"negative hop max", func(o *Outbound) { o.HopIntervalMax = -1 }},
+		{"hop max without ports", func(o *Outbound) { o.HopIntervalMax = 60 }},
+		{"hop max below interval", func(o *Outbound) {
+			o.HopPorts = "20000"
+			o.HopInterval, o.HopIntervalMax = 90, 30
+		}},
+		{"unknown bbr profile", func(o *Outbound) { o.BBRProfile = "turbo" }},
+	}
+	for _, c := range bad {
+		t.Run(c.name, func(t *testing.T) {
+			o := hy2Outbound()
+			c.mut(&o)
+			if err := o.Validate(); err == nil {
+				t.Fatalf("Validate = nil, want error")
+			}
+		})
+	}
+}
+
 func TestValidateRejectsBadHysteria2Tuning(t *testing.T) {
 	cases := []struct {
 		name string

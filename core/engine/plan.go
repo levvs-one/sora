@@ -193,6 +193,15 @@ type Outbound struct {
 	// HopInterval is the Hysteria2 port hop interval in seconds. Zero
 	// keeps the engine default (30s); the protocol requires at least 5s.
 	HopInterval int
+	// HopIntervalMax is the randomized upper bound of the port hop
+	// interval in seconds (sing-box 1.14 hop_interval_max; Hysteria
+	// 2.8's randomized hop interval). Zero keeps a fixed HopInterval.
+	HopIntervalMax int
+	// BBRProfile selects the sing-box 1.14 Hysteria2 BBR congestion
+	// profile: "standard", "conservative" or "aggressive". Empty keeps
+	// the engine default. It applies only while BBR is in charge (no
+	// bandwidth caps — caps switch the client to Brutal).
+	BBRProfile string
 	// CongestionControl selects the TUIC QUIC congestion controller:
 	// "bbr" (default), "cubic" or "new_reno". Unknown values are rejected.
 	CongestionControl string

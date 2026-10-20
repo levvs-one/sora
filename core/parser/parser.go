@@ -420,7 +420,7 @@ func parseLink(raw string) (OutboundSpec, error) {
 	if a := getq(u, "alpn"); a != "" {
 		o.ALPN = strings.Split(a, ",")
 	}
-	for _, k := range []string{"mport", "pinSHA256", "pin_sha256", "obfs", "obfs-password", "obfs_password", "congestion_control", "udp_relay_mode", "upmbps", "downmbps", "hop-interval", "hopinterval", "ports", "token"} {
+	for _, k := range []string{"mport", "pinSHA256", "pin_sha256", "obfs", "obfs-password", "obfs_password", "congestion_control", "udp_relay_mode", "upmbps", "downmbps", "hop-interval", "hopinterval", "hop-interval-max", "hopintervalmax", "bbr-profile", "bbr_profile", "ports", "token"} {
 		if v := getq(u, k); v != "" {
 			o.Options[k] = v
 		}

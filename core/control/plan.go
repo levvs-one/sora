@@ -121,6 +121,18 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 			break
 		}
 	}
+	for _, key := range []string{"hop-interval-max", "hopintervalmax"} {
+		if value := spec.Options[key]; value != "" {
+			values["hop_interval_max"] = value
+			break
+		}
+	}
+	for _, key := range []string{"bbr-profile", "bbr_profile"} {
+		if value := spec.Options[key]; value != "" {
+			values["bbr_profile"] = value
+			break
+		}
+	}
 	// TUIC tuning and the v4 token.
 	values["congestion_control"] = spec.Options["congestion_control"]
 	values["udp_relay_mode"] = spec.Options["udp_relay_mode"]
@@ -579,10 +591,14 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	outbound.Flow = values["flow"]
 	outbound.Obfs = values["obfs"]
 	outbound.ObfsParam = values["obfs_param"]
+	outbound.Plugin = values["ss_plugin"]
+	outbound.PluginOpts = values["ss_plugin_opts"]
 	outbound.UpMbps = atoiNonNegative(values["upmbps"])
 	outbound.DownMbps = atoiNonNegative(values["downmbps"])
 	outbound.HopPorts = values["hop_ports"]
 	outbound.HopInterval = atoiNonNegative(values["hop_interval"])
+	outbound.HopIntervalMax = atoiNonNegative(values["hop_interval_max"])
+	outbound.BBRProfile = values["bbr_profile"]
 	outbound.CongestionControl = values["congestion_control"]
 	outbound.UDPRelayMode = values["udp_relay_mode"]
 	outbound.Token = values["token"]
