@@ -589,14 +589,27 @@ class Sora extends ChangeNotifier {
 
   /// All subscription servers in list order, deduplicated by ID.
   List<OutboundSpec> get servers {
+    final cached = _serversCache;
+    if (cached != null) return cached;
     final seen = <String>{};
     final hidden = hiddenServerIds;
-    return [
+    return _serversCache = [
       for (final s in _subscriptions.values)
         for (final o in s.outbounds)
           if (seen.add(o.id) && !hidden.contains(o.id)) o,
     ];
   }
+
+  /// Memo for [servers], dropped by [notifyListeners]. A single build pass
+  /// reads [servers] from the connection pane, from every server row (via
+  /// [selected]) and from the plan builder, and each read used to rebuild
+  /// the whole deduped list — O(reads × servers) allocations on the first
+  /// builds and on every probe tick. Every write to the inputs
+  /// (_subscriptions, subscription overrides) already ends in
+  /// [notifyListeners], so the memo can never outlive a mutation; it is
+  /// replaced rather than mutated, so a held reference keeps the snapshot
+  /// semantics the fresh-list-per-call version had.
+  List<OutboundSpec>? _serversCache;
 
   /// Current selection; falls back to auto if the selected server or group is
   /// no longer present. Always the canonical outbound id: custom servers are
@@ -664,6 +677,9 @@ class Sora extends ChangeNotifier {
 
   @override
   void notifyListeners() {
+    // State just changed, so the memoized server list may be stale; the
+    // next [servers] read rebuilds it (see [_serversCache]).
+    _serversCache = null;
     if (!_disposed) super.notifyListeners();
   }
 
