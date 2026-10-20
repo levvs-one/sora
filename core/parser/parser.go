@@ -69,42 +69,50 @@ type ImportDetector struct{ MaxItems int }
 // Detect identifies src's format. Empty or oversized input returns an empty
 // Detection; other errors include the best format guess.
 func (d ImportDetector) Detect(src []byte) (Detection, error) {
+	det, _, err := d.detect(src)
+	return det, err
+}
+
+// detect is Detect plus the decoded payload for FormatBase64 input, so Parse
+// does not have to decode the payload a second time. The decoded bytes are
+// nil for every other format.
+func (d ImportDetector) detect(src []byte) (Detection, []byte, error) {
 	if len(src) == 0 || strings.TrimSpace(string(src)) == "" {
-		return Detection{}, ErrEmptySource
+		return Detection{}, nil, ErrEmptySource
 	}
 	if len(src) > MaxInputSize {
-		return Detection{}, ErrInputTooLarge
+		return Detection{}, nil, ErrInputTooLarge
 	}
 	s := strings.TrimSpace(string(src))
 	low := strings.ToLower(s)
 	if strings.HasPrefix(low, "https://") {
-		return Detection{Format: FormatSubscription}, nil
+		return Detection{Format: FormatSubscription}, nil, nil
 	}
 	if strings.HasPrefix(low, "http://") {
-		return Detection{Format: FormatHTTPSubscription, Reason: "subscriptions require HTTPS"}, nil
+		return Detection{Format: FormatHTTPSubscription, Reason: "subscriptions require HTTPS"}, nil, nil
 	}
 	if hasScheme(s) {
-		return Detection{Format: FormatLink}, nil
+		return Detection{Format: FormatLink}, nil, nil
 	}
 	if strings.HasPrefix(s, "{") || strings.HasPrefix(s, "[") {
 		var v any
 		if json.Unmarshal([]byte(s), &v) == nil {
-			return classifyJSON(v), nil
+			return classifyJSON(v), nil, nil
 		}
 	}
 	if strings.Contains(s, "proxies:") {
-		return Detection{Format: FormatClash}, nil
+		return Detection{Format: FormatClash}, nil, nil
 	}
 	if looksWG(s) {
-		return Detection{Format: FormatWireGuard}, nil
+		return Detection{Format: FormatWireGuard}, nil, nil
 	}
 	if b, ok := decodeBase64(s); ok && (hasScheme(string(b)) || looksList(string(b))) {
-		return Detection{Format: FormatBase64}, nil
+		return Detection{Format: FormatBase64}, b, nil
 	}
 	if looksList(s) {
-		return Detection{Format: FormatPlainList}, nil
+		return Detection{Format: FormatPlainList}, nil, nil
 	}
-	return Detection{Format: FormatUnknown, Reason: "no supported parser matched"}, ErrUnsupported
+	return Detection{Format: FormatUnknown, Reason: "no supported parser matched"}, nil, ErrUnsupported
 }
 func hasScheme(s string) bool {
 	for _, l := range strings.Fields(s) {
@@ -272,19 +280,20 @@ func (p LinkParser) Parse(src []byte) (ImportResult, error) {
 	if len(src) > MaxInputSize {
 		return ImportResult{}, ErrInputTooLarge
 	}
-	d, e := (ImportDetector{p.limit()}).Detect(src)
+	d, decoded, e := (ImportDetector{p.limit()}).detect(src)
 	if e != nil && d.Format != FormatHTTPSubscription && d.Format != FormatUnknown {
 		return ImportResult{Format: d.Format}, e
 	}
 	if d.Format == FormatHTTPSubscription {
 		return ImportResult{Format: d.Format}, ErrUnsupported
 	}
+	if d.Format == FormatBase64 {
+		// detect already decoded the payload to classify it; parse the
+		// decoded bytes instead of decoding the raw text a second time.
+		return p.parseList(string(decoded), FormatPlainList)
+	}
 	s := strings.TrimSpace(string(src))
 	switch d.Format {
-	case FormatBase64:
-		b, _ := decodeBase64(s)
-		s = string(b)
-		d.Format = FormatPlainList
 	case FormatSIP008, FormatSingBox, FormatXray:
 		return p.parseJSON([]byte(s), d.Format)
 	case FormatClash:
