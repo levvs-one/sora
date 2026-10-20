@@ -40,33 +40,15 @@ const (
 	defaultBenchmarkTimeout     = 30 * time.Second
 	defaultBenchmarkConcurrency = 2
 	maxBenchmarkConcurrency     = 4
-
-	// historyTTL marks entries older than this as stale; readers decide how
-	// to display them.
-	historyTTL = 24 * time.Hour
-	// historyPruneAfter bounds restart persistence: entries older than
-	// this are dropped on load. Twice the TTL is safe because no scorer
-	// can use them (freshness decays to zero at the TTL) and the 24h
-	// stale rule for display is unchanged.
-	historyPruneAfter = 2 * historyTTL
-	historyDir        = "probe"
-	historyFile       = "history.json"
-	// historySaveInterval bounds disk writes: a probe sweep records one
-	// latency per endpoint, and persisting the whole map per result would
-	// rewrite the file hundreds of times in a burst. The in-memory history
-	// stays fresh; the file is only restart persistence.
-	historySaveInterval = 30 * time.Second
 )
 
 // BenchmarkerConfig wires a Benchmarker. NewEngine and SelectKind are
-// required; DataDir is optional (empty disables history persistence).
+// required.
 type BenchmarkerConfig struct {
 	// NewEngine builds a temporary engine for one benchmark plan.
 	NewEngine func(ctx context.Context, p *engine.Plan) (engine.Engine, error)
 	// SelectKind picks the engine kind able to carry the outbound.
 	SelectKind func(o engine.Outbound) (engine.Kind, error)
-	// DataDir anchors probe/history.json. Empty disables history.
-	DataDir string
 	// Now is overridden in tests.
 	Now func() time.Time
 }
@@ -80,44 +62,18 @@ type BandwidthSample struct {
 	Err         error
 }
 
-// HistoryEntry is one stored measurement.
-type HistoryEntry struct {
-	ServerID    string
-	BytesPerSec uint64
-	LatencyMs   uint32
-	MeasuredAt  time.Time
-}
-
-// StaleAt reports whether the entry is older than the history TTL as of now.
-func (e HistoryEntry) StaleAt(now time.Time) bool { return now.Sub(e.MeasuredAt) > historyTTL }
-
-// Benchmarker measures throughput and keeps the result history.
+// Benchmarker measures throughput. It keeps no stored history: results
+// stream out of Benchmark live, and the app stores whatever it shows.
 type Benchmarker struct {
 	cfg BenchmarkerConfig
-	now func() time.Time
-
-	mu      sync.Mutex
-	history map[string]HistoryEntry
-	// lastSave bounds history.json writes to historySaveInterval; the zero
-	// value means "never saved", so the first record always persists.
-	lastSave time.Time
 }
 
-// NewBenchmarker validates the config and loads persisted history.
+// NewBenchmarker validates the config.
 func NewBenchmarker(cfg BenchmarkerConfig) (*Benchmarker, error) {
 	if cfg.NewEngine == nil || cfg.SelectKind == nil {
 		return nil, fmt.Errorf("probe: benchmarker needs NewEngine and SelectKind")
 	}
-	b := &Benchmarker{
-		cfg:     cfg,
-		now:     cfg.Now,
-		history: map[string]HistoryEntry{},
-	}
-	if b.now == nil {
-		b.now = time.Now
-	}
-	b.loadHistory()
-	return b, nil
+	return &Benchmarker{cfg: cfg}, nil
 }
 
 // runtimeProvider is implemented by engines embedding supervise.Supervisor.
@@ -374,110 +330,4 @@ func downloadGoodput(ctx context.Context, proxyAddr, rawURL string, duration tim
 			return uint64(float64(total.Load()) / elapsed.Seconds()), nil
 		}
 	}
-}
-
-// recordBandwidth stores a fresh throughput result, keeping any known
-// latency from earlier probes.
-func (b *Benchmarker) recordBandwidth(serverID string, bps uint64, _ engine.Kind) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	e := b.history[serverID]
-	e.ServerID = serverID
-	e.BytesPerSec = bps
-	e.MeasuredAt = b.now()
-	b.history[serverID] = e
-	b.saveHistoryLocked()
-}
-
-// RecordLatency stores a latency probe result, keeping any known throughput.
-// A latency probe is a fresh measurement of the server, so it refreshes the
-// entry timestamp exactly like recordBandwidth does: freshness must reflect
-// the newest data of either kind, not just the newest bandwidth run.
-func (b *Benchmarker) RecordLatency(serverID string, latency time.Duration) {
-	if serverID == "" {
-		return
-	}
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	e := b.history[serverID]
-	e.ServerID = serverID
-	ms := latency.Milliseconds()
-	if ms >= 0 && ms < 1<<32 {
-		e.LatencyMs = uint32(ms)
-		e.MeasuredAt = b.now()
-	}
-	b.history[serverID] = e
-	b.saveHistoryLocked()
-}
-
-// History returns stored entries, newest first.
-func (b *Benchmarker) History() []HistoryEntry {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	out := make([]HistoryEntry, 0, len(b.history))
-	for _, e := range b.history {
-		out = append(out, e)
-	}
-	// Newest first. The hand-rolled insertion sort was O(n^2); with
-	// thousands of servers that showed up on the GetBenchmarks RPC.
-	sort.SliceStable(out, func(i, j int) bool { return out[i].MeasuredAt.After(out[j].MeasuredAt) })
-	return out
-}
-
-// historyPath is probe/history.json under the data dir.
-func (b *Benchmarker) historyPath() string {
-	if b.cfg.DataDir == "" {
-		return ""
-	}
-	return filepath.Join(b.cfg.DataDir, historyDir, historyFile)
-}
-
-func (b *Benchmarker) loadHistory() {
-	path := b.historyPath()
-	if path == "" {
-		return
-	}
-	raw, err := os.ReadFile(path)
-	if err != nil {
-		return // Absent history is not an error.
-	}
-	var stored map[string]HistoryEntry
-	if err := json.Unmarshal(raw, &stored); err != nil {
-		return // Corrupt history is dropped, never fatal.
-	}
-	now := b.now()
-	for id, e := range stored {
-		if now.Sub(e.MeasuredAt) > historyPruneAfter {
-			continue
-		}
-		e.ServerID = id
-		b.history[id] = e
-	}
-}
-
-// saveHistoryLocked persists atomically: write temp, then rename. Writes
-// are throttled to historySaveInterval because probe sweeps record one
-// result per endpoint; the in-memory history is always current.
-func (b *Benchmarker) saveHistoryLocked() {
-	path := b.historyPath()
-	if path == "" {
-		return
-	}
-	now := b.now()
-	if now.Sub(b.lastSave) < historySaveInterval {
-		return
-	}
-	b.lastSave = now
-	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
-		return
-	}
-	raw, err := json.Marshal(b.history)
-	if err != nil {
-		return
-	}
-	tmp := path + ".tmp"
-	if err := os.WriteFile(tmp, raw, 0o600); err != nil {
-		return
-	}
-	_ = os.Rename(tmp, path)
 }
