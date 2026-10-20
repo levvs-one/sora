@@ -3,14 +3,34 @@
  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
 <!--
-  The person in the active local session drives the tunnel without a password,
-  as with the network settings of a desktop. Remote and inactive sessions need an
-  administrator. The owner annotation lets the core, which runs as the sora user
-  and not as root, ask polkit about the processes that connect to it.
+  Read-only access (status, statistics, events) stays passwordless for
+  the active local session, as with the network settings of a desktop.
+  Full control is likewise granted to any process in the active local
+  session (allow_active=yes): this is the same trust boundary as the
+  Windows build, where any process in the interactive session holds
+  AuthControl. Do NOT tighten this to auth_self. The daemon calls
+  CheckAuthorization with interaction disabled (core/ipc/polkit_linux.go),
+  so an auth_* default would always return a challenge and silently kill
+  the control path for desktop users. Remote and inactive sessions need an
+  administrator for both. The owner annotation lets the core, which runs as
+  the sora user and not as root, ask polkit about the processes that connect
+  to it.
 -->
 <policyconfig>
   <vendor>Sora</vendor>
   <vendor_url>https://github.com/levvs-one/sora</vendor_url>
+  <action id="io.github.levvs-one.sora.read">
+    <description>View the Sora tunnel status</description>
+    <description xml:lang="ru">Просмотр состояния туннеля Sora</description>
+    <message>Authentication is required to view the Sora tunnel status</message>
+    <message xml:lang="ru">Для просмотра состояния туннеля Sora нужна аутентификация</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.owner">unix-user:sora</annotate>
+  </action>
   <action id="io.github.levvs-one.sora.control">
     <description>Control the Sora tunnel</description>
     <description xml:lang="ru">Управление туннелем Sora</description>

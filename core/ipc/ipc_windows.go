@@ -129,5 +129,19 @@ func sessionActive(id uint32) bool {
 
 // defaultAllow admits active-session or administrator peers; see peerOf.
 func defaultAllow(Options) func(Peer) bool {
-	return func(p Peer) bool { return p.Verified && p.Present }
+	authorize := DefaultAuthorize(Options{})
+	return func(p Peer) bool { return authorize(p) != AuthNone }
+}
+
+// DefaultAuthorize maps an admitted peer to its control-API privilege level.
+// Windows admits only active-session or administrator peers through the pipe
+// DACL, which keeps full control as before (SORA-H2 leaves this boundary
+// unchanged).
+func DefaultAuthorize(Options) func(Peer) AuthLevel {
+	return func(p Peer) AuthLevel {
+		if p.Verified && p.Present {
+			return AuthControl
+		}
+		return AuthNone
+	}
 }

@@ -9,10 +9,20 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
-// PolkitAction authorizes core control via service/linux/sora.policy. Active
-// local users need no password; sora owns the action because non-root checks of
-// other processes require action ownership.
+// PolkitAction authorizes full core control via service/linux/sora.policy.
+// Active local users are allowed without a password (allow_active=yes):
+// any process in the active local session holds full control, the same
+// trust boundary as the Windows build. Do NOT change the policy to auth_*:
+// polkitAllows checks authorization with interaction disabled, so an
+// auth_* default would always return a challenge and silently kill the
+// control path. sora owns the action because non-root checks of other
+// processes require action ownership.
 const PolkitAction = "io.github.levvs-one.sora.control"
+
+// PolkitReadAction authorizes read-only access (status, statistics, events,
+// logs) via service/linux/sora.policy. Active local users need no password;
+// anything mutating or private requires PolkitAction (SORA-H2).
+const PolkitReadAction = "io.github.levvs-one.sora.read"
 
 // polkitTimeout bounds authorization requests; timeout rejects the peer.
 const polkitTimeout = 3 * time.Second
