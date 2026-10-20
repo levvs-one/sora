@@ -1,0 +1,33 @@
+# {{.Name}}
+
+A Sora background-worker extension (runtime v2).
+
+The worker script runs periodically in a deliberately small sandbox: it can
+append to the extension log and - because this template also requests
+`net.fetch` - make allowlisted HTTP requests. No filesystem, no process
+control, no raw sockets.
+
+## The worker envelope
+
+The app-side JS runner executes `worker.js` with two globals:
+
+- `worker.log(message)` - appends a line to the extension log (visible in
+  the extension details screen).
+- `worker.fetch(url, {method, headers, body})` - HTTPS request to a host in
+  `network_hosts`. Rejects when the host is not allowlisted.
+
+The manifest declares `interval_minutes` as a wish; the runtime clamps the
+effective interval into [15 min, 7 days]. Every run's outcome (ok, failed,
+panicked) is written to the extension log.
+
+## Develop / ship
+
+```sh
+sora-ext validate
+sora-ext pack . -o {{.ID}}.soraext
+sora-ext sign --key .sora/author.key {{.ID}}.soraext
+```
+
+`network_hosts` entries are lowercase DNS names or `*.example.com`
+wildcards - no IPs, schemes, ports or paths. `api.example.com` matches only
+itself; `*.example.com` matches subdomains but not the bare domain.

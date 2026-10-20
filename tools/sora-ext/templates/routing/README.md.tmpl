@@ -1,0 +1,29 @@
+# {{.Name}}
+
+A Sora routing extension (contributes routing rules).
+
+> **Status: contract v0 (proposed).** The manifest side is real - `sora-ext
+> validate` accepts it and the app parses it - but core-side merging of
+> contributed rules is not implemented yet. `rules.json` below is the
+> proposed format the core will consume.
+
+## Contract v0
+
+- `rules.json` - `rules`: evaluated top-down, first match wins.
+  - `match`: `domain_suffix` (matches the domain and subdomains) and/or
+    `ip_cidr` (e.g. `10.0.0.0/8`).
+  - `action`: `proxy` (through the VPN), `direct` (bypass), `block`.
+  - `comment`: shown in the app next to the rule.
+- Anything not matched falls through to the user's own rules. Contributed
+  rules never silently override an explicit user rule.
+
+## Develop / ship
+
+```sh
+sora-ext validate
+sora-ext pack . -o {{.ID}}.soraext
+sora-ext sign --key .sora/author.key {{.ID}}.soraext
+```
+
+The `routing.rules` permission is **dangerous**: the install prompt requires
+explicit confirmation, and updates that add it re-prompt the user.

@@ -1,0 +1,33 @@
+# {{.Name}}
+
+A Sora extension (panel template). The only bridge between this panel and
+the app is `window.soraExt` - typed in `sora-ext.d.ts` next to this file.
+
+## Develop
+
+```sh
+sora-ext dev        # serve with live reload on http://127.0.0.1:8377
+sora-ext serve      # serve with a mocked window.soraExt (test in a desktop browser)
+```
+
+## Ship
+
+```sh
+sora-ext validate
+sora-ext pack . -o {{.ID}}.soraext
+sora-ext sign --key .sora/author.key {{.ID}}.soraext
+sora-ext publish {{.ID}}.soraext
+```
+
+Docs: `docs/extensions-quickstart.md` (10-minute guide), `docs/extensions-api.md`
+(API reference), `docs/extensions-cookbook.md` (recipes). Normative spec:
+`docs/extensions.md`.
+
+## Files
+
+- `sora-extension.json` - manifest v1 (id `{{.ID}}`)
+- `panel.html` - the panel
+- `sora-ext.d.ts` - TypeScript definitions for `window.soraExt`
+- `author.key` / `author.pub` - your signing keypair. **Keep `author.key`
+  offline and never commit it.** If it leaks, generate a new one and
+  re-sign; the public key in the manifest is what the app trusts.
