@@ -58,7 +58,7 @@ const (
 	// maxHappRoutingBytes bounds the stored routing payload: the
 	// decoded document is separately capped by happrouting.
 	maxHappRoutingBytes = 2 << 20
-	maxIntervalHours = 24 * 365
+	maxIntervalHours    = 24 * 365
 	// bodyHeaderLines bounds the leading lines inspected for metadata.
 	bodyHeaderLines = 10
 )

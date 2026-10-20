@@ -150,12 +150,12 @@ func TestEntryClassification(t *testing.T) {
 	}
 	conv := p.Convert("")
 	want := map[string]bool{
-		"domain:wild.example":          true,
-		"domain:url.example":           true,
-		"geosite:Mixed":                true,
-		"10.1.2.3/32":                  true,
-		"2001:db8::1/128":              true,
-		"192.168.0.0/16":               true,
+		"domain:wild.example":              true,
+		"domain:url.example":               true,
+		"geosite:Mixed":                    true,
+		"10.1.2.3/32":                      true,
+		"2001:db8::1/128":                  true,
+		"192.168.0.0/16":                   true,
 		"domain:domain-in-ip-list.example": true,
 	}
 	for _, r := range conv.Rules {

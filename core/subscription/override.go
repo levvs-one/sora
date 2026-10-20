@@ -51,10 +51,10 @@ type ProviderRouting struct {
 	// RemoteDNS / DomesticDNS are the provider's resolvers verbatim
 	// ("DoH https://…"), recorded, not applied: sora's DNS is one
 	// user-owned per-session list with no remote/domestic split.
-	RemoteDNS    string `json:"remote_dns,omitempty"`
-	DomesticDNS  string `json:"domestic_dns,omitempty"`
-	Notes        []ProviderNote `json:"notes,omitempty"`
-	Skipped      int    `json:"skipped,omitempty"`
+	RemoteDNS   string         `json:"remote_dns,omitempty"`
+	DomesticDNS string         `json:"domestic_dns,omitempty"`
+	Notes       []ProviderNote `json:"notes,omitempty"`
+	Skipped     int            `json:"skipped,omitempty"`
 }
 
 // ProviderNote records how one field of the provider document was
