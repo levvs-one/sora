@@ -224,3 +224,21 @@ func TestGuardApplyBlocksFakeIPRange6(t *testing.T) {
 		}
 	}
 }
+
+// TestBlockedReflectsTheFirewall: Blocked is the honest kernel-side state,
+// not the guard's memory.
+func TestBlockedReflectsTheFirewall(t *testing.T) {
+	firewall := &memoryFirewall{}
+	system, err := guard.New(testOptions(), firewall)
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	ctx := testContext()
+	if blocked, err := system.Blocked(ctx); err != nil || blocked {
+		t.Errorf("Blocked() = %v, %v with nothing armed", blocked, err)
+	}
+	firewall.armed = true
+	if blocked, err := system.Blocked(ctx); err != nil || !blocked {
+		t.Errorf("Blocked() = %v, %v with the firewall armed behind the guard's back", blocked, err)
+	}
+}

@@ -57,13 +57,14 @@ type Options struct {
 	// EnginePorts are the local ports the kill switch must never block.
 	EnginePorts []uint16
 	// Mode selects how far the kill switch goes: ModeStandard arms it
-	// while the session asks for it, ModeStrict keeps the block armed
-	// across crashes, clean exits, and reboots until explicitly turned
-	// off, and ModeOff never arms it. The zero value is ModeStandard.
+	// while the session asks for it, and ModeOff never arms it. A
+	// persistent (strict) mode exists inside the package for tests but
+	// is not selectable here — enabling a block that survives reboots
+	// is a product decision the owner has not taken. The zero value is
+	// ModeStandard.
 	Mode Mode
-	// StateDir holds the strict-mode marker when Mode is ModeStrict. It
-	// must survive reboots (for example /var/lib/sora on Linux); New
-	// fails closed when it is empty in strict mode.
+	// StateDir holds the internal strict-mode marker. It must survive
+	// reboots (for example /var/lib/sora on Linux).
 	StateDir string
 }
 
@@ -87,12 +88,12 @@ func New(opts Options, firewall Firewall) (*Guard, error) {
 			"guard: no engine ports to keep open")
 	}
 	switch opts.Mode {
-	case ModeStandard, ModeStrict, ModeOff:
+	case ModeStandard, modeStrict, ModeOff:
 	default:
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyGuardFirewallFail,
 			"guard: unknown kill-switch mode %d", int(opts.Mode))
 	}
-	if opts.Mode == ModeStrict && opts.StateDir == "" {
+	if opts.Mode == modeStrict && opts.StateDir == "" {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyGuardFirewallFail,
 			"guard: strict mode needs a state directory for its marker; refusing a strict switch that could not survive a reboot")
 	}
@@ -145,8 +146,8 @@ func (g *Guard) applyKillSwitch(ctx context.Context, want bool) error {
 				"guard: the kill switch is off and will not arm; refusing instead of reporting a block that is not there")
 		}
 		return nil
-	case ModeStrict:
-		was := g.applied.KillSwitch || StrictWanted(g.stateDir)
+	case modeStrict:
+		was := g.applied.KillSwitch || strictWanted(g.stateDir)
 		switch {
 		case want && !was:
 			if err := g.firewall.Arm(ctx, g.opts.EnginePorts); err != nil {
@@ -162,7 +163,7 @@ func (g *Guard) applyKillSwitch(ctx context.Context, want bool) error {
 		case want && was && !g.applied.KillSwitch:
 			// The marker says the block should be up, but this
 			// process never armed it (crash or reboot without a
-			// Recover): verify against the platform and repair.
+			// reconcile): verify against the platform and repair.
 			armed, err := g.firewall.Armed(ctx)
 			if err != nil {
 				return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardFirewallFail)
@@ -177,7 +178,7 @@ func (g *Guard) applyKillSwitch(ctx context.Context, want bool) error {
 				return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardFirewallFail)
 			}
 			// The firewall is down; a leftover marker would re-arm
-			// it on the next Recover. Failing to clear it keeps
+			// it on the next reconcile. Failing to clear it keeps
 			// blocking (fail closed) and reports the problem.
 			if err := removeStrictMarker(g.stateDir); err != nil {
 				return err
@@ -199,17 +200,16 @@ func (g *Guard) applyKillSwitch(ctx context.Context, want bool) error {
 	}
 }
 
-// Recover reconciles the firewall with the persistent intent at startup.
-// Call it once, while holding the instance lock, before the first Apply:
-//
-//   - strict mode with a marker: re-arms the block (idempotent), so the
-//     switch survives crashes and reboots;
-//   - otherwise: removes a table a crashed core left behind, so stale
-//     rules do not keep blocking traffic with no live session (SORA-M4).
-func (g *Guard) Recover(ctx context.Context) error {
+// reconcile matches the firewall against the persistent intent at startup.
+// It is internal: callers use it once, before the first Apply. In strict
+// mode with a marker it re-arms the block (idempotent), so the switch
+// survives crashes and reboots; otherwise it removes a table a crashed
+// core left behind, so stale rules do not keep blocking traffic with no
+// live session (SORA-M4).
+func (g *Guard) reconcile(ctx context.Context) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if g.mode == ModeStrict && StrictWanted(g.stateDir) {
+	if g.mode == modeStrict && strictWanted(g.stateDir) {
 		if err := g.firewall.Arm(ctx, g.opts.EnginePorts); err != nil {
 			return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardFirewallFail)
 		}
@@ -236,14 +236,15 @@ func (g *Guard) Blocked(ctx context.Context) (bool, error) {
 	return g.firewall.Armed(ctx)
 }
 
-// StrictWanted reports whether the user asked for a persistent strict
+// strictIntent reports whether the user asked for a persistent strict
 // block that was never explicitly turned off. When true but Blocked is
-// false (for example before Recover runs at startup), the UI should show
-// the block as pending rather than "Disconnected".
-func (g *Guard) StrictWanted() bool {
+// false (for example before reconcile runs at startup), the UI should show
+// the block as pending rather than "Disconnected". Internal with the rest
+// of the strict machinery.
+func (g *Guard) strictIntent() bool {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	return g.mode == ModeStrict && StrictWanted(g.stateDir)
+	return g.mode == modeStrict && strictWanted(g.stateDir)
 }
 
 // Restore lifts the kill switch if this guard armed it. In strict mode
@@ -256,7 +257,7 @@ func (g *Guard) Restore(ctx context.Context) error {
 	g.restoring = true
 	defer func() { g.restoring = false }()
 
-	if g.mode == ModeStrict {
+	if g.mode == modeStrict {
 		g.applied = session.Settings{}
 		return nil
 	}
@@ -279,7 +280,7 @@ func (g *Guard) Current() session.Settings {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	current := g.applied
-	if g.mode == ModeStrict && StrictWanted(g.stateDir) {
+	if g.mode == modeStrict && strictWanted(g.stateDir) {
 		current.KillSwitch = true
 	}
 	return current

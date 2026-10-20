@@ -2,10 +2,14 @@
 //
 //   - ModeStandard (the default): the kill switch is armed while the session
 //     asks for it and lifted when the session ends or the core exits.
-//   - ModeStrict: the block is persistent. Once armed it survives a core
-//     crash, a clean exit, and a reboot, until the user explicitly turns the
-//     kill switch off. A StrictWanted marker in Options.StateDir records the
-//     intent; Guard.Recover re-arms the firewall from the marker at startup.
+//   - modeStrict (internal only): the block is persistent. Once armed it
+//     survives a core crash, a clean exit, and a reboot, until the user
+//     explicitly turns the kill switch off. A strictWanted marker in
+//     Options.StateDir records the intent; Guard.reconcile re-arms the
+//     firewall from the marker at startup. The mode is not exposed:
+//     enabling a persistent firewall block is a product decision the
+//     owner has not taken, so the machinery stays tested but
+//     unreachable from the public API.
 //   - ModeOff: the kill switch never arms. Asking for it fails instead of
 //     silently reporting a block that is not there.
 //
@@ -29,9 +33,10 @@ const (
 	// lifts it on restore. This is the zero value and the historical
 	// behaviour.
 	ModeStandard Mode = iota
-	// ModeStrict keeps the block armed across crashes, clean exits, and
-	// reboots until the kill switch is explicitly turned off.
-	ModeStrict
+	// modeStrict keeps the block armed across crashes, clean exits, and
+	// reboots until the kill switch is explicitly turned off. Unexported:
+	// no caller outside this package may select it.
+	modeStrict
 	// ModeOff never arms the kill switch; requesting it is an error.
 	ModeOff
 )
@@ -41,7 +46,7 @@ func (m Mode) String() string {
 	switch m {
 	case ModeStandard:
 		return "standard"
-	case ModeStrict:
+	case modeStrict:
 		return "strict"
 	case ModeOff:
 		return "off"
@@ -50,15 +55,16 @@ func (m Mode) String() string {
 	}
 }
 
-// ParseMode parses a user-facing mode name. Matching is case-insensitive;
-// anything else fails closed so a typo can never silently pick a weaker
-// mode than intended.
-func ParseMode(name string) (Mode, error) {
+// parseMode parses a mode name. Matching is case-insensitive; anything
+// else fails closed so a typo can never silently pick a weaker mode than
+// intended. Unexported: the persistent mode is not user-facing, so no
+// caller outside this package parses mode names.
+func parseMode(name string) (Mode, error) {
 	switch strings.ToLower(strings.TrimSpace(name)) {
 	case "standard":
 		return ModeStandard, nil
 	case "strict":
-		return ModeStrict, nil
+		return modeStrict, nil
 	case "off":
 		return ModeOff, nil
 	default:
@@ -77,13 +83,14 @@ const strictMarkerName = "killswitch.strict"
 // be distinguished from a foreign file that happens to share the name.
 const strictMarkerVersion = "sora-strict-v1\n"
 
-// StrictWanted reports whether the state directory carries a strict-mode
+// strictWanted reports whether the state directory carries a strict-mode
 // marker: the user asked for a persistent block and never turned it off.
-// Callers use it at startup to decide between Guard.Recover (re-arm) and
+// Callers use it at startup to decide between Guard.reconcile (re-arm) and
 // stale-table cleanup (remove). A corrupt directory fails closed towards
 // keeping the block: an unreadable state must not silently drop
-// protection the user asked for.
-func StrictWanted(stateDir string) bool {
+// protection the user asked for. Unexported with the rest of the strict
+// machinery.
+func strictWanted(stateDir string) bool {
 	if stateDir == "" {
 		return false
 	}
