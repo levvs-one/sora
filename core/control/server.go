@@ -737,6 +737,86 @@ func (s *Server) SetKillSwitch(ctx context.Context, req *corev1.SetKillSwitchReq
 	return &corev1.SetKillSwitchResponse{Enabled: req.GetEnabled()}, nil
 }
 
+// SelectServer pins a new member of a select group of the running
+// session (fast switch, since 1.12): the engine moves without a
+// restart of the session, the guard or the tunnel, unlike a Connect
+// with a changed plan. The group and the target are validated against
+// the session's plan first, so a group the plan does not carry — or
+// carries as an automatic group — fails with KeySelectUnsupported
+// instead of an engine-specific error.
+func (s *Server) SelectServer(ctx context.Context, req *corev1.SelectServerRequest) (*corev1.SelectServerResponse, error) {
+	id := requestID(req.GetRequestId())
+	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
+		return nil, transportStatus(err)
+	}
+	if err := s.auth.Check(req.GetControlAuthenticator()); err != nil {
+		return nil, transportStatus(err)
+	}
+	running := s.sessions.Current()
+	if running == nil {
+		err := errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionRequired,
+			"control: there is no session to switch")
+		return &corev1.SelectServerResponse{Error: toWire(err, nil, id)}, nil
+	}
+	if err := s.checkSession(req.GetSessionId()); err != nil {
+		return &corev1.SelectServerResponse{Error: toWire(err, nil, id)}, nil
+	}
+	group, target := strings.TrimSpace(req.GetGroup()), strings.TrimSpace(req.GetTarget())
+	if group == "" || target == "" {
+		err := errs.Newf(errs.CodeInvalidArgument, errs.KeyInvalidRequest,
+			"control: a select needs both a group and a target")
+		return &corev1.SelectServerResponse{Error: toWire(err, nil, id)}, nil
+	}
+	if err := checkSelectable(running.Plan(), group, target); err != nil {
+		return &corev1.SelectServerResponse{Error: toWire(err, nil, id)}, nil
+	}
+	ctx, cancel := requestDeadline(ctx, connectTimeout)
+	defer cancel()
+	if err := running.Select(ctx, group, target); err != nil {
+		var mask func(string) string
+		if redactor := s.redactors.get(running.ID()); redactor != nil {
+			mask = redactor.String
+		}
+		return &corev1.SelectServerResponse{
+			Status: &corev1.SessionStatus{Connection: wireStatus(running.Status()), NegotiatedVersion: s.apiVersion()},
+			Error:  toWire(err, mask, id),
+		}, nil
+	}
+	return &corev1.SelectServerResponse{
+		Status: &corev1.SessionStatus{Connection: wireStatus(running.Status()), NegotiatedVersion: s.apiVersion()},
+	}, nil
+}
+
+// checkSelectable reports whether target may be pinned in group of the
+// plan: the group must exist, be a select group, and hold the target —
+// by outbound id, or by the display name the engines also resolve.
+func checkSelectable(plan *engine.Plan, group, target string) error {
+	unsupported := func(format string, args ...any) error {
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySelectUnsupported, format, args...)
+	}
+	if plan == nil {
+		return unsupported("control: the session carries no plan")
+	}
+	for _, g := range plan.Groups {
+		if g.Name != group {
+			continue
+		}
+		if g.Type != engine.GroupSelect {
+			return unsupported("control: group %q is not a select group", group)
+		}
+		for _, member := range g.Outbounds {
+			if member == target {
+				return nil
+			}
+			if o, ok := plan.OutboundByID(member); ok && o.Name == target {
+				return nil
+			}
+		}
+		return unsupported("control: %q is not a member of group %q", target, group)
+	}
+	return unsupported("control: the session plan has no group %q", group)
+}
+
 // syncExtKillSwitch mirrors the session's kill-switch state into the
 // extension scheduler. It is called on Connect (a session may start with
 // the switch already armed) and on every SetKillSwitch change. Nil-safe:

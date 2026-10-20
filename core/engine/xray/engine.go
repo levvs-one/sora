@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"slices"
 	"strconv"
 	"sync"
 	"time"
@@ -299,12 +300,43 @@ func (e *Engine) Select(ctx context.Context, group, target string) error {
 	return nil
 }
 
+// seedPlanSelection fills the selection map from the plan's select
+// groups (Group.Selected), so a fresh start routes through the member
+// the plan names instead of always the first one. Groups that already
+// have a selection keep it: Select stores the user's runtime choice in
+// the same map before re-applying the plan, and a reconnect re-applies
+// the plan without wanting to undo that choice. A fresh engine (one per
+// session) starts with an empty map, so seeding is what makes the
+// plan's Selected effective at Connect.
+func (d *driver) seedPlanSelection(p *engine.Plan) {
+	if p == nil {
+		return
+	}
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.sel == nil {
+		d.sel = Selection{}
+	}
+	for _, g := range p.Groups {
+		if g.Type != engine.GroupSelect || g.Selected == "" {
+			continue
+		}
+		if _, ok := d.sel[g.Name]; ok {
+			continue
+		}
+		if slices.Contains(g.Outbounds, g.Selected) {
+			d.sel[g.Name] = g.Selected
+		}
+	}
+}
+
 // Apply warns about VLESS+REALITY outbounds without a vision flow, then
 // starts the engine as usual. The warning is journal-only: without vision
 // the inner TLS runs inside the outer REALITY TLS (TLS-in-TLS), a
 // detectable signal, but the connection itself still works.
 func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 	e.warnRealityWithoutVision(p)
+	e.driver.seedPlanSelection(p)
 	return e.Supervisor.Apply(ctx, p)
 }
 

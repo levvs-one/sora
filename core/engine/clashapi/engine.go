@@ -16,11 +16,53 @@ type Engine struct {
 
 	mu       sync.Mutex
 	counters engine.Counters
+	// picked records the selections made through Select on this engine
+	// instance, by plan group name. Apply consults it so a re-apply (a
+	// session reconnect) does not undo a runtime fast switch with the
+	// plan's starting member.
+	picked map[string]string
 }
 
 // NewEngine wraps a supervisor whose driver configures a Clash API controller
 // on Runtime.ControlAddr with Runtime.Secret.
 func NewEngine(sup *supervise.Supervisor) *Engine { return &Engine{Supervisor: sup} }
+
+// Apply starts the engine, then pins every select group to the starting
+// member its plan names (Group.Selected): Clash-API engines start a
+// selector on its first member or on whatever their persisted cache
+// holds from an earlier session, and mihomo's config has no field for a
+// starting member at all, so without this the plan's Selected would be
+// silently dropped at Connect. sing-box also renders the same value as
+// the selector's default; the controller call is idempotent there and
+// keeps one code path for both engines. Groups the user already moved
+// through Select on this engine instance are left alone, so a re-apply
+// (a session reconnect) keeps the runtime choice — the same rule the
+// Xray driver applies when seeding its selection map. A failed pin
+// fails Apply: reporting connected on the wrong member would be worse
+// than reporting failure.
+func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
+	if err := e.Supervisor.Apply(ctx, p); err != nil {
+		return err
+	}
+	if p == nil {
+		return nil
+	}
+	for _, g := range p.Groups {
+		if g.Type != engine.GroupSelect || g.Selected == "" {
+			continue
+		}
+		e.mu.Lock()
+		_, moved := e.picked[g.Name]
+		e.mu.Unlock()
+		if moved {
+			continue
+		}
+		if err := e.Select(ctx, g.Name, g.Selected); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // For returns the controller client of one engine run.
 func For(rt supervise.Runtime) *Client {
@@ -81,6 +123,12 @@ func (e *Engine) Select(ctx context.Context, group, target string) error {
 	if err := c.Select(ctx, e.engineName(group), e.engineName(target)); err != nil {
 		return e.Redactor().Err(err)
 	}
+	e.mu.Lock()
+	if e.picked == nil {
+		e.picked = map[string]string{}
+	}
+	e.picked[group] = target
+	e.mu.Unlock()
 	e.Events().Publish(engine.Event{Kind: engine.EventGroup, Group: &engine.GroupStatus{Name: group, Selected: target}})
 	return nil
 }

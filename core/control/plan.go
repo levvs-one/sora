@@ -427,7 +427,7 @@ func groupsFromProto(in []*corev1.GroupSpec, outbounds map[string]struct{}) ([]e
 			return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanGroupsInvalid, "control: two groups are named %q", name)
 		}
 		names[name] = struct{}{}
-		group := engine.Group{Name: name, Type: kind, Outbounds: spec.GetMembers(), URL: spec.GetTestUrl(), Tolerance: int(min(spec.GetToleranceMs(), 60000))}
+		group := engine.Group{Name: name, Type: kind, Outbounds: spec.GetMembers(), Selected: strings.TrimSpace(spec.GetSelected()), URL: spec.GetTestUrl(), Tolerance: int(min(spec.GetToleranceMs(), 60000))}
 		if d := spec.GetTestInterval(); d != nil {
 			group.Interval = int(min(max(d.AsDuration(), time.Minute), 24*time.Hour) / time.Second)
 		}

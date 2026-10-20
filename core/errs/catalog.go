@@ -16,6 +16,7 @@ const (
 	KeyRequestTooLarge    Key = "core.request.too_large"
 	KeyUnknownSession     Key = "core.session.unknown"
 	KeySessionRequired    Key = "core.session.required"
+	KeySelectUnsupported  Key = "core.session.select_unsupported"
 	KeySessionBusy        Key = "core.session.busy"
 	KeyInternal           Key = "core.internal.unexpected"
 	KeyCancelled          Key = "core.request.cancelled"
@@ -110,6 +111,7 @@ var catalog = map[Key]Entry{
 	KeyRequestTooLarge:    {CodeResourceExhausted, false, "the request exceeds a documented contract limit"},
 	KeyUnknownSession:     {CodeNotFound, false, "the session id is unknown to the core"},
 	KeySessionRequired:    {CodeFailedPrecondition, false, "the operation needs an active session"},
+	KeySelectUnsupported:  {CodeFailedPrecondition, false, "the session has no select group by that name, or the target is not a member of it"},
 	KeySessionBusy:        {CodeFailedPrecondition, true, "another connect or disconnect is already running"},
 	KeyInternal:           {CodeInternal, false, "an internal invariant was false, which is a defect"},
 	KeyCancelled:          {CodeCancelled, false, "the caller cancelled the request"},

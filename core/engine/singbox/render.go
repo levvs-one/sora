@@ -565,6 +565,16 @@ func (r *renderer) group(g engine.Group) (obj, error) {
 	switch g.Type {
 	case engine.GroupSelect:
 		out["type"] = "selector"
+		if g.Selected != "" {
+			// The selector's default is the member it starts on;
+			// without it sing-box starts on the first member and the
+			// plan's Selected would be silently dropped at Connect.
+			tag, err := r.target(g.Selected)
+			if err != nil {
+				return nil, err
+			}
+			out["default"] = tag
+		}
 	case engine.GroupURLTest:
 		out.set("type", "urltest").set("url", orDefault(g.URL, r.plan.Options.TestURL)).set("tolerance", g.Tolerance)
 		if g.Interval > 0 {

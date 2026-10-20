@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -166,6 +167,13 @@ func (g Group) validate() error {
 	}
 	if len(g.Outbounds) == 0 {
 		errs = append(errs, fmt.Errorf("group %q: no members", g.Name))
+	}
+	if g.Selected != "" {
+		if g.Type != GroupSelect {
+			errs = append(errs, fmt.Errorf("group %q: a starting member is only meaningful for a select group", g.Name))
+		} else if !slices.Contains(g.Outbounds, g.Selected) {
+			errs = append(errs, fmt.Errorf("group %q: selected member %q is not one of its members", g.Name, g.Selected))
+		}
 	}
 	if g.Interval < 0 || g.Interval > 86400 {
 		errs = append(errs, fmt.Errorf("group %q: interval must be between 0 and 86400 seconds", g.Name))

@@ -264,7 +264,7 @@ type Group struct {
 	// after start — so a fresh session's effective selection is Selected
 	// on all engines (the fast-switch invariant). Meaningful only for
 	// GroupSelect; validation rejects it elsewhere.
-	Selected string
+	Selected  string
 	URL       string
 	Interval  int
 	Tolerance int
