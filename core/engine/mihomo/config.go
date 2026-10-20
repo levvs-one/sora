@@ -88,22 +88,22 @@ type proxy struct {
 	Tag    string `yaml:"tag,omitempty"`
 	Dialer string `yaml:"dialer-proxy,omitempty"`
 
-	UUID          string `yaml:"uuid,omitempty"`
-	Flow          string `yaml:"flow,omitempty"`
-	AlterID       *int   `yaml:"alterId,omitempty"` // required by mihomo for vmess, even when 0
-	Cipher        string `yaml:"cipher,omitempty"`
-	Password      string `yaml:"password,omitempty"`
-	Username      string `yaml:"username,omitempty"`
-	Obfs          string `yaml:"obfs,omitempty"`
-	ObfsParam     string `yaml:"obfs-param,omitempty"`
-	ObfsPassword  string `yaml:"obfs-password,omitempty"`
+	UUID         string `yaml:"uuid,omitempty"`
+	Flow         string `yaml:"flow,omitempty"`
+	AlterID      *int   `yaml:"alterId,omitempty"` // required by mihomo for vmess, even when 0
+	Cipher       string `yaml:"cipher,omitempty"`
+	Password     string `yaml:"password,omitempty"`
+	Username     string `yaml:"username,omitempty"`
+	Obfs         string `yaml:"obfs,omitempty"`
+	ObfsParam    string `yaml:"obfs-param,omitempty"`
+	ObfsPassword string `yaml:"obfs-password,omitempty"`
 	// SSPlugin selects a Shadowsocks SIP002 obfuscation plugin
 	// (v2ray-plugin, ...); SSPluginOpts is its translated option map.
-	SSPlugin     string         `yaml:"plugin,omitempty"`
-	SSPluginOpts map[string]any `yaml:"plugin-opts,omitempty"`
-	Protocol      string `yaml:"protocol,omitempty"`
-	ProtocolParam string `yaml:"protocol-param,omitempty"`
-	TLS           *bool  `yaml:"tls,omitempty"`
+	SSPlugin      string         `yaml:"plugin,omitempty"`
+	SSPluginOpts  map[string]any `yaml:"plugin-opts,omitempty"`
+	Protocol      string         `yaml:"protocol,omitempty"`
+	ProtocolParam string         `yaml:"protocol-param,omitempty"`
+	TLS           *bool          `yaml:"tls,omitempty"`
 
 	// Network selects the stream transport. Its options must be nested
 	// because mihomo silently ignores unknown flat keys.
@@ -120,8 +120,8 @@ type proxy struct {
 	ALPN           []string `yaml:"alpn,omitempty"`
 	// ECH enables Encrypted Client Hello; mihomo fetches the ECH config
 	// via DNS itself, so only the toggle is wired.
-	ECH            *bool    `yaml:"ech,omitempty"`
-	Reality        *reality `yaml:"reality-opts,omitempty"`
+	ECH     *bool    `yaml:"ech,omitempty"`
+	Reality *reality `yaml:"reality-opts,omitempty"`
 
 	// Hysteria2 bandwidth caps ("100 Mbps"): positive values switch the
 	// engine from BBR to Brutal congestion control.

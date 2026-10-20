@@ -54,3 +54,39 @@ func TestAnHTTPSProxyKeepsItsTLS(t *testing.T) {
 		t.Errorf("an https proxy rendered without TLS: tls=%v sni=%q", px.TLS, px.SNI)
 	}
 }
+
+// TestBuildProxyRealitySmux: T007 — REALITY proxies carry smux by default
+// (one TLS connection instead of many parallel handshakes sharing one
+// SNI), unless Options.Mux.Disabled opts out.
+func TestBuildProxyRealitySmux(t *testing.T) {
+	reality := engine.Outbound{
+		ID: "r", Protocol: engine.ProtocolVLESS, Server: "203.0.113.7", Port: 443,
+		UUID: "11111111-2222-3333-4444-555555555555",
+		TLS: engine.TLS{Reality: true, ServerName: "www.example.com",
+			RealityPublicKey: "Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw"},
+	}
+	px, err := buildProxy(reality, engine.MuxOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if px.Smux == nil || !px.Smux.Enabled {
+		t.Fatal("REALITY proxy must carry smux by default (T007)")
+	}
+	px, err = buildProxy(reality, engine.MuxOptions{Disabled: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if px.Smux != nil {
+		t.Fatal("Options.Mux.Disabled must suppress smux")
+	}
+	plain := reality
+	plain.TLS.Reality = false
+	plain.TLS.Enabled = true
+	px, err = buildProxy(plain, engine.MuxOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if px.Smux != nil {
+		t.Fatal("smux default applies to REALITY only")
+	}
+}
