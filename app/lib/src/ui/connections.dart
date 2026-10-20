@@ -216,7 +216,14 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     for (final c in shown) {
       groups.putIfAbsent(c.process.isEmpty ? '—' : c.process, () => []).add(c);
     }
-    final keys = groups.keys.toList()..sort((a, b) => _traffic(groups[b]!).compareTo(_traffic(groups[a]!)));
+    // Traffic totals are the sort keys: compute them once per build pass,
+    // not per comparison — _traffic sums every connection in the group, so
+    // the comparator made grouping O(g log g × group size) on every poll
+    // tick and search keystroke (the benchmark screen's sort-keys
+    // pattern). The totals cannot change during the sort, so the order is
+    // identical.
+    final traffic = {for (final key in groups.keys) key: _traffic(groups[key]!)};
+    final keys = groups.keys.toList()..sort((a, b) => traffic[b]!.compareTo(traffic[a]!));
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 24),
       itemCount: keys.length,
