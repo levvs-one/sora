@@ -65,6 +65,13 @@ func PrepareTun(p *Plan) error {
 	if p.Tun.IPv4.Overlaps(fakePrefix) || !p.Tun.IPv4.Addr().Is4() || !p.Tun.IPv6.Addr().Is6() || p.Tun.IPv4.Bits() != 30 || p.Tun.IPv6.Bits() != 126 {
 		return fmt.Errorf("tun: adapters must use separate IPv4 /30 and IPv6 /126 subnets")
 	}
+	// Caller-provided prefixes skip chooseTunPrefix, so they must be checked
+	// against LAN interfaces here as well.
+	for _, prefix := range []netip.Prefix{p.Tun.IPv4, p.Tun.IPv6} {
+		if slices.ContainsFunc(used, prefix.Overlaps) {
+			return fmt.Errorf("tun: adapter subnet %s overlaps an existing interface", prefix)
+		}
+	}
 	for _, address := range []netip.Addr{p.Tun.IPv4.Addr(), p.Tun.IPv6.Addr()} {
 		if !address.IsGlobalUnicast() || address.IsPrivate() {
 			return fmt.Errorf("tun: adapter subnets must be outside private and link-local networks")
