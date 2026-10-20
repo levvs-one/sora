@@ -57,6 +57,15 @@ func TestCoreEventPayloadKinds(t *testing.T) {
 func TestNewFieldTagsAreStable(t *testing.T) {
 	file := (&corev1.CoreEvent{}).ProtoReflect().Descriptor().ParentFile()
 	want := map[string]map[string]protoreflect.FieldNumber{
+		// Since 1.11 (S1 seam audit): flow/flow_auto were added to the
+		// proto and the Dart pb.dart stub but initially missed the tag
+		// pin and the Dart pbjson descriptor; both are pinned now (see
+		// dart_descriptor_parity_test.go).
+		"OutboundSpec": {
+			"id": 1, "display_name": 2, "protocol": 3, "transport": 4,
+			"security": 5, "endpoint": 6, "credentials": 7, "bypass": 8,
+			"display_protocol": 9, "flow": 10, "flow_auto": 11,
+		},
 		"SessionPlan": {
 			"tun_stack": 14, "chain": 15, "zapret_with_vpn": 16, "zapret_strategy": 17,
 		},

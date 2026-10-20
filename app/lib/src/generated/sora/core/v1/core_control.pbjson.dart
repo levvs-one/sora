@@ -430,18 +430,23 @@ const OutboundSpec$json = {
     {'1': 'endpoint', '3': 6, '4': 1, '5': 11, '6': '.sora.core.v1.Endpoint', '10': 'endpoint'},
     {'1': 'credentials', '3': 7, '4': 1, '5': 11, '6': '.sora.core.v1.CredentialsRef', '10': 'credentials'},
     {'1': 'display_protocol', '3': 9, '4': 1, '5': 9, '10': 'displayProtocol'},
+    {'1': 'flow', '3': 10, '4': 1, '5': 9, '10': 'flow'},
+    {'1': 'flow_auto', '3': 11, '4': 1, '5': 8, '10': 'flowAuto'},
   ],
 };
 
 /// Descriptor for `OutboundSpec`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List outboundSpecDescriptor =
-    $convert.base64Decode('CgxPdXRib3VuZFNwZWMSDgoCaWQYASABKAlSAmlkEiEKDGRpc3BsYXlfbmFtZRgCIAEoCVILZG'
-        'lzcGxheU5hbWUSNAoGYnlwYXNzGAggASgLMhwuc29yYS5jb3JlLnYxLkJ5cGFzc1N0cmF0ZWd5'
-        'UgZieXBhc3MSGgoIcHJvdG9jb2wYAyABKAlSCHByb3RvY29sEhwKCXRyYW5zcG9ydBgEIAEoCV'
-        'IJdHJhbnNwb3J0EhoKCHNlY3VyaXR5GAUgASgJUghzZWN1cml0eRIyCghlbmRwb2ludBgGIAEo'
-        'CzIWLnNvcmEuY29yZS52MS5FbmRwb2ludFIIZW5kcG9pbnQSPgoLY3JlZGVudGlhbHMYByABKA'
-        'syHC5zb3JhLmNvcmUudjEuQ3JlZGVudGlhbHNSZWZSC2NyZWRlbnRpYWxzEikKEGRpc3BsYXlf'
-        'cHJvdG9jb2wYCSABKAlSD2Rpc3BsYXlQcm90b2NvbA==');
+    $convert.base64Decode(
+        'CgxPdXRib3VuZFNwZWMSDgoCaWQYASABKAlSAmlkEiEKDGRpc3BsYXlfbmFtZRgCIAEoCVILZGlz'
+        'cGxheU5hbWUSNAoGYnlwYXNzGAggASgLMhwuc29yYS5jb3JlLnYxLkJ5cGFzc1N0cmF0ZWd5UgZi'
+        'eXBhc3MSGgoIcHJvdG9jb2wYAyABKAlSCHByb3RvY29sEhwKCXRyYW5zcG9ydBgEIAEoCVIJdHJh'
+        'bnNwb3J0EhoKCHNlY3VyaXR5GAUgASgJUghzZWN1cml0eRIyCghlbmRwb2ludBgGIAEoCzIWLnNv'
+        'cmEuY29yZS52MS5FbmRwb2ludFIIZW5kcG9pbnQSPgoLY3JlZGVudGlhbHMYByABKAsyHC5zb3Jh'
+        'LmNvcmUudjEuQ3JlZGVudGlhbHNSZWZSC2NyZWRlbnRpYWxzEikKEGRpc3BsYXlfcHJvdG9jb2wY'
+        'CSABKAlSD2Rpc3BsYXlQcm90b2NvbBISCgRmbG93GAogASgJUgRmbG93EhsKCWZsb3dfYXV0bxgL'
+        'IAEoCFIIZmxvd0F1dG8='
+    );
 
 @$core.Deprecated('Use endpointDescriptor instead')
 const Endpoint$json = {
