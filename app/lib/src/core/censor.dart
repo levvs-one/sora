@@ -72,6 +72,51 @@ class CensorVerdict {
     if (recommendedProfileId.isNotEmpty) 'recommendedProfileId': recommendedProfileId,
   };
 
+  /// Detector wire kinds (core/censor Kind.String()) that mean the path
+  /// interfered. Anything else the core sends ("no_interference",
+  /// "unknown", or a kind this client predates) must not be upgraded to a
+  /// blocking claim.
+  static const _blockingWireKinds = {
+    'rst_injection',
+    'handshake_timeout',
+    'dns_poisoning',
+    'sni_blocking',
+    'ip_blocking',
+    'data_stall',
+  };
+
+  /// Builds a verdict from a pushed `CoreEvent.censorship_detected` payload
+  /// (sora.core.v1, field 13): [wireKind] is the detector's Kind spelling,
+  /// [wireConfidence] its 0..1 confidence. The grade follows the core's own
+  /// wording bands in censor's explain(): below 0.35 the proto contract
+  /// pairs the verdict with UNKNOWN, 0.35..0.75 is "likely", and only
+  /// 0.75+ is stated plainly — so only 0.75+ maps to [CensorVerdictKind.blocked].
+  static CensorVerdict fromWire({
+    required String id,
+    required DateTime detectedAt,
+    required String wireKind,
+    required double wireConfidence,
+    required String explanation,
+    required List<String> evidence,
+  }) {
+    final kind = switch (wireKind) {
+      'no_interference' => CensorVerdictKind.notBlocked,
+      _ when !_blockingWireKinds.contains(wireKind) || wireConfidence < 0.35 => CensorVerdictKind.unknown,
+      _ when wireConfidence >= 0.75 => CensorVerdictKind.blocked,
+      _ => CensorVerdictKind.likelyBlocked,
+    };
+    return CensorVerdict(
+      id: id,
+      detectedAt: detectedAt,
+      confidence: (wireConfidence * 100).round().clamp(0, 100),
+      kind: kind,
+      reasons: [
+        if (explanation.isNotEmpty) CensorReason(code: wireKind, detail: explanation),
+        for (final item in evidence) CensorReason(code: wireKind, detail: item),
+      ],
+    );
+  }
+
   static CensorVerdict? fromJson(Map<String, dynamic> json) {
     final id = json['id'] as String?;
     if (id == null || id.isEmpty) return null;
@@ -91,10 +136,12 @@ class CensorVerdict {
 
 /// Stores detector verdicts and surfaces the one actionable prompt.
 ///
-/// Verdicts arrive from the core (see `proto/sora/censor/v1/censor.proto`):
-/// pushed as a CoreEvent payload or polled after a failed connection. The
-/// core call itself is injected through [fetchVerdict]; until the detector
-/// API lands it stays null and polling is a graceful no-op.
+/// Verdicts arrive from the core: pushed as the `censorship_detected`
+/// payload of CoreEvent (sora.core.v1) and ingested by the session watch
+/// through [CensorVerdict.fromWire]. The on-demand DetectCensorship RPC
+/// (proto/sora/censor/v1/censor.proto) has no Dart client yet, so the
+/// injected [fetchVerdict] poll stays null and polling is a graceful
+/// no-op; the push path is what feeds the history.
 class CensorDetector extends ChangeNotifier {
   CensorDetector(this._read, this._write) {
     _load();

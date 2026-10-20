@@ -316,7 +316,9 @@ class Sora extends ChangeNotifier {
     _notices.add(notice);
     if (notice is ConnectionFailed) {
       // Ask the detector whether the failure looks like provider blocking.
-      // A no-op until the core detector API lands (CensorDetector.fetchVerdict).
+      // The poll is a no-op while DetectCensorship has no Dart client
+      // (CensorDetector.fetchVerdict); verdicts the core detects on its own
+      // arrive as censorship_detected watch events instead.
       unawaited(
         censor.pollAfterFailure(_link).then((verdict) {
           if (verdict != null && !_disposed) ingestCensorVerdict(verdict);
@@ -917,9 +919,6 @@ class Sora extends ChangeNotifier {
         _seenSession = id;
         _seenSequence = event.sequence;
         final fresh = !event.hasEmittedAt() || event.emittedAt.toDateTime().isAfter(opened);
-        // TODO(censor): ingest pushed detector verdicts here once
-        // proto/sora/censor/v1/censor.proto lands and the Dart stubs are
-        // regenerated (CoreEvent.censorVerdict).
         if (event.hasStateChanged()) {
           _applyState(event.stateChanged.state, report: fresh);
           notifyListeners();
@@ -931,6 +930,26 @@ class Sora extends ChangeNotifier {
           // ignores unknown profile ids, so a stale core/client profile set
           // cannot break the watch.
           unawaited(handleProfileMatched(event.profileMatched.profileId));
+        } else if (event.hasCensorshipDetected() && fresh) {
+          // The core's session hook classified a failed attempt (1.11+):
+          // record the verdict so the blocking-diagnostics history and the
+          // actionable prompt have something to show. The id carries the
+          // event time because stream sequences restart with the core,
+          // while the persisted history outlives it.
+          final detected = event.censorshipDetected;
+          final at = event.hasEmittedAt() ? event.emittedAt.toDateTime() : DateTime.now();
+          unawaited(
+            ingestCensorVerdict(
+              CensorVerdict.fromWire(
+                id: 'core-${event.sequence}-${at.millisecondsSinceEpoch}',
+                detectedAt: at,
+                wireKind: detected.kind,
+                wireConfidence: detected.confidence,
+                explanation: detected.explanation,
+                evidence: detected.evidence,
+              ),
+            ),
+          );
         }
       },
       onError: (Object error) {
