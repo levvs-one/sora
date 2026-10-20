@@ -226,6 +226,17 @@ func TestEngineAcceptsRenderedPlans(t *testing.T) {
 		p.Outbounds[0].Amnezia = enginetest.AmneziaWG().Amnezia
 		plans["amneziawg"] = p
 	}
+	if caps.Supports(engine.FeatureAmneziaWG3) {
+		// S5 risk flag: the lx fork's public description says
+		// "AmneziaWG 2.0", while BuildCapabilities claims its with_awg
+		// stack applies the 3.1 parameters. sing-box rejects unknown
+		// config keys at check time, so a build that silently cut the
+		// 3.1 fields (header_protection_key, random_trailers, ranged
+		// timings) fails here instead of passing a hollow render.
+		p := enginetest.Plan(engine.ProtocolWireGuard)
+		p.Outbounds[0].Amnezia = enginetest.AmneziaWG3().Amnezia
+		plans["amneziawg3"] = p
+	}
 	for name, p := range plans {
 		t.Run(name, func(t *testing.T) {
 			raw, err := Render(p, testRuntime)

@@ -29,8 +29,9 @@ package censor
 // POLICY's actions — fingerprint/SNI rotation and plan failover on a
 // running session — still have no consumer: the session layer cannot
 // rotate a fingerprint or SNI on a live plan yet (SW4 tier 2, an owner
-// decision). The policy is kept, tested, and fed through ObserveAttempt
-// so the day the session learns to act, the ladder is already correct.
+// decision). The policy is kept and tested; ObserveAttempt itself has
+// no production caller yet — the day the session learns to act, the
+// ladder is already correct and the feeding point is one call away.
 
 import (
 	"strconv"

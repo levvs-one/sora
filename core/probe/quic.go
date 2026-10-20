@@ -327,6 +327,14 @@ type dialUDPFunc func(ctx context.Context, network string, laddr, raddr *net.UDP
 // Hysteria2/TUIC outbounds happen inside the engine binaries and cannot
 // be spliced from here; engines rotate source ports themselves or not at
 // all — that gap is tracked in the spec, not hidden.
+//
+// Not applied, deliberately: the USENIX/FOCI 2026 QUIC-censorship paper
+// reports the GFW skips QUIC packets whose source port is below the
+// destination port. Binding a low source port is not something a
+// userspace dialer can promise — ports below 1024 need privileges on
+// most systems, and NAT rewrites the port after it leaves the host —
+// so sora does not claim the property. It stays a measurement idea for
+// the censor-proxy bench, not a shipped guarantee.
 func DialQUIC(ctx context.Context, raddr *net.UDPAddr, tracker *BanTracker) (*net.UDPConn, error) {
 	return dialQUIC(ctx, raddr, tracker, func(ctx context.Context, network string, laddr, raddr *net.UDPAddr) (*net.UDPConn, error) {
 		var d net.Dialer

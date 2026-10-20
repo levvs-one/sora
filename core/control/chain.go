@@ -3,6 +3,11 @@ package control
 // Proxy chain probing (F8). ProbeChain checks a 2-3 server chain before
 // connecting: per-hop reachability via a fast TCP probe, the summed latency
 // estimate, and which installed engines can carry the chain.
+//
+// Production status (2026-10-20): NOT WIRED on the client side. The RPC
+// is implemented and tested, but no Dart code calls it — the chains UI
+// connects without a pre-flight probe. Chains themselves work end to
+// end (plan Via -> engine detour); only this probe is unconsumed.
 
 import (
 	"context"

@@ -444,6 +444,12 @@ func validateAmneziaWG(id string, a *AmneziaWG) []error {
 			}
 		}
 	}
+	// The 3.1 docs also RECOMMEND S1==S2==S3==S4 when RandomTrailers is
+	// on (unequal sizes can misclassify the packet type). That stays a
+	// recommendation, not an error: the engines accept unequal sizes,
+	// and sora's own generator (wgobfusc) deliberately picks distinct
+	// sizes that keep S1+56 != S2, which the hard check above enforces.
+	//
 	// AmneziaWG 3.1: Header Protection needs a genuine 32-byte key, and
 	// S1..S4 must be at least 12 bytes each (the ChaCha20 nonce is the
 	// first 12 bytes of every Sx prefix). Anything else is a config the
