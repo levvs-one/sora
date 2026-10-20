@@ -24,6 +24,7 @@
 // ignore_for_file: non_constant_identifier_names, prefer_relative_imports
 
 import 'dart:convert';
+import 'dart:core';
 import 'dart:core' as $core;
 
 import 'package:flutter/foundation.dart';
