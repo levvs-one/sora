@@ -281,8 +281,9 @@ append to the extension log and — only when the extension also holds
 `net.fetch` — make allowlisted HTTP requests through its own `Fetcher`.
 No filesystem, no process control, no raw sockets. (The Go `WorkerFunc` is
 the seam where the host plugs its JS runner in. Implementation status:
-the scheduler and `net.fetch` enforcement exist in `core/ext`, but no
-host — neither the app nor the service — schedules workers yet, so worker
+the scheduler and `net.fetch` enforcement exist in `core/ext`, and the
+service creates and starts the scheduler at startup — but no worker
+tasks are registered with it yet and there is no JS executor, so worker
 scripts do not execute in practice; the app currently only persists the
 `background_task` config the user edits in the extension details screen.)
 
