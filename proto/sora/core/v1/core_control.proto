@@ -276,6 +276,10 @@ message StateChanged { ConnectionState state = 1; }
 // outbound ids or names of nested groups.
 message GroupSwitched { string group = 1; string selected = 2; string previous = 3; }
 message StatsTick { uint64 bytes_up = 1; uint64 bytes_down = 2; uint64 active_connections = 3; }
+// NOT WIRED (2026-10-20): no core code emits this event and no client reads
+// it; bypass/obfs strategy notices travel as journal log lines (LogBatch)
+// instead. The message stays for wire compatibility; do not build on this
+// payload until it is emitted.
 message BypassStrategyChanged { string strategy = 1; }
 message ProbeResult {
   string server_id = 1;
@@ -294,6 +298,12 @@ message LogBatch { repeated string lines = 1; } // Limit: 200 lines, 256 KiB aft
 // the packet filter the core still records the request, and the interface has to
 // be able to show a switch that is on but not blocking rather than a switch that
 // protects the user when it does not.
+//
+// NOT WIRED (2026-10-20): no core code emits this event and no client reads
+// it. The live kill-switch state flows through the SetKillSwitch response and
+// GetStatus (arming either applies or returns an error, so an enabled-but-not-
+// enforced state cannot occur silently today). The message stays for wire
+// compatibility; do not build on this payload until it is emitted.
 message KillSwitchChanged { bool enabled = 1; bool enforced = 2; }
 
 message ParseImportRequest { ApiVersion api_version = 1; string request_id = 2; bytes payload = 3; }
