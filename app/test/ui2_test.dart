@@ -338,7 +338,11 @@ void main() {
       await tester.pumpAndSettle();
       final menu = find.byKey(const ValueKey('mihomo-tun-stack'));
       await tester.ensureVisible(menu);
-      await tester.tap(find.descendant(of: menu, matching: find.text('Mixed')));
+      // The stack labels are localized since 98464ab2 (tunStackMixed /
+      // tunStackSystem); this test runs in Russian, so the anchor shows
+      // 'Смешанный', not the old hardcoded 'Mixed'. 'gVisor'/'MIPS' are
+      // technical names and stay untranslated in every locale.
+      await tester.tap(find.descendant(of: menu, matching: find.text('Смешанный')));
       await tester.pumpAndSettle();
       expect(find.byType(MenuItemButton), findsNWidgets(4));
       await tester.tap(find.text('MIPS'));
@@ -350,6 +354,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(menu, findsNothing);
       expect(find.text('Стек TUN'), findsNothing);
+      // ensureVisible first, as with mode-proxy/engine-xray above: at
+      // 420px the ensureVisible(mode-proxy) scroll leaves mode-tun
+      // clipped at the dialog's top edge, so a bare tap misses it and
+      // the mode never switches back to tun.
+      await tester.ensureVisible(find.byKey(const ValueKey('mode-tun')));
       await tester.tap(find.byKey(const ValueKey('mode-tun')));
       await tester.pumpAndSettle();
       expect(menu, findsOneWidget);
@@ -363,7 +372,7 @@ void main() {
       await tester.tap(find.descendant(of: xrayMenu, matching: find.text('gVisor')));
       await tester.pumpAndSettle();
       expect(find.byType(MenuItemButton), findsNWidgets(4));
-      await tester.tap(find.text('System'));
+      await tester.tap(find.text('Системный'));
       await tester.pumpAndSettle();
       expect(sora.settings.xrayTunStack, 'system');
       expect((await Settings.load()).xrayTunStack, 'system');
