@@ -68,19 +68,22 @@ credential-free shapes before anything crosses the boundary.
 
 "Real check in code on every call path, not a declaration." Audited
 2026-10-20 against `core/ext`, `core/control/exthost.go`, `proto/.../ext_host.proto`
-and the Dart mirror `app/lib/src/ext`.
+and the Dart mirror `app/lib/src/ext`. The machine-readable, test-pinned
+version of this matrix lives in `core/ext/enforcement.go`
+(`EnforcementTable`, with a Dart mirror in `app/lib/src/ext/enforcement.dart`);
+this section is its prose rendering — when they disagree, the code wins.
 
 | Permission | Go core enforcement | Dart app enforcement | Verdict |
 |---|---|---|---|
 | `connections.read` | `Host.check()` → `rpcPermissions["GetConnections"]`, every call | `bridge.dart` `_methodPermission` | ✅ enforced both layers |
 | `servers.read` | `Host.check()` → `GetServers` | `bridge.dart` | ✅ enforced both layers |
 | `notifications` | `Host.check()` → `Notify` (+120/500 char caps) | `bridge.dart` | ✅ enforced both layers |
-| `net.fetch` | `Fetcher` built only when granted (`Scheduler.Register`); allowlist + https/IP/port/redirect/rate/size checks per request | worker runner passes nil fetcher otherwise | ✅ enforced at construction and per request |
-| `background` | `Scheduler.Register` requires capability **and** permission; interval clamped [15m, 7d] | scheduler wiring | ✅ enforced |
+| `net.fetch` | `Fetcher` built only when granted (`Scheduler.RegisterConfig`); allowlist + https/IP/port/redirect/rate/size checks per request; transport is `ext.TunnelTransport` — every request rides the tunnel's loopback proxy and **fails closed** (`ext.netfetch.no-tunnel`) when no tunnel proxy is live, instead of dialing direct | no panel-side fetch (CSP `connect-src 'none'`) | ✅ enforced at construction, per request, and at the tunnel |
+| `background` | `Scheduler.RegisterConfig` requires capability **and** permission; interval clamped [15m, 7d]; overlap guard + circuit breaker; scheduler is created/started in sora-core with the kill switch wired through the control plane | background config UI (`<id>.background.json`) | ✅ enforced; **no worker executor is wired yet, so no extension code runs** |
 | `settings.read` | — none — | — none — | ⚠️ **no enforcement point; inert** (see below) |
 | `settings.write` | — none — | — none — | ⚠️ **no enforcement point; inert** |
 | `tray` | — none — | — none — | ⚠️ declared only (runtime v2) |
-| `ui.panel` | manifest capability gate at install | panel loader | ⚠️ install-time only |
+| `ui.panel` | **gated at validation**: declared panels require the `ui-panel` capability **and** the `ui.panel` permission (`core/ext/manifest.go` + Dart mirror) — the install prompt always consents to UI embedding | panel loader serves only declared panels; bridge methods individually gated | ✅ install-time, now a real gate (pass 1) |
 | `theme.apply` | — none — | — none — | ⚠️ declared only |
 | `routing.rules` | — none — | — none — | ⚠️ **declared only, RiskDangerous** |
 | `net.hooks` | — none — | — none — | ⚠️ **declared only, RiskDangerous** |
@@ -202,8 +205,19 @@ Offline policy (no theater):
   already-installed extensions keep running.
 - **Emergency kill** (`"versions": "*"`) works only when the device can
   fetch the list. An offline device cannot receive a kill order, and we
-  do not pretend otherwise. The app re-checks on every startup and
-  catalog sync; disabling revokes tokens immediately.
+  do not pretend otherwise. Disabling revokes tokens immediately.
+
+Pass-1 status of the re-check pipeline (honest): the transport and the
+storage exist — `core/ext/revocation_cache.go` (`RevocationCache`,
+`Refresh`: fetch `.json` + `.minisig`, verify, cache **verified bytes
+only**, fall back to cache on any failure) — and sora-core applies the
+cached list to the store at startup (`cmd/sora-core`), so a kill order
+received earlier keeps applying offline and across restarts. What is
+still missing: **no production trigger calls `Refresh` yet** (there is no
+published team endpoint, and verification fails closed until the key
+ceremony anyway), so today the cache can only ever be empty. The day the
+ceremony completes, wiring `Refresh` into catalog sync is the last step —
+the mechanism needs no rework.
 
 ## 8. Sideload consent (WS6)
 
@@ -245,14 +259,17 @@ un-pre-checked decision.
 4. **Offline kill gap** (§7). Stated, not solved.
 5. **Ceremony pending** (§6). Stated, not solved; the owner action is
    tracked, not hand-waved.
-6. **Allowlist DNS.** `net.fetch` matches DNS names; a hostile network
-   can answer them with attacker IPs, but the request is still https to
-   a name the author chose and the user approved. The residual risk is
-   the allowlisted host itself turning malicious.
+6. **Allowlist DNS.** `net.fetch` matches DNS names; since pass 1 the
+   request rides the tunnel proxy, so name resolution happens at the
+   engine, not on the local network — but the residual risk that an
+   allowlisted host itself turns malicious remains.
 7. **Inert-but-dangerous permissions.** Until enforced, `routing.rules`
    / `net.hooks` in the prompt must be labeled "not yet supported",
    not granted silently. A permission the app cannot enforce must not
-   be presented as a protection.
+   be presented as a protection. The machine-readable status is
+   `core/ext/enforcement.go`; the CLI already warns authors about it
+   (`sora-ext validate`), and the install prompt is the remaining
+   consumer (l10n key `extPermNotYetActive`, proposed).
 
 ## 10. Fuzzing (WS8)
 
@@ -262,3 +279,13 @@ in ids) and `FuzzParseChecksums`. Invariants: no panics; accept ⇒
 re-validates and satisfies the structural rules independently checked.
 Findings and fixes are recorded in the security report
 (`reports/extensions-40/partial-security.md`).
+
+Pass 1 added seeds from real cases (the full v2-runtime manifest, the
+dangerous-permission set, panel-entry attacks: percent-encoded traversal,
+Windows ADS, backslashes) and three more targets:
+`FuzzParseManifestFull` (the v2 half the v1 fuzzer never reaches —
+background/network-hosts/asset pointers/panels gate),
+`FuzzParseRevocationList` (the emergency-brake parser), and
+`FuzzFetchURLPolicy` (the `net.fetch` URL policy: https-only, no
+userinfo, no IP literals, no ports, allowlist — policy checked
+independently, no network issued).
