@@ -983,7 +983,7 @@ func (r *renderer) tun(t engine.Tun) obj {
 		// multi_queue scales packet I/O with CPU cores but needs
 		// sing-tun's own TCP/IP stack (sing-box 1.15+): the pinned
 		// 1.14-based lx fork rejects it as an unknown field (verified
-		// with `sing-box check` against 1.14.3-lx.14).
+		// with `sing-box check` against 1.14.3-lx.22).
 		if !r.ver.Less(engine.Version{Major: 1, Minor: 15}) {
 			out["multi_queue"] = true
 		}
