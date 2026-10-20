@@ -117,6 +117,27 @@ type Transport struct {
 	// handshake instead of waiting for it. Zero disables it; only the
 	// ws transport honours it.
 	EarlyData int
+	// EarlyDataHeaderName names the header that carries the WebSocket
+	// early data instead of the default Sec-WebSocket-Protocol. All
+	// three engines spell it (sing-box early_data_header_name, Xray
+	// earlyDataHeaderName, mihomo early-data-header-name; each render
+	// verified against the pinned binary). It is meaningless without
+	// EarlyData and validation rejects the stray combination.
+	EarlyDataHeaderName string
+	// GRPCAuthority overrides the gRPC :authority pseudo-header. Only
+	// Xray spells it (grpcSettings.authority, verified on the pin);
+	// sing-box and mihomo have no such field and their stacks silently
+	// ignore unknown keys, so a plan setting it reports the feature
+	// missing on those engines (see catalog MissingFor) and their
+	// renderers refuse it instead of dropping it.
+	GRPCAuthority string
+	// GRPCMultiMode selects Xray's multi-mode gRPC (multiple streams
+	// per H2 connection, "gun" multi). Xray-only, like GRPCAuthority.
+	GRPCMultiMode bool
+	// GRPCUserAgent overrides the gRPC User-Agent. Xray spells it
+	// user_agent and mihomo grpc-user-agent (both verified on the
+	// pins); sing-box has no spelling, so it is gated there.
+	GRPCUserAgent string
 	// Mode is the XHTTP mode: auto, packet-up, stream-up or stream-one.
 	Mode string
 	// DownloadAddress and DownloadPort split the XHTTP downlink onto a
@@ -228,6 +249,13 @@ type Outbound struct {
 	// UDPRelayMode selects the TUIC UDP relay mode: "native" (default)
 	// or "quic".
 	UDPRelayMode string
+	// TUICHeartbeat is the TUIC heartbeat (keepalive) interval in
+	// seconds. Zero keeps DefaultTUICHeartbeatSeconds (see
+	// quic_defaults.go); renderers emit the effective value on both
+	// TUIC engines (sing-box heartbeat duration, mihomo
+	// heartbeat-interval in milliseconds) so a session's keepalive
+	// never depends on which engine carries it.
+	TUICHeartbeat int
 	// Token is the TUIC v4 pre-shared token; v5 authenticates with
 	// UUID+Password. Like the other credential fields, it must be masked
 	// in logs and events.
@@ -594,6 +622,13 @@ type BypassStrategy struct {
 	// (nfqws --dpi-desync-autottl). Mutually exclusive. Need Desync.
 	TTL     int
 	AutoTTL bool
+	// AutoTTLDelta is the safety margin (in hops) the autottl
+	// calibration keeps between the fake packet's death and the
+	// server: the rendered form is --dpi-desync-autottl=<delta>:<min>-<max>
+	// with the window from bypass.FakeTTL (a fake must die after the
+	// in-path censor but strictly before the server). Zero keeps
+	// zapret's own default autottl. Needs AutoTTL (and with it, fake).
+	AutoTTLDelta int
 	// Repeats duplicates the fake injection
 	// (nfqws --dpi-desync-repeats). Needs Desync.
 	Repeats int

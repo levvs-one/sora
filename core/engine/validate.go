@@ -128,6 +128,15 @@ func (o Outbound) Warnings() []string {
 	if o.Transport.Type == "ws" && !o.TLS.Enabled {
 		out = append(out, "websocket-without-tls")
 	}
+	if o.Transport.EarlyData > 0 {
+		// 0-RTT puts the first payload bytes — for VMess/Trojan the
+		// opening of an authenticated stream — into the handshake
+		// flight: replayable by an on-path observer and a distinct
+		// first-flight shape for DPI entropy heuristics (TSPU cascade).
+		// It stays opt-in data, never a default, and the UI must be
+		// able to say it is on.
+		out = append(out, "websocket-early-data-0rtt")
+	}
 	if o.Transport.Type == "xhttp" {
 		// XHTTP is under active development upstream: the client and
 		// server cores must run matching versions, or the stream fails
@@ -226,6 +235,8 @@ func (o Outbound) Validate() error {
 			errs = append(errs, fmt.Errorf("outbound %s: header %q is not a safe HTTP header", o.ID, k))
 		}
 	}
+	errs = append(errs, validateTransportFields(o)...)
+	errs = append(errs, validateVMessTrojan(o)...)
 	if o.Amnezia != nil {
 		if o.Protocol != ProtocolWireGuard {
 			errs = append(errs, fmt.Errorf("outbound %s: AmneziaWG parameters require the wireguard protocol", o.ID))
@@ -240,6 +251,82 @@ func (o Outbound) Validate() error {
 	}
 	errs = append(errs, validateXHTTP(o)...)
 	return errors.Join(errs...)
+}
+
+// validateTransportFields rejects transport-scoped fields riding on a
+// transport that cannot honour them. Every renderer drops unknown fields
+// for its transport silently, so a stray value is a config bug, not a
+// hint — the same discipline as the early-data and XHTTP checks above.
+func validateTransportFields(o Outbound) []error {
+	t := o.Transport
+	var errs []error
+	bad := func(format string, args ...any) {
+		args = append([]any{o.ID}, args...)
+		errs = append(errs, fmt.Errorf("outbound %s: "+format, args...))
+	}
+	if t.EarlyDataHeaderName != "" {
+		if t.Type != "ws" {
+			bad("early data header name needs the ws transport, not %q", t.Type)
+		} else if t.EarlyData <= 0 {
+			bad("early data header name %q has no effect without early data", t.EarlyDataHeaderName)
+		} else if !validHeaderToken(t.EarlyDataHeaderName) {
+			bad("early data header name %q is not a safe HTTP header name", t.EarlyDataHeaderName)
+		}
+	}
+	if t.Service != "" && t.Type != "grpc" {
+		bad("grpc service name %q needs the grpc transport, not %q", t.Service, t.Type)
+	}
+	if t.Type != "grpc" {
+		if t.GRPCAuthority != "" {
+			bad("grpc authority %q needs the grpc transport, not %q", t.GRPCAuthority, t.Type)
+		}
+		if t.GRPCMultiMode {
+			bad("grpc multi-mode needs the grpc transport, not %q", t.Type)
+		}
+		if t.GRPCUserAgent != "" {
+			bad("grpc user agent needs the grpc transport, not %q", t.Type)
+		}
+	}
+	if strings.ContainsAny(t.GRPCUserAgent, "\r\n") || strings.ContainsAny(t.GRPCAuthority, "\r\n") {
+		bad("grpc authority and user agent must not contain line breaks")
+	}
+	return errs
+}
+
+// validVMessSecurity is the VMess AEAD security set every pinned engine
+// accepts, verified by running the binaries (2026-10-20): sing-box
+// 1.14.3-lx.22 and mihomo 1.19.32 both refuse anything else at load
+// ("unsupported security type"), while Xray 26.10.17 accepts even a
+// nonsense value and silently falls back — so the whitelist must live
+// here, at plan level, not in the engines. Notably absent:
+// "aes-128-ctr", which older stacks listed but both Clash-lineage and
+// sing-box pins reject today.
+var validVMessSecurity = map[string]bool{
+	"": true, "auto": true, "aes-128-gcm": true, "chacha20-poly1305": true,
+	"none": true, "zero": true,
+}
+
+// validateVMessTrojan checks the VMess and Trojan credentials and the
+// VMess security option engine-independently. VMess here is AEAD only:
+// the plan has no alterId field by design — legacy (pre-AEAD) VMess is
+// rejected at import (parser) rather than silently upgraded to AEAD,
+// which a legacy server cannot authenticate.
+func validateVMessTrojan(o Outbound) []error {
+	var errs []error
+	switch o.Protocol {
+	case ProtocolVMess:
+		if o.UUID == "" {
+			errs = append(errs, fmt.Errorf("outbound %s: vmess needs a uuid", o.ID))
+		}
+		if !validVMessSecurity[o.Cipher] {
+			errs = append(errs, fmt.Errorf("outbound %s: vmess security %q is not one of auto, aes-128-gcm, chacha20-poly1305, none, zero", o.ID, o.Cipher))
+		}
+	case ProtocolTrojan:
+		if o.Password == "" {
+			errs = append(errs, fmt.Errorf("outbound %s: trojan needs a password", o.ID))
+		}
+	}
+	return errs
 }
 
 // validXHTTPModes whitelists the XHTTP stream modes every engine implements.
@@ -971,6 +1058,14 @@ func (s *BypassStrategy) validate(id string) error {
 		return fmt.Errorf("outbound %s: more than 8 split positions", id)
 	}
 	for _, pos := range append(slices.Clone(s.SplitPos), s.TLSRecord) {
+		if pos == "midsni" {
+			// The registry-level marker (bypass.MidSNIMarker): it names
+			// "the middle of the actual SNI", which only the caller who
+			// knows the target SNI can resolve. An unresolved marker
+			// reaching an executor would be a guess, so it is refused
+			// here with the remedy named.
+			return fmt.Errorf("outbound %s: split position %q is an unresolved marker: resolve it with bypass.ResolveStrategy against the target SNI before applying the plan", id, pos)
+		}
 		if pos != "" && !bypassPosition.MatchString(pos) {
 			return fmt.Errorf("outbound %s: %q is not a split position", id, pos)
 		}
@@ -1123,6 +1218,14 @@ func validateDesync(id string, s *BypassStrategy) error {
 	case s.AutoTTL && !hasFake:
 		return fmt.Errorf("outbound %s: autottl needs the fake desync method", id)
 	}
+	if s.AutoTTLDelta != 0 {
+		if !s.AutoTTL {
+			return fmt.Errorf("outbound %s: an autottl delta needs autottl", id)
+		}
+		if s.AutoTTLDelta < 1 || s.AutoTTLDelta > 16 {
+			return fmt.Errorf("outbound %s: autottl delta %d is out of range (1-16)", id, s.AutoTTLDelta)
+		}
+	}
 	if s.Repeats != 0 {
 		if !hasFake {
 			return fmt.Errorf("outbound %s: repeats need the fake desync method", id)
@@ -1174,15 +1277,33 @@ func validateHysteria2Tuning(o Outbound) []error {
 	if o.UpMbps < 0 || o.DownMbps < 0 {
 		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 bandwidth caps must not be negative", o.ID))
 	}
+	if o.UpMbps > MaxHy2BandwidthMbps || o.DownMbps > MaxHy2BandwidthMbps {
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 bandwidth caps must not exceed %d Mbps", o.ID, MaxHy2BandwidthMbps))
+	}
+	// Obfs is a plan-level promise of wire obfuscation: the type must
+	// be one the engines implement and its password (credential data,
+	// carried in ObfsParam and masked via Secrets) must be present —
+	// both hopping engines reject an obfs block without a password
+	// at config load (verified on the pins, CENSOR-P3), so accepting
+	// it here would defer a plan error to a dead engine start.
+	if o.Obfs != "" && !ValidHy2Obfs[o.Obfs] {
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 obfs %q is not salamander or gecko", o.ID, o.Obfs))
+	}
+	if o.Obfs != "" && o.ObfsParam == "" {
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 obfs %q needs its password", o.ID, o.Obfs))
+	}
+	if o.Obfs == "" && o.ObfsParam != "" {
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 obfs password without an obfs type does nothing", o.ID))
+	}
 	if err := validateHopPorts(o.ID, o.HopPorts); err != nil {
 		errs = append(errs, err)
 	}
 	switch {
 	case o.HopInterval < 0:
 		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval must not be negative", o.ID))
-	case o.HopInterval > 0 && o.HopInterval < 5:
+	case o.HopInterval > 0 && o.HopInterval < MinHy2HopIntervalSeconds:
 		// Hysteria2 requires at least 5s between hops.
-		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval must be at least 5s", o.ID))
+		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval must be at least %ds", o.ID, MinHy2HopIntervalSeconds))
 	case o.HopInterval > 0 && o.HopPorts == "":
 		errs = append(errs, fmt.Errorf("outbound %s: hysteria2 hop interval needs hop ports", o.ID))
 	}
@@ -1208,39 +1329,34 @@ var validBBRProfiles = map[string]bool{"standard": true, "conservative": true, "
 
 // validateHopPorts checks a Hysteria2 port-hopping spec such as
 // "20000-30000,40000": comma-separated single ports or ascending ranges.
+// The parse itself lives in HopPortRanges (quic_defaults.go), the same
+// parser the renderers translate from, so validation and rendering
+// can never disagree about what a spec means.
 func validateHopPorts(id, spec string) error {
-	if spec == "" {
-		return nil
-	}
-	for _, part := range strings.Split(spec, ",") {
-		part = strings.TrimSpace(part)
-		lo, hi, hasRange := strings.Cut(part, "-")
-		if !hasRange {
-			lo, hi = part, part
-		}
-		a, errA := strconv.Atoi(strings.TrimSpace(lo))
-		b, errB := strconv.Atoi(strings.TrimSpace(hi))
-		if errA != nil || errB != nil || a < 1 || b > 65535 || a > b {
-			return fmt.Errorf("outbound %s: %q is not a valid hysteria2 hop port spec", id, spec)
-		}
+	if _, err := HopPortRanges(spec); err != nil {
+		return fmt.Errorf("outbound %s: %w", id, err)
 	}
 	return nil
 }
 
-// validTUICCongestion lists the congestion controllers every supported
-// engine (sing-box, mihomo) implements for TUIC.
-var validTUICCongestion = map[string]bool{"bbr": true, "cubic": true, "new_reno": true}
-
-// validateTUICTuning checks the congestion controller and UDP relay mode of
-// a TUIC outbound against what the engines implement, so an unknown value
-// fails validation instead of silently falling back to an engine default.
+// validateTUICTuning checks the congestion controller, UDP relay mode
+// and heartbeat of a TUIC outbound against what the engines implement,
+// so an unknown value fails validation instead of silently falling
+// back to an engine default. The vocabularies live in
+// quic_defaults.go (ValidTUICCongestion / ValidTUICUDPRelayMode);
+// mihomo accepts unknown values silently at config load, so this
+// gate is the only thing standing between a typo and a silent
+// default there (verified on the pins, CENSOR-P3).
 func validateTUICTuning(o Outbound) []error {
 	var errs []error
-	if o.CongestionControl != "" && !validTUICCongestion[o.CongestionControl] {
+	if o.CongestionControl != "" && !ValidTUICCongestion[o.CongestionControl] {
 		errs = append(errs, fmt.Errorf("outbound %s: unknown tuic congestion control %q", o.ID, o.CongestionControl))
 	}
-	if o.UDPRelayMode != "" && o.UDPRelayMode != "native" && o.UDPRelayMode != "quic" {
+	if o.UDPRelayMode != "" && !ValidTUICUDPRelayMode[o.UDPRelayMode] {
 		errs = append(errs, fmt.Errorf("outbound %s: unknown tuic udp relay mode %q", o.ID, o.UDPRelayMode))
+	}
+	if o.TUICHeartbeat < 0 || (o.TUICHeartbeat > 0 && o.TUICHeartbeat < MinTUICHeartbeatSeconds) || o.TUICHeartbeat > MaxTUICHeartbeatSeconds {
+		errs = append(errs, fmt.Errorf("outbound %s: tuic heartbeat %ds is outside %d-%ds (0 keeps the default)", o.ID, o.TUICHeartbeat, MinTUICHeartbeatSeconds, MaxTUICHeartbeatSeconds))
 	}
 	return errs
 }
