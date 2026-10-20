@@ -23,6 +23,10 @@ type Meta struct {
 	Name      string `json:"name"`
 	UpdatedAt int64  `json:"updated_at"` // unix milliseconds
 	Hash      string `json:"hash"`       // hex sha256 of the payload
+	// From is the device id that sent this copy. Empty in inventories;
+	// set on sync reports so the client can show where a document came
+	// from.
+	From string `json:"from,omitempty"`
 }
 
 // Document is one synchronized blob.
@@ -201,7 +205,9 @@ func (s *session) runInitiator(ctx context.Context) (Report, error) {
 				return rep, err
 			}
 			if changed {
-				rep.Pulled = append(rep.Pulled, doc.Meta)
+				meta := doc.Meta
+				meta.From = doc.From
+				rep.Pulled = append(rep.Pulled, meta)
 			}
 		}
 	}
@@ -306,7 +312,9 @@ func (s *session) runResponder(ctx context.Context) (Report, error) {
 				return rep, err
 			}
 			if changed {
-				rep.Pulled = append(rep.Pulled, doc.Meta)
+				meta := doc.Meta
+				meta.From = doc.From
+				rep.Pulled = append(rep.Pulled, meta)
 			}
 		case "bye":
 			if err := s.send(message{T: "bye"}); err != nil {
