@@ -132,7 +132,10 @@ func xrayCutsPlaintext(v Version) bool {
 // XrayPlaintextMissing lists the plan's VLESS/Trojan outbounds that an
 // Xray build of version v refuses at config load: unencrypted (no TLS, no
 // REALITY, and — for VLESS — no VLESS Encryption) on builds >=
-// xrayPlaintextCutoff. Upstream phrases the prohibition as "without TLS or
+// xrayPlaintextCutoff. A Trojan outbound is never plaintext here: the xray
+// renderer always sets security: tls for Trojan (xray/render.go), so the
+// check skips Trojan without an explicit TLS block, matching MissingFor
+// (catalog.go). Upstream phrases the prohibition as "without TLS or
 // other encryption" (VLESS Encryption counts), so an encrypted VLESS
 // outbound is accepted without TLS/REALITY. It is a no-op for other
 // engines and for older builds, including the shipped 26.3.27 pin, so
@@ -148,6 +151,11 @@ func (c Capabilities) XrayPlaintextMissing(p *Plan, v Version) []string {
 			continue
 		}
 		encrypted := o.TLS.Enabled || o.TLS.Reality ||
+			// The xray renderer always sets security: tls for Trojan
+			// (xray/render.go), so a Trojan without an explicit TLS
+			// block is encrypted by construction — never plaintext,
+			// matching MissingFor above.
+			o.Protocol == ProtocolTrojan ||
 			(o.Protocol == ProtocolVLESS && o.Encryption != "" && o.Encryption != "none")
 		if !encrypted {
 			return []string{fmt.Sprintf("plaintext %s (Xray %s+ refuses it; enable TLS or REALITY)", o.Protocol, xrayPlaintextCutoff)}
