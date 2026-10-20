@@ -1,7 +1,7 @@
 # bench-baseline.txt — allocation baseline for tools/bench-baseline.sh.
 # Columns: <package> <benchmark> <B/op> <allocs/op>  (min over -count=3, -benchtime=100x; core/cmd/sora-core at 20x).
 # ns/op is intentionally NOT recorded: it is wall-clock noise on shared runners; B/op and allocs/op are exact allocator counters.
-# Captured: 2026-10-20T09:43:43Z  commit: 0b8d3ae09b3040217ce9eb66cea066b99798afc2  go: go version go1.24.7 linux/amd64
+# Captured: 2026-10-20T09:49:07Z  commit: cad60ae1f91e265340d7b9f80cf40c0841eec973  go: go version go1.24.7 linux/amd64
 # Re-capture only via: tools/bench-baseline.sh --update  (then review every raised number).
 core/censor BenchmarkDetectJournal256 618 6
 core/censor BenchmarkDetectSmall 400 6
@@ -15,8 +15,8 @@ core/control BenchmarkCredentialRoundTrip 2266 19
 core/control BenchmarkPlanFromProto200Servers 424072 1236
 core/control BenchmarkRedactorCacheHit 0 0
 core/control BenchmarkRedactorCacheMiss 0 0
-core/control BenchmarkResolveBenchmarkServers32of200 4432 8
-core/control BenchmarkResolveBenchmarkServers32of2000 4432 8
+core/control BenchmarkResolveBenchmarkServers32of200 4472 10
+core/control BenchmarkResolveBenchmarkServers32of2000 4472 10
 core/diagnostics BenchmarkCheckDnsLeaks16 27857 318
 core/engine BenchmarkRedactCleanLine 26 0
 core/engine BenchmarkRedactLines 560 2
