@@ -42,8 +42,10 @@ const sniExtHeaderLen = 9
 // mismatch of a few bytes still lands inside the extension, but garbage in
 // gives a garbage cut, so malformed input is refused rather than guessed.
 //
-// NOT WIRED: the desync arg builder does not call this yet — it is a
-// tested primitive waiting for the fragment-position path (T031).
+// Wired: ResolveStrategy (resolve.go) resolves the MidSNIMarker
+// split position through this function against the target SNI, and the
+// result flows into both arg builders (tpws --split-pos and nfqws
+// --dpi-desync-split-pos share the position syntax).
 func MidSNISplit(sni string) (string, error) {
 	if sni == "" {
 		return "", fmt.Errorf("bypass: cannot align a split to an empty SNI")

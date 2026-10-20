@@ -50,8 +50,10 @@ const (
 // (server too close for any valid TTL) it returns ok=false so the
 // caller falls back to a non-fake strategy.
 //
-// NOT WIRED: the tpws arg builder does not call this yet — it is a
-// tested primitive waiting for the desync arg generation path (T015).
+// Wired: ResolveStrategy (resolve.go) calls this whenever a strategy
+// carries AutoTTL with a delta and the caller measured the path, and
+// NFQWSArgs renders the same delta/window in nfqws's native
+// --dpi-desync-autottl=<delta>:<min>-<max> form when it did not.
 func FakeTTL(hopsToServer, delta int) (ttl int, ok bool, err error) {
 	if hopsToServer <= 0 {
 		return 0, false, fmt.Errorf("bypass: cannot calibrate a fake TTL without a measured distance to the server")

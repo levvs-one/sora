@@ -93,6 +93,13 @@ func NFQWSArgs(s engine.BypassStrategy, home string) []string {
 		args = append(args, "--dpi-desync-fooling="+s.Fooling)
 	}
 	switch {
+	case s.AutoTTL && s.AutoTTLDelta > 0:
+		// The vendored nfqws accepts --dpi-desync-autottl=<delta>[:<min>[-<max>]]:
+		// delta is the FakeTTL safety margin (the fake dies delta hops
+		// before the server), and the clamp window is FakeTTL's own
+		// usable range, so the calibrated and the fixed-TTL paths can
+		// never disagree about what a survivable fake TTL is.
+		args = append(args, fmt.Sprintf("--dpi-desync-autottl=%d:%d-%d", s.AutoTTLDelta, minFakeTTL, maxFakeTTL))
 	case s.AutoTTL:
 		args = append(args, "--dpi-desync-autottl")
 	case s.TTL > 0:
@@ -260,6 +267,20 @@ type Engine struct {
 	sweepOnce sync.Once
 	// iceptOverride replaces the platform interceptor in tests.
 	iceptOverride interceptor
+
+	// capsMu guards the capability snapshot cache (capability.go).
+	capsMu sync.Mutex
+	caps   *Capabilities
+	// capsOverride pins the capability snapshot in tests.
+	capsOverride *Capabilities
+	// tableLive records that this Engine installed the nft table, so
+	// teardown sweeps it even if every filter was already removed by
+	// a later Apply (a leaked table steers traffic into dead queues:
+	// a fail-open defect, see capability.go).
+	tableLive bool
+	// swept records the startup sweep ran (nfqws.go), so teardown
+	// knows a stale table from a previous process was already handled.
+	swept bool
 }
 
 type proxy struct {
@@ -291,6 +312,7 @@ func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 	needed := map[string]engine.BypassStrategy{}
 	neededNFQWS := map[string]engine.BypassStrategy{}
 	nfqIDs := map[string]string{}
+	tpwsIDs := map[string]string{}
 	for _, o := range p.Outbounds {
 		if o.Protocol == engine.ProtocolBypass && o.Bypass != nil {
 			if BackendOf(*o.Bypass) == BackendNFQWS {
@@ -298,9 +320,18 @@ func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 				neededNFQWS[k] = *o.Bypass
 				nfqIDs[k] = o.ID
 			} else {
-				needed[key(*o.Bypass)] = *o.Bypass
+				k := key(*o.Bypass)
+				needed[k] = *o.Bypass
+				tpwsIDs[k] = o.ID
 			}
 		}
+	}
+	// Capability gate first, before any state changes: the probed
+	// host capabilities (capability.go) decide as data whether each
+	// backend can run here; a missing capability is an honest,
+	// named refusal — never a silent skip of the obfuscation.
+	if err := e.gateStrategies(ctx, needed, neededNFQWS, tpwsIDs, nfqIDs); err != nil {
+		return err
 	}
 	if len(neededNFQWS) > 0 {
 		if err := e.checkNFQWS(neededNFQWS, nfqIDs); err != nil {
@@ -393,7 +424,7 @@ func (e *Engine) keep(ctx context.Context, px *proxy, spec supervise.Spec) {
 		if err := proc.Wait(ctx); ctx.Err() != nil {
 			return
 		} else if e.logs != nil {
-			e.logs.Write(time.Time{}, logs.LevelWarning, Source, fmt.Sprintf("tpws stopped (%v); starting it again", err))
+			e.logs.Write(time.Time{}, logs.LevelWarning, Source, e.mask(fmt.Sprintf("tpws stopped (%v); starting it again", err)))
 		}
 		if backoff.Wait(ctx, attempt) != nil {
 			return
@@ -413,9 +444,23 @@ func (px *proxy) stop() {
 	_ = px.proc.Stop(context.Background(), time.Second)
 }
 
+// mask redacts one bypass-process output line before it reaches the
+// log center. tpws/nfqws output names the hosts and SNI values it is
+// desyncing — the exact destinations the core must not persist — and
+// this path previously wrote it raw, bypassing every redactor the
+// engine path uses (CENSOR-LEAK). The inner engine's redactor knows
+// the plan's seeds and identifiers; when the inner engine exposes
+// none, a pattern-only redactor still applies the generic patterns.
+func (e *Engine) mask(line string) string {
+	if r, ok := e.Engine.(interface{ Redactor() *engine.Redactor }); ok && r.Redactor() != nil {
+		return r.Redactor().String(line)
+	}
+	return engine.NewRedactor().String(line)
+}
+
 func (e *Engine) logLine(line string) {
 	if e.logs != nil {
-		e.logs.Write(time.Time{}, logs.LevelInfo, Source, line)
+		e.logs.Write(time.Time{}, logs.LevelInfo, Source, e.mask(line))
 	}
 }
 

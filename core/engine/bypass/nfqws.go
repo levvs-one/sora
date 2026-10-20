@@ -69,7 +69,7 @@ func (e *Engine) assetsDir() string {
 func (e *Engine) sweep(ctx context.Context, icept interceptor) {
 	if err := icept.Sweep(ctx); err != nil && e.logs != nil {
 		e.logs.Write(time.Time{}, logs.LevelWarning, Source,
-			fmt.Sprintf("nfqws: dropping a stale interception table failed: %v", err))
+			e.mask(fmt.Sprintf("nfqws: dropping a stale interception table failed: %v", err)))
 	}
 }
 
@@ -93,11 +93,10 @@ func (e *Engine) interceptor() (interceptor, error) {
 // there is no silent tpws fallback. ids maps each needed key to an
 // outbound that carries it, for error attribution.
 func (e *Engine) checkNFQWS(needed map[string]engine.BypassStrategy, ids map[string]string) error {
-	if e.nfqws == "" {
-		for _, id := range ids {
-			return fmt.Errorf("bypass: outbound %s needs the nfqws backend, but nfqws is not installed in the engines directory", id)
-		}
-	}
+	// Binary presence is the capability gate's row (gateStrategies,
+	// capability.go) and has already run; what remains here is the
+	// interceptor's own construction and the unfiltered-traffic
+	// refusal.
 	if _, err := e.interceptor(); err != nil {
 		for _, id := range ids {
 			return fmt.Errorf("bypass: outbound %s needs the nfqws backend: %w", id, err)
@@ -127,6 +126,7 @@ func (e *Engine) syncFilters(ctx context.Context, needed map[string]engine.Bypas
 		// error here is not fatal — unlike the paths below, where
 		// nfqws is actually required.
 		e.sweepOnce.Do(func() {
+			e.swept = true
 			if icept, err := e.interceptor(); err == nil {
 				e.sweep(ctx, icept)
 			}
@@ -137,7 +137,7 @@ func (e *Engine) syncFilters(ctx context.Context, needed map[string]engine.Bypas
 	if err != nil {
 		return err // already wrapped by checkNFQWS on the Apply path
 	}
-	e.sweepOnce.Do(func() { e.sweep(ctx, icept) })
+	e.sweepOnce.Do(func() { e.swept = true; e.sweep(ctx, icept) })
 
 	// Assign queues: running instances keep theirs, new strategies
 	// take a free one.
@@ -173,6 +173,9 @@ func (e *Engine) syncFilters(ctx context.Context, needed map[string]engine.Bypas
 		}
 		return fmt.Errorf("bypass: installing nfqws queue rules: %w", err)
 	}
+	e.mu.Lock()
+	e.tableLive = len(specs) > 0
+	e.mu.Unlock()
 
 	// Stop instances the plan no longer needs.
 	e.mu.Lock()
@@ -302,7 +305,7 @@ func (e *Engine) keepFilter(ctx context.Context, f *filter, spec supervise.Spec)
 		if err := proc.Wait(ctx); ctx.Err() != nil {
 			return
 		} else if e.logs != nil {
-			e.logs.Write(time.Time{}, logs.LevelWarning, Source, fmt.Sprintf("nfqws stopped (%v); starting it again", err))
+			e.logs.Write(time.Time{}, logs.LevelWarning, Source, e.mask(fmt.Sprintf("nfqws stopped (%v); starting it again", err)))
 		}
 		if backoff.Wait(ctx, attempt) != nil {
 			return
@@ -324,16 +327,28 @@ func (f *filter) stop() {
 
 // stopFilters stops every nfqws instance and removes the interception
 // state. Called from Engine.Stop/Close alongside the tpws teardown.
+//
+// Cleanup symmetry (the restart contract): the table is swept whenever
+// this Engine installed it (tableLive), whenever filters were running,
+// and — when no Apply ever ran — once for a table a previous, crashed
+// core may have left behind. A leaked sora_nfqws table steers traffic
+// into queues with no consumer: packets blackhole and the tunnel looks
+// up while its direct traffic dies, a fail-open-grade leak. tpws needs
+// no symmetric sweep: it holds no kernel state, its processes die with
+// the core, and a re-Apply re-renders every strategy from the plan.
 func (e *Engine) stopFilters(ctx context.Context) {
 	e.mu.Lock()
 	filters := e.filters
 	e.filters = map[string]*filter{}
+	live := e.tableLive
+	e.tableLive = false
+	swept := e.swept
 	e.mu.Unlock()
 	for _, f := range filters {
 		f.stop()
 		e.alloc.Release(f.queue)
 	}
-	if len(filters) == 0 {
+	if len(filters) == 0 && !live && swept {
 		return
 	}
 	if icept, err := e.interceptor(); err == nil {
