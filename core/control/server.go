@@ -432,8 +432,15 @@ func (s *Server) mask(plan *engine.Plan) func(string) string {
 	if plan == nil {
 		return nil
 	}
-	values := append(plan.Secrets(), plan.Identifiers()...)
-	redactor := engine.NewRedactor(values...)
+	// Feed the two lists to the redactor separately instead of joining
+	// them into a third slice first: for a 200-server plan the join
+	// regrew and copied ~1400 strings (~26 KB) per Connect. Two Add
+	// calls build the identical value set — Add deduplicates across
+	// calls and its length-descending stable sort produces the same
+	// final order, because the secrets-before-identifiers relative
+	// order within each length class is preserved by both sorts.
+	redactor := engine.NewRedactor(plan.Secrets()...)
+	redactor.Add(plan.Identifiers()...)
 	s.redactors.put(plan.SessionID, redactor)
 	return redactor.String
 }
@@ -851,16 +858,25 @@ func newEventFeed(journal *session.Journal, after uint64, redactor *engine.Redac
 // subscription.
 func (f *eventFeed) history() []session.Event {
 	events := f.journal.Since(f.after, 0)
-	out := make([]session.Event, 0, len(events))
+	// The usual case — no event in the window sits above the captured
+	// head — returns the journal's fresh slice as is instead of copying
+	// every (large) Event into a second slice of the same size: a full
+	// 512-event replay paid that copy on every WatchEvents reconnect.
 	for _, event := range events {
 		if event.Sequence > f.head {
 			// Events above the captured head already belong to live
 			// delivery.
-			continue
+			out := make([]session.Event, 0, len(events))
+			for _, kept := range events {
+				if kept.Sequence > f.head {
+					continue
+				}
+				out = append(out, kept)
+			}
+			return out
 		}
-		out = append(out, event)
 	}
-	return out
+	return events
 }
 
 // unsent reports whether a live event still has to go out. One appended
