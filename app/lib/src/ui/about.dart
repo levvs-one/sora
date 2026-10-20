@@ -414,42 +414,50 @@ class _LicensesScreenState extends State<_LicensesScreen> {
           }
           final data = snapshot.data;
           if (data == null) return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-          final query = _search.text.trim().toLowerCase();
-          final names = data.keys.where((name) => name.toLowerCase().contains(query)).toList()
-            ..sort(
-              (a, b) => a == b
-                  ? 0
-                  : a == 'Sora'
-                  ? -1
-                  : b == 'Sora'
-                  ? 1
-                  : a.toLowerCase().compareTo(b.toLowerCase()),
-            );
-          if (names.isEmpty) {
-            return Center(
-              child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
-            );
-          }
-          return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.sizeOf(context).width < 720 ? 72 : 20),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: ColoredBox(
-                color: palette.surface,
-                child: ListView.separated(
-                  key: const ValueKey('license-components'),
-                  padding: const EdgeInsets.all(4),
-                  itemCount: names.length,
-                  separatorBuilder: (_, _) =>
-                      Divider(height: 1, thickness: 0.5, indent: 12, endIndent: 12, color: palette.field),
-                  itemBuilder: (_, i) => LinkTile(
-                    key: ValueKey('license-${names[i]}'),
-                    title: names[i],
-                    onTap: () => unawaited(push(context, _LicenseText(name: names[i], entries: data[names[i]]!))),
+          // The component list listens to the search field through a
+          // ValueListenableBuilder, so typing rebuilds only the list, not
+          // the whole licenses screen (the program-picker pattern).
+          return ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _search,
+            builder: (context, value, _) {
+              final query = value.text.trim().toLowerCase();
+              final names = data.keys.where((name) => name.toLowerCase().contains(query)).toList()
+                ..sort(
+                  (a, b) => a == b
+                      ? 0
+                      : a == 'Sora'
+                      ? -1
+                      : b == 'Sora'
+                      ? 1
+                      : a.toLowerCase().compareTo(b.toLowerCase()),
+                );
+              if (names.isEmpty) {
+                return Center(
+                  child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
+                );
+              }
+              return Padding(
+                padding: EdgeInsets.only(bottom: MediaQuery.sizeOf(context).width < 720 ? 72 : 20),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: ColoredBox(
+                    color: palette.surface,
+                    child: ListView.separated(
+                      key: const ValueKey('license-components'),
+                      padding: const EdgeInsets.all(4),
+                      itemCount: names.length,
+                      separatorBuilder: (_, _) =>
+                          Divider(height: 1, thickness: 0.5, indent: 12, endIndent: 12, color: palette.field),
+                      itemBuilder: (_, i) => LinkTile(
+                        key: ValueKey('license-${names[i]}'),
+                        title: names[i],
+                        onTap: () => unawaited(push(context, _LicenseText(name: names[i], entries: data[names[i]]!))),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),
@@ -464,7 +472,8 @@ class _LicensesScreenState extends State<_LicensesScreen> {
           borderRadius: BorderRadius.circular(12),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
           itemColor: palette.ink3,
-          onChanged: (_) => setState(() {}),
+          // No onChanged setState: the list above listens through
+          // ValueListenableBuilder on [_search].
         ),
         const SizedBox(height: 12),
       ],
