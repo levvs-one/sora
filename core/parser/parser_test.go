@@ -229,3 +229,30 @@ func TestParseExtraDownloadSettings(t *testing.T) {
 		}
 	}
 }
+
+// TestPinnedHysteria2LinkIsRefusedNotUnpinned: pinSHA256 is defined for
+// Hysteria2 links, but no engine consumes it (no plan field, no
+// renderer). Importing such a link anyway would silently drop the pin,
+// so parsing must refuse it (counted unsupported in lists) instead of
+// importing an unpinned server.
+func TestPinnedHysteria2LinkIsRefusedNotUnpinned(t *testing.T) {
+	for _, link := range []string{
+		"hysteria2://secret@example.com:443?pinSHA256=PEgHXXPzTsMBr6Uf5FYZ9CDpGHuCkSKpAZcJZU1hRVc%3D#H2",
+		"hy2://secret@example.com:443?pin_sha256=PEgHXXPzTsMBr6Uf5FYZ9CDpGHuCkSKpAZcJZU1hRVc%3D#H2",
+	} {
+		r, err := (LinkParser{}).Parse([]byte(link))
+		if err == nil && len(r.Servers) > 0 {
+			t.Fatalf("pinned hy2 link was imported without its pin: %#v", r.Servers)
+		}
+	}
+	// In a list, only the pinned link is skipped; neighbours import.
+	r, err := (LinkParser{}).Parse([]byte(
+		"hysteria2://secret@example.com:443#plain\n" +
+			"hysteria2://secret@example.com:443?pinSHA256=PEgHXXPzTsMBr6Uf5FYZ9CDpGHuCkSKpAZcJZU1hRVc%3D#pinned"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r.Report.Imported != 1 || r.Report.Unsupported != 1 {
+		t.Fatalf("list = %+v, want 1 imported and 1 unsupported", r.Report)
+	}
+}
