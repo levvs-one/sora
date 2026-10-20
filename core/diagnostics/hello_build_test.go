@@ -21,9 +21,9 @@ type helloSpec struct {
 func buildHello(t *testing.T, spec helloSpec) []byte {
 	t.Helper()
 	var body []byte
-	body = append(body, 0x03, 0x03)           // legacy version 771
-	body = append(body, make([]byte, 32)...)  // random
-	body = append(body, 0)                    // session id len
+	body = append(body, 0x03, 0x03)          // legacy version 771
+	body = append(body, make([]byte, 32)...) // random
+	body = append(body, 0)                   // session id len
 	var cs []byte
 	for _, c := range spec.ciphers {
 		cs = binary.BigEndian.AppendUint16(cs, c)

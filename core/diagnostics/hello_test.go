@@ -17,7 +17,7 @@ import (
 // construction — no magic constants copied from anywhere.
 func TestAnalyzeHelloSynthetic(t *testing.T) {
 	raw := buildHello(t, helloSpec{
-		ciphers:    []uint16{0x0a0a, 0x1301, 0x1302, 0xc02b},
+		ciphers: []uint16{0x0a0a, 0x1301, 0x1302, 0xc02b},
 		extensions: []helloExt{{typ: 0, data: sniData("example.com")},
 			{typ: 10, data: u16List(0x11ec, 0x001d)},
 			{typ: 11, data: []byte{1, 0}},

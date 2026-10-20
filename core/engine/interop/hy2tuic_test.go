@@ -29,7 +29,6 @@ package interop_test
 
 import (
 	"context"
-	"os/exec"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -44,6 +43,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
