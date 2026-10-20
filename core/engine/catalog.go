@@ -40,7 +40,7 @@ var Catalog = map[Kind]Capabilities{
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
 			FeatureXHTTPDownloadSplit: true, FeatureXHTTPXmux: true,
 			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureChains: true,
-			FeatureHy2PortHop: true, FeatureDoH3: true, FeatureECH: true,
+			FeatureHy2PortHop: true, FeatureHy2Obfs: true, FeatureDoH3: true, FeatureECH: true,
 			// FeatureXHTTPDownloadSplit and FeatureXHTTPXmux are
 			// claimed as of the engine bump validation (2026-10-20):
 			// the mihomo renderer emits download-settings,
@@ -73,7 +73,7 @@ var Catalog = map[Kind]Capabilities{
 			FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
 			FeatureURLTest: true, FeatureLatencyTest: true, FeatureGeoData: true,
 			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureChains: true,
-			FeatureHy2PortHop: true, FeatureDoH3: true, FeatureECH: true,
+			FeatureHy2PortHop: true, FeatureHy2Obfs: true, FeatureDoH3: true, FeatureECH: true,
 			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux: the
 			// lx fork's xhttp transport has neither downlink splitting
 			// nor xmux reuse tuning (x_padding_bytes only).
@@ -100,7 +100,7 @@ var Catalog = map[Kind]Capabilities{
 			FeatureURLTest: true, FeatureLoadBalance: true, FeatureLatencyTest: true,
 			FeatureGeoData: true, FeatureTLSFragment: true,
 			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
-			FeatureXHTTPDownloadSplit: true,
+			FeatureXHTTPDownloadSplit: true, FeatureRealityMLDSA65: true,
 			// Deliberately no FeatureXHTTPXmux: Xray's xhttp case
 			// renders only mode/path/host/headers/downloadSettings and
 			// emits neither xmux nor x_padding. Mihomo does claim the
@@ -121,6 +121,8 @@ var Catalog = map[Kind]Capabilities{
 			// S4); the gate returns together with a verified render.
 			// Deliberately no FeatureHy2PortHop: Xray's hysteria2
 			// outbound cannot hop ports (see FeatureHy2PortHop).
+			// Deliberately no FeatureHy2Obfs: Xray's hysteria
+			// transport exposes no obfs option (see FeatureHy2Obfs).
 			// Deliberately no FeatureDoH3: Xray has no DNS-over-HTTP/3
 			// transport (see FeatureDoH3).
 		},
@@ -361,6 +363,63 @@ func (c Capabilities) MissingFor(p *Plan, v Version) []string {
 				missing = append(missing, "AmneziaWG J1/J2/J3/Itime parameters")
 				break
 			}
+		}
+	}
+	if c.Kind == KindSingBox || c.Kind == KindMihomo {
+		// gRPC authority and multi-mode are Xray-only spellings
+		// (verified on the pinned binaries, CENSOR-P2): sing-box's
+		// gRPC transport has neither field and rejects unknown keys,
+		// mihomo's grpc-opts has neither and silently ignores unknown
+		// YAML keys. Without this gate a plan setting them would lose
+		// them silently on either engine; their renderers refuse the
+		// same fields as a backstop. The gRPC user agent is narrower:
+		// mihomo spells it (grpc-user-agent), sing-box does not.
+		for _, o := range p.Outbounds {
+			t := o.Transport
+			if t.Type != "grpc" {
+				continue
+			}
+			if t.GRPCAuthority != "" || t.GRPCMultiMode {
+				missing = append(missing, "gRPC authority/multi-mode (Xray-only)")
+				break
+			}
+		}
+		if c.Kind == KindSingBox {
+			for _, o := range p.Outbounds {
+				if o.Transport.Type == "grpc" && o.Transport.GRPCUserAgent != "" {
+					missing = append(missing, "gRPC user-agent")
+					break
+				}
+			}
+		}
+	}
+	// Shadowsocks method and plugin support is per-engine measured
+	// data (ss_support.go, ss_plugin.go), not a protocol-level claim:
+	// a plan whose cipher or plugin this engine's pinned build does
+	// not implement must not be routed here — the engine would refuse
+	// the config at load or, worse, silently run without the plugin
+	// (CENSOR-P4). One entry per fact, first offender only, mirroring
+	// the J1/J2/J3 style above.
+	for _, o := range p.Outbounds {
+		if o.Protocol != ProtocolShadowsocks {
+			continue
+		}
+		if !SupportsShadowsocksMethod(c.Kind, o.Cipher) {
+			missing = append(missing, "shadowsocks method "+normalizeShadowsocksMethod(o.Cipher))
+			break
+		}
+	}
+	for _, o := range p.Outbounds {
+		if o.Protocol != ProtocolShadowsocks {
+			continue
+		}
+		if o.Plugin != "" && !SupportsSSPlugin(c.Kind, o.Plugin) {
+			missing = append(missing, "shadowsocks plugin "+o.Plugin)
+			break
+		}
+		if o.Plugin == "" && o.Obfs != "" && !SupportsSSPlugin(c.Kind, "") {
+			missing = append(missing, "shadowsocks obfs (simple-obfs)")
+			break
 		}
 	}
 	for proto := range p.Protocols() {

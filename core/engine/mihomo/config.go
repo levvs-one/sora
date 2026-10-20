@@ -114,7 +114,7 @@ type proxy struct {
 	XHTTPOpts  *xhttpOpts `yaml:"xhttp-opts,omitempty"`
 	Encryption string     `yaml:"encryption,omitempty"`
 
-	SNI            string   `yaml:"sni,omitempty"`
+	SNI string `yaml:"sni,omitempty"`
 	// ServerName is the "servername" spelling of the TLS server name.
 	// mihomo's adapters disagree on the key: vless and vmess read only
 	// "servername" and silently drop "sni", while trojan, anytls,
@@ -148,6 +148,10 @@ type proxy struct {
 	// relay mode ("native", "quic").
 	CongestionController string `yaml:"congestion-controller,omitempty"`
 	UDPRelayMode         string `yaml:"udp-relay-mode,omitempty"`
+	// TUIC heartbeat (keepalive) interval in milliseconds; the plan
+	// carries seconds (engine plan TUICHeartbeat), the renderer
+	// converts from the effective value in quic_defaults.go.
+	HeartbeatInterval int `yaml:"heartbeat-interval,omitempty"`
 
 	PrivateKey string          `yaml:"private-key,omitempty"`
 	IP         string          `yaml:"ip,omitempty"`
@@ -170,10 +174,18 @@ type wsOpts struct {
 	// MaxEarlyData caps WebSocket 0-RTT: the first payload bytes ride
 	// the handshake. Zero disables it.
 	MaxEarlyData int `yaml:"max-early-data,omitempty"`
+	// EarlyDataHeaderName renames the header carrying the early data
+	// (verified accepted by `mihomo -t` on the pin, CENSOR-P2).
+	EarlyDataHeaderName string `yaml:"early-data-header-name,omitempty"`
 }
 
 type grpcOpts struct {
 	ServiceName string `yaml:"grpc-service-name,omitempty"`
+	// UserAgent is grpc-user-agent (verified on the pin). Mihomo has
+	// no authority or multi-mode key and silently ignores unknown
+	// YAML keys, so those plan fields are refused in applyTransport
+	// instead of being dropped here.
+	UserAgent string `yaml:"grpc-user-agent,omitempty"`
 }
 
 type h2Opts struct {

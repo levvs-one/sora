@@ -239,6 +239,24 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		server["password"] = o.Password
 		settings = obj{"servers": []obj{server}}
 	case engine.ProtocolShadowsocks:
+		// Xray has no SIP002 plugin support at all and its config
+		// loader silently ignores unknown keys (verified on the
+		// 26.10.17 pin: a plugin field loads with rc=0 and no
+		// obfuscation happens). Rendering the outbound without its
+		// plugin — or with a method Xray dropped (stream ciphers,
+		// "none", aes-192-gcm, the chacha8/chacha12 2022 variants) —
+		// would break the plan's promise silently, so refuse here;
+		// selection (catalog MissingFor, same data) refuses earlier
+		// (CENSOR-P4).
+		if o.Plugin != "" {
+			return nil, fmt.Errorf("xray: shadowsocks outbound %s uses plugin %q, which Xray does not implement: refusing to render it unobfuscated", o.ID, o.Plugin)
+		}
+		if o.Obfs != "" {
+			return nil, fmt.Errorf("xray: shadowsocks outbound %s uses obfs %q, which Xray does not implement for shadowsocks: refusing to render it unobfuscated", o.ID, o.Obfs)
+		}
+		if !engine.SupportsShadowsocksMethod(engine.KindXray, o.Cipher) {
+			return nil, fmt.Errorf("xray: shadowsocks outbound %s uses method %q, which Xray does not implement", o.ID, orDefault(o.Cipher, "aes-256-gcm"))
+		}
 		server["method"], server["password"] = orDefault(o.Cipher, "aes-256-gcm"), o.Password
 		settings = obj{"servers": []obj{server}}
 	case engine.ProtocolSOCKS5, engine.ProtocolHTTP:
@@ -289,13 +307,32 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 	case "", "tcp":
 	case "ws":
 		s["network"] = "ws"
-		s["wsSettings"] = obj{}.set("path", t.Path).set("host", t.Host).set("maxEarlyData", t.EarlyData)
+		ws := obj{}.set("path", t.Path).set("host", t.Host).set("maxEarlyData", t.EarlyData).
+			set("earlyDataHeaderName", t.EarlyDataHeaderName)
+		if len(t.Headers) > 0 {
+			// Xray was dropping the plan's WS headers while sing-box
+			// and mihomo emit them: the masquerade header set (UA and
+			// friends) silently vanished on this engine (CENSOR-P2).
+			// Verified accepted by the pinned binary (run -test).
+			ws.set("headers", t.Headers)
+		}
+		s["wsSettings"] = ws
 	case "grpc":
 		s["network"] = "grpc"
-		s["grpcSettings"] = obj{}.set("serviceName", t.Service)
+		// authority, multiMode and user_agent are Xray's spellings
+		// (verified on the pin); sing-box renders none of them and
+		// mihomo only the user agent, so catalog gates keep plans
+		// that set authority/multi-mode on this engine.
+		s["grpcSettings"] = obj{}.set("serviceName", t.Service).
+			set("authority", t.GRPCAuthority).set("multiMode", t.GRPCMultiMode).
+			set("user_agent", t.GRPCUserAgent)
 	case "httpupgrade":
 		s["network"] = "httpupgrade"
-		s["httpupgradeSettings"] = obj{}.set("path", t.Path).set("host", t.Host)
+		hu := obj{}.set("path", t.Path).set("host", t.Host)
+		if len(t.Headers) > 0 {
+			hu.set("headers", t.Headers)
+		}
+		s["httpupgradeSettings"] = hu
 	case "xhttp":
 		s["network"] = "xhttp"
 		xs := obj{"mode": orDefault(t.Mode, "auto")}.set("path", t.Path).set("host", t.Host)
@@ -325,7 +362,8 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 		s["realitySettings"] = obj{
 			"serverName": o.TLS.ServerName, "publicKey": o.TLS.RealityPublicKey,
 			"fingerprint": r.realityFingerprint(o),
-		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")) // "/" is the documented safe default path
+		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")). // "/" is the documented safe default path
+													set("mldsa65Verify", o.TLS.RealityMLDSA65Verify)
 	case o.TLS.Enabled || needsTLS:
 		s["security"] = "tls"
 		s["tlsSettings"] = obj{}.set("serverName", o.TLS.ServerName).set("alpn", o.TLS.ALPN).
@@ -437,7 +475,8 @@ func (r *renderer) xhttpDownloadSettings(o engine.Outbound) (obj, error) {
 		ds["realitySettings"] = obj{
 			"serverName": t.DownloadAddress, "publicKey": o.TLS.RealityPublicKey,
 			"fingerprint": fp,
-		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")) // "/" is the documented safe default path
+		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")). // "/" is the documented safe default path
+													set("mldsa65Verify", o.TLS.RealityMLDSA65Verify)
 	case o.TLS.Enabled || o.Protocol == engine.ProtocolTrojan:
 		ds["security"] = "tls"
 		ds["tlsSettings"] = obj{"serverName": t.DownloadAddress}.
@@ -517,7 +556,7 @@ func wireguard(o engine.Outbound, tag string) (obj, error) {
 	// wire while the plan promises obfuscation - the exact silent no-op
 	// this check exists to prevent. Fail closed: the caller must pick an
 	// engine with FeatureAmneziaWG instead.
-	if o.Amnezia != nil {
+	if !o.Amnezia.IsZero() {
 		return nil, fmt.Errorf("xray: wireguard outbound %s sets AmneziaWG obfuscation parameters, which xray does not implement: refusing to render an unobfuscated outbound", o.ID)
 	}
 	peers := make([]obj, 0, len(o.Peers))

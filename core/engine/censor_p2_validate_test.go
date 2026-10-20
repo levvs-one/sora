@@ -104,3 +104,42 @@ func TestWarningsEarlyData(t *testing.T) {
 		t.Fatalf("Warnings = %v, want websocket-early-data-0rtt", o.Warnings())
 	}
 }
+
+func TestCatalogGRPCGates(t *testing.T) {
+	mk := func() *Plan {
+		o := p2Outbound(ProtocolTrojan)
+		o.Transport = Transport{Type: "grpc", Service: "tun", GRPCAuthority: "a.example.com", GRPCMultiMode: true}
+		return &Plan{SessionID: "p2", Outbounds: []Outbound{o}}
+	}
+	for _, kind := range []Kind{KindSingBox, KindMihomo} {
+		missing := Catalog[kind].Missing(mk())
+		found := false
+		for _, m := range missing {
+			if strings.Contains(m, "gRPC authority/multi-mode") {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("%s: Missing = %v, want the gRPC authority/multi-mode gate", kind, missing)
+		}
+	}
+	if missing := Catalog[KindXray].Missing(mk()); len(missing) != 0 {
+		t.Errorf("xray: Missing = %v, want none for its own gRPC fields", missing)
+	}
+	// User agent alone: mihomo carries it, sing-box does not.
+	o := p2Outbound(ProtocolTrojan)
+	o.Transport = Transport{Type: "grpc", Service: "tun", GRPCUserAgent: "ua/1.0"}
+	p := &Plan{SessionID: "p2", Outbounds: []Outbound{o}}
+	if missing := Catalog[KindMihomo].Missing(p); len(missing) != 0 {
+		t.Errorf("mihomo: Missing = %v, want none for grpc-user-agent", missing)
+	}
+	found := false
+	for _, m := range Catalog[KindSingBox].Missing(p) {
+		if strings.Contains(m, "gRPC user-agent") {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("sing-box: Missing = %v, want the gRPC user-agent gate", Catalog[KindSingBox].Missing(p))
+	}
+}

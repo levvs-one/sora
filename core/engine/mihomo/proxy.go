@@ -31,11 +31,26 @@ func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
 		px.Type = "ss"
 		px.Cipher = orDefault(o.Cipher, "aes-256-gcm")
 		px.Password = o.Password
+		if !engine.SupportsShadowsocksMethod(engine.KindMihomo, o.Cipher) {
+			return proxy{}, fmt.Errorf("mihomo: shadowsocks outbound %s uses method %q, which mihomo does not implement", o.ID, px.Cipher)
+		}
 		if o.Plugin != "" {
 			// An explicit SIP002 plugin goes through mihomo's plugin
 			// path; the legacy Obfs mapping below stays for the native
-			// simple-obfs fields.
-			px.SSPlugin = o.Plugin
+			// simple-obfs fields. The plugin NAME must be translated:
+			// mihomo's adapter matches its own spellings ("obfs", not
+			// the SIP002 binary name "obfs-local"; "restls", not
+			// "restls-plugin") and silently ignores any other name —
+			// the outbound would run unobfuscated (CENSOR-P4, read
+			// from the pinned adapter/outbound/shadowsocks.go).
+			spec := engine.SSPluginByName(o.Plugin)
+			if spec == nil || !engine.SupportsSSPlugin(engine.KindMihomo, o.Plugin) {
+				return proxy{}, fmt.Errorf("mihomo: shadowsocks outbound %s uses plugin %q, which mihomo does not implement", o.ID, o.Plugin)
+			}
+			px.SSPlugin = spec.MihomoName
+			if px.SSPlugin == "" {
+				px.SSPlugin = spec.Name
+			}
 			if opts := ssPluginOpts(o.Plugin, o.PluginOpts); len(opts) > 0 {
 				px.SSPluginOpts = opts
 			}
@@ -85,12 +100,18 @@ func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
 		if o.Token != "" {
 			px.Token = o.Token
 		}
-		if o.CongestionControl != "" {
-			px.CongestionController = o.CongestionControl
-		}
+		// The effective congestion controller always renders (the
+		// plan value, or DefaultTUICCongestion): mihomo silently
+		// accepts an omitted or unknown controller and falls back
+		// to its own default, so spelling the effective value is
+		// what keeps a plan's controller identical across engines
+		// (CENSOR-P3, verified with `mihomo -t`).
+		px.CongestionController = o.EffectiveTUICCongestion()
 		if o.UDPRelayMode != "" {
 			px.UDPRelayMode = o.UDPRelayMode
 		}
+		// TUIC heartbeat in mihomo's spelling: milliseconds.
+		px.HeartbeatInterval = o.EffectiveTUICHeartbeatSeconds() * 1000
 	case engine.ProtocolAnyTLS:
 		// AnyTLS mandates TLS on the wire; the plan carries the SNI and
 		// the uTLS client fingerprint in TLS. Stream transports do not
@@ -121,7 +142,7 @@ func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
 		if px.IP == "" && px.IPv6 == "" {
 			return proxy{}, fmt.Errorf("mihomo: wireguard outbound %s has no interface address", o.ID)
 		}
-		if o.Amnezia != nil {
+		if !o.Amnezia.IsZero() {
 			opts, err := amneziaOptions(o.Amnezia)
 			if err != nil {
 				return proxy{}, err
@@ -192,15 +213,22 @@ func applyTransport(px *proxy, t engine.Transport) error {
 		px.Network = "tcp"
 	case "ws":
 		px.Network = "ws"
-		px.WSOpts = &wsOpts{Path: t.Path, Headers: headers, MaxEarlyData: t.EarlyData}
+		px.WSOpts = &wsOpts{Path: t.Path, Headers: headers, MaxEarlyData: t.EarlyData, EarlyDataHeaderName: t.EarlyDataHeaderName}
 	case "httpupgrade":
 		// mihomo carries HTTPUpgrade as a flavour of its websocket
 		// transport.
 		px.Network = "ws"
 		px.WSOpts = &wsOpts{Path: t.Path, Headers: headers, V2RayHTTPUpgrade: true}
 	case "grpc":
+		if t.GRPCAuthority != "" || t.GRPCMultiMode {
+			// mihomo's grpc-opts has no authority or multi-mode key
+			// and its YAML loader ignores unknown keys: emitting them
+			// would drop the fields silently. Catalog MissingFor
+			// keeps such plans on Xray; this is the render backstop.
+			return fmt.Errorf("mihomo: grpc authority and multi-mode are Xray-only and mihomo does not render them")
+		}
 		px.Network = "grpc"
-		px.GRPCOpts = &grpcOpts{ServiceName: t.Service}
+		px.GRPCOpts = &grpcOpts{ServiceName: t.Service, UserAgent: t.GRPCUserAgent}
 	case "h2":
 		px.Network = "h2"
 		px.H2Opts = &h2Opts{Path: t.Path}
@@ -397,6 +425,14 @@ func applyTLS(px *proxy, o engine.Outbound) error {
 		px.SkipCertVerify = &skip
 	}
 	if o.TLS.Reality {
+		if o.TLS.RealityMLDSA65Verify != "" {
+			// Fail closed behind the FeatureRealityMLDSA65 gate:
+			// mihomo silently ignores unknown reality-opts keys
+			// (probed on the pin, 2026-10-20), so rendering here
+			// would drop the pinned ML-DSA-65 server check without
+			// a trace.
+			return fmt.Errorf("mihomo: outbound %s pins a REALITY mldsa65Verify key, which mihomo does not implement: refusing to render a handshake without the ML-DSA-65 server check", o.ID)
+		}
 		if o.TLS.RealityPublicKey == "" {
 			return fmt.Errorf("mihomo: outbound %s uses reality without a public key", o.ID)
 		}
@@ -483,7 +519,11 @@ func ssPluginOpts(plugin, opts string) map[string]any {
 			out["host"] = h
 		}
 		return out
-	case "v2ray-plugin":
+	case "v2ray-plugin", "gost-plugin":
+		// gost-plugin's mihomo option shape mirrors v2ray-plugin's
+		// (its adapter decodes the same fields and likewise requires
+		// mode "websocket"); without the shared case it fell into the
+		// generic passthrough and never got the mandatory mode.
 		out := map[string]any{"mode": "websocket"}
 		for k, v := range raw {
 			switch k {

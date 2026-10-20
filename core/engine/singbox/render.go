@@ -269,6 +269,17 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		out.set("type", "trojan").set("password", o.Password)
 		needsTLS = true
 	case engine.ProtocolShadowsocks:
+		// Fail closed on what the pinned build refuses at load
+		// (measured, CENSOR-P4): unknown 2022 chacha variants and
+		// plugin names the binary cannot resolve die here with the
+		// plan context instead of as a bare engine FATAL at start.
+		// Selection refuses the same facts earlier (catalog.go).
+		if !engine.SupportsShadowsocksMethod(engine.KindSingBox, o.Cipher) {
+			return nil, fmt.Errorf("singbox: shadowsocks outbound %s uses method %q, which sing-box does not implement", o.ID, orDefault(o.Cipher, "aes-256-gcm"))
+		}
+		if o.Plugin != "" && !engine.SupportsSSPlugin(engine.KindSingBox, o.Plugin) {
+			return nil, fmt.Errorf("singbox: shadowsocks outbound %s uses plugin %q, which needs a plugin binary sora does not ship: refusing to render", o.ID, o.Plugin)
+		}
 		out.set("type", "shadowsocks").set("method", orDefault(o.Cipher, "aes-256-gcm")).set("password", o.Password)
 		// An explicit SIP002 plugin wins over the legacy obfs-local
 		// mapping; sing-box passes plugin/plugin_opts to the plugin
@@ -297,9 +308,20 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 			out["down_mbps"] = o.DownMbps
 		}
 		// Port hopping: server_ports overrides server_port (sing-box
-		// >= 1.11 ignores server_port when server_ports is set).
+		// >= 1.11 ignores server_port when server_ports is set). The
+		// plan spec is share-link spelling ("20000-30000,40000");
+		// sing-box wants colon ranges with an explicit upper bound
+		// ("20000:30000", "40000:40000") and rejects the plan
+		// spelling at config load — the verbatim split that used to
+		// sit here made every hopping plan unstartable on this
+		// engine (CENSOR-P3, verified on lx.22: "bad port range:
+		// 20000-30000"). SingBoxHopPorts is the single translation.
 		if o.HopPorts != "" {
-			out["server_ports"] = strings.Split(o.HopPorts, ",")
+			ports, err := engine.SingBoxHopPorts(o.HopPorts)
+			if err != nil {
+				return nil, fmt.Errorf("singbox: outbound %s: %w", o.ID, err)
+			}
+			out["server_ports"] = ports
 		}
 		if o.HopInterval > 0 {
 			out["hop_interval"] = strconv.Itoa(o.HopInterval) + "s"
@@ -323,15 +345,18 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		needsTLS = true
 	case engine.ProtocolTUIC:
 		tuic := out.set("type", "tuic").set("uuid", o.UUID).set("password", o.Password)
-		// The engines default to BBR; an explicit link parameter wins.
-		if o.CongestionControl != "" {
-			tuic.set("congestion_control", o.CongestionControl)
-		} else {
-			tuic.set("congestion_control", "bbr")
-		}
+		// The effective congestion controller always renders (the
+		// plan value, or DefaultTUICCongestion from quic_defaults.go):
+		// sing-box and mihomo then run the same controller for the
+		// same plan instead of each falling back to its own default.
+		tuic.set("congestion_control", o.EffectiveTUICCongestion())
 		if o.UDPRelayMode != "" {
 			tuic.set("udp_relay_mode", o.UDPRelayMode)
 		}
+		// Heartbeat (TUIC keepalive): sing-box spells it as a
+		// duration string; the effective seconds come from the plan
+		// or DefaultTUICHeartbeatSeconds (quic_defaults.go).
+		tuic.set("heartbeat", strconv.Itoa(o.EffectiveTUICHeartbeatSeconds())+"s")
 		needsTLS = true
 	case engine.ProtocolAnyTLS:
 		out.set("type", "anytls").set("password", o.Password)
@@ -360,6 +385,13 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		return wireguard(out, o)
 	default:
 		return nil, fmt.Errorf("singbox: protocol %q is not supported", o.Protocol)
+	}
+	if o.TLS.RealityMLDSA65Verify != "" {
+		// Fail closed behind the FeatureRealityMLDSA65 gate: the
+		// pinned binary rejects the field as unknown (probed
+		// 2026-10-20), so a direct render must refuse rather than
+		// complete a handshake without the pinned ML-DSA-65 check.
+		return nil, fmt.Errorf("singbox: outbound %s pins a REALITY mldsa65Verify key, which sing-box does not implement: refusing to render a handshake without the ML-DSA-65 server check", o.ID)
 	}
 	if o.TLS.Enabled || needsTLS {
 		out["tls"] = r.tls(o)
@@ -416,23 +448,45 @@ func (r *renderer) tls(o engine.Outbound) obj {
 }
 
 func transport(t engine.Transport) (obj, error) {
-	host := func() obj {
-		if t.Host == "" {
+	// wsHeaders merges the plan's header set with the Host field: the
+	// explicit Host wins, exactly as in the mihomo renderer, so a
+	// subscription's custom headers (User-Agent and friends — the
+	// browser-masquerade data) reach the wire identically on every
+	// engine. Previously only Host was emitted and every other header
+	// was lost silently on this engine (CENSOR-P2).
+	wsHeaders := func() obj {
+		if len(t.Headers) == 0 && t.Host == "" {
 			return nil
 		}
-		return obj{"Host": t.Host}
+		out := make(obj, len(t.Headers)+1)
+		for k, v := range t.Headers {
+			out[k] = v
+		}
+		if t.Host != "" {
+			out["Host"] = t.Host
+		}
+		return out
 	}
 	switch t.Type {
 	case "", "tcp":
 		return nil, nil
 	case "ws":
-		out := obj{"type": "ws"}.set("path", t.Path).set("headers", host())
+		out := obj{"type": "ws"}.set("path", t.Path).set("headers", wsHeaders())
 		if t.EarlyData > 0 {
 			// 0-RTT: the first payload bytes ride the handshake.
 			out["max_early_data"] = t.EarlyData
+			out.set("early_data_header_name", t.EarlyDataHeaderName)
 		}
 		return out, nil
 	case "grpc":
+		// sing-box's gRPC transport spells only the service name (plus
+		// timeouts the plan does not carry). Authority, multi-mode and
+		// user-agent are Xray spellings; catalog MissingFor keeps such
+		// plans off this engine, and this refusal is the render-time
+		// backstop so the fields can never drop silently.
+		if t.GRPCAuthority != "" || t.GRPCMultiMode || t.GRPCUserAgent != "" {
+			return nil, fmt.Errorf("transport grpc: authority, multi-mode and user-agent are Xray-only and sing-box does not render them")
+		}
 		return obj{"type": "grpc"}.set("service_name", t.Service), nil
 	case "h2":
 		out := obj{"type": "http"}.set("path", t.Path)
@@ -441,7 +495,14 @@ func transport(t engine.Transport) (obj, error) {
 		}
 		return out, nil
 	case "httpupgrade":
-		return obj{"type": "httpupgrade"}.set("host", t.Host).set("path", t.Path), nil
+		out := obj{"type": "httpupgrade"}.set("host", t.Host).set("path", t.Path)
+		if len(t.Headers) > 0 {
+			// Verified on the pin: httpupgrade accepts a headers map;
+			// dropping it lost the masquerade headers other engines
+			// emit for the same plan (CENSOR-P2).
+			out["headers"] = t.Headers
+		}
+		return out, nil
 	case "xhttp":
 		out := obj{"type": "xhttp", "mode": orDefault(t.Mode, "auto")}.set("host", t.Host).set("path", t.Path)
 		if len(t.Headers) > 0 {
@@ -466,7 +527,7 @@ func wireguard(out obj, o engine.Outbound) (obj, error) {
 	}
 	out = sized
 	out.set("type", "wireguard").set("address", o.Addresses).set("private_key", o.PrivateKey).set("mtu", 1420)
-	if a := o.Amnezia; a != nil {
+	if a := o.Amnezia; !a.IsZero() {
 		if a.J1 != "" || a.J2 != "" || a.J3 != "" || a.Itime != 0 {
 			return nil, fmt.Errorf("singbox: AmneziaWG J1/J2/J3/Itime require another engine")
 		}
