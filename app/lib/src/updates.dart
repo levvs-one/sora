@@ -112,11 +112,14 @@ class RolloutPolicy {
 /// unless the stored UUID is wiped.
 int updateCohort(String installUuid) {
   final digest = sha256.convert(utf8.encode(installUuid)).bytes;
-  var head = 0;
+  // BigInt on purpose: the first 8 digest bytes do not fit a signed 64-bit
+  // int, and the plain-int accumulation silently wraps negative for about
+  // half of all UUIDs, changing their cohort (pinned by updates_rollout_test).
+  var head = BigInt.zero;
   for (var i = 0; i < 8; i++) {
-    head = (head << 8) | digest[i];
+    head = (head << 8) | BigInt.from(digest[i]);
   }
-  return head % 100;
+  return (head % BigInt.from(100)).toInt();
 }
 
 class ReleaseAsset {
