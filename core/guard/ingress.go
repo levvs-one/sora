@@ -18,6 +18,7 @@ package guard
 
 import (
 	"context"
+	"errors"
 	"net/netip"
 	"strings"
 	"sync"
@@ -145,14 +146,29 @@ func (f *IngressFirewall) Arm(ctx context.Context, enginePorts []uint16) error {
 		return err
 	}
 	if err := f.ensureBackend(); err != nil {
-		return err
+		// F-02: a failed Arm after a successful inner.Arm must not leave
+		// the kill switch armed with no session. Guard.Restore only
+		// disarms what applyKillSwitch recorded, and a failed Arm records
+		// nothing — so roll back here, or the user loses connectivity
+		// until a core restart.
+		return f.rollbackArm(ctx, err)
 	}
 	if f.backend != nil {
 		if err := f.backend.arm(ctx); err != nil {
-			return err
+			return f.rollbackArm(ctx, err)
 		}
 	}
 	return nil
+}
+
+// rollbackArm undoes a successful inner.Arm after a later Arm step failed.
+// Disarm succeeds when nothing is armed (see the platform contracts), so
+// the rollback is always safe.
+func (f *IngressFirewall) rollbackArm(ctx context.Context, err error) error {
+	if disarmErr := f.inner.Disarm(context.WithoutCancel(ctx)); disarmErr != nil {
+		return errors.Join(err, disarmErr)
+	}
+	return err
 }
 
 // ensureBackend builds the platform backend on first use. A nil inner

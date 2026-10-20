@@ -248,6 +248,26 @@ func TestIngressFirewallInnerFailureArmsNothing(t *testing.T) {
 	}
 }
 
+// TestIngressFirewallRollsBackInnerArmOnBackendFailure locks F-02: when the
+// kill switch arms but a later Arm step fails, the decorator must disarm the
+// kill switch again. Otherwise Session.Start fails, Guard.Restore sees no
+// recorded kill switch, and the network stays blocked with no live session.
+// fakeFirewall is neither the platform firewall nor NoopFirewall, so
+// ensureBackend fails closed on every platform — deterministically.
+func TestIngressFirewallRollsBackInnerArmOnBackendFailure(t *testing.T) {
+	inner := &fakeFirewall{}
+	decorated := guard.WithIngress(inner, guard.DefaultIngressConfig())
+	if err := decorated.Arm(context.Background(), nil); err == nil {
+		t.Fatal("Arm() succeeded while backend construction was guaranteed to fail")
+	}
+	if inner.armed {
+		t.Error("inner firewall still armed after a failed Arm — partial Arm leaked (F-02)")
+	}
+	if inner.disarms != 1 {
+		t.Errorf("inner Disarm calls = %d, want exactly 1 rollback", inner.disarms)
+	}
+}
+
 // TestIngressFirewallOnNoopPlatform is the Android/VpnService shape:
 // PlatformFirewall returns NoopFirewall where the OS owns the tunnel, and
 // ingress must be a no-op rather than an error.
