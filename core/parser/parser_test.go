@@ -110,6 +110,60 @@ func TestXrayConfigurationsBecomeProfiles(t *testing.T) {
 	}
 }
 
+// TestParserAcceptsNewerUUIDVersions is the regression test for S5-SP2:
+// the UUID check rejected versions 6-8, which RFC 9562 defines, so
+// Remnawave panels issuing v7 UUIDs could not be imported. Valid UUIDs
+// of every version 1-8 must be accepted; the check stays strict on the
+// variant, format and length (see TestParserRejectsInvalidUUIDVersions).
+func TestParserAcceptsNewerUUIDVersions(t *testing.T) {
+	for _, id := range []string{
+		"123e4567-e89b-12d3-a456-426614174000", // v1
+		"123e4567-e89b-22d3-a456-426614174000", // v2
+		"123e4567-e89b-32d3-a456-426614174000", // v3
+		"123e4567-e89b-42d3-a456-426614174000", // v4
+		"123e4567-e89b-52d3-a456-426614174000", // v5
+		"123e4567-e89b-62d3-a456-426614174000", // v6
+		"01926f2a-9c6e-7c3b-b9e8-2b1b3f6a4c5d", // v7 (Remnawave-issued shape)
+		"123e4567-e89b-82d3-a456-426614174000", // v8
+		"01926F2A-9C6E-7C3B-B9E8-2B1B3F6A4C5D", // v7, upper-case hex
+	} {
+		r, err := (LinkParser{}).Parse([]byte("vless://" + id + "@a.example:443"))
+		if err != nil {
+			t.Errorf("uuid %q: Parse error = %v", id, err)
+			continue
+		}
+		if len(r.Servers) != 1 || r.Servers[0].UUID != id {
+			t.Errorf("uuid %q was not imported: %#v", id, r.Report)
+		}
+	}
+}
+
+// TestParserRejectsInvalidUUIDVersions pins the strictness the version
+// widening must not lose: version 0/9, a non-[89ab] variant, non-hex
+// garbage and broken lengths are still refused (counted invalid, never
+// imported).
+func TestParserRejectsInvalidUUIDVersions(t *testing.T) {
+	for _, id := range []string{
+		"123e4567-e89b-02d3-a456-426614174000",  // v0: not a defined version here
+		"123e4567-e89b-92d3-a456-426614174000",  // v9: not a defined version
+		"123e4567-e89b-42d3-c456-426614174000",  // bad variant (c)
+		"123e4567-e89b-42d3-0456-426614174000",  // bad variant (0)
+		"123e4567-e89b-42d3-a456-42661417400",   // truncated: 11 hex in last group
+		"123e4567-e89b-42d3-a456-4266141740000", // too long: 13 hex in last group
+		"123e4567-e89b-42d3-a456-42661417400g",  // non-hex garbage
+		"not-a-uuid",                            // garbage
+		"123e4567e89b42d3a456426614174000",      // missing hyphens
+	} {
+		r, err := (LinkParser{}).Parse([]byte("vless://" + id + "@a.example:443"))
+		if err == nil && len(r.Servers) != 0 {
+			t.Errorf("uuid %q was imported: %#v", id, r.Servers)
+		}
+		if r.Report.Imported != 0 {
+			t.Errorf("uuid %q: Imported = %d, want 0 (report %+v)", id, r.Report.Imported, r.Report)
+		}
+	}
+}
+
 func TestParseHysteria2TuningOptions(t *testing.T) {
 	r, err := (LinkParser{}).Parse([]byte("hysteria2://secret@example.com:443?upmbps=20&downmbps=100&mport=20000-30000%2C40000&hop-interval=30&sni=example.com#H2"))
 	if err != nil {
