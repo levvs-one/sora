@@ -103,17 +103,65 @@ class PairingSession {
   }
 }
 
+/// Metadata of one synchronized document (F9 contract §4): what it is,
+/// where it came from and when that copy was written. The daemon reports
+/// metas as JSON objects with `kind`, `name`, `updated_at` (unix
+/// milliseconds, like every other daemon timestamp), `hash` (hex sha256 of
+/// the payload) and, on sync reports, `from` (the device id that sent the
+/// copy). A `GET /v1/documents/{kind}/{name}` meta has no `hash`.
+class SyncDocMeta {
+  SyncDocMeta({
+    required this.kind,
+    required this.name,
+    this.from = '',
+    required this.updatedAt,
+    this.hash = '',
+  });
+
+  final String kind;
+  final String name;
+
+  /// Device id that sent this copy; empty outside sync reports.
+  final String from;
+
+  /// When this copy was written (unix milliseconds from the daemon).
+  final DateTime updatedAt;
+
+  /// Hex sha256 of the payload; used to skip republishing unchanged docs.
+  final String hash;
+
+  factory SyncDocMeta.fromJson(Map<String, dynamic> json) => SyncDocMeta(
+        kind: json['kind'] as String? ?? '',
+        name: json['name'] as String? ?? '',
+        from: json['from'] as String? ?? '',
+        updatedAt: _syncUnixMillis(json['updated_at']),
+        hash: json['hash'] as String? ?? '',
+      );
+}
+
+/// Unix-millisecond daemon timestamps (shared with [SyncPeer._unixMillis]).
+DateTime _syncUnixMillis(dynamic v) => v is int && v > 0
+    ? DateTime.fromMillisecondsSinceEpoch(v, isUtc: true)
+    : DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+
 /// Result of `POST /v1/peers/{id}/sync` (F9). The daemon reports the moved
-/// documents as JSON arrays of metas; the counts are what the UI shows.
+/// documents as metas; the UI shows them per document (kind, name, from,
+/// updated_at) instead of bare counters.
 class SyncResult {
   SyncResult({required this.pulled, required this.pushed});
 
-  final int pulled;
-  final int pushed;
+  final List<SyncDocMeta> pulled;
+  final List<SyncDocMeta> pushed;
+
+  static List<SyncDocMeta> _metas(dynamic value) => [
+        if (value is List)
+          for (final item in value)
+            if (item is Map<String, dynamic>) SyncDocMeta.fromJson(item),
+      ];
 
   factory SyncResult.fromJson(Map<String, dynamic> json) => SyncResult(
-        pulled: (json['pulled'] as List?)?.length ?? 0,
-        pushed: (json['pushed'] as List?)?.length ?? 0,
+        pulled: _metas(json['pulled']),
+        pushed: _metas(json['pushed']),
       );
 }
 
@@ -230,6 +278,49 @@ class SyncApiClient {
           timeout: const Duration(seconds: 60),
         ),
       );
+
+  /// Publishes one application document (contract §4). The payload is sent
+  /// base64-encoded; the daemon stamps `updated_at` itself when
+  /// [updatedAt] is not given.
+  Future<void> putDocument({
+    required String kind,
+    required String name,
+    required List<int> payload,
+    int? updatedAt,
+  }) async {
+    await _call(
+      'PUT',
+      '/v1/documents/${Uri.encodeComponent(kind)}/${Uri.encodeComponent(name)}',
+      body: {
+        'payload': base64Encode(payload),
+        if (updatedAt != null) 'updated_at': updatedAt,
+      },
+      timeout: const Duration(seconds: 30),
+    );
+  }
+
+  /// Lists the daemon's stored documents (metas only, no payloads).
+  Future<List<SyncDocMeta>> documents() async {
+    final json = await _call('GET', '/v1/documents');
+    final docs = json['docs'];
+    return [
+      if (docs is List)
+        for (final item in docs)
+          if (item is Map<String, dynamic>) SyncDocMeta.fromJson(item),
+    ];
+  }
+
+  /// Fetches one stored document: its meta and raw payload bytes.
+  Future<({SyncDocMeta meta, List<int> payload})> getDocument(String kind, String name) async {
+    final json = await _call(
+      'GET',
+      '/v1/documents/${Uri.encodeComponent(kind)}/${Uri.encodeComponent(name)}',
+      timeout: const Duration(seconds: 30),
+    );
+    final payload = json['payload'];
+    if (payload is! String) throw SyncApiException('bad response from the sync service');
+    return (meta: SyncDocMeta.fromJson(json), payload: base64Decode(payload));
+  }
 }
 
 /// Localized headline for a sync failure. The daemon's raw message

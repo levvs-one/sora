@@ -62,8 +62,9 @@ class SyncDaemonException implements Exception {
 /// alone — its owner manages it.
 ///
 /// Status (2026-10-20): wired — the sync screen drives pairing, peers and
-/// sync through [SyncApiClient]. The app-to-daemon document bridge (which
-/// document kinds the app feeds in) is not wired yet.
+/// sync through [SyncApiClient], and the app-to-daemon document bridge
+/// (`sync_docs.dart`, contract §4) publishes application documents before
+/// every sync and applies the pulled ones after it.
 class SyncDaemon extends ChangeNotifier {
   SyncDaemonState _state = SyncDaemonState.idle;
 

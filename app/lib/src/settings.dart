@@ -372,6 +372,92 @@ class Settings {
   String get censorVerdicts => _store.getString('censorVerdicts') ?? '';
   set censorVerdicts(String value) => _store.setString('censorVerdicts', value);
 
+  /// Settings keys portable across the user's own devices (F9 document
+  /// bridge, kind `app_settings`). Only genuine preferences land here;
+  /// device-local state stays out: the selected `server` (server ids do
+  /// not resolve on another device), the consent-gated `controlPort`, the
+  /// update machinery (`checkUpdates`, `notifiedUpdate`, `resumeAfterUpdate`,
+  /// `pendingUpdate`, `lastRollback`), the rollout `installUuid`, the
+  /// crash-recovery marker `sessionIntent`, the system-proxy snapshot
+  /// `proxySnapshot`, `benchmarkHistory`, `notificationHistory`, and UI
+  /// chrome (`trayHintShown`, `sidebarExpanded`, `tourDone`,
+  /// `speedtestService`, `syncedDevices`, `dnsLeakLastCheck`,
+  /// `censorVerdicts`). The JSON-backed stores (`subscriptionOverrides`,
+  /// `networkProfiles`, `proxyChains`, `obfs`) sync as their own document
+  /// kinds so their stores can reload after an import.
+  static const syncableSettingsKeys = <String>{
+    'preset', 'blockAds', 'killSwitch', 'engine', 'animations', 'theme', 'language', //
+    'fragment', 'fragmentPackets', 'fragmentLength', 'fragmentInterval', //
+    'ipv6', 'dns', 'dnsPreset', //
+    'probeMethod', 'probeUrl', 'probeTimeout', //
+    'splitPos', 'disorder', 'tlsRecord', 'hostCase', //
+    'rules', 'failover', 'connectOnStart', 'tunnel', //
+    'mihomoTunStack', 'xrayTunStack', //
+    'launchAtLogin', 'closeToTray', 'notifications', //
+    'serverSortMode', 'autoSelectMode', 'autoSwitchOnDegrade', 'restoreOnCrash', //
+    'zapretWithVpn',
+  };
+
+  /// Raw stored values of the syncable subset, in a JSON-encodable shape:
+  /// `{key: {t: 's'|'b'|'i'|'sl', v: value}}`. Keys never written are
+  /// skipped; the merge on import fills only what the doc carries.
+  Map<String, dynamic> exportSyncableSettings() {
+    final out = <String, dynamic>{};
+    for (final key in syncableSettingsKeys) {
+      final asString = _store.getString(key);
+      if (asString != null) {
+        out[key] = {'t': 's', 'v': asString};
+        continue;
+      }
+      final asBool = _store.getBool(key);
+      if (asBool != null) {
+        out[key] = {'t': 'b', 'v': asBool};
+        continue;
+      }
+      final asInt = _store.getInt(key);
+      if (asInt != null) {
+        out[key] = {'t': 'i', 'v': asInt};
+        continue;
+      }
+      final asList = _store.getStringList(key);
+      if (asList != null) {
+        out[key] = {'t': 'sl', 'v': asList};
+      }
+    }
+    return out;
+  }
+
+  /// Applies a synced settings document (see [exportSyncableSettings]).
+  /// Only allowlisted keys with a well-typed tagged value are written;
+  /// everything else is ignored, so a hostile or newer-version doc cannot
+  /// smuggle arbitrary preferences in. Keys absent from the doc are left
+  /// alone (per-key merge, not a wipe).
+  Future<void> importSyncableSettings(Map<String, dynamic> doc) async {
+    for (final entry in doc.entries) {
+      final key = entry.key;
+      if (!syncableSettingsKeys.contains(key)) continue;
+      final tagged = entry.value;
+      if (tagged is! Map<String, dynamic>) continue;
+      final value = tagged['v'];
+      switch (tagged['t']) {
+        case 's':
+          if (value is String) await _store.setString(key, value);
+          break;
+        case 'b':
+          if (value is bool) await _store.setBool(key, value);
+          break;
+        case 'i':
+          if (value is int) await _store.setInt(key, value);
+          break;
+        case 'sl':
+          if (value is List && value.every((e) => e is String)) {
+            await _store.setStringList(key, value.cast<String>());
+          }
+          break;
+      }
+    }
+  }
+
   /// Resets preferences to defaults while preserving the proxy snapshot.
   Future<void> reset() async {
     // Keep the proxy snapshot so the next disconnect can restore system

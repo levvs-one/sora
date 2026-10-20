@@ -780,6 +780,17 @@ class ObfsSettings extends ChangeNotifier {
     _write(jsonEncode({'preset': _preset, 'utls': _utls, 'fragment': _fragment, 'jitter': _jitter}));
   }
 
+  /// Re-reads from settings (e.g. after a sync import replaced the
+  /// underlying JSON) and notifies listeners.
+  void reload() {
+    _preset = obfsPresetOff;
+    _utls = obfsUtlsAuto;
+    _fragment = false;
+    _jitter = false;
+    _load();
+    notifyListeners();
+  }
+
   /// Applies a named preset. Manual edits go through the setters below and
   /// flip the preset to custom.
   void applyPreset(String preset) {

@@ -154,6 +154,16 @@ class ProfilesStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Re-reads the store from settings (e.g. after a sync import replaced
+  /// the underlying JSON) and notifies listeners. The network match is
+  /// dropped: imported profiles are new data, not a live match.
+  void reload() {
+    _profiles.clear();
+    activeId = null;
+    _load();
+    notifyListeners();
+  }
+
   void add(NetworkProfile profile) {
     _profiles.add(profile);
     _save();

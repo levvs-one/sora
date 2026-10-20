@@ -98,6 +98,13 @@ class OverrideStore {
   /// Drops all edits for a subscription (called when it is deleted).
   void drop(String subscriptionId) => put(subscriptionId, const SubscriptionOverride());
 
+  /// Drops the cache so the next read re-parses the settings JSON (e.g.
+  /// after a sync import replaced it), then notifies like any mutation.
+  void reload() {
+    _cache = null;
+    onChanged?.call();
+  }
+
   /// Hidden server IDs across all subscriptions.
   Set<String> get hiddenIds => {for (final o in all.values) ...o.hidden};
 

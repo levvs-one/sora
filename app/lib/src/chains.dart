@@ -89,6 +89,14 @@ class ChainsStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Re-reads the store from settings (e.g. after a sync import replaced
+  /// the underlying JSON) and notifies listeners.
+  void reload() {
+    _chains.clear();
+    _load();
+    notifyListeners();
+  }
+
   /// Adds a chain; returns an error key when the hops are invalid.
   String? add(ProxyChain chain) {
     final error = validateHops(chain.hops);
