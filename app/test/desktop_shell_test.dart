@@ -23,6 +23,12 @@ import 'package:sora/src/ui/shell.dart';
 
 import 'fixtures/desktop_state.dart';
 
+/// Opens section [number] (1-based section index) via its Ctrl+digit
+/// shortcut. The digit for a section is its position in the shell's
+/// _sectionOrder, not the section index: e.g. About (section 7) sits last
+/// in the order, so since 7aafa4a5 restored Connections (section 2) to the
+/// 8th slot it is Ctrl+9, not Ctrl+8. Connections itself is selected
+/// directly below because historically it had no digit at all.
 Future<void> section(WidgetTester tester, int number) async {
   if (number == 3) {
     tester.widget<ShellScope>(find.byType(ShellScope)).select(2);
@@ -38,7 +44,8 @@ Future<void> section(WidgetTester tester, int number) async {
     LogicalKeyboardKey.digit6,
     LogicalKeyboardKey.digit7,
     LogicalKeyboardKey.digit8,
-  ][const [0, 4, 0, 5, 3, 6, 1, 7][number - 1]];
+    LogicalKeyboardKey.digit9,
+  ][const [0, 4, 0, 5, 3, 6, 1, 8][number - 1]];
   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
   await tester.sendKeyEvent(key);
   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
@@ -145,6 +152,7 @@ void main() {
       'Правила',
       'Логи',
       'Настройки',
+      'Подключения',
       'О приложении',
     ]);
     expect(tester.getSize(find.byKey(const ValueKey('sidebar-toggle'))), const Size(36, 36));
