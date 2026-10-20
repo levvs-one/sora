@@ -676,7 +676,14 @@ class Sora extends ChangeNotifier {
           // A pending crash-restore offer owns the connection decision: wait
           // for it instead of connecting underneath the banner (F7 honesty).
           // An explicit dismiss stands the auto-connect down for this launch.
-          while (_pendingRestore != null && !_disposed && phase == Phase.off) {
+          // A dropped core link ends the wait: the run loop must recover the
+          // transport below instead of stalling on the banner; the offer
+          // still stands, because the gate below requires _pendingRestore to
+          // be null before any auto-connect.
+          while (_pendingRestore != null &&
+              !_disposed &&
+              phase == Phase.off &&
+              !dropped.isCompleted) {
             await Future<void>.delayed(const Duration(milliseconds: 200));
           }
           if (phase == Phase.off && _pendingRestore == null && !_restoreDeclined) {
