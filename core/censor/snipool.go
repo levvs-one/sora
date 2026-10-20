@@ -100,15 +100,6 @@ func (p *SNIPool) ResetBad() {
 	p.bad = map[string]bool{}
 }
 
-// Members returns the pool members in rotation order, for diagnostics.
-func (p *SNIPool) Members() []string {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	out := make([]string, len(p.snis))
-	copy(out, p.snis)
-	return out
-}
-
 // IsBad reports whether sni is currently burned.
 func (p *SNIPool) IsBad(sni string) bool {
 	p.mu.Lock()

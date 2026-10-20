@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"io"
-	"os"
 	"path"
 	"sort"
 	"strings"
@@ -38,12 +37,6 @@ type Package struct {
 	ManifestExt *ManifestExt
 }
 
-// Open reads a .soraext file with strict limits and structural checks.
-// It does NOT verify the signature; call Verify next.
-func Open(path string) (*Package, error) {
-	return openArchive(path)
-}
-
 // OpenBytes is Open for an in-memory archive (downloads, tests).
 func OpenBytes(data []byte) (*Package, error) {
 	if len(data) > maxPackageBytes {
@@ -56,25 +49,6 @@ func OpenBytes(data []byte) (*Package, error) {
 			"ext: the package is not a zip archive: %v", err)
 	}
 	return readArchive(zr)
-}
-
-func openArchive(p string) (*Package, error) {
-	// Reject an oversized file before touching the zip parser: the archive
-	// limit applies to the container too, not just in-memory downloads.
-	if fi, err := os.Stat(p); err != nil {
-		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
-			"ext: cannot stat the package: %v", err)
-	} else if fi.Size() > maxPackageBytes {
-		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
-			"ext: the package exceeds %d bytes", maxPackageBytes)
-	}
-	zr, err := zip.OpenReader(p)
-	if err != nil {
-		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
-			"ext: the package is not a zip archive: %v", err)
-	}
-	defer zr.Close()
-	return readArchive(&zr.Reader)
 }
 
 func readArchive(zr *zip.Reader) (*Package, error) {

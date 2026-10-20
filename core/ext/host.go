@@ -259,27 +259,3 @@ func toStatus(err error) error {
 	}
 	return status.Error(codes.Internal, err.Error())
 }
-
-// RegisterOn registers the service on a gRPC server. Wiring note: call this
-// from the core's gRPC server setup (core/control/server.go) with the same
-// *grpc.Server that serves CoreControl:
-//
-//	extHost := ext.NewHost(store.Issuer(), ext.Deps{
-//		...,
-//		GrantedPermissions: func(id string) ([]string, bool) {
-//			inst, ok := store.Get(id)
-//			if !ok || !inst.Enabled {
-//				return nil, false
-//			}
-//			return inst.Granted, true
-//		},
-//	})
-//	extv1.RegisterExtensionHostServer(grpcServer, extHost)
-//
-// Wiring GrantedPermissions makes MintToken enforce that minted tokens never
-// exceed what the user granted (and never mint for unknown or disabled
-// extensions). Disabling an extension revokes its tokens everywhere at once
-// because the issuer is the store's.
-func RegisterOn(register func(srv extv1.ExtensionHostServer), h *Host) {
-	register(h)
-}

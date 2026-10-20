@@ -949,9 +949,3 @@ func orDefault(v, fallback string) string {
 	return v
 }
 
-func orDefaultInt(v, fallback int) int {
-	if v == 0 {
-		return fallback
-	}
-	return v
-}

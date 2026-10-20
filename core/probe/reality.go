@@ -104,11 +104,6 @@ type DestReport struct {
 
 const destDialTimeout = 10 * time.Second
 
-// CheckDest runs the REALITY dest checklist against host (port 443).
-func CheckDest(ctx context.Context, host string) (*DestReport, error) {
-	return checkDest(ctx, host, nil, nil, nil)
-}
-
 // checkDest is the injectable core: resolve maps a name to addresses,
 // dial opens a TLS connection with the given config, roots overrides the
 // system cert pool (nil = system). Tests inject all three; production
@@ -197,17 +192,6 @@ func checkDest(ctx context.Context, host string, resolve func(context.Context, s
 	}
 	r.Passed = len(r.Issues) == 0
 	return r, nil
-}
-
-// CheckSNIConsistency is the light client-side half of T006's "SNI must
-// match the hosting infrastructure". It resolves the dest and reports
-// structural problems: unresolvable, private/loopback addresses, or the
-// dest pointing at the REALITY server itself (a decoy should be an
-// independent real site — otherwise the SNI↔infrastructure cross-check
-// has nothing plausible to find). ASN comparison needs an offline ASN
-// table and stays a spec item.
-func CheckSNIConsistency(ctx context.Context, serverAddr, destHost string) (resolved []string, issues []string, err error) {
-	return checkSNIConsistency(ctx, serverAddr, destHost, defaultResolve)
 }
 
 func checkSNIConsistency(ctx context.Context, serverAddr, destHost string, resolve func(context.Context, string) ([]string, error)) (resolved []string, issues []string, err error) {

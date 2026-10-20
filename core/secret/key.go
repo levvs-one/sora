@@ -42,9 +42,6 @@ func (FileProtector) Unprotect(wrapped []byte) ([]byte, error) {
 // Name identifies the mechanism in diagnostics.
 func (FileProtector) Name() string { return "file" }
 
-// DefaultProtector returns the protector the current platform uses.
-func DefaultProtector() Protector { return platformProtector() }
-
 // loadOrCreateKey loads or creates the master key and public store ID. The ID
 // binds the vault to its store and prevents mixing keys and vaults from
 // different stores.

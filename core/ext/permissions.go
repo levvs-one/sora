@@ -61,13 +61,6 @@ func LookupPermission(id string) (Permission, bool) {
 	return p, ok
 }
 
-// RequiresExplicitConfirm reports whether granting id needs an explicit
-// confirmation step on the install prompt (dangerous risk).
-func RequiresExplicitConfirm(id string) bool {
-	p, ok := permissionIndex[id]
-	return ok && p.Risk == RiskDangerous
-}
-
 // DiffPermissions splits wanted into added and removed relative to granted,
 // so an update that widens permissions can re-prompt the user.
 func DiffPermissions(granted, wanted []string) (added, removed []string) {

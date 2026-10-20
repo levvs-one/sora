@@ -328,17 +328,6 @@ func fetchRawCatalog(ctx context.Context, client *http.Client, catalogURL string
 	return body, nil
 }
 
-// FetchCatalog downloads catalog.json and its .minisig, verifies the team
-// signature, and returns the parsed catalog. client may be nil (a default
-// client with a 30s timeout is used). The URL must be https.
-func FetchCatalog(ctx context.Context, client *http.Client, catalogURL string) (*Catalog, error) {
-	raw, err := fetchRawCatalog(ctx, client, catalogURL)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCatalog(raw)
-}
-
 // Find returns the catalog entry for id, if present.
 func (c *Catalog) Find(id string) *Entry {
 	for i := range c.Extensions {
