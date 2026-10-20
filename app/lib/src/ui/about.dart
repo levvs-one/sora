@@ -213,7 +213,6 @@ class _AboutScreenState extends State<AboutScreen> {
                           Expanded(
                             child: Text(
                               switch (updates.stage) {
-                                UpdateStage.checking => s.updateChecking,
                                 UpdateStage.installing => s.updateInstalling,
                                 _ => s.updateDownloading,
                               },
