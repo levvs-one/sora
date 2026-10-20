@@ -4,9 +4,12 @@
 // network profile, and watches the live session for degradation to advise a
 // switch without flapping.
 //
-// The package is client-side only: it needs no new RPCs. The session feeds
-// probe results and connection outcomes in, and asks for a pick or a
-// degradation verdict out.
+// Production status (2026-10-20): NOT WIRED. No production code calls
+// this package: the live auto-selection users experience is the Dart
+// client's (app/lib/src/sora.dart), fed by probe results over the
+// control RPC. The package is kept for its unit tests and the designed
+// scoring model; moving selection into the core (or deleting this
+// implementation in favour of the Dart one) is an owner decision (SW3).
 package serversel
 
 import (

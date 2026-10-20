@@ -5,6 +5,13 @@
 // Shadowsocks AEAD entropy heuristics, and so on. The score is a heuristic
 // for the interface (0-100, higher means less detectable), not a security
 // proof: a high score never means "undetectable".
+//
+// Production status (2026-10-20): NOT WIRED. No RPC or UI surface calls
+// Grade today — the grades exist only in this package's unit tests. The
+// package is kept because the checks themselves are the maintained
+// record of DPI-visible plan mistakes (they informed several fixes
+// elsewhere); exposing them in the client (or deleting the grader) is
+// an owner decision (S8).
 package stealth
 
 import (

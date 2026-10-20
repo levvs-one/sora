@@ -32,4 +32,7 @@
 //     current tpws executor (core/engine/bypass) supports only
 //     split/disorder/oob/tlsrec/HTTP reshaping. Params that need nfqws
 //     are marked so the caller never asks tpws to run them.
+//
+// Production status (2026-10-20): NOT WIRED — a prototype with no
+// production callers, like its parent package core/tune (SW1d).
 package desync

@@ -13,4 +13,11 @@
 // The package never applies a strategy itself: the caller supplies an
 // AttemptFunc that configures the plan and probes the connection. Telemetry
 // comes back as a Result whose Summary fits the session journal Detail line.
+//
+// Production status (2026-10-20): NOT WIRED. No production code calls
+// the Tuner today — connection failure handling in the live client
+// goes through the session's own retry/failover paths, not through
+// strategy search. The package (with its desync subpackage) is kept
+// for its unit tests and the designed strategy-tuner behaviour;
+// wiring or deleting it is an owner decision (SW1d).
 package tune
