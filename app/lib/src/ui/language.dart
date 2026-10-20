@@ -302,10 +302,6 @@ class _LanguageButtonState extends State<LanguageButton> {
       (x) => x.code == locale.toString(),
       orElse: () => appLanguages.firstWhere((x) => x.code == locale.languageCode, orElse: () => appLanguages.first),
     );
-    final query = _search.text.trim().toLowerCase();
-    final shown = appLanguages
-        .where((x) => '${x.native} ${x.english} ${x.russian} ${x.aliases}'.toLowerCase().contains(query))
-        .toList();
     final width = (MediaQuery.sizeOf(context).width - 48).clamp(220.0, 296.0);
     return MenuAnchor(
       controller: _menu,
@@ -327,7 +323,9 @@ class _LanguageButtonState extends State<LanguageButton> {
                 key: const ValueKey('language-search'),
                 controller: _search,
                 autofocus: true,
-                onChanged: (_) => setState(() {}),
+                // No onChanged setState: the list below listens through
+                // ValueListenableBuilder, so typing rebuilds only the list,
+                // not the search field and the language button.
                 style: Styles.secondary.copyWith(color: palette.ink),
                 decoration: InputDecoration(
                   hintText: s.search,
@@ -340,74 +338,85 @@ class _LanguageButtonState extends State<LanguageButton> {
                 ),
               ),
               const SizedBox(height: 8),
-              SizedBox(
-                height: (shown.length * 56.0 + (query.isEmpty ? 40 : 0)).clamp(
-                  64.0,
-                  (MediaQuery.sizeOf(context).height * .45).clamp(120.0, 360.0),
-                ),
-                child: ListView(
-                  primary: false,
-                  padding: EdgeInsets.zero,
-                  children: [
-                    if (query.isEmpty)
-                      MenuItemButton(
-                        key: const ValueKey('language-system'),
-                        leadingIcon: Icon(Symbols.language_rounded, size: 20, color: palette.ink),
-                        onPressed: () => _choose('system'),
-                        child: Text(s.languageSystem, style: Styles.secondary.copyWith(color: palette.ink)),
-                      ),
-                    if (shown.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
-                      ),
-                    for (final language in shown)
-                      MenuItemButton(
-                        key: ValueKey('language-${language.code}'),
-                        leadingIcon: ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: Image.asset(
-                            'assets/flags/${language.country}.png',
-                            width: 22,
-                            height: 14,
-                            fit: BoxFit.cover,
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _search,
+                builder: (context, value, _) {
+                  final query = value.text.trim().toLowerCase();
+                  final shown = appLanguages
+                      .where((x) => '${x.native} ${x.english} ${x.russian} ${x.aliases}'.toLowerCase().contains(query))
+                      .toList();
+                  return SizedBox(
+                    height: (shown.length * 56.0 + (query.isEmpty ? 40 : 0)).clamp(
+                      64.0,
+                      (MediaQuery.sizeOf(context).height * .45).clamp(120.0, 360.0),
+                    ),
+                    child: ListView(
+                      primary: false,
+                      padding: EdgeInsets.zero,
+                      children: [
+                        if (query.isEmpty)
+                          MenuItemButton(
+                            key: const ValueKey('language-system'),
+                            leadingIcon: Icon(Symbols.language_rounded, size: 20, color: palette.ink),
+                            onPressed: () => _choose('system'),
+                            child: Text(s.languageSystem, style: Styles.secondary.copyWith(color: palette.ink)),
                           ),
-                        ),
-                        style: ButtonStyle(
-                          padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                          backgroundColor: WidgetStatePropertyAll(
-                            language.code == sora.settings.language ? palette.field : null,
+                        if (shown.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
                           ),
-                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                        ),
-                        onPressed: () => _choose(language.code),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text.rich(
-                              query.isEmpty
-                                  ? TextSpan(text: language.native)
-                                  : _highlight(language.native, query, palette.field),
-                              style: Styles.secondary.copyWith(color: palette.ink),
-                            ),
-                            if (query.isNotEmpty && !language.native.toLowerCase().contains(query))
-                              Text.rich(
-                                _highlight(
-                                  [
-                                    language.english,
-                                    language.russian,
-                                    language.aliases,
-                                  ].firstWhere((x) => x.toLowerCase().contains(query)),
-                                  query,
-                                  palette.field,
-                                ),
-                                style: Styles.caption.copyWith(color: palette.ink),
+                        for (final language in shown)
+                          MenuItemButton(
+                            key: ValueKey('language-${language.code}'),
+                            leadingIcon: ClipRRect(
+                              borderRadius: BorderRadius.circular(3),
+                              child: Image.asset(
+                                'assets/flags/${language.country}.png',
+                                width: 22,
+                                height: 14,
+                                fit: BoxFit.cover,
                               ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
+                            ),
+                            style: ButtonStyle(
+                              padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
+                              backgroundColor: WidgetStatePropertyAll(
+                                language.code == sora.settings.language ? palette.field : null,
+                              ),
+                              shape: WidgetStatePropertyAll(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                            onPressed: () => _choose(language.code),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text.rich(
+                                  query.isEmpty
+                                      ? TextSpan(text: language.native)
+                                      : _highlight(language.native, query, palette.field),
+                                  style: Styles.secondary.copyWith(color: palette.ink),
+                                ),
+                                if (query.isNotEmpty && !language.native.toLowerCase().contains(query))
+                                  Text.rich(
+                                    _highlight(
+                                      [
+                                        language.english,
+                                        language.russian,
+                                        language.aliases,
+                                      ].firstWhere((x) => x.toLowerCase().contains(query)),
+                                      query,
+                                      palette.field,
+                                    ),
+                                    style: Styles.caption.copyWith(color: palette.ink),
+                                  ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
