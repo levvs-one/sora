@@ -32,10 +32,7 @@ const (
 const nftTable = "sora_nfqws"
 
 // QueueAllocator hands out NFQUEUE numbers to nfqws instances. It is safe
-// for concurrent use.
-//
-// NOT WIRED: the nfqws executor runtime is sibling's active work (T005);
-// no executor calls this yet.
+// for concurrent use; the executor (nfqws.go) is its caller.
 type QueueAllocator struct {
 	mu   sync.Mutex
 	used [queueCount]bool
@@ -107,9 +104,12 @@ type QueueSpec struct {
 }
 
 // nftRules renders the nft add/delete commands for the spec. The
-// sora_nfqws table and its output chain must exist; creating them is the
-// executor's job. At least one of TCPPorts/UDPPorts must select something:
-// a queue with no traffic is a configuration bug, fail here instead of
+// sora_nfqws table and its output chain are created by the executor,
+// which feeds these lines through one atomic batch with the table
+// definition (nfqws_linux.go); deleting is whole-table there, so
+// DeleteRules serves inspection and tests, not the live teardown.
+// At least one of TCPPorts/UDPPorts must select something: a queue
+// with no traffic is a configuration bug, fail here instead of
 // installing a dead rule.
 func (s QueueSpec) nftRules(verb string) ([]string, error) {
 	tcp, err := parsePorts(s.TCPPorts)
