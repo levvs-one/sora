@@ -127,8 +127,11 @@ var censorMarkers = map[string]bool{
 // resolver or injects forged answers. UDP and TCP queries race with short
 // budgets; the verdict is derived from their agreement, flags and content.
 //
-// NOT WIRED: no RPC or diagnostic flow calls this yet — it is a tested
-// probe primitive waiting for a client trigger (T010).
+// Wiring: the production trigger is the core binary's operator mode
+// (sora-core -dns-check, cmd/sora-core/netcheck.go), which runs this
+// probe with the defaults below and prints the verdict with its
+// evidence. An in-app diagnostics-flow trigger still needs a proto
+// field this repo cannot regenerate (CENSOR-SURV.md).
 func DetectDNSIntercept(ctx context.Context, in InterceptInput) InterceptReport {
 	server := in.Server
 	if server == "" {

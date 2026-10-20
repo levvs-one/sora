@@ -65,7 +65,12 @@ import (
 // the 4-tuple after a QUIC SNI drop, self-renewing while packets arrive.
 const residualBanTTL = 420 * time.Second
 
-// quicProbeTimeout bounds one reachability attempt.
+// quicProbeTimeout bounds one reachability attempt. A Version
+// Negotiation is a single UDP round trip: on any live path it lands
+// in well under a second, and silence past a few seconds is the drop
+// signature the probe exists to measure — waiting longer would only
+// delay the TCP control leg (and, on a banned tuple, the user's
+// answer) without changing the verdict.
 const quicProbeTimeout = 3 * time.Second
 
 // quicMinInitial is the minimum QUIC Initial datagram size (RFC 9000 §14);
@@ -129,10 +134,14 @@ func (r *QUICResult) Advice() string {
 // Negotiation; no real handshake is performed and nothing is retransmitted,
 // so a lost probe never extends a residual ban by itself.
 //
-// NOT WIRED: no RPC or diagnostic path calls ProbeQUIC yet — it is a
-// tested primitive waiting for a client trigger (spec
-// 31-quic-residual-ban.md). The BanTracker from the same module IS wired
-// through DialQUIC into the probe dials.
+// Wiring: the production trigger is the core binary's operator mode
+// (sora-core -quic-probe host[:port], cmd/sora-core/netcheck.go),
+// which runs ProbeQUICWithTracker against the persistent BanTracker
+// file in the data dir and renders the verdict plus Advice. An
+// in-app (RPC) trigger still needs a proto field this repo cannot
+// regenerate — that remainder is named in CENSOR-SURV.md, not hidden.
+// The BanTracker from the same module IS wired through DialQUIC into
+// the probe dials.
 func ProbeQUIC(ctx context.Context, host string, port int) (*QUICResult, error) {
 	return ProbeQUICWithTracker(ctx, host, port, nil)
 }

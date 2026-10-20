@@ -35,6 +35,8 @@ type flags struct {
 	seriesProbe string
 	seriesTLS   bool
 	seriesMin   int
+	quicProbe   string
+	dnsCheck    bool
 }
 
 func main() {
@@ -83,6 +85,8 @@ func run(ctx context.Context, arguments []string) error {
 	set.StringVar(&f.seriesProbe, "series-probe", "", "probe one host:port in a series (T055 two-stage blocking check) and exit; see -series-probe-minutes")
 	set.BoolVar(&f.seriesTLS, "series-probe-tls", false, "series probe: require a TLS handshake, not just an open socket")
 	set.IntVar(&f.seriesMin, "series-probe-minutes", 0, "series probe length in minutes; 0 is the full 15-minute confirmation window")
+	set.StringVar(&f.quicProbe, "quic-probe", "", "probe one host[:port] for QUIC censorship (T008 residual-ban check, ban tracker persists in the data dir) and exit")
+	set.BoolVar(&f.dnsCheck, "dns-check", false, "probe the path for DNS interception/injection (T010) and exit")
 	if err := set.Parse(arguments); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			// -h/--help: the usage is already printed above. A help
@@ -127,6 +131,24 @@ func run(ctx context.Context, arguments []string) error {
 			fmt.Println(line)
 		}
 		return seriesProbeError(res)
+	}
+	if f.quicProbe != "" {
+		// A measurement, not a service — same contract as the series
+		// probe. The ban tracker file lives in the data dir.
+		lines, err := runQUICProbe(ctx, f.dataDir, f.quicProbe)
+		if err != nil {
+			return err
+		}
+		for _, line := range lines {
+			fmt.Println(line)
+		}
+		return nil
+	}
+	if f.dnsCheck {
+		for _, line := range runDNSInterceptCheck(ctx) {
+			fmt.Println(line)
+		}
+		return nil
 	}
 	logger, err := newLogger(f.logLevel)
 	if err != nil {
