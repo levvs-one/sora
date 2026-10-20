@@ -17,7 +17,7 @@ const updatePolicy = '/usr/share/polkit-1/actions/io.github.levvs-one.sora.updat
 
 enum UpdateConnection { idle, connected, changing, unknown }
 
-enum UpdateError { network, release, checksum, installation, connecting, unsupported }
+enum UpdateError { network, release, checksum, installation, connecting, unsupported, signatureRequired }
 
 /// Visible phase of an in-flight update flow (FEATURE-PLAN.md F7).
 /// There is deliberately no "verifying" stage: file hashes are checked
@@ -378,6 +378,21 @@ class AppUpdater extends ChangeNotifier {
     notifyListeners();
     bool handedOff = false;
     try {
+      if (_windows) {
+        // Fail closed (analysis-20 U1): the Windows in-app path would install
+        // an elevated .exe trusting only TLS plus a SHA256 against a manifest
+        // fetched from the same host. The SHA256SUMS.minisig signature is not
+        // verified in-app: ext/verifier.dart implements the .soraext
+        // trusted-comment scheme ("timestamp:..\tfile:..\tsha256:.."), not
+        // the stock minisign scheme the release is signed with (signature over
+        // trusted-comment || file, plus a global signature), so it cannot be
+        // reused 1:1; and the release key is still a placeholder (key ceremony
+        // pending). Installing here would silently downgrade the documented
+        // fail-closed policy, so refuse with an honest error instead of
+        // proceeding. This also removes the Windows verify->exec TOCTOU
+        // window (analysis-20 U3): launchWindows is never reached from here.
+        throw const UpdateFailure(UpdateError.signatureRequired);
+      }
       _guard();
       final release = latest!;
       final installation = _windows ? null : await LinuxInstallation.detect(_run, _executable);

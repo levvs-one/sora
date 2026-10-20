@@ -396,7 +396,16 @@ void main() {
           },
         );
         expect(updater.busy, isFalse);
-        if (scenario == 'success') {
+        if (manager == 'windows') {
+          // Fail closed (analysis-20 U1): the Windows in-app install path is
+          // blocked until release-signature verification is implemented, so no
+          // scenario downloads, verifies, or launches anything.
+          expect(updater.error, UpdateError.signatureRequired);
+          expect(order, isEmpty);
+          expect(requests, isEmpty);
+          expect(updater.manualCommand, isNull);
+          expect(settings.resumeAfterUpdate, isFalse);
+        } else if (scenario == 'success') {
           expect(order, manager == 'windows' ? ['warn', 'install', 'quit'] : ['warn', 'install', 'restart', 'quit']);
           expect(updater.error, isNull);
         } else if (scenario == 'manual' || scenario == 'denied') {

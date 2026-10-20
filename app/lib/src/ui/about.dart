@@ -233,6 +233,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   UpdateError.installation => s.updateInstallError,
                   UpdateError.connecting => s.updateWaitConnection,
                   UpdateError.unsupported => s.updateUnsupported,
+                  UpdateError.signatureRequired => s.updateWindowsSigBlocked,
                 }, style: Styles.dangerSecondary(context)),
               ),
             if (updates.manualCommand case final command?)
