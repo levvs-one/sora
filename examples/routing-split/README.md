@@ -61,3 +61,10 @@ sora-ext sign --key <your.key> routing-split.soraext
 ```
 
 Signed with a throwaway example key — **not** a trust anchor.
+
+Pass-2 audit note (2026-10-20): the first shipped packages mistakenly
+embedded the example secret key (`author.key`) inside the .soraext.
+Those keys are public and burned — never trust a package signed with
+them. The packages were rebuilt from these sources and re-signed with
+fresh throwaway keys whose secrets were destroyed and are shipped
+nowhere; `sora-ext pack` now refuses to include key files at all.
