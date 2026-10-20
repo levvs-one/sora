@@ -3,6 +3,8 @@ package subscription_test
 import (
 	"context"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -230,6 +232,81 @@ func TestDeviceStoreLifecycle(t *testing.T) {
 	after, err := subscription.NewDeviceStore(dir).Headers("Linux")
 	if err != nil || after.HWID != fresh {
 		t.Errorf("Headers() after reset = %+v, %v; want the reset value", after, err)
+	}
+}
+
+// A record that predates the enabled field ({"hwid": ...} with no
+// "enabled") means the identity is ON: Enabled reports true and
+// Headers returns the set. An explicit false in the file is the
+// user's opt-out and stays false. (Review fix: decoding the absence
+// as false silently opted every legacy install out.)
+func TestDeviceStoreLegacyRecordDefaultsEnabled(t *testing.T) {
+	dir := t.TempDir()
+	hwid := "123e4567-e89b-42d3-a456-426614174000"
+	if err := os.WriteFile(filepath.Join(dir, "device.json"), []byte(`{"hwid": "`+hwid+`"}`), 0o600); err != nil {
+		t.Fatalf("write legacy record: %v", err)
+	}
+	store := subscription.NewDeviceStore(dir)
+	enabled, err := store.Enabled()
+	if err != nil {
+		t.Fatalf("Enabled() error = %v", err)
+	}
+	if !enabled {
+		t.Error("legacy record without enabled: Enabled() = false, want true")
+	}
+	headers, err := store.Headers("Linux")
+	if err != nil {
+		t.Fatalf("Headers() error = %v", err)
+	}
+	if headers.HWID != hwid {
+		t.Errorf("legacy record: Headers().HWID = %q, want %q", headers.HWID, hwid)
+	}
+
+	offDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(offDir, "device.json"),
+		[]byte(`{"hwid": "`+hwid+`", "enabled": false}`), 0o600); err != nil {
+		t.Fatalf("write disabled record: %v", err)
+	}
+	off := subscription.NewDeviceStore(offDir)
+	enabled, err = off.Enabled()
+	if err != nil {
+		t.Fatalf("Enabled() on explicit false error = %v", err)
+	}
+	if enabled {
+		t.Error("record with explicit enabled:false: Enabled() = true, want false")
+	}
+	headers, err = off.Headers("Linux")
+	if err != nil || headers != (subscription.DeviceHeaders{}) {
+		t.Errorf("explicit false: Headers() = %+v, %v; want the zero set", headers, err)
+	}
+}
+
+// The companion platform facts (contract 1.13) persist beside the
+// identity, ride Headers, survive a reopen, and reject values the
+// fetch path would refuse.
+func TestDeviceStorePlatformCompanions(t *testing.T) {
+	dir := t.TempDir()
+	store := subscription.NewDeviceStore(dir)
+	if err := store.SetPlatform("6.8.0-test", "Testbox 3000"); err != nil {
+		t.Fatalf("SetPlatform() error = %v", err)
+	}
+	headers, err := subscription.NewDeviceStore(dir).Headers("Linux")
+	if err != nil {
+		t.Fatalf("Headers() error = %v", err)
+	}
+	if headers.VersionOS != "6.8.0-test" || headers.DeviceModel != "Testbox 3000" {
+		t.Errorf("Headers() companions = %q/%q, want the stored values", headers.VersionOS, headers.DeviceModel)
+	}
+	if err := store.SetPlatform("bad\nvalue", ""); err == nil {
+		t.Error("SetPlatform() accepted a value with a newline, want a refusal")
+	}
+	// Clearing is explicit: empty values remove the headers again.
+	if err := store.SetPlatform("", ""); err != nil {
+		t.Fatalf("SetPlatform(clear) error = %v", err)
+	}
+	headers, err = store.Headers("Linux")
+	if err != nil || headers.VersionOS != "" || headers.DeviceModel != "" {
+		t.Errorf("Headers() after clear = %+v, %v; want empty companions", headers, err)
 	}
 }
 

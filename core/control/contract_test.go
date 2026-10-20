@@ -125,6 +125,14 @@ func TestNewFieldTagsAreStable(t *testing.T) {
 			"hops": 1, "total_latency_ms": 2, "engines": 3, "error": 4,
 		},
 		"ChainHop": {"server_id": 1, "reachable": 2, "latency_ms": 3},
+		// Since 1.13 (C1 UI): the device identity settings surface.
+		"GetDeviceIdentityRequest":  {"api_version": 1, "control_authenticator": 2},
+		"GetDeviceIdentityResponse": {"hwid": 1, "enabled": 2, "error": 3},
+		"SetDeviceIdentityRequest": {
+			"api_version": 1, "control_authenticator": 2, "enabled": 3,
+			"reset": 4, "ver_os": 5, "device_model": 6,
+		},
+		"SetDeviceIdentityResponse": {"hwid": 1, "enabled": 2, "error": 3},
 	}
 	for msgName, fields := range want {
 		msg := file.Messages().ByName(protoreflect.Name(msgName))

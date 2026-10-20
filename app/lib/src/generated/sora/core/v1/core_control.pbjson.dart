@@ -2455,3 +2455,79 @@ final $typed_data.Uint8List censorshipDetectedDescriptor =
         'ASgBUgpjb25maWRlbmNlEiAKC2V4cGxhbmF0aW9uGAMgASgJUgtleHBsYW5hdGlvbhIaCghldmlk'
         'ZW5jZRgEIAMoCVIIZXZpZGVuY2U='
     );
+
+const GetDeviceIdentityRequest$json = {
+  '1': 'GetDeviceIdentityRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+  ],
+};
+
+/// Descriptor for `GetDeviceIdentityRequest`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN for contract 1.13 (pending protoc-gen-dart codegen); bytes
+/// match the Go contract descriptor for the same message.
+final $typed_data.Uint8List getDeviceIdentityRequestDescriptor =
+    $convert.base64Decode(
+        'ChhHZXREZXZpY2VJZGVudGl0eVJlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLmNv'
+        'cmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIzChVjb250cm9sX2F1dGhlbnRpY2F0b3IYAiAB'
+        'KAxSFGNvbnRyb2xBdXRoZW50aWNhdG9y');
+
+const GetDeviceIdentityResponse$json = {
+  '1': 'GetDeviceIdentityResponse',
+  '2': [
+    {'1': 'hwid', '3': 1, '4': 1, '5': 9, '10': 'hwid'},
+    {'1': 'enabled', '3': 2, '4': 1, '5': 8, '10': 'enabled'},
+    {'1': 'error', '3': 3, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `GetDeviceIdentityResponse`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN for contract 1.13 (pending protoc-gen-dart codegen); bytes
+/// match the Go contract descriptor for the same message.
+final $typed_data.Uint8List getDeviceIdentityResponseDescriptor =
+    $convert.base64Decode(
+        'ChlHZXREZXZpY2VJZGVudGl0eVJlc3BvbnNlEhIKBGh3aWQYASABKAlSBGh3aWQSGAoHZW5hYmxl'
+        'ZBgCIAEoCFIHZW5hYmxlZBItCgVlcnJvchgDIAEoCzIXLnNvcmEuY29yZS52MS5Tb3JhRXJyb3JS'
+        'BWVycm9y');
+
+const SetDeviceIdentityRequest$json = {
+  '1': 'SetDeviceIdentityRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'enabled', '3': 3, '4': 1, '5': 8, '10': 'enabled'},
+    {'1': 'reset', '3': 4, '4': 1, '5': 8, '10': 'reset'},
+    {'1': 'ver_os', '3': 5, '4': 1, '5': 9, '10': 'verOs'},
+    {'1': 'device_model', '3': 6, '4': 1, '5': 9, '10': 'deviceModel'},
+  ],
+};
+
+/// Descriptor for `SetDeviceIdentityRequest`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN for contract 1.13 (pending protoc-gen-dart codegen); bytes
+/// match the Go contract descriptor for the same message.
+final $typed_data.Uint8List setDeviceIdentityRequestDescriptor =
+    $convert.base64Decode(
+        'ChhTZXREZXZpY2VJZGVudGl0eVJlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLmNv'
+        'cmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIzChVjb250cm9sX2F1dGhlbnRpY2F0b3IYAiAB'
+        'KAxSFGNvbnRyb2xBdXRoZW50aWNhdG9yEhgKB2VuYWJsZWQYAyABKAhSB2VuYWJsZWQSFAoFcmVz'
+        'ZXQYBCABKAhSBXJlc2V0EhUKBnZlcl9vcxgFIAEoCVIFdmVyT3MSIQoMZGV2aWNlX21vZGVsGAYg'
+        'ASgJUgtkZXZpY2VNb2RlbA==');
+
+const SetDeviceIdentityResponse$json = {
+  '1': 'SetDeviceIdentityResponse',
+  '2': [
+    {'1': 'hwid', '3': 1, '4': 1, '5': 9, '10': 'hwid'},
+    {'1': 'enabled', '3': 2, '4': 1, '5': 8, '10': 'enabled'},
+    {'1': 'error', '3': 3, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `SetDeviceIdentityResponse`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN for contract 1.13 (pending protoc-gen-dart codegen); bytes
+/// match the Go contract descriptor for the same message.
+final $typed_data.Uint8List setDeviceIdentityResponseDescriptor =
+    $convert.base64Decode(
+        'ChlTZXREZXZpY2VJZGVudGl0eVJlc3BvbnNlEhIKBGh3aWQYASABKAlSBGh3aWQSGAoHZW5hYmxl'
+        'ZBgCIAEoCFIHZW5hYmxlZBItCgVlcnJvchgDIAEoCzIXLnNvcmEuY29yZS52MS5Tb3JhRXJyb3JS'
+        'BWVycm9y');

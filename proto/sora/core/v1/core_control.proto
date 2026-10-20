@@ -100,6 +100,15 @@ service CoreControl {
   // the summed latency estimate, and which installed engines can carry it.
   // Requires the control authenticator: probes burn traffic.
   rpc ProbeChain(ProbeChainRequest) returns (ProbeChainResponse);
+
+  // Since 1.13. The provider device identity (C1, HWID device limits):
+  // the settings surface reads the identity, toggles whether
+  // subscription fetches carry it, and resets it. Requires the control
+  // authenticator: the identifier is a stable per-install value, and
+  // changing or resetting it affects every provider with a device
+  // limit.
+  rpc GetDeviceIdentity(GetDeviceIdentityRequest) returns (GetDeviceIdentityResponse);
+  rpc SetDeviceIdentity(SetDeviceIdentityRequest) returns (SetDeviceIdentityResponse);
 }
 
 message ApiVersion {
@@ -1006,4 +1015,37 @@ message CensorshipDetected {
   // overstates the evidence.
   string explanation = 3;
   repeated string evidence = 4;
+}
+
+// Since 1.13. The provider device identity (C1). The core generates
+// and stores the HWID (see core/subscription/device_store.go); the
+// interface only reads it, toggles it and resets it, and supplies the
+// companion platform facts it honestly knows.
+message GetDeviceIdentityRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+}
+message GetDeviceIdentityResponse {
+  string hwid = 1;
+  bool enabled = 2;
+  SoraError error = 3;
+}
+message SetDeviceIdentityRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  bool enabled = 3;
+  // Replaces the HWID with a fresh one; the response carries the new
+  // value. Providers count it as a new device.
+  bool reset = 4;
+  // Companion platform facts the interface honestly knows: the OS
+  // version (x-ver-os) and the device model (x-device-model). The
+  // core stores them with the identity and sends them on subscription
+  // fetches; empty leaves the header unsent, never fabricated.
+  string ver_os = 5;
+  string device_model = 6;
+}
+message SetDeviceIdentityResponse {
+  string hwid = 1;
+  bool enabled = 2;
+  SoraError error = 3;
 }

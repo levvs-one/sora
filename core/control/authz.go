@@ -25,6 +25,10 @@ var readOnlyMethods = map[string]bool{
 	corev1.CoreControl_QueryLogs_FullMethodName:         true,
 	corev1.CoreControl_WatchLogs_FullMethodName:         true,
 	corev1.CoreControl_GetLogSettings_FullMethodName:    true,
+	// Since 1.13. Reading the device identity is inspection like the
+	// log settings; SetDeviceIdentity mutates it and stays control-only
+	// (absent here on purpose).
+	corev1.CoreControl_GetDeviceIdentity_FullMethodName: true,
 	// Obfuscation capabilities describe engines, not the user.
 	obfsv1.ObfsControl_GetObfsCapabilities_FullMethodName: true,
 }

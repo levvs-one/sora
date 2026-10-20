@@ -9250,6 +9250,272 @@ func (x *CensorshipDetected) GetEvidence() []string {
 	return nil
 }
 
+// Since 1.13. The provider device identity (C1). The core generates
+// and stores the HWID (see core/subscription/device_store.go); the
+// interface only reads it, toggles it and resets it, and supplies the
+// companion platform facts it honestly knows.
+type GetDeviceIdentityRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	ApiVersion           *ApiVersion            `protobuf:"bytes,1,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
+	ControlAuthenticator []byte                 `protobuf:"bytes,2,opt,name=control_authenticator,json=controlAuthenticator,proto3" json:"control_authenticator,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *GetDeviceIdentityRequest) Reset() {
+	*x = GetDeviceIdentityRequest{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[127]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceIdentityRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceIdentityRequest) ProtoMessage() {}
+
+func (x *GetDeviceIdentityRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[127]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceIdentityRequest.ProtoReflect.Descriptor instead.
+func (*GetDeviceIdentityRequest) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{127}
+}
+
+func (x *GetDeviceIdentityRequest) GetApiVersion() *ApiVersion {
+	if x != nil {
+		return x.ApiVersion
+	}
+	return nil
+}
+
+func (x *GetDeviceIdentityRequest) GetControlAuthenticator() []byte {
+	if x != nil {
+		return x.ControlAuthenticator
+	}
+	return nil
+}
+
+type GetDeviceIdentityResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Hwid          string                 `protobuf:"bytes,1,opt,name=hwid,proto3" json:"hwid,omitempty"`
+	Enabled       bool                   `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Error         *SoraError             `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeviceIdentityResponse) Reset() {
+	*x = GetDeviceIdentityResponse{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[128]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeviceIdentityResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeviceIdentityResponse) ProtoMessage() {}
+
+func (x *GetDeviceIdentityResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[128]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeviceIdentityResponse.ProtoReflect.Descriptor instead.
+func (*GetDeviceIdentityResponse) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{128}
+}
+
+func (x *GetDeviceIdentityResponse) GetHwid() string {
+	if x != nil {
+		return x.Hwid
+	}
+	return ""
+}
+
+func (x *GetDeviceIdentityResponse) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *GetDeviceIdentityResponse) GetError() *SoraError {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
+type SetDeviceIdentityRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	ApiVersion           *ApiVersion            `protobuf:"bytes,1,opt,name=api_version,json=apiVersion,proto3" json:"api_version,omitempty"`
+	ControlAuthenticator []byte                 `protobuf:"bytes,2,opt,name=control_authenticator,json=controlAuthenticator,proto3" json:"control_authenticator,omitempty"`
+	Enabled              bool                   `protobuf:"varint,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	// Replaces the HWID with a fresh one; the response carries the new
+	// value. Providers count it as a new device.
+	Reset_ bool `protobuf:"varint,4,opt,name=reset,proto3" json:"reset,omitempty"`
+	// Companion platform facts the interface honestly knows: the OS
+	// version (x-ver-os) and the device model (x-device-model). The
+	// core stores them with the identity and sends them on subscription
+	// fetches; empty leaves the header unsent, never fabricated.
+	VerOs         string `protobuf:"bytes,5,opt,name=ver_os,json=verOs,proto3" json:"ver_os,omitempty"`
+	DeviceModel   string `protobuf:"bytes,6,opt,name=device_model,json=deviceModel,proto3" json:"device_model,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetDeviceIdentityRequest) Reset() {
+	*x = SetDeviceIdentityRequest{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[129]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetDeviceIdentityRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetDeviceIdentityRequest) ProtoMessage() {}
+
+func (x *SetDeviceIdentityRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[129]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetDeviceIdentityRequest.ProtoReflect.Descriptor instead.
+func (*SetDeviceIdentityRequest) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{129}
+}
+
+func (x *SetDeviceIdentityRequest) GetApiVersion() *ApiVersion {
+	if x != nil {
+		return x.ApiVersion
+	}
+	return nil
+}
+
+func (x *SetDeviceIdentityRequest) GetControlAuthenticator() []byte {
+	if x != nil {
+		return x.ControlAuthenticator
+	}
+	return nil
+}
+
+func (x *SetDeviceIdentityRequest) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *SetDeviceIdentityRequest) GetReset_() bool {
+	if x != nil {
+		return x.Reset_
+	}
+	return false
+}
+
+func (x *SetDeviceIdentityRequest) GetVerOs() string {
+	if x != nil {
+		return x.VerOs
+	}
+	return ""
+}
+
+func (x *SetDeviceIdentityRequest) GetDeviceModel() string {
+	if x != nil {
+		return x.DeviceModel
+	}
+	return ""
+}
+
+type SetDeviceIdentityResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Hwid          string                 `protobuf:"bytes,1,opt,name=hwid,proto3" json:"hwid,omitempty"`
+	Enabled       bool                   `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Error         *SoraError             `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetDeviceIdentityResponse) Reset() {
+	*x = SetDeviceIdentityResponse{}
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[130]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetDeviceIdentityResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetDeviceIdentityResponse) ProtoMessage() {}
+
+func (x *SetDeviceIdentityResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_core_v1_core_control_proto_msgTypes[130]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetDeviceIdentityResponse.ProtoReflect.Descriptor instead.
+func (*SetDeviceIdentityResponse) Descriptor() ([]byte, []int) {
+	return file_sora_core_v1_core_control_proto_rawDescGZIP(), []int{130}
+}
+
+func (x *SetDeviceIdentityResponse) GetHwid() string {
+	if x != nil {
+		return x.Hwid
+	}
+	return ""
+}
+
+func (x *SetDeviceIdentityResponse) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+func (x *SetDeviceIdentityResponse) GetError() *SoraError {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
 var File_sora_core_v1_core_control_proto protoreflect.FileDescriptor
 
 const file_sora_core_v1_core_control_proto_rawDesc = "" +
@@ -9990,7 +10256,27 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"confidence\x18\x02 \x01(\x01R\n" +
 	"confidence\x12 \n" +
 	"\vexplanation\x18\x03 \x01(\tR\vexplanation\x12\x1a\n" +
-	"\bevidence\x18\x04 \x03(\tR\bevidence*\x8d\x01\n" +
+	"\bevidence\x18\x04 \x03(\tR\bevidence\"\x8a\x01\n" +
+	"\x18GetDeviceIdentityRequest\x129\n" +
+	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\n" +
+	"apiVersion\x123\n" +
+	"\x15control_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\"x\n" +
+	"\x19GetDeviceIdentityResponse\x12\x12\n" +
+	"\x04hwid\x18\x01 \x01(\tR\x04hwid\x12\x18\n" +
+	"\aenabled\x18\x02 \x01(\bR\aenabled\x12-\n" +
+	"\x05error\x18\x03 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"\xf4\x01\n" +
+	"\x18SetDeviceIdentityRequest\x129\n" +
+	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\n" +
+	"apiVersion\x123\n" +
+	"\x15control_authenticator\x18\x02 \x01(\fR\x14controlAuthenticator\x12\x18\n" +
+	"\aenabled\x18\x03 \x01(\bR\aenabled\x12\x14\n" +
+	"\x05reset\x18\x04 \x01(\bR\x05reset\x12\x15\n" +
+	"\x06ver_os\x18\x05 \x01(\tR\x05verOs\x12!\n" +
+	"\fdevice_model\x18\x06 \x01(\tR\vdeviceModel\"x\n" +
+	"\x19SetDeviceIdentityResponse\x12\x12\n" +
+	"\x04hwid\x18\x01 \x01(\tR\x04hwid\x12\x18\n" +
+	"\aenabled\x18\x02 \x01(\bR\aenabled\x12-\n" +
+	"\x05error\x18\x03 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error*\x8d\x01\n" +
 	"\tGroupType\x12\x1a\n" +
 	"\x16GROUP_TYPE_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11GROUP_TYPE_SELECT\x10\x01\x12\x17\n" +
@@ -10045,7 +10331,7 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"\x16LOG_EXPORT_FORMAT_JSON\x10\x04\x12\x19\n" +
 	"\x15LOG_EXPORT_FORMAT_XML\x10\x05\x12\x19\n" +
 	"\x15LOG_EXPORT_FORMAT_ZIP\x10\x06\x12\x1a\n" +
-	"\x16LOG_EXPORT_FORMAT_GZIP\x10\a2\x92\x1d\n" +
+	"\x16LOG_EXPORT_FORMAT_GZIP\x10\a2\xde\x1e\n" +
 	"\vCoreControl\x12F\n" +
 	"\aConnect\x12\x1c.sora.core.v1.ConnectRequest\x1a\x1d.sora.core.v1.ConnectResponse\x12O\n" +
 	"\n" +
@@ -10090,7 +10376,9 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"\rDeleteProfile\x12\".sora.core.v1.DeleteProfileRequest\x1a#.sora.core.v1.DeleteProfileResponse\x12p\n" +
 	"\x15GetNetworkFingerprint\x12*.sora.core.v1.GetNetworkFingerprintRequest\x1a+.sora.core.v1.GetNetworkFingerprintResponse\x12O\n" +
 	"\n" +
-	"ProbeChain\x12\x1f.sora.core.v1.ProbeChainRequest\x1a .sora.core.v1.ProbeChainResponseB?Z=github.com/levvs-one/sora-client/core/gen/sora/core/v1;corev1b\x06proto3"
+	"ProbeChain\x12\x1f.sora.core.v1.ProbeChainRequest\x1a .sora.core.v1.ProbeChainResponse\x12d\n" +
+	"\x11GetDeviceIdentity\x12&.sora.core.v1.GetDeviceIdentityRequest\x1a'.sora.core.v1.GetDeviceIdentityResponse\x12d\n" +
+	"\x11SetDeviceIdentity\x12&.sora.core.v1.SetDeviceIdentityRequest\x1a'.sora.core.v1.SetDeviceIdentityResponseB?Z=github.com/levvs-one/sora-client/core/gen/sora/core/v1;corev1b\x06proto3"
 
 var (
 	file_sora_core_v1_core_control_proto_rawDescOnce sync.Once
@@ -10105,7 +10393,7 @@ func file_sora_core_v1_core_control_proto_rawDescGZIP() []byte {
 }
 
 var file_sora_core_v1_core_control_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
-var file_sora_core_v1_core_control_proto_msgTypes = make([]protoimpl.MessageInfo, 129)
+var file_sora_core_v1_core_control_proto_msgTypes = make([]protoimpl.MessageInfo, 133)
 var file_sora_core_v1_core_control_proto_goTypes = []any{
 	(GroupType)(0),                           // 0: sora.core.v1.GroupType
 	(TunnelMode)(0),                          // 1: sora.core.v1.TunnelMode
@@ -10242,10 +10530,14 @@ var file_sora_core_v1_core_control_proto_goTypes = []any{
 	(*ProbeChainResponse)(nil),               // 132: sora.core.v1.ProbeChainResponse
 	(*ChainHop)(nil),                         // 133: sora.core.v1.ChainHop
 	(*CensorshipDetected)(nil),               // 134: sora.core.v1.CensorshipDetected
-	nil,                                      // 135: sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
-	nil,                                      // 136: sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
-	(*durationpb.Duration)(nil),              // 137: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),            // 138: google.protobuf.Timestamp
+	(*GetDeviceIdentityRequest)(nil),         // 135: sora.core.v1.GetDeviceIdentityRequest
+	(*GetDeviceIdentityResponse)(nil),        // 136: sora.core.v1.GetDeviceIdentityResponse
+	(*SetDeviceIdentityRequest)(nil),         // 137: sora.core.v1.SetDeviceIdentityRequest
+	(*SetDeviceIdentityResponse)(nil),        // 138: sora.core.v1.SetDeviceIdentityResponse
+	nil,                                      // 139: sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
+	nil,                                      // 140: sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
+	(*durationpb.Duration)(nil),              // 141: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),            // 142: google.protobuf.Timestamp
 }
 var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	8,   // 0: sora.core.v1.ConnectRequest.api_version:type_name -> sora.core.v1.ApiVersion
@@ -10270,7 +10562,7 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	18,  // 19: sora.core.v1.SessionPlan.routing:type_name -> sora.core.v1.RoutingOptions
 	104, // 20: sora.core.v1.SessionPlan.zapret_strategy:type_name -> sora.core.v1.BypassStrategy
 	0,   // 21: sora.core.v1.GroupSpec.type:type_name -> sora.core.v1.GroupType
-	137, // 22: sora.core.v1.GroupSpec.test_interval:type_name -> google.protobuf.Duration
+	141, // 22: sora.core.v1.GroupSpec.test_interval:type_name -> google.protobuf.Duration
 	104, // 23: sora.core.v1.OutboundSpec.bypass:type_name -> sora.core.v1.BypassStrategy
 	22,  // 24: sora.core.v1.OutboundSpec.endpoint:type_name -> sora.core.v1.Endpoint
 	23,  // 25: sora.core.v1.OutboundSpec.credentials:type_name -> sora.core.v1.CredentialsRef
@@ -10281,9 +10573,9 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	61,  // 30: sora.core.v1.GetStatsResponse.error:type_name -> sora.core.v1.SoraError
 	2,   // 31: sora.core.v1.ConnectionState.value:type_name -> sora.core.v1.ConnectionStateValue
 	5,   // 32: sora.core.v1.ConnectionState.reason:type_name -> sora.core.v1.SoraErrorCode
-	138, // 33: sora.core.v1.ConnectionState.changed_at:type_name -> google.protobuf.Timestamp
-	137, // 34: sora.core.v1.ConnectionState.retry_after:type_name -> google.protobuf.Duration
-	138, // 35: sora.core.v1.CoreEvent.emitted_at:type_name -> google.protobuf.Timestamp
+	142, // 33: sora.core.v1.ConnectionState.changed_at:type_name -> google.protobuf.Timestamp
+	141, // 34: sora.core.v1.ConnectionState.retry_after:type_name -> google.protobuf.Duration
+	142, // 35: sora.core.v1.CoreEvent.emitted_at:type_name -> google.protobuf.Timestamp
 	32,  // 36: sora.core.v1.CoreEvent.state_changed:type_name -> sora.core.v1.StateChanged
 	34,  // 37: sora.core.v1.CoreEvent.stats_tick:type_name -> sora.core.v1.StatsTick
 	35,  // 38: sora.core.v1.CoreEvent.bypass_strategy_changed:type_name -> sora.core.v1.BypassStrategyChanged
@@ -10303,8 +10595,8 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	21,  // 52: sora.core.v1.FetchSubscriptionResponse.outbounds:type_name -> sora.core.v1.OutboundSpec
 	61,  // 53: sora.core.v1.FetchSubscriptionResponse.error:type_name -> sora.core.v1.SoraError
 	43,  // 54: sora.core.v1.FetchSubscriptionResponse.info:type_name -> sora.core.v1.SubscriptionInfo
-	137, // 55: sora.core.v1.SubscriptionInfo.update_interval:type_name -> google.protobuf.Duration
-	138, // 56: sora.core.v1.SubscriptionInfo.expire:type_name -> google.protobuf.Timestamp
+	141, // 55: sora.core.v1.SubscriptionInfo.update_interval:type_name -> google.protobuf.Duration
+	142, // 56: sora.core.v1.SubscriptionInfo.expire:type_name -> google.protobuf.Timestamp
 	8,   // 57: sora.core.v1.ProbeServersRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	22,  // 58: sora.core.v1.ProbeServersRequest.endpoints:type_name -> sora.core.v1.Endpoint
 	21,  // 59: sora.core.v1.ProbeServersRequest.outbounds:type_name -> sora.core.v1.OutboundSpec
@@ -10332,12 +10624,12 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	23,  // 81: sora.core.v1.DeleteSecretRequest.credentials:type_name -> sora.core.v1.CredentialsRef
 	61,  // 82: sora.core.v1.DeleteSecretResponse.error:type_name -> sora.core.v1.SoraError
 	5,   // 83: sora.core.v1.SoraError.code:type_name -> sora.core.v1.SoraErrorCode
-	137, // 84: sora.core.v1.SoraError.retry_after:type_name -> google.protobuf.Duration
-	138, // 85: sora.core.v1.LogEntry.time:type_name -> google.protobuf.Timestamp
+	141, // 84: sora.core.v1.SoraError.retry_after:type_name -> google.protobuf.Duration
+	142, // 85: sora.core.v1.LogEntry.time:type_name -> google.protobuf.Timestamp
 	6,   // 86: sora.core.v1.LogEntry.level:type_name -> sora.core.v1.LogLevel
 	6,   // 87: sora.core.v1.LogFilter.min_level:type_name -> sora.core.v1.LogLevel
-	138, // 88: sora.core.v1.LogFilter.since:type_name -> google.protobuf.Timestamp
-	138, // 89: sora.core.v1.LogFilter.until:type_name -> google.protobuf.Timestamp
+	142, // 88: sora.core.v1.LogFilter.since:type_name -> google.protobuf.Timestamp
+	142, // 89: sora.core.v1.LogFilter.until:type_name -> google.protobuf.Timestamp
 	8,   // 90: sora.core.v1.QueryLogsRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	63,  // 91: sora.core.v1.QueryLogsRequest.filter:type_name -> sora.core.v1.LogFilter
 	62,  // 92: sora.core.v1.QueryLogsResponse.entries:type_name -> sora.core.v1.LogEntry
@@ -10362,18 +10654,18 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	74,  // 111: sora.core.v1.SetLogSettingsRequest.settings:type_name -> sora.core.v1.LogSettings
 	74,  // 112: sora.core.v1.SetLogSettingsResponse.settings:type_name -> sora.core.v1.LogSettings
 	61,  // 113: sora.core.v1.SetLogSettingsResponse.error:type_name -> sora.core.v1.SoraError
-	138, // 114: sora.core.v1.Connection.start:type_name -> google.protobuf.Timestamp
+	142, // 114: sora.core.v1.Connection.start:type_name -> google.protobuf.Timestamp
 	8,   // 115: sora.core.v1.ListConnectionsRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	79,  // 116: sora.core.v1.ListConnectionsResponse.connections:type_name -> sora.core.v1.Connection
 	61,  // 117: sora.core.v1.ListConnectionsResponse.error:type_name -> sora.core.v1.SoraError
 	8,   // 118: sora.core.v1.CloseConnectionRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	61,  // 119: sora.core.v1.CloseConnectionResponse.error:type_name -> sora.core.v1.SoraError
-	137, // 120: sora.core.v1.SubscriptionSettings.update_interval:type_name -> google.protobuf.Duration
+	141, // 120: sora.core.v1.SubscriptionSettings.update_interval:type_name -> google.protobuf.Duration
 	84,  // 121: sora.core.v1.SubscriptionState.settings:type_name -> sora.core.v1.SubscriptionSettings
 	43,  // 122: sora.core.v1.SubscriptionState.info:type_name -> sora.core.v1.SubscriptionInfo
 	21,  // 123: sora.core.v1.SubscriptionState.outbounds:type_name -> sora.core.v1.OutboundSpec
-	138, // 124: sora.core.v1.SubscriptionState.last_update:type_name -> google.protobuf.Timestamp
-	138, // 125: sora.core.v1.SubscriptionState.next_update:type_name -> google.protobuf.Timestamp
+	142, // 124: sora.core.v1.SubscriptionState.last_update:type_name -> google.protobuf.Timestamp
+	142, // 125: sora.core.v1.SubscriptionState.next_update:type_name -> google.protobuf.Timestamp
 	61,  // 126: sora.core.v1.SubscriptionState.last_error:type_name -> sora.core.v1.SoraError
 	8,   // 127: sora.core.v1.SaveSubscriptionRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	84,  // 128: sora.core.v1.SaveSubscriptionRequest.settings:type_name -> sora.core.v1.SubscriptionSettings
@@ -10393,7 +10685,7 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	8,   // 142: sora.core.v1.GetAboutRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	99,  // 143: sora.core.v1.GetAboutResponse.about:type_name -> sora.core.v1.About
 	61,  // 144: sora.core.v1.GetAboutResponse.error:type_name -> sora.core.v1.SoraError
-	138, // 145: sora.core.v1.About.commit_time:type_name -> google.protobuf.Timestamp
+	142, // 145: sora.core.v1.About.commit_time:type_name -> google.protobuf.Timestamp
 	8,   // 146: sora.core.v1.About.contract:type_name -> sora.core.v1.ApiVersion
 	100, // 147: sora.core.v1.About.engines:type_name -> sora.core.v1.EngineBuild
 	22,  // 148: sora.core.v1.About.local_proxy:type_name -> sora.core.v1.Endpoint
@@ -10409,11 +10701,11 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	112, // 158: sora.core.v1.GetBenchmarksResponse.benchmarks:type_name -> sora.core.v1.BenchmarkRecord
 	61,  // 159: sora.core.v1.GetBenchmarksResponse.error:type_name -> sora.core.v1.SoraError
 	8,   // 160: sora.core.v1.SaveSubscriptionOverrideRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	135, // 161: sora.core.v1.SaveSubscriptionOverrideRequest.renames:type_name -> sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
+	139, // 161: sora.core.v1.SaveSubscriptionOverrideRequest.renames:type_name -> sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry
 	61,  // 162: sora.core.v1.SaveSubscriptionOverrideResponse.error:type_name -> sora.core.v1.SoraError
 	85,  // 163: sora.core.v1.SaveSubscriptionOverrideResponse.state:type_name -> sora.core.v1.SubscriptionState
 	8,   // 164: sora.core.v1.GetSubscriptionOverrideRequest.api_version:type_name -> sora.core.v1.ApiVersion
-	136, // 165: sora.core.v1.GetSubscriptionOverrideResponse.renames:type_name -> sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
+	140, // 165: sora.core.v1.GetSubscriptionOverrideResponse.renames:type_name -> sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry
 	117, // 166: sora.core.v1.GetSubscriptionOverrideResponse.extra_rules:type_name -> sora.core.v1.OverrideRule
 	61,  // 167: sora.core.v1.GetSubscriptionOverrideResponse.error:type_name -> sora.core.v1.SoraError
 	117, // 168: sora.core.v1.GetSubscriptionOverrideResponse.provider_routing:type_name -> sora.core.v1.OverrideRule
@@ -10434,93 +10726,101 @@ var file_sora_core_v1_core_control_proto_depIdxs = []int32{
 	8,   // 183: sora.core.v1.ProbeChainRequest.api_version:type_name -> sora.core.v1.ApiVersion
 	133, // 184: sora.core.v1.ProbeChainResponse.hops:type_name -> sora.core.v1.ChainHop
 	61,  // 185: sora.core.v1.ProbeChainResponse.error:type_name -> sora.core.v1.SoraError
-	9,   // 186: sora.core.v1.CoreControl.Connect:input_type -> sora.core.v1.ConnectRequest
-	11,  // 187: sora.core.v1.CoreControl.Disconnect:input_type -> sora.core.v1.DisconnectRequest
-	13,  // 188: sora.core.v1.CoreControl.GetStatus:input_type -> sora.core.v1.GetStatusRequest
-	15,  // 189: sora.core.v1.CoreControl.WatchEvents:input_type -> sora.core.v1.WatchEventsRequest
-	39,  // 190: sora.core.v1.CoreControl.ParseImport:input_type -> sora.core.v1.ParseImportRequest
-	41,  // 191: sora.core.v1.CoreControl.FetchSubscription:input_type -> sora.core.v1.FetchSubscriptionRequest
-	44,  // 192: sora.core.v1.CoreControl.ProbeServers:input_type -> sora.core.v1.ProbeServersRequest
-	28,  // 193: sora.core.v1.CoreControl.GetStats:input_type -> sora.core.v1.GetStatsRequest
-	46,  // 194: sora.core.v1.CoreControl.RunDiagnostics:input_type -> sora.core.v1.RunDiagnosticsRequest
-	48,  // 195: sora.core.v1.CoreControl.ExportDiagnostics:input_type -> sora.core.v1.ExportDiagnosticsRequest
-	50,  // 196: sora.core.v1.CoreControl.SetKillSwitch:input_type -> sora.core.v1.SetKillSwitchRequest
-	52,  // 197: sora.core.v1.CoreControl.SelectServer:input_type -> sora.core.v1.SelectServerRequest
-	55,  // 198: sora.core.v1.CoreControl.Handshake:input_type -> sora.core.v1.HandshakeRequest
-	97,  // 199: sora.core.v1.CoreControl.GetAbout:input_type -> sora.core.v1.GetAboutRequest
-	101, // 200: sora.core.v1.CoreControl.GetRoutingPresets:input_type -> sora.core.v1.GetRoutingPresetsRequest
-	64,  // 201: sora.core.v1.CoreControl.QueryLogs:input_type -> sora.core.v1.QueryLogsRequest
-	69,  // 202: sora.core.v1.CoreControl.WatchLogs:input_type -> sora.core.v1.WatchLogsRequest
-	70,  // 203: sora.core.v1.CoreControl.ExportLogs:input_type -> sora.core.v1.ExportLogsRequest
-	72,  // 204: sora.core.v1.CoreControl.ClearLogs:input_type -> sora.core.v1.ClearLogsRequest
-	75,  // 205: sora.core.v1.CoreControl.GetLogSettings:input_type -> sora.core.v1.GetLogSettingsRequest
-	77,  // 206: sora.core.v1.CoreControl.SetLogSettings:input_type -> sora.core.v1.SetLogSettingsRequest
-	80,  // 207: sora.core.v1.CoreControl.ListConnections:input_type -> sora.core.v1.ListConnectionsRequest
-	82,  // 208: sora.core.v1.CoreControl.CloseConnection:input_type -> sora.core.v1.CloseConnectionRequest
-	86,  // 209: sora.core.v1.CoreControl.SaveSubscription:input_type -> sora.core.v1.SaveSubscriptionRequest
-	88,  // 210: sora.core.v1.CoreControl.ListSubscriptions:input_type -> sora.core.v1.ListSubscriptionsRequest
-	90,  // 211: sora.core.v1.CoreControl.DeleteSubscription:input_type -> sora.core.v1.DeleteSubscriptionRequest
-	92,  // 212: sora.core.v1.CoreControl.RefreshSubscription:input_type -> sora.core.v1.RefreshSubscriptionRequest
-	94,  // 213: sora.core.v1.CoreControl.WatchSubscriptions:input_type -> sora.core.v1.WatchSubscriptionsRequest
-	95,  // 214: sora.core.v1.CoreControl.GetSubscriptionLink:input_type -> sora.core.v1.GetSubscriptionLinkRequest
-	57,  // 215: sora.core.v1.CoreControl.PutSecret:input_type -> sora.core.v1.PutSecretRequest
-	59,  // 216: sora.core.v1.CoreControl.DeleteSecret:input_type -> sora.core.v1.DeleteSecretRequest
-	106, // 217: sora.core.v1.CoreControl.CheckDnsLeaks:input_type -> sora.core.v1.CheckDnsLeaksRequest
-	108, // 218: sora.core.v1.CoreControl.BenchmarkServers:input_type -> sora.core.v1.BenchmarkServersRequest
-	110, // 219: sora.core.v1.CoreControl.GetBenchmarks:input_type -> sora.core.v1.GetBenchmarksRequest
-	113, // 220: sora.core.v1.CoreControl.SaveSubscriptionOverride:input_type -> sora.core.v1.SaveSubscriptionOverrideRequest
-	115, // 221: sora.core.v1.CoreControl.GetSubscriptionOverride:input_type -> sora.core.v1.GetSubscriptionOverrideRequest
-	122, // 222: sora.core.v1.CoreControl.ListProfiles:input_type -> sora.core.v1.ListProfilesRequest
-	124, // 223: sora.core.v1.CoreControl.SaveProfile:input_type -> sora.core.v1.SaveProfileRequest
-	126, // 224: sora.core.v1.CoreControl.DeleteProfile:input_type -> sora.core.v1.DeleteProfileRequest
-	128, // 225: sora.core.v1.CoreControl.GetNetworkFingerprint:input_type -> sora.core.v1.GetNetworkFingerprintRequest
-	131, // 226: sora.core.v1.CoreControl.ProbeChain:input_type -> sora.core.v1.ProbeChainRequest
-	10,  // 227: sora.core.v1.CoreControl.Connect:output_type -> sora.core.v1.ConnectResponse
-	12,  // 228: sora.core.v1.CoreControl.Disconnect:output_type -> sora.core.v1.DisconnectResponse
-	14,  // 229: sora.core.v1.CoreControl.GetStatus:output_type -> sora.core.v1.GetStatusResponse
-	31,  // 230: sora.core.v1.CoreControl.WatchEvents:output_type -> sora.core.v1.CoreEvent
-	40,  // 231: sora.core.v1.CoreControl.ParseImport:output_type -> sora.core.v1.ParseImportResponse
-	42,  // 232: sora.core.v1.CoreControl.FetchSubscription:output_type -> sora.core.v1.FetchSubscriptionResponse
-	36,  // 233: sora.core.v1.CoreControl.ProbeServers:output_type -> sora.core.v1.ProbeResult
-	29,  // 234: sora.core.v1.CoreControl.GetStats:output_type -> sora.core.v1.GetStatsResponse
-	47,  // 235: sora.core.v1.CoreControl.RunDiagnostics:output_type -> sora.core.v1.RunDiagnosticsResponse
-	49,  // 236: sora.core.v1.CoreControl.ExportDiagnostics:output_type -> sora.core.v1.ExportDiagnosticsResponse
-	51,  // 237: sora.core.v1.CoreControl.SetKillSwitch:output_type -> sora.core.v1.SetKillSwitchResponse
-	53,  // 238: sora.core.v1.CoreControl.SelectServer:output_type -> sora.core.v1.SelectServerResponse
-	56,  // 239: sora.core.v1.CoreControl.Handshake:output_type -> sora.core.v1.HandshakeResponse
-	98,  // 240: sora.core.v1.CoreControl.GetAbout:output_type -> sora.core.v1.GetAboutResponse
-	102, // 241: sora.core.v1.CoreControl.GetRoutingPresets:output_type -> sora.core.v1.GetRoutingPresetsResponse
-	65,  // 242: sora.core.v1.CoreControl.QueryLogs:output_type -> sora.core.v1.QueryLogsResponse
-	62,  // 243: sora.core.v1.CoreControl.WatchLogs:output_type -> sora.core.v1.LogEntry
-	71,  // 244: sora.core.v1.CoreControl.ExportLogs:output_type -> sora.core.v1.ExportLogsResponse
-	73,  // 245: sora.core.v1.CoreControl.ClearLogs:output_type -> sora.core.v1.ClearLogsResponse
-	76,  // 246: sora.core.v1.CoreControl.GetLogSettings:output_type -> sora.core.v1.GetLogSettingsResponse
-	78,  // 247: sora.core.v1.CoreControl.SetLogSettings:output_type -> sora.core.v1.SetLogSettingsResponse
-	81,  // 248: sora.core.v1.CoreControl.ListConnections:output_type -> sora.core.v1.ListConnectionsResponse
-	83,  // 249: sora.core.v1.CoreControl.CloseConnection:output_type -> sora.core.v1.CloseConnectionResponse
-	87,  // 250: sora.core.v1.CoreControl.SaveSubscription:output_type -> sora.core.v1.SaveSubscriptionResponse
-	89,  // 251: sora.core.v1.CoreControl.ListSubscriptions:output_type -> sora.core.v1.ListSubscriptionsResponse
-	91,  // 252: sora.core.v1.CoreControl.DeleteSubscription:output_type -> sora.core.v1.DeleteSubscriptionResponse
-	93,  // 253: sora.core.v1.CoreControl.RefreshSubscription:output_type -> sora.core.v1.RefreshSubscriptionResponse
-	85,  // 254: sora.core.v1.CoreControl.WatchSubscriptions:output_type -> sora.core.v1.SubscriptionState
-	96,  // 255: sora.core.v1.CoreControl.GetSubscriptionLink:output_type -> sora.core.v1.GetSubscriptionLinkResponse
-	58,  // 256: sora.core.v1.CoreControl.PutSecret:output_type -> sora.core.v1.PutSecretResponse
-	60,  // 257: sora.core.v1.CoreControl.DeleteSecret:output_type -> sora.core.v1.DeleteSecretResponse
-	107, // 258: sora.core.v1.CoreControl.CheckDnsLeaks:output_type -> sora.core.v1.CheckDnsLeaksResponse
-	109, // 259: sora.core.v1.CoreControl.BenchmarkServers:output_type -> sora.core.v1.BandwidthSample
-	111, // 260: sora.core.v1.CoreControl.GetBenchmarks:output_type -> sora.core.v1.GetBenchmarksResponse
-	114, // 261: sora.core.v1.CoreControl.SaveSubscriptionOverride:output_type -> sora.core.v1.SaveSubscriptionOverrideResponse
-	116, // 262: sora.core.v1.CoreControl.GetSubscriptionOverride:output_type -> sora.core.v1.GetSubscriptionOverrideResponse
-	123, // 263: sora.core.v1.CoreControl.ListProfiles:output_type -> sora.core.v1.ListProfilesResponse
-	125, // 264: sora.core.v1.CoreControl.SaveProfile:output_type -> sora.core.v1.SaveProfileResponse
-	127, // 265: sora.core.v1.CoreControl.DeleteProfile:output_type -> sora.core.v1.DeleteProfileResponse
-	129, // 266: sora.core.v1.CoreControl.GetNetworkFingerprint:output_type -> sora.core.v1.GetNetworkFingerprintResponse
-	132, // 267: sora.core.v1.CoreControl.ProbeChain:output_type -> sora.core.v1.ProbeChainResponse
-	227, // [227:268] is the sub-list for method output_type
-	186, // [186:227] is the sub-list for method input_type
-	186, // [186:186] is the sub-list for extension type_name
-	186, // [186:186] is the sub-list for extension extendee
-	0,   // [0:186] is the sub-list for field type_name
+	8,   // 186: sora.core.v1.GetDeviceIdentityRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	61,  // 187: sora.core.v1.GetDeviceIdentityResponse.error:type_name -> sora.core.v1.SoraError
+	8,   // 188: sora.core.v1.SetDeviceIdentityRequest.api_version:type_name -> sora.core.v1.ApiVersion
+	61,  // 189: sora.core.v1.SetDeviceIdentityResponse.error:type_name -> sora.core.v1.SoraError
+	9,   // 190: sora.core.v1.CoreControl.Connect:input_type -> sora.core.v1.ConnectRequest
+	11,  // 191: sora.core.v1.CoreControl.Disconnect:input_type -> sora.core.v1.DisconnectRequest
+	13,  // 192: sora.core.v1.CoreControl.GetStatus:input_type -> sora.core.v1.GetStatusRequest
+	15,  // 193: sora.core.v1.CoreControl.WatchEvents:input_type -> sora.core.v1.WatchEventsRequest
+	39,  // 194: sora.core.v1.CoreControl.ParseImport:input_type -> sora.core.v1.ParseImportRequest
+	41,  // 195: sora.core.v1.CoreControl.FetchSubscription:input_type -> sora.core.v1.FetchSubscriptionRequest
+	44,  // 196: sora.core.v1.CoreControl.ProbeServers:input_type -> sora.core.v1.ProbeServersRequest
+	28,  // 197: sora.core.v1.CoreControl.GetStats:input_type -> sora.core.v1.GetStatsRequest
+	46,  // 198: sora.core.v1.CoreControl.RunDiagnostics:input_type -> sora.core.v1.RunDiagnosticsRequest
+	48,  // 199: sora.core.v1.CoreControl.ExportDiagnostics:input_type -> sora.core.v1.ExportDiagnosticsRequest
+	50,  // 200: sora.core.v1.CoreControl.SetKillSwitch:input_type -> sora.core.v1.SetKillSwitchRequest
+	52,  // 201: sora.core.v1.CoreControl.SelectServer:input_type -> sora.core.v1.SelectServerRequest
+	55,  // 202: sora.core.v1.CoreControl.Handshake:input_type -> sora.core.v1.HandshakeRequest
+	97,  // 203: sora.core.v1.CoreControl.GetAbout:input_type -> sora.core.v1.GetAboutRequest
+	101, // 204: sora.core.v1.CoreControl.GetRoutingPresets:input_type -> sora.core.v1.GetRoutingPresetsRequest
+	64,  // 205: sora.core.v1.CoreControl.QueryLogs:input_type -> sora.core.v1.QueryLogsRequest
+	69,  // 206: sora.core.v1.CoreControl.WatchLogs:input_type -> sora.core.v1.WatchLogsRequest
+	70,  // 207: sora.core.v1.CoreControl.ExportLogs:input_type -> sora.core.v1.ExportLogsRequest
+	72,  // 208: sora.core.v1.CoreControl.ClearLogs:input_type -> sora.core.v1.ClearLogsRequest
+	75,  // 209: sora.core.v1.CoreControl.GetLogSettings:input_type -> sora.core.v1.GetLogSettingsRequest
+	77,  // 210: sora.core.v1.CoreControl.SetLogSettings:input_type -> sora.core.v1.SetLogSettingsRequest
+	80,  // 211: sora.core.v1.CoreControl.ListConnections:input_type -> sora.core.v1.ListConnectionsRequest
+	82,  // 212: sora.core.v1.CoreControl.CloseConnection:input_type -> sora.core.v1.CloseConnectionRequest
+	86,  // 213: sora.core.v1.CoreControl.SaveSubscription:input_type -> sora.core.v1.SaveSubscriptionRequest
+	88,  // 214: sora.core.v1.CoreControl.ListSubscriptions:input_type -> sora.core.v1.ListSubscriptionsRequest
+	90,  // 215: sora.core.v1.CoreControl.DeleteSubscription:input_type -> sora.core.v1.DeleteSubscriptionRequest
+	92,  // 216: sora.core.v1.CoreControl.RefreshSubscription:input_type -> sora.core.v1.RefreshSubscriptionRequest
+	94,  // 217: sora.core.v1.CoreControl.WatchSubscriptions:input_type -> sora.core.v1.WatchSubscriptionsRequest
+	95,  // 218: sora.core.v1.CoreControl.GetSubscriptionLink:input_type -> sora.core.v1.GetSubscriptionLinkRequest
+	57,  // 219: sora.core.v1.CoreControl.PutSecret:input_type -> sora.core.v1.PutSecretRequest
+	59,  // 220: sora.core.v1.CoreControl.DeleteSecret:input_type -> sora.core.v1.DeleteSecretRequest
+	106, // 221: sora.core.v1.CoreControl.CheckDnsLeaks:input_type -> sora.core.v1.CheckDnsLeaksRequest
+	108, // 222: sora.core.v1.CoreControl.BenchmarkServers:input_type -> sora.core.v1.BenchmarkServersRequest
+	110, // 223: sora.core.v1.CoreControl.GetBenchmarks:input_type -> sora.core.v1.GetBenchmarksRequest
+	113, // 224: sora.core.v1.CoreControl.SaveSubscriptionOverride:input_type -> sora.core.v1.SaveSubscriptionOverrideRequest
+	115, // 225: sora.core.v1.CoreControl.GetSubscriptionOverride:input_type -> sora.core.v1.GetSubscriptionOverrideRequest
+	122, // 226: sora.core.v1.CoreControl.ListProfiles:input_type -> sora.core.v1.ListProfilesRequest
+	124, // 227: sora.core.v1.CoreControl.SaveProfile:input_type -> sora.core.v1.SaveProfileRequest
+	126, // 228: sora.core.v1.CoreControl.DeleteProfile:input_type -> sora.core.v1.DeleteProfileRequest
+	128, // 229: sora.core.v1.CoreControl.GetNetworkFingerprint:input_type -> sora.core.v1.GetNetworkFingerprintRequest
+	131, // 230: sora.core.v1.CoreControl.ProbeChain:input_type -> sora.core.v1.ProbeChainRequest
+	135, // 231: sora.core.v1.CoreControl.GetDeviceIdentity:input_type -> sora.core.v1.GetDeviceIdentityRequest
+	137, // 232: sora.core.v1.CoreControl.SetDeviceIdentity:input_type -> sora.core.v1.SetDeviceIdentityRequest
+	10,  // 233: sora.core.v1.CoreControl.Connect:output_type -> sora.core.v1.ConnectResponse
+	12,  // 234: sora.core.v1.CoreControl.Disconnect:output_type -> sora.core.v1.DisconnectResponse
+	14,  // 235: sora.core.v1.CoreControl.GetStatus:output_type -> sora.core.v1.GetStatusResponse
+	31,  // 236: sora.core.v1.CoreControl.WatchEvents:output_type -> sora.core.v1.CoreEvent
+	40,  // 237: sora.core.v1.CoreControl.ParseImport:output_type -> sora.core.v1.ParseImportResponse
+	42,  // 238: sora.core.v1.CoreControl.FetchSubscription:output_type -> sora.core.v1.FetchSubscriptionResponse
+	36,  // 239: sora.core.v1.CoreControl.ProbeServers:output_type -> sora.core.v1.ProbeResult
+	29,  // 240: sora.core.v1.CoreControl.GetStats:output_type -> sora.core.v1.GetStatsResponse
+	47,  // 241: sora.core.v1.CoreControl.RunDiagnostics:output_type -> sora.core.v1.RunDiagnosticsResponse
+	49,  // 242: sora.core.v1.CoreControl.ExportDiagnostics:output_type -> sora.core.v1.ExportDiagnosticsResponse
+	51,  // 243: sora.core.v1.CoreControl.SetKillSwitch:output_type -> sora.core.v1.SetKillSwitchResponse
+	53,  // 244: sora.core.v1.CoreControl.SelectServer:output_type -> sora.core.v1.SelectServerResponse
+	56,  // 245: sora.core.v1.CoreControl.Handshake:output_type -> sora.core.v1.HandshakeResponse
+	98,  // 246: sora.core.v1.CoreControl.GetAbout:output_type -> sora.core.v1.GetAboutResponse
+	102, // 247: sora.core.v1.CoreControl.GetRoutingPresets:output_type -> sora.core.v1.GetRoutingPresetsResponse
+	65,  // 248: sora.core.v1.CoreControl.QueryLogs:output_type -> sora.core.v1.QueryLogsResponse
+	62,  // 249: sora.core.v1.CoreControl.WatchLogs:output_type -> sora.core.v1.LogEntry
+	71,  // 250: sora.core.v1.CoreControl.ExportLogs:output_type -> sora.core.v1.ExportLogsResponse
+	73,  // 251: sora.core.v1.CoreControl.ClearLogs:output_type -> sora.core.v1.ClearLogsResponse
+	76,  // 252: sora.core.v1.CoreControl.GetLogSettings:output_type -> sora.core.v1.GetLogSettingsResponse
+	78,  // 253: sora.core.v1.CoreControl.SetLogSettings:output_type -> sora.core.v1.SetLogSettingsResponse
+	81,  // 254: sora.core.v1.CoreControl.ListConnections:output_type -> sora.core.v1.ListConnectionsResponse
+	83,  // 255: sora.core.v1.CoreControl.CloseConnection:output_type -> sora.core.v1.CloseConnectionResponse
+	87,  // 256: sora.core.v1.CoreControl.SaveSubscription:output_type -> sora.core.v1.SaveSubscriptionResponse
+	89,  // 257: sora.core.v1.CoreControl.ListSubscriptions:output_type -> sora.core.v1.ListSubscriptionsResponse
+	91,  // 258: sora.core.v1.CoreControl.DeleteSubscription:output_type -> sora.core.v1.DeleteSubscriptionResponse
+	93,  // 259: sora.core.v1.CoreControl.RefreshSubscription:output_type -> sora.core.v1.RefreshSubscriptionResponse
+	85,  // 260: sora.core.v1.CoreControl.WatchSubscriptions:output_type -> sora.core.v1.SubscriptionState
+	96,  // 261: sora.core.v1.CoreControl.GetSubscriptionLink:output_type -> sora.core.v1.GetSubscriptionLinkResponse
+	58,  // 262: sora.core.v1.CoreControl.PutSecret:output_type -> sora.core.v1.PutSecretResponse
+	60,  // 263: sora.core.v1.CoreControl.DeleteSecret:output_type -> sora.core.v1.DeleteSecretResponse
+	107, // 264: sora.core.v1.CoreControl.CheckDnsLeaks:output_type -> sora.core.v1.CheckDnsLeaksResponse
+	109, // 265: sora.core.v1.CoreControl.BenchmarkServers:output_type -> sora.core.v1.BandwidthSample
+	111, // 266: sora.core.v1.CoreControl.GetBenchmarks:output_type -> sora.core.v1.GetBenchmarksResponse
+	114, // 267: sora.core.v1.CoreControl.SaveSubscriptionOverride:output_type -> sora.core.v1.SaveSubscriptionOverrideResponse
+	116, // 268: sora.core.v1.CoreControl.GetSubscriptionOverride:output_type -> sora.core.v1.GetSubscriptionOverrideResponse
+	123, // 269: sora.core.v1.CoreControl.ListProfiles:output_type -> sora.core.v1.ListProfilesResponse
+	125, // 270: sora.core.v1.CoreControl.SaveProfile:output_type -> sora.core.v1.SaveProfileResponse
+	127, // 271: sora.core.v1.CoreControl.DeleteProfile:output_type -> sora.core.v1.DeleteProfileResponse
+	129, // 272: sora.core.v1.CoreControl.GetNetworkFingerprint:output_type -> sora.core.v1.GetNetworkFingerprintResponse
+	132, // 273: sora.core.v1.CoreControl.ProbeChain:output_type -> sora.core.v1.ProbeChainResponse
+	136, // 274: sora.core.v1.CoreControl.GetDeviceIdentity:output_type -> sora.core.v1.GetDeviceIdentityResponse
+	138, // 275: sora.core.v1.CoreControl.SetDeviceIdentity:output_type -> sora.core.v1.SetDeviceIdentityResponse
+	233, // [233:276] is the sub-list for method output_type
+	190, // [190:233] is the sub-list for method input_type
+	190, // [190:190] is the sub-list for extension type_name
+	190, // [190:190] is the sub-list for extension extendee
+	0,   // [0:190] is the sub-list for field type_name
 }
 
 func init() { file_sora_core_v1_core_control_proto_init() }
@@ -10546,7 +10846,7 @@ func file_sora_core_v1_core_control_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sora_core_v1_core_control_proto_rawDesc), len(file_sora_core_v1_core_control_proto_rawDesc)),
 			NumEnums:      8,
-			NumMessages:   129,
+			NumMessages:   133,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

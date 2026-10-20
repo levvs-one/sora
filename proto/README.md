@@ -35,6 +35,12 @@ Contract 1.12 adds `SelectServer` (fast in-session server switch over a
 select group, no engine restart) and `GroupSpec.selected` (the member a
 select group starts on, honoured by every engine at Connect).
 
+Contract 1.13 adds `GetDeviceIdentity`/`SetDeviceIdentity` (the provider
+device identity settings surface, C1): the interface reads the HWID,
+toggles whether subscription fetches carry it, resets it, and supplies
+the companion platform facts (`ver_os`, `device_model`) the core stores
+with the identity.
+
 Contract 1.11 adds `sora.obfs.v1.ObfsControl` (uTLS, TLS fragmentation,
 jitter), `sora.leak.v1.LeakService` (egress self-tests),
 `sora.censor.v1.CensorControl` (censorship diagnosis), and

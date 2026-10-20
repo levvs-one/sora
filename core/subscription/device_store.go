@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -29,10 +30,32 @@ import (
 // deviceRecord is the stored form. Enabled defaults to true: a record
 // that predates the field, or a missing record, means the identity is
 // sent — otherwise the feature is dead at exactly the providers that
-// require it. The user-facing switch writes false explicitly.
+// require it. The user-facing switch writes false explicitly. The
+// default is presence-aware (see deviceRecordFile): a plain bool
+// would decode a missing field as false and silently opt every
+// legacy install out.
+//
+// VerOS and DeviceModel are the companion platform facts the
+// interface supplies through SetDeviceIdentity (contract 1.13): the
+// core has no honest source for them itself, so they live here,
+// beside the identity they decorate, and Headers fills them in.
+// Empty means the platform did not provide the fact; the header is
+// then omitted, never fabricated.
 type deviceRecord struct {
-	HWID    string `json:"hwid"`
-	Enabled bool   `json:"enabled"`
+	HWID        string `json:"hwid"`
+	Enabled     bool   `json:"enabled"`
+	VerOS       string `json:"ver_os,omitempty"`
+	DeviceModel string `json:"device_model,omitempty"`
+}
+
+// deviceRecordFile is the decoding form of deviceRecord: Enabled is a
+// pointer so loadLocked can tell an explicit false (the user's
+// opt-out) from a field the file predates (which means true).
+type deviceRecordFile struct {
+	HWID        string `json:"hwid"`
+	Enabled     *bool  `json:"enabled"`
+	VerOS       string `json:"ver_os"`
+	DeviceModel string `json:"device_model"`
 }
 
 // DeviceStore persists the per-install device identity under
@@ -67,9 +90,18 @@ func (s *DeviceStore) loadLocked() (deviceRecord, error) {
 		}
 		return deviceRecord{}, err
 	}
-	var rec deviceRecord
-	if err := json.Unmarshal(raw, &rec); err != nil {
+	var file deviceRecordFile
+	if err := json.Unmarshal(raw, &file); err != nil {
 		return deviceRecord{}, errors.New("subscription: device identity file is corrupt")
+	}
+	rec := deviceRecord{
+		HWID:        file.HWID,
+		Enabled:     true, // a record that predates the field means true
+		VerOS:       file.VerOS,
+		DeviceModel: file.DeviceModel,
+	}
+	if file.Enabled != nil {
+		rec.Enabled = *file.Enabled
 	}
 	if rec.HWID != "" && !ValidHWID(rec.HWID) {
 		return deviceRecord{}, errors.New("subscription: stored device identifier is not valid")
@@ -162,6 +194,34 @@ func (s *DeviceStore) SetEnabled(enabled bool) error {
 	return s.saveLocked(rec)
 }
 
+// SetPlatform records the companion platform facts the interface
+// supplied (contract 1.13): the OS version and the device model, each
+// possibly empty when the platform does not honestly provide it. The
+// values are validated with the same rules the fetch path applies, so
+// a value the store accepted can never fail a later fetch. The
+// identity itself is generated first if needed, exactly as in
+// SetEnabled, so storing companions never changes it.
+func (s *DeviceStore) SetPlatform(verOS, deviceModel string) error {
+	if s == nil {
+		return errors.New("subscription: device identity store disabled")
+	}
+	verOS, deviceModel = strings.TrimSpace(verOS), strings.TrimSpace(deviceModel)
+	if err := checkDeviceField(verOS); err != nil {
+		return err
+	}
+	if err := checkDeviceField(deviceModel); err != nil {
+		return err
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	rec, err := s.identityLocked()
+	if err != nil {
+		return err
+	}
+	rec.VerOS, rec.DeviceModel = verOS, deviceModel
+	return s.saveLocked(rec)
+}
+
 // Reset replaces the HWID with a fresh one. Providers count the new
 // value as a new device; the old value is gone, not archived.
 func (s *DeviceStore) Reset() (string, error) {
@@ -203,5 +263,10 @@ func (s *DeviceStore) Headers(deviceOS string) (DeviceHeaders, error) {
 	if !rec.Enabled {
 		return DeviceHeaders{}, nil
 	}
-	return DeviceHeaders{HWID: rec.HWID, DeviceOS: deviceOS}, nil
+	return DeviceHeaders{
+		HWID:        rec.HWID,
+		DeviceOS:    deviceOS,
+		VersionOS:   rec.VerOS,
+		DeviceModel: rec.DeviceModel,
+	}, nil
 }

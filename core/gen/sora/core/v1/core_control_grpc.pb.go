@@ -60,6 +60,8 @@ const (
 	CoreControl_DeleteProfile_FullMethodName            = "/sora.core.v1.CoreControl/DeleteProfile"
 	CoreControl_GetNetworkFingerprint_FullMethodName    = "/sora.core.v1.CoreControl/GetNetworkFingerprint"
 	CoreControl_ProbeChain_FullMethodName               = "/sora.core.v1.CoreControl/ProbeChain"
+	CoreControl_GetDeviceIdentity_FullMethodName        = "/sora.core.v1.CoreControl/GetDeviceIdentity"
+	CoreControl_SetDeviceIdentity_FullMethodName        = "/sora.core.v1.CoreControl/SetDeviceIdentity"
 )
 
 // CoreControlClient is the client API for CoreControl service.
@@ -151,6 +153,14 @@ type CoreControlClient interface {
 	// the summed latency estimate, and which installed engines can carry it.
 	// Requires the control authenticator: probes burn traffic.
 	ProbeChain(ctx context.Context, in *ProbeChainRequest, opts ...grpc.CallOption) (*ProbeChainResponse, error)
+	// Since 1.13. The provider device identity (C1, HWID device limits):
+	// the settings surface reads the identity, toggles whether
+	// subscription fetches carry it, and resets it. Requires the control
+	// authenticator: the identifier is a stable per-install value, and
+	// changing or resetting it affects every provider with a device
+	// limit.
+	GetDeviceIdentity(ctx context.Context, in *GetDeviceIdentityRequest, opts ...grpc.CallOption) (*GetDeviceIdentityResponse, error)
+	SetDeviceIdentity(ctx context.Context, in *SetDeviceIdentityRequest, opts ...grpc.CallOption) (*SetDeviceIdentityResponse, error)
 }
 
 type coreControlClient struct {
@@ -616,6 +626,26 @@ func (c *coreControlClient) ProbeChain(ctx context.Context, in *ProbeChainReques
 	return out, nil
 }
 
+func (c *coreControlClient) GetDeviceIdentity(ctx context.Context, in *GetDeviceIdentityRequest, opts ...grpc.CallOption) (*GetDeviceIdentityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeviceIdentityResponse)
+	err := c.cc.Invoke(ctx, CoreControl_GetDeviceIdentity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreControlClient) SetDeviceIdentity(ctx context.Context, in *SetDeviceIdentityRequest, opts ...grpc.CallOption) (*SetDeviceIdentityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetDeviceIdentityResponse)
+	err := c.cc.Invoke(ctx, CoreControl_SetDeviceIdentity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CoreControlServer is the server API for CoreControl service.
 // All implementations must embed UnimplementedCoreControlServer
 // for forward compatibility.
@@ -705,6 +735,14 @@ type CoreControlServer interface {
 	// the summed latency estimate, and which installed engines can carry it.
 	// Requires the control authenticator: probes burn traffic.
 	ProbeChain(context.Context, *ProbeChainRequest) (*ProbeChainResponse, error)
+	// Since 1.13. The provider device identity (C1, HWID device limits):
+	// the settings surface reads the identity, toggles whether
+	// subscription fetches carry it, and resets it. Requires the control
+	// authenticator: the identifier is a stable per-install value, and
+	// changing or resetting it affects every provider with a device
+	// limit.
+	GetDeviceIdentity(context.Context, *GetDeviceIdentityRequest) (*GetDeviceIdentityResponse, error)
+	SetDeviceIdentity(context.Context, *SetDeviceIdentityRequest) (*SetDeviceIdentityResponse, error)
 	mustEmbedUnimplementedCoreControlServer()
 }
 
@@ -837,6 +875,12 @@ func (UnimplementedCoreControlServer) GetNetworkFingerprint(context.Context, *Ge
 }
 func (UnimplementedCoreControlServer) ProbeChain(context.Context, *ProbeChainRequest) (*ProbeChainResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProbeChain not implemented")
+}
+func (UnimplementedCoreControlServer) GetDeviceIdentity(context.Context, *GetDeviceIdentityRequest) (*GetDeviceIdentityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDeviceIdentity not implemented")
+}
+func (UnimplementedCoreControlServer) SetDeviceIdentity(context.Context, *SetDeviceIdentityRequest) (*SetDeviceIdentityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetDeviceIdentity not implemented")
 }
 func (UnimplementedCoreControlServer) mustEmbedUnimplementedCoreControlServer() {}
 func (UnimplementedCoreControlServer) testEmbeddedByValue()                     {}
@@ -1562,6 +1606,42 @@ func _CoreControl_ProbeChain_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CoreControl_GetDeviceIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceIdentityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).GetDeviceIdentity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_GetDeviceIdentity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).GetDeviceIdentity(ctx, req.(*GetDeviceIdentityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreControl_SetDeviceIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetDeviceIdentityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).SetDeviceIdentity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_SetDeviceIdentity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).SetDeviceIdentity(ctx, req.(*SetDeviceIdentityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CoreControl_ServiceDesc is the grpc.ServiceDesc for CoreControl service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1712,6 +1792,14 @@ var CoreControl_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ProbeChain",
 			Handler:    _CoreControl_ProbeChain_Handler,
+		},
+		{
+			MethodName: "GetDeviceIdentity",
+			Handler:    _CoreControl_GetDeviceIdentity_Handler,
+		},
+		{
+			MethodName: "SetDeviceIdentity",
+			Handler:    _CoreControl_SetDeviceIdentity_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

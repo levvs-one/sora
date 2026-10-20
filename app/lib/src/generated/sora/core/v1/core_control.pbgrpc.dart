@@ -351,6 +351,26 @@ class CoreControlClient extends $grpc.Client {
   }) {
     return $createUnaryCall(_$probeChain, request, options: options);
   }
+
+  /// Since 1.13. The provider device identity (C1, HWID device limits):
+  /// the settings surface reads the identity, toggles whether
+  /// subscription fetches carry it, and resets it. Requires the control
+  /// authenticator: the identifier is a stable per-install value, and
+  /// changing or resetting it affects every provider with a device
+  /// limit.
+  $grpc.ResponseFuture<$0.GetDeviceIdentityResponse> getDeviceIdentity(
+    $0.GetDeviceIdentityRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getDeviceIdentity, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.SetDeviceIdentityResponse> setDeviceIdentity(
+    $0.SetDeviceIdentityRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$setDeviceIdentity, request, options: options);
+  }
   // method descriptors
 
   static final _$connect = $grpc.ClientMethod<$0.ConnectRequest, $0.ConnectResponse>(
@@ -519,6 +539,14 @@ class CoreControlClient extends $grpc.Client {
       '/sora.core.v1.CoreControl/ProbeChain',
       ($0.ProbeChainRequest value) => value.writeToBuffer(),
       $0.ProbeChainResponse.fromBuffer);
+  static final _$getDeviceIdentity = $grpc.ClientMethod<$0.GetDeviceIdentityRequest, $0.GetDeviceIdentityResponse>(
+      '/sora.core.v1.CoreControl/GetDeviceIdentity',
+      ($0.GetDeviceIdentityRequest value) => value.writeToBuffer(),
+      $0.GetDeviceIdentityResponse.fromBuffer);
+  static final _$setDeviceIdentity = $grpc.ClientMethod<$0.SetDeviceIdentityRequest, $0.SetDeviceIdentityResponse>(
+      '/sora.core.v1.CoreControl/SetDeviceIdentity',
+      ($0.SetDeviceIdentityRequest value) => value.writeToBuffer(),
+      $0.SetDeviceIdentityResponse.fromBuffer);
 }
 
 @$pb.GrpcServiceName('sora.core.v1.CoreControl')
@@ -814,6 +842,20 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.ProbeChainRequest.fromBuffer(value),
         ($0.ProbeChainResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetDeviceIdentityRequest, $0.GetDeviceIdentityResponse>(
+        'GetDeviceIdentity',
+        getDeviceIdentity_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetDeviceIdentityRequest.fromBuffer(value),
+        ($0.GetDeviceIdentityResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SetDeviceIdentityRequest, $0.SetDeviceIdentityResponse>(
+        'SetDeviceIdentity',
+        setDeviceIdentity_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.SetDeviceIdentityRequest.fromBuffer(value),
+        ($0.SetDeviceIdentityResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.ConnectResponse> connect_Pre(
@@ -1103,4 +1145,16 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.ProbeChainResponse> probeChain($grpc.ServiceCall call, $0.ProbeChainRequest request);
+  $async.Future<$0.GetDeviceIdentityResponse> getDeviceIdentity_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetDeviceIdentityRequest> $request) async {
+    return getDeviceIdentity($call, await $request);
+  }
+
+  $async.Future<$0.GetDeviceIdentityResponse> getDeviceIdentity($grpc.ServiceCall call, $0.GetDeviceIdentityRequest request);
+  $async.Future<$0.SetDeviceIdentityResponse> setDeviceIdentity_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.SetDeviceIdentityRequest> $request) async {
+    return setDeviceIdentity($call, await $request);
+  }
+
+  $async.Future<$0.SetDeviceIdentityResponse> setDeviceIdentity($grpc.ServiceCall call, $0.SetDeviceIdentityRequest request);
 }
