@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Canonical uTLS fingerprint knowledge for the core (net-rd 6/20).
@@ -84,6 +85,34 @@ const ReferenceChromeJA4 = "t13d1517h2_8daaf6152771_cb7bf5808d99"
 // them (see the TSPU field tests in XTLS/Xray-core#7131).
 const CurrentChromeVersion = 155
 
+// ParrotReviewInterval is the maximum age of the fingerprint knowledge
+// in this file before it must be re-verified against upstream (T050).
+// Chrome ships a new milestone about every two weeks (Chrome 155 stable
+// 2026-10-06; 156 expected by cadence in late Oct 2026), so the parrot
+// watch is MONTHLY — the previous quarterly cadence let a parrot rot
+// for a whole quarter while real browsers moved four milestones on.
+const ParrotReviewInterval = 30 * 24 * time.Hour
+
+// ParrotReviewedAt is the date (YYYY-MM-DD) the fingerprint knowledge in
+// this file was last re-verified against upstream: Chrome stable
+// releases, the vendored uTLS parrot set, and the engines.lock pins.
+// Bump it (with CurrentChromeParrot/ReferenceChromeJA4 when they move)
+// at every monthly review.
+const ParrotReviewedAt = "2026-10-20"
+
+// ParrotReviewOverdue reports whether the fingerprint knowledge is older
+// than ParrotReviewInterval at now. The control plane surfaces it as a
+// startup notice: a stale-parrot warning that appears on its own beats a
+// quarterly process nobody remembers. An unparseable review date counts
+// as overdue — broken bookkeeping must complain, not pass silently.
+func ParrotReviewOverdue(now time.Time) bool {
+	t, err := time.Parse("2006-01-02", ParrotReviewedAt)
+	if err != nil {
+		return true
+	}
+	return now.Sub(t) > ParrotReviewInterval
+}
+
 // minPQChromeVersion is the first Chrome release whose parrot carries the
 // X25519MLKEM768 post-quantum hybrid key share. ~90% of real Chrome traffic
 // had it in 2026; a "modern Chrome" ClientHello without it is a visible
@@ -149,6 +178,14 @@ func FingerprintWarning(name string) string {
 		if v := ParrotVersion(normalized); v != 0 && v < CurrentChromeVersion {
 			return "fingerprint: versioned parrot " + normalized + " pins Chrome " + strconv.Itoa(v) +
 				" and is stale (TSPU blocks Chrome 133 and older); current upstream is " + CurrentChromeParrot
+		}
+		// hellochrome_155 is exactly the parrot Xray's pinned vendored
+		// uTLS does not know yet (commit e5a6911 is in Xray main, not
+		// in any release as of 2026-10-20): an explicit name only works
+		// on an Xray release newer than the pinned 26.3.27, and the
+		// config fails at load on older builds. Use hellochrome_auto.
+		if v := ParrotVersion(normalized); v != 0 && v >= CurrentChromeVersion {
+			return "fingerprint: versioned parrot " + normalized + " is not in Xray's vendored uTLS on the pinned 26.3.27 build (its newest Chrome parrot is 133); an explicit name fails at engine load on current pins — prefer hellochrome_auto"
 		}
 		return "fingerprint: versioned parrot " + normalized + " is engine-specific (Xray only); current upstream is " + CurrentChromeParrot
 	}
