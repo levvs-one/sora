@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Packet-tunnel SYSTEM EXTENSION Info.plist DRAFT (macOS target).
+     The provider CODE is the shared apple/PacketTunnel/
+     PacketTunnelProvider.swift (same NEPacketTunnelProvider as iOS);
+     on macOS it is packaged as a system extension, on iOS as an app
+     extension — this plist is the macOS packaging only.
+     Bundle id: ARCHITECTURE.md §3.4 canon. -->
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>io.github.levvs-one.sora.PacketTunnel</string>
+	<key>CFBundleName</key>
+	<string>SoraPacketTunnel</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.networkextension.packet-tunnel</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>$(PRODUCT_MODULE_NAME).PacketTunnelProvider</string>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>NEProviderClasses</key>
+			<dict>
+				<key>com.apple.networkextension.packet-tunnel</key>
+				<string>$(PRODUCT_MODULE_NAME).PacketTunnelProvider</string>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>

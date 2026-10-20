@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- macOS app Info.plist DRAFT (task §7). If the XcodeGen spec
+     (apple/project.yml) generates the plist, these keys must be merged
+     into its INFOPLIST_KEY_* settings instead — one source, not two.
+     Identifiers: ARCHITECTURE.md §3.4 canon
+     (io.github.levvs-one.sora*, group.io.github.levvs-one.sora). -->
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>io.github.levvs-one.sora</string>
+	<key>CFBundleName</key>
+	<string>Sora</string>
+	<key>CFBundleDisplayName</key>
+	<string>Sora</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>11.0</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<!-- URL schemes: `sora` (import host) + every LinkParser scheme.
+	     Keep in sync with AppIdentifiers.urlSchemes. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>io.github.levvs-one.sora.import</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sora</string>
+				<string>vless</string>
+				<string>vmess</string>
+				<string>trojan</string>
+				<string>ss</string>
+				<string>ssr</string>
+				<string>socks</string>
+				<string>socks5</string>
+				<string>hysteria</string>
+				<string>hysteria2</string>
+				<string>hy2</string>
+				<string>tuic</string>
+				<string>wireguard</string>
+				<string>wg</string>
+				<string>olcrtc</string>
+				<string>happ</string>
+				<string>hiddify</string>
+				<string>streisand</string>
+				<string>v2rayn</string>
+				<string>v2rayng</string>
+				<string>clash</string>
+				<string>clashx</string>
+				<string>mihomo</string>
+				<string>sing-box</string>
+			</array>
+		</dict>
+	</array>
+	<!-- NOTE: http/https are deliberately NOT registered as URL types:
+	     Sora must not claim to be a web browser. Bare subscription
+	     URLs reach the app via paste / drag & drop / sora://add/. -->
+	<!-- Handoff (§6): the live-connection activity type. -->
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>io.github.levvs-one.sora.handoff.connection</string>
+	</array>
+	<key>NSUserNotificationAlertStyle</key>
+	<string>alert</string>
+</dict>
+</plist>

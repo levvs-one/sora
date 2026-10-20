@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- macOS app entitlements DRAFT — Mac App Store / sandboxed variant
+     (task §7). Identifiers: ARCHITECTURE.md §3.4 canon.
+     Sandbox split, honestly:
+       * This file = App Sandbox build (MAS). User files are reached
+         only through the open panel / drag & drop + security-scoped
+         bookmarks (SecurityScopedBookmarks.swift).
+       * Developer ID build uses SoraMac-DeveloperID.entitlements:
+         NO app-sandbox key (hardened runtime instead), everything
+         else identical, and the code path for file access is the
+         same — bookmarks work in both, so behaviour does not fork. -->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+	<key>com.apple.security.files.bookmarks.app-scope</key>
+	<true/>
+	<key>com.apple.developer.networking.networkextension</key>
+	<array>
+		<string>packet-tunnel-provider</string>
+	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.io.github.levvs-one.sora</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)io.github.levvs-one.sora</string>
+	</array>
+</dict>
+</plist>

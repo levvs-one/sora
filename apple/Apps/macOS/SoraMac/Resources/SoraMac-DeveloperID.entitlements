@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- macOS app entitlements DRAFT — Developer ID variant (task §7).
+     Differences from the sandboxed file, and only these:
+       * no com.apple.security.app-sandbox (Developer ID distribution
+         uses the Hardened Runtime, a release-build setting, not an
+         entitlement);
+       * system-extension install needs the dedicated entitlement
+         below for the OSSystemExtensionRequest flow outside the MAS.
+     Everything else (groups, keychain, NE) is identical so the two
+     channels run the same code. -->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.developer.networking.networkextension</key>
+	<array>
+		<string>packet-tunnel-provider</string>
+	</array>
+	<key>com.apple.developer.system-extension.install</key>
+	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.io.github.levvs-one.sora</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)io.github.levvs-one.sora</string>
+	</array>
+</dict>
+</plist>
