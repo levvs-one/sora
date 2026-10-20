@@ -53,7 +53,7 @@ void main() {
       expect(plan.antiCensorship.tlsFragment, isFalse);
     });
 
-    test('a picked server is the target, with no group, and the advanced choices travel', () {
+    test('a picked server rides the pick group, and the advanced choices travel', () {
       settings
         ..engine = 'xray'
         ..ipv6 = true
@@ -61,13 +61,33 @@ void main() {
         ..fragment = true
         ..fragmentLength = '100-200';
       final plan = buildPlan(servers: servers, choice: 'b', settings: settings);
-      expect(plan.groups, isEmpty);
-      expect(plan.routing.proxyTarget, 'b');
+      // Since API 1.12 a manual pick is a select group over every
+      // ordinary server, starting on the pick: the session can then
+      // fast-switch with SelectServer instead of reconnecting.
+      expect(plan.groups.single.name, Sora.pickGroup);
+      expect(plan.groups.single.type, GroupType.GROUP_TYPE_SELECT);
+      expect(plan.groups.single.members, ['a', 'b']);
+      expect(plan.groups.single.selected, 'b');
+      expect(plan.routing.proxyTarget, Sora.pickGroup);
       expect(plan.engines, ['xray']);
       expect(plan.ipv6, isTrue);
       expect(plan.dnsPolicy.servers, ['https://1.1.1.1/dns-query']);
       expect(plan.antiCensorship.tlsFragment, isTrue);
       expect(plan.antiCensorship.fragmentLength, '100-200');
+    });
+
+    test('stripPickGroup restores the pre-1.12 plan shape for older cores', () {
+      settings
+        ..failover = false
+        ..rules = ['proxy domain:bank.ru'];
+      final plan = buildPlan(servers: servers, choice: 'b', settings: settings);
+      final stripped = stripPickGroup(plan);
+      expect(stripped.groups, isEmpty);
+      expect(stripped.routing.proxyTarget, 'b');
+      expect(stripped.routes.single.outboundId, 'b');
+      expect(stripped.outbounds.map((o) => o.id), ['a', 'b']);
+      // The original plan is untouched.
+      expect(plan.groups.single.selected, 'b');
     });
 
     test('no server carries everything through zapret with the chosen strategy', () {
@@ -130,9 +150,9 @@ void main() {
       ]);
       settings.engine = 'sing-box';
       expect(
-        buildPlan(servers: servers, choice: 'b', settings: settings).groups,
-        isEmpty,
-        reason: 'only mihomo has fallback groups; a pinned engine keeps the picked server alone',
+        buildPlan(servers: servers, choice: 'b', settings: settings).groups.single.name,
+        Sora.pickGroup,
+        reason: 'only mihomo has fallback groups; a pinned engine gets the pick group instead',
       );
     });
 
@@ -442,7 +462,7 @@ void main() {
       expect(plan.groups.single.members, isNot(contains('abc')));
     });
 
-    test('a pinned custom server without failover is the routing target itself', () async {
+    test('a pinned custom server without failover rides the pick group', () async {
       SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
       final settings = await Settings.load();
       settings.failover = false;
@@ -450,7 +470,14 @@ void main() {
       addTearDown(sora.dispose);
       await sora.select('abc');
       final plan = sora.currentPlan;
-      expect(plan.routing.proxyTarget, 'custom/abc', reason: 'the core validates the target against outbound ids');
+      // Since API 1.12 the pick is the selected member of the pick
+      // group, addressed by its canonical id — never the plain id the
+      // core would reject.
+      expect(plan.routing.proxyTarget, Sora.pickGroup);
+      expect(plan.groups.single.name, Sora.pickGroup);
+      expect(plan.groups.single.selected, 'custom/abc');
+      expect(plan.groups.single.members, contains('custom/abc'));
+      expect(plan.groups.single.members, isNot(contains('abc')));
     });
 
     test('passive probes and the card share one latency key', () async {

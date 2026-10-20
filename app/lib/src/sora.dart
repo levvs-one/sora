@@ -263,6 +263,12 @@ class Sora extends ChangeNotifier {
   static const failoverGroup = 'sora:failover';
   static const entryGroup = 'sora:group';
 
+  /// The select group a manual server pick rides in (API 1.12): the plan
+  /// carries every ordinary server as a member and [GroupSpec.selected]
+  /// as the pick, so switching servers is a SelectServer call on the
+  /// running session instead of a full reconnect.
+  static const pickGroup = 'sora:pick';
+
   CoreLink? _link;
   bool _disposed = false;
   bool _startedOnce = false;
@@ -658,7 +664,7 @@ class Sora extends ChangeNotifier {
     final hops = chain == null
         ? const <String>[]
         : [for (final id in chain.hops) if (servers.any((o) => o.id == id)) id];
-    return buildPlan(
+    final built = buildPlan(
       servers: servers,
       choice: selected,
       settings: settings,
@@ -673,6 +679,11 @@ class Sora extends ChangeNotifier {
       zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
       reliabilityOf: reliabilityOf,
     );
+    // Against a core before 1.12 the pick group cannot carry the choice
+    // (see stripPickGroup); planning in the stripped shape keeps plan
+    // comparisons honest — the active plan is then exactly this plan.
+    final link = _link;
+    return link != null && link.minor < 12 ? stripPickGroup(built) : built;
   }
 
   @override
@@ -1357,7 +1368,7 @@ class Sora extends ChangeNotifier {
         return;
       }
     }
-    final plan = via == null
+    var plan = via == null
         ? currentPlan
         : buildPlan(
             servers: servers,
@@ -1383,6 +1394,11 @@ class Sora extends ChangeNotifier {
       notifyListeners();
       return;
     }
+    // A core before 1.12 does not know GroupSpec.selected: it would drop
+    // the field and start the pick group on its first member. Strip the
+    // group to the pre-1.12 plan shape so the picked server is the one
+    // that connects; switching then stays a full reconnect, as before.
+    if (link.minor < 12) plan = stripPickGroup(plan);
     final fallbacks = {
       for (final g in plan.groups)
         if (g.type == GroupType.GROUP_TYPE_FALLBACK && g.members.isNotEmpty)
@@ -1556,12 +1572,62 @@ class Sora extends ChangeNotifier {
         return;
       }
       if ((phase == Phase.connected || phase == Phase.reconnecting) && currentPlan != _activePlan) {
-        await connect();
+        // Fast switch (API 1.12): when the new plan differs from the
+        // active one only in the pick group's selected member, a
+        // SelectServer call moves the running session — no engine
+        // restart, no guard re-arm. Anything else, any failure, and any
+        // older core fall back to the full connect below.
+        if (!await _tryFastSelect(link)) await connect();
       }
       if (link == _link && revision == _selectionRevision && failure?.key != CoreFailure.unavailable.key) {
         _pendingSelection = null;
       }
     });
+  }
+
+  /// Tries the SelectServer fast switch for the pending selection.
+  /// Returns true when the running session now serves [currentPlan]:
+  /// the caller then skips the full connect. Every precondition failure
+  /// and every RPC error returns false (the caller reconnects instead) —
+  /// a failed fast switch must never leave the UI believing the server
+  /// changed when it did not.
+  Future<bool> _tryFastSelect(CoreLink link) async {
+    if (link.minor < 12) return false;
+    final active = _activePlan;
+    if (active == null) return false;
+    GroupSpec? pickOf(SessionPlan plan) => plan.groups.where((g) => g.name == Sora.pickGroup).firstOrNull;
+    final next = currentPlan;
+    final activePick = pickOf(active);
+    final nextPick = pickOf(next);
+    if (activePick == null || nextPick == null) return false;
+    if (nextPick.selected.isEmpty || nextPick.selected == activePick.selected) return false;
+    // The plans must differ ONLY in the pick group's selected member:
+    // aligning that one field on a copy of the new plan must reproduce
+    // the active plan exactly.
+    final aligned = next.deepCopy();
+    pickOf(aligned)!.selected = activePick.selected;
+    if (aligned != active) return false;
+    try {
+      final answer = await link.stub.selectServer(
+        SelectServerRequest(
+          apiVersion: apiVersion,
+          controlAuthenticator: link.token,
+          sessionId: sessionId ?? '',
+          group: Sora.pickGroup,
+          target: nextPick.selected,
+        ),
+        options: CallOptions(timeout: const Duration(seconds: 35)),
+      );
+      if (_disposed || link != _link) return false;
+      if (answer.hasError()) return false;
+      if (answer.hasStatus()) _applyState(answer.status.connection);
+      _activePlan = next;
+      needsReconnect = false;
+      notifyListeners();
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   /// Applies settings and stages connection changes. Disable [replan] for
@@ -2366,11 +2432,52 @@ SessionPlan buildPlan({
       ),
     );
     plan.routing.proxyTarget = Sora.failoverGroup;
+  } else if (ordinary.any((o) => o.id == choice) &&
+      (settings.engine.isEmpty || settings.engine == 'sing-box' || settings.engine == 'xray' || settings.engine == 'mihomo')) {
+    // Manual pick (API 1.12): every ordinary server becomes a member of
+    // one select group and the pick is its starting member. All three
+    // engines honour GroupSpec.selected at Connect (sing-box renders it
+    // as the selector default, Xray seeds its selection map, the Clash
+    // API engines pin it through the controller), so the session starts
+    // on the chosen server — and a later pick that changes only this
+    // group's selected member can fast-switch via SelectServer instead
+    // of reconnecting. The failover path above keeps its own group.
+    plan.groups.add(
+      GroupSpec(
+        name: Sora.pickGroup,
+        type: GroupType.GROUP_TYPE_SELECT,
+        members: [for (final o in ordinary) o.id],
+        selected: choice,
+      ),
+    );
+    plan.routing.proxyTarget = Sora.pickGroup;
   } else {
     plan.routing.proxyTarget = choice;
   }
   addRules(plan.routing.proxyTarget);
   return plan;
+}
+
+/// Removes the pick group of a 1.12 plan for a core that predates it:
+/// such a core drops the unknown selected field and would start the
+/// select group on its first member — a different server than the user
+/// picked. The stripped plan is the pre-1.12 shape: the picked server
+/// as the direct routing target, with user rules retargeted to it.
+SessionPlan stripPickGroup(SessionPlan plan) {
+  final pick = plan.groups.where((g) => g.name == Sora.pickGroup).firstOrNull;
+  if (pick == null) return plan;
+  final target = pick.selected.isNotEmpty
+      ? pick.selected
+      : pick.members.isNotEmpty
+      ? pick.members.first
+      : '';
+  final out = plan.deepCopy();
+  out.groups.removeWhere((g) => g.name == Sora.pickGroup);
+  if (out.routing.proxyTarget == Sora.pickGroup) out.routing.proxyTarget = target;
+  for (final rule in out.routes) {
+    if (rule.outboundId == Sora.pickGroup) rule.outboundId = target;
+  }
+  return out;
 }
 
 /// Picks a member not measured as unreachable: first by role priority,
