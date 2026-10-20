@@ -1371,7 +1371,7 @@ class Sora extends ChangeNotifier {
     if (!chainsSupported) {
       throw const CoreFailure('chainUnsupported');
     }
-    final error = ProxyChain.validateHops(chain.hops);
+    final error = ChainsStore.validateHops(chain.hops);
     if (error != null) throw CoreFailure(error);
     final missing = [for (final id in chain.hops) if (!servers.any((o) => o.id == id)) id];
     if (missing.isNotEmpty) {
@@ -1433,7 +1433,7 @@ class Sora extends ChangeNotifier {
     // on firstWhere.
     final keepChain = via ?? _activeChain;
     if (keepChain != null) {
-      final broken = ProxyChain.validateHops(keepChain.hops) != null ||
+      final broken = ChainsStore.validateHops(keepChain.hops) != null ||
           keepChain.hops.any((id) => !servers.any((o) => o.id == id));
       if (broken) {
         failure = const CoreFailure('chainHopMissing');
