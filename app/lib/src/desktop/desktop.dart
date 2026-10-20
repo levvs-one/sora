@@ -341,15 +341,21 @@ class Desktop with WindowListener {
     final id => sora.displayNameOf(id),
   };
 
-  /// Server entries for the tray menu, mirroring the main list: hidden
-  /// servers are dropped — selecting one would silently fall back to auto —
-  /// and subscription renames apply.
+  /// Server entries for the tray menu, mirroring the main servers list:
+  /// custom servers live in the «Мои серверы» card and are dropped here too
+  /// (INT-1); hidden servers are dropped — selecting one would silently fall
+  /// back to auto — and subscription renames apply.
   List<Entry> _trayEntries() {
     final out = <Entry>[];
     for (final sub in sora.subscriptions) {
       final override = sora.overrides.of(sub.settings.id);
       for (final entry in entriesOf(sub)) {
-        final visible = entry.withoutHidden(override.hidden);
+        // Drop customs before overrides, like the main list: overrides apply
+        // to subscription servers only, and a renamed custom member must not
+        // slip back in through applyRenames.
+        final deduped = entry.withoutCustom();
+        if (deduped == null) continue;
+        final visible = deduped.withoutHidden(override.hidden);
         if (visible == null) continue;
         out.addAll(visible.applyRenames(override.renames));
       }
