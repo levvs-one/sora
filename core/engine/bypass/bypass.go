@@ -1,10 +1,14 @@
 // Package bypass runs zapret to reshape direct TLS, HTTP and QUIC
 // handshakes against DPI. Legacy strategies run on tpws, one loopback
 // SOCKS5 proxy per strategy, with bypass outbounds rewritten to SOCKS5;
-// strategies with desync methods need the nfqws backend (fake packets,
-// autottl, UDP/QUIC desync), which requires packet interception and is
-// not wired up yet — such strategies fail closed (see
-// NFQWS-MIGRATION.md). Supports all engines, rules, and groups.
+// strategies with desync methods run on the nfqws executor (fake
+// packets, autottl, UDP/QUIC desync over NFQUEUE on Linux), whose
+// outbounds stay direct at the engine — desync happens at the packet
+// layer below it. Both backends share one lifecycle, one log source and
+// one fail-closed policy in this package (see NFQWS-MIGRATION.md).
+// Windows winws is discovery-only for now: such plans fail closed
+// naming the pending WinDivert step. Supports all engines, rules, and
+// groups.
 package bypass
 
 import (
@@ -35,8 +39,8 @@ const (
 	// packet injection.
 	BackendTPWS Backend = iota
 	// BackendNFQWS is zapret's packet filter (nfqws on Linux, winws on
-	// Windows): fake packets, autottl, UDP/QUIC desync. It needs packet
-	// interception (NFQUEUE rules / WinDivert), wired up separately.
+	// Windows): fake packets, autottl, UDP/QUIC desync. The Linux
+	// executor is wired (nfqws.go); the Windows one is not yet.
 	BackendNFQWS
 )
 
@@ -58,13 +62,9 @@ const defaultQUICFake = "quic_initial_www_google_com.bin"
 // DefaultStrategy is the modern nfqws/winws desync set: fake, split2,
 // disorder2 and multisplit with autottl, applied to TCP 80/443 and UDP
 // 443 (TLS and QUIC), with a shipped QUIC Initial as the QUIC fake.
-// It needs the nfqws backend; see NFQWS-MIGRATION.md.
-//
-// NOT WIRED: no production caller since the F11 plan-time refusal
-// (2a1395e6) — applyZapretWithVPN requires an explicit strategy from
-// the client and never substitutes this set. Kept as the reference
-// nfqws set for the migration in NFQWS-MIGRATION.md; exercised only
-// by this package's tests.
+// It runs on the nfqws backend; since the executor landed it is the
+// built-in strategy applyZapretWithVPN applies when the client sends
+// none (see NFQWS-MIGRATION.md).
 func DefaultStrategy() engine.BypassStrategy {
 	return engine.BypassStrategy{
 		Desync:    []string{"fake", "split2", "disorder2", "multisplit"},
@@ -197,13 +197,21 @@ func Args(s engine.BypassStrategy, port int) []string {
 // key identifies a strategy so matching outbounds share one tpws process.
 func key(s engine.BypassStrategy) string { return strings.Join(Args(s, 0), " ") }
 
-// Rewrite replaces bypass outbounds with SOCKS5 proxies. ports maps strategy
-// keys to ports; absent keys use port 1 for validation without a running proxy.
+// Rewrite prepares a plan for an engine. tpws-bound outbounds become
+// SOCKS5 proxies to the strategy's tpws (ports maps strategy keys;
+// absent keys use port 1 for validation without a running proxy).
+// nfqws-bound outbounds become direct: nfqws works at the packet
+// layer, so the engine must route them untouched while the queue
+// rules desync them below it (NFQWS-MIGRATION.md §4).
 func Rewrite(p *engine.Plan, ports map[string]int) *engine.Plan {
 	out := *p
 	out.Outbounds = slices.Clone(p.Outbounds)
 	for i, o := range out.Outbounds {
-		if o.Protocol != engine.ProtocolBypass {
+		if o.Protocol != engine.ProtocolBypass || o.Bypass == nil {
+			continue
+		}
+		if BackendOf(*o.Bypass) == BackendNFQWS {
+			out.Outbounds[i] = engine.Outbound{ID: o.ID, Name: o.Name, Protocol: engine.ProtocolDirect}
 			continue
 		}
 		port := ports[key(*o.Bypass)]
@@ -216,15 +224,42 @@ func Rewrite(p *engine.Plan, ports map[string]int) *engine.Plan {
 	return &out
 }
 
-// Engine runs an engine with the tpws processes its plan needs.
+// Binaries names the zapret executables the wrapper may run, as
+// discovered (and digest-verified) by the registry. An empty path
+// means that backend is not installed; plans needing it fail closed.
+type Binaries struct {
+	// TPWS is zapret's transparent SOCKS proxy (tpws).
+	TPWS string
+	// NFQWS is zapret's packet filter: nfqws on Linux, winws.exe on
+	// Windows.
+	NFQWS string
+	// Assets is the shipped zapret directory holding the fake/
+	// payload files (engines/zapret). Empty: resolve payloads under
+	// the runtime zapret home instead.
+	Assets string
+}
+
+// Engine runs an engine with the zapret processes its plan needs:
+// tpws proxies for legacy strategies, nfqws filters for desync ones.
 type Engine struct {
 	engine.Engine
-	tpws string
-	home string
-	logs *logs.Center
+	tpws   string
+	nfqws  string
+	home   string
+	assets string
+	logs   *logs.Center
 
-	mu    sync.Mutex
-	procs map[string]*proxy
+	mu      sync.Mutex
+	procs   map[string]*proxy
+	filters map[string]*filter
+	alloc   *QueueAllocator
+
+	iceptOnce sync.Once
+	icept     interceptor
+	iceptErr  error
+	sweepOnce sync.Once
+	// iceptOverride replaces the platform interceptor in tests.
+	iceptOverride interceptor
 }
 
 type proxy struct {
@@ -233,9 +268,11 @@ type proxy struct {
 	cancel context.CancelFunc
 }
 
-// Wrap adds bypass outbounds to an engine. tpws is the path of the binary.
-func Wrap(inner engine.Engine, tpws, home string, center *logs.Center) *Engine {
-	return &Engine{Engine: inner, tpws: tpws, home: home, logs: center, procs: map[string]*proxy{}}
+// Wrap adds bypass outbounds to an engine. bins names the discovered
+// zapret binaries; home is the runtime zapret working directory.
+func Wrap(inner engine.Engine, bins Binaries, home string, center *logs.Center) *Engine {
+	return &Engine{Engine: inner, tpws: bins.TPWS, nfqws: bins.NFQWS, home: home, assets: bins.Assets,
+		logs: center, procs: map[string]*proxy{}, filters: map[string]*filter{}, alloc: &QueueAllocator{}}
 }
 
 // Validate checks the plan the engine will run.
@@ -243,19 +280,35 @@ func (e *Engine) Validate(ctx context.Context, p *engine.Plan) error {
 	return e.Engine.Validate(ctx, Rewrite(p, nil))
 }
 
-// Apply starts the tpws processes of the plan, stops the ones it no longer
-// needs, and applies the rewritten plan to the engine. A strategy that
-// needs the nfqws backend fails closed: silently running it on tpws would
-// pretend to desync (e.g. QUIC) while doing nothing.
+// Apply starts the zapret processes of the plan (tpws proxies and
+// nfqws filters), stops the ones it no longer needs, and applies the
+// rewritten plan to the engine. A plan may mix both backends. Any
+// piece the nfqws backend needs but the host lacks fails the whole
+// Apply closed, before any state changes: silently running a desync
+// strategy without interception would pretend to desync (e.g. QUIC)
+// while doing nothing.
 func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 	needed := map[string]engine.BypassStrategy{}
+	neededNFQWS := map[string]engine.BypassStrategy{}
+	nfqIDs := map[string]string{}
 	for _, o := range p.Outbounds {
 		if o.Protocol == engine.ProtocolBypass && o.Bypass != nil {
 			if BackendOf(*o.Bypass) == BackendNFQWS {
-				return fmt.Errorf("bypass: outbound %s needs the nfqws backend (packet interception), which is not wired up yet; see core/engine/bypass/NFQWS-MIGRATION.md", o.ID)
+				k := e.nfqKey(*o.Bypass)
+				neededNFQWS[k] = *o.Bypass
+				nfqIDs[k] = o.ID
+			} else {
+				needed[key(*o.Bypass)] = *o.Bypass
 			}
-			needed[key(*o.Bypass)] = *o.Bypass
 		}
+	}
+	if len(neededNFQWS) > 0 {
+		if err := e.checkNFQWS(neededNFQWS, nfqIDs); err != nil {
+			return err
+		}
+	}
+	if err := e.syncFilters(ctx, neededNFQWS); err != nil {
+		return err
 	}
 	e.mu.Lock()
 	for k, px := range e.procs {
@@ -366,14 +419,14 @@ func (e *Engine) logLine(line string) {
 	}
 }
 
-// Stop stops the engine and every tpws.
+// Stop stops the engine and every zapret process (tpws and nfqws).
 func (e *Engine) Stop(ctx context.Context) error {
 	err := e.Engine.Stop(ctx)
 	e.stopAll()
 	return err
 }
 
-// Close closes the engine and stops every tpws.
+// Close closes the engine and stops every zapret process.
 func (e *Engine) Close() error {
 	err := e.Engine.Close()
 	e.stopAll()
@@ -381,6 +434,7 @@ func (e *Engine) Close() error {
 }
 
 func (e *Engine) stopAll() {
+	e.stopFilters(context.Background())
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	for k, px := range e.procs {

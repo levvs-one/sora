@@ -264,19 +264,19 @@ func (stubEngine) Stop(context.Context) error                        { return ni
 func (stubEngine) Close() error                                      { return nil }
 
 func TestApplyFailsClosedForNFQWS(t *testing.T) {
-	e := Wrap(stubEngine{}, filepath.Join("no", "tpws"), t.TempDir(), nil)
+	e := Wrap(stubEngine{}, Binaries{}, t.TempDir(), nil)
 	s := DefaultStrategy()
 	p := &engine.Plan{Outbounds: []engine.Outbound{
 		{ID: "z", Protocol: engine.ProtocolBypass, Bypass: &s},
 	}}
 	err := e.Apply(context.Background(), p)
 	if err == nil || !strings.Contains(err.Error(), "nfqws") || !strings.Contains(err.Error(), "z") {
-		t.Fatalf("an nfqws strategy must fail closed, got %v", err)
+		t.Fatalf("an nfqws strategy without the binary must fail closed, got %v", err)
 	}
 }
 
 func TestApplyStillRunsTPWS(t *testing.T) {
-	e := Wrap(stubEngine{}, filepath.Join("no", "tpws"), t.TempDir(), nil)
+	e := Wrap(stubEngine{}, Binaries{TPWS: filepath.Join("no", "tpws")}, t.TempDir(), nil)
 	s := engine.BypassStrategy{SplitPos: []string{"1"}}
 	p := &engine.Plan{Outbounds: []engine.Outbound{
 		{ID: "z", Protocol: engine.ProtocolBypass, Bypass: &s},

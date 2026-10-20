@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"runtime"
 	"testing"
 	"time"
@@ -317,4 +318,106 @@ func TestDiscoverVerifiesTpwsDigest(t *testing.T) {
 			t.Error("tpws without a manifest was accepted; want fail-closed refusal")
 		}
 	})
+}
+
+// TestDiscoverVerifiesNFQWSDigest gives nfqws exactly the tpws
+// treatment: the packet filter runs with the core's privileges and
+// steers traffic, so an unverifiable one is not used, ever.
+func TestDiscoverVerifiesNFQWSDigest(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("nfqws discovery here is the Linux one")
+	}
+	digestOf := func(body []byte) string {
+		sum := sha256.Sum256(body)
+		return hex.EncodeToString(sum[:])
+	}
+	setup := func(t *testing.T, body, manifestBody []byte) string {
+		t.Helper()
+		dir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(dir, "nfqws"), body, 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if manifestBody != nil {
+			manifest := digestOf(manifestBody) + "  nfqws\n"
+			if err := os.WriteFile(filepath.Join(dir, "engines.digests"), []byte(manifest), 0o644); err != nil {
+				t.Fatal(err)
+			}
+		}
+		return dir
+	}
+	discover := func(t *testing.T, dir string) *Registry {
+		t.Helper()
+		return Discover(context.Background(), dir, supervise.Config{HomeDir: t.TempDir()})
+	}
+
+	t.Run("matching digest is accepted", func(t *testing.T) {
+		dir := setup(t, []byte("fake-nfqws-binary"), []byte("fake-nfqws-binary"))
+		r := discover(t, dir)
+		if r.nfqws == "" {
+			t.Fatal("nfqws with a matching digest was rejected")
+		}
+		if _, nfqws := r.BypassBackends(); !nfqws {
+			t.Error("BypassBackends does not report the discovered nfqws")
+		}
+		if r.zapretAssets != filepath.Join(dir, "zapret") {
+			t.Errorf("zapretAssets = %q, want the shipped zapret dir", r.zapretAssets)
+		}
+	})
+	t.Run("tampered binary is refused", func(t *testing.T) {
+		dir := setup(t, []byte("fake-nfqws-binary!"), []byte("fake-nfqws-binary"))
+		if r := discover(t, dir); r.nfqws != "" {
+			t.Error("tampered nfqws was accepted; want it refused")
+		}
+	})
+	t.Run("missing manifest is refused", func(t *testing.T) {
+		dir := setup(t, []byte("fake-nfqws-binary"), nil)
+		if r := discover(t, dir); r.nfqws != "" {
+			t.Error("nfqws without a manifest was accepted; want fail-closed refusal")
+		}
+	})
+}
+
+// TestFactoryGatesBypassBackendsSeparately pins the per-backend gate:
+// an nfqws-only plan must not be refused for a missing tpws, and the
+// refusal names the binary that is actually missing.
+func TestFactoryGatesBypassBackendsSeparately(t *testing.T) {
+	nfqStrategy := engine.BypassStrategy{
+		Desync: []string{"fake"}, FakeQUIC: "quic", FilterUDP: "443", FilterL7: "quic",
+	}
+	tpwsStrategy := engine.BypassStrategy{SplitPos: []string{"1"}}
+	planWith := func(s engine.BypassStrategy) *engine.Plan {
+		return &engine.Plan{Outbounds: []engine.Outbound{
+			{ID: "z", Protocol: engine.ProtocolBypass, Bypass: &s},
+		}}
+	}
+	cases := []struct {
+		name    string
+		r       *Registry
+		plan    *engine.Plan
+		wantHas string
+	}{
+		{"nfqws plan, nothing installed", &Registry{}, planWith(nfqStrategy), "nfqws"},
+		{"tpws plan, nothing installed", &Registry{}, planWith(tpwsStrategy), "tpws"},
+		{"nfqws plan, only tpws present", &Registry{tpws: "/tpws"}, planWith(nfqStrategy), "nfqws"},
+		{"tpws plan, only nfqws present", &Registry{nfqws: "/nfqws"}, planWith(tpwsStrategy), "tpws"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := tc.r.Factory()(context.Background(), tc.plan)
+			if err == nil || !strings.Contains(err.Error(), tc.wantHas) {
+				t.Fatalf("err = %v, want a refusal naming %s", err, tc.wantHas)
+			}
+			if errs.KeyOf(err) != errs.KeyEngineBinaryMissing {
+				t.Fatalf("err key = %q, want the missing-engine key", errs.KeyOf(err))
+			}
+		})
+	}
+	// With nfqws present, the nfqws plan passes the zapret gate; the
+	// refusal that follows is about engines, not about zapret.
+	r := &Registry{nfqws: "/nfqws", binaries: map[engine.Kind]supervise.Binary{},
+		preference: engine.DefaultPreference}
+	if _, err := r.Factory()(context.Background(), planWith(nfqStrategy)); err != nil &&
+		strings.Contains(err.Error(), "zapret") {
+		t.Fatalf("nfqws plan refused at the zapret gate although nfqws is present: %v", err)
+	}
 }

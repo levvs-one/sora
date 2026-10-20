@@ -63,6 +63,11 @@ type Registry struct {
 	// tpws is zapret's proxy for bypass outbounds; empty when not
 	// installed.
 	tpws string
+	// nfqws is zapret's packet filter for desync bypass outbounds;
+	// empty when not installed. zapretAssets is the shipped zapret
+	// directory holding its fake/ payloads.
+	nfqws        string
+	zapretAssets string
 
 	mu   sync.Mutex
 	last engine.Selection
@@ -85,6 +90,22 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 				r.tpws = candidate
 			}
 		}
+		// nfqws (winws.exe on Windows) gets exactly the tpws treatment:
+		// same executable-bit and digest gates — an unverifiable
+		// packet filter must never run with the core's privileges.
+		nfqwsName := "nfqws"
+		if runtime.GOOS == "windows" {
+			nfqwsName = "winws.exe"
+		}
+		candidate = filepath.Join(enginesDir, nfqwsName)
+		if info, err := os.Stat(candidate); err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 { //nolint:gosec // the engines directory is set by the service, not by a client
+			if verr := supervise.VerifyNamedInDir(enginesDir, nfqwsName); verr == nil {
+				r.nfqws = candidate
+			}
+		}
+		// The shipped fake payloads live next to the binaries; the
+		// nfqws executor resolves strategy fake names under it.
+		r.zapretAssets = filepath.Join(enginesDir, "zapret")
 	}
 	discovery := supervise.DiscoveryOptions{AllowEnvBin: base.AllowEnvBin}
 	for _, kind := range engine.DefaultPreference {
@@ -121,6 +142,14 @@ func (r *Registry) Usable() bool { return len(r.binaries) > 0 }
 // BypassAvailable reports whether the serverless engine can run on this platform.
 func (r *Registry) BypassAvailable() bool {
 	return runtime.GOOS == "linux" && r.tpws != "" && r.Usable()
+}
+
+// BypassBackends reports which zapret backends discovery found (and
+// digest-verified) in the engines directory: the tpws proxy and the
+// nfqws packet filter. Availability reporting names the backends
+// separately because a plan may need either — or both.
+func (r *Registry) BypassBackends() (tpws, nfqws bool) {
+	return r.tpws != "", r.nfqws != ""
 }
 
 // LastSelection returns the latest engine choice and rejection reasons for
@@ -172,10 +201,29 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		}
 		withBypass := bypass.Has(p)
 		// Missing installations use the missing-engine key rather than
-		// an invalid-plan error.
-		if withBypass && r.tpws == "" {
-			return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
-				"registry: bypass outbounds need zapret's tpws in the engines directory")
+		// an invalid-plan error. The gate is per backend: a plan whose
+		// bypass outbounds are all nfqws-bound needs nfqws, not tpws,
+		// and a mixed plan needs both (NFQWS-MIGRATION.md §4).
+		if withBypass {
+			needsTPWS, needsNFQWS := false, false
+			for _, o := range p.Outbounds {
+				if o.Protocol != engine.ProtocolBypass {
+					continue
+				}
+				if o.Bypass != nil && bypass.BackendOf(*o.Bypass) == bypass.BackendNFQWS {
+					needsNFQWS = true
+				} else {
+					needsTPWS = true
+				}
+			}
+			if needsTPWS && r.tpws == "" {
+				return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
+					"registry: bypass outbounds need zapret's tpws in the engines directory")
+			}
+			if needsNFQWS && r.nfqws == "" {
+				return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
+					"registry: bypass outbounds need zapret's nfqws in the engines directory")
+			}
 		}
 		// Select capabilities against the SOCKS5 plan produced by
 		// bypass rewriting. Plans without a bypass outbound (the common
@@ -212,7 +260,8 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		if err != nil || !withBypass {
 			return built, err
 		}
-		return bypass.Wrap(built, r.tpws, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs), nil
+		return bypass.Wrap(built, bypass.Binaries{TPWS: r.tpws, NFQWS: r.nfqws, Assets: r.zapretAssets},
+			filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs), nil
 	}
 }
 
