@@ -246,23 +246,6 @@
   "updateCopyCommand": "복사 명령",
   "updateChecksDisabled": "설정에서 자동 검사가 비활성화되어 있습니다.",
   "updateInstalled": "업데이트가 설치되었습니다. Sora를 다시 엽니다.",
-  "@updateRollbacking": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      }
-    }
-  },
-  "@updateRolledBack": {
-    "placeholders": {
-      "version": {
-        "type": "String"
-      },
-      "fromVersion": {
-        "type": "String"
-      }
-    }
-  },
   "projectLinks": "프로젝트",
   "githubReleases": "릴리스 및 다운로드",
   "telegramChannel": "Telegram 채널",
@@ -583,10 +566,6 @@
   "updateWindowsSigBlocked": "Automatic installation is disabled on Windows until release-signature verification is implemented. Download the installer from the release page and verify it manually.",
   "updateVersionRevoked": "This version has been recalled by the developer. Please wait for a fixed release.",
   "updateRolloutPending": "A newer version is rolling out gradually and will be offered to you automatically.",
-  "updateRollbacking": "Rolling back to version {version}...",
-  "updateRolledBack": "The update to {version} did not pass the health check, so Sora was rolled back to {fromVersion}.",
-  "updateRollbackError": "Automatic rollback failed. If Sora does not work correctly, reinstall the previous version manually with the command below.",
-  "updateRollbackCacheError": "Could not prepare a verified rollback copy of the current version, so the update was not installed.",
   "extRatingLabel": "Rating {rating} of 5",
   "@extRatingLabel": {"placeholders": {"rating": {"type": {"type": "String"}}}},
   "extByAuthor": "by {author}",

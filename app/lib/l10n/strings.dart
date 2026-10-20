@@ -2083,10 +2083,6 @@ abstract class S {
   String get updateWindowsSigBlocked;
   String get updateVersionRevoked;
   String get updateRolloutPending;
-  String updateRollbacking(String version);
-  String updateRolledBack(String version, String fromVersion);
-  String get updateRollbackError;
-  String get updateRollbackCacheError;
   String get crashRestoreTitle;
 
   /// No description provided for @restoreOnCrash.
