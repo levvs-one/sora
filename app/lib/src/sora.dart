@@ -533,6 +533,26 @@ class Sora extends ChangeNotifier {
   final Map<String, SubscriptionState> _subscriptions = {};
   List<SubscriptionState> get subscriptions => _subscriptions.values.toList();
 
+  /// Routing layers the core holds per subscription (F6 extra rules +
+  /// C3 provider routing), keyed by subscription id. Filled by
+  /// [_refreshCoreOverrides] from GetSubscriptionOverride and read
+  /// synchronously by [currentPlan]/[buildPlan] when a plan is merged.
+  final Map<String, CoreSubscriptionRules> _coreRules = {};
+
+  /// Outbound id -> owning subscription id, for plan-time layer gating
+  /// in [buildPlan]. Custom servers are merged into every subscription
+  /// state (INT-1) and belong to no subscription, so they are excluded:
+  /// a custom server never receives a subscription's layer.
+  Map<String, String> get _serverSubscriptions {
+    final out = <String, String>{};
+    for (final s in _subscriptions.values) {
+      for (final o in s.outbounds) {
+        if (!o.id.startsWith(customServerPrefix)) out.putIfAbsent(o.id, () => s.settings.id);
+      }
+    }
+    return out;
+  }
+
   /// Server latency in milliseconds; null means the server did not respond.
   final Map<String, int?> latency = {};
 
@@ -678,6 +698,8 @@ class Sora extends ChangeNotifier {
       chain: hops,
       zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
       reliabilityOf: reliabilityOf,
+      coreRules: _coreRules,
+      serverSubscription: _serverSubscriptions,
     );
     // Against a core before 1.12 the pick group cannot carry the choice
     // (see stripPickGroup); planning in the stripped shape keeps plan
@@ -898,8 +920,14 @@ class Sora extends ChangeNotifier {
       final id = state.settings.id;
       if (state.deleted) {
         _subscriptions.remove(id);
+        _coreRules.remove(id);
       } else {
         _subscriptions[id] = state;
+        // The stored routing layer may have changed with this state (a
+        // refresh replaces the provider layer wholesale): refetch it so
+        // the next plan merges the fresh rules, then notify so plan
+        // comparisons see them.
+        unawaited(_refreshCoreOverride(link, id).then((_) => notifyListeners()));
       }
       final key = state.hasLastError() ? state.lastError.userMessageKey : '';
       if (key.isNotEmpty) {
@@ -909,6 +937,46 @@ class Sora extends ChangeNotifier {
       }
       notifyListeners();
     }, onError: _drop);
+  }
+
+  /// Fetches the core-held routing layers (F6 extra rules + C3 provider
+  /// routing) for every known subscription and caches them for the plan
+  /// builder. Called on every subscription watch event (per changed
+  /// subscription) and before every connect (all subscriptions), so a
+  /// layer that failed to load is retried instead of being silently
+  /// dropped forever.
+  Future<void> _refreshCoreOverrides() async {
+    final link = _link;
+    if (link == null) return;
+    await Future.wait([for (final id in _subscriptions.keys.toList()) _refreshCoreOverride(link, id)]);
+  }
+
+  Future<void> _refreshCoreOverride(CoreLink link, String id) async {
+    try {
+      final answer = await link.stub.getSubscriptionOverride(
+        GetSubscriptionOverrideRequest(apiVersion: apiVersion, controlAuthenticator: link.token, subscriptionId: id),
+      );
+      if (_disposed || link != _link) return;
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      ({String destination, String outboundId}) wire(OverrideRule r) =>
+          (destination: r.destination, outboundId: r.outboundId);
+      final rules = CoreSubscriptionRules(
+        extraRules: [for (final r in answer.extraRules) wire(r)],
+        providerRules: [for (final r in answer.providerRouting) wire(r)],
+      );
+      if (rules.isEmpty) {
+        _coreRules.remove(id);
+      } else {
+        _coreRules[id] = rules;
+      }
+    } catch (error) {
+      // Honest fallback: the next plan is built without this
+      // subscription's layer and the miss is logged, never fatal —
+      // connecting without the provider's rules beats not connecting.
+      // The layer is retried on the next watch event and connect.
+      debugPrint('[override] GetSubscriptionOverride($id) failed; planning without its routing layer: $error');
+      _coreRules.remove(id);
+    }
   }
 
   /// Replaces the current session watch. Events before [since] update state
@@ -1343,6 +1411,12 @@ class Sora extends ChangeNotifier {
       return;
     }
     failure = null;
+    // Refresh the core-held routing layers (F6 extra rules + C3
+    // provider routing) so the plan below merges the current rules;
+    // a failed fetch plans without the layer and logs (see
+    // _refreshCoreOverride), it never blocks the connect.
+    await _refreshCoreOverrides();
+    if (_disposed || link != _link) return;
     if (selected != 'bypass' && servers.isEmpty) {
       failure = const CoreFailure('app.no_servers');
       _emit(ConnectionFailed(failure!));
@@ -1379,6 +1453,8 @@ class Sora extends ChangeNotifier {
             chain: via.hops,
             zapretWithVpn: settings.zapretWithVpn && Platform.isLinux && serverlessAvailable,
             reliabilityOf: reliabilityOf,
+            coreRules: _coreRules,
+            serverSubscription: _serverSubscriptions,
           );
     if (plan.tunStack.isNotEmpty && link.minor < 7) {
       failure = const CoreFailure('core.api.version_mismatch');
@@ -2255,6 +2331,15 @@ class Sora extends ChangeNotifier {
 /// Builds routing for [choice]: auto selects the fastest ordinary server,
 /// bypass uses no server, or an ID selects one. A provider Xray profile runs as
 /// the sole outbound; profile-only auto selection uses [latency].
+///
+/// [coreRules] are the core-held subscription layers (F6 extra rules +
+/// C3 provider routing) by subscription id, and [serverSubscription]
+/// maps an outbound id to its owning subscription: a subscription's
+/// layer is merged only when the session's servers belong to that
+/// subscription (custom servers belong to none and never receive a
+/// layer). Layer rules land after the user's own rules — the engines
+/// match routes in order (first match wins), so user rules outrank the
+/// provider's, and the plan default decides what neither covers.
 SessionPlan buildPlan({
   required List<OutboundSpec> servers,
   required String choice,
@@ -2265,6 +2350,8 @@ SessionPlan buildPlan({
   List<String> chain = const [],
   bool zapretWithVpn = false,
   double? Function(String id)? reliabilityOf,
+  Map<String, CoreSubscriptionRules> coreRules = const {},
+  Map<String, String> serverSubscription = const {},
 }) {
   final plan = SessionPlan(
     tunnelMode: settings.tunnel == 'proxy' ? TunnelMode.TUNNEL_MODE_APPLICATION : TunnelMode.TUNNEL_MODE_SYSTEM,
@@ -2300,6 +2387,45 @@ SessionPlan buildPlan({
     }
   }
 
+  // Subscription layers (F6 extra rules + C3 provider routing) merge
+  // right after the user's own rules: user agency first, the provider's
+  // layer below it, the plan default last — the engines match routes in
+  // order, so list order here IS the precedence. Only the subscriptions
+  // named by [subs] contribute (the ones this branch's servers belong
+  // to). A rule's "proxy" sentinel resolves to this branch's proxy
+  // target — passing it through raw would name no outbound and no
+  // built-in target and the core would reject the whole plan;
+  // "direct"/"reject" stay the built-in targets and any other outbound
+  // id passes through as stored.
+  void addLayerRules(String proxy, Iterable<String> subs) {
+    final ids = subs.toSet();
+    if (ids.isEmpty || coreRules.isEmpty) return;
+    void emit(List<({String destination, String outboundId})> rules) {
+      for (final rule in rules) {
+        if (rule.destination.isEmpty || rule.outboundId.isEmpty) continue;
+        final target = rule.outboundId == 'proxy' ? proxy : rule.outboundId;
+        plan.routes.add(RoutingRule(destination: rule.destination, outboundId: target));
+      }
+    }
+
+    // Every subscription's user extra rules outrank every provider
+    // rule, even when auto selection spans several subscriptions.
+    for (final id in ids) {
+      final layer = coreRules[id];
+      if (layer != null) emit(layer.extraRules);
+    }
+    for (final id in ids) {
+      final layer = coreRules[id];
+      if (layer != null) emit(layer.providerRules);
+    }
+  }
+
+  // The subscriptions owning [outbounds], in list order.
+  List<String> subsOf(Iterable<OutboundSpec> outbounds) => [
+    for (final o in outbounds)
+      if (serverSubscription[o.id] != null) serverSubscription[o.id]!,
+  ];
+
   // F11: zapret's tpws alongside the VPN tunnel (Linux only, needs tpws in
   // the engines directory); never in serverless bypass mode.
   if (zapretWithVpn && choice != 'bypass') {
@@ -2325,6 +2451,7 @@ SessionPlan buildPlan({
     plan.chain.addAll(chain);
     plan.routing.proxyTarget = chain.first;
     addRules(chain.first);
+    addLayerRules(chain.first, subsOf(hops));
     return plan;
   }
 
@@ -2387,6 +2514,7 @@ SessionPlan buildPlan({
     );
     plan.routing.proxyTarget = Sora.entryGroup;
     addRules(Sora.entryGroup);
+    addLayerRules(Sora.entryGroup, subsOf(entry.members));
     return plan;
   }
   final picked = profiles.where((o) => o.id == choice).firstOrNull;
@@ -2403,6 +2531,7 @@ SessionPlan buildPlan({
     plan.outbounds.add(profile);
     plan.routing.proxyTarget = profile.id;
     addRules(profile.id);
+    addLayerRules(profile.id, subsOf([profile]));
     return plan;
   }
   plan.outbounds.addAll(ordinary);
@@ -2455,6 +2584,15 @@ SessionPlan buildPlan({
     plan.routing.proxyTarget = choice;
   }
   addRules(plan.routing.proxyTarget);
+  // A specific pick receives only its own subscription's layer; auto
+  // spans every subscription in the plan, so all of their layers merge
+  // (in server order, extra rules before provider rules throughout).
+  addLayerRules(
+    plan.routing.proxyTarget,
+    choice == 'auto'
+        ? subsOf(ordinary)
+        : [if (serverSubscription[choice] != null) serverSubscription[choice]!],
+  );
   return plan;
 }
 

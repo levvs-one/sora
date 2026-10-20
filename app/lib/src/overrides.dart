@@ -4,15 +4,17 @@ import 'package:flutter/foundation.dart';
 
 /// User edits layered over a subscription: server renames and hidden servers.
 ///
-/// Stored locally in settings (`subscriptionOverrides`). The core has its own
-/// override store with the SaveSubscriptionOverride/GetSubscriptionOverride
-/// RPCs (`core/control/override.go`, `core/subscription/override.go`) —
-/// implemented, but the app never calls them: this local store is the source
-/// of truth the UI edits and the plan builder applies. Note the core still
-/// applies its (normally empty) overrides to the subscription states it
-/// serves (`subscriptionBook.stateLocked`), so the two stores must not be
-/// confused when debugging server lists. Open owner decision: either
-/// delegate this store to the core RPCs or accept the permanent split.
+/// Stored locally in settings (`subscriptionOverrides`); this local store
+/// is the source of truth the UI edits for renames and hides. The core has
+/// its own override store with the SaveSubscriptionOverride/
+/// GetSubscriptionOverride RPCs (`core/control/override.go`,
+/// `core/subscription/override.go`), and the two stores must not be
+/// confused when debugging server lists: the core applies its renames/
+/// hides/pins to the subscription states it serves, while the routing
+/// rules the core holds (below) only take effect because the app fetches
+/// them and merges them into the session plan. Open owner decision:
+/// either delegate the rename/hide store to the core RPCs too, or accept
+/// the permanent split.
 class SubscriptionOverride {
   const SubscriptionOverride({this.renames = const {}, this.hidden = const {}});
 
@@ -48,6 +50,24 @@ class SubscriptionOverride {
 
   SubscriptionOverride copyWith({Map<String, String>? renames, Set<String>? hidden}) =>
       SubscriptionOverride(renames: renames ?? this.renames, hidden: hidden ?? this.hidden);
+}
+
+/// Routing rules the core holds for one subscription, fetched with
+/// GetSubscriptionOverride and cached by Sora for the plan builder:
+/// the user's per-subscription extra rules (F6) and the provider's
+/// routing layer (C3, converted from the Happ happRouting payload at
+/// refresh time). Both lists keep the wire form — destination in the
+/// core contract's form, outboundId a built-in target (`direct`,
+/// `reject`), a concrete outbound id, or the sentinel `proxy`, which
+/// the plan builder substitutes with the session proxy target when
+/// merging (the core cannot know that target).
+class CoreSubscriptionRules {
+  const CoreSubscriptionRules({this.extraRules = const [], this.providerRules = const []});
+
+  final List<({String destination, String outboundId})> extraRules;
+  final List<({String destination, String outboundId})> providerRules;
+
+  bool get isEmpty => extraRules.isEmpty && providerRules.isEmpty;
 }
 
 /// Loads, caches and persists per-subscription overrides.
