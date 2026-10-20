@@ -55,7 +55,17 @@ func prepareTun(p *Plan, listAddrs func() ([]net.Addr, error)) error {
 		used = append(used, prefix)
 	}
 	fake := p.DNS.FakeIPRange
-	configured := fake != ""
+	// A pool this package itself picked is not a user configuration:
+	// PrepareTun persists its choice into the plan (below), and the
+	// Connect path prepares the same plan more than once. The spare
+	// pools live outside the benchmark range by design, so treating a
+	// re-entered plan's spare as "configured" would reject the core's
+	// own fallback with "must be within 198.18.0.0/15" — TUN could
+	// never start on a host whose 198.18.0.0/15 is genuinely occupied.
+	// The spares are documentation ranges outside private and
+	// link-local space (TestFallbackPoolsAreSafe), so accepting one
+	// verbatim is exactly as safe as picking it fresh.
+	configured := fake != "" && !slices.Contains(fakeIPPools, fake)
 	if !configured {
 		// A real 198.18.0.0/15 network makes the default unusable; fall
 		// back to another benchmark range instead of refusing to start

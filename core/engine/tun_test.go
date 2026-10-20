@@ -110,6 +110,30 @@ func TestFakeIPPoolFallsBackWhenTheDefaultIsTaken(t *testing.T) {
 	}
 }
 
+// TestFakeIPPoolFallbackSurvivesReprepare: PrepareTun persists the pool
+// it picked into the plan, and the Connect path prepares the same plan
+// more than once. The second pass must accept the core's own spare pool
+// instead of rejecting it as a user configuration outside the benchmark
+// range (the integration E2E caught exactly this on a host whose egress
+// interface sits inside 198.18.0.0/15: TUN Connect always failed with
+// "fake-IP pool must be within 198.18.0.0/15").
+func TestFakeIPPoolFallbackSurvivesReprepare(t *testing.T) {
+	p := &Plan{Tun: Tun{Enabled: true}, DNS: DNS{FakeIPRange: ""}}
+	addrs := fakeAddrs("198.19.0.2/30")
+	if err := prepareTun(p, addrs); err != nil {
+		t.Fatalf("first prepareTun() error = %v", err)
+	}
+	if p.DNS.FakeIPRange != "198.51.100.0/24" {
+		t.Fatalf("fallback pool = %q, want the first spare benchmark range", p.DNS.FakeIPRange)
+	}
+	if err := prepareTun(p, addrs); err != nil {
+		t.Fatalf("second prepareTun() error = %v: the core rejected its own fallback pool", err)
+	}
+	if p.DNS.FakeIPRange != "198.51.100.0/24" {
+		t.Fatalf("pool changed across reprepare: %q", p.DNS.FakeIPRange)
+	}
+}
+
 // TestFakeIPPoolExhaustion: every benchmark range occupied is a hard but
 // honest error — it reaches the UI through the localized plan error key,
 // never as a raw string.
