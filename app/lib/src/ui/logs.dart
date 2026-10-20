@@ -36,6 +36,10 @@ class _LogsScreenState extends State<LogsScreen> {
   LogLevel _level = LogLevel.LOG_LEVEL_DEBUG;
   String _section = 'all';
   List<LogEntry> _entries = [];
+  // Sequences currently held in [_entries], for O(1) duplicate detection.
+  // A linear indexWhere per event janks on slow machines once the buffer
+  // grows towards [_keep] (audit M18).
+  final Set<Int64> _known = {};
   StreamSubscription<LogEntry>? _watch;
   Timer? _debounce;
   bool _loaded = false;
@@ -113,6 +117,9 @@ class _LogsScreenState extends State<LogsScreen> {
       if (!mounted || revision != _revision || link != SoraScope.read(context).link) return;
       setState(() {
         _entries = page.entries.toList();
+        _known
+          ..clear()
+          ..addAll(page.entries.map((e) => e.sequence));
         _before = page.beforeSequence;
         _olderLoading = false;
         _above = 0;
@@ -159,9 +166,10 @@ class _LogsScreenState extends State<LogsScreen> {
       );
       if (page.hasError()) throw CoreFailure(page.error.userMessageKey);
       if (!mounted || revision != _revision || _link != link) return;
-      final known = _entries.map((e) => e.sequence).toSet();
       setState(() {
-        _entries.addAll(page.entries.where((e) => !known.contains(e.sequence)));
+        for (final entry in page.entries) {
+          if (_known.add(entry.sequence)) _entries.add(entry);
+        }
         _before = page.beforeSequence;
       });
     } catch (error) {
@@ -179,13 +187,14 @@ class _LogsScreenState extends State<LogsScreen> {
     setState(() {
       if (atTop) _above = 0;
       // Repeated messages retain their sequence number and update the repeat
-      // count.
-      final index = _entries.indexWhere((e) => e.sequence == entry.sequence);
-      if (index >= 0) {
-        _entries[index] = entry;
+      // count. Membership is O(1); only the rare repeat path scans.
+      if (_known.contains(entry.sequence)) {
+        final index = _entries.indexWhere((e) => e.sequence == entry.sequence);
+        if (index >= 0) _entries[index] = entry;
       } else {
+        _known.add(entry.sequence);
         _entries.insert(0, entry);
-        if (_entries.length > _keep) _entries.removeLast();
+        if (_entries.length > _keep) _known.remove(_entries.removeLast().sequence);
         // New entries grow above the viewport anchor while older text is read.
         _above = atTop ? 0 : (_above + 1).clamp(0, _entries.length);
       }
@@ -239,6 +248,7 @@ class _LogsScreenState extends State<LogsScreen> {
       if (mounted) {
         setState(() {
           _entries = [];
+          _known.clear();
           _above = 0;
           _before = Int64.ZERO;
         });
@@ -248,19 +258,21 @@ class _LogsScreenState extends State<LogsScreen> {
     }
   }
 
-  Future<void> _diagnostic(String extension) async {
+  /// Exports one diagnostics bundle: the client-side HTTP archive ('har')
+  /// or the core's redacted diagnostics archive ('archive', a zip built by
+  /// ExportDiagnostics with the default format). Raw capture formats are
+  /// gone on purpose: the core refuses PCAPNG/EVTX outright (SORA-H3), so
+  /// the menu no longer offers what the core cannot produce.
+  Future<void> _diagnostic(String kind) async {
     if (!mounted) return;
     final sora = SoraScope.read(context), s = S.of(context);
+    final isHar = kind == 'har';
     final name =
-        'sora-log_${switch (extension) {
-          'har' => 'http',
-          'pcapng' => 'packets',
-          _ => 'windows-events',
-        }}_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.$extension';
+        'sora-log_${isHar ? 'http' : 'core'}_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.${isHar ? 'har' : 'zip'}';
     ResponseFuture<ExportDiagnosticsResponse>? request;
     try {
       List<int> data;
-      if (extension == 'har') {
+      if (isHar) {
         if (sora.browserDiagnostics.length == 0) {
           await sora.recordNotification(
             AppNotification(
@@ -276,27 +288,11 @@ class _LogsScreenState extends State<LogsScreen> {
       } else {
         final link = sora.link;
         if (link == null || _capture != null) return;
-        if (!sora.coreCapabilities.contains('native-diagnostics')) throw const CoreFailure('core.api.version_mismatch');
-        if (extension == 'evtx' && !Platform.isWindows) {
-          await sora.recordNotification(
-            AppNotification(time: DateTime.now(), title: s.diagnosticEvents, body: s.diagnosticUnavailable),
-          );
-          return;
-        }
-        if (extension == 'pcapng' && (sora.phase != Phase.connected || sora.settings.tunnel != 'tun')) {
-          await sora.recordNotification(
-            AppNotification(time: DateTime.now(), title: s.diagnosticPackets, body: s.diagnosticRequiresTun),
-          );
-          return;
-        }
         request = link.stub.exportDiagnostics(
           ExportDiagnosticsRequest(
             apiVersion: apiVersion,
             controlAuthenticator: link.token,
             sessionId: sora.sessionId,
-            format: extension == 'pcapng'
-                ? DiagnosticFormat.DIAGNOSTIC_FORMAT_PCAPNG
-                : DiagnosticFormat.DIAGNOSTIC_FORMAT_EVTX,
           ),
           options: CallOptions(timeout: const Duration(seconds: 30)),
         );
@@ -322,6 +318,13 @@ class _LogsScreenState extends State<LogsScreen> {
   Widget build(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
+    // The export-menu labels embed the filename's date stamp: compute it
+    // once per build pass instead of constructing a DateFormat for every
+    // menu item on every rebuild — this screen rebuilds on every log entry
+    // that streams in. The export itself still stamps at capture time via
+    // [_filename].
+    final stamp = DateFormat('dd_MM_yyyy').format(DateTime.now());
+    String menuFilename(String extension) => 'sora-log_${_section}_$stamp.$extension';
     return Screen(
       title: s.logs,
       actions: [
@@ -360,31 +363,23 @@ class _LogsScreenState extends State<LogsScreen> {
                   padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 12)),
                 ),
                 child: Text(
-                  s.exportLogFile(_filename(extension)),
+                  s.exportLogFile(menuFilename(extension)),
                   style: Styles.secondary.copyWith(color: palette.ink),
                 ),
               ),
             const Divider(height: 12),
-            for (final (extension, label, icon) in [
-              ('har', s.diagnosticHttp, Symbols.language_rounded),
-              ('pcapng', s.diagnosticPackets, Symbols.network_check_rounded),
-              if (Platform.isWindows) ('evtx', s.diagnosticEvents, Symbols.article_rounded),
+            for (final (kind, icon) in [
+              ('har', Symbols.language_rounded),
+              ('archive', Symbols.article_rounded),
             ])
               MenuItemButton(
-                onPressed: _capture == null ? () => unawaited(_diagnostic(extension)) : null,
+                onPressed: _capture == null ? () => unawaited(_diagnostic(kind)) : null,
                 leadingIcon: Icon(icon, size: 18, color: palette.ink),
-                child: Tooltip(
-                  message: extension == 'pcapng' ? '${s.diagnosticPackets}: ${s.diagnosticCapture}' : label,
-                  child: Text(
-                    s.exportLogFile(
-                      'sora-log_${switch (extension) {
-                        'har' => 'http',
-                        'pcapng' => 'packets',
-                        _ => 'windows-events',
-                      }}_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.$extension',
-                    ),
-                    style: Styles.secondary.copyWith(color: palette.ink),
+                child: Text(
+                  s.exportLogFile(
+                    'sora-log_${kind == 'har' ? 'http' : 'core'}_$stamp.${kind == 'har' ? 'har' : 'zip'}',
                   ),
+                  style: Styles.secondary.copyWith(color: palette.ink),
                 ),
               ),
           ],

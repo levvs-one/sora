@@ -84,24 +84,29 @@ class TourScrim extends StatelessWidget {
       tween: RectTween(begin: rect, end: rect),
       duration: duration,
       curve: Curves.easeOutCubic,
-      builder: (_, value, _) => CustomPaint(painter: _Cutout(value!, radius), size: Size.infinite),
+      builder: (_, value, _) => CustomPaint(
+        painter: _Cutout(value!, radius, Palette.of(context).scrim),
+        size: Size.infinite,
+      ),
     ),
   );
 }
 
 class _Cutout extends CustomPainter {
-  const _Cutout(this.rect, this.radius);
+  const _Cutout(this.rect, this.radius, this.color);
   final Rect rect;
   final double radius;
+  final Color color;
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path()
       ..fillType = PathFillType.evenOdd
       ..addRect(Offset.zero & size)
       ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)));
-    canvas.drawPath(path, Paint()..color = const Color(0xB3000000));
+    canvas.drawPath(path, Paint()..color = color);
   }
 
   @override
-  bool shouldRepaint(_Cutout oldDelegate) => rect != oldDelegate.rect || radius != oldDelegate.radius;
+  bool shouldRepaint(_Cutout oldDelegate) =>
+      rect != oldDelegate.rect || radius != oldDelegate.radius || color != oldDelegate.color;
 }

@@ -21,10 +21,38 @@ Future<void> main(List<String> args) async {
   final sora = Sora(await Settings.load());
   unawaited(sora.run());
   final navigator = GlobalKey<NavigatorState>();
+  // A link passed on the command line launches the app (cold start).
+  // app_links only reports links received while the app runs, so the launch
+  // argument is extracted here and delivered after startup.
+  final launchLink = _launchLink(args);
   final desktop = Platform.isLinux || Platform.isWindows ? Desktop(sora, navigator) : null;
   await desktop?.start(hidden: args.contains('--hidden'));
   runApp(SoraApp(sora: sora, navigator: navigator, desktop: desktop));
-  WidgetsBinding.instance.addPostFrameCallback((_) => sora.updates.start());
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    sora.updates.start();
+    // S11b: post-update health check / automatic rollback. No-op unless a
+    // pending-update marker was written by the previous build (Linux only).
+    if (desktop != null) {
+      unawaited(
+        sora.updates.checkPendingUpdate(
+          coreHealthy: () => sora.coreHandshakeDone,
+          restart: desktop.restartAfterUpdate,
+          quit: desktop.quit,
+        ),
+      );
+    }
+  });
+  await desktop?.handleInitialLinks(launchLink);
+}
+
+/// First command-line argument that looks like a link; option flags are
+/// skipped. Mirrors the native runners' find_link_arg.
+String? _launchLink(List<String> args) {
+  for (final arg in args) {
+    if (arg.startsWith('-')) continue;
+    if (arg.contains('://')) return arg;
+  }
+  return null;
 }
 
 class SoraApp extends StatefulWidget {
@@ -41,6 +69,13 @@ class SoraApp extends StatefulWidget {
 class _SoraAppState extends State<SoraApp> {
   static bool _licensesRegistered = false;
   late final _navigator = widget.navigator ?? GlobalKey<NavigatorState>();
+
+  // buildTheme is a pure function of brightness (fixed palettes), but
+  // SoraApp rebuilds on every Sora notification — probe ticks, state
+  // changes — and used to construct both ThemeData trees (ColorScheme,
+  // component themes) on every rebuild. Build each once per app run.
+  late final _lightTheme = buildTheme(Brightness.light);
+  late final _darkTheme = buildTheme(Brightness.dark);
 
   @override
   void initState() {
@@ -69,8 +104,8 @@ class _SoraAppState extends State<SoraApp> {
           child: MaterialApp(
             title: 'Sora',
             debugShowCheckedModeBanner: false,
-            theme: buildTheme(Brightness.light),
-            darkTheme: buildTheme(Brightness.dark),
+            theme: _lightTheme,
+            darkTheme: _darkTheme,
             themeMode: switch (sora.settings.theme) {
               'light' => ThemeMode.light,
               'dark' => ThemeMode.dark,
@@ -90,7 +125,11 @@ class _SoraAppState extends State<SoraApp> {
             ],
             supportedLocales: S.supportedLocales,
             navigatorKey: _navigator,
-            builder: (_, child) => NotificationToasts(sora: sora, navigator: _navigator, child: child!),
+            builder: (_, child) => NotificationToasts(
+              sora: sora,
+              navigator: _navigator,
+              child: child!,
+            ),
             home: const DesktopShell(),
           ),
         ),

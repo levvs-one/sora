@@ -1,9 +1,22 @@
+import 'dart:convert';
 import 'dart:io' show Platform;
+import 'dart:math' show Random;
 import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'notifications.dart';
+
+/// Random UUID v4 for the staged-rollout install cohort (S11a). Not a
+/// security token — only a stable, uniformly distributed install identity.
+String _newInstallUuid() {
+  final random = Random.secure();
+  final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+  bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 10xxxxxx
+  final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+  return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}';
+}
 
 /// Locally persisted app preferences. The core stores subscriptions and servers
 /// encrypted and updates them while the UI is closed.
@@ -17,6 +30,7 @@ class Settings {
   static const _keys = {
     'format', 'server', 'preset', 'blockAds', 'killSwitch', 'engine', 'animations', 'theme', 'language', //
     'fragment', 'fragmentPackets', 'fragmentLength', 'fragmentInterval', 'ipv6', 'dns', //
+    'dnsPreset', 'dnsLeakLastCheck', //
     'probeMethod',
     'probeUrl',
     'probeTimeout',
@@ -43,6 +57,20 @@ class Settings {
     'checkUpdates',
     'notifiedUpdate',
     'resumeAfterUpdate',
+    'pendingUpdate',
+    'lastRollback',
+    'installUuid',
+    'serverSortMode',
+    'autoSelectMode',
+    'autoSwitchOnDegrade',
+    'restoreOnCrash',
+    'benchmarkHistory',
+    'sessionIntent',
+    'subscriptionOverrides',
+    'networkProfiles',
+    'proxyChains',
+    'syncedDevices',
+    'zapretWithVpn',
   };
 
   final SharedPreferencesWithCache _store;
@@ -61,6 +89,12 @@ class Settings {
       // Detect upgrades before migration writes its own defaults.
       final existing = _keys.where((key) => key != 'tourDone').any(_store.containsKey);
       await _store.setBool('tourDone', existing);
+    }
+    if (!_store.containsKey('installUuid')) {
+      // Stable per-install identifier for the staged-rollout cohort (S11a).
+      // Generated once; the cohort (SHA-256(uuid) mod 100) never changes
+      // while this value is stored.
+      await _store.setString('installUuid', _newInstallUuid());
     }
     final stored = _store.getInt('format') ?? 0;
     if (stored > format) {
@@ -136,6 +170,15 @@ class Settings {
   List<String> get dns => _store.getStringList('dns') ?? const [];
   set dns(List<String> value) => _store.setStringList('dns', value);
 
+  /// DNS preset id: auto, cloudflare, google, quad9, adguard or custom.
+  /// Custom stores its resolvers in [dns]; presets resolve to fixed lists.
+  String get dnsPreset => _store.getString('dnsPreset') ?? 'auto';
+  set dnsPreset(String value) => _store.setString('dnsPreset', value);
+
+  /// Last leak-check timestamp in millis since epoch; zero means never checked.
+  int get dnsLeakLastCheck => _store.getInt('dnsLeakLastCheck') ?? 0;
+  set dnsLeakLastCheck(int value) => _store.setInt('dnsLeakLastCheck', value);
+
   /// Probe method: auto uses the server's engine when available; engine or
   /// connect pins the method.
   String get probeMethod => _store.getString('probeMethod') ?? 'auto';
@@ -200,7 +243,11 @@ class Settings {
   set xrayTunStack(String value) => _store.setString('xrayTunStack', value);
 
   /// Starts Sora in the tray at login.
-  bool get launchAtLogin => _store.getBool('launchAtLogin') ?? true;
+  ///
+  /// Opt-in by owner decision: the default is off. The fallback below only
+  /// applies when the key was never written, so existing users who enabled
+  /// it keep their choice; no migration ever resets a stored value.
+  bool get launchAtLogin => _store.getBool('launchAtLogin') ?? false;
   set launchAtLogin(bool value) => _store.setBool('launchAtLogin', value);
 
   /// Keeps Sora in the tray when the window closes.
@@ -217,6 +264,77 @@ class Settings {
   Future<void> saveNotifiedUpdate(String value) => _store.setString('notifiedUpdate', value);
   bool get resumeAfterUpdate => _store.getBool('resumeAfterUpdate') ?? false;
   Future<void> saveResumeAfterUpdate(bool value) => _store.setBool('resumeAfterUpdate', value);
+
+  /// Post-update health-check marker (S11b): JSON
+  /// `{"from":"1.2.3","to":"1.3.0","atMs":169...}`, written before the
+  /// privileged helper runs. The new build clears it once the core answers
+  /// the control channel; a stale marker triggers the automatic rollback.
+  String get pendingUpdate => _store.getString('pendingUpdate') ?? '';
+  Future<void> savePendingUpdate(String value) => _store.setString('pendingUpdate', value);
+  Future<void> clearPendingUpdate() => _store.remove('pendingUpdate');
+
+  /// Notice of the last automatic rollback (S11b): JSON `{"from","to"}`.
+  /// Survives the restart the rollback performs so About can report it.
+  String get lastRollback => _store.getString('lastRollback') ?? '';
+  Future<void> saveLastRollback(String from, String to) =>
+      _store.setString('lastRollback', jsonEncode({'from': from, 'to': to}));
+  Future<void> clearLastRollback() => _store.remove('lastRollback');
+
+  /// Stable per-install UUID for the staged-rollout cohort (S11a). Generated
+  /// once in [_migrate] and preserved across [reset] so a settings reset
+  /// cannot re-roll the cohort to dodge a rollout or a kill-switch.
+  String get installUuid => _store.getString('installUuid') ?? '';
+
+  /// Server list sort: ping, speed or name.
+  String get serverSortMode => _store.getString('serverSortMode') ?? 'ping';
+  set serverSortMode(String value) => _store.setString('serverSortMode', value);
+
+  /// Automatic server choice: ping, speed or smart (ping 40% + speed 40% +
+  /// measurement freshness 20%, scaled by probe reliability when known).
+  String get autoSelectMode => _store.getString('autoSelectMode') ?? 'ping';
+  set autoSelectMode(String value) => _store.setString('autoSelectMode', value);
+
+  /// Switches the pinned server to the best measured alternative when it
+  /// degrades (stops answering or gets clearly slower) — at most once every
+  /// 10 minutes. Never touches 'auto', groups, profiles or bypass.
+  bool get autoSwitchOnDegrade => _store.getBool('autoSwitchOnDegrade') ?? false;
+  set autoSwitchOnDegrade(bool value) => _store.setBool('autoSwitchOnDegrade', value);
+
+  /// Offer to restore the session when the app restarts after a crash.
+  bool get restoreOnCrash => _store.getBool('restoreOnCrash') ?? true;
+  set restoreOnCrash(bool value) => _store.setBool('restoreOnCrash', value);
+
+  /// Bandwidth history as JSON: {serverId: {bps, at}}.
+  String get benchmarkHistory => _store.getString('benchmarkHistory') ?? '';
+  set benchmarkHistory(String value) => _store.setString('benchmarkHistory', value);
+
+  /// Crash-recovery marker written on connect, cleared on clean disconnect.
+  String get sessionIntent => _store.getString('sessionIntent') ?? '';
+  set sessionIntent(String value) => _store.setString('sessionIntent', value);
+
+  /// Subscription overrides as JSON: {subId: {renames: {id: name}, hidden: [id]}}.
+  String get subscriptionOverrides => _store.getString('subscriptionOverrides') ?? '';
+  set subscriptionOverrides(String value) => _store.setString('subscriptionOverrides', value);
+
+  /// Network profiles as JSON: [{id, name, ssids, gateways, asns, autoApply,
+  /// apply: {tunnel, preset, dns, dnsPreset, serverId, engine}}] (F5).
+  String get networkProfiles => _store.getString('networkProfiles') ?? '';
+  set networkProfiles(String value) => _store.setString('networkProfiles', value);
+
+  /// Named proxy chains as JSON: [{id, name, hops: [serverId, ...]}] (F8).
+  String get proxyChains => _store.getString('proxyChains') ?? '';
+  set proxyChains(String value) => _store.setString('proxyChains', value);
+
+  /// Legacy pre-wiring sync device list (F9). The pre-2026-10-20 screen added
+  /// an entry per scanned code without any handshake, so the entries were
+  /// never paired; the sync screen clears this once with an explanation and
+  /// never writes it again. The daemon is the source of truth for peers.
+  String get syncedDevices => _store.getString('syncedDevices') ?? '';
+  set syncedDevices(String value) => _store.setString('syncedDevices', value);
+
+  /// Run zapret for direct traffic alongside the VPN tunnel (F11, Linux only).
+  bool get zapretWithVpn => _store.getBool('zapretWithVpn') ?? false;
+  set zapretWithVpn(bool value) => _store.setBool('zapretWithVpn', value);
 
   /// Original system proxy settings and Sora's endpoint, retained until
   /// restoration. Saving is awaited before proxy changes to allow crash
@@ -245,6 +363,91 @@ class Settings {
   Future<void> saveNotificationHistory(List<AppNotification> history) =>
       _store.setStringList('notificationHistory', history.take(100).map((n) => n.stored).toList());
 
+  /// Settings keys portable across the user's own devices (F9 document
+  /// bridge, kind `app_settings`). Only genuine preferences land here;
+  /// device-local state stays out: the selected `server` (server ids do
+  /// not resolve on another device), the consent-gated `controlPort`, the
+  /// update machinery (`checkUpdates`, `notifiedUpdate`, `resumeAfterUpdate`,
+  /// `pendingUpdate`, `lastRollback`), the rollout `installUuid`, the
+  /// crash-recovery marker `sessionIntent`, the system-proxy snapshot
+  /// `proxySnapshot`, `benchmarkHistory`, `notificationHistory`, and UI
+  /// chrome (`trayHintShown`, `sidebarExpanded`, `tourDone`,
+  /// `speedtestService`, `syncedDevices`, `dnsLeakLastCheck`). The JSON-backed
+  /// stores (`subscriptionOverrides`, `networkProfiles`, `proxyChains`) sync as their own document
+  /// kinds so their stores can reload after an import.
+  static const syncableSettingsKeys = <String>{
+    'preset', 'blockAds', 'killSwitch', 'engine', 'animations', 'theme', 'language', //
+    'fragment', 'fragmentPackets', 'fragmentLength', 'fragmentInterval', //
+    'ipv6', 'dns', 'dnsPreset', //
+    'probeMethod', 'probeUrl', 'probeTimeout', //
+    'splitPos', 'disorder', 'tlsRecord', 'hostCase', //
+    'rules', 'failover', 'connectOnStart', 'tunnel', //
+    'mihomoTunStack', 'xrayTunStack', //
+    'launchAtLogin', 'closeToTray', 'notifications', //
+    'serverSortMode', 'autoSelectMode', 'autoSwitchOnDegrade', 'restoreOnCrash', //
+    'zapretWithVpn',
+  };
+
+  /// Raw stored values of the syncable subset, in a JSON-encodable shape:
+  /// `{key: {t: 's'|'b'|'i'|'sl', v: value}}`. Keys never written are
+  /// skipped; the merge on import fills only what the doc carries.
+  Map<String, dynamic> exportSyncableSettings() {
+    final out = <String, dynamic>{};
+    for (final key in syncableSettingsKeys) {
+      final asString = _store.getString(key);
+      if (asString != null) {
+        out[key] = {'t': 's', 'v': asString};
+        continue;
+      }
+      final asBool = _store.getBool(key);
+      if (asBool != null) {
+        out[key] = {'t': 'b', 'v': asBool};
+        continue;
+      }
+      final asInt = _store.getInt(key);
+      if (asInt != null) {
+        out[key] = {'t': 'i', 'v': asInt};
+        continue;
+      }
+      final asList = _store.getStringList(key);
+      if (asList != null) {
+        out[key] = {'t': 'sl', 'v': asList};
+      }
+    }
+    return out;
+  }
+
+  /// Applies a synced settings document (see [exportSyncableSettings]).
+  /// Only allowlisted keys with a well-typed tagged value are written;
+  /// everything else is ignored, so a hostile or newer-version doc cannot
+  /// smuggle arbitrary preferences in. Keys absent from the doc are left
+  /// alone (per-key merge, not a wipe).
+  Future<void> importSyncableSettings(Map<String, dynamic> doc) async {
+    for (final entry in doc.entries) {
+      final key = entry.key;
+      if (!syncableSettingsKeys.contains(key)) continue;
+      final tagged = entry.value;
+      if (tagged is! Map<String, dynamic>) continue;
+      final value = tagged['v'];
+      switch (tagged['t']) {
+        case 's':
+          if (value is String) await _store.setString(key, value);
+          break;
+        case 'b':
+          if (value is bool) await _store.setBool(key, value);
+          break;
+        case 'i':
+          if (value is int) await _store.setInt(key, value);
+          break;
+        case 'sl':
+          if (value is List && value.every((e) => e is String)) {
+            await _store.setStringList(key, value.cast<String>());
+          }
+          break;
+      }
+    }
+  }
+
   /// Resets preferences to defaults while preserving the proxy snapshot.
   Future<void> reset() async {
     // Keep the proxy snapshot so the next disconnect can restore system
@@ -252,10 +455,22 @@ class Settings {
     final snapshot = proxySnapshot;
     final history = notificationHistory;
     final notified = notifiedUpdate;
+    final uuid = installUuid;
+    final pending = pendingUpdate;
+    final rolledBack = lastRollback;
     await _store.clear();
     await completeTour();
     await saveNotificationHistory(history);
     if (notified.isNotEmpty) await saveNotifiedUpdate(notified);
+    // Keep the rollout cohort stable: re-rolling the install UUID on reset
+    // would let a settings reset dodge a staged rollout or a kill-switch.
+    if (uuid.isNotEmpty) await _store.setString('installUuid', uuid);
+    // The post-update health marker is a safety mechanism, not a preference:
+    // a reset must not silently disarm the rollback of an update that is
+    // still inside its health window. The rollback notice is kept for the
+    // same reason — the user should still learn that a rollback happened.
+    if (pending.isNotEmpty) await savePendingUpdate(pending);
+    if (rolledBack.isNotEmpty) await _store.setString('lastRollback', rolledBack);
     if (snapshot.isNotEmpty) await saveProxySnapshot(snapshot);
     await _migrate();
   }

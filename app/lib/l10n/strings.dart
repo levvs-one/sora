@@ -399,6 +399,12 @@ abstract class S {
   /// **'Здесь пусто'**
   String get logsEmpty;
 
+  /// No description provided for @connEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет соединений'**
+  String get connEmpty;
+
   /// No description provided for @appVersion.
   ///
   /// In ru, this message translates to:
@@ -446,6 +452,18 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'{n} мс'**
   String milliseconds(int n);
+
+  /// No description provided for @latencyMs.
+  ///
+  /// In ru, this message translates to:
+  /// **'{value} мс'**
+  String latencyMs(int value);
+
+  /// No description provided for @speedMbps.
+  ///
+  /// In ru, this message translates to:
+  /// **'{value} Мбит/с'**
+  String speedMbps(double value);
 
   /// No description provided for @bytesB.
   ///
@@ -1095,6 +1113,12 @@ abstract class S {
   /// **'Запускать вместе с системой'**
   String get launchAtLogin;
 
+  /// No description provided for @launchAtLoginDetail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Sora будет автоматически запускаться при входе в систему и оставаться в трее.'**
+  String get launchAtLoginDetail;
+
   /// No description provided for @closeToTray.
   ///
   /// In ru, this message translates to:
@@ -1623,6 +1647,60 @@ abstract class S {
   /// **'Выполните команду в терминале для установки обоих проверенных пакетов, затем откройте Sora снова. Файлы сохранены в каталоге загрузки. VPN-соединение прервётся.'**
   String get updateManual;
 
+  /// No description provided for @updateSignaturePending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подлинность релиза пока не проверяется подписью — церемония ключа подписи ещё не проведена. Файлы сверяются по SHA-256 с манифестом, полученным по TLS.'**
+  String get updateSignaturePending;
+
+  /// No description provided for @updateManualSigWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Внимание: подпись манифеста не проверена — файлы ниже сверены только по хэшам. Выполняйте команду, только если доверяете каналу релиза.'**
+  String get updateManualSigWarning;
+
+  /// No description provided for @updateWindowsSigBlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматическая установка отключена в Windows, пока не реализована проверка подписи релиза. Скачайте установщик со страницы релиза и проверьте его вручную.'**
+  String get updateWindowsSigBlocked;
+
+  /// No description provided for @updateVersionRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эта версия отозвана разработчиком. Дождитесь исправленного релиза.'**
+  String get updateVersionRevoked;
+
+  /// No description provided for @updateRolloutPending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая версия распространяется постепенно и будет предложена вам автоматически.'**
+  String get updateRolloutPending;
+
+  /// No description provided for @updateRollbacking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Откатываемся к версии {version}...'**
+  String updateRollbacking(String version);
+
+  /// No description provided for @updateRolledBack.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновление до {version} не прошло проверку работоспособности, поэтому Sora откатилась к {fromVersion}.'**
+  String updateRolledBack(String version, String fromVersion);
+
+  /// No description provided for @updateRollbackError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматический откат не удался. Если новая версия не работает, переустановите предыдущий релиз вручную.'**
+  String get updateRollbackError;
+
+  /// No description provided for @updateRollbackCacheError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось подготовить проверенную копию текущей версии для отката, поэтому обновление не установлено.'**
+  String get updateRollbackCacheError;
+
   /// No description provided for @updateCopyCommand.
   ///
   /// In ru, this message translates to:
@@ -1779,11 +1857,803 @@ abstract class S {
   /// **'Расширения'**
   String get extensions;
 
-  /// No description provided for @extensionsSoon.
+  /// No description provided for @extRatingLabel.
   ///
   /// In ru, this message translates to:
-  /// **'Скоро появится'**
-  String get extensionsSoon;
+  /// **'Оценка {rating} из 5'**
+  String extRatingLabel(String rating);
+
+  /// No description provided for @extByAuthor.
+  ///
+  /// In ru, this message translates to:
+  /// **'{author}'**
+  String extByAuthor(String author);
+
+  /// No description provided for @extInstallsCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'установок: {count}'**
+  String extInstallsCount(String count);
+
+  /// No description provided for @extInstallOne.
+  ///
+  /// In ru, this message translates to:
+  /// **'1 установка'**
+  String get extInstallOne;
+
+  /// No description provided for @extBadgeVerified.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверено'**
+  String get extBadgeVerified;
+
+  /// No description provided for @extBadgeTop.
+  ///
+  /// In ru, this message translates to:
+  /// **'Топ недели'**
+  String get extBadgeTop;
+
+  /// No description provided for @extBadgeNew.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое'**
+  String get extBadgeNew;
+
+  /// No description provided for @extBadgeStaff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Команда Sora'**
+  String get extBadgeStaff;
+
+  /// No description provided for @extSideloadShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не из каталога'**
+  String get extSideloadShort;
+
+  /// No description provided for @extSideloadWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не из каталога команды. Ключ автора не проверен: устанавливайте, только если доверяете автору.'**
+  String get extSideloadWarning;
+
+  /// No description provided for @extInstallTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установить «{name}»'**
+  String extInstallTitle(String name);
+
+  /// No description provided for @extUpdateTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить «{name}»'**
+  String extUpdateTitle(String name);
+
+  /// No description provided for @extPermissionsIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расширение сможет:'**
+  String get extPermissionsIntro;
+
+  /// No description provided for @extPermissionsWidened.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновление запрашивает новые разрешения:'**
+  String get extPermissionsWidened;
+
+  /// No description provided for @extDangerousAck.
+  ///
+  /// In ru, this message translates to:
+  /// **'Я понимаю, что эти разрешения серьёзные'**
+  String get extDangerousAck;
+
+  /// No description provided for @extInstall.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установить'**
+  String get extInstall;
+
+  /// No description provided for @extUpdate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить'**
+  String get extUpdate;
+
+  /// No description provided for @extCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get extCancel;
+
+  /// No description provided for @extConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтвердить'**
+  String get extConfirm;
+
+  /// No description provided for @extOk.
+  ///
+  /// In ru, this message translates to:
+  /// **'ОК'**
+  String get extOk;
+
+  /// No description provided for @extCatalog.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каталог'**
+  String get extCatalog;
+
+  /// No description provided for @extInstalled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установленные'**
+  String get extInstalled;
+
+  /// No description provided for @extSearchHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск расширений'**
+  String get extSearchHint;
+
+  /// No description provided for @extCatAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все'**
+  String get extCatAll;
+
+  /// No description provided for @extCatTools.
+  ///
+  /// In ru, this message translates to:
+  /// **'Инструменты'**
+  String get extCatTools;
+
+  /// No description provided for @extCatThemes.
+  ///
+  /// In ru, this message translates to:
+  /// **'Темы'**
+  String get extCatThemes;
+
+  /// No description provided for @extCatAutomation.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматизация'**
+  String get extCatAutomation;
+
+  /// No description provided for @extCatStats.
+  ///
+  /// In ru, this message translates to:
+  /// **'Статистика'**
+  String get extCatStats;
+
+  /// No description provided for @extCatNetwork.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сеть'**
+  String get extCatNetwork;
+
+  /// No description provided for @extSortBy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сортировка'**
+  String get extSortBy;
+
+  /// No description provided for @extSortPopular.
+  ///
+  /// In ru, this message translates to:
+  /// **'По популярности'**
+  String get extSortPopular;
+
+  /// No description provided for @extSortRating.
+  ///
+  /// In ru, this message translates to:
+  /// **'По рейтингу'**
+  String get extSortRating;
+
+  /// No description provided for @extSortName.
+  ///
+  /// In ru, this message translates to:
+  /// **'По названию'**
+  String get extSortName;
+
+  /// No description provided for @extCatalogError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить каталог'**
+  String get extCatalogError;
+
+  /// No description provided for @extRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить'**
+  String get extRetry;
+
+  /// No description provided for @extEmptySearch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ничего не найдено'**
+  String get extEmptySearch;
+
+  /// No description provided for @extEmptyInstalled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нет установленных расширений.\nНайдите в каталоге или установите из файла.'**
+  String get extEmptyInstalled;
+
+  /// No description provided for @extInstallFromFile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установить из файла'**
+  String get extInstallFromFile;
+
+  /// No description provided for @extInstallFromUrl.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установить по ссылке'**
+  String get extInstallFromUrl;
+
+  /// No description provided for @extUrlHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'https://…/extension.soraext'**
+  String get extUrlHint;
+
+  /// No description provided for @extDownload.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скачать'**
+  String get extDownload;
+
+  /// No description provided for @extDownloading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скачивание…'**
+  String get extDownloading;
+
+  /// No description provided for @extVerifying.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка…'**
+  String get extVerifying;
+
+  /// No description provided for @extInstalling.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установка…'**
+  String get extInstalling;
+
+  /// No description provided for @extInstallFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось установить'**
+  String get extInstallFailed;
+
+  /// No description provided for @extErrSignature.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка подписи не пройдена. Файл может быть повреждён или подменён.'**
+  String get extErrSignature;
+
+  /// No description provided for @extErrManifest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Манифест расширения некорректен.'**
+  String get extErrManifest;
+
+  /// No description provided for @extErrNetwork.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ошибка сети. Проверьте соединение и попробуйте снова.'**
+  String get extErrNetwork;
+
+  /// No description provided for @extErrHash.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скачанный файл не совпадает с каталогом. Возможно, он подменён.'**
+  String get extErrHash;
+
+  /// No description provided for @extErrMinApp.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расширению нужна версия приложения {version} или новее.'**
+  String extErrMinApp(String version);
+
+  /// No description provided for @extErrHttpsOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешены только ссылки https://'**
+  String get extErrHttpsOnly;
+
+  /// No description provided for @extErrGeneric.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что-то пошло не так. Попробуйте снова.'**
+  String get extErrGeneric;
+
+  /// No description provided for @extErrAuthorKeyChanged.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.'**
+  String get extErrAuthorKeyChanged;
+
+  /// No description provided for @extUpdateAvailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступно обновление'**
+  String get extUpdateAvailable;
+
+  /// No description provided for @extDisabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отключено'**
+  String get extDisabled;
+
+  /// No description provided for @extToggleEnabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить {name}'**
+  String extToggleEnabled(String name);
+
+  /// No description provided for @extSearchInstalled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поиск установленных'**
+  String get extSearchInstalled;
+
+  /// No description provided for @extUpdateAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить все'**
+  String get extUpdateAll;
+
+  /// No description provided for @extUpdatesAvailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступно обновлений: {count}'**
+  String extUpdatesAvailable(int count);
+
+  /// No description provided for @extUpdatedCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлено: {count}'**
+  String extUpdatedCount(int count);
+
+  /// No description provided for @extRiskNormal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обычный'**
+  String get extRiskNormal;
+
+  /// No description provided for @extRiskSensitive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чувствительный'**
+  String get extRiskSensitive;
+
+  /// No description provided for @extRiskDangerous.
+  ///
+  /// In ru, this message translates to:
+  /// **'Высокий риск'**
+  String get extRiskDangerous;
+
+  /// No description provided for @extPermissionsRemoved.
+  ///
+  /// In ru, this message translates to:
+  /// **'Больше не запрашивается:'**
+  String get extPermissionsRemoved;
+
+  /// No description provided for @extUpdateFailedKept.
+  ///
+  /// In ru, this message translates to:
+  /// **'Предыдущая версия осталась установлена.'**
+  String get extUpdateFailedKept;
+
+  /// No description provided for @extConflictsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Конфликты расширений'**
+  String get extConflictsTitle;
+
+  /// No description provided for @extConflictsIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эти расширения претендуют на одно и то же. Выберите победителя — другое останется установлено. Когда спорная возможность появится в движке, работать будет только победитель.'**
+  String get extConflictsIntro;
+
+  /// No description provided for @extConflictRoutingRules.
+  ///
+  /// In ru, this message translates to:
+  /// **'Правила маршрутизации'**
+  String get extConflictRoutingRules;
+
+  /// No description provided for @extConflictTheme.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тема приложения'**
+  String get extConflictTheme;
+
+  /// No description provided for @extConflictNetHooks.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сетевые хуки'**
+  String get extConflictNetHooks;
+
+  /// No description provided for @extConflictWinner.
+  ///
+  /// In ru, this message translates to:
+  /// **'Побеждает: {name}'**
+  String extConflictWinner(String name);
+
+  /// No description provided for @extConflictsCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Требуют решения: {count}'**
+  String extConflictsCount(int count);
+
+  /// No description provided for @extConflictsResolve.
+  ///
+  /// In ru, this message translates to:
+  /// **'Решить'**
+  String get extConflictsResolve;
+
+  /// No description provided for @extConflictNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ваш выбор сохраняется на этом устройстве и будет применён, когда движок начнёт поддерживать эти возможности.'**
+  String get extConflictNote;
+
+  /// No description provided for @extVersionLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия {version}'**
+  String extVersionLabel(String version);
+
+  /// No description provided for @extAuthor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автор'**
+  String get extAuthor;
+
+  /// No description provided for @extRating.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оценка'**
+  String get extRating;
+
+  /// No description provided for @extInstalls.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установки'**
+  String get extInstalls;
+
+  /// No description provided for @extVersion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия'**
+  String get extVersion;
+
+  /// No description provided for @extAbout.
+  ///
+  /// In ru, this message translates to:
+  /// **'Описание'**
+  String get extAbout;
+
+  /// No description provided for @extPermissionsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешения'**
+  String get extPermissionsTitle;
+
+  /// No description provided for @extNoPermissions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Особых разрешений не требуется.'**
+  String get extNoPermissions;
+
+  /// No description provided for @extSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки'**
+  String get extSettings;
+
+  /// No description provided for @extSaveSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить настройки'**
+  String get extSaveSettings;
+
+  /// No description provided for @extSaving.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранение…'**
+  String get extSaving;
+
+  /// No description provided for @extUpdateTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновить до {version}'**
+  String extUpdateTo(String version);
+
+  /// No description provided for @extEnabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включено'**
+  String get extEnabled;
+
+  /// No description provided for @extRollbackTo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Откатить до {version}'**
+  String extRollbackTo(String version);
+
+  /// No description provided for @extRollbackConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Откатить до версии {version}?'**
+  String extRollbackConfirm(String version);
+
+  /// No description provided for @extUninstall.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить'**
+  String get extUninstall;
+
+  /// No description provided for @extUninstallConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить «{name}» и его настройки?'**
+  String extUninstallConfirm(String name);
+
+  /// No description provided for @extPanelUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Панель недоступна. Возможно, расширение отключено или удалено.'**
+  String get extPanelUnavailable;
+
+  /// No description provided for @extCatalogSoonTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каталог команды скоро появится'**
+  String get extCatalogSoonTitle;
+
+  /// No description provided for @extCatalogSoonBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'А пока расширения можно устанавливать из файла или по ссылке — каждый пакет всё равно проверяется по подписи.'**
+  String get extCatalogSoonBody;
+
+  /// No description provided for @extPermConnectionsRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Видеть список активных соединений'**
+  String get extPermConnectionsRead;
+
+  /// No description provided for @extPermServersRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Видеть список ваших серверов'**
+  String get extPermServersRead;
+
+  /// No description provided for @extPermSettingsRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Читать настройки приложения'**
+  String get extPermSettingsRead;
+
+  /// No description provided for @extPermSettingsWrite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменять настройки приложения'**
+  String get extPermSettingsWrite;
+
+  /// No description provided for @extPermNotifications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показывать уведомления'**
+  String get extPermNotifications;
+
+  /// No description provided for @extPermTray.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавлять пункты в меню трея'**
+  String get extPermTray;
+
+  /// No description provided for @extPermUiPanel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показывать панели в приложении'**
+  String get extPermUiPanel;
+
+  /// No description provided for @extPermThemeApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применять темы оформления'**
+  String get extPermThemeApply;
+
+  /// No description provided for @extPermRoutingRules.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавлять правила маршрутизации (влияет на трафик)'**
+  String get extPermRoutingRules;
+
+  /// No description provided for @extPermNetHooks.
+  ///
+  /// In ru, this message translates to:
+  /// **'Встраиваться в сетевой тракт (модули обхода DPI)'**
+  String get extPermNetHooks;
+
+  /// No description provided for @extPermNetFetch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрашивать URL из разрешённого списка'**
+  String get extPermNetFetch;
+
+  /// No description provided for @extPermBackground.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выполнять фоновые задачи'**
+  String get extPermBackground;
+
+  /// No description provided for @extPermBackgroundDetail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения. Фоновое выполнение пока недоступно в этой версии Sora.'**
+  String get extPermBackgroundDetail;
+
+  /// No description provided for @extPermNotYetActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока не активно в этой версии Sora — это разрешение сейчас ничего не изменит.'**
+  String get extPermNotYetActive;
+
+  /// No description provided for @extCapBackground.
+  ///
+  /// In ru, this message translates to:
+  /// **'Работает в фоновом режиме'**
+  String get extCapBackground;
+
+  /// No description provided for @extCapFilterTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Возможности'**
+  String get extCapFilterTitle;
+
+  /// No description provided for @extCapNetHook.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обходы и сетевые хуки'**
+  String get extCapNetHook;
+
+  /// No description provided for @extCapPanel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Панели'**
+  String get extCapPanel;
+
+  /// No description provided for @extCapRouting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Правила маршрутизации'**
+  String get extCapRouting;
+
+  /// No description provided for @extCapTheme.
+  ///
+  /// In ru, this message translates to:
+  /// **'Темы'**
+  String get extCapTheme;
+
+  /// No description provided for @extCapWidget.
+  ///
+  /// In ru, this message translates to:
+  /// **'Виджеты'**
+  String get extCapWidget;
+
+  /// No description provided for @extCatalogCached.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кэш каталога · {date}'**
+  String extCatalogCached(String date);
+
+  /// No description provided for @extChangelog.
+  ///
+  /// In ru, this message translates to:
+  /// **'История версий'**
+  String get extChangelog;
+
+  /// No description provided for @extImageFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить изображение'**
+  String get extImageFailed;
+
+  /// No description provided for @extRatingHow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как считаются оценки'**
+  String get extRatingHow;
+
+  /// No description provided for @extRatingHowBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, — один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.'**
+  String get extRatingHowBody;
+
+  /// No description provided for @extScreenshots.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скриншоты'**
+  String get extScreenshots;
+
+  /// No description provided for @extSortRelevance.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сначала подходящие'**
+  String get extSortRelevance;
+
+  /// No description provided for @extPermNetworkDetail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загружает данные из интернета. Разрешены только хосты из списка ниже — всё остальное заблокировано. Сетевые запросы пока недоступны в этой версии Sora.'**
+  String get extPermNetworkDetail;
+
+  /// No description provided for @extBgTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фоновая задача'**
+  String get extBgTitle;
+
+  /// No description provided for @extBgEnabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выполнять в фоне'**
+  String get extBgEnabled;
+
+  /// No description provided for @extBgInterval.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запускать каждые'**
+  String get extBgInterval;
+
+  /// No description provided for @extBgMinutes.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{# минуту} few{# минуты} other{# минут}}'**
+  String extBgMinutes(int count);
+
+  /// No description provided for @extBgHours.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{# час} few{# часа} other{# часов}}'**
+  String extBgHours(int count);
+
+  /// No description provided for @extBgNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фоновое выполнение недоступно в этой версии Sora. Ваше расписание сохранено и начнёт действовать автоматически, когда появится фоновый рантайм. Минимальный интервал — 15 минут.'**
+  String get extBgNote;
+
+  /// No description provided for @extBgRuntimeBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока недоступно'**
+  String get extBgRuntimeBadge;
+
+  /// No description provided for @extBgDisabledNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включите расширение, чтобы управлять его фоновой задачей.'**
+  String get extBgDisabledNote;
+
+  /// No description provided for @extCapNetwork.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступ к сети'**
+  String get extCapNetwork;
+
+  /// No description provided for @extCapNetworkHosts.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сеть: {hosts}'**
+  String extCapNetworkHosts(String hosts);
 
   /// No description provided for @exportLogFile.
   ///
@@ -1797,23 +2667,11 @@ abstract class S {
   /// **'HTTP-диагностика'**
   String get diagnosticHttp;
 
-  /// No description provided for @diagnosticPackets.
+  /// No description provided for @diagnosticArchive.
   ///
   /// In ru, this message translates to:
-  /// **'Захват пакетов'**
-  String get diagnosticPackets;
-
-  /// No description provided for @diagnosticEvents.
-  ///
-  /// In ru, this message translates to:
-  /// **'События Windows'**
-  String get diagnosticEvents;
-
-  /// No description provided for @diagnosticCapture.
-  ///
-  /// In ru, this message translates to:
-  /// **'Записать 10 секунд'**
-  String get diagnosticCapture;
+  /// **'Архив диагностики ядра'**
+  String get diagnosticArchive;
 
   /// No description provided for @diagnosticNoData.
   ///
@@ -1821,17 +2679,1475 @@ abstract class S {
   /// **'Запросов пока нет. Сначала откройте сайт проверки скорости.'**
   String get diagnosticNoData;
 
-  /// No description provided for @diagnosticRequiresTun.
+  /// No description provided for @qrShareTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Для захвата пакетов нужно активное TUN-подключение Sora.'**
-  String get diagnosticRequiresTun;
+  /// **'Поделиться QR-кодом'**
+  String get qrShareTitle;
 
-  /// No description provided for @diagnosticUnavailable.
+  /// No description provided for @qrScanTitle.
   ///
   /// In ru, this message translates to:
-  /// **'Эта диагностика недоступна на данной платформе.'**
-  String get diagnosticUnavailable;
+  /// **'Сканировать QR-код'**
+  String get qrScanTitle;
+
+  /// No description provided for @qrCopyLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать ссылку'**
+  String get qrCopyLink;
+
+  /// No description provided for @qrShowLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать ссылку'**
+  String get qrShowLink;
+
+  /// No description provided for @qrHideLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скрыть ссылку'**
+  String get qrHideLink;
+
+  /// No description provided for @qrWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'QR-код содержит данные для подключения. Не показывайте его посторонним.'**
+  String get qrWarning;
+
+  /// No description provided for @qrScanHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите снимок экрана или фото с QR-кодом либо вставьте ссылку'**
+  String get qrScanHint;
+
+  /// No description provided for @qrFromClipboard.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вставить из буфера обмена'**
+  String get qrFromClipboard;
+
+  /// No description provided for @qrNoCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'На изображении не найден QR-код.'**
+  String get qrNoCode;
+
+  /// No description provided for @qrInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'В этом QR-коде нет корректной ссылки.'**
+  String get qrInvalid;
+
+  /// No description provided for @qrScan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сканировать QR'**
+  String get qrScan;
+
+  /// No description provided for @qrFromImage.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть изображение'**
+  String get qrFromImage;
+
+  /// No description provided for @connGroupByProcess.
+  ///
+  /// In ru, this message translates to:
+  /// **'По процессам'**
+  String get connGroupByProcess;
+
+  /// No description provided for @connListView.
+  ///
+  /// In ru, this message translates to:
+  /// **'Списком'**
+  String get connListView;
+
+  /// No description provided for @connCopyHost.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скопировать хост'**
+  String get connCopyHost;
+
+  /// No description provided for @connAddRule.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить правило'**
+  String get connAddRule;
+
+  /// No description provided for @connConnectionsCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{# соединение} few{# соединения} other{# соединений}}'**
+  String connConnectionsCount(num count);
+
+  /// No description provided for @dnsPreset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пресет'**
+  String get dnsPreset;
+
+  /// No description provided for @dnsPresetCloudflare.
+  ///
+  /// In ru, this message translates to:
+  /// **'Cloudflare'**
+  String get dnsPresetCloudflare;
+
+  /// No description provided for @dnsPresetGoogle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Google'**
+  String get dnsPresetGoogle;
+
+  /// No description provided for @dnsPresetQuad9.
+  ///
+  /// In ru, this message translates to:
+  /// **'Quad9'**
+  String get dnsPresetQuad9;
+
+  /// No description provided for @dnsPresetAdGuard.
+  ///
+  /// In ru, this message translates to:
+  /// **'AdGuard'**
+  String get dnsPresetAdGuard;
+
+  /// No description provided for @dnsPresetCustom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свой'**
+  String get dnsPresetCustom;
+
+  /// No description provided for @dnsCheck.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить утечки'**
+  String get dnsCheck;
+
+  /// No description provided for @dnsChecking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка...'**
+  String get dnsChecking;
+
+  /// No description provided for @dnsNoLeak.
+  ///
+  /// In ru, this message translates to:
+  /// **'Утечек не найдено'**
+  String get dnsNoLeak;
+
+  /// No description provided for @dnsLeakFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обнаружена утечка'**
+  String get dnsLeakFound;
+
+  /// No description provided for @dnsLastCheck.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последняя проверка'**
+  String get dnsLastCheck;
+
+  /// No description provided for @dnsNeverChecked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё не проверялось'**
+  String get dnsNeverChecked;
+
+  /// No description provided for @dnsLeakCheckTunnelDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Резолверы DNS туннеля'**
+  String get dnsLeakCheckTunnelDns;
+
+  /// No description provided for @dnsLeakCheckSystemResolvers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Системные резолверы'**
+  String get dnsLeakCheckSystemResolvers;
+
+  /// No description provided for @dnsLeakCheckKillSwitchDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Kill switch закрывает DNS'**
+  String get dnsLeakCheckKillSwitchDns;
+
+  /// No description provided for @dnsLeakFixConfigureTunnelDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задайте DNS туннеля в настройках выше.'**
+  String get dnsLeakFixConfigureTunnelDns;
+
+  /// No description provided for @dnsLeakFixReviewSystemResolvers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте, какие резолверы система использует вне туннеля.'**
+  String get dnsLeakFixReviewSystemResolvers;
+
+  /// No description provided for @dnsLeakFixEnableKillSwitch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включите kill switch, чтобы DNS оставался в туннеле.'**
+  String get dnsLeakFixEnableKillSwitch;
+
+  /// No description provided for @dnsLeakCheckEncryptedDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зашифрованный DNS системы'**
+  String get dnsLeakCheckEncryptedDns;
+
+  /// No description provided for @dnsLeakCheckDnsSpoof.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подмена ответов DNS'**
+  String get dnsLeakCheckDnsSpoof;
+
+  /// No description provided for @dnsLeakFixReviewEncryptedDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте, какие конечные точки зашифрованного DNS система использует вне туннеля.'**
+  String get dnsLeakFixReviewEncryptedDns;
+
+  /// No description provided for @dnsLeakFixUseEncryptedDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Используйте зашифрованный DNS (DoT или DoH) в туннеле, чтобы резолверы не могли подделывать ответы.'**
+  String get dnsLeakFixUseEncryptedDns;
+
+  /// No description provided for @dnsCheckNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сначала подключитесь к VPN, затем проверьте утечки.'**
+  String get dnsCheckNeedsConnection;
+
+  /// No description provided for @dnsExpected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ожидалось'**
+  String get dnsExpected;
+
+  /// No description provided for @dnsActual.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обнаружено'**
+  String get dnsActual;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сортировать'**
+  String get sortBy;
+
+  /// No description provided for @sortPing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пинг'**
+  String get sortPing;
+
+  /// No description provided for @sortSpeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скорость'**
+  String get sortSpeed;
+
+  /// No description provided for @sortName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Имя'**
+  String get sortName;
+
+  /// No description provided for @measureSpeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Замерить скорость'**
+  String get measureSpeed;
+
+  /// No description provided for @benchmarkStale.
+  ///
+  /// In ru, this message translates to:
+  /// **'устарело'**
+  String get benchmarkStale;
+
+  /// No description provided for @autoSelectMode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автовыбор сервера'**
+  String get autoSelectMode;
+
+  /// No description provided for @autoSelectPing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самый быстрый пинг'**
+  String get autoSelectPing;
+
+  /// No description provided for @autoSelectSpeed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Самая высокая скорость'**
+  String get autoSelectSpeed;
+
+  /// No description provided for @autoSelectSmart.
+  ///
+  /// In ru, this message translates to:
+  /// **'Умный выбор'**
+  String get autoSelectSmart;
+
+  /// No description provided for @coreWatchUnstable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Связь с ядром нестабильна'**
+  String get coreWatchUnstable;
+
+  /// No description provided for @watchReconnect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Переподключить'**
+  String get watchReconnect;
+
+  /// No description provided for @coreRestoringLink.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстанавливаю связь с ядром…'**
+  String get coreRestoringLink;
+
+  /// No description provided for @crashRestoreTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прошлое соединение оборвалось'**
+  String get crashRestoreTitle;
+
+  /// No description provided for @restoreOnCrash.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстанавливать сессию после сбоя'**
+  String get restoreOnCrash;
+
+  /// No description provided for @crashRestore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Восстановить'**
+  String get crashRestore;
+
+  /// No description provided for @crashDismiss.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не сейчас'**
+  String get crashDismiss;
+
+  /// No description provided for @overrideTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои правки'**
+  String get overrideTitle;
+
+  /// No description provided for @overrideEdit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Редактировать серверы'**
+  String get overrideEdit;
+
+  /// No description provided for @overrideHide.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скрыть'**
+  String get overrideHide;
+
+  /// No description provided for @overrideUnhide.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать'**
+  String get overrideUnhide;
+
+  /// No description provided for @overrideClear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить правки'**
+  String get overrideClear;
+
+  /// No description provided for @overrideEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нет правок'**
+  String get overrideEmpty;
+
+  /// No description provided for @overrideCustomRules.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свои правила'**
+  String get overrideCustomRules;
+
+  /// No description provided for @errBenchmarkUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для замера скорости нужна новая версия ядра'**
+  String get errBenchmarkUnsupported;
+
+  /// No description provided for @benchmarkProgress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Замер {done} из {total}…'**
+  String benchmarkProgress(Object done, Object total);
+
+  /// No description provided for @profiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сетевые профили'**
+  String get profiles;
+
+  /// No description provided for @profilesEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профилей пока нет. Создайте профиль, чтобы настройки применялись автоматически в известных сетях.'**
+  String get profilesEmpty;
+
+  /// No description provided for @profileAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить профиль'**
+  String get profileAdd;
+
+  /// No description provided for @profileName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название профиля'**
+  String get profileName;
+
+  /// No description provided for @profileSsids.
+  ///
+  /// In ru, this message translates to:
+  /// **'Wi-Fi-сети (SSID)'**
+  String get profileSsids;
+
+  /// No description provided for @profileSsidsHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дом, Офис — через запятую'**
+  String get profileSsidsHint;
+
+  /// No description provided for @profileGateways.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шлюзы'**
+  String get profileGateways;
+
+  /// No description provided for @profileAsns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номера AS'**
+  String get profileAsns;
+
+  /// No description provided for @profileAutoApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применять автоматически'**
+  String get profileAutoApply;
+
+  /// No description provided for @profileAutoApplyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если выключено — спрашивать перед применением'**
+  String get profileAutoApplyHint;
+
+  /// No description provided for @profileSnapshot.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запомнить текущие настройки'**
+  String get profileSnapshot;
+
+  /// No description provided for @profileSnapshotDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текущие настройки сохранены в профиль'**
+  String get profileSnapshotDone;
+
+  /// No description provided for @profileDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить профиль'**
+  String get profileDelete;
+
+  /// No description provided for @profileDeleteConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить профиль «{name}»?'**
+  String profileDeleteConfirm(Object name);
+
+  /// No description provided for @profileApplyAsk.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применить профиль «{name}»?'**
+  String profileApplyAsk(Object name);
+
+  /// No description provided for @profileApply.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применить'**
+  String get profileApply;
+
+  /// No description provided for @profileApplied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Профиль «{name}» применён'**
+  String profileApplied(Object name);
+
+  /// No description provided for @profileUndo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отменить'**
+  String get profileUndo;
+
+  /// No description provided for @profileActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Активен'**
+  String get profileActive;
+
+  /// No description provided for @networkNow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сейчас: {info}'**
+  String networkNow(Object info);
+
+  /// No description provided for @networkUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет данных о сети'**
+  String get networkUnknown;
+
+  /// No description provided for @profileNoTriggers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте хотя бы один триггер: SSID, шлюз или ASN'**
+  String get profileNoTriggers;
+
+  /// No description provided for @chains.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цепочки прокси'**
+  String get chains;
+
+  /// No description provided for @chainsEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цепочек пока нет. Свяжите 2–3 сервера, чтобы трафик шёл через каждый из них.'**
+  String get chainsEmpty;
+
+  /// No description provided for @chainAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая цепочка'**
+  String get chainAdd;
+
+  /// No description provided for @chainName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название цепочки'**
+  String get chainName;
+
+  /// No description provided for @chainPickServers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите 2–3 сервера'**
+  String get chainPickServers;
+
+  /// No description provided for @chainOrderHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Перетащите, чтобы изменить порядок: трафик входит сверху, выходит снизу.'**
+  String get chainOrderHint;
+
+  /// No description provided for @chainTooFew.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите минимум 2 сервера'**
+  String get chainTooFew;
+
+  /// No description provided for @chainTooMany.
+  ///
+  /// In ru, this message translates to:
+  /// **'В цепочке максимум 3 сервера'**
+  String get chainTooMany;
+
+  /// No description provided for @chainEstimate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Примерная задержка'**
+  String get chainEstimate;
+
+  /// No description provided for @chainSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить цепочку'**
+  String get chainSave;
+
+  /// No description provided for @chainDelete.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить цепочку'**
+  String get chainDelete;
+
+  /// No description provided for @chainDeleteConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить цепочку «{name}»?'**
+  String chainDeleteConfirm(Object name);
+
+  /// No description provided for @chainUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Текущий движок не умеет строить цепочки'**
+  String get chainUnsupported;
+
+  /// No description provided for @chainHopMissing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Один из серверов цепочки больше недоступен'**
+  String get chainHopMissing;
+
+  /// No description provided for @chainHop.
+  ///
+  /// In ru, this message translates to:
+  /// **'Хоп {n}'**
+  String chainHop(Object n);
+
+  /// No description provided for @chainEntry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход'**
+  String get chainEntry;
+
+  /// No description provided for @chainExit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выход'**
+  String get chainExit;
+
+  /// No description provided for @sync.
+  ///
+  /// In ru, this message translates to:
+  /// **'Синхронизация устройств'**
+  String get sync;
+
+  /// No description provided for @syncDevices.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои устройства'**
+  String get syncDevices;
+
+  /// No description provided for @syncEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет спаренных устройств. Спарьте другое устройство в локальной сети.'**
+  String get syncEmpty;
+
+  /// No description provided for @syncPair.
+  ///
+  /// In ru, this message translates to:
+  /// **'Спарить устройство'**
+  String get syncPair;
+
+  /// No description provided for @syncShowCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать мой код'**
+  String get syncShowCode;
+
+  /// No description provided for @syncScanCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сканировать код'**
+  String get syncScanCode;
+
+  /// No description provided for @syncRevoke.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать'**
+  String get syncRevoke;
+
+  /// No description provided for @syncRevokeConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отозвать «{name}»?'**
+  String syncRevokeConfirm(Object name);
+
+  /// No description provided for @syncLastSync.
+  ///
+  /// In ru, this message translates to:
+  /// **'Последняя синхронизация: {time}'**
+  String syncLastSync(Object time);
+
+  /// No description provided for @syncNever.
+  ///
+  /// In ru, this message translates to:
+  /// **'Никогда'**
+  String get syncNever;
+
+  /// No description provided for @syncWhat.
+  ///
+  /// In ru, this message translates to:
+  /// **'Что синхронизируется'**
+  String get syncWhat;
+
+  /// No description provided for @syncWhatBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подписки, правила, настройки и сетевые профили. Никогда не синхронизируются: локальные логи, IPC-токены.'**
+  String get syncWhatBody;
+
+  /// No description provided for @syncNoLan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройства должны быть в одной локальной сети'**
+  String get syncNoLan;
+
+  /// No description provided for @syncPaired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройство спарено'**
+  String get syncPaired;
+
+  /// No description provided for @syncPairingTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Спарить с этим устройством'**
+  String get syncPairingTitle;
+
+  /// No description provided for @syncWaiting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ожидание другого устройства…'**
+  String get syncWaiting;
+
+  /// No description provided for @syncSecureNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Канал защищён сквозным шифрованием. Никаких аккаунтов и облачных серверов.'**
+  String get syncSecureNote;
+
+  /// No description provided for @zapretWithVpn.
+  ///
+  /// In ru, this message translates to:
+  /// **'DPI-обход для прямого трафика'**
+  String get zapretWithVpn;
+
+  /// No description provided for @zapretWithVpnHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запускает zapret рядом с VPN-туннелем: туннелированный трафик идёт через VPN, прямой — через обход.'**
+  String get zapretWithVpnHint;
+
+  /// No description provided for @chainDuplicate.
+  ///
+  /// In ru, this message translates to:
+  /// **'Каждый сервер — только один раз'**
+  String get chainDuplicate;
+
+  /// No description provided for @edit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить'**
+  String get edit;
+
+  /// No description provided for @remove.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать'**
+  String get remove;
+
+  /// No description provided for @autoSwitchOnDegrade.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автопереключение при деградации'**
+  String get autoSwitchOnDegrade;
+
+  /// No description provided for @autoSwitchOnDegradeDetail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если выбранный сервер сильно замедлится или перестанет отвечать, Sora переключится на лучший из измеренных — не чаще одного раза в 10 минут.'**
+  String get autoSwitchOnDegradeDetail;
+
+  /// No description provided for @tunStackMixed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смешанный'**
+  String get tunStackMixed;
+
+  /// No description provided for @tunStackSystem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Системный'**
+  String get tunStackSystem;
+
+  /// No description provided for @censorTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Диагностика блокировок'**
+  String get censorTitle;
+
+  /// No description provided for @censorHistory.
+  ///
+  /// In ru, this message translates to:
+  /// **'История проверок'**
+  String get censorHistory;
+
+  /// No description provided for @censorEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверок пока не было. Если соединение не удастся установить, детектор проверит, не блокирует ли его провайдер.'**
+  String get censorEmpty;
+
+  /// No description provided for @censorExplainer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это не ошибка приложения: похоже, провайдер ограничивает соединение. Маскировка меняет способ подключения и часто помогает.'**
+  String get censorExplainer;
+
+  /// No description provided for @censorNoProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для этого вердикта нет подходящего профиля'**
+  String get censorNoProfile;
+
+  /// No description provided for @censorApplyProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Применить рекомендованный профиль'**
+  String get censorApplyProfile;
+
+  /// No description provided for @censorEnable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включить'**
+  String get censorEnable;
+
+  /// No description provided for @censorDetails.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подробнее'**
+  String get censorDetails;
+
+  /// No description provided for @censorNotNow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не сейчас'**
+  String get censorNotNow;
+
+  /// No description provided for @censorPromptTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Возможно, соединение блокируют'**
+  String get censorPromptTitle;
+
+  /// No description provided for @censorPromptBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Похоже, провайдер блокирует соединение (уверенность {confidence}%). Попробовать маскировку?'**
+  String censorPromptBody(int confidence);
+
+  /// No description provided for @censorConfidence.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уверенность: {confidence}%'**
+  String censorConfidence(int confidence);
+
+  /// No description provided for @censorKindBlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Блокировка обнаружена'**
+  String get censorKindBlocked;
+
+  /// No description provided for @censorKindLikely.
+  ///
+  /// In ru, this message translates to:
+  /// **'Похоже на блокировку'**
+  String get censorKindLikely;
+
+  /// No description provided for @censorKindClear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Блокировка не обнаружена'**
+  String get censorKindClear;
+
+  /// No description provided for @censorKindUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось определить'**
+  String get censorKindUnknown;
+
+  /// No description provided for @censorReasonTlsReset.
+  ///
+  /// In ru, this message translates to:
+  /// **'TLS-соединения сбрасываются — характерный признак фильтрации'**
+  String get censorReasonTlsReset;
+
+  /// No description provided for @censorReasonHttpBlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'HTTP-запросы блокируются'**
+  String get censorReasonHttpBlock;
+
+  /// No description provided for @censorReasonDnsSpoofed.
+  ///
+  /// In ru, this message translates to:
+  /// **'DNS-ответы подменяются'**
+  String get censorReasonDnsSpoofed;
+
+  /// No description provided for @censorReasonConnectTimeout.
+  ///
+  /// In ru, this message translates to:
+  /// **'Соединения обрываются по таймауту'**
+  String get censorReasonConnectTimeout;
+
+  /// No description provided for @customServerAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить свой сервер'**
+  String get customServerAdd;
+
+  /// No description provided for @customServers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мои серверы'**
+  String get customServers;
+
+  /// No description provided for @customServerName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Название'**
+  String get customServerName;
+
+  /// No description provided for @customServerNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Например: мой VPS'**
+  String get customServerNameHint;
+
+  /// No description provided for @customServerNameRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите название'**
+  String get customServerNameRequired;
+
+  /// No description provided for @customServerAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес'**
+  String get customServerAddress;
+
+  /// No description provided for @customServerAddressHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'example.com или 192.0.2.1'**
+  String get customServerAddressHint;
+
+  /// No description provided for @customServerAddressRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите адрес сервера'**
+  String get customServerAddressRequired;
+
+  /// No description provided for @customServerAddressInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Некорректный адрес'**
+  String get customServerAddressInvalid;
+
+  /// No description provided for @customServerPort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порт'**
+  String get customServerPort;
+
+  /// No description provided for @customServerPortHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'443'**
+  String get customServerPortHint;
+
+  /// No description provided for @customServerPortInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Порт — число от 1 до 65535'**
+  String get customServerPortInvalid;
+
+  /// No description provided for @customServerProtocol.
+  ///
+  /// In ru, this message translates to:
+  /// **'Протокол'**
+  String get customServerProtocol;
+
+  /// No description provided for @customServerCredentials.
+  ///
+  /// In ru, this message translates to:
+  /// **'Данные для входа'**
+  String get customServerCredentials;
+
+  /// No description provided for @customServerOptional.
+  ///
+  /// In ru, this message translates to:
+  /// **'Необязательно'**
+  String get customServerOptional;
+
+  /// No description provided for @customServerShowSecret.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать секрет'**
+  String get customServerShowSecret;
+
+  /// No description provided for @customServerHideSecret.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скрыть секрет'**
+  String get customServerHideSecret;
+
+  /// No description provided for @customServerBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'свой'**
+  String get customServerBadge;
+
+  /// No description provided for @flowAuto.
+  ///
+  /// In ru, this message translates to:
+  /// **'авто'**
+  String get flowAuto;
+
+  /// No description provided for @customServerDeleteConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Удалить сервер «{name}»?'**
+  String customServerDeleteConfirm(String name);
+
+  /// No description provided for @customServerEmptyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте сервер вручную: адрес, порт и протокол'**
+  String get customServerEmptyHint;
+
+  /// No description provided for @customServerTest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить'**
+  String get customServerTest;
+
+  /// No description provided for @errObfsUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установленный core слишком стар для профилей маскировки. Обновите Sora, чтобы применять их.'**
+  String get errObfsUnsupported;
+
+  /// No description provided for @leakTestTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверка утечек'**
+  String get leakTestTitle;
+
+  /// No description provided for @leakTestIntro.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверяет, может ли трафик покинуть устройство в обход туннеля: прямые DNS- и ICMP-запросы, утечки IPv6 и системные резолверы. Запускайте при активном подключении.'**
+  String get leakTestIntro;
+
+  /// No description provided for @leakTestRun.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверить'**
+  String get leakTestRun;
+
+  /// No description provided for @leakTestCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get leakTestCancel;
+
+  /// No description provided for @leakTestNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключитесь, чтобы проверить утечки.'**
+  String get leakTestNeedsConnection;
+
+  /// No description provided for @leakTestProgress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выполнено тестов: {count}'**
+  String leakTestProgress(int count);
+
+  /// No description provided for @leakTestAllClear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Утечек не найдено'**
+  String get leakTestAllClear;
+
+  /// No description provided for @leakTestFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{Найдена # утечка} few{Найдены # утечки} other{Найдено # утечек}}'**
+  String leakTestFound(int count);
+
+  /// No description provided for @leakTestSkipped.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пропущен — неприменим в этой сессии'**
+  String get leakTestSkipped;
+
+  /// No description provided for @leakTestFix.
+  ///
+  /// In ru, this message translates to:
+  /// **'Исправить'**
+  String get leakTestFix;
+
+  /// No description provided for @leakTestFixedNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Kill switch включён — запустите проверку снова.'**
+  String get leakTestFixedNote;
+
+  /// No description provided for @leakTestCheckDirectDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прямой DNS'**
+  String get leakTestCheckDirectDns;
+
+  /// No description provided for @leakTestCheckIcmpEcho.
+  ///
+  /// In ru, this message translates to:
+  /// **'ICMP echo'**
+  String get leakTestCheckIcmpEcho;
+
+  /// No description provided for @leakTestCheckIpv6.
+  ///
+  /// In ru, this message translates to:
+  /// **'IPv6'**
+  String get leakTestCheckIpv6;
+
+  /// No description provided for @leakTestCheckSystemResolvers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Системные резолверы'**
+  String get leakTestCheckSystemResolvers;
+
+  /// No description provided for @leakTestCheckTunnelConnectivity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Связность туннеля'**
+  String get leakTestCheckTunnelConnectivity;
+
+  /// No description provided for @leakTestCheckTunnelDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'DNS через туннель'**
+  String get leakTestCheckTunnelDns;
+
+  /// No description provided for @noticeDegraded.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер замедлился — переключено на лучший из измеренных'**
+  String get noticeDegraded;
+
+  /// No description provided for @obfs.
+  ///
+  /// In ru, this message translates to:
+  /// **'Маскировка трафика'**
+  String get obfs;
+
+  /// No description provided for @obfsPreset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пресет'**
+  String get obfsPreset;
+
+  /// No description provided for @obfsPresetAggressive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Максимальная маскировка'**
+  String get obfsPresetAggressive;
+
+  /// No description provided for @obfsPresetBalanced.
+  ///
+  /// In ru, this message translates to:
+  /// **'Баланс'**
+  String get obfsPresetBalanced;
+
+  /// No description provided for @obfsPresetOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скорость'**
+  String get obfsPresetOff;
+
+  /// No description provided for @obfsPresetCustom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вручную'**
+  String get obfsPresetCustom;
+
+  /// No description provided for @obfsManual.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ручные настройки'**
+  String get obfsManual;
+
+  /// No description provided for @obfsUtls.
+  ///
+  /// In ru, this message translates to:
+  /// **'uTLS-профиль'**
+  String get obfsUtls;
+
+  /// No description provided for @obfsUtlsAuto.
+  ///
+  /// In ru, this message translates to:
+  /// **'Авто'**
+  String get obfsUtlsAuto;
+
+  /// No description provided for @obfsJitter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Джиттер'**
+  String get obfsJitter;
+
+  /// No description provided for @obfsJitterNeedsFragment.
+  ///
+  /// In ru, this message translates to:
+  /// **'Джиттер работает только при включённой фрагментации.'**
+  String get obfsJitterNeedsFragment;
+
+  /// No description provided for @obfsFineTune.
+  ///
+  /// In ru, this message translates to:
+  /// **'Размеры и задержки'**
+  String get obfsFineTune;
+
+  /// No description provided for @obfsDetecting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Определение возможностей…'**
+  String get obfsDetecting;
+
+  /// No description provided for @obfsCapabilities.
+  ///
+  /// In ru, this message translates to:
+  /// **'Возможности движка'**
+  String get obfsCapabilities;
+
+  /// No description provided for @obfsCompatibleEngines.
+  ///
+  /// In ru, this message translates to:
+  /// **'Совместимые движки: {engines}'**
+  String obfsCompatibleEngines(String engines);
+
+  /// No description provided for @obfsSupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поддерживается'**
+  String get obfsSupported;
+
+  /// No description provided for @obfsUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не поддерживается'**
+  String get obfsUnsupported;
+
+  /// No description provided for @obfsUnknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'Возможности пока определяются.'**
+  String get obfsUnknown;
+
+  /// No description provided for @syncCodeExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Срок действия кода истёк'**
+  String get syncCodeExpired;
+
+  /// No description provided for @syncDaemonFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось запустить службу синхронизации'**
+  String get syncDaemonFailed;
+
+  /// No description provided for @syncDaemonMissing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Компонент sora-sync не найден. Переустановите приложение, чтобы включить синхронизацию устройств.'**
+  String get syncDaemonMissing;
+
+  /// No description provided for @syncDaemonStarting.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запуск службы синхронизации…'**
+  String get syncDaemonStarting;
+
+  /// No description provided for @syncErrAuth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Служба синхронизации отклонила токен доступа. Перезапустите приложение и попробуйте снова.'**
+  String get syncErrAuth;
+
+  /// No description provided for @syncErrNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройство больше не спарено'**
+  String get syncErrNotFound;
+
+  /// No description provided for @syncErrPairingActive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сессия спаривания уже открыта'**
+  String get syncErrPairingActive;
+
+  /// No description provided for @syncErrUnreachable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Другое устройство не отвечает. Убедитесь, что оно в той же сети и показывает свой код.'**
+  String get syncErrUnreachable;
+
+  /// No description provided for @syncError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ошибка синхронизации'**
+  String get syncError;
+
+  /// No description provided for @syncExpiresIn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Код истечёт через {duration}'**
+  String syncExpiresIn(String duration);
+
+  /// No description provided for @syncJoining.
+  ///
+  /// In ru, this message translates to:
+  /// **'Спаривание с устройством…'**
+  String get syncJoining;
+
+  /// No description provided for @syncLegacyCleared.
+  ///
+  /// In ru, this message translates to:
+  /// **'Старый список устройств никогда не был по-настоящему спарен, поэтому он очищен. Спарьте устройства заново — теперь по-настоящему.'**
+  String get syncLegacyCleared;
+
+  /// No description provided for @syncNewCode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый код'**
+  String get syncNewCode;
+
+  /// No description provided for @syncPairedWith.
+  ///
+  /// In ru, this message translates to:
+  /// **'«{name}» спарено'**
+  String syncPairedWith(String name);
+
+  /// No description provided for @syncRetry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Повторить'**
+  String get syncRetry;
+
+  /// No description provided for @syncStopShowing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прекратить показ'**
+  String get syncStopShowing;
+
+  /// No description provided for @syncSyncNow.
+  ///
+  /// In ru, this message translates to:
+  /// **'Синхронизировать'**
+  String get syncSyncNow;
+
+  /// No description provided for @syncSyncResult.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получено: {pulled} · отправлено: {pushed}'**
+  String syncSyncResult(int pulled, int pushed);
+
+  /// No description provided for @syncResultTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Результат синхронизации'**
+  String get syncResultTitle;
+
+  /// No description provided for @syncPulled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Получено'**
+  String get syncPulled;
+
+  /// No description provided for @syncPushed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправлено'**
+  String get syncPushed;
+
+  /// No description provided for @syncNoChanges.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет изменений'**
+  String get syncNoChanges;
+
+  /// No description provided for @syncDocKindSubscriptions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подписки'**
+  String get syncDocKindSubscriptions;
+
+  /// No description provided for @syncDocKindSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки'**
+  String get syncDocKindSettings;
+
+  /// No description provided for @syncDocKindOverrides.
+  ///
+  /// In ru, this message translates to:
+  /// **'Переопределения подписок'**
+  String get syncDocKindOverrides;
+
+  /// No description provided for @syncDocKindProfiles.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сетевые профили'**
+  String get syncDocKindProfiles;
+
+  /// No description provided for @syncDocKindChains.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цепочки прокси'**
+  String get syncDocKindChains;
+
+  /// No description provided for @syncDocKindObfs.
+  ///
+  /// In ru, this message translates to:
+  /// **'Маскировка трафика'**
+  String get syncDocKindObfs;
+
+  /// No description provided for @syncFrom.
+  ///
+  /// In ru, this message translates to:
+  /// **'с {name}'**
+  String syncFrom(String name);
+
+  /// No description provided for @syncThisDevice.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это устройство'**
+  String get syncThisDevice;
+
+  /// No description provided for @syncUnavailableAndroid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Синхронизация устройств пока недоступна на Android — там не может работать служба синхронизации.'**
+  String get syncUnavailableAndroid;
+
+  /// No description provided for @smartPickReason.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выбран умным режимом: пинг {ping}, скорость {speed}'**
+  String smartPickReason(String ping, String speed);
+
+  /// No description provided for @serverReliability.
+  ///
+  /// In ru, this message translates to:
+  /// **'Надёжность {pct}%'**
+  String serverReliability(int pct);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

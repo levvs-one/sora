@@ -20,16 +20,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   // plugins.
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
-  // A link opened while Sora runs, from a browser or a messenger, goes to the
-  // running window, which shows the import.
-  if (SendAppLinkToInstance()) {
-    return EXIT_SUCCESS;
-  }
-
   // One window per session, as on Linux: a second start brings the open
   // window forward instead of starting another interface.
   HANDLE single = ::CreateMutexW(nullptr, TRUE, L"Local\\io.github.levvs_one.sora");
   if (single != nullptr && ::GetLastError() == ERROR_ALREADY_EXISTS) {
+    // A link opened while Sora runs, from a browser or a messenger, goes to
+    // the running window, which shows the import. The first instance may
+    // still be starting and have no window yet: retry briefly instead of
+    // silently dropping the activation (and the link with it). Once a window
+    // exists, a failed send means the target cannot receive (e.g. it runs
+    // elevated), not that it is still starting, so stop retrying.
+    for (int attempt = 0; attempt < 40; ++attempt) {
+      if (SendAppLinkToInstance()) {
+        return EXIT_SUCCESS;
+      }
+      if (::FindWindowW(L"FLUTTER_RUNNER_WIN32_WINDOW", L"Sora") != nullptr) {
+        break;
+      }
+      ::Sleep(100);
+    }
     if (HWND open = ::FindWindowW(L"FLUTTER_RUNNER_WIN32_WINDOW", L"Sora")) {
       ::ShowWindow(open, SW_RESTORE);
       ::SetForegroundWindow(open);

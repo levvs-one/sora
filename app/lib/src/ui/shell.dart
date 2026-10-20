@@ -11,6 +11,7 @@ import '../design/theme.dart';
 import '../sora.dart';
 import 'about.dart';
 import 'connections.dart';
+import 'extensions/store_screen.dart';
 import 'home.dart';
 import 'logs.dart';
 import 'notifications_screen.dart';
@@ -43,7 +44,25 @@ class DesktopShell extends StatefulWidget {
 }
 
 class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver {
-  static const _sectionOrder = [0, 6, 8, 4, 1, 3, 5, 7];
+  // Connections (2) restored to its 1.0.7 slot: 8th item, Ctrl+8.
+  // About (7) stays last and is pinned at the sidebar bottom.
+  static const _sectionOrder = [0, 6, 8, 4, 1, 3, 5, 2, 7];
+
+  // Section widgets by section index. All are const constructors and only
+  // the selected one is ever inflated (by the content Navigator below), so
+  // the list itself is built once instead of on every shell rebuild — the
+  // shell rebuilds on every Sora notification.
+  static const _pages = <Widget>[
+    HomeScreen(),
+    RulesScreen(),
+    ConnectionsScreen(),
+    LogsScreen(),
+    NotificationsScreen(),
+    SettingsScreen(),
+    SpeedtestScreen(),
+    AboutScreen(),
+    ExtensionsScreen(),
+  ];
   final _scaffold = GlobalKey<ScaffoldState>();
   final _tourKeys = List.generate(5, (_) => GlobalKey());
   final _focus = FocusNode();
@@ -223,6 +242,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
       LogicalKeyboardKey.digit6,
       LogicalKeyboardKey.digit7,
       LogicalKeyboardKey.digit8,
+      LogicalKeyboardKey.digit9,
     ];
     final index = numbers.indexOf(key);
     if (index >= 0) {
@@ -257,24 +277,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
     final width = MediaQuery.sizeOf(context).width;
     final compact = width < 720;
     final expanded = width >= 1000 && sora.settings.sidebarExpanded;
-    final pages = <Widget>[
-      const HomeScreen(),
-      const RulesScreen(),
-      const ConnectionsScreen(),
-      const LogsScreen(),
-      const NotificationsScreen(),
-      const SettingsScreen(),
-      const SpeedtestScreen(),
-      const AboutScreen(),
-      Screen(
-        title: S.of(context).extensions,
-        fill: Center(
-          child: Text(S.of(context).extensionsSoon, style: Styles.heading.copyWith(color: palette.ink)),
-        ),
-        children: const [],
-      ),
-    ];
-    final page = pages[_section];
+    final page = _pages[_section];
     final content = KeyedSubtree(
       key: ObjectKey(_contentNavigator),
       child: Navigator(
@@ -437,7 +440,8 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
           ),
         ),
         const SizedBox(height: 20),
-        for (final index in _sectionOrder.take(7))
+        // The last section (About) is pinned at the sidebar bottom below.
+        for (final index in _sectionOrder.take(_sectionOrder.length - 1))
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             child: index == 5 && !drawer

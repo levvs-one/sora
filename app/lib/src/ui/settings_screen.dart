@@ -11,14 +11,18 @@ import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../settings.dart';
 import '../sora.dart';
 import 'about.dart';
+import 'chains.dart';
 import 'connections.dart';
+import 'dns.dart';
 import 'kit.dart';
 import 'language.dart';
 import 'logs.dart';
+import 'profiles.dart';
 import 'rules_screen.dart';
 import 'subscription.dart';
 import 'subscription_sheet.dart';
 import 'shell.dart';
+import 'sync.dart';
 import 'modes.dart';
 
 /// App settings, with common options first and advanced options in named
@@ -37,11 +41,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// Temporarily shows confirmation after copying the proxy address.
   bool _copied = false;
 
+  /// Generation counter so a second tap's timer cannot hide the first tap's
+  /// indicator early (audit L22).
+  int _copiedStamp = 0;
+
   // Match core validation to reject invalid settings before connection.
   static final _range = RegExp(r'^\d{1,5}-\d{1,5}$');
   static final _packets = RegExp(r'^(tlshello|\d{1,3}-\d{1,3})$');
   static final _position = RegExp(r'^(-?\d{1,4}|(method|host|endhost|sld|midsld|endsld|sniext)([+-]\d{1,4})?)$');
-  static final _resolver = RegExp(r'^[A-Za-z0-9\[\]:._/-]+$');
 
   @override
   void initState() {
@@ -123,6 +130,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (p.isNotEmpty) p,
   ];
 
+  /// Summarizes the DNS configuration for the settings row: preset name,
+  /// or the first custom resolver. Legacy installs with resolvers but no
+  /// preset read as custom.
+  static String _dnsSummary(S s, Settings settings) {
+    final preset = settings.dnsPreset;
+    if (preset == 'custom' || (preset == 'auto' && settings.dns.isNotEmpty)) {
+      return settings.dns.isEmpty ? s.dnsAuto : settings.dns.first;
+    }
+    return switch (preset) {
+      'cloudflare' => s.dnsPresetCloudflare,
+      'google' => s.dnsPresetGoogle,
+      'quad9' => s.dnsPresetQuad9,
+      'adguard' => s.dnsPresetAdGuard,
+      _ => s.dnsAuto,
+    };
+  }
+
   static bool _web(String value) {
     final uri = Uri.tryParse(value);
     return uri != null && (uri.isScheme('https') || uri.isScheme('http')) && uri.host.isNotEmpty;
@@ -159,9 +183,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: _copied ? s.copied : '${local.host}:${local.port}',
                 onTap: () async {
                   await Clipboard.setData(ClipboardData(text: '${local.host}:${local.port}'));
+                  final stamp = ++_copiedStamp;
                   setState(() => _copied = true);
                   await Future<void>.delayed(const Duration(milliseconds: 1500));
-                  if (mounted) setState(() => _copied = false);
+                  if (mounted && stamp == _copiedStamp) setState(() => _copied = false);
                 },
               ),
             SwitchTile(title: s.blockAds, value: settings.blockAds, onChanged: (v) => set((x) => x.blockAds = v)),
@@ -177,6 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (desktop != null)
               SwitchTile(
                 title: s.launchAtLogin,
+                detail: s.launchAtLoginDetail,
                 value: settings.launchAtLogin,
                 onChanged: (v) async {
                   await sora.change((x) => x.launchAtLogin = v, replan: false);
@@ -230,17 +256,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () => push<void>(context, const RulesScreen()),
             ),
             SwitchTile(title: s.failover, value: settings.failover, onChanged: (v) => set((x) => x.failover = v)),
+            SwitchTile(
+              title: s.restoreOnCrash,
+              value: settings.restoreOnCrash,
+              onChanged: (v) => set((x) => x.restoreOnCrash = v, replan: false),
+            ),
             SwitchTile(title: s.ipv6, value: settings.ipv6, onChanged: (v) => set((x) => x.ipv6 = v)),
             LinkTile(
               title: s.dns,
-              value: settings.dns.isEmpty ? s.dnsAuto : settings.dns.first,
-              onTap: () => _edit(
-                title: s.dns,
-                hint: s.dnsHint,
-                initial: settings.dns.join(', '),
-                valid: (v) => _parts(v).every(_resolver.hasMatch),
-                apply: (x, v) => x.dns = _parts(v),
-              ),
+              value: _dnsSummary(s, settings),
+              onTap: () => push<void>(context, const DnsScreen()),
+            ),
+            LinkTile(
+              title: s.profiles,
+              value: sora.profiles.profiles.isEmpty
+                  ? null
+                  : sora.profiles.activeId == null
+                      ? '${sora.profiles.profiles.length}'
+                      : s.profileActive,
+              onTap: () => push<void>(context, const ProfilesScreen()),
+            ),
+            LinkTile(
+              title: s.chains,
+              value: sora.chains.chains.isEmpty ? null : '${sora.chains.chains.length}',
+              onTap: () => push<void>(context, const ChainsScreen()),
+            ),
+            LinkTile(
+              title: s.sync,
+              onTap: () => push<void>(context, const SyncScreen()),
             ),
             SwitchTile(title: s.fragment, value: settings.fragment, onChanged: (v) => set((x) => x.fragment = v)),
             if (settings.fragment) ...[
@@ -332,6 +375,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.probeTimeout,
               choices: {0: s.byDefault, 2000: s.seconds(2), 5000: s.seconds(5), 10000: s.seconds(10)},
               onChanged: (v) => set((x) => x.probeTimeout = v, replan: false),
+            ),
+            ChoiceTile<String>(
+              title: s.autoSelectMode,
+              value: settings.autoSelectMode,
+              choices: {'ping': s.autoSelectPing, 'speed': s.autoSelectSpeed, 'smart': s.autoSelectSmart},
+              onChanged: (v) => set((x) => x.autoSelectMode = v),
+            ),
+            SwitchTile(
+              title: s.autoSwitchOnDegrade,
+              detail: s.autoSwitchOnDegradeDetail,
+              value: settings.autoSwitchOnDegrade,
+              onChanged: (v) => set((x) => x.autoSwitchOnDegrade = v, replan: false),
             ),
           ],
         ),
