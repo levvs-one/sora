@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -35,6 +36,22 @@ func (l Level) String() string {
 
 // ParseLevel accepts the level names the engines and the core use.
 func ParseLevel(s string) (Level, bool) {
+	// Fast path for the exact spellings the engines emit (sing-box shouts,
+	// mihomo whispers, Xray capitalizes), so the per-line parse does not pay
+	// for the allocating lowercase copy below. Any other spelling falls
+	// through to the original case- and space-insensitive match.
+	switch s {
+	case "trace", "TRACE", "Trace", "debug", "DEBUG", "Debug", "dbg", "DBG", "Dbg":
+		return LevelDebug, true
+	case "info", "INFO", "Info", "information", "INFORMATION", "Information",
+		"notice", "NOTICE", "Notice":
+		return LevelInfo, true
+	case "warn", "WARN", "Warn", "warning", "WARNING", "Warning":
+		return LevelWarning, true
+	case "error", "ERROR", "Error", "err", "ERR", "Err", "fatal", "FATAL", "Fatal",
+		"panic", "PANIC", "Panic", "critical", "CRITICAL", "Critical":
+		return LevelError, true
+	}
 	switch strings.ToLower(strings.TrimSpace(s)) {
 	case "trace", "debug", "dbg":
 		return LevelDebug, true
@@ -118,7 +135,15 @@ func (s Settings) normalized() Settings {
 type Center struct {
 	mu       sync.Mutex
 	settings Settings
-	entries  []Entry // oldest first
+	entries  []Entry // oldest first; a view into backing starting at head
+	// backing is the allocation entries views into, and head is the number
+	// of leading slots eviction has slid past. Keeping both lets Write
+	// compact the view back to the front of the same allocation instead
+	// of paying for a fresh copying allocation every time the view runs
+	// off the end — the steady state of a full log, where every write
+	// evicts one entry.
+	backing  []Entry
+	head     int
 	bytes    int
 	next     uint64
 	dropped  uint64 // entries evicted by the bounds
@@ -195,7 +220,28 @@ func (c *Center) Write(at time.Time, level Level, source, message string) {
 	}
 	e := Entry{Seq: c.next, Time: at, Level: level, Source: source, Message: message, Repeat: 1}
 	c.next++
+	grew := false
+	if len(c.entries) == cap(c.entries) {
+		if c.backing != nil && c.head > 0 {
+			// The view ran off the end of its allocation, but eviction
+			// left dead slide space in front of it: move the live
+			// entries back to the front and clear the stale copies the
+			// move leaves behind, so appending reuses the allocation.
+			// The move copies exactly what the realloc it replaces
+			// would have copied; only the allocation is saved.
+			n := copy(c.backing, c.entries)
+			clear(c.backing[n : c.head+n])
+			c.entries = c.backing[:n]
+			c.head = 0
+		} else {
+			grew = true // append is about to allocate a fresh backing
+		}
+	}
 	c.entries = append(c.entries, e)
+	if grew || c.backing == nil {
+		c.backing = c.entries[:cap(c.entries)]
+		c.head = 0
+	}
 	c.bytes += e.size()
 	c.evict()
 	c.notify(e)
@@ -214,6 +260,7 @@ func (c *Center) evict() {
 	// Release discarded messages without copying the full log on every write.
 	clear(c.entries[:drop])
 	c.entries = c.entries[drop:]
+	c.head += drop
 }
 
 // Clear removes entries without resetting sequence numbers, preserving cursor
@@ -222,6 +269,8 @@ func (c *Center) Clear() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.entries = nil
+	c.backing = nil
+	c.head = 0
 	c.bytes = 0
 }
 
@@ -265,10 +314,40 @@ func (f Filter) match(e Entry) bool {
 	if !f.Until.IsZero() && e.Time.After(f.Until) {
 		return false
 	}
-	if f.Contains != "" && !strings.Contains(strings.ToLower(e.Message), strings.ToLower(f.Contains)) {
+	if f.Contains != "" && !foldContains(e.Message, f.Contains) {
 		return false
 	}
 	return f.Pattern == nil || f.Pattern.MatchString(e.Message)
+}
+
+// foldContains reports whether s contains sub under Unicode lowercase
+// folding. It is the comparison the Contains filter made through
+// strings.ToLower copies of both sides — strings.ToLower maps each rune
+// with unicode.ToLower, so folding rune by rune during the scan gives the
+// same answer without allocating either copy (a query over a full center
+// previously allocated a fresh pair of copies for every stored entry).
+func foldContains(s, sub string) bool {
+	if len(sub) == 0 {
+		return true
+	}
+	for i := 0; i < len(s); {
+		j, k := i, 0
+		for j < len(s) && k < len(sub) {
+			r1, size1 := utf8.DecodeRuneInString(s[j:])
+			r2, size2 := utf8.DecodeRuneInString(sub[k:])
+			if unicode.ToLower(r1) != unicode.ToLower(r2) {
+				break
+			}
+			j += size1
+			k += size2
+		}
+		if k == len(sub) {
+			return true
+		}
+		_, size := utf8.DecodeRuneInString(s[i:])
+		i += size
+	}
+	return false
 }
 
 // Page holds one Query result.
@@ -303,7 +382,7 @@ func (c *Center) Query(f Filter, before uint64, limit int) Page {
 	}
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	page := Page{Stats: c.stats()}
+	page := Page{Stats: c.stats(), Entries: make([]Entry, 0, min(limit, len(c.entries)))}
 	for i := len(c.entries) - 1; i >= 0; i-- {
 		e := c.entries[i]
 		if before != 0 && e.Seq >= before {
@@ -325,7 +404,19 @@ func (c *Center) Query(f Filter, before uint64, limit int) Page {
 func (c *Center) Matching(f Filter) []Entry {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	var out []Entry
+	// Count first, then fill one exact-size slice: growing by append made a
+	// full-center export allocate roughly four times the result size in
+	// discarded intermediate arrays.
+	n := 0
+	for _, e := range c.entries {
+		if f.match(e) {
+			n++
+		}
+	}
+	if n == 0 {
+		return nil
+	}
+	out := make([]Entry, 0, n)
 	for _, e := range c.entries {
 		if f.match(e) {
 			out = append(out, e)

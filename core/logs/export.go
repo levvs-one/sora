@@ -31,22 +31,74 @@ const (
 // MaxExportBytes bounds an export and its uncompressed diagnostic contents.
 const MaxExportBytes = 32 << 20
 
+// jsonEntryOf renders one entry for the structured formats. The text,
+// CSV, ZIP, and GZIP paths never build these rows: formatting a timestamp
+// string and a row struct for every entry and then discarding them cost
+// roughly a quarter of a plain text export.
+func jsonEntryOf(e Entry) jsonEntry {
+	return jsonEntry{e.Seq, e.Time.Format(time.RFC3339Nano), e.Level.String(), e.Source, e.Message, e.Repeat}
+}
+
+func jsonRows(entries []Entry) []jsonEntry {
+	rows := make([]jsonEntry, 0, len(entries))
+	for _, e := range entries {
+		rows = append(rows, jsonEntryOf(e))
+	}
+	return rows
+}
+
+// levelUpper is Level.String in upper case, from a switch instead of a
+// strings.ToUpper copy per exported entry.
+func levelUpper(l Level) string {
+	switch l {
+	case LevelDebug:
+		return "DEBUG"
+	case LevelInfo:
+		return "INFO"
+	case LevelWarning:
+		return "WARNING"
+	case LevelError:
+		return "ERROR"
+	}
+	return "UNKNOWN"
+}
+
+// writeTextEntry renders one entry exactly as the previous
+// fmt.Fprintf("%s %-7s %-8s %s") form did, without the format machinery
+// (several allocations per entry) or the concatenated bracket copy.
+func writeTextEntry(buf *bytes.Buffer, e Entry) {
+	buf.Write(e.Time.AppendFormat(buf.AvailableBuffer(), "2006-01-02 15:04:05.000"))
+	buf.WriteByte(' ')
+	level := levelUpper(e.Level)
+	buf.WriteString(level)
+	for i := len(level); i < 7; i++ {
+		buf.WriteByte(' ')
+	}
+	buf.WriteByte(' ')
+	buf.WriteByte('[')
+	buf.WriteString(e.Source)
+	buf.WriteByte(']')
+	for i := len(e.Source) + 2; i < 8; i++ {
+		buf.WriteByte(' ')
+	}
+	buf.WriteByte(' ')
+	buf.WriteString(e.Message)
+	if e.Repeat > 1 {
+		buf.WriteString(" (x")
+		buf.Write(strconv.AppendUint(buf.AvailableBuffer(), uint64(e.Repeat), 10))
+		buf.WriteByte(')')
+	}
+	buf.WriteByte('\n')
+}
+
 // Export preserves the original messages and their order in every format.
 func Export(entries []Entry, format Format, at time.Time) (data []byte, name, mediaType string, err error) {
 	var buf bytes.Buffer
-	rows := make([]jsonEntry, 0, len(entries))
-	for _, e := range entries {
-		rows = append(rows, jsonEntry{e.Seq, e.Time.Format(time.RFC3339Nano), e.Level.String(), e.Source, e.Message, e.Repeat})
-	}
 	extension := ""
 	switch format {
 	case FormatText, FormatLog:
 		for _, e := range entries {
-			fmt.Fprintf(&buf, "%s %-7s %-8s %s", e.Time.Format("2006-01-02 15:04:05.000"), strings.ToUpper(e.Level.String()), "["+e.Source+"]", e.Message)
-			if e.Repeat > 1 {
-				fmt.Fprintf(&buf, " (x%d)", e.Repeat)
-			}
-			buf.WriteByte('\n')
+			writeTextEntry(&buf, e)
 		}
 		extension, mediaType = "txt", "text/plain; charset=utf-8"
 		if format == FormatLog {
@@ -54,8 +106,8 @@ func Export(entries []Entry, format Format, at time.Time) (data []byte, name, me
 		}
 	case FormatJSONLines:
 		enc := json.NewEncoder(&buf)
-		for _, row := range rows {
-			if err = enc.Encode(row); err != nil {
+		for _, e := range entries {
+			if err = enc.Encode(jsonEntryOf(e)); err != nil {
 				return nil, "", "", err
 			}
 		}
@@ -67,7 +119,7 @@ func Export(entries []Entry, format Format, at time.Time) (data []byte, name, me
 			Format     string      `json:"format"`
 			ExportedAt string      `json:"exported_at"`
 			Entries    []jsonEntry `json:"entries"`
-		}{"sora-log/1", at.Format(time.RFC3339), rows})
+		}{"sora-log/1", at.Format(time.RFC3339), jsonRows(entries)})
 		extension, mediaType = "json", "application/json"
 	case FormatXML:
 		buf.WriteString(xml.Header)
@@ -78,16 +130,23 @@ func Export(entries []Entry, format Format, at time.Time) (data []byte, name, me
 			Format     string      `xml:"format,attr"`
 			ExportedAt string      `xml:"exported-at,attr"`
 			Entries    []jsonEntry `xml:"entries>entry"`
-		}{Format: "1", ExportedAt: at.Format(time.RFC3339), Entries: rows})
+		}{Format: "1", ExportedAt: at.Format(time.RFC3339), Entries: jsonRows(entries)})
 		extension, mediaType = "xml", "application/xml"
 	case FormatCSV:
 		w := csv.NewWriter(&buf)
+		row := make([]string, 6)
 		err = w.Write([]string{"sequence", "time", "level", "source", "message", "repeat"})
 		for _, e := range entries {
 			if err != nil {
 				break
 			}
-			err = w.Write([]string{strconv.FormatUint(e.Seq, 10), e.Time.Format(time.RFC3339Nano), e.Level.String(), cell(e.Source), cell(e.Message), strconv.FormatUint(uint64(e.Repeat), 10)})
+			row[0] = strconv.FormatUint(e.Seq, 10)
+			row[1] = e.Time.Format(time.RFC3339Nano)
+			row[2] = e.Level.String()
+			row[3] = cell(e.Source)
+			row[4] = cell(e.Message)
+			row[5] = strconv.FormatUint(uint64(e.Repeat), 10)
+			err = w.Write(row)
 		}
 		w.Flush()
 		if err == nil {

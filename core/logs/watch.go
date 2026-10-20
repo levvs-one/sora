@@ -26,7 +26,16 @@ type Subscription struct {
 func (c *Center) Watch(f Filter, after uint64) *Subscription {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	var replay []Entry
+	// Count first, then fill one exact-size slice, as in Matching: growing
+	// the replay by append allocates several discarded arrays on a full
+	// center.
+	n := 0
+	for _, e := range c.entries {
+		if e.Seq > after && f.match(e) {
+			n++
+		}
+	}
+	replay := make([]Entry, 0, n)
 	for _, e := range c.entries {
 		if e.Seq > after && f.match(e) {
 			replay = append(replay, e)
