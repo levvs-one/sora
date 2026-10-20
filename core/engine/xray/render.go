@@ -218,17 +218,6 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		// pins (CENSOR-P1).
 		return nil, fmt.Errorf("xray: outbound %s pins a REALITY key_share, which Xray does not expose (the fingerprint parrot decides the key share); use the sing-box or mihomo engine", o.ID)
 	}
-	if o.TLS.ECH.Enabled {
-		// Xray implements ECH (transport/internet/tls/ech.go:
-		// echConfigList/echForceQuery), but this renderer emits
-		// neither, and the echConfigList format the pin expects —
-		// base64 ECHConfigList vs the plan's PEM lines — is unverified
-		// without the binary. Rendering without it would send the SNI
-		// in the clear while the plan promises it hidden, so fail
-		// closed here too, not just at engine selection (FeatureECH,
-		// PASS3 deep S4).
-		return nil, fmt.Errorf("xray: outbound %s enables ECH, which the Xray renderer does not emit (echConfigList is unverified on the pinned build); use the sing-box or mihomo engine", o.ID)
-	}
 	tag := r.tags[o.ID]
 	server := obj{"address": o.Server, "port": int(o.Port)}
 	var settings obj
@@ -374,8 +363,37 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 															set("mldsa65Verify", o.TLS.RealityMLDSA65Verify)
 	case o.TLS.Enabled || needsTLS:
 		s["security"] = "tls"
-		s["tlsSettings"] = obj{}.set("serverName", o.TLS.ServerName).set("alpn", o.TLS.ALPN).
-			set("fingerprint", engine.NormalizeFingerprint(o.TLS.Fingerprint))
+		tlsSettings := obj{}.set("serverName", o.TLS.ServerName).set("alpn", o.TLS.ALPN).
+			set("fingerprint", engine.ResolveFingerprint(engine.KindXray, o, r.plan.Options.Fingerprint))
+		if o.TLS.ECH.Enabled {
+			// ECH on Xray (transport/internet/tls/ech.go), probed on
+			// the pinned 26.10.17 binary (CENSOR-FP): the pinned list
+			// renders as ONE base64 string in echConfigList and a
+			// wire capture shows the outer SNI becoming the list's
+			// public_name — real ECH. Without a pinned list Xray
+			// fetches the ECHConfigList itself when echForceQuery is
+			// "full". (The loader does not parse echConfigList at
+			// config-test time, so only the capture proves this —
+			// the runtime probe re-measures it per binary.)
+			if len(o.TLS.ECH.Config) > 0 {
+				b64, err := engine.ECHConfigListBase64(o.TLS.ECH.Config)
+				if err != nil {
+					return nil, fmt.Errorf("xray: outbound %s: %w", o.ID, err)
+				}
+				tlsSettings["echConfigList"] = b64
+			} else {
+				tlsSettings["echForceQuery"] = "full"
+			}
+			if o.TLS.ECH.QueryServerName != "" {
+				// Xray has no query_server_name spelling for ECH:
+				// the pinned list carries its own public_name and
+				// the DNS query uses the server name. Refuse rather
+				// than silently drop the override (sing-box and
+				// mihomo render it).
+				return nil, fmt.Errorf("xray: outbound %s sets ECH query_server_name %q, which Xray does not spell; use the sing-box or mihomo engine", o.ID, o.TLS.ECH.QueryServerName)
+			}
+		}
+		s["tlsSettings"] = tlsSettings
 	}
 	if r.plan.Options.Fragment.Enabled && s["security"] != nil {
 		// Dial proxy connections through the fragment outbound to split
@@ -388,12 +406,12 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 // realityFingerprint resolves the uTLS fingerprint of a REALITY outbound:
 // the plan's explicit value (normalized) wins, then a probe-discovered
 // working fingerprint (normalized, so it can never diverge from the XHTTP
-// downlink leg, which normalizes the same hint), then the canonical
-// default. The default is the
-// "hellochrome_auto" alias — always the newest verified Chrome parrot of
+// downlink leg, which normalizes the same hint), then the plan's
+// fingerprint policy — whose canonical default is the
+// "hellochrome_auto" alias, always the newest verified Chrome parrot of
 // the engine's vendored uTLS — because Xray's pinned "chrome" alias sends
 // Chrome 133, which TSPU fingerprints and blocks (see
-// engine.DefaultXrayFingerprint).
+// engine.DefaultXrayFingerprint and fingerprint_policy.go).
 func (r *renderer) realityFingerprint(o engine.Outbound) string {
 	if fp := engine.NormalizeFingerprint(o.TLS.Fingerprint); fp != "" {
 		return fp
@@ -401,23 +419,16 @@ func (r *renderer) realityFingerprint(o engine.Outbound) string {
 	if fp := engine.NormalizeFingerprint(r.fpHints[o.ID]); fp != "" {
 		return fp
 	}
-	return engine.DefaultXrayFingerprint
+	return engine.ResolveFingerprint(engine.KindXray, o, r.plan.Options.Fingerprint)
 }
 
-// fingerprintRotation is the uTLS fingerprint try-order for Xray probes.
-// Index 0 is the render default (engine.DefaultXrayFingerprint); when a
-// probe times out, the next entries are tried in order so one blocked
-// template does not mark a working server dead. Real browser templates go
-// first: randomized fingerprints match no browser population and are more
-// detectable (see engine.IsRandomizedFingerprint), so "randomized" stays
-// last, with the TSPU-flagged pinned "chrome" (Chrome 133) just before it.
-var fingerprintRotation = []string{
-	engine.DefaultXrayFingerprint,
-	"firefox",
-	"safari",
-	"chrome",
-	"randomized",
-}
+// fingerprintRotation is the uTLS fingerprint try-order for Xray
+// probes. The order itself is policy data now — the single canonical
+// list in engine (fingerprint_policy.go, CanonicalRotation), shared
+// with the other engines' retry paths: index 0 is the render default;
+// real browser templates go first, randomized last. This alias keeps
+// the Xray driver's attempt indexing (engine.go) on the same data.
+var fingerprintRotation = engine.CanonicalRotation
 
 // realityWithoutVision reports a VLESS+REALITY outbound without an XTLS
 // vision flow. Without vision the inner TLS session runs inside the outer

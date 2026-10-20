@@ -498,6 +498,15 @@ func (t TLS) validate(what string) []error {
 	if t.Reality {
 		errs = append(errs, fmt.Errorf("%s: ECH and REALITY are incompatible", what))
 	}
+	if len(ech.Config) > 0 {
+		// A pinned list every renderer must decode: garbage here
+		// would otherwise surface as an engine startup refusal
+		// (sing-box) or a silently unparseable echConfigList (Xray's
+		// loader does not parse it at config time, CENSOR-FP).
+		if _, err := ECHConfigListBytes(ech.Config); err != nil {
+			errs = append(errs, fmt.Errorf("%s: %w", what, err))
+		}
+	}
 	return errs
 }
 

@@ -1,7 +1,6 @@
 package mihomo
 
 import (
-	"encoding/base64"
 	"fmt"
 	"maps"
 	"net"
@@ -17,6 +16,13 @@ import (
 // to ensure plan-wide uniqueness. mux carries the plan's REALITY
 // multiplexing policy (T007): mux on by default for REALITY outbounds.
 func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
+	return buildProxyPolicy(o, mux, engine.FingerprintPolicy{})
+}
+
+// buildProxyPolicy is buildProxy with the plan's fingerprint policy:
+// the render path passes p.Options.Fingerprint so resolution matches
+// the other engines (fingerprint_policy.go).
+func buildProxyPolicy(o engine.Outbound, mux engine.MuxOptions, policy engine.FingerprintPolicy) (proxy, error) {
 	udp := o.Protocol != engine.ProtocolHTTP && (o.Protocol != engine.ProtocolSOCKS5 || o.SOCKSUDP)
 	px := proxy{Type: "ss", Tag: o.ID, UDP: &udp, IPVer: "dual"}
 	// WireGuard uses its peer's server address.
@@ -118,7 +124,7 @@ func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
 		// apply to it.
 		px.Type = "anytls"
 		px.Password = o.Password
-		if err := applyTLS(&px, o); err != nil {
+		if err := applyTLS(&px, o, policy); err != nil {
 			return proxy{}, err
 		}
 		tls := true
@@ -173,7 +179,7 @@ func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
 		px.Password = o.Password
 		// HTTPS proxies require TLS to avoid sending credentials in
 		// cleartext.
-		if err := applyTLS(&px, o); err != nil {
+		if err := applyTLS(&px, o, policy); err != nil {
 			return proxy{}, err
 		}
 		return px, nil
@@ -184,7 +190,7 @@ func buildProxy(o engine.Outbound, mux engine.MuxOptions) (proxy, error) {
 	if err := applyTransport(&px, o.Transport); err != nil {
 		return proxy{}, err
 	}
-	if err := applyTLS(&px, o); err != nil {
+	if err := applyTLS(&px, o, policy); err != nil {
 		return proxy{}, err
 	}
 	if engine.RealityMux(o, mux) {
@@ -385,7 +391,7 @@ func amneziaOptions(a *engine.AmneziaWG) (map[string]any, error) {
 }
 
 // applyTLS writes TLS, SNI, ALPN, uTLS fingerprint and Reality parameters.
-func applyTLS(px *proxy, o engine.Outbound) error {
+func applyTLS(px *proxy, o engine.Outbound, policy engine.FingerprintPolicy) error {
 	if o.Protocol == engine.ProtocolWireGuard {
 		return nil
 	}
@@ -436,15 +442,21 @@ func applyTLS(px *proxy, o engine.Outbound) error {
 		if o.TLS.RealityPublicKey == "" {
 			return fmt.Errorf("mihomo: outbound %s uses reality without a public key", o.ID)
 		}
-		// REALITY only works behind a uTLS fingerprint; default to
-		// engine.DefaultFingerprint when the plan carries none, like the
-		// sing-box and Xray renderers do (legacy port of af8d343).
-		px.Fingerprint = orDefault(o.TLS.Fingerprint, engine.DefaultFingerprint)
+		// REALITY only works behind a uTLS fingerprint; the name
+		// resolves through the plan's policy, the single source every
+		// renderer shares (fingerprint_policy.go) — explicit value
+		// (normalized), per-protocol profile, then the canonical
+		// default, as on the sing-box and Xray paths.
+		px.Fingerprint = engine.ResolveFingerprint(engine.KindMihomo, o, policy)
 		px.Reality = &reality{PublicKey: o.TLS.RealityPublicKey, ShortID: o.TLS.RealityShortID}
 		// PASS3 deep S2: the plan's REALITY key-share knob, third leg
 		// of PASS2 S3. hybrid -> support-x25519mlkem768: true,
-		// classical -> false explicitly; unset leaves the key out
-		// (mihomo's default is not confirmed from the pinned docs).
+		// classical -> false explicitly; unset leaves the key out.
+		// The unset default is now MEASURED, not just undocumented:
+		// a wire capture against the pinned 1.19.32 binary shows the
+		// default ClientHello carrying NO X25519MLKEM768 group (a
+		// ~590-byte hello vs ~1780 with the hybrid), so "" honestly
+		// means "mihomo's default, which offers no hybrid" (CENSOR-FP).
 		switch o.TLS.KeyShare {
 		case "hybrid":
 			v := true
@@ -453,46 +465,28 @@ func applyTLS(px *proxy, o engine.Outbound) error {
 			v := false
 			px.Reality.SupportMLKEM768 = &v
 		}
-	} else if o.TLS.Fingerprint != "" {
-		px.Fingerprint = o.TLS.Fingerprint
+	} else if fp := engine.ResolveFingerprint(engine.KindMihomo, o, policy); fp != "" {
+		px.Fingerprint = fp
 	}
 	return nil
 }
 
 // mihomoECHConfig converts the plan's pinned ECHConfigList to the
-// ech-opts.config spelling: one base64 string. The plan stores PEM
-// lines (the shape sing-box takes); strip the armor, join the body,
-// verify it really is base64, and re-encode it as a single string.
-// Bare base64 lines (no armor) pass through the same path. More than
-// one PEM block cannot be merged into mihomo's single config value —
-// each block is a complete ECHConfigList, and concatenating two lists
-// is not a list — so that shape fails closed instead of rendering a
-// config mihomo would reject or misread.
+// ech-opts.config spelling: one base64 string. The conversion itself
+// is the shared engine helper (echconfig.go): strip any armor, verify
+// the body is one base64 ECHConfigList, re-encode canonically. More
+// than one PEM block cannot be merged into mihomo's single config
+// value — each block is a complete ECHConfigList — so that shape
+// fails closed here with the mihomo context attached.
 func mihomoECHConfig(lines []string) (string, error) {
 	if len(lines) == 0 {
 		return "", nil
 	}
-	blocks := 0
-	var body strings.Builder
-	for _, ln := range lines {
-		ln = strings.TrimSpace(ln)
-		switch {
-		case strings.HasPrefix(ln, "-----BEGIN"):
-			blocks++
-		case strings.HasPrefix(ln, "-----END"), ln == "":
-			// armor trailer or blank line: no payload
-		default:
-			body.WriteString(ln)
-		}
+	out, err := engine.ECHConfigListBase64(lines)
+	if err != nil {
+		return "", fmt.Errorf("mihomo: %w", err)
 	}
-	if blocks > 1 {
-		return "", fmt.Errorf("mihomo: %d pinned ECH configs cannot be merged into the single ech-opts.config value", blocks)
-	}
-	raw, err := base64.StdEncoding.DecodeString(body.String())
-	if err != nil || len(raw) == 0 {
-		return "", fmt.Errorf("mihomo: the pinned ECH config is not PEM/base64 ECHConfigList data")
-	}
-	return base64.StdEncoding.EncodeToString(raw), nil
+	return out, nil
 }
 
 // ssPluginOpts translates a SIP002 plugin option string ("k=v;k;flag")

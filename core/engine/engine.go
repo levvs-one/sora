@@ -89,13 +89,13 @@ const (
 	FeatureDoH3 Feature = "doh3"
 	// FeatureECH marks engines whose renderer actually emits Encrypted
 	// Client Hello for an outbound that enables it: sing-box (ech
-	// block with pinned config and query_server_name) and mihomo
-	// (ech-opts with pinned config and query-server-name). The Xray
-	// renderer emits neither echConfigList nor echForceQuery — the
-	// format Xray's pin expects for echConfigList (base64 ECHConfigList
-	// vs the plan's PEM lines) is unverified without the binary — so
-	// Xray does not claim it and refuses ECH outbounds at render time
-	// instead of silently sending the SNI in the clear (PASS3 deep S4).
+	// block with pinned config and query_server_name), mihomo
+	// (ech-opts with pinned config and query-server-name) and Xray
+	// (echConfigList + echForceQuery; the pinned list's format and
+	// its wire effect — outer SNI becomes the list's public_name —
+	// were verified by capture against the pinned 26.10.17 binary,
+	// CENSOR-FP). An engine whose runtime probe rejects ECH is gated
+	// by ProbeMissing regardless of this claim.
 	FeatureECH Feature = "ech"
 	// FeatureRealityMLDSA65 marks engines that verify the REALITY
 	// server's ML-DSA-65 signature (realitySettings.mldsa65Verify).

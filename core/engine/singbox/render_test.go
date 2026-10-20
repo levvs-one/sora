@@ -521,9 +521,26 @@ func TestRenderECHOutboundTLS(t *testing.T) {
 	if ech["enabled"] != true {
 		t.Fatalf("ech.enabled = %v, want true", ech["enabled"])
 	}
+	// The pinned list renders canonicalized to the PEM armor the
+	// binary accepts — label "ECH CONFIGS", probed on lx.22 (the
+	// verbatim passthrough of a bare base64 line or an "ECHCONFIG"
+	// label fails the engine's startup, CENSOR-FP) — carrying the
+	// same ECHConfigList bytes.
 	got, _ := ech["config"].([]any)
-	if len(got) != 1 || got[0] != "AE7+DQA8NwAgACBwaW5uZWQtZWNoLXRlc3QtY29uZmln" {
-		t.Fatalf("ech.config = %v, want the pinned ECHConfigList", ech["config"])
+	var lines []string
+	for _, v := range got {
+		lines = append(lines, v.(string))
+	}
+	raw, err := engine.ECHConfigListBytes(lines)
+	if err != nil {
+		t.Fatalf("ech.config = %v, want a decodable pinned ECHConfigList: %v", ech["config"], err)
+	}
+	want, _ := engine.ECHConfigListBytes([]string{"AE7+DQA8NwAgACBwaW5uZWQtZWNoLXRlc3QtY29uZmln"})
+	if string(raw) != string(want) {
+		t.Fatalf("ech.config decodes to %x, want the pinned list %x", raw, want)
+	}
+	if len(lines) == 0 || lines[0] != "-----BEGIN ECH CONFIGS-----" {
+		t.Fatalf("ech.config = %v, want canonical ECH CONFIGS armor", ech["config"])
 	}
 }
 

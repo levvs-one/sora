@@ -92,6 +92,16 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 			// ECH plans only to engines that emit it (PASS3 deep S4).
 			out[FeatureECH] = true
 		}
+		if o.TLS.KeyShare != "" {
+			// The key-share choice is spelled by exactly two
+			// renderers (sing-box reality.key_share, mihomo
+			// support-x25519mlkem768) and honoured on the wire by
+			// both (probe captures, CENSOR-FP). Xray has no knob —
+			// its parrot decides — so without this gate a plan
+			// pinning "classical"/"hybrid" routed to Xray lost the
+			// choice silently (S2-C2).
+			out[FeatureRealityKeyShare] = true
+		}
 		if o.TLS.RealityMLDSA65Verify != "" {
 			// Only the Xray renderer emits mldsa65Verify; on the
 			// other engines the pinned ML-DSA-65 server check would

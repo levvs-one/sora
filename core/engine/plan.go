@@ -686,6 +686,12 @@ type Options struct {
 	// keeps the default: mux on for REALITY, off everywhere else. See
 	// mux.go for the policy and the vision↔mux decision.
 	Mux MuxOptions
+	// Fingerprint is the session's uTLS fingerprint policy as data:
+	// per-protocol profiles, the rotation order for probes, the
+	// session default. The zero value is the canonical behaviour
+	// (explicit outbound fingerprints win, REALITY gets the engine
+	// default). See fingerprint_policy.go.
+	Fingerprint FingerprintPolicy
 }
 
 // LocalProxy opens a loopback HTTP/SOCKS5 listener only for system proxy mode

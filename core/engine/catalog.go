@@ -74,9 +74,14 @@ var Catalog = map[Kind]Capabilities{
 			FeatureURLTest: true, FeatureLatencyTest: true, FeatureGeoData: true,
 			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureChains: true,
 			FeatureHy2PortHop: true, FeatureHy2Obfs: true, FeatureDoH3: true, FeatureECH: true,
-			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux: the
-			// lx fork's xhttp transport has neither downlink splitting
-			// nor xmux reuse tuning (x_padding_bytes only).
+			FeatureRealityKeyShare: true,
+			// Deliberately no FeatureXHTTPDownloadSplit: the lx
+			// fork's xhttp transport has no download_settings field
+			// at all (probed on lx.22: unknown field, CENSOR-P1).
+			// Its xmux and x_padding_bytes claims ride the probed
+			// with_xhttp build in BuildCapabilities, exactly like
+			// FeatureXHTTP itself — upstream sing-box spells
+			// neither, so the static entry claims neither.
 		},
 	},
 	KindXray: {
@@ -101,24 +106,33 @@ var Catalog = map[Kind]Capabilities{
 			FeatureGeoData: true, FeatureTLSFragment: true,
 			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
 			FeatureXHTTPDownloadSplit: true, FeatureRealityMLDSA65: true,
-			// Deliberately no FeatureXHTTPXmux: Xray's xhttp case
-			// renders only mode/path/host/headers/downloadSettings and
-			// emits neither xmux nor x_padding. Mihomo does claim the
-			// feature (its reuse-settings render is verified with
-			// `mihomo -t` on the pin, see the mihomo entry above), and
-			// sing-box emits neither — so xmux-tuned plans report the
-			// feature missing on Xray and sing-box and route to
-			// mihomo. Claiming it for Xray would route xmux-tuned
-			// plans to a silent loss (PASS3 deep S1).
+			FeatureXHTTPXmux: true, FeatureXHTTPPadding: true,
+			// FeatureXHTTPXmux and FeatureXHTTPPadding are claimed
+			// since CENSOR-P1: the Xray renderer now emits xmux and
+			// xPaddingBytes (XHTTP is Xray's own transport; the
+			// fields were always in the binary — probed with
+			// `xray run -test` on 26.10.17), closing the PASS3
+			// deep S1 silent loss where xmux-tuned plans could
+			// only route to mihomo.
 			// dialerProxy exists since long before the minimum
 			// version, so chains need no extra version gate.
 			FeatureChains: true,
-			// Deliberately no FeatureECH: the Xray renderer does not
-			// emit echConfigList/echForceQuery (the format the pin
-			// expects is unverified without the binary) and refuses
-			// ECH outbounds at render time. Claiming it would route
-			// ECH plans into a silent cleartext-SNI loss (PASS3 deep
-			// S4); the gate returns together with a verified render.
+			// FeatureECH is claimed as of the CENSOR-FP probe
+			// (2026-10-20): the renderer now emits echConfigList
+			// (the plan's pinned list as one base64 string) and
+			// echForceQuery, and a wire capture against the pinned
+			// 26.10.17 binary shows the outer SNI becoming the
+			// list's public_name — real ECH, not GREASE. The claim
+			// is probe-gated like every fingerprint fact: a binary
+			// whose probe rejects ECH is refused by ProbeMissing
+			// regardless of this expectation. Before the probe, the
+			// renderer refused ECH at render time (PASS3 deep S4).
+			FeatureECH: true,
+			// Deliberately no FeatureRealityKeyShare: Xray has no
+			// key-share knob — the chosen parrot decides whether the
+			// hybrid group is offered — so a plan pinning the choice
+			// reports it missing here instead of losing it silently
+			// (S2-C2).
 			// Deliberately no FeatureHy2PortHop: Xray's hysteria2
 			// outbound cannot hop ports (see FeatureHy2PortHop).
 			// Deliberately no FeatureHy2Obfs: Xray's hysteria

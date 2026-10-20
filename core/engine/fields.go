@@ -114,6 +114,9 @@ func (o Options) validate() error {
 	default:
 		errs = append(errs, fmt.Errorf("options: unknown mode %q", o.Mode))
 	}
+	if err := o.Fingerprint.Validate(); err != nil {
+		errs = append(errs, err)
+	}
 	errs = append(errs, validateTestURL("options", o.TestURL))
 	for _, u := range []string{o.GeoSiteURL, o.GeoIPURL} {
 		if u != "" && !strings.HasPrefix(u, "https://") {

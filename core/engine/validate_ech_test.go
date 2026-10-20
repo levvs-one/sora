@@ -52,18 +52,16 @@ func TestValidateAcceptsECHQueryServerName(t *testing.T) {
 
 func TestECHPlanRequiresFeatureECH(t *testing.T) {
 	// PASS3 deep S4: an ECH plan must route only to engines whose
-	// renderer emits ECH. Xray renders none of it, so it reports the
-	// feature missing; sing-box and mihomo carry it.
+	// renderer emits ECH. Since the CENSOR-FP wire probe verified
+	// real ECH on all three pinned binaries, all three carry it; the
+	// gate itself remains what keeps a future non-ECH engine out.
 	p := &Plan{SessionID: "s1", Outbounds: []Outbound{echOutbound()}}
 	if !p.RequiredFeatures()[FeatureECH] {
 		t.Fatal("an ECH-enabled plan must require feature ech")
 	}
-	if missing := Catalog[KindXray].Missing(p); !containsStr(missing, "feature "+string(FeatureECH)) {
-		t.Errorf("xray must miss feature ech, got %v", missing)
-	}
-	for _, kind := range []Kind{KindSingBox, KindMihomo} {
+	for _, kind := range []Kind{KindSingBox, KindMihomo, KindXray} {
 		if missing := Catalog[kind].Missing(p); containsStr(missing, "feature "+string(FeatureECH)) {
-			t.Errorf("%s renders ECH and must not miss feature ech, got %v", kind, missing)
+			t.Errorf("%s renders ECH (probe-verified) and must not miss feature ech, got %v", kind, missing)
 		}
 	}
 }
@@ -116,7 +114,10 @@ func TestValidateAcceptsECHWithPinnedConfig(t *testing.T) {
 	// A pinned ECHConfigList skips the DNS lookup entirely, so plaintext
 	// DNS is irrelevant.
 	o := echOutbound()
-	o.TLS.ECH.Config = []string{"-----BEGIN ECHCONFIG-----"}
+	// A complete (if tiny) pinned list: armor plus a base64 body.
+	// Validation decodes the pin (CENSOR-FP), so a bare BEGIN line —
+	// the old fixture — is now honestly rejected as undecodable.
+	o.TLS.ECH.Config = []string{"-----BEGIN ECHCONFIG-----", "QUJD", "-----END ECHCONFIG-----"}
 	p := &Plan{
 		SessionID: "s1",
 		Outbounds: []Outbound{o},

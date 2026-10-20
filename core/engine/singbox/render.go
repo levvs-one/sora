@@ -394,7 +394,11 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		return nil, fmt.Errorf("singbox: outbound %s pins a REALITY mldsa65Verify key, which sing-box does not implement: refusing to render a handshake without the ML-DSA-65 server check", o.ID)
 	}
 	if o.TLS.Enabled || needsTLS {
-		out["tls"] = r.tls(o)
+		tlsObj, err := r.tls(o)
+		if err != nil {
+			return nil, err
+		}
+		out["tls"] = tlsObj
 	}
 	transport, err := transport(o.Transport)
 	if err != nil {
@@ -413,17 +417,26 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	return out.set("transport", transport), nil
 }
 
-func (r *renderer) tls(o engine.Outbound) obj {
+func (r *renderer) tls(o engine.Outbound) (obj, error) {
 	t := obj{"enabled": true}
 	t.set("server_name", o.TLS.ServerName).set("insecure", o.TLS.Insecure).set("alpn", o.TLS.ALPN)
-	fingerprint := o.TLS.Fingerprint
+	// The fingerprint resolves through the plan's policy, the single
+	// source every renderer shares (fingerprint_policy.go): explicit
+	// plan value (normalized), per-protocol profile, then the REALITY
+	// default — the "chrome" alias, which sing-box resolves to
+	// utls.HelloChrome_Auto of its vendored uTLS.
+	fingerprint := engine.ResolveFingerprint(engine.KindSingBox, o, r.plan.Options.Fingerprint)
 	if o.TLS.Reality {
-		// REALITY only works behind a uTLS fingerprint. DefaultFingerprint
-		// is the "chrome" alias, which sing-box resolves to
-		// utls.HelloChrome_Auto — the newest verified Chrome parrot of
-		// sing-box's vendored uTLS.
-		fingerprint = orDefault(fingerprint, engine.DefaultFingerprint)
-		t["reality"] = obj{"enabled": true, "public_key": o.TLS.RealityPublicKey}.set("short_id", o.TLS.RealityShortID)
+		reality := obj{"enabled": true, "public_key": o.TLS.RealityPublicKey}.set("short_id", o.TLS.RealityShortID)
+		if o.TLS.KeyShare != "" {
+			// tls.reality.key_share of the lx fork (PASS2 S3), probed
+			// on the pinned lx.22 binary: "hybrid"/"classical" are
+			// accepted, anything else is refused at load, and a wire
+			// capture shows classical dropping the X25519MLKEM768
+			// group from the ClientHello (CENSOR-FP).
+			reality["key_share"] = o.TLS.KeyShare
+		}
+		t["reality"] = reality
 	}
 	if fingerprint != "" {
 		t["utls"] = obj{"enabled": true, "fingerprint": fingerprint}
@@ -435,7 +448,16 @@ func (r *renderer) tls(o engine.Outbound) obj {
 		// always safe to emit.
 		ech := obj{"enabled": true}
 		if len(o.TLS.ECH.Config) > 0 {
-			ech["config"] = o.TLS.ECH.Config
+			// The pinned list is canonicalized to the PEM label the
+			// binary actually accepts — "ECH CONFIGS", probed on
+			// lx.22: the historical "ECHCONFIG" label makes the
+			// binary refuse the whole config at startup ("invalid
+			// ECH configs pem", CENSOR-FP).
+			pem, err := engine.ECHConfigPEM(o.TLS.ECH.Config)
+			if err != nil {
+				return nil, fmt.Errorf("singbox: outbound %s: %w", o.ID, err)
+			}
+			ech["config"] = pem
 		}
 		ech.set("query_server_name", o.TLS.ECH.QueryServerName)
 		t["ech"] = ech
@@ -444,7 +466,7 @@ func (r *renderer) tls(o engine.Outbound) obj {
 		// QUIC protocols have no TCP ClientHello to split.
 		t["fragment"] = true
 	}
-	return t
+	return t, nil
 }
 
 func transport(t engine.Transport) (obj, error) {
