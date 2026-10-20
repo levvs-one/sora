@@ -19,6 +19,13 @@ import (
 // FeatureXHTTPXmux claims for mihomo in the catalog: if a future mihomo
 // renames or drops these fields, this test fails before the claims can
 // silently route plans into a config the engine refuses.
+//
+// The plan also sets XPaddingBytes, and the render string is asserted
+// below — but `mihomo -t` silently ignores unknown keys, so neither
+// proves the pin HONOURS x-padding-bytes. That proof is traffic-level:
+// interop.TestMihomoXHTTPPaddingOnTheWire captures the client→server
+// bytes of a live session and shows the filler run tracking the
+// rendered range (CENSOR-P1 review Low item).
 func TestBinaryAcceptsXHTTPDownloadSettings(t *testing.T) {
 	bin := os.Getenv("SORA_MIHOMO_BIN")
 	if bin == "" {
@@ -34,12 +41,13 @@ func TestBinaryAcceptsXHTTPDownloadSettings(t *testing.T) {
 		Type: "xhttp", Path: "/x", Host: "cdn.example.com", Mode: "stream-up",
 		DownloadAddress: "dl.example.com", DownloadPort: 8443,
 		XmuxMaxConnections: 8, XmuxMaxReuseTimes: 64,
+		XPaddingBytes: "100-1000",
 	}
 	out, err := Render(p, testRuntime(t))
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"download-settings:", "reuse-settings:", "c-max-reuse-times: \"64\""} {
+	for _, want := range []string{"download-settings:", "reuse-settings:", "c-max-reuse-times: \"64\"", "x-padding-bytes: 100-1000"} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("render is missing %q:\n%s", want, out)
 		}
