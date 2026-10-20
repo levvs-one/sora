@@ -66,6 +66,23 @@ class Entry {
     });
   }
 
+  /// Copy without custom (SW7) members, or null when none remain. INT-1
+  /// merges custom servers into every subscription's outbound list so the
+  /// plan builder sees them; subscription views drop them because the UI
+  /// already shows them in the «Мои серверы» card — keeping them would list
+  /// every custom server twice (once per subscription). Entries with no
+  /// custom members return [this], so callers can skip rebuilding.
+  Entry? withoutCustom() {
+    if (id.startsWith(customServerPrefix)) return null;
+    final rest = [for (final o in members) if (!o.id.startsWith(customServerPrefix)) o];
+    if (rest.length == members.length) return this;
+    if (rest.isEmpty) return null;
+    return Entry._(id, name, rest, {
+      for (final o in rest)
+        if (roles[o.id] != null) o.id: roles[o.id]!,
+    });
+  }
+
   /// Returns main members first, then backups. Unlabelled members of a group
   /// with roles are treated as backups.
   List<OutboundSpec> get byRole => [
@@ -77,6 +94,10 @@ class Entry {
 }
 
 const groupPrefix = 'group:';
+
+/// Id prefix the core assigns to custom (user-added, SW7) servers when it
+/// merges them into subscription outbound lists (INT-1): `custom/<server id>`.
+const customServerPrefix = 'custom/';
 
 final _role = RegExp(
   r'\s*[\(\[\-–\u2014\u00b7|:,]?\s*(основн(?:ой|ая|ое)|главн(?:ый|ая|ое)|запасн(?:ой|ая|ое)|резерв(?:ный|ная|ное)?|main|primary|backup|reserve|fallback)\s*[\)\]]?\s*$',

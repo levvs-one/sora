@@ -253,12 +253,24 @@ List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty
 /// ones they renamed (FEATURE-PLAN.md F6). A renamed group member splits out
 /// of its group so the rename stays visible instead of being swallowed by the
 /// shared group title.
+///
+/// Custom servers (SW7) are dropped everywhere below: INT-1 merges them into
+/// each subscription's outbound list so the plan builder sees them, but in
+/// the UI they already live in the «Мои серверы» card — keeping them here
+/// would show every custom server again inside each subscription. The drop
+/// runs before overrides: overrides apply to subscription servers only, and
+/// a renamed custom member must not slip back in through [Entry.applyRenames].
 List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
   final override = sora.overrides.of(subscription.settings.id);
-  if (override.isEmpty) return entriesOf(subscription);
   final out = <Entry>[];
   for (final entry in entriesOf(subscription)) {
-    final visible = entry.withoutHidden(override.hidden);
+    final deduped = entry.withoutCustom();
+    if (deduped == null) continue;
+    if (override.isEmpty) {
+      out.add(deduped);
+      continue;
+    }
+    final visible = deduped.withoutHidden(override.hidden);
     if (visible == null) continue;
     out.addAll(visible.applyRenames(override.renames));
   }
