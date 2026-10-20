@@ -90,6 +90,22 @@ func (l *HandshakeLimiter) sem(key string) chan struct{} {
 func (l *HandshakeLimiter) Acquire(ctx context.Context, sni string) (release func(), err error) {
 	key := normalizeSNI(sni)
 	sem := l.sem(key)
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	// Fast path: a free slot is taken without arming the acquire
+	// timer. time.NewTimer costs 248 B / 3 allocs on this path
+	// (measured, [opt40]) while the uncontended acquire — the norm,
+	// since the limiter only bites under a >3-way burst on one SNI —
+	// needs no deadline at all: 264 B / 4 allocs -> 16 B / 1 alloc.
+	// The contended path below is unchanged, timer and all. The
+	// ctx.Err pre-check keeps a cancelled caller from taking a slot
+	// the old three-way select would only randomly have refused.
+	select {
+	case sem <- struct{}{}:
+		return func() { <-sem }, nil
+	default:
+	}
 	timer := time.NewTimer(l.acquireTimeout())
 	defer timer.Stop()
 	select {
