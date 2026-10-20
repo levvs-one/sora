@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/ext"
 	"github.com/levvs-one/sora-client/core/logs"
@@ -108,7 +109,12 @@ func (s *Server) ExtHostDeps() ext.Deps {
 			return out, nil
 		},
 		Notify: func(_ context.Context, extensionID, title, body string) error {
-			s.logs.Write(time.Time{}, logs.LevelInfo, "ext:"+extensionID, title+": "+body)
+			// Extension text is third-party content: it reaches the
+			// log center only through the pattern redactor, like every
+			// other obfuscating-path log line (CENSOR-LEAK). It used
+			// to be written raw.
+			mask := engine.NewRedactor().String
+			s.logs.Write(time.Time{}, logs.LevelInfo, "ext:"+extensionID, mask(title+": "+body))
 			return nil
 		},
 		WatchEvents: func(ctx context.Context) (<-chan [2]string, error) {
