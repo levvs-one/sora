@@ -2,6 +2,8 @@ module github.com/levvs-one/sora-client/core
 
 go 1.27
 
+toolchain go1.27.2
+
 require (
 	github.com/Microsoft/go-winio v0.6.4
 	github.com/godbus/dbus/v5 v5.2.4
