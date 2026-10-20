@@ -59,6 +59,12 @@ type Apply struct {
 	// Engine is the preferred engine: "sing-box", "xray" or "mihomo".
 	// Empty keeps the default.
 	Engine string `json:"engine,omitempty"`
+	// DesyncProfile is the desync strategy profile (core/tune/desync
+	// registry ID, e.g. "sni_block/fake-autottl-badseq") the Geneva
+	// tuner bound to this network. It is data the client renders into
+	// the session's zapret strategy; the tuner writes it, the user
+	// can clear it. Empty means no tuned strategy for this network.
+	DesyncProfile string `json:"desync_profile,omitempty"`
 }
 
 // Profile is one saved network profile.
@@ -350,6 +356,14 @@ func validate(p Profile) error {
 	case "", "sing-box", "xray", "mihomo":
 	default:
 		return fmt.Errorf("profiles: engine %q is unknown", p.Apply.Engine)
+	}
+	if len(p.Apply.DesyncProfile) > 64 {
+		return fmt.Errorf("profiles: the desync profile id is longer than 64 bytes")
+	}
+	for _, c := range p.Apply.DesyncProfile {
+		if !isIDChar(c) && c != '/' {
+			return fmt.Errorf("profiles: the desync profile id %q has an unsafe character", p.Apply.DesyncProfile)
+		}
 	}
 	if len(p.Apply.DNS) > MaxDNS {
 		return fmt.Errorf("profiles: more than %d DNS servers", MaxDNS)

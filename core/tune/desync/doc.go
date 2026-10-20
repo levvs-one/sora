@@ -29,10 +29,21 @@
 //     winners to the F5 network profile and rotates on silent death
 //     (see rotate.go) instead of pretending one strategy lasts.
 //   - Fake-packet tricks, TTL/autottl and fooling need nfqws; sora's
-//     current tpws executor (core/engine/bypass) supports only
+//     tpws executor (core/engine/bypass) supports only
 //     split/disorder/oob/tlsrec/HTTP reshaping. Params that need nfqws
-//     are marked so the caller never asks tpws to run them.
+//     are marked so the caller never asks tpws to run them — and the
+//     executor's runtime capability gate (bypass.Capabilities) refuses
+//     them honestly on hosts whose kernel cannot queue, instead of
+//     the caller having to guess from the OS.
 //
-// Production status (2026-10-20): NOT WIRED — a prototype with no
-// production callers, like its parent package core/tune (SW1d).
+// Production status (2026-10-20): WIRED. The user-triggered entry
+// point is the control plane's TuneDesync RPC (sora.censor.v1, since
+// 1.13; core/control/desync_tune.go), which runs Service (runner.go):
+// rate-limited per network, probing only the package's canary
+// endpoints, winners bound to the F5 network profile and rotated on
+// silent death. Strategies are data: the registry (registry.go) is
+// the single source of curated profiles per censor-cascade class,
+// versioned like this pool. What is still NOT claimed: a live packet
+// run needs nfnetlink_queue, which sandboxes and some kernels lack —
+// the capability gate says so at Apply instead of pretending.
 package desync

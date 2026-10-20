@@ -20,6 +20,11 @@ service CensorControl {
   // authenticator: the request names servers and the response describes the
   // machine's network.
   rpc DetectCensorship(DetectCensorshipRequest) returns (DetectCensorshipResponse);
+  // TuneDesync runs the Geneva-style desync tuner (core/tune/desync) once:
+  // the explicit user action behind "pick a strategy". It probes only the
+  // core's canary endpoints, is rate-limited per network, and binds the
+  // winner to the matching F5 network profile. Since 1.13.
+  rpc TuneDesync(TuneDesyncRequest) returns (TuneDesyncResponse);
 }
 
 // CensorshipKind is the detector's classification. UNSPECIFIED and UNKNOWN
@@ -130,4 +135,40 @@ message DetectCensorshipResponse {
   // supplied events or journal history.
   bool probe_ran = 2;
   sora.core.v1.SoraError error = 3;
+}
+
+// TuneDesyncRequest is the user's explicit "pick a strategy" action.
+// It carries no targets on purpose: the tuner probes only the core's
+// own canary endpoints, never a client-named host — active probing
+// fingerprints itself, so the target set is the core's, not the caller's.
+message TuneDesyncRequest {
+  sora.core.v1.ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string request_id = 3;
+  // Executor to tune for: "nfqws" or "tpws". Empty means nfqws when the
+  // host's probed capabilities allow it, else tpws — the choice is made
+  // from the runtime capability probe, not from the client.
+  string engine = 4;
+}
+
+message TuneDesyncResponse {
+  // The winning strategy's stable genome id ("d/fake:..."), or the
+  // registry profile id when the winner is a registry profile verbatim.
+  // Empty when no candidate worked (error is then unset: "no working
+  // strategy" is an outcome, not a failure of the call).
+  string winner_id = 1;
+  // Human-readable one-liner for the winner, as the tuner journal
+  // renders it.
+  string winner_describe = 2;
+  // The winner's Geneva fitness in [0,1].
+  double score = 3;
+  // How many candidates were probed.
+  int32 attempts = 4;
+  // The registry profile id bound to the matched F5 network profile,
+  // when the winner is a registry profile and a profile matched.
+  string bound_profile_id = 5;
+  // True when a fresh active search ran; false when the answer is a
+  // previously bound winner re-served for this network.
+  bool probe_ran = 6;
+  sora.core.v1.SoraError error = 7;
 }

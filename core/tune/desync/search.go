@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -102,10 +103,34 @@ type SearchResult struct {
 	Ranked []Scored
 	// Attempts is how many probes ran.
 	Attempts int
+	// BindErr is a non-fatal failure to persist or bind the winner
+	// (set by Service.Tune, mirroring tune.Result.CacheErr): the
+	// winner still applies to this session.
+	BindErr error
 }
 
 // Succeeded reports whether any candidate worked.
 func (r SearchResult) Succeeded() bool { return r.Best.Working() }
+
+// Summary renders the one uniform journal line for a finished search,
+// in the same shape package tune uses: strategy id, attempts, and the
+// bind warning when persistence failed. It carries no probe content —
+// no canary payloads, no latencies, no network identifiers — so every
+// caller logs strategies the same way and nothing beyond the outcome
+// reaches the log.
+func (r SearchResult) Summary() string {
+	var b strings.Builder
+	if r.Succeeded() {
+		fmt.Fprintf(&b, "desync: strategy %q worked", r.Best.Params.ID())
+	} else {
+		b.WriteString("desync: no working strategy")
+	}
+	fmt.Fprintf(&b, " after %d attempt(s)", r.Attempts)
+	if r.BindErr != nil {
+		fmt.Fprintf(&b, "; binding not saved: %v", r.BindErr)
+	}
+	return b.String()
+}
 
 // Search runs the bounded two-generation search: score the seed
 // population, then mutate around the winners and score the children.
