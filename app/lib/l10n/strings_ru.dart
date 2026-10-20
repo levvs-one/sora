@@ -1580,6 +1580,18 @@ class SRu extends S {
   String get sortName => 'Имя';
 
   @override
+  String get favorites => 'Избранное';
+
+  @override
+  String get favoritesEmpty => 'Пока нет избранных серверов. Нажмите звезду у сервера, чтобы добавить его сюда.';
+
+  @override
+  String get addToFavorites => 'В избранное';
+
+  @override
+  String get removeFromFavorites => 'Убрать из избранного';
+
+  @override
   String get measureSpeed => 'Замерить скорость';
 
   @override

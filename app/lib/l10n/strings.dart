@@ -2967,6 +2967,30 @@ abstract class S {
   /// **'Имя'**
   String get sortName;
 
+  /// No description provided for @favorites.
+  ///
+  /// In ru, this message translates to:
+  /// **'Избранное'**
+  String get favorites;
+
+  /// No description provided for @favoritesEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нет избранных серверов. Нажмите звезду у сервера, чтобы добавить его сюда.'**
+  String get favoritesEmpty;
+
+  /// No description provided for @addToFavorites.
+  ///
+  /// In ru, this message translates to:
+  /// **'В избранное'**
+  String get addToFavorites;
+
+  /// No description provided for @removeFromFavorites.
+  ///
+  /// In ru, this message translates to:
+  /// **'Убрать из избранного'**
+  String get removeFromFavorites;
+
   /// No description provided for @measureSpeed.
   ///
   /// In ru, this message translates to:

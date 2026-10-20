@@ -1552,6 +1552,18 @@ class SJa extends S {
   String get sortName => 'Name';
 
   @override
+  String get favorites => 'Favorites';
+
+  @override
+  String get favoritesEmpty => 'No favorites yet. Tap the star on a server to add it here.';
+
+  @override
+  String get addToFavorites => 'Add to favorites';
+
+  @override
+  String get removeFromFavorites => 'Remove from favorites';
+
+  @override
   String get measureSpeed => 'Measure speed';
 
   @override

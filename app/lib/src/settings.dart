@@ -61,6 +61,7 @@ class Settings {
     'lastRollback',
     'installUuid',
     'serverSortMode',
+    'favoriteServers',
     'autoSelectMode',
     'autoSwitchOnDegrade',
     'restoreOnCrash',
@@ -291,6 +292,29 @@ class Settings {
   String get serverSortMode => _store.getString('serverSortMode') ?? 'ping';
   set serverSortMode(String value) => _store.setString('serverSortMode', value);
 
+  /// Favorite server ids, starred in the server list. Server ids are stable
+  /// across subscription refreshes, so favorites survive them; a favorite
+  /// whose server is temporarily absent simply matches nothing and is kept,
+  /// not pruned, so a subscription outage does not lose the user's marks.
+  /// Stored sorted so the persisted shape is canonical.
+  ///
+  /// Deliberately not in [syncableSettingsKeys]: like the selected `server`
+  /// and the server-id-keyed `benchmarkHistory`, these ids are assigned by
+  /// the core on this device and do not resolve on another one.
+  Set<String> get favorites => (_store.getStringList('favoriteServers') ?? const <String>[]).toSet();
+  set favorites(Set<String> value) => _store.setStringList('favoriteServers', value.toList()..sort());
+
+  bool isFavorite(String id) => favorites.contains(id);
+
+  /// Stars [id] when it is not a favorite yet, unstars it otherwise, and
+  /// returns the new state.
+  bool toggleFavorite(String id) {
+    final next = favorites;
+    if (!next.remove(id)) next.add(id);
+    favorites = next;
+    return next.contains(id);
+  }
+
   /// Automatic server choice: ping, speed or smart (ping 40% + speed 40% +
   /// measurement freshness 20%, scaled by probe reliability when known).
   String get autoSelectMode => _store.getString('autoSelectMode') ?? 'ping';
@@ -374,8 +398,9 @@ class Settings {
 
   /// Settings keys portable across the user's own devices (F9 document
   /// bridge, kind `app_settings`). Only genuine preferences land here;
-  /// device-local state stays out: the selected `server` (server ids do
-  /// not resolve on another device), the consent-gated `controlPort`, the
+  /// device-local state stays out: the selected `server` and the starred
+  /// `favoriteServers` (server ids do not resolve on another device), the
+  /// consent-gated `controlPort`, the
   /// update machinery (`checkUpdates`, `notifiedUpdate`, `resumeAfterUpdate`,
   /// `pendingUpdate`, `lastRollback`), the rollout `installUuid`, the
   /// crash-recovery marker `sessionIntent`, the system-proxy snapshot
