@@ -78,7 +78,12 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 	if enginesDir != "" {
 		candidate := filepath.Join(enginesDir, "tpws")
 		if info, err := os.Stat(candidate); err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 { //nolint:gosec // the engines directory is set by the service, not by a client
-			r.tpws = candidate
+			// SORA-H5 covers zapret's helper too: a tpws that cannot be
+			// verified against engines.digests is not used. The bypass is
+			// then honestly unavailable (BypassAvailable reports it).
+			if verr := supervise.VerifyNamedInDir(enginesDir, "tpws"); verr == nil {
+				r.tpws = candidate
+			}
 		}
 	}
 	discovery := supervise.DiscoveryOptions{AllowEnvBin: base.AllowEnvBin}

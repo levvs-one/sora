@@ -207,3 +207,21 @@ func loadDigests(enginesDir string) (map[string]string, error) {
 func (b Binary) VerifyDigest(expected string) error {
 	return verifyPathDigest(b.Kind, b.Path, expected)
 }
+
+// VerifyNamedInDir checks the file named name inside enginesDir against the
+// digest recorded for it in the engines directory's engines.digests manifest.
+// Fail-closed, like engine verification: a missing manifest, a missing entry,
+// or a mismatch is an error. It exists for helpers that are not version-probed
+// engines — zapret's tpws — so the SORA-H5 rule "the core never executes an
+// unverified binary from its own engines directory" covers them too.
+func VerifyNamedInDir(enginesDir, name string) error {
+	digests, err := loadDigests(enginesDir)
+	if err != nil {
+		return err
+	}
+	expected, ok := digests[strings.ToLower(strings.TrimSuffix(name, ".exe"))]
+	if !ok {
+		return fmt.Errorf("no digest for %q in engines.digests", name)
+	}
+	return verifyPathDigest(engine.Kind(name), filepath.Join(enginesDir, name), expected)
+}

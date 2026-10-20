@@ -2,6 +2,8 @@ package registry
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/pem"
 	"net/http"
 	"net/http/httptest"
@@ -225,4 +227,60 @@ func TestAutomaticSelectionCarriesProviderProfilesThroughTheTunBridge(t *testing
 	if _, _, err := r.selectPlan(p, engine.DefaultPreference); errs.KeyOf(err) != errs.KeyPlanEngineUnsupported {
 		t.Fatalf("provider without its packet engine: %v", err)
 	}
+}
+
+// TestDiscoverVerifiesTpwsDigest locks F-1: zapret's tpws is verified
+// against engines.digests at discovery (SORA-H5). A tpws whose bytes do not
+// match the manifest — or an engines directory without a manifest — is not
+// used; the bypass is then honestly unavailable.
+func TestDiscoverVerifiesTpwsDigest(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("tpws is a Linux helper")
+	}
+	writeTpws := func(t *testing.T, dir string, body []byte) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(dir, "tpws"), body, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	digestOf := func(body []byte) string {
+		sum := sha256.Sum256(body)
+		return hex.EncodeToString(sum[:])
+	}
+	discover := func(t *testing.T, dir string) *Registry {
+		t.Helper()
+		return Discover(context.Background(), dir, supervise.Config{HomeDir: t.TempDir()})
+	}
+
+	t.Run("matching digest is accepted", func(t *testing.T) {
+		dir := t.TempDir()
+		body := []byte("fake-tpws-binary")
+		writeTpws(t, dir, body)
+		manifest := digestOf(body) + "  tpws\n"
+		if err := os.WriteFile(filepath.Join(dir, "engines.digests"), []byte(manifest), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if r := discover(t, dir); r.tpws == "" {
+			t.Error("tpws with a matching digest was rejected")
+		}
+	})
+	t.Run("tampered binary is refused", func(t *testing.T) {
+		dir := t.TempDir()
+		writeTpws(t, dir, []byte("fake-tpws-binary"))
+		manifest := digestOf([]byte("fake-tpws-binary")) + "  tpws\n"
+		if err := os.WriteFile(filepath.Join(dir, "engines.digests"), []byte(manifest), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		os.WriteFile(filepath.Join(dir, "tpws"), []byte("fake-tpws-binary!"), 0o755)
+		if r := discover(t, dir); r.tpws != "" {
+			t.Error("tampered tpws was accepted; want it refused")
+		}
+	})
+	t.Run("missing manifest is refused", func(t *testing.T) {
+		dir := t.TempDir()
+		writeTpws(t, dir, []byte("fake-tpws-binary"))
+		if r := discover(t, dir); r.tpws != "" {
+			t.Error("tpws without a manifest was accepted; want fail-closed refusal")
+		}
+	})
 }
