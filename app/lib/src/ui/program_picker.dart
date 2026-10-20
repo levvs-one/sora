@@ -31,7 +31,9 @@ class _ProgramPickerState extends State<_ProgramPicker> {
   @override
   void initState() {
     super.initState();
-    _search.addListener(() => setState(() {}));
+    // No setState listener on [_search]: the list below listens through
+    // ValueListenableBuilder, so typing rebuilds only the list, not the
+    // title, mode switch and search field.
     _load();
   }
 
@@ -82,8 +84,6 @@ class _ProgramPickerState extends State<_ProgramPicker> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context), palette = Palette.of(context);
-    final query = _search.text.toLowerCase();
-    final shown = _programs?.where((p) => '${p.name} ${p.binary} ${p.icon}'.toLowerCase().contains(query)).toList();
     return Dialog(
       backgroundColor: palette.raised,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -137,35 +137,44 @@ class _ProgramPickerState extends State<_ProgramPicker> {
               ),
               const SizedBox(height: 12),
               Expanded(
-                child: _failed
-                    ? Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(s.errGeneric, style: Styles.secondary.copyWith(color: palette.ink2)),
-                            const SizedBox(height: 8),
-                            TextButton(onPressed: _load, child: Text(s.refresh)),
-                          ],
-                        ),
-                      )
-                    : shown == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : shown.isEmpty
-                    ? Center(
-                        child: Text(s.programsEmpty, style: Styles.secondary.copyWith(color: palette.ink2)),
-                      )
-                    : ListView.builder(
-                        itemCount: shown.length,
-                        itemBuilder: (context, i) {
-                          final app = shown[i];
-                          return Tile(
-                            title: app.name,
-                            detail: app.binary,
-                            trailing: _icon(app, palette),
-                            onTap: () => Navigator.pop(context, app.binary),
+                child: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _search,
+                  builder: (context, value, _) {
+                    final query = value.text.toLowerCase();
+                    final shown = _programs
+                        ?.where((p) => '${p.name} ${p.binary} ${p.icon}'.toLowerCase().contains(query))
+                        .toList();
+                    return _failed
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(s.errGeneric, style: Styles.secondary.copyWith(color: palette.ink2)),
+                                const SizedBox(height: 8),
+                                TextButton(onPressed: _load, child: Text(s.refresh)),
+                              ],
+                            ),
+                          )
+                        : shown == null
+                        ? const Center(child: CircularProgressIndicator())
+                        : shown.isEmpty
+                        ? Center(
+                            child: Text(s.programsEmpty, style: Styles.secondary.copyWith(color: palette.ink2)),
+                          )
+                        : ListView.builder(
+                            itemCount: shown.length,
+                            itemBuilder: (context, i) {
+                              final app = shown[i];
+                              return Tile(
+                                title: app.name,
+                                detail: app.binary,
+                                trailing: _icon(app, palette),
+                                onTap: () => Navigator.pop(context, app.binary),
+                              );
+                            },
                           );
-                        },
-                      ),
+                  },
+                ),
               ),
             ],
           ),
