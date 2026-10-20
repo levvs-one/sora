@@ -75,9 +75,37 @@ class _DeviceIdentitySectionState extends State<_DeviceIdentitySection> {
   }
 
   Future<void> _load() async {
-    final identity = await SoraScope.read(context).getDeviceIdentity();
+    final sora = SoraScope.read(context);
+    final identity = await sora.getDeviceIdentity();
     if (!mounted) return;
     setState(() => _identity = identity);
+    if (identity == null) return;
+    // One background companion sync per load: a Set with the loaded
+    // enabled value and no reset pushes the companions (ver_os, empty
+    // device_model — built inside Sora.setDeviceIdentity) into the
+    // core store, so a fresh install sends x-ver-os on subscription
+    // fetches without waiting for a first toggle or reset here. With
+    // reset=false and the same enabled the core does not regenerate
+    // the HWID (pinned by the core RPC test), so the identity shown
+    // above stays exactly the loaded one.
+    unawaited(_syncCompanions(sora, enabled: identity.enabled));
+  }
+
+  /// Fire-and-forget companion sync for [_load]: never blocks or
+  /// changes the visible state, and a failure (an RPC error, or a
+  /// core that answers Get but fails Set) is only logged — the next
+  /// section load retries it. The real Sora method reports its own
+  /// failures and returns null instead of throwing; the catch covers
+  /// implementations that do throw.
+  Future<void> _syncCompanions(Sora sora, {required bool enabled}) async {
+    try {
+      final synced = await sora.setDeviceIdentity(enabled: enabled, reset: false);
+      if (synced == null) {
+        debugPrint('[device-identity] companion sync failed; will retry on next load');
+      }
+    } catch (error) {
+      debugPrint('[device-identity] companion sync failed: $error');
+    }
   }
 
   Future<void> _apply({required bool enabled, bool reset = false}) async {
