@@ -299,6 +299,13 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 	case "xhttp":
 		s["network"] = "xhttp"
 		xs := obj{"mode": orDefault(t.Mode, "auto")}.set("path", t.Path).set("host", t.Host)
+		if len(t.Headers) > 0 {
+			// PASS3 deep A4: Xray was the only renderer dropping
+			// the transport headers (sing-box and mihomo emit
+			// them); subscriptions whose CDN fronting rides on
+			// custom headers beyond Host lost them silently here.
+			xs.set("headers", t.Headers)
+		}
 		if t.DownloadAddress != "" || t.DownloadPort != 0 {
 			ds, err := r.xhttpDownloadSettings(o)
 			if err != nil {

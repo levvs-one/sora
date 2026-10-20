@@ -75,6 +75,21 @@ func TestRealityWarnings(t *testing.T) {
 			t.Fatalf("expected reality-ws-transport, got %v", w)
 		}
 	})
+	t.Run("spiderX is flagged as Xray-only", func(t *testing.T) {
+		// PASS3 deep A2: only the Xray renderer honours SpiderX;
+		// sing-box has no such field in its client REALITY schema
+		// and mihomo's pinned reality-opts has none either, so the
+		// loss on those paths must warn, not stay silent.
+		o := realityOutbound()
+		o.TLS.SpiderX = "/spider"
+		if w := o.RealityWarnings(); !contains(w, "reality-spiderx-xray-only") {
+			t.Fatalf("expected reality-spiderx-xray-only, got %v", w)
+		}
+		o.TLS.SpiderX = ""
+		if w := o.RealityWarnings(); contains(w, "reality-spiderx-xray-only") {
+			t.Fatalf("no SpiderX must not warn, got %v", w)
+		}
+	})
 }
 
 func TestValidateReality(t *testing.T) {

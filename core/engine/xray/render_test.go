@@ -213,6 +213,48 @@ func xhttpVLESS() *engine.Plan {
 	return p
 }
 
+// TestRenderXHTTPHeaders pins PASS3 deep A4: the XHTTP headers of
+// the plan must reach xhttpSettings — Xray was the only one of the
+// three renderers dropping them (sing-box and mihomo emit them), so
+// CDN-fronted subscriptions lost their custom headers silently on
+// this path. An empty header set must stay absent, not become {}.
+func TestRenderXHTTPHeaders(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	o := &p.Outbounds[0]
+	o.Flow = ""
+	o.Transport = engine.Transport{Type: "xhttp", Path: "/x", Host: "cdn.example.com",
+		Headers: map[string]string{"User-Agent": "test-agent", "X-Custom": "v1"}}
+	raw, err := Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cfg struct {
+		Outbounds []struct {
+			StreamSettings struct {
+				XHTTP struct {
+					Headers map[string]string `json:"headers"`
+				} `json:"xhttpSettings"`
+			} `json:"streamSettings"`
+		} `json:"outbounds"`
+	}
+	if err := json.Unmarshal(raw, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	got := cfg.Outbounds[0].StreamSettings.XHTTP.Headers
+	if got["User-Agent"] != "test-agent" || got["X-Custom"] != "v1" || len(got) != 2 {
+		t.Fatalf("xhttp headers = %v, want the plan headers verbatim", got)
+	}
+
+	o.Transport.Headers = nil
+	raw, err = Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(raw), `"headers"`) {
+		t.Fatalf("no headers in the plan must render no headers key:\n%s", raw)
+	}
+}
+
 func TestRenderPassesXHTTPDownloadSettings(t *testing.T) {
 	raw, err := Render(xhttpVLESS(), testRuntime, nil)
 	if err != nil {

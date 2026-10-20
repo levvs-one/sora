@@ -60,6 +60,17 @@ func (o Outbound) RealityWarnings() []string {
 		// flow is legal on any transport, so no warning (PASS3 deep S3b).
 		out = append(out, "reality-xhttp-vision")
 	}
+	if o.TLS.SpiderX != "" {
+		// PASS3 deep A2: SpiderX is rendered only by Xray (both
+		// stream legs). sing-box's client REALITY schema has no
+		// spider field at all — the engine cannot honour it — and
+		// mihomo's reality-opts in the pinned docs has none either,
+		// so on those paths the parameter used to vanish silently.
+		// Warn instead of dropping it quietly; the code is advisory
+		// (RealityWarnings never block) and the app words it as
+		// "honoured only by Xray".
+		out = append(out, "reality-spiderx-xray-only")
+	}
 	if dest := o.realityDest(); dest != "" {
 		if _, err := netip.ParseAddr(dest); err == nil {
 			out = append(out, "reality-dest-ip")
