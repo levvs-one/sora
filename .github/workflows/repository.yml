@@ -145,7 +145,7 @@ jobs:
         uses: golangci/golangci-lint-action@4afd733a84b1f43292c63897423277bb7f4313a9 # v8
         with:
           # Built with a Go new enough for the go directive of core/go.mod.
-          version: v2.14.0
+          version: v2.15.0
           working-directory: core
 
   app:
