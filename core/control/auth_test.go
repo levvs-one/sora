@@ -3,6 +3,7 @@ package control_test
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/levvs-one/sora-client/core/control"
@@ -42,7 +43,9 @@ func TestRotatePersistsTheToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("stat token file: %v", err)
 	}
-	if mode := info.Mode().Perm(); mode != 0o600 {
+	// Windows has no POSIX mode bits; Go reports 0666 for any writable file
+	// there, so only Unix can observe the 0600 the writer requests.
+	if mode := info.Mode().Perm(); runtime.GOOS != "windows" && mode != 0o600 {
 		t.Errorf("token file mode = %o, want 600", mode)
 	}
 }
