@@ -613,7 +613,7 @@
   "extPermissionsRemoved": "Больше не запрашивается:",
   "extUpdateFailedKept": "Предыдущая версия осталась установлена.",
   "extConflictsTitle": "Конфликты расширений",
-  "extConflictsIntro": "Эти расширения претендуют на одно и то же. Выберите победителя — другое останется установлено, но спорная возможность будет приостановлена.",
+  "extConflictsIntro": "Эти расширения претендуют на одно и то же. Выберите победителя — другое останется установлено. Когда спорная возможность появится в движке, работать будет только победитель.",
   "extConflictRoutingRules": "Правила маршрутизации",
   "extConflictTheme": "Тема приложения",
   "extConflictNetHooks": "Сетевые хуки",
@@ -622,7 +622,7 @@
   "extConflictsCount": "Требуют решения: {count}",
   "@extConflictsCount": {"placeholders": {"count": {"type": "int"}}},
   "extConflictsResolve": "Решить",
-  "extConflictNote": "Ваш выбор сохраняется на этом устройстве и применяется движком.",
+  "extConflictNote": "Ваш выбор сохраняется на этом устройстве и будет применён, когда движок начнёт поддерживать эти возможности.",
   "extVersionLabel": "Версия {version}",
   "@extVersionLabel": {
     "placeholders": {

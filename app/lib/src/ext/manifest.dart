@@ -206,6 +206,18 @@ class ExtManifest {
         throw ManifestError('panel "${p.id}" has an unsafe entry "${p.entry}"');
       }
     }
+    // Panels embed the extension's UI inside the app: they require the
+    // "ui-panel" capability and the "ui.panel" permission, mirroring
+    // core/ext's manifest validation, so the install prompt always
+    // consents to UI embedding when a panel exists.
+    if (panels.isNotEmpty) {
+      if (!capabilities.contains('ui-panel')) {
+        throw ManifestError('panels require the "ui-panel" capability');
+      }
+      if (!permissions.contains('ui.panel')) {
+        throw ManifestError('panels require the "ui.panel" permission');
+      }
+    }
     if (settingsSchema != null) validateSettingsSchema(settingsSchema!);
   }
 

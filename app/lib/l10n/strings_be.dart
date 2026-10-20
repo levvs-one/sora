@@ -1166,7 +1166,7 @@ Find one in the catalog or install from a file.';
   @override
   String get extConflictsTitle => 'Extension conflicts';
   @override
-  String get extConflictsIntro => 'These extensions want the same thing. Choose which one wins — the other stays installed, but its contested capability is paused.';
+  String get extConflictsIntro => 'These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.';
   @override
   String get extConflictRoutingRules => 'Routing rules';
   @override
@@ -1180,7 +1180,7 @@ Find one in the catalog or install from a file.';
   @override
   String get extConflictsResolve => 'Resolve';
   @override
-  String get extConflictNote => 'Your choice is saved on this device and applied by the engine.';
+  String get extConflictNote => 'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
   @override
   String extVersionLabel(String version) => 'Version $version';
   @override

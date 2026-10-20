@@ -1168,7 +1168,7 @@ class SRu extends S {
   @override
   String get extConflictsTitle => 'Конфликты расширений';
   @override
-  String get extConflictsIntro => 'Эти расширения претендуют на одно и то же. Выберите победителя — другое останется установлено, но спорная возможность будет приостановлена.';
+  String get extConflictsIntro => 'Эти расширения претендуют на одно и то же. Выберите победителя — другое останется установлено. Когда спорная возможность появится в движке, работать будет только победитель.';
   @override
   String get extConflictRoutingRules => 'Правила маршрутизации';
   @override
@@ -1182,7 +1182,7 @@ class SRu extends S {
   @override
   String get extConflictsResolve => 'Решить';
   @override
-  String get extConflictNote => 'Ваш выбор сохраняется на этом устройстве и применяется движком.';
+  String get extConflictNote => 'Ваш выбор сохраняется на этом устройстве и будет применён, когда движок начнёт поддерживать эти возможности.';
   @override
   String extVersionLabel(String version) => 'Версия $version';
   @override
