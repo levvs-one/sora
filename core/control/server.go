@@ -585,6 +585,12 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	for _, notice := range obfsNotices {
 		started.Journal().Append(session.Event{Kind: session.EventLog, LogLine: notice})
 	}
+	// The JA4 self-check over the plan's pinned fingerprints (S8): a
+	// stale parrot is scored or blocked by TSPU-class DPI before any
+	// HTTP flows, so a measured-stale verdict belongs in the journal.
+	for _, notice := range ja4FreshnessNotices(ctx, plan) {
+		started.Journal().Append(session.Event{Kind: session.EventLog, LogLine: notice})
+	}
 	return &corev1.ConnectResponse{
 		Status: &corev1.SessionStatus{
 			Connection:        wireStatus(started.Status()),
