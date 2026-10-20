@@ -205,15 +205,23 @@ func TestStallWatchProgressResetsBackoff(t *testing.T) {
 // tests can drive the stall detector end to end.
 type stallFakeEngine struct {
 	*fakeEngine
-	mu        sync.Mutex
-	conns     []engine.Connection
-	closedAll int
+	mu         sync.Mutex
+	conns      []engine.Connection
+	closedAll  int
+	connsCalls int
 }
 
 func (f *stallFakeEngine) Connections(context.Context) ([]engine.Connection, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	f.connsCalls++
 	return append([]engine.Connection(nil), f.conns...), nil
+}
+
+func (f *stallFakeEngine) connsCallsCount() int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.connsCalls
 }
 
 func (f *stallFakeEngine) CloseConnection(context.Context, string) error { return nil }
@@ -248,6 +256,9 @@ func TestSessionReopensFlowsOnStall(t *testing.T) {
 		fakeEngine: newFakeEngine(),
 		conns:      []engine.Connection{{ID: "c1"}},
 	}
+	// The stats tick samples counters, not the connection list, so the
+	// demand must be visible there: one open connection, zero bytes.
+	eng.counters = engine.Counters{ActiveConnections: 1}
 	session, err := New(testConfig(eng, &fakeGuard{}))
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
@@ -262,7 +273,7 @@ func TestSessionReopensFlowsOnStall(t *testing.T) {
 	// Baseline the detector at the current fake time first: the stall
 	// window must be measured from live samples, not from a clock jump
 	// the ticker has not observed yet.
-	session.checkStall(context.Background())
+	session.checkStall(context.Background(), Counters{ActiveConnections: 1}, true)
 	clock.advance(stallWarmup + stallWindow + time.Second)
 	waitFor(t, 2*time.Second, func() bool { return eng.closedAllCount() > 0 })
 	if !journalHasStall(session) {
@@ -271,4 +282,52 @@ func TestSessionReopensFlowsOnStall(t *testing.T) {
 	if state := session.State(); state != StateConnected {
 		t.Fatalf("a stall reconnect must keep the session connected, got %s", state)
 	}
+}
+
+// TestStatsTickIssuesOneEngineRequest pins the per-tick request budget:
+// the counters sample feeds both the journal and the stall detector, so
+// the connection list is fetched only when a stall is actually suspected.
+func TestStatsTickIssuesOneEngineRequest(t *testing.T) {
+	eng := &stallFakeEngine{
+		fakeEngine: newFakeEngine(),
+		conns:      []engine.Connection{{ID: "c1"}},
+	}
+	// Demand, zero bytes: the counters alone must not fetch the list
+	// while the detector is still in warmup.
+	eng.counters = engine.Counters{ActiveConnections: 1}
+	session, err := New(testConfig(eng, &fakeGuard{}))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	clock := &manualClock{t: time.Now()}
+	session.stall.now = clock.now
+	if err := session.Start(context.Background()); err != nil {
+		t.Fatalf("Start() error = %v", err)
+	}
+	defer func() { _ = session.Stop(context.Background()) }()
+
+	waitFor(t, 2*time.Second, func() bool { return journalCountersCount(session) >= 5 })
+	if n := eng.connsCallsCount(); n != 0 {
+		t.Fatalf("the connection list was fetched %d times without a stall suspicion", n)
+	}
+	// Past the warmup and the window the suspicion must confirm against
+	// the live list exactly once before reopening the flows.
+	clock.advance(stallWarmup + stallWindow + time.Second)
+	waitFor(t, 2*time.Second, func() bool { return eng.closedAllCount() > 0 })
+	if n := eng.connsCallsCount(); n == 0 {
+		t.Fatal("a suspected stall never confirmed against the connection list")
+	}
+	if !journalHasStall(session) {
+		t.Fatal("the stall must be journaled")
+	}
+}
+
+func journalCountersCount(s *Session) int {
+	n := 0
+	for _, ev := range s.Journal().Since(0, 4096) {
+		if ev.Kind == EventCounters {
+			n++
+		}
+	}
+	return n
 }

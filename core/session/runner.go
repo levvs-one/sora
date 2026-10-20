@@ -489,8 +489,8 @@ func (s *Session) supervise(events <-chan engine.Event) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			s.publishCounters(ctx)
-			s.checkStall(ctx)
+			counters, sampled := s.publishCounters(ctx)
+			s.checkStall(ctx, counters, sampled)
 		case <-looksAt:
 			// While the engine restarts, a look may reach the process
 			// that is going away or one not yet checked.
@@ -673,14 +673,18 @@ func (s *Session) noticeFallbacks(ctx context.Context, last map[string]string) {
 	}
 }
 
-// publishCounters records sampled traffic totals. Temporary read failures
-// during restart are skipped until the next tick.
-func (s *Session) publishCounters(ctx context.Context) {
+// publishCounters records sampled traffic totals and returns them, so the
+// same stats tick can reuse the sample instead of issuing a second engine
+// request. Temporary read failures during restart are skipped until the
+// next tick; the returned flag tells the caller whether the sample is
+// fresh. A stall decision never uses counters it did not read itself.
+func (s *Session) publishCounters(ctx context.Context) (Counters, bool) {
 	counters, err := s.Counters(ctx)
 	if err != nil {
-		return
+		return Counters{}, false
 	}
 	s.log.Append(Event{Kind: EventCounters, Counters: counters})
+	return counters, true
 }
 
 // mask redacts credentials and server identifiers before journaling.

@@ -122,11 +122,16 @@ func (w *stallWatch) observe(total uint64, demand bool) bool {
 	return true
 }
 
-// checkStall samples the live connections and triggers a stall reconnect
-// when the tunnel is established but moves no payload despite demand. It
-// runs on the stats tick; transient read failures skip the tick instead of
-// counting as a stall.
-func (s *Session) checkStall(ctx context.Context) {
+// checkStall samples the session counters taken on the same stats tick and
+// triggers a stall reconnect when the tunnel is established but moves no
+// payload despite demand. The counters (BytesUp+BytesDown, the cumulative
+// engine totals, plus ActiveConnections) feed the detector; the live
+// connection list is fetched only when the counters actually suspect a
+// stall, to confirm real demand and count the open flows for the journal —
+// one engine request per tick instead of two. Engines without
+// per-connection visibility (Xray) keep the detector dormant. A tick with
+// no fresh sample never decides on stale data.
+func (s *Session) checkStall(ctx context.Context, counters Counters, sampled bool) {
 	if s.State() != StateConnected {
 		return
 	}
@@ -135,17 +140,22 @@ func (s *Session) checkStall(ctx context.Context) {
 		// No per-connection visibility (Xray): the detector cannot run.
 		return
 	}
-	conns, err := tracker.Connections(ctx)
-	if err != nil {
+	if !sampled {
 		return
 	}
-	var total uint64
-	for _, c := range conns {
-		total += c.Upload + c.Download
+	total := counters.BytesUp + counters.BytesDown
+	if !s.stall.observe(total, counters.ActiveConnections > 0) {
+		return
 	}
-	if s.stall.observe(total, len(conns) > 0) {
-		s.reconnectStalled(ctx, len(conns))
+	// The counters suspect a stall: confirm against the live list before
+	// reopening flows. A transient read failure or an emptied list skips
+	// the tick instead of counting as a stall; the detector already
+	// recorded the suspicion and its backoff.
+	conns, err := tracker.Connections(ctx)
+	if err != nil || len(conns) == 0 {
+		return
 	}
+	s.reconnectStalled(ctx, len(conns))
 }
 
 // reconnectStalled journals the stall and reopens the flows through the
