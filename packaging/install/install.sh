@@ -144,7 +144,12 @@ verify_signature "$work/SHA256SUMS" "$work/SHA256SUMS.minisig"
 (
 	cd "$work"
 	for name in $files; do
-		grep -E "  \\*?$name\$" SHA256SUMS >>expected || die "$name is not in SHA256SUMS"
+		# Accept both sha256sum layouts: text mode ("<hash>  <name>") and
+		# binary mode ("<hash> *<name>"), like every other SHA256SUMS reader
+		# in the tree (the Dart updater, sora-update, install.ps1). The old
+		# pattern demanded two spaces before the optional "*", so a
+		# binary-mode manifest was rejected here alone.
+		grep -E " [ *]$name\$" SHA256SUMS >>expected || die "$name is not in SHA256SUMS"
 	done
 	sha256sum -c --quiet expected || die "a download does not match SHA256SUMS; nothing was installed"
 )
