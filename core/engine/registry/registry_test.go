@@ -206,6 +206,40 @@ func TestXrayBridgeRequiresTheInstalledPacketEngineBeforeConstruction(t *testing
 	}
 }
 
+// TestXrayBridgeAdjustmentNeverMutatesTheCallerPlan pins the copy-on-write
+// behind the admit path: with a new-enough packet engine installed, the
+// bridge adjustment (TUN cleared, fake-IP demotion, h3 DNS stepped down to
+// DoH) applies to the selection candidate only, never to the caller's plan
+// — including the elements of its DNS.Servers slice, which the candidate
+// shares until selectPlan clones it.
+func TestXrayBridgeAdjustmentNeverMutatesTheCallerPlan(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Engines = []engine.Kind{engine.KindXray}
+	p.Tun = engine.Tun{Enabled: true, Stack: "system"}
+	p.DNS.Mode = string(engine.DNSFakeIP)
+	p.DNS.Servers = append(p.DNS.Servers, engine.DNSServer{Tag: "h3", Transport: engine.DNSH3, Address: "dns.example"})
+	serversBefore := make([]engine.DNSServer, len(p.DNS.Servers))
+	copy(serversBefore, p.DNS.Servers)
+	r := &Registry{
+		preference: engine.DefaultPreference,
+		binaries:   map[engine.Kind]supervise.Binary{engine.KindMihomo: {Version: engine.Version{Major: 1, Minor: 19, Patch: 32}}},
+		availability: []engine.Availability{
+			{Kind: engine.KindMihomo, Usable: true, Version: engine.Version{Major: 1, Minor: 19, Patch: 32}},
+		},
+	}
+	if _, err := r.Factory()(t.Context(), p); err == nil {
+		t.Fatal("xray itself is not installed: admit must fail")
+	}
+	if !p.Tun.Enabled || p.Tun.Stack != "system" || p.DNS.Mode != string(engine.DNSFakeIP) {
+		t.Fatalf("factory mutated the caller's plan: tun %+v, dns mode %q", p.Tun, p.DNS.Mode)
+	}
+	for i, s := range p.DNS.Servers {
+		if s != serversBefore[i] {
+			t.Fatalf("factory mutated the caller's DNS server %d: got %+v, want %+v", i, s, serversBefore[i])
+		}
+	}
+}
+
 func TestAutomaticSelectionCarriesProviderProfilesThroughTheTunBridge(t *testing.T) {
 	r := &Registry{binaries: map[engine.Kind]supervise.Binary{
 		engine.KindXray: {}, engine.KindMihomo: {Version: engine.Version{Major: 1, Minor: 19, Patch: 32}},

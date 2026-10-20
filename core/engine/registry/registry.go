@@ -178,8 +178,18 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 				"registry: bypass outbounds need zapret's tpws in the engines directory")
 		}
 		// Select capabilities against the SOCKS5 plan produced by
-		// bypass rewriting.
-		selectPlan := bypass.Rewrite(p, nil)
+		// bypass rewriting. Plans without a bypass outbound (the common
+		// case) select against themselves: rewriting them only cloned
+		// every outbound to produce an identical plan, and selection
+		// only reads the plan. The bridge adjustment in selectPlan
+		// copies on write (candidate := *p, and DNS.Servers is cloned
+		// before any server is stepped down), so the caller's plan is
+		// never mutated — pinned by
+		// TestXrayBridgeAdjustmentNeverMutatesTheCallerPlan.
+		selectPlan := p
+		if withBypass {
+			selectPlan = bypass.Rewrite(p, nil)
+		}
 		sel, bridge, err := r.selectPlan(selectPlan, order)
 		r.mu.Lock()
 		r.last = sel
