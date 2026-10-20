@@ -13,6 +13,7 @@ import (
 )
 
 var _ session.Guard = (*Guard)(nil)
+var _ session.BlockHolder = (*Guard)(nil)
 
 // NoopFirewall supports system-owned tunnels such as Android VpnService, where
 // this process has no firewall rules to manage.
@@ -78,6 +79,11 @@ type Guard struct {
 	stateDir  string
 	applied   session.Settings
 	restoring bool
+	// holds counts outstanding session.BlockHolder holds. While it is
+	// positive Restore clears the session's ownership but leaves the
+	// firewall armed, so a server switch with the kill switch wanted on
+	// both sides never opens a direct-traffic window.
+	holds int
 }
 
 // New creates a guard. Nil uses NoopFirewall for platforms without a
@@ -247,10 +253,67 @@ func (g *Guard) strictIntent() bool {
 	return g.mode == modeStrict && strictWanted(g.stateDir)
 }
 
+// HoldBlock implements session.BlockHolder: it pins the kill-switch
+// block across a server switch. The block a running session armed stays
+// armed while the hold is outstanding — Restore clears ownership only —
+// and releasing the last hold disarms it when no session has re-applied
+// the switch in the meantime. In strict mode the block already survives
+// Restore by design, so a hold only counts. In off mode there is no
+// block to hold: the hold is vacuous and the canonical Apply refusal
+// still decides the switch. The hold interacts with IngressFirewall
+// only through Arm/Disarm: Restore under a hold never calls Disarm, so
+// the ingress rules stay installed too, and a re-Apply re-arms the
+// decorator idempotently; the one path a hold cannot cover is
+// IngressFirewall's own rollbackArm disarming its inner firewall after
+// a failed ingress Arm inside Apply (F-02) — that disarm is the
+// decorator's, not this guard's, and a later rollback re-Apply re-arms.
+func (g *Guard) HoldBlock(ctx context.Context) (func(context.Context) error, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	if g.restoring {
+		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail,
+			"guard: the guard is being restored")
+	}
+	if g.mode == ModeStandard && !g.applied.KillSwitch {
+		// No session block is recorded (the caller holds defensively):
+		// arm now so the release has a symmetric block to drop.
+		if err := g.firewall.Arm(ctx, g.opts.EnginePorts); err != nil {
+			return nil, errs.Wrap(err, errs.CodeInternal, errs.KeyGuardFirewallFail)
+		}
+	}
+	g.holds++
+	var once sync.Once
+	var relErr error
+	release := func(ctx context.Context) error {
+		once.Do(func() { relErr = g.releaseBlockHold(ctx) })
+		return relErr
+	}
+	return release, nil
+}
+
+// releaseBlockHold drops one hold and, for the last one, disarms the
+// block no session re-applied while switching. A block the new (or
+// rolled-back) session applied is left exactly as it was.
+func (g *Guard) releaseBlockHold(ctx context.Context) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	if g.holds > 0 {
+		g.holds--
+	}
+	if g.holds == 0 && g.mode == ModeStandard && !g.applied.KillSwitch {
+		if err := g.firewall.Disarm(ctx); err != nil {
+			return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
+		}
+	}
+	return nil
+}
+
 // Restore lifts the kill switch if this guard armed it. In strict mode
 // Restore deliberately keeps the block: the persistent intent belongs to
 // the user, not to the session, and only an explicit Apply with the
-// switch off clears it.
+// switch off clears it. While a block hold is outstanding (a server
+// switch) Restore also keeps the block and only clears ownership, so
+// the replacement session re-applies onto an armed firewall.
 func (g *Guard) Restore(ctx context.Context) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -258,6 +321,10 @@ func (g *Guard) Restore(ctx context.Context) error {
 	defer func() { g.restoring = false }()
 
 	if g.mode == modeStrict {
+		g.applied = session.Settings{}
+		return nil
+	}
+	if g.holds > 0 {
 		g.applied = session.Settings{}
 		return nil
 	}

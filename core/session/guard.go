@@ -52,6 +52,46 @@ type Guard interface {
 	Name() string
 }
 
+// BlockHolder is an optional Guard extension for server switches. When
+// both the old and the new session want the kill switch, the manager
+// holds the block before stopping the old session and releases it only
+// after the new session (or a rolled-back previous session) is running:
+// Restore calls made while a hold is active must clear the session's
+// ownership of the settings without lifting the block itself. A hold is
+// a count, not the guard lock — implementations must return promptly and
+// let Apply/Restore run while a hold is outstanding. The returned
+// release is idempotent; releasing the last hold lifts the block only
+// when no applied settings want it any more. Guards that do not
+// implement BlockHolder keep the previous switch behaviour (a window
+// with no block between the old Restore and the new Apply).
+type BlockHolder interface {
+	HoldBlock(ctx context.Context) (release func(ctx context.Context) error, err error)
+}
+
+// errBlockHoldUnsupported marks a BlockHolder that, underneath, holds
+// nothing (for example a composite whose parts are all plain guards).
+// The manager treats it as "no hold available" and switches the old way
+// instead of failing a switch that would otherwise work.
+var errBlockHoldUnsupported = errors.New("session: guard does not support holding the kill-switch block")
+
+// acquireBlockHold takes a block hold when the guard supports it. A nil
+// release with a nil error means the guard cannot hold and the caller
+// proceeds without continuity; any other error is real and fails closed.
+func acquireBlockHold(ctx context.Context, guard Guard) (func(context.Context) error, error) {
+	holder, ok := guard.(BlockHolder)
+	if !ok {
+		return nil, nil
+	}
+	release, err := holder.HoldBlock(ctx)
+	if err != nil {
+		if errors.Is(err, errBlockHoldUnsupported) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return release, nil
+}
+
 // NoopGuard supports system-owned tunnels such as Android, where this process
 // manages no system settings.
 type NoopGuard struct{}
@@ -166,6 +206,51 @@ func (c *compositeGuard) Blocked(ctx context.Context) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+// HoldBlock holds the block on every part that supports holding and
+// reports errBlockHoldUnsupported when no part does, so the manager
+// falls back to the old switch behaviour for plain composites. Parts
+// without BlockHolder are not covered: their Restore still lifts their
+// share of the block during a switch. A part failing mid-acquire
+// releases the holds already taken.
+func (c *compositeGuard) HoldBlock(ctx context.Context) (func(context.Context) error, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	var releases []func(context.Context) error
+	for _, part := range c.parts {
+		holder, ok := part.(BlockHolder)
+		if !ok {
+			continue
+		}
+		release, err := holder.HoldBlock(ctx)
+		if err != nil {
+			if errors.Is(err, errBlockHoldUnsupported) {
+				continue
+			}
+			var joined error
+			for i := len(releases) - 1; i >= 0; i-- {
+				joined = errors.Join(joined, releases[i](context.WithoutCancel(ctx)))
+			}
+			return nil, errors.Join(err, joined)
+		}
+		if release != nil {
+			releases = append(releases, release)
+		}
+	}
+	if len(releases) == 0 {
+		return nil, errBlockHoldUnsupported
+	}
+	var once sync.Once
+	var relErr error
+	return func(ctx context.Context) error {
+		once.Do(func() {
+			for i := len(releases) - 1; i >= 0; i-- {
+				relErr = errors.Join(relErr, releases[i](ctx))
+			}
+		})
+		return relErr
+	}, nil
 }
 
 // Name lists guard names in apply order for diagnostics.

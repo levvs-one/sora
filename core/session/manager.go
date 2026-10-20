@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math/rand/v2"
 	"sync"
 	"time"
@@ -118,21 +119,11 @@ func (m *Manager) SetCensorshipHook(fn func(censor.Verdict, string)) {
 	m.censorHook = fn
 }
 
-// Connect stops any previous session and restores its settings before starting
-// the new plan.
-func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Settings) (*Session, error) {
-	m.mu.Lock()
-	if m.busy {
-		m.mu.Unlock()
-		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
-			"session: another connect or disconnect is running")
-	}
-	m.busy = true
-	previous := m.current
-	m.mu.Unlock()
-
-	defer m.release()
-
+// buildSession runs the pre-start phase shared by Connect and by the
+// switch rollback: prepare the plan, build its engine through the
+// factory and validate it. Nothing here touches a running previous
+// session, so a failure leaves the current tunnel exactly as it was.
+func (m *Manager) buildSession(ctx context.Context, plan *engine.Plan, settings Settings) (*Session, error) {
 	if err := engine.PrepareTun(plan); err != nil {
 		return nil, errs.Wrap(err, errs.CodeFailedPrecondition, errs.KeyPlanTunnel)
 	}
@@ -173,12 +164,139 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 		}
 		return nil, err
 	}
+	return created, nil
+}
+
+// closeBuilt closes the engine of a built-but-never-started session,
+// joining a close failure onto err instead of swallowing it (SORA-L13).
+func closeBuilt(s *Session, err error) error {
+	if s == nil {
+		return err
+	}
+	if closeErr := s.eng.Close(); closeErr != nil {
+		return errors.Join(err, closeErr)
+	}
+	return err
+}
+
+// adopt makes a successfully started session the manager's current one
+// and remembers its inputs for a planned re-handshake or a switch
+// rollback. It also attaches the manager-owned watchers.
+func (m *Manager) adopt(created *Session, plan *engine.Plan, settings Settings) {
+	m.mu.Lock()
+	m.current = created
+	m.last = created.Status()
+	m.lastPlan = plan
+	m.lastSettings = settings
+	created.censorHook = m.censorHook
+	created.shutdownDet = m.shutdown
+	m.mu.Unlock()
+	// Diagnose network-level failures in the background: the watcher reacts
+	// to journal events only and never touches the session runner (SW4).
+	created.WatchCensorshipFailures(&censor.Detector{}, &censor.Prober{})
+	// T017: the worker restarts this session on the same plan when the
+	// transport handshake outlives the policy.
+	go m.rehandshakeLoop(created)
+	// T029: the dead-mode watchdog payload-probes the connected tunnel;
+	// a no-traffic verdict marks dead-mode and pauses the re-handshake
+	// worker instead of retry-storming a shut network.
+	go m.deadSessionLoop(created)
+}
+
+// rollbackToPrevious makes one attempt to bring the previous session
+// back after a switch failed past the point of no return (the previous
+// session is already stopped and sessions are single-use, so the
+// rollback is a fresh build+start from the remembered plan/settings,
+// never a restart of the stopped object). On success the restored
+// session becomes current and its journal says why it exists.
+func (m *Manager) rollbackToPrevious(ctx context.Context, stopCtx context.Context, switchErr error) (*Session, error) {
+	m.mu.Lock()
+	plan, settings := m.lastPlan, m.lastSettings
+	m.mu.Unlock()
+	if plan == nil {
+		return nil, errors.New("session: no previous plan to roll back to")
+	}
+	restored, err := m.buildSession(ctx, plan, settings)
+	if err != nil {
+		return nil, err
+	}
+	if err := restored.Start(ctx); err != nil {
+		cleanupErr := restored.Stop(stopCtx)
+		if cleanupErr != nil {
+			// The failed rollback still owns unrestored settings;
+			// keep it as current so Disconnect can retry the cleanup
+			// instead of losing the owner (same rule as a failed
+			// startup in Connect).
+			m.mu.Lock()
+			m.current = restored
+			m.mu.Unlock()
+			return nil, errors.Join(err, cleanupErr)
+		}
+		return nil, err
+	}
+	restored.Journal().Append(Event{
+		Kind:    EventLog,
+		LogLine: fmt.Sprintf("rollback: restored the previous session after the server switch failed: %v", switchErr),
+	})
+	m.adopt(restored, plan, settings)
+	return restored, nil
+}
+
+// Connect stops any previous session and restores its settings before starting
+// the new plan. When the new session fails to start after the previous
+// one was stopped, Connect makes one attempt to restore the previous
+// session from the remembered plan and returns the original switch
+// error either way. When both the old and the new sessions want the
+// kill switch and the guard supports holding it, the block is held
+// across the whole switch (and across a rollback), so it never lifts.
+func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Settings) (*Session, error) {
+	m.mu.Lock()
+	if m.busy {
+		m.mu.Unlock()
+		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
+			"session: another connect or disconnect is running")
+	}
+	m.busy = true
+	previous := m.current
+	prevSettings := m.lastSettings
+	m.mu.Unlock()
+
+	defer m.release()
+
+	created, err := m.buildSession(ctx, plan, settings)
+	if err != nil {
+		return nil, err
+	}
 	stopCtx := context.WithoutCancel(ctx)
+
+	// Kill-switch continuity: hold the shared guard's block before the
+	// previous session's Stop can restore it, and release only after
+	// the new session (or the rollback) is running. Guards without
+	// BlockHolder keep the previous behaviour.
+	var releaseHold func(context.Context) error
+	if previous != nil && prevSettings.KillSwitch && settings.KillSwitch {
+		release, holdErr := acquireBlockHold(ctx, m.cfg.Guard)
+		if holdErr != nil {
+			// Fail closed before touching the previous session: the
+			// switch is refused, the working tunnel stays up.
+			m.setLast(previous.Status())
+			return nil, closeBuilt(created, errs.Wrap(holdErr, errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail))
+		}
+		releaseHold = release
+	}
+	releaseBlock := func() error {
+		if releaseHold == nil {
+			return nil
+		}
+		release := releaseHold
+		releaseHold = nil
+		return release(stopCtx)
+	}
+
 	if previous != nil {
 		if err := previous.Stop(stopCtx); err != nil {
-			if closeErr := built.Close(); closeErr != nil {
-				err = errors.Join(err, closeErr)
-			}
+			err = closeBuilt(created, err)
+			_ = releaseBlock()
 			m.setLast(previous.Status())
 			return nil, err
 		}
@@ -198,29 +316,27 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 			m.current = created
 			m.mu.Unlock()
 			err = errs.Wrap(errors.Join(err, cleanupErr), errs.CodeOf(cleanupErr), errs.KeyOf(cleanupErr))
+			_ = releaseBlock()
+			m.setLast(status)
+			return nil, err
 		}
+		if previous != nil {
+			// The previous session was stopped for this switch and
+			// was working: one rollback attempt from the remembered
+			// plan. The caller still gets the switch error, never
+			// the rollback's.
+			if _, rbErr := m.rollbackToPrevious(ctx, stopCtx, err); rbErr == nil {
+				_ = releaseBlock()
+				return nil, err
+			}
+		}
+		_ = releaseBlock()
 		m.setLast(status)
 		return nil, err
 	}
 
-	m.mu.Lock()
-	m.current = created
-	m.last = created.Status()
-	m.lastPlan = plan
-	m.lastSettings = settings
-	created.censorHook = m.censorHook
-	created.shutdownDet = m.shutdown
-	m.mu.Unlock()
-	// Diagnose network-level failures in the background: the watcher reacts
-	// to journal events only and never touches the session runner (SW4).
-	created.WatchCensorshipFailures(&censor.Detector{}, &censor.Prober{})
-	// T017: the worker restarts this session on the same plan when the
-	// transport handshake outlives the policy.
-	go m.rehandshakeLoop(created)
-	// T029: the dead-mode watchdog payload-probes the connected tunnel;
-	// a no-traffic verdict marks dead-mode and pauses the re-handshake
-	// worker instead of retry-storming a shut network.
-	go m.deadSessionLoop(created)
+	m.adopt(created, plan, settings)
+	_ = releaseBlock()
 	return created, nil
 }
 
