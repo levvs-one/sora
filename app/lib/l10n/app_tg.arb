@@ -154,6 +154,7 @@
   "proxyAddress": "Суроғаи прокси",
   "copied": "Нусхабардорӣ",
   "launchAtLogin": "Бо система оғоз кунед",
+  "launchAtLoginDetail": "Ҳангоми воридшавӣ ба система Sora ба таври худкор оғоз шуда, дар tray мемонад.",
   "closeToTray": "Ҳангоми пӯшидан дар табақ нигоҳ доред",
   "notifications": "Огоҳиномаҳо",
   "trayOpen": "Sora-ро кушоед",

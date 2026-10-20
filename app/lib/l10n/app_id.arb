@@ -154,6 +154,7 @@
   "proxyAddress": "Alamat proksi",
   "copied": "Disalin",
   "launchAtLogin": "Mulailah dengan sistem",
+  "launchAtLoginDetail": "Sora akan berjalan otomatis saat Anda masuk dan tetap berada di tray.",
   "closeToTray": "Simpan di dalam baki dalam keadaan tertutup",
   "notifications": "Pemberitahuan",
   "trayOpen": "Buka Sora",

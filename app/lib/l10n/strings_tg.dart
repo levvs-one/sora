@@ -608,6 +608,9 @@ class STg extends S {
   String get launchAtLogin => 'Бо система оғоз кунед';
 
   @override
+  String get launchAtLoginDetail => 'Ҳангоми воридшавӣ ба система Sora ба таври худкор оғоз шуда, дар tray мемонад.';
+
+  @override
   String get closeToTray => 'Ҳангоми пӯшидан дар табақ нигоҳ доред';
 
   @override

@@ -608,6 +608,9 @@ class SHi extends S {
   String get launchAtLogin => 'सिस्टम से शुरुआत करें';
 
   @override
+  String get launchAtLoginDetail => 'साइन इन करने पर Sora अपने आप शुरू होगा और ट्रे में रहेगा।';
+
+  @override
   String get closeToTray => 'बंद होने पर ट्रे में रखें';
 
   @override

@@ -154,6 +154,7 @@
   "proxyAddress": "Adres proxy",
   "copied": "Skopiowano",
   "launchAtLogin": "Zacznij od systemu",
+  "launchAtLoginDetail": "Sora będzie automatycznie uruchamiana przy logowaniu i pozostanie w zasobniku systemowym.",
   "closeToTray": "Przechowywać na tacy po zamknięciu",
   "notifications": "Powiadomienia",
   "trayOpen": "Otwórz Sora",

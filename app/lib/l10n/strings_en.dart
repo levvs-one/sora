@@ -592,6 +592,9 @@ class SEn extends S {
   String get launchAtLogin => 'Start with the system';
 
   @override
+  String get launchAtLoginDetail => 'Sora will launch automatically when you sign in, hidden in the tray.';
+
+  @override
   String get closeToTray => 'Keep in the tray when closed';
 
   @override

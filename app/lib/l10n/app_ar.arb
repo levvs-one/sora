@@ -154,6 +154,7 @@
   "proxyAddress": "عنوان الوكيل",
   "copied": "منقول",
   "launchAtLogin": "ابدأ بالنظام",
+  "launchAtLoginDetail": "سيبدأ Sora تلقائيًا عند تسجيل الدخول ويبقى في علبة النظام.",
   "closeToTray": "احتفظ بها في الدرج عند إغلاقها",
   "notifications": "إشعارات",
   "trayOpen": "افتح Sora",

@@ -608,6 +608,9 @@ class SUz extends S {
   String get launchAtLogin => 'Tizimdan boshlang';
 
   @override
+  String get launchAtLoginDetail => 'Tizimga kirganingizda Sora avtomatik ishga tushadi va laganda qoladi.';
+
+  @override
   String get closeToTray => 'Yopiq holatda patnisda saqlang';
 
   @override

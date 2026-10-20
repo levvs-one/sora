@@ -597,6 +597,9 @@ class SZh extends S {
   String get launchAtLogin => '从系统入手';
 
   @override
+  String get launchAtLoginDetail => '登录时 Sora 会自动启动，并隐藏到系统托盘中。';
+
+  @override
   String get closeToTray => '关闭时保留在托盘中';
 
   @override
@@ -2428,6 +2431,9 @@ class SZhHans extends SZh {
   String get launchAtLogin => '从系统入手';
 
   @override
+  String get launchAtLoginDetail => '登录时 Sora 会自动启动，并隐藏到系统托盘中。';
+
+  @override
   String get closeToTray => '关闭时保留在托盘中';
 
   @override
@@ -3427,6 +3433,9 @@ class SZhHant extends SZh {
 
   @override
   String get launchAtLogin => '從系統入手';
+
+  @override
+  String get launchAtLoginDetail => '登入時 Sora 會自動啟動，並隱藏到系統托盤中。';
 
   @override
   String get closeToTray => '關閉時保留在托盤中';

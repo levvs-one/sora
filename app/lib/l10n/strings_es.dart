@@ -608,6 +608,9 @@ class SEs extends S {
   String get launchAtLogin => 'Comience con el sistema';
 
   @override
+  String get launchAtLoginDetail => 'Sora se iniciará automáticamente al iniciar sesión y quedará en la bandeja del sistema.';
+
+  @override
   String get closeToTray => 'Mantener en la bandeja cuando esté cerrada.';
 
   @override

@@ -608,6 +608,9 @@ class STr extends S {
   String get launchAtLogin => 'Sistemle başlayın';
 
   @override
+  String get launchAtLoginDetail => 'Oturum açtığınızda Sora otomatik olarak başlatılacak ve tepside kalacak.';
+
+  @override
   String get closeToTray => 'Kapalıyken tepside saklayın';
 
   @override

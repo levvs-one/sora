@@ -608,6 +608,9 @@ class SKk extends S {
   String get launchAtLogin => 'Жүйеден бастаңыз';
 
   @override
+  String get launchAtLoginDetail => 'Жүйеге кіргенде Sora автоматты түрде іске қосылып, науада қалады.';
+
+  @override
   String get closeToTray => 'Жабылған кезде науада ұстаңыз';
 
   @override

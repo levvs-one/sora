@@ -598,6 +598,9 @@ class SKo extends S {
   String get launchAtLogin => '시스템으로 시작하세요';
 
   @override
+  String get launchAtLoginDetail => '로그인 시 Sora가 자동으로 시작되어 트레이에 상주합니다.';
+
+  @override
   String get closeToTray => '닫은 후에는 트레이에 보관하세요.';
 
   @override

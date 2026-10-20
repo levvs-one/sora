@@ -608,6 +608,9 @@ class SFa extends S {
   String get launchAtLogin => 'با سیستم شروع کنید';
 
   @override
+  String get launchAtLoginDetail => 'Sora هنگام ورود به سیستم به‌طور خودکار اجرا می‌شود و در سینی سیستم باقی می‌ماند.';
+
+  @override
   String get closeToTray => 'وقتی بسته است در سینی نگه دارید';
 
   @override

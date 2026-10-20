@@ -608,6 +608,9 @@ class SDe extends S {
   String get launchAtLogin => 'Beginnen Sie mit dem System';
 
   @override
+  String get launchAtLoginDetail => 'Sora wird beim Anmelden automatisch gestartet und bleibt im Infobereich.';
+
+  @override
   String get closeToTray => 'Im geschlossenen Zustand im Fach aufbewahren';
 
   @override

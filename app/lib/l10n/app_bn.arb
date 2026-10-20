@@ -154,6 +154,7 @@
   "proxyAddress": "প্রক্সি ঠিকানা",
   "copied": "কপি করা হয়েছে",
   "launchAtLogin": "সিস্টেম দিয়ে শুরু করুন",
+  "launchAtLoginDetail": "সাইন ইন করলে Sora স্বয়ংক্রিয়ভাবে চালু হবে এবং ট্রেতে থাকবে।",
   "closeToTray": "বন্ধ হয়ে গেলে ট্রেতে রাখুন",
   "notifications": "বিজ্ঞপ্তি",
   "trayOpen": "Sora খুলুন",

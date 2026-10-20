@@ -608,6 +608,9 @@ class SVi extends S {
   String get launchAtLogin => 'Bắt đầu với hệ thống';
 
   @override
+  String get launchAtLoginDetail => 'Sora sẽ tự động khởi động khi bạn đăng nhập và nằm ở khay hệ thống.';
+
+  @override
   String get closeToTray => 'Giữ trong khay khi đóng lại';
 
   @override

@@ -154,6 +154,7 @@
   "proxyAddress": "Proksi ünvanı",
   "copied": "Kopyalandı",
   "launchAtLogin": "Sistemdən başlayın",
+  "launchAtLoginDetail": "Daxil olduqda Sora avtomatik işə düşəcək və nimçədə qalacaq.",
   "closeToTray": "Bağlı halda nimçədə saxlayın",
   "notifications": "Bildirişlər",
   "trayOpen": "Sora-ni açın",

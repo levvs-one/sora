@@ -154,6 +154,7 @@
   "proxyAddress": "Прокси мекенжайы",
   "copied": "Көшірілген",
   "launchAtLogin": "Жүйеден бастаңыз",
+  "launchAtLoginDetail": "Жүйеге кіргенде Sora автоматты түрде іске қосылып, науада қалады.",
   "closeToTray": "Жабылған кезде науада ұстаңыз",
   "notifications": "Хабарландырулар",
   "trayOpen": "Sora ашыңыз",

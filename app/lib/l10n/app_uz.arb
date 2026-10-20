@@ -154,6 +154,7 @@
   "proxyAddress": "Proksi manzili",
   "copied": "Ko‘chirildi",
   "launchAtLogin": "Tizimdan boshlang",
+  "launchAtLoginDetail": "Tizimga kirganingizda Sora avtomatik ishga tushadi va laganda qoladi.",
   "closeToTray": "Yopiq holatda patnisda saqlang",
   "notifications": "Bildirishnomalar",
   "trayOpen": "Sora ni oching",

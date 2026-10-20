@@ -603,6 +603,9 @@ class SBn extends S {
   String get launchAtLogin => 'সিস্টেম দিয়ে শুরু করুন';
 
   @override
+  String get launchAtLoginDetail => 'সাইন ইন করলে Sora স্বয়ংক্রিয়ভাবে চালু হবে এবং ট্রেতে থাকবে।';
+
+  @override
   String get closeToTray => 'বন্ধ হয়ে গেলে ট্রেতে রাখুন';
 
   @override

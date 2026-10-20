@@ -154,6 +154,7 @@
   "proxyAddress": "代理地址",
   "copied": "已複製",
   "launchAtLogin": "從系統入手",
+  "launchAtLoginDetail": "登入時 Sora 會自動啟動，並隱藏到系統托盤中。",
   "closeToTray": "關閉時保留在托盤中",
   "notifications": "通知",
   "trayOpen": "開啟Sora",

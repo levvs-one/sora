@@ -598,6 +598,9 @@ class SAr extends S {
   String get launchAtLogin => 'ابدأ بالنظام';
 
   @override
+  String get launchAtLoginDetail => 'سيبدأ Sora تلقائيًا عند تسجيل الدخول ويبقى في علبة النظام.';
+
+  @override
   String get closeToTray => 'احتفظ بها في الدرج عند إغلاقها';
 
   @override

@@ -611,6 +611,9 @@ class SRu extends S {
   String get launchAtLogin => 'Запускать вместе с системой';
 
   @override
+  String get launchAtLoginDetail => 'Sora будет автоматически запускаться при входе в систему и оставаться в трее.';
+
+  @override
   String get closeToTray => 'Сворачивать в трей при закрытии';
 
   @override

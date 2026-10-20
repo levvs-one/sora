@@ -154,6 +154,7 @@
   "proxyAddress": "Прокси дареги",
   "copied": "Көчүрүлгөн",
   "launchAtLogin": "Системадан баштаңыз",
+  "launchAtLoginDetail": "Системага киргенде Sora автоматтык түрдө ишке кирип, лотокто калат.",
   "closeToTray": "Жабык болгондо лотокто сактаңыз",
   "notifications": "Эскертмелер",
   "trayOpen": "Sora ачыңыз",

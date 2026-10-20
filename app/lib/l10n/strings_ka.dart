@@ -608,6 +608,9 @@ class SKa extends S {
   String get launchAtLogin => 'დაიწყეთ სისტემით';
 
   @override
+  String get launchAtLoginDetail => 'შესვლისას Sora ავტომატურად გაეშვება და დარჩება სისტემურ უჯრაში.';
+
+  @override
   String get closeToTray => 'შეინახეთ უჯრაში დახურვისას';
 
   @override

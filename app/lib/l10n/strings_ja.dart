@@ -598,6 +598,9 @@ class SJa extends S {
   String get launchAtLogin => 'システムから始める';
 
   @override
+  String get launchAtLoginDetail => 'サインイン時に Sora が自動的に起動し、トレイに常駐します。';
+
+  @override
   String get closeToTray => '閉じた状態でトレイに保管してください';
 
   @override

@@ -173,6 +173,7 @@
   "proxyAddress": "Proxy address",
   "copied": "Copied",
   "launchAtLogin": "Start with the system",
+  "launchAtLoginDetail": "Sora will launch automatically when you sign in, hidden in the tray.",
   "closeToTray": "Keep in the tray when closed",
   "notifications": "Notifications",
   "trayOpen": "Open Sora",

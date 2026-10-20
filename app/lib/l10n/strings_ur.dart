@@ -608,6 +608,9 @@ class SUr extends S {
   String get launchAtLogin => 'سسٹم کے ساتھ شروع کریں۔';
 
   @override
+  String get launchAtLoginDetail => 'سائن ان کرنے پر Sora خودکار طور پر شروع ہوگا اور ٹرے میں رہے گا۔';
+
+  @override
   String get closeToTray => 'بند ہونے پر ٹرے میں رکھیں';
 
   @override

@@ -608,6 +608,9 @@ class STh extends S {
   String get launchAtLogin => 'เริ่มต้นด้วยระบบ';
 
   @override
+  String get launchAtLoginDetail => 'Sora จะเริ่มทำงานอัตโนมัติเมื่อคุณเข้าสู่ระบบและอยู่ในถาดระบบ';
+
+  @override
   String get closeToTray => 'เก็บในถาดเมื่อปิด';
 
   @override

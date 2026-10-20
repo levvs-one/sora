@@ -154,6 +154,7 @@
   "proxyAddress": "Proxy adresi",
   "copied": "Kopyalandı",
   "launchAtLogin": "Sistemle başlayın",
+  "launchAtLoginDetail": "Oturum açtığınızda Sora otomatik olarak başlatılacak ve tepside kalacak.",
   "closeToTray": "Kapalıyken tepside saklayın",
   "notifications": "Bildirimler",
   "trayOpen": "Sora'yi açın",

@@ -608,6 +608,9 @@ class STk extends S {
   String get launchAtLogin => 'Ulgamdan başlaň';
 
   @override
+  String get launchAtLoginDetail => 'Ulgama gireniňizde Sora awtomatiki işe girizer we lotoqda galar.';
+
+  @override
   String get closeToTray => 'Closedapylanda tarelde saklaň';
 
   @override

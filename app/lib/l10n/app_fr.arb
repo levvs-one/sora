@@ -154,6 +154,7 @@
   "proxyAddress": "Adresse proxy",
   "copied": "Copié",
   "launchAtLogin": "Commencez par le système",
+  "launchAtLoginDetail": "Sora démarrera automatiquement à la connexion, en arrière-plan dans la barre d'état.",
   "closeToTray": "Conserver dans le bac une fois fermé",
   "notifications": "Notifications",
   "trayOpen": "Ouvrir Sora",

@@ -154,6 +154,7 @@
   "proxyAddress": "プロキシアドレス",
   "copied": "コピーされました",
   "launchAtLogin": "システムから始める",
+  "launchAtLoginDetail": "サインイン時に Sora が自動的に起動し、トレイに常駐します。",
   "closeToTray": "閉じた状態でトレイに保管してください",
   "notifications": "通知",
   "trayOpen": "Soraを開く",

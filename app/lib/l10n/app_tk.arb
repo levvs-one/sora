@@ -154,6 +154,7 @@
   "proxyAddress": "Proksi salgysy",
   "copied": "Göçürildi",
   "launchAtLogin": "Ulgamdan başlaň",
+  "launchAtLoginDetail": "Ulgama gireniňizde Sora awtomatiki işe girizer we lotoqda galar.",
   "closeToTray": "Closedapylanda tarelde saklaň",
   "notifications": "Duýduryşlar",
   "trayOpen": "Sora açyň",

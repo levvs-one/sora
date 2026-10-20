@@ -608,6 +608,9 @@ class SHy extends S {
   String get launchAtLogin => 'Սկսեք համակարգից';
 
   @override
+  String get launchAtLoginDetail => 'Մուտք գործելիս Sora-ն կգործարկվի ավտոմատ և կմնա համակարգային սկուտեղում։';
+
+  @override
   String get closeToTray => 'Փակված վիճակում պահել սկուտեղի մեջ';
 
   @override

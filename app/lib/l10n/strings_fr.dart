@@ -608,6 +608,9 @@ class SFr extends S {
   String get launchAtLogin => 'Commencez par le système';
 
   @override
+  String get launchAtLoginDetail => 'Sora démarrera automatiquement à la connexion, en arrière-plan dans la barre d\'état.';
+
+  @override
   String get closeToTray => 'Conserver dans le bac une fois fermé';
 
   @override

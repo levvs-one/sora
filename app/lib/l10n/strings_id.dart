@@ -608,6 +608,9 @@ class SId extends S {
   String get launchAtLogin => 'Mulailah dengan sistem';
 
   @override
+  String get launchAtLoginDetail => 'Sora akan berjalan otomatis saat Anda masuk dan tetap berada di tray.';
+
+  @override
   String get closeToTray => 'Simpan di dalam baki dalam keadaan tertutup';
 
   @override

@@ -154,6 +154,7 @@
   "proxyAddress": "آدرس پروکسی",
   "copied": "کپی شده",
   "launchAtLogin": "با سیستم شروع کنید",
+  "launchAtLoginDetail": "Sora هنگام ورود به سیستم به‌طور خودکار اجرا می‌شود و در سینی سیستم باقی می‌ماند.",
   "closeToTray": "وقتی بسته است در سینی نگه دارید",
   "notifications": "اطلاعیه ها",
   "trayOpen": "Sora را باز کنید",

@@ -223,7 +223,11 @@ class Settings {
   set xrayTunStack(String value) => _store.setString('xrayTunStack', value);
 
   /// Starts Sora in the tray at login.
-  bool get launchAtLogin => _store.getBool('launchAtLogin') ?? true;
+  ///
+  /// Opt-in by owner decision: the default is off. The fallback below only
+  /// applies when the key was never written, so existing users who enabled
+  /// it keep their choice; no migration ever resets a stored value.
+  bool get launchAtLogin => _store.getBool('launchAtLogin') ?? false;
   set launchAtLogin(bool value) => _store.setBool('launchAtLogin', value);
 
   /// Keeps Sora in the tray when the window closes.

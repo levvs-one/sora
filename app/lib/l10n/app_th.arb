@@ -154,6 +154,7 @@
   "proxyAddress": "ที่อยู่พร็อกซี",
   "copied": "คัดลอกแล้ว",
   "launchAtLogin": "เริ่มต้นด้วยระบบ",
+  "launchAtLoginDetail": "Sora จะเริ่มทำงานอัตโนมัติเมื่อคุณเข้าสู่ระบบและอยู่ในถาดระบบ",
   "closeToTray": "เก็บในถาดเมื่อปิด",
   "notifications": "การแจ้งเตือน",
   "trayOpen": "เปิด Sora",

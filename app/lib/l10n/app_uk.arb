@@ -154,6 +154,7 @@
   "proxyAddress": "Адреса проксі",
   "copied": "Скопійовано",
   "launchAtLogin": "Почніть із системи",
+  "launchAtLoginDetail": "Sora автоматично запускатиметься під час входу в систему й залишатиметься в треї.",
   "closeToTray": "Зберігати в закритому лотку",
   "notifications": "Сповіщення",
   "trayOpen": "Відкрийте Sora",

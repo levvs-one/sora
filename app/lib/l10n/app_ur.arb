@@ -154,6 +154,7 @@
   "proxyAddress": "پراکسی ایڈریس",
   "copied": "کاپی",
   "launchAtLogin": "سسٹم کے ساتھ شروع کریں۔",
+  "launchAtLoginDetail": "سائن ان کرنے پر Sora خودکار طور پر شروع ہوگا اور ٹرے میں رہے گا۔",
   "closeToTray": "بند ہونے پر ٹرے میں رکھیں",
   "notifications": "اطلاعات",
   "trayOpen": "Sora کھولیں۔",

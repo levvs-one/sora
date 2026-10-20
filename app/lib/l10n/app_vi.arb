@@ -154,6 +154,7 @@
   "proxyAddress": "Địa chỉ proxy",
   "copied": "Đã sao chép",
   "launchAtLogin": "Bắt đầu với hệ thống",
+  "launchAtLoginDetail": "Sora sẽ tự động khởi động khi bạn đăng nhập và nằm ở khay hệ thống.",
   "closeToTray": "Giữ trong khay khi đóng lại",
   "notifications": "Thông báo",
   "trayOpen": "Mở Sora",

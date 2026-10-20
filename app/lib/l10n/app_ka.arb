@@ -154,6 +154,7 @@
   "proxyAddress": "პროქსის მისამართი",
   "copied": "კოპირებულია",
   "launchAtLogin": "დაიწყეთ სისტემით",
+  "launchAtLoginDetail": "შესვლისას Sora ავტომატურად გაეშვება და დარჩება სისტემურ უჯრაში.",
   "closeToTray": "შეინახეთ უჯრაში დახურვისას",
   "notifications": "შეტყობინებები",
   "trayOpen": "გახსენით Sora",

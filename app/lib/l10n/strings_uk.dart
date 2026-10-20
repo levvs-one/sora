@@ -608,6 +608,9 @@ class SUk extends S {
   String get launchAtLogin => 'Почніть із системи';
 
   @override
+  String get launchAtLoginDetail => 'Sora автоматично запускатиметься під час входу в систему й залишатиметься в треї.';
+
+  @override
   String get closeToTray => 'Зберігати в закритому лотку';
 
   @override

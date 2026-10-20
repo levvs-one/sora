@@ -608,6 +608,9 @@ class SAz extends S {
   String get launchAtLogin => 'Sistemdən başlayın';
 
   @override
+  String get launchAtLoginDetail => 'Daxil olduqda Sora avtomatik işə düşəcək və nimçədə qalacaq.';
+
+  @override
   String get closeToTray => 'Bağlı halda nimçədə saxlayın';
 
   @override

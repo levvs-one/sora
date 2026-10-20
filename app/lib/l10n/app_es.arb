@@ -154,6 +154,7 @@
   "proxyAddress": "dirección proxy",
   "copied": "Copiada",
   "launchAtLogin": "Comience con el sistema",
+  "launchAtLoginDetail": "Sora se iniciará automáticamente al iniciar sesión y quedará en la bandeja del sistema.",
   "closeToTray": "Mantener en la bandeja cuando esté cerrada.",
   "notifications": "Notificaciones",
   "trayOpen": "Abierto Sora",

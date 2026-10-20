@@ -608,6 +608,9 @@ class SBe extends S {
   String get launchAtLogin => 'Пачніце з сістэмы';
 
   @override
+  String get launchAtLoginDetail => 'Sora аўтаматычна запускаецца пры ўваходзе ў сістэму і застаецца ў трэі.';
+
+  @override
   String get closeToTray => 'Захоўваць у латку ў закрытым выглядзе';
 
   @override

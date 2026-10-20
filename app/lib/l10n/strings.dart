@@ -1104,6 +1104,12 @@ abstract class S {
   /// **'Запускать вместе с системой'**
   String get launchAtLogin;
 
+  /// No description provided for @launchAtLoginDetail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Sora будет автоматически запускаться при входе в систему и оставаться в трее.'**
+  String get launchAtLoginDetail;
+
   /// No description provided for @closeToTray.
   ///
   /// In ru, this message translates to:

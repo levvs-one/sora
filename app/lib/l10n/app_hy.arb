@@ -154,6 +154,7 @@
   "proxyAddress": "Վստահված անձի հասցե",
   "copied": "Պատճենվել է",
   "launchAtLogin": "Սկսեք համակարգից",
+  "launchAtLoginDetail": "Մուտք գործելիս Sora-ն կգործարկվի ավտոմատ և կմնա համակարգային սկուտեղում։",
   "closeToTray": "Փակված վիճակում պահել սկուտեղի մեջ",
   "notifications": "Ծանուցումներ",
   "trayOpen": "Բացեք Sora",

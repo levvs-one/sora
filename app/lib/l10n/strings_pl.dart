@@ -608,6 +608,9 @@ class SPl extends S {
   String get launchAtLogin => 'Zacznij od systemu';
 
   @override
+  String get launchAtLoginDetail => 'Sora będzie automatycznie uruchamiana przy logowaniu i pozostanie w zasobniku systemowym.';
+
+  @override
   String get closeToTray => 'Przechowywać na tacy po zamknięciu';
 
   @override

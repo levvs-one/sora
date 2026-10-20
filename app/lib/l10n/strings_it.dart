@@ -608,6 +608,9 @@ class SIt extends S {
   String get launchAtLogin => 'Cominciamo dal sistema';
 
   @override
+  String get launchAtLoginDetail => 'Sora si avvierà automaticamente all\'accesso e resterà nell\'area di notifica.';
+
+  @override
   String get closeToTray => 'Conservare nella vaschetta quando è chiuso';
 
   @override

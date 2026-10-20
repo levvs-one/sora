@@ -608,6 +608,9 @@ class SKy extends S {
   String get launchAtLogin => 'Системадан баштаңыз';
 
   @override
+  String get launchAtLoginDetail => 'Системага киргенде Sora автоматтык түрдө ишке кирип, лотокто калат.';
+
+  @override
   String get closeToTray => 'Жабык болгондо лотокто сактаңыз';
 
   @override

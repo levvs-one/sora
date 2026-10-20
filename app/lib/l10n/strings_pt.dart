@@ -608,6 +608,9 @@ class SPt extends S {
   String get launchAtLogin => 'Comece com o sistema';
 
   @override
+  String get launchAtLoginDetail => 'O Sora será iniciado automaticamente ao entrar e ficará na bandeja do sistema.';
+
+  @override
   String get closeToTray => 'Manter na bandeja quando fechado';
 
   @override
