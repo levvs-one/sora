@@ -119,7 +119,6 @@ func TestAssessJA4_PQShareCountsAsFresh(t *testing.T) {
 	}
 }
 
-// TestAssessJA4_StaleParrotFlagged locks the stale-set logic: an explicit
 // Chrome 133 capture must be judged stale even though the default chrome
 // parrot is fresh after the utls bump. The 133 vector is injected so the
 // test does not depend on the vendored Auto parrot.

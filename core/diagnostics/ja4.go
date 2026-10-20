@@ -637,10 +637,9 @@ func hash12Sorted(list []string) string {
 
 // ja4ExtHash hashes the extension section: sorted extensions, then the
 // signature algorithms in wire order, joined with "_". GREASE values are
-// stripped from the signature algorithms (as they already are from ciphers
-// and extensions): modern parrots emit a fresh GREASE sigalg per handshake,
-// and hashing it would make the JA4 non-deterministic — a fingerprint that
-// changes on every capture cannot honestly signal anything (S8).
+// stripped from both: the 155 parrot (and real Chrome) GREASEs the first
+// signature algorithm per handshake, and hashing it would make the JA4
+// non-deterministic.
 func ja4ExtHash(exts []string, sigAlgs []uint16) string {
 	sorted := append([]string(nil), exts...)
 	sort.Strings(sorted)
