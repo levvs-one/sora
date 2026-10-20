@@ -95,12 +95,16 @@ var Catalog = map[Kind]Capabilities{
 			FeatureGeoData: true, FeatureTLSFragment: true,
 			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
 			FeatureXHTTPDownloadSplit: true,
-			// Deliberately no FeatureXHTTPXmux: no renderer emits xmux
-			// or x_padding yet — not even Xray's (its xhttp case renders
-			// only mode/path/host/downloadSettings). Claiming it routed
-			// xmux-tuned plans to a silent loss; until a renderer emits
-			// xmux and is verified, such plans honestly report the
-			// feature missing on every engine (PASS3 deep S1).
+			// Deliberately no FeatureXHTTPXmux: Xray's xhttp case
+			// renders only mode/path/host/headers/downloadSettings and
+			// emits neither xmux nor x_padding. Mihomo's renderer does
+			// emit reuse-settings/x-padding-bytes, but its claim waits
+			// for `mihomo -t` on the pin (see the mihomo entry above),
+			// and sing-box emits neither — so no engine claims the
+			// feature yet. Claiming it for Xray routed xmux-tuned
+			// plans to a silent loss; until a claim is verified, such
+			// plans honestly report the feature missing on every
+			// engine (PASS3 deep S1).
 			// dialerProxy exists since long before the minimum
 			// version, so chains need no extra version gate.
 			FeatureChains: true,
