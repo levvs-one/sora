@@ -83,7 +83,7 @@ void main() {
       'bare trailing fragment': '$t1#',
       'duplicated key': '$t1&port=1',
       'duplicated pub': '$t1&pub=$pub32',
-      'unknown scheme case is still wrong host':
+      'uppercase host is rejected':
           'sora-sync://PAIR?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1',
     };
     for (final entry in cases.entries) {
