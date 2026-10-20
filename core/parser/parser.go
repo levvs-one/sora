@@ -547,13 +547,6 @@ func xmuxRangeValue(raw json.RawMessage) int {
 	return v
 }
 
-// extraParams is the top level of a share link's extra= JSON document.
-type extraParams struct {
-	DownloadSettings *extraDownloadSettings `json:"downloadSettings"`
-	Xmux             *extraXmux             `json:"xmux"`
-	XPaddingBytes    string                 `json:"xPaddingBytes"`
-}
-
 // applyExtra parses the XHTTP data carried by a link's
 // extra=<url-encoded JSON> query parameter into the spec: the
 // up/down split, the xmux reuse tuning and the padding range. Each
@@ -563,25 +556,45 @@ type extraParams struct {
 // Surviving values are validated again at plan level
 // (engine.validateXHTTP); on non-XHTTP transports the split is a
 // hard plan error, not a silent drop.
+//
+// The independence is structural, not aspirational: the document is
+// decoded once into raw per-section messages and each section is
+// then unmarshalled on its own, so a type error inside one section
+// (a port spelled as a string, a padding range spelled as a number,
+// an xmux object spelled as a string) fails only that section's
+// decode. Decoding the whole document into one typed struct in a
+// single Unmarshal — the pre-fix shape — let any one mistyped
+// section poison all the others (CENSOR-P1 review T2).
 func (o *OutboundSpec) applyExtra(raw string) {
 	if raw == "" {
 		return
 	}
-	var x extraParams
-	if err := json.Unmarshal([]byte(raw), &x); err != nil {
+	var sections map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(raw), &sections); err != nil {
 		return
 	}
-	if ds := x.DownloadSettings; ds != nil && ds.Address != "" && ds.Port >= 1 && ds.Port <= 65535 {
-		o.DownloadAddress = ds.Address
-		o.DownloadPort = uint16(ds.Port)
+	if rawDS, ok := sections["downloadSettings"]; ok {
+		var ds extraDownloadSettings
+		if err := json.Unmarshal(rawDS, &ds); err == nil && ds.Address != "" && ds.Port >= 1 && ds.Port <= 65535 {
+			o.DownloadAddress = ds.Address
+			o.DownloadPort = uint16(ds.Port)
+		}
 	}
-	if xm := x.Xmux; xm != nil {
-		o.XmuxMaxConcurrency = xmuxRangeValue(xm.MaxConcurrency)
-		o.XmuxMaxConnections = xmuxRangeValue(xm.MaxConnections)
-		o.XmuxMaxReuseTimes = xmuxRangeValue(xm.MaxReuseTimes)
-		o.XmuxMaxRequestTimes = xmuxRangeValue(xm.MaxRequestTimes)
+	if rawXmux, ok := sections["xmux"]; ok {
+		var xm extraXmux
+		if err := json.Unmarshal(rawXmux, &xm); err == nil {
+			o.XmuxMaxConcurrency = xmuxRangeValue(xm.MaxConcurrency)
+			o.XmuxMaxConnections = xmuxRangeValue(xm.MaxConnections)
+			o.XmuxMaxReuseTimes = xmuxRangeValue(xm.MaxReuseTimes)
+			o.XmuxMaxRequestTimes = xmuxRangeValue(xm.MaxRequestTimes)
+		}
 	}
-	o.XPaddingBytes = x.XPaddingBytes
+	if rawPadding, ok := sections["xPaddingBytes"]; ok {
+		var padding string
+		if err := json.Unmarshal(rawPadding, &padding); err == nil {
+			o.XPaddingBytes = padding
+		}
+	}
 }
 func parseBool(s string) bool { v, _ := strconv.ParseBool(s); return v }
 func parsePort(s string) (uint16, error) {
