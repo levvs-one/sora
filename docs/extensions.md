@@ -4,6 +4,12 @@ This document is the normative spec for Sora extensions (feature F10).
 Reference implementation: `core/ext` (Go). The app mirrors it in Dart
 (`app/lib/src/ext`).
 
+**Developer guides:** [your first extension in 10
+minutes](extensions-quickstart.md), [`window.soraExt` API
+reference](extensions-api.md), [cookbook](extensions-cookbook.md), [dev
+mode](extensions-devmode.md). Tooling: `tools/sora-ext` (`sora-ext
+scaffold|validate|pack|sign|keygen|publish|dev|serve`).
+
 ## 1. Package layout
 
 A `.soraext` file is a ZIP archive:
@@ -98,6 +104,9 @@ Rules:
   Manifest version stays `1`: they are additive, and old manifests without
   them parse exactly as before. Unknown keys — including unknown keys
   *inside* `background_task` — are still rejected.
+- `theme`, `network_hook`, `routing`: optional capability-contract pointers,
+  see §8. Same additive rules: manifest version stays `1`, unknown inner
+  keys are rejected, and each requires its capability + permission.
 
 ## 3. Permissions (v1 registry)
 
@@ -161,6 +170,7 @@ Shape:
 {
   "catalog_version": 1,
   "updated_at": "2026-10-19T12:00:00Z",
+  "max_age": 3600,
   "extensions": [
     {
       "id": "com.example.speedstats",
@@ -176,11 +186,17 @@ Shape:
       "installs": 5210,
       "badges": ["verified"],
       "categories": ["tools"],
+      "capabilities": ["ui-panel"],
       "permissions": ["connections.read"],
       "download_url": "https://...",
       "sha256": "<hex of the .soraext>",
       "size": 48210,
-      "min_app_version": "1.9.0"
+      "min_app_version": "1.9.0",
+      "rollout_fraction": 1.0,
+      "screenshots": ["https://.../shot1.png"],
+      "changelog": [
+        {"version": "1.2.0", "date": "2026-10-19T12:00:00Z", "notes": "..."}
+      ]
     }
   ]
 }
@@ -190,6 +206,29 @@ Badges: `verified` (reviewed by the Sora team), `top` (top of the week),
 `new`, `staff` (built by the Sora team). URLs must be https. Catalog
 installs verify the downloaded `.soraext` sha256 against the entry, then run
 the normal package verification.
+
+Additive catalog fields (all optional):
+
+- `max_age` (300..604800 s, default 3600): the server's freshness promise.
+  Clients may serve the offline cache within `max_age`; past it they must
+  try to revalidate, and say "cached - <date>" when serving stale data.
+- `rollout_fraction` (0..1, default 1): staged rollout of a version.
+  Eligibility is deterministic per install:
+  `sha256(install_id | ext id | version)` mod 10000 < fraction·10000.
+  The update button shows only for eligible installs; the listing is never
+  gated. A bad version is halted via the revocation list, not a zero
+  fraction.
+- `screenshots`: ≤ 8 https image URLs for the detail page.
+- `changelog`: version/date(RFC3339)/notes rows, newest first.
+- `capabilities`: subset of the manifest capability registry; the store
+  filters on these ("Themes", "Bypasses & network hooks", ...).
+
+The rating methodology (Bayesian average, freshness decay, one vote per
+account) is specified separately; the catalog carries the finished
+`rating` / `ratings_count` / `installs` numbers. Revocation uses
+`revocations.json` + `.minisig` (same team key): see the abuse-handling
+spec. Until the team key ceremony, every team-signature check fails
+closed and the app shows an honest "catalog coming soon" state.
 
 ## 6. Trust notes
 
@@ -280,3 +319,49 @@ Host-side enforcement (`core/ext/netfetch.go`):
 - diagnostics: per-extension counters (requests, denied, bytes out/in)
   via `Fetcher.Stats()`, surfaced in the extension details screen next
   to the log.
+
+## 8. Capability contracts: theme, network-hook, routing (v0, proposed)
+
+Three capabilities exist in the v1 registry without a runtime yet. Their
+manifest side is real: `ParseManifestFull` (`core/ext/manifest_v1ext.go`)
+and the app's `ExtManifest.parse` accept three optional top-level keys,
+each a pointer to an asset file inside the package:
+
+```json
+{
+  "capabilities": ["theme"],
+  "permissions": ["theme.apply"],
+  "theme": {"entry": "theme.json"}
+}
+```
+
+| Key | Capability | Permission (risk) | Entry |
+|---|---|---|---|
+| `theme` | `theme` | `theme.apply` (sensitive) | theme descriptor |
+| `network_hook` | `network-hook` | `net.hooks` (dangerous) | hook module descriptor |
+| `routing` | `routing` | `routing.rules` (dangerous) | routing rules file |
+
+Rules, enforced on both sides:
+
+- each key requires its capability **and** its permission; without either
+  the manifest is rejected;
+- `entry` is a relative `.json` path without traversal (same rule as
+  worker scripts);
+- unknown keys *inside* the pointer objects are rejected;
+- manifest version stays `1`: the keys are additive.
+
+The asset files' own schemas are **contract v0 (proposed)** — only the
+pointers are enforced, not the asset contents. The proposals, with
+working signed example packages:
+
+- theme: `examples/theme-midnight` (`theme.json`: `name`, `variant`,
+  `css_variables`, `stylesheet`);
+- network-hook: `examples/net-hook-dpi` (`hook.json`: `module`,
+  `strategies[]` with `id`/`title`/`description`/`transports`);
+- routing: `examples/routing-split` (`rules.json`: `rules[]` with
+  `match`/`action`/`comment`, first match wins).
+
+Each example README states the proposed status explicitly. The runtime
+side (theme engine, hook loading, rule merging) is planned; until it
+lands, these packages validate, pack, sign and verify exactly like any
+other extension.

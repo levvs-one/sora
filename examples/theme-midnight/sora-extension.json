@@ -1,0 +1,1 @@
+{"author":{"identity":"github:levvs-one","name":"Sora Team","public_key":"RWSv4Bcwe4pZYr9keBFmZ32E9ZgeCGgqpksXBQMUgnzfmMGwQ9O5GNMw"},"capabilities":["theme"],"description":"A dark midnight theme for Sora.","id":"org.sora.midnight","manifest_version":1,"min_app_version":"1.9.0","name":"Midnight Theme","permissions":["theme.apply"],"theme":{"entry":"theme.json"},"version":"0.1.0"}

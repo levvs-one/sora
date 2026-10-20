@@ -16,6 +16,10 @@
 - [Как устроена Sora](architecture.md)
 - [Разработка и сборка](development.md)
 - [Расширения: manifest v1](extensions.md) (in English)
+- [Расширения: первое расширение за 10 минут](extensions-quickstart.md) (in English)
+- [Расширения: API `window.soraExt`](extensions-api.md) (in English)
+- [Расширения: cookbook](extensions-cookbook.md) (in English)
+- [Расширения: dev-режим](extensions-devmode.md) (in English)
 - [Android VpnService: архитектура будущего клиента](android-vpnservice.md)
 - [Политика поэтапного обновления](update-rollout.md)
 
