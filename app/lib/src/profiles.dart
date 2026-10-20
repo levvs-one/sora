@@ -14,7 +14,9 @@ import 'package:flutter/foundation.dart';
 /// `DeleteProfile`/`GetNetworkFingerprint`) exist on both sides of the wire —
 /// the generated Dart stubs already carry them — but the app does not call
 /// them yet, so the core store stays empty and live matches come from this
-/// store only.
+/// store only. Open owner decision: either wire the app to the core RPCs
+/// (one store of truth) or drop the core-side store — the dual-store split
+/// is tech debt until then.
 class NetworkProfile {
   NetworkProfile({
     required this.id,
@@ -97,10 +99,11 @@ class NetworkProfile {
 
 /// Fingerprint of the currently joined network.
 ///
-/// Filled by the core RPC `GetNetworkFingerprint` once the generated Dart
-/// stubs are regenerated for the 1.10 profile RPCs (the Go side has landed
-/// in `core/profiles/profiles.go`); until then the app shows the
-/// "unavailable" state instead of guessing.
+/// Will be filled by the core RPC `GetNetworkFingerprint` once the app wires
+/// it up — the generated Dart stubs already carry the 1.10 profile RPCs, no
+/// regeneration needed, and the Go side has landed in
+/// `core/profiles/profiles.go`. Until then the app shows the "unavailable"
+/// state instead of guessing.
 class NetworkFingerprint {
   const NetworkFingerprint({this.ssid, this.gateway, this.asn});
 

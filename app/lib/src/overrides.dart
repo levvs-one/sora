@@ -11,7 +11,8 @@ import 'package:flutter/foundation.dart';
 /// of truth the UI edits and the plan builder applies. Note the core still
 /// applies its (normally empty) overrides to the subscription states it
 /// serves (`subscriptionBook.stateLocked`), so the two stores must not be
-/// confused when debugging server lists.
+/// confused when debugging server lists. Open owner decision: either
+/// delegate this store to the core RPCs or accept the permanent split.
 class SubscriptionOverride {
   const SubscriptionOverride({this.renames = const {}, this.hidden = const {}});
 
