@@ -163,7 +163,12 @@ func (j *Journal) Since(after uint64, limit int) []Event {
 	if limit <= 0 || limit > j.capacity {
 		limit = j.capacity
 	}
-	out := make([]Event, 0, limit)
+	// Capacity hint only: never reserve more than the retained history
+	// can fill. Callers pass the journal cap as the limit even for a
+	// young session holding a handful of events, and Event is a large
+	// struct — reserving the full limit allocates ~100 KB to return
+	// three events (the censor ingest path hits exactly this).
+	out := make([]Event, 0, min(limit, len(j.history)))
 	for _, ev := range j.history {
 		if ev.Sequence <= after {
 			continue
