@@ -44,6 +44,10 @@ const (
 	// older versions when adding formats to preserve subscriptions across
 	// upgrades.
 	recordVersion = 1
+	// refPrefix namespaces every subscription-owned secret reference so
+	// provider servers can be identified and removed without touching
+	// manual imports.
+	refPrefix = "u1_"
 	// listChunkBytes keeps every stored piece of a server list under the
 	// vault's limit for one entry.
 	listChunkBytes = 60 << 10
@@ -51,15 +55,15 @@ const (
 
 // recordRef derives a subscription record reference. The 16-hex-character ID
 // keeps all subscription references within the vault's 64-byte limit.
-func recordRef(id string) string         { return "u1_" + id + "_rec" }
-func listRef(id string, part int) string { return "u1_" + id + "_l" + strconv.Itoa(part) }
+func recordRef(id string) string         { return refPrefix + id + "_rec" }
+func listRef(id string, part int) string { return refPrefix + id + "_l" + strconv.Itoa(part) }
 
 // serverRefFor derives subscription-owned server references. Removed provider
 // servers can then be deleted without affecting manual imports.
 func serverRefFor(id string) func(parser.OutboundSpec) (string, error) {
 	return func(spec parser.OutboundSpec) (string, error) {
 		sum := sha256.Sum256([]byte(spec.StableKey()))
-		return "u1_" + id + "_" + hex.EncodeToString(sum[:12]), nil
+		return refPrefix + id + "_" + hex.EncodeToString(sum[:12]), nil
 	}
 }
 
@@ -114,37 +118,52 @@ type subscriptionBook struct {
 	backoff engine.Backoff
 	now     func() time.Time
 
-	mu       sync.Mutex
-	records  map[string]*subscriptionRecord
-	lists    map[string][]*corev1.OutboundSpec
-	updating map[string]bool
-	watchers map[chan *corev1.SubscriptionState]struct{}
-	wake     chan struct{}
+	// overrides reapplies user edits after every refresh.
+	overrides *subscription.OverrideStore
+
+	mu      sync.Mutex
+	records map[string]*subscriptionRecord
+	lists   map[string][]*corev1.OutboundSpec
+	// pendingLists marks records whose stored server list has not been
+	// parsed yet. Lists are parsed lazily on first use (listLocked):
+	// proto-unmarshalling every subscription's servers dominated
+	// control-plane construction for large catalogues, and nothing
+	// needs a list before the first state snapshot, refresh, or server
+	// lookup. A failed parse yields a nil list, exactly as the eager
+	// load did, so deferring it changes no observable behaviour.
+	pendingLists map[string]bool
+	updating     map[string]bool
+	watchers     map[chan *corev1.SubscriptionState]struct{}
+	wake         chan struct{}
 }
 
 func newSubscriptionBook(srv *Server) *subscriptionBook {
 	b := &subscriptionBook{
-		srv:      srv,
-		backoff:  engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
-		now:      time.Now,
-		records:  map[string]*subscriptionRecord{},
-		lists:    map[string][]*corev1.OutboundSpec{},
-		updating: map[string]bool{},
-		watchers: map[chan *corev1.SubscriptionState]struct{}{},
-		wake:     make(chan struct{}, 1),
+		srv:          srv,
+		backoff:      engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
+		now:          time.Now,
+		overrides:    subscription.NewOverrideStore(srv.dataDir),
+		records:      map[string]*subscriptionRecord{},
+		lists:        map[string][]*corev1.OutboundSpec{},
+		pendingLists: map[string]bool{},
+		updating:     map[string]bool{},
+		watchers:     map[chan *corev1.SubscriptionState]struct{}{},
+		wake:         make(chan struct{}, 1),
 	}
 	b.load()
 	return b
 }
 
-// load reads every stored subscription. A record this core cannot read is
-// left in the vault untouched, so a downgrade does not destroy it.
+// load reads every stored subscription record. A record this core cannot
+// read is left in the vault untouched, so a downgrade does not destroy it.
+// Server lists are not parsed here; they load lazily per subscription
+// (pendingLists), so startup cost stays flat in stored server count.
 func (b *subscriptionBook) load() {
 	if b.srv.secrets == nil {
 		return
 	}
 	for _, ref := range b.srv.secrets.Refs() {
-		if !strings.HasPrefix(ref, "u1_") || !strings.HasSuffix(ref, "_rec") {
+		if !strings.HasPrefix(ref, refPrefix) || !strings.HasSuffix(ref, "_rec") {
 			continue
 		}
 		raw, err := b.srv.secrets.Get(ref)
@@ -156,7 +175,7 @@ func (b *subscriptionBook) load() {
 			continue
 		}
 		b.records[rec.ID] = rec
-		b.lists[rec.ID] = b.loadList(rec)
+		b.pendingLists[rec.ID] = true
 	}
 }
 
@@ -174,6 +193,25 @@ func (b *subscriptionBook) loadList(rec *subscriptionRecord) []*corev1.OutboundS
 		return nil
 	}
 	return list.GetOutbounds()
+}
+
+// listLocked returns the stored server list for id, parsing it from the
+// vault on first demand. Callers must hold b.mu.
+func (b *subscriptionBook) listLocked(id string) []*corev1.OutboundSpec {
+	if b.pendingLists[id] {
+		delete(b.pendingLists, id)
+		b.lists[id] = b.loadList(b.records[id])
+	}
+	return b.lists[id]
+}
+
+// ensureListsLocked parses every pending list. Callers must hold b.mu.
+// It exists for the reverse lookup in subscriptionsOf, which by nature
+// scans all lists.
+func (b *subscriptionBook) ensureListsLocked() {
+	for id := range b.pendingLists {
+		_ = b.listLocked(id)
+	}
 }
 
 func newSubscriptionID() (string, error) {
@@ -312,8 +350,16 @@ func (b *subscriptionBook) delete(id string) error {
 	if err := b.srv.secrets.Apply(nil, deletes); err != nil {
 		return err
 	}
+	// User overrides die with the subscription.
+	if b.overrides != nil {
+		if err := b.overrides.Delete(id); err != nil && b.srv.logs != nil {
+			b.srv.logs.Write(b.now(), logs.LevelWarning, logs.SourceSubscription,
+				"subscription override cleanup failed id="+id)
+		}
+	}
 	delete(b.records, id)
 	delete(b.lists, id)
+	delete(b.pendingLists, id)
 	b.notifyLocked(&corev1.SubscriptionState{Settings: &corev1.SubscriptionSettings{Id: id}, Deleted: true}, logs.LevelInfo, "Subscription removed")
 	return nil
 }
@@ -430,6 +476,7 @@ func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subsc
 	}
 	*rec = updated
 	b.lists[rec.ID] = list.GetOutbounds()
+	delete(b.pendingLists, rec.ID)
 	return nil
 }
 
@@ -484,6 +531,13 @@ func (b *subscriptionBook) run(ctx context.Context) {
 			}
 		}
 		b.mu.Unlock()
+		if len(due) > 0 && b.killSwitchHolding() {
+			// The kill switch promises no byte leaves outside the tunnel,
+			// and background subscription fetches use direct HTTPS. They
+			// wait for disconnect; explicit user refreshes still run on
+			// demand, and the overdue records fire on the next round.
+			due = nil
+		}
 		for _, id := range due {
 			select {
 			case slots <- struct{}{}:
@@ -505,6 +559,20 @@ func (b *subscriptionBook) run(ctx context.Context) {
 		}
 		timer.Stop()
 	}
+}
+
+// killSwitchHolding reports whether the running session currently blocks
+// non-tunnel traffic. Core-initiated background network activity must not
+// run then: it would either fail against the firewall or, worse, emit
+// packets outside the tunnel.
+func (b *subscriptionBook) killSwitchHolding() bool {
+	if b.srv == nil || b.srv.sessions == nil {
+		return false
+	}
+	if cur := b.srv.sessions.Current(); cur != nil {
+		return cur.Status().KillSwitch
+	}
+	return false
 }
 
 // poke wakes the scheduler after a change.
@@ -537,6 +605,39 @@ func (b *subscriptionBook) list() []*corev1.SubscriptionState {
 	return out
 }
 
+// withCustomOutbounds appends the user's own servers (SW7) to a
+// subscription's outbound list so the client's combined server list - and
+// therefore the plan builder - sees them without touching the subscription
+// book. Subscription overrides (hide/rename/reorder) apply to the
+// subscription's servers only; custom servers travel as-is. The result is
+// always a fresh slice: the subscription list's backing array is shared
+// with the book and must not be rewritten by append.
+func withCustomOutbounds(b *subscriptionBook, specs []*corev1.OutboundSpec, o *subscription.Override) []*corev1.OutboundSpec {
+	sub := applySubscriptionOverride(specs, o)
+	if b.srv == nil {
+		return sub
+	}
+	custom := b.srv.CustomOutbounds()
+	if len(custom) == 0 {
+		return sub
+	}
+	out := make([]*corev1.OutboundSpec, 0, len(sub)+len(custom))
+	out = append(out, sub...)
+	return append(out, custom...)
+}
+
+// broadcastCustomChange re-emits every subscription state so watchers pick
+// up custom-server additions and removals without waiting for the next
+// subscription refresh: the merged states they already hold would otherwise
+// keep pointing at a stale custom list.
+func (b *subscriptionBook) broadcastCustomChange() {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	for id := range b.records {
+		b.notifyLocked(b.stateLocked(id), logs.LevelInfo, "Custom servers changed")
+	}
+}
+
 func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 	rec := b.records[id]
 	settings := &corev1.SubscriptionSettings{Id: rec.ID, Name: rec.Name, UserAgent: rec.UserAgent, AutoUpdate: rec.AutoUpdate}
@@ -546,7 +647,7 @@ func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 	state := &corev1.SubscriptionState{
 		Settings:    settings,
 		Info:        subscriptionInfoToWire(rec.Info),
-		Outbounds:   b.lists[id],
+		Outbounds:   withCustomOutbounds(b, b.listLocked(id), b.loadOverride(id)),
 		Updating:    b.updating[id],
 		DisplayName: displayName(rec),
 	}

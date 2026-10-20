@@ -35,7 +35,8 @@ const (
 	// MaxProbeEndpoints is the largest number of endpoints one probe
 	// request
 	// may carry.
-	MaxProbeEndpoints = 256
+	MaxProbeEndpoints = 4096
+	ProbeChunkSize    = 128
 )
 
 // resolver resolves plan references to credentials for the engine. Resolved
@@ -234,7 +235,7 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 		if err != nil {
 			return nil, err
 		}
-		if _, ok := seen[rule.Target]; !ok && !isBuiltInTarget(rule.Target) {
+		if _, ok := seen[rule.Target]; !ok && !engine.IsBuiltInTarget(rule.Target) {
 			return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanUnknownTarget,
 				"control: rule %q points at %q, which is not in this plan", rule.Value, rule.Target)
 		}
@@ -256,6 +257,16 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 	plan.DNS = dnsFromProto(in.GetDnsPolicy(), plan.Tun.Enabled)
 	if err := checkDNS(plan.DNS); err != nil {
 		return nil, err
+	}
+	if chain := in.GetChain(); len(chain) > 0 {
+		if err := applyChain(plan, chain); err != nil {
+			return nil, err
+		}
+	}
+	if in.GetZapretWithVpn() {
+		if err := applyZapretWithVPN(plan, in.GetZapretStrategy()); err != nil {
+			return nil, err
+		}
 	}
 	for _, entry := range in.GetBypassSettings().GetRules() {
 		if err := checkBypass(entry); err != nil {
@@ -311,24 +322,13 @@ func groupsFromProto(in []*corev1.GroupSpec, outbounds map[string]struct{}) ([]e
 		for _, member := range g.Outbounds {
 			_, isOutbound := outbounds[member]
 			_, isGroup := names[member]
-			if !isOutbound && !isGroup && !isBuiltInTarget(member) {
+			if !isOutbound && !isGroup && !engine.IsBuiltInTarget(member) {
 				return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanGroupsInvalid,
 					"control: group %q names %q, which is not in this plan", g.Name, member)
 			}
 		}
 	}
 	return out, nil
-}
-
-// isBuiltInTarget reports whether a target is provided by the engine instead of
-// the plan.
-func isBuiltInTarget(target string) bool {
-	switch target {
-	case "direct", "block", "reject":
-		return true
-	default:
-		return false
-	}
 }
 
 // checkDNS validates resolvers and returns a problem-specific error key.
@@ -775,4 +775,83 @@ func unpackProfile(packed string) (json.RawMessage, error) {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds, "control: a stored Xray profile is unreadable or too large")
 	}
 	return profile, nil
+}
+
+func applyChain(plan *engine.Plan, chain []string) error {
+	if len(chain) < 2 || len(chain) > engine.MaxChainHops {
+		return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+			"control: a proxy chain needs 2 to %d servers, got %d", engine.MaxChainHops, len(chain))
+	}
+	byID := make(map[string]int, len(plan.Outbounds))
+	for i := range plan.Outbounds {
+		byID[plan.Outbounds[i].ID] = i
+	}
+	seen := make(map[string]bool, len(chain))
+	for i, id := range chain {
+		if seen[id] {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+				"control: the proxy chain repeats %q", id)
+		}
+		seen[id] = true
+		idx, ok := byID[id]
+		if !ok {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanUnknownTarget,
+				"control: the proxy chain names %q, which is not an outbound of this plan", id)
+		}
+		if i > 0 {
+			plan.Outbounds[idx].Via = chain[i-1]
+		}
+	}
+	entry, exit := chain[0], chain[len(chain)-1]
+	for i := range plan.Rules {
+		if plan.Rules[i].Target == entry {
+			plan.Rules[i].Target = exit
+		}
+	}
+	for i := range plan.Groups {
+		for j, member := range plan.Groups[i].Outbounds {
+			if member == entry {
+				plan.Groups[i].Outbounds[j] = exit
+			}
+		}
+	}
+	return nil
+}
+
+const zapretDirectOutboundID = "sora-zapret-direct"
+
+func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) error {
+	if !plan.Tun.Enabled {
+		return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanTunnel,
+			"control: zapret_with_vpn needs TUN mode")
+	}
+	if runtime.GOOS != "linux" {
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
+			"control: zapret_with_vpn runs on Linux, where tpws is shipped")
+	}
+	if strategy == nil {
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanBypassInvalid,
+			"control: zapret_with_vpn needs an explicit tpws strategy from the client")
+	}
+	for _, o := range plan.Outbounds {
+		if o.ID == zapretDirectOutboundID {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanDuplicateID,
+				"control: outbound id %q is reserved for zapret", zapretDirectOutboundID)
+		}
+	}
+	bs := engine.BypassStrategy{
+		SplitPos: strategy.GetSplitPos(), Disorder: strategy.GetDisorder(), OOB: strategy.GetOob(),
+		TLSRecord: strategy.GetTlsRecord(), HostCase: strategy.GetHostCase(),
+		DomainCase: strategy.GetDomainCase(), MethodEOL: strategy.GetMethodEol(),
+	}
+	plan.Outbounds = append(plan.Outbounds, engine.Outbound{
+		ID: zapretDirectOutboundID, Name: "Zapret (direct traffic)",
+		Protocol: engine.ProtocolBypass, Bypass: &bs,
+	})
+	for i := range plan.Rules {
+		if plan.Rules[i].Target == "direct" {
+			plan.Rules[i].Target = zapretDirectOutboundID
+		}
+	}
+	return nil
 }

@@ -22,9 +22,14 @@ import (
 	"github.com/levvs-one/sora-client/core/diagnostics"
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/ext"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	leakv1 "github.com/levvs-one/sora-client/core/gen/sora/leak/v1"
+	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/parser"
+	"github.com/levvs-one/sora-client/core/probe"
+	"github.com/levvs-one/sora-client/core/profiles"
 	"github.com/levvs-one/sora-client/core/routing"
 	"github.com/levvs-one/sora-client/core/secret"
 	"github.com/levvs-one/sora-client/core/session"
@@ -90,9 +95,9 @@ func Capabilities() []string {
 		"stats",
 		"engine-selection",
 		"tls-fragment",
+		"native-diagnostics",
 		"log-center",
 		"connection-center",
-		"native-diagnostics",
 		"log-export-formats",
 	}
 }
@@ -101,6 +106,14 @@ func Capabilities() []string {
 // return engine.ErrNoEngine.
 type Measurer interface {
 	Measure(ctx context.Context, outbounds []engine.Outbound, opts engine.MeasureOptions) (<-chan engine.Measurement, error)
+}
+
+// Benchmarker measures download throughput through compatible engines.
+// Unsupported outbounds yield a done sample carrying engine.ErrNoEngine.
+// Results stream out of Benchmark; sora keeps no stored history of its
+// own (the app stores whatever it displays).
+type Benchmarker interface {
+	Benchmark(ctx context.Context, outbounds []engine.Outbound, opts engine.BandwidthOptions) (<-chan probe.BandwidthSample, error)
 }
 
 // Prober checks endpoint reachability. Implementations may dial directly or
@@ -125,21 +138,35 @@ type Fetcher interface {
 // Server implements the control-plane service.
 type Server struct {
 	corev1.UnimplementedCoreControlServer
+	// LeakService serves the egress self-tests (core/control/leak.go).
+	// See reports/featlog-swarm-sw2.md.
+	leakv1.UnimplementedLeakServiceServer
 
-	version     Version
-	auth        *Authenticator
-	sessions    *session.Manager
-	secrets     SecretStore
-	parser      parser.LinkParser
-	redactors   *redactorCache
-	prober      Prober
-	measurer    Measurer
-	subs        *subscriptionBook
-	logs        *logs.Center
-	about       func() *corev1.About
-	diagnostics Diagnostics
-	fetcher     Fetcher
-	captureMu   sync.Mutex
+	version  Version
+	auth     *Authenticator
+	sessions *session.Manager
+	// extSched is the extension background scheduler (Config.ExtScheduler);
+	// it follows the kill switch via syncExtKillSwitch.
+	extSched *ext.Scheduler
+	// extProxyPort is the loopback mixed-listener port backing
+	// ExtFetchTransport (Config.LocalProxyPort).
+	extProxyPort int
+	secrets      SecretStore
+	parser       parser.LinkParser
+	redactors    *redactorCache
+	prober       Prober
+	measurer     Measurer
+	subs         *subscriptionBook
+	logs         *logs.Center
+	about        func() *corev1.About
+	diagnostics  Diagnostics
+	fetcher      Fetcher
+	dataDir      string
+	benchmarker  Benchmarker
+	// profiles stores network profiles for automatic matching (F5). Nil
+	// disables the profile RPCs with explicit errors.
+	profiles  *profiles.Store
+	captureMu sync.Mutex
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -192,6 +219,26 @@ type Config struct {
 	// Fetcher retrieves subscriptions; nil answers that fetching is
 	// unavailable.
 	Fetcher Fetcher
+	// DataDir is the owner-only core data directory. Empty disables
+	// features that persist files (benchmark history, overrides).
+	DataDir string
+	// Benchmarker measures server throughput; nil answers that
+	// benchmarking is unavailable.
+	Benchmarker Benchmarker
+	// Profiles stores network profiles for automatic matching (F5); nil
+	// disables the profile RPCs with explicit errors.
+	Profiles *profiles.Store
+	// ExtScheduler is the extension background-work scheduler (core/ext).
+	// The control plane forwards the kill switch to it so background
+	// extension work pauses while traffic is blocked. Nil means no
+	// extension scheduler runs in this process (tests, diagnostics).
+	ExtScheduler *ext.Scheduler
+	// LocalProxyPort is the loopback port of the tunnel's mixed
+	// (HTTP+SOCKS5) listener - the port supervise gives every engine.
+	// Extension net.fetch rides it when the session plan enables the
+	// local proxy (see Server.ExtFetchTransport). Zero disables the
+	// tunnel transport: extension fetches then fail closed.
+	LocalProxyPort int
 }
 
 // New creates a control plane, supplying the default version when unset.
@@ -208,18 +255,23 @@ func New(cfg Config) (*Server, error) {
 		cfg.Version = Version{Major: 1, Minor: 0, MinSupportedMinor: 0}
 	}
 	server := &Server{
-		version:     cfg.Version,
-		auth:        cfg.Authenticator,
-		sessions:    cfg.Sessions,
-		secrets:     cfg.Secrets,
-		parser:      parser.LinkParser{MaxItems: cfg.MaxImportItems},
-		redactors:   &redactorCache{byRef: make(map[string]*engine.Redactor)},
-		prober:      cfg.Prober,
-		measurer:    cfg.Measurer,
-		logs:        cfg.Logs,
-		about:       cfg.About,
-		diagnostics: cfg.Diagnostics,
-		fetcher:     cfg.Fetcher,
+		version:      cfg.Version,
+		auth:         cfg.Authenticator,
+		sessions:     cfg.Sessions,
+		secrets:      cfg.Secrets,
+		parser:       parser.LinkParser{MaxItems: cfg.MaxImportItems},
+		redactors:    &redactorCache{byRef: make(map[string]*engine.Redactor)},
+		extSched:     cfg.ExtScheduler,
+		extProxyPort: cfg.LocalProxyPort,
+		prober:       cfg.Prober,
+		measurer:     cfg.Measurer,
+		logs:         cfg.Logs,
+		about:        cfg.About,
+		diagnostics:  cfg.Diagnostics,
+		fetcher:      cfg.Fetcher,
+		dataDir:      cfg.DataDir,
+		benchmarker:  cfg.Benchmarker,
+		profiles:     cfg.Profiles,
 	}
 	server.subs = newSubscriptionBook(server)
 	return server, nil
@@ -271,6 +323,9 @@ func (s *Server) apiVersion() *corev1.ApiVersion {
 	capabilities := Capabilities()
 	if provider, ok := s.measurer.(interface{ BypassAvailable() bool }); ok && provider.BypassAvailable() {
 		capabilities = append(capabilities, "serverless")
+	}
+	if len(chainEngines(s.measurer)) > 0 {
+		capabilities = append(capabilities, "chains")
 	}
 	return &corev1.ApiVersion{
 		Major:             s.version.Major,
@@ -342,8 +397,15 @@ func (s *Server) mask(plan *engine.Plan) func(string) string {
 	if plan == nil {
 		return nil
 	}
-	values := append(plan.Secrets(), plan.Identifiers()...)
-	redactor := engine.NewRedactor(values...)
+	// Feed the two lists to the redactor separately instead of joining
+	// them into a third slice first: for a 200-server plan the join
+	// regrew and copied ~1400 strings (~26 KB) per Connect. Two Add
+	// calls build the identical value set - Add deduplicates across
+	// calls and its length-descending stable sort produces the same
+	// final order, because the secrets-before-identifiers relative
+	// order within each length class is preserved by both sorts.
+	redactor := engine.NewRedactor(plan.Secrets()...)
+	redactor.Add(plan.Identifiers()...)
 	s.redactors.put(plan.SessionID, redactor)
 	return redactor.String
 }
@@ -445,8 +507,10 @@ const (
 
 // Handshake negotiates the API version without a token so clients can
 // initialize. Incompatible clients still receive the core's version to
-// determine the required update.
-func (s *Server) Handshake(_ context.Context, req *corev1.HandshakeRequest) (*corev1.HandshakeResponse, error) {
+// determine the required update. The control token is issued only to
+// control-authorized peers; read-only peers never receive it, so the token
+// cannot smuggle control rights past the method checks (SORA-H2).
+func (s *Server) Handshake(ctx context.Context, req *corev1.HandshakeRequest) (*corev1.HandshakeResponse, error) {
 	negotiated, err := s.checkVersion(req.GetClientVersion())
 	if err != nil {
 		return &corev1.HandshakeResponse{
@@ -456,7 +520,11 @@ func (s *Server) Handshake(_ context.Context, req *corev1.HandshakeRequest) (*co
 	}
 	answer := s.apiVersion()
 	answer.Minor = negotiated
-	return &corev1.HandshakeResponse{NegotiatedVersion: answer, ControlAuthenticator: s.auth.Token()}, nil
+	resp := &corev1.HandshakeResponse{NegotiatedVersion: answer}
+	if peerLevel(ctx) == ipc.AuthControl {
+		resp.ControlAuthenticator = s.auth.Token()
+	}
+	return resp, nil
 }
 
 // Connect starts a session after checking version, authentication, limits, and
@@ -491,6 +559,9 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	if err != nil {
 		return &corev1.ConnectResponse{Error: toWire(err, mask, id)}, nil
 	}
+	// A session can start with the kill switch already armed (restored
+	// settings): background extension work must start out paused too.
+	s.syncExtKillSwitch(started.Status().KillSwitch)
 	return &corev1.ConnectResponse{
 		Status: &corev1.SessionStatus{
 			Connection:        wireStatus(started.Status()),
@@ -528,6 +599,11 @@ func (s *Server) Disconnect(ctx context.Context, req *corev1.DisconnectRequest) 
 	if finished := s.sessions.Status().SessionID; finished != "" {
 		s.redactors.drop(finished)
 	}
+	// The session is gone: mirror the manager's kill-switch state (an armed
+	// switch stays armed across disconnects). Extension fetches stay
+	// fail-closed regardless - the tunnel transport finds no live session
+	// and refuses instead of dialing direct.
+	s.syncExtKillSwitch(s.sessions.Status().KillSwitch)
 	return &corev1.DisconnectResponse{
 		Status: &corev1.SessionStatus{Connection: wireStatus(s.sessions.Status())},
 	}, nil
@@ -591,7 +667,20 @@ func (s *Server) SetKillSwitch(ctx context.Context, req *corev1.SetKillSwitchReq
 	if err := running.SetKillSwitch(ctx, req.GetEnabled()); err != nil {
 		return &corev1.SetKillSwitchResponse{Enabled: req.GetEnabled(), Error: toWire(err, nil, id)}, nil
 	}
+	// Background extension work follows the kill switch: while traffic is
+	// blocked, workers must not run and their fetches must fail fast.
+	s.syncExtKillSwitch(req.GetEnabled())
 	return &corev1.SetKillSwitchResponse{Enabled: req.GetEnabled()}, nil
+}
+
+// syncExtKillSwitch mirrors the session's kill-switch state into the
+// extension scheduler. It is called on Connect (a session may start with
+// the switch already armed) and on every SetKillSwitch change. Nil-safe:
+// without a scheduler there is nothing to pause.
+func (s *Server) syncExtKillSwitch(armed bool) {
+	if s.extSched != nil {
+		s.extSched.SetKillSwitch(armed)
+	}
 }
 
 // GetStats returns session traffic counters. With no session, it returns zero
@@ -705,16 +794,25 @@ func newEventFeed(journal *session.Journal, after uint64, redactor *engine.Redac
 // subscription.
 func (f *eventFeed) history() []session.Event {
 	events := f.journal.Since(f.after, 0)
-	out := make([]session.Event, 0, len(events))
+	// The usual case - no event in the window sits above the captured
+	// head - returns the journal's fresh slice as is instead of copying
+	// every (large) Event into a second slice of the same size: a full
+	// 512-event replay paid that copy on every WatchEvents reconnect.
 	for _, event := range events {
 		if event.Sequence > f.head {
 			// Events above the captured head already belong to live
 			// delivery.
-			continue
+			out := make([]session.Event, 0, len(events))
+			for _, kept := range events {
+				if kept.Sequence > f.head {
+					continue
+				}
+				out = append(out, kept)
+			}
+			return out
 		}
-		out = append(out, event)
 	}
-	return out
+	return events
 }
 
 // unsent reports whether a live event still has to go out. One appended
@@ -735,7 +833,11 @@ func (f *eventFeed) close() {
 // clients lose events without unbounded memory growth.
 const streamBuffer = 128
 
-// toWireEvent converts a journal event to the contract format.
+// NetworkEventPrefix marks LogBatch lines that carry a network-move event
+// (session.EventNetwork). The client matches this prefix to surface the
+// connection state while flows re-establish.
+const NetworkEventPrefix = "network-changed: "
+
 func toWireEvent(event session.Event, redactor *engine.Redactor) *corev1.CoreEvent {
 	var mask func(string) string
 	if redactor != nil {
@@ -783,6 +885,22 @@ func toWireEvent(event session.Event, redactor *engine.Redactor) *corev1.CoreEve
 			moved.Group, moved.Previous, moved.Selected = event.Switch.Group, event.Switch.Previous, event.Switch.Selected
 		}
 		out.Payload = &corev1.CoreEvent_GroupSwitched{GroupSwitched: moved}
+	case session.EventNetwork:
+		// Network moves surface as a marked log line; the client matches
+		// NetworkEventPrefix to show the connection state.
+		out.Payload = &corev1.CoreEvent_LogBatch{LogBatch: &corev1.LogBatch{
+			Lines: []string{NetworkEventPrefix + maskText(mask, event.Detail)},
+		}}
+	case session.EventProfile:
+		// A saved network profile matched the current network; the client
+		// applies it (F5).
+		matched := &corev1.ProfileMatched{}
+		if event.Profile != nil {
+			matched.ProfileId = event.Profile.ProfileID
+			matched.ProfileName = event.Profile.Name
+			matched.AutoApply = event.Profile.AutoApply
+		}
+		out.Payload = &corev1.CoreEvent_ProfileMatched{ProfileMatched: matched}
 	default:
 		out.Payload = &corev1.CoreEvent_LogBatch{LogBatch: &corev1.LogBatch{
 			Lines: []string{maskText(mask, event.Detail)},
@@ -845,7 +963,11 @@ func (s *Server) ParseImport(_ context.Context, req *corev1.ParseImportRequest) 
 		return &corev1.ParseImportResponse{Error: toWire(err, nil, id)}, nil
 	}
 	puts := make(map[string][]byte, len(servers))
-	plan := &corev1.SessionPlan{TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM}
+	plan := &corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		// One outbound per imported server: size for them up front.
+		Outbounds: make([]*corev1.OutboundSpec, 0, len(servers)),
+	}
 	for _, server := range servers {
 		puts[server.reference] = server.document
 		plan.Outbounds = append(plan.Outbounds, server.spec)
@@ -1005,6 +1127,14 @@ func subscriptionInfoToWire(info subscription.Info) *corev1.SubscriptionInfo {
 // ProbeServers streams results using the stream context. Endpoints use TCP;
 // outbounds use a compatible engine with optional TCP fallback. Each result
 // identifies its method.
+//
+// Large probes are chunked: the request is processed in ProbeChunkSize
+// pieces and each chunk's results stream as they complete, so probing
+// thousands of servers degrades into a longer stream instead of dying on a
+// per-request limit. A failing chunk does not abort the others: the first
+// chunk error is remembered, the remaining chunks still run, and the RPC
+// then returns that error (mapped through transportStatus, as before) -
+// partial results, no silent loss.
 func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.ServerStreamingServer[corev1.ProbeResult]) error {
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return transportStatus(err)
@@ -1012,14 +1142,17 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 	ctx, cancel := context.WithCancel(stream.Context())
 	defer cancel()
 	id := requestID(req.GetRequestId())
-	total := len(req.GetEndpoints()) + len(req.GetOutbounds())
+	endpoints := req.GetEndpoints()
+	outbounds := req.GetOutbounds()
+	total := len(endpoints) + len(outbounds)
 	if total == 0 {
 		return errs.Newf(errs.CodeInvalidArgument, errs.KeyProbeNoEndpoints,
 			"control: the probe request carries no endpoints")
 	}
 	if total > MaxProbeEndpoints {
 		return errs.Newf(errs.CodeResourceExhausted, errs.KeyProbeTooMany,
-			"control: the probe request carries %d servers, the limit is %d", total, MaxProbeEndpoints)
+			"control: the probe request carries %d servers, the limit is %d; split it into chunks of at most %d",
+			total, MaxProbeEndpoints, ProbeChunkSize)
 	}
 
 	results := make(chan *corev1.ProbeResult, total)
@@ -1047,13 +1180,26 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		return nil
 	}
 
-	if err := connect(req.GetEndpoints(), nil); err != nil {
-		return transportStatus(err)
-	}
-	if len(req.GetOutbounds()) > 0 {
-		if err := s.measureOutbounds(ctx, req, id, results, &wg, connect); err != nil {
-			return transportStatus(err)
+	// note remembers the first chunk failure; the remaining chunks still
+	// run so one bad piece does not sink the whole probe.
+	var firstErr error
+	note := func(err error) {
+		if err != nil && firstErr == nil {
+			firstErr = err
 		}
+	}
+	opts := req.GetOptions()
+	for _, chunk := range chunkServers(endpoints, ProbeChunkSize) {
+		if ctx.Err() != nil {
+			break
+		}
+		note(connect(chunk, nil))
+	}
+	for _, chunk := range chunkServers(outbounds, ProbeChunkSize) {
+		if ctx.Err() != nil {
+			break
+		}
+		note(s.measureOutbounds(ctx, opts, chunk, id, results, &wg, connect))
 	}
 	go func() {
 		wg.Wait()
@@ -1064,7 +1210,27 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 			return err
 		}
 	}
+	if firstErr != nil {
+		return transportStatus(firstErr)
+	}
 	return nil
+}
+
+// chunkServers splits xs into consecutive pieces of at most size. Empty
+// input yields no pieces, so empty chunks never reach the pipeline.
+func chunkServers[T any](xs []T, size int) [][]T {
+	if size <= 0 || len(xs) == 0 {
+		return nil
+	}
+	chunks := make([][]T, 0, (len(xs)+size-1)/size)
+	for i := 0; i < len(xs); i += size {
+		end := i + size
+		if end > len(xs) {
+			end = len(xs)
+		}
+		chunks = append(chunks, xs[i:end])
+	}
+	return chunks
 }
 
 // Probe methods as the results name them.
@@ -1073,12 +1239,11 @@ const (
 	probeConnect = "connect"
 )
 
-// measureOutbounds resolves the outbounds of a probe request and measures them
-// through engines, falling back to a connection check where the options allow.
-func (s *Server) measureOutbounds(ctx context.Context, req *corev1.ProbeServersRequest, id string,
+// measureOutbounds resolves one chunk of outbounds of a probe request and
+// measures them through engines, falling back to a connection check where
+// the options allow.
+func (s *Server) measureOutbounds(ctx context.Context, opts *corev1.ProbeOptions, specs []*corev1.OutboundSpec, id string,
 	results chan<- *corev1.ProbeResult, wg *sync.WaitGroup, connect func([]*corev1.Endpoint, []string) error) error {
-	opts := req.GetOptions()
-	specs := req.GetOutbounds()
 	if opts.GetMethod() == corev1.ProbeMethod_PROBE_METHOD_CONNECT || s.measurer == nil {
 		if opts.GetMethod() == corev1.ProbeMethod_PROBE_METHOD_ENGINE {
 			return errs.Newf(errs.CodeUnsupported, errs.KeyProbeInvalidEndpoint,
@@ -1190,7 +1355,9 @@ func (s *Server) RunDiagnostics(ctx context.Context, req *corev1.RunDiagnosticsR
 }
 
 // ExportDiagnostics returns an archive built from already-redacted core values.
-// Clients cannot expand its contents.
+// Clients cannot expand its contents. Raw capture formats (PCAPNG, EVTX) are
+// refused outright: packet payloads and event logs cannot be redacted to the
+// archive's guarantee, so the core will not produce them (SORA-H3).
 func (s *Server) ExportDiagnostics(ctx context.Context, req *corev1.ExportDiagnosticsRequest) (*corev1.ExportDiagnosticsResponse, error) {
 	id := requestID(req.GetRequestId())
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {

@@ -29,11 +29,15 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/tunroute"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/ext"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	extv1 "github.com/levvs-one/sora-client/core/gen/sora/ext/v1"
+	leakv1 "github.com/levvs-one/sora-client/core/gen/sora/leak/v1"
 	"github.com/levvs-one/sora-client/core/guard"
 	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/probe"
+	"github.com/levvs-one/sora-client/core/profiles"
 	"github.com/levvs-one/sora-client/core/secret"
 	"github.com/levvs-one/sora-client/core/session"
 	"github.com/levvs-one/sora-client/core/subscription"
@@ -41,7 +45,7 @@ import (
 
 // Version defines the API contract served by this build. Contract changes must
 // update this value and the generated code together.
-var Version = control.Version{Major: 1, Minor: 7, MinSupportedMinor: 1}
+var Version = control.Version{Major: 1, Minor: 11, MinSupportedMinor: 1}
 
 // Options configures a core instance.
 type Options struct {
@@ -91,6 +95,7 @@ type App struct {
 	address  string
 	local    string
 	engines  *registry.Registry
+	extSched *ext.Scheduler
 	instance io.Closer
 }
 
@@ -214,11 +219,19 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		return nil, err
 	}
 	redactor := engine.NewRedactor()
+	// Network profiles are auxiliary: a corrupt file disables matching with
+	// a warning instead of failing the core.
+	profStore, err := profiles.NewStore(opts.DataDir)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "sora-core: network profiles disabled: %v\n", err)
+		profStore, _ = profiles.NewStore("")
+	}
 	manager := session.NewManager(session.ManagerConfig{
 		Factory:  factory,
 		Guard:    system,
 		Redactor: redactor,
 		Network:  session.NetworkFingerprint,
+		Profiles: profStore,
 	})
 	app.sessions = manager
 
@@ -236,19 +249,43 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	// Keep a nil registry as a nil interface to avoid calling through a nil
 	// pointer.
 	var measurer control.Measurer
+	var benchmarker control.Benchmarker
 	if app.engines != nil {
 		measurer = app.engines
+		b, err := probe.NewBenchmarker(probe.BenchmarkerConfig{
+			NewEngine: app.engines.BenchmarkEngine,
+			SelectKind: func(o engine.Outbound) (engine.Kind, error) {
+				sel, err := engine.SelectEngine(
+					&engine.Plan{Outbounds: []engine.Outbound{o}},
+					app.engines.Availability(), nil)
+				if err != nil {
+					return "", err
+				}
+				return sel.Kind, nil
+			},
+		})
+		if err != nil {
+			_ = store.Close()
+			return nil, err
+		}
+		benchmarker = b
 	}
+	extSched := ext.NewScheduler(nil)
 	plane, err := control.New(control.Config{
-		Version:       Version,
-		Authenticator: auth,
-		Sessions:      manager,
-		Secrets:       store,
-		Prober:        probe.New(probe.Config{}),
-		Measurer:      measurer,
-		Logs:          center,
-		About:         app.about,
-		Fetcher:       subscription.New(subscription.Options{}),
+		Version:        Version,
+		Authenticator:  auth,
+		Sessions:       manager,
+		Secrets:        store,
+		Prober:         probe.New(probe.Config{}),
+		Measurer:       measurer,
+		Benchmarker:    benchmarker,
+		DataDir:        opts.DataDir,
+		Profiles:       profStore,
+		ExtScheduler:   extSched,
+		LocalProxyPort: int(tunnelPort),
+		Logs:           center,
+		About:          app.about,
+		Fetcher:        subscription.New(subscription.Options{}),
 	})
 	if err != nil {
 		_ = store.Close()
@@ -262,12 +299,19 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		// limit before allocating their payload.
 		grpc.MaxRecvMsgSize(control.MaxRecvMsgBytes),
 		grpc.MaxSendMsgSize(control.MaxSendMsgBytes),
+		grpc.Creds(ipc.PeerCredentials(ipc.DefaultAuthorize(ipc.Options{Address: opts.Socket}))),
+		grpc.UnaryInterceptor(plane.UnaryAuthInterceptor()),
+		grpc.StreamInterceptor(plane.StreamAuthInterceptor()),
 		// Reap connections that never do anything: together with the
 		// listener's connection cap this bounds silent-connection FD
 		// exhaustion. Active streams are not idle.
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 10 * time.Minute}),
 	)
-	corev1.RegisterCoreControlServer(app.server, plane)
+	if err := mountControlServices(app.server, plane, opts.DataDir); err != nil {
+		return nil, err
+	}
+	extSched.SetFetchTransport(plane.ExtFetchTransport())
+	app.extSched = extSched
 	built = true
 	return app, nil
 }
@@ -376,6 +420,10 @@ func (a *App) Serve(ctx context.Context) error {
 	a.log.Info("core listening", "endpoint", a.address, "tunnel", a.local)
 	// Subscription updates must continue without a connected UI.
 	go a.plane.Run(ctx)
+	if a.extSched != nil {
+		a.extSched.Start(ctx)
+		defer a.extSched.Stop()
+	}
 	err := a.server.Serve(a.listener)
 	if ctx.Err() != nil {
 		// Closing the listener on cancellation is a normal service
@@ -448,4 +496,48 @@ func portOf(address string) (uint16, error) {
 	}
 	port, err := strconv.ParseUint(portText, 10, 16)
 	return uint16(port), err
+}
+
+func mountControlServices(server *grpc.Server, plane *control.Server, dataDir string) error {
+	corev1.RegisterCoreControlServer(server, plane)
+	// User-added servers (SW7): shares the control socket and its auth
+	// interceptors; every RPC additionally checks the API version and the
+	// control authenticator, like the rest of the control plane.
+	plane.MountCustomServices(server)
+	// Leak self-tests: active egress probes over the control socket. The
+	// service shares the socket's auth interceptors, so only control peers
+	// reach it; the handler additionally checks the control authenticator.
+	leakv1.RegisterLeakServiceServer(server, plane)
+	// Extensions: the host service shares the control socket and its auth
+	// interceptors, so only control peers reach it; per-extension tokens
+	// and permission scopes are enforced inside the host.
+	extStore, err := ext.OpenStore(filepath.Join(dataDir, "extensions"))
+	if err != nil {
+		return err
+	}
+	// GrantedPermissions closes the mint hole: without it Host.MintToken
+	// trusts the app's permission list, so a confused control plane could
+	// mint tokens for disabled extensions or with ungranted permissions.
+	// With it, the core mints only for installed+enabled extensions and
+	// only within the user-granted set.
+	extDeps := plane.ExtHostDeps()
+	extDeps.GrantedPermissions = func(id string) ([]string, bool) {
+		inst, ok := extStore.Get(id)
+		if !ok || !inst.Enabled {
+			return nil, false
+		}
+		return inst.Granted, true
+	}
+	extv1.RegisterExtensionHostServer(server, ext.NewHost(extStore.Issuer(), extDeps))
+	// Arm revocation enforcement from the on-disk cache of the last
+	// signature-verified list, so a kill order received in an earlier run
+	// keeps applying offline and across restarts (see ext.RevocationCache).
+	// Best-effort: no cache is the documented policy state (installs
+	// proceed), and a cache problem must not brick core startup.
+	if rc, err := ext.NewRevocationCache(filepath.Join(dataDir, "extensions")); err == nil {
+		if l, ok := rc.Load(); ok {
+			ext.ApplyToStore(extStore, l)
+		}
+	}
+	return nil
 }
