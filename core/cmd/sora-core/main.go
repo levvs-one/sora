@@ -26,7 +26,6 @@ import (
 	"github.com/levvs-one/sora-client/core/control"
 	"github.com/levvs-one/sora-client/core/diagnostics"
 	"github.com/levvs-one/sora-client/core/engine"
-	"github.com/levvs-one/sora-client/core/engine/registry"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/tunroute"
 	"github.com/levvs-one/sora-client/core/errs"
@@ -101,7 +100,7 @@ type App struct {
 	report   *diagnostics.Collector
 	address  string
 	local    string
-	engines  *registry.Registry
+	engines  *lazyEngines
 	instance io.Closer
 }
 
@@ -195,20 +194,19 @@ func New(ctx context.Context, opts Options) (*App, error) {
 				return nil, err
 			}
 		}
-		app.engines = registry.Discover(ctx, opts.EnginesDir, supervise.Config{
+		// Discovery (digest verification plus a version probe per engine)
+		// dominates startup time, but its result is only needed at first
+		// use: it starts in the background and the control API does not
+		// wait for it; see lazyEngines.
+		engines, err := newLazyEngines(ctx, log, opts.EnginesDir, supervise.Config{
 			HomeDir: filepath.Join(opts.DataDir, "engine"), LocalPort: int(tunnelPort), Logs: center,
 			AllowEnvBin: opts.AllowEnvBin,
-		})
-		if err := app.engines.Pin(opts.Engine); err != nil {
+		}, opts.Engine)
+		if err != nil {
 			return nil, err
 		}
+		app.engines = engines
 		factory = app.engines.Factory()
-		if !app.engines.Usable() {
-			// Keep status, diagnostics, and import available when
-			// no engine is installed.
-			log.Warn("no engine binary found; connecting fails until one is installed",
-				"engines_dir", opts.EnginesDir)
-		}
 	}
 
 	firewall, err := guard.PlatformFirewall(guard.FirewallOptions{
