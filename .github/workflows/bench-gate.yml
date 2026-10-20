@@ -1,65 +1,54 @@
 name: Benchmark gate
 
 # =============================================================================
-# Benchmark regression gate — allocation metrics only (B/op, allocs/op).
+# Benchmark regression gate — CI integration around tools/bench-baseline.sh.
+#
+# The mechanism (benchmark discovery, the fixed measurement recipe, the
+# comparison, the verdicts) lives in tools/bench-baseline.sh and the
+# baseline in tools/bench-baseline.txt; both are documented in that script's
+# header. This workflow owns only the CI process around it: when the gate
+# runs, which baseline is authoritative, and where the evidence goes. Do not
+# re-implement the comparison here — improve the script instead, so local
+# runs and CI can never drift apart.
+#
+# WHY ONLY B/op AND allocs/op ARE GATED (summary; full rationale in the
+# script header): ns/op is a wall-clock sample and swings 2-3x for
+# identical code on shared runners, so gating on it would be a coin flip.
+# B/op and allocs/op are exact allocator counters, reproducible on any
+# machine for a given Go toolchain — a regression in them is real. The
+# script's default threshold is 5% with absolute floors (+32 B, +1 alloc;
+# a zero baseline fails on any new allocation).
 #
 # WHY A SEPARATE WORKFLOW, not another job in repository.yml:
 #   repository.yml shares one top-level `on:` block across all its jobs, so
-#   adding `schedule:`/`workflow_dispatch:` there would also re-run the heavy
-#   Windows installer and Linux packaging jobs on every nightly/manual run.
-#   This file has its own triggers and one cheap, Go-only job. The job is
-#   deliberately NOT in repository.yml's `release.needs`: a performance
-#   regression must block the PR that introduces it (and be caught nightly on
-#   main), but it must never hold a tagged release hostage to a noisy runner.
+#   adding `schedule:`/`workflow_dispatch:` there would also re-run the
+#   heavy Windows installer and Linux packaging jobs on every nightly or
+#   manual run. This file has its own triggers and one Go-only job (plus
+#   the baseline tooling). The job is deliberately NOT in repository.yml's
+#   `release.needs`: a performance regression must block the PR that
+#   introduces it (and be caught nightly on main), but it must never hold
+#   a tagged release hostage.
 #
-# WHY ONLY B/op AND allocs/op — ns/op IS NOT GATED:
-#   On shared GitHub runners ns/op swings wildly for identical code (other
-#   tenants, CPU throttling, steal time). Measured while building this gate:
-#   the same benchmark on the same tree reported 34k, 73k and 101k ns/op in
-#   three consecutive counts, and 113k-172k ns/op for another — a >3x spread
-#   with zero code change. A gate on ns/op would be a coin flip that trains
-#   everyone to ignore it. B/op and allocs/op are exact counters produced by
-#   the Go allocator, not samples of wall time: for a given Go toolchain they
-#   are reproducible on any machine, so a regression in them is real. Each
-#   benchmark runs with -count=3 and the gate compares the MINIMUM B/op (and
-#   its allocs/op) across the counts — the steady-state floor, with one-off
-#   warm-up allocations (sync.Pool, lazy init) amortised away.
-#
-# THRESHOLD: the job fails when a gated benchmark grows by more than
-#   THRESHOLD_PCT (default 10%) in B/op (with an absolute floor of +32 B, so
-#   a 160 -> 161 B/op wobble cannot fail anyone) or in allocs/op (absolute
-#   floor of +1 alloc; a baseline of 0 allocs fails on ANY new allocation —
-#   several hot paths in this repo are allocation-free by contract). A gated
-#   benchmark that disappears from the output (renamed, removed, or newly
-#   skipped) also fails: silence is how benchmarks rot. Benchmarks that are
-#   not in the baseline yet are reported but do not fail the job.
-#
-# BASELINE: .github/bench-baseline.txt, captured from the audit branch tip
-#   when this gate landed. For pull requests the baseline is taken from the
-#   BASE branch checkout, not from the PR tree, so a PR cannot quietly raise
-#   its own baseline to hide a regression. A PR that changes the baseline
-#   file is treated as a baseline-update PR: it is gated against its own new
-#   baseline and flagged with a warning for maintainer review (CODEOWNERS
-#   already routes every file to the owner).
+# BASELINE RULE FOR PULL REQUESTS: the script reads
+#   tools/bench-baseline.txt from the PR tree, so this job checks that
+#   file against the PR's BASE branch (checked out separately below) and
+#   makes any change loud: a PR that changes the baseline is a
+#   baseline-update PR — gated against its own new numbers, but flagged
+#   with a warning and a full baseline diff in the log, so quietly
+#   raising the baseline to hide a regression inside an unrelated PR is
+#   impossible (CODEOWNERS already routes every file to the owner).
 #
 # HOW TO UPDATE THE BASELINE (intentional performance change):
 #   1. Run this workflow manually (workflow_dispatch) with
-#      update_baseline=true on the branch with the change. The job compares
-#      as usual but does not fail, and uploads the measured values as the
-#      `bench-baseline-candidate` artifact.
+#      update_baseline=true on the branch with the change. The job runs
+#      `tools/bench-baseline.sh --update` and uploads the re-captured
+#      tools/bench-baseline.txt as the `bench-baseline-candidate` artifact.
 #   2. Download the artifact, review the diff line by line — every raised
-#      number must be explained by the change that caused it — and replace
-#      .github/bench-baseline.txt in a PR that touches nothing else
-#      (or the same PR, accepting the baseline-update warning above).
-#   Local equivalent of the measurement, from the module root:
-#      go test -run='^$' -bench='<regex>' -benchmem -benchtime=1s -count=3 ./<pkg>/
+#      number must be explained by the change that caused it — and commit
+#      it in a PR that touches nothing else (or accept the
+#      baseline-update warning by including it in the change's own PR).
+#   Locally the same flow is just: tools/bench-baseline.sh --update
 #   Never hand-edit baseline numbers you did not measure.
-#
-# RELATION TO tools/bench-baseline.*: a standalone baseline-capture script
-#   may land separately (zone: benchmark baselines). Until it exists this
-#   job is self-contained on purpose; if/when it lands, the "Run benchmarks"
-#   and "Compare" steps below are the two seams to swap for a call to it —
-#   the triggers, the base-baseline rule and the threshold stay as they are.
 # =============================================================================
 
 on:
@@ -67,22 +56,23 @@ on:
     # The audit branch is listed explicitly while the audit is in flight
     # (the gate must guard PRs into it); drop it once the audit merges and
     # only main remains. The paths filter keeps Dart/docs-only PRs from
-    # paying for a Go benchmark run they cannot affect.
+    # paying for a Go benchmark run they cannot affect; it must name every
+    # tree the script discovers benchmarks in, plus the gate itself.
     branches: [main, 'bugfix/audit-2026-10-19']
     paths:
       - 'core/**'
       - 'service/sync/**'
-      - '.github/bench-baseline.txt'
+      - 'tools/**'
       - '.github/workflows/bench-gate.yml'
   workflow_dispatch:
     inputs:
       threshold_pct:
-        description: 'Regression threshold in percent for B/op and allocs/op'
+        description: 'Regression threshold in percent (empty = script default, 5)'
         required: false
-        default: '10'
+        default: ''
         type: string
       update_baseline:
-        description: 'Measure only: upload a baseline candidate artifact and do not fail on regressions'
+        description: 'Re-capture the baseline and upload it as an artifact instead of gating'
         required: false
         default: false
         type: boolean
@@ -106,11 +96,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      THRESHOLD_PCT: ${{ inputs.threshold_pct || '10' }}
+      # Empty string is fine: the script's ${BENCH_THRESHOLD_PCT:-5}
+      # falls back to its 5% default. Set only via workflow_dispatch.
+      BENCH_THRESHOLD_PCT: ${{ inputs.threshold_pct }}
       UPDATE_BASELINE: ${{ inputs.update_baseline || false }}
-      # Fixed measurement recipe (see header): 1s per count, 3 counts, min.
-      BENCHTIME: '1s'
-      BENCHCOUNT: '3'
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       # The base tree supplies the authoritative baseline for pull requests
@@ -124,149 +113,62 @@ jobs:
           path: base-tree
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
-          # Same arrangement as security.yml: the toolchain pinned by
-          # core/go.mod (go1.27.2) also satisfies service/sync (go 1.26.9).
+          # The script runs benchmarks in every Go module of the repo
+          # (core, service/sync, tools/sora-ext). Same arrangement as
+          # security.yml: the toolchain pinned by core/go.mod (go1.27.2)
+          # satisfies the older go directives of the other modules.
           go-version-file: core/go.mod
           cache: false
 
-      - name: Select the baseline
+      - name: Check the baseline against the PR base
+        if: env.UPDATE_BASELINE != 'true'
         shell: bash
         run: |
           set -euo pipefail
-          baseline="$RUNNER_TEMP/baseline.txt"
-          if [ "$GITHUB_EVENT_NAME" = 'pull_request' ] && [ -f base-tree/.github/bench-baseline.txt ]; then
-            if cmp -s .github/bench-baseline.txt base-tree/.github/bench-baseline.txt; then
-              cp base-tree/.github/bench-baseline.txt "$baseline"
-              echo 'Baseline: taken from the PR base (authoritative).'
-            else
-              cp .github/bench-baseline.txt "$baseline"
-              echo '::warning::This PR changes .github/bench-baseline.txt — baseline-update PR. It is gated against its own new baseline; every raised number needs a maintainer-reviewed explanation.'
-            fi
-          else
-            if [ "$GITHUB_EVENT_NAME" = 'pull_request' ]; then
-              echo '::warning::No baseline file on the PR base yet; gating against the baseline in the PR tree (self-referential until the gate itself lands).'
-            fi
-            cp .github/bench-baseline.txt "$baseline"
+          # The gate below reads tools/bench-baseline.txt from the PR tree.
+          # That is safe only because this step makes any baseline change
+          # loud: if the PR touches the baseline, it is a baseline-update
+          # PR — gated against its own new numbers (the base numbers would
+          # fail it by construction) but flagged so the maintainer reviews
+          # every raised number before merge. Quietly raising the baseline
+          # inside an unrelated PR is exactly what this warning exists to
+          # catch; CODEOWNERS routes the file to the owner regardless.
+          if [ "$GITHUB_EVENT_NAME" != 'pull_request' ]; then
             echo 'Baseline: taken from the checked-out tree.'
+          elif [ ! -f base-tree/tools/bench-baseline.txt ]; then
+            echo '::warning::No baseline file on the PR base yet; gating against the baseline in the PR tree (self-referential until the gate itself lands).'
+          elif cmp -s tools/bench-baseline.txt base-tree/tools/bench-baseline.txt; then
+            echo 'Baseline: unchanged by this PR (identical to the base copy).'
+          else
+            echo '::warning::This PR changes tools/bench-baseline.txt — baseline-update PR. Every raised number needs a maintainer-reviewed explanation.'
+            diff base-tree/tools/bench-baseline.txt tools/bench-baseline.txt || true
           fi
-          echo "BASELINE_FILE=$baseline" >> "$GITHUB_ENV"
 
-      - name: Run benchmarks
+      - name: Run the benchmark gate
+        if: env.UPDATE_BASELINE != 'true'
         shell: bash
         run: |
           set -uo pipefail
-          raw="$RUNNER_TEMP/bench-raw.txt"
-          : > "$raw"
-          # Gated set: the hot, deterministic paths — config renderers for
-          # all three engines, the log redactor, subscription parsing, probe
-          # steady-state observers, session start, and the sync service's
-          # crypto/store paths. Benchmarks that need engines, TUN, network
-          # or root are excluded by construction (they are not in this list).
-          core_specs=(
-            'engine|^BenchmarkRedact(Lines|CleanLine|URLLine)$'
-            'engine/mihomo|^Benchmark(RenderAllProtocols|RenderLargePlan)$'
-            'engine/singbox|^Benchmark(RenderAllProtocols|RenderLargePlan)$'
-            'engine/xray|^Benchmark(RenderAllProtocols|RenderLargePlan|RenderVLESSRealityVision)$'
-            'parser|^Benchmark(ParseSubscription200|ParseBase64List2000)$'
-            'probe|^Benchmark(FreezeDetectorObserveSteady|PathQualityObserve|SubnetObserveSteady)$'
-            'censor|^BenchmarkDetectSmall$'
-            'control|^Benchmark(PlanFromProto200Servers|ResolveBenchmarkServers32of200|BandwidthStream1000Events)$'
-            'guard|^BenchmarkNftRulesetBypass64$'
-            'logs|^BenchmarkFullLogWrite$'
-            'session|^Benchmark(SessionStart|SessionSettings)$'
-            'diagnostics|^BenchmarkCheckDnsLeaks16$'
-          )
-          sync_specs=(
-            'api|^BenchmarkPeersList$'
-            'sync|^Benchmark(Apply100Docs|HashOf1KB)$'
-            'transport|^Benchmark(Encrypt1KB|Decrypt1KB|TransportRoundTrip1KB)$'
-          )
-          run_module() {
-            local modroot=$1 prefix=$2; shift 2
-            local spec pkg regex
-            for spec in "$@"; do
-              pkg=${spec%%|*}; regex=${spec#*|}
-              echo "## pkg $prefix/$pkg" >> "$raw"
-              echo "--- $prefix/$pkg ($regex)"
-              # A build failure must not abort the whole sweep: the compare
-              # step reports the missing benchmarks by name and fails there.
-              (cd "$modroot" && go test -run='^$' -bench="$regex" -benchmem \
-                -benchtime="$BENCHTIME" -count="$BENCHCOUNT" "./$pkg/") >> "$raw" 2>&1 \
-                || echo "## FAIL $prefix/$pkg" >> "$raw"
-            done
-          }
-          run_module core core "${core_specs[@]}"
-          run_module service/sync service/sync "${sync_specs[@]}"
-          echo "BENCH_RAW=$raw" >> "$GITHUB_ENV"
+          # The script discovers every benchmark package in the repo,
+          # measures with its fixed recipe and compares B/op + allocs/op
+          # against tools/bench-baseline.txt. Its exit code is the verdict.
+          tools/bench-baseline.sh 2>&1 | tee "$RUNNER_TEMP/bench-gate.log"
+          exit "${PIPESTATUS[0]}"
 
-      - name: Compare against the baseline
+      - name: Re-capture the baseline (manual update run)
+        if: env.UPDATE_BASELINE == 'true'
         shell: bash
         run: |
           set -uo pipefail
-          current="$RUNNER_TEMP/bench-current.txt"
-          # Normalise the raw `go test -bench` output: one line per
-          # benchmark, "<pkg> <name> <min B/op> <allocs/op of that run>".
-          # ns/op columns are parsed over and discarded on purpose.
-          awk '
-            /^## pkg / { pkg = $3; next }
-            /^Benchmark/ {
-              name = $1; sub(/-[0-9]+$/, "", name)
-              b = ""; a = ""
-              for (i = 2; i <= NF; i++) {
-                if ($i == "B/op") b = $(i-1)
-                if ($i == "allocs/op") a = $(i-1)
-              }
-              if (b == "") next
-              k = pkg " " name
-              if (!(k in mb) || b < mb[k] || (b == mb[k] && a < ma[k])) { mb[k] = b; ma[k] = a }
-            }
-            END { for (k in mb) print k, mb[k], ma[k] }
-          ' "$BENCH_RAW" | sort > "$current"
-          echo "BENCH_CURRENT=$current" >> "$GITHUB_ENV"
-          cat "$current"
-          # benchstat-style verdict, allocation columns only.
-          status=0
-          awk -v pct="$THRESHOLD_PCT" '
-            FNR == NR {
-              if ($1 ~ /^#/ || NF == 0) next
-              key = $1 SUBSEP $2; bb[key] = $3; ba[key] = $4; seen[key] = 1; next
-            }
-            {
-              key = $1 SUBSEP $2; got[key] = 1
-              if (!(key in bb)) { printf "NEW      %s %s: %s B/op %s allocs/op (not in baseline, not gated)\n", $1, $2, $3, $4; next }
-              fail = ""
-              if (bb[key] == 0) { if ($3 > 32) fail = "B/op 0 -> " $3 " (allocation-free baseline)" }
-              else if ($3 > bb[key] * (1 + pct/100) && $3 - bb[key] >= 32) fail = "B/op " bb[key] " -> " $3
-              if (ba[key] == 0) { if ($4 >= 1) fail = fail " allocs/op 0 -> " $4 }
-              else if ($4 > ba[key] * (1 + pct/100) && $4 - ba[key] >= 1) fail = fail " allocs/op " ba[key] " -> " $4
-              if (fail != "") { printf "REGRESS  %s %s: %s\n", $1, $2, fail; bad = 1 }
-              else if ($3 < bb[key] || $4 < ba[key]) printf "IMPROVED %s %s: %s B/op (base %s), %s allocs/op (base %s) — consider lowering the baseline\n", $1, $2, $3, bb[key], $4, ba[key]
-              else printf "OK       %s %s: %s B/op (base %s), %s allocs/op (base %s)\n", $1, $2, $3, bb[key], $4, ba[key]
-            }
-            END {
-              for (k in seen) if (!(k in got)) {
-                split(k, parts, SUBSEP)
-                printf "MISSING  %s %s: in baseline but produced no result (renamed, removed, skipped, or the package failed to build)\n", parts[1], parts[2]
-                bad = 1
-              }
-              exit bad
-            }
-          ' "$BASELINE_FILE" "$current" || status=$?
-          if [ "$UPDATE_BASELINE" = 'true' ]; then
-            echo '::notice::update_baseline run: verdict above is advisory only; the measured values are uploaded as the bench-baseline-candidate artifact.'
-            exit 0
-          fi
-          exit "$status"
+          tools/bench-baseline.sh --update 2>&1 | tee "$RUNNER_TEMP/bench-gate.log"
+          exit "${PIPESTATUS[0]}"
 
-      - name: Upload raw benchmark output
+      - name: Upload gate log
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: bench-gate-output
-          path: |
-            ${{ runner.temp }}/bench-raw.txt
-            ${{ runner.temp }}/bench-current.txt
-            ${{ runner.temp }}/baseline.txt
+          name: bench-gate-log
+          path: ${{ runner.temp }}/bench-gate.log
           if-no-files-found: ignore
 
       - name: Upload baseline candidate
@@ -274,5 +176,5 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: bench-baseline-candidate
-          path: ${{ runner.temp }}/bench-current.txt
+          path: tools/bench-baseline.txt
           if-no-files-found: error
