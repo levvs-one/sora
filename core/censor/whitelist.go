@@ -84,13 +84,14 @@ type whitelistMark struct {
 
 // WhitelistDetector tracks direct-path stalls at the ~16 KB cutoff.
 //
-// Production status (2026-10-20): NOT WIRED. Nothing feeds it (the
-// feeding rules above describe the session-layer contract, which no
-// production code honors yet) and nothing consumes its
-// WhitelistAssessment: the strategy it names (TCP/443-first, valid-SNI,
-// SNI rotation) would have to be applied by the control plane, which
-// has no such hook today. Kept for its unit tests and the designed
-// policy; wiring it end-to-end is an owner decision (SW4 tier 2).
+// Production status (2026-10-20): WIRED. The session failure watcher
+// (session/censor.go) feeds every direct-path probe attempt into the
+// manager-shared ShutdownDetector, which wraps this detector; its
+// WhitelistAssessment reaches the session journal as a network-mode
+// verdict. NOT WIRED, by design, is the automatic application of the
+// strategy it names (TCP/443-first, valid-SNI-only, SNI rotation): the
+// control plane has no hook to reshape the plan mid-session, and
+// switching shapes automatically is an owner decision (SW4 tier 2).
 type WhitelistDetector struct {
 	mu      sync.Mutex
 	stalled map[string]whitelistMark // normalized host -> last cutoff stall

@@ -72,6 +72,10 @@ type Manager struct {
 	// censorHook backs ManagerConfig.OnCensorshipVerdict and can be
 	// installed after construction with SetCensorshipHook.
 	censorHook func(censor.Verdict, string)
+	// shutdown is the whitelist/shutdown classifier (T047), shared by
+	// every session this manager runs: the classification is a property
+	// of the network, and evidence must survive reconnects.
+	shutdown *censor.ShutdownDetector
 }
 
 // NewManager validates the required factory at construction rather than on
@@ -99,6 +103,7 @@ func NewManager(cfg ManagerConfig) *Manager {
 		cfg:        cfg,
 		last:       Status{State: StateDisconnected, ChangedAt: cfg.Now()},
 		censorHook: cfg.OnCensorshipVerdict,
+		shutdown:   censor.NewShutdownDetector(),
 	}
 }
 
@@ -204,6 +209,7 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 	m.lastPlan = plan
 	m.lastSettings = settings
 	created.censorHook = m.censorHook
+	created.shutdownDet = m.shutdown
 	m.mu.Unlock()
 	// Diagnose network-level failures in the background: the watcher reacts
 	// to journal events only and never touches the session runner (SW4).
@@ -211,6 +217,10 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 	// T017: the worker restarts this session on the same plan when the
 	// transport handshake outlives the policy.
 	go m.rehandshakeLoop(created)
+	// T029: the dead-mode watchdog payload-probes the connected tunnel;
+	// a no-traffic verdict marks dead-mode and pauses the re-handshake
+	// worker instead of retry-storming a shut network.
+	go m.deadSessionLoop(created)
 	return created, nil
 }
 
@@ -253,6 +263,9 @@ func (m *Manager) rehandshakeLoop(s *Session) {
 			}
 			if frozenRecently(s, now) {
 				continue // T017 §3.5: defer while interference is fresh
+			}
+			if s.deadRecently(now) {
+				continue // T029/T047: dead-mode — a fresh handshake cannot revive a shut path
 			}
 			s.Journal().Append(Event{
 				Kind:    EventLog,

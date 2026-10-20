@@ -24,6 +24,13 @@ type censorshipWatcher struct {
 	session *Session
 	det     *censor.Detector
 	prober  *censor.Prober
+	// probeFn, when set, replaces the prober's Probe. Tests use it to
+	// feed recorded attempts without a network (same pattern as
+	// probe.Prober's lookupIP seam).
+	probeFn func(ctx context.Context, t censor.Target) censor.Attempt
+	// shutdown is the manager-shared whitelist/shutdown classifier
+	// (T047); nil disables path-mode classification.
+	shutdown *censor.ShutdownDetector
 
 	events      <-chan Event
 	unsubscribe func()
@@ -52,6 +59,8 @@ func (s *Session) WatchCensorshipFailures(det *censor.Detector, prober *censor.P
 			session:     s,
 			det:         det,
 			prober:      prober,
+			probeFn:     s.censorProbeFn,
+			shutdown:    s.shutdownDet,
 			events:      events,
 			unsubscribe: unsubscribe,
 			onVerdict:   s.censorHook,
@@ -113,10 +122,40 @@ func (w *censorshipWatcher) onEvent(ev Event) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	attempt := w.prober.Probe(ctx, target)
+	probe := w.prober.Probe
+	if w.probeFn != nil {
+		probe = w.probeFn
+	}
+	attempt := probe(ctx, target)
 	attempt.ServerID = serverIDOf(w.session.Plan())
 	attempt.KnownGoodHost = w.knownGood()
 	verdict := w.det.Detect(attempt)
+	// T047: feed the direct-path attempt to the whitelist/shutdown
+	// classifier. The probe is direct by construction (censor.Prober
+	// dials without a tunnel), which is exactly the feeding contract.
+	// A path-mode verdict replaces the per-server verdict: under a
+	// whitelist the server is not the problem, and under a shutdown
+	// nothing is. It also skips the T042 expedite hook on purpose —
+	// under a whitelist a fresh subscription list changes nothing, and
+	// under a shutdown there is no path to fetch one with. Retrying is
+	// not a strategy against either mode.
+	if w.shutdown != nil {
+		w.shutdown.Observe(attempt)
+		if a := w.shutdown.Assess(); a.Mode != censor.PathNormal {
+			merged := verdict
+			merged.Explanation = a.Explanation
+			merged.Evidence = append(append([]string{}, a.Evidence...), merged.Evidence...)
+			if a.Confidence > merged.Confidence {
+				merged.Confidence = a.Confidence
+			}
+			w.session.log.Append(Event{
+				Kind:   EventCensor,
+				Detail: "network mode: " + a.Explanation,
+				Censor: &merged,
+			})
+			return
+		}
+	}
 	if verdict.Kind == censor.KindUnknown {
 		// Stay silent: an "unknown" verdict on every failure is noise, and
 		// the engine already reported the failure itself.

@@ -134,6 +134,19 @@ type Session struct {
 	// It must be fast and non-blocking: it runs on the watcher's
 	// goroutine.
 	censorHook func(censor.Verdict, string)
+	// shutdownDet is the manager-shared whitelist/shutdown classifier
+	// (T047). The censorship watcher feeds it every direct-path probe
+	// attempt; it lives on the manager because the classification is
+	// about the network, not about one connection.
+	shutdownDet *censor.ShutdownDetector
+	// censorProbeFn, when set, replaces the censorship watcher's probe.
+	// Tests use it to feed recorded attempts without a network.
+	censorProbeFn func(ctx context.Context, t censor.Target) censor.Attempt
+	// deadAt records when the dead-mode payload probe last proved the
+	// tunnel carries no traffic (T029). The planned re-handshake defers
+	// while the verdict is fresh: restarting a handshake cannot revive
+	// a shut path, it only hands the censor more handshakes.
+	deadAt time.Time
 }
 
 // New constructs a stopped session. Start changes the system after plan
