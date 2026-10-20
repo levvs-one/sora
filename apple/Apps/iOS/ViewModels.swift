@@ -35,7 +35,7 @@ public final class ServersViewModel: ObservableObject {
     /// their earliest server name), then manually added servers under a
     /// nil key (rendered with the `customServers` heading).
     public var groups: [(subscriptionID: String?, profiles: [ServerProfile])] {
-        var byKey: [String?, [ServerProfile]] = [:]
+        var byKey: [String?: [ServerProfile]] = [:]
         for profile in filtered { byKey[profile.subscriptionID, default: []].append(profile) }
         return byKey
             .map { (subscriptionID: $0.key, profiles: $0.value.sorted { $0.name < $1.name }) }
