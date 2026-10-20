@@ -92,7 +92,7 @@ func isProbeTimeout(err error) bool {
 //
 // This package is a leaf on purpose: diagnostics imports session (the
 // collector's Source) and session needs this detector, so the primitive
-// lives here; diagnostics/deadsession.go re-exports it.
+// lives here.
 func DetectDeadSession(ctx context.Context, in DeadSessionInput) DeadSessionVerdict {
 	timeout := in.Timeout
 	if timeout <= 0 {

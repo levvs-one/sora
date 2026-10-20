@@ -1,4 +1,4 @@
-package diagnostics
+package deadcheck
 
 import (
 	"context"
