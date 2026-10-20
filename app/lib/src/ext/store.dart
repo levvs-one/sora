@@ -16,11 +16,13 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 
 import 'catalog.dart';
 import 'manifest.dart';
 import 'package.dart';
 import 'permissions.dart';
+import 'revoke.dart';
 
 class ExtStoreError implements Exception {
   ExtStoreError(this.message);
@@ -140,6 +142,18 @@ class ExtensionStore extends ChangeNotifier {
   late final CatalogCache catalogCache =
       CatalogCache('$_dir${Platform.pathSeparator}catalog_cache');
 
+  /// Offline revocation-list cache: the last signature-verified
+  /// revocations.json, in this store's own directory (mirrors core/ext's
+  /// RevocationCache living in the core's extensions dir — each registry
+  /// keeps its own copy because neither can read the other's).
+  late final RevocationCache revocationCache = RevocationCache(_dir);
+
+  /// The revocation list currently arming enforcement, or null when no
+  /// verified list has ever been cached. Loaded from [revocationCache]
+  /// by [load]; replaced by [refreshRevocations] / [applyRevocations].
+  RevocationList? _revocations;
+  RevocationList? get revocations => _revocations;
+
   String _contentDir(String id, String version) =>
       '$_dir${Platform.pathSeparator}$id@$version';
 
@@ -169,8 +183,97 @@ class ExtensionStore extends ChangeNotifier {
         // Corrupt registry: start empty rather than crash the section.
       }
     }
+    // Arm revocation enforcement from the on-disk cache of the last
+    // verified list, so a kill order received earlier keeps applying
+    // across restarts and offline launches, and disable any installed
+    // extension the list revokes before the UI can offer it.
+    _revocations = await revocationCache.load();
+    await _disableRevokedMatches();
     _loaded = true;
     notifyListeners();
+  }
+
+  // --- Revocations (mirrors core/ext Store.SetRevocations + the policy
+  // in revoke.go, enforced from revoke.dart) ---
+
+  /// Whether [id]@[version] is revoked by the current list. An expired
+  /// list does not answer this: already-installed extensions keep
+  /// running under stale intel (see [checkRevocations] for the install /
+  /// enable gate, which an expired list blocks wholesale instead).
+  bool isRevoked(String id, String version) {
+    final list = _revocations;
+    return list != null && !list.expired(DateTime.now()) && list.isRevoked(id, version);
+  }
+
+  /// The enforcement gate for install/update/enable of id@version,
+  /// mirroring core/ext checkRevocationsLocked exactly:
+  ///   - no list: proceed (the catalog signature is the primary gate);
+  ///   - expired list: refuse (fail closed — stale intel is worse than
+  ///     none);
+  ///   - revoked id@version: refuse.
+  /// Returns the refusal, or null when the operation may proceed.
+  RevocationError? checkRevocations(String id, String version) {
+    final list = _revocations;
+    if (list == null) return null;
+    if (list.expired(DateTime.now())) {
+      return RevocationError(
+          'ext: the revocation list expired at ${list.expiresAt.toUtc().toIso8601String()} and cannot be refreshed offline — installs are blocked until it is renewed',
+          kind: RevocationErrorKind.expired);
+    }
+    if (list.isRevoked(id, version)) {
+      return RevocationError(
+          'ext: $id@$version was revoked by the Sora team and cannot be installed or enabled',
+          kind: RevocationErrorKind.revoked);
+    }
+    return null;
+  }
+
+  void _checkRevocations(String id, String version) {
+    final block = checkRevocations(id, version);
+    if (block != null) throw block;
+  }
+
+  /// Installs [list] as the enforcement list (null clears it) and
+  /// disables every installed extension it revokes — the emergency-kill
+  /// path. An expired list disables nothing (already-installed
+  /// extensions keep running); it only blocks install/enable via
+  /// [checkRevocations]. Returns the ids this call disabled.
+  Future<List<String>> applyRevocations(RevocationList? list) async {
+    _revocations = list;
+    final disabled = await _disableRevokedMatches();
+    if (disabled.isNotEmpty) notifyListeners();
+    return disabled;
+  }
+
+  /// Disables installed, enabled extensions matched by the current
+  /// (non-expired) list and persists the registry when anything changed.
+  /// Returns the ids disabled by this call.
+  Future<List<String>> _disableRevokedMatches() async {
+    final list = _revocations;
+    if (list == null || list.expired(DateTime.now())) return const [];
+    final disabled = <String>[];
+    for (final e in _installed.entries.toList()) {
+      if (e.value.enabled && list.isRevoked(e.key, e.value.version)) {
+        _installed[e.key] = e.value.copyWith(enabled: false);
+        disabled.add(e.key);
+      }
+    }
+    if (disabled.isNotEmpty) await _save();
+    return disabled;
+  }
+
+  /// Fetches the team revocation list (see [RevocationCache.refresh]:
+  /// verified download, cache fallback, error only when there is no
+  /// cache at all) and arms enforcement with the result, disabling any
+  /// installed extension it revokes. Throws [RevocationError] when no
+  /// list could be loaded at all; callers running this in the background
+  /// must treat that as "no new intel", never as a user-facing error.
+  Future<({RevocationList list, bool fromCache})> refreshRevocations(
+      {http.Client? client, String url = defaultRevocationUrl, String? teamKeyOverride}) async {
+    final r = await revocationCache.refresh(
+        client: client, url: url, teamKeyOverride: teamKeyOverride);
+    await applyRevocations(r.list);
+    return r;
   }
 
   Future<void> _save() async {
@@ -301,6 +404,10 @@ class ExtensionStore extends ChangeNotifier {
     if (missing.isNotEmpty) {
       throw ExtStoreError('install does not grant required permissions: ${missing.join(", ")}');
     }
+    // Revocation gate (mirrors core/ext Install): a revoked id@version
+    // never reaches the disk, and an expired list blocks every install
+    // until it is renewed.
+    _checkRevocations(m.id, m.version);
     final cur = _installed[m.id];
     if (cur != null && compareVersions(m.version, cur.version) <= 0) {
       throw ExtStoreError('version ${m.version} is not newer than installed ${cur.version}');
@@ -407,9 +514,15 @@ class ExtensionStore extends ChangeNotifier {
 
   /// One-tap enable/disable. Disabling takes effect immediately: the panel
   /// host tears the WebView down and drops the bridge.
+  ///
+  /// Enabling goes through the revocation gate (mirrors core/ext
+  /// SetEnabled): a revoked extension can never be re-enabled, and an
+  /// expired list blocks enabling until it is renewed. Disabling is
+  /// always allowed — it is the kill path.
   Future<void> setEnabled(String id, bool enabled) async {
     final cur = _installed[id];
     if (cur == null) throw ExtStoreError('"$id" is not installed');
+    if (enabled) _checkRevocations(id, cur.version);
     _installed[id] = cur.copyWith(enabled: enabled);
     await _save();
     notifyListeners();
