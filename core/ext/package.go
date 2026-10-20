@@ -59,6 +59,13 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 	files := make(map[string][]byte, len(zr.File))
 	var total int64
 	for _, f := range zr.File {
+		// Directory entries carry no content and are not extracted; skip
+		// them before the path check, exactly like the app-side opener.
+		// A malicious directory name escapes nothing, because nothing is
+		// ever written for it.
+		if f.FileInfo().IsDir() {
+			continue
+		}
 		name := f.Name
 		// Zip-slip and layout rules: relative, forward slashes, no
 		// traversal, no absolute paths, no directories escaping the root.
@@ -69,9 +76,6 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 		if f.UncompressedSize64 > maxSingleFile {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
 				"ext: file %q exceeds %d bytes", name, maxSingleFile)
-		}
-		if f.FileInfo().IsDir() {
-			continue
 		}
 		// The header-declared UncompressedSize64 above is a fast path, and the
 		// stdlib itself refuses to decompress past the declared size (fail
@@ -141,6 +145,17 @@ func isSafeArchivePath(name string) bool {
 	if clean == "." || clean == "/" || strings.HasPrefix(clean, "..") {
 		return false
 	}
+	// Only the canonical name is accepted: "./panel.html", "a//b" and
+	// "a/./b" all clean to a different string, and an alias like that is
+	// never legitimate — the archive would store "panel.html" under a key
+	// the manifest entry (and the panel CSP injector, and the rollback
+	// re-verification against the on-disk layout) never matches, so the
+	// file the user consented to and the file that gets served silently
+	// diverge. The app-side opener has always rejected these by segment;
+	// this makes Go agree.
+	if clean != name {
+		return false
+	}
 	for _, part := range strings.Split(clean, "/") {
 		if part == "" || part == "." || part == ".." {
 			return false
@@ -150,6 +165,8 @@ func isSafeArchivePath(name string) bool {
 }
 
 // Verify checks the package integrity and authenticity:
+//  0. every file the manifest declares by pointer (panels, worker script,
+//     capability-contract assets) is present in the package,
 //  1. every file's sha256 matches checksums.txt,
 //  2. checksums.txt covers every content file exactly once (no extras, no
 //     missing — except the signature itself, which cannot checksum itself),
@@ -163,11 +180,64 @@ func (p *Package) Verify() error {
 	return p.VerifyWithKey(p.Manifest.Author.PublicKey)
 }
 
+// declaredEntry is one file the manifest points at: a panel, the worker
+// script, or a capability-contract asset (theme / network-hook / routing).
+type declaredEntry struct {
+	field string // manifest field, for the error message
+	entry string
+}
+
+// declaredEntries lists every file the manifest pair declares by pointer.
+// Installing a package whose declared file is absent would leave the user
+// with an extension whose panel 404s, whose worker never starts, or whose
+// contract asset is silently missing — the project-side CLI check
+// (sora-ext validate, "missing-entry") has always refused that; Verify
+// closes the same hole for the package itself, which is the only artifact
+// sideload and catalog installs ever see.
+func (p *Package) declaredEntries() []declaredEntry {
+	var out []declaredEntry
+	if p.Manifest != nil && p.Manifest.UI != nil {
+		for _, panel := range p.Manifest.UI.Panels {
+			out = append(out, declaredEntry{"ui.panels[" + panel.ID + "].entry", panel.Entry})
+		}
+	}
+	if x := p.ManifestExt; x != nil {
+		if x.Background != nil {
+			out = append(out, declaredEntry{"background_task.entry", x.Background.Entry})
+		}
+		if x.Theme != nil {
+			out = append(out, declaredEntry{"theme.entry", x.Theme.Entry})
+		}
+		if x.NetworkHook != nil {
+			out = append(out, declaredEntry{"network_hook.entry", x.NetworkHook.Entry})
+		}
+		if x.Routing != nil {
+			out = append(out, declaredEntry{"routing.entry", x.Routing.Entry})
+		}
+	}
+	return out
+}
+
+// checkDeclaredEntries fails verification when a declared entry file is
+// absent from the package.
+func (p *Package) checkDeclaredEntries() error {
+	for _, d := range p.declaredEntries() {
+		if _, ok := p.Files[d.entry]; !ok {
+			return errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
+				"ext: the manifest declares %s %q, which is missing from the package", d.field, d.entry)
+		}
+	}
+	return nil
+}
+
 // VerifyWithKey is Verify against an explicit author key line. Catalog
 // installs must pass the catalog-pinned key: the manifest's embedded key
 // is self-attested, so verifying against it would let a package smuggle
 // in its own trust anchor (D1).
 func (p *Package) VerifyWithKey(authorKeyLine string) error {
+	if err := p.checkDeclaredEntries(); err != nil {
+		return err
+	}
 	checksumsRaw, ok := p.Files[checksumsName]
 	if !ok {
 		return errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: the package is missing %q", checksumsName)

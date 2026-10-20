@@ -153,6 +153,8 @@ class ExtPackage {
   }
 
   /// Verifies integrity and authenticity:
+  /// 0. every file the manifest declares by pointer (panels, worker
+  ///    script, theme / network-hook / routing assets) is present,
   /// 1. every file's sha256 matches checksums.txt,
   /// 2. checksums.txt covers every content file exactly (except itself and
   ///    the signature, which cannot checksum themselves),
@@ -165,6 +167,23 @@ class ExtPackage {
   /// the manifest's own key would let a package smuggle in its own trust
   /// anchor.
   Future<void> verify({String? authorKeyLine}) async {
+    // Mirrors core/ext checkDeclaredEntries: a package that declares an
+    // entry but does not ship the file would install an extension whose
+    // panel 404s or whose worker never starts. Refuse it here, at the
+    // same gate as the integrity checks.
+    final declared = <String>[
+      for (final p in manifest.panels) p.entry,
+      if (manifest.backgroundTask != null) manifest.backgroundTask!.entry,
+      if (manifest.themeEntry != null) manifest.themeEntry!,
+      if (manifest.networkHookEntry != null) manifest.networkHookEntry!,
+      if (manifest.routingEntry != null) manifest.routingEntry!,
+    ];
+    for (final entry in declared) {
+      if (!files.containsKey(entry)) {
+        throw PackageError(
+            'the manifest declares "$entry", which is missing from the package');
+      }
+    }
     final checksumsRaw = files[checksumsName]!;
     final sigText = utf8.decode(files[signatureName]!);
     final listed = _parseChecksums(utf8.decode(checksumsRaw));

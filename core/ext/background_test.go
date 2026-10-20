@@ -69,9 +69,13 @@ func TestBackgroundDefaults(t *testing.T) {
 // network_hosts) that the Manifest struct does not model.
 func buildRawPackage(t *testing.T, manRaw []byte) []byte {
 	t.Helper()
+	// A worker script is always present: Verify now refuses a package
+	// whose manifest declares background_task.entry but ships no such
+	// file (the worker the user consented to must exist).
 	strFiles := map[string]string{
 		manifestName: string(manRaw),
 		"panel.html": "<html><body>hi</body></html>",
+		"worker.js":  "// test worker\n",
 	}
 	checksums := MakeChecksums(strFiles)
 	sig, err := SignPayload(testSeed, "test key", sigFileChecksums, time.Now().Unix(), []byte(checksums))
@@ -81,12 +85,13 @@ func buildRawPackage(t *testing.T, manRaw []byte) []byte {
 	binFiles := map[string][]byte{
 		manifestName:  manRaw,
 		"panel.html":  []byte("<html><body>hi</body></html>"),
+		"worker.js":   []byte("// test worker\n"),
 		checksumsName: []byte(checksums),
 		signatureName: []byte(sig),
 	}
 	var buf bytes.Buffer
 	zw := zip.NewWriter(&buf)
-	for _, name := range []string{manifestName, checksumsName, signatureName, "panel.html"} {
+	for _, name := range []string{manifestName, checksumsName, signatureName, "panel.html", "worker.js"} {
 		w, err := zw.Create(name)
 		if err != nil {
 			t.Fatal(err)
