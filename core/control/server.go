@@ -21,6 +21,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/ext"
 	censorv1 "github.com/levvs-one/sora-client/core/gen/sora/censor/v1"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	leakv1 "github.com/levvs-one/sora-client/core/gen/sora/leak/v1"
@@ -148,21 +149,27 @@ type Server struct {
 	// See reports/featlog-swarm-sw2.md.
 	leakv1.UnimplementedLeakServiceServer
 
-	version     Version
-	auth        *Authenticator
-	sessions    *session.Manager
-	secrets     SecretStore
-	parser      parser.LinkParser
-	redactors   *redactorCache
-	prober      Prober
-	measurer    Measurer
-	subs        *subscriptionBook
-	logs        *logs.Center
-	about       func() *corev1.About
-	diagnostics Diagnostics
-	fetcher     Fetcher
-	dataDir     string
-	benchmarker Benchmarker
+	version  Version
+	auth     *Authenticator
+	sessions *session.Manager
+	// extSched is the extension background scheduler (Config.ExtScheduler);
+	// it follows the kill switch via syncExtKillSwitch.
+	extSched *ext.Scheduler
+	// extProxyPort is the loopback mixed-listener port backing
+	// ExtFetchTransport (Config.LocalProxyPort).
+	extProxyPort int
+	secrets      SecretStore
+	parser       parser.LinkParser
+	redactors    *redactorCache
+	prober       Prober
+	measurer     Measurer
+	subs         *subscriptionBook
+	logs         *logs.Center
+	about        func() *corev1.About
+	diagnostics  Diagnostics
+	fetcher      Fetcher
+	dataDir      string
+	benchmarker  Benchmarker
 	// profiles stores network profiles for automatic matching (F5). Nil
 	// disables the profile RPCs with explicit errors.
 	profiles *profiles.Store
@@ -233,6 +240,17 @@ type Config struct {
 	// Profiles stores network profiles for automatic matching (F5); nil
 	// disables the profile RPCs with explicit errors.
 	Profiles *profiles.Store
+	// ExtScheduler is the extension background-work scheduler (core/ext).
+	// The control plane forwards the kill switch to it so background
+	// extension work pauses while traffic is blocked. Nil means no
+	// extension scheduler runs in this process (tests, diagnostics).
+	ExtScheduler *ext.Scheduler
+	// LocalProxyPort is the loopback port of the tunnel's mixed
+	// (HTTP+SOCKS5) listener — the port supervise gives every engine.
+	// Extension net.fetch rides it when the session plan enables the
+	// local proxy (see Server.ExtFetchTransport). Zero disables the
+	// tunnel transport: extension fetches then fail closed.
+	LocalProxyPort int
 }
 
 // New creates a control plane, supplying the default version when unset.
@@ -249,21 +267,23 @@ func New(cfg Config) (*Server, error) {
 		cfg.Version = Version{Major: 1, Minor: 0, MinSupportedMinor: 0}
 	}
 	server := &Server{
-		version:     cfg.Version,
-		auth:        cfg.Authenticator,
-		sessions:    cfg.Sessions,
-		secrets:     cfg.Secrets,
-		parser:      parser.LinkParser{MaxItems: cfg.MaxImportItems},
-		redactors:   &redactorCache{byRef: make(map[string]*engine.Redactor)},
-		prober:      cfg.Prober,
-		measurer:    cfg.Measurer,
-		logs:        cfg.Logs,
-		about:       cfg.About,
-		diagnostics: cfg.Diagnostics,
-		fetcher:     cfg.Fetcher,
-		dataDir:     cfg.DataDir,
-		benchmarker: cfg.Benchmarker,
-		profiles:    cfg.Profiles,
+		version:      cfg.Version,
+		auth:         cfg.Authenticator,
+		sessions:     cfg.Sessions,
+		secrets:      cfg.Secrets,
+		parser:       parser.LinkParser{MaxItems: cfg.MaxImportItems},
+		redactors:    &redactorCache{byRef: make(map[string]*engine.Redactor)},
+		extSched:     cfg.ExtScheduler,
+		extProxyPort: cfg.LocalProxyPort,
+		prober:       cfg.Prober,
+		measurer:     cfg.Measurer,
+		logs:         cfg.Logs,
+		about:        cfg.About,
+		diagnostics:  cfg.Diagnostics,
+		fetcher:      cfg.Fetcher,
+		dataDir:      cfg.DataDir,
+		benchmarker:  cfg.Benchmarker,
+		profiles:     cfg.Profiles,
 	}
 	server.subs = newSubscriptionBook(server)
 	// Restore the obfuscation profile chosen earlier; a corrupt file is
@@ -584,6 +604,9 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	if err != nil {
 		return &corev1.ConnectResponse{Error: toWire(err, mask, id)}, nil
 	}
+	// A session can start with the kill switch already armed (restored
+	// settings): background extension work must start out paused too.
+	s.syncExtKillSwitch(started.Status().KillSwitch)
 	// Surface suite conditions in the session journal so WatchEvents shows
 	// them: a corrupt profile file that disabled the suite at startup, or
 	// a pinned engine that will silently drop profile features.
@@ -633,6 +656,11 @@ func (s *Server) Disconnect(ctx context.Context, req *corev1.DisconnectRequest) 
 	if finished := s.sessions.Status().SessionID; finished != "" {
 		s.redactors.drop(finished)
 	}
+	// The session is gone: mirror the manager's kill-switch state (an armed
+	// switch stays armed across disconnects). Extension fetches stay
+	// fail-closed regardless — the tunnel transport finds no live session
+	// and refuses instead of dialing direct.
+	s.syncExtKillSwitch(s.sessions.Status().KillSwitch)
 	return &corev1.DisconnectResponse{
 		Status: &corev1.SessionStatus{Connection: wireStatus(s.sessions.Status())},
 	}, nil
@@ -696,7 +724,20 @@ func (s *Server) SetKillSwitch(ctx context.Context, req *corev1.SetKillSwitchReq
 	if err := running.SetKillSwitch(ctx, req.GetEnabled()); err != nil {
 		return &corev1.SetKillSwitchResponse{Enabled: req.GetEnabled(), Error: toWire(err, nil, id)}, nil
 	}
+	// Background extension work follows the kill switch: while traffic is
+	// blocked, workers must not run and their fetches must fail fast.
+	s.syncExtKillSwitch(req.GetEnabled())
 	return &corev1.SetKillSwitchResponse{Enabled: req.GetEnabled()}, nil
+}
+
+// syncExtKillSwitch mirrors the session's kill-switch state into the
+// extension scheduler. It is called on Connect (a session may start with
+// the switch already armed) and on every SetKillSwitch change. Nil-safe:
+// without a scheduler there is nothing to pause.
+func (s *Server) syncExtKillSwitch(armed bool) {
+	if s.extSched != nil {
+		s.extSched.SetKillSwitch(armed)
+	}
 }
 
 // GetStats returns session traffic counters. With no session, it returns zero

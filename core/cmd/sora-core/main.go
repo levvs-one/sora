@@ -103,6 +103,10 @@ type App struct {
 	local    string
 	engines  *lazyEngines
 	instance io.Closer
+	// extSched is the extension background-work scheduler: wired (fetch
+	// transport, kill switch) and running, but no worker is registered
+	// until the app-side JS runner lands.
+	extSched *ext.Scheduler
 }
 
 // New builds a core from its options.
@@ -343,19 +347,27 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	}
 	prober.SetFreezeDetector(freezeDet)
 
+	// Extension background scheduler: the component exists from startup
+	// (transport + kill-switch plumbing wired below), even though no
+	// worker is registered until the app-side JS runner lands — see the
+	// pass-1 extensions report. Registering a task without an executor
+	// would be theater; running an idle scheduler is just plumbing.
+	extSched := ext.NewScheduler(nil)
 	plane, err := control.New(control.Config{
-		Version:       Version,
-		Authenticator: auth,
-		Sessions:      manager,
-		Secrets:       store,
-		Prober:        prober,
-		Measurer:      measurer,
-		Benchmarker:   benchmarker,
-		DataDir:       opts.DataDir,
-		Profiles:      profStore,
-		Logs:          center,
-		About:         app.about,
-		Fetcher:       subscription.New(subscription.Options{}),
+		Version:        Version,
+		Authenticator:  auth,
+		Sessions:       manager,
+		Secrets:        store,
+		Prober:         prober,
+		Measurer:       measurer,
+		Benchmarker:    benchmarker,
+		DataDir:        opts.DataDir,
+		Profiles:       profStore,
+		Logs:           center,
+		About:          app.about,
+		Fetcher:        subscription.New(subscription.Options{}),
+		ExtScheduler:   extSched,
+		LocalProxyPort: int(tunnelPort),
 	})
 	if err != nil {
 		_ = store.Close()
@@ -393,6 +405,10 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		_ = store.Close()
 		return nil, err
 	}
+	// Extension net.fetch rides the tunnel (control's lookup), never
+	// direct: the transport fails closed while no tunnel proxy is live.
+	extSched.SetFetchTransport(plane.ExtFetchTransport())
+	app.extSched = extSched
 	built = true
 	return app, nil
 }
@@ -440,6 +456,16 @@ func mountControlServices(server *grpc.Server, plane *control.Server, dataDir st
 		return inst.Granted, true
 	}
 	extv1.RegisterExtensionHostServer(server, ext.NewHost(extStore.Issuer(), extDeps))
+	// Arm revocation enforcement from the on-disk cache of the last
+	// signature-verified list, so a kill order received in an earlier run
+	// keeps applying offline and across restarts (see ext.RevocationCache).
+	// Best-effort: no cache is the documented policy state (installs
+	// proceed), and a cache problem must not brick core startup.
+	if rc, err := ext.NewRevocationCache(filepath.Join(dataDir, "extensions")); err == nil {
+		if l, ok := rc.Load(); ok {
+			ext.ApplyToStore(extStore, l)
+		}
+	}
 	return nil
 }
 
@@ -554,6 +580,10 @@ func (a *App) Serve(ctx context.Context) error {
 	a.log.Info("core listening", "endpoint", a.address, "tunnel", a.local)
 	// Subscription updates must continue without a connected UI.
 	go a.plane.Run(ctx)
+	if a.extSched != nil {
+		a.extSched.Start(ctx)
+		defer a.extSched.Stop()
+	}
 	err := a.server.Serve(a.listener)
 	if ctx.Err() != nil {
 		// Closing the listener on cancellation is a normal service
