@@ -108,9 +108,10 @@ type subnetTrack struct {
 // SubnetReputation tracks per-subnet dial outcomes. It is safe for
 // concurrent use; the zero value is not usable, use NewSubnetReputation.
 type SubnetReputation struct {
-	mu   sync.Mutex
-	now  func() time.Time
-	subs map[netip.Prefix]*subnetTrack
+	mu        sync.Mutex
+	now       func() time.Time
+	subs      map[netip.Prefix]*subnetTrack
+	lastPrune time.Time
 }
 
 // NewSubnetReputation returns an empty tracker.
@@ -134,7 +135,15 @@ func (r *SubnetReputation) Observe(addr netip.Addr, ok bool) {
 		r.subs[p] = t
 	}
 	t.ips[addr.Unmap()] = ipOutcome{ok: ok, at: now}
-	r.pruneLocked(now)
+	// Pruning is memory hygiene only — verdicts filter by the window at
+	// read time (stateOf), so it is amortized: the touched track is swept
+	// on every Observe, the whole map at most once per window. A full
+	// sweep per Observe made every dial outcome cost O(all tracked IPs)
+	// under the lock (~61µs at 500 subnets x 8 IPs).
+	pruneTrackLocked(t, now)
+	if now.Sub(r.lastPrune) >= subnetWindow {
+		r.pruneLocked(now)
+	}
 }
 
 // State returns the reputation verdict for the subnet containing addr.
@@ -146,7 +155,8 @@ func (r *SubnetReputation) State(addr netip.Addr) SubnetState {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	now := r.now()
-	r.pruneLocked(now)
+	// No prune here: stateOf ignores out-of-window outcomes, so the
+	// verdict is identical whether stale entries were swept or not.
 	return stateOf(r.subs[p], now)
 }
 
@@ -254,15 +264,21 @@ func (r *SubnetReputation) SummaryLines() []string {
 
 // pruneLocked drops outcomes older than the window and empty tracks.
 func (r *SubnetReputation) pruneLocked(now time.Time) {
-	cutoff := now.Add(-subnetWindow)
+	r.lastPrune = now
 	for p, t := range r.subs {
-		for ip, o := range t.ips {
-			if o.at.Before(cutoff) {
-				delete(t.ips, ip)
-			}
-		}
+		pruneTrackLocked(t, now)
 		if len(t.ips) == 0 {
 			delete(r.subs, p)
+		}
+	}
+}
+
+// pruneTrackLocked drops one track's out-of-window outcomes.
+func pruneTrackLocked(t *subnetTrack, now time.Time) {
+	cutoff := now.Add(-subnetWindow)
+	for ip, o := range t.ips {
+		if o.at.Before(cutoff) {
+			delete(t.ips, ip)
 		}
 	}
 }
