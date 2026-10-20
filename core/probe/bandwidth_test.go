@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -156,6 +157,79 @@ func TestBenchmarkSuccess(t *testing.T) {
 
 	// No stored history remains to assert (M3): results are the live
 	// samples above, nothing else.
+}
+
+// TestBenchmarkBuildsFreshEnginePerServer pins the load-bearing half of
+// the Hysteria2 stall audit (WEB-RESEARCH-5 S2): every server is measured
+// through its OWN newly built temporary engine, so a benchmark verdict
+// can never ride a pre-existing (possibly stalled) QUIC connection —
+// neither the live session's nor another server's. If benchmarkOne ever
+// starts sharing one engine across servers, this fails.
+func TestBenchmarkBuildsFreshEnginePerServer(t *testing.T) {
+	payload := make([]byte, 32*1024)
+	stub, port := proxyStub(t, payload)
+	defer stub.Close()
+
+	var mu sync.Mutex
+	var engines []*fakeEngine
+	b, err := NewBenchmarker(BenchmarkerConfig{
+		NewEngine: func(context.Context, *engine.Plan) (engine.Engine, error) {
+			eng := &fakeEngine{port: port}
+			mu.Lock()
+			engines = append(engines, eng)
+			mu.Unlock()
+			return eng, nil
+		},
+		SelectKind: func(engine.Outbound) (engine.Kind, error) {
+			return engine.KindSingBox, nil
+		},
+		Now: time.Now,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ch, err := b.Benchmark(context.Background(),
+		[]engine.Outbound{testOutbound("s1"), testOutbound("s2")},
+		engine.BandwidthOptions{
+			URL:         stub.URL,
+			Duration:    300 * time.Millisecond,
+			Timeout:     10 * time.Second,
+			Concurrency: 2,
+		})
+	if err != nil {
+		t.Fatal(err)
+	}
+	samples := collectSamples(t, ch)
+	doneCount := 0
+	for _, s := range samples {
+		if s.Done {
+			doneCount++
+			if s.Err != nil {
+				t.Fatalf("benchmark for %s failed: %v", s.ServerID, s.Err)
+			}
+		}
+	}
+	if doneCount != 2 {
+		t.Fatalf("expected 2 done samples, got %d (%+v)", doneCount, samples)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if len(engines) != 2 {
+		t.Fatalf("NewEngine called %d times for 2 servers, want exactly 2 (one fresh engine per server)", len(engines))
+	}
+	seen := map[string]bool{}
+	for _, eng := range engines {
+		if eng.applied == nil || len(eng.applied.Outbounds) != 1 {
+			t.Fatalf("each temporary engine must carry exactly one outbound, got %+v", eng.applied)
+		}
+		seen[eng.applied.Outbounds[0].ID] = true
+		if !eng.closed.Load() {
+			t.Fatal("temporary engine was not closed")
+		}
+	}
+	if !seen["s1"] || !seen["s2"] {
+		t.Fatalf("each server must be measured on its own engine, saw %v", seen)
+	}
 }
 
 func TestBenchmarkNoEngine(t *testing.T) {

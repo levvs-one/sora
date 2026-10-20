@@ -10,6 +10,25 @@ package probe
 // parallel streams, then tears the engine down. The temporary engine receives
 // credentials exactly like a normal session (stdin); no new secret paths are
 // introduced.
+//
+// Hysteria2 stall semantics (WEB-RESEARCH-5 S2, audited 2026-10-20): the
+// stall-after-upload failure (Colitu Lab, 2026-10-15) wedges one QUIC
+// connection — its connection-level flow-control window fills with unread
+// upload data, so no NEW stream on that connection carries TCP traffic
+// while the QUIC connection itself stays alive. A health verdict based on
+// that connection's liveness (ACKs, datagrams) would be a false "alive".
+// This benchmark cannot produce one, by construction: it is download-only
+// (DefaultSpeedtestURL is a __down endpoint; there is no upload speedtest
+// in the core), and every measurement runs on a brand-new temporary engine
+// whose QUIC connection was created by that benchmark's own Apply — never
+// the live session's possibly-wedged connection. If the fresh connection
+// itself wedges mid-download, requests fail and the Done sample carries
+// the error; nothing here reports success from a stalled stream. Live
+// session health is a different question with a different probe: the
+// session watchdog's payload probe (core/session payloadProbe →
+// Engine.Delay) — see PASS3-TSPU-SOLUTIONS.md for the per-engine audit,
+// including the Xray Delay blind spot (a fresh temporary Xray cannot see
+// the live connection's stall).
 
 import (
 	"context"
