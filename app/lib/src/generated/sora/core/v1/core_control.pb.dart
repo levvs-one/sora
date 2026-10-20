@@ -934,6 +934,7 @@ class GroupSpec extends $pb.GeneratedMessage {
     $core.String? testUrl,
     $1.Duration? testInterval,
     $core.int? toleranceMs,
+    $core.String? selected,
   }) {
     final result = GroupSpec._();
     if (name != null) result.name = name;
@@ -942,6 +943,7 @@ class GroupSpec extends $pb.GeneratedMessage {
     if (testUrl != null) result.testUrl = testUrl;
     if (testInterval != null) result.testInterval = testInterval;
     if (toleranceMs != null) result.toleranceMs = toleranceMs;
+    if (selected != null) result.selected = selected;
     return result;
   }
 
@@ -962,6 +964,7 @@ class GroupSpec extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'testUrl')
     ..aOM<$1.Duration>(5, _omitFieldNames ? '' : 'testInterval', subBuilder: $1.Duration.$_createMessage)
     ..aI(6, _omitFieldNames ? '' : 'toleranceMs', fieldType: $pb.PbFieldType.OU3)
+    ..aOS(7, _omitFieldNames ? '' : 'selected')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1037,6 +1040,19 @@ class GroupSpec extends $pb.GeneratedMessage {
   $core.bool hasToleranceMs() => $_has(5);
   @$pb.TagNumber(6)
   void clearToleranceMs() => $_clearField(6);
+
+  /// Since 1.12. The member a select group starts on: an outbound id or the
+  /// name of a nested group, one of members. Empty starts on the first
+  /// member. Engines honour it at Connect, so the effective selection of a
+  /// fresh session is this member on every engine.
+  @$pb.TagNumber(7)
+  $core.String get selected => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set selected($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasSelected() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearSelected() => $_clearField(7);
 }
 
 /// RoutingOptions apply a preset after the routes of the plan; see
@@ -4039,6 +4055,196 @@ class SetKillSwitchResponse extends $pb.GeneratedMessage {
   $core.bool hasEnabled() => $_has(0);
   @$pb.TagNumber(1)
   void clearEnabled() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
+/// Since 1.12. SelectServer pins target as the member of group in the running
+/// session. session_id is optional; a non-empty one must name the running
+/// session. target is an outbound id of the plan (a display name the engine
+/// resolves is also accepted, as with engine Select).
+class SelectServerRequest extends $pb.GeneratedMessage {
+  factory SelectServerRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.String? requestId,
+    $core.String? sessionId,
+    $core.String? group,
+    $core.String? target,
+  }) {
+    final result = SelectServerRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (requestId != null) result.requestId = requestId;
+    if (sessionId != null) result.sessionId = sessionId;
+    if (group != null) result.group = group;
+    if (target != null) result.target = target;
+    return result;
+  }
+
+  SelectServerRequest._();
+
+  factory SelectServerRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SelectServerRequest()..mergeFromBuffer(data, registry);
+  factory SelectServerRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SelectServerRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SelectServerRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: SelectServerRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOS(3, _omitFieldNames ? '' : 'requestId')
+    ..aOS(4, _omitFieldNames ? '' : 'sessionId')
+    ..aOS(5, _omitFieldNames ? '' : 'group')
+    ..aOS(6, _omitFieldNames ? '' : 'target')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SelectServerRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SelectServerRequest copyWith(void Function(SelectServerRequest) updates) =>
+      super.copyWith((message) => updates(message as SelectServerRequest)) as SelectServerRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SelectServerRequest() / SelectServerRequest.new instead')
+  static SelectServerRequest create() => SelectServerRequest._();
+  static $pb.GeneratedMessage $_createMessage() => SelectServerRequest._();
+  @$core.override
+  SelectServerRequest createEmptyInstance() => SelectServerRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SelectServerRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SelectServerRequest>(SelectServerRequest.$_createMessage);
+  static SelectServerRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get requestId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set requestId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRequestId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRequestId() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get sessionId => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set sessionId($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasSessionId() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearSessionId() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get group => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set group($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasGroup() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearGroup() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get target => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set target($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasTarget() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearTarget() => $_clearField(6);
+}
+
+class SelectServerResponse extends $pb.GeneratedMessage {
+  factory SelectServerResponse({
+    SessionStatus? status,
+    SoraError? error,
+  }) {
+    final result = SelectServerResponse._();
+    if (status != null) result.status = status;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  SelectServerResponse._();
+
+  factory SelectServerResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SelectServerResponse()..mergeFromBuffer(data, registry);
+  factory SelectServerResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SelectServerResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SelectServerResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: SelectServerResponse.$_createMessage)
+    ..aOM<SessionStatus>(1, _omitFieldNames ? '' : 'status', subBuilder: SessionStatus.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SelectServerResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SelectServerResponse copyWith(void Function(SelectServerResponse) updates) =>
+      super.copyWith((message) => updates(message as SelectServerResponse)) as SelectServerResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SelectServerResponse() / SelectServerResponse.new instead')
+  static SelectServerResponse create() => SelectServerResponse._();
+  static $pb.GeneratedMessage $_createMessage() => SelectServerResponse._();
+  @$core.override
+  SelectServerResponse createEmptyInstance() => SelectServerResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SelectServerResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SelectServerResponse>(SelectServerResponse.$_createMessage);
+  static SelectServerResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  SessionStatus get status => $_getN(0);
+  @$pb.TagNumber(1)
+  set status(SessionStatus value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasStatus() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearStatus() => $_clearField(1);
+  @$pb.TagNumber(1)
+  SessionStatus ensureStatus() => $_ensure(0);
 
   @$pb.TagNumber(2)
   SoraError get error => $_getN(1);
@@ -9069,7 +9275,7 @@ class SaveSubscriptionOverrideRequest extends $pb.GeneratedMessage {
     $core.Map<$core.String, $core.String>? renames,
     $core.Iterable<$core.String>? hidden,
     $core.Iterable<$core.String>? pinnedOrder,
-    $core.bool? clear,
+    $core.bool? clear_7,
   }) {
     final result = SaveSubscriptionOverrideRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
@@ -9078,7 +9284,7 @@ class SaveSubscriptionOverrideRequest extends $pb.GeneratedMessage {
     if (renames != null) result.renames.addAll(renames);
     if (hidden != null) result.hidden.addAll(hidden);
     if (pinnedOrder != null) result.pinnedOrder.addAll(pinnedOrder);
-    if (clear != null) result.clear = clear;
+    if (clear_7 != null) result.clear_7 = clear_7;
     return result;
   }
 
@@ -9165,9 +9371,9 @@ class SaveSubscriptionOverrideRequest extends $pb.GeneratedMessage {
   $core.List<$core.String> get pinnedOrder => $_getList(5);
 
   @$pb.TagNumber(7)
-  $core.bool get clear => $_getBF(6);
+  $core.bool get clear_7 => $_getBF(6);
   @$pb.TagNumber(7)
-  set clear($core.bool value) => $_setBool(6, value);
+  set clear_7($core.bool value) => $_setBool(6, value);
   @$pb.TagNumber(7)
   $core.bool hasClear() => $_has(6);
   @$pb.TagNumber(7)

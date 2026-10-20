@@ -31,6 +31,10 @@ Contract 1.10 adds network profiles with auto-detect (`ListProfiles`,
 (`ProbeChain`), `SessionPlan.chain`, `SessionPlan.zapret_with_vpn`, and the
 `sora.ext.v1.ExtensionHost` service.
 
+Contract 1.12 adds `SelectServer` (fast in-session server switch over a
+select group, no engine restart) and `GroupSpec.selected` (the member a
+select group starts on, honoured by every engine at Connect).
+
 Contract 1.11 adds `sora.obfs.v1.ObfsControl` (uTLS, TLS fragmentation,
 jitter), `sora.leak.v1.LeakService` (egress self-tests),
 `sora.censor.v1.CensorControl` (censorship diagnosis), and

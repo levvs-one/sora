@@ -20,6 +20,11 @@ service CoreControl {
   rpc RunDiagnostics(RunDiagnosticsRequest) returns (RunDiagnosticsResponse);
   rpc ExportDiagnostics(ExportDiagnosticsRequest) returns (ExportDiagnosticsResponse);
   rpc SetKillSwitch(SetKillSwitchRequest) returns (SetKillSwitchResponse);
+  // Since 1.12. Fast server switch: pins a new member of a select group of
+  // the running session without restarting the engine, the guard or the
+  // tunnel. The plan of the session must already carry the group; a plan
+  // change still goes through Connect.
+  rpc SelectServer(SelectServerRequest) returns (SelectServerResponse);
   rpc Handshake(HandshakeRequest) returns (HandshakeResponse);
   // Since 1.3. What the "About" screen shows about the core. Nothing in it is
   // personal, so it needs no authenticator.
@@ -179,6 +184,11 @@ message GroupSpec {
   google.protobuf.Duration test_interval = 5;
   // url-test switches only when another member is faster by this much.
   uint32 tolerance_ms = 6;
+  // Since 1.12. The member a select group starts on: an outbound id or the
+  // name of a nested group, one of members. Empty starts on the first
+  // member. Engines honour it at Connect, so the effective selection of a
+  // fresh session is this member on every engine.
+  string selected = 7;
 }
 
 enum GroupType {
@@ -393,6 +403,19 @@ message ExportDiagnosticsRequest {
 message ExportDiagnosticsResponse { bytes archive = 1; SoraError error = 2; }
 message SetKillSwitchRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bool enabled = 4; }
 message SetKillSwitchResponse { bool enabled = 1; SoraError error = 2; }
+// Since 1.12. SelectServer pins target as the member of group in the running
+// session. session_id is optional; a non-empty one must name the running
+// session. target is an outbound id of the plan (a display name the engine
+// resolves is also accepted, as with engine Select).
+message SelectServerRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string request_id = 3;
+  string session_id = 4;
+  string group = 5;
+  string target = 6;
+}
+message SelectServerResponse { SessionStatus status = 1; SoraError error = 2; }
 message DiagnosticReport { repeated string lines = 1; }
 message HandshakeRequest { ApiVersion client_version = 1; }
 message HandshakeResponse {

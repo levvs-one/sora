@@ -358,16 +358,17 @@ const GroupSpec$json = {
     {'1': 'test_url', '3': 4, '4': 1, '5': 9, '10': 'testUrl'},
     {'1': 'test_interval', '3': 5, '4': 1, '5': 11, '6': '.google.protobuf.Duration', '10': 'testInterval'},
     {'1': 'tolerance_ms', '3': 6, '4': 1, '5': 13, '10': 'toleranceMs'},
+    {'1': 'selected', '3': 7, '4': 1, '5': 9, '10': 'selected'},
   ],
 };
 
 /// Descriptor for `GroupSpec`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List groupSpecDescriptor =
-    $convert.base64Decode('CglHcm91cFNwZWMSEgoEbmFtZRgBIAEoCVIEbmFtZRIrCgR0eXBlGAIgASgOMhcuc29yYS5jb3'
-        'JlLnYxLkdyb3VwVHlwZVIEdHlwZRIYCgdtZW1iZXJzGAMgAygJUgdtZW1iZXJzEhkKCHRlc3Rf'
-        'dXJsGAQgASgJUgd0ZXN0VXJsEj4KDXRlc3RfaW50ZXJ2YWwYBSABKAsyGS5nb29nbGUucHJvdG'
-        '9idWYuRHVyYXRpb25SDHRlc3RJbnRlcnZhbBIhCgx0b2xlcmFuY2VfbXMYBiABKA1SC3RvbGVy'
-        'YW5jZU1z');
+    $convert.base64Decode('CglHcm91cFNwZWMSEgoEbmFtZRgBIAEoCVIEbmFtZRIrCgR0eXBlGAIgASgOMhcuc29yYS5jb3Jl'
+        'LnYxLkdyb3VwVHlwZVIEdHlwZRIYCgdtZW1iZXJzGAMgAygJUgdtZW1iZXJzEhkKCHRlc3RfdXJs'
+        'GAQgASgJUgd0ZXN0VXJsEj4KDXRlc3RfaW50ZXJ2YWwYBSABKAsyGS5nb29nbGUucHJvdG9idWYu'
+        'RHVyYXRpb25SDHRlc3RJbnRlcnZhbBIhCgx0b2xlcmFuY2VfbXMYBiABKA1SC3RvbGVyYW5jZU1z'
+        'EhoKCHNlbGVjdGVkGAcgASgJUghzZWxlY3RlZA==');
 
 @$core.Deprecated('Use routingOptionsDescriptor instead')
 const RoutingOptions$json = {
@@ -994,6 +995,44 @@ const SetKillSwitchResponse$json = {
 final $typed_data.Uint8List setKillSwitchResponseDescriptor =
     $convert.base64Decode('ChVTZXRLaWxsU3dpdGNoUmVzcG9uc2USGAoHZW5hYmxlZBgBIAEoCFIHZW5hYmxlZBItCgVlcn'
         'JvchgCIAEoCzIXLnNvcmEuY29yZS52MS5Tb3JhRXJyb3JSBWVycm9y');
+
+@$core.Deprecated('Use selectServerRequestDescriptor instead')
+const SelectServerRequest$json = {
+  '1': 'SelectServerRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'request_id', '3': 3, '4': 1, '5': 9, '10': 'requestId'},
+    {'1': 'session_id', '3': 4, '4': 1, '5': 9, '10': 'sessionId'},
+    {'1': 'group', '3': 5, '4': 1, '5': 9, '10': 'group'},
+    {'1': 'target', '3': 6, '4': 1, '5': 9, '10': 'target'},
+  ],
+};
+
+/// Descriptor for `SelectServerRequest`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN for API 1.12 (pending protoc-gen-dart codegen).
+final $typed_data.Uint8List selectServerRequestDescriptor =
+    $convert.base64Decode('ChNTZWxlY3RTZXJ2ZXJSZXF1ZXN0EjkKC2FwaV92ZXJzaW9uGAEgASgLMhguc29yYS5jb3JlLnYx'
+        'LkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50aWNhdG9yGAIgASgMUhRj'
+        'b250cm9sQXV0aGVudGljYXRvchIdCgpyZXF1ZXN0X2lkGAMgASgJUglyZXF1ZXN0SWQSHQoKc2Vz'
+        'c2lvbl9pZBgEIAEoCVIJc2Vzc2lvbklkEhQKBWdyb3VwGAUgASgJUgVncm91cBIWCgZ0YXJnZXQY'
+        'BiABKAlSBnRhcmdldA==');
+
+@$core.Deprecated('Use selectServerResponseDescriptor instead')
+const SelectServerResponse$json = {
+  '1': 'SelectServerResponse',
+  '2': [
+    {'1': 'status', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.SessionStatus', '10': 'status'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `SelectServerResponse`. Decode as a `google.protobuf.DescriptorProto`.
+/// HAND-WRITTEN for API 1.12 (pending protoc-gen-dart codegen).
+final $typed_data.Uint8List selectServerResponseDescriptor =
+    $convert.base64Decode('ChRTZWxlY3RTZXJ2ZXJSZXNwb25zZRIzCgZzdGF0dXMYASABKAsyGy5zb3JhLmNvcmUudjEuU2Vz'
+        'c2lvblN0YXR1c1IGc3RhdHVzEi0KBWVycm9yGAIgASgLMhcuc29yYS5jb3JlLnYxLlNvcmFFcnJv'
+        'clIFZXJyb3I=');
 
 @$core.Deprecated('Use diagnosticReportDescriptor instead')
 const DiagnosticReport$json = {

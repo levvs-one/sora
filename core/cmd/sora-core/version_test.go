@@ -16,21 +16,21 @@ import (
 // the core stays liberal here so old builds keep serving while clients move
 // on.
 func TestVersionContract(t *testing.T) {
-	want := control.Version{Major: 1, Minor: 11, MinSupportedMinor: 1}
+	want := control.Version{Major: 1, Minor: 12, MinSupportedMinor: 1}
 	if Version != want {
 		t.Fatalf("served API version = %v, want %v (keep in sync with app/lib/src/core/link.dart)", Version, want)
 	}
 
-	// Positive case: the current Dart client (1.11, supports back to 1.6)
+	// Positive case: the current Dart client (1.12, supports back to 1.6)
 	// must negotiate successfully with this build.
-	dart := &corev1.ApiVersion{Major: 1, Minor: 11, MinSupportedMinor: 6}
+	dart := &corev1.ApiVersion{Major: 1, Minor: 12, MinSupportedMinor: 6}
 	core := &corev1.ApiVersion{Major: Version.Major, Minor: Version.Minor, MinSupportedMinor: Version.MinSupportedMinor}
 	got, err := control.Negotiate(dart, core)
 	if err != nil {
 		t.Fatalf("Negotiate(current Dart client, core) failed: %v", err)
 	}
-	if got != 11 {
-		t.Fatalf("Negotiate(current Dart client, core) = %d, want 11", got)
+	if got != 12 {
+		t.Fatalf("Negotiate(current Dart client, core) = %d, want 12", got)
 	}
 
 	// Negative case: a client from a different major must be rejected.

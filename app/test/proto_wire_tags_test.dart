@@ -80,7 +80,7 @@ void main() {
           (m) => (m as SaveSubscriptionOverrideRequest).pinnedOrder.add('s1'), 6, 2,
           'SaveSubscriptionOverrideRequest.pinned_order');
       expectFirstTag(() => SaveSubscriptionOverrideRequest(),
-          (m) => (m as SaveSubscriptionOverrideRequest).clear = true, 7, 0,
+          (m) => (m as SaveSubscriptionOverrideRequest).clear_7 = true, 7, 0,
           'SaveSubscriptionOverrideRequest.clear');
     });
     test('renames map round-trips', () {
@@ -260,6 +260,49 @@ void main() {
           'ChainHop.reachable');
       expectFirstTag(() => ChainHop(), (m) => (m as ChainHop).latencyMs = 42, 3, 0,
           'ChainHop.latency_ms');
+    });
+  });
+
+  group('API 1.12: fast server switch', () {
+    test('GroupSpec.selected is field #7', () {
+      expectFirstTag(() => GroupSpec(), (m) => (m as GroupSpec).selected = 's1', 7, 2,
+          'GroupSpec.selected');
+      final back = GroupSpec.fromBuffer((GroupSpec()..selected = 'srv-2').writeToBuffer());
+      expect(back.selected, 'srv-2');
+    });
+    test('SelectServerRequest tags', () {
+      expectFirstTag(() => SelectServerRequest(),
+          (m) => (m as SelectServerRequest).apiVersion = ApiVersion(), 1, 2,
+          'SelectServerRequest.api_version');
+      expectFirstTag(() => SelectServerRequest(),
+          (m) => (m as SelectServerRequest).controlAuthenticator = [1, 2], 2, 2,
+          'SelectServerRequest.control_authenticator');
+      expectFirstTag(() => SelectServerRequest(),
+          (m) => (m as SelectServerRequest).requestId = 'r1', 3, 2,
+          'SelectServerRequest.request_id');
+      expectFirstTag(() => SelectServerRequest(),
+          (m) => (m as SelectServerRequest).sessionId = 's1', 4, 2,
+          'SelectServerRequest.session_id');
+      expectFirstTag(() => SelectServerRequest(), (m) => (m as SelectServerRequest).group = 'sora:pick',
+          5, 2, 'SelectServerRequest.group');
+      expectFirstTag(() => SelectServerRequest(), (m) => (m as SelectServerRequest).target = 'srv-1',
+          6, 2, 'SelectServerRequest.target');
+    });
+    test('SelectServerResponse tags', () {
+      expectFirstTag(() => SelectServerResponse(),
+          (m) => (m as SelectServerResponse).status = SessionStatus(), 1, 2,
+          'SelectServerResponse.status');
+      expectFirstTag(() => SelectServerResponse(),
+          (m) => (m as SelectServerResponse).error = SoraError(), 2, 2,
+          'SelectServerResponse.error');
+    });
+    test('SelectServer round-trips', () {
+      final request = SelectServerRequest()
+        ..group = 'sora:pick'
+        ..target = 'srv-9';
+      final back = SelectServerRequest.fromBuffer(request.writeToBuffer());
+      expect(back.group, 'sora:pick');
+      expect(back.target, 'srv-9');
     });
   });
 

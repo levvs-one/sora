@@ -119,6 +119,17 @@ class CoreControlClient extends $grpc.Client {
     return $createUnaryCall(_$setKillSwitch, request, options: options);
   }
 
+  /// Since 1.12. Fast server switch: pins a new member of a select group of
+  /// the running session without restarting the engine, the guard or the
+  /// tunnel. The plan of the session must already carry the group; a plan
+  /// change still goes through Connect.
+  $grpc.ResponseFuture<$0.SelectServerResponse> selectServer(
+    $0.SelectServerRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$selectServer, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.HandshakeResponse> handshake(
     $0.HandshakeRequest request, {
     $grpc.CallOptions? options,
@@ -391,6 +402,10 @@ class CoreControlClient extends $grpc.Client {
       '/sora.core.v1.CoreControl/SetKillSwitch',
       ($0.SetKillSwitchRequest value) => value.writeToBuffer(),
       $0.SetKillSwitchResponse.fromBuffer);
+  static final _$selectServer = $grpc.ClientMethod<$0.SelectServerRequest, $0.SelectServerResponse>(
+      '/sora.core.v1.CoreControl/SelectServer',
+      ($0.SelectServerRequest value) => value.writeToBuffer(),
+      $0.SelectServerResponse.fromBuffer);
   static final _$handshake = $grpc.ClientMethod<$0.HandshakeRequest, $0.HandshakeResponse>(
       '/sora.core.v1.CoreControl/Handshake',
       ($0.HandshakeRequest value) => value.writeToBuffer(),
@@ -596,6 +611,13 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.SetKillSwitchRequest.fromBuffer(value),
         ($0.SetKillSwitchResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SelectServerRequest, $0.SelectServerResponse>(
+        'SelectServer',
+        selectServer_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.SelectServerRequest.fromBuffer(value),
+        ($0.SelectServerResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.HandshakeRequest, $0.HandshakeResponse>(
         'Handshake',
         handshake_Pre,
@@ -880,6 +902,13 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.SetKillSwitchResponse> setKillSwitch($grpc.ServiceCall call, $0.SetKillSwitchRequest request);
+
+  $async.Future<$0.SelectServerResponse> selectServer_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.SelectServerRequest> $request) async {
+    return selectServer($call, await $request);
+  }
+
+  $async.Future<$0.SelectServerResponse> selectServer($grpc.ServiceCall call, $0.SelectServerRequest request);
 
   $async.Future<$0.HandshakeResponse> handshake_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.HandshakeRequest> $request) async {
