@@ -2,8 +2,9 @@ package control
 
 // Throughput benchmarks (F2). BenchmarkServers measures real download
 // goodput per server through temporary engine sessions and streams progress;
-// GetBenchmarks reads the persisted history. Benchmarks need the control
-// authenticator: they burn traffic and spawn engine processes.
+// results are live samples only — the app stores whatever history it
+// shows. Benchmarks need the control authenticator: they burn traffic
+// and spawn engine processes.
 
 import (
 	"context"
@@ -108,10 +109,10 @@ func (s *Server) BenchmarkServers(req *corev1.BenchmarkServersRequest, stream gr
 	}
 	for sample := range samples {
 		wire := &corev1.BandwidthSample{
-			ServerId:     sample.ServerID,
-			BytesPerSec:  sample.BytesPerSec,
-			ProgressPct:  sample.ProgressPct,
-			Done:         sample.Done,
+			ServerId:    sample.ServerID,
+			BytesPerSec: sample.BytesPerSec,
+			ProgressPct: sample.ProgressPct,
+			Done:        sample.Done,
 		}
 		if sample.Err != nil {
 			wire.Error = toWire(errs.From(sample.Err), nil, "")
