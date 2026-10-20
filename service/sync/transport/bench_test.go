@@ -162,6 +162,86 @@ func BenchmarkDecrypt1KB(b *testing.B) {
 	}
 }
 
+// benchFrames encrypts one application message (payload chunked like
+// WriteMsg) into its wire frames using enc, advancing its nonce sequence.
+func benchFrames(b *testing.B, enc *noise.CipherState, payload []byte) []byte {
+	b.Helper()
+	var frames []byte
+	var hdr [2]byte
+	for left := payload; ; {
+		n := len(left)
+		last := true
+		if n > chunkSize {
+			n = chunkSize
+			last = false
+		}
+		plain := make([]byte, 0, n+1)
+		if last {
+			plain = append(plain, 1)
+		} else {
+			plain = append(plain, 0)
+		}
+		plain = append(plain, left[:n]...)
+		ct, err := enc.Encrypt(nil, nil, plain)
+		if err != nil {
+			b.Fatal(err)
+		}
+		binary.BigEndian.PutUint16(hdr[:], uint16(len(ct)))
+		frames = append(frames, hdr[:]...)
+		frames = append(frames, ct...)
+		left = left[n:]
+		if last {
+			return frames
+		}
+	}
+}
+
+// BenchmarkDecryptLarge measures ReadMsg reassembly of multi-chunk
+// messages: the large-document path (a 1 MiB message is 32 chunks).
+func BenchmarkDecryptLarge(b *testing.B) {
+	for _, tc := range []struct {
+		name  string
+		size  int
+		batch int
+	}{
+		{"100KiB", 100 * 1024, 32},
+		{"1MiB", 1024 * 1024, 4},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			payload := make([]byte, tc.size)
+			for i := range payload {
+				payload[i] = byte(i * 31)
+			}
+			newBatch := func() *Conn {
+				enc, dec := benchCipherPair(b)
+				var all []byte
+				for i := 0; i < tc.batch; i++ {
+					all = append(all, benchFrames(b, enc, payload)...)
+				}
+				return &Conn{Conn: &benchReplayConn{data: all}, decrypt: dec}
+			}
+			c := newBatch()
+			b.SetBytes(int64(tc.size))
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				if i > 0 && i%tc.batch == 0 {
+					b.StopTimer()
+					c = newBatch()
+					b.StartTimer()
+				}
+				got, err := c.ReadMsg()
+				if err != nil {
+					b.Fatal(err)
+				}
+				if len(got) != tc.size || got[0] != payload[0] {
+					b.Fatal("reassembled payload mismatch")
+				}
+			}
+		})
+	}
+}
+
 // benchRoundTripPair returns a fully handshaked initiator/responder pair
 // over TCP loopback.
 func benchRoundTripPair(tb testing.TB) (initiator, responder *Conn) {

@@ -64,6 +64,12 @@ type Conn struct {
 	// header, the plaintext, and the ciphertext. Writers are serialized
 	// by wmu, so no pool is needed.
 	wscratch []byte
+	// rscratch is the reusable chunk buffer for ReadMsg: ciphertext is
+	// read into it and decrypted in place, and chunk plaintext is copied
+	// out of it before the next chunk overwrites it, so a returned
+	// message never aliases it. Readers are serialized by rmu, so no
+	// pool is needed.
+	rscratch []byte
 	// Peer is the identity the peer presented after the handshake.
 	Peer Identity
 }
@@ -463,19 +469,51 @@ func (c *Conn) writeChunk(plain []byte, last bool) error {
 	return err
 }
 
+// readChunk reads one framed chunk into the reusable scratch buffer and
+// decrypts it in place: once authenticated, the ciphertext is no longer
+// needed. The returned plaintext (flag byte + payload) aliases rscratch;
+// the caller must copy anything it keeps before the next call.
+func (c *Conn) readChunk() ([]byte, error) {
+	var hdr [2]byte
+	if _, err := io.ReadFull(c.Conn, hdr[:]); err != nil {
+		return nil, err
+	}
+	n := int(binary.BigEndian.Uint16(hdr[:]))
+	if cap(c.rscratch) < n {
+		c.rscratch = make([]byte, n)
+	}
+	frame := c.rscratch[:n]
+	if _, err := io.ReadFull(c.Conn, frame); err != nil {
+		return nil, err
+	}
+	return c.decrypt.Decrypt(frame[:0], nil, frame)
+}
+
+// appendReassembly appends one decrypted chunk to the message being
+// reassembled, growing the buffer by doubling. Plain append growth
+// advances in ~1.25x steps once the capacity is large, so reassembling a
+// 1 MiB message copied the accumulated bytes through ~5 MiB of
+// intermediate buffers; doubling keeps the total near 2x the message.
+func appendReassembly(out, chunk []byte) []byte {
+	if len(out)+len(chunk) > cap(out) {
+		newCap := 2 * cap(out)
+		if newCap < len(out)+len(chunk) {
+			newCap = len(out) + len(chunk)
+		}
+		grown := make([]byte, len(out), newCap)
+		copy(grown, out)
+		out = grown
+	}
+	return append(out, chunk...)
+}
+
 // ReadMsg reads one application message, reassembling chunks.
 func (c *Conn) ReadMsg() ([]byte, error) {
 	c.rmu.Lock()
 	defer c.rmu.Unlock()
 	var out []byte
 	for {
-		frame, err := readFrame(c.Conn)
-		if err != nil {
-			return nil, err
-		}
-		// Decrypt in place into the frame buffer: once authenticated,
-		// the ciphertext is no longer needed.
-		plain, err := c.decrypt.Decrypt(frame[:0], nil, frame)
+		plain, err := c.readChunk()
 		if err != nil {
 			return nil, err
 		}
@@ -483,11 +521,14 @@ func (c *Conn) ReadMsg() ([]byte, error) {
 			return nil, errors.New("transport: empty chunk")
 		}
 		if plain[0] == 1 && out == nil {
-			// Single-chunk fast path: hand the caller the decrypted
-			// buffer instead of copying it into a fresh slice.
-			return plain[1:], nil
+			// Single-chunk fast path: copy the payload out of the
+			// scratch buffer into a caller-owned slice (previously the
+			// frame allocation itself; the byte count is unchanged).
+			res := make([]byte, len(plain)-1)
+			copy(res, plain[1:])
+			return res, nil
 		}
-		out = append(out, plain[1:]...)
+		out = appendReassembly(out, plain[1:])
 		if plain[0] == 1 {
 			return out, nil
 		}
