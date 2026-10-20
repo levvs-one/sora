@@ -11,7 +11,11 @@ import (
 // directory. The table lets ASN triggers work without any network requests;
 // when it is absent or unreadable, ASN matching simply never fires. A
 // corrupt table is ignored rather than breaking startup: the ASN is a
-// heuristic, documented as such.
+// heuristic, documented as such. It runs on the first ASN lookup, not at
+// store construction (see Store.asnDir): the result is not needed before
+// the first network fingerprint, and the load never fails — absent or
+// corrupt yields an empty table either way, so deferring it changes no
+// observable behaviour, only when the parsing cost is paid.
 func loadASNTable(dir string) (nets []netip.Prefix, asns []string) {
 	if dir == "" {
 		return nil, nil
@@ -24,6 +28,10 @@ func loadASNTable(dir string) (nets []netip.Prefix, asns []string) {
 	if err := json.Unmarshal(raw, &table); err != nil {
 		return nil, nil
 	}
+	// Pre-size from the decoded entry count: growing both slices by
+	// append doubling copies ~2x their final size again on large tables.
+	nets = make([]netip.Prefix, 0, len(table))
+	asns = make([]string, 0, len(table))
 	for cidr, asn := range table {
 		p, err := netip.ParsePrefix(cidr)
 		if err != nil || asn == "" {
@@ -43,6 +51,10 @@ func (s *Store) asnFor(addr string) string {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if !s.asnLoaded {
+		s.asnNets, s.asnValues = loadASNTable(s.asnDir)
+		s.asnLoaded = true
+	}
 	for i, p := range s.asnNets {
 		if p.Contains(ip) {
 			return s.asnValues[i]

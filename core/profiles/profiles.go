@@ -128,7 +128,12 @@ type Store struct {
 	path     string
 	profiles []Profile
 	// asnNets and asnValues are the optional local ASN table, aligned by
-	// index. Empty when the table is absent.
+	// index. Empty when the table is absent. The table is loaded lazily
+	// on the first ASN lookup (asnLoaded), not at store construction:
+	// parsing it costs real time on large tables, and nothing needs an
+	// ASN before the first network fingerprint is taken.
+	asnDir    string
+	asnLoaded bool
 	asnNets   []netip.Prefix
 	asnValues []string
 	trust     *TrustStore
@@ -150,7 +155,7 @@ func NewStore(dir string) (*Store, error) {
 		return nil, fmt.Errorf("profiles: %w", err)
 	}
 	s.path = filepath.Join(dir, fileName)
-	s.asnNets, s.asnValues = loadASNTable(dir)
+	s.asnDir = dir
 	raw, err := os.ReadFile(s.path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
