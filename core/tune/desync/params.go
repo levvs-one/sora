@@ -235,12 +235,28 @@ func (p Params) BypassStrategy() (engine.BypassStrategy, bool) {
 	if p.TTL > 0 && p.AutoTTL {
 		return engine.BypassStrategy{}, false
 	}
-	// Split, disorder and OOB are defined by their position: without
-	// one the tpws rendering changes nothing (or reorders nothing),
-	// which validation rejects. TLSRec defaults its position below
-	// and Fake/HTTPShuffle carry a strategy without one, so only
-	// these three methods refuse.
-	if p.SplitPos == "" && (p.Method == MethodSplit || p.Method == MethodDisorder || p.Method == MethodOOB) {
+	// Split, disorder and OOB with neither a position nor fooling
+	// change nothing, which validation rejects: their tpws rendering
+	// is an empty strategy (split), or a Disorder/OOB flag validation
+	// refuses without a split position. Fooling is the exception
+	// that makes a position-less genome non-empty, and the only one
+	// in this genome space: fooling forces the nfqws rendering
+	// (RequiresNFQWS), where split/disorder become the split2 /
+	// disorder2 desync methods — validation's non-emptiness check is
+	// satisfied by the desync method itself, no split position is
+	// required for one, and the executor applies its default
+	// position. (The other nfqws-only fields cannot substitute:
+	// FakeProto, TTL, autottl and repeats>1 already refused above
+	// for every non-fake method, and Scope alone renders no strategy
+	// field here. A full enumeration of the bounded space pins this:
+	// dropping the guard entirely converts exactly 12 further
+	// genomes, all position-less and fooling-less, and validation
+	// rejects every one as changing nothing.) OOB with fooling
+	// passes this guard but still refuses below: nfqws has no OOB
+	// byte, and fooling has no tpws rendering. TLSRec defaults its
+	// position below and Fake/HTTPShuffle carry a strategy without
+	// one, so only these three methods are guarded here.
+	if p.SplitPos == "" && p.Fooling == "" && (p.Method == MethodSplit || p.Method == MethodDisorder || p.Method == MethodOOB) {
 		return engine.BypassStrategy{}, false
 	}
 	var s engine.BypassStrategy

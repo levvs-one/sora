@@ -108,3 +108,32 @@ func TestNFQWSArgsRenderTheGenome(t *testing.T) {
 		t.Error("a tpws genome rendered nfqws args")
 	}
 }
+
+// Position-less split/disorder genomes carrying fooling render as
+// nfqws strategies too: the desync method and the fooling are
+// emitted, and no split-pos argument appears — the executor's
+// default position applies, which is exactly why conversion must
+// not refuse them (see genome_invariant_test.go).
+func TestNFQWSArgsPositionlessFoolingSplitDisorder(t *testing.T) {
+	for _, tc := range []struct {
+		p    Params
+		want string
+	}{
+		{Params{Method: MethodSplit, Fooling: "badseq"}, "--dpi-desync=split2"},
+		{Params{Method: MethodDisorder, Fooling: "ts"}, "--dpi-desync=disorder2"},
+	} {
+		args, ok := tc.p.NFQWSArgs("/zapret")
+		if !ok {
+			t.Fatalf("genome %s must render nfqws args", tc.p.ID())
+		}
+		joined := strings.Join(args, " ")
+		for _, want := range []string{tc.want, "--dpi-desync-fooling=" + tc.p.Fooling} {
+			if !strings.Contains(joined, want) {
+				t.Errorf("genome %s args %q missing %q", tc.p.ID(), joined, want)
+			}
+		}
+		if strings.Contains(joined, "split-pos") {
+			t.Errorf("genome %s args %q carry a split position; want the executor default", tc.p.ID(), joined)
+		}
+	}
+}
