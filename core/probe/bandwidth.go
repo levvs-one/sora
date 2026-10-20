@@ -251,6 +251,22 @@ func waitProxy(ctx context.Context, addr string, timeout time.Duration) error {
 	}
 }
 
+// downloadBufSize is the per-worker read buffer of a goodput download:
+// large enough that the read loop is never the bottleneck at VPN speeds.
+const downloadBufSize = 128 * 1024
+
+// downloadBufPool recycles worker read buffers across benchmarks. A
+// buffer is checked out by exactly one worker goroutine and returned
+// when that worker exits, and downloadGoodput returns only after every
+// worker has finished (each exit path joins the WaitGroup), so a
+// recycled buffer is never touched by its previous owner again. Unlike
+// the wire messages of the sample stream — whose sync.Pool reuse was
+// rejected because a sent message's lifetime belongs to grpc — these
+// buffers never leave this function.
+var downloadBufPool = sync.Pool{
+	New: func() any { return make([]byte, downloadBufSize) },
+}
+
 // downloadGoodput fetches url through the loopback proxy in parallel range
 // streams for the whole duration and returns bytes per second. Progress
 // callbacks receive 0..99; the caller emits the final 100.
@@ -295,7 +311,8 @@ func downloadGoodput(ctx context.Context, proxyAddr, rawURL string, duration tim
 				errCh <- fmt.Errorf("probe: speedtest answered %s", resp.Status)
 				return
 			}
-			buf := make([]byte, 128*1024)
+			buf := downloadBufPool.Get().([]byte)
+			defer downloadBufPool.Put(buf)
 			for {
 				n, rerr := resp.Body.Read(buf)
 				total.Add(uint64(n))
