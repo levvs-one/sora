@@ -74,116 +74,156 @@ func parseCredential(material []byte) (map[string]string, error) {
 }
 
 // credentialDocument serializes only supported credential fields for storage.
+//
+// The document is written field by field in sorted key order instead of
+// through a map[string]string and json.Marshal: the map version cost
+// ~1.9 KB and 22 allocations per server on the import/refresh path
+// (bucket growth, key sorting, reflective marshal), the builder below
+// needs one grown buffer. The output is byte-identical to
+// json.Marshal of the same map — keys sorted, empty values omitted,
+// strings escaped exactly as encoding/json escapes them — so stored
+// documents and downgrade readers see no change.
 func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
-	values := map[string]string{
-		"uuid":         spec.UUID,
-		"password":     spec.Password,
-		"method":       spec.Cipher,
-		"user":         spec.User,
-		"flow":         spec.Flow,
-		"public_key":   spec.PublicKey,
-		"short_id":     spec.ShortID,
-		"server_name":  spec.ServerName,
-		"fingerprint":  spec.Fingerprint,
-		"spider_x":     spec.SpiderX,
-		"mode":         spec.Mode,
-		"path":         spec.Path,
-		"host_header":  spec.HostHeader,
-		"service_name": spec.ServiceName,
-		"alpn":         strings.Join(spec.ALPN, ","),
-		"security":     spec.Security,
-		"encryption":   spec.Options["encryption"],
-	}
 	// Copy only known obfuscation options from untrusted links. Normalize
 	// the three password aliases to one vault key.
-	values["obfs"] = spec.Options["obfs"]
-	for _, key := range []string{"obfs_param", "obfs-password", "obfs_password"} {
-		if value := spec.Options[key]; value != "" {
-			values["obfs_param"] = value
-			break
+	firstOpt := func(keys ...string) string {
+		for _, key := range keys {
+			if value := spec.Options[key]; value != "" {
+				return value
+			}
 		}
+		return ""
 	}
-	// SIP002 plugin/plugin_opts for Shadowsocks (T020). The raw "plugin"
-	// query key stays in Options but is never stored under that name.
-	values["ss_plugin"] = spec.Options["ss_plugin"]
-	values["ss_plugin_opts"] = spec.Options["ss_plugin_opts"]
+	obfsParam := firstOpt("obfs_param", "obfs-password", "obfs_password")
 	// Hysteria2 performance tuning: bandwidth caps enable Brutal congestion
 	// control in the engines instead of BBR. Hop ports arrive as mport
 	// (official hy2 links) or ports (mihomo-style links).
-	values["upmbps"] = spec.Options["upmbps"]
-	values["downmbps"] = spec.Options["downmbps"]
-	for _, key := range []string{"mport", "ports"} {
-		if value := spec.Options[key]; value != "" {
-			values["hop_ports"] = value
-			break
-		}
-	}
-	for _, key := range []string{"hop-interval", "hopinterval"} {
-		if value := spec.Options[key]; value != "" {
-			values["hop_interval"] = value
-			break
-		}
-	}
-	for _, key := range []string{"hop-interval-max", "hopintervalmax"} {
-		if value := spec.Options[key]; value != "" {
-			values["hop_interval_max"] = value
-			break
-		}
-	}
-	for _, key := range []string{"bbr-profile", "bbr_profile"} {
-		if value := spec.Options[key]; value != "" {
-			values["bbr_profile"] = value
-			break
-		}
-	}
-	// TUIC tuning and the v4 token.
-	values["congestion_control"] = spec.Options["congestion_control"]
-	values["udp_relay_mode"] = spec.Options["udp_relay_mode"]
-	values["token"] = spec.Options["token"]
-	// XHTTP up/down split from the link's extra= JSON (09-xhttp §4). The
-	// tuning travels inside the credential document, not the proto
-	// contract, so no contract change is needed.
-	values["download_address"] = spec.DownloadAddress
-	values["download_port"] = strconv.Itoa(int(spec.DownloadPort))
+	hopPorts := firstOpt("mport", "ports")
+	hopInterval := firstOpt("hop-interval", "hopinterval")
+	hopIntervalMax := firstOpt("hop-interval-max", "hopintervalmax")
+	bbrProfile := firstOpt("bbr-profile", "bbr_profile")
+	var privateKey, addresses, peers, amnezia string
 	if strings.EqualFold(spec.Protocol, "wireguard") {
-		key, addresses, peers := wireguardMaterial(spec)
-		values["private_key"] = key
-		values["addresses"] = strings.Join(addresses, ",")
-		if len(peers) > 0 {
-			raw, err := json.Marshal(peers)
+		key, addrs, wpeers := wireguardMaterial(spec)
+		privateKey, addresses = key, strings.Join(addrs, ",")
+		if len(wpeers) > 0 {
+			raw, err := json.Marshal(wpeers)
 			if err != nil {
 				return nil, errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
 			}
-			values["peers"] = string(raw)
+			peers = string(raw)
 		}
 		if awg := amneziaMaterial(spec.Options); len(awg) > 0 {
 			raw, err := json.Marshal(awg)
 			if err != nil {
 				return nil, errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
 			}
-			values["amneziawg"] = string(raw)
+			amnezia = string(raw)
 		}
 	}
+	insecure := ""
 	if spec.AllowInsecure {
-		values["insecure"] = "1"
+		insecure = "1"
 	}
-	if profile := spec.Options["profile"]; profile != "" {
-		packed, err := packProfile(profile)
+	profile := ""
+	if p := spec.Options["profile"]; p != "" {
+		packed, err := packProfile(p)
 		if err != nil {
 			return nil, err
 		}
-		values["xray_profile"] = packed
+		profile = packed
 	}
-	for key, value := range values {
-		if value == "" {
-			delete(values, key)
+
+	doc := credentialDoc{buf: make([]byte, 0, 384)}
+	doc.buf = append(doc.buf, '{')
+	// Sorted key order, mirroring json.Marshal's map key sort.
+	doc.field("addresses", addresses)
+	doc.field("alpn", strings.Join(spec.ALPN, ","))
+	doc.field("amneziawg", amnezia)
+	doc.field("bbr_profile", bbrProfile)
+	// TUIC tuning and the v4 token.
+	doc.field("congestion_control", spec.Options["congestion_control"])
+	// XHTTP up/down split from the link's extra= JSON (09-xhttp §4). The
+	// tuning travels inside the credential document, not the proto
+	// contract, so no contract change is needed.
+	doc.field("download_address", spec.DownloadAddress)
+	doc.field("download_port", strconv.Itoa(int(spec.DownloadPort)))
+	doc.field("downmbps", spec.Options["downmbps"])
+	doc.field("encryption", spec.Options["encryption"])
+	doc.field("fingerprint", spec.Fingerprint)
+	doc.field("flow", spec.Flow)
+	doc.field("host_header", spec.HostHeader)
+	doc.field("hop_interval", hopInterval)
+	doc.field("hop_interval_max", hopIntervalMax)
+	doc.field("hop_ports", hopPorts)
+	doc.field("insecure", insecure)
+	doc.field("method", spec.Cipher)
+	doc.field("mode", spec.Mode)
+	doc.field("obfs", spec.Options["obfs"])
+	doc.field("obfs_param", obfsParam)
+	doc.field("password", spec.Password)
+	doc.field("path", spec.Path)
+	doc.field("peers", peers)
+	doc.field("private_key", privateKey)
+	doc.field("public_key", spec.PublicKey)
+	doc.field("security", spec.Security)
+	doc.field("server_name", spec.ServerName)
+	doc.field("service_name", spec.ServiceName)
+	doc.field("short_id", spec.ShortID)
+	doc.field("spider_x", spec.SpiderX)
+	// SIP002 plugin/plugin_opts for Shadowsocks (T020). The raw "plugin"
+	// query key stays in Options but is never stored under that name.
+	doc.field("ss_plugin", spec.Options["ss_plugin"])
+	doc.field("ss_plugin_opts", spec.Options["ss_plugin_opts"])
+	doc.field("token", spec.Options["token"])
+	doc.field("udp_relay_mode", spec.Options["udp_relay_mode"])
+	doc.field("upmbps", spec.Options["upmbps"])
+	doc.field("user", spec.User)
+	doc.field("uuid", spec.UUID)
+	doc.field("xray_profile", profile)
+	doc.buf = append(doc.buf, '}')
+	return doc.buf, nil
+}
+
+// credentialDoc accumulates one credential document. field appends a
+// "key":"value" pair, skipping empty values exactly like the map version
+// did when it deleted empty entries before marshaling.
+type credentialDoc struct {
+	buf   []byte
+	first bool
+}
+
+func (d *credentialDoc) field(key, value string) {
+	if value == "" {
+		return
+	}
+	if d.first {
+		d.buf = append(d.buf, ',')
+	}
+	d.first = true
+	d.buf = appendCredentialString(d.buf, key)
+	d.buf = append(d.buf, ':')
+	d.buf = appendCredentialString(d.buf, value)
+}
+
+// appendCredentialString appends s as a JSON string literal with exactly
+// encoding/json's escaping. Printable ASCII that needs no escape (the
+// overwhelming norm for credential values) is copied verbatim; anything
+// else — quotes, backslashes, the HTML-sensitive <, >, &, control bytes,
+// non-ASCII — goes through json.Marshal for that one string, so the
+// output matches the old map marshal byte for byte on every input,
+// including invalid UTF-8 (which Marshal rewrites to U+FFFD).
+func appendCredentialString(buf []byte, s string) []byte {
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c < 0x20 || c > 0x7e || c == '"' || c == '\\' || c == '<' || c == '>' || c == '&' {
+			raw, _ := json.Marshal(s)
+			return append(buf, raw...)
 		}
 	}
-	document, err := json.Marshal(values)
-	if err != nil {
-		return nil, errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
-	}
-	return document, nil
+	buf = append(buf, '"')
+	buf = append(buf, s...)
+	return append(buf, '"')
 }
 
 func kinds(names []string) []engine.Kind {
