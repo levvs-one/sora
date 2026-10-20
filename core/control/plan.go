@@ -20,6 +20,7 @@ import (
 	"golang.org/x/net/idna"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/bypass"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	"github.com/levvs-one/sora-client/core/parser"
@@ -479,21 +480,23 @@ func applyChain(plan *engine.Plan, chain []string) error {
 // traffic when zapret runs alongside the VPN tunnel (F11).
 const zapretDirectOutboundID = "sora-zapret-direct"
 
-// applyZapretWithVPN routes direct traffic through zapret's tpws while the
-// VPN tunnel carries the rest (F11). It appends a synthetic bypass outbound
-// and retargets "direct" rules at it; the engine factory then wraps the plan
-// with the tpws supervisor, failing honestly when tpws is not installed.
+// applyZapretWithVPN runs zapret alongside the VPN tunnel (F11):
+// direct traffic gets desync while the tunnel carries the rest.
 //
-// The strategy must come from the client. The core's reference set
-// (bypass.DefaultStrategy) is the modern nfqws/winws desync set; it is
-// NOT WIRED — no production caller applies it as a default, it is kept
-// for the nfqws migration — and the nfqws backend is not wired up yet
-// (see
-// core/engine/bypass/NFQWS-MIGRATION.md): substituting it here would build
-// a plan that only fails later, at engine Apply, with the client unable
-// to tell why. Failing at plan time keeps the refusal early and precise;
-// the app always sends its tuned tpws strategy, so this only affects
-// clients that send none.
+// With an explicit strategy from the client (the proto carries only
+// tpws fields, so it always selects tpws) it appends a synthetic
+// bypass outbound and retargets "direct" rules at it; the engine
+// factory then wraps the plan with the tpws supervisor, failing
+// honestly when tpws is not installed.
+//
+// With no strategy it applies the core's built-in set
+// (bypass.DefaultStrategy): the modern nfqws desync set. nfqws works
+// at the packet layer, so there is nothing to retarget — the rules
+// keep targeting "direct", the engine routes them untouched, and the
+// nfqws executor desyncs them below the engine
+// (core/engine/bypass/NFQWS-MIGRATION.md §4). The synthetic outbound
+// still rides along so the factory wraps the plan and the executor
+// starts; if nfqws is not installed, Apply fails closed naming it.
 func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) error {
 	if !plan.Tun.Enabled {
 		return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanTunnel,
@@ -503,15 +506,19 @@ func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) erro
 		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
 			"control: zapret_with_vpn runs on Linux, where tpws is shipped")
 	}
-	if strategy == nil {
-		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanBypassInvalid,
-			"control: zapret_with_vpn needs an explicit tpws strategy from the client: the built-in default needs the nfqws backend, which is not wired up yet")
-	}
 	for _, o := range plan.Outbounds {
 		if o.ID == zapretDirectOutboundID {
 			return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanDuplicateID,
 				"control: outbound id %q is reserved for zapret", zapretDirectOutboundID)
 		}
+	}
+	if strategy == nil {
+		bs := bypass.DefaultStrategy()
+		plan.Outbounds = append(plan.Outbounds, engine.Outbound{
+			ID: zapretDirectOutboundID, Name: "Zapret (direct traffic)",
+			Protocol: engine.ProtocolBypass, Bypass: &bs,
+		})
+		return nil
 	}
 	bs := engine.BypassStrategy{
 		SplitPos: strategy.GetSplitPos(), Disorder: strategy.GetDisorder(), OOB: strategy.GetOob(),

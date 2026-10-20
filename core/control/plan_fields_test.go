@@ -3,7 +3,6 @@ package control
 import (
 	"reflect"
 	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -89,22 +88,27 @@ func TestPlanFromProtoMapsZapretStrategy(t *testing.T) {
 	}
 }
 
-// TestPlanFromProtoZapretWithoutStrategyFails: an absent strategy is
-// refused at plan time. The core's built-in default needs the nfqws
-// backend, which is not wired up yet, so defaulting to it would build a
-// plan that only fails at engine Apply; the refusal must be early and
-// name the reason.
-func TestPlanFromProtoZapretWithoutStrategyFails(t *testing.T) {
+// TestPlanFromProtoZapretWithoutStrategyUsesTheDefault: an absent
+// strategy is no longer refused — the nfqws executor landed, so the
+// core's built-in default (the modern nfqws desync set) is applied at
+// plan time and runs at Apply. The full behavior is pinned by
+// TestPlanFromProtoZapretWithVPNDefaultStrategy; this keeps the
+// no-strategy entry point itself under test.
+func TestPlanFromProtoZapretWithoutStrategyUsesTheDefault(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("zapret_with_vpn is Linux-only")
 	}
 	in := chainTestPlan()
 	in.ZapretWithVpn = true
-	_, err := planFromProto(in, "s-1", nil)
-	if err == nil {
-		t.Fatal("zapret_with_vpn without a strategy must be rejected at plan time")
+	plan, err := planFromProto(in, "s-1", nil)
+	if err != nil {
+		t.Fatalf("zapret_with_vpn without a strategy must build the default plan, got %v", err)
 	}
-	if !strings.Contains(err.Error(), "nfqws") {
-		t.Fatalf("error = %v, want it to name the unwired nfqws backend", err)
+	for i := range plan.Outbounds {
+		if plan.Outbounds[i].ID == zapretDirectOutboundID && plan.Outbounds[i].Bypass != nil &&
+			len(plan.Outbounds[i].Bypass.Desync) > 0 {
+			return
+		}
 	}
+	t.Fatal("the plan carries no zapret outbound with the nfqws default strategy")
 }
