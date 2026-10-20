@@ -89,6 +89,20 @@ type TLS struct {
 	RealityPublicKey string
 	RealityShortID   string
 	SpiderX          string
+	// KeyShare selects the key share the REALITY ClientHello offers:
+	// "" leaves the engine default, "classical" offers X25519 only,
+	// "hybrid" offers the X25519MLKEM768 hybrid. REALITY servers on
+	// Xray >= 26.9.8 accept only the hybrid share, so against them
+	// "classical" (or a default that omits the hybrid) fails the
+	// handshake with an opaque verification error (PASS2 deep S3).
+	// Only the mihomo renderer emits this today
+	// (reality-opts.support-x25519mlkem768, PASS3 deep S2); the
+	// sing-box-lx key_share render is the separate PASS2 S3 item.
+	// Whether mihomo's own default already offers the hybrid is NOT
+	// confirmed from the pinned docs — they only show the explicit
+	// `true` — so "" honestly means "engine default, unverified",
+	// never a promise that the hybrid is offered.
+	KeyShare string
 }
 
 // Transport holds the stream transport of an outbound.

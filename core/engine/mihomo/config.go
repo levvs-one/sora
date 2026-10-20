@@ -203,6 +203,11 @@ type smux struct {
 type reality struct {
 	PublicKey string `yaml:"public-key,omitempty"`
 	ShortID   string `yaml:"short-id,omitempty"`
+	// SupportMLKEM768 is reality-opts.support-x25519mlkem768 of the
+	// pinned docs. A pointer, so an explicit false (plan KeyShare
+	// "classical") renders as false instead of vanishing, and nil
+	// (KeyShare unset) omits the key entirely.
+	SupportMLKEM768 *bool `yaml:"support-x25519mlkem768,omitempty"`
 }
 
 // echOpts is mihomo's ECH block (ech-opts in the pinned docs):

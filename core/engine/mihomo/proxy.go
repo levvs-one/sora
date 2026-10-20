@@ -308,6 +308,18 @@ func applyTLS(px *proxy, o engine.Outbound) error {
 		// sing-box and Xray renderers do (legacy port of af8d343).
 		px.Fingerprint = orDefault(o.TLS.Fingerprint, engine.DefaultFingerprint)
 		px.Reality = &reality{PublicKey: o.TLS.RealityPublicKey, ShortID: o.TLS.RealityShortID}
+		// PASS3 deep S2: the plan's REALITY key-share knob, third leg
+		// of PASS2 S3. hybrid -> support-x25519mlkem768: true,
+		// classical -> false explicitly; unset leaves the key out
+		// (mihomo's default is not confirmed from the pinned docs).
+		switch o.TLS.KeyShare {
+		case "hybrid":
+			v := true
+			px.Reality.SupportMLKEM768 = &v
+		case "classical":
+			v := false
+			px.Reality.SupportMLKEM768 = &v
+		}
 	} else if o.TLS.Fingerprint != "" {
 		px.Fingerprint = o.TLS.Fingerprint
 	}

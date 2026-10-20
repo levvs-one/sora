@@ -322,11 +322,22 @@ func validateXHTTP(o Outbound) []error {
 // false (PASS3 deep S4). The Xray path, which renders no ECH at all,
 // is closed by the FeatureECH capability gate, not by validation.
 func (t TLS) validate(what string) []error {
+	var errs []error
+	// KeyShare is the REALITY key-share knob (PASS3 deep S2): only
+	// the two documented values, and only with REALITY — anywhere
+	// else it would be a setting no renderer can honour.
+	switch t.KeyShare {
+	case "", "classical", "hybrid":
+	default:
+		errs = append(errs, fmt.Errorf("%s: reality key_share %q is not \"classical\" or \"hybrid\"", what, t.KeyShare))
+	}
+	if t.KeyShare != "" && !t.Reality {
+		errs = append(errs, fmt.Errorf("%s: reality key_share needs REALITY", what))
+	}
 	ech := t.ECH
 	if !ech.Enabled {
-		return nil
+		return errs
 	}
-	var errs []error
 	if !t.Enabled {
 		errs = append(errs, fmt.Errorf("%s: ECH is enabled but TLS is not", what))
 	}

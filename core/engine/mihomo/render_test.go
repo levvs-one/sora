@@ -439,6 +439,40 @@ func TestAmneziaOptionsRefuses31(t *testing.T) {
 	}
 }
 
+// TestRenderRealityKeyShare pins PASS3 deep S2: the plan's KeyShare
+// knob renders as reality-opts.support-x25519mlkem768 on mihomo —
+// hybrid as explicit true, classical as explicit false, unset as
+// absent (mihomo's own default is not confirmed from the pinned
+// docs, so the renderer must not invent one).
+func TestRenderRealityKeyShare(t *testing.T) {
+	render := func(ks string) string {
+		p := testPlan()
+		p.Outbounds[0] = engine.Outbound{
+			ID: "srv-1", Name: "Reality 01", Protocol: engine.ProtocolVLESS,
+			Server: "re.example.com", Port: 443, UUID: "11111111-2222-3333-4444-555555555555",
+			TLS: engine.TLS{Enabled: true, ServerName: "www.example.com",
+				Reality: true, RealityPublicKey: "Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw",
+				KeyShare: ks},
+		}
+		p.Groups = []engine.Group{{Name: "sel", Type: engine.GroupSelect, Outbounds: []string{"srv-1"}}}
+		p.Rules = []engine.Rule{{Type: engine.RuleMatchAll, Target: "srv-1"}}
+		out, err := Render(p, testRuntime(t))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return out
+	}
+	if out := render("hybrid"); !strings.Contains(out, "support-x25519mlkem768: true") {
+		t.Fatalf("hybrid must render support-x25519mlkem768: true:\n%s", out)
+	}
+	if out := render("classical"); !strings.Contains(out, "support-x25519mlkem768: false") {
+		t.Fatalf("classical must render support-x25519mlkem768: false explicitly:\n%s", out)
+	}
+	if out := render(""); strings.Contains(out, "support-x25519mlkem768") {
+		t.Fatalf("an unset KeyShare must omit the key entirely:\n%s", out)
+	}
+}
+
 // TestRenderRealityForcesAClientFingerprint is the sora regression test
 // for the mihomo REALITY gap (legacy detail-fix af8d343): sing-box and
 // Xray fall back to a uTLS fingerprint for REALITY, while mihomo rendered

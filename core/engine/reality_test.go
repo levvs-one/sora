@@ -155,6 +155,29 @@ func TestRealityMux(t *testing.T) {
 	}
 }
 
+// TestValidateKeyShare pins the plan knob behind PASS3 deep S2:
+// only "classical"/"hybrid", and only on a REALITY outbound.
+func TestValidateKeyShare(t *testing.T) {
+	for _, ks := range []string{"", "classical", "hybrid"} {
+		o := realityOutbound()
+		o.TLS.KeyShare = ks
+		if err := o.Validate(); err != nil {
+			t.Errorf("KeyShare %q on REALITY: Validate = %v, want nil", ks, err)
+		}
+	}
+	o := realityOutbound()
+	o.TLS.KeyShare = "post-quantum-ish"
+	if err := o.Validate(); err == nil || !strings.Contains(err.Error(), "key_share") {
+		t.Errorf("unknown KeyShare: Validate = %v, want a key_share error", err)
+	}
+	o = realityOutbound()
+	o.TLS.Reality = false
+	o.TLS.KeyShare = "hybrid"
+	if err := o.Validate(); err == nil || !strings.Contains(err.Error(), "key_share needs REALITY") {
+		t.Errorf("KeyShare without REALITY: Validate = %v, want a key_share error", err)
+	}
+}
+
 func TestIsVisionFlow(t *testing.T) {
 	for _, f := range []string{"xtls-rprx-vision", "xtls-rprx-vision-udp443"} {
 		if !IsVisionFlow(f) {
