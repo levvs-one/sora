@@ -2098,13 +2098,7 @@ abstract class S {
   String get updateSignaturePending;
   String get updateManualSigWarning;
 
-  /// In-app installation on Windows is blocked until the release signature
-  /// can be verified in Dart (analysis-20 U1). A concrete getter, not an
-  /// abstract one: every locale inherits this English fallback until the l10n
-  /// pass translates it. Do not silently remap this error to a generic one —
-  /// the user must know the install path is deliberately disabled.
-  String get updateWindowsSigBlocked =>
-      'Automatic installation is disabled on Windows until release-signature verification is implemented. Download the installer from the release page and verify it manually.';
+  String get updateWindowsSigBlocked;
   String get crashRestoreTitle;
 
   /// No description provided for @restoreOnCrash.
