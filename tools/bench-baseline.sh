@@ -51,6 +51,30 @@
 #   than 32 B/op appearing — losing the zero-alloc property is exactly
 #   the regression this gate exists to catch.
 #
+# RACY BENCHMARKS — WIDENED BANDS FOR TWO MEASUREMENTS
+#   Two benchmarks in the set are concurrency-shaped: helper goroutines
+#   perform part of the work, and whether their allocations are
+#   attributed to the measurement window is scheduler-dependent. On
+#   IDENTICAL code, repeated runs on this VM measured:
+#     core/probe BenchmarkRunSeriesShort (serial probe loop racing a
+#       context/timer allocation): allocs/op flips 17 <-> 18 between
+#       counts, B/op swings ~1213 -> ~1333 (+10%);
+#     service/sync/transport BenchmarkTransportRoundTrip1KB (reader
+#       goroutine drains a Noise transport): single counts swing
+#       16 -> 807 B/op, allocs/op 1 -> 3.
+#   Gating those two at 5% would fail on noise, so they get explicit,
+#   per-benchmark widened bands in the comparison below (25% B/op and
+#   +2 allocs for RunSeriesShort; a 1024 B/op absolute cap and +2
+#   allocs for TransportRoundTrip1KB — a real regression there, e.g. a
+#   per-message buffer leaving the pool, sustains >= 1 KiB/op as the
+#   MINIMUM across counts, which races alone never produced: worst
+#   observed polluted count was 807 B/op). Every other benchmark —
+#   including the allocation-free-by-contract hot paths — keeps the
+#   strict 5% band. The exceptions are keyed by exact package+name and
+#   exist ONLY in the two repos' shared script so they stay visible in
+#   review; a benchmark that becomes deterministic should be removed
+#   from the table, never added to it casually.
+#
 # VERDICTS
 #   REGRESS  gated metric grew past the threshold  -> exit 1
 #   MISSING  benchmark is in the baseline but produced no result
@@ -245,6 +269,14 @@ fi
 
 status=0
 awk -v pct="$THRESHOLD_PCT" '
+  BEGIN {
+    # Racy-benchmark exceptions (see header). eb: B/op band in percent;
+    # ebabs: B/op absolute cap; ea: allocs/op absolute tolerance.
+    eb["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 25
+    ea["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 2
+    ebabs["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 1024
+    ea["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 2
+  }
   FNR == NR {
     if ($1 ~ /^#/ || NF == 0) next
     key = $1 SUBSEP $2; bb[key] = $3; ba[key] = $4; seen[key] = 1; next
@@ -253,9 +285,12 @@ awk -v pct="$THRESHOLD_PCT" '
     key = $1 SUBSEP $2; got[key] = 1
     if (!(key in bb)) { printf "NEW      %s %s: %s B/op %s allocs/op (not in baseline, not gated)\n", $1, $2, $3, $4; next }
     fail = ""
-    if (bb[key] == 0) { if ($3 > 32) fail = "B/op 0 -> " $3 " (allocation-free baseline)" }
-    else if ($3 > bb[key] * (1 + pct/100) && $3 - bb[key] >= 32) fail = "B/op " bb[key] " -> " $3
-    if (ba[key] == 0) { if ($4 >= 1) fail = fail " allocs/op 0 -> " $4 }
+    bp = (key in eb) ? eb[key] : pct
+    if (key in ebabs) { if ($3 > ebabs[key] && $3 > bb[key] * 4) fail = "B/op " bb[key] " -> " $3 " (past racy cap " ebabs[key] ")" }
+    else if (bb[key] == 0) { if ($3 > 32) fail = "B/op 0 -> " $3 " (allocation-free baseline)" }
+    else if ($3 > bb[key] * (1 + bp/100) && $3 - bb[key] >= 32) fail = "B/op " bb[key] " -> " $3
+    if (key in ea) { if ($4 - ba[key] > ea[key]) fail = fail " allocs/op " ba[key] " -> " $4 " (past racy tolerance +" ea[key] ")" }
+    else if (ba[key] == 0) { if ($4 >= 1) fail = fail " allocs/op 0 -> " $4 }
     else if ($4 > ba[key] * (1 + pct/100) && $4 - ba[key] >= 1) fail = fail " allocs/op " ba[key] " -> " $4
     if (fail != "") { printf "REGRESS  %s %s: %s\n", $1, $2, fail; bad = 1 }
     else if ($3 < bb[key] || $4 < ba[key]) printf "IMPROVED %s %s: %s B/op (base %s), %s allocs/op (base %s) — consider lowering the baseline\n", $1, $2, $3, bb[key], $4, ba[key]
