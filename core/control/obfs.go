@@ -262,32 +262,44 @@ func obfsFeatures(p *obfsv1.ObfuscationProfile) obfsFeatureUse {
 	}
 }
 
+// obfsMissingFeatures lists the profile features one engine cannot carry,
+// using the feature names clients see in warnings.
+func obfsMissingFeatures(caps engineObfsCaps, use obfsFeatureUse) []string {
+	var missing []string
+	if use.utls != "" {
+		if !caps.utls {
+			missing = append(missing, "uTLS")
+		} else if !slices.Contains(caps.utlsProfiles, use.utls) {
+			missing = append(missing, "uTLS profile "+use.utls)
+		}
+	}
+	if use.fragmentation && !caps.fragmentation {
+		missing = append(missing, "TLS fragmentation")
+	}
+	if use.delay && !caps.fragmentParams {
+		missing = append(missing, "fragment delay")
+	}
+	if use.jitter && !caps.jitter {
+		missing = append(missing, "fragment jitter")
+	}
+	if use.fakeSNI && !caps.fakeSNI {
+		missing = append(missing, "decoy SNI")
+	}
+	return missing
+}
+
 // obfsCompatibleEngines lists the engines able to carry every feature the
 // profile enables, with a warning per engine that cannot.
+//
+// This is the apply-time view. Engine selection at Connect time
+// (SelectEngine) is obfuscation-blind — it picks the first preferred
+// engine that carries the plan — so a pinned engine can still silently
+// drop profile features; obfsEnginePreferenceWarning reconciles that at
+// Connect.
 func obfsCompatibleEngines(p *obfsv1.ObfuscationProfile) (compatible []string, warnings []string) {
 	use := obfsFeatures(p)
 	for _, caps := range obfsEngineCapabilities {
-		var missing []string
-		if use.utls != "" {
-			if !caps.utls {
-				missing = append(missing, "uTLS")
-			} else if !slices.Contains(caps.utlsProfiles, use.utls) {
-				missing = append(missing, "uTLS profile "+use.utls)
-			}
-		}
-		if use.fragmentation && !caps.fragmentation {
-			missing = append(missing, "TLS fragmentation")
-		}
-		if use.delay && !caps.fragmentParams {
-			missing = append(missing, "fragment delay")
-		}
-		if use.jitter && !caps.jitter {
-			missing = append(missing, "fragment jitter")
-		}
-		if use.fakeSNI && !caps.fakeSNI {
-			missing = append(missing, "decoy SNI")
-		}
-		if len(missing) == 0 {
+		if missing := obfsMissingFeatures(caps, use); len(missing) == 0 {
 			compatible = append(compatible, caps.engine)
 		} else {
 			warnings = append(warnings, caps.engine+": drops "+strings.Join(missing, ", "))
@@ -299,6 +311,31 @@ func obfsCompatibleEngines(p *obfsv1.ObfuscationProfile) (compatible []string, w
 			"fake_sni replaces the handshake SNI: use it only against servers that do not validate SNI; REALITY outbounds are skipped")
 	}
 	return compatible, warnings
+}
+
+// obfsEnginePreferenceWarning reconciles the stored profile with the
+// session's engine preference at Connect time. A pinned engine that cannot
+// carry the profile's features would silently drop them: the merge stamps
+// the features onto the plan, SelectEngine never looks at them, and the
+// apply-time compatible_engines report is long forgotten by the client.
+// An empty preference means the core default order, whose graceful
+// degradation is documented in the proto, so only an explicit pin warns.
+func obfsEnginePreferenceWarning(engines []engine.Kind, p *obfsv1.ObfuscationProfile) string {
+	if !obfsEnabled(p) || len(engines) == 0 {
+		return ""
+	}
+	use := obfsFeatures(p)
+	for _, caps := range obfsEngineCapabilities {
+		if caps.engine != string(engines[0]) {
+			continue
+		}
+		if missing := obfsMissingFeatures(caps, use); len(missing) > 0 {
+			return fmt.Sprintf("obfuscation: the preferred engine %q cannot carry %s from the active profile; those defences stay off for this session",
+				caps.engine, strings.Join(missing, ", "))
+		}
+		return ""
+	}
+	return ""
 }
 
 // MergeObfsProfile maps the active obfuscation profile onto the engine
@@ -380,6 +417,9 @@ func (s *Server) ApplyObfsProfile(_ context.Context, req *obfsv1.ApplyObfsProfil
 		return &obfsv1.ApplyObfsProfileResponse{Error: toWire(err, nil, id)}, nil
 	}
 	s.obfs = normalized
+	// A freshly applied profile replaces whatever the startup file held:
+	// a corrupt-file warning from NewServer no longer describes reality.
+	s.obfsLoadWarning = ""
 	return &obfsv1.ApplyObfsProfileResponse{
 		Applied:           proto.Clone(normalized).(*obfsv1.ObfuscationProfile),
 		CompatibleEngines: compatible,
@@ -467,8 +507,10 @@ func (s *Server) saveObfsProfile(p *obfsv1.ObfuscationProfile) error {
 }
 
 // loadObfsProfile reads the persisted profile. A missing file means the
-// suite was never configured; a corrupt one is logged and ignored so a
-// hand-edited file can never break startup.
+// suite was never configured; a corrupt or invalid one is reported through
+// warn and ignored so a hand-edited file can never break startup. The warn
+// messages are self-contained: the server journals them into the first
+// session's event stream so WatchEvents surfaces the disabled suite.
 func loadObfsProfile(path string, warn func(string)) *obfsv1.ObfuscationProfile {
 	raw, err := os.ReadFile(path)
 	if err != nil {
@@ -477,14 +519,14 @@ func loadObfsProfile(path string, warn func(string)) *obfsv1.ObfuscationProfile 
 	p := &obfsv1.ObfuscationProfile{}
 	if err := protojson.Unmarshal(raw, p); err != nil {
 		if warn != nil {
-			warn("obfuscation profile ignored: file is corrupt")
+			warn("obfuscation: the stored profile (" + obfsProfileFile + ") is corrupt and was ignored; the suite stays disabled until a profile is applied")
 		}
 		return nil
 	}
 	normalized, err := normalizeObfsProfile(p)
 	if err != nil {
 		if warn != nil {
-			warn("obfuscation profile ignored: file holds an invalid profile")
+			warn("obfuscation: the stored profile (" + obfsProfileFile + ") is invalid and was ignored; the suite stays disabled until a profile is applied")
 		}
 		return nil
 	}

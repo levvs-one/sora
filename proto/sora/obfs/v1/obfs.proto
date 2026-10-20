@@ -15,6 +15,13 @@ option go_package = "github.com/levvs-one/sora-client/core/gen/sora/obfs/v1;obfs
 // restart keeps the stored profile, so a user is never silently left
 // without the obfuscation they asked for.
 //
+// Precedence: the stored profile wins over the per-Connect
+// SessionPlan.anti_censorship defences. When a profile is active, Connect
+// merges it into the plan after the request's own defences, silently
+// overriding them (fragmentation settings, uTLS fingerprints, SNI). A
+// client that needs its per-session defences to apply must clear the
+// stored profile first (preset OFF).
+//
 // Since 1.11. Clients must negotiate 1.11 before calling: an older core has
 // no such service and fails the call at the transport.
 service ObfsControl {
@@ -62,6 +69,11 @@ enum ObfsPreset {
 
 // ObfuscationProfile describes how proxy handshakes should look on the
 // wire. Empty (preset OFF) disables the suite.
+//
+// Precedence: once stored via ApplyObfsProfile, the profile merges into
+// the engine plan of every later Connect and overrides the per-Connect
+// SessionPlan.anti_censorship defences (fragmentation, uTLS, SNI). See the
+// ObfsControl service comment.
 message ObfuscationProfile {
   // A preset to start from; explicit fields override it. UNSPECIFIED with
   // explicit fields is a fully custom profile.

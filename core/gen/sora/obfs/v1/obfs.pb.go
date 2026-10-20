@@ -163,6 +163,11 @@ func (ObfsPreset) EnumDescriptor() ([]byte, []int) {
 
 // ObfuscationProfile describes how proxy handshakes should look on the
 // wire. Empty (preset OFF) disables the suite.
+//
+// Precedence: once stored via ApplyObfsProfile, the profile merges into
+// the engine plan of every later Connect and overrides the per-Connect
+// SessionPlan.anti_censorship defences (fragmentation, uTLS, SNI). See the
+// ObfsControl service comment.
 type ObfuscationProfile struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A preset to start from; explicit fields override it. UNSPECIFIED with

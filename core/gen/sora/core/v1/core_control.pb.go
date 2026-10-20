@@ -1393,6 +1393,13 @@ func (x *LocalProxy) GetPassword() string {
 }
 
 // AntiCensorship holds the per-session defences against DPI.
+//
+// Precedence: when the core holds an active obfuscation profile
+// (sora.obfs.v1.ObfsControl), Connect merges that stored profile into the
+// plan after these defences, and the stored profile wins: fragmentation
+// settings, uTLS fingerprints and SNI from the request are silently
+// overridden. Clear the stored profile (preset OFF) to make per-session
+// defences apply.
 type AntiCensorship struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Splits the TLS ClientHello of proxy connections into several TCP segments.

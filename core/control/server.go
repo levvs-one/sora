@@ -171,9 +171,11 @@ type Server struct {
 	// disables the profile RPCs with explicit errors.
 	profiles *profiles.Store
 	// obfsMu guards obfs, the active obfuscation profile stored by
-	// ApplyObfsProfile and merged into every later Connect.
-	obfsMu sync.Mutex
-	obfs   *obfsv1.ObfuscationProfile
+	// ApplyObfsProfile and merged into every later Connect, and
+	// obfsLoadWarning, the reason the persisted profile is not active.
+	obfsMu          sync.Mutex
+	obfs            *obfsv1.ObfuscationProfile
+	obfsLoadWarning string
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -269,15 +271,29 @@ func New(cfg Config) (*Server, error) {
 	}
 	server.subs = newSubscriptionBook(server)
 	// Restore the obfuscation profile chosen earlier; a corrupt file is
-	// ignored so the core always starts.
+	// ignored so the core always starts. The reason is stashed for the
+	// first session's event stream: from the client's perspective the
+	// suite must not go silent.
 	if path := server.obfsProfilePath(); path != "" {
 		server.obfs = loadObfsProfile(path, func(msg string) {
+			server.obfsMu.Lock()
+			server.obfsLoadWarning = msg
+			server.obfsMu.Unlock()
 			if server.logs != nil {
 				server.logs.Write(time.Time{}, logs.LevelWarning, logs.SourceCore, msg)
 			}
 		})
 	}
 	return server, nil
+}
+
+// obfsStartupWarning reports why the persisted obfuscation profile is not
+// active (a corrupt or invalid file at startup), or "" when the suite
+// loaded normally. ApplyObfsProfile clears it once a fresh profile lands.
+func (s *Server) obfsStartupWarning() string {
+	s.obfsMu.Lock()
+	defer s.obfsMu.Unlock()
+	return s.obfsLoadWarning
 }
 
 // GetAbout returns core build information for the client's About screen.
@@ -546,8 +562,15 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	}
 	// The obfuscation suite merges here so every session carries the
 	// active profile without the client resending it.
+	var obfsNotices []string
 	if prof := s.activeObfsProfile(); prof != nil {
 		MergeObfsProfile(plan, prof)
+		if w := obfsEnginePreferenceWarning(plan.Engines, prof); w != "" {
+			obfsNotices = append(obfsNotices, w)
+		}
+	}
+	if w := s.obfsStartupWarning(); w != "" {
+		obfsNotices = append(obfsNotices, w)
 	}
 	mask := s.mask(plan)
 
@@ -556,6 +579,12 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	started, err := s.sessions.Connect(ctx, plan, sessionSettings(req))
 	if err != nil {
 		return &corev1.ConnectResponse{Error: toWire(err, mask, id)}, nil
+	}
+	// Surface suite conditions in the session journal so WatchEvents shows
+	// them: a corrupt profile file that disabled the suite at startup, or
+	// a pinned engine that will silently drop profile features.
+	for _, notice := range obfsNotices {
+		started.Journal().Append(session.Event{Kind: session.EventLog, LogLine: notice})
 	}
 	return &corev1.ConnectResponse{
 		Status: &corev1.SessionStatus{
