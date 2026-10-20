@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/netip"
 	"strings"
+
+	"golang.org/x/net/idna"
+	"golang.org/x/net/publicsuffix"
 )
 
 // REALITY hardening: validation and warnings (T002).
@@ -19,6 +22,19 @@ import (
 // the server, and the UI may additionally offer a hard block for
 // reality-without-vision (see the spec). Errors (ValidateReality) block:
 // they name configurations that cannot work or that leak identity.
+// realityDest is the EFFECTIVE SNI: the value that actually goes on
+// the wire as the ClientHello server name. Every renderer passes
+// TLS.ServerName verbatim — sing-box's generic TLS block sets
+// server_name from it (omitting the key when empty), Xray's
+// realitySettings does the same, and mihomo sets sni/servername only
+// when it is non-empty — and for an empty ServerName each engine
+// falls back to the server address it dials (sing-box spells that
+// fallback explicitly on the naive path: orDefault(ServerName,
+// Server); mihomo's adapter comment in proxy.go records the same
+// dial-address fallback). So the effective SNI is ServerName when
+// set, otherwise Server, and any check that means "the name the
+// censor will see" must validate this value, not ServerName alone
+// (CENSOR-SURV review, Medium 1).
 func (o Outbound) realityDest() string {
 	if o.TLS.ServerName != "" {
 		return o.TLS.ServerName
@@ -121,9 +137,15 @@ func (o Outbound) RealityWarnings() []string {
 		// probe's SNI-consistency check flags the same shape from the
 		// wire side), so the "real site" and the proxy share one
 		// infrastructure — exactly the correlation T006 warns about.
+		// Exact equality is only the narrowest form: a parent/subdomain
+		// pair (Server=vpn.example.com, SNI=www.example.com, or the
+		// reverse) sits on the same registrable domain and the same
+		// infrastructure, and the censor correlates it just as easily,
+		// so the check compares registrable domains, not strings
+		// (CENSOR-SURV review, §1).
 		if o.TLS.ServerName != "" && o.Server != "" {
 			if _, err := netip.ParseAddr(o.Server); err != nil &&
-				normalizeDestName(o.TLS.ServerName) == normalizeDestName(o.Server) {
+				sameSiteName(o.TLS.ServerName, o.Server) {
 				out = append(out, "reality-sni-is-server")
 			}
 		}
@@ -139,11 +161,12 @@ func (o Outbound) RealityWarnings() []string {
 				// default that thousands of unrelated servers
 				// share — a correlation handle, not a secret.
 				out = append(out, "reality-shortid-short")
-			case allBytesEqual(raw):
-				// 000000…, aaaaaa… and friends are the published
-				// example/default shortIds: sending one announces
-				// "stock REALITY config" to any observer who has
-				// read the same examples.
+			case lowEntropyShortID(raw, id):
+				// 000000…, aaaaaa…, abcdabcd…, deadbeefdeadbeef…
+				// and friends are the published example/default
+				// shortIds: sending one announces "stock REALITY
+				// config" to any observer who has read the same
+				// examples.
 				out = append(out, "reality-shortid-low-entropy")
 			}
 		}
@@ -166,12 +189,35 @@ func normalizeDestName(s string) string {
 // labels of letters, digits and interior hyphens, 1–63 bytes each, the
 // whole name at most 253 bytes. It makes no claim about existence or
 // popularity — syntax only, so it never false-positives a real site.
+//
+// Two shapes need care (CENSOR-SURV review, §1):
+//   - U-label IDN (bücher.example.de) is a legitimate dest a provider
+//     may well hand out: the name is converted to its A-label
+//     (punycode) form via IDNA and validated in that form, so a valid
+//     IDN passes — it must never be a hard block. (The punycode form
+//     itself is plain LDH and passes unchanged.) A name IDNA rejects
+//     (underscore, space, wildcard, a label starting with a hyphen)
+//     is not a DNS name at all.
+//   - A dotted all-numeric name (123.456.78) is a quasi-IP, not a DNS
+//     name: a top label of digits only is not a legal TLD (RFC 1123
+//     relaxes the first label, never the last), and an observer reads
+//     the shape as a broken IP literal. It is malformed here, so both
+//     the warning and ValidateReality name it as such instead of
+//     staying silent.
 func validDNSName(s string) bool {
 	s = strings.TrimSuffix(s, ".")
-	if s == "" || len(s) > 253 {
+	if s == "" {
 		return false
 	}
-	for _, label := range strings.Split(s, ".") {
+	ascii, err := idna.Lookup.ToASCII(s)
+	if err != nil {
+		return false
+	}
+	if ascii == "" || len(ascii) > 253 {
+		return false
+	}
+	labels := strings.Split(ascii, ".")
+	for _, label := range labels {
 		if label == "" || len(label) > 63 {
 			return false
 		}
@@ -186,14 +232,74 @@ func validDNSName(s string) bool {
 			return false
 		}
 	}
+	// Quasi-IP: the last label is all digits (see above).
+	if isAllDigits(labels[len(labels)-1]) {
+		return false
+	}
 	return true
 }
 
+// isAllDigits reports whether s is non-empty and all ASCII digits.
+func isAllDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		if s[i] < '0' || s[i] > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+// destASCIIName converts a dest name to its canonical ASCII form
+// (IDNA A-labels, lower case, no trailing dot) for comparisons that
+// must agree across spellings: "Bücher.example.de" and
+// "xn--bcher-kva.example.de" are the same site. It returns "" when
+// the name cannot be converted at all.
+func destASCIIName(s string) string {
+	ascii, err := idna.Lookup.ToASCII(strings.TrimSuffix(normalizeDestName(s), "."))
+	if err != nil {
+		return ""
+	}
+	return ascii
+}
+
+// sameSiteName reports whether two names are the same site for
+// SNI↔server correlation: equal after normalization, or sharing one
+// registrable domain (eTLD+1), so parent/subdomain pairs in either
+// direction count. Names that cannot yield a registrable domain
+// (single labels, bare TLDs, unconvertible IDN) fall back to the
+// exact normalized comparison only — no guessed correlation.
+func sameSiteName(a, b string) bool {
+	if normalizeDestName(a) == normalizeDestName(b) {
+		return true
+	}
+	ra, rb := registrableDomain(a), registrableDomain(b)
+	return ra != "" && rb != "" && ra == rb
+}
+
+// registrableDomain returns the eTLD+1 of a name in canonical ASCII
+// form, or "" when the name has none.
+func registrableDomain(s string) string {
+	ascii := destASCIIName(s)
+	if ascii == "" {
+		return ""
+	}
+	d, err := publicsuffix.EffectiveTLDPlusOne(ascii)
+	if err != nil {
+		return ""
+	}
+	return d
+}
+
 // privateDestSuffixes are suffixes that never name a public website:
-// home/LAN conventions and reserved special-use names (RFC 6761/6762).
+// home/LAN conventions and reserved special-use names (RFC 6761/6762,
+// home.arpa is RFC 8375, .onion is RFC 7686).
 var privateDestSuffixes = []string{
 	".local", ".lan", ".home", ".internal", ".intranet", ".corp",
 	".localhost", ".invalid", ".example", ".test",
+	".home.arpa", ".onion", ".localdomain",
 }
 
 // isPublicDestName reports whether a syntactically valid dest name
@@ -202,7 +308,7 @@ var privateDestSuffixes = []string{
 // and LAN names do not.
 func isPublicDestName(s string) bool {
 	n := normalizeDestName(s)
-	if n == "localhost" || !strings.Contains(n, ".") {
+	if n == "localhost" || n == "home.arpa" || !strings.Contains(n, ".") {
 		return false
 	}
 	for _, suf := range privateDestSuffixes {
@@ -253,6 +359,56 @@ func allBytesEqual(b []byte) bool {
 	return len(b) > 0
 }
 
+// lowEntropyShortID reports whether a decoded shortId is a published
+// placeholder shape rather than a random secret. The name of the
+// warning promises "low entropy", so the check covers the shapes
+// stock configs actually ship (CENSOR-SURV review, §1 — the earlier
+// version caught only the all-same-byte shape):
+//   - every byte the same (000000…, aaaaaa…);
+//   - a short period repeated over the bytes or over the hex text
+//     (abcdabcd…, deadbeefdeadbeef… — any tiling of a shorter block);
+//   - a known placeholder word in the hex (deadbeef, cafebabe),
+//     even once: a single deadbeef is a textbook default, not entropy.
+//
+// A genuinely random id matching any of these is vanishingly
+// unlikely — and if one did, it really would be low-entropy.
+func lowEntropyShortID(raw []byte, hexStr string) bool {
+	if allBytesEqual(raw) {
+		return true
+	}
+	if hasPeriod(raw) {
+		return true
+	}
+	h := strings.ToLower(hexStr)
+	if hasPeriod([]byte(h)) {
+		return true
+	}
+	for _, word := range []string{"deadbeef", "cafebabe", "feedface"} {
+		if strings.Contains(h, word) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasPeriod reports whether b is a repetition of a shorter block:
+// b[i] == b[i%p] for some period p < len(b).
+func hasPeriod(b []byte) bool {
+	for p := 1; p*2 <= len(b); p++ {
+		ok := true
+		for i := p; i < len(b); i++ {
+			if b[i] != b[i%p] {
+				ok = false
+				break
+			}
+		}
+		if ok {
+			return true
+		}
+	}
+	return false
+}
+
 // ValidateReality rejects REALITY configurations that cannot work or that
 // are malformed in ways the engines would silently misapply. A nil error
 // means the cryptographic parameters are well-formed; it says nothing
@@ -293,7 +449,17 @@ func (o Outbound) ValidateReality() error {
 	// at connect time in front of the censor. An IP-literal SNI stays
 	// a warning (reality-dest-ip): some engines accept it, and the
 	// operator may be mid-migration.
-	if sni := o.TLS.ServerName; sni != "" {
+	//
+	// The value checked is the EFFECTIVE SNI (realityDest): with an
+	// empty ServerName every engine falls back to the server address,
+	// so a malformed Server is exactly what would go on the wire —
+	// checking ServerName alone let Server="my_site.example.com" with
+	// an empty SNI pass while the warnings (which use realityDest)
+	// already named it malformed (CENSOR-SURV review, Medium 1). A
+	// valid U-label IDN passes (validDNSName converts via IDNA): a
+	// legitimate provider dest must not be hard-blocked for its
+	// spelling.
+	if sni := o.realityDest(); sni != "" {
 		if _, err := netip.ParseAddr(sni); err != nil && !validDNSName(sni) {
 			return fmt.Errorf("outbound %s: REALITY dest/SNI %q is not a valid DNS name", o.ID, sni)
 		}
