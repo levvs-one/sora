@@ -1121,6 +1121,14 @@ func subscriptionInfoToWire(info subscription.Info) *corev1.SubscriptionInfo {
 // ProbeServers streams results using the stream context. Endpoints use TCP;
 // outbounds use a compatible engine with optional TCP fallback. Each result
 // identifies its method.
+//
+// Large probes are chunked: the request is processed in ProbeChunkSize
+// pieces and each chunk's results stream as they complete, so probing
+// thousands of servers degrades into a longer stream instead of dying on a
+// per-request limit. A failing chunk does not abort the others: the first
+// chunk error is remembered, the remaining chunks still run, and the RPC
+// then returns that error (mapped through transportStatus, as before) —
+// partial results, no silent loss.
 func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.ServerStreamingServer[corev1.ProbeResult]) error {
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return transportStatus(err)
