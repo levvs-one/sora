@@ -24,7 +24,17 @@ func applySubscriptionOverride(specs []*corev1.OutboundSpec, o *subscription.Ove
 	if o == nil {
 		return specs
 	}
-	hidden := map[string]bool{}
+	// An override with nothing in it (the common case: most subscriptions
+	// carry no user edits, and a missing override file loads as an empty
+	// override) changes nothing, so the shared list goes back as is
+	// instead of paying a per-state copy of every spec pointer plus an
+	// empty hidden map: stateLocked builds a state on every refresh,
+	// save and watch broadcast. Callers treat the result as read-only —
+	// withCustomOutbounds copies again before appending custom servers.
+	if len(o.Hidden) == 0 && len(o.Renames) == 0 && len(o.PinnedOrder) == 0 {
+		return specs
+	}
+	hidden := make(map[string]bool, len(o.Hidden))
 	for _, id := range o.Hidden {
 		hidden[id] = true
 	}
