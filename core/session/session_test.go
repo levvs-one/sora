@@ -734,3 +734,33 @@ func TestSessionLogsTheTeardownStopFailure(t *testing.T) {
 		t.Error("the journal has no entry for the failed teardown Stop")
 	}
 }
+
+// TestFakeIPRange6BlockedOnlyWhenRendered locks the guard condition for
+// the IPv6 fake pool: the block must exist exactly when the plan renders
+// fake AAAA answers (IPv6 on, fakeip mode), because fc00::/18 sits inside
+// the default fc00::/7 bypass and would otherwise drop real ULA traffic.
+func TestFakeIPRange6BlockedOnlyWhenRendered(t *testing.T) {
+	plan := testPlan("v6")
+	plan.Options.IPv6 = true
+	plan.DNS.Mode = string(engine.DNSFakeIP)
+	s := &Session{cfg: Config{Plan: plan}}
+	if got := s.settingsLocked().FakeIPRange6; got.String() != engine.DefaultFakeIPRange6 {
+		t.Fatalf("FakeIPRange6 = %v, want %s", got, engine.DefaultFakeIPRange6)
+	}
+	// A pinned pool is honored verbatim.
+	plan.DNS.FakeIPRange6 = "fc00:1::/32"
+	if got := s.settingsLocked().FakeIPRange6; got.String() != "fc00:1::/32" {
+		t.Fatalf("FakeIPRange6 = %v, want the pinned fc00:1::/32", got)
+	}
+	// IPv6 off: no render, no block.
+	plan.Options.IPv6 = false
+	if got := s.settingsLocked().FakeIPRange6; got.IsValid() {
+		t.Fatalf("FakeIPRange6 = %v, must be unset when IPv6 is off", got)
+	}
+	// Rule mode: no fake AAAA answers either.
+	plan.Options.IPv6 = true
+	plan.DNS.Mode = "rule"
+	if got := s.settingsLocked().FakeIPRange6; got.IsValid() {
+		t.Fatalf("FakeIPRange6 = %v, must be unset outside fakeip mode", got)
+	}
+}

@@ -320,17 +320,19 @@ func TestIngressFirewallForwardsSessionNetworks(t *testing.T) {
 	}
 	tun := netip.MustParsePrefix("192.0.2.1/30")
 	fake := netip.MustParsePrefix("198.18.0.0/15")
+	fake6 := netip.MustParsePrefix("fc00::/18")
 	if err := g.Apply(context.Background(), session.Settings{
-		TunNetworks: []netip.Prefix{tun},
-		FakeIPRange: fake,
-		KillSwitch:  true,
+		TunNetworks:  []netip.Prefix{tun},
+		FakeIPRange:  fake,
+		FakeIPRange6: fake6,
+		KillSwitch:   true,
 	}); err != nil {
 		t.Fatalf("Apply() error = %v", err)
 	}
 	if !slices.Equal(inner.tunNetworks, []netip.Prefix{tun}) {
 		t.Errorf("SetTunNetworks = %v, want [%v]", inner.tunNetworks, tun)
 	}
-	want := []netip.Prefix{tun, fake}
+	want := []netip.Prefix{tun, fake, fake6.Masked()}
 	if !slices.Equal(inner.blockedNetworks, want) {
 		t.Errorf("SetBlockedNetworks = %v, want %v", inner.blockedNetworks, want)
 	}

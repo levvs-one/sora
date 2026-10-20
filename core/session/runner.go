@@ -719,12 +719,29 @@ func (s *Session) settings() Settings {
 func (s *Session) settingsLocked() Settings {
 	fake, _ := netip.ParsePrefix(s.cfg.Plan.DNS.FakeIPRange)
 	return Settings{
-		FakeIPRange: fake,
-		TunNetworks: s.cfg.Plan.Tun.Networks(),
-		KillSwitch:  s.status.KillSwitch,
-		Bypass:      append([]string(nil), s.status.Bypass...),
-		TunnelMode:  s.status.TunnelMode,
+		FakeIPRange:  fake,
+		FakeIPRange6: fakeIPRange6(s.cfg.Plan),
+		TunNetworks:  s.cfg.Plan.Tun.Networks(),
+		KillSwitch:   s.status.KillSwitch,
+		Bypass:       append([]string(nil), s.status.Bypass...),
+		TunnelMode:   s.status.TunnelMode,
 	}
+}
+
+// fakeIPRange6 returns the effective IPv6 fake-address pool when the plan
+// actually renders one: sing-box answers AAAA with fake addresses only
+// with IPv6 on in fakeip mode. Blocking the pool at any other time would
+// drop real ULA traffic that the fc00::/7 bypass keeps reachable.
+func fakeIPRange6(p *engine.Plan) netip.Prefix {
+	if p == nil || !p.Options.IPv6 || p.DNS.Mode != string(engine.DNSFakeIP) {
+		return netip.Prefix{}
+	}
+	range6 := p.DNS.FakeIPRange6
+	if range6 == "" {
+		range6 = engine.DefaultFakeIPRange6
+	}
+	fake6, _ := netip.ParsePrefix(range6)
+	return fake6
 }
 
 // Select pins a group member and journals the change for reconnecting clients.

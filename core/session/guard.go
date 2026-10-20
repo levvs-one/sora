@@ -13,7 +13,14 @@ import (
 // them and restores prior state on every exit path.
 type Settings struct {
 	TunNetworks []netip.Prefix
+	// FakeIPRange is the fake-address pool the engines answer with; the
+	// guard blocks it outside the tunnel.
 	FakeIPRange netip.Prefix
+	// FakeIPRange6 is the IPv6 fake-address pool, set only when the plan
+	// actually renders it. fc00::/18 sits inside the default fc00::/7
+	// bypass, so the block must exist exactly when fake IPv6 answers do —
+	// at any other time it would drop real ULA traffic.
+	FakeIPRange6 netip.Prefix
 	// KillSwitch blocks non-session traffic and stays armed while the
 	// engine is down.
 	KillSwitch bool

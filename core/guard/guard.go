@@ -118,6 +118,12 @@ func (g *Guard) Apply(ctx context.Context, settings session.Settings) error {
 		if settings.FakeIPRange.IsValid() {
 			networks = append(networks, settings.FakeIPRange.Masked())
 		}
+		// The IPv6 fake pool (fc00::/18 by default) sits inside the
+		// default fc00::/7 bypass: without the block, fake IPv6 answers
+		// would leave the tunnel through the LAN permit.
+		if settings.FakeIPRange6.IsValid() {
+			networks = append(networks, settings.FakeIPRange6.Masked())
+		}
 		f.SetBlockedNetworks(networks)
 	}
 	if err := g.applyKillSwitch(ctx, settings.KillSwitch); err != nil {

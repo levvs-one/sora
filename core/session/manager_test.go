@@ -254,4 +254,3 @@ func TestManagerKillSwitchBlockedAsksTheGuard(t *testing.T) {
 		t.Fatalf("KillSwitchBlocked() = %v, %v, want true while the table is in force", blocked, err)
 	}
 }
-

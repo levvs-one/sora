@@ -196,3 +196,31 @@ func TestGuardReceivesSelectedTunNetworksBeforeArming(t *testing.T) {
 		t.Fatalf("firewall=%+v", firewall)
 	}
 }
+
+// TestGuardApplyBlocksFakeIPRange6 locks the v6 half of the fake-IP
+// coverage: fc00::/18 sits inside the default fc00::/7 bypass, so without
+// the block, fake IPv6 answers would leave the tunnel through the LAN
+// permit. An unset range stays out of the blocked list.
+func TestGuardApplyBlocksFakeIPRange6(t *testing.T) {
+	firewall := &memoryFirewall{}
+	system, err := guard.New(testOptions(), firewall)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v6 := netip.MustParsePrefix("fc00::/18")
+	if err := system.Apply(testContext(), session.Settings{FakeIPRange6: v6}); err != nil {
+		t.Fatal(err)
+	}
+	if !slices.Contains(firewall.blocked, v6.Masked()) {
+		t.Errorf("the v6 fake range is not blocked: %v", firewall.blocked)
+	}
+	// Unset: nothing v6 appended.
+	if err := system.Apply(testContext(), session.Settings{}); err != nil {
+		t.Fatal(err)
+	}
+	for _, network := range firewall.blocked {
+		if network.Addr().Is6() {
+			t.Errorf("a v6 block without a configured range: %v", firewall.blocked)
+		}
+	}
+}
