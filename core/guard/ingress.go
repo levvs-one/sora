@@ -267,19 +267,36 @@ func (f *IngressFirewall) SetBlockedNetworks(networks []netip.Prefix) {
 	}
 }
 
-// CleanupStale removes a kill-switch table a crashed core left behind,
-// forwarded to the inner firewall. The startup path asserts this
+// CleanupStale removes the tables a crashed core left behind: the
+// kill-switch table (forwarded to the inner firewall) AND this
+// decorator's own ingress table. The startup path asserts this
 // capability on the wrapped firewall, so the wrap must not swallow it
-// (SORA-M4).
+// (SORA-M4) — and until CENSOR-LEAK it forwarded only the inner half:
+// a crashed core's sora_ingress table, whose chain ends in a drop,
+// stayed installed after a restart with no session owning it, a
+// blocking remnant the startup cleanup claimed to have removed. The
+// ingress half is probed against the platform (backend.armed), not
+// process memory, so a table this process never armed is still
+// removed; a backend that cannot be built on this platform never
+// installed one and its error is not allowed to mask the inner
+// cleanup's result.
 func (f *IngressFirewall) CleanupStale(ctx context.Context) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	var err error
 	if c, ok := f.inner.(interface {
 		CleanupStale(context.Context) error
 	}); ok {
-		return c.CleanupStale(ctx)
+		err = c.CleanupStale(ctx)
 	}
-	return nil
+	if f.cfg.Enabled && f.ensureBackend() == nil && f.backend != nil {
+		if armed, aerr := f.backend.armed(ctx); aerr != nil {
+			err = errors.Join(err, aerr)
+		} else if armed {
+			err = errors.Join(err, f.backend.disarm(ctx))
+		}
+	}
+	return err
 }
 
 // Name identifies the decorator in a diagnostics line.

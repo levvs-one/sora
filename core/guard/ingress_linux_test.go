@@ -384,3 +384,81 @@ func TestGuardArmsIngressThroughTheProductionPath(t *testing.T) {
 		t.Errorf("Armed() = %v, %v after Restore", armed, err)
 	}
 }
+
+// TestIngressCleanupStaleRemovesBothTables pins the CENSOR-LEAK
+// transition fix: the startup cleanup (main.go asserts CleanupStale
+// on the wrapped firewall) must remove a crashed core's ingress table
+// as well as the kill-switch table. Before, CleanupStale forwarded
+// only to the inner firewall, so sora_ingress — a chain ending in a
+// drop — survived every restart as a blocking remnant with no owner.
+func TestIngressCleanupStaleRemovesBothTables(t *testing.T) {
+	dir := t.TempDir()
+	script := `#!/bin/sh
+if [ "$1" = "list" ]; then
+	if [ -f "$SORA_FAKE_DIR/$4.state" ]; then exit 0; else exit 1; fi
+fi
+input=$(cat)
+table=""
+deleting=0
+case "$input" in
+"delete table inet sora_ingress")
+	table=sora_ingress
+	deleting=1
+	;;
+"delete table inet sora")
+	table=sora
+	deleting=1
+	;;
+*"table inet sora_ingress {"*)
+	table=sora_ingress
+	;;
+*"table inet sora {"*)
+	table=sora
+	;;
+esac
+[ -z "$table" ] && exit 0
+state="$SORA_FAKE_DIR/$table.state"
+if [ "$deleting" = 1 ]; then
+	if [ -f "$state" ]; then
+		rm -f "$state"
+		exit 0
+	fi
+	echo "Error: Could not process rule: No such file or directory" >&2
+	exit 1
+fi
+echo "$input" > "$state"
+exit 0
+`
+	nft := dir + "/nft"
+	if err := os.WriteFile(nft, []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("SORA_FAKE_DIR", dir)
+	guard.NftBinForTest = nft
+	t.Cleanup(func() { guard.NftBinForTest = "" })
+
+	// Plant the two tables a crashed core would have left behind.
+	for _, table := range []string{"sora", "sora_ingress"} {
+		if err := os.WriteFile(dir+"/"+table+".state", []byte("stale"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	inner, err := guard.NewNftables(1000, nil)
+	if err != nil {
+		t.Fatalf("NewNftables() error = %v", err)
+	}
+	decorated := guard.WithIngress(inner, guard.DefaultIngressConfig())
+	ctx := testContext()
+	if err := decorated.CleanupStale(ctx); err != nil {
+		t.Fatalf("CleanupStale() error = %v", err)
+	}
+	for _, table := range []string{"sora", "sora_ingress"} {
+		if _, err := os.Stat(dir + "/" + table + ".state"); !os.IsNotExist(err) {
+			t.Errorf("stale table %s survived CleanupStale", table)
+		}
+	}
+	// Cleanup with nothing stale must succeed (idempotent startup).
+	if err := decorated.CleanupStale(ctx); err != nil {
+		t.Fatalf("second CleanupStale() error = %v", err)
+	}
+}
