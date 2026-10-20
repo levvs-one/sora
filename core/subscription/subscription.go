@@ -40,6 +40,12 @@ type FetchOptions struct {
 	// UserAgent overrides the default because panels may choose
 	// client-specific subscription formats.
 	UserAgent string
+	// FallbackURL is a reserve subscription reference, tried only when
+	// the primary reference fails. Callers that store the fallback
+	// beside the primary (the subscription book) pass it here; a
+	// fallback-url fragment on the reference itself is honoured too
+	// and is used when this field is empty.
+	FallbackURL string
 }
 
 // Result is one retrieved subscription.
@@ -47,6 +53,11 @@ type Result struct {
 	Body []byte
 	// Info contains provider response headers and leading body metadata.
 	Info Info
+	// UsedFallback reports that the primary reference failed and this
+	// body came from the fallback reference. It is set only on a
+	// fallback success, so callers can log and show the switch instead
+	// of silently presenting the reserve as the primary.
+	UsedFallback bool
 }
 
 // Options configures a fetcher.
@@ -113,15 +124,57 @@ func New(opts Options) *Fetcher {
 // Fetch validates HTTPS and redirect limits on every hop and bounds the body.
 // Failures stop retrieval without including the bearer reference in error
 // details.
+//
+// When the reference declares a fallback (a fallback-url fragment, or
+// FetchOptions.FallbackURL) and the primary attempt fails, the fallback
+// is tried once under the exact same validation, redirect, and dial
+// rules, with its own timeout budget. A fallback success is marked with
+// Result.UsedFallback. When both attempts fail, the primary error is
+// returned: it names the failure the user must act on, and the fallback
+// outcome never masks it. Caller cancellation suppresses the fallback
+// attempt entirely.
 func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions) (Result, error) {
 	agent, err := UserAgentFor(opts.UserAgent)
 	if err != nil {
 		return Result{}, err
 	}
+	primary, fragmentFallback, err := SplitFallback(reference)
+	if err != nil {
+		return Result{}, err
+	}
+	fallback := strings.TrimSpace(opts.FallbackURL)
+	if fallback == "" {
+		fallback = fragmentFallback
+	}
+	if fallback != "" {
+		if _, err := ValidateReference(fallback); err != nil {
+			return Result{}, err
+		}
+	}
+	result, err := f.fetch(ctx, primary, agent)
+	if err == nil {
+		return result, nil
+	}
+	if fallback == "" || ctx.Err() != nil {
+		return Result{}, err
+	}
+	reserve, reserveErr := f.fetch(ctx, fallback, agent)
+	if reserveErr != nil {
+		return Result{}, err
+	}
+	reserve.UsedFallback = true
+	return reserve, nil
+}
+
+// fetch retrieves one reference, following validated redirects. The
+// fragment is cleared before the first request: fragments are client
+// side only and must never reach a provider.
+func (f *Fetcher) fetch(ctx context.Context, reference string, agent string) (Result, error) {
 	target, err := ValidateReference(reference)
 	if err != nil {
 		return Result{}, err
 	}
+	target.Fragment, target.RawFragment = "", ""
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 	ctx = context.WithValue(ctx, privateKey{}, isPrivateHost(target.Hostname()))
@@ -149,6 +202,7 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 		if err != nil {
 			return Result{}, err
 		}
+		target.Fragment, target.RawFragment = "", ""
 	}
 }
 

@@ -76,9 +76,16 @@ type storedError struct {
 }
 
 type subscriptionRecord struct {
-	Version     int               `json:"v"`
-	ID          string            `json:"id"`
-	URL         string            `json:"url"`
+	Version int    `json:"v"`
+	ID      string `json:"id"`
+	URL     string `json:"url"`
+	// FallbackURL is the reserve subscription link from the link's
+	// fallback-url fragment (C4), stored beside the primary URL. It
+	// never travels inside URL: URL stays fragment-free, so nothing
+	// extra is ever sent to the primary provider. Records written
+	// before fallback support simply have no field (additive JSON,
+	// recordVersion unchanged) and older cores ignore it on read.
+	FallbackURL string            `json:"fallback,omitempty"`
 	Name        string            `json:"name,omitempty"`
 	UserAgent   string            `json:"ua,omitempty"`
 	AutoUpdate  bool              `json:"auto"`
@@ -242,6 +249,38 @@ func normalizedLink(raw string) (string, error) {
 	return u.String(), nil
 }
 
+// subscriptionLinkParts normalizes a user-supplied subscription link
+// and splits off its fallback-url fragment. Both parts go through the
+// same validation and normalization, so a fallback that the fetcher
+// would refuse (plain HTTP, embedded credentials) is refused at save
+// time instead of being stored and failing on every refresh. The
+// primary comes back fragment-free: the fragment is client-side only
+// and must never be sent to the provider.
+func subscriptionLinkParts(raw string) (primary, fallback string, err error) {
+	primaryRaw, fallbackRaw, err := subscription.SplitFallback(raw)
+	if err != nil {
+		return "", "", err
+	}
+	if primary, err = normalizedLink(primaryRaw); err != nil {
+		return "", "", err
+	}
+	if fallbackRaw != "" {
+		if fallback, err = normalizedLink(fallbackRaw); err != nil {
+			return "", "", err
+		}
+	}
+	return primary, fallback, nil
+}
+
+// storedLink renders the record's link the way the user pasted it:
+// primary plus the fallback in its fragment, so GetSubscriptionLink
+// round-trips the fallback instead of silently dropping it. States
+// never carry the link at all (see GetSubscriptionLink); this helper
+// serves only that one authenticated read.
+func (rec *subscriptionRecord) storedLink() string {
+	return subscription.JoinFallback(rec.URL, rec.FallbackURL)
+}
+
 func checkInterval(d *durationpb.Duration) (time.Duration, error) {
 	if d == nil {
 		return 0, nil
@@ -269,9 +308,9 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 	if err != nil {
 		return nil, err
 	}
-	link := ""
+	link, fallbackLink := "", ""
 	if strings.TrimSpace(in.GetUrl()) != "" {
-		if link, err = normalizedLink(in.GetUrl()); err != nil {
+		if link, fallbackLink, err = subscriptionLinkParts(in.GetUrl()); err != nil {
 			return nil, err
 		}
 	}
@@ -301,7 +340,7 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 		if err != nil {
 			return nil, err
 		}
-		rec = subscriptionRecord{Version: recordVersion, ID: id, URL: link, Created: b.now().UTC()}
+		rec = subscriptionRecord{Version: recordVersion, ID: id, URL: link, FallbackURL: fallbackLink, Created: b.now().UTC()}
 		fetchNow = true
 	} else {
 		existing, ok := b.records[in.GetId()]
@@ -309,9 +348,18 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 			return nil, errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: no subscription %s", in.GetId())
 		}
 		rec = *existing
-		if link != "" && link != rec.URL {
-			rec.URL, rec.Failures, rec.LastError = link, 0, nil
-			fetchNow = true
+		if link != "" {
+			// An explicitly supplied link replaces the stored one as a
+			// whole, fallback fragment included; saves that pass no
+			// link (renames, settings edits) leave both untouched.
+			if link != rec.URL {
+				rec.URL, rec.Failures, rec.LastError = link, 0, nil
+				fetchNow = true
+			}
+			if fallbackLink != rec.FallbackURL {
+				rec.FallbackURL = fallbackLink
+				fetchNow = true
+			}
 		}
 	}
 	rec.Name = strings.TrimSpace(in.GetName())
@@ -392,13 +440,13 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 		return nil, errs.Newf(errs.CodeUnsupported, errs.KeySubscriptionFetch, "control: this core cannot fetch subscriptions")
 	}
 	b.updating[id] = true
-	link, agent := rec.URL, rec.UserAgent
+	link, agent, fallback := rec.URL, rec.UserAgent, rec.FallbackURL
 	b.notifyLocked(b.stateLocked(id), logs.LevelInfo, "Subscription update started")
 	b.mu.Unlock()
 
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
 	defer cancel()
-	fetched, err := b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
+	fetched, err := b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent, FallbackURL: fallback})
 	answered := err == nil
 	var servers []importedServer
 	if err == nil {
@@ -413,7 +461,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	// provider.
 	delete(b.expedited, id)
 	current, ok := b.records[id]
-	if !ok || current.URL != link {
+	if !ok || current.URL != link || current.FallbackURL != fallback {
 		// Discard results if the subscription was deleted or its link
 		// changed during the fetch.
 		return nil, errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: subscription %s changed during the update", id)
@@ -441,6 +489,10 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	state := b.stateLocked(id)
 	if err != nil {
 		b.notifyLocked(state, logs.LevelError, "Subscription update failed: "+string(errs.KeyOf(err)))
+	} else if fetched.UsedFallback {
+		// A fallback success is never masked as a primary one: the log
+		// says the reserve answered, so a dying primary stays visible.
+		b.notifyLocked(state, logs.LevelWarning, fmt.Sprintf("Subscription updated via fallback: %d servers", len(state.GetOutbounds())))
 	} else {
 		b.notifyLocked(state, logs.LevelInfo, fmt.Sprintf("Subscription updated: %d servers", len(state.GetOutbounds())))
 	}
@@ -757,7 +809,7 @@ func (s *Server) GetSubscriptionLink(_ context.Context, req *corev1.GetSubscript
 		err := errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: subscription not found")
 		return &corev1.GetSubscriptionLinkResponse{Error: toWire(err, nil, "")}, nil
 	}
-	return &corev1.GetSubscriptionLinkResponse{Url: rec.URL}, nil
+	return &corev1.GetSubscriptionLinkResponse{Url: rec.storedLink()}, nil
 }
 
 // DeleteSubscription removes a subscription with its servers and credentials.
