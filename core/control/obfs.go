@@ -182,12 +182,15 @@ func normalizeObfsProfile(p *obfsv1.ObfuscationProfile) (*obfsv1.ObfuscationProf
 	if p.GetPreset() == obfsv1.ObfsPreset_OBFS_PRESET_OFF {
 		if p.GetUtlsProfile() != obfsv1.UtlsProfile_UTLS_PROFILE_UNSPECIFIED ||
 			len(p.GetFragSizes()) > 0 || p.GetFragDelayMs() > 0 ||
-			p.GetJitterMs() > 0 || p.GetFakeSni() != "" {
+			p.GetJitterMs() > 0 || p.GetFakeSni() != "" || p.GetMuxDisabled() {
 			return nil, invalidObfs("preset OFF contradicts the other fields; send OFF alone to disable")
 		}
 		return &obfsv1.ObfuscationProfile{Preset: obfsv1.ObfsPreset_OBFS_PRESET_OFF}, nil
 	}
 	out := obfsPresetDefaults(p.GetPreset())
+	// No preset sets mux_disabled: it is an explicit-only opt-out of the
+	// REALITY mux default, carried through verbatim.
+	out.MuxDisabled = p.GetMuxDisabled()
 	if u := p.GetUtlsProfile(); u != obfsv1.UtlsProfile_UTLS_PROFILE_UNSPECIFIED {
 		out.UtlsProfile = u
 	}
@@ -228,7 +231,7 @@ func normalizeObfsProfile(p *obfsv1.ObfuscationProfile) (*obfsv1.ObfuscationProf
 	}
 	if out.GetPreset() == obfsv1.ObfsPreset_OBFS_PRESET_UNSPECIFIED &&
 		out.GetUtlsProfile() == obfsv1.UtlsProfile_UTLS_PROFILE_UNSPECIFIED &&
-		len(out.GetFragSizes()) == 0 && out.GetFakeSni() == "" {
+		len(out.GetFragSizes()) == 0 && out.GetFakeSni() == "" && !out.GetMuxDisabled() {
 		return nil, invalidObfs("the profile is empty: pick a preset or set a field")
 	}
 	return out, nil
@@ -239,7 +242,7 @@ func normalizeObfsProfile(p *obfsv1.ObfuscationProfile) (*obfsv1.ObfuscationProf
 func obfsEnabled(p *obfsv1.ObfuscationProfile) bool {
 	return p != nil && p.GetPreset() != obfsv1.ObfsPreset_OBFS_PRESET_OFF &&
 		(p.GetUtlsProfile() != obfsv1.UtlsProfile_UTLS_PROFILE_UNSPECIFIED ||
-			len(p.GetFragSizes()) > 0 || p.GetFakeSni() != "")
+			len(p.GetFragSizes()) > 0 || p.GetFakeSni() != "" || p.GetMuxDisabled())
 }
 
 // obfsFeatureUse summarizes which features the profile enables, for the
@@ -341,14 +344,20 @@ func obfsEnginePreferenceWarning(engines []engine.Kind, p *obfsv1.ObfuscationPro
 // MergeObfsProfile maps the active obfuscation profile onto the engine
 // plan. It is the single place the suite touches plan fields: uTLS goes to
 // each TLS outbound's fingerprint (an explicit profile overrides the
-// subscription's), fragmentation to the plan options, and the decoy SNI to
+// subscription's), fragmentation to the plan options, the decoy SNI to
 // each TLS outbound's server name except REALITY ones, where a wrong SNI
-// would break the handshake by design. Nil or disabled profiles are a
-// no-op. The parallel core/obfs package consumes engine.Plan, so this is
-// the seam between the control plane and the suite's engine rendering.
+// would break the handshake by design, and mux_disabled to the plan's mux
+// options — every renderer's REALITY mux goes through engine.RealityMux
+// on plan.Options.Mux, so this one stamp honestly disables mux on all
+// engines. Nil or disabled profiles are a no-op. The parallel core/obfs
+// package consumes engine.Plan, so this is the seam between the control
+// plane and the suite's engine rendering.
 func MergeObfsProfile(plan *engine.Plan, p *obfsv1.ObfuscationProfile) {
 	if plan == nil || !obfsEnabled(p) {
 		return
+	}
+	if p.GetMuxDisabled() {
+		plan.Options.Mux.Disabled = true
 	}
 	if sizes := p.GetFragSizes(); len(sizes) > 0 {
 		min, max := sizes[0], sizes[0]

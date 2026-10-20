@@ -223,6 +223,64 @@ func TestMergeObfsProfileIntoPlan(t *testing.T) {
 	}
 }
 
+func TestMergeObfsProfileMuxDisabled(t *testing.T) {
+	reality := engine.Outbound{ID: "reality", TLS: engine.TLS{Enabled: true, Reality: true}}
+
+	// mux_disabled alone is a valid, enabled profile: the merge stamps the
+	// plan mux option, and the shared RealityMux predicate — the single
+	// gate every renderer consults — then builds no mux anywhere.
+	plan := &engine.Plan{Outbounds: []engine.Outbound{reality}}
+	control.MergeObfsProfile(plan, &obfsv1.ObfuscationProfile{MuxDisabled: true})
+	if !plan.Options.Mux.Disabled {
+		t.Fatal("mux_disabled did not reach plan.Options.Mux")
+	}
+	if engine.RealityMux(plan.Outbounds[0], plan.Options.Mux) {
+		t.Error("REALITY outbound still muxes with mux_disabled set")
+	}
+
+	// Without the flag the previous policy stands untouched: REALITY
+	// muxes by default, and a vision flow suppresses mux on its own.
+	plan2 := &engine.Plan{Outbounds: []engine.Outbound{reality}}
+	control.MergeObfsProfile(plan2, &obfsv1.ObfuscationProfile{Preset: obfsv1.ObfsPreset_OBFS_PRESET_LIGHT})
+	if plan2.Options.Mux.Disabled {
+		t.Error("profile without mux_disabled disabled the plan mux")
+	}
+	if !engine.RealityMux(plan2.Outbounds[0], plan2.Options.Mux) {
+		t.Error("REALITY outbound lost its default mux")
+	}
+	vision := reality
+	vision.Flow = "xtls-rprx-vision"
+	if engine.RealityMux(vision, plan2.Options.Mux) {
+		t.Error("vision flow must keep suppressing mux without the flag")
+	}
+}
+
+func TestApplyObfsProfileMuxDisabledOnly(t *testing.T) {
+	server, _ := newTestServer(t)
+	ctx := context.Background()
+	res, err := server.ApplyObfsProfile(ctx, applyReq(&obfsv1.ObfuscationProfile{MuxDisabled: true}))
+	if err != nil {
+		t.Fatalf("ApplyObfsProfile() error = %v", err)
+	}
+	if res.GetError() != nil {
+		t.Fatalf("mux-only profile rejected: %v", res.GetError())
+	}
+	if !res.GetApplied().GetMuxDisabled() {
+		t.Error("applied profile lost mux_disabled")
+	}
+	// OFF must still arrive alone: OFF + mux_disabled is a contradiction.
+	res, err = server.ApplyObfsProfile(ctx, applyReq(&obfsv1.ObfuscationProfile{
+		Preset:      obfsv1.ObfsPreset_OBFS_PRESET_OFF,
+		MuxDisabled: true,
+	}))
+	if err != nil {
+		t.Fatalf("ApplyObfsProfile() transport error = %v", err)
+	}
+	if res.GetError() == nil {
+		t.Error("OFF with mux_disabled = no error, want rejection")
+	}
+}
+
 func TestMergeObfsProfileNoop(t *testing.T) {
 	plan := &engine.Plan{}
 	control.MergeObfsProfile(nil, &obfsv1.ObfuscationProfile{Preset: obfsv1.ObfsPreset_OBFS_PRESET_LIGHT})

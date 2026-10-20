@@ -100,6 +100,13 @@ message ObfuscationProfile {
   // will fail the handshake. The core never applies it to REALITY
   // outbounds. Empty keeps the real name.
   string fake_sni = 6;
+  // Disables the REALITY multiplexing default (see core/engine/mux.go):
+  // mux carries many streams over one TLS connection, so a REALITY
+  // server sees a single handshake. Set this when a server is known to
+  // mishandle mux. Vision flows never mux either way, and non-REALITY
+  // outbounds are unaffected. False keeps the default policy. Since
+  // 1.13; older cores ignore the unknown field and keep the default.
+  bool mux_disabled = 7;
 }
 
 message ApplyObfsProfileRequest {

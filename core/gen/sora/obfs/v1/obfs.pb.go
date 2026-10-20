@@ -194,7 +194,14 @@ type ObfuscationProfile struct {
 	// Dangerous: servers that validate SNI (fallbacks, REALITY targets)
 	// will fail the handshake. The core never applies it to REALITY
 	// outbounds. Empty keeps the real name.
-	FakeSni       string `protobuf:"bytes,6,opt,name=fake_sni,json=fakeSni,proto3" json:"fake_sni,omitempty"`
+	FakeSni string `protobuf:"bytes,6,opt,name=fake_sni,json=fakeSni,proto3" json:"fake_sni,omitempty"`
+	// Disables the REALITY multiplexing default (see core/engine/mux.go):
+	// mux carries many streams over one TLS connection, so a REALITY
+	// server sees a single handshake. Set this when a server is known to
+	// mishandle mux. Vision flows never mux either way, and non-REALITY
+	// outbounds are unaffected. False keeps the default policy. Since
+	// 1.13; older cores ignore the unknown field and keep the default.
+	MuxDisabled   bool `protobuf:"varint,7,opt,name=mux_disabled,json=muxDisabled,proto3" json:"mux_disabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -269,6 +276,13 @@ func (x *ObfuscationProfile) GetFakeSni() string {
 		return x.FakeSni
 	}
 	return ""
+}
+
+func (x *ObfuscationProfile) GetMuxDisabled() bool {
+	if x != nil {
+		return x.MuxDisabled
+	}
+	return false
 }
 
 type ApplyObfsProfileRequest struct {
@@ -606,7 +620,7 @@ var File_sora_obfs_v1_obfs_proto protoreflect.FileDescriptor
 
 const file_sora_obfs_v1_obfs_proto_rawDesc = "" +
 	"\n" +
-	"\x17sora/obfs/v1/obfs.proto\x12\fsora.obfs.v1\x1a\x1fsora/core/v1/core_control.proto\"\xff\x01\n" +
+	"\x17sora/obfs/v1/obfs.proto\x12\fsora.obfs.v1\x1a\x1fsora/core/v1/core_control.proto\"\xa2\x02\n" +
 	"\x12ObfuscationProfile\x120\n" +
 	"\x06preset\x18\x01 \x01(\x0e2\x18.sora.obfs.v1.ObfsPresetR\x06preset\x12<\n" +
 	"\futls_profile\x18\x02 \x01(\x0e2\x19.sora.obfs.v1.UtlsProfileR\vutlsProfile\x12\x1d\n" +
@@ -614,7 +628,8 @@ const file_sora_obfs_v1_obfs_proto_rawDesc = "" +
 	"frag_sizes\x18\x03 \x03(\rR\tfragSizes\x12\"\n" +
 	"\rfrag_delay_ms\x18\x04 \x01(\rR\vfragDelayMs\x12\x1b\n" +
 	"\tjitter_ms\x18\x05 \x01(\rR\bjitterMs\x12\x19\n" +
-	"\bfake_sni\x18\x06 \x01(\tR\afakeSni\"\x90\x01\n" +
+	"\bfake_sni\x18\x06 \x01(\tR\afakeSni\x12!\n" +
+	"\fmux_disabled\x18\a \x01(\bR\vmuxDisabled\"\x90\x01\n" +
 	"\x17ApplyObfsProfileRequest\x129\n" +
 	"\vapi_version\x18\x01 \x01(\v2\x18.sora.core.v1.ApiVersionR\n" +
 	"apiVersion\x12:\n" +
