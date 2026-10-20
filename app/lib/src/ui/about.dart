@@ -262,7 +262,7 @@ class _AboutScreenState extends State<AboutScreen> {
               ),
             // S11b: automatic rollback status. The notice survives the
             // restart the rollback performs (persisted in settings).
-            if (updates.rollbackBusy && updates.rollbackTarget case final target?)
+            if (updates.rollbackTarget case final target? when updates.rollbackBusy)
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(s.updateRollbacking(target), style: Styles.secondary.copyWith(color: palette.ink2)),
