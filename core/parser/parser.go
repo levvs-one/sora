@@ -187,9 +187,15 @@ type OutboundSpec struct {
 	Port                                                                                            uint16
 	UUID, Password, User, Cipher                                                                    string
 	PublicKey, ShortID, SpiderX, ServerName, Fingerprint, Flow, Path, HostHeader, ServiceName, Mode string
-	ALPN                                                                                            []string
-	CountryCode                                                                                     string
-	AllowInsecure                                                                                   bool
+	// MLDSA65Verify carries the REALITY post-quantum verification key
+	// of a vless link's pqv parameter. It travels through the
+	// credential document into engine.TLS.RealityMLDSA65Verify, where
+	// plan validation checks its shape and the capability gate routes
+	// it to Xray, the only engine that spells it.
+	MLDSA65Verify string
+	ALPN          []string
+	CountryCode   string
+	AllowInsecure bool
 	// DownloadAddress/DownloadPort carry the XHTTP up/down split from the
 	// link's extra= JSON (see applyExtraDownloadSettings). They travel
 	// through the credential document into engine.Transport, where plan
@@ -439,6 +445,7 @@ func parseLink(raw string) (OutboundSpec, error) {
 	o.Mode = getq(q, "mode")
 	o.PublicKey = getq(q, "pbk", "public-key")
 	o.ShortID = getq(q, "sid", "short-id")
+	o.MLDSA65Verify = getq(q, "pqv", "mldsa65-verify")
 	o.SpiderX = getq(q, "spx")
 	o.ServerName = getq(q, "sni")
 	o.Fingerprint = getq(q, "fp")

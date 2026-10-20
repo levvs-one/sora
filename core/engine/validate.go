@@ -482,6 +482,12 @@ func (t TLS) validate(what string) []error {
 	if t.KeyShare != "" && !t.Reality {
 		errs = append(errs, fmt.Errorf("%s: reality key_share needs REALITY", what))
 	}
+	// The ML-DSA-65 verify key is a REALITY parameter the same way:
+	// without REALITY no renderer can honour it (CENSOR-P1). Its shape
+	// is checked in ValidateReality, which owns the REALITY errors.
+	if t.RealityMLDSA65Verify != "" && !t.Reality {
+		errs = append(errs, fmt.Errorf("%s: reality mldsa65Verify needs REALITY", what))
+	}
 	ech := t.ECH
 	if !ech.Enabled {
 		return errs

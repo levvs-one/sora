@@ -92,6 +92,14 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 			// ECH plans only to engines that emit it (PASS3 deep S4).
 			out[FeatureECH] = true
 		}
+		if o.TLS.RealityMLDSA65Verify != "" {
+			// Only the Xray renderer emits mldsa65Verify; on the
+			// other engines the pinned ML-DSA-65 server check would
+			// vanish (sing-box refuses the key, mihomo ignores it),
+			// so the plan must report the feature missing there
+			// instead of completing a weaker handshake (CENSOR-P1).
+			out[FeatureRealityMLDSA65] = true
+		}
 		if o.Amnezia != nil {
 			out[FeatureAmneziaWG] = true
 			if o.Amnezia.UsesAWG31() {

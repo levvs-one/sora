@@ -97,6 +97,19 @@ const (
 	// Xray does not claim it and refuses ECH outbounds at render time
 	// instead of silently sending the SNI in the clear (PASS3 deep S4).
 	FeatureECH Feature = "ech"
+	// FeatureRealityMLDSA65 marks engines that verify the REALITY
+	// server's ML-DSA-65 signature (realitySettings.mldsa65Verify).
+	// Only Xray spells it: probed on the pinned binaries (2026-10-20),
+	// sing-box 1.14.3-lx.22 rejects the field as unknown and mihomo
+	// 1.19.32 silently ignores unknown reality-opts keys, so routing a
+	// plan that pins the key to either would drop a server-
+	// authentication check without a trace. Every Xray build that
+	// passes the catalog floor (26.3.27) carries the field — the
+	// post-quantum REALITY line landed in the 25.9 series — and the
+	// shipped pin is verified by config test and traffic
+	// (xray.TestBinaryAcceptsMLDSA65Verify,
+	// interop.TestRealityMLDSA65ThroughXray).
+	FeatureRealityMLDSA65 Feature = "reality-mldsa65"
 )
 
 // Capabilities describes the protocols and features supported by an engine

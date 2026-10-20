@@ -88,7 +88,19 @@ type TLS struct {
 	// because they identify a server.
 	RealityPublicKey string
 	RealityShortID   string
-	SpiderX          string
+	// RealityMLDSA65Verify is the server's ML-DSA-65 verification key
+	// (the "pqv" link parameter): base64url, 1952 bytes decoded. When
+	// set, the REALITY handshake must carry a valid ML-DSA-65
+	// signature over it, which binds the session to the post-quantum
+	// server key instead of only the X25519 public key. Only Xray
+	// spells it (realitySettings.mldsa65Verify, verified on the
+	// pinned 26.10.17 binary by config test and by traffic); the
+	// other engines have no field for it — probed on the pins:
+	// sing-box rejects the key as unknown, mihomo silently ignores
+	// unknown reality-opts keys — so a plan setting it requires
+	// FeatureRealityMLDSA65 instead of losing the check silently.
+	RealityMLDSA65Verify string
+	SpiderX              string
 	// KeyShare selects the key share the REALITY ClientHello offers:
 	// "" leaves the engine default, "classical" offers X25519 only,
 	// "hybrid" offers the X25519MLKEM768 hybrid. REALITY servers on

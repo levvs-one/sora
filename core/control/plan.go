@@ -159,6 +159,10 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 	doc.field("host_header", spec.HostHeader)
 	doc.field("insecure", insecure)
 	doc.field("method", spec.Cipher)
+	// REALITY ML-DSA-65 verify key (pqv in the link): public key
+	// material that identifies the server, stored like the REALITY
+	// public key it extends.
+	doc.field("mldsa65_verify", spec.MLDSA65Verify)
 	doc.field("mode", spec.Mode)
 	doc.field("obfs", spec.Options["obfs"])
 	doc.field("obfs_param", obfsParam)
@@ -749,6 +753,7 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 		outbound.TLS.Reality = true
 		outbound.TLS.RealityPublicKey = values["public_key"]
 		outbound.TLS.RealityShortID = values["short_id"]
+		outbound.TLS.RealityMLDSA65Verify = values["mldsa65_verify"]
 		outbound.TLS.SpiderX = values["spider_x"]
 	}
 	outbound.Transport.Path = values["path"]
