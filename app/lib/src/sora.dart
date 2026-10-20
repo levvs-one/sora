@@ -2392,6 +2392,17 @@ double smartScoreOf(
 
 /// Compares two servers for auto-selection. [mode] is ping, speed or smart;
 /// unknown modes fall back to ping. Ties break by ping.
+///
+/// T011 NOT WIRED here: this selection (and [_fastest]/[pickMember])
+/// has no subnet-reputation input, so a server in a carpet-banned /24
+/// is NOT rejected or demoted on that basis. The core tracks subnet
+/// reputation (probe.SubnetReputation, fed by real probe dials) and
+/// the designed Go consumer exists (serversel.Picker.WithSubnets in
+/// core/select), but ProbeResult carries no subnet field and the
+/// proto cannot be extended in this repo (no buf/protoc); the Go
+/// picker itself has no production caller (owner decision SW3 — see
+/// core/select/select.go). Until one of those lands, auto-selection
+/// must not be described as avoiding burned subnets.
 int compareAutoSelect(
   String a,
   String b,

@@ -104,9 +104,21 @@ func (p *Prober) Quality() *QualityRegistry {
 }
 
 // Subnets returns the T011 subnet-reputation tracker: one verdict per
-// /24 (or v6 /48), fed by every address this prober dials. Server
-// selection reads it to avoid carpet-banned subnets; the tracker is
-// never nil.
+// /24 (or v6 /48), fed by every address this prober dials. The tracker
+// is never nil.
+//
+// T011 wiring status (verified again in pass 2, 2026-10-20): the
+// collection side is live — this tracker is fed by real dials and read
+// by diagnostics (cmd/sora-core prints Subnets().SummaryLines()). The
+// selection side is NOT WIRED: no production code feeds this tracker
+// into a server choice. The designed consumer, serversel.Picker via
+// Picker.WithSubnets, has zero production importers (see the NOT
+// WIRED note in core/select), and the live selection — the Dart
+// client's compareAutoSelect/_fastest in app/lib/src/sora.dart —
+// cannot see subnet verdicts because ProbeResult carries no subnet
+// field and this repo has no buf/protoc to add one. Unblocking needs
+// an owner decision (SW3): either a ProbeResult subnet field plus
+// Dart consumption, or moving selection into the core.
 func (p *Prober) Subnets() *SubnetReputation {
 	return p.subnets
 }
