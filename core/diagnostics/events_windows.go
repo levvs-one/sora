@@ -40,7 +40,7 @@ func ExportWindowsEvents(ctx context.Context) ([]byte, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	file, err := os.Open(path) //nolint:gosec // Fixed filename in the private directory created above.
+	file, err := os.OpenInRoot(dir, "events.evtx")
 	if err != nil {
 		return nil, err
 	}

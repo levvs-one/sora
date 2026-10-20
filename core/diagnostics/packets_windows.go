@@ -167,6 +167,7 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	}
 	call := func(name string, args ...uintptr) error {
 		result, _, _ := procedures[name].Call(args...)
+		// HRESULT is a 32-bit value even when Call returns a 64-bit uintptr.
 		if result&0x80000000 != 0 {
 			return errs.Newf(errs.CodeUnavailable, errs.KeyDiagnosticsFailed, "%s failed: HRESULT 0x%08x", name, result&0xffffffff)
 		}
@@ -176,6 +177,7 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	if err := call("PacketMonitorInitialize", 0x00010000, 0, uintptr(unsafe.Pointer(&monitor))); err != nil {
 		return nil, err
 	}
+	// The three Pktmon handle-closing functions return void, not HRESULT.
 	defer func() { _, _, _ = procedures["PacketMonitorUninitialize"].Call(uintptr(monitor)) }()
 	owner := packetStreamID.Add(1)
 	stream := &packetStream{packets: make(chan capturedPacket, 128), failures: make(chan error, 1)}
@@ -233,7 +235,9 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	if err := call("PacketMonitorSetSessionActive", uintptr(session), 1); err != nil {
 		return nil, err
 	}
-	defer func() { _, _, _ = procedures["PacketMonitorSetSessionActive"].Call(uintptr(session), 0) }()
+	// The normal path checks deactivation below; early failures still need
+	// a best-effort stop before the session handle is closed.
+	defer func() { _ = call("PacketMonitorSetSessionActive", uintptr(session), 0) }()
 	var output bytes.Buffer
 	writer, err := pcapgo.NewNgWriterInterface(&output, pcapgo.NgInterface{Name: device, Description: "Sora TUN", LinkType: layers.LinkTypeRaw, SnapLength: 256},
 		pcapgo.NgWriterOptions{SectionInfo: pcapgo.NgSectionInfo{Application: "Sora " + coreVersion}})

@@ -573,25 +573,35 @@ func (e *hangingEngine) Stop(ctx context.Context) error {
 	return ctx.Err()
 }
 
-// TestStopBoundsAHungEngine locks SORA-H7: Stop must return after StopGrace
-// even when the engine never stops on its own, instead of wedging the
-// manager busy forever.
+// TestStopBoundsAHungEngine locks SORA-H7: a running engine that never
+// completes Stop must exhaust the shutdown budget without wedging the manager.
 func TestStopBoundsAHungEngine(t *testing.T) {
 	eng := &hangingEngine{fakeEngine: newFakeEngine()}
 	cfg := testConfig(eng, &fakeGuard{})
-	cfg.StopGrace = 200 * time.Millisecond
+	cfg.StopGrace = 20 * time.Millisecond
 	s, err := New(cfg)
 	if err != nil {
 		t.Fatalf("New() error = %v", err)
 	}
+	if err := s.Start(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	started := time.Now()
 	done := make(chan error, 1)
-	go func() { done <- s.Stop(context.Background()) }()
+	go func() { done <- s.Stop(ctx) }()
+	budget := cfg.StopGrace + stopCleanupTimeout
 	select {
-	case <-done:
-		// Stop returns (possibly with the hung engine's context error);
-		// the point is it does not hang forever.
-	case <-time.After(5 * time.Second):
-		t.Fatal("Stop() did not return after StopGrace with a hung engine")
+	case err := <-done:
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatalf("Stop() = %v, want shutdown deadline", err)
+		}
+		if elapsed := time.Since(started); elapsed < budget {
+			t.Fatalf("cancelled caller shortened shutdown budget: %s < %s", elapsed, budget)
+		}
+	case <-time.After(budget + 2*time.Second):
+		t.Fatal("Stop() exceeded the bounded shutdown budget")
 	}
 }
 

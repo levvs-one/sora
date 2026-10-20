@@ -1,0 +1,212 @@
+[
+  {
+    "name": "vless",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?security=tls&type=ws&path=%2F#🇩🇪%20Berlin",
+    "protocol": "vless",
+    "security": "tls",
+    "count": 1
+  },
+  {
+    "name": "vless plain",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443",
+    "protocol": "vless",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "trojan",
+    "input": "trojan://secret@example.com:443?sni=example.com#Trojan",
+    "protocol": "trojan",
+    "security": "tls",
+    "count": 1
+  },
+  {
+    "name": "shadowsocks",
+    "input": "ss://YWVzLTI1Ni1nY206cGFzcw@example.com:8388#SS",
+    "protocol": "shadowsocks",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "hysteria2",
+    "input": "hysteria2://secret@example.com:443?sni=example.com#H2",
+    "protocol": "hysteria2",
+    "security": "tls",
+    "count": 1
+  },
+  {
+    "name": "hy2",
+    "input": "hy2://secret@example.com:443#H2",
+    "protocol": "hysteria2",
+    "security": "tls",
+    "count": 1
+  },
+  {
+    "name": "tuic",
+    "input": "tuic://123e4567-e89b-12d3-a456-426614174000:pass@example.com:443",
+    "protocol": "tuic",
+    "security": "tls",
+    "count": 1
+  },
+  {
+    "name": "socks",
+    "input": "socks://user:pass@example.com:1080",
+    "protocol": "socks5",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "socks5",
+    "input": "socks5://example.com:1080",
+    "protocol": "socks5",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "https",
+    "input": "https://user:pass@example.com:443",
+    "protocol": "http",
+    "security": "tls",
+    "count": 1
+  },
+  {
+    "name": "vless tcp",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?type=tcp",
+    "protocol": "vless",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "vless grpc",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?type=grpc",
+    "protocol": "vless",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "vless h2",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?type=h2",
+    "protocol": "vless",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "vless httpupgrade",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?type=httpupgrade",
+    "protocol": "vless",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "vless xhttp",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?type=xhttp",
+    "protocol": "vless",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "vless raw",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?type=raw",
+    "protocol": "vless",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "vmess url",
+    "input": "vmess://123e4567-e89b-12d3-a456-426614174000@example.com:443?type=ws",
+    "protocol": "vmess",
+    "security": "auto",
+    "count": 1
+  },
+  {
+    "name": "wrapped list",
+    "input": "dmxlc3M6Ly8xMjNlNDU2Ny1lODliLTEyZDMtYTQ1Ni00MjY2MTQxNzQwMDBAZXhhbXBsZS5jb206NDQzCg==",
+    "protocol": "vless",
+    "security": "none",
+    "count": 1
+  },
+  {
+    "name": "plain list",
+    "input": "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443\nvless://123e4567-e89b-12d3-a456-426614174000@other.example.com:443",
+    "protocol": "vless",
+    "security": "none",
+    "count": 2
+  },
+  {
+    "name": "wireguard url",
+    "input": "wireguard://cKE7LmCF61IhqqABGhvJ44jWXp8fKymcMAEVAzLDYVk%3D@198.51.100.7:51820?publickey=Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw%3D&address=10.7.0.2",
+    "protocol": "wireguard",
+    "security": "",
+    "count": 1
+  },
+  {
+    "name": "wg url",
+    "input": "wg://cKE7LmCF61IhqqABGhvJ44jWXp8fKymcMAEVAzLDYVk%3D@198.51.100.7:51820?publickey=Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw%3D&address=10.7.0.2",
+    "protocol": "wireguard",
+    "security": "",
+    "count": 1
+  },
+  {
+    "name": "wireguard conf",
+    "input": "[Interface]\nPrivateKey = cKE7LmCF61IhqqABGhvJ44jWXp8fKymcMAEVAzLDYVk=\nAddress = 10.7.0.2/32, fd00::2/128\n\n[Peer]\nPublicKey = Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw=\nEndpoint = 198.51.100.7:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n",
+    "protocol": "wireguard",
+    "security": "",
+    "count": 1
+  },
+  {
+    "name": "amneziawg conf",
+    "input": "[Interface]\nPrivateKey = cKE7LmCF61IhqqABGhvJ44jWXp8fKymcMAEVAzLDYVk=\nJc = 4\nJmin = 40\nJmax = 70\nS1 = 15\nS2 = 25\nH1 = 100000\nH2 = 200000\nH3 = 300000\nH4 = 400000\nAddress = 10.7.0.2/32, fd00::2/128\n\n[Peer]\nPublicKey = Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw=\nEndpoint = 198.51.100.7:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n",
+    "protocol": "wireguard",
+    "security": "",
+    "count": 1
+  },
+  {
+    "name": "singbox json",
+    "input": "{\"outbounds\": [{\"type\": \"vless\", \"server\": \"example.com\", \"server_port\": 443, \"uuid\": \"123e4567-e89b-12d3-a456-426614174000\", \"network\": \"ws\"}]}",
+    "protocol": "vless",
+    "security": "",
+    "count": 1
+  },
+  {
+    "name": "sip008 json",
+    "input": "{\"servers\": [{\"type\": \"shadowsocks\", \"server\": \"example.com\", \"server_port\": 8388, \"method\": \"aes-256-gcm\", \"password\": \"pass\"}]}",
+    "protocol": "shadowsocks",
+    "security": "",
+    "count": 1
+  },
+  {
+    "name": "clash yaml",
+    "input": "proxies:\n  - name: Edge\n    type: vless\n    server: example.com\n    port: 443\n    uuid: 123e4567-e89b-12d3-a456-426614174000\n    network: raw\n",
+    "protocol": "vless",
+    "security": "",
+    "count": 1
+  },
+  {
+    "name": "xray profile raw",
+    "input": "{\"remarks\": \"Edge\", \"outbounds\": [{\"protocol\": \"vless\", \"settings\": {\"vnext\": [{\"address\": \"example.com\", \"port\": 443, \"users\": [{\"id\": \"123e4567-e89b-12d3-a456-426614174000\"}]}]}, \"streamSettings\": {\"network\": \"raw\", \"security\": \"tls\"}}, {\"protocol\": \"freedom\", \"tag\": \"direct\"}]}",
+    "protocol": "xray-profile",
+    "security": "tls",
+    "count": 1
+  },
+  {
+    "name": "xray profile xhttp",
+    "input": "{\"remarks\": \"Edge\", \"outbounds\": [{\"protocol\": \"vless\", \"settings\": {\"vnext\": [{\"address\": \"example.com\", \"port\": 443, \"users\": [{\"id\": \"123e4567-e89b-12d3-a456-426614174000\"}]}]}, \"streamSettings\": {\"network\": \"xhttp\", \"security\": \"tls\"}}, {\"protocol\": \"freedom\", \"tag\": \"direct\"}]}",
+    "protocol": "xray-profile",
+    "security": "tls",
+    "count": 1
+  },
+  {
+    "name": "xray profile list",
+    "input": "[{\"remarks\": \"Edge\", \"outbounds\": [{\"protocol\": \"vless\", \"settings\": {\"vnext\": [{\"address\": \"example.com\", \"port\": 443, \"users\": [{\"id\": \"123e4567-e89b-12d3-a456-426614174000\"}]}]}, \"streamSettings\": {\"network\": \"xhttp\", \"security\": \"tls\"}}, {\"protocol\": \"freedom\", \"tag\": \"direct\"}]}, {\"remarks\": \"Other\", \"outbounds\": [{\"protocol\": \"vless\", \"settings\": {\"vnext\": [{\"address\": \"example.com\", \"port\": 443, \"users\": [{\"id\": \"123e4567-e89b-12d3-a456-426614174000\"}]}]}, \"streamSettings\": {\"network\": \"xhttp\", \"security\": \"tls\"}}, {\"protocol\": \"freedom\", \"tag\": \"direct\"}]}]",
+    "protocol": "xray-profile",
+    "security": "tls",
+    "count": 2
+  },
+  {
+    "name": "xray profile hysteria",
+    "input": "{\"remarks\": \"Edge\", \"outbounds\": [{\"protocol\": \"hysteria\", \"settings\": {\"version\": 2, \"address\": \"example.com\", \"port\": 443}, \"streamSettings\": {\"network\": \"hysteria\", \"hysteriaSettings\": {\"version\": 2, \"auth\": \"secret\"}, \"security\": \"tls\", \"tlsSettings\": {\"serverName\": \"example.com\"}}}, {\"protocol\": \"freedom\", \"tag\": \"direct\"}]}",
+    "protocol": "xray-profile",
+    "security": "tls",
+    "count": 1
+  }
+]

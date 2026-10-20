@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/profiles"
 )
@@ -44,7 +45,7 @@ type Config struct {
 	JournalCapacity int
 	// StatsInterval samples the engine counters.
 	StatsInterval time.Duration
-	// StopGrace bounds the engine shutdown.
+	// StopGrace allows graceful shutdown before kill and cleanup.
 	StopGrace time.Duration
 	// Network supplies fingerprints for connection renewal on change. Nil
 	// disables watching.
@@ -71,6 +72,10 @@ type Config struct {
 
 // tunWait bounds how long an engine may take to bring its adapter up.
 const tunWait = 5 * time.Second
+
+// A child can consume the full grace before Kill. Reserve its complete reap
+// wait plus time for the supervisor to remove routes with a live context.
+const stopCleanupTimeout = supervise.KillWait + 5*time.Second
 
 func interfaceUp(ctx context.Context, device string) error {
 	ctx, cancel := context.WithTimeout(ctx, tunWait)
@@ -277,14 +282,14 @@ func (s *Session) Done() <-chan struct{} { return s.done }
 
 // Stop shuts down the engine, restores the guard, and transitions to
 // disconnected. Repeated calls are safe from user, shutdown, and failure paths.
-// The engine shutdown is bounded by StopGrace and detached from the caller's
+// The engine shutdown has a bounded budget detached from the caller's
 // context: a cancelled Disconnect must not strand a half-stopped engine and
 // wedge the manager busy forever (SORA-H7).
 func (s *Session) Stop(ctx context.Context) error {
 	// Detach the shutdown budget from the caller: eng.Stop must run to
-	// completion (or the grace timeout) even if the Disconnect RPC that
+	// completion (or the shutdown timeout) even if the Disconnect RPC that
 	// triggered it is cancelled.
-	stopCtx, stopCancel := context.WithTimeout(context.WithoutCancel(ctx), s.cfg.StopGrace)
+	stopCtx, stopCancel := context.WithTimeout(context.WithoutCancel(ctx), s.cfg.StopGrace+stopCleanupTimeout)
 	defer stopCancel()
 	s.mu.Lock()
 	if s.stopping {

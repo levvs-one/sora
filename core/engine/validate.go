@@ -98,7 +98,6 @@ func (o Outbound) Warnings() []string {
 	return out
 }
 
-// Validate checks one outbound on its own, without engine capabilities.
 // validProtocols whitelists the protocols a plan may hold, so an unknown
 // protocol fails validation with a clear error instead of surfacing late at
 // eng.Apply (SORA-L16).
@@ -110,12 +109,12 @@ var validProtocols = map[Protocol]bool{
 	ProtocolDirect: true,
 }
 
-// validTransports whitelists the stream transports a plan may hold. "h2" is
-// accepted at plan level for sing-box; engines that dropped it (Xray) reject
-// it when rendering.
+// validTransports includes parser outputs and renderer transport names:
+// WireGuard uses udp, mihomo accepts raw, and Xray profiles carry hysteria.
+// Each renderer still rejects transports it cannot use for that outbound.
 var validTransports = map[string]bool{
-	"": true, "tcp": true, "ws": true, "grpc": true,
-	"h2": true, "httpupgrade": true, "xhttp": true,
+	"": true, "tcp": true, "udp": true, "raw": true, "ws": true, "grpc": true,
+	"h2": true, "httpupgrade": true, "xhttp": true, "hysteria": true,
 }
 
 // Validate checks one outbound before rendering.
