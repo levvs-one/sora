@@ -17,9 +17,10 @@
 | `/usr/lib/sora/sora-update` | sora | helper установки проверенной пары пакетов |
 | `/usr/share/polkit-1/actions/io.github.levvs-one.sora.update.policy` | sora | обновление с паролем администратора |
 | `/usr/share/applications/io.github.levvs_one.sora.desktop` | sora | ярлык, обработчик ссылок `sora://` и `happ://` |
-| `/usr/share/icons/hicolor/scalable/apps/io.github.levvs_one.sora.svg` | sora | значок |
+| `/usr/share/icons/hicolor/…/io.github.levvs_one.sora.{svg,png}` | sora | значок: SVG и растровые размеры 48–512 |
+| `/usr/share/metainfo/io.github.levvs_one.sora.metainfo.xml` | sora | AppStream: описание и скриншоты для магазинов приложений |
 
-Скрипты в `scripts/`: после установки создаётся пользователь `sora`, служба включается и запускается; перед удалением служба останавливается; после удаления снимается таблица nftables `sora`, если она осталась.
+Скрипты в `scripts/`: после установки создаётся пользователь `sora`, служба включается и запускается; перед удалением служба останавливается; после удаления снимаются таблицы nftables `sora`, `sora_nfqws` и `sora_ingress`, если они остались.
 
 ## Сборка
 

@@ -11,6 +11,10 @@ nft delete table inet sora 2>/dev/null || true
 # gets the same treatment: a killed core could not remove it, and its rules
 # would keep steering traffic into queues with no listener behind them.
 nft delete table inet sora_nfqws 2>/dev/null || true
+# The ingress guard's table (core/guard: nftIngressTable "sora_ingress")
+# likewise: its chain ends in a drop, so a leftover table would keep
+# filtering inbound traffic for a core that no longer exists.
+nft delete table inet sora_ingress 2>/dev/null || true
 # Purge removes the secret store, the control token, and engine state:
 # secrets must not survive uninstallation (SORA-L7). A plain remove keeps
 # them so reinstalling does not lose subscriptions.

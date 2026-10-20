@@ -27,4 +27,6 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now sora-core
 ```
 
-Если служба была убита и интернет не работает, kill switch снимается командой `sudo nft delete table inet sora`.
+Если служба была убита и интернет не работает, таблицы ядра снимаются командами `sudo nft delete table inet sora`, `sudo nft delete table inet sora_ingress` и `sudo nft delete table inet sora_nfqws`.
+
+При удалении пакета данные в `/var/lib/sora` (подписки и секреты) сохраняются, чтобы переустановка ничего не теряла. На Debian и Ubuntu полное удаление вместе с данными — `sudo apt purge sora-core`. У пакетов RPM и Arch отдельного purge нет, поэтому там каталог удаляется вручную: `sudo rm -rf /var/lib/sora`.

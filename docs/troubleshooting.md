@@ -72,7 +72,11 @@ Kill switch на Linux:
 
 ```sh
 sudo nft delete table inet sora
+sudo nft delete table inet sora_ingress
+sudo nft delete table inet sora_nfqws
 ```
+
+(второй и третьей таблиц может не быть — это нормально.)
 
 На Windows правила kill switch пропадают сами, когда служба останавливается.
 
