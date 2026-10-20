@@ -114,27 +114,32 @@ type ScoreContext struct {
 func ContextFor(cands []Candidate) ScoreContext {
 	var ctx ScoreContext
 	for _, c := range cands {
-		if c.HasLatency {
-			if !ctx.HasLatency {
-				ctx.HasLatency = true
-				ctx.MinLatencyMs, ctx.MaxLatencyMs = c.LatencyMs, c.LatencyMs
-			} else {
-				if c.LatencyMs < ctx.MinLatencyMs {
-					ctx.MinLatencyMs = c.LatencyMs
-				}
-				if c.LatencyMs > ctx.MaxLatencyMs {
-					ctx.MaxLatencyMs = c.LatencyMs
-				}
+		ctx.add(c)
+	}
+	return ctx
+}
+
+// add folds one candidate into the reference values.
+func (ctx *ScoreContext) add(c Candidate) {
+	if c.HasLatency {
+		if !ctx.HasLatency {
+			ctx.HasLatency = true
+			ctx.MinLatencyMs, ctx.MaxLatencyMs = c.LatencyMs, c.LatencyMs
+		} else {
+			if c.LatencyMs < ctx.MinLatencyMs {
+				ctx.MinLatencyMs = c.LatencyMs
 			}
-		}
-		if c.HasBandwidth {
-			ctx.HasBandwidth = true
-			if c.BandwidthBps > ctx.MaxBandwidthBps {
-				ctx.MaxBandwidthBps = c.BandwidthBps
+			if c.LatencyMs > ctx.MaxLatencyMs {
+				ctx.MaxLatencyMs = c.LatencyMs
 			}
 		}
 	}
-	return ctx
+	if c.HasBandwidth {
+		ctx.HasBandwidth = true
+		if c.BandwidthBps > ctx.MaxBandwidthBps {
+			ctx.MaxBandwidthBps = c.BandwidthBps
+		}
+	}
 }
 
 // Breakdown explains one composite score. Every component is in [0, 1];
@@ -196,7 +201,7 @@ func (s *Scorer) pingScore(c Candidate, ctx ScoreContext) float64 {
 	// Float arithmetic: a candidate scored against a foreign context (one
 	// it was not part of) may sit outside [min, max]; the uint32
 	// subtraction would wrap around. clamp01 keeps the result sane.
-	return clamp01(1 - (float64(c.LatencyMs) - float64(ctx.MinLatencyMs)) / float64(span))
+	return clamp01(1 - (float64(c.LatencyMs)-float64(ctx.MinLatencyMs))/float64(span))
 }
 
 // bandwidthScore is relative to the fastest measured candidate.

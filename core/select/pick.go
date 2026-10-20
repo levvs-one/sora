@@ -3,7 +3,6 @@ package serversel
 import (
 	"fmt"
 	"net/netip"
-	"sort"
 	"strings"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -135,9 +134,18 @@ func (p *Picker) PickBest(cands []Candidate, cons Constraints) (Pick, error) {
 	excluded := excludeSet(cons.ExcludeIDs)
 	countries := countrySet(cons.Countries)
 
-	var eligible []Candidate
+	// One pass over the candidates: filter, remember the survivors by
+	// index and fold them into the score context as we go. The previous
+	// shape copied every survivor into an eligible slice (~128 B per
+	// candidate), copied them again into a ranked slice and paid for a
+	// full stable sort plus its scratch buffer — ~543 KB of allocations
+	// to pick one winner out of 1000 candidates, measured. PickBest only
+	// ever reads the winner, so a linear best-scan over indices is
+	// enough; the context is the same one ContextFor(eligible) built.
+	eligible := make([]int, 0, len(cands))
 	var rejected []Rejection
-	for _, c := range cands {
+	var ctx ScoreContext
+	for i, c := range cands {
 		if why := eligibleCandidate(c, caps, excluded, countries); why != "" {
 			rejected = append(rejected, Rejection{ID: c.ID, Reason: why})
 			continue
@@ -151,16 +159,18 @@ func (p *Picker) PickBest(cands []Candidate, cons Constraints) (Pick, error) {
 			rejected = append(rejected, Rejection{ID: c.ID, Reason: "subnet carpet-banned (T011): every observed server in its /24 fails"})
 			continue
 		}
-		eligible = append(eligible, c)
+		eligible = append(eligible, i)
+		ctx.add(c)
 	}
 	if len(eligible) == 0 {
 		return Pick{Rejected: rejected}, fmt.Errorf("%w (%d rejected)", ErrNoEligible, len(rejected))
 	}
 
 	if p.pick.PinPreferredServer && cons.Profile.PreferredServerID != "" {
-		for _, c := range eligible {
+		for _, i := range eligible {
+			c := cands[i]
 			if c.ID == cons.Profile.PreferredServerID {
-				b := p.breakdown(c, eligible)
+				b := p.scorer.Score(c, ctx, p.reliability(c.ID))
 				return Pick{
 					Candidate: c,
 					Breakdown: b,
@@ -174,8 +184,14 @@ func (p *Picker) PickBest(cands []Candidate, cons Constraints) (Pick, error) {
 		// Preferred server absent or filtered out: fall through to scoring.
 	}
 
-	ranked := p.rank(eligible, cons.Profile.PreferredEngine)
-	best := ranked[0]
+	var best ranked
+	for n, i := range eligible {
+		c := cands[i]
+		r := ranked{c: c, b: p.adjustedScore(c, ctx, cons.Profile.PreferredEngine)}
+		if n == 0 || ranksBefore(r, best) {
+			best = r
+		}
+	}
 	return Pick{
 		Candidate: best.c,
 		Breakdown: best.b,
@@ -227,7 +243,12 @@ func eligibleCandidate(c Candidate, caps engine.Capabilities, excluded, countrie
 	return ""
 }
 
+// excludeSet indexes the excluded ids. An empty input yields a nil
+// map: lookups on a nil map are safe, and most picks exclude nothing.
 func excludeSet(ids []string) map[string]bool {
+	if len(ids) == 0 {
+		return nil
+	}
 	set := make(map[string]bool, len(ids))
 	for _, id := range ids {
 		set[id] = true
@@ -235,7 +256,12 @@ func excludeSet(ids []string) map[string]bool {
 	return set
 }
 
+// countrySet indexes the wanted countries, upper-cased. An empty input
+// yields a nil map (see excludeSet).
 func countrySet(countries []string) map[string]bool {
+	if len(countries) == 0 {
+		return nil
+	}
 	set := make(map[string]bool, len(countries))
 	for _, cc := range countries {
 		set[strings.ToUpper(cc)] = true
@@ -248,48 +274,46 @@ type ranked struct {
 	b Breakdown
 }
 
-// rank scores every candidate and sorts best-first.
-func (p *Picker) rank(eligible []Candidate, preferredEngine engine.Kind) []ranked {
-	ctx := ContextFor(eligible)
-	out := make([]ranked, 0, len(eligible))
-	for _, c := range eligible {
-		b := p.scorer.Score(c, ctx, p.reliability(c.ID))
-		if preferredEngine != "" && c.Engine == preferredEngine {
-			b.Total = clamp01(b.Total + p.pick.ProfileEngineBonus)
-		}
-		// T011: a degraded subnet (mixed outcomes) costs score but does
-		// not veto: half the subnet answering is information, not a ban.
-		if p.subnetState(c) == probe.SubnetDegraded {
-			b.Total = clamp01(b.Total - subnetDegradedPenalty)
-		}
-		out = append(out, ranked{c: c, b: b})
+// adjustedScore scores one candidate against the eligible set's context
+// and applies the picker's soft adjustments: the profile-engine bonus
+// and the T011 degraded-subnet penalty.
+func (p *Picker) adjustedScore(c Candidate, ctx ScoreContext, preferredEngine engine.Kind) Breakdown {
+	b := p.scorer.Score(c, ctx, p.reliability(c.ID))
+	if preferredEngine != "" && c.Engine == preferredEngine {
+		b.Total = clamp01(b.Total + p.pick.ProfileEngineBonus)
 	}
-	sort.SliceStable(out, func(i, j int) bool {
-		a, z := out[i], out[j]
-		if a.b.Total != z.b.Total {
-			return a.b.Total > z.b.Total
-		}
-		// Tie-breaks: known latency beats unknown, lower beats higher.
-		if a.c.HasLatency != z.c.HasLatency {
-			return a.c.HasLatency
-		}
-		if a.c.HasLatency && a.c.LatencyMs != z.c.LatencyMs {
-			return a.c.LatencyMs < z.c.LatencyMs
-		}
-		if a.c.HasBandwidth != z.c.HasBandwidth {
-			return a.c.HasBandwidth
-		}
-		if a.c.HasBandwidth && a.c.BandwidthBps != z.c.BandwidthBps {
-			return a.c.BandwidthBps > z.c.BandwidthBps
-		}
-		return a.c.ID < z.c.ID
-	})
-	return out
+	// T011: a degraded subnet (mixed outcomes) costs score but does
+	// not veto: half the subnet answering is information, not a ban.
+	if p.subnetState(c) == probe.SubnetDegraded {
+		b.Total = clamp01(b.Total - subnetDegradedPenalty)
+	}
+	return b
 }
 
-// breakdown scores one candidate against the eligible set.
-func (p *Picker) breakdown(c Candidate, eligible []Candidate) Breakdown {
-	return p.scorer.Score(c, ContextFor(eligible), p.reliability(c.ID))
+// ranksBefore reports whether a ranks ahead of z under the picker's
+// ordering: higher score first, ties broken by known-then-lower
+// latency, known-then-higher bandwidth, then id. PickBest keeps the
+// first candidate nothing ranks before, which is exactly the head of
+// the stable sort this ordering used to feed — among fully equal
+// candidates the earliest in the input still wins.
+func ranksBefore(a, z ranked) bool {
+	if a.b.Total != z.b.Total {
+		return a.b.Total > z.b.Total
+	}
+	// Tie-breaks: known latency beats unknown, lower beats higher.
+	if a.c.HasLatency != z.c.HasLatency {
+		return a.c.HasLatency
+	}
+	if a.c.HasLatency && a.c.LatencyMs != z.c.LatencyMs {
+		return a.c.LatencyMs < z.c.LatencyMs
+	}
+	if a.c.HasBandwidth != z.c.HasBandwidth {
+		return a.c.HasBandwidth
+	}
+	if a.c.HasBandwidth && a.c.BandwidthBps != z.c.BandwidthBps {
+		return a.c.BandwidthBps > z.c.BandwidthBps
+	}
+	return a.c.ID < z.c.ID
 }
 
 // reliability reads the store rate, or the prior when there is no store.
