@@ -58,6 +58,15 @@ class UpdateSora extends Sora {
         : UpdateConnection.changing,
     client: () => MockClient((request) async {
       requests++;
+      // S11a: the rollout policy feed gets a valid policy; the release API
+      // gets the recorded release JSON.
+      if (request.url.toString() == rolloutPolicyUrl) {
+        return http.Response(
+          '{"format":1,"rollout":{"version":"1.0.5","percent":100},"blocked_versions":[]}',
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }
       expect(request.url.path, '/repos/levvs-one/sora/releases/latest');
       return http.Response(response, 200, headers: {'content-type': 'application/json; charset=utf-8'});
     }),
@@ -244,7 +253,19 @@ void main() {
       available: (_) async {
         notices++;
       },
-      client: () => MockClient((_) async => http.Response.bytes(utf8.encode(recorded), 200)),
+      client: () => MockClient((request) async {
+        // S11a: a valid policy for the rollout feed, the recorded release
+        // for everything else. Serving the release JSON on the rollout URL
+        // would fail RolloutPolicy.parse and withhold the update.
+        if (request.url.toString() == rolloutPolicyUrl) {
+          return http.Response(
+            '{"format":1,"rollout":{"version":"1.0.5","percent":100},"blocked_versions":[]}',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }
+        return http.Response.bytes(utf8.encode(recorded), 200);
+      }),
     );
     addTearDown(updater.dispose);
     await updater.check(manual: true).timeout(const Duration(seconds: 2));
@@ -263,9 +284,22 @@ void main() {
       available: (_) async {
         notices++;
       },
-      client: () => MockClient((_) async {
+      client: () => MockClient((request) async {
+        // S11a: the rollout feed gets a valid policy; only release-API
+        // fetches count as update checks.
+        if (request.url.toString() == rolloutPolicyUrl) {
+          return http.Response(
+            '{"format":1,"rollout":{"version":"1.0.5","percent":100},"blocked_versions":[]}',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }
         checks++;
-        return http.Response(recorded, 200, headers: {'content-type': 'application/json; charset=utf-8'});
+        return http.Response(
+          recorded,
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
       }),
     );
     updater.start();
@@ -292,9 +326,23 @@ void main() {
       available: (_) async {
         notices++;
       },
-      client: () => MockClient(
-        (_) async => http.Response(recorded, 200, headers: {'content-type': 'application/json; charset=utf-8'}),
-      ),
+      client: () => MockClient((request) async {
+        // S11a: the rollout feed gets a valid policy, like in the updater
+        // above; the notices stay at 1 either way because the version was
+        // already announced.
+        if (request.url.toString() == rolloutPolicyUrl) {
+          return http.Response(
+            '{"format":1,"rollout":{"version":"1.0.5","percent":100},"blocked_versions":[]}',
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        }
+        return http.Response(
+          recorded,
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }),
     );
     final checked = reloaded.check();
     await finishCheck(tester, reloaded);
