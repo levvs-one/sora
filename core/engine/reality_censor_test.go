@@ -93,6 +93,24 @@ func TestCensorP1ShortIDBoundaries(t *testing.T) {
 	}
 }
 
+// TestCensorP1RealityMuxExcludesXHTTP pins the mux fix proven by
+// traffic in interop: XHTTP multiplexes itself (xmux), so the
+// REALITY mux default must not layer outbound mux over it, while
+// stream transports keep the default.
+func TestCensorP1RealityMuxExcludesXHTTP(t *testing.T) {
+	o := realityOutbound()
+	o.Transport.Type = "xhttp"
+	if RealityMux(o, MuxOptions{}) {
+		t.Error("mux default must not apply over XHTTP (the transport multiplexes itself)")
+	}
+	for _, typ := range []string{"", "ws", "grpc", "httpupgrade"} {
+		o.Transport.Type = typ
+		if !RealityMux(o, MuxOptions{}) {
+			t.Errorf("transport %q: REALITY mux default must stay", typ)
+		}
+	}
+}
+
 // TestCensorP1KeyShareGate pins the selection side of the KeyShare
 // fix end-to-end: a plan pinning the share requires the feature, the
 // two engines that spell it carry the plan, Xray reports it missing.

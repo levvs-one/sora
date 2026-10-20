@@ -51,6 +51,15 @@ func MuxConcurrency(o MuxOptions) int {
 // flow is not an XTLS vision flow. The vision exclusion lives here, in
 // the shared predicate, so no renderer can reintroduce mux+vision by
 // forgetting its own guard (PASS3 deep S3a).
+//
+// XHTTP is excluded for the same reason vision is: the transport
+// already multiplexes (xmux), and layering outbound mux (mux.cool on
+// Xray, smux on sing-box/mihomo) over it is rejected by servers —
+// proven by traffic (CENSOR-P1: an Xray server answers a mux.cool
+// stream over XHTTP with "failed to read metadata" and closes it;
+// the same plan with mux suppressed carries traffic on all three
+// engines). Before this exclusion every non-vision REALITY+XHTTP
+// plan was broken by the mux default it never asked for.
 func RealityMux(o Outbound, mux MuxOptions) bool {
-	return o.TLS.Reality && !mux.Disabled && !IsVisionFlow(o.Flow)
+	return o.TLS.Reality && !mux.Disabled && !IsVisionFlow(o.Flow) && o.Transport.Type != "xhttp"
 }
