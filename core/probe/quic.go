@@ -23,6 +23,30 @@ package probe
 // Negotiation packet. A VN reply proves the UDP path is open end to end;
 // silence toward a host that serves QUIC, while TCP/443 answers, proves
 // the censor dropped the Initial.
+//
+// Engine QUIC stacks (T049, verified 2026-10-20 against the go.mod of the
+// engines.lock pins):
+//   - sing-box-lx 1.14.3-lx.14: sagernet/quic-go v0.61.0-sing-box-mod.9
+//   - Xray-core v26.3.27: apernet/quic-go v0.59.1-0.20260217092621 (fork)
+//   - mihomo v1.19.32: metacubex/quic-go v0.61.1-0.20260727080200 (fork)
+// Upstream quic-go v0.52.0 (Apr 2025, PR #5107) fragments the TLS
+// ClientHello into multiple pieces by default ("complicating Deep Packet
+// Inspection"); all three engine bases are newer, so the fragmentation
+// reaches sora's QUIC outbounds unless a fork removed it. sora does not
+// set QUIC_GO_DISABLE_CLIENTHELLO_SCRAMBLING, so the upstream default
+// (on) applies wherever the fork kept it. The pre-Initial random UDP
+// datagram exemption (the paper's other technique) is not a library
+// behavior: it is an application-level trick, and the engines do not
+// perform it. Honest limits: fork wire behavior is NOT verified here —
+// the forks could diverge from upstream in the handshake path. Proving
+// it needs the T026 pcap harness on a real engine build (QUICv2-canary
+// and CRYPTO-reassembly field work, still open), not a go.mod read.
+// The residual 420 s was reconfirmed for TSPU specifically by the FOCI
+// 2026 Russia measurements: the censor drops the Initial and residually
+// bans the 4-tuple for ~420 s; sending uncensored data first on the same
+// 4-tuple exempts the flow. Sora deliberately does NOT exploit the
+// fail-open (active overload is a legal risk, see T040): the exemption
+// is measurement knowledge, not a shipped tactic.
 
 import (
 	"context"

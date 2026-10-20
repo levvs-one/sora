@@ -157,8 +157,24 @@ func (w *censorshipWatcher) onEvent(ev Event) {
 		}
 	}
 	if verdict.Kind == censor.KindUnknown {
-		// Stay silent: an "unknown" verdict on every failure is noise, and
-		// the engine already reported the failure itself.
+		// Before staying silent, rule out the cheap impostor (T014 P0.3):
+		// a captive portal intercepts plain HTTP and makes EVERYTHING
+		// look blocked. If a portal answers, that is the diagnosis —
+		// "log in first", not "censorship". The check is direct-path
+		// HTTP to the OS endpoints, bounded by this probe's context.
+		if rep := censor.DetectCaptivePortal(ctx, nil, nil); rep.State == censor.CaptivePortal {
+			w.publish(censor.Verdict{
+				Kind:       censor.KindNoInterference,
+				Confidence: 0.8,
+				Explanation: "A captive portal is intercepting this network: log in to the network " +
+					"first (open any web page in a browser), then reconnect. This is the network " +
+					"asking for a login — not censorship and not a broken server.",
+				Evidence: rep.Evidence,
+				At:       time.Now().UTC(),
+			})
+		}
+		// Otherwise stay silent: an "unknown" verdict on every failure
+		// is noise, and the engine already reported the failure itself.
 		return
 	}
 	w.publish(verdict)

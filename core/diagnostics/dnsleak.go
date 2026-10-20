@@ -28,6 +28,11 @@ const (
 	// DnsLeakKillSwitchDNS reports whether the kill switch covers DNS. It
 	// is a warning, never a leak by itself.
 	DnsLeakKillSwitchDNS = "killswitch-dns"
+	// DnsLeakSpoofDNS cross-checks the canary answer across the system
+	// and tunnel resolvers (T014, CENSORSHIP-METER P0.2): a resolver that
+	// answers with a sinkhole address or disagrees with everyone else is
+	// a censor-shaped DNS lie.
+	DnsLeakSpoofDNS = "dns-spoof"
 )
 
 // Localization keys for the check titles shown in the UI.
@@ -36,6 +41,7 @@ const (
 	DnsLeakLabelSystemResolvers = "dnsLeak.check.systemResolvers"
 	DnsLeakLabelEncryptedDNS    = "dnsLeak.check.encryptedDns"
 	DnsLeakLabelKillSwitchDNS   = "dnsLeak.check.killSwitchDns"
+	DnsLeakLabelSpoofDNS        = "dnsLeak.check.dnsSpoof"
 )
 
 // Localization keys for the suggested fixes. A check may carry a hint
@@ -45,6 +51,7 @@ const (
 	DnsLeakFixReviewResolvers  = "dnsLeak.fix.reviewSystemResolvers"
 	DnsLeakFixReviewEncrypted  = "dnsLeak.fix.reviewEncryptedDns"
 	DnsLeakFixEnableKillSwitch = "dnsLeak.fix.enableKillSwitch"
+	DnsLeakFixUseEncryptedDNS  = "dnsLeak.fix.useEncryptedDns"
 )
 
 // canaryHost is the fixed, documented name used to sanity-probe the tunnel
@@ -159,7 +166,8 @@ func probeVia(ctx context.Context, network, addr, host string) ([]string, error)
 // CheckDnsLeaks compares the session's DNS path against the OS resolvers and
 // the kill switch state, and flags OS-level encrypted DNS that bypasses the
 // tunnel. It performs DNS probes only: one canary query per probeable
-// tunnel resolver, in parallel.
+// tunnel resolver, in parallel, plus one verification round per plain
+// (UDP/TCP) tunnel resolver for the dns-spoof cross-check (T014).
 func CheckDnsLeaks(ctx context.Context, in DnsLeakInput) []DnsLeakCheck {
 	if in.CanaryHost == "" {
 		in.CanaryHost = canaryHost
@@ -189,12 +197,55 @@ func CheckDnsLeaks(ctx context.Context, in DnsLeakInput) []DnsLeakCheck {
 		}
 	}
 
-	checks := make([]DnsLeakCheck, 0, 4)
-	checks = append(checks, checkTunnelDNS(ctx, in, tunnel, probe))
+	checks := make([]DnsLeakCheck, 0, 5)
+	tunnelCheck, firstRound := checkTunnelDNS(ctx, in, tunnel, probe)
+	checks = append(checks, tunnelCheck)
 	checks = append(checks, checkSystemResolvers(tunnel, normalizedSystem, in.DnsHijacked, in.KillSwitchArmed))
 	checks = append(checks, checkEncryptedDNS(in))
 	checks = append(checks, checkKillSwitchDNS(in.KillSwitchArmed))
+	checks = append(checks, checkDnsSpoof(ctx, in, firstRound, probe))
 	return checks
+}
+
+// checkDnsSpoof runs the T014 spoof comparison over the tunnel's
+// plain-DNS resolvers: the tunnel check's own canary answers are the
+// first round, and one verification round per resolver runs here, so
+// the whole leak check adds exactly one query per plain resolver.
+// Bogus and inconsistent verdicts are leaks of trust (the DNS path is
+// lying); unresolved and NXDOMAIN are reported without the leak flag —
+// no evidence, no accusation. System resolvers are deliberately not
+// queried here: this pipeline's contract is tunnel-path probes only;
+// cross-checking the system path is a separate, explicitly triggered
+// measurement (DetectDnsSpoof).
+func checkDnsSpoof(ctx context.Context, in DnsLeakInput, firstRound map[string][]string, probe func(context.Context, string, string, string) ([]string, error)) DnsLeakCheck {
+	check := DnsLeakCheck{
+		ID:       DnsLeakSpoofDNS,
+		Label:    DnsLeakLabelSpoofDNS,
+		Expected: "every tunnel resolver agrees on " + in.CanaryHost,
+	}
+	var targets []SpoofTarget
+	for _, r := range in.TunnelResolvers {
+		network, addr, skip := canaryTarget(r)
+		if skip == "" && (network == "udp" || network == "tcp") {
+			targets = append(targets, SpoofTarget{Network: network, Addr: addr})
+		}
+	}
+	if len(targets) == 0 {
+		check.Actual = "no plain-DNS tunnel resolver to cross-check"
+		return check
+	}
+	rep := CompareDnsSpoof(ctx, targets, in.CanaryHost, firstRound, probe)
+	if len(rep.Evidence) > 0 {
+		check.Actual = rep.Evidence[0]
+	} else {
+		check.Actual = rep.Verdict.String()
+	}
+	switch rep.Verdict {
+	case DnsSpoofBogus, DnsSpoofInconsistent:
+		check.Leaked = true
+		check.FixHint = DnsLeakFixUseEncryptedDNS
+	}
+	return check
 }
 
 // canaryTarget maps a tunnel resolver to the probe that can exercise it.
@@ -256,7 +307,7 @@ func dohEndpoint(r TunnelResolver) string {
 // canary-probes every probeable one in parallel: a broken second resolver
 // behind a working first one must not pass silently. Probe failures are
 // outages, not leaks, and are reported as such without raising the flag.
-func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, probe func(context.Context, string, string, string) ([]string, error)) DnsLeakCheck {
+func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, probe func(context.Context, string, string, string) ([]string, error)) (DnsLeakCheck, map[string][]string) {
 	check := DnsLeakCheck{
 		ID:       DnsLeakTunnelDNS,
 		Label:    DnsLeakLabelTunnelDNS,
@@ -266,7 +317,7 @@ func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, probe
 		check.Actual = "(none)"
 		check.Leaked = true
 		check.FixHint = DnsLeakFixConfigureTunnel
-		return check
+		return check, nil
 	}
 	type target struct {
 		network, addr, name string
@@ -296,14 +347,19 @@ func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, probe
 	}
 	if timeout <= 0 {
 		check.Actual = "canary skipped: no time left"
-		return check
+		return check, nil
 	}
 	if len(targets) == 0 {
 		check.Actual = displayList(tunnel) + " (canary not probed: " + strings.Join(skipped, "; ") + ")"
-		return check
+		return check, nil
 	}
 	results := make([]string, len(targets))
+	// firstRound carries each resolver's answers to the spoof
+	// cross-check (T014): it is the first of its two rounds, the
+	// verification round runs in checkDnsSpoof.
+	firstRound := make(map[string][]string, len(targets))
 	var wg sync.WaitGroup
+	var firstMu sync.Mutex
 	for i, tg := range targets {
 		wg.Add(1)
 		go func() {
@@ -318,12 +374,15 @@ func checkTunnelDNS(ctx context.Context, in DnsLeakInput, tunnel []string, probe
 				return
 			}
 			results[i] = tg.name + ": " + displayList(ips)
+			firstMu.Lock()
+			firstRound[tg.addr] = ips
+			firstMu.Unlock()
 		}()
 	}
 	wg.Wait()
 	parts := append(results, skipped...)
 	check.Actual = "canary " + in.CanaryHost + ": " + strings.Join(parts, "; ")
-	return check
+	return check, firstRound
 }
 
 // checkSystemResolvers flags OS resolvers that would answer outside the

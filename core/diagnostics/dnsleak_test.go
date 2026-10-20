@@ -36,8 +36,8 @@ func findCheck(checks []diagnostics.DnsLeakCheck, id string) *diagnostics.DnsLea
 
 func TestCheckDnsLeaks_Clean(t *testing.T) {
 	checks := diagnostics.CheckDnsLeaks(context.Background(), leakInput())
-	if len(checks) != 4 {
-		t.Fatalf("expected 4 checks, got %d", len(checks))
+	if len(checks) != 5 {
+		t.Fatalf("expected 5 checks, got %d", len(checks))
 	}
 	for _, c := range checks {
 		if c.Leaked {
@@ -196,8 +196,11 @@ func TestCheckDnsLeaks_ProbesEveryResolver(t *testing.T) {
 	if tunnel == nil {
 		t.Fatal("missing tunnel-dns check")
 	}
-	if len(probed) != 2 {
-		t.Errorf("expected both resolvers probed, got %q", probed)
+	// Two rounds per resolver since T014: the tunnel canary round plus
+	// the dns-spoof verification round. The guard's point stands: every
+	// resolver is probed, a broken second one cannot hide.
+	if len(probed) != 4 {
+		t.Errorf("expected both resolvers probed in both rounds, got %q", probed)
 	}
 	if !strings.Contains(tunnel.Actual, "1.1.1.1: 203.0.113.7") || !strings.Contains(tunnel.Actual, "9.9.9.9: unreachable") {
 		t.Errorf("per-resolver results not reported, got %q", tunnel.Actual)
