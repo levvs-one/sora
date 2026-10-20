@@ -869,6 +869,12 @@ class Sora extends ChangeNotifier {
           notifyListeners();
         } else if (event.hasGroupSwitched() && fresh) {
           _fallbackMoved(event.groupSwitched);
+        } else if (event.hasProfileMatched() && fresh) {
+          // The core auto-matched a network profile (1.10+): apply it when
+          // auto-apply is on, otherwise ask the user. handleProfileMatched
+          // ignores unknown profile ids, so a stale core/client profile set
+          // cannot break the watch.
+          unawaited(handleProfileMatched(event.profileMatched.profileId));
         }
       },
       onError: (Object error) {
