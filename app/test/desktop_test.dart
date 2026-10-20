@@ -37,10 +37,17 @@ void main() {
       expect(parseImportLink('happ://crypt/AbCdEf=='), isA<SealedForHapp>());
     });
 
+    test('bare web subscription URLs are accepted as pasted', () {
+      // Deliberate since 3e9a0e32: the share flow QR-encodes the raw
+      // subscription link and users paste raw links from messengers, so
+      // parseImportLink accepts a bare http(s) URL directly.
+      expect(add('https://sub.example.com/a').url.toString(), 'https://sub.example.com/a');
+      expect(add('http://sub.example.com/a').url.toString(), 'http://sub.example.com/a');
+    });
+
     test('anything that is not a web subscription is refused', () {
       for (final text in [
         '',
-        'https://sub.example.com/a',
         'sora://add/file:///etc/passwd',
         'sora://add/javascript:alert(1)',
         'happ://add/',
