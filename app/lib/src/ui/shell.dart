@@ -47,6 +47,22 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
   // Connections (2) restored to its 1.0.7 slot: 8th item, Ctrl+8.
   // About (7) stays last and is pinned at the sidebar bottom.
   static const _sectionOrder = [0, 6, 8, 4, 1, 3, 5, 2, 7];
+
+  // Section widgets by section index. All are const constructors and only
+  // the selected one is ever inflated (by the content Navigator below), so
+  // the list itself is built once instead of on every shell rebuild — the
+  // shell rebuilds on every Sora notification.
+  static const _pages = <Widget>[
+    HomeScreen(),
+    RulesScreen(),
+    ConnectionsScreen(),
+    LogsScreen(),
+    NotificationsScreen(),
+    SettingsScreen(),
+    SpeedtestScreen(),
+    AboutScreen(),
+    ExtensionsScreen(),
+  ];
   final _scaffold = GlobalKey<ScaffoldState>();
   final _tourKeys = List.generate(5, (_) => GlobalKey());
   final _focus = FocusNode();
@@ -261,18 +277,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
     final width = MediaQuery.sizeOf(context).width;
     final compact = width < 720;
     final expanded = width >= 1000 && sora.settings.sidebarExpanded;
-    final pages = <Widget>[
-      const HomeScreen(),
-      const RulesScreen(),
-      const ConnectionsScreen(),
-      const LogsScreen(),
-      const NotificationsScreen(),
-      const SettingsScreen(),
-      const SpeedtestScreen(),
-      const AboutScreen(),
-      const ExtensionsScreen(),
-    ];
-    final page = pages[_section];
+    final page = _pages[_section];
     final content = KeyedSubtree(
       key: ObjectKey(_contentNavigator),
       child: Navigator(
