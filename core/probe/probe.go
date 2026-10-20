@@ -60,6 +60,9 @@ type Prober struct {
 	freeze         *FreezeDetector
 	freezeMu       sync.Mutex
 	freezeInFlight map[string]int
+	// quality is the T035 path-quality sink: every measured dial feeds
+	// its (server, transport) series, feeding CENSORSHIP-METER.
+	quality *QualityRegistry
 	// lookupIP resolves endpoint hosts for address racing; nil uses
 	// the system resolver. Tests override it to avoid the network.
 	lookupIP func(ctx context.Context, host string) ([]netip.Addr, error)
@@ -83,7 +86,16 @@ func New(cfg Config) *Prober {
 		serverName:  cfg.ServerName,
 		slots:       make(chan struct{}, cfg.Concurrency),
 		requests:    make(chan struct{}, MaxConcurrentRequests),
+		quality:     NewQualityRegistry(),
 	}
+}
+
+// Quality returns the T035 path-quality registry: one PathQuality series
+// per (server, transport) pair, fed by every dial this prober performs.
+// Diagnostics (T018) and the future meter read it; the registry is never
+// nil.
+func (p *Prober) Quality() *QualityRegistry {
+	return p.quality
 }
 
 // SetFreezeDetector attaches the passive freeze detector: every TLS dial
@@ -183,11 +195,20 @@ func (p *Prober) measure(ctx context.Context, index int, endpoint *corev1.Endpoi
 		result.Error = toWire(err, "")
 		return result
 	}
+	// T035: every measured dial is a path-quality sample for its
+	// (server, transport) series — failures count as loss, successes
+	// carry their dial latency as the RTT sample.
+	transport := "tcp"
+	if p.tls {
+		transport = "tls"
+	}
 	latency, err := p.dial(ctx, host, port)
 	if err != nil {
+		p.quality.Observe(result.ServerId, transport, 0, false, time.Now())
 		result.Error = toWire(err, host)
 		return result
 	}
+	p.quality.Observe(result.ServerId, transport, latency, true, time.Now())
 	result.Reachable = true
 	result.LatencyMs = counter(latency.Milliseconds())
 	return result

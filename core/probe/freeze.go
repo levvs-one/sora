@@ -64,16 +64,31 @@ const (
 )
 
 // freezeFingerprintRotation is the auto-switch order for the uTLS
-// fingerprint when a freeze fires: common browser parrots only. "random" is
-// excluded — a random pick can land back on the throttled fingerprint —
-// and so are the region-specific "360"/"qq".
-var freezeFingerprintRotation = []string{"chrome", "firefox", "safari", "edge", "ios", "android"}
+// fingerprint when a freeze fires. It is the single source of truth for
+// freeze rotations across the core: the censor package's policy layer
+// reads the same list (see FreezeFingerprintRotation).
+//
+// Chrome, Safari and iOS are deliberately absent: per the field reports
+// behind T007 those are the fingerprints the siberian freeze targets, so
+// rotating *to* them is never the answer. "random" is excluded — a random
+// pick can land back on the throttled fingerprint. The list is ordered by
+// field success: Firefox first.
+var freezeFingerprintRotation = []string{"firefox", "edge", "qq", "android"}
+
+// FreezeFingerprintRotation returns the freeze-mitigation rotation order
+// (a copy): the fingerprints a session may rotate to after a recognized
+// freeze, in the order to try them. Chrome, Safari and iOS are excluded
+// on purpose (see freezeFingerprintRotation).
+func FreezeFingerprintRotation() []string {
+	return append([]string(nil), freezeFingerprintRotation...)
+}
 
 // RotateFingerprint returns the next fingerprint after current in the
 // freeze-mitigation rotation, wrapping around. Names are matched
-// case-insensitively; an empty or unknown current yields "firefox" —
-// deliberately different from engine.DefaultFingerprint ("chrome") so the
-// switch is real even when the caller had no fingerprint configured.
+// case-insensitively; an empty, unknown or suspect (chrome/safari/ios)
+// current yields "firefox" — deliberately different from
+// engine.DefaultFingerprint ("chrome") so the switch is real even when
+// the caller had no fingerprint configured.
 func RotateFingerprint(current string) string {
 	norm := ""
 	for _, r := range freezeFingerprintRotation {

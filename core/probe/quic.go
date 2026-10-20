@@ -104,6 +104,15 @@ func (r *QUICResult) Advice() string {
 // Negotiation; no real handshake is performed and nothing is retransmitted,
 // so a lost probe never extends a residual ban by itself.
 func ProbeQUIC(ctx context.Context, host string, port int) (*QUICResult, error) {
+	return ProbeQUICWithTracker(ctx, host, port, nil)
+}
+
+// ProbeQUICWithTracker is ProbeQUIC with a residual-ban tracker (T008/31):
+// the dial rotates away from banned source ports instead of hammering a
+// dead 4-tuple, and a Blocked verdict records the tuple so the next dial —
+// probe or pre-flight — does not extend the ban. A nil tracker behaves
+// exactly like ProbeQUIC.
+func ProbeQUICWithTracker(ctx context.Context, host string, port int, tracker *BanTracker) (*QUICResult, error) {
 	if host == "" {
 		return nil, errors.New("probe: quic probe needs a host")
 	}
@@ -114,9 +123,9 @@ func ProbeQUIC(ctx context.Context, host string, port int) (*QUICResult, error) 
 	if err != nil {
 		return nil, err
 	}
-	conn, err := net.DialUDP("udp", nil, raddr)
+	conn, err := DialQUIC(ctx, raddr, tracker)
 	if err != nil {
-		return nil, fmt.Errorf("probe: dial udp: %w", err)
+		return nil, err
 	}
 	defer conn.Close()
 	laddr, ok := conn.LocalAddr().(*net.UDPAddr)
@@ -152,7 +161,13 @@ func ProbeQUIC(ctx context.Context, host string, port int) (*QUICResult, error) 
 				return res, nil
 			}
 			if isTimeout(err) {
-				return res.withControl(ctx, host, port)
+				out, cerr := res.withControl(ctx, host, port)
+				if cerr == nil && out.Verdict == VerdictBlocked && tracker != nil {
+					// Feed the tracker: this 4-tuple just ate a drop, so
+					// the next dial must rotate away from it (T008).
+					tracker.NoteBlocked(localPort, remote)
+				}
+				return out, cerr
 			}
 			res.Verdict = VerdictUnknown
 			return res, nil
@@ -281,4 +296,70 @@ func (b *BanTracker) Banned(localPort int, remote string) bool {
 
 func banKey(localPort int, remote string) string {
 	return fmt.Sprintf("%d->%s", localPort, remote)
+}
+
+// quicDialAttempts bounds the source-port rotation loop: a banned port is
+// re-rolled, but an environment where every fresh port is banned is a
+// signal to report, not a loop to spin in.
+const quicDialAttempts = 4
+
+// dialUDPFunc dials a connected UDP socket; it exists so tests can hand
+// out sockets on chosen local ports. Production passes net.DialUDP.
+type dialUDPFunc func(ctx context.Context, network string, laddr, raddr *net.UDPAddr) (*net.UDPConn, error)
+
+// DialQUIC dials raddr over UDP for a QUIC handshake, rotating the local
+// source port when tracker says the 4-tuple is inside its residual ban
+// (T008, spec 31-quic-residual-ban.md). Each attempt binds a fresh
+// ephemeral port; a banned socket is closed without a single packet
+// sent, because a retry from a banned port only renews the ban. Attempts
+// back off exponentially (100 ms, 200 ms, 400 ms) for the same reason.
+// A nil tracker disables the rotation and dials once.
+//
+// Scope, honestly: this covers the QUIC dials sora's own code performs
+// (reachability probes, pre-flight checks). The QUIC handshakes of the
+// Hysteria2/TUIC outbounds happen inside the engine binaries and cannot
+// be spliced from here; engines rotate source ports themselves or not at
+// all — that gap is tracked in the spec, not hidden.
+func DialQUIC(ctx context.Context, raddr *net.UDPAddr, tracker *BanTracker) (*net.UDPConn, error) {
+	return dialQUIC(ctx, raddr, tracker, func(ctx context.Context, network string, laddr, raddr *net.UDPAddr) (*net.UDPConn, error) {
+		var d net.Dialer
+		conn, err := d.DialContext(ctx, network, raddr.String())
+		if err != nil {
+			return nil, err
+		}
+		udp, ok := conn.(*net.UDPConn)
+		if !ok {
+			_ = conn.Close()
+			return nil, errors.New("probe: udp dial did not return a udp socket")
+		}
+		return udp, nil
+	})
+}
+
+func dialQUIC(ctx context.Context, raddr *net.UDPAddr, tracker *BanTracker, dial dialUDPFunc) (*net.UDPConn, error) {
+	remote := raddr.String()
+	backoff := 100 * time.Millisecond
+	for attempt := 0; ; attempt++ {
+		conn, err := dial(ctx, "udp", nil, raddr)
+		if err != nil {
+			return nil, fmt.Errorf("probe: dial udp: %w", err)
+		}
+		lport := 0
+		if la, ok := conn.LocalAddr().(*net.UDPAddr); ok {
+			lport = la.Port
+		}
+		if tracker == nil || lport == 0 || !tracker.Banned(lport, remote) {
+			return conn, nil
+		}
+		_ = conn.Close()
+		if attempt+1 >= quicDialAttempts {
+			return nil, fmt.Errorf("probe: %d fresh source ports to %s are all in residual ban", quicDialAttempts, remote)
+		}
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(backoff):
+		}
+		backoff *= 2
+	}
 }

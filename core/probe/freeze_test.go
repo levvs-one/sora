@@ -136,12 +136,19 @@ func TestFreezeDetectorStaleSamplesIgnored(t *testing.T) {
 	}
 }
 
-// TestRotateFingerprint checks the auto-switch order.
+// TestRotateFingerprint checks the auto-switch order. The rotation never
+// lands on Chrome, Safari or iOS: per the T007 field reports those are
+// the fingerprints the freeze targets, so the first move from any suspect
+// current is always away from the suspect set.
 func TestRotateFingerprint(t *testing.T) {
 	cases := map[string]string{
-		"chrome":  "firefox",
-		"firefox": "safari",
-		"android": "chrome", // wraps around
+		"chrome":  "firefox", // suspect: first move is away
+		"safari":  "firefox", // suspect
+		"ios":     "firefox", // suspect
+		"firefox": "edge",
+		"edge":    "qq",
+		"qq":      "android",
+		"android": "firefox", // wraps around, still inside the safe set
 		"Chrome":  "firefox",
 		"":        "firefox", // unknown/empty switches away from the default
 		"bogus":   "firefox",
@@ -152,9 +159,10 @@ func TestRotateFingerprint(t *testing.T) {
 			t.Fatalf("RotateFingerprint(%q) = %q, want %q", in, got, want)
 		}
 	}
-	// Full cycle returns to the start without repeats.
+	// Full cycle returns to the start without repeats and never leaves
+	// the safe set.
 	seen := map[string]bool{}
-	cur := "chrome"
+	cur := "firefox"
 	for i := 0; i < len(freezeFingerprintRotation); i++ {
 		if seen[cur] {
 			t.Fatalf("rotation repeated %q", cur)
@@ -162,8 +170,23 @@ func TestRotateFingerprint(t *testing.T) {
 		seen[cur] = true
 		cur = RotateFingerprint(cur)
 	}
-	if cur != "chrome" {
+	if cur != "firefox" {
 		t.Fatalf("rotation did not cycle, ended at %q", cur)
+	}
+	// The exported list is the same single source of truth, and callers
+	// cannot mutate it.
+	rot := FreezeFingerprintRotation()
+	if len(rot) != len(freezeFingerprintRotation) {
+		t.Fatalf("FreezeFingerprintRotation = %v, want %v", rot, freezeFingerprintRotation)
+	}
+	for _, fp := range rot {
+		if fp == "chrome" || fp == "safari" || fp == "ios" {
+			t.Fatalf("rotation contains suspect fingerprint %q", fp)
+		}
+	}
+	rot[0] = "chrome"
+	if freezeFingerprintRotation[0] == "chrome" {
+		t.Fatalf("FreezeFingerprintRotation leaked the internal slice")
 	}
 }
 
