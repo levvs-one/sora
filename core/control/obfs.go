@@ -509,8 +509,9 @@ func (s *Server) saveObfsProfile(p *obfsv1.ObfuscationProfile) error {
 // loadObfsProfile reads the persisted profile. A missing file means the
 // suite was never configured; a corrupt or invalid one is reported through
 // warn and ignored so a hand-edited file can never break startup. The warn
-// messages are self-contained: the server journals them into the first
-// session's event stream so WatchEvents surfaces the disabled suite.
+// messages are self-contained: the server journals them into every later
+// session's event stream (until ApplyObfsProfile clears the warning) so
+// WatchEvents surfaces the disabled suite.
 func loadObfsProfile(path string, warn func(string)) *obfsv1.ObfuscationProfile {
 	raw, err := os.ReadFile(path)
 	if err != nil {
