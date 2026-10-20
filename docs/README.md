@@ -17,6 +17,7 @@
 - [Разработка и сборка](development.md)
 - [Расширения: manifest v1](extensions.md) (in English)
 - [Android VpnService: архитектура будущего клиента](android-vpnservice.md)
+- [Политика поэтапного обновления](update-rollout.md)
 
 ## Безопасность
 

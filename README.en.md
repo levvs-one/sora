@@ -47,15 +47,15 @@ For older systems, there is a separate client: [sora-legacy](https://github.com/
 - Subscriptions with auto-update: lowest-latency server selection, traffic usage, expiry dates, provider announcements.
 - TUN adapter or system proxy; kill switch; split tunneling by site, IP address and app.
 - On Linux, a serverless zapret mode for some blocks. It does not hide your IP address or replace a VPN.
-- One-click diagnostics: HAR, PCAPNG, Windows event logs; in-app updates; 32 interface languages.
+- One-click diagnostics: HAR and a redacted core diagnostics archive; in-app updates; 32 interface languages.
 - Extensions: signed add-ons that extend the client.
 
 ## Security
 
 - Releases ship with `SHA256SUMS` — the install scripts verify checksums before installing.
-- Release authenticity: minisign signature (`SHA256SUMS`) plus file checksums; without a valid signature, installation and updates refuse to proceed.
+- Release authenticity: minisign signature (`SHA256SUMS`) plus file checksums; without a valid signature, installation and updates refuse to proceed. The signing key is issued by the project owner (key ceremony); until it is configured, verification refuses to continue — fail-closed.
 - In-app updates verify checksums of downloaded files.
-- No telemetry: Sora sends nothing to developers or third parties.
+- No telemetry: Sora sends no analytics or usage statistics to the developers. The only network contact the app itself makes is checking GitHub for updates: GitHub sees your IP address and app version, as with any website visit (can be turned off in settings).
 
 Details — in [docs/security.md](docs/security.md).
 
