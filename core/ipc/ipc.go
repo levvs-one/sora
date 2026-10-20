@@ -7,6 +7,8 @@ package ipc
 import (
 	"context"
 	"net"
+	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -50,7 +52,18 @@ type Options struct {
 	Allow func(Peer) bool
 	// HandshakeTimeout bounds a connection that has not introduced itself.
 	HandshakeTimeout time.Duration
+	// MaxConnections caps simultaneously open connections; connections
+	// beyond the cap are refused without a reply. Zero selects
+	// DefaultMaxConnections. It bounds local FD-exhaustion denial of
+	// service (SORA-M1).
+	MaxConnections int
 }
+
+const (
+	// DefaultMaxConnections caps simultaneous control-plane connections
+	// when Options.MaxConnections is not set.
+	DefaultMaxConnections = 128
+)
 
 // Listener is the local endpoint the control plane is served on.
 type Listener struct {
@@ -58,6 +71,7 @@ type Listener struct {
 	address string
 	options Options
 	allow   func(Peer) bool
+	active  atomic.Int64
 }
 
 // Listen opens a context-owned endpoint. Cancellation closes the listener even
@@ -94,7 +108,9 @@ func Listen(ctx context.Context, opts Options) (*Listener, error) {
 func (l *Listener) Address() string { return l.address }
 
 // Accept returns the next authorized connection. Checking peers here also
-// protects gRPC servers using the listener directly.
+// protects gRPC servers using the listener directly. Connections beyond the
+// configured cap are refused without a reply to bound local FD exhaustion
+// (SORA-M1).
 func (l *Listener) Accept() (net.Conn, error) {
 	for {
 		connection, err := l.Listener.Accept()
@@ -107,8 +123,50 @@ func (l *Listener) Accept() (net.Conn, error) {
 			_ = connection.Close()
 			continue
 		}
-		return connection, nil
+		if !l.admit() {
+			// Over the connection cap: refuse silently; the client
+			// may retry.
+			_ = connection.Close()
+			continue
+		}
+		return &countedConn{Conn: connection, done: l.release}, nil
 	}
+}
+
+// admit takes one connection slot when the cap allows it.
+func (l *Listener) admit() bool {
+	max := l.options.MaxConnections
+	if max <= 0 {
+		max = DefaultMaxConnections
+	}
+	for {
+		n := l.active.Load()
+		if n >= int64(max) {
+			return false
+		}
+		if l.active.CompareAndSwap(n, n+1) {
+			return true
+		}
+	}
+}
+
+// release frees one connection slot.
+func (l *Listener) release() { l.active.Add(-1) }
+
+// ActiveConnections reports the current number of open connections.
+func (l *Listener) ActiveConnections() int64 { return l.active.Load() }
+
+// countedConn releases the listener's connection slot on close.
+type countedConn struct {
+	net.Conn
+	done func()
+	once sync.Once
+}
+
+// Close implements net.Conn.
+func (c *countedConn) Close() error {
+	c.once.Do(c.done)
+	return c.Conn.Close()
 }
 
 // Serve runs a handler per admitted connection until cancellation closes the
@@ -133,6 +191,10 @@ func (l *Listener) Serve(ctx context.Context, handle func(context.Context, net.C
 }
 
 // dispatch gives one connection its own context and its introduction budget.
+// The budget stays in force for the whole handler call: handlers serving
+// long-lived streams must clear or extend the deadline once the peer has
+// introduced itself. Clearing it before the handler runs would leave silent
+// connections unbounded (SORA-M1).
 func (l *Listener) dispatch(ctx context.Context, connection net.Conn, handle func(context.Context, net.Conn) error) {
 	connectionCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -142,9 +204,6 @@ func (l *Listener) dispatch(ctx context.Context, connection net.Conn, handle fun
 		timeout = handshakeTimeout
 	}
 	_ = connection.SetDeadline(time.Now().Add(timeout))
-	// Clear the introduction deadline because the handler owns subsequent
-	// long-lived streams.
-	_ = connection.SetDeadline(time.Time{})
 	_ = handle(connectionCtx, connection)
 }
 
