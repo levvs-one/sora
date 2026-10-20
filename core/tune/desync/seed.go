@@ -88,8 +88,9 @@ func SeedParams() []Params {
 	return out
 }
 
-// ExecutableSeeds returns only the seeds the named executor can run.
-// "tpws" today, "nfqws" when the executor lands.
+// ExecutableSeeds returns only the seeds the named executor can run:
+// "tpws" excludes the nfqws-only genomes; "nfqws" (the executor in
+// core/engine/bypass) runs the whole pool.
 func ExecutableSeeds(engine string) []Params {
 	var out []Params
 	for _, p := range SeedParams() {

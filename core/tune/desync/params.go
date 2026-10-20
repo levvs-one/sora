@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/bypass"
 )
 
 // Method is one desync primitive the tuner can combine. The set mirrors
@@ -94,10 +97,12 @@ type Params struct {
 	Scope Scope
 }
 
-// RequiresNFQWS reports whether any field needs nfqws. sora executes
-// bypass through tpws today (core/engine/bypass); a candidate that
-// requires nfqws must wait for the nfqws executor instead of failing
-// silently under tpws.
+// RequiresNFQWS reports whether any field needs nfqws. tpws cannot
+// express those fields; before the nfqws executor landed
+// (core/engine/bypass) such candidates had to wait — now they run
+// through BypassStrategy/NFQWSArgs below. Callers must still check:
+// feeding an nfqws-only genome to the tpws subset (Args) drops the
+// fields silently.
 func (p Params) RequiresNFQWS() bool {
 	return p.Method == MethodFake ||
 		p.Fooling != "" ||
@@ -200,4 +205,101 @@ func (p Params) Describe() string {
 		b.WriteString(" (needs nfqws)")
 	}
 	return b.String()
+}
+
+// BypassStrategy converts the genome into the engine strategy the
+// bypass executors run. The conversion is faithful or it refuses:
+// ok=false means the genome has no exact rendering (a TTL without the
+// fake method, OOB combined with nfqws-only fooling, the none control
+// arm) and a caller must skip it rather than run an approximation.
+//
+// Genomes that need nfqws render through the desync fields: fake
+// stays fake, split/disorder become their nfqws forms (split2,
+// disorder2), and the filters are set from the genome's scope/proto
+// so the executor queues exactly the traffic the genome targets —
+// mirroring the reference set's filters in bypass.DefaultStrategy.
+// Genomes tpws can express render through the legacy fields.
+func (p Params) BypassStrategy() (engine.BypassStrategy, bool) {
+	// TTL, autottl and repeats ride on the fake packet; without the
+	// fake method they are unexecutable (plan validation agrees).
+	if p.Method != MethodFake && (p.TTL > 0 || p.AutoTTL || p.Repeats > 1) {
+		return engine.BypassStrategy{}, false
+	}
+	var s engine.BypassStrategy
+	if p.SplitPos != "" {
+		s.SplitPos = []string{p.SplitPos}
+	}
+	nfq := p.RequiresNFQWS()
+	switch p.Method {
+	case MethodFake:
+		s.Desync = []string{"fake"}
+	case MethodSplit:
+		if nfq {
+			s.Desync = []string{"split2"}
+		}
+	case MethodDisorder:
+		if nfq {
+			s.Desync = []string{"disorder2"}
+		} else {
+			s.Disorder = true
+		}
+	case MethodOOB:
+		if nfq {
+			return engine.BypassStrategy{}, false // nfqws has no OOB byte
+		}
+		s.OOB = true
+	case MethodTLSRec:
+		if nfq {
+			return engine.BypassStrategy{}, false
+		}
+		s.TLSRecord = "sniext+1"
+		if p.SplitPos != "" {
+			s.TLSRecord = p.SplitPos
+		}
+		s.SplitPos = nil
+	case MethodHTTPShuffle:
+		if nfq {
+			return engine.BypassStrategy{}, false
+		}
+		s.HostCase, s.HostDot = true, true
+	default: // MethodNone: the control arm carries no strategy at all.
+		return engine.BypassStrategy{}, false
+	}
+	if len(s.Desync) == 0 {
+		return s, true
+	}
+	s.Fooling = p.Fooling
+	switch p.FakeProto {
+	case "tls":
+		s.FakeTLS = "tls"
+	case "quic":
+		s.FakeQUIC = "quic"
+	}
+	if p.Method == MethodFake {
+		s.TTL, s.AutoTTL, s.Repeats = p.TTL, p.AutoTTL, p.Repeats
+	}
+	// Filters: the executor refuses unfiltered strategies, so a
+	// genome that names no scope still gets the reference filter set
+	// for its protocol family.
+	switch {
+	case p.FakeProto == "quic" || p.Scope == ScopeQUIC:
+		s.FilterUDP, s.FilterL7 = "443", "quic"
+	case p.Scope == ScopeHTTP:
+		s.FilterTCP, s.FilterL7 = "80", "http"
+	default:
+		s.FilterTCP, s.FilterL7 = "80,443", "tls"
+	}
+	return s, true
+}
+
+// NFQWSArgs renders the full genome as nfqws arguments, through the
+// same renderer the executor uses (bypass.NFQWSArgs), so a tuned
+// strategy and a hand-written one can never drift apart. ok=false
+// when the genome has no faithful nfqws rendering.
+func (p Params) NFQWSArgs(home string) ([]string, bool) {
+	s, ok := p.BypassStrategy()
+	if !ok || bypass.BackendOf(s) != bypass.BackendNFQWS {
+		return nil, false
+	}
+	return bypass.NFQWSArgs(s, home), true
 }
