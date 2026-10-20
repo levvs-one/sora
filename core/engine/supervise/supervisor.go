@@ -263,6 +263,7 @@ func (s *Supervisor) PlanNames() map[string]string {
 func (s *Supervisor) Validate(ctx context.Context, p *engine.Plan) (err error) {
 	if p != nil {
 		s.redactor.Add(p.Secrets()...)
+	s.redactor.Add(p.Identifiers()...)
 	}
 	defer func() {
 		if err != nil && s.cfg.Logs != nil {
@@ -333,6 +334,7 @@ func (s *Supervisor) Apply(ctx context.Context, p *engine.Plan) error {
 	}
 	s.mu.Lock()
 	s.redactor.Add(p.Secrets()...)
+	s.redactor.Add(p.Identifiers()...)
 	s.plan = p
 	s.stopping = false
 	proc, rt := s.proc, s.rt
