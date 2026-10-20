@@ -470,3 +470,83 @@ func TestObserveFailureIgnoresCancellation(t *testing.T) {
 		t.Fatalf("deadline-exceeded attempts must still record stalls: %+v", v)
 	}
 }
+
+// TestFreezeVerdictEvidencePinned pins the exact evidence strings of
+// every verdict branch and checks that a verdict delivered through the
+// OnFreeze hook carries the same evidence as a direct Verdict call for
+// the same samples. The [opt40] split of Verdict into a counting scan
+// plus lazy evidence formatting must stay byte-identical to the
+// single-pass original.
+func TestFreezeVerdictEvidencePinned(t *testing.T) {
+	feed := func(d *FreezeDetector, sni string, seqOK, seqStalled, parStalled, parOK int) {
+		for i := 0; i < seqOK; i++ {
+			d.Observe(FreezeSample{SNI: sni, Concurrent: 1})
+		}
+		for i := 0; i < seqStalled; i++ {
+			d.Observe(FreezeSample{SNI: sni, Concurrent: 1, Stalled: true})
+		}
+		for i := 0; i < parStalled; i++ {
+			d.Observe(FreezeSample{SNI: sni, Concurrent: 6, Stalled: true})
+		}
+		for i := 0; i < parOK; i++ {
+			d.Observe(FreezeSample{SNI: sni, Concurrent: 6})
+		}
+	}
+	cases := []struct {
+		name                           string
+		seqOK, seqStalled, parS, parOK int
+		wantFrozen                     bool
+		wantEvidence                   []string
+	}{
+		{"frozen", 2, 0, 3, 1, true, []string{
+			"3 of 4 parallel dials (concurrency > 3) stalled",
+			"2 of 2 sequential dials succeeded: the endpoint is alive, the path throttles concurrency",
+		}},
+		{"dead endpoint", 0, 2, 3, 0, false, []string{
+			"sequential dials stalled too (2 of 2): dead or slow endpoint, not a freeze signature",
+		}},
+		{"healthy parallel", 1, 0, 0, 3, false, []string{
+			"3 parallel dials completed: no freeze",
+		}},
+		{"sparse", 1, 0, 1, 0, false, []string{
+			"not enough was observed to name a freeze pattern",
+		}},
+	}
+	for _, tc := range cases {
+		d := &FreezeDetector{}
+		feed(d, "example.com", tc.seqOK, tc.seqStalled, tc.parS, tc.parOK)
+		v := d.Verdict("example.com")
+		if v.Frozen != tc.wantFrozen {
+			t.Errorf("%s: Frozen = %v, want %v", tc.name, v.Frozen, tc.wantFrozen)
+		}
+		if len(v.Evidence) != len(tc.wantEvidence) {
+			t.Fatalf("%s: Evidence = %v, want %v", tc.name, v.Evidence, tc.wantEvidence)
+		}
+		for i := range tc.wantEvidence {
+			if v.Evidence[i] != tc.wantEvidence[i] {
+				t.Errorf("%s: Evidence[%d] = %q, want %q", tc.name, i, v.Evidence[i], tc.wantEvidence[i])
+			}
+		}
+	}
+
+	// The hook receives the fully-formed frozen verdict, evidence
+	// included, exactly as Verdict reports it for the same samples.
+	// The feed stops at the exact observation that completes the
+	// pattern (the hook fires there), so both verdicts read identical
+	// tallies.
+	var hooked FreezeVerdict
+	d := &FreezeDetector{OnFreeze: func(v FreezeVerdict) { hooked = v }}
+	feed(d, "example.com", 2, 0, 2, 0)
+	direct := d.Verdict("example.com")
+	if !hooked.Frozen {
+		t.Fatal("hook did not receive a frozen verdict")
+	}
+	if len(hooked.Evidence) != len(direct.Evidence) {
+		t.Fatalf("hook evidence = %v, direct = %v", hooked.Evidence, direct.Evidence)
+	}
+	for i := range direct.Evidence {
+		if hooked.Evidence[i] != direct.Evidence[i] {
+			t.Errorf("hook Evidence[%d] = %q, direct %q", i, hooked.Evidence[i], direct.Evidence[i])
+		}
+	}
+}

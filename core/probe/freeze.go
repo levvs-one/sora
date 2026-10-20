@@ -270,7 +270,12 @@ func (d *FreezeDetector) Observe(s FreezeSample) {
 	if d.OnFreeze == nil {
 		return
 	}
-	v := d.Verdict(s.SNI)
+	// The hook check runs on every observed dial (the passive prober
+	// feeds each one), so it must not pay for verdict evidence that is
+	// almost always discarded: scanVerdict counts the pattern without
+	// formatting a single evidence string, and the strings are built
+	// only once the cooldown says this verdict will actually fire.
+	v := d.scanVerdict(s.SNI)
 	if !v.Frozen {
 		return
 	}
@@ -286,6 +291,7 @@ func (d *FreezeDetector) Observe(s FreezeSample) {
 	}
 	d.lastFire[s.SNI] = now
 	d.mu.Unlock()
+	v.Evidence = freezeEvidence(v)
 	d.OnFreeze(v)
 }
 
@@ -319,6 +325,18 @@ func (d *FreezeDetector) ObserveFailure(sni string, concurrent int, err error, t
 
 // Verdict reads the current pattern for one SNI.
 func (d *FreezeDetector) Verdict(sni string) FreezeVerdict {
+	v := d.scanVerdict(sni)
+	v.Evidence = freezeEvidence(v)
+	return v
+}
+
+// scanVerdict counts the freeze pattern for one SNI — Frozen,
+// Confidence and the tallies — without formatting any evidence
+// strings. Observe's per-dial hook check uses it so the common
+// outcomes (not frozen, or frozen but inside the OnFreeze cooldown)
+// allocate nothing; Verdict and the actual hook firing attach the
+// evidence via freezeEvidence, so consumers see identical verdicts.
+func (d *FreezeDetector) scanVerdict(sni string) FreezeVerdict {
 	sni = normalizeFreezeSNI(sni)
 	v := FreezeVerdict{SNI: sni}
 	d.mu.Lock()
@@ -341,29 +359,38 @@ func (d *FreezeDetector) Verdict(sni string) FreezeVerdict {
 			}
 		}
 	}
-	switch {
-	case v.ParallelStalled >= freezeMinStalled && v.SequentialOK >= freezeMinSequentialOK:
+	if v.ParallelStalled >= freezeMinStalled && v.SequentialOK >= freezeMinSequentialOK {
 		v.Frozen = true
 		v.Confidence = freezeConfidence(v.ParallelStalled, v.SequentialOK)
-		v.Evidence = []string{
+	}
+	return v
+}
+
+// freezeEvidence formats the human-readable evidence for a scanned
+// verdict. The strings depend only on the verdict's tallies, so a
+// verdict scanned without evidence and completed here is identical to
+// one built in a single pass.
+func freezeEvidence(v FreezeVerdict) []string {
+	switch {
+	case v.Frozen:
+		return []string{
 			evidencef("%d of %d parallel dials (concurrency > %d) stalled",
 				v.ParallelStalled, v.ParallelTotal, freezeParallelThreshold),
 			evidencef("%d of %d sequential dials succeeded: the endpoint is alive, the path throttles concurrency",
 				v.SequentialOK, v.SequentialTotal),
 		}
 	case v.SequentialTotal > 0 && v.SequentialOK == 0:
-		v.Evidence = []string{
+		return []string{
 			evidencef("sequential dials stalled too (%d of %d): dead or slow endpoint, not a freeze signature",
 				v.SequentialTotal-v.SequentialOK, v.SequentialTotal),
 		}
 	case v.ParallelTotal >= freezeMinStalled && v.ParallelStalled == 0:
-		v.Evidence = []string{
+		return []string{
 			evidencef("%d parallel dials completed: no freeze", v.ParallelTotal),
 		}
 	default:
-		v.Evidence = []string{"not enough was observed to name a freeze pattern"}
+		return []string{"not enough was observed to name a freeze pattern"}
 	}
-	return v
 }
 
 // freezeConfidence: 0.55 for the minimal pattern (2 stalled parallels, 1

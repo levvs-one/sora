@@ -8,6 +8,7 @@ package probe
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"testing"
 	"time"
@@ -168,5 +169,52 @@ func BenchmarkRotateFingerprint(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = RotateFingerprint("Chrome")
+	}
+}
+
+// [opt40] Observe with the OnFreeze hook attached — the production
+// wiring (cmd/sora-core sets OnFreeze), which the hook-less Observe
+// benches above do not model: with a hook, every Observe also runs
+// the verdict check.
+
+// A 200-server probe round: every dial lands on a distinct SNI, nothing
+// is frozen, the hook never fires — but Observe still pays for a verdict
+// on every sample.
+func BenchmarkFreezeObserveHookCold200(b *testing.B) {
+	d := &FreezeDetector{OnFreeze: func(FreezeVerdict) {}}
+	snis := make([]string, 200)
+	for i := range snis {
+		snis[i] = fmt.Sprintf("srv-%d.example.com", i)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		d.Observe(FreezeSample{SNI: snis[i%len(snis)], Concurrent: 6, Stalled: i%3 == 0})
+	}
+}
+
+// Mass freeze: the SNI is frozen, the verdict pattern holds, but the
+// 15-minute OnFreeze cooldown swallows every fire — Observe keeps
+// building (and discarding) full evidence verdicts per dial.
+func BenchmarkFreezeObserveHookFrozenCooldown(b *testing.B) {
+	d := &FreezeDetector{OnFreeze: func(FreezeVerdict) {}}
+	// Establish the freeze: sequential successes + stalled parallels.
+	for i := 0; i < 3; i++ {
+		d.Observe(FreezeSample{SNI: "example.com", Concurrent: 1, Stalled: false})
+	}
+	for i := 0; i < 4; i++ {
+		d.Observe(FreezeSample{SNI: "example.com", Concurrent: 6, Stalled: true})
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		// 4 stalled parallels per 1 sequential success keeps the
+		// differential pattern alive inside the 128-sample window:
+		// the verdict stays frozen the whole run.
+		if i%5 == 4 {
+			d.Observe(FreezeSample{SNI: "example.com", Concurrent: 1, Stalled: false, At: time.Now()})
+		} else {
+			d.Observe(FreezeSample{SNI: "example.com", Concurrent: 6, Stalled: true, At: time.Now()})
+		}
 	}
 }
