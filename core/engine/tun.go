@@ -12,16 +12,37 @@ import (
 var tunPools4 = []string{"192.0.2.1/30", "192.0.2.5/30", "192.0.2.9/30"}
 var tunPools6 = []string{"2001:db8:5340::1/126", "2001:db8:5341::1/126", "2001:db8:5342::1/126"}
 
+// fakeIPPools lists the fake-address pools in priority order. The default is
+// the RFC 2544 benchmarking range the renderers share (S7); the spares are
+// the other documentation/benchmark ranges. All sit outside private and
+// link-local space, so the kill switch never keeps them reachable.
+// benchmarkRangeOf validates an explicitly configured pool; the spares are
+// only picked when the default is genuinely occupied by the machine.
+var fakeIPPools = []string{"198.18.0.0/15", "198.51.100.0/24", "203.0.113.0/24"}
+
+// benchmarkRange is the range an explicitly configured fake-IP pool must
+// stay within. Reject custom LAN pools rather than allowing cached fake
+// addresses onto LAN.
+var benchmarkRange = netip.MustParsePrefix("198.18.0.0/15")
+
 // PrepareTun chooses session addresses before the guard and engines use them.
 // Restarts retain the choice so network watchers and firewall permits agree.
 func PrepareTun(p *Plan) error {
+	return prepareTun(p, net.InterfaceAddrs)
+}
+
+// prepareTun is PrepareTun with the interface list injected. Production
+// callers pass net.InterfaceAddrs; tests pass a fake so the suite does not
+// depend on the machine's interfaces (a host with a real 198.18.0.0/15
+// interface used to break the tests).
+func prepareTun(p *Plan, listAddrs func() ([]net.Addr, error)) error {
 	if p == nil {
 		return fmt.Errorf("tun: nil plan")
 	}
 	if !p.Tun.Enabled {
 		return nil
 	}
-	addrs, err := net.InterfaceAddrs()
+	addrs, err := listAddrs()
 	if err != nil {
 		return fmt.Errorf("tun: read interface addresses: %w", err)
 	}
@@ -33,16 +54,28 @@ func PrepareTun(p *Plan) error {
 		}
 		used = append(used, prefix)
 	}
-	// The benchmark range is reserved for synthesized addresses. Reject
-	// custom LAN pools rather than allowing cached fake addresses onto LAN.
 	fake := p.DNS.FakeIPRange
-	if fake == "" {
-		fake = DefaultFakeIPRange
+	configured := fake != ""
+	if !configured {
+		// A real 198.18.0.0/15 network makes the default unusable; fall
+		// back to another benchmark range instead of refusing to start
+		// TUN+FakeIP.
+		candidate, err := pickFakeIPPool(used)
+		if err != nil {
+			return err
+		}
+		fake = candidate
 	}
 	fakePrefix, err := netip.ParsePrefix(fake)
-	benchmark := netip.MustParsePrefix("198.18.0.0/15")
-	if err != nil || !fakePrefix.Addr().Is4() || fakePrefix.Bits() < benchmark.Bits() || !benchmark.Contains(fakePrefix.Addr()) {
-		return fmt.Errorf("tun: fake-IP pool must be within %s", benchmark)
+	if configured {
+		// The benchmark range is reserved for synthesized addresses.
+		// Reject custom LAN pools rather than allowing cached fake
+		// addresses onto LAN.
+		if err != nil || !fakePrefix.Addr().Is4() || fakePrefix.Bits() < benchmarkRange.Bits() || !benchmarkRange.Contains(fakePrefix.Addr()) {
+			return fmt.Errorf("tun: fake-IP pool must be within %s", benchmarkRange)
+		}
+	} else if err != nil || !fakePrefix.Addr().Is4() || fakePrefix.Bits() < benchmarkRange.Bits() {
+		return fmt.Errorf("tun: fake-IP pool is not usable: %s", fake)
 	}
 	// Keep the selected pool across restarts, including when both adapter
 	// addresses were supplied by the caller.
@@ -88,6 +121,22 @@ func PrepareTun(p *Plan) error {
 	}
 	p.DNS.FakeIPRange = fakePrefix.Masked().String()
 	return nil
+}
+
+// pickFakeIPPool returns the first fake-address pool that does not overlap
+// any existing interface, so a network that genuinely owns 198.18.0.0/15
+// falls back to another benchmark range instead of failing to start
+// TUN+FakeIP. When even the spares are taken the error stays honest: it
+// reaches the UI through the localized plan error key at the session
+// layer, never as a raw string.
+func pickFakeIPPool(used []netip.Prefix) (string, error) {
+	for _, candidate := range fakeIPPools {
+		pool := netip.MustParsePrefix(candidate)
+		if !slices.ContainsFunc(used, pool.Overlaps) {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("tun: every fake-IP pool overlaps an existing interface")
 }
 
 func chooseTunPrefix(candidates []string, used []netip.Prefix) (netip.Prefix, error) {
