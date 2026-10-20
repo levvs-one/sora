@@ -2208,4 +2208,8 @@ class SId extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Untuk Shadowsocks: metode:kata sandi, misalnya chacha20-ietf-poly1305:sandi';
 }

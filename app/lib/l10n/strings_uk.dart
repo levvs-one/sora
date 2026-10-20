@@ -2207,4 +2207,8 @@ class SUk extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Для Shadowsocks: метод:пароль, наприклад chacha20-ietf-poly1305:пароль';
 }

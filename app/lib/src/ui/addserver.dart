@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -9,15 +11,35 @@ import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../sora.dart';
 import 'kit.dart';
 
-/// Protocols the core can run for a user-added server: the full
-/// [CustomProtocol] enum minus UNSPECIFIED, which the core rejects.
+/// Protocols whose credentials fit one secret field. WireGuard needs peer
+/// keys and addresses, which arrive complete through a .conf import.
 const _protocols = [
   CustomProtocol.CUSTOM_PROTOCOL_VLESS,
   CustomProtocol.CUSTOM_PROTOCOL_VMESS,
   CustomProtocol.CUSTOM_PROTOCOL_TROJAN,
   CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS,
-  CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD,
 ];
+
+/// Builds the credential document the core stores in its vault and reads
+/// back when it plans a connection (core/control credentialDocument). An
+/// empty secret stores nothing; null means the secret does not fit the
+/// protocol (Shadowsocks needs `method:password`).
+String? customCredentialDocument(CustomProtocol protocol, String secret) {
+  if (secret.isEmpty) return '';
+  switch (protocol) {
+    case CustomProtocol.CUSTOM_PROTOCOL_VLESS:
+    case CustomProtocol.CUSTOM_PROTOCOL_VMESS:
+      return jsonEncode({'uuid': secret});
+    case CustomProtocol.CUSTOM_PROTOCOL_TROJAN:
+      return jsonEncode({'password': secret});
+    case CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS:
+      final colon = secret.indexOf(':');
+      if (colon <= 0 || colon == secret.length - 1) return null;
+      return jsonEncode({'method': secret.substring(0, colon), 'password': secret.substring(colon + 1)});
+    default:
+      return null;
+  }
+}
 
 /// Display name for a custom protocol: the generated enum keeps the
 /// CUSTOM_PROTOCOL_ prefix, the UI shows the bare name (VLESS, VMESS, ...).
@@ -53,7 +75,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
   @override
   void initState() {
     super.initState();
-    for (final entry in {'name': _name, 'address': _address, 'port': _port}.entries) {
+    for (final entry in {'name': _name, 'address': _address, 'port': _port, 'credentials': _credentials}.entries) {
       entry.value.addListener(() {
         if (_errors.remove(entry.key) != null && mounted) setState(() {});
       });
@@ -82,6 +104,9 @@ class _AddServerScreenState extends State<AddServerScreen> {
     }
     final port = int.tryParse(_port.text.trim());
     if (port == null || port < 1 || port > 65535) errors['port'] = s.customServerPortInvalid;
+    if (customCredentialDocument(_protocol, _credentials.text) == null) {
+      errors['credentials'] = s.customServerShadowsocksCredentials;
+    }
     setState(() {
       _errors
         ..clear()
@@ -97,7 +122,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
     address: _address.text.trim(),
     port: int.parse(_port.text.trim()),
     // Secrets are verbatim: never trim the credentials.
-    credentials: _credentials.text,
+    credentials: customCredentialDocument(_protocol, _credentials.text)!,
   );
 
   Future<void> _save() async {
@@ -175,7 +200,10 @@ class _AddServerScreenState extends State<AddServerScreen> {
             _SecretField(
               controller: _credentials,
               label: s.customServerCredentials,
-              hint: s.customServerOptional,
+              hint: _protocol == CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS
+                  ? s.customServerShadowsocksCredentials
+                  : s.customServerOptional,
+              error: _errors['credentials'],
             ),
           ],
         ),
@@ -263,11 +291,12 @@ class _LabeledField extends StatelessWidget {
 /// A password field that stays obscured until the user reveals it, like the
 /// hidden link in QR sharing.
 class _SecretField extends StatefulWidget {
-  const _SecretField({required this.controller, required this.label, required this.hint});
+  const _SecretField({required this.controller, required this.label, required this.hint, this.error});
 
   final TextEditingController controller;
   final String label;
   final String hint;
+  final String? error;
 
   @override
   State<_SecretField> createState() => _SecretFieldState();
@@ -283,6 +312,7 @@ class _SecretFieldState extends State<_SecretField> {
     return _LabeledField(
       label: widget.label,
       hint: widget.hint,
+      error: widget.error,
       child: TextField(
         controller: widget.controller,
         obscureText: _hidden,

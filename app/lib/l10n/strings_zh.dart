@@ -2191,6 +2191,9 @@ class SZh extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4379,6 +4382,9 @@ class SZhHans extends SZh {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6567,4 +6573,7 @@ class SZhHant extends SZh {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密碼，例如 chacha20-ietf-poly1305:password';
 }

@@ -2207,4 +2207,8 @@ class STk extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Shadowsocks üçin: usul:açar sözi, mysal üçin chacha20-ietf-poly1305:password';
 }

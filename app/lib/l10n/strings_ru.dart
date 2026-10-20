@@ -2230,4 +2230,8 @@ class SRu extends S {
   String serverReliability(int pct) {
     return 'Надёжность $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль';
 }

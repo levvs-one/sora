@@ -2207,4 +2207,8 @@ class STr extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Shadowsocks için: yöntem:parola, örneğin chacha20-ietf-poly1305:parola';
 }

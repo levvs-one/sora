@@ -1120,5 +1120,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "customServerShadowsocksCredentials": "Für Shadowsocks: Methode:Passwort, zum Beispiel chacha20-ietf-poly1305:passwort"
 }

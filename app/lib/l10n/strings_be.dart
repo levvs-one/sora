@@ -2207,4 +2207,8 @@ class SBe extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Для Shadowsocks: метад:пароль, напрыклад chacha20-ietf-poly1305:пароль';
 }

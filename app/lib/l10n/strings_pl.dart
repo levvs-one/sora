@@ -2210,4 +2210,8 @@ class SPl extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Dla Shadowsocks: metoda:hasło, na przykład chacha20-ietf-poly1305:haslo';
 }

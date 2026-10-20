@@ -2191,4 +2191,7 @@ class SKo extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials => 'Shadowsocks의 경우: 방식:비밀번호 (예: chacha20-ietf-poly1305:password)';
 }

@@ -2194,4 +2194,8 @@ class SAr extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'لـ Shadowsocks: الطريقة:كلمة المرور، مثل chacha20-ietf-poly1305:password';
 }

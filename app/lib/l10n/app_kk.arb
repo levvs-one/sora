@@ -1120,5 +1120,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "customServerShadowsocksCredentials": "Shadowsocks үшін: әдіс:құпиясөз, мысалы chacha20-ietf-poly1305:password"
 }

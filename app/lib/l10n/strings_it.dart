@@ -2211,4 +2211,8 @@ class SIt extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Per Shadowsocks: metodo:password, ad esempio chacha20-ietf-poly1305:password';
 }

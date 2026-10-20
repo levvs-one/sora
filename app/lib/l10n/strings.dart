@@ -4148,6 +4148,12 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Надёжность {pct}%'**
   String serverReliability(int pct);
+
+  /// No description provided for @customServerShadowsocksCredentials.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль'**
+  String get customServerShadowsocksCredentials;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

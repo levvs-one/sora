@@ -2209,4 +2209,8 @@ class STg extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password';
 }

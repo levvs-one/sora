@@ -1120,5 +1120,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "customServerShadowsocksCredentials": "Shadowsocks-এর জন্য: method:password, যেমন chacha20-ietf-poly1305:password"
 }

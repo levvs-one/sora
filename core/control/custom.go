@@ -105,6 +105,14 @@ func (c *customServer) SaveCustomServer(_ context.Context, req *customv1.SaveCus
 	if err := custom.ValidatePort(in.GetPort()); err != nil {
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
+	// The vault material is read back by applyCredential at connect time;
+	// refuse anything that is not a credential document now instead of
+	// failing every later connect.
+	if material := in.GetCredentials(); material != "" {
+		if _, err := parseCredential([]byte(material)); err != nil {
+			return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
+		}
+	}
 	stored, err := st.Save(custom.Server{
 		ID:       in.GetId(),
 		Name:     in.GetName(),
@@ -255,6 +263,11 @@ func (s *Server) CustomOutbounds() []*corev1.OutboundSpec {
 			DisplayName: srv.Name,
 			Protocol:    string(srv.Protocol),
 			Endpoint:    &corev1.Endpoint{Host: srv.Address, Port: uint32(srv.Port)},
+		}
+		// Shadowsocks carries its own encryption; outboundFromProto turns
+		// TLS on for every other security value.
+		if srv.Protocol == custom.ProtocolShadowsocks {
+			spec.Security = "none"
 		}
 		if srv.SecretRef != "" {
 			spec.Credentials = &corev1.CredentialsRef{Reference: srv.SecretRef}

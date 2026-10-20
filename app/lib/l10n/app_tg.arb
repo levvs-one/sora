@@ -1120,5 +1120,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "customServerShadowsocksCredentials": "Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password"
 }

@@ -2208,4 +2208,8 @@ class SFa extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'برای Shadowsocks: روش:گذرواژه، مثلاً chacha20-ietf-poly1305:password';
 }

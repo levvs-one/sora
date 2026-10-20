@@ -87,7 +87,7 @@ func TestCustomRPCSaveListDelete(t *testing.T) {
 			Protocol:    customv1.CustomProtocol_CUSTOM_PROTOCOL_VLESS,
 			Address:     "vpn.example.com",
 			Port:        443,
-			Credentials: "uuid-secret",
+			Credentials: `{"uuid":"uuid-secret"}`,
 		},
 	})
 	if err != nil {
@@ -159,7 +159,7 @@ func TestCustomRPCValidation(t *testing.T) {
 				Protocol:    customv1.CustomProtocol_CUSTOM_PROTOCOL_VLESS,
 				Address:     "vpn.example.com",
 				Port:        443,
-				Credentials: "secret",
+				Credentials: `{"uuid":"secret"}`,
 			}
 			mutate(in)
 			resp, err := c.SaveCustomServer(ctx, &customv1.SaveCustomServerRequest{
@@ -254,7 +254,7 @@ func TestCustomRPCTestReachability(t *testing.T) {
 			Protocol:    customv1.CustomProtocol_CUSTOM_PROTOCOL_TROJAN,
 			Address:     "127.0.0.1",
 			Port:        port,
-			Credentials: "secret",
+			Credentials: `{"uuid":"secret"}`,
 		},
 	})
 	if err != nil || saved.GetError() != nil {
@@ -333,7 +333,7 @@ func TestCustomOutboundsHook(t *testing.T) {
 			Protocol:    customv1.CustomProtocol_CUSTOM_PROTOCOL_VLESS,
 			Address:     "vpn.example.com",
 			Port:        443,
-			Credentials: "secret",
+			Credentials: `{"uuid":"secret"}`,
 		},
 	})
 	if err != nil || saved.GetError() != nil {
@@ -382,7 +382,7 @@ func saveCustomForHook(t *testing.T, c *customServer, token []byte, name string)
 			Protocol:    customv1.CustomProtocol_CUSTOM_PROTOCOL_VLESS,
 			Address:     "vpn.example.com",
 			Port:        443,
-			Credentials: "s3cr3t",
+			Credentials: `{"uuid":"s3cr3t"}`,
 		},
 	})
 	if err != nil || saved.GetError() != nil {
@@ -490,6 +490,58 @@ func TestExtHostListServersIncludesCustomsOnce(t *testing.T) {
 	for sid, n := range seen {
 		if n != 1 {
 			t.Errorf("server %q listed %d times", sid, n)
+		}
+	}
+}
+
+// TestCustomCredentialsBuildAConnectablePlan pins the contract between the
+// client form and the planner: only a credential document is accepted, and
+// what is stored comes back as engine credentials at connect time.
+func TestCustomCredentialsBuildAConnectablePlan(t *testing.T) {
+	srv, token := customTestPlane(t)
+	c := customImpl(t, srv)
+	ctx := context.Background()
+	save := func(protocol customv1.CustomProtocol, credentials string) *customv1.SaveCustomServerResponse {
+		t.Helper()
+		resp, err := c.SaveCustomServer(ctx, &customv1.SaveCustomServerRequest{
+			ApiVersion:           customVersion(),
+			ControlAuthenticator: token,
+			Server: &customv1.CustomServer{
+				Name: "Manual", Protocol: protocol, Address: "vpn.example.com", Port: 443, Credentials: credentials,
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return resp
+	}
+	if resp := save(customv1.CustomProtocol_CUSTOM_PROTOCOL_VLESS, "bare-uuid"); resp.GetError() == nil {
+		t.Fatal("a bare secret was stored; the planner could never read it back")
+	}
+	if resp := save(customv1.CustomProtocol_CUSTOM_PROTOCOL_VLESS, `{"uuid":"11111111-2222-3333-4444-555555555555"}`); resp.GetError() != nil {
+		t.Fatalf("vless document refused: %v", resp.GetError())
+	}
+	if resp := save(customv1.CustomProtocol_CUSTOM_PROTOCOL_SHADOWSOCKS, `{"method":"chacha20-ietf-poly1305","password":"pw"}`); resp.GetError() != nil {
+		t.Fatalf("shadowsocks document refused: %v", resp.GetError())
+	}
+	specs := srv.CustomOutbounds()
+	if len(specs) != 2 {
+		t.Fatalf("outbounds = %d, want 2", len(specs))
+	}
+	for i, spec := range specs {
+		out, err := outboundFromProto(i, spec, srv.secrets)
+		if err != nil {
+			t.Fatalf("%s: %v", spec.GetProtocol(), err)
+		}
+		switch spec.GetProtocol() {
+		case "vless":
+			if out.UUID != "11111111-2222-3333-4444-555555555555" || !out.TLS.Enabled {
+				t.Errorf("vless outbound = uuid %q tls %v", out.UUID, out.TLS.Enabled)
+			}
+		case "shadowsocks":
+			if out.Cipher != "chacha20-ietf-poly1305" || out.Password != "pw" || out.TLS.Enabled {
+				t.Errorf("shadowsocks outbound = cipher %q password %q tls %v", out.Cipher, out.Password, out.TLS.Enabled)
+			}
 		}
 	}
 }
