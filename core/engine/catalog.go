@@ -21,8 +21,8 @@ type Availability struct {
 
 // Catalog holds upstream engine capabilities, separate from installed
 // Availability. Entries were validated with mihomo v1.19.32 (-t), sing-box
-// v1.14.2 (check), sing-box-lx v1.14.3-lx.14 capability tags (unit), and
-// Xray v26.3.27 (run -test).
+// v1.14.2 (check), sing-box-lx v1.14.3-lx.22 (check and interop traffic),
+// and Xray v26.10.17 (run -test and interop traffic).
 var Catalog = map[Kind]Capabilities{
 	KindMihomo: {
 		Kind:       KindMihomo,
@@ -79,8 +79,12 @@ var Catalog = map[Kind]Capabilities{
 	},
 	KindXray: {
 		Kind: KindXray,
-		// The minimum version is the shipped build verified for
-		// Hysteria2, XHTTP, and VLESS Encryption.
+		// Capability floor: the oldest build verified for Hysteria2,
+		// XHTTP, and VLESS Encryption rendering. The shipped pin is
+		// newer (26.10.17, see packaging/engines/engines.lock);
+		// user-supplied builds between the floor and the pin stay
+		// usable under the version-aware gates (see
+		// xrayPlaintextCutoff).
 		MinVersion: "26.3.27",
 		Protocols: map[Protocol]bool{
 			ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
@@ -97,14 +101,13 @@ var Catalog = map[Kind]Capabilities{
 			FeatureXHTTPDownloadSplit: true,
 			// Deliberately no FeatureXHTTPXmux: Xray's xhttp case
 			// renders only mode/path/host/headers/downloadSettings and
-			// emits neither xmux nor x_padding. Mihomo's renderer does
-			// emit reuse-settings/x-padding-bytes, but its claim waits
-			// for `mihomo -t` on the pin (see the mihomo entry above),
-			// and sing-box emits neither — so no engine claims the
-			// feature yet. Claiming it for Xray routed xmux-tuned
-			// plans to a silent loss; until a claim is verified, such
-			// plans honestly report the feature missing on every
-			// engine (PASS3 deep S1).
+			// emits neither xmux nor x_padding. Mihomo does claim the
+			// feature (its reuse-settings render is verified with
+			// `mihomo -t` on the pin, see the mihomo entry above), and
+			// sing-box emits neither — so xmux-tuned plans report the
+			// feature missing on Xray and sing-box and route to
+			// mihomo. Claiming it for Xray would route xmux-tuned
+			// plans to a silent loss (PASS3 deep S1).
 			// dialerProxy exists since long before the minimum
 			// version, so chains need no extra version gate.
 			FeatureChains: true,
@@ -124,10 +127,11 @@ var Catalog = map[Kind]Capabilities{
 
 // xrayPlaintextCutoff is the first Xray release that refuses plaintext
 // (no TLS, no REALITY) VLESS/Trojan outbounds at config load instead of
-// silently connecting without encryption. The shipped pin (26.3.27, see
-// packaging/engines/engines.lock and Catalog[KindXray].MinVersion) predates
-// the cutoff, so the gate only bites once the engine is bumped or a
-// user-supplied build is selected.
+// silently connecting without encryption. The shipped pin (26.10.17, see
+// packaging/engines/engines.lock) is past the cutoff — verified on the
+// binary: a plaintext VLESS outbound to a public address fails config
+// load, so the gate below is live for the shipped build, not just for
+// user-supplied ones.
 // Upstream policy behind the cut:
 // https://xtls.github.io/en/config/inbounds/trojan.html
 // ("Trojan must be used with transport-security TLS ...").
@@ -152,10 +156,12 @@ func xrayCutsPlaintext(v Version) bool {
 // (catalog.go). Upstream phrases the prohibition as "without TLS or
 // other encryption" (VLESS Encryption counts), so an encrypted VLESS
 // outbound is accepted without TLS/REALITY. It is a no-op for other
-// engines and for older builds, including the shipped 26.3.27 pin, so
-// current behavior is unchanged until the engine is bumped. Callers pass
-// the probed engine version (Availability.Version, Supervisor.Version) —
-// never a hardcoded string.
+// engines and for builds older than the cutoff. Upstream itself allows
+// plaintext to private addresses; sora stays stricter and refuses it on
+// every address — fail closed, with an actionable message instead of a
+// config the engine may or may not accept. Callers pass the probed
+// engine version (Availability.Version, Supervisor.Version) — never a
+// hardcoded string.
 func (c Capabilities) XrayPlaintextMissing(p *Plan, v Version) []string {
 	if c.Kind != KindXray || !xrayCutsPlaintext(v) {
 		return nil
@@ -237,7 +243,7 @@ type Selection struct {
 // build: 1.15.0 upstream, 1.14.3 for the 1.14-based lx. fork (which
 // versions itself as "<base>-lx.<n>"). Raising the upstream pin must not
 // reject the shipped fork (packaging/engines/engines.lock pins
-// sing-box-lx v1.14.3-lx.14).
+// sing-box-lx v1.14.3-lx.22).
 func singBoxFloor(v Version) string {
 	if strings.HasPrefix(v.PreRelease, "lx.") && !v.Less(Version{Major: 1, Minor: 14, Patch: 3}) {
 		return "1.14.3"

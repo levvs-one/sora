@@ -25,10 +25,14 @@ import (
 //     sent Firefox/Safari parrots WITHOUT the hybrid share, a DPI-visible
 //     contradiction with real Firefox 132+/Safari 26; the bump fixed it.
 //     (S8 post-quantum audit, 2026-10-20.)
-//   - Xray-core main (2026-10-11, issue XTLS/Xray-core#7131) still pins a
-//     utls where "chrome" sends Chrome 133 (JA4
-//     t13d1516h2_8daaf6152771_d8a2da3f94cd); TSPU blocking of that stale
-//     fingerprint is reported in Russia.
+//   - The pinned Xray (v26.10.17, verified on the binary 2026-10-20)
+//     still sends the Chrome 133 ClientHello for "chrome" and
+//     "hellochrome_auto" (JA4 t13d1516h2_8daaf6152771_d8a2da3f94cd,
+//     measured on the wire; the hello does carry the X25519MLKEM768
+//     key share). Its vendored uTLS rejects the explicit name
+//     hellochrome_155 at config load — named Chrome parrots top out at
+//     hellochrome_133 (hellofirefox_148 exists). TSPU blocking of that
+//     stale fingerprint is reported in Russia (XTLS/Xray-core#7131).
 //   - CVE-2026-27017 (fixed in utls 1.8.1): Chrome parrot + GREASE ECH
 //     picked the ECH cipher suite inconsistently with the outer
 //     ClientHello — a distinguisher impossible in real Chrome.
@@ -179,13 +183,16 @@ func FingerprintWarning(name string) string {
 			return "fingerprint: versioned parrot " + normalized + " pins Chrome " + strconv.Itoa(v) +
 				" and is stale (TSPU blocks Chrome 133 and older); current upstream is " + CurrentChromeParrot
 		}
-		// hellochrome_155 is exactly the parrot Xray's pinned vendored
-		// uTLS does not know yet (commit e5a6911 is in Xray main, not
-		// in any release as of 2026-10-20): an explicit name only works
-		// on an Xray release newer than the pinned 26.3.27, and the
-		// config fails at load on older builds. Use hellochrome_auto.
+		// hellochrome_155 is still not a name the pinned Xray's
+		// vendored uTLS knows: verified on the shipped 26.10.17
+		// binary (2026-10-20) — the name fails config load in both
+		// TLS and REALITY settings, named Chrome parrots top out at
+		// hellochrome_133, and hellochrome_auto still sends the
+		// Chrome 133 ClientHello (see the landscape note above).
+		// The warning stays until a pinned Xray both accepts and
+		// sends the parrot. Use hellochrome_auto.
 		if v := ParrotVersion(normalized); v != 0 && v >= CurrentChromeVersion {
-			return "fingerprint: versioned parrot " + normalized + " is not in Xray's vendored uTLS on the pinned 26.3.27 build (its newest Chrome parrot is 133); an explicit name fails at engine load on current pins — prefer hellochrome_auto"
+			return "fingerprint: versioned parrot " + normalized + " is not in Xray's vendored uTLS on the pinned 26.10.17 build (its newest named Chrome parrot is 133); an explicit name fails at engine load on the shipped pin — prefer hellochrome_auto"
 		}
 		return "fingerprint: versioned parrot " + normalized + " is engine-specific (Xray only); current upstream is " + CurrentChromeParrot
 	}

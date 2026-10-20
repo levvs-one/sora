@@ -26,7 +26,7 @@ The `sora-core` service in Go. It runs the engines (sing-box, Xray, mihomo), kee
 | `diagnostics` | diagnostic report with secrets masked |
 | `errs` | error codes and message keys |
 
-Tested engine builds: sing-box 1.14.2, Xray 26.3.27, mihomo 1.19.32. The exact files and checksums are in `packaging/engines/engines.lock`.
+Tested engine builds: sing-box-lx 1.14.3-lx.22, Xray 26.10.17, mihomo 1.19.32. The exact files and checksums are in `packaging/engines/engines.lock`.
 
 ## Run
 
