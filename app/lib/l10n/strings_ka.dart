@@ -483,6 +483,11 @@ class SKa extends S {
   String get ruleBlock => 'დაბლოკვა';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'ჩართეთ წარუმატებლობა';
 
   @override

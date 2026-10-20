@@ -483,6 +483,11 @@ class SFr extends S {
   String get ruleBlock => 'Bloc';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Échec de l\'allumage';
 
   @override

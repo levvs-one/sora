@@ -145,6 +145,7 @@
   "ruleDirect": "Trực tiếp",
   "ruleProxy": "Thông qua VPN",
   "ruleBlock": "Khối",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Bật thất bại",
   "connectOnStart": "Kết nối khi bắt đầu",
   "trafficLow": "{name}: {left} còn lại",

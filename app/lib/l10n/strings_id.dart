@@ -483,6 +483,11 @@ class SId extends S {
   String get ruleBlock => 'Memblokir';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Aktifkan kegagalan';
 
   @override

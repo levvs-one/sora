@@ -145,6 +145,7 @@
   "ruleDirect": "Ուղղակի",
   "ruleProxy": "VPN-ի միջոցով",
   "ruleBlock": "Արգելափակել",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Միացնել ձախողումը",
   "connectOnStart": "Միացեք մեկնարկին",
   "trafficLow": "{name}: {left} մնացել է",

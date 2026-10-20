@@ -145,6 +145,7 @@
   "ruleDirect": "პირდაპირი",
   "ruleProxy": "VPN-ის საშუალებით",
   "ruleBlock": "დაბლოკვა",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "ჩართეთ წარუმატებლობა",
   "connectOnStart": "დაკავშირება დაწყებისას",
   "trafficLow": "{name}: {left} დარჩა",

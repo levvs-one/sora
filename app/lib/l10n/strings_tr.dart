@@ -483,6 +483,11 @@ class STr extends S {
   String get ruleBlock => 'Engellemek';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Arızayı açma';
 
   @override

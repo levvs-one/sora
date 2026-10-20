@@ -262,6 +262,14 @@
   "ruleDirect": "Напрямую",
   "ruleProxy": "Через VPN",
   "ruleBlock": "Блокировать",
+  "routingNoteRecorded": "{field}: записано, но не применяется",
+  "@routingNoteRecorded": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
   "failover": "Переключаться при сбое",
   "connectOnStart": "Подключаться при запуске",
   "expiresIn": "{name}: подписка закончится через {days, plural, =0{несколько часов} one{# день} few{# дня} other{# дней}}",

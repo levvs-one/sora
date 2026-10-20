@@ -483,6 +483,11 @@ class STh extends S {
   String get ruleBlock => 'ปิดกั้น';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'เปิดสวิตช์ความล้มเหลว';
 
   @override

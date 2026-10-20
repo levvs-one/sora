@@ -145,6 +145,7 @@
   "ruleDirect": "Тікелей",
   "ruleProxy": "VPN арқылы",
   "ruleBlock": "Блоктау",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Сәтсіздікті қосу",
   "connectOnStart": "Бастапқыда қосылыңыз",
   "trafficLow": "{name}: {left} қалды",

@@ -145,6 +145,7 @@
   "ruleDirect": "Түз",
   "ruleProxy": "VPN аркылуу",
   "ruleBlock": "Блок",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Ката күйгүзүү",
   "connectOnStart": "Башында туташуу",
   "trafficLow": "{name}: {left} калды",

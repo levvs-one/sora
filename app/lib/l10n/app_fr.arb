@@ -145,6 +145,7 @@
   "ruleDirect": "Direct",
   "ruleProxy": "Via VPN",
   "ruleBlock": "Bloc",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Échec de l'allumage",
   "connectOnStart": "Se connecter au démarrage",
   "trafficLow": "{name} : {left} gauche",

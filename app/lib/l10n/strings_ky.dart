@@ -483,6 +483,11 @@ class SKy extends S {
   String get ruleBlock => 'Блок';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Ката күйгүзүү';
 
   @override

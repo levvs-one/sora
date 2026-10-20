@@ -483,6 +483,11 @@ class SKo extends S {
   String get ruleBlock => '차단하다';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => '실패를 켜십시오';
 
   @override

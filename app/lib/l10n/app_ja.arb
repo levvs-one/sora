@@ -145,6 +145,7 @@
   "ruleDirect": "直接",
   "ruleProxy": "VPN経由",
   "ruleBlock": "ブロック",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "スイッチオンの失敗",
   "connectOnStart": "起動時に接続する",
   "trafficLow": "{name}: {left} 左",

@@ -87,6 +87,41 @@ void main() {
       expect(note.applied, isFalse);
     });
 
+    test('CIDR entries are masked to their network, like Go', () {
+      final doc = {
+        'DirectIp': ['10.1.2.3/8', '2001:db8::dead:beef/32', '192.168.1.77/24'],
+      };
+      final imported = convertHappRouting(base64Encode(utf8.encode(jsonEncode(doc))))!;
+      expect(imported.rules.map((r) => r.destination), ['10.0.0.0/8', '2001:db8::/32', '192.168.1.0/24']);
+    });
+
+    test('a known key with an unusable shape fails the document, like Go', () {
+      String encode(Map<String, dynamic> doc) => base64Encode(utf8.encode(jsonEncode(doc)));
+      // A non-string element inside a routing list.
+      expect(convertHappRouting(encode({'DirectSites': ['ok.example', 42]})), isNull);
+      // A list key holding a number instead of a list or string.
+      expect(convertHappRouting(encode({'ProxyIp': 42})), isNull);
+      // An unparseable boolean spelling.
+      expect(convertHappRouting(encode({'GlobalProxy': 'yes', 'ProxySites': ['p.example']})), isNull);
+      // A string key holding a number.
+      expect(convertHappRouting(encode({'Name': 42})), isNull);
+      // Tolerated spellings still convert: string booleans and a
+      // single-string list.
+      final ok = convertHappRouting(encode({'GlobalProxy': 'true', 'DirectSites': 'a.example'}))!;
+      expect(ok.globalProxy, isTrue);
+      expect(ok.rules.single.destination, 'domain:a.example');
+    });
+
+    test('payloads over the 1 MiB cap are refused, like Go', () {
+      // A raw JSON document over the cap.
+      final big = jsonEncode({'Name': 'x' * (1 << 20), 'DirectSites': ['a.example']});
+      expect(convertHappRouting(big), isNull);
+      // The same document base64-encoded (decoded size is what caps).
+      expect(convertHappRouting(base64Encode(utf8.encode(big))), isNull);
+      // Transport text alone over twice the cap.
+      expect(convertHappRouting('A' * (2 * (1 << 20) + 1)), isNull);
+    });
+
     test('broken payloads fail honestly', () {
       for (final payload in [
         '',

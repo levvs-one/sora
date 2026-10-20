@@ -29,6 +29,12 @@ Future<void> showRoutingImport(BuildContext context, Sora sora, String payload) 
     '${s.ruleProxy}: ${imported.countOf(RuleTarget.proxy)}',
     '${s.ruleBlock}: ${imported.countOf(RuleTarget.block)}',
     if (imported.remoteDns.isNotEmpty) '${s.dns}: ${imported.remoteDns}',
+    // Fields sora recorded but does not apply (FakeDNS, a direct
+    // default from GlobalProxy=false, provider DNS, …) are named in
+    // the dialog instead of vanishing: the user confirms with the
+    // whole picture, not just the rule counts.
+    for (final note in imported.notes)
+      if (!note.applied) s.routingNoteRecorded(note.field),
   ].join('\n');
   if (imported.rules.isEmpty) {
     // A valid profile with no convertible rules (DNS-only, or every

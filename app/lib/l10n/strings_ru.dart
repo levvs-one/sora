@@ -483,6 +483,11 @@ class SRu extends S {
   String get ruleBlock => 'Блокировать';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: записано, но не применяется';
+  }
+
+  @override
   String get failover => 'Переключаться при сбое';
 
   @override

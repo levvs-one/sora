@@ -483,6 +483,11 @@ class SIt extends S {
   String get ruleBlock => 'Bloccare';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Accensione in caso di guasto';
 
   @override

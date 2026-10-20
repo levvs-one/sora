@@ -145,6 +145,7 @@
   "ruleDirect": "Прямий",
   "ruleProxy": "Через VPN",
   "ruleBlock": "Блокувати",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Помилка ввімкнення",
   "connectOnStart": "Підключитися при запуску",
   "trafficLow": "{name}: {left} ліворуч",

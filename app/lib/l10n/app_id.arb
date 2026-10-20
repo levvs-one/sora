@@ -145,6 +145,7 @@
   "ruleDirect": "Langsung",
   "ruleProxy": "Melalui VPN",
   "ruleBlock": "Memblokir",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Aktifkan kegagalan",
   "connectOnStart": "Hubungkan di awal",
   "trafficLow": "{name}: {left} kiri",

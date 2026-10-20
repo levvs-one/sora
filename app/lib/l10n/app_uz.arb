@@ -145,6 +145,7 @@
   "ruleDirect": "To'g'ridan-to'g'ri",
   "ruleProxy": "VPN orqali",
   "ruleBlock": "Bloklash",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Muvaffaqiyatsizlikni yoqing",
   "connectOnStart": "Boshida ulaning",
   "trafficLow": "{name}: {left} qoldi",

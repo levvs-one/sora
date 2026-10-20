@@ -145,6 +145,7 @@
   "ruleDirect": "مباشر",
   "ruleProxy": "من خلال VPN",
   "ruleBlock": "حاجز",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "التبديل على الفشل",
   "connectOnStart": "الاتصال في البداية",
   "trafficLow": "{name}: {left} يسار",

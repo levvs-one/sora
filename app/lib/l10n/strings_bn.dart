@@ -483,6 +483,11 @@ class SBn extends S {
   String get ruleBlock => 'ব্লক';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'ব্যর্থতা চালু করুন';
 
   @override

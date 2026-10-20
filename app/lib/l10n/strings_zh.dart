@@ -483,6 +483,11 @@ class SZh extends S {
   String get ruleBlock => '堵塞';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => '开机失败';
 
   @override
@@ -2750,6 +2755,11 @@ class SZhHans extends SZh {
   String get ruleBlock => '堵塞';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => '开机失败';
 
   @override
@@ -5015,6 +5025,11 @@ class SZhHant extends SZh {
 
   @override
   String get ruleBlock => '堵塞';
+
+  @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
 
   @override
   String get failover => '開機失敗';

@@ -483,6 +483,11 @@ class STk extends S {
   String get ruleBlock => 'Blok';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Şowsuzlygy açyň';
 
   @override

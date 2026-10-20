@@ -483,6 +483,11 @@ class SFa extends S {
   String get ruleBlock => 'مسدود کردن';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'شکست را روشن کنید';
 
   @override

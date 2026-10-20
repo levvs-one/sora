@@ -483,6 +483,11 @@ class SUr extends S {
   String get ruleBlock => 'بلاک';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'ناکامی پر سوئچ کریں۔';
 
   @override

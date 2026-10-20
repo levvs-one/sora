@@ -145,6 +145,7 @@
   "ruleDirect": "Göni",
   "ruleProxy": "VPN arkaly",
   "ruleBlock": "Blok",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Şowsuzlygy açyň",
   "connectOnStart": "Başda birikdiriň",
   "trafficLow": "{name}: {left} galdy",

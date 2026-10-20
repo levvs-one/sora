@@ -145,6 +145,7 @@
   "ruleDirect": "直接的",
   "ruleProxy": "通过VPN",
   "ruleBlock": "堵塞",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "开机失败",
   "connectOnStart": "启动时连接",
   "trafficLow": "{name}：{left} 左",

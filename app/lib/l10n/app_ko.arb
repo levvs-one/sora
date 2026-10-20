@@ -145,6 +145,7 @@
   "ruleDirect": "직접",
   "ruleProxy": "VPN을 통해",
   "ruleBlock": "차단하다",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "실패를 켜십시오",
   "connectOnStart": "시작 시 연결",
   "trafficLow": "{name}: {left} 왼쪽",

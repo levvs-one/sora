@@ -145,6 +145,7 @@
   "ruleDirect": "مستقیم",
   "ruleProxy": "از طریق VPN",
   "ruleBlock": "مسدود کردن",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "شکست را روشن کنید",
   "connectOnStart": "در شروع وصل شوید",
   "trafficLow": "{name}: {left} باقی مانده است",

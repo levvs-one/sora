@@ -145,6 +145,7 @@
   "ruleDirect": "โดยตรง",
   "ruleProxy": "ผ่านวีพีเอ็น",
   "ruleBlock": "ปิดกั้น",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "เปิดสวิตช์ความล้มเหลว",
   "connectOnStart": "เชื่อมต่อเมื่อเริ่มต้น",
   "trafficLow": "{name}: เหลือ {left}",

@@ -145,6 +145,7 @@
   "ruleDirect": "Прамы",
   "ruleProxy": "Праз VPN",
   "ruleBlock": "Блок",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Збой уключэння",
   "connectOnStart": "Падключэнне пры запуску",
   "trafficLow": "{name}: {left} злева",

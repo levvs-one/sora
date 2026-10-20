@@ -145,6 +145,7 @@
   "ruleDirect": "براہ راست",
   "ruleProxy": "وی پی این کے ذریعے",
   "ruleBlock": "بلاک",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "ناکامی پر سوئچ کریں۔",
   "connectOnStart": "شروع پر جڑیں۔",
   "trafficLow": "{name}: {left} چھوڑ دیا۔",

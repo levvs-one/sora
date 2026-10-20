@@ -145,6 +145,7 @@
   "ruleDirect": "Doğrudan",
   "ruleProxy": "VPN aracılığıyla",
   "ruleBlock": "Engellemek",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Arızayı açma",
   "connectOnStart": "Başlangıçta bağlanın",
   "trafficLow": "{name}: {left} sol",

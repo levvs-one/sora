@@ -1,7 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import '../rules.dart';
+
+/// Payload size cap, mirroring core/happrouting's MaxPayloadBytes:
+/// a provider-controlled document larger than this is refused whole.
+const maxHappPayloadBytes = 1 << 20;
 
 /// Conversion of a Happ routing profile (the Remnawave panel's
 /// happRouting document) into sora user rules. This is the Dart mirror
@@ -74,6 +79,9 @@ HappRoutingImport? convertHappRouting(String payload) {
 Map<String, dynamic>? _decode(String payload) {
   var text = payload.trim();
   if (text.isEmpty) return null;
+  // Transport-form cap, as in Go's DecodePayload: the base64 text may
+  // be at most twice the document cap.
+  if (text.length > 2 * maxHappPayloadBytes) return null;
   if (text.contains('%')) {
     try {
       text = Uri.decodeComponent(text);
@@ -93,15 +101,54 @@ Map<String, dynamic>? _decode(String payload) {
       return null;
     }
   }
+  if (utf8.encode(jsonText).length > maxHappPayloadBytes) return null;
   try {
     final decoded = jsonDecode(jsonText);
     if (decoded is! Map<String, dynamic>) return null;
     // Keys match case-insensitively (the builder itself tolerates
     // the RemoteDNSIP / RemoteDNSIp spelling drift).
-    return {for (final e in decoded.entries) e.key.toLowerCase(): e.value};
+    final doc = {for (final e in decoded.entries) e.key.toLowerCase(): e.value};
+    return _hasValidShapes(doc) ? doc : null;
   } on FormatException {
     return null;
   }
+}
+
+/// Mirrors Go's ParseJSON strictness: a known key with an unusable
+/// shape fails the whole document (ErrInvalid) instead of being
+/// silently dropped — a non-string list element, a list key holding a
+/// number, a boolean key holding "yes", a string key holding a list.
+/// Unknown keys are ignored; an explicit JSON null reads as the zero
+/// value, exactly as Go's json.Unmarshal treats it.
+bool _hasValidShapes(Map<String, dynamic> doc) {
+  for (final key in ['globalproxy', 'fakedns', 'usechunkfiles']) {
+    final value = doc[key];
+    if (value == null || value is bool || value is num) continue;
+    if (value is String && _boolOf(value) != null) continue;
+    return false;
+  }
+  for (final key in [
+    'name',
+    'remotednstype',
+    'remotednsip',
+    'domesticdnstype',
+    'domesticdnsip',
+    'geoipurl',
+    'geositeurl',
+    'domainstrategy',
+  ]) {
+    final value = doc[key];
+    if (value != null && value is! String) return false;
+  }
+  final updated = doc['lastupdated'];
+  if (updated != null && updated is! String && updated is! num) return false;
+  for (final key in ['directsites', 'directip', 'proxysites', 'proxyip', 'blocksites', 'blockip']) {
+    final value = doc[key];
+    if (value == null || value is String) continue;
+    if (value is List && value.every((item) => item == null || item is String)) continue;
+    return false;
+  }
+  return true;
 }
 
 bool? _boolOf(Object? value) {
@@ -121,10 +168,9 @@ String _stringOf(Object? value) => value is String ? value.trim() : '';
 
 List<String> _listOf(Object? value) {
   if (value is List) {
-    return [
-      for (final item in value)
-        if (item is String) item,
-    ];
+    // Shapes were validated by _hasValidShapes: only strings and
+    // explicit nulls (Go reads a null element as "") can appear here.
+    return [for (final item in value) item is String ? item : ''];
   }
   if (value is String) return value.split(RegExp(r'[\n\r,]'));
   return const [];
@@ -265,7 +311,19 @@ String? _destinationOf(String entry) {
     final bits = int.tryParse(parts[1]);
     if (ip == null || bits == null) return null;
     final max = ip.type == InternetAddressType.IPv6 ? 128 : 32;
-    return bits >= 0 && bits <= max ? text : null;
+    if (bits < 0 || bits > max) return null;
+    // Masked, like Go's netip Prefix.Masked: host bits are zeroed, so
+    // 10.1.2.3/8 names the network 10.0.0.0/8, not the host itself.
+    final bytes = Uint8List.fromList(ip.rawAddress);
+    for (var i = 0; i < bytes.length; i++) {
+      final keep = bits - i * 8;
+      if (keep <= 0) {
+        bytes[i] = 0;
+      } else if (keep < 8) {
+        bytes[i] = bytes[i] & (0xff << (8 - keep));
+      }
+    }
+    return '${InternetAddress.fromRawAddress(bytes).address}/$bits';
   }
   final ip = InternetAddress.tryParse(text);
   if (ip != null) return '${ip.address}/${ip.type == InternetAddressType.IPv6 ? 128 : 32}';

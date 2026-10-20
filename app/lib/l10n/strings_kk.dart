@@ -483,6 +483,11 @@ class SKk extends S {
   String get ruleBlock => 'Блоктау';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Сәтсіздікті қосу';
 
   @override

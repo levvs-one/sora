@@ -483,6 +483,11 @@ class SUz extends S {
   String get ruleBlock => 'Bloklash';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Muvaffaqiyatsizlikni yoqing';
 
   @override

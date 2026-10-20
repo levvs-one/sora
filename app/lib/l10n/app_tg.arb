@@ -145,6 +145,7 @@
   "ruleDirect": "Бевосита",
   "ruleProxy": "Тавассути VPN",
   "ruleBlock": "Блок",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Нокомиро фурӯзон кунед",
   "connectOnStart": "Дар оғоз пайваст шавед",
   "trafficLow": "{name}: {left} чап",

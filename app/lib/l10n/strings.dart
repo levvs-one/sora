@@ -1035,6 +1035,12 @@ abstract class S {
   /// **'Блокировать'**
   String get ruleBlock;
 
+  /// No description provided for @routingNoteRecorded.
+  ///
+  /// In ru, this message translates to:
+  /// **'{field}: записано, но не применяется'**
+  String routingNoteRecorded(String field);
+
   /// No description provided for @failover.
   ///
   /// In ru, this message translates to:

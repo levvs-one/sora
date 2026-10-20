@@ -145,6 +145,7 @@
   "ruleDirect": "प्रत्यक्ष",
   "ruleProxy": "वीपीएन के माध्यम से",
   "ruleBlock": "अवरोध पैदा करना",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "विफलता पर स्विच करें",
   "connectOnStart": "प्रारंभ पर कनेक्ट करें",
   "trafficLow": "{name}: {left} बाएँ",

@@ -483,6 +483,11 @@ class SEs extends S {
   String get ruleBlock => 'Bloquear';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Fallo de encendido';
 
   @override

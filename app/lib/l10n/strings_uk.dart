@@ -483,6 +483,11 @@ class SUk extends S {
   String get ruleBlock => 'Блокувати';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Помилка ввімкнення';
 
   @override

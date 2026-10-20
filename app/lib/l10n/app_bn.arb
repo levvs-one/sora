@@ -145,6 +145,7 @@
   "ruleDirect": "সরাসরি",
   "ruleProxy": "ভিপিএন এর মাধ্যমে",
   "ruleBlock": "ব্লক",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "ব্যর্থতা চালু করুন",
   "connectOnStart": "শুরুতে সংযোগ করুন",
   "trafficLow": "{name}: {left} বাকি",

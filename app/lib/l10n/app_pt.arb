@@ -145,6 +145,7 @@
   "ruleDirect": "Direta",
   "ruleProxy": "Através de VPN",
   "ruleBlock": "Bloquear",
+  "routingNoteRecorded": "{field}: recorded, not applied",
   "failover": "Falha na ativação",
   "connectOnStart": "Conecte-se no início",
   "trafficLow": "{name}: {left} esquerdo",

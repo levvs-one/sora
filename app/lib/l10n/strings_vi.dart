@@ -483,6 +483,11 @@ class SVi extends S {
   String get ruleBlock => 'Khối';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Bật thất bại';
 
   @override

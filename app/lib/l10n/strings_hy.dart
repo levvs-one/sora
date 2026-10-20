@@ -483,6 +483,11 @@ class SHy extends S {
   String get ruleBlock => 'Արգելափակել';
 
   @override
+  String routingNoteRecorded(String field) {
+    return '$field: recorded, not applied';
+  }
+
+  @override
   String get failover => 'Միացնել ձախողումը';
 
   @override
