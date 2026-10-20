@@ -168,8 +168,11 @@ type Server struct {
 	about        func() *corev1.About
 	diagnostics  Diagnostics
 	fetcher      Fetcher
-	dataDir      string
-	benchmarker  Benchmarker
+	// device is the provider device identity store (C1); nil when no
+	// data directory is configured, which disables the identity.
+	device      *subscription.DeviceStore
+	dataDir     string
+	benchmarker Benchmarker
 	// profiles stores network profiles for automatic matching (F5). Nil
 	// disables the profile RPCs with explicit errors.
 	profiles *profiles.Store
@@ -281,6 +284,7 @@ func New(cfg Config) (*Server, error) {
 		about:        cfg.About,
 		diagnostics:  cfg.Diagnostics,
 		fetcher:      cfg.Fetcher,
+		device:       subscription.NewDeviceStore(cfg.DataDir),
 		dataDir:      cfg.DataDir,
 		benchmarker:  cfg.Benchmarker,
 		profiles:     cfg.Profiles,
@@ -1248,7 +1252,11 @@ func (s *Server) FetchSubscription(ctx context.Context, req *corev1.FetchSubscri
 	}
 	ctx, cancel := requestDeadline(ctx, importTimeout)
 	defer cancel()
-	fetched, err := s.fetcher.Fetch(ctx, req.GetReference(), subscription.FetchOptions{UserAgent: req.GetUserAgent()})
+	device, err := s.deviceHeaders()
+	if err != nil {
+		return &corev1.FetchSubscriptionResponse{Error: toWire(err, nil, id)}, nil
+	}
+	fetched, err := s.fetcher.Fetch(ctx, req.GetReference(), subscription.FetchOptions{UserAgent: req.GetUserAgent(), Device: device})
 	if err != nil {
 		return &corev1.FetchSubscriptionResponse{Error: toWire(err, nil, id)}, nil
 	}

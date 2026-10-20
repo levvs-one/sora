@@ -450,7 +450,19 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
 	defer cancel()
-	fetched, err := b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent, FallbackURL: fallback})
+	// The device identity is resolved at fetch time, not save time,
+	// so a reset or an opt-out change applies to the very next fetch
+	// of every subscription. A store failure fails this refresh with
+	// the actionable reason instead of fetching without the identity
+	// and surfacing a limited provider's bare 404 (see device.go).
+	device, derr := b.srv.deviceHeaders()
+	var fetched subscription.Result
+	var err error
+	if derr != nil {
+		err = derr
+	} else {
+		fetched, err = b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent, FallbackURL: fallback, Device: device})
+	}
 	answered := err == nil
 	var servers []importedServer
 	if err == nil {
