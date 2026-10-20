@@ -110,12 +110,12 @@ var validProtocols = map[Protocol]bool{
 	ProtocolDirect: true,
 }
 
-// validTransports whitelists the stream transports a plan may hold. "h2" is
-// accepted at plan level for sing-box; engines that dropped it (Xray) reject
-// it when rendering.
+// validTransports includes parser outputs and renderer transport names:
+// WireGuard uses udp, mihomo accepts raw, and Xray profiles carry hysteria.
+// Each renderer still rejects transports it cannot use for that outbound.
 var validTransports = map[string]bool{
-	"": true, "tcp": true, "ws": true, "grpc": true,
-	"h2": true, "httpupgrade": true, "xhttp": true,
+	"": true, "tcp": true, "udp": true, "raw": true, "ws": true, "grpc": true,
+	"h2": true, "httpupgrade": true, "xhttp": true, "hysteria": true,
 }
 
 func (o Outbound) Validate() error {
