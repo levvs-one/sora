@@ -26,7 +26,7 @@ type ManagerConfig struct {
 	JournalCapacity int
 	// StatsInterval samples the engine counters.
 	StatsInterval time.Duration
-	// StopGrace bounds the engine shutdown.
+	// StopGrace allows graceful shutdown before kill and cleanup.
 	StopGrace time.Duration
 	// Redactor masks secrets in the journal.
 	Redactor *engine.Redactor
