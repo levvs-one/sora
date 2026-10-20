@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"strings"
 	"testing"
@@ -32,6 +33,21 @@ func TestRedactorEncodedSeedForms(t *testing.T) {
 		"base64 url":     base64.URLEncoding.EncodeToString([]byte(secret)),
 		"base64 raw url": base64.RawURLEncoding.EncodeToString([]byte(secret)),
 		"hex":            hex.EncodeToString([]byte(secret)),
+		"hex upper":      strings.ToUpper(hex.EncodeToString([]byte(secret))),
+		"percent all upper": func() string {
+			var b strings.Builder
+			for i := 0; i < len(secret); i++ {
+				b.WriteString(fmt.Sprintf("%%%02X", secret[i]))
+			}
+			return b.String()
+		}(),
+		"percent all lower": func() string {
+			var b strings.Builder
+			for i := 0; i < len(secret); i++ {
+				b.WriteString(fmt.Sprintf("%%%02x", secret[i]))
+			}
+			return b.String()
+		}(),
 	}
 	if m, err := json.Marshal(secret); err == nil {
 		forms["json escaped"] = string(m[1 : len(m)-1])
@@ -49,6 +65,138 @@ func TestRedactorEncodedSeedForms(t *testing.T) {
 		}
 		if !strings.Contains(out, "[masked]") {
 			t.Errorf("%s form masked nothing: %q", name, out)
+		}
+	}
+}
+
+// TestRedactorUnicodeEscapeSeedForms pins the per-rune \uXXXX class
+// (CENSOR-LEAK review, Low): a seed whose characters arrive
+// JSON-escaped — fully, or with a single character escaped inside an
+// otherwise raw string — in either hex case. The bare seed is
+// "mysecret1234": none of its characters are escaped by
+// encoding/json, so every form below exists only because
+// derivedForms registers the escape shapes explicitly.
+func TestRedactorUnicodeEscapeSeedForms(t *testing.T) {
+	secret := "mysecret1234"
+	r := NewRedactor(secret)
+	escapeAll := func(upper bool) string {
+		var b strings.Builder
+		for _, ch := range secret {
+			if upper {
+				fmt.Fprintf(&b, `\u%04X`, ch)
+			} else {
+				fmt.Fprintf(&b, `\u%04x`, ch)
+			}
+		}
+		return b.String()
+	}
+	forms := map[string]string{
+		"unicode all lower": escapeAll(false),
+		"unicode all upper": escapeAll(true),
+		// The reviewer's probe: one character escaped mid-string.
+		"unicode single": `mysecr\u0065t1234`,
+		// A single escape whose hex carries a letter (m = 0x6d),
+		// in both cases.
+		"unicode single lower": `\u006dysecret1234`,
+		"unicode single upper": `\u006Dysecret1234`,
+		"percent single":       `mysecr%65t1234`,
+		"percent single lower": `%6dysecret1234`,
+		"percent single upper": `%6Dysecret1234`,
+	}
+	for name, form := range forms {
+		out := r.String("dial failed: " + form + " end")
+		if out == "dial failed: "+form+" end" {
+			t.Errorf("%s form of a seed leaked: %q", name, form)
+		}
+		if !strings.Contains(out, "[masked]") {
+			t.Errorf("%s form masked nothing: %q", name, out)
+		}
+	}
+	// The fully percent-encoded form of a second seed, lower and
+	// upper hex, including a byte whose hex carries a letter.
+	r2 := NewRedactor("tok/en")
+	for _, form := range []string{"%74%6f%6b%2f%65%6e", "%74%6F%6B%2F%65%6E"} {
+		if out := r2.String("x " + form + " y"); strings.Contains(out, "%6") || strings.Contains(out, "%2") {
+			t.Errorf("full percent form leaked: form %q out %q", form, out)
+		}
+	}
+}
+
+// TestRedactorNestedSubscriptionPaths pins the API-prefix nesting
+// (CENSOR-LEAK review, Low): subscription tokens under the
+// conventional api/version prefix mask exactly like the root form,
+// while URLs without a subscription keyword segment — including an
+// "apiary" segment that merely starts with "api" — stay readable.
+func TestRedactorNestedSubscriptionPaths(t *testing.T) {
+	leaks := []string{
+		"https://h.example/api/v1/sub/NestedToken123456",
+		"https://h.example/api/sub/NestedToken123456",
+		"https://h.example/v2/subscribe/NestedToken123456",
+		"https://h.example/api/v1/sub/NestedToken123456?x=1",
+		"https://h.example:8443/API/V1/SUB/NestedToken123456",
+	}
+	for _, in := range leaks {
+		out := maskPatterns(in)
+		if strings.Contains(out, "NestedToken") {
+			t.Errorf("nested subscription token leaked:\n in: %q\nout: %q", in, out)
+		}
+		if !strings.Contains(out, "[masked]") || !strings.Contains(out, "h.example") {
+			t.Errorf("nested subscription URL mangled:\n in: %q\nout: %q", in, out)
+		}
+	}
+	for _, in := range []string{
+		"https://h.example/api/v1/users/profile12345",
+		"https://h.example/apiary/sub/NestedToken123456",
+		"https://h.example/api/v1/guide/getting-started",
+	} {
+		if out := maskPatterns(in); out != in {
+			t.Errorf("ordinary URL changed:\n in: %q\nout: %q", in, out)
+		}
+	}
+}
+
+// TestRedactorIdempotentQuotedSuffix is the regression test for the
+// FuzzRedactor crash input token  ""0 (CENSOR-LEAK review,
+// Medium): a quoted value glued to a suffix is ONE value. The first
+// pass must consume the glued suffix (it is part of the token, and
+// leaving it would leak it), and a second pass over the masked text
+// must be a fixed point for every neighbour form — empty and
+// non-empty quotes, both quote kinds, glued alphanumerics, and
+// structural delimiters the first pass preserves.
+func TestRedactorIdempotentQuotedSuffix(t *testing.T) {
+	cases := []struct {
+		in    string
+		want  string // exact first-pass output
+		leaks string // substring that must not survive the first pass
+	}{
+		{in: `token  ""0`, want: `token  [masked]`, leaks: "0"},
+		{in: `token: ""0`, want: `token: [masked]`},
+		{in: `token: "abc"def`, want: `token: [masked]`, leaks: "def"},
+		{in: `token: ""x y`, want: `token: [masked] y`, leaks: "x"},
+		{in: `token: ''0`, want: `token: [masked]`},
+		{in: `password: "a"b`, want: `password: [masked]`, leaks: "b"},
+		{in: `token  ""0abc def`, want: `token  [masked] def`, leaks: "0abc"},
+		{in: `token: "abc",`, want: `token: [masked],`},
+		{in: `token: "abc"]`, want: `token: [masked]]`},
+		{in: `token: "abc")`, want: `token: [masked])`},
+		{in: `sni: "a.example"443`, want: `sni: [masked]`, leaks: "443"},
+		{in: `token: ""`, want: `token: [masked]`},
+	}
+	for _, c := range cases {
+		once := maskPatterns(c.in)
+		if c.want != "" && once != c.want {
+			t.Errorf("first pass wrong:\n in: %q\nwant: %q\n got: %q", c.in, c.want, once)
+		}
+		if c.leaks != "" && strings.Contains(once, c.leaks) {
+			t.Errorf("glued suffix leaked:\n in: %q\nout: %q\nleak: %q", c.in, once, c.leaks)
+		}
+		if twice := maskPatterns(once); twice != once {
+			t.Errorf("maskPatterns not idempotent:\n in: %q\nonce: %q\ntwice: %q", c.in, once, twice)
+		}
+		// The seeded entry point must be a fixed point too.
+		r := NewRedactor("seed-value-1234")
+		if a, b := r.String(once), r.String(r.String(c.in)); a != b {
+			t.Errorf("Redactor.String not idempotent:\n in: %q\nonce: %q\ntwice: %q", c.in, a, b)
 		}
 	}
 }
@@ -187,6 +335,15 @@ func FuzzRedactorNoPanicAndIdempotent(f *testing.F) {
 		`token: "a \"b\" c"`, "https://h/sub/AbCdEfGh12345678?key=x",
 		"sni: a.example", "user = bob", "Bearer abcdefgh12345678",
 		"Key: kelvin", "://", "", "a-b-c-d-e",
+		// The deterministic crash input of the CENSOR-LEAK review
+		// and its neighbour forms (empty quotes glued to a suffix,
+		// both quote kinds, delimiters after a quoted value): the
+		// same set is committed under testdata/fuzz/ so plain
+		// `go test` runs it too.
+		`token  ""0`, `token: ""0`, `token: "abc"def`, `token: ""x y`,
+		`token: ''0`, `password: "a"b`, `token  ""0abc def`,
+		`token: "abc",`, `token: "abc"]`, `token: "abc")`,
+		"https://h.example/api/v1/sub/NestedToken123456",
 	} {
 		f.Add(seed)
 	}

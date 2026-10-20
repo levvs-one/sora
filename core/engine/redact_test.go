@@ -186,8 +186,14 @@ func TestMaskPatternsDifferential(t *testing.T) {
 		s = subscriptionPathPattern.ReplaceAllString(s, "${1}[masked]")
 		s = authHeaderPattern.ReplaceAllString(s, "${1}[masked]")
 		s = bearerPattern.ReplaceAllString(s, "${1}[masked]")
-		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
-		s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+		// The key-value passes go through replaceKeyValues (the
+		// production helper with the [masked] idempotence guard):
+		// this reference pins the GATE — that skipping a pattern
+		// whose gate flag is unset never changes the result — not
+		// the replacement mechanics, which the corpus and the
+		// idempotence tests pin directly.
+		s = replaceKeyValues(keyValuePattern, s)
+		s = replaceKeyValues(strictKeyValuePattern, s)
 		s = uuidPattern.ReplaceAllString(s, "[masked]")
 		return s
 	}

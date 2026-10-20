@@ -99,10 +99,21 @@ func (r *Redactor) Err(err error) error {
 
 // derivedForms returns the re-encodings of a seed value that log
 // pipelines commonly produce: URL percent-encoding (query and path
-// flavours, upper- and lowercase hex digits), base64 (standard and
-// URL-safe, padded and raw), hex, and the JSON string escaping of the
-// value (\" \\ and \uXXXX forms). The list is computed once per
+// flavours; every byte escaped as well as only the specials; upper-
+// and lowercase hex digits), base64 (standard and URL-safe, padded
+// and raw), hex (lower- and uppercase), and the JSON string escaping
+// of the value (\" \\ and \uXXXX forms, the fully-escaped per-rune
+// form, and single-rune escapes). The list is computed once per
 // redactor rebuild, alongside the seeds themselves.
+//
+// Case contract (CENSOR-LEAK review): real encoders are consistent
+// within one string — Go's hex is lowercase, %X-style encoders are
+// uppercase, JSON \uXXXX writers pick one case — so the pure upper
+// and lower forms of every encoding are registered. Forms that mix
+// cases character by character would need a per-character case
+// randomiser no known encoder is; they are the documented residual,
+// together with multi-character escape subsets beyond the single-
+// escape forms registered below.
 func derivedForms(v string) []string {
 	forms := make([]string, 0, 10)
 	add := func(s string) {
@@ -117,6 +128,11 @@ func derivedForms(v string) []string {
 		add(esc)
 		add(lowerPercentHex(esc))
 	}
+	// An encoder that escapes every byte, not only the specials
+	// (defensive formatters, some subscription proxies): the seed
+	// then survives as one long %XX run in both hex cases.
+	add(percentEncodeAll(v, true))
+	add(percentEncodeAll(v, false))
 	raw := []byte(v)
 	for _, enc := range []*base64.Encoding{
 		base64.StdEncoding, base64.RawStdEncoding,
@@ -124,11 +140,142 @@ func derivedForms(v string) []string {
 	} {
 		add(enc.EncodeToString(raw))
 	}
-	add(hex.EncodeToString(raw))
+	// WireGuard tooling and %X formatters print hex uppercase; the
+	// pure-uppercase form is a different string the replacer must
+	// know, symmetric to lowercase percent-hex.
+	lowerHex := hex.EncodeToString(raw)
+	add(lowerHex)
+	add(strings.ToUpper(lowerHex))
 	if marshalled, err := json.Marshal(v); err == nil && len(marshalled) >= 2 {
-		add(string(marshalled[1 : len(marshalled)-1]))
+		inner := string(marshalled[1 : len(marshalled)-1])
+		add(inner)
+		// Encoders disagree on the case of \uXXXX hex digits in
+		// the escapes json.Marshal does emit (\u003c vs \u003C).
+		add(upperUnicodeHexDigits(inner))
+	}
+	// Per-rune \uXXXX: encoders that escape every character, and
+	// encoders that escape exactly one character of an otherwise
+	// raw string (the reviewer's mysecr\u0065t1234 probe), in both
+	// hex cases.
+	uni := unicodeEscapeAll(v)
+	add(uni)
+	add(upperUnicodeHexDigits(uni))
+	// Single-position escapes are enumerated only for bounded
+	// seeds: the form count grows linearly with the seed, and a
+	// very long seed's single-escape variants would bloat the
+	// replacer for a shape no encoder produces at that length.
+	if len(v) <= 64 {
+		for _, form := range singleEscapes(v) {
+			add(form)
+		}
 	}
 	return forms
+}
+
+// percentEncodeAll escapes every byte of v as %XX (upper selects the
+// hex digit case), the full-encoding form derivedForms documents.
+func percentEncodeAll(v string, upper bool) string {
+	const digitsLower, digitsUpper = "0123456789abcdef", "0123456789ABCDEF"
+	digits := digitsLower
+	if upper {
+		digits = digitsUpper
+	}
+	var b strings.Builder
+	b.Grow(len(v) * 3)
+	for i := 0; i < len(v); i++ {
+		c := v[i]
+		b.WriteByte('%')
+		b.WriteByte(digits[c>>4])
+		b.WriteByte(digits[c&0x0f])
+	}
+	return b.String()
+}
+
+// unicodeEscapeAll escapes every rune of v as \uXXXX with lowercase
+// hex digits, using a surrogate pair above the BMP exactly as JSON
+// string encoders do.
+func unicodeEscapeAll(v string) string {
+	var b strings.Builder
+	for _, r := range v {
+		writeUnicodeEscape(&b, r)
+	}
+	return b.String()
+}
+
+// writeUnicodeEscape writes one rune as \uXXXX (lowercase hex), or a
+// surrogate pair for runes above U+FFFF.
+func writeUnicodeEscape(b *strings.Builder, r rune) {
+	const digits = "0123456789abcdef"
+	put := func(u uint16) {
+		b.WriteString(`\u`)
+		for shift := 12; shift >= 0; shift -= 4 {
+			b.WriteByte(digits[(u>>uint(shift))&0x0f])
+		}
+	}
+	if r > 0xffff {
+		r -= 0x10000
+		put(uint16(0xd800 + (r >> 10)))
+		put(uint16(0xdc00 + (r & 0x3ff)))
+		return
+	}
+	put(uint16(r))
+}
+
+// upperUnicodeHexDigits uppercases the four hex digits of every
+// \uXXXX escape in s; all other bytes pass through unchanged.
+func upperUnicodeHexDigits(s string) string {
+	b := []byte(s)
+	for i := 0; i+5 < len(b); i++ {
+		if b[i] != '\\' || b[i+1] != 'u' {
+			continue
+		}
+		ok := true
+		for j := i + 2; j <= i+5; j++ {
+			c := b[j]
+			if !('0' <= c && c <= '9' || 'a' <= c && c <= 'f' || 'A' <= c && c <= 'F') {
+				ok = false
+				break
+			}
+		}
+		if !ok {
+			continue
+		}
+		for j := i + 2; j <= i+5; j++ {
+			if 'a' <= b[j] && b[j] <= 'f' {
+				b[j] -= 'a' - 'A'
+			}
+		}
+		i += 5
+	}
+	return string(b)
+}
+
+// singleEscapes returns the forms of v in which exactly one position
+// is escaped and the rest is raw: per byte as %XX (both hex cases)
+// and per rune as \uXXXX (both hex cases). These are the shapes an
+// encoder produces when it escapes one character class member inside
+// an otherwise literal string.
+func singleEscapes(v string) []string {
+	const digitsLower, digitsUpper = "0123456789abcdef", "0123456789ABCDEF"
+	var out []string
+	for i := 0; i < len(v); i++ {
+		for _, digits := range []string{digitsUpper, digitsLower} {
+			c := v[i]
+			out = append(out, v[:i]+"%"+string([]byte{digits[c>>4], digits[c&0x0f]})+v[i+1:])
+		}
+	}
+	// Rune offsets for the \u forms; a rune-wise walk keeps
+	// multi-byte characters intact (escaping half a UTF-8 sequence
+	// is not a form any JSON encoder emits).
+	for i, r := range v {
+		var esc strings.Builder
+		writeUnicodeEscape(&esc, r)
+		lower := esc.String()
+		for _, form := range []string{lower, upperUnicodeHexDigits(lower)} {
+			out = append(out, v[:i]+form+v[i+len(string(r)):])
+		}
+	}
+	return out
 }
 
 // lowerPercentHex lowercases the hex digits of %XX escapes: encoders
@@ -177,7 +324,19 @@ var (
 	// public[_-]?key is present on both sides.
 	// TestRedactorParityKeySpellings in both repos pins this list by
 	// execution.
-	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|(?:access|refresh|session|id|auth|api)[_-]?token|token|private[_-]?key|pre[_-]?shared[_-]?key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\S+)`)
+	// The value's quoted alternatives carry a glued-suffix tail
+	// ([^\s,;}\]\)]*): characters stuck to the closing quote with
+	// no whitespace are part of the same token — token: "abc"def
+	// and token: ""0 are one value, not a value plus a tail. The
+	// old pattern stopped at the closing quote and left the tail
+	// readable; worse, the tail then merged with the [masked]
+	// replacement on a second pass, so masking was not idempotent
+	// (FuzzRedactorNoPanicAndIdempotent's token  ""0 crash). The
+	// tail class stops at structural delimiters (, ; } ] )) so a
+	// compact-JSON separator after a quoted value survives; a
+	// suffix behind such a delimiter is frozen by the [masked]
+	// guard in replaceKeyValues instead.
+	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|(?:access|refresh|session|id|auth|api)[_-]?token|token|private[_-]?key|pre[_-]?shared[_-]?key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("(?:\\.|[^"\\])*"[^\s,;}\]\)]*|'(?:\\.|[^'\\])*'[^\s,;}\]\)]*|\S+)`)
 	// strictKeyValuePattern masks keys whose names are also ordinary
 	// words only with an explicit assignment (":" or "="): a bare space
 	// after "user" or "login" is usually prose ("user agent", "login
@@ -188,7 +347,7 @@ var (
 	// (profile credentials), and the destination identifiers a censor
 	// cares about — sni, server_name, dest, host, serviceName — which
 	// are prose-safe only behind an explicit assignment.
-	strictKeyValuePattern = regexp.MustCompile(`(?i)\b(user|login|key|code|session|seed|hwid|device[_-]?id|session[_-]?id|sni|server[_-]?name|servername|dest|encryption|service[_-]?name|servicename|host)\b([\"']?\s*[:=]\s*)("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\S+)`)
+	strictKeyValuePattern = regexp.MustCompile(`(?i)\b(user|login|key|code|session|seed|hwid|device[_-]?id|session[_-]?id|sni|server[_-]?name|servername|dest|encryption|service[_-]?name|servicename|host)\b([\"']?\s*[:=]\s*)("(?:\\.|[^"\\])*"[^\s,;}\]\)]*|'(?:\\.|[^'\\])*'[^\s,;}\]\)]*|\S+)`)
 	// userInfoPattern masks the credentials of proxy links for every
 	// protocol the core parses. The password half is optional:
 	// trojan://token@host, hysteria2://secret@host and vless://id@host
@@ -210,7 +369,15 @@ var (
 	// userinfo pattern can see it. Only the segment after a
 	// subscription-shaped path element is masked; ordinary URLs (rule
 	// sets, documentation, engine downloads) keep readable paths.
-	subscriptionPathPattern = regexp.MustCompile(`(?i)\b(https?://[^\s/]+/(?:sub|subscribe|subscription|feed|token|link)/)[A-Za-z0-9._~%+/=-]{8,}`)
+	// Between host and the keyword segment, the conventional API
+	// prefix is allowed — api and version segments in any combination
+	// (https://host/api/v1/sub/<token>, /api/sub/<token>) — because
+	// provider panels nest subscriptions exactly there. Arbitrary
+	// nesting is deliberately NOT allowed: a keyword segment buried
+	// under content segments (…/news/sub/<word>) is at least as
+	// likely to be a documentation path as a credential, and masking
+	// it would mangle ordinary URLs in logs.
+	subscriptionPathPattern = regexp.MustCompile(`(?i)\b(https?://[^\s/]+/(?:(?:api|v[0-9]+)/)*(?:sub|subscribe|subscription|feed|token|link)/)[A-Za-z0-9._~%+/=-]{8,}`)
 	// bearerPattern masks a bare Bearer token (curl-style dumps, proxy
 	// logs) with no Authorization header around it. The value must look
 	// like a token (12+ token characters) so prose ("bearer of news",
@@ -387,6 +554,46 @@ func gateFlagsASCII(s string) gateFlags {
 	return f
 }
 
+// replaceKeyValues applies one of the key-value patterns (groups:
+// 1=key, 2=separator, 3=value), replacing the value with [masked]
+// while preserving key and separator verbatim. A match whose value
+// already starts with [masked] is copied through unchanged: it is a
+// mask this pipeline (or an earlier redaction of the same log)
+// already produced. Without the guard, the value's \S+ alternative
+// re-consumes the mask plus any suffix the first pass deliberately
+// preserved — a structural delimiter as in token: [masked], or a
+// bracket as in token: [masked]] — and masking is not a fixed
+// point. The guard is the second half of the idempotence fix: the
+// quoted alternatives' glued-suffix tail (see keyValuePattern)
+// consumes what belongs to the value, and the guard freezes what
+// was already masked, so maskPatterns(maskPatterns(x)) ==
+// maskPatterns(x) holds for the whole pipeline.
+func replaceKeyValues(re *regexp.Regexp, s string) string {
+	matches := re.FindAllStringSubmatchIndex(s, -1)
+	if matches == nil {
+		return s
+	}
+	var b strings.Builder
+	b.Grow(len(s))
+	last := 0
+	for _, m := range matches {
+		if m[6] < 0 {
+			continue
+		}
+		b.WriteString(s[last:m[0]])
+		if strings.HasPrefix(s[m[6]:m[7]], "[masked]") {
+			b.WriteString(s[m[0]:m[1]])
+		} else {
+			b.WriteString(s[m[2]:m[3]])
+			b.WriteString(s[m[4]:m[5]])
+			b.WriteString("[masked]")
+		}
+		last = m[1]
+	}
+	b.WriteString(s[last:])
+	return b.String()
+}
+
 // maskPatterns masks identifiers, credential pairs, and URL credentials whose
 // exact values are unknown.
 func maskPatterns(s string) string {
@@ -402,8 +609,8 @@ func maskPatterns(s string) string {
 		s = subscriptionPathPattern.ReplaceAllString(s, "${1}[masked]")
 		s = authHeaderPattern.ReplaceAllString(s, "${1}[masked]")
 		s = bearerPattern.ReplaceAllString(s, "${1}[masked]")
-		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
-		s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+		s = replaceKeyValues(keyValuePattern, s)
+		s = replaceKeyValues(strictKeyValuePattern, s)
 		s = uuidPattern.ReplaceAllString(s, "[masked]")
 		return s
 	}
@@ -436,10 +643,10 @@ func maskPatterns(s string) string {
 		s = bearerPattern.ReplaceAllString(s, "${1}[masked]")
 	}
 	if f.key {
-		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+		s = replaceKeyValues(keyValuePattern, s)
 	}
 	if f.strict {
-		s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+		s = replaceKeyValues(strictKeyValuePattern, s)
 	}
 	if f.uuid {
 		s = uuidPattern.ReplaceAllString(s, "[masked]")
