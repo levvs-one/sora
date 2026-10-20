@@ -46,20 +46,34 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 		t.Fatal(err)
 	}
 	digest := sha256.Sum256(payload)
-	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/bulk" {
 			w.Header().Set("Content-Type", "application/octet-stream")
 			_, _ = w.Write(payload)
 			return
 		}
 		_, _ = io.WriteString(w, reply)
-	}))
-	t.Cleanup(target.Close)
-	address := strings.TrimPrefix(target.URL, "http://")
-	udp, err := (&net.ListenConfig{}).ListenPacket(t.Context(), "udp", address)
+	})
+	// TCP and UDP share one port. Windows reserves different port ranges per
+	// protocol, so a free TCP port can be forbidden for UDP; try another pair.
+	var (
+		target  *httptest.Server
+		address string
+		udp     net.PacketConn
+		err     error
+	)
+	for range 20 {
+		target = httptest.NewServer(handler)
+		address = strings.TrimPrefix(target.URL, "http://")
+		if udp, err = (&net.ListenConfig{}).ListenPacket(t.Context(), "udp", address); err == nil {
+			break
+		}
+		target.Close()
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(target.Close)
 	t.Cleanup(func() { _ = udp.Close() })
 	go func() {
 		buffer := make([]byte, 4096)
