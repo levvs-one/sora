@@ -288,7 +288,10 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 		case o.Plugin != "":
 			out.set("plugin", o.Plugin)
 			if o.PluginOpts != "" {
-				out.set("plugin_opts", o.PluginOpts)
+				// Canonical schema order: the same option set
+				// renders byte-identically however the import
+				// link spelled it (CENSOR-P4 "мелочи" §3).
+				out.set("plugin_opts", engine.CanonicalSSPluginOpts(o.Plugin, o.PluginOpts))
 			}
 		case o.Obfs != "":
 			opts := "obfs=" + o.Obfs

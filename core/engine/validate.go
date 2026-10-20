@@ -52,6 +52,20 @@ func (o Outbound) appendSecrets(dst []string) []string {
 	add(o.UserID)
 	add(o.ObfsParam)
 	add(o.PluginOpts)
+	// Secret-typed plugin option values (shadow-tls/restls/jls
+	// passwords, kcptun keys) live ONLY inside the PluginOpts string:
+	// masking the whole string does not mask a log line that quotes
+	// just the value, so the values are registered separately
+	// (CENSOR-P4 "мелочи" §5).
+	if spec := SSPluginByName(o.Plugin); spec != nil {
+		if pairs, err := parseSSPluginOpts(o.PluginOpts); err == nil {
+			for _, pr := range pairs {
+				if kind, ok := spec.optKind(pr.key); ok && kind == ssOptSecret {
+					add(pr.val)
+				}
+			}
+		}
+	}
 	add(o.Token)
 	add(o.PrivateKey)
 	if o.Amnezia != nil {
@@ -280,6 +294,13 @@ func (o Outbound) Validate() error {
 			errs = append(errs, validateAmneziaWG(o.ID, o.Amnezia)...)
 		}
 	}
+	// Shadowsocks fail-closed checks (CENSOR-P4): a malformed SIP022
+	// key and a broken plugin specification refuse the plan here,
+	// with the reason named, instead of dying inside an engine.
+	if err := validateShadowsocks2022Key(o); err != nil {
+		errs = append(errs, err)
+	}
+	errs = append(errs, validateShadowsocksPlugin(o)...)
 	// REALITY hardening (T002): malformed keys or shortIds fail here, not
 	// at the engine.
 	if err := o.ValidateReality(); err != nil {
@@ -651,6 +672,34 @@ func validateAmneziaWG(id string, a *AmneziaWG) []error {
 		if _, _, err := parseAWGRangeU16(r[1]); err != nil {
 			bad("%s %q is not a range<uint16> (\"a-b\" or \"a\"): %v", r[0], r[1], err)
 		}
+	}
+	if a.Jc > 0 && a.Jmax == 0 {
+		// Junk packets of maximum size zero carry nothing: Jc asks
+		// for junk the size range makes impossible, so one of the
+		// two values is a typo the engine would silently flatten.
+		bad("jc %d sends junk packets but jmax is 0", a.Jc)
+	}
+	// J1..J3 and Itime are the AmneziaWG 1.5 junk-session parameters.
+	// They were the one AmneziaWG field family with NO validation:
+	// J1..J3 are CPS scripts like I1..I5 (a malformed one is an
+	// engine load error), and Itime is the junk interval in seconds,
+	// meaningless below 0 and absurd above an hour. The combination
+	// with any 3.1 mechanism is carriable by no engine — mihomo
+	// refuses it at render, sing-box refuses J1..J3 outright — so it
+	// fails here instead of at engine selection (CENSOR-P4).
+	if a.Itime < 0 || a.Itime > 3600 {
+		bad("itime %d is outside 0-3600", a.Itime)
+	}
+	for i, raw := range []string{a.J1, a.J2, a.J3} {
+		if raw == "" {
+			continue
+		}
+		if err := validateAWGCPS(raw); err != nil {
+			bad("j%d %q is not a valid CPS script: %v", i+1, raw, err)
+		}
+	}
+	if a.UsesAWG31() && (a.J1 != "" || a.J2 != "" || a.J3 != "" || a.Itime != 0) {
+		bad("j1/j2/j3/itime are AmneziaWG 1.5 parameters and cannot be combined with 3.1 mechanisms")
 	}
 	// I1..I5 are CPS tag scripts: a malformed script is rejected by the
 	// engine at load, so catch it here with the plan context attached.

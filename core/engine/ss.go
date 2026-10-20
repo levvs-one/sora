@@ -41,11 +41,11 @@ const (
 // shadowsocks2022KeyLen maps each SIP022 method to its required PSK length
 // in bytes. The PSK is raw binary, base64-encoded for storage.
 var shadowsocks2022KeyLen = map[string]int{
-	"2022-blake3-aes-128-gcm":        16,
-	"2022-blake3-aes-256-gcm":        32,
-	"2022-blake3-chacha20-poly1305":  32,
-	"2022-blake3-chacha12-poly1305":  32,
-	"2022-blake3-chacha8-poly1305":   32,
+	"2022-blake3-aes-128-gcm":       16,
+	"2022-blake3-aes-256-gcm":       32,
+	"2022-blake3-chacha20-poly1305": 32,
+	"2022-blake3-chacha12-poly1305": 32,
+	"2022-blake3-chacha8-poly1305":  32,
 }
 
 // shadowsocksAEAD holds the SIP004/SIP007 AEAD methods, including the
@@ -178,12 +178,19 @@ const wellKnownShadowsocksPort = 8388
 const DefaultNewShadowsocksMethod = "2022-blake3-aes-256-gcm"
 
 // Shadowsocks2022Methods lists the SIP022 ciphers for UI pickers, in
-// recommended order.
+// recommended order. The list is the full SIP022 set sora knows (the
+// shadowsocks2022KeyLen keys), not only the subset every pinned engine
+// carries: whether a concrete plan runs is decided per engine by
+// ShadowsocksMethodEngines and the selection gate in catalog.go, which
+// refuses a method no available engine implements with the method
+// named — a picker entry is data, never a promise (CENSOR-P4).
 func Shadowsocks2022Methods() []string {
 	return []string{
 		"2022-blake3-aes-256-gcm",
 		"2022-blake3-aes-128-gcm",
 		"2022-blake3-chacha20-poly1305",
+		"2022-blake3-chacha8-poly1305",
+		"2022-blake3-chacha12-poly1305",
 	}
 }
 
@@ -207,10 +214,40 @@ func GenerateShadowsocks2022PSK(method string) (string, error) {
 	return base64.StdEncoding.EncodeToString(key), nil
 }
 
+// validateShadowsocks2022Key is the fail-closed half of the SS-2022
+// warnings (CENSOR-P4): a SIP022 password that is not a base64 PSK of
+// exactly the method's required length cannot authenticate on ANY
+// conforming engine — sing-box refuses the config at load ("bad key
+// length, required 32, got 16", measured on the lx.22 pin) and the
+// others fail the handshake. Letting the plan through turned a broken
+// key into an opaque dead server; the plan now refuses it with the
+// required length named. The warning code stays for pre-validation
+// surfaces (import lists) that show the same fact without rejecting.
+func validateShadowsocks2022Key(o Outbound) error {
+	if o.Protocol != ProtocolShadowsocks {
+		return nil
+	}
+	if classifyShadowsocksMethod(o.Cipher) != ssClassAEAD2022 {
+		return nil
+	}
+	method := normalizeShadowsocksMethod(o.Cipher)
+	want := shadowsocks2022KeyLen[method]
+	key, ok := decodeShadowsocksPSK(o.Password)
+	if !ok {
+		return fmt.Errorf("outbound %s: shadowsocks method %s needs a base64 PSK of %d bytes; the password is not base64", o.ID, method, want)
+	}
+	if len(key) != want {
+		return fmt.Errorf("outbound %s: shadowsocks method %s needs a %d-byte PSK, got %d bytes", o.ID, method, want, len(key))
+	}
+	return nil
+}
+
 // shadowsocksWarnings classifies the outbound's method and key material
-// into warning codes. It never fails validation: engines differ in the
-// exact methods and key handling they accept, so everything here is advice,
-// not a rejection.
+// into warning codes. The one exception to "warnings never fail" is
+// the SS-2022 key shape, which validateShadowsocks2022Key above makes
+// a hard plan error; everything else stays advice because engines
+// legitimately differ (see ss_support.go for the per-engine facts,
+// which selection enforces separately).
 func (o Outbound) shadowsocksWarnings() []string {
 	if o.Protocol != ProtocolShadowsocks {
 		return nil
