@@ -203,6 +203,15 @@ update replaces it.
 
 ## Known limitations
 
+- **Manual install on openSUSE (zypper):** when the privileged helper is not
+  available, the app prints a manual fallback command built from the same
+  arguments the helper uses — plain `zypper --non-interactive install` with
+  GPG signature verification intact, matching the helper (SORA-H1). The app
+  does not silently weaken verification on the fallback path, so the RPMs
+  must be GPG-signed; the release-signing key ceremony is still pending
+  (owner blocker). Until it is done, installing on openSUSE requires either
+  the privileged helper or a deliberate manual `zypper install
+  --allow-unsigned-rpm` by the user.
 - **Metered connections:** not implemented. The codebase has no honest
   metered-link signal on any platform, so a "don't download on metered"
   setting would be unenforceable theater. Cut from scope deliberately.

@@ -233,7 +233,7 @@ class LinuxInstallation {
   List<String> installArguments(List<String> files) => switch (manager) {
     'apt-get' => ['install', '-y', ...files],
     'dnf' => ['install', '-y', ...files],
-    'zypper' => ['--non-interactive', 'install', '--allow-unsigned-rpm', ...files],
+    'zypper' => ['--non-interactive', 'install', ...files],
     'pacman' => ['-U', '--noconfirm', ...files],
     _ => throw const UpdateFailure(UpdateError.unsupported),
   };
