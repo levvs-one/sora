@@ -589,6 +589,9 @@ func parseVMess(raw string, u *url.URL) (OutboundSpec, error) {
 	if o.Transport == "" {
 		o.Transport = "tcp"
 	}
+	if aid := getq(q, "aid", "alterId"); aid != "" && aid != "0" {
+		return OutboundSpec{}, fmt.Errorf("%w: vmess alterId %q is legacy pre-AEAD; sora renders AEAD (alterId 0) only", ErrUnsupported, aid)
+	}
 	o.Security = getq(q, "security")
 	if o.Security == "" {
 		o.Security = "auto"
@@ -642,6 +645,14 @@ func mapVMessJSON(m map[string]any, frag string) (OutboundSpec, error) {
 	if o.Cipher == "" {
 		o.Cipher = "auto"
 	}
+	// Legacy VMess (alterId > 0) is the pre-AEAD protocol: sora renders
+	// AEAD only (alterId 0 on every engine), so importing such a link
+	// silently would hand the user a server that can never authenticate
+	// while looking imported. Refuse it as unsupported, in the open —
+	// the same discipline as the hy2 pinSHA256 refusal above.
+	if err := checkVMessAlterID(m["aid"]); err != nil {
+		return OutboundSpec{}, err
+	}
 	if net := stringValue(m["net"]); net != "" {
 		o.Transport = net
 	}
@@ -663,6 +674,25 @@ func mapVMessJSON(m map[string]any, frag string) (OutboundSpec, error) {
 	o.AllowInsecure = jsonBool(m["insecure"]) || jsonBool(m["allowInsecure"])
 	o.CountryCode = countryCode(o.DisplayName)
 	return o, o.validate()
+}
+
+// checkVMessAlterID refuses a non-zero VMess alterId in any of its
+// loosely typed forms (JSON number, numeric string). Zero, "0" and an
+// absent value are AEAD and pass.
+func checkVMessAlterID(v any) error {
+	if v == nil {
+		return nil
+	}
+	if s, ok := v.(string); ok {
+		if s == "" || s == "0" {
+			return nil
+		}
+		return fmt.Errorf("%w: vmess alterId %q is legacy pre-AEAD; sora renders AEAD (alterId 0) only", ErrUnsupported, s)
+	}
+	if n := number(v); n != 0 {
+		return fmt.Errorf("%w: vmess alterId %d is legacy pre-AEAD; sora renders AEAD (alterId 0) only", ErrUnsupported, n)
+	}
+	return nil
 }
 
 // jsonBool reads the loosely typed boolean flags of share-link JSON
@@ -723,6 +753,16 @@ func mapJSONSpec(m map[string]any, fallback string) (OutboundSpec, error) {
 	o.Flow = stringValue(m["flow"])
 	o.DisplayName = stringValue(m["tag"])
 	o.Security = stringValue(m["security"])
+	if o.Protocol == "vmess" {
+		// sing-box-shaped VMess documents spell it alter_id; both keys
+		// are legacy pre-AEAD when non-zero (see mapVMessJSON).
+		if err := checkVMessAlterID(m["aid"]); err != nil {
+			return OutboundSpec{}, err
+		}
+		if err := checkVMessAlterID(m["alter_id"]); err != nil {
+			return OutboundSpec{}, err
+		}
+	}
 	for k, v := range m {
 		if b, err := json.Marshal(v); err == nil {
 			o.Options[k] = string(b)
