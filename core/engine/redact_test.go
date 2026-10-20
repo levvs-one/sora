@@ -174,3 +174,62 @@ func TestRedactorParityKeySpellings(t *testing.T) {
 		}
 	}
 }
+
+// TestMaskPatternsDifferential pins the [pass3-opt] per-pattern gates:
+// maskPatterns must stay byte-identical to the unconditional five-pattern
+// pipeline on every input, ASCII or not. The reference below is that
+// pipeline verbatim.
+func TestMaskPatternsDifferential(t *testing.T) {
+	reference := func(s string) string {
+		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
+		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+		s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+		s = uuidPattern.ReplaceAllString(s, "[masked]")
+		return s
+	}
+	fragments := []string{
+		"plain log line, latency 45ms",
+		"token: \"my secret value\"",
+		"Token: abc",
+		"PASSWORD=hunter2",
+		"pre_shared_key: zzz",
+		"pre-shared-key: zzz",
+		"public_key: q",
+		"spider_x=1",
+		"api_key: k",
+		"auth_str: s",
+		"client_secret: c",
+		"short_id: 6ba8",
+		"user = bob",
+		"login: root",
+		"username: eve",
+		"vless://123e4567-e89b-12d3-a456-426614174000@h:443",
+		"vmess://dG9rZW4td2l0aC1kYXNoZXM=",
+		"https://user:pass@host/path",
+		"uuid is 123e4567-e89b-12d3-a456-426614174000 ok",
+		"a-b-c-d-e",
+		"Key: kelvin",
+		"пароль token: y",
+		"ключ: значение",
+		"obfs_param: p",
+		"psk: p",
+		"key",
+		"user",
+		"://",
+		"-",
+		"",
+	}
+	var inputs []string
+	inputs = append(inputs, fragments...)
+	for _, a := range fragments {
+		for _, b := range fragments {
+			inputs = append(inputs, a+" "+b)
+		}
+	}
+	for _, in := range inputs {
+		if got, want := maskPatterns(in), reference(in); got != want {
+			t.Errorf("maskPatterns differs from unconditional pipeline:\n in: %q\nwant: %q\n got: %q", in, want, got)
+		}
+	}
+}

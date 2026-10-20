@@ -150,16 +150,165 @@ func gateContains(s string) bool {
 	return false
 }
 
+// keyGateWords are the substrings that gate keyValuePattern alone: every
+// alternative of its key alternation contains one of them (uuid/password/
+// passwd/secret/token/psk/spider/short literally; every *_key/*-key form
+// contains "key"; obfs_param contains "param"; auth and auth_str contain
+// "auth"; username contains "user"). A line with none of them cannot be
+// changed by keyValuePattern.
+var keyGateWords = []string{
+	"uuid", "password", "passwd", "secret", "token", "key", "param",
+	"auth", "psk", "user", "spider", "short",
+}
+
+// isASCII reports whether s is plain ASCII, where case folding is a
+// per-byte operation and the gate scans below are exact. Non-ASCII text
+// keeps the strings.ToLower gate: Unicode folding (e.g. U+212A KELVIN
+// SIGN folding to "k") is observable there and must not change.
+func isASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= 0x80 {
+			return false
+		}
+	}
+	return true
+}
+
+// gateFlags holds the per-pattern necessary conditions of one ASCII
+// line, computed by gateFlagsASCII in a single pass.
+type gateFlags struct {
+	scheme bool // "://" present: userInfoPattern/tokenLinkPattern may match
+	key    bool // a keyGateWords substring: keyValuePattern may match
+	strict bool // "user"/"login" present: strictKeyValuePattern may match
+	uuid   bool // at least four dashes: uuidPattern may match
+}
+
+// matchFoldAt reports whether w (lowercase ASCII) occurs in s at i,
+// folding ASCII letters only.
+func matchFoldAt(s string, i int, w string) bool {
+	if i+len(w) > len(s) {
+		return false
+	}
+	for j := 0; j < len(w); j++ {
+		c := s[i+j]
+		if 'A' <= c && c <= 'Z' {
+			c += 'a' - 'A'
+		}
+		if c != w[j] {
+			return false
+		}
+	}
+	return true
+}
+
+// gateFlagsASCII computes the flags in one pass over s, trying gate
+// words only at positions whose folded byte can start one. It allocates
+// nothing, unlike the ToLower copy gateContains makes of every line.
+func gateFlagsASCII(s string) gateFlags {
+	var f gateFlags
+	dashes := 0
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '-' {
+			dashes++
+			continue
+		}
+		if 'A' <= c && c <= 'Z' {
+			c += 'a' - 'A'
+		}
+		switch c {
+		case ':':
+			if i+2 < len(s) && s[i+1] == '/' && s[i+2] == '/' {
+				f.scheme = true
+			}
+		case 'u':
+			if matchFoldAt(s, i, "user") {
+				f.key, f.strict = true, true
+			}
+			if matchFoldAt(s, i, "uuid") {
+				f.key = true
+			}
+		case 'p':
+			if matchFoldAt(s, i, "password") || matchFoldAt(s, i, "passwd") || matchFoldAt(s, i, "psk") || matchFoldAt(s, i, "param") {
+				f.key = true
+			}
+		case 's':
+			if matchFoldAt(s, i, "secret") || matchFoldAt(s, i, "spider") || matchFoldAt(s, i, "short") {
+				f.key = true
+			}
+		case 't':
+			if matchFoldAt(s, i, "token") {
+				f.key = true
+			}
+		case 'k':
+			if matchFoldAt(s, i, "key") {
+				f.key = true
+			}
+		case 'a':
+			if matchFoldAt(s, i, "auth") {
+				f.key = true
+			}
+		case 'l':
+			if matchFoldAt(s, i, "login") {
+				f.strict = true
+			}
+		}
+		if f.scheme && f.key && f.strict && dashes >= 4 {
+			break
+		}
+	}
+	f.uuid = dashes >= 4
+	return f
+}
+
 // maskPatterns masks identifiers, credential pairs, and URL credentials whose
 // exact values are unknown.
 func maskPatterns(s string) string {
-	if !gateContains(s) && strings.Count(s, "-") < 4 {
+	if !isASCII(s) {
+		// The original gate and full pipeline, unchanged: Unicode case
+		// folding decides what the (?i) patterns can see, so no ASCII
+		// shortcut may skip a pass here.
+		if !gateContains(s) && strings.Count(s, "-") < 4 {
+			return s
+		}
+		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
+		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+		s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+		s = uuidPattern.ReplaceAllString(s, "[masked]")
 		return s
 	}
-	s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
-	s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
-	s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
-	s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
-	s = uuidPattern.ReplaceAllString(s, "[masked]")
+	// ASCII fast path: one gate per pattern, each a necessary condition
+	// for that pattern to match at all —
+	//   userInfo/tokenLink need a literal "://";
+	//   keyValue needs one of keyGateWords (see its comment);
+	//   strictKeyValue needs "user" or "login";
+	//   uuid needs at least four dashes (the pattern has exactly four).
+	// The flags are computed once, on entry. That stays a superset for
+	// the string each later pattern actually receives: the replacements
+	// only delete spans and insert "[masked]"/"[masked]@", whose bracket
+	// characters no gate word can span, and keyValue preserves its key
+	// and separator verbatim — so no pass can create a trigger (scheme,
+	// key word, user/login, dashes) that the entry string lacked. A
+	// skipped pattern therefore provably cannot match, and the output is
+	// byte-identical to the unconditional pipeline (pinned by
+	// TestMaskPatternsDifferential).
+	f := gateFlagsASCII(s)
+	if !f.scheme && !f.key && !f.strict && !f.uuid {
+		return s
+	}
+	if f.scheme {
+		s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
+		s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
+	}
+	if f.key {
+		s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+	}
+	if f.strict {
+		s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+	}
+	if f.uuid {
+		s = uuidPattern.ReplaceAllString(s, "[masked]")
+	}
 	return s
 }
