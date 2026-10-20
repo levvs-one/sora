@@ -122,6 +122,53 @@ void main() {
       expect(convertHappRouting('A' * (2 * (1 << 20) + 1)), isNull);
     });
 
+    test('the same destination in direct and proxy keeps both rules, direct first', () {
+      // Mirror of the Go converter pin: dedup is per (destination,
+      // target), conversion order is block, direct, proxy, and the
+      // engines match first-hit — so the direct rule takes effect.
+      final doc = {
+        'DirectSites': ['both.example'],
+        'ProxySites': ['both.example'],
+      };
+      final imported = convertHappRouting(base64Encode(utf8.encode(jsonEncode(doc))))!;
+      expect(imported.rules.map((r) => r.stored), ['direct domain:both.example', 'proxy domain:both.example']);
+    });
+
+    test('duplicates inside one list collapse to one rule', () {
+      final doc = {
+        'DirectSites': ['dup.example', 'dup.example', 'DUP.example', '*.dup.example'],
+      };
+      final imported = convertHappRouting(base64Encode(utf8.encode(jsonEncode(doc))))!;
+      expect(imported.rules.map((r) => r.stored), ['direct domain:dup.example']);
+      expect(imported.skipped, 0, reason: 'duplicates are deduped, not skipped');
+    });
+
+    test('an empty profile converts to zero rules and no notes', () {
+      final imported = convertHappRouting(base64Encode(utf8.encode(jsonEncode({'Name': 'empty'}))))!;
+      expect(imported.rules, isEmpty);
+      expect(imported.skipped, 0);
+      expect(imported.notes, isEmpty, reason: 'nothing carried, nothing to account for');
+    });
+
+    test('re-importing the same link merges by destination and never duplicates', () {
+      final imported = convertHappRouting(goldenBase64)!;
+      final once = mergeImportedRules(const [], imported.rules);
+      final twice = mergeImportedRules(once, imported.rules);
+      expect(twice, once, reason: 'the merge of a merge is the same list');
+      expect(twice.toSet().length, twice.length, reason: 'no stored rule appears twice');
+      // A stored rule for an imported destination is replaced, not
+      // kept alongside; unrelated and unparseable entries stay put.
+      final seeded = mergeImportedRules(const ['proxy domain:bank.example', 'direct domain:mine.example', 'garbage'], imported.rules);
+      expect(seeded.where((r) => r.endsWith('domain:bank.example')), ['direct domain:bank.example']);
+      expect(seeded, containsAll(['direct domain:mine.example', 'garbage']));
+      expect(seeded.length, imported.rules.length + 2);
+      // A re-import that flips a destination's target replaces it.
+      final flipped = mergeImportedRules(seeded, convertHappRouting(base64Encode(utf8.encode(jsonEncode({
+        'DirectSites': ['video.example'],
+      }))))!.rules);
+      expect(flipped.where((r) => r.endsWith('domain:video.example')), ['direct domain:video.example']);
+    });
+
     test('broken payloads fail honestly', () {
       for (final payload in [
         '',

@@ -66,6 +66,23 @@ class HappRoutingImport {
   int countOf(RuleTarget target) => rules.where((r) => r.target == target).length;
 }
 
+/// Merges [imported] rules into the user's stored rule list (the
+/// stored-string form the rules screen edits): a stored rule whose
+/// destination the import carries is dropped and the imported rule
+/// takes its place at the end; every other stored rule keeps its
+/// position, and unparseable stored strings are kept verbatim.
+/// Re-importing the same profile is therefore idempotent — the merge
+/// of a merge changes nothing, and rules never duplicate — while a
+/// re-import with a changed target for a destination replaces it.
+List<String> mergeImportedRules(List<String> stored, List<UserRule> imported) {
+  final replaced = imported.map((r) => r.destination).toSet();
+  return [
+    for (final rule in stored)
+      if (!replaced.contains(UserRule.parse(rule)?.destination)) rule,
+    for (final rule in imported) rule.stored,
+  ];
+}
+
 /// Decodes and converts the payload of a happ://routing/add/ link.
 /// Returns null when the payload is not a Happ routing document at
 /// all (bad base64, bad JSON, wrong shape): the import then fails

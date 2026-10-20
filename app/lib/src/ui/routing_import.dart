@@ -44,17 +44,8 @@ Future<void> showRoutingImport(BuildContext context, Sora sora, String payload) 
   }
   final accepted = await confirm(context, question: summary, action: s.add, destructive: false);
   if (!accepted) return;
-  final replaced = imported.rules.map((r) => r.destination).toSet();
-  bool keep(String stored) {
-    final destination = UserRule.parse(stored)?.destination;
-    return destination == null || !replaced.contains(destination);
-  }
 
   await sora.change((x) {
-    x.rules = [
-      for (final stored in x.rules)
-        if (keep(stored)) stored,
-      for (final rule in imported.rules) rule.stored,
-    ];
+    x.rules = mergeImportedRules(x.rules, imported.rules);
   });
 }

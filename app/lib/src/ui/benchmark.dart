@@ -55,12 +55,19 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
     final ordered = List<String>.of(ids)
       ..sort((a, b) {
         final x = freshById[a], y = freshById[b];
-        if (x == null && y == null) {
-          return nameById[a]!.compareTo(nameById[b]!);
+        if (x != null && y != null) {
+          final bySpeed = y.compareTo(x);
+          if (bySpeed != 0) return bySpeed;
+        } else if (x == null && y != null) {
+          return 1;
+        } else if (x != null) {
+          return -1;
         }
-        if (x == null) return 1;
-        if (y == null) return -1;
-        return y.compareTo(x);
+        // List.sort is not stable: equal speeds (and the unmeasured
+        // pair) tie-break by name, then by id, so the result order is
+        // the same whatever order the ids arrived in.
+        final byName = nameById[a]!.compareTo(nameById[b]!);
+        return byName != 0 ? byName : a.compareTo(b);
       });
     return Screen(
       title: s.measureSpeed,

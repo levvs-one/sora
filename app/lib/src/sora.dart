@@ -2331,7 +2331,10 @@ class Sora extends ChangeNotifier {
   /// Compares two servers for list sorting: ping, speed, smart or name.
   int compareServers(String a, String b, String mode) {
     if (mode == 'name') {
-      return displayNameOf(a).toLowerCase().compareTo(displayNameOf(b).toLowerCase());
+      final byName = displayNameOf(a).toLowerCase().compareTo(displayNameOf(b).toLowerCase());
+      // List.sort is not stable: equal names need a deterministic
+      // tie-break or the row order depends on the input order.
+      return byName != 0 ? byName : a.compareTo(b);
     }
     return compareAutoSelect(a, b, mode, latency, bandwidth, reliabilityOf: reliabilityOf);
   }
@@ -2621,7 +2624,12 @@ SessionPlan buildPlan({
     final others = [
       for (final o in ordinary)
         if (o.id != choice) o,
-    ]..sort((a, b) => (latency[a.id] ?? 1 << 30).compareTo(latency[b.id] ?? 1 << 30));
+    ]..sort((a, b) {
+        final byLatency = (latency[a.id] ?? 1 << 30).compareTo(latency[b.id] ?? 1 << 30);
+        // List.sort is not stable: equal latencies tie-break by id so
+        // the fallback group's member order is deterministic.
+        return byLatency != 0 ? byLatency : a.id.compareTo(b.id);
+      });
     plan.groups.add(
       GroupSpec(
         name: Sora.failoverGroup,
@@ -2770,7 +2778,10 @@ double smartScoreOf(
 }
 
 /// Compares two servers for auto-selection. [mode] is ping, speed or smart;
-/// unknown modes fall back to ping. Ties break by ping.
+/// unknown modes fall back to ping. Ties break by ping, then by id:
+/// List.sort is not stable, so without the final id tie-break two
+/// servers with equal metrics would order by input position instead
+/// of deterministically (the servers screen sorts through here).
 ///
 /// T011 NOT WIRED here: this selection (and [_fastest]/[pickMember])
 /// has no subnet-reputation input, so a server in a carpet-banned /24
@@ -2791,6 +2802,11 @@ int compareAutoSelect(
   double? Function(String id)? reliabilityOf,
 }) {
   int byPing() => (latency[a] ?? 1 << 30).compareTo(latency[b] ?? 1 << 30);
+  int byPingThenId() {
+    final by = byPing();
+    return by != 0 ? by : a.compareTo(b);
+  }
+
   switch (mode) {
     case 'speed':
       final x = freshBandwidthOf(bandwidth, a), y = freshBandwidthOf(bandwidth, b);
@@ -2800,7 +2816,7 @@ int compareAutoSelect(
         final bySpeed = y.compareTo(x);
         if (bySpeed != 0) return bySpeed;
       }
-      return byPing();
+      return byPingThenId();
     case 'smart':
       final bySmart = smartScoreOf(
         b,
@@ -2808,9 +2824,9 @@ int compareAutoSelect(
         bandwidth,
         reliability: reliabilityOf?.call(b),
       ).compareTo(smartScoreOf(a, latency, bandwidth, reliability: reliabilityOf?.call(a)));
-      return bySmart != 0 ? bySmart : byPing();
+      return bySmart != 0 ? bySmart : byPingThenId();
     default:
-      return byPing();
+      return byPingThenId();
   }
 }
 

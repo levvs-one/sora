@@ -386,7 +386,13 @@ List<Entry> _sortEntries(List<Entry> entries, Sora sora, [Map<Entry, OutboundSpe
     // on every probe-tick rebuild. The values are pure in the entry name,
     // so the order is identical.
     final nameKeys = {for (final e in entries) e: e.name.toLowerCase()};
-    entries.sort((a, b) => nameKeys[a]!.compareTo(nameKeys[b]!));
+    entries.sort((a, b) {
+      final byName = nameKeys[a]!.compareTo(nameKeys[b]!);
+      // List.sort is not stable: entries whose names compare equal
+      // (case variants, renamed splits) tie-break by entry id so the
+      // order does not depend on the input order.
+      return byName != 0 ? byName : a.id.compareTo(b.id);
+    });
     return entries;
   }
   // Groups are represented by the prospective active member — the same one
