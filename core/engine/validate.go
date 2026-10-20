@@ -1050,6 +1050,40 @@ func validateDesync(id string, s *BypassStrategy) error {
 		}
 	}
 	nfqws := len(s.Desync) > 0
+	if nfqws {
+		// The nfqws renderer (bypass.NFQWSArgs) carries only SplitPos
+		// of the legacy tpws fields; every other legacy field set
+		// alongside a desync method would be dropped silently when
+		// BackendOf routes the strategy to nfqws (S2 seams audit).
+		// Refuse the mix, mirroring the nfqws-only checks below:
+		// disorder on nfqws is spelled as a desync method
+		// (disorder/disorder2), and the HTTP-shaping, OOB, TLS-record,
+		// tamper-window and MSS knobs have no NFQWSArgs rendering.
+		for _, f := range []struct {
+			name string
+			set  bool
+		}{
+			{"disorder", s.Disorder || s.DisorderScope != ""},
+			{"oob", s.OOB || s.OOBScope != "" || s.OOBData != ""},
+			{"tlsrec", s.TLSRecord != ""},
+			{"hostcase", s.HostCase},
+			{"domcase", s.DomainCase},
+			{"methodeol", s.MethodEOL},
+			{"hostdot", s.HostDot},
+			{"hosttab", s.HostTab},
+			{"hostnospace", s.HostNoSpace},
+			{"methodspace", s.MethodSpace},
+			{"unixeol", s.UnixEOL},
+			{"split-any-protocol", s.SplitAnyProtocol},
+			{"tamper-start", s.TamperStart != ""},
+			{"tamper-cutoff", s.TamperCutoff != ""},
+			{"mss", s.MSS != ""},
+		} {
+			if f.set {
+				return fmt.Errorf("outbound %s: %s is a tpws-only option: a strategy with desync methods runs on nfqws, which does not render it", id, f.name)
+			}
+		}
+	}
 	if s.Fooling != "" {
 		if !nfqws {
 			return fmt.Errorf("outbound %s: fooling needs a desync method (nfqws-only)", id)
