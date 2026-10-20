@@ -49,7 +49,6 @@ func (s *Server) BenchmarkServers(req *corev1.BenchmarkServersRequest, stream gr
 
 	specs, missing := s.resolveBenchmarkServers(ids)
 	outbounds := make([]engine.Outbound, 0, len(specs))
-	byID := make(map[string]string, len(specs))
 	for i, spec := range specs {
 		o, err := outboundFromProto(i, spec, s.secrets)
 		if err != nil {
@@ -63,7 +62,6 @@ func (s *Server) BenchmarkServers(req *corev1.BenchmarkServersRequest, stream gr
 			continue
 		}
 		outbounds = append(outbounds, o)
-		byID[o.ID] = spec.GetId()
 	}
 
 	duration := time.Duration(req.GetDurationS()) * time.Second
@@ -129,23 +127,32 @@ func (s *Server) BenchmarkServers(req *corev1.BenchmarkServersRequest, stream gr
 func (s *Server) resolveBenchmarkServers(ids []string) (found []*corev1.OutboundSpec, missing []string) {
 	s.subs.mu.Lock()
 	defer s.subs.mu.Unlock()
-	// Size the index for every subscription server up front: ids are
-	// unique, so the map never grows past this.
-	total := 0
-	for _, list := range s.subs.lists {
-		total += len(list)
+	// Index only the requested ids, not the whole book: a request names
+	// at most maxBenchmarkServers servers, while the subscriptions may
+	// hold thousands. The previous full-book index allocated ~110 KB to
+	// answer a 32-id lookup in a 2000-server book (measured); the
+	// inverted index allocates proportionally to the request. The scan
+	// still visits every list and lets later lists override earlier
+	// ones, exactly like the full index did — only the storage shrinks.
+	want := make(map[string]struct{}, len(ids))
+	for _, id := range ids {
+		want[id] = struct{}{}
 	}
-	byID := make(map[string]*corev1.OutboundSpec, total)
+	matched := make(map[string]*corev1.OutboundSpec, len(ids))
 	for _, list := range s.subs.lists {
 		for _, spec := range list {
-			byID[spec.GetId()] = spec
+			id := spec.GetId()
+			if _, ok := want[id]; ok {
+				matched[id] = spec
+			}
 		}
 	}
-	// At most len(ids) ids land in each bucket.
+	// At most len(ids) ids land in each bucket; duplicates in the
+	// request are answered per occurrence, in request order.
 	found = make([]*corev1.OutboundSpec, 0, len(ids))
 	missing = make([]string, 0, len(ids))
 	for _, id := range ids {
-		if spec, ok := byID[id]; ok {
+		if spec, ok := matched[id]; ok {
 			found = append(found, spec)
 		} else {
 			missing = append(missing, id)

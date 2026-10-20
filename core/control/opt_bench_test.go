@@ -159,6 +159,32 @@ func BenchmarkResolveBenchmarkServers32of200(b *testing.B) {
 	}
 }
 
+// BenchmarkResolveBenchmarkServers32of2000 resolves 32 ids out of a 2000
+// server subscription book — the scale where indexing the whole book per
+// request (the previous implementation) cost ~110 KB of allocations to
+// answer a 32-id lookup; the inverted index allocates per request size.
+func BenchmarkResolveBenchmarkServers32of2000(b *testing.B) {
+	token := benchToken(b)
+	specs := benchSpecs(2000)
+	srv := benchBenchServer(b, token, specs, nil)
+	ids := make([]string, 0, 32)
+	for i := 0; i < 32; i += 2 {
+		ids = append(ids, fmt.Sprintf("srv-%d", i*61))
+	}
+	for i := 0; i < 16; i++ {
+		ids = append(ids, fmt.Sprintf("missing-%d", i))
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		found, missing := srv.resolveBenchmarkServers(ids)
+		if len(found) != 16 || len(missing) != 16 {
+			b.Fatalf("found %d, missing %d; want 16 and 16", len(found), len(missing))
+		}
+	}
+}
+
 // benchPlan200 builds a 200-server session plan: outbounds, rules that
 // reference them, and two groups.
 func benchPlan200() *corev1.SessionPlan {
