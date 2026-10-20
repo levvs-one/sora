@@ -279,3 +279,33 @@ func censorWhatFromProto(w censorv1.AttemptEventKind) censor.What {
 // (The UnimplementedCensorControlServer embedding lives on the Server struct
 // in server.go.)
 var _ censorv1.CensorControlServer = (*Server)(nil)
+
+// ExpediteForCensorship pulls subscription refreshes forward after a
+// censorship verdict names interference (T042): during a block wave the
+// provider rotates endpoints (IPs, domains, SNI variants) and the hourly
+// schedule is too slow — the user would sit on a dead list for up to an
+// hour. serverID is the failed server; only subscriptions whose last
+// known list owns it are expedited. Verdicts that carry no interference
+// signal (Unknown, NoInterference) are ignored. It returns how many
+// subscriptions were expedited. Safe for concurrent use; the cooldown
+// (15 min per subscription) lives in ExpediteUpdate.
+//
+// The trigger is honest about what expedite cannot do: it pulls the next
+// refresh forward, it does not conjure new servers — if the provider has
+// nothing rotated yet, the refresh returns the same list.
+func (s *Server) ExpediteForCensorship(v censor.Verdict, serverID string) int {
+	if s == nil || s.subs == nil {
+		return 0
+	}
+	switch v.Kind {
+	case censor.KindUnknown, censor.KindNoInterference:
+		return 0
+	}
+	n := 0
+	for _, id := range s.subs.subscriptionsOf(serverID) {
+		if s.subs.ExpediteUpdate(id) {
+			n++
+		}
+	}
+	return n
+}

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/levvs-one/sora-client/core/censor"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 )
 
@@ -92,4 +93,54 @@ func TestExpediteUpdateWhileFetching(t *testing.T) {
 		t.Error("ExpediteUpdate during a running fetch = true, want false")
 	}
 	close(p.release)
+}
+
+// TestExpediteForCensorship (T042 wiring): a verdict naming interference
+// expedites exactly the subscriptions owning the failed server; benign
+// verdicts and unknown servers expedite nothing.
+func TestExpediteForCensorship(t *testing.T) {
+	p := &panel{body: servers("a", "b")}
+	srv, _ := bookServer(t, t.TempDir(), p)
+	b := srv.subs
+	now := time.Now()
+	b.now = func() time.Time { return now }
+
+	state := saveAndWait(t, b, &corev1.SubscriptionSettings{
+		Url: "https://panel.example/sub/abc", AutoUpdate: true,
+	})
+	id := state.GetSettings().GetId()
+
+	list := b.lists[id]
+	if len(list) < 2 {
+		t.Fatalf("parsed list has %d servers, want 2", len(list))
+	}
+	srvA, srvB := list[0].GetId(), list[1].GetId()
+
+	ids := b.subscriptionsOf(srvA)
+	if len(ids) != 1 || ids[0] != id {
+		t.Fatalf("subscriptionsOf(%s) = %v, want [%s]", srvA, ids, id)
+	}
+	if got := b.subscriptionsOf(""); got != nil {
+		t.Fatalf("subscriptionsOf(empty) = %v, want nil", got)
+	}
+	if got := b.subscriptionsOf("no-such-server"); len(got) != 0 {
+		t.Fatalf("subscriptionsOf(unknown) = %v, want none", got)
+	}
+
+	if n := srv.ExpediteForCensorship(censor.Verdict{Kind: censor.KindSNIBlocking}, srvA); n != 1 {
+		t.Fatalf("interference verdict expedited %d subscriptions, want 1", n)
+	}
+	// Cooldown: a second verdict right away must not re-expedite.
+	if n := srv.ExpediteForCensorship(censor.Verdict{Kind: censor.KindRSTInjection}, srvA); n != 0 {
+		t.Fatalf("verdict within cooldown expedited %d, want 0", n)
+	}
+	if n := srv.ExpediteForCensorship(censor.Verdict{Kind: censor.KindNoInterference}, srvB); n != 0 {
+		t.Fatalf("no-interference verdict expedited %d, want 0", n)
+	}
+	if n := srv.ExpediteForCensorship(censor.Verdict{Kind: censor.KindUnknown}, srvB); n != 0 {
+		t.Fatalf("unknown verdict expedited %d, want 0", n)
+	}
+	if n := srv.ExpediteForCensorship(censor.Verdict{Kind: censor.KindIPBlocking}, "no-such-server"); n != 0 {
+		t.Fatalf("verdict for unknown server expedited %d, want 0", n)
+	}
 }

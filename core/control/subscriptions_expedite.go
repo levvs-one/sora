@@ -46,3 +46,27 @@ func (b *subscriptionBook) expeditedDue(rec *subscriptionRecord, at time.Time) t
 	}
 	return at
 }
+
+// subscriptionsOf returns the ids of subscriptions whose last known server
+// list contains serverID. It is the T042 reverse lookup: a censorship
+// verdict names the failed server, and the expedited refresh must pull
+// the provider list that owns it — not every subscription. (rec.Servers
+// holds secret-store refs, not server ids; the ids live on the parsed
+// OutboundSpecs in lists.)
+func (b *subscriptionBook) subscriptionsOf(serverID string) []string {
+	if serverID == "" {
+		return nil
+	}
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	var out []string
+	for id, list := range b.lists {
+		for _, ob := range list {
+			if ob.GetId() == serverID {
+				out = append(out, id)
+				break
+			}
+		}
+	}
+	return out
+}

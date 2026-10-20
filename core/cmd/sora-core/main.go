@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/levvs-one/sora-client/core/censor"
 	"github.com/levvs-one/sora-client/core/control"
 	"github.com/levvs-one/sora-client/core/diagnostics"
 	"github.com/levvs-one/sora-client/core/engine"
@@ -264,6 +265,10 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		Redactor: redactor,
 		Network:  session.NetworkFingerprint,
 		Profiles: profStore,
+		// T017: planned re-handshake so handshake age stops being a
+		// cheap censor feature. MaxAge 45m ± 10m (spec
+		// 17-long-sessions.md §3.2); 0 would disable it fail-closed.
+		Rehandshake: session.RehandshakePolicy{MaxAge: 45 * time.Minute, Jitter: 10 * time.Minute},
 	})
 	app.sessions = manager
 
@@ -303,12 +308,48 @@ func New(ctx context.Context, opts Options) (*App, error) {
 			benchmarker = b
 		}
 	}
+	// The control prober carries the freeze recognizer (T007): every TLS
+	// dial it runs feeds the shared probe.FreezeDetector passively, so
+	// the "parallel handshakes stall, sequential ones succeed" pattern
+	// becomes visible without an active probe. A confirmed freeze is
+	// surfaced as a censorship journal event on the running session and
+	// expedites the T042 subscription refresh — the same treatment every
+	// other censorship verdict gets.
+	prober := probe.New(probe.Config{})
+	freezeDet := &probe.FreezeDetector{}
+	freezeDet.OnFreeze = func(v probe.FreezeVerdict) {
+		cur := manager.Current()
+		if cur == nil {
+			return
+		}
+		verdict := censor.Verdict{
+			Kind:        censor.KindHandshakeTimeout,
+			Confidence:  v.Confidence,
+			Explanation: "parallel TLS handshakes to " + v.SNI + " stall while sequential ones succeed: per-SNI concurrency freeze",
+			Evidence:    v.Evidence,
+			At:          time.Now().UTC(),
+		}
+		cur.Journal().Append(session.Event{
+			Kind:   session.EventCensor,
+			Detail: "censorship check: " + verdict.Explanation,
+			Censor: &verdict,
+		})
+		serverID := ""
+		if plan := cur.Plan(); plan != nil && len(plan.Outbounds) > 0 {
+			serverID = plan.Outbounds[0].ID
+		}
+		if app.plane != nil {
+			app.plane.ExpediteForCensorship(verdict, serverID)
+		}
+	}
+	prober.SetFreezeDetector(freezeDet)
+
 	plane, err := control.New(control.Config{
 		Version:       Version,
 		Authenticator: auth,
 		Sessions:      manager,
 		Secrets:       store,
-		Prober:        probe.New(probe.Config{}),
+		Prober:        prober,
 		Measurer:      measurer,
 		Benchmarker:   benchmarker,
 		DataDir:       opts.DataDir,
@@ -323,6 +364,13 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	}
 	plane.SetDiagnostics(app.report)
 	app.plane = plane
+	// T042: session censorship verdicts expedite the refresh of the
+	// subscription owning the failed server (block-wave endpoint
+	// rotation outruns the hourly schedule). The manager is built before
+	// the plane, so the hook is installed now that the consumer exists.
+	manager.SetCensorshipHook(func(v censor.Verdict, serverID string) {
+		plane.ExpediteForCensorship(v, serverID)
+	})
 
 	app.server = grpc.NewServer(
 		// The transport rejects requests above the four-megabyte plan

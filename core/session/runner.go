@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/levvs-one/sora-client/core/censor"
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/profiles"
@@ -123,6 +124,16 @@ type Session struct {
 	// censorWatchOnce keeps the censorship failure watcher (SW4) attached
 	// at most once per session.
 	censorWatchOnce sync.Once
+	// handshakeAt is when the current transport's handshake completed.
+	// It is the age baseline for the planned re-handshake (T017): age is
+	// now − handshakeAt, and keepalives/KeyUpdates/rekeys do not reset it.
+	handshakeAt time.Time
+	// censorHook, when set, receives every censorship verdict the
+	// watcher publishes, with the failed server's id. The manager sets
+	// it so the control plane can expedite subscription refreshes (T042).
+	// It must be fast and non-blocking: it runs on the watcher's
+	// goroutine.
+	censorHook func(censor.Verdict, string)
 }
 
 // New constructs a stopped session. Start changes the system after plan
@@ -200,6 +211,17 @@ func (s *Session) Status() Status {
 	return s.status
 }
 
+// HandshakeAt reports when the current transport's handshake completed —
+// the age baseline for the planned re-handshake (T017, spec
+// 17-long-sessions.md). Zero when the session never connected. Age is
+// now − HandshakeAt: keepalives, TLS KeyUpdates and WireGuard rekeys do
+// not reset it, only a fresh handshake does.
+func (s *Session) HandshakeAt() time.Time {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.handshakeAt
+}
+
 // Start waits for readiness or permanent failure. Retryable failures enter
 // reconnecting and continue in the background without requiring another
 // Connect.
@@ -271,6 +293,12 @@ func (s *Session) Start(ctx context.Context) error {
 	}
 
 	s.setState(StateConnected, errs.Code(""), errs.Key(""), "")
+	// The transport handshake completed here: this is the age baseline
+	// for the planned re-handshake (T017). Reconnects inside the engine
+	// do not move it — only a new session handshake does.
+	s.mu.Lock()
+	s.handshakeAt = s.cfg.Now()
+	s.mu.Unlock()
 	// A clean connect starts a fresh crash episode.
 	s.crashes.reset()
 	// ... and a fresh stall episode: zero bytes are expected while the

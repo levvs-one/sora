@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"errors"
+	"math/rand/v2"
 	"sync"
 	"time"
 
@@ -41,6 +42,17 @@ type ManagerConfig struct {
 	// Profiles matches saved network profiles on network changes; see
 	// Config.Profiles. Nil disables profile matching.
 	Profiles *profiles.Store
+	// Rehandshake is the planned re-handshake policy (T017): a session
+	// whose transport handshake outlives it is restarted on the same
+	// plan so handshake age stops being a cheap censor feature. The
+	// zero value disables it (fail-closed).
+	Rehandshake RehandshakePolicy
+	// OnCensorshipVerdict receives every censorship verdict a session's
+	// failure watcher publishes, with the failed server's id. The
+	// control plane uses it for the T042 expedited subscription
+	// refresh. Can also be set later with SetCensorshipHook when the
+	// consumer is built after the manager.
+	OnCensorshipVerdict func(censor.Verdict, string)
 }
 
 // Manager owns at most one session. Connect stops and restores the old session
@@ -52,6 +64,14 @@ type Manager struct {
 	current *Session
 	last    Status
 	busy    bool
+	// lastPlan/lastSettings remember the running session's inputs so the
+	// T017 worker can restart the same session for a planned
+	// re-handshake. They change only at a successful Connect.
+	lastPlan     *engine.Plan
+	lastSettings Settings
+	// censorHook backs ManagerConfig.OnCensorshipVerdict and can be
+	// installed after construction with SetCensorshipHook.
+	censorHook func(censor.Verdict, string)
 }
 
 // NewManager validates the required factory at construction rather than on
@@ -75,7 +95,22 @@ func NewManager(cfg ManagerConfig) *Manager {
 	if cfg.Guard == nil {
 		cfg.Guard = NoopGuard{}
 	}
-	return &Manager{cfg: cfg, last: Status{State: StateDisconnected, ChangedAt: cfg.Now()}}
+	return &Manager{
+		cfg:        cfg,
+		last:       Status{State: StateDisconnected, ChangedAt: cfg.Now()},
+		censorHook: cfg.OnCensorshipVerdict,
+	}
+}
+
+// SetCensorshipHook installs (or replaces) the hook receiving censorship
+// verdicts published by session failure watchers, with the failed
+// server's id. It exists because the control plane — the hook's consumer
+// — is constructed after the manager. Sessions started before the call
+// keep whatever hook they captured at Connect.
+func (m *Manager) SetCensorshipHook(fn func(censor.Verdict, string)) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.censorHook = fn
 }
 
 // Connect stops any previous session and restores its settings before starting
@@ -166,11 +201,123 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 	m.mu.Lock()
 	m.current = created
 	m.last = created.Status()
+	m.lastPlan = plan
+	m.lastSettings = settings
+	created.censorHook = m.censorHook
 	m.mu.Unlock()
 	// Diagnose network-level failures in the background: the watcher reacts
 	// to journal events only and never touches the session runner (SW4).
 	created.WatchCensorshipFailures(&censor.Detector{}, &censor.Prober{})
+	// T017: the worker restarts this session on the same plan when the
+	// transport handshake outlives the policy.
+	go m.rehandshakeLoop(created)
 	return created, nil
+}
+
+// rehandshakeLoop implements the T017 planned re-handshake. It ticks once
+// a minute; when the session's transport handshake is overdue for renewal
+// it restarts the session on the same plan and exits — the new session
+// gets its own worker. The trigger is one-shot per session and
+// fail-closed: a disabled policy never starts the loop, a superseded
+// session is never touched, and a recent censorship verdict defers the
+// restart (spec 17-long-sessions.md §3.5: new handshakes during a freeze
+// or block wave only burn more handshakes).
+func (m *Manager) rehandshakeLoop(s *Session) {
+	policy := m.cfg.Rehandshake
+	if policy.MaxAge <= 0 {
+		return
+	}
+	// Session-local jitter source: the deadline must not tick on a grid
+	// shared across processes or machines.
+	var idSeed uint64
+	if id := s.ID(); id != "" {
+		idSeed = uint64(id[0])
+	}
+	r := rand.New(rand.NewPCG(uint64(m.cfg.Now().UnixNano()), idSeed))
+	deadline := policy.Deadline(s.HandshakeAt(), r)
+	if deadline.IsZero() {
+		return
+	}
+	t := time.NewTicker(time.Minute)
+	defer t.Stop()
+	for {
+		select {
+		case <-s.Done():
+			return
+		case now := <-t.C:
+			if m.currentSession() != s {
+				return // superseded by a newer session
+			}
+			if !policy.Overdue(now, deadline) {
+				continue
+			}
+			if frozenRecently(s, now) {
+				continue // T017 §3.5: defer while interference is fresh
+			}
+			s.Journal().Append(Event{
+				Kind:    EventLog,
+				LogLine: "planned re-handshake: the transport handshake outlived the session age policy; restarting on the same plan",
+			})
+			if err := m.rehandshake(s); err != nil {
+				// A busy manager or a failed restart is not fatal: the
+				// next tick retries, and the journal line above says why
+				// the restart was wanted.
+				continue
+			}
+			return
+		}
+	}
+}
+
+// rehandshake restarts s on the plan and settings it was connected with.
+// Connect stops the previous session before starting the new one (the
+// guard/TUN cannot be owned twice), so there is a brief gap — shorter
+// than a manual reconnect, and announced in the journal by the caller.
+func (m *Manager) rehandshake(s *Session) error {
+	m.mu.Lock()
+	plan, settings, current := m.lastPlan, m.lastSettings, m.current
+	m.mu.Unlock()
+	if current != s || plan == nil {
+		return errors.New("session: re-handshake target was superseded")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+	_, err := m.Connect(ctx, plan, settings)
+	return err
+}
+
+// currentSession returns the running session, or nil.
+func (m *Manager) currentSession() *Session {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.current
+}
+
+// freezeInterferenceWindow is how long a censorship verdict defers the
+// T017 planned re-handshake: the siberian backoff is ~120 s, so five
+// minutes keeps new handshakes out of the freeze's tail.
+const freezeInterferenceWindow = 5 * time.Minute
+
+// frozenRecently reports whether the session journal carries a recent
+// censorship verdict naming interference. A planned re-handshake during
+// a freeze or block wave only feeds the censor more handshakes (T017
+// §3.5), so the worker defers. Unknown and no-interference verdicts are
+// not interference.
+func frozenRecently(s *Session, now time.Time) bool {
+	for _, e := range s.Journal().Since(0, 256) {
+		if e.Kind != EventCensor || e.Censor == nil {
+			continue
+		}
+		if now.Sub(e.Censor.At) > freezeInterferenceWindow {
+			continue
+		}
+		switch e.Censor.Kind {
+		case censor.KindUnknown, censor.KindNoInterference:
+		default:
+			return true
+		}
+	}
+	return false
 }
 
 // Disconnect stops the current session and succeeds if none exists.

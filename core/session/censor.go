@@ -28,6 +28,11 @@ type censorshipWatcher struct {
 	events      <-chan Event
 	unsubscribe func()
 
+	// onVerdict, when set, receives each published verdict with the
+	// failed server's id. The manager uses it for the T042 hook
+	// (expedited subscription refresh after a censorship verdict).
+	onVerdict func(censor.Verdict, string)
+
 	mu        sync.Mutex
 	lastProbe time.Time
 }
@@ -49,6 +54,7 @@ func (s *Session) WatchCensorshipFailures(det *censor.Detector, prober *censor.P
 			prober:      prober,
 			events:      events,
 			unsubscribe: unsubscribe,
+			onVerdict:   s.censorHook,
 		}
 		go w.run()
 	})
@@ -121,13 +127,18 @@ func (w *censorshipWatcher) onEvent(ev Event) {
 
 // publish appends the verdict to the journal. The control plane surfaces the
 // Detail line through the existing event stream; the structured verdict rides
-// along for future consumers.
+// along for future consumers. The onVerdict hook fires after the journal
+// append: consumers (T042 expedited refresh) act on the same verdict the
+// user sees, never on a hidden one.
 func (w *censorshipWatcher) publish(v censor.Verdict) {
 	w.session.log.Append(Event{
 		Kind:   EventCensor,
 		Detail: "censorship check: " + v.Explanation,
 		Censor: &v,
 	})
+	if w.onVerdict != nil {
+		w.onVerdict(v, serverIDOf(w.session.Plan()))
+	}
 }
 
 // knownGood reports whether the journal shows this host working before: the
