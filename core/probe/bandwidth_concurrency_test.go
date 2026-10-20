@@ -95,8 +95,7 @@ func TestBenchmarkAbandonedConsumerTearsDownEngines(t *testing.T) {
 		SelectKind: func(engine.Outbound) (engine.Kind, error) {
 			return engine.KindSingBox, nil
 		},
-		DataDir: t.TempDir(),
-		Now:     time.Now,
+		Now: time.Now,
 	})
 	if err != nil {
 		t.Fatal(err)
