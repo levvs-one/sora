@@ -2,10 +2,15 @@ package session
 
 // Dead-mode payload watchdog (T029 / T048).
 //
-// The hostile-environment failure mode (Iran's 76-day shutdown, RU
-// regional shutdowns): the tunnel handshake succeeds, the session reports
-// connected — and no payload ever flows. A handshake check cannot see it;
-// only an active payload probe through the tunnel can. The detector
+// The hostile-environment failure mode (episodes like Iran's 76-day
+// total shutdown of Feb–May 2026 and RU regional shutdowns): the tunnel
+// handshake succeeds, the session reports connected — and no payload
+// ever flows. Dead-mode is readiness for such episodes, not a claim
+// that one is happening now: the Iranian episode ended in May 2026
+// (T048, dating corrected in pass 2), so no text here or in the UI may
+// present a shutdown as current on its basis. A handshake check cannot
+// see this failure mode; only an active payload probe through the
+// tunnel can. The detector
 // (deadcheck.DetectDeadSession) is a pure verdict primitive; this file
 // is its production wiring:
 //
