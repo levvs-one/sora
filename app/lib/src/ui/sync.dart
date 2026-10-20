@@ -11,6 +11,7 @@ import '../sora.dart';
 import '../sync.dart';
 import '../sync_api.dart';
 import '../sync_daemon.dart';
+import '../sync_docs.dart';
 import 'kit.dart';
 import 'qr.dart';
 
@@ -102,6 +103,9 @@ class _SyncScreenState extends State<SyncScreen> {
   Future<void> _refresh() async {
     final client = _daemon.client;
     if (client == null || _refreshing) return;
+    // Keep Sora's document bridge pointed at the daemon's current client
+    // (a retry may have created a new one).
+    SoraScope.read(context).ensureSyncBridge();
     _refreshing = true;
     try {
       final status = await client.status();
@@ -144,13 +148,20 @@ class _SyncScreenState extends State<SyncScreen> {
 
   /// Joins with a scanned payload: the daemon runs discovery and the
   /// Noise_XX handshake. "Paired" is claimed only when the daemon returns
-  /// the peer.
+  /// the peer. The bridge publishes the app's documents first so the
+  /// first sync (which runs inside the daemon during join) carries them;
+  /// documents that arrived during it are applied afterwards.
   Future<void> _join(String raw) async {
     final client = _daemon.client;
     if (client == null || _joining) return;
     setState(() => _joining = true);
     try {
+      final sora = SoraScope.read(context);
+      final bridge = SyncDocumentBridge(sora: sora, client: client);
+      final before = await client.documents();
+      await bridge.publish();
       final peer = await client.joinPairing(raw);
+      await bridge.applyPulled(syncDocsDiff(before, await client.documents()));
       if (!mounted) return;
       setState(() => _joining = false);
       await _refresh();
@@ -160,6 +171,10 @@ class _SyncScreenState extends State<SyncScreen> {
       if (!mounted) return;
       setState(() => _joining = false);
       _snack(describeSyncError(S.of(context), e));
+    } on SyncBridgeException catch (e) {
+      if (!mounted) return;
+      setState(() => _joining = false);
+      _snack('${S.of(context).syncError}: ${e.message}');
     }
   }
 
@@ -176,17 +191,51 @@ class _SyncScreenState extends State<SyncScreen> {
     if (client == null || !_syncing.add(peer.id)) return;
     if (mounted) setState(() {});
     try {
+      final sora = SoraScope.read(context);
+      final bridge = SyncDocumentBridge(sora: sora, client: client);
+      // Publish first: the sync moves what the daemon holds, so the app's
+      // current state must reach the daemon before the peer sync runs.
+      await bridge.publish();
       final result = await client.syncPeer(peer.id);
+      // Apply exactly what arrived, then show per-document results
+      // (kind, name, from, updated_at) instead of bare counters.
+      await bridge.applyPulled(result.pulled);
       if (!mounted) return;
       _syncing.remove(peer.id);
       await _refresh();
       if (!mounted) return;
-      _snack(S.of(context).syncSyncResult(result.pulled, result.pushed));
+      _snack(S.of(context).syncSyncResult(result.pulled.length, result.pushed.length));
+      await _showSyncResult(peer, result);
     } on SyncApiException catch (e) {
       if (!mounted) return;
       _syncing.remove(peer.id);
       setState(() => _opError = describeSyncError(S.of(context), e));
+    } on SyncBridgeException catch (e) {
+      if (!mounted) return;
+      _syncing.remove(peer.id);
+      setState(() => _opError = '${S.of(context).syncError}: ${e.message}');
     }
+  }
+
+  /// Shows what a sync moved: every pulled and pushed document with its
+  /// kind label, name, origin device and update time.
+  Future<void> _showSyncResult(SyncPeer peer, SyncResult result) {
+    final palette = Palette.of(context);
+    return showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: palette.scrim,
+      transitionDuration: Motion.enabled(context) ? Motion.medium : Duration.zero,
+      transitionBuilder: (context, animation, _, child) {
+        final curved = CurvedAnimation(parent: animation, curve: Motion.curve);
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(scale: Tween(begin: 0.94, end: 1.0).animate(curved), child: child),
+        );
+      },
+      pageBuilder: (context, _, _) => _SyncResultCard(peer: peer, result: result),
+    );
   }
 
   Future<void> _revoke(SyncPeer peer) async {
@@ -468,6 +517,100 @@ class _SyncScreenState extends State<SyncScreen> {
         ],
       ),
     ];
+  }
+}
+
+/// Result of one peer sync: every moved document with its kind label,
+/// name, origin device and update time — the honest view of what arrived
+/// and what left, instead of bare counters.
+class _SyncResultCard extends StatelessWidget {
+  const _SyncResultCard({required this.peer, required this.result});
+
+  final SyncPeer peer;
+  final SyncResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    final locale = Localizations.localeOf(context).languageCode;
+    String when(DateTime t) => DateFormat.yMMMd(locale).add_Hm().format(t.toLocal());
+    final peerName = peer.name.isEmpty ? peer.id : peer.name;
+
+    Widget docRow(SyncDocMeta meta, String fromLabel) => Tile(
+          title: syncDocKindLabel(s, meta.kind),
+          detail: '${meta.name} · ${s.syncFrom(fromLabel)} · ${when(meta.updatedAt)}',
+          detailColor: palette.ink2,
+        );
+
+    return Center(
+      child: Material(
+        color: palette.raised,
+        borderRadius: BorderRadius.circular(26),
+        child: SizedBox(
+          width: 360,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 14),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  s.syncResultTitle,
+                  textAlign: TextAlign.center,
+                  style: Styles.bodyStrong.copyWith(color: palette.ink),
+                ),
+                const SizedBox(height: 12),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (result.pulled.isEmpty && result.pushed.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Text(
+                              s.syncNoChanges,
+                              textAlign: TextAlign.center,
+                              style: Styles.secondary.copyWith(color: palette.ink2),
+                            ),
+                          )
+                        else ...[
+                          if (result.pulled.isNotEmpty) ...[
+                            Heading(s.syncPulled),
+                            Group(
+                              children: [for (final meta in result.pulled) docRow(meta, peerName)],
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          if (result.pushed.isNotEmpty) ...[
+                            Heading(s.syncPushed),
+                            Group(
+                              children: [for (final meta in result.pushed) docRow(meta, s.syncThisDevice)],
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                Pressable(
+                  onTap: () => Navigator.of(context).pop(),
+                  radius: 22,
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 44),
+                    alignment: Alignment.center,
+                    child: Text(s.close, style: Styles.body.copyWith(color: palette.ink)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
