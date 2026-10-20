@@ -3,6 +3,7 @@ package registry
 import (
 	"context"
 	"encoding/pem"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -224,5 +225,30 @@ func TestAutomaticSelectionCarriesProviderProfilesThroughTheTunBridge(t *testing
 	delete(r.binaries, engine.KindMihomo)
 	if _, _, err := r.selectPlan(p, engine.DefaultPreference); errs.KeyOf(err) != errs.KeyPlanEngineUnsupported {
 		t.Fatalf("provider without its packet engine: %v", err)
+	}
+}
+
+func TestBenchmarkEngineDoesNotReuseLiveRuntime(t *testing.T) {
+	original := drivers[engine.KindSingBox]
+	t.Cleanup(func() { drivers[engine.KindSingBox] = original })
+	captured := supervise.Config{}
+	stop := errors.New("configuration captured")
+	fake := original
+	fake.build = func(cfg supervise.Config) (engine.Engine, error) { captured = cfg; return nil, stop }
+	drivers[engine.KindSingBox] = fake
+	r := &Registry{base: supervise.Config{HomeDir: "live-home", LocalPort: 7890}, preference: engine.DefaultPreference,
+		binaries:     map[engine.Kind]supervise.Binary{engine.KindSingBox: {}},
+		availability: []engine.Availability{{Kind: engine.KindSingBox, Usable: true, Version: engine.Version{Major: 1, Minor: 14, Patch: 3}}},
+	}
+	home := t.TempDir()
+	_, err := r.BenchmarkEngine(context.Background(), &engine.Plan{Engines: []engine.Kind{engine.KindSingBox}, Outbounds: []engine.Outbound{{ID: "direct", Protocol: engine.ProtocolDirect}}}, home)
+	if !errors.Is(err, stop) {
+		t.Fatalf("temporary builder: %v", err)
+	}
+	if captured.LocalPort != 0 || captured.HomeDir != filepath.Join(home, "sing-box") {
+		t.Fatalf("benchmark reused live runtime: port=%d home=%s", captured.LocalPort, captured.HomeDir)
+	}
+	if r.base.LocalPort != 7890 || r.base.HomeDir != "live-home" {
+		t.Fatal("live configuration changed")
 	}
 }

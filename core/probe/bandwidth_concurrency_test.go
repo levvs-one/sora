@@ -88,7 +88,7 @@ func TestBenchmarkAbandonedConsumerTearsDownEngines(t *testing.T) {
 	// building one. The invariant is closed == built.
 	var built, closed atomic.Int32
 	b, err := NewBenchmarker(BenchmarkerConfig{
-		NewEngine: func(context.Context, *engine.Plan) (engine.Engine, error) {
+		NewEngine: func(context.Context, *engine.Plan, string) (engine.Engine, error) {
 			built.Add(1)
 			return &closeCountingEngine{port: port, closed: &closed}, nil
 		},

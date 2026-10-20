@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -80,7 +81,7 @@ func testOutbound(id string) engine.Outbound {
 func newTestBenchmarker(t *testing.T, eng *fakeEngine) *Benchmarker {
 	t.Helper()
 	b, err := NewBenchmarker(BenchmarkerConfig{
-		NewEngine: func(context.Context, *engine.Plan) (engine.Engine, error) {
+		NewEngine: func(context.Context, *engine.Plan, string) (engine.Engine, error) {
 			return eng, nil
 		},
 		SelectKind: func(engine.Outbound) (engine.Kind, error) {
@@ -173,7 +174,7 @@ func TestBenchmarkBuildsFreshEnginePerServer(t *testing.T) {
 	var mu sync.Mutex
 	var engines []*fakeEngine
 	b, err := NewBenchmarker(BenchmarkerConfig{
-		NewEngine: func(context.Context, *engine.Plan) (engine.Engine, error) {
+		NewEngine: func(context.Context, *engine.Plan, string) (engine.Engine, error) {
 			eng := &fakeEngine{port: port}
 			mu.Lock()
 			engines = append(engines, eng)
@@ -234,7 +235,7 @@ func TestBenchmarkBuildsFreshEnginePerServer(t *testing.T) {
 
 func TestBenchmarkNoEngine(t *testing.T) {
 	b, err := NewBenchmarker(BenchmarkerConfig{
-		NewEngine: func(context.Context, *engine.Plan) (engine.Engine, error) {
+		NewEngine: func(context.Context, *engine.Plan, string) (engine.Engine, error) {
 			t.Fatal("engine must not be built without a kind")
 			return nil, nil
 		},
@@ -305,5 +306,38 @@ func TestBenchmarkCancelled(t *testing.T) {
 func TestNewBenchmarkerValidation(t *testing.T) {
 	if _, err := NewBenchmarker(BenchmarkerConfig{}); err == nil {
 		t.Fatal("expected validation error for empty config")
+	}
+}
+
+func TestBenchmarkIsolatesAndRemovesEngineHomes(t *testing.T) {
+	var mu sync.Mutex
+	var homes []string
+	b, err := NewBenchmarker(BenchmarkerConfig{
+		NewEngine: func(_ context.Context, _ *engine.Plan, home string) (engine.Engine, error) {
+			mu.Lock()
+			homes = append(homes, home)
+			mu.Unlock()
+			if info, err := os.Stat(home); err != nil || !info.IsDir() {
+				t.Errorf("temporary home is unavailable: %v", err)
+			}
+			return &fakeEngine{failRun: true}, nil
+		},
+		SelectKind: func(engine.Outbound) (engine.Kind, error) { return engine.KindSingBox, nil },
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	samples, err := b.Benchmark(context.Background(), []engine.Outbound{testOutbound("a"), testOutbound("b")}, engine.BandwidthOptions{Concurrency: 2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	collectSamples(t, samples)
+	if len(homes) != 2 || homes[0] == homes[1] {
+		t.Fatalf("benchmark homes are not isolated: %v", homes)
+	}
+	for _, home := range homes {
+		if _, err := os.Stat(home); !os.IsNotExist(err) {
+			t.Errorf("temporary home survived shutdown: %v", err)
+		}
 	}
 }

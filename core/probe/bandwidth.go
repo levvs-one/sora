@@ -18,6 +18,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -42,7 +43,7 @@ const (
 // required.
 type BenchmarkerConfig struct {
 	// NewEngine builds a temporary engine for one benchmark plan.
-	NewEngine func(ctx context.Context, p *engine.Plan) (engine.Engine, error)
+	NewEngine func(ctx context.Context, p *engine.Plan, home string) (engine.Engine, error)
 	// SelectKind picks the engine kind able to carry the outbound.
 	SelectKind func(o engine.Outbound) (engine.Kind, error)
 	// Now is overridden in tests.
@@ -176,7 +177,13 @@ func (b *Benchmarker) benchmarkOne(ctx context.Context, o engine.Outbound, kind 
 		Rules:      []engine.Rule{{Type: engine.RuleMatchAll, Target: o.Name}},
 		Options:    engine.Options{LogLevel: "error"},
 	}
-	eng, err := b.cfg.NewEngine(ctx, plan)
+	home, err := os.MkdirTemp("", "sora-benchmark-")
+	if err != nil {
+		fail(fmt.Errorf("probe: benchmark home: %w", err))
+		return
+	}
+	defer func() { _ = os.RemoveAll(home) }()
+	eng, err := b.cfg.NewEngine(ctx, plan, home)
 	if err != nil {
 		fail(fmt.Errorf("probe: benchmark engine build: %w", err))
 		return
