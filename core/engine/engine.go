@@ -93,6 +93,13 @@ const (
 	// be routed to it: hopping rendered nowhere would silently pin the
 	// client to one port.
 	FeatureHy2PortHop Feature = "hy2-port-hop"
+	// FeatureHy2Obfs marks engines whose Hysteria2 outbound implements
+	// obfuscation (salamander/gecko): sing-box and mihomo do, Xray's
+	// hysteria transport exposes no obfs option and its renderer
+	// refuses the field. Without the gate an obfuscated plan routed
+	// to Xray failed only at Apply, after selection had promised it
+	// could run (CENSOR-P3).
+	FeatureHy2Obfs Feature = "hy2-obfs"
 	// FeatureDoH3 marks engines whose DNS stack can speak DNS over
 	// HTTP/3 (sing-box h3:// servers, mihomo ?h3=true). Xray has no
 	// DoH3 transport, so a plan naming an h3:// resolver must never be

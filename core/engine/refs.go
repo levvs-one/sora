@@ -133,6 +133,12 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 			// single port on Xray.
 			out[FeatureHy2PortHop] = true
 		}
+		if o.Protocol == ProtocolHysteria2 && o.Obfs != "" {
+			// Xray's hysteria transport has no obfs option; without
+			// the gate an obfuscated plan was selected for Xray and
+			// only failed at render time (CENSOR-P3).
+			out[FeatureHy2Obfs] = true
+		}
 	}
 	if p.Options.Fragment.Enabled {
 		out[FeatureTLSFragment] = true
