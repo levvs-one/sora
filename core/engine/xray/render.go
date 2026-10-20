@@ -210,6 +210,14 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	if o.TLS.Insecure && !o.TLS.Reality && (o.TLS.Enabled || o.Protocol == engine.ProtocolTrojan || o.Protocol == engine.ProtocolHysteria2) {
 		return nil, fmt.Errorf("xray: outbound %s disables certificate verification; this build requires verification or certificate pinning", o.ID)
 	}
+	if o.TLS.KeyShare != "" {
+		// Fail closed behind the FeatureRealityKeyShare gate: Xray
+		// has no REALITY key_share knob — the uTLS parrot decides
+		// which key shares the ClientHello offers — so rendering
+		// here would silently offer a different share than the plan
+		// pins (CENSOR-P1).
+		return nil, fmt.Errorf("xray: outbound %s pins a REALITY key_share, which Xray does not expose (the fingerprint parrot decides the key share); use the sing-box or mihomo engine", o.ID)
+	}
 	if o.TLS.ECH.Enabled {
 		// Xray implements ECH (transport/internet/tls/ech.go:
 		// echConfigList/echForceQuery), but this renderer emits
@@ -362,8 +370,8 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 		s["realitySettings"] = obj{
 			"serverName": o.TLS.ServerName, "publicKey": o.TLS.RealityPublicKey,
 			"fingerprint": r.realityFingerprint(o),
-		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")). // "/" is the documented safe default path
-													set("mldsa65Verify", o.TLS.RealityMLDSA65Verify)
+		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, engine.DefaultSpiderX)). // "/" is the documented safe default path
+															set("mldsa65Verify", o.TLS.RealityMLDSA65Verify)
 	case o.TLS.Enabled || needsTLS:
 		s["security"] = "tls"
 		s["tlsSettings"] = obj{}.set("serverName", o.TLS.ServerName).set("alpn", o.TLS.ALPN).
@@ -475,8 +483,8 @@ func (r *renderer) xhttpDownloadSettings(o engine.Outbound) (obj, error) {
 		ds["realitySettings"] = obj{
 			"serverName": t.DownloadAddress, "publicKey": o.TLS.RealityPublicKey,
 			"fingerprint": fp,
-		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")). // "/" is the documented safe default path
-													set("mldsa65Verify", o.TLS.RealityMLDSA65Verify)
+		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, engine.DefaultSpiderX)). // "/" is the documented safe default path
+															set("mldsa65Verify", o.TLS.RealityMLDSA65Verify)
 	case o.TLS.Enabled || o.Protocol == engine.ProtocolTrojan:
 		ds["security"] = "tls"
 		ds["tlsSettings"] = obj{"serverName": t.DownloadAddress}.

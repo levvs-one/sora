@@ -33,6 +33,13 @@ func IsVisionFlow(flow string) bool {
 	return flow == "xtls-rprx-vision" || flow == "xtls-rprx-vision-udp443"
 }
 
+// DefaultSpiderX is the spider path every renderer falls back to
+// when the plan carries no SpiderX: the documented safe default of
+// the one engine that spells the field (Xray). One constant, so the
+// main stream leg and the XHTTP download leg can never drift to
+// different defaults (CENSOR-P1).
+const DefaultSpiderX = "/"
+
 // RealityWarnings returns human-readable warning codes for a REALITY
 // outbound. Empty means nothing to warn about. The codes are stable UI
 // contract: the app maps each to a localized message.
@@ -59,6 +66,25 @@ func (o Outbound) RealityWarnings() []string {
 		// there is xmux's job, not vision's. With VLESS Encryption the
 		// flow is legal on any transport, so no warning (PASS3 deep S3b).
 		out = append(out, "reality-xhttp-vision")
+	}
+	if fp := o.TLS.Fingerprint; fp != "" {
+		// The fingerprint half of the REALITY mistakes this file's
+		// header lists — stale uTLS and shares no modern browser
+		// offers — was never surfaced (CENSOR-P1): a randomized
+		// parrot matches no browser population, a stale explicit
+		// parrot is what TSPU already scores, and a pre-131 Chrome
+		// parrot is KNOWN to lack the X25519MLKEM768 hybrid share
+		// modern REALITY servers require (see fingerprint.go for
+		// what each predicate can and cannot prove from a name).
+		if IsRandomizedFingerprint(fp) {
+			out = append(out, "reality-fingerprint-randomized")
+		}
+		if IsStaleParrot(fp) {
+			out = append(out, "reality-fingerprint-stale")
+		}
+		if KnownMissingPQKeyShare(fp) {
+			out = append(out, "reality-fingerprint-no-pq-key-share")
+		}
 	}
 	if o.TLS.SpiderX != "" {
 		// PASS3 deep A2: SpiderX is rendered only by Xray (both
@@ -244,6 +270,15 @@ func (o Outbound) ValidateReality() error {
 		// "mldsa65Verify"`, so the shape is a plan error here, not a
 		// dead engine at connect time.
 		return fmt.Errorf("outbound %s: REALITY mldsa65Verify is not a 1952-byte base64url ML-DSA-65 key", o.ID)
+	}
+	if sx := o.TLS.SpiderX; sx != "" && !strings.HasPrefix(sx, "/") {
+		// Probed on the pinned Xray (2026-10-20): a spiderX without
+		// the leading slash fails config load, while spaces, query
+		// strings and multi-KB paths all load — the slash is the
+		// engine's only shape rule, so it is the only one enforced
+		// here. The value itself is an identifier (see Identifiers)
+		// and stays out of the error text.
+		return fmt.Errorf("outbound %s: REALITY spiderX must start with %q", o.ID, "/")
 	}
 	if !isX25519PublicKey(o.TLS.RealityPublicKey) {
 		return fmt.Errorf("outbound %s: REALITY public key is not a 32-byte base64url X25519 key", o.ID)

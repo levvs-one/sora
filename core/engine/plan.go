@@ -107,13 +107,18 @@ type TLS struct {
 	// Xray >= 26.9.8 accept only the hybrid share, so against them
 	// "classical" (or a default that omits the hybrid) fails the
 	// handshake with an opaque verification error (PASS2 deep S3).
-	// Only the mihomo renderer emits this today
-	// (reality-opts.support-x25519mlkem768, PASS3 deep S2); the
-	// sing-box-lx key_share render is the separate PASS2 S3 item.
-	// Whether mihomo's own default already offers the hybrid is NOT
-	// confirmed from the pinned docs — they only show the explicit
-	// `true` — so "" honestly means "engine default, unverified",
-	// never a promise that the hybrid is offered.
+	// Two renderers emit it: mihomo as
+	// reality-opts.support-x25519mlkem768 (PASS3 deep S2) and
+	// sing-box-lx as tls.reality.key_share (CENSOR-P1, verified with
+	// `sing-box check` on the pinned lx.22 binary). Xray has no
+	// key_share knob — its uTLS parrot decides the offered groups —
+	// so a plan setting KeyShare requires FeatureRealityKeyShare and
+	// never routes to Xray (CENSOR-P1). Mihomo's own default is
+	// MEASURED by wire capture on the pinned 1.19.32 binary
+	// (CENSOR-FP): with KeyShare unset its REALITY ClientHello offers
+	// NO hybrid group (~590-byte hello), so "" honestly means
+	// "engine default" — and on mihomo that default offers no
+	// hybrid, never a promise that it does.
 	KeyShare string
 }
 

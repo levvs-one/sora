@@ -110,6 +110,10 @@ const (
 	// (xray.TestBinaryAcceptsMLDSA65Verify,
 	// interop.TestRealityMLDSA65ThroughXray).
 	FeatureRealityMLDSA65 Feature = "reality-mldsa65"
+	// FeatureRealityKeyShare is declared in probecaps.go with the
+	// probed-capability records: it marks engines whose renderer
+	// spells the REALITY key-share choice and whose binary honours
+	// it on the wire (sing-box-lx and mihomo; Xray has no knob).
 )
 
 // Capabilities describes the protocols and features supported by an engine
