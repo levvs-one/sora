@@ -129,7 +129,7 @@ SORA_ARCH=amd64 SORA_VERSION=<версия> nfpm package --config packaging/linu
 Windows, из корня репозитория:
 
 ```powershell
-cd core; go build -o ..\dist\windows\sora-core.exe .\cmd\sora-core; cd ..
+cd core; $env:CGO_ENABLED='0'; go build -trimpath -ldflags '-s -w -X main.buildVersion=<версия>' -o ..\dist\windows\sora-core.exe .\cmd\sora-core; cd ..
 bash packaging/engines/fetch.sh windows-amd64 dist/windows/engines
 cd app; flutter build windows --release --dart-define=SORA_VERSION=<версия> --dart-define=APP_VERSION=<версия>; cd ..
 iscc /DAppVersion=<версия> /DSoraUnsigned packaging\windows\sora.iss

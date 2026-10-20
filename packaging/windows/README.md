@@ -20,7 +20,7 @@
 $AppVersion = ((Select-String -Path app\pubspec.yaml -Pattern '^version:\s*(\S+)').Matches[0].Groups[1].Value).Split('+')[0]
 
 ```powershell
-cd core; go build -trimpath -ldflags '-s -w' -o ..\dist\windows\sora-core.exe .\cmd\sora-core; cd ..
+cd core; $env:CGO_ENABLED='0'; go build -trimpath -ldflags '-s -w -X main.buildVersion=$AppVersion' -o ..\dist\windows\sora-core.exe .\cmd\sora-core; cd ..
 bash packaging/engines/fetch.sh windows-amd64 dist/windows/engines
 cd app; flutter build windows --release --dart-define=SORA_VERSION=$AppVersion --dart-define=APP_VERSION=$AppVersion; cd ..
 iscc /DAppVersion=$AppVersion /DSoraUnsigned packaging\windows\sora.iss
