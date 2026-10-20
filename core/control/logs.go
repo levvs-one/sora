@@ -130,6 +130,7 @@ func (s *Server) QueryLogs(_ context.Context, req *corev1.QueryLogsRequest) (*co
 	}
 	page := center.Query(filter, req.GetBeforeSequence(), int(req.GetLimit()))
 	out := &corev1.QueryLogsResponse{BeforeSequence: page.Before, Stats: statsToWire(page.Stats)}
+	out.Entries = make([]*corev1.LogEntry, 0, len(page.Entries))
 	for _, e := range page.Entries {
 		out.Entries = append(out.Entries, entryToWire(e))
 	}
