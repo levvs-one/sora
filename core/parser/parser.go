@@ -412,6 +412,19 @@ func parseLink(raw string) (OutboundSpec, error) {
 	case "tuic":
 		o.UUID = o.User
 		o.Security = "tls"
+	case "trojan", "hysteria2", "hy2":
+		// Password-only protocols: the credential is the userinfo
+		// username (trojan://<password>@host, hysteria2://<password>@host —
+		// the canonical share forms). The generic branch parks the
+		// username in UUID and leaves Password empty, so every such
+		// link imported without its credential and engines rejected
+		// the rendered plan ("unset fields: password") or failed
+		// authentication (WAVE-INTEGRATION E2E).
+		if o.Password == "" {
+			o.Password = o.User
+		}
+		o.Transport = getq(q, "type", "transport")
+		o.Security = getq(q, "security")
 	default:
 		o.UUID = o.User
 		o.Transport = getq(q, "type", "transport")

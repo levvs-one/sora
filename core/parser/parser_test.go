@@ -425,3 +425,45 @@ func TestParseVMessURLStyleStillWorks(t *testing.T) {
 		t.Fatalf("url-style vmess = %+v", r.Servers)
 	}
 }
+
+// TestParsePasswordOnlyCredentials pins the canonical share forms of
+// the password-only protocols: the credential rides in the userinfo
+// username (trojan://<password>@host, hysteria2://<password>@host) and
+// must land in Password — the field every engine renderer reads. The
+// generic branch once parked it in UUID, leaving Password empty, so
+// imported trojan/hy2 servers carried no credential at all
+// (WAVE-INTEGRATION E2E: mihomo rejected the plan, "unset fields:
+// password").
+func TestParsePasswordOnlyCredentials(t *testing.T) {
+	tests := []struct{ name, input, protocol string }{
+		{"trojan", "trojan://s3cret@example.com:443?sni=example.com#T", "trojan"},
+		{"hysteria2", "hysteria2://s3cret@example.com:443?sni=example.com#H", "hysteria2"},
+		{"hy2 alias", "hy2://s3cret@example.com:443#H", "hysteria2"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r, err := (LinkParser{}).Parse([]byte(tt.input))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(r.Servers) != 1 {
+				t.Fatalf("servers = %d", len(r.Servers))
+			}
+			o := r.Servers[0]
+			if o.Protocol != tt.protocol || o.Password != "s3cret" {
+				t.Fatalf("protocol/password = %q %q", o.Protocol, o.Password)
+			}
+			if o.UUID != "" {
+				t.Fatalf("the password must not be parked in UUID, got %q", o.UUID)
+			}
+		})
+	}
+	// The UUID protocols keep their shape: vless UUID set, no password.
+	r, err := (LinkParser{}).Parse([]byte("vless://123e4567-e89b-12d3-a456-426614174000@example.com:443#V"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Servers[0].UUID == "" || r.Servers[0].Password != "" {
+		t.Fatalf("vless shape = %+v", r.Servers)
+	}
+}
