@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"net/http"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -104,6 +105,12 @@ type WorkerTask struct {
 	disabled atomic.Bool
 	// fails counts consecutive failed runs for the circuit breaker.
 	fails atomic.Int32
+	// Last-run bookkeeping for Scheduler.Status. A skipped (overlap) tick
+	// is not a run and is never recorded here.
+	hasRun             atomic.Bool
+	lastRunUnixNano    atomic.Int64
+	lastRunOK          atomic.Bool
+	lastRunInterrupted atomic.Bool
 	// ctx is the task loop's context, derived from the scheduler's run
 	// context. It is canceled when the task is unregistered, replaced, or
 	// the scheduler stops, so no ticker loop outlives its task.
@@ -275,6 +282,103 @@ func (s *Scheduler) Task(extID string) (*WorkerTask, bool) {
 	defer s.mu.Unlock()
 	t, ok := s.tasks[extID]
 	return t, ok
+}
+
+// WorkerStatus is an honest snapshot of one registered background task:
+// what the scheduler actually knows, nothing more. It exists so the host
+// (and one day the UI) can say "disabled by the user", "paused by the kill
+// switch" or "last run failed" instead of guessing from the install state.
+// A task stopped by the circuit breaker is unregistered, so it reports
+// ok=false here exactly like a never-registered extension — the breaker
+// trip itself is in the extension log.
+type WorkerStatus struct {
+	ExtensionID string
+	// Entry is the manifest's worker script.
+	Entry string
+	// Interval is the effective, clamped schedule.
+	Interval time.Duration
+	// Disabled: the user's background.json override turned this worker
+	// off; it is registered but never runs.
+	Disabled bool
+	// Running: a run is in flight right now.
+	Running bool
+	// Paused: the scheduler-wide kill-switch pause is active.
+	Paused bool
+	// ConsecutiveFailures is the circuit-breaker counter.
+	ConsecutiveFailures int
+	// HasRun reports whether any run has finished (ok, failed or
+	// interrupted) since registration.
+	HasRun bool
+	// LastRunAt is when the last finished run ended. Zero without HasRun.
+	LastRunAt time.Time
+	// LastRunOK is the last finished run's outcome. It is false for a
+	// failed run and for an interrupted one (see LastRunInterrupted).
+	LastRunOK bool
+	// LastRunInterrupted: the last run was aborted by the kill-switch
+	// pause or by the task being stopped/unregistered — not a failure,
+	// and it never counted toward the circuit breaker.
+	LastRunInterrupted bool
+	// Fetch holds the task fetcher's counters, or nil when the extension
+	// was not granted "net.fetch" and has no fetcher.
+	Fetch *FetchStats
+}
+
+// Status returns the status snapshot for one registered task.
+func (s *Scheduler) Status(extID string) (WorkerStatus, bool) {
+	s.mu.Lock()
+	t, ok := s.tasks[extID]
+	s.mu.Unlock()
+	if !ok {
+		return WorkerStatus{}, false
+	}
+	return s.statusOf(t), true
+}
+
+// Statuses returns snapshots of all registered tasks, sorted by id.
+func (s *Scheduler) Statuses() []WorkerStatus {
+	s.mu.Lock()
+	tasks := make([]*WorkerTask, 0, len(s.tasks))
+	for _, t := range s.tasks {
+		tasks = append(tasks, t)
+	}
+	s.mu.Unlock()
+	out := make([]WorkerStatus, 0, len(tasks))
+	for _, t := range tasks {
+		out = append(out, s.statusOf(t))
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ExtensionID < out[j].ExtensionID })
+	return out
+}
+
+func (s *Scheduler) statusOf(t *WorkerTask) WorkerStatus {
+	st := WorkerStatus{
+		ExtensionID:         t.ExtensionID,
+		Entry:               t.Entry,
+		Interval:            t.Interval,
+		Disabled:            t.disabled.Load(),
+		Running:             t.running.Load(),
+		Paused:              s.Paused(),
+		ConsecutiveFailures: int(t.fails.Load()),
+		HasRun:              t.hasRun.Load(),
+		LastRunOK:           t.lastRunOK.Load(),
+		LastRunInterrupted:  t.lastRunInterrupted.Load(),
+	}
+	if ns := t.lastRunUnixNano.Load(); ns != 0 {
+		st.LastRunAt = time.Unix(0, ns).UTC()
+	}
+	if t.fetcher != nil {
+		fs := t.fetcher.Stats()
+		st.Fetch = &fs
+	}
+	return st
+}
+
+// recordRun stores one finished run's outcome for Status.
+func (t *WorkerTask) recordRun(ok, interrupted bool) {
+	t.lastRunUnixNano.Store(time.Now().UnixNano())
+	t.lastRunOK.Store(ok)
+	t.lastRunInterrupted.Store(interrupted)
+	t.hasRun.Store(true)
 }
 
 // Start begins ticking all registered tasks. It is idempotent; tasks
@@ -453,8 +557,9 @@ func (s *Scheduler) startLoopWith(task *WorkerTask) {
 //     The extension itself stays installed and enabled; the next app start
 //     re-registers its worker from the stored manifest.
 //
-// A run aborted by the kill-switch pause (see SetKillSwitch) is logged as
-// interrupted and does not count toward the circuit breaker.
+// A run aborted by the host — the kill-switch pause (see SetKillSwitch)
+// or the task being stopped/unregistered — is logged as interrupted and
+// does not count toward the circuit breaker.
 func (s *Scheduler) runOnce(task *WorkerTask) {
 	if !task.running.CompareAndSwap(false, true) {
 		s.hub.Log(task.ExtensionID).Append(LogWarn,
@@ -462,14 +567,22 @@ func (s *Scheduler) runOnce(task *WorkerTask) {
 		return
 	}
 	defer task.running.Store(false)
-	// The run context derives from the scheduler's pause context:
-	// SetKillSwitch(true) cancels it, aborting in-flight runs (and their
-	// fetches) promptly instead of draining the run timeout.
+	// The run context ends with whichever comes first: the run timeout,
+	// the task's own context (unregistered, replaced, or the scheduler
+	// stopping — Stop must not block on a stuck worker until the timeout
+	// drains), or the kill-switch pause context (SetKillSwitch(true)
+	// cancels it, aborting in-flight runs and their fetches promptly).
+	base := context.Context(task.ctx)
+	if base == nil {
+		base = context.Background()
+	}
+	ctx, cancel := context.WithTimeout(base, WorkerRunTimeout)
+	defer cancel()
 	s.pauseMu.Lock()
 	pctx := s.pauseCtx
 	s.pauseMu.Unlock()
-	ctx, cancel := context.WithTimeout(pctx, WorkerRunTimeout)
-	defer cancel()
+	stopPauseLink := context.AfterFunc(pctx, cancel)
+	defer stopPauseLink()
 	env := &WorkerEnv{extID: task.ExtensionID, log: s.hub.Log(task.ExtensionID), fetcher: task.fetcher}
 	start := time.Now()
 	err := func() (err error) {
@@ -483,15 +596,25 @@ func (s *Scheduler) runOnce(task *WorkerTask) {
 	}()
 	elapsed := time.Since(start).Truncate(time.Millisecond)
 	if err != nil {
-		// A run aborted by the kill-switch pause is not a failure: the
-		// network was deliberately cut under it. Log it as interrupted
-		// and keep it out of the circuit breaker, or a few switch
-		// toggles would permanently unregister a healthy worker.
+		// A run aborted by the host is not a failure: the kill-switch
+		// pause cut the network under it, or the task was stopped /
+		// unregistered / replaced under it. Log it as interrupted and
+		// keep it out of the circuit breaker, or a few switch toggles
+		// (or one disable) would permanently unregister a healthy
+		// worker.
 		if ctx.Err() != nil && s.Paused() {
+			task.recordRun(false, true)
 			s.hub.Log(task.ExtensionID).Append(LogInfo,
 				fmt.Sprintf("background worker run interrupted by the kill-switch pause after %s", elapsed))
 			return
 		}
+		if task.ctx != nil && task.ctx.Err() != nil {
+			task.recordRun(false, true)
+			s.hub.Log(task.ExtensionID).Append(LogInfo,
+				fmt.Sprintf("background worker run interrupted: the task was stopped after %s", elapsed))
+			return
+		}
+		task.recordRun(false, false)
 		n := task.fails.Add(1)
 		s.hub.Log(task.ExtensionID).Append(LogError,
 			fmt.Sprintf("background worker run failed after %s: %v", elapsed, oneLine(err, 300)))
@@ -502,6 +625,7 @@ func (s *Scheduler) runOnce(task *WorkerTask) {
 		}
 		return
 	}
+	task.recordRun(true, false)
 	task.fails.Store(0)
 	s.hub.Log(task.ExtensionID).Append(LogInfo,
 		fmt.Sprintf("background worker run ok (%s)", elapsed))
