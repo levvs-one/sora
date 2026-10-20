@@ -318,6 +318,13 @@ class _LogsScreenState extends State<LogsScreen> {
   Widget build(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
+    // The export-menu labels embed the filename's date stamp: compute it
+    // once per build pass instead of constructing a DateFormat for every
+    // menu item on every rebuild — this screen rebuilds on every log entry
+    // that streams in. The export itself still stamps at capture time via
+    // [_filename].
+    final stamp = DateFormat('dd_MM_yyyy').format(DateTime.now());
+    String menuFilename(String extension) => 'sora-log_${_section}_$stamp.$extension';
     return Screen(
       title: s.logs,
       actions: [
@@ -356,7 +363,7 @@ class _LogsScreenState extends State<LogsScreen> {
                   padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 12)),
                 ),
                 child: Text(
-                  s.exportLogFile(_filename(extension)),
+                  s.exportLogFile(menuFilename(extension)),
                   style: Styles.secondary.copyWith(color: palette.ink),
                 ),
               ),
@@ -370,7 +377,7 @@ class _LogsScreenState extends State<LogsScreen> {
                 leadingIcon: Icon(icon, size: 18, color: palette.ink),
                 child: Text(
                   s.exportLogFile(
-                    'sora-log_${kind == 'har' ? 'http' : 'core'}_${DateFormat('dd_MM_yyyy').format(DateTime.now())}.${kind == 'har' ? 'har' : 'zip'}',
+                    'sora-log_${kind == 'har' ? 'http' : 'core'}_$stamp.${kind == 'har' ? 'har' : 'zip'}',
                   ),
                   style: Styles.secondary.copyWith(color: palette.ink),
                 ),
