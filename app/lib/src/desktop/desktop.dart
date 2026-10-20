@@ -550,8 +550,11 @@ class Desktop with WindowListener {
       try {
         // A second instance may have delivered a link while the stream had
         // no subscriber yet; the plugin keeps the latest one.
-        final latest = await _links.getLatestAppLinkString();
-        if (latest != null && latest.isNotEmpty) links.add(latest);
+        // app_links 7.x renamed getLatestAppLinkString() to
+        // getLatestLink(), which returns the link as a Uri.
+        final latest = await _links.getLatestLink();
+        final latestString = latest?.toString() ?? '';
+        if (latestString.isNotEmpty) links.add(latestString);
       } catch (_) {}
     }
     if (launchLink != null && launchLink.isNotEmpty) links.add(launchLink);
