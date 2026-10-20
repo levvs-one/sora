@@ -18,6 +18,9 @@
 #
 # Surveyed 2026-10-19: Xray publishes .dgst only; mihomo and Leadaxe/sing-box-lx
 # publish no signatures.
+# wintun.net publishes no signatures for the builds zip either; the SHA-256 in
+# engines.lock (verified against the site 2026-10-20) is the only check.
 xray     dgst-crosscheck
 mihomo   none
 sing-box none
+wintun   none

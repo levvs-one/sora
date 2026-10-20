@@ -102,6 +102,23 @@ while read -r engine line_arch digest url; do
 	# Enforce the upstream-signature declaration from engines.sig (SORA-M3).
 	verify_upstream_signature "$engine" "$digest" "$url"
 	if [[ "$arch" == windows-* || "$arch" == win7-* ]]; then
+		if [[ "$engine" == wintun ]]; then
+			# The wintun zip carries one dll per architecture; extract the
+			# matching one next to the engine executables. Windows needs it
+			# on the DLL search path for the system-stack TUN path.
+			case "$arch" in
+			windows-amd64) wsub=amd64 ;;
+			win7-386) wsub=x86 ;;
+			*) echo "engines.lock: no wintun build for $arch" >&2; exit 1 ;;
+			esac
+			unzip -o -q "$file" -d "$work/wintun"
+			dll=$(find "$work/wintun" -path "*/bin/$wsub/wintun.dll" | head -1)
+			[[ -n "$dll" ]] || { echo "engines.lock: no $wsub wintun.dll in $(basename "$url")" >&2; exit 1; }
+			install -m 0755 "$dll" "$dest/wintun.dll"
+			record_digest "$dest/wintun.dll"
+			echo "$engine $arch: verified"
+			continue
+		fi
 		# Every Windows build is a zip with one executable named after its
 		# engine; Xray's also carries the geo databases.
 		unzip -o -q "$file" -d "$work/$engine"
@@ -140,7 +157,12 @@ while read -r engine line_arch digest url; do
 	echo "$engine $arch: verified"
 done <"$lock"
 
-if [[ "$found" -ne 3 ]]; then
-	echo "engines.lock has $found engines for $arch, expected 3" >&2
+# Three engines everywhere, plus wintun.dll on the Windows arches.
+expected=3
+if [[ "$arch" == windows-* || "$arch" == win7-* ]]; then
+	expected=4
+fi
+if [[ "$found" -ne "$expected" ]]; then
+	echo "engines.lock has $found assets for $arch, expected $expected" >&2
 	exit 1
 fi
