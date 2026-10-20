@@ -106,13 +106,19 @@ type subscription struct {
 const DefaultJournalCapacity = 512
 
 // NewJournal returns a journal that keeps capacity events of history.
+// The history buffer starts small and grows with the session: allocating
+// the full capacity up front costs a ~100 KB zeroed pointerful slice on
+// every session start, and most of that work is pure memclr/GC pressure.
+// The steady state is unchanged — once full, trimming keeps the retained
+// capacity exactly as before.
 func NewJournal(capacity int) *Journal {
 	if capacity <= 0 {
 		capacity = DefaultJournalCapacity
 	}
+	initial := min(capacity, 64)
 	return &Journal{
 		capacity: capacity,
-		history:  make([]Event, 0, capacity),
+		history:  make([]Event, 0, initial),
 		subs:     make(map[*subscription]struct{}),
 	}
 }

@@ -178,7 +178,7 @@ func New(cfg Config) (*Session, error) {
 		status: Status{
 			ChangedAt:  cfg.Now(),
 			KillSwitch: cfg.Settings.KillSwitch,
-			Bypass:     append([]string(nil), cfg.Settings.Bypass...),
+			Bypass:     copyBypass(cfg.Settings.Bypass),
 			TunnelMode: cfg.Settings.TunnelMode,
 		},
 		crashes: newCrashWatch(),
@@ -751,9 +751,19 @@ func (s *Session) settingsLocked() Settings {
 		FakeIPRange6: fakeIPRange6(s.cfg.Plan),
 		TunNetworks:  s.cfg.Plan.Tun.Networks(),
 		KillSwitch:   s.status.KillSwitch,
-		Bypass:       append([]string(nil), s.status.Bypass...),
+		Bypass:       copyBypass(s.status.Bypass),
 		TunnelMode:   s.status.TunnelMode,
 	}
+}
+
+// copyBypass duplicates the bypass list so callers cannot mutate session
+// state through the returned slice. An empty list stays nil instead of
+// allocating: Settings consumers only ever check len().
+func copyBypass(bypass []string) []string {
+	if len(bypass) == 0 {
+		return nil
+	}
+	return append([]string(nil), bypass...)
 }
 
 // fakeIPRange6 returns the effective IPv6 fake-address pool when the plan
