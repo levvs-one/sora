@@ -238,6 +238,13 @@ message OutboundSpec {
   CredentialsRef credentials = 7;
   // Display metadata for full profiles; protocol still selects the adapter.
   string display_protocol = 9;
+  // Since 1.11. The flow actually used on the wire (e.g. "xtls-rprx-vision"):
+  // the link's explicit flow when set, otherwise the plan-level auto-vision
+  // result. Empty when the protocol has no flow concept.
+  string flow = 10;
+  // Since 1.11. True when flow was assigned by the core's auto-vision rather
+  // than the import link or the user: the UI shows a calm "auto" badge.
+  bool flow_auto = 11;
 }
 message Endpoint { string host = 1; uint32 port = 2; }
 message CredentialsRef { string reference = 1; }

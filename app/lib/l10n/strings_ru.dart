@@ -901,6 +901,22 @@ class SRu extends S {
   String get updateRolloutPending => 'Новая версия распространяется постепенно и будет предложена вам автоматически.';
 
   @override
+  String updateRollbacking(String version) {
+    return 'Rolling back to version $version...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+  }
+
+  @override
+  String get updateRollbackError => 'Automatic rollback failed. If Sora does not work correctly, reinstall the previous version manually with the command below.';
+
+  @override
+  String get updateRollbackCacheError => 'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+
+  @override
   String get updateCopyCommand => 'Скопировать команду';
 
   @override
@@ -1727,6 +1743,7 @@ class SRu extends S {
 
   @override
   String get customServerBadge => 'свой';
+  String get flowAuto => 'авто';
 
   @override
   String customServerDeleteConfirm(String name) {

@@ -892,7 +892,12 @@ func referenceOf(spec parser.OutboundSpec) (string, error) {
 
 // outboundToProto converts a parsed server for the client, exposing only a
 // credential reference. The core resolves it when applying the plan.
+//
+// Flow/FlowAuto carry the EFFECTIVE flow: the link's explicit flow when set,
+// otherwise the plan-level auto-vision result (see effectiveFlow). The UI
+// badge therefore always agrees with what the engine will put on the wire.
 func outboundToProto(spec parser.OutboundSpec, reference string) *corev1.OutboundSpec {
+	flow, flowAuto := effectiveFlow(spec)
 	return &corev1.OutboundSpec{
 		Id:              spec.StableKey(),
 		DisplayName:     spec.DisplayName,
@@ -900,9 +905,33 @@ func outboundToProto(spec parser.OutboundSpec, reference string) *corev1.Outboun
 		DisplayProtocol: spec.DisplayProtocol,
 		Transport:       spec.Transport,
 		Security:        spec.Security,
+		Flow:            flow,
+		FlowAuto:        flowAuto,
 		Endpoint:        &corev1.Endpoint{Host: spec.Host, Port: uint32(spec.Port)},
 		Credentials:     &corev1.CredentialsRef{Reference: reference},
 	}
+}
+
+// effectiveFlow computes the wire-level flow for an imported server. The
+// predicate is engine.Outbound.ApplyAutoVision — the very same method
+// outboundFromProto applies when assembling the plan — so the UI-level
+// value and the plan-level value cannot drift apart: one source of truth.
+//
+// The inputs mirror outboundFromProto exactly: Flow starts as the link's
+// explicit flow (restored from the credential document there), TLS.Enabled
+// is security != "none", and REALITY is security == "reality".
+func effectiveFlow(spec parser.OutboundSpec) (flow string, auto bool) {
+	outbound := engine.Outbound{
+		Protocol:  engine.Protocol(spec.Protocol),
+		Transport: engine.Transport{Type: orDefault(spec.Transport, "tcp")},
+		TLS: engine.TLS{
+			Enabled: !strings.EqualFold(spec.Security, "none"),
+			Reality: strings.EqualFold(spec.Security, "reality"),
+		},
+		Flow: spec.Flow,
+	}
+	outbound.ApplyAutoVision()
+	return outbound.Flow, outbound.FlowAuto
 }
 
 // packProfile compresses provider configuration to fit the secret store's 64

@@ -1306,6 +1306,8 @@ class OutboundSpec extends $pb.GeneratedMessage {
     CredentialsRef? credentials,
     BypassStrategy? bypass,
     $core.String? displayProtocol,
+    $core.String? flow,
+    $core.bool? flowAuto,
   }) {
     final result = OutboundSpec._();
     if (id != null) result.id = id;
@@ -1317,6 +1319,8 @@ class OutboundSpec extends $pb.GeneratedMessage {
     if (credentials != null) result.credentials = credentials;
     if (bypass != null) result.bypass = bypass;
     if (displayProtocol != null) result.displayProtocol = displayProtocol;
+    if (flow != null) result.flow = flow;
+    if (flowAuto != null) result.flowAuto = flowAuto;
     return result;
   }
 
@@ -1340,6 +1344,8 @@ class OutboundSpec extends $pb.GeneratedMessage {
     ..aOM<CredentialsRef>(7, _omitFieldNames ? '' : 'credentials', subBuilder: CredentialsRef.$_createMessage)
     ..aOM<BypassStrategy>(8, _omitFieldNames ? '' : 'bypass', subBuilder: BypassStrategy.$_createMessage)
     ..aOS(9, _omitFieldNames ? '' : 'displayProtocol')
+    ..aOS(10, _omitFieldNames ? '' : 'flow')
+    ..aOB(11, _omitFieldNames ? '' : 'flowAuto')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1451,6 +1457,29 @@ class OutboundSpec extends $pb.GeneratedMessage {
   $core.bool hasDisplayProtocol() => $_has(8);
   @$pb.TagNumber(9)
   void clearDisplayProtocol() => $_clearField(9);
+
+  /// Since 1.11. The flow actually used on the wire (e.g. "xtls-rprx-vision"):
+  /// the link's explicit flow when set, otherwise the plan-level auto-vision
+  /// result. Empty when the protocol has no flow concept.
+  @$pb.TagNumber(10)
+  $core.String get flow => $_getSZ(9);
+  @$pb.TagNumber(10)
+  set flow($core.String value) => $_setString(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasFlow() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearFlow() => $_clearField(10);
+
+  /// Since 1.11. True when flow was assigned by the core's auto-vision rather
+  /// than the import link or the user: the UI shows a calm "auto" badge.
+  @$pb.TagNumber(11)
+  $core.bool get flowAuto => $_getBF(10);
+  @$pb.TagNumber(11)
+  set flowAuto($core.bool value) => $_setBool(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasFlowAuto() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearFlowAuto() => $_clearField(11);
 }
 
 class Endpoint extends $pb.GeneratedMessage {

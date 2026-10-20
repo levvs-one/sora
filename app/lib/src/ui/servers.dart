@@ -338,15 +338,17 @@ class _ServerRow extends StatelessWidget {
     final palette = Palette.of(context);
     final s = S.of(context);
     final chosen = sora.selected == id;
-    // Use the prospective active member's latency for a group row.
-    final measuredId = entry == null
-        ? id
+    // Use the prospective active member's latency for a group row. The same
+    // member supplies the wire-level flow shown in the badge below.
+    final OutboundSpec? shown = entry == null
+        ? null
         : pickMember(
             entry!,
             sora.latency,
             bandwidth: sora.bandwidth,
             autoSelect: sora.settings.autoSelectMode,
-          ).id;
+          );
+    final measuredId = shown?.id ?? id;
     final measured = sora.latency.containsKey(measuredId);
     final ms = sora.latency[measuredId];
     final bps = sora.freshBandwidth(measuredId);
@@ -383,14 +385,25 @@ class _ServerRow extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: Styles.row.copyWith(color: palette.ink),
                         ),
-                        if (detail != null && detail.isNotEmpty)
+                        if (detail != null && detail.isNotEmpty || (shown?.flow.isNotEmpty ?? false))
                           Padding(
                             padding: const EdgeInsets.only(top: 3),
-                            child: Text(
-                              detail,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Styles.caption.copyWith(color: palette.ink3),
+                            child: Row(
+                              children: [
+                                if (detail != null && detail.isNotEmpty)
+                                  Expanded(
+                                    child: Text(
+                                      detail,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Styles.caption.copyWith(color: palette.ink3),
+                                    ),
+                                  ),
+                                if (shown != null && shown.flow.isNotEmpty) ...[
+                                  const SizedBox(width: 6),
+                                  _FlowBadge(flow: shown.flow, auto: shown.flowAuto),
+                                ],
+                              ],
                             ),
                           ),
                       ],
@@ -866,6 +879,36 @@ class _CustomBadge extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: Text(label, style: Styles.caption.copyWith(color: palette.ink2)),
+      ),
+    );
+  }
+}
+
+/// A small outlined pill showing the flow a server actually uses on the wire.
+/// When [auto] is true the core assigned the flow itself (auto-vision) rather
+/// than the import link, and a calm localized "auto" marker is appended.
+class _FlowBadge extends StatelessWidget {
+  const _FlowBadge({required this.flow, required this.auto});
+
+  final String flow;
+  final bool auto;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    final s = S.of(context);
+    final label = auto ? '$flow · ${s.flowAuto}' : flow;
+    return Semantics(
+      label: label,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(color: palette.ink3.withValues(alpha: 0.6)),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          child: Text(label, style: Styles.caption.copyWith(color: palette.ink2)),
+        ),
       ),
     );
   }

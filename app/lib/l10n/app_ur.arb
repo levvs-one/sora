@@ -246,6 +246,23 @@
   "updateCopyCommand": "کمانڈ کاپی کریں۔",
   "updateChecksDisabled": "خودکار چیک سیٹنگز میں غیر فعال ہیں۔",
   "updateInstalled": "اپ ڈیٹ انسٹال ہو گیا۔ Sora دوبارہ کھولیں۔",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "پروجیکٹ",
   "githubReleases": "ریلیز اور ڈاؤن لوڈز",
   "telegramChannel": "Telegram چینل",
@@ -511,6 +528,7 @@
   "customServerShowSecret": "Show secret",
   "customServerHideSecret": "Hide secret",
   "customServerBadge": "custom",
+  "flowAuto": "auto",
   "customServerDeleteConfirm": "Delete server “{name}”?",
   "@customServerDeleteConfirm": {"placeholders": {"name": {"type": "String"}}},
   "customServerEmptyHint": "Add a server manually: address, port and protocol",
@@ -565,6 +583,10 @@
   "updateWindowsSigBlocked": "Automatic installation is disabled on Windows until release-signature verification is implemented. Download the installer from the release page and verify it manually.",
   "updateVersionRevoked": "This version has been recalled by the developer. Please wait for a fixed release.",
   "updateRolloutPending": "A newer version is rolling out gradually and will be offered to you automatically.",
+  "updateRollbacking": "Rolling back to version {version}...",
+  "updateRolledBack": "The update to {version} did not pass the health check, so Sora was rolled back to {fromVersion}.",
+  "updateRollbackError": "Automatic rollback failed. If Sora does not work correctly, reinstall the previous version manually with the command below.",
+  "updateRollbackCacheError": "Could not prepare a verified rollback copy of the current version, so the update was not installed.",
   "extRatingLabel": "Rating {rating} of 5",
   "@extRatingLabel": {"placeholders": {"rating": {"type": {"type": "String"}}}},
   "extByAuthor": "by {author}",
