@@ -39,7 +39,9 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   @override
   void initState() {
     super.initState();
-    _search.addListener(() => setState(() {}));
+    // No setState listener on [_search]: the list below listens through
+    // ValueListenableBuilder, so typing rebuilds only the list, not the
+    // stats bar, search field and view switch.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_read());
       _timer = Timer.periodic(_every, (_) => unawaited(_read()));
@@ -122,33 +124,38 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   Widget build(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
-    final query = _search.text.trim().toLowerCase();
-    final shown = query.isEmpty
-        ? _list
-        : [
-            for (final c in _list)
-              if ('${c.host} ${c.process} ${c.chain.join(' ')}'.toLowerCase().contains(query)) c,
-          ];
     return Screen(
       title: s.connections,
-      fill: !_loaded
-          ? const SizedBox()
-          : shown.isEmpty
-          ? Center(
-              child: Text(s.logsEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
-            )
-          : _grouped
-          ? _groupedList(shown)
-          : ListView.builder(
-              padding: const EdgeInsets.only(bottom: 24),
-              itemCount: shown.length,
-              itemBuilder: (context, i) => _Row(
-                connection: shown[i],
-                onClose: () => unawaited(_close(shown[i])),
-                onCopyHost: () => unawaited(_copyHost(shown[i])),
-                onAddRule: () => _addRule(shown[i]),
-              ),
-            ),
+      fill: ValueListenableBuilder<TextEditingValue>(
+        valueListenable: _search,
+        builder: (context, value, _) {
+          final query = value.text.trim().toLowerCase();
+          final shown = query.isEmpty
+              ? _list
+              : [
+                  for (final c in _list)
+                    if ('${c.host} ${c.process} ${c.chain.join(' ')}'.toLowerCase().contains(query)) c,
+                ];
+          return !_loaded
+              ? const SizedBox()
+              : shown.isEmpty
+              ? Center(
+                  child: Text(s.connEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
+                )
+              : _grouped
+              ? _groupedList(shown)
+              : ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  itemCount: shown.length,
+                  itemBuilder: (context, i) => _Row(
+                    connection: shown[i],
+                    onClose: () => unawaited(_close(shown[i])),
+                    onCopyHost: () => unawaited(_copyHost(shown[i])),
+                    onAddRule: () => _addRule(shown[i]),
+                  ),
+                );
+        },
+      ),
       children: [
         _statsBar(context),
         CupertinoSearchTextField(
