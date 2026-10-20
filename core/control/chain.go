@@ -31,21 +31,21 @@ func (s *Server) ProbeChain(ctx context.Context, req *corev1.ProbeChainRequest) 
 	}
 	ids := req.GetServerIds()
 	if len(ids) < 2 || len(ids) > engine.MaxChainHops {
-		err := errs.Newf(errs.CodeInvalidArgument, errs.KeyProbeNoEndpoints,
+		err := errs.Newf(errs.CodeInvalidArgument, errs.KeyProbeChainInvalid,
 			"control: a proxy chain needs 2 to %d servers, got %d", engine.MaxChainHops, len(ids))
 		return &corev1.ProbeChainResponse{Error: toWire(err, nil, "")}, nil
 	}
 	seen := make(map[string]bool, len(ids))
 	for _, id := range ids {
 		if seen[id] {
-			err := errs.Newf(errs.CodeInvalidArgument, errs.KeyProbeNoEndpoints,
+			err := errs.Newf(errs.CodeInvalidArgument, errs.KeyProbeChainInvalid,
 				"control: the proxy chain repeats %q", id)
 			return &corev1.ProbeChainResponse{Error: toWire(err, nil, "")}, nil
 		}
 		seen[id] = true
 	}
 	if s.prober == nil {
-		err := errs.Newf(errs.CodeUnsupported, errs.KeyProbeInvalidEndpoint,
+		err := errs.Newf(errs.CodeUnsupported, errs.KeyProbeUnsupported,
 			"control: this core cannot probe endpoints")
 		return &corev1.ProbeChainResponse{Error: toWire(err, nil, "")}, nil
 	}

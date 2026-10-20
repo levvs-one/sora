@@ -2322,6 +2322,12 @@ class SRu extends S {
   String get errProbeTooMany => 'Слишком много серверов для одной проверки';
 
   @override
+  String get errProbeUnsupported => 'Это ядро не поддерживает проверку серверов';
+
+  @override
+  String get errProbeChainInvalid => 'Недопустимая цепочка серверов: нужно от 2 до 3 разных серверов';
+
+  @override
   String get errCancelled => 'Операция отменена';
 
   @override

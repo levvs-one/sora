@@ -2300,6 +2300,12 @@ class SUz extends S {
   String get errProbeTooMany => 'Too many servers to check at once';
 
   @override
+  String get errProbeUnsupported => 'This core does not support checking servers';
+
+  @override
+  String get errProbeChainInvalid => 'Invalid server chain: pick 2 or 3 different servers';
+
+  @override
   String get errCancelled => 'The operation was cancelled';
 
   @override

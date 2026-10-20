@@ -953,6 +953,8 @@
   "errProbeEndpointInvalid": "A server address is missing or not valid",
   "errProbeNoEndpoints": "There are no servers to check",
   "errProbeTooMany": "Too many servers to check at once",
+  "errProbeUnsupported": "This core does not support checking servers",
+  "errProbeChainInvalid": "Invalid server chain: pick 2 or 3 different servers",
   "errCancelled": "The operation was cancelled",
   "errRequestTooLarge": "The request is too large",
   "errSecretNotFound": "A needed secret was not found",

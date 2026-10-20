@@ -81,6 +81,8 @@ const (
 	KeyProbeInvalidEndpoint Key = "core.probe.invalid_endpoint"
 	KeyProbeNoEndpoints     Key = "core.probe.no_endpoints"
 	KeyProbeTooMany         Key = "core.probe.too_many"
+	KeyProbeUnsupported     Key = "core.probe.unsupported"
+	KeyProbeChainInvalid    Key = "core.probe.chain_invalid"
 	KeyDiagnosticsFailed    Key = "core.diagnostics.failed"
 	KeyDiagnosticsTooLarge  Key = "core.diagnostics.too_large"
 
@@ -175,6 +177,8 @@ var catalog = map[Key]Entry{
 	KeyProbeInvalidEndpoint: {CodeInvalidArgument, false, "an endpoint has no host or an impossible port"},
 	KeyProbeNoEndpoints:     {CodeInvalidArgument, false, "the probe request carries no endpoints"},
 	KeyProbeTooMany:         {CodeResourceExhausted, false, "the probe request carries more endpoints than allowed"},
+	KeyProbeUnsupported:     {CodeUnsupported, false, "this core cannot probe, measure or benchmark servers"},
+	KeyProbeChainInvalid:    {CodeInvalidArgument, false, "the chain does not hold 2 to 3 distinct servers"},
 	KeyDiagnosticsFailed:    {CodeInternal, false, "diagnostics could not be collected"},
 	KeyDiagnosticsTooLarge:  {CodeResourceExhausted, false, "the diagnostics archive is larger than allowed"},
 

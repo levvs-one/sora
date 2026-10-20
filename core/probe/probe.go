@@ -282,7 +282,7 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 		}
 	}
 	if timeout <= 0 {
-		return 0, netip.Addr{}, errs.Newf(errs.CodeDeadlineExceeded, errs.KeyProbeInvalidEndpoint,
+		return 0, netip.Addr{}, errs.Newf(errs.CodeDeadlineExceeded, errs.KeyDeadlineExceeded,
 			"probe: the request has no time left")
 	}
 	// A hostname that resolves to several addresses races them Happy

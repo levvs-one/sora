@@ -746,6 +746,8 @@ String describe(S s, CoreFailure failure) {
     'core.probe.invalid_endpoint' => s.errProbeEndpointInvalid,
     'core.probe.no_endpoints' => s.errProbeNoEndpoints,
     'core.probe.too_many' => s.errProbeTooMany,
+    'core.probe.unsupported' => s.errProbeUnsupported,
+    'core.probe.chain_invalid' => s.errProbeChainInvalid,
     'core.request.cancelled' => s.errCancelled,
     'core.request.too_large' => s.errRequestTooLarge,
     'app.core_watch_unstable' => s.coreWatchUnstable,

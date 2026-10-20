@@ -1084,6 +1084,8 @@
   "errProbeEndpointInvalid": "Адрес сервера не указан или задан неверно",
   "errProbeNoEndpoints": "Нет серверов для проверки",
   "errProbeTooMany": "Слишком много серверов для одной проверки",
+  "errProbeUnsupported": "Это ядро не поддерживает проверку серверов",
+  "errProbeChainInvalid": "Недопустимая цепочка серверов: нужно от 2 до 3 разных серверов",
   "errCancelled": "Операция отменена",
   "errRequestTooLarge": "Запрос слишком большой",
   "errSecretNotFound": "Нужный секрет не найден",

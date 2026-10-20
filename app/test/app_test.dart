@@ -290,6 +290,8 @@ void main() {
       'core.probe.invalid_endpoint': s.errProbeEndpointInvalid,
       'core.probe.no_endpoints': s.errProbeNoEndpoints,
       'core.probe.too_many': s.errProbeTooMany,
+      'core.probe.unsupported': s.errProbeUnsupported,
+      'core.probe.chain_invalid': s.errProbeChainInvalid,
       'core.request.cancelled': s.errCancelled,
       'core.request.too_large': s.errRequestTooLarge,
       'core.secret.not_found': s.errSecretNotFound,
@@ -298,13 +300,19 @@ void main() {
       'core.subscription.not_found': s.errSubNotFound,
       'core.subscription.interval_invalid': s.errSubIntervalInvalid,
     };
-    expect(expected, hasLength(20));
+    expect(expected, hasLength(22));
     for (final entry in expected.entries) {
       expect(describe(s, CoreFailure(entry.key)), entry.value, reason: entry.key);
       expect(entry.value, isNot(s.errGeneric), reason: entry.key);
     }
     // The one generic catalog key keeps the generic words on purpose.
     expect(describe(s, const CoreFailure('core.internal.unexpected')), s.errGeneric);
+    // The split keys must not borrow the endpoint words they replaced:
+    // a core that cannot check servers and a malformed chain are not
+    // endpoint failures.
+    expect(s.errProbeUnsupported, isNot(s.errProbeEndpointInvalid));
+    expect(s.errProbeChainInvalid, isNot(s.errProbeNoEndpoints));
+    expect(s.errProbeChainInvalid, isNot(s.errProbeEndpointInvalid));
   });
 
   testWidgets('without a core the home screen says so and stays still', (tester) async {

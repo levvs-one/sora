@@ -4317,6 +4317,18 @@ abstract class S {
   /// **'Слишком много серверов для одной проверки'**
   String get errProbeTooMany;
 
+  /// No description provided for @errProbeUnsupported.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это ядро не поддерживает проверку серверов'**
+  String get errProbeUnsupported;
+
+  /// No description provided for @errProbeChainInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недопустимая цепочка серверов: нужно от 2 до 3 разных серверов'**
+  String get errProbeChainInvalid;
+
   /// No description provided for @errCancelled.
   ///
   /// In ru, this message translates to:

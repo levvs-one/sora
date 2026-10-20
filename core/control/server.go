@@ -1332,7 +1332,7 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 			return nil
 		}
 		if s.prober == nil {
-			return errs.Newf(errs.CodeUnsupported, errs.KeyProbeInvalidEndpoint,
+			return errs.Newf(errs.CodeUnsupported, errs.KeyProbeUnsupported,
 				"control: this core cannot probe endpoints")
 		}
 		found, err := s.prober.Probe(ctx, endpoints, ids)
@@ -1416,7 +1416,7 @@ func (s *Server) measureOutbounds(ctx context.Context, opts *corev1.ProbeOptions
 	results chan<- *corev1.ProbeResult, wg *sync.WaitGroup, connect func([]*corev1.Endpoint, []string) error) error {
 	if opts.GetMethod() == corev1.ProbeMethod_PROBE_METHOD_CONNECT || s.measurer == nil {
 		if opts.GetMethod() == corev1.ProbeMethod_PROBE_METHOD_ENGINE {
-			return errs.Newf(errs.CodeUnsupported, errs.KeyProbeInvalidEndpoint,
+			return errs.Newf(errs.CodeUnsupported, errs.KeyProbeUnsupported,
 				"control: this core cannot measure through an engine")
 		}
 		endpoints, ids := endpointsOf(specs)
