@@ -392,7 +392,11 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   bool _loading = true;
   bool _catalogSoon = false;
   String? _catalogError;
-  String _query = '';
+
+  /// Catalog search input. The result list below listens to it through a
+  /// ValueListenableBuilder, so typing rebuilds only the list, not the tab
+  /// switch, search field, filter chips and sort row.
+  final _catalogSearch = TextEditingController();
   String _category = 'all';
   String _capability = 'all';
   int _sort = 0; // 0 popular, 1 rating, 2 name, 3 relevance
@@ -408,6 +412,12 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
 
   CatalogCache? _cache;
   bool _depsReady = false;
+
+  @override
+  void dispose() {
+    _catalogSearch.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -547,7 +557,6 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
 
   Widget _catalogList(BuildContext context) {
     final s = S.of(context), palette = Palette.of(context);
-    final entries = _filtered();
     final cachedAt = _cachedAt;
     return Column(
       children: [
@@ -572,12 +581,14 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
             ),
           ),
         TextField(
+          controller: _catalogSearch,
+          // No onChanged setState: the list below listens through
+          // ValueListenableBuilder, so typing rebuilds only the list.
           decoration: InputDecoration(
             hintText: s.extSearchHint,
             prefixIcon: const Icon(Symbols.search_rounded),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          onChanged: (v) => setState(() => _query = v.trim().toLowerCase()),
         ),
         const SizedBox(height: 10),
         SizedBox(
@@ -639,18 +650,24 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
           ],
         ),
         Expanded(
-          child: entries.isEmpty
-              ? Center(
-                  child: Text(s.extEmptySearch,
-                      style: Styles.body.copyWith(color: palette.ink2)))
-              : RefreshIndicator(
-                  onRefresh: _refreshCatalog,
-                  child: ListView.separated(
-                    itemCount: entries.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, i) => _catalogCard(context, entries[i]),
-                  ),
-                ),
+          child: ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _catalogSearch,
+            builder: (context, value, _) {
+              final entries = _filtered(value.text.trim().toLowerCase());
+              return entries.isEmpty
+                  ? Center(
+                      child: Text(s.extEmptySearch,
+                          style: Styles.body.copyWith(color: palette.ink2)))
+                  : RefreshIndicator(
+                      onRefresh: _refreshCatalog,
+                      child: ListView.separated(
+                        itemCount: entries.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (context, i) => _catalogCard(context, entries[i]),
+                      ),
+                    );
+            },
+          ),
         ),
       ],
     );
@@ -718,12 +735,12 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     }
   }
 
-  List<CatalogEntry> _filtered() {
+  List<CatalogEntry> _filtered(String query) {
     // Memoized: filtering + sorting a few hundred entries is cheap, but
     // rebuilding the whole section on every store notification (install
     // finishes, switch toggled) would redo it for nothing. The key covers
     // every input; a miss recomputes once.
-    final key = '$_catalogRevision|$_query|$_category|$_capability|$_sort';
+    final key = '$_catalogRevision|$query|$_category|$_capability|$_sort';
     final cached = _filteredCache;
     if (key == _filteredKey && cached != null) return cached;
     // Copy first: sorting must never mutate the catalog's own list.
@@ -734,12 +751,12 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     if (_capability != 'all') {
       list = list.where((e) => e.capabilities.contains(_capability)).toList();
     }
-    if (_query.isNotEmpty) {
+    if (query.isNotEmpty) {
       list = list
           .where((e) =>
-              e.name.toLowerCase().contains(_query) ||
-              e.author.toLowerCase().contains(_query) ||
-              e.description.toLowerCase().contains(_query))
+              e.name.toLowerCase().contains(query) ||
+              e.author.toLowerCase().contains(query) ||
+              e.description.toLowerCase().contains(query))
           .toList();
     }
     switch (_sort) {
@@ -755,7 +772,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
           // O(n log n) relevance evaluations (the benchmark screen's
           // sort-keys pattern). The values are pure in the entry and the
           // query, so the order is identical.
-          final relevance = {for (final e in list) e: _relevance(e)};
+          final relevance = {for (final e in list) e: _relevance(e, query)};
           list.sort((a, b) => relevance[b]!.compareTo(relevance[a]!));
         }
       default:
@@ -770,17 +787,17 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   /// description), then the honest rating, then a logarithmic installs
   /// term. Log installs break ties without letting a huge install base
   /// bury a better-rated newcomer.
-  double _relevance(CatalogEntry e) {
+  double _relevance(CatalogEntry e, String query) {
     double text = 0.5; // neutral when there is no query
-    if (_query.isNotEmpty) {
+    if (query.isNotEmpty) {
       final name = e.name.toLowerCase();
       final author = e.author.toLowerCase();
       final desc = e.description.toLowerCase();
-      if (name.contains(_query)) {
+      if (name.contains(query)) {
         text = 1.0;
-      } else if (author.contains(_query)) {
+      } else if (author.contains(query)) {
         text = 0.7;
-      } else if (desc.contains(_query)) {
+      } else if (desc.contains(query)) {
         text = 0.4;
       } else {
         text = 0.0;
