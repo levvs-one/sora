@@ -98,18 +98,22 @@ mode degrades to "do nothing + tell the user" instead of a silent downgrade.
 
 ### The marker
 
-Before handing the downloaded packages to the privileged helper,
-`AppUpdater.install()` writes a `pendingUpdate` marker to settings:
+After the privileged helper reports a successful install — right before the
+app restarts into the new build — `AppUpdater.install()` writes a
+`pendingUpdate` marker to settings:
 
 ```json
 {"from": "1.2.3", "to": "1.3.0", "atMs": 1729471234567}
 ```
 
 - `from` — the version being replaced, `to` — the version being installed,
-  `atMs` — wall-clock time of the handoff.
-- The marker is written **only** when the helper is actually about to run
-  (elevation available, rollback cache ready). Any earlier failure leaves no
-  marker behind.
+  `atMs` — wall-clock time just before the restart.
+- The marker is written **only** after the helper exited 0. It is deliberately
+  not written before the handoff: on a slow machine installing two packages
+  can take minutes, and a pre-handoff timestamp would look "stale" to the new
+  build and trigger a bogus auto-rollback of a working install. Any earlier
+  failure (no elevation, failed download, failed rollback-cache preparation,
+  failed handoff) leaves no marker behind.
 - A settings reset preserves the marker: it is a safety mechanism, not a
   preference, and resetting must not silently disarm it.
 

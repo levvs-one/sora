@@ -182,8 +182,9 @@ Future<void> verifyUpdateFile(File file, String manifest, String name) async {
   if (actual.toString() != expected) throw const UpdateFailure(UpdateError.checksum);
 }
 
-/// Marker written to settings before a Linux update hands off to the
-/// privileged helper (S11b). After the restart the new build sees it and
+/// Marker written to settings after a Linux update's privileged helper
+/// reported success, right before the restart (S11b). After the restart the
+/// new build sees it and
 /// runs the post-update health check: the marker is cleared only when the
 /// core answers the control channel within 60 s; otherwise the install
 /// rolls back to [from].
@@ -672,13 +673,6 @@ class AppUpdater extends ChangeNotifier {
         // Fail-closed: without the cache the update does not proceed.
         await _prepareRollbackCache(installation!);
         _guard();
-        await settings.savePendingUpdate(
-          PendingUpdate(
-            from: version,
-            to: release.version,
-            atMs: DateTime.now().millisecondsSinceEpoch,
-          ).encode(),
-        );
         stage = UpdateStage.installing;
         notifyListeners();
         final result = await _run('/usr/bin/pkexec', [
@@ -694,6 +688,20 @@ class AppUpdater extends ChangeNotifier {
           manualCommand = installation.manualCommand(paths);
           throw const UpdateFailure(UpdateError.installation);
         }
+        // S11b: the marker is written only AFTER the helper reported success,
+        // so atMs ≈ the moment the new build will start. Writing it before
+        // the handoff would stamp the pre-install time; on a slow machine the
+        // two packages can take minutes to install, and the new build would
+        // then see a "stale" marker and roll back a working install. Early
+        // exits (no elevation, failed download, failed handoff) never reach
+        // this line, so they never write a marker.
+        await settings.savePendingUpdate(
+          PendingUpdate(
+            from: version,
+            to: release.version,
+            atMs: DateTime.now().millisecondsSinceEpoch,
+          ).encode(),
+        );
         installed = true;
         await restartLinux();
         await quit();
@@ -705,9 +713,9 @@ class AppUpdater extends ChangeNotifier {
       progress = null;
       stage = UpdateStage.idle;
       if (!handedOff && !installed) await settings.saveResumeAfterUpdate(false);
-      // The marker survives only when the new packages were actually handed
-      // to the installer: any earlier failure leaves the old build running,
-      // and a stale marker must never arm a health check for it.
+      // The marker survives only when the helper confirmed the install:
+      // any earlier failure leaves the old build running, and a stale
+      // marker must never arm a health check for it.
       if (!installed) await settings.clearPendingUpdate();
       // Keep verified files for the manual command or a launched Windows setup.
       if (!handedOff && manualCommand == null && _work != null) {
