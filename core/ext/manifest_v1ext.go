@@ -94,10 +94,14 @@ type RoutingExt struct {
 var (
 	// DNS label: alphanumerics, interior hyphens, 1..63 chars.
 	dnsLabelPattern = regexp.MustCompile(`^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`)
-	// Worker script file names: relative .js path, no traversal.
-	scriptNamePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_.\-/]{0,255}\.js$`)
-	// Capability-contract asset file names: relative .json path, no traversal.
-	assetNamePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_.\-/]{0,255}\.json$`)
+	// Worker script file names: relative .js path, forward slashes only, no
+	// traversal. The class is written with the hyphen last so it is
+	// unambiguously literal; a backslash is not a member of the class
+	// (the zip format mandates '/', and isSafeArchivePath rejects \ anyway).
+	scriptNamePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.js$`)
+	// Capability-contract asset file names: relative .json path, forward
+	// slashes only, no traversal - same unambiguous class as above.
+	assetNamePattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.json$`)
 )
 
 // MaxNetworkHosts caps the allowlist so a manifest cannot smuggle an

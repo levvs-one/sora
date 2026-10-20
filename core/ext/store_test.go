@@ -3,6 +3,8 @@ package ext
 import (
 	"context"
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -27,7 +29,7 @@ func installHello(t *testing.T, s *Store, version string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
 		t.Fatalf("install failed: %v", err)
 	}
 }
@@ -59,7 +61,7 @@ func TestStoreInstallRejectsMissingGrant(t *testing.T) {
 		t.Fatal(err)
 	}
 	// The manifest wants connections.read + notifications; grant only one.
-	if _, err := s.Install(pkg, SourceSideload, []string{"notifications"}); err == nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"notifications"}, ""); err == nil {
 		t.Fatal("install must require granting every manifest permission")
 	}
 }
@@ -75,7 +77,7 @@ func TestStoreUpdateReportsAddedPermissions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	added, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "servers.read"})
+	added, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications", "servers.read"}, "")
 	if err != nil {
 		t.Fatalf("update failed: %v", err)
 	}
@@ -98,7 +100,7 @@ func TestStoreUpdateRejectsDowngrade(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}); err == nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err == nil {
 		t.Fatal("downgrade must be rejected")
 	}
 }
@@ -113,7 +115,7 @@ func TestStoreRollback(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
 		t.Fatal(err)
 	}
 	if err := s.Rollback("com.example.hello"); err != nil {
@@ -125,6 +127,38 @@ func TestStoreRollback(t *testing.T) {
 	}
 	if err := s.Rollback("com.example.hello"); err == nil {
 		t.Fatal("second rollback must fail (no previous)")
+	}
+}
+
+func TestStoreRollbackTamperedPreviousRejects(t *testing.T) {
+	s := testStore(t)
+	installHello(t, s, "1.0.0")
+	m := testManifest(t)
+	m.Version = "1.1.0"
+	data := buildPackage(t, m, nil, nil)
+	pkg, err := OpenBytes(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
+		t.Fatal(err)
+	}
+	// Tamper with the N-1 files on disk: rollback must refuse and leave
+	// the current install untouched (fail closed).
+	prevHTML := filepath.Join(s.extDir("com.example.hello", "1.0.0"), "panel.html")
+	raw, err := os.ReadFile(prevHTML)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(prevHTML, append(raw, []byte("<!-- evil -->")...), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Rollback("com.example.hello"); err == nil {
+		t.Fatal("rollback of a tampered previous version must be refused")
+	}
+	inst, _ := s.Get("com.example.hello")
+	if inst.Version != "1.1.0" || inst.Previous != "1.0.0" {
+		t.Fatalf("a refused rollback must leave the install untouched: %+v", inst)
 	}
 }
 
@@ -172,7 +206,7 @@ func TestStoreSettingsValidation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"connections.read", "notifications"}, ""); err != nil {
 		t.Fatal(err)
 	}
 	// Defaults are visible before any save.

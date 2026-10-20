@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -413,6 +414,36 @@ func injectPanelCSP(html []byte) []byte {
 	return out
 }
 
+// readVersionFiles walks an extracted version directory and returns every
+// file keyed by its slash-separated path relative to dir (the archive
+// layout), so a previous version kept on disk can be re-verified as a
+// Package before rollback restores it.
+func readVersionFiles(dir string) (map[string][]byte, error) {
+	files := map[string][]byte{}
+	err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		rel, err := filepath.Rel(dir, p)
+		if err != nil {
+			return err
+		}
+		data, err := os.ReadFile(p) //nolint:gosec // p stays inside the store dir
+		if err != nil {
+			return err
+		}
+		files[filepath.ToSlash(rel)] = data
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
+}
+
 // Rollback restores the N-1 version kept at install time.
 //
 // The previous manifest is re-read from its directory on disk (the source
@@ -449,6 +480,38 @@ func (s *Store) Rollback(id string) error {
 	if prevManifest.ID != id || prevManifest.Version != cur.Previous {
 		return errs.Newf(errs.CodeInternal, KeyLifecycle,
 			"ext: the previous manifest of %q does not match version %s", id, cur.Previous)
+	}
+	// Re-verify the previous version before restoring it: the N-1
+	// directory is not integrity-checked after install, so a tampered
+	// previous version must fail the rollback (fail closed) rather than
+	// become the served version. The panel CSP injected at extract time
+	// is stripped first — verification is against the signed bytes. The
+	// trust anchor is the pinned author key, never the on-disk manifest's
+	// self-attested key.
+	pinned := cur.AuthorKey
+	if pinned == "" {
+		pinned = cur.Manifest.Author.PublicKey
+	}
+	prevFiles, err := readVersionFiles(prevDir)
+	if err != nil {
+		return errs.Newf(errs.CodeInternal, KeyLifecycle,
+			"ext: cannot read the previous version of %q: %v", id, err)
+	}
+	panelEntries := map[string]bool{}
+	if prevManifest.UI != nil {
+		for _, p := range prevManifest.UI.Panels {
+			panelEntries[p.Entry] = true
+		}
+	}
+	for name, data := range prevFiles {
+		if panelEntries[name] {
+			prevFiles[name] = bytes.Replace(data, []byte(panelCSP), nil, 1)
+		}
+	}
+	prevPkg := &Package{Files: prevFiles, Manifest: prevManifest}
+	if err := prevPkg.VerifyWithKey(pinned); err != nil {
+		return errs.Newf(errs.CodeUnauthenticated, KeySignatureInvalid,
+			"ext: the previous version of %q failed its integrity re-check - refusing rollback: %v", id, err)
 	}
 	// Drop the bad version's directory, keep the previous one.
 	if err := os.RemoveAll(s.extDir(id, cur.Version)); err != nil {

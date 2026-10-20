@@ -117,7 +117,8 @@ func TestParseManifestFullBadIntervals(t *testing.T) {
 }
 
 func TestParseManifestFullBadEntry(t *testing.T) {
-	for _, entry := range []string{"", "../evil.js", "/abs.js", "worker.html", "worker.JS "} {
+	for _, entry := range []string{"", "../evil.js", "/abs.js", "worker.html", "worker.JS ",
+		"sub\\worker.js", "..\\evil.js", "C:\\evil.js"} {
 		raw := rawManifestWith(t, bgManifest(t), map[string]any{
 			"background_task": map[string]any{"interval_minutes": 30, "entry": entry},
 		})
