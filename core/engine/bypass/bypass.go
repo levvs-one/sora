@@ -308,7 +308,18 @@ func (e *Engine) Validate(ctx context.Context, p *engine.Plan) error {
 // Apply closed, before any state changes: silently running a desync
 // strategy without interception would pretend to desync (e.g. QUIC)
 // while doing nothing.
+//
+// The executor is its own last guard: Apply resolves and validates
+// every strategy itself (resolvePlanStrategies) before any process
+// starts, so an unresolved marker or a malformed strategy is refused
+// here even when a caller skipped plan validation — the invariant
+// "no unresolved strategy reaches a binary" belongs to the executor,
+// not to whichever caller happened to validate.
 func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
+	p, err := resolvePlanStrategies(p)
+	if err != nil {
+		return err
+	}
 	needed := map[string]engine.BypassStrategy{}
 	neededNFQWS := map[string]engine.BypassStrategy{}
 	nfqIDs := map[string]string{}
@@ -353,7 +364,6 @@ func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 	// to five seconds for the process to listen, and Stop must not wait
 	// behind that.
 	ports := map[string]int{}
-	var err error
 	for k, strategy := range needed {
 		px := e.current(k)
 		if px == nil {
