@@ -307,3 +307,52 @@ func TestNewBenchmarkerValidation(t *testing.T) {
 		t.Fatal("expected validation error for empty config")
 	}
 }
+
+// TestBenchmarkPlanPassesEngineValidation runs the benchmark with the
+// engine double (whose Validate is a no-op) and then puts the applied
+// plan through the REAL engine.Plan.Validate. The double alone let two
+// wiring defects ship: the match-all rule targeted the invented
+// display name "benchmark" instead of the outbound ID, which every
+// real engine rejects as an unknown target (WAVE-INTEGRATION E2E).
+func TestBenchmarkPlanPassesEngineValidation(t *testing.T) {
+	payload := make([]byte, 32*1024)
+	stub, port := proxyStub(t, payload)
+	defer stub.Close()
+
+	eng := &fakeEngine{port: port}
+	b := newTestBenchmarker(t, eng)
+	outbound := engine.Outbound{
+		ID: "shadowsocks:127.0.0.1:8388:abc123", Name: "srv-real",
+		Protocol: engine.ProtocolShadowsocks, Server: "127.0.0.1", Port: 8388,
+		Cipher: "aes-256-gcm", Password: "test-password",
+	}
+	ch, err := b.Benchmark(context.Background(), []engine.Outbound{outbound}, engine.BandwidthOptions{
+		URL: stub.URL, Duration: 1200 * time.Millisecond, Timeout: 10 * time.Second, Concurrency: 1,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, s := range collectSamples(t, ch) {
+		if s.Done && s.Err != nil {
+			t.Fatalf("benchmark failed: %v", s.Err)
+		}
+	}
+	if eng.applied == nil {
+		t.Fatal("engine received no plan")
+	}
+	if err := eng.applied.Validate(); err != nil {
+		t.Fatalf("the benchmark plan must pass real engine validation: %v", err)
+	}
+	found := false
+	for _, r := range eng.applied.Rules {
+		if r.Type == engine.RuleMatchAll {
+			found = true
+			if r.Target != outbound.ID {
+				t.Fatalf("match-all rule target = %q, want the outbound ID %q", r.Target, outbound.ID)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("benchmark plan has no match-all rule")
+	}
+}

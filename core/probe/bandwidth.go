@@ -192,8 +192,14 @@ func (b *Benchmarker) benchmarkOne(ctx context.Context, o engine.Outbound, kind 
 		Engines:    []engine.Kind{kind},
 		LocalProxy: engine.LocalProxy{Enabled: true},
 		Outbounds:  []engine.Outbound{o},
-		Rules:      []engine.Rule{{Type: engine.RuleMatchAll, Target: o.Name}},
-		Options:    engine.Options{LogLevel: "error"},
+		// Rule targets name outbound IDs, never display names
+		// (engine validate: ids, group names, built-ins). Targeting
+		// the "benchmark" display name made every real engine reject
+		// the plan with `unknown target "benchmark"`; the unit-test
+		// engine double skipped validation, so only live E2E saw it
+		// (WAVE-INTEGRATION).
+		Rules:   []engine.Rule{{Type: engine.RuleMatchAll, Target: o.ID}},
+		Options: engine.Options{LogLevel: "error"},
 	}
 	eng, err := b.cfg.NewEngine(ctx, plan)
 	if err != nil {
