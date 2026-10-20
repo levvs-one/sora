@@ -1,0 +1,2 @@
+go test fuzz v1
+string("vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?security=tls&type=ws&path=%2F#Berlin")

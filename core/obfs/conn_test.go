@@ -29,6 +29,9 @@ func TestWrapConnFragmentAndSNI(t *testing.T) {
 	client, server := net.Pipe()
 	defer client.Close()
 	defer server.Close()
+	// Bound the exchange so a broken fragmenter fails fast instead
+	// of hanging the test on synchronous net.Pipe reads.
+	_ = server.SetReadDeadline(time.Now().Add(10 * time.Second))
 	wrapped := p.WrapConn(client)
 
 	writeErr := make(chan error, 1)
@@ -46,8 +49,13 @@ func TestWrapConnFragmentAndSNI(t *testing.T) {
 			t.Fatalf("fragment %d differs from expected", i)
 		}
 	}
-	if err := <-writeErr; err != nil {
-		t.Fatalf("Write: %v", err)
+	select {
+	case err := <-writeErr:
+		if err != nil {
+			t.Fatalf("Write: %v", err)
+		}
+	case <-time.After(10 * time.Second):
+		t.Fatal("Write did not return within 10s after all fragments were read")
 	}
 }
 
@@ -222,6 +230,45 @@ func TestDialTLSErrors(t *testing.T) {
 	}
 }
 
+// writeBounded runs c.Write off the test goroutine and fails the
+// test if it does not return within the bound. The fail-closed
+// branch tests below need this form: net.Pipe writes are
+// synchronous, so the OLD fail-open behaviour (deliver the original
+// hello on an obfs error) blocks forever in Write when nobody is
+// reading — a distinction by hang, not by assertion, as the
+// CENSOR-LEAK review found (its mutation run had to be killed).
+// With the write bounded, a fail-open mutation fails cleanly in
+// seconds: either Write returns success (caught by the caller) or
+// the bound fires here. The deferred pipe closes in each test
+// release the blocked writer goroutine afterwards.
+func writeBounded(t *testing.T, c net.Conn, rec []byte) error {
+	t.Helper()
+	done := make(chan error, 1)
+	go func() {
+		_, err := c.Write(rec)
+		done <- err
+	}()
+	select {
+	case err := <-done:
+		return err
+	case <-time.After(5 * time.Second):
+		t.Fatal("Write did not return within 5s: a fail-open write blocks on net.Pipe delivering the original hello (no peer drains it); the branch must fail closed, fast")
+		return nil
+	}
+}
+
+// assertPeerSilent checks that no byte reached the pipe peer: a
+// read under a short deadline must time out with zero bytes.
+func assertPeerSilent(t *testing.T, server net.Conn) {
+	t.Helper()
+	_ = server.SetReadDeadline(time.Now().Add(200 * time.Millisecond))
+	buf := make([]byte, 1)
+	n, err := server.Read(buf)
+	if n > 0 || err == nil {
+		t.Fatalf("bytes reached the peer despite the failure: n=%d err=%v", n, err)
+	}
+}
+
 // TestWrapConnFailsClosedOnRewriteError pins the CENSOR-LEAK
 // fail-closed rule: when a ClientHello cannot be given the profile's
 // fake SNI, Write must fail and NOTHING may reach the peer — the
@@ -234,16 +281,12 @@ func TestWrapConnFailsClosedOnRewriteError(t *testing.T) {
 	defer server.Close()
 	// An invalid fake hostname makes RewriteClientHelloSNI fail.
 	wrapped := (&fragConn{Conn: client, fakeSNI: "not a hostname!"})
-	if _, err := wrapped.Write(rec); err == nil {
+	if err := writeBounded(t, wrapped, rec); err == nil {
 		t.Fatal("Write succeeded with an unrewritable ClientHello; want fail-closed error")
 	}
 	// Nothing may have been written: a read with a deadline must
 	// time out, not return hello bytes.
-	_ = server.SetReadDeadline(time.Now().Add(200 * time.Millisecond))
-	buf := make([]byte, 1)
-	if _, err := server.Read(buf); err == nil {
-		t.Fatal("bytes reached the peer despite the rewrite failure")
-	}
+	assertPeerSilent(t, server)
 }
 
 // TestWrapConnFailsClosedOnSplitError pins the same rule for
@@ -255,14 +298,10 @@ func TestWrapConnFailsClosedOnSplitError(t *testing.T) {
 	defer client.Close()
 	defer server.Close()
 	wrapped := (&fragConn{Conn: client, sizes: []int{-5}})
-	if _, err := wrapped.Write(rec); err == nil {
+	if err := writeBounded(t, wrapped, rec); err == nil {
 		t.Fatal("Write succeeded with unsplittable sizes; want fail-closed error")
 	}
-	_ = server.SetReadDeadline(time.Now().Add(200 * time.Millisecond))
-	buf := make([]byte, 1)
-	if _, err := server.Read(buf); err == nil {
-		t.Fatal("bytes reached the peer despite the split failure")
-	}
+	assertPeerSilent(t, server)
 }
 
 // TestWrapConnNoSNIPassesThrough pins the one deliberate exception:
@@ -273,6 +312,10 @@ func TestWrapConnNoSNIPassesThrough(t *testing.T) {
 	client, server := net.Pipe()
 	defer client.Close()
 	defer server.Close()
+	// A read deadline bounds the whole exchange: if a regression
+	// made this branch fail closed (or swallow the hello), the
+	// read fails fast instead of hanging the test on net.Pipe.
+	_ = server.SetReadDeadline(time.Now().Add(5 * time.Second))
 	wrapped := (&fragConn{Conn: client, fakeSNI: "decoy.test"})
 	done := make(chan error, 1)
 	go func() {
@@ -286,7 +329,12 @@ func TestWrapConnNoSNIPassesThrough(t *testing.T) {
 	if string(got) != string(rec) {
 		t.Fatal("no-SNI hello was modified")
 	}
-	if err := <-done; err != nil {
-		t.Fatalf("Write: %v", err)
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("Write: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("Write did not return within 5s after the hello was delivered")
 	}
 }
