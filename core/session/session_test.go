@@ -114,12 +114,14 @@ func (f *fakeEngine) counts() (applies, stops, closes int) {
 
 // fakeGuard records the settings it was asked for and can be told to fail.
 type fakeGuard struct {
-	mu        sync.Mutex
-	applied   []Settings
-	restores  int
-	applyErr  error
-	restoreEr error
-	current   Settings
+	mu         sync.Mutex
+	applied    []Settings
+	restores   int
+	applyErr   error
+	restoreEr  error
+	current    Settings
+	blocked    bool
+	blockedErr error
 }
 
 func (g *fakeGuard) Apply(_ context.Context, s Settings) error {
@@ -148,6 +150,15 @@ func (g *fakeGuard) Current() Settings {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	return g.current
+}
+
+// Blocked reports whatever the test staged, independent of the applied
+// settings: the platform can disagree with the wish, and tests reproduce
+// exactly that gap.
+func (g *fakeGuard) Blocked(context.Context) (bool, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.blocked, g.blockedErr
 }
 
 func (g *fakeGuard) Name() string { return "fake" }

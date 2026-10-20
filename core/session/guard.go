@@ -36,6 +36,11 @@ type Guard interface {
 	Restore(ctx context.Context) error
 	// Current reports the settings the guard believes are in force.
 	Current() Settings
+	// Blocked reports whether the block is actually in force right now,
+	// checked against the platform rather than the applied settings: a
+	// table removed out-of-band (or left by a crashed core) must not be
+	// echoed back as armed. Diagnostics ask this, not Current().KillSwitch.
+	Blocked(ctx context.Context) (bool, error)
 	// Name identifies the implementation in diagnostics.
 	Name() string
 }
@@ -52,6 +57,9 @@ func (NoopGuard) Restore(context.Context) error { return nil }
 
 // Current reports empty settings.
 func (NoopGuard) Current() Settings { return Settings{} }
+
+// Blocked reports that nothing is blocked: there is no firewall to probe.
+func (NoopGuard) Blocked(context.Context) (bool, error) { return false, nil }
 
 // Name identifies the implementation in diagnostics.
 func (NoopGuard) Name() string { return "noop" }
@@ -133,6 +141,24 @@ func (c *compositeGuard) Current() Settings {
 		return Settings{}
 	}
 	return c.parts[0].Current()
+}
+
+// Blocked reports true when any part reports its block in force. A block
+// owned by any part still blocks traffic, so the first positive answer
+// decides; a probe failure leaves the answer unknown instead of guessing.
+func (c *compositeGuard) Blocked(ctx context.Context) (bool, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for _, part := range c.parts {
+		blocked, err := part.Blocked(ctx)
+		if err != nil {
+			return false, err
+		}
+		if blocked {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 // Name lists guard names in apply order for diagnostics.

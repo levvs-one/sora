@@ -231,3 +231,27 @@ func TestFailedStartupKeepsTheOwnerOfUnrestoredSettings(t *testing.T) {
 
 // release gates the blocking engine factory of the concurrency test.
 var release chan struct{}
+
+// TestManagerKillSwitchBlockedAsksTheGuard locks the honest-truth path:
+// the session asked for the kill switch (wished), but the platform
+// reports no block (the table was removed out-of-band). Diagnostics read
+// the platform through this method, not the wish.
+func TestManagerKillSwitchBlockedAsksTheGuard(t *testing.T) {
+	guard := &fakeGuard{}
+	manager, _ := testManager(t, guard)
+	ctx := context.Background()
+	if _, err := manager.Connect(ctx, testPlan("blocked"), Settings{KillSwitch: true}); err != nil {
+		t.Fatalf("Connect() error = %v", err)
+	}
+	defer func() { _ = manager.Disconnect(ctx) }()
+	// Applied (wished) but the table is gone: the probe must say false.
+	guard.blocked = false
+	if blocked, err := manager.KillSwitchBlocked(ctx); err != nil || blocked {
+		t.Fatalf("KillSwitchBlocked() = %v, %v, want false after the table was removed", blocked, err)
+	}
+	guard.blocked = true
+	if blocked, err := manager.KillSwitchBlocked(ctx); err != nil || !blocked {
+		t.Fatalf("KillSwitchBlocked() = %v, %v, want true while the table is in force", blocked, err)
+	}
+}
+

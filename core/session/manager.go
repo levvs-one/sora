@@ -222,6 +222,16 @@ func (m *Manager) Status() Status {
 	return last
 }
 
+// KillSwitchBlocked reports whether the kill-switch block is actually in
+// force right now, checked against the platform through the guard. The
+// session status only records what was asked for; when a table is removed
+// out-of-band the wish and the reality diverge, and diagnostics must
+// report the reality. Callers fall back to the desired state only when
+// the probe itself errors.
+func (m *Manager) KillSwitchBlocked(ctx context.Context) (bool, error) {
+	return m.cfg.Guard.Blocked(ctx)
+}
+
 // Shutdown stops the session and restores system settings for service stop,
 // SIGTERM, or self-update.
 func (m *Manager) Shutdown(ctx context.Context) error {

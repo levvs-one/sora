@@ -49,3 +49,25 @@ func TestPartialApplyKeepsOwnershipWhenRollbackFails(t *testing.T) {
 		t.Fatal("retry did not restore partially applied settings")
 	}
 }
+
+// TestCompositeGuardBlockedReportsAnyPart: a block owned by any part
+// still blocks traffic, and a probe failure stays unknown instead of a
+// guessed answer.
+func TestCompositeGuardBlockedReportsAnyPart(t *testing.T) {
+	first, last := &fakeGuard{}, &fakeGuard{}
+	guard := NewCompositeGuard(first, last)
+	ctx := context.Background()
+	last.blocked = true
+	blocked, err := guard.Blocked(ctx)
+	if err != nil || !blocked {
+		t.Fatalf("Blocked() = %v, %v, want true from the blocked part", blocked, err)
+	}
+	last.blocked = false
+	last.blockedErr = errors.New("probe failed")
+	if _, err := guard.Blocked(ctx); err == nil {
+		t.Fatal("a probe failure was hidden")
+	}
+	if blocked, err := (NoopGuard{}).Blocked(ctx); err != nil || blocked {
+		t.Fatalf("NoopGuard.Blocked() = %v, %v, want false", blocked, err)
+	}
+}

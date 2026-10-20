@@ -40,14 +40,20 @@ func (s *Server) CheckDnsLeaks(ctx context.Context, req *corev1.CheckDnsLeaksReq
 				Transport: string(ds.Transport),
 			})
 		}
-		hijacked = len(plan.DNS.HijackTun) > 0
+		// The old signal was len(plan.DNS.HijackTun) > 0 — a field
+		// nothing in production fills, so this was false on every real
+		// session and the system-resolvers check failed spuriously
+		// without a kill switch.
+		hijacked = hijacksDNS(running.Status().TunnelMode, plan)
 	}
 	ctx, cancel := requestDeadline(ctx, dnsLeakTimeout)
 	defer cancel()
 	checks := diagnostics.CheckDnsLeaks(ctx, diagnostics.DnsLeakInput{
 		TunnelResolvers: tunnel,
 		DnsHijacked:     hijacked,
-		KillSwitchArmed: running.Status().KillSwitch,
+		// The platform-probed block state, not the session's wish:
+		// a manually removed table must read as "not covered".
+		KillSwitchArmed: s.killSwitchArmed(ctx, running),
 	})
 	out := &corev1.CheckDnsLeaksResponse{}
 	for _, c := range checks {
