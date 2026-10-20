@@ -27,6 +27,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/engine/enginetest"
 	"github.com/levvs-one/sora-client/core/engine/registry"
+	"github.com/levvs-one/sora-client/core/engine/singbox"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/xray"
 	"github.com/levvs-one/sora-client/core/logs"
@@ -406,6 +407,120 @@ func TestBypassCarriesTrafficThroughZapret(t *testing.T) {
 			}
 			if len(center.Query(logs.Filter{Sources: []string{"zapret"}}, 0, 0).Entries) == 0 {
 				t.Error("tpws wrote nothing to the log center")
+			}
+		})
+	}
+}
+
+// TestRealityThroughEveryEngine carries VLESS+REALITY traffic through
+// every engine against a sing-box REALITY server. This is the case the
+// suite lacked while mihomo's renderer emitted the TLS server name
+// under "sni" — a key its vless adapter never reads — so every REALITY
+// session on the default engine path failed its handshake
+// (WAVE-INTEGRATION). The SNI deliberately differs from the dial
+// address: with a matching name the defect is invisible. The server is
+// sing-box because the matrix above already covers Xray as a server
+// for the other transports, and a hand-rolled Xray REALITY inbound in
+// this sandbox failed even between two vendor binaries.
+func TestRealityThroughEveryEngine(t *testing.T) {
+	dir := os.Getenv("SORA_ENGINES_DIR")
+	if dir == "" {
+		t.Skip("set SORA_ENGINES_DIR to a directory with sing-box, xray and mihomo")
+	}
+	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { _, _ = io.WriteString(w, reply) }))
+	defer target.Close()
+	dest := httptest.NewTLSServer(http.NotFoundHandler())
+	defer dest.Close()
+
+	keys, err := ecdh.X25519().GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	serverPort := port(t)
+	cfg, err := json.Marshal(map[string]any{
+		"log": map[string]any{"level": "warn"},
+		"inbounds": []any{map[string]any{
+			"type": "vless", "tag": "in-reality", "listen": "127.0.0.1", "listen_port": serverPort,
+			"users": []any{map[string]any{"uuid": uuid, "flow": "xtls-rprx-vision"}},
+			"tls": map[string]any{
+				"enabled": true, "server_name": "www.example.com",
+				"reality": map[string]any{
+					"enabled": true,
+					"handshake": map[string]any{
+						"server": "127.0.0.1", "server_port": dest.Listener.Addr().(*net.TCPAddr).Port,
+					},
+					"private_key": base64.RawURLEncoding.EncodeToString(keys.Bytes()),
+					"short_id":    []string{"0123456789abcdef"},
+				},
+			},
+		}},
+		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfgPath := filepath.Join(t.TempDir(), "reality-server.json")
+	if err := os.WriteFile(cfgPath, cfg, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	bin, err := singbox.Prober.Discover(context.Background(), dir, supervise.DiscoveryOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	proc, err := supervise.Start(ctx, supervise.Spec{Name: "sing-box-reality-server", Path: bin.Path, Args: []string{"run", "-c", cfgPath}, Dir: t.TempDir()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		cancel()
+		_ = proc.Stop(context.Background(), 0)
+	})
+	time.Sleep(300 * time.Millisecond)
+	if err := proc.Err(); err != nil {
+		t.Fatalf("sing-box reality server: %v", err)
+	}
+
+	outbound := engine.Outbound{
+		ID: "vless-reality", Name: "vless-reality", Protocol: engine.ProtocolVLESS,
+		Server: "127.0.0.1", Port: uint16(serverPort), UUID: uuid, Flow: "xtls-rprx-vision",
+		TLS: engine.TLS{Enabled: true, Reality: true, ServerName: "www.example.com",
+			Fingerprint: "chrome",
+			RealityPublicKey: base64.RawURLEncoding.EncodeToString(keys.PublicKey().Bytes()),
+			RealityShortID:   "0123456789abcdef"},
+	}
+	availability := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir()}).Availability()
+	for _, kind := range []engine.Kind{engine.KindSingBox, engine.KindXray, engine.KindMihomo} {
+		plan := &engine.Plan{
+			SessionID:  "interop-reality",
+			LocalProxy: engine.LocalProxy{Enabled: true},
+			Outbounds:  []engine.Outbound{outbound},
+			Rules:      []engine.Rule{{Type: engine.RuleMatchAll, Target: outbound.ID}},
+			Options:    engine.Options{LogLevel: "warning", TestURL: engine.TestURLProduction},
+		}
+		if _, err := engine.SelectEngine(plan, availability, []engine.Kind{kind}); err != nil {
+			continue
+		}
+		t.Run(string(kind), func(t *testing.T) {
+			local := port(t)
+			reg := registry.Discover(context.Background(), dir, supervise.Config{HomeDir: t.TempDir(), LocalPort: local, StartTimeout: 10 * time.Second})
+			plan.Engines = []engine.Kind{kind}
+			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cancel()
+			eng, err := reg.Factory()(ctx, plan)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer func() { _ = eng.Close() }()
+			if err := eng.Apply(ctx, plan); err != nil {
+				t.Fatalf("Apply: %v", err)
+			}
+			body, err := fetch(ctx, local, target.URL)
+			if err != nil {
+				t.Fatalf("request through %s: %v", kind, err)
+			}
+			if body != reply {
+				t.Fatalf("got %q", body)
 			}
 		})
 	}
