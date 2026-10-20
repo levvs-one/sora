@@ -48,6 +48,20 @@ updates:
         patterns: ['*']
     labels: ['dependencies', 'sync']
 
+  # The sora-ext CLI is a separate Go module (tools/sora-ext/go.mod); without
+  # its own entry dependabot never proposes bumps for it.
+  - package-ecosystem: gomod
+    directory: /tools/sora-ext
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:47'
+    open-pull-requests-limit: 5
+    groups:
+      go-sora-ext:
+        patterns: ['*']
+    labels: ['dependencies', 'sora-ext']
+
   # Flutter app: pub.dev packages from app/pubspec.yaml.
   - package-ecosystem: pub
     directory: /app

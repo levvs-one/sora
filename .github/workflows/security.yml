@@ -20,20 +20,23 @@ jobs:
   vulnerabilities:
     name: Vulnerable dependencies
     runs-on: ubuntu-latest
-    # Every Go module in the monorepo gets its own scan: a vulnerability in the
-    # sync service must not hide behind the core's clean result.
+    # Every Go module in the monorepo gets its own scan: a vulnerability in
+    # the sync service or the sora-ext CLI must not hide behind the core's
+    # clean result.
     strategy:
       fail-fast: false
       matrix:
-        module: ['core', 'service/sync']
+        module: ['core', 'service/sync', 'tools/sora-ext']
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Install Go
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
-          # Both modules pin the same toolchain (go 1.26.9), so one
-          # go-version-file is enough; govulncheck runs inside each module.
+          # core and tools/sora-ext pin go 1.27 and service/sync pins go
+          # 1.26.9; the newer toolchain from core/go.mod satisfies all three
+          # (an older go directive does not demand an older toolchain), and
+          # govulncheck runs inside each module.
           go-version-file: core/go.mod
           cache: false
 
@@ -56,6 +59,7 @@ jobs:
           scan-args: |-
             --lockfile=go.mod:core/go.mod
             --lockfile=go.mod:service/sync/go.mod
+            --lockfile=go.mod:tools/sora-ext/go.mod
             --lockfile=pubspec.lock:app/pubspec.lock
 
   codeql:
