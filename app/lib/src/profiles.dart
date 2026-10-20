@@ -10,13 +10,14 @@ import 'package:flutter/foundation.dart';
 /// (`session.Session.checkProfile`), emitting `ProfileMatched` events that
 /// the app dispatches (`Sora._watchSession` → `handleProfileMatched`). This
 /// Dart store is the source of truth for the editor UI and the app-side
-/// matcher. The management RPCs (`ListProfiles`/`SaveProfile`/
-/// `DeleteProfile`/`GetNetworkFingerprint`) exist on both sides of the wire —
-/// the generated Dart stubs already carry them — but the app does not call
-/// them yet, so the core store stays empty and live matches come from this
-/// store only. Open owner decision: either wire the app to the core RPCs
-/// (one store of truth) or drop the core-side store — the dual-store split
-/// is tech debt until then.
+/// matcher. The app calls `GetNetworkFingerprint` (`Sora.refreshFingerprint`)
+/// so app-side matching is live — it fires when the profiles screen opens
+/// or refresh is tapped, not continuously in the background. The management
+/// RPCs (`ListProfiles`/`SaveProfile`/`DeleteProfile`) exist on both sides
+/// of the wire but the app still does not call them, so the core store stays
+/// empty and core-side matches never fire. Open owner decision: either wire
+/// the app to the core RPCs (one store of truth) or drop the core-side
+/// store — the dual-store split is tech debt until then.
 class NetworkProfile {
   NetworkProfile({
     required this.id,
@@ -99,11 +100,10 @@ class NetworkProfile {
 
 /// Fingerprint of the currently joined network.
 ///
-/// Will be filled by the core RPC `GetNetworkFingerprint` once the app wires
-/// it up — the generated Dart stubs already carry the 1.10 profile RPCs, no
-/// regeneration needed, and the Go side has landed in
-/// `core/profiles/profiles.go`. Until then the app shows the "unavailable"
-/// state instead of guessing.
+/// Filled by `Sora.refreshFingerprint` from the core RPC
+/// `GetNetworkFingerprint` (the Go side lives in `core/profiles/`). When
+/// the core cannot be asked, the fingerprint stays unknown and the app
+/// shows the "unavailable" state instead of guessing.
 class NetworkFingerprint {
   const NetworkFingerprint({this.ssid, this.gateway, this.asn});
 

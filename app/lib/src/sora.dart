@@ -16,7 +16,12 @@ import 'core/link.dart';
 import 'core/censor.dart';
 import 'browser_diagnostics.dart';
 import 'chains.dart';
-import 'generated/sora/core/v1/core_control.pbgrpc.dart';
+// The proto messages NetworkProfile/NetworkFingerprint collide with the
+// app-side model classes in profiles.dart, which are the ones this file
+// uses; hide the proto names so the references stay unambiguous. The
+// fingerprint RPC answer is consumed through its fields, never by naming
+// the proto type.
+import 'generated/sora/core/v1/core_control.pbgrpc.dart' hide NetworkFingerprint, NetworkProfile;
 import 'generated/sora/custom/v1/custom.pbgrpc.dart';
 import 'groups.dart';
 import 'overrides.dart';
@@ -560,8 +565,9 @@ class Sora extends ChangeNotifier {
   /// what guarantees nothing is missed.
   void _noteSyncChanged() => _syncBridge?.noteChanged();
 
-  /// Fingerprint of the currently joined network. Unknown until the core
-  /// RPC GetNetworkFingerprint is reachable from Dart (F5).
+  /// Fingerprint of the currently joined network, filled by
+  /// [refreshFingerprint] from the core's GetNetworkFingerprint RPC (F5).
+  /// Unknown until the first successful refresh.
   NetworkFingerprint networkFingerprint = const NetworkFingerprint.unknown();
 
   /// True when the core advertises proxy-chain support for the active
@@ -1219,18 +1225,42 @@ class Sora extends ChangeNotifier {
     }
   }
 
-  /// Refreshes the current network fingerprint (F5).
+  /// Refreshes the current network fingerprint (F5) via the core's
+  /// GetNetworkFingerprint RPC (API 1.10) and runs the app-side profile
+  /// matcher on it: a match applies the profile (auto-apply) or asks the
+  /// user, via [handleProfileMatched]. Without a core link, with an older
+  /// core, or when the call fails, the fingerprint stays unknown and the
+  /// UI says so instead of guessing; matching then does not fire.
   ///
-  /// TODO(profiles): wire to the GetNetworkFingerprint RPC — the generated
-  /// Dart stubs already carry the 1.10 profile RPCs, no regeneration needed.
-  /// Core-side matching is wired end to end (network change → session
-  /// `checkProfile` → `ProfileMatched` event → `_watchSession`), but the
-  /// core store stays empty until the app pushes profiles via SaveProfile,
-  /// so this local fingerprint is the only live matcher. Until the RPC is
-  /// wired, the fingerprint stays unknown and the UI says so instead of
-  /// guessing.
+  /// The core also keeps its own profile store and matcher (network
+  /// change → session `checkProfile` → `ProfileMatched` event →
+  /// `_watchSession`), but the app does not push profiles via SaveProfile,
+  /// so the core store stays empty and this refresh — on opening the
+  /// profiles screen or tapping refresh — is the live trigger. Open owner
+  /// decision: one store of truth (see profiles.dart).
   Future<void> refreshFingerprint() async {
-    networkFingerprint = const NetworkFingerprint.unknown();
+    var fingerprint = const NetworkFingerprint.unknown();
+    final link = _link;
+    if (link != null && link.minor >= 10) {
+      try {
+        final answer = await link.stub.getNetworkFingerprint(
+          GetNetworkFingerprintRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
+          options: CallOptions(timeout: const Duration(seconds: 10)),
+        );
+        if (!_disposed && link == _link && !answer.hasError() && answer.hasFingerprint()) {
+          String? nonEmpty(String value) => value.isEmpty ? null : value;
+          fingerprint = NetworkFingerprint(
+            ssid: nonEmpty(answer.fingerprint.ssid),
+            gateway: nonEmpty(answer.fingerprint.gateway),
+            asn: nonEmpty(answer.fingerprint.asn),
+          );
+        }
+      } catch (_) {
+        // A failed lookup must not break the UI; the fingerprint stays
+        // unknown and the profiles screen shows the unavailable state.
+      }
+    }
+    networkFingerprint = fingerprint;
     final matched = profiles.match(networkFingerprint);
     if (matched != null && matched.id != profiles.activeId) {
       await handleProfileMatched(matched.id);
