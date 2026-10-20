@@ -357,7 +357,12 @@ func parseLink(raw string) (OutboundSpec, error) {
 		o.User = u.User.Username()
 		o.Password, _ = u.User.Password()
 	}
-	for k, v := range u.Query() {
+	// The query is parsed once and shared by every lookup below:
+	// url.URL.Query() re-parses RawQuery on each call, and a link's
+	// fields are read through ~20 lookups — on a multi-thousand-link
+	// subscription import that re-parsing dominated the whole import.
+	q := u.Query()
+	for k, v := range q {
 		if len(v) > 0 {
 			o.Options[k] = v[0]
 		}
@@ -366,7 +371,7 @@ func parseLink(raw string) (OutboundSpec, error) {
 	// reaches any engine (no plan field, no renderer), so importing a
 	// pinned link today would silently unpin it. The link is skipped
 	// and counted as unsupported instead.
-	if (proto == "hysteria2" || proto == "hy2") && getq(u, "pinSHA256", "pin_sha256") != "" {
+	if (proto == "hysteria2" || proto == "hy2") && getq(q, "pinSHA256", "pin_sha256") != "" {
 		return OutboundSpec{}, fmt.Errorf("%w: hy2 pinSHA256 certificate pinning is not implemented", ErrUnsupported)
 	}
 	switch proto {
@@ -379,16 +384,16 @@ func parseLink(raw string) (OutboundSpec, error) {
 			}
 		}
 		if o.Password == "" {
-			o.Password = getq(u, "password")
+			o.Password = getq(q, "password")
 		}
 		// SIP002 plugin: the combined form "plugin=v2ray-plugin;tls;host=x"
 		// or the split form "plugin=v2ray-plugin" + "plugin_opts=tls;host=x".
 		// Canonical keys keep the raw "plugin" copy (from the loop above)
 		// from leaking into the credential document under two names.
-		if opts := getq(u, "plugin_opts", "plugin-opts"); opts != "" {
+		if opts := getq(q, "plugin_opts", "plugin-opts"); opts != "" {
 			o.Options["ss_plugin_opts"] = opts
 		}
-		if plug := getq(u, "plugin"); plug != "" {
+		if plug := getq(q, "plugin"); plug != "" {
 			name, rest, _ := strings.Cut(plug, ";")
 			o.Options["ss_plugin"] = strings.TrimSpace(name)
 			if o.Options["ss_plugin_opts"] == "" && rest != "" {
@@ -400,35 +405,35 @@ func parseLink(raw string) (OutboundSpec, error) {
 		o.Security = "tls"
 	default:
 		o.UUID = o.User
-		o.Transport = getq(u, "type", "transport")
-		o.Security = getq(u, "security")
+		o.Transport = getq(q, "type", "transport")
+		o.Security = getq(q, "security")
 		if o.Security == "" && proto == "vless" {
 			o.Security = "none"
 		}
 	}
-	o.Path = getq(u, "path")
-	o.HostHeader = getq(u, "host")
-	o.ServiceName = getq(u, "serviceName", "service_name")
-	o.Mode = getq(u, "mode")
-	o.PublicKey = getq(u, "pbk", "public-key")
-	o.ShortID = getq(u, "sid", "short-id")
-	o.SpiderX = getq(u, "spx")
-	o.ServerName = getq(u, "sni")
-	o.Fingerprint = getq(u, "fp")
-	o.Flow = getq(u, "flow")
-	o.AllowInsecure = parseBool(getq(u, "allowInsecure", "insecure", "skip-cert-verify"))
-	if a := getq(u, "alpn"); a != "" {
+	o.Path = getq(q, "path")
+	o.HostHeader = getq(q, "host")
+	o.ServiceName = getq(q, "serviceName", "service_name")
+	o.Mode = getq(q, "mode")
+	o.PublicKey = getq(q, "pbk", "public-key")
+	o.ShortID = getq(q, "sid", "short-id")
+	o.SpiderX = getq(q, "spx")
+	o.ServerName = getq(q, "sni")
+	o.Fingerprint = getq(q, "fp")
+	o.Flow = getq(q, "flow")
+	o.AllowInsecure = parseBool(getq(q, "allowInsecure", "insecure", "skip-cert-verify"))
+	if a := getq(q, "alpn"); a != "" {
 		o.ALPN = strings.Split(a, ",")
 	}
 	for _, k := range []string{"mport", "pinSHA256", "pin_sha256", "obfs", "obfs-password", "obfs_password", "congestion_control", "udp_relay_mode", "upmbps", "downmbps", "hop-interval", "hopinterval", "hop-interval-max", "hopintervalmax", "bbr-profile", "bbr_profile", "ports", "token"} {
-		if v := getq(u, k); v != "" {
+		if v := getq(q, k); v != "" {
 			o.Options[k] = v
 		}
 	}
 	// The XHTTP up/down split rides in the extra=<url-encoded JSON>
 	// parameter (de-facto link standard). Garbage there is provider
 	// decoration, never an import error: it is ignored, not fatal.
-	o.applyExtraDownloadSettings(getq(u, "extra"))
+	o.applyExtraDownloadSettings(getq(q, "extra"))
 	if o.Security == "" {
 		// Default security follows protocol semantics: trojan,
 		// hysteria2, and HTTPS use TLS; others do not. Empty security
@@ -499,9 +504,9 @@ func parsePort(s string) (uint16, error) {
 	}
 	return uint16(n), nil
 }
-func getq(u *url.URL, ks ...string) string {
+func getq(q url.Values, ks ...string) string {
 	for _, k := range ks {
-		if v := u.Query().Get(k); v != "" {
+		if v := q.Get(k); v != "" {
 			return v
 		}
 	}
@@ -541,16 +546,17 @@ func parseVMess(u *url.URL) (OutboundSpec, error) {
 		o.UUID = u.User.Username()
 		o.Password, _ = u.User.Password()
 	}
-	for k, v := range u.Query() {
+	q := u.Query()
+	for k, v := range q {
 		if len(v) > 0 {
 			o.Options[k] = v[0]
 		}
 	}
-	o.Transport = getq(u, "type", "transport")
+	o.Transport = getq(q, "type", "transport")
 	if o.Transport == "" {
 		o.Transport = "tcp"
 	}
-	o.Security = getq(u, "security")
+	o.Security = getq(q, "security")
 	if o.Security == "" {
 		o.Security = "auto"
 	}
@@ -563,7 +569,8 @@ func parseWireURL(u *url.URL) (OutboundSpec, error) {
 		return OutboundSpec{}, e
 	}
 	o := OutboundSpec{Protocol: "wireguard", Host: u.Hostname(), Port: p, Transport: "udp", DisplayName: fragmentName(u.Fragment), Options: map[string]string{}}
-	for k, v := range u.Query() {
+	q := u.Query()
+	for k, v := range q {
 		if len(v) > 0 {
 			o.Options[k] = v[0]
 		}
