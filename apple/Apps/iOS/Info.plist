@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Sora iOS app Info.plist (draft for the Xcode project; Xcode may
+     regenerate parts of this from target settings — keep the URL types
+     and usage strings in sync with DeepLinks.swift if it does).
+     Bundle id style matches the repo-wide io.github.levvs-one.sora. -->
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>Sora</string>
+	<key>CFBundleIdentifier</key>
+	<string>io.github.levvs-one.sora</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.12</string>
+	<key>CFBundleVersion</key>
+	<string>13</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+	</dict>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<!-- Camera is used only by the QR scanner (QRScannerView). -->
+	<key>NSCameraUsageDescription</key>
+	<string>Scan a QR code with a server or subscription link.</string>
+	<!-- URL types: `sora` (import/connect/disconnect hosts) plus every
+	     scheme LinkParser accepts, mirroring DeepLinks.SoraURLScheme.
+	     Registration routes links to the app; LinkParser decides what
+	     is accepted. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>io.github.levvs-one.sora.import</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sora</string>
+				<string>vless</string>
+				<string>vmess</string>
+				<string>trojan</string>
+				<string>ss</string>
+				<string>ssr</string>
+				<string>socks</string>
+				<string>socks5</string>
+				<string>hysteria</string>
+				<string>hysteria2</string>
+				<string>hy2</string>
+				<string>tuic</string>
+				<string>wireguard</string>
+				<string>wg</string>
+				<string>olcrtc</string>
+				<string>happ</string>
+				<string>hiddify</string>
+				<string>streisand</string>
+				<string>v2rayn</string>
+				<string>v2rayng</string>
+				<string>clash</string>
+				<string>clashx</string>
+				<string>mihomo</string>
+				<string>sing-box</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
