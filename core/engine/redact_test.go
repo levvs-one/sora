@@ -18,7 +18,26 @@ func TestRedactorMasksCredentialPatterns(t *testing.T) {
 		{
 			name: "quoted value with spaces masked whole",
 			in:   `token: "my secret value"`,
-			want: []string{"secret value", `"my`},
+			// Every word of the phrase must be gone, not just the
+			// contiguous "secret value": the separator must not eat the
+			// opening quote (that used to leak the phrase tail word by
+			// word: token: "a b" -> token: "[masked] b").
+			want: []string{"secret value", `"my`, "secret", "value"},
+		},
+		{
+			name: "short quoted value masked whole",
+			in:   `token: "a b"`,
+			want: []string{"a b", `b"`},
+		},
+		{
+			name: "quoted passphrase masked whole",
+			in:   `password: "correct horse battery"`,
+			want: []string{"correct", "horse", "battery"},
+		},
+		{
+			name: "json quoted value masked whole",
+			in:   `"token": "abc def"`,
+			want: []string{"abc", "def"},
 		},
 		{
 			name: "api_key masked",

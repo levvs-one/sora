@@ -94,13 +94,16 @@ var (
 	// JSON quoting with or without spaces, and the value tolerates
 	// quoting so a quoted phrase is masked whole: without the quoted
 	// alternation, token: "my secret value" would mask only "my and
-	// leave 'secret value"' in the log. Hosts stay readable: only the
-	// pair is masked.
-	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|preshared[_-]?key|pre-shared-key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*[\"']?|\s+)("[^"]*"|'[^']*'|\S+)`)
+	// leave 'secret value"' in the log. Note the separator deliberately
+	// does NOT consume a quote after ":" - eating it would make the
+	// value alternation fall through to \S+ and leak the tail of the
+	// phrase ("token: \"a b\"" used to mask only "a). Hosts stay
+	// readable: only the pair is masked.
+	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|preshared[_-]?key|pre-shared-key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("[^"]*"|'[^']*'|\S+)`)
 	// strictKeyValuePattern masks short generic credential keys only with
 	// an explicit assignment: a bare space after "user" or "login" is
 	// usually prose ("user agent", "login failed"), not a credential pair.
-	strictKeyValuePattern = regexp.MustCompile(`(?i)\b(user|login)\b([\"']?\s*[:=]\s*[\"']?)("[^"]*"|'[^']*'|\S+)`)
+	strictKeyValuePattern = regexp.MustCompile(`(?i)\b(user|login)\b([\"']?\s*[:=]\s*)("[^"]*"|'[^']*'|\S+)`)
 	// userInfoPattern masks the credentials of proxy links for every
 	// protocol the core parses. The password half is optional:
 	// trojan://token@host, hysteria2://secret@host and vless://id@host
