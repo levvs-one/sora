@@ -293,6 +293,41 @@ type BanTracker struct {
 	until map[string]time.Time
 	ttl   time.Duration
 	now   func() time.Time
+	// netEpoch is the network fingerprint the bans belong to (see
+	// BindNetwork): a residual ban is a property of the path through
+	// one network, and a banned 4-tuple says nothing after a move.
+	netEpoch string
+}
+
+// BindNetwork attaches the tracker to a network fingerprint. When it
+// changes, every recorded ban belongs to the old network's path and
+// is dropped — keeping it would make the dialer rotate away from
+// source ports that were never banned here. It reports whether state
+// was dropped. An empty fingerprint never invalidates; the first
+// non-empty bind only records the epoch.
+func (b *BanTracker) BindNetwork(fingerprint string) bool {
+	if fingerprint == "" {
+		return false
+	}
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	if b.netEpoch == "" {
+		b.netEpoch = fingerprint
+		return false
+	}
+	if b.netEpoch == fingerprint {
+		return false
+	}
+	b.netEpoch = fingerprint
+	b.until = map[string]time.Time{}
+	return true
+}
+
+// NetworkEpoch returns the fingerprint the current bans belong to.
+func (b *BanTracker) NetworkEpoch() string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.netEpoch
 }
 
 // NewBanTracker returns a tracker with the FOCI-measured 420s ban TTL.
@@ -301,10 +336,20 @@ func NewBanTracker() *BanTracker {
 }
 
 // NoteBlocked records that localPort→remote just ate a QUIC drop.
+// Expired entries are pruned here (the only writer), so a long-lived
+// tracker fed by many remotes cannot grow without bound — previously
+// an entry was only removed when its exact key was read again
+// (CENSOR-P3 completeness check).
 func (b *BanTracker) NoteBlocked(localPort int, remote string) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	b.until[banKey(localPort, remote)] = b.now().Add(b.ttl)
+	now := b.now()
+	for k, until := range b.until {
+		if !now.Before(until) {
+			delete(b.until, k)
+		}
+	}
+	b.until[banKey(localPort, remote)] = now.Add(b.ttl)
 }
 
 // Banned reports whether localPort→remote is still inside its residual
@@ -333,6 +378,13 @@ func banKey(localPort int, remote string) string {
 // re-rolled, but an environment where every fresh port is banned is a
 // signal to report, not a loop to spin in.
 const quicDialAttempts = 4
+
+// quicDialBackoffStart is the first pause between source-port
+// rotation attempts; it doubles per attempt (100ms, 200ms, 400ms).
+// Sending into a banned 4-tuple renews the ban, so attempts are
+// spaced instead of hammered (CENSOR-P3: the value was an unnamed
+// literal in the dial loop).
+const quicDialBackoffStart = 100 * time.Millisecond
 
 // dialUDPFunc dials a connected UDP socket; it exists so tests can hand
 // out sockets on chosen local ports. Production passes net.DialUDP.
@@ -377,7 +429,7 @@ func DialQUIC(ctx context.Context, raddr *net.UDPAddr, tracker *BanTracker) (*ne
 
 func dialQUIC(ctx context.Context, raddr *net.UDPAddr, tracker *BanTracker, dial dialUDPFunc) (*net.UDPConn, error) {
 	remote := raddr.String()
-	backoff := 100 * time.Millisecond
+	backoff := quicDialBackoffStart
 	for attempt := 0; ; attempt++ {
 		conn, err := dial(ctx, "udp", nil, raddr)
 		if err != nil {

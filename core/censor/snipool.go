@@ -22,6 +22,56 @@ type SNIPool struct {
 	snis  []string        // rotation order, normalized
 	bad   map[string]bool // burned members
 	index int             // next candidate
+	// netEpoch is the network fingerprint the burned marks belong to:
+	// an SNI burned on one network is not burned on another.
+	netEpoch string
+}
+
+// Snapshot returns the pool's candidates in rotation order, so a
+// profile can persist the pool as data and rebuild it with
+// NewSNIPool. Burned marks are runtime state, not profile data, and
+// are not part of the snapshot.
+func (p *SNIPool) Snapshot() []string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return append([]string(nil), p.snis...)
+}
+
+// BindNetwork attaches the pool to a network fingerprint. When it
+// changes, burned marks belong to the old network's path and are
+// cleared (the candidates themselves are profile data and stay):
+// keeping them would strand the session on a healthy new network
+// with every dest marked dead. It reports whether marks were
+// cleared. An empty fingerprint never invalidates; the first
+// non-empty bind only records the epoch.
+func (p *SNIPool) BindNetwork(fingerprint string) bool {
+	if fingerprint == "" {
+		return false
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.netEpoch == "" {
+		p.netEpoch = fingerprint
+		return false
+	}
+	if p.netEpoch == fingerprint {
+		return false
+	}
+	p.netEpoch = fingerprint
+	p.bad = map[string]bool{}
+	p.index = 0
+	return true
+}
+
+// BurnAndRotate is the pool's reaction to a freeze/ban event naming
+// sni: the member is burned and the next live member is returned
+// ("" when the pool is exhausted — then the session must fail over
+// to another server, not cycle). It is the one-call form of the
+// MarkBad+Rotate pair the reaction chain uses, so no caller can
+// burn without rotating or rotate without burning.
+func (p *SNIPool) BurnAndRotate(sni string) string {
+	p.MarkBad(sni)
+	return p.Rotate()
 }
 
 // NewSNIPool builds a pool from candidate dest names. Empty names and

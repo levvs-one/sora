@@ -217,6 +217,48 @@ type FreezeDetector struct {
 	mu       sync.Mutex
 	samples  map[string][]FreezeSample
 	lastFire map[string]time.Time
+	// netEpoch is the network fingerprint the samples belong to (see
+	// BindNetwork). Samples measured on a dead network are evidence
+	// about a path that no longer exists.
+	netEpoch string
+}
+
+// BindNetwork attaches the detector to a network fingerprint (the
+// caller computes it, e.g. session.NetworkFingerprint: interfaces,
+// gateway, DNS — the shape is the caller's data, this type only
+// compares it). When the fingerprint changes, every accumulated
+// sample and cooldown belongs to the old network and is dropped: a
+// freeze verdict must never be carried across a network move, or the
+// client would rotate fingerprints and burn SNIs on a healthy new
+// path for a freeze that died with the old one. It reports whether
+// state was dropped. An empty fingerprint is "unknown" and never
+// invalidates; the first non-empty bind only records the epoch (the
+// samples so far were measured on the network being named).
+func (d *FreezeDetector) BindNetwork(fingerprint string) bool {
+	if fingerprint == "" {
+		return false
+	}
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.netEpoch == "" {
+		d.netEpoch = fingerprint
+		return false
+	}
+	if d.netEpoch == fingerprint {
+		return false
+	}
+	d.netEpoch = fingerprint
+	d.samples = nil
+	d.lastFire = nil
+	return true
+}
+
+// NetworkEpoch returns the fingerprint the current samples belong
+// to, or "" when none was bound.
+func (d *FreezeDetector) NetworkEpoch() string {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return d.netEpoch
 }
 
 func (d *FreezeDetector) now() time.Time {

@@ -127,9 +127,39 @@ type freezePolicyTrack struct {
 type FreezePolicy struct {
 	det *probe.FreezeDetector
 
-	mu     sync.Mutex
-	tracks map[string]*freezePolicyTrack
-	now    func() time.Time
+	mu       sync.Mutex
+	tracks   map[string]*freezePolicyTrack
+	now      func() time.Time
+	netEpoch string
+}
+
+// BindNetwork attaches the policy to a network fingerprint and
+// forwards the bind to the shared recognizer. On a network change,
+// the policy's backoff tracks belong to the old network's freeze —
+// holding a session in a 120 s quiet period for a freeze that died
+// with that network would be a self-inflicted outage — so they are
+// dropped together with the recognizer's samples. It reports whether
+// any state was dropped. An empty fingerprint never invalidates.
+func (p *FreezePolicy) BindNetwork(fingerprint string) bool {
+	if fingerprint == "" {
+		return false
+	}
+	changed := false
+	if p.det != nil {
+		changed = p.det.BindNetwork(fingerprint)
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.netEpoch == "" {
+		p.netEpoch = fingerprint
+		return changed
+	}
+	if p.netEpoch == fingerprint {
+		return changed
+	}
+	p.netEpoch = fingerprint
+	p.tracks = map[string]*freezePolicyTrack{}
+	return true
 }
 
 // NewFreezePolicy returns a policy reading verdicts from det, the shared
