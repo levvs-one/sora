@@ -1128,14 +1128,17 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 	ctx, cancel := context.WithCancel(stream.Context())
 	defer cancel()
 	id := requestID(req.GetRequestId())
-	total := len(req.GetEndpoints()) + len(req.GetOutbounds())
+	endpoints := req.GetEndpoints()
+	outbounds := req.GetOutbounds()
+	total := len(endpoints) + len(outbounds)
 	if total == 0 {
 		return errs.Newf(errs.CodeInvalidArgument, errs.KeyProbeNoEndpoints,
 			"control: the probe request carries no endpoints")
 	}
 	if total > MaxProbeEndpoints {
 		return errs.Newf(errs.CodeResourceExhausted, errs.KeyProbeTooMany,
-			"control: the probe request carries %d servers, the limit is %d", total, MaxProbeEndpoints)
+			"control: the probe request carries %d servers, the limit is %d; split it into chunks of at most %d",
+			total, MaxProbeEndpoints, ProbeChunkSize)
 	}
 
 	results := make(chan *corev1.ProbeResult, total)
@@ -1163,13 +1166,26 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		return nil
 	}
 
-	if err := connect(req.GetEndpoints(), nil); err != nil {
-		return transportStatus(err)
-	}
-	if len(req.GetOutbounds()) > 0 {
-		if err := s.measureOutbounds(ctx, req, id, results, &wg, connect); err != nil {
-			return transportStatus(err)
+	// note remembers the first chunk failure; the remaining chunks still
+	// run so one bad piece does not sink the whole probe.
+	var firstErr error
+	note := func(err error) {
+		if err != nil && firstErr == nil {
+			firstErr = err
 		}
+	}
+	opts := req.GetOptions()
+	for _, chunk := range chunkServers(endpoints, ProbeChunkSize) {
+		if ctx.Err() != nil {
+			break
+		}
+		note(connect(chunk, nil))
+	}
+	for _, chunk := range chunkServers(outbounds, ProbeChunkSize) {
+		if ctx.Err() != nil {
+			break
+		}
+		note(s.measureOutbounds(ctx, opts, chunk, id, results, &wg, connect))
 	}
 	go func() {
 		wg.Wait()
@@ -1183,7 +1199,27 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 			return err
 		}
 	}
+	if firstErr != nil {
+		return transportStatus(firstErr)
+	}
 	return nil
+}
+
+// chunkServers splits xs into consecutive pieces of at most size. Empty
+// input yields no pieces, so empty chunks never reach the pipeline.
+func chunkServers[T any](xs []T, size int) [][]T {
+	if size <= 0 || len(xs) == 0 {
+		return nil
+	}
+	chunks := make([][]T, 0, (len(xs)+size-1)/size)
+	for i := 0; i < len(xs); i += size {
+		end := i + size
+		if end > len(xs) {
+			end = len(xs)
+		}
+		chunks = append(chunks, xs[i:end])
+	}
+	return chunks
 }
 
 // Probe methods as the results name them.
@@ -1192,12 +1228,11 @@ const (
 	probeConnect = "connect"
 )
 
-// measureOutbounds resolves the outbounds of a probe request and measures them
-// through engines, falling back to a connection check where the options allow.
-func (s *Server) measureOutbounds(ctx context.Context, req *corev1.ProbeServersRequest, id string,
+// measureOutbounds resolves one chunk of outbounds of a probe request and
+// measures them through engines, falling back to a connection check where
+// the options allow.
+func (s *Server) measureOutbounds(ctx context.Context, opts *corev1.ProbeOptions, specs []*corev1.OutboundSpec, id string,
 	results chan<- *corev1.ProbeResult, wg *sync.WaitGroup, connect func([]*corev1.Endpoint, []string) error) error {
-	opts := req.GetOptions()
-	specs := req.GetOutbounds()
 	if opts.GetMethod() == corev1.ProbeMethod_PROBE_METHOD_CONNECT || s.measurer == nil {
 		if opts.GetMethod() == corev1.ProbeMethod_PROBE_METHOD_ENGINE {
 			return errs.Newf(errs.CodeUnsupported, errs.KeyProbeInvalidEndpoint,

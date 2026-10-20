@@ -1703,6 +1703,13 @@ class Sora extends ChangeNotifier {
   /// hundreds of times (audit M20).
   static const _probeNotifyInterval = Duration(milliseconds: 300);
 
+  /// Maximum servers in one probe request. Mirrors the core's ProbeChunkSize
+  /// (core/control/plan.go): the core processes probes in chunks of this
+  /// size, so every chunk stays far inside the per-request limit, keeps the
+  /// request message small and the stream short and cancellable. Keep in
+  /// sync with the core.
+  static const _probeChunkSize = 128;
+
   Future<void> probe({String? subscriptionId}) async {
     final link = _link;
     final all = subscriptionId == null ? servers : _subscriptions[subscriptionId]?.outbounds.toList() ?? [];
@@ -1710,37 +1717,52 @@ class Sora extends ChangeNotifier {
     probing = true;
     probingSubscription = subscriptionId;
     recovered('probe');
+    notifyListeners();
+    // The first chunk failure is reported once below; every chunk's results
+    // are kept independently, so one bad chunk never sinks the whole probe.
+    Object? firstError;
     try {
-      final call = _probeCall = link.stub.probeServers(
-        ProbeServersRequest(
-          apiVersion: apiVersion,
-          outbounds: all,
-          options: ProbeOptions(
-            method: switch (settings.probeMethod) {
-              'engine' => ProbeMethod.PROBE_METHOD_ENGINE,
-              'connect' => ProbeMethod.PROBE_METHOD_CONNECT,
-              _ => ProbeMethod.PROBE_METHOD_UNSPECIFIED,
-            },
-            url: settings.probeUrl,
-            timeoutMs: settings.probeTimeout,
-          ),
-        ),
-      );
-      notifyListeners();
       var lastNotify = DateTime.now();
-      await for (final r in call) {
+      for (var i = 0; i < all.length; i += _probeChunkSize) {
         if (_disposed || link != _link || busy || (phase != Phase.off && phase != Phase.connected)) break;
-        latency[r.serverId] = r.reachable ? r.latencyMs : null;
-        _recordProbe(r.serverId, r.reachable);
-        final now = DateTime.now();
-        if (now.difference(lastNotify) >= _probeNotifyInterval) {
-          lastNotify = now;
-          notifyListeners();
+        final chunk = all.sublist(i, min(i + _probeChunkSize, all.length));
+        try {
+          final call = _probeCall = link.stub.probeServers(
+            ProbeServersRequest(
+              apiVersion: apiVersion,
+              outbounds: chunk,
+              options: ProbeOptions(
+                method: switch (settings.probeMethod) {
+                  'engine' => ProbeMethod.PROBE_METHOD_ENGINE,
+                  'connect' => ProbeMethod.PROBE_METHOD_CONNECT,
+                  _ => ProbeMethod.PROBE_METHOD_UNSPECIFIED,
+                },
+                url: settings.probeUrl,
+                timeoutMs: settings.probeTimeout,
+              ),
+            ),
+          );
+          await for (final r in call) {
+            if (_disposed || link != _link || busy || (phase != Phase.off && phase != Phase.connected)) break;
+            latency[r.serverId] = r.reachable ? r.latencyMs : null;
+            _recordProbe(r.serverId, r.reachable);
+            final now = DateTime.now();
+            if (now.difference(lastNotify) >= _probeNotifyInterval) {
+              lastNotify = now;
+              notifyListeners();
+            }
+          }
+        } catch (error) {
+          // A cancelled chunk is a user-initiated stop (connect, disconnect,
+          // dispose): end the probe quietly instead of failing it.
+          if (error is GrpcError && error.code == StatusCode.cancelled) break;
+          // A failed chunk leaves its servers unknown; the rest are still
+          // measured.
+          firstError ??= error;
         }
       }
-    } catch (error) {
-      if (!_disposed && link == _link && !(error is GrpcError && error.code == StatusCode.cancelled)) {
-        reportFailure(error, source: 'probe');
+      if (firstError != null && !_disposed && link == _link) {
+        reportFailure(firstError, source: 'probe');
       }
       // Keep partial results; unmeasured servers remain unknown instead of
       // being marked unreachable.

@@ -33,10 +33,22 @@ const (
 	MaxPlanBytes = 4 << 20
 	// MaxImportBytes is the largest payload ParseImport accepts.
 	MaxImportBytes = 16 << 20
+	// ProbeChunkSize is the probe pipeline's chunk unit: ProbeServers splits
+	// every request into chunks of at most this many servers and streams
+	// each chunk's results as they complete, so probing thousands of
+	// servers degrades into a longer stream instead of dying on a
+	// per-request limit. Clients should likewise split large probes into
+	// chunks of at most ProbeChunkSize: with 2x margin under the historic
+	// 256 cap every chunk stays a small request message with a short,
+	// cancellable stream.
+	ProbeChunkSize = 128
 	// MaxProbeEndpoints is the largest number of endpoints one probe
-	// request
-	// may carry.
-	MaxProbeEndpoints = 256
+	// request may carry. It is a fail-fast safety bound only: below it the
+	// server chunks the work itself (see ProbeChunkSize), above it the
+	// request is rejected before anything is allocated. 4096 typical
+	// outbound specs still fit under the 5 MiB gRPC receive limit
+	// (MaxRecvMsgBytes).
+	MaxProbeEndpoints = 4096
 )
 
 // resolver resolves plan references to credentials for the engine. Resolved
