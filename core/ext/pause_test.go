@@ -212,6 +212,54 @@ func TestStandaloneFetcherNeverPauses(t *testing.T) {
 	}
 }
 
+func TestWaitWhilePausedRePauseBeforeWakeup(t *testing.T) {
+	// A tick that fires during pause #1 must not start a run when a
+	// resume→re-pause toggle lands before the waiter is scheduled: the
+	// wakeup on the closed first channel must be re-checked against the
+	// current pause state.
+	s := NewScheduler(nil)
+	// Warmup: shake off cold-start goroutine scheduling latency so the
+	// settle sleep below reliably means "the waiter is blocked".
+	s.SetKillSwitch(true)
+	warmCtx, warmCancel := context.WithCancel(context.Background())
+	warmDone := make(chan bool, 1)
+	go func() { warmDone <- s.waitWhilePaused(warmCtx) }()
+	time.Sleep(200 * time.Millisecond)
+	s.SetKillSwitch(false)
+	select {
+	case <-warmDone:
+	case <-time.After(2 * time.Second):
+		t.Fatal("warmup waiter did not wake on resume")
+	}
+	warmCancel()
+
+	s.SetKillSwitch(true)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan bool, 1)
+	go func() { done <- s.waitWhilePaused(ctx) }()
+	time.Sleep(200 * time.Millisecond) // let the waiter block on the pause channel
+	s.SetKillSwitch(false)
+	s.SetKillSwitch(true) // re-pause before the waiter wakes
+	select {
+	case ok := <-done:
+		t.Fatalf("waitWhilePaused returned %v during the second pause; a tick must not start a run while the kill switch is active", ok)
+	case <-time.After(200 * time.Millisecond):
+	}
+	s.SetKillSwitch(false)
+	select {
+	case ok := <-done:
+		if !ok {
+			t.Fatal("waitWhilePaused must return true after the final resume")
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("waitWhilePaused did not wake on the final resume")
+	}
+	if s.Paused() {
+		t.Fatal("Paused must be false after the final resume")
+	}
+}
+
 func TestKillSwitchToggleRace(t *testing.T) {
 	s := NewScheduler(nil)
 	m, x := bgPair(t, 60)

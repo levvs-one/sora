@@ -386,18 +386,26 @@ func (s *Scheduler) Paused() bool {
 // waitWhilePaused blocks while the kill-switch pause is active. It returns
 // false when ctx ends first (unregistered, replaced, or scheduler
 // stopped), in which case the caller must exit its loop.
+//
+// The pause predicate is re-checked after every wakeup: a tick that read
+// the pause channel just before a resume→re-pause toggle must not trust
+// the stale wakeup, or it would start a run while the kill switch is
+// active again.
 func (s *Scheduler) waitWhilePaused(ctx context.Context) bool {
-	s.pauseMu.Lock()
-	ch := s.pauseCh
-	s.pauseMu.Unlock()
-	if ch == nil {
-		return true
-	}
-	select {
-	case <-ctx.Done():
-		return false
-	case <-ch: // resumed: the channel is closed by SetKillSwitch(false)
-		return true
+	for {
+		s.pauseMu.Lock()
+		ch := s.pauseCh
+		s.pauseMu.Unlock()
+		if ch == nil {
+			return true
+		}
+		select {
+		case <-ctx.Done():
+			return false
+		case <-ch:
+			// Resumed — but a new pause may have started already;
+			// loop back and re-check instead of running.
+		}
 	}
 }
 
