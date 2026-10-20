@@ -458,9 +458,32 @@ func (e *Engine) mask(line string) string {
 	return engine.NewRedactor().String(line)
 }
 
+// bypassLineLevel classifies one tpws/nfqws output line. The
+// supervisor path parses engine levels through the driver's
+// LogParser, but the bypass processes have no parser and every line
+// used to land at LevelInfo — including their errors, which log
+// queries filtering on level>=warning then silently missed
+// (CENSOR-LEAK, log-level agreement). A leading level word wins;
+// otherwise an error/fatal keyword anywhere in the line promotes it,
+// and everything else stays Info.
+func bypassLineLevel(line string) logs.Level {
+	first, _, _ := strings.Cut(line, " ")
+	if level, ok := logs.ParseLevel(strings.Trim(first, "[]:")); ok {
+		return level
+	}
+	lower := strings.ToLower(line)
+	if strings.Contains(lower, "error") || strings.Contains(lower, "fatal") {
+		return logs.LevelError
+	}
+	if strings.Contains(lower, "warn") {
+		return logs.LevelWarning
+	}
+	return logs.LevelInfo
+}
+
 func (e *Engine) logLine(line string) {
 	if e.logs != nil {
-		e.logs.Write(time.Time{}, logs.LevelInfo, Source, e.mask(line))
+		e.logs.Write(time.Time{}, bypassLineLevel(line), Source, e.mask(line))
 	}
 }
 

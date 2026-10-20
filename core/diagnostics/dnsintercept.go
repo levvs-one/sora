@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
 	"math/rand"
 	"net"
 	"strings"
@@ -307,20 +308,36 @@ func queryDNSWire(ctx context.Context, network, server, host string) (DNSAnswer,
 	if _, err := conn.Write(msg); err != nil {
 		return DNSAnswer{}, err
 	}
-	buf := make([]byte, 4096)
+	// Message sizes follow RFC 1035, not a magic buffer: over UDP a
+	// message is capped at 512 bytes (section 2.3.4; the query
+	// advertises no EDNS, so no larger answer is legal), and over TCP
+	// the two-byte length prefix (section 4.2.2) states the exact
+	// message size, which is read in full — the old single 4096-byte
+	// Read silently truncated longer TCP answers mid-record and
+	// could split the prefix across reads (CENSOR-LEAK, sizes by
+	// spec).
+	if network == "tcp" {
+		var prefix [2]byte
+		if _, err := io.ReadFull(conn, prefix[:]); err != nil {
+			return DNSAnswer{}, errors.New("diagnostics: truncated tcp dns response")
+		}
+		raw := make([]byte, int(binary.BigEndian.Uint16(prefix[:])))
+		if _, err := io.ReadFull(conn, raw); err != nil {
+			return DNSAnswer{}, errors.New("diagnostics: truncated tcp dns response")
+		}
+		return decodeDNSAnswer(raw)
+	}
+	buf := make([]byte, dnsMaxUDPMessage)
 	n, err := conn.Read(buf)
 	if err != nil {
 		return DNSAnswer{}, err
 	}
-	raw := buf[:n]
-	if network == "tcp" {
-		if n < 2 {
-			return DNSAnswer{}, errors.New("diagnostics: truncated tcp dns response")
-		}
-		raw = raw[2:]
-	}
-	return decodeDNSAnswer(raw)
+	return decodeDNSAnswer(buf[:n])
 }
+
+// dnsMaxUDPMessage is the RFC 1035 section 2.3.4 cap on a DNS message
+// carried over UDP without EDNS.
+const dnsMaxUDPMessage = 512
 
 // encodeDNSQuery builds a minimal recursive A-query.
 func encodeDNSQuery(host string) []byte {

@@ -50,3 +50,22 @@ func TestBypassLogLineIsRedacted(t *testing.T) {
 	}
 	_ = time.Time{}
 }
+
+// TestBypassLineLevelAgreement pins the level classification: a
+// bypass error line must not land at Info where level-filtered log
+// queries would miss it.
+func TestBypassLineLevelAgreement(t *testing.T) {
+	cases := map[string]logs.Level{
+		"tpws started, pid 123":              logs.LevelInfo,
+		"[ERROR] cannot bind socket":         logs.LevelError,
+		"error: queue 200 is busy":           logs.LevelError,
+		"warning: hostlist is empty":         logs.LevelWarning,
+		"nfqws: fatal: no such device":       logs.LevelError,
+		"connection to example closed early": logs.LevelInfo,
+	}
+	for line, want := range cases {
+		if got := bypassLineLevel(line); got != want {
+			t.Errorf("bypassLineLevel(%q) = %v, want %v", line, got, want)
+		}
+	}
+}

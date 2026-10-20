@@ -81,6 +81,21 @@ const (
 	OutcomeUnknown
 )
 
+// dnsMaxUDPMessage is the largest DNS message a plain UDP exchange
+// carries without EDNS: RFC 1035 section 2.3.4 caps UDP messages at
+// 512 bytes. The probes only need to know a resolver answered and to
+// read its address records, so one maximum-size buffer is the spec
+// bound, not a tuning guess. (Answers larger than this arrive
+// truncated with the TC bit; the header and first records the judges
+// read are unaffected.)
+const dnsMaxUDPMessage = 512
+
+// icmpProbeBuffer bounds one ICMP echo reply read. An echo reply to
+// the fixed "sora-leak" payload is a header plus 9 data bytes; the
+// buffer is the same RFC 1035-sized datagram bound the DNS probes
+// use, far above anything a conforming reply needs.
+const icmpProbeBuffer = 512
+
 // DefaultProbeTimeout bounds one network probe.
 const DefaultProbeTimeout = 4 * time.Second
 
@@ -468,7 +483,7 @@ func probeTunnelDNS(ctx context.Context, resolver, host string) ([]string, error
 	if _, err := conn.Write(dnsQuery(host)); err != nil {
 		return nil, err
 	}
-	raw := make([]byte, 512)
+	raw := make([]byte, dnsMaxUDPMessage)
 	n, err := conn.Read(raw)
 	if err != nil {
 		return nil, err
@@ -598,7 +613,7 @@ func probeDNSReply(ctx context.Context, target string) Outcome {
 	if _, err := conn.Write(dnsQuery(canaryHost)); err != nil {
 		return OutcomeBlocked
 	}
-	buf := make([]byte, 512)
+	buf := make([]byte, dnsMaxUDPMessage)
 	if _, err := conn.Read(buf); err != nil {
 		return OutcomeBlocked
 	}
@@ -655,7 +670,7 @@ func icmpAttempt(ctx context.Context, network string, dst *net.IPAddr) (Outcome,
 	if _, err := conn.WriteTo(req, dst); err != nil {
 		return OutcomeBlocked, true
 	}
-	reply := make([]byte, 512)
+	reply := make([]byte, icmpProbeBuffer)
 	for {
 		n, _, err := conn.ReadFrom(reply)
 		if err != nil {

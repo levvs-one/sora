@@ -198,3 +198,79 @@ func FuzzRedactorNoPanicAndIdempotent(f *testing.F) {
 		_ = NewRedactor("seed-value-1234").String(s)
 	})
 }
+
+// TestRedactorBoundaryVectors pins the editor's edges (owner's
+// "мелочи" criterion): seed lengths 0/1/3/4, pattern-length boundaries,
+// multiline values, and values carrying separators. The contract for
+// sub-4-byte seeds is documented, not accidental: Add ignores them
+// because masking 1-3 byte strings would destroy ordinary log text,
+// and the pattern ring is the backstop for their structured forms.
+func TestRedactorBoundaryVectors(t *testing.T) {
+	// Lengths 0 and 1 can never be seeds.
+	r := NewRedactor("", "x")
+	if out := r.String("x marks the spot"); out != "x marks the spot" {
+		t.Errorf("1-byte seed masked prose: %q", out)
+	}
+	// Length 3 is below the seed floor; length 4 is the first masked.
+	r = NewRedactor("abc", "abcd")
+	if out := r.String("abc abcd"); strings.Contains(out, "abcd") || !strings.Contains(out, "abc") {
+		t.Errorf("seed floor boundary wrong: %q (abc must survive, abcd must not)", out)
+	}
+	// A seed at the very start and very end of the text.
+	r = NewRedactor("edge-secret-1")
+	if out := r.String("edge-secret-1 middle edge-secret-1"); strings.Contains(out, "edge-secret-1") {
+		t.Errorf("seed at text edges leaked: %q", out)
+	}
+	// Bearer pattern length boundary: 11 token chars survive (prose
+	// guard), 12 are masked.
+	if out := maskPatterns("Bearer abcdefghijk"); out != "Bearer abcdefghijk" {
+		t.Errorf("11-char bearer value changed: %q", out)
+	}
+	if out := maskPatterns("Bearer abcdefghijkl"); !strings.Contains(out, "[masked]") {
+		t.Errorf("12-char bearer value not masked: %q", out)
+	}
+	// A secret carrying separators is masked as one seed everywhere,
+	// including inside a URL userinfo and a key pair.
+	r = NewRedactor("user:p@ss/word")
+	for _, in := range []string{
+		"dial user:p@ss/word failed",
+		"https://user:p@ss/word@host.example/x",
+		"password: user:p@ss/word",
+	} {
+		if out := r.String(in); strings.Contains(out, "p@ss") {
+			t.Errorf("separator-carrying seed leaked:\n in: %q\nout: %q", in, out)
+		}
+	}
+	// Multiline: a quoted credential phrase spanning lines is masked
+	// whole by the quoted alternation ([^"] crosses newlines only via
+	// the escaped-quote form, which excludes neither \n nor \r).
+	out := maskPatterns("token: \"first line\nsecond line\"")
+	if strings.Contains(out, "second line") {
+		t.Errorf("multiline quoted value leaked its tail: %q", out)
+	}
+	// A raw multiline seed matches only as a whole string; a log line
+	// split loses the second half — pinned as the known limit, with
+	// the first line still masked when it is itself a seed.
+	r = NewRedactor("multi\nline-secret")
+	if out := r.String("multi\nline-secret"); strings.Contains(out, "line-secret") {
+		t.Errorf("whole multiline seed leaked: %q", out)
+	}
+}
+
+// TestProfileExtractionDeterministic pins run-to-run stability of
+// the extracted lists: map iteration order must not leak into
+// Secrets()/Identifiers() (owner's determinism criterion).
+func TestProfileExtractionDeterministic(t *testing.T) {
+	profile := json.RawMessage(`{"z": {"password": "ZuluPassword1"}, "a": {"token": "AlphaToken1"},
+		"m": {"address": "mid.example", "id": "MidIDValue1"}, "b": {"serverName": "bravo.example"}}`)
+	o := Outbound{ID: "d1", Protocol: ProtocolXrayProfile, Profile: profile}
+	firstSecrets, firstIDs := o.Secrets(), o.Identifiers()
+	for i := 0; i < 32; i++ {
+		if got := o.Secrets(); strings.Join(got, "|") != strings.Join(firstSecrets, "|") {
+			t.Fatalf("Secrets() order unstable at run %d: %v vs %v", i, got, firstSecrets)
+		}
+		if got := o.Identifiers(); strings.Join(got, "|") != strings.Join(firstIDs, "|") {
+			t.Fatalf("Identifiers() order unstable at run %d: %v vs %v", i, got, firstIDs)
+		}
+	}
+}

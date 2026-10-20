@@ -119,5 +119,12 @@ func findServerNameExt(body []byte) (extLenOff, extOff, extLen int, err error) {
 		}
 		e += 4 + elen
 	}
-	return 0, 0, 0, errors.New("obfs: ClientHello has no server_name extension")
+	return 0, 0, 0, errNoServerName
 }
+
+// errNoServerName marks a well-formed ClientHello that simply carries
+// no server_name extension. It is distinct from a malformed hello:
+// callers on the write path may let a nameless hello through (there
+// is no SNI to leak or replace), while a hello they cannot parse
+// must fail closed.
+var errNoServerName = errors.New("obfs: ClientHello has no server_name extension")

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/json"
+	"sort"
 	"strings"
 )
 
@@ -57,7 +58,17 @@ func profileWalk(raw json.RawMessage, keys map[string]bool) []string {
 	walk = func(v any) {
 		switch x := v.(type) {
 		case map[string]any:
-			for k, value := range x {
+			// Keys are visited in sorted order: Go map iteration is
+			// randomized, and Secrets()/Identifiers() feed ordered
+			// redactor registration and tests — the same profile must
+			// yield the same lists on every run (determinism rule).
+			names := make([]string, 0, len(x))
+			for k := range x {
+				names = append(names, k)
+			}
+			sort.Strings(names)
+			for _, k := range names {
+				value := x[k]
 				if !keys[normalizeProfileKey(k)] {
 					walk(value)
 					continue

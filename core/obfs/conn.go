@@ -26,18 +26,34 @@ func (c *fragConn) Write(p []byte) (int, error) {
 	}
 	for _, rec := range recs {
 		if isClientHelloRecord(rec) && c.fakeSNI != "" {
-			if rewritten, err := RewriteClientHelloSNI(rec, c.fakeSNI); err == nil {
-				rec = rewritten
+			rewritten, err := RewriteClientHelloSNI(rec, c.fakeSNI)
+			if errors.Is(err, errNoServerName) {
+				// A well-formed hello with no SNI at all: there is
+				// nothing to leak and nothing to replace, so it goes
+				// out as-is (fragmented below if configured).
+				err = nil
+				rewritten = rec
 			}
-			// If the ClientHello cannot be rewritten we still send it
-			// (possibly fragmented): obfuscation must never break the
-			// write path.
+			if err != nil {
+				// Fail closed (CENSOR-LEAK): the profile asked for a
+				// fake SNI and this ClientHello could not be given
+				// one. Sending the original would put the real SNI on
+				// the wire in plaintext — the exact leak the wrapper
+				// exists to prevent — so the write fails instead.
+				// (The previous behaviour sent it anyway, "obfuscation
+				// must never break the write path": that made every
+				// rewrite error a silent de-obfuscation.)
+				return 0, errors.New("obfs: ClientHello could not be rewritten with the fake SNI; refusing to send the real SNI")
+			}
+			rec = rewritten
 		}
 		var frags [][]byte
 		if isClientHelloRecord(rec) && len(c.sizes) > 0 {
 			frags, err = SplitClientHello(rec, c.sizes)
 			if err != nil {
-				frags = [][]byte{rec}
+				// Same rule for fragmentation: a ClientHello the
+				// profile wants fragmented is never sent whole.
+				return 0, errors.New("obfs: ClientHello could not be fragmented; refusing to send it whole")
 			}
 		} else {
 			frags = [][]byte{rec}

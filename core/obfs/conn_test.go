@@ -221,3 +221,72 @@ func TestDialTLSErrors(t *testing.T) {
 		t.Error("expected error for unknown fingerprint")
 	}
 }
+
+// TestWrapConnFailsClosedOnRewriteError pins the CENSOR-LEAK
+// fail-closed rule: when a ClientHello cannot be given the profile's
+// fake SNI, Write must fail and NOTHING may reach the peer — the
+// previous behaviour sent the original hello, putting the real SNI
+// on the wire in plaintext on every rewrite error.
+func TestWrapConnFailsClosedOnRewriteError(t *testing.T) {
+	rec := testClientHelloRecord(t, "real.example", true)
+	client, server := net.Pipe()
+	defer client.Close()
+	defer server.Close()
+	// An invalid fake hostname makes RewriteClientHelloSNI fail.
+	wrapped := (&fragConn{Conn: client, fakeSNI: "not a hostname!"})
+	if _, err := wrapped.Write(rec); err == nil {
+		t.Fatal("Write succeeded with an unrewritable ClientHello; want fail-closed error")
+	}
+	// Nothing may have been written: a read with a deadline must
+	// time out, not return hello bytes.
+	_ = server.SetReadDeadline(time.Now().Add(200 * time.Millisecond))
+	buf := make([]byte, 1)
+	if _, err := server.Read(buf); err == nil {
+		t.Fatal("bytes reached the peer despite the rewrite failure")
+	}
+}
+
+// TestWrapConnFailsClosedOnSplitError pins the same rule for
+// fragmentation: a hello the profile wants fragmented is never sent
+// whole when the splitter rejects the sizes.
+func TestWrapConnFailsClosedOnSplitError(t *testing.T) {
+	rec := testClientHelloRecord(t, "real.example", true)
+	client, server := net.Pipe()
+	defer client.Close()
+	defer server.Close()
+	wrapped := (&fragConn{Conn: client, sizes: []int{-5}})
+	if _, err := wrapped.Write(rec); err == nil {
+		t.Fatal("Write succeeded with unsplittable sizes; want fail-closed error")
+	}
+	_ = server.SetReadDeadline(time.Now().Add(200 * time.Millisecond))
+	buf := make([]byte, 1)
+	if _, err := server.Read(buf); err == nil {
+		t.Fatal("bytes reached the peer despite the split failure")
+	}
+}
+
+// TestWrapConnNoSNIPassesThrough pins the one deliberate exception:
+// a well-formed ClientHello with no server_name extension carries no
+// SNI to leak, so it is sent (fragmented if configured), not failed.
+func TestWrapConnNoSNIPassesThrough(t *testing.T) {
+	rec := testClientHelloRecordNoSNI(t)
+	client, server := net.Pipe()
+	defer client.Close()
+	defer server.Close()
+	wrapped := (&fragConn{Conn: client, fakeSNI: "decoy.test"})
+	done := make(chan error, 1)
+	go func() {
+		_, err := wrapped.Write(rec)
+		done <- err
+	}()
+	got := make([]byte, len(rec))
+	if _, err := io.ReadFull(server, got); err != nil {
+		t.Fatalf("read: %v", err)
+	}
+	if string(got) != string(rec) {
+		t.Fatal("no-SNI hello was modified")
+	}
+	if err := <-done; err != nil {
+		t.Fatalf("Write: %v", err)
+	}
+}
