@@ -92,13 +92,26 @@ func main() {
 	flag.Parse()
 	log.SetPrefix("sora-sync: ")
 
-	// One instance per data directory: if a live daemon already serves
-	// this dir, refuse to start a second one that would steal its
-	// http_addr file. The app uses the same check to reuse the running
-	// daemon instead of spawning another.
-	if addr := liveInstance(*dataDir); addr != "" {
-		log.Fatalf("another sora-sync already serves %s at %s; not starting a second instance", *dataDir, addr)
+	// One instance per data directory. The lock is taken BEFORE probing for
+	// a live daemon: probing first and locking later would let two daemons
+	// started at once both conclude "no live instance" and race to steal
+	// each other's http_addr file (the old TOCTOU). The OS lock is held
+	// for the process lifetime — a second daemon blocks on LOCK_NB here,
+	// and process death releases it, so no stale lock can wedge restarts.
+	if err := os.MkdirAll(*dataDir, 0o700); err != nil {
+		log.Fatalf("data dir: %v", err)
 	}
+	lockFile, err := takeDataDirLock(*dataDir)
+	if err != nil {
+		// The lock is held: either a live daemon (the normal case) or a
+		// process that died mid-startup. Probe to tell them apart so the
+		// error names the actual situation.
+		if addr := liveInstance(*dataDir); addr != "" {
+			log.Fatalf("another sora-sync already serves %s at %s; not starting a second instance", *dataDir, addr)
+		}
+		log.Fatalf("cannot lock data dir %s: %v", *dataDir, err)
+	}
+	defer lockFile.Close() // held until process exit
 
 	d, err := api.New(*dataDir)
 	if err != nil {
