@@ -34,12 +34,20 @@ final _catalogSemverPattern =
     RegExp(r'^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)([-+][0-9A-Za-z.-]+)?$');
 
 final _rfc3339Pattern = RegExp(
-    r'^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|[+-]\d{2}:\d{2})$');
+    r'^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|[+-](\d{2}):(\d{2}))$');
 
 /// Parses a timestamp with Go's `time.Parse(time.RFC3339)` strictness:
 /// Dart's DateTime.tryParse accepts date-only and space-separated
 /// forms and silently rolls overflow days into the next month, all of
 /// which the Go catalog parser rejects. Throws [CatalogError].
+///
+/// The UTC offset needs its own range check: tryParse normalizes any
+/// offset instead of rejecting it (it accepted +99:99). Probing Go's
+/// parser pins its real boundary — offset hour up to 24 and offset
+/// minute up to 60 are ACCEPTED (+24:00, +00:60, +24:60), hour 25+ and
+/// minute 61+ are rejected ("time zone offset hour/minute out of
+/// range"). This mirrors the probed Go boundary exactly: a textbook
+/// 23/59 limit would falsely reject catalogs the core accepts.
 DateTime parseCatalogTimestamp(String s, String what) {
   final m = _rfc3339Pattern.firstMatch(s);
   if (m == null) throw CatalogError('$what is not RFC3339: "$s"');
@@ -47,6 +55,12 @@ DateTime parseCatalogTimestamp(String s, String what) {
   final hour = int.parse(m[4]!), minute = int.parse(m[5]!), second = int.parse(m[6]!);
   if (month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59) {
     throw CatalogError('$what is not RFC3339: "$s"');
+  }
+  if (m[8] != 'Z') {
+    final offsetHour = int.parse(m[9]!), offsetMinute = int.parse(m[10]!);
+    if (offsetHour > 24 || offsetMinute > 60) {
+      throw CatalogError('$what is not RFC3339: "$s"');
+    }
   }
   // Day must exist in the month (Go rejects Feb 31; DateTime.parse
   // would roll it over).

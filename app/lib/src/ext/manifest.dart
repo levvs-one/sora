@@ -36,10 +36,17 @@ class ExtAuthor {
     for (final key in json.keys) {
       if (!known.contains(key)) throw ManifestError('unknown author field "$key"');
     }
+    // No trimming here: Go keeps the raw JSON strings and Validate
+    // measures their byte length raw (len()), judging only emptiness
+    // on the trimmed value. Trimming in fromJson let raw values over
+    // the limit through (79 chars + 2 spaces = 81 bytes passed the
+    // 80-byte author-name limit). The public key is the same: Go's
+    // ParsePublicKey does its own TrimSpace, mirrored by
+    // parsePublicKey in verifier.dart — the stored value stays raw.
     return ExtAuthor(
-      name: (json['name'] as String? ?? '').trim(),
-      identity: (json['identity'] as String? ?? '').trim(),
-      publicKey: (json['public_key'] as String? ?? '').trim(),
+      name: json['name'] as String? ?? '',
+      identity: json['identity'] as String? ?? '',
+      publicKey: json['public_key'] as String? ?? '',
     );
   }
 
@@ -200,7 +207,9 @@ class ExtManifest {
     if (author.identity.trim().isEmpty || _utf8Len(author.identity) > 160) {
       throw ManifestError('author identity must be 1..160 characters');
     }
-    if (author.publicKey.isEmpty) throw ManifestError('author public key is required');
+    if (author.publicKey.trim().isEmpty) {
+      throw ManifestError('author public key is required');
+    }
     // Go additionally requires the key to be a real minisign key
     // (ParsePublicKey: 42-byte "Ed" envelope); a garbage string passed
     // here and only failed later, at signature verification, with the
@@ -223,7 +232,11 @@ class ExtManifest {
     }
     final seenHosts = <String>{};
     for (final h in networkHosts) {
-      if (!_networkHostPattern.hasMatch(h) || _isIpLike(h)) {
+      // Go's normalizeHostPattern runs its label and IP-literal checks
+      // on the name with "*." already stripped; checking the prefixed
+      // string here would let "*.1.2.3.4" slip past _isIpLike.
+      final bare = h.startsWith('*.') ? h.substring(2) : h;
+      if (!_networkHostPattern.hasMatch(h) || _isIpLike(bare)) {
         throw ManifestError('bad network host "$h"');
       }
       if (!seenHosts.add(h)) {
@@ -398,7 +411,14 @@ List<String> _parseNetworkHosts(dynamic raw) {
     // names only, and matching is case-insensitive.
     if (e is! String) throw ManifestError('network_hosts entries must be strings');
     final h = e.trim().toLowerCase();
-    if (h.isEmpty || _utf8Len(h) > 253) throw ManifestError('bad network host "$h"');
+    // Mirrors core/ext's normalizeHostPattern: a leading "*." is
+    // stripped BEFORE the 253-byte limit is measured, so a 252/253-byte
+    // name behind a wildcard is valid even though the whole string is
+    // 254/255 bytes. Measuring the full string falsely rejected those.
+    final bare = h.startsWith('*.') ? h.substring(2) : h;
+    if (bare.isEmpty || _utf8Len(bare) > 253) {
+      throw ManifestError('bad network host "$h"');
+    }
     out.add(h);
   }
   return out;
