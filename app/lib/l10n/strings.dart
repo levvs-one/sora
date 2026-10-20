@@ -399,6 +399,12 @@ abstract class S {
   /// **'Здесь пусто'**
   String get logsEmpty;
 
+  /// No description provided for @connEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет соединений'**
+  String get connEmpty;
+
   /// No description provided for @appVersion.
   ///
   /// In ru, this message translates to:

@@ -197,6 +197,9 @@ class SRu extends S {
   String get logsEmpty => 'Здесь пусто';
 
   @override
+  String get connEmpty => 'Нет соединений';
+
+  @override
   String appVersion(String version) {
     return 'Версия $version';
   }
@@ -1211,7 +1214,7 @@ class SRu extends S {
   @override
   String get extPermBackground => 'Выполнять фоновые задачи';
   @override
-  String get extPermBackgroundDetail => 'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения.';
+  String get extPermBackgroundDetail => 'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения. Фоновое выполнение пока недоступно в этой версии Sora.';
 
   @override
   String get extCapBackground => 'Работает в фоновом режиме';
@@ -1242,7 +1245,7 @@ class SRu extends S {
   @override
   String get extSortRelevance => 'Сначала подходящие';
   @override
-  String get extPermNetworkDetail => 'Загружает данные из интернета. Разрешены только хосты из списка ниже — всё остальное заблокировано.';
+  String get extPermNetworkDetail => 'Загружает данные из интернета. Разрешены только хосты из списка ниже — всё остальное заблокировано. Сетевые запросы пока недоступны в этой версии Sora.';
   @override
   String get extBgTitle => 'Фоновая задача';
   @override

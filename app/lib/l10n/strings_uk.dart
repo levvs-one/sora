@@ -197,6 +197,9 @@ class SUk extends S {
   String get logsEmpty => 'Тут нічого немає';
 
   @override
+  String get connEmpty => 'No connections';
+
+  @override
   String appVersion(String version) {
     return 'Версія $version';
   }
@@ -1209,7 +1212,7 @@ Find one in the catalog or install from a file.';
   @override
   String get extPermBackground => 'Run background tasks';
   @override
-  String get extPermBackgroundDetail => 'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+  String get extPermBackgroundDetail => 'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
 
   @override
   String get extCapBackground => 'Runs in the background';
@@ -1240,7 +1243,7 @@ Find one in the catalog or install from a file.';
   @override
   String get extSortRelevance => 'Relevance';
   @override
-  String get extPermNetworkDetail => 'Fetches data from the internet. Only the hosts below are allowed — everything else is blocked.';
+  String get extPermNetworkDetail => 'Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.';
   @override
   String get extBgTitle => 'Background task';
   @override
