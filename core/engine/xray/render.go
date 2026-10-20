@@ -332,7 +332,17 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 		s["httpupgradeSettings"] = hu
 	case "xhttp":
 		s["network"] = "xhttp"
-		xs := obj{"mode": orDefault(t.Mode, "auto")}.set("path", t.Path).set("host", t.Host)
+		xs := obj{"mode": orDefault(t.Mode, engine.DefaultXHTTPMode)}.set("path", t.Path).set("host", t.Host)
+		// XHTTP reuse tuning and padding (CENSOR-P1): Xray spells
+		// both natively (xmux, xPaddingBytes — probed with
+		// `xray run -test` on the pin), but this renderer emitted
+		// neither, so the tuning silently dropped on the engine
+		// that invented the transport while the catalog gate routed
+		// tuned plans away from it.
+		if xmux := xhttpXmux(t); len(xmux) > 0 {
+			xs["xmux"] = xmux
+		}
+		xs.set("xPaddingBytes", t.XPaddingBytes)
 		if len(t.Headers) > 0 {
 			// PASS3 deep A4: Xray was the only renderer dropping
 			// the transport headers (sing-box and mihomo emit
@@ -467,6 +477,23 @@ func checkStreamCompat(o engine.Outbound) error {
 	return nil
 }
 
+// xhttpXmux renders the plan's XHTTP reuse tuning in Xray's xmux
+// spelling. Zero fields omit the key entirely (set drops them), so
+// an untuned plan renders no xmux block and keeps the engine
+// default. The download leg reuses the same block: the plan carries
+// one tuning set for the outbound, and mihomo's renderer likewise
+// mirrors reuse-settings onto its download-settings leg. Padding is
+// NOT mirrored: the plan's single range describes the padding of the
+// uplink requests the server checks, and mihomo's download-settings
+// has no padding field either (CENSOR-P1).
+func xhttpXmux(t engine.Transport) obj {
+	return obj{}.
+		set("maxConcurrency", t.XmuxMaxConcurrency).
+		set("maxConnections", t.XmuxMaxConnections).
+		set("cMaxReuseTimes", t.XmuxMaxReuseTimes).
+		set("hMaxRequestTimes", t.XmuxMaxRequestTimes)
+}
+
 // xhttpDownloadSettings renders the XHTTP downlink detour: the downlink
 // rides a separate server, so uplink and downlink can use different
 // domains. Xray dials it as an independent stream, so it carries its own
@@ -486,8 +513,13 @@ func (r *renderer) xhttpDownloadSettings(o engine.Outbound) (obj, error) {
 	if err != nil {
 		return nil, err
 	}
+	dxs := obj{}.set("path", t.Path)
+	if xmux := xhttpXmux(t); len(xmux) > 0 {
+		dxs["xmux"] = xmux
+	}
 	ds := obj{"address": t.DownloadAddress, "port": int(t.DownloadPort), "network": "xhttp"}.
-		set("xhttpSettings", obj{}.set("path", t.Path))
+		set("xhttpSettings", dxs)
+
 	switch {
 	case o.TLS.Reality:
 		ds["security"] = "reality"

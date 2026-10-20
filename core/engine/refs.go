@@ -71,16 +71,18 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 				out[FeatureXHTTPDownloadSplit] = true
 			}
 			if o.Transport.XmuxMaxConcurrency > 0 || o.Transport.XmuxMaxConnections > 0 ||
-				o.Transport.XmuxMaxReuseTimes > 0 || o.Transport.XmuxMaxRequestTimes > 0 ||
-				o.Transport.XPaddingBytes != "" {
-				// XPaddingBytes rides the same gate as the xmux
-				// fields (S2 seams audit): only the mihomo renderer
-				// emits x-padding-bytes, while the Xray and sing-box
-				// renderers drop it at render time. A padding-only
-				// plan that required nothing would route to those
-				// engines and silently lose its padding — the exact
-				// silent loss the xmux gate exists to prevent.
+				o.Transport.XmuxMaxReuseTimes > 0 || o.Transport.XmuxMaxRequestTimes > 0 {
 				out[FeatureXHTTPXmux] = true
+			}
+			if o.Transport.XPaddingBytes != "" {
+				// Padding has its own gate since CENSOR-P1: it
+				// rode the xmux gate while only mihomo rendered
+				// it (S2 seams audit), but the fields are
+				// independent — a padding-only plan must not
+				// demand xmux support and vice versa. All three
+				// renderers emit the range now, each verified
+				// against its pinned binary.
+				out[FeatureXHTTPPadding] = true
 			}
 		}
 		if o.Encryption != "" && o.Encryption != "none" {

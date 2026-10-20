@@ -48,15 +48,26 @@ const (
 	// to it would silently send downloads over the uplink server.
 	FeatureXHTTPDownloadSplit Feature = "xhttp-download-split"
 	// FeatureXHTTPXmux marks engines that honour XHTTP connection-reuse
-	// tuning. Only mihomo claims it: its renderer emits reuse-settings
-	// and x-padding-bytes (PASS3 deep A1) and the render is verified
-	// with `mihomo -t` on the pin; the Xray and sing-box renderers emit
-	// neither xmux nor x_padding. So a plan that requires xmux tuning
-	// reports it missing on those two engines instead of being routed
-	// to a silent loss (PASS3 deep S1). A claim belongs in a catalog
-	// entry only together with a renderer that emits the tuning AND a
-	// binary check.
-	FeatureXHTTPXmux    Feature = "xhttp-xmux"
+	// tuning. All three engines claim it since CENSOR-P1: mihomo
+	// renders reuse-settings, Xray renders xmux, sing-box-lx renders
+	// xmux — each claim verified against the pinned binary (config
+	// check plus, for mihomo, the PASS3 deep A1 render). Before
+	// CENSOR-P1 only mihomo rendered the tuning and a plan setting it
+	// reported the feature missing on the other two instead of being
+	// routed to a silent loss (PASS3 deep S1). A claim belongs in a
+	// catalog entry only together with a renderer that emits the
+	// tuning AND a binary check.
+	FeatureXHTTPXmux Feature = "xhttp-xmux"
+	// FeatureXHTTPPadding marks engines that honour the XHTTP
+	// padding range (Transport.XPaddingBytes). It is a separate
+	// feature from FeatureXHTTPXmux because the fields are
+	// independent plan data: a padding-only plan must not demand
+	// xmux support, and an xmux-only plan must not demand padding.
+	// All three engines claim it since CENSOR-P1 (mihomo
+	// x-padding-bytes, Xray xPaddingBytes, sing-box-lx
+	// x_padding_bytes; binary-verified on the pins). Before the
+	// split, padding rode the xmux gate (S2 seams audit).
+	FeatureXHTTPPadding Feature = "xhttp-padding"
 	FeatureVLESSEncrypt Feature = "vless-encryption"
 	FeatureAmneziaWG    Feature = "amneziawg"
 	// FeatureAmneziaWG3 marks engines whose AmneziaWG stack implements

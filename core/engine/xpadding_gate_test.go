@@ -5,36 +5,39 @@ import (
 	"testing"
 )
 
-// TestXPaddingBytesRequiresXmuxCapability pins the S2 seams fix: a plan
-// that sets only XPaddingBytes (no xmux tuning fields) must still
-// require FeatureXHTTPXmux. Only the mihomo renderer emits
-// x-padding-bytes; the Xray and sing-box renderers drop the value at
-// render time, so without this gate a padding-only plan routed to
-// either of them silently lost its padding while validation passed —
-// the same silent-loss class the xmux gate closed for the tuning
-// fields (PASS3 deep S1).
-func TestXPaddingBytesRequiresXmuxCapability(t *testing.T) {
+// TestXPaddingBytesGate is the S2 seams regression for XHTTP
+// padding, updated for the CENSOR-P1 feature split: padding rides
+// its OWN gate (FeatureXHTTPPadding), separate from the xmux tuning
+// gate it shared while only one renderer emitted it. A padding-only
+// plan requires FeatureXHTTPPadding and not FeatureXHTTPXmux; all
+// three renderers emit the range now (mihomo x-padding-bytes, Xray
+// xPaddingBytes, sing-box-lx x_padding_bytes — the sing-box claim
+// rides the probed lx build, like FeatureXHTTP itself).
+func TestXPaddingBytesGate(t *testing.T) {
 	p := validPlan()
 	p.Outbounds = p.Outbounds[:1]
-	p.Outbounds[0].Transport = Transport{Type: "xhttp", Path: "/x", XPaddingBytes: "100-1000"}
+	p.Outbounds[0].Transport.Type = "xhttp"
+	p.Outbounds[0].Transport.XPaddingBytes = "100-1000"
 
-	if !p.RequiredFeatures()[FeatureXHTTPXmux] {
-		t.Fatal("a padding-only xhttp plan must require FeatureXHTTPXmux")
+	req := p.RequiredFeatures()
+	if !req[FeatureXHTTPPadding] {
+		t.Fatal("a plan setting XPaddingBytes must require FeatureXHTTPPadding")
 	}
-	// The two renderers that emit no x-padding-bytes must report the
-	// feature missing, whatever the catalog's mihomo claim state is.
-	for _, kind := range []Kind{KindXray, KindSingBox} {
-		missing := strings.Join(Catalog[kind].Missing(p), " ")
-		if !strings.Contains(missing, string(FeatureXHTTPXmux)) {
-			t.Errorf("%s: padding-only plan must report %s missing, got %q", kind, FeatureXHTTPXmux, missing)
+	if req[FeatureXHTTPXmux] {
+		t.Fatal("a padding-only plan must not require the xmux feature (independent data, independent gate)")
+	}
+	for _, kind := range []Kind{KindMihomo, KindXray} {
+		if missing := strings.Join(Catalog[kind].Missing(p), " "); strings.Contains(missing, string(FeatureXHTTPPadding)) {
+			t.Errorf("%s renders the padding range, it must not report it missing: %q", kind, missing)
 		}
 	}
-	// A plain xhttp plan without padding or xmux tuning must not
-	// suddenly require the feature.
-	plain := validPlan()
-	plain.Outbounds = plain.Outbounds[:1]
-	plain.Outbounds[0].Transport = Transport{Type: "xhttp", Path: "/x"}
-	if plain.RequiredFeatures()[FeatureXHTTPXmux] {
-		t.Error("an untuned xhttp plan must not require FeatureXHTTPXmux")
+	lx := BuildCapabilities(KindSingBox,
+		Version{Raw: "1.14.3-lx.22", Major: 1, Minor: 14, Patch: 3, PreRelease: "lx.22"},
+		[]string{"with_xhttp"})
+	if missing := strings.Join(lx.Missing(p), " "); strings.Contains(missing, string(FeatureXHTTPPadding)) {
+		t.Errorf("the lx build renders x_padding_bytes, it must not report it missing: %q", missing)
+	}
+	if missing := strings.Join(Catalog[KindSingBox].Missing(p), " "); !strings.Contains(missing, string(FeatureXHTTPPadding)) {
+		t.Errorf("upstream sing-box must report %s missing, got %q", FeatureXHTTPPadding, missing)
 	}
 }

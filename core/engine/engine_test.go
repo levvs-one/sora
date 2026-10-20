@@ -460,16 +460,15 @@ func TestXrayMissesNameserverPolicy(t *testing.T) {
 }
 
 // TestCatalogXmuxClaimMatchesRenderers pins the claim state after
-// the `mihomo -t` verification landed (engine bump validation,
-// 2026-10-20; the binary check itself is
-// mihomo.TestBinaryAcceptsXHTTPDownloadSettings): mihomo's renderer
-// emits reuse-settings, x-padding-bytes and download-settings and the
-// pinned binary accepts them, so mihomo claims FeatureXHTTPXmux and
-// FeatureXHTTPDownloadSplit. The Xray and sing-box renderers still
-// emit no xmux at all, so an xmux-tuned plan must report the feature
-// missing on those two engines; Xray keeps FeatureXHTTPDownloadSplit
-// (its renderer emits downloadSettings) and sing-box keeps lacking
-// both.
+// the CENSOR-P1 XHTTP parity work (2026-10-20): all three renderers
+// now emit the reuse tuning — mihomo reuse-settings (verified with
+// `mihomo -t`, PASS3 deep A1), Xray xmux and sing-box-lx xmux (both
+// verified by config check on the pins) — so mihomo and Xray claim
+// FeatureXHTTPXmux in the static catalog, and sing-box claims it for
+// the probed lx+with_xhttp build in BuildCapabilities (upstream
+// sing-box has no xhttp transport in this catalog at all). An
+// xmux-tuned plan must report the feature missing only where the
+// claim is honestly absent: the static (upstream) sing-box entry.
 func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
 	for kind, caps := range Catalog {
 		if caps.Supports(FeatureXHTTPXmux) && kind != KindMihomo {

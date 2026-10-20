@@ -19,6 +19,16 @@ const (
 	TestURLProduction = "https://www.gstatic.com/generate_204"
 )
 
+// DefaultXHTTPMode is the XHTTP stream mode every renderer falls
+// back to when the plan carries no Mode: Xray's own auto (the engine
+// picks packet-up/stream semantics per security), which sing-box-lx
+// mirrors. One constant so the renderers can never drift to
+// different defaults (CENSOR-P1). The mihomo renderer passes an
+// explicit plan mode through verbatim (its docs list "auto" among
+// the values) and leaves an unset mode unset — mihomo's own default
+// is its data, not sora's.
+const DefaultXHTTPMode = "auto"
+
 // Protocol is an outbound protocol name as used in plans.
 type Protocol string
 
@@ -165,22 +175,22 @@ type Transport struct {
 	DownloadPort    uint16
 	// Xmux tunes XHTTP connection reuse. MaxConcurrency (streams per
 	// connection) and MaxConnections are mutually exclusive. Zero keeps
-	// the engine default. The mihomo renderer emits these fields as
-	// reuse-settings (PASS3 deep A1) and mihomo claims
-	// FeatureXHTTPXmux (verified with `mihomo -t` on the pin,
-	// 2026-10-20); the Xray and sing-box renderers do not emit xmux,
-	// so a plan setting these fields reports the feature missing on
-	// those engines instead of silently dropping the tuning at
-	// selection time (see FeatureXHTTPXmux).
+	// the engine default. Every renderer emits the tuning since
+	// CENSOR-P1 — mihomo as reuse-settings (PASS3 deep A1), Xray as
+	// xmux, sing-box-lx as xmux — and every engine claims
+	// FeatureXHTTPXmux with a binary check on the pin (2026-10-20).
+	// Before CENSOR-P1 only mihomo emitted it and the gate existed to
+	// keep the tuning from silently dropping on the other engines.
 	XmuxMaxConcurrency  int
 	XmuxMaxConnections  int
 	XmuxMaxReuseTimes   int
 	XmuxMaxRequestTimes int
 	// XPaddingBytes is the random XHTTP padding range, "min-max" or a
-	// single number, e.g. "100-1000". The mihomo renderer emits it as
-	// x-padding-bytes; the Xray and sing-box renderers do not emit it
-	// yet, so on those paths the value is validated here and dropped
-	// at render time (same staged state as the xmux fields above).
+	// single number, e.g. "100-1000". Every renderer emits it since
+	// CENSOR-P1 — mihomo as x-padding-bytes, Xray as xPaddingBytes,
+	// sing-box-lx as x_padding_bytes — under its own capability
+	// (FeatureXHTTPPadding), split from the xmux gate it used to
+	// ride: padding and reuse tuning are independent plan data.
 	XPaddingBytes string
 }
 
