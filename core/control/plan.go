@@ -444,9 +444,11 @@ const zapretDirectOutboundID = "sora-zapret-direct"
 // and retargets "direct" rules at it; the engine factory then wraps the plan
 // with the tpws supervisor, failing honestly when tpws is not installed.
 //
-// The strategy must come from the client. The core's built-in default
-// (bypass.DefaultStrategy) is the modern nfqws/winws desync set, and the
-// nfqws backend is not wired up yet (see
+// The strategy must come from the client. The core's reference set
+// (bypass.DefaultStrategy) is the modern nfqws/winws desync set; it is
+// NOT WIRED — no production caller applies it as a default, it is kept
+// for the nfqws migration — and the nfqws backend is not wired up yet
+// (see
 // core/engine/bypass/NFQWS-MIGRATION.md): substituting it here would build
 // a plan that only fails later, at engine Apply, with the client unable
 // to tell why. Failing at plan time keeps the refusal early and precise;

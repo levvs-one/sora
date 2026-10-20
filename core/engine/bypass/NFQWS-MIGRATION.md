@@ -6,13 +6,17 @@ tpws and fails closed on nfqws strategies.
 
 ## Why
 
-The default bypass strategy is now the modern nfqws/winws desync set
+The reference bypass strategy — the set this migration will make the
+default — is the modern nfqws/winws desync set
 (`fake,split2,disorder2,multisplit` + autottl, TCP 80/443, UDP 443, QUIC
-fake — `bypass.DefaultStrategy`). tpws cannot run it: tpws is a
+fake — `bypass.DefaultStrategy`). It is currently NOT WIRED: no
+production caller applies it by default since the F11 plan-time
+refusal (2a1395e6); `applyZapretWithVPN` requires an explicit strategy
+from the client. tpws cannot run it: tpws is a
 transparent SOCKS proxy, TCP-only, with no packet injection, so no fake
 packets, no autottl, no UDP/QUIC desync. Keeping tpws as the only executor
-while the default needs nfqws means `Engine.Apply` fails closed on every
-default-strategy plan. The full migration makes the default actually run.
+while that set needs nfqws means `Engine.Apply` fails closed on every
+plan that carries it. The full migration makes the set actually run.
 
 Non-goals: removing tpws (it stays as the fallback for TCP-only
 strategies and for hosts where interception is unavailable), changing the
@@ -25,7 +29,8 @@ wire protocol, touching engine drivers.
   `FilterUDP`, `FilterL7`.
 - `bypass.BackendOf` selects tpws/nfqws per strategy; `bypass.NFQWSArgs`
   renders the nfqws/winws command line against the vendored zapret 72.1
-  flag set; `bypass.DefaultStrategy` is the modern set.
+  flag set; `bypass.DefaultStrategy` is the modern set (reference
+  only — NOT WIRED as a default, see above).
 - `engine` validation covers the new fields (mode/fooling/l7
   whitelists, TTL range, TTL↔autottl exclusivity, QUIC fake needs
   filter-udp, fake names confined to the zapret home).

@@ -59,6 +59,12 @@ const defaultQUICFake = "quic_initial_www_google_com.bin"
 // disorder2 and multisplit with autottl, applied to TCP 80/443 and UDP
 // 443 (TLS and QUIC), with a shipped QUIC Initial as the QUIC fake.
 // It needs the nfqws backend; see NFQWS-MIGRATION.md.
+//
+// NOT WIRED: no production caller since the F11 plan-time refusal
+// (2a1395e6) — applyZapretWithVPN requires an explicit strategy from
+// the client and never substitutes this set. Kept as the reference
+// nfqws set for the migration in NFQWS-MIGRATION.md; exercised only
+// by this package's tests.
 func DefaultStrategy() engine.BypassStrategy {
 	return engine.BypassStrategy{
 		Desync:    []string{"fake", "split2", "disorder2", "multisplit"},
