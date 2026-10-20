@@ -178,12 +178,12 @@ func TestParseHysteria2TuningOptions(t *testing.T) {
 }
 
 func TestParseTUICTuningOptions(t *testing.T) {
-	r, err := (LinkParser{}).Parse([]byte("tuic://123e4567-e89b-12d3-a456-426614174000:pass@example.com:443?congestion_control=cubic&udp_relay_mode=quic#TUIC"))
+	r, err := (LinkParser{}).Parse([]byte("tuic://123e4567-e89b-12d3-a456-426614174000:pass@example.com:443?congestion_control=cubic&udp_relay_mode=quic&heartbeat=25#TUIC"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	o := r.Servers[0].Options
-	if o["congestion_control"] != "cubic" || o["udp_relay_mode"] != "quic" {
+	if o["congestion_control"] != "cubic" || o["udp_relay_mode"] != "quic" || o["heartbeat"] != "25" {
 		t.Fatalf("unexpected tuic options: %#v", o)
 	}
 	r, err = (LinkParser{}).Parse([]byte("tuic://example.com:443?token=v4secret#TUICv4"))

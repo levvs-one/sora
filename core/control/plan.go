@@ -153,6 +153,9 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 	doc.field("encryption", spec.Options["encryption"])
 	doc.field("fingerprint", spec.Fingerprint)
 	doc.field("flow", spec.Flow)
+	// TUIC heartbeat (keepalive) seconds, from the link's heartbeat
+	// parameter (CENSOR-P3); restored by applyCredential.
+	doc.field("heartbeat", spec.Options["heartbeat"])
 	doc.field("hop_interval", hopInterval)
 	doc.field("hop_interval_max", hopIntervalMax)
 	doc.field("hop_ports", hopPorts)
@@ -742,6 +745,7 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	outbound.BBRProfile = values["bbr_profile"]
 	outbound.CongestionControl = values["congestion_control"]
 	outbound.UDPRelayMode = values["udp_relay_mode"]
+	outbound.TUICHeartbeat = atoiNonNegative(values["heartbeat"])
 	outbound.Token = values["token"]
 	outbound.PublicKey = values["public_key"]
 	outbound.ShortID = values["short_id"]

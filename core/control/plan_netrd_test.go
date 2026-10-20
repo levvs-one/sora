@@ -66,7 +66,7 @@ func TestHysteria2TuningSurvivesTheVault(t *testing.T) {
 // UDP relay mode, and the v4 token reach the engine outbound.
 func TestTUICTuningSurvivesTheVault(t *testing.T) {
 	link := "tuic://123e4567-e89b-12d3-a456-426614174000:pass@example.com:443" +
-		"?congestion_control=cubic&udp_relay_mode=quic#TUIC"
+		"?congestion_control=cubic&udp_relay_mode=quic&heartbeat=25#TUIC"
 	result, err := parser.LinkParser{}.Parse([]byte(link))
 	if err != nil || len(result.Servers) != 1 {
 		t.Fatalf("Parse = %+v, %v", result, err)
@@ -85,6 +85,9 @@ func TestTUICTuningSurvivesTheVault(t *testing.T) {
 	}
 	if o.CongestionControl != "cubic" || o.UDPRelayMode != "quic" {
 		t.Errorf("tuic tuning = %q/%q, want cubic/quic", o.CongestionControl, o.UDPRelayMode)
+	}
+	if o.TUICHeartbeat != 25 {
+		t.Errorf("tuic heartbeat = %d, want 25 (CENSOR-P3 vault round-trip)", o.TUICHeartbeat)
 	}
 	if o.Password != "pass" {
 		t.Errorf("tuic v5 password = %q, want pass", o.Password)
