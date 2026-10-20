@@ -2,8 +2,10 @@
 /// installed or when an update widens permissions.
 ///
 /// Least privilege, stated plainly: every permission is rendered as a
-/// human-readable "will be able to" line. Dangerous permissions are
-/// highlighted and need an explicit confirmation checkbox.
+/// human-readable "will be able to" line with its honest risk tier.
+/// Dangerous permissions are highlighted and need an explicit confirmation
+/// checkbox. A widening update shows only what is new (plus what the
+/// update drops), with the changelog on top so the user knows why.
 library;
 
 import 'package:flutter/material.dart';
@@ -12,17 +14,24 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../kit.dart';
+import '../../ext/catalog.dart';
 import '../../ext/manifest.dart';
 import '../../ext/permissions.dart';
 import 'widgets.dart';
 
 /// Shows the install prompt. Returns the granted permission ids, or null
 /// when the user cancelled.
+///
+/// [addedPermissions] / [removedPermissions] describe a widening update:
+/// only the delta is shown, with the honest "Update" title. [changelog]
+/// lists the new versions' notes newest-first; null when unknown (sideload).
 Future<List<String>?> showInstallPrompt(
   BuildContext context, {
   required ExtManifest manifest,
   required bool sideload,
   List<String>? addedPermissions,
+  List<String>? removedPermissions,
+  List<CatalogChangelogEntry>? changelog,
 }) {
   return showDialog<List<String>>(
     context: context,
@@ -30,6 +39,8 @@ Future<List<String>?> showInstallPrompt(
       manifest: manifest,
       sideload: sideload,
       addedPermissions: addedPermissions,
+      removedPermissions: removedPermissions,
+      changelog: changelog,
     ),
   );
 }
@@ -86,10 +97,14 @@ class _InstallPrompt extends StatefulWidget {
     required this.manifest,
     required this.sideload,
     this.addedPermissions,
+    this.removedPermissions,
+    this.changelog,
   });
   final ExtManifest manifest;
   final bool sideload;
   final List<String>? addedPermissions;
+  final List<String>? removedPermissions;
+  final List<CatalogChangelogEntry>? changelog;
 
   @override
   State<_InstallPrompt> createState() => _InstallPromptState();
@@ -102,7 +117,12 @@ class _InstallPromptState extends State<_InstallPrompt> {
   Widget build(BuildContext context) {
     final s = S.of(context), palette = Palette.of(context);
     final m = widget.manifest;
-    final perms = widget.addedPermissions ?? m.permissions;
+    // Three honest states: fresh install (null) shows the full list under
+    // "Install"; an update shows the delta under "Update"; an update with
+    // no additions falls back to the full list with the neutral intro.
+    final isUpdate = widget.addedPermissions != null;
+    final showDelta = isUpdate && widget.addedPermissions!.isNotEmpty;
+    final perms = showDelta ? widget.addedPermissions! : m.permissions;
     final dangerous = perms.where(requiresExplicitConfirm).toList();
     final canInstall = dangerous.isEmpty || _dangerousAck;
     return Dialog(
@@ -134,9 +154,7 @@ class _InstallPromptState extends State<_InstallPrompt> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.addedPermissions == null
-                              ? s.extInstallTitle(m.name)
-                              : s.extUpdateTitle(m.name),
+                          isUpdate ? s.extUpdateTitle(m.name) : s.extInstallTitle(m.name),
                           style: Styles.title.copyWith(color: palette.ink),
                         ),
                         const SizedBox(height: 2),
@@ -156,19 +174,40 @@ class _InstallPromptState extends State<_InstallPrompt> {
                 ),
               ],
               const SizedBox(height: 12),
+              if (widget.changelog != null && widget.changelog!.isNotEmpty) ...[
+                Text(s.extChangelog,
+                    style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                const SizedBox(height: 4),
+                for (final c in widget.changelog!) ...[
+                  Text(c.version,
+                      style: Styles.caption.copyWith(
+                          color: palette.ink, fontWeight: FontWeight.w600)),
+                  Text(c.notes,
+                      style: Styles.caption.copyWith(color: palette.ink2)),
+                  const SizedBox(height: 6),
+                ],
+                const SizedBox(height: 4),
+              ],
               Text(
-                widget.addedPermissions == null
-                    ? s.extPermissionsIntro
-                    : s.extPermissionsWidened,
+                showDelta ? s.extPermissionsWidened : s.extPermissionsIntro,
                 style: Styles.body.copyWith(color: palette.ink),
               ),
               const SizedBox(height: 4),
               for (final p in perms) ...[
                 PermissionRow(
                   blurb: permissionBlurb(context, p),
-                  dangerous: requiresExplicitConfirm(p),
+                  risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
                 ),
                 _permissionExtra(context, m, p),
+              ],
+              if (widget.removedPermissions != null &&
+                  widget.removedPermissions!.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(s.extPermissionsRemoved,
+                    style: Styles.body.copyWith(color: palette.ink)),
+                const SizedBox(height: 4),
+                for (final p in widget.removedPermissions!)
+                  _RemovedPermissionRow(blurb: permissionBlurb(context, p)),
               ],
               if (dangerous.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -204,7 +243,7 @@ class _InstallPromptState extends State<_InstallPrompt> {
               ],
               const SizedBox(height: 16),
               PrimaryButton(
-                label: widget.addedPermissions == null ? s.extInstall : s.extUpdate,
+                label: isUpdate ? s.extUpdate : s.extInstall,
                 onTap: canInstall ? () => Navigator.pop(context, List.of(m.permissions)) : null,
               ),
               const SizedBox(height: 8),
@@ -238,6 +277,32 @@ class _InstallPromptState extends State<_InstallPrompt> {
             const SizedBox(height: 4),
             NetworkHostsList(hosts: hosts),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// A permission the update drops. Rendered quieter than the granted rows:
+/// the point is "you are losing access", not an alarm.
+class _RemovedPermissionRow extends StatelessWidget {
+  const _RemovedPermissionRow({required this.blurb});
+  final String blurb;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Symbols.remove_circle_rounded, size: 18, color: palette.ink3),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(blurb,
+                style: Styles.body.copyWith(color: palette.ink2)),
+          ),
         ],
       ),
     );

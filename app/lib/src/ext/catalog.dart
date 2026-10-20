@@ -106,11 +106,20 @@ class CatalogEntry {
       minAppVersion: json['min_app_version'] as String? ?? '',
       rolloutFraction: (json['rollout_fraction'] as num? ?? 0).toDouble(),
       screenshotUrls: (json['screenshots'] as List? ?? []).map((e) => e.toString()).toList(),
-      changelog: (json['changelog'] as List? ?? [])
-          .whereType<Map<String, dynamic>>()
-          .map(CatalogChangelogEntry.fromJson)
-          .toList(),
+      changelog: [
+        for (final r in (json['changelog'] as List? ?? []))
+          CatalogChangelogEntry.fromJson(_changelogRow(r)),
+      ],
     );
+  }
+
+  /// A changelog row must be an object; a malformed row fails the whole
+  /// entry rather than silently disappearing (the Go validator is strict
+  /// too — a team-signed catalog with a broken row is a team bug that
+  /// must surface).
+  static Map<String, dynamic> _changelogRow(dynamic r) {
+    if (r is Map<String, dynamic>) return r;
+    throw CatalogError('changelog row is not an object');
   }
 
   bool get isVerified => badges.contains('verified');
@@ -121,18 +130,18 @@ class CatalogEntry {
   /// Whether [installId] falls inside this version's staged-rollout bucket.
   /// Mirrors core/ext RolloutEligible: sha256(installId | id | version),
   /// big-endian first 8 bytes mod 10000 < fraction * 10000. Deterministic
-  /// per device, so eligibility never flaps between catalog syncs.
+  /// per device, so eligibility never flaps between catalog syncs. The
+  /// modulo is folded incrementally to stay exact on 64-bit signed ints.
   bool rolloutEligible(String installId) {
     final f = effectiveRollout;
     if (f >= 1) return true;
-    final digest = sha256
-        .convert(utf8.encode('$installId\x00$id\x00$version'))
-        .bytes;
-    var bucket = 0;
+    final digest =
+        sha256.convert(utf8.encode('$installId\x00$id\x00$version')).bytes;
+    var mod = 0;
     for (var i = 0; i < 8; i++) {
-      bucket = (bucket << 8) | digest[i];
+      mod = (mod * 256 + digest[i]) % 10000;
     }
-    return bucket % 10000 < (f * 10000).floor();
+    return mod < (f * 10000).floor();
   }
 }
 

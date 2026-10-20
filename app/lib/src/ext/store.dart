@@ -182,6 +182,75 @@ class ExtensionStore extends ChangeNotifier {
     await tmp.rename(reg.path);
   }
 
+  // --- Conflict resolutions (which extension wins a contested surface) ---
+  //
+  // Stored separately from installed.json: resolutions change rarely and
+  // must survive registry rewrites untouched.
+
+  final _conflictWinners = <String, String>{};
+  Future<void>? _conflictsLoad;
+
+  String _conflictsFile() =>
+      '${_dir}${Platform.pathSeparator}conflicts.json';
+
+  /// Loads once; concurrent callers share the same future.
+  Future<void> _loadConflicts() =>
+      _conflictsLoad ??= _doLoadConflicts();
+
+  Future<void> _doLoadConflicts() async {
+    final f = File(_conflictsFile());
+    if (!await f.exists()) return;
+    try {
+      final raw = jsonDecode(await f.readAsString()) as Map<String, dynamic>;
+      for (final e in raw.entries) {
+        final v = e.value;
+        if (v is String && v.isNotEmpty) _conflictWinners[e.key] = v;
+      }
+    } catch (_) {
+      // Corrupt resolutions fall back to "undecided": the banner reappears
+      // and the user decides again. Never crash the section over this.
+    }
+  }
+
+  Future<void> _saveConflicts() async {
+    final f = File(_conflictsFile());
+    final tmp = File('${f.path}.tmp');
+    await tmp.writeAsString(jsonEncode(_conflictWinners), flush: true);
+    await tmp.rename(f.path);
+  }
+
+  /// The winning extension id for [conflictKey], or null when undecided.
+  /// Loads the file on first use; call after [load].
+  Future<String?> conflictWinner(String conflictKey) async {
+    await _loadConflicts();
+    return _conflictWinners[conflictKey];
+  }
+
+  /// Synchronous read for UI code that already triggered a load (the
+  /// conflicts banner resolves after the first frame anyway).
+  String? conflictWinnerSync(String conflictKey) => _conflictWinners[conflictKey];
+
+  /// All stored winners (conflict key -> extension id). Loads the file on
+  /// first use; returns a copy.
+  Future<Map<String, String>> conflictWinners() async {
+    await _loadConflicts();
+    return Map.of(_conflictWinners);
+  }
+
+  /// Records the user's decision. Throws [ExtStoreError] on I/O failure so
+  /// the sheet can say the choice was not saved.
+  Future<void> setConflictWinner(String conflictKey, String extensionId) async {
+    await _loadConflicts();
+    _conflictWinners[conflictKey] = extensionId;
+    try {
+      await _saveConflicts();
+    } catch (_) {
+      _conflictWinners.remove(conflictKey);
+      throw ExtStoreError('could not save the conflict resolution');
+    }
+    notifyListeners();
+  }
+
   /// Reads the install id, creating and persisting a fresh random one.
   /// A corrupt file is replaced, never fatal.
   Future<String> _loadOrCreateInstallId() async {

@@ -8,6 +8,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:intl/intl.dart';
 
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
@@ -106,7 +107,17 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                 if (entry.rating > 0)
                   Tile(
                     title: s.extRating,
-                    trailing: StarRating(rating: entry.rating),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        StarRating(rating: entry.rating),
+                        const SizedBox(width: 6),
+                        Icon(Symbols.info_rounded,
+                            size: 16, color: palette.ink3),
+                      ],
+                    ),
+                    // The published rating methodology, in plain language.
+                    onTap: () => showRatingHowDialog(context),
                   ),
                 if (entry.installs > 0)
                   Tile(
@@ -121,6 +132,44 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                     Text(m.version, style: Styles.body.copyWith(color: palette.ink2)),
               ),
             ]),
+            if (entry != null && entry.screenshotUrls.isNotEmpty) ...[
+              Heading(s.extScreenshots),
+              _ScreenshotsCarousel(urls: entry.screenshotUrls),
+              const SizedBox(height: 16),
+            ],
+            if (entry != null && entry.changelog.isNotEmpty) ...[
+              Heading(s.extChangelog),
+              Group(children: [
+                for (final c in entry.changelog)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(c.version,
+                                style: Styles.bodyStrong
+                                    .copyWith(color: palette.ink)),
+                            const SizedBox(width: 8),
+                            Text(
+                                DateFormat.yMMMd(Localizations.localeOf(context)
+                                        .toLanguageTag())
+                                    .format(c.date.toLocal()),
+                                style: Styles.caption
+                                    .copyWith(color: palette.ink3)),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(c.notes,
+                            style:
+                                Styles.body.copyWith(color: palette.ink2)),
+                      ],
+                    ),
+                  ),
+              ]),
+              const SizedBox(height: 16),
+            ],
             if (m.description.isNotEmpty) ...[
               Heading(s.extAbout),
               Group(children: [
@@ -145,7 +194,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                       for (final p in m.permissions) ...[
                         PermissionRow(
                           blurb: permissionBlurb(context, p),
-                          dangerous: requiresExplicitConfirm(p),
+                          risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
                         ),
                         if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
                           Padding(
@@ -160,6 +209,21 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
             if (live != null && _hasBackgroundTask(live)) ...[
               Heading(s.extBgTitle),
               _BackgroundTaskSection(extensionId: live.id, interactive: live.enabled),
+            ],
+            // Every declared panel gets its own row: with several panels a
+            // single "open" button would silently pick the first one.
+            if (live != null && live.enabled && m.panels.isNotEmpty) ...[
+              Heading(s.extCapPanel),
+              Group(children: [
+                for (final p in m.panels)
+                  LinkTile(
+                    title: p.title,
+                    onTap: () => push(
+                        context,
+                        ExtensionPanelScreen(
+                            extensionId: live.id, panelId: p.id)),
+                  ),
+              ]),
             ],
             if (live != null && _settings != null && m.settingsSchema != null) ...[
               Heading(s.extSettings),
@@ -241,15 +305,12 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
         onTap: entry == null ? null : () => widget.onInstall?.call(entry),
       );
     }
-    final needsUpdate = entry != null && compareVersions(entry.version, live.version) > 0;
+    final needsUpdate = entry != null &&
+        compareVersions(entry.version, live.version) > 0 &&
+        entry.rolloutEligible(store.installId);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (live.enabled && m.panels.isNotEmpty)
-          PrimaryButton(
-            label: s.extOpenPanel,
-            onTap: () => push(context, ExtensionPanelScreen(extensionId: live.id)),
-          ),
         if (needsUpdate) ...[
           const SizedBox(height: 8),
           PrimaryButton(
@@ -636,5 +697,63 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
           enabled: config.enabled, intervalMinutes: v)),
     );
     return editable ? tile : AbsorbPointer(child: tile);
+  }
+}
+
+/// Screenshot carousel for the extension detail page: a horizontally
+/// swipable strip of the catalog's screenshot URLs. A failed image is an
+/// honest placeholder (extImageFailed), never a blank hole or a crash.
+class _ScreenshotsCarousel extends StatefulWidget {
+  const _ScreenshotsCarousel({required this.urls});
+  final List<String> urls;
+
+  @override
+  State<_ScreenshotsCarousel> createState() => _ScreenshotsCarouselState();
+}
+
+class _ScreenshotsCarouselState extends State<_ScreenshotsCarousel> {
+  final _controller = PageController(viewportFraction: 0.85);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context), s = S.of(context);
+    return SizedBox(
+      height: 220,
+      child: PageView.builder(
+        controller: _controller,
+        itemCount: widget.urls.length,
+        itemBuilder: (context, i) => Padding(
+          padding: const EdgeInsetsDirectional.only(end: 10),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              color: palette.field.withValues(alpha: 0.6),
+              child: Image.network(
+                widget.urls[i],
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Symbols.broken_image_rounded, color: palette.ink3),
+                      const SizedBox(height: 6),
+                      Text(s.extImageFailed,
+                          style:
+                              Styles.caption.copyWith(color: palette.ink2)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

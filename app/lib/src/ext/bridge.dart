@@ -131,7 +131,14 @@ window.soraExt = (() => {
         } catch (e) { delete pending[id]; reject(e); }
       });
     },
-    onEvent(cb) { if (typeof cb === 'function') listeners.push(cb); },
+    onEvent(cb) {
+      if (typeof cb !== 'function') return () {};
+      listeners.push(cb);
+      return () {
+        const i = listeners.indexOf(cb);
+        if (i >= 0) listeners.splice(i, 1);
+      };
+    },
     _resolve(id, ok, payload) {
       const p = pending[id];
       if (!p) return;

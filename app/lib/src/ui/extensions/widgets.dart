@@ -15,6 +15,10 @@ import '../../ext/catalog.dart';
 import '../../ext/permissions.dart';
 
 /// 5-star rating display with the numeric value.
+///
+/// The whole row is one semantic node ("Rating 4.5 of 5"): the star icons
+/// are decorative and the numeric text is folded into the label, so screen
+/// readers announce it once instead of five images plus a number.
 class StarRating extends StatelessWidget {
   const StarRating({super.key, required this.rating, this.size = 14});
   final double rating;
@@ -27,25 +31,24 @@ class StarRating extends StatelessWidget {
         NumberFormat('0.0', Localizations.localeOf(context).toLanguageTag())
             .format(rating);
     final s = S.of(context);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 1; i <= 5; i++)
-          Icon(
-            rating >= i - 0.25
-                ? Symbols.star_rounded
-                : (rating >= i - 0.75 ? Symbols.star_half_rounded : Symbols.star_outline_rounded),
-            size: size,
-            color: palette.ink,
-          ),
-        const SizedBox(width: 4),
-        Text(ratingText, style: Styles.caption.copyWith(color: palette.ink2)),
-        // Screen-reader text; visual users see the stars.
-        Semantics(
-          label: s.extRatingLabel(ratingText),
-          child: const SizedBox.shrink(),
-        ),
-      ],
+    return Semantics(
+      label: s.extRatingLabel(ratingText),
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 1; i <= 5; i++)
+            Icon(
+              rating >= i - 0.25
+                  ? Symbols.star_rounded
+                  : (rating >= i - 0.75 ? Symbols.star_half_rounded : Symbols.star_outline_rounded),
+              size: size,
+              color: palette.ink,
+            ),
+          const SizedBox(width: 4),
+          Text(ratingText, style: Styles.caption.copyWith(color: palette.ink2)),
+        ],
+      ),
     );
   }
 }
@@ -231,33 +234,52 @@ class ExtensionCard extends StatelessWidget {
 }
 
 /// Permission row for the install prompt and the detail screen.
+///
+/// The risk tier is visually honest: normal permissions get a plain check,
+/// sensitive ones a stronger info mark, dangerous ones the warning icon in
+/// the semantic danger color. The tier is also part of the screen-reader
+/// label, so it is never color- or icon-only information.
 class PermissionRow extends StatelessWidget {
   const PermissionRow({
     super.key,
     required this.blurb,
-    required this.dangerous,
+    required this.risk,
   });
   final String blurb;
-  final bool dangerous;
+  final ExtRisk risk;
+
+  String _tierLabel(BuildContext context) {
+    final s = S.of(context);
+    return switch (risk) {
+      ExtRisk.normal => s.extRiskNormal,
+      ExtRisk.sensitive => s.extRiskSensitive,
+      ExtRisk.dangerous => s.extRiskDangerous,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            dangerous ? Symbols.warning_rounded : Symbols.check_circle_rounded,
-            size: 18,
-            color: dangerous ? palette.danger : palette.ink2,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(blurb, style: Styles.body.copyWith(color: palette.ink)),
-          ),
-        ],
+    final (icon, color) = switch (risk) {
+      ExtRisk.normal => (Symbols.check_circle_rounded, palette.ink2),
+      ExtRisk.sensitive => (Symbols.info_rounded, palette.ink),
+      ExtRisk.dangerous => (Symbols.warning_rounded, palette.danger),
+    };
+    return Semantics(
+      label: '${_tierLabel(context)}: $blurb',
+      excludeSemantics: true,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(blurb, style: Styles.body.copyWith(color: palette.ink)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -322,8 +344,7 @@ class _CapabilityLine extends StatelessWidget {
 
 /// The host allowlist for the network permission, one row per host.
 /// Callers add the surrounding padding/indentation.
-class NetworkHostsList extends StatelessWidget {
-  const NetworkHostsList({super.key, required this.hosts});
+class NetworkHostsList extends StatelessWidget {  const NetworkHostsList({super.key, required this.hosts});
   final List<String> hosts;
 
   @override
@@ -349,4 +370,40 @@ class NetworkHostsList extends StatelessWidget {
       ],
     );
   }
+}
+
+/// "How ratings work" dialog: the published rating methodology in plain
+/// language (extRatingHowBody). Opened from the rating row on the extension
+/// detail page. The formula lives in core/ext/ratings.go and the normative
+/// spec; this dialog is its user-facing summary.
+Future<void> showRatingHowDialog(BuildContext context) {
+  final s = S.of(context), palette = Palette.of(context);
+  return showDialog<void>(
+    context: context,
+    builder: (context) => Dialog(
+      backgroundColor: palette.raised,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 380),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(s.extRatingHow,
+                  style: Styles.title.copyWith(color: palette.ink)),
+              const SizedBox(height: 10),
+              Text(s.extRatingHowBody,
+                  style: Styles.body.copyWith(color: palette.ink2)),
+              const SizedBox(height: 16),
+              PrimaryButton(
+                  label: s.extOk, onTap: () => Navigator.pop(context)),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
