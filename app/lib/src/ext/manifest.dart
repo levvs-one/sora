@@ -7,6 +7,12 @@ library;
 import 'dart:convert';
 
 import 'permissions.dart';
+import 'verifier.dart';
+
+/// Length in UTF-8 bytes. Go's validators measure with len(), so a
+/// Cyrillic name counts double there; measuring Dart code units here
+/// let manifests through that core/ext then rejected.
+int _utf8Len(String s) => utf8.encode(s).length;
 
 /// Thrown when a manifest is malformed or violates the v1 rules. The message
 /// is a developer-facing detail; the UI maps failures to localized text.
@@ -24,6 +30,12 @@ class ExtAuthor {
   final String publicKey;
 
   factory ExtAuthor.fromJson(Map<String, dynamic> json) {
+    // Mirrors core/ext's DisallowUnknownFields: a stray key in a nested
+    // object is a malformed manifest, not something to silently drop.
+    const known = {'name', 'identity', 'public_key'};
+    for (final key in json.keys) {
+      if (!known.contains(key)) throw ManifestError('unknown author field "$key"');
+    }
     return ExtAuthor(
       name: (json['name'] as String? ?? '').trim(),
       identity: (json['identity'] as String? ?? '').trim(),
@@ -41,6 +53,10 @@ class ExtPanel {
   final String entry;
 
   factory ExtPanel.fromJson(Map<String, dynamic> json) {
+    const known = {'id', 'title', 'entry'};
+    for (final key in json.keys) {
+      if (!known.contains(key)) throw ManifestError('unknown panel field "$key"');
+    }
     return ExtPanel(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? '',
@@ -127,8 +143,18 @@ class ExtManifest {
     for (final key in decoded.keys) {
       if (!known.contains(key)) throw ManifestError('unknown field "$key"');
     }
-    if (decoded['manifest_version'] != 1) {
-      throw ManifestError('unsupported manifest_version ${decoded['manifest_version']}');
+    // Strictly the JSON integer 1: a "1.0" double compares equal to 1
+    // in Dart but Go's decoder refuses it for the int field.
+    final manifestVersion = decoded['manifest_version'];
+    if (manifestVersion is! int || manifestVersion != 1) {
+      throw ManifestError('unsupported manifest_version $manifestVersion');
+    }
+    final uiRaw = decoded['ui'];
+    if (uiRaw is Map<String, dynamic>) {
+      const uiKnown = {'panels'};
+      for (final key in uiRaw.keys) {
+        if (!uiKnown.contains(key)) throw ManifestError('unknown ui field "$key"');
+      }
     }
     final m = ExtManifest(
       id: decoded['id'] as String? ?? '',
@@ -158,20 +184,32 @@ class ExtManifest {
     if (!_idPattern.hasMatch(id)) {
       throw ManifestError('id "$id" must be reverse-DNS (e.g. com.example.stats)');
     }
-    final n = name.trim();
-    if (n.isEmpty || n.length > 80) throw ManifestError('name must be 1..80 characters');
+    // Length limits mirror Go exactly: emptiness is judged on the
+    // trimmed value, the limit on the raw value's UTF-8 byte length.
+    if (name.trim().isEmpty || _utf8Len(name) > 80) {
+      throw ManifestError('name must be 1..80 characters');
+    }
     if (!_semverPattern.hasMatch(version)) throw ManifestError('version "$version" must be semver');
     if (!_semverPattern.hasMatch(minAppVersion)) {
       throw ManifestError('min_app_version "$minAppVersion" must be semver');
     }
-    if (description.length > 2000) throw ManifestError('description exceeds 2000 characters');
-    if (author.name.trim().isEmpty || author.name.length > 80) {
+    if (_utf8Len(description) > 2000) throw ManifestError('description exceeds 2000 characters');
+    if (author.name.trim().isEmpty || _utf8Len(author.name) > 80) {
       throw ManifestError('author name must be 1..80 characters');
     }
-    if (author.identity.trim().isEmpty || author.identity.length > 160) {
+    if (author.identity.trim().isEmpty || _utf8Len(author.identity) > 160) {
       throw ManifestError('author identity must be 1..160 characters');
     }
     if (author.publicKey.isEmpty) throw ManifestError('author public key is required');
+    // Go additionally requires the key to be a real minisign key
+    // (ParsePublicKey: 42-byte "Ed" envelope); a garbage string passed
+    // here and only failed later, at signature verification, with the
+    // two parsers disagreeing about the manifest itself until then.
+    try {
+      parsePublicKey(author.publicKey);
+    } on SignatureError catch (e) {
+      throw ManifestError('author public key is not a minisign key: ${e.message}');
+    }
     final seen = <String>{};
     for (final p in permissions) {
       if (!isKnownPermission(p)) throw ManifestError('unknown permission "$p"');
@@ -200,8 +238,9 @@ class ExtManifest {
     for (final p in panels) {
       if (!_panelIdPattern.hasMatch(p.id)) throw ManifestError('bad panel id "${p.id}"');
       if (!panelIds.add(p.id)) throw ManifestError('duplicate panel id "${p.id}"');
-      final t = p.title.trim();
-      if (t.isEmpty || t.length > 60) throw ManifestError('panel "${p.id}" needs a title of 1..60 characters');
+      if (p.title.trim().isEmpty || _utf8Len(p.title) > 60) {
+        throw ManifestError('panel "${p.id}" needs a title of 1..60 characters');
+      }
       if (!isSafeEntry(p.entry)) {
         throw ManifestError('panel "${p.id}" has an unsafe entry "${p.entry}"');
       }
@@ -359,7 +398,7 @@ List<String> _parseNetworkHosts(dynamic raw) {
     // names only, and matching is case-insensitive.
     if (e is! String) throw ManifestError('network_hosts entries must be strings');
     final h = e.trim().toLowerCase();
-    if (h.isEmpty || h.length > 253) throw ManifestError('bad network host "$h"');
+    if (h.isEmpty || _utf8Len(h) > 253) throw ManifestError('bad network host "$h"');
     out.add(h);
   }
   return out;
@@ -432,7 +471,7 @@ void validateSettingsSchema(Map<String, dynamic> schema) {
   final props = schema['properties'] as Map<String, dynamic>?;
   if (props == null) return;
   for (final e in props.entries) {
-    if (e.key.isEmpty || e.key.length > 64) {
+    if (e.key.isEmpty || _utf8Len(e.key) > 64) {
       throw ManifestError('bad settings property name "${e.key}"');
     }
     final prop = e.value as Map<String, dynamic>?;
