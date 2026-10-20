@@ -160,6 +160,13 @@ void main() {
         (policyStatus: 404, policyThrows: false),
         (policyStatus: 200, policyThrows: true),
       ]) {
+        // Each sub-case is a separate install: AppUpdater.check calls
+        // `available` only while settings.notifiedUpdate differs from the
+        // release (the deliberate once-per-version notice dedup, also
+        // pinned by updates_test's toast test). Without a storage reset
+        // the first sub-case's notified marker (1.0.5) leaks into the
+        // second, which then correctly reports 0 new notices.
+        SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
         final (updater: updater, notices: notices) = await checkWithPolicy(
           settings,
