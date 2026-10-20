@@ -151,11 +151,11 @@ func (d *Daemon) handlePairingConn(s *pairingSession, netConn net.Conn, self tra
 		return
 	}
 	defer c.Close()
-	// Recorded early; the save is retried by the upsert after the first
-	// sync below, which reports a persistence failure to the daemon log.
-	_ = d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
-		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:]))
-	// Run the first sync immediately so the devices converge now.
+	// Run the first sync immediately so the devices converge now. The peer
+	// is recorded only after the sync succeeds, like the joiner side does:
+	// a device the daemon could not sync with is not a peer, and an
+	// ignored upsert error would report a pairing the daemon cannot prove
+	// it persisted.
 	if _, err := syncpkg.Sync(ctx, c, d.identity.ID, d.store, false); err != nil {
 		return
 	}
