@@ -40,6 +40,19 @@ type Prober struct {
 	HandshakeTimeout time.Duration
 	// ResolveTimeout bounds DNS. Zero uses the default.
 	ResolveTimeout time.Duration
+	// Budget is the per-SNI handshake budget the TLS handshake
+	// acquires from (T007): an active probe is a core-initiated dial,
+	// and a burst of probes against one SNI must not itself trip the
+	// freeze. Nil uses DefaultHandshakeBudget, shared across all
+	// probers — the censor counts per SNI, not per caller.
+	Budget *HandshakeLimiter
+}
+
+func (p *Prober) budget() *HandshakeLimiter {
+	if p.Budget != nil {
+		return p.Budget
+	}
+	return DefaultHandshakeBudget
 }
 
 func (p *Prober) dialTimeout() time.Duration {
@@ -114,6 +127,17 @@ func (p *Prober) Probe(ctx context.Context, t Target) Attempt {
 	if sni == "" {
 		sni = t.Host
 	}
+	// Take a handshake-budget slot for this SNI before the ClientHello
+	// goes out. A refused acquisition is recorded as the attempt's TLS
+	// outcome — the probe never errors out, and a budget refusal is
+	// itself the measurement ("core dials are saturating this SNI").
+	release, berr := p.budget().Acquire(ctx, sni)
+	if berr != nil {
+		emit(StageTLS, WhatError, "handshake budget: "+berr.Error())
+		_ = tcpConn.Close()
+		return a
+	}
+	defer release()
 	tlsConn := tls.Client(tcpConn, &tls.Config{
 		ServerName: sni,
 		MinVersion: tls.VersionTLS12,

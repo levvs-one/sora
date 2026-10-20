@@ -1,136 +1,37 @@
 package censor
 
 import (
-	"context"
-	"sync"
 	"time"
+
+	"github.com/levvs-one/sora-client/core/probe"
 )
 
 // Handshake budget: the client-side half of the siberian parallelism
-// limit.
+// limit (more than three parallel TLS handshakes sharing one SNI trips
+// the freeze — see core/probe/budget.go for the full account).
 //
-// The freeze triggers on more than three parallel TLS handshakes sharing
-// one SNI. Multiplexing (one TLS connection carrying many streams) is the
-// structural fix for tunneled traffic, but the core also opens TLS
-// connections itself — probes, dest checks, DoH bootstrap — and a burst of
-// those can trip the same counter. HandshakeLimiter caps concurrent
-// handshakes per SNI at three, which is the highest count the field
-// reports leave unflagged.
+// The implementation lives in core/probe as the single source of truth —
+// the same arrangement as the FreezeDetector — because the dial paths
+// that must acquire from it (the REALITY dest checker, the endpoint
+// prober) live there, and this package imports core/probe, never the
+// other way round. The aliases below keep the censor-facing API the
+// policy layer and its tests have always used; there is exactly one
+// limiter implementation in the tree.
 //
-// This limiter cannot see inside the engines: Xray/sing-box open their own
-// connections. For engine traffic the defense is mux-by-default (see
-// engine/mux.go), not this semaphore. The limiter is for core-initiated
-// dials only, and its doc comment says so wherever it is used.
-//
-// NOT WIRED: core dials (the probe) do not acquire from this yet — it
-// is a tested primitive waiting for the probe-dial acquisition path
-// (T007).
-//
-// The zero value is ready to use.
-type HandshakeLimiter struct {
-	mu   sync.Mutex
-	sems map[string]chan struct{}
-	// max is the per-SNI parallelism cap; zero means defaultHandshakeLimit.
-	max int
-	// timeout bounds how long Acquire waits for a slot; zero means
-	// defaultHandshakeAcquireTimeout. A stuck holder must not wedge the
-	// caller forever.
-	timeout time.Duration
-}
+// Wired consumers: probe.CheckDest acquires one slot per dest
+// handshake, and this package's active Prober acquires around its TLS
+// handshake (Prober.Budget, defaulting to DefaultHandshakeBudget).
+type HandshakeLimiter = probe.HandshakeLimiter
 
-const (
-	// defaultHandshakeLimit is the censor's trigger threshold: more than
-	// three parallel handshakes with one SNI.
-	defaultHandshakeLimit = 3
-	// defaultHandshakeAcquireTimeout bounds slot acquisition. Handshakes
-	// are short; waiting longer means the budget is saturated by stuck
-	// dials, and the caller should fail fast instead of queueing behind
-	// them.
-	defaultHandshakeAcquireTimeout = 10 * time.Second
-)
-
-// NewHandshakeLimiter returns a limiter with explicit tuning. Non-positive
-// values select the defaults.
+// NewHandshakeLimiter returns a limiter with explicit tuning.
+// Non-positive values select the defaults (3 parallel handshakes per
+// SNI, 10 s acquire timeout).
 func NewHandshakeLimiter(maxParallel int, acquireTimeout time.Duration) *HandshakeLimiter {
-	return &HandshakeLimiter{sems: map[string]chan struct{}{}, max: maxParallel, timeout: acquireTimeout}
+	return probe.NewHandshakeLimiter(maxParallel, acquireTimeout)
 }
 
-func (l *HandshakeLimiter) limit() int {
-	if l.max > 0 {
-		return l.max
-	}
-	return defaultHandshakeLimit
-}
-
-func (l *HandshakeLimiter) acquireTimeout() time.Duration {
-	if l.timeout > 0 {
-		return l.timeout
-	}
-	return defaultHandshakeAcquireTimeout
-}
-
-func (l *HandshakeLimiter) sem(key string) chan struct{} {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	if l.sems == nil {
-		l.sems = map[string]chan struct{}{}
-	}
-	s, ok := l.sems[key]
-	if !ok {
-		s = make(chan struct{}, l.limit())
-		l.sems[key] = s
-	}
-	return s
-}
-
-// Acquire takes one handshake slot for sni, or returns an error when the
-// context expires or the acquire timeout elapses. The returned release
-// function must be called when the handshake finishes, even on failure.
-// Slots are per normalized SNI; different SNIs never contend.
-func (l *HandshakeLimiter) Acquire(ctx context.Context, sni string) (release func(), err error) {
-	key := normalizeSNI(sni)
-	sem := l.sem(key)
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
-	// Fast path: a free slot is taken without arming the acquire
-	// timer. time.NewTimer costs 248 B / 3 allocs on this path
-	// (measured, [opt40]) while the uncontended acquire — the norm,
-	// since the limiter only bites under a >3-way burst on one SNI —
-	// needs no deadline at all: 264 B / 4 allocs -> 16 B / 1 alloc.
-	// The contended path below is unchanged, timer and all. The
-	// ctx.Err pre-check keeps a cancelled caller from taking a slot
-	// the old three-way select would only randomly have refused.
-	select {
-	case sem <- struct{}{}:
-		return func() { <-sem }, nil
-	default:
-	}
-	timer := time.NewTimer(l.acquireTimeout())
-	defer timer.Stop()
-	select {
-	case sem <- struct{}{}:
-		return func() { <-sem }, nil
-	case <-timer.C:
-		return nil, errHandshakeBudgetTimeout{key}
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	}
-}
-
-// InFlight reports the current slot usage for sni, for diagnostics.
-func (l *HandshakeLimiter) InFlight(sni string) int {
-	l.mu.Lock()
-	sem, ok := l.sems[normalizeSNI(sni)]
-	l.mu.Unlock()
-	if !ok {
-		return 0
-	}
-	return len(sem)
-}
-
-type errHandshakeBudgetTimeout struct{ sni string }
-
-func (e errHandshakeBudgetTimeout) Error() string {
-	return "handshake budget: no slot for " + e.sni + " within the acquire timeout"
-}
+// DefaultHandshakeBudget is the shared limiter the active censorship
+// prober acquires from when Prober.Budget is nil: censorship probes
+// from every flow share one per-SNI budget, which is the point — the
+// censor counts handshakes per SNI, not per caller.
+var DefaultHandshakeBudget = NewHandshakeLimiter(0, 0)

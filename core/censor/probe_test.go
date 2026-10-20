@@ -3,6 +3,8 @@ package censor
 import (
 	"context"
 	"net"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -146,5 +148,47 @@ func TestProbePlainTCPNoTLS(t *testing.T) {
 	// mistaking a quiet close for interference.
 	if ws := findWhat(a, StageTCP); !containsWhat(ws, WhatRemoteClose) {
 		t.Fatalf("tcp events = %v, want the orderly close observed", ws)
+	}
+}
+
+// TestProbeHandshakeBudgetRefusal: with the per-SNI budget saturated,
+// the active prober records the refusal as the attempt's TLS outcome
+// instead of putting a fourth ClientHello on the wire (T007).
+func TestProbeHandshakeBudgetRefusal(t *testing.T) {
+	// A real TLS target the probe would otherwise reach.
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+	go func() {
+		for {
+			c, err := ln.Accept()
+			if err != nil {
+				return
+			}
+			_ = c.Close()
+		}
+	}()
+	host, portStr, _ := net.SplitHostPort(ln.Addr().String())
+	port, _ := strconv.Atoi(portStr)
+
+	budget := NewHandshakeLimiter(1, 20*time.Millisecond)
+	hold, err := budget.Acquire(context.Background(), host)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer hold()
+
+	p := &Prober{Budget: budget}
+	a := p.Probe(context.Background(), Target{Host: host, Port: port, TLS: true})
+	var sawBudget bool
+	for _, e := range a.Events {
+		if e.Stage == StageTLS && strings.Contains(e.Detail, "handshake budget") {
+			sawBudget = true
+		}
+	}
+	if !sawBudget {
+		t.Fatalf("expected a handshake-budget TLS event, got events %+v", a.Events)
 	}
 }

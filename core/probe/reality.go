@@ -104,6 +104,40 @@ type DestReport struct {
 
 const destDialTimeout = 10 * time.Second
 
+// destHandshakeLimiter is the shared per-SNI handshake budget every
+// dest-check handshake acquires from (T007): a dest check performs two
+// handshakes, and a burst of checks against one SNI must not itself
+// trip the freeze the budget exists to dodge. Tests swap it to prove
+// the acquisition path; production uses the defaults (3/SNI).
+var destHandshakeLimiter = NewHandshakeLimiter(0, 0)
+
+// CheckDest runs the REALITY dest checklist against host with the
+// production resolver and dialer. It is the on-demand diagnostic the
+// checklist was built for: two sequential TLS handshakes, no tunnel.
+func CheckDest(ctx context.Context, host string) (*DestReport, error) {
+	return checkDest(ctx, host, nil, nil, nil)
+}
+
+// CheckDestForServer is CheckDest plus the SNI↔infrastructure
+// consistency check against the REALITY server's own address: a dest
+// that resolves to the server itself, or to non-public addresses, is
+// not an independent decoy, and the report says so (Passed=false).
+func CheckDestForServer(ctx context.Context, serverAddr, host string) (*DestReport, error) {
+	r, err := checkDest(ctx, host, nil, nil, nil)
+	if err != nil {
+		return r, err
+	}
+	_, issues, cerr := checkSNIConsistency(ctx, serverAddr, host, nil)
+	if cerr != nil {
+		return r, cerr
+	}
+	if len(issues) > 0 {
+		r.Issues = append(r.Issues, issues...)
+		r.Passed = false
+	}
+	return r, nil
+}
+
 // checkDest is the injectable core: resolve maps a name to addresses,
 // dial opens a TLS connection with the given config, roots overrides the
 // system cert pool (nil = system). Tests inject all three; production
@@ -143,7 +177,20 @@ func checkDest(ctx context.Context, host string, resolve func(context.Context, s
 		InsecureSkipVerify: true, // the certificate is verified manually below
 		MinVersion:         tls.VersionTLS10,
 	}
-	conn, err := dial(rctx, addrs[0], base)
+	// Every handshake this checker performs takes a slot from the
+	// shared per-SNI budget first: the checker is a core-initiated
+	// dial like any other, and its own bursts must not trip the
+	// freeze it helps diagnose. The slot is held only for the
+	// handshake (the dial), never for the analysis after it.
+	dialLimited := func(cfg *tls.Config) (*tls.Conn, error) {
+		release, aerr := destHandshakeLimiter.Acquire(rctx, host)
+		if aerr != nil {
+			return nil, fmt.Errorf("probe: dest check handshake budget for %q: %w", host, aerr)
+		}
+		defer release()
+		return dial(rctx, addrs[0], cfg)
+	}
+	conn, err := dialLimited(base)
 	if err != nil {
 		return nil, fmt.Errorf("probe: TLS to dest %q failed: %w", host, err)
 	}
@@ -168,7 +215,7 @@ func checkDest(ctx context.Context, host string, resolve func(context.Context, s
 	// negotiated group, so offering only X25519 is the honest test.
 	xcfg := base.Clone()
 	xcfg.CurvePreferences = []tls.CurveID{tls.X25519}
-	xconn, err := dial(rctx, addrs[0], xcfg)
+	xconn, err := dialLimited(xcfg)
 	if err != nil {
 		r.Issues = append(r.Issues, "dest does not complete a handshake offering only X25519")
 	} else {
@@ -197,6 +244,9 @@ func checkDest(ctx context.Context, host string, resolve func(context.Context, s
 func checkSNIConsistency(ctx context.Context, serverAddr, destHost string, resolve func(context.Context, string) ([]string, error)) (resolved []string, issues []string, err error) {
 	if strings.TrimSpace(destHost) == "" {
 		return nil, nil, fmt.Errorf("probe: empty dest host")
+	}
+	if resolve == nil {
+		resolve = defaultResolve
 	}
 	rctx, cancel := context.WithTimeout(ctx, destDialTimeout)
 	defer cancel()
