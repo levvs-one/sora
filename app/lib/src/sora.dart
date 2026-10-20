@@ -140,12 +140,16 @@ class Sora extends ChangeNotifier {
     ),
   )..addListener(notifyListeners);
 
-  bool get updateBlocked => updates.busy;
+  bool get updateBlocked => updates.busy || updates.rollbackBusy;
 
   final _messages = StreamController<AppNotification>.broadcast();
   Stream<AppNotification> get messages => _messages.stream;
   final _reported = <String, String>{};
   bool serverlessAvailable = false;
+
+  /// Set once the core answers the control channel (the getStatus/getAbout
+  /// handshake in [run]); the S11b post-update health signal.
+  bool coreHandshakeDone = false;
   Set<String> coreCapabilities = {};
 
   S get strings {
@@ -657,6 +661,11 @@ class Sora extends ChangeNotifier {
         localProxy = about.about.hasLocalProxy() ? about.about.localProxy : null;
         if (failure?.key == CoreFailure.unavailable.key) failure = null;
         recovered('core');
+        // S11b: getStatus + getAbout answered — the honest post-update
+        // health signal. The updater clears its pending-update marker here;
+        // the 60-second rollback window never fires on a healthy core.
+        coreHandshakeDone = true;
+        unawaited(_updates.noteCoreHealthy());
         // Heal the core-side obfuscation profile: the app is the source of
         // truth, the core only caches it. Silent: an old core keeps working
         // with local-only settings.

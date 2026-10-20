@@ -440,6 +440,10 @@
   "updateWindowsSigBlocked": "Автоматическая установка отключена в Windows, пока не реализована проверка подписи релиза. Скачайте установщик со страницы релиза и проверьте его вручную.",
   "updateVersionRevoked": "Эта версия отозвана разработчиком. Дождитесь исправленного релиза.",
   "updateRolloutPending": "Новая версия распространяется постепенно и будет предложена вам автоматически.",
+  "updateRollbacking": "Rolling back to version {version}...",
+  "updateRolledBack": "The update to {version} did not pass the health check, so Sora was rolled back to {fromVersion}.",
+  "updateRollbackError": "Automatic rollback failed. If the new version does not work, reinstall the previous release manually.",
+  "updateRollbackCacheError": "Could not prepare a verified rollback copy of the current version, so the update was not installed.",
   "updateCopyCommand": "Скопировать команду",
   "updateChecksDisabled": "Автоматические проверки отключены в настройках.",
   "updateInstalled": "Обновление установлено. Откройте Sora снова.",
@@ -453,6 +457,23 @@
   "@updateNotes": {
     "placeholders": {
       "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
         "type": "String"
       }
     }

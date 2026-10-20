@@ -85,8 +85,109 @@ Add the bad version to `blocked_versions` and push to `main`:
 - Clients stop offering `1.2.3` on their next check (≤ 12 h, or immediately on
   manual check).
 - Installs already on `1.2.3` see a persistent "this version has been
-  recalled, wait for a fix" notice in About. There is no auto-rollback
-  (separate workstream S11b).
+  recalled, wait for a fix" notice in About. A recalled version is **not**
+  rolled back automatically while it runs fine — recall is a warning, not a
+  failure signal. Automatic rollback (S11b, below) only fires when a freshly
+  installed update fails its post-update health check.
+
+## Post-update health check and automatic rollback (S11b, Linux)
+
+Every in-app update on Linux is rollback-protected. The mechanism is honest
+by construction: it only ever claims what it verified, and every failure
+mode degrades to "do nothing + tell the user" instead of a silent downgrade.
+
+### The marker
+
+Before handing the downloaded packages to the privileged helper,
+`AppUpdater.install()` writes a `pendingUpdate` marker to settings:
+
+```json
+{"from": "1.2.3", "to": "1.3.0", "atMs": 1729471234567}
+```
+
+- `from` — the version being replaced, `to` — the version being installed,
+  `atMs` — wall-clock time of the handoff.
+- The marker is written **only** when the helper is actually about to run
+  (elevation available, rollback cache ready). Any earlier failure leaves no
+  marker behind.
+- A settings reset preserves the marker: it is a safety mechanism, not a
+  preference, and resetting must not silently disarm it.
+
+### The 60-second health check
+
+After the restart, the new build sees the marker and opens a 60-second
+window (`AppUpdater.healthCheckWindow`):
+
+- **Health signal.** The app considers the core alive when `Sora.run()`
+  completes the control-channel handshake: `CoreLink.open` plus successful
+  `getStatus` and `getAbout` gRPC round-trips. A bare TCP connect is not
+  enough — the core must actually answer the control channel. This is the
+  same signal the app itself uses to leave the offline phase, so the check
+  cannot "pass" while the UI still shows the core as down.
+- If the signal arrives in time, the marker is cleared and the update is
+  accepted. The check is silent on success.
+- If the app crashed before clearing the marker, the next launch finds a
+  **stale** marker (`now - atMs > 60 s`) and goes straight to rollback —
+  no fresh window, no waiting.
+- A corrupt marker, or a marker naming a build other than the running one
+  (update never landed, manual reinstall), is cleared silently: its premise
+  is void and it must never trigger a downgrade.
+
+### The rollback
+
+When the window expires (or the marker is stale), the app rolls back to
+`from`:
+
+1. The pre-update packages come from a **rollback cache** prepared at update
+   time: `~/.cache/sora/rollback/<from>/` (or `$XDG_CACHE_HOME`), holding
+   both packages plus that release's `SHA256SUMS` and `SHA256SUMS.minisig`.
+   The cache is hash-verified when downloaded, so the rollback works
+   **offline** — re-downloading at rollback time would fail exactly when
+   the network is unusable.
+2. Before invoking the helper, the app **re-verifies** every cached package
+   against the cached manifest (fail-closed: the cache lived on
+   user-writable disk since download). Any mismatch → no rollback, error
+   plus a manual reinstall command in About.
+3. The install goes through the same privileged helper with
+   `--allow-downgrade`; the helper re-verifies the manifest **signature as
+   root** before trusting any hash (SORA-H1), same as for upgrades.
+4. On success the marker is cleared, a persistent "rolled back to X" notice
+   is stored, and the app restarts into the old build.
+
+Fail-closed rules:
+
+- No verified cache → no rollback (error + manual command, no pkexec).
+- No elevation → no rollback (manual command shown instead).
+- Helper failure → no retry loop: the marker is cleared so a broken updater
+  cannot downgrade on every launch; the error stays visible in About.
+- A rollback never fires for a healthy install: the core-health gate is
+  re-checked immediately before invoking the helper.
+
+Preparing the cache is mandatory: if the previous release's packages cannot
+be downloaded and hash-verified, the **update itself is aborted** with
+`updateRollbackCacheError`. Installing without a rollback path is not an
+option once the safety net is promised. Cost: the update downloads roughly
+twice the packages (old + new), and the cache occupies disk until the next
+update replaces it.
+
+### Known limitations
+
+- **The app must be able to start.** If the new build crashes before
+  `checkPendingUpdate` runs, no automatic rollback happens — a program that
+  cannot run cannot repair itself. This is a documented limitation, not a
+  gap to paper over.
+- **Manual rollback** (when auto-rollback cannot run): download the previous
+  release's packages from the GitHub Releases page, verify `SHA256SUMS`
+  (and the `.minisig` signature once the key ceremony is done), then install
+  for your distro — e.g. `sudo dpkg -i sora-core_<ver>_amd64.deb
+  sora_<ver>_amd64.deb`, `sudo dnf install ./sora-core-<ver>-1.x86_64.rpm
+  ./sora-<ver>-1.x86_64.rpm`, or `sudo pacman -U
+  sora-core-<ver>-1-x86_64.pkg.tar.zst sora-<ver>-1-x86_64.pkg.tar.zst`.
+  The stale `pendingUpdate` marker is harmless: the reinstalled old build
+  sees `marker.to != version` and clears it silently.
+- **Windows:** the in-app update path is blocked fail-closed (A2), so no
+  marker is ever written and rollback does not apply. Reinstall the previous
+  `Sora-Setup-<ver>-x64.exe` by hand if needed.
 
 ### Validation checklist before pushing the feed
 

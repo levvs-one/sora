@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io' show Platform;
 import 'dart:math' show Random;
 import 'dart:ui' show Locale, PlatformDispatcher;
@@ -56,6 +57,8 @@ class Settings {
     'checkUpdates',
     'notifiedUpdate',
     'resumeAfterUpdate',
+    'pendingUpdate',
+    'lastRollback',
     'installUuid',
     'serverSortMode',
     'autoSelectMode',
@@ -264,6 +267,21 @@ class Settings {
   bool get resumeAfterUpdate => _store.getBool('resumeAfterUpdate') ?? false;
   Future<void> saveResumeAfterUpdate(bool value) => _store.setBool('resumeAfterUpdate', value);
 
+  /// Post-update health-check marker (S11b): JSON
+  /// `{"from":"1.2.3","to":"1.3.0","atMs":169...}`, written before the
+  /// privileged helper runs. The new build clears it once the core answers
+  /// the control channel; a stale marker triggers the automatic rollback.
+  String get pendingUpdate => _store.getString('pendingUpdate') ?? '';
+  Future<void> savePendingUpdate(String value) => _store.setString('pendingUpdate', value);
+  Future<void> clearPendingUpdate() => _store.remove('pendingUpdate');
+
+  /// Notice of the last automatic rollback (S11b): JSON `{"from","to"}`.
+  /// Survives the restart the rollback performs so About can report it.
+  String get lastRollback => _store.getString('lastRollback') ?? '';
+  Future<void> saveLastRollback(String from, String to) =>
+      _store.setString('lastRollback', jsonEncode({'from': from, 'to': to}));
+  Future<void> clearLastRollback() => _store.remove('lastRollback');
+
   /// Stable per-install UUID for the staged-rollout cohort (S11a). Generated
   /// once in [_migrate] and preserved across [reset] so a settings reset
   /// cannot re-roll the cohort to dodge a rollout or a kill-switch.
@@ -362,6 +380,8 @@ class Settings {
     final history = notificationHistory;
     final notified = notifiedUpdate;
     final uuid = installUuid;
+    final pending = pendingUpdate;
+    final rolledBack = lastRollback;
     await _store.clear();
     await completeTour();
     await saveNotificationHistory(history);
@@ -369,6 +389,12 @@ class Settings {
     // Keep the rollout cohort stable: re-rolling the install UUID on reset
     // would let a settings reset dodge a staged rollout or a kill-switch.
     if (uuid.isNotEmpty) await _store.setString('installUuid', uuid);
+    // The post-update health marker is a safety mechanism, not a preference:
+    // a reset must not silently disarm the rollback of an update that is
+    // still inside its health window. The rollback notice is kept for the
+    // same reason — the user should still learn that a rollback happened.
+    if (pending.isNotEmpty) await savePendingUpdate(pending);
+    if (rolledBack.isNotEmpty) await _store.setString('lastRollback', rolledBack);
     if (snapshot.isNotEmpty) await saveProxySnapshot(snapshot);
     await _migrate();
   }

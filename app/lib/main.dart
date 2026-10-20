@@ -29,7 +29,20 @@ Future<void> main(List<String> args) async {
   final desktop = Platform.isLinux || Platform.isWindows ? Desktop(sora, navigator) : null;
   await desktop?.start(hidden: args.contains('--hidden'));
   runApp(SoraApp(sora: sora, navigator: navigator, desktop: desktop));
-  WidgetsBinding.instance.addPostFrameCallback((_) => sora.updates.start());
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    sora.updates.start();
+    // S11b: post-update health check / automatic rollback. No-op unless a
+    // pending-update marker was written by the previous build (Linux only).
+    if (desktop != null) {
+      unawaited(
+        sora.updates.checkPendingUpdate(
+          coreHealthy: () => sora.coreHandshakeDone,
+          restart: desktop.restartAfterUpdate,
+          quit: desktop.quit,
+        ),
+      );
+    }
+  });
   await desktop?.handleInitialLinks(launchLink);
 }
 

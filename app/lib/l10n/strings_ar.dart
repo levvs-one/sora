@@ -887,6 +887,22 @@ class SAr extends S {
   String get updateRolloutPending => 'A newer version is rolling out gradually and will be offered to you automatically.';
 
   @override
+  String updateRollbacking(String version) {
+    return 'Rolling back to version $version...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+  }
+
+  @override
+  String get updateRollbackError => 'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+
+  @override
+  String get updateRollbackCacheError => 'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+
+  @override
   String get updateCopyCommand => 'أمر النسخ';
 
   @override

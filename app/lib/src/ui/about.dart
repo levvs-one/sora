@@ -213,6 +213,7 @@ class _AboutScreenState extends State<AboutScreen> {
                           Expanded(
                             child: Text(
                               switch (updates.stage) {
+                                UpdateStage.checking => s.updateChecking,
                                 UpdateStage.installing => s.updateInstalling,
                                 _ => s.updateDownloading,
                               },
@@ -255,7 +256,39 @@ class _AboutScreenState extends State<AboutScreen> {
                   UpdateError.connecting => s.updateWaitConnection,
                   UpdateError.unsupported => s.updateUnsupported,
                   UpdateError.signatureRequired => s.updateWindowsSigBlocked,
+                  UpdateError.rollback => s.updateRollbackError,
+                  UpdateError.rollbackCache => s.updateRollbackCacheError,
                 }, style: Styles.dangerSecondary(context)),
+              ),
+            // S11b: automatic rollback status. The notice survives the
+            // restart the rollback performs (persisted in settings).
+            if (updates.rollbackBusy && updates.rollbackTarget case final target?)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(s.updateRollbacking(target), style: Styles.secondary.copyWith(color: palette.ink2)),
+              ),
+            if (updates.lastRollback case final notice?)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      s.updateRolledBack(notice.to, notice.from),
+                      style: Styles.secondary.copyWith(color: palette.ink2),
+                    ),
+                    const SizedBox(height: 8),
+                    Pressable(
+                      onTap: () => unawaited(updates.dismissRollbackNotice()),
+                      radius: 8,
+                      semanticButton: true,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Text(s.close, style: Styles.secondary.copyWith(color: palette.ink)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             if (updates.manualCommand case final command?)
               Padding(
