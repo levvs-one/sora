@@ -533,6 +533,17 @@ type AmneziaWG struct {
 	MasqueradeBrowser  string
 }
 
+// IsZero reports whether every AmneziaWG parameter is unset. A zero
+// AmneziaWG is the documented "disabled" state (the validator accepts
+// it as such): it requests no obfuscation, so feature gates and
+// renderers must treat it exactly like a nil Amnezia — before this
+// check, a zero struct still forced FeatureAmneziaWG at selection,
+// dropped the sing-box MTU to 1280 and made the Xray renderer refuse
+// a plain WireGuard outbound it could have carried (CENSOR-P4).
+func (a *AmneziaWG) IsZero() bool {
+	return a == nil || *a == AmneziaWG{}
+}
+
 // awg31Ranges lists the AmneziaWG 3.1 fields that carry range<uint16>
 // values, for enablement checks and validation loops.
 func (a *AmneziaWG) awg31Ranges() [][2]string {

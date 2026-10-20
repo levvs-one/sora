@@ -112,7 +112,7 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 			// instead of completing a weaker handshake (CENSOR-P1).
 			out[FeatureRealityMLDSA65] = true
 		}
-		if o.Amnezia != nil {
+		if !o.Amnezia.IsZero() {
 			out[FeatureAmneziaWG] = true
 			if o.Amnezia.UsesAWG31() {
 				// Without the gate a 3.x plan could land on an engine

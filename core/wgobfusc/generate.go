@@ -59,6 +59,16 @@ func GenerateWith(rng io.Reader, preset Preset) (engine.AmneziaWG, error) {
 	return generate(rng, preset, false)
 }
 
+// GeneratePreset returns a random parameter set whose I1 carries the
+// requested traffic-shape preset, in the 2.0 or the 3.1 variant. It is
+// the public form of the preset choice Generate/Generate31 fix to
+// QUIC: the UI's preset picker calls this so a DNS or SIP shape the
+// user picked is the shape that renders, on every engine that carries
+// AWG (the I1..I5 fields are data all AWG renderers emit verbatim).
+func GeneratePreset(preset Preset, v31 bool) (engine.AmneziaWG, error) {
+	return generate(rand.Reader, preset, v31)
+}
+
 func generate(rng io.Reader, preset Preset, v31 bool) (engine.AmneziaWG, error) {
 	var a engine.AmneziaWG
 	ri := &reader{rng: rng}
@@ -145,6 +155,13 @@ func presetScript(ri *reader, preset Preset) (string, error) {
 		return string(out), nil
 	}
 	r := func(lo, hi int) int { return lo + ri.n(hi-lo+1) }
+	switch preset {
+	case PresetQUIC, PresetDNS, PresetSIP:
+	default:
+		// An out-of-range preset silently becoming QUIC would render
+		// a different shape than the profile names — fail closed.
+		return "", fmt.Errorf("wgobfusc: unknown preset %d", int(preset))
+	}
 	switch preset {
 	case PresetDNS:
 		// DNS query: random transaction ID, standard-query flags,
