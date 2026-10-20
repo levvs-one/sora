@@ -22,11 +22,11 @@ func TestWFPTunnelFiltersAllowInboundReauthorization(t *testing.T) {
 			if rule.Layer != layer {
 				continue
 			}
-			if rule.Name == "Sora: tunnel destination outside the tunnel" {
+			if rule.Name == "Sora: legacy fake addresses" {
 				for _, c := range rule.Conditions {
 					if c.Value == netip.MustParsePrefix("172.19.0.0/16") {
 						legacyBlock++
-						if layer != wf.LayerALEAuthConnectV4 || rule.Action != wf.ActionBlock || rule.Weight <= weightPermit {
+						if layer != wf.LayerALEAuthConnectV4 || rule.Action != wf.ActionBlock || rule.Weight >= weightPermit {
 							t.Fatal("legacy IPv4 destination block has wrong family, action or precedence")
 						}
 					}

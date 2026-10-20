@@ -116,11 +116,24 @@ func TestDNSAndTunnelDestinationsPrecedeLANPermits(t *testing.T) {
 	}
 }
 
-func TestLegacyFakeIPCannotUseEngineOrLANPermits(t *testing.T) {
-	rules := guard.NftRuleset(999, []string{"0.0.0.0/0"})
+// TestLegacyFakeIPYieldsToLANBypass: 172.19.0.0/16 sits inside the default
+// 172.16.0.0/12 bypass, so the legacy drop must come after the
+// local-network accepts — Docker networks stay reachable while the kill
+// switch is armed. Stale fake addresses pointing anywhere else are still
+// dropped before the final kill-switch drop.
+func TestLegacyFakeIPYieldsToLANBypass(t *testing.T) {
+	rules := guard.NftRuleset(999, nil)
 	block := strings.Index(rules, "ip daddr 172.19.0.0/16 counter drop")
-	if block <= strings.Index(rules, `oifname "sora0" accept`) || block >= strings.Index(rules, "meta skuid 999 accept") || block >= strings.Index(rules, "ip daddr 0.0.0.0/0 accept") {
-		t.Fatal("legacy fake addresses must leave only through Sora TUN")
+	bypass := strings.Index(rules, "ip daddr 172.16.0.0/12 accept")
+	final := strings.Index(rules, `counter drop comment "sora: kill switch"`)
+	if block < 0 || bypass < 0 || final < 0 {
+		t.Fatalf("the ruleset is missing a rule:\n%s", rules)
+	}
+	if block < bypass {
+		t.Error("the legacy drop precedes the local-network bypass: Docker 172.19.0.0/16 would be unreachable")
+	}
+	if block > final {
+		t.Error("the legacy drop must still be in force before the final kill-switch drop")
 	}
 }
 

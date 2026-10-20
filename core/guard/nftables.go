@@ -48,7 +48,7 @@ func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string 
 	b.WriteString("\t\toif lo accept comment \"sora: the local engine is on loopback\"\n")
 	// Permit traffic through TUN; block only traffic bypassing it.
 	b.WriteString("\t\toifname \"" + engine.TunDevice + "\" accept comment \"sora: through the tunnel\"\n")
-	for _, network := range append([]netip.Prefix{netip.MustParsePrefix(legacyFakeIPNetwork)}, blocked...) {
+	for _, network := range blocked {
 		family := "ip"
 		if network.Addr().Is6() {
 			family = "ip6"
@@ -79,6 +79,12 @@ func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string 
 		}
 		b.WriteString("\t\t" + family + " daddr " + prefix.Masked().String() + " accept comment \"sora: local network bypass\"\n")
 	}
+	// The legacy fake-IP drop sits after the local-network accepts on
+	// purpose: 172.19.0.0/16 lives inside the default 172.16.0.0/12
+	// bypass, and Docker networks there must stay reachable while the
+	// kill switch is armed. Stale cached fake addresses pointing
+	// anywhere else are still dropped here, ahead of the final drop.
+	b.WriteString("\t\tip daddr " + legacyFakeIPNetwork + " counter drop comment \"sora: legacy fake addresses\"\n")
 	b.WriteString("\t\tcounter drop comment \"sora: kill switch\"\n")
 	b.WriteString("\t}\n")
 	b.WriteString("}\n")

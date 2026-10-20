@@ -67,6 +67,13 @@ const (
 	weightTunnelBlock  = 40
 	weightTunnelPermit = 50
 	weightBlock        = 0
+	// weightLegacyBlock ranks the stale fake-address block below the
+	// local-network permits on purpose: 172.19.0.0/16 sits inside the
+	// default 172.16.0.0/12 bypass, and Docker networks there must stay
+	// reachable while the kill switch is armed. Stale cached fake
+	// addresses pointing anywhere else are still blocked, ahead of the
+	// final block.
+	weightLegacyBlock = 5
 )
 
 var outbound = []wf.LayerID{wf.LayerALEAuthConnectV4, wf.LayerALEAuthConnectV6}
@@ -199,11 +206,19 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 			return err
 		}
 	}
-	for _, network := range append([]netip.Prefix{netip.MustParsePrefix(legacyFakeIPNetwork)}, w.blockedNetworks...) {
+	for _, network := range w.blockedNetworks {
 		if err := add("tunnel destination outside the tunnel", wf.ActionBlock, weightTunnelBlock,
 			&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: network}); err != nil {
 			return err
 		}
+	}
+	// The legacy fake-address block sits below the local-network permits:
+	// 172.19.0.0/16 is inside the default 172.16.0.0/12 bypass, so a
+	// weight above the permits would make Docker networks unreachable
+	// while the kill switch is armed.
+	if err := add("legacy fake addresses", wf.ActionBlock, weightLegacyBlock,
+		&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.MustParsePrefix(legacyFakeIPNetwork)}); err != nil {
+		return err
 	}
 	if err := add("DNS outside the tunnel", wf.ActionBlock, 20,
 		&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(53)}); err != nil {
