@@ -3,6 +3,7 @@ package control
 import (
 	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -88,20 +89,22 @@ func TestPlanFromProtoMapsZapretStrategy(t *testing.T) {
 	}
 }
 
-// TestPlanFromProtoZapretStrategyDefaults: an absent strategy selects the
-// core default, not an empty strategy.
-func TestPlanFromProtoZapretStrategyDefaults(t *testing.T) {
+// TestPlanFromProtoZapretWithoutStrategyFails: an absent strategy is
+// refused at plan time. The core's built-in default needs the nfqws
+// backend, which is not wired up yet, so defaulting to it would build a
+// plan that only fails at engine Apply; the refusal must be early and
+// name the reason.
+func TestPlanFromProtoZapretWithoutStrategyFails(t *testing.T) {
 	if runtime.GOOS != "linux" {
 		t.Skip("zapret_with_vpn is Linux-only")
 	}
 	in := chainTestPlan()
 	in.ZapretWithVpn = true
-	plan, err := planFromProto(in, "s-1", nil)
-	if err != nil {
-		t.Fatalf("planFromProto: %v", err)
+	_, err := planFromProto(in, "s-1", nil)
+	if err == nil {
+		t.Fatal("zapret_with_vpn without a strategy must be rejected at plan time")
 	}
-	zb := zapretTestOutbound(t, plan)
-	if zb.Bypass == nil || !reflect.DeepEqual(*zb.Bypass, defaultZapretStrategy) {
-		t.Fatalf("zapret strategy = %+v, want default %+v", zb.Bypass, defaultZapretStrategy)
+	if !strings.Contains(err.Error(), "nfqws") {
+		t.Fatalf("error = %v, want it to name the unwired nfqws backend", err)
 	}
 }
