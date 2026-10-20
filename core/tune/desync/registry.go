@@ -183,9 +183,23 @@ func LookupProfile(id string) (Profile, bool) {
 // profileForParams finds the registry profile a genome came from, if
 // any: the tuner binds winners by profile ID when the winner is a
 // registry entry verbatim, and by genome ID otherwise.
+//
+// The comparison happens in RESOLVED space: Tune resolves registry
+// markers against the blocked canary's SNI before probing, so the
+// winner it hands back is the resolved genome (d/split:sniext+14…),
+// while the registry stores the marker form (d/split:midsni…).
+// Comparing the resolved winner against the unresolved registry made
+// every marker profile (3 of 11) unbindable — the winner was
+// remembered by the binding store but never bound to F5. Registry
+// entries are therefore resolved with the same canary SNI the search
+// used before their IDs are compared.
 func profileForParams(p Params) (Profile, bool) {
 	for _, prof := range registry {
-		if prof.Params.ID() == p.ID() {
+		resolved, err := resolveMarkers(prof.Params, BlockedCanary.SNI)
+		if err != nil {
+			continue
+		}
+		if resolved.ID() == p.ID() {
 			return prof, true
 		}
 	}

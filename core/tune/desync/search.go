@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"sort"
 	"strings"
 	"time"
@@ -118,6 +119,13 @@ func (r SearchResult) Succeeded() bool { return r.Best.Working() }
 // no canary payloads, no latencies, no network identifiers — so every
 // caller logs strategies the same way and nothing beyond the outcome
 // reaches the log.
+//
+// The bind warning is a fixed category, never the error's text: the
+// binder's errors quote profile values (gateway and DNS addresses
+// from profiles validation) and the binding store's quote filesystem
+// paths, and a journal line that interpolates them leaks the user's
+// network identifiers into the log the redactors never see. The full
+// error stays available programmatically in BindErr for the caller.
 func (r SearchResult) Summary() string {
 	var b strings.Builder
 	if r.Succeeded() {
@@ -127,9 +135,25 @@ func (r SearchResult) Summary() string {
 	}
 	fmt.Fprintf(&b, " after %d attempt(s)", r.Attempts)
 	if r.BindErr != nil {
-		fmt.Fprintf(&b, "; binding not saved: %v", r.BindErr)
+		fmt.Fprintf(&b, "; binding not saved: %s", bindErrKind(r.BindErr))
 	}
 	return b.String()
+}
+
+// bindErrKind classifies a bind/persist failure into one of a few
+// fixed, content-free tokens for the journal line (see Summary). It
+// never echoes the error's own text.
+func bindErrKind(err error) string {
+	switch {
+	case errors.Is(err, fs.ErrPermission):
+		return "permission denied"
+	case errors.Is(err, fs.ErrNotExist):
+		return "storage path missing"
+	case errors.Is(err, fs.ErrExist):
+		return "storage path conflict"
+	default:
+		return "bind error"
+	}
 }
 
 // Search runs the bounded two-generation search: score the seed

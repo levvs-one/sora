@@ -32,8 +32,20 @@ type Rotator struct {
 
 // NewRotator builds the ring over ranked candidates (best first). Entries
 // with Score 0 are dropped. maxFails <= 0 means 3, maxAge <= 0 means
-// 15 minutes — the TSPU re-block window from field practice.
+// 15 minutes — the TSPU re-block window from field practice. The ring
+// is born now; callers serving a strategy that was adopted earlier
+// (a stored tuner binding) use NewRotatorBorn so the age check
+// measures the strategy's real age, not the ring's construction time.
 func NewRotator(ranked []Scored, maxFails int, maxAge time.Duration) *Rotator {
+	return NewRotatorBorn(ranked, maxFails, maxAge, time.Now())
+}
+
+// NewRotatorBorn is NewRotator with an explicit adoption time: the
+// moment the current strategy was adopted (for a tuner binding, when
+// the winner was scored). Age rotation compares against this, so a
+// winner bound an hour ago rotates on first serve instead of getting
+// a fresh 15 minutes every time a ring is rebuilt.
+func NewRotatorBorn(ranked []Scored, maxFails int, maxAge time.Duration, born time.Time) *Rotator {
 	alive := make([]Scored, 0, len(ranked))
 	for _, s := range ranked {
 		if s.Working() {
@@ -46,7 +58,7 @@ func NewRotator(ranked []Scored, maxFails int, maxAge time.Duration) *Rotator {
 	if maxAge <= 0 {
 		maxAge = 15 * time.Minute
 	}
-	return &Rotator{ranked: alive, maxFails: maxFails, maxAge: maxAge, born: time.Now()}
+	return &Rotator{ranked: alive, maxFails: maxFails, maxAge: maxAge, born: born}
 }
 
 // Empty reports whether the ring holds no working strategy.

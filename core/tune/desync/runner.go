@@ -42,9 +42,12 @@ var BlockedCanary = Canary{Host: "youtube.com", Port: 443, SNI: "youtube.com"}
 var ControlCanary = Canary{Host: "one.one.one.one", Port: 443, SNI: "one.one.one.one"}
 
 // IsCanary reports whether a target is one of the two sanctioned
-// probing endpoints. The Service refuses to run a probe built for any
-// other target: active probing fingerprints itself, so sora probes
-// its own canaries and nothing else.
+// probing endpoints. The production prober (control's
+// desyncSessionProber.handshake) refuses any other target before
+// dialling: active probing fingerprints itself, so sora probes its
+// own canaries and nothing else. The structural half of the same
+// guarantee is that the TuneDesync request carries no target field
+// at all — this guard is the executable half.
 func IsCanary(c Canary) bool {
 	return c == BlockedCanary || c == ControlCanary
 }
@@ -72,6 +75,30 @@ type ProfileBinder interface {
 	BindDesyncProfile(ctx context.Context, fp profiles.Fingerprint, profileID string, winner Params) error
 }
 
+// Rotation parameters for a bound winner's ring. The values are
+// rotate.go's field-derived defaults, named here so the wiring is
+// data, not literals at the call site: 3 consecutive failures declare
+// a strategy dead, and 15 minutes is the TSPU re-block window — a
+// winner older than that may have died silently.
+const (
+	rotatorMaxFails = 3
+	rotatorMaxAge   = 15 * time.Minute
+)
+
+// boundRing is the persistent rotation state for one network: the
+// ring built from a specific binding (identified by its scoring time
+// and winner), kept across Current/Observe calls so failure counts
+// and the winner's age survive between callers. Rebuilding the ring
+// on every Current() — the previous behaviour — reset born to "now"
+// on each call, so age rotation never fired and Fail() counts never
+// accumulated: rotation existed only inside one returned instance
+// that production never kept.
+type boundRing struct {
+	at       time.Time
+	winnerID string
+	rot      *Rotator
+}
+
 // Service is the production tuner facade: rate limiting, the
 // registry-seeded search, binding, rotation and passive health in one
 // place. Safe for concurrent use; runs are serialized (one active
@@ -84,11 +111,18 @@ type Service struct {
 	MinInterval time.Duration
 	// Now supplies the clock for tests; nil means time.Now.
 	Now func() time.Time
+	// OnRefuse, when set, is told whenever Current refuses to serve a
+	// stored binding (stale data versions, a winner that no longer
+	// converts): the refusal is an event the caller journals, never a
+	// silent serve and never a silent drop. The reason is one of the
+	// stable tokens from validatedRing — it carries no genome content.
+	OnRefuse func(fp profiles.Fingerprint, reason string)
 
-	mu      sync.Mutex
-	running bool
-	lastRun map[string]time.Time
-	health  map[string]*Health
+	mu       sync.Mutex
+	running  bool
+	lastRun  map[string]time.Time
+	health   map[string]*Health
+	rotators map[string]*boundRing
 }
 
 // NewService builds a Service over a binding store. The registry is
@@ -102,7 +136,8 @@ func NewService(store *BindingStore, binder ProfileBinder) (*Service, error) {
 		store, _ = NewBindingStore("")
 	}
 	return &Service{Store: store, Binder: binder,
-		lastRun: map[string]time.Time{}, health: map[string]*Health{}}, nil
+		lastRun: map[string]time.Time{}, health: map[string]*Health{},
+		rotators: map[string]*boundRing{}}, nil
 }
 
 func (s *Service) now() time.Time {
@@ -186,37 +221,105 @@ func (s *Service) Tune(ctx context.Context, fp profiles.Fingerprint, engine stri
 	}
 	if berr := s.Store.Bind(fp, binding); berr != nil {
 		res.BindErr = berr
-	} else if s.Binder != nil && binding.ProfileID != "" {
-		res.BindErr = s.Binder.BindDesyncProfile(ctx, fp, binding.ProfileID, binding.Winner)
+	} else {
+		// A fresh winner replaces the network's rotation ring: the
+		// old ring's failure counts describe a strategy that is no
+		// longer bound here.
+		s.mu.Lock()
+		delete(s.rotators, key)
+		s.mu.Unlock()
+		if s.Binder != nil && binding.ProfileID != "" {
+			res.BindErr = s.Binder.BindDesyncProfile(ctx, fp, binding.ProfileID, binding.Winner)
+		}
 	}
 	return res, nil
 }
 
+// validatedRing re-validates a stored binding before anything from
+// it is served — the check binding.go's contract promises ("entries
+// are served only after re-validation"). It returns the rotation
+// material (winner first, markers resolved, runners-up that still
+// convert) or a stable refusal token naming why the binding must not
+// be served: a winner recorded under another registry or gene-pool
+// version, an unresolvable marker, or a genome that no longer
+// converts to a strategy plan validation accepts (a corrupt or
+// hand-edited store can hold all three; the JSON layer cannot see
+// any of them). Runners-up are filtered, not fatal: a dead runner-up
+// must not kill a valid winner.
+func validatedRing(b Binding) ([]Scored, string) {
+	if b.RegistryVersion != RegistryVersion {
+		return nil, "stale registry version"
+	}
+	if b.GenePoolVersion != GenePoolVersion {
+		return nil, "stale gene pool version"
+	}
+	winner, err := resolveMarkers(b.Winner, BlockedCanary.SNI)
+	if err != nil {
+		return nil, "winner marker does not resolve"
+	}
+	if !winner.convertsValidly() {
+		return nil, "winner no longer converts"
+	}
+	ranked := []Scored{{Params: winner, Score: b.Score}}
+	for i, p := range b.Ranked {
+		rp, err := resolveMarkers(p, BlockedCanary.SNI)
+		if err != nil || !rp.convertsValidly() {
+			continue
+		}
+		score := b.Score // bindings written before RankedScores: keep order, reuse the winner's fitness
+		if i < len(b.RankedScores) {
+			score = b.RankedScores[i]
+		}
+		ranked = append(ranked, Scored{Params: rp, Score: score})
+	}
+	return ranked, ""
+}
+
+// ringLocked returns the network's persistent rotation ring,
+// building it from the binding when the binding changed (a new tune
+// re-scores: the old ring's age and failure counts describe the old
+// winner). The ring is born at Binding.At — the moment the winner was
+// scored — not at first serve, so age rotation measures the winner's
+// real age. s.mu must be held.
+func (s *Service) ringLocked(fp profiles.Fingerprint, b Binding, ranked []Scored) *Rotator {
+	key := NetworkKey(fp)
+	if cur, ok := s.rotators[key]; ok && cur.at.Equal(b.At) && cur.winnerID == b.Winner.ID() {
+		return cur.rot
+	}
+	born := b.At
+	if born.IsZero() {
+		born = s.now()
+	}
+	rot := NewRotatorBorn(ranked, rotatorMaxFails, rotatorMaxAge, born)
+	s.rotators[key] = &boundRing{at: b.At, winnerID: b.Winner.ID(), rot: rot}
+	return rot
+}
+
 // Current returns the rotation ring for a network: the bound winner
-// and its working runners-up, re-validated before serving (a winner
-// recorded under an older registry version, or one that no longer
-// converts, is refused rather than trusted). ok=false means no usable
-// binding: the caller should offer a fresh tune.
+// and its working runners-up, re-validated before serving (see
+// validatedRing). A binding that fails re-validation is refused —
+// ok=false, "no usable winner" — and the refusal is reported through
+// OnRefuse: serving an unconvertible or stale winner silently was
+// the failure this guards against. ok=false with NO stored binding
+// is the ordinary empty case and is not an event. The returned ring
+// is the Service's persistent one for the network: repeated calls
+// return the same Rotator, whose age runs from Binding.At and whose
+// failure counts accumulate across callers.
 func (s *Service) Current(fp profiles.Fingerprint) (*Rotator, Binding, bool) {
 	b, ok := s.Store.Lookup(fp)
 	if !ok {
 		return nil, Binding{}, false
 	}
-	if b.RegistryVersion != RegistryVersion {
-		return nil, Binding{}, false
-	}
-	if _, err := resolveMarkers(b.Winner, BlockedCanary.SNI); err != nil {
-		return nil, Binding{}, false
-	}
-	ranked := []Scored{{Params: b.Winner, Score: b.Score}}
-	for i, p := range b.Ranked {
-		score := b.Score // bindings written before RankedScores: keep order, reuse the winner's fitness
-		if i < len(b.RankedScores) {
-			score = b.RankedScores[i]
+	ranked, refuse := validatedRing(b)
+	if refuse != "" {
+		if s.OnRefuse != nil {
+			s.OnRefuse(fp, refuse)
 		}
-		ranked = append(ranked, Scored{Params: p, Score: score})
+		return nil, Binding{}, false
 	}
-	rot := NewRotator(ranked, 3, 15*time.Minute)
+	s.mu.Lock()
+	rot := s.ringLocked(fp, b, ranked)
+	s.mu.Unlock()
 	if rot.Empty() {
 		return nil, Binding{}, false
 	}
@@ -225,17 +328,41 @@ func (s *Service) Current(fp profiles.Fingerprint) (*Rotator, Binding, bool) {
 
 // Observe feeds one passive signal from real traffic into the
 // network's health window — the preferred retune input, costing no
-// probe at all.
+// probe at all. It also drives the network's persistent rotation
+// ring: a censor-specific bad signal (injected RST, block page, SNI
+// stall) counts as a ring failure and a clean connection as a ring
+// success, so "the winner died quietly" accumulates in the same ring
+// Current serves. Plain resets stay health-only — they are noise,
+// and the ring must not rotate on noise.
 func (s *Service) Observe(fp profiles.Fingerprint, sig Signal) {
 	key := NetworkKey(fp)
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	h, ok := s.health[key]
 	if !ok {
 		h = NewHealth(0)
 		s.health[key] = h
 	}
 	h.Add(sig)
+	s.mu.Unlock()
+	if sig != SignalSuccess && !sig.bad() {
+		return
+	}
+	b, ok := s.Store.Lookup(fp)
+	if !ok {
+		return
+	}
+	ranked, refuse := validatedRing(b)
+	if refuse != "" {
+		return // not an event here: Current reports refusals; Observe stays a hot path
+	}
+	s.mu.Lock()
+	rot := s.ringLocked(fp, b, ranked)
+	s.mu.Unlock()
+	if sig == SignalSuccess {
+		rot.Success()
+	} else {
+		rot.Fail()
+	}
 }
 
 // ShouldRetune applies the retune policy for a network: a network
