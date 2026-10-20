@@ -3915,6 +3915,12 @@ abstract class S {
   /// **'Скорость'**
   String get obfsPresetOff;
 
+  /// No description provided for @obfsPresetLight.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лёгкий'**
+  String get obfsPresetLight;
+
   /// No description provided for @obfsPresetCustom.
   ///
   /// In ru, this message translates to:
@@ -3992,6 +3998,24 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Возможности пока определяются.'**
   String get obfsUnknown;
+
+  /// No description provided for @obfsMux.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мультиплексирование'**
+  String get obfsMux;
+
+  /// No description provided for @obfsMuxDetail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Mux пропускает много потоков через одно TLS-соединение к REALITY-серверу, поэтому сеть видит один handshake. Отключайте, только если сервер плохо работает с mux: отдельные handshake могут стать заметнее.'**
+  String get obfsMuxDetail;
+
+  /// No description provided for @fragmentPerSessionNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только на эту сессию: при подключении её перекрывает сохранённый профиль маскировки. Курируемые пресеты — на экране «Маскировка трафика».'**
+  String get fragmentPerSessionNote;
 
   /// No description provided for @syncCodeExpired.
   ///

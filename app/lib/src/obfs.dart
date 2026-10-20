@@ -109,6 +109,7 @@ class ObfuscationProfile extends $pb.GeneratedMessage {
     $core.int? fragDelayMs,
     $core.int? jitterMs,
     $core.String? fakeSni,
+    $core.bool? muxDisabled,
   }) {
     final result = ObfuscationProfile._();
     if (preset != null) result.preset = preset;
@@ -117,6 +118,7 @@ class ObfuscationProfile extends $pb.GeneratedMessage {
     if (fragDelayMs != null) result.fragDelayMs = fragDelayMs;
     if (jitterMs != null) result.jitterMs = jitterMs;
     if (fakeSni != null) result.fakeSni = fakeSni;
+    if (muxDisabled != null) result.muxDisabled = muxDisabled;
     return result;
   }
 
@@ -138,6 +140,7 @@ class ObfuscationProfile extends $pb.GeneratedMessage {
     ..aI(4, _omitFieldNames ? '' : 'fragDelayMs', fieldType: $pb.PbFieldType.OU3)
     ..aI(5, _omitFieldNames ? '' : 'jitterMs', fieldType: $pb.PbFieldType.OU3)
     ..aOS(6, _omitFieldNames ? '' : 'fakeSni')
+    ..aOB(7, _omitFieldNames ? '' : 'muxDisabled')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -218,6 +221,18 @@ class ObfuscationProfile extends $pb.GeneratedMessage {
   $core.bool hasFakeSni() => $_has(5);
   @$pb.TagNumber(6)
   void clearFakeSni() => $_clearField(6);
+
+  /// Disables the REALITY multiplexing default: mux carries many streams
+  /// over one TLS connection, so a REALITY server sees a single
+  /// handshake. False keeps the core's default policy.
+  @$pb.TagNumber(7)
+  $core.bool get muxDisabled => $_getBF(6);
+  @$pb.TagNumber(7)
+  set muxDisabled($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasMuxDisabled() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearMuxDisabled() => $_clearField(7);
 }
 
 class ApplyObfsProfileRequest extends $pb.GeneratedMessage {
@@ -678,7 +693,7 @@ const obfsPresetBalanced = 'balanced';
 const obfsPresetAggressive = 'aggressive';
 const obfsPresetCustom = 'custom';
 
-/// All preset ids the model accepts. The UI offers every id but "light".
+/// All preset ids the model accepts; the UI offers every one of them.
 const obfsPresets = <String>[obfsPresetAggressive, obfsPresetBalanced, obfsPresetLight, obfsPresetOff, obfsPresetCustom];
 
 /// uTLS profile ids in UI order; '' means "auto" (UTLS_PROFILE_UNSPECIFIED:
@@ -746,6 +761,7 @@ class ObfsSettings extends ChangeNotifier {
   String _utls = obfsUtlsAuto;
   bool _fragment = false;
   bool _jitter = false;
+  bool _muxDisabled = false;
 
   /// 'off', 'light', 'balanced', 'aggressive' or 'custom'.
   String get preset => _preset;
@@ -755,6 +771,9 @@ class ObfsSettings extends ChangeNotifier {
 
   bool get fragment => _fragment;
   bool get jitter => _jitter;
+
+  /// True turns the REALITY multiplexing default off on the core.
+  bool get muxDisabled => _muxDisabled;
 
   void _load() {
     final raw = _read();
@@ -770,6 +789,8 @@ class ObfsSettings extends ChangeNotifier {
       if (fragment is bool) _fragment = fragment;
       final jitter = json['jitter'];
       if (jitter is bool) _jitter = jitter;
+      final muxDisabled = json['muxDisabled'];
+      if (muxDisabled is bool) _muxDisabled = muxDisabled;
       // Repair stores written before the jitter setter implied fragmentation.
       if (_jitter && !_fragment) _fragment = true;
     } catch (_) {
@@ -778,7 +799,13 @@ class ObfsSettings extends ChangeNotifier {
   }
 
   void _save() {
-    _write(jsonEncode({'preset': _preset, 'utls': _utls, 'fragment': _fragment, 'jitter': _jitter}));
+    _write(jsonEncode({
+      'preset': _preset,
+      'utls': _utls,
+      'fragment': _fragment,
+      'jitter': _jitter,
+      'muxDisabled': _muxDisabled,
+    }));
   }
 
   /// Re-reads from settings (e.g. after a sync import replaced the
@@ -788,6 +815,7 @@ class ObfsSettings extends ChangeNotifier {
     _utls = obfsUtlsAuto;
     _fragment = false;
     _jitter = false;
+    _muxDisabled = false;
     _load();
     notifyListeners();
   }
@@ -834,9 +862,20 @@ class ObfsSettings extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Builds the wire profile. Named presets travel preset-only (the core
-  /// expands them); custom carries explicit fields. fake_sni is never set
-  /// by the app UI.
+  set muxDisabled(bool value) {
+    if (_muxDisabled == value) return;
+    _muxDisabled = value;
+    _preset = obfsPresetCustom;
+    _save();
+    notifyListeners();
+  }
+
+  /// Builds the wire profile. Named presets (off, light, balanced,
+  /// aggressive) travel preset-only (the core expands them); custom
+  /// carries explicit fields. mux_disabled is explicit-only, so it rides
+  /// along with any preset but OFF — OFF must arrive alone, and clearing
+  /// the profile restores the default mux policy anyway. fake_sni is
+  /// never set by the app UI.
   ObfuscationProfile toProfile() {
     final profile = ObfuscationProfile();
     switch (_preset) {
@@ -859,6 +898,7 @@ class ObfsSettings extends ChangeNotifier {
           }
         }
     }
+    if (_muxDisabled && _preset != obfsPresetOff) profile.muxDisabled = true;
     return profile;
   }
 }

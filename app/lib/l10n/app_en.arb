@@ -850,6 +850,7 @@
   "obfsPresetAggressive": "Maximum obfuscation",
   "obfsPresetBalanced": "Balanced",
   "obfsPresetOff": "Speed",
+  "obfsPresetLight": "Light",
   "obfsPresetCustom": "Custom",
   "obfsManual": "Manual settings",
   "obfsUtls": "uTLS profile",
@@ -864,6 +865,9 @@
   "obfsSupported": "Supported",
   "obfsUnsupported": "Not supported",
   "obfsUnknown": "Capabilities are still being detected.",
+  "obfsMux": "Multiplexing",
+  "obfsMuxDetail": "Mux sends many streams over one TLS connection to a REALITY server, so the network sees a single handshake. Turn it off only if a server mishandles mux; separate handshakes may stand out more.",
+  "fragmentPerSessionNote": "Per-session only: the stored obfuscation profile overrides this when connecting. Curated presets live in Traffic obfuscation.",
 
   "syncCodeExpired": "The code expired",
   "syncDaemonFailed": "Couldn't start the sync service",

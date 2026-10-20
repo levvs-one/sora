@@ -2099,6 +2099,9 @@ class SRu extends S {
   String get obfsPresetOff => 'Скорость';
 
   @override
+  String get obfsPresetLight => 'Лёгкий';
+
+  @override
   String get obfsPresetCustom => 'Вручную';
 
   @override
@@ -2138,6 +2141,17 @@ class SRu extends S {
 
   @override
   String get obfsUnknown => 'Возможности пока определяются.';
+
+  @override
+  String get obfsMux => 'Мультиплексирование';
+
+  @override
+  String get obfsMuxDetail =>
+      'Mux пропускает много потоков через одно TLS-соединение к REALITY-серверу, поэтому сеть видит один handshake. Отключайте, только если сервер плохо работает с mux: отдельные handshake могут стать заметнее.';
+
+  @override
+  String get fragmentPerSessionNote =>
+      'Только на эту сессию: при подключении её перекрывает сохранённый профиль маскировки. Курируемые пресеты — на экране «Маскировка трафика».';
 
   @override
   String get syncCodeExpired => 'Срок действия кода истёк';

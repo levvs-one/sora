@@ -503,7 +503,7 @@ class Sora extends ChangeNotifier {
   /// nothing, so the reconnect banner only appears when the wire profile
   /// actually changes. Throws [CoreFailure] when the push fails; the local
   /// settings stay saved and sync on the next link or edit.
-  Future<ObfsApplyResult> updateObfs({String? preset, String? utls, bool? fragment, bool? jitter}) async {
+  Future<ObfsApplyResult> updateObfs({String? preset, String? utls, bool? fragment, bool? jitter, bool? muxDisabled}) async {
     var changed = false;
     if (preset != null) {
       changed = obfs.preset != preset;
@@ -521,6 +521,10 @@ class Sora extends ChangeNotifier {
     }
     if (jitter != null && obfs.jitter != jitter) {
       obfs.jitter = jitter;
+      changed = true;
+    }
+    if (muxDisabled != null && obfs.muxDisabled != muxDisabled) {
+      obfs.muxDisabled = muxDisabled;
       changed = true;
     }
     if (!changed) return (compatibleEngines: const <String>[], warnings: const <String>[]);

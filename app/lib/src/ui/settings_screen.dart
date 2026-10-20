@@ -291,7 +291,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: s.sync,
               onTap: () => push<void>(context, const SyncScreen()),
             ),
-            SwitchTile(title: s.fragment, value: settings.fragment, onChanged: (v) => set((x) => x.fragment = v)),
+            // Legacy per-session fragmentation (AntiCensorship): the stored
+            // obfuscation profile overrides it at Connect, so the tile says
+            // so and points at the curated presets on the ObfsScreen.
+            SwitchTile(
+              title: s.fragment,
+              detail: s.fragmentPerSessionNote,
+              value: settings.fragment,
+              onChanged: (v) => set((x) => x.fragment = v),
+            ),
             if (settings.fragment) ...[
               LinkTile(
                 title: s.fragmentPackets,

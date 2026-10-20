@@ -17,6 +17,7 @@ import 'modes.dart' show ConnectionChanges;
 String obfsPresetLabel(S s, String preset) => switch (preset) {
       obfsPresetAggressive => s.obfsPresetAggressive,
       obfsPresetBalanced => s.obfsPresetBalanced,
+      obfsPresetLight => s.obfsPresetLight,
       obfsPresetOff => s.obfsPresetOff,
       _ => s.obfsPresetCustom,
     };
@@ -68,7 +69,7 @@ class _ObfsScreenState extends State<ObfsScreen> {
     });
   }
 
-  Future<void> _update({String? preset, String? utls, bool? fragment, bool? jitter}) async {
+  Future<void> _update({String? preset, String? utls, bool? fragment, bool? jitter, bool? muxDisabled}) async {
     if (_applying) return;
     setState(() {
       _applying = true;
@@ -77,8 +78,8 @@ class _ObfsScreenState extends State<ObfsScreen> {
     });
     final sora = SoraScope.read(context);
     try {
-      final result =
-          await sora.updateObfs(preset: preset, utls: utls, fragment: fragment, jitter: jitter);
+      final result = await sora.updateObfs(
+          preset: preset, utls: utls, fragment: fragment, jitter: jitter, muxDisabled: muxDisabled);
       if (!mounted) return;
       setState(() => _lastApply = result);
     } on CoreFailure catch (failure) {
@@ -183,6 +184,7 @@ class _ObfsScreenState extends State<ObfsScreen> {
               choices: {
                 obfsPresetAggressive: s.obfsPresetAggressive,
                 obfsPresetBalanced: s.obfsPresetBalanced,
+                obfsPresetLight: s.obfsPresetLight,
                 obfsPresetOff: s.obfsPresetOff,
                 obfsPresetCustom: s.obfsPresetCustom,
               },
@@ -222,6 +224,14 @@ class _ObfsScreenState extends State<ObfsScreen> {
               )
             else
               Tile(title: s.obfsJitter, detail: s.obfsUnsupported),
+            // Mux is a plan-level policy every engine renderer honors via
+            // the shared RealityMux gate, so no capability row gates it.
+            SwitchTile(
+              title: s.obfsMux,
+              detail: s.obfsMuxDetail,
+              value: !obfs.muxDisabled,
+              onChanged: _applying ? null : (v) => unawaited(_update(muxDisabled: !v)),
+            ),
           ],
         ),
         if (!obfs.fragment && jitterSupported) _note(context, Symbols.info_rounded, s.obfsJitterNeedsFragment),

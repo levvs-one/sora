@@ -2062,6 +2062,9 @@ class SZh extends S {
   String get obfsPresetOff => 'Speed';
 
   @override
+  String get obfsPresetLight => 'Light';
+
+  @override
   String get obfsPresetCustom => 'Custom';
 
   @override
@@ -2101,6 +2104,17 @@ class SZh extends S {
 
   @override
   String get obfsUnknown => 'Capabilities are still being detected.';
+
+  @override
+  String get obfsMux => 'Multiplexing';
+
+  @override
+  String get obfsMuxDetail =>
+      'Mux sends many streams over one TLS connection to a REALITY server, so the network sees a single handshake. Turn it off only if a server mishandles mux; separate handshakes may stand out more.';
+
+  @override
+  String get fragmentPerSessionNote =>
+      'Per-session only: the stored obfuscation profile overrides this when connecting. Curated presets live in Traffic obfuscation.';
 
   @override
   String get syncCodeExpired => 'The code expired';
@@ -4356,6 +4370,9 @@ class SZhHans extends SZh {
   String get obfsPresetOff => 'Speed';
 
   @override
+  String get obfsPresetLight => 'Light';
+
+  @override
   String get obfsPresetCustom => 'Custom';
 
   @override
@@ -4395,6 +4412,17 @@ class SZhHans extends SZh {
 
   @override
   String get obfsUnknown => 'Capabilities are still being detected.';
+
+  @override
+  String get obfsMux => 'Multiplexing';
+
+  @override
+  String get obfsMuxDetail =>
+      'Mux sends many streams over one TLS connection to a REALITY server, so the network sees a single handshake. Turn it off only if a server mishandles mux; separate handshakes may stand out more.';
+
+  @override
+  String get fragmentPerSessionNote =>
+      'Per-session only: the stored obfuscation profile overrides this when connecting. Curated presets live in Traffic obfuscation.';
 
   @override
   String get syncCodeExpired => 'The code expired';
@@ -6650,6 +6678,9 @@ class SZhHant extends SZh {
   String get obfsPresetOff => 'Speed';
 
   @override
+  String get obfsPresetLight => 'Light';
+
+  @override
   String get obfsPresetCustom => 'Custom';
 
   @override
@@ -6689,6 +6720,17 @@ class SZhHant extends SZh {
 
   @override
   String get obfsUnknown => 'Capabilities are still being detected.';
+
+  @override
+  String get obfsMux => 'Multiplexing';
+
+  @override
+  String get obfsMuxDetail =>
+      'Mux sends many streams over one TLS connection to a REALITY server, so the network sees a single handshake. Turn it off only if a server mishandles mux; separate handshakes may stand out more.';
+
+  @override
+  String get fragmentPerSessionNote =>
+      'Per-session only: the stored obfuscation profile overrides this when connecting. Curated presets live in Traffic obfuscation.';
 
   @override
   String get syncCodeExpired => 'The code expired';
