@@ -650,3 +650,53 @@ func TestAutoVisionSkipsNonTCPAtPlanLevel(t *testing.T) {
 		t.Errorf("ws plan flow = %q auto=%v, want untouched", o.Flow, o.FlowAuto)
 	}
 }
+
+func TestAmneziaWG31SurvivesTheVault(t *testing.T) {
+	// AmneziaWG 3.1 fields must survive the same vault round trip as the
+	// 1.x/2.0 keys (TestAmneziaWGSurvivesTheVault): before this test the
+	// import filter dropped every 3.1 key, so a 3.1 config silently
+	// degraded to a plain 2.0 profile.
+	conf := "[Interface]\nPrivateKey = cKE7LmCF61IhqqABGhvJ44jWXp8fKymcMAEVAzLDYVk=\nAddress = 10.8.0.2/32\n" +
+		"Jc = 4\nS1 = 15\nS2 = 25\nS3 = 20\nS4 = 18\n" +
+		"HeaderProtectionKey = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n" +
+		"ContentPaddingAddition = 1-16\nRekeyAfterTime = 60-120\nRekeyTimeout = 5\n" +
+		"RejectAfterTime = 180\nKeepaliveTimeout = 30\nMaxHandshakeAttempts = 10\n" +
+		"RandomTrailers = true\nDisableCookies = 1\n" +
+		"MasqueradeProtocol = dns\nMasqueradeDomain = dns.example\n\n" +
+		"[Peer]\nPublicKey = Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw=\nEndpoint = 198.51.100.7:51820\nAllowedIPs = 0.0.0.0/0\n"
+	result, err := parser.LinkParser{}.Parse([]byte(conf))
+	if err != nil || len(result.Servers) != 1 {
+		t.Fatalf("Parse = %+v, %v", result, err)
+	}
+	document, err := credentialDocument(result.Servers[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	values, err := parseCredential(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var o engine.Outbound
+	if err := applyCredential(&o, values); err != nil {
+		t.Fatal(err)
+	}
+	if o.Amnezia == nil {
+		t.Fatal("amneziawg was lost on the way to the plan")
+	}
+	a := *o.Amnezia
+	if a.HeaderProtectionKey != "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" ||
+		a.ContentPaddingAddition != "1-16" || a.RekeyAfterTime != "60-120" ||
+		a.RekeyTimeout != "5" || a.RejectAfterTime != "180" ||
+		a.KeepaliveTimeout != "30" || a.MaxHandshakeAttempts != "10" {
+		t.Fatalf("3.1 range/protection fields lost: %+v", a)
+	}
+	if !a.RandomTrailers || !a.DisableCookies {
+		t.Fatalf("3.1 boolean fields lost: %+v", a)
+	}
+	if a.MasqueradeProtocol != "dns" || a.MasqueradeDomain != "dns.example" {
+		t.Fatalf("masquerade fields lost: %+v", a)
+	}
+	if !a.UsesAWG31() {
+		t.Fatal("restored config must report UsesAWG31 so engine selection keeps the 3.1 gate")
+	}
+}

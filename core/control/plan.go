@@ -646,9 +646,17 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 }
 
 // amneziaKeys lists supported AmneziaWG parameters using the parser's lowercase
-// interface keys.
+// interface keys. The 3.1 section (lowercase spellings match the documented
+// interface keys on engine.AmneziaWG) was silently dropped here before: a
+// 3.1 config imported from a .conf or link lost HeaderProtectionKey and the
+// rest on the way to the engine, degrading to 1.x/2.0 behavior without any
+// complaint (open Q20 of the first detail pass).
 var amneziaKeys = []string{"jc", "jmin", "jmax", "s1", "s2", "s3", "s4", "h1", "h2", "h3", "h4",
-	"i1", "i2", "i3", "i4", "i5", "j1", "j2", "j3", "itime"}
+	"i1", "i2", "i3", "i4", "i5", "j1", "j2", "j3", "itime",
+	"headerprotectionkey", "contentpaddingaddition",
+	"rekeyaftertime", "rekeytimeout", "rejectaftertime", "keepalivetimeout",
+	"maxhandshakeattempts", "randomtrailers", "disablecookies",
+	"masqueradeprotocol", "masqueradedomain", "masqueradebrowser"}
 
 // amneziaMaterial copies only known AmneziaWG keys from an untrusted import.
 func amneziaMaterial(options map[string]string) map[string]string {
@@ -687,6 +695,22 @@ func amneziaFrom(raw string) (*engine.AmneziaWG, error) {
 		}
 		*field = n
 	}
+	// AmneziaWG 3.1: range/protection values are strings, kept verbatim —
+	// the engine validator owns shape checks; two booleans accept the same
+	// "1"/"true" spelling the credential parser uses for insecure.
+	a.HeaderProtectionKey = v["headerprotectionkey"]
+	a.ContentPaddingAddition = v["contentpaddingaddition"]
+	a.RekeyAfterTime = v["rekeyaftertime"]
+	a.RekeyTimeout = v["rekeytimeout"]
+	a.RejectAfterTime = v["rejectaftertime"]
+	a.KeepaliveTimeout = v["keepalivetimeout"]
+	a.MaxHandshakeAttempts = v["maxhandshakeattempts"]
+	truthy := func(s string) bool { return s == "1" || strings.EqualFold(s, "true") }
+	a.RandomTrailers = truthy(v["randomtrailers"])
+	a.DisableCookies = truthy(v["disablecookies"])
+	a.MasqueradeProtocol = v["masqueradeprotocol"]
+	a.MasqueradeDomain = v["masqueradedomain"]
+	a.MasqueradeBrowser = v["masqueradebrowser"]
 	return a, nil
 }
 
