@@ -154,3 +154,17 @@ type ConnectionTracker interface {
 	// CloseConnections drops every live connection at once.
 	CloseConnections(ctx context.Context) error
 }
+
+// BandwidthOptions controls a throughput benchmark through engines.
+type BandwidthOptions struct {
+	// URL is the download target; it should support range requests.
+	URL string
+	// Duration caps one server's measurement.
+	Duration time.Duration
+	// Timeout caps one server's whole attempt, including engine startup.
+	Timeout time.Duration
+	// Concurrency bounds parallel downloads through one server.
+	Concurrency int
+	// Engines is the preference order; empty uses the core default.
+	Engines []Kind
+}

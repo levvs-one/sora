@@ -94,6 +94,8 @@ type WireGuardPeer struct {
 
 // Outbound is one server the plan can route traffic through.
 type Outbound struct {
+	// Via names the outbound used to dial this hop.
+	Via  string
 	ID   string
 	Name string
 

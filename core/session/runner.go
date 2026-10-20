@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/netip"
 	"strings"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/profiles"
 )
 
 // Session deadlines bound readiness waits and shutdown for slow engines.
@@ -49,6 +51,7 @@ type Config struct {
 	Network func() string
 	// NetworkInterval is how often Network is read.
 	NetworkInterval time.Duration
+	Profiles        *profiles.Store
 	// Settings defines system state owned while running; fill it before
 	// Start.
 	Settings Settings
@@ -106,6 +109,7 @@ type Session struct {
 	guardApplied bool
 	// guardMu serializes kill-switch changes and shutdown restoration.
 	guardMu   sync.Mutex
+	crashes   *crashWatch
 	engineSub func()
 	ctx       context.Context
 	cancel    context.CancelFunc
@@ -157,7 +161,8 @@ func New(cfg Config) (*Session, error) {
 			Bypass:     append([]string(nil), cfg.Settings.Bypass...),
 			TunnelMode: cfg.Settings.TunnelMode,
 		},
-		done: make(chan struct{}),
+		crashes: newCrashWatch(),
+		done:    make(chan struct{}),
 	}, nil
 }
 
@@ -479,6 +484,7 @@ func (s *Session) supervise(events <-chan engine.Event) {
 		case <-network:
 			if why := watch.changed(); why != "" {
 				s.renewConnections(ctx, why)
+				s.checkProfile()
 			}
 		case ev, ok := <-events:
 			if !ok {
@@ -495,6 +501,9 @@ func (s *Session) supervise(events <-chan engine.Event) {
 					reason, key = errs.CodeOf(ev.Err), errs.KeyOf(ev.Err)
 				}
 				s.setStateReconnecting(reason, key, 0)
+				if s.crashes.note() {
+					s.log.Append(Event{Kind: EventError, Reason: errs.CodeUnavailable, Key: errs.KeyEngineUnstable, Detail: "the engine keeps crashing"})
+				}
 			case engine.EventState:
 				if ev.State == engine.StateRunning && s.State() == StateReconnecting {
 					// A restarted engine starts its fallback groups over
@@ -506,8 +515,27 @@ func (s *Session) supervise(events <-chan engine.Event) {
 					s.setState(StateConnected, errs.Code(""), errs.Key(""), "")
 				}
 			case engine.EventFatal:
-				s.fail(errs.Newf(errs.CodeUnavailable, errs.KeyEngineStopped,
-					"session: the engine reported a fatal error"))
+				// Keep the supervisor's reason (restart budget exhausted,
+				// restart failure) in the failure status: a generic line
+				// here hides the actual cause from the client (F7 honesty).
+				fatal := ev.Err
+				if ev.Message != "" {
+					// The budget message ("more than 5 restarts within
+					// 10m0s") is not part of ev.Err; carry it along so the
+					// status detail names the real reason.
+					if fatal == nil {
+						fatal = errors.New(ev.Message)
+					} else {
+						fatal = errors.Join(fatal, errors.New(ev.Message))
+					}
+				}
+				if fatal == nil {
+					fatal = errs.Newf(errs.CodeUnavailable, errs.KeyEngineStopped,
+						"session: the engine reported a fatal error")
+				} else {
+					fatal = errs.Wrap(fatal, errs.CodeUnavailable, errs.KeyEngineStopped)
+				}
+				s.fail(fatal)
 				return
 			}
 		}
@@ -715,4 +743,22 @@ func (s *Session) setStateReconnecting(reason errs.Code, key errs.Key, delay tim
 		Key:        key,
 		RetryAfter: delay,
 	})
+}
+
+func (s *Session) checkProfile() {
+	if s.cfg.Profiles == nil || s.State() != StateConnected {
+		return
+	}
+	s.matchProfile(s.cfg.Profiles.Fingerprint())
+}
+
+func (s *Session) matchProfile(fp profiles.Fingerprint) {
+	if s.cfg.Profiles == nil {
+		return
+	}
+	m := s.cfg.Profiles.Match(fp)
+	if m == nil {
+		return
+	}
+	s.log.Append(Event{Kind: EventProfile, Profile: m})
 }

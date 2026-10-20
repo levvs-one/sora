@@ -171,6 +171,19 @@ func (r *renderer) outbounds() ([]obj, error) {
 		if err != nil {
 			return nil, err
 		}
+		if o.Via != "" {
+			stream, _ := ob["streamSettings"].(obj)
+			if stream == nil {
+				stream = obj{}
+				ob["streamSettings"] = stream
+			}
+			sockopt, _ := stream["sockopt"].(obj)
+			if sockopt == nil {
+				sockopt = obj{}
+				stream["sockopt"] = sockopt
+			}
+			sockopt["dialerProxy"] = r.tags[o.Via]
+		}
 		out = append(out, ob)
 	}
 	out = append(out,

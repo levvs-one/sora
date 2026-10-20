@@ -41,6 +41,7 @@ const (
 	FeatureXHTTP          Feature = "xhttp"
 	FeatureVLESSEncrypt   Feature = "vless-encryption"
 	FeatureAmneziaWG      Feature = "amneziawg"
+	FeatureChains         Feature = "chains"
 	FeaturePrivateControl Feature = "private-control"
 )
 

@@ -139,3 +139,10 @@ func (g *Guard) Current() session.Settings {
 
 // Name identifies the guard in a diagnostics line.
 func (g *Guard) Name() string { return "sora-guard" }
+
+// Blocked probes the firewall instead of returning the last requested state.
+func (g *Guard) Blocked(ctx context.Context) (bool, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.firewall.Armed(ctx)
+}

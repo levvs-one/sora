@@ -184,6 +184,9 @@ func (r *renderer) outbounds() (outbounds, endpoints []obj, err error) {
 
 func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	out := obj{"tag": r.tags[o.ID]}
+	if o.Via != "" {
+		out["detour"] = r.tags[o.Via]
+	}
 	if o.Protocol != engine.ProtocolDirect && o.Protocol != engine.ProtocolWireGuard {
 		out.set("server", o.Server).set("server_port", int(o.Port))
 	}

@@ -153,6 +153,11 @@ func buildProxies(p *engine.Plan) (map[string]string, []proxy, error) {
 		byID[o.ID] = name
 		out = append(out, px)
 	}
+	for i, o := range p.Outbounds {
+		if o.Via != "" {
+			out[i].Dialer = byID[o.Via]
+		}
+	}
 	return byID, out, nil
 }
 

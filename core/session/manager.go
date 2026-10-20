@@ -8,6 +8,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/profiles"
 )
 
 // Factory creates an engine for a plan, keeping discovery and test engines
@@ -35,7 +36,8 @@ type ManagerConfig struct {
 	// TunUp waits for the adapter of a tun plan; see Config.TunUp.
 	TunUp func(ctx context.Context, device string) error
 	// Network fingerprints the networks of the machine; see Config.Network.
-	Network func() string
+	Network  func() string
+	Profiles *profiles.Store
 }
 
 // Manager owns at most one session. Connect stops and restores the old session
@@ -107,6 +109,7 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 		Now:           m.cfg.Now,
 		TunUp:         m.cfg.TunUp,
 		Network:       m.cfg.Network,
+		Profiles:      m.cfg.Profiles,
 	})
 	if err != nil {
 		// Surface a failing Close instead of swallowing it (SORA-L13).
@@ -231,4 +234,14 @@ func (m *Manager) setLast(status Status) {
 	m.mu.Lock()
 	m.last = status
 	m.mu.Unlock()
+}
+
+// KillSwitchBlocked probes the firewall when the guard exposes its state.
+func (m *Manager) KillSwitchBlocked(ctx context.Context) (bool, error) {
+	if guard, ok := m.cfg.Guard.(interface {
+		Blocked(context.Context) (bool, error)
+	}); ok {
+		return guard.Blocked(ctx)
+	}
+	return false, errors.New("session: guard cannot probe firewall state")
 }

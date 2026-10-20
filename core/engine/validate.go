@@ -118,6 +118,7 @@ var validTransports = map[string]bool{
 	"h2": true, "httpupgrade": true, "xhttp": true,
 }
 
+// Validate checks one outbound before rendering.
 func (o Outbound) Validate() error {
 	var errs []error
 	if o.ID == "" {
@@ -233,7 +234,7 @@ func (p *Plan) Validate() error {
 		for _, ref := range g.Outbounds {
 			_, isOutbound := ids[ref]
 			_, isGroup := members[ref]
-			if !isOutbound && !isGroup && !isBuiltInTarget(ref) {
+			if !isOutbound && !isGroup && !IsBuiltInTarget(ref) {
 				errs = append(errs, fmt.Errorf("group %q: unknown outbound %q", g.Name, ref))
 			}
 		}
@@ -250,12 +251,13 @@ func (p *Plan) Validate() error {
 		}
 		_, isOutbound := ids[r.Target]
 		_, isGroup := names[r.Target]
-		if !isOutbound && !isGroup && !isBuiltInTarget(r.Target) {
+		if !isOutbound && !isGroup && !IsBuiltInTarget(r.Target) {
 			errs = append(errs, fmt.Errorf("rule %s %q: unknown target %q", r.Type, r.Value, r.Target))
 		}
 	}
 
 	errs = append(errs, p.DNS.validate(), p.Tun.validate(), p.Options.validate())
+	errs = append(errs, validateChains(p.Outbounds, ids))
 	return errors.Join(errs...)
 }
 
@@ -295,6 +297,47 @@ func (s *BypassStrategy) validate(id string) error {
 	}
 	if (s.Disorder || s.OOB) && len(s.SplitPos) == 0 {
 		return fmt.Errorf("outbound %s: disorder and out-of-band bytes need a split position", id)
+	}
+	return nil
+}
+
+// MaxChainHops bounds an entry and its proxy hops.
+const MaxChainHops = 3
+
+func validateChains(outbounds []Outbound, ids map[string]struct{}) error {
+	via := make(map[string]string, len(outbounds))
+	for _, o := range outbounds {
+		if o.Via == "" {
+			continue
+		}
+		if o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass {
+			return fmt.Errorf("outbound %s: a %s outbound cannot dial through another", o.ID, o.Protocol)
+		}
+		if o.Via == o.ID {
+			return fmt.Errorf("outbound %s: dials through itself", o.ID)
+		}
+		if _, ok := ids[o.Via]; !ok {
+			return fmt.Errorf("outbound %s: dials through unknown outbound %q", o.ID, o.Via)
+		}
+		via[o.ID] = o.Via
+	}
+	for _, o := range outbounds {
+		if o.Via == "" {
+			continue
+		}
+		seen := map[string]bool{o.ID: true}
+		depth := 1
+		for next := o.Via; next != ""; {
+			if seen[next] {
+				return fmt.Errorf("outbound %s: its chain loops back through %q", o.ID, next)
+			}
+			seen[next] = true
+			depth++
+			if depth > MaxChainHops {
+				return fmt.Errorf("outbound %s: its chain is longer than %d hops", o.ID, MaxChainHops)
+			}
+			next = via[next]
+		}
 	}
 	return nil
 }

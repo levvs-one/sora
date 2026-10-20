@@ -33,7 +33,7 @@ var Catalog = map[Kind]Capabilities{
 			ProtocolDirect: true,
 		},
 		Features: map[Feature]bool{
-			FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
+			FeatureChains: true, FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
 			FeatureProxyProviders: true, FeatureURLTest: true, FeatureLatencyTest: true,
 			FeatureHotApply: true, FeatureGeoData: true, FeatureFallbackGroup: true,
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
@@ -52,7 +52,7 @@ var Catalog = map[Kind]Capabilities{
 			ProtocolAnyTLS: true, ProtocolDirect: true,
 		},
 		Features: map[Feature]bool{
-			FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
+			FeatureChains: true, FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
 			FeatureURLTest: true, FeatureLatencyTest: true, FeatureGeoData: true,
 			FeaturePerAppRouting: true, FeatureTLSFragment: true,
 		},
@@ -71,7 +71,7 @@ var Catalog = map[Kind]Capabilities{
 			// Xray TUN does not install routes; engine/tunroute
 			// supplies them on supported platforms (see
 			// catalog_*.go).
-			FeatureURLTest: true, FeatureLoadBalance: true, FeatureLatencyTest: true,
+			FeatureChains: true, FeatureURLTest: true, FeatureLoadBalance: true, FeatureLatencyTest: true,
 			FeatureGeoData: true, FeatureTLSFragment: true,
 			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
 		},

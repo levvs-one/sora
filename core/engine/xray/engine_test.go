@@ -1,10 +1,10 @@
 package xray
 
 import (
+	"context"
 	"net/http"
 	"testing"
 )
-
 
 // TestMetricsBypassTheProxy locks SORA-L10: the loopback metrics client must
 // not honor HTTP_PROXY from the environment.
@@ -17,7 +17,7 @@ func TestMetricsBypassTheProxy(t *testing.T) {
 		t.Fatalf("metrics client transport is %T, want *http.Transport", metricsClient.Transport)
 	}
 	if transport.Proxy != nil {
-		req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:12345/debug/vars", nil)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://127.0.0.1:12345/debug/vars", nil)
 		if err != nil {
 			t.Fatal(err)
 		}

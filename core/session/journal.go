@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/profiles"
 )
 
 // EventKind maps session events to CoreEvent oneof fields for control-plane
@@ -19,6 +20,8 @@ const (
 	EventProbe    EventKind = "probe"
 	EventError    EventKind = "error"
 	EventGroup    EventKind = "group"
+	EventNetwork  EventKind = "network"
+	EventProfile  EventKind = "profile"
 )
 
 // Event records a session change. Journal-assigned sequence numbers increase
@@ -33,6 +36,7 @@ type Event struct {
 	Detail     string
 	Counters   Counters
 	Probe      *ProbeOutcome
+	Profile    *profiles.Match
 	Switch     *GroupSwitch
 	RetryAfter time.Duration
 	LogLine    string
