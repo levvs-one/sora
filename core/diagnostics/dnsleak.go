@@ -91,8 +91,9 @@ type DnsLeakInput struct {
 	ResolveTimeout time.Duration
 	// Probe queries host through one tunnel resolver: network is "udp",
 	// "tcp", "tls" (DoT) or "https" (DoH); addr is "ip", "ip:port", or a
-	// DoH URL. Nil selects the standard probers. Tests inject failures
-	// here.
+	// DoH URL. It is called concurrently (one goroutine per resolver
+	// target), so a Probe with state must be safe for concurrent use.
+	// Nil selects the standard probers. Tests inject failures here.
 	Probe func(ctx context.Context, network, addr, host string) ([]string, error)
 }
 

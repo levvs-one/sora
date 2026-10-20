@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -180,8 +181,11 @@ func TestCheckDnsLeaks_ProbesEveryResolver(t *testing.T) {
 		{Address: "9.9.9.9", Transport: "udp"},
 	}
 	var probed []string
+	var probedMu sync.Mutex
 	in.Probe = func(ctx context.Context, network, addr, host string) ([]string, error) {
+		probedMu.Lock()
 		probed = append(probed, addr)
+		probedMu.Unlock()
 		if addr == "9.9.9.9" {
 			return nil, errors.New("refused")
 		}
