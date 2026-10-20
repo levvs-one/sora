@@ -11,10 +11,11 @@
 /// install/load), inert (no API exists; granting changes nothing),
 /// unimplemented (runtime consumer not built; granting changes nothing).
 ///
-/// When the UI renders these statuses in the user's language, use the l10n
-/// key `extPermNotYetActive` (proposed; add alongside the extPerm* keys)
+/// The UI renders these statuses with the l10n key `extPermNotYetActive`
 /// for [ExtEnforcementStatus.inert] and [ExtEnforcementStatus.unimplemented]
-/// rows, and keep the prompt blunt: "granted silently today".
+/// rows — wired in the install prompt (permissions_sheet.dart) and in the
+/// detail screen's permission list, so a grant that does nothing yet is
+/// labelled at consent time and afterwards.
 library;
 
 enum ExtEnforcementStatus { enforced, installTime, inert, unimplemented }

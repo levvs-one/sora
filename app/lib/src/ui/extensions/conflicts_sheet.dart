@@ -3,7 +3,10 @@
 /// user picks the winner instead of suffering a quiet last-write-wins.
 ///
 /// The choice is persisted per conflict key ([ExtConflict.key]) so it
-/// survives reinstalls of the same contender set; the engine applies it.
+/// survives reinstalls of the same contender set. It is the user's declared
+/// intent: the engine will apply the stored winner once it gains support
+/// for these capabilities; until then nothing is applied silently — the
+/// install prompt and the conflict texts say so explicitly.
 library;
 
 import 'package:flutter/material.dart';

@@ -1906,6 +1906,7 @@ abstract class S {
   String get extPermNetFetch;
   String get extPermBackground;
   String get extPermBackgroundDetail;
+  String get extPermNotYetActive;
 
   String get extCapBackground;
 

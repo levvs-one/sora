@@ -1248,6 +1248,7 @@ Find one in the catalog or install from a file.';
   String get extPermBackground => 'Run background tasks';
   @override
   String get extPermBackgroundDetail => 'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
+  String get extPermNotYetActive => 'Not active in this version of Sora yet — granting it changes nothing today.';
 
   @override
   String get extCapBackground => 'Runs in the background';

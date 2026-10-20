@@ -14,6 +14,7 @@ import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../kit.dart';
 import '../../ext/catalog.dart';
+import '../../ext/enforcement.dart';
 import '../../ext/manifest.dart';
 import '../../ext/permissions.dart';
 import '../../ext/store.dart';
@@ -196,6 +197,16 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                           blurb: permissionBlurb(context, p),
                           risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
                         ),
+                        // Same honesty marker as the install prompt: a
+                        // permission whose runtime is not built must say
+                        // so here too, not only before the grant.
+                        if (isNotYetActive(p))
+                          Padding(
+                            padding: const EdgeInsets.only(left: 28, bottom: 4),
+                            child: Text(s.extPermNotYetActive,
+                                style: Styles.caption
+                                    .copyWith(color: palette.ink2)),
+                          ),
                         if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(left: 28, bottom: 4),

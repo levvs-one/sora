@@ -1250,6 +1250,7 @@ class SRu extends S {
   String get extPermBackground => 'Выполнять фоновые задачи';
   @override
   String get extPermBackgroundDetail => 'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения. Фоновое выполнение пока недоступно в этой версии Sora.';
+  String get extPermNotYetActive => 'Пока не активно в этой версии Sora — это разрешение сейчас ничего не изменит.';
 
   @override
   String get extCapBackground => 'Работает в фоновом режиме';

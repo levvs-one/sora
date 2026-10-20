@@ -15,6 +15,7 @@ import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../kit.dart';
 import '../../ext/catalog.dart';
+import '../../ext/enforcement.dart';
 import '../../ext/manifest.dart';
 import '../../ext/permissions.dart';
 import 'widgets.dart';
@@ -259,12 +260,19 @@ class _InstallPromptState extends State<_InstallPrompt> {
   }
 
   /// The plain-language explanation (and, for network access, the exact
-  /// host allowlist) rendered under a permission row. Empty when the blurb
-  /// says it all.
+  /// host allowlist) rendered under a permission row. Also carries the
+  /// honest "not yet active" marker for permissions whose runtime is not
+  /// built (enforcement.dart is the source of truth): the prompt must
+  /// never present an inert or unimplemented grant as live protection.
+  /// Empty when the blurb says it all.
   Widget _permissionExtra(BuildContext context, ExtManifest m, String permission) {
     final detail = permissionDetail(context, permission);
     final hosts = isNetworkPermission(permission) ? m.networkHosts : const <String>[];
-    if (detail == null && hosts.isEmpty) return const SizedBox.shrink();
+    final notYetActive = isNotYetActive(permission);
+    if (detail == null && hosts.isEmpty && !notYetActive) {
+      return const SizedBox.shrink();
+    }
+    final s = S.of(context);
     final palette = Palette.of(context);
     return Padding(
       padding: const EdgeInsets.only(left: 28, bottom: 4),
@@ -273,6 +281,11 @@ class _InstallPromptState extends State<_InstallPrompt> {
         children: [
           if (detail != null)
             Text(detail, style: Styles.caption.copyWith(color: palette.ink2)),
+          if (notYetActive) ...[
+            if (detail != null) const SizedBox(height: 2),
+            Text(s.extPermNotYetActive,
+                style: Styles.caption.copyWith(color: palette.ink2)),
+          ],
           if (hosts.isNotEmpty) ...[
             const SizedBox(height: 4),
             NetworkHostsList(hosts: hosts),
