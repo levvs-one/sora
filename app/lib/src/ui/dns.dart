@@ -16,11 +16,20 @@ import 'subscription_sheet.dart';
 
 /// Fixed resolver lists for the built-in presets. `auto` keeps the core
 /// defaults (empty list); `custom` edits [Settings.dns] directly.
+///
+/// Every preset speaks DoH: the presets used to carry bare IPs, which the
+/// core parses as plaintext UDP/53 — picking the "Cloudflare" preset
+/// silently *downgraded* the user below the encrypted `auto` default the
+/// docs promise (usage.md "DNS по умолчанию"). Cloudflare and Google are
+/// IP-addressed, like the core defaults, so they need no bootstrap;
+/// Quad9 and AdGuard publish hostname DoH endpoints, which the engines
+/// resolve through their bootstrap resolver (user queries still travel
+/// encrypted; only the endpoint's own name is resolved plainly).
 const _presets = <String, List<String>>{
-  'cloudflare': ['1.1.1.1', '1.0.0.1'],
-  'google': ['8.8.8.8', '8.8.4.4'],
-  'quad9': ['9.9.9.9', '149.112.112.112'],
-  'adguard': ['94.140.14.14', '94.140.15.15'],
+  'cloudflare': ['https://1.1.1.1/dns-query', 'https://1.0.0.1/dns-query'],
+  'google': ['https://8.8.8.8/dns-query', 'https://8.8.4.4/dns-query'],
+  'quad9': ['https://dns.quad9.net/dns-query'],
+  'adguard': ['https://dns.adguard-dns.com/dns-query'],
 };
 
 /// Resolves a core-provided localization key such as "dnsLeak.check.tunnelDns".
