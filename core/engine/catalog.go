@@ -75,13 +75,9 @@ var Catalog = map[Kind]Capabilities{
 			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureChains: true,
 			FeatureHy2PortHop: true, FeatureHy2Obfs: true, FeatureDoH3: true, FeatureECH: true,
 			FeatureRealityKeyShare: true,
-			// Deliberately no FeatureXHTTPDownloadSplit: the lx
-			// fork's xhttp transport has no download_settings field
-			// at all (probed on lx.22: unknown field, CENSOR-P1).
-			// Its xmux and x_padding_bytes claims ride the probed
-			// with_xhttp build in BuildCapabilities, exactly like
-			// FeatureXHTTP itself — upstream sing-box spells
-			// neither, so the static entry claims neither.
+			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux: the
+			// lx fork's xhttp transport has neither downlink splitting
+			// nor xmux reuse tuning (x_padding_bytes only).
 		},
 	},
 	KindXray: {
@@ -106,14 +102,15 @@ var Catalog = map[Kind]Capabilities{
 			FeatureGeoData: true, FeatureTLSFragment: true,
 			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
 			FeatureXHTTPDownloadSplit: true, FeatureRealityMLDSA65: true,
-			FeatureXHTTPXmux: true, FeatureXHTTPPadding: true,
-			// FeatureXHTTPXmux and FeatureXHTTPPadding are claimed
-			// since CENSOR-P1: the Xray renderer now emits xmux and
-			// xPaddingBytes (XHTTP is Xray's own transport; the
-			// fields were always in the binary — probed with
-			// `xray run -test` on 26.10.17), closing the PASS3
-			// deep S1 silent loss where xmux-tuned plans could
-			// only route to mihomo.
+			// Deliberately no FeatureXHTTPXmux: Xray's xhttp case
+			// renders only mode/path/host/headers/downloadSettings and
+			// emits neither xmux nor x_padding. Mihomo does claim the
+			// feature (its reuse-settings render is verified with
+			// `mihomo -t` on the pin, see the mihomo entry above), and
+			// sing-box emits neither — so xmux-tuned plans report the
+			// feature missing on Xray and sing-box and route to
+			// mihomo. Claiming it for Xray would route xmux-tuned
+			// plans to a silent loss (PASS3 deep S1).
 			// dialerProxy exists since long before the minimum
 			// version, so chains need no extra version gate.
 			FeatureChains: true,
