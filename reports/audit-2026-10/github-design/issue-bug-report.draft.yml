@@ -1,0 +1,85 @@
+name: Сообщить об ошибке
+description: Что-то сломалось или работает не так
+title: "[Ошибка]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Не публикуйте ссылки подписок, UUID, адреса серверов и другие секреты. Для отчёта используйте встроенный безопасный диагностический архив.
+  - type: input
+    id: version
+    attributes:
+      label: Версия Sora
+      placeholder: 0.2.2
+    validations:
+      required: true
+  - type: dropdown
+    id: system
+    attributes:
+      label: Система
+      options:
+        - Windows 11
+        - Windows 10
+        - Debian / Ubuntu
+        - Fedora
+        - openSUSE
+        - Arch
+        - Android
+        - Другое
+    validations:
+      required: true
+  - type: input
+    id: kernel
+    attributes:
+      label: Версия ядра
+      description: Только для Linux и Android.
+      placeholder: 6.8.0-…
+    validations:
+      required: false
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Движок
+      description: Какой движок выполнял подключение, когда всё сломалось.
+      options:
+        - Не знаю
+        - sing-box
+        - Xray-core
+        - mihomo
+        - Не связано с подключением
+    validations:
+      required: false
+  - type: textarea
+    id: problem
+    attributes:
+      label: Что произошло
+      description: Что вы увидели и что ожидали увидеть.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Как воспроизвести
+      placeholder: |
+        1. Открыть …
+        2. Нажать …
+        3. Увидеть …
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Диагностика
+      description: Перетащите безопасный диагностический ZIP или приложите очищенный фрагмент журнала.
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки
+      options:
+        - label: Я проверил последний релиз и поискал похожие issues.
+          required: true
+        - label: В отчёте нет ссылок подписок, UUID, адресов серверов и учётных данных.
+          required: true

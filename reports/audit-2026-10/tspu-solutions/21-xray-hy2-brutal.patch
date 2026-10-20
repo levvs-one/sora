@@ -1,0 +1,66 @@
+diff --git a/core/engine/xray/render.go b/core/engine/xray/render.go
+index afe5de7..ba4e43f 100644
+--- a/core/engine/xray/render.go
++++ b/core/engine/xray/render.go
+@@ -286,7 +286,19 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
+ }
+ 
+ func (*renderer) hysteria(o engine.Outbound, tag string) obj {
++	// Bandwidth hints switch the client from BBR to Brutal congestion
++	// control; zero means auto (BBR). The hints live in hysteriaSettings,
++	// the transport config Xray documents for brutal:
++	// https://xtls.github.io/en/config/outbounds/hysteria.html
+ 	hy := obj{"version": 2, "auth": o.Password}
++	if o.UpMbps > 0 {
++		hy["up_mbps"] = o.UpMbps
++	}
++	if o.DownMbps > 0 {
++		hy["down_mbps"] = o.DownMbps
++	}
++	// Port hopping has no Xray spelling: hopping plans must never be
++	// routed to Xray, or the hop silently collapses to a single port.
+ 	tls := obj{}.set("serverName", o.TLS.ServerName).set("alpn", o.TLS.ALPN)
+ 	stream := obj{"network": "hysteria", "hysteriaSettings": hy, "security": "tls", "tlsSettings": tls}
+ 	return obj{
+diff --git a/core/engine/xray/render_test.go b/core/engine/xray/render_test.go
+index 2331b87..61d58c7 100644
+--- a/core/engine/xray/render_test.go
++++ b/core/engine/xray/render_test.go
+@@ -201,3 +201,37 @@ func TestLiveEngineLifecycle(t *testing.T) {
+ 		t.Fatalf("Stop: %v", err)
+ 	}
+ }
++
++func TestRenderPassesHysteria2BandwidthToBrutal(t *testing.T) {
++	p := hysteriaWithoutObfs(enginetest.Plan(engine.ProtocolHysteria2))
++	p.Outbounds[0].UpMbps, p.Outbounds[0].DownMbps = 100, 500
++	raw, err := Render(p, testRuntime, nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var cfg struct {
++		Outbounds []struct {
++			StreamSettings struct {
++				HysteriaSettings map[string]any `json:"hysteriaSettings"`
++			} `json:"streamSettings"`
++		} `json:"outbounds"`
++	}
++	if err := json.Unmarshal(raw, &cfg); err != nil {
++		t.Fatal(err)
++	}
++	hy := cfg.Outbounds[0].StreamSettings.HysteriaSettings
++	if hy["up_mbps"] != float64(100) || hy["down_mbps"] != float64(500) {
++		t.Errorf("hysteriaSettings = %v, want up_mbps=100 down_mbps=500 (brutal CC)", hy)
++	}
++
++	// Zero caps must stay absent: the engine default (BBR) applies
++	// instead of a brutal hint pinned to nothing.
++	p = hysteriaWithoutObfs(enginetest.Plan(engine.ProtocolHysteria2))
++	raw, err = Render(p, testRuntime, nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if strings.Contains(string(raw), "up_mbps") || strings.Contains(string(raw), "down_mbps") {
++		t.Errorf("zero bandwidth caps must not render: %s", raw)
++	}
++}
