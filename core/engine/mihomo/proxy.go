@@ -216,6 +216,15 @@ func applyTransport(px *proxy, t engine.Transport) error {
 	}
 	switch t.Type {
 	case "", "tcp", "raw":
+		if len(t.Headers) > 0 {
+			// A raw stream has no HTTP handshake to carry headers;
+			// plan validation rejects the set, and this is the
+			// render-time backstop (CENSOR-P2 fix). The check reads
+			// t.Headers, not the merged headers map above: that map
+			// can hold the Host field alone, which must not trigger
+			// this refusal.
+			return fmt.Errorf("mihomo: headers have no spelling on a raw stream and mihomo does not render them")
+		}
 		px.Network = "tcp"
 	case "ws":
 		px.Network = "ws"
@@ -233,9 +242,23 @@ func applyTransport(px *proxy, t engine.Transport) error {
 			// keeps such plans on Xray; this is the render backstop.
 			return fmt.Errorf("mihomo: grpc authority and multi-mode are Xray-only and mihomo does not render them")
 		}
+		if len(t.Headers) > 0 {
+			// grpc-opts spells only the service name and user agent;
+			// a headers key would be silently ignored by the YAML
+			// loader. Plan validation rejects the set; this is the
+			// render backstop (CENSOR-P2 fix).
+			return fmt.Errorf("mihomo: headers have no spelling on the grpc transport and mihomo does not render them")
+		}
 		px.Network = "grpc"
 		px.GRPCOpts = &grpcOpts{ServiceName: t.Service, UserAgent: t.GRPCUserAgent}
 	case "h2":
+		if len(t.Headers) > 0 {
+			// h2-opts spells only host and path; the header set is a
+			// sing-box-only spelling on this transport, catalog-gated
+			// via FeatureH2Headers, and this refusal is the render
+			// backstop (CENSOR-P2 fix).
+			return fmt.Errorf("mihomo: headers on the h2 transport are sing-box-only and mihomo does not render them")
+		}
 		px.Network = "h2"
 		px.H2Opts = &h2Opts{Path: t.Path}
 		if t.Host != "" {

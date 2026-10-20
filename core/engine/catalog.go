@@ -89,6 +89,10 @@ var Catalog = map[Kind]Capabilities{
 			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureChains: true,
 			FeatureHy2PortHop: true, FeatureHy2Obfs: true, FeatureDoH3: true, FeatureECH: true,
 			FeatureRealityKeyShare: true,
+			// FeatureH2Headers: the lx http (h2) transport spells a
+			// headers map — probed with `sing-box check` on lx.22,
+			// which rejects unknown keys (CENSOR-P2 fix).
+			FeatureH2Headers: true,
 			// Deliberately no FeatureXHTTPDownloadSplit: the lx
 			// fork's xhttp transport has no download_settings field
 			// at all (probed on lx.22: unknown field, CENSOR-P1).

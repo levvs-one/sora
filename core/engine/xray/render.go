@@ -302,6 +302,12 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 	}
 	switch t.Type {
 	case "", "tcp":
+		if len(t.Headers) > 0 {
+			// A raw stream has no HTTP handshake to carry headers;
+			// plan validation rejects the set, and this is the
+			// render-time backstop (CENSOR-P2 fix).
+			return nil, fmt.Errorf("transport tcp: headers have no spelling on a raw stream and Xray does not render them")
+		}
 	case "ws":
 		s["network"] = "ws"
 		ws := obj{}.set("path", t.Path).set("host", t.Host).set("maxEarlyData", t.EarlyData).
@@ -315,6 +321,13 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
 		}
 		s["wsSettings"] = ws
 	case "grpc":
+		if len(t.Headers) > 0 {
+			// grpcSettings spells serviceName/authority/multiMode/
+			// user_agent only — no generic headers map; plan
+			// validation rejects the set and this refusal is the
+			// backstop (CENSOR-P2 fix).
+			return nil, fmt.Errorf("transport grpc: headers have no spelling on the grpc transport and Xray does not render them")
+		}
 		s["network"] = "grpc"
 		// authority, multiMode and user_agent are Xray's spellings
 		// (verified on the pin); sing-box renders none of them and

@@ -330,6 +330,27 @@ func validateTransportFields(o Outbound) []error {
 			bad("early data header name %q is not a safe HTTP header name", t.EarlyDataHeaderName)
 		}
 	}
+	// Headers are HTTP-handshake data. Every renderer spells them on
+	// ws, httpupgrade and xhttp, and sing-box spells them on h2 (the
+	// catalog gates that combination via FeatureH2Headers). On grpc
+	// and on a raw stream ("" or "tcp") no pinned engine has a generic
+	// headers spelling at all — gRPC customisation lives in the GRPC*
+	// fields, and sing-box rejects a headers key on its gRPC transport
+	// as unknown while mihomo and Xray silently ignore one — so a
+	// non-empty set here is a plan error, never a silent drop
+	// (CENSOR-P2 review §3). The error names the transport only: header
+	// values can carry secrets and are never echoed.
+	if len(t.Headers) > 0 {
+		switch t.Type {
+		case "ws", "httpupgrade", "xhttp", "h2":
+		default:
+			name := t.Type
+			if name == "" {
+				name = "tcp"
+			}
+			bad("headers need the ws, httpupgrade, xhttp or h2 transport, not %q", name)
+		}
+	}
 	if t.Service != "" && t.Type != "grpc" {
 		bad("grpc service name %q needs the grpc transport, not %q", t.Service, t.Type)
 	}

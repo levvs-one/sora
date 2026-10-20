@@ -494,6 +494,12 @@ func transport(t engine.Transport) (obj, error) {
 	}
 	switch t.Type {
 	case "", "tcp":
+		if len(t.Headers) > 0 {
+			// A raw stream has no HTTP handshake to carry headers;
+			// plan validation rejects the set, and this is the
+			// render-time backstop (CENSOR-P2 fix).
+			return nil, fmt.Errorf("transport tcp: headers have no spelling on a raw stream and sing-box does not render them")
+		}
 		return nil, nil
 	case "ws":
 		out := obj{"type": "ws"}.set("path", t.Path).set("headers", wsHeaders())
@@ -512,11 +518,26 @@ func transport(t engine.Transport) (obj, error) {
 		if t.GRPCAuthority != "" || t.GRPCMultiMode || t.GRPCUserAgent != "" {
 			return nil, fmt.Errorf("transport grpc: authority, multi-mode and user-agent are Xray-only and sing-box does not render them")
 		}
+		if len(t.Headers) > 0 {
+			// The pin's gRPC transport has no headers key at all
+			// (`sing-box check` on lx.22: json: unknown field
+			// "headers"); plan validation rejects the set and this
+			// refusal is the backstop (CENSOR-P2 fix).
+			return nil, fmt.Errorf("transport grpc: headers have no spelling on the grpc transport and sing-box does not render them")
+		}
 		return obj{"type": "grpc"}.set("service_name", t.Service), nil
 	case "h2":
 		out := obj{"type": "http"}.set("path", t.Path)
 		if t.Host != "" {
 			out["host"] = []string{t.Host}
+		}
+		if len(t.Headers) > 0 {
+			// The http transport spells a headers map (probed with
+			// `sing-box check` on lx.22, which rejects unknown keys);
+			// this renderer emitted only host/path and the masquerade
+			// set dropped silently (CENSOR-P2 fix). The Host field
+			// stays in its own host list above, as the pin spells it.
+			out["headers"] = t.Headers
 		}
 		return out, nil
 	case "httpupgrade":

@@ -68,6 +68,17 @@ const (
 	// x_padding_bytes; binary-verified on the pins). Before the
 	// split, padding rode the xmux gate (S2 seams audit).
 	FeatureXHTTPPadding Feature = "xhttp-padding"
+	// FeatureH2Headers marks engines that spell the plan's custom
+	// header set on the h2 (V2Ray HTTP) transport. Only sing-box
+	// does: its http transport carries a headers map, probed on the
+	// pinned lx.22 binary (`sing-box check` rejects unknown keys yet
+	// accepts headers there, CENSOR-P2 fix). Mihomo's h2-opts has no
+	// headers key and its YAML loader silently ignores unknown keys;
+	// Xray removed the h2 transport entirely. On ws, httpupgrade and
+	// xhttp every renderer emits the header set, so no gate is needed
+	// there; on grpc and tcp/raw no engine spells generic headers at
+	// all, so plan validation rejects the set there instead of gating.
+	FeatureH2Headers    Feature = "h2-headers"
 	FeatureVLESSEncrypt Feature = "vless-encryption"
 	FeatureAmneziaWG    Feature = "amneziawg"
 	// FeatureAmneziaWG3 marks engines whose AmneziaWG stack implements

@@ -85,6 +85,14 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 				out[FeatureXHTTPPadding] = true
 			}
 		}
+		if o.Transport.Type == "h2" && len(o.Transport.Headers) > 0 {
+			// Only the sing-box renderer spells the header set on
+			// the h2 transport (FeatureH2Headers); without the gate
+			// an h2 plan carrying headers would lose them silently
+			// on mihomo, whose h2-opts has no headers key
+			// (CENSOR-P2 fix).
+			out[FeatureH2Headers] = true
+		}
 		if o.Encryption != "" && o.Encryption != "none" {
 			out[FeatureVLESSEncrypt] = true
 		}

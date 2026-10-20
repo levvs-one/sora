@@ -139,6 +139,14 @@ type Transport struct {
 	Path    string
 	Host    string
 	Service string
+	// Headers is the custom HTTP header set of the stream transport
+	// (browser-masquerade data: User-Agent and friends). Every
+	// renderer spells it on ws, httpupgrade and xhttp; sing-box alone
+	// spells it on h2 (catalog FeatureH2Headers). The grpc and raw
+	// (tcp) transports have no generic-headers spelling on any pinned
+	// engine — gRPC customisation lives in the GRPC* fields below —
+	// so plan validation rejects a non-empty set there instead of
+	// letting a renderer drop it silently (CENSOR-P2).
 	Headers map[string]string
 	// EarlyData caps WebSocket 0-RTT: the first payload bytes ride the
 	// handshake instead of waiting for it. Zero disables it; only the
