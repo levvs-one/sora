@@ -61,7 +61,14 @@
 #       counts, B/op swings ~1213 -> ~1333 (+10%);
 #     service/sync/transport BenchmarkTransportRoundTrip1KB (reader
 #       goroutine drains a Noise transport): single counts swing
-#       16 -> 807 B/op, allocs/op 1 -> 3.
+#       16 -> 807 B/op, allocs/op 1 -> 3;
+#     core/probe BenchmarkDownloadGoodput (30 ms time-boxed loopback
+#       download against an in-process httptest server whose own
+#       allocations share the process — the benchmark's header comment
+#       says so): B/op scales with the chunks served inside the window,
+#       43794 -> 50047 B/op across counts on identical code, while
+#       allocs/op stay tight (318 -> 331), so only its B/op band is
+#       widened (25%); allocs keep the strict 5%.
 #   Gating those two at 5% would fail on noise, so they get explicit,
 #   per-benchmark widened bands in the comparison below (25% B/op and
 #   +2 allocs for RunSeriesShort; a 1024 B/op absolute cap and +2
@@ -273,6 +280,7 @@ awk -v pct="$THRESHOLD_PCT" '
     # Racy-benchmark exceptions (see header). eb: B/op band in percent;
     # ebabs: B/op absolute cap; ea: allocs/op absolute tolerance.
     eb["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 25
+    eb["core/probe" SUBSEP "BenchmarkDownloadGoodput"] = 25
     ea["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 2
     ebabs["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 1024
     ea["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 2
