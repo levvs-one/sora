@@ -130,3 +130,43 @@ func TestHysteria2PinSHA256IsRejected(t *testing.T) {
 		t.Errorf("unpinned hy2 link must still import: servers=%d err=%v", len(r.Servers), err)
 	}
 }
+
+func TestParseClashDuplicatesByStableKey(t *testing.T) {
+	const uuid = "123e4567-e89b-12d3-a456-426614174000"
+	payload := "proxies:\n" +
+		"  - {name: First, type: vless, server: a.example.com, port: 443, uuid: " + uuid + "}\n" +
+		"  - {name: Second, type: vless, server: a.example.com, port: 443, uuid: " + uuid + "}\n"
+	r, err := (LinkParser{}).Parse([]byte(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Servers[0].DisplayName != "First" {
+		t.Fatalf("servers = %#v, want only the first entry kept", r.Servers)
+	}
+	if r.Report.Imported != 1 || r.Report.SkippedDuplicates != 1 {
+		t.Fatalf("report = %+v, want 1 imported and 1 skipped duplicate", r.Report)
+	}
+	if len(r.Report.DuplicateItems) != 1 || r.Report.DuplicateItems[0].Index != 1 || r.Report.DuplicateItems[0].Reason != "duplicate server" {
+		t.Fatalf("duplicate items = %#v, want one entry at index 1", r.Report.DuplicateItems)
+	}
+}
+
+func TestParseJSONDuplicatesByStableKey(t *testing.T) {
+	const uuid = "123e4567-e89b-12d3-a456-426614174000"
+	payload := `{"outbounds":[` +
+		`{"type":"vless","tag":"First","server":"a.example.com","server_port":443,"uuid":"` + uuid + `"},` +
+		`{"type":"vless","tag":"Second","server":"a.example.com","server_port":443,"uuid":"` + uuid + `"}]}`
+	r, err := (LinkParser{}).Parse([]byte(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Servers[0].DisplayName != "First" {
+		t.Fatalf("servers = %#v, want only the first entry kept", r.Servers)
+	}
+	if r.Report.Imported != 1 || r.Report.SkippedDuplicates != 1 {
+		t.Fatalf("report = %+v, want 1 imported and 1 skipped duplicate", r.Report)
+	}
+	if len(r.Report.DuplicateItems) != 1 || r.Report.DuplicateItems[0].Index != 1 || r.Report.DuplicateItems[0].Reason != "duplicate server" {
+		t.Fatalf("duplicate items = %#v, want one entry at index 1", r.Report.DuplicateItems)
+	}
+}
