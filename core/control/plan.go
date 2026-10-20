@@ -208,6 +208,10 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 	plan := &engine.Plan{
 		SessionID: sessionID,
 		Engines:   kinds(in.GetEngines()),
+		// Outbounds and rules are known up front: size for the request so
+		// large plans do not regrow the slices one power of two at a time.
+		Outbounds: make([]engine.Outbound, 0, len(in.GetOutbounds())),
+		Rules:     make([]engine.Rule, 0, len(in.GetRoutes())),
 		// Keep engines at debug level so capture-level changes apply
 		// immediately without restarting connections.
 		Options: engine.Options{Mode: "rule", LogLevel: "debug", TestURL: engine.TestURLProduction, IPv6: in.GetIpv6(), Fragment: engine.Fragment{
