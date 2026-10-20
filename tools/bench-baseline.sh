@@ -68,7 +68,13 @@
 #       says so): B/op scales with the chunks served inside the window,
 #       43794 -> 50047 B/op across counts on identical code, while
 #       allocs/op stay tight (318 -> 331), so only its B/op band is
-#       widened (25%); allocs keep the strict 5%.
+#       widened (25%); allocs keep the strict 5%;
+#     service/sync/api BenchmarkHandleDocGet256KiB (256 KiB document
+#       served through the handler into an httptest recorder): B/op
+#       1088344 -> 1229323 across counts on identical code (buffer
+#       growth/chunking of a quarter-megabyte body), allocs/op tight
+#       (40 -> 42), so only its B/op band is widened (25%). Its PUT
+#       sibling is stable (+-0.7%) and keeps the strict band.
 #   Gating those two at 5% would fail on noise, so they get explicit,
 #   per-benchmark widened bands in the comparison below (25% B/op and
 #   +2 allocs for RunSeriesShort; a 1024 B/op absolute cap and +2
@@ -281,6 +287,7 @@ awk -v pct="$THRESHOLD_PCT" '
     # ebabs: B/op absolute cap; ea: allocs/op absolute tolerance.
     eb["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 25
     eb["core/probe" SUBSEP "BenchmarkDownloadGoodput"] = 25
+    eb["service/sync/api" SUBSEP "BenchmarkHandleDocGet256KiB"] = 25
     ea["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 2
     ebabs["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 1024
     ea["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 2
