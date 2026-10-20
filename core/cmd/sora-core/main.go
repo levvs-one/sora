@@ -107,6 +107,10 @@ type App struct {
 	// transport, kill switch) and running, but no worker is registered
 	// until the app-side JS runner lands.
 	extSched *ext.Scheduler
+	// freezeDet is the shared SNI-freeze recognizer the control prober
+	// feeds. Serve re-binds it to the live network fingerprint so a
+	// network move drops verdicts measured on the dead path.
+	freezeDet *probe.FreezeDetector
 }
 
 // New builds a core from its options.
@@ -314,9 +318,21 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	prober := probe.New(probe.Config{})
 	app.prober = prober
 	freezeDet := &probe.FreezeDetector{}
+	// The recognizer's samples belong to the network they were measured
+	// on: bind the current fingerprint now, and Serve keeps re-binding
+	// it (watchCensorshipNetwork) so a network move drops the old
+	// path's verdicts instead of acting on them.
+	freezeDet.BindNetwork(session.NetworkFingerprint())
+	app.freezeDet = freezeDet
 	freezeDet.OnFreeze = func(v probe.FreezeVerdict) {
 		cur := manager.Current()
 		if cur == nil {
+			// Reaction unavailable is recorded, never silent: without
+			// a live session there is no journal to append to and no
+			// server whose subscription could be expedited, so the
+			// freeze would otherwise leave no trace at all.
+			app.log.Warn("censorship reaction unavailable: freeze detected with no live session to journal or expedite",
+				"sni", v.SNI, "confidence", v.Confidence)
 			return
 		}
 		verdict := censor.Verdict{
@@ -337,6 +353,9 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		}
 		if app.plane != nil {
 			app.plane.ExpediteForCensorship(verdict, serverID)
+		} else {
+			app.log.Warn("censorship reaction unavailable: freeze journaled but the control plane is not built yet, subscription refresh was not expedited",
+				"sni", v.SNI)
 		}
 	}
 	prober.SetFreezeDetector(freezeDet)
@@ -583,10 +602,40 @@ func (s *source) EngineLines() []string {
 	return lines
 }
 
+// watchCensorshipNetwork re-binds the freeze recognizer to the live
+// network fingerprint until ctx ends. A confirmed change drops the
+// old network's freeze samples (and, through the policy bind in the
+// session layer, its backoffs): reactions must describe the network
+// the user is on now, not the one they left. The drop is journaled
+// as a censorship event on the live session — state disappearing
+// silently is how stale verdicts get acted on.
+func (a *App) watchCensorshipNetwork(ctx context.Context) {
+	tick := time.NewTicker(10 * time.Second)
+	defer tick.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-tick.C:
+		}
+		if a.freezeDet == nil || !a.freezeDet.BindNetwork(session.NetworkFingerprint()) {
+			continue
+		}
+		a.log.Info("network changed: censorship state measured on the previous network was dropped")
+		if cur := a.sessions.Current(); cur != nil {
+			cur.Journal().Append(session.Event{
+				Kind:   session.EventCensor,
+				Detail: "network changed: freeze verdicts from the previous network were dropped; they described a path that no longer exists",
+			})
+		}
+	}
+}
+
 // Serve runs the control plane until the context ends.
 func (a *App) Serve(ctx context.Context) error {
 	stop := context.AfterFunc(ctx, func() { _ = a.listener.Close() })
 	defer stop()
+	go a.watchCensorshipNetwork(ctx)
 	a.log.Info("core listening", "endpoint", a.address, "tunnel", a.local)
 	// Subscription updates must continue without a connected UI.
 	go a.plane.Run(ctx)
