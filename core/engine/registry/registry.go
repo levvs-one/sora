@@ -108,16 +108,23 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 		r.zapretAssets = filepath.Join(enginesDir, "zapret")
 	}
 	discovery := supervise.DiscoveryOptions{AllowEnvBin: base.AllowEnvBin}
+	// Probe the host once (TUN device, kernel WireGuard): the facts
+	// are the same for every engine and selection gates on them, so
+	// they are stamped onto every Availability entry — measured here,
+	// never assumed from the pins (CENSOR-P4).
+	host := supervise.ProbeHost()
 	for _, kind := range engine.DefaultPreference {
 		b, err := drivers[kind].prober.Discover(ctx, enginesDir, discovery)
 		if err != nil {
 			// Probe errors contain local paths; expose them only
 			// through sora-core -check, not diagnostics.
-			r.availability = append(r.availability, engine.Availability{Kind: kind, Reason: "not installed"})
+			r.availability = append(r.availability, engine.Availability{Kind: kind, Reason: "not installed",
+				HostProbed: host.Probed, TUNDevice: host.TUNDevice, KernelWireGuard: host.KernelWireGuard})
 			continue
 		}
 		r.binaries[kind] = b
-		r.availability = append(r.availability, engine.Availability{Kind: kind, Path: b.Path, Version: b.Version, BuildTags: b.BuildTags, Usable: true})
+		r.availability = append(r.availability, engine.Availability{Kind: kind, Path: b.Path, Version: b.Version, BuildTags: b.BuildTags, Usable: true,
+			HostProbed: host.Probed, TUNDevice: host.TUNDevice, KernelWireGuard: host.KernelWireGuard})
 	}
 	return r
 }

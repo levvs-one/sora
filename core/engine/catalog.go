@@ -10,6 +10,12 @@ import (
 )
 
 // Availability describes an engine build found on this machine.
+// Version and BuildTags are PROBED facts (supervise.Prober runs the
+// binary and parses its version output and Tags line) — never copied
+// from the shipped pins: the AmneziaWG gates in BuildCapabilities key
+// off exactly these probed values, so a sing-box build whose probed
+// tags lack with_awg is refused an AWG plan however new its version
+// looks (CENSOR-P4).
 type Availability struct {
 	Kind      Kind
 	Path      string
@@ -17,6 +23,14 @@ type Availability struct {
 	Usable    bool
 	Reason    string
 	BuildTags []string
+	// Host probe facts (supervise.ProbeHost), stamped by registry
+	// discovery — the same host for every engine. HostProbed=false
+	// means nobody measured this host; selection then gates only on
+	// the binary facts, never on an assumed TUN device or kernel
+	// module.
+	HostProbed      bool
+	TUNDevice       bool
+	KernelWireGuard bool
 }
 
 // Catalog holds upstream engine capabilities, separate from installed
@@ -312,6 +326,16 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 		}
 		if lowest, err := ParseVersion(floor); err == nil && avail.Version.Less(lowest) {
 			rejected = append(rejected, fmt.Sprintf("%s: version %s is older than %s", kind, avail.Version, floor))
+			continue
+		}
+		if avail.HostProbed && p.Tun.Enabled && !avail.TUNDevice {
+			// Probed host fact, not an assumption: without a TUN
+			// device every engine fails the TUN start opaquely, so
+			// the plan is refused here with the cause named. WG/AWG
+			// plans do NOT gate on KernelWireGuard: both capable
+			// engines serve them from userspace (amneziawg-go),
+			// which the probed binary facts above already establish.
+			rejected = append(rejected, fmt.Sprintf("%s: host has no TUN device (/dev/net/tun, probed)", kind))
 			continue
 		}
 		missing := caps.MissingFor(p, avail.Version)
