@@ -299,7 +299,6 @@ func New(ctx context.Context, opts Options) (*App, error) {
 				}
 				return sel.Kind, nil
 			},
-			DataDir: opts.DataDir,
 		}); err != nil {
 			_ = store.Close()
 			return nil, err

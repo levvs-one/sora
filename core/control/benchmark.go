@@ -153,43 +153,8 @@ func (s *Server) resolveBenchmarkServers(ids []string) (found []*corev1.Outbound
 	return found, missing
 }
 
-// GetBenchmarks returns the stored throughput/latency history.
-func (s *Server) GetBenchmarks(ctx context.Context, req *corev1.GetBenchmarksRequest) (*corev1.GetBenchmarksResponse, error) {
-	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
-		return nil, err
-	}
-	if s.benchmarker == nil {
-		err := errs.Newf(errs.CodeFailedPrecondition, errs.KeyProbeInvalidEndpoint,
-			"control: this core cannot benchmark throughput")
-		return &corev1.GetBenchmarksResponse{Error: toWire(err, nil, "")}, nil
-	}
-	want := map[string]bool{}
-	for _, id := range req.GetServerIds() {
-		want[id] = true
-	}
-	history := s.benchmarker.History()
-	out := &corev1.GetBenchmarksResponse{
-		Benchmarks: make([]*corev1.BenchmarkRecord, 0, len(history)),
-	}
-	for _, e := range history {
-		if len(want) > 0 && !want[e.ServerID] {
-			continue
-		}
-		out.Benchmarks = append(out.Benchmarks, &corev1.BenchmarkRecord{
-			ServerId:       e.ServerID,
-			BytesPerSec:    e.BytesPerSec,
-			LatencyMs:      e.LatencyMs,
-			MeasuredAtUnix: e.MeasuredAt.Unix(),
-		})
-	}
-	return out, nil
-}
-
-// feedBenchmarkLatency records a latency probe result into the benchmark
-// history so the UI can sort by the smart score.
-func (s *Server) feedBenchmarkLatency(serverID string, latency time.Duration) {
-	if s.benchmarker == nil || serverID == "" {
-		return
-	}
-	s.benchmarker.RecordLatency(serverID, latency)
-}
+// GetBenchmarks was removed (M3, PASS1-SWARM): no client ever called it
+// — the app keeps its benchmark history locally — so the RPC, the
+// history store behind it, and the latency feed that wrote into it are
+// gone. The proto keeps the message shapes for wire compatibility; the
+// method itself now falls through to UnimplementedCoreControlServer.

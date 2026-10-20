@@ -70,7 +70,11 @@ service CoreControl {
   // samples; each server reports done=true once. Requires the control
   // authenticator: benchmarks burn traffic and spawn engine processes.
   rpc BenchmarkServers(BenchmarkServersRequest) returns (stream BandwidthSample);
-  // Since 1.9. Returns the stored benchmark history (see BenchmarkServers).
+  // Since 1.9. RETIRED (2026-10-20, PASS1 M3): no client ever called
+  // this RPC — the app keeps its benchmark history locally — so the
+  // core no longer implements it (callers get Unimplemented) and the
+  // stored history behind it was removed. The messages stay for wire
+  // compatibility; do not build on this method.
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksResponse);
 
   // Since 1.9. User overrides on top of a subscription: renames, hidden

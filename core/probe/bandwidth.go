@@ -1,7 +1,9 @@
 package probe
 
 // Throughput benchmarks: measures real download goodput per server through a
-// temporary engine session, and keeps a TTL history of results.
+// temporary engine session. Results stream to the caller live; sora keeps
+// no benchmark history of its own (the GetBenchmarks RPC that once read
+// one had no client and was removed — see reports/PASS1-SWARM.md, M3).
 //
 // A benchmark spins up one engine per server (never the live session engine),
 // routes a local loopback proxy through that server only, downloads in

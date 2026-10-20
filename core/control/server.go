@@ -108,15 +108,12 @@ type Measurer interface {
 	Measure(ctx context.Context, outbounds []engine.Outbound, opts engine.MeasureOptions) (<-chan engine.Measurement, error)
 }
 
-// Benchmarker measures download throughput through compatible engines and
-// keeps a history of results. Unsupported outbounds yield a done sample
-// carrying engine.ErrNoEngine.
+// Benchmarker measures download throughput through compatible engines.
+// Unsupported outbounds yield a done sample carrying engine.ErrNoEngine.
+// Results stream out of Benchmark; sora keeps no stored history of its
+// own (the app stores whatever it displays).
 type Benchmarker interface {
 	Benchmark(ctx context.Context, outbounds []engine.Outbound, opts engine.BandwidthOptions) (<-chan probe.BandwidthSample, error)
-	// History returns stored measurements, newest first.
-	History() []probe.HistoryEntry
-	// RecordLatency feeds latency probe results into the history.
-	RecordLatency(serverID string, latency time.Duration)
 }
 
 // Prober checks endpoint reachability. Implementations may dial directly or
@@ -1234,9 +1231,6 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		close(results)
 	}()
 	for result := range results {
-		if result.GetLatencyMs() > 0 && result.GetReachable() {
-			s.feedBenchmarkLatency(result.GetServerId(), time.Duration(result.GetLatencyMs())*time.Millisecond)
-		}
 		if err := stream.Send(result); err != nil {
 			return err
 		}
