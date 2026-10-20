@@ -133,6 +133,41 @@ class SRu extends S {
   }
 
   @override
+  String get syncResultTitle => 'Результат синхронизации';
+
+  @override
+  String get syncPulled => 'Получено';
+
+  @override
+  String get syncPushed => 'Отправлено';
+
+  @override
+  String get syncNoChanges => 'Нет изменений';
+
+  @override
+  String get syncDocKindSubscriptions => 'Подписки';
+
+  @override
+  String get syncDocKindSettings => 'Настройки';
+
+  @override
+  String get syncDocKindOverrides => 'Переопределения подписок';
+
+  @override
+  String get syncDocKindProfiles => 'Сетевые профили';
+
+  @override
+  String get syncDocKindChains => 'Цепочки прокси';
+
+  @override
+  String get syncDocKindObfs => 'Маскировка трафика';
+
+  @override
+  String syncFrom(String name) {
+    return 'с $name';
+  }
+
+  @override
   String get syncThisDevice => 'Это устройство';
 
   @override

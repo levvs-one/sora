@@ -2624,6 +2624,39 @@ abstract class S {
   /// **'Received {pulled} · sent {pushed}'**
   String syncSyncResult(int pulled, int pushed);
 
+  /// **'Sync result'**
+  String get syncResultTitle;
+
+  /// **'Received'**
+  String get syncPulled;
+
+  /// **'Sent'**
+  String get syncPushed;
+
+  /// **'No changes'**
+  String get syncNoChanges;
+
+  /// **'Subscriptions'**
+  String get syncDocKindSubscriptions;
+
+  /// **'App settings'**
+  String get syncDocKindSettings;
+
+  /// **'Subscription overrides'**
+  String get syncDocKindOverrides;
+
+  /// **'Network profiles'**
+  String get syncDocKindProfiles;
+
+  /// **'Proxy chains'**
+  String get syncDocKindChains;
+
+  /// **'Traffic obfuscation'**
+  String get syncDocKindObfs;
+
+  /// **'from {name}'**
+  String syncFrom(String name);
+
   /// **'This device'**
   String get syncThisDevice;
 

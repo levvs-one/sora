@@ -133,6 +133,41 @@ class SEn extends S {
   }
 
   @override
+  String get syncResultTitle => 'Sync result';
+
+  @override
+  String get syncPulled => 'Received';
+
+  @override
+  String get syncPushed => 'Sent';
+
+  @override
+  String get syncNoChanges => 'No changes';
+
+  @override
+  String get syncDocKindSubscriptions => 'Subscriptions';
+
+  @override
+  String get syncDocKindSettings => 'App settings';
+
+  @override
+  String get syncDocKindOverrides => 'Subscription overrides';
+
+  @override
+  String get syncDocKindProfiles => 'Network profiles';
+
+  @override
+  String get syncDocKindChains => 'Proxy chains';
+
+  @override
+  String get syncDocKindObfs => 'Traffic obfuscation';
+
+  @override
+  String syncFrom(String name) {
+    return 'from $name';
+  }
+
+  @override
   String get syncThisDevice => 'This device';
 
   @override
