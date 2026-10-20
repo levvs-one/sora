@@ -77,6 +77,12 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 		if o.Encryption != "" && o.Encryption != "none" {
 			out[FeatureVLESSEncrypt] = true
 		}
+		if o.TLS.ECH.Enabled {
+			// An engine that does not render ECH would send the SNI
+			// in the clear while the plan promises it hidden: route
+			// ECH plans only to engines that emit it (PASS3 deep S4).
+			out[FeatureECH] = true
+		}
 		if o.Amnezia != nil {
 			out[FeatureAmneziaWG] = true
 			if o.Amnezia.UsesAWG31() {

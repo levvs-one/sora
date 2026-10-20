@@ -66,7 +66,10 @@ type ECHConfig struct {
 	// lookup. Useful where encrypted DNS itself is blocked.
 	Config []string
 	// QueryServerName overrides the domain used for the ECH DNS query.
-	// Not rendered yet: it needs sing-box >= 1.13, above our 1.12 minimum.
+	// Rendered by sing-box (ech.query_server_name, available since
+	// 1.13 — below the 1.14.3 floor) and by mihomo
+	// (ech-opts.query-server-name). The Xray renderer does not emit
+	// ECH at all; see FeatureECH.
 	QueryServerName string
 }
 

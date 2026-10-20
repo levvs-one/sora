@@ -39,7 +39,7 @@ var Catalog = map[Kind]Capabilities{
 			FeatureHotApply: true, FeatureGeoData: true, FeatureFallbackGroup: true,
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
 			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureChains: true,
-			FeatureHy2PortHop: true, FeatureDoH3: true,
+			FeatureHy2PortHop: true, FeatureDoH3: true, FeatureECH: true,
 			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux: sora's
 			// mihomo renderer emits only path/host/mode/headers in
 			// xhttp-opts, so a split or xmux-tuned plan routed to mihomo
@@ -69,7 +69,7 @@ var Catalog = map[Kind]Capabilities{
 			FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
 			FeatureURLTest: true, FeatureLatencyTest: true, FeatureGeoData: true,
 			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureChains: true,
-			FeatureHy2PortHop: true, FeatureDoH3: true,
+			FeatureHy2PortHop: true, FeatureDoH3: true, FeatureECH: true,
 			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux: the
 			// lx fork's xhttp transport has neither downlink splitting
 			// nor xmux reuse tuning (x_padding_bytes only).
@@ -102,6 +102,12 @@ var Catalog = map[Kind]Capabilities{
 			// dialerProxy exists since long before the minimum
 			// version, so chains need no extra version gate.
 			FeatureChains: true,
+			// Deliberately no FeatureECH: the Xray renderer does not
+			// emit echConfigList/echForceQuery (the format the pin
+			// expects is unverified without the binary) and refuses
+			// ECH outbounds at render time. Claiming it would route
+			// ECH plans into a silent cleartext-SNI loss (PASS3 deep
+			// S4); the gate returns together with a verified render.
 			// Deliberately no FeatureHy2PortHop: Xray's hysteria2
 			// outbound cannot hop ports (see FeatureHy2PortHop).
 			// Deliberately no FeatureDoH3: Xray has no DNS-over-HTTP/3

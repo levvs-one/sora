@@ -313,10 +313,14 @@ func validateXHTTP(o Outbound) []error {
 // validate enforces the ECH honesty rules (T024, P13-3/P13-4):
 //   - ECH without TLS is meaningless;
 //   - ECH and REALITY are incompatible: REALITY owns the ClientHello, an
-//     ECH extension on top of it is misconfiguration, not stealth;
-//   - QueryServerName is accepted by the struct but rendered by no engine
-//     yet (needs sing-box >= 1.13): accepting it silently would lie about
-//     where the ECH config comes from.
+//     ECH extension on top of it is misconfiguration, not stealth.
+//
+// QueryServerName is NOT rejected here: sing-box renders it
+// (ech.query_server_name, available since 1.13 — below the 1.14.3
+// floor) and mihomo renders it (ech-opts.query-server-name). The old
+// "not rendered yet" rejection outlived the renderers that made it
+// false (PASS3 deep S4). The Xray path, which renders no ECH at all,
+// is closed by the FeatureECH capability gate, not by validation.
 func (t TLS) validate(what string) []error {
 	ech := t.ECH
 	if !ech.Enabled {
@@ -328,9 +332,6 @@ func (t TLS) validate(what string) []error {
 	}
 	if t.Reality {
 		errs = append(errs, fmt.Errorf("%s: ECH and REALITY are incompatible", what))
-	}
-	if strings.TrimSpace(ech.QueryServerName) != "" {
-		errs = append(errs, fmt.Errorf("%s: ech query_server_name is not rendered yet (needs sing-box >= 1.13)", what))
 	}
 	return errs
 }

@@ -305,8 +305,60 @@ func TestRenderECHProxyToggle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out, "ech: true") {
-		t.Fatalf("rendered mihomo config must enable ech, got:\n%s", out)
+	if !strings.Contains(out, "ech-opts:") || !strings.Contains(out, "enable: true") {
+		t.Fatalf("rendered mihomo config must enable ech via ech-opts, got:\n%s", out)
+	}
+	if strings.Contains(out, "\n    ech: true") {
+		t.Fatalf("the legacy flat ech toggle must not be emitted anymore:\n%s", out)
+	}
+}
+
+func TestRenderECHPinnedConfigAndQueryServerName(t *testing.T) {
+	// PASS3 deep S4: the pinned config and the query name used to be
+	// dropped (only `ech: true` was rendered). The plan stores PEM
+	// lines; ech-opts.config is one base64 string.
+	p := testPlan()
+	p.Outbounds[0].TLS.ECH = engine.ECHConfig{
+		Enabled: true,
+		Config: []string{
+			"-----BEGIN ECHCONFIG-----",
+			"AE7+DQA8NwAgACBwaW5uZWQtZWNoLXRlc3QtY29uZmln",
+			"-----END ECHCONFIG-----",
+		},
+		QueryServerName: "ech-query.example.com",
+	}
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		"config: AE7+DQA8NwAgACBwaW5uZWQtZWNoLXRlc3QtY29uZmln",
+		"query-server-name: ech-query.example.com",
+	} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("rendered mihomo config is missing %q:\n%s", want, out)
+		}
+	}
+	if strings.Contains(out, "BEGIN ECHCONFIG") {
+		t.Fatalf("PEM armor must not reach ech-opts.config:\n%s", out)
+	}
+}
+
+func TestRenderECHRejectsUnmergeablePinnedConfigs(t *testing.T) {
+	p := testPlan()
+	p.Outbounds[0].TLS.ECH = engine.ECHConfig{
+		Enabled: true,
+		Config: []string{
+			"-----BEGIN ECHCONFIG-----", "QUJD", "-----END ECHCONFIG-----",
+			"-----BEGIN ECHCONFIG-----", "REVG", "-----END ECHCONFIG-----",
+		},
+	}
+	if _, err := Render(p, testRuntime(t)); err == nil {
+		t.Fatal("two pinned ECHConfigLists cannot merge into mihomo's single config value and must be refused")
+	}
+	p.Outbounds[0].TLS.ECH.Config = []string{"not base64!!!"}
+	if _, err := Render(p, testRuntime(t)); err == nil {
+		t.Fatal("a non-base64 pinned ECH config must be refused, not rendered")
 	}
 }
 
@@ -315,7 +367,7 @@ func TestRenderOmitsECHByDefault(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(out, "ech:") {
+	if strings.Contains(out, "ech-opts") {
 		t.Fatalf("rendered mihomo config must not mention ech unless enabled, got:\n%s", out)
 	}
 }

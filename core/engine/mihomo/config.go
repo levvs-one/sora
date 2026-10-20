@@ -118,9 +118,11 @@ type proxy struct {
 	SkipCertVerify *bool    `yaml:"skip-cert-verify,omitempty"`
 	Fingerprint    string   `yaml:"client-fingerprint,omitempty"`
 	ALPN           []string `yaml:"alpn,omitempty"`
-	// ECH enables Encrypted Client Hello; mihomo fetches the ECH config
-	// via DNS itself, so only the toggle is wired.
-	ECH     *bool    `yaml:"ech,omitempty"`
+	// ECH carries Encrypted Client Hello as ech-opts: the enable
+	// toggle, the pinned config (one base64 string) and the DNS query
+	// name override. The legacy flat `ech: true` spelling dropped the
+	// pinned config and the query name (PASS3 deep S4).
+	ECH     *echOpts `yaml:"ech-opts,omitempty"`
 	Reality *reality `yaml:"reality-opts,omitempty"`
 
 	// Hysteria2 bandwidth caps ("100 Mbps"): positive values switch the
@@ -201,6 +203,15 @@ type smux struct {
 type reality struct {
 	PublicKey string `yaml:"public-key,omitempty"`
 	ShortID   string `yaml:"short-id,omitempty"`
+}
+
+// echOpts is mihomo's ECH block (ech-opts in the pinned docs):
+// enable, the pinned ECHConfigList as one base64 string (empty means
+// "resolve via DNS"), and the name to use for that DNS resolution.
+type echOpts struct {
+	Enable          bool   `yaml:"enable"`
+	Config          string `yaml:"config,omitempty"`
+	QueryServerName string `yaml:"query-server-name,omitempty"`
 }
 
 // proxyGroup models a selectable group. Interval uses seconds and Timeout uses

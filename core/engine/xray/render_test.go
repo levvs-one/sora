@@ -489,6 +489,21 @@ func TestRenderAcceptsCompatibleTransportPairs(t *testing.T) {
 	}
 }
 
+func TestRenderRefusesECH(t *testing.T) {
+	// PASS3 deep S4: the Xray renderer emits no echConfigList /
+	// echForceQuery, and the format the pin expects is unverified
+	// without the binary. Rendering anyway would send the SNI in the
+	// clear while the plan promises it hidden — refuse instead.
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	o := &p.Outbounds[0]
+	o.Flow, o.TLS.Reality = "", false
+	o.TLS = engine.TLS{Enabled: true, ServerName: "cdn.example.com",
+		ECH: engine.ECHConfig{Enabled: true}}
+	if _, err := Render(p, testRuntime, nil); err == nil || !strings.Contains(err.Error(), "ECH") {
+		t.Fatalf("ECH on the Xray path must be refused with a named error, got %v", err)
+	}
+}
+
 func TestRenderPinsHysteria2NativeMapping(t *testing.T) {
 	// Xray's "hysteria" outbound IS the native Hysteria2 implementation
 	// (upstream requires settings.version == 2); this pins the mapping so it

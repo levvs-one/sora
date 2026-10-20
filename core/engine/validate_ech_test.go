@@ -38,12 +38,43 @@ func TestValidateRejectsECHWithReality(t *testing.T) {
 	}
 }
 
-func TestValidateRejectsUnrenderedECHQueryServerName(t *testing.T) {
+func TestValidateAcceptsECHQueryServerName(t *testing.T) {
+	// PASS3 deep S4: the old rejection ("not rendered yet, needs
+	// sing-box >= 1.13") outlived its truth — sing-box renders
+	// query_server_name (floor is 1.14.3) and mihomo renders
+	// query-server-name in ech-opts.
 	o := echOutbound()
 	o.TLS.ECH.QueryServerName = "ech.example.com"
-	if err := o.Validate(); err == nil || !strings.Contains(err.Error(), "query_server_name") {
-		t.Errorf("Validate = %v, want query_server_name error", err)
+	if err := o.Validate(); err != nil {
+		t.Errorf("Validate = %v, want nil for a rendered query_server_name", err)
 	}
+}
+
+func TestECHPlanRequiresFeatureECH(t *testing.T) {
+	// PASS3 deep S4: an ECH plan must route only to engines whose
+	// renderer emits ECH. Xray renders none of it, so it reports the
+	// feature missing; sing-box and mihomo carry it.
+	p := &Plan{SessionID: "s1", Outbounds: []Outbound{echOutbound()}}
+	if !p.RequiredFeatures()[FeatureECH] {
+		t.Fatal("an ECH-enabled plan must require feature ech")
+	}
+	if missing := Catalog[KindXray].Missing(p); !containsStr(missing, "feature "+string(FeatureECH)) {
+		t.Errorf("xray must miss feature ech, got %v", missing)
+	}
+	for _, kind := range []Kind{KindSingBox, KindMihomo} {
+		if missing := Catalog[kind].Missing(p); containsStr(missing, "feature "+string(FeatureECH)) {
+			t.Errorf("%s renders ECH and must not miss feature ech, got %v", kind, missing)
+		}
+	}
+}
+
+func containsStr(list []string, want string) bool {
+	for _, s := range list {
+		if s == want {
+			return true
+		}
+	}
+	return false
 }
 
 func TestValidateRejectsECHBootstrapOverPlaintextDNS(t *testing.T) {

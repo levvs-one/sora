@@ -1,6 +1,7 @@
 package mihomo
 
 import (
+	"encoding/base64"
 	"fmt"
 	"maps"
 	"net"
@@ -288,8 +289,11 @@ func applyTLS(px *proxy, o engine.Outbound) error {
 		px.ALPN = o.TLS.ALPN
 	}
 	if o.TLS.ECH.Enabled {
-		ech := true
-		px.ECH = &ech
+		cfg, err := mihomoECHConfig(o.TLS.ECH.Config)
+		if err != nil {
+			return err
+		}
+		px.ECH = &echOpts{Enable: true, Config: cfg, QueryServerName: o.TLS.ECH.QueryServerName}
 	}
 	if o.TLS.Insecure {
 		skip := true
@@ -308,6 +312,42 @@ func applyTLS(px *proxy, o engine.Outbound) error {
 		px.Fingerprint = o.TLS.Fingerprint
 	}
 	return nil
+}
+
+// mihomoECHConfig converts the plan's pinned ECHConfigList to the
+// ech-opts.config spelling: one base64 string. The plan stores PEM
+// lines (the shape sing-box takes); strip the armor, join the body,
+// verify it really is base64, and re-encode it as a single string.
+// Bare base64 lines (no armor) pass through the same path. More than
+// one PEM block cannot be merged into mihomo's single config value —
+// each block is a complete ECHConfigList, and concatenating two lists
+// is not a list — so that shape fails closed instead of rendering a
+// config mihomo would reject or misread.
+func mihomoECHConfig(lines []string) (string, error) {
+	if len(lines) == 0 {
+		return "", nil
+	}
+	blocks := 0
+	var body strings.Builder
+	for _, ln := range lines {
+		ln = strings.TrimSpace(ln)
+		switch {
+		case strings.HasPrefix(ln, "-----BEGIN"):
+			blocks++
+		case strings.HasPrefix(ln, "-----END"), ln == "":
+			// armor trailer or blank line: no payload
+		default:
+			body.WriteString(ln)
+		}
+	}
+	if blocks > 1 {
+		return "", fmt.Errorf("mihomo: %d pinned ECH configs cannot be merged into the single ech-opts.config value", blocks)
+	}
+	raw, err := base64.StdEncoding.DecodeString(body.String())
+	if err != nil || len(raw) == 0 {
+		return "", fmt.Errorf("mihomo: the pinned ECH config is not PEM/base64 ECHConfigList data")
+	}
+	return base64.StdEncoding.EncodeToString(raw), nil
 }
 
 // ssPluginOpts translates a SIP002 plugin option string ("k=v;k;flag")

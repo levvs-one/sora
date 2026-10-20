@@ -210,6 +210,17 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	if o.TLS.Insecure && !o.TLS.Reality && (o.TLS.Enabled || o.Protocol == engine.ProtocolTrojan || o.Protocol == engine.ProtocolHysteria2) {
 		return nil, fmt.Errorf("xray: outbound %s disables certificate verification; this build requires verification or certificate pinning", o.ID)
 	}
+	if o.TLS.ECH.Enabled {
+		// Xray implements ECH (transport/internet/tls/ech.go:
+		// echConfigList/echForceQuery), but this renderer emits
+		// neither, and the echConfigList format the pin expects —
+		// base64 ECHConfigList vs the plan's PEM lines — is unverified
+		// without the binary. Rendering without it would send the SNI
+		// in the clear while the plan promises it hidden, so fail
+		// closed here too, not just at engine selection (FeatureECH,
+		// PASS3 deep S4).
+		return nil, fmt.Errorf("xray: outbound %s enables ECH, which the Xray renderer does not emit (echConfigList is unverified on the pinned build); use the sing-box or mihomo engine", o.ID)
+	}
 	tag := r.tags[o.ID]
 	server := obj{"address": o.Server, "port": int(o.Port)}
 	var settings obj

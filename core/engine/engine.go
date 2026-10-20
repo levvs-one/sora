@@ -83,6 +83,16 @@ const (
 	// DoH3 transport, so a plan naming an h3:// resolver must never be
 	// routed to it: the render would fail the whole session instead.
 	FeatureDoH3 Feature = "doh3"
+	// FeatureECH marks engines whose renderer actually emits Encrypted
+	// Client Hello for an outbound that enables it: sing-box (ech
+	// block with pinned config and query_server_name) and mihomo
+	// (ech-opts with pinned config and query-server-name). The Xray
+	// renderer emits neither echConfigList nor echForceQuery — the
+	// format Xray's pin expects for echConfigList (base64 ECHConfigList
+	// vs the plan's PEM lines) is unverified without the binary — so
+	// Xray does not claim it and refuses ECH outbounds at render time
+	// instead of silently sending the SNI in the clear (PASS3 deep S4).
+	FeatureECH Feature = "ech"
 )
 
 // Capabilities describes the protocols and features supported by an engine
