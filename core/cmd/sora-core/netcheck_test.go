@@ -91,6 +91,50 @@ func TestRunQUICProbeCorruptTrackerIsHonestReset(t *testing.T) {
 	}
 }
 
+// TestRunQUICProbeMissingDataDir pins CENSOR-SURV review Medium 3:
+// on a fresh operator run the data dir may not exist yet. The probe
+// must still print its verdict (previously the tracker save failed
+// and the verdict was lost entirely), and the tracker file is
+// created inside the new dir.
+func TestRunQUICProbeMissingDataDir(t *testing.T) {
+	stubQUICProbe(t, probe.VerdictOpen)
+	dir := filepath.Join(t.TempDir(), "does-not-exist")
+	lines, err := runQUICProbe(context.Background(), dir, "example.com")
+	if err != nil {
+		t.Fatalf("missing data dir must not lose the verdict: %v", err)
+	}
+	joined := strings.Join(lines, "\n")
+	if !strings.Contains(joined, "verdict=open") {
+		t.Fatalf("lines = %q, want the open verdict", joined)
+	}
+	if _, err := os.Stat(filepath.Join(dir, banTrackerFileName)); err != nil {
+		t.Fatalf("ban tracker file must be persisted in the created dir: %v", err)
+	}
+}
+
+// TestRunQUICProbeSaveFailureKeepsVerdict: when the tracker cannot
+// be saved at all (here the tracker path is blocked by a directory),
+// the verdict is still returned, with the save failure as a warning
+// line — persistence trouble is not a lost result.
+func TestRunQUICProbeSaveFailureKeepsVerdict(t *testing.T) {
+	stubQUICProbe(t, probe.VerdictBlocked)
+	dir := t.TempDir()
+	if err := os.Mkdir(filepath.Join(dir, banTrackerFileName), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	lines, err := runQUICProbe(context.Background(), dir, "example.com")
+	if err != nil {
+		t.Fatalf("a save failure must not fail the probe run: %v", err)
+	}
+	joined := strings.Join(lines, "\n")
+	if !strings.Contains(joined, "verdict=blocked") {
+		t.Fatalf("lines = %q, want the blocked verdict despite the save failure", joined)
+	}
+	if !strings.Contains(joined, "warning: ban tracker was not saved:") {
+		t.Fatalf("lines = %q, want the save-failure warning line", joined)
+	}
+}
+
 func TestQUICTargetParsing(t *testing.T) {
 	if host, port, err := quicTarget("example.com"); err != nil || host != "example.com" || port != 443 {
 		t.Fatalf("bare host = (%q, %d, %v), want example.com:443", host, port, err)

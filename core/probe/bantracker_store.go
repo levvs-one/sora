@@ -84,7 +84,10 @@ func (b *BanTracker) Restore(snap map[string]time.Time) int {
 
 // SaveBanTracker writes the tracker's live bans to path atomically
 // (temp file + rename, owner-only permissions: the file reveals which
-// remotes the censor banned, which is path metadata).
+// remotes the censor banned, which is path metadata). The parent
+// directory is created when missing: a fresh operator run whose
+// data dir was never created by an install is the normal first-run
+// case, not an error (CENSOR-SURV review, Medium 3).
 func SaveBanTracker(path string, b *BanTracker) error {
 	snap := b.Snapshot()
 	keys := make([]string, 0, len(snap))
@@ -99,6 +102,11 @@ func SaveBanTracker(path string, b *BanTracker) error {
 	raw, err := json.Marshal(f)
 	if err != nil {
 		return fmt.Errorf("probe: encode ban tracker: %w", err)
+	}
+	if dir := filepath.Dir(path); dir != "" {
+		if err := os.MkdirAll(dir, 0o700); err != nil {
+			return fmt.Errorf("probe: create ban tracker dir: %w", err)
+		}
 	}
 	tmp := path + ".tmp"
 	if err := os.WriteFile(tmp, raw, 0o600); err != nil {

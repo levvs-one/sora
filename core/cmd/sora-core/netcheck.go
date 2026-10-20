@@ -56,9 +56,13 @@ func runQUICProbe(ctx context.Context, dataDir, target string) ([]string, error)
 	if err != nil {
 		return nil, err
 	}
-	if serr := probe.SaveBanTracker(path, tracker); serr != nil {
-		return nil, serr
-	}
+	// Persistence is not the verdict: a save failure (a data dir
+	// that cannot be written, a path blocked by a directory, ...)
+	// must never swallow the probe result the operator asked for.
+	// The verdict is printed regardless; the save failure rides
+	// along as a warning line (CENSOR-SURV review, Medium 3 — the
+	// previous code returned the save error and no verdict at all).
+	serr := probe.SaveBanTracker(path, tracker)
 	lines := []string{}
 	if resetNote != "" {
 		lines = append(lines, resetNote)
@@ -72,9 +76,17 @@ func runQUICProbe(ctx context.Context, dataDir, target string) ([]string, error)
 	if res.Verdict == probe.VerdictBlocked {
 		// The reaction is part of the chain, not a hope: the blocked
 		// 4-tuple is in the tracker (ProbeQUICWithTracker recorded
-		// it), the next dial rotates the source port, and the tracker
-		// file just saved carries the ban across restarts.
-		lines = append(lines, "reaction: the blocked 4-tuple was recorded in the ban tracker; the next QUIC dial rotates the source port instead of renewing the 420s ban")
+		// it) and the next dial rotates the source port. Whether the
+		// ban also survives a restart depends on the save above, so
+		// the saved-to-file claim is made only when the save landed.
+		if serr == nil {
+			lines = append(lines, "reaction: the blocked 4-tuple was recorded in the ban tracker; the next QUIC dial rotates the source port instead of renewing the 420s ban")
+		} else {
+			lines = append(lines, "reaction: the blocked 4-tuple was recorded in the ban tracker for this process; the next QUIC dial rotates the source port instead of renewing the 420s ban")
+		}
+	}
+	if serr != nil {
+		lines = append(lines, "warning: ban tracker was not saved: "+serr.Error()+" (the verdict above is unaffected)")
 	}
 	return lines, nil
 }
