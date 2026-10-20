@@ -22,6 +22,10 @@ import (
 // engine/mux.go), not this semaphore. The limiter is for core-initiated
 // dials only, and its doc comment says so wherever it is used.
 //
+// NOT WIRED: core dials (the probe) do not acquire from this yet — it
+// is a tested primitive waiting for the probe-dial acquisition path
+// (T007).
+//
 // The zero value is ready to use.
 type HandshakeLimiter struct {
 	mu   sync.Mutex

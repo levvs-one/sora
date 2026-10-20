@@ -336,6 +336,9 @@ func shortNetErr(err error) string {
 // real web server. A nil ctx uses Background. The probes are sequential:
 // parallel connections from one client look like a scan, not like five
 // independent prober sources, and would muddy the classification.
+//
+// NOT WIRED: no UI or RPC path triggers this yet — it is a tested
+// primitive waiting for the trojan self-test checklist (T022).
 func ProbeTrojanFallback(ctx context.Context, target string) (*TrojanSelfTestReport, error) {
 	if ctx == nil {
 		ctx = context.Background()

@@ -33,6 +33,9 @@ const nftTable = "sora_nfqws"
 
 // QueueAllocator hands out NFQUEUE numbers to nfqws instances. It is safe
 // for concurrent use.
+//
+// NOT WIRED: the nfqws executor runtime is sibling's active work (T005);
+// no executor calls this yet.
 type QueueAllocator struct {
 	mu   sync.Mutex
 	used [queueCount]bool

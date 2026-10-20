@@ -76,6 +76,9 @@ type SeriesResult struct {
 // attempt is exactly the single-probe lie this exists to replace. A
 // cancelled context returns the partial series, not an error — partial
 // evidence is still evidence.
+//
+// NOT WIRED: no RPC or diagnostic path runs series yet — it is a tested
+// primitive waiting for the serial-probe client trigger (T041).
 func RunSeries(ctx context.Context, opts SeriesOptions, probe ProbeFunc) SeriesResult {
 	opts = opts.normalized()
 	var res SeriesResult

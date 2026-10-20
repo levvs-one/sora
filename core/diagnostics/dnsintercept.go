@@ -125,6 +125,9 @@ var censorMarkers = map[string]bool{
 // DetectDNSIntercept probes whether the path to server impersonates the
 // resolver or injects forged answers. UDP and TCP queries race with short
 // budgets; the verdict is derived from their agreement, flags and content.
+//
+// NOT WIRED: no RPC or diagnostic flow calls this yet — it is a tested
+// probe primitive waiting for a client trigger (T010).
 func DetectDNSIntercept(ctx context.Context, in InterceptInput) InterceptReport {
 	server := in.Server
 	if server == "" {

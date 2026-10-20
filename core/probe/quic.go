@@ -103,6 +103,11 @@ func (r *QUICResult) Advice() string {
 // It sends one Initial with a grease version and waits for Version
 // Negotiation; no real handshake is performed and nothing is retransmitted,
 // so a lost probe never extends a residual ban by itself.
+//
+// NOT WIRED: no RPC or diagnostic path calls ProbeQUIC yet — it is a
+// tested primitive waiting for a client trigger (spec
+// 31-quic-residual-ban.md). The BanTracker from the same module IS wired
+// through DialQUIC into the probe dials.
 func ProbeQUIC(ctx context.Context, host string, port int) (*QUICResult, error) {
 	return ProbeQUICWithTracker(ctx, host, port, nil)
 }

@@ -176,6 +176,9 @@ func Shadowsocks2022Methods() []string {
 // "upgrade to 2022" migration: new key and new method on the same server
 // entry, no deletion. The caller must deliver the key to the server
 // operator out of band — sora cannot rotate a server-side key by itself.
+//
+// NOT WIRED: no UI path calls this yet — it waits for the "rotate to
+// 2022" client flow (T020).
 func GenerateShadowsocks2022PSK(method string) (string, error) {
 	n, ok := shadowsocks2022KeyLen[normalizeShadowsocksMethod(method)]
 	if !ok {
