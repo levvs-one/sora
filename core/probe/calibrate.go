@@ -4,6 +4,8 @@ import (
 	"errors"
 	"math"
 	"time"
+
+	"github.com/levvs-one/sora-client/core/engine"
 )
 
 // Hysteria2 brutal auto-calibration (T021, spec 21-hysteria2.md §4).
@@ -18,26 +20,45 @@ import (
 // to the client, which owns the credential document the caps are written
 // into.
 //
-// NOT WIRED: no caller yet — the trigger needs the client-side seam
-// (post-connect hook + credential write + 7-day cooldown bookkeeping,
-// spec §4.3–4.5). The function is deliberately not invoked from the core:
-// a background self-measurement would burn ~100 MB of user traffic and
-// observe the network, both forbidden by the spec.
+// WIRING (CENSOR-P3): CalibrateBrutal itself stays a pure function.
+// The caller-facing entry point is BrutalCalibrator (brutal.go): it
+// owns the per-server result cache and the 7-day cooldown, takes the
+// measured rate from a Benchmarker run the user or the client
+// explicitly started, and lets manual plan caps (UpMbps/DownMbps
+// from the link or the credential document) override the calibration
+// untouched. It is deliberately never invoked on a timer from the
+// core: a background self-measurement would burn ~100 MB of user
+// traffic and observe the network, both forbidden by the spec. The
+// remaining call-site seam (invoking the calibrator at the end of
+// BenchmarkServers / after a hy2 Connect and persisting the result
+// into the credential document) lives in core/control files owned by
+// another department; the exact diff is specified in
+// reports/CENSOR-P3.md §"Brutal seam".
 
 // brutalSafetyMargin: brutal must not sit exactly on the measured
 // ceiling — the measurement is the path at one moment (CGNAT, evening
-// congestion), not the tariff.
+// congestion), not the tariff. Why 0.9: spec 21-hysteria2.md §4 fixes
+// the margin at 10% — large enough to absorb benchmark overshoot
+// (a short download overstates sustained goodput), small enough not
+// to waste a genuinely measured path.
 const brutalSafetyMargin = 0.9
 
 // brutalUpShare sizes the upload cap when the user never provided a
 // tariff: a tenth of the measured download, labelled an estimate.
+// Why 0.1: spec §4's conservative residential-uplink assumption
+// (asymmetric access is typically ≥10:1); the result is always
+// flagged UpEstimated so the client can label it, never present it
+// as a measurement.
 const brutalUpShare = 0.1
 
 // BrutalCapBounds are the sane extremes for a stated cap: brutal below
-// 1 Mbps is meaningless, above 100 Gbps is a typo.
+// 1 Mbps is meaningless, above 100 Gbps is a typo. The ceiling is the
+// engine package's MaxHy2BandwidthMbps (quic_defaults.go), the single
+// source plan validation also enforces, so a calibrated cap can never
+// be a value the plan would reject.
 const (
 	brutalMinMbps = 1
-	brutalMaxMbps = 100000
+	brutalMaxMbps = engine.MaxHy2BandwidthMbps
 )
 
 // CalibrationCooldown is the minimum spacing between two calibrations of
