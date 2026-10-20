@@ -32,6 +32,10 @@ type storedDoc struct {
 	UpdatedAt int64  `json:"updated_at"`
 	Payload   string `json:"payload"` // base64
 	From      string `json:"from,omitempty"`
+	// Hash is the cached hex sha256 of the payload, computed once by Put.
+	// Files written before the cache existed have no hash; readers fall
+	// back to decoding and hashing the payload.
+	Hash string `json:"hash,omitempty"`
 }
 
 // safeName rejects path separators and traversal so kind/name can address
@@ -53,6 +57,14 @@ func (d *DirStore) path(kind, name string) (string, error) {
 		return "", fmt.Errorf("sync: unsafe document name %q/%q", kind, name)
 	}
 	return filepath.Join(d.dir, kind, name+".json"), nil
+}
+
+// storedMeta is the subset of storedDoc an inventory scan needs: the
+// payload stays on disk, undecided and unhashed, unless the cached hash is
+// missing (files written before the cache).
+type storedMeta struct {
+	UpdatedAt int64  `json:"updated_at"`
+	Hash      string `json:"hash,omitempty"`
 }
 
 // List returns the metadata of every stored document.
@@ -84,17 +96,26 @@ func (d *DirStore) List() []Meta {
 			if err != nil {
 				continue
 			}
-			var sd storedDoc
-			if err := json.Unmarshal(raw, &sd); err != nil {
+			var sm storedMeta
+			if err := json.Unmarshal(raw, &sm); err != nil {
 				continue
 			}
-			payload, err := base64.StdEncoding.DecodeString(sd.Payload)
-			if err != nil {
-				continue
+			hash := sm.Hash
+			if hash == "" {
+				// Legacy file: decode and hash once, as List used to.
+				var sd storedDoc
+				if err := json.Unmarshal(raw, &sd); err != nil {
+					continue
+				}
+				payload, err := base64.StdEncoding.DecodeString(sd.Payload)
+				if err != nil {
+					continue
+				}
+				hash = HashOf(payload)
 			}
 			out = append(out, Meta{
 				Kind: k.Name(), Name: name,
-				UpdatedAt: sd.UpdatedAt, Hash: HashOf(payload),
+				UpdatedAt: sm.UpdatedAt, Hash: hash,
 			})
 		}
 	}
@@ -121,8 +142,13 @@ func (d *DirStore) Get(kind, name string) (Document, bool) {
 	if err != nil {
 		return Document{}, false
 	}
+	hash := sd.Hash
+	if hash == "" {
+		// Legacy file without the cached hash.
+		hash = HashOf(payload)
+	}
 	return Document{
-		Meta:    Meta{Kind: kind, Name: name, UpdatedAt: sd.UpdatedAt, Hash: HashOf(payload)},
+		Meta:    Meta{Kind: kind, Name: name, UpdatedAt: sd.UpdatedAt, Hash: hash},
 		Payload: payload,
 		From:    sd.From,
 	}, true
@@ -152,6 +178,9 @@ func (d *DirStore) Put(doc Document) (bool, error) {
 		UpdatedAt: doc.UpdatedAt,
 		Payload:   base64.StdEncoding.EncodeToString(doc.Payload),
 		From:      doc.From,
+		// Cache the hash at write time so reads never decode and hash
+		// the payload; computed here rather than trusting doc.Hash.
+		Hash: HashOf(doc.Payload),
 	})
 	if err != nil {
 		return false, fmt.Errorf("sync: %w", err)
