@@ -220,9 +220,27 @@ func (p Params) Describe() string {
 // mirroring the reference set's filters in bypass.DefaultStrategy.
 // Genomes tpws can express render through the legacy fields.
 func (p Params) BypassStrategy() (engine.BypassStrategy, bool) {
-	// TTL, autottl and repeats ride on the fake packet; without the
-	// fake method they are unexecutable (plan validation agrees).
-	if p.Method != MethodFake && (p.TTL > 0 || p.AutoTTL || p.Repeats > 1) {
+	// TTL, autottl, repeats and the fake payload all ride on the fake
+	// packet; without the fake method they are unexecutable (plan
+	// validation agrees). FakeProto belongs in this list: it used to
+	// leak into split2/disorder2 strategies as FakeTLS/FakeQUIC, which
+	// validation then rejected ("fake payloads need the fake desync
+	// method") — a converted genome that can only fail closed.
+	if p.Method != MethodFake && (p.TTL > 0 || p.AutoTTL || p.Repeats > 1 || p.FakeProto != "") {
+		return engine.BypassStrategy{}, false
+	}
+	// A fixed TTL and autottl are two answers to the same question;
+	// plan validation treats them as mutually exclusive even on the
+	// fake method, so the combination has no faithful rendering.
+	if p.TTL > 0 && p.AutoTTL {
+		return engine.BypassStrategy{}, false
+	}
+	// Split, disorder and OOB are defined by their position: without
+	// one the tpws rendering changes nothing (or reorders nothing),
+	// which validation rejects. TLSRec defaults its position below
+	// and Fake/HTTPShuffle carry a strategy without one, so only
+	// these three methods refuse.
+	if p.SplitPos == "" && (p.Method == MethodSplit || p.Method == MethodDisorder || p.Method == MethodOOB) {
 		return engine.BypassStrategy{}, false
 	}
 	var s engine.BypassStrategy
@@ -290,6 +308,21 @@ func (p Params) BypassStrategy() (engine.BypassStrategy, bool) {
 		s.FilterTCP, s.FilterL7 = "80,443", "tls"
 	}
 	return s, true
+}
+
+// convertsValidly reports whether the genome converts faithfully to a
+// strategy plan validation accepts. It is the tuner's production
+// invariant in one place — every genome the search generates or mutates
+// must satisfy it (genome_invariant_test.go pins it over the whole
+// bounded space) — so generators filter through it instead of
+// re-encoding the conversion rules and drifting from them.
+func (p Params) convertsValidly() bool {
+	s, ok := p.BypassStrategy()
+	if !ok {
+		return false
+	}
+	o := engine.Outbound{ID: "desync", Protocol: engine.ProtocolBypass, Bypass: &s}
+	return o.Validate() == nil
 }
 
 // NFQWSArgs renders the full genome as nfqws arguments, through the

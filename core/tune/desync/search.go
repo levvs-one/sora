@@ -202,10 +202,17 @@ var (
 // mutate generates up to n single-field children of p. It changes one
 // axis at a time so a fitness delta stays attributable — the Geneva
 // brevity term then keeps the winner minimal.
+//
+// A child is only emitted when it converts faithfully to a strategy
+// plan validation accepts (Params.convertsValidly): a single-field
+// tweak can otherwise cross into a combination with no rendering at
+// all — a TTL on a non-fake parent, fooling on an OOB parent — and
+// every probe spent on such a child is wasted on a genome that could
+// only fail closed.
 func mutate(p Params, n int) []Params {
 	var out []Params
 	add := func(c Params) {
-		if len(out) >= n || c.ID() == p.ID() {
+		if len(out) >= n || c.ID() == p.ID() || !c.convertsValidly() {
 			return
 		}
 		out = append(out, c)

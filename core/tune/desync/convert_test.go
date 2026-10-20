@@ -64,11 +64,17 @@ func TestTPWSGenomesConvertToTPWS(t *testing.T) {
 func TestUnfaithfulGenomesRefuse(t *testing.T) {
 	for _, p := range []Params{
 		{Method: MethodNone},
-		{Method: MethodSplit, TTL: 3},              // TTL needs the fake packet
-		{Method: MethodDisorder, AutoTTL: true},    // autottl needs the fake packet
-		{Method: MethodOOB, Fooling: "badseq"},     // nfqws has no OOB byte
-		{Method: MethodTLSRec, Repeats: 2},         // repeats need the fake packet
-		{Method: MethodHTTPShuffle, Fooling: "ts"}, // fooling is nfqws-only, shuffle has no nfqws form
+		{Method: MethodSplit, TTL: 3},                                 // TTL needs the fake packet
+		{Method: MethodDisorder, AutoTTL: true},                       // autottl needs the fake packet
+		{Method: MethodOOB, Fooling: "badseq"},                        // nfqws has no OOB byte
+		{Method: MethodTLSRec, Repeats: 2},                            // repeats need the fake packet
+		{Method: MethodHTTPShuffle, Fooling: "ts"},                    // fooling is nfqws-only, shuffle has no nfqws form
+		{Method: MethodSplit, SplitPos: "2", FakeProto: "tls"},        // the fake payload needs the fake packet
+		{Method: MethodDisorder, SplitPos: "2", FakeProto: "quic"},    // same, on disorder2
+		{Method: MethodFake, FakeProto: "tls", TTL: 3, AutoTTL: true}, // fixed TTL and autottl are mutually exclusive
+		{Method: MethodSplit},                                         // a split without a position splits nothing
+		{Method: MethodDisorder},                                      // disorder without a position has nothing to reorder
+		{Method: MethodOOB},                                           // OOB without a position has nothing to attach to
 	} {
 		if _, ok := p.BypassStrategy(); ok {
 			t.Errorf("genome %s converted; want a refusal", p.ID())
