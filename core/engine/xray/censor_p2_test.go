@@ -76,3 +76,27 @@ func TestCensorP2HTTPUpgradeHeaders(t *testing.T) {
 		t.Fatalf("httpupgradeSettings = %v", hu)
 	}
 }
+
+func TestCensorP2DeterministicRenderAndEmptyService(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolTrojan)
+	p.Outbounds[0].Transport = engine.Transport{
+		Type: "ws", Path: "/ws", Host: "cdn.example.com",
+		Headers: map[string]string{"User-Agent": "ua", "X-B": "2", "X-A": "1", "Accept": "*/*"},
+	}
+	a, err := Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := Render(p, testRuntime, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(a) != string(b) {
+		t.Fatal("repeated render of a header-carrying plan is not byte-identical")
+	}
+	p.Outbounds[0].Transport = engine.Transport{Type: "grpc"}
+	g, _ := p2Stream(t, p, "trojan")["grpcSettings"].(map[string]any)
+	if _, ok := g["serviceName"]; ok {
+		t.Fatalf("empty service name must be omitted, got %v", g)
+	}
+}

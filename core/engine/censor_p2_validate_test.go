@@ -143,3 +143,33 @@ func TestCatalogGRPCGates(t *testing.T) {
 		t.Errorf("sing-box: Missing = %v, want the gRPC user-agent gate", Catalog[KindSingBox].Missing(p))
 	}
 }
+
+// Boundaries (owner's "мелочи" standard): values at the edges behave
+// deliberately, not accidentally.
+func TestCensorP2Boundaries(t *testing.T) {
+	// Early data: 0 is off (renderers omit the key, pinned per engine),
+	// a large value passes through as data — the pinned binaries accept
+	// at least 1 MiB (sing-box check) / 16 MiB, so the plan invents no
+	// cap of its own; the engines own the wire limit.
+	o := p2Outbound(ProtocolVMess)
+	o.Transport = Transport{Type: "ws", Path: "/ws", EarlyData: 1048576}
+	if err := o.Validate(); err != nil {
+		t.Fatalf("early data 1MiB: Validate = %v", err)
+	}
+	// Lengths: a maximum-size DNS host name (253 bytes), a long path
+	// and a dotted service name all pass through untruncated.
+	host := strings.Repeat("a", 63) + "." + strings.Repeat("b", 63) + "." +
+		strings.Repeat("c", 63) + "." + strings.Repeat("d", 61) // 253 bytes
+	o.Transport = Transport{Type: "ws", Path: "/" + strings.Repeat("p", 1024), Host: host}
+	if err := o.Validate(); err != nil {
+		t.Fatalf("long path/host: Validate = %v", err)
+	}
+	// Empty vs absent: an empty gRPC service name is legal data (the
+	// engines apply their default service) and must validate; each
+	// renderer omits the key rather than emitting an empty one.
+	o2 := p2Outbound(ProtocolTrojan)
+	o2.Transport = Transport{Type: "grpc"}
+	if err := o2.Validate(); err != nil {
+		t.Fatalf("empty grpc service: Validate = %v", err)
+	}
+}

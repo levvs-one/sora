@@ -44,3 +44,30 @@ func TestCensorP2GRPCAuthorityRefused(t *testing.T) {
 		t.Fatalf("Render = %v, want an Xray-only refusal", err)
 	}
 }
+
+func TestCensorP2DeterministicRenderAndEmptyService(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolTrojan)
+	p.Outbounds[0].Transport = engine.Transport{
+		Type: "ws", Path: "/ws", Host: "cdn.example.com",
+		Headers: map[string]string{"User-Agent": "ua", "X-B": "2", "X-A": "1", "Accept": "*/*"},
+	}
+	a, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if a != b {
+		t.Fatal("repeated render of a header-carrying plan is not byte-identical")
+	}
+	p.Outbounds[0].Transport = engine.Transport{Type: "grpc"}
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(out, "grpc-service-name") {
+		t.Fatalf("empty service name must be omitted:\n%s", out)
+	}
+}
