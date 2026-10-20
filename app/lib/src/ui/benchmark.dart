@@ -45,12 +45,18 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
     final palette = Palette.of(context);
     final ids = widget.serverIds ?? [for (final o in sora.servers) o.id];
     final progress = sora.benchmarkProgress;
+    // Sort keys are computed once per build pass, not per comparison:
+    // freshBandwidth checks measurement age and displayNameOf scans the
+    // server lists, so calling them inside the comparator made every
+    // benchmark-progress rebuild O(n log n) scans.
+    final freshById = <String, int?>{for (final id in ids) id: sora.freshBandwidth(id)};
+    final nameById = <String, String>{for (final id in ids) id: sora.displayNameOf(id).toLowerCase()};
     // Fastest first; unmeasured servers last, by name.
     final ordered = List<String>.of(ids)
       ..sort((a, b) {
-        final x = sora.freshBandwidth(a), y = sora.freshBandwidth(b);
+        final x = freshById[a], y = freshById[b];
         if (x == null && y == null) {
-          return sora.displayNameOf(a).toLowerCase().compareTo(sora.displayNameOf(b).toLowerCase());
+          return nameById[a]!.compareTo(nameById[b]!);
         }
         if (x == null) return 1;
         if (y == null) return -1;
