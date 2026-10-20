@@ -435,3 +435,45 @@ func TestFakeIPRange6Validation(t *testing.T) {
 		})
 	}
 }
+
+// TestCatalogXmuxClaimMatchesRenderers pins PASS3 deep S1: no renderer
+// emits xmux or x_padding (checked in xray/singbox/mihomo render code),
+// so no catalog entry may claim FeatureXHTTPXmux and an xmux-tuned plan
+// must report the feature missing on every engine. The paired feature
+// FeatureXHTTPDownloadSplit was checked the same way: the Xray renderer
+// does emit downloadSettings, so Xray keeps that claim and the other
+// engines keep lacking it.
+func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
+	for kind, caps := range Catalog {
+		if caps.Supports(FeatureXHTTPXmux) {
+			t.Errorf("%s claims FeatureXHTTPXmux but no renderer emits xmux/x_padding", kind)
+		}
+	}
+	xhttpPlan := func(mutate func(*Transport)) *Plan {
+		p := validPlan()
+		p.Outbounds = p.Outbounds[:1]
+		p.Outbounds[0].Transport.Type = "xhttp"
+		mutate(&p.Outbounds[0].Transport)
+		return p
+	}
+	xmux := xhttpPlan(func(tr *Transport) { tr.XmuxMaxConcurrency = 8 })
+	for kind, caps := range Catalog {
+		missing := strings.Join(caps.Missing(xmux), " ")
+		if !strings.Contains(missing, string(FeatureXHTTPXmux)) {
+			t.Errorf("%s: xmux plan must report %s missing, got %q", kind, FeatureXHTTPXmux, missing)
+		}
+	}
+	split := xhttpPlan(func(tr *Transport) {
+		tr.Mode = "stream-up"
+		tr.DownloadAddress = "dl.example.com"
+		tr.DownloadPort = 443
+	})
+	if missing := strings.Join(Catalog[KindXray].Missing(split), " "); strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
+		t.Errorf("xray renders downloadSettings, so it must keep FeatureXHTTPDownloadSplit: %q", missing)
+	}
+	for _, kind := range []Kind{KindSingBox, KindMihomo} {
+		if missing := strings.Join(Catalog[kind].Missing(split), " "); !strings.Contains(missing, string(FeatureXHTTPDownloadSplit)) {
+			t.Errorf("%s does not render download-settings, split must stay missing: %q", kind, missing)
+		}
+	}
+}

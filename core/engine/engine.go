@@ -47,10 +47,14 @@ const (
 	// over the uplink server.
 	FeatureXHTTPDownloadSplit Feature = "xhttp-download-split"
 	// FeatureXHTTPXmux marks engines that honour XHTTP connection-reuse
-	// tuning (Xray xmux only: sora's mihomo renderer does not emit
-	// reuse-settings, so mihomo must not claim it). sing-box-lx exposes
-	// only x_padding_bytes; xmux values handed to it would be silently
-	// dropped.
+	// tuning. No engine claims it today: no renderer emits xmux (or
+	// x_padding_bytes) yet — Xray's xhttp case renders only
+	// mode/path/host/downloadSettings, sing-box's only host/path/mode/
+	// headers, mihomo's only path/host/mode/headers — so a plan that
+	// requires xmux tuning honestly reports it missing on every engine
+	// instead of being routed to a silent loss (PASS3 deep S1). The
+	// feature returns to a catalog entry only together with a renderer
+	// that actually emits it.
 	FeatureXHTTPXmux    Feature = "xhttp-xmux"
 	FeatureVLESSEncrypt Feature = "vless-encryption"
 	FeatureAmneziaWG    Feature = "amneziawg"
