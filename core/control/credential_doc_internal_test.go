@@ -112,6 +112,23 @@ func richVLESSSpec(t *testing.T) parser.OutboundSpec {
 	return result.Servers[0]
 }
 
+// hopHostHysteria2Spec is a parsed hysteria2 link that carries a Host
+// header (the host= query key) together with the hop options (mport
+// range and hop intervals). The parser sets HostHeader and the hop
+// options for any protocol, so this combination is a real import shape:
+// it is the one that separates host_header from the hop_* keys in byte
+// order (hop_* < host_header, because 'p' < 's').
+func hopHostHysteria2Spec(t *testing.T) parser.OutboundSpec {
+	t.Helper()
+	link := "hysteria2://pw@edge.example.com:443?mport=20000-30000&hop-interval=30&hop-interval-max=65" +
+		"&host=cdn.example.com&sni=www.example.com#Hy2Hop"
+	result, err := parser.LinkParser{}.Parse([]byte(link))
+	if err != nil || len(result.Servers) != 1 {
+		t.Fatalf("parse hop/host spec: %v, servers %d", err, len(result.Servers))
+	}
+	return result.Servers[0]
+}
+
 // TestCredentialDocumentMatchesLegacyMapForm pins byte-identity of the
 // streaming credential document builder against the map implementation
 // across the shapes the import pipeline produces, including values that
@@ -120,6 +137,7 @@ func richVLESSSpec(t *testing.T) parser.OutboundSpec {
 func TestCredentialDocumentMatchesLegacyMapForm(t *testing.T) {
 	specs := []parser.OutboundSpec{
 		richVLESSSpec(t),
+		hopHostHysteria2Spec(t),
 		{},
 		{Protocol: "vless", UUID: "u", Password: "p<a>&\"\\\n\t\x01\x7f", Host: "h", Port: 1},
 		{Protocol: "vless", Password: "invalid\xffutf8 and ünicode", ServerName: "пример.com"},
