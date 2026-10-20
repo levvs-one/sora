@@ -9,7 +9,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../desktop/links.dart';
+import '../sora.dart';
 import 'kit.dart';
+import 'routing_import.dart';
 import 'subscription_sheet.dart';
 
 /// Shows a scannable QR code for [payload] (a subscription or import link).
@@ -182,6 +184,12 @@ class _QrScanScreenState extends State<QrScanScreen> {
       case AddSubscription(:final url, :final name):
         navigator.pop();
         await showSubscriptionSheet(navigator.context, link: url.toString(), name: name);
+      case AddRouting(:final payload):
+        navigator.pop();
+        final ctx = navigator.context;
+        if (ctx.mounted) {
+          await showRoutingImport(ctx, SoraScope.read(ctx), payload);
+        }
       case SealedForHapp():
         navigator.pop();
         final ctx = navigator.context;

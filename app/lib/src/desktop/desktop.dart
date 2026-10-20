@@ -21,6 +21,7 @@ import '../notifications.dart';
 import '../sora.dart';
 import '../updates.dart';
 import '../ui/kit.dart';
+import '../ui/routing_import.dart';
 import '../ui/servers.dart';
 import '../ui/subscription_sheet.dart';
 import 'links.dart';
@@ -596,6 +597,8 @@ class Desktop with WindowListener {
     switch (link) {
       case AddSubscription(:final url, :final name):
         await showSubscriptionSheet(context, link: url.toString(), name: name);
+      case AddRouting(:final payload):
+        await showRoutingImport(context, sora, payload);
       case SealedForHapp():
         final s = S.of(context);
         await confirm(context, question: s.importSealed, action: s.understood, destructive: false, cancellable: false);

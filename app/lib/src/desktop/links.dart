@@ -17,6 +17,18 @@ final class SealedForHapp extends ImportLink {
   const SealedForHapp();
 }
 
+/// A Happ routing profile link, happ://routing/add/{base64}: the
+/// payload is the base64 of the routing JSON the Remnawave panel's
+/// HAPP Routing Builder produces (see happ_routing.dart). The payload
+/// travels verbatim; decoding and conversion happen at import time so
+/// a malformed profile is reported there, not mistaken for a
+/// subscription here.
+final class AddRouting extends ImportLink {
+  const AddRouting(this.payload);
+
+  final String payload;
+}
+
 /// Registered schemes. Other supported import schemes are parsed when passed to
 /// Sora, without registering them.
 const ownSchemes = ['sora', 'happ'];
@@ -50,6 +62,13 @@ ImportLink? _parse(String link) {
 
   if (scheme == 'happ' && RegExp(r'^crypt\d*/', caseSensitive: false).hasMatch(rest)) {
     return const SealedForHapp();
+  }
+  // Routing profiles are checked before the add/ extraction: both
+  // live under happ:// (and sora://), and "routing/add/…" must never
+  // fall through to the subscription path.
+  if ((scheme == 'happ' || scheme == 'sora') && rest.toLowerCase().startsWith('routing/add/')) {
+    final payload = rest.substring('routing/add/'.length).trim();
+    return payload.isEmpty ? null : AddRouting(payload);
   }
   final pasted = switch (scheme) {
     'sora' || 'happ' => after('add/'),
