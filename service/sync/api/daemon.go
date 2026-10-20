@@ -281,6 +281,15 @@ func (d *Daemon) Peers() []Peer {
 	return out
 }
 
+// peerCount returns the number of paired devices without copying the
+// registry — the status endpoint polls it on every UI tick and needs
+// only the count.
+func (d *Daemon) peerCount() int {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return len(d.peers)
+}
+
 // RevokePeer forgets a paired device; its documents stay. The second
 // result reports a registry save failure.
 func (d *Daemon) RevokePeer(id string) (bool, error) {
