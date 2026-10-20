@@ -145,9 +145,11 @@ message TuneDesyncRequest {
   sora.core.v1.ApiVersion api_version = 1;
   bytes control_authenticator = 2;
   string request_id = 3;
-  // Executor to tune for: "nfqws" or "tpws". Empty means nfqws when the
-  // host's probed capabilities allow it, else tpws — the choice is made
-  // from the runtime capability probe, not from the client.
+  // Executor to tune for: "nfqws" or "tpws". Empty means nfqws: the
+  // handler normalizes an empty value to "nfqws" unconditionally —
+  // there is no capability-based fallback to tpws (a host that cannot
+  // run nfqws refuses the candidates through the capability gate,
+  // it does not silently re-tune for the other executor).
   string engine = 4;
 }
 
@@ -167,8 +169,10 @@ message TuneDesyncResponse {
   // The registry profile id bound to the matched F5 network profile,
   // when the winner is a registry profile and a profile matched.
   string bound_profile_id = 5;
-  // True when a fresh active search ran; false when the answer is a
-  // previously bound winner re-served for this network.
+  // True when a fresh active search ran. The current handler always
+  // runs a fresh search, so this is always true today; the false case
+  // (a previously bound winner re-served for this network) is reserved
+  // for a future read path and is not produced by TuneDesync.
   bool probe_ran = 6;
   sora.core.v1.SoraError error = 7;
 }

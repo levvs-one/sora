@@ -69,6 +69,18 @@ func (s *Server) desyncService() (*desync.Service, error) {
 	if err != nil {
 		return nil, err
 	}
+	if s.logs != nil {
+		// A stored winner the Service refuses to re-serve (stale data
+		// versions, a genome that no longer converts) is an event the
+		// user-facing journal must show — the alternative is a silent
+		// stale strategy. The reason is one of the tuner's fixed
+		// tokens; the fingerprint is deliberately NOT logged (it names
+		// the user's network).
+		svc.OnRefuse = func(_ profiles.Fingerprint, reason string) {
+			s.logs.Write(time.Time{}, logs.LevelWarning, bypass.Source,
+				"desync: the stored winner for this network was refused ("+reason+"); run tuning again to pick a fresh strategy")
+		}
+	}
 	actual, _ := desyncServices.LoadOrStore(s, svc)
 	return actual.(*desync.Service), nil
 }
@@ -189,6 +201,16 @@ func (p *desyncSessionProber) Probe(ctx context.Context, params desync.Params) d
 	if !ok {
 		return rep
 	}
+	// hopsToServer is honestly 0 — "not measured". Nothing in the
+	// tree measures path length today (no traceroute or TTL probe in
+	// core/probe or the diagnostics), so the fixed-TTL FakeTTL branch
+	// of ResolveStrategy is NOT reachable from this production path:
+	// autottl candidates keep their autottl form and nfqws calibrates
+	// natively (--dpi-desync-autottl=<delta>:<min>-<max>). FakeTTL
+	// runs for callers that DO hold a measured hop count, through
+	// bypass.ArgsForTarget / bypass.NFQWSArgsForTarget. Narrowing the
+	// contract here is deliberate: inventing a hop count to reach the
+	// branch would ship fakes calibrated on a guess.
 	resolved, ok, err := bypass.ResolveStrategy(strat, desync.BlockedCanary.SNI, 0)
 	if err != nil || !ok {
 		return rep
@@ -225,8 +247,15 @@ func (p *desyncSessionProber) Probe(ctx context.Context, params desync.Params) d
 // handshake dials one canary through the engine's local SOCKS proxy
 // and completes a TLS handshake with real certificate verification:
 // the candidate only "works" if the handshake a browser would accept
-// completes through it.
+// completes through it. The canary allowlist is enforced here, on the
+// production path (desync.IsCanary): a target that is not one of the
+// two sanctioned canaries is never dialled, whatever a future caller
+// hands in — active probing fingerprints itself, so the prober's
+// target set is closed by construction AND by this guard.
 func (p *desyncSessionProber) handshake(ctx context.Context, canary desync.Canary) (ok bool, latency time.Duration, rst bool) {
+	if !desync.IsCanary(canary) {
+		return false, 0, false
+	}
 	dialer, err := proxy.SOCKS5("tcp", net.JoinHostPort("127.0.0.1", fmt.Sprintf("%d", p.srv.extProxyPort)), nil, proxy.Direct)
 	if err != nil {
 		return false, 0, false
