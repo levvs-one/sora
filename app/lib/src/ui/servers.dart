@@ -35,6 +35,7 @@ class ServersScreen extends StatefulWidget {
 class _ServersScreenState extends State<ServersScreen> {
   final _search = TextEditingController();
   bool _probed = false;
+  bool _favoritesOnly = false;
   final _collapsed = <String>{};
 
   @override
@@ -122,6 +123,28 @@ class _ServersScreenState extends State<ServersScreen> {
         onTap: () => push<void>(context, const QrScanScreen()),
       ),
     ];
+    // Favorites filter chip, styled after the logs screen's section chips:
+    // a quiet pill under the search field that narrows every subscription
+    // section (and the custom card) to starred servers only.
+    final favoritesFilter = Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: ChoiceChip(
+          key: const ValueKey('favorites-filter'),
+          avatar: Icon(Symbols.star_rounded, size: 18, color: palette.ink, fill: _favoritesOnly ? 1 : 0),
+          label: Text(s.favorites, style: Styles.secondary.copyWith(color: palette.ink)),
+          selected: _favoritesOnly,
+          showCheckmark: false,
+          selectedColor: palette.field,
+          backgroundColor: palette.surface,
+          side: BorderSide.none,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          onSelected: (selected) => setState(() => _favoritesOnly = selected),
+        ),
+      ),
+    );
     final search = Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
@@ -173,9 +196,9 @@ class _ServersScreenState extends State<ServersScreen> {
     );
     final separator = palette.ink3.withValues(alpha: 0.28);
     final slivers = <Widget>[
-      SliverToBoxAdapter(child: Column(children: [toolbar, const SizedBox(height: 8), search])),
+      SliverToBoxAdapter(child: Column(children: [toolbar, const SizedBox(height: 8), search, favoritesFilter])),
       SliverToBoxAdapter(child: automatic),
-      const SliverToBoxAdapter(child: _CustomServersCard()),
+      SliverToBoxAdapter(child: _CustomServersCard(favoritesOnly: _favoritesOnly)),
       // Typing filters the subscription sections only: the toolbar, search
       // field and custom card keep their state instead of the whole screen
       // rebuilding on every keystroke.
@@ -189,9 +212,12 @@ class _ServersScreenState extends State<ServersScreen> {
           // again per row.
           final shownCache = <Entry, OutboundSpec?>{};
           final sections = <Widget>[];
+          final favorites = sora.settings.favorites;
           for (final subscription in sora.subscriptions) {
-            final entries = _sortEntries(_matching(_visibleEntries(subscription, sora), query), sora, shownCache);
-            if (query.isNotEmpty && entries.isEmpty) continue;
+            var entries = _matching(_visibleEntries(subscription, sora), query);
+            if (_favoritesOnly) entries = favoriteEntries(entries, favorites);
+            entries = _sortEntries(entries, sora, shownCache);
+            if ((query.isNotEmpty || _favoritesOnly) && entries.isEmpty) continue;
             sections.add(
               SliverPadding(
                 padding: const EdgeInsets.only(bottom: 16),
@@ -243,6 +269,18 @@ class _ServersScreenState extends State<ServersScreen> {
               ),
             );
           }
+          if (_favoritesOnly && query.isEmpty && sections.isEmpty) {
+            // The filter is on but nothing is starred anywhere: say so in
+            // words instead of leaving a mysteriously empty list.
+            sections.add(
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(s.favoritesEmpty, style: Styles.caption.copyWith(color: palette.ink3)),
+                ),
+              ),
+            );
+          }
           return SliverMainAxisGroup(slivers: sections);
         },
       ),
@@ -275,6 +313,28 @@ List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty
         for (final e in entries)
           if (e.name.toLowerCase().contains(query)) e,
       ];
+
+/// Whether [entry] counts as a favorite: a single server when its own id is
+/// starred, a group when every member is starred. Keyed by member ids — the
+/// entry's own id is a synthetic `group:...` id for groups, never a server
+/// id — so a favorite survives a subscription refresh that rebuilds the
+/// entries with the same server ids.
+bool isFavoriteEntry(Entry entry, Set<String> favorites) => entry.members.every((m) => favorites.contains(m.id));
+
+/// The favorites-only view of [entries]: exactly the starred ones, in their
+/// original order.
+List<Entry> favoriteEntries(List<Entry> entries, Set<String> favorites) => [
+  for (final e in entries)
+    if (isFavoriteEntry(e, favorites)) e,
+];
+
+/// Applies a star tap on [entry] to [favorites] and returns the new set:
+/// starring a group stars every member, unstarring removes every member,
+/// so the group's star is filled exactly when [isFavoriteEntry] holds.
+Set<String> toggledFavorites(Set<String> favorites, Entry entry) {
+  final ids = {for (final m in entry.members) m.id};
+  return isFavoriteEntry(entry, favorites) ? favorites.difference(ids) : {...favorites, ...ids};
+}
 
 /// Applies subscription overrides: hides servers the user hid and renames the
 /// ones they renamed (FEATURE-PLAN.md F6). A renamed group member splits out
@@ -400,6 +460,7 @@ class _ServerRow extends StatelessWidget {
     final bps = sora.freshBandwidth(measuredId);
     final staleBps = bps == null ? sora.bandwidth[measuredId]?.bps : null;
     final group = entry;
+    final favorite = entry != null && isFavoriteEntry(entry!, sora.settings.favorites);
     final detail = group?.members.map(protocolLine).toSet().join(' | ');
     return Semantics(
       selected: chosen,
@@ -475,13 +536,24 @@ class _ServerRow extends StatelessWidget {
                           Text(
                             s.speedMbps(mbpsOf(bps ?? staleBps!)),
                             textAlign: TextAlign.right,
-                            style: Styles.figures(
-                              Styles.caption,
-                            ).copyWith(color: bps != null ? palette.ink2 : palette.ink3),
+                            style: Styles.figures(Styles.caption)
+                                .copyWith(color: bps != null ? palette.ink2 : palette.ink3),
                           ),
                       ],
                     ),
                   ),
+                  if (entry != null) ...[
+                    const SizedBox(width: 4),
+                    RoundButton(
+                      key: ValueKey('favorite-${entry!.id}'),
+                      icon: Symbols.star_rounded,
+                      fill: favorite ? 1 : 0,
+                      label: favorite ? s.removeFromFavorites : s.addToFavorites,
+                      onTap: () => unawaited(
+                        sora.change((x) => x.favorites = toggledFavorites(x.favorites, entry!), replan: false),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -712,14 +784,26 @@ Future<void> _deleteCustomServer(BuildContext context, CustomServer server) asyn
 /// The user's own servers, stored by the core outside subscriptions. Always
 /// visible: the empty state is the discovery path to the add form.
 class _CustomServersCard extends StatelessWidget {
-  const _CustomServersCard();
+  const _CustomServersCard({this.favoritesOnly = false});
+
+  /// When the favorites filter is on, only starred custom servers show; a
+  /// card with none of them disappears instead of showing the add-server
+  /// discovery tile, which is not a favorite.
+  final bool favoritesOnly;
 
   @override
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context);
     final s = S.of(context);
     final palette = Palette.of(context);
-    final servers = sora.customServers;
+    final allServers = sora.customServers;
+    final servers = favoritesOnly
+        ? [
+            for (final server in allServers)
+              if (sora.settings.isFavorite(sora.canonicalServerId(server.id))) server,
+          ]
+        : allServers;
+    if (favoritesOnly && servers.isEmpty) return const SizedBox.shrink();
     final separator = palette.ink3.withValues(alpha: 0.28);
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -877,6 +961,13 @@ class _CustomServerRowState extends State<_CustomServerRow> {
                       style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
                     ),
                   ),
+                  RoundButton(
+                    key: ValueKey('favorite-$customId'),
+                    icon: Symbols.star_rounded,
+                    fill: sora.settings.isFavorite(customId) ? 1 : 0,
+                    label: sora.settings.isFavorite(customId) ? s.removeFromFavorites : s.addToFavorites,
+                    onTap: () => unawaited(sora.change((x) => x.toggleFavorite(customId), replan: false)),
+                  ),
                   Tooltip(
                     message: s.customServerTest,
                     child: Pressable(
@@ -885,11 +976,7 @@ class _CustomServerRowState extends State<_CustomServerRow> {
                       child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: _testing
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CupertinoActivityIndicator(radius: 9),
-                              )
+                            ? const SizedBox(width: 18, height: 18, child: CupertinoActivityIndicator(radius: 9))
                             : Icon(Symbols.network_check_rounded, size: 18, color: palette.ink2),
                       ),
                     ),

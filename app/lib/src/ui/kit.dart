@@ -108,13 +108,18 @@ class _PressableState extends State<Pressable> {
 
 /// A circular icon button with an optional accessibility label.
 class RoundButton extends StatelessWidget {
-  const RoundButton({super.key, required this.icon, required this.onTap, this.label});
+  const RoundButton({super.key, required this.icon, required this.onTap, this.label, this.fill});
 
   final IconData icon;
   final VoidCallback? onTap;
 
   /// Screen-reader label; not displayed visually.
   final String? label;
+
+  /// Material Symbols fill variation (0 outline, 1 filled) for icons whose
+  /// filled and outline forms share one glyph, like the star; null keeps
+  /// the font default. The shell's navigation icons toggle state this way.
+  final double? fill;
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +133,7 @@ class RoundButton extends StatelessWidget {
         give: 0.9,
         child: SizedBox.square(
           dimension: 36,
-          child: Icon(icon, size: 20, color: onTap == null ? palette.ink3 : palette.ink),
+          child: Icon(icon, size: 20, color: onTap == null ? palette.ink3 : palette.ink, fill: fill),
         ),
       ),
     );
