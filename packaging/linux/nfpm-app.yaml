@@ -20,11 +20,16 @@ depends:
   - sora-core (= ${SORA_VERSION})
 overrides:
   deb:
-    depends: ["sora-core (= ${SORA_VERSION})", libgtk-3-0, libwebkit2gtk-4.1-0, gstreamer1.0-plugins-good]
+    # pkexec and minisign are hard requirements of the shipped sora-update
+    # helper: it is exec'd through pkexec (see the update polkit policy) and
+    # refuses to install anything without minisign to verify SHA256SUMS.
+    # Neither was declared anywhere, so a clean install could offer the
+    # in-app update and then fail inside the helper.
+    depends: ["sora-core (= ${SORA_VERSION})", libgtk-3-0, libwebkit2gtk-4.1-0, gstreamer1.0-plugins-good, pkexec, minisign]
   rpm:
-    depends: ["sora-core = ${SORA_VERSION}", gtk3, webkit2gtk4.1, gstreamer1-plugins-good]
+    depends: ["sora-core = ${SORA_VERSION}", gtk3, webkit2gtk4.1, gstreamer1-plugins-good, polkit, minisign]
   archlinux:
-    depends: ["sora-core=${SORA_VERSION}", gtk3, webkit2gtk-4.1, gst-plugins-good]
+    depends: ["sora-core=${SORA_VERSION}", gtk3, webkit2gtk-4.1, gst-plugins-good, polkit, minisign]
 
 contents:
   - src: ./packaging/linux/sora-update
