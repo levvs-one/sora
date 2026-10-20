@@ -6,7 +6,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
-import 'package:crypto/crypto.dart';
+import 'package:crypto/crypto.dart' as crypto;
 
 import 'manifest.dart';
 import 'permissions.dart';
@@ -23,6 +23,40 @@ class CatalogError implements Exception {
 const String defaultCatalogUrl = 'https://extensions.sora.example/v1/catalog.json';
 
 const Set<String> catalogBadges = {'verified', 'top', 'new', 'staff'};
+
+/// Reverse-DNS id and semver patterns — the same shapes core/ext pins
+/// (idPattern / semverPattern in core/ext/manifest.go). The catalog is
+/// team-signed, but the app validates it exactly like the core does: a
+/// catalog the core would reject must not slip through the store.
+final _catalogIdPattern =
+    RegExp(r'^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$');
+final _catalogSemverPattern =
+    RegExp(r'^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)([-+][0-9A-Za-z.-]+)?$');
+
+final _rfc3339Pattern = RegExp(
+    r'^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|[+-]\d{2}:\d{2})$');
+
+/// Parses a timestamp with Go's `time.Parse(time.RFC3339)` strictness:
+/// Dart's DateTime.tryParse accepts date-only and space-separated
+/// forms and silently rolls overflow days into the next month, all of
+/// which the Go catalog parser rejects. Throws [CatalogError].
+DateTime parseCatalogTimestamp(String s, String what) {
+  final m = _rfc3339Pattern.firstMatch(s);
+  if (m == null) throw CatalogError('$what is not RFC3339: "$s"');
+  final year = int.parse(m[1]!), month = int.parse(m[2]!), day = int.parse(m[3]!);
+  final hour = int.parse(m[4]!), minute = int.parse(m[5]!), second = int.parse(m[6]!);
+  if (month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59) {
+    throw CatalogError('$what is not RFC3339: "$s"');
+  }
+  // Day must exist in the month (Go rejects Feb 31; DateTime.parse
+  // would roll it over).
+  if (day < 1 || day > DateTime.utc(year, month + 1, 0).day) {
+    throw CatalogError('$what is not RFC3339: "$s"');
+  }
+  final parsed = DateTime.tryParse(s);
+  if (parsed == null) throw CatalogError('$what is not RFC3339: "$s"');
+  return parsed;
+}
 
 class CatalogEntry {
   CatalogEntry({
@@ -143,7 +177,10 @@ class CatalogEntry {
     // '\x00' is not NUL (an unrecognized escape degrades to the escaped
     // character, so the hashed bytes were "x00"), which silently
     // bucketed this side differently from the Go implementation.
-    final digest = sha256
+    // crypto.sha256 must stay prefixed: the bare name `sha256` inside
+    // this class resolves to the entry's own sha256 field (a String),
+    // which shadowed the hash function and broke compilation.
+    final digest = crypto.sha256
         .convert(utf8.encode('$installId\u0000$id\u0000$version'))
         .bytes;
     var mod = 0;
@@ -162,9 +199,15 @@ class CatalogChangelogEntry {
   final String notes;
 
   factory CatalogChangelogEntry.fromJson(Map<String, dynamic> json) {
+    const known = {'version', 'date', 'notes'};
+    for (final key in json.keys) {
+      if (!known.contains(key)) throw CatalogError('unknown changelog field "$key"');
+    }
     return CatalogChangelogEntry(
       version: json['version'] as String? ?? '',
-      date: DateTime.tryParse(json['date'] as String? ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0),
+      // Go rejects a bad changelog date; the old code silently mapped
+      // it to the epoch, which hid a broken (team-signed) catalog.
+      date: parseCatalogTimestamp(json['date'] as String? ?? '', 'changelog date'),
       notes: json['notes'] as String? ?? '',
     );
   }
@@ -200,19 +243,33 @@ class ExtensionCatalog {
       throw CatalogError('catalog is not valid JSON: $e');
     }
     if (decoded is! Map<String, dynamic>) throw CatalogError('catalog top level must be an object');
-    if (decoded['catalog_version'] != 1) {
-      throw CatalogError('unsupported catalog_version ${decoded['catalog_version']}');
+    // The Go parser (ParseCatalog) rejects unknown fields everywhere
+    // (DisallowUnknownFields) and non-integer values in integer fields;
+    // mirror both, so one catalog gets one verdict on both sides.
+    const topKnown = {'catalog_version', 'updated_at', 'extensions', 'max_age'};
+    for (final key in decoded.keys) {
+      if (!topKnown.contains(key)) throw CatalogError('unknown catalog field "$key"');
     }
-    final updatedAt = DateTime.tryParse(decoded['updated_at'] as String? ?? '');
-    if (updatedAt == null) throw CatalogError('catalog updated_at is not a date');
-    final maxAge = decoded['max_age'] as num?;
+    final catalogVersion = decoded['catalog_version'];
+    if (catalogVersion is! int || catalogVersion != 1) {
+      throw CatalogError('unsupported catalog_version $catalogVersion');
+    }
+    final updatedAt =
+        parseCatalogTimestamp(decoded['updated_at'] as String? ?? '', 'catalog updated_at');
+    final maxAgeRaw = decoded['max_age'];
+    if (maxAgeRaw != null && maxAgeRaw is! int) {
+      throw CatalogError('catalog max_age must be an integer');
+    }
+    final maxAge = maxAgeRaw as int?;
     if (maxAge != null && (maxAge < 300 || maxAge > 604800)) {
       throw CatalogError('catalog max_age is outside 300..604800');
     }
     final entries = <CatalogEntry>[];
     final seen = <String>{};
     for (final raw in (decoded['extensions'] as List? ?? [])) {
-      final e = CatalogEntry.fromJson(raw as Map<String, dynamic>);
+      final row = raw as Map<String, dynamic>;
+      _checkEntryShape(row);
+      final e = CatalogEntry.fromJson(row);
       _validateEntry(e);
       if (!seen.add(e.id)) throw CatalogError('catalog lists "${e.id}" twice');
       entries.add(e);
@@ -220,12 +277,41 @@ class ExtensionCatalog {
     return ExtensionCatalog(
         updatedAt: updatedAt,
         entries: entries,
-        maxAge: (maxAge ?? 3600).toInt());
+        maxAge: maxAge ?? 3600);
+  }
+
+  /// Raw-shape checks that must happen before [CatalogEntry.fromJson]
+  /// converts values: unknown fields, and integer-typed fields that a
+  /// JSON float would otherwise be silently truncated from.
+  static void _checkEntryShape(Map<String, dynamic> json) {
+    const known = {
+      'id', 'name', 'version', 'description', 'author', 'author_identity',
+      'author_key', 'icon_url', 'rating', 'ratings_count', 'installs',
+      'badges', 'categories', 'capabilities', 'permissions', 'download_url',
+      'sha256', 'size', 'min_app_version', 'rollout_fraction', 'screenshots',
+      'changelog',
+    };
+    for (final key in json.keys) {
+      if (!known.contains(key)) throw CatalogError('unknown catalog entry field "$key"');
+    }
+    for (final field in const ['ratings_count', 'installs', 'size']) {
+      final v = json[field];
+      if (v != null && v is! int) {
+        throw CatalogError('catalog entry field "$field" must be an integer');
+      }
+    }
   }
 
   static void _validateEntry(CatalogEntry e) {
-    if (e.id.isEmpty || e.name.trim().isEmpty || e.author.trim().isEmpty) {
+    if (!_catalogIdPattern.hasMatch(e.id)) {
+      throw CatalogError('catalog entry has a bad id "${e.id}"');
+    }
+    if (e.name.trim().isEmpty || e.author.trim().isEmpty) {
       throw CatalogError('catalog entry needs id, name and author');
+    }
+    if (!_catalogSemverPattern.hasMatch(e.version) ||
+        !_catalogSemverPattern.hasMatch(e.minAppVersion)) {
+      throw CatalogError('entry "${e.id}" has a bad version');
     }
     if (e.rating < 0 || e.rating > 5) throw CatalogError('entry "${e.id}" has a bad rating');
     for (final b in e.badges) {
@@ -262,7 +348,11 @@ class ExtensionCatalog {
       }
     }
     for (final c in e.changelog) {
-      if (c.version.isEmpty || c.notes.trim().isEmpty || c.notes.length > 2000) {
+      // Go checks the changelog version as semver and the notes length
+      // in bytes; the date is already enforced as RFC3339 at parse time.
+      if (!_catalogSemverPattern.hasMatch(c.version) ||
+          c.notes.trim().isEmpty ||
+          utf8.encode(c.notes).length > 2000) {
         throw CatalogError('entry "${e.id}" has a bad changelog row');
       }
     }
