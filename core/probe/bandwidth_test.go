@@ -2,13 +2,10 @@ package probe
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -26,10 +23,10 @@ type fakeEngine struct {
 	failRun bool
 }
 
-func (f *fakeEngine) Kind() engine.Kind                      { return engine.KindSingBox }
-func (f *fakeEngine) Capabilities() engine.Capabilities      { return engine.Capabilities{} }
-func (f *fakeEngine) State() engine.State                    { return engine.StateRunning }
-func (f *fakeEngine) Version() engine.Version                 { return engine.Version{} }
+func (f *fakeEngine) Kind() engine.Kind                            { return engine.KindSingBox }
+func (f *fakeEngine) Capabilities() engine.Capabilities            { return engine.Capabilities{} }
+func (f *fakeEngine) State() engine.State                          { return engine.StateRunning }
+func (f *fakeEngine) Version() engine.Version                      { return engine.Version{} }
 func (f *fakeEngine) Validate(context.Context, *engine.Plan) error { return nil }
 func (f *fakeEngine) Apply(_ context.Context, p *engine.Plan) error {
 	if f.failRun {
@@ -88,8 +85,7 @@ func newTestBenchmarker(t *testing.T, eng *fakeEngine) *Benchmarker {
 		SelectKind: func(engine.Outbound) (engine.Kind, error) {
 			return engine.KindSingBox, nil
 		},
-		DataDir: t.TempDir(),
-		Now:     time.Now,
+		Now: time.Now,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -158,13 +154,8 @@ func TestBenchmarkSuccess(t *testing.T) {
 		t.Fatal("benchmark plan must enable the loopback proxy")
 	}
 
-	hist := b.History()
-	if len(hist) != 1 || hist[0].ServerID != "s1" || hist[0].BytesPerSec == 0 {
-		t.Fatalf("history not recorded: %+v", hist)
-	}
-	if hist[0].StaleAt(time.Now()) {
-		t.Fatal("fresh entry must not be stale")
-	}
+	// No stored history remains to assert (M3): results are the live
+	// samples above, nothing else.
 }
 
 func TestBenchmarkNoEngine(t *testing.T) {
@@ -176,7 +167,6 @@ func TestBenchmarkNoEngine(t *testing.T) {
 		SelectKind: func(engine.Outbound) (engine.Kind, error) {
 			return "", engine.ErrNoEngine
 		},
-		DataDir: t.TempDir(),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -215,9 +205,6 @@ func TestBenchmarkEngineStartFails(t *testing.T) {
 	}
 	if !eng.closed.Load() {
 		t.Fatal("failed engine must still be closed")
-	}
-	if len(b.History()) != 0 {
-		t.Fatal("failed benchmark must not be recorded")
 	}
 }
 

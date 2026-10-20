@@ -13,15 +13,11 @@ package probe
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
-	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -173,12 +169,12 @@ func (b *Benchmarker) benchmarkOne(ctx context.Context, o engine.Outbound, kind 
 
 	o.Name = "benchmark"
 	plan := &engine.Plan{
-		SessionID: "benchmark-" + id,
-		Engines:   []engine.Kind{kind},
+		SessionID:  "benchmark-" + id,
+		Engines:    []engine.Kind{kind},
 		LocalProxy: engine.LocalProxy{Enabled: true},
-		Outbounds: []engine.Outbound{o},
-		Rules:     []engine.Rule{{Type: engine.RuleMatchAll, Target: o.Name}},
-		Options:   engine.Options{LogLevel: "error"},
+		Outbounds:  []engine.Outbound{o},
+		Rules:      []engine.Rule{{Type: engine.RuleMatchAll, Target: o.Name}},
+		Options:    engine.Options{LogLevel: "error"},
 	}
 	eng, err := b.cfg.NewEngine(ctx, plan)
 	if err != nil {
@@ -215,7 +211,6 @@ func (b *Benchmarker) benchmarkOne(ctx context.Context, o engine.Outbound, kind 
 		fail(err)
 		return
 	}
-	b.recordBandwidth(id, bps, kind)
 	send(BandwidthSample{ServerID: id, BytesPerSec: bps, ProgressPct: 100, Done: true})
 }
 

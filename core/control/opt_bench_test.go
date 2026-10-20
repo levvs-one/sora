@@ -16,7 +16,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	"google.golang.org/grpc"
 
@@ -121,11 +120,11 @@ func BenchmarkBandwidthStream1000Events(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		stream := &benchStream[corev1.BandwidthSample]{ctx: context.Background()}
 		req := &corev1.BenchmarkServersRequest{
-			ApiVersion:          version,
+			ApiVersion:           version,
 			ControlAuthenticator: token,
-			ServerIds:           []string{"srv-0"},
-			DurationS:           10,
-			Concurrency:         2,
+			ServerIds:            []string{"srv-0"},
+			DurationS:            10,
+			Concurrency:          2,
 		}
 		if err := srv.BenchmarkServers(req, stream); err != nil {
 			b.Fatal(err)
