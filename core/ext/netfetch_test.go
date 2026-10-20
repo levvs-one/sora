@@ -368,7 +368,7 @@ func TestFetchStats(t *testing.T) {
 	if st.Denied != 1 {
 		t.Fatalf("Denied = %d, want 1", st.Denied)
 	}
-	if st.BytesIn != 2*len("pong") {
+	if st.BytesIn != uint64(2*len("pong")) {
 		t.Fatalf("BytesIn = %d, want %d", st.BytesIn, 2*len("pong"))
 	}
 	if st.BytesOut != 5 {

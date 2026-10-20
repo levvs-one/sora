@@ -426,7 +426,8 @@ func (s *Store) SetEnabled(id string, enabled bool) error {
 	return s.saveLocked()
 }
 
-// Uninstall removes an extension, its previous version, settings and tokens.
+// Uninstall removes an extension, its previous version, settings, background
+// config and tokens.
 func (s *Store) Uninstall(id string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -444,6 +445,12 @@ func (s *Store) Uninstall(id string) error {
 	}
 	if err := os.RemoveAll(s.settingsPath(id)); err != nil {
 		return errs.Newf(errs.CodeInternal, KeyLifecycle, "ext: cannot remove the settings of %q: %v", id, err)
+	}
+	// The background override is a per-extension runtime file like the
+	// settings; leaving it behind would resurrect the user's schedule on
+	// reinstall (mirrors the Dart ExtensionStore.uninstall).
+	if err := os.Remove(s.backgroundPath(id)); err != nil && !os.IsNotExist(err) {
+		return errs.Newf(errs.CodeInternal, KeyLifecycle, "ext: cannot remove the background config of %q: %v", id, err)
 	}
 	s.issuer.RevokeByExtension(id)
 	delete(s.installed, id)

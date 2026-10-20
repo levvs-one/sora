@@ -98,6 +98,10 @@ type WorkerTask struct {
 	// running guards against overlapping runs: when a run overruns the
 	// interval, the next tick is skipped instead of piling up.
 	running atomic.Bool
+	// disabled is set when the user's <id>.background.json says
+	// enabled=false: the task is registered but never runs. The extension
+	// itself stays installed and enabled.
+	disabled atomic.Bool
 	// fails counts consecutive failed runs for the circuit breaker.
 	fails atomic.Int32
 	// ctx is the task loop's context, derived from the scheduler's run
@@ -122,6 +126,17 @@ type Scheduler struct {
 	// direct dials. Set before Start/Register; not safe to change while
 	// running.
 	fetchTransport func(extensionID string) http.RoundTripper
+	// Kill-switch pause (see SetKillSwitch). While paused, ticker loops
+	// wait instead of starting runs, Fetcher.Fetch fails fast, and the
+	// in-flight runs' contexts are canceled. pauseMu guards paused and
+	// pauseCh; pauseCtx/pauseCancel back the in-flight run contexts and
+	// are recreated on every pause so post-resume runs are not born
+	// canceled.
+	pauseMu     sync.Mutex
+	paused      bool
+	pauseCh     chan struct{} // non-nil while paused; closed on resume to wake the waiters
+	pauseCtx    context.Context
+	pauseCancel context.CancelFunc
 }
 
 // NewScheduler returns a scheduler writing to hub. A nil hub gets a fresh
@@ -130,7 +145,8 @@ func NewScheduler(hub *LogHub) *Scheduler {
 	if hub == nil {
 		hub = NewLogHub()
 	}
-	return &Scheduler{tasks: map[string]*WorkerTask{}, hub: hub}
+	pauseCtx, pauseCancel := context.WithCancel(context.Background())
+	return &Scheduler{tasks: map[string]*WorkerTask{}, hub: hub, pauseCtx: pauseCtx, pauseCancel: pauseCancel}
 }
 
 // Hub exposes the log sink the scheduler writes to.
@@ -158,9 +174,26 @@ func (s *Scheduler) fetchTransportFor(extID string) http.RoundTripper {
 
 // Register validates the manifest pair and installs the task. It requires
 // the "background" capability and permission plus a declared
-// background_task; the interval is clamped (see ClampWorkerInterval). A nil
-// run is rejected. Re-registering an extension replaces its task.
+// background_task; the effective schedule is the manifest's declared
+// interval clamped (see ClampWorkerInterval), because no user override was
+// supplied. A nil run is rejected. Re-registering an extension replaces its
+// task.
+//
+// To apply the user's <id>.background.json override, read it with
+// Store.GetBackgroundConfig and call RegisterConfig instead.
 func (s *Scheduler) Register(m *Manifest, x *ManifestExt, run WorkerFunc) error {
+	return s.RegisterConfig(m, x, BackgroundDefaults(x), run)
+}
+
+// RegisterConfig is Register with an explicit BackgroundConfig (the user's
+// <id>.background.json override, see background.go):
+//   - cfg.IntervalMinutes replaces the manifest's declared interval and is
+//     clamped into [MinWorkerInterval, MaxWorkerInterval];
+//   - cfg.Enabled=false registers the task disabled: it is stored and
+//     visible via Task, but no ticker loop starts and no run ever fires.
+//     The extension itself stays installed and enabled. Re-registering
+//     with enabled=true resumes the schedule.
+func (s *Scheduler) RegisterConfig(m *Manifest, x *ManifestExt, cfg BackgroundConfig, run WorkerFunc) error {
 	if m == nil || x == nil || x.Background == nil {
 		return errs.Newf(errs.CodeInvalidArgument, KeyBackgroundInvalid,
 			"ext: background worker needs a manifest with background_task")
@@ -183,15 +216,20 @@ func (s *Scheduler) Register(m *Manifest, x *ManifestExt, run WorkerFunc) error 
 		if err != nil {
 			return err
 		}
+		// The fetcher fails fast while the kill-switch pause is active;
+		// the gate is read on every Fetch call, so toggling the pause
+		// needs no fetcher rebuild.
+		f.paused = s.Paused
 		fetcher = f
 	}
 	task := &WorkerTask{
 		ExtensionID: m.ID,
-		Interval:    ClampWorkerInterval(x.Background.IntervalMinutes),
+		Interval:    ClampWorkerInterval(cfg.IntervalMinutes),
 		Entry:       x.Background.Entry,
 		run:         run,
 		fetcher:     fetcher,
 	}
+	task.disabled.Store(!cfg.Enabled)
 	s.mu.Lock()
 	if old, ok := s.tasks[m.ID]; ok && old.stop != nil {
 		// Replacing a running task: stop the old ticker loop first, or
@@ -200,14 +238,19 @@ func (s *Scheduler) Register(m *Manifest, x *ManifestExt, run WorkerFunc) error 
 	}
 	s.tasks[m.ID] = task
 	var taskCtx context.Context
-	if s.runCtx != nil {
+	if s.runCtx != nil && !task.disabled.Load() {
 		taskCtx, task.stop = context.WithCancel(s.runCtx)
 		task.ctx = taskCtx
 	}
 	s.mu.Unlock()
+	if task.disabled.Load() {
+		s.hub.Log(m.ID).Append(LogInfo,
+			"background worker disabled by the user's background.json override; not scheduled")
+		return nil
+	}
 	s.hub.Log(m.ID).Append(LogInfo,
-		fmt.Sprintf("background worker registered: every %s (declared %d min), entry %s",
-			task.Interval, x.Background.IntervalMinutes, task.Entry))
+		fmt.Sprintf("background worker registered: every %s (wanted %d min), entry %s",
+			task.Interval, cfg.IntervalMinutes, task.Entry))
 	if taskCtx != nil {
 		s.startLoopWith(task)
 	}
@@ -247,6 +290,11 @@ func (s *Scheduler) Start(ctx context.Context) {
 	s.stop = cancel
 	tasks := make([]*WorkerTask, 0, len(s.tasks))
 	for _, t := range s.tasks {
+		if t.disabled.Load() {
+			// The user turned this worker off via background.json: no
+			// ticker loop, no runs. Re-registering enabled starts it.
+			continue
+		}
 		tasks = append(tasks, t)
 		t.ctx, t.stop = context.WithCancel(runCtx)
 	}
@@ -271,6 +319,88 @@ func (s *Scheduler) Stop() {
 	s.wg.Wait()
 }
 
+// SetKillSwitch pauses (active=true) or resumes (active=false) all
+// background extension work. It is the host's hook for the VPN kill
+// switch: call it when the guard arms (e.g. Session.SetKillSwitch(true) /
+// guard.Apply) and again when the switch is lifted.
+//
+// While paused:
+//   - ticker loops wait instead of starting runs — no worker executes,
+//     not even once, until resume;
+//   - Fetcher.Fetch fails fast with ext.netfetch.paused, so no background
+//     request is attempted against the blocked network;
+//   - the contexts of runs that are already in flight are canceled, so
+//     their network I/O stops promptly instead of draining the timeout.
+//     Such an interrupted run is logged but NOT counted toward the circuit
+//     breaker.
+//
+// Resume needs no re-registration: the waiting loops pick up their normal
+// schedule. No goroutine is spawned per pause/resume or per tick — the
+// waiting happens inside the existing ticker loops, so pausing cannot leak.
+func (s *Scheduler) SetKillSwitch(active bool) {
+	s.pauseMu.Lock()
+	if active == s.paused {
+		s.pauseMu.Unlock()
+		return
+	}
+	s.paused = active
+	s.mu.Lock()
+	tasks := make([]*WorkerTask, 0, len(s.tasks))
+	for _, t := range s.tasks {
+		tasks = append(tasks, t)
+	}
+	s.mu.Unlock()
+	if active {
+		s.pauseCh = make(chan struct{})
+		// Abort in-flight runs: their contexts derive from pauseCtx.
+		// Recreate it at once so runs started after resume are not born
+		// canceled.
+		s.pauseCancel()
+		s.pauseCtx, s.pauseCancel = context.WithCancel(context.Background())
+		s.pauseMu.Unlock()
+		for _, t := range tasks {
+			s.hub.Log(t.ExtensionID).Append(LogWarn,
+				"background network paused: kill switch is active")
+		}
+		return
+	}
+	ch := s.pauseCh
+	s.pauseCh = nil
+	s.pauseMu.Unlock()
+	close(ch) // wakes the loops waiting in waitWhilePaused
+	for _, t := range tasks {
+		s.hub.Log(t.ExtensionID).Append(LogInfo,
+			"background network resumed: kill switch is off")
+	}
+}
+
+// Paused reports whether the kill-switch pause is active. The scheduler
+// wires it into every task fetcher, so extension fetches fail fast while
+// paused.
+func (s *Scheduler) Paused() bool {
+	s.pauseMu.Lock()
+	defer s.pauseMu.Unlock()
+	return s.paused
+}
+
+// waitWhilePaused blocks while the kill-switch pause is active. It returns
+// false when ctx ends first (unregistered, replaced, or scheduler
+// stopped), in which case the caller must exit its loop.
+func (s *Scheduler) waitWhilePaused(ctx context.Context) bool {
+	s.pauseMu.Lock()
+	ch := s.pauseCh
+	s.pauseMu.Unlock()
+	if ch == nil {
+		return true
+	}
+	select {
+	case <-ctx.Done():
+		return false
+	case <-ch: // resumed: the channel is closed by SetKillSwitch(false)
+		return true
+	}
+}
+
 // startLoopWith runs the ticker loop for one task until the task's context
 // ends (unregistered, replaced, or scheduler stopped).
 func (s *Scheduler) startLoopWith(task *WorkerTask) {
@@ -290,6 +420,13 @@ func (s *Scheduler) startLoopWith(task *WorkerTask) {
 			case <-task.ctx.Done():
 				return
 			case <-timer.C:
+				// While the kill-switch pause is active the loop waits
+				// here instead of starting runs; on resume the normal
+				// schedule continues. The wait happens in this same
+				// goroutine — no extra goroutine per tick or per pause.
+				if !s.waitWhilePaused(task.ctx) {
+					return
+				}
 				s.runOnce(task)
 				timer.Reset(task.Interval)
 			}
@@ -307,6 +444,9 @@ func (s *Scheduler) startLoopWith(task *WorkerTask) {
 //     failures the task is unregistered (stopped) with an error in the log.
 //     The extension itself stays installed and enabled; the next app start
 //     re-registers its worker from the stored manifest.
+//
+// A run aborted by the kill-switch pause (see SetKillSwitch) is logged as
+// interrupted and does not count toward the circuit breaker.
 func (s *Scheduler) runOnce(task *WorkerTask) {
 	if !task.running.CompareAndSwap(false, true) {
 		s.hub.Log(task.ExtensionID).Append(LogWarn,
@@ -314,7 +454,13 @@ func (s *Scheduler) runOnce(task *WorkerTask) {
 		return
 	}
 	defer task.running.Store(false)
-	ctx, cancel := context.WithTimeout(context.Background(), WorkerRunTimeout)
+	// The run context derives from the scheduler's pause context:
+	// SetKillSwitch(true) cancels it, aborting in-flight runs (and their
+	// fetches) promptly instead of draining the run timeout.
+	s.pauseMu.Lock()
+	pctx := s.pauseCtx
+	s.pauseMu.Unlock()
+	ctx, cancel := context.WithTimeout(pctx, WorkerRunTimeout)
 	defer cancel()
 	env := &WorkerEnv{extID: task.ExtensionID, log: s.hub.Log(task.ExtensionID), fetcher: task.fetcher}
 	start := time.Now()
@@ -329,6 +475,15 @@ func (s *Scheduler) runOnce(task *WorkerTask) {
 	}()
 	elapsed := time.Since(start).Truncate(time.Millisecond)
 	if err != nil {
+		// A run aborted by the kill-switch pause is not a failure: the
+		// network was deliberately cut under it. Log it as interrupted
+		// and keep it out of the circuit breaker, or a few switch
+		// toggles would permanently unregister a healthy worker.
+		if ctx.Err() != nil && s.Paused() {
+			s.hub.Log(task.ExtensionID).Append(LogInfo,
+				fmt.Sprintf("background worker run interrupted by the kill-switch pause after %s", elapsed))
+			return
+		}
 		n := task.fails.Add(1)
 		s.hub.Log(task.ExtensionID).Append(LogError,
 			fmt.Sprintf("background worker run failed after %s: %v", elapsed, oneLine(err, 300)))

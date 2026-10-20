@@ -39,6 +39,7 @@ const (
 	KeyNetworkHostsInvalid errs.Key = "ext.network_hosts.invalid"
 	KeyNetFetchDenied      errs.Key = "ext.netfetch.denied"
 	KeyNetFetchFailed      errs.Key = "ext.netfetch.failed"
+	KeyNetFetchPaused      errs.Key = "ext.netfetch.paused"
 	KeyWorkerFailed        errs.Key = "ext.worker.failed"
 	KeyThemeInvalid        errs.Key = "ext.theme.invalid"
 	KeyNetworkHookInvalid  errs.Key = "ext.network_hook.invalid"

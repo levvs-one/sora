@@ -141,7 +141,7 @@ func (l *rateLimiter) allow() bool {
 // The app surfaces them in the extension details screen next to the log.
 type FetchStats struct {
 	Requests uint64 // Fetch calls, allowed or not
-	Denied   uint64 // requests refused by policy (allowlist, rate limit, sizes)
+	Denied   uint64 // requests refused (allowlist, rate limit, sizes, kill-switch pause)
 	BytesOut uint64 // request body bytes actually sent
 	BytesIn  uint64 // response body bytes actually read
 }
@@ -162,6 +162,12 @@ type Fetcher struct {
 	hub     *LogHub
 	limiter *rateLimiter
 	client  *http.Client
+	// paused, when set, reports whether the kill-switch pause is active.
+	// Fetch fails fast while it returns true. The scheduler wires it to
+	// Scheduler.Paused for task fetchers; a nil gate (standalone fetchers)
+	// never pauses. It is set once before the fetcher is shared and only
+	// read afterwards.
+	paused func() bool
 
 	statRequests atomic.Uint64
 	statDenied   atomic.Uint64
@@ -265,6 +271,15 @@ func (f *Fetcher) logf(level LogLevel, format string, args ...any) {
 // which is the audit trail for extension network activity.
 func (f *Fetcher) Fetch(ctx context.Context, req FetchRequest) (*FetchResponse, error) {
 	f.statRequests.Add(1)
+	if f.paused != nil && f.paused() {
+		// Kill-switch pause: no background request is attempted against
+		// the blocked network. In-flight requests are aborted separately
+		// via the run context (see Scheduler.SetKillSwitch).
+		f.statDenied.Add(1)
+		f.logf(LogWarn, "fetch DENIED %s: kill switch paused background network", safeMethodURL(req))
+		return nil, errs.Newf(errs.CodeUnavailable, KeyNetFetchPaused,
+			"ext: net.fetch is paused: the kill switch is active")
+	}
 	if !f.limiter.allow() {
 		f.statDenied.Add(1)
 		f.logf(LogWarn, "fetch DENIED %s: rate limit exceeded", safeMethodURL(req))
