@@ -127,22 +127,22 @@ type Transport struct {
 	DownloadPort    uint16
 	// Xmux tunes XHTTP connection reuse. MaxConcurrency (streams per
 	// connection) and MaxConnections are mutually exclusive. Zero keeps
-	// the engine default. Rendering xmux tuning is a backlog item
-	// (spec 09-xhttp §3): no renderer emits it yet, so setting these
-	// fields routes the plan away from sing-box/mihomo without changing
-	// the wire config, and — since no engine claims
-	// FeatureXHTTPXmux — a plan setting these fields reports the
-	// feature missing on every engine instead of silently dropping
-	// the tuning (see FeatureXHTTPXmux).
+	// the engine default. The mihomo renderer emits these fields as
+	// reuse-settings (PASS3 deep A1); the Xray and sing-box renderers
+	// do not emit xmux yet, and — since no engine claims
+	// FeatureXHTTPXmux (mihomo's claim waits for `mihomo -t` on the
+	// pin) — a plan setting these fields reports the feature missing
+	// on every engine instead of silently dropping the tuning at
+	// selection time (see FeatureXHTTPXmux).
 	XmuxMaxConcurrency  int
 	XmuxMaxConnections  int
 	XmuxMaxReuseTimes   int
 	XmuxMaxRequestTimes int
 	// XPaddingBytes is the random XHTTP padding range, "min-max" or a
-	// single number, e.g. "100-1000". Xray, mihomo and sing-box-lx all
-	// accept the range spelling upstream, but no sora renderer emits
-	// it yet (same backlog as the xmux fields above), so the value is
-	// validated here and dropped at render time until that lands.
+	// single number, e.g. "100-1000". The mihomo renderer emits it as
+	// x-padding-bytes; the Xray and sing-box renderers do not emit it
+	// yet, so on those paths the value is validated here and dropped
+	// at render time (same staged state as the xmux fields above).
 	XPaddingBytes string
 }
 

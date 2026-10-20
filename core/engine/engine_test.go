@@ -436,17 +436,20 @@ func TestFakeIPRange6Validation(t *testing.T) {
 	}
 }
 
-// TestCatalogXmuxClaimMatchesRenderers pins PASS3 deep S1: no renderer
-// emits xmux or x_padding (checked in xray/singbox/mihomo render code),
-// so no catalog entry may claim FeatureXHTTPXmux and an xmux-tuned plan
-// must report the feature missing on every engine. The paired feature
-// FeatureXHTTPDownloadSplit was checked the same way: the Xray renderer
-// does emit downloadSettings, so Xray keeps that claim and the other
-// engines keep lacking it.
+// TestCatalogXmuxClaimMatchesRenderers pins PASS3 deep S1 as staged
+// by PASS3 deep A1: the mihomo renderer now emits reuse-settings and
+// x-padding-bytes, but no catalog entry may claim FeatureXHTTPXmux
+// until that render is verified with `mihomo -t` on the pin — and the
+// Xray/sing-box renderers still emit no xmux at all — so an
+// xmux-tuned plan must report the feature missing on every engine.
+// The paired feature FeatureXHTTPDownloadSplit was checked the same
+// way: the Xray renderer does emit downloadSettings, so Xray keeps
+// that claim and the other engines keep lacking it (mihomo renders
+// download-settings but likewise waits for the -t verification).
 func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
 	for kind, caps := range Catalog {
 		if caps.Supports(FeatureXHTTPXmux) {
-			t.Errorf("%s claims FeatureXHTTPXmux but no renderer emits xmux/x_padding", kind)
+			t.Errorf("%s claims FeatureXHTTPXmux before the render is verified with the engine binary", kind)
 		}
 	}
 	xhttpPlan := func(mutate func(*Transport)) *Plan {

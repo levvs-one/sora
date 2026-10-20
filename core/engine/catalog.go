@@ -40,13 +40,15 @@ var Catalog = map[Kind]Capabilities{
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
 			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureChains: true,
 			FeatureHy2PortHop: true, FeatureDoH3: true, FeatureECH: true,
-			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux: sora's
-			// mihomo renderer emits only path/host/mode/headers in
-			// xhttp-opts, so a split or xmux-tuned plan routed to mihomo
-			// would silently drop the downlink settings. The upstream
-			// download-settings/reuse-settings shapes are a backlog
-			// render (spec 09-xhttp §3); until it is implemented and
-			// verified with mihomo -t, such plans route Xray-only.
+			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux yet:
+			// the mihomo renderer now emits download-settings,
+			// reuse-settings and x-padding-bytes in xhttp-opts (PASS3
+			// deep A1), but a catalog claim is a routing promise, and
+			// the pinned docs' shapes are not yet verified with
+			// `mihomo -t` on the 1.19.32 binary. Until that dev-machine
+			// check lands, split/xmux plans keep routing Xray-only for
+			// the split and report xmux missing everywhere; the claims
+			// flip in the same commit as the -t verification.
 		},
 	},
 	KindSingBox: {

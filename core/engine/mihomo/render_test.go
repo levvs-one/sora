@@ -362,6 +362,79 @@ func TestRenderECHRejectsUnmergeablePinnedConfigs(t *testing.T) {
 	}
 }
 
+// TestRenderXHTTPReuseSettings pins PASS3 deep A1: without
+// reuse-settings mihomo disables connection reuse entirely (no
+// default value upstream — every request opens a new connection),
+// so the block is always rendered: the docs' example default when
+// the plan tunes nothing, the plan's tuning when it does.
+func TestRenderXHTTPReuseSettings(t *testing.T) {
+	xhttpPlan := func(mut func(*engine.Transport)) *engine.Plan {
+		p := enginetest.Plan(engine.ProtocolVLESS)
+		p.Outbounds[0].Flow = ""
+		tr := engine.Transport{Type: "xhttp", Path: "/x", Host: "cdn.example.com"}
+		if mut != nil {
+			mut(&tr)
+		}
+		p.Outbounds[0].Transport = tr
+		return p
+	}
+	render := func(p *engine.Plan) string {
+		out, err := Render(p, testRuntime(t))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return out
+	}
+
+	out := render(xhttpPlan(nil))
+	if !strings.Contains(out, "reuse-settings:") || !strings.Contains(out, "16-32") {
+		t.Fatalf("an untuned xhttp plan must still render reuse-settings with the docs default:\n%s", out)
+	}
+
+	out = render(xhttpPlan(func(tr *engine.Transport) {
+		tr.XmuxMaxConnections = 4
+		tr.XmuxMaxReuseTimes = 10
+		tr.XmuxMaxRequestTimes = 600
+		tr.XPaddingBytes = "100-1000"
+	}))
+	for _, want := range []string{"max-connections:", "c-max-reuse-times:", "h-max-request-times:", "x-padding-bytes: 100-1000"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("tuned xhttp render is missing %q:\n%s", want, out)
+		}
+	}
+	if strings.Contains(out, "max-concurrency") {
+		t.Fatalf("a tuned plan must not grow the default max-concurrency (it conflicts with max-connections):\n%s", out)
+	}
+
+	// mode: auto is a documented mihomo mode value and must pass
+	// through verbatim (PASS3 deep A1 sub-check, resolved by docs).
+	out = render(xhttpPlan(func(tr *engine.Transport) { tr.Mode = "auto" }))
+	if !strings.Contains(out, "mode: auto") {
+		t.Fatalf("mode auto must render verbatim:\n%s", out)
+	}
+}
+
+// TestRenderXHTTPDownloadSettings pins the download-settings leg of
+// PASS3 deep A1: a split plan renders the separate downlink server
+// with its own reuse-settings; unset items inherit the uplink.
+func TestRenderXHTTPDownloadSettings(t *testing.T) {
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	p.Outbounds[0].Flow = ""
+	p.Outbounds[0].Transport = engine.Transport{
+		Type: "xhttp", Path: "/x", Host: "cdn.example.com", Mode: "stream-up",
+		DownloadAddress: "dl.example.com", DownloadPort: 8443,
+	}
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"download-settings:", "server: dl.example.com", "port: 8443"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("split xhttp render is missing %q:\n%s", want, out)
+		}
+	}
+}
+
 func TestRenderOmitsECHByDefault(t *testing.T) {
 	out, err := Render(testPlan(), testRuntime(t))
 	if err != nil {

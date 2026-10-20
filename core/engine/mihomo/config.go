@@ -177,6 +177,35 @@ type xhttpOpts struct {
 	Host    string            `yaml:"host,omitempty"`
 	Mode    string            `yaml:"mode,omitempty"`
 	Headers map[string]string `yaml:"headers,omitempty"`
+	// XPaddingBytes is x-padding-bytes of the pinned docs: the
+	// random padding range attached to each request ("100-1000").
+	// The server checks the range, so dropping a pinned range could
+	// get requests rejected (PASS3 deep S1/A1).
+	XPaddingBytes    string         `yaml:"x-padding-bytes,omitempty"`
+	ReuseSettings    *xhttpReuse    `yaml:"reuse-settings,omitempty"`
+	DownloadSettings *xhttpDownload `yaml:"download-settings,omitempty"`
+}
+
+// xhttpReuse is reuse-settings (aka XMUX) of the pinned docs. All
+// values are range strings there ("16-32", "600-900"), so the plan's
+// ints render as plain number strings. h-max-reusable-secs and
+// h-keep-alive-period have no plan fields and stay unset.
+type xhttpReuse struct {
+	MaxConcurrency   string `yaml:"max-concurrency,omitempty"`
+	MaxConnections   string `yaml:"max-connections,omitempty"`
+	CMaxReuseTimes   string `yaml:"c-max-reuse-times,omitempty"`
+	HMaxRequestTimes string `yaml:"h-max-request-times,omitempty"`
+	HMaxReusableSecs string `yaml:"h-max-reusable-secs,omitempty"`
+}
+
+// xhttpDownload is download-settings: the separate downlink leg.
+// Items left unset inherit the uplink parameters (pinned docs), so
+// only the split address/port and the leg's own reuse-settings are
+// rendered.
+type xhttpDownload struct {
+	Server        string      `yaml:"server,omitempty"`
+	Port          int         `yaml:"port,omitempty"`
+	ReuseSettings *xhttpReuse `yaml:"reuse-settings,omitempty"`
 }
 
 // wireguardPeer is one WireGuard peer.

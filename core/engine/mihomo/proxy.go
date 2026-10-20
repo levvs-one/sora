@@ -209,11 +209,56 @@ func applyTransport(px *proxy, t engine.Transport) error {
 		}
 	case "xhttp":
 		px.Network = "xhttp"
-		px.XHTTPOpts = &xhttpOpts{Path: t.Path, Host: t.Host, Mode: t.Mode, Headers: maps.Clone(t.Headers)}
+		// Mode passes through verbatim: the pinned docs list "auto"
+		// among the available mode values ("Mode. Available values:
+		// auto, stream-one, stream-up, or packet-up"), so a plan's
+		// explicit auto is legal here, not a leak (PASS3 deep A1
+		// sub-check, resolved against the docs).
+		opts := &xhttpOpts{Path: t.Path, Host: t.Host, Mode: t.Mode, Headers: maps.Clone(t.Headers),
+			XPaddingBytes: t.XPaddingBytes, ReuseSettings: xhttpReuseSettings(t)}
+		if t.DownloadAddress != "" {
+			opts.DownloadSettings = &xhttpDownload{
+				Server: t.DownloadAddress, Port: int(t.DownloadPort),
+				ReuseSettings: xhttpReuseSettings(t),
+			}
+		}
+		px.XHTTPOpts = opts
 	default:
 		return fmt.Errorf("mihomo: transport %q is not supported", t.Type)
 	}
 	return nil
+}
+
+// xhttpReuseSettings renders reuse-settings (XMUX) from the plan's
+// xmux tuning. Unlike the original Xray implementation, mihomo's
+// reuse-settings has NO default value: omitting the block disables
+// connection reuse entirely — every request opens a new underlying
+// connection (pinned docs, transport configuration). The block is
+// therefore always emitted: the plan's tuning when the plan carries
+// it, otherwise the docs' example default (max-concurrency "16-32")
+// so the mihomo path reuses connections like the other engines
+// instead of paying a fresh TCP+TLS handshake per request (PASS3
+// deep A1). The default is only used when the plan tunes nothing:
+// max-concurrency conflicts with max-connections, so a tuned plan
+// must never grow a default concurrency on top of its connections.
+func xhttpReuseSettings(t engine.Transport) *xhttpReuse {
+	r := &xhttpReuse{}
+	if t.XmuxMaxConcurrency > 0 {
+		r.MaxConcurrency = strconv.Itoa(t.XmuxMaxConcurrency)
+	}
+	if t.XmuxMaxConnections > 0 {
+		r.MaxConnections = strconv.Itoa(t.XmuxMaxConnections)
+	}
+	if t.XmuxMaxReuseTimes > 0 {
+		r.CMaxReuseTimes = strconv.Itoa(t.XmuxMaxReuseTimes)
+	}
+	if t.XmuxMaxRequestTimes > 0 {
+		r.HMaxRequestTimes = strconv.Itoa(t.XmuxMaxRequestTimes)
+	}
+	if r.MaxConcurrency == "" && r.MaxConnections == "" && r.CMaxReuseTimes == "" && r.HMaxRequestTimes == "" {
+		r.MaxConcurrency = "16-32"
+	}
+	return r
 }
 
 func wireguardPeers(o engine.Outbound) ([]wireguardPeer, error) {
