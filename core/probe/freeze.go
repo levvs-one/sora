@@ -35,6 +35,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/netip"
 	"strconv"
 	"strings"
 	"sync"
@@ -69,6 +70,13 @@ const (
 	freezeConfidenceCap = 0.85
 	// freezeCooldownDefault: minimum interval between OnFreeze firings for
 	// one SNI, so a persistent freeze does not flap the mitigation.
+	// The number is a policy bound, not a measurement: the freeze
+	// itself lasts ~120 s (the policy backoff), so 15 min spans
+	// several full freeze/backoff cycles — a mitigation that did not
+	// help within them is escalated by the policy ladder on other
+	// evidence, and re-firing the same first step more often would
+	// only churn fingerprints. It is also half the sample TTL, so a
+	// refire always rests on samples from the current window.
 	freezeCooldownDefault = 15 * time.Minute
 )
 
@@ -115,6 +123,37 @@ func RotateFingerprint(current string) string {
 		}
 	}
 	return "firefox" // unreachable; kept for totality
+}
+
+// MaskedName renders a host or SNI for logs, journal events and
+// diagnostics: the name's shape stays visible (first letter of the
+// first label, the remaining labels, or the first IP octet) because
+// the shape is diagnostic — a freeze on a .ru dest and on a .com dest
+// are different stories — while the identity does not leak into text
+// that leaves the process or persists on disk. Censorship-event
+// wording uses this everywhere a name would otherwise be printed
+// raw; the uniform dictionary is: names masked, counts and verdicts
+// verbatim.
+func MaskedName(name string) string {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return ""
+	}
+	if ip, err := netip.ParseAddr(name); err == nil {
+		s := ip.String()
+		if i := strings.IndexByte(s, '.'); i > 0 {
+			return s[:i] + ".***"
+		}
+		if i := strings.IndexByte(s, ':'); i > 0 {
+			return s[:i] + ":***"
+		}
+		return "***"
+	}
+	labels := strings.Split(strings.TrimSuffix(name, "."), ".")
+	if len(labels) == 1 {
+		return string(labels[0][0]) + "***"
+	}
+	return string(labels[0][0]) + "***." + strings.Join(labels[1:], ".")
 }
 
 func equalFoldASCII(a, b string) bool {
@@ -184,7 +223,7 @@ func (v FreezeVerdict) Mitigation(currentFingerprint string) FreezeMitigation {
 		RotateSNI: true,
 		// Handshakes at or below the ceiling go through; serialize above it.
 		CapParallelism: freezeParallelThreshold,
-		Why: "parallel TLS handshakes to " + v.SNI + " stall while " +
+		Why: "parallel TLS handshakes to " + MaskedName(v.SNI) + " stall while " +
 			"sequential ones succeed: per-SNI concurrency freeze",
 	}
 }

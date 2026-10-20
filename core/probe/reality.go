@@ -102,6 +102,11 @@ type DestReport struct {
 	Passed bool
 }
 
+// destDialTimeout bounds the whole dest check (resolution plus both
+// handshakes). A real site's TLS handshake is two round trips; 10 s
+// is patience for slow paths and a cold resolver, not a retry budget
+// — the check is an on-demand diagnostic and anything slower is
+// itself checklist evidence against the dest.
 const destDialTimeout = 10 * time.Second
 
 // destHandshakeLimiter is the shared per-SNI handshake budget every

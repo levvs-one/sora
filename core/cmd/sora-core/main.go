@@ -332,13 +332,13 @@ func New(ctx context.Context, opts Options) (*App, error) {
 			// server whose subscription could be expedited, so the
 			// freeze would otherwise leave no trace at all.
 			app.log.Warn("censorship reaction unavailable: freeze detected with no live session to journal or expedite",
-				"sni", v.SNI, "confidence", v.Confidence)
+				"sni", probe.MaskedName(v.SNI), "confidence", v.Confidence)
 			return
 		}
 		verdict := censor.Verdict{
 			Kind:        censor.KindHandshakeTimeout,
 			Confidence:  v.Confidence,
-			Explanation: "parallel TLS handshakes to " + v.SNI + " stall while sequential ones succeed: per-SNI concurrency freeze",
+			Explanation: "parallel TLS handshakes to " + probe.MaskedName(v.SNI) + " stall while sequential ones succeed: per-SNI concurrency freeze",
 			Evidence:    v.Evidence,
 			At:          time.Now().UTC(),
 		}
@@ -355,7 +355,7 @@ func New(ctx context.Context, opts Options) (*App, error) {
 			app.plane.ExpediteForCensorship(verdict, serverID)
 		} else {
 			app.log.Warn("censorship reaction unavailable: freeze journaled but the control plane is not built yet, subscription refresh was not expedited",
-				"sni", v.SNI)
+				"sni", probe.MaskedName(v.SNI))
 		}
 	}
 	prober.SetFreezeDetector(freezeDet)
