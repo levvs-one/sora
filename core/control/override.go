@@ -142,13 +142,23 @@ func (s *Server) SaveSubscriptionOverride(ctx context.Context, req *corev1.SaveS
 	// Extra rules ride the same file; the client merges them into the
 	// session plan it builds. This request carries no extra_rules field,
 	// so preserve whatever is already stored instead of wiping it.
+	// The provider routing layer (C3) rides the same file too and is
+	// owned by refreshes, so a user save must preserve it as well.
 	if !req.GetClear() {
 		if existing, err := s.subs.overrides.Load(id); err == nil && existing != nil {
 			o.ExtraRules = existing.ExtraRules
+			o.ProviderRouting = existing.ProviderRouting
 		}
 	}
 	if req.GetClear() {
-		o = &subscription.Override{}
+		// Clear wipes the user's edits, not the provider layer: the
+		// provider's rules are not the user's to clear, and the next
+		// refresh would restore them anyway — keeping them avoids a
+		// window where the subscription runs without them.
+		o = &subscription.Override{ProviderRouting: o.ProviderRouting}
+		if existing, err := s.subs.overrides.Load(id); err == nil && existing != nil {
+			o.ProviderRouting = existing.ProviderRouting
+		}
 	}
 	if err := s.subs.overrides.Save(id, o); err != nil {
 		cerr := errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)

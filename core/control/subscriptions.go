@@ -471,6 +471,12 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	if err == nil {
 		err = b.applyUpdateLocked(&next, fetched.Info, servers)
 	}
+	if err == nil {
+		// The provider routing layer rides the same successful
+		// refresh (C3): replaced, cleared, or — for a broken
+		// payload — kept, never silently dropped.
+		b.applyProviderRoutingLocked(id, fetched.Info.HappRouting)
+	}
 	if err != nil {
 		// Failed updates must preserve the last successful server list.
 		next.Failures++

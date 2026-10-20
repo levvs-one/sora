@@ -25,6 +25,44 @@ type Override struct {
 	ExtraRules []OverrideRule `json:"extra_rules,omitempty"`
 	// PinnedOrder lists server ids first; others keep relative order after.
 	PinnedOrder []string `json:"pinned_order,omitempty"`
+	// ProviderRouting is the provider-supplied routing layer (C3,
+	// Happ happRouting), stored beside the user edits but owned by
+	// refreshes: every successful refresh replaces it wholesale, user
+	// saves preserve it, and it dies with the subscription. Keeping
+	// it apart from ExtraRules is what lets a refresh replace the
+	// provider's rules without ever touching the user's.
+	ProviderRouting *ProviderRouting `json:"provider_routing,omitempty"`
+}
+
+// ProviderRouting is one converted provider routing profile bound to
+// a subscription. Rules are in the contract's destination form;
+// proxy rules carry the outbound_id sentinel "proxy", which the
+// client substitutes with its session proxy target when merging the
+// rules into a plan (the same resolution it applies to user rules).
+type ProviderRouting struct {
+	// Name is the profile name from the provider document.
+	Name string `json:"name,omitempty"`
+	// Rules are the converted Direct/Proxy/Block rules.
+	Rules []OverrideRule `json:"rules,omitempty"`
+	// GlobalProxy is the provider's default-traffic decision when
+	// the document carried one. Recorded, not applied: see
+	// core/happrouting's GlobalProxy note.
+	GlobalProxy *bool `json:"global_proxy,omitempty"`
+	// RemoteDNS / DomesticDNS are the provider's resolvers verbatim
+	// ("DoH https://…"), recorded, not applied: sora's DNS is one
+	// user-owned per-session list with no remote/domestic split.
+	RemoteDNS    string `json:"remote_dns,omitempty"`
+	DomesticDNS  string `json:"domestic_dns,omitempty"`
+	Notes        []ProviderNote `json:"notes,omitempty"`
+	Skipped      int    `json:"skipped,omitempty"`
+}
+
+// ProviderNote records how one field of the provider document was
+// handled, mirroring happrouting.Note for storage.
+type ProviderNote struct {
+	Field   string `json:"field"`
+	Applied bool   `json:"applied"`
+	Reason  string `json:"reason,omitempty"`
 }
 
 // OverrideRule is one user routing rule.
@@ -101,7 +139,7 @@ func (s *OverrideStore) Save(id string, o *Override) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if o == nil || (len(o.Renames) == 0 && len(o.Hidden) == 0 && len(o.ExtraRules) == 0 && len(o.PinnedOrder) == 0) {
+	if o == nil || (len(o.Renames) == 0 && len(o.Hidden) == 0 && len(o.ExtraRules) == 0 && len(o.PinnedOrder) == 0 && o.ProviderRouting == nil) {
 		// Report a failed removal like Delete does: a silent failure
 		// would keep stale renames, hides and pins applied while the
 		// user believes they cleared them.

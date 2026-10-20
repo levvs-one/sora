@@ -36,6 +36,17 @@ type Info struct {
 	SupportURL string
 	// Announce is a short message from the provider to the user.
 	Announce string
+	// HappRouting is the provider's Happ routing profile exactly as
+	// served: a base64 payload or a whole happ://routing/add/ link
+	// (the panel's happRouting setting stores either form). It is
+	// extracted opportunistically from the "happ-routing" response
+	// header or a leading "#happ-routing:" body line — the metadata
+	// slots panels use for the sibling happAnnounce setting, which
+	// sora reads as "announce". How the panel hands happRouting to a
+	// fetching client is not established by its open backend sources,
+	// so an absent value is the normal case, never an error. Parsing
+	// and conversion live in core/happrouting.
+	HappRouting string
 }
 
 // Bound provider-controlled text and update intervals to prevent oversized
@@ -44,6 +55,9 @@ const (
 	maxTitleRunes    = 128
 	maxAnnounceRunes = 2048
 	maxURLBytes      = 2048
+	// maxHappRoutingBytes bounds the stored routing payload: the
+	// decoded document is separately capped by happrouting.
+	maxHappRoutingBytes = 2 << 20
 	maxIntervalHours = 24 * 365
 	// bodyHeaderLines bounds the leading lines inspected for metadata.
 	bodyHeaderLines = 10
@@ -53,6 +67,7 @@ const (
 var infoKeys = []string{
 	"profile-title", "profile-update-interval", "subscription-userinfo",
 	"profile-web-page-url", "support-url", "announce", "content-disposition",
+	"happ-routing",
 }
 
 // parseInfo reads metadata, preferring response headers over matching body
@@ -79,6 +94,12 @@ func parseInfo(header http.Header, body []byte) Info {
 	info.WebPageURL = cleanURL(values["profile-web-page-url"])
 	info.SupportURL = cleanURL(values["support-url"])
 	info.Announce = cleanText(decodeMarked(values["announce"]), maxAnnounceRunes, true)
+	// Kept byte-verbatim (only trimmed and bounded): the payload is
+	// base64 or a deep link, and any interpretation belongs to
+	// core/happrouting at apply time.
+	if raw := strings.TrimSpace(values["happ-routing"]); raw != "" && len(raw) <= maxHappRoutingBytes {
+		info.HappRouting = raw
+	}
 	return info
 }
 
