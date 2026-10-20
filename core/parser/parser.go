@@ -823,7 +823,16 @@ func (p LinkParser) parseJSON(b []byte, f Format) (ImportResult, error) {
 			r.Report.Imported++
 			continue
 		}
-		o, e := mapJSONSpec(m, "")
+		// SIP008 entries carry no "type" field at all: the format
+		// itself means Shadowsocks, so it supplies the protocol the
+		// generic mapper otherwise requires. Without it every SIP008
+		// entry failed validation and a SIP008 subscription imported
+		// zero servers (B1 servers audit).
+		fallback := ""
+		if f == FormatSIP008 {
+			fallback = "shadowsocks"
+		}
+		o, e := mapJSONSpec(m, fallback)
 		if e != nil {
 			r.Report.Invalid++
 			continue
@@ -831,6 +840,21 @@ func (p LinkParser) parseJSON(b []byte, f Format) (ImportResult, error) {
 		if o.Protocol == "" {
 			r.Report.Unsupported++
 			continue
+		}
+		// SIP008 names the entry "remarks", not the sing-box "tag" the
+		// generic mapper reads; keep the provider's name. Its plugin
+		// fields use the plain SIP002 names, so map them onto the
+		// canonical option keys the credential document copies (the
+		// generic Options dump JSON-quotes them under their raw names).
+		if o.DisplayName == "" {
+			o.DisplayName = stringValue(m["remarks"])
+			o.CountryCode = countryCode(o.DisplayName)
+		}
+		if s, ok := m["plugin"].(string); ok && s != "" {
+			o.Options["ss_plugin"] = s
+		}
+		if s, ok := m["plugin_opts"].(string); ok && s != "" {
+			o.Options["ss_plugin_opts"] = s
 		}
 		k := o.StableKey()
 		if _, ok := seen[k]; ok {
