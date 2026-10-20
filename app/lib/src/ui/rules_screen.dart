@@ -21,8 +21,7 @@ Future<void> addRuleSheet(BuildContext context, {String? initialDestination}) {
   final target = ValueNotifier(RuleTarget.direct);
   final field = TextEditingController(text: initialDestination ?? '');
   String? program;
-  unawaited(
-    showFieldSheet(
+  return showFieldSheet(
       context,
       title: s.ruleAdd,
       hint: s.ruleHint,
@@ -65,8 +64,7 @@ Future<void> addRuleSheet(BuildContext context, {String? initialDestination}) {
     ).whenComplete(() {
       target.dispose();
       field.dispose();
-    }),
-  );
+    });
 }
 
 /// Edits user rules for domains, addresses and processes. These rules take

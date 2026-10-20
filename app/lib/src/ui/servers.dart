@@ -91,7 +91,7 @@ class _ServersScreenState extends State<ServersScreen> {
         SizedBox.square(dimension: 36, child: CupertinoActivityIndicator(color: palette.ink))
       else
         RoundButton(
-          icon: Symbols.gauge_rounded,
+          icon: Symbols.speed_rounded,
           label: s.measureSpeed,
           onTap: sora.canBenchmark ? () => push<void>(context, const BenchmarkScreen()) : null,
         ),

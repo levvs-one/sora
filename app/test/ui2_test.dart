@@ -8,6 +8,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:sora/main.dart';
+import 'package:sora/src/chains.dart';
 import 'package:sora/src/core/link.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pb.dart';
 import 'package:sora/src/notifications.dart';
@@ -30,7 +31,7 @@ class _EmptySora extends Sora {
   }
   int connects = 0;
   @override
-  Future<void> connect({bool retry = false}) async {
+  Future<void> connect({bool retry = false, ProxyChain? via}) async {
     connects++;
   }
 }

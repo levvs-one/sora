@@ -270,11 +270,11 @@ class _SyncScreenState extends State<SyncScreen> {
           ),
       ],
       children: [
-        switch (daemon.state) {
-          SyncDaemonState.idle || SyncDaemonState.starting => _starting(s),
-          SyncDaemonState.unavailable => _unavailable(s, daemon.unavailableReason),
-          SyncDaemonState.failed => _failed(s, daemon),
-          SyncDaemonState.running => ..._ready(context, s),
+        ...switch (daemon.state) {
+          SyncDaemonState.idle || SyncDaemonState.starting => [_starting(s)],
+          SyncDaemonState.unavailable => [_unavailable(s, daemon.unavailableReason)],
+          SyncDaemonState.failed => [_failed(s, daemon)],
+          SyncDaemonState.running => _ready(context, s),
         },
       ],
     );
@@ -682,7 +682,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
     }
     try {
       _knownPeers = {for (final p in await client.peers()) p.id};
-      final PairingSession session;
+      PairingSession session;
       try {
         session = await client.startPairing();
       } on SyncApiException catch (e) {

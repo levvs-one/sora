@@ -224,7 +224,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
               child: MobileScanner(
                 controller: _controller,
                 onDetect: _onDetect,
-                errorBuilder: (context, error) {
+                errorBuilder: (context, error, _) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (mounted && !_noCamera) setState(() => _noCamera = true);
                   });
