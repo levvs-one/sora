@@ -116,7 +116,10 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
               children: [
                 for (var i = 0; i < ordered.length; i++) ...[
                   if (i > 0) Divider(height: 1, thickness: 1, indent: 12, endIndent: 12, color: palette.field),
-                  _BenchmarkRow(id: ordered[i]),
+                  // Keyed by server id: the list re-sorts fastest-first
+                  // as each measurement lands, so row state (progress
+                  // indicator) must follow the server, not the position.
+                  _BenchmarkRow(key: ValueKey(ordered[i]), id: ordered[i]),
                 ],
               ],
             ),
@@ -127,7 +130,7 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
 }
 
 class _BenchmarkRow extends StatelessWidget {
-  const _BenchmarkRow({required this.id});
+  const _BenchmarkRow({super.key, required this.id});
 
   final String id;
 

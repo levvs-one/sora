@@ -221,7 +221,12 @@ class _ServersScreenState extends State<ServersScreen> {
                             itemCount: entries.length,
                             itemBuilder: (_, index) {
                               final entry = entries[index];
+                              // Keyed by entry id: rows re-sort on every
+                              // probe tick and sort-mode change, and the
+                              // row's Pressable/Image state must follow the
+                              // server, not the position it lands in.
                               return _ServerRow(
+                                key: ValueKey(entry.id),
                                 id: entry.id,
                                 name: entry.name,
                                 entry: entry,
@@ -358,7 +363,7 @@ InlineSpan serverNameSpan(String name) {
 }
 
 class _ServerRow extends StatelessWidget {
-  const _ServerRow({required this.id, required this.name, this.entry, this.shownCache});
+  const _ServerRow({super.key, required this.id, required this.name, this.entry, this.shownCache});
 
   final String id;
   final String name;
@@ -753,7 +758,10 @@ class _CustomServersCard extends StatelessWidget {
                       children: [
                         for (var i = 0; i < servers.length; i++) ...[
                           if (i > 0) Divider(height: 1, thickness: 1, indent: 8, endIndent: 8, color: separator),
-                          _CustomServerRow(server: servers[i]),
+                          // Keyed by server id: the row is stateful (its
+                          // in-flight test spinner), so a deletion must not
+                          // shift that state onto the next server.
+                          _CustomServerRow(key: ValueKey(servers[i].id), server: servers[i]),
                         ],
                       ],
                     ),
@@ -766,7 +774,7 @@ class _CustomServersCard extends StatelessWidget {
 }
 
 class _CustomServerRow extends StatefulWidget {
-  const _CustomServerRow({required this.server});
+  const _CustomServerRow({super.key, required this.server});
 
   final CustomServer server;
 
