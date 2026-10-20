@@ -71,6 +71,13 @@ class _SoraAppState extends State<SoraApp> {
   static bool _licensesRegistered = false;
   late final _navigator = widget.navigator ?? GlobalKey<NavigatorState>();
 
+  // buildTheme is a pure function of brightness (fixed palettes), but
+  // SoraApp rebuilds on every Sora notification — probe ticks, state
+  // changes — and used to construct both ThemeData trees (ColorScheme,
+  // component themes) on every rebuild. Build each once per app run.
+  late final _lightTheme = buildTheme(Brightness.light);
+  late final _darkTheme = buildTheme(Brightness.dark);
+
   @override
   void initState() {
     super.initState();
@@ -98,8 +105,8 @@ class _SoraAppState extends State<SoraApp> {
           child: MaterialApp(
             title: 'Sora',
             debugShowCheckedModeBanner: false,
-            theme: buildTheme(Brightness.light),
-            darkTheme: buildTheme(Brightness.dark),
+            theme: _lightTheme,
+            darkTheme: _darkTheme,
             themeMode: switch (sora.settings.theme) {
               'light' => ThemeMode.light,
               'dark' => ThemeMode.dark,
