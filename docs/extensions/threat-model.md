@@ -177,7 +177,17 @@ is a load-bearing invariant, stated in `docs/extensions.md` §3.
   overlong names, duplicates — and since 2026-10-20 also `\` and `:`
   anywhere, because on the Windows/Dart extractor a backslash is a
   separator (`..\..\evil`) and a colon is an ADS (`panel.html:evil`).
-  The Dart mirror must replicate this byte-for-byte.
+  The Dart mirror must replicate this byte-for-byte. Pass 2 additionally
+  requires the canonical name (`name == path.Clean(name)`): aliases like
+  `./panel.html` or `a//b` made the panel CSP injector miss the file and
+  rollback re-verification fail against the canonical on-disk name.
+- **Declared entries**: `Verify` refuses a package whose manifest points
+  at a file it does not ship (panel entries, `background_task.entry`,
+  `theme` / `network_hook` / `routing` entries). Without the check the
+  checksummed file set and the consented surface silently diverged: a
+  panel that 404s, a worker that never starts. The Dart
+  `ExtPackage.verify` mirrors the check; the CLI has always enforced it
+  for projects (`missing-entry`).
 - **Downgrade**: `Store.Install` requires a strictly newer semver than
   the installed one; reinstalling an older `.soraext` as an "update" is
   refused. Rollback to N-1 is an explicit user action, re-reading the
