@@ -368,7 +368,18 @@ func applyTLS(px *proxy, o engine.Outbound) error {
 	}
 	px.TLS = &enabled
 	if o.TLS.ServerName != "" {
-		px.SNI = o.TLS.ServerName
+		// vless and vmess read the TLS server name from "servername"
+		// only; every other adapter reads "sni" (see the ServerName
+		// field comment in config.go). The wrong key is silently
+		// ignored by mihomo, which then verifies the peer certificate
+		// against the dial address: a REALITY or TLS handshake to an
+		// IP-addressed server with a domain SNI always failed.
+		switch o.Protocol {
+		case engine.ProtocolVLESS, engine.ProtocolVMess:
+			px.ServerName = o.TLS.ServerName
+		default:
+			px.SNI = o.TLS.ServerName
+		}
 	}
 	if len(o.TLS.ALPN) > 0 {
 		px.ALPN = o.TLS.ALPN

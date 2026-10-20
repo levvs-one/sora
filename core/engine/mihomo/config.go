@@ -115,6 +115,15 @@ type proxy struct {
 	Encryption string     `yaml:"encryption,omitempty"`
 
 	SNI            string   `yaml:"sni,omitempty"`
+	// ServerName is the "servername" spelling of the TLS server name.
+	// mihomo's adapters disagree on the key: vless and vmess read only
+	// "servername" and silently drop "sni", while trojan, anytls,
+	// hysteria2, tuic and http read only "sni" (adapter option structs
+	// of the pinned 1.19.32 source). Emitting the wrong spelling is not
+	// an error at load; the handshake just verifies the certificate
+	// against the server address and fails, so applyTLS picks the key
+	// per protocol.
+	ServerName     string   `yaml:"servername,omitempty"`
 	SkipCertVerify *bool    `yaml:"skip-cert-verify,omitempty"`
 	Fingerprint    string   `yaml:"client-fingerprint,omitempty"`
 	ALPN           []string `yaml:"alpn,omitempty"`

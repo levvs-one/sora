@@ -669,3 +669,57 @@ func TestRenderRealityForcesAClientFingerprint(t *testing.T) {
 		t.Errorf("plain TLS must not gain a client-fingerprint, got %q", fp)
 	}
 }
+
+// TestRenderServerNameKeyPerProtocol pins the TLS server-name key per
+// protocol. mihomo's vless and vmess adapters read only "servername"
+// and silently drop "sni"; trojan and the other TLS adapters read only
+// "sni" (option structs of the pinned 1.19.32 source). With the wrong
+// key the name never reaches the handshake, so the peer certificate is
+// verified against the dial address and every TLS session whose SNI
+// differs from the server address fails — for REALITY that is every
+// session. Found by live E2E against a local REALITY server
+// (WAVE-INTEGRATION), after golden-shape tests and `mihomo -t` both
+// passed on the broken spelling.
+func TestRenderServerNameKeyPerProtocol(t *testing.T) {
+	render := func(proto engine.Protocol) map[string]any {
+		p := testPlan()
+		p.Outbounds = []engine.Outbound{{
+			ID: "srv-1", Name: "Named 01", Protocol: proto,
+			Server: "192.0.2.10", Port: 443, UUID: "11111111-2222-3333-4444-555555555555",
+			Password: "secret",
+			TLS:      engine.TLS{Enabled: true, ServerName: "front.example.com"},
+		}}
+		p.Groups = []engine.Group{{Name: "sel", Type: engine.GroupSelect, Outbounds: []string{"srv-1"}}}
+		p.Rules = []engine.Rule{{Type: engine.RuleMatchAll, Target: "srv-1"}}
+		out, err := Render(p, testRuntime(t))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var cfg struct {
+			Proxies []map[string]any `yaml:"proxies"`
+		}
+		if err := yaml.Unmarshal([]byte(out), &cfg); err != nil {
+			t.Fatal(err)
+		}
+		if len(cfg.Proxies) != 1 {
+			t.Fatalf("want exactly one proxy, got %d", len(cfg.Proxies))
+		}
+		return cfg.Proxies[0]
+	}
+	for _, proto := range []engine.Protocol{engine.ProtocolVLESS, engine.ProtocolVMess} {
+		px := render(proto)
+		if got := px["servername"]; got != "front.example.com" {
+			t.Errorf("%s: servername = %v, want front.example.com", proto, got)
+		}
+		if _, present := px["sni"]; present {
+			t.Errorf("%s: sni must not be emitted; the adapter drops it and the name is lost", proto)
+		}
+	}
+	px := render(engine.ProtocolTrojan)
+	if got := px["sni"]; got != "front.example.com" {
+		t.Errorf("trojan: sni = %v, want front.example.com", got)
+	}
+	if _, present := px["servername"]; present {
+		t.Errorf("trojan: servername must not be emitted; the adapter drops it")
+	}
+}
