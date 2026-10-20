@@ -128,6 +128,16 @@ type sniTrack struct {
 
 // FreezeDetector tracks TLS handshake outcomes per SNI and recognizes the
 // siberian freeze pattern. It is safe for concurrent use.
+//
+// Production status (2026-10-20): NOT WIRED. Nothing feeds it and
+// nothing consumes its SiberianAssessment: WatchCensorshipFailures
+// (session) could feed Observe/ObserveSuccess, but the actions the
+// assessment prescribes — fingerprint rotation, SNI rotation, plan
+// failover — have no consumer in the session layer today, so feeding
+// the tracker would produce verdicts nobody acts on (theater). The
+// detector is kept for its unit tests and the designed policy;
+// wiring it is an owner decision (SW4 tier 2): the session must learn
+// to rotate fingerprints/SNI on a running plan first.
 type FreezeDetector struct {
 	mu         sync.Mutex
 	tracks     map[string]*sniTrack
