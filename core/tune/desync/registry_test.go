@@ -85,10 +85,10 @@ func TestRegistryMarkerProfilesResolve(t *testing.T) {
 func TestValidateProfileFailClosed(t *testing.T) {
 	bad := []Profile{
 		{ID: "", Class: ClassSNIBlock, Params: Params{Method: MethodSplit, SplitPos: "1"}, Note: "x"},
-		{ID: "stall/x", Class: ClassSNIBlock, Params: Params{Method: MethodSplit, SplitPos: "1"}, Note: "x"}, // class/id disagree
-		{ID: "sni_block/x", Class: ClassSNIBlock, Params: Params{Method: MethodNone}, Note: "x"},              // control arm is not a strategy
-		{ID: "sni_block/x", Class: ClassSNIBlock, Params: Params{Method: MethodSplit, SplitPos: "1"}},          // no note
-		{ID: "nope/x", Class: Class("nope"), Params: Params{Method: MethodSplit, SplitPos: "1"}, Note: "x"},    // unknown class
+		{ID: "stall/x", Class: ClassSNIBlock, Params: Params{Method: MethodSplit, SplitPos: "1"}, Note: "x"},                       // class/id disagree
+		{ID: "sni_block/x", Class: ClassSNIBlock, Params: Params{Method: MethodNone}, Note: "x"},                                   // control arm is not a strategy
+		{ID: "sni_block/x", Class: ClassSNIBlock, Params: Params{Method: MethodSplit, SplitPos: "1"}},                              // no note
+		{ID: "nope/x", Class: Class("nope"), Params: Params{Method: MethodSplit, SplitPos: "1"}, Note: "x"},                        // unknown class
 		{ID: "quic_throttle/x", Class: ClassQUICThrottle, Params: Params{Method: MethodFake, FakeProto: "tls", TTL: 3}, Note: "x"}, // tls fake in a quic profile still renders — but as TCP; caught below by class check? no: renders validly, so not in this list
 	}
 	for i, p := range bad[:5] {

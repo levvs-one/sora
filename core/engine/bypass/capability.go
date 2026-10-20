@@ -239,4 +239,3 @@ func (e *Engine) gateStrategies(ctx context.Context, tpwsNeeded, nfqNeeded map[s
 func (e *Engine) CapabilitiesNow(ctx context.Context) Capabilities {
 	return e.capabilities(ctx)
 }
-
