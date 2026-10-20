@@ -136,8 +136,11 @@ export interface SoraExt {
    */
   call(method: 'getSettings'): Promise<Record<string, unknown>>;
   /**
-   * Write the extension's own settings. Values are validated against
-   * `settings_schema`; invalid values reject with `invalid-argument`.
+   * Write the extension's own settings. The write merges: only the keys
+   * given here change, unmentioned keys keep their stored values (so a
+   * one-key write like `setSettings({refresh_seconds: 10})` is safe).
+   * Values are validated against `settings_schema`; invalid values
+   * reject with `invalid-argument` and change nothing.
    * Needs no permission.
    */
   call(method: 'setSettings', args: Record<string, unknown>): Promise<void>;

@@ -239,7 +239,18 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       servers: _servers,
       notify: _notify,
       getSettings: () => store.getSettings(widget.extensionId),
-      setSettings: (v) => store.setSettings(widget.extensionId, v),
+      setSettings: (v) async {
+        try {
+          await store.setSettings(widget.extensionId, v);
+        } on ExtStoreError catch (e) {
+          // The documented bridge contract (sora-ext.d.ts, the mock):
+          // a settings value the schema rejects is 'invalid-argument'.
+          // Without this translation the bridge's generic catch would
+          // report it as 'internal', and panels could not tell a fixable
+          // value from a host failure.
+          throw BridgeError('invalid-argument', e.message);
+        }
+      },
     );
     // Tear the panel down the moment the extension is disabled/removed.
     store.addListener(_onStoreChanged);

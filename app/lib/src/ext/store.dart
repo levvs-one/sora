@@ -551,12 +551,29 @@ class ExtensionStore extends ChangeNotifier {
     return out;
   }
 
+  /// Merges [values] into the extension's stored settings: keys not
+  /// mentioned keep their stored values. This is the documented panel
+  /// contract (docs/extensions.md shows a one-key setSettings write, and
+  /// the sora-ext mock has always merged) and matches the Go mirror
+  /// (core/ext Store.SetSettings). The settings form passes the full
+  /// form map, which merges to the same result. Validation runs first,
+  /// so a rejected write changes nothing.
   Future<void> setSettings(String id, Map<String, dynamic> values) async {
     final inst = _installed[id];
     if (inst == null) throw ExtStoreError('"$id" is not installed');
     _validateSettingsValues(inst.manifest.settingsSchema, values);
     final f = File('$_dir${Platform.pathSeparator}$id.settings.json');
-    await f.writeAsString(jsonEncode(values), flush: true);
+    final merged = <String, dynamic>{};
+    if (await f.exists()) {
+      try {
+        merged.addAll(jsonDecode(await f.readAsString()) as Map<String, dynamic>);
+      } catch (_) {
+        // Corrupt settings repair like getSettings: start from empty
+        // rather than bricking every future save.
+      }
+    }
+    merged.addAll(values);
+    await f.writeAsString(jsonEncode(merged), flush: true);
     notifyListeners();
   }
 

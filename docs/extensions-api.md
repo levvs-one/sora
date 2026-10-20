@@ -35,8 +35,10 @@ Notes:
   core.
 - `notify`: title ≤ 120 chars, body ≤ 500 chars, else `invalid-argument`.
 - `getSettings` returns schema defaults merged with stored values.
-- `setSettings` validates against `settings_schema`; invalid values reject
-  with `invalid-argument`. Unknown properties reject too.
+- `setSettings` merges: only the keys given change, unmentioned keys keep
+  their stored values. Values are validated against `settings_schema`;
+  invalid values reject with `invalid-argument` and change nothing.
+  Unknown properties reject too.
 - Calling a method without its permission rejects with
   `permission-denied`. There is no way to escalate: the token is scoped at
   install time, and disabling the extension revokes it.

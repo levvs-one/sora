@@ -52,6 +52,12 @@ class PanelBridge {
   final Future<void> Function(String title, String body) notify;
 
   final Future<Map<String, dynamic>> Function() getSettings;
+
+  /// Writes settings (merge semantics: unmentioned keys keep their
+  /// values). Implementations must surface a schema rejection as
+  /// BridgeError('invalid-argument', ...) — the documented error
+  /// contract — not as a bare store error, which [handle] would report
+  /// to the panel as 'internal'.
   final Future<void> Function(Map<String, dynamic>) setSettings;
 
   /// Handles one JSON message posted to the `soraExt` JavaScript channel.

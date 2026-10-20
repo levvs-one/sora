@@ -658,7 +658,13 @@ func (s *Store) GetSettings(id string) (map[string]any, error) {
 }
 
 // SetSettings validates values against the manifest's settings_schema and
-// persists them. Unknown keys and type violations are rejected.
+// merges them into the stored settings: keys not mentioned keep their
+// stored values. Unknown keys and type violations are rejected. Merge is
+// the documented panel contract (docs/extensions.md shows
+// setSettings({refresh_seconds: 10}) as a one-key write) and the mock's
+// behavior; the app settings form passes the full form map, which merges
+// to the same result. The Dart mirror (app/lib/src/ext/store.dart
+// setSettings) implements the same semantics.
 func (s *Store) SetSettings(id string, values map[string]any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -669,7 +675,18 @@ func (s *Store) SetSettings(id string, values map[string]any) error {
 	if err := validateSettingsValues(inst.Manifest.SettingsSchema, values); err != nil {
 		return err
 	}
-	raw, err := json.MarshalIndent(values, "", "  ")
+	merged := map[string]any{}
+	if raw, err := os.ReadFile(s.settingsPath(id)); err == nil { //nolint:gosec // fixed suffix inside the store dir
+		// A corrupt stored file repairs like GetSettings: start from
+		// empty rather than bricking every future save.
+		if err := json.Unmarshal(raw, &merged); err != nil {
+			merged = map[string]any{}
+		}
+	}
+	for k, v := range values {
+		merged[k] = v
+	}
+	raw, err := json.MarshalIndent(merged, "", "  ")
 	if err != nil {
 		return errs.Newf(errs.CodeInternal, KeyLifecycle, "ext: cannot encode the settings of %q: %v", id, err)
 	}
