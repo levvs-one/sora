@@ -151,6 +151,37 @@ func TestRolloutEligible(t *testing.T) {
 	}
 }
 
+// TestRolloutEligiblePinnedVectors pins the exact bucket bytes:
+// sha256(installID || 0x00 || entryID || 0x00 || version), big-endian
+// first 8 bytes mod 10000 < fraction*10000. The Dart mirror
+// (app/lib/src/ext/catalog.dart rolloutEligible) must produce the same
+// answers for these inputs — a device must not be eligible in the store
+// UI and ineligible in the core (or vice versa) because one side hashed
+// different separator bytes. If this test fails, the byte format changed;
+// change both implementations and these vectors together, deliberately.
+func TestRolloutEligiblePinnedVectors(t *testing.T) {
+	cases := []struct {
+		install, id, version string
+		fraction             float64
+		want                 bool
+	}{
+		{"install-0001", "com.example.alpha", "1.0.0", 0.5, true},  // bucket 1113
+		{"install-0005", "com.example.alpha", "1.0.0", 0.5, false}, // bucket 5344
+		{"install-0008", "com.example.alpha", "1.0.0", 0.5, false}, // bucket 9757
+		{"install-0010", "com.example.alpha", "1.0.0", 0.5, true},  // bucket 4223
+		{"install-0004", "com.example.beta", "2.3.1", 0.25, false}, // bucket 4108
+		{"device-xyz", "org.sora.hello-panel", "1.1.0", 0.25, false}, // bucket 2831
+		{"device-xyz", "org.sora.hello-panel", "1.1.0", 0.5, true},   // bucket 2831
+	}
+	for _, tc := range cases {
+		e := Entry{ID: tc.id, Version: tc.version, RolloutFraction: tc.fraction}
+		if got := e.RolloutEligible(tc.install); got != tc.want {
+			t.Errorf("RolloutEligible(%q, %q@%q, f=%v) = %v, want %v (pinned vector)",
+				tc.install, tc.id, tc.version, tc.fraction, got, tc.want)
+		}
+	}
+}
+
 func TestCatalogCacheRoundtrip(t *testing.T) {
 	cc, err := NewCatalogCache(t.TempDir())
 	if err != nil {

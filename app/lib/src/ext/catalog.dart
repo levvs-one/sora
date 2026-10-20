@@ -128,15 +128,24 @@ class CatalogEntry {
   double get effectiveRollout => rolloutFraction <= 0 ? 1.0 : rolloutFraction;
 
   /// Whether [installId] falls inside this version's staged-rollout bucket.
-  /// Mirrors core/ext RolloutEligible: sha256(installId | id | version),
-  /// big-endian first 8 bytes mod 10000 < fraction * 10000. Deterministic
-  /// per device, so eligibility never flaps between catalog syncs. The
-  /// modulo is folded incrementally to stay exact on 64-bit signed ints.
+  /// Mirrors core/ext RolloutEligible: sha256(installId | id | version)
+  /// with NUL separators, big-endian first 8 bytes mod 10000
+  /// < fraction * 10000. Deterministic per device, so eligibility never
+  /// flaps between catalog syncs. The modulo is folded incrementally to
+  /// stay exact on 64-bit signed ints. The Go side pins this byte format
+  /// with fixed vectors (TestRolloutEligiblePinnedVectors); both sides
+  /// must give the same answers for those inputs.
   bool rolloutEligible(String installId) {
     final f = effectiveRollout;
     if (f >= 1) return true;
-    final digest =
-        sha256.convert(utf8.encode('$installId\x00$id\x00$version')).bytes;
+    // The separator is a literal NUL byte, exactly as in core/ext. It is
+    // spelled \u0000 because Dart has no \x escape: in a Dart string
+    // '\x00' is not NUL (an unrecognized escape degrades to the escaped
+    // character, so the hashed bytes were "x00"), which silently
+    // bucketed this side differently from the Go implementation.
+    final digest = sha256
+        .convert(utf8.encode('$installId\u0000$id\u0000$version'))
+        .bytes;
     var mod = 0;
     for (var i = 0; i < 8; i++) {
       mod = (mod * 256 + digest[i]) % 10000;
