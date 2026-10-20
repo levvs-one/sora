@@ -103,3 +103,35 @@ func TestRedactorSeededValuesWin(t *testing.T) {
 		t.Errorf("seeded values not masked: %q", out)
 	}
 }
+
+// TestMaskGateParity pins the maskPatterns fast-path gate: lines that no
+// pattern can touch come back byte-identical, and representative lines
+// from every pattern family are still masked exactly as without the gate.
+func TestMaskGateParity(t *testing.T) {
+	unchanged := []string{
+		"[tun] interface sora0 up, mtu 9000",
+		"dns: query for example.com. from 192.168.1.10",
+		"connection reset by peer, retry 3 of 5",
+		"123e4567-e89b-12d3-a456 (partial uuid, only three dashes)",
+	}
+	for _, in := range unchanged {
+		if out := maskPatterns(in); out != in {
+			t.Errorf("clean line changed:\n in: %q\nout: %q", in, out)
+		}
+	}
+	masked := map[string]string{
+		`token: "my secret value"`: `token: [masked]`,
+		`token: "a b"`:             `token: [masked]`,
+		`user = "bob jones"`:       `user = [masked]`,
+		"vless://123e4567-e89b-12d3-a456-426614174000@h:443": "vless://[masked]@h:443",
+		"uuid is 123e4567-e89b-12d3-a456-426614174000 ok":    "uuid [masked] [masked] ok",
+		"id 123e4567-e89b-12d3-a456-426614174000 end":        "id [masked] end",
+		"api_key=testkey123456":                              "api_key=[masked]",
+		"user = bob":                                         "user = [masked]",
+	}
+	for in, want := range masked {
+		if out := maskPatterns(in); out != want {
+			t.Errorf("mask changed by gate:\n in: %q\nwant: %q\n got: %q", in, want, out)
+		}
+	}
+}

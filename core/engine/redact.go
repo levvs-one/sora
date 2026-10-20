@@ -115,9 +115,40 @@ var (
 	tokenLinkPattern = regexp.MustCompile(`(?i)\b(vmess|ssr)://[A-Za-z0-9+/_=-]+`)
 )
 
+// gateWords is the conservative fast path for maskPatterns: every
+// pattern below can only match text containing "://" (URL userinfo and
+// token links), one of these credential key words (the alternations in
+// keyValuePattern/strictKeyValuePattern all contain one as a substring),
+// or a UUID shape, which needs at least four dashes. A log line with
+// none of these cannot be changed by any pattern, so it skips all five
+// regexp passes — most engine output is such lines, and the passes cost
+// tens of microseconds each on the big alternations. The gate is a
+// superset by construction (substring presence, no word boundaries):
+// when in doubt it lets the line through to the real patterns. It is a
+// lowercase substring scan on purpose: a case-insensitive regexp gate
+// measured 24µs per line, nearly as slow as the patterns themselves.
+var gateWords = []string{
+	"://", "uuid", "password", "passwd", "secret", "token", "key", "param",
+	"auth", "psk", "username", "user", "login", "spider", "short",
+}
+
+// gateContains reports whether s holds any gate word, case-insensitively.
+func gateContains(s string) bool {
+	l := strings.ToLower(s)
+	for _, w := range gateWords {
+		if strings.Contains(l, w) {
+			return true
+		}
+	}
+	return false
+}
+
 // maskPatterns masks identifiers, credential pairs, and URL credentials whose
 // exact values are unknown.
 func maskPatterns(s string) string {
+	if !gateContains(s) && strings.Count(s, "-") < 4 {
+		return s
+	}
 	s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
 	s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
 	s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
