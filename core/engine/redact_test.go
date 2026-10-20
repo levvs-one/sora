@@ -135,3 +135,42 @@ func TestMaskGateParity(t *testing.T) {
 		}
 	}
 }
+
+// TestRedactorParityKeySpellings pins the canonical key-superset shared
+// byte-for-byte with sora-legacy (M1, pass 3/3): every WireGuard
+// pre-shared-key spelling, every spider spelling and every public-key
+// spelling must mask, plain and as a quoted JSON value (quoted form
+// verifies the phrase tail is not leaked word by word — the pass-1
+// false closure).
+func TestRedactorParityKeySpellings(t *testing.T) {
+	keys := []string{
+		"pre_shared_key", "pre-shared-key", "preshared_key", "presharedkey",
+		"public_key", "public-key", "publickey",
+		"spider_x", "spider-x", "spiderx", "spiderX",
+		"private_key", "auth_str", "short_id",
+	}
+	for _, key := range keys {
+		for _, in := range []string{
+			key + "=ParitySecret99",
+			key + ": ParitySecret99",
+			`"` + key + `": "ParitySecret99"`,
+			key + `: "secret phrase tail"`,
+		} {
+			out := maskPatterns(in)
+			if strings.Contains(out, "ParitySecret99") || strings.Contains(out, "phrase tail") {
+				t.Errorf("key %q leaked: in=%q out=%q", key, in, out)
+			}
+			if !strings.Contains(out, "[masked]") {
+				t.Errorf("key %q masked nothing: in=%q out=%q", key, in, out)
+			}
+		}
+	}
+	// pre_shared_key is the literal WireGuard field name in sing-box JSON:
+	// a quoted multi-word value must be masked whole, not word by word.
+	out := maskPatterns(`"pre_shared_key": "a b c"`)
+	for _, leak := range []string{"a b", `b"`, "c"} {
+		if strings.Contains(out, leak) {
+			t.Errorf("quoted pre_shared_key tail leaked: out=%q leak=%q", out, leak)
+		}
+	}
+}

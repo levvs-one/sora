@@ -99,7 +99,14 @@ var (
 	// value alternation fall through to \S+ and leak the tail of the
 	// phrase ("token: \"a b\"" used to mask only "a). Hosts stay
 	// readable: only the pair is masked.
-	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|preshared[_-]?key|pre-shared-key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("[^"]*"|'[^']*'|\S+)`)
+	// The key alternation is the canonical superset shared byte-for-byte
+	// with sora-legacy's redactor: pre[_-]?shared[_-]?key covers every
+	// WireGuard spelling (pre_shared_key is the literal sing-box JSON
+	// field name), spider[_-]?x covers spider_x/spider-x/spiderx, and
+	// public[_-]?key is present on both sides.
+	// TestRedactorParityKeySpellings in both repos pins this list by
+	// execution.
+	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|pre[_-]?shared[_-]?key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*|\s+)("[^"]*"|'[^']*'|\S+)`)
 	// strictKeyValuePattern masks short generic credential keys only with
 	// an explicit assignment: a bare space after "user" or "login" is
 	// usually prose ("user agent", "login failed"), not a credential pair.
