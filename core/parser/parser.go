@@ -690,7 +690,11 @@ func (p LinkParser) parseJSON(b []byte, f Format) (ImportResult, error) {
 	if m, ok := v.(map[string]any); ok && isXrayConfig(m) {
 		items = []any{m}
 	}
-	for _, it := range items {
+	// Deduplicate by StableKey exactly as parseList does: without it a
+	// subscription listing the same endpoint+UUID under two names yields
+	// two specs with the same identity (and duplicate UI keys).
+	seen := map[string]struct{}{}
+	for i, it := range items {
 		m, ok := it.(map[string]any)
 		if !ok {
 			continue
@@ -701,6 +705,13 @@ func (p LinkParser) parseJSON(b []byte, f Format) (ImportResult, error) {
 				r.Report.Invalid++
 				continue
 			}
+			k := o.StableKey()
+			if _, ok := seen[k]; ok {
+				r.Report.SkippedDuplicates++
+				r.Report.DuplicateItems = append(r.Report.DuplicateItems, ItemReason{i, "duplicate server"})
+				continue
+			}
+			seen[k] = struct{}{}
 			r.Servers = append(r.Servers, o)
 			r.Report.Imported++
 			continue
@@ -714,6 +725,13 @@ func (p LinkParser) parseJSON(b []byte, f Format) (ImportResult, error) {
 			r.Report.Unsupported++
 			continue
 		}
+		k := o.StableKey()
+		if _, ok := seen[k]; ok {
+			r.Report.SkippedDuplicates++
+			r.Report.DuplicateItems = append(r.Report.DuplicateItems, ItemReason{i, "duplicate server"})
+			continue
+		}
+		seen[k] = struct{}{}
 		r.Servers = append(r.Servers, o)
 		r.Report.Imported++
 	}
@@ -807,13 +825,22 @@ func (p LinkParser) parseYAML(b []byte) (ImportResult, error) {
 		return ImportResult{Format: FormatClash}, ErrInvalid
 	}
 	r := ImportResult{Format: FormatClash}
-	for _, m := range root.Proxies {
+	// Deduplicate by StableKey exactly as parseList does (see parseJSON).
+	seen := map[string]struct{}{}
+	for i, m := range root.Proxies {
 		o, e := mapJSONSpec(m, "")
 		if e != nil {
 			r.Report.Invalid++
 			continue
 		}
 		o.DisplayName = stringValue(m["name"])
+		k := o.StableKey()
+		if _, ok := seen[k]; ok {
+			r.Report.SkippedDuplicates++
+			r.Report.DuplicateItems = append(r.Report.DuplicateItems, ItemReason{i, "duplicate server"})
+			continue
+		}
+		seen[k] = struct{}{}
 		r.Servers = append(r.Servers, o)
 		r.Report.Imported++
 	}

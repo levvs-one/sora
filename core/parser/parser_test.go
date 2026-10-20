@@ -256,3 +256,106 @@ func TestPinnedHysteria2LinkIsRefusedNotUnpinned(t *testing.T) {
 		t.Fatalf("list = %+v, want 1 imported and 1 unsupported", r.Report)
 	}
 }
+
+// TestParseClashDuplicatesByStableKey is the regression test for the
+// duplicate-ValueKey bug: parseYAML appended every proxy without the
+// StableKey deduplication parseList already had, so a Clash subscription
+// listing one endpoint+UUID under two names produced two specs with the
+// same identity.
+func TestParseClashDuplicatesByStableKey(t *testing.T) {
+	const uuid = "123e4567-e89b-12d3-a456-426614174000"
+	payload := "proxies:\n" +
+		"  - {name: First, type: vless, server: a.example.com, port: 443, uuid: " + uuid + "}\n" +
+		"  - {name: Second, type: vless, server: a.example.com, port: 443, uuid: " + uuid + "}\n"
+	r, err := (LinkParser{}).Parse([]byte(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Servers[0].DisplayName != "First" {
+		t.Fatalf("servers = %#v, want only the first entry kept", r.Servers)
+	}
+	if r.Report.Imported != 1 || r.Report.SkippedDuplicates != 1 {
+		t.Fatalf("report = %+v, want 1 imported and 1 skipped duplicate", r.Report)
+	}
+	if len(r.Report.DuplicateItems) != 1 || r.Report.DuplicateItems[0].Index != 1 || r.Report.DuplicateItems[0].Reason != "duplicate server" {
+		t.Fatalf("duplicate items = %#v, want one entry at index 1", r.Report.DuplicateItems)
+	}
+}
+
+// TestParseJSONDuplicatesByStableKey is the same regression for the
+// sing-box JSON path of parseJSON.
+func TestParseJSONDuplicatesByStableKey(t *testing.T) {
+	const uuid = "123e4567-e89b-12d3-a456-426614174000"
+	payload := `{"outbounds":[` +
+		`{"type":"vless","tag":"First","server":"a.example.com","server_port":443,"uuid":"` + uuid + `"},` +
+		`{"type":"vless","tag":"Second","server":"a.example.com","server_port":443,"uuid":"` + uuid + `"}]}`
+	r, err := (LinkParser{}).Parse([]byte(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Servers[0].DisplayName != "First" {
+		t.Fatalf("servers = %#v, want only the first entry kept", r.Servers)
+	}
+	if r.Report.Imported != 1 || r.Report.SkippedDuplicates != 1 {
+		t.Fatalf("report = %+v, want 1 imported and 1 skipped duplicate", r.Report)
+	}
+	if len(r.Report.DuplicateItems) != 1 || r.Report.DuplicateItems[0].Index != 1 || r.Report.DuplicateItems[0].Reason != "duplicate server" {
+		t.Fatalf("duplicate items = %#v, want one entry at index 1", r.Report.DuplicateItems)
+	}
+}
+
+// TestParseJSONAndYAMLKeepDistinctServers guards the deduplication against
+// overreach: a different UUID or a different endpoint is a different
+// server, and xray-profile entries keep distinct remarks (their
+// StableKey includes the display name).
+func TestParseJSONAndYAMLKeepDistinctServers(t *testing.T) {
+	const uuidA = "123e4567-e89b-12d3-a456-426614174000"
+	const uuidB = "123e4567-e89b-42d3-a456-426614174001"
+	cases := map[string]string{
+		"json different uuid": `{"outbounds":[` +
+			`{"type":"vless","tag":"One","server":"a.example.com","server_port":443,"uuid":"` + uuidA + `"},` +
+			`{"type":"vless","tag":"Two","server":"a.example.com","server_port":443,"uuid":"` + uuidB + `"}]}`,
+		"json different endpoint": `{"outbounds":[` +
+			`{"type":"vless","tag":"One","server":"a.example.com","server_port":443,"uuid":"` + uuidA + `"},` +
+			`{"type":"vless","tag":"Two","server":"b.example.com","server_port":443,"uuid":"` + uuidA + `"}]}`,
+		"yaml different uuid": "proxies:\n" +
+			"  - {name: One, type: vless, server: a.example.com, port: 443, uuid: " + uuidA + "}\n" +
+			"  - {name: Two, type: vless, server: a.example.com, port: 443, uuid: " + uuidB + "}\n",
+		"yaml different endpoint": "proxies:\n" +
+			"  - {name: One, type: vless, server: a.example.com, port: 443, uuid: " + uuidA + "}\n" +
+			"  - {name: Two, type: vless, server: b.example.com, port: 443, uuid: " + uuidA + "}\n",
+	}
+	for name, payload := range cases {
+		r, err := (LinkParser{}).Parse([]byte(payload))
+		if err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		if len(r.Servers) != 2 || r.Report.SkippedDuplicates != 0 {
+			t.Errorf("%s: servers = %d, report = %+v, want both servers kept", name, len(r.Servers), r.Report)
+		}
+	}
+	// Xray profiles on one endpoint with different remarks are distinct
+	// (the name is part of their StableKey); the exact same profile
+	// twice is a duplicate on the xray-config append site.
+	config := func(name string) string {
+		return `{"remarks":"` + name + `","inbounds":[{"listen":"127.0.0.1","port":10808,"protocol":"socks"}],` +
+			`"outbounds":[{"tag":"proxy","protocol":"vless","settings":{"vnext":[{"address":"185.92.222.239","port":443,` +
+			`"users":[{"id":"123e4567-e89b-12d3-a456-426614174000","encryption":"none"}]}]},` +
+			`"streamSettings":{"network":"xhttp","security":"reality","realitySettings":{"publicKey":"k","shortId":"s"}}},` +
+			`{"protocol":"freedom","tag":"direct"}],"routing":{"rules":[{"domain":["domain:openai.com"],"outboundTag":"proxy"}]}}`
+	}
+	r, err := (LinkParser{}).Parse([]byte("[" + config("One") + "," + config("Two") + "]"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 2 || r.Report.SkippedDuplicates != 0 {
+		t.Fatalf("profiles with different remarks: servers = %d, report = %+v, want both kept", len(r.Servers), r.Report)
+	}
+	r, err = (LinkParser{}).Parse([]byte("[" + config("Same") + "," + config("Same") + "]"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Report.SkippedDuplicates != 1 || len(r.Report.DuplicateItems) != 1 {
+		t.Fatalf("identical profiles: servers = %d, report = %+v, want 1 kept and 1 skipped duplicate", len(r.Servers), r.Report)
+	}
+}
