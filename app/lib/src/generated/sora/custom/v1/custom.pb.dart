@@ -63,7 +63,7 @@ class CustomServer extends $pb.GeneratedMessage {
     $core.String? address,
     $core.int? port,
     $core.String? credentials,
-    $core.bool? hasCredentials,
+    $core.bool? hasCredentials_7,
   }) {
     final result = CustomServer._();
     if (id != null) result.id = id;
@@ -72,7 +72,7 @@ class CustomServer extends $pb.GeneratedMessage {
     if (address != null) result.address = address;
     if (port != null) result.port = port;
     if (credentials != null) result.credentials = credentials;
-    if (hasCredentials != null) result.hasCredentials = hasCredentials;
+    if (hasCredentials_7 != null) result.hasCredentials_7 = hasCredentials_7;
     return result;
   }
 
@@ -174,13 +174,13 @@ class CustomServer extends $pb.GeneratedMessage {
 
   /// Read-only: true when the core holds credentials for this server.
   @$pb.TagNumber(7)
-  $core.bool get hasCredentials => $_getBF(6);
+  $core.bool get hasCredentials_7 => $_getBF(6);
   @$pb.TagNumber(7)
-  set hasCredentials($core.bool value) => $_setBool(6, value);
+  set hasCredentials_7($core.bool value) => $_setBool(6, value);
   @$pb.TagNumber(7)
-  $core.bool hasHasCredentials() => $_has(6);
+  $core.bool hasHasCredentials_7() => $_has(6);
   @$pb.TagNumber(7)
-  void clearHasCredentials() => $_clearField(7);
+  void clearHasCredentials_7() => $_clearField(7);
 }
 
 class SaveCustomServerRequest extends $pb.GeneratedMessage {
