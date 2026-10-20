@@ -190,5 +190,19 @@ func (s *Server) GetSubscriptionOverride(ctx context.Context, req *corev1.GetSub
 			OutboundId:  r.OutboundID,
 		})
 	}
+	// The provider routing layer rides the same response so the client
+	// can merge it into the session plan it builds (C3 closure). Rules
+	// go out exactly as stored — proxy rules keep the "proxy" sentinel:
+	// substituting the session proxy target is the client's job, the
+	// core does not know it. A subscription without a layer (or without
+	// an override file at all) answers an empty field, not an error.
+	if o.ProviderRouting != nil {
+		for _, r := range o.ProviderRouting.Rules {
+			out.ProviderRouting = append(out.ProviderRouting, &corev1.OverrideRule{
+				Destination: r.Destination,
+				OutboundId:  r.OutboundID,
+			})
+		}
+	}
 	return out, nil
 }

@@ -114,3 +114,71 @@ func TestRefreshStoresReplacesAndClearsProviderRouting(t *testing.T) {
 		t.Fatalf("delete must drop the whole override, got %+v %v", o, err)
 	}
 }
+
+// TestGetSubscriptionOverrideServesProviderRouting is the C3 closure
+// round-trip: a layer stored by the refresh path must come back out
+// through GetSubscriptionOverride — the only channel the client has —
+// with the "proxy" sentinel intact (substitution is the client's job)
+// and beside the user's extra rules from the same file. A subscription
+// without a layer answers an empty field, not an error.
+func TestGetSubscriptionOverrideServesProviderRouting(t *testing.T) {
+	p := &panel{body: servers("tokyo"), info: subscription.Info{Title: "Provider", HappRouting: happLinkV1}}
+	srv, _ := bookServer(t, t.TempDir(), p)
+	srv.subs.overrides = subscription.NewOverrideStore(t.TempDir())
+	state := saveAndWait(t, srv.subs, &corev1.SubscriptionSettings{Url: "https://panel.example/sub/abc"})
+	id := state.GetSettings().GetId()
+
+	// Seed a user extra rule into the same override file.
+	stored := loadOverrideForTest(t, srv, id)
+	stored.ExtraRules = []subscription.OverrideRule{{Destination: "domain:mine.example", OutboundID: "direct"}}
+	if err := srv.subs.overrides.Save(id, stored); err != nil {
+		t.Fatal(err)
+	}
+
+	ver := &corev1.ApiVersion{Major: 1, Minor: 0}
+	resp, err := srv.GetSubscriptionOverride(context.Background(), &corev1.GetSubscriptionOverrideRequest{
+		ApiVersion: ver, ControlAuthenticator: make([]byte, TokenLen), SubscriptionId: id,
+	})
+	if err != nil || resp.GetError() != nil {
+		t.Fatalf("get override: %v %v", err, resp.GetError())
+	}
+	rules := resp.GetProviderRouting()
+	if len(rules) != 9 {
+		t.Fatalf("provider_routing = %d rules, want the stored 9: %v", len(rules), rules)
+	}
+	targets := map[string]string{}
+	for _, r := range rules {
+		targets[r.GetDestination()] = r.GetOutboundId()
+	}
+	if targets["geosite:youtube"] != "proxy" || targets["203.0.113.7/32"] != "proxy" ||
+		targets["domain:bank.example"] != "direct" || targets["domain:ads.example"] != "reject" {
+		t.Fatalf("provider rule targets = %v (the sentinel must survive the RPC)", targets)
+	}
+	if len(resp.GetExtraRules()) != 1 || resp.GetExtraRules()[0].GetDestination() != "domain:mine.example" {
+		t.Fatalf("extra_rules = %v", resp.GetExtraRules())
+	}
+
+	// No layer: a subscription whose provider sends no routing answers
+	// empty, not an error.
+	srv2, _ := bookServer(t, t.TempDir(), &panel{body: servers("oslo")})
+	srv2.subs.overrides = subscription.NewOverrideStore(t.TempDir())
+	state2 := saveAndWait(t, srv2.subs, &corev1.SubscriptionSettings{Url: "https://panel.example/sub/plain"})
+	resp2, err := srv2.GetSubscriptionOverride(context.Background(), &corev1.GetSubscriptionOverrideRequest{
+		ApiVersion: ver, ControlAuthenticator: make([]byte, TokenLen), SubscriptionId: state2.GetSettings().GetId(),
+	})
+	if err != nil || resp2.GetError() != nil {
+		t.Fatalf("get plain override: %v %v", err, resp2.GetError())
+	}
+	if len(resp2.GetProviderRouting()) != 0 {
+		t.Fatalf("a subscription without a layer must answer empty provider_routing, got %v", resp2.GetProviderRouting())
+	}
+}
+
+func loadOverrideForTest(t *testing.T, srv *Server, id string) *subscription.Override {
+	t.Helper()
+	o, err := srv.subs.overrides.Load(id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return o
+}

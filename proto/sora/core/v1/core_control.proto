@@ -862,6 +862,16 @@ message GetSubscriptionOverrideResponse {
   repeated string pinned_order = 3;
   repeated OverrideRule extra_rules = 4;
   SoraError error = 5;
+  // The provider-supplied routing layer stored for this subscription
+  // (C3, Happ happRouting converted at refresh time), in the same
+  // destination form as extra_rules. Rules that send traffic to the
+  // subscription's proxy carry the outbound_id sentinel "proxy": the
+  // core does not know the client's session proxy target, so the
+  // client substitutes it when merging the rules into a plan, exactly
+  // as it resolves the proxy target of a user rule. "direct" and
+  // "reject" are the built-in targets. Empty when the subscription
+  // carries no provider layer.
+  repeated OverrideRule provider_routing = 6;
 }
 // OverrideRule is one user routing rule bound to a subscription; the client
 // merges these into the session plan it builds.

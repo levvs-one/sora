@@ -119,6 +119,9 @@ void main() {
       expectFirstTag(() => GetSubscriptionOverrideResponse(),
           (m) => (m as GetSubscriptionOverrideResponse).error = SoraError(), 5, 2,
           'GetSubscriptionOverrideResponse.error');
+      expectFirstTag(() => GetSubscriptionOverrideResponse(),
+          (m) => (m as GetSubscriptionOverrideResponse).providerRouting.add(OverrideRule()), 6, 2,
+          'GetSubscriptionOverrideResponse.provider_routing');
     });
     test('OverrideRule tags', () {
       expectFirstTag(() => OverrideRule(), (m) => (m as OverrideRule).destination = 'geosite:ads', 1, 2,

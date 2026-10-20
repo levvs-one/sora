@@ -9843,6 +9843,7 @@ class GetSubscriptionOverrideResponse extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? pinnedOrder,
     $core.Iterable<OverrideRule>? extraRules,
     SoraError? error,
+    $core.Iterable<OverrideRule>? providerRouting,
   }) {
     final result = GetSubscriptionOverrideResponse._();
     if (renames != null) result.renames.addAll(renames);
@@ -9850,6 +9851,7 @@ class GetSubscriptionOverrideResponse extends $pb.GeneratedMessage {
     if (pinnedOrder != null) result.pinnedOrder.addAll(pinnedOrder);
     if (extraRules != null) result.extraRules.addAll(extraRules);
     if (error != null) result.error = error;
+    if (providerRouting != null) result.providerRouting.addAll(providerRouting);
     return result;
   }
 
@@ -9873,6 +9875,7 @@ class GetSubscriptionOverrideResponse extends $pb.GeneratedMessage {
     ..pPS(3, _omitFieldNames ? '' : 'pinnedOrder')
     ..pPM<OverrideRule>(4, _omitFieldNames ? '' : 'extraRules', subBuilder: OverrideRule.$_createMessage)
     ..aOM<SoraError>(5, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..pPM<OverrideRule>(6, _omitFieldNames ? '' : 'providerRouting', subBuilder: OverrideRule.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -9917,6 +9920,9 @@ class GetSubscriptionOverrideResponse extends $pb.GeneratedMessage {
   void clearError() => $_clearField(5);
   @$pb.TagNumber(5)
   SoraError ensureError() => $_ensure(4);
+
+  @$pb.TagNumber(6)
+  $core.List<OverrideRule> get providerRouting => $_getList(5);
 
 }
 

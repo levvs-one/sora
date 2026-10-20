@@ -96,6 +96,7 @@ func TestNewFieldTagsAreStable(t *testing.T) {
 		},
 		"GetSubscriptionOverrideResponse": {
 			"renames": 1, "hidden": 2, "pinned_order": 3, "extra_rules": 4, "error": 5,
+			"provider_routing": 6,
 		},
 		"OverrideRule": {"destination": 1, "outbound_id": 2},
 		"ProfileMatched": {"profile_id": 1, "profile_name": 2, "auto_apply": 3},

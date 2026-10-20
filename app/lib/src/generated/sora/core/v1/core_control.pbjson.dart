@@ -2130,6 +2130,7 @@ const GetSubscriptionOverrideResponse$json = {
     {'1': 'pinned_order', '3': 3, '4': 3, '5': 9, '10': 'pinnedOrder'},
     {'1': 'extra_rules', '3': 4, '4': 3, '5': 11, '6': '.sora.core.v1.OverrideRule', '10': 'extraRules'},
     {'1': 'error', '3': 5, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+    {'1': 'provider_routing', '3': 6, '4': 3, '5': 11, '6': '.sora.core.v1.OverrideRule', '10': 'providerRouting'},
   ],
 };
 
@@ -2142,7 +2143,10 @@ final $typed_data.Uint8List getSubscriptionOverrideResponseDescriptor =
         'bmFtZXMSFgoGaGlkZGVuGAIgAygJUgZoaWRkZW4SIQoMcGlubmVkX29yZGVyGAMgAygJUgtwaW5u'
         'ZWRPcmRlchI7CgtleHRyYV9ydWxlcxgEIAMoCzIaLnNvcmEuY29yZS52MS5PdmVycmlkZVJ1bGVS'
         'CmV4dHJhUnVsZXMSLQoFZXJyb3IYBSABKAsyFy5zb3JhLmNvcmUudjEuU29yYUVycm9yUgVlcnJv'
-        'cho2CgxSZW5hbWVzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVl');
+        'chJFChBwcm92aWRlcl9yb3V0aW5nGAYgAygLMhouc29yYS5jb3JlLnYxLk92ZXJyaWRlUnVsZVIP'
+        'cHJvdmlkZXJSb3V0aW5nGjgKDFJlbmFtZXNFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1'
+        'ZRgCIAEoCVIFdmFsdWU6AA=='
+);
 
 const OverrideRule$json = {
   '1': 'OverrideRule',
