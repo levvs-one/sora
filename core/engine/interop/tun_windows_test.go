@@ -188,7 +188,9 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 				}
 				transport := &http.Transport{DisableKeepAlives: true}
 				defer transport.CloseIdleConnections()
-				client := &http.Client{Transport: transport, Timeout: 5 * time.Second}
+				// The first request brings the freshly applied TUN route up;
+				// sing-box and mihomo cold start slower than Xray on the runner.
+				client := &http.Client{Transport: transport, Timeout: 20 * time.Second}
 				request, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+destination, nil)
 				if err != nil {
 					t.Fatal(err)
