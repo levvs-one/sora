@@ -37,11 +37,11 @@ set in Xcode or an untracked xcconfig —
 - `SORA_CODE_SIGN_IDENTITY` — e.g. `Apple Development` (dev) /
   `Developer ID Application` (macOS release).
 
-⚠️ Known conflict to fix first: bundle IDs in project.yml follow
-ARCHITECTURE.md §3.4 (`io.github.levvs-one.sora…`), but
-`Apps/macOS/SoraMac/Core/AppIdentifiers.swift` still carries `dev.sora.*`
-values. Per §3.4 the document wins — align that file before creating
-App IDs, or the App Group will not match the entitlements.
+Identifiers: bundle IDs in project.yml and all app code follow
+ARCHITECTURE.md §3.4 (`io.github.levvs-one.sora…`, App Group
+`group.io.github.levvs-one.sora`). An early cross-department
+divergence was reconciled at acceptance (2026-10-20) and verified by a
+repo-wide grep — no other spelling remains in code.
 
 ## 2. Libbox.xcframework (the engine)
 

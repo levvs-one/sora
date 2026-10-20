@@ -5,10 +5,10 @@
 # of truth): base `io.github.levvs-one.sora` for BOTH apps, App Group
 # `group.io.github.levvs-one.sora`, keychain group
 # `$(AppIdentifierPrefix)io.github.levvs-one.sora`.
-# KNOWN CONFLICT (flagged, not silently resolved): macOS app code in
-# Apps/macOS/SoraMac/Core/AppIdentifiers.swift currently uses `dev.sora.*`
-# ids and a `group.dev.sora.app` group. Per ARCHITECTURE.md §3.4 the doc
-# changes first, then the code - the app department must align that file.
+# RESOLVED (acceptance 2026-10-20): an early identifier divergence
+# (three App Group spellings across sub-departments) was reconciled to
+# the §3.4 canon everywhere; a repo-wide grep over apple/ for the old
+# variants returns zero code occurrences.
 #
 # Deployment targets (ARCHITECTURE.md decision): iOS 15.0 / macOS 13.0.
 # libbox for Apple floors at iOS 15.0 / macOS 13.0, so macOS 11-12 are NOT
@@ -41,7 +41,7 @@ targets:
     platform: iOS
     sources:
       - path: Apps/iOS
-        excludes: ["Widgets/**", "Intents/**"]
+        excludes: ["Widgets/**"]
       - path: Localizations/Localizable.xcstrings
       - path: Assets/Media.xcassets
     dependencies:
@@ -60,6 +60,7 @@ targets:
     platform: macOS
     sources:
       - path: Apps/macOS/SoraMac
+      - path: Apps/macOS/Intents
       - path: Localizations/Localizable.xcstrings
       - path: Assets/Media.xcassets
     dependencies:

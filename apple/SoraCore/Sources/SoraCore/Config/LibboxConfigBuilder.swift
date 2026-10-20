@@ -45,8 +45,11 @@ public enum LibboxConfigBuilder {
             }
         }
         outbounds.append(["type": "direct", "tag": "direct"])
-        outbounds.append(["type": "block", "tag": "block"])
-        outbounds.append(["type": "dns", "tag": "dns-out"])
+        // No `block`/`dns` outbounds: sing-box removed the dns outbound in
+        // 1.13 (the pinned 1.14.3-lx.22 rejects it at decode — verified by
+        // `sing-box check` on golden configs, acceptance 2026-10-20) and
+        // blocking is the route action `reject`, exactly like the Go
+        // renderer (1.12+ format: hijack-dns / reject actions).
 
         var config: [String: Any] = [
             "log": logConfig(settings.logLevel),
@@ -71,12 +74,47 @@ public enum LibboxConfigBuilder {
         return ["level": resolved, "timestamp": false]
     }
 
+    /// The bootstrap resolver, exactly as the Go renderer's dns():
+    /// the first configured server that needs no resolution itself
+    /// (system/local transport or an IP-literal address); when none
+    /// qualifies, a `local` server is appended and used. sing-box 1.14
+    /// removed the implicit fallback, so route.default_domain_resolver
+    /// and per-server domain_resolver must name it explicitly
+    /// (`sing-box check` ERROR otherwise — acceptance 2026-10-20).
+    static func bootstrapDNSTag(_ s: AppSettings) -> String {
+        for (i, raw) in s.dnsServers.enumerated() {
+            let srv = dnsServer(raw, tag: "dns-\(i + 1)")
+            if (srv["type"] as? String) == "local" { return "dns-\(i + 1)" }
+            if let host = srv["server"] as? String, isIPLiteral(host) {
+                return "dns-\(i + 1)"
+            }
+        }
+        return "local"
+    }
+
+    static func isIPLiteral(_ host: String) -> Bool {
+        if host.contains(":") { return true } // IPv6 literal
+        let parts = host.split(separator: ".")
+        return parts.count == 4 && parts.allSatisfy {
+            !$0.isEmpty && $0.allSatisfy(\.isNumber)
+        }
+    }
+
     static func dnsConfig(_ s: AppSettings) -> [String: Any] {
+        let bootstrap = bootstrapDNSTag(s)
         var servers: [[String: Any]] = []
         for (i, raw) in s.dnsServers.enumerated() {
-            servers.append(dnsServer(raw, tag: "dns-\(i + 1)"))
+            var srv = dnsServer(raw, tag: "dns-\(i + 1)")
+            // A resolver named by hostname needs the bootstrap to
+            // resolve its own name (Go: byHostname servers).
+            if (srv["type"] as? String) != "local",
+               let host = srv["server"] as? String, !isIPLiteral(host) {
+                srv["domain_resolver"] = bootstrap
+            }
+            servers.append(srv)
         }
-        if servers.isEmpty {
+        if bootstrap == "local",
+           !servers.contains(where: { ($0["tag"] as? String) == "local" }) {
             servers.append(["type": "local", "tag": "local"])
         }
         let ipv6 = s.capabilities.resolvedIPv6
@@ -167,11 +205,12 @@ public enum LibboxConfigBuilder {
         if s.killSwitch, s.capabilities.killSwitchBehavior == .blockOnFailure {
             // Explicit blocks instead of relying on strict_route alone,
             // for systems where the app layer does not trust strict_route.
-            rules.append(["port": [53], "network": ["udp"], "action": "route", "outbound": "block"])
+            rules.append(["port": [53], "network": ["udp"], "action": "reject"])
             rules.append(["ip_cidr": ["0.0.0.0/0", "::/0"], "inbound": ["mixed-in"],
                           "action": "route", "outbound": "proxy"])
         }
-        return ["rules": rules, "final": "proxy", "auto_detect_interface": true]
+        return ["rules": rules, "final": "proxy", "auto_detect_interface": true,
+                "default_domain_resolver": ["server": bootstrapDNSTag(s)]]
     }
 
     // MARK: - Outbounds

@@ -4,18 +4,15 @@ Native SwiftUI client for iOS, at design parity with the Flutter app
 (cool-neutral palette, dark theme primary, no raw error text anywhere in
 the UI — every failure is a designed, localized state).
 
-> **Identifier warning — read first.** This sub-department's mandate
-> fixes the App Group as `group.io.github.levvs-one.sora` and bundle ids
-> under `io.github.levvs-one.sora` (the repo-wide style: polkit actions,
-> desktop file). Two sibling efforts currently use other values
-> (SoraCore `SoraSharedIdentifiers.appGroup = group.one.levvs.sora`,
-> macOS `group.dev.sora.app`). They must be reconciled to ONE value
-> before the first Xcode build, or the app, the profile store and the
-> provider will silently talk to different containers. This code takes
-> its group from `PacketTunnel/TunnelConfigExchange.swift`
+> **Identifiers — resolved.** The App Group is
+> `group.io.github.levvs-one.sora` and bundle ids sit under
+> `io.github.levvs-one.sora` (ARCHITECTURE.md §3.4, single source of
+> truth). An early divergence across sub-departments was reconciled at
+> acceptance (2026-10-20) and verified by grep over all of `apple/`.
+> This code takes its group from `PacketTunnel/TunnelConfigExchange.swift`
 > (`SoraIdentifiers`) everywhere — including constructing
 > `JSONFileProfileStore(directory:)` explicitly instead of
-> `sharedContainer()` — so the reconciliation is a one-line change here.
+> `sharedContainer()`.
 
 ## Targets and files
 

@@ -123,7 +123,11 @@ final class LibboxConfigBuilderTests: XCTestCase {
     func testCommonSections() throws {
         let cfg = try build(ProfileFixtures.vless)
         let tags = JSONTestHelper.outbounds(cfg).compactMap { $0["tag"] as? String }
-        XCTAssertTrue(tags.contains("direct") && tags.contains("block") && tags.contains("dns-out"))
+        XCTAssertTrue(tags.contains("direct"))
+        // Regression pin (acceptance 2026-10-20): sing-box 1.13+ removed
+        // the dns outbound and block is a rule action — neither outbound
+        // may ever be emitted again; `sing-box check` fails otherwise.
+        XCTAssertFalse(tags.contains("block") || tags.contains("dns-out"))
         XCTAssertEqual(JSONTestHelper.route(cfg)["final"] as? String, "proxy")
         let dns = JSONTestHelper.dns(cfg)
         let serverTypes = (dns["servers"] as! [[String: Any]]).compactMap { $0["type"] as? String }
@@ -166,7 +170,27 @@ final class LibboxConfigBuilderTests: XCTestCase {
         let cfg = try build(ProfileFixtures.vless,
                             settings: AppSettings(killSwitch: true, capabilities: caps))
         let rules = JSONTestHelper.route(cfg)["rules"] as! [[String: Any]]
-        XCTAssertTrue(rules.contains { $0["outbound"] as? String == "block" })
+        XCTAssertTrue(rules.contains { $0["action"] as? String == "reject" })
+    }
+
+    func testDomainResolverIsExplicit() throws {
+        // Regression pin (acceptance 2026-10-20, sing-box check on the
+        // pinned 1.14.3-lx.22): 1.14 removed the implicit resolver
+        // fallback — route.default_domain_resolver must name the
+        // bootstrap (Go dns() returns it), and a hostname-addressed DNS
+        // server must carry domain_resolver to the bootstrap.
+        let ipCfg = try build(ProfileFixtures.vless) // default 1.1.1.1 DoH
+        let resolver = JSONTestHelper.route(ipCfg)["default_domain_resolver"] as? [String: Any]
+        XCTAssertEqual(resolver?["server"] as? String, "dns-1")
+
+        let hostCfg = try build(ProfileFixtures.vless,
+                                settings: AppSettings(dnsServers: ["https://dns.example.com/dns-query"]))
+        let dns = JSONTestHelper.dns(hostCfg)
+        let servers = dns["servers"] as! [[String: Any]]
+        XCTAssertEqual(servers.first?["domain_resolver"] as? String, "local")
+        XCTAssertTrue(servers.contains { ($0["tag"] as? String) == "local" })
+        let hostResolver = JSONTestHelper.route(hostCfg)["default_domain_resolver"] as? [String: Any]
+        XCTAssertEqual(hostResolver?["server"] as? String, "local")
     }
 
     func testBypassLANAddsPrivateDirectRule() throws {
