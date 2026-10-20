@@ -2218,4 +2218,64 @@ class SIt extends S {
   String serverReliability(int pct) {
     return 'Reliability $pct%';
   }
+
+  @override
+  String get errConnectionsUnavailable => 'The connection list is unavailable right now';
+
+  @override
+  String get errDiagnosticsFailed => 'Could not collect diagnostics';
+
+  @override
+  String get errDiagnosticsTooLarge => 'The diagnostics archive is too large';
+
+  @override
+  String get errEngineStalled => 'The tunnel stopped passing traffic';
+
+  @override
+  String get errEngineUnstable => 'The engine is unstable and keeps stopping';
+
+  @override
+  String get errNotFound => 'The requested item was not found';
+
+  @override
+  String get errProxyFailed => 'Could not set up the system proxy';
+
+  @override
+  String get errLogsUnavailable => 'This core does not keep a log';
+
+  @override
+  String get errLogFilterInvalid => 'The log filter is not valid: check the expression and the time range';
+
+  @override
+  String get errLogExportFailed => 'Could not export the log: it is too large. Narrow the filter and try again.';
+
+  @override
+  String get errProbeEndpointInvalid => 'A server address is missing or not valid';
+
+  @override
+  String get errProbeNoEndpoints => 'There are no servers to check';
+
+  @override
+  String get errProbeTooMany => 'Too many servers to check at once';
+
+  @override
+  String get errCancelled => 'The operation was cancelled';
+
+  @override
+  String get errRequestTooLarge => 'The request is too large';
+
+  @override
+  String get errSecretNotFound => 'A needed secret was not found';
+
+  @override
+  String get errSecretReferenceInvalid => 'The secret reference is not valid';
+
+  @override
+  String get errSecretTooLarge => 'The secret is too large to store';
+
+  @override
+  String get errSubNotFound => 'The subscription was not found';
+
+  @override
+  String get errSubIntervalInvalid => 'The update interval must be between one hour and 30 days';
 }

@@ -2237,4 +2237,64 @@ class SRu extends S {
   String serverReliability(int pct) {
     return 'Надёжность $pct%';
   }
+
+  @override
+  String get errConnectionsUnavailable => 'Список подключений сейчас недоступен';
+
+  @override
+  String get errDiagnosticsFailed => 'Не удалось собрать диагностику';
+
+  @override
+  String get errDiagnosticsTooLarge => 'Архив диагностики слишком большой';
+
+  @override
+  String get errEngineStalled => 'Туннель перестал пропускать трафик';
+
+  @override
+  String get errEngineUnstable => 'Ядро работает нестабильно и постоянно останавливается';
+
+  @override
+  String get errNotFound => 'Запрошенный элемент не найден';
+
+  @override
+  String get errProxyFailed => 'Не удалось настроить системный прокси';
+
+  @override
+  String get errLogsUnavailable => 'Это ядро не ведёт журнал';
+
+  @override
+  String get errLogFilterInvalid => 'Фильтр журнала задан неверно: проверьте выражение и диапазон времени';
+
+  @override
+  String get errLogExportFailed => 'Не удалось выгрузить журнал: он слишком большой. Сузьте фильтр и попробуйте снова.';
+
+  @override
+  String get errProbeEndpointInvalid => 'Адрес сервера не указан или задан неверно';
+
+  @override
+  String get errProbeNoEndpoints => 'Нет серверов для проверки';
+
+  @override
+  String get errProbeTooMany => 'Слишком много серверов для одной проверки';
+
+  @override
+  String get errCancelled => 'Операция отменена';
+
+  @override
+  String get errRequestTooLarge => 'Запрос слишком большой';
+
+  @override
+  String get errSecretNotFound => 'Нужный секрет не найден';
+
+  @override
+  String get errSecretReferenceInvalid => 'Ссылка на секрет задана неверно';
+
+  @override
+  String get errSecretTooLarge => 'Секрет слишком большой для хранилища';
+
+  @override
+  String get errSubNotFound => 'Подписка не найдена';
+
+  @override
+  String get errSubIntervalInvalid => 'Интервал обновления должен быть от одного часа до 30 дней';
 }

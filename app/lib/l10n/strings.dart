@@ -4160,6 +4160,126 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Надёжность {pct}%'**
   String serverReliability(int pct);
+
+  /// No description provided for @errConnectionsUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Список подключений сейчас недоступен'**
+  String get errConnectionsUnavailable;
+
+  /// No description provided for @errDiagnosticsFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось собрать диагностику'**
+  String get errDiagnosticsFailed;
+
+  /// No description provided for @errDiagnosticsTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Архив диагностики слишком большой'**
+  String get errDiagnosticsTooLarge;
+
+  /// No description provided for @errEngineStalled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Туннель перестал пропускать трафик'**
+  String get errEngineStalled;
+
+  /// No description provided for @errEngineUnstable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ядро работает нестабильно и постоянно останавливается'**
+  String get errEngineUnstable;
+
+  /// No description provided for @errNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрошенный элемент не найден'**
+  String get errNotFound;
+
+  /// No description provided for @errProxyFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось настроить системный прокси'**
+  String get errProxyFailed;
+
+  /// No description provided for @errLogsUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Это ядро не ведёт журнал'**
+  String get errLogsUnavailable;
+
+  /// No description provided for @errLogFilterInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фильтр журнала задан неверно: проверьте выражение и диапазон времени'**
+  String get errLogFilterInvalid;
+
+  /// No description provided for @errLogExportFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось выгрузить журнал: он слишком большой. Сузьте фильтр и попробуйте снова.'**
+  String get errLogExportFailed;
+
+  /// No description provided for @errProbeEndpointInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адрес сервера не указан или задан неверно'**
+  String get errProbeEndpointInvalid;
+
+  /// No description provided for @errProbeNoEndpoints.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет серверов для проверки'**
+  String get errProbeNoEndpoints;
+
+  /// No description provided for @errProbeTooMany.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком много серверов для одной проверки'**
+  String get errProbeTooMany;
+
+  /// No description provided for @errCancelled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Операция отменена'**
+  String get errCancelled;
+
+  /// No description provided for @errRequestTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрос слишком большой'**
+  String get errRequestTooLarge;
+
+  /// No description provided for @errSecretNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужный секрет не найден'**
+  String get errSecretNotFound;
+
+  /// No description provided for @errSecretReferenceInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ссылка на секрет задана неверно'**
+  String get errSecretReferenceInvalid;
+
+  /// No description provided for @errSecretTooLarge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Секрет слишком большой для хранилища'**
+  String get errSecretTooLarge;
+
+  /// No description provided for @errSubNotFound.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подписка не найдена'**
+  String get errSubNotFound;
+
+  /// No description provided for @errSubIntervalInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Интервал обновления должен быть от одного часа до 30 дней'**
+  String get errSubIntervalInvalid;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

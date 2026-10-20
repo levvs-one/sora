@@ -274,6 +274,39 @@ void main() {
     expect(describe(s, const CoreFailure('core.plan.tunnel_unsupported')), s.errTunnel);
   });
 
+  test('every specific core failure has its own words, not the generic ones', () {
+    final s = SRu();
+    final expected = <String, String>{
+      'core.connections.unavailable': s.errConnectionsUnavailable,
+      'core.diagnostics.failed': s.errDiagnosticsFailed,
+      'core.diagnostics.too_large': s.errDiagnosticsTooLarge,
+      'core.engine.stalled': s.errEngineStalled,
+      'core.engine.unstable': s.errEngineUnstable,
+      'core.generic.not_found': s.errNotFound,
+      'core.guard.proxy_failed': s.errProxyFailed,
+      'core.logs.unavailable': s.errLogsUnavailable,
+      'core.logs.filter_invalid': s.errLogFilterInvalid,
+      'core.logs.export_failed': s.errLogExportFailed,
+      'core.probe.invalid_endpoint': s.errProbeEndpointInvalid,
+      'core.probe.no_endpoints': s.errProbeNoEndpoints,
+      'core.probe.too_many': s.errProbeTooMany,
+      'core.request.cancelled': s.errCancelled,
+      'core.request.too_large': s.errRequestTooLarge,
+      'core.secret.not_found': s.errSecretNotFound,
+      'core.secret.reference_invalid': s.errSecretReferenceInvalid,
+      'core.secret.too_large': s.errSecretTooLarge,
+      'core.subscription.not_found': s.errSubNotFound,
+      'core.subscription.interval_invalid': s.errSubIntervalInvalid,
+    };
+    expect(expected, hasLength(20));
+    for (final entry in expected.entries) {
+      expect(describe(s, CoreFailure(entry.key)), entry.value, reason: entry.key);
+      expect(entry.value, isNot(s.errGeneric), reason: entry.key);
+    }
+    // The one generic catalog key keeps the generic words on purpose.
+    expect(describe(s, const CoreFailure('core.internal.unexpected')), s.errGeneric);
+  });
+
   testWidgets('without a core the home screen says so and stays still', (tester) async {
     SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
     tester.platformDispatcher.localesTestValue = const [Locale('ru')];
