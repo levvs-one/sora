@@ -1,0 +1,193 @@
+diff --git a/app/lib/src/chains.dart b/app/lib/src/chains.dart
+index 2026f89..d48635f 100644
+--- a/app/lib/src/chains.dart
++++ b/app/lib/src/chains.dart
+@@ -126,6 +126,9 @@ class ChainsStore extends ChangeNotifier {
+     if (hops.length < minChainHops) return 'chainTooFew';
+     if (hops.length > maxChainHops) return 'chainTooMany';
+     if (hops.toSet().length != hops.length) return 'chainDuplicate';
++    // An empty id names no server; without this a hand-built chain could be
++    // saved and only fail later at connect time.
++    if (hops.any((h) => h.isEmpty)) return 'chainHopMissing';
+     return null;
+   }
+ }
+diff --git a/app/lib/src/profiles.dart b/app/lib/src/profiles.dart
+index 12088b7..1fde734 100644
+--- a/app/lib/src/profiles.dart
++++ b/app/lib/src/profiles.dart
+@@ -7,8 +7,12 @@ import 'package:flutter/foundation.dart';
+ ///
+ /// The Go core owns trigger matching on network change
+ /// (`core/profiles/profiles.go`, RPCs `ListProfiles`/`SaveProfile`/
+-/// `DeleteProfile`/`GetNetworkFingerprint`); this store is the app-side cache
+-/// and the source of truth for the editor UI until the core sync lands.
++/// `DeleteProfile`/`GetNetworkFingerprint`, `ProfileMatched` events); this
++/// store is the app-side cache and the source of truth for the editor UI.
++/// NOTE: the generated Dart stubs (`lib/src/generated/sora/core/v1/`)
++/// predate the 1.10 profile RPCs, so the app cannot call them yet — pushing
++/// profiles to the core and dispatching `ProfileMatched` need the stubs
++/// regenerated with protoc first. Until then matching stays app-side only.
+ class NetworkProfile {
+   NetworkProfile({
+     required this.id,
+@@ -91,8 +95,10 @@ class NetworkProfile {
+ 
+ /// Fingerprint of the currently joined network.
+ ///
+-/// Filled by the core RPC `GetNetworkFingerprint` once the Go side lands;
+-/// until then the app shows the "unavailable" state instead of guessing.
++/// Filled by the core RPC `GetNetworkFingerprint` once the generated Dart
++/// stubs are regenerated for the 1.10 profile RPCs (the Go side has landed
++/// in `core/profiles/profiles.go`); until then the app shows the
++/// "unavailable" state instead of guessing.
+ class NetworkFingerprint {
+   const NetworkFingerprint({this.ssid, this.gateway, this.asn});
+ 
+diff --git a/app/lib/src/sora.dart b/app/lib/src/sora.dart
+index d77370c..1b22104 100644
+--- a/app/lib/src/sora.dart
++++ b/app/lib/src/sora.dart
+@@ -25,7 +25,7 @@ import 'rules.dart';
+ import 'settings.dart';
+ import 'notifications.dart';
+ import 'obfs.dart';
+-import 'sync.dart';
++import 'sync_daemon.dart';
+ import 'updates.dart';
+ import 'ui/kit.dart' show describe;
+ 
+@@ -87,7 +87,6 @@ class Sora extends ChangeNotifier {
+       overrides = OverrideStore(() => settings.subscriptionOverrides, (v) => settings.subscriptionOverrides = v),
+       profiles = ProfilesStore(() => settings.networkProfiles, (v) => settings.networkProfiles = v),
+       chains = ChainsStore(() => settings.proxyChains, (v) => settings.proxyChains = v),
+-      syncDevices = SyncDevices(() => settings.syncedDevices, (v) => settings.syncedDevices = v),
+       censor = CensorDetector(() => settings.censorVerdicts, (v) => settings.censorVerdicts = v),
+       obfs = ObfsSettings(() => settings.obfs, (v) => settings.obfs = v) {
+     overrides.onChanged = () {
+@@ -97,7 +96,6 @@ class Sora extends ChangeNotifier {
+     };
+     profiles.addListener(notifyListeners);
+     chains.addListener(notifyListeners);
+-    syncDevices.addListener(notifyListeners);
+     obfs.addListener(notifyListeners);
+     _loadBandwidth();
+   }
+@@ -525,11 +523,14 @@ class Sora extends ChangeNotifier {
+   /// Named proxy chains (FEATURE-PLAN.md F8).
+   final ChainsStore chains;
+ 
+-  /// Devices paired for E2E sync (FEATURE-PLAN.md F9).
+-  final SyncDevices syncDevices;
++  /// Lifecycle manager for the sora-sync device-sync daemon (F9). The daemon
++  /// is spawned on demand (first opened sync screen) and stopped on app exit;
++  /// it is the source of truth for paired devices — the app keeps no device
++  /// registry of its own.
++  final SyncDaemon syncDaemon = SyncDaemon();
+ 
+   /// Fingerprint of the currently joined network. Unknown until the core
+-  /// RPC GetNetworkFingerprint lands (F5).
++  /// RPC GetNetworkFingerprint is reachable from Dart (F5).
+   NetworkFingerprint networkFingerprint = const NetworkFingerprint.unknown();
+ 
+   /// True when the core advertises proxy-chain support for the active
+@@ -1091,10 +1092,12 @@ class Sora extends ChangeNotifier {
+ 
+   /// Refreshes the current network fingerprint (F5).
+   ///
+-  /// TODO(core): wire to the GetNetworkFingerprint RPC and the
+-  /// ProfileMatched core event once the Go agent lands
+-  /// `core/profiles/profiles.go`. Until then the fingerprint stays unknown
+-  /// and the UI says so instead of guessing.
++  /// TODO(stubs): wire to the GetNetworkFingerprint RPC and dispatch the
++  /// ProfileMatched core event in _watchSession once the generated Dart
++  /// stubs (`lib/src/generated/sora/core/v1/`) are regenerated for the 1.10
++  /// profile RPCs — the Go side has already landed
++  /// (`core/control/profiles.go`, `core/profiles/`). Until then the
++  /// fingerprint stays unknown and the UI says so instead of guessing.
+   Future<void> refreshFingerprint() async {
+     networkFingerprint = const NetworkFingerprint.unknown();
+     final matched = profiles.match(networkFingerprint);
+@@ -1160,6 +1163,25 @@ class Sora extends ChangeNotifier {
+     }
+     final choice = selected;
+     final entry = choice.startsWith(groupPrefix) ? entryOf(choice, _subscriptions.values) : null;
++    // A plain reconnect during a chain session keeps the chain (F8): via is
++    // only set for a fresh chain connect, while select()/disconnect() clear
++    // the tracked chain explicitly. A hop deleted mid-session breaks the
++    // chain: fail loudly with chainHopMissing instead of silently connecting
++    // a single server the user did not ask for, or crashing the plan builder
++    // on firstWhere.
++    final keepChain = via ?? _activeChain;
++    if (keepChain != null) {
++      final broken = ProxyChain.validateHops(keepChain.hops) != null ||
++          keepChain.hops.any((id) => !servers.any((o) => o.id == id));
++      if (broken) {
++        failure = const CoreFailure('chainHopMissing');
++        _emit(ConnectionFailed(failure!));
++        // No restore may be offered for a chain known to be broken (F7).
++        _clearSessionIntent();
++        notifyListeners();
++        return;
++      }
++    }
+     final plan = via == null
+         ? currentPlan
+         : buildPlan(
+@@ -1204,8 +1226,9 @@ class Sora extends ChangeNotifier {
+     phase = Phase.connecting;
+     // Remember the intent so a crash can offer to restore the session (F7).
+     // Chain connects are recorded by chain id and restored through
+-    // connectChain rather than the server selector.
+-    _writeSessionIntent(via == null ? choice : 'chain:${via.id}');
++    // connectChain rather than the server selector; a plain reconnect during
++    // a chain session keeps the chain id too (F8).
++    _writeSessionIntent(keepChain == null ? choice : 'chain:${keepChain.id}');
+     notifyListeners();
+     // Include events emitted during these requests, before the watch opens.
+     final started = DateTime.now();
+@@ -1222,7 +1245,8 @@ class Sora extends ChangeNotifier {
+       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+       _applyState(answer.status.connection);
+       _activePlan = plan;
+-      _activeChain = via;
++      // via == null on a plain reconnect keeps the tracked chain (F8).
++      _activeChain = keepChain;
+       needsReconnect = currentPlan != plan;
+       connected = true;
+       // Swapped together with the watch, so events of the previous session
+@@ -1932,6 +1956,7 @@ class Sora extends ChangeNotifier {
+   void dispose() {
+     _disposed = true;
+     browserDiagnostics.clear();
++    unawaited(syncDaemon.stop());
+     unawaited(_probeCall?.cancel());
+     _drop(CoreFailure.unavailable);
+     updates.dispose();
+@@ -2166,6 +2191,11 @@ int? freshBandwidthOf(Map<String, ({int bps, DateTime at})> bandwidth, String id
+   return measurement.bps;
+ }
+ 
++/// Benchmark goodput is stored in bytes per second; the UI labels it
++/// megabits per second, so the bytes-to-bits scaling lives here instead of
++/// at every call site.
++double mbpsOf(int bytesPerSec) => bytesPerSec * 8 / 1000000;
++
+ /// Smart score in [0, 1] (higher is better): ping 40%, speed 40%,
+ /// measurement freshness 20%, scaled by [reliability] when known — a server
+ /// answering half of its recent probes keeps three quarters of its score.
+diff --git a/app/lib/src/ui/kit.dart b/app/lib/src/ui/kit.dart
+index b7d6950..68a89e2 100644
+--- a/app/lib/src/ui/kit.dart
++++ b/app/lib/src/ui/kit.dart
+@@ -716,6 +716,10 @@ String describe(S s, CoreFailure failure) {
+     'app.benchmark_unsupported' => s.errBenchmarkUnsupported,
+     'app.obfs_unsupported' => s.errObfsUnsupported,
+     'chainUnsupported' => s.chainUnsupported,
++    'chainHopMissing' => s.chainHopMissing,
++    'chainTooFew' => s.chainTooFew,
++    'chainTooMany' => s.chainTooMany,
++    'chainDuplicate' => s.chainDuplicate,
+     _ when key.startsWith('core.plan.') => s.errServers,
+     _ => s.errGeneric,
+   };

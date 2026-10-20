@@ -1,0 +1,206 @@
+--- a/core/engine/engine_test.go
++++ b/core/engine/engine_test.go
+@@ -273,5 +273,70 @@
+ 	if err := good.Validate(); err != nil {
+ 		t.Fatalf("good plan rejected: %v", err)
+ 	}
+ }
+ 
++
++// TestDoH3ResolverRequiresDoH3Feature locks the DoH3 gate: a plan naming
++// an h3:// resolver requires FeatureDoH3, so automatic selection routes it
++// to sing-box/mihomo and never to Xray (whose render cannot speak H3).
++func TestDoH3ResolverRequiresDoH3Feature(t *testing.T) {
++	p := validPlan()
++	p.DNS = DNS{Enabled: true, Servers: []DNSServer{
++		{Tag: "dns-1", Transport: DNSH3, Address: "1.1.1.1"},
++	}}
++	if !p.RequiredFeatures()[FeatureDoH3] {
++		t.Fatal("an h3:// resolver must require FeatureDoH3")
++	}
++	p.DNS.Servers[0].Transport = DNSHTTPS
++	if p.RequiredFeatures()[FeatureDoH3] {
++		t.Fatal("a plain DoH resolver must not require FeatureDoH3")
++	}
++}
++
++// TestDoH3PlanAvoidsXray locks selection: with Xray pinned the h3 plan is
++// rejected naming the missing feature; with a choice the selector prefers
++// an engine that actually speaks DoH3.
++func TestDoH3PlanAvoidsXray(t *testing.T) {
++	p := validPlan()
++	p.DNS = DNS{Enabled: true, Servers: []DNSServer{
++		{Tag: "dns-1", Transport: DNSH3, Address: "1.1.1.1"},
++	}}
++	available := []Availability{
++		{Kind: KindXray, Usable: true, Version: mustVersion(t, "26.3.27")},
++		{Kind: KindSingBox, Usable: true, Version: mustVersion(t, "1.14.3-lx.14"), BuildTags: []string{"with_xhttp"}},
++	}
++	if _, err := SelectEngine(p, available, []Kind{KindXray}); err == nil || !strings.Contains(err.Error(), "doh3") {
++		t.Fatalf("pinned Xray must reject the h3 plan naming doh3, got: %v", err)
++	}
++	sel, err := SelectEngine(p, available, []Kind{KindXray, KindSingBox})
++	if err != nil || sel.Kind != KindSingBox {
++		t.Fatalf("selection should route the h3 plan to sing-box: %+v, %v", sel, err)
++	}
++}
++
++// TestFakeIPRange6Validation locks the IPv6 fake pool: it must be an IPv6
++// CIDR when set, and a v4 CIDR or garbage fails plan validation.
++func TestFakeIPRange6Validation(t *testing.T) {
++	for _, tc := range []struct {
++		name string
++		pool string
++		want string // "" means valid
++	}{
++		{"unset", "", ""},
++		{"valid v6", "fd00::/48", ""},
++		{"garbage", "not-a-cidr", "IPv6"},
++		{"v4 in v6 field", "198.18.0.0/16", "IPv6"},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			p := validPlan()
++			p.DNS = DNS{Enabled: true, Mode: string(DNSFakeIP), FakeIPRange6: tc.pool}
++			err := p.Validate()
++			if tc.want == "" && err != nil {
++				t.Fatalf("valid range rejected: %v", err)
++			}
++			if tc.want != "" && (err == nil || !strings.Contains(err.Error(), tc.want)) {
++				t.Fatalf("range %q must fail validation naming %q, got: %v", tc.pool, tc.want, err)
++			}
++		})
++	}
++}
+--- a/core/engine/singbox/render_test.go
++++ b/core/engine/singbox/render_test.go
+@@ -766,5 +766,67 @@
+ 	if _, has := ech["query_server_name"]; has {
+ 		t.Fatal("ech.query_server_name must stay unset when empty")
+ 	}
+ }
+ 
++
++// fakeIPServer extracts the rendered fakeip DNS server.
++func fakeIPServer(t *testing.T, p *engine.Plan) map[string]any {
++	t.Helper()
++	cfg := render(t, p)
++	dns, ok := cfg["dns"].(map[string]any)
++	if !ok {
++		t.Fatal("rendered config has no dns block")
++	}
++	for _, s := range dns["servers"].([]any) {
++		if m, ok := s.(map[string]any); ok && m["tag"] == "fakeip" {
++			return m
++		}
++	}
++	t.Fatal("no fakeip server rendered")
++	return nil
++}
++
++// TestFakeIPRendersIPv6RangeWhenIPv6IsOn locks the mandatory inet6_range:
++// with IPv6 enabled the fakeip server must answer AAAA from its own pool,
++// otherwise IPv6-capable apps stall on resolution.
++func TestFakeIPRendersIPv6RangeWhenIPv6IsOn(t *testing.T) {
++	p := enginetest.Plan(engine.ProtocolVLESS)
++	p.DNS.Mode = string(engine.DNSFakeIP)
++	p.Options.IPv6 = true
++	srv := fakeIPServer(t, p)
++	if srv["inet6_range"] != "fc00::/18" {
++		t.Fatalf("default inet6_range = %v, want fc00::/18", srv["inet6_range"])
++	}
++	if srv["inet4_range"] != "198.18.0.0/16" {
++		t.Fatalf("inet4_range = %v, want 198.18.0.0/16", srv["inet4_range"])
++	}
++	p.DNS.FakeIPRange6 = "fd00:face::/48"
++	if srv := fakeIPServer(t, p); srv["inet6_range"] != "fd00:face::/48" {
++		t.Fatalf("custom inet6_range = %v, want fd00:face::/48", srv["inet6_range"])
++	}
++}
++
++// TestFakeIPOmitsIPv6RangeWhenIPv6IsOff locks the negative: with IPv6
++// disabled a fake IPv6 pool would hand out unusable addresses, so the
++// server must stay v4-only and AAAA keeps getting NODATA.
++func TestFakeIPOmitsIPv6RangeWhenIPv6IsOff(t *testing.T) {
++	p := enginetest.Plan(engine.ProtocolVLESS)
++	p.DNS.Mode = string(engine.DNSFakeIP)
++	p.Options.IPv6 = false
++	srv := fakeIPServer(t, p)
++	if _, ok := srv["inet6_range"]; ok {
++		t.Fatalf("inet6_range must be omitted with IPv6 off, got %v", srv["inet6_range"])
++	}
++}
++
++func shadowsocksOutbound(t *testing.T, cfg map[string]any) map[string]any {
++	t.Helper()
++	for _, ob := range cfg["outbounds"].([]any) {
++		m := ob.(map[string]any)
++		if m["type"] == "shadowsocks" {
++			return m
++		}
++	}
++	t.Fatal("no shadowsocks outbound rendered")
++	return nil
++}
+--- a/core/engine/xray/render_test.go
++++ b/core/engine/xray/render_test.go
+@@ -503,5 +503,19 @@
+ 			t.Errorf("%s: realityWithoutVision = %v, want %v", tc.name, got, tc.want)
+ 		}
+ 	}
+ }
+ 
++
++// TestRenderRejectsDoH3WithGuidance locks the honest failure: Xray has no
++// DNS-over-HTTP/3 transport, so an h3:// resolver must fail the render
++// with an actionable message instead of a bare "not supported".
++func TestRenderRejectsDoH3WithGuidance(t *testing.T) {
++	p := enginetest.Plan(engine.ProtocolVLESS)
++	p.DNS = engine.DNS{Enabled: true, Servers: []engine.DNSServer{
++		{Tag: "dns-1", Transport: engine.DNSH3, Address: "1.1.1.1"},
++	}}
++	_, err := Render(p, testRuntime, nil)
++	if err == nil || !strings.Contains(err.Error(), "DNS-over-HTTP/3") {
++		t.Fatalf("h3 render must fail naming DNS-over-HTTP/3, got: %v", err)
++	}
++}
+--- a/core/engine/xraytun/bridge_test.go
++++ b/core/engine/xraytun/bridge_test.go
+@@ -40,5 +40,38 @@
+ 			t.Fatal("packet settings must belong to one engine without changing the original plan")
+ 		}
+ 	}
+ }
+ 
++
++// TestBridgeDowngradesDoH3ForTheXrayLeg locks the h3 split: the packet
++// engine keeps answering client queries over HTTP/3, while Xray's own
++// leg (proxy hostnames only) steps down to DoH — Xray has no H3 DNS
++// transport and would fail Validate on h3:// otherwise. The original
++// plan must stay untouched.
++func TestBridgeDowngradesDoH3ForTheXrayLeg(t *testing.T) {
++	e := &Engine{port: 12345, password: "test-private-password", xrayName: "xray"}
++	p := &engine.Plan{SessionID: "bridge-doh3",
++		Outbounds: []engine.Outbound{{ID: "out", Protocol: engine.ProtocolDirect}},
++		Tun:       engine.Tun{Enabled: true, Stack: "mixed"},
++		DNS: engine.DNS{Enabled: true, Servers: []engine.DNSServer{
++			{Tag: "dns-1", Transport: engine.DNSH3, Address: "1.1.1.1"},
++			{Tag: "dns-2", Transport: engine.DNSHTTPS, Address: "8.8.8.8"},
++		}},
++		Rules: []engine.Rule{{Type: engine.RuleMatchAll, Target: "out"}}}
++	x, packet, err := e.plans(p)
++	if err != nil {
++		t.Fatalf("plans: %v", err)
++	}
++	if got := x.DNS.Servers[0].Transport; got != engine.DNSHTTPS {
++		t.Fatalf("xray leg transport = %q, want https (downgraded from h3)", got)
++	}
++	if got := x.DNS.Servers[1].Transport; got != engine.DNSHTTPS {
++		t.Fatalf("xray leg must leave https alone, got %q", got)
++	}
++	if got := packet.DNS.Servers[0].Transport; got != engine.DNSH3 {
++		t.Fatalf("packet-engine leg transport = %q, want h3 (kept)", got)
++	}
++	if p.DNS.Servers[0].Transport != engine.DNSH3 {
++		t.Fatal("plans() mutated the caller's plan: h3 downgrade leaked out")
++	}
++}

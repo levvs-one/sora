@@ -1,0 +1,121 @@
+commit 754ebcade7c3869b3bd7c89cb08ed74f8f0a6e2f
+Author: audit-fix <audit-fix@local>
+Date:   Mon Oct 19 20:51:33 2026 +0000
+
+    [power-run] parse URL query once per link
+    
+    getq called u.Query() per key, re-parsing the raw query ~20 times per
+    server in parseLink. Parse once, pass url.Values down. Zero behavior
+    change.
+
+diff --git a/core/parser/parser.go b/core/parser/parser.go
+index 48b22305..a5fb13a8 100644
+--- a/core/parser/parser.go
++++ b/core/parser/parser.go
+@@ -362,7 +362,10 @@ func parseLink(raw string) (OutboundSpec, error) {
+ 		o.User = u.User.Username()
+ 		o.Password, _ = u.User.Password()
+ 	}
+-	for k, v := range u.Query() {
++	// Parse the query once: getq is called ~20 times below, and each
++	// u.Query() re-parses the raw query from scratch.
++	q := u.Query()
++	for k, v := range q {
+ 		if len(v) > 0 {
+ 			o.Options[k] = v[0]
+ 		}
+@@ -377,35 +380,35 @@ func parseLink(raw string) (OutboundSpec, error) {
+ 			}
+ 		}
+ 		if o.Password == "" {
+-			o.Password = getq(u, "password")
++			o.Password = getq(q, "password")
+ 		}
+ 	case "tuic":
+ 		o.UUID = o.User
+ 		o.Security = "tls"
+ 	default:
+ 		o.UUID = o.User
+-		o.Transport = getq(u, "type", "transport")
+-		o.Security = getq(u, "security")
++		o.Transport = getq(q, "type", "transport")
++		o.Security = getq(q, "security")
+ 		if o.Security == "" && proto == "vless" {
+ 			o.Security = "none"
+ 		}
+ 	}
+-	o.Path = getq(u, "path")
+-	o.HostHeader = getq(u, "host")
+-	o.ServiceName = getq(u, "serviceName", "service_name")
+-	o.Mode = getq(u, "mode")
+-	o.PublicKey = getq(u, "pbk", "public-key")
+-	o.ShortID = getq(u, "sid", "short-id")
+-	o.SpiderX = getq(u, "spx")
+-	o.ServerName = getq(u, "sni")
+-	o.Fingerprint = getq(u, "fp")
+-	o.Flow = getq(u, "flow")
+-	o.AllowInsecure = parseBool(getq(u, "allowInsecure", "insecure", "skip-cert-verify"))
+-	if a := getq(u, "alpn"); a != "" {
++	o.Path = getq(q, "path")
++	o.HostHeader = getq(q, "host")
++	o.ServiceName = getq(q, "serviceName", "service_name")
++	o.Mode = getq(q, "mode")
++	o.PublicKey = getq(q, "pbk", "public-key")
++	o.ShortID = getq(q, "sid", "short-id")
++	o.SpiderX = getq(q, "spx")
++	o.ServerName = getq(q, "sni")
++	o.Fingerprint = getq(q, "fp")
++	o.Flow = getq(q, "flow")
++	o.AllowInsecure = parseBool(getq(q, "allowInsecure", "insecure", "skip-cert-verify"))
++	if a := getq(q, "alpn"); a != "" {
+ 		o.ALPN = strings.Split(a, ",")
+ 	}
+-	for _, k := range []string{"mport", "pinSHA256", "pin_sha256", "obfs", "obfs-password", "obfs_password", "congestion_control", "udp_relay_mode"} {
+-		if v := getq(u, k); v != "" {
++	for _, k := range []string{"mport", "pinSHA256", "pin_sha256", "obfs", "obfs-password", "obfs_password", "congestion_control", "udp_relay_mode", "upmbps", "downmbps", "hop-interval", "hopinterval", "ports", "token"} {
++		if v := getq(q, k); v != "" {
+ 			o.Options[k] = v
+ 		}
+ 	}
+@@ -437,9 +440,13 @@ func parsePort(s string) (uint16, error) {
+ 	}
+ 	return uint16(n), nil
+ }
+-func getq(u *url.URL, ks ...string) string {
++
++// getq returns the first non-empty query value for ks. The caller parses the
++// query once with u.Query and passes it in: parsing per key re-scans the raw
++// query every time.
++func getq(q url.Values, ks ...string) string {
+ 	for _, k := range ks {
+-		if v := u.Query().Get(k); v != "" {
++		if v := q.Get(k); v != "" {
+ 			return v
+ 		}
+ 	}
+@@ -484,11 +491,13 @@ func parseVMess(u *url.URL) (OutboundSpec, error) {
+ 			o.Options[k] = v[0]
+ 		}
+ 	}
+-	o.Transport = getq(u, "type", "transport")
++	// Parse the query once instead of once per getq call.
++	q := u.Query()
++	o.Transport = getq(q, "type", "transport")
+ 	if o.Transport == "" {
+ 		o.Transport = "tcp"
+ 	}
+-	o.Security = getq(u, "security")
++	o.Security = getq(q, "security")
+ 	if o.Security == "" {
+ 		o.Security = "auto"
+ 	}
+@@ -501,7 +510,8 @@ func parseWireURL(u *url.URL) (OutboundSpec, error) {
+ 		return OutboundSpec{}, e
+ 	}
+ 	o := OutboundSpec{Protocol: "wireguard", Host: u.Hostname(), Port: p, Transport: "udp", DisplayName: fragmentName(u.Fragment), Options: map[string]string{}}
+-	for k, v := range u.Query() {
++	q := u.Query()
++	for k, v := range q {
+ 		if len(v) > 0 {
+ 			o.Options[k] = v[0]
+ 		}
