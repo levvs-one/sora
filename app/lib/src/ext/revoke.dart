@@ -176,6 +176,12 @@ class RevocationList {
       throw RevocationError(
           'ext: the revocation list has a bad size (${data.length} bytes)');
     }
+    // Go's json.Decoder rejects a UTF-8 BOM (it is not JSON whitespace)
+    // while Dart's utf8.decode silently strips one — refuse it on the
+    // raw bytes so both parsers accept exactly the same payloads.
+    if (data.length >= 3 && data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF) {
+      throw RevocationError('ext: the revocation list must not start with a UTF-8 BOM');
+    }
     final dynamic decoded;
     try {
       decoded = jsonDecode(utf8.decode(data));

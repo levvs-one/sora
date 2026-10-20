@@ -82,7 +82,12 @@ class InstalledExtension {
       source: source,
       installedAt: installedAt,
       granted: granted ?? this.granted,
-      previous: previous,
+      // An omitted previous keeps the rollback pointer, like every other
+      // field here: the only callers (setEnabled, the revocation sweep)
+      // toggle `enabled` and must never silently destroy the N-1 chain.
+      // No caller passes previous at all — install/rollback set or clear
+      // it by constructing InstalledExtension directly.
+      previous: previous ?? this.previous,
       authorKey: authorKey ?? this.authorKey,
     );
   }

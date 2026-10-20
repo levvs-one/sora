@@ -189,6 +189,11 @@ void main() {
       'float list version':
           '{"revocation_version":1.0,"updated_at":"2026-10-20T00:00:00Z","expires_at":"2026-10-27T00:00:00Z","entries":[]}',
       'missing timestamps': '{"revocation_version":1,"entries":[]}',
+      // Go's json.Decoder rejects a UTF-8 BOM prefix; Dart's utf8.decode
+      // silently strips it, so parse must refuse it explicitly (З-2).
+      // '\uFEFF' utf8-encodes to exactly EF BB BF.
+      'bom prefix':
+          '\uFEFF{"revocation_version":1,"updated_at":"2026-10-20T00:00:00Z","expires_at":"2026-10-27T00:00:00Z","entries":[]}',
       'empty': '',
       'not json': 'definitely not json',
       'oversize': 'x' * (maxRevocationBytes + 1),
@@ -444,6 +449,48 @@ void main() {
       expect(store2.isEnabled('com.example.hello'), isFalse);
       await expectLater(store2.setEnabled('com.example.hello', true),
           throwsA(isA<RevocationError>()));
+    });
+
+    test('rollback after a revocation sweep returns to the clean previous version', () async {
+      // Regression (revocation review З-1), the reviewer's exact
+      // scenario: 1.0.0 installed, updated to 2.0.0, then a list
+      // revoking only =2.0.0 lands in the cache and the load-time sweep
+      // disables the extension. The sweep goes through
+      // InstalledExtension.copyWith(enabled:) — which used to drop
+      // `previous` — so rollback then died with "has no previous
+      // version" and the emergency exit to the clean 1.0.0 was gone.
+      final v1 = await _buildPackage(author, 'com.example.hello', '1.0.0');
+      await store.install(v1, source: 'sideload', granted: const []);
+      final v2 = await _buildPackage(author, 'com.example.hello', '2.0.0');
+      await store.install(v2, source: 'sideload', granted: const []);
+      expect(store.get('com.example.hello')!.version, '2.0.0');
+      expect(store.get('com.example.hello')!.previous, '1.0.0');
+      expect(store.isEnabled('com.example.hello'), isTrue);
+
+      await RevocationCache(dir.path).store(utf8.encode(_revJson([
+        {'id': 'com.example.hello', 'versions': '=2.0.0', 'reason': 'bad build'},
+      ])));
+      final store2 = ExtensionStore(dir: dir.path);
+      addTearDown(store2.dispose);
+      await store2.load();
+
+      // The sweep ran — and the rollback pointer survived it.
+      expect(store2.get('com.example.hello')!.version, '2.0.0');
+      expect(store2.isEnabled('com.example.hello'), isFalse);
+      expect(store2.get('com.example.hello')!.previous, '1.0.0');
+      expect(store2.isRevoked('com.example.hello', '2.0.0'), isTrue);
+
+      // The emergency exit works again: rollback restores clean 1.0.0.
+      await store2.rollback('com.example.hello');
+      expect(store2.get('com.example.hello')!.version, '1.0.0');
+      expect(store2.isRevoked('com.example.hello', '1.0.0'), isFalse);
+
+      // Rollback itself preserves the swept (disabled) state — Go's
+      // Rollback never touches Enabled either — but re-enabling the
+      // clean version passes the enable/panel gate, so the extension
+      // ends up back on 1.0.0, enabled.
+      await store2.setEnabled('com.example.hello', true);
+      expect(store2.isEnabled('com.example.hello'), isTrue);
     });
   });
 }
