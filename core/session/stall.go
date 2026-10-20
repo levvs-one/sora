@@ -29,8 +29,11 @@ import (
 
 const (
 	// stallWindow is how long the tunnel may move zero payload bytes while
-	// connections are open before it counts as stalled (S4: 15–20 s).
-	stallWindow = 20 * time.Second
+	// connections are open before it counts as stalled. Upstream PR #1703
+	// (still unmerged, 2026-10-20) uses a 10 s stall timeout for the same
+	// failure mode; sora's watchdog sits at the top of that band (12 s)
+	// so a single slow-but-alive stream does not trip a reconnect.
+	stallWindow = 12 * time.Second
 	// stallWarmup is the grace period after (re)connect during which the
 	// stall clock does not run.
 	stallWarmup = 10 * time.Second
