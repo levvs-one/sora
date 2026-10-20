@@ -406,9 +406,13 @@ const panelCSP = `<meta http-equiv="Content-Security-Policy" content="default-sr
 // document. Idempotent per extraction: the input is always the pristine
 // package bytes, never an already-injected copy.
 func injectPanelCSP(html []byte) []byte {
-	lower := bytes.ToLower(html)
-	if i := bytes.Index(lower, []byte("<head")); i >= 0 {
-		if j := bytes.IndexByte(lower[i:], '>'); j >= 0 {
+	// Find the first "<head" case-insensitively without lowercasing a full
+	// copy of the document: bytes.ToLower allocated len(html) on top of the
+	// output copy (~2x the panel size in total allocations). "<head" is
+	// pure ASCII, so a byte-wise EqualFold scan finds exactly what the
+	// lowercased search found.
+	if i := indexHeadTag(html); i >= 0 {
+		if j := bytes.IndexByte(html[i:], '>'); j >= 0 {
 			at := i + j + 1
 			out := make([]byte, 0, len(html)+len(panelCSP))
 			out = append(out, html[:at]...)
@@ -421,6 +425,17 @@ func injectPanelCSP(html []byte) []byte {
 	out = append(out, panelCSP...)
 	out = append(out, html...)
 	return out
+}
+
+// indexHeadTag returns the offset of the first "<head" in html, matched
+// ASCII case-insensitively, or -1. It allocates nothing.
+func indexHeadTag(html []byte) int {
+	for i := 0; i+5 <= len(html); i++ {
+		if html[i] == '<' && bytes.EqualFold(html[i+1:i+5], []byte("head")) {
+			return i
+		}
+	}
+	return -1
 }
 
 // readVersionFiles walks an extracted version directory and returns every

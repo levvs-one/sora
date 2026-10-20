@@ -1,6 +1,7 @@
 package ext
 
 import (
+	"bytes"
 	"encoding/json"
 	"regexp"
 	"strings"
@@ -94,7 +95,7 @@ func ParseManifest(data []byte) (*Manifest, error) {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyManifestInvalid, "ext: the manifest exceeds 1 MiB")
 	}
 	var m Manifest
-	dec := json.NewDecoder(strings.NewReader(string(data)))
+	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(&m); err != nil {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyManifestInvalid, "ext: the manifest is not valid JSON: %v", err)

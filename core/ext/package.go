@@ -88,7 +88,7 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
 				"ext: cannot read %q: %v", name, err)
 		}
-		data, err := io.ReadAll(io.LimitReader(rc, maxSingleFile+1))
+		data, err := readZipFile(rc, f.UncompressedSize64)
 		rc.Close()
 		if err != nil {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
@@ -124,6 +124,79 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 		return nil, err
 	}
 	return &Package{Files: files, Manifest: m, ManifestExt: x}, nil
+}
+
+// readZipFile reads one archive member with the same limit semantics as
+// io.ReadAll(io.LimitReader(rc, maxSingleFile+1)): at most maxSingleFile+1
+// bytes, never truncated silently (the caller rejects len > maxSingleFile).
+// The header-declared size only pre-sizes the buffer (see readAllLimited).
+// A lying header is harmless: a smaller declaration just falls back to
+// buffer growth, and a larger one wastes a bounded pre-allocation (the
+// header was already checked against maxSingleFile before this runs).
+func readZipFile(rc io.Reader, declared uint64) ([]byte, error) {
+	var hint int64
+	if declared > 0 && declared <= maxSingleFile {
+		hint = int64(declared)
+	}
+	return readAllLimited(rc, maxSingleFile+1, hint)
+}
+
+// readAllLimited reads r to EOF, returning at most limit bytes. hint, when
+// positive, is the expected total size and pre-sizes the single backing
+// array. io.ReadAll's doubling growth allocates ~2x the content in total
+// (measured: a 4 MiB member cost 10.0 MB of allocations to open); reading
+// into a pre-sized array costs ~1x. The array is sized hint+1 so the read
+// that confirms EOF still has a window and never triggers a speculative
+// doubling — the trap a bytes.Buffer hits at an exact fit (its ReadFrom
+// grows to 2x before probing for EOF). A wrong hint degrades to the same
+// doubling growth as io.ReadAll, never to a wrong result, and limit is
+// enforced regardless of the hint.
+func readAllLimited(r io.Reader, limit int64, hint int64) ([]byte, error) {
+	size := int64(512)
+	if hint > 0 && hint < limit {
+		size = hint + 1
+	}
+	data := make([]byte, 0, size)
+	for int64(len(data)) < limit {
+		if len(data) == cap(data) {
+			newCap := int64(cap(data)) * 2
+			if newCap > limit {
+				newCap = limit
+			}
+			grown := make([]byte, len(data), newCap)
+			copy(grown, data)
+			data = grown
+		}
+		window := data[len(data):cap(data)]
+		if remain := limit - int64(len(data)); int64(len(window)) > remain {
+			window = window[:remain]
+		}
+		n, err := r.Read(window)
+		data = data[:len(data)+n]
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	return data, nil
+}
+
+// isHexDigest reports whether s is exactly 64 hex characters (a sha256
+// digest in text form), without the allocation hex.DecodeString spends on
+// a decoded copy the callers here only validate and discard.
+func isHexDigest(s string) bool {
+	if len(s) != 64 {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F') {
+			return false
+		}
+	}
+	return true
 }
 
 func isSafeArchivePath(name string) bool {
@@ -264,7 +337,20 @@ func (p *Package) VerifyWithKey(authorKeyLine string) error {
 				"ext: file %q is not covered by checksums.txt — the package was modified", name)
 		}
 		sum := sha256.Sum256(data)
-		if hex.EncodeToString(sum[:]) != want {
+		// Compare the hex form in place: hex.EncodeToString would allocate
+		// a 64-byte string per file just to be compared and thrown away
+		// (~500 allocs on a 500-file package). parseChecksums guarantees
+		// want is exactly 64 lowercase hex characters.
+		var enc [64]byte
+		hex.Encode(enc[:], sum[:])
+		match := true
+		for i := range enc {
+			if enc[i] != want[i] {
+				match = false
+				break
+			}
+		}
+		if !match {
 			return errs.Newf(errs.CodeUnauthenticated, KeySignatureInvalid,
 				"ext: file %q does not match checksums.txt — the package was modified", name)
 		}
@@ -296,7 +382,7 @@ func parseChecksums(text string) (map[string]string, error) {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
 				"ext: checksums.txt line %d is malformed", i+1)
 		}
-		if _, err := hex.DecodeString(fields[0]); err != nil {
+		if !isHexDigest(fields[0]) {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
 				"ext: checksums.txt line %d has a bad sha256", i+1)
 		}

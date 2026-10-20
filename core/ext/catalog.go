@@ -1,10 +1,10 @@
 package ext
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/binary"
-	"encoding/hex"
 	"encoding/json"
 	"io"
 	"math"
@@ -109,7 +109,7 @@ func ParseCatalog(data []byte) (*Catalog, error) {
 			"ext: the catalog has a bad size (%d bytes)", len(data))
 	}
 	var c Catalog
-	dec := json.NewDecoder(strings.NewReader(string(data)))
+	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(&c); err != nil {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyCatalogInvalid,
@@ -184,7 +184,7 @@ func (c *Catalog) Validate() error {
 			return errs.Newf(errs.CodeInvalidArgument, KeyCatalogInvalid,
 				"ext: catalog entry %q has a bad sha256", e.ID)
 		}
-		if _, err := hex.DecodeString(e.Sha256); err != nil {
+		if !isHexDigest(e.Sha256) {
 			return errs.Newf(errs.CodeInvalidArgument, KeyCatalogInvalid,
 				"ext: catalog entry %q sha256 is not hex", e.ID)
 		}
