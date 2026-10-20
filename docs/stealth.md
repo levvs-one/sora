@@ -95,12 +95,12 @@ DPI ловит VPN на трёх уровнях, и у каждого своя �
 | Shadowsocks obfs (http/tls) | ✅ sing-box (`obfs-local`), Xray |
 | Цепочки (dial через другой outbound) | ✅ `Outbound.Via` → `dialer_proxy` (Xray/sing-box) |
 | VLESS post-quantum encryption | ✅ поле `Outbound.Encryption` (Xray) |
-| Оценка незаметности конфига | ❌ только идея (§3 №13 competitor-analysis) |
+| Оценка незаметности конфига | ⚠️ грейдер реализован (`core/engine/stealth`, тесты зелёные), но не выведен ни в RPC, ни в UI — решение владельца (S8) |
 | WG через Shadowsocks одной кнопкой | ❌ композиция возможна руками через `Via`, пресета нет |
 | WG поверх TLS-туннеля (паттерн Proton Stealth) | ❌ |
 | Cover-трафик/шейпинг (паттерн DAITA/Maybenot) | ❌ |
 | PQ для WireGuard (паттерн Mullvad ML-KEM) | ❌ |
-| Пресеты «уровень стелса» в UI | ❌ |
+| Пресеты «уровень стелса» в UI | ✅ `ObfsControl` (proto `sora.obfs.v1`): Off/Light/Balanced/Aggressive + ручные uTLS/фрагментация/джиттер, экран «Обфускация»; оговорки: пресет Light не предлагается в UI-выборе, mux/XHTTP/zapret-стратегии в пресеты не входят (см. WAVE-INTEGRATION-2, C5) |
 
 ## 4. Куда дальше
 
