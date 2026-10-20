@@ -254,11 +254,17 @@ func (d *FreezeDetector) Observe(s FreezeSample) {
 	if d.samples == nil {
 		d.samples = map[string][]FreezeSample{}
 	}
-	kept := append(d.samples[s.SNI], s)
-	if len(kept) > freezeMaxSamples {
-		kept = kept[len(kept)-freezeMaxSamples:]
+	// Keep the newest freezeMaxSamples samples. The append-and-reslice
+	// window periodically grows a fresh doubled backing array and
+	// copies the whole window into it; shifting in place reuses the
+	// array the track already has, so the steady-state hot path
+	// allocates nothing here.
+	samples := d.samples[s.SNI]
+	if len(samples) >= freezeMaxSamples {
+		copy(samples, samples[len(samples)-freezeMaxSamples+1:])
+		samples = samples[:freezeMaxSamples-1]
 	}
-	d.samples[s.SNI] = kept
+	d.samples[s.SNI] = append(samples, s)
 	d.mu.Unlock()
 
 	if d.OnFreeze == nil {

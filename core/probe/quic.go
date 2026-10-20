@@ -31,6 +31,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -225,18 +226,17 @@ func greaseInitial() ([]byte, error) {
 	if _, err := rand.Read(dcid); err != nil {
 		return nil, fmt.Errorf("probe: random dcid: %w", err)
 	}
-	pkt := []byte{0xC3} // long header, fixed bit, Initial, 1-byte packet number
-	pkt = append(pkt, 0x0A, 0x0A, 0x0A, 0x0A)
-	pkt = append(pkt, byte(len(dcid)))
-	pkt = append(pkt, dcid...)
-	pkt = append(pkt, 0x00) // empty SCID
-	pkt = append(pkt, 0x00) // empty token (varint)
-	// Length covers packet number + payload; computed below.
-	pkt = append(pkt, 0x00, 0x00)
-	pkt = append(pkt, 0x00) // packet number 0
-	payloadLen := quicMinInitial - len(pkt)
-	pkt = append(pkt, make([]byte, payloadLen)...) // PADDING frames
-	length := 1 + payloadLen
+	// Build the packet at its final size in one allocation: the body is
+	// zeros (empty SCID, empty token, packet number 0, PADDING frames),
+	// so only the header fields need writing.
+	pkt := make([]byte, quicMinInitial)
+	pkt[0] = 0xC3 // long header, fixed bit, Initial, 1-byte packet number
+	pkt[1], pkt[2], pkt[3], pkt[4] = 0x0A, 0x0A, 0x0A, 0x0A
+	pkt[5] = byte(len(dcid))
+	copy(pkt[6:], dcid)
+	// Length (bytes 16–17) covers the packet number plus the payload;
+	// the header through the packet number is 19 bytes.
+	length := 1 + (quicMinInitial - 19)
 	pkt[16] = 0x40 | byte(length>>8)
 	pkt[17] = byte(length)
 	return pkt, nil
@@ -286,21 +286,23 @@ func (b *BanTracker) NoteBlocked(localPort int, remote string) {
 // Banned reports whether localPort→remote is still inside its residual
 // ban. Expired entries are pruned on read.
 func (b *BanTracker) Banned(localPort int, remote string) bool {
+	key := banKey(localPort, remote)
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	until, ok := b.until[banKey(localPort, remote)]
+	until, ok := b.until[key]
 	if !ok {
 		return false
 	}
 	if !b.now().Before(until) {
-		delete(b.until, banKey(localPort, remote))
+		delete(b.until, key)
 		return false
 	}
 	return true
 }
 
 func banKey(localPort int, remote string) string {
-	return fmt.Sprintf("%d->%s", localPort, remote)
+	// Plain concatenation: one allocation, no fmt.Sprintf machinery.
+	return strconv.Itoa(localPort) + "->" + remote
 }
 
 // quicDialAttempts bounds the source-port rotation loop: a banned port is
