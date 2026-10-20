@@ -110,7 +110,30 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 	return out
 }
 
-func isBuiltInTarget(t string) bool {
+// IsBuiltInTarget reports whether a target is provided by the engine
+// instead of the plan: it names no outbound and no group, so no plan-defined
+// id may shadow it. This is the single source of truth for built-in rule
+// targets; control and the engine bridges must use it rather than their own
+// copies (A20-18: control/plan.go kept a divergent set and rejected plans
+// the engine accepted, while accepting a target no engine could render).
+//
+// The canonical set is {direct, reject, pass, dns}:
+//   - direct: every engine sends the traffic outside the tunnel;
+//   - reject: every engine refuses the connection;
+//   - dns: DNS-bound traffic — mihomo renders NO-ADAPT, sing-box
+//     hijack-dns, xray routes to its DNS outbound;
+//   - pass: mihomo-only. Mihomo continues rule matching with the remaining
+//     rules (rendered as ACCEPT); sing-box and the xray renderer do not
+//     implement it and fail at render time, so a plan targeting pass only
+//     runs on mihomo. The xraytun bridge preserves pass rules for the
+//     mihomo packet-engine config.
+//
+// "block" is deliberately NOT a built-in target: no engine renderer maps it
+// from a plan rule (xray's profile.go maps "block" only while augmenting a
+// provider profile, never from a plan). Accepting it at the control boundary
+// only deferred the failure to render time; plans naming it now fail fast
+// at validation.
+func IsBuiltInTarget(t string) bool {
 	switch t {
 	case "direct", "reject", "pass", "dns":
 		return true

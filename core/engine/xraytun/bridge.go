@@ -158,7 +158,7 @@ func (e *Engine) plans(p *engine.Plan) (*engine.Plan, *engine.Plan, error) {
 		// Process rules also belong here, before SOCKS loses their identity.
 		tun.Rules = []engine.Rule{{Type: engine.RuleProcess, Value: e.xrayName, Target: "direct"}}
 		for _, rule := range p.Rules {
-			if !slices.Contains([]string{"direct", "reject", "pass", "dns"}, rule.Target) {
+			if !engine.IsBuiltInTarget(rule.Target) {
 				rule.Target = bridgeID
 			}
 			tun.Rules = append(tun.Rules, rule)

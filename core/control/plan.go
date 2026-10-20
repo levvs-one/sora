@@ -262,7 +262,7 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 		if err != nil {
 			return nil, err
 		}
-		if _, ok := seen[rule.Target]; !ok && !isBuiltInTarget(rule.Target) {
+		if _, ok := seen[rule.Target]; !ok && !engine.IsBuiltInTarget(rule.Target) {
 			return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanUnknownTarget,
 				"control: rule %q points at %q, which is not in this plan", rule.Value, rule.Target)
 		}
@@ -360,24 +360,13 @@ func groupsFromProto(in []*corev1.GroupSpec, outbounds map[string]struct{}) ([]e
 		for _, member := range g.Outbounds {
 			_, isOutbound := outbounds[member]
 			_, isGroup := names[member]
-			if !isOutbound && !isGroup && !isBuiltInTarget(member) {
+			if !isOutbound && !isGroup && !engine.IsBuiltInTarget(member) {
 				return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanGroupsInvalid,
 					"control: group %q names %q, which is not in this plan", g.Name, member)
 			}
 		}
 	}
 	return out, nil
-}
-
-// isBuiltInTarget reports whether a target is provided by the engine instead of
-// the plan.
-func isBuiltInTarget(target string) bool {
-	switch target {
-	case "direct", "block", "reject":
-		return true
-	default:
-		return false
-	}
 }
 
 // applyChain links ordered outbound ids so each dials through the next:

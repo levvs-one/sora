@@ -637,7 +637,7 @@ func (p *Plan) Validate() error {
 		for _, ref := range g.Outbounds {
 			_, isOutbound := ids[ref]
 			_, isGroup := members[ref]
-			if !isOutbound && !isGroup && !isBuiltInTarget(ref) {
+			if !isOutbound && !isGroup && !IsBuiltInTarget(ref) {
 				errs = append(errs, fmt.Errorf("group %q: unknown outbound %q", g.Name, ref))
 			}
 		}
@@ -654,7 +654,7 @@ func (p *Plan) Validate() error {
 		}
 		_, isOutbound := ids[r.Target]
 		_, isGroup := names[r.Target]
-		if !isOutbound && !isGroup && !isBuiltInTarget(r.Target) {
+		if !isOutbound && !isGroup && !IsBuiltInTarget(r.Target) {
 			errs = append(errs, fmt.Errorf("rule %s %q: unknown target %q", r.Type, r.Value, r.Target))
 		}
 	}
