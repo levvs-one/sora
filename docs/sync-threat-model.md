@@ -29,12 +29,23 @@ telemetry.
 >   the QR's; `upsertPeer` replaces a peer's identity key on re-pairing so
 >   a reinstalled device does not leave a stale key that would fail every
 >   later sync.
-> The app (`app/lib`) side — launching the daemon, the API client, the QR
-> screen, and the Dart-side parser with byte-identical validation — is a
-> separate workstream (Dart agent); the "What the app must do" obligations
-> below are therefore still design requirements, not current behavior.
-> Wire the service (launch + packaging + API client + QR format) before
-> treating F9 as done.
+> - The inviter records the peer only after the first sync succeeds, like
+  the joiner: a device the daemon could not sync with is not a peer.
+- Sync reports carry `kind`/`name`/`from`/`updated_at` per document so the
+  client can show exactly what arrived and where it came from.
+- Single instance per data dir is enforced with an OS file lock
+  (`flock`/`LockFileEx` on `<dataDir>/lock`) taken *before* the
+  `http_addr` probe — the old probe-then-start had a startup race where
+  two daemons could both conclude "no live instance".
+- The app side is wired (2026-10-20): the sync screen spawns the daemon,
+  publishes the contract §4 document kinds (`PUT /v1/documents/...`)
+  before every peer sync (skipping unchanged snapshots by hash, so no
+  timestamp churn), applies exactly the `pulled` metas after the sync,
+  and shows a per-document result (kind, name, `from`, `updated_at`)
+  instead of bare counters. The document bridge is covered by
+  `app/test/sync_qr_test.dart` (Dart QR vectors, mirror of the Go
+  vectors) and the daemon side by `api/bridge_test.go`
+  (`TestDocumentKindsEndToEnd` over the real HTTP API).
 
 ## Assets
 
@@ -144,6 +155,9 @@ the joiner to an attacker, who then fails the cryptographic checks.
 
 - Show the QR only on explicit user action; never log or screenshot it.
 - After pairing, show the new peer and let the user revoke unknown ones.
-- When documents arrive (`pulled` in a sync report), notify the user with
-  kind/name/`from` before applying anything to the core.
+- When documents arrive (`pulled` in a sync report), show the user what
+  came from where: the sync result lists every pulled and pushed document
+  with kind, name, `from` and `updated_at`. Applying pulled documents
+  follows the user's explicit sync action — the bridge applies exactly the
+  `pulled` metas and never invents documents.
 - Keep `api_token` out of logs and diagnostics bundles.

@@ -61,15 +61,6 @@ vectorTok16 = "AAECAwQFBgcICQoLDA0ODw"                      // bytes 0..15
   not base64, `token` of 15 bytes or padded (`...Dw==`), `port` 0 / 65536 /
   non-numeric, empty or missing `id`, any fragment, any duplicated key.
 
-### Dart migration note
-
-The current app-side `SyncPairing` (`app/lib/src/sync.dart`) uses a
-different, incompatible shape (`token` as hex, `key` instead of `pub`, no
-`id`/`port`). It MUST be replaced with this contract before F9 ships: parse
-with the rules above, render the QR from `POST /v1/pairing/start`
-`qr_payload` verbatim (the daemon is the only key generator — the UI MUST
-NOT invent key material), and never log the payload.
-
 ## 2. mDNS discovery
 
 - Service type: `_sora-sync._tcp` (both advertise and browse).
@@ -100,3 +91,53 @@ NOT invent key material), and never log the payload.
   the whole install lifetime and there is no refresh flow; expiry would
   only create lockouts, not security (localhost + `0600` is the boundary).
 - The token MUST NOT appear in logs, QR payloads, or diagnostics bundles.
+
+## 4. Document kinds
+
+The daemon stores opaque blobs; the kinds below are the contract the app
+(`app/lib/src/sync_docs.dart`) implements. `name` is fixed per kind
+(`list` for collections, `main` for singletons) so last-write-wins applies
+to the whole set at once.
+
+| Kind | Name | Payload (JSON, UTF-8) | Merge when applying |
+|---|---|---|---|
+| `subscriptions` | `list` | `{"v":1,"items":[{"name","url","auto_update","user_agent","update_interval_seconds"}]}` | Additive by URL: missing subscriptions are added, present ones renamed; **deletions do not propagate**. The device-local subscription id is intentionally absent from the payload (the core assigns ids per device) so identical states hash identically and converge |
+| `app_settings` | `main` | `{"<key>":{"t":"s"\|"b"\|"i"\|"sl","v":<value>}}` for the keys in `Settings.syncableSettingsKeys` | Per-key merge; keys absent from the doc are left alone |
+| `overrides` | `main` | Raw `subscriptionOverrides` JSON | Whole-value replace |
+| `profiles` | `main` | Raw `networkProfiles` JSON | Whole-value replace |
+| `chains` | `main` | Raw `proxyChains` JSON | Whole-value replace |
+| `obfs` | `main` | Raw `obfs` JSON (traffic obfuscation suite) | Whole-value replace |
+
+Rules:
+
+- The app publishes (`PUT /v1/documents/{kind}/{name}`) a fresh snapshot
+  before every peer sync and debounced after subscription/server changes.
+  It skips the PUT when the daemon's stored hash already matches, so an
+  unchanged snapshot does not churn `updated_at` and does not ping-pong
+  between devices.
+- After a sync the app applies exactly the `pulled` metas: `GET` each
+  document and merge it per the table above. Unknown kinds are ignored
+  (forward compatibility).
+- Bearer material: `subscriptions.url` and custom-server credentials are
+  the user's own secrets, synced only between their own paired devices.
+  They travel exclusively inside the Noise-encrypted channel and rest in
+  the daemon data dir at `0600` — the same OS-user boundary as the core's
+  own store. They never appear in logs, QR payloads, or diagnostics
+  bundles.
+- NOT synced: daemon-owned state (device identity, peers), server lists
+  derived from subscriptions (recomputed from the synced subscriptions),
+  custom servers — the core never returns their credentials
+  (`ListCustomServers` exposes `HasCredentials` only, by design), so the
+  app cannot republish them and syncing credential-less copies would
+  create broken servers on the peer — device-local settings
+  (`installUuid`, the update machinery, the crash-recovery marker, the
+  system-proxy snapshot), notification history, and anything else the
+  core keeps that the app cannot read back honestly.
+
+## 5. Platform availability
+
+- Desktop (Linux/Windows): the app spawns `sora-sync` on demand; the sync
+  screen is fully functional.
+- Android: not supported — the app cannot spawn the Go binary as a child
+  process, so the sync screen reports "unavailable" honestly instead of
+  faking anything. No cloud relay is planned: F9 is LAN-only by design.
