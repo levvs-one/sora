@@ -88,16 +88,37 @@ func (e *maskedError) Error() string { return e.Redactor.String(e.cause.Error())
 func (e *maskedError) Unwrap() error { return e.cause }
 
 var (
-	uuidPattern     = regexp.MustCompile(`(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`)
-	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|preshared[_-]?key|pre-shared-key|obfs[_-]?password|psk|public[_-]?key|short[_-]?id|spider[_-]?x)\b([=: ]+)(\S+)`)
-	userInfoPattern = regexp.MustCompile(`(?i)\b(https?|socks5|vless|vmess|trojan|ss|hysteria2|hy2|tuic|wireguard|wg)://[^/\s@]+@`)
+	uuidPattern = regexp.MustCompile(`(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`)
+	// keyValuePattern masks credential pairs. Keys cover the naming
+	// styles configs use (kebab, snake, camel); the separator tolerates
+	// JSON quoting with or without spaces, and the value tolerates
+	// quoting so a quoted phrase is masked whole: without the quoted
+	// alternation, token: "my secret value" would mask only "my and
+	// leave 'secret value"' in the log. Hosts stay readable: only the
+	// pair is masked.
+	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|preshared[_-]?key|pre-shared-key|obfs[_-]?password|obfs[_-]?param|api[_-]?key|auth(?:[_-]?str)?|secret[_-]?key|client[_-]?secret|psk|public[_-]?key|short[_-]?id|spider[_-]?x|username)\b([\"']?\s*[:=]\s*[\"']?|\s+)("[^"]*"|'[^']*'|\S+)`)
+	// strictKeyValuePattern masks short generic credential keys only with
+	// an explicit assignment: a bare space after "user" or "login" is
+	// usually prose ("user agent", "login failed"), not a credential pair.
+	strictKeyValuePattern = regexp.MustCompile(`(?i)\b(user|login)\b([\"']?\s*[:=]\s*[\"']?)("[^"]*"|'[^']*'|\S+)`)
+	// userInfoPattern masks the credentials of proxy links for every
+	// protocol the core parses. The password half is optional:
+	// trojan://token@host, hysteria2://secret@host and vless://id@host
+	// carry a single token. The host stays readable for diagnosis.
+	userInfoPattern = regexp.MustCompile(`(?i)\b(https?|socks5?h?|socks4a?|ssr?|vless|vmess|trojan|hysteria2?|hy2|tuic|wireguard|wg|naive|snell)://[^/\s@]+@`)
+	// tokenLinkPattern masks schemeless-credential links whose secret is a
+	// bare token with no userinfo, such as vmess://base64json. The
+	// fragment stays readable: it is the user's display name.
+	tokenLinkPattern = regexp.MustCompile(`(?i)\b(vmess|ssr)://[A-Za-z0-9+/_=-]+`)
 )
 
 // maskPatterns masks identifiers, credential pairs, and URL credentials whose
 // exact values are unknown.
 func maskPatterns(s string) string {
 	s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
+	s = tokenLinkPattern.ReplaceAllString(s, "${1}://[masked]")
 	s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+	s = strictKeyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
 	s = uuidPattern.ReplaceAllString(s, "[masked]")
 	return s
 }
