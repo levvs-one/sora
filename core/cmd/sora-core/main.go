@@ -295,13 +295,7 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		if b, err := probe.NewBenchmarker(probe.BenchmarkerConfig{
 			NewEngine: app.engines.Factory(),
 			SelectKind: func(o engine.Outbound) (engine.Kind, error) {
-				sel, err := engine.SelectEngine(
-					&engine.Plan{Outbounds: []engine.Outbound{o}},
-					app.engines.Availability(), nil)
-				if err != nil {
-					return "", err
-				}
-				return sel.Kind, nil
+				return benchmarkSelectKind(app.engines.Availability(), o)
 			},
 		}); err != nil {
 			_ = store.Close()
@@ -411,6 +405,22 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	app.extSched = extSched
 	built = true
 	return app, nil
+}
+
+// benchmarkSelectKind picks the engine that carries one benchmarked
+// outbound. The preference must be explicit: SelectEngine iterates the
+// given order, so a nil order tries no engine at all and every server
+// fails with ErrNoEngine — the wiring passed nil until the integration
+// E2E caught it (WAVE-INTEGRATION), which left BenchmarkServers dead
+// against a real core while unit tests around it stayed green.
+func benchmarkSelectKind(availability []engine.Availability, o engine.Outbound) (engine.Kind, error) {
+	sel, err := engine.SelectEngine(
+		&engine.Plan{Outbounds: []engine.Outbound{o}},
+		availability, engine.DefaultPreference)
+	if err != nil {
+		return "", err
+	}
+	return sel.Kind, nil
 }
 
 // mountControlServices registers every gRPC service the core exposes on

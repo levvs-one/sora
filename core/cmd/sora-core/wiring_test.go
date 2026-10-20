@@ -95,3 +95,33 @@ func TestAllProtoServicesMounted(t *testing.T) {
 		}
 	}
 }
+
+// TestBenchmarkSelectKindPicksACarryingEngine pins the benchmarker's
+// engine selection. The production wiring once passed a nil preference
+// to SelectEngine, which iterates the given order — so it tried no
+// engine at all and BenchmarkServers answered ErrNoEngine for every
+// server against a real core (WAVE-INTEGRATION E2E). The selection must
+// pick the first DefaultPreference engine that carries the outbound.
+func TestBenchmarkSelectKindPicksACarryingEngine(t *testing.T) {
+	availability := []engine.Availability{
+		{Kind: engine.KindSingBox, Usable: true, Version: engine.Version{Major: 1, Minor: 14, Patch: 3}},
+		{Kind: engine.KindXray, Usable: true, Version: engine.Version{Major: 26, Minor: 3, Patch: 27}},
+		{Kind: engine.KindMihomo, Usable: true, Version: engine.Version{Major: 1, Minor: 19, Patch: 32}},
+	}
+	kind, err := benchmarkSelectKind(availability, engine.Outbound{
+		ID: "srv-1", Protocol: engine.ProtocolVLESS, Server: "192.0.2.10", Port: 443,
+		UUID: "11111111-2222-3333-4444-555555555555",
+	})
+	if err != nil {
+		t.Fatalf("benchmarkSelectKind: %v", err)
+	}
+	if kind != engine.KindSingBox {
+		t.Fatalf("kind = %s, want the first carrying engine of DefaultPreference (sing-box)", kind)
+	}
+	if _, err := benchmarkSelectKind(nil, engine.Outbound{
+		ID: "srv-2", Protocol: engine.ProtocolVLESS, Server: "192.0.2.10", Port: 443,
+		UUID: "11111111-2222-3333-4444-555555555555",
+	}); err == nil {
+		t.Fatal("with no usable engines the selection must fail, not invent one")
+	}
+}
