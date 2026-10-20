@@ -59,6 +59,7 @@ func (b *subscriptionBook) subscriptionsOf(serverID string) []string {
 	}
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	b.ensureListsLocked()
 	var out []string
 	for id, list := range b.lists {
 		for _, ob := range list {

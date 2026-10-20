@@ -121,10 +121,18 @@ type subscriptionBook struct {
 	// overrides reapplies user edits after every refresh.
 	overrides *subscription.OverrideStore
 
-	mu       sync.Mutex
-	records  map[string]*subscriptionRecord
-	lists    map[string][]*corev1.OutboundSpec
-	updating map[string]bool
+	mu      sync.Mutex
+	records map[string]*subscriptionRecord
+	lists   map[string][]*corev1.OutboundSpec
+	// pendingLists marks records whose stored server list has not been
+	// parsed yet. Lists are parsed lazily on first use (listLocked):
+	// proto-unmarshalling every subscription's servers dominated
+	// control-plane construction for large catalogues, and nothing
+	// needs a list before the first state snapshot, refresh, or server
+	// lookup. A failed parse yields a nil list, exactly as the eager
+	// load did, so deferring it changes no observable behaviour.
+	pendingLists map[string]bool
+	updating     map[string]bool
 	// expedited holds pending expedited refreshes (T042): subscription id
 	// -> request time, cleared when the refresh runs. expediteLast holds
 	// the last request time for the cooldown. Both are in-memory only; a
@@ -132,30 +140,33 @@ type subscriptionBook struct {
 	// conservative choice.
 	expedited    map[string]time.Time
 	expediteLast map[string]time.Time
-	watchers map[chan *corev1.SubscriptionState]struct{}
-	wake     chan struct{}
+	watchers     map[chan *corev1.SubscriptionState]struct{}
+	wake         chan struct{}
 }
 
 func newSubscriptionBook(srv *Server) *subscriptionBook {
 	b := &subscriptionBook{
-		srv:       srv,
-		backoff:   engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
-		now:       time.Now,
-		overrides: subscription.NewOverrideStore(srv.dataDir),
-		records:   map[string]*subscriptionRecord{},
-		lists:     map[string][]*corev1.OutboundSpec{},
-		updating:  map[string]bool{},
-		expedited: map[string]time.Time{},
+		srv:          srv,
+		backoff:      engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
+		now:          time.Now,
+		overrides:    subscription.NewOverrideStore(srv.dataDir),
+		records:      map[string]*subscriptionRecord{},
+		lists:        map[string][]*corev1.OutboundSpec{},
+		pendingLists: map[string]bool{},
+		updating:     map[string]bool{},
+		expedited:    map[string]time.Time{},
 		expediteLast: map[string]time.Time{},
-		watchers:  map[chan *corev1.SubscriptionState]struct{}{},
-		wake:      make(chan struct{}, 1),
+		watchers:     map[chan *corev1.SubscriptionState]struct{}{},
+		wake:         make(chan struct{}, 1),
 	}
 	b.load()
 	return b
 }
 
-// load reads every stored subscription. A record this core cannot read is
-// left in the vault untouched, so a downgrade does not destroy it.
+// load reads every stored subscription record. A record this core cannot
+// read is left in the vault untouched, so a downgrade does not destroy it.
+// Server lists are not parsed here; they load lazily per subscription
+// (pendingLists), so startup cost stays flat in stored server count.
 func (b *subscriptionBook) load() {
 	if b.srv.secrets == nil {
 		return
@@ -173,7 +184,7 @@ func (b *subscriptionBook) load() {
 			continue
 		}
 		b.records[rec.ID] = rec
-		b.lists[rec.ID] = b.loadList(rec)
+		b.pendingLists[rec.ID] = true
 	}
 }
 
@@ -191,6 +202,25 @@ func (b *subscriptionBook) loadList(rec *subscriptionRecord) []*corev1.OutboundS
 		return nil
 	}
 	return list.GetOutbounds()
+}
+
+// listLocked returns the stored server list for id, parsing it from the
+// vault on first demand. Callers must hold b.mu.
+func (b *subscriptionBook) listLocked(id string) []*corev1.OutboundSpec {
+	if b.pendingLists[id] {
+		delete(b.pendingLists, id)
+		b.lists[id] = b.loadList(b.records[id])
+	}
+	return b.lists[id]
+}
+
+// ensureListsLocked parses every pending list. Callers must hold b.mu.
+// It exists for the reverse lookup in subscriptionsOf, which by nature
+// scans all lists.
+func (b *subscriptionBook) ensureListsLocked() {
+	for id := range b.pendingLists {
+		_ = b.listLocked(id)
+	}
 }
 
 func newSubscriptionID() (string, error) {
@@ -338,6 +368,7 @@ func (b *subscriptionBook) delete(id string) error {
 	}
 	delete(b.records, id)
 	delete(b.lists, id)
+	delete(b.pendingLists, id)
 	b.notifyLocked(&corev1.SubscriptionState{Settings: &corev1.SubscriptionSettings{Id: id}, Deleted: true}, logs.LevelInfo, "Subscription removed")
 	return nil
 }
@@ -458,6 +489,7 @@ func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subsc
 	}
 	*rec = updated
 	b.lists[rec.ID] = list.GetOutbounds()
+	delete(b.pendingLists, rec.ID)
 	return nil
 }
 
@@ -630,7 +662,7 @@ func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 	state := &corev1.SubscriptionState{
 		Settings:    settings,
 		Info:        subscriptionInfoToWire(rec.Info),
-		Outbounds:   withCustomOutbounds(b, b.lists[id], b.loadOverride(id)),
+		Outbounds:   withCustomOutbounds(b, b.listLocked(id), b.loadOverride(id)),
 		Updating:    b.updating[id],
 		DisplayName: displayName(rec),
 	}
