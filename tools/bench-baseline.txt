@@ -1,14 +1,14 @@
 # bench-baseline.txt — allocation baseline for tools/bench-baseline.sh.
 # Columns: <package> <benchmark> <B/op> <allocs/op>  (min over -count=3, -benchtime=100x; core/cmd/sora-core at 20x).
 # ns/op is intentionally NOT recorded: it is wall-clock noise on shared runners; B/op and allocs/op are exact allocator counters.
-# Captured: 2026-10-20T09:49:07Z  commit: cad60ae1f91e265340d7b9f80cf40c0841eec973  go: go version go1.24.7 linux/amd64
+# Captured: 2026-10-20T10:02:00Z  commit: 56cddb88dcaab80c1bda5c7d4d7465e54c5d71e0  go: go version go1.24.7 linux/amd64
 # Re-capture only via: tools/bench-baseline.sh --update  (then review every raised number).
 core/censor BenchmarkDetectJournal256 618 6
 core/censor BenchmarkDetectSmall 400 6
 core/censor BenchmarkHandshakeLimiterAcquireRelease 19 1
 core/censor BenchmarkHandshakeLimiterAcquireReleaseMixedCase 35 2
 core/censor BenchmarkHandshakeLimiterInFlight 0 0
-core/cmd/sora-core BenchmarkNewCold 221331 968
+core/cmd/sora-core BenchmarkNewCold 245632 968
 core/cmd/sora-core BenchmarkNewWarmPopulated 840510 1428
 core/control BenchmarkBandwidthStream1000Events 131576 1013
 core/control BenchmarkCredentialRoundTrip 2266 19
@@ -37,7 +37,7 @@ core/engine/singbox BenchmarkRenderLargePlan 209336 4719
 core/engine/singbox BenchmarkRenderVLESSRealityMux 17842 402
 core/engine/singbox BenchmarkRenderVersionedTun 18786 427
 core/engine/singbox BenchmarkVersionLess 0 0
-core/engine/tunroute BenchmarkCleanupNoStaleState 161117 345
+core/engine/tunroute BenchmarkCleanupNoStaleState 180461 345
 core/engine/xray BenchmarkBuildCapabilities 0 0
 core/engine/xray BenchmarkParseLogPlain 0 0
 core/engine/xray BenchmarkParseLogTrace 0 0
