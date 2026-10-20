@@ -396,6 +396,10 @@ func (r *renderer) xhttpDownloadSettings(o engine.Outbound) (obj, error) {
 		// separate downlink is contradictory; stream-up is the two-leg mode.
 		return nil, fmt.Errorf("xray: outbound %s: XHTTP downloadSettings is incompatible with mode stream-one (use stream-up)", o.ID)
 	}
+	fp, err := r.xhttpDownlinkFingerprint(o)
+	if err != nil {
+		return nil, err
+	}
 	ds := obj{"address": t.DownloadAddress, "port": int(t.DownloadPort), "network": "xhttp"}.
 		set("xhttpSettings", obj{}.set("path", t.Path))
 	switch {
@@ -403,14 +407,47 @@ func (r *renderer) xhttpDownloadSettings(o engine.Outbound) (obj, error) {
 		ds["security"] = "reality"
 		ds["realitySettings"] = obj{
 			"serverName": t.DownloadAddress, "publicKey": o.TLS.RealityPublicKey,
-			"fingerprint": r.realityFingerprint(o),
+			"fingerprint": fp,
 		}.set("shortId", o.TLS.RealityShortID).set("spiderX", orDefault(o.TLS.SpiderX, "/")) // "/" is the documented safe default path
 	case o.TLS.Enabled || o.Protocol == engine.ProtocolTrojan:
 		ds["security"] = "tls"
 		ds["tlsSettings"] = obj{"serverName": t.DownloadAddress}.
-			set("alpn", o.TLS.ALPN).set("fingerprint", engine.NormalizeFingerprint(o.TLS.Fingerprint))
+			set("alpn", o.TLS.ALPN).set("fingerprint", fp)
 	}
 	return ds, nil
+}
+
+// xhttpDownlinkFingerprint resolves the uTLS fingerprint for the XHTTP
+// downlink detour so it can never silently diverge from the uplink: the
+// plan's explicit fingerprint (normalized) wins, then the outbound's own
+// probe-discovered hint. Unlike the main stream's reality fingerprint —
+// which falls back to the canonical auto default — the downlink refuses an
+// empty or Xray-unknown fingerprint with an honest render error. The
+// downlink dials a different server than the uplink, so a silent default
+// (or a name Xray would reject at startup) would put a different — or
+// broken — ClientHello on the wire: exactly the fingerprint-mismatch
+// detect signal this resolution exists to prevent. To use the auto parrot,
+// spell it out in the plan ("hellochrome_auto").
+func (r *renderer) xhttpDownlinkFingerprint(o engine.Outbound) (string, error) {
+	fp := engine.NormalizeFingerprint(o.TLS.Fingerprint)
+	if fp == "" {
+		fp = engine.NormalizeFingerprint(r.fpHints[o.ID])
+	}
+	if fp == "" {
+		return "", fmt.Errorf("xray: outbound %s: XHTTP downloadSettings needs an explicit uTLS fingerprint (plan TLS.Fingerprint): refusing to silently default the downlink parrot", o.ID)
+	}
+	if !xrayAcceptsFingerprint(fp) {
+		return "", fmt.Errorf("xray: outbound %s: XHTTP downloadSettings fingerprint %q is not accepted by Xray", o.ID, fp)
+	}
+	return fp, nil
+}
+
+// xrayAcceptsFingerprint reports whether Xray understands the fingerprint
+// name: the engine-union aliases ("chrome", "firefox", ...), the randomized
+// variants, or an Xray versioned/auto parrot ("hellochrome_155",
+// "hellochrome_auto", ...).
+func xrayAcceptsFingerprint(fp string) bool {
+	return engine.IsKnownFingerprint(fp) || engine.IsRandomizedFingerprint(fp) || engine.IsVersionedParrot(fp)
 }
 
 func (*renderer) hysteria(o engine.Outbound, tag string) obj {

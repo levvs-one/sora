@@ -280,6 +280,129 @@ func TestRenderRefusesBrokenXHTTPDownloadSettings(t *testing.T) {
 	}
 }
 
+// xhttpPlanWithFingerprint builds an XHTTP plan with a download detour and
+// the given plan fingerprint; tlsOnly switches the security from REALITY
+// to plain TLS so both downlink branches are covered.
+func xhttpPlanWithFingerprint(fp string, tlsOnly bool) *engine.Plan {
+	p := xhttpVLESS()
+	o := &p.Outbounds[0]
+	if tlsOnly {
+		o.TLS.Reality = false
+		o.TLS.Enabled = true
+		o.TLS.ServerName = "up.example.com"
+	}
+	o.TLS.Fingerprint = fp
+	return p
+}
+
+// xhttpFingerprints extracts the uTLS fingerprints of the uplink stream and
+// the downloadSettings downlink from a rendered config.
+func xhttpFingerprints(t *testing.T, raw []byte) (uplink, downlink string) {
+	t.Helper()
+	var cfg struct {
+		Outbounds []struct {
+			StreamSettings struct {
+				RealitySettings struct {
+					Fingerprint string `json:"fingerprint"`
+				} `json:"realitySettings"`
+				TLSSettings struct {
+					Fingerprint string `json:"fingerprint"`
+				} `json:"tlsSettings"`
+				XHTTP struct {
+					Download struct {
+						RealitySettings struct {
+							Fingerprint string `json:"fingerprint"`
+						} `json:"realitySettings"`
+						TLSSettings struct {
+							Fingerprint string `json:"fingerprint"`
+						} `json:"tlsSettings"`
+					} `json:"downloadSettings"`
+				} `json:"xhttpSettings"`
+			} `json:"streamSettings"`
+		} `json:"outbounds"`
+	}
+	if err := json.Unmarshal(raw, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	if len(cfg.Outbounds) == 0 {
+		t.Fatal("rendered config has no outbounds")
+	}
+	s := cfg.Outbounds[0].StreamSettings
+	uplink = s.RealitySettings.Fingerprint
+	if uplink == "" {
+		uplink = s.TLSSettings.Fingerprint
+	}
+	d := s.XHTTP.Download
+	downlink = d.RealitySettings.Fingerprint
+	if downlink == "" {
+		downlink = d.TLSSettings.Fingerprint
+	}
+	return uplink, downlink
+}
+
+func TestRenderXHTTPDownloadFingerprintMirrorsUplink(t *testing.T) {
+	// The downlink must carry exactly the uplink's fingerprint: any
+	// divergence between the two ClientHellos of one config is a detect
+	// signal. The pinned "chrome" alias renders as-is (explicit is
+	// explicit); hellochrome_auto and versioned parrots must pass through.
+	cases := map[string]string{
+		"pinned chrome alias": "chrome",
+		"auto parrot":         "hellochrome_auto",
+		"explicit versioned":  "hellochrome_155",
+		"case-insensitive":    " HelloChrome_Auto ",
+	}
+	for _, tlsOnly := range []bool{false, true} {
+		for name, fp := range cases {
+			raw, err := Render(xhttpPlanWithFingerprint(fp, tlsOnly), testRuntime, nil)
+			if err != nil {
+				t.Fatalf("%s (tlsOnly=%v): must render, got %v", name, tlsOnly, err)
+			}
+			up, down := xhttpFingerprints(t, raw)
+			want := engine.NormalizeFingerprint(fp)
+			if up != want || down != want {
+				t.Errorf("%s (tlsOnly=%v): uplink=%q downlink=%q, want both %q", name, tlsOnly, up, down, want)
+			}
+		}
+	}
+}
+
+func TestRenderXHTTPDownloadFingerprintProbeHintInherited(t *testing.T) {
+	// With no explicit plan fingerprint, the downlink inherits the
+	// outbound's own probe-discovered hint — the same source the uplink
+	// reality fingerprint resolves from — so the two legs stay identical.
+	p := xhttpPlanWithFingerprint("", false)
+	raw, err := render(p, testRuntime, nil, map[string]string{p.Outbounds[0].ID: "firefox"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	up, down := xhttpFingerprints(t, raw)
+	if down != "firefox" {
+		t.Errorf("downlink fingerprint = %q, want the probe hint %q", down, "firefox")
+	}
+	if up != down {
+		t.Errorf("uplink=%q downlink=%q: the two legs must not diverge", up, down)
+	}
+}
+
+func TestRenderXHTTPDownloadFingerprintRefused(t *testing.T) {
+	// Empty or Xray-unknown fingerprints must fail at render time with a
+	// named error — never a silent default or a name Xray would reject at
+	// startup.
+	cases := map[string]string{
+		"empty":               "",
+		"whitespace":          "   ",
+		"unknown fingerprint": "not-a-parrot",
+		"typo of chrome":      "chorme",
+	}
+	for _, tlsOnly := range []bool{false, true} {
+		for name, fp := range cases {
+			if _, err := Render(xhttpPlanWithFingerprint(fp, tlsOnly), testRuntime, nil); err == nil {
+				t.Errorf("%s (tlsOnly=%v): must be refused, not silently rendered", name, tlsOnly)
+			}
+		}
+	}
+}
+
 func TestRenderRefusesIncompatibleTransportPairs(t *testing.T) {
 	// REALITY is documented as unsupported with websocket and httpupgrade;
 	// XTLS Vision only under TCP+TLS/REALITY.
