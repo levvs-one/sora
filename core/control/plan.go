@@ -185,6 +185,14 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 	doc.field("upmbps", spec.Options["upmbps"])
 	doc.field("user", spec.User)
 	doc.field("uuid", spec.UUID)
+	// XHTTP padding range and xmux reuse tuning from the link's
+	// extra= JSON (CENSOR-P1), travelling like the download split
+	// above; restored by applyCredential into engine.Transport.
+	doc.field("x_padding_bytes", spec.XPaddingBytes)
+	doc.field("xmux_max_concurrency", strconv.Itoa(spec.XmuxMaxConcurrency))
+	doc.field("xmux_max_connections", strconv.Itoa(spec.XmuxMaxConnections))
+	doc.field("xmux_max_request_times", strconv.Itoa(spec.XmuxMaxRequestTimes))
+	doc.field("xmux_max_reuse_times", strconv.Itoa(spec.XmuxMaxReuseTimes))
 	doc.field("xray_profile", profile)
 	doc.buf = append(doc.buf, '}')
 	return doc.buf, nil
@@ -767,6 +775,14 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	if port := atoiNonNegative(values["download_port"]); port <= 65535 {
 		outbound.Transport.DownloadPort = uint16(port)
 	}
+	// XHTTP padding and xmux tuning from the same extra= data
+	// (CENSOR-P1); atoiNonNegative keeps a forged document from
+	// smuggling negative tuning into the plan.
+	outbound.Transport.XPaddingBytes = values["x_padding_bytes"]
+	outbound.Transport.XmuxMaxConcurrency = atoiNonNegative(values["xmux_max_concurrency"])
+	outbound.Transport.XmuxMaxConnections = atoiNonNegative(values["xmux_max_connections"])
+	outbound.Transport.XmuxMaxRequestTimes = atoiNonNegative(values["xmux_max_request_times"])
+	outbound.Transport.XmuxMaxReuseTimes = atoiNonNegative(values["xmux_max_reuse_times"])
 	outbound.PrivateKey = values["private_key"]
 	if addresses := values["addresses"]; addresses != "" {
 		outbound.Addresses = strings.Split(addresses, ",")
