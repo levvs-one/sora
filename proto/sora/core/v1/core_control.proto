@@ -688,6 +688,72 @@ message BypassStrategy {
   bool host_case = 5;
   bool domain_case = 6;
   bool method_eol = 7;
+  // Limits disorder to one protocol: "" (both), "http" or "tls".
+  // Needs disorder.
+  string disorder_scope = 8;
+  // Limits the out-of-band byte to one protocol: "" (both), "http" or
+  // "tls". Needs oob.
+  string oob_scope = 9;
+  // Adds "." after the Host: name.
+  bool host_dot = 10;
+  // Reshapes the space after Host: with a tab.
+  bool host_tab = 11;
+  // Removes the space after Host:.
+  bool host_no_space = 12;
+  // Adds an extra space after the HTTP method.
+  bool method_space = 13;
+  // Replaces CRLF with LF in plain HTTP requests.
+  bool unix_eol = 14;
+  // Splits every protocol, not only HTTP and TLS.
+  bool split_any_protocol = 15;
+  // Limits handshake shaping to outbound stream positions at or after
+  // this point ("--tamper-start"). Same position syntax as split_pos,
+  // with an optional leading "n" selecting a data block number instead
+  // of a byte offset.
+  string tamper_start = 16;
+  // Stops shaping after this point ("--tamper-cutoff"). Same position
+  // syntax as tamper_start.
+  string tamper_cutoff = 17;
+  // Overrides the default 0x00 out-of-band byte: one character or 0xHEX
+  // ("--oob-data"). Needs oob.
+  string oob_data = 18;
+  // Clamps the TCP maximum segment size ("--mss"), a plain byte count.
+  string mss = 19;
+  // nfqws --dpi-desync methods in order, e.g. "fake", "split2",
+  // "disorder2", "multisplit". Any entry selects the nfqws backend;
+  // empty keeps the legacy tpws-compatible fields above.
+  repeated string desync = 20;
+  // Fake payload for the fake desync method: "tls" keeps zapret's
+  // built-in, anything else is a file name under the zapret home
+  // directory.
+  string fake_tls = 21;
+  // Fake payload for QUIC: like fake_tls, but QUIC has no built-in
+  // fake, so this should name a file. Needs filter_udp covering 443.
+  string fake_quic = 22;
+  // Degrades the fake/disorder packet so the censor's stack drops it
+  // while the real server tolerates it: "badseq", "badack", "md5sig",
+  // "ts", "badsum", "datanoack". Needs desync.
+  string fooling = 23;
+  // Fixes the fake packet TTL so it dies before the server
+  // (nfqws --dpi-desync-ttl). Mutually exclusive with auto_ttl.
+  // Needs desync.
+  int32 ttl = 24;
+  // Derives the fake packet TTL from the path instead
+  // (nfqws --dpi-desync-autottl). Mutually exclusive with ttl.
+  // Needs desync.
+  bool auto_ttl = 25;
+  // Duplicates the fake injection (nfqws --dpi-desync-repeats).
+  // Needs desync.
+  int32 repeats = 26;
+  // Intercepted TCP ports, e.g. "80,443". Empty leaves the backend
+  // default in place.
+  string filter_tcp = 27;
+  // Intercepted UDP ports, e.g. "443". UDP/QUIC desync needs this.
+  // Empty leaves the backend default in place.
+  string filter_udp = 28;
+  // Limits desync to application layers, e.g. "tls,quic". Empty
+  // leaves the backend default in place.
+  string filter_l7 = 29;
 }
 
 // Since 1.8. One DNS leak check. label and fix_hint are localization keys

@@ -328,4 +328,74 @@ void main() {
           'BenchmarkServersRequest.url');
     });
   });
+
+  group('BypassStrategy full field set (contract: 29 fields)', () {
+    test('BypassStrategy tags 8-29', () {
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).disorderScope = 'tls', 8, 2,
+          'BypassStrategy.disorder_scope');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).oobScope = 'http', 9, 2,
+          'BypassStrategy.oob_scope');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).hostDot = true, 10, 0,
+          'BypassStrategy.host_dot');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).hostTab = true, 11, 0,
+          'BypassStrategy.host_tab');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).hostNoSpace = true, 12, 0,
+          'BypassStrategy.host_no_space');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).methodSpace = true, 13, 0,
+          'BypassStrategy.method_space');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).unixEol = true, 14, 0,
+          'BypassStrategy.unix_eol');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).splitAnyProtocol = true, 15, 0,
+          'BypassStrategy.split_any_protocol');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).tamperStart = 'n1', 16, 2,
+          'BypassStrategy.tamper_start');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).tamperCutoff = '10', 17, 2,
+          'BypassStrategy.tamper_cutoff');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).oobData = '0x41', 18, 2,
+          'BypassStrategy.oob_data');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).mss = '1200', 19, 2,
+          'BypassStrategy.mss');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).desync.add('fake'), 20, 2,
+          'BypassStrategy.desync');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).fakeTls = 'tls', 21, 2,
+          'BypassStrategy.fake_tls');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).fakeQuic = 'quic.bin', 22, 2,
+          'BypassStrategy.fake_quic');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).fooling = 'badseq', 23, 2,
+          'BypassStrategy.fooling');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).ttl = 8, 24, 0, 'BypassStrategy.ttl');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).autoTtl = true, 25, 0,
+          'BypassStrategy.auto_ttl');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).repeats = 3, 26, 0,
+          'BypassStrategy.repeats');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).filterTcp = '80,443', 27, 2,
+          'BypassStrategy.filter_tcp');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).filterUdp = '443', 28, 2,
+          'BypassStrategy.filter_udp');
+      expectFirstTag(() => BypassStrategy(), (m) => (m as BypassStrategy).filterL7 = 'tls,quic', 29, 2,
+          'BypassStrategy.filter_l7');
+    });
+    test('BypassStrategy new fields round-trip', () {
+      final strategy = BypassStrategy()
+        ..disorderScope = 'tls'
+        ..hostDot = true
+        ..tamperStart = 'n1'
+        ..desync.addAll(['fake', 'split2'])
+        ..fakeQuic = 'quic.bin'
+        ..ttl = 8
+        ..autoTtl = true
+        ..repeats = 3
+        ..filterL7 = 'tls,quic';
+      final back = BypassStrategy.fromBuffer(strategy.writeToBuffer());
+      expect(back.disorderScope, 'tls');
+      expect(back.hostDot, isTrue);
+      expect(back.tamperStart, 'n1');
+      expect(back.desync, ['fake', 'split2']);
+      expect(back.fakeQuic, 'quic.bin');
+      expect(back.ttl, 8);
+      expect(back.autoTtl, isTrue);
+      expect(back.repeats, 3);
+      expect(back.filterL7, 'tls,quic');
+    });
+  });
 }

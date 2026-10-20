@@ -6951,9 +6951,75 @@ type BypassStrategy struct {
 	// Splits the TLS ClientHello into two records at this position.
 	TlsRecord string `protobuf:"bytes,4,opt,name=tls_record,json=tlsRecord,proto3" json:"tls_record,omitempty"`
 	// Reshape plain HTTP requests.
-	HostCase      bool `protobuf:"varint,5,opt,name=host_case,json=hostCase,proto3" json:"host_case,omitempty"`
-	DomainCase    bool `protobuf:"varint,6,opt,name=domain_case,json=domainCase,proto3" json:"domain_case,omitempty"`
-	MethodEol     bool `protobuf:"varint,7,opt,name=method_eol,json=methodEol,proto3" json:"method_eol,omitempty"`
+	HostCase   bool `protobuf:"varint,5,opt,name=host_case,json=hostCase,proto3" json:"host_case,omitempty"`
+	DomainCase bool `protobuf:"varint,6,opt,name=domain_case,json=domainCase,proto3" json:"domain_case,omitempty"`
+	MethodEol  bool `protobuf:"varint,7,opt,name=method_eol,json=methodEol,proto3" json:"method_eol,omitempty"`
+	// Limits disorder to one protocol: "" (both), "http" or "tls".
+	// Needs disorder.
+	DisorderScope string `protobuf:"bytes,8,opt,name=disorder_scope,json=disorderScope,proto3" json:"disorder_scope,omitempty"`
+	// Limits the out-of-band byte to one protocol: "" (both), "http" or
+	// "tls". Needs oob.
+	OobScope string `protobuf:"bytes,9,opt,name=oob_scope,json=oobScope,proto3" json:"oob_scope,omitempty"`
+	// Adds "." after the Host: name.
+	HostDot bool `protobuf:"varint,10,opt,name=host_dot,json=hostDot,proto3" json:"host_dot,omitempty"`
+	// Reshapes the space after Host: with a tab.
+	HostTab bool `protobuf:"varint,11,opt,name=host_tab,json=hostTab,proto3" json:"host_tab,omitempty"`
+	// Removes the space after Host:.
+	HostNoSpace bool `protobuf:"varint,12,opt,name=host_no_space,json=hostNoSpace,proto3" json:"host_no_space,omitempty"`
+	// Adds an extra space after the HTTP method.
+	MethodSpace bool `protobuf:"varint,13,opt,name=method_space,json=methodSpace,proto3" json:"method_space,omitempty"`
+	// Replaces CRLF with LF in plain HTTP requests.
+	UnixEol bool `protobuf:"varint,14,opt,name=unix_eol,json=unixEol,proto3" json:"unix_eol,omitempty"`
+	// Splits every protocol, not only HTTP and TLS.
+	SplitAnyProtocol bool `protobuf:"varint,15,opt,name=split_any_protocol,json=splitAnyProtocol,proto3" json:"split_any_protocol,omitempty"`
+	// Limits handshake shaping to outbound stream positions at or after
+	// this point ("--tamper-start"). Same position syntax as split_pos,
+	// with an optional leading "n" selecting a data block number instead
+	// of a byte offset.
+	TamperStart string `protobuf:"bytes,16,opt,name=tamper_start,json=tamperStart,proto3" json:"tamper_start,omitempty"`
+	// Stops shaping after this point ("--tamper-cutoff"). Same position
+	// syntax as tamper_start.
+	TamperCutoff string `protobuf:"bytes,17,opt,name=tamper_cutoff,json=tamperCutoff,proto3" json:"tamper_cutoff,omitempty"`
+	// Overrides the default 0x00 out-of-band byte: one character or 0xHEX
+	// ("--oob-data"). Needs oob.
+	OobData string `protobuf:"bytes,18,opt,name=oob_data,json=oobData,proto3" json:"oob_data,omitempty"`
+	// Clamps the TCP maximum segment size ("--mss"), a plain byte count.
+	Mss string `protobuf:"bytes,19,opt,name=mss,proto3" json:"mss,omitempty"`
+	// nfqws --dpi-desync methods in order, e.g. "fake", "split2",
+	// "disorder2", "multisplit". Any entry selects the nfqws backend;
+	// empty keeps the legacy tpws-compatible fields above.
+	Desync []string `protobuf:"bytes,20,rep,name=desync,proto3" json:"desync,omitempty"`
+	// Fake payload for the fake desync method: "tls" keeps zapret's
+	// built-in, anything else is a file name under the zapret home
+	// directory.
+	FakeTls string `protobuf:"bytes,21,opt,name=fake_tls,json=fakeTls,proto3" json:"fake_tls,omitempty"`
+	// Fake payload for QUIC: like fake_tls, but QUIC has no built-in
+	// fake, so this should name a file. Needs filter_udp covering 443.
+	FakeQuic string `protobuf:"bytes,22,opt,name=fake_quic,json=fakeQuic,proto3" json:"fake_quic,omitempty"`
+	// Degrades the fake/disorder packet so the censor's stack drops it
+	// while the real server tolerates it: "badseq", "badack", "md5sig",
+	// "ts", "badsum", "datanoack". Needs desync.
+	Fooling string `protobuf:"bytes,23,opt,name=fooling,proto3" json:"fooling,omitempty"`
+	// Fixes the fake packet TTL so it dies before the server
+	// (nfqws --dpi-desync-ttl). Mutually exclusive with auto_ttl.
+	// Needs desync.
+	Ttl int32 `protobuf:"varint,24,opt,name=ttl,proto3" json:"ttl,omitempty"`
+	// Derives the fake packet TTL from the path instead
+	// (nfqws --dpi-desync-autottl). Mutually exclusive with ttl.
+	// Needs desync.
+	AutoTtl bool `protobuf:"varint,25,opt,name=auto_ttl,json=autoTtl,proto3" json:"auto_ttl,omitempty"`
+	// Duplicates the fake injection (nfqws --dpi-desync-repeats).
+	// Needs desync.
+	Repeats int32 `protobuf:"varint,26,opt,name=repeats,proto3" json:"repeats,omitempty"`
+	// Intercepted TCP ports, e.g. "80,443". Empty leaves the backend
+	// default in place.
+	FilterTcp string `protobuf:"bytes,27,opt,name=filter_tcp,json=filterTcp,proto3" json:"filter_tcp,omitempty"`
+	// Intercepted UDP ports, e.g. "443". UDP/QUIC desync needs this.
+	// Empty leaves the backend default in place.
+	FilterUdp string `protobuf:"bytes,28,opt,name=filter_udp,json=filterUdp,proto3" json:"filter_udp,omitempty"`
+	// Limits desync to application layers, e.g. "tls,quic". Empty
+	// leaves the backend default in place.
+	FilterL7      string `protobuf:"bytes,29,opt,name=filter_l7,json=filterL7,proto3" json:"filter_l7,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -7035,6 +7101,160 @@ func (x *BypassStrategy) GetMethodEol() bool {
 		return x.MethodEol
 	}
 	return false
+}
+
+func (x *BypassStrategy) GetDisorderScope() string {
+	if x != nil {
+		return x.DisorderScope
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetOobScope() string {
+	if x != nil {
+		return x.OobScope
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetHostDot() bool {
+	if x != nil {
+		return x.HostDot
+	}
+	return false
+}
+
+func (x *BypassStrategy) GetHostTab() bool {
+	if x != nil {
+		return x.HostTab
+	}
+	return false
+}
+
+func (x *BypassStrategy) GetHostNoSpace() bool {
+	if x != nil {
+		return x.HostNoSpace
+	}
+	return false
+}
+
+func (x *BypassStrategy) GetMethodSpace() bool {
+	if x != nil {
+		return x.MethodSpace
+	}
+	return false
+}
+
+func (x *BypassStrategy) GetUnixEol() bool {
+	if x != nil {
+		return x.UnixEol
+	}
+	return false
+}
+
+func (x *BypassStrategy) GetSplitAnyProtocol() bool {
+	if x != nil {
+		return x.SplitAnyProtocol
+	}
+	return false
+}
+
+func (x *BypassStrategy) GetTamperStart() string {
+	if x != nil {
+		return x.TamperStart
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetTamperCutoff() string {
+	if x != nil {
+		return x.TamperCutoff
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetOobData() string {
+	if x != nil {
+		return x.OobData
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetMss() string {
+	if x != nil {
+		return x.Mss
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetDesync() []string {
+	if x != nil {
+		return x.Desync
+	}
+	return nil
+}
+
+func (x *BypassStrategy) GetFakeTls() string {
+	if x != nil {
+		return x.FakeTls
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetFakeQuic() string {
+	if x != nil {
+		return x.FakeQuic
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetFooling() string {
+	if x != nil {
+		return x.Fooling
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetTtl() int32 {
+	if x != nil {
+		return x.Ttl
+	}
+	return 0
+}
+
+func (x *BypassStrategy) GetAutoTtl() bool {
+	if x != nil {
+		return x.AutoTtl
+	}
+	return false
+}
+
+func (x *BypassStrategy) GetRepeats() int32 {
+	if x != nil {
+		return x.Repeats
+	}
+	return 0
+}
+
+func (x *BypassStrategy) GetFilterTcp() string {
+	if x != nil {
+		return x.FilterTcp
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetFilterUdp() string {
+	if x != nil {
+		return x.FilterUdp
+	}
+	return ""
+}
+
+func (x *BypassStrategy) GetFilterL7() string {
+	if x != nil {
+		return x.FilterL7
+	}
+	return ""
 }
 
 // Since 1.8. One DNS leak check. label and fix_hint are localization keys
@@ -9548,7 +9768,7 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"\x05error\x18\x02 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error\"7\n" +
 	"\rRoutingPreset\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
-	"\x06direct\x18\x02 \x03(\tR\x06direct\"\xd7\x01\n" +
+	"\x06direct\x18\x02 \x03(\tR\x06direct\"\xe2\x06\n" +
 	"\x0eBypassStrategy\x12\x1b\n" +
 	"\tsplit_pos\x18\x01 \x03(\tR\bsplitPos\x12\x1a\n" +
 	"\bdisorder\x18\x02 \x01(\bR\bdisorder\x12\x10\n" +
@@ -9559,7 +9779,32 @@ const file_sora_core_v1_core_control_proto_rawDesc = "" +
 	"\vdomain_case\x18\x06 \x01(\bR\n" +
 	"domainCase\x12\x1d\n" +
 	"\n" +
-	"method_eol\x18\a \x01(\bR\tmethodEol\"\x9b\x01\n" +
+	"method_eol\x18\a \x01(\bR\tmethodEol\x12%\n" +
+	"\x0edisorder_scope\x18\b \x01(\tR\rdisorderScope\x12\x1b\n" +
+	"\toob_scope\x18\t \x01(\tR\boobScope\x12\x19\n" +
+	"\bhost_dot\x18\n" +
+	" \x01(\bR\ahostDot\x12\x19\n" +
+	"\bhost_tab\x18\v \x01(\bR\ahostTab\x12\"\n" +
+	"\rhost_no_space\x18\f \x01(\bR\vhostNoSpace\x12!\n" +
+	"\fmethod_space\x18\r \x01(\bR\vmethodSpace\x12\x19\n" +
+	"\bunix_eol\x18\x0e \x01(\bR\aunixEol\x12,\n" +
+	"\x12split_any_protocol\x18\x0f \x01(\bR\x10splitAnyProtocol\x12!\n" +
+	"\ftamper_start\x18\x10 \x01(\tR\vtamperStart\x12#\n" +
+	"\rtamper_cutoff\x18\x11 \x01(\tR\ftamperCutoff\x12\x19\n" +
+	"\boob_data\x18\x12 \x01(\tR\aoobData\x12\x10\n" +
+	"\x03mss\x18\x13 \x01(\tR\x03mss\x12\x16\n" +
+	"\x06desync\x18\x14 \x03(\tR\x06desync\x12\x19\n" +
+	"\bfake_tls\x18\x15 \x01(\tR\afakeTls\x12\x1b\n" +
+	"\tfake_quic\x18\x16 \x01(\tR\bfakeQuic\x12\x18\n" +
+	"\afooling\x18\x17 \x01(\tR\afooling\x12\x10\n" +
+	"\x03ttl\x18\x18 \x01(\x05R\x03ttl\x12\x19\n" +
+	"\bauto_ttl\x18\x19 \x01(\bR\aautoTtl\x12\x18\n" +
+	"\arepeats\x18\x1a \x01(\x05R\arepeats\x12\x1d\n" +
+	"\n" +
+	"filter_tcp\x18\x1b \x01(\tR\tfilterTcp\x12\x1d\n" +
+	"\n" +
+	"filter_udp\x18\x1c \x01(\tR\tfilterUdp\x12\x1b\n" +
+	"\tfilter_l7\x18\x1d \x01(\tR\bfilterL7\"\x9b\x01\n" +
 	"\fDnsLeakCheck\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n" +

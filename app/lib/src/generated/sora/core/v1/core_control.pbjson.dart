@@ -1877,15 +1877,49 @@ const BypassStrategy$json = {
     {'1': 'host_case', '3': 5, '4': 1, '5': 8, '10': 'hostCase'},
     {'1': 'domain_case', '3': 6, '4': 1, '5': 8, '10': 'domainCase'},
     {'1': 'method_eol', '3': 7, '4': 1, '5': 8, '10': 'methodEol'},
+    {'1': 'disorder_scope', '3': 8, '4': 1, '5': 9, '10': 'disorderScope'},
+    {'1': 'oob_scope', '3': 9, '4': 1, '5': 9, '10': 'oobScope'},
+    {'1': 'host_dot', '3': 10, '4': 1, '5': 8, '10': 'hostDot'},
+    {'1': 'host_tab', '3': 11, '4': 1, '5': 8, '10': 'hostTab'},
+    {'1': 'host_no_space', '3': 12, '4': 1, '5': 8, '10': 'hostNoSpace'},
+    {'1': 'method_space', '3': 13, '4': 1, '5': 8, '10': 'methodSpace'},
+    {'1': 'unix_eol', '3': 14, '4': 1, '5': 8, '10': 'unixEol'},
+    {'1': 'split_any_protocol', '3': 15, '4': 1, '5': 8, '10': 'splitAnyProtocol'},
+    {'1': 'tamper_start', '3': 16, '4': 1, '5': 9, '10': 'tamperStart'},
+    {'1': 'tamper_cutoff', '3': 17, '4': 1, '5': 9, '10': 'tamperCutoff'},
+    {'1': 'oob_data', '3': 18, '4': 1, '5': 9, '10': 'oobData'},
+    {'1': 'mss', '3': 19, '4': 1, '5': 9, '10': 'mss'},
+    {'1': 'desync', '3': 20, '4': 3, '5': 9, '10': 'desync'},
+    {'1': 'fake_tls', '3': 21, '4': 1, '5': 9, '10': 'fakeTls'},
+    {'1': 'fake_quic', '3': 22, '4': 1, '5': 9, '10': 'fakeQuic'},
+    {'1': 'fooling', '3': 23, '4': 1, '5': 9, '10': 'fooling'},
+    {'1': 'ttl', '3': 24, '4': 1, '5': 5, '10': 'ttl'},
+    {'1': 'auto_ttl', '3': 25, '4': 1, '5': 8, '10': 'autoTtl'},
+    {'1': 'repeats', '3': 26, '4': 1, '5': 5, '10': 'repeats'},
+    {'1': 'filter_tcp', '3': 27, '4': 1, '5': 9, '10': 'filterTcp'},
+    {'1': 'filter_udp', '3': 28, '4': 1, '5': 9, '10': 'filterUdp'},
+    {'1': 'filter_l7', '3': 29, '4': 1, '5': 9, '10': 'filterL7'},
   ],
 };
 
 /// Descriptor for `BypassStrategy`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List bypassStrategyDescriptor =
-    $convert.base64Decode('Cg5CeXBhc3NTdHJhdGVneRIbCglzcGxpdF9wb3MYASADKAlSCHNwbGl0UG9zEhoKCGRpc29yZG'
-        'VyGAIgASgIUghkaXNvcmRlchIQCgNvb2IYAyABKAhSA29vYhIdCgp0bHNfcmVjb3JkGAQgASgJ'
-        'Ugl0bHNSZWNvcmQSGwoJaG9zdF9jYXNlGAUgASgIUghob3N0Q2FzZRIfCgtkb21haW5fY2FzZR'
-        'gGIAEoCFIKZG9tYWluQ2FzZRIdCgptZXRob2RfZW9sGAcgASgIUgltZXRob2RFb2w=');
+    $convert.base64Decode('Cg5CeXBhc3NTdHJhdGVneRIbCglzcGxpdF9wb3MYASADKAlSCHNwbGl0UG9zEhoKCGRpc29yZGVy'
+        'GAIgASgIUghkaXNvcmRlchIQCgNvb2IYAyABKAhSA29vYhIdCgp0bHNfcmVjb3JkGAQgASgJUgl0'
+        'bHNSZWNvcmQSGwoJaG9zdF9jYXNlGAUgASgIUghob3N0Q2FzZRIfCgtkb21haW5fY2FzZRgGIAEo'
+        'CFIKZG9tYWluQ2FzZRIdCgptZXRob2RfZW9sGAcgASgIUgltZXRob2RFb2wSJQoOZGlzb3JkZXJf'
+        'c2NvcGUYCCABKAlSDWRpc29yZGVyU2NvcGUSGwoJb29iX3Njb3BlGAkgASgJUghvb2JTY29wZRIZ'
+        'Cghob3N0X2RvdBgKIAEoCFIHaG9zdERvdBIZCghob3N0X3RhYhgLIAEoCFIHaG9zdFRhYhIiCg1o'
+        'b3N0X25vX3NwYWNlGAwgASgIUgtob3N0Tm9TcGFjZRIhCgxtZXRob2Rfc3BhY2UYDSABKAhSC21l'
+        'dGhvZFNwYWNlEhkKCHVuaXhfZW9sGA4gASgIUgd1bml4RW9sEiwKEnNwbGl0X2FueV9wcm90b2Nv'
+        'bBgPIAEoCFIQc3BsaXRBbnlQcm90b2NvbBIhCgx0YW1wZXJfc3RhcnQYECABKAlSC3RhbXBlclN0'
+        'YXJ0EiMKDXRhbXBlcl9jdXRvZmYYESABKAlSDHRhbXBlckN1dG9mZhIZCghvb2JfZGF0YRgSIAEo'
+        'CVIHb29iRGF0YRIQCgNtc3MYEyABKAlSA21zcxIWCgZkZXN5bmMYFCADKAlSBmRlc3luYxIZCghm'
+        'YWtlX3RscxgVIAEoCVIHZmFrZVRscxIbCglmYWtlX3F1aWMYFiABKAlSCGZha2VRdWljEhgKB2Zv'
+        'b2xpbmcYFyABKAlSB2Zvb2xpbmcSEAoDdHRsGBggASgFUgN0dGwSGQoIYXV0b190dGwYGSABKAhS'
+        'B2F1dG9UdGwSGAoHcmVwZWF0cxgaIAEoBVIHcmVwZWF0cxIdCgpmaWx0ZXJfdGNwGBsgASgJUglm'
+        'aWx0ZXJUY3ASHQoKZmlsdGVyX3VkcBgcIAEoCVIJZmlsdGVyVWRwEhsKCWZpbHRlcl9sNxgdIAEo'
+        'CVIIZmlsdGVyTDc=');
 
 const DnsLeakCheck$json = {
   '1': 'DnsLeakCheck',

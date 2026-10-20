@@ -8423,6 +8423,28 @@ class BypassStrategy extends $pb.GeneratedMessage {
     $core.bool? hostCase,
     $core.bool? domainCase,
     $core.bool? methodEol,
+    $core.String? disorderScope,
+    $core.String? oobScope,
+    $core.bool? hostDot,
+    $core.bool? hostTab,
+    $core.bool? hostNoSpace,
+    $core.bool? methodSpace,
+    $core.bool? unixEol,
+    $core.bool? splitAnyProtocol,
+    $core.String? tamperStart,
+    $core.String? tamperCutoff,
+    $core.String? oobData,
+    $core.String? mss,
+    $core.Iterable<$core.String>? desync,
+    $core.String? fakeTls,
+    $core.String? fakeQuic,
+    $core.String? fooling,
+    $core.int? ttl,
+    $core.bool? autoTtl,
+    $core.int? repeats,
+    $core.String? filterTcp,
+    $core.String? filterUdp,
+    $core.String? filterL7,
   }) {
     final result = BypassStrategy._();
     if (splitPos != null) result.splitPos.addAll(splitPos);
@@ -8432,6 +8454,28 @@ class BypassStrategy extends $pb.GeneratedMessage {
     if (hostCase != null) result.hostCase = hostCase;
     if (domainCase != null) result.domainCase = domainCase;
     if (methodEol != null) result.methodEol = methodEol;
+    if (disorderScope != null) result.disorderScope = disorderScope;
+    if (oobScope != null) result.oobScope = oobScope;
+    if (hostDot != null) result.hostDot = hostDot;
+    if (hostTab != null) result.hostTab = hostTab;
+    if (hostNoSpace != null) result.hostNoSpace = hostNoSpace;
+    if (methodSpace != null) result.methodSpace = methodSpace;
+    if (unixEol != null) result.unixEol = unixEol;
+    if (splitAnyProtocol != null) result.splitAnyProtocol = splitAnyProtocol;
+    if (tamperStart != null) result.tamperStart = tamperStart;
+    if (tamperCutoff != null) result.tamperCutoff = tamperCutoff;
+    if (oobData != null) result.oobData = oobData;
+    if (mss != null) result.mss = mss;
+    if (desync != null) result.desync.addAll(desync);
+    if (fakeTls != null) result.fakeTls = fakeTls;
+    if (fakeQuic != null) result.fakeQuic = fakeQuic;
+    if (fooling != null) result.fooling = fooling;
+    if (ttl != null) result.ttl = ttl;
+    if (autoTtl != null) result.autoTtl = autoTtl;
+    if (repeats != null) result.repeats = repeats;
+    if (filterTcp != null) result.filterTcp = filterTcp;
+    if (filterUdp != null) result.filterUdp = filterUdp;
+    if (filterL7 != null) result.filterL7 = filterL7;
     return result;
   }
 
@@ -8453,6 +8497,28 @@ class BypassStrategy extends $pb.GeneratedMessage {
     ..aOB(5, _omitFieldNames ? '' : 'hostCase')
     ..aOB(6, _omitFieldNames ? '' : 'domainCase')
     ..aOB(7, _omitFieldNames ? '' : 'methodEol')
+    ..aOS(8, _omitFieldNames ? '' : 'disorderScope')
+    ..aOS(9, _omitFieldNames ? '' : 'oobScope')
+    ..aOB(10, _omitFieldNames ? '' : 'hostDot')
+    ..aOB(11, _omitFieldNames ? '' : 'hostTab')
+    ..aOB(12, _omitFieldNames ? '' : 'hostNoSpace')
+    ..aOB(13, _omitFieldNames ? '' : 'methodSpace')
+    ..aOB(14, _omitFieldNames ? '' : 'unixEol')
+    ..aOB(15, _omitFieldNames ? '' : 'splitAnyProtocol')
+    ..aOS(16, _omitFieldNames ? '' : 'tamperStart')
+    ..aOS(17, _omitFieldNames ? '' : 'tamperCutoff')
+    ..aOS(18, _omitFieldNames ? '' : 'oobData')
+    ..aOS(19, _omitFieldNames ? '' : 'mss')
+    ..pPS(20, _omitFieldNames ? '' : 'desync')
+    ..aOS(21, _omitFieldNames ? '' : 'fakeTls')
+    ..aOS(22, _omitFieldNames ? '' : 'fakeQuic')
+    ..aOS(23, _omitFieldNames ? '' : 'fooling')
+    ..aI(24, _omitFieldNames ? '' : 'ttl')
+    ..aOB(25, _omitFieldNames ? '' : 'autoTtl')
+    ..aI(26, _omitFieldNames ? '' : 'repeats')
+    ..aOS(27, _omitFieldNames ? '' : 'filterTcp')
+    ..aOS(28, _omitFieldNames ? '' : 'filterUdp')
+    ..aOS(29, _omitFieldNames ? '' : 'filterL7')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -8535,6 +8601,242 @@ class BypassStrategy extends $pb.GeneratedMessage {
   $core.bool hasMethodEol() => $_has(6);
   @$pb.TagNumber(7)
   void clearMethodEol() => $_clearField(7);
+
+  /// Limits disorder to one protocol: "" (both), "http" or "tls".
+  /// Needs disorder.
+  @$pb.TagNumber(8)
+  $core.String get disorderScope => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set disorderScope($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasDisorderScope() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearDisorderScope() => $_clearField(8);
+
+  /// Limits the out-of-band byte to one protocol: "" (both), "http" or
+  /// "tls". Needs oob.
+  @$pb.TagNumber(9)
+  $core.String get oobScope => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set oobScope($core.String value) => $_setString(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasOobScope() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearOobScope() => $_clearField(9);
+
+  /// Adds "." after the Host: name.
+  @$pb.TagNumber(10)
+  $core.bool get hostDot => $_getBF(9);
+  @$pb.TagNumber(10)
+  set hostDot($core.bool value) => $_setBool(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasHostDot() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearHostDot() => $_clearField(10);
+
+  /// Reshapes the space after Host: with a tab.
+  @$pb.TagNumber(11)
+  $core.bool get hostTab => $_getBF(10);
+  @$pb.TagNumber(11)
+  set hostTab($core.bool value) => $_setBool(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasHostTab() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearHostTab() => $_clearField(11);
+
+  /// Removes the space after Host:.
+  @$pb.TagNumber(12)
+  $core.bool get hostNoSpace => $_getBF(11);
+  @$pb.TagNumber(12)
+  set hostNoSpace($core.bool value) => $_setBool(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasHostNoSpace() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearHostNoSpace() => $_clearField(12);
+
+  /// Adds an extra space after the HTTP method.
+  @$pb.TagNumber(13)
+  $core.bool get methodSpace => $_getBF(12);
+  @$pb.TagNumber(13)
+  set methodSpace($core.bool value) => $_setBool(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasMethodSpace() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearMethodSpace() => $_clearField(13);
+
+  /// Replaces CRLF with LF in plain HTTP requests.
+  @$pb.TagNumber(14)
+  $core.bool get unixEol => $_getBF(13);
+  @$pb.TagNumber(14)
+  set unixEol($core.bool value) => $_setBool(13, value);
+  @$pb.TagNumber(14)
+  $core.bool hasUnixEol() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearUnixEol() => $_clearField(14);
+
+  /// Splits every protocol, not only HTTP and TLS.
+  @$pb.TagNumber(15)
+  $core.bool get splitAnyProtocol => $_getBF(14);
+  @$pb.TagNumber(15)
+  set splitAnyProtocol($core.bool value) => $_setBool(14, value);
+  @$pb.TagNumber(15)
+  $core.bool hasSplitAnyProtocol() => $_has(14);
+  @$pb.TagNumber(15)
+  void clearSplitAnyProtocol() => $_clearField(15);
+
+  /// Limits handshake shaping to outbound stream positions at or after
+  /// this point ("--tamper-start"). Same position syntax as split_pos,
+  /// with an optional leading "n" selecting a data block number instead
+  /// of a byte offset.
+  @$pb.TagNumber(16)
+  $core.String get tamperStart => $_getSZ(15);
+  @$pb.TagNumber(16)
+  set tamperStart($core.String value) => $_setString(15, value);
+  @$pb.TagNumber(16)
+  $core.bool hasTamperStart() => $_has(15);
+  @$pb.TagNumber(16)
+  void clearTamperStart() => $_clearField(16);
+
+  /// Stops shaping after this point ("--tamper-cutoff"). Same position
+  /// syntax as tamper_start.
+  @$pb.TagNumber(17)
+  $core.String get tamperCutoff => $_getSZ(16);
+  @$pb.TagNumber(17)
+  set tamperCutoff($core.String value) => $_setString(16, value);
+  @$pb.TagNumber(17)
+  $core.bool hasTamperCutoff() => $_has(16);
+  @$pb.TagNumber(17)
+  void clearTamperCutoff() => $_clearField(17);
+
+  /// Overrides the default 0x00 out-of-band byte: one character or 0xHEX
+  /// ("--oob-data"). Needs oob.
+  @$pb.TagNumber(18)
+  $core.String get oobData => $_getSZ(17);
+  @$pb.TagNumber(18)
+  set oobData($core.String value) => $_setString(17, value);
+  @$pb.TagNumber(18)
+  $core.bool hasOobData() => $_has(17);
+  @$pb.TagNumber(18)
+  void clearOobData() => $_clearField(18);
+
+  /// Clamps the TCP maximum segment size ("--mss"), a plain byte count.
+  @$pb.TagNumber(19)
+  $core.String get mss => $_getSZ(18);
+  @$pb.TagNumber(19)
+  set mss($core.String value) => $_setString(18, value);
+  @$pb.TagNumber(19)
+  $core.bool hasMss() => $_has(18);
+  @$pb.TagNumber(19)
+  void clearMss() => $_clearField(19);
+
+  /// nfqws --dpi-desync methods in order, e.g. "fake", "split2",
+  /// "disorder2", "multisplit". Any entry selects the nfqws backend;
+  /// empty keeps the legacy tpws-compatible fields above.
+  @$pb.TagNumber(20)
+  $pb.PbList<$core.String> get desync => $_getList(19);
+
+  /// Fake payload for the fake desync method: "tls" keeps zapret's
+  /// built-in, anything else is a file name under the zapret home
+  /// directory.
+  @$pb.TagNumber(21)
+  $core.String get fakeTls => $_getSZ(20);
+  @$pb.TagNumber(21)
+  set fakeTls($core.String value) => $_setString(20, value);
+  @$pb.TagNumber(21)
+  $core.bool hasFakeTls() => $_has(20);
+  @$pb.TagNumber(21)
+  void clearFakeTls() => $_clearField(21);
+
+  /// Fake payload for QUIC: like fake_tls, but QUIC has no built-in
+  /// fake, so this should name a file. Needs filter_udp covering 443.
+  @$pb.TagNumber(22)
+  $core.String get fakeQuic => $_getSZ(21);
+  @$pb.TagNumber(22)
+  set fakeQuic($core.String value) => $_setString(21, value);
+  @$pb.TagNumber(22)
+  $core.bool hasFakeQuic() => $_has(21);
+  @$pb.TagNumber(22)
+  void clearFakeQuic() => $_clearField(22);
+
+  /// Degrades the fake/disorder packet so the censor's stack drops it
+  /// while the real server tolerates it: "badseq", "badack", "md5sig",
+  /// "ts", "badsum", "datanoack". Needs desync.
+  @$pb.TagNumber(23)
+  $core.String get fooling => $_getSZ(22);
+  @$pb.TagNumber(23)
+  set fooling($core.String value) => $_setString(22, value);
+  @$pb.TagNumber(23)
+  $core.bool hasFooling() => $_has(22);
+  @$pb.TagNumber(23)
+  void clearFooling() => $_clearField(23);
+
+  /// Fixes the fake packet TTL so it dies before the server
+  /// (nfqws --dpi-desync-ttl). Mutually exclusive with auto_ttl.
+  /// Needs desync.
+  @$pb.TagNumber(24)
+  $core.int get ttl => $_getIZ(23);
+  @$pb.TagNumber(24)
+  set ttl($core.int value) => $_setSignedInt32(23, value);
+  @$pb.TagNumber(24)
+  $core.bool hasTtl() => $_has(23);
+  @$pb.TagNumber(24)
+  void clearTtl() => $_clearField(24);
+
+  /// Derives the fake packet TTL from the path instead
+  /// (nfqws --dpi-desync-autottl). Mutually exclusive with ttl.
+  /// Needs desync.
+  @$pb.TagNumber(25)
+  $core.bool get autoTtl => $_getBF(24);
+  @$pb.TagNumber(25)
+  set autoTtl($core.bool value) => $_setBool(24, value);
+  @$pb.TagNumber(25)
+  $core.bool hasAutoTtl() => $_has(24);
+  @$pb.TagNumber(25)
+  void clearAutoTtl() => $_clearField(25);
+
+  /// Duplicates the fake injection (nfqws --dpi-desync-repeats).
+  /// Needs desync.
+  @$pb.TagNumber(26)
+  $core.int get repeats => $_getIZ(25);
+  @$pb.TagNumber(26)
+  set repeats($core.int value) => $_setSignedInt32(25, value);
+  @$pb.TagNumber(26)
+  $core.bool hasRepeats() => $_has(25);
+  @$pb.TagNumber(26)
+  void clearRepeats() => $_clearField(26);
+
+  /// Intercepted TCP ports, e.g. "80,443". Empty leaves the backend
+  /// default in place.
+  @$pb.TagNumber(27)
+  $core.String get filterTcp => $_getSZ(26);
+  @$pb.TagNumber(27)
+  set filterTcp($core.String value) => $_setString(26, value);
+  @$pb.TagNumber(27)
+  $core.bool hasFilterTcp() => $_has(26);
+  @$pb.TagNumber(27)
+  void clearFilterTcp() => $_clearField(27);
+
+  /// Intercepted UDP ports, e.g. "443". UDP/QUIC desync needs this.
+  /// Empty leaves the backend default in place.
+  @$pb.TagNumber(28)
+  $core.String get filterUdp => $_getSZ(27);
+  @$pb.TagNumber(28)
+  set filterUdp($core.String value) => $_setString(27, value);
+  @$pb.TagNumber(28)
+  $core.bool hasFilterUdp() => $_has(27);
+  @$pb.TagNumber(28)
+  void clearFilterUdp() => $_clearField(28);
+
+  /// Limits desync to application layers, e.g. "tls,quic". Empty
+  /// leaves the backend default in place.
+  @$pb.TagNumber(29)
+  $core.String get filterL7 => $_getSZ(28);
+  @$pb.TagNumber(29)
+  set filterL7($core.String value) => $_setString(28, value);
+  @$pb.TagNumber(29)
+  $core.bool hasFilterL7() => $_has(28);
+  @$pb.TagNumber(29)
+  void clearFilterL7() => $_clearField(29);
 }
 
 class DnsLeakCheck extends $pb.GeneratedMessage {
