@@ -32,6 +32,9 @@ type flags struct {
 	install     bool
 	uninstall   bool
 	showToken   bool
+	seriesProbe string
+	seriesTLS   bool
+	seriesMin   int
 }
 
 func main() {
@@ -77,6 +80,9 @@ func run(ctx context.Context, arguments []string) error {
 	set.BoolVar(&f.install, "install-service", false, "Windows: register this executable as the SoraCore service with the other flags, start it and exit")
 	set.BoolVar(&f.uninstall, "uninstall-service", false, "Windows: stop and remove the SoraCore service and exit")
 	set.BoolVar(&f.showToken, "print-token", false, "print the control plane token and exit")
+	set.StringVar(&f.seriesProbe, "series-probe", "", "probe one host:port in a series (T055 two-stage blocking check) and exit; see -series-probe-minutes")
+	set.BoolVar(&f.seriesTLS, "series-probe-tls", false, "series probe: require a TLS handshake, not just an open socket")
+	set.IntVar(&f.seriesMin, "series-probe-minutes", 0, "series probe length in minutes; 0 is the full 15-minute confirmation window")
 	if err := set.Parse(arguments); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			// -h/--help: the usage is already printed above. A help
@@ -109,6 +115,18 @@ func run(ctx context.Context, arguments []string) error {
 		}
 		fmt.Println(token)
 		return nil
+	}
+	if f.seriesProbe != "" {
+		// A measurement, not a service: no engines, no installation
+		// state needed.
+		res, err := runSeriesProbe(ctx, f.seriesProbe, f.seriesTLS, f.seriesMin)
+		if err != nil {
+			return err
+		}
+		for _, line := range seriesProbeLines(f.seriesProbe, f.seriesTLS, res) {
+			fmt.Println(line)
+		}
+		return seriesProbeError(res)
 	}
 	logger, err := newLogger(f.logLevel)
 	if err != nil {
