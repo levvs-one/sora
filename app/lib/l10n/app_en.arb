@@ -660,6 +660,12 @@
   "overrideCustomRules": "Custom rules",
   "errBenchmarkUnsupported": "Speed measurement needs a newer core",
   "benchmarkProgress": "Measuring {done} of {total}…",
+  "@benchmarkProgress": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
   "profiles": "Network profiles",
   "profilesEmpty": "No profiles yet. Create one to apply settings automatically on known networks.",
   "profileAdd": "Add profile",
@@ -674,12 +680,32 @@
   "profileSnapshotDone": "Current settings saved into the profile",
   "profileDelete": "Delete profile",
   "profileDeleteConfirm": "Delete profile \"{name}\"?",
+  "@profileDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "profileApplyAsk": "Apply profile \"{name}\"?",
+  "@profileApplyAsk": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "profileApply": "Apply",
   "profileApplied": "Profile \"{name}\" applied",
+  "@profileApplied": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "profileUndo": "Undo",
   "profileActive": "Active",
   "networkNow": "Now: {info}",
+  "@networkNow": {
+    "placeholders": {
+      "info": {"type": "String"}
+    }
+  },
   "networkUnknown": "Network info unavailable",
   "profileNoTriggers": "Add at least one trigger: SSID, gateway or ASN",
   "chains": "Proxy chains",
@@ -694,9 +720,19 @@
   "chainSave": "Save chain",
   "chainDelete": "Delete chain",
   "chainDeleteConfirm": "Delete chain \"{name}\"?",
+  "@chainDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "chainUnsupported": "The current engine cannot build chains",
   "chainHopMissing": "One of the chain servers is no longer available",
   "chainHop": "Hop {n}",
+  "@chainHop": {
+    "placeholders": {
+      "n": {"type": "String"}
+    }
+  },
   "chainEntry": "Entry",
   "chainExit": "Exit",
   "sync": "Device sync",
@@ -707,7 +743,17 @@
   "syncScanCode": "Scan a code",
   "syncRevoke": "Revoke",
   "syncRevokeConfirm": "Revoke \"{name}\"?",
+  "@syncRevokeConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "syncLastSync": "Last sync: {time}",
+  "@syncLastSync": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "syncNever": "Never",
   "syncWhat": "What syncs",
   "syncWhatBody": "Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.",

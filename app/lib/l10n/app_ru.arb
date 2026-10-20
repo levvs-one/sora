@@ -755,6 +755,11 @@
   "connCopyHost": "Скопировать хост",
   "connAddRule": "Добавить правило",
   "connConnectionsCount": "{count, plural, one{# соединение} few{# соединения} other{# соединений}}",
+  "@connConnectionsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "dnsPreset": "Пресет",
   "dnsPresetCloudflare": "Cloudflare",
   "dnsPresetGoogle": "Google",
@@ -806,6 +811,12 @@
   "overrideCustomRules": "Свои правила",
   "errBenchmarkUnsupported": "Для замера скорости нужна новая версия ядра",
   "benchmarkProgress": "Замер {done} из {total}…",
+  "@benchmarkProgress": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
   "profiles": "Сетевые профили",
   "profilesEmpty": "Профилей пока нет. Создайте профиль, чтобы настройки применялись автоматически в известных сетях.",
   "profileAdd": "Добавить профиль",
@@ -820,12 +831,32 @@
   "profileSnapshotDone": "Текущие настройки сохранены в профиль",
   "profileDelete": "Удалить профиль",
   "profileDeleteConfirm": "Удалить профиль «{name}»?",
+  "@profileDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "profileApplyAsk": "Применить профиль «{name}»?",
+  "@profileApplyAsk": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "profileApply": "Применить",
   "profileApplied": "Профиль «{name}» применён",
+  "@profileApplied": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "profileUndo": "Отменить",
   "profileActive": "Активен",
   "networkNow": "Сейчас: {info}",
+  "@networkNow": {
+    "placeholders": {
+      "info": {"type": "String"}
+    }
+  },
   "networkUnknown": "Нет данных о сети",
   "profileNoTriggers": "Добавьте хотя бы один триггер: SSID, шлюз или ASN",
   "chains": "Цепочки прокси",
@@ -840,9 +871,19 @@
   "chainSave": "Сохранить цепочку",
   "chainDelete": "Удалить цепочку",
   "chainDeleteConfirm": "Удалить цепочку «{name}»?",
+  "@chainDeleteConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "chainUnsupported": "Текущий движок не умеет строить цепочки",
   "chainHopMissing": "Один из серверов цепочки больше недоступен",
   "chainHop": "Хоп {n}",
+  "@chainHop": {
+    "placeholders": {
+      "n": {"type": "String"}
+    }
+  },
   "chainEntry": "Вход",
   "chainExit": "Выход",
   "sync": "Синхронизация устройств",
@@ -853,7 +894,17 @@
   "syncScanCode": "Сканировать код",
   "syncRevoke": "Отозвать",
   "syncRevokeConfirm": "Отозвать «{name}»?",
+  "@syncRevokeConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "syncLastSync": "Последняя синхронизация: {time}",
+  "@syncLastSync": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "syncNever": "Никогда",
   "syncWhat": "Что синхронизируется",
   "syncWhatBody": "Подписки, правила, настройки и сетевые профили. Никогда не синхронизируются: локальные логи, IPC-токены.",

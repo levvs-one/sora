@@ -75,104 +75,7 @@ class SRu extends S {
   @override
   String deleteSubscription(String name) {
     return 'Удалить «$name»?';
-  
-
-  @override
-  String get syncCodeExpired => 'Срок действия кода истёк';
-
-  @override
-  String get syncDaemonFailed => 'Не удалось запустить службу синхронизации';
-
-  @override
-  String get syncDaemonMissing => 'Компонент sora-sync не найден. Переустановите приложение, чтобы включить синхронизацию устройств.';
-
-  @override
-  String get syncDaemonStarting => 'Запуск службы синхронизации…';
-  @override
-  String get syncErrAuth => 'Служба синхронизации отклонила токен доступа. Перезапустите приложение и попробуйте снова.';
-  @override
-  String get syncErrNotFound => 'Устройство больше не спарено';
-  @override
-  String get syncErrPairingActive => 'Сессия спаривания уже открыта';
-  @override
-  String get syncErrUnreachable => 'Другое устройство не отвечает. Убедитесь, что оно в той же сети и показывает свой код.';
-  @override
-  String get syncError => 'Ошибка синхронизации';
-
-  @override
-  String syncExpiresIn(String duration) {
-    return 'Код истечёт через $duration';
   }
-
-  @override
-  String get syncJoining => 'Спаривание с устройством…';
-
-  @override
-  String get syncLegacyCleared => 'Старый список устройств никогда не был по-настоящему спарен, поэтому он очищен. Спарьте устройства заново — теперь по-настоящему.';
-
-  @override
-  String get syncNewCode => 'Новый код';
-
-  @override
-  String syncPairedWith(String name) {
-    return '«$name» спарено';
-  }
-
-  @override
-  String get syncRetry => 'Повторить';
-
-  @override
-  String get syncStopShowing => 'Прекратить показ';
-
-  @override
-  String get syncSyncNow => 'Синхронизировать';
-
-  @override
-  String syncSyncResult(int pulled, int pushed) {
-    return 'Получено: $pulled · отправлено: $pushed';
-  }
-
-  @override
-  String get syncResultTitle => 'Результат синхронизации';
-
-  @override
-  String get syncPulled => 'Получено';
-
-  @override
-  String get syncPushed => 'Отправлено';
-
-  @override
-  String get syncNoChanges => 'Нет изменений';
-
-  @override
-  String get syncDocKindSubscriptions => 'Подписки';
-
-  @override
-  String get syncDocKindSettings => 'Настройки';
-
-  @override
-  String get syncDocKindOverrides => 'Переопределения подписок';
-
-  @override
-  String get syncDocKindProfiles => 'Сетевые профили';
-
-  @override
-  String get syncDocKindChains => 'Цепочки прокси';
-
-  @override
-  String get syncDocKindObfs => 'Маскировка трафика';
-
-  @override
-  String syncFrom(String name) {
-    return 'с $name';
-  }
-
-  @override
-  String get syncThisDevice => 'Это устройство';
-
-  @override
-  String get syncUnavailableAndroid => 'Синхронизация устройств пока недоступна на Android — там не может работать служба синхронизации.';
-}
 
   @override
   String get routes => 'Маршруты';
@@ -267,13 +170,13 @@ class SRu extends S {
   }
 
   @override
-  String speedMbps(double value) {
-    return '${intl.NumberFormat('0.0', localeName).format(value)} Мбит/с';
+  String latencyMs(int value) {
+    return '$value мс';
   }
 
   @override
-  String latencyMs(int value) {
-    return '$value мс';
+  String speedMbps(double value) {
+    return '$value Мбит/с';
   }
 
   @override
@@ -932,10 +835,23 @@ class SRu extends S {
   @override
   String get updateManual =>
       'Выполните команду в терминале для установки обоих проверенных пакетов, затем откройте Sora снова. Файлы сохранены в каталоге загрузки. VPN-соединение прервётся.';
-  String get updateSignaturePending => 'Подлинность релиза пока не проверяется подписью — церемония ключа подписи ещё не проведена. Файлы сверяются по SHA-256 с манифестом, полученным по TLS.';
-  String get updateManualSigWarning => 'Внимание: подпись манифеста не проверена — файлы ниже сверены только по хэшам. Выполняйте команду, только если доверяете каналу релиза.';
-  String get updateWindowsSigBlocked => 'Автоматическая установка отключена в Windows, пока не реализована проверка подписи релиза. Скачайте установщик со страницы релиза и проверьте его вручную.';
+
+  @override
+  String get updateSignaturePending =>
+      'Подлинность релиза пока не проверяется подписью — церемония ключа подписи ещё не проведена. Файлы сверяются по SHA-256 с манифестом, полученным по TLS.';
+
+  @override
+  String get updateManualSigWarning =>
+      'Внимание: подпись манифеста не проверена — файлы ниже сверены только по хэшам. Выполняйте команду, только если доверяете каналу релиза.';
+
+  @override
+  String get updateWindowsSigBlocked =>
+      'Автоматическая установка отключена в Windows, пока не реализована проверка подписи релиза. Скачайте установщик со страницы релиза и проверьте его вручную.';
+
+  @override
   String get updateVersionRevoked => 'Эта версия отозвана разработчиком. Дождитесь исправленного релиза.';
+
+  @override
   String get updateRolloutPending => 'Новая версия распространяется постепенно и будет предложена вам автоматически.';
 
   @override
@@ -949,10 +865,12 @@ class SRu extends S {
   }
 
   @override
-  String get updateRollbackError => 'Автоматический откат не удался. Если новая версия не работает, переустановите предыдущий релиз вручную.';
+  String get updateRollbackError =>
+      'Автоматический откат не удался. Если новая версия не работает, переустановите предыдущий релиз вручную.';
 
   @override
-  String get updateRollbackCacheError => 'Не удалось подготовить проверенную копию текущей версии для отката, поэтому обновление не установлено.';
+  String get updateRollbackCacheError =>
+      'Не удалось подготовить проверенную копию текущей версии для отката, поэтому обновление не установлено.';
 
   @override
   String get updateCopyCommand => 'Скопировать команду';
@@ -1034,260 +952,427 @@ class SRu extends S {
 
   @override
   String get extensions => 'Расширения';
+
   @override
-  String extRatingLabel(String rating) => 'Оценка $rating из 5';
+  String extRatingLabel(String rating) {
+    return 'Оценка $rating из 5';
+  }
+
   @override
-  String extByAuthor(String author) => '$author';
+  String extByAuthor(String author) {
+    return '$author';
+  }
+
   @override
-  String extInstallsCount(String count) => 'установок: $count';
+  String extInstallsCount(String count) {
+    return 'установок: $count';
+  }
+
   @override
   String get extInstallOne => '1 установка';
+
   @override
   String get extBadgeVerified => 'Проверено';
+
   @override
   String get extBadgeTop => 'Топ недели';
+
   @override
   String get extBadgeNew => 'Новое';
+
   @override
   String get extBadgeStaff => 'Команда Sora';
+
   @override
   String get extSideloadShort => 'Не из каталога';
+
   @override
-  String get extSideloadWarning => 'Не из каталога команды. Ключ автора не проверен: устанавливайте, только если доверяете автору.';
+  String get extSideloadWarning =>
+      'Не из каталога команды. Ключ автора не проверен: устанавливайте, только если доверяете автору.';
+
   @override
-  String extInstallTitle(String name) => 'Установить «$name»';
+  String extInstallTitle(String name) {
+    return 'Установить «$name»';
+  }
+
   @override
-  String extUpdateTitle(String name) => 'Обновить «$name»';
+  String extUpdateTitle(String name) {
+    return 'Обновить «$name»';
+  }
+
   @override
   String get extPermissionsIntro => 'Расширение сможет:';
+
   @override
   String get extPermissionsWidened => 'Обновление запрашивает новые разрешения:';
+
   @override
   String get extDangerousAck => 'Я понимаю, что эти разрешения серьёзные';
+
   @override
   String get extInstall => 'Установить';
+
   @override
   String get extUpdate => 'Обновить';
+
   @override
   String get extCancel => 'Отмена';
+
   @override
   String get extConfirm => 'Подтвердить';
+
   @override
   String get extOk => 'ОК';
+
   @override
   String get extCatalog => 'Каталог';
+
   @override
   String get extInstalled => 'Установленные';
+
   @override
   String get extSearchHint => 'Поиск расширений';
+
   @override
   String get extCatAll => 'Все';
+
   @override
   String get extCatTools => 'Инструменты';
+
   @override
   String get extCatThemes => 'Темы';
+
   @override
   String get extCatAutomation => 'Автоматизация';
+
   @override
   String get extCatStats => 'Статистика';
+
   @override
   String get extCatNetwork => 'Сеть';
+
   @override
   String get extSortBy => 'Сортировка';
+
   @override
   String get extSortPopular => 'По популярности';
+
   @override
   String get extSortRating => 'По рейтингу';
+
   @override
   String get extSortName => 'По названию';
+
   @override
   String get extCatalogError => 'Не удалось загрузить каталог';
+
   @override
   String get extRetry => 'Повторить';
+
   @override
   String get extEmptySearch => 'Ничего не найдено';
+
   @override
-  String get extEmptyInstalled => 'Пока нет установленных расширений.
-Найдите в каталоге или установите из файла.';
+  String get extEmptyInstalled => 'Пока нет установленных расширений.\nНайдите в каталоге или установите из файла.';
+
   @override
   String get extInstallFromFile => 'Установить из файла';
+
   @override
   String get extInstallFromUrl => 'Установить по ссылке';
+
   @override
   String get extUrlHint => 'https://…/extension.soraext';
+
   @override
   String get extDownload => 'Скачать';
+
   @override
   String get extDownloading => 'Скачивание…';
+
   @override
   String get extVerifying => 'Проверка…';
+
   @override
   String get extInstalling => 'Установка…';
+
   @override
   String get extInstallFailed => 'Не удалось установить';
+
   @override
   String get extErrSignature => 'Проверка подписи не пройдена. Файл может быть повреждён или подменён.';
+
   @override
   String get extErrManifest => 'Манифест расширения некорректен.';
+
   @override
   String get extErrNetwork => 'Ошибка сети. Проверьте соединение и попробуйте снова.';
+
   @override
   String get extErrHash => 'Скачанный файл не совпадает с каталогом. Возможно, он подменён.';
+
   @override
-  String extErrMinApp(String version) => 'Расширению нужна версия приложения $version или новее.';
+  String extErrMinApp(String version) {
+    return 'Расширению нужна версия приложения $version или новее.';
+  }
+
   @override
   String get extErrHttpsOnly => 'Разрешены только ссылки https://';
+
   @override
   String get extErrGeneric => 'Что-то пошло не так. Попробуйте снова.';
+
   @override
-  String get extErrAuthorKeyChanged => 'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.';
+  String get extErrAuthorKeyChanged =>
+      'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.';
+
   @override
   String get extUpdateAvailable => 'Доступно обновление';
+
   @override
   String get extDisabled => 'Отключено';
+
   @override
-  String extToggleEnabled(String name) => 'Включить ${name}';
+  String extToggleEnabled(String name) {
+    return 'Включить $name';
+  }
+
   @override
   String get extSearchInstalled => 'Поиск установленных';
+
   @override
   String get extUpdateAll => 'Обновить все';
+
   @override
-  String extUpdatesAvailable(int count) => 'Доступно обновлений: ${count}';
+  String extUpdatesAvailable(int count) {
+    return 'Доступно обновлений: $count';
+  }
+
   @override
-  String extUpdatedCount(int count) => 'Обновлено: ${count}';
+  String extUpdatedCount(int count) {
+    return 'Обновлено: $count';
+  }
+
   @override
   String get extRiskNormal => 'Обычный';
+
   @override
   String get extRiskSensitive => 'Чувствительный';
+
   @override
   String get extRiskDangerous => 'Высокий риск';
+
   @override
   String get extPermissionsRemoved => 'Больше не запрашивается:';
+
   @override
   String get extUpdateFailedKept => 'Предыдущая версия осталась установлена.';
+
   @override
   String get extConflictsTitle => 'Конфликты расширений';
+
   @override
-  String get extConflictsIntro => 'Эти расширения претендуют на одно и то же. Выберите победителя — другое останется установлено. Когда спорная возможность появится в движке, работать будет только победитель.';
+  String get extConflictsIntro =>
+      'Эти расширения претендуют на одно и то же. Выберите победителя — другое останется установлено. Когда спорная возможность появится в движке, работать будет только победитель.';
+
   @override
   String get extConflictRoutingRules => 'Правила маршрутизации';
+
   @override
   String get extConflictTheme => 'Тема приложения';
+
   @override
   String get extConflictNetHooks => 'Сетевые хуки';
+
   @override
-  String extConflictWinner(String name) => 'Побеждает: ${name}';
+  String extConflictWinner(String name) {
+    return 'Побеждает: $name';
+  }
+
   @override
-  String extConflictsCount(int count) => 'Требуют решения: ${count}';
+  String extConflictsCount(int count) {
+    return 'Требуют решения: $count';
+  }
+
   @override
   String get extConflictsResolve => 'Решить';
+
   @override
-  String get extConflictNote => 'Ваш выбор сохраняется на этом устройстве и будет применён, когда движок начнёт поддерживать эти возможности.';
+  String get extConflictNote =>
+      'Ваш выбор сохраняется на этом устройстве и будет применён, когда движок начнёт поддерживать эти возможности.';
+
   @override
-  String extVersionLabel(String version) => 'Версия $version';
+  String extVersionLabel(String version) {
+    return 'Версия $version';
+  }
+
   @override
   String get extAuthor => 'Автор';
+
   @override
   String get extRating => 'Оценка';
+
   @override
   String get extInstalls => 'Установки';
+
   @override
   String get extVersion => 'Версия';
+
   @override
   String get extAbout => 'Описание';
+
   @override
   String get extPermissionsTitle => 'Разрешения';
+
   @override
   String get extNoPermissions => 'Особых разрешений не требуется.';
+
   @override
   String get extSettings => 'Настройки';
+
   @override
   String get extSaveSettings => 'Сохранить настройки';
+
   @override
   String get extSaving => 'Сохранение…';
+
   @override
-  @override
-  String extUpdateTo(String version) => 'Обновить до $version';
+  String extUpdateTo(String version) {
+    return 'Обновить до $version';
+  }
+
   @override
   String get extEnabled => 'Включено';
+
   @override
-  String extRollbackTo(String version) => 'Откатить до $version';
+  String extRollbackTo(String version) {
+    return 'Откатить до $version';
+  }
+
   @override
-  String extRollbackConfirm(String version) => 'Откатить до версии $version?';
+  String extRollbackConfirm(String version) {
+    return 'Откатить до версии $version?';
+  }
+
   @override
   String get extUninstall => 'Удалить';
+
   @override
-  String extUninstallConfirm(String name) => 'Удалить «$name» и его настройки?';
+  String extUninstallConfirm(String name) {
+    return 'Удалить «$name» и его настройки?';
+  }
+
   @override
   String get extPanelUnavailable => 'Панель недоступна. Возможно, расширение отключено или удалено.';
+
   @override
   String get extCatalogSoonTitle => 'Каталог команды скоро появится';
+
   @override
-  String get extCatalogSoonBody => 'А пока расширения можно устанавливать из файла или по ссылке — каждый пакет всё равно проверяется по подписи.';
+  String get extCatalogSoonBody =>
+      'А пока расширения можно устанавливать из файла или по ссылке — каждый пакет всё равно проверяется по подписи.';
+
   @override
   String get extPermConnectionsRead => 'Видеть список активных соединений';
+
   @override
   String get extPermServersRead => 'Видеть список ваших серверов';
+
   @override
   String get extPermSettingsRead => 'Читать настройки приложения';
+
   @override
   String get extPermSettingsWrite => 'Изменять настройки приложения';
+
   @override
   String get extPermNotifications => 'Показывать уведомления';
+
   @override
   String get extPermTray => 'Добавлять пункты в меню трея';
+
   @override
   String get extPermUiPanel => 'Показывать панели в приложении';
+
   @override
   String get extPermThemeApply => 'Применять темы оформления';
+
   @override
   String get extPermRoutingRules => 'Добавлять правила маршрутизации (влияет на трафик)';
+
   @override
   String get extPermNetHooks => 'Встраиваться в сетевой тракт (модули обхода DPI)';
+
   @override
   String get extPermNetFetch => 'Запрашивать URL из разрешённого списка';
+
   @override
   String get extPermBackground => 'Выполнять фоновые задачи';
+
   @override
-  String get extPermBackgroundDetail => 'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения. Фоновое выполнение пока недоступно в этой версии Sora.';
+  String get extPermBackgroundDetail =>
+      'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения. Фоновое выполнение пока недоступно в этой версии Sora.';
+
+  @override
   String get extPermNotYetActive => 'Пока не активно в этой версии Sora — это разрешение сейчас ничего не изменит.';
 
   @override
   String get extCapBackground => 'Работает в фоновом режиме';
+
   @override
   String get extCapFilterTitle => 'Возможности';
+
   @override
   String get extCapNetHook => 'Обходы и сетевые хуки';
+
   @override
   String get extCapPanel => 'Панели';
+
   @override
   String get extCapRouting => 'Правила маршрутизации';
+
   @override
   String get extCapTheme => 'Темы';
+
   @override
   String get extCapWidget => 'Виджеты';
+
   @override
-  String extCatalogCached(String date) => 'Кэш каталога · ${date}';
+  String extCatalogCached(String date) {
+    return 'Кэш каталога · $date';
+  }
+
   @override
   String get extChangelog => 'История версий';
+
   @override
   String get extImageFailed => 'Не удалось загрузить изображение';
+
   @override
   String get extRatingHow => 'Как считаются оценки';
+
   @override
-  String get extRatingHowBody => 'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, — один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.';
+  String get extRatingHowBody =>
+      'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, — один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.';
+
   @override
   String get extScreenshots => 'Скриншоты';
+
   @override
   String get extSortRelevance => 'Сначала подходящие';
+
   @override
-  String get extPermNetworkDetail => 'Загружает данные из интернета. Разрешены только хосты из списка ниже — всё остальное заблокировано. Сетевые запросы пока недоступны в этой версии Sora.';
+  String get extPermNetworkDetail =>
+      'Загружает данные из интернета. Разрешены только хосты из списка ниже — всё остальное заблокировано. Сетевые запросы пока недоступны в этой версии Sora.';
+
   @override
   String get extBgTitle => 'Фоновая задача';
+
   @override
   String get extBgEnabled => 'Выполнять в фоне';
+
   @override
   String get extBgInterval => 'Запускать каждые';
+
   @override
   String extBgMinutes(int count) {
     String _temp0 = intl.Intl.pluralLogic(
@@ -1297,27 +1382,28 @@ class SRu extends S {
       few: '# минуты',
       one: '# минуту',
     );
-    return _temp0;
+    return '$_temp0';
   }
+
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '# часов',
-      few: '# часа',
-      one: '# час',
-    );
-    return _temp0;
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# часов', few: '# часа', one: '# час');
+    return '$_temp0';
   }
+
   @override
-  String get extBgNote => 'Фоновое выполнение недоступно в этой версии Sora. Ваше расписание сохранено и начнёт действовать автоматически, когда появится фоновый рантайм. Минимальный интервал — 15 минут.';
-  @override
-  String get extBgDisabledNote => 'Включите расширение, чтобы управлять его фоновой задачей.';
+  String get extBgNote =>
+      'Фоновое выполнение недоступно в этой версии Sora. Ваше расписание сохранено и начнёт действовать автоматически, когда появится фоновый рантайм. Минимальный интервал — 15 минут.';
+
   @override
   String get extBgRuntimeBadge => 'Пока недоступно';
+
+  @override
+  String get extBgDisabledNote => 'Включите расширение, чтобы управлять его фоновой задачей.';
+
   @override
   String get extCapNetwork => 'Доступ к сети';
+
   @override
   String extCapNetworkHosts(String hosts) {
     return 'Сеть: $hosts';
@@ -1338,63 +1424,53 @@ class SRu extends S {
   String get diagnosticNoData => 'Запросов пока нет. Сначала откройте сайт проверки скорости.';
 
   @override
-  String get dnsExpected => 'Ожидалось';
-  @override
-  String get dnsActual => 'Обнаружено';
-  @override
-  String get dnsCheckNeedsConnection => 'Сначала подключитесь к VPN, затем проверьте утечки.';
-  @override
-  String get dnsLeakCheckTunnelDns => 'Резолверы DNS туннеля';
-  @override
-  String get dnsLeakCheckSystemResolvers => 'Системные резолверы';
-  @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch закрывает DNS';
-  @override
-  String get dnsLeakFixConfigureTunnelDns => 'Задайте DNS туннеля в настройках выше.';
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'Проверьте, какие резолверы система использует вне туннеля.';
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'Включите kill switch, чтобы DNS оставался в туннеле.';
-  @override
-  String get dnsLeakCheckEncryptedDns => 'Зашифрованный DNS системы';
-  @override
-  String get dnsLeakCheckDnsSpoof => 'Подмена ответов DNS';
-  @override
-  String get dnsLeakFixReviewEncryptedDns => 'Проверьте, какие конечные точки зашифрованного DNS система использует вне туннеля.';
-  @override
-  String get dnsLeakFixUseEncryptedDns => 'Используйте зашифрованный DNS (DoT или DoH) в туннеле, чтобы резолверы не могли подделывать ответы.';
-  @override
   String get qrShareTitle => 'Поделиться QR-кодом';
+
   @override
   String get qrScanTitle => 'Сканировать QR-код';
+
   @override
   String get qrCopyLink => 'Скопировать ссылку';
+
   @override
   String get qrShowLink => 'Показать ссылку';
+
   @override
   String get qrHideLink => 'Скрыть ссылку';
+
   @override
   String get qrWarning => 'QR-код содержит данные для подключения. Не показывайте его посторонним.';
+
   @override
   String get qrScanHint => 'Наведите камеру на QR-код';
+
   @override
   String get qrFromClipboard => 'Вставить из буфера обмена';
+
   @override
   String get qrNoCamera => 'Камера недоступна. Вставьте ссылку из буфера обмена.';
+
   @override
   String get qrInvalid => 'В этом QR-коде нет корректной ссылки.';
+
   @override
   String get qrScan => 'Сканировать QR';
+
   @override
   String get qrTorch => 'Фонарик';
+
   @override
   String get connGroupByProcess => 'По процессам';
+
   @override
   String get connListView => 'Списком';
+
   @override
   String get connCopyHost => 'Скопировать хост';
+
   @override
   String get connAddRule => 'Добавить правило';
+
   @override
   String connConnectionsCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
@@ -1404,92 +1480,172 @@ class SRu extends S {
       few: '# соединения',
       one: '# соединение',
     );
-    return _temp0;
+    return '$_temp0';
   }
+
   @override
   String get dnsPreset => 'Пресет';
+
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
+
   @override
   String get dnsPresetGoogle => 'Google';
+
   @override
   String get dnsPresetQuad9 => 'Quad9';
+
   @override
   String get dnsPresetAdGuard => 'AdGuard';
+
   @override
   String get dnsPresetCustom => 'Свой';
+
   @override
   String get dnsCheck => 'Проверить утечки';
+
   @override
   String get dnsChecking => 'Проверка...';
+
   @override
   String get dnsNoLeak => 'Утечек не найдено';
+
   @override
   String get dnsLeakFound => 'Обнаружена утечка';
+
   @override
   String get dnsLastCheck => 'Последняя проверка';
+
   @override
   String get dnsNeverChecked => 'Ещё не проверялось';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'Резолверы DNS туннеля';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'Системные резолверы';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Kill switch закрывает DNS';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Задайте DNS туннеля в настройках выше.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Проверьте, какие резолверы система использует вне туннеля.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Включите kill switch, чтобы DNS оставался в туннеле.';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'Зашифрованный DNS системы';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'Подмена ответов DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Проверьте, какие конечные точки зашифрованного DNS система использует вне туннеля.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Используйте зашифрованный DNS (DoT или DoH) в туннеле, чтобы резолверы не могли подделывать ответы.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Сначала подключитесь к VPN, затем проверьте утечки.';
+
+  @override
+  String get dnsExpected => 'Ожидалось';
+
+  @override
+  String get dnsActual => 'Обнаружено';
+
   @override
   String get sortBy => 'Сортировать';
+
   @override
   String get sortPing => 'Пинг';
+
   @override
   String get sortSpeed => 'Скорость';
+
   @override
   String get sortName => 'Имя';
+
   @override
   String get measureSpeed => 'Замерить скорость';
+
   @override
   String get benchmarkStale => 'устарело';
+
   @override
   String get autoSelectMode => 'Автовыбор сервера';
+
   @override
   String get autoSelectPing => 'Самый быстрый пинг';
+
   @override
   String get autoSelectSpeed => 'Самая высокая скорость';
+
   @override
   String get autoSelectSmart => 'Умный выбор';
+
   @override
   String get coreWatchUnstable => 'Связь с ядром нестабильна';
+
   @override
   String get watchReconnect => 'Переподключить';
+
   @override
   String get coreRestoringLink => 'Восстанавливаю связь с ядром…';
-  @override
+
   @override
   String get crashRestoreTitle => 'Прошлое соединение оборвалось';
 
   @override
   String get restoreOnCrash => 'Восстанавливать сессию после сбоя';
+
   @override
   String get crashRestore => 'Восстановить';
+
   @override
   String get crashDismiss => 'Не сейчас';
+
   @override
   String get overrideTitle => 'Мои правки';
 
   @override
   String get overrideEdit => 'Редактировать серверы';
+
   @override
   String get overrideHide => 'Скрыть';
+
   @override
   String get overrideUnhide => 'Показать';
+
   @override
   String get overrideClear => 'Сбросить правки';
+
   @override
   String get overrideEmpty => 'Пока нет правок';
+
   @override
   String get overrideCustomRules => 'Свои правила';
+
   @override
   String get errBenchmarkUnsupported => 'Для замера скорости нужна новая версия ядра';
+
   @override
-  String benchmarkProgress(int done, int total) => 'Замер $done из $total…';
+  String benchmarkProgress(int done, int total) {
+    return 'Замер $done из $total…';
+  }
+
   @override
   String get profiles => 'Сетевые профили';
 
   @override
-  String get profilesEmpty => 'Профилей пока нет. Создайте профиль, чтобы настройки применялись автоматически в известных сетях.';
+  String get profilesEmpty =>
+      'Профилей пока нет. Создайте профиль, чтобы настройки применялись автоматически в известных сетях.';
 
   @override
   String get profileAdd => 'Добавить профиль';
@@ -1525,16 +1681,22 @@ class SRu extends S {
   String get profileDelete => 'Удалить профиль';
 
   @override
-  String profileDeleteConfirm(String name) => 'Удалить профиль «${name}»?';
+  String profileDeleteConfirm(String name) {
+    return 'Удалить профиль «$name»?';
+  }
 
   @override
-  String profileApplyAsk(String name) => 'Применить профиль «${name}»?';
+  String profileApplyAsk(String name) {
+    return 'Применить профиль «$name»?';
+  }
 
   @override
   String get profileApply => 'Применить';
 
   @override
-  String profileApplied(String name) => 'Профиль «${name}» применён';
+  String profileApplied(String name) {
+    return 'Профиль «$name» применён';
+  }
 
   @override
   String get profileUndo => 'Отменить';
@@ -1543,7 +1705,9 @@ class SRu extends S {
   String get profileActive => 'Активен';
 
   @override
-  String networkNow(String info) => 'Сейчас: ${info}';
+  String networkNow(String info) {
+    return 'Сейчас: $info';
+  }
 
   @override
   String get networkUnknown => 'Нет данных о сети';
@@ -1585,7 +1749,9 @@ class SRu extends S {
   String get chainDelete => 'Удалить цепочку';
 
   @override
-  String chainDeleteConfirm(String name) => 'Удалить цепочку «${name}»?';
+  String chainDeleteConfirm(String name) {
+    return 'Удалить цепочку «$name»?';
+  }
 
   @override
   String get chainUnsupported => 'Текущий движок не умеет строить цепочки';
@@ -1594,7 +1760,9 @@ class SRu extends S {
   String get chainHopMissing => 'Один из серверов цепочки больше недоступен';
 
   @override
-  String chainHop(String n) => 'Хоп ${n}';
+  String chainHop(String n) {
+    return 'Хоп $n';
+  }
 
   @override
   String get chainEntry => 'Вход';
@@ -1624,10 +1792,14 @@ class SRu extends S {
   String get syncRevoke => 'Отозвать';
 
   @override
-  String syncRevokeConfirm(String name) => 'Отозвать «${name}»?';
+  String syncRevokeConfirm(String name) {
+    return 'Отозвать «$name»?';
+  }
 
   @override
-  String syncLastSync(String time) => 'Последний синк: ${time}';
+  String syncLastSync(String time) {
+    return 'Последняя синхронизация: $time';
+  }
 
   @override
   String get syncNever => 'Никогда';
@@ -1636,7 +1808,8 @@ class SRu extends S {
   String get syncWhat => 'Что синхронизируется';
 
   @override
-  String get syncWhatBody => 'Подписки, правила, настройки и сетевые профили. Никогда не синхронизируются: локальные логи, IPC-токены.';
+  String get syncWhatBody =>
+      'Подписки, правила, настройки и сетевые профили. Никогда не синхронизируются: локальные логи, IPC-токены.';
 
   @override
   String get syncNoLan => 'Устройства должны быть в одной локальной сети';
@@ -1645,31 +1818,40 @@ class SRu extends S {
   String get syncPaired => 'Устройство спарено';
 
   @override
-  String get syncPairingTitle => 'Спарьтесь с этим устройством';
+  String get syncPairingTitle => 'Спарить с этим устройством';
 
   @override
   String get syncWaiting => 'Ожидание другого устройства…';
 
   @override
-  String get syncSecureNote => 'Канал зашифрован end-to-end. Никаких аккаунтов и облачных серверов.';
+  String get syncSecureNote => 'Канал защищён сквозным шифрованием. Никаких аккаунтов и облачных серверов.';
 
   @override
   String get zapretWithVpn => 'DPI-обход для прямого трафика';
 
   @override
-  String get zapretWithVpnHint => 'Запускает zapret рядом с VPN-туннелем: туннелированный трафик идёт через VPN, прямой — через обход.';
+  String get zapretWithVpnHint =>
+      'Запускает zapret рядом с VPN-туннелем: туннелированный трафик идёт через VPN, прямой — через обход.';
+
   @override
   String get chainDuplicate => 'Каждый сервер — только один раз';
+
   @override
   String get edit => 'Изменить';
+
   @override
   String get remove => 'Убрать';
+
   @override
   String get autoSwitchOnDegrade => 'Автопереключение при деградации';
+
   @override
-  String get autoSwitchOnDegradeDetail => 'Если выбранный сервер сильно замедлится или перестанет отвечать, Sora переключится на лучший из измеренных — не чаще одного раза в 10 минут.';
+  String get autoSwitchOnDegradeDetail =>
+      'Если выбранный сервер сильно замедлится или перестанет отвечать, Sora переключится на лучший из измеренных — не чаще одного раза в 10 минут.';
+
   @override
   String get tunStackMixed => 'Смешанный';
+
   @override
   String get tunStackSystem => 'Системный';
 
@@ -1680,10 +1862,12 @@ class SRu extends S {
   String get censorHistory => 'История проверок';
 
   @override
-  String get censorEmpty => 'Проверок пока не было. Если соединение не удастся установить, детектор проверит, не блокирует ли его провайдер.';
+  String get censorEmpty =>
+      'Проверок пока не было. Если соединение не удастся установить, детектор проверит, не блокирует ли его провайдер.';
 
   @override
-  String get censorExplainer => 'Это не ошибка приложения: похоже, провайдер ограничивает соединение. Маскировка меняет способ подключения и часто помогает.';
+  String get censorExplainer =>
+      'Это не ошибка приложения: похоже, провайдер ограничивает соединение. Маскировка меняет способ подключения и часто помогает.';
 
   @override
   String get censorNoProfile => 'Для этого вердикта нет подходящего профиля';
@@ -1790,6 +1974,8 @@ class SRu extends S {
 
   @override
   String get customServerBadge => 'свой';
+
+  @override
   String get flowAuto => 'авто';
 
   @override
@@ -1804,13 +1990,15 @@ class SRu extends S {
   String get customServerTest => 'Проверить';
 
   @override
-  String get errObfsUnsupported => 'Установленный core слишком стар для профилей маскировки. Обновите Sora, чтобы применять их.';
+  String get errObfsUnsupported =>
+      'Установленный core слишком стар для профилей маскировки. Обновите Sora, чтобы применять их.';
 
   @override
   String get leakTestTitle => 'Проверка утечек';
 
   @override
-  String get leakTestIntro => 'Проверяет, может ли трафик покинуть устройство в обход туннеля: прямые DNS- и ICMP-запросы, утечки IPv6 и системные резолверы. Запускайте при активном подключении.';
+  String get leakTestIntro =>
+      'Проверяет, может ли трафик покинуть устройство в обход туннеля: прямые DNS- и ICMP-запросы, утечки IPv6 и системные резолверы. Запускайте при активном подключении.';
 
   @override
   String get leakTestRun => 'Проверить';
@@ -1838,7 +2026,7 @@ class SRu extends S {
       few: 'Найдены # утечки',
       one: 'Найдена # утечка',
     );
-    return _temp0;
+    return '$_temp0';
   }
 
   @override
@@ -1926,6 +2114,112 @@ class SRu extends S {
 
   @override
   String get obfsUnknown => 'Возможности пока определяются.';
+
+  @override
+  String get syncCodeExpired => 'Срок действия кода истёк';
+
+  @override
+  String get syncDaemonFailed => 'Не удалось запустить службу синхронизации';
+
+  @override
+  String get syncDaemonMissing =>
+      'Компонент sora-sync не найден. Переустановите приложение, чтобы включить синхронизацию устройств.';
+
+  @override
+  String get syncDaemonStarting => 'Запуск службы синхронизации…';
+
+  @override
+  String get syncErrAuth =>
+      'Служба синхронизации отклонила токен доступа. Перезапустите приложение и попробуйте снова.';
+
+  @override
+  String get syncErrNotFound => 'Устройство больше не спарено';
+
+  @override
+  String get syncErrPairingActive => 'Сессия спаривания уже открыта';
+
+  @override
+  String get syncErrUnreachable =>
+      'Другое устройство не отвечает. Убедитесь, что оно в той же сети и показывает свой код.';
+
+  @override
+  String get syncError => 'Ошибка синхронизации';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'Код истечёт через $duration';
+  }
+
+  @override
+  String get syncJoining => 'Спаривание с устройством…';
+
+  @override
+  String get syncLegacyCleared =>
+      'Старый список устройств никогда не был по-настоящему спарен, поэтому он очищен. Спарьте устройства заново — теперь по-настоящему.';
+
+  @override
+  String get syncNewCode => 'Новый код';
+
+  @override
+  String syncPairedWith(String name) {
+    return '«$name» спарено';
+  }
+
+  @override
+  String get syncRetry => 'Повторить';
+
+  @override
+  String get syncStopShowing => 'Прекратить показ';
+
+  @override
+  String get syncSyncNow => 'Синхронизировать';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Получено: $pulled · отправлено: $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'Результат синхронизации';
+
+  @override
+  String get syncPulled => 'Получено';
+
+  @override
+  String get syncPushed => 'Отправлено';
+
+  @override
+  String get syncNoChanges => 'Нет изменений';
+
+  @override
+  String get syncDocKindSubscriptions => 'Подписки';
+
+  @override
+  String get syncDocKindSettings => 'Настройки';
+
+  @override
+  String get syncDocKindOverrides => 'Переопределения подписок';
+
+  @override
+  String get syncDocKindProfiles => 'Сетевые профили';
+
+  @override
+  String get syncDocKindChains => 'Цепочки прокси';
+
+  @override
+  String get syncDocKindObfs => 'Маскировка трафика';
+
+  @override
+  String syncFrom(String name) {
+    return 'с $name';
+  }
+
+  @override
+  String get syncThisDevice => 'Это устройство';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Синхронизация устройств пока недоступна на Android — там не может работать служба синхронизации.';
 
   @override
   String smartPickReason(String ping, String speed) {
