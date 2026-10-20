@@ -214,3 +214,80 @@ func contains(ss []string, s string) bool {
 	}
 	return false
 }
+
+// TestRealityHygieneWarnings pins the [censor] dest/shortId hygiene
+// warnings: each fires on its exact shape and stays silent on plausible
+// production configs (no false positives on the common shapes).
+func TestRealityHygieneWarnings(t *testing.T) {
+	cases := []struct {
+		name   string
+		mutate func(*Outbound)
+		want   string // "" means the warning must NOT fire
+	}{
+		{"malformed dest: port", func(o *Outbound) { o.TLS.ServerName = "example.com:443" }, "reality-dest-malformed"},
+		{"malformed dest: underscore", func(o *Outbound) { o.TLS.ServerName = "my_site.example.com" }, "reality-dest-malformed"},
+		{"malformed dest: wildcard", func(o *Outbound) { o.TLS.ServerName = "*.example.com" }, "reality-dest-malformed"},
+		{"malformed dest: empty label", func(o *Outbound) { o.TLS.ServerName = "example..com" }, "reality-dest-malformed"},
+		{"lan dest", func(o *Outbound) { o.TLS.ServerName = "router.lan" }, "reality-dest-not-public"},
+		{"single-label dest", func(o *Outbound) { o.TLS.ServerName = "decoy" }, "reality-dest-not-public"},
+		{"localhost dest", func(o *Outbound) { o.TLS.ServerName = "localhost" }, "reality-dest-not-public"},
+		{"mdns dest", func(o *Outbound) { o.TLS.ServerName = "printer.local" }, "reality-dest-not-public"},
+		{"sni equals server name", func(o *Outbound) { o.Server = "cdn.example.com"; o.TLS.ServerName = "CDN.Example.COM." }, "reality-sni-is-server"},
+		{"sni differs from server name", func(o *Outbound) { o.Server = "edge.provider.net" }, ""},
+		{"short shortId 1 byte", func(o *Outbound) { o.TLS.RealityShortID = "ab" }, "reality-shortid-short"},
+		{"short shortId 2 bytes", func(o *Outbound) { o.TLS.RealityShortID = "abcd" }, "reality-shortid-short"},
+		{"zero shortId", func(o *Outbound) { o.TLS.RealityShortID = "0000000000000000" }, "reality-shortid-low-entropy"},
+		{"repeated-byte shortId", func(o *Outbound) { o.TLS.RealityShortID = "aaaaaaaaaa" }, "reality-shortid-low-entropy"},
+		{"real shortId 6 bytes", func(o *Outbound) { o.TLS.RealityShortID = "6ba85179e30d" }, ""},
+		{"real shortId 8 bytes", func(o *Outbound) { o.TLS.RealityShortID = "6ba85179e30d4fc2" }, ""},
+		{"empty shortId is not flagged", func(o *Outbound) { o.TLS.RealityShortID = "" }, ""},
+		{"plausible dest stays clean", func(o *Outbound) { o.TLS.ServerName = "www.microsoft.com" }, ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			o := realityOutbound()
+			tc.mutate(&o)
+			w := o.RealityWarnings()
+			code := tc.want
+			if code == "" {
+				// The "" cases pin absence of the hygiene family.
+				for _, c := range []string{"reality-dest-malformed", "reality-dest-not-public",
+					"reality-sni-is-server", "reality-shortid-short", "reality-shortid-low-entropy"} {
+					if contains(w, c) {
+						t.Fatalf("warning %s must not fire, got %v", c, w)
+					}
+				}
+				return
+			}
+			if !contains(w, code) {
+				t.Fatalf("expected %s, got %v", code, w)
+			}
+		})
+	}
+	// A short low-entropy id reports exactly one of the two codes:
+	// "00" is short; the low-entropy code is reserved for full-length
+	// stock defaults, so the UI never double-counts one defect.
+	o := realityOutbound()
+	o.TLS.RealityShortID = "00"
+	w := o.RealityWarnings()
+	if !contains(w, "reality-shortid-short") || contains(w, "reality-shortid-low-entropy") {
+		t.Fatalf("short id codes = %v, want only reality-shortid-short", w)
+	}
+}
+
+func TestValidateRealityDestShape(t *testing.T) {
+	for _, sni := range []string{"example.com:443", "https://example.com", "my_site.example.com", "*.example.com", "exa mple.com", "example..com", "-bad.com"} {
+		o := realityOutbound()
+		o.TLS.ServerName = sni
+		if err := o.ValidateReality(); err == nil {
+			t.Errorf("SNI %q: expected a validation error", sni)
+		}
+	}
+	for _, sni := range []string{"www.example.com", "example.com.", "a.b.c.d-example.org", "203.0.113.7"} {
+		o := realityOutbound()
+		o.TLS.ServerName = sni
+		if err := o.ValidateReality(); err != nil {
+			t.Errorf("SNI %q: unexpected error %v (IP literals and valid names stay warnings, not blocks)", sni, err)
+		}
+	}
+}
