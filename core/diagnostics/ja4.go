@@ -36,6 +36,17 @@ import (
 //     identical hellos mean the randomization is broken;
 //   - a JA4 matching a documented current parrot is fresh.
 //
+// Chrome 156 checkpoint (T056, verified 2026-10-20): Chrome 156 stable
+// shipped 2026-10-20, but its release notes carry no TLS/ClientHello
+// changes, no public capture of a branded Chrome 156 ClientHello (or its
+// JA4) exists, and the pinned uTLS has no HelloChrome_156:
+// HelloChrome_Auto is still HelloChrome_155 (verified against the module
+// source in the Go module cache). The gate below therefore stays pinned
+// to Chrome 155; ja4_internal_test.go carries the checkpoint assertion
+// (TestChromeAutoParrotIsStill155) that forces re-verification the moment
+// upstream adds a newer verified parrot. The engine-zone monthly parrot
+// watch (core/engine/fingerprint.go, ParrotReviewedAt/ParrotReviewOverdue)
+// remains the process owner; this file only documents the checkpoint.
 // JA4 reference: FoxIO JA4 spec (t13d1516h2_8daaf6152771_d8a2da3f94cd):
 // JA4_a = t<tls-version><sni><cipher-count><ext-count><alpn>,
 // JA4_b = sha256 hex[:12] of the cipher suites sorted, GREASE stripped,

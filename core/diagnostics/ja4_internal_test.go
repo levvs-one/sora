@@ -66,6 +66,25 @@ func TestCapturedHello_PQKeyShare(t *testing.T) {
 	}
 }
 
+// TestChromeAutoParrotIsStill155 is the T056 checkpoint: on 2026-10-20
+// Chrome 156 stable shipped, but no public capture of a branded Chrome
+// 156 ClientHello (or its JA4) exists, Chrome 156 release notes carry no
+// TLS/ClientHello changes, and the pinned uTLS has no HelloChrome_156
+// (there is no symbol to reference — its absence is exactly what this
+// assertion pair encodes from the other side). When upstream ships a
+// verified newer parrot, HelloChrome_Auto moves, this test fails, and
+// the failure is the trigger to run the capture comparison against the
+// freshness gate (TestCoreUTLSFreshnessGate) and update the reference,
+// knownGoodJA4, and engine.CurrentChromeParrot together — not before,
+// and not by guessing a 156 JA4 that nobody has measured.
+func TestChromeAutoParrotIsStill155(t *testing.T) {
+	if utls.HelloChrome_Auto != utls.HelloChrome_155 {
+		t.Errorf("HelloChrome_Auto = %s, want %s: upstream added a newer verified parrot; "+
+			"verify it against a public branded-Chrome capture, then move the T056 checkpoint",
+			utls.HelloChrome_Auto.Str(), utls.HelloChrome_155.Str())
+	}
+}
+
 func mustCapture(t *testing.T, id utls.ClientHelloID) []byte {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
