@@ -160,6 +160,9 @@ void main() {
         (policyStatus: 404, policyThrows: false),
         (policyStatus: 200, policyThrows: true),
       ]) {
+        // A fresh store per case: the first case records the notified
+        // version, which would silence the second one.
+        SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
         final (updater: updater, notices: notices) = await checkWithPolicy(
           settings,

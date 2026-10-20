@@ -203,12 +203,19 @@ class _QrScanScreenState extends State<QrScanScreen> {
 
   /// Routes a scanned or pasted link through the standard import flow.
   Future<void> _import(String raw) async {
+    final navigator = Navigator.of(context);
     final link = parseImportLink(raw);
     if (link == null) {
+      // The share screen encodes the bare subscription URL, so a plain
+      // single-line https link is a subscription too.
+      if (raw.startsWith('https://') && !raw.contains('\n') && Uri.tryParse(raw)?.host.isNotEmpty == true) {
+        navigator.pop();
+        await showSubscriptionSheet(navigator.context, link: raw);
+        return;
+      }
       if (mounted) setState(() => _error = S.of(context).qrInvalid);
       return;
     }
-    final navigator = Navigator.of(context);
     switch (link) {
       case AddSubscription(:final url, :final name):
         navigator.pop();

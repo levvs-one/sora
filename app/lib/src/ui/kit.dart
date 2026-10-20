@@ -525,20 +525,25 @@ class Segments<T> extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 36),
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(11)),
+      // The labels size the control; the indicator fills whatever height
+      // they take, so large text scales grow both together.
       child: Stack(
+        alignment: Alignment.center,
         children: [
-          AnimatedAlign(
-            alignment: Alignment(keys.length == 1 ? 0 : -1 + 2 * index / (keys.length - 1), 0),
-            duration: Motion.of(context, Motion.medium),
-            curve: Motion.curve,
-            child: FractionallySizedBox(
-              widthFactor: 1 / keys.length,
-              heightFactor: 1,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: palette.surface,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [BoxShadow(color: palette.shadow, blurRadius: 6, offset: const Offset(0, 1))],
+          Positioned.fill(
+            child: AnimatedAlign(
+              alignment: Alignment(keys.length == 1 ? 0 : -1 + 2 * index / (keys.length - 1), 0),
+              duration: Motion.of(context, Motion.medium),
+              curve: Motion.curve,
+              child: FractionallySizedBox(
+                widthFactor: 1 / keys.length,
+                heightFactor: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: palette.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [BoxShadow(color: palette.shadow, blurRadius: 6, offset: const Offset(0, 1))],
+                  ),
                 ),
               ),
             ),
@@ -554,7 +559,10 @@ class Segments<T> extends StatelessWidget {
                       onTap: () => onChanged(key),
                       radius: 8,
                       give: 1,
-                      child: Center(
+                      child: Container(
+                        // 36 minus the 3 px padding on each side.
+                        constraints: const BoxConstraints(minHeight: 30),
+                        alignment: Alignment.center,
                         child: Text(choices[key]!, style: Styles.caption.copyWith(color: palette.ink)),
                       ),
                     ),

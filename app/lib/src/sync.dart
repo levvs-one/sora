@@ -29,7 +29,8 @@ class SyncPairing {
   static List<int>? _b64rawDecode(String s, int length) {
     if (!RegExp(r'^[A-Za-z0-9_-]+$').hasMatch(s)) return null;
     try {
-      final bytes = base64Url.decode(s);
+      // Go writes RawURLEncoding (no padding); Dart's decoder demands it.
+      final bytes = base64Url.decode(base64Url.normalize(s));
       return bytes.length == length ? bytes : null;
     } on FormatException {
       return null;

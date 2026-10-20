@@ -338,7 +338,7 @@ void main() {
       await tester.pumpAndSettle();
       final menu = find.byKey(const ValueKey('mihomo-tun-stack'));
       await tester.ensureVisible(menu);
-      await tester.tap(find.descendant(of: menu, matching: find.text('Mixed')));
+      await tester.tap(find.descendant(of: menu, matching: find.text('Смешанный')));
       await tester.pumpAndSettle();
       expect(find.byType(MenuItemButton), findsNWidgets(4));
       await tester.tap(find.text('MIPS'));
@@ -350,6 +350,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(menu, findsNothing);
       expect(find.text('Стек TUN'), findsNothing);
+      await tester.ensureVisible(find.byKey(const ValueKey('mode-tun')));
       await tester.tap(find.byKey(const ValueKey('mode-tun')));
       await tester.pumpAndSettle();
       expect(menu, findsOneWidget);
@@ -363,7 +364,7 @@ void main() {
       await tester.tap(find.descendant(of: xrayMenu, matching: find.text('gVisor')));
       await tester.pumpAndSettle();
       expect(find.byType(MenuItemButton), findsNWidgets(4));
-      await tester.tap(find.text('System'));
+      await tester.tap(find.text('Системный'));
       await tester.pumpAndSettle();
       expect(sora.settings.xrayTunStack, 'system');
       expect((await Settings.load()).xrayTunStack, 'system');

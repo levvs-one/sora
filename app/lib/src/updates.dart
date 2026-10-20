@@ -112,11 +112,14 @@ class RolloutPolicy {
 /// unless the stored UUID is wiped.
 int updateCohort(String installUuid) {
   final digest = sha256.convert(utf8.encode(installUuid)).bytes;
-  var head = 0;
+  // The first 8 digest bytes are an unsigned 64-bit number on the server
+  // side; Dart ints are signed, so reduce while folding instead of letting
+  // the top bit turn the value negative.
+  var cohort = 0;
   for (var i = 0; i < 8; i++) {
-    head = (head << 8) | digest[i];
+    cohort = (cohort * 256 + digest[i]) % 100;
   }
-  return head % 100;
+  return cohort;
 }
 
 class ReleaseAsset {
