@@ -226,6 +226,8 @@ func censorKindToProto(k censor.Kind) censorv1.CensorshipKind {
 		return censorv1.CensorshipKind_CENSORSHIP_KIND_SNI_BLOCKING
 	case censor.KindIPBlocking:
 		return censorv1.CensorshipKind_CENSORSHIP_KIND_IP_BLOCKING
+	case censor.KindDataStall:
+		return censorv1.CensorshipKind_CENSORSHIP_KIND_DATA_STALL
 	default:
 		return censorv1.CensorshipKind_CENSORSHIP_KIND_UNKNOWN
 	}

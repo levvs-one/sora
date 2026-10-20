@@ -38,6 +38,9 @@ const (
 	CensorshipKind_CENSORSHIP_KIND_DNS_POISONING     CensorshipKind = 5
 	CensorshipKind_CENSORSHIP_KIND_SNI_BLOCKING      CensorshipKind = 6
 	CensorshipKind_CENSORSHIP_KIND_IP_BLOCKING       CensorshipKind = 7
+	// The established session carried data and then went silent with no
+	// RST or FIN (the TSPU freeze/throttle signature). Since 1.11.
+	CensorshipKind_CENSORSHIP_KIND_DATA_STALL CensorshipKind = 8
 )
 
 // Enum value maps for CensorshipKind.
@@ -51,6 +54,7 @@ var (
 		5: "CENSORSHIP_KIND_DNS_POISONING",
 		6: "CENSORSHIP_KIND_SNI_BLOCKING",
 		7: "CENSORSHIP_KIND_IP_BLOCKING",
+		8: "CENSORSHIP_KIND_DATA_STALL",
 	}
 	CensorshipKind_value = map[string]int32{
 		"CENSORSHIP_KIND_UNSPECIFIED":       0,
@@ -61,6 +65,7 @@ var (
 		"CENSORSHIP_KIND_DNS_POISONING":     5,
 		"CENSORSHIP_KIND_SNI_BLOCKING":      6,
 		"CENSORSHIP_KIND_IP_BLOCKING":       7,
+		"CENSORSHIP_KIND_DATA_STALL":        8,
 	}
 )
 
@@ -687,7 +692,7 @@ const file_sora_censor_v1_censor_proto_rawDesc = "" +
 	"\x18DetectCensorshipResponse\x12;\n" +
 	"\averdict\x18\x01 \x01(\v2!.sora.censor.v1.CensorshipVerdictR\averdict\x12\x1b\n" +
 	"\tprobe_ran\x18\x02 \x01(\bR\bprobeRan\x12-\n" +
-	"\x05error\x18\x03 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error*\xa3\x02\n" +
+	"\x05error\x18\x03 \x01(\v2\x17.sora.core.v1.SoraErrorR\x05error*\xc3\x02\n" +
 	"\x0eCensorshipKind\x12\x1f\n" +
 	"\x1bCENSORSHIP_KIND_UNSPECIFIED\x10\x00\x12\x1b\n" +
 	"\x17CENSORSHIP_KIND_UNKNOWN\x10\x01\x12#\n" +
@@ -696,7 +701,8 @@ const file_sora_censor_v1_censor_proto_rawDesc = "" +
 	"!CENSORSHIP_KIND_HANDSHAKE_TIMEOUT\x10\x04\x12!\n" +
 	"\x1dCENSORSHIP_KIND_DNS_POISONING\x10\x05\x12 \n" +
 	"\x1cCENSORSHIP_KIND_SNI_BLOCKING\x10\x06\x12\x1f\n" +
-	"\x1bCENSORSHIP_KIND_IP_BLOCKING\x10\a*\xa1\x01\n" +
+	"\x1bCENSORSHIP_KIND_IP_BLOCKING\x10\a\x12\x1e\n" +
+	"\x1aCENSORSHIP_KIND_DATA_STALL\x10\b*\xa1\x01\n" +
 	"\fAttemptStage\x12\x1d\n" +
 	"\x19ATTEMPT_STAGE_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11ATTEMPT_STAGE_DNS\x10\x01\x12\x15\n" +

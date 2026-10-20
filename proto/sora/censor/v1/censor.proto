@@ -32,6 +32,9 @@ enum CensorshipKind {
   CENSORSHIP_KIND_DNS_POISONING = 5;
   CENSORSHIP_KIND_SNI_BLOCKING = 6;
   CENSORSHIP_KIND_IP_BLOCKING = 7;
+  // The established session carried data and then went silent with no
+  // RST or FIN (the TSPU freeze/throttle signature). Since 1.11.
+  CENSORSHIP_KIND_DATA_STALL = 8;
 }
 
 // AttemptStage is the connection-stack step an observation belongs to.
