@@ -986,7 +986,11 @@ func (s *Server) ParseImport(_ context.Context, req *corev1.ParseImportRequest) 
 		return &corev1.ParseImportResponse{Error: toWire(err, nil, id)}, nil
 	}
 	puts := make(map[string][]byte, len(servers))
-	plan := &corev1.SessionPlan{TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM}
+	plan := &corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		// One outbound per imported server: size for them up front.
+		Outbounds: make([]*corev1.OutboundSpec, 0, len(servers)),
+	}
 	for _, server := range servers {
 		puts[server.reference] = server.document
 		plan.Outbounds = append(plan.Outbounds, server.spec)

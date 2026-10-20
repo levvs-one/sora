@@ -128,12 +128,21 @@ func (s *Server) BenchmarkServers(req *corev1.BenchmarkServersRequest, stream gr
 func (s *Server) resolveBenchmarkServers(ids []string) (found []*corev1.OutboundSpec, missing []string) {
 	s.subs.mu.Lock()
 	defer s.subs.mu.Unlock()
-	byID := map[string]*corev1.OutboundSpec{}
+	// Size the index for every subscription server up front: ids are
+	// unique, so the map never grows past this.
+	total := 0
+	for _, list := range s.subs.lists {
+		total += len(list)
+	}
+	byID := make(map[string]*corev1.OutboundSpec, total)
 	for _, list := range s.subs.lists {
 		for _, spec := range list {
 			byID[spec.GetId()] = spec
 		}
 	}
+	// At most len(ids) ids land in each bucket.
+	found = make([]*corev1.OutboundSpec, 0, len(ids))
+	missing = make([]string, 0, len(ids))
 	for _, id := range ids {
 		if spec, ok := byID[id]; ok {
 			found = append(found, spec)
@@ -158,8 +167,11 @@ func (s *Server) GetBenchmarks(ctx context.Context, req *corev1.GetBenchmarksReq
 	for _, id := range req.GetServerIds() {
 		want[id] = true
 	}
-	out := &corev1.GetBenchmarksResponse{}
-	for _, e := range s.benchmarker.History() {
+	history := s.benchmarker.History()
+	out := &corev1.GetBenchmarksResponse{
+		Benchmarks: make([]*corev1.BenchmarkRecord, 0, len(history)),
+	}
+	for _, e := range history {
 		if len(want) > 0 && !want[e.ServerID] {
 			continue
 		}
