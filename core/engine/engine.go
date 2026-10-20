@@ -40,18 +40,20 @@ const (
 	FeatureTLSFragment    Feature = "tls-fragment"
 	FeatureXHTTP          Feature = "xhttp"
 	// FeatureXHTTPDownloadSplit marks engines that can split the XHTTP
-	// downlink onto a separate server (Xray downloadSettings, mihomo
-	// download-settings). sing-box (including the lx fork) has no such
+	// downlink onto a separate server (Xray downloadSettings only: sora's
+	// mihomo renderer does not emit download-settings, so mihomo must
+	// not claim it). sing-box (including the lx fork) has no such
 	// option: routing a split plan to it would silently send downloads
 	// over the uplink server.
 	FeatureXHTTPDownloadSplit Feature = "xhttp-download-split"
 	// FeatureXHTTPXmux marks engines that honour XHTTP connection-reuse
-	// tuning (Xray xmux, mihomo reuse-settings). sing-box-lx exposes only
-	// x_padding_bytes; xmux values handed to it would be silently
+	// tuning (Xray xmux only: sora's mihomo renderer does not emit
+	// reuse-settings, so mihomo must not claim it). sing-box-lx exposes
+	// only x_padding_bytes; xmux values handed to it would be silently
 	// dropped.
-	FeatureXHTTPXmux      Feature = "xhttp-xmux"
-	FeatureVLESSEncrypt   Feature = "vless-encryption"
-	FeatureAmneziaWG      Feature = "amneziawg"
+	FeatureXHTTPXmux    Feature = "xhttp-xmux"
+	FeatureVLESSEncrypt Feature = "vless-encryption"
+	FeatureAmneziaWG    Feature = "amneziawg"
 	// FeatureAmneziaWG3 marks engines whose AmneziaWG stack implements
 	// the 3.x parameters (header_protection_key, content padding,
 	// trailers, ranged timings). mihomo only knows the 1.x/2.0 keys, so

@@ -1,6 +1,7 @@
 package control
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -107,5 +108,51 @@ func TestTUICTuningSurvivesTheVault(t *testing.T) {
 	}
 	if o.Token != "v4secret" {
 		t.Errorf("tuic v4 token = %q, want v4secret", o.Token)
+	}
+}
+
+// TestDownloadSplitSurvivesTheVault checks the end-to-end producer for
+// the XHTTP up/down split (D1): the link's extra= JSON reaches the
+// parser's OutboundSpec, travels through the credential vault, and
+// lands in engine.Transport.DownloadAddress/DownloadPort, where the
+// Xray renderer and plan validation honour it.
+func TestDownloadSplitSurvivesTheVault(t *testing.T) {
+	link := "vless://123e4567-e89b-12d3-a456-426614174000@up.example.com:443" +
+		"?type=xhttp&security=tls" +
+		"&extra=" + url.QueryEscape(`{"downloadSettings":{"address":"down.example.com","port":8443}}`) +
+		"#X"
+	result, err := parser.LinkParser{}.Parse([]byte(link))
+	if err != nil || len(result.Servers) != 1 {
+		t.Fatalf("Parse = %+v, %v", result, err)
+	}
+	spec := result.Servers[0]
+	if spec.DownloadAddress != "down.example.com" || spec.DownloadPort != 8443 {
+		t.Fatalf("parser spec = %q:%d, want down.example.com:8443", spec.DownloadAddress, spec.DownloadPort)
+	}
+	document, err := credentialDocument(spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	values, err := parseCredential(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var o engine.Outbound
+	if err := applyCredential(&o, values); err != nil {
+		t.Fatal(err)
+	}
+	if o.Transport.DownloadAddress != "down.example.com" || o.Transport.DownloadPort != 8443 {
+		t.Errorf("transport split = %q:%d, want down.example.com:8443",
+			o.Transport.DownloadAddress, o.Transport.DownloadPort)
+	}
+	// A forged credential document cannot smuggle an invalid port: the
+	// port is re-bounded on the way in.
+	values["download_port"] = "99999"
+	o = engine.Outbound{}
+	if err := applyCredential(&o, values); err != nil {
+		t.Fatal(err)
+	}
+	if o.Transport.DownloadPort != 0 {
+		t.Errorf("forged port 99999 survived as %d, want 0", o.Transport.DownloadPort)
 	}
 }

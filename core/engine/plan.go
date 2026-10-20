@@ -78,9 +78,9 @@ type TLS struct {
 	Fingerprint string
 	// ECH enables Encrypted Client Hello. Opt-in only: some censors drop
 	// ClientHellos carrying the ECH extension, so it must never default on.
-	ECH         ECHConfig
-	Insecure    bool
-	Reality     bool
+	ECH      ECHConfig
+	Insecure bool
+	Reality  bool
 	// RealityPublicKey and other REALITY parameters are public but masked
 	// because they identify a server.
 	RealityPublicKey string
@@ -112,12 +112,13 @@ type Transport struct {
 	DownloadPort    uint16
 	// Xmux tunes XHTTP connection reuse. MaxConcurrency (streams per
 	// connection) and MaxConnections are mutually exclusive. Zero keeps
-	// the engine default. Xray renders xmux, mihomo renders
-	// reuse-settings; sing-box cannot honour them (see
-	// FeatureXHTTPXmux).
-	XmuxMaxConcurrency int
-	XmuxMaxConnections int
-	XmuxMaxReuseTimes  int
+	// the engine default. Rendering xmux tuning is a backlog item
+	// (spec 09-xhttp §3): no renderer emits it yet, so setting these
+	// fields routes the plan away from sing-box/mihomo without changing
+	// the wire config (see FeatureXHTTPXmux).
+	XmuxMaxConcurrency  int
+	XmuxMaxConnections  int
+	XmuxMaxReuseTimes   int
 	XmuxMaxRequestTimes int
 	// XPaddingBytes is the random XHTTP padding range, "min-max" or a
 	// single number, e.g. "100-1000". Xray, mihomo and sing-box-lx all
@@ -150,11 +151,11 @@ type Outbound struct {
 
 	// UUID and the following credential fields must be masked in logs and
 	// events.
-	UUID       string
-	Password   string
-	Cipher     string
-	UserID     string
-	Flow       string
+	UUID     string
+	Password string
+	Cipher   string
+	UserID   string
+	Flow     string
 	// FlowAuto records that Flow was assigned by plan-level auto-vision
 	// (Outbound.ApplyAutoVision) rather than by the import link or the
 	// user. Intended UI contract: the app shows an "auto" badge next to
@@ -163,9 +164,9 @@ type Outbound struct {
 	// struct copy and is ready for the wire field.) It is only ever set
 	// together with Flow by ApplyAutoVision; a manually configured flow
 	// always leaves it false.
-	FlowAuto   bool
-	Obfs       string
-	ObfsParam  string
+	FlowAuto  bool
+	Obfs      string
+	ObfsParam string
 	// Plugin and PluginOpts carry a Shadowsocks SIP002 obfuscation plugin
 	// (e.g. v2ray-plugin) and its raw option string, verbatim from the
 	// import link. When set, Plugin wins over the legacy Obfs/ObfsParam

@@ -40,9 +40,13 @@ var Catalog = map[Kind]Capabilities{
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
 			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureChains: true,
 			FeatureHy2PortHop: true, FeatureDoH3: true,
-			// mihomo 1.19.32 speaks download-settings and reuse-settings
-			// on xhttp-opts (verified against the pinned source).
-			FeatureXHTTPDownloadSplit: true, FeatureXHTTPXmux: true,
+			// Deliberately no FeatureXHTTPDownloadSplit/XHTTPXmux: sora's
+			// mihomo renderer emits only path/host/mode/headers in
+			// xhttp-opts, so a split or xmux-tuned plan routed to mihomo
+			// would silently drop the downlink settings. The upstream
+			// download-settings/reuse-settings shapes are a backlog
+			// render (spec 09-xhttp §3); until it is implemented and
+			// verified with mihomo -t, such plans route Xray-only.
 		},
 	},
 	KindSingBox: {

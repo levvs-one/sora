@@ -182,8 +182,14 @@ type OutboundSpec struct {
 	ALPN                                                                                            []string
 	CountryCode                                                                                     string
 	AllowInsecure                                                                                   bool
-	Options                                                                                         map[string]string
-	Peers                                                                                           []WireGuardPeer
+	// DownloadAddress/DownloadPort carry the XHTTP up/down split from the
+	// link's extra= JSON (see applyExtraDownloadSettings). They travel
+	// through the credential document into engine.Transport, where plan
+	// validation and the Xray renderer honour them.
+	DownloadAddress string
+	DownloadPort    uint16
+	Options         map[string]string
+	Peers           []WireGuardPeer
 }
 
 // WireGuardPeer is one WireGuard peer as described by a wg-conf file or a
@@ -412,6 +418,10 @@ func parseLink(raw string) (OutboundSpec, error) {
 			o.Options[k] = v
 		}
 	}
+	// The XHTTP up/down split rides in the extra=<url-encoded JSON>
+	// parameter (de-facto link standard). Garbage there is provider
+	// decoration, never an import error: it is ignored, not fatal.
+	o.applyExtraDownloadSettings(getq(u, "extra"))
 	if o.Security == "" {
 		// Default security follows protocol semantics: trojan,
 		// hysteria2, and HTTPS use TLS; others do not. Empty security
@@ -431,6 +441,48 @@ func parseLink(raw string) (OutboundSpec, error) {
 	o.DisplayName = fragmentName(u.Fragment)
 	o.CountryCode = countryCode(o.DisplayName)
 	return o, o.validate()
+}
+
+// extraDownloadSettings is the Xray camelCase shape of the
+// downloadSettings object inside a share link's extra=<url-encoded JSON>
+// parameter — the de-facto link standard (mihomo's common/convert/v.go).
+// Only these recognized fields are read; every other key inside extra
+// (xmux tuning, session placement, ...) is ignored by the parser.
+type extraDownloadSettings struct {
+	Address string `json:"address"`
+	Port    int    `json:"port"`
+}
+
+// extraParams is the top level of a share link's extra= JSON document.
+type extraParams struct {
+	DownloadSettings *extraDownloadSettings `json:"downloadSettings"`
+}
+
+// applyExtraDownloadSettings parses the XHTTP up/down split carried by a
+// link's extra=<url-encoded JSON> query parameter into the spec. A
+// missing, malformed, or unusable extra — and an address without a valid
+// port — are ignored entirely: extra is provider decoration, and losing
+// the split must never fail the import. Surviving values are validated
+// again at plan level (engine.validateXHTTP) and honoured by the Xray
+// renderer; on non-XHTTP transports they are a hard plan error, not a
+// silent drop.
+func (o *OutboundSpec) applyExtraDownloadSettings(raw string) {
+	if raw == "" {
+		return
+	}
+	var x extraParams
+	if err := json.Unmarshal([]byte(raw), &x); err != nil {
+		return
+	}
+	ds := x.DownloadSettings
+	if ds == nil || ds.Address == "" {
+		return
+	}
+	if ds.Port < 1 || ds.Port > 65535 {
+		return
+	}
+	o.DownloadAddress = ds.Address
+	o.DownloadPort = uint16(ds.Port)
 }
 func parseBool(s string) bool { v, _ := strconv.ParseBool(s); return v }
 func parsePort(s string) (uint16, error) {

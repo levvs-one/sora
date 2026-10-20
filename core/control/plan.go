@@ -125,6 +125,11 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 	values["congestion_control"] = spec.Options["congestion_control"]
 	values["udp_relay_mode"] = spec.Options["udp_relay_mode"]
 	values["token"] = spec.Options["token"]
+	// XHTTP up/down split from the link's extra= JSON (09-xhttp §4). The
+	// tuning travels inside the credential document, not the proto
+	// contract, so no contract change is needed.
+	values["download_address"] = spec.DownloadAddress
+	values["download_port"] = strconv.Itoa(int(spec.DownloadPort))
 	if strings.EqualFold(spec.Protocol, "wireguard") {
 		key, addresses, peers := wireguardMaterial(spec)
 		values["private_key"] = key
@@ -601,6 +606,13 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	outbound.Transport.Host = values["host_header"]
 	outbound.Transport.Service = values["service_name"]
 	outbound.Transport.Mode = values["mode"]
+	// XHTTP up/down split from the link's extra= JSON (09-xhttp §4): the
+	// address rides the credential document; the port is bounded again
+	// here so a forged document cannot smuggle an invalid one.
+	outbound.Transport.DownloadAddress = values["download_address"]
+	if port := atoiNonNegative(values["download_port"]); port <= 65535 {
+		outbound.Transport.DownloadPort = uint16(port)
+	}
 	outbound.PrivateKey = values["private_key"]
 	if addresses := values["addresses"]; addresses != "" {
 		outbound.Addresses = strings.Split(addresses, ",")
