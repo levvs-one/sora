@@ -314,7 +314,13 @@ List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
 List<Entry> _sortEntries(List<Entry> entries, Sora sora, [Map<Entry, OutboundSpec?>? shownCache]) {
   final mode = sora.settings.serverSortMode;
   if (mode == 'name') {
-    entries.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    // Sort keys are computed once per pass, not per comparison (the
+    // benchmark screen's pattern, same as the key map below): the
+    // comparator lowercased both names on every comparison, and this runs
+    // on every probe-tick rebuild. The values are pure in the entry name,
+    // so the order is identical.
+    final nameKeys = {for (final e in entries) e: e.name.toLowerCase()};
+    entries.sort((a, b) => nameKeys[a]!.compareTo(nameKeys[b]!));
     return entries;
   }
   // Groups are represented by the prospective active member — the same one
