@@ -1858,6 +1858,19 @@ class SRu extends S {
       'Запускает zapret рядом с VPN-туннелем: туннелированный трафик идёт через VPN, прямой — через обход.';
 
   @override
+  String get lanSharing => 'Делиться подключением в локальной сети';
+
+  @override
+  String get lanSharingHint =>
+      'Устройства в этой сети смогут выходить в интернет через это подключение. Доступ — по паролю: укажите на другом устройстве адрес прокси, логин и пароль ниже.';
+
+  @override
+  String get lanSharingLogin => 'Логин';
+
+  @override
+  String get lanSharingPassword => 'Пароль';
+
+  @override
   String get chainDuplicate => 'Каждый сервер — только один раз';
 
   @override

@@ -3477,6 +3477,30 @@ abstract class S {
   /// **'Запускает zapret рядом с VPN-туннелем: туннелированный трафик идёт через VPN, прямой — через обход.'**
   String get zapretWithVpnHint;
 
+  /// No description provided for @lanSharing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Делиться подключением в локальной сети'**
+  String get lanSharing;
+
+  /// No description provided for @lanSharingHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Устройства в этой сети смогут выходить в интернет через это подключение. Доступ — по паролю: укажите на другом устройстве адрес прокси, логин и пароль ниже.'**
+  String get lanSharingHint;
+
+  /// No description provided for @lanSharingLogin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Логин'**
+  String get lanSharingLogin;
+
+  /// No description provided for @lanSharingPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль'**
+  String get lanSharingPassword;
+
   /// No description provided for @chainDuplicate.
   ///
   /// In ru, this message translates to:

@@ -376,6 +376,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(sora.settings.xrayTunStack, 'system');
       expect((await Settings.load()).xrayTunStack, 'system');
+      // ensureVisible first: the LAN sharing section (C7) made the
+      // dialog taller, so at 420px a bare tap on engine- can miss it
+      // while it is clipped by the scroll position, as with mode-tun
+      // above.
+      await tester.ensureVisible(find.byKey(const ValueKey('engine-')));
       await tester.tap(find.byKey(const ValueKey('engine-')));
       await tester.pumpAndSettle();
       expect(find.text('Стек TUN'), findsNothing);

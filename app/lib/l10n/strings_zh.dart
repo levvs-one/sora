@@ -1828,6 +1828,19 @@ class SZh extends S {
       'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
 
   @override
+  String get lanSharing => 'Share connection on the local network';
+
+  @override
+  String get lanSharingHint =>
+      'Devices on this network can go online through this connection. Access is by password: enter the proxy address, login and password below on the other device.';
+
+  @override
+  String get lanSharingLogin => 'Login';
+
+  @override
+  String get lanSharingPassword => 'Password';
+
+  @override
   String get chainDuplicate => 'Each server can appear only once';
 
   @override
@@ -4136,6 +4149,19 @@ class SZhHans extends SZh {
       'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
 
   @override
+  String get lanSharing => 'Share connection on the local network';
+
+  @override
+  String get lanSharingHint =>
+      'Devices on this network can go online through this connection. Access is by password: enter the proxy address, login and password below on the other device.';
+
+  @override
+  String get lanSharingLogin => 'Login';
+
+  @override
+  String get lanSharingPassword => 'Password';
+
+  @override
   String get chainDuplicate => 'Each server can appear only once';
 
   @override
@@ -6442,6 +6468,19 @@ class SZhHant extends SZh {
   @override
   String get zapretWithVpnHint =>
       'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+
+  @override
+  String get lanSharing => 'Share connection on the local network';
+
+  @override
+  String get lanSharingHint =>
+      'Devices on this network can go online through this connection. Access is by password: enter the proxy address, login and password below on the other device.';
+
+  @override
+  String get lanSharingLogin => 'Login';
+
+  @override
+  String get lanSharingPassword => 'Password';
 
   @override
   String get chainDuplicate => 'Each server can appear only once';

@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
+import '../settings.dart';
 import '../sora.dart';
 import 'kit.dart';
 import 'subscription_sheet.dart';
@@ -263,6 +265,10 @@ class _Modes extends StatelessWidget {
                 value: settings.killSwitch,
                 onChanged: (v) => unawaited(sora.setKillSwitch(v)),
               ),
+              if (current == 'tun') ...[
+                const SizedBox(height: 12),
+                const _LanSharingSection(),
+              ],
               if (Platform.isLinux && sora.serverlessAvailable) ...[
                 const SizedBox(height: 12),
                 SwitchTile(
@@ -301,6 +307,111 @@ class _Modes extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// LAN sharing (C7): in TUN mode the local proxy can listen on every
+/// interface so another device on this network goes online through the
+/// connection. The password is the only gate, so while sharing is on the
+/// section shows the endpoint and the credentials for the second device,
+/// in the same selectable-plus-copy shape as the device identity section.
+/// The LAN address is read once from the OS interfaces (the first
+/// non-loopback IPv4); the port is the one the core reports in
+/// About.local_proxy, exactly as the settings screen reads it.
+class _LanSharingSection extends StatefulWidget {
+  const _LanSharingSection();
+
+  @override
+  State<_LanSharingSection> createState() => _LanSharingSectionState();
+}
+
+class _LanSharingSectionState extends State<_LanSharingSection> {
+  String? _lanIp;
+  bool _requested = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_requested) return;
+    _requested = true;
+    unawaited(_load());
+  }
+
+  Future<void> _load() async {
+    try {
+      final interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
+      for (final interface in interfaces) {
+        for (final address in interface.addresses) {
+          if (!address.isLoopback) {
+            if (mounted) setState(() => _lanIp = address.address);
+            return;
+          }
+        }
+      }
+    } catch (_) {
+      // No readable interface list: the section stays without an endpoint
+      // instead of inventing an address.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
+    final settings = sora.settings;
+    final port = sora.localProxy?.port;
+    final endpoint = _lanIp != null && port != null ? '$_lanIp:$port' : null;
+    Widget credential(String label, String value, String key) => Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: Styles.secondary.copyWith(color: palette.ink2)),
+                const SizedBox(height: 4),
+                SelectableText(
+                  value,
+                  key: ValueKey(key),
+                  style: Styles.caption.copyWith(color: palette.ink, fontFamily: 'monospace'),
+                ),
+              ],
+            ),
+          ),
+          Tooltip(
+            message: s.deviceIdCopy,
+            child: Pressable(
+              onTap: () => unawaited(Clipboard.setData(ClipboardData(text: value))),
+              radius: 8,
+              child: Padding(
+                padding: const EdgeInsets.all(6),
+                child: Icon(Symbols.content_copy_rounded, size: 18, color: palette.ink2),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SwitchTile(
+          key: const ValueKey('allow-lan-sharing'),
+          title: s.lanSharing,
+          value: settings.allowLanSharing,
+          onChanged: (v) => unawaited(sora.change((x) => x.allowLanSharing = v)),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+          child: Text(s.lanSharingHint, style: Styles.secondary.copyWith(color: palette.ink2)),
+        ),
+        if (settings.allowLanSharing) ...[
+          if (endpoint != null) credential(s.proxyAddress, endpoint, 'lan-sharing-endpoint'),
+          credential(s.lanSharingLogin, Settings.lanProxyUsername, 'lan-sharing-login'),
+          credential(s.lanSharingPassword, settings.lanProxyPassword, 'lan-sharing-password'),
+        ],
+      ],
     );
   }
 }

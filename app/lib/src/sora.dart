@@ -2420,6 +2420,19 @@ SessionPlan buildPlan({
         : '',
     engines: [if (settings.engine.isNotEmpty) settings.engine],
     networkControlAllowed: settings.controlPort,
+    // LAN sharing (C7): only in TUN mode and never for the serverless
+    // bypass session, which has no connection to share. In the system
+    // proxy mode the core forces its own login-less listener and refuses
+    // allow_lan, so the field stays unset there — with sharing off the
+    // plan keeps its previous shape entirely (no LocalProxy at all).
+    localProxy: settings.tunnel == 'tun' && settings.allowLanSharing && choice != 'bypass'
+        ? LocalProxy(
+            enabled: true,
+            username: Settings.lanProxyUsername,
+            password: settings.lanProxyPassword,
+            allowLan: true,
+          )
+        : null,
     routing: RoutingOptions(preset: settings.preset, blockAds: settings.blockAds),
     ipv6: settings.ipv6,
     dnsPolicy: DnsPolicy(servers: settings.dns),

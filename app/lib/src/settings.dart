@@ -7,6 +7,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'notifications.dart';
 
+/// Random password for the LAN-shared local proxy (C7). The password is
+/// the only gate on a listener bound to every interface, so it is drawn
+/// from [Random.secure] over an unambiguous alphabet (no 0/O, 1/l/I) at
+/// 24 characters — comfortably above the 16-character floor, and easy to
+/// retype on a second device from the modes panel.
+String _newLanProxyPassword() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  final random = Random.secure();
+  return String.fromCharCodes(List.generate(24, (_) => alphabet.codeUnitAt(random.nextInt(alphabet.length))));
+}
+
 /// Random UUID v4 for the staged-rollout install cohort (S11a). Not a
 /// security token — only a stable, uniformly distributed install identity.
 String _newInstallUuid() {
@@ -74,6 +85,8 @@ class Settings {
     'zapretWithVpn',
     'censorVerdicts',
     'obfs',
+    'allowLanSharing',
+    'lanProxyPassword',
   };
 
   final SharedPreferencesWithCache _store;
@@ -98,6 +111,13 @@ class Settings {
       // Generated once; the cohort (SHA-256(uuid) mod 100) never changes
       // while this value is stored.
       await _store.setString('installUuid', _newInstallUuid());
+    }
+    if (!_store.containsKey('lanProxyPassword')) {
+      // LAN sharing password (C7): generated once, like the install UUID,
+      // so buildPlan can read it synchronously. It is not preserved by
+      // [reset] (unlike the install UUID): a settings reset rotates it,
+      // and sharing defaults to off, so nothing is exposed meanwhile.
+      await _store.setString('lanProxyPassword', _newLanProxyPassword());
     }
     final stored = _store.getInt('format') ?? 0;
     if (stored > format) {
@@ -361,6 +381,29 @@ class Settings {
   /// Run zapret for direct traffic alongside the VPN tunnel (F11, Linux only).
   bool get zapretWithVpn => _store.getBool('zapretWithVpn') ?? false;
   set zapretWithVpn(bool value) => _store.setBool('zapretWithVpn', value);
+
+  /// Shares the connection with the local network (C7): in TUN mode the
+  /// local proxy listens on every interface, gated by [lanProxyPassword].
+  /// Off by default; the core refuses the plan without the password or in
+  /// the system proxy mode, whose listener cannot carry a login.
+  ///
+  /// Deliberately not in [syncableSettingsKeys]: the switch is a
+  /// device-local exposure decision (like the consent-gated
+  /// `controlPort`), and the password is this device's own secret — a
+  /// peer device must be told it on this device's screen, never synced.
+  bool get allowLanSharing => _store.getBool('allowLanSharing') ?? false;
+  set allowLanSharing(bool value) => _store.setBool('allowLanSharing', value);
+
+  /// The fixed login of the LAN-shared local proxy (C7). A username is
+  /// not a secret — the password is the gate — so a fixed, recognisable
+  /// name beats a generated one: the person types "sora" and the password
+  /// shown in the modes panel on the second device.
+  static const lanProxyUsername = 'sora';
+
+  /// The generated-once password of the LAN-shared local proxy (C7),
+  /// written by [_migrate]. Never logged anywhere; the modes panel shows
+  /// it to the user only while sharing is on.
+  String get lanProxyPassword => _store.getString('lanProxyPassword') ?? '';
 
   /// Obfuscation suite settings as JSON: {preset, utls, fragment, jitter}.
   String get obfs => _store.getString('obfs') ?? '';
