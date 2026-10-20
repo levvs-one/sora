@@ -2,7 +2,7 @@
 
 Normative wire contract between the Go sync daemon (`service/sync`) and the
 app UI. Both sides MUST implement exactly this; when they disagree, this
-document wins. The Go side is the reference implementation — its tests
+document wins. The Go side is the reference implementation - its tests
 (`pairing/pairing_test.go`, vectors T1) pin the wire bytes.
 
 ## 1. Pairing QR payload
@@ -70,7 +70,7 @@ vectorTok16 = "AAECAwQFBgcICQoLDA0ODw"                      // bytes 0..15
   handshake (static-key check) and the token confirmation.
 - **Dial gate:** the daemon dials ONLY loopback, RFC 1918, or link-local
   addresses (see `lanAddr` in `api/pairing.go`). A spoofed answer pointing
-  outside the LAN is rejected before any TCP connect — so a LAN attacker
+  outside the LAN is rejected before any TCP connect - so a LAN attacker
   cannot make the daemon disclose its Noise static key to an internet host.
 
 ## 3. Local HTTP API auth
@@ -121,15 +121,15 @@ Rules:
 - Bearer material: `subscriptions.url` and custom-server credentials are
   the user's own secrets, synced only between their own paired devices.
   They travel exclusively inside the Noise-encrypted channel and rest in
-  the daemon data dir at `0600` — the same OS-user boundary as the core's
+  the daemon data dir at `0600` - the same OS-user boundary as the core's
   own store. They never appear in logs, QR payloads, or diagnostics
   bundles.
 - NOT synced: daemon-owned state (device identity, peers), server lists
   derived from subscriptions (recomputed from the synced subscriptions),
-  custom servers — the core never returns their credentials
+  custom servers - the core never returns their credentials
   (`ListCustomServers` exposes `HasCredentials` only, by design), so the
   app cannot republish them and syncing credential-less copies would
-  create broken servers on the peer — device-local settings
+  create broken servers on the peer - device-local settings
   (`installUuid`, the update machinery, the crash-recovery marker, the
   system-proxy snapshot), notification history, and anything else the
   core keeps that the app cannot read back honestly.
@@ -138,6 +138,6 @@ Rules:
 
 - Desktop (Linux/Windows): the app spawns `sora-sync` on demand; the sync
   screen is fully functional.
-- Android: not supported — the app cannot spawn the Go binary as a child
+- Android: not supported - the app cannot spawn the Go binary as a child
   process, so the sync screen reports "unavailable" honestly instead of
   faking anything. No cloud relay is planned: F9 is LAN-only by design.
