@@ -52,7 +52,7 @@ var Catalog = map[Kind]Capabilities{
 			FeatureProxyProviders: true, FeatureURLTest: true, FeatureLatencyTest: true,
 			FeatureHotApply: true, FeatureGeoData: true, FeatureFallbackGroup: true,
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
-			FeatureXHTTPDownloadSplit: true, FeatureXHTTPXmux: true, FeatureXHTTPPadding: true,
+			FeatureXHTTPDownloadSplit: true, FeatureXHTTPXmux: true, FeatureXHTTPPadding: true, FeatureRealityKeyShare: true,
 			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureChains: true,
 			FeatureHy2PortHop: true, FeatureHy2Obfs: true, FeatureDoH3: true, FeatureECH: true,
 			// FeatureXHTTPDownloadSplit and FeatureXHTTPXmux are
