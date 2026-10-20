@@ -497,6 +497,45 @@ const zapretDirectOutboundID = "sora-zapret-direct"
 // (core/engine/bypass/NFQWS-MIGRATION.md §4). The synthetic outbound
 // still rides along so the factory wraps the plan and the executor
 // starts; if nfqws is not installed, Apply fails closed naming it.
+// bypassStrategyFromProto maps every BypassStrategy contract field onto
+// the engine strategy. It is the single conversion for both call sites
+// (zapret_strategy and a per-outbound bypass) so the two cannot drift
+// apart again: the contract once carried only 7 of the engine's 29 fields
+// and each site copied just those.
+func bypassStrategyFromProto(strategy *corev1.BypassStrategy) engine.BypassStrategy {
+	return engine.BypassStrategy{
+		SplitPos:         strategy.GetSplitPos(),
+		Disorder:         strategy.GetDisorder(),
+		DisorderScope:    strategy.GetDisorderScope(),
+		OOB:              strategy.GetOob(),
+		OOBScope:         strategy.GetOobScope(),
+		TLSRecord:        strategy.GetTlsRecord(),
+		HostCase:         strategy.GetHostCase(),
+		DomainCase:       strategy.GetDomainCase(),
+		MethodEOL:        strategy.GetMethodEol(),
+		HostDot:          strategy.GetHostDot(),
+		HostTab:          strategy.GetHostTab(),
+		HostNoSpace:      strategy.GetHostNoSpace(),
+		MethodSpace:      strategy.GetMethodSpace(),
+		UnixEOL:          strategy.GetUnixEol(),
+		SplitAnyProtocol: strategy.GetSplitAnyProtocol(),
+		TamperStart:      strategy.GetTamperStart(),
+		TamperCutoff:     strategy.GetTamperCutoff(),
+		OOBData:          strategy.GetOobData(),
+		MSS:              strategy.GetMss(),
+		Desync:           strategy.GetDesync(),
+		FakeTLS:          strategy.GetFakeTls(),
+		FakeQUIC:         strategy.GetFakeQuic(),
+		Fooling:          strategy.GetFooling(),
+		TTL:              int(strategy.GetTtl()),
+		AutoTTL:          strategy.GetAutoTtl(),
+		Repeats:          int(strategy.GetRepeats()),
+		FilterTCP:        strategy.GetFilterTcp(),
+		FilterUDP:        strategy.GetFilterUdp(),
+		FilterL7:         strategy.GetFilterL7(),
+	}
+}
+
 func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) error {
 	if !plan.Tun.Enabled {
 		return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanTunnel,
@@ -520,11 +559,7 @@ func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) erro
 		})
 		return nil
 	}
-	bs := engine.BypassStrategy{
-		SplitPos: strategy.GetSplitPos(), Disorder: strategy.GetDisorder(), OOB: strategy.GetOob(),
-		TLSRecord: strategy.GetTlsRecord(), HostCase: strategy.GetHostCase(),
-		DomainCase: strategy.GetDomainCase(), MethodEOL: strategy.GetMethodEol(),
-	}
+	bs := bypassStrategyFromProto(strategy)
 	plan.Outbounds = append(plan.Outbounds, engine.Outbound{
 		ID: zapretDirectOutboundID, Name: "Zapret (direct traffic)",
 		Protocol: engine.ProtocolBypass, Bypass: &bs,
@@ -617,10 +652,8 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 		outbound.Name = id
 	}
 	if b := spec.GetBypass(); b != nil {
-		outbound.Bypass = &engine.BypassStrategy{
-			SplitPos: b.GetSplitPos(), Disorder: b.GetDisorder(), OOB: b.GetOob(), TLSRecord: b.GetTlsRecord(),
-			HostCase: b.GetHostCase(), DomainCase: b.GetDomainCase(), MethodEOL: b.GetMethodEol(),
-		}
+		bs := bypassStrategyFromProto(b)
+		outbound.Bypass = &bs
 	}
 	if reference := spec.GetCredentials().GetReference(); reference != "" {
 		if secrets == nil {
