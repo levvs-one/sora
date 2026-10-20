@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/levvs-one/sora-client/core/custom"
+	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	customv1 "github.com/levvs-one/sora-client/core/gen/sora/custom/v1"
@@ -79,7 +80,13 @@ func isCredentialDocument(material []byte) bool {
 //
 // Shadowsocks is the one two-part credential: the accepted form is
 // "method:password" (the SIP002 userinfo shape); a value without a
-// plausible method prefix is stored as a bare password.
+// plausible method prefix is stored as a bare password. "Plausible"
+// means a cipher sora actually knows (engine.IsKnownShadowsocksMethod,
+// the one cipher list in core/engine/ss.go): an earlier version split
+// on the first colon unconditionally, so "my:secret" was stored as
+// method "my" — a garbage cipher that passed plan validation and only
+// failed when the engine started — and a bare password containing a
+// colon could not be represented at all (B1 review).
 func customCredentialDocument(protocol custom.Protocol, raw []byte) []byte {
 	if len(raw) == 0 || isCredentialDocument(raw) {
 		return nil
@@ -95,7 +102,8 @@ func customCredentialDocument(protocol custom.Protocol, raw []byte) []byte {
 	case custom.ProtocolTrojan:
 		values["password"] = cred
 	case custom.ProtocolShadowsocks:
-		if method, password, ok := strings.Cut(cred, ":"); ok && method != "" && !strings.ContainsAny(method, " \t") {
+		if method, password, ok := strings.Cut(cred, ":"); ok && method != "" && !strings.ContainsAny(method, " \t") &&
+			engine.IsKnownShadowsocksMethod(method) {
 			values["method"], values["password"] = method, password
 		} else {
 			values["password"] = cred

@@ -595,7 +595,23 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 		// outbound, so a WireGuard server imported from a link or a
 		// .conf could never build a plan (B1 servers audit). The
 		// engine's WireGuard outbound carries no transport type.
-		outbound.Transport.Type = ""
+		//
+		// Only those producer spellings ("", "tcp", "udp") are
+		// normalized. Any other value is not a WireGuard transport
+		// at all: an earlier version erased it unconditionally, so
+		// wireguard/"bogus", wireguard/"ws" and wireguard/"grpc"
+		// silently became valid plans (B1 review). Erasing "ws" or
+		// "grpc" cannot be left to plan validation either — both are
+		// legitimate transports for other protocols, so the plan
+		// whitelist would accept them — hence the honest rejection
+		// here, in the converter that knows the protocol.
+		switch outbound.Transport.Type {
+		case "", "tcp", "udp":
+			outbound.Transport.Type = ""
+		default:
+			return engine.Outbound{}, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+				"control: outbound %q: wireguard has no stream transport, got %q", id, outbound.Transport.Type)
+		}
 	}
 	if outbound.Name == "" {
 		outbound.Name = id

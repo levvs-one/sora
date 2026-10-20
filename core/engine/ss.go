@@ -76,6 +76,22 @@ func normalizeShadowsocksMethod(method string) string {
 	return m
 }
 
+// IsKnownShadowsocksMethod reports whether method names a Shadowsocks
+// cipher sora recognizes: a SIP022 method, a SIP004/SIP007 AEAD method,
+// a deprecated stream cipher, or "none"/"plain". It is the classifier
+// above exported for callers that must decide whether a string is a
+// method at all (the control plane's custom-server credential split):
+// a single source of truth, so no second cipher list can drift from
+// the one the warnings use. An empty method is NOT known here: the
+// classifier maps "" onto the aes-256-gcm default, but as an explicit
+// name the empty string is the absence of a method, not a cipher.
+func IsKnownShadowsocksMethod(method string) bool {
+	if strings.TrimSpace(method) == "" {
+		return false
+	}
+	return classifyShadowsocksMethod(method) != ssClassUnknown
+}
+
 // classifyShadowsocksMethod returns the security class of a method name.
 func classifyShadowsocksMethod(method string) ssMethodClass {
 	m := normalizeShadowsocksMethod(method)
