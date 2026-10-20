@@ -181,8 +181,19 @@ func isSafeArchivePath(name string) bool {
 //     missing — except the signature itself, which cannot checksum itself),
 //  3. signature.minisig is a valid author signature over checksums.txt.
 //
-// On success the package is trusted to match what the author signed.
+// The signature is checked against the manifest's self-attested author key;
+// for catalog installs use VerifyWithKey with the catalog-pinned key
+// instead (see Store.Install). On success the package is trusted to match
+// what the author signed.
 func (p *Package) Verify() error {
+	return p.VerifyWithKey(p.Manifest.Author.PublicKey)
+}
+
+// VerifyWithKey is Verify against an explicit author key line. Catalog
+// installs must pass the catalog-pinned key: the manifest's embedded key
+// is self-attested, so verifying against it would let a package smuggle
+// in its own trust anchor (D1).
+func (p *Package) VerifyWithKey(authorKeyLine string) error {
 	checksumsRaw, ok := p.Files[checksumsName]
 	if !ok {
 		return errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: the package is missing %q", checksumsName)
@@ -223,7 +234,7 @@ func (p *Package) Verify() error {
 				"ext: checksums.txt lists %q which is missing — the package was modified", name)
 		}
 	}
-	if err := VerifyPackageSignature(p.Manifest.Author.PublicKey, string(sigText), checksumsRaw); err != nil {
+	if err := VerifyPackageSignature(authorKeyLine, string(sigText), checksumsRaw); err != nil {
 		return err
 	}
 	return nil

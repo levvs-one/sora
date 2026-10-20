@@ -576,6 +576,22 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
     final config = _config;
     final editable = widget.interactive && !_busy;
     return Group(children: [
+      // Honest status, not a fake runner: the switch below persists the
+      // user's schedule (<id>.background.json, the runtime contract), but
+      // no background runtime executes it in this build — the scheduler is
+      // never started and the worker script has no executor yet. The badge
+      // says so instead of letting the toggle pretend otherwise.
+      Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: ExtBadge(
+            label: s.extBgRuntimeBadge,
+            tone: ExtBadgeTone.warn,
+            icon: Symbols.info_rounded,
+          ),
+        ),
+      ),
       if (config == null)
         const Padding(
           padding: EdgeInsets.all(14),

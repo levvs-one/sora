@@ -18,6 +18,7 @@ const (
 	KeyManifestInvalid     errs.Key = "ext.manifest.invalid"
 	KeyPackageInvalid      errs.Key = "ext.package.invalid"
 	KeySignatureInvalid    errs.Key = "ext.signature.invalid"
+	KeyAuthorKeyChanged    errs.Key = "ext.author_key.changed"
 	KeySigningUnconfigured errs.Key = "ext.signing.unconfigured"
 	KeyPermissionDenied    errs.Key = "ext.permission.denied"
 	KeyCatalogInvalid      errs.Key = "ext.catalog.invalid"

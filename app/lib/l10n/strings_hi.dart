@@ -1081,6 +1081,8 @@ Find one in the catalog or install from a file.';
   @override
   String get extErrGeneric => 'Something went wrong. Please try again.';
   @override
+  String get extErrAuthorKeyChanged => 'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+  @override
   String get extUpdateAvailable => 'Update available';
   @override
   String get extDisabled => 'Disabled';
@@ -1247,9 +1249,11 @@ Find one in the catalog or install from a file.';
     return _temp0;
   }
   @override
-  String get extBgNote => 'The system may delay runs to save battery. The shortest interval is 15 minutes.';
+  String get extBgNote => 'Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.';
   @override
   String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  @override
+  String get extBgRuntimeBadge => 'Not available yet';
   @override
   String get extCapNetwork => 'Network access';
   @override

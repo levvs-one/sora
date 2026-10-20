@@ -48,6 +48,13 @@ func testManifest(t *testing.T) *Manifest {
 // buildPackage assembles a signed .soraext in memory. mutate lets a test
 // tamper with the files after signing.
 func buildPackage(t *testing.T, m *Manifest, extra map[string]string, mutate func(files map[string][]byte)) []byte {
+	return buildPackageWithSeed(t, m, testSeed, extra, mutate)
+}
+
+// buildPackageWithSeed is buildPackage signing with an explicit ed25519
+// seed, so tests can build packages whose signer differs from the
+// manifest's declared author key.
+func buildPackageWithSeed(t *testing.T, m *Manifest, seed []byte, extra map[string]string, mutate func(files map[string][]byte)) []byte {
 	t.Helper()
 	manRaw, err := json.Marshal(m)
 	if err != nil {
@@ -61,7 +68,7 @@ func buildPackage(t *testing.T, m *Manifest, extra map[string]string, mutate fun
 		strFiles[k] = v
 	}
 	checksums := MakeChecksums(strFiles)
-	sig, err := SignPayload(testSeed, "test key", sigFileChecksums, time.Now().Unix(), []byte(checksums))
+	sig, err := SignPayload(seed, "test key", sigFileChecksums, time.Now().Unix(), []byte(checksums))
 	if err != nil {
 		t.Fatal(err)
 	}

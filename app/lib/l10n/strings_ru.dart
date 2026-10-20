@@ -1084,6 +1084,8 @@ class SRu extends S {
   @override
   String get extErrGeneric => 'Что-то пошло не так. Попробуйте снова.';
   @override
+  String get extErrAuthorKeyChanged => 'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.';
+  @override
   String get extUpdateAvailable => 'Доступно обновление';
   @override
   String get extDisabled => 'Отключено';
@@ -1252,9 +1254,11 @@ class SRu extends S {
     return _temp0;
   }
   @override
-  String get extBgNote => 'Система может откладывать запуски для экономии заряда. Минимальный интервал — 15 минут.';
+  String get extBgNote => 'Фоновое выполнение недоступно в этой версии Sora. Ваше расписание сохранено и начнёт действовать автоматически, когда появится фоновый рантайм. Минимальный интервал — 15 минут.';
   @override
   String get extBgDisabledNote => 'Включите расширение, чтобы управлять его фоновой задачей.';
+  @override
+  String get extBgRuntimeBadge => 'Пока недоступно';
   @override
   String get extCapNetwork => 'Доступ к сети';
   @override

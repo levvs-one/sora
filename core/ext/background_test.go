@@ -113,7 +113,7 @@ func installBg(t *testing.T, s *Store, minutes int) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Install(pkg, SourceSideload, []string{"background", "net.fetch"}); err != nil {
+	if _, err := s.Install(pkg, SourceSideload, []string{"background", "net.fetch"}, ""); err != nil {
 		t.Fatalf("install: %v", err)
 	}
 }

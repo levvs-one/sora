@@ -48,6 +48,13 @@ type Installed struct {
 	Granted []string `json:"granted"`
 	// Previous keeps the N-1 version directory name for rollback.
 	Previous string `json:"previous,omitempty"`
+	// AuthorKey is the pinned author public key (the minisign .pub line):
+	// the catalog-pinned key for catalog installs, the manifest's
+	// self-attested key otherwise (trust on first use). Updates must carry
+	// the same key — a changed key is refused, never silently adopted
+	// (key continuity, D2). Omitted in registries written before pinning;
+	// reads fall back to the manifest's key for those.
+	AuthorKey string `json:"author_key,omitempty"`
 	// ExtJSON carries the raw v2-runtime manifest fields
 	// (background_task, network_hosts) so Rollback can restore them from
 	// the registry without re-reading the package. Omitted when the
@@ -190,16 +197,33 @@ func (s *Store) extDir(id, version string) string {
 // Install verifies pkg and installs it. granted must cover every permission
 // in the manifest; the caller is expected to have shown the permission
 // prompt (and any re-prompt for widened permissions) before calling.
+//
+// authorKeyPin carries the catalog-pinned author key for catalog installs
+// (source == SourceCatalog) and is required then: the package signature is
+// verified against the pin, never against the manifest's self-attested
+// key, and the pin becomes the extension's trust anchor. For other sources
+// the pin is ignored and the manifest's key is trusted on first use.
 // For an update it returns the permissions added relative to the previous
 // version, so the caller can surface what changed.
-func (s *Store) Install(pkg *Package, source string, granted []string) (added []string, err error) {
+func (s *Store) Install(pkg *Package, source string, granted []string, authorKeyPin string) (added []string, err error) {
 	if pkg == nil || pkg.Manifest == nil {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: no package")
 	}
-	if err := pkg.Verify(); err != nil {
+	m := pkg.Manifest
+	// D1: catalog packages are verified against the catalog-pinned author
+	// key. The manifest's embedded key is self-attested — verifying
+	// against it would let a package smuggle in its own trust anchor.
+	verifyKey := m.Author.PublicKey
+	if source == SourceCatalog {
+		if strings.TrimSpace(authorKeyPin) == "" {
+			return nil, errs.Newf(errs.CodeInvalidArgument, KeyAuthorKeyChanged,
+				"ext: a catalog install of %q needs the catalog-pinned author key", m.ID)
+		}
+		verifyKey = authorKeyPin
+	}
+	if err := pkg.VerifyWithKey(verifyKey); err != nil {
 		return nil, err
 	}
-	m := pkg.Manifest
 	for _, g := range granted {
 		if !IsKnownPermission(g) {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPermissionDenied, "ext: unknown granted permission %q", g)
@@ -234,6 +258,21 @@ func (s *Store) Install(pkg *Package, source string, granted []string) (added []
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyLifecycle,
 				"ext: version %s is not newer than installed %s", m.Version, cur.Version)
 		}
+		// D2: author-key continuity. An update signed by a different key
+		// than the pinned one is refused outright — a silent substitution
+		// of the trust anchor (id squatting, catalog -> sideload
+		// cross-source swaps) must never happen. The user can still get
+		// the new build by uninstalling and installing it explicitly.
+		pinned := cur.AuthorKey
+		if pinned == "" {
+			// Registries written before pinning: the previously
+			// installed manifest's key is the anchor.
+			pinned = cur.Manifest.Author.PublicKey
+		}
+		if !sameAuthorKey(m.Author.PublicKey, pinned) {
+			return nil, errs.Newf(errs.CodeUnauthenticated, KeyAuthorKeyChanged,
+				"ext: the author key of %q changed — refusing the update", m.ID)
+		}
 		added, _ = DiffPermissions(cur.Granted, granted)
 	}
 	if err := s.extractLocked(m, pkg); err != nil {
@@ -246,10 +285,21 @@ func (s *Store) Install(pkg *Package, source string, granted []string) (added []
 	previous := ""
 	enabled := true
 	installedAt := time.Now().UTC()
+	// The trust anchor: the catalog pin for catalog installs, the
+	// manifest's self-attested key otherwise (trust on first use). Updates
+	// keep the previously pinned key; a changed key was refused above.
+	storedPin := m.Author.PublicKey
+	if source == SourceCatalog {
+		storedPin = authorKeyPin
+	}
 	if updating {
 		previous = cur.Version
 		enabled = cur.Enabled
 		installedAt = cur.InstalledAt
+		storedPin = cur.AuthorKey
+		if storedPin == "" {
+			storedPin = cur.Manifest.Author.PublicKey
+		}
 	}
 	s.installed[m.ID] = &Installed{
 		Manifest:    *m,
@@ -259,12 +309,20 @@ func (s *Store) Install(pkg *Package, source string, granted []string) (added []
 		InstalledAt: installedAt,
 		Granted:     append([]string(nil), granted...),
 		Previous:    previous,
+		AuthorKey:   storedPin,
 		ExtJSON:     marshalManifestExt(pkg.ManifestExt),
 	}
 	if err := s.saveLocked(); err != nil {
 		return nil, err
 	}
 	return added, nil
+}
+
+// sameAuthorKey compares two minisign .pub lines for the continuity
+// check. Comparison is on the trimmed lines: base64 is case-sensitive, so
+// only surrounding whitespace is forgiven, never key content.
+func sameAuthorKey(a, b string) bool {
+	return strings.TrimSpace(a) == strings.TrimSpace(b)
 }
 
 // marshalManifestExt serializes the v2-runtime manifest fields for the

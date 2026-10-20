@@ -1845,6 +1845,7 @@ abstract class S {
   String extErrMinApp(String version);
   String get extErrHttpsOnly;
   String get extErrGeneric;
+  String get extErrAuthorKeyChanged;
   String get extUpdateAvailable;
   String get extDisabled;
   String extToggleEnabled(String name);
@@ -2000,6 +2001,7 @@ abstract class S {
   String extBgHours(int hours);
   String get extBgNote;
   String get extBgDisabledNote;
+  String get extBgRuntimeBadge;
   String get extCapNetwork;
   String extCapNetworkHosts(String hosts);
 

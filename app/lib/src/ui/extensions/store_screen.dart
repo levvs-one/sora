@@ -158,7 +158,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
 
   /// Verifies and installs raw .soraext bytes with the permission prompt.
   Future<void> _installBytes(BuildContext context, Uint8List data,
-      {required String source, required String? expectedSha256}) async {
+      {required String source, required String? expectedSha256, String? authorKeyPin}) async {
     final s = S.of(context);
     if (!context.mounted) return;
     var progressOpen = false;
@@ -181,7 +181,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         if (!ok) throw PackageError('download does not match the catalog sha256');
       }
       final pkg = ExtPackage.open(data);
-      await pkg.verify();
+      // Catalog installs verify against the catalog-pinned author key,
+      // never against the manifest's self-attested one.
+      await pkg.verify(authorKeyLine: authorKeyPin);
       // min_app_version gate against the running app.
       if (_appVersion.isNotEmpty && compareVersions(pkg.manifest.minAppVersion, _appVersion) > 0) {
         throw PackageError('needs app ${pkg.manifest.minAppVersion}');
@@ -201,7 +203,8 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       if (granted == null || !context.mounted) return;
       showProgress(s.extInstalling);
       try {
-        await _store.install(pkg, source: source, granted: granted);
+        await _store.install(pkg,
+            source: source, granted: granted, authorKeyPin: authorKeyPin);
       } finally {
         hideProgress();
       }
@@ -224,6 +227,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     final s = S.of(context);
     if (message.contains('sha256')) return s.extErrHash;
     if (message.contains('signature') || message.contains('checksums')) return s.extErrSignature;
+    if (message.contains('author key changed')) return s.extErrAuthorKeyChanged;
     if (message.contains('manifest')) return s.extErrManifest;
     if (message.contains('needs app')) {
       final version = message.replaceFirst('needs app ', '').trim();
@@ -602,7 +606,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       Navigator.of(context).pop();
       progressOpen = false;
       await state._installBytes(context, data,
-          source: 'catalog', expectedSha256: e.sha256);
+          source: 'catalog', expectedSha256: e.sha256, authorKeyPin: e.authorKey);
     } catch (_) {
       if (progressOpen && context.mounted) Navigator.of(context).pop();
       if (context.mounted) state._showError(context, s.extErrNetwork);

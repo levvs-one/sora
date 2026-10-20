@@ -53,6 +53,7 @@ class InstalledExtension {
     required this.installedAt,
     required this.granted,
     this.previous,
+    this.authorKey,
   });
 
   final ExtManifest manifest;
@@ -62,10 +63,17 @@ class InstalledExtension {
   final List<String> granted;
   final String? previous; // N-1 version kept for rollback
 
+  /// Pinned author public key (minisign .pub line): the catalog-pinned key
+  /// for catalog installs, the manifest's self-attested key otherwise
+  /// (trust on first use). Updates must carry the same key — a changed key
+  /// is refused, never silently adopted. Null in registries written before
+  /// pinning; readers fall back to the manifest's key for those.
+  final String? authorKey;
+
   String get id => manifest.id;
   String get version => manifest.version;
 
-  InstalledExtension copyWith({bool? enabled, String? previous, ExtManifest? manifest, List<String>? granted}) {
+  InstalledExtension copyWith({bool? enabled, String? previous, ExtManifest? manifest, List<String>? granted, String? authorKey}) {
     return InstalledExtension(
       manifest: manifest ?? this.manifest,
       enabled: enabled ?? this.enabled,
@@ -73,6 +81,7 @@ class InstalledExtension {
       installedAt: installedAt,
       granted: granted ?? this.granted,
       previous: previous,
+      authorKey: authorKey ?? this.authorKey,
     );
   }
 
@@ -83,6 +92,7 @@ class InstalledExtension {
         'installed_at': installedAt.toIso8601String(),
         'granted': granted,
         if (previous != null) 'previous': previous,
+        if (authorKey != null) 'author_key': authorKey,
       };
 
   static InstalledExtension fromJson(Map<String, dynamic> json) {
@@ -93,9 +103,16 @@ class InstalledExtension {
       installedAt: DateTime.tryParse(json['installed_at'] as String? ?? '') ?? DateTime.now(),
       granted: (json['granted'] as List? ?? []).map((e) => e.toString()).toList(),
       previous: json['previous'] as String?,
+      authorKey: json['author_key'] as String?,
     );
   }
 }
+
+/// Compares two minisign .pub lines for the author-key continuity check.
+/// Only surrounding whitespace is forgiven — base64 is case-sensitive, so
+/// key content is never normalized.
+bool _sameAuthorKey(String a, String? b) =>
+    b != null && a.trim() == b.trim();
 
 /// App-side extension store. One instance per Extensions section subtree,
 /// provided through [ExtScope].
@@ -191,10 +208,19 @@ class ExtensionStore extends ChangeNotifier {
   /// the previously installed version (empty for a fresh install) so the UI
   /// can re-prompt on widening updates.
   ///
+  /// [authorKeyPin] carries the catalog-pinned author key for catalog
+  /// installs and is required then: the package signature is verified
+  /// against the pin (see [installBytes]), never against the manifest's
+  /// self-attested key, and the pin becomes the extension's trust anchor.
+  /// For other sources the pin is ignored and the manifest's key is
+  /// trusted on first use. An update whose author key differs from the
+  /// pinned one is refused outright — key continuity, never a silent
+  /// substitution.
+  ///
   /// Throws [ExtStoreError] / [PackageError] with developer messages; the UI
   /// maps them to localized text.
   Future<List<String>> install(ExtPackage pkg,
-      {required String source, required List<String> granted}) async {
+      {required String source, required List<String> granted, String? authorKeyPin}) async {
     final m = pkg.manifest;
     for (final g in granted) {
       if (!isKnownPermission(g)) throw ExtStoreError('unknown granted permission "$g"');
@@ -206,6 +232,20 @@ class ExtensionStore extends ChangeNotifier {
     final cur = _installed[m.id];
     if (cur != null && compareVersions(m.version, cur.version) <= 0) {
       throw ExtStoreError('version ${m.version} is not newer than installed ${cur.version}');
+    }
+    // Author-key continuity: an update signed by a different key than the
+    // pinned one is refused outright — a silent substitution of the trust
+    // anchor (id squatting, catalog -> sideload cross-source swaps) must
+    // never happen. The user can still get the new build by uninstalling
+    // and installing it explicitly.
+    final pinned = cur?.authorKey ?? cur?.manifest.author.publicKey;
+    if (cur != null && !_sameAuthorKey(m.author.publicKey, pinned)) {
+      throw ExtStoreError('author key changed for "${m.id}": refusing the update');
+    }
+    // The catalog pin is the trust anchor for catalog installs; without it
+    // the install cannot prove it verified against the right key.
+    if (source == 'catalog' && (authorKeyPin == null || authorKeyPin.trim().isEmpty)) {
+      throw ExtStoreError('catalog install of "${m.id}" needs the catalog-pinned author key');
     }
     // Extract to a staging dir first; only touch the registry when the
     // content is fully on disk.
@@ -231,6 +271,19 @@ class ExtensionStore extends ChangeNotifier {
       final stale = Directory(_contentDir(m.id, cur!.previous!));
       if (await stale.exists()) await stale.delete(recursive: true);
     }
+    // The trust anchor: the catalog pin for catalog installs, the
+    // manifest's self-attested key otherwise (trust on first use). Updates
+    // keep the previously pinned key; a changed key was refused above.
+    // Registries written before pinning backfill from the previously
+    // installed manifest on the next update.
+    final String storedPin;
+    if (cur != null) {
+      storedPin = cur.authorKey ?? cur.manifest.author.publicKey;
+    } else if (source == 'catalog') {
+      storedPin = authorKeyPin!; // enforced non-empty above
+    } else {
+      storedPin = m.author.publicKey;
+    }
     _installed[m.id] = InstalledExtension(
       manifest: m,
       enabled: cur?.enabled ?? true,
@@ -238,6 +291,7 @@ class ExtensionStore extends ChangeNotifier {
       installedAt: cur?.installedAt ?? DateTime.now(),
       granted: List.of(granted),
       previous: cur?.version,
+      authorKey: storedPin,
     );
     await _save();
     notifyListeners();
@@ -245,8 +299,12 @@ class ExtensionStore extends ChangeNotifier {
   }
 
   /// Opens, verifies and installs raw .soraext bytes (file picker / download).
+  ///
+  /// [authorKeyPin] is the catalog-pinned author key for catalog installs:
+  /// the signature is verified against it (never against the manifest's
+  /// self-attested key) and it becomes the extension's trust anchor.
   Future<List<String>> installBytes(Uint8List data,
-      {required String source, required List<String> granted, String? expectedSha256}) async {
+      {required String source, required List<String> granted, String? expectedSha256, String? authorKeyPin}) async {
     if (expectedSha256 != null) {
       final sum = crypto.sha256.convert(data).toString();
       if (sum != expectedSha256.toLowerCase()) {
@@ -260,11 +318,11 @@ class ExtensionStore extends ChangeNotifier {
       throw ExtStoreError(e.message);
     }
     try {
-      await pkg.verify();
+      await pkg.verify(authorKeyLine: authorKeyPin);
     } on PackageError catch (e) {
       throw ExtStoreError(e.message);
     }
-    return install(pkg, source: source, granted: granted);
+    return install(pkg, source: source, granted: granted, authorKeyPin: authorKeyPin);
   }
 
   /// One-tap enable/disable. Disabling takes effect immediately: the panel
@@ -295,6 +353,9 @@ class ExtensionStore extends ChangeNotifier {
       source: cur.source,
       installedAt: cur.installedAt,
       granted: cur.granted,
+      // The trust anchor survives the rollback: the previous version was
+      // installed under the same pin.
+      authorKey: cur.authorKey ?? cur.manifest.author.publicKey,
     );
     await _save();
     notifyListeners();
