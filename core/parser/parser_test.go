@@ -108,3 +108,25 @@ func TestXrayConfigurationsBecomeProfiles(t *testing.T) {
 		t.Fatal("two profiles on one server must keep two identities")
 	}
 }
+
+func TestHysteria2PinSHA256IsRejected(t *testing.T) {
+	// A pinned link must fail closed: pinSHA256 reaches no engine, so a
+	// silent import would drop the pin. The link is skipped, not imported.
+	for _, link := range []string{
+		"hysteria2://secret@example.com:443?pinSHA256=deadbeef#H2",
+		"hy2://secret@example.com:443?pin_sha256=deadbeef#H2",
+	} {
+		r, err := (LinkParser{}).Parse([]byte(link))
+		if err != nil {
+			t.Errorf("Parse(%q) error = %v", link, err)
+		}
+		if len(r.Servers) != 0 {
+			t.Errorf("Parse(%q) imported %d servers, want the pinned link skipped", link, len(r.Servers))
+		}
+	}
+	// Without a pin the same link still imports.
+	r, err := (LinkParser{}).Parse([]byte("hysteria2://secret@example.com:443#H2"))
+	if err != nil || len(r.Servers) != 1 {
+		t.Errorf("unpinned hy2 link must still import: servers=%d err=%v", len(r.Servers), err)
+	}
+}
