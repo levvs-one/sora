@@ -74,7 +74,14 @@
 #       1088344 -> 1229323 across counts on identical code (buffer
 #       growth/chunking of a quarter-megabyte body), allocs/op tight
 #       (40 -> 42), so only its B/op band is widened (25%). Its PUT
-#       sibling is stable (+-0.7%) and keeps the strict band.
+#       sibling is stable (+-0.7%) and keeps the strict band;
+#     core/ext BenchmarkOpt40ParseManifestFull{Plain,Ext} are BIMODAL:
+#       identical code produces exactly two B/op states (2088 or 2514;
+#       3680 or 4879) at constant allocs/op — one allocation lands in
+#       one of two size outcomes depending on run order/GC state, and
+#       a min-of-3 can draw either state. Their B/op bands are widened
+#       to cover the high state (30% / 40%); allocs keep the strict
+#       band (constant in every observed count).
 #   Gating those two at 5% would fail on noise, so they get explicit,
 #   per-benchmark widened bands in the comparison below (25% B/op and
 #   +2 allocs for RunSeriesShort; a 1024 B/op absolute cap and +2
@@ -288,6 +295,8 @@ awk -v pct="$THRESHOLD_PCT" '
     eb["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 25
     eb["core/probe" SUBSEP "BenchmarkDownloadGoodput"] = 25
     eb["service/sync/api" SUBSEP "BenchmarkHandleDocGet256KiB"] = 25
+    eb["core/ext" SUBSEP "BenchmarkOpt40ParseManifestFullPlain"] = 30
+    eb["core/ext" SUBSEP "BenchmarkOpt40ParseManifestFullExt"] = 40
     ea["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 2
     ebabs["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 1024
     ea["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 2
