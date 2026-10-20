@@ -316,6 +316,9 @@ class _Modes extends StatelessWidget {
 /// connection. The password is the only gate, so while sharing is on the
 /// section shows the endpoint and the credentials for the second device,
 /// in the same selectable-plus-copy shape as the device identity section.
+/// Until an endpoint exists (no non-loopback IPv4 yet, or the core has not
+/// reported a port) a plain-language status line stands in its place, so
+/// the hint's promise of an address "below" is never left unfulfilled.
 /// The LAN address is read once from the OS interfaces (the first
 /// non-loopback IPv4); the port is the one the core reports in
 /// About.local_proxy, exactly as the settings screen reads it.
@@ -407,7 +410,21 @@ class _LanSharingSectionState extends State<_LanSharingSection> {
           child: Text(s.lanSharingHint, style: Styles.secondary.copyWith(color: palette.ink2)),
         ),
         if (settings.allowLanSharing) ...[
-          if (endpoint != null) credential(s.proxyAddress, endpoint, 'lan-sharing-endpoint'),
+          if (endpoint != null)
+            credential(s.proxyAddress, endpoint, 'lan-sharing-endpoint')
+          else
+            // The hint above promises the address "below": while there is
+            // no endpoint yet (no non-loopback IPv4, or the core has not
+            // reported its port), keep that promise with an honest status
+            // line in the endpoint's place instead of showing nothing.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Text(
+                s.lanSharingNoAddress,
+                key: const ValueKey('lan-sharing-no-address'),
+                style: Styles.secondary.copyWith(color: palette.ink2),
+              ),
+            ),
           credential(s.lanSharingLogin, Settings.lanProxyUsername, 'lan-sharing-login'),
           credential(s.lanSharingPassword, settings.lanProxyPassword, 'lan-sharing-password'),
         ],

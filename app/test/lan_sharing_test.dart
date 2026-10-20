@@ -123,4 +123,47 @@ void main() {
     expect(login.data, Settings.lanProxyUsername);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('sharing on without an endpoint shows the no-address status instead of the endpoint', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1440, 900);
+    addTearDown(tester.view.reset);
+    final settings = await Settings.load();
+    await settings.completeTour();
+    settings
+      ..language = 'en'
+      ..animations = false;
+    // DesktopState never reports a local proxy, so the core's port is
+    // unknown: the endpoint cannot be built no matter what the host's
+    // network interfaces look like.
+    final sora = DesktopState(settings);
+    expect(sora.localProxy, isNull);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(SoraApp(sora: sora));
+    await tester.pumpAndSettle();
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
+    });
+
+    await tester.tap(find.byKey(const ValueKey('mode-button')));
+    await tester.pumpAndSettle();
+    final toggle = find.byKey(const ValueKey('allow-lan-sharing'));
+    expect(toggle, findsOneWidget);
+    expect(find.byKey(const ValueKey('lan-sharing-no-address')), findsNothing);
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(settings.allowLanSharing, isTrue);
+    // The hint promises the address "below": the status line keeps that
+    // promise, the endpoint row stays absent, and the credentials remain.
+    final status = tester.widget<Text>(find.byKey(const ValueKey('lan-sharing-no-address')));
+    expect(status.data, 'No local network address yet — the address will appear here when this device is connected to a network.');
+    expect(find.byKey(const ValueKey('lan-sharing-endpoint')), findsNothing);
+    final password = tester.widget<SelectableText>(find.byKey(const ValueKey('lan-sharing-password')));
+    expect(password.data, settings.lanProxyPassword);
+    final login = tester.widget<SelectableText>(find.byKey(const ValueKey('lan-sharing-login')));
+    expect(login.data, Settings.lanProxyUsername);
+    expect(tester.takeException(), isNull);
+  });
 }

@@ -1837,6 +1837,10 @@ class SEn extends S {
   String get lanSharingLogin => 'Login';
 
   @override
+  String get lanSharingNoAddress =>
+      'No local network address yet — the address will appear here when this device is connected to a network.';
+
+  @override
   String get lanSharingPassword => 'Password';
 
   @override

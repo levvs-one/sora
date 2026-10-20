@@ -3495,6 +3495,12 @@ abstract class S {
   /// **'Логин'**
   String get lanSharingLogin;
 
+  /// No description provided for @lanSharingNoAddress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пока нет адреса в локальной сети — адрес появится здесь, когда устройство подключится к сети.'**
+  String get lanSharingNoAddress;
+
   /// No description provided for @lanSharingPassword.
   ///
   /// In ru, this message translates to:

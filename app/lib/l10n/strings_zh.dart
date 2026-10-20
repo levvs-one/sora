@@ -1838,6 +1838,10 @@ class SZh extends S {
   String get lanSharingLogin => 'Login';
 
   @override
+  String get lanSharingNoAddress =>
+      'No local network address yet — the address will appear here when this device is connected to a network.';
+
+  @override
   String get lanSharingPassword => 'Password';
 
   @override
@@ -4165,6 +4169,10 @@ class SZhHans extends SZh {
   String get lanSharingLogin => 'Login';
 
   @override
+  String get lanSharingNoAddress =>
+      'No local network address yet — the address will appear here when this device is connected to a network.';
+
+  @override
   String get lanSharingPassword => 'Password';
 
   @override
@@ -6490,6 +6498,10 @@ class SZhHant extends SZh {
 
   @override
   String get lanSharingLogin => 'Login';
+
+  @override
+  String get lanSharingNoAddress =>
+      'No local network address yet — the address will appear here when this device is connected to a network.';
 
   @override
   String get lanSharingPassword => 'Password';

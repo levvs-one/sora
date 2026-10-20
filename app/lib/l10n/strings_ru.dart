@@ -1868,6 +1868,10 @@ class SRu extends S {
   String get lanSharingLogin => 'Логин';
 
   @override
+  String get lanSharingNoAddress =>
+      'Пока нет адреса в локальной сети — адрес появится здесь, когда устройство подключится к сети.';
+
+  @override
   String get lanSharingPassword => 'Пароль';
 
   @override

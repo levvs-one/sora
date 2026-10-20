@@ -891,6 +891,7 @@
   "lanSharing": "Share connection on the local network",
   "lanSharingHint": "Devices on this network can go online through this connection. Access is by password: enter the proxy address, login and password below on the other device.",
   "lanSharingLogin": "Login",
+  "lanSharingNoAddress": "No local network address yet — the address will appear here when this device is connected to a network.",
   "lanSharingPassword": "Password",
   "chainDuplicate": "Each server can appear only once",
   "edit": "Edit",
