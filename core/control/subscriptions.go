@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -593,10 +594,33 @@ func (b *subscriptionBook) nextUpdate(rec *subscriptionRecord) time.Time {
 			retry.Max = min(retry.Max, rec.interval())
 			at = rec.LastAttempt.Add(retry.Delay(rec.Failures - 1))
 		default:
-			at = rec.LastSuccess.Add(rec.interval())
+			at = rec.LastSuccess.Add(rec.interval()).Add(fetchJitter(rec.ID, rec.interval()))
 		}
 	}
 	return b.expeditedDue(rec, at)
+}
+
+// fetchJitter spreads background refreshes in time: without it every
+// install of a popular provider fetches on the interval boundary
+// (install time + k·interval), a timing pattern that identifies the
+// client fleet to the provider's logs as surely as a User-Agent. The
+// jitter is a pure function of the subscription ID — stable across
+// scheduler ticks, so the due time never flaps — in [0, min(30m,
+// interval/8)]: long enough to decorrelate a fleet, short enough to
+// never delay a refresh materially, and never negative, so the
+// provider's own update interval is always respected.
+func fetchJitter(id string, interval time.Duration) time.Duration {
+	const maxFetchJitter = 30 * time.Minute
+	window := interval / 8
+	if window > maxFetchJitter {
+		window = maxFetchJitter
+	}
+	if window <= 0 {
+		return 0
+	}
+	h := sha256.Sum256([]byte("fetch-jitter:" + id))
+	n := binary.BigEndian.Uint64(h[:8])
+	return time.Duration(n % uint64(window))
 }
 
 // run starts due updates and waits for the next deadline, change, or

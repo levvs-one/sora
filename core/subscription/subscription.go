@@ -5,6 +5,7 @@ package subscription
 
 import (
 	"context"
+	"hash/fnv"
 	"io"
 	"net"
 	"net/http"
@@ -28,12 +29,42 @@ const (
 	// MaxBodyBytes matches the import size limit, allowing accepted bodies
 	// to reach parsing.
 	MaxBodyBytes = 16 << 20
-	// UserAgent identifies Sora when no override is set, allowing
-	// provider-specific handling without browser impersonation.
-	UserAgent = "sora-core/1 (+https://github.com/levvs-one/sora)"
 	// MaxUserAgent bounds the User-Agent a subscription may set.
 	MaxUserAgent = 256
 )
+
+// DefaultUserAgents is the fetch User-Agent pool, as data: when a
+// subscription sets no override, the fetcher sends one of these
+// ordinary browser agents, chosen deterministically by provider host
+// (see userAgentForHost). A single hard-coded client agent would be
+// a fingerprint — every sora install fetching with the same
+// self-naming string tells the provider's logs (and anyone who reads
+// them) exactly which client this is, and a censor with provider
+// access could correlate users by it. A per-host pick from a small
+// pool of agents real browsers send has neither property: the same
+// provider always sees the same agent from this install (so any
+// format the panel selects by agent stays stable), while different
+// providers see different, unremarkable agents.
+//
+// The pool is data, not code: refresh the strings on release like
+// any other fingerprint data. Panels that need a specific client
+// format still get it through the per-subscription UserAgent
+// override, which always wins over the pool.
+var DefaultUserAgents = []string{
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15",
+	"Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0",
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0",
+}
+
+// userAgentForHost picks the pool agent for a provider host:
+// FNV-1a over the normalized host, stable across runs and fetches,
+// so one provider's view of this install never rotates.
+func userAgentForHost(host string) string {
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(strings.ToLower(strings.TrimSpace(host))))
+	return DefaultUserAgents[int(h.Sum32())%len(DefaultUserAgents)]
+}
 
 // FetchOptions configures one subscription retrieval.
 type FetchOptions struct {
@@ -150,6 +181,17 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 	primary, fragmentFallback, err := SplitFallback(reference)
 	if err != nil {
 		return Result{}, err
+	}
+	if agent == "" {
+		// No override: the pool agent for this provider host. It is
+		// chosen once, from the primary reference, and used for the
+		// fallback and every redirect hop too — a real browser does
+		// not change its agent mid-retrieval.
+		target, verr := ValidateReference(primary)
+		if verr != nil {
+			return Result{}, verr
+		}
+		agent = userAgentForHost(target.Hostname())
 	}
 	fallback := strings.TrimSpace(opts.FallbackURL)
 	if fallback == "" {
@@ -329,12 +371,15 @@ func ValidateReference(reference string) (*url.URL, error) {
 	return parsed, nil
 }
 
-// UserAgentFor validates an override or returns the default. Line breaks are
-// rejected to prevent header injection.
+// UserAgentFor validates an override. An empty override returns ""
+// and means "the fetcher picks the pool agent for the provider host"
+// (see DefaultUserAgents): the default is per-provider data, not one
+// global client string. Line breaks are rejected to prevent header
+// injection.
 func UserAgentFor(asked string) (string, error) {
 	trimmed := strings.TrimSpace(asked)
 	if trimmed == "" {
-		return UserAgent, nil
+		return "", nil
 	}
 	if len(trimmed) > MaxUserAgent {
 		return "", errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionScheme,

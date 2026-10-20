@@ -35,8 +35,10 @@ func newServer(t *testing.T, handler http.HandlerFunc) (*subscription.Fetcher, s
 
 func TestFetchReturnsTheBody(t *testing.T) {
 	fetcher, url := newServer(t, func(w http.ResponseWriter, r *http.Request) {
-		if got := r.Header.Get("User-Agent"); !strings.HasPrefix(got, "sora-core/") {
-			t.Errorf("user agent = %q, want one that identifies the client honestly", got)
+		if got := r.Header.Get("User-Agent"); strings.Contains(strings.ToLower(got), "sora") {
+			t.Errorf("user agent = %q, the default fetch agent must not name the client (fingerprint)", got)
+		} else if !containsString(subscription.DefaultUserAgents, got) {
+			t.Errorf("user agent = %q, want one of the pool agents in DefaultUserAgents", got)
 		}
 		if got := r.Header.Get("Accept-Encoding"); got != "identity" {
 			t.Errorf("accept-encoding = %q, want identity so a body cannot be expanded past the limit", got)
@@ -221,4 +223,14 @@ func TestFetchRefusesAUserAgentThatInjectsAHeader(t *testing.T) {
 	if _, err := fetcher.Fetch(context.Background(), url, subscription.FetchOptions{UserAgent: "Sora\r\nX-Evil: 1"}); err == nil {
 		t.Fatal("a User-Agent with a line break must be refused")
 	}
+}
+
+// containsString reports whether xs holds want exactly.
+func containsString(xs []string, want string) bool {
+	for _, x := range xs {
+		if x == want {
+			return true
+		}
+	}
+	return false
 }
