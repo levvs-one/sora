@@ -589,8 +589,14 @@ func ruleFromProto(route *corev1.RoutingRule) (engine.Rule, error) {
 // Convert only exact and suffix domains, preserving process names and patterns.
 var ruleIDNA = idna.New(idna.MapForLookup(), idna.StrictDomainName(true), idna.ValidateLabels(true), idna.VerifyDNSLength(true), idna.BidiRule())
 
-// ruleValue strips the type prefix: the engines add their own.
+// ruleValue strips type prefixes and expands single IPs to host routes
+// because every engine consumes IP rules as CIDRs.
 func ruleValue(kind engine.RuleType, destination string) string {
+	if kind == engine.RuleIPCIDR {
+		if addr, err := netip.ParseAddr(destination); err == nil && addr.Zone() == "" {
+			return netip.PrefixFrom(addr, addr.BitLen()).String()
+		}
+	}
 	if prefix, ok := rulePrefixes[kind]; ok {
 		return strings.TrimPrefix(destination, prefix)
 	}
