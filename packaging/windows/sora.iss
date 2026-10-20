@@ -130,7 +130,12 @@ Source: "..\..\THIRD-PARTY-NOTICES.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\app\assets\fonts\Inter-LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{autoprograms}\Sora"; Filename: "{app}\sora.exe"
+; The AppUserModelID must match the one the app passes to the notification
+; plugin (app/lib/src/desktop/desktop.dart): without it on the Start Menu
+; shortcut, Windows cannot attribute Sora's toast notifications to Sora and
+; they arrive under a generic identity or not at all. Requires Inno Setup
+; 6.1 or later, which is what CI carries.
+Name: "{autoprograms}\Sora"; Filename: "{app}\sora.exe"; AppUserModelID: "io.github.levvs_one.Sora"
 Name: "{autodesktop}\Sora"; Filename: "{app}\sora.exe"; Tasks: desktopicon
 
 [Run]
