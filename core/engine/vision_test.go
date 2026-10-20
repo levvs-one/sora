@@ -2,10 +2,14 @@ package engine
 
 import "testing"
 
-// TestApplyAutoVision locks the S2 plan-level rule: VLESS/Trojan over
-// TCP with TLS/REALITY and no explicit flow get xtls-rprx-vision, and
-// the fact is recorded in FlowAuto. Everything else is left alone —
-// most importantly a manually configured flow.
+// TestApplyAutoVision locks the S2 plan-level rule: VLESS over TCP
+// with TLS/REALITY and no explicit flow gets xtls-rprx-vision, and the
+// fact is recorded in FlowAuto. Trojan is deliberately NOT
+// auto-visioned: no engine honours a vision flow for Trojan, and the
+// Xray mux gate keys off plan-level Flow, so assigning vision to Trojan
+// silently killed its mux while the flow never reached the wire.
+// Everything else is left alone — most importantly a manually
+// configured flow.
 func TestApplyAutoVision(t *testing.T) {
 	cases := []struct {
 		name      string
@@ -36,11 +40,11 @@ func TestApplyAutoVision(t *testing.T) {
 			wantApply: true,
 		},
 		{
-			name:      "trojan tls tcp empty flow gets vision",
+			name:      "trojan tls tcp empty flow is untouched (no engine honours vision for trojan)",
 			o:         Outbound{Protocol: ProtocolTrojan, Transport: Transport{Type: "tcp"}, TLS: TLS{Enabled: true}},
-			wantFlow:  VisionFlow,
-			wantAuto:  true,
-			wantApply: true,
+			wantFlow:  "",
+			wantAuto:  false,
+			wantApply: false,
 		},
 		{
 			name:      "manual flow is respected",

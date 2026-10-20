@@ -57,10 +57,12 @@ func TestOutboundToProtoFlowAutoVision(t *testing.T) {
 			t.Fatalf("transport %q: flow_auto = false, want true", transport)
 		}
 	}
-	// Same for Trojan + TLS.
+	// Trojan + TLS is NOT auto-visioned (S2): no engine honours a vision
+	// flow for Trojan, and the plan-level flow would suppress Xray mux
+	// while never reaching the wire. The badge must say "no flow".
 	wire := outboundToProto(linkSpec("trojan", "tcp", "tls", ""), "ref")
-	if wire.GetFlow() != engine.VisionFlow || !wire.GetFlowAuto() {
-		t.Fatalf("trojan: flow = %q auto = %v", wire.GetFlow(), wire.GetFlowAuto())
+	if wire.GetFlow() != "" || wire.GetFlowAuto() {
+		t.Fatalf("trojan: flow = %q auto = %v, want empty flow and flow_auto = false", wire.GetFlow(), wire.GetFlowAuto())
 	}
 }
 

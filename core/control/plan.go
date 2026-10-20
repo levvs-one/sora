@@ -537,10 +537,13 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 				"control: outbound %q: %v", id, err)
 		}
 	}
-	// S2 auto-vision: VLESS/Trojan + TCP + REALITY/TLS with an empty flow
-	// get xtls-rprx-vision here, at plan level, instead of passing the
-	// empty flow through. A manual flow is respected (never overwritten),
-	// and the fact is recorded in Outbound.FlowAuto for the UI badge.
+	// S2 auto-vision: VLESS + TCP + REALITY/TLS with an empty flow
+	// gets xtls-rprx-vision here, at plan level, instead of passing the
+	// empty flow through. Trojan is excluded: no engine honours a vision
+	// flow for Trojan, and the plan-level flow would suppress Xray mux
+	// while never reaching the wire. A manual flow is respected (never
+	// overwritten), and the fact is recorded in Outbound.FlowAuto for
+	// the UI badge.
 	outbound.ApplyAutoVision()
 	return outbound, nil
 }
