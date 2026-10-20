@@ -574,6 +574,11 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	if w := s.obfsStartupWarning(); w != "" {
 		obfsNotices = append(obfsNotices, w)
 	}
+	// T050: the monthly parrot watch surfaces its staleness here, in the
+	// same notices channel as the obfs startup warnings.
+	if w := parrotReviewNotice(time.Now()); w != "" {
+		obfsNotices = append(obfsNotices, w)
+	}
 	mask := s.mask(plan)
 
 	ctx, cancel := requestDeadline(ctx, connectTimeout)
