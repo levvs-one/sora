@@ -748,7 +748,16 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       case 2:
         list.sort((a, b) => a.name.compareTo(b.name));
       case 3:
-        list.sort((a, b) => _relevance(b).compareTo(_relevance(a)));
+        {
+          // Relevance keys are computed once per filter pass, not per
+          // comparison: _relevance lowercases three fields and takes two
+          // logarithms per call, so the comparator made sorting
+          // O(n log n) relevance evaluations (the benchmark screen's
+          // sort-keys pattern). The values are pure in the entry and the
+          // query, so the order is identical.
+          final relevance = {for (final e in list) e: _relevance(e)};
+          list.sort((a, b) => relevance[b]!.compareTo(relevance[a]!));
+        }
       default:
         list.sort((a, b) => b.installs.compareTo(a.installs));
     }
