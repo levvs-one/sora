@@ -31,6 +31,7 @@ type switchGuard struct {
 	applyErr       error
 	restoreEr      error
 	blockedProbeEr error
+	releaseErr     error
 }
 
 func (g *switchGuard) setBlockedLocked(v bool) {
@@ -94,6 +95,7 @@ func (g *switchGuard) HoldBlock(context.Context) (func(context.Context) error, e
 	g.seq = append(g.seq, fmt.Sprintf("hold blocked=%v", g.blocked))
 	g.mu.Unlock()
 	var once sync.Once
+	var relErr error
 	return func(context.Context) error {
 		once.Do(func() {
 			g.mu.Lock()
@@ -107,8 +109,9 @@ func (g *switchGuard) HoldBlock(context.Context) (func(context.Context) error, e
 				g.blocked = false
 			}
 			g.seq = append(g.seq, fmt.Sprintf("release blocked=%v", g.blocked))
+			relErr = g.releaseErr
 		})
-		return nil
+		return relErr
 	}, nil
 }
 
@@ -585,4 +588,215 @@ func BenchmarkManagerConnectSwitch(b *testing.B) {
 	}
 	b.StopTimer()
 	_ = rig.manager.Disconnect(ctx)
+}
+
+// panicApplyEngine panics inside Apply, standing in for a third-party
+// engine bug on the switch path.
+type panicApplyEngine struct{ *fakeEngine }
+
+func (panicApplyEngine) Apply(context.Context, *engine.Plan) error { panic("engine boom") }
+
+// Regression (review of the switch/hold change): a panic mid-switch
+// must not leak the kill-switch hold. releaseBlock used to run only on
+// the enumerated return paths, so the panic left holds=1 forever and
+// Disconnect could never lift the block. The deferred release must
+// also fire exactly once alongside the explicit releases on the
+// ordinary paths (no double release).
+func TestManagerSwitchPanicInEngineApplyReleasesHold(t *testing.T) {
+	guard := &switchGuard{}
+	manager := NewManager(ManagerConfig{
+		Factory: func(_ context.Context, p *engine.Plan) (engine.Engine, error) {
+			if p.SessionID == "new" {
+				return panicApplyEngine{newFakeEngine()}, nil
+			}
+			return newFakeEngine(), nil
+		},
+		Guard: guard,
+	})
+	ctx := context.Background()
+	if _, err := manager.Connect(ctx, testPlan("prev"), Settings{KillSwitch: true}); err != nil {
+		t.Fatal(err)
+	}
+	func() {
+		defer func() { _ = recover() }()
+		_, _ = manager.Connect(ctx, testPlan("new"), Settings{KillSwitch: true})
+	}()
+	_, _, _, holds := guard.snapshot()
+	if holds != 0 {
+		t.Errorf("holds = %d after a panicking switch, want 0 (hold leaked; block can never be restored)", holds)
+	}
+	done := make(chan error, 1)
+	go func() { done <- manager.Disconnect(ctx) }()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("Disconnect wedged after the panic")
+	}
+	_, blocked, _, _ := guard.snapshot()
+	if blocked {
+		t.Error("block still armed after Disconnect following the panicking switch")
+	}
+
+	// Exactly one release per switch on the ordinary path too: the
+	// explicit release and the deferred one must not both fire.
+	rig := newSwitchRig()
+	if _, err := rig.manager.Connect(ctx, testPlan("prev"), Settings{KillSwitch: true}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := rig.manager.Connect(ctx, testPlan("new"), Settings{KillSwitch: true}); err != nil {
+		t.Fatal(err)
+	}
+	seq, _, _, _ := rig.guard.snapshot()
+	releases := 0
+	for _, entry := range seq {
+		if strings.HasPrefix(entry, "release") {
+			releases++
+		}
+	}
+	if releases != 1 {
+		t.Errorf("release entries = %d in %v, want exactly 1 per switch", releases, seq)
+	}
+	if err := rig.manager.Disconnect(ctx); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// Regression (review of the switch/hold change): the hold decision
+// must use the previous session's LIVE kill-switch state.
+// Session.SetKillSwitch updates the session (and the guard) but not
+// Manager.lastSettings, so deciding from lastSettings missed the hold
+// for a live-armed session — its Stop really lifted the block for the
+// switch window — and took a spurious hold for a live-disarmed one.
+func TestManagerHoldDecisionUsesLiveKillSwitchState(t *testing.T) {
+	ctx := context.Background()
+	sawHold := func(seq []string) bool {
+		for _, e := range seq {
+			if strings.HasPrefix(e, "hold") {
+				return true
+			}
+		}
+		return false
+	}
+
+	t.Run("toggled on live", func(t *testing.T) {
+		rig := newSwitchRig()
+		first, err := rig.manager.Connect(ctx, testPlan("prev"), Settings{KillSwitch: false})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := first.SetKillSwitch(ctx, true); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := rig.manager.Connect(ctx, testPlan("new"), Settings{KillSwitch: true}); err != nil {
+			t.Fatal(err)
+		}
+		seq, blocked, violated, holds := rig.guard.snapshot()
+		if !sawHold(seq) {
+			t.Errorf("no hold taken although the live session had the kill switch ON (toggled): seq=%v", seq)
+		}
+		if violated || !blocked || holds != 0 {
+			t.Errorf("after switch: blocked=%v violated=%v holds=%d, want held throughout and released", blocked, violated, holds)
+		}
+		if err := rig.manager.Disconnect(ctx); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("toggled off live", func(t *testing.T) {
+		rig := newSwitchRig()
+		first, err := rig.manager.Connect(ctx, testPlan("prev"), Settings{KillSwitch: true})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := first.SetKillSwitch(ctx, false); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := rig.manager.Connect(ctx, testPlan("new"), Settings{KillSwitch: true}); err != nil {
+			t.Fatal(err)
+		}
+		seq, blocked, _, _ := rig.guard.snapshot()
+		if sawHold(seq) {
+			t.Errorf("a hold was taken although the live session had the kill switch OFF (toggled): seq=%v", seq)
+		}
+		if !blocked {
+			t.Error("block down after a switch to a session that wants it up")
+		}
+		if err := rig.manager.Disconnect(ctx); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+// cancelApplyEngine fails Apply and cancels the caller's context on
+// the way out, staging a switch whose RPC context dies with it.
+type cancelApplyEngine struct {
+	*fakeEngine
+	cancel context.CancelFunc
+}
+
+func (e cancelApplyEngine) Apply(context.Context, *engine.Plan) error {
+	e.cancel()
+	return errSwitchEngine
+}
+
+// Regression (review of the switch/hold change): the rollback must
+// build and start the restored session on the detached stop context,
+// not on the switch's (cancelled) context — otherwise a switch that
+// failed because its RPC went away can never roll back.
+func TestManagerRollbackRunsOnTheDetachedContext(t *testing.T) {
+	guard := &switchGuard{}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	manager := NewManager(ManagerConfig{
+		Factory: func(_ context.Context, p *engine.Plan) (engine.Engine, error) {
+			if p.SessionID == "new" {
+				return cancelApplyEngine{fakeEngine: newFakeEngine(), cancel: cancel}, nil
+			}
+			return newFakeEngine(), nil
+		},
+		Guard: guard,
+	})
+	if _, err := manager.Connect(ctx, testPlan("prev"), Settings{KillSwitch: true}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := manager.Connect(ctx, testPlan("new"), Settings{KillSwitch: true}); !errors.Is(err, errSwitchEngine) {
+		t.Fatalf("switch error = %v, want the original switch failure", err)
+	}
+	current := manager.Current()
+	if current == nil || current.ID() != "prev" || current.State() != StateConnected {
+		t.Fatalf("current = %v, want prev restored despite the cancelled switch context", current)
+	}
+	if err := manager.Disconnect(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// A failed hold release must not be swallowed by the manager: the
+// switch result stands, but the failure lands in the journal of the
+// session that is current after the switch.
+func TestManagerJournalsAFailedHoldRelease(t *testing.T) {
+	rig := newSwitchRig()
+	ctx := context.Background()
+	if _, err := rig.manager.Connect(ctx, testPlan("prev"), Settings{KillSwitch: true}); err != nil {
+		t.Fatal(err)
+	}
+	rig.guard.mu.Lock()
+	rig.guard.releaseErr = errors.New("nftables busy")
+	rig.guard.mu.Unlock()
+	created, err := rig.manager.Connect(ctx, testPlan("new"), Settings{KillSwitch: true})
+	if err != nil {
+		t.Fatalf("a failed hold release must not fail the switch itself: %v", err)
+	}
+	found := false
+	for _, ev := range created.Journal().Since(0, 64) {
+		if ev.Kind == EventError && strings.Contains(ev.LogLine, "kill-switch hold release failed") {
+			found = true
+		}
+	}
+	if !found {
+		t.Error("the failed hold release left no journal entry on the new session")
+	}
+	if err := rig.manager.Disconnect(ctx); err != nil {
+		t.Fatal(err)
+	}
 }

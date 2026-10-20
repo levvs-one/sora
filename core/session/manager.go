@@ -208,19 +208,24 @@ func (m *Manager) adopt(created *Session, plan *engine.Plan, settings Settings) 
 // session is already stopped and sessions are single-use, so the
 // rollback is a fresh build+start from the remembered plan/settings,
 // never a restart of the stopped object). On success the restored
-// session becomes current and its journal says why it exists.
-func (m *Manager) rollbackToPrevious(ctx context.Context, stopCtx context.Context, switchErr error) (*Session, error) {
+// session becomes current and its journal says why it exists. The
+// rollback builds and starts on stopCtx — the caller's context
+// detached from cancellation — not on the switch's own context: a
+// switch often fails precisely because that context was cancelled
+// (the RPC went away), and reusing it would make the rollback fail
+// for the same unrelated reason and strand the user with no tunnel.
+func (m *Manager) rollbackToPrevious(stopCtx context.Context, switchErr error) (*Session, error) {
 	m.mu.Lock()
 	plan, settings := m.lastPlan, m.lastSettings
 	m.mu.Unlock()
 	if plan == nil {
 		return nil, errors.New("session: no previous plan to roll back to")
 	}
-	restored, err := m.buildSession(ctx, plan, settings)
+	restored, err := m.buildSession(stopCtx, plan, settings)
 	if err != nil {
 		return nil, err
 	}
-	if err := restored.Start(ctx); err != nil {
+	if err := restored.Start(stopCtx); err != nil {
 		cleanupErr := restored.Stop(stopCtx)
 		if cleanupErr != nil {
 			// The failed rollback still owns unrestored settings;
@@ -263,11 +268,56 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 
 	defer m.release()
 
+	// The hold decision below — and any rollback — must use the
+	// previous session's LIVE kill-switch state, not the settings it
+	// was connected with: Session.SetKillSwitch toggles the guard and
+	// the session status in place but never touches lastSettings, so
+	// deciding from lastSettings both misses a hold for a switch the
+	// user armed live (the previous Stop then really lifts the block
+	// for the switch window) and takes a spurious hold for one they
+	// disarmed live. Sync the remembered settings to the live value
+	// so a rollback restores what was actually in force, too.
+	if previous != nil {
+		if live := previous.Status().KillSwitch; live != prevSettings.KillSwitch {
+			prevSettings.KillSwitch = live
+			m.mu.Lock()
+			if m.current == previous {
+				m.lastSettings.KillSwitch = live
+			}
+			m.mu.Unlock()
+		}
+	}
+
 	created, err := m.buildSession(ctx, plan, settings)
 	if err != nil {
 		return nil, err
 	}
 	stopCtx := context.WithoutCancel(ctx)
+
+	// Panic safety for the built session: an engine is third-party
+	// code and its Apply can panic mid-switch, after its session's
+	// guard Apply is already in force. Without cleanup that session
+	// would stay half-started with no owner able to restore it, and
+	// the block would stick even after the hold is released (a
+	// release rightly leaves a block an applied session still
+	// wants). On panic only — normal returns are untouched — stop
+	// the built session (or close its engine when Start was never
+	// attempted), then re-panic: a panic in Connect propagates as a
+	// panic, never as a swallowed error.
+	createdStartAttempted := false
+	createdOwned := false // adopted, or kept as current for Disconnect cleanup
+	defer func() {
+		if r := recover(); r != nil {
+			if !createdOwned {
+				if createdStartAttempted {
+					_ = created.Stop(stopCtx)
+				} else {
+					_ = closeBuilt(created, nil)
+				}
+			}
+			panic(r)
+		}
+	}()
 
 	// Kill-switch continuity: hold the shared guard's block before the
 	// previous session's Stop can restore it, and release only after
@@ -292,11 +342,52 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 		releaseHold = nil
 		return release(stopCtx)
 	}
+	// releaseBlockLogged releases the hold (releaseBlock itself is
+	// idempotent: it consumes releaseHold, so the deferred call below
+	// and the explicit calls on the return paths can never release
+	// twice) and journals a failure instead of swallowing it. A failed
+	// release means the guard could not drop a block nobody wants any
+	// more; the guard keeps that disarm retryable (see core/guard), so
+	// the next Restore retries it — but the failure must be visible
+	// somewhere, and the session journal is the least invasive place:
+	// returning it would mask the switch's own result, which callers
+	// already act on. The log target is whichever session is current
+	// when the release runs, falling back to the built session.
+	releaseBlockLogged := func() {
+		err := releaseBlock()
+		if err == nil {
+			return
+		}
+		target := m.currentSession()
+		if target == nil {
+			target = created
+		}
+		if target == nil {
+			target = previous
+		}
+		if target != nil {
+			target.Journal().Append(Event{
+				Kind:    EventError,
+				Reason:  errs.CodeOf(err),
+				Key:     errs.KeyGuardRestoreFailed,
+				LogLine: fmt.Sprintf("kill-switch hold release failed; the block stays armed and the guard will retry dropping it on the next restore: %v", err),
+				Detail:  err.Error(),
+			})
+		}
+	}
+	if releaseHold != nil {
+		// Deferred immediately after the acquire: a panic anywhere in
+		// the switch below (an engine's Apply is third-party code)
+		// must not leak the hold — with the hold stuck, every later
+		// Restore keeps the block armed forever and Disconnect can
+		// never lift it.
+		defer releaseBlockLogged()
+	}
 
 	if previous != nil {
 		if err := previous.Stop(stopCtx); err != nil {
 			err = closeBuilt(created, err)
-			_ = releaseBlock()
+			releaseBlockLogged()
 			m.setLast(previous.Status())
 			return nil, err
 		}
@@ -305,6 +396,7 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 	m.mu.Lock()
 	m.current = nil
 	m.mu.Unlock()
+	createdStartAttempted = true
 	if err := created.Start(ctx); err != nil {
 		// Stop failed startups because they may still own an engine or
 		// device. Capture the failure status before Stop replaces it
@@ -315,8 +407,9 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 			m.mu.Lock()
 			m.current = created
 			m.mu.Unlock()
+			createdOwned = true
 			err = errs.Wrap(errors.Join(err, cleanupErr), errs.CodeOf(cleanupErr), errs.KeyOf(cleanupErr))
-			_ = releaseBlock()
+			releaseBlockLogged()
 			m.setLast(status)
 			return nil, err
 		}
@@ -325,18 +418,19 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 			// was working: one rollback attempt from the remembered
 			// plan. The caller still gets the switch error, never
 			// the rollback's.
-			if _, rbErr := m.rollbackToPrevious(ctx, stopCtx, err); rbErr == nil {
-				_ = releaseBlock()
+			if _, rbErr := m.rollbackToPrevious(stopCtx, err); rbErr == nil {
+				releaseBlockLogged()
 				return nil, err
 			}
 		}
-		_ = releaseBlock()
+		releaseBlockLogged()
 		m.setLast(status)
 		return nil, err
 	}
 
 	m.adopt(created, plan, settings)
-	_ = releaseBlock()
+	createdOwned = true
+	releaseBlockLogged()
 	return created, nil
 }
 
