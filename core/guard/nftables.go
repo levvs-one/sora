@@ -34,14 +34,62 @@ func parseBypassNetwork(entry string) (netip.Prefix, bool) {
 	return netip.Prefix{}, false
 }
 
+// defaultBypassPrefixes is DefaultBypassNetworks parsed once. User bypass
+// entries are parsed per call (untrusted input must fail closed every
+// time), but the built-in defaults are constants; re-parsing them on every
+// Arm only burns time on the kill-switch path.
+var defaultBypassPrefixes = func() []netip.Prefix {
+	out := make([]netip.Prefix, 0, len(DefaultBypassNetworks()))
+	for _, entry := range DefaultBypassNetworks() {
+		out = append(out, netip.MustParsePrefix(entry).Masked())
+	}
+	return out
+}()
+
+// bypassPrefixes resolves the bypass networks to prefixes. Invalid entries
+// fail closed: nft cannot express them in daddr and interpolating raw text
+// would allow ruleset injection, so they are skipped and the kill switch
+// blocks them instead of bypassing them.
+func bypassPrefixes(bypass []string) []netip.Prefix {
+	if len(bypass) == 0 {
+		return defaultBypassPrefixes
+	}
+	prefixes := make([]netip.Prefix, 0, len(bypass))
+	for _, network := range bypass {
+		if prefix, ok := parseBypassNetwork(network); ok {
+			prefixes = append(prefixes, prefix.Masked())
+		}
+	}
+	return prefixes
+}
+
+// writePrefixRule appends one "\t\t<family> <field> <prefix> <tail>" line
+// without the intermediate strings the concatenation form allocated: the
+// prefix text goes straight from netip into the builder through a stack
+// scratch buffer.
+func writePrefixRule(b *strings.Builder, prefix netip.Prefix, field, tail string) {
+	masked := prefix.Masked()
+	if masked.Addr().Is6() {
+		b.WriteString("\t\tip6 ")
+	} else {
+		b.WriteString("\t\tip ")
+	}
+	b.WriteString(field)
+	b.WriteString(" ")
+	var scratch [64]byte
+	b.Write(masked.AppendTo(scratch[:0]))
+	b.WriteString(tail)
+}
+
 // NftRuleset renders testable kill-switch rules for the engine UID. Bypass
 // networks keep local resources reachable; empty uses private and link-local
 // ranges.
-func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string {	networks := bypass
-	if len(networks) == 0 {
-		networks = DefaultBypassNetworks()
-	}
+func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string {
+	prefixes := bypassPrefixes(bypass)
 	var b strings.Builder
+	// One rule line is ~90 bytes; pre-sizing avoids the builder's
+	// repeated doubling on large bypass lists.
+	b.Grow(700 + 96*(len(blocked)+len(prefixes)))
 	b.WriteString("table inet " + nftTable + " {\n")
 	b.WriteString("\tchain " + nftChain + " {\n")
 	b.WriteString("\t\ttype filter hook output priority filter; policy accept;\n")
@@ -49,35 +97,21 @@ func NftRuleset(engineUID int, bypass []string, blocked ...netip.Prefix) string 
 	// Permit traffic through TUN; block only traffic bypassing it.
 	b.WriteString("\t\toifname \"" + engine.TunDevice + "\" accept comment \"sora: through the tunnel\"\n")
 	for _, network := range blocked {
-		family := "ip"
-		if network.Addr().Is6() {
-			family = "ip6"
-		}
-		b.WriteString("\t\t" + family + " daddr " + network.Masked().String() + " counter drop comment \"sora: tunnel destination outside the tunnel\"\n")
+		writePrefixRule(&b, network, "daddr", " counter drop comment \"sora: tunnel destination outside the tunnel\"\n")
 	}
-	b.WriteString("\t\tmeta skuid " + itoa(engineUID) + " accept comment \"sora: the engine keeps its own traffic\"\n")
+	b.WriteString("\t\tmeta skuid ")
+	b.WriteString(itoa(engineUID))
+	b.WriteString(" accept comment \"sora: the engine keeps its own traffic\"\n")
 	// Bound resolvers can remain on a physical device even after routing
 	// selects TUN. Never let the LAN exception release their queries.
 	b.WriteString("\t\tmeta l4proto { tcp, udp } th dport 53 counter drop comment \"sora: DNS outside the tunnel\"\n")
 	// Allow replies to inbound connections, but not pre-existing outbound
 	// flows that could bypass TUN.
 	b.WriteString("\t\tct direction reply ct state established,related accept comment \"sora: replies to incoming connections\"\n")
-	for _, network := range networks {
-		prefix, ok := parseBypassNetwork(network)
-		if !ok {
-			// Not an address or prefix: nft cannot express it in daddr,
-			// and interpolating raw text would allow ruleset injection.
-			// Skip it; the kill switch then blocks it instead of
-			// bypassing it (fail closed).
-			continue
-		}
+	for _, prefix := range prefixes {
 		// Match each network only against its address family; nft
 		// rejects cross-family rules.
-		family := "ip"
-		if prefix.Addr().Is6() {
-			family = "ip6"
-		}
-		b.WriteString("\t\t" + family + " daddr " + prefix.Masked().String() + " accept comment \"sora: local network bypass\"\n")
+		writePrefixRule(&b, prefix, "daddr", " accept comment \"sora: local network bypass\"\n")
 	}
 	// The legacy fake-IP drop sits after the local-network accepts on
 	// purpose: 172.19.0.0/16 lives inside the default 172.16.0.0/12

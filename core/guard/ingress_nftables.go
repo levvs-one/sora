@@ -4,6 +4,7 @@
 package guard
 
 import (
+	"net/netip"
 	"strings"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -37,11 +38,14 @@ func NftIngressRuleset(cfg IngressConfig, bypass []string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	networks := bypass
-	if len(networks) == 0 {
-		networks = DefaultBypassNetworks()
+	var prefixes []netip.Prefix
+	if cfg.AllowLAN {
+		// Same fail-closed rule as the kill switch: invalid entries are
+		// dropped by bypassPrefixes, raw text never reaches the ruleset.
+		prefixes = bypassPrefixes(bypass)
 	}
 	var b strings.Builder
+	b.Grow(448 + 96*(len(endpoints)+len(prefixes)))
 	b.WriteString("table inet " + nftIngressTable + " {\n")
 	b.WriteString("\tchain " + nftIngressChain + " {\n")
 	b.WriteString("\t\ttype filter hook input priority filter; policy accept;\n")
@@ -54,27 +58,18 @@ func NftIngressRuleset(cfg IngressConfig, bypass []string) (string, error) {
 	// Conntrack first: established VPN sessions and their replies must
 	// never reach the drop below.
 	b.WriteString("\t\tct state established,related accept comment \"sora: ingress keeps established connections\"\n")
+	var scratch [64]byte
 	for _, addr := range endpoints {
-		family := "ip"
 		if addr.Is6() {
-			family = "ip6"
+			b.WriteString("\t\tip6 saddr ")
+		} else {
+			b.WriteString("\t\tip saddr ")
 		}
-		b.WriteString("\t\t" + family + " saddr " + addr.String() + " accept comment \"sora: ingress keeps VPN server endpoints\"\n")
+		b.Write(addr.AppendTo(scratch[:0]))
+		b.WriteString(" accept comment \"sora: ingress keeps VPN server endpoints\"\n")
 	}
-	if cfg.AllowLAN {
-		for _, network := range networks {
-			prefix, ok := parseBypassNetwork(network)
-			if !ok {
-				// Same fail-closed rule as the kill switch: raw text
-				// never reaches the ruleset.
-				continue
-			}
-			family := "ip"
-			if prefix.Addr().Is6() {
-				family = "ip6"
-			}
-			b.WriteString("\t\t" + family + " saddr " + prefix.Masked().String() + " accept comment \"sora: ingress keeps local networks\"\n")
-		}
+	for _, prefix := range prefixes {
+		writePrefixRule(&b, prefix, "saddr", " accept comment \"sora: ingress keeps local networks\"\n")
 	}
 	b.WriteString("\t\tcounter drop comment \"sora: ingress drop\"\n")
 	b.WriteString("\t}\n")
