@@ -226,6 +226,46 @@ func (f *IngressFirewall) Inner() Firewall {
 	return f.inner
 }
 
+// SetTunNetworks forwards the session adapter subnets to the inner
+// firewall. Guard.Apply calls this through the Firewall interface, and a
+// decorator without the method would silently swallow the call: the type
+// assertion in Guard.Apply would never fire, and the adapter permits
+// would be lost in production.
+func (f *IngressFirewall) SetTunNetworks(networks []netip.Prefix) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if s, ok := f.inner.(interface{ SetTunNetworks([]netip.Prefix) }); ok {
+		s.SetTunNetworks(networks)
+	}
+}
+
+// SetBlockedNetworks forwards the session destinations that must never
+// bypass the tunnel (the fake-IP pool and the adapter subnets). Without
+// this the type assertion in Guard.Apply misses through the decorator
+// and the fake-IP block silently vanishes from the installed ruleset.
+func (f *IngressFirewall) SetBlockedNetworks(networks []netip.Prefix) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if s, ok := f.inner.(interface{ SetBlockedNetworks([]netip.Prefix) }); ok {
+		s.SetBlockedNetworks(networks)
+	}
+}
+
+// CleanupStale removes a kill-switch table a crashed core left behind,
+// forwarded to the inner firewall. The startup path asserts this
+// capability on the wrapped firewall, so the wrap must not swallow it
+// (SORA-M4).
+func (f *IngressFirewall) CleanupStale(ctx context.Context) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if c, ok := f.inner.(interface {
+		CleanupStale(context.Context) error
+	}); ok {
+		return c.CleanupStale(ctx)
+	}
+	return nil
+}
+
 // Name identifies the decorator in a diagnostics line.
 func (f *IngressFirewall) Name() string { return "ingress+" + firewallName(f.inner) }
 

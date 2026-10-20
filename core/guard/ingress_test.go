@@ -2,10 +2,13 @@ package guard_test
 
 import (
 	"context"
+	"net/netip"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/levvs-one/sora-client/core/guard"
+	"github.com/levvs-one/sora-client/core/session"
 )
 
 func TestDefaultIngressConfigIsOnWithLocalTrafficKept(t *testing.T) {
@@ -134,10 +137,13 @@ func TestNftIngressRemoveNamesTheOwnedTable(t *testing.T) {
 
 // fakeFirewall is a Firewall test double recording calls.
 type fakeFirewall struct {
-	armPorts [][]uint16
-	disarms  int
-	armErr   error
-	armed    bool
+	armPorts        [][]uint16
+	disarms         int
+	armErr          error
+	armed           bool
+	tunNetworks     []netip.Prefix
+	blockedNetworks []netip.Prefix
+	cleanups        int
 }
 
 func (f *fakeFirewall) Arm(_ context.Context, ports []uint16) error {
@@ -156,6 +162,19 @@ func (f *fakeFirewall) Disarm(_ context.Context) error {
 }
 
 func (f *fakeFirewall) Armed(_ context.Context) (bool, error) { return f.armed, nil }
+
+func (f *fakeFirewall) SetTunNetworks(networks []netip.Prefix) {
+	f.tunNetworks = append([]netip.Prefix(nil), networks...)
+}
+
+func (f *fakeFirewall) SetBlockedNetworks(networks []netip.Prefix) {
+	f.blockedNetworks = append([]netip.Prefix(nil), networks...)
+}
+
+func (f *fakeFirewall) CleanupStale(context.Context) error {
+	f.cleanups++
+	return nil
+}
 
 func TestIngressFirewallDelegatesToTheInnerFirewall(t *testing.T) {
 	inner := &fakeFirewall{}
@@ -280,5 +299,63 @@ func TestIngressFirewallValidatesBeforeArmingInner(t *testing.T) {
 	}
 	if inner.armed {
 		t.Error("the kill switch stayed armed after a config failure")
+	}
+}
+
+// TestIngressFirewallForwardsSessionNetworks proves the decorator does not
+// swallow the per-session calls Guard.Apply makes through the Firewall
+// interface: without forwarding, the type assertions in Guard.Apply would
+// miss through WithIngress and the adapter permits plus the fake-IP block
+// would silently vanish from the production ruleset. Ingress rules are
+// disabled here (the fake has no platform backend); only the delegation
+// is exercised.
+func TestIngressFirewallForwardsSessionNetworks(t *testing.T) {
+	inner := &fakeFirewall{}
+	cfg := guard.DefaultIngressConfig()
+	cfg.Enabled = false
+	decorated := guard.WithIngress(inner, cfg)
+	g, err := guard.New(guard.Options{EnginePorts: []uint16{5000}}, decorated)
+	if err != nil {
+		t.Fatalf("guard.New() error = %v", err)
+	}
+	tun := netip.MustParsePrefix("192.0.2.1/30")
+	fake := netip.MustParsePrefix("198.18.0.0/15")
+	if err := g.Apply(context.Background(), session.Settings{
+		TunNetworks: []netip.Prefix{tun},
+		FakeIPRange: fake,
+		KillSwitch:  true,
+	}); err != nil {
+		t.Fatalf("Apply() error = %v", err)
+	}
+	if !slices.Equal(inner.tunNetworks, []netip.Prefix{tun}) {
+		t.Errorf("SetTunNetworks = %v, want [%v]", inner.tunNetworks, tun)
+	}
+	want := []netip.Prefix{tun, fake}
+	if !slices.Equal(inner.blockedNetworks, want) {
+		t.Errorf("SetBlockedNetworks = %v, want %v", inner.blockedNetworks, want)
+	}
+	if !inner.armed {
+		t.Error("the kill switch did not arm through the decorator")
+	}
+}
+
+// TestIngressFirewallForwardsCleanupStale locks the main.go startup shape:
+// the eager stale-table cleanup asserts CleanupStale on the wrapped
+// firewall, so the decorator must forward it instead of hiding the
+// capability (SORA-M4).
+func TestIngressFirewallForwardsCleanupStale(t *testing.T) {
+	inner := &fakeFirewall{}
+	decorated := guard.WithIngress(inner, guard.DefaultIngressConfig())
+	cleaner, ok := interface{}(decorated).(interface {
+		CleanupStale(context.Context) error
+	})
+	if !ok {
+		t.Fatal("WithIngress does not expose CleanupStale")
+	}
+	if err := cleaner.CleanupStale(context.Background()); err != nil {
+		t.Fatalf("CleanupStale() error = %v", err)
+	}
+	if inner.cleanups != 1 {
+		t.Errorf("inner CleanupStale calls = %d, want 1", inner.cleanups)
 	}
 }

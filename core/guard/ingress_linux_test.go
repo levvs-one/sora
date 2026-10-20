@@ -3,11 +3,13 @@
 package guard_test
 
 import (
+	"net/netip"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/levvs-one/sora-client/core/guard"
+	"github.com/levvs-one/sora-client/core/session"
 )
 
 // TestIngressFirewallInstallsAndRemovesTheLinuxTable arms the decorator over
@@ -176,6 +178,23 @@ fi
 case "$input" in *"table inet sora {"*)
 	case "$input" in *"sora_ingress"*) ;; *) echo "$input" > "$SORA_FAKE_DIR/sora.state";; esac;;
 esac
+# A bare delete of the kill-switch table (no reinstall in the same batch)
+# removes it; deleting a missing table fails like the real nft.
+case "$input" in
+	*"delete table inet sora"*)
+		case "$input" in
+			*"table inet sora {"*) ;;
+			*"sora_ingress"*) ;;
+			*)
+				if [ ! -f "$SORA_FAKE_DIR/sora.state" ]; then
+					echo "Error: Could not process rule: No such file or directory" >&2
+					exit 1
+				fi
+				rm -f "$SORA_FAKE_DIR/sora.state"
+				;;
+		esac
+		;;
+esac
 exit 0
 `
 
@@ -288,5 +307,80 @@ func TestIngressReArmRestoresExternallyRemovedTable(t *testing.T) {
 	}
 	if err := decorated.Disarm(ctx); err != nil {
 		t.Fatalf("Disarm() error = %v", err)
+	}
+}
+
+// TestGuardArmsIngressThroughTheProductionPath reproduces how main.go
+// builds the guard: guard.New over the WithIngress-wrapped platform
+// firewall with DefaultIngressConfig. Before the wrap the kill switch
+// filtered outbound only, so this is the negative control for the
+// production gap: both tables must be installed, and the fake-IP drop in
+// the kill-switch table proves SetBlockedNetworks crosses the decorator
+// instead of vanishing in the type assertion.
+func TestGuardArmsIngressThroughTheProductionPath(t *testing.T) {
+	dir := t.TempDir()
+	writeFakeNftBatch(t, dir)
+	inner, err := guard.NewNftables(1000, nil)
+	if err != nil {
+		t.Fatalf("NewNftables() error = %v", err)
+	}
+	// The exact main.go construction order.
+	decorated := guard.WithIngress(inner, guard.DefaultIngressConfig())
+	g, err := guard.New(guard.Options{EnginePorts: []uint16{5000}}, decorated)
+	if err != nil {
+		t.Fatalf("guard.New() error = %v", err)
+	}
+	ctx := testContext()
+	tun := netip.MustParsePrefix("192.0.2.1/30")
+	fake := netip.MustParsePrefix("198.18.0.0/15")
+	if err := g.Apply(ctx, session.Settings{
+		TunNetworks: []netip.Prefix{tun},
+		FakeIPRange: fake,
+		KillSwitch:  true,
+	}); err != nil {
+		t.Fatalf("Apply() error = %v", err)
+	}
+	for _, table := range []string{"sora", "sora_ingress"} {
+		if _, err := os.Stat(dir + "/" + table + ".state"); err != nil {
+			t.Fatalf("table %s was not installed through the production path: %v", table, err)
+		}
+	}
+	// The fake-IP drop in the kill-switch table: only present when the
+	// blocked networks cross the decorator to the inner firewall.
+	installed, err := os.ReadFile(dir + "/sora.state")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"198.18.0.0/15", tun.Masked().String()} {
+		if !strings.Contains(string(installed), want) {
+			t.Errorf("the kill-switch table does not block %q:\\n%s", want, installed)
+		}
+	}
+	// The ingress table ends with the drop: new inbound on physical
+	// interfaces is filtered while established and local traffic stays
+	// accepted.
+	ingress, err := os.ReadFile(dir + "/sora_ingress.state")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{`iif "lo" accept`, "ct state established,related accept", "counter drop"} {
+		if !strings.Contains(string(ingress), want) {
+			t.Errorf("the ingress table does not contain %q:\\n%s", want, ingress)
+		}
+	}
+	if armed, err := decorated.IngressArmed(ctx); err != nil || !armed {
+		t.Errorf("IngressArmed() = %v, %v after Apply", armed, err)
+	}
+	if blocked, err := g.Blocked(ctx); err != nil || !blocked {
+		t.Errorf("Blocked() = %v, %v after Apply", blocked, err)
+	}
+	if err := g.Restore(ctx); err != nil {
+		t.Fatalf("Restore() error = %v", err)
+	}
+	if armed, _ := decorated.IngressArmed(ctx); armed {
+		t.Error("the ingress table survived Restore")
+	}
+	if armed, err := decorated.Armed(ctx); err != nil || armed {
+		t.Errorf("Armed() = %v, %v after Restore", armed, err)
 	}
 }

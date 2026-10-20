@@ -220,6 +220,19 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		_ = store.Close()
 		return nil, err
 	}
+	// The platform firewall filters outbound only; without this wrap
+	// inbound connections arriving on physical interfaces stay open
+	// (the output chain's "ct direction reply accept" answers them).
+	// Ingress protection drops inbound attempts that are not replies to
+	// an established session, loopback, the tunnel, a VPN server
+	// endpoint, or local networks. Local networks stay reachable by
+	// default, so printers, Chromecast and file shares keep working —
+	// an explicit exception, not a silent hole. The decorator forwards
+	// CleanupStale and the session networks to the inner firewall, so
+	// the stale-table cleanup below and Guard.Apply keep working
+	// through it; on platforms without a process-managed firewall it is
+	// a no-op over NoopFirewall.
+	firewall = guard.WithIngress(firewall, guard.DefaultIngressConfig())
 	// A crashed core can leave the kill-switch table behind, which would
 	// keep blocking traffic with no live session. We hold the instance
 	// lock from here on, so no other core owns the table (SORA-M4).
