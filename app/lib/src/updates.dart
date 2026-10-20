@@ -742,7 +742,7 @@ class AppUpdater extends ChangeNotifier {
     if (_disposed || _windows || _healthCheckArmed) return;
     final marker = PendingUpdate.parse(settings.pendingUpdate);
     if (marker == null) return;
-    if (marker.to != version) {
+    if (marker.to != normalizedVersion(version)) {
       debugPrint('[updates] pending-update marker targets ${marker.to} but this is $version; clearing it');
       await settings.clearPendingUpdate();
       return;
