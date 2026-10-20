@@ -23,9 +23,11 @@ import (
 // Verdicts are honest by construction: a lone mismatch names itself
 // "inconsistent" (one resolver disagrees — evidence, not proof of who
 // lied), a non-routable answer for a public canary is "bogus" (the
-// sinkhole signature), and a total failure to resolve is "unresolved" —
-// never dressed up as spoofing, because a dead network lies about
-// nothing.
+// sinkhole signature), an NXDOMAIN from some resolvers while others
+// resolve the provably-existing canary is "nxdomain-split" (the
+// authoritative-NXDOMAIN injection pattern), and a total failure to
+// resolve is "unresolved" — never dressed up as spoofing, because a
+// dead network lies about nothing.
 type DnsSpoofVerdict int
 
 const (
@@ -42,6 +44,13 @@ const (
 	// DnsSpoofNXDomain means every resolver claims the canary does not
 	// exist.
 	DnsSpoofNXDomain
+	// DnsSpoofNXDomainSplit means some resolvers answer NXDOMAIN while
+	// others resolve the canary: the authoritative-NXDOMAIN injection
+	// pattern (a state resolver denying a name that provably exists —
+	// the NSDI signature on youtube.com/whatsapp.com). Distinct from
+	// nxdomain (all resolvers deny) and from inconsistent (resolvers
+	// disagree about addresses, none denies existence).
+	DnsSpoofNXDomainSplit
 )
 
 // String renders the verdict for reports.
@@ -55,6 +64,8 @@ func (v DnsSpoofVerdict) String() string {
 		return "bogus"
 	case DnsSpoofNXDomain:
 		return "nxdomain"
+	case DnsSpoofNXDomainSplit:
+		return "nxdomain-split"
 	default:
 		return "unresolved"
 	}
@@ -97,14 +108,17 @@ func DetectDnsSpoof(ctx context.Context, targets []SpoofTarget, canary string, r
 	pools := map[string]map[string]bool{}
 	rep := DnsSpoofReport{Answers: map[string][]string{}}
 	var answered, nxdomain int
+	var nxOnly []string
 	for _, tgt := range targets {
 		seen := map[string]bool{}
+		sawNotFound := false
 		for round := 0; round < rounds; round++ {
 			ips, err := probe(ctx, tgt.Network, tgt.Addr, canary)
 			if err != nil {
 				var dnsErr *net.DNSError
 				if errors.As(err, &dnsErr) && dnsErr.IsNotFound {
 					nxdomain++
+					sawNotFound = true
 					continue
 				}
 				continue // failure is evidence of nothing beyond failure
@@ -125,9 +139,16 @@ func DetectDnsSpoof(ctx context.Context, targets []SpoofTarget, canary string, r
 		rep.Answers[tgt.Addr] = list
 		if len(list) > 0 {
 			pools[tgt.Addr] = seen
+		} else if sawNotFound {
+			// The resolver denies the canary in every round it
+			// answered at all: it never produced an address, so it
+			// is an NXDOMAIN-only source for the split check. A
+			// resolver that denied once and answered another round
+			// reads as flaky, not as a split.
+			nxOnly = append(nxOnly, tgt.Addr)
 		}
 	}
-	return classifySpoof(rep, pools, canary, rounds, answered, nxdomain, len(targets))
+	return classifySpoof(rep, pools, canary, rounds, answered, nxdomain, len(targets), nxOnly)
 }
 
 // CompareDnsSpoof is the pipeline form: prior carries the answer pools
@@ -141,16 +162,19 @@ func CompareDnsSpoof(ctx context.Context, targets []SpoofTarget, canary string, 
 	pools := map[string]map[string]bool{}
 	rep := DnsSpoofReport{Answers: map[string][]string{}}
 	var answered, nxdomain int
+	var nxOnly []string
 	for _, tgt := range targets {
 		seen := map[string]bool{}
 		for _, s := range prior[tgt.Addr] {
 			seen[s] = true
 		}
 		ips, err := probe(ctx, tgt.Network, tgt.Addr, canary)
+		sawNotFound := false
 		if err != nil {
 			var dnsErr *net.DNSError
 			if errors.As(err, &dnsErr) && dnsErr.IsNotFound {
 				nxdomain++
+				sawNotFound = true
 			}
 		} else if len(ips) > 0 {
 			answered++
@@ -166,13 +190,15 @@ func CompareDnsSpoof(ctx context.Context, targets []SpoofTarget, canary string, 
 		rep.Answers[tgt.Addr] = list
 		if len(list) > 0 {
 			pools[tgt.Addr] = seen
+		} else if sawNotFound {
+			nxOnly = append(nxOnly, tgt.Addr)
 		}
 	}
 	// The prior round counts as one round for the evidence text.
-	return classifySpoof(rep, pools, canary, 2, answered, nxdomain, len(targets))
+	return classifySpoof(rep, pools, canary, 2, answered, nxdomain, len(targets), nxOnly)
 }
 
-func classifySpoof(rep DnsSpoofReport, pools map[string]map[string]bool, canary string, rounds, answered, nxdomain, targets int) DnsSpoofReport {
+func classifySpoof(rep DnsSpoofReport, pools map[string]map[string]bool, canary string, rounds, answered, nxdomain, targets int, nxOnly []string) DnsSpoofReport {
 	if answered == 0 {
 		if nxdomain > 0 && targets > 0 {
 			rep.Verdict = DnsSpoofNXDomain
@@ -204,6 +230,24 @@ func classifySpoof(rep DnsSpoofReport, pools map[string]map[string]bool, canary 
 				return rep
 			}
 		}
+	}
+	// NXDOMAIN split: at least one resolver answered, and at least one
+	// other only ever denied the canary. The canary provably exists —
+	// the answering resolvers just resolved it — so the denial is the
+	// authoritative-NXDOMAIN injection pattern, not an outage and not
+	// an address disagreement. Checked before inconsistent: existence
+	// denial is the stronger, more specific claim.
+	if len(nxOnly) > 0 && len(pools) > 0 {
+		sort.Strings(nxOnly)
+		var answering string
+		for r := range pools {
+			answering = r
+			break
+		}
+		rep.Verdict = DnsSpoofNXDomainSplit
+		rep.Evidence = []string{"resolver " + nxOnly[0] + " claims " + canary + " does not exist (NXDOMAIN) while " +
+			answering + " resolves it: the authoritative-NXDOMAIN injection pattern (NSDI)"}
+		return rep
 	}
 	// Inconsistent: resolvers disagree on the pool. Round-robin within a
 	// resolver is already absorbed (each resolver's pool is the union of

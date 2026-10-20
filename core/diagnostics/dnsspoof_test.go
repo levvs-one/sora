@@ -101,6 +101,84 @@ func TestDetectDnsSpoofNXDomain(t *testing.T) {
 	}
 }
 
+// nxDomainProbe answers per-resolver: resolvers in nx always deny the
+// name, resolvers in answers resolve it, everything else fails plainly.
+func nxDomainProbe(nx map[string]bool, answers map[string][]string) spoofProbeFunc {
+	return func(_ context.Context, _, addr, host string) ([]string, error) {
+		if nx[addr] {
+			return nil, &net.DNSError{Err: "no such host", Name: host, IsNotFound: true}
+		}
+		if ips, ok := answers[addr]; ok {
+			return ips, nil
+		}
+		return nil, errors.New("no route to resolver")
+	}
+}
+
+// TestDetectDnsSpoofNXDomainSplitNSDI is the T014 NSDI regression
+// vector (te-st.org measurements, 11.10.2026): the state resolver
+// answers an authoritative NXDOMAIN for a name that provably exists
+// (youtube.com), while alternative resolvers return real addresses.
+// Before the split verdict existed this shape silently read "ok".
+func TestDetectDnsSpoofNXDomainSplitNSDI(t *testing.T) {
+	p := nxDomainProbe(
+		map[string]bool{"89.107.129.25": true}, // NSDI-style state resolver
+		map[string][]string{
+			"1.1.1.1": {"142.250.185.78"},
+			"8.8.8.8": {"142.250.185.78"},
+		},
+	)
+	rep := DetectDnsSpoof(context.Background(),
+		udpTargets("89.107.129.25", "1.1.1.1", "8.8.8.8"), "youtube.com", 2, p)
+	if rep.Verdict != DnsSpoofNXDomainSplit {
+		t.Fatalf("verdict = %v (%v), want nxdomain-split", rep.Verdict, rep.Evidence)
+	}
+	if len(rep.Evidence) == 0 || !strings.Contains(rep.Evidence[0], "NXDOMAIN") ||
+		!strings.Contains(rep.Evidence[0], "89.107.129.25") {
+		t.Fatalf("evidence must name the denying resolver and the pattern, got %v", rep.Evidence)
+	}
+}
+
+// TestCompareDnsSpoofNXDomainSplit covers the pipeline form: the prior
+// (tunnel) round resolved the canary through the honest resolvers; the
+// verification round exposes the denier.
+func TestCompareDnsSpoofNXDomainSplit(t *testing.T) {
+	p := nxDomainProbe(
+		map[string]bool{"89.107.129.25": true},
+		map[string][]string{
+			"1.1.1.1": {"142.250.185.78"},
+			"8.8.8.8": {"142.250.185.78"},
+		},
+	)
+	prior := map[string][]string{
+		"1.1.1.1": {"142.250.185.78"},
+		"8.8.8.8": {"142.250.185.78"},
+	}
+	rep := CompareDnsSpoof(context.Background(),
+		udpTargets("89.107.129.25", "1.1.1.1", "8.8.8.8"), "youtube.com", prior, p)
+	if rep.Verdict != DnsSpoofNXDomainSplit {
+		t.Fatalf("verdict = %v (%v), want nxdomain-split", rep.Verdict, rep.Evidence)
+	}
+}
+
+// TestDetectDnsSpoofFlakyNXDomainAbsorbed: a resolver that denies in
+// one round and answers in the next is flaky, not a split — the denial
+// must be consistent (every round) to name the injection pattern.
+func TestDetectDnsSpoofFlakyNXDomainAbsorbed(t *testing.T) {
+	calls := map[string]int{}
+	p := func(_ context.Context, _, addr, host string) ([]string, error) {
+		calls[addr]++
+		if addr == "9.9.9.9" && calls[addr] == 1 {
+			return nil, &net.DNSError{Err: "no such host", Name: host, IsNotFound: true}
+		}
+		return []string{"142.250.185.78"}, nil
+	}
+	rep := DetectDnsSpoof(context.Background(), udpTargets("9.9.9.9", "1.1.1.1"), "youtube.com", 2, p)
+	if rep.Verdict != DnsSpoofOK {
+		t.Fatalf("verdict = %v (%v), want ok: a one-round denial is flakiness", rep.Verdict, rep.Evidence)
+	}
+}
+
 func TestCheckDnsLeaksIncludesSpoofCheck(t *testing.T) {
 	checks := CheckDnsLeaks(context.Background(), DnsLeakInput{
 		TunnelResolvers: []TunnelResolver{{Address: "1.1.1.1", Transport: "udp"}},
@@ -121,6 +199,35 @@ func TestCheckDnsLeaksIncludesSpoofCheck(t *testing.T) {
 	if spoof.Leaked {
 		t.Fatalf("agreeing resolvers must not leak-flag, got %+v", spoof)
 	}
+}
+
+// TestCheckDnsLeaksSpoofFlagsNXDomainSplit wires the NSDI vector
+// through the whole leak pipeline: the tunnel check's round resolves
+// the canary via the honest resolver and fails on the denier; the
+// spoof cross-check must leak-flag the split.
+func TestCheckDnsLeaksSpoofFlagsNXDomainSplit(t *testing.T) {
+	checks := CheckDnsLeaks(context.Background(), DnsLeakInput{
+		TunnelResolvers: []TunnelResolver{
+			{Address: "89.107.129.25", Transport: "udp"},
+			{Address: "1.1.1.1", Transport: "udp"},
+		},
+		SystemResolvers: []string{"1.1.1.1"},
+		Probe: func(_ context.Context, _, addr, host string) ([]string, error) {
+			if addr == "89.107.129.25" {
+				return nil, &net.DNSError{Err: "no such host", Name: host, IsNotFound: true}
+			}
+			return []string{"142.250.185.78"}, nil
+		},
+	})
+	for _, c := range checks {
+		if c.ID == DnsLeakSpoofDNS {
+			if !c.Leaked || !strings.Contains(c.Actual, "NXDOMAIN") {
+				t.Fatalf("NXDOMAIN split must flag the check, got %+v", c)
+			}
+			return
+		}
+	}
+	t.Fatal("dns-spoof check missing")
 }
 
 func TestCheckDnsLeaksSpoofFlagsSinkhole(t *testing.T) {

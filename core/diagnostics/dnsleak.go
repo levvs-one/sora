@@ -211,8 +211,10 @@ func CheckDnsLeaks(ctx context.Context, in DnsLeakInput) []DnsLeakCheck {
 // plain-DNS resolvers: the tunnel check's own canary answers are the
 // first round, and one verification round per resolver runs here, so
 // the whole leak check adds exactly one query per plain resolver.
-// Bogus and inconsistent verdicts are leaks of trust (the DNS path is
-// lying); unresolved and NXDOMAIN are reported without the leak flag —
+// Bogus, inconsistent and nxdomain-split verdicts are leaks of trust
+// (the DNS path is lying — a split is a denial of a name other
+// resolvers just resolved, which is evidence, not absence of it);
+// unresolved and all-NXDOMAIN are reported without the leak flag —
 // no evidence, no accusation. System resolvers are deliberately not
 // queried here: this pipeline's contract is tunnel-path probes only;
 // cross-checking the system path is a separate, explicitly triggered
@@ -241,7 +243,7 @@ func checkDnsSpoof(ctx context.Context, in DnsLeakInput, firstRound map[string][
 		check.Actual = rep.Verdict.String()
 	}
 	switch rep.Verdict {
-	case DnsSpoofBogus, DnsSpoofInconsistent:
+	case DnsSpoofBogus, DnsSpoofInconsistent, DnsSpoofNXDomainSplit:
 		check.Leaked = true
 		check.FixHint = DnsLeakFixUseEncryptedDNS
 	}
