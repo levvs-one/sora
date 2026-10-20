@@ -45,6 +45,43 @@ func TestRenderAmneziaWG3(t *testing.T) {
 	}
 }
 
+// TestAwgRangeShapes pins awgRange's number-vs-string decision for every
+// input shape the Atoi-based original distinguished, so the [opt40]
+// plain-int fast path (which skips Atoi's error allocation on ranges)
+// cannot drift from it: plain and signed ints and int-shaped values with
+// surrounding space stay numbers; ranges, junk and overflowing digit
+// strings stay strings, verbatim and untrimmed.
+func TestAwgRangeShapes(t *testing.T) {
+	for _, tc := range []struct {
+		raw  string
+		want any
+	}{
+		{"5", 5},
+		{"+5", 5},
+		{"-5", -5},
+		{"007", 7},
+		{" 42 ", 42},
+		{"32-96", "32-96"},
+		{"100-140", "100-140"},
+		{" 32-96 ", " 32-96 "},
+		{"abc", "abc"},
+		{"+", "+"},
+		{"-", "-"},
+		{"99999999999999999999999999", "99999999999999999999999999"},
+	} {
+		out := obj{}
+		awgRange(out, "k", tc.raw)
+		if got := out["k"]; got != tc.want {
+			t.Errorf("awgRange(%q) = %v (%T), want %v (%T)", tc.raw, got, got, tc.want, tc.want)
+		}
+	}
+	empty := obj{}
+	awgRange(empty, "k", "")
+	if _, ok := empty["k"]; ok {
+		t.Error("awgRange(\"\") must leave the key unset")
+	}
+}
+
 func TestRenderWSEarlyData(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolVLESS)
 	p.Outbounds[0].Transport = engine.Transport{Type: "ws", Path: "/ws", Host: "example.com", EarlyData: 2048}

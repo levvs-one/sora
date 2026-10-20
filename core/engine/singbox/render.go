@@ -457,6 +457,14 @@ func wireguard(out obj, o engine.Outbound) (obj, error) {
 	if len(o.Addresses) == 0 {
 		return nil, fmt.Errorf("singbox: wireguard outbound %s has no interface address", o.ID)
 	}
+	// The endpoint map grows to ~30 keys with AmneziaWG parameters;
+	// rehashing a one-entry literal several times per endpoint dominated
+	// the render of WireGuard-heavy plans, so rebuild it pre-sized.
+	sized := make(obj, 32)
+	for k, v := range out {
+		sized[k] = v
+	}
+	out = sized
 	out.set("type", "wireguard").set("address", o.Addresses).set("private_key", o.PrivateKey).set("mtu", 1420)
 	if a := o.Amnezia; a != nil {
 		if a.J1 != "" || a.J2 != "" || a.J3 != "" || a.Itime != 0 {
@@ -509,11 +517,36 @@ func awgRange(out obj, key, raw string) {
 	if raw == "" {
 		return
 	}
-	if n, err := strconv.Atoi(strings.TrimSpace(raw)); err == nil {
-		out[key] = n
-		return
+	trimmed := strings.TrimSpace(raw)
+	if isPlainInt(trimmed) {
+		if n, err := strconv.Atoi(trimmed); err == nil {
+			out[key] = n
+			return
+		}
 	}
 	out[key] = raw
+}
+
+// isPlainInt reports whether s has the exact shape strconv.Atoi accepts
+// as a plain integer: an optional sign followed by at least one digit.
+// Range spellings ("32-96") fail the scan, so awgRange keeps them as
+// strings without paying for Atoi's syntax-error allocation per call.
+func isPlainInt(s string) bool {
+	if s == "" {
+		return false
+	}
+	if s[0] == '+' || s[0] == '-' {
+		s = s[1:]
+	}
+	if s == "" {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		if s[i] < '0' || s[i] > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func (r *renderer) group(g engine.Group) (obj, error) {

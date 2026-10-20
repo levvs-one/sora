@@ -123,3 +123,44 @@ func BenchmarkRenderLargePlan(b *testing.B) {
 		benchSink = raw
 	}
 }
+
+// awg3LargePlan builds a WireGuard-heavy plan: n AmneziaWG 3.1 endpoints
+// with masquerade, the shape whose endpoint maps grow to ~30 keys.
+func awg3LargePlan(n int) *engine.Plan {
+	p := enginetest.Plan(engine.ProtocolWireGuard)
+	base := enginetest.AmneziaWG3()
+	p.Outbounds = p.Outbounds[:0]
+	for i := 0; i < n; i++ {
+		o := base
+		o.ID = fmt.Sprintf("srv-%d", i)
+		o.Name = fmt.Sprintf("Server %d", i)
+		p.Outbounds = append(p.Outbounds, o)
+	}
+	ids := make([]string, 0, n)
+	for _, o := range p.Outbounds {
+		ids = append(ids, o.ID)
+	}
+	p.Groups = []engine.Group{
+		{Name: "Auto", Type: engine.GroupURLTest, Outbounds: ids, Interval: 300, Tolerance: 50},
+		{Name: "Proxy", Type: engine.GroupSelect, Outbounds: append([]string{"Auto"}, ids...)},
+	}
+	return p
+}
+
+// BenchmarkRenderAmneziaWG3LargePlan is the regression control for the
+// [opt40] endpoint pre-sizing: at 200 endpoints the un-sized map growth
+// plus per-range Atoi error allocations cost 1 735 330 B/op / 26 711
+// allocs; pre-sized it renders at ~1.21–1.30 MB/op / ~23.8–24.1k allocs
+// with byte-identical output.
+func BenchmarkRenderAmneziaWG3LargePlan(b *testing.B) {
+	p := awg3LargePlan(200)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		raw, err := Render(p, testRuntime)
+		if err != nil {
+			b.Fatal(err)
+		}
+		benchSink = raw
+	}
+}
