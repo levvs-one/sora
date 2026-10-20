@@ -51,7 +51,11 @@ func skipName(rel string) bool {
 }
 
 // Collect reads dir and returns the package file set (slash-separated
-// relative paths to contents).
+// relative paths to contents). It refuses outright to pack key files
+// (*.key): secret key material has no place in a distributable package.
+// (2026-10-20 audit: the first shipped examples shipped their author.key
+// secret inside the .soraext — pack must fail loudly instead of packing
+// it silently.)
 func Collect(dir string) (map[string][]byte, error) {
 	files := map[string][]byte{}
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
@@ -71,6 +75,9 @@ func Collect(dir string) (map[string][]byte, error) {
 		rel = filepath.ToSlash(rel)
 		if skipName(rel) {
 			return nil
+		}
+		if strings.HasSuffix(filepath.Base(rel), ".key") {
+			return fmt.Errorf("refusing to pack %q: *.key files are secret key material and must never ship inside a .soraext", rel)
 		}
 		data, err := os.ReadFile(path)
 		if err != nil {
