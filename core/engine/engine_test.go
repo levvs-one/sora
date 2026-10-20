@@ -156,10 +156,13 @@ func TestSingBoxCapabilitiesFollowTheBuildRatherThanTheName(t *testing.T) {
 	}
 }
 
-// TestSingBoxPin115KeepsTheLXFork: the 1.15 pin must reject outdated
-// upstream builds, but never the shipped lx. fork, which tracks the 1.14
-// base and keeps its own 1.14.3 floor.
-func TestSingBoxPin115KeepsTheLXFork(t *testing.T) {
+// TestSingBoxFloorKeepsTheLXFork: the sing-box floor (upstream stable
+// 1.14.3 — 1.15 exists only as alpha as of 2026-10-20) accepts both the
+// current upstream stable and the shipped lx. fork, which tracks the
+// same 1.14 base. Renders were validated with `sing-box check` against
+// v1.14.2 upstream, so a 1.15 floor would only accept prereleases: it
+// is not kept.
+func TestSingBoxFloorKeepsTheLXFork(t *testing.T) {
 	p := validPlan()
 	p.Outbounds = p.Outbounds[:1]
 	for _, tc := range []struct {
@@ -167,8 +170,9 @@ func TestSingBoxPin115KeepsTheLXFork(t *testing.T) {
 		tags    []string
 		want    bool
 	}{
-		{"1.14.3", nil, false}, // outdated upstream: below the 1.15 pin
-		{"1.15.0", nil, true},  // current upstream
+		{"1.14.3", nil, true}, // current upstream stable
+		{"1.14.2", nil, false},
+		{"1.15.0", nil, true}, // a future stable stays accepted
 		// Less ignores the pre-release, like the fork floor does.
 		{"1.15.0-alpha.12", nil, true},
 		{"1.14.3-lx.14", []string{"with_awg"}, true},  // shipped fork

@@ -51,11 +51,14 @@ var Catalog = map[Kind]Capabilities{
 	},
 	KindSingBox: {
 		Kind: KindSingBox,
+		// Upstream stable is 1.14.3 (checked 2026-10-20): the 1.15 line
+		// is still alpha (1.15.0-alpha.12), so a "1.15.0" floor would
+		// gate on a release that does not exist. The renderer needs the
+		// DNS and rule-action formats added in 1.12, which 1.14.3 has.
 		// 1.15 rewrote TUN around sing-tun's own TCP/IP stack, so the
-		// stack option is deprecated there (removed in 1.17) and the
-		// renderer only emits it for older builds. The renderer needs
-		// the DNS and rule-action formats added in 1.12.
-		MinVersion: "1.15.0",
+		// stack option is deprecated there (removed in 1.17); the
+		// renderer only emits it for older builds (see MissingFor).
+		MinVersion: "1.14.3",
 		Protocols: map[Protocol]bool{
 			ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 			ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
