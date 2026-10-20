@@ -192,10 +192,10 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 	// extra= JSON (CENSOR-P1), travelling like the download split
 	// above; restored by applyCredential into engine.Transport.
 	doc.field("x_padding_bytes", spec.XPaddingBytes)
-	doc.field("xmux_max_concurrency", strconv.Itoa(spec.XmuxMaxConcurrency))
-	doc.field("xmux_max_connections", strconv.Itoa(spec.XmuxMaxConnections))
-	doc.field("xmux_max_request_times", strconv.Itoa(spec.XmuxMaxRequestTimes))
-	doc.field("xmux_max_reuse_times", strconv.Itoa(spec.XmuxMaxReuseTimes))
+	doc.field("xmux_max_concurrency", itoaNonZero(spec.XmuxMaxConcurrency))
+	doc.field("xmux_max_connections", itoaNonZero(spec.XmuxMaxConnections))
+	doc.field("xmux_max_request_times", itoaNonZero(spec.XmuxMaxRequestTimes))
+	doc.field("xmux_max_reuse_times", itoaNonZero(spec.XmuxMaxReuseTimes))
 	doc.field("xray_profile", profile)
 	doc.buf = append(doc.buf, '}')
 	return doc.buf, nil
@@ -717,6 +717,17 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 // document. Garbage and negatives become "unset" so a malformed link
 // parameter cannot wedge the engine config; hard validation happens in
 // engine.Outbound.Validate.
+// itoaNonZero renders a tuning value for the credential document:
+// zero means "engine default" and is omitted entirely (doc.field
+// skips empty values), so an untuned server document stays
+// byte-identical to the form written before the field existed.
+func itoaNonZero(v int) string {
+	if v == 0 {
+		return ""
+	}
+	return strconv.Itoa(v)
+}
+
 func atoiNonNegative(s string) int {
 	n, err := strconv.Atoi(strings.TrimSpace(s))
 	if err != nil || n < 0 {
