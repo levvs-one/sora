@@ -11,6 +11,7 @@ import (
 	"net/netip"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/levvs-one/sora-client/core/errs"
@@ -185,23 +186,47 @@ func (p *Prober) Probe(ctx context.Context, endpoints []*corev1.Endpoint, server
 	go func() {
 		defer close(results)
 		defer func() { <-p.requests }()
+		// Worker pool instead of one goroutine per endpoint: a
+		// 256-endpoint request used to spawn 256 goroutines, almost all
+		// of them parked on the slot semaphore, while at most
+		// p.concurrency dials can ever run at once (the slots channel
+		// has exactly that capacity). Spawning only that many workers
+		// and handing them endpoint indices from an atomic counter
+		// keeps the same bounds — per-request workers, the global slot
+		// budget, completion-order streaming, and the rule that an
+		// endpoint still waiting for a slot when the context ends
+		// produces no result — without the per-endpoint goroutine.
+		workers := p.concurrency
+		if workers <= 0 {
+			workers = DefaultConcurrency
+		}
+		if workers > len(endpoints) {
+			workers = len(endpoints)
+		}
+		var next atomic.Int64
 		var wg sync.WaitGroup
-		for index, endpoint := range endpoints {
-			wg.Add(1)
-			go func(index int, endpoint *corev1.Endpoint) {
+		wg.Add(workers)
+		for range workers {
+			go func() {
 				defer wg.Done()
-				select {
-				case p.slots <- struct{}{}:
-					defer func() { <-p.slots }()
-				case <-ctx.Done():
-					return
+				for {
+					index := int(next.Add(1) - 1)
+					if index >= len(endpoints) {
+						return
+					}
+					select {
+					case p.slots <- struct{}{}:
+					case <-ctx.Done():
+						return
+					}
+					result := p.measure(ctx, index, endpoints[index], serverIDs)
+					select {
+					case results <- result:
+					case <-ctx.Done():
+					}
+					<-p.slots
 				}
-				result := p.measure(ctx, index, endpoint, serverIDs)
-				select {
-				case results <- result:
-				case <-ctx.Done():
-				}
-			}(index, endpoint)
+			}()
 		}
 		wg.Wait()
 	}()
