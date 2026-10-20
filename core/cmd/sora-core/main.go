@@ -94,6 +94,7 @@ type App struct {
 	log      *slog.Logger
 	store    *secret.Store
 	sessions *session.Manager
+	prober   *probe.Prober
 	plane    *control.Server
 	listener *ipc.Listener
 	server   *grpc.Server
@@ -314,6 +315,7 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	// expedites the T042 subscription refresh — the same treatment every
 	// other censorship verdict gets.
 	prober := probe.New(probe.Config{})
+	app.prober = prober
 	freezeDet := &probe.FreezeDetector{}
 	freezeDet.OnFreeze = func(v probe.FreezeVerdict) {
 		cur := manager.Current()
@@ -535,6 +537,13 @@ func (s *source) EngineLines() []string {
 	}
 	for _, why := range s.app.engines.LastSelection().Rejected {
 		lines = append(lines, "engine passed over: "+why)
+	}
+	// T011: subnet reputation is part of the diagnostics readout — a
+	// carpet-ban wave must be visible in the report the user exports,
+	// not only in selection internals. Subnet prefixes are not server
+	// addresses; the collector's redactor still masks the lines.
+	if s.app.prober != nil {
+		lines = append(lines, s.app.prober.Subnets().SummaryLines()...)
 	}
 	return lines
 }

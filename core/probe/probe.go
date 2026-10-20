@@ -63,6 +63,10 @@ type Prober struct {
 	// quality is the T035 path-quality sink: every measured dial feeds
 	// its (server, transport) series, feeding CENSORSHIP-METER.
 	quality *QualityRegistry
+	// subnets is the T011 carpet-ban tracker: every measured dial feeds
+	// its winning address's /24 (or /48), so burned subnets can be
+	// detected and avoided.
+	subnets *SubnetReputation
 	// lookupIP resolves endpoint hosts for address racing; nil uses
 	// the system resolver. Tests override it to avoid the network.
 	lookupIP func(ctx context.Context, host string) ([]netip.Addr, error)
@@ -87,6 +91,7 @@ func New(cfg Config) *Prober {
 		slots:       make(chan struct{}, cfg.Concurrency),
 		requests:    make(chan struct{}, MaxConcurrentRequests),
 		quality:     NewQualityRegistry(),
+		subnets:     NewSubnetReputation(),
 	}
 }
 
@@ -96,6 +101,14 @@ func New(cfg Config) *Prober {
 // nil.
 func (p *Prober) Quality() *QualityRegistry {
 	return p.quality
+}
+
+// Subnets returns the T011 subnet-reputation tracker: one verdict per
+// /24 (or v6 /48), fed by every address this prober dials. Server
+// selection reads it to avoid carpet-banned subnets; the tracker is
+// never nil.
+func (p *Prober) Subnets() *SubnetReputation {
+	return p.subnets
 }
 
 // SetFreezeDetector attaches the passive freeze detector: every TLS dial
@@ -202,7 +215,13 @@ func (p *Prober) measure(ctx context.Context, index int, endpoint *corev1.Endpoi
 	if p.tls {
 		transport = "tls"
 	}
-	latency, err := p.dial(ctx, host, port)
+	latency, dialed, err := p.dial(ctx, host, port)
+	// T011: the dial outcome is a subnet-reputation sample for the
+	// address actually reached (race winner or IP literal). Hostnames on
+	// the single-dial path yield no address: no sample, no claim.
+	if dialed.IsValid() {
+		p.subnets.Observe(dialed, err == nil)
+	}
 	if err != nil {
 		p.quality.Observe(result.ServerId, transport, 0, false, time.Now())
 		result.Error = toWire(err, host)
@@ -215,8 +234,10 @@ func (p *Prober) measure(ctx context.Context, index int, endpoint *corev1.Endpoi
 }
 
 // dial opens the connection, optionally completes a handshake, and reports how
-// long the whole thing took.
-func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Duration, error) {
+// long the whole thing took. It also reports the address actually dialed
+// when it is known (race winner or IP literal); the zero Addr means
+// "unknown", which callers must treat as no address evidence.
+func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Duration, netip.Addr, error) {
 	timeout := p.timeout
 	if deadline, ok := ctx.Deadline(); ok {
 		if remaining := time.Until(deadline); remaining > 0 && remaining < timeout {
@@ -224,7 +245,7 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 		}
 	}
 	if timeout <= 0 {
-		return 0, errs.Newf(errs.CodeDeadlineExceeded, errs.KeyProbeInvalidEndpoint,
+		return 0, netip.Addr{}, errs.Newf(errs.CodeDeadlineExceeded, errs.KeyProbeInvalidEndpoint,
 			"probe: the request has no time left")
 	}
 	// A hostname that resolves to several addresses races them Happy
@@ -241,17 +262,20 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 }
 
 // dialSingle is the historical one-address dial: one TCP connect, and one
-// TLS handshake when configured.
-func (p *Prober) dialSingle(ctx context.Context, host string, port uint32, timeout time.Duration) (time.Duration, error) {
+// TLS handshake when configured. The dialed address is reported only when
+// the host is an IP literal: a hostname's chosen address is the dialer's
+// private business and guessing it would fabricate subnet evidence.
+func (p *Prober) dialSingle(ctx context.Context, host string, port uint32, timeout time.Duration) (time.Duration, netip.Addr, error) {
+	literal, _ := netip.ParseAddr(host)
 	address := net.JoinHostPort(host, strconv.FormatUint(uint64(port), 10))
 	start := time.Now()
 	if !p.tls {
 		connection, err := (&net.Dialer{Timeout: timeout}).DialContext(ctx, "tcp", address)
 		if err != nil {
-			return 0, errs.From(err)
+			return 0, literal, errs.From(err)
 		}
 		_ = connection.Close()
-		return time.Since(start), nil
+		return time.Since(start), literal, nil
 	}
 	// Include TLS in the measurement to distinguish certificate failures
 	// from TCP reachability. The context cancels stalled handshakes.
@@ -269,10 +293,10 @@ func (p *Prober) dialSingle(ctx context.Context, host string, port uint32, timeo
 	// operation; the phase signal does not survive wrapping.
 	p.freezeEnd(freeze, sni, inflight, err)
 	if err != nil {
-		return 0, errs.From(err)
+		return 0, literal, errs.From(err)
 	}
 	_ = connection.Close()
-	return time.Since(start), nil
+	return time.Since(start), literal, nil
 }
 
 // candidateAddrs resolves host to the addresses a race would try, in
@@ -321,7 +345,7 @@ func systemLookupIP(ctx context.Context, host string) ([]netip.Addr, error) {
 // Eyeballs race and reports the winner's latency. The winner's label
 // names its address for process-local telemetry; it never reaches the
 // wire result, where endpoint addresses stay redacted (SORA-M7).
-func (p *Prober) dialRace(ctx context.Context, host string, port uint32, addrs []netip.Addr, timeout time.Duration) (time.Duration, error) {
+func (p *Prober) dialRace(ctx context.Context, host string, port uint32, addrs []netip.Addr, timeout time.Duration) (time.Duration, netip.Addr, error) {
 	portStr := strconv.FormatUint(uint64(port), 10)
 	candidates := make([]race.Candidate, 0, len(addrs))
 	for _, addr := range addrs {
@@ -341,10 +365,24 @@ func (p *Prober) dialRace(ctx context.Context, host string, port uint32, addrs [
 		AttemptTimeout: timeout,
 	})
 	if err != nil {
-		return 0, err
+		// The race only errors when every candidate failed, so every
+		// attempted address is a genuine failure sample for its subnet.
+		// Feed them here: the returned address stays zero, so measure
+		// does not double-count.
+		for _, addr := range addrs {
+			p.subnets.Observe(addr, false)
+		}
+		return 0, netip.Addr{}, err
 	}
 	_ = res.Conn.Close()
-	return res.Latency, nil
+	// The winner's address is the one the path actually carried: the only
+	// honest subnet sample this dial produces. A lost race loser says
+	// nothing about its subnet.
+	winner := netip.Addr{}
+	if res.Index >= 0 && res.Index < len(addrs) {
+		winner = addrs[res.Index]
+	}
+	return res.Latency, winner, nil
 }
 
 // dialCandidate dials one raced address: a TCP connect, plus the TLS

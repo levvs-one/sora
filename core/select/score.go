@@ -1,6 +1,7 @@
 package serversel
 
 import (
+	"net/netip"
 	"time"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -83,6 +84,11 @@ type Candidate struct {
 	Via string
 	// Engine is the engine kind this candidate is planned to run on.
 	Engine engine.Kind
+	// Addr is the server address the candidate dials, when known. It is
+	// the key into subnet reputation (T011): a candidate whose /24 is
+	// carpet-banned is filtered out no matter how good its own numbers
+	// look. The zero Addr means unknown — no subnet claim is made.
+	Addr netip.Addr
 	// Country is the ISO country code; empty means unknown.
 	Country string
 

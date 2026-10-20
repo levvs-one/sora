@@ -2,10 +2,12 @@ package serversel
 
 import (
 	"fmt"
+	"net/netip"
 	"sort"
 	"strings"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/probe"
 )
 
 // ProfileHint carries the bits of the active F5 network profile that steer
@@ -74,6 +76,18 @@ type Pick struct {
 	Rejected []Rejection
 }
 
+// SubnetJudge reports the carpet-ban reputation of the subnet containing
+// an address (probe.SubnetReputation in production). A nil judge disables
+// subnet filtering: candidates are judged on their own numbers only.
+type SubnetJudge interface {
+	State(addr netip.Addr) probe.SubnetState
+}
+
+// subnetDegradedPenalty is the score subtracted from a candidate in a
+// degraded subnet: enough to prefer a healthy-subnet peer, small enough
+// that a clearly better server still wins.
+const subnetDegradedPenalty = 0.15
+
 // Picker scores and ranks candidates. It is safe for concurrent use; the
 // reliability store may be nil, in which case every server scores the prior
 // rate.
@@ -82,6 +96,7 @@ type Picker struct {
 	pick   PickConfig
 	scorer *Scorer
 	rel    *ReliabilityStore
+	subnet SubnetJudge
 }
 
 // NewPicker clamps both configs. rel may be nil.
@@ -89,6 +104,24 @@ func NewPicker(score ScoreConfig, pick PickConfig, rel *ReliabilityStore) *Picke
 	score = score.clamped()
 	pick = pick.clamped()
 	return &Picker{score: score, pick: pick, scorer: NewScorer(score), rel: rel}
+}
+
+// WithSubnets attaches the subnet-reputation source (T011): candidates in
+// a burned /24 are rejected outright — a carpet ban kills the subnet, not
+// the address — and candidates in a degraded subnet are penalized. It
+// returns the picker for chaining. Nil disables filtering.
+func (p *Picker) WithSubnets(j SubnetJudge) *Picker {
+	p.subnet = j
+	return p
+}
+
+// subnetState resolves a candidate's subnet verdict, or SubnetHealthy
+// when no judge is attached or the candidate's address is unknown.
+func (p *Picker) subnetState(c Candidate) probe.SubnetState {
+	if p.subnet == nil || !c.Addr.IsValid() {
+		return probe.SubnetHealthy
+	}
+	return p.subnet.State(c.Addr)
 }
 
 // PickBest filters the candidates by the constraints, scores the survivors
@@ -107,6 +140,15 @@ func (p *Picker) PickBest(cands []Candidate, cons Constraints) (Pick, error) {
 	for _, c := range cands {
 		if why := eligibleCandidate(c, caps, excluded, countries); why != "" {
 			rejected = append(rejected, Rejection{ID: c.ID, Reason: why})
+			continue
+		}
+		// T011: a burned subnet rejects the candidate before scoring —
+		// the ban is on the /24, so this server's own history is beside
+		// the point. The profile pin below only sees survivors, so a
+		// pinned server in a burned subnet falls through to scoring
+		// instead of being connected into a carpet ban.
+		if p.subnetState(c) == probe.SubnetBurned {
+			rejected = append(rejected, Rejection{ID: c.ID, Reason: "subnet carpet-banned (T011): every observed server in its /24 fails"})
 			continue
 		}
 		eligible = append(eligible, c)
@@ -214,6 +256,11 @@ func (p *Picker) rank(eligible []Candidate, preferredEngine engine.Kind) []ranke
 		b := p.scorer.Score(c, ctx, p.reliability(c.ID))
 		if preferredEngine != "" && c.Engine == preferredEngine {
 			b.Total = clamp01(b.Total + p.pick.ProfileEngineBonus)
+		}
+		// T011: a degraded subnet (mixed outcomes) costs score but does
+		// not veto: half the subnet answering is information, not a ban.
+		if p.subnetState(c) == probe.SubnetDegraded {
+			b.Total = clamp01(b.Total - subnetDegradedPenalty)
 		}
 		out = append(out, ranked{c: c, b: b})
 	}

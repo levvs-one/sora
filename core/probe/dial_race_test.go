@@ -46,7 +46,7 @@ func TestDialRacesResolvedAddresses(t *testing.T) {
 	p := New(Config{Timeout: 5 * time.Second})
 	p.lookupIP = twoLoopbacks
 	for i := 0; i < 5; i++ {
-		latency, err := p.dial(context.Background(), "example.com", port)
+		latency, _, err := p.dial(context.Background(), "example.com", port)
 		if err != nil {
 			t.Fatalf("iteration %d: dial() error = %v", i, err)
 		}
@@ -68,7 +68,7 @@ func TestDialRaceFailureRedactsAddresses(t *testing.T) {
 	_ = ln.Close()                                  // nothing listens now: both refuse
 	p := New(Config{Timeout: 5 * time.Second})
 	p.lookupIP = twoLoopbacks
-	_, err = p.dial(context.Background(), "example.com", closed)
+	_, _, err = p.dial(context.Background(), "example.com", closed)
 	if err == nil {
 		t.Fatal("dial() error = nil, want refused")
 	}
@@ -86,7 +86,7 @@ func TestDialIPLiteralKeepsTheSinglePath(t *testing.T) {
 		t.Errorf("resolver called for IP literal %q", host)
 		return nil, nil
 	}
-	latency, err := p.dial(context.Background(), "127.0.0.1", port)
+	latency, _, err := p.dial(context.Background(), "127.0.0.1", port)
 	if err != nil {
 		t.Fatalf("dial() error = %v", err)
 	}
@@ -159,7 +159,7 @@ func TestDialSingleResolvedAddressSkipsSecondLookup(t *testing.T) {
 		lookups++
 		return []netip.Addr{netip.MustParseAddr("127.0.0.1")}, nil
 	}
-	latency, err := p.dial(context.Background(), "example.com", port)
+	latency, _, err := p.dial(context.Background(), "example.com", port)
 	if err != nil {
 		t.Fatalf("dial() error = %v", err)
 	}
