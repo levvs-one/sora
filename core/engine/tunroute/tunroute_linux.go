@@ -15,6 +15,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/levvs-one/sora-client/core/engine"
 )
@@ -134,14 +135,43 @@ func bypassSteps(device string, addresses []netip.Prefix, families []string) [][
 	return steps
 }
 
+// unrouteReads holds the two read-only ip queries unroute needs for one
+// address family, fetched concurrently by unroute: process spawns
+// dominate cleanup time at core startup, and the queries are mutually
+// independent (rules and routes are separate kernel objects, and each
+// family is scoped apart), so overlapping them changes only wall time —
+// the processing below, its order, and its errors are exactly the
+// sequential version's.
+type unrouteReads struct {
+	rulesOut []byte
+	rulesErr error
+	tableOut []byte
+	tableErr error
+}
+
 func unroute(ctx context.Context) error {
 	bin, err := ipBin()
 	if err != nil {
 		return err
 	}
+	fams := families()
+	reads := make([]unrouteReads, len(fams))
+	var wg sync.WaitGroup
+	for i, family := range fams {
+		wg.Add(2)
+		go func() {
+			defer wg.Done()
+			reads[i].rulesOut, reads[i].rulesErr = exec.CommandContext(ctx, bin, family, "-d", "-j", "-N", "rule").Output() //nolint:gosec // bin is the absolute iproute2 path; family is the fixed -4/-6 set
+		}()
+		go func() {
+			defer wg.Done()
+			reads[i].tableOut, reads[i].tableErr = exec.CommandContext(ctx, bin, family, "route", "show", "table", table).CombinedOutput() //nolint:gosec // bin is the absolute iproute2 path; fixed family and Sora table
+		}()
+	}
+	wg.Wait()
 	var errs []error
-	for _, family := range families() {
-		out, err := exec.CommandContext(ctx, bin, family, "-d", "-j", "-N", "rule").Output() //nolint:gosec // bin is the absolute iproute2 path; family is the fixed -4/-6 set
+	for i, family := range fams {
+		out, err := reads[i].rulesOut, reads[i].rulesErr
 		if err != nil {
 			return fmt.Errorf("tunroute: read rules: %w", err)
 		}
@@ -165,7 +195,7 @@ func unroute(ctx context.Context) error {
 		}
 		// Reading first lets a proxy-only, unprivileged core start when there
 		// is no stale state, without attempting privileged mutations.
-		out, err = exec.CommandContext(ctx, bin, family, "route", "show", "table", table).CombinedOutput() //nolint:gosec // bin is the absolute iproute2 path; fixed family and Sora table
+		out, err = reads[i].tableOut, reads[i].tableErr
 		if err != nil && !strings.Contains(string(out), "FIB table does not exist") {
 			errs = append(errs, fmt.Errorf("tunroute: read table: %w: %s", err, out))
 		} else if err == nil && len(out) != 0 {
