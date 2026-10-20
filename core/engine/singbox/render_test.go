@@ -1161,3 +1161,33 @@ func TestRenderKeepsAmneziaWG20(t *testing.T) {
 		t.Fatalf("2.0 obfuscation parameters must reach the endpoint: %s", raw)
 	}
 }
+
+// TestRenderLocalProxyListenFollowsAllowLAN locks C7 in the sing-box
+// render: the mixed inbound binds every interface only for a LAN-shared
+// plan carrying a login; anything else stays on loopback.
+func TestRenderLocalProxyListenFollowsAllowLAN(t *testing.T) {
+	mixed := func(p *engine.Plan) map[string]any {
+		cfg := render(t, p)
+		for _, in := range cfg["inbounds"].([]any) {
+			if m := in.(map[string]any); m["type"] == "mixed" {
+				return m
+			}
+		}
+		t.Fatalf("no mixed inbound in %v", cfg["inbounds"])
+		return nil
+	}
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	if got := mixed(p)["listen"]; got != "127.0.0.1" {
+		t.Errorf("default listen = %v, want loopback", got)
+	}
+	p.Options.AllowLAN = true
+	p.LocalProxy.Username, p.LocalProxy.Password = "sora", "lan-sharing-password"
+	in := mixed(p)
+	if in["listen"] != "0.0.0.0" {
+		t.Errorf("LAN listen = %v, want 0.0.0.0", in["listen"])
+	}
+	users, _ := in["users"].([]any)
+	if len(users) != 1 || users[0].(map[string]any)["username"] != "sora" {
+		t.Errorf("the LAN listener must carry the login: %v", in["users"])
+	}
+}

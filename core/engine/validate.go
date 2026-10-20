@@ -812,6 +812,12 @@ func (p *Plan) Validate() error {
 	if (p.LocalProxy.Username == "") != (p.LocalProxy.Password == "") {
 		errs = append(errs, errors.New("plan: the local proxy login needs both a username and a password"))
 	}
+	// Defense in depth for LAN sharing (C7): a listener bound to every
+	// interface must never run without a login, whoever built the plan.
+	// The pair check above does not catch "no login at all".
+	if p.Options.AllowLAN && p.LocalProxy.Enabled && p.LocalProxy.Username == "" && p.LocalProxy.Password == "" {
+		errs = append(errs, errors.New("plan: sharing the local proxy on the local network needs a username and a password"))
+	}
 	if strings.ContainsAny(p.LocalProxy.Username, ":@ \r\n") {
 		errs = append(errs, errors.New("plan: the local proxy username contains a separator"))
 	}

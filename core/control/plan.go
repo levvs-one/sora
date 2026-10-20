@@ -299,6 +299,20 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 		Username: local.GetUsername(),
 		Password: local.GetPassword(),
 	}
+	// LAN sharing (C7): the listener binds every interface, so it is
+	// allowed only in TUN mode and only behind a full login. In the
+	// system proxy mode the listener is forced for the OS proxy, which
+	// cannot carry a login (the check below keeps refusing that), so an
+	// allow_lan request there would open an unauthenticated LAN proxy.
+	if local.GetAllowLan() && !plan.Tun.Enabled {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanLocalProxy,
+			"control: sharing the local proxy on the local network needs TUN mode; the system proxy cannot carry a login")
+	}
+	if local.GetAllowLan() && (local.GetUsername() == "" || local.GetPassword() == "") {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanLocalProxy,
+			"control: sharing the local proxy on the local network needs both a username and a password")
+	}
+	plan.Options.AllowLAN = local.GetAllowLan()
 	if !plan.Tun.Enabled && local.GetUsername() != "" {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanLocalProxy,
 			"control: the system proxy cannot carry a login for the local proxy")

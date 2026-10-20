@@ -177,6 +177,47 @@ func TestPlanKeepsEngineControlAndTheLocalProxyPrivate(t *testing.T) {
 	}
 }
 
+// TestPlanLanSharingNeedsTunAndAFullLogin locks C7 at the contract
+// layer: allow_lan maps to Options.AllowLAN only in TUN mode and only
+// behind a complete login; in the system proxy mode it is refused even
+// with a login, because that listener cannot carry one.
+func TestPlanLanSharingNeedsTunAndAFullLogin(t *testing.T) {
+	base := func(mode corev1.TunnelMode, lp *corev1.LocalProxy) *corev1.SessionPlan {
+		return &corev1.SessionPlan{TunnelMode: mode, LocalProxy: lp,
+			Outbounds: []*corev1.OutboundSpec{{Id: "a", Protocol: "direct"}}}
+	}
+	sharing := &corev1.LocalProxy{Enabled: true, Username: "sora", Password: "lan-sharing-password", AllowLan: true}
+	p, err := planFromProto(base(corev1.TunnelMode_TUNNEL_MODE_SYSTEM, sharing), "s", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !p.Options.AllowLAN || !p.LocalProxy.Enabled || p.LocalProxy.Username != "sora" {
+		t.Errorf("allow_lan+auth+TUN must reach the plan: %+v %+v", p.Options, p.LocalProxy)
+	}
+	for name, lp := range map[string]*corev1.LocalProxy{
+		"no login":      {Enabled: true, AllowLan: true},
+		"username only": {Enabled: true, AllowLan: true, Username: "sora"},
+		"password only": {Enabled: true, AllowLan: true, Password: "lan-sharing-password"},
+	} {
+		if _, err := planFromProto(base(corev1.TunnelMode_TUNNEL_MODE_SYSTEM, lp), "s", nil); err == nil {
+			t.Errorf("allow_lan with %s must be refused", name)
+		}
+	}
+	if _, err := planFromProto(base(corev1.TunnelMode_TUNNEL_MODE_APPLICATION, sharing), "s", nil); err == nil {
+		t.Error("allow_lan in the system proxy mode must be refused even with a login")
+	}
+	if _, err := planFromProto(base(corev1.TunnelMode_TUNNEL_MODE_APPLICATION,
+		&corev1.LocalProxy{AllowLan: true}), "s", nil); err == nil {
+		t.Error("allow_lan in the system proxy mode must be refused without a login too")
+	}
+	// Without allow_lan nothing changes: AllowLAN stays off.
+	p, err = planFromProto(base(corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		&corev1.LocalProxy{Enabled: true, Username: "sora", Password: "lan-sharing-password"}), "s", nil)
+	if err != nil || p.Options.AllowLAN {
+		t.Errorf("a locked loopback listener must not become LAN sharing: %+v, %v", p.Options, err)
+	}
+}
+
 func TestPlanCarriesGroupsAndAppliesThePreset(t *testing.T) {
 	in := &corev1.SessionPlan{
 		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,

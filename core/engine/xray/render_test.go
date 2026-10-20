@@ -755,3 +755,43 @@ func TestRenderRejectsVisionOnNonTCP(t *testing.T) {
 		t.Fatalf("vision+ws render must fail naming the TCP requirement, got: %v", err)
 	}
 }
+
+// TestRenderLocalProxyListenFollowsAllowLAN locks C7 in the Xray render:
+// the socks inbound binds every interface only for a LAN-shared plan
+// carrying a login; anything else stays on loopback.
+func TestRenderLocalProxyListenFollowsAllowLAN(t *testing.T) {
+	listen := func(p *engine.Plan) (string, map[string]any) {
+		raw, err := Render(p, testRuntime, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var cfg struct {
+			Inbounds []map[string]any `json:"inbounds"`
+		}
+		if err := json.Unmarshal(raw, &cfg); err != nil {
+			t.Fatal(err)
+		}
+		for _, in := range cfg.Inbounds {
+			if in["protocol"] == "socks" {
+				settings, _ := in["settings"].(map[string]any)
+				got, _ := in["listen"].(string)
+				return got, settings
+			}
+		}
+		t.Fatalf("no socks inbound in %s", raw)
+		return "", nil
+	}
+	p := enginetest.Plan(engine.ProtocolVLESS)
+	if got, _ := listen(p); got != "127.0.0.1" {
+		t.Errorf("default listen = %q, want loopback", got)
+	}
+	p.Options.AllowLAN = true
+	p.LocalProxy.Username, p.LocalProxy.Password = "sora", "lan-sharing-password"
+	got, settings := listen(p)
+	if got != "0.0.0.0" {
+		t.Errorf("LAN listen = %q, want 0.0.0.0", got)
+	}
+	if settings["auth"] != "password" {
+		t.Errorf("the LAN listener must require the login: %v", settings)
+	}
+}

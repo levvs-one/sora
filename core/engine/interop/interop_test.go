@@ -303,9 +303,9 @@ func TestLocalProxyIsClosedOrLockedOnEveryEngine(t *testing.T) {
 	defer target.Close()
 	for _, kind := range []engine.Kind{engine.KindSingBox, engine.KindXray, engine.KindMihomo} {
 		t.Run(string(kind), func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 			defer cancel()
-			run := func(lp engine.LocalProxy) (int, func()) {
+			run := func(lp engine.LocalProxy, allowLAN bool) (int, func()) {
 				local := port(t)
 				reg := registry.Discover(ctx, dir, supervise.Config{HomeDir: t.TempDir(), LocalPort: local, StartTimeout: 10 * time.Second})
 				plan := &engine.Plan{
@@ -314,7 +314,7 @@ func TestLocalProxyIsClosedOrLockedOnEveryEngine(t *testing.T) {
 					LocalProxy: lp,
 					Outbounds:  []engine.Outbound{{ID: "out", Protocol: engine.ProtocolDirect}},
 					Rules:      []engine.Rule{{Type: engine.RuleMatchAll, Target: "out"}},
-					Options:    engine.Options{LogLevel: "warning", TestURL: engine.TestURLProduction},
+					Options:    engine.Options{LogLevel: "warning", TestURL: engine.TestURLProduction, AllowLAN: allowLAN},
 				}
 				eng, err := reg.Factory()(ctx, plan)
 				if err != nil {
@@ -326,7 +326,7 @@ func TestLocalProxyIsClosedOrLockedOnEveryEngine(t *testing.T) {
 				return local, func() { _ = eng.Close() }
 			}
 
-			local, stop := run(engine.LocalProxy{})
+			local, stop := run(engine.LocalProxy{}, false)
 			var dialer net.Dialer
 			if conn, err := dialer.DialContext(ctx, "tcp", "127.0.0.1:"+strconv.Itoa(local)); err == nil {
 				_ = conn.Close()
@@ -334,7 +334,8 @@ func TestLocalProxyIsClosedOrLockedOnEveryEngine(t *testing.T) {
 			}
 			stop()
 
-			local, stop = run(engine.LocalProxy{Enabled: true, Username: "sora", Password: "interop-login-password"})
+			locked := engine.LocalProxy{Enabled: true, Username: "sora", Password: "interop-login-password"}
+			local, stop = run(locked, false)
 			defer stop()
 			if _, err := fetch(ctx, local, target.URL); err == nil {
 				t.Error("a locked local proxy must refuse a request without the login")
@@ -342,8 +343,72 @@ func TestLocalProxyIsClosedOrLockedOnEveryEngine(t *testing.T) {
 			if body, err := fetchAs(ctx, local, "sora", "interop-login-password", target.URL); err != nil || body != reply {
 				t.Errorf("the login must open the local proxy: %q, %v", body, err)
 			}
+			// The bind checks below use 127.0.0.2, the second address
+			// of the loopback range: a listener bound to 127.0.0.1 does
+			// not answer there, one bound to 0.0.0.0 does, so it tells
+			// the two binds apart on any machine. (The sandbox's uplink
+			// address cannot be used instead: the sandbox intercepts
+			// every TCP connection to it before it reaches a local
+			// listener. A check from a real second device on a real LAN
+			// remains a dev-machine verification.)
+			const otherAddr = "127.0.0.2"
+			if conn, err := dialer.DialContext(ctx, "tcp", net.JoinHostPort(otherAddr, strconv.Itoa(local))); err == nil {
+				_ = conn.Close()
+				t.Error("a loopback plan must not listen beyond 127.0.0.1")
+			}
+
+			// LAN sharing (C7): with AllowLAN the same locked listener
+			// answers beyond 127.0.0.1 — and stays locked there.
+			local, stop = run(locked, true)
+			defer stop()
+			if _, err := fetchAt(ctx, otherAddr, local, target.URL); err == nil {
+				t.Error("a LAN-shared proxy must refuse a request without the login beyond loopback")
+			}
+			if body, err := fetchAsAt(ctx, otherAddr, local, "sora", "interop-login-password", target.URL); err != nil || body != reply {
+				t.Errorf("the login must open the LAN-shared proxy on %s: %q, %v", otherAddr, body, err)
+			}
 		})
 	}
+}
+
+// fetchAt is fetch through the proxy at an explicit host address.
+func fetchAt(ctx context.Context, host string, local int, target string) (string, error) {
+	proxy, _ := url.Parse("http://" + net.JoinHostPort(host, strconv.Itoa(local)))
+	client := &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{Proxy: http.ProxyURL(proxy), DisableKeepAlives: true}}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, target, nil)
+	if err != nil {
+		return "", err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	body, err := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("status %d", resp.StatusCode)
+	}
+	return string(body), err
+}
+
+// fetchAsAt is fetchAs through the proxy at an explicit host address.
+func fetchAsAt(ctx context.Context, host string, local int, user, password, target string) (string, error) {
+	proxy := &url.URL{Scheme: "http", Host: net.JoinHostPort(host, strconv.Itoa(local)), User: url.UserPassword(user, password)}
+	client := &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{Proxy: http.ProxyURL(proxy), DisableKeepAlives: true}}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, target, nil)
+	if err != nil {
+		return "", err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	body, err := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("status %d", resp.StatusCode)
+	}
+	return string(body), err
 }
 
 // fetchAs is fetch with a proxy login.

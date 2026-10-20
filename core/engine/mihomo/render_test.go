@@ -723,3 +723,30 @@ func TestRenderServerNameKeyPerProtocol(t *testing.T) {
 		t.Errorf("trojan: servername must not be emitted; the adapter drops it")
 	}
 }
+
+// TestRenderAllowLANFollowsThePlan locks C7 in the mihomo render:
+// allow-lan is emitted only for a LAN-shared plan carrying a login, and
+// a LAN-shared plan without a login fails validation before rendering.
+func TestRenderAllowLANFollowsThePlan(t *testing.T) {
+	p := testPlan()
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "allow-lan: false") || strings.Contains(out, "authentication:") {
+		t.Errorf("the default render must stay loopback-only without a login:\n%s", out)
+	}
+	p.Options.AllowLAN = true
+	p.LocalProxy.Username, p.LocalProxy.Password = "sora", "lan-sharing-password"
+	out, err = Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "allow-lan: true") || !strings.Contains(out, "sora:lan-sharing-password") {
+		t.Errorf("the LAN render must open allow-lan behind the login:\n%s", out)
+	}
+	p.LocalProxy.Username, p.LocalProxy.Password = "", ""
+	if _, err := Render(p, testRuntime(t)); err == nil {
+		t.Error("LAN sharing without a login must not render")
+	}
+}

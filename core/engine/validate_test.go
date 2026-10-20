@@ -326,6 +326,36 @@ func TestValidateRejectsBadCPSInPlan(t *testing.T) {
 	}
 }
 
+// TestValidateRejectsLanSharingWithoutALogin locks C7 defense in depth:
+// AllowLAN binds the local proxy on every interface, so a plan that asks
+// for it with the listener enabled must carry a full login — whoever
+// built the plan, not only plans arriving through the control layer.
+func TestValidateRejectsLanSharingWithoutALogin(t *testing.T) {
+	plan := validPlan()
+	plan.Options.AllowLAN = true
+	plan.LocalProxy = LocalProxy{Enabled: true}
+	if err := plan.Validate(); err == nil || !strings.Contains(err.Error(), "local network") {
+		t.Fatalf("LAN sharing without a login must be refused, got %v", err)
+	}
+	plan.LocalProxy = LocalProxy{Enabled: true, Username: "sora", Password: "lan-sharing-password"}
+	if err := plan.Validate(); err != nil {
+		t.Fatalf("LAN sharing with a login must validate: %v", err)
+	}
+	// Loopback-only plans are untouched by the gate: no login is fine
+	// while AllowLAN stays off, and AllowLAN alone opens nothing while
+	// the listener itself is disabled.
+	plan.Options.AllowLAN = false
+	plan.LocalProxy = LocalProxy{Enabled: true}
+	if err := plan.Validate(); err != nil {
+		t.Fatalf("a loopback listener without a login must validate: %v", err)
+	}
+	plan.Options.AllowLAN = true
+	plan.LocalProxy = LocalProxy{}
+	if err := plan.Validate(); err != nil {
+		t.Fatalf("AllowLAN with no listener must validate: %v", err)
+	}
+}
+
 func TestValidateEarlyData(t *testing.T) {
 	ws := func() Outbound {
 		o := wireguardWithAmnezia(nil)
