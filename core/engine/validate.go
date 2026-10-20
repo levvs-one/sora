@@ -98,7 +98,6 @@ func (o Outbound) Warnings() []string {
 	return out
 }
 
-// Validate checks one outbound on its own, without engine capabilities.
 // validProtocols whitelists the protocols a plan may hold, so an unknown
 // protocol fails validation with a clear error instead of surfacing late at
 // eng.Apply (SORA-L16).
@@ -118,6 +117,7 @@ var validTransports = map[string]bool{
 	"h2": true, "httpupgrade": true, "xhttp": true, "hysteria": true,
 }
 
+// Validate checks one outbound on its own, without engine capabilities.
 func (o Outbound) Validate() error {
 	var errs []error
 	if o.ID == "" {

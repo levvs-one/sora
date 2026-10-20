@@ -135,13 +135,13 @@ func (l *Listener) Accept() (net.Conn, error) {
 
 // admit takes one connection slot when the cap allows it.
 func (l *Listener) admit() bool {
-	max := l.options.MaxConnections
-	if max <= 0 {
-		max = DefaultMaxConnections
+	limit := l.options.MaxConnections
+	if limit <= 0 {
+		limit = DefaultMaxConnections
 	}
 	for {
 		n := l.active.Load()
-		if n >= int64(max) {
+		if n >= int64(limit) {
 			return false
 		}
 		if l.active.CompareAndSwap(n, n+1) {
