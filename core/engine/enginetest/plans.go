@@ -134,6 +134,19 @@ func AmneziaWG3() engine.Outbound {
 
 // TrustCertificate uses the real engines with a test-local CA after SafeEnv
 // filtering. It never changes the host certificate store or production trust.
+//
+// Two discovery hardenings shape the wrapper's form (SORA-H5): the
+// SORA_*_BIN overrides are honored only when the caller passes
+// supervise.Config.AllowEnvBin (test call sites that use this helper
+// must opt in — production never does), and an env candidate whose
+// file name matches an engines.digests entry is digest-verified
+// before execution. A wrapper script named exactly "xray" therefore
+// fails verification against the real binary's digest and discovery
+// silently falls back to the unwrapped binary — every
+// certificate-based case then dies with x509 unknown authority. The
+// wrapper file carries a distinct name the manifest does not claim,
+// so the explicit-trust env path applies, as documented in
+// supervise.checkDigestPath.
 func TrustCertificate(t *testing.T, certificate string) {
 	t.Helper()
 	if runtime.GOOS != "linux" {
@@ -148,7 +161,7 @@ func TrustCertificate(t *testing.T, certificate string) {
 		if binary == "" {
 			binary = filepath.Join(os.Getenv("SORA_ENGINES_DIR"), core.name)
 		}
-		wrapper := filepath.Join(dir, core.name)
+		wrapper := filepath.Join(dir, core.name+".sora-ca-wrapper")
 		script := fmt.Sprintf("#!/bin/sh\nSSL_CERT_FILE=%s exec %s \"$@\"\n", quote(certificate), quote(binary))
 		if err := os.WriteFile(wrapper, []byte(script), 0700); err != nil { //nolint:gosec // test-local wrapper must be executable
 			t.Fatal(err)

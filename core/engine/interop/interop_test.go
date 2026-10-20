@@ -123,6 +123,26 @@ func services(t *testing.T) []service {
 	add("vmess-ws", map[string]any{"protocol": "vmess", "settings": map[string]any{"clients": []any{map[string]any{"id": uuid}}},
 		"streamSettings": map[string]any{"network": "ws", "wsSettings": map[string]any{"path": "/vm"}}},
 		engine.Outbound{Protocol: engine.ProtocolVMess, UUID: uuid, Transport: engine.Transport{Type: "ws", Path: "/vm"}})
+	// CENSOR-P2 combos: VMess over the remaining stream transports (with
+	// a non-default AEAD security on the gRPC leg, so the plan's Cipher
+	// is load-bearing) and Trojan over WS and gRPC under TLS.
+	add("vmess-grpc", map[string]any{"protocol": "vmess", "settings": map[string]any{"clients": []any{map[string]any{"id": uuid}}},
+		"streamSettings": map[string]any{"network": "grpc", "grpcSettings": map[string]any{"serviceName": "tun"}}},
+		engine.Outbound{Protocol: engine.ProtocolVMess, UUID: uuid, Cipher: "chacha20-poly1305", Transport: engine.Transport{Type: "grpc", Service: "tun"}})
+	add("vmess-httpupgrade", map[string]any{"protocol": "vmess", "settings": map[string]any{"clients": []any{map[string]any{"id": uuid}}},
+		"streamSettings": map[string]any{"network": "httpupgrade", "httpupgradeSettings": map[string]any{"path": "/vmup"}}},
+		engine.Outbound{Protocol: engine.ProtocolVMess, UUID: uuid, Transport: engine.Transport{Type: "httpupgrade", Path: "/vmup"}})
+	trojanCerts := map[string]any{"certificates": []any{map[string]any{"certificateFile": certPath, "keyFile": keyPath}}}
+	add("trojan-ws", map[string]any{"protocol": "trojan", "settings": map[string]any{"clients": []any{map[string]any{"password": password}}},
+		"streamSettings": map[string]any{"network": "ws", "security": "tls", "tlsSettings": trojanCerts, "wsSettings": map[string]any{"path": "/tw"}}},
+		engine.Outbound{Protocol: engine.ProtocolTrojan, Password: password,
+			TLS:       engine.TLS{Enabled: true, ServerName: "example.com"},
+			Transport: engine.Transport{Type: "ws", Path: "/tw"}})
+	add("trojan-grpc", map[string]any{"protocol": "trojan", "settings": map[string]any{"clients": []any{map[string]any{"password": password}}},
+		"streamSettings": map[string]any{"network": "grpc", "security": "tls", "tlsSettings": trojanCerts, "grpcSettings": map[string]any{"serviceName": "tun"}}},
+		engine.Outbound{Protocol: engine.ProtocolTrojan, Password: password,
+			TLS:       engine.TLS{Enabled: true, ServerName: "example.com", ALPN: []string{"h2"}},
+			Transport: engine.Transport{Type: "grpc", Service: "tun"}})
 	add("shadowsocks", map[string]any{"protocol": "shadowsocks", "settings": map[string]any{"method": "aes-256-gcm", "password": password, "network": "tcp,udp"}},
 		engine.Outbound{Protocol: engine.ProtocolShadowsocks, Cipher: "aes-256-gcm", Password: password})
 	return out
@@ -187,7 +207,14 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 	}
 	svcs := services(t)
 	startServer(t, server, svcs)
-	availability := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir()}).Availability()
+	// AllowEnvBin: enginetest.TrustCertificate points SORA_*_BIN at
+	// SSL_CERT_FILE wrappers for the TLS cases below; since the
+	// SORA-H5 hardening, discovery honors those overrides only when
+	// the caller explicitly opts in, and without the opt-in every
+	// certificate-based case fails with x509 unknown authority
+	// against the raw binary (the REALITY case, which needs no CA,
+	// kept passing and masked the break).
+	availability := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir(), AllowEnvBin: true}).Availability()
 
 	// Wrong credentials must fail to rule out traffic bypassing the proxy.
 	wrong := svcs[0]
@@ -207,9 +234,20 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 	}
 	encryptedWrong.name, encryptedWrong.outbound.ID = "wrong-encryption-key", "wrong-encryption-key"
 	encryptedWrong.outbound.Encryption = "mlkem768x25519plus.native.0rtt." + base64.RawURLEncoding.EncodeToString(wrongKey.PublicKey().Bytes())
+	// CENSOR-P2 negative control: a Trojan outbound with a wrong
+	// password must fail exactly like the wrong-UUID case above.
+	var wrongTrojan service
+	for _, svc := range svcs {
+		if svc.name == "trojan-ws" {
+			wrongTrojan = svc
+			break
+		}
+	}
+	wrongTrojan.name, wrongTrojan.outbound.ID = "wrong-trojan-password", "wrong-trojan-password"
+	wrongTrojan.outbound.Password = "wrong-trojan-password"
 
 	for _, kind := range []engine.Kind{engine.KindSingBox, engine.KindXray, engine.KindMihomo} {
-		for _, svc := range append(svcs, wrong, encryptedWrong) {
+		for _, svc := range append(svcs, wrong, encryptedWrong, wrongTrojan) {
 			plan := &engine.Plan{
 				SessionID:  "interop",
 				LocalProxy: engine.LocalProxy{Enabled: true},
@@ -223,7 +261,7 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 			t.Run(string(kind)+"/"+svc.name, func(t *testing.T) {
 				local := port(t)
 				center := logs.New(logs.Settings{CaptureLevel: logs.LevelDebug, RecordDestinations: true})
-				reg := registry.Discover(context.Background(), dir, supervise.Config{HomeDir: t.TempDir(), LocalPort: local, StartTimeout: 10 * time.Second, Logs: center})
+				reg := registry.Discover(context.Background(), dir, supervise.Config{HomeDir: t.TempDir(), LocalPort: local, StartTimeout: 10 * time.Second, Logs: center, AllowEnvBin: true})
 				plan.Engines = []engine.Kind{kind}
 				plan.Options.LogLevel = "debug"
 				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -237,7 +275,7 @@ func TestEveryEngineCarriesTrafficThroughEveryTransport(t *testing.T) {
 					t.Fatalf("Apply: %v", err)
 				}
 				body, err := fetch(ctx, local, target.URL)
-				if svc.name == wrong.name || svc.name == encryptedWrong.name {
+				if svc.name == wrong.name || svc.name == encryptedWrong.name || svc.name == wrongTrojan.name {
 					if err == nil {
 						t.Fatalf("invalid credentials reached the target through %s: the request bypassed the proxy", kind)
 					}
