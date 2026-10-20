@@ -135,9 +135,21 @@ func startServer(t *testing.T, b supervise.Binary, svcs []service, redirect ...s
 		inbounds = append(inbounds, s.inbound)
 	}
 	freedom := map[string]any{"protocol": "freedom"}
-	if len(redirect) > 0 {
-		freedom["settings"] = map[string]any{"redirect": redirect[0]}
+	// Xray 26.10.17's freedom outbound tarpits private-IP destinations
+	// (30-90s blackhole) when a vless-family inbound forwards to it and
+	// no finalRules are configured — an upstream SSRF guard aimed at
+	// public servers. This rig's whole job is carrying loopback
+	// traffic to the test target, so the guard is lifted explicitly;
+	// without the rule every case times out on the new pin while the
+	// engines themselves are healthy (verified against the freedom
+	// source of v26.10.17: getDefaultFinalRule/defaultBlockPrivateRule).
+	freedomSettings := map[string]any{
+		"finalRules": []any{map[string]any{"action": "allow"}},
 	}
+	if len(redirect) > 0 {
+		freedomSettings["redirect"] = redirect[0]
+	}
+	freedom["settings"] = freedomSettings
 	cfg, err := json.Marshal(map[string]any{
 		"log":       map[string]any{"loglevel": "warning"},
 		"inbounds":  inbounds,
