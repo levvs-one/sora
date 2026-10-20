@@ -104,6 +104,10 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 			break
 		}
 	}
+	// SIP002 plugin/plugin_opts for Shadowsocks (T020). The raw "plugin"
+	// query key stays in Options but is never stored under that name.
+	values["ss_plugin"] = spec.Options["ss_plugin"]
+	values["ss_plugin_opts"] = spec.Options["ss_plugin_opts"]
 	// Hysteria2 performance tuning: bandwidth caps enable Brutal congestion
 	// control in the engines instead of BBR. Hop ports arrive as mport
 	// (official hy2 links) or ports (mihomo-style links).
