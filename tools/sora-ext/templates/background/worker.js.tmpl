@@ -1,0 +1,17 @@
+// worker.js — periodic background task for "{{.Name}}".
+//
+// Envelope (provided by the app-side JS runner):
+//   worker.log(message)                 -> extension log
+//   worker.fetch(url, {method, headers, body}) -> Promise<{status, headers, body}>
+//     HTTPS only, host must be in network_hosts, 30s timeout.
+//
+// The runtime clamps interval_minutes into [15 min, 7 days]. A thrown error
+// (or timeout) is recorded as a failed run in the extension log.
+
+// Example: poll a status endpoint and log the result.
+const res = await worker.fetch('https://api.example.com/status');
+if (res.status === 200) {
+  worker.log('status check ok: ' + res.body.slice(0, 200));
+} else {
+  throw new Error('status check failed: HTTP ' + res.status);
+}

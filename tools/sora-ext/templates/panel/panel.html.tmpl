@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Name}}</title>
+<style>
+  :root { color-scheme: dark light; }
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  p.sub { opacity: .65; margin: 0 0 16px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid rgba(127,127,127,.25); }
+  th { opacity: .6; font-weight: 600; }
+  .empty { opacity: .6; padding: 24px 0; text-align: center; }
+  .err { color: #b3261e; padding: 12px; border: 1px solid currentColor; border-radius: 8px; }
+  .row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  button { padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(127,127,127,.4); background: transparent; color: inherit; cursor: pointer; }
+  button:hover { background: rgba(127,127,127,.15); }
+</style>
+</head>
+<body>
+<h1>{{.Name}}</h1>
+<p class="sub" id="status">Loading…</p>
+<div class="row">
+  <button id="refresh">Refresh</button>
+  <button id="notify">Send test notification</button>
+</div>
+<div id="content"></div>
+<!--
+  Type definitions for window.soraExt live in sora-ext.d.ts next to this
+  file. In TypeScript add:  /// <reference path="./sora-ext.d.ts" />
+  In plain JS you still get editor autocomplete if your editor picks up
+  the .d.ts (VS Code does when it sits next to the file).
+-->
+<script>
+  'use strict';
+  const content = document.getElementById('content');
+  const status = document.getElementById('status');
+
+  function fmtBytes(n) {
+    if (n < 1024) return n + ' B';
+    const u = ['KB', 'MB', 'GB', 'TB'];
+    let i = -1;
+    do { n /= 1024; i++; } while (n >= 1024 && i < u.length - 1);
+    return n.toFixed(1) + ' ' + u[i];
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // settings holds the extension's own settings (getSettings/setSettings).
+  // Defaults come from settings_schema in sora-extension.json.
+  let settings = { refresh_seconds: 5 };
+  let timer = null;
+
+  async function loadSettings() {
+    try {
+      settings = Object.assign(settings, await window.soraExt.call('getSettings'));
+    } catch (e) { /* keep defaults; surfaced below on first load */ }
+  }
+
+  function armTimer() {
+    if (timer) clearInterval(timer);
+    const s = Math.min(60, Math.max(1, settings.refresh_seconds | 0 || 5));
+    timer = setInterval(load, s * 1000);
+  }
+
+  async function load() {
+    try {
+      const conns = await window.soraExt.call('getConnections');
+      status.textContent = conns.length === 1
+        ? '1 active connection' : conns.length + ' active connections';
+      if (conns.length === 0) {
+        content.innerHTML = '<div class="empty">No active connections.</div>';
+        return;
+      }
+      let html = '<table><tr><th>Process</th><th>Host</th><th>Down</th><th>Up</th></tr>';
+      for (const c of conns) {
+        html += '<tr><td>' + esc(c.process || '—') + '</td><td>' + esc(c.host || '—') +
+          '</td><td>' + fmtBytes(c.down_bytes || 0) + '</td><td>' + fmtBytes(c.up_bytes || 0) + '</td></tr>';
+      }
+      content.innerHTML = html + '</table>';
+    } catch (e) {
+      const code = e && e.code ? ' (' + esc(e.code) + ')' : '';
+      content.innerHTML = '<div class="err">Could not load connections' + code +
+        ': ' + esc((e && e.message) || e) + '</div>';
+    }
+  }
+
+  document.getElementById('refresh').addEventListener('click', load);
+  document.getElementById('notify').addEventListener('click', async () => {
+    try {
+      await window.soraExt.call('notify', { title: '{{.Name}}', body: 'The extension API works.' });
+    } catch (e) { /* permission-denied etc. surfaces in the panel console */ }
+  });
+
+  // Re-render on session changes; the host tears the panel down after
+  // 'extension.disabled', so there is nothing to clean up here.
+  if (window.soraExt && window.soraExt.onEvent) {
+    window.soraExt.onEvent((kind) => {
+      if (kind === 'session.connected' || kind === 'session.disconnected') load();
+    });
+  }
+
+  (async () => { await loadSettings(); armTimer(); await load(); })();
+</script>
+</body>
+</html>

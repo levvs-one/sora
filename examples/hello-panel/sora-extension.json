@@ -8,15 +8,34 @@
   "author": {
     "name": "Sora Team",
     "identity": "github:levvs-one",
-    "public_key": "RWQAAAAAAAAAAHd26HC5M1TyoLJMI/KjbMToDiIyGMG5eSb90Bg5aiub"
+    "public_key": "RWQNGkwMMnQVTGyuFua7fqfC1doq1NAkj68zaqIaxY2E/6jvojZ/zzLz"
   },
-  "permissions": ["connections.read", "notifications"],
-  "capabilities": ["ui-panel"],
-  "ui": {"panels": [{"id": "main", "title": "Hello", "entry": "panel.html"}]},
+  "permissions": [
+    "connections.read",
+    "notifications",
+    "ui.panel"
+  ],
+  "capabilities": [
+    "ui-panel"
+  ],
+  "ui": {
+    "panels": [
+      {
+        "id": "main",
+        "title": "Hello",
+        "entry": "panel.html"
+      }
+    ]
+  },
   "settings_schema": {
     "type": "object",
     "properties": {
-      "refresh_seconds": {"type": "integer", "minimum": 1, "maximum": 60, "default": 5}
+      "refresh_seconds": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 60,
+        "default": 5
+      }
     }
   }
 }

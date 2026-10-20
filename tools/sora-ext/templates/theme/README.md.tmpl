@@ -1,0 +1,31 @@
+# {{.Name}}
+
+A Sora theme extension — a theme is data, not code.
+
+> **Status: contract per `reports/extensions-40/spec-theme-runtime.md`.**
+> The manifest side is real; the app-side theme engine is not implemented
+> yet. Deliberately **no CSS**: CSS is an executable surface (`url()` →
+> exfiltration, `@import` → network), so the engine only accepts validated
+> tokens.
+
+## theme.json
+
+- `theme_version: 1`, `name`
+- `tokens`: `color.*` (`#rgb`/`#rrggbb`/`#rrggbbaa`, `transparent`),
+  `radius.*` (0..32), `font.scale` (0.8..1.3), `opacity.*` (0..1).
+  Unknown token names are rejected, not ignored.
+- `dark.tokens` (optional): overrides for dark brightness.
+- Contrast gate: every `onX`/`X` pair must pass WCAG AA (4.5:1) or the
+  theme is refused with the reason in the extension log.
+
+Applying is atomic; disabling the extension restores the system theme.
+The `theme.apply` permission is sensitive, and installing never
+auto-applies the theme.
+
+## Ship
+
+```sh
+sora-ext validate
+sora-ext pack . -o {{.ID}}.soraext
+sora-ext sign --key author.key {{.ID}}.soraext
+```

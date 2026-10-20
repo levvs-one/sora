@@ -1,0 +1,32 @@
+# {{.Name}}
+
+A Sora network-hook extension (DPI-bypass fragments).
+
+> **Status: contract per `reports/extensions-40/spec-net-hooks.md`.** The
+> manifest side is real; core-side compilation of fragments is not
+> implemented yet.
+
+## hook.json (L1: declarative engine fragments)
+
+No extension code runs on the traffic path — the engine compiles these
+fragments into its own config:
+
+- `hook_version: 1`
+- `engine_fragments[]`: `engines` (e.g. `sing-box`), `match`
+  (`domain_suffix` here), `params` — strictly per-engine (allowlisted,
+  typed, ranged). An unknown param rejects the whole fragment.
+- Fragments merge into the session plan as a named extension layer; on
+  conflict with user settings **the user wins**.
+
+No MITM by design: a hook gets no keys, installs no CA, decrypts nothing.
+
+## Ship
+
+```sh
+sora-ext validate
+sora-ext pack . -o {{.ID}}.soraext
+sora-ext sign --key author.key {{.ID}}.soraext
+```
+
+The `net.hooks` permission is **dangerous**: the install prompt requires
+explicit confirmation, and updates that add it re-prompt the user.
