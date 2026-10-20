@@ -369,9 +369,12 @@ func TestRuleSetDownloadsUseHTTPClient(t *testing.T) {
 	}
 }
 
-// TestRuleSetDownloadsOmitHTTPClientWithoutProxies: a plan with no proxies
-// must not render an HTTP client at all (direct is the engine default).
-func TestRuleSetDownloadsOmitHTTPClientWithoutProxies(t *testing.T) {
+// TestRuleSetDownloadsExplicitDirectClientWithoutProxies: a plan with
+// no proxies but with remote rule-sets must still render an HTTP
+// client — an explicit direct one (tag only, no detour) selected by
+// route.default_http_client. Omitting it relied on the implicit
+// default HTTP client that sing-box 1.16 removes (PASS3 deep A5).
+func TestRuleSetDownloadsExplicitDirectClientWithoutProxies(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolDirect)
 	p.Rules = []engine.Rule{
 		{Type: engine.RuleGeoSite, Value: "category-ads-all", Target: "reject"},
@@ -386,11 +389,20 @@ func TestRuleSetDownloadsOmitHTTPClientWithoutProxies(t *testing.T) {
 	if _, ok := sets[0].(map[string]any)["download_detour"]; ok {
 		t.Fatalf("download_detour is deprecated and must not be rendered: %v", sets[0])
 	}
-	if _, ok := cfg["http_clients"]; ok {
-		t.Fatalf("http_clients must be omitted with no proxies, got %v", cfg["http_clients"])
+	tag, _ := route["default_http_client"].(string)
+	if tag == "" {
+		t.Fatalf("route must select the explicit direct http client, got %v", route)
 	}
-	if _, ok := route["default_http_client"]; ok {
-		t.Fatalf("default_http_client must be omitted with no proxies, got %v", route["default_http_client"])
+	clients, _ := cfg["http_clients"].([]any)
+	if len(clients) != 1 {
+		t.Fatalf("want one explicit http client, got %v", cfg["http_clients"])
+	}
+	c := clients[0].(map[string]any)
+	if c["tag"] != tag {
+		t.Fatalf("http client tag = %v, want the route's default %q", c["tag"], tag)
+	}
+	if _, ok := c["detour"]; ok {
+		t.Fatalf("the direct client must carry no detour, got %v", c)
 	}
 }
 

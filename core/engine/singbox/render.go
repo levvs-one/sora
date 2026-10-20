@@ -176,9 +176,11 @@ type renderer struct {
 	used     map[string]bool
 	final    string
 	ruleSets []obj
-	// httpClients carries the detour for remote rule-set downloads
-	// (route.default_http_client selects its tag); empty when the
-	// plan has no proxy to download through.
+	// httpClients carries the client for remote rule-set downloads
+	// (route.default_http_client selects its tag): with a detour when
+	// the plan has a proxy to download through, an explicit direct
+	// client when it does not; empty only when the plan has no remote
+	// rule-sets at all.
 	httpClients []obj
 }
 
@@ -588,17 +590,24 @@ func (r *renderer) route() (obj, error) {
 		// sing-box 1.14 deprecated the per-rule-set download_detour
 		// (removal in 1.16) in favor of reusable HTTP clients: one
 		// client carries the detour and route.default_http_client
-		// selects it for every remote rule-set. With no proxy at all
-		// no client is rendered and sing-box downloads directly.
-		if detour := r.ruleSetDetour(); detour != "" {
-			tag := "rule-sets"
-			for n := 2; r.used[tag]; n++ {
-				tag = "rule-sets-" + strconv.Itoa(n)
-			}
-			r.used[tag] = true
-			r.httpClients = []obj{{"tag": tag, "detour": detour}}
-			out["default_http_client"] = tag
+		// selects it for every remote rule-set. The client is rendered
+		// ALWAYS when remote rule-sets exist — with no proxy in the
+		// plan it is an explicit direct client (tag only). Rendering
+		// nothing there relied on the implicit default HTTP client
+		// that 1.16 removes: a direct-only plan with remote rule-sets
+		// would lose its downloads at the next engine bump (PASS3
+		// deep A5, the unfinished half of the 1.14 migration).
+		tag := "rule-sets"
+		for n := 2; r.used[tag]; n++ {
+			tag = "rule-sets-" + strconv.Itoa(n)
 		}
+		r.used[tag] = true
+		client := obj{"tag": tag}
+		if detour := r.ruleSetDetour(); detour != "" {
+			client["detour"] = detour
+		}
+		r.httpClients = []obj{client}
+		out["default_http_client"] = tag
 		out["rule_set"] = r.ruleSets
 	}
 	return out, nil
