@@ -41,7 +41,23 @@ func SplitFallback(reference string) (primary, fallback string, err error) {
 	}
 	frag := parsed.Fragment
 	marker := fallbackParam + "="
-	idx := strings.Index(frag, marker)
+	// The marker counts only as a fragment parameter of its own: at
+	// the very start of the fragment or immediately after '&'. The
+	// same text inside another parameter's value ("#name=fallback-
+	// url=https://…") is that parameter's data, not a declaration.
+	idx := -1
+	for from := 0; ; {
+		found := strings.Index(frag[from:], marker)
+		if found < 0 {
+			break
+		}
+		cand := from + found
+		if cand == 0 || frag[cand-1] == '&' {
+			idx = cand
+			break
+		}
+		from = cand + 1
+	}
 	if idx < 0 {
 		primary = trimmed
 		if frag != "" {

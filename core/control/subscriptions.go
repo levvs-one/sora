@@ -357,7 +357,11 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 				fetchNow = true
 			}
 			if fallbackLink != rec.FallbackURL {
-				rec.FallbackURL = fallbackLink
+				// A fallback-only change is a link change too: the
+				// pair is fetched at once below, so the error state
+				// of the old pair must not outlive it, exactly as
+				// on a primary change.
+				rec.FallbackURL, rec.Failures, rec.LastError = fallbackLink, 0, nil
 				fetchNow = true
 			}
 		}

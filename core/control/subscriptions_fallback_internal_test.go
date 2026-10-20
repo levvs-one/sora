@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
@@ -160,6 +161,54 @@ func TestRelinkingReplacesTheFallbackAndLinklessSavesKeepIt(t *testing.T) {
 	}
 	if got := srv.subs.records[id].FallbackURL; got != "https://third.example/sub/x" {
 		t.Fatalf("the replacement fallback = %q", got)
+	}
+}
+
+func TestRelinkWithOnlyFallbackChangeResetsFailures(t *testing.T) {
+	// The blocking fetcher keeps the relink-triggered refresh from
+	// landing (and masking the save-time state with a successful
+	// update) while the test inspects the record: whatever save left
+	// behind is exactly what is checked.
+	p := &panel{body: servers("a")}
+	srv, _ := bookServer(t, t.TempDir(), p)
+	state := saveAndWait(t, srv.subs, &corev1.SubscriptionSettings{Url: fallbackPastedLink})
+	id := state.GetSettings().GetId()
+
+	srv.subs.mu.Lock()
+	rec := srv.subs.records[id]
+	rec.Failures = 3
+	rec.LastError = &storedError{Code: errs.CodeUnavailable, Key: errs.KeySubscriptionStatus, Detail: "boom"}
+	srv.subs.mu.Unlock()
+
+	p.release = make(chan struct{})
+	if _, err := srv.subs.save(&corev1.SubscriptionSettings{Id: id, Url: fallbackPrimaryLink + "#fallback-url=https://third.example/sub/x"}); err != nil {
+		t.Fatal(err)
+	}
+	srv.subs.mu.Lock()
+	rec = srv.subs.records[id]
+	if rec.URL != fallbackPrimaryLink || rec.FallbackURL != "https://third.example/sub/x" {
+		srv.subs.mu.Unlock()
+		t.Fatalf("after a fallback-only relink the record is %+v, want the same primary and the new fallback", rec)
+	}
+	if rec.Failures != 0 || rec.LastError != nil {
+		failures, lastError := rec.Failures, rec.LastError
+		srv.subs.mu.Unlock()
+		t.Errorf("a fallback-only relink must reset the error state like a primary change, got Failures = %d, LastError = %+v", failures, lastError)
+	} else {
+		srv.subs.mu.Unlock()
+	}
+	close(p.release)
+	for deadline := time.Now().Add(5 * time.Second); ; {
+		srv.subs.mu.Lock()
+		updating := srv.subs.updating[id]
+		srv.subs.mu.Unlock()
+		if !updating {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("the relink refresh never finished")
+		}
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 

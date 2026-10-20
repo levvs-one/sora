@@ -221,13 +221,17 @@ func TestSplitFallbackForms(t *testing.T) {
 		primary   string
 		fallback  string
 	}{
-		"no fragment":                {primary, primary, ""},
-		"plain name":                 {primary + "#My VPN", primary, ""},
-		"raw fallback":               {primary + "#fallback-url=" + backup, primary, backup},
-		"encoded fallback":           {primary + "#fallback-url=https%3A%2F%2Fbackup.example%2Fsub%2Ftoken-b%3Fregion%3Deu%26fast%3D1", primary, backup},
-		"named then fallback":        {primary + "#name=Mine&fallback-url=" + backup, primary, backup},
-		"empty fallback":             {primary + "#fallback-url=", primary, ""},
-		"fallback with own fragment": {primary + "#fallback-url=" + backup + "#name", primary, backup},
+		"no fragment":                 {primary, primary, ""},
+		"plain name":                  {primary + "#My VPN", primary, ""},
+		"raw fallback":                {primary + "#fallback-url=" + backup, primary, backup},
+		"encoded fallback":            {primary + "#fallback-url=https%3A%2F%2Fbackup.example%2Fsub%2Ftoken-b%3Fregion%3Deu%26fast%3D1", primary, backup},
+		"named then fallback":         {primary + "#name=Mine&fallback-url=" + backup, primary, backup},
+		"marker at fragment start":    {primary + "#fallback-url=" + backup, primary, backup},
+		"marker after ampersand":      {primary + "#name=Mine&lang=en&fallback-url=" + backup, primary, backup},
+		"marker inside a value":       {primary + "#name=fallback-url=" + backup, primary, ""},
+		"marker inside a later value": {primary + "#name=Mine&note=fallback-url=" + backup, primary, ""},
+		"empty fallback":              {primary + "#fallback-url=", primary, ""},
+		"fallback with own fragment":  {primary + "#fallback-url=" + backup + "#name", primary, backup},
 	}
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
