@@ -416,6 +416,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   @override
   void dispose() {
     _catalogSearch.dispose();
+    _installedSearch.dispose();
     super.dispose();
   }
 
@@ -913,19 +914,28 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     return Column(
       children: [
         TextField(
+          controller: _installedSearch,
+          // No onChanged setState: the list below listens through
+          // ValueListenableBuilder, so typing rebuilds only the list, not
+          // the tab switch and search field.
           decoration: InputDecoration(
             hintText: S.of(context).extSearchInstalled,
             prefixIcon: const Icon(Symbols.search_rounded),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          onChanged: (v) => setState(() => _installedQuery = v.trim().toLowerCase()),
         ),
         const SizedBox(height: 10),
         Expanded(
           child: AnimatedBuilder(
             animation: ExtScope.of(context),
-            builder: (context, _) =>
-                _installedList(context, ExtScope.of(context)),
+            builder: (context, _) => ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _installedSearch,
+              builder: (context, value, _) => _installedList(
+                context,
+                ExtScope.of(context),
+                value.text.trim().toLowerCase(),
+              ),
+            ),
           ),
         ),
       ],
@@ -934,7 +944,9 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
 
   /// Update-all in flight: the button shows progress and ignores taps.
   bool _updatingAll = false;
-  String _installedQuery = '';
+
+  /// Installed-tab search input; same builder isolation as [_catalogSearch].
+  final _installedSearch = TextEditingController();
 
   bool _needsUpdate(ExtensionStore store, InstalledExtension inst) {
     final catalogEntry = _catalog?.find(inst.id);
@@ -943,9 +955,9 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
         catalogEntry.rolloutEligible(store.installId);
   }
 
-  Widget _installedList(BuildContext context, ExtensionStore store) {
+  Widget _installedList(BuildContext context, ExtensionStore store, String query) {
     final s = S.of(context), palette = Palette.of(context);
-    final q = _installedQuery;
+    final q = query;
     var list = store.installed;
     if (q.isNotEmpty) {
       list = list
