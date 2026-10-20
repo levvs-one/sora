@@ -787,8 +787,34 @@ func match(rule engine.Rule) (obj, error) {
 	return nil, fmt.Errorf("xray: rule type %q is not supported", rule.Type)
 }
 
-// dns renders resolvers. Proxy-only DNS follows routing; other resolvers use
-// direct "+local" dialing.
+// dns renders resolvers. Every resolver is rendered in its routed
+// form: the query enters Xray's routing component and follows the
+// plan's rules. That is the invariant the other engines render —
+// sing-box dials a resolver without detour on its default route and
+// reserves the proxy detour for proxy-only resolvers — and it is what
+// a proxy-only resolver already got here, so ProxyOnly needs no
+// separate spelling. Xray's "+local" forms (TCPL, DOHL, DOQL) bypass
+// routing and dial directly through the Freedom outbound (Xray DNS
+// documentation), so an ordinary resolver must never carry one:
+// before the CENSOR-LEAK E1 fix, tcp and https resolvers went direct
+// while plain and tls resolvers were routed, leaking the plan's DNS
+// on exactly the encrypted transports users pick for privacy.
+//
+// Two transports keep a non-standard spelling because the pinned
+// Xray (26.10.17) implements nothing else; both were proven on the
+// binary and are pinned by TestRenderDNSResolverTable:
+//
+//   - DNS-over-QUIC exists only as DOQL, so DNSQUIC keeps
+//     "quic+local://" for every resolver, ProxyOnly or not. A routed
+//     "quic://" is not a DoQ client on the pin: the nameserver
+//     factory falls back to a classic UDP client addressed at the
+//     literal string, which would trade a working direct DoQ for
+//     silently broken DNS, not for routed DoQ.
+//   - DNS-over-TLS has no nameserver client on the pin at all (the
+//     same factory fallback swallows "tls://"). DNSTLS keeps its
+//     historical spelling — crucially without a "+local" variant —
+//     pending a product decision on DoT for this engine; respelling
+//     it here would not make it DoT.
 func (r *renderer) dns() (obj, error) {
 	// +1: the localhost fallback.
 	servers := make([]any, 0, len(r.plan.DNS.Servers)+1)
@@ -797,21 +823,17 @@ func (r *renderer) dns() (obj, error) {
 		if s.Port != 0 {
 			addr = net.JoinHostPort(s.Address, strconv.Itoa(int(s.Port)))
 		}
-		local := "+local"
-		if s.ProxyOnly {
-			local = ""
-		}
 		switch s.Transport {
 		case engine.DNSSystem:
 			servers = append(servers, "localhost")
 		case engine.DNSPlain, "":
 			servers = append(servers, addr)
 		case engine.DNSTCP:
-			servers = append(servers, "tcp"+local+"://"+addr)
+			servers = append(servers, "tcp://"+addr)
 		case engine.DNSTLS:
 			servers = append(servers, "tls://"+addr)
 		case engine.DNSHTTPS:
-			servers = append(servers, "https"+local+"://"+addr+"/dns-query")
+			servers = append(servers, "https://"+addr+"/dns-query")
 		case engine.DNSQUIC:
 			servers = append(servers, "quic+local://"+addr)
 		default:
