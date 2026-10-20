@@ -13,11 +13,17 @@ import (
 // That makes fingerprint *freshness* a property of the pinned engine
 // binaries (see packaging/engines/engines.lock), not of this code.
 //
-// Landscape as of 2026-10-19:
-//   - refraction-networking/utls master added HelloChrome_155 on 2026-10-06
-//     (commit 6ebdceb, verified against branded Chrome 155) and made it
-//     HelloChrome_Auto. JA4 of the new parrot matches real Chrome 155:
-//     t13d1517h2_8daaf6152771_cb7bf5808d99.
+// Landscape as of 2026-10-20:
+//   - core pins refraction-networking/utls
+//     v1.8.3-0.20261006222701-ff1b50fbbe9a (post-1.8.2): HelloChrome_Auto is
+//     HelloChrome_155 (added upstream 2026-10-06, verified against branded
+//     Chrome 155; JA4 t13d1517h2_8daaf6152771_cb7bf5808d99). All Auto
+//     browser parrots — Chrome 155, Firefox 148, Safari 26.3 — offer the
+//     X25519MLKEM768 hybrid key share, verified on the wire by
+//     diagnostics.TestCapturedHello_PQKeyShare. The previous pin (v1.8.2)
+//     sent Firefox/Safari parrots WITHOUT the hybrid share, a DPI-visible
+//     contradiction with real Firefox 132+/Safari 26; the bump fixed it.
+//     (S8 post-quantum audit, 2026-10-20.)
 //   - Xray-core main (2026-10-11, issue XTLS/Xray-core#7131) still pins a
 //     utls where "chrome" sends Chrome 133 (JA4
 //     t13d1516h2_8daaf6152771_d8a2da3f94cd); TSPU blocking of that stale

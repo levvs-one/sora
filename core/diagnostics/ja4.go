@@ -94,7 +94,8 @@ type JA4Report struct {
 	// nothing was captured.
 	JA4 string
 	// Fresh reports whether the fingerprint looks current: not in the
-	// stale set, and actually varying for randomized profiles.
+	// stale set, offering the X25519MLKEM768 PQ hybrid key share that
+	// modern browsers send, and actually varying for randomized profiles.
 	Fresh bool
 	// Detail carries the verdict basis in plain words.
 	Detail string
@@ -147,8 +148,15 @@ func AssessJA4(ctx context.Context, in JA4Input) JA4Report {
 		return rep
 	}
 	rep.JA4 = ja4Of(hello)
+	// A "modern browser" ClientHello without the X25519MLKEM768 hybrid key
+	// share contradicts what real Chrome 131+, Firefox 132+ and current
+	// Safari send: the overwhelming majority of real browser traffic
+	// carries it, so its absence is a distinguisher visible to DPI before
+	// any HTTP is exchanged. That is a freshness failure, not a cosmetic
+	// note: Fresh stays false and the detail names the contradiction.
+	pq := hasPQKeyShare(hello)
 	pqNote := "; no PQ key share"
-	if hasPQKeyShare(hello) {
+	if pq {
 		pqNote = "; offers X25519MLKEM768 PQ key share"
 	}
 	if reason, stale := staleJA4[rep.JA4]; stale {
@@ -160,8 +168,14 @@ func AssessJA4(ctx context.Context, in JA4Input) JA4Report {
 		rep.Detail = "JA4 " + rep.JA4 + " matches documented " + what + ": fresh" + pqNote
 		return rep
 	}
-	rep.Fresh = true
-	rep.Detail = "JA4 " + rep.JA4 + " is not in the stale set (no documented reference for " + strconv.Quote(name) + ")" + pqNote
+	rep.Fresh = pq
+	if pq {
+		rep.Detail = "JA4 " + rep.JA4 + " is not in the stale set (no documented reference for " + strconv.Quote(name) + ")" + pqNote
+		return rep
+	}
+	rep.Detail = "JA4 " + rep.JA4 + " offers no X25519MLKEM768 PQ key share" +
+		" (real Chrome 131+, Firefox 132+ and current Safari all send it):" +
+		" a detectable contradiction for a modern browser fingerprint"
 	return rep
 }
 
@@ -622,7 +636,11 @@ func hash12Sorted(list []string) string {
 }
 
 // ja4ExtHash hashes the extension section: sorted extensions, then the
-// signature algorithms in wire order, joined with "_".
+// signature algorithms in wire order, joined with "_". GREASE values are
+// stripped from the signature algorithms (as they already are from ciphers
+// and extensions): modern parrots emit a fresh GREASE sigalg per handshake,
+// and hashing it would make the JA4 non-deterministic — a fingerprint that
+// changes on every capture cannot honestly signal anything (S8).
 func ja4ExtHash(exts []string, sigAlgs []uint16) string {
 	sorted := append([]string(nil), exts...)
 	sort.Strings(sorted)
@@ -630,9 +648,14 @@ func ja4ExtHash(exts []string, sigAlgs []uint16) string {
 	if len(sigAlgs) > 0 {
 		var sa []string
 		for _, v := range sigAlgs {
+			if isGREASE(v) {
+				continue
+			}
 			sa = append(sa, fmt.Sprintf("%04x", v))
 		}
-		s += "_" + strings.Join(sa, ",")
+		if len(sa) > 0 {
+			s += "_" + strings.Join(sa, ",")
+		}
 	}
 	if s == "" {
 		return "000000000000"

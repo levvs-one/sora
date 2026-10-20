@@ -11,14 +11,13 @@ import (
 
 // TestJA4_ChromeCaptureMatchesDocumented is the end-to-end proof that the
 // capture → parse → hash chain is correct: the real ClientHello of the
-// "chrome" parrot must hash to the JA4 documented in
-// core/engine/fingerprint.go, byte for byte. GREASE stripping is proven
-// by the match itself: the raw hello contains GREASE, the documented
-// JA4 does not.
+// explicit "chrome 133" parrot must hash to the JA4 documented in
+// core/engine/fingerprint.go, byte for byte. The explicit parrot (not
+// Auto) keeps this proof stable across uTLS bumps.
 func TestJA4_ChromeCaptureMatchesDocumented(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	raw, err := captureHello(ctx, utls.HelloChrome_Auto, "example.com", []string{"h2"}, 5*time.Second)
+	raw, err := captureHello(ctx, utls.HelloChrome_133, "example.com", []string{"h2"}, 5*time.Second)
 	if err != nil {
 		t.Fatalf("capture failed: %v", err)
 	}
@@ -32,8 +31,111 @@ func TestJA4_ChromeCaptureMatchesDocumented(t *testing.T) {
 	}
 }
 
-func TestAssessJA4_ChromeIsStale(t *testing.T) {
-	rep := AssessJA4(context.Background(), JA4Input{Fingerprint: "chrome"})
+// TestCapturedHello_PQKeyShare is the S8 wire audit made executable: the
+// pinned uTLS must really emit the X25519MLKEM768 hybrid key share everywhere
+// sora promises a modern browser fingerprint. The pre-PQ Chrome 120 parrot
+// is the negative control: it must NOT have the share, proving the parser
+// discriminates instead of always answering true.
+func TestCapturedHello_PQKeyShare(t *testing.T) {
+	withPQ := map[string]utls.ClientHelloID{
+		"HelloChrome_Auto":  utls.HelloChrome_Auto,
+		"HelloChrome_131":   utls.HelloChrome_131,
+		"HelloChrome_155":   utls.HelloChrome_155,
+		"HelloFirefox_Auto": utls.HelloFirefox_Auto,
+		"HelloSafari_Auto":  utls.HelloSafari_Auto,
+	}
+	for name, id := range withPQ {
+		raw := mustCapture(t, id)
+		hello, err := parseCapturedHello(raw)
+		if err != nil {
+			t.Fatalf("%s: parse failed: %v", name, err)
+		}
+		if !hasPQKeyShare(hello) {
+			t.Errorf("%s: ClientHello has no X25519MLKEM768 key share (groups=%#v); "+
+				"a modern-browser fingerprint without PQ is a DPI-visible contradiction", name, hello.keyShareGroups)
+		}
+	}
+	raw := mustCapture(t, utls.HelloChrome_120)
+	hello, err := parseCapturedHello(raw)
+	if err != nil {
+		t.Fatalf("HelloChrome_120: parse failed: %v", err)
+	}
+	if hasPQKeyShare(hello) {
+		t.Errorf("HelloChrome_120: unexpected X25519MLKEM768 key share (groups=%#v); "+
+			"the negative control must stay negative", hello.keyShareGroups)
+	}
+}
+
+func mustCapture(t *testing.T, id utls.ClientHelloID) []byte {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	raw, err := captureHello(ctx, id, "example.com", []string{"h2"}, 5*time.Second)
+	if err != nil {
+		t.Fatalf("capture failed: %v", err)
+	}
+	return raw
+}
+
+// TestAssessJA4_MissingPQKeyShareNotFresh locks the S8 detect-signal: a
+// captured hello without the hybrid share (here a real pre-PQ Chrome 120
+// capture) must not be reported fresh, and the detail must name the
+// missing X25519MLKEM768 share.
+func TestAssessJA4_MissingPQKeyShareNotFresh(t *testing.T) {
+	raw := mustCapture(t, utls.HelloChrome_120)
+	rep := AssessJA4(context.Background(), JA4Input{
+		Fingerprint: "chrome",
+		Hello: func(context.Context) ([]byte, error) {
+			return raw, nil
+		},
+	})
+	if rep.Fresh {
+		t.Errorf("pre-PQ hello must not be fresh, got %+v", rep)
+	}
+	if !strings.Contains(rep.Detail, "X25519MLKEM768") {
+		t.Errorf("detail must name the missing PQ key share, got %q", rep.Detail)
+	}
+}
+
+// TestAssessJA4_PQShareCountsAsFresh is the positive end of the S8
+// detect-signal: a hello that offers the hybrid share but matches no
+// documented JA4 (here a real Chrome 131 capture, on the unknown-JA4 path)
+// must be reported fresh, with the detail confirming the PQ share.
+// Chrome 131 is chosen deliberately: its JA4 is in neither the stale nor
+// the known-good set, so this exercises the path the Fresh flip changed.
+func TestAssessJA4_PQShareCountsAsFresh(t *testing.T) {
+	raw := mustCapture(t, utls.HelloChrome_131)
+	rep := AssessJA4(context.Background(), JA4Input{
+		Fingerprint: "chrome",
+		Hello: func(context.Context) ([]byte, error) {
+			return raw, nil
+		},
+	})
+	if !rep.Fresh {
+		t.Errorf("hello offering the PQ key share must be fresh, got %+v", rep)
+	}
+	if !strings.Contains(rep.Detail, "offers X25519MLKEM768 PQ key share") {
+		t.Errorf("detail must confirm the PQ key share, got %q", rep.Detail)
+	}
+}
+
+// TestAssessJA4_StaleParrotFlagged locks the stale-set logic: an explicit
+// Chrome 133 capture must be judged stale even though the default chrome
+// parrot is fresh after the utls bump. The 133 vector is injected so the
+// test does not depend on the vendored Auto parrot.
+func TestAssessJA4_StaleParrotFlagged(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	raw, err := captureHello(ctx, utls.HelloChrome_133, "example.com", []string{"h2"}, 5*time.Second)
+	if err != nil {
+		t.Fatalf("capture failed: %v", err)
+	}
+	rep := AssessJA4(context.Background(), JA4Input{
+		Fingerprint: "chrome",
+		Hello: func(context.Context) ([]byte, error) {
+			return raw, nil
+		},
+	})
 	if rep.Fingerprint != "chrome" {
 		t.Errorf("Fingerprint = %q", rep.Fingerprint)
 	}
