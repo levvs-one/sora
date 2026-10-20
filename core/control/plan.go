@@ -417,6 +417,22 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 			return nil, err
 		}
 	}
+	// A broken bypass strategy gets its own key, checked on its own
+	// before the plan-wide validation below: plan.Validate joins every
+	// failure into one error, and wrapping that join in the groups key
+	// told the user the groups were at fault for a strategy the detail
+	// named exactly (round-2 E2E). The probe outbound carries only the
+	// strategy, so its validation can fail for nothing else — the
+	// engine's own strategy rules decide, nothing is re-checked here.
+	for _, o := range plan.Outbounds {
+		if o.Protocol != engine.ProtocolBypass {
+			continue
+		}
+		probe := engine.Outbound{ID: o.ID, Protocol: engine.ProtocolBypass, Bypass: o.Bypass}
+		if err := probe.Validate(); err != nil {
+			return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanBypassStrategyInvalid)
+		}
+	}
 	if err := plan.Validate(); err != nil {
 		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanGroupsInvalid)
 	}

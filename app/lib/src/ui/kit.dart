@@ -718,6 +718,7 @@ String describe(S s, CoreFailure failure) {
     'core.engine.start_failed' => s.errEngineStart,
     'core.engine.stopped' || 'core.engine.restart_budget_spent' => s.errEngineStopped,
     'core.plan.tunnel_unsupported' => s.errTunnel,
+    'core.plan.bypass_strategy_invalid' => s.errBypassStrategyInvalid,
     'core.guard.firewall_failed' => s.errFirewall,
     'core.network.timeout' || 'core.request.deadline_exceeded' => s.errTimeout,
     'core.network.failed' || 'core.network.connection_refused' || 'core.tls.certificate' => s.errNetwork,

@@ -292,6 +292,7 @@ void main() {
       'core.probe.too_many': s.errProbeTooMany,
       'core.probe.unsupported': s.errProbeUnsupported,
       'core.probe.chain_invalid': s.errProbeChainInvalid,
+      'core.plan.bypass_strategy_invalid': s.errBypassStrategyInvalid,
       'core.request.cancelled': s.errCancelled,
       'core.request.too_large': s.errRequestTooLarge,
       'core.secret.not_found': s.errSecretNotFound,
@@ -300,7 +301,7 @@ void main() {
       'core.subscription.not_found': s.errSubNotFound,
       'core.subscription.interval_invalid': s.errSubIntervalInvalid,
     };
-    expect(expected, hasLength(22));
+    expect(expected, hasLength(23));
     for (final entry in expected.entries) {
       expect(describe(s, CoreFailure(entry.key)), entry.value, reason: entry.key);
       expect(entry.value, isNot(s.errGeneric), reason: entry.key);
@@ -313,6 +314,11 @@ void main() {
     expect(s.errProbeUnsupported, isNot(s.errProbeEndpointInvalid));
     expect(s.errProbeChainInvalid, isNot(s.errProbeNoEndpoints));
     expect(s.errProbeChainInvalid, isNot(s.errProbeEndpointInvalid));
+    // The bypass-strategy key must not borrow the plan fallback words it
+    // replaced: a broken zapret strategy is not a server configuration
+    // failure (the core.plan.* fallback reads as errServers).
+    expect(s.errBypassStrategyInvalid, isNot(s.errServers));
+    expect(s.errBypassStrategyInvalid, isNot(s.errGeneric));
   });
 
   testWidgets('without a core the home screen says so and stays still', (tester) async {

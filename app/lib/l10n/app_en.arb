@@ -929,6 +929,7 @@
   "errProbeTooMany": "Too many servers to check at once",
   "errProbeUnsupported": "This core does not support checking servers",
   "errProbeChainInvalid": "Invalid server chain: pick 2 or 3 different servers",
+  "errBypassStrategyInvalid": "Invalid bypass strategy: check the split positions and desync settings",
   "errCancelled": "The operation was cancelled",
   "errRequestTooLarge": "The request is too large",
   "errSecretNotFound": "A needed secret was not found",

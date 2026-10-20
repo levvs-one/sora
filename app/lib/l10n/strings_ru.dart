@@ -2332,6 +2332,10 @@ class SRu extends S {
   String get errProbeChainInvalid => 'Недопустимая цепочка серверов: нужно от 2 до 3 разных серверов';
 
   @override
+  String get errBypassStrategyInvalid =>
+      'Недопустимая стратегия обхода: проверьте позиции разделения и настройки десинхронизации';
+
+  @override
   String get errCancelled => 'Операция отменена';
 
   @override

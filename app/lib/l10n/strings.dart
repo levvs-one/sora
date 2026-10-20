@@ -4335,6 +4335,12 @@ abstract class S {
   /// **'Недопустимая цепочка серверов: нужно от 2 до 3 разных серверов'**
   String get errProbeChainInvalid;
 
+  /// No description provided for @errBypassStrategyInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недопустимая стратегия обхода: проверьте позиции разделения и настройки десинхронизации'**
+  String get errBypassStrategyInvalid;
+
   /// No description provided for @errCancelled.
   ///
   /// In ru, this message translates to:

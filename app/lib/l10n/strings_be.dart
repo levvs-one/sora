@@ -2309,6 +2309,9 @@ class SBe extends S {
   String get errProbeChainInvalid => 'Invalid server chain: pick 2 or 3 different servers';
 
   @override
+  String get errBypassStrategyInvalid => 'Invalid bypass strategy: check the split positions and desync settings';
+
+  @override
   String get errCancelled => 'The operation was cancelled';
 
   @override
