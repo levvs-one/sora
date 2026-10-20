@@ -101,7 +101,11 @@ func driveP4Client(t *testing.T, dir string, kind engine.Kind, plan *engine.Plan
 // driveP4ClientLogged is driveP4Client plus the engine log center,
 // so a test can tell an environment block (this sandbox's seccomp
 // profile denies sendmmsg, which wireguard-go requires) from a
-// product failure.
+// product failure. The distinction is made ONLY by the exact EPERM
+// signature in the engine log (sandboxBlocksSendmmsg): a box that
+// merely runs under some seccomp filter — the default Docker
+// profile, which ALLOWS sendmmsg — must run the traffic proof, not
+// skip it (CENSOR-P4 fix M1).
 func driveP4ClientLogged(t *testing.T, dir string, kind engine.Kind, plan *engine.Plan, target string) (string, error, *logs.Center) {
 	t.Helper()
 	availability := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir()}).Availability()
@@ -138,24 +142,6 @@ func driveP4ClientLogged(t *testing.T, dir string, kind engine.Kind, plan *engin
 func sandboxBlocksSendmmsg(center *logs.Center) bool {
 	for _, e := range center.Matching(logs.Filter{}) {
 		if strings.Contains(e.Message, "sendmmsg: operation not permitted") {
-			return true
-		}
-	}
-	return false
-}
-
-// seccompFiltered reports whether this test process itself runs
-// under a seccomp filter (Linux /proc/self/status). Engine
-// children inherit the filter; mihomo's stack reports the blocked
-// send only as a proxy 502, so the process state is the reliable
-// secondary evidence next to sing-box's explicit log line.
-func seccompFiltered() bool {
-	b, err := os.ReadFile("/proc/self/status")
-	if err != nil {
-		return false
-	}
-	for _, line := range strings.Split(string(b), "\n") {
-		if line == "Seccomp:\t2" {
 			return true
 		}
 	}
@@ -552,7 +538,16 @@ func TestP4AmneziaWGTraffic(t *testing.T) {
 			a := good
 			body, err, center := driveP4ClientLogged(t, dir, kind, mk(&a), target)
 			if err != nil {
-				if sandboxBlocksSendmmsg(center) || seccompFiltered() {
+				// SKIP only on an exact signature: the engine
+				// log carries sendmmsg's EPERM, or this test
+				// process's own sendmmsg probe was denied with
+				// EPERM (sendmmsgDenied — mihomo reports the
+				// blocked send only as a proxy 502, never as a
+				// log line). Any other failure — including on a
+				// host that happens to run under an unrelated
+				// seccomp filter — is a real failure and must
+				// stay red (CENSOR-P4 fix M1).
+				if sandboxBlocksSendmmsg(center) || sendmmsgDenied() {
 					t.Skipf("sandbox seccomp denies sendmmsg (wireguard-go cannot send): AWG traffic proof requires a dev machine; fetch failed with: %v", err)
 				}
 				t.Fatalf("AWG through %s: %v", kind, err)
