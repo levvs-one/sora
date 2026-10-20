@@ -21,17 +21,38 @@ func PrepareTun(p *Plan) error {
 	if !p.Tun.Enabled {
 		return nil
 	}
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return fmt.Errorf("tun: read interface addresses: %w", err)
+	if p.Tun.DeviceName == "" {
+		p.Tun.DeviceName = TunDevice
 	}
-	used := make([]netip.Prefix, 0, len(addrs))
-	for _, addr := range addrs {
-		prefix, err := netip.ParsePrefix(addr.String())
-		if err != nil {
-			return fmt.Errorf("tun: read interface prefix: %w", err)
+	// The device name reaches privileged `ip` invocations; reject anything
+	// but a plain kernel interface name here as well as in Tun.validate
+	// (SORA-M2).
+	if err := validateInterfaceName("tun", p.Tun.DeviceName); err != nil {
+		return err
+	}
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return fmt.Errorf("tun: read interfaces: %w", err)
+	}
+	var used []netip.Prefix
+	for _, iface := range interfaces {
+		// Apply prepares the replacement before stopping the old engine.
+		// Its adapter may still own these addresses; other devices must
+		// remain in the overlap check even when their prefixes match.
+		if iface.Name == p.Tun.DeviceName {
+			continue
 		}
-		used = append(used, prefix)
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return fmt.Errorf("tun: read interface %s addresses: %w", iface.Name, err)
+		}
+		for _, addr := range addrs {
+			prefix, err := netip.ParsePrefix(addr.String())
+			if err != nil {
+				return fmt.Errorf("tun: read interface prefix: %w", err)
+			}
+			used = append(used, prefix)
+		}
 	}
 	// The benchmark range is reserved for synthesized addresses. Reject
 	// custom LAN pools rather than allowing cached fake addresses onto LAN.
@@ -76,15 +97,6 @@ func PrepareTun(p *Plan) error {
 		if !address.IsGlobalUnicast() || address.IsPrivate() {
 			return fmt.Errorf("tun: adapter subnets must be outside private and link-local networks")
 		}
-	}
-	if p.Tun.DeviceName == "" {
-		p.Tun.DeviceName = TunDevice
-	}
-	// The device name reaches privileged `ip` invocations; reject anything
-	// but a plain kernel interface name here as well as in Tun.validate
-	// (SORA-M2).
-	if err := validateInterfaceName("tun", p.Tun.DeviceName); err != nil {
-		return err
 	}
 	p.DNS.FakeIPRange = fakePrefix.Masked().String()
 	return nil
