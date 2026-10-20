@@ -3,6 +3,8 @@ package censor
 import (
 	"strings"
 	"time"
+
+	"github.com/levvs-one/sora-client/core/probe"
 )
 
 // Confidence bounds. A single attempt never claims more than singleAttemptCap:
@@ -171,6 +173,30 @@ func isTerminal(w What) bool {
 	}
 }
 
+// maskedForEvidence renders an address for a verdict explanation:
+// already-masked values pass through, raw ones are masked with
+// probe.MaskedName — explanations are user/log-facing text and
+// follow the same dictionary as event details.
+func maskedForEvidence(s string) string {
+	if strings.Contains(s, "***") {
+		return s
+	}
+	return probe.MaskedName(s)
+}
+
+// resolvedMismatch compares the attempt's resolved address with the
+// expected one. The active prober records the resolved address
+// masked (probe.MaskedName), so when either side is masked the
+// comparison runs on masked forms — first octet for IPv4 — instead
+// of reporting a guaranteed mismatch of a masked value against a
+// raw one. Two raw values compare exactly, as before.
+func resolvedMismatch(resolvedTo, expectedIP string) bool {
+	if strings.Contains(resolvedTo, "***") || strings.Contains(expectedIP, "***") {
+		return maskedForEvidence(resolvedTo) != maskedForEvidence(expectedIP)
+	}
+	return resolvedTo != expectedIP
+}
+
 // dnsPoisoningRule fires on resolver lies: NXDOMAIN for a name known to have
 // existed, or an answer that contradicts the last known-good address. An
 // NXDOMAIN for a name never seen working is only weak evidence — names die —
@@ -183,9 +209,9 @@ func dnsPoisoningRule(a Attempt, s failureScan) (candidate, bool) {
 	}
 	d := s.terminalDetail
 	isNX := strings.Contains(d, "nxdomain") || strings.Contains(d, "no such host")
-	if s.resolvedTo != "" && a.ExpectedIP != "" && s.resolvedTo != a.ExpectedIP {
+	if s.resolvedTo != "" && a.ExpectedIP != "" && resolvedMismatch(s.resolvedTo, a.ExpectedIP) {
 		return candidate{KindDNSPoisoning, 0.8, []string{
-			"the name resolved to " + s.resolvedTo + ", but it used to resolve to " + a.ExpectedIP,
+			"the name resolved to " + maskedForEvidence(s.resolvedTo) + ", but it used to resolve to " + maskedForEvidence(a.ExpectedIP),
 		}}, true
 	}
 	if isNX {

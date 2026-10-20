@@ -44,6 +44,18 @@ func TestHandshakeLimiterCapsPerSNI(t *testing.T) {
 	r2()
 }
 
+// TestDefaultDestLimiterIsTheSharedInstance pins CENSOR-SURV review
+// Medium 2 on the probe side: the dest checker's production limiter
+// is the single process-wide instance, not a private second budget.
+// (The censor side — DefaultHandshakeBudget being the same object,
+// and the combined cap across both paths — is pinned in
+// core/censor's budget_shared_test.go.)
+func TestDefaultDestLimiterIsTheSharedInstance(t *testing.T) {
+	if destHandshakeLimiter != DefaultHandshakeLimiter {
+		t.Fatal("destHandshakeLimiter must default to DefaultHandshakeLimiter (one budget per process)")
+	}
+}
+
 // TestCheckDestRespectsHandshakeBudget proves the dest checker really
 // acquires: with the budget for the dest saturated, the check fails
 // with the budget error and never dials.

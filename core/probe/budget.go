@@ -64,6 +64,19 @@ func NewHandshakeLimiter(maxParallel int, acquireTimeout time.Duration) *Handsha
 	return &HandshakeLimiter{sems: map[string]chan struct{}{}, max: maxParallel, timeout: acquireTimeout}
 }
 
+// DefaultHandshakeLimiter is THE process-wide handshake budget: the
+// single instance every production dial path acquires from. The
+// censor counts handshakes per SNI across the whole client, not per
+// caller, so two independent default instances would silently double
+// the cap (CheckDest's limiter plus censor.Prober's budget allowed
+// up to 6 parallel handshakes on one SNI against a limit of 3 —
+// CENSOR-SURV review, Medium 2). probe's dest checker uses this
+// instance (destHandshakeLimiter defaults to it) and core/censor
+// re-exports it as censor.DefaultHandshakeBudget; both names denote
+// this one object. Tests may still build their own limiters with
+// NewHandshakeLimiter — that is a test seam, not a second budget.
+var DefaultHandshakeLimiter = NewHandshakeLimiter(0, 0)
+
 func (l *HandshakeLimiter) limit() int {
 	if l.max > 0 {
 		return l.max
@@ -141,5 +154,10 @@ func (l *HandshakeLimiter) InFlight(sni string) int {
 type errHandshakeBudgetTimeout struct{ sni string }
 
 func (e errHandshakeBudgetTimeout) Error() string {
-	return "handshake budget: no slot for " + e.sni + " within the acquire timeout"
+	// The SNI is masked, never raw: this error text lands in
+	// censorship-event details and diagnostics, which follow the
+	// masked-name dictionary (MaskedName) — the raw name here put
+	// the very identifier the dictionary exists to hide into
+	// censor.Event.Detail (CENSOR-SURV review, §6).
+	return "handshake budget: no slot for " + MaskedName(e.sni) + " within the acquire timeout"
 }

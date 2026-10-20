@@ -109,12 +109,15 @@ type DestReport struct {
 // itself checklist evidence against the dest.
 const destDialTimeout = 10 * time.Second
 
-// destHandshakeLimiter is the shared per-SNI handshake budget every
+// destHandshakeLimiter is the per-SNI handshake budget every
 // dest-check handshake acquires from (T007): a dest check performs two
 // handshakes, and a burst of checks against one SNI must not itself
-// trip the freeze the budget exists to dodge. Tests swap it to prove
-// the acquisition path; production uses the defaults (3/SNI).
-var destHandshakeLimiter = NewHandshakeLimiter(0, 0)
+// trip the freeze the budget exists to dodge. It defaults to the
+// single process-wide instance (DefaultHandshakeLimiter) — the same
+// object censor.Prober acquires from — so the per-SNI cap is a cap
+// across both paths combined, not per path (CENSOR-SURV review,
+// Medium 2). Tests swap it to prove the acquisition path.
+var destHandshakeLimiter = DefaultHandshakeLimiter
 
 // CheckDest runs the REALITY dest checklist against host with the
 // production resolver and dialer. It is the on-demand diagnostic the

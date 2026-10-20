@@ -10,6 +10,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/levvs-one/sora-client/core/probe"
 )
 
 // Default timeouts bound the active probe. A diagnosis must never become a
@@ -100,7 +102,14 @@ func (p *Prober) Probe(ctx context.Context, t Target) Attempt {
 		emit(StageDNS, WhatError, "no addresses returned")
 		return a
 	}
-	emit(StageDNS, WhatResolved, ips[0].IP.String())
+	// The resolved address is masked in the event detail: events are
+	// journal/log material and follow the masked-name dictionary
+	// (probe.MaskedName) — the raw IP here was the dictionary's
+	// counterexample (CENSOR-SURV review, §6). The dial below still
+	// uses the raw address; only the recorded detail is masked. The
+	// detector's ExpectedIP comparison understands the masked form
+	// (see dnsPoisoningRule).
+	emit(StageDNS, WhatResolved, probe.MaskedName(ips[0].IP.String()))
 
 	d := net.Dialer{Timeout: p.dialTimeout()}
 	conn, err := d.DialContext(ctx, "tcp", net.JoinHostPort(ips[0].IP.String(), itoa(t.Port)))
@@ -133,7 +142,16 @@ func (p *Prober) Probe(ctx context.Context, t Target) Attempt {
 	// itself the measurement ("core dials are saturating this SNI").
 	release, berr := p.budget().Acquire(ctx, sni)
 	if berr != nil {
-		emit(StageTLS, WhatError, "handshake budget: "+berr.Error())
+		// The budget error already masks the SNI (probe.MaskedName)
+		// and carries its own "handshake budget:" prefix; a context
+		// error does not, so the prefix is added only when missing —
+		// the detail must never carry the raw SNI (CENSOR-SURV
+		// review, §6).
+		detail := berr.Error()
+		if !strings.Contains(detail, "handshake budget") {
+			detail = "handshake budget: " + detail
+		}
+		emit(StageTLS, WhatError, detail)
 		_ = tcpConn.Close()
 		return a
 	}

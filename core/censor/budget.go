@@ -33,5 +33,9 @@ func NewHandshakeLimiter(maxParallel int, acquireTimeout time.Duration) *Handsha
 // DefaultHandshakeBudget is the shared limiter the active censorship
 // prober acquires from when Prober.Budget is nil: censorship probes
 // from every flow share one per-SNI budget, which is the point — the
-// censor counts handshakes per SNI, not per caller.
-var DefaultHandshakeBudget = NewHandshakeLimiter(0, 0)
+// censor counts handshakes per SNI, not per caller. It is NOT a
+// second instance: it is probe.DefaultHandshakeLimiter itself, the
+// same object probe.CheckDest acquires from, so the combined load of
+// dest checks and active probes on one SNI stays under the single
+// cap of 3 (CENSOR-SURV review, Medium 2).
+var DefaultHandshakeBudget = probe.DefaultHandshakeLimiter

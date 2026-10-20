@@ -40,6 +40,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 // normalizeFreezeSNI canonicalizes a sample key: "Example.COM." and
@@ -149,11 +150,33 @@ func MaskedName(name string) string {
 		}
 		return "***"
 	}
-	labels := strings.Split(strings.TrimSuffix(name, "."), ".")
-	if len(labels) == 1 {
-		return string(labels[0][0]) + "***"
+	// Drop empty labels: the input domain of a "safe for logs" helper
+	// is exactly the garbage names (".", ".com", "..", ".a"), and the
+	// previous implementation indexed labels[0][0] on a possibly
+	// empty first label and panicked on all of them (CENSOR-SURV
+	// review, §6). A name with no non-empty label at all is all
+	// punctuation and masks to the bare placeholder.
+	var labels []string
+	for _, l := range strings.Split(name, ".") {
+		if l != "" {
+			labels = append(labels, l)
+		}
 	}
-	return string(labels[0][0]) + "***." + strings.Join(labels[1:], ".")
+	if len(labels) == 0 {
+		return "***"
+	}
+	// The visible first character is a RUNE, not a byte: indexing a
+	// byte of a multi-byte first label produced mojibake
+	// ("éxample.com" masked to "Ã***.com"). Invalid UTF-8 masks to
+	// the placeholder rather than leaking the broken byte.
+	first, size := utf8.DecodeRuneInString(labels[0])
+	if first == utf8.RuneError && size <= 1 {
+		first = '*'
+	}
+	if len(labels) == 1 {
+		return string(first) + "***"
+	}
+	return string(first) + "***." + strings.Join(labels[1:], ".")
 }
 
 func equalFoldASCII(a, b string) bool {
