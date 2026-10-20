@@ -21,7 +21,7 @@ func (p *Plan) Secrets() []string {
 	}
 	out := make([]string, 0, len(p.Outbounds)*4+1)
 	for _, o := range p.Outbounds {
-		out = append(out, o.Secrets()...)
+		out = o.appendSecrets(out)
 	}
 	if len(p.LocalProxy.Password) >= 4 {
 		out = append(out, p.LocalProxy.Password)
@@ -32,50 +32,75 @@ func (p *Plan) Secrets() []string {
 // Secrets lists the secret fields of one outbound. Values shorter than four
 // characters are skipped: masking them would destroy ordinary log text.
 func (o Outbound) Secrets() []string {
-	candidates := []string{o.UUID, o.Password, o.UserID, o.ObfsParam, o.PluginOpts, o.Token, o.PrivateKey}
+	return o.appendSecrets(make([]string, 0, 12))
+}
+
+// appendSecrets appends the outbound's secrets to dst in the same order
+// Secrets has always returned them. Building a plan's list through it
+// allocates one backing array for the whole plan instead of two per
+// outbound (a candidates slice and a filtered copy): on the Connect path
+// that was ~1000 allocations for a 200-server plan.
+func (o Outbound) appendSecrets(dst []string) []string {
+	add := func(c string) {
+		if len(c) >= 4 {
+			dst = append(dst, c)
+		}
+	}
+	add(o.UUID)
+	add(o.Password)
+	add(o.UserID)
+	add(o.ObfsParam)
+	add(o.PluginOpts)
+	add(o.Token)
+	add(o.PrivateKey)
 	if o.Amnezia != nil {
 		// The header-protection key is key material like the private
 		// key: it must never reach a log, an event or a diagnostic
 		// archive.
-		candidates = append(candidates, o.Amnezia.HeaderProtectionKey)
+		add(o.Amnezia.HeaderProtectionKey)
 	}
 	if o.Encryption != "none" {
-		candidates = append(candidates, o.Encryption)
+		add(o.Encryption)
 	}
 	for _, p := range o.Peers {
-		candidates = append(candidates, p.PreSharedKey)
+		add(p.PreSharedKey)
 	}
-	candidates = append(candidates, profileSecrets(o.Profile)...)
-	out := make([]string, 0, len(candidates))
-	for _, c := range candidates {
-		if len(c) >= 4 {
-			out = append(out, c)
-		}
+	for _, s := range profileSecrets(o.Profile) {
+		add(s)
 	}
-	return out
+	return dst
 }
 
 // Identifiers returns the server host and host:port for privacy redaction.
 // These are not credentials but identify user connections and providers.
 func (o Outbound) Identifiers() []string {
-	out := make([]string, 0, 6)
+	return o.appendIdentifiers(make([]string, 0, 7))
+}
+
+// appendIdentifiers appends the outbound's identifiers to dst in the same
+// order Identifiers has always returned them; see appendSecrets for why
+// the plan-level builders go through it.
+func (o Outbound) appendIdentifiers(dst []string) []string {
 	if o.Server != "" {
-		out = append(out, o.Server)
+		dst = append(dst, o.Server)
 		if o.Port != 0 {
-			out = append(out, net.JoinHostPort(o.Server, strconv.Itoa(int(o.Port))))
+			dst = append(dst, net.JoinHostPort(o.Server, strconv.Itoa(int(o.Port))))
 		}
 	}
 	if o.TLS.ServerName != "" {
-		out = append(out, o.TLS.ServerName)
+		dst = append(dst, o.TLS.ServerName)
 	}
 	// REALITY parameters are public but identify the server (SORA-L9).
-	for _, id := range []string{o.TLS.RealityPublicKey, o.TLS.RealityShortID, o.TLS.SpiderX} {
-		if id != "" {
-			out = append(out, id)
-		}
+	if o.TLS.RealityPublicKey != "" {
+		dst = append(dst, o.TLS.RealityPublicKey)
 	}
-	out = append(out, o.Name)
-	return out
+	if o.TLS.RealityShortID != "" {
+		dst = append(dst, o.TLS.RealityShortID)
+	}
+	if o.TLS.SpiderX != "" {
+		dst = append(dst, o.TLS.SpiderX)
+	}
+	return append(dst, o.Name)
 }
 
 // Identifiers returns plan server identifiers for redaction alongside Secrets.
@@ -83,9 +108,9 @@ func (p *Plan) Identifiers() []string {
 	if p == nil {
 		return nil
 	}
-	out := make([]string, 0, len(p.Outbounds)*3)
+	out := make([]string, 0, len(p.Outbounds)*6)
 	for _, o := range p.Outbounds {
-		out = append(out, o.Identifiers()...)
+		out = o.appendIdentifiers(out)
 	}
 	return out
 }
