@@ -481,14 +481,37 @@ func TestRenderTUICTuning(t *testing.T) {
 		ID: "srv-3", Name: "TUIC", Protocol: engine.ProtocolTUIC,
 		Server: "tu.example.com", Port: 443,
 		UUID: "11111111-2222-3333-4444-555555555555", Password: "tuic-test-password",
-		CongestionControl: "cubic", UDPRelayMode: "quic", Token: "v4-token",
+		CongestionControl: "cubic", UDPRelayMode: "quic", Token: "v4-token", TUICHeartbeat: 25,
 		TLS: engine.TLS{Enabled: true, ServerName: "tu.example.com"},
 	})
 	out, err := Render(p, testRuntime(t))
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"type: tuic", "congestion-controller: cubic", "udp-relay-mode: quic", "token: v4-token"} {
+	for _, want := range []string{"type: tuic", "congestion-controller: cubic", "udp-relay-mode: quic", "token: v4-token", "heartbeat-interval: 25000"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("rendered mihomo config is missing %q:\n%s", want, out)
+		}
+	}
+}
+
+// TestRenderTUICDefaults: an untuned TUIC outbound renders the
+// effective defaults from quic_defaults.go explicitly — mihomo
+// silently falls back to its own defaults for omitted fields, and
+// the two TUIC engines must agree on a plan (CENSOR-P3).
+func TestRenderTUICDefaults(t *testing.T) {
+	p := testPlan()
+	p.Outbounds = append(p.Outbounds, engine.Outbound{
+		ID: "srv-3", Name: "TUIC", Protocol: engine.ProtocolTUIC,
+		Server: "tu.example.com", Port: 443,
+		UUID: "11111111-2222-3333-4444-555555555555", Password: "tuic-test-password",
+		TLS: engine.TLS{Enabled: true, ServerName: "tu.example.com"},
+	})
+	out, err := Render(p, testRuntime(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"congestion-controller: " + engine.DefaultTUICCongestion, "heartbeat-interval: 10000"} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("rendered mihomo config is missing %q:\n%s", want, out)
 		}
@@ -748,5 +771,29 @@ func TestRenderAllowLANFollowsThePlan(t *testing.T) {
 	p.LocalProxy.Username, p.LocalProxy.Password = "", ""
 	if _, err := Render(p, testRuntime(t)); err == nil {
 		t.Error("LAN sharing without a login must not render")
+	}
+}
+
+// TestRenderHy2TUICDeterministic pins the owner's determinism rule
+// (CENSOR-P3 "мелочи"): the same hy2/tuic plan rendered twice is
+// byte-identical.
+func TestRenderHy2TUICDeterministic(t *testing.T) {
+	for _, proto := range []engine.Protocol{engine.ProtocolHysteria2, engine.ProtocolTUIC} {
+		p := enginetest.Plan(proto)
+		o := &p.Outbounds[0]
+		o.HopPorts, o.HopInterval = "20000-30000,40000", 30
+		o.UpMbps, o.DownMbps = 20, 100
+		o.CongestionControl, o.UDPRelayMode, o.TUICHeartbeat = "cubic", "quic", 25
+		first, err := Render(p, testRuntime(t))
+		if err != nil {
+			t.Fatal(err)
+		}
+		again, err := Render(p, testRuntime(t))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if again != first {
+			t.Fatalf("%s renders differ:\n%s\n---\n%s", proto, again, first)
+		}
 	}
 }

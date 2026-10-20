@@ -621,9 +621,12 @@ func TestRenderHysteria2BandwidthAndHopping(t *testing.T) {
 	if hy2["up_mbps"] != float64(20) || hy2["down_mbps"] != float64(100) {
 		t.Fatalf("bandwidth caps not rendered: %v", hy2)
 	}
+	// server_ports uses sing-box spelling: colon ranges with an
+	// explicit upper bound (CENSOR-P3 — the binary rejects the plan's
+	// dash spelling and bare single ports at config load).
 	ports, ok := hy2["server_ports"].([]any)
-	if !ok || len(ports) != 2 || ports[0] != "20000-30000" || ports[1] != "40000" {
-		t.Fatalf("hop ports not rendered: %v", hy2["server_ports"])
+	if !ok || len(ports) != 2 || ports[0] != "20000:30000" || ports[1] != "40000:40000" {
+		t.Fatalf("hop ports not rendered in sing-box spelling: %v", hy2["server_ports"])
 	}
 	if hy2["hop_interval"] != "30s" {
 		t.Fatalf("hop interval not rendered: %v", hy2["hop_interval"])
@@ -712,6 +715,7 @@ func TestRenderTUICTuning(t *testing.T) {
 	p := enginetest.Plan(engine.ProtocolTUIC)
 	p.Outbounds[0].CongestionControl = "cubic"
 	p.Outbounds[0].UDPRelayMode = "quic"
+	p.Outbounds[0].TUICHeartbeat = 25
 	cfg := render(t, p)
 	tuic := findOutbound(cfg, "tuic")
 	if tuic == nil {
@@ -720,10 +724,18 @@ func TestRenderTUICTuning(t *testing.T) {
 	if tuic["congestion_control"] != "cubic" || tuic["udp_relay_mode"] != "quic" {
 		t.Fatalf("tuic tuning not rendered: %v", tuic)
 	}
-	// Default stays BBR, as before.
+	if tuic["heartbeat"] != "25s" {
+		t.Fatalf("tuic heartbeat not rendered: %v", tuic)
+	}
+	// Defaults come from quic_defaults.go: BBR and the default
+	// heartbeat, rendered explicitly so both TUIC engines agree.
 	cfg = render(t, enginetest.Plan(engine.ProtocolTUIC))
-	if findOutbound(cfg, "tuic")["congestion_control"] != "bbr" {
+	tuic = findOutbound(cfg, "tuic")
+	if tuic["congestion_control"] != engine.DefaultTUICCongestion {
 		t.Fatal("tuic default congestion control must stay bbr")
+	}
+	if want := "10s"; tuic["heartbeat"] != want {
+		t.Fatalf("tuic default heartbeat = %v, want %s (DefaultTUICHeartbeatSeconds)", tuic["heartbeat"], want)
 	}
 }
 

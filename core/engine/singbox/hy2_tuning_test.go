@@ -81,3 +81,30 @@ func TestRenderAnyTLSHasNoMetadata(t *testing.T) {
 		}
 	}
 }
+
+// TestRenderHy2TUICDeterministic pins the owner's determinism rule
+// (CENSOR-P3 "мелочи"): the same hy2/tuic plan rendered twice is
+// byte-identical — config churn between identical plans would churn
+// engine restarts and defeat config diffing in diagnostics.
+func TestRenderHy2TUICDeterministic(t *testing.T) {
+	for _, proto := range []engine.Protocol{engine.ProtocolHysteria2, engine.ProtocolTUIC} {
+		p := enginetest.Plan(proto)
+		o := &p.Outbounds[0]
+		o.HopPorts, o.HopInterval, o.HopIntervalMax = "20000-30000,40000", 30, 90
+		o.UpMbps, o.DownMbps = 20, 100
+		o.CongestionControl, o.UDPRelayMode, o.TUICHeartbeat = "cubic", "quic", 25
+		first, err := Render(p, testRuntime)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for i := 0; i < 3; i++ {
+			again, err := Render(p, testRuntime)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(again) != string(first) {
+				t.Fatalf("%s render %d differs from the first:\n%s\n---\n%s", proto, i, again, first)
+			}
+		}
+	}
+}
