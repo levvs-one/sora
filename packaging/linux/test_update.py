@@ -85,7 +85,12 @@ class UpdateHelperTest(unittest.TestCase):
             # key because minisign itself is faked above.
             "--setenv", "SORA_MINISIGN_PUBKEY", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
         ]
-        for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum"]:
+        # Every external tool sora-update calls must be bound in, or the
+        # helper dies with "not found" inside the empty /usr/bin: cut and sed
+        # serve the version comparison and chmod protects the public key
+        # file. All three are standard on every base system (the helper's own
+        # PATH is /usr/sbin:/usr/bin:/sbin:/bin).
+        for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "sed", "cut", "chmod", "mktemp", "sha256sum"]:
             command += ["--ro-bind", str(pathlib.Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
         for name, body in scripts.items():
             command += ["--ro-bind", str(self.script(name, body)), "/usr/bin/" + name]
