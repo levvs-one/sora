@@ -269,7 +269,13 @@ class _ServersScreenState extends State<ServersScreen> {
               ),
             );
           }
-          if (_favoritesOnly && query.isEmpty && sections.isEmpty) {
+          // The custom card above is a separate sliver, so [sections] alone
+          // does not decide emptiness: a starred custom server is part of
+          // this view too. Mirror _CustomServersCard's own filter predicate.
+          final hasFavoriteCustom = sora.customServers.any(
+            (server) => sora.settings.isFavorite(sora.canonicalServerId(server.id)),
+          );
+          if (_favoritesOnly && query.isEmpty && sections.isEmpty && !hasFavoriteCustom) {
             // The filter is on but nothing is starred anywhere: say so in
             // words instead of leaving a mysteriously empty list.
             sections.add(

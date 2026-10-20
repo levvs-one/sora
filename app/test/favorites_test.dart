@@ -6,6 +6,7 @@ import 'package:sora/l10n/strings.dart';
 import 'package:sora/l10n/strings_ru.dart';
 import 'package:sora/src/design/theme.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pb.dart';
+import 'package:sora/src/generated/sora/custom/v1/custom.pb.dart';
 import 'package:sora/src/groups.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
@@ -165,15 +166,53 @@ void main() {
     expect(find.text(SRu().favoritesEmpty), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('a lone favorite custom server suppresses the favorites empty hint', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(900, 700);
+    addTearDown(tester.view.reset);
+    final settings = await Settings.load();
+    settings.animations = false;
+    // The only favorite anywhere is the custom server, in its canonical
+    // outbound id form — no subscription server is starred, so the
+    // subscription sections are empty under the filter.
+    settings.favorites = {'custom/abc'};
+    final sora = _FavoritesSora(settings, customServers: [CustomServer(id: 'abc', name: 'Mine')]);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(
+      SoraScope(
+        sora: sora,
+        child: MaterialApp(
+          locale: const Locale('ru'),
+          localizationsDelegates: S.localizationsDelegates,
+          supportedLocales: S.supportedLocales,
+          theme: buildTheme(Brightness.light),
+          home: const ServersScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('favorites-filter')));
+    await tester.pumpAndSettle();
+    // The custom card is a separate sliver above the subscription sections:
+    // its starred row is visible, so the "no favorites" hint must not be.
+    expect(find.text('Mine'), findsOneWidget);
+    expect(find.text(SRu().favoritesEmpty), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 /// A Sora whose subscription carries three plain servers, with no core
 /// attached: the servers screen renders from [subscriptions], and selection
 /// still records the choice in settings.
 class _FavoritesSora extends Sora {
-  _FavoritesSora(super.settings);
+  _FavoritesSora(super.settings, {this.customServers = const []});
 
   static final _outbounds = [_server('a', 'Alpha'), _server('b', 'Beta'), _server('c', 'Gamma')];
+
+  @override
+  final List<CustomServer> customServers;
 
   @override
   List<SubscriptionState> get subscriptions => [_sub(_outbounds)];
