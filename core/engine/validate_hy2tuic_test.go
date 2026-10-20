@@ -130,7 +130,8 @@ func TestValidateHysteria2ObfsGate(t *testing.T) {
 	// CENSOR-P3: the obfs type must be one the engines implement and
 	// its password is credential data the engines require — both
 	// hopping engines reject an obfs block without a password at
-	// config load (verified on the pins).
+	// config load (verified on the pins with `sing-box check` and
+	// `mihomo -t` — config acceptance, not live traffic).
 	ok := hy2Outbound()
 	ok.Obfs, ok.ObfsParam = "gecko", "gecko-secret"
 	if err := ok.Validate(); err != nil {

@@ -10,6 +10,14 @@ package interop_test
 // controller at config load), so this suite only believes bytes
 // arriving at the target.
 //
+// Environment honesty: in the audit sandbox UDP is blocked, so
+// this traffic verification did NOT run there — the suite probes
+// the environment by fact (udpChildProbeWorks below), self-skips
+// with the reason, and the live QUIC run remains pending a
+// UDP-capable dev machine. Config acceptance (`sing-box check`,
+// `mihomo -t`) and the unit tests are what was verified in the
+// sandbox; they are not a substitute for this traffic run.
+//
 // Hopping scenario honesty: a Hysteria2 server does not "hop"; the
 // client rotates destination ports. The server side here is three
 // identical hy2 inbounds on the three ports of the client's hop
@@ -194,15 +202,18 @@ func runClientOnce(t *testing.T, dir string, kind engine.Kind, o engine.Outbound
 // udpChildProbeWorks reports whether a process spawned by this
 // test can send a UDP datagram over loopback. It re-executes the
 // test binary as a child running TestUDPChildProbe, because the
-// ability that matters is the engine children's, not this process's:
-// in the audit sandbox every UDP send from a descendant of the Go
-// test binary is refused with EPERM by the environment's network
-// policy (measured 2026-10-20, all packet sizes, while the same
-// binaries orchestrated from a shell pass traffic freely). QUIC
-// scenarios cannot run there at all; the suite skips with the
-// reason instead of burning minutes on handshake timeouts that
-// would look like engine failures. On a machine without the policy
-// the probe passes and the full matrix runs.
+// ability that matters is the engine children's, not this process's.
+// How the audit sandbox blocks UDP depends on the probe type
+// (measured 2026-10-20): python/shell raw-socket probes fail at
+// sendto with EPERM (Operation not permitted), while the Go child
+// probe here does not get EPERM — its datagram is silently
+// dropped and the read times out (i/o timeout). Both forms mean
+// UDP is unavailable there, and this probe treats either as a
+// failure of the child, so QUIC scenarios cannot run there at
+// all; the suite skips with the reason instead of burning minutes
+// on handshake timeouts that would look like engine failures. On
+// a machine without the policy the probe passes and the full
+// matrix runs.
 func udpChildProbeWorks(t *testing.T) (bool, string) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)

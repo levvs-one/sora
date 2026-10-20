@@ -75,6 +75,20 @@ const CalibrationCooldown = 7 * 24 * time.Hour
 // estimate instead of presenting it as a fact. Both caps are clamped to
 // [1, 100000] Mbps. A non-positive or non-finite measurement is an
 // error: calibrating from nothing would write fiction into the config.
+//
+// Deliberate deviation from spec 21-hysteria2.md §4.3, named as
+// such: §4.3 literally writes up = min(userTariff,
+// measured_down * 0.1), but this code passes a stated tariff
+// through unchanged (measured 100 + tariff 20 yields up=20, not
+// min(20, 9)=9). Reason: the 0.1 share is the estimate for the
+// case where no tariff is known (see brutalUpShare); letting an
+// estimate derived from a momentary download measurement shrink
+// a tariff the user actually stated would let a guess override
+// data — the same principle that makes BrutalCalibrator treat
+// manual caps as data, not a hint. The passthrough is the pre-P3
+// semantics and is pinned by TestCalibrateBrutal; changing it to
+// the §4.3 min() formula is a decision for the spec's owner, not
+// a silent fix here.
 func CalibrateBrutal(measuredDownMbps float64, userUpMbps int) (upMbps, downMbps int, upEstimated bool, err error) {
 	if measuredDownMbps <= 0 || math.IsNaN(measuredDownMbps) || math.IsInf(measuredDownMbps, 0) {
 		return 0, 0, false, errors.New("probe: brutal calibration needs a positive measured download rate")

@@ -117,6 +117,35 @@ func TestBanTrackerExpiry(t *testing.T) {
 	}
 }
 
+// TestBanTrackerNoteBlockedPrunesExpired pins the pruning
+// NoteBlocked performs on write (CENSOR-P3): expired entries are
+// removed at the only writer, so a long-lived tracker fed by many
+// remotes cannot grow without bound. 500 expired entries plus one
+// fresh write must leave exactly the fresh entry.
+func TestBanTrackerNoteBlockedPrunesExpired(t *testing.T) {
+	base := time.Now()
+	clock := base
+	b := NewBanTracker()
+	b.now = func() time.Time { return clock }
+	for i := 0; i < 500; i++ {
+		b.NoteBlocked(20000+i, "203.0.113.7:443")
+	}
+	if len(b.until) != 500 {
+		t.Fatalf("tracker holds %d entries after 500 writes, want 500", len(b.until))
+	}
+	clock = base.Add(residualBanTTL + time.Second)
+	b.NoteBlocked(40000, "198.51.100.9:443")
+	if len(b.until) != 1 {
+		t.Fatalf("tracker holds %d entries after pruning write, want 1 (only the fresh entry)", len(b.until))
+	}
+	if !b.Banned(40000, "198.51.100.9:443") {
+		t.Fatal("fresh entry must survive the pruning write")
+	}
+	if b.Banned(20000, "203.0.113.7:443") {
+		t.Fatal("expired entry must be pruned by the write, not linger")
+	}
+}
+
 func TestAdviceNeverRecommendsBlindFallback(t *testing.T) {
 	r := &QUICResult{Verdict: VerdictBlocked, LocalPort: 45678}
 	advice := r.Advice()

@@ -11,10 +11,16 @@ import (
 // "unset"; the effective value of an unset field is the constant here,
 // never a literal buried in a renderer, so the three engines cannot
 // drift apart and a future default change lands in exactly one place.
-// Every value below was verified against the pinned binaries
-// (sing-box-lx 1.14.3-lx.22 `check`, mihomo 1.19.32 `-t`, Xray
-// 26.10.17 `run -test`) and by live traffic in
-// core/engine/interop/hy2tuic_test.go.
+// Every value below was verified against the pinned binaries by
+// config acceptance — sing-box-lx 1.14.3-lx.22 `check`, mihomo
+// 1.19.32 `-t`, Xray 26.10.17 `run -test` — and by the render and
+// validation tests in this tree. Those checks are real: they are
+// what caught the sing-box hop-port spelling the binary rejects
+// at load. Live QUIC traffic was NOT verified in the audit
+// environment (UDP is blocked there; see the probe note in
+// core/engine/interop/hy2tuic_test.go): the traffic matrix in
+// that file is the live check, it self-skips where UDP is
+// unavailable, and it must be run on a UDP-capable dev machine.
 const (
 	// DefaultHy2HopIntervalSeconds is the port-hop interval both
 	// hopping engines apply when a plan does not pin one. Why 30:
@@ -22,7 +28,8 @@ const (
 	// hop_interval, mihomo hop-interval) and of the reference
 	// Hysteria2 client — the value is taken from the engines, not
 	// chosen here, so an unset plan behaves exactly like a native
-	// hy2 client (verified on the pins, CENSOR-P3).
+	// hy2 client (verified on the pins by `check`/`-t` config
+	// acceptance, CENSOR-P3).
 	DefaultHy2HopIntervalSeconds = 30
 	// MinHy2HopIntervalSeconds is the protocol floor for a hop
 	// interval. Why 5: the Hysteria2 specification's minimum hop
@@ -64,8 +71,11 @@ const (
 // ValidHy2Obfs lists the Hysteria2 obfuscation types the hopping
 // engines implement (sing-box obfs.type, mihomo obfs): salamander is
 // the Hysteria2 standard, gecko is the sing-box 1.14 addition that
-// mihomo 1.19.32 also accepts (verified with `mihomo -t` and by live
-// traffic, see the interop suite). Xray implements neither: its
+// mihomo 1.19.32 also accepts (verified with `mihomo -t` and
+// `sing-box check` on the pinned binaries; live traffic through
+// the interop suite was not run in the audit environment and is
+// pending a UDP-capable dev machine — see hy2tuic_test.go, which
+// self-skips there). Xray implements neither: its
 // renderer refuses every obfs value and the FeatureHy2Obfs gate
 // keeps obfuscated plans off it at selection time.
 var ValidHy2Obfs = map[string]bool{"salamander": true, "gecko": true}
@@ -107,8 +117,9 @@ func (o Outbound) EffectiveTUICHeartbeatSeconds() int {
 // renderer translates it into its engine's spelling from these
 // ranges — sing-box server_ports wants colon ranges with an explicit
 // upper bound ("20000:30000", "40000:40000") and rejects the dash
-// form at config load (verified on lx.22: "bad port range:
-// 20000-30000"), while mihomo takes the plan spelling verbatim.
+// form at config load (verified with `sing-box check` on lx.22:
+// "bad port range: 20000-30000"), while mihomo takes the plan
+// spelling verbatim (verified with `mihomo -t`).
 func HopPortRanges(spec string) ([][2]int, error) {
 	if strings.TrimSpace(spec) == "" {
 		return nil, nil
@@ -133,7 +144,7 @@ func HopPortRanges(spec string) ([][2]int, error) {
 // SingBoxHopPorts renders the plan hop-port spec in sing-box
 // server_ports spelling: one "lo:hi" string per range, single ports
 // expanded to "p:p" (the binary rejects a bare "40000" as a bad port
-// range, verified on lx.22).
+// range, verified with `sing-box check` on lx.22).
 func SingBoxHopPorts(spec string) ([]string, error) {
 	ranges, err := HopPortRanges(spec)
 	if err != nil {
