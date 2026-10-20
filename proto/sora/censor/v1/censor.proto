@@ -12,6 +12,9 @@ option go_package = "github.com/levvs-one/sora-client/core/gen/sora/censor/v1;ce
 // automatically on network-level failures and publishes the verdict to the
 // journal; this RPC re-runs it on demand, optionally with a fresh active
 // probe from the core.
+//
+// Since 1.11. Clients must negotiate 1.11 before calling: an older core has
+// no such service and fails the call at the transport.
 service CensorControl {
   // DetectCensorship classifies one failed attempt. Requires the control
   // authenticator: the request names servers and the response describes the
