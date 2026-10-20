@@ -118,10 +118,10 @@ func BenchmarkBandwidthStream1000Events(b *testing.B) {
 	}
 	samples = append(samples, probe.BandwidthSample{ServerID: "srv-0", Done: true, ProgressPct: 100})
 	version := &corev1.ApiVersion{Major: 1, Minor: 3, MinSupportedMinor: 1}
+	srv := benchBenchServer(b, token, specs, samples)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		srv := benchBenchServer(b, token, specs, samples)
 		stream := &benchStream[corev1.BandwidthSample]{ctx: context.Background()}
 		req := &corev1.BenchmarkServersRequest{
 			ApiVersion:          version,
