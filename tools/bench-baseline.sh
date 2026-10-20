@@ -82,6 +82,17 @@
 #       a min-of-3 can draw either state. Their B/op bands are widened
 #       to cover the high state (30% / 40%); allocs keep the strict
 #       band (constant in every observed count).
+#     core/engine/singbox BenchmarkRenderAmneziaWG3LargePlan (renders
+#       a ~156 KB AmneziaWG config, ~1.25 MB allocated per op): its
+#       min-of-3 B/op spread on IDENTICAL code is continuous and
+#       load-sensitive — invocation minima measured 1247753..1316685
+#       on the baseline-capture commit and 1261580..1289093 on the
+#       final [opt40] tip in the same hour, and the zone reviewer saw
+#       one invocation reach 1488839 under full swarm load, while
+#       allocs/op stay tight (23763..23778). The captured baseline
+#       sits at the bottom of that spread, so the strict 5% band
+#       flaps on allocator state alone; only its B/op band is
+#       widened (25%); allocs keep the strict 5%.
 #   Gating those two at 5% would fail on noise, so they get explicit,
 #   per-benchmark widened bands in the comparison below (25% B/op and
 #   +2 allocs for RunSeriesShort; a 1024 B/op absolute cap and +2
@@ -297,6 +308,7 @@ awk -v pct="$THRESHOLD_PCT" '
     eb["service/sync/api" SUBSEP "BenchmarkHandleDocGet256KiB"] = 25
     eb["core/ext" SUBSEP "BenchmarkOpt40ParseManifestFullPlain"] = 30
     eb["core/ext" SUBSEP "BenchmarkOpt40ParseManifestFullExt"] = 40
+    eb["core/engine/singbox" SUBSEP "BenchmarkRenderAmneziaWG3LargePlan"] = 25
     ea["core/probe" SUBSEP "BenchmarkRunSeriesShort"] = 2
     ebabs["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 1024
     ea["service/sync/transport" SUBSEP "BenchmarkTransportRoundTrip1KB"] = 2
