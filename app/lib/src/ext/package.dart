@@ -220,10 +220,13 @@ class ExtPackage {
 }
 
 /// An [OutputMemoryStream] that throws [PackageError] instead of growing
-/// past [limit] bytes. Every write path the inflater can use is capped —
-/// including [writeBackReference], which is how deflate emits LZ77 matches
-/// (the classic zip-bomb expansion vector: a tiny back-reference can
-/// otherwise expand into gigabytes without a single [writeBytes] call).
+/// past [limit] bytes. Every write path the inflater can use is capped:
+/// [writeByte]/[writeBytes] carry the streamed deflate output — the native
+/// decoder writes decoded chunks through [writeBytes], so the cap trips
+/// mid-inflation and a lying header cannot cause unbounded in-memory
+/// expansion — and [writeStream] covers stored entries and whole-buffer
+/// copies. (package:archive 4.0.7 has no back-reference write path: LZ77
+/// matches are expanded inside the decoder, never through this sink.)
 class _CappedOutput extends OutputMemoryStream {
   _CappedOutput(this._limit, this._name);
 
@@ -246,13 +249,6 @@ class _CappedOutput extends OutputMemoryStream {
     if (_written + n > _limit) throw _tooBig();
     _written += n;
     super.writeBytes(bytes, length: length);
-  }
-
-  @override
-  void writeBackReference(int distance, int count) {
-    if (_written + count > _limit) throw _tooBig();
-    _written += count;
-    super.writeBackReference(distance, count);
   }
 
   @override
