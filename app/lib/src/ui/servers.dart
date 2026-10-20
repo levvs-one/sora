@@ -46,7 +46,9 @@ class _ServersScreenState extends State<ServersScreen> {
   @override
   void initState() {
     super.initState();
-    _search.addListener(() => setState(() {}));
+    // No setState listener on [_search]: the subscription sections below
+    // listen through ValueListenableBuilder, so typing rebuilds only the
+    // list, not the toolbar, search field and custom card.
   }
 
   @override
@@ -70,7 +72,6 @@ class _ServersScreenState extends State<ServersScreen> {
     if (widget.embedded && sora.subscriptions.isEmpty && sora.customServers.isEmpty) {
       return widget.scrollable ? const SizedBox.expand() : const SliverToBoxAdapter();
     }
-    final query = _search.text.trim().toLowerCase();
     final sortMode = sora.settings.serverSortMode;
     String sortLabel(String mode) => switch (mode) {
       'speed' => s.sortSpeed,
@@ -170,56 +171,77 @@ class _ServersScreenState extends State<ServersScreen> {
         ...actions,
       ],
     );
+    final separator = palette.ink3.withValues(alpha: 0.28);
     final slivers = <Widget>[
       SliverToBoxAdapter(child: Column(children: [toolbar, const SizedBox(height: 8), search])),
       SliverToBoxAdapter(child: automatic),
       const SliverToBoxAdapter(child: _CustomServersCard()),
-    ];
-    final separator = palette.ink3.withValues(alpha: 0.28);
-    for (final subscription in sora.subscriptions) {
-      final entries = _sortEntries(_matching(_visibleEntries(subscription, sora), query), sora);
-      if (query.isNotEmpty && entries.isEmpty) continue;
-      slivers.add(
-        SliverPadding(
-          padding: const EdgeInsets.only(bottom: 16),
-          sliver: DecoratedSliver(
-            decoration: BoxDecoration(
-              color: palette.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: separator),
-            ),
-            sliver: SliverMainAxisGroup(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: _SubscriptionHeader(
-                    key: ValueKey(subscription.settings.id),
-                    state: subscription,
-                    expanded: !_collapsed.contains(subscription.settings.id),
-                    onToggle: () => setState(() {
-                      final id = subscription.settings.id;
-                      if (!_collapsed.remove(id)) _collapsed.add(id);
-                    }),
+      // Typing filters the subscription sections only: the toolbar, search
+      // field and custom card keep their state instead of the whole screen
+      // rebuilding on every keystroke.
+      ValueListenableBuilder<TextEditingValue>(
+        valueListenable: _search,
+        builder: (context, value, _) {
+          final query = value.text.trim().toLowerCase();
+          // One shared cache per build pass: the sort step and the rows both
+          // need each group entry's prospective active member (see
+          // _sortEntries), so it is computed once, not per comparison and
+          // again per row.
+          final shownCache = <Entry, OutboundSpec?>{};
+          final sections = <Widget>[];
+          for (final subscription in sora.subscriptions) {
+            final entries = _sortEntries(_matching(_visibleEntries(subscription, sora), query), sora, shownCache);
+            if (query.isNotEmpty && entries.isEmpty) continue;
+            sections.add(
+              SliverPadding(
+                padding: const EdgeInsets.only(bottom: 16),
+                sliver: DecoratedSliver(
+                  decoration: BoxDecoration(
+                    color: palette.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: separator),
+                  ),
+                  sliver: SliverMainAxisGroup(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: _SubscriptionHeader(
+                          key: ValueKey(subscription.settings.id),
+                          state: subscription,
+                          expanded: !_collapsed.contains(subscription.settings.id),
+                          onToggle: () => setState(() {
+                            final id = subscription.settings.id;
+                            if (!_collapsed.remove(id)) _collapsed.add(id);
+                          }),
+                        ),
+                      ),
+                      if (!_collapsed.contains(subscription.settings.id))
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                          sliver: SliverList.separated(
+                            itemCount: entries.length,
+                            itemBuilder: (_, index) {
+                              final entry = entries[index];
+                              return _ServerRow(
+                                id: entry.id,
+                                name: entry.name,
+                                entry: entry,
+                                shownCache: shownCache,
+                              );
+                            },
+                            separatorBuilder: (_, _) =>
+                                Divider(height: 1, thickness: 1, indent: 8, endIndent: 8, color: separator),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-                if (!_collapsed.contains(subscription.settings.id))
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-                    sliver: SliverList.separated(
-                      itemCount: entries.length,
-                      itemBuilder: (_, index) {
-                        final entry = entries[index];
-                        return _ServerRow(id: entry.id, name: entry.name, entry: entry);
-                      },
-                      separatorBuilder: (_, _) =>
-                          Divider(height: 1, thickness: 1, indent: 8, endIndent: 8, color: separator),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+              ),
+            );
+          }
+          return SliverMainAxisGroup(slivers: sections);
+        },
+      ),
+    ];
     if (!widget.scrollable) {
       return SliverPadding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -278,7 +300,13 @@ List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
 }
 
 /// Sorts server entries by the user's sort mode (FEATURE-PLAN.md F2).
-List<Entry> _sortEntries(List<Entry> entries, Sora sora) {
+///
+/// [shownCache] optionally collects each group entry's prospective active
+/// member: the sort keys and the rows below both need it, and [pickMember]
+/// scans every member — computing it once per entry per build pass instead
+/// of once per sort comparison plus once per row removes the probe-tick
+/// hotspot (latency ticks rebuild this screen about three times a second).
+List<Entry> _sortEntries(List<Entry> entries, Sora sora, [Map<Entry, OutboundSpec?>? shownCache]) {
   final mode = sora.settings.serverSortMode;
   if (mode == 'name') {
     entries.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
@@ -286,11 +314,17 @@ List<Entry> _sortEntries(List<Entry> entries, Sora sora) {
   }
   // Groups are represented by the prospective active member — the same one
   // whose metrics the row shows — so the visible numbers match the sort order.
-  String keyOf(Entry e) =>
-      e.isGroup
-          ? pickMember(e, sora.latency, bandwidth: sora.bandwidth, autoSelect: sora.settings.autoSelectMode).id
-          : e.id;
-  entries.sort((a, b) => sora.compareServers(keyOf(a), keyOf(b), mode));
+  // Keys are computed once per entry: keyOf used to call pickMember on every
+  // comparison (O(n log n) member scans per build).
+  String keyOf(Entry e) {
+    if (!e.isGroup) return e.id;
+    final shown = pickMember(e, sora.latency, bandwidth: sora.bandwidth, autoSelect: sora.settings.autoSelectMode);
+    shownCache?[e] = shown;
+    return shown.id;
+  }
+
+  final keys = {for (final e in entries) e: keyOf(e)};
+  entries.sort((a, b) => sora.compareServers(keys[a]!, keys[b]!, mode));
   return entries;
 }
 
@@ -324,13 +358,17 @@ InlineSpan serverNameSpan(String name) {
 }
 
 class _ServerRow extends StatelessWidget {
-  const _ServerRow({required this.id, required this.name, this.entry});
+  const _ServerRow({required this.id, required this.name, this.entry, this.shownCache});
 
   final String id;
   final String name;
 
   /// Group data when multiple servers share a name.
   final Entry? entry;
+
+  /// Prospective active members computed during sorting in the same build
+  /// pass; consulted before recomputing [pickMember].
+  final Map<Entry, OutboundSpec?>? shownCache;
 
   @override
   Widget build(BuildContext context) {
@@ -339,15 +377,12 @@ class _ServerRow extends StatelessWidget {
     final s = S.of(context);
     final chosen = sora.selected == id;
     // Use the prospective active member's latency for a group row. The same
-    // member supplies the wire-level flow shown in the badge below.
-    final OutboundSpec? shown = entry == null
+    // member supplies the wire-level flow shown in the badge below. The sort
+    // step already computed it for this build pass (see _sortEntries).
+    final OutboundSpec? shown = entry == null || !entry!.isGroup
         ? null
-        : pickMember(
-            entry!,
-            sora.latency,
-            bandwidth: sora.bandwidth,
-            autoSelect: sora.settings.autoSelectMode,
-          );
+        : shownCache?[entry!] ??
+              pickMember(entry!, sora.latency, bandwidth: sora.bandwidth, autoSelect: sora.settings.autoSelectMode);
     final measuredId = shown?.id ?? id;
     final measured = sora.latency.containsKey(measuredId);
     final ms = sora.latency[measuredId];
