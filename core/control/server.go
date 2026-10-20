@@ -342,6 +342,9 @@ func (s *Server) apiVersion() *corev1.ApiVersion {
 	if provider, ok := s.measurer.(interface{ BypassAvailable() bool }); ok && provider.BypassAvailable() {
 		capabilities = append(capabilities, "serverless")
 	}
+	if len(chainEngines(s.measurer)) > 0 {
+		capabilities = append(capabilities, "chains")
+	}
 	return &corev1.ApiVersion{
 		Major:             s.version.Major,
 		Minor:             s.version.Minor,
