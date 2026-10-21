@@ -11,6 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/levvs-one/sora-client/core/errs"
+	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	extv1 "github.com/levvs-one/sora-client/core/gen/sora/ext/v1"
 )
 
@@ -22,6 +23,14 @@ var rpcPermissions = map[string]string{
 	"GetServers":           "servers.read",
 	"Notify":               "notifications",
 	"WatchExtensionEvents": "",
+	// Anti-DPI seam (contract 1.14): reads share bypass.read; applying a
+	// layer is bypass.write; running the tuner is bypass.tune.
+	"GetBypassCapabilities": "bypass.read",
+	"GetBypassState":        "bypass.read",
+	"GetBypassLayer":        "bypass.read",
+	"WatchBypassEvents":     "bypass.read",
+	"ApplyBypassLayer":      "bypass.write",
+	"TuneDesync":            "bypass.tune",
 }
 
 // Connection is what the host exposes to extensions: process name and
@@ -41,6 +50,51 @@ type Server struct {
 	Name      string
 	Country   string
 	LatencyMs int64 // -1 when unknown
+}
+
+// BackendState is one bypass backend's measured availability, as the
+// GetBypassCapabilities dep reports it.
+type BackendState struct {
+	// Kind is "tpws" or "nfqws".
+	Kind      string
+	Available bool
+	// Reason names the missing capability and the remedy when the
+	// backend is unavailable; empty when available.
+	Reason string
+}
+
+// BypassStateInfo is the core's effective bypass state, as the
+// GetBypassState dep reports it. The semantics live with the producer
+// (core/control): GlobalSource is "user", "extension", "core_default"
+// or "none"; BindingsCount counts the bindings the last built plan
+// actually carries.
+type BypassStateInfo struct {
+	Platform      string
+	GlobalSource  string
+	GlobalFrom    string
+	SessionActive bool
+	PendingApply  bool
+	BindingsCount int
+}
+
+// TuneOutcome is one desync tuner run's result for the TuneDesync dep.
+// Strategy is the winner's strategy in contract form, or nil when the
+// winner has no faithful strategy rendering (or nothing worked).
+type TuneOutcome struct {
+	WinnerID       string
+	WinnerDescribe string
+	Score          float64
+	Attempts       int32
+	Strategy       *corev1.BypassStrategy
+}
+
+// BypassEvent is one bypass-relevant session event for the
+// WatchBypassEvents dep: Kind is "censorship", "strategy" or "session".
+type BypassEvent struct {
+	Kind           string
+	CensorshipKind string
+	Explanation    string
+	At             time.Time
 }
 
 // Deps are the core capabilities the host service needs. core/control will
@@ -63,6 +117,21 @@ type Deps struct {
 	// When nil, the control-token caller is trusted to pass exactly the
 	// granted permissions, as MintTokenRequest documents.
 	GrantedPermissions func(extensionID string) (perms []string, ok bool)
+	// BypassCapabilities returns the measured bypass capability
+	// snapshot: the executor platform and each backend's availability.
+	BypassCapabilities func(ctx context.Context) (platform string, backends []BackendState, err error)
+	// BypassLayers is the persistent store of per-extension bypass
+	// layers. ApplyBypassLayer writes the calling extension's layer
+	// into it and GetBypassLayer reads it back; nil disables both.
+	BypassLayers *LayerStore
+	// BypassState returns the effective bypass state for the calling
+	// extension (see BypassStateInfo).
+	BypassState func(ctx context.Context, extensionID string) (*BypassStateInfo, error)
+	// TuneDesync runs the desync tuner once for the named engine
+	// ("tpws"/"nfqws"; empty = the core default).
+	TuneDesync func(ctx context.Context, engine string) (*TuneOutcome, error)
+	// WatchBypassEvents subscribes to bypass-relevant session events.
+	WatchBypassEvents func(ctx context.Context) (<-chan BypassEvent, error)
 }
 
 // Host implements extv1.ExtensionHostServer.
@@ -240,6 +309,176 @@ func (h *Host) WatchExtensionEvents(req *extv1.WatchExtensionEventsRequest, stre
 	}
 }
 
+// GetBypassCapabilities implements the bypass.read capability probe:
+// the answer is the dep's measured snapshot, never an assumption.
+func (h *Host) GetBypassCapabilities(ctx context.Context, req *extv1.GetBypassCapabilitiesRequest) (*extv1.GetBypassCapabilitiesResponse, error) {
+	if _, err := h.check(req.GetExtensionToken(), "GetBypassCapabilities"); err != nil {
+		return nil, err
+	}
+	if h.deps.BypassCapabilities == nil {
+		return nil, status.Error(codes.Unimplemented, "ext: bypass capabilities are not wired")
+	}
+	platform, backends, err := h.deps.BypassCapabilities(ctx)
+	if err != nil {
+		return nil, toStatus(err)
+	}
+	resp := &extv1.GetBypassCapabilitiesResponse{Platform: platform}
+	for _, b := range backends {
+		resp.Backends = append(resp.Backends, &extv1.BackendInfo{
+			Kind: b.Kind, Available: b.Available, Reason: b.Reason,
+		})
+	}
+	return resp, nil
+}
+
+// GetBypassState implements the bypass.read state read.
+func (h *Host) GetBypassState(ctx context.Context, req *extv1.GetBypassStateRequest) (*extv1.GetBypassStateResponse, error) {
+	g, err := h.check(req.GetExtensionToken(), "GetBypassState")
+	if err != nil {
+		return nil, err
+	}
+	if h.deps.BypassState == nil {
+		return nil, status.Error(codes.Unimplemented, "ext: bypass state is not wired")
+	}
+	info, err := h.deps.BypassState(ctx, g.ExtensionID)
+	if err != nil {
+		return nil, toStatus(err)
+	}
+	if info == nil {
+		return nil, status.Error(codes.Internal, "ext: bypass state is not wired")
+	}
+	return &extv1.GetBypassStateResponse{
+		Platform:      info.Platform,
+		GlobalSource:  info.GlobalSource,
+		GlobalFrom:    info.GlobalFrom,
+		SessionActive: info.SessionActive,
+		PendingApply:  info.PendingApply,
+		BindingsCount: int32(info.BindingsCount), //nolint:gosec // bounded by the plan's rule limit at merge time
+	}, nil
+}
+
+// GetBypassLayer returns the calling extension's own stored layer. An
+// extension with no layer gets the empty layer, not an error: "no
+// layer" is a normal state, and layers of other extensions are never
+// visible here.
+func (h *Host) GetBypassLayer(ctx context.Context, req *extv1.GetBypassLayerRequest) (*extv1.GetBypassLayerResponse, error) {
+	g, err := h.check(req.GetExtensionToken(), "GetBypassLayer")
+	if err != nil {
+		return nil, err
+	}
+	if h.deps.BypassLayers == nil {
+		return nil, status.Error(codes.Unimplemented, "ext: bypass layers are not wired")
+	}
+	resp := &extv1.GetBypassLayerResponse{}
+	layer, ok := h.deps.BypassLayers.Get(g.ExtensionID)
+	if !ok {
+		return resp, nil
+	}
+	resp.HasGlobal = layer.Global != nil
+	resp.Global = layer.Global
+	for _, b := range layer.Bindings {
+		resp.Bindings = append(resp.Bindings, &extv1.BypassBinding{Match: b.Match, Strategy: b.Strategy})
+	}
+	resp.UpdatedAtUnix = layer.UpdatedAt.Unix()
+	return resp, nil
+}
+
+// ApplyBypassLayer replaces the calling extension's stored layer. An
+// empty layer (no global, no bindings) clears it. The store validates
+// fail-closed; the layer takes effect at the next plan build and never
+// overrides user rules (the merge lives in core/control).
+func (h *Host) ApplyBypassLayer(ctx context.Context, req *extv1.ApplyBypassLayerRequest) (*extv1.ApplyBypassLayerResponse, error) {
+	g, err := h.check(req.GetExtensionToken(), "ApplyBypassLayer")
+	if err != nil {
+		return nil, err
+	}
+	if h.deps.BypassLayers == nil {
+		return nil, status.Error(codes.Unimplemented, "ext: bypass layers are not wired")
+	}
+	layer := Layer{}
+	if req.GetHasGlobal() {
+		layer.Global = req.GetGlobal()
+	}
+	for _, b := range req.GetBindings() {
+		layer.Bindings = append(layer.Bindings, Binding{Match: b.GetMatch(), Strategy: b.GetStrategy()})
+	}
+	if layer.IsEmpty() {
+		if err := h.deps.BypassLayers.Delete(g.ExtensionID); err != nil {
+			return nil, toStatus(err)
+		}
+		return &extv1.ApplyBypassLayerResponse{UpdatedAtUnix: time.Now().UTC().Unix()}, nil
+	}
+	if err := h.deps.BypassLayers.Set(g.ExtensionID, layer); err != nil {
+		return nil, toStatus(err)
+	}
+	stored, _ := h.deps.BypassLayers.Get(g.ExtensionID)
+	return &extv1.ApplyBypassLayerResponse{UpdatedAtUnix: stored.UpdatedAt.Unix()}, nil
+}
+
+// TuneDesync implements the bypass.tune tuner run. The request carries
+// no target by design; the dep probes only the core's canaries.
+func (h *Host) TuneDesync(ctx context.Context, req *extv1.TuneDesyncRequest) (*extv1.TuneDesyncResponse, error) {
+	if _, err := h.check(req.GetExtensionToken(), "TuneDesync"); err != nil {
+		return nil, err
+	}
+	if h.deps.TuneDesync == nil {
+		return nil, status.Error(codes.Unimplemented, "ext: bypass tuning is not wired")
+	}
+	out, err := h.deps.TuneDesync(ctx, req.GetEngine())
+	if err != nil {
+		return nil, toStatus(err)
+	}
+	if out == nil {
+		return &extv1.TuneDesyncResponse{}, nil
+	}
+	return &extv1.TuneDesyncResponse{
+		WinnerId:       out.WinnerID,
+		WinnerDescribe: out.WinnerDescribe,
+		Score:          out.Score,
+		Attempts:       out.Attempts,
+		HasStrategy:    out.Strategy != nil,
+		Strategy:       out.Strategy,
+	}, nil
+}
+
+// WatchBypassEvents streams bypass-relevant session events to an
+// extension with bypass.read. Unlike WatchExtensionEvents, the event
+// payload is the point here (a censorship verdict's kind and
+// explanation are exactly what an Anti-DPI panel exists to show), and
+// bypass.read is the permission that was granted for it.
+func (h *Host) WatchBypassEvents(req *extv1.WatchBypassEventsRequest, stream extv1.ExtensionHost_WatchBypassEventsServer) error {
+	if _, err := h.check(req.GetExtensionToken(), "WatchBypassEvents"); err != nil {
+		return err
+	}
+	if h.deps.WatchBypassEvents == nil {
+		return status.Error(codes.Unimplemented, "ext: bypass events are not wired")
+	}
+	ch, err := h.deps.WatchBypassEvents(stream.Context())
+	if err != nil {
+		return toStatus(err)
+	}
+	for {
+		select {
+		case <-stream.Context().Done():
+			return nil
+		case ev, ok := <-ch:
+			if !ok {
+				return nil
+			}
+			at := ev.At
+			if at.IsZero() {
+				at = time.Now().UTC()
+			}
+			if err := stream.Send(&extv1.BypassEvent{
+				Kind: ev.Kind, CensorshipKind: ev.CensorshipKind,
+				Explanation: ev.Explanation, At: timestamppb.New(at),
+			}); err != nil {
+				return err
+			}
+		}
+	}
+}
+
 // toStatus maps core errors to gRPC statuses, preserving codes.
 func toStatus(err error) error {
 	if err == nil {
@@ -255,6 +494,10 @@ func toStatus(err error) error {
 			return status.Error(codes.NotFound, e.Error())
 		case errs.CodeUnavailable:
 			return status.Error(codes.Unavailable, e.Error())
+		case errs.CodeResourceExhausted:
+			return status.Error(codes.ResourceExhausted, e.Error())
+		case errs.CodeFailedPrecondition:
+			return status.Error(codes.FailedPrecondition, e.Error())
 		}
 	}
 	return status.Error(codes.Internal, err.Error())
