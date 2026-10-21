@@ -203,6 +203,7 @@ func TestParseOLCRTCRejects(t *testing.T) {
 		{"empty room", "olcrtc://jitsi?datachannel@#" + key, ErrInvalid},
 		{"wbstream placeholder room", "olcrtc://wbstream?datachannel@any#" + key, ErrInvalid},
 		{"datachannel with payload", "olcrtc://jitsi?datachannel<fps=60>@room#" + key, ErrInvalid},
+		{"datachannel with empty payload", "olcrtc://jitsi?datachannel<>@room#" + key, ErrInvalid},
 		{"payload unclosed", "olcrtc://wbstream?seichannel<fps=60@room#" + key, ErrInvalid},
 		{"payload stray close", "olcrtc://wbstream?seichannel>@room#" + key, ErrInvalid},
 		{"payload nested bracket", "olcrtc://wbstream?seichannel<fps=<60>>@room#" + key, ErrInvalid},
@@ -493,6 +494,107 @@ func TestOLCRTCMetaBindingRules(t *testing.T) {
 	}
 	if r.Report.Invalid != 1 {
 		t.Errorf("malformed ## must be invalid, report %+v", r.Report)
+	}
+}
+
+// TestOLCRTCMetaAfterBadLink is the regression test for review
+// finding Z-1: a ## block after a rejected olcrtc line must be an
+// orphan, not rebind to the previous good server. Both reviewer
+// counterexamples (a malformed link and an unsupported-provider
+// link) and the good-line sanity case are pinned.
+func TestOLCRTCMetaAfterBadLink(t *testing.T) {
+	good := "olcrtc://jitsi?datachannel@room-01#" + olcrtcTestKey + "$First"
+	cases := []struct {
+		name string
+		bad  string
+	}{
+		{"short key", "olcrtc://jitsi?datachannel@room-02#short"},
+		{"unsupported provider", "olcrtc://zoom?datachannel@room-02#" + olcrtcTestKey},
+		{"unsupported transport", "olcrtc://jitsi?carrierpigeon@room-02#" + olcrtcTestKey},
+		{"invalid param", "olcrtc://wbstream?seichannel<fps=999>@room-02#" + olcrtcTestKey},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			r, err := (LinkParser{}).Parse([]byte(good + "\n" + tt.bad + "\n##name: AfterBad"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(r.Servers) != 1 {
+				t.Fatalf("servers = %d, want the one good server", len(r.Servers))
+			}
+			if r.Servers[0].DisplayName != "First" {
+				t.Errorf("good server renamed to %q by a ## block after a rejected line, want %q", r.Servers[0].DisplayName, "First")
+			}
+			// One invalid/unsupported for the rejected line plus
+			// one invalid for the orphaned ## block.
+			if total := r.Report.Invalid + r.Report.Unsupported; total != 2 {
+				t.Errorf("report invalid+unsupported = %d, want 2 (bad line + orphan ##), report %+v", total, r.Report)
+			}
+			if r.Report.Invalid < 1 {
+				t.Errorf("orphan ## must count as invalid, report %+v", r.Report)
+			}
+			if _, ok := r.Servers[0].Options["olcrtc_meta_name"]; ok {
+				t.Errorf("orphan ## leaked into options: %v", r.Servers[0].Options)
+			}
+		})
+	}
+	// Sanity: a ## block after the good line itself still binds.
+	r, err := (LinkParser{}).Parse([]byte(good + "\n##name: Renamed"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Servers[0].DisplayName != "Renamed" || r.Report.Invalid != 0 {
+		t.Errorf("binding after a good line must still work: servers %+v report %+v", r.Servers, r.Report)
+	}
+	// An empty-payload datachannel rejection (Z-5) behaves like
+	// any other bad olcrtc line for binding.
+	r, err = (LinkParser{}).Parse([]byte(good + "\nolcrtc://jitsi?datachannel<>@room-02#" + olcrtcTestKey + "\n##name: AfterBad"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(r.Servers) != 1 || r.Servers[0].DisplayName != "First" {
+		t.Errorf("empty-payload rejection must also reset binding: %+v", r.Servers)
+	}
+}
+
+// TestOLCRTCTileZeroIsUnset is the regression test for review
+// finding Z-6: an explicit video-tile-module=0 (and video-tile-rs=0)
+// is the session layer's "unset" spelling, so it neither requires
+// video-codec=tile nor is stored; a non-zero value still does.
+func TestOLCRTCTileZeroIsUnset(t *testing.T) {
+	for _, link := range []string{
+		"olcrtc://telemost?videochannel<video-tile-module=0>@room#" + olcrtcTestKey,
+		"olcrtc://telemost?videochannel<video-tile-rs=0>@room#" + olcrtcTestKey,
+		"olcrtc://telemost?videochannel<video-codec=qrcode&video-tile-module=0&video-tile-rs=0>@room#" + olcrtcTestKey,
+		"olcrtc://telemost?videochannel<video-tile-module=00>@room#" + olcrtcTestKey,
+	} {
+		o, err := parseLink(link)
+		if err != nil {
+			t.Fatalf("parse %q: %v, want success (0 is unset)", link, err)
+		}
+		if _, ok := o.Options["video-tile-module"]; ok {
+			t.Errorf("%q: video-tile-module=0 must not be stored, options %v", link, o.Options)
+		}
+		if _, ok := o.Options["video-tile-rs"]; ok {
+			t.Errorf("%q: video-tile-rs=0 must not be stored, options %v", link, o.Options)
+		}
+		out, err := o.ShareLink()
+		if err != nil {
+			t.Fatalf("emit %q: %v", link, err)
+		}
+		if strings.Contains(out, "video-tile") {
+			t.Errorf("emit must not produce zero tile params: %s", out)
+		}
+	}
+	// An empty payload block on a non-datachannel transport carries
+	// no parameters and stays equivalent to no block (Z-5 choice:
+	// only datachannel rejects a present block, even an empty one).
+	o, err := parseLink("olcrtc://wbstream?seichannel<>@room#" + olcrtcTestKey)
+	if err != nil {
+		t.Fatalf("empty seichannel payload must import: %v", err)
+	}
+	if len(o.Options) != 2 { // only olcrtc_provider + olcrtc_room
+		t.Errorf("empty payload must add no params, options %v", o.Options)
 	}
 }
 

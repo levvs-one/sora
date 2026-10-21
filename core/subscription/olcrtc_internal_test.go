@@ -86,16 +86,55 @@ func TestOLCRTCAvailableFillsTotal(t *testing.T) {
 	}
 }
 
+func TestOLCRTCAvailableWithoutValidUsed(t *testing.T) {
+	const link = "olcrtc://jitsi?datachannel@room#" +
+		"d823fa01cb3e0609b67322f7cf984c4ee2e4ce2e294936fc24ef38c9e59f4799\n"
+	gb := float64(uint64(1) << 30)
+
+	// #available alone is a Total source in its own right (Z-4):
+	// sub.md defines it as the total available volume, so a body
+	// with no #used at all still reports its allowance.
+	info := parseInfo(http.Header{}, []byte("#available: 1.1gb\n"+link))
+	if want := uint64(1.1 * gb); !info.HasUsage || info.Total != want || info.Download != 0 {
+		t.Errorf("available alone: %+v, want HasUsage with Total=%d and no used", info, want)
+	}
+
+	// A malformed #used must not suppress a valid #available.
+	info = parseInfo(http.Header{}, []byte("#used: garbage\n#available: 2gb\n"+link))
+	if want := uint64(2 * gb); !info.HasUsage || info.Total != want || info.Download != 0 {
+		t.Errorf("available with garbage used: %+v, want HasUsage with Total=%d", info, want)
+	}
+
+	// A valid #used denominator stays authoritative: #available
+	// never overwrites a Total the denominator already gave.
+	info = parseInfo(http.Header{}, []byte("#used: 10mb/10gb\n#available: 9.99gb\n"+link))
+	if !info.HasUsage || info.Download != 10<<20 || info.Total != 10<<30 {
+		t.Errorf("denominator must win over available: %+v", info)
+	}
+
+	// No valid traffic figure at all: no usage is fabricated.
+	info = parseInfo(http.Header{}, []byte("#used: garbage\n#available: junk\n"+link))
+	if info.HasUsage || info.Total != 0 {
+		t.Errorf("garbage traffic must report no usage: %+v", info)
+	}
+}
+
 func TestParseOLCRTCRefresh(t *testing.T) {
 	for s, want := range map[string]time.Duration{
 		"5s": 5 * time.Second, "10m": 10 * time.Minute,
 		"6h": 6 * time.Hour, "1d": 24 * time.Hour,
+		// Fractional values are scaled, not truncated (Z-3):
+		// both reviewer subcases — a fraction that used to lose
+		// its tail and one that used to collapse to a rejection.
+		"1.5h": 90 * time.Minute, "1.5d": 36 * time.Hour,
+		"10.9m": 10*time.Minute + 54*time.Second, "0.5m": 30 * time.Second,
+		"0.5s": 500 * time.Millisecond, "2.5h": 2*time.Hour + 30*time.Minute,
 	} {
 		if got, ok := parseOLCRTCRefresh(s); !ok || got != want {
 			t.Errorf("parseOLCRTCRefresh(%q) = %s, %v; want %s", s, got, ok, want)
 		}
 	}
-	for _, s := range []string{"", "10", "10x", "0m", "-5m", "99999d", "m"} {
+	for _, s := range []string{"", "10", "10x", "0m", "-5m", "99999d", "m", "0.0m", "Infh", "NaNh"} {
 		if got, ok := parseOLCRTCRefresh(s); ok {
 			t.Errorf("parseOLCRTCRefresh(%q) = %s, want rejection", s, got)
 		}

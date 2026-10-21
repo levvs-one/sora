@@ -354,7 +354,9 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 	// lastOlcrtc is the index in r.Servers that a "##key: value"
 	// subscription block binds to: the nearest preceding olcrtc://
 	// line (docs/sub.md). It resets when a non-olcrtc server becomes
-	// the nearest preceding line, and a skipped duplicate still counts
+	// the nearest preceding line and when an olcrtc line is rejected
+	// (that line is the nearest preceding one but has no server, so
+	// its block is an orphan), and a skipped duplicate still counts
 	// as the preceding olcrtc line — its block binds to the entry the
 	// duplicate deduplicated into.
 	lastOlcrtc := -1
@@ -383,6 +385,14 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 		}
 		o, e := parseLink(l)
 		if e != nil {
+			if isOLCRTCLink(l) {
+				// A rejected olcrtc line is still the nearest
+				// preceding olcrtc:// line for sub.md binding,
+				// but it produced no server: a following ##
+				// block must become an orphan (invalid), not
+				// silently rebind to an earlier good server.
+				lastOlcrtc = -1
+			}
 			if errors.Is(e, ErrUnsupported) {
 				r.Report.Unsupported++
 				r.Report.UnsupportedItems = append(r.Report.UnsupportedItems, ItemReason{i, "unsupported protocol or option"})

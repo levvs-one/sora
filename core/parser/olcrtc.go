@@ -172,7 +172,7 @@ func parseOLCRTCLink(raw string) (OutboundSpec, error) {
 	if !olcrtcProviders[provider] {
 		return OutboundSpec{}, fmt.Errorf("%w: olcrtc provider %q", ErrUnsupported, provider)
 	}
-	transport, payload, err := splitOLCRTCPayload(transportPart)
+	transport, payload, hasPayload, err := splitOLCRTCPayload(transportPart)
 	if err != nil {
 		return OutboundSpec{}, err
 	}
@@ -193,7 +193,7 @@ func parseOLCRTCLink(raw string) (OutboundSpec, error) {
 		// as an empty room (internal/auth/wbstream Issue).
 		return OutboundSpec{}, fmt.Errorf("%w: olcrtc wbstream room id %q is a placeholder, not a room", ErrInvalid, room)
 	}
-	params, err := parseOLCRTCParams(transport, payload)
+	params, err := parseOLCRTCParams(transport, payload, hasPayload)
 	if err != nil {
 		return OutboundSpec{}, err
 	}
@@ -265,26 +265,29 @@ func isHex64(s string) bool {
 // splitOLCRTCPayload splits "<Transport><k=v&...>" into the transport
 // name and the raw payload inside the angle brackets ("" when the
 // block is absent — the block is dropped entirely when defaults are
-// used). The block must hug the transport name and close the segment:
-// anything after '>' belongs to the room side of the grammar and its
-// presence here means the link is malformed.
-func splitOLCRTCPayload(part string) (transport, payload string, err error) {
+// used). hasPayload reports whether a <...> block was present at
+// all, which the empty string alone cannot express: datachannel
+// rejects even an empty block (see parseOLCRTCParams). The block
+// must hug the transport name and close the segment: anything after
+// '>' belongs to the room side of the grammar and its presence here
+// means the link is malformed.
+func splitOLCRTCPayload(part string) (transport, payload string, hasPayload bool, err error) {
 	lt := strings.Index(part, "<")
 	if lt < 0 {
 		if strings.Contains(part, ">") {
-			return "", "", fmt.Errorf("%w: olcrtc transport %q has a stray >", ErrInvalid, part)
+			return "", "", false, fmt.Errorf("%w: olcrtc transport %q has a stray >", ErrInvalid, part)
 		}
-		return part, "", nil
+		return part, "", false, nil
 	}
 	block := part[lt:]
 	if len(block) < 2 || block[len(block)-1] != '>' {
-		return "", "", fmt.Errorf("%w: olcrtc parameter block is not closed by >", ErrInvalid)
+		return "", "", false, fmt.Errorf("%w: olcrtc parameter block is not closed by >", ErrInvalid)
 	}
 	inner := block[1 : len(block)-1]
 	if strings.ContainsAny(inner, "<>") {
-		return "", "", fmt.Errorf("%w: olcrtc parameter block contains a nested bracket", ErrInvalid)
+		return "", "", false, fmt.Errorf("%w: olcrtc parameter block contains a nested bracket", ErrInvalid)
 	}
-	return part[:lt], inner, nil
+	return part[:lt], inner, true, nil
 }
 
 // parseOLCRTCParams parses and validates the payload body. Known keys
@@ -292,13 +295,19 @@ func splitOLCRTCPayload(part string) (transport, payload string, err error) {
 // unknown keys are preserved verbatim — a newer producer's settings
 // must survive an older sora import instead of being silently dropped
 // (the reference client's payload loss is the defect being avoided).
-func parseOLCRTCParams(transport, payload string) (map[string]string, error) {
+func parseOLCRTCParams(transport, payload string, hasPayload bool) (map[string]string, error) {
 	params := map[string]string{}
+	// Chosen strictly, matching the IMPORT.md validation table
+	// ("any payload at datachannel is rejected"): datachannel is
+	// specified as "No payload", so a present <...> block is a
+	// payload even when empty — datachannel<> is rejected, not
+	// silently treated as no block. For other transports an empty
+	// block carries no parameters and stays equivalent to absence.
+	if hasPayload && transport == "datachannel" {
+		return nil, fmt.Errorf("%w: olcrtc datachannel takes no parameters, got <%s>", ErrInvalid, payload)
+	}
 	if payload == "" {
 		return params, nil
-	}
-	if transport == "datachannel" {
-		return nil, fmt.Errorf("%w: olcrtc datachannel takes no parameters, got <%s>", ErrInvalid, payload)
 	}
 	for _, pair := range strings.Split(payload, "&") {
 		k, v, found := strings.Cut(pair, "=")
@@ -354,10 +363,15 @@ func validateOLCRTCParams(transport string, params map[string]string) error {
 	// Cross-field tile rules: the tile-only keys require the tile
 	// codec, and tile frames are strictly 1080x1080 when a dimension
 	// is pinned (ErrTileCodecDimensions in the olcrtc validator).
+	// A tile key spelled 0 is not "used" here: the session layer
+	// treats 0 as unset for video-tile-module (its default is 0,
+	// like video-tile-rs and video-qr-size in the dictionary), so
+	// an explicit =0 neither requires the tile codec nor is
+	// stored — canonicalization drops it as the default anyway.
 	if transport == "videochannel" {
 		codec := params["video-codec"]
-		_, hasModule := params["video-tile-module"]
-		_, hasRS := params["video-tile-rs"]
+		hasModule := olcrtcParamNonZero(params, "video-tile-module")
+		hasRS := olcrtcParamNonZero(params, "video-tile-rs")
 		if (hasModule || hasRS) && codec != "tile" {
 			return fmt.Errorf("%w: olcrtc video-tile-* parameters require video-codec=tile", ErrInvalid)
 		}
@@ -370,6 +384,19 @@ func validateOLCRTCParams(transport string, params map[string]string) error {
 		}
 	}
 	return nil
+}
+
+// olcrtcParamNonZero reports whether params carries key with a
+// numerically non-zero value (an absent key, an unparsable value —
+// already rejected by the per-key range check above — and an
+// explicit 0 all count as unset).
+func olcrtcParamNonZero(params map[string]string, key string) bool {
+	v, ok := params[key]
+	if !ok {
+		return false
+	}
+	n, err := olcrtcInt(v)
+	return err == nil && n != 0
 }
 
 // olcrtcInt parses a bare decimal integer: digits only, no sign, no

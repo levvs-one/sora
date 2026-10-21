@@ -1,6 +1,7 @@
 package subscription
 
 import (
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -21,7 +22,8 @@ import (
 //   - #used:     -> usage: "10mb/10gb" fills Download with the used
 //     amount — the UI's used figure is upload+download and an olcrtc
 //     subscription reports one combined number — and Total with the
-//     denominator; #available: fills Total when #used: carried none.
+//     denominator; #available: fills Total whenever Total is still
+//     empty, independently of #used (see applyOLCRTCGlobals).
 //
 // #update: (a Unix timestamp of the last provider update) has no Info
 // field — Expire is a different fact — and #color:/#icon: are UI
@@ -45,15 +47,22 @@ func (info *Info) applyOLCRTCGlobals(values map[string]string) {
 	if info.HasUsage {
 		return
 	}
-	used, total, ok := parseOLCRTCUsed(values["used"])
-	if !ok {
-		return
+	// #available is a Total source in its own right, not merely a
+	// fallback for a denominator-less #used: sub.md defines it as
+	// the total available volume of the subscription ("how much is
+	// available in total" / "сколько доступно всего"), i.e. the
+	// allowance itself, not the remainder after #used. It is
+	// therefore applied whenever Total is still empty — including
+	// when #used is absent or malformed — while a denominator in
+	// a valid #used stays authoritative and is never overwritten.
+	if used, total, ok := parseOLCRTCUsed(values["used"]); ok {
+		info.HasUsage = true
+		info.Download = used
+		info.Total = total
 	}
-	info.HasUsage = true
-	info.Download = used
-	info.Total = total
 	if info.Total == 0 {
 		if available, ok := parseHumanTraffic(values["available"]); ok {
+			info.HasUsage = true
 			info.Total = available
 		}
 	}
@@ -61,7 +70,12 @@ func (info *Info) applyOLCRTCGlobals(values map[string]string) {
 
 // parseOLCRTCRefresh parses a sub.md #refresh value: a number with a
 // s/m/h/d unit suffix. Zero, malformed and over-a-year values are
-// rejected, mirroring the package's interval bounds.
+// rejected, mirroring the package's interval bounds. The documented
+// examples are integral (5s/10m/6h/1d), but the value is a number in
+// the same file whose traffic values are fractional (1.1gb), so a
+// fraction is a real duration, not an error: it is scaled in
+// floating point (1.5h = 90m, 0.5m = 30s) and rounded to the
+// nearest nanosecond, never silently truncated toward zero.
 func parseOLCRTCRefresh(s string) (time.Duration, bool) {
 	s = strings.TrimSpace(s)
 	if len(s) < 2 {
@@ -81,10 +95,14 @@ func parseOLCRTCRefresh(s string) (time.Duration, bool) {
 		return 0, false
 	}
 	n, err := strconv.ParseFloat(strings.TrimSpace(s[:len(s)-1]), 64)
-	if err != nil || n <= 0 {
+	if err != nil || n <= 0 || math.IsNaN(n) || math.IsInf(n, 0) {
 		return 0, false
 	}
-	d := time.Duration(n) * unit
+	f := n * float64(unit)
+	if f <= 0 || f > float64(maxIntervalHours*time.Hour) {
+		return 0, false
+	}
+	d := time.Duration(math.Round(f))
 	if d <= 0 || d > maxIntervalHours*time.Hour {
 		return 0, false
 	}
