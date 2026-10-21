@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Sora iOSLegacy app entitlements — identical capability set to the
+     main app (Apps/iOS/Sora.entitlements): packet-tunnel provider +
+     the SAME App Group, so profiles/settings written by either app
+     are visible to its tunnel extension. ARCHITECTURE §3.4: the App
+     Group value does NOT take the legacy suffix — only the bundle id
+     proposal does (TARGET-NOTES.md §2), and even that is the
+     coordinator's call. Requires a paid Apple Developer account with
+     the Network Extension capability approved for this App ID. -->
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.networking.networkextension</key>
+	<array>
+		<string>packet-tunnel-provider</string>
+	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.io.github.levvs-one.sora</string>
+	</array>
+</dict>
+</plist>
