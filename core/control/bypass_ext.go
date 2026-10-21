@@ -302,9 +302,13 @@ func (s *Server) bypassState(ctx context.Context, extensionID string) (*ext.Bypa
 		GlobalSource: "none",
 	}
 	info.SessionActive = s.sessions.Current() != nil
+	// Read the fields directly under the lock: extLayerStore() locks
+	// bypassMu itself, and sync.Mutex is not reentrant — calling it
+	// here deadlocked GetBypassState (caught by the state test's
+	// timeout, fixed before this ever shipped in a build).
 	s.bypassMu.Lock()
 	prov := s.bypassProv
-	store := s.extLayerStore()
+	store := s.bypassLayerStore
 	s.bypassMu.Unlock()
 	// PendingApply: a layer that will change the next plan exists but
 	// the last built plan predates it — either any provider layer (the
