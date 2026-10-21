@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -19,7 +20,36 @@ import (
 
 func TestStrictNftIntegration(t *testing.T) {
 	switch os.Getenv("SORA_NFT_STAGE") {
+	case "other-user", "other-user-baseline":
+		for _, host := range []string{"203.0.113.2", "2001:db8::2"} {
+			tcp, udp := strictHTTPReachable(t.Context(), host), strictUDPReachable(t.Context(), host)
+			if os.Getenv("SORA_NFT_STAGE") == "other-user-baseline" {
+				if !tcp || !udp {
+					t.Fatalf("another UID cannot reach baseline endpoint %s: TCP=%v UDP=%v", host, tcp, udp)
+				}
+			} else if tcp || udp {
+				t.Fatalf("another UID reached endpoint %s", host)
+			}
+		}
+		return
 	case "peer":
+		packet, err := (&net.ListenConfig{}).ListenPacket(t.Context(), "udp", ":8080")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() { _ = packet.Close() }()
+		go func() {
+			buf := make([]byte, 128)
+			for {
+				n, addr, err := packet.ReadFrom(buf)
+				if err != nil {
+					return
+				}
+				if _, err := packet.WriteTo(buf[:n], addr); err != nil {
+					return
+				}
+			}
+		}()
 		server := &http.Server{Addr: ":8080", ReadHeaderTimeout: time.Second, Handler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(204) })}
 		listener, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", server.Addr)
 		if err != nil {
@@ -31,9 +61,9 @@ func TestStrictNftIntegration(t *testing.T) {
 		}
 		return
 	case "holder":
-		firewall, _ := NewNftables(999, nil)
+		firewall, _ := NewNftables(0, nil)
 		g, _ := New(Options{DataDir: os.Getenv("SORA_NFT_DIR"), EnginePorts: []uint16{7890}}, firewall)
-		if err := g.Apply(t.Context(), session.Settings{StrictKillSwitch: true, Endpoints: []netip.AddrPort{netip.MustParseAddrPort("203.0.113.2:8080")}}); err != nil {
+		if err := g.Apply(t.Context(), session.Settings{StrictKillSwitch: true, Endpoints: []session.Endpoint{{Address: netip.MustParseAddrPort("203.0.113.2:8080"), Protocol: "tcp"}, {Address: netip.MustParseAddrPort("[2001:db8::2]:8080"), Protocol: "udp"}}}); err != nil {
 			t.Fatal(err)
 		}
 		fmt.Println("READY")
@@ -53,7 +83,13 @@ func TestStrictNftIntegration(t *testing.T) {
 				t.Skip(tool + " unavailable")
 			}
 		}
-		cmd := exec.CommandContext(t.Context(), "unshare", "-Urn", os.Args[0], "-test.run=^TestStrictNftIntegration$", "-test.v")
+		args := []string{"-Urn"}
+		if os.Getuid() == 0 {
+			// Keep all UID mappings for the root-only cross-account regression.
+			args = []string{"-n"}
+		}
+		args = append(args, os.Args[0], "-test.run=^TestStrictNftIntegration$", "-test.v")
+		cmd := exec.CommandContext(t.Context(), "unshare", args...)
 		cmd.Env = append(os.Environ(), "SORA_NFT_STAGE=network")
 		output, err := cmd.CombinedOutput()
 		// Some hosts (Ubuntu 24.04 runners among them) forbid unprivileged
@@ -112,27 +148,33 @@ func TestStrictNftIntegration(t *testing.T) {
 	// DAD must complete before IPv6 reachability is tested.
 	run("nsenter", "-t", fmt.Sprint(peer.Process.Pid), "-n", "ip", "link", "set", "lo", "up")
 	client := &http.Client{Timeout: 500 * time.Millisecond, Transport: &http.Transport{DisableKeepAlives: true}}
-	reaches := func(host string) bool {
-		request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://"+net.JoinHostPort(host, "8080"), nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-		res, err := client.Do(request)
-		if err != nil {
-			return false
-		}
-		_ = res.Body.Close()
-		return res.StatusCode == 204
-	}
+	reaches := func(host string) bool { return strictHTTPReachable(t.Context(), host) }
 	deadline := time.Now().Add(5 * time.Second)
 	for !reaches("2001:db8::2") && time.Now().Before(deadline) {
 		time.Sleep(50 * time.Millisecond)
 	}
 	for _, host := range []string{"203.0.113.2", "192.168.50.2", "2001:db8::2", "fd00::2"} {
-		if !reaches(host) {
+		if !reaches(host) || !strictUDPReachable(t.Context(), host) {
 			t.Fatalf("baseline unreachable: %s", host)
 		}
 	}
+	checkOtherUID := func(stage string) {
+		t.Helper()
+		t.Run(stage, func(t *testing.T) {
+			cmd := exec.CommandContext(t.Context(), os.Args[0], "-test.run=^TestStrictNftIntegration$", "-test.v")
+			cmd.Env = append(os.Environ(), "SORA_NFT_STAGE="+stage)
+			cmd.SysProcAttr = &syscall.SysProcAttr{Credential: &syscall.Credential{Uid: 999, Gid: 999, NoSetGroups: true}}
+			output, err := cmd.CombinedOutput()
+			if err != nil {
+				if len(output) == 0 && os.Getenv("SORA_NFT_REQUIRED") == "" {
+					t.Skipf("another UID is unavailable in this user namespace: %v", err)
+				}
+				t.Fatalf("UID restriction: %v\n%s", err, output)
+			}
+			t.Log(string(output))
+		})
+	}
+	checkOtherUID("other-user-baseline")
 	holder := start("holder", os.Args[0], "-test.run=^TestStrictNftIntegration$")
 	dir := ""
 	for _, value := range holder.Env {
@@ -153,10 +195,14 @@ func TestStrictNftIntegration(t *testing.T) {
 			t.Fatalf("loopback blocked: %v", err)
 		}
 		_ = response.Body.Close()
-		if !reaches("203.0.113.2") {
-			t.Fatal("VPN endpoint blocked")
+		if !reaches("203.0.113.2") || !strictUDPReachable(t.Context(), "2001:db8::2") {
+			t.Fatal("engine VPN endpoint blocked")
 		}
-		for _, host := range []string{"192.168.50.2", "2001:db8::2", "fd00::2"} {
+		if strictUDPReachable(t.Context(), "203.0.113.2") || reaches("2001:db8::2") {
+			t.Fatal("endpoint allowed the wrong transport")
+		}
+		checkOtherUID("other-user")
+		for _, host := range []string{"192.168.50.2", "fd00::2"} {
 			if reaches(host) {
 				t.Fatalf("leak: %s", host)
 			}
@@ -168,7 +214,7 @@ func TestStrictNftIntegration(t *testing.T) {
 	}
 	verify()
 	run("nft", "delete", "table", "inet", "sora")
-	firewall, _ := NewNftables(999, nil)
+	firewall, _ := NewNftables(0, nil)
 	g, _ := New(Options{DataDir: dir, EnginePorts: []uint16{7890}}, firewall)
 	if err := g.Recover(t.Context()); err != nil {
 		t.Fatal(err)
@@ -198,5 +244,36 @@ func TestStrictNftIntegration(t *testing.T) {
 	if err != nil || strings.Contains(string(output), "sora") {
 		t.Fatalf("cleanup left rules: %s, %v", output, err)
 	}
-	t.Log("real nft: IPv4/IPv6 blocked, endpoint and LAN policy allowed, SIGKILL protection retained, recovery reapplied, repeated Disconnect removed all rules")
+	t.Log("real nft: IPv4/IPv6 blocked, engine UID and endpoint transports restricted, LAN policy allowed, SIGKILL protection retained, recovery reapplied, repeated Disconnect removed all rules")
+}
+
+func strictHTTPReachable(ctx context.Context, host string) bool {
+	client := &http.Client{Timeout: 500 * time.Millisecond, Transport: &http.Transport{DisableKeepAlives: true}}
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+net.JoinHostPort(host, "8080"), nil)
+	if err != nil {
+		return false
+	}
+	response, err := client.Do(request)
+	if err != nil {
+		return false
+	}
+	_ = response.Body.Close()
+	return response.StatusCode == 204
+}
+
+func strictUDPReachable(ctx context.Context, host string) bool {
+	conn, err := (&net.Dialer{}).DialContext(ctx, "udp", net.JoinHostPort(host, "8080"))
+	if err != nil {
+		return false
+	}
+	defer func() { _ = conn.Close() }()
+	if err := conn.SetDeadline(time.Now().Add(500 * time.Millisecond)); err != nil {
+		return false
+	}
+	if _, err := conn.Write([]byte("endpoint probe")); err != nil {
+		return false
+	}
+	buf := make([]byte, 128)
+	n, err := conn.Read(buf)
+	return err == nil && string(buf[:n]) == "endpoint probe"
 }

@@ -128,12 +128,16 @@ func StrictNftRuleset(uid int, policy session.Settings, blocked ...netip.Prefix)
 	}
 	rules := NftRuleset(uid, bypass, blocked...)
 	recovery := ""
-	for _, ep := range policy.Endpoints {
+	for _, endpoint := range policy.Endpoints {
+		if endpoint.Protocol != "tcp" && endpoint.Protocol != "udp" {
+			continue
+		}
+		ep := endpoint.Address
 		family := "ip"
 		if ep.Addr().Is6() {
 			family = "ip6"
 		}
-		recovery += fmt.Sprintf("\t\t%s daddr %s meta l4proto { tcp, udp } th dport %d accept\n", family, ep.Addr(), ep.Port())
+		recovery += fmt.Sprintf("\t\tmeta skuid %d %s daddr %s %s dport %d accept\n", uid, family, ep.Addr(), endpoint.Protocol, ep.Port())
 	}
 	// DNS is needed for server names after network changes; only the service account gets it.
 	recovery += fmt.Sprintf("\t\tmeta skuid %d meta l4proto { tcp, udp } th dport 53 accept\n", uid)

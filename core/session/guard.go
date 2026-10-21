@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/netip"
 	"sync"
@@ -19,13 +20,30 @@ type Settings struct {
 	KillSwitch       bool
 	StrictKillSwitch bool
 	Reconnect        bool
-	Endpoints        []netip.AddrPort
+	Endpoints        []Endpoint
 	AllowLAN         bool
 	// Bypass lists destinations that must skip the tunnel.
 	Bypass []string
 	// TunnelMode is the tunnel the plan asked for: system, application or
 	// none.
 	TunnelMode string
+}
+
+// Endpoint keeps transport restrictions in crash recovery intent.
+type Endpoint struct {
+	Address  netip.AddrPort
+	Protocol string
+}
+
+// UnmarshalJSON accepts old intent without granting unknown transports. A new
+// Connect resolves the plan again before starting an engine.
+func (e *Endpoint) UnmarshalJSON(data []byte) error {
+	if len(data) > 0 && data[0] == '"' {
+		*e = Endpoint{}
+		return json.Unmarshal(data, &e.Address)
+	}
+	type endpoint Endpoint
+	return json.Unmarshal(data, (*endpoint)(e))
 }
 
 // Guard applies and restores session system changes. Apply is idempotent;

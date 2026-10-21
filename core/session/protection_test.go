@@ -2,7 +2,10 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"net/netip"
+	"slices"
 	"testing"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -107,4 +110,70 @@ func strictPlan(id string) *engine.Plan {
 		plan.Outbounds[i].Server = "203.0.113.2"
 	}
 	return plan
+}
+
+func TestStrictEndpointTransports(t *testing.T) {
+	cases := []struct {
+		outbound engine.Outbound
+		want     []string
+	}{
+		{engine.Outbound{Protocol: engine.ProtocolVLESS}, []string{"tcp"}},
+		{engine.Outbound{Protocol: engine.ProtocolVMess, Transport: engine.Transport{Type: "ws"}}, []string{"tcp"}},
+		{engine.Outbound{Protocol: engine.ProtocolTrojan}, []string{"tcp"}},
+		{engine.Outbound{Protocol: engine.ProtocolAnyTLS}, []string{"tcp"}},
+		{engine.Outbound{Protocol: engine.ProtocolHTTP}, []string{"tcp"}},
+		{engine.Outbound{Protocol: engine.ProtocolSOCKS5}, []string{"tcp"}},
+		{engine.Outbound{Protocol: engine.ProtocolSOCKS5, SOCKSUDP: true}, []string{"tcp", "udp"}},
+		{engine.Outbound{Protocol: engine.ProtocolShadowsocks}, []string{"tcp", "udp"}},
+		{engine.Outbound{Protocol: engine.ProtocolHysteria2}, []string{"udp"}},
+		{engine.Outbound{Protocol: engine.ProtocolTUIC}, []string{"udp"}},
+		{engine.Outbound{Protocol: engine.ProtocolWireGuard}, []string{"udp"}},
+		{engine.Outbound{Protocol: engine.ProtocolVLESS, Transport: engine.Transport{Type: "quic"}}, []string{"udp"}},
+		{engine.Outbound{Protocol: engine.ProtocolVMess, Transport: engine.Transport{Type: "kcp"}}, []string{"udp"}},
+	}
+	for _, tc := range cases {
+		t.Run(string(tc.outbound.Protocol)+tc.outbound.Transport.Type, func(t *testing.T) {
+			tc.outbound.Server, tc.outbound.Port = "203.0.113.2", 443
+			endpoints, err := planEndpoints(t.Context(), &engine.Plan{Outbounds: []engine.Outbound{tc.outbound}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(endpoints) != len(tc.want) {
+				t.Fatalf("endpoints=%v", endpoints)
+			}
+			for i, protocol := range tc.want {
+				if endpoints[i].Protocol != protocol || endpoints[i].Address != netip.MustParseAddrPort("203.0.113.2:443") {
+					t.Fatalf("endpoint=%v", endpoints[i])
+				}
+			}
+		})
+	}
+}
+
+func TestStrictProfileEndpointTransports(t *testing.T) {
+	profile := json.RawMessage(`{"outbounds":[
+ {"protocol":"vless","settings":{"vnext":[{"address":"203.0.113.2","port":443}]},"streamSettings":{"network":"ws"}},
+ {"protocol":"vmess","settings":{"vnext":[{"address":"2001:db8::2","port":443}]},"streamSettings":{"network":"kcp"}},
+ {"protocol":"wireguard","settings":{"peers":[{"endpoint":"[2001:db8::3]:51820"}]}}
+ ]}`)
+	endpoints, err := planEndpoints(t.Context(), &engine.Plan{Outbounds: []engine.Outbound{{Protocol: engine.ProtocolXrayProfile, Profile: profile}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []Endpoint{
+		{Address: netip.MustParseAddrPort("203.0.113.2:443"), Protocol: "tcp"},
+		{Address: netip.MustParseAddrPort("[2001:db8::2]:443"), Protocol: "udp"},
+		{Address: netip.MustParseAddrPort("[2001:db8::3]:51820"), Protocol: "udp"},
+	}
+	if !slices.Equal(endpoints, want) {
+		t.Fatalf("endpoints=%v; want %v", endpoints, want)
+	}
+	data, err := json.Marshal(endpoints)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var restored []Endpoint
+	if err := json.Unmarshal(data, &restored); err != nil || !slices.Equal(restored, want) {
+		t.Fatalf("journal lost endpoint restrictions: %s, %v", data, err)
+	}
 }

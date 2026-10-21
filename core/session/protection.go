@@ -11,15 +11,23 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
-func planEndpoints(ctx context.Context, plan *engine.Plan) ([]netip.AddrPort, error) {
-	var endpoints []netip.AddrPort
+func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
+	var endpoints []Endpoint
 	for _, outbound := range plan.Outbounds {
-		peers := []engine.WireGuardPeer{{Endpoint: net.JoinHostPort(outbound.Server, strconv.Itoa(int(outbound.Port)))}}
-		peers = append(peers, outbound.Peers...)
+		type peerEndpoint struct {
+			endpoint  string
+			protocols []string
+		}
+		peers := []peerEndpoint{{net.JoinHostPort(outbound.Server, strconv.Itoa(int(outbound.Port))), endpointProtocols(outbound)}}
+		for _, peer := range outbound.Peers {
+			peers = append(peers, peerEndpoint{peer.Endpoint, []string{"udp"}})
+		}
 		if len(outbound.Profile) > 0 {
 			var profile struct {
 				Outbounds []struct {
-					Settings struct {
+					Protocol       engine.Protocol
+					StreamSettings struct{ Network string }
+					Settings       struct {
 						Vnext []struct {
 							Address string
 							Port    uint16
@@ -37,13 +45,15 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]netip.AddrPort, er
 			}
 			for _, ob := range profile.Outbounds {
 				for _, server := range append(ob.Settings.Vnext, ob.Settings.Servers...) {
-					peers = append(peers, engine.WireGuardPeer{Endpoint: net.JoinHostPort(server.Address, strconv.Itoa(int(server.Port)))})
+					peers = append(peers, peerEndpoint{net.JoinHostPort(server.Address, strconv.Itoa(int(server.Port))), endpointProtocols(engine.Outbound{Protocol: ob.Protocol, Transport: engine.Transport{Type: ob.StreamSettings.Network}})})
 				}
-				peers = append(peers, ob.Settings.Peers...)
+				for _, peer := range ob.Settings.Peers {
+					peers = append(peers, peerEndpoint{peer.Endpoint, []string{"udp"}})
+				}
 			}
 		}
 		for _, peer := range peers {
-			host, port, err := net.SplitHostPort(peer.Endpoint)
+			host, port, err := net.SplitHostPort(peer.endpoint)
 			if err != nil || host == "" || port == "0" {
 				continue
 			}
@@ -56,7 +66,9 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]netip.AddrPort, er
 				return nil, errs.Wrap(err, errs.CodeUnavailable, errs.KeyGuardFirewallFail)
 			}
 			for _, addr := range addresses {
-				endpoints = append(endpoints, netip.AddrPortFrom(addr.Unmap(), uint16(number)))
+				for _, protocol := range peer.protocols {
+					endpoints = append(endpoints, Endpoint{Address: netip.AddrPortFrom(addr.Unmap(), uint16(number)), Protocol: protocol})
+				}
 			}
 		}
 	}
@@ -64,6 +76,25 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]netip.AddrPort, er
 		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail, "session: strict mode needs VPN server endpoints")
 	}
 	return endpoints, nil
+}
+
+// UDP payloads inside stream protocols still use TCP on the physical link.
+func endpointProtocols(outbound engine.Outbound) []string {
+	switch outbound.Protocol {
+	case engine.ProtocolHysteria2, engine.ProtocolTUIC, engine.ProtocolWireGuard:
+		return []string{"udp"}
+	case engine.ProtocolShadowsocks:
+		return []string{"tcp", "udp"}
+	case engine.ProtocolSOCKS5, "socks":
+		if outbound.SOCKSUDP {
+			return []string{"tcp", "udp"}
+		}
+	}
+	switch outbound.Transport.Type {
+	case "quic", "kcp", "mkcp":
+		return []string{"udp"}
+	}
+	return []string{"tcp"}
 }
 
 // SetProtection serializes changes with connection replacement and disconnect.

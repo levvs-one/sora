@@ -329,9 +329,6 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 		return err
 	}
 	for index, file := range apps {
-		if w.policy.StrictKillSwitch && index != 0 {
-			continue
-		}
 		id, err := wf.AppID(file)
 		if err != nil {
 			return err
@@ -341,6 +338,27 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 			{Field: wf.FieldALEUserID, Op: wf.MatchTypeEqual, Value: owner},
 		}
 		if w.policy.StrictKillSwitch {
+			if index != 0 {
+				for _, ep := range w.policy.Endpoints {
+					protocol := wf.IPProtoTCP
+					switch ep.Protocol {
+					case "tcp":
+					case "udp":
+						protocol = wf.IPProtoUDP
+					default:
+						continue
+					}
+					endpointConditions := append(append([]*wf.Match(nil), conditions...),
+						&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.PrefixFrom(ep.Address.Addr(), ep.Address.Addr().BitLen())},
+						&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: ep.Address.Port()},
+						&wf.Match{Field: wf.FieldIPProtocol, Op: wf.MatchTypeEqual, Value: protocol},
+					)
+					if err := add("VPN endpoint", wf.ActionPermit, 30, endpointConditions...); err != nil {
+						return err
+					}
+				}
+				continue
+			}
 			conditions = append(conditions, &wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(53)})
 		}
 		if err := add(filepath.Base(file), wf.ActionPermit, 30, conditions...); err != nil {
@@ -376,14 +394,6 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 	if err := add("DNS outside the tunnel", wf.ActionBlock, 20,
 		&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(53)}); err != nil {
 		return err
-	}
-	for _, ep := range w.policy.Endpoints {
-		if err := add("VPN endpoint", wf.ActionPermit, 30,
-			&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.PrefixFrom(ep.Addr(), ep.Addr().BitLen())},
-			&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: ep.Port()},
-		); err != nil {
-			return err
-		}
 	}
 	bypass := w.bypass
 	if w.policy.StrictKillSwitch {
