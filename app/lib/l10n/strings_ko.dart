@@ -132,7 +132,7 @@ class SKo extends S {
   String get logsEmpty => '여기에는 아무것도 없습니다';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => '연결 없음';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class SKo extends S {
   String get theme => '주제';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => '시스템 설정';
 
   @override
   String get themeLight => '빛';
@@ -292,7 +292,7 @@ class SKo extends S {
   String get language => '언어';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => '시스템 설정';
 
   @override
   String get sectionConnection => '연결';
@@ -780,30 +780,26 @@ class SKo extends S {
   String get updateManualSigWarning => '아래 파일은 릴리스 체크섬과 일치합니다. 공식 릴리스에서 내려받았다면 명령을 실행하세요.';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => '개발자가 이 버전을 철회했습니다. 수정된 릴리스를 기다려 주십시오.';
 
   @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateRolloutPending => '최신 버전이 점진적으로 출시되고 자동으로 제공됩니다.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return '$version 버전으로 롤백하는 중...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return '$version 업데이트가 상태 검사를 통과하지 못해 Sora가 $fromVersion로 롤백되었습니다.';
   }
 
   @override
-  String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+  String get updateRollbackError => '자동 롤백에 실패했습니다. 새 버전이 작동하지 않으면 이전 릴리스를 수동으로 다시 설치하십시오.';
 
   @override
-  String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+  String get updateRollbackCacheError => '현재 버전의 확인된 롤백 복사본을 준비할 수 없어 업데이트가 설치되지 않았습니다.';
 
   @override
   String get updateCopyCommand => '복사 명령';
@@ -880,372 +876,369 @@ class SKo extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return '평가 $rating/5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return '작성자: $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return '설치 $count회';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '설치 1회';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => '확인됨';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => '이번 주 가장 인기 있는 항목';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => '신규';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Sora 팀';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => '카탈로그에 없음';
 
   @override
-  String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+  String get extSideloadWarning => '이 확장은 팀 카탈로그에 없습니다. 작성자만이 키를 보증했습니다. 작성자를 신뢰하는 경우에만 키를 설치하세요.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return '“$name” 설치';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return '“$name” 업데이트';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => '이 확장 프로그램은 다음을 수행할 수 있습니다.';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => '업데이트에서 새 권한을 요청합니다.';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => '나는 이러한 권한이 심각한 것임을 이해합니다';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => '설치';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => '업데이트';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => '취소';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => '확인';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => '카탈로그';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => '설치된 확장 프로그램';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => '확장 검색';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => '모두';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => '도구';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => '테마';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => '자동화';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => '통계';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => '네트워크';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => '정렬 기준';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => '가장 인기 있는';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => '최고 평점';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => '이름';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => '카탈로그를 로드할 수 없습니다.';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => '재시도';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => '아무것도 발견되지 않았습니다';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled => '아직 확장 프로그램이 설치되지 않았습니다.\n카탈로그에서 찾거나 파일에서 설치하세요.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => '파일에서 설치';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'URL에서 설치';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => '다운로드';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => '다운로드 중…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => '확인 중…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => '설치 중…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => '설치 실패';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => '서명 확인에 실패했습니다. 파일이 손상되었거나 변조되었을 수 있습니다.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => '확장 매니페스트가 잘못되었습니다.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => '네트워크 오류입니다. 연결을 확인하고 다시 시도하세요.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => '다운로드가 카탈로그와 일치하지 않습니다. 조작되었을 수도 있습니다.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return '이 확장 프로그램에는 앱 버전 $version 이상이 필요합니다.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'https:// 링크만 허용됩니다.';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => '문제가 발생했습니다. 다시 시도해 주세요.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      '이 업데이트는 설치된 버전과 다른 작성자 키로 서명되었으므로 차단되었습니다. 새 키를 신뢰하는 경우 확장 프로그램을 제거하고 명시적으로 다시 설치하세요.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => '업데이트 가능';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => '비활성화됨';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return '$name 활성화';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => '설치된 확장 검색';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => '모두 업데이트';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count 업데이트 사용 가능';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count 업데이트됨';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => '정상';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => '민감함';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => '높은 위험';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => '더 이상 요청되지 않음:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => '이전 버전이 아직 설치되어 있습니다.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => '확장 프로그램 충돌';
 
   @override
   String get extConflictsIntro => '이 확장 프로그램들은 같은 것을 원합니다. 실행할 것을 고르세요. 다른 하나는 설치된 채로 남습니다.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => '앱 테마';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => '네트워크 후크';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '$name 승리';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count 충돌에는 귀하의 결정이 필요합니다';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => '충돌 해결';
 
   @override
-  String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+  String get extConflictNote => '선택 사항은 이 기기에 저장됩니다. 테마는 바로 바뀌며, 네트워크 훅은 이 버전에서 실행되지 않습니다.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return '버전 $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => '작성자';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => '평가';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => '설치 수';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => '버전';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => '이 확장 프로그램 정보';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => '권한';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => '특별한 권한이 없습니다.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => '설정';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => '설정 저장';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => '저장 중…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return '$version(으)로 업그레이드';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => '활성화됨';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return '$version으로 롤백';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return '버전 $version로 롤백하시겠습니까?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => '제거';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return '\"$name\" 및 해당 설정을 제거하시겠습니까?';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => '패널을 사용할 수 없습니다. 확장 프로그램이 비활성화되었거나 제거되었을 수 있습니다.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => '활성 연결 목록 보기';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => '서버 목록 보기';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => '앱 설정 읽기';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => '앱 설정 변경';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => '알림 표시';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => '트레이 메뉴에 항목 추가';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => '앱 내부에 패널 표시';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => '테마 적용';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => '라우팅 규칙 추가(네트워크 트래픽이 이동하는 위치에 영향을 줌)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => '네트워크 경로에 통합(DPI 우회 모듈)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => '허용 목록에서 URL 요청';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => '백그라운드 작업 실행';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+  String get extPermBackgroundDetail => '패널이 닫혀 있어도 예약된 작업을 실행합니다. 확장 프로그램 설정에서 일시 중지하거나 실행 빈도를 변경할 수 있습니다.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => '백그라운드에서 실행됩니다.';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => '우회 기능 및 네트워크 후크';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => '패널';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => '라우팅 규칙';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => '테마';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => '위젯';
 
   @override
   String extCatalogCached(String date) {
@@ -1253,45 +1246,45 @@ class SKo extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => '변경 로그';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => '이미지를 로드할 수 없습니다.';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => '평가 작동 방식';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      '평점은 베이지안 평균을 사용합니다. 평점이 거의 없는 확장 프로그램은 더 많은 사람들이 투표할 때까지 중간 근처에 유지되므로 별 5개짜리 단일 리뷰로는 새 확장 프로그램을 맨 위로 올릴 수 없습니다. 최근 평가는 이전 평가보다 중요하며 계정당 하나의 평가만 계산됩니다.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => '스크린샷';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => '관련성';
 
   @override
   String get extPermNetworkDetail => 'VPN을 통해 인터넷에서 데이터를 가져옵니다. 아래 호스트만 허용되며 나머지는 모두 차단됩니다.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => '백그라운드 작업';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => '백그라운드에서 실행';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => '실행 간격';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '#분');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '#시간');
     return '$_temp0';
   }
 
@@ -1299,14 +1292,14 @@ class SKo extends S {
   String get extBgNote => 'Sora가 열려 있는 동안 트레이에 있을 때도 일정에 따라 작업이 실행됩니다. 최소 간격은 15분입니다.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => '백그라운드 작업을 관리하려면 확장 프로그램을 활성화하세요.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => '네트워크 액세스';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return '네트워크: $hosts';
   }
 
   @override
@@ -1321,61 +1314,61 @@ class SKo extends S {
   String get diagnosticNoData => '아직 기록된 요청이 없습니다. 먼저 속도 테스트 웹사이트를 열어보세요.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'QR로 공유';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'QR 코드 스캔';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => '링크 복사';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => '링크 표시';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => '링크 숨기기';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => '이 QR 코드에는 연결 세부정보가 포함되어 있습니다. 낯선 사람에게 보여주지 마세요.';
 
   @override
   String get qrScanHint => 'QR 코드가 있는 스크린샷이나 사진을 선택하거나 링크를 붙여 넣으세요';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => '클립보드에서 붙여넣기';
 
   @override
   String get qrNoCode => '이 이미지에서 QR 코드를 찾을 수 없습니다.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => '이 QR 코드에는 유효한 링크가 포함되어 있지 않습니다.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => '스캔 QR';
 
   @override
   String get qrFromImage => '이미지 열기';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => '프로세스별 그룹화';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => '목록';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => '호스트 복사';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => '규칙 추가';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '연결 #개');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => '사전 설정';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1390,445 +1383,443 @@ class SKo extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => '사용자 지정';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => '데이터 유출 확인';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => '확인 중...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => '누출이 발견되지 않았습니다.';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => '누출이 감지되었습니다.';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => '마지막 확인';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => '아직 테스트되지 않았습니다.';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => '터널 DNS 리졸버';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => '시스템 리졸버';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => '네트워크 차단을 통한 DNS 보호';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => '위의 DNS 설정에서 터널에 대해 DNS을 구성합니다.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers => '시스템이 터널 외부에서 사용할 확인 프로그램을 확인하세요.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'DNS 트래픽이 터널 안에 머물도록 네트워크 차단을 켜세요.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => '운영 체제의 암호화 DNS';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => '위조된 DNS 응답';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns => '시스템이 터널 외부에서 사용하는 암호화된 DNS 엔드포인트를 확인하세요.';
 
   @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+  String get dnsLeakFixUseEncryptedDns => '리졸버가 응답을 위조할 수 없도록 터널에 암호화 DNS(DoT 또는 DoH)를 사용하세요.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => '먼저 VPN에 연결한 후 누출이 있는지 확인하세요.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => '예상됨';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => '관찰됨';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => '정렬 기준';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => '핑';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => '속도';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => '이름';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => '속도 측정';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => '오래됨';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => '서버 자동 선택';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => '가장 빠른 핑';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => '가장 빠른 속도';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => '현명한 선택';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'Sora 코어에 대한 연결이 불안정합니다.';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => '다시 연결';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'Sora 코어에 대한 연결을 복원하는 중…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => '마지막 세션이 중단되었습니다.';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => '충돌 후 세션 복원';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => '복원';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => '지금은 아님';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => '내 편집 내용';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => '서버 편집';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => '숨기기';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => '표시';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => '편집 내용 재설정';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => '아직 수정사항이 없습니다.';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => '자체 규칙';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => '속도 측정에는 최신 코어가 필요합니다.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return '$total에서 $done 측정…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => '네트워크 프로필';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty => '아직 프로필이 없습니다. 알려진 네트워크에 자동으로 설정을 적용하려면 네트워크를 만드세요.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => '프로필 추가';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => '프로필 이름';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi 네트워크(SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => '집, 사무실은 쉼표로 구분됩니다.';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => '네트워크 게이트웨이';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS 번호';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => '자동 적용';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => '끄면 프로필을 적용하기 전에 확인합니다.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => '현재 설정 기억';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => '프로필에 저장된 현재 설정';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => '프로필 삭제';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return '프로필 \"$name\"을(를) 삭제하시겠습니까?';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return '프로필 \"$name\"을 적용하시겠습니까?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => '적용';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return '프로필 \'$name\'이 적용됨';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => '취소';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => '활성';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return '현재: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => '네트워크 정보를 사용할 수 없습니다.';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => '하나 이상의 트리거 추가: SSID, 게이트웨이 또는 ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => '프록시 체인';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => '아직 체인이 없습니다. 2~3개의 서버를 연결하여 트래픽이 각 서버를 통과하도록 합니다.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => '새 체인';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => '체인 이름';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => '2~3개의 서버 선택';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => '드래그하여 재정렬: 트래픽이 위쪽으로 들어오고 아래쪽으로 나갑니다.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => '서버를 2개 이상 선택하세요.';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => '체인은 최대 3개의 서버를 보유합니다.';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => '예상 대기 시간';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => '저장 체인';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => '체인 삭제';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return '체인 \"$name\"을 삭제하시겠습니까?';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => '현재 엔진은 체인을 구축할 수 없습니다.';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => '체인 서버 중 하나를 더 이상 사용할 수 없습니다.';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return '홉 $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => '입구';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => '출구';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => '장치 동기화';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => '내 장치';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => '페어링된 장치가 없습니다. 로컬 네트워크를 통해 다른 장치를 페어링합니다.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => '장치 페어링';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => '내 코드 표시';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => '스캔 코드';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => '철회';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return '\"$name\"을(를) 취소하시겠습니까?';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return '마지막 동기화: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => '절대 안함';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => '장치는 동일한 로컬 네트워크에 있어야 합니다.';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => '장치가 페어링되었습니다';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => '이 장치와 페어링';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => '다른 장치를 기다리는 중…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => '종단 간 암호화된 채널입니다. 계정도 없고 클라우드 서버도 없습니다.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => '우회 DPI 직접 네트워크 트래픽 필터링';
 
   @override
-  String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+  String get zapretWithVpnHint => 'VPN 터널과 함께 zapret을 실행합니다. 터널 트래픽은 VPN을 사용하고 직접 트래픽은 우회 기능을 사용합니다.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => '각 서버는 한 번만 나타날 수 있습니다.';
 
   @override
-  String get edit => 'Edit';
+  String get edit => '편집';
 
   @override
-  String get remove => 'Remove';
+  String get remove => '제거';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => '성능 저하 시 자동 전환';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      '선택한 서버가 크게 느려지거나 응답하지 않으면 Sora가 측정 결과가 가장 좋은 서버로 전환합니다. 전환은 10분에 한 번으로 제한됩니다.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => '혼합';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => '시스템';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => '사용자 정의 서버 추가';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => '내 서버';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => '이름';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => '예: 내 VPS';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => '이름을 입력하세요';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => '주소';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com 또는 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => '서버 주소를 입력하세요';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => '잘못된 주소';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => '포트';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => '포트는 1~65535 사이의 숫자여야 합니다.';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => '프로토콜';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => '로그인 정보';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => '선택사항';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => '비밀 표시';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => '비밀 숨기기';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => '사용자 지정';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return '서버 \"$name\"을 삭제하시겠습니까?';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => '수동으로 서버 추가: 주소, 포트 및 프로토콜';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => '테스트';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => '데이터 유출 테스트';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      '트래픽이 터널 밖으로 기기를 빠져나갈 수 있는지 확인합니다. 직접 DNS 및 ICMP 요청, IPv6 외부 통신, 시스템 리졸버를 검사합니다. 연결된 상태에서 실행하세요.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => '확인';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => '취소';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'VPN에 연결하여 데이터 유출을 테스트합니다.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return '테스트 완료: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => '누출이 발견되지 않았습니다.';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '유출 #건 발견');
     return '$_temp0';
   }
 
@@ -1836,131 +1827,129 @@ class SKo extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => '수정';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => '네트워크 차단이 켜져 있습니다. 테스트를 다시 실행해 확인하세요.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => '직접 DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP 에코';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => '시스템 리졸버';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => '터널 연결';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS 터널을 통과';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => '서버가 느려졌습니다. Sora은 측정 중에 찾은 최적의 서버로 전환했습니다.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => '트래픽 난독화';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => '코드가 만료되었습니다';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => '동기화 서비스를 시작할 수 없습니다.';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing => 'sora-sync 구성 요소를 찾을 수 없습니다. 기기 동기화를 활성화하려면 앱을 다시 설치하세요.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => '동기화 서비스를 시작하는 중…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => '동기화 서비스가 액세스 토큰을 거부했습니다. 앱을 다시 시작한 후 다시 시도해 보세요.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => '장치가 더 이상 페어링되지 않습니다.';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => '페어링 세션이 이미 열려 있습니다.';
 
   @override
-  String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+  String get syncErrUnreachable => '다른 장치가 응답하지 않았습니다. 동일한 네트워크에 있고 해당 코드가 표시되는지 확인하세요.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => '동기화 오류';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return '코드는 $duration 후에 만료됩니다';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => '기기와 페어링 중…';
 
   @override
-  String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+  String get syncLegacyCleared => '이전 장치 목록은 실제로 페어링된 적이 없으므로 삭제되었습니다. 이번에는 실제로 장치를 다시 페어링하십시오.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => '새 코드';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return '은 $name과 페어링됨';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => '반복';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => '코드 숨기기';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => '지금 동기화';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return '수신 $pulled, 전송 $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => '동기화 결과';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => '수신됨';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => '보냄';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => '변경 사항이 감지되지 않았습니다.';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => '구독';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => '앱 설정';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => '신청 설정 재정의';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => '네트워크 프로필';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => '프록시 체인';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return '$name에서';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => '이 장치';
 
   @override
   String get syncUnavailableAndroid =>

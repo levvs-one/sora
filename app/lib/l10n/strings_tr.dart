@@ -132,7 +132,7 @@ class STr extends S {
   String get logsEmpty => 'Burada hiçbir şey yok';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'Bağlantı yok';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class STr extends S {
   String get theme => 'Tema';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Sistemdeki gibi';
 
   @override
   String get themeLight => 'Işık';
@@ -292,7 +292,7 @@ class STr extends S {
   String get language => 'Dil';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Sistemdeki gibi';
 
   @override
   String get sectionConnection => 'Bağlantı';
@@ -791,30 +791,29 @@ class STr extends S {
       'Aşağıdaki dosyalar sürümün sağlama toplamlarıyla eşleşiyor. Bunları resmi sürümden indirdiyseniz komutu çalıştırın.';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => 'Geliştirici bu sürümü geri çekti. Lütfen düzeltilmiş sürümü bekleyin.';
 
   @override
   String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+      'Daha yeni bir sürüm yavaş yavaş kullanıma sunuluyor ve size otomatik olarak sunulacak.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return '$version sürümüne geri dönülüyor...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return '$version güncellemesi durum denetimini geçemediği için Sora, $fromVersion sürümüne geri alındı.';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'Otomatik geri alma başarısız oldu. Yeni sürüm çalışmıyorsa önceki sürümü manuel olarak yeniden yükleyin.';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'Geçerli sürümün doğrulanmış geri alma kopyası hazırlanamadığından güncelleme yüklenmedi.';
 
   @override
   String get updateCopyCommand => 'Komutu kopyala';
@@ -893,372 +892,372 @@ class STr extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'Derecelendirme $rating / 5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return 'yazan: $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return 'Kurulumlar: $count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 yükleme';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'Doğrulandı';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'Bu haftanın en popüleri';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'Yeni';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Sora ekibi';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'Katalogdan değil';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'Bu uzantı takım kataloğundan değil. Yalnızca yazar kendi anahtarına kefil olmuştur: yalnızca yazara güveniyorsanız yükleyin.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return '“$name” uzantısını yükle';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return '“$name” uzantısını güncelle';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'Bu uzantı şunları yapabilecektir:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'Güncelleme yeni izinler istiyor:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'Bu izinlerin ciddi olduğunu anlıyorum';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'Yükle';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'Güncelle';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'İptal';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'Onayla';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'Katalog';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'Yüklü uzantılar';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'Uzantı ara';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'Hepsi';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'Araçlar';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'Temalar';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'Otomasyon';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'İstatistikler';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'Ağ';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'Sıralama ölçütü';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'En popüler';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'En yüksek puan';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'Ad';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'Katalog yüklenemedi';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'Tekrar dene';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'Hiçbir şey bulunamadı';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled => 'Henüz yüklü uzantı yok.\nKatalogda bir tane bulun veya bir dosyadan yükleyin.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'Dosyadan yükle';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'URL adresinden yükle';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'İndir';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'İndiriliyor…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'Doğrulanıyor…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'Yükleniyor…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'Yükleme başarısız oldu';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'İmza kontrolü başarısız oldu. Dosya zarar görmüş veya tahrif edilmiş olabilir.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'Uzantının bildirimi geçersiz.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'Ağ hatası. Bağlantınızı kontrol edip tekrar deneyin.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'İndirme işlemi katalogla eşleşmiyor. Kurcalanmış olabilir.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'Bu uzantının $version veya daha yeni bir uygulama sürümüne ihtiyacı var.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'Yalnızca https:// bağlantılarına izin verilir';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'Bu güncelleme, yüklü sürümden farklı bir yazar anahtarıyla imzalandığından engellendi. Yeni anahtara güveniyorsanız uzantıyı kaldırın ve açıkça yeniden yükleyin.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'Güncelleme mevcut';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'Devre dışı';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return 'Etkinleştir $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'Yüklü uzantılarda ara';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'Tümünü güncelle';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count güncellemeleri mevcut';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count güncellendi';
   }
 
   @override
   String get extRiskNormal => 'Normal';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'Hassas';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'Yüksek risk';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'Artık talep edilmiyor:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'Önceki sürüm hâlâ yüklü.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'Uzantı çakışmaları';
 
   @override
   String get extConflictsIntro => 'Bu uzantılar aynı şeyi istiyor. Hangisinin çalışacağını seçin; diğeri kurulu kalır.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'Uygulama teması';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'Ağ kancaları';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '$name kazanır';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count anlaşmazlıklar için sizin kararınıza ihtiyaç var';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'Çakışmaları çözme';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'Seçiminiz bu cihazda kaydedilir. Tema hemen değişir; ağ kancaları bu sürümde çalışmaz.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'Sürüm $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'Yazar';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'Değerlendirme';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'Kurulumlar';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'Sürüm';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'Bu uzantı hakkında';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'İzinler';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'Özel izin yok.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'Ayarlar';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'Ayarları kaydet';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'Kaydediliyor…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return '$version\'ye yükseltme';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'Etkin';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return '$version\'e geri dönme';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return '$version sürümüne geri dönülsün mü?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'Kaldırma';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return '“$name” ve ayarları kaldırılsın mı?';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => 'Panel kullanılamıyor. Uzantı devre dışı bırakılmış veya kaldırılmış olabilir.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'Etkin bağlantıların listesine bakın';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'Sunucularınızın listesini görün';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'Uygulama ayarlarını oku';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'Uygulama ayarlarını değiştir';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'Bildirimleri göster';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'Tepsi menüsüne öğe ekleme';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'Panelleri uygulama içinde göster';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'Temaları uygula';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'Yönlendirme kuralları ekleyin (ağ trafiğinin nereye gittiğini etkiler)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'Ağ yoluna entegre edin (DPI bypass modülleri)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'İzin verilenler listesinden URL isteğinde bulunun';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'Arka plan görevlerini çalıştır';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'Panel kapalıyken bile zamanlanmış görevleri çalıştırır. Uzantı ayarlarından duraklatabilir veya çalışma sıklığını değiştirebilirsiniz.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'Arka planda çalışır';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'Engel aşma ve ağ kancaları';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'Arayüz panelleri';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'Yönlendirme kuralları';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'Temalar';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'Widget\'lar';
 
   @override
   String extCatalogCached(String date) {
@@ -1266,46 +1265,46 @@ class STr extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'Değişiklik Günlüğü';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'Resim yüklenemedi';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'Derecelendirmelerin işleyiş şekli';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'Derecelendirmeler Bayes ortalamasını kullanır: Az sayıda derecelendirmeye sahip bir uzantı, daha fazla kişi oy verene kadar ortalara yakın bir yerde kalır; dolayısıyla tek bir 5 yıldızlı inceleme, yeni bir uzantıyı en üst sıraya çıkaramaz. Son derecelendirmeler eski derecelendirmelerden daha ağırdır ve hesap başına yalnızca bir derecelendirme sayılır.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'Ekran Görüntüleri';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'Alaka düzeyi';
 
   @override
   String get extPermNetworkDetail =>
       'İnternetten VPN üzerinden veri alır. Yalnızca aşağıdaki sunuculara izin verilir, diğer her şey engellenir.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'Arka plan görevi';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'Arka planda çalıştır';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'Çalıştırma aralığı';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# dakika', one: '# dakika');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# saat', one: '# saat');
     return '$_temp0';
   }
 
@@ -1314,14 +1313,14 @@ class STr extends S {
       'Görev, Sora açık olduğu sürece, tepside dahil, zamanlamaya göre çalışır. En kısa aralık 15 dakikadır.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'Uzantının arka plan görevini yönetmesini etkinleştirin.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'Ağ erişimi';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'Ağ: $hosts';
   }
 
   @override
@@ -1336,61 +1335,61 @@ class STr extends S {
   String get diagnosticNoData => 'Henüz kayıtlı istek yok. Önce bir hız testi web sitesi açın.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'QR kodunu paylaş';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'QR kodunu tarayın';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'Bağlantıyı kopyala';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'Bağlantıyı göster';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'Bağlantıyı gizle';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'Bu QR kodu bağlantı ayrıntılarını içerir. Yabancılara göstermeyin.';
 
   @override
   String get qrScanHint => 'QR kodlu bir ekran görüntüsü veya fotoğraf seçin ya da bağlantı yapıştırın';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'Panodan yapıştır';
 
   @override
   String get qrNoCode => 'Bu görselde QR kod bulunamadı.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'Bu QR kodu geçerli bir bağlantı içermiyor.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'Tara QR';
 
   @override
   String get qrFromImage => 'Görsel aç';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'İşleme göre gruplandırma';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'Liste';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'Ana bilgisayarı kopyala';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'Kural ekle';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# bağlantı', one: '# bağlantı');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'Ön Ayar';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1405,379 +1404,382 @@ class STr extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'Özel';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'Veri sızıntılarını kontrol edin';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'Kontrol ediliyor...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'Sızıntı bulunamadı';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'Sızıntı algılandı';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'Son kontrol';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'Henüz test edilmedi';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'Tünelin DNS çözümleyicileri';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'Sistem çözümleyicileri';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'Ağ kilidi ile DNS koruması';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'Yukarıdaki DNS ayarlarında tünel için DNS yapılandırın.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Sisteminizin tünel dışında hangi çözümleyicileri kullanacağını kontrol edin.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'DNS trafiğinin tünelde kalması için ağ kilidini etkinleştirin.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'İşletim sisteminin şifreli DNS\'i';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'Sahte DNS yanıtları';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Sisteminizin tünel dışında hangi şifrelenmiş DNS uç noktalarını kullandığını kontrol edin.';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'Çözümleyicilerin yanıtları taklit edememesi için tünel için şifrelenmiş DNS (DoT veya DoH) kullanın.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'Önce VPN\'ye bağlanın, ardından sızıntı olup olmadığını kontrol edin.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'Beklenen';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'Gözlemlendi';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'Sıralama ölçütü';
 
   @override
   String get sortPing => 'Ping';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'Hız';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'Ad';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'Hızı ölç';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'güncel değil';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'Sunucuyu otomatik seç';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'En hızlı ping';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'En yüksek hız';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'Akıllı seçim';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'Sora çekirdeğine olan bağlantı kararsız';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'Yeniden bağlan';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'Sora çekirdeğiyle bağlantı geri yükleniyor…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'Son oturum kesintiye uğradı';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'Bir kilitlenme sonrasında oturumu geri yükleme';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'Geri Yükle';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'Şimdi değil';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'Düzenlemelerim';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'Sunucuları düzenle';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'Gizle';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'Göster';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'Düzenlemeleri sıfırla';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'Henüz düzenleme yok';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'Kendi kuralları';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'Hız ölçümü için daha yeni bir çekirdek gerekiyor';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return '$total\'dan $done ölçümü…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'Ağ profilleri';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty =>
+      'Henüz profil yok. Bilinen ağlarda ayarların otomatik olarak uygulanması için bir tane oluşturun.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'Profil ekle';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'Profil adı';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi ağları (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'Ev, Ofis virgülle ayrılmış';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'Ağ ağ geçitleri';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS sayılar';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'Otomatik uygula';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'Kapalıysa profil uygulanmadan önce onay istenir.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'Geçerli ayarları hatırla';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'Profile kaydedilen mevcut ayarlar';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'Profili sil';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return '\"$name\" profili silinsin mi?';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return '\"$name\" profili uygulansın mı?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'Uygula';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return '“$name” profili uygulandı';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'İptal';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'Etkin';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'Şimdi: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'Ağ bilgisi mevcut değil';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'En az bir tetikleyici ekleyin: SSID, ağ geçidi veya ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'Proxy zincirleri';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => 'Henüz zincir yok. Trafiğin her birinden geçmesi için 2-3 sunucuyu bağlayın.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'Yeni zincir';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'Zincir adı';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => '2–3 sunucu seçin';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => 'Yeniden sıralamak için sürükleyin: trafik üstten girer ve alttan çıkar.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'En az 2 sunucu seçin';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'Bir zincirde en fazla 3 sunucu bulunur';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'Tahmini gecikme';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'Zinciri kaydet';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'Zinciri sil';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return '\"$name\" zinciri silinsin mi?';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'Mevcut motor zincir oluşturamıyor';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'Zincir sunuculardan biri artık kullanılamıyor';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return 'Atlama $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'Giriş';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'Çıkış';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'Cihaz senkronizasyonu';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'Cihazlarım';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'Eşleştirilmiş cihaz yok. Yerel ağ üzerinden başka bir cihazı eşleştirin.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'Cihazı eşleştir';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'Kodumu göster';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'Tarama kodu';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'Çekilme';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return '\"$name\" iptal edilsin mi?';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'Son senkronizasyon: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'Hiçbir zaman';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'Cihazlar aynı yerel ağda olmalıdır';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'Cihaz eşlendi';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'Bu cihazla eşleştir';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'Diğer cihaz bekleniyor…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'Uçtan uca şifrelenmiş kanal. Hesap yok, bulut sunucusu yok.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'Doğrudan ağ trafiği için DPI filtrelemeyi atlayın';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'zapret\'i VPN tüneliyle birlikte çalıştırır: tünel trafiği VPN üzerinden, doğrudan trafik ise engel aşma mekanizması üzerinden gider.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'Her sunucu yalnızca bir kez görünebilir';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Düzenle';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Kaldır';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'Bozulma durumunda otomatik geçiş';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'Seçili sunucu çok yavaşlarsa veya yanıt vermezse Sora ölçümlere göre en iyi sunucuya geçer, ancak 10 dakikada bir defadan sık geçiş yapmaz.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'Karışık';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'Sistem';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'Özel sunucu ekle';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'Sunucularım';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'Ad';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'Örneğin: VPS\'im';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'Adı girin';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'Adres';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com veya 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'Sunucu adresini girin';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'Geçersiz adres';
 
   @override
   String get customServerPort => 'Port';
@@ -1786,64 +1788,69 @@ class STr extends S {
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'Bağlantı noktası 1 ile 65535 arasında bir sayı olmalıdır';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'Protokolü';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'Giriş bilgileri';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'İsteğe bağlı';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'Sırrı göster';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'Sırrı gizle';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'özel';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return '“$name” sunucusu silinsin mi?';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'Sunucuyu manuel olarak ekleyin: adres, bağlantı noktası ve protokol';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'Testi';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'Veri sızıntılarını test edin';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'Trafiğin tünel dışında cihazdan çıkıp çıkamadığını denetler: doğrudan DNS ve ICMP istekleri, IPv6 çıkışı ve sistem çözümleyicileri. Bağlıyken çalıştırın.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'Kontrol et';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'İptal';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'Veri sızıntılarını test etmek için VPN\'ye bağlanın.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'Tamamlanan testler: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'Sızıntı bulunamadı';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# sızıntı bulundu',
+      one: '# sızıntı bulundu',
+    );
     return '$_temp0';
   }
 
@@ -1851,131 +1858,133 @@ class STr extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'Düzelt';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'Ağ kilidi etkin. Doğrulamak için testi yeniden çalıştırın.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'Doğrudan DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP yankı';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'Sistem çözümleyicileri';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'Tünel bağlantısı';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS tünelden';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => 'Sunucu yavaşladı. Sora ölçüm sırasında bulunan en iyi sunucuya geçti.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'Trafiği gizleme';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'Kodun süresi doldu';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'Senkronizasyon hizmeti başlatılamadı';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing =>
+      'sora-sync bileşeni bulunamadı. Cihaz senkronizasyonunu etkinleştirmek için uygulamayı yeniden yükleyin.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'Senkronizasyon hizmeti başlatılıyor…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth =>
+      'Eşitleme hizmeti erişim belirtecini reddetti. Uygulamayı yeniden başlatın ve tekrar deneyin.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'Cihaz artık eşlenmemiş';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'Bir eşleştirme oturumu zaten açık';
 
   @override
   String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+      'Diğer cihaz yanıt vermedi. Aynı ağda olduğundan ve kodunu gösterdiğinden emin olun.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'Senkronizasyon hatası';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'Kodun süresi $duration sonra dolar';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'Cihazla eşleştiriliyor…';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'Eski cihaz listesi gerçekte hiçbir zaman eşleştirilmediğinden temizlendi. Bu sefer gerçekten cihazlarınızı tekrar eşleştirin.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'Yeni kod';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return '$name ile eşlendi';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'Tekrarla';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'Kodu gizle';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'Şimdi eşitle';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return 'Alındı $pulled, gönderildi $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'Senkronizasyon sonucu';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'Alındı';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'Gönderildi';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'Hiçbir değişiklik algılanmadı';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'Abonelikler';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'Uygulama ayarları';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'Abonelik özelleştirmeleri';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'Ağ profilleri';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'Proxy zincirleri';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return '$name cihazından';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'Bu cihaz';
 
   @override
   String get syncUnavailableAndroid =>

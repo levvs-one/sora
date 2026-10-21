@@ -132,7 +132,7 @@ class SFa extends S {
   String get logsEmpty => 'اینجا هیچی';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'بدون اتصال';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class SFa extends S {
   String get theme => 'موضوع';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'مطابق سیستم';
 
   @override
   String get themeLight => 'نور';
@@ -292,7 +292,7 @@ class SFa extends S {
   String get language => 'زبان';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'مطابق سیستم';
 
   @override
   String get sectionConnection => 'اتصال';
@@ -792,30 +792,28 @@ class SFa extends S {
       'فایل‌های زیر با چک‌سام‌های نسخه مطابقت دارند. اگر آن‌ها را از نسخهٔ رسمی دانلود کرده‌اید، فرمان را اجرا کنید.';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => 'توسعه دهنده این نسخه را پس گرفته است. لطفا منتظر انتشار تصحیح شده باشید.';
 
   @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateRolloutPending => 'نسخه جدیدتر به تدریج در حال انتشار است و به طور خودکار به شما ارائه می شود.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return 'بازگشت به نسخه $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return 'به‌روزرسانی $version از بررسی سلامت عبور نکرد، بنابراین Sora به $fromVersion بازگشت.';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'بازگشت خودکار شکست خورد. اگر نسخه جدید کار نمی کند، نسخه قبلی را دوباره به صورت دستی نصب کنید.';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'یک کپی بازگشتی تأیید شده از نسخه فعلی تهیه نشد، بنابراین به‌روزرسانی نصب نشد.';
 
   @override
   String get updateCopyCommand => 'دستور کپی';
@@ -893,373 +891,374 @@ class SFa extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'رتبه $rating از 5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return 'توسط $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return 'نصب: $count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 نصب';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'تأیید شد';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'محبوب ترین این هفته';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'جدید';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'تیم Sora';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'نه از کاتالوگ';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'این برنامه افزودنی از کاتالوگ تیم نیست. فقط نویسنده کلید خود را تضمین کرده است: فقط در صورتی آن را نصب کنید که به نویسنده اعتماد دارید.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return 'نصب «$name»';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return 'به‌روزرسانی «$name»';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'این برنامه افزودنی قادر خواهد بود:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'به روز رسانی مجوزهای جدید را می خواهد:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'می‌دانم که این مجوزها جدی هستند';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'نصب';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'به‌روزرسانی';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'لغو';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'تأیید کنید';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'کاتالوگ';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'برنامه های افزودنی نصب شده';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'جستجوی برنامه‌های افزودنی';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'همه';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'ابزار';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'پوسته‌ها';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'اتوماسیون';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'آمار';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'شبکه';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'مرتب سازی بر اساس';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'محبوب ترین';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'بالاترین امتیاز';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'نام';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'کاتالوگ بارگیری نشد';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'دوباره امتحان کنید';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'چیزی پیدا نشد';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled =>
+      'هنوز هیچ برنامه افزودنی نصب نشده است.\nیکی را در کاتالوگ پیدا کنید یا از یک فایل نصب کنید.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'نصب از فایل';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'نصب از URL';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'دانلود کنید';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'در حال بارگیری…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'در حال تأیید…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'در حال نصب…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'نصب انجام نشد';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'بررسی امضا انجام نشد. ممکن است فایل آسیب دیده یا دستکاری شده باشد.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'مانیفست افزونه نامعتبر است.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'خطای شبکه. اتصال خود را بررسی کنید و دوباره امتحان کنید.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'دانلود با کاتالوگ مطابقت ندارد. ممکن است دستکاری شده باشد.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'این برنامه افزودنی به نسخه برنامه $version یا جدیدتر نیاز دارد.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'فقط پیوندهای https:// مجاز هستند';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'مشکلی پیش آمد. لطفا دوباره امتحان کنید.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'این به روز رسانی با یک کلید نویسنده متفاوت از نسخه نصب شده امضا شده است، بنابراین مسدود شد. اگر به کلید جدید اعتماد دارید، برنامه افزودنی را حذف نصب کنید و دوباره آن را به صراحت نصب کنید.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'به‌روزرسانی موجود است';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'غیرفعال';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return '$name را فعال کنید';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'جستجوی برنامه‌های افزودنی نصب‌شده';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'به روز رسانی همه';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count به روز رسانی موجود است';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count به روز شد';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => 'عادی';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'حساس';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'ریسک بالا';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'دیگر درخواست نمی‌شود:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'نسخه قبلی هنوز نصب است.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'تعارضات پسوند';
 
   @override
   String get extConflictsIntro =>
       'این افزونه‌ها یک چیز را می‌خواهند. انتخاب کنید کدام اجرا شود؛ دیگری نصب‌شده می‌ماند.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'تم برنامه';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'قلاب های شبکه';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return 'اولویت با $name';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return 'تعارضات $count به تصمیم شما نیاز دارد';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'تعارضات را حل کنید';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'انتخاب شما روی این دستگاه ذخیره می‌شود. پوسته فوراً عوض می‌شود، اما هوک‌های شبکه در این نسخه اجرا نمی‌شوند.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'نسخه $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'نویسنده';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'رتبه بندی';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'دفعات نصب';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'نسخه';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'درباره این پسوند';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'مجوزها';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'بدون مجوزهای خاص.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'تنظیمات';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'ذخیرهٔ تنظیمات';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'در حال ذخیره…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return 'ارتقا به $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'فعال';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return 'بازگشت به $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return 'بازگشت به نسخه $version؟';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'حذف نصب کنید';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return '\"$name\" و تنظیمات آن حذف شود؟';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => 'پانل در دسترس نیست. پسوند ممکن است غیرفعال یا حذف شده باشد.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'لیست اتصالات فعال را ببینید';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'فهرستی از سرورهای خود را ببینید';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'تنظیمات برنامه را بخوانید';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'تنظیمات برنامه را تغییر دهید';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'نمایش اعلان‌ها';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'موارد را به منوی سینی اضافه کنید';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'نمایش پانل های داخل برنامه';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'تم ها را اعمال کنید';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'قوانین مسیریابی را اضافه کنید (بر جایی که ترافیک شبکه می رود تأثیر می گذارد)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'ادغام در مسیر شبکه (DPI ماژول های دور زدن)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'URL را از لیست مجاز درخواست کنید';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'وظایف پس زمینه را اجرا کنید';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'کارهای برنامه ریزی شده را حتی زمانی که پانل بسته است اجرا می کند. می‌توانید آن را موقتاً متوقف کنید یا تعداد دفعات اجرای آن را در تنظیمات برنامه افزودنی تغییر دهید.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'در پس‌زمینه اجرا می‌شود';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'دور زدن محدودیت‌ها و قلاب‌های شبکه';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'پانل های رابط';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'قوانین مسیریابی';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'پوسته‌ها';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'ابزارک‌ها';
 
   @override
   String extCatalogCached(String date) {
@@ -1267,46 +1266,46 @@ class SFa extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'تغییرات';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'تصویر بارگیری نشد';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'رتبه بندی چگونه کار می کند';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'رتبه‌بندی‌ها از میانگین بیزی استفاده می‌کنند: برنامه‌های افزودنی با رتبه‌بندی‌های کم تا زمانی که افراد بیشتری رای دهند، نزدیک به وسط می‌ماند، بنابراین یک بررسی 5 ستاره نمی‌تواند یک برنامه افزودنی جدید را به بالاترین سطح برساند. رتبه‌بندی‌های اخیر بیشتر از رتبه‌بندی‌های قدیمی هستند و تنها یک رتبه برای هر حساب حساب می‌شود.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'تصاویر';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'ربط';
 
   @override
   String get extPermNetworkDetail =>
       'داده‌ها را از طریق VPN از اینترنت دریافت می‌کند. فقط میزبان‌های فهرست زیر مجازند و بقیه مسدودند.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'کار پس‌زمینه';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'در پس‌زمینه اجرا شود';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'فاصلهٔ اجرا';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# دقیقه', one: '# دقیقه');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ساعت', one: '# ساعت');
     return '$_temp0';
   }
 
@@ -1315,14 +1314,14 @@ class SFa extends S {
       'وظیفه تا وقتی Sora باز است، حتی در سینی سیستم، طبق زمان‌بندی اجرا می‌شود. کوتاه‌ترین فاصله ۱۵ دقیقه است.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'برنامه افزودنی را برای مدیریت وظیفه پس‌زمینه خود فعال کنید.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'دسترسی به شبکه';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'شبکه: $hosts';
   }
 
   @override
@@ -1337,61 +1336,61 @@ class SFa extends S {
   String get diagnosticNoData => 'هنوز درخواستی ثبت نشده است. ابتدا یک وب سایت تست سرعت باز کنید.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'کد QR را به اشتراک بگذارید';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'کد QR را اسکن کنید';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'پیوند را کپی کنید';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'نمایش پیوند';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'پنهان کردن پیوند';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'این کد QR حاوی جزئیات اتصال است. آن را به غریبه ها نشان ندهید.';
 
   @override
   String get qrScanHint => 'یک اسکرین‌شات یا عکس دارای کد QR انتخاب کنید یا پیوندی را جای‌گذاری کنید';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'چسباندن از کلیپ بورد';
 
   @override
   String get qrNoCode => 'در این تصویر کد QR پیدا نشد.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'این کد QR حاوی پیوند معتبری نیست.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'اسکن QR';
 
   @override
   String get qrFromImage => 'باز کردن تصویر';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'گروه بر اساس فرآیند';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'فهرست';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'کپی میزبان';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'قانون اضافه کنید';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# اتصال', one: '# اتصال');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'از پیش تنظیم شده';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1406,445 +1405,449 @@ class SFa extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'سفارشی';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'نشت داده را بررسی کنید';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'در حال بررسی...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'هیچ نشتی یافت نشد';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'نشت شناسایی شد';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'آخرین بررسی';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'هنوز تست نشده است';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'تحلیلگرهای DNS تونل';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'تحلیلگرهای نام سیستم';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'محافظت DNS با قطع اضطراری';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'DNS را برای تونل در تنظیمات DNS بالا پیکربندی کنید.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers =>
+      'بررسی کنید که سیستم شما از کدام حل کننده ها در خارج از تونل استفاده می کند.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'قطع اضطراری را روشن کنید تا ترافیک DNS درون تونل بماند.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'DNS رمزگذاری‌شدهٔ سیستم‌عامل';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'پاسخ های جعلی DNS';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns =>
+      'بررسی کنید که سیستم شما از کدام نقاط پایانی DNS رمزگذاری شده در خارج از تونل استفاده می کند.';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'از DNS (DoT یا DoH) رمزگذاری شده برای تونل استفاده کنید تا حل‌کننده‌ها نتوانند پاسخ‌ها را جعل کنند.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'ابتدا به VPN متصل شوید، سپس نشتی را بررسی کنید.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'مورد انتظار';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'مشاهده شد';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'مرتب سازی بر اساس';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => 'پینگ';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'سرعت';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'نام';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'اندازه گیری سرعت';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'منسوخ شده است';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'انتخاب خودکار سرور';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'سریعترین پینگ';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'سریعترین سرعت';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'انتخاب هوشمندانه';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'اتصال به هسته Sora ناپایدار است';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'دوباره وصل شوید';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'در حال بازیابی اتصال به هسته Sora…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'آخرین جلسه قطع شد';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'بازیابی جلسه پس از خرابی';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'بازیابی';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'اکنون نه';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'ویرایش های من';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'ویرایش سرورها';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'پنهان کردن';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'نمایش';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'ویرایش ها را بازنشانی کنید';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'هنوز هیچ ویرایشی انجام نشده است';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'قوانین خود را';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'اندازه گیری سرعت به هسته جدیدتری نیاز دارد';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return 'اندازه گیری $done از $total…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'نمایه های شبکه';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty =>
+      'هنوز پروفایلی وجود ندارد. یکی ایجاد کنید تا تنظیمات به طور خودکار در شبکه های شناخته شده اعمال شود.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'افزودن نمایه';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'نام نمایه';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi شبکه (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'خانه، دفتر با کاما جدا شده است';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'دروازه های شبکه';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS شماره';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'اعمال خودکار';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'اگر خاموش باشد، پیش از اعمال نمایه تأیید خواسته می‌شود.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'تنظیمات فعلی را به خاطر بسپارید';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'تنظیمات فعلی در نمایه ذخیره شده است';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'حذف نمایه';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return 'نمایه \"$name\" حذف شود؟';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return 'نمایه \"$name\" اعمال شود؟';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'اعمال';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return 'نمایه «$name» اعمال شد';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'لغو';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'فعال';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'اکنون: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'اطلاعات شبکه در دسترس نیست';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'حداقل یک محرک اضافه کنید: SSID، دروازه یا ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'زنجیره های پروکسی';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty =>
+      'هنوز زنجیر وجود ندارد. 2-3 سرور را پیوند دهید تا ترافیک از طریق هر یک از آنها افزایش یابد.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'زنجیره جدید';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'نام زنجیر';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => '2 تا 3 سرور را انتخاب کنید';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => 'برای ترتیب مجدد بکشید: ترافیک در بالا وارد می شود و در پایین خارج می شود.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'حداقل 2 سرور انتخاب کنید';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'یک زنجیره حداکثر 3 سرور را در خود جای می دهد';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'تأخیر تخمینی';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'ذخیره زنجیره';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'حذف زنجیره';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return 'زنجیره \"$name\" حذف شود؟';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'موتور فعلی نمی تواند زنجیر بسازد';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'یکی از سرورهای زنجیره ای دیگر در دسترس نیست';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return 'گام $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'ورود';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'خروج';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'همگام سازی دستگاه';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'دستگاه های من';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'هیچ دستگاه جفت شده ای وجود ندارد. دستگاه دیگری را از طریق شبکه محلی جفت کنید.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'جفت کردن دستگاه';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'نمایش کد من';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'کد را اسکن کنید';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'برداشت';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return '\"$name\" لغو شود؟';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'آخرین همگام سازی: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'هرگز';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'دستگاه ها باید در یک شبکه محلی باشند';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'دستگاه جفت شد';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'با این دستگاه جفت شود';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'در انتظار دستگاه دیگر…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'کانال رمزگذاری شده سرتاسر. بدون حساب، بدون سرور ابری.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'برای ترافیک مستقیم شبکه، فیلتر DPI را دور بزنید';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'zapret را در کنار تونل VPN اجرا می‌کند: ترافیک تونل از VPN و ترافیک مستقیم از مسیر دور زدن محدودیت عبور می‌کند.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'هر سرور فقط یک بار می تواند ظاهر شود';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'ویرایش';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'حذف کنید';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'تغییر خودکار در تخریب';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'اگر سرور انتخابی بسیار کند شود یا پاسخ ندهد، Sora به بهترین سرور طبق اندازه‌گیری‌ها تغییر می‌کند، اما حداکثر یک بار در هر 10 دقیقه.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'مختلط';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'سیستم';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'افزودن سرور سفارشی';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'سرورهای من';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'نام';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'به عنوان مثال: VPS من';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'نام را وارد کنید';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'نشانی';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com یا 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'آدرس سرور را وارد کنید';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'آدرس نامعتبر است';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => 'درگاه';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'پورت باید از 1 تا 65535 باشد';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'پروتکل';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'اطلاعات ورود';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'اختیاری';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'نمایش راز';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'مخفی کردن راز';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'سفارشی';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return 'سرور \"$name\" حذف شود؟';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'سرور را به صورت دستی اضافه کنید: آدرس، پورت و پروتکل';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'آزمایش';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'تست نشت داده ها';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'بررسی می‌کند آیا ترافیک می‌تواند خارج از تونل از دستگاه خارج شود: درخواست‌های مستقیم DNS و ICMP، خروجی IPv6 و تحلیلگرهای نام سیستم. هنگام اتصال اجرا کنید.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'بررسی کنید';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'لغو';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'برای آزمایش نشت داده به VPN متصل شوید.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'آزمایشات تکمیل شده: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'هیچ نشتی یافت نشد';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# نشت پیدا شد', one: '# نشت پیدا شد');
     return '$_temp0';
   }
 
@@ -1852,131 +1855,132 @@ class SFa extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'رفع کنید';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'قطع اضطراری روشن است. برای بررسی، آزمایش را دوباره اجرا کنید.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'مستقیم DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP اکو';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'تحلیلگرهای نام سیستم';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'اتصال تونل';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS از طریق تونل';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => 'سرور کند شد. Sora به بهترین سروری که در حین اندازه‌گیری یافت شد تغییر داد.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'مبهم‌سازی ترافیک';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'کد منقضی شده است';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'سرویس همگام‌سازی راه‌اندازی نشد';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing =>
+      'مؤلفه sora-sync پیدا نشد. برای فعال کردن همگام سازی دستگاه، برنامه را دوباره نصب کنید.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'شروع سرویس همگام سازی…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth =>
+      'سرویس همگام‌سازی رمز دسترسی را رد کرد. برنامه را مجددا راه اندازی کنید و دوباره امتحان کنید.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'دستگاه دیگر جفت نشده است';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'یک جلسه جفت سازی از قبل باز است';
 
   @override
-  String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+  String get syncErrUnreachable => 'دستگاه دیگر پاسخ نداد. مطمئن شوید که در همان شبکه است و کد آن را نشان می دهد.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'خطای همگام سازی';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'کد پس از $duration منقضی می‌شود';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'جفت شدن با دستگاه…';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'لیست دستگاه های قدیمی هرگز جفت نشد، بنابراین پاک شد. دستگاه های خود را دوباره جفت کنید، این بار به صورت واقعی.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'کد جدید';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return 'جفت شده با $name';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'تکرار کنید';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'پنهان کردن کد';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'همگام‌سازی اکنون';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return '$pulled را دریافت کرد، $pushed را ارسال کرد';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'نتیجه همگام سازی';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'دریافت شد';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'ارسال شد';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'بدون تغییر';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'اشتراک ها';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'تنظیمات برنامه';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'تنظیمات جایگزین اشتراک‌ها';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'نمایه های شبکه';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'زنجیره های پروکسی';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return 'از $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'این دستگاه';
 
   @override
   String get syncUnavailableAndroid =>

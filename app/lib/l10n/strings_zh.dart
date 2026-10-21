@@ -132,7 +132,7 @@ class SZh extends S {
   String get logsEmpty => '这里什么都没有';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => '没有连接';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class SZh extends S {
   String get theme => '主题';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => '跟随系统';
 
   @override
   String get themeLight => '光';
@@ -292,7 +292,7 @@ class SZh extends S {
   String get language => '语言';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => '跟随系统';
 
   @override
   String get sectionConnection => '联系';
@@ -780,30 +780,26 @@ class SZh extends S {
   String get updateManualSigWarning => '下面的文件与版本的校验和一致。如果是从官方版本下载的，请运行该命令。';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版。';
 
   @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateRolloutPending => '新版本正分批推出，届时会自动通知您更新。';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return '正在回滚至版本 $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return '更新至 $version 后未通过运行检查，Sora 已回滚至 $fromVersion。';
   }
 
   @override
-  String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+  String get updateRollbackError => '自动回滚失败。若新版本无法运行，请手动重新安装先前的版本。';
 
   @override
-  String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+  String get updateRollbackCacheError => '无法准备目前版本的已验证回滚副本，因此未安装更新。';
 
   @override
   String get updateCopyCommand => '复制命令';
@@ -880,372 +876,368 @@ class SZh extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return '评分 $rating，满分 5 分';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return '作者：$author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return '安装次数：$count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 次安装';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => '已验证';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => '本周热门';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => '新';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Sora 团队';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => '非目录来源';
 
   @override
-  String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+  String get extSideloadWarning => '非来自团队目录。作者密钥仅由作者自行声明，请只在信任作者时安装。';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return '安装「$name」';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return '更新「$name」';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => '此扩展将能够：';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => '此更新要求新的权限：';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => '我了解这些权限的影响范围很大';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => '安装';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => '更新';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => '取消';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => '确认';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => '目录';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => '已安装';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => '搜寻扩展';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => '全部';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => '工具';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => '主题';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => '自动化';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => '统计';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => '网络';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => '排序方式';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => '最热门';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => '评分最高';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => '名称';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => '无法加载目录';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => '重试';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => '找不到结果';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled => '尚未安装扩展。\n请从目录中寻找，或从文件安装。';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => '从文件安装';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => '从 URL 安装';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => '下载';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => '正在下载…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => '正在验证…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => '正在安装…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => '安装失败';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => '签名验证失败。文件可能已损毁或遭到窜改。';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => '扩展的信息清单无效。';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => '网络错误，请检查连接后再试一次。';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => '下载的文件与目录不符，可能遭到窜改。';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return '此扩展需要应用程序 $version 或更新版本。';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => '仅允许 https:// 链接';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => '发生错误，请再试一次。';
 
   @override
-  String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+  String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => '有可用更新';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => '已停用';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return '启用 $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => '搜寻已安装的扩展';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => '全部更新';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '有 $count 个可用更新';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '已更新 $count 个';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => '一般';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => '敏感';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => '高风险';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => '不再要求：';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => '已保留先前安装的版本。';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => '扩展冲突';
 
   @override
   String get extConflictsIntro => '这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => '应用主题';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => '网络拦截挂钩';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '优先使用 $name';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '有 $count 个冲突需要您决定';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => '解决冲突';
 
   @override
-  String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+  String get extConflictNote => '你的选择会保存在此设备上。主题会立即切换，网络钩子在此版本中不运行。';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return '版本 $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => '作者';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => '评分';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => '安装次数';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => '版本';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => '关于';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => '权限';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => '不需要特殊权限。';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => '设置';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => '保存设置';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => '正在保存…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return '更新至 $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => '已启用';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return '回滚至 $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return '要回滚至版本 $version 吗？';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => '卸载';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return '要移除「$name」及其设置吗？';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => '面板无法使用，扩展可能已停用或移除。';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => '查看目前的连接清单';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => '查看您的服务器清单';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => '读取应用程序设置';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => '变更应用程序设置';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => '显示通知';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => '添加系统托盘菜单项';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => '在应用程序中显示面板';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => '应用应用程序主题';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => '添加路由规则（影响流量去向）';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => '介入网络传输路径（DPI 绕过模块）';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => '访问允许清单中的 URL';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => '执行后台任务';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+  String get extPermBackgroundDetail => '即使关闭面板，仍会执行计划工作。您可以在扩展设置中暂停工作或调整执行频率。';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => '在后台执行';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => '绕过机制与网络挂钩';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => '面板';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => '路由规则';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => '主题';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => '小组件';
 
   @override
   String extCatalogCached(String date) {
@@ -1253,45 +1245,44 @@ class SZh extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => '版本记录';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => '无法加载图片';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => '评分计算方式';
 
   @override
-  String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+  String get extRatingHowBody => '评分采用贝叶斯平均：评分数量较少的扩展会维持在中间值附近，直到有更多人评分，因此单一五星评价无法让新扩展登上榜首。近期评分的权重高于较早的评分，每个账号只计入一笔评分。';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => '截图';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => '相关性';
 
   @override
   String get extPermNetworkDetail => '通过 VPN 从互联网获取数据。只允许下方列出的主机，其余全部阻止。';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => '后台任务';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => '在后台执行';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => '执行间隔';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 分钟');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小时');
     return '$_temp0';
   }
 
@@ -1299,14 +1290,14 @@ class SZh extends S {
   String get extBgNote => '只要 Sora 处于打开状态（包括在托盘中），任务就会按计划运行。最短间隔为 15 分钟。';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => '请先启用扩展，才能管理后台任务。';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => '网络访问';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return '网络：$hosts';
   }
 
   @override
@@ -1321,61 +1312,61 @@ class SZh extends S {
   String get diagnosticNoData => '尚未记录请求。 首先打开一个速度测试网站。';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => '透过 QR 分享';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => '扫描 QR 码';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => '复制链接';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => '显示链接';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => '隐藏链接';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => '此 QR 码含有连接信息，请勿向陌生人展示。';
 
   @override
   String get qrScanHint => '选择包含二维码的截图或照片，或粘贴链接';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => '从剪贴板粘贴';
 
   @override
   String get qrNoCode => '此图片中未找到二维码。';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => '此 QR 码不含有效链接。';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => '扫描 QR';
 
   @override
   String get qrFromImage => '打开图片';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => '依进程分组';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => '列表视图';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => '复制主机名称';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => '添加规则';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 个连接');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => '预设';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1390,445 +1381,441 @@ class SZh extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => '自订';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => '检查泄漏';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => '正在检查...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => '未发现泄漏';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => '检测到泄漏';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => '上次检查';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => '尚未检查';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => '隧道 DNS 解析器';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => '系统解析器';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => '网络锁定的 DNS 保护';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => '请在上方的 DNS 设置中指定隧道 DNS。';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers => '检查系统在隧道外会使用哪些解析器。';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => '请启用网络锁定，让 DNS 流量保持在隧道内。';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => '操作系统加密 DNS';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'DNS 响应伪造';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns => '检查系统在隧道外使用的加密 DNS 端点。';
 
   @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+  String get dnsLeakFixUseEncryptedDns => '请为隧道使用加密 DNS（DoT 或 DoH），避免解析器伪造响应。';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => '请先连接 VPN，再检查是否泄漏。';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => '预期';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => '实际';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => '排序方式';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => '延迟';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => '速度';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => '名称';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => '测量速度';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => '已过时';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => '自动选择服务器';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => '最低延迟';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => '最高速度';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => '智能选择';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => '与核心的连接不稳定';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => '重新连接';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => '正在恢复与核心的连接…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => '上次会话意外中断';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => '崩溃后恢复会话';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => '恢复';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => '暂不';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => '我的修改';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => '编辑服务器';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => '隐藏';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => '显示';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => '清除修改';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => '尚无修改';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => '自订规则';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => '测速需要更新版本的核心';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return '正在测量 $done/$total…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => '网络配置文件';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty => '尚无配置文件。建立后，即可在已知网络中自动应用设置。';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => '添加配置文件';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => '配置文件名称';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi 网络（SSID）';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => '家庭、办公室，以逗号分隔';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => '网关';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS 编号';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => '自动应用';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => '关闭时，应用配置文件前会要求确认。';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => '记住当前设置';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => '当前设置已保存至配置文件';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => '删除配置文件';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return '要删除配置文件「$name」吗？';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return '要应用配置文件「$name」吗？';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => '应用';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return '已应用配置文件「$name」';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => '撤销';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => '使用中';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return '目前：$info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => '无法取得网络信息';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => '请至少添加一个触发条件：SSID、网关或 ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => '代理链';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => '尚无代理链。串接 2 至 3 台服务器，让流量依序通过每台服务器。';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => '添加代理链';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => '代理链名称';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => '选择 2 至 3 台服务器';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => '拖动以调整顺序：流量从上方进入，从下方离开。';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => '请至少选择 2 台服务器';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => '代理链最多包含 3 台服务器';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => '预估延迟';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => '保存代理链';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => '删除代理链';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return '要删除代理链「$name」吗？';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => '目前的引擎无法建立代理链';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => '代理链中的一台服务器已无法使用';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return '第 $n 跳';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => '入口';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => '出口';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => '设备同步';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => '我的设备';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => '尚无配对的设备。请透过局域网与另一台设备配对。';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => '配对设备';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => '显示我的代码';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => '扫描代码';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => '撤销';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return '要撤销「$name」吗？';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return '上次同步：$time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => '从未';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => '设备必须位于同一个局域网';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => '设备已配对';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => '与此设备配对';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => '正在等待另一台设备…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => '通道采用端到端加密，无需账号或云服务器。';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => '直接连接流量的 DPI 绕过';
 
   @override
-  String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+  String get zapretWithVpnHint => '与 VPN 隧道并行执行 zapret：隧道流量使用 VPN，直接连接流量则透过绕过机制。';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => '每台服务器只能选择一次';
 
   @override
-  String get edit => 'Edit';
+  String get edit => '编辑';
 
   @override
-  String get remove => 'Remove';
+  String get remove => '移除';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => '质量下降时自动切换';
 
   @override
-  String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+  String get autoSwitchOnDegradeDetail => '若所选服务器大幅变慢或停止回应，Sora 会切换至测量结果最佳的服务器，最多每 10 分钟切换一次。';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => '混合';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => '系统';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => '添加自订服务器';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => '我的服务器';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => '名称';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => '例如：我的 VPS';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => '请输入名称';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => '地址';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com 或 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => '请输入服务器地址';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => '地址无效';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => '端口';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => '端口必须是 1 到 65535 之间的数字';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => '协议';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => '登录信息';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => '可选';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => '显示密钥';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => '隐藏密钥';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => '自订';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return '要删除服务器「$name」吗？';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => '手动添加服务器：地址、端口和协议';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => '测试';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => '泄漏测试';
 
   @override
-  String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+  String get leakTestIntro => '检查流量能否不经隧道离开设备：包括直接 DNS 和 ICMP 请求、IPv6 对外流量以及系统解析器。请在连接时执行。';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => '执行测试';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => '取消';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => '请先连接，再执行泄漏测试。';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return '已完成测试：$count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => '未发现泄漏';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '发现 # 处泄漏');
     return '$_temp0';
   }
 
@@ -1836,131 +1823,129 @@ class SZh extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => '修复';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => '已启用网络锁定，请重新测试以确认。';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => '直接 DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP 回显';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => '系统解析器';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => '隧道连接状态';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => '隧道 DNS';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => '服务器变慢，已切换至测量结果最佳的服务器';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => '流量混淆';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => '代码已到期';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => '无法启动同步服务';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing => '找不到 sora-sync 元件。请重新安装应用程序以启用设备同步。';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => '正在启动同步服务…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => '同步服务拒绝了访问令牌。请重新启动应用程序后再试一次。';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => '此设备已解除配对';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => '已有进行中的配对会话';
 
   @override
-  String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+  String get syncErrUnreachable => '另一台设备没有回应。请确认设备位于同一个网络，且正在显示配对代码。';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => '同步错误';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return '代码将在 $duration 后到期';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => '正在与设备配对…';
 
   @override
-  String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+  String get syncLegacyCleared => '旧设备清单未曾完成实际配对，因此已清除。请重新配对设备，这次会真正建立配对。';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => '新代码';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return '已与 $name 配对';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => '重试';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => '隐藏代码';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => '立即同步';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return '已接收 $pulled，已发送 $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => '同步结果';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => '已接收';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => '已发送';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => '没有更改';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => '订阅';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => '应用程序设置';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => '订阅覆盖设置';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => '网络配置文件';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => '代理链';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return '来自 $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => '此设备';
 
   @override
   String get syncUnavailableAndroid =>
@@ -2162,7 +2147,7 @@ class SZhHans extends SZh {
   String get logsEmpty => '这里什么都没有';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => '没有连接';
 
   @override
   String appVersion(String version) {
@@ -2310,7 +2295,7 @@ class SZhHans extends SZh {
   String get theme => '主题';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => '跟随系统';
 
   @override
   String get themeLight => '光';
@@ -2322,7 +2307,7 @@ class SZhHans extends SZh {
   String get language => '语言';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => '跟随系统';
 
   @override
   String get sectionConnection => '联系';
@@ -2810,30 +2795,26 @@ class SZhHans extends SZh {
   String get updateManualSigWarning => '下面的文件与版本的校验和一致。如果是从官方版本下载的，请运行该命令。';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版。';
 
   @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateRolloutPending => '新版本正分批推出，届时会自动通知您更新。';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return '正在回滚至版本 $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return '更新至 $version 后未通过运行检查，Sora 已回滚至 $fromVersion。';
   }
 
   @override
-  String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+  String get updateRollbackError => '自动回滚失败。若新版本无法运行，请手动重新安装先前的版本。';
 
   @override
-  String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+  String get updateRollbackCacheError => '无法准备目前版本的已验证回滚副本，因此未安装更新。';
 
   @override
   String get updateCopyCommand => '复制命令';
@@ -2910,372 +2891,368 @@ class SZhHans extends SZh {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return '评分 $rating，满分 5 分';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return '作者：$author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return '安装次数：$count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 次安装';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => '已验证';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => '本周热门';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => '新';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Sora 团队';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => '非目录来源';
 
   @override
-  String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+  String get extSideloadWarning => '非来自团队目录。作者密钥仅由作者自行声明，请只在信任作者时安装。';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return '安装「$name」';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return '更新「$name」';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => '此扩展将能够：';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => '此更新要求新的权限：';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => '我了解这些权限的影响范围很大';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => '安装';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => '更新';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => '取消';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => '确认';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => '目录';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => '已安装';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => '搜寻扩展';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => '全部';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => '工具';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => '主题';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => '自动化';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => '统计';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => '网络';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => '排序方式';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => '最热门';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => '评分最高';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => '名称';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => '无法加载目录';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => '重试';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => '找不到结果';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled => '尚未安装扩展。\n请从目录中寻找，或从文件安装。';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => '从文件安装';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => '从 URL 安装';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => '下载';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => '正在下载…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => '正在验证…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => '正在安装…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => '安装失败';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => '签名验证失败。文件可能已损毁或遭到窜改。';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => '扩展的信息清单无效。';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => '网络错误，请检查连接后再试一次。';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => '下载的文件与目录不符，可能遭到窜改。';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return '此扩展需要应用程序 $version 或更新版本。';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => '仅允许 https:// 链接';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => '发生错误，请再试一次。';
 
   @override
-  String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+  String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => '有可用更新';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => '已停用';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return '启用 $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => '搜寻已安装的扩展';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => '全部更新';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '有 $count 个可用更新';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '已更新 $count 个';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => '一般';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => '敏感';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => '高风险';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => '不再要求：';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => '已保留先前安装的版本。';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => '扩展冲突';
 
   @override
   String get extConflictsIntro => '这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => '应用主题';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => '网络拦截挂钩';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '优先使用 $name';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '有 $count 个冲突需要您决定';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => '解决冲突';
 
   @override
-  String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+  String get extConflictNote => '你的选择会保存在此设备上。主题会立即切换，网络钩子在此版本中不运行。';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return '版本 $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => '作者';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => '评分';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => '安装次数';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => '版本';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => '关于';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => '权限';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => '不需要特殊权限。';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => '设置';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => '保存设置';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => '正在保存…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return '更新至 $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => '已启用';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return '回滚至 $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return '要回滚至版本 $version 吗？';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => '卸载';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return '要移除「$name」及其设置吗？';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => '面板无法使用，扩展可能已停用或移除。';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => '查看目前的连接清单';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => '查看您的服务器清单';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => '读取应用程序设置';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => '变更应用程序设置';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => '显示通知';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => '添加系统托盘菜单项';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => '在应用程序中显示面板';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => '应用应用程序主题';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => '添加路由规则（影响流量去向）';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => '介入网络传输路径（DPI 绕过模块）';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => '访问允许清单中的 URL';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => '执行后台任务';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+  String get extPermBackgroundDetail => '即使关闭面板，仍会执行计划工作。您可以在扩展设置中暂停工作或调整执行频率。';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => '在后台执行';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => '绕过机制与网络挂钩';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => '面板';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => '路由规则';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => '主题';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => '小组件';
 
   @override
   String extCatalogCached(String date) {
@@ -3283,45 +3260,44 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => '版本记录';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => '无法加载图片';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => '评分计算方式';
 
   @override
-  String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+  String get extRatingHowBody => '评分采用贝叶斯平均：评分数量较少的扩展会维持在中间值附近，直到有更多人评分，因此单一五星评价无法让新扩展登上榜首。近期评分的权重高于较早的评分，每个账号只计入一笔评分。';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => '截图';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => '相关性';
 
   @override
   String get extPermNetworkDetail => '通过 VPN 从互联网获取数据。只允许下方列出的主机，其余全部阻止。';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => '后台任务';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => '在后台执行';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => '执行间隔';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 分钟');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小时');
     return '$_temp0';
   }
 
@@ -3329,14 +3305,14 @@ class SZhHans extends SZh {
   String get extBgNote => '只要 Sora 处于打开状态（包括在托盘中），任务就会按计划运行。最短间隔为 15 分钟。';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => '请先启用扩展，才能管理后台任务。';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => '网络访问';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return '网络：$hosts';
   }
 
   @override
@@ -3351,61 +3327,61 @@ class SZhHans extends SZh {
   String get diagnosticNoData => '尚未记录请求。 首先打开一个速度测试网站。';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => '透过 QR 分享';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => '扫描 QR 码';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => '复制链接';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => '显示链接';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => '隐藏链接';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => '此 QR 码含有连接信息，请勿向陌生人展示。';
 
   @override
   String get qrScanHint => '选择包含二维码的截图或照片，或粘贴链接';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => '从剪贴板粘贴';
 
   @override
   String get qrNoCode => '此图片中未找到二维码。';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => '此 QR 码不含有效链接。';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => '扫描 QR';
 
   @override
   String get qrFromImage => '打开图片';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => '依进程分组';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => '列表视图';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => '复制主机名称';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => '添加规则';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 个连接');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => '预设';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -3420,445 +3396,441 @@ class SZhHans extends SZh {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => '自订';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => '检查泄漏';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => '正在检查...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => '未发现泄漏';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => '检测到泄漏';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => '上次检查';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => '尚未检查';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => '隧道 DNS 解析器';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => '系统解析器';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => '网络锁定的 DNS 保护';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => '请在上方的 DNS 设置中指定隧道 DNS。';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers => '检查系统在隧道外会使用哪些解析器。';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => '请启用网络锁定，让 DNS 流量保持在隧道内。';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => '操作系统加密 DNS';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'DNS 响应伪造';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns => '检查系统在隧道外使用的加密 DNS 端点。';
 
   @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+  String get dnsLeakFixUseEncryptedDns => '请为隧道使用加密 DNS（DoT 或 DoH），避免解析器伪造响应。';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => '请先连接 VPN，再检查是否泄漏。';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => '预期';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => '实际';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => '排序方式';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => '延迟';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => '速度';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => '名称';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => '测量速度';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => '已过时';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => '自动选择服务器';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => '最低延迟';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => '最高速度';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => '智能选择';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => '与核心的连接不稳定';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => '重新连接';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => '正在恢复与核心的连接…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => '上次会话意外中断';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => '崩溃后恢复会话';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => '恢复';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => '暂不';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => '我的修改';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => '编辑服务器';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => '隐藏';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => '显示';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => '清除修改';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => '尚无修改';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => '自订规则';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => '测速需要更新版本的核心';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return '正在测量 $done/$total…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => '网络配置文件';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty => '尚无配置文件。建立后，即可在已知网络中自动应用设置。';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => '添加配置文件';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => '配置文件名称';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi 网络（SSID）';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => '家庭、办公室，以逗号分隔';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => '网关';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS 编号';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => '自动应用';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => '关闭时，应用配置文件前会要求确认。';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => '记住当前设置';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => '当前设置已保存至配置文件';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => '删除配置文件';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return '要删除配置文件「$name」吗？';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return '要应用配置文件「$name」吗？';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => '应用';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return '已应用配置文件「$name」';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => '撤销';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => '使用中';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return '目前：$info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => '无法取得网络信息';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => '请至少添加一个触发条件：SSID、网关或 ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => '代理链';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => '尚无代理链。串接 2 至 3 台服务器，让流量依序通过每台服务器。';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => '添加代理链';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => '代理链名称';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => '选择 2 至 3 台服务器';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => '拖动以调整顺序：流量从上方进入，从下方离开。';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => '请至少选择 2 台服务器';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => '代理链最多包含 3 台服务器';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => '预估延迟';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => '保存代理链';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => '删除代理链';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return '要删除代理链「$name」吗？';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => '目前的引擎无法建立代理链';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => '代理链中的一台服务器已无法使用';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return '第 $n 跳';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => '入口';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => '出口';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => '设备同步';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => '我的设备';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => '尚无配对的设备。请透过局域网与另一台设备配对。';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => '配对设备';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => '显示我的代码';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => '扫描代码';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => '撤销';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return '要撤销「$name」吗？';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return '上次同步：$time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => '从未';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => '设备必须位于同一个局域网';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => '设备已配对';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => '与此设备配对';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => '正在等待另一台设备…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => '通道采用端到端加密，无需账号或云服务器。';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => '直接连接流量的 DPI 绕过';
 
   @override
-  String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+  String get zapretWithVpnHint => '与 VPN 隧道并行执行 zapret：隧道流量使用 VPN，直接连接流量则透过绕过机制。';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => '每台服务器只能选择一次';
 
   @override
-  String get edit => 'Edit';
+  String get edit => '编辑';
 
   @override
-  String get remove => 'Remove';
+  String get remove => '移除';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => '质量下降时自动切换';
 
   @override
-  String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+  String get autoSwitchOnDegradeDetail => '若所选服务器大幅变慢或停止回应，Sora 会切换至测量结果最佳的服务器，最多每 10 分钟切换一次。';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => '混合';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => '系统';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => '添加自订服务器';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => '我的服务器';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => '名称';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => '例如：我的 VPS';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => '请输入名称';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => '地址';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com 或 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => '请输入服务器地址';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => '地址无效';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => '端口';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => '端口必须是 1 到 65535 之间的数字';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => '协议';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => '登录信息';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => '可选';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => '显示密钥';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => '隐藏密钥';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => '自订';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return '要删除服务器「$name」吗？';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => '手动添加服务器：地址、端口和协议';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => '测试';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => '泄漏测试';
 
   @override
-  String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+  String get leakTestIntro => '检查流量能否不经隧道离开设备：包括直接 DNS 和 ICMP 请求、IPv6 对外流量以及系统解析器。请在连接时执行。';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => '执行测试';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => '取消';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => '请先连接，再执行泄漏测试。';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return '已完成测试：$count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => '未发现泄漏';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '发现 # 处泄漏');
     return '$_temp0';
   }
 
@@ -3866,131 +3838,129 @@ class SZhHans extends SZh {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => '修复';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => '已启用网络锁定，请重新测试以确认。';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => '直接 DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP 回显';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => '系统解析器';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => '隧道连接状态';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => '隧道 DNS';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => '服务器变慢，已切换至测量结果最佳的服务器';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => '流量混淆';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => '代码已到期';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => '无法启动同步服务';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing => '找不到 sora-sync 元件。请重新安装应用程序以启用设备同步。';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => '正在启动同步服务…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => '同步服务拒绝了访问令牌。请重新启动应用程序后再试一次。';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => '此设备已解除配对';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => '已有进行中的配对会话';
 
   @override
-  String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+  String get syncErrUnreachable => '另一台设备没有回应。请确认设备位于同一个网络，且正在显示配对代码。';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => '同步错误';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return '代码将在 $duration 后到期';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => '正在与设备配对…';
 
   @override
-  String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+  String get syncLegacyCleared => '旧设备清单未曾完成实际配对，因此已清除。请重新配对设备，这次会真正建立配对。';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => '新代码';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return '已与 $name 配对';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => '重试';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => '隐藏代码';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => '立即同步';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return '已接收 $pulled，已发送 $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => '同步结果';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => '已接收';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => '已发送';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => '没有更改';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => '订阅';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => '应用程序设置';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => '订阅覆盖设置';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => '网络配置文件';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => '代理链';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return '来自 $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => '此设备';
 
   @override
   String get syncUnavailableAndroid =>
@@ -4192,7 +4162,7 @@ class SZhHant extends SZh {
   String get logsEmpty => '這裡什麼都沒有';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => '沒有連接';
 
   @override
   String appVersion(String version) {
@@ -4340,7 +4310,7 @@ class SZhHant extends SZh {
   String get theme => '主題';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => '跟隨系統';
 
   @override
   String get themeLight => '光';
@@ -4352,7 +4322,7 @@ class SZhHant extends SZh {
   String get language => '語言';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => '跟隨系統';
 
   @override
   String get sectionConnection => '聯繫';
@@ -4840,30 +4810,26 @@ class SZhHant extends SZh {
   String get updateManualSigWarning => '下方檔案與版本的檢查碼相符。如果是從官方版本下載的，請執行該指令。';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => '開發者已撤回此版本，請等待修正版。';
 
   @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateRolloutPending => '新版本正分批推出，屆時會自動通知您更新。';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return '正在還原至版本 $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return '更新至 $version 後未通過運作檢查，Sora 已還原至 $fromVersion。';
   }
 
   @override
-  String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+  String get updateRollbackError => '自動還原失敗。若新版本無法運作，請手動重新安裝先前的版本。';
 
   @override
-  String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+  String get updateRollbackCacheError => '無法準備目前版本的已驗證還原副本，因此未安裝更新。';
 
   @override
   String get updateCopyCommand => '複製指令';
@@ -4940,372 +4906,368 @@ class SZhHant extends SZh {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return '評分 $rating，滿分 5 分';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return '作者：$author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return '安裝次數：$count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 次安裝';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => '已驗證';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => '本週熱門';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => '最新';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Sora 團隊';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => '非來自目錄';
 
   @override
-  String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+  String get extSideloadWarning => '非來自團隊目錄。作者金鑰僅由作者自行聲明，請只在信任作者時安裝。';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return '安裝「$name」';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return '更新「$name」';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => '此擴充功能將能夠：';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => '此更新要求新的權限：';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => '我瞭解這些權限的影響範圍很大';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => '安裝';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => '更新';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => '取消';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => '確認';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => '目錄';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => '已安裝';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => '搜尋擴充功能';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => '全部';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => '工具';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => '佈景主題';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => '自動化';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => '統計';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => '網路';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => '排序方式';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => '最熱門';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => '評分最高';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => '名稱';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => '無法載入目錄';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => '重試';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => '找不到結果';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled => '尚未安裝擴充功能。\n請從目錄中尋找，或從檔案安裝。';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => '從檔案安裝';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => '從 URL 安裝';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => '下載';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => '正在下載…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => '正在驗證…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => '正在安裝…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => '安裝失敗';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => '簽章驗證失敗。檔案可能已損毀或遭到竄改。';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => '擴充功能的資訊清單無效。';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => '網路錯誤，請檢查連接後再試一次。';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => '下載的檔案與目錄不符，可能遭到竄改。';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return '此擴充功能需要應用程式 $version 或更新版本。';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => '僅允許 https:// 連結';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => '發生錯誤，請再試一次。';
 
   @override
-  String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+  String get extErrAuthorKeyChanged => '此更新的作者簽署金鑰與已安裝版本不同，因此已遭封鎖。若您信任新金鑰，請先解除安裝擴充功能，再自行重新安裝。';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => '有可用更新';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => '已停用';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return '啟用 $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => '搜尋已安裝的擴充功能';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => '全部更新';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '有 $count 個可用更新';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '已更新 $count 個';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => '一般';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => '敏感';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => '高風險';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => '不再要求：';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => '已保留先前安裝的版本。';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => '擴充功能衝突';
 
   @override
   String get extConflictsIntro => '這些擴充功能想要同一樣東西。選擇要讓哪個執行，另一個仍保持安裝。';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => '應用程式佈景主題';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => '網路攔截掛鉤';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '優先使用 $name';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '有 $count 個衝突需要您決定';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => '解決衝突';
 
   @override
-  String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+  String get extConflictNote => '你的選擇會儲存在此裝置上。主題會立即切換，網路掛鉤在此版本中不會執行。';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return '版本 $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => '作者';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => '評分';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => '安裝次數';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => '版本';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => '關於';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => '權限';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => '不需要特殊權限。';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => '設定';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => '儲存設定';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => '正在儲存…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return '更新至 $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => '已啟用';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return '還原至 $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return '要還原至版本 $version 嗎？';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => '解除安裝';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return '要移除「$name」及其設定嗎？';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => '面板無法使用，擴充功能可能已停用或移除。';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => '查看目前的連接清單';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => '查看您的伺服器清單';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => '讀取應用程式設定';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => '變更應用程式設定';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => '顯示通知';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => '新增系統匣選單項目';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => '在應用程式中顯示面板';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => '套用應用程式佈景主題';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => '新增路由規則（影響流量去向）';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => '介入網路傳輸路徑（DPI 繞過模組）';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => '存取允許清單中的 URL';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => '執行背景工作';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+  String get extPermBackgroundDetail => '即使關閉面板，仍會執行排程工作。您可以在擴充功能設定中暫停工作或調整執行頻率。';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => '在背景執行';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => '繞過機制與網路掛鉤';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => '面板';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => '路由規則';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => '佈景主題';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => '小工具';
 
   @override
   String extCatalogCached(String date) {
@@ -5313,45 +5275,45 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => '版本記錄';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => '無法載入圖片';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => '評分計算方式';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      '評分採用貝氏平均：評分數量較少的擴充功能會維持在中間值附近，直到有更多人評分，因此單一五星評價無法讓新擴充功能登上榜首。近期評分的權重高於較早的評分，每個帳號只計入一筆評分。';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => '螢幕擷取畫面';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => '相關程度';
 
   @override
   String get extPermNetworkDetail => '透過 VPN 從網際網路取得資料。只允許下方列出的主機，其餘全部封鎖。';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => '背景工作';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => '在背景執行';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => '執行間隔';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 分鐘');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小時');
     return '$_temp0';
   }
 
@@ -5359,14 +5321,14 @@ class SZhHant extends SZh {
   String get extBgNote => '只要 Sora 處於開啟狀態（包括在系統匣中），工作就會依排程執行。最短間隔為 15 分鐘。';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => '請先啟用擴充功能，才能管理背景工作。';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => '網路存取';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return '網路：$hosts';
   }
 
   @override
@@ -5381,61 +5343,61 @@ class SZhHant extends SZh {
   String get diagnosticNoData => '尚未記錄請求。 首先打開一個速度測試網站。';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => '透過 QR 分享';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => '掃描 QR 碼';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => '複製連結';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => '顯示連結';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => '隱藏連結';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => '此 QR 碼含有連接資訊，請勿向陌生人展示。';
 
   @override
   String get qrScanHint => '選擇包含 QR 碼的截圖或相片，或貼上連結';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => '從剪貼簿貼上';
 
   @override
   String get qrNoCode => '此圖片中找不到 QR 碼。';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => '此 QR 碼不含有效連結。';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => '掃描 QR';
 
   @override
   String get qrFromImage => '開啟圖片';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => '依處理程序分組';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => '清單檢視';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => '複製主機名稱';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => '新增規則';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 個連接');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => '預設組態';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -5450,445 +5412,441 @@ class SZhHant extends SZh {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => '自訂';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => '檢查洩漏';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => '正在檢查...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => '未發現洩漏';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => '偵測到洩漏';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => '上次檢查';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => '尚未檢查';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => '通道 DNS 解析器';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => '系統解析器';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => '網路鎖定的 DNS 保護';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => '請在上方的 DNS 設定中指定通道 DNS。';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers => '檢查系統在通道外會使用哪些解析器。';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => '請啟用網路鎖定，讓 DNS 流量保持在通道內。';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => '作業系統加密 DNS';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'DNS 回應偽造';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns => '檢查系統在通道外使用的加密 DNS 端點。';
 
   @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+  String get dnsLeakFixUseEncryptedDns => '請為通道使用加密 DNS（DoT 或 DoH），避免解析器偽造回應。';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => '請先連接 VPN，再檢查是否洩漏。';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => '預期';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => '實際';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => '排序方式';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => '延遲';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => '速度';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => '名稱';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => '測量速度';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => '已過時';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => '自動選擇伺服器';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => '最低延遲';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => '最高速度';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => '智慧選擇';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => '與核心的連接不穩定';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => '重新連接';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => '正在恢復與核心的連接…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => '上次工作階段意外中斷';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => '當機後還原工作階段';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => '還原';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => '暫時不要';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => '我的修改';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => '編輯伺服器';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => '隱藏';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => '顯示';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => '清除修改';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => '尚無修改';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => '自訂規則';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => '測速需要更新版本的核心';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return '正在測量 $done/$total…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => '網路設定檔';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty => '尚無設定檔。建立後，即可在已知網路中自動套用設定。';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => '新增設定檔';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => '設定檔名稱';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi 網路（SSID）';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => '住家、辦公室，以逗號分隔';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => '閘道';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS 編號';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => '自動套用';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => '關閉時，套用設定檔前會要求確認。';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => '記住目前設定';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => '目前設定已儲存至設定檔';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => '刪除設定檔';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return '要刪除設定檔「$name」嗎？';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return '要套用設定檔「$name」嗎？';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => '套用';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return '已套用設定檔「$name」';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => '復原';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => '使用中';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return '目前：$info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => '無法取得網路資訊';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => '請至少新增一個觸發條件：SSID、閘道或 ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => '代理鏈';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => '尚無代理鏈。串接 2 至 3 台伺服器，讓流量依序通過每台伺服器。';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => '新增代理鏈';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => '代理鏈名稱';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => '選擇 2 至 3 台伺服器';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => '拖曳以調整順序：流量從上方進入，從下方離開。';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => '請至少選擇 2 台伺服器';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => '代理鏈最多包含 3 台伺服器';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => '預估延遲';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => '儲存代理鏈';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => '刪除代理鏈';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return '要刪除代理鏈「$name」嗎？';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => '目前的引擎無法建立代理鏈';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => '代理鏈中的一台伺服器已無法使用';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return '第 $n 跳';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => '入口';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => '出口';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => '裝置同步';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => '我的裝置';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => '尚無配對的裝置。請透過區域網路與另一台裝置配對。';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => '配對裝置';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => '顯示我的代碼';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => '掃描代碼';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => '撤銷';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return '要撤銷「$name」嗎？';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return '上次同步：$time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => '從未';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => '裝置必須位於同一個區域網路';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => '裝置已配對';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => '與此裝置配對';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => '正在等待另一台裝置…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => '通道採用端對端加密，不需要帳號或雲端伺服器。';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => '直接連線流量的 DPI 繞過';
 
   @override
-  String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+  String get zapretWithVpnHint => '與 VPN 通道並行執行 zapret：通道流量使用 VPN，直接連線流量則透過繞過機制。';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => '每台伺服器只能選擇一次';
 
   @override
-  String get edit => 'Edit';
+  String get edit => '編輯';
 
   @override
-  String get remove => 'Remove';
+  String get remove => '移除';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => '品質下降時自動切換';
 
   @override
-  String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+  String get autoSwitchOnDegradeDetail => '若所選伺服器大幅變慢或停止回應，Sora 會切換至測量結果最佳的伺服器，最多每 10 分鐘切換一次。';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => '混合';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => '系統';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => '新增自訂伺服器';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => '我的伺服器';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => '名稱';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => '例如：我的 VPS';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => '請輸入名稱';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => '位址';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com 或 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => '請輸入伺服器位址';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => '位址無效';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => '連接埠';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => '連接埠必須是 1 到 65535 之間的數字';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => '協定';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => '登入資訊';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => '選填';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => '顯示機密資訊';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => '隱藏機密資訊';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => '自訂';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return '要刪除伺服器「$name」嗎？';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => '手動新增伺服器：位址、連接埠和協定';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => '測試';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => '洩漏測試';
 
   @override
-  String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+  String get leakTestIntro => '檢查流量能否不經通道離開裝置：包括直接 DNS 和 ICMP 請求、IPv6 對外流量以及系統解析器。請在連接時執行。';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => '執行測試';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => '取消';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => '請先連接，再執行洩漏測試。';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return '已完成測試：$count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => '未發現洩漏';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '發現 # 處洩漏');
     return '$_temp0';
   }
 
@@ -5896,131 +5854,129 @@ class SZhHant extends SZh {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => '修正';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => '已啟用網路鎖定，請重新測試以確認。';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => '直接 DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP 回應';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => '系統解析器';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => '通道連接狀態';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => '通道 DNS';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => '伺服器變慢，已切換至測量結果最佳的伺服器';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => '流量混淆';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => '代碼已到期';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => '無法啟動同步服務';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing => '找不到 sora-sync 元件。請重新安裝應用程式以啟用裝置同步。';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => '正在啟動同步服務…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => '同步服務拒絕了存取權杖。請重新啟動應用程式後再試一次。';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => '此裝置已解除配對';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => '已有進行中的配對工作階段';
 
   @override
-  String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+  String get syncErrUnreachable => '另一台裝置沒有回應。請確認裝置位於同一個網路，且正在顯示配對代碼。';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => '同步錯誤';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return '代碼將在 $duration 後到期';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => '正在與裝置配對…';
 
   @override
-  String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+  String get syncLegacyCleared => '舊裝置清單未曾完成實際配對，因此已清除。請重新配對裝置，這次會真正建立配對。';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => '新代碼';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return '已與 $name 配對';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => '重試';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => '隱藏代碼';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => '立即同步';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return '已接收 $pulled，已傳送 $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => '同步結果';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => '已接收';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => '已傳送';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => '沒有變更';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => '訂閱';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => '應用程式設定';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => '訂閱覆寫設定';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => '網路設定檔';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => '代理鏈';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return '來自 $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => '此裝置';
 
   @override
   String get syncUnavailableAndroid =>

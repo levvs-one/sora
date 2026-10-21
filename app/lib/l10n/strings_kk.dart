@@ -132,7 +132,7 @@ class SKk extends S {
   String get logsEmpty => 'Мұнда ештеңе жоқ';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'Қосылымдар жоқ';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class SKk extends S {
   String get theme => 'Тақырып';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Жүйедегідей';
 
   @override
   String get themeLight => 'Жарық';
@@ -292,7 +292,7 @@ class SKk extends S {
   String get language => 'Тіл';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Жүйедегідей';
 
   @override
   String get sectionConnection => 'Байланыс';
@@ -791,30 +791,28 @@ class SKk extends S {
       'Төмендегі файлдар шығарылымның бақылау сомаларына сәйкес келеді. Оларды ресми шығарылымнан жүктесеңіз, пәрменді орындаңыз.';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => 'Әзірлеуші бұл нұсқаны қайтарып алды. Түзетілген шығарылымды күтіңіз.';
 
   @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateRolloutPending => 'Жаңарақ нұсқасы бірте-бірте шығарылады және сізге автоматты түрде ұсынылады.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return '$version нұсқасына оралу...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return '$version жаңартуы денсаулық тексеруінен өтпеді, сондықтан Sora $fromVersion нұсқасына қайтарылды.';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'Автоматты кері қайтару сәтсіз аяқталды. Жаңа нұсқа жұмыс істемесе, алдыңғы шығарылымды қолмен қайта орнатыңыз.';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'Ағымдағы нұсқаның расталған кері қайтару көшірмесін дайындау мүмкін болмады, сондықтан жаңарту орнатылмады.';
 
   @override
   String get updateCopyCommand => 'Көшіру пәрмені';
@@ -893,373 +891,374 @@ class SKk extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'Бағалау $rating/5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return 'авторы $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return 'Орнатулар: $count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 орнату';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'Тексерілді';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'Осы аптада ең танымал';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'Жаңа';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Sora командасы';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'Каталогтан емес';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'Бұл кеңейтім топ каталогынан емес. Тек автор олардың кілтіне кепілдік берді: авторға сенсеңіз ғана орнатыңыз.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return '«$name» орнату';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return '«$name» жаңарту';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'Бұл кеңейтім келесі әрекеттерді орындай алады:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'Жаңарту жаңа рұқсаттарды сұрайды:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'Мен бұл рұқсаттардың маңызды екенін түсінемін';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'Орнату';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'Жаңарту';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'Болдырмау';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'Растау';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'Каталог';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'Орнатылған кеңейтімдер';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'Кеңейтімдерді іздеу';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'Барлығы';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'Құралдар';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'Тақырыптар';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'Автоматтандыру';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'Статистика';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'Желі';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'Сұрыптау';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'Ең танымал';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'Ең жоғары баға';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'Аты';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'Каталогты жүктеу мүмкін болмады';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'Қайталап көріңіз';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'Ештеңе табылмады';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled =>
+      'Әлі ешқандай кеңейтімдер орнатылмаған.\nКаталогтан біреуін табыңыз немесе файлдан орнатыңыз.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'Файлдан орнату';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'URL бастап орнату';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'Жүктеп алу';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'Жүктеп алынуда…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'Тексерілуде…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'Орнатуда…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'Орнату сәтсіз аяқталды';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'Қолтаңбаны тексеру сәтсіз аяқталды. Файл зақымдалған немесе бұрмаланған болуы мүмкін.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'Кеңейтім манифесті жарамсыз.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'Желі қатесі. Байланысты тексеріп, әрекетті қайталаңыз.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'Жүктеп алу каталогқа сәйкес келмейді. Ол бұрмаланған болуы мүмкін.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'Бұл кеңейтім қолданбаның $version немесе одан жаңа нұсқасын қажет етеді.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'Тек https:// сілтемелерге рұқсат етілген';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'Бірдеңе дұрыс болмады. Қайталап көріңіз.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'Бұл жаңарту орнатылған нұсқаға қарағанда басқа автор кілтімен қол қойылған, сондықтан ол бұғатталды. Жаңа кілтке сенсеңіз, кеңейтімді жойып, оны қайта орнатыңыз.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'Жаңарту қолжетімді';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'Өшірулі';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return '$name қосу';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'Орнатылған кеңейтімдерді іздеу';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'Барлығын жаңарту';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count жаңартулар қолжетімді';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count жаңартылды';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => 'Қалыпты';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'Сезімтал';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'Жоғары тәуекел';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'Енді сұралмаған:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'Алдыңғы нұсқа әлі де орнатылған.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'Кеңейтім қайшылықтары';
 
   @override
   String get extConflictsIntro =>
       'Бұл кеңейтулер бір нәрсені қалайды. Қайсысы жұмыс істейтінін таңдаңыз, екіншісі орнатылған күйде қалады.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'Қолданба тақырыбы';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'Желі ілмектері';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return 'Басымдық: $name';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count қақтығыстар сіздің шешіміңізді қажет етеді';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'Қайшылықтарды шешу';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'Таңдауыңыз осы құрылғыда сақталады. Тақырып бірден ауысады, желілік хуктар бұл нұсқада іске қосылмайды.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'Нұсқа $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'Автор';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'Рейтинг';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'Орнатулар';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'Нұсқа';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'Осы кеңейтім туралы';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'Рұқсаттар';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'Арнайы рұқсаттар жоқ.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'Параметрлер';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'Параметрлерді сақтау';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'Сақталуда…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return '$version дейін жаңарту';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'Қосулы';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return '$version қалпына қайтару';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return '$version нұсқасына қайтару керек пе?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'Жою';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return '“$name” және оның параметрлерін жою керек пе?';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => 'Панель қолжетімді емес. Кеңейтім өшірілген немесе жойылған болуы мүмкін.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'Белсенді қосылымдар тізімін қараңыз';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'Серверлер тізімін қараңыз';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'Қолданба параметрлерін оқыңыз';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'Қолданба параметрлерін өзгерту';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'Хабарландыруларды көрсету';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'Науа мәзіріне элементтерді қосыңыз';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'Қолданбаның ішіндегі панельдерді көрсету';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'Тақырыптарды қолдану';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'Маршруттау ережелерін қосу (желі трафигі қай жерде жүретініне әсер етеді)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'Желі жолына біріктіру (DPI айналып өту модульдері)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'Рұқсат етілген тізімнен URL сұрау';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'Фондық тапсырмаларды іске қосыңыз';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'Тіпті панель жабылған кезде де жоспарланған тапсырмаларды іске қосады. Кеңейтім параметрлерінде оны кідіртуге немесе қаншалықты жиі жұмыс істейтінін өзгертуге болады.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'Фондық режимде жұмыс істейді';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'Бұғаттауды айналып өту және желілік ілмектер';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'Интерфейс тақталары';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'Маршруттау ережелері';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'Тақырыптар';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'Виджеттер';
 
   @override
   String extCatalogCached(String date) {
@@ -1267,46 +1266,46 @@ class SKk extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'Өзгеріс журналы';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'Кескінді жүктеу мүмкін болмады';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'Бағалар қалай жұмыс істейді';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'Рейтингтер орташа Байездік мәнді пайдаланады: бірнеше рейтингі бар кеңейтім көп адам дауыс бергенше ортаның жанында қалады, сондықтан бір 5 жұлдызды шолу жаңа кеңейтімді жоғарыға шығара алмайды. Жақында берілген рейтингтер ескілеріне қарағанда салмақты және бір есептік жазбаға бір ғана рейтинг есептеледі.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'Скриншоттар';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'Сәйкестік';
 
   @override
   String get extPermNetworkDetail =>
       'Интернеттен деректерді VPN арқылы жүктейді. Тек төмендегі тізімдегі хосттарға рұқсат бар, қалғаны бұғатталған.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'Фондық тапсырма';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'Фондық режимде іске қосу';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'Іске қосу аралығы';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# минут', one: '# минут');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# сағат', one: '# сағат');
     return '$_temp0';
   }
 
@@ -1315,14 +1314,14 @@ class SKk extends S {
       'Тапсырма Sora ашық тұрғанда, соның ішінде тартпада тұрғанда да кесте бойынша іске қосылады. Ең қысқа аралық 15 минут.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'Фондық тапсырманы басқару үшін кеңейтімді қосыңыз.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'Желіге кіру';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'Желі: $hosts';
   }
 
   @override
@@ -1337,61 +1336,61 @@ class SKk extends S {
   String get diagnosticNoData => 'Жазылған сұраулар әлі жоқ. Алдымен жылдамдықты тексеру веб-сайтын ашыңыз.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'QR кодын бөлісіңіз';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'QR кодын сканерлеңіз';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'Сілтемені көшіру';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'Сілтемені көрсету';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'Сілтемені жасыру';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'Бұл QR кодында қосылым мәліметтері бар. Оны бейтаныс адамдарға көрсетпеңіз.';
 
   @override
   String get qrScanHint => 'QR коды бар скриншотты не фотоны таңдаңыз немесе сілтемені қойыңыз';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'Буферден қою';
 
   @override
   String get qrNoCode => 'Бұл суреттен QR код табылмады.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'Бұл QR кодында жарамды сілтеме жоқ.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'Сканерлеу QR';
 
   @override
   String get qrFromImage => 'Суретті ашу';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'Процесс бойынша топтастыру';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'Тізім';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'Хостты көшіру';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'Ереже қосу';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# қосылым', one: '# қосылым');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'Алдын ала орнатылған';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1406,445 +1405,453 @@ class SKk extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'Жеке';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'Деректердің ағып кетуін тексеріңіз';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'Тексерілуде...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'Ағып кету табылмады';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'Ағып кету анықталды';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'Соңғы тексеру';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'Әлі тексерілмеген';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'Туннельдің DNS резолверлері';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'Жүйелік резолверлер';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'Желі бұғаттауының DNS қорғанысы';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'Жоғарыдағы DNS параметрлерінде туннель үшін DNS конфигурациялаңыз.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers => 'Жүйе туннельден тыс қандай шешушілерді пайдаланатынын тексеріңіз.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'DNS трафигі туннельде қалуы үшін желі бұғаттауын қосыңыз.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'Жүйенің шифрланған DNS қызметі';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'Жалған DNS жауаптар';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Жүйе туннельден тыс қандай шифрланған DNS соңғы нүктелерді пайдаланатынын тексеріңіз.';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'Резолверлер жауаптарды қолдан жасай алмауы үшін туннельде шифрланған DNS (DoT немесе DoH) пайдаланыңыз.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'Алдымен VPN желісіне қосылыңыз, содан кейін ағып кетуді тексеріңіз.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'Күтілетін';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'Бақыланады';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'Сұрыптау';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => 'Пинг';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'Жылдамдық';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'Аты';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'Жылдамдықты өлшеңіз';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'ескірген';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'Серверді автоматты түрде таңдау';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'Ең жылдам пинг';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'Ең жылдам жылдамдық';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'Ақылды таңдау';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'Sora ядросына қосылу тұрақсыз';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'Қайта қосыңыз';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'Ядромен байланыс қалпына келтірілуде…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'Соңғы сессия үзілді';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'Бұзылудан кейін сеансты қалпына келтіру';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'Қалпына келтіру';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'Қазір емес';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'Менің өңдеулерім';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'Серверлерді өңдеу';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'Жасыру';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'Көрсету';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'Өңдеулерді қалпына келтіріңіз';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'Әзірге өңдеулер жоқ';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'Жеке ережелер';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'Жылдамдықты өлшеуге жаңа ядро қажет';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return '$total бастап $done өлшеуі…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'Желі профильдері';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty =>
+      'Әзірге профильдер жоқ. Белгілі желілерде параметрлерді автоматты түрде қолдану үшін біреуін жасаңыз.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'Профиль қосу';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'Профиль атауы';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi желілер (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'Үй, кеңсе үтірмен бөлінген';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'Желілік шлюздер';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS сандар';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'Автоматты түрде қолдану';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'Өшірулі болса, профильді қолдану алдында растау сұралады.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'Ағымдағы параметрлерді есте сақтаңыз';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'Ағымдағы параметрлер профильге сақталған';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'Профильді жою';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return '\"$name\" профилін жою керек пе?';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return '\"$name\" профилін қолдану керек пе?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'Қолдану';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return '\"$name\" профилі қолданылды';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'Болдырмау';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'Белсенді';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'Қазір: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'Желі туралы ақпарат қолжетімді емес';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'Кем дегенде бір триггерді қосыңыз: SSID, шлюз немесе ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'Прокси-тізбектер';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty =>
+      'Әлі тізбектер жоқ. 2–3 серверді байланыстырыңыз, осылайша олардың әрқайсысы арқылы трафик өтеді.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'Жаңа тізбек';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'Тізбек атауы';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => '2–3 серверді таңдаңыз';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => 'Қайта реттеу үшін сүйреңіз: трафик жоғарғы жағынан кіреді және төменгі жағынан шығады.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'Кемінде 2 серверді таңдаңыз';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'Тізбек ең көбі 3 серверді қамтиды';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'Болжалды кідіріс';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'Тізбекті сақтау';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'Тізбекті жою';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return '\"$name\" тізбегін жою керек пе?';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'Ағымдағы қозғалтқыш тізбек құра алмайды';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'Тізбек серверлерінің бірі енді қолжетімсіз';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return 'Аралық торап $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'Кіру';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'Шығу';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'Құрылғыны синхрондау';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'Менің құрылғыларым';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'Жұптастырылған құрылғылар жоқ. Жергілікті желі арқылы басқа құрылғыны жұптаңыз.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'Құрылғыны жұптаңыз';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'Менің кодты көрсетіңіз';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'Кодты сканерлеу';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'Алып тастау';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return '\"$name\" күшін жою керек пе?';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'Соңғы синхрондау: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'Ешқашан';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'Құрылғылар бір жергілікті желіде болуы керек';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'Құрылғы жұпталған';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'Осы құрылғымен жұптаңыз';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'Басқа құрылғы күтілуде…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'Шифрланған арна. Есептік жазбалар, бұлттық серверлер жоқ.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'Тікелей желі трафигі үшін DPI сүзгісін айналып өтіңіз';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'zapret VPN туннелімен қатар іске қосылады: туннель трафигі VPN арқылы, тікелей трафик бұғаттауды айналып өту құралы арқылы өтеді.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'Әрбір сервер тек бір рет пайда болуы мүмкін';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Өңдеу';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Жою';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'Тозуды автоматты түрде қосу';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'Таңдалған сервер қатты баяуласа немесе жауап бермесе, Sora өлшеу нәтижесі ең жақсы серверге ауысады, бірақ 10 минутта бір реттен жиі емес.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'Аралас';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'Жүйе';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'Теңшелетін серверді қосыңыз';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'Менің серверлерім';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'Аты';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'Мысалы: менің VPS';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'Атын енгізіңіз';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'Мекенжай';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com немесе 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'Сервер мекенжайын енгізіңіз';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'Жарамсыз мекенжай';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => 'Порт';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'Порт 1-ден 65535-ке дейінгі сан болуы керек';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'Протокол';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'Жүйеге кіру ақпараты';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'Қосымша';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'Құпияны көрсету';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'Құпияны жасыру';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'жеке';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return '\"$name\" серверін жою керек пе?';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'Серверді қолмен қосыңыз: мекенжай, порт және протокол';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'Сынақ';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'Деректердің ағып кетуіне сынақ';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'Трафиктің құрылғыдан туннельден тыс шыға алатынын тексереді: тікелей DNS және ICMP сұраулары, IPv6 шығысы және жүйелік резолверлер. Қосылым белсенді кезде іске қосыңыз.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'Тексеріңіз';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'Болдырмау';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'Деректердің ағып кетуін тексеру үшін VPN желісіне қосылыңыз.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'Тестілеу аяқталды: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'Ағып кету табылмады';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# дерек ағуы анықталды',
+      one: '# дерек ағуы анықталды',
+    );
     return '$_temp0';
   }
 
@@ -1852,131 +1859,133 @@ class SKk extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'Түзету';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'Желі бұғаттауы қосулы. Тексеру үшін сынақты қайта іске қосыңыз.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'Тікелей DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP жаңғырық';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'Жүйелік резолверлер';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'Туннель қосылымы';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS туннель арқылы';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => 'Сервер баяулады. Sora өлшеу кезінде табылған ең жақсы серверге ауысты.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'Трафикті бүркемелеу';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'Кодтың мерзімі аяқталды';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'Синхрондау қызметін бастау мүмкін болмады';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing =>
+      'sora-sync компоненті табылмады. Құрылғыны синхрондауды қосу үшін қолданбаны қайта орнатыңыз.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'Синхрондау қызметін бастау…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth =>
+      'Синхрондау қызметі кіру таңбалауышын қабылдамады. Қолданбаны қайта іске қосып, әрекетті қайталаңыз.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'Құрылғы енді жұпталмаған';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'Жұптастыру сеансы әлдеқашан ашық';
 
   @override
   String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+      'Басқа құрылғы жауап бермеді. Оның бір желіде екеніне және оның кодын көрсететініне көз жеткізіңіз.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'Синхрондау қатесі';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'Кодтың мерзімі $duration кейін аяқталады';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'Құрылғымен жұптастыру…';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'Ескі құрылғылар тізімі ешқашан шынымен жұпталмаған, сондықтан ол тазартылды. Құрылғыларыңызды қайта жұптаңыз, бұл жолы нақты.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'Жаңа код';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return '$name жұптастырылған';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'Қайталау';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'Кодты жасыру';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'Қазір синхрондау';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return '$pulled алынды, $pushed жіберілді';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'Синхрондау нәтижесі';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'алынды';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'Жіберілді';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'Ешқандай өзгерістер анықталмады';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'Жазылымдар';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'Қолданба параметрлері';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'Жазылымдардың жеке түзетулері';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'Желі профильдері';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'Прокси-тізбектер';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return '$name құрылғысынан';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'Бұл құрылғы';
 
   @override
   String get syncUnavailableAndroid =>

@@ -132,7 +132,7 @@ class STg extends S {
   String get logsEmpty => 'Ҳеҷ чиз дар ин ҷо';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'Пайвастшавӣ нест';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class STg extends S {
   String get theme => 'Мавзӯъ';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Мисли система';
 
   @override
   String get themeLight => 'Нур';
@@ -292,7 +292,7 @@ class STg extends S {
   String get language => 'Забон';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Мисли система';
 
   @override
   String get sectionConnection => 'Пайвастшавӣ';
@@ -792,30 +792,29 @@ class STg extends S {
       'Файлҳои зерин ба суммаҳои назоратии релиз мувофиқанд. Агар онҳоро аз релизи расмӣ боргирӣ карда бошед, фармонро иҷро кунед.';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => 'Таҳиягар ин версияро бозпас гирифт. Лутфан нашри ислоҳшударо интизор шавед.';
 
   @override
   String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+      'Версияи навтар тадриҷан паҳн мешавад ва ба таври худкор ба шумо пешниҳод карда мешавад.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return 'Бозгашт ба версияи $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return 'Навсозӣ ба $version аз санҷиши коршоямӣ нагузашт, бинобар ин Sora ба $fromVersion баргардонида шуд.';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'Бозгашти худкор ноком шуд. Агар версияи нав кор накунад, версияи қаблиро дастӣ аз нав насб кунед.';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'Нусхаи санҷидашудаи версияи ҷорӣ барои бозгашт омода нашуд, бинобар ин навсозӣ насб нашуд.';
 
   @override
   String get updateCopyCommand => 'Фармони нусхабардорӣ';
@@ -894,373 +893,374 @@ class STg extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'Рейтинг $rating аз 5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return 'аз ҷониби $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return 'Насбкунӣ: $count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 насб';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'Тасдиқ карда шудааст';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'Маъмултарин дар ин ҳафта';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'Нав';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Дастаи Sora';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'Аз каталог нест';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'Ин васеъшавӣ аз каталоги даста нест. Калиди онҳоро танҳо муаллиф кафолат додааст: онро танҳо агар шумо ба муаллиф бовар кунед, насб кунед.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return 'Насб кардани «$name»';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return 'Навсозии «$name»';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'Ин васеъшавӣ қодир аст:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'Навсозӣ иҷозатҳои навро талаб мекунад:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'Ман мефаҳмам, ки ин иҷозатҳо ҷиддӣ ҳастанд';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'Насб кунед';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'Навсозӣ';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'Бекор кардан';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'Тасдиқ кунед';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'Каталог';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'Васеъкуниҳои насбшуда';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'Ҷустуҷӯи васеъшавиҳо';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'Ҳама';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'Асбобҳо';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'Мавзӯъҳо';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'Автоматикунонӣ';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'Омор';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'Шабака';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'Мураттабсозӣ аз рӯйи';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'Маъмултарин';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'Баҳои баландтарин';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'Ном';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'Каталогро бор кардан муяссар нашуд';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'Боз кӯшиш кунед';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'Ҳеҷ чиз ёфт нашуд';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled =>
+      'То ҳол ягон васеъкунӣ насб нашудааст.\nЯкеро дар каталог пайдо кунед ё аз файл насб кунед.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'Аз файл насб кунед';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'Аз URL насб кунед';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'Зеркашӣ кунед';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'Зеркашӣ карда мешавад…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'Тасдиқ карда мешавад…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'Насб карда мешавад…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'Насб карда нашуд';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'Санҷиши имзо ноком шуд. Файл метавонад вайрон ё таҳриф карда шавад.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'Манифести васеъкунӣ беэътибор аст.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'Хатои шабака. Пайвасти худро санҷед ва бори дигар кӯшиш кунед.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'Зеркашӣ ба каталог мувофиқат намекунад. Мумкин аст, ки онро вайрон карда бошанд.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'Ин васеъшавӣ версияи барнома $version ё навтарро талаб мекунад.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'Танҳо https:// истинодҳо иҷозат дода шудаанд';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'Чизе хато кард. Лутфан бори дигар кӯшиш кунед.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'Ин навсозӣ бо калиди дигари муаллиф аз версияи насбшуда имзо шудааст, бинобар ин он баста шуд. Агар шумо ба калиди нав бовар кунед, васеъкуниро нест кунед ва онро дубора насб кунед.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'Навсозии дастрас';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'Хомӯш';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return 'Фаъол $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'Ҷустуҷӯ дар васеъшавиҳои насбшуда';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'Ҳамаашро нав кунед';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count навсозиҳо дастрасанд';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count нав карда шуд';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => 'Муқаррарӣ';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'Ҳассос';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'Хавфи баланд';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'Дигар дархост карда намешавад:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'Версияи қаблӣ ҳанӯз насб карда шудааст.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'Ихтилофоти васеъшавӣ';
 
   @override
   String get extConflictsIntro =>
       'Ин васеъкуниҳо як чизро мехоҳанд. Интихоб кунед, ки кадомаш кор кунад, дигаре насбшуда мемонад.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'Мавзӯи барнома';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'Қалмоқҳои шабакавӣ';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return 'Афзалият: $name';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count ихтилофҳо ба қарори шумо ниёз доранд';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'ихтилофотро ҳал кунед';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'Интихоби шумо дар ҳамин дастгоҳ нигоҳ дошта мешавад. Мавзӯъ фавран иваз мешавад, хукҳои шабака дар ин версия кор намекунанд.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'Версияи $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'Муаллиф';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'Рейтинг';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'Насбкунӣ';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'Версия';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'Дар бораи ин тамдид';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'Иҷозатҳо';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'Иҷозатҳои махсус надоранд.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'Танзимотҳо';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'Танзимотро захира кунед';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'Захира…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return 'Навсозӣ ба $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'Фаъол';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return 'Бозгашт ба $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return 'Бозгашт ба версияи $version?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'Хориҷ кунед';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return '\"$name\" ва танзимоти онро нест кунед?';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => 'Панел дастнорас аст. Мумкин аст васеъшавӣ ғайрифаъол ё хориҷ карда шуда бошад.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'Ба рӯйхати пайвастҳои фаъол нигаред';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'Рӯйхати серверҳои худро бубинед';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'Танзимоти барномаро хонед';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'Танзимоти барномаро тағир диҳед';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'Огоҳиҳоро нишон диҳед';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'Ба менюи табақи ҷузъҳо илова кунед';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'Панелҳоро дар дохили барнома нишон диҳед';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'Мавзӯъҳоро татбиқ кунед';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'Илова кардани қоидаҳои масир (ба куҷо рафтани трафики шабака таъсир мерасонад)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'Интегратсия ба роҳи шабака (DPI модулҳои гузариш)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'Аз рӯйхати иҷозатдодашуда URL дархост кунед';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'Вазифаҳои заминаро иҷро кунед';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'Вазифаҳои ба нақша гирифташударо ҳатто ҳангоми пӯшида будани панел иҷро мекунад. Шумо метавонед онро таваққуф кунед ё дар танзимоти васеъшавӣ чанд маротиба кор кардани онро тағир диҳед.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'Дар замина кор мекунад';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'Давр задани маҳдудиятҳо ва қалмоқҳои шабака';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'Панелҳои интерфейс';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'Қоидаҳои масирдиҳӣ';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'Мавзӯъҳо';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'Виҷетҳо';
 
   @override
   String extCatalogCached(String date) {
@@ -1268,46 +1268,46 @@ class STg extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'Тағйирот';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'Тасвирро бор карда натавонист';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'Рейтингҳо чӣ гуна кор мекунанд';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'Рейтингҳо ҳисоби миёнаи Байесиро истифода мебаранд: тамдиди дорои чанд рейтинг то он даме, ки шумораи бештари одамон овоз медиҳанд, дар наздикии мобайн боқӣ мемонад, аз ин рӯ як баррасии 5-ситорадор наметавонад тамдиди навро ба боло тела диҳад. Рейтингҳои охирин нисбат ба рейтингҳои кӯҳна зиёдтаранд ва танҳо як рейтинг барои як ҳисоб ҳисоб карда мешавад.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'Скриншотҳо';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'Муносибат';
 
   @override
   String get extPermNetworkDetail =>
       'Маълумотро аз интернет тавассути VPN мегирад. Танҳо хостҳои рӯйхати зерин иҷозат доранд, боқимонда баста аст.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'Вазифаи пасзамина';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'Дар замина иҷро кунед';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'Фосилаи иҷро';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# дақиқа');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# соат');
     return '$_temp0';
   }
 
@@ -1316,14 +1316,14 @@ class STg extends S {
       'Вазифа то он даме ки Sora кушода аст, аз ҷумла дар трей, мувофиқи ҷадвал иҷро мешавад. Кӯтоҳтарин фосила 15 дақиқа аст.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'Барои идоракунии вазифаи пасзамина васеъшавиро фаъол кунед.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'Дастрасии шабака';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'Шабака: $hosts';
   }
 
   @override
@@ -1338,61 +1338,61 @@ class STg extends S {
   String get diagnosticNoData => 'Ҳанӯз ягон дархост сабт нашудааст. Аввал вебсайти санҷиши суръатро кушоед.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'Рамзи QR мубодила кунед';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'Рамзи QR скан кунед';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'Истиноди нусхабардорӣ';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'Истинодро нишон диҳед';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'Пинҳон кардани пайванд';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'Ин рамзи QR дорои тафсилоти пайвастшавӣ мебошад. Онро ба бегонагон нишон надиҳед.';
 
   @override
   String get qrScanHint => 'Скриншот ё акси дорои рамзи QR-ро интихоб кунед ё истинодро гузоред';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'Аз буфер часбонед';
 
   @override
   String get qrNoCode => 'Дар ин тасвир рамзи QR ёфт нашуд.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'Ин рамзи QR дорои истиноди дуруст нест.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'Скан QR';
 
   @override
   String get qrFromImage => 'Кушодани тасвир';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'Аз рӯи раванд гурӯҳбандӣ кунед';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'Рӯйхат';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'Хостро нусхабардорӣ кунед';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'Илова кардани қоида';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# пайваст');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'Пешакӣ';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1407,445 +1407,449 @@ class STg extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'Шахсӣ';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'ихроҷи маълумотро тафтиш кунед';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'Санҷиш...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'Ягон ихроҷ ёфт нашуд';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'Ихроҷ ошкор шуд';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'Санҷиши охирин';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'Ҳанӯз санҷида нашудааст';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'Ҳалкунандаҳои DNS-и нақб';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'Ҳалкунандаҳои номи система';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'Ҳифзи DNS бо бастани шабака';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'DNS-ро барои нақб дар танзимоти DNS дар боло танзим кунед.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Санҷед, ки кадом ҳалкунандаҳои системаи шумо берун аз нақб истифода мешавад.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'Бастани шабакаро фаъол кунед, то трафики DNS дар нақб бимонад.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'DNS-и рамзгузоришудаи система';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'Ҷавобҳои қалбакӣ DNS';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Санҷед, ки кадом нуқтаи ниҳоии рамзгузоришудаи DNS системаи шумо берун аз нақб истифода мебарад.';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'Дар нақб DNS-и рамзгузоришуда (DoT ё DoH) истифода баред, то ҳалкунандаҳои ном ҷавобҳоро сохта натавонанд.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'Аввал ба VPN пайваст шавед, сипас ихроҷро тафтиш кунед.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'Дар назар аст';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'мушохида карда шуд';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'Мураттабсозӣ аз рӯйи';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => 'Пинг';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'Суръат';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'Ном';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'Суръатро чен кунед';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'кӯҳна шудааст';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'Сервери худкори интихоб';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'Пинги зудтарин';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'Суръати баландтарин';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'Интихоби оқилона';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'Пайвастшавӣ ба ядрои Sora ноустувор аст';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'Аз нав пайваст кунед';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'Барқарор кардани пайвастшавӣ ба ядрои Sora…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'Сеанси охирин катъ гардид';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'Сеансро пас аз садама барқарор кунед';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'Барқарор кардан';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'Ҳоло не';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'Таҳрири ман';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'Серверҳоро таҳрир кунед';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'Пинҳон кардан';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'Намоиш';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'Таҳрирҳоро аз нав танзим кунед';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'Ҳанӯз таҳрир нашудааст';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'Қоидаҳои худ';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'Андозагирии суръат ба ядрои навтар ниёз дорад';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return 'Андозаи $done аз $total…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'Профилҳои шабакавӣ';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty =>
+      'Ҳоло профилҳо нест. Барои ба таври худкор татбиқ кардани танзимот дар шабакаҳои маълум якеро эҷод кунед.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'Профил илова кунед';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'Номи профил';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi шабакаҳо (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'Хона, Офис бо вергул ҷудо карда шудааст';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'Шлюзҳои шабакавӣ';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS рақамҳо';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'Ба таври худкор татбиқ кардан';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'Агар хомӯш бошад, пеш аз татбиқи профил тасдиқ пурсида мешавад.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'Танзимоти ҷориро дар хотир доред';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'Танзимоти ҷорӣ дар профил захира карда шудаанд';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'Профилро нест кунед';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return 'Профили \"$name\" нест карда шавад?';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return 'Профили \"$name\"-ро татбиқ кунед?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'Татбиқ кардан';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return 'Профили \"$name\" татбиқ карда шуд';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'Бекор кардан';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'Фаъол';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'Ҳоло: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'Маълумот дар бораи шабака дастрас нест';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'Ҳадди ақал як триггер илова кунед: SSID, дарвоза ё ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'Занҷирҳои прокси';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => 'Ҳанӯз занҷир нест. 2–3 серверро пайваст кунед, то трафик тавассути ҳар яки онҳо гузаред.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'занҷири нав';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'Номи занҷир';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => '2–3 серверро интихоб кунед';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint =>
+      'Барои аз нав тартиб додан кашола кунед: трафик аз боло ворид мешавад ва аз поён мебарояд.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'Ақаллан 2 серверро интихоб кунед';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'Як занҷир ҳадди аксар 3 серверро дар бар мегирад';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'Вақти тахминии';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'Занҷираи захира кунед';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'Занҷирро нест кунед';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return 'Занҷираи \"$name\" нест карда шавад?';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'Мотори ҷорӣ занҷир сохта наметавонад';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'Яке аз серверҳои занҷир дигар дастрас нест';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return 'Гузариш $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'Вуруд';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'Баромад';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'Синхронизатсияи дастгоҳ';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'Дастгоҳҳои ман';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'Ягон дастгоҳҳои ҷуфтшуда. Дастгоҳи дигарро тавассути шабакаи маҳаллӣ пайваст кунед.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'Дастгоҳро ҷуфт кунед';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'Рамзи маро нишон диҳед';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'Рамзи скан';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'Бозхонд';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return '\"$name\" бекор карда шавад?';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'Синхронизатсияи охирин: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'Ҳеҷ гоҳ';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'Дастгоҳҳо бояд дар як шабакаи маҳаллӣ бошанд';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'Дастгоҳ ҷуфт карда шуд';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'Бо ин дастгоҳ ҷуфт кунед';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'Дастгоҳи дигар интизор аст…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'Канали рамзгузоришуда. Не ҳисобҳо, на серверҳои абрӣ.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'Гузаронидани DPI филтр барои трафики мустақими шабака';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'zapret-ро ҳамроҳи нақби VPN иҷро мекунад: трафики нақб аз VPN ва трафики мустақим аз воситаи давр задани маҳдудият мегузарад.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'Ҳар як сервер метавонад танҳо як маротиба пайдо шавад';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Таҳрир';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Хориҷ кунед';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'Гузариши худкор дар таназзул';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'Агар сервери интихобшуда хеле суст шавад ё ҷавоб надиҳад, Sora ба сервери беҳтарин аз рӯйи ченкунӣ мегузарад, вале на бештар аз як бор дар ҳар 10 дақиқа.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'Омехта';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'Система';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'Илова кардани сервери фармоишӣ';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'Серверҳои ман';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'Ном';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'Масалан: VPS-и ман';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'Номро ворид кунед';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'Суроға';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com ё 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'Суроғаи серверро ворид кунед';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'Суроғаи нодуруст';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => 'Порт';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'Порт бояд аз 1 то 65535 бошад';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'Протокол';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'Маълумоти воридшавӣ';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'Ихтиёрӣ';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'Сиррро нишон диҳед';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'Пинҳон кардани асрор';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'шахсӣ';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return 'Сервери \"$name\" нест карда шавад?';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'Серверро дастӣ илова кунед: суроға, порт ва протокол';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'Санҷиш';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'Санҷиши ихроҷи маълумот';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'Месанҷад, ки трафик метавонад аз дастгоҳ берун аз нақб барояд ё не: дархостҳои мустақими DNS ва ICMP, баромади IPv6 ва ҳалкунандаҳои номи система. Ҳангоми пайвасти фаъол иҷро кунед.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'Санҷед';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'Бекор кардан';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'Барои санҷидани ихроҷи маълумот ба VPN пайваст шавед.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'Санҷишҳо анҷом ёфтанд: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'Ягон ихроҷ ёфт нашуд';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ихроҷ ёфт шуд');
     return '$_temp0';
   }
 
@@ -1853,131 +1857,133 @@ class STg extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'Ислоҳ';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'Бастани шабака фаъол аст. Барои санҷидан озмоишро такрор кунед.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'мустақим DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP акси садо';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'Ҳалкунандаҳои номи система';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'Пайвасти нақб';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS тавассути нақб';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => 'Сервер суст шуд. Sora ба беҳтарин сервере, ки ҳангоми андозагирӣ ёфт шуд, гузашт.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'Пинҳонкунии трафик';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'Рамз ба охир расид';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'Хидмати ҳамоҳангсозиро оғоз карда натавонист';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing =>
+      'Ҷузъи sora-sync ёфт нашуд. Барои фаъол кардани ҳамоҳангсозии дастгоҳ барномаро аз нав насб кунед.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'Оғози хидмати ҳамоҳангсозӣ…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth =>
+      'Хидмати ҳамоҳангсозӣ аломати дастрасиро рад кард. Барномаро аз нав оғоз кунед ва бори дигар кӯшиш кунед.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'Дастгоҳ дигар ҷуфт карда нашудааст';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'Сеанси ҷуфткунӣ аллакай кушода аст';
 
   @override
   String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+      'Дастгоҳи дигар ҷавоб надод. Боварӣ ҳосил кунед, ки он дар ҳамон шабака аст ва рамзи онро нишон медиҳад.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'Хатои синхронизатсия';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'Рамз пас аз $duration беэътибор мешавад';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'Ҷуфткунӣ бо дастгоҳ…';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'Рӯйхати дастгоҳҳои кӯҳна ҳеҷ гоҳ воқеан ҷуфт карда нашудааст, аз ин рӯ тоза карда шуд. Дастгоҳҳои худро дубора ҷуфт кунед, ин дафъа воқеӣ.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'Рамзи нав';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return '$name ҷуфт шуд';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'Такрор кунед';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'Пинҳон кардани рамз';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'Ҳозир ҳамоҳанг кардан';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return 'Қабул карда шуд $pulled, фиристодашуда $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'Натиҷаи ҳамоҳангсозӣ';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'гирифта шудааст';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'Фиристода шуд';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'Ягон тағирот ошкор нашудааст';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'Обунаҳо';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'Танзимоти барнома';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'Тағйироти шахсии обунаҳо';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'Профилҳои шабакавӣ';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'Занҷирҳои прокси';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return 'аз $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'Ин дастгоҳ';
 
   @override
   String get syncUnavailableAndroid =>

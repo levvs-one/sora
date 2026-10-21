@@ -132,7 +132,7 @@ class SKa extends S {
   String get logsEmpty => 'აქ არაფერი';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'არანაირი კავშირი';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class SKa extends S {
   String get theme => 'თემა';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'სისტემის მიხედვით';
 
   @override
   String get themeLight => 'სინათლე';
@@ -292,7 +292,7 @@ class SKa extends S {
   String get language => 'ენა';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'სისტემის მიხედვით';
 
   @override
   String get sectionConnection => 'კავშირი';
@@ -793,30 +793,28 @@ class SKa extends S {
       'ქვემოთ მოცემული ფაილები ემთხვევა გამოშვების საკონტროლო ჯამებს. გაუშვით ბრძანება, თუ ისინი ოფიციალური გამოშვებიდან ჩამოტვირთეთ.';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => 'დეველოპერმა გააუქმა ეს ვერსია. გთხოვთ, დაელოდოთ შესწორებულ გამოცემას.';
 
   @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateRolloutPending => 'უფრო ახალი ვერსია გამოდის თანდათანობით და შემოგთავაზებთ ავტომატურად.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return 'დაბრუნება ვერსიაზე $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return '$version-ის განახლებამ ვერ გაიარა ჯანმრთელობის შემოწმება, ამიტომ Sora დაბრუნდა $fromVersion-ზე.';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'ავტომატური დაბრუნება ვერ მოხერხდა. თუ ახალი ვერსია არ მუშაობს, ხელახლა დააინსტალირეთ წინა ვერსია ხელით.';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'ვერ მოვამზადე მიმდინარე ვერსიის დადასტურებული ასლი, ამიტომ განახლება არ იყო დაინსტალირებული.';
 
   @override
   String get updateCopyCommand => 'დააკოპირეთ ბრძანება';
@@ -894,373 +892,374 @@ class SKa extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'რეიტინგი $rating 5-დან';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return '$author-ის მიერ';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return 'ინსტალაციები: $count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 ინსტალაცია';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'დამოწმებულია';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'ყველაზე პოპულარული ამ კვირაში';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'ახალი';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Sora გუნდი';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'არა კატალოგიდან';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'ეს გაფართოება არ არის გუნდის კატალოგიდან. მხოლოდ ავტორმა დადო გარანტია მათი გასაღებისთვის: დააინსტალირეთ მხოლოდ იმ შემთხვევაში, თუ ენდობით ავტორს.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return '„$name“-ის დაყენება';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return '„$name“-ის განახლება';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'ამ გაფართოებას შეეძლება:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'განახლება ითხოვს ახალ ნებართვებს:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'მესმის, რომ ეს ნებართვები სერიოზულია';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'დააინსტალირეთ';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'განახლება';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'გაუქმება';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'დაადასტურეთ';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'კატალოგი';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'დაინსტალირებული გაფართოებები';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'გაფართოებების ძიება';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'ყველა';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'ხელსაწყოები';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'თემები';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'ავტომატიზაცია';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'სტატისტიკა';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'ქსელი';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'დალაგება';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'ყველაზე პოპულარული';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'ყველაზე მაღალი რეიტინგი';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'დასახელება';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'კატალოგის ჩატვირთვა ვერ მოხერხდა';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'ხელახლა სცადეთ';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'ვერაფერი მოიძებნა';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled =>
+      'გაფართოებები ჯერ არ არის დაინსტალირებული.\nიპოვეთ ერთი კატალოგში ან დააინსტალირეთ ფაილიდან.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'ინსტალაცია ფაილიდან';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'ინსტალაცია URL-დან';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'ჩამოტვირთვა';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'მიმდინარეობს ჩამოტვირთვა…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'დადასტურება…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'ინსტალაცია…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'ინსტალაცია ვერ მოხერხდა';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'ხელმოწერის შემოწმება ვერ მოხერხდა. ფაილი შეიძლება იყოს დაზიანებული ან დაზიანებული.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'გაფართოების manifest არასწორია.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'ქსელის შეცდომა. შეამოწმეთ თქვენი კავშირი და სცადეთ ხელახლა.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'ჩამოტვირთვა არ ემთხვევა კატალოგს. შესაძლოა, ის გატეხილი იყო.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'ამ გაფართოებას სჭირდება აპის ვერსია $version ან უფრო ახალი.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'დასაშვებია მხოლოდ https:// ბმული';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'რაღაც შეფერხდა. გთხოვთ, სცადოთ ხელახლა.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'ეს განახლება ხელმოწერილია სხვა ავტორის გასაღებით, ვიდრე დაინსტალირებული ვერსია, ამიტომ დაბლოკილია. თუ ენდობით ახალ გასაღებს, წაშალეთ გაფართოება და ხელახლა დააინსტალირეთ იგი აშკარად.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'განახლება ხელმისაწვდომია';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'გამორთულია';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return 'ჩართეთ $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'დაყენებული გაფართოებების ძიება';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'განაახლეთ ყველაფერი';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count განახლებები ხელმისაწვდომია';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count განახლებულია';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => 'ნორმალური';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'მგრძნობიარე';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'მაღალი რისკი';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'აღარ არის მოთხოვნილი:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'წინა ვერსია ჯერ კიდევ დაინსტალირებულია.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'გაფართოების კონფლიქტები';
 
   @override
   String get extConflictsIntro =>
       'ეს გაფართოებები ერთსა და იმავეს ითხოვს. აირჩიეთ, რომელი იმუშავებს, მეორე დაინსტალირებული დარჩება.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'აპლიკაციის თემა';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'ქსელის კაკვები';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return 'უპირატესობა: $name';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count კონფლიქტებს თქვენი გადაწყვეტილება სჭირდება';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'კონფლიქტების მოგვარება';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'თქვენი არჩევანი ინახება ამ მოწყობილობაზე. თემა მაშინვე იცვლება, ქსელური ჰუკები კი ამ ვერსიაში არ ეშვება.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'ვერსია $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'ავტორი';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'რეიტინგი';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'ინსტალაციები';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'ვერსია';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'ამ გაფართოების შესახებ';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'ნებართვები';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'არ არის სპეციალური ნებართვები.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'პარამეტრები';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'პარამეტრების შენახვა';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'ინახება…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return 'განახლება $version-ზე';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'ჩართულია';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return 'დაბრუნება $version-ზე';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return 'დაბრუნება ვერსიაზე $version?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'დეინსტალაცია';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return 'წაიშალოს „$name“ და მისი პარამეტრები?';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => 'პანელი მიუწვდომელია. გაფართოება შესაძლოა გათიშული ან წაშლილი იყოს.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'იხილეთ აქტიური კავშირების სია';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'იხილეთ თქვენი სერვერების სია';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'წაიკითხეთ აპის პარამეტრები';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'შეცვალეთ აპის პარამეტრები';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'შეტყობინებების ჩვენება';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'დაამატეთ ელემენტები უჯრის მენიუში';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'აპის შიგნით პანელების ჩვენება';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'თემების გამოყენება';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'მარშრუტიზაციის წესების დამატება (იმოქმედებს სად მიდის ქსელის ტრაფიკი)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'ინტეგრირება ქსელის გზაზე (DPI შემოვლითი მოდულები)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'მოითხოვეთ URL დაშვებული სიიდან';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'გაუშვით ფონური ამოცანები';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'ასრულებს დაგეგმილ ამოცანებს მაშინაც კი, როდესაც პანელი დახურულია. შეგიძლიათ დააპაუზოთ ან შეცვალოთ მისი გაშვების სიხშირე გაფართოების პარამეტრებში.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'გადის ფონზე';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'ბლოკირების გვერდის ავლა და ქსელის ჩარევები';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'ინტერფეისის პანელები';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'მარშრუტიზაციის წესები';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'თემები';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'ვიჯეტები';
 
   @override
   String extCatalogCached(String date) {
@@ -1268,46 +1267,46 @@ class SKa extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'ცვლილებები';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'სურათის ჩატვირთვა ვერ მოხერხდა';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'როგორ მუშაობს რეიტინგები';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'რეიტინგები იყენებს ბაიესის საშუალოს: გაფართოება მცირე რეიტინგით რჩება შუათან ახლოს, სანამ მეტი ადამიანი არ მისცემს ხმას, ასე რომ, ერთი 5 ვარსკვლავიანი მიმოხილვა ვერ აიყვანს ახალ გაფართოებას ზევით. ბოლო რეიტინგები უფრო მეტს იწონის, ვიდრე ძველები და ანგარიშზე მხოლოდ ერთი რეიტინგი ითვლება.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'ეკრანის ანაბეჭდები';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'აქტუალობა';
 
   @override
   String get extPermNetworkDetail =>
       'ტვირთავს მონაცემებს ინტერნეტიდან VPN-ის გავლით. დაშვებულია მხოლოდ ქვემოთ მოცემული ჰოსტები, დანარჩენი დაბლოკილია.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'ფონური ამოცანა';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'გაშვება ფონზე';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'გაშვების ინტერვალი';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# წუთი', one: '# წუთი');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# საათი', one: '# საათი');
     return '$_temp0';
   }
 
@@ -1315,14 +1314,14 @@ class SKa extends S {
   String get extBgNote => 'დავალება გრაფიკით ეშვება, სანამ Sora ღიაა, მათ შორის უჯრაში. მინიმალური ინტერვალი 15 წუთია.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'ჩართეთ გაფართოება მისი ფონის ამოცანის მართვისთვის.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'ქსელის წვდომა';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'ქსელი: $hosts';
   }
 
   @override
@@ -1337,61 +1336,61 @@ class SKa extends S {
   String get diagnosticNoData => 'ჯერ არ არის ჩაწერილი მოთხოვნა. ჯერ გახსენით სიჩქარის ტესტის ვებსაიტი.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'გააზიარეთ QR კოდი';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'QR კოდის სკანირება';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'დააკოპირეთ ბმული';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'ბმული ჩვენება';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'ბმულის დამალვა';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'ეს QR კოდი შეიცავს კავშირის დეტალებს. არ აჩვენო ის უცნობებს.';
 
   @override
   String get qrScanHint => 'აირჩიეთ ეკრანის სურათი ან ფოტო QR კოდით, ან ჩასვით ბმული';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'ჩასმა ბუფერიდან';
 
   @override
   String get qrNoCode => 'ამ სურათში QR კოდი ვერ მოიძებნა.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'ეს QR კოდი არ შეიცავს მოქმედ ბმულს.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'სკანირება QR';
 
   @override
   String get qrFromImage => 'სურათის გახსნა';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'დაჯგუფება პროცესის მიხედვით';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'სია';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'დააკოპირეთ მასპინძელი';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'დაამატე წესი';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# კავშირი', one: '# კავშირი');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'წინასწარ დაყენებული';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1406,445 +1405,453 @@ class SKa extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'საკუთარი';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'შეამოწმეთ მონაცემთა გაჟონვა';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'შემოწმება...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'გაჟონვა არ მოიძებნა';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'აღმოჩენილია გაჟონვა';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'ბოლო შემოწმება';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'ჯერ არ არის გამოცდილი';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'გვირაბის DNS რეზოლვერები';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'სისტემის რეზოლვერები';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'DNS-ის დაცვა ქსელის ბლოკირებით';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'დააკონფიგურირეთ DNS გვირაბისთვის ზემოთ DNS პარამეტრებში.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers =>
+      'შეამოწმეთ, რომელ გადამწყვეტებს გამოიყენებდა თქვენი სისტემა გვირაბის გარეთ.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'ჩართეთ ქსელის ბლოკირება, რათა DNS ტრაფიკი გვირაბში დარჩეს.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'სისტემის დაშიფრული DNS';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'ყალბი DNS პასუხი';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns =>
+      'შეამოწმეთ, რომელ დაშიფრულ DNS ბოლო წერტილებს იყენებს თქვენი სისტემა გვირაბის გარეთ.';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'გვირაბისთვის გამოიყენეთ დაშიფრული DNS (DoT ან DoH), რათა რეზოლვერებმა პასუხები ვერ გააყალბონ.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'ჯერ დაუკავშირდით VPN-ს, შემდეგ შეამოწმეთ გაჟონვა.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'მოსალოდნელია';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'დაფიქსირდა';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'დალაგება';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => 'პინგი';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'სიჩქარე';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'სახელი';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'გაზომეთ სიჩქარე';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'მოძველებულია';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'ავტომატური არჩევის სერვერი';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'ყველაზე სწრაფი პინგი';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'ყველაზე სწრაფი სიჩქარე';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'ჭკვიანი არჩევანი';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'Sora ბირთვთან კავშირი არასტაბილურია';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'ხელახლა დაკავშირება';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'მიმდინარეობს კავშირის აღდგენა Sora ბირთვთან…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'ბოლო სხდომა შეწყდა';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'სესიის აღდგენა ავარიის შემდეგ';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'აღდგენა';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'ახლა არა';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'ჩემი რედაქტირებები';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'სერვერების რედაქტირება';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'დამალვა';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'ჩვენება';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'რედაქტირების გადატვირთვა';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'ჯერ არ არის შესწორებები';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'საკუთარი წესები';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'სიჩქარის გაზომვას უფრო ახალი ბირთვი სჭირდება';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return '$done-ის გაზომვა $total-დან…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'ქსელის პროფილები';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty =>
+      'ჯერ არ არის პროფილები. შექმენით ერთი, რომ ავტომატურად გამოიყენოს პარამეტრები ცნობილ ქსელებში.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'პროფილის დამატება';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'პროფილის სახელი';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi ქსელები (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'სახლი, ოფისი გამოყოფილია მძიმეებით';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'ქსელის კარიბჭეები';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS ნომრები';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'ავტომატურად გამოყენება';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'თუ გამორთულია, პროფილის გამოყენებამდე დადასტურებას მოგთხოვთ.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'დაიმახსოვრე მიმდინარე პარამეტრები';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'მიმდინარე პარამეტრები შენახულია პროფილში';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'პროფილის წაშლა';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return 'წაშალოთ პროფილი „$name“?';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return 'გსურთ პროფილის „$name“ გამოყენება?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'გამოყენება';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return 'პროფილი „$name“ გამოყენებულია';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'გაუქმება';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'აქტიური';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'ახლა: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'ქსელის ინფორმაცია მიუწვდომელია';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'დაამატეთ მინიმუმ ერთი ტრიგერი: SSID, კარიბჭე ან ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'პროქსი ჯაჭვები';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => 'ჯაჭვები ჯერ არ არის. დააკავშირეთ 2–3 სერვერი, რათა ტრეფიკი გადაიტანოს თითოეულ მათგანში.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'ახალი ჯაჭვი';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'ჯაჭვის სახელწოდება';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => 'აირჩიეთ 2–3 სერვერი';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => 'გადაათრიეთ ხელახლა შეკვეთისთვის: ტრაფიკი შედის ზევით და გამოდის ქვემოდან.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'აირჩიეთ მინიმუმ 2 სერვერი';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'ჯაჭვი ინახავს მაქსიმუმ 3 სერვერს';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'სავარაუდო შეყოვნება';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'ჯაჭვის შენახვა';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'ჯაჭვის წაშლა';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return 'წაშალოთ ჯაჭვი \"$name\"?';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'მიმდინარე ძრავას არ შეუძლია ჯაჭვების აშენება';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'ერთ-ერთი ჯაჭვის სერვერი აღარ არის ხელმისაწვდომი';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return 'გადასვლა $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'შესასვლელი';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'გასასვლელი';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'მოწყობილობის სინქრონიზაცია';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'ჩემი მოწყობილობები';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'არ არის დაწყვილებული მოწყობილობები. სხვა მოწყობილობის დაწყვილება ლოკალურ ქსელში.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'მოწყობილობის დაწყვილება';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'აჩვენე ჩემი კოდი';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'კოდის სკანირება';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'გატანა';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return 'გააუქმოს \"$name\"?';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'ბოლო სინქრონიზაცია: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'არასოდეს';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'მოწყობილობები უნდა იყოს იმავე ლოკალურ ქსელში';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'მოწყობილობა დაწყვილებულია';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'დაწყვილება ამ მოწყობილობასთან';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'ელოდება სხვა მოწყობილობას…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'ბოლოდან ბოლომდე დაშიფრული არხი. არც ანგარიშები, არც ღრუბლოვანი სერვერები.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'გვერდის ავლით DPI ფილტრაცია პირდაპირი ქსელის ტრაფიკისთვის';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'უშვებს zapret-ს VPN გვირაბთან ერთად: გვირაბის ტრაფიკი გადის VPN-ით, პირდაპირი ტრაფიკი კი ბლოკირების გვერდის ავლის მექანიზმით.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'თითოეული სერვერი შეიძლება გამოჩნდეს მხოლოდ ერთხელ';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'რედაქტირება';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'ამოღება';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'ავტომატური ჩართვა დეგრადაციაზე';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'თუ არჩეული სერვერი მნიშვნელოვნად შენელდება ან პასუხს შეწყვეტს, Sora გაზომვის შედეგებით საუკეთესო სერვერზე გადაერთვება, მაგრამ არა უმეტეს ერთხელ ყოველ 10 წუთში.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'შერეული';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'სისტემა';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'მორგებული სერვერის დამატება';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'ჩემი სერვერები';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'სახელი';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'მაგალითად: ჩემი VPS';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'შეიყვანეთ სახელი';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'მისამართი';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com ან 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'შეიყვანეთ სერვერის მისამართი';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'არასწორი მისამართი';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => 'პორტი';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'პორტი უნდა იყოს რიცხვი 1-დან 65535-მდე';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'ოქმი';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'შესვლის ინფორმაცია';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'სურვილისამებრ';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'საიდუმლოს ჩვენება';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'საიდუმლოს დამალვა';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'საკუთარი';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return 'წაშალოთ სერვერი „$name“?';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'ხელით დაამატეთ სერვერი: მისამართი, პორტი და პროტოკოლი';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'ტესტი';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'ტესტი მონაცემთა გაჟონვისთვის';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'ამოწმებს, შეუძლია თუ არა ტრაფიკს მოწყობილობიდან გვირაბის გარეთ გასვლა: პირდაპირი DNS და ICMP მოთხოვნები, IPv6 გასასვლელი და სისტემის რეზოლვერები. გაუშვით აქტიური კავშირისას.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'შეამოწმეთ';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'გაუქმება';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'დაუკავშირდით VPN-ს მონაცემთა გაჟონვის შესამოწმებლად.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'დასრულებული ტესტები: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'გაჟონვა არ მოიძებნა';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'აღმოჩენილია # გაჟონვა',
+      one: 'აღმოჩენილია # გაჟონვა',
+    );
     return '$_temp0';
   }
 
@@ -1852,131 +1859,132 @@ class SKa extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'დაფიქსირება';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'ქსელის ბლოკირება ჩართულია. შესამოწმებლად ტესტი ხელახლა გაუშვით.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'პირდაპირი DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP ექო';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'სისტემის რეზოლვერები';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'გვირაბის კავშირი';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS გვირაბით';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => 'სერვერი შენელდა. Sora გადაერთო გაზომვის დროს ნაპოვნი საუკეთესო სერვერზე.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'ტრაფიკის შენიღბვა';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'კოდს ვადა გაუვიდა';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'სინქრონიზაციის სერვისის დაწყება ვერ მოხერხდა';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing =>
+      'sora-sync კომპონენტი ვერ მოიძებნა. ხელახლა დააინსტალირეთ აპი მოწყობილობის სინქრონიზაციის გასააქტიურებლად.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'სინქრონიზაციის სერვისის დაწყება…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => 'სინქრონიზაციის სერვისმა უარყო წვდომის ჟეტონი. გადატვირთეთ აპი და სცადეთ ხელახლა.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'მოწყობილობა აღარ არის დაწყვილებული';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'დაწყვილების სესია უკვე ღიაა';
 
   @override
   String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+      'მეორე მოწყობილობამ არ უპასუხა. დარწმუნდით, რომ ის იმავე ქსელშია და აჩვენებს მის კოდს.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'სინქრონიზაციის შეცდომა';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'კოდის ვადა ამოიწურება $duration-ში';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'მოწყობილობასთან დაწყვილება…';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'ძველი მოწყობილობების სია ფაქტობრივად არასოდეს ყოფილა დაწყვილებული, ამიტომ ის გასუფთავდა. ხელახლა დააწყვილეთ თქვენი მოწყობილობები, ამჯერად რეალურად.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'ახალი კოდი';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return 'დაწყვილებულია $name-თან';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'გაიმეორეთ';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'კოდის დამალვა';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'სინქრონიზაცია ახლა';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return 'მიღებული $pulled, გაგზავნილი $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'სინქრონიზაციის შედეგი';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'მიღებულია';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'გაგზავნილი';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'ცვლილებები არ გამოვლენილა';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'გამოწერები';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'აპის პარამეტრები';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'გამოწერების შეცვლილი პარამეტრები';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'ქსელის პროფილები';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'პროქსი ჯაჭვები';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return '$name-დან';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'ეს მოწყობილობა';
 
   @override
   String get syncUnavailableAndroid =>

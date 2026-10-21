@@ -132,7 +132,7 @@ class STh extends S {
   String get logsEmpty => 'ไม่มีอะไรที่นี่';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'ไม่มีการเชื่อมต่อ';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class STh extends S {
   String get theme => 'ธีม';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'ตามระบบ';
 
   @override
   String get themeLight => 'แสงสว่าง';
@@ -292,7 +292,7 @@ class STh extends S {
   String get language => 'ภาษา';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'ตามระบบ';
 
   @override
   String get sectionConnection => 'การเชื่อมต่อ';
@@ -789,30 +789,28 @@ class STh extends S {
       'ไฟล์ด้านล่างตรงกับ checksum ของรีลีส เรียกใช้คำสั่งหากคุณดาวน์โหลดจากรีลีสทางการ';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => 'ผู้พัฒนาได้ถอนเวอร์ชันนี้ออกแล้ว กรุณารอการแก้ไขการเผยแพร่';
 
   @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateRolloutPending => 'เวอร์ชันใหม่กำลังทยอยเปิดตัว และจะเสนอให้คุณโดยอัตโนมัติ';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return 'กำลังย้อนกลับเป็นเวอร์ชัน $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return 'การอัปเดตเป็น $version ไม่ผ่านการตรวจสุขภาพ ดังนั้น Sora จึงถูกย้อนกลับเป็น $fromVersion';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'การย้อนกลับอัตโนมัติล้มเหลว หากเวอร์ชันใหม่ใช้งานไม่ได้ ให้ติดตั้งเวอร์ชันก่อนหน้าใหม่ด้วยตนเอง';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'ไม่สามารถเตรียมสำเนาย้อนกลับที่ได้รับการยืนยันของเวอร์ชันปัจจุบัน ดังนั้นจึงไม่ได้ติดตั้งการอัปเดต';
 
   @override
   String get updateCopyCommand => 'คำสั่งคัดลอก';
@@ -891,372 +889,372 @@ class STh extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'คะแนน $rating จาก 5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return 'โดย $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return 'การติดตั้ง: $count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 ติดตั้ง';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'ตรวจสอบแล้ว';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'ฮิตที่สุดในสัปดาห์นี้';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'ใหม่';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'ทีมงาน Sora';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'ไม่ใช่จากแค็ตตาล็อก';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'ส่วนขยายนี้ไม่ได้มาจากแค็ตตาล็อกของทีม มีเพียงผู้เขียนเท่านั้นที่รับรองรหัสของตน: ติดตั้งเฉพาะเมื่อคุณเชื่อถือผู้เขียนเท่านั้น';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return 'ติดตั้ง “$name”';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return 'อัปเดต “$name”';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'ส่วนขยายนี้จะสามารถ:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'การอัปเดตจะขอสิทธิ์ใหม่:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'ฉันเข้าใจว่าการอนุญาตเหล่านี้เป็นเรื่องร้ายแรง';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'ติดตั้ง';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'อัปเดต';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'ยกเลิก';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'ยืนยัน';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'แคตตาล็อก';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'ส่วนขยายที่ติดตั้งแล้ว';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'ค้นหาส่วนขยาย';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'ทั้งหมด';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'เครื่องมือ';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'ธีม';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'ระบบอัตโนมัติ';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'สถิติ';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'เครือข่าย';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'เรียงตาม';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'ฮิตที่สุด';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'คะแนนสูงสุด';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'ชื่อ';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'ไม่สามารถโหลดแค็ตตาล็อกได้';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'ลองอีกครั้ง';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'ไม่พบอะไรเลย';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled => 'ยังไม่ได้ติดตั้งส่วนขยาย\nค้นหารายการหนึ่งในแค็ตตาล็อกหรือติดตั้งจากไฟล์';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'ติดตั้งจากไฟล์';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'ติดตั้งจาก URL';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'ดาวน์โหลด';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'กำลังดาวน์โหลด...';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'กำลังตรวจสอบ...';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'กำลังติดตั้ง...';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'การติดตั้งล้มเหลว';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'การตรวจสอบลายเซ็นล้มเหลว ไฟล์อาจเสียหายหรือถูกดัดแปลง';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'รายการส่วนขยายไม่ถูกต้อง';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'ข้อผิดพลาดของเครือข่าย ตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'การดาวน์โหลดไม่ตรงกับแค็ตตาล็อก ก็อาจถูกแทรกแซงได้';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'ส่วนขยายนี้ต้องใช้แอปเวอร์ชัน $version หรือใหม่กว่า';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'อนุญาตเฉพาะลิงก์ https:// เท่านั้น';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้ง';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'การอัปเดตนี้ลงนามด้วยรหัสผู้สร้างที่แตกต่างจากเวอร์ชันที่ติดตั้ง ดังนั้นจึงถูกบล็อก หากคุณเชื่อถือคีย์ใหม่ ให้ถอนการติดตั้งส่วนขยายและติดตั้งอีกครั้งอย่างชัดเจน';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'มีการอัปเดตแล้ว';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'ปิดใช้งาน';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return 'เปิดใช้งาน $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'ค้นหาส่วนขยายที่ติดตั้ง';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'อัพเดททั้งหมด';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count มีการอัปเดต';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count อัปเดตแล้ว';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => 'ปกติ';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'ละเอียดอ่อน';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'มีความเสี่ยงสูง';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'ไม่มีการร้องขออีกต่อไป:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'เวอร์ชันก่อนหน้านี้ยังคงติดตั้งอยู่';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'ข้อขัดแย้งของส่วนขยาย';
 
   @override
   String get extConflictsIntro => 'ส่วนขยายเหล่านี้ต้องการสิ่งเดียวกัน เลือกว่าจะให้ตัวไหนทำงาน อีกตัวจะยังติดตั้งอยู่';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'ธีมแอป';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'ตะขอเครือข่าย';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '$name ชนะ';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count ข้อขัดแย้งต้องให้คุณตัดสินใจ';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'แก้ไขข้อขัดแย้ง';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'ระบบจะบันทึกตัวเลือกของคุณไว้ในอุปกรณ์นี้ ธีมจะเปลี่ยนทันที ส่วนฮุกเครือข่ายจะไม่ทำงานในเวอร์ชันนี้';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'เวอร์ชัน $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'ผู้เขียน';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'เรตติ้ง';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'การติดตั้ง';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'เวอร์ชัน';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'เกี่ยวกับส่วนขยายนี้';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'สิทธิ์';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'ไม่มีการอนุญาตพิเศษ';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'การตั้งค่า';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'บันทึกการตั้งค่า';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'กำลังบันทึก...';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return 'อัปเกรดเป็น $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'เปิดใช้งาน';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return 'ย้อนกลับเป็น $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return 'ย้อนกลับเป็นเวอร์ชัน $version?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'ถอนการติดตั้ง';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return 'ลบ “$name” และการตั้งค่าของมันออกหรือไม่';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => 'แผงควบคุมไม่พร้อมใช้งาน ส่วนขยายอาจถูกปิดใช้งานหรือลบออก';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'ดูรายการการเชื่อมต่อที่ใช้งานอยู่';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'ดูรายการเซิร์ฟเวอร์ของคุณ';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'อ่านการตั้งค่าแอป';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'เปลี่ยนการตั้งค่าแอป';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'แสดงการแจ้งเตือน';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'เพิ่มรายการลงในเมนูถาด';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'แสดงแผงภายในแอป';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'ใช้ธีม';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'เพิ่มกฎการกำหนดเส้นทาง (ส่งผลต่อตำแหน่งที่การรับส่งข้อมูลเครือข่าย)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'รวมเข้ากับเส้นทางเครือข่าย (DPI โมดูลบายพาส)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'ขอ URL จากรายการที่อนุญาต';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'เรียกใช้งานพื้นหลัง';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'รันงานที่กำหนดเวลาไว้แม้ในขณะที่แผงปิดอยู่ คุณสามารถหยุดชั่วคราวหรือเปลี่ยนความถี่ในการทำงานได้ในการตั้งค่าส่วนขยาย';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'ทำงานอยู่เบื้องหลัง';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'การหลบเลี่ยงและฮุกเครือข่าย';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'แผงอินเทอร์เฟซ';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'กฎการกำหนดเส้นทาง';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'ธีม';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'วิดเจ็ต';
 
   @override
   String extCatalogCached(String date) {
@@ -1264,46 +1262,46 @@ class STh extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'บันทึกการเปลี่ยนแปลง';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'ไม่สามารถโหลดภาพได้';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'การให้คะแนนทำงานอย่างไร';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'การให้คะแนนใช้ค่าเฉลี่ยแบบเบย์: ส่วนขยายที่มีการให้คะแนนน้อยจะยังคงอยู่ใกล้ตรงกลางจนกว่าผู้คนจะโหวตมากขึ้น ดังนั้นบทวิจารณ์ระดับ 5 ดาวรายการเดียวจึงไม่สามารถผลักดันส่วนขยายใหม่ขึ้นไปด้านบนได้ การให้คะแนนล่าสุดมีน้ำหนักมากกว่าการให้คะแนนแบบเก่า และมีเพียงการให้คะแนนเดียวต่อบัญชีเท่านั้น';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'ภาพหน้าจอ';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'ความเกี่ยวข้อง';
 
   @override
   String get extPermNetworkDetail =>
       'ดึงข้อมูลจากอินเทอร์เน็ตผ่าน VPN อนุญาตเฉพาะโฮสต์ในรายการด้านล่าง ที่เหลือถูกบล็อก';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'งานเบื้องหลัง';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'ทำงานในพื้นหลัง';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'เรียกใช้ทุก';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# นาที');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ชั่วโมง');
     return '$_temp0';
   }
 
@@ -1312,14 +1310,14 @@ class STh extends S {
       'งานจะทำงานตามกำหนดเวลาขณะที่ Sora เปิดอยู่ รวมถึงตอนอยู่ในถาดระบบ ช่วงเวลาสั้นที่สุดคือ 15 นาที';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'เปิดใช้งานส่วนขยายเพื่อจัดการงานพื้นหลัง';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'การเข้าถึงเครือข่าย';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'เครือข่าย: $hosts';
   }
 
   @override
@@ -1334,61 +1332,61 @@ class STh extends S {
   String get diagnosticNoData => 'ยังไม่มีการร้องขอที่บันทึกไว้ เปิดเว็บไซต์ทดสอบความเร็วก่อน';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'แบ่งปันรหัส QR';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'สแกนโค้ด QR';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'คัดลอกลิงค์';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'แสดงลิงค์';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'ซ่อนลิงก์';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'รหัส QR นี้มีรายละเอียดการเชื่อมต่อ อย่าแสดงให้คนแปลกหน้าเห็น';
 
   @override
   String get qrScanHint => 'เลือกภาพหน้าจอหรือรูปภาพที่มีคิวอาร์โค้ด หรือวางลิงก์';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'วางจากคลิปบอร์ด';
 
   @override
   String get qrNoCode => 'ไม่พบคิวอาร์โค้ดในรูปภาพนี้';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'รหัส QR นี้ไม่มีลิงก์ที่ถูกต้อง';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'สแกน QR';
 
   @override
   String get qrFromImage => 'เปิดรูปภาพ';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'จัดกลุ่มตามกระบวนการ';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'รายการ';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'คัดลอกโฮสต์';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'เพิ่มกฎ';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# การเชื่อมต่อ');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'ตั้งค่าล่วงหน้า';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1403,445 +1401,445 @@ class STh extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'กำหนดเอง';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'ตรวจสอบข้อมูลรั่วไหล';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'กำลังตรวจสอบ...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'ไม่พบรอยรั่ว';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'ตรวจพบการรั่วไหล';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'ตรวจสอบครั้งสุดท้าย';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'ยังไม่ได้ทดสอบ';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'ตัวแปลงชื่อ DNS ของอุโมงค์';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'ตัวแปลงชื่อของระบบ';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'การป้องกัน DNS ด้วยการตัดเครือข่าย';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'กำหนดค่า DNS สำหรับช่องสัญญาณในการตั้งค่า DNS ด้านบน';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers => 'ตรวจสอบว่ารีโซลเวอร์ใดที่ระบบของคุณจะใช้นอกอุโมงค์';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'เปิดการตัดเครือข่ายเพื่อให้การรับส่งข้อมูล DNS อยู่ในอุโมงค์';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'DNS แบบเข้ารหัสของระบบ';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'ปลอมแปลงคำตอบ DNS';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns => 'ตรวจสอบว่าปลายทาง DNS ที่เข้ารหัสซึ่งระบบของคุณใช้นอกอุโมงค์';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'ใช้ DNS แบบเข้ารหัส (DoT หรือ DoH) ในอุโมงค์เพื่อป้องกันตัวแปลงชื่อปลอมคำตอบ';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'เชื่อมต่อกับ VPN ก่อน จากนั้นจึงตรวจสอบรอยรั่ว';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'คาดว่า';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'สังเกตแล้ว';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'เรียงตาม';
 
   @override
-  String get sortPing => 'Ping';
+  String get sortPing => 'ปิง';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'ความเร็ว';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'ชื่อ';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'วัดความเร็ว';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'ล้าสมัย';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'เลือกเซิร์ฟเวอร์อัตโนมัติ';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'ปิงที่เร็วที่สุด';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'ความเร็วสูงสุด';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'ทางเลือกที่ชาญฉลาด';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'การเชื่อมต่อกับแกน Sora ไม่เสถียร';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'เชื่อมต่อใหม่';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'กำลังคืนค่าการเชื่อมต่อกับ Sora คอร์...';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'เซสชั่นสุดท้ายถูกขัดจังหวะ';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'กู้คืนเซสชันหลังจากเกิดข้อขัดข้อง';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'กู้คืน';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'ไม่ใช่ตอนนี้';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'การแก้ไขของฉัน';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'แก้ไขเซิร์ฟเวอร์';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'ซ่อน';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'แสดง';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'รีเซ็ตการแก้ไข';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'ยังไม่มีการแก้ไข';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'กฎของตัวเอง';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'การวัดความเร็วจำเป็นต้องมีคอร์ที่ใหม่กว่า';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return 'การวัด $done จาก $total...';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'โปรไฟล์เครือข่าย';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty => 'ยังไม่มีโปรไฟล์ สร้างหนึ่งรายการเพื่อใช้การตั้งค่าโดยอัตโนมัติกับเครือข่ายที่รู้จัก';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'เพิ่มโปรไฟล์';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'ชื่อโปรไฟล์';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi เครือข่าย (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'บ้าน, สำนักงาน คั่นด้วยเครื่องหมายจุลภาค';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'เกตเวย์เครือข่าย';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS หมายเลข';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'นำไปใช้โดยอัตโนมัติ';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'หากปิดไว้ จะขอการยืนยันก่อนใช้โปรไฟล์';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'จำการตั้งค่าปัจจุบัน';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'บันทึกการตั้งค่าปัจจุบันลงในโปรไฟล์';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'ลบโปรไฟล์';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return 'ลบโปรไฟล์ \"$name\" หรือไม่';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return 'ใช้โปรไฟล์ \"$name\"?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'นำไปใช้';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return 'ใช้โปรไฟล์ “$name” แล้ว';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'ยกเลิก';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'ใช้งานอยู่';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'ตอนนี้: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'ข้อมูลเครือข่ายไม่พร้อมใช้งาน';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'เพิ่มทริกเกอร์อย่างน้อยหนึ่งรายการ: SSID เกตเวย์ หรือ ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'พร็อกซีเชน';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => 'ยังไม่มีโซ่ เชื่อมโยงเซิร์ฟเวอร์ 2–3 ตัวเพื่อให้การรับส่งข้อมูลผ่านแต่ละเซิร์ฟเวอร์';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'โซ่ใหม่';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'ชื่อลูกโซ่';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => 'เลือกเซิร์ฟเวอร์ 2–3 เครื่อง';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => 'ลากเพื่อเรียงลำดับใหม่: การจราจรเข้าที่ด้านบนและออกที่ด้านล่าง';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'เลือกอย่างน้อย 2 เซิร์ฟเวอร์';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'สายโซ่มีเซิร์ฟเวอร์ได้สูงสุด 3 เครื่อง';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'เวลาแฝงโดยประมาณ';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'บันทึกห่วงโซ่';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'ลบเชน';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return 'ลบเชน \"$name\" หรือไม่';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'เอนจินปัจจุบันไม่รองรับการสร้างเชน';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'หนึ่งในเซิร์ฟเวอร์ลูกโซ่ไม่สามารถใช้งานได้อีกต่อไป';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return 'ฮอป $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'ทางเข้า';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'ทางออก';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'การซิงโครไนซ์อุปกรณ์';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'อุปกรณ์ของฉัน';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'ไม่มีอุปกรณ์ที่จับคู่ จับคู่อุปกรณ์อื่นผ่านเครือข่ายท้องถิ่น';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'จับคู่อุปกรณ์';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'แสดงรหัสของฉัน';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'สแกนโค้ด';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'ถอนออก';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return 'เพิกถอน \"$name\" หรือไม่';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'ซิงค์ครั้งล่าสุด: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'ไม่เคย';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'อุปกรณ์ต้องอยู่ในเครือข่ายท้องถิ่นเดียวกัน';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'จับคู่อุปกรณ์แล้ว';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'จับคู่กับอุปกรณ์นี้';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'กำลังรออุปกรณ์อื่น...';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'ช่องทางการเข้ารหัสจากต้นทางถึงปลายทาง ไม่มีบัญชี ไม่มีเซิร์ฟเวอร์คลาวด์';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'บายพาส DPI กรองการรับส่งข้อมูลเครือข่ายโดยตรง';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'เรียกใช้ zapret ควบคู่กับอุโมงค์ VPN: ข้อมูลในอุโมงค์ใช้ VPN ส่วนข้อมูลที่เชื่อมต่อโดยตรงใช้กลไกหลบเลี่ยงการปิดกั้น';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'แต่ละเซิร์ฟเวอร์สามารถปรากฏได้เพียงครั้งเดียว';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'แก้ไข';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'ลบ';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'เปิดการย่อยสลายอัตโนมัติ';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'หากเซิร์ฟเวอร์ที่เลือกช้าลงมากหรือไม่ตอบสนอง Sora จะสลับไปยังเซิร์ฟเวอร์ที่ได้ผลการวัดดีที่สุด โดยไม่เกินหนึ่งครั้งทุก 10 นาที';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'คละ';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'ระบบ';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'เพิ่มเซิร์ฟเวอร์ที่กำหนดเอง';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'เซิร์ฟเวอร์ของฉัน';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'ชื่อ';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'ตัวอย่างเช่น: VPS ของฉัน';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'ใส่ชื่อ';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'ที่อยู่';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com หรือ 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'ป้อนที่อยู่เซิร์ฟเวอร์';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'ที่อยู่ไม่ถูกต้อง';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => 'พอร์ต';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'พอร์ตต้องเป็นตัวเลขตั้งแต่ 1 ถึง 65535';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'โปรโตคอล';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'ข้อมูลการเข้าสู่ระบบ';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'ไม่บังคับ';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'แสดงความลับ';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'ซ่อนความลับ';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'กำหนดเอง';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return 'ลบเซิร์ฟเวอร์ “$name” หรือไม่';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'เพิ่มเซิร์ฟเวอร์ด้วยตนเอง: ที่อยู่ พอร์ต และโปรโตคอล';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'ทดสอบ';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'ทดสอบการรั่วไหลของข้อมูล';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'ตรวจสอบว่าข้อมูลออกจากอุปกรณ์โดยไม่ผ่านอุโมงค์ได้หรือไม่ โดยทดสอบ DNS และ ICMP โดยตรง การเชื่อมต่อขาออก IPv6 และตัวแปลงชื่อของระบบ ให้เรียกใช้ขณะเชื่อมต่ออยู่';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'ตรวจสอบ';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'ยกเลิก';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'เชื่อมต่อกับ VPN เพื่อทดสอบข้อมูลรั่วไหล';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'การทดสอบเสร็จสมบูรณ์: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'ไม่พบรอยรั่ว';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: 'พบการรั่วไหล # รายการ');
     return '$_temp0';
   }
 
@@ -1849,131 +1847,130 @@ class STh extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'แก้ไข';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'เปิดการตัดเครือข่ายแล้ว เรียกใช้การทดสอบอีกครั้งเพื่อตรวจสอบ';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'โดยตรง DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP ก้อง';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'ตัวแปลงชื่อของระบบ';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'การเชื่อมต่อแบบทันเนล';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS ลอดอุโมงค์';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded => 'เซิร์ฟเวอร์เริ่มช้า Sora สลับไปยังเซิร์ฟเวอร์ที่ดีที่สุดที่พบในระหว่างการวัด';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'การอำพรางข้อมูลเครือข่าย';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'รหัสหมดอายุแล้ว';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'ไม่สามารถเริ่มบริการซิงค์ได้';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing => 'ไม่พบองค์ประกอบ sora-sync ติดตั้งแอปอีกครั้งเพื่อเปิดใช้งานการซิงค์อุปกรณ์';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'กำลังเริ่มบริการซิงค์...';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => 'บริการซิงค์ปฏิเสธโทเค็นการเข้าถึง รีสตาร์ทแอปแล้วลองอีกครั้ง';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'อุปกรณ์ไม่ได้จับคู่อีกต่อไป';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'เซสชั่นการจับคู่เปิดอยู่แล้ว';
 
   @override
-  String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+  String get syncErrUnreachable => 'อุปกรณ์อีกเครื่องไม่รับสาย ตรวจสอบให้แน่ใจว่าอยู่ในเครือข่ายเดียวกันและแสดงรหัส';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'ข้อผิดพลาดในการซิงโครไนซ์';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'รหัสจะหมดอายุใน $duration';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'กำลังจับคู่กับอุปกรณ์...';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'รายการอุปกรณ์เก่าไม่เคยจับคู่จริงๆ ดังนั้นจึงถูกล้างออกไป จับคู่อุปกรณ์ของคุณอีกครั้งแบบเรียลไทม์ในครั้งนี้';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'รหัสใหม่';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return 'จับคู่กับ $name';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'ทำซ้ำ';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'ซ่อนรหัส';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'ซิงค์ตอนนี้';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return 'ได้รับ $pulled ส่ง $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'ผลการซิงโครไนซ์';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'ได้รับแล้ว';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'ส่งแล้ว';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'ไม่พบการเปลี่ยนแปลง';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'สมัครสมาชิก';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'การตั้งค่าแอป';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'การตั้งค่าทับของการสมัครสมาชิก';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'โปรไฟล์เครือข่าย';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'พร็อกซีเชน';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return 'จาก $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'อุปกรณ์นี้';
 
   @override
   String get syncUnavailableAndroid =>

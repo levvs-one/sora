@@ -132,7 +132,7 @@ class SIt extends S {
   String get logsEmpty => 'Niente qui';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'Nessuna connessione';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class SIt extends S {
   String get theme => 'Tema';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Come il sistema';
 
   @override
   String get themeLight => 'Leggera';
@@ -292,7 +292,7 @@ class SIt extends S {
   String get language => 'Lingua';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Come il sistema';
 
   @override
   String get sectionConnection => 'Connessione';
@@ -796,29 +796,29 @@ class SIt extends S {
 
   @override
   String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+      'Lo sviluppatore ha ritirato questa versione. Please wait for a corrected release.';
 
   @override
   String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+      'Una versione più recente verrà lanciata gradualmente e ti verrà offerta automaticamente.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return 'Ripristino della versione $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return 'L\'aggiornamento a $version non ha superato il controllo di integrità, quindi Sora è stato riportato a $fromVersion.';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'Rollback automatico non riuscito. Se la nuova versione non funziona, reinstallare manualmente la versione precedente.';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'Impossibile preparare una copia di rollback verificata della versione corrente, quindi l\'aggiornamento non è stato installato.';
 
   @override
   String get updateCopyCommand => 'Copia comando';
@@ -897,373 +897,376 @@ class SIt extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'Valutazione $rating di 5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return 'di $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return 'Installazioni: $count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 installazione';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'Verificato';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'Most popular this week';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'Nuovo';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'La squadra Sora';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'Non dal catalogo';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'Questa estensione non è presente nel catalogo del team. Solo l\'autore ha garantito per la propria chiave: installala solo se ti fidi dell\'autore.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return 'Installa «$name»';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return 'Aggiorna «$name»';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'Questa estensione sarà in grado di:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'L\'aggiornamento richiede nuove autorizzazioni:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'Capisco che questi permessi sono seri';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'Installa';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'Aggiorna';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'Annulla';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'Conferma';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'Catalogo';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'Estensioni installate';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'Cerca estensioni';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'Tutti';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'Strumenti';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'Temi';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'Automazione';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'Statistiche';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'Rete';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'Ordina per';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'Il più popolare';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'Voto più alto';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'Nome';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'Impossibile caricare il catalogo';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'Riprova';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'Non è stato trovato nulla';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled =>
+      'Nessuna estensione ancora installata.\nTrovane uno nel catalogo o installalo da un file.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'Installa da file';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'Installa da URL';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'Scarica';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'Download in corso…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'Verifica…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'Installazione…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'Installazione non riuscita';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature =>
+      'Il controllo della firma non è riuscito. Il file potrebbe essere danneggiato o manomesso.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'Il manifest dell\'estensione non è valido.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'Errore di rete. Controlla la connessione e riprova.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'Il download non corrisponde al catalogo. Potrebbe essere stato manomesso.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'Questa estensione richiede la versione dell\'app $version o successiva.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'Sono consentiti solo i collegamenti https://';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'Qualcosa è andato storto. Per favore riprova.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'Questo aggiornamento è firmato con una chiave autore diversa rispetto alla versione installata, quindi è stato bloccato. Se ti fidi della nuova chiave, disinstalla l\'estensione e installala di nuovo esplicitamente.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'Aggiornamento disponibile';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'Disattivato';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return 'Abilita $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'Cerca tra le estensioni installate';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'Aggiorna tutto';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count aggiornamenti disponibili';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count aggiornato';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => 'Normale';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'Sensibile';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'Rischio alto';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'Non più richiesto:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'La versione precedente è ancora installata.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'Conflitti di estensione';
 
   @override
   String get extConflictsIntro =>
       'Queste estensioni vogliono la stessa cosa. Scegli quale funziona; l’altra resta installata.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'Tema dell\'app';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'Ganci di rete';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '$name vince';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count i conflitti richiedono la tua decisione';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'Risolvere i conflitti';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'La tua scelta viene salvata su questo dispositivo. Un tema cambia subito; gli hook di rete non vengono eseguiti in questa versione.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'Versione $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'Autore';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'Valutazione';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'Installazioni';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'Versione';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'Informazioni su questa estensione';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'Autorizzazioni';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'Nessuna autorizzazione speciale.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'Impostazioni';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'Salva le impostazioni';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'Salvataggio…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return 'Aggiorna alla $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'Attivato';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return 'Torna alla $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return 'Rollback alla versione $version?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'Disinstalla';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return 'Rimuovere “$name” e le relative impostazioni?';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable =>
+      'Il pannello non è disponibile. L\'estensione potrebbe essere stata disabilitata o rimossa.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'Visualizza l\'elenco delle connessioni attive';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'Visualizza un elenco dei tuoi server';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'Leggi le impostazioni dell\'app';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'Modificare le impostazioni dell\'app';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'Mostra notifiche';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'Aggiungi elementi al menu della barra delle applicazioni';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'Mostra i pannelli all\'interno dell\'app';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'Applica temi';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'Aggiungi regole di routing (influisce su dove va il traffico di rete)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'Integrazione nel percorso di rete (DPI moduli bypass)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'Richiedi URL dall\'elenco consentito';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'Esegui attività in background';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'Esegue le attività pianificate anche quando il pannello è chiuso. Puoi metterlo in pausa o modificare la frequenza con cui viene eseguito nelle impostazioni dell\'estensione.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'Viene eseguito in background';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'Aggiramenti e hook di rete';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'Pannelli di interfaccia';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'Regole di instradamento';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'Temi';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'Widget';
 
   @override
   String extCatalogCached(String date) {
@@ -1271,46 +1274,46 @@ class SIt extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'Registro delle modifiche';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'Impossibile caricare l\'immagine';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'Come funzionano le valutazioni';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'Le valutazioni utilizzano una media bayesiana: un\'estensione con poche valutazioni rimane quasi al centro finché non votano più persone, quindi una singola recensione a 5 stelle non può spingere una nuova estensione in cima. Le valutazioni recenti pesano più di quelle vecchie e conta solo una valutazione per account.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'Schermate';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'Rilevanza';
 
   @override
   String get extPermNetworkDetail =>
       'Scarica dati da Internet tramite la VPN. Sono consentiti solo gli host qui sotto, tutto il resto è bloccato.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'Attività in background';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'Esegui in background';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'Esegui ogni';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minuti', one: '# minuto');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ore', one: '# ora');
     return '$_temp0';
   }
 
@@ -1319,14 +1322,14 @@ class SIt extends S {
       'L’attività viene eseguita secondo la pianificazione finché Sora è aperto, anche nell’area di notifica. L’intervallo minimo è di 15 minuti.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'Abilita l\'estensione a gestire la sua attività in background.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'Accesso alla rete';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'Rete: $hosts';
   }
 
   @override
@@ -1341,61 +1344,61 @@ class SIt extends S {
   String get diagnosticNoData => 'Nessuna richiesta registrata ancora. Apri prima un sito Web di test di velocità.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'Condividi il codice QR';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'Scansiona il codice QR';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'Copia collegamento';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'Mostra collegamento';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'Nascondi collegamento';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'Questo codice QR contiene i dettagli della connessione. Non mostrarlo agli sconosciuti.';
 
   @override
   String get qrScanHint => 'Scegli uno screenshot o una foto con un codice QR, oppure incolla un link';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'Incolla dagli appunti';
 
   @override
   String get qrNoCode => 'Nessun codice QR trovato in questa immagine.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'Questo codice QR non contiene un collegamento valido.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'Scansione QR';
 
   @override
   String get qrFromImage => 'Apri immagine';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'Raggruppare per processo';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'Elenco';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'Copia host';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'Aggiungi regola';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connessioni', one: '# connessione');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'Preimpostato';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1410,445 +1413,454 @@ class SIt extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'Personalizzato';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'Verificare la presenza di perdite di dati';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'Controllo...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'Nessuna fuga di notizie trovata';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'Perdita rilevata';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'Ultimo controllo';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'Non ancora testato';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'Resolver DNS del tunnel';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'Resolver di sistema';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'Protezione DNS del blocco di rete';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'Configurare DNS per il tunnel nelle impostazioni DNS sopra.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Controlla quali risolutori utilizzerebbe il tuo sistema al di fuori del tunnel.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'Attiva il blocco di rete per mantenere il traffico DNS nel tunnel.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'DNS cifrato del sistema operativo';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'Risposte DNS contraffatte';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Controlla quali endpoint DNS crittografati utilizza il tuo sistema all\'esterno del tunnel.';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'Utilizzare DNS crittografato (DoT o DoH) per il tunnel in modo che i risolutori non possano falsificare le risposte.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'Connettersi prima a VPN, quindi verificare eventuali perdite.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'Previsto';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'Osservato';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'Ordina per';
 
   @override
   String get sortPing => 'Ping';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'Velocità';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'Nome';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'Misurare la velocità';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'obsoleto';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'Selezione automatica del server';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'Ping più veloce';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'Velocità massima';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'Scelta intelligente';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'La connessione al nucleo Sora è instabile';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'Riconnetti';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'Ripristino della connessione al nucleo Sora…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'L\'ultima seduta è stata interrotta';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'Ripristina la sessione dopo un arresto anomalo';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'Ripristina';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'Non ora';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'Le mie modifiche';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'Modifica i server';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'Nascondi';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'Mostra';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'Reimposta le modifiche';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'Ancora nessuna modifica';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'Regole proprie';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'La misurazione della velocità necessita di un nucleo più recente';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return 'Misurazione di $done da $total…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'Profili di rete';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty =>
+      'Nessun profilo ancora. Creane uno per applicare automaticamente le impostazioni sulle reti conosciute.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'Aggiungi profilo';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'Nome del profilo';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi reti (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'Casa, Ufficio separati da virgole';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'Gateway di rete';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS numeri';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'Applica automaticamente';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'Se disattivato, chiedi conferma prima di applicare il profilo.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'Ricorda le impostazioni attuali';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'Impostazioni correnti salvate nel profilo';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'Cancella profilo';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return 'Eliminare il profilo \"$name\"?';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return 'Applicare il profilo \"$name\"?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'Applica';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return 'Profilo “$name” applicato';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'Annulla';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'Attivo';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'Adesso: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'Informazioni di rete non disponibili';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'Aggiungi almeno un trigger: SSID, gateway o ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'Catene proxy';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty =>
+      'Ancora nessuna catena. Collega 2-3 server in modo che il traffico passi attraverso ciascuno di essi.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'Nuova catena';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'Nome della catena';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => 'Scegli 2-3 server';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => 'Trascina per riordinare: il traffico entra in alto ed esce in basso.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'Scegli almeno 2 server';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'Una catena contiene al massimo 3 server';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'Latenza stimata';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'Salva catena';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'Elimina catena';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return 'Eliminare la catena \"$name\"?';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'Il motore attuale non può costruire catene';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'Uno dei server della catena non è più disponibile';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return 'Salto $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'Ingresso';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'Uscita';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'Sincronizzazione del dispositivo';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'I miei dispositivi';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'Nessun dispositivo associato. Associa un altro dispositivo sulla rete locale.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'Associa il dispositivo';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'Mostra il mio codice';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'Scansiona il codice';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'Ritira';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return 'Revoca \"$name\"?';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'Ultima sincronizzazione: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'Mai';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'I dispositivi devono trovarsi sulla stessa rete locale';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'Dispositivo accoppiato';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'Accoppia con questo dispositivo';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'In attesa dell\'altro dispositivo…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'Canale crittografato end-to-end. Nessun account, nessun server cloud.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'Ignora il filtro DPI per il traffico di rete diretto';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'Esegue zapret insieme al tunnel VPN: il traffico nel tunnel usa la VPN, quello diretto passa per il sistema di aggiramento.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'Ciascun server può apparire solo una volta';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Modifica';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Rimuovi';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'Degrado accensione automatica';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'Se il server selezionato rallenta molto o smette di rispondere, Sora passa al migliore in base alle misurazioni, al massimo una volta ogni 10 minuti.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'Misto';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'Sistema';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'Aggiungi server personalizzato';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'I miei server';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'Nome';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'Ad esempio: il mio VPS';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'Inserisci il nome';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'Indirizzo';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com o 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'Immettere l\'indirizzo del server';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'Indirizzo non valido';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => 'Porta';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'La porta deve essere un numero compreso tra 1 e 65535';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'Protocollo';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'Informazioni di accesso';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'Opzionale';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'Mostra segreto';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'Nascondi segreto';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'personalizzato';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return 'Eliminare il server “$name”?';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'Aggiungere manualmente un server: indirizzo, porta e protocollo';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'Prova';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'Test per perdite di dati';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'Verifica se il traffico può uscire dal dispositivo al di fuori del tunnel: richieste DNS e ICMP dirette, traffico IPv6 in uscita e resolver di sistema. Esegui il test durante la connessione.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'Controlla';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'Annulla';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'Connettersi a VPN per verificare eventuali fughe di dati.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'Test completati: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'Nessuna fuga di notizie trovata';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# perdite rilevate',
+      one: '# perdita rilevata',
+    );
     return '$_temp0';
   }
 
@@ -1856,131 +1868,134 @@ class SIt extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'Correzione';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'Il blocco di rete è attivo. Ripeti il test per verificare.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'Diretto DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP eco';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'Resolver di sistema';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'Connettività tra tunnel';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS attraverso il tunnel';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded =>
+      'Il server è diventato lento. Sora è passato al miglior server trovato durante la misurazione.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'Offuscamento del traffico';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'Il codice è scaduto';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'Impossibile avviare il servizio di sincronizzazione';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing =>
+      'Il componente sora-sync non è stato trovato. Reinstallare l\'app per abilitare la sincronizzazione del dispositivo.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'Avvio del servizio di sincronizzazione…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth =>
+      'Il servizio di sincronizzazione ha rifiutato il token di accesso. Riavvia l\'app e riprova.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'Il dispositivo non è più associato';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'Una sessione di abbinamento è già aperta';
 
   @override
   String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+      'L\'altro dispositivo non ha risposto. Assicurati che sia sulla stessa rete e che mostri il relativo codice.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'Errore di sincronizzazione';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'Il codice scade tra $duration';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'Associazione con il dispositivo…';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'Il vecchio elenco dei dispositivi non è mai stato effettivamente accoppiato, quindi è stato cancellato. Accoppia nuovamente i tuoi dispositivi, questa volta per davvero.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'Nuovo codice';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return 'Accoppiato con $name';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'Ripeti';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'Nascondi codice';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'Sincronizza ora';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return 'Ricevuto $pulled, inviato $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'Risultato della sincronizzazione';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'Ricevuto';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'Inviato';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'Nessuna modifica rilevata';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'Sottoscrizioni';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'Impostazioni dell\'app';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'Personalizzazioni delle sottoscrizioni';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'Profili di rete';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'Catene proxy';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return 'da $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'Questo dispositivo';
 
   @override
   String get syncUnavailableAndroid =>

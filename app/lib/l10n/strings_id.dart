@@ -132,7 +132,7 @@ class SId extends S {
   String get logsEmpty => 'Tidak ada apa pun di sini';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'Tidak ada koneksi';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class SId extends S {
   String get theme => 'Tema';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Ikuti sistem';
 
   @override
   String get themeLight => 'Lampu';
@@ -292,7 +292,7 @@ class SId extends S {
   String get language => 'Bahasa';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Ikuti sistem';
 
   @override
   String get sectionConnection => 'Koneksi';
@@ -791,30 +791,29 @@ class SId extends S {
       'File di bawah cocok dengan checksum rilis. Jalankan perintah jika Anda mengunduhnya dari rilis resmi.';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => 'Pengembang telah menarik versi ini. Harap tunggu rilis yang diperbaiki.';
 
   @override
   String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+      'Versi yang lebih baru diluncurkan secara bertahap dan akan ditawarkan kepada Anda secara otomatis.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return 'Mengembalikan ke versi $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return 'Pembaruan ke $version tidak lolos pemeriksaan kesehatan, jadi Sora dibatalkan ke $fromVersion.';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'Pengembalian otomatis gagal. Jika versi baru tidak berfungsi, instal ulang rilis sebelumnya secara manual.';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'Tidak dapat menyiapkan salinan rollback terverifikasi dari versi saat ini, sehingga pembaruan tidak diinstal.';
 
   @override
   String get updateCopyCommand => 'Salin perintah';
@@ -893,373 +892,373 @@ class SId extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'Peringkat $rating dari 5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return 'oleh $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return 'Instalasi: $count';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 pemasangan';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'Terverifikasi';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'Paling populer minggu ini';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'Baru';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Tim Sora';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'Bukan dari katalog';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'Ekstensi ini bukan dari katalog tim. Hanya penulis yang menjamin kuncinya: instal hanya jika Anda memercayai penulisnya.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return 'Pasang “$name”';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return 'Perbarui “$name”';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'Ekstensi ini akan dapat:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'Pembaruan meminta izin baru:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'Saya memahami bahwa izin ini serius';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'Pasang';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'Perbarui';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'Batal';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'Konfirmasi';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'Katalog';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'Ekstensi terpasang';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'Cari ekstensi';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'Semuanya';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'Alat';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'Tema';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'Otomatisasi';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'Statistik';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'Jaringan';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'Urutkan berdasarkan';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'Paling populer';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'Nilai tertinggi';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'Nama';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'Tidak dapat memuat katalog';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'Coba lagi';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'Tidak ada yang ditemukan';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled => 'Belum ada ekstensi yang dipasang.\nTemukan satu di katalog atau instal dari file.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'Instal dari file';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'Instal dari URL';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'Unduh';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'Mengunduh…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'Memverifikasi…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'Memasang…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'Penginstalan gagal';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'Pemeriksaan tanda tangan gagal. File mungkin rusak atau diubah.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'Manifes ekstensi tidak valid.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'Unduhan tidak sesuai dengan katalog. Ini mungkin telah dirusak.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'Ekstensi ini memerlukan versi aplikasi $version atau lebih baru.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'Hanya tautan https:// yang diperbolehkan';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'Ada yang tidak beres. Silakan coba lagi.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'Pembaruan ini ditandatangani dengan kunci penulis yang berbeda dari versi yang diinstal, sehingga diblokir. Jika Anda memercayai kunci baru, copot pemasangan ekstensi dan pasang kembali secara eksplisit.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'Pembaruan tersedia';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'Dinonaktifkan';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return 'Aktifkan $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'Cari ekstensi terpasang';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'Perbarui semua';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count pembaruan tersedia';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count diperbarui';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => 'Biasa';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'Sensitif';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'Resiko tinggi';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'Tidak lagi diminta:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'Versi sebelumnya masih terinstal.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'Konflik perluasan';
 
   @override
   String get extConflictsIntro =>
       'Ekstensi ini menginginkan hal yang sama. Pilih mana yang berjalan; yang lain tetap terpasang.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'Tema aplikasi';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'Kait jaringan';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '$name menang';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count konflik membutuhkan keputusan Anda';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'Selesaikan konflik';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'Pilihan Anda disimpan di perangkat ini. Tema langsung berganti; hook jaringan tidak dijalankan di versi ini.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'Versi $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'Penulis';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'Peringkat';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'Instalasi';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'Versi';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'Tentang ekstensi ini';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'Izin';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'Tidak ada izin khusus.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'Pengaturan';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'Simpan pengaturan';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'Menyimpan…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return 'Perbarui ke $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'Diaktifkan';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return 'Kembalikan ke $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return 'Kembalikan ke versi $version?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'Copot pemasangan';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return 'Hapus “$name” dan pengaturannya?';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => 'Panel tidak tersedia. Ekstensi mungkin telah dinonaktifkan atau dihapus.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'Lihat daftar koneksi aktif';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'Lihat daftar server Anda';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'Baca pengaturan aplikasi';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'Mengubah pengaturan aplikasi';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'Tampilkan notifikasi';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'Tambahkan item ke menu baki';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'Tampilkan panel di dalam aplikasi';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'Terapkan tema';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'Tambahkan aturan perutean (mempengaruhi kemana lalu lintas jaringan pergi)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'Integrasikan ke jalur jaringan (DPI modul bypass)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'Minta URL dari daftar yang diizinkan';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'Jalankan tugas latar belakang';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'Menjalankan tugas terjadwal bahkan ketika panel ditutup. Anda dapat menjeda atau mengubah frekuensi dijalankannya di pengaturan ekstensi.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'Berjalan di latar belakang';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'Pengelakan dan kait jaringan';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'Panel antarmuka';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'Aturan perutean';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'Tema';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'Widget';
 
   @override
   String extCatalogCached(String date) {
@@ -1267,46 +1266,46 @@ class SId extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'Catatan Perubahan';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'Tidak dapat memuat gambar';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'Cara kerja pemeringkatan';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'Peringkat menggunakan rata-rata Bayesian: ekstensi dengan sedikit peringkat tetap berada di tengah hingga lebih banyak orang memilih, sehingga satu ulasan bintang 5 tidak dapat mendorong ekstensi baru ke atas. Peringkat terbaru lebih berbobot dibandingkan peringkat lama, dan hanya satu peringkat per akun yang dihitung.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'Tangkapan Layar';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'Relevansi';
 
   @override
   String get extPermNetworkDetail =>
       'Mengambil data dari internet melalui VPN. Hanya host di bawah yang diizinkan, sisanya diblokir.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'Tugas latar belakang';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'Jalankan di latar belakang';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'Jalankan setiap';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# menit');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# jam');
     return '$_temp0';
   }
 
@@ -1315,14 +1314,14 @@ class SId extends S {
       'Tugas berjalan sesuai jadwal selama Sora terbuka, termasuk saat di baki. Interval terpendek 15 menit.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'Aktifkan ekstensi untuk mengelola tugas latar belakangnya.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'Akses jaringan';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'Jaringan: $hosts';
   }
 
   @override
@@ -1337,61 +1336,61 @@ class SId extends S {
   String get diagnosticNoData => 'Belum ada permintaan yang tercatat. Buka situs tes kecepatan terlebih dahulu.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'Bagikan kode QR';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'Pindai kode QR';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'Salin tautan';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'Tampilkan tautan';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'Sembunyikan tautan';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'Kode QR ini berisi detail koneksi. Jangan perlihatkan kepada orang asing.';
 
   @override
   String get qrScanHint => 'Pilih tangkapan layar atau foto berisi kode QR, atau tempel tautan';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'Tempel dari papan klip';
 
   @override
   String get qrNoCode => 'Tidak ada kode QR di gambar ini.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'Kode QR ini tidak berisi tautan yang valid.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'Pindai QR';
 
   @override
   String get qrFromImage => 'Buka gambar';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'Kelompokkan berdasarkan proses';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'Daftar';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'Salin hostnya';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'Tambahkan aturan';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# koneksi');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'Prasetel';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1406,263 +1405,266 @@ class SId extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'Khusus';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'Periksa kebocoran data';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'Memeriksa...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'Tidak ditemukan kebocoran';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'Kebocoran terdeteksi';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'Pemeriksaan terakhir';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'Belum diuji';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'Resolver DNS terowongan';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'Resolver sistem';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'Perlindungan DNS oleh pemutus jaringan';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'Konfigurasikan DNS untuk terowongan dalam pengaturan DNS di atas.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Periksa penyelesai mana yang akan digunakan sistem Anda di luar terowongan.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'Aktifkan pemutus jaringan agar lalu lintas DNS tetap di dalam terowongan.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'DNS terenkripsi sistem operasi';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'Tanggapan DNS palsu';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Periksa titik akhir DNS terenkripsi mana yang digunakan sistem Anda di luar terowongan.';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'Gunakan DNS terenkripsi (DoT atau DoH) untuk terowongan agar resolver tidak dapat memalsukan jawaban.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'Hubungkan ke VPN terlebih dahulu, lalu periksa kebocorannya.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'Diharapkan';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'Diamati';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'Urutkan berdasarkan';
 
   @override
   String get sortPing => 'Ping';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'Kecepatan';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'Nama';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'Ukur kecepatan';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'ketinggalan jaman';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'Pilih server secara otomatis';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'Ping tercepat';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'Kecepatan tercepat';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'Pilihan cerdas';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'Koneksi ke inti Sora tidak stabil';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'Sambungkan kembali';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'Memulihkan koneksi ke inti Sora…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'Sesi terakhir diinterupsi';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'Pulihkan sesi setelah crash';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'Pulihkan';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'Tidak sekarang';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'Hasil edit saya';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'Mengedit server';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'Sembunyikan';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'Tunjukkan';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'Setel ulang pengeditan';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'Belum ada pengeditan';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'Aturan sendiri';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'Pengukuran kecepatan membutuhkan inti yang lebih baru';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return 'Pengukuran $done dari $total…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'Profil jaringan';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty =>
+      'Belum ada profil. Buat satu untuk menerapkan pengaturan secara otomatis pada jaringan yang dikenal.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'Tambahkan profil';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'Nama profil';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi jaringan (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'Beranda, Kantor dipisahkan dengan koma';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'Gerbang jaringan';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS nomor';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'Terapkan otomatis';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'Jika dinonaktifkan, minta konfirmasi sebelum menerapkan profil.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'Ingat pengaturan saat ini';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'Pengaturan saat ini disimpan ke dalam profil';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'Hapus profil';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return 'Hapus profil \"$name\"?';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return 'Terapkan profil \"$name\"?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'Terapkan';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return 'Profil “$name” diterapkan';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'Batal';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'Aktif';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'Sekarang: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'Info jaringan tidak tersedia';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'Tambahkan setidaknya satu pemicu: SSID, gateway atau ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'Rantai proksi';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => 'Belum ada rantai. Tautkan 2–3 server sehingga lalu lintas melewati masing-masing server.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'Rantai baru';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'Nama rantai';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => 'Pilih 2–3 server';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => 'Seret untuk menyusun ulang: lalu lintas masuk di atas dan keluar di bawah.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'Pilih setidaknya 2 server';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'Sebuah rantai menampung paling banyak 3 server';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'Perkiraan latensi';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'Simpan rantai';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'Hapus rantai';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return 'Hapus rantai \"$name\"?';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'Mesin yang ada saat ini tidak dapat membuat rantai';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'Salah satu server rantai tidak lagi tersedia';
 
   @override
   String chainHop(Object n) {
@@ -1670,115 +1672,115 @@ class SId extends S {
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'Masuk';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'Keluar';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'Sinkronisasi perangkat';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'Perangkatku';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'Tidak ada perangkat yang dipasangkan. Pasangkan perangkat lain melalui jaringan lokal.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'Pasangkan perangkat';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'Tunjukkan kode saya';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'Pindai kode';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'Mundur';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return 'Cabut \"$name\"?';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'Sinkronisasi terakhir: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'Tidak pernah';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'Perangkat harus berada di jaringan lokal yang sama';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'Perangkat dipasangkan';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'Pasangkan dengan perangkat ini';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'Menunggu perangkat lain…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'Saluran terenkripsi ujung ke ujung. Tidak ada akun, tidak ada server cloud.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'Lewati pemfilteran DPI untuk lalu lintas jaringan langsung';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'Menjalankan zapret bersama terowongan VPN: lalu lintas terowongan memakai VPN, lalu lintas langsung melewati mekanisme pengelakan.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'Setiap server hanya dapat muncul satu kali';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Sunting';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Hapus';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'Aktifkan degradasi secara otomatis';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'Jika server yang dipilih sangat melambat atau berhenti merespons, Sora beralih ke server dengan hasil pengukuran terbaik, paling sering sekali setiap 10 menit.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'Campur aduk';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'Sistem';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'Tambahkan server khusus';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'Serverku';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'Nama';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'Misalnya: VPS saya';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'Masukkan nama';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'Alamat';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com atau 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'Masukkan alamat server';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'Alamat tidak valid';
 
   @override
   String get customServerPort => 'Port';
@@ -1787,64 +1789,64 @@ class SId extends S {
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'Port harus berupa angka dari 1 hingga 65535';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'Protokol';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'Informasi masuk';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'Opsional';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'Tampilkan rahasia';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'Sembunyikan rahasia';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'khusus';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return 'Hapus server “$name”?';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'Tambahkan server secara manual: alamat, port dan protokol';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'Tes';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'Uji kebocoran data';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'Memeriksa apakah lalu lintas dapat keluar dari perangkat di luar terowongan: DNS dan ICMP langsung, lalu lintas keluar IPv6, serta resolver sistem. Jalankan saat terhubung.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'Periksa';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'Batal';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'Hubungkan ke VPN untuk menguji kebocoran data.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'Tes selesai: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'Tidak ditemukan kebocoran';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# kebocoran ditemukan');
     return '$_temp0';
   }
 
@@ -1852,131 +1854,133 @@ class SId extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'Perbaiki';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'Pemutus jaringan aktif. Jalankan pengujian lagi untuk memastikannya.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'Langsung DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP gema';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'Resolver sistem';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'Konektivitas terowongan';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS melalui terowongan';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded =>
+      'Server menjadi lambat. Sora beralih ke server terbaik yang ditemukan selama pengukuran.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'Penyamaran lalu lintas';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'Kode telah kedaluwarsa';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'Tidak dapat memulai layanan sinkronisasi';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing =>
+      'Komponen sora-sync tidak ditemukan. Instal ulang aplikasi untuk mengaktifkan sinkronisasi perangkat.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'Memulai layanan sinkronisasi…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => 'Layanan sinkronisasi menolak token akses. Mulai ulang aplikasi dan coba lagi.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'Perangkat tidak lagi dipasangkan';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'Sesi berpasangan sudah terbuka';
 
   @override
   String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+      'Perangkat lain tidak menjawab. Pastikan itu berada di jaringan yang sama dan menampilkan kodenya.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'Kesalahan sinkronisasi';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'Kode kedaluwarsa dalam $duration';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'Memasangkan dengan perangkat…';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'Daftar perangkat lama tidak pernah benar-benar dipasangkan, jadi daftar tersebut dihapus. Pasangkan kembali perangkat Anda, kali ini secara nyata.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'Kode baru';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return 'Dipasangkan dengan $name';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'Ulangi';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'Sembunyikan kode';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'Sinkronkan sekarang';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return 'Menerima $pulled, mengirim $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'Hasil sinkronisasi';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'Diterima';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'Terkirim';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'Tidak ada perubahan yang terdeteksi';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'Langganan';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'Pengaturan aplikasi';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'Penyesuaian berlangganan';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'Profil jaringan';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'Rantai proksi';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return 'dari $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'Perangkat ini';
 
   @override
   String get syncUnavailableAndroid =>

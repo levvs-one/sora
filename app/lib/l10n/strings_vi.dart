@@ -132,7 +132,7 @@ class SVi extends S {
   String get logsEmpty => 'Không có gì ở đây';
 
   @override
-  String get connEmpty => 'No connections';
+  String get connEmpty => 'Không có kết nối';
 
   @override
   String appVersion(String version) {
@@ -280,7 +280,7 @@ class SVi extends S {
   String get theme => 'chủ đề';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Theo hệ thống';
 
   @override
   String get themeLight => 'Ánh sáng';
@@ -292,7 +292,7 @@ class SVi extends S {
   String get language => 'Ngôn ngữ';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Theo hệ thống';
 
   @override
   String get sectionConnection => 'Sự liên quan';
@@ -792,30 +792,29 @@ class SVi extends S {
       'Các tệp dưới đây khớp với checksum của bản phát hành. Hãy chạy lệnh nếu bạn tải chúng từ bản phát hành chính thức.';
 
   @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
+  String get updateVersionRevoked => 'Nhà phát triển đã rút phiên bản này. Vui lòng chờ bản phát hành được sửa chữa.';
 
   @override
   String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+      'Một phiên bản mới hơn đang được triển khai dần dần và sẽ tự động được cung cấp cho bạn.';
 
   @override
   String updateRollbacking(String version) {
-    return 'Rolling back to version $version...';
+    return 'Quay lại phiên bản $version...';
   }
 
   @override
   String updateRolledBack(String version, String fromVersion) {
-    return 'The update to $version did not pass the health check, so Sora was rolled back to $fromVersion.';
+    return 'Bản cập nhật cho $version không vượt qua được quá trình kiểm tra tình trạng nên Sora đã được khôi phục về $fromVersion.';
   }
 
   @override
   String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+      'Tự động khôi phục không thành công. Nếu phiên bản mới không hoạt động, hãy cài đặt lại bản phát hành trước đó theo cách thủ công.';
 
   @override
   String get updateRollbackCacheError =>
-      'Could not prepare a verified rollback copy of the current version, so the update was not installed.';
+      'Không thể chuẩn bị bản sao khôi phục đã được xác minh của phiên bản hiện tại, do đó bản cập nhật chưa được cài đặt.';
 
   @override
   String get updateCopyCommand => 'Sao chép lệnh';
@@ -893,373 +892,375 @@ class SVi extends S {
 
   @override
   String extRatingLabel(String rating) {
-    return 'Rating $rating of 5';
+    return 'Xếp hạng $rating trên 5';
   }
 
   @override
   String extByAuthor(String author) {
-    return 'by $author';
+    return 'bởi $author';
   }
 
   @override
   String extInstallsCount(String count) {
-    return '$count installs';
+    return '$count lượt cài đặt';
   }
 
   @override
-  String get extInstallOne => '1 install';
+  String get extInstallOne => '1 lượt cài đặt';
 
   @override
-  String get extBadgeVerified => 'Verified';
+  String get extBadgeVerified => 'Đã xác minh';
 
   @override
-  String get extBadgeTop => 'Top this week';
+  String get extBadgeTop => 'Phổ biến nhất tuần này';
 
   @override
-  String get extBadgeNew => 'New';
+  String get extBadgeNew => 'Mới';
 
   @override
-  String get extBadgeStaff => 'Sora team';
+  String get extBadgeStaff => 'Đội Sora';
 
   @override
-  String get extSideloadShort => 'Not from catalog';
+  String get extSideloadShort => 'Không có trong danh mục';
 
   @override
   String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
+      'Tiện ích mở rộng này không có trong danh mục của nhóm. Chỉ tác giả mới xác nhận khóa của họ: chỉ cài đặt nó nếu bạn tin tưởng tác giả.';
 
   @override
   String extInstallTitle(String name) {
-    return 'Install $name';
+    return 'Cài đặt “$name”';
   }
 
   @override
   String extUpdateTitle(String name) {
-    return 'Update $name';
+    return 'Cập nhật “$name”';
   }
 
   @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extPermissionsIntro => 'Tiện ích mở rộng này sẽ có thể:';
 
   @override
-  String get extPermissionsWidened => 'The update asks for new permissions:';
+  String get extPermissionsWidened => 'Bản cập nhật yêu cầu quyền mới:';
 
   @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
+  String get extDangerousAck => 'Tôi hiểu rằng những quyền này là nghiêm trọng';
 
   @override
-  String get extInstall => 'Install';
+  String get extInstall => 'Cài đặt';
 
   @override
-  String get extUpdate => 'Update';
+  String get extUpdate => 'Cập nhật';
 
   @override
-  String get extCancel => 'Cancel';
+  String get extCancel => 'Hủy';
 
   @override
-  String get extConfirm => 'Confirm';
+  String get extConfirm => 'Xác nhận';
 
   @override
   String get extOk => 'OK';
 
   @override
-  String get extCatalog => 'Catalog';
+  String get extCatalog => 'Danh mục';
 
   @override
-  String get extInstalled => 'Installed';
+  String get extInstalled => 'Tiện ích mở rộng đã cài đặt';
 
   @override
-  String get extSearchHint => 'Search extensions';
+  String get extSearchHint => 'Tìm tiện ích mở rộng';
 
   @override
-  String get extCatAll => 'All';
+  String get extCatAll => 'Tất cả';
 
   @override
-  String get extCatTools => 'Tools';
+  String get extCatTools => 'Dụng cụ';
 
   @override
-  String get extCatThemes => 'Themes';
+  String get extCatThemes => 'Giao diện';
 
   @override
-  String get extCatAutomation => 'Automation';
+  String get extCatAutomation => 'Tự động hóa';
 
   @override
-  String get extCatStats => 'Statistics';
+  String get extCatStats => 'Thống kê';
 
   @override
-  String get extCatNetwork => 'Network';
+  String get extCatNetwork => 'Mạng';
 
   @override
-  String get extSortBy => 'Sort by';
+  String get extSortBy => 'Sắp xếp theo';
 
   @override
-  String get extSortPopular => 'Most popular';
+  String get extSortPopular => 'Phổ biến nhất';
 
   @override
-  String get extSortRating => 'Highest rated';
+  String get extSortRating => 'Được đánh giá cao nhất';
 
   @override
-  String get extSortName => 'Name';
+  String get extSortName => 'Tên';
 
   @override
-  String get extCatalogError => 'Could not load the catalog';
+  String get extCatalogError => 'Không thể tải danh mục';
 
   @override
-  String get extRetry => 'Retry';
+  String get extRetry => 'Thử lại';
 
   @override
-  String get extEmptySearch => 'Nothing found';
+  String get extEmptySearch => 'Không tìm thấy gì';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled =>
+      'Chưa cài đặt tiện ích mở rộng nào.\nTìm một cái trong danh mục hoặc cài đặt từ một tập tin.';
 
   @override
-  String get extInstallFromFile => 'Install from file';
+  String get extInstallFromFile => 'Cài đặt từ tập tin';
 
   @override
-  String get extInstallFromUrl => 'Install from URL';
+  String get extInstallFromUrl => 'Cài đặt từ URL';
 
   @override
   String get extUrlHint => 'https://…/extension.soraext';
 
   @override
-  String get extDownload => 'Download';
+  String get extDownload => 'Tải xuống';
 
   @override
-  String get extDownloading => 'Downloading…';
+  String get extDownloading => 'Đang tải xuống…';
 
   @override
-  String get extVerifying => 'Verifying…';
+  String get extVerifying => 'Đang xác minh…';
 
   @override
-  String get extInstalling => 'Installing…';
+  String get extInstalling => 'Đang cài đặt…';
 
   @override
-  String get extInstallFailed => 'Install failed';
+  String get extInstallFailed => 'Cài đặt không thành công';
 
   @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'Kiểm tra chữ ký không thành công. Tệp có thể bị hỏng hoặc bị giả mạo.';
 
   @override
-  String get extErrManifest => 'The extension manifest is invalid.';
+  String get extErrManifest => 'Tệp kê khai tiện ích mở rộng không hợp lệ.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'Lỗi mạng. Hãy kiểm tra kết nối của bạn và thử lại.';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'Bản tải xuống không khớp với danh mục. Nó có thể đã bị giả mạo.';
 
   @override
   String extErrMinApp(String version) {
-    return 'This extension needs app version $version or newer.';
+    return 'Tiện ích mở rộng này cần phiên bản ứng dụng $version hoặc mới hơn.';
   }
 
   @override
-  String get extErrHttpsOnly => 'Only https:// links are allowed';
+  String get extErrHttpsOnly => 'Chỉ cho phép liên kết https://';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'Đã xảy ra lỗi. Vui lòng thử lại.';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'Bản cập nhật này được ký bằng khóa tác giả khác với phiên bản đã cài đặt nên đã bị chặn. Nếu bạn tin cậy khóa mới, hãy gỡ cài đặt tiện ích mở rộng và cài đặt lại một cách rõ ràng.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
+  String get extUpdateAvailable => 'Đã có bản cập nhật';
 
   @override
-  String get extDisabled => 'Disabled';
+  String get extDisabled => 'Đã tắt';
 
   @override
   String extToggleEnabled(String name) {
-    return 'Enable $name';
+    return 'Kích hoạt $name';
   }
 
   @override
-  String get extSearchInstalled => 'Search installed';
+  String get extSearchInstalled => 'Tìm tiện ích đã cài đặt';
 
   @override
-  String get extUpdateAll => 'Update all';
+  String get extUpdateAll => 'Cập nhật tất cả';
 
   @override
   String extUpdatesAvailable(int count) {
-    return '$count updates available';
+    return '$count có bản cập nhật';
   }
 
   @override
   String extUpdatedCount(int count) {
-    return '$count updated';
+    return '$count đã cập nhật';
   }
 
   @override
-  String get extRiskNormal => 'Normal';
+  String get extRiskNormal => 'Bình thường';
 
   @override
-  String get extRiskSensitive => 'Sensitive';
+  String get extRiskSensitive => 'Nhạy cảm';
 
   @override
-  String get extRiskDangerous => 'High risk';
+  String get extRiskDangerous => 'Rủi ro cao';
 
   @override
-  String get extPermissionsRemoved => 'No longer requested:';
+  String get extPermissionsRemoved => 'Không còn được yêu cầu:';
 
   @override
-  String get extUpdateFailedKept => 'The previous version is still installed.';
+  String get extUpdateFailedKept => 'Phiên bản trước đó vẫn được cài đặt.';
 
   @override
-  String get extConflictsTitle => 'Extension conflicts';
+  String get extConflictsTitle => 'Xung đột tiện ích mở rộng';
 
   @override
   String get extConflictsIntro =>
       'Các tiện ích này muốn cùng một thứ. Chọn tiện ích sẽ chạy; tiện ích còn lại vẫn được cài đặt.';
 
   @override
-  String get extConflictTheme => 'App theme';
+  String get extConflictTheme => 'Chủ đề ứng dụng';
 
   @override
-  String get extConflictNetHooks => 'Network hooks';
+  String get extConflictNetHooks => 'Móc mạng';
 
   @override
   String extConflictWinner(String name) {
-    return '$name wins';
+    return '$name thắng';
   }
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return '$count xung đột cần bạn quyết định';
   }
 
   @override
-  String get extConflictsResolve => 'Resolve';
+  String get extConflictsResolve => 'Giải quyết xung đột';
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'Lựa chọn của bạn được lưu trên thiết bị này. Giao diện đổi ngay, còn hook mạng không chạy trong phiên bản này.';
 
   @override
   String extVersionLabel(String version) {
-    return 'Version $version';
+    return 'Phiên bản $version';
   }
 
   @override
-  String get extAuthor => 'Author';
+  String get extAuthor => 'Tác giả';
 
   @override
-  String get extRating => 'Rating';
+  String get extRating => 'Đánh giá';
 
   @override
-  String get extInstalls => 'Installs';
+  String get extInstalls => 'Lượt cài đặt';
 
   @override
-  String get extVersion => 'Version';
+  String get extVersion => 'Phiên bản';
 
   @override
-  String get extAbout => 'About';
+  String get extAbout => 'Giới thiệu về tiện ích mở rộng này';
 
   @override
-  String get extPermissionsTitle => 'Permissions';
+  String get extPermissionsTitle => 'Quyền';
 
   @override
-  String get extNoPermissions => 'No special permissions.';
+  String get extNoPermissions => 'Không có quyền đặc biệt.';
 
   @override
-  String get extSettings => 'Settings';
+  String get extSettings => 'Cài đặt';
 
   @override
-  String get extSaveSettings => 'Save settings';
+  String get extSaveSettings => 'Lưu cài đặt';
 
   @override
-  String get extSaving => 'Saving…';
+  String get extSaving => 'Đang lưu…';
 
   @override
   String extUpdateTo(String version) {
-    return 'Update to $version';
+    return 'Nâng cấp lên $version';
   }
 
   @override
-  String get extEnabled => 'Enabled';
+  String get extEnabled => 'Đã bật';
 
   @override
   String extRollbackTo(String version) {
-    return 'Roll back to $version';
+    return 'Quay lại $version';
   }
 
   @override
   String extRollbackConfirm(String version) {
-    return 'Roll back to version $version?';
+    return 'Quay lại phiên bản $version?';
   }
 
   @override
-  String get extUninstall => 'Uninstall';
+  String get extUninstall => 'Gỡ cài đặt';
 
   @override
   String extUninstallConfirm(String name) {
-    return 'Remove “$name” and its settings?';
+    return 'Xóa “$name” và các cài đặt của nó?';
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable =>
+      'Bảng điều khiển không có sẵn. Tiện ích mở rộng có thể đã bị vô hiệu hóa hoặc bị xóa.';
 
   @override
-  String get extPermConnectionsRead => 'See the list of active connections';
+  String get extPermConnectionsRead => 'Xem danh sách các kết nối đang hoạt động';
 
   @override
-  String get extPermServersRead => 'See your server list';
+  String get extPermServersRead => 'Xem danh sách máy chủ của bạn';
 
   @override
-  String get extPermSettingsRead => 'Read app settings';
+  String get extPermSettingsRead => 'Đọc cài đặt ứng dụng';
 
   @override
-  String get extPermSettingsWrite => 'Change app settings';
+  String get extPermSettingsWrite => 'Thay đổi cài đặt ứng dụng';
 
   @override
-  String get extPermNotifications => 'Show notifications';
+  String get extPermNotifications => 'Hiển thị thông báo';
 
   @override
-  String get extPermTray => 'Add tray menu entries';
+  String get extPermTray => 'Thêm các mục vào menu khay';
 
   @override
-  String get extPermUiPanel => 'Show panels inside the app';
+  String get extPermUiPanel => 'Hiển thị các bảng bên trong ứng dụng';
 
   @override
-  String get extPermThemeApply => 'Apply themes to the app';
+  String get extPermThemeApply => 'Áp dụng chủ đề';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'Thêm quy tắc định tuyến (ảnh hưởng đến nơi lưu lượng truy cập mạng đi)';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'Tích hợp vào đường dẫn mạng (DPI mô-đun bỏ qua)';
 
   @override
-  String get extPermNetFetch => 'Fetch URLs from an allowlist';
+  String get extPermNetFetch => 'Yêu cầu URL từ danh sách được phép';
 
   @override
-  String get extPermBackground => 'Run background tasks';
+  String get extPermBackground => 'Chạy các tác vụ nền';
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
+      'Chạy các tác vụ đã lên lịch ngay cả khi đóng bảng điều khiển. Bạn có thể tạm dừng hoặc thay đổi tần suất chạy trong cài đặt tiện ích mở rộng.';
 
   @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
-  String get extCapBackground => 'Runs in the background';
+  String get extCapBackground => 'Chạy ở chế độ nền';
 
   @override
-  String get extCapNetHook => 'Bypasses & network hooks';
+  String get extCapNetHook => 'Vượt chặn và hook mạng';
 
   @override
-  String get extCapPanel => 'Panels';
+  String get extCapPanel => 'Bảng giao diện';
 
   @override
-  String get extCapRouting => 'Routing rules';
+  String get extCapRouting => 'Quy tắc định tuyến';
 
   @override
-  String get extCapTheme => 'Themes';
+  String get extCapTheme => 'Giao diện';
 
   @override
-  String get extCapWidget => 'Widgets';
+  String get extCapWidget => 'Widget';
 
   @override
   String extCatalogCached(String date) {
@@ -1267,46 +1268,46 @@ class SVi extends S {
   }
 
   @override
-  String get extChangelog => 'Changelog';
+  String get extChangelog => 'Nhật ký thay đổi';
 
   @override
-  String get extImageFailed => 'Couldn\'t load the image';
+  String get extImageFailed => 'Không thể tải hình ảnh';
 
   @override
-  String get extRatingHow => 'How ratings work';
+  String get extRatingHow => 'Cách xếp hạng hoạt động';
 
   @override
   String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
+      'Xếp hạng sử dụng mức trung bình Bayes: tiện ích mở rộng có ít xếp hạng sẽ ở gần giữa cho đến khi có nhiều người bỏ phiếu hơn, do đó, một đánh giá 5 sao không thể đẩy tiện ích mở rộng mới lên đầu. Xếp hạng gần đây nặng hơn xếp hạng cũ và chỉ tính một xếp hạng cho mỗi tài khoản.';
 
   @override
-  String get extScreenshots => 'Screenshots';
+  String get extScreenshots => 'Ảnh chụp màn hình';
 
   @override
-  String get extSortRelevance => 'Relevance';
+  String get extSortRelevance => 'Mức độ liên quan';
 
   @override
   String get extPermNetworkDetail =>
       'Tải dữ liệu từ internet qua VPN. Chỉ các máy chủ bên dưới được phép, còn lại đều bị chặn.';
 
   @override
-  String get extBgTitle => 'Background task';
+  String get extBgTitle => 'Tác vụ nền';
 
   @override
-  String get extBgEnabled => 'Run in the background';
+  String get extBgEnabled => 'Chạy ở chế độ nền';
 
   @override
-  String get extBgInterval => 'Run every';
+  String get extBgInterval => 'Chạy mỗi';
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# phút');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# giờ');
     return '$_temp0';
   }
 
@@ -1315,14 +1316,14 @@ class SVi extends S {
       'Tác vụ chạy theo lịch khi Sora đang mở, kể cả khi ở khay hệ thống. Khoảng cách ngắn nhất là 15 phút.';
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
+  String get extBgDisabledNote => 'Kích hoạt tiện ích mở rộng để quản lý tác vụ nền của nó.';
 
   @override
-  String get extCapNetwork => 'Network access';
+  String get extCapNetwork => 'Truy cập mạng';
 
   @override
   String extCapNetworkHosts(String hosts) {
-    return 'Network: $hosts';
+    return 'Mạng: $hosts';
   }
 
   @override
@@ -1337,61 +1338,61 @@ class SVi extends S {
   String get diagnosticNoData => 'Chưa có yêu cầu nào được ghi lại. Trước tiên hãy mở một trang web kiểm tra tốc độ.';
 
   @override
-  String get qrShareTitle => 'Share via QR';
+  String get qrShareTitle => 'Chia sẻ mã QR';
 
   @override
-  String get qrScanTitle => 'Scan QR code';
+  String get qrScanTitle => 'Quét mã QR';
 
   @override
-  String get qrCopyLink => 'Copy link';
+  String get qrCopyLink => 'Sao chép liên kết';
 
   @override
-  String get qrShowLink => 'Show link';
+  String get qrShowLink => 'Hiển thị liên kết';
 
   @override
-  String get qrHideLink => 'Hide link';
+  String get qrHideLink => 'Ẩn liên kết';
 
   @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'Mã QR này chứa chi tiết kết nối. Đừng cho người lạ xem.';
 
   @override
   String get qrScanHint => 'Chọn ảnh chụp màn hình hoặc ảnh có mã QR, hoặc dán liên kết';
 
   @override
-  String get qrFromClipboard => 'Paste from clipboard';
+  String get qrFromClipboard => 'Dán từ bảng nhớ tạm';
 
   @override
   String get qrNoCode => 'Không tìm thấy mã QR trong hình ảnh này.';
 
   @override
-  String get qrInvalid => 'This QR code does not contain a valid link.';
+  String get qrInvalid => 'Mã QR này không chứa liên kết hợp lệ.';
 
   @override
-  String get qrScan => 'Scan QR';
+  String get qrScan => 'Quét QR';
 
   @override
   String get qrFromImage => 'Mở hình ảnh';
 
   @override
-  String get connGroupByProcess => 'By process';
+  String get connGroupByProcess => 'Nhóm theo quy trình';
 
   @override
-  String get connListView => 'As list';
+  String get connListView => 'Danh sách';
 
   @override
-  String get connCopyHost => 'Copy host';
+  String get connCopyHost => 'Sao chép máy chủ';
 
   @override
-  String get connAddRule => 'Add rule';
+  String get connAddRule => 'Thêm quy tắc';
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connections', one: '# connection');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# kết nối');
     return '$_temp0';
   }
 
   @override
-  String get dnsPreset => 'Preset';
+  String get dnsPreset => 'cài sẵn';
 
   @override
   String get dnsPresetCloudflare => 'Cloudflare';
@@ -1406,445 +1407,447 @@ class SVi extends S {
   String get dnsPresetAdGuard => 'AdGuard';
 
   @override
-  String get dnsPresetCustom => 'Custom';
+  String get dnsPresetCustom => 'Tùy chỉnh';
 
   @override
-  String get dnsCheck => 'Check for leaks';
+  String get dnsCheck => 'Kiểm tra rò rỉ dữ liệu';
 
   @override
-  String get dnsChecking => 'Checking...';
+  String get dnsChecking => 'Đang kiểm tra...';
 
   @override
-  String get dnsNoLeak => 'No leaks found';
+  String get dnsNoLeak => 'Không tìm thấy rò rỉ';
 
   @override
-  String get dnsLeakFound => 'Leak detected';
+  String get dnsLeakFound => 'Phát hiện rò rỉ';
 
   @override
-  String get dnsLastCheck => 'Last check';
+  String get dnsLastCheck => 'Kiểm tra lần cuối';
 
   @override
-  String get dnsNeverChecked => 'Not checked yet';
+  String get dnsNeverChecked => 'Chưa được thử nghiệm';
 
   @override
-  String get dnsLeakCheckTunnelDns => 'Tunnel DNS resolvers';
+  String get dnsLeakCheckTunnelDns => 'Trình phân giải DNS của đường hầm';
 
   @override
-  String get dnsLeakCheckSystemResolvers => 'System resolvers';
+  String get dnsLeakCheckSystemResolvers => 'Trình phân giải hệ thống';
 
   @override
-  String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
+  String get dnsLeakCheckKillSwitchDns => 'Bảo vệ DNS bằng chặn mạng';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+  String get dnsLeakFixConfigureTunnelDns => 'Định cấu hình DNS cho đường hầm trong cài đặt DNS ở trên.';
 
   @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Kiểm tra xem hệ thống của bạn sẽ sử dụng bộ phân giải nào bên ngoài đường hầm.';
 
   @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+  String get dnsLeakFixEnableKillSwitch => 'Bật chặn mạng để lưu lượng DNS luôn đi trong đường hầm.';
 
   @override
-  String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
+  String get dnsLeakCheckEncryptedDns => 'DNS mã hóa của hệ điều hành';
 
   @override
-  String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+  String get dnsLeakCheckDnsSpoof => 'Giả mạo DNS phản hồi';
 
   @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Kiểm tra xem điểm cuối DNS được mã hóa nào mà hệ thống của bạn sử dụng bên ngoài đường hầm.';
 
   @override
   String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+      'Dùng DNS mã hóa (DoT hoặc DoH) cho đường hầm để trình phân giải không thể giả mạo câu trả lời.';
 
   @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
+  String get dnsCheckNeedsConnection => 'Trước tiên hãy kết nối với VPN, sau đó kiểm tra xem có rò rỉ không.';
 
   @override
-  String get dnsExpected => 'Expected';
+  String get dnsExpected => 'Dự kiến';
 
   @override
-  String get dnsActual => 'Observed';
+  String get dnsActual => 'Đã quan sát';
 
   @override
-  String get sortBy => 'Sort by';
+  String get sortBy => 'Sắp xếp theo';
 
   @override
   String get sortPing => 'Ping';
 
   @override
-  String get sortSpeed => 'Speed';
+  String get sortSpeed => 'Tốc độ';
 
   @override
-  String get sortName => 'Name';
+  String get sortName => 'Tên';
 
   @override
-  String get measureSpeed => 'Measure speed';
+  String get measureSpeed => 'Đo tốc độ';
 
   @override
-  String get benchmarkStale => 'outdated';
+  String get benchmarkStale => 'lỗi thời';
 
   @override
-  String get autoSelectMode => 'Auto-select server';
+  String get autoSelectMode => 'Tự động chọn máy chủ';
 
   @override
-  String get autoSelectPing => 'Fastest ping';
+  String get autoSelectPing => 'Ping nhanh nhất';
 
   @override
-  String get autoSelectSpeed => 'Fastest speed';
+  String get autoSelectSpeed => 'Tốc độ nhanh nhất';
 
   @override
-  String get autoSelectSmart => 'Smart choice';
+  String get autoSelectSmart => 'Lựa chọn thông minh';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'Kết nối tới lõi Sora không ổn định';
 
   @override
-  String get watchReconnect => 'Reconnect';
+  String get watchReconnect => 'Kết nối lại';
 
   @override
-  String get coreRestoringLink => 'Restoring the link to the core…';
+  String get coreRestoringLink => 'Đang khôi phục kết nối tới lõi Sora…';
 
   @override
-  String get crashRestoreTitle => 'The last session was interrupted';
+  String get crashRestoreTitle => 'Phiên cuối cùng bị gián đoạn';
 
   @override
-  String get restoreOnCrash => 'Restore session after a crash';
+  String get restoreOnCrash => 'Khôi phục phiên sau sự cố';
 
   @override
-  String get crashRestore => 'Restore';
+  String get crashRestore => 'Khôi phục';
 
   @override
-  String get crashDismiss => 'Not now';
+  String get crashDismiss => 'Không phải bây giờ';
 
   @override
-  String get overrideTitle => 'My edits';
+  String get overrideTitle => 'Chỉnh sửa của tôi';
 
   @override
-  String get overrideEdit => 'Edit servers';
+  String get overrideEdit => 'Chỉnh sửa máy chủ';
 
   @override
-  String get overrideHide => 'Hide';
+  String get overrideHide => 'Ẩn';
 
   @override
-  String get overrideUnhide => 'Show';
+  String get overrideUnhide => 'Hiển thị';
 
   @override
-  String get overrideClear => 'Clear edits';
+  String get overrideClear => 'Đặt lại chỉnh sửa';
 
   @override
-  String get overrideEmpty => 'No edits yet';
+  String get overrideEmpty => 'Chưa có chỉnh sửa nào';
 
   @override
-  String get overrideCustomRules => 'Custom rules';
+  String get overrideCustomRules => 'Quy tắc riêng';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'Đo tốc độ cần lõi mới hơn';
 
   @override
   String benchmarkProgress(Object done, Object total) {
-    return 'Measuring $done of $total…';
+    return 'Đo $done từ $total…';
   }
 
   @override
-  String get profiles => 'Network profiles';
+  String get profiles => 'Cấu hình mạng';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty => 'Chưa có hồ sơ nào. Tạo một cái để tự động áp dụng cài đặt trên các mạng đã biết.';
 
   @override
-  String get profileAdd => 'Add profile';
+  String get profileAdd => 'Thêm hồ sơ';
 
   @override
-  String get profileName => 'Profile name';
+  String get profileName => 'Tên hồ sơ';
 
   @override
-  String get profileSsids => 'Wi-Fi networks (SSID)';
+  String get profileSsids => 'Wi-Fi mạng (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
+  String get profileSsidsHint => 'Nhà, Văn phòng cách nhau bằng dấu phẩy';
 
   @override
-  String get profileGateways => 'Gateways';
+  String get profileGateways => 'Cổng mạng';
 
   @override
-  String get profileAsns => 'AS numbers';
+  String get profileAsns => 'AS số';
 
   @override
-  String get profileAutoApply => 'Apply automatically';
+  String get profileAutoApply => 'Tự động áp dụng';
 
   @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
+  String get profileAutoApplyHint => 'Khi tắt, yêu cầu xác nhận trước khi áp dụng hồ sơ.';
 
   @override
-  String get profileSnapshot => 'Remember current settings';
+  String get profileSnapshot => 'Ghi nhớ cài đặt hiện tại';
 
   @override
-  String get profileSnapshotDone => 'Current settings saved into the profile';
+  String get profileSnapshotDone => 'Cài đặt hiện tại được lưu vào hồ sơ';
 
   @override
-  String get profileDelete => 'Delete profile';
+  String get profileDelete => 'Xóa hồ sơ';
 
   @override
   String profileDeleteConfirm(Object name) {
-    return 'Delete profile \"$name\"?';
+    return 'Xóa hồ sơ \"$name\"?';
   }
 
   @override
   String profileApplyAsk(Object name) {
-    return 'Apply profile \"$name\"?';
+    return 'Đăng ký hồ sơ \"$name\"?';
   }
 
   @override
-  String get profileApply => 'Apply';
+  String get profileApply => 'Áp dụng';
 
   @override
   String profileApplied(Object name) {
-    return 'Profile \"$name\" applied';
+    return 'Đã áp dụng hồ sơ “$name”';
   }
 
   @override
-  String get profileUndo => 'Undo';
+  String get profileUndo => 'Hủy';
 
   @override
-  String get profileActive => 'Active';
+  String get profileActive => 'Đang hoạt động';
 
   @override
   String networkNow(Object info) {
-    return 'Now: $info';
+    return 'Bây giờ: $info';
   }
 
   @override
-  String get networkUnknown => 'Network info unavailable';
+  String get networkUnknown => 'Không có thông tin mạng';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'Thêm ít nhất một trình kích hoạt: SSID, cổng hoặc ASN';
 
   @override
-  String get chains => 'Proxy chains';
+  String get chains => 'Chuỗi proxy';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => 'Chưa có dây chuyền nào. Liên kết 2–3 máy chủ để lưu lượng truy cập đi qua từng máy chủ.';
 
   @override
-  String get chainAdd => 'New chain';
+  String get chainAdd => 'Dây chuyền mới';
 
   @override
-  String get chainName => 'Chain name';
+  String get chainName => 'Tên dây chuyền';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainPickServers => 'Chọn 2–3 máy chủ';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
+  String get chainOrderHint => 'Kéo để sắp xếp lại: lưu lượng vào ở trên cùng và thoát ra ở dưới cùng.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'Chọn ít nhất 2 máy chủ';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'Một chuỗi chứa tối đa 3 máy chủ';
 
   @override
-  String get chainEstimate => 'Estimated latency';
+  String get chainEstimate => 'Độ trễ ước tính';
 
   @override
-  String get chainSave => 'Save chain';
+  String get chainSave => 'Lưu chuỗi';
 
   @override
-  String get chainDelete => 'Delete chain';
+  String get chainDelete => 'Xóa chuỗi';
 
   @override
   String chainDeleteConfirm(Object name) {
-    return 'Delete chain \"$name\"?';
+    return 'Xóa chuỗi \"$name\"?';
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'Động cơ hiện tại không hỗ trợ tạo chuỗi';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'Một trong các máy chủ của chuỗi không còn khả dụng';
 
   @override
   String chainHop(Object n) {
-    return 'Hop $n';
+    return 'Chặng $n';
   }
 
   @override
-  String get chainEntry => 'Entry';
+  String get chainEntry => 'Đầu vào';
 
   @override
-  String get chainExit => 'Exit';
+  String get chainExit => 'Đầu ra';
 
   @override
-  String get sync => 'Device sync';
+  String get sync => 'Đồng bộ hóa thiết bị';
 
   @override
-  String get syncDevices => 'My devices';
+  String get syncDevices => 'Thiết bị của tôi';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'Không có thiết bị nào được ghép nối. Ghép nối một thiết bị khác qua mạng cục bộ.';
 
   @override
-  String get syncPair => 'Pair a device';
+  String get syncPair => 'Ghép nối thiết bị';
 
   @override
-  String get syncShowCode => 'Show my code';
+  String get syncShowCode => 'Hiển thị mã của tôi';
 
   @override
-  String get syncScanCode => 'Scan a code';
+  String get syncScanCode => 'Quét mã';
 
   @override
-  String get syncRevoke => 'Revoke';
+  String get syncRevoke => 'Rút tiền';
 
   @override
   String syncRevokeConfirm(Object name) {
-    return 'Revoke \"$name\"?';
+    return 'Thu hồi \"$name\"?';
   }
 
   @override
   String syncLastSync(Object time) {
-    return 'Last sync: $time';
+    return 'Đồng bộ hóa lần cuối: $time';
   }
 
   @override
-  String get syncNever => 'Never';
+  String get syncNever => 'Không bao giờ';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
+  String get syncNoLan => 'Các thiết bị phải nằm trên cùng một mạng cục bộ';
 
   @override
-  String get syncPaired => 'Device paired';
+  String get syncPaired => 'Đã ghép nối thiết bị';
 
   @override
-  String get syncPairingTitle => 'Pair with this device';
+  String get syncPairingTitle => 'Ghép nối với thiết bị này';
 
   @override
-  String get syncWaiting => 'Waiting for the other device…';
+  String get syncWaiting => 'Đang chờ thiết bị kia…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
+  String get syncSecureNote => 'Kênh được mã hóa hai đầu. Không có tài khoản, không có máy chủ đám mây.';
 
   @override
-  String get zapretWithVpn => 'DPI bypass for direct traffic';
+  String get zapretWithVpn => 'Bỏ qua DPI lọc lưu lượng truy cập mạng trực tiếp';
 
   @override
   String get zapretWithVpnHint =>
-      'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
+      'Chạy zapret song song với đường hầm VPN: lưu lượng trong đường hầm dùng VPN, lưu lượng trực tiếp đi qua cơ chế vượt chặn.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'Mỗi máy chủ chỉ có thể xuất hiện một lần';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Chỉnh sửa';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Xóa';
 
   @override
-  String get autoSwitchOnDegrade => 'Auto-switch on degradation';
+  String get autoSwitchOnDegrade => 'Tự động chuyển đổi khi xuống cấp';
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
+      'Nếu máy chủ đã chọn chậm đi nhiều hoặc ngừng phản hồi, Sora chuyển sang máy chủ tốt nhất theo kết quả đo, tối đa một lần mỗi 10 phút.';
 
   @override
-  String get tunStackMixed => 'Mixed';
+  String get tunStackMixed => 'Hỗn hợp';
 
   @override
-  String get tunStackSystem => 'System';
+  String get tunStackSystem => 'Hệ thống';
 
   @override
-  String get customServerAdd => 'Add custom server';
+  String get customServerAdd => 'Thêm máy chủ tùy chỉnh';
 
   @override
-  String get customServers => 'My servers';
+  String get customServers => 'Máy chủ của tôi';
 
   @override
-  String get customServerName => 'Name';
+  String get customServerName => 'Tên';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
+  String get customServerNameHint => 'Ví dụ: VPS của tôi';
 
   @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'Nhập tên';
 
   @override
-  String get customServerAddress => 'Address';
+  String get customServerAddress => 'Địa chỉ';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
+  String get customServerAddressHint => 'example.com hoặc 192.0.2.1';
 
   @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'Nhập địa chỉ máy chủ';
 
   @override
-  String get customServerAddressInvalid => 'Invalid address';
+  String get customServerAddressInvalid => 'Địa chỉ không hợp lệ';
 
   @override
-  String get customServerPort => 'Port';
+  String get customServerPort => 'Cổng';
 
   @override
   String get customServerPortHint => '443';
 
   @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'Cổng phải là số từ 1 đến 65535';
 
   @override
-  String get customServerProtocol => 'Protocol';
+  String get customServerProtocol => 'Giao thức';
 
   @override
-  String get customServerCredentials => 'Credentials';
+  String get customServerCredentials => 'Thông tin đăng nhập';
 
   @override
-  String get customServerOptional => 'Optional';
+  String get customServerOptional => 'Tùy chọn';
 
   @override
-  String get customServerShowSecret => 'Show secret';
+  String get customServerShowSecret => 'Hiển thị bí mật';
 
   @override
-  String get customServerHideSecret => 'Hide secret';
+  String get customServerHideSecret => 'Ẩn bí mật';
 
   @override
-  String get customServerBadge => 'custom';
+  String get customServerBadge => 'tùy chỉnh';
 
   @override
   String customServerDeleteConfirm(String name) {
-    return 'Delete server “$name”?';
+    return 'Xóa máy chủ “$name”?';
   }
 
   @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
+  String get customServerEmptyHint => 'Thêm máy chủ theo cách thủ công: địa chỉ, cổng và giao thức';
 
   @override
-  String get customServerTest => 'Test';
+  String get customServerTest => 'Kiểm tra';
 
   @override
-  String get leakTestTitle => 'Leak test';
+  String get leakTestTitle => 'Kiểm tra rò rỉ dữ liệu';
 
   @override
   String get leakTestIntro =>
-      'Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.';
+      'Kiểm tra xem lưu lượng có thể rời thiết bị ngoài đường hầm hay không: DNS và ICMP trực tiếp, lưu lượng IPv6 đi ra và trình phân giải của hệ thống. Chạy khi đang kết nối.';
 
   @override
-  String get leakTestRun => 'Run test';
+  String get leakTestRun => 'Kiểm tra';
 
   @override
-  String get leakTestCancel => 'Cancel';
+  String get leakTestCancel => 'Hủy';
 
   @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+  String get leakTestNeedsConnection => 'Kết nối với VPN để kiểm tra rò rỉ dữ liệu.';
 
   @override
   String leakTestProgress(int count) {
-    return 'Tests completed: $count';
+    return 'Đã hoàn thành kiểm tra: $count';
   }
 
   @override
-  String get leakTestAllClear => 'No leaks found';
+  String get leakTestAllClear => 'Không tìm thấy rò rỉ';
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# leaks found', one: '# leak found');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: 'Phát hiện # rò rỉ');
     return '$_temp0';
   }
 
@@ -1852,131 +1855,133 @@ class SVi extends S {
   String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
-  String get leakTestFix => 'Fix';
+  String get leakTestFix => 'Sửa';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
+  String get leakTestFixedNote => 'Đã bật chặn mạng. Chạy lại kiểm tra để xác nhận.';
 
   @override
-  String get leakTestCheckDirectDns => 'Direct DNS';
+  String get leakTestCheckDirectDns => 'Trực tiếp DNS';
 
   @override
-  String get leakTestCheckIcmpEcho => 'ICMP echo';
+  String get leakTestCheckIcmpEcho => 'ICMP tiếng vọng';
 
   @override
   String get leakTestCheckIpv6 => 'IPv6';
 
   @override
-  String get leakTestCheckSystemResolvers => 'System resolvers';
+  String get leakTestCheckSystemResolvers => 'Trình phân giải hệ thống';
 
   @override
-  String get leakTestCheckTunnelConnectivity => 'Tunnel connectivity';
+  String get leakTestCheckTunnelConnectivity => 'Kết nối đường hầm';
 
   @override
-  String get leakTestCheckTunnelDns => 'Tunnel DNS';
+  String get leakTestCheckTunnelDns => 'DNS xuyên qua đường hầm';
 
   @override
-  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
+  String get noticeDegraded =>
+      'Máy chủ trở nên chậm. Sora đã chuyển sang máy chủ tốt nhất được tìm thấy trong quá trình đo.';
 
   @override
-  String get obfs => 'Traffic obfuscation';
+  String get obfs => 'Ngụy trang lưu lượng';
 
   @override
-  String get syncCodeExpired => 'The code expired';
+  String get syncCodeExpired => 'Mã đã hết hạn';
 
   @override
-  String get syncDaemonFailed => 'Couldn\'t start the sync service';
+  String get syncDaemonFailed => 'Không thể khởi động dịch vụ đồng bộ hóa';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing =>
+      'Không tìm thấy thành phần sora-sync. Cài đặt lại ứng dụng để bật đồng bộ hóa thiết bị.';
 
   @override
-  String get syncDaemonStarting => 'Starting the sync service…';
+  String get syncDaemonStarting => 'Đang bắt đầu dịch vụ đồng bộ hóa…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => 'Dịch vụ đồng bộ hóa đã từ chối mã thông báo truy cập. Khởi động lại ứng dụng và thử lại.';
 
   @override
-  String get syncErrNotFound => 'The device is no longer paired';
+  String get syncErrNotFound => 'Thiết bị không còn được ghép nối';
 
   @override
-  String get syncErrPairingActive => 'A pairing session is already open';
+  String get syncErrPairingActive => 'Phiên ghép nối đã được mở';
 
   @override
   String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+      'Thiết bị kia không trả lời. Đảm bảo nó nằm trên cùng một mạng và hiển thị mã của nó.';
 
   @override
-  String get syncError => 'Sync error';
+  String get syncError => 'Lỗi đồng bộ hóa';
 
   @override
   String syncExpiresIn(String duration) {
-    return 'Code expires in $duration';
+    return 'Mã hết hạn sau $duration';
   }
 
   @override
-  String get syncJoining => 'Pairing with the device…';
+  String get syncJoining => 'Đang ghép nối với thiết bị…';
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
+      'Danh sách thiết bị cũ chưa bao giờ thực sự được ghép nối nên đã bị xóa. Ghép nối lại các thiết bị của bạn, lần này là thực sự.';
 
   @override
-  String get syncNewCode => 'New code';
+  String get syncNewCode => 'Mã mới';
 
   @override
   String syncPairedWith(String name) {
-    return '$name paired';
+    return 'Ghép nối với $name';
   }
 
   @override
-  String get syncRetry => 'Try again';
+  String get syncRetry => 'Lặp lại';
 
   @override
-  String get syncStopShowing => 'Stop showing';
+  String get syncStopShowing => 'Ẩn mã';
 
   @override
-  String get syncSyncNow => 'Sync now';
+  String get syncSyncNow => 'Đồng bộ ngay';
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled, sent $pushed';
+    return 'Đã nhận $pulled, đã gửi $pushed';
   }
 
   @override
-  String get syncResultTitle => 'Sync result';
+  String get syncResultTitle => 'Kết quả đồng bộ hóa';
 
   @override
-  String get syncPulled => 'Received';
+  String get syncPulled => 'Đã nhận được';
 
   @override
-  String get syncPushed => 'Sent';
+  String get syncPushed => 'Đã gửi';
 
   @override
-  String get syncNoChanges => 'No changes';
+  String get syncNoChanges => 'Không phát hiện thấy thay đổi nào';
 
   @override
-  String get syncDocKindSubscriptions => 'Subscriptions';
+  String get syncDocKindSubscriptions => 'Đăng ký';
 
   @override
-  String get syncDocKindSettings => 'App settings';
+  String get syncDocKindSettings => 'Cài đặt ứng dụng';
 
   @override
-  String get syncDocKindOverrides => 'Subscription overrides';
+  String get syncDocKindOverrides => 'Tùy chỉnh đăng ký';
 
   @override
-  String get syncDocKindProfiles => 'Network profiles';
+  String get syncDocKindProfiles => 'Cấu hình mạng';
 
   @override
-  String get syncDocKindChains => 'Proxy chains';
+  String get syncDocKindChains => 'Chuỗi proxy';
 
   @override
   String syncFrom(String name) {
-    return 'from $name';
+    return 'từ $name';
   }
 
   @override
-  String get syncThisDevice => 'This device';
+  String get syncThisDevice => 'Thiết bị này';
 
   @override
   String get syncUnavailableAndroid =>
