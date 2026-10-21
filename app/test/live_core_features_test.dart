@@ -275,9 +275,37 @@ void main() {
         request.response.write('through-private-vpn');
         await request.response.close();
       });
-      final reservation = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
-      final vpnPort = reservation.port;
-      await reservation.close();
+      Future<int> freePort() async {
+        final reservation = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+        final port = reservation.port;
+        await reservation.close();
+        return port;
+      }
+
+      // Xray's dns outbound forwards queries upstream, which this namespace
+      // cannot reach, so the VPN exit hands port 53 to mihomo's resolver.
+      final dnsPort = await freePort();
+      final resolver = await Process.start('$engines/mihomo', ['-d', '${dir.path}/resolver', '-f', '-']);
+      unawaited(resolver.stdout.drain<void>());
+      unawaited(resolver.stderr.drain<void>());
+      resolver.stdin.write(
+        jsonEncode({
+          'log-level': 'warning',
+          'hosts': {
+            'example.com': ['127.0.0.2', '::1'],
+          },
+          'dns': {
+            'enable': true,
+            'listen': '127.0.0.1:$dnsPort',
+            'use-hosts': true,
+            'ipv6': true,
+            'nameserver': ['127.0.0.1:1'],
+          },
+          'rules': ['MATCH,DIRECT'],
+        }),
+      );
+      await resolver.stdin.close();
+      final vpnPort = await freePort();
       final config = {
         'log': {'loglevel': 'warning'},
         'inbounds': [
@@ -288,14 +316,9 @@ void main() {
             'settings': {'method': 'aes-256-gcm', 'password': 'live-extension-vpn-password'},
           },
         ],
-        'dns': {
-          'hosts': {
-            'example.com': ['127.0.0.2', '::1'],
-          },
-        },
         'routing': {
           'rules': [
-            {'port': '53', 'outboundTag': 'dns'},
+            {'port': '53', 'outboundTag': 'resolver'},
           ],
         },
         'outbounds': [
@@ -304,7 +327,11 @@ void main() {
             'protocol': 'freedom',
             'settings': {'redirect': '127.0.0.1:${origin.port}'},
           },
-          {'tag': 'dns', 'protocol': 'dns'},
+          {
+            'tag': 'resolver',
+            'protocol': 'freedom',
+            'settings': {'redirect': '127.0.0.1:$dnsPort'},
+          },
         ],
       };
       final vpn = await Process.start('$engines/xray', ['run', '-c', 'stdin:']);
@@ -380,10 +407,14 @@ void main() {
             ),
           );
         }
+        final logs = <String>[];
         final result = await output
-            .firstWhere((message) => message.failed || message.log == 'fetch-vpn-verified')
+            .firstWhere((message) {
+              logs.add(message.log);
+              return message.failed || message.log == 'fetch-vpn-verified';
+            })
             .timeout(const Duration(minutes: 17));
-        expect(result.failed, isFalse, reason: result.log);
+        expect(result.failed, isFalse, reason: logs.join('\n'));
         expect(result.log, 'fetch-vpn-verified');
         expect(requests, 1);
       } finally {
@@ -392,6 +423,8 @@ void main() {
         await link.stub.disconnect(DisconnectRequest(apiVersion: apiVersion, controlAuthenticator: link.token));
         vpn.kill();
         await vpn.exitCode;
+        resolver.kill();
+        await resolver.exitCode;
         await origin.close(force: true);
         await serving.cancel();
       }

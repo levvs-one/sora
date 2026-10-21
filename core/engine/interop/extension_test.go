@@ -2,7 +2,9 @@ package interop_test
 
 import (
 	"context"
+	"encoding/json"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -14,6 +16,7 @@ import (
 	"time"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/mihomo"
 	"github.com/levvs-one/sora-client/core/engine/registry"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/xray"
@@ -44,11 +47,33 @@ func TestExtensionFetchUsesAuthenticatedVPNDespiteDirectRule(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// The VPN exit answers TCP DNS for example.com, so a name resolved outside
+	// the tunnel (or not at all) fails instead of reaching the VPN origin.
+	resolver, err := mihomo.Prober.Discover(t.Context(), dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dnsPort := port(t)
+	startProcess(t, "mihomo-dns", resolver.Path, []string{"-d", t.TempDir(), "-f", "-"}, map[string]any{
+		"log-level": "warning",
+		"hosts":     map[string]any{"example.com": []string{"127.0.0.2", "::1"}},
+		"dns": map[string]any{"enable": true, "listen": "127.0.0.1:" + strconv.Itoa(dnsPort), "use-hosts": true,
+			"ipv6": true, "nameserver": []string{"127.0.0.1:1"}},
+		"rules": []string{"MATCH,DIRECT"},
+	})
 	upstream := port(t)
-	startServer(t, server, []service{{inbound: map[string]any{
-		"listen": "127.0.0.1", "port": upstream, "protocol": "shadowsocks",
-		"settings": map[string]any{"method": "aes-256-gcm", "password": password},
-	}}}, strings.TrimPrefix(vpn.URL, "http://"))
+	startProcess(t, "xray-server", server.Path, []string{"run", "-c", "stdin:"}, map[string]any{
+		"log": map[string]any{"loglevel": "warning"},
+		"inbounds": []any{map[string]any{
+			"listen": "127.0.0.1", "port": upstream, "protocol": "shadowsocks",
+			"settings": map[string]any{"method": "aes-256-gcm", "password": password},
+		}},
+		"routing": map[string]any{"rules": []any{map[string]any{"port": "53", "outboundTag": "resolver"}}},
+		"outbounds": []any{
+			map[string]any{"protocol": "freedom", "settings": map[string]any{"redirect": strings.TrimPrefix(vpn.URL, "http://")}},
+			map[string]any{"tag": "resolver", "protocol": "freedom", "settings": map[string]any{"redirect": "127.0.0.1:" + strconv.Itoa(dnsPort)}},
+		},
+	})
 	for _, kind := range []engine.Kind{engine.KindSingBox, engine.KindXray, engine.KindMihomo} {
 		t.Run(string(kind), func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
@@ -61,6 +86,7 @@ func TestExtensionFetchUsesAuthenticatedVPNDespiteDirectRule(t *testing.T) {
 					Server: "127.0.0.1", Port: uint16(upstream), Cipher: "aes-256-gcm", Password: password}},
 				Rules: []engine.Rule{
 					{Type: engine.RuleDomain, Value: "localhost", Target: "direct"},
+					{Type: engine.RuleDomain, Value: "example.com", Target: "direct"},
 					{Type: engine.RuleIPCIDR, Value: "127.0.0.0/8", Target: "direct"},
 					{Type: engine.RuleMatchAll, Target: "reject"},
 				},
@@ -114,13 +140,15 @@ func TestExtensionFetchUsesAuthenticatedVPNDespiteDirectRule(t *testing.T) {
 					t.Fatalf("extension escaped VPN: %q, %v", body, err)
 				}
 			}
-			// Exercise the production SOCKS transport against the real inbound.
+			// Exercise the production SOCKS transport against the real inbound,
+			// by name, so its DNS must also use the VPN despite the direct rule.
 			tr, err := ext.ProxyRoundTripper(ext.TunnelProxy{Addr: "127.0.0.1:" + strconv.Itoa(p.ExtensionProxy.Port), Username: p.ExtensionProxy.Username, Password: p.ExtensionProxy.Password})
 			if err != nil {
 				t.Fatal(err)
 			}
 			defer tr.CloseIdleConnections()
-			req, err := http.NewRequestWithContext(ctx, http.MethodGet, direct.URL, nil)
+			_, directPort, _ := net.SplitHostPort(direct.Listener.Addr().String())
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://example.com:"+directPort+"/", nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -134,5 +162,27 @@ func TestExtensionFetchUsesAuthenticatedVPNDespiteDirectRule(t *testing.T) {
 				t.Fatalf("production transport bypassed the VPN: %q, direct hits=%d", body, directHits.Load()-before)
 			}
 		})
+	}
+}
+
+func startProcess(t *testing.T, name, path string, args []string, config map[string]any) {
+	t.Helper()
+	cfg, err := json.Marshal(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	proc, err := supervise.Start(ctx, supervise.Spec{Name: name, Path: path, Args: args, Dir: t.TempDir(), Config: cfg})
+	if err != nil {
+		cancel()
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		cancel()
+		_ = proc.Stop(context.Background(), 0)
+	})
+	time.Sleep(300 * time.Millisecond)
+	if err := proc.Err(); err != nil {
+		t.Fatalf("%s: %v", name, err)
 	}
 }
