@@ -117,7 +117,7 @@ func (d ImportDetector) detect(src []byte) (Detection, []byte, error) {
 func hasScheme(s string) bool {
 	for _, l := range strings.Fields(s) {
 		p := strings.ToLower(strings.TrimSpace(l))
-		for _, x := range []string{"vless://", "vmess://", "trojan://", "ss://", "socks://", "socks5://", "http://", "https://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://"} {
+		for _, x := range []string{"vless://", "vmess://", "trojan://", "ss://", "socks://", "socks5://", "http://", "https://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://", "olcrtc://"} {
 			if strings.HasPrefix(p, x) {
 				return true
 			}
@@ -241,13 +241,40 @@ func (o OutboundSpec) StableKey() string {
 	if o.Protocol == "xray-profile" {
 		material += "\x00" + o.DisplayName
 	}
+	// An olcrtc server's identity is provider + transport + room:
+	// Host already carries the room, but two providers (or two
+	// transports of one provider) can serve the same room id and are
+	// different servers. The key, like other passwords, stays out.
+	if o.Protocol == "olcrtc" {
+		material += "\x00" + o.Options["olcrtc_provider"] + "\x00" + o.Transport
+	}
 	h := sha256.Sum256([]byte(material))
 	return o.Protocol + ":" + o.Host + ":" + strconv.Itoa(int(o.Port)) + ":" + hex.EncodeToString(h[:8])
 }
 func (o *OutboundSpec) validate() error {
+	if o.Protocol == "" {
+		return ErrInvalid
+	}
+	if o.Protocol == "olcrtc" {
+		// olcrtc has no host:port endpoint (see olcrtc.go): Host
+		// carries the RoomID and Port must stay 0. Validity is the
+		// provider/transport registries plus the strict key shape;
+		// the room is required for every provider except none, whose
+		// connection data the URI cannot express at all.
+		if o.Port != 0 || !olcrtcProviders[o.Options["olcrtc_provider"]] || !olcrtcTransports[o.Transport] {
+			return ErrInvalid
+		}
+		if !isHex64(o.Password) {
+			return ErrInvalid
+		}
+		if o.Options["olcrtc_provider"] != "none" && o.Host == "" {
+			return ErrInvalid
+		}
+		return nil
+	}
 	// uint16 permits only zero as an invalid port here; larger values are
 	// rejected during parsing.
-	if o.Protocol == "" || o.Host == "" || o.Port < 1 {
+	if o.Host == "" || o.Port < 1 {
 		return ErrInvalid
 	}
 	if o.Protocol == "vless" || o.Protocol == "vmess" || o.Protocol == "tuic" {
@@ -323,15 +350,35 @@ func (p LinkParser) Parse(src []byte) (ImportResult, error) {
 }
 func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 	r := ImportResult{Format: f}
-	seen := map[string]struct{}{}
+	seen := map[string]int{}
+	// lastOlcrtc is the index in r.Servers that a "##key: value"
+	// subscription block binds to: the nearest preceding olcrtc://
+	// line (docs/sub.md). It resets when a non-olcrtc server becomes
+	// the nearest preceding line, and a skipped duplicate still counts
+	// as the preceding olcrtc line — its block binds to the entry the
+	// duplicate deduplicated into.
+	lastOlcrtc := -1
 	for i, l := range strings.Split(s, "\n") {
+		l = strings.TrimSpace(l)
+		if l == "" {
+			continue
+		}
+		if strings.HasPrefix(l, "##") {
+			if err := applyOLCRTCMeta(&r, lastOlcrtc, l); err != nil {
+				r.Report.Invalid++
+				r.Report.InvalidItems = append(r.Report.InvalidItems, ItemReason{i, "invalid link fields"})
+			}
+			continue
+		}
+		if isSubscriptionMetaLine(l) {
+			// Global "#key: value" headers are subscription
+			// metadata (read by the subscription layer), not
+			// server candidates.
+			continue
+		}
 		if len(r.Servers) >= p.limit() {
 			r.Report.Unsupported++
 			r.Report.UnsupportedItems = append(r.Report.UnsupportedItems, ItemReason{i, "item limit exceeded"})
-			continue
-		}
-		l = strings.TrimSpace(l)
-		if l == "" {
 			continue
 		}
 		o, e := parseLink(l)
@@ -346,14 +393,22 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 			continue
 		}
 		k := o.StableKey()
-		if _, ok := seen[k]; ok {
+		if idx, ok := seen[k]; ok {
 			r.Report.SkippedDuplicates++
 			r.Report.DuplicateItems = append(r.Report.DuplicateItems, ItemReason{i, "duplicate server"})
+			if o.Protocol == "olcrtc" {
+				lastOlcrtc = idx
+			}
 			continue
 		}
-		seen[k] = struct{}{}
+		seen[k] = len(r.Servers)
 		r.Servers = append(r.Servers, o)
 		r.Report.Imported++
+		if o.Protocol == "olcrtc" {
+			lastOlcrtc = len(r.Servers) - 1
+		} else {
+			lastOlcrtc = -1
+		}
 	}
 	if len(r.Servers) == 0 && r.Report.Unsupported == 0 && r.Report.Invalid == 0 {
 		return r, ErrUnsupported
@@ -361,6 +416,13 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 	return r, nil
 }
 func parseLink(raw string) (OutboundSpec, error) {
+	// olcrtc links are cut by hand in olcrtc.go: their grammar puts a
+	// transport name and a <...> payload where net/url expects a host,
+	// and the room may be a full URL of its own. url.Parse would
+	// mis-split or reject them (a raw MIMO comment may hold spaces).
+	if isOLCRTCLink(raw) {
+		return parseOLCRTCLink(raw)
+	}
 	u, e := url.Parse(strings.TrimSpace(raw))
 	if e != nil {
 		return OutboundSpec{}, ErrInvalid
