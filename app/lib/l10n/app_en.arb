@@ -983,5 +983,7 @@
   "customServerWgKeepalive": "Keepalive, seconds",
   "customServerWgKeyInvalid": "The key must be 32 bytes of base64, as wg genkey prints.",
   "customServerWgCidrInvalid": "Enter comma separated prefixes such as 10.0.0.2/32.",
-  "customServerWgKeepaliveInvalid": "Enter a number of seconds from 0 to 65535."
+  "customServerWgKeepaliveInvalid": "Enter a number of seconds from 0 to 65535.",
+  "strictKillSwitch": "Strict kill switch",
+  "strictKillSwitchWarning": "After connecting, blocks traffic outside the VPN even after a crash, restart or app exit. Only Disconnect or turning this off restores access. After reboot, blocking resumes only when Connect on start is enabled."
 }

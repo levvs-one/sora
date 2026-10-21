@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive بالثواني",
   "customServerWgKeyInvalid": "يجب أن يكون المفتاح 32 بايت بترميز base64 كما يطبعه wg genkey.",
   "customServerWgCidrInvalid": "أدخل بادئات مفصولة بفواصل مثل 10.0.0.2/32.",
-  "customServerWgKeepaliveInvalid": "أدخل عدد ثوانٍ من 0 إلى 65535."
+  "customServerWgKeepaliveInvalid": "أدخل عدد ثوانٍ من 0 إلى 65535.",
+  "strictKillSwitch": "مفتاح إيقاف صارم",
+  "strictKillSwitchWarning": "بعد الاتصال، يحظر حركة البيانات خارج VPN حتى بعد التعطل أو إعادة التشغيل أو إغلاق التطبيق. لا تعود إمكانية الوصول إلا بقطع الاتصال أو تعطيل هذا الخيار. بعد إعادة تشغيل الجهاز، يُستأنف الحظر فقط إذا كان الاتصال عند بدء التشغيل مفعّلاً."
 }

@@ -2254,4 +2254,11 @@ class STr extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => '0 ile 65535 arasında bir saniye değeri girin.';
+
+  @override
+  String get strictKillSwitch => 'Katı ağ kilidi';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Bağlandıktan sonra çökme, yeniden başlatma veya uygulamadan çıkma durumunda bile VPN dışındaki trafiği engeller. Erişim yalnızca bağlantıyı kesince veya bu seçeneği kapatınca geri gelir. Cihaz yeniden başlatıldığında engelleme yalnızca başlangıçta bağlanma etkinse devam eder.';
 }

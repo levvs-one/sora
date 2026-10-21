@@ -2257,4 +2257,11 @@ class SPl extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => 'Wpisz liczbę sekund od 0 do 65535.';
+
+  @override
+  String get strictKillSwitch => 'Ścisła blokada sieci';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Po połączeniu blokuje ruch poza VPN także po awarii, ponownym uruchomieniu lub zamknięciu aplikacji. Dostęp przywraca tylko rozłączenie lub wyłączenie tej opcji. Po restarcie systemu blokada wraca tylko przy włączonym łączeniu podczas uruchamiania.';
 }

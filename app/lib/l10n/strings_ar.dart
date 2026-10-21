@@ -2241,4 +2241,11 @@ class SAr extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => 'أدخل عدد ثوانٍ من 0 إلى 65535.';
+
+  @override
+  String get strictKillSwitch => 'مفتاح إيقاف صارم';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'بعد الاتصال، يحظر حركة البيانات خارج VPN حتى بعد التعطل أو إعادة التشغيل أو إغلاق التطبيق. لا تعود إمكانية الوصول إلا بقطع الاتصال أو تعطيل هذا الخيار. بعد إعادة تشغيل الجهاز، يُستأنف الحظر فقط إذا كان الاتصال عند بدء التشغيل مفعّلاً.';
 }

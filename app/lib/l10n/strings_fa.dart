@@ -2255,4 +2255,11 @@ class SFa extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => 'عددی بین 0 تا 65535 ثانیه وارد کنید.';
+
+  @override
+  String get strictKillSwitch => 'قطع اضطراری سخت‌گیرانه';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'پس از اتصال، ترافیک خارج از VPN را حتی پس از خرابی، راه‌اندازی مجدد یا خروج از برنامه مسدود می‌کند. دسترسی فقط با قطع اتصال یا خاموش کردن این گزینه برمی‌گردد. پس از راه‌اندازی مجدد دستگاه، مسدودسازی فقط در صورت فعال بودن اتصال هنگام شروع از سر گرفته می‌شود.';
 }

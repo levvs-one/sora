@@ -2250,4 +2250,11 @@ class SBn extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => '0 থেকে 65535 সেকেন্ডের মধ্যে একটি সংখ্যা দিন।';
+
+  @override
+  String get strictKillSwitch => 'কঠোর নেটওয়ার্ক অবরোধ';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'সংযোগের পর, ক্র্যাশ, পুনরায় চালু বা অ্যাপ বন্ধ হলেও VPN-এর বাইরের ট্র্যাফিক আটকায়। শুধু সংযোগ বিচ্ছিন্ন করলে বা এই বিকল্প বন্ধ করলে প্রবেশাধিকার ফিরে আসে। ডিভাইস পুনরায় চালু হলে শুরুতে সংযোগের বিকল্প চালু থাকলেই অবরোধ আবার কার্যকর হয়।';
 }

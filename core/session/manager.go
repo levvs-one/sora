@@ -89,6 +89,10 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 	m.mu.Unlock()
 
 	defer m.release()
+	if m.cfg.Guard.Current().StrictKillSwitch {
+		settings.StrictKillSwitch = true
+		settings.KillSwitch = true
+	}
 
 	if err := engine.PrepareTun(plan); err != nil {
 		return nil, errs.Wrap(err, errs.CodeFailedPrecondition, errs.KeyPlanTunnel)
@@ -181,11 +185,25 @@ func (m *Manager) Disconnect(ctx context.Context) error {
 
 	defer m.release()
 
+	var releaseErr error
+	if g, ok := m.cfg.Guard.(interface{ Release(context.Context) error }); ok {
+		// Release even if stopping the engine fails or there is no live session.
+		if current == nil {
+			releaseErr = g.Release(context.WithoutCancel(ctx))
+		}
+	}
 	if current == nil {
+		if releaseErr != nil {
+			return releaseErr
+		}
 		m.setLast(Status{State: StateDisconnected, ChangedAt: m.cfg.Now()})
 		return nil
 	}
-	err := current.Stop(ctx)
+	stopErr := current.Stop(ctx)
+	if g, ok := m.cfg.Guard.(interface{ Release(context.Context) error }); ok {
+		releaseErr = g.Release(context.WithoutCancel(ctx))
+	}
+	err := errors.Join(stopErr, releaseErr)
 	m.setLast(current.Status())
 	if err == nil {
 		m.mu.Lock()
@@ -211,15 +229,30 @@ func (m *Manager) Status() Status {
 	// Read live state so failure or reconnection is not reported as an old
 	// connected snapshot.
 	if current != nil {
-		return current.Status()
+		status := current.Status()
+		protection := m.cfg.Guard.Current()
+		if status.StrictKillSwitch || protection.StrictKillSwitch {
+			status.KillSwitch = protection.KillSwitch
+			status.StrictKillSwitch = protection.StrictKillSwitch
+		}
+		return status
 	}
+	protection := m.cfg.Guard.Current()
+	last.KillSwitch = protection.KillSwitch
+	last.StrictKillSwitch = protection.StrictKillSwitch
 	return last
 }
 
 // Shutdown stops the session and restores system settings for service stop,
 // SIGTERM, or self-update.
 func (m *Manager) Shutdown(ctx context.Context) error {
-	return m.Disconnect(ctx)
+	m.mu.Lock()
+	current := m.current
+	m.mu.Unlock()
+	if current != nil {
+		return current.Stop(ctx)
+	}
+	return m.cfg.Guard.Restore(ctx)
 }
 
 // release clears the busy flag that serialises connect and disconnect.

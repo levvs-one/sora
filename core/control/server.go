@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"math"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -41,7 +42,7 @@ import (
 // the system proxy.
 func sessionSettings(req *corev1.ConnectRequest) session.Settings {
 	in := req.GetSessionPlan()
-	settings := session.Settings{TunnelMode: "system", KillSwitch: req.GetKillSwitch()}
+	settings := session.Settings{TunnelMode: "system", KillSwitch: req.GetKillSwitch() || req.GetStrictKillSwitch(), StrictKillSwitch: req.GetStrictKillSwitch(), Reconnect: req.GetReconnect(), AllowLAN: in.GetBypassSettings().GetEnabled()}
 	if in.GetTunnelMode() == corev1.TunnelMode_TUNNEL_MODE_APPLICATION {
 		settings.TunnelMode = "application"
 	}
@@ -321,6 +322,9 @@ func (s *Server) SetDiagnostics(collector Diagnostics) {
 // apiVersion returns the core's wire API version.
 func (s *Server) apiVersion() *corev1.ApiVersion {
 	capabilities := Capabilities()
+	if s.version.Minor >= 12 && (runtime.GOOS == "linux" || runtime.GOOS == "windows") {
+		capabilities = append(capabilities, "strict-kill-switch")
+	}
 	if provider, ok := s.measurer.(interface{ BypassAvailable() bool }); ok && provider.BypassAvailable() {
 		capabilities = append(capabilities, "serverless")
 	}
@@ -531,6 +535,10 @@ func (s *Server) Handshake(ctx context.Context, req *corev1.HandshakeRequest) (*
 // plan validity. Failed checks leave the current session and system settings
 // unchanged.
 func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*corev1.ConnectResponse, error) {
+	if req.GetStrictKillSwitch() && (s.version.Minor < 12 || req.GetApiVersion().GetMinor() < 12 || (runtime.GOOS != "linux" && runtime.GOOS != "windows")) {
+		return nil, transportStatus(errs.Newf(errs.CodeVersionMismatch, errs.KeyAPIVersionMismatch, "control: strict mode needs API 1.12 on Linux or Windows"))
+	}
+
 	id := requestID(req.GetRequestId())
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return nil, transportStatus(err)
@@ -566,6 +574,7 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 		Status: &corev1.SessionStatus{
 			Connection:        wireStatus(started.Status()),
 			NegotiatedVersion: s.apiVersion(),
+			KillSwitch:        s.sessions.Status().KillSwitch, StrictKillSwitch: s.sessions.Status().StrictKillSwitch,
 		},
 	}, nil
 }
@@ -582,7 +591,7 @@ func (s *Server) Disconnect(ctx context.Context, req *corev1.DisconnectRequest) 
 	}
 	if wanted := strings.TrimSpace(req.GetSessionId()); wanted != "" {
 		running := s.sessions.Current()
-		if running == nil || running.ID() != wanted {
+		if (running == nil && !s.sessions.Status().StrictKillSwitch) || (running != nil && running.ID() != wanted) {
 			err := errs.Newf(errs.CodeNotFound, errs.KeyUnknownSession,
 				"control: the request names a session that is not running")
 			return &corev1.DisconnectResponse{Error: toWire(err, nil, id)}, nil
@@ -621,6 +630,7 @@ func (s *Server) GetStatus(_ context.Context, req *corev1.GetStatusRequest) (*co
 			Status: &corev1.SessionStatus{
 				Connection:        wireStatus(session.Status{}),
 				NegotiatedVersion: s.apiVersion(),
+				KillSwitch:        s.sessions.Status().KillSwitch, StrictKillSwitch: s.sessions.Status().StrictKillSwitch,
 			},
 			Error: toWire(err, nil, id),
 		}, nil
@@ -629,6 +639,7 @@ func (s *Server) GetStatus(_ context.Context, req *corev1.GetStatusRequest) (*co
 	return &corev1.GetStatusResponse{Status: &corev1.SessionStatus{
 		Connection:        wireStatus(status),
 		NegotiatedVersion: s.apiVersion(),
+		KillSwitch:        s.sessions.Status().KillSwitch, StrictKillSwitch: s.sessions.Status().StrictKillSwitch,
 	}}, nil
 }
 
@@ -649,28 +660,27 @@ func (s *Server) checkSession(named string) error {
 
 // SetKillSwitch arms or disarms the kill switch of the running session.
 func (s *Server) SetKillSwitch(ctx context.Context, req *corev1.SetKillSwitchRequest) (*corev1.SetKillSwitchResponse, error) {
+	if req.GetStrict() && (s.version.Minor < 12 || req.GetApiVersion().GetMinor() < 12) {
+		return nil, transportStatus(errs.Newf(errs.CodeVersionMismatch, errs.KeyAPIVersionMismatch, "control: strict mode needs API 1.12"))
+	}
+
 	id := requestID(req.GetRequestId())
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return nil, transportStatus(err)
 	}
-	running := s.sessions.Current()
-	if running == nil {
-		err := errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionRequired,
-			"control: there is no session to arm")
-		return &corev1.SetKillSwitchResponse{Error: toWire(err, nil, id)}, nil
-	}
+
 	if err := s.checkSession(req.GetSessionId()); err != nil {
 		return &corev1.SetKillSwitchResponse{Error: toWire(err, nil, id)}, nil
 	}
 	ctx, cancel := requestDeadline(ctx, guardTimeout)
 	defer cancel()
-	if err := running.SetKillSwitch(ctx, req.GetEnabled()); err != nil {
-		return &corev1.SetKillSwitchResponse{Enabled: req.GetEnabled(), Error: toWire(err, nil, id)}, nil
+	if err := s.sessions.SetProtection(ctx, req.GetEnabled(), req.Strict); err != nil {
+		return &corev1.SetKillSwitchResponse{Enabled: s.sessions.Status().KillSwitch, Strict: s.sessions.Status().StrictKillSwitch, Error: toWire(err, nil, id)}, nil
 	}
 	// Background extension work follows the kill switch: while traffic is
 	// blocked, workers must not run and their fetches must fail fast.
-	s.syncExtKillSwitch(req.GetEnabled())
-	return &corev1.SetKillSwitchResponse{Enabled: req.GetEnabled()}, nil
+	s.syncExtKillSwitch(s.sessions.Status().KillSwitch)
+	return &corev1.SetKillSwitchResponse{Enabled: s.sessions.Status().KillSwitch, Strict: s.sessions.Status().StrictKillSwitch}, nil
 }
 
 // syncExtKillSwitch mirrors the session's kill-switch state into the

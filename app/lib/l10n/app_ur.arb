@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive، سیکنڈ",
   "customServerWgKeyInvalid": "کلید wg genkey کی طرح base64 میں 32 بائٹ ہونی چاہیے۔",
   "customServerWgCidrInvalid": "کوما سے الگ پری فکس درج کریں، جیسے 10.0.0.2/32۔",
-  "customServerWgKeepaliveInvalid": "0 سے 65535 تک سیکنڈ درج کریں۔"
+  "customServerWgKeepaliveInvalid": "0 سے 65535 تک سیکنڈ درج کریں۔",
+  "strictKillSwitch": "سخت نیٹ ورک بندش",
+  "strictKillSwitchWarning": "اتصال کے بعد، خرابی، دوبارہ آغاز یا ایپ بند ہونے پر بھی VPN سے باہر کی ٹریفک روکتا ہے۔ رسائی صرف اتصال منقطع کرنے یا اس اختیار کو بند کرنے سے بحال ہوتی ہے۔ آلہ دوبارہ شروع ہونے پر بندش صرف اسی وقت بحال ہوتی ہے جب آغاز پر اتصال فعال ہو۔"
 }

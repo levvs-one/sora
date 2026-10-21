@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, soniya",
   "customServerWgKeyInvalid": "Kalit wg genkey chiqargandek base64’da 32 bayt bo‘lishi kerak.",
   "customServerWgCidrInvalid": "Vergul bilan ajratilgan prefikslarni kiriting, masalan 10.0.0.2/32.",
-  "customServerWgKeepaliveInvalid": "0 dan 65535 gacha soniya sonini kiriting."
+  "customServerWgKeepaliveInvalid": "0 dan 65535 gacha soniya sonini kiriting.",
+  "strictKillSwitch": "Qatʼiy tarmoq qulfi",
+  "strictKillSwitchWarning": "Ulangandan keyin nosozlik, qayta ishga tushirish yoki ilovadan chiqishda ham VPN tashqarisidagi trafikni bloklaydi. Kirish faqat ulanish uzilganda yoki bu sozlama oʻchirilganda tiklanadi. Qurilma qayta yoqilganda bloklash faqat ishga tushishda ulanish yoqilgan boʻlsa davom etadi."
 }

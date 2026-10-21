@@ -2237,4 +2237,11 @@ class SJa extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => '0 から 65535 までの秒数を入力してください。';
+
+  @override
+  String get strictKillSwitch => '厳格なネットワーク遮断';
+
+  @override
+  String get strictKillSwitchWarning =>
+      '接続後は、クラッシュ、再起動、アプリ終了後も VPN 外の通信を遮断します。接続を切るか、この設定をオフにした場合のみアクセスが戻ります。端末の再起動後は、起動時の接続が有効な場合のみ遮断を再開します。';
 }

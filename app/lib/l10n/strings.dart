@@ -4238,6 +4238,18 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Укажите число секунд от 0 до 65535.'**
   String get customServerWgKeepaliveInvalid;
+
+  /// No description provided for @strictKillSwitch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Строгий kill switch'**
+  String get strictKillSwitch;
+
+  /// No description provided for @strictKillSwitchWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'После подключения блокирует трафик вне VPN даже при сбое, перезапуске ядра или выходе из приложения. Доступ вернётся только после отключения VPN или этой настройки. После перезагрузки блокировка возобновится только при включённом подключении при запуске.'**
+  String get strictKillSwitchWarning;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

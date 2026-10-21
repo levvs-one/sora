@@ -2254,4 +2254,11 @@ class SBe extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => 'Пакажыце колькасць секунд ад 0 да 65535.';
+
+  @override
+  String get strictKillSwitch => 'Строгі kill switch';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Пасля падключэння блакуе трафік па-за VPN нават пасля збою, перазапуску ці выхаду з праграмы. Доступ вернецца толькі пасля адключэння VPN або гэтай налады. Пасля перазагрузкі блакаванне аднаўляецца толькі пры ўключаным падключэнні пры запуску.';
 }

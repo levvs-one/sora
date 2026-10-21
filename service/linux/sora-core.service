@@ -1,11 +1,16 @@
 [Unit]
 Description=Sora core service
 Documentation=https://github.com/levvs-one/sora/tree/main/service/linux
-After=network-online.target nss-lookup.target
-Wants=network-online.target
+# Restore persisted strict intent before network managers configure the link.
+DefaultDependencies=no
+After=local-fs.target systemd-sysusers.service
+Conflicts=shutdown.target
+Before=network-pre.target shutdown.target
+Wants=network-pre.target
 
 [Service]
-Type=simple
+Type=notify
+NotifyAccess=main
 # The core runs as its own account: the kill switch lets the engines' traffic
 # through by uid, and the interface reaches the core through the socket.
 User=sora
@@ -13,8 +18,8 @@ Group=sora
 ExecStart=/usr/bin/sora-core -data-dir /var/lib/sora -engines-dir /usr/lib/sora/engines
 Restart=on-failure
 RestartSec=2s
-# Stopping restores the system proxy and removes the nftables table; give it
-# time before the kill.
+# Stopping cleans up the engine; a strict firewall stays armed until an
+# explicit disconnect. Allow time for graceful engine shutdown.
 TimeoutStopSec=15s
 
 StateDirectory=sora

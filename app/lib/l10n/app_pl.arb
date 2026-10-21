@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, sekundy",
   "customServerWgKeyInvalid": "Klucz musi mieć 32 bajty w base64, jak wypisuje wg genkey.",
   "customServerWgCidrInvalid": "Wpisz prefiksy rozdzielone przecinkami, np. 10.0.0.2/32.",
-  "customServerWgKeepaliveInvalid": "Wpisz liczbę sekund od 0 do 65535."
+  "customServerWgKeepaliveInvalid": "Wpisz liczbę sekund od 0 do 65535.",
+  "strictKillSwitch": "Ścisła blokada sieci",
+  "strictKillSwitchWarning": "Po połączeniu blokuje ruch poza VPN także po awarii, ponownym uruchomieniu lub zamknięciu aplikacji. Dostęp przywraca tylko rozłączenie lub wyłączenie tej opcji. Po restarcie systemu blokada wraca tylko przy włączonym łączeniu podczas uruchamiania."
 }

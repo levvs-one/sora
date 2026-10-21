@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -139,6 +141,17 @@ func run(ctx context.Context, arguments []string) error {
 				"core: the installation is not ready")
 		}
 		return nil
+	}
+	if runtime.GOOS == "linux" && os.Getenv("NOTIFY_SOCKET") != "" {
+		// Type=notify holds network-pre.target until persisted protection is restored.
+		connection, err := (&net.Dialer{}).DialContext(ctx, "unixgram", os.Getenv("NOTIFY_SOCKET"))
+		if err != nil {
+			return err
+		}
+		_, writeErr := connection.Write([]byte("READY=1"))
+		if err := errors.Join(writeErr, connection.Close()); err != nil {
+			return err
+		}
 	}
 	return app.Serve(ctx)
 }

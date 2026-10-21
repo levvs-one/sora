@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, secondes",
   "customServerWgKeyInvalid": "La clé doit faire 32 octets en base64, comme l’affiche wg genkey.",
   "customServerWgCidrInvalid": "Saisissez des préfixes séparés par des virgules, comme 10.0.0.2/32.",
-  "customServerWgKeepaliveInvalid": "Saisissez un nombre de secondes entre 0 et 65535."
+  "customServerWgKeepaliveInvalid": "Saisissez un nombre de secondes entre 0 et 65535.",
+  "strictKillSwitch": "Coupe-circuit strict",
+  "strictKillSwitchWarning": "Après la connexion, bloque le trafic hors VPN même après un plantage, un redémarrage ou la fermeture de l’application. Seule la déconnexion ou la désactivation de cette option rétablit l’accès. Après un redémarrage du système, le blocage reprend uniquement si la connexion au démarrage est activée."
 }

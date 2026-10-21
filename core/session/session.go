@@ -88,7 +88,8 @@ type Status struct {
 
 	// KillSwitch reports whether traffic is blocked while the engine is
 	// down.
-	KillSwitch bool
+	KillSwitch       bool
+	StrictKillSwitch bool
 	// Bypass lists the destinations that skip the tunnel.
 	Bypass []string
 	// TunnelMode is the tunnel the session asked for.

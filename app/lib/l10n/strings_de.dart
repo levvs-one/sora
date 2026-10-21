@@ -2259,4 +2259,11 @@ class SDe extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => 'Eine Sekundenzahl von 0 bis 65535 eingeben.';
+
+  @override
+  String get strictKillSwitch => 'Strikte Netzwerksperre';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Blockiert nach dem Verbinden Datenverkehr außerhalb des VPN auch bei Absturz, Neustart oder Beenden der App. Nur Trennen oder Ausschalten dieser Option gibt den Zugriff frei. Nach einem Systemneustart greift die Sperre nur bei aktivierter Verbindung beim Start.';
 }

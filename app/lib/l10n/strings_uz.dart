@@ -2255,4 +2255,11 @@ class SUz extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => '0 dan 65535 gacha soniya sonini kiriting.';
+
+  @override
+  String get strictKillSwitch => 'Qatʼiy tarmoq qulfi';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Ulangandan keyin nosozlik, qayta ishga tushirish yoki ilovadan chiqishda ham VPN tashqarisidagi trafikni bloklaydi. Kirish faqat ulanish uzilganda yoki bu sozlama oʻchirilganda tiklanadi. Qurilma qayta yoqilganda bloklash faqat ishga tushishda ulanish yoqilgan boʻlsa davom etadi.';
 }

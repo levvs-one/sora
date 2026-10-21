@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, Sekunden",
   "customServerWgKeyInvalid": "Der Schlüssel muss 32 Byte in Base64 sein, wie wg genkey ihn ausgibt.",
   "customServerWgCidrInvalid": "Präfixe kommagetrennt eingeben, etwa 10.0.0.2/32.",
-  "customServerWgKeepaliveInvalid": "Eine Sekundenzahl von 0 bis 65535 eingeben."
+  "customServerWgKeepaliveInvalid": "Eine Sekundenzahl von 0 bis 65535 eingeben.",
+  "strictKillSwitch": "Strikte Netzwerksperre",
+  "strictKillSwitchWarning": "Blockiert nach dem Verbinden Datenverkehr außerhalb des VPN auch bei Absturz, Neustart oder Beenden der App. Nur Trennen oder Ausschalten dieser Option gibt den Zugriff frei. Nach einem Systemneustart greift die Sperre nur bei aktivierter Verbindung beim Start."
 }

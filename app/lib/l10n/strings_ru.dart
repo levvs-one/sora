@@ -2277,4 +2277,11 @@ class SRu extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => 'Укажите число секунд от 0 до 65535.';
+
+  @override
+  String get strictKillSwitch => 'Строгий kill switch';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'После подключения блокирует трафик вне VPN даже при сбое, перезапуске ядра или выходе из приложения. Доступ вернётся только после отключения VPN или этой настройки. После перезагрузки блокировка возобновится только при включённом подключении при запуске.';
 }

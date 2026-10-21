@@ -263,6 +263,29 @@ class _Modes extends StatelessWidget {
                 value: settings.killSwitch,
                 onChanged: (v) => unawaited(sora.setKillSwitch(v)),
               ),
+              if (Platform.isLinux || Platform.isWindows)
+                ExpansionTile(
+                  key: const ValueKey('advanced-protection'),
+                  title: Text(s.more, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                  childrenPadding: const EdgeInsets.only(bottom: 12),
+                  iconColor: palette.ink2,
+                  collapsedIconColor: palette.ink2,
+                  shape: const Border(),
+                  collapsedShape: const Border(),
+                  children: [
+                    SwitchTile(
+                      key: const ValueKey('strict-kill-switch'),
+                      title: s.strictKillSwitch,
+                      value: settings.strictKillSwitch,
+                      onChanged: (v) => unawaited(sora.setStrictKillSwitch(v)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                      child: Text(s.strictKillSwitchWarning, style: Styles.secondary.copyWith(color: palette.ink2)),
+                    ),
+                  ],
+                ),
               if (Platform.isLinux && sora.serverlessAvailable) ...[
                 const SizedBox(height: 12),
                 SwitchTile(

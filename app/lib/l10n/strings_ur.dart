@@ -2253,4 +2253,11 @@ class SUr extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => '0 سے 65535 تک سیکنڈ درج کریں۔';
+
+  @override
+  String get strictKillSwitch => 'سخت نیٹ ورک بندش';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'اتصال کے بعد، خرابی، دوبارہ آغاز یا ایپ بند ہونے پر بھی VPN سے باہر کی ٹریفک روکتا ہے۔ رسائی صرف اتصال منقطع کرنے یا اس اختیار کو بند کرنے سے بحال ہوتی ہے۔ آلہ دوبارہ شروع ہونے پر بندش صرف اسی وقت بحال ہوتی ہے جب آغاز پر اتصال فعال ہو۔';
 }

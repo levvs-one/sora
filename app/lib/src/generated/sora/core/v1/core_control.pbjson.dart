@@ -198,6 +198,8 @@ const ConnectRequest$json = {
     {'1': 'session_plan', '3': 4, '4': 1, '5': 11, '6': '.sora.core.v1.SessionPlan', '10': 'sessionPlan'},
     {'1': 'control_authenticator', '3': 5, '4': 1, '5': 12, '10': 'controlAuthenticator'},
     {'1': 'kill_switch', '3': 6, '4': 1, '5': 8, '10': 'killSwitch'},
+    {'1': 'strict_kill_switch', '3': 7, '4': 1, '5': 8, '10': 'strictKillSwitch'},
+    {'1': 'reconnect', '3': 8, '4': 1, '5': 8, '10': 'reconnect'},
   ],
 };
 
@@ -208,7 +210,8 @@ final $typed_data.Uint8List connectRequestDescriptor =
         'ZXNzaW9uX2lkGAMgASgJUglzZXNzaW9uSWQSPAoMc2Vzc2lvbl9wbGFuGAQgASgLMhkuc29yYS'
         '5jb3JlLnYxLlNlc3Npb25QbGFuUgtzZXNzaW9uUGxhbhIzChVjb250cm9sX2F1dGhlbnRpY2F0'
         'b3IYBSABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9yEh8KC2tpbGxfc3dpdGNoGAYgASgIUgpraW'
-        'xsU3dpdGNo');
+        'xsU3dpdGNoEiwKEnN0cmljdF9raWxsX3N3aXRjaBgHIAEoCFIQc3RyaWN0S2lsbFN3aXRjaBIc'
+        'CglyZWNvbm5lY3QYCCABKAhSCXJlY29ubmVjdA==');
 
 @$core.Deprecated('Use connectResponseDescriptor instead')
 const ConnectResponse$json = {
@@ -520,6 +523,8 @@ const SessionStatus$json = {
   '2': [
     {'1': 'connection', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ConnectionState', '10': 'connection'},
     {'1': 'negotiated_version', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'negotiatedVersion'},
+    {'1': 'kill_switch', '3': 3, '4': 1, '5': 8, '10': 'killSwitch'},
+    {'1': 'strict_kill_switch', '3': 4, '4': 1, '5': 8, '10': 'strictKillSwitch'},
   ],
 };
 
@@ -527,7 +532,9 @@ const SessionStatus$json = {
 final $typed_data.Uint8List sessionStatusDescriptor =
     $convert.base64Decode('Cg1TZXNzaW9uU3RhdHVzEj0KCmNvbm5lY3Rpb24YASABKAsyHS5zb3JhLmNvcmUudjEuQ29ubm'
         'VjdGlvblN0YXRlUgpjb25uZWN0aW9uEkcKEm5lZ290aWF0ZWRfdmVyc2lvbhgCIAEoCzIYLnNv'
-        'cmEuY29yZS52MS5BcGlWZXJzaW9uUhFuZWdvdGlhdGVkVmVyc2lvbg==');
+        'cmEuY29yZS52MS5BcGlWZXJzaW9uUhFuZWdvdGlhdGVkVmVyc2lvbhIfCgtraWxsX3N3aXRjaB'
+        'gDIAEoCFIKa2lsbFN3aXRjaBIsChJzdHJpY3Rfa2lsbF9zd2l0Y2gYBCABKAhSEHN0cmljdEtp'
+        'bGxTd2l0Y2g=');
 
 @$core.Deprecated('Use getStatsRequestDescriptor instead')
 const GetStatsRequest$json = {
@@ -963,6 +970,10 @@ const SetKillSwitchRequest$json = {
     {'1': 'request_id', '3': 2, '4': 1, '5': 9, '10': 'requestId'},
     {'1': 'session_id', '3': 3, '4': 1, '5': 9, '10': 'sessionId'},
     {'1': 'enabled', '3': 4, '4': 1, '5': 8, '10': 'enabled'},
+    {'1': 'strict', '3': 5, '4': 1, '5': 8, '9': 0, '10': 'strict', '17': true},
+  ],
+  '8': [
+    {'1': '_strict'},
   ],
 };
 
@@ -971,7 +982,7 @@ final $typed_data.Uint8List setKillSwitchRequestDescriptor =
     $convert.base64Decode('ChRTZXRLaWxsU3dpdGNoUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29yZS'
         '52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEh0KCnJlcXVlc3RfaWQYAiABKAlSCXJlcXVlc3RJ'
         'ZBIdCgpzZXNzaW9uX2lkGAMgASgJUglzZXNzaW9uSWQSGAoHZW5hYmxlZBgEIAEoCFIHZW5hYm'
-        'xlZA==');
+        'xlZBIbCgZzdHJpY3QYBSABKAhIAFIGc3RyaWN0iAEBQgkKB19zdHJpY3Q=');
 
 @$core.Deprecated('Use setKillSwitchResponseDescriptor instead')
 const SetKillSwitchResponse$json = {
@@ -979,13 +990,15 @@ const SetKillSwitchResponse$json = {
   '2': [
     {'1': 'enabled', '3': 1, '4': 1, '5': 8, '10': 'enabled'},
     {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+    {'1': 'strict', '3': 3, '4': 1, '5': 8, '10': 'strict'},
   ],
 };
 
 /// Descriptor for `SetKillSwitchResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List setKillSwitchResponseDescriptor =
     $convert.base64Decode('ChVTZXRLaWxsU3dpdGNoUmVzcG9uc2USGAoHZW5hYmxlZBgBIAEoCFIHZW5hYmxlZBItCgVlcn'
-        'JvchgCIAEoCzIXLnNvcmEuY29yZS52MS5Tb3JhRXJyb3JSBWVycm9y');
+        'JvchgCIAEoCzIXLnNvcmEuY29yZS52MS5Tb3JhRXJyb3JSBWVycm9yEhYKBnN0cmljdBgDIAEo'
+        'CFIGc3RyaWN0');
 
 @$core.Deprecated('Use diagnosticReportDescriptor instead')
 const DiagnosticReport$json = {

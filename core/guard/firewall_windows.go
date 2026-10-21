@@ -4,6 +4,7 @@ package guard
 
 import (
 	"context"
+	"errors"
 	"net/netip"
 	"os"
 	"path/filepath"
@@ -14,11 +15,10 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/session"
 )
 
-// WFP owns a dynamic sublayer permitting core/engine, TUN, local, DHCP, and
-// neighbor-discovery traffic. Windows removes filters on close or process exit,
-// allowing traffic after crashes, as WireGuard and Tailscale do.
+// WFP uses a stable sublayer for strict rules so a new process can adopt or remove them.
 type WFP struct {
 	mu              sync.Mutex
 	enginesDir      string
@@ -26,6 +26,7 @@ type WFP struct {
 	tunNetworks     []netip.Prefix
 	blockedNetworks []netip.Prefix
 	session         *wf.Session
+	policy          session.Settings
 }
 
 // PlatformFirewall returns Windows WFP, matching engines by executable because
@@ -75,20 +76,32 @@ var outbound = []wf.LayerID{wf.LayerALEAuthConnectV4, wf.LayerALEAuthConnectV6}
 func (w *WFP) Arm(context.Context, []uint16) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	if w.session != nil {
+	if w.session != nil && !w.policy.StrictKillSwitch {
 		return nil
 	}
 	session, err := wf.New(&wf.Options{
 		Name:        "Sora kill switch",
 		Description: "Blocks traffic that does not go through the Sora tunnel",
-		Dynamic:     true,
+		Dynamic:     !w.policy.StrictKillSwitch,
 	})
 	if err != nil {
 		return refused(err)
 	}
-	if err := w.install(session); err != nil {
+	var installErr error
+	if w.policy.StrictKillSwitch {
+		installErr = w.installStrict(session)
+	} else {
+		installErr = w.install(session)
+	}
+	if err := installErr; err != nil {
 		_ = session.Close()
 		return refused(err)
+	}
+	if w.session != nil {
+		if err := w.session.Close(); err != nil {
+			_ = session.Close()
+			return refused(err)
+		}
 	}
 	w.session = session
 	return nil
@@ -101,21 +114,108 @@ func (w *WFP) Arm(context.Context, []uint16) error {
 func (w *WFP) Disarm(context.Context) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	if w.session == nil {
-		return nil
-	}
-	if err := w.session.Close(); err != nil {
+	// Non-dynamic rules remain accessible even after the original owner died.
+	connection, err := wf.New(nil)
+	if err != nil {
 		return refused(err)
 	}
-	w.session = nil
-	return nil
+	defer func() { _ = connection.Close() }()
+	rules, err := connection.Rules()
+	if err != nil {
+		return refused(err)
+	}
+	var failures error
+	for _, rule := range rules {
+		if rule.Sublayer == strictSublayer {
+			failures = errors.Join(failures, connection.DeleteRule(rule.ID))
+		}
+	}
+	layers, layerErr := connection.Sublayers()
+	failures = errors.Join(failures, layerErr)
+	for _, layer := range layers {
+		if layer.ID == strictSublayer {
+			failures = errors.Join(failures, connection.DeleteSublayer(strictSublayer))
+		}
+	}
+	if w.session != nil {
+		if err := w.session.Close(); err != nil {
+			failures = errors.Join(failures, err)
+		} else {
+			w.session = nil
+		}
+	}
+	return failures
 }
 
-// Armed reports whether this process holds the filters.
+// Armed includes strict filters held by earlier processes.
 func (w *WFP) Armed(context.Context) (bool, error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
+	connection, err := wf.New(nil)
+	if err != nil {
+		return false, err
+	}
+	defer func() { _ = connection.Close() }()
+	rules, err := connection.Rules()
+	if err != nil {
+		return false, err
+	}
+	for _, rule := range rules {
+		if rule.Sublayer == strictSublayer {
+			return true, nil
+		}
+	}
 	return w.session != nil, nil
+}
+
+// SetPolicy is applied before replacing the rules.
+func (w *WFP) SetPolicy(s session.Settings) { w.mu.Lock(); defer w.mu.Unlock(); w.policy = s }
+
+var strictSublayer = wf.SublayerID{Data1: 0x18ce701b, Data2: 0x251c, Data3: 0x4bc8, Data4: [8]byte{0x8f, 0x3b, 0x13, 0x23, 0x7b, 0x0e, 0x74, 0x91}}
+
+func (w *WFP) installStrict(connection *wf.Session) error {
+	layers, err := connection.Sublayers()
+	if err != nil {
+		return err
+	}
+	found := false
+	for _, layer := range layers {
+		if layer.ID == strictSublayer {
+			found = true
+		}
+	}
+	if !found {
+		if err := connection.AddSublayer(&wf.Sublayer{ID: strictSublayer, Name: "Sora strict kill switch", Weight: 0xffff, Persistent: true}); err != nil {
+			return err
+		}
+	}
+	old, err := connection.Rules()
+	if err != nil {
+		return err
+	}
+	// Install the replacement before deleting the old block, including during recovery.
+	var added []wf.RuleID
+	if err := w.rules(func(rule *wf.Rule) error {
+		rule.Persistent = w.policy.Reconnect
+		if err := connection.AddRule(rule); err != nil {
+			return err
+		}
+		added = append(added, rule.ID)
+		return nil
+	}, strictSublayer); err != nil {
+		for _, id := range added {
+			_ = connection.DeleteRule(id)
+		}
+		return err
+	}
+	for _, rule := range old {
+		if rule.Sublayer == strictSublayer {
+			if err := connection.DeleteRule(rule.ID); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // Name identifies the implementation in a diagnostics line.
@@ -148,6 +248,7 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 			if err := addRule(&wf.Rule{
 				ID: wf.RuleID(guid), Name: "Sora: " + name, Layer: layer, Sublayer: sublayer,
 				Weight: weight, Conditions: conditions, Action: action,
+				Persistent: w.policy.StrictKillSwitch && w.policy.Reconnect,
 			}); err != nil {
 				return err
 			}
@@ -168,17 +269,25 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 	if err != nil {
 		return err
 	}
-	for _, file := range apps {
+	for index, file := range apps {
+		if w.policy.StrictKillSwitch && index != 0 {
+			continue
+		}
 		id, err := wf.AppID(file)
 		if err != nil {
 			return err
 		}
-		if err := add(filepath.Base(file), wf.ActionPermit, 30,
-			&wf.Match{Field: wf.FieldALEAppID, Op: wf.MatchTypeEqual, Value: id},
-			&wf.Match{Field: wf.FieldALEUserID, Op: wf.MatchTypeEqual, Value: owner},
-		); err != nil {
+		conditions := []*wf.Match{
+			{Field: wf.FieldALEAppID, Op: wf.MatchTypeEqual, Value: id},
+			{Field: wf.FieldALEUserID, Op: wf.MatchTypeEqual, Value: owner},
+		}
+		if w.policy.StrictKillSwitch {
+			conditions = append(conditions, &wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(53)})
+		}
+		if err := add(filepath.Base(file), wf.ActionPermit, 30, conditions...); err != nil {
 			return err
 		}
+
 	}
 	if err := add("loopback", wf.ActionPermit, 30, &wf.Match{Field: wf.FieldFlags, Op: wf.MatchTypeFlagsAllSet, Value: wf.ConditionFlagIsLoopback}); err != nil {
 		return err
@@ -209,7 +318,24 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 		&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(53)}); err != nil {
 		return err
 	}
-	for _, network := range w.bypass {
+	for _, ep := range w.policy.Endpoints {
+		if err := add("VPN endpoint", wf.ActionPermit, 30,
+			&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.PrefixFrom(ep.Addr(), ep.Addr().BitLen())},
+			&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: ep.Port()},
+		); err != nil {
+			return err
+		}
+	}
+	bypass := w.bypass
+	if w.policy.StrictKillSwitch {
+		bypass = nil
+		if w.policy.AllowLAN {
+			for _, network := range DefaultBypassNetworks() {
+				bypass = append(bypass, netip.MustParsePrefix(network))
+			}
+		}
+	}
+	for _, network := range bypass {
 		if err := permit("local network", &wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: network}); err != nil {
 			return err
 		}
@@ -221,7 +347,7 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 		udp,
 		&wf.Match{Field: wf.FieldIPLocalPort, Op: wf.MatchTypeEqual, Value: uint16(68)},
 		&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(67)},
-		&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.MustParsePrefix("255.255.255.255/32")},
+		&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.MustParsePrefix("0.0.0.0/0")},
 	); err != nil {
 		return err
 	}
@@ -232,6 +358,13 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 		&wf.Match{Field: wf.FieldIPLocalPort, Op: wf.MatchTypeEqual, Value: uint16(546)},
 		&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(547)},
 		&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.MustParsePrefix("ff02::1:2/128")},
+	); err != nil {
+		return err
+	}
+	if err := permit("DHCPv6 renewal", udp,
+		&wf.Match{Field: wf.FieldIPLocalPort, Op: wf.MatchTypeEqual, Value: uint16(546)},
+		&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(547)},
+		&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.MustParsePrefix("fe80::/10")},
 	); err != nil {
 		return err
 	}

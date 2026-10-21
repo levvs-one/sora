@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, सेकंड",
   "customServerWgKeyInvalid": "की wg genkey की तरह base64 में 32 बाइट होनी चाहिए।",
   "customServerWgCidrInvalid": "कॉमा से अलग प्रीफ़िक्स दें, जैसे 10.0.0.2/32।",
-  "customServerWgKeepaliveInvalid": "0 से 65535 तक सेकंड की संख्या दें।"
+  "customServerWgKeepaliveInvalid": "0 से 65535 तक सेकंड की संख्या दें।",
+  "strictKillSwitch": "सख्त नेटवर्क अवरोध",
+  "strictKillSwitchWarning": "कनेक्ट होने के बाद, क्रैश, पुनः आरंभ या ऐप बंद होने पर भी VPN के बाहर का ट्रैफ़िक रोकता है। केवल डिस्कनेक्ट करने या यह विकल्प बंद करने से पहुँच लौटती है। डिवाइस पुनः आरंभ होने पर अवरोध तभी फिर लागू होगा जब शुरू होते समय कनेक्ट करने का विकल्प चालू हो।"
 }

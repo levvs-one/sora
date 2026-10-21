@@ -2254,4 +2254,11 @@ class SUk extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => 'Вкажіть кількість секунд від 0 до 65535.';
+
+  @override
+  String get strictKillSwitch => 'Суворий kill switch';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Після підключення блокує трафік поза VPN навіть після збою, перезапуску чи виходу з програми. Доступ відновиться лише після відключення VPN або цієї опції. Після перезавантаження блокування відновлюється лише з увімкненим підключенням під час запуску.';
 }

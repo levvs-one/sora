@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, секунд",
   "customServerWgKeyInvalid": "Ключ має бути 32 байтами в base64, як виводить wg genkey.",
   "customServerWgCidrInvalid": "Вкажіть адреси через кому у вигляді 10.0.0.2/32.",
-  "customServerWgKeepaliveInvalid": "Вкажіть кількість секунд від 0 до 65535."
+  "customServerWgKeepaliveInvalid": "Вкажіть кількість секунд від 0 до 65535.",
+  "strictKillSwitch": "Суворий kill switch",
+  "strictKillSwitchWarning": "Після підключення блокує трафік поза VPN навіть після збою, перезапуску чи виходу з програми. Доступ відновиться лише після відключення VPN або цієї опції. Після перезавантаження блокування відновлюється лише з увімкненим підключенням під час запуску."
 }

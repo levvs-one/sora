@@ -2253,4 +2253,11 @@ class SHi extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => '0 से 65535 तक सेकंड की संख्या दें।';
+
+  @override
+  String get strictKillSwitch => 'सख्त नेटवर्क अवरोध';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'कनेक्ट होने के बाद, क्रैश, पुनः आरंभ या ऐप बंद होने पर भी VPN के बाहर का ट्रैफ़िक रोकता है। केवल डिस्कनेक्ट करने या यह विकल्प बंद करने से पहुँच लौटती है। डिवाइस पुनः आरंभ होने पर अवरोध तभी फिर लागू होगा जब शुरू होते समय कनेक्ट करने का विकल्प चालू हो।';
 }

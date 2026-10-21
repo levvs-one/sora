@@ -2253,4 +2253,11 @@ class STh extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => 'ป้อนจำนวนวินาทีตั้งแต่ 0 ถึง 65535';
+
+  @override
+  String get strictKillSwitch => 'การตัดเครือข่ายแบบเข้มงวด';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'หลังเชื่อมต่อ จะบล็อกการรับส่งข้อมูลนอก VPN แม้เกิดข้อขัดข้อง เริ่มใหม่ หรือออกจากแอป การเข้าถึงจะกลับมาเมื่อยกเลิกการเชื่อมต่อหรือปิดตัวเลือกนี้เท่านั้น หลังรีบูตอุปกรณ์ จะบล็อกต่อเฉพาะเมื่อเปิดการเชื่อมต่อเมื่อเริ่มต้นไว้';
 }

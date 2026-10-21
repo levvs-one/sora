@@ -2236,6 +2236,12 @@ class SZh extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => '请输入 0 到 65535 之间的秒数。';
+
+  @override
+  String get strictKillSwitch => '严格网络锁定';
+
+  @override
+  String get strictKillSwitchWarning => '连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4469,6 +4475,12 @@ class SZhHans extends SZh {
 
   @override
   String get customServerWgKeepaliveInvalid => '请输入 0 到 65535 之间的秒数。';
+
+  @override
+  String get strictKillSwitch => '严格网络锁定';
+
+  @override
+  String get strictKillSwitchWarning => '连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6702,4 +6714,11 @@ class SZhHant extends SZh {
 
   @override
   String get customServerWgKeepaliveInvalid => '請輸入 0 到 65535 之間的秒數。';
+
+  @override
+  String get strictKillSwitch => '嚴格網路鎖定';
+
+  @override
+  String get strictKillSwitchWarning =>
+      '連線後，即使當機、重新啟動或結束應用程式，也會阻擋 VPN 以外的流量。只有中斷連線或關閉此選項才會恢復存取。裝置重新啟動後，僅在啟用啟動時連線時恢復阻擋。';
 }

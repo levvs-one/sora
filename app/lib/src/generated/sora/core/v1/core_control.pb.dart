@@ -114,6 +114,8 @@ class ConnectRequest extends $pb.GeneratedMessage {
     SessionPlan? sessionPlan,
     $core.List<$core.int>? controlAuthenticator,
     $core.bool? killSwitch,
+    $core.bool? strictKillSwitch,
+    $core.bool? reconnect,
   }) {
     final result = ConnectRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
@@ -122,6 +124,8 @@ class ConnectRequest extends $pb.GeneratedMessage {
     if (sessionPlan != null) result.sessionPlan = sessionPlan;
     if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
     if (killSwitch != null) result.killSwitch = killSwitch;
+    if (strictKillSwitch != null) result.strictKillSwitch = strictKillSwitch;
+    if (reconnect != null) result.reconnect = reconnect;
     return result;
   }
 
@@ -142,6 +146,8 @@ class ConnectRequest extends $pb.GeneratedMessage {
     ..aOM<SessionPlan>(4, _omitFieldNames ? '' : 'sessionPlan', subBuilder: SessionPlan.$_createMessage)
     ..a<$core.List<$core.int>>(5, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
     ..aOB(6, _omitFieldNames ? '' : 'killSwitch')
+    ..aOB(7, _omitFieldNames ? '' : 'strictKillSwitch')
+    ..aOB(8, _omitFieldNames ? '' : 'reconnect')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -223,6 +229,26 @@ class ConnectRequest extends $pb.GeneratedMessage {
   $core.bool hasKillSwitch() => $_has(5);
   @$pb.TagNumber(6)
   void clearKillSwitch() => $_clearField(6);
+
+  /// Since 1.12. Opt-in, persists a block until explicit disconnect or disable.
+  @$pb.TagNumber(7)
+  $core.bool get strictKillSwitch => $_getBF(6);
+  @$pb.TagNumber(7)
+  set strictKillSwitch($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasStrictKillSwitch() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearStrictKillSwitch() => $_clearField(7);
+
+  /// Reapply after a reboot only when the user intends automatic reconnect.
+  @$pb.TagNumber(8)
+  $core.bool get reconnect => $_getBF(7);
+  @$pb.TagNumber(8)
+  set reconnect($core.bool value) => $_setBool(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasReconnect() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearReconnect() => $_clearField(8);
 }
 
 class ConnectResponse extends $pb.GeneratedMessage {
@@ -1768,10 +1794,14 @@ class SessionStatus extends $pb.GeneratedMessage {
   factory SessionStatus({
     ConnectionState? connection,
     ApiVersion? negotiatedVersion,
+    $core.bool? killSwitch,
+    $core.bool? strictKillSwitch,
   }) {
     final result = SessionStatus._();
     if (connection != null) result.connection = connection;
     if (negotiatedVersion != null) result.negotiatedVersion = negotiatedVersion;
+    if (killSwitch != null) result.killSwitch = killSwitch;
+    if (strictKillSwitch != null) result.strictKillSwitch = strictKillSwitch;
     return result;
   }
 
@@ -1788,6 +1818,8 @@ class SessionStatus extends $pb.GeneratedMessage {
       createEmptyInstance: SessionStatus.$_createMessage)
     ..aOM<ConnectionState>(1, _omitFieldNames ? '' : 'connection', subBuilder: ConnectionState.$_createMessage)
     ..aOM<ApiVersion>(2, _omitFieldNames ? '' : 'negotiatedVersion', subBuilder: ApiVersion.$_createMessage)
+    ..aOB(3, _omitFieldNames ? '' : 'killSwitch')
+    ..aOB(4, _omitFieldNames ? '' : 'strictKillSwitch')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1831,6 +1863,24 @@ class SessionStatus extends $pb.GeneratedMessage {
   void clearNegotiatedVersion() => $_clearField(2);
   @$pb.TagNumber(2)
   ApiVersion ensureNegotiatedVersion() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  $core.bool get killSwitch => $_getBF(2);
+  @$pb.TagNumber(3)
+  set killSwitch($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasKillSwitch() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearKillSwitch() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get strictKillSwitch => $_getBF(3);
+  @$pb.TagNumber(4)
+  set strictKillSwitch($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasStrictKillSwitch() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearStrictKillSwitch() => $_clearField(4);
 }
 
 class GetStatsRequest extends $pb.GeneratedMessage {
@@ -3862,12 +3912,14 @@ class SetKillSwitchRequest extends $pb.GeneratedMessage {
     $core.String? requestId,
     $core.String? sessionId,
     $core.bool? enabled,
+    $core.bool? strict,
   }) {
     final result = SetKillSwitchRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
     if (requestId != null) result.requestId = requestId;
     if (sessionId != null) result.sessionId = sessionId;
     if (enabled != null) result.enabled = enabled;
+    if (strict != null) result.strict = strict;
     return result;
   }
 
@@ -3887,6 +3939,7 @@ class SetKillSwitchRequest extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'requestId')
     ..aOS(3, _omitFieldNames ? '' : 'sessionId')
     ..aOB(4, _omitFieldNames ? '' : 'enabled')
+    ..aOB(5, _omitFieldNames ? '' : 'strict')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3946,16 +3999,27 @@ class SetKillSwitchRequest extends $pb.GeneratedMessage {
   $core.bool hasEnabled() => $_has(3);
   @$pb.TagNumber(4)
   void clearEnabled() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get strict => $_getBF(4);
+  @$pb.TagNumber(5)
+  set strict($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasStrict() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearStrict() => $_clearField(5);
 }
 
 class SetKillSwitchResponse extends $pb.GeneratedMessage {
   factory SetKillSwitchResponse({
     $core.bool? enabled,
     SoraError? error,
+    $core.bool? strict,
   }) {
     final result = SetKillSwitchResponse._();
     if (enabled != null) result.enabled = enabled;
     if (error != null) result.error = error;
+    if (strict != null) result.strict = strict;
     return result;
   }
 
@@ -3973,6 +4037,7 @@ class SetKillSwitchResponse extends $pb.GeneratedMessage {
       createEmptyInstance: SetKillSwitchResponse.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'enabled')
     ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..aOB(3, _omitFieldNames ? '' : 'strict')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -4014,6 +4079,15 @@ class SetKillSwitchResponse extends $pb.GeneratedMessage {
   void clearError() => $_clearField(2);
   @$pb.TagNumber(2)
   SoraError ensureError() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  $core.bool get strict => $_getBF(2);
+  @$pb.TagNumber(3)
+  set strict($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasStrict() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearStrict() => $_clearField(3);
 }
 
 class DiagnosticReport extends $pb.GeneratedMessage {

@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, saniye",
   "customServerWgKeyInvalid": "Anahtar, wg genkey çıktısındaki gibi base64’te 32 bayt olmalı.",
   "customServerWgCidrInvalid": "10.0.0.2/32 gibi virgülle ayrılmış önekler girin.",
-  "customServerWgKeepaliveInvalid": "0 ile 65535 arasında bir saniye değeri girin."
+  "customServerWgKeepaliveInvalid": "0 ile 65535 arasında bir saniye değeri girin.",
+  "strictKillSwitch": "Katı ağ kilidi",
+  "strictKillSwitchWarning": "Bağlandıktan sonra çökme, yeniden başlatma veya uygulamadan çıkma durumunda bile VPN dışındaki trafiği engeller. Erişim yalnızca bağlantıyı kesince veya bu seçeneği kapatınca geri gelir. Cihaz yeniden başlatıldığında engelleme yalnızca başlangıçta bağlanma etkinse devam eder."
 }

@@ -1,10 +1,12 @@
 package guard
 
 import (
+	"fmt"
 	"net/netip"
 	"strings"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/session"
 )
 
 // nftables owns an atomically installed Linux table. Engine UID, loopback, and
@@ -116,4 +118,28 @@ func itoa(value int) string {
 		digits[index] = '-'
 	}
 	return string(digits[index:])
+}
+
+// StrictNftRuleset exposes only recovery endpoints and explicitly permitted LAN.
+func StrictNftRuleset(uid int, policy session.Settings, blocked ...netip.Prefix) string {
+	bypass := []string{"127.0.0.0/8", "::1/128"}
+	if policy.AllowLAN {
+		bypass = DefaultBypassNetworks()
+	}
+	rules := NftRuleset(uid, bypass, blocked...)
+	recovery := ""
+	for _, ep := range policy.Endpoints {
+		family := "ip"
+		if ep.Addr().Is6() {
+			family = "ip6"
+		}
+		recovery += fmt.Sprintf("\t\t%s daddr %s meta l4proto { tcp, udp } th dport %d accept\n", family, ep.Addr(), ep.Port())
+	}
+	// DNS is needed for server names after network changes; only the service account gets it.
+	recovery += fmt.Sprintf("\t\tmeta skuid %d meta l4proto { tcp, udp } th dport 53 accept\n", uid)
+	recovery += "\t\tmeta nfproto ipv4 udp sport 68 udp dport 67 accept\n"
+	recovery += "\t\tip6 daddr { ff02::1:2, fe80::/10 } udp sport 546 udp dport 547 accept\n"
+	recovery += "\t\tip6 hoplimit 255 icmpv6 type { nd-router-solicit, nd-neighbor-solicit, nd-neighbor-advert } accept\n"
+	rules = strings.Replace(rules, "\t\tmeta skuid "+itoa(uid)+" accept comment \"sora: the engine keeps its own traffic\"\n", recovery, 1)
+	return strings.Replace(rules, "\t\tct direction reply ct state established,related accept comment \"sora: replies to incoming connections\"\n", "", 1)
 }

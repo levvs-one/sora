@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, secondi",
   "customServerWgKeyInvalid": "La chiave deve essere di 32 byte in base64, come la stampa wg genkey.",
   "customServerWgCidrInvalid": "Inserisci prefissi separati da virgole, come 10.0.0.2/32.",
-  "customServerWgKeepaliveInvalid": "Inserisci un numero di secondi da 0 a 65535."
+  "customServerWgKeepaliveInvalid": "Inserisci un numero di secondi da 0 a 65535.",
+  "strictKillSwitch": "Blocco di rete rigoroso",
+  "strictKillSwitchWarning": "Dopo la connessione blocca il traffico esterno alla VPN anche in caso di arresto anomalo, riavvio o chiusura dell’app. Solo la disconnessione o la disattivazione di questa opzione ripristina l’accesso. Dopo il riavvio del sistema, il blocco riprende solo se è attiva la connessione all’avvio."
 }

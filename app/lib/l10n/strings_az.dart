@@ -2255,4 +2255,11 @@ class SAz extends S {
 
   @override
   String get customServerWgKeepaliveInvalid => '0-dan 65535-ə qədər saniyə sayı daxil edin.';
+
+  @override
+  String get strictKillSwitch => 'Sərt şəbəkə kilidi';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir.';
 }

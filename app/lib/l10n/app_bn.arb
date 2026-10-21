@@ -1135,5 +1135,7 @@
   "customServerWgKeepalive": "Keepalive, সেকেন্ড",
   "customServerWgKeyInvalid": "কী-টি wg genkey-এর মতো base64-এ 32 বাইট হতে হবে।",
   "customServerWgCidrInvalid": "কমা দিয়ে আলাদা প্রিফিক্স দিন, যেমন 10.0.0.2/32।",
-  "customServerWgKeepaliveInvalid": "0 থেকে 65535 সেকেন্ডের মধ্যে একটি সংখ্যা দিন।"
+  "customServerWgKeepaliveInvalid": "0 থেকে 65535 সেকেন্ডের মধ্যে একটি সংখ্যা দিন।",
+  "strictKillSwitch": "কঠোর নেটওয়ার্ক অবরোধ",
+  "strictKillSwitchWarning": "সংযোগের পর, ক্র্যাশ, পুনরায় চালু বা অ্যাপ বন্ধ হলেও VPN-এর বাইরের ট্র্যাফিক আটকায়। শুধু সংযোগ বিচ্ছিন্ন করলে বা এই বিকল্প বন্ধ করলে প্রবেশাধিকার ফিরে আসে। ডিভাইস পুনরায় চালু হলে শুরুতে সংযোগের বিকল্প চালু থাকলেই অবরোধ আবার কার্যকর হয়।"
 }

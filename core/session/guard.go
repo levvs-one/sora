@@ -16,7 +16,11 @@ type Settings struct {
 	FakeIPRange netip.Prefix
 	// KillSwitch blocks non-session traffic and stays armed while the
 	// engine is down.
-	KillSwitch bool
+	KillSwitch       bool
+	StrictKillSwitch bool
+	Reconnect        bool
+	Endpoints        []netip.AddrPort
+	AllowLAN         bool
 	// Bypass lists destinations that must skip the tunnel.
 	Bypass []string
 	// TunnelMode is the tunnel the plan asked for: system, application or
