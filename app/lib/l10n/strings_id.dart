@@ -2223,4 +2223,11 @@ class SId extends S {
 
   @override
   String get diagnosticUnavailable => 'Diagnostik ini tidak tersedia pada platform ini.';
+
+  @override
+  String get strictKillSwitch => 'Pemutus jaringan ketat';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Setelah terhubung, memblokir lalu lintas di luar VPN meskipun terjadi kerusakan, mulai ulang, atau aplikasi ditutup. Akses hanya pulih setelah memutus koneksi atau menonaktifkan opsi ini. Setelah perangkat dimulai ulang, pemblokiran berlanjut hanya jika koneksi saat mulai diaktifkan.';
 }

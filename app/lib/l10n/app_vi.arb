@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Sự kiện Windows",
   "diagnosticCapture": "Chụp trong 10 giây",
   "diagnosticRequiresTun": "Việc chụp gói cần có kết nối Sora TUN đang hoạt động.",
-  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này."
+  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này.",
+  "strictKillSwitch": "Chặn mạng nghiêm ngặt",
+  "strictKillSwitchWarning": "Sau khi kết nối, chặn lưu lượng ngoài VPN kể cả khi gặp sự cố, khởi động lại hoặc thoát ứng dụng. Chỉ ngắt kết nối hoặc tắt tùy chọn này mới khôi phục truy cập. Sau khi khởi động lại thiết bị, chỉ tiếp tục chặn nếu đã bật kết nối khi khởi động."
 }

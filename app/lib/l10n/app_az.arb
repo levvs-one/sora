@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows hadisələri",
   "diagnosticCapture": "10 saniyə çəkin",
   "diagnosticRequiresTun": "Paket ələ keçirmək üçün aktiv Sora TUN bağlantısı lazımdır.",
-  "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil."
+  "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil.",
+  "strictKillSwitch": "Sərt şəbəkə kilidi",
+  "strictKillSwitchWarning": "Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir."
 }

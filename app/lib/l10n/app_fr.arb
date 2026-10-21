@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Événements Windows",
   "diagnosticCapture": "Capturez pendant 10 secondes",
   "diagnosticRequiresTun": "La capture de paquets nécessite une connexion Sora TUN active.",
-  "diagnosticUnavailable": "Ce diagnostic n'est pas disponible sur cette plateforme."
+  "diagnosticUnavailable": "Ce diagnostic n'est pas disponible sur cette plateforme.",
+  "strictKillSwitch": "Coupe-circuit strict",
+  "strictKillSwitchWarning": "Après la connexion, bloque le trafic hors VPN même après un plantage, un redémarrage ou la fermeture de l’application. Seule la déconnexion ou la désactivation de cette option rétablit l’accès. Après un redémarrage du système, le blocage reprend uniquement si la connexion au démarrage est activée."
 }

@@ -2226,4 +2226,11 @@ class SIt extends S {
 
   @override
   String get diagnosticUnavailable => 'Questa diagnostica non è disponibile su questa piattaforma.';
+
+  @override
+  String get strictKillSwitch => 'Blocco di rete rigoroso';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Dopo la connessione blocca il traffico esterno alla VPN anche in caso di arresto anomalo, riavvio o chiusura dell’app. Solo la disconnessione o la disattivazione di questa opzione ripristina l’accesso. Dopo il riavvio del sistema, il blocco riprende solo se è attiva la connessione all’avvio.';
 }

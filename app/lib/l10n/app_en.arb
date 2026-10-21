@@ -973,5 +973,7 @@
   "diagnosticEvents": "Windows events",
   "diagnosticCapture": "Capture for 10 seconds",
   "diagnosticRequiresTun": "Packet capture needs an active Sora TUN connection.",
-  "diagnosticUnavailable": "This diagnostic is unavailable on this platform."
+  "diagnosticUnavailable": "This diagnostic is unavailable on this platform.",
+  "strictKillSwitch": "Strict kill switch",
+  "strictKillSwitchWarning": "After connecting, blocks traffic outside the VPN even after a crash, restart or app exit. Only Disconnect or turning this off restores access. After reboot, blocking resumes only when Connect on start is enabled."
 }

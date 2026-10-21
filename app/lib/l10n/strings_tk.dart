@@ -2222,4 +2222,11 @@ class STk extends S {
 
   @override
   String get diagnosticUnavailable => 'Bu anyklaýyş bu platformada elýeterli däl.';
+
+  @override
+  String get strictKillSwitch => 'Berk tor gulpy';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Birikdirilenden soň näsazlyk, gaýtadan başlatmak ýa-da programmadan çykmak wagtynda hem VPN-den daşarky traffigi petikleýär. Giriş diňe baglanyşyk kesilende ýa-da bu sazlama öçürilende dikeldilýär. Enjam gaýtadan açylanda petikleme diňe başlangyçda birikmek işjeň bolsa dowam edýär.';
 }

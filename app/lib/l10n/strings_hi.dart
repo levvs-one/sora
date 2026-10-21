@@ -2221,4 +2221,11 @@ class SHi extends S {
 
   @override
   String get diagnosticUnavailable => 'यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.';
+
+  @override
+  String get strictKillSwitch => 'सख्त नेटवर्क अवरोध';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'कनेक्ट होने के बाद, क्रैश, पुनः आरंभ या ऐप बंद होने पर भी VPN के बाहर का ट्रैफ़िक रोकता है। केवल डिस्कनेक्ट करने या यह विकल्प बंद करने से पहुँच लौटती है। डिवाइस पुनः आरंभ होने पर अवरोध तभी फिर लागू होगा जब शुरू होते समय कनेक्ट करने का विकल्प चालू हो।';
 }

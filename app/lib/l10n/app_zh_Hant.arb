@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows 事件",
   "diagnosticCapture": "捕捉10秒",
   "diagnosticRequiresTun": "封包擷取需要活動的 Sora TUN 連線。",
-  "diagnosticUnavailable": "此診斷在此平台上不可用。"
+  "diagnosticUnavailable": "此診斷在此平台上不可用。",
+  "strictKillSwitch": "嚴格網路鎖定",
+  "strictKillSwitchWarning": "連線後，即使當機、重新啟動或結束應用程式，也會阻擋 VPN 以外的流量。只有中斷連線或關閉此選項才會恢復存取。裝置重新啟動後，僅在啟用啟動時連線時恢復阻擋。"
 }

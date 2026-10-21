@@ -2226,4 +2226,11 @@ class SDe extends S {
 
   @override
   String get diagnosticUnavailable => 'Diese Diagnose ist auf dieser Plattform nicht verfügbar.';
+
+  @override
+  String get strictKillSwitch => 'Strikte Netzwerksperre';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Blockiert nach dem Verbinden Datenverkehr außerhalb des VPN auch bei Absturz, Neustart oder Beenden der App. Nur Trennen oder Ausschalten dieser Option gibt den Zugriff frei. Nach einem Systemneustart greift die Sperre nur bei aktivierter Verbindung beim Start.';
 }

@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Zdarzenia Windowsa",
   "diagnosticCapture": "Przechwytuj przez 10 sekund",
   "diagnosticRequiresTun": "Przechwytywanie pakietów wymaga aktywnego połączenia Sora TUN.",
-  "diagnosticUnavailable": "Ta diagnostyka jest niedostępna na tej platformie."
+  "diagnosticUnavailable": "Ta diagnostyka jest niedostępna na tej platformie.",
+  "strictKillSwitch": "Ścisła blokada sieci",
+  "strictKillSwitchWarning": "Po połączeniu blokuje ruch poza VPN także po awarii, ponownym uruchomieniu lub zamknięciu aplikacji. Dostęp przywraca tylko rozłączenie lub wyłączenie tej opcji. Po restarcie systemu blokada wraca tylko przy włączonym łączeniu podczas uruchamiania."
 }

@@ -2227,4 +2227,11 @@ class SFr extends S {
 
   @override
   String get diagnosticUnavailable => 'Ce diagnostic n\'est pas disponible sur cette plateforme.';
+
+  @override
+  String get strictKillSwitch => 'Coupe-circuit strict';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Après la connexion, bloque le trafic hors VPN même après un plantage, un redémarrage ou la fermeture de l’application. Seule la déconnexion ou la désactivation de cette option rétablit l’accès. Après un redémarrage du système, le blocage reprend uniquement si la connexion au démarrage est activée.';
 }

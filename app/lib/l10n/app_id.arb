@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Acara Windows",
   "diagnosticCapture": "Tangkap selama 10 detik",
   "diagnosticRequiresTun": "Pengambilan paket memerlukan koneksi Sora TUN yang aktif.",
-  "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini."
+  "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini.",
+  "strictKillSwitch": "Pemutus jaringan ketat",
+  "strictKillSwitchWarning": "Setelah terhubung, memblokir lalu lintas di luar VPN meskipun terjadi kerusakan, mulai ulang, atau aplikasi ditutup. Akses hanya pulih setelah memutus koneksi atau menonaktifkan opsi ini. Setelah perangkat dimulai ulang, pemblokiran berlanjut hanya jika koneksi saat mulai diaktifkan."
 }

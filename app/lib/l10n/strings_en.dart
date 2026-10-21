@@ -2205,4 +2205,11 @@ class SEn extends S {
 
   @override
   String get diagnosticUnavailable => 'This diagnostic is unavailable on this platform.';
+
+  @override
+  String get strictKillSwitch => 'Strict kill switch';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'After connecting, blocks traffic outside the VPN even after a crash, restart or app exit. Only Disconnect or turning this off restores access. After reboot, blocking resumes only when Connect on start is enabled.';
 }

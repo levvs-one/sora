@@ -2222,4 +2222,11 @@ class SUk extends S {
 
   @override
   String get diagnosticUnavailable => 'Ця діагностика недоступна на цій платформі.';
+
+  @override
+  String get strictKillSwitch => 'Суворий kill switch';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Після підключення блокує трафік поза VPN навіть після збою, перезапуску чи виходу з програми. Доступ відновиться лише після відключення VPN або цієї опції. Після перезавантаження блокування відновлюється лише з увімкненим підключенням під час запуску.';
 }

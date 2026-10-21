@@ -2245,4 +2245,11 @@ class SRu extends S {
 
   @override
   String get diagnosticUnavailable => 'Эта диагностика недоступна на данной платформе.';
+
+  @override
+  String get strictKillSwitch => 'Строгий kill switch';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'После подключения блокирует трафик вне VPN даже при сбое, перезапуске ядра или выходе из приложения. Доступ вернётся только после отключения VPN или этой настройки. После перезагрузки блокировка возобновится только при включённом подключении при запуске.';
 }

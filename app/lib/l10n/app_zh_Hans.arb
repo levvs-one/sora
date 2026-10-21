@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows 事件",
   "diagnosticCapture": "捕捉10秒",
   "diagnosticRequiresTun": "数据包捕获需要活动的 Sora TUN 连接。",
-  "diagnosticUnavailable": "此诊断在此平台上不可用。"
+  "diagnosticUnavailable": "此诊断在此平台上不可用。",
+  "strictKillSwitch": "严格网络锁定",
+  "strictKillSwitchWarning": "连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。"
 }

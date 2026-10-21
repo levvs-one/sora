@@ -158,6 +158,8 @@ class Desktop with WindowListener {
   /// session.
   Future<void> quit({bool disconnect = true}) async {
     _closing = true;
+    // Quitting is not explicit permission to release a strict block.
+    disconnect = disconnect && !sora.settings.strictKillSwitch && !sora.strictBlocked;
     _dropping = disconnect;
     // A quit that reaches here is a clean shutdown, not a crash: never offer
     // to "restore" this run's session on next launch (F7 honesty). This covers

@@ -29,6 +29,7 @@ class Settings {
 
   static const _keys = {
     'format', 'server', 'preset', 'blockAds', 'killSwitch', 'engine', 'animations', 'theme', 'language', //
+    'strictKillSwitch', //
     'fragment', 'fragmentPackets', 'fragmentLength', 'fragmentInterval', 'ipv6', 'dns', //
     'dnsPreset', 'dnsLeakLastCheck', //
     'probeMethod',
@@ -129,6 +130,9 @@ class Settings {
 
   bool get killSwitch => _store.getBool('killSwitch') ?? false;
   set killSwitch(bool value) => _store.setBool('killSwitch', value);
+
+  bool get strictKillSwitch => _store.getBool('strictKillSwitch') ?? false;
+  set strictKillSwitch(bool value) => _store.setBool('strictKillSwitch', value);
 
   /// Pinned engine kind; empty lets the core choose.
   String get engine => _store.getString('engine') ?? '';

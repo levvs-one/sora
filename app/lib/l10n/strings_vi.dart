@@ -2223,4 +2223,11 @@ class SVi extends S {
 
   @override
   String get diagnosticUnavailable => 'Chẩn đoán này không có sẵn trên nền tảng này.';
+
+  @override
+  String get strictKillSwitch => 'Chặn mạng nghiêm ngặt';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Sau khi kết nối, chặn lưu lượng ngoài VPN kể cả khi gặp sự cố, khởi động lại hoặc thoát ứng dụng. Chỉ ngắt kết nối hoặc tắt tùy chọn này mới khôi phục truy cập. Sau khi khởi động lại thiết bị, chỉ tiếp tục chặn nếu đã bật kết nối khi khởi động.';
 }

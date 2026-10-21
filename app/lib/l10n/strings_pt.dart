@@ -2224,4 +2224,11 @@ class SPt extends S {
 
   @override
   String get diagnosticUnavailable => 'Este diagnóstico não está disponível nesta plataforma.';
+
+  @override
+  String get strictKillSwitch => 'Bloqueio de rede estrito';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Após a conexão, bloqueia o tráfego fora da VPN mesmo após uma falha, reinício ou saída do aplicativo. Apenas desconectar ou desativar esta opção restaura o acesso. Após reiniciar o sistema, o bloqueio só retorna se a conexão ao iniciar estiver ativada.';
 }

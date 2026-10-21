@@ -270,6 +270,7 @@ class Sora extends ChangeNotifier {
   int? _pendingSelection;
   bool needsReconnect = false;
   bool cleanupPending = false;
+  bool strictBlocked = false;
 
   /// Tracks a reported drop so restoration also emits a notice.
   bool _lostAnnounced = false;
@@ -643,6 +644,14 @@ class Sora extends ChangeNotifier {
     if (_disposed || link != _link || expected != sessionId) return;
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
     _applyState(answer.status.connection, report: report);
+    if (link.minor >= 12) {
+      strictBlocked = answer.status.strictKillSwitch;
+      if (strictBlocked) {
+        settings.strictKillSwitch = true;
+        settings.killSwitch = true;
+      }
+      if (phase == Phase.off && strictBlocked) cleanupPending = true;
+    }
   }
 
   void _applyState(ConnectionState state, {bool report = true}) {
@@ -660,6 +669,7 @@ class Sora extends ChangeNotifier {
       ConnectionStateValue.CONNECTION_STATE_VALUE_RECONNECTING => Phase.reconnecting,
       _ => Phase.off,
     };
+    if (phase == Phase.off && strictBlocked) cleanupPending = true;
     if (phase == Phase.connecting || phase == Phase.reconnecting) unawaited(_probeCall?.cancel());
     // Session events may omit the ID. Retain the known ID until the session
     // ends.
@@ -878,6 +888,7 @@ class Sora extends ChangeNotifier {
   /// (`quit(disconnect: false)`) or the disconnect is skipped because the
   /// core is offline.
   void noteCleanShutdown() {
+    if (settings.strictKillSwitch || strictBlocked) return;
     _clearSessionIntent();
   }
 
@@ -1144,7 +1155,7 @@ class Sora extends ChangeNotifier {
   /// remaining attempt count during profile-group failover.
   Future<void> connect({bool retry = false, ProxyChain? via}) async {
     if (_disposed || updateBlocked || busy || _stopping) return;
-    if (cleanupPending) {
+    if (cleanupPending && !strictBlocked) {
       await disconnect();
       if (cleanupPending || _disposed) return;
     }
@@ -1219,7 +1230,14 @@ class Sora extends ChangeNotifier {
             ordered: entry?.ordered ?? false,
           ),
     };
-    final armed = settings.killSwitch;
+    final strict = settings.strictKillSwitch;
+    if (strict && (link.minor < 12 || !coreCapabilities.contains('strict-kill-switch'))) {
+      failure = const CoreFailure('core.api.version_mismatch');
+      _emit(ConnectionFailed(failure!));
+      notifyListeners();
+      return;
+    }
+    final armed = settings.killSwitch || strict;
     // Track the active profile because profile groups fail over in the client.
     _member = entry != null && entry.members.any(isProfile) ? plan.outbounds.single.id : null;
     if (!retry) _memberSpare = entry == null ? 0 : entry.members.length - 1;
@@ -1234,7 +1252,14 @@ class Sora extends ChangeNotifier {
       final answer = await link.stub.connect(
         // The core arms the kill switch before the engine starts, so nothing
         // leaves outside the tunnel while it comes up.
-        ConnectRequest(apiVersion: apiVersion, sessionPlan: plan, controlAuthenticator: link.token, killSwitch: armed),
+        ConnectRequest(
+          apiVersion: apiVersion,
+          sessionPlan: plan,
+          controlAuthenticator: link.token,
+          killSwitch: armed,
+          strictKillSwitch: strict,
+          reconnect: settings.connectOnStart,
+        ),
         options: CallOptions(timeout: const Duration(seconds: 35)),
       );
       if (_disposed || link != _link) return;
@@ -1245,6 +1270,7 @@ class Sora extends ChangeNotifier {
       _activeChain = keepChain;
       needsReconnect = currentPlan != plan;
       connected = true;
+      strictBlocked = strict;
       // Remember the intent only once the session is truly up (F7): writing
       // it before the RPC would offer to "restore" a session that never
       // existed if the connect failed. Chain connects are recorded by chain
@@ -1273,6 +1299,9 @@ class Sora extends ChangeNotifier {
     } finally {
       _connectionWork = null;
       work.complete();
+    }
+    if (connected && !_disposed && !_stopping && settings.strictKillSwitch != strict) {
+      await setStrictKillSwitch(settings.strictKillSwitch);
     }
     if (connected && !_disposed && !_stopping && settings.killSwitch != armed && sessionId != null) {
       await setKillSwitch(settings.killSwitch);
@@ -1318,6 +1347,7 @@ class Sora extends ChangeNotifier {
             return answer;
           }, retryIf: (error) => error is CoreFailure && error.key == 'core.session.busy');
       cleanupPending = false;
+      strictBlocked = false;
       _applyState(answer.status.connection);
     } catch (error) {
       failure = CoreFailure.from(error);
@@ -1409,8 +1439,10 @@ class Sora extends ChangeNotifier {
   }
 
   Future<void> setKillSwitch(bool value) {
+    if (!value && (settings.strictKillSwitch || strictBlocked)) return setStrictKillSwitch(false);
     recovered('kill-switch');
     settings.killSwitch = value;
+    if (!value) settings.strictKillSwitch = false;
     notifyListeners();
     if (_stopping || _connectionWork != null) return Future.value();
     return _killSwitchWork = _killSwitchWork.then((_) async {
@@ -1438,11 +1470,47 @@ class Sora extends ChangeNotifier {
           SetKillSwitchRequest(apiVersion: apiVersion, sessionId: id, enabled: value),
         );
         if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+        strictBlocked = answer.strict;
       } catch (error) {
         failure = CoreFailure.from(error);
         reportFailure(error, source: 'kill-switch');
         notifyListeners();
       }
+    });
+  }
+
+  Future<void> setStrictKillSwitch(bool value) {
+    recovered('strict-kill-switch');
+    final previous = settings.strictKillSwitch;
+    final previousKill = settings.killSwitch;
+    settings.strictKillSwitch = value;
+    if (value) settings.killSwitch = true;
+    notifyListeners();
+    return _killSwitchWork = _killSwitchWork.then((_) async {
+      await _connectionWork?.future;
+      if (_disposed || _stopping || settings.strictKillSwitch != value) return;
+      final link = _link;
+      try {
+        if (link == null) {
+          if (!value) throw CoreFailure.unavailable;
+          return;
+        }
+        if (link.minor < 12) throw const CoreFailure('core.api.version_mismatch');
+        if (value && sessionId == null && !strictBlocked) return;
+        final answer = await link.stub.setKillSwitch(
+          SetKillSwitchRequest(apiVersion: apiVersion, enabled: value, strict: value),
+          options: CallOptions(timeout: const Duration(seconds: 15)),
+        );
+        if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+        strictBlocked = answer.strict;
+        settings.killSwitch = answer.enabled;
+        if (!strictBlocked && phase == Phase.off) cleanupPending = false;
+      } catch (error) {
+        settings.strictKillSwitch = previous;
+        settings.killSwitch = previousKill;
+        reportFailure(error, source: 'strict-kill-switch');
+      }
+      notifyListeners();
     });
   }
 

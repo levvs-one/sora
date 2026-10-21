@@ -2222,4 +2222,11 @@ class SAz extends S {
 
   @override
   String get diagnosticUnavailable => 'Bu diaqnostika bu platformada əlçatan deyil.';
+
+  @override
+  String get strictKillSwitch => 'Sərt şəbəkə kilidi';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir.';
 }

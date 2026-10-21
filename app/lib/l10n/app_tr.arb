@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows etkinlikleri",
   "diagnosticCapture": "10 saniye boyunca çekim yapın",
   "diagnosticRequiresTun": "Paket yakalama, etkin bir Sora TUN bağlantısına ihtiyaç duyar.",
-  "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor."
+  "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor.",
+  "strictKillSwitch": "Katı ağ kilidi",
+  "strictKillSwitchWarning": "Bağlandıktan sonra çökme, yeniden başlatma veya uygulamadan çıkma durumunda bile VPN dışındaki trafiği engeller. Erişim yalnızca bağlantıyı kesince veya bu seçeneği kapatınca geri gelir. Cihaz yeniden başlatıldığında engelleme yalnızca başlangıçta bağlanma etkinse devam eder."
 }

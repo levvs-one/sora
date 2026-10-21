@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows-Ereignisse",
   "diagnosticCapture": "10 Sekunden lang einfangen",
   "diagnosticRequiresTun": "Für die Paketerfassung ist eine aktive Sora TUN-Verbindung erforderlich.",
-  "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar."
+  "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar.",
+  "strictKillSwitch": "Strikte Netzwerksperre",
+  "strictKillSwitchWarning": "Blockiert nach dem Verbinden Datenverkehr außerhalb des VPN auch bei Absturz, Neustart oder Beenden der App. Nur Trennen oder Ausschalten dieser Option gibt den Zugriff frei. Nach einem Systemneustart greift die Sperre nur bei aktivierter Verbindung beim Start."
 }

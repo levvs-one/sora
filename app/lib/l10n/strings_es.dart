@@ -2226,4 +2226,11 @@ class SEs extends S {
 
   @override
   String get diagnosticUnavailable => 'Este diagnóstico no está disponible en esta plataforma.';
+
+  @override
+  String get strictKillSwitch => 'Bloqueo de red estricto';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Tras conectar, bloquea el tráfico fuera de la VPN incluso después de un fallo, reinicio o cierre de la aplicación. Solo desconectar o desactivar esta opción restablece el acceso. Tras reiniciar el equipo, el bloqueo se reanuda solo si está activada la conexión al inicio.';
 }
