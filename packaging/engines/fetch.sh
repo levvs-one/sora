@@ -101,6 +101,38 @@ while read -r engine line_arch digest url; do
 	echo "$digest  $file" | sha256sum --check --quiet --strict
 	# Enforce the upstream-signature declaration from engines.sig (SORA-M3).
 	verify_upstream_signature "$engine" "$digest" "$url"
+	if [[ "$engine" == olcrtc ]]; then
+		# olcrtc ships no release binaries (see engines.lock): the
+		# verified artifact is the source archive of the pinned tag,
+		# and the binary is built here, per architecture, with the
+		# upstream install.sh flags. Its own digest is recorded in
+		# engines.digests like every other engine's, so the core's
+		# SORA-H5 verification covers the sidecar unchanged. The
+		# build needs a Go toolchain able to build the tag's go.mod
+		# (go 1.26+; GOTOOLCHAIN=auto fetches it when the local go is
+		# older). No win7-386 line exists in the lock: that toolchain
+		# no longer targets Windows 7.
+		command -v go >/dev/null 2>&1 || { echo "engines.lock: building olcrtc needs a Go toolchain in PATH" >&2; exit 1; }
+		case "$arch" in
+		amd64) goos=linux goarch=amd64 ;;
+		arm64) goos=linux goarch=arm64 ;;
+		windows-amd64) goos=windows goarch=amd64 ;;
+		*) echo "engines.lock: no olcrtc build for $arch" >&2; exit 1 ;;
+		esac
+		mkdir -p "$work/olcrtc-src"
+		tar --extract --gzip --file "$file" --directory "$work/olcrtc-src" --strip-components=1
+		(cd "$work/olcrtc-src" && CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" \
+			go build -trimpath -ldflags="-s -w" -o "$work/olcrtc-bin" ./cmd/olcrtc)
+		if [[ "$goos" == windows ]]; then
+			install -m 0755 "$work/olcrtc-bin" "$dest/olcrtc.exe"
+			record_digest "$dest/olcrtc.exe"
+		else
+			install -m 0755 "$work/olcrtc-bin" "$dest/olcrtc"
+			record_digest "$dest/olcrtc"
+		fi
+		echo "$engine $arch: verified (built from pinned source)"
+		continue
+	fi
 	if [[ "$arch" == windows-* || "$arch" == win7-* ]]; then
 		if [[ "$engine" == wintun ]]; then
 			# The wintun zip carries one dll per architecture; extract the
@@ -157,10 +189,15 @@ while read -r engine line_arch digest url; do
 	echo "$engine $arch: verified"
 done <"$lock"
 
-# Three engines everywhere, plus wintun.dll on the Windows arches.
+# Three engines everywhere, plus wintun.dll on the Windows arches,
+# plus the olcrtc sidecar on every arch except win7-386 (see the
+# lock: its Go toolchain no longer targets Windows 7).
 expected=3
+if [[ "$arch" != win7-386 ]]; then
+	expected=$((expected + 1))
+fi
 if [[ "$arch" == windows-* || "$arch" == win7-* ]]; then
-	expected=4
+	expected=$((expected + 1))
 fi
 if [[ "$found" -ne "$expected" ]]; then
 	echo "engines.lock has $found assets for $arch, expected $expected" >&2

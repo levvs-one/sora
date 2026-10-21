@@ -12,6 +12,7 @@ Sora их не изменяет.
 | Xray-core | 26.3.27 | Linux, Windows | MPL-2.0 | https://github.com/XTLS/Xray-core/tree/v26.3.27 |
 | mihomo | 1.19.32 | Linux, Windows (сборка compatible) | GPL-3.0 | https://github.com/MetaCubeX/mihomo/tree/v1.19.32 |
 | zapret (tpws, nfqws) | 72.1 | Linux | MIT, © bol-van | [`third_party/zapret`](third_party/zapret) |
+| olcrtc (сайдкар OpenLibre, режим клиента) | v0.0.1 (тег, сборка из исходников) | Linux, Windows | WTFPL-2.0, © zarazaex | https://github.com/openlibrecommunity/olcrtc/tree/v0.0.1 |
 
 ## Приложение
 

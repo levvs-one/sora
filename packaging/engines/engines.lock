@@ -16,6 +16,20 @@ mihomo    arm64  9dd862e28b46ff7d775f169cceebc28deccaa0a9e804237d421cd2571e0caba
 sing-box  windows-amd64  7042233bb2eaba63cf8ae0ed8b766b376a88377022b3bab46d1f550dd5a25944  https://github.com/Leadaxe/sing-box-lx/releases/download/v1.14.3-lx.22/sing-box-1.14.3-lx.22-windows-amd64.zip
 xray      windows-amd64  c10a532a9271964f2aa2f4b4c0757605ff529222cb1d5d7ab88f8ecc52e67fb0  https://github.com/XTLS/Xray-core/releases/download/v26.10.17/Xray-windows-64.zip
 mihomo    windows-amd64  974a4d7ad69aed27aa2e8f91d61113573c14dadb14562c63e58effabf59816f0  https://github.com/MetaCubeX/mihomo/releases/download/v1.19.32/mihomo-windows-amd64-compatible-v1.19.32.zip
+# olcrtc: the OpenLibre sidecar. Upstream publishes NO release binaries at
+# all (the GitHub releases list is empty; its own install.sh builds from
+# source), so the pin is a build from the v0.0.1 tag (commit
+# 3e42ae98d81280242ad38582896fc47d56dc62c0). The digest below is the SHA-256
+# of the GitHub source archive of that tag, measured by downloading it on
+# 2026-10-21; fetch.sh verifies the archive against it, builds
+# ./cmd/olcrtc per architecture (CGO off, -trimpath -ldflags="-s -w", the
+# upstream install.sh flags), and records the built binary's own digest in
+# engines.digests like every other engine. No win7-386 line: olcrtc's Go
+# toolchain (go 1.26+) no longer targets Windows 7, so olcrtc servers are
+# honestly unavailable there.
+olcrtc    amd64          acaaee246e876aed83fd6a21f77c1ff7a8093584ee5a36453ab1803f9a2bcca7  https://github.com/openlibrecommunity/olcrtc/archive/refs/tags/v0.0.1.tar.gz
+olcrtc    arm64          acaaee246e876aed83fd6a21f77c1ff7a8093584ee5a36453ab1803f9a2bcca7  https://github.com/openlibrecommunity/olcrtc/archive/refs/tags/v0.0.1.tar.gz
+olcrtc    windows-amd64  acaaee246e876aed83fd6a21f77c1ff7a8093584ee5a36453ab1803f9a2bcca7  https://github.com/openlibrecommunity/olcrtc/archive/refs/tags/v0.0.1.tar.gz
 # wintun: the WireGuard tunnel driver library. The system-stack TUN path on
 # Windows needs wintun.dll on the DLL search path (next to the engine
 # executables). Zip digest verified against www.wintun.net 2026-10-20; the

@@ -24,3 +24,8 @@ xray     dgst-crosscheck
 mihomo   none
 sing-box none
 wintun   none
+# olcrtc publishes no signatures and no release binaries at all; the
+# source-archive digest in engines.lock is the only check, and the
+# binary digest recorded in engines.digests at fetch time pins what
+# the core will execute (SORA-H5).
+olcrtc   none

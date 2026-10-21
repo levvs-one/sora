@@ -58,6 +58,11 @@ contents:
   - src: ./dist/engines/nfqws
     dst: /usr/lib/sora/engines/nfqws
     file_info: {mode: 0755}
+  # OpenLibre olcrtc sidecar (WTFPL), built from the pinned source
+  # tag by packaging/engines/fetch.sh; digest-verified like the rest.
+  - src: ./dist/engines/olcrtc
+    dst: /usr/lib/sora/engines/olcrtc
+    file_info: {mode: 0755}
   - src: ./dist/engines/zapret/fake/
     dst: /usr/lib/sora/engines/zapret/fake
     type: tree
