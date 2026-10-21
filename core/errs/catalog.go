@@ -47,6 +47,13 @@ const (
 	KeySubscriptionLimit     Key = "core.subscription.limit"
 	KeySubscriptionInterval  Key = "core.subscription.interval_invalid"
 
+	// OpenLibre (olcrtc sidecar).
+	KeyOlcrtcInvalid        Key = "core.olcrtc.invalid"
+	KeyOlcrtcCombination    Key = "core.olcrtc.combination_unsupported"
+	KeyOlcrtcTokenRequired  Key = "core.olcrtc.token_required"
+	KeyOlcrtcNotConnectable Key = "core.olcrtc.not_connectable"
+	KeyOlcrtcServerMode     Key = "core.olcrtc.server_mode_refused"
+
 	// Engine.
 	KeyEngineBinaryMissing Key = "core.engine.binary_missing"
 	KeyEngineStartFailed   Key = "core.engine.start_failed"
@@ -144,6 +151,13 @@ var catalog = map[Key]Entry{
 	KeySubscriptionNotFound:  {CodeNotFound, false, "no subscription with this id"},
 	KeySubscriptionLimit:     {CodeResourceExhausted, false, "the core already keeps the largest number of subscriptions"},
 	KeySubscriptionInterval:  {CodeInvalidArgument, false, "the update interval is shorter than an hour or longer than 30 days"},
+
+	// OpenLibre (olcrtc sidecar).
+	KeyOlcrtcInvalid:        {CodeInvalidArgument, false, "an olcrtc server is missing its provider, transport, room or a well-formed encryption key"},
+	KeyOlcrtcCombination:    {CodeUnsupported, false, "the olcrtc provider and transport combination cannot carry a tunnel"},
+	KeyOlcrtcTokenRequired:  {CodeFailedPrecondition, false, "this olcrtc server needs a provider account token the share link does not carry"},
+	KeyOlcrtcNotConnectable: {CodeFailedPrecondition, false, "this olcrtc server cannot be connected from a share link alone"},
+	KeyOlcrtcServerMode:     {CodeInvalidArgument, false, "sora is an olcrtc client only and refuses to run an egress (server mode)"},
 
 	// Engine.
 	KeyEngineBinaryMissing: {CodeNotFound, false, "the engine binary is not installed for this platform"},

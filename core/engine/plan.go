@@ -47,6 +47,11 @@ const (
 	// ProtocolBypass reshapes direct TLS and HTTP handshakes with zapret to
 	// evade DPI. It requires no server.
 	ProtocolBypass Protocol = "bypass"
+	// ProtocolOLCRTC reaches a community egress through an OpenLibre
+	// olcrtc room on a provider's SFU. No engine carries it natively:
+	// the olcwrap decorator rewrites it to a SOCKS5 outbound aimed at
+	// the olcrtc sidecar's loopback listener (see OlcrtcConfig).
+	ProtocolOLCRTC Protocol = "olcrtc"
 	// ProtocolXrayProfile runs a provider's full Xray configuration within
 	// the session, preserving outbounds, balancers, and routing. Only Xray
 	// supports it.
@@ -295,6 +300,11 @@ type Outbound struct {
 	// UUID+Password. Like the other credential fields, it must be masked
 	// in logs and events.
 	Token string
+
+	// Olcrtc carries the OpenLibre configuration of an olcrtc
+	// outbound (provider, transport, room, link parameters). Nil for
+	// every other protocol. The encryption key is Password.
+	Olcrtc *OlcrtcConfig
 
 	Peers []WireGuardPeer
 	// Amnezia turns a WireGuard outbound into AmneziaWG. Nil is plain

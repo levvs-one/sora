@@ -67,6 +67,10 @@ func (o Outbound) appendSecrets(dst []string) []string {
 		}
 	}
 	add(o.Token)
+	if o.Olcrtc != nil {
+		// The wbstream provider token authenticates like a password.
+		add(o.Olcrtc.AuthToken)
+	}
 	add(o.PrivateKey)
 	if o.Amnezia != nil {
 		// The header-protection key is key material like the private
@@ -147,6 +151,11 @@ func (o Outbound) appendIdentifiers(dst []string) []string {
 			dst = append(dst, net.JoinHostPort(o.Transport.DownloadAddress, strconv.Itoa(int(o.Transport.DownloadPort))))
 		}
 	}
+	if o.Olcrtc != nil && o.Olcrtc.Room != "" {
+		// The room names the conference the user joined; the sidecar's
+		// own logs name it too, so it is an identifier like a host.
+		dst = append(dst, o.Olcrtc.Room)
+	}
 	// An Xray profile carries its own server addresses, SNI names and
 	// REALITY dest inside the profile JSON; without extracting them
 	// here they were registered with no redactor at all (CENSOR-LEAK).
@@ -202,6 +211,9 @@ func (o Outbound) Warnings() []string {
 	out = append(out, o.shadowsocksWarnings()...)
 	// REALITY hardening (T002): vision/TLS-in-TLS and dest-shape warnings.
 	out = append(out, o.RealityWarnings()...)
+	// OpenLibre v1 limits (TCP-only, IPv4-only egress), stated as
+	// labels instead of silently disappointing the user.
+	out = append(out, o.olcrtcWarnings()...)
 	return out
 }
 
@@ -214,7 +226,7 @@ var validProtocols = map[Protocol]bool{
 	ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
 	ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
 	ProtocolAnyTLS: true, ProtocolBypass: true, ProtocolXrayProfile: true,
-	ProtocolDirect: true,
+	ProtocolDirect: true, ProtocolOLCRTC: true,
 }
 
 // validTransports whitelists the stream transports a plan may hold. "h2" is
@@ -241,15 +253,24 @@ func (o Outbound) Validate() error {
 	if !validTransports[o.Transport.Type] {
 		errs = append(errs, fmt.Errorf("outbound %s: unknown transport %q", o.ID, o.Transport.Type))
 	}
-	serverless := o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass
+	// An olcrtc outbound is serverless in the host:port sense: its
+	// "server" is a provider room (a jitsi room is a full URL, which
+	// validateServer would refuse), and its port is honestly 0 — the
+	// sidecar wrapper owns its shape checks instead.
+	serverless := o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass || o.Protocol == ProtocolOLCRTC
 	if !serverless && o.Port == 0 {
 		errs = append(errs, fmt.Errorf("outbound %s: port must be between 1 and 65535", o.ID))
 	}
-	if err := validateServer("outbound "+o.ID, o.Server, !serverless); err != nil {
-		errs = append(errs, err)
+	if o.Protocol != ProtocolOLCRTC {
+		if err := validateServer("outbound "+o.ID, o.Server, !serverless); err != nil {
+			errs = append(errs, err)
+		}
 	}
 	if o.Protocol == ProtocolBypass {
 		errs = append(errs, o.Bypass.validate(o.ID))
+	}
+	if o.Protocol == ProtocolOLCRTC {
+		errs = append(errs, o.validateOlcrtc()...)
 	}
 	if o.Protocol == ProtocolHysteria2 {
 		errs = append(errs, validateHysteria2Tuning(o)...)
