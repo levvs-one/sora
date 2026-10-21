@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/netip"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -130,9 +131,11 @@ func TestStrictEndpointTransports(t *testing.T) {
 		{engine.Outbound{Protocol: engine.ProtocolWireGuard}, []string{"udp"}},
 		{engine.Outbound{Protocol: engine.ProtocolVLESS, Transport: engine.Transport{Type: "quic"}}, []string{"udp"}},
 		{engine.Outbound{Protocol: engine.ProtocolVMess, Transport: engine.Transport{Type: "kcp"}}, []string{"udp"}},
+		{engine.Outbound{Protocol: engine.ProtocolVLESS, Transport: engine.Transport{Type: "xhttp"}, TLS: engine.TLS{ALPN: []string{"h3"}}}, []string{"udp"}},
+		{engine.Outbound{Protocol: engine.ProtocolVLESS, Transport: engine.Transport{Type: "xhttp"}, TLS: engine.TLS{ALPN: []string{"h3", "h2"}}}, []string{"tcp", "udp"}},
 	}
 	for _, tc := range cases {
-		t.Run(string(tc.outbound.Protocol)+tc.outbound.Transport.Type, func(t *testing.T) {
+		t.Run(string(tc.outbound.Protocol)+tc.outbound.Transport.Type+strings.Join(tc.outbound.TLS.ALPN, ","), func(t *testing.T) {
 			tc.outbound.Server, tc.outbound.Port = "203.0.113.2", 443
 			endpoints, err := planEndpoints(t.Context(), &engine.Plan{Outbounds: []engine.Outbound{tc.outbound}})
 			if err != nil {

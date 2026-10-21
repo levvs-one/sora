@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net"
 	"net/netip"
+	"slices"
 	"strconv"
 
 	"github.com/levvs-one/sora-client/core/engine"
@@ -26,8 +27,11 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
 			var profile struct {
 				Outbounds []struct {
 					Protocol       engine.Protocol
-					StreamSettings struct{ Network string }
-					Settings       struct {
+					StreamSettings struct {
+						Network     string
+						TLSSettings struct{ ALPN []string }
+					}
+					Settings struct {
 						Vnext []struct {
 							Address string
 							Port    uint16
@@ -45,7 +49,7 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
 			}
 			for _, ob := range profile.Outbounds {
 				for _, server := range append(ob.Settings.Vnext, ob.Settings.Servers...) {
-					peers = append(peers, peerEndpoint{net.JoinHostPort(server.Address, strconv.Itoa(int(server.Port))), endpointProtocols(engine.Outbound{Protocol: ob.Protocol, Transport: engine.Transport{Type: ob.StreamSettings.Network}})})
+					peers = append(peers, peerEndpoint{net.JoinHostPort(server.Address, strconv.Itoa(int(server.Port))), endpointProtocols(engine.Outbound{Protocol: ob.Protocol, Transport: engine.Transport{Type: ob.StreamSettings.Network}, TLS: engine.TLS{ALPN: ob.StreamSettings.TLSSettings.ALPN}})})
 				}
 				for _, peer := range ob.Settings.Peers {
 					peers = append(peers, peerEndpoint{peer.Endpoint, []string{"udp"}})
@@ -93,6 +97,14 @@ func endpointProtocols(outbound engine.Outbound) []string {
 	switch outbound.Transport.Type {
 	case "quic", "kcp", "mkcp":
 		return []string{"udp"}
+	}
+	// HTTP/3 rides QUIC; an h3 ALPN that also lists h2 or http/1.1 may fall
+	// back to TCP, so both stay open.
+	if slices.Contains(outbound.TLS.ALPN, "h3") {
+		if len(outbound.TLS.ALPN) == 1 {
+			return []string{"udp"}
+		}
+		return []string{"tcp", "udp"}
 	}
 	return []string{"tcp"}
 }
