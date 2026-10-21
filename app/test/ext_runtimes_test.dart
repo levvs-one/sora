@@ -309,4 +309,33 @@ void main() {
     await sora.change((s) => s.rules = ['block domain:example.org']);
     expect(store.runtimeLog(inst.id).join('\n'), contains('routing overlap'));
   });
+
+  // Published examples, scaffold templates and the manifest guide must stay
+  // installable by this release and never claim support before 1.1.0,
+  // the first version with extensions.
+  test('documented min_app_version stays between 1.1.0 and this release', () {
+    final release = RegExp(
+      r'^version: (\d+\.\d+\.\d+)',
+      multiLine: true,
+    ).firstMatch(File('pubspec.yaml').readAsStringSync())!.group(1)!;
+    List<File> manifests(String dir, String name) => [
+      for (final entry in Directory(dir).listSync().whereType<Directory>())
+        if (File('${entry.path}/$name').existsSync()) File('${entry.path}/$name'),
+    ];
+    final files = [
+      ...manifests('../examples', 'sora-extension.json'),
+      ...manifests('../tools/sora-ext/templates', 'sora-extension.json.tmpl'),
+      File('../docs/extensions.md'),
+    ];
+    var checked = 0;
+    for (final file in files) {
+      for (final match in RegExp(r'"min_app_version":\s*"([^"]+)"').allMatches(file.readAsStringSync())) {
+        final version = match.group(1)!;
+        expect(compareVersions(version, '1.1.0'), greaterThanOrEqualTo(0), reason: '${file.path}: $version');
+        expect(compareVersions(version, release), lessThanOrEqualTo(0), reason: '${file.path}: $version > $release');
+        checked++;
+      }
+    }
+    expect(checked, greaterThanOrEqualTo(files.length));
+  });
 }

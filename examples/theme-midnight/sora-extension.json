@@ -3,7 +3,7 @@
   "id": "org.sora.theme-midnight",
   "name": "Midnight",
   "version": "1.0.0",
-  "min_app_version": "1.0.12",
+  "min_app_version": "1.1.0",
   "description": "A readable dark palette for Sora.",
   "author": {
     "name": "Sora Team",

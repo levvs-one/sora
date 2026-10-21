@@ -3,7 +3,7 @@
   "id": "org.sora.routing-split",
   "name": "Split routing",
   "version": "1.0.0",
-  "min_app_version": "1.0.12",
+  "min_app_version": "1.1.0",
   "description": "Send private networks directly and example.org through the selected proxy.",
   "author": {
     "name": "Sora Team",

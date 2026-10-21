@@ -61,7 +61,7 @@ format is the standard one: base64 of `"Ed" || key_id(8) || pubkey(32)`.
   "id": "com.example.speedstats",
   "name": "Speed Stats",
   "version": "1.2.0",
-  "min_app_version": "1.9.0",
+  "min_app_version": "1.1.0",
   "description": "Live connection statistics in a panel.",
   "author": {
     "name": "Jane Doe",
@@ -91,8 +91,10 @@ Rules:
 - `id`: reverse-DNS, at least two labels (`com.example.stats`).
 - `version`, `min_app_version`: semver `MAJOR.MINOR.PATCH`.
 - The app enforces `min_app_version` against its own version, injected at
-  build time: `flutter build --dart-define=APP_VERSION=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d+ -f1)`.
-  Dev builds without the define skip the gate instead of guessing.
+  build time: `flutter build --dart-define=SORA_VERSION=1.1.0`. Release CI
+  passes the tag version. Dev builds without the define skip the gate
+  instead of guessing. Extensions first shipped in 1.1.0, so an older
+  `min_app_version` gains nothing.
 - `permissions`: subset of the registry below, no duplicates.
 - `capabilities`: subset of `theme`, `network-hook`, `routing`, `ui-panel`,
   `background`, `widget`.
@@ -195,7 +197,7 @@ Shape:
       "download_url": "https://...",
       "sha256": "<hex of the .soraext>",
       "size": 48210,
-      "min_app_version": "1.9.0",
+      "min_app_version": "1.1.0",
       "rollout_fraction": 1.0,
       "screenshots": ["https://.../shot1.png"],
       "changelog": [
