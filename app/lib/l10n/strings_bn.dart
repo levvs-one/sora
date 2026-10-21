@@ -223,6 +223,28 @@ class SBn extends S {
   String get errEngineMissing => 'এই সার্ভারের জন্য কোনো ইঞ্জিন পাওয়া যায়নি';
 
   @override
+  String get errOlcrtcInvalid =>
+      'এই olcRTC সার্ভারটি অসম্পূর্ণ: প্রদানকারী, ট্রান্সপোর্ট, রুম এবং এনক্রিপশন কী যাচাই করুন';
+
+  @override
+  String get errOlcrtcCombination => 'এই olcRTC প্রদানকারী ও ট্রান্সপোর্ট একসাথে কাজ করে না';
+
+  @override
+  String get errOlcrtcTokenRequired => 'এই olcRTC সার্ভারের একটি প্রদানকারী অ্যাকাউন্ট টোকেন দরকার যা লিঙ্কে নেই';
+
+  @override
+  String get errOlcrtcNotConnectable => 'শুধু লিঙ্ক দিয়ে এই olcRTC সার্ভারে সংযোগ করা যায় না';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora শুধু olcRTC সার্ভারে সংযোগ করে, নিজে সার্ভার চালায় না';
+
+  @override
+  String get olcrtcTcpOnly => 'শুধু TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'শুধু IPv4';
+
+  @override
   String get errEngineStart => 'ইঞ্জিন চালু হয়নি';
 
   @override

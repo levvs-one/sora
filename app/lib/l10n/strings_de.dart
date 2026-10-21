@@ -223,6 +223,29 @@ class SDe extends S {
   String get errEngineMissing => 'Für diesen Server wurde keine Engine gefunden';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Dieser olcRTC-Server ist unvollständig: Prüfen Sie Anbieter, Transport, Raum und Verschlüsselungsschlüssel';
+
+  @override
+  String get errOlcrtcCombination => 'Dieser olcRTC-Anbieter und -Transport funktionieren nicht zusammen';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Dieser olcRTC-Server benötigt ein Token des Anbieterkontos, das der Link nicht enthält';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Dieser olcRTC-Server kann nicht allein über einen Link verbunden werden';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora verbindet sich nur mit olcRTC-Servern und betreibt selbst keinen';
+
+  @override
+  String get olcrtcTcpOnly => 'Nur TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Nur IPv4';
+
+  @override
   String get errEngineStart => 'Der Motor sprang nicht an';
 
   @override

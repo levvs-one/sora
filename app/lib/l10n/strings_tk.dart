@@ -223,6 +223,27 @@ class STk extends S {
   String get errEngineMissing => 'Bu serwer üçin motor tapylmady';
 
   @override
+  String get errOlcrtcInvalid => 'Bu olcRTC serweri doly däl: üpjünçini, transporty, otagy we şifrleme açaryny barlaň';
+
+  @override
+  String get errOlcrtcCombination => 'Bu olcRTC üpjünçisi we transporty bilelikde işlemeýär';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Bu olcRTC serwerine baglanyşykda ýok üpjünçi hasaby tokeni gerek';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Bu olcRTC serwerine diňe baglanyşyk arkaly birikdirip bolmaýar';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora diňe olcRTC serwerlerine birigýär, öz serwerini işletmeýär';
+
+  @override
+  String get olcrtcTcpOnly => 'Diňe TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Diňe IPv4';
+
+  @override
   String get errEngineStart => 'Motor başlamady';
 
   @override

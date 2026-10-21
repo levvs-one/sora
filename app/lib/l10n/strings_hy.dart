@@ -223,6 +223,29 @@ class SHy extends S {
   String get errEngineMissing => 'Այս սերվերի համար շարժիչ չի գտնվել';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Այս olcRTC սերվերը թերի է. ստուգեք մատակարարին, տրանսպորտը, սենյակը և գաղտնագրման բանալին';
+
+  @override
+  String get errOlcrtcCombination => 'Այս olcRTC մատակարարն ու տրանսպորտը միասին չեն աշխատում';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Այս olcRTC սերվերին անհրաժեշտ է մատակարարի հաշվի թոքեն, որը հղումը չի պարունակում';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Այս olcRTC սերվերին չի կարելի միանալ միայն հղումով';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora-ն միայն միանում է olcRTC սերվերներին և սեփական սերվեր չի գործարկում';
+
+  @override
+  String get olcrtcTcpOnly => 'Միայն TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Միայն IPv4';
+
+  @override
   String get errEngineStart => 'Շարժիչը չի գործարկվել';
 
   @override

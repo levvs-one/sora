@@ -223,6 +223,27 @@ class SUr extends S {
   String get errEngineMissing => 'اس سرور کے لیے کوئی انجن نہیں ملا';
 
   @override
+  String get errOlcrtcInvalid => 'یہ olcRTC سرور نامکمل ہے: فراہم کنندہ، ٹرانسپورٹ، کمرہ اور خفیہ کلید چیک کریں';
+
+  @override
+  String get errOlcrtcCombination => 'یہ olcRTC فراہم کنندہ اور ٹرانسپورٹ ایک ساتھ کام نہیں کرتے';
+
+  @override
+  String get errOlcrtcTokenRequired => 'اس olcRTC سرور کو فراہم کنندہ کے اکاؤنٹ ٹوکن کی ضرورت ہے جو لنک میں نہیں ہے';
+
+  @override
+  String get errOlcrtcNotConnectable => 'اس olcRTC سرور سے صرف لنک کے ذریعے رابطہ نہیں ہو سکتا';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora صرف olcRTC سرورز سے جڑتا ہے، اپنا سرور نہیں چلاتا';
+
+  @override
+  String get olcrtcTcpOnly => 'صرف TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'صرف IPv4';
+
+  @override
   String get errEngineStart => 'انجن اسٹارٹ نہیں ہوا۔';
 
   @override

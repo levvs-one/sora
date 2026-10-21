@@ -223,6 +223,29 @@ class SKa extends S {
   String get errEngineMissing => 'ამ სერვერისთვის ძრავა ვერ მოიძებნა';
 
   @override
+  String get errOlcrtcInvalid =>
+      'ეს olcRTC სერვერი არასრულია: შეამოწმეთ პროვაიდერი, ტრანსპორტი, ოთახი და დაშიფვრის გასაღები';
+
+  @override
+  String get errOlcrtcCombination => 'ეს olcRTC პროვაიდერი და ტრანსპორტი ერთად არ მუშაობს';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'ამ olcRTC სერვერს სჭირდება პროვაიდერის ანგარიშის ტოკენი, რომელიც ბმულში არ არის';
+
+  @override
+  String get errOlcrtcNotConnectable => 'ამ olcRTC სერვერთან მხოლოდ ბმულით დაკავშირება შეუძლებელია';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora მხოლოდ olcRTC სერვერებს უკავშირდება და საკუთარს არ უშვებს';
+
+  @override
+  String get olcrtcTcpOnly => 'მხოლოდ TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'მხოლოდ IPv4';
+
+  @override
   String get errEngineStart => 'ძრავა არ დაიწყო';
 
   @override

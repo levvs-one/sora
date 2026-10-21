@@ -473,7 +473,13 @@ class _ServerRow extends StatelessWidget {
     final staleBps = bps == null ? sora.bandwidth[measuredId]?.bps : null;
     final group = entry;
     final favorite = entry != null && isFavoriteEntry(entry!, sora.settings.favorites);
-    final detail = group?.members.map(protocolLine).toSet().join(' | ');
+    final limits = group?.members.map((m) => olcrtcLimits(s, m)).whereType<String>().toSet().join(' | ');
+    final detail = group == null
+        ? null
+        : [
+            group.members.map(protocolLine).toSet().join(' | '),
+            if (limits != null && limits.isNotEmpty) limits,
+          ].where((x) => x.isNotEmpty).join(' · ');
     return Semantics(
       selected: chosen,
       button: true,
@@ -1098,6 +1104,15 @@ String? subscriptionWarning(S s, SubscriptionState sub, String locale) {
     }
   }
   return null;
+}
+
+/// The honest v1 limits of an olcrtc server, localized from the core
+/// warning codes `olcrtc-tcp-only` / `olcrtc-ipv4-only` (see
+/// [warningLabel]): the community tunnel carries TCP over IPv4 only.
+/// Null for every other protocol.
+String? olcrtcLimits(S s, OutboundSpec server) {
+  if (server.protocol.toLowerCase() != 'olcrtc') return null;
+  return [warningLabel(s, 'olcrtc-tcp-only'), warningLabel(s, 'olcrtc-ipv4-only')].whereType<String>().join(' · ');
 }
 
 String protocolLine(OutboundSpec server) => [

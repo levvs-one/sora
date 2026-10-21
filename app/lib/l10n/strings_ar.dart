@@ -223,6 +223,27 @@ class SAr extends S {
   String get errEngineMissing => 'لم يتم العثور على محرك لهذا الخادم';
 
   @override
+  String get errOlcrtcInvalid => 'خادم olcRTC هذا غير مكتمل: تحقق من الموفر ووسيلة النقل والغرفة ومفتاح التشفير';
+
+  @override
+  String get errOlcrtcCombination => 'موفر olcRTC ووسيلة النقل هذه لا يعملان معًا';
+
+  @override
+  String get errOlcrtcTokenRequired => 'يحتاج خادم olcRTC هذا إلى رمز حساب موفر لا يحتويه الرابط';
+
+  @override
+  String get errOlcrtcNotConnectable => 'لا يمكن الاتصال بخادم olcRTC هذا من رابط فقط';
+
+  @override
+  String get errOlcrtcServerMode => 'يتصل Sora بخوادم olcRTC فقط ولا يشغّل خادمًا';
+
+  @override
+  String get olcrtcTcpOnly => 'TCP فقط';
+
+  @override
+  String get olcrtcIpv4Only => 'IPv4 فقط';
+
+  @override
   String get errEngineStart => 'المحرك لم يبدأ';
 
   @override

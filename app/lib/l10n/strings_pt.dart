@@ -223,6 +223,29 @@ class SPt extends S {
   String get errEngineMissing => 'Nenhum mecanismo encontrado para este servidor';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Este servidor olcRTC está incompleto: verifique o provedor, o transporte, a sala e a chave de criptografia';
+
+  @override
+  String get errOlcrtcCombination => 'Este provedor e transporte olcRTC não funcionam juntos';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Este servidor olcRTC precisa de um token de conta do provedor que o link não contém';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Este servidor olcRTC não pode ser conectado apenas por um link';
+
+  @override
+  String get errOlcrtcServerMode => 'O Sora apenas se conecta a servidores olcRTC e não executa um';
+
+  @override
+  String get olcrtcTcpOnly => 'Somente TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Somente IPv4';
+
+  @override
   String get errEngineStart => 'O motor não ligou';
 
   @override

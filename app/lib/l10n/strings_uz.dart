@@ -223,6 +223,28 @@ class SUz extends S {
   String get errEngineMissing => 'Bu server uchun vosita topilmadi';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Bu olcRTC serveri toʻliq emas: provayder, transport, xona va shifrlash kalitini tekshiring';
+
+  @override
+  String get errOlcrtcCombination => 'Bu olcRTC provayderi va transporti birga ishlamaydi';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Bu olcRTC serveriga havolada boʻlmagan provayder hisobi tokeni kerak';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Bu olcRTC serveriga faqat havola orqali ulanib boʻlmaydi';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora faqat olcRTC serverlariga ulanadi, oʻz serverini ishga tushirmaydi';
+
+  @override
+  String get olcrtcTcpOnly => 'Faqat TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Faqat IPv4';
+
+  @override
   String get errEngineStart => 'Dvigatel ishga tushmadi';
 
   @override

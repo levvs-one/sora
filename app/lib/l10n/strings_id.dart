@@ -223,6 +223,28 @@ class SId extends S {
   String get errEngineMissing => 'Tidak ada mesin yang ditemukan untuk server ini';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Server olcRTC ini tidak lengkap: periksa penyedia, transport, ruang, dan kunci enkripsi';
+
+  @override
+  String get errOlcrtcCombination => 'Penyedia dan transport olcRTC ini tidak dapat bekerja bersama';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Server olcRTC ini memerlukan token akun penyedia yang tidak ada di tautan';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Server olcRTC ini tidak dapat dihubungkan hanya dari tautan';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora hanya terhubung ke server olcRTC dan tidak menjalankannya';
+
+  @override
+  String get olcrtcTcpOnly => 'TCP saja';
+
+  @override
+  String get olcrtcIpv4Only => 'IPv4 saja';
+
+  @override
   String get errEngineStart => 'Mesinnya tidak menyala';
 
   @override

@@ -223,6 +223,29 @@ class STr extends S {
   String get errEngineMissing => 'Bu sunucu için motor bulunamadı';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Bu olcRTC sunucusu eksik: sağlayıcıyı, aktarımı, odayı ve şifreleme anahtarını kontrol edin';
+
+  @override
+  String get errOlcrtcCombination => 'Bu olcRTC sağlayıcısı ve aktarımı birlikte çalışmıyor';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Bu olcRTC sunucusu, bağlantının içermediği bir sağlayıcı hesabı belirteci gerektiriyor';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Bu olcRTC sunucusuna yalnızca bir bağlantıyla bağlanılamaz';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora yalnızca olcRTC sunucularına bağlanır, kendi sunucusunu çalıştırmaz';
+
+  @override
+  String get olcrtcTcpOnly => 'Yalnızca TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Yalnızca IPv4';
+
+  @override
   String get errEngineStart => 'Motor çalışmadı';
 
   @override

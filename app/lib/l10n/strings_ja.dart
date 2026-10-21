@@ -223,6 +223,27 @@ class SJa extends S {
   String get errEngineMissing => 'このサーバー用のエンジンが見つかりません';
 
   @override
+  String get errOlcrtcInvalid => 'この olcRTC サーバーは不完全です：プロバイダー、トランスポート、ルーム、暗号化キーを確認してください';
+
+  @override
+  String get errOlcrtcCombination => 'この olcRTC プロバイダーとトランスポートの組み合わせは動作しません';
+
+  @override
+  String get errOlcrtcTokenRequired => 'この olcRTC サーバーには、リンクに含まれていないプロバイダーアカウントのトークンが必要です';
+
+  @override
+  String get errOlcrtcNotConnectable => 'この olcRTC サーバーにはリンクだけでは接続できません';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora は olcRTC サーバーへ接続するだけで、自らは実行しません';
+
+  @override
+  String get olcrtcTcpOnly => 'TCP のみ';
+
+  @override
+  String get olcrtcIpv4Only => 'IPv4 のみ';
+
+  @override
   String get errEngineStart => 'エンジンが始動しなかった';
 
   @override

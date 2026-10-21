@@ -223,6 +223,27 @@ class SFa extends S {
   String get errEngineMissing => 'هیچ موتوری برای این سرور پیدا نشد';
 
   @override
+  String get errOlcrtcInvalid => 'این سرور olcRTC ناقص است: ارائه‌دهنده، انتقال، اتاق و کلید رمزنگاری را بررسی کنید';
+
+  @override
+  String get errOlcrtcCombination => 'این ارائه‌دهنده و انتقال olcRTC با هم کار نمی‌کنند';
+
+  @override
+  String get errOlcrtcTokenRequired => 'این سرور olcRTC به توکن حساب ارائه‌دهنده نیاز دارد که در پیوند نیست';
+
+  @override
+  String get errOlcrtcNotConnectable => 'نمی‌توان تنها با یک پیوند به این سرور olcRTC متصل شد';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora فقط به سرورهای olcRTC متصل می‌شود و سروری اجرا نمی‌کند';
+
+  @override
+  String get olcrtcTcpOnly => 'فقط TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'فقط IPv4';
+
+  @override
   String get errEngineStart => 'موتور روشن نشد';
 
   @override

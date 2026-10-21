@@ -223,6 +223,29 @@ class SUk extends S {
   String get errEngineMissing => 'Для цього сервера не знайдено механізму';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Цей сервер olcRTC заповнено не повністю: перевірте провайдера, транспорт, кімнату та ключ шифрування';
+
+  @override
+  String get errOlcrtcCombination => 'Цей провайдер і транспорт olcRTC не працюють разом';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Цьому серверу olcRTC потрібен токен облікового запису провайдера, якого немає в посиланні';
+
+  @override
+  String get errOlcrtcNotConnectable => 'До цього сервера olcRTC не можна підключитися лише за посиланням';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora лише підключається до серверів olcRTC і не запускає власний';
+
+  @override
+  String get olcrtcTcpOnly => 'Лише TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Лише IPv4';
+
+  @override
   String get errEngineStart => 'Двигун не заводився';
 
   @override

@@ -531,6 +531,48 @@ abstract class S {
   /// **'Не найдено ядро для этого сервера'**
   String get errEngineMissing;
 
+  /// No description provided for @errOlcrtcInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер olcRTC заполнен не полностью: проверьте провайдера, транспорт, комнату и ключ шифрования'**
+  String get errOlcrtcInvalid;
+
+  /// No description provided for @errOlcrtcCombination.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот провайдер и транспорт olcRTC не работают вместе'**
+  String get errOlcrtcCombination;
+
+  /// No description provided for @errOlcrtcTokenRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этому серверу olcRTC нужен токен аккаунта провайдера, которого нет в ссылке'**
+  String get errOlcrtcTokenRequired;
+
+  /// No description provided for @errOlcrtcNotConnectable.
+  ///
+  /// In ru, this message translates to:
+  /// **'К этому серверу olcRTC нельзя подключиться только по ссылке'**
+  String get errOlcrtcNotConnectable;
+
+  /// No description provided for @errOlcrtcServerMode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Sora только подключается к серверам olcRTC, а свой не запускает'**
+  String get errOlcrtcServerMode;
+
+  /// No description provided for @olcrtcTcpOnly.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только TCP'**
+  String get olcrtcTcpOnly;
+
+  /// No description provided for @olcrtcIpv4Only.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только IPv4'**
+  String get olcrtcIpv4Only;
+
   /// No description provided for @errEngineStart.
   ///
   /// In ru, this message translates to:

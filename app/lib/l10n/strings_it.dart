@@ -223,6 +223,29 @@ class SIt extends S {
   String get errEngineMissing => 'Nessun motore trovato per questo server';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Questo server olcRTC è incompleto: controlla provider, trasporto, stanza e chiave di crittografia';
+
+  @override
+  String get errOlcrtcCombination => 'Questo provider e trasporto olcRTC non funzionano insieme';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Questo server olcRTC richiede un token dell\'account del provider che il link non contiene';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Questo server olcRTC non può essere connesso solo tramite un link';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora si connette solo ai server olcRTC e non ne ospita uno';
+
+  @override
+  String get olcrtcTcpOnly => 'Solo TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Solo IPv4';
+
+  @override
   String get errEngineStart => 'Il motore non si è avviato';
 
   @override

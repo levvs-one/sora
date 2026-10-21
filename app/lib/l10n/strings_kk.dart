@@ -223,6 +223,28 @@ class SKk extends S {
   String get errEngineMissing => 'Бұл сервер үшін ешқандай қозғалтқыш табылмады';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Бұл olcRTC сервері толық емес: провайдерді, транспортты, бөлмені және шифрлау кілтін тексеріңіз';
+
+  @override
+  String get errOlcrtcCombination => 'Бұл olcRTC провайдері мен транспорты бірге жұмыс істемейді';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Бұл olcRTC серверіне сілтемеде жоқ провайдер тіркелгісінің токені қажет';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Бұл olcRTC серверіне тек сілтеме арқылы қосылу мүмкін емес';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora тек olcRTC серверлеріне қосылады, өз серверін іске қоспайды';
+
+  @override
+  String get olcrtcTcpOnly => 'Тек TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Тек IPv4';
+
+  @override
   String get errEngineStart => 'Қозғалтқыш іске қосылмады';
 
   @override

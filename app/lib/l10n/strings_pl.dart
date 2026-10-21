@@ -223,6 +223,28 @@ class SPl extends S {
   String get errEngineMissing => 'Nie znaleziono silnika dla tego serwera';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Ten serwer olcRTC jest niekompletny: sprawdź dostawcę, transport, pokój i klucz szyfrowania';
+
+  @override
+  String get errOlcrtcCombination => 'Ten dostawca i transport olcRTC nie działają razem';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Ten serwer olcRTC wymaga tokena konta dostawcy, którego nie ma w linku';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Tego serwera olcRTC nie można połączyć samym linkiem';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora tylko łączy się z serwerami olcRTC i nie uruchamia własnego';
+
+  @override
+  String get olcrtcTcpOnly => 'Tylko TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Tylko IPv4';
+
+  @override
   String get errEngineStart => 'Silnik nie został uruchomiony';
 
   @override

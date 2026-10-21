@@ -223,6 +223,27 @@ class SZh extends S {
   String get errEngineMissing => '找不到该服务器的引擎';
 
   @override
+  String get errOlcrtcInvalid => '此 olcRTC 服务器不完整：请检查提供商、传输方式、房间和加密密钥';
+
+  @override
+  String get errOlcrtcCombination => '此 olcRTC 提供商与传输方式无法配合使用';
+
+  @override
+  String get errOlcrtcTokenRequired => '此 olcRTC 服务器需要链接中没有的提供商账户令牌';
+
+  @override
+  String get errOlcrtcNotConnectable => '无法仅凭链接连接此 olcRTC 服务器';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora 仅连接 olcRTC 服务器，不运行自己的服务器';
+
+  @override
+  String get olcrtcTcpOnly => '仅 TCP';
+
+  @override
+  String get olcrtcIpv4Only => '仅 IPv4';
+
+  @override
   String get errEngineStart => '发动机没有启动';
 
   @override
@@ -2557,6 +2578,27 @@ class SZhHans extends SZh {
   String get errEngineMissing => '找不到该服务器的引擎';
 
   @override
+  String get errOlcrtcInvalid => '此 olcRTC 服务器不完整：请检查提供商、传输方式、房间和加密密钥';
+
+  @override
+  String get errOlcrtcCombination => '此 olcRTC 提供商与传输方式无法配合使用';
+
+  @override
+  String get errOlcrtcTokenRequired => '此 olcRTC 服务器需要链接中没有的提供商账户令牌';
+
+  @override
+  String get errOlcrtcNotConnectable => '无法仅凭链接连接此 olcRTC 服务器';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora 仅连接 olcRTC 服务器，不运行自己的服务器';
+
+  @override
+  String get olcrtcTcpOnly => '仅 TCP';
+
+  @override
+  String get olcrtcIpv4Only => '仅 IPv4';
+
+  @override
   String get errEngineStart => '发动机没有启动';
 
   @override
@@ -4889,6 +4931,27 @@ class SZhHant extends SZh {
 
   @override
   String get errEngineMissing => '找不到該伺服器的引擎';
+
+  @override
+  String get errOlcrtcInvalid => '此 olcRTC 伺服器不完整：請檢查提供商、傳輸方式、房間和加密金鑰';
+
+  @override
+  String get errOlcrtcCombination => '此 olcRTC 提供商與傳輸方式無法配合使用';
+
+  @override
+  String get errOlcrtcTokenRequired => '此 olcRTC 伺服器需要連結中沒有的提供商帳戶權杖';
+
+  @override
+  String get errOlcrtcNotConnectable => '無法僅憑連結連接此 olcRTC 伺服器';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora 僅連接 olcRTC 伺服器，不運行自己的伺服器';
+
+  @override
+  String get olcrtcTcpOnly => '僅 TCP';
+
+  @override
+  String get olcrtcIpv4Only => '僅 IPv4';
 
   @override
   String get errEngineStart => '引擎沒有啟動';

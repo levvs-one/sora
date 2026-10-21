@@ -223,6 +223,29 @@ class SBe extends S {
   String get errEngineMissing => 'Для гэтага сервера не знойдзены механізм';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Гэты сервер olcRTC запоўнены не цалкам: праверце правайдара, транспарт, пакой і ключ шыфравання';
+
+  @override
+  String get errOlcrtcCombination => 'Гэты правайдар і транспарт olcRTC не працуюць разам';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Гэтаму серверу olcRTC патрэбен токен уліковага запісу правайдара, якога няма ў спасылцы';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Да гэтага сервера olcRTC нельга падключыцца толькі па спасылцы';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora толькі падключаецца да сервераў olcRTC і не запускае ўласны';
+
+  @override
+  String get olcrtcTcpOnly => 'Толькі TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Толькі IPv4';
+
+  @override
   String get errEngineStart => 'Рухавік не завёўся';
 
   @override

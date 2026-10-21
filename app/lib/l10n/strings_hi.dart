@@ -223,6 +223,27 @@ class SHi extends S {
   String get errEngineMissing => 'इस सर्वर के लिए कोई इंजन नहीं मिला';
 
   @override
+  String get errOlcrtcInvalid => 'यह olcRTC सर्वर अधूरा है: प्रदाता, ट्रांसपोर्ट, रूम और एन्क्रिप्शन कुंजी जाँचें';
+
+  @override
+  String get errOlcrtcCombination => 'यह olcRTC प्रदाता और ट्रांसपोर्ट एक साथ काम नहीं करते';
+
+  @override
+  String get errOlcrtcTokenRequired => 'इस olcRTC सर्वर को प्रदाता खाता टोकन चाहिए जो लिंक में नहीं है';
+
+  @override
+  String get errOlcrtcNotConnectable => 'इस olcRTC सर्वर से केवल लिंक से कनेक्ट नहीं किया जा सकता';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora केवल olcRTC सर्वरों से कनेक्ट होता है, अपना सर्वर नहीं चलाता';
+
+  @override
+  String get olcrtcTcpOnly => 'केवल TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'केवल IPv4';
+
+  @override
   String get errEngineStart => 'इंजन चालू नहीं हुआ';
 
   @override

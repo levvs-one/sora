@@ -223,6 +223,28 @@ class SEn extends S {
   String get errEngineMissing => 'No engine found for this server';
 
   @override
+  String get errOlcrtcInvalid =>
+      'This olcRTC server is incomplete: check the provider, transport, room and encryption key';
+
+  @override
+  String get errOlcrtcCombination => 'This olcRTC provider and transport cannot work together';
+
+  @override
+  String get errOlcrtcTokenRequired => 'This olcRTC server needs a provider account token that the link does not carry';
+
+  @override
+  String get errOlcrtcNotConnectable => 'This olcRTC server cannot be connected from a link alone';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora only connects to olcRTC servers and does not run one';
+
+  @override
+  String get olcrtcTcpOnly => 'TCP only';
+
+  @override
+  String get olcrtcIpv4Only => 'IPv4 only';
+
+  @override
   String get errEngineStart => 'The engine did not start';
 
   @override

@@ -223,6 +223,27 @@ class SKo extends S {
   String get errEngineMissing => '이 서버에 대한 엔진을 찾을 수 없습니다.';
 
   @override
+  String get errOlcrtcInvalid => '이 olcRTC 서버가 불완전합니다: 제공업체, 전송 방식, 방, 암호화 키를 확인하세요';
+
+  @override
+  String get errOlcrtcCombination => '이 olcRTC 제공업체와 전송 방식은 함께 작동하지 않습니다';
+
+  @override
+  String get errOlcrtcTokenRequired => '이 olcRTC 서버에는 링크에 없는 제공업체 계정 토큰이 필요합니다';
+
+  @override
+  String get errOlcrtcNotConnectable => '이 olcRTC 서버에는 링크만으로 연결할 수 없습니다';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora는 olcRTC 서버에 연결만 하며 직접 운영하지 않습니다';
+
+  @override
+  String get olcrtcTcpOnly => 'TCP 전용';
+
+  @override
+  String get olcrtcIpv4Only => 'IPv4 전용';
+
+  @override
   String get errEngineStart => '엔진이 시동되지 않았습니다';
 
   @override

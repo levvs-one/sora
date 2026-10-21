@@ -223,6 +223,28 @@ class STg extends S {
   String get errEngineMissing => 'Барои ин сервер ягон муҳаррик ёфт нашуд';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Ин сервери olcRTC нопурра аст: провайдер, транспорт, ҳуҷра ва калиди рамзгузориро санҷед';
+
+  @override
+  String get errOlcrtcCombination => 'Ин провайдер ва транспорти olcRTC якҷоя кор намекунанд';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Ин сервери olcRTC токени ҳисоби провайдерро талаб мекунад, ки дар пайванд нест';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Ба ин сервери olcRTC танҳо бо пайванд пайваст шудан мумкин нест';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora танҳо ба серверҳои olcRTC пайваст мешавад ва сервери худро иҷро намекунад';
+
+  @override
+  String get olcrtcTcpOnly => 'Танҳо TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Танҳо IPv4';
+
+  @override
   String get errEngineStart => 'Мотор ба кор надаромад';
 
   @override

@@ -712,6 +712,11 @@ String describe(S s, CoreFailure failure) {
     'core.api.version_mismatch' => s.errVersion,
     'core.session.busy' => s.errBusy,
     'core.engine.binary_missing' => s.errEngineMissing,
+    'core.olcrtc.invalid' => s.errOlcrtcInvalid,
+    'core.olcrtc.combination_unsupported' => s.errOlcrtcCombination,
+    'core.olcrtc.token_required' => s.errOlcrtcTokenRequired,
+    'core.olcrtc.not_connectable' => s.errOlcrtcNotConnectable,
+    'core.olcrtc.server_mode_refused' => s.errOlcrtcServerMode,
     'core.plan.engine_unsupported' => s.errEngineUnsupported,
     'core.guard.restore_failed' => s.errRestore,
     'core.session.unknown' || 'core.session.required' => s.errSessionEnded,
@@ -763,3 +768,12 @@ String describe(S s, CoreFailure failure) {
     _ => s.errGeneric,
   };
 }
+
+/// Returns a localized label for a core capability warning code (the
+/// `Warnings()` codes of an outbound), or null when the code has no UI
+/// wording yet — unknown codes are never shown raw.
+String? warningLabel(S s, String code) => switch (code) {
+  'olcrtc-tcp-only' => s.olcrtcTcpOnly,
+  'olcrtc-ipv4-only' => s.olcrtcIpv4Only,
+  _ => null,
+};

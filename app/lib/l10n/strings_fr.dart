@@ -223,6 +223,28 @@ class SFr extends S {
   String get errEngineMissing => 'Aucun moteur trouvé pour ce serveur';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Ce serveur olcRTC est incomplet : vérifiez le fournisseur, le transport, la salle et la clé de chiffrement';
+
+  @override
+  String get errOlcrtcCombination => 'Ce fournisseur et ce transport olcRTC ne fonctionnent pas ensemble';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Ce serveur olcRTC nécessite un jeton de compte fournisseur absent du lien';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Ce serveur olcRTC ne peut pas être connecté à partir d\'un simple lien';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora se connecte uniquement aux serveurs olcRTC et n\'en héberge pas';
+
+  @override
+  String get olcrtcTcpOnly => 'TCP uniquement';
+
+  @override
+  String get olcrtcIpv4Only => 'IPv4 uniquement';
+
+  @override
   String get errEngineStart => 'Le moteur n\'a pas démarré';
 
   @override

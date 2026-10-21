@@ -223,6 +223,28 @@ class SRu extends S {
   String get errEngineMissing => 'Не найдено ядро для этого сервера';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Сервер olcRTC заполнен не полностью: проверьте провайдера, транспорт, комнату и ключ шифрования';
+
+  @override
+  String get errOlcrtcCombination => 'Этот провайдер и транспорт olcRTC не работают вместе';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Этому серверу olcRTC нужен токен аккаунта провайдера, которого нет в ссылке';
+
+  @override
+  String get errOlcrtcNotConnectable => 'К этому серверу olcRTC нельзя подключиться только по ссылке';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora только подключается к серверам olcRTC, а свой не запускает';
+
+  @override
+  String get olcrtcTcpOnly => 'Только TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Только IPv4';
+
+  @override
   String get errEngineStart => 'Ядро не запустилось';
 
   @override

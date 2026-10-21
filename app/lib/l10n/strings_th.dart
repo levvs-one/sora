@@ -223,6 +223,28 @@ class STh extends S {
   String get errEngineMissing => 'ไม่พบเอ็นจิ้นสำหรับเซิร์ฟเวอร์นี้';
 
   @override
+  String get errOlcrtcInvalid =>
+      'เซิร์ฟเวอร์ olcRTC นี้ไม่สมบูรณ์: โปรดตรวจสอบผู้ให้บริการ การขนส่ง ห้อง และคีย์เข้ารหัส';
+
+  @override
+  String get errOlcrtcCombination => 'ผู้ให้บริการและการขนส่ง olcRTC นี้ทำงานร่วมกันไม่ได้';
+
+  @override
+  String get errOlcrtcTokenRequired => 'เซิร์ฟเวอร์ olcRTC นี้ต้องใช้โทเค็นบัญชีผู้ให้บริการซึ่งลิงก์ไม่มี';
+
+  @override
+  String get errOlcrtcNotConnectable => 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ olcRTC นี้จากลิงก์เพียงอย่างเดียวได้';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora เชื่อมต่อกับเซิร์ฟเวอร์ olcRTC เท่านั้นและไม่เรียกใช้เซิร์ฟเวอร์เอง';
+
+  @override
+  String get olcrtcTcpOnly => 'TCP เท่านั้น';
+
+  @override
+  String get olcrtcIpv4Only => 'IPv4 เท่านั้น';
+
+  @override
   String get errEngineStart => 'เครื่องยนต์สตาร์ทไม่ติด';
 
   @override

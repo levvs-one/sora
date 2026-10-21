@@ -223,6 +223,28 @@ class SAz extends S {
   String get errEngineMissing => 'Bu server üçün heç bir mühərrik tapılmadı';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Bu olcRTC serveri natamamdır: provayderi, nəqliyyatı, otağı və şifrələmə açarını yoxlayın';
+
+  @override
+  String get errOlcrtcCombination => 'Bu olcRTC provayderi və nəqliyyatı birlikdə işləmir';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Bu olcRTC serveri üçün keçiddə olmayan provayder hesabı tokeni lazımdır';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Bu olcRTC serverinə təkcə keçidlə qoşulmaq mümkün deyil';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora yalnız olcRTC serverlərinə qoşulur, öz serverini işə salmır';
+
+  @override
+  String get olcrtcTcpOnly => 'Yalnız TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Yalnız IPv4';
+
+  @override
   String get errEngineStart => 'Mühərrik işə düşmədi';
 
   @override

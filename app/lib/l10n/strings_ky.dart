@@ -223,6 +223,28 @@ class SKy extends S {
   String get errEngineMissing => 'Бул сервер үчүн эч кандай кыймылдаткыч табылган жок';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Бул olcRTC сервери толук эмес: провайдерди, транспортту, бөлмөнү жана шифрлөө ачкычын текшериңиз';
+
+  @override
+  String get errOlcrtcCombination => 'Бул olcRTC провайдери менен транспорту чогуу иштебейт';
+
+  @override
+  String get errOlcrtcTokenRequired => 'Бул olcRTC серверине шилтемеде жок провайдер аккаунтунун токени керек';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Бул olcRTC серверине жалгыз шилтеме менен туташуу мүмкүн эмес';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora olcRTC серверлерине гана туташат, өз серверин иштетпейт';
+
+  @override
+  String get olcrtcTcpOnly => 'TCP гана';
+
+  @override
+  String get olcrtcIpv4Only => 'IPv4 гана';
+
+  @override
   String get errEngineStart => 'Мотор иштебей калды';
 
   @override

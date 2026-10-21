@@ -223,6 +223,29 @@ class SEs extends S {
   String get errEngineMissing => 'No se encontró ningún motor para este servidor';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Este servidor olcRTC está incompleto: comprueba el proveedor, el transporte, la sala y la clave de cifrado';
+
+  @override
+  String get errOlcrtcCombination => 'Este proveedor y transporte de olcRTC no funcionan juntos';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Este servidor olcRTC necesita un token de cuenta del proveedor que el enlace no incluye';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Este servidor olcRTC no se puede conectar solo con un enlace';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora solo se conecta a servidores olcRTC, no ejecuta uno propio';
+
+  @override
+  String get olcrtcTcpOnly => 'Solo TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Solo IPv4';
+
+  @override
   String get errEngineStart => 'El motor no arrancó';
 
   @override

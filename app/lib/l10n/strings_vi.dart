@@ -223,6 +223,29 @@ class SVi extends S {
   String get errEngineMissing => 'Không tìm thấy công cụ nào cho máy chủ này';
 
   @override
+  String get errOlcrtcInvalid =>
+      'Máy chủ olcRTC này chưa đầy đủ: hãy kiểm tra nhà cung cấp, phương thức truyền, phòng và khóa mã hóa';
+
+  @override
+  String get errOlcrtcCombination => 'Nhà cung cấp và phương thức truyền olcRTC này không hoạt động cùng nhau';
+
+  @override
+  String get errOlcrtcTokenRequired =>
+      'Máy chủ olcRTC này cần mã thông báo tài khoản nhà cung cấp mà liên kết không có';
+
+  @override
+  String get errOlcrtcNotConnectable => 'Không thể kết nối tới máy chủ olcRTC này chỉ bằng một liên kết';
+
+  @override
+  String get errOlcrtcServerMode => 'Sora chỉ kết nối tới các máy chủ olcRTC và không chạy máy chủ riêng';
+
+  @override
+  String get olcrtcTcpOnly => 'Chỉ TCP';
+
+  @override
+  String get olcrtcIpv4Only => 'Chỉ IPv4';
+
+  @override
   String get errEngineStart => 'Động cơ không khởi động';
 
   @override
