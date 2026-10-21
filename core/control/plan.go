@@ -914,7 +914,34 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	// configuration (the proto endpoint carries only the room). A
 	// document without olcrtc fields leaves the outbound untouched,
 	// so non-olcrtc servers restore exactly as before.
-	if values["olcrtc_provider"] != "" || values["olcrtc_transport"] != "" || values["olcrtc_params"] != "" {
+	//
+	// The guard is symmetric (review remark Z-2): ANY olcrtc
+	// configuration field — provider, transport, room, channel,
+	// auth token, mode or params — makes the whole block present,
+	// and every field is restored. (olcrtc_meta is not a
+	// configuration field: subscription metadata rides the document
+	// itself and is never restored into a plan config, complete
+	// documents included.) credentialDocument writes provider and transport
+	// atomically with the rest of the block for every olcrtc server
+	// (the parser guarantees both), and there is no honest default
+	// provider to invent, so a block that carries only supplementary
+	// fields (channel/token/mode/…) has no legitimate producer: it
+	// is a broken document and fails closed with a clear error —
+	// the same treatment broken WireGuard peers and broken olcrtc
+	// params get above — instead of silently dropping the fields it
+	// does carry. In particular a lone olcrtc_mode never resurrects
+	// a config: "srv" from such a document is refused here, and
+	// "srv" in a complete document is refused by validation, so no
+	// document shape makes sora run an egress.
+	hasOlcrtc := false
+	for _, key := range []string{"olcrtc_provider", "olcrtc_transport", "olcrtc_room",
+		"olcrtc_channel", "olcrtc_auth_token", "olcrtc_mode", "olcrtc_params"} {
+		if values[key] != "" {
+			hasOlcrtc = true
+			break
+		}
+	}
+	if hasOlcrtc {
 		cfg := &engine.OlcrtcConfig{
 			Provider:  values["olcrtc_provider"],
 			Transport: values["olcrtc_transport"],
@@ -926,7 +953,11 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 		if cfg.Room == "" {
 			cfg.Room = outbound.Server
 		}
-		if cfg.Transport == "" {
+		if cfg.Transport == "" && engine.OlcrtcTransports[outbound.Transport.Type] {
+			// The proto transport honestly carries the olcrtc
+			// transport name for an olcrtc outbound; the "tcp"
+			// stream default of other protocols does not, and must
+			// not be dressed up as one.
 			cfg.Transport = outbound.Transport.Type
 		}
 		if raw := values["olcrtc_params"]; raw != "" {
@@ -936,6 +967,9 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 			if err := json.Unmarshal([]byte(raw), &cfg.Params); err != nil {
 				return fmt.Errorf("invalid olcrtc parameters: %w", err)
 			}
+		}
+		if cfg.Provider == "" || cfg.Transport == "" {
+			return fmt.Errorf("incomplete olcrtc credential document: olcrtc fields are present but the provider or transport is missing")
 		}
 		outbound.Olcrtc = cfg
 	}

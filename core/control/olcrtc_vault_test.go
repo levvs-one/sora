@@ -129,6 +129,82 @@ func TestOlcrtcVaultKeepsSubscriptionMeta(t *testing.T) {
 	}
 }
 
+// TestOlcrtcVaultPartialDocumentFailsClosed is the regression
+// test for review remark Z-2: the old guard created an OlcrtcConfig
+// only when provider, transport or params was present, so a
+// document carrying only supplementary fields (channel, auth
+// token, mode, room) lost them silently. credentialDocument writes
+// provider and transport atomically with the rest of the block and
+// there is no honest default provider, so such a document is
+// broken: applyCredential now refuses it with a clear error and
+// restores nothing — in particular a lone olcrtc_mode never
+// resurrects a configuration, so "srv" cannot reappear from a
+// partial document in any shape.
+func TestOlcrtcVaultPartialDocumentFailsClosed(t *testing.T) {
+	docs := map[string]map[string]string{
+		"only channel and token": {"olcrtc_channel": "chan-1", "olcrtc_auth_token": "tok-1"},
+		"only channel":           {"olcrtc_channel": "chan-1"},
+		"only auth token":        {"olcrtc_auth_token": "tok-1"},
+		"only mode srv":          {"olcrtc_mode": "srv"},
+		"only room":              {"olcrtc_room": "room-99"},
+	}
+	for name, values := range docs {
+		t.Run(name, func(t *testing.T) {
+			outbound := engine.Outbound{
+				ID: "partial", Protocol: engine.ProtocolOLCRTC, Server: "room-01",
+				Transport: engine.Transport{Type: "datachannel"},
+			}
+			err := applyCredential(&outbound, values)
+			if err == nil || !strings.Contains(err.Error(), "incomplete olcrtc credential document") {
+				t.Fatalf("applyCredential = %v, want an incomplete-document error", err)
+			}
+			if outbound.Olcrtc != nil {
+				t.Fatalf("partial document restored a config: %+v", outbound.Olcrtc)
+			}
+		})
+	}
+	// The same refusal on the full plan path: a stored partial
+	// document behind a real olcrtc proto spec fails plan building
+	// instead of quietly producing a channel/token-less server.
+	result, err := parser.LinkParser{}.Parse([]byte("olcrtc://wbstream?datachannel@room-01#" + strings.Repeat("a", 64)))
+	if err != nil || len(result.Servers) != 1 {
+		t.Fatalf("parse: %v", err)
+	}
+	spec := result.Servers[0]
+	partial := []byte(`{"olcrtc_channel":"chan-1","olcrtc_auth_token":"tok-1"}`)
+	if _, err := outboundFromProto(0, outboundToProto(spec, "ref"), stubResolver{"ref": partial}); err == nil ||
+		!strings.Contains(err.Error(), "incomplete olcrtc credential document") {
+		t.Fatalf("outboundFromProto with a channel+token-only document = %v, want an incomplete-document error", err)
+	}
+}
+
+// TestOlcrtcVaultChannelAndTokenRestoredWithIdentity: the flip
+// side of Z-2 — when the document does carry the identity fields,
+// the supplementary channel and auth token restore in full (they
+// are document-only fields no link carries), and Mode stays empty:
+// nothing in the document asked for a mode, so none appears.
+func TestOlcrtcVaultChannelAndTokenRestoredWithIdentity(t *testing.T) {
+	outbound := engine.Outbound{
+		ID: "full", Protocol: engine.ProtocolOLCRTC, Server: "room-01",
+		Transport: engine.Transport{Type: "datachannel"},
+	}
+	values := map[string]string{
+		"olcrtc_provider":   "wbstream",
+		"olcrtc_transport":  "datachannel",
+		"olcrtc_room":       "room-01",
+		"olcrtc_channel":    "chan-1",
+		"olcrtc_auth_token": "tok-1",
+	}
+	if err := applyCredential(&outbound, values); err != nil {
+		t.Fatal(err)
+	}
+	cfg := outbound.Olcrtc
+	if cfg == nil || cfg.Provider != "wbstream" || cfg.Transport != "datachannel" ||
+		cfg.Room != "room-01" || cfg.Channel != "chan-1" || cfg.AuthToken != "tok-1" || cfg.Mode != "" {
+		t.Fatalf("restored config = %+v, want channel and token restored and no mode", cfg)
+	}
+}
+
 // TestOlcrtcServerModeRefusedFromVault: a document that smuggles
 // mode "srv" produces a plan outbound whose validation refuses it —
 // sora never runs an egress, whatever the stored material says.
