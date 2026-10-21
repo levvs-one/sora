@@ -218,7 +218,7 @@ class SyncDaemon extends ChangeNotifier {
     _spawnedByUs = true;
     process.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen(stderrTail.add);
     // Drain stdout so the daemon never blocks on a full pipe.
-    unawaited(process.stdout.drain<List<int>>());
+    unawaited(process.stdout.drain<void>());
     var exited = false;
     int? exitCode;
     unawaited(

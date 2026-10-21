@@ -160,6 +160,11 @@ jobs:
         with:
           flutter-version: 3.47.6
           channel: stable
+      # test/sync_daemon_test.dart builds and drives the real sora-sync.
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: service/sync/go.mod
+          cache: false
       - name: Install Linux build dependencies
         run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev bubblewrap shellcheck
       - name: Get packages

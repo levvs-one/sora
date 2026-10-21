@@ -9,7 +9,7 @@ void main() {
   setUpAll(() async {
     binaries = await Directory.systemTemp.createTemp('sora-syncfix-bin-');
     binary = '${binaries.path}/sora-sync';
-    final build = await Process.run('/usr/bin/go', [
+    final build = await Process.run('go', [
       'build',
       '-o',
       binary,
