@@ -36,9 +36,8 @@ import (
 )
 
 // DefaultRevocationURL is where the app looks for the team revocation
-// list. Placeholder until the team publishes the endpoint, mirroring
-// DefaultCatalogURL.
-const DefaultRevocationURL = "https://extensions.sora.example/v1/revocations.json"
+// list, next to DefaultCatalogURL.
+const DefaultRevocationURL = "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/revocations.json"
 
 // RevocationCache is the offline revocation list: the last verified
 // revocations.json on disk. The store loads it at startup so a kill order

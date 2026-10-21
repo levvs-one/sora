@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "Eventos de Windows",
   "diagnosticCapture": "Captura durante 10 segundos",
   "diagnosticRequiresTun": "La captura de paquetes necesita una conexión Sora TUN activa.",
-  "diagnosticUnavailable": "Este diagnóstico no está disponible en esta plataforma."
+  "diagnosticUnavailable": "Este diagnóstico no está disponible en esta plataforma.",
+  "extErrRevoked": "El equipo de Sora retiró esta versión de la extensión porque es insegura o no funciona.",
+  "extErrRevocationsExpired": "No se pudo renovar la lista de extensiones retiradas. La instalación está bloqueada hasta que se renueve: revisa la red e inténtalo de nuevo.",
+  "extRevokedDisabled": "Se desactivaron extensiones retiradas: {names}"
 }

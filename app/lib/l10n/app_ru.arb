@@ -705,8 +705,6 @@
     }
   },
   "extPanelUnavailable": "Панель недоступна. Возможно, расширение отключено или удалено.",
-  "extCatalogSoonTitle": "Каталог команды скоро появится",
-  "extCatalogSoonBody": "А пока расширения можно устанавливать из файла или по ссылке — каждый пакет всё равно проверяется по подписи.",
   "extPermConnectionsRead": "Видеть список активных соединений",
   "extPermServersRead": "Видеть список ваших серверов",
   "extPermSettingsRead": "Читать настройки приложения",
@@ -1125,5 +1123,15 @@
   "diagnosticEvents": "События Windows",
   "diagnosticCapture": "Записать 10 секунд",
   "diagnosticRequiresTun": "Для захвата пакетов нужно активное TUN-подключение Sora.",
-  "diagnosticUnavailable": "Эта диагностика недоступна на данной платформе."
+  "diagnosticUnavailable": "Эта диагностика недоступна на данной платформе.",
+  "extErrRevoked": "Команда Sora отозвала эту версию расширения: она небезопасна или сломана.",
+  "extErrRevocationsExpired": "Не удалось обновить список отозванных расширений. Установка недоступна, пока он не обновится: проверьте сеть и попробуйте снова.",
+  "extRevokedDisabled": "Выключены отозванные расширения: {names}",
+  "@extRevokedDisabled": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  }
 }

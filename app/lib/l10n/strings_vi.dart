@@ -1263,13 +1263,6 @@ class SVi extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2223,4 +2216,16 @@ class SVi extends S {
 
   @override
   String get diagnosticUnavailable => 'Chẩn đoán này không có sẵn trên nền tảng này.';
+
+  @override
+  String get extErrRevoked => 'Nhóm Sora đã thu hồi phiên bản tiện ích này vì không an toàn hoặc bị lỗi.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Không thể gia hạn danh sách tiện ích bị thu hồi. Việc cài đặt bị chặn cho đến khi gia hạn được: kiểm tra mạng rồi thử lại.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Đã tắt các tiện ích bị thu hồi: $names';
+  }
 }

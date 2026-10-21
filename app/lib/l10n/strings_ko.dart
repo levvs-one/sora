@@ -1246,13 +1246,6 @@ class SKo extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2205,4 +2198,15 @@ class SKo extends S {
 
   @override
   String get diagnosticUnavailable => '이 플랫폼에서는 이 진단을 사용할 수 없습니다.';
+
+  @override
+  String get extErrRevoked => 'Sora 팀이 안전하지 않거나 손상된 이 확장 프로그램 버전을 철회했습니다.';
+
+  @override
+  String get extErrRevocationsExpired => '철회된 확장 프로그램 목록을 갱신하지 못했습니다. 갱신될 때까지 설치할 수 없습니다. 네트워크를 확인하고 다시 시도하세요.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return '철회된 확장 프로그램을 껐습니다: $names';
+  }
 }

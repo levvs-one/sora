@@ -1263,13 +1263,6 @@ class SAz extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2222,4 +2215,17 @@ class SAz extends S {
 
   @override
   String get diagnosticUnavailable => 'Bu diaqnostika bu platformada əlçatan deyil.';
+
+  @override
+  String get extErrRevoked =>
+      'Sora komandası bu genişləndirmə versiyasını təhlükəli və ya xarab olduğu üçün geri çağırdı.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Geri çağırılmış genişləndirmələr siyahısı yenilənmədi. Yenilənənə qədər quraşdırma bağlıdır: şəbəkəni yoxlayın və yenidən cəhd edin.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Geri çağırılmış genişləndirmələr söndürüldü: $names';
+  }
 }

@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "উইন্ডোজ ইভেন্ট",
   "diagnosticCapture": "10 সেকেন্ডের জন্য ক্যাপচার করুন",
   "diagnosticRequiresTun": "প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।",
-  "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ."
+  "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.",
+  "extErrRevoked": "Sora দল এই এক্সটেনশন সংস্করণটি প্রত্যাহার করেছে, কারণ এটি অনিরাপদ বা ভাঙা।",
+  "extErrRevocationsExpired": "প্রত্যাহার করা এক্সটেনশনের তালিকা নবায়ন করা যায়নি। নবায়ন না হওয়া পর্যন্ত ইনস্টল বন্ধ: নেটওয়ার্ক দেখে আবার চেষ্টা করুন।",
+  "extRevokedDisabled": "প্রত্যাহার করা এক্সটেনশন বন্ধ করা হয়েছে: {names}"
 }

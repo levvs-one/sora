@@ -42,8 +42,9 @@ void main() {
     await expectLater(ExtPackage.fromFiles(files, pkg.manifest).verify(), throwsA(isA<PackageError>()));
   });
 
-  test('catalog signatures fail closed until the team key exists', () {
-    expect(teamSigningConfigured, isFalse);
-    expect(() => verifyCatalogSignature('', Uint8List(0)), throwsA(isA<SignatureError>()));
+  test('a team signature only verifies for its own role', () async {
+    final revocations = File('../extensions/revocations.json').readAsBytesSync();
+    final sig = File('../extensions/revocations.json.minisig').readAsStringSync();
+    await expectLater(verifyCatalogSignature(sig, revocations), throwsA(isA<SignatureError>()));
   });
 }

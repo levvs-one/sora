@@ -1265,13 +1265,6 @@ class SPl extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2225,4 +2218,16 @@ class SPl extends S {
 
   @override
   String get diagnosticUnavailable => 'Ta diagnostyka jest niedostępna na tej platformie.';
+
+  @override
+  String get extErrRevoked => 'Zespół Sora wycofał tę wersję rozszerzenia, ponieważ jest niebezpieczna lub uszkodzona.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Nie udało się odnowić listy wycofanych rozszerzeń. Instalacja jest zablokowana do czasu odnowienia: sprawdź sieć i spróbuj ponownie.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Wyłączono wycofane rozszerzenia: $names';
+  }
 }

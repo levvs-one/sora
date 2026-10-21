@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "เหตุการณ์ของวินโดวส์",
   "diagnosticCapture": "จับภาพเป็นเวลา 10 วินาที",
   "diagnosticRequiresTun": "การจับแพ็คเก็ตจำเป็นต้องมีการเชื่อมต่อ Sora TUN ที่ใช้งานอยู่",
-  "diagnosticUnavailable": "การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้"
+  "diagnosticUnavailable": "การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้",
+  "extErrRevoked": "ทีม Sora ได้เพิกถอนส่วนขยายเวอร์ชันนี้ เพราะไม่ปลอดภัยหรือใช้งานไม่ได้",
+  "extErrRevocationsExpired": "ต่ออายุรายการส่วนขยายที่ถูกเพิกถอนไม่สำเร็จ การติดตั้งถูกบล็อกจนกว่าจะต่ออายุได้ ตรวจสอบเครือข่ายแล้วลองอีกครั้ง",
+  "extRevokedDisabled": "ปิดส่วนขยายที่ถูกเพิกถอนแล้ว: {names}"
 }

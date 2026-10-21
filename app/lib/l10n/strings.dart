@@ -2403,18 +2403,6 @@ abstract class S {
   /// **'Панель недоступна. Возможно, расширение отключено или удалено.'**
   String get extPanelUnavailable;
 
-  /// No description provided for @extCatalogSoonTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Каталог команды скоро появится'**
-  String get extCatalogSoonTitle;
-
-  /// No description provided for @extCatalogSoonBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'А пока расширения можно устанавливать из файла или по ссылке — каждый пакет всё равно проверяется по подписи.'**
-  String get extCatalogSoonBody;
-
   /// No description provided for @extPermConnectionsRead.
   ///
   /// In ru, this message translates to:
@@ -4178,6 +4166,24 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Эта диагностика недоступна на данной платформе.'**
   String get diagnosticUnavailable;
+
+  /// No description provided for @extErrRevoked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Команда Sora отозвала эту версию расширения: она небезопасна или сломана.'**
+  String get extErrRevoked;
+
+  /// No description provided for @extErrRevocationsExpired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось обновить список отозванных расширений. Установка недоступна, пока он не обновится: проверьте сеть и попробуйте снова.'**
+  String get extErrRevocationsExpired;
+
+  /// No description provided for @extRevokedDisabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выключены отозванные расширения: {names}'**
+  String extRevokedDisabled(String names);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

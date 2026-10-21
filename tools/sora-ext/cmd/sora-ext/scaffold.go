@@ -75,6 +75,13 @@ and stores the result as signature.minisig.
 Generates a minisign keypair: name.key (secret, keep offline) and
 name.pub (public). Prints the public key line for the manifest.
 `)
+	case "sign-file":
+		fmt.Print(`Usage:
+  sora-ext sign-file --key team.key --role catalog.json|revocations.json <file>
+
+Signs a team document with the trusted comment the app and the core check
+(timestamp, role and sha256) and writes <file>.minisig next to it.
+`)
 	case "publish":
 		fmt.Print(`Usage:
   sora-ext publish [path] [--ack-dangerous]

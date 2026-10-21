@@ -11,8 +11,9 @@ Files:
 
 ## Build and sign
 
-The `author.public_key` in the manifest is a throwaway key whose secret was
-discarded, so replace it with your own before signing:
+This is the official package in the team catalog (extensions/), so the
+manifest carries the Sora team key. To build your own copy, put your key
+there instead before signing:
 
 ```sh
 sora-ext keygen -o author        # author.key stays offline, never commit it

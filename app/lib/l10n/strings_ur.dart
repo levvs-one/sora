@@ -1261,13 +1261,6 @@ class SUr extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2221,4 +2214,16 @@ class SUr extends S {
 
   @override
   String get diagnosticUnavailable => 'یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔';
+
+  @override
+  String get extErrRevoked => 'Sora ٹیم نے یہ ایکسٹینشن ورژن واپس لے لیا ہے کیونکہ یہ غیر محفوظ یا خراب ہے۔';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'واپس لیے گئے ایکسٹینشنز کی فہرست تازہ نہیں ہو سکی۔ تازہ ہونے تک انسٹال بند ہے: نیٹ ورک چیک کر کے دوبارہ کوشش کریں۔';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'واپس لیے گئے ایکسٹینشنز بند کر دیے گئے: $names';
+  }
 }

@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "Windows-Ereignisse",
   "diagnosticCapture": "10 Sekunden lang einfangen",
   "diagnosticRequiresTun": "Für die Paketerfassung ist eine aktive Sora TUN-Verbindung erforderlich.",
-  "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar."
+  "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar.",
+  "extErrRevoked": "Das Sora-Team hat diese Version der Erweiterung zurückgezogen, weil sie unsicher oder defekt ist.",
+  "extErrRevocationsExpired": "Die Liste zurückgezogener Erweiterungen konnte nicht erneuert werden. Installationen sind gesperrt, bis das gelingt: Netzwerk prüfen und erneut versuchen.",
+  "extRevokedDisabled": "Zurückgezogene Erweiterungen wurden ausgeschaltet: {names}"
 }

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"time"
 
 	"github.com/levvs-one/sora-client/core/ext"
@@ -109,5 +110,40 @@ func cmdSign(args []string) int {
 		return errOp("write: %v", err)
 	}
 	fmt.Printf("signed %s\n", pkgPath)
+	return 0
+}
+
+// teamRoles are the documents the team key signs; the role is part of the
+// signed trusted comment, so a catalog signature cannot pass as a
+// revocation list and the other way round.
+var teamRoles = map[string]bool{"catalog.json": true, "revocations.json": true}
+
+func cmdSignFile(args []string) int {
+	fs := flag.NewFlagSet("sign-file", flag.ContinueOnError)
+	keyPath := fs.String("key", "", "")
+	role := fs.String("role", "", "")
+	if err := fs.Parse(reorderArgs(args, nil)); err != nil {
+		return 1
+	}
+	if *keyPath == "" || !teamRoles[*role] || fs.NArg() != 1 {
+		return errUsage("usage: sora-ext sign-file --key team.key --role catalog.json|revocations.json <file>")
+	}
+	key, err := keyutil.Load(*keyPath)
+	if err != nil {
+		return errOp("key: %v", err)
+	}
+	path := fs.Arg(0)
+	payload, err := os.ReadFile(path)
+	if err != nil {
+		return errOp("read: %v", err)
+	}
+	sigText, err := ext.SignPayload(key, "sora team signature", *role, time.Now().Unix(), payload)
+	if err != nil {
+		return errOp("sign: %v", err)
+	}
+	if err := os.WriteFile(path+".minisig", []byte(sigText), 0o644); err != nil {
+		return errOp("write: %v", err)
+	}
+	fmt.Printf("signed %s as %s\n", path, *role)
 	return 0
 }

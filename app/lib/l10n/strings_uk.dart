@@ -1262,13 +1262,6 @@ class SUk extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2222,4 +2215,16 @@ class SUk extends S {
 
   @override
   String get diagnosticUnavailable => 'Ця діагностика недоступна на цій платформі.';
+
+  @override
+  String get extErrRevoked => 'Команда Sora відкликала цю версію розширення: вона небезпечна або зламана.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Не вдалося оновити список відкликаних розширень. Встановлення недоступне, доки він не оновиться: перевірте мережу й спробуйте знову.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Вимкнено відкликані розширення: $names';
+  }
 }

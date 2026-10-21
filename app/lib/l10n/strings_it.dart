@@ -1266,13 +1266,6 @@ class SIt extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2226,4 +2219,17 @@ class SIt extends S {
 
   @override
   String get diagnosticUnavailable => 'Questa diagnostica non è disponibile su questa piattaforma.';
+
+  @override
+  String get extErrRevoked =>
+      'Il team di Sora ha ritirato questa versione dell’estensione perché non è sicura o non funziona.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Non è stato possibile rinnovare l’elenco delle estensioni ritirate. L’installazione è bloccata finché non viene rinnovato: controlla la rete e riprova.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Estensioni ritirate disattivate: $names';
+  }
 }

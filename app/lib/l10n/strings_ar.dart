@@ -1249,13 +1249,6 @@ class SAr extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2209,4 +2202,16 @@ class SAr extends S {
 
   @override
   String get diagnosticUnavailable => 'هذا التشخيص غير متوفر على هذا النظام الأساسي.';
+
+  @override
+  String get extErrRevoked => 'سحب فريق Sora هذا الإصدار من الإضافة لأنه غير آمن أو معطّل.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'تعذّر تحديث قائمة الإضافات المسحوبة. التثبيت متوقف حتى تُحدَّث: تحقّق من الشبكة وحاول مجددًا.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'تم إيقاف الإضافات المسحوبة: $names';
+  }
 }

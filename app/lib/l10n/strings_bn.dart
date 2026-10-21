@@ -1258,13 +1258,6 @@ class SBn extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2218,4 +2211,16 @@ class SBn extends S {
 
   @override
   String get diagnosticUnavailable => 'এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.';
+
+  @override
+  String get extErrRevoked => 'Sora দল এই এক্সটেনশন সংস্করণটি প্রত্যাহার করেছে, কারণ এটি অনিরাপদ বা ভাঙা।';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'প্রত্যাহার করা এক্সটেনশনের তালিকা নবায়ন করা যায়নি। নবায়ন না হওয়া পর্যন্ত ইনস্টল বন্ধ: নেটওয়ার্ক দেখে আবার চেষ্টা করুন।';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'প্রত্যাহার করা এক্সটেনশন বন্ধ করা হয়েছে: $names';
+  }
 }

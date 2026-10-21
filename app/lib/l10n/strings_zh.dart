@@ -1246,13 +1246,6 @@ class SZh extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2205,6 +2198,17 @@ class SZh extends S {
 
   @override
   String get diagnosticUnavailable => '此诊断在此平台上不可用。';
+
+  @override
+  String get extErrRevoked => 'Sora 团队已撤回此扩展版本，因为它不安全或已损坏。';
+
+  @override
+  String get extErrRevocationsExpired => '无法更新已撤回扩展的列表。在更新之前无法安装：请检查网络后重试。';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return '已关闭被撤回的扩展：$names';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3448,13 +3452,6 @@ class SZhHans extends SZh {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -4407,6 +4404,17 @@ class SZhHans extends SZh {
 
   @override
   String get diagnosticUnavailable => '此诊断在此平台上不可用。';
+
+  @override
+  String get extErrRevoked => 'Sora 团队已撤回此扩展版本，因为它不安全或已损坏。';
+
+  @override
+  String get extErrRevocationsExpired => '无法更新已撤回扩展的列表。在更新之前无法安装：请检查网络后重试。';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return '已关闭被撤回的扩展：$names';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -5650,13 +5658,6 @@ class SZhHant extends SZh {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -6609,4 +6610,15 @@ class SZhHant extends SZh {
 
   @override
   String get diagnosticUnavailable => '此診斷在此平台上不可用。';
+
+  @override
+  String get extErrRevoked => 'Sora 團隊已撤回此擴充功能版本，因為它不安全或已損壞。';
+
+  @override
+  String get extErrRevocationsExpired => '無法更新已撤回擴充功能的清單。在更新之前無法安裝：請檢查網路後重試。';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return '已關閉被撤回的擴充功能：$names';
+  }
 }

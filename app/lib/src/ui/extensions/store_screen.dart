@@ -50,11 +50,26 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     _store.load().then(
       (_) {
         if (mounted) setState(() => _ready = true);
+        unawaited(_refreshRevocations());
       },
       onError: (Object _) {
         if (mounted) setState(() => _failed = true);
       },
     );
+  }
+
+  /// Fetches the team revocation list; a fetch failure keeps the cached
+  /// list and stays quiet, a disabled extension is always announced.
+  Future<void> _refreshRevocations() async {
+    try {
+      final disabled = await _store.refreshRevocations();
+      if (!mounted || disabled.isEmpty) return;
+      final s = S.of(context);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(s.extRevokedDisabled(disabled.map((e) => e.manifest.name).join(', ')))));
+    } catch (e) {
+      debugPrint('[ext] revocation list not refreshed: $e');
+    }
   }
 
   @override
@@ -267,6 +282,8 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       if (context.mounted) showFailure(context, s.extErrSignature);
     } on ManifestError {
       if (context.mounted) showFailure(context, s.extErrManifest);
+    } on ExtStoreError catch (e) {
+      if (context.mounted) showFailure(context, extStoreErrorText(s, e));
     } catch (_) {
       if (context.mounted) showFailure(context, s.extErrGeneric);
     }
@@ -404,7 +421,6 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   int _tab = 0;
   ExtensionCatalog? _catalog;
   bool _loading = true;
-  bool _catalogSoon = false;
   String? _catalogError;
 
   /// Catalog search input. The result list below listens to it through a
@@ -446,21 +462,9 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   Future<void> _refreshCatalog() async {
     // Any refresh invalidates the memoized filter, whatever the outcome.
     _catalogRevision++;
-    // The team catalog URL and key are placeholders until the owner completes
-    // the signing key ceremony. Show an honest "coming soon" state instead of
-    // a permanent network error; sideloading stays fully working.
-    if (!teamSigningConfigured) {
-      setState(() {
-        _loading = false;
-        _catalogSoon = true;
-        _catalogError = null;
-      });
-      return;
-    }
     setState(() {
       _loading = true;
       _catalogError = null;
-      _catalogSoon = false;
     });
     try {
       final ExtensionCatalog catalog;
@@ -525,31 +529,6 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     final s = S.of(context), palette = Palette.of(context);
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
-    }
-    if (_catalogSoon) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Symbols.store_rounded, size: 40, color: palette.ink3),
-            const SizedBox(height: 12),
-            Text(
-              s.extCatalogSoonTitle,
-              style: Styles.title.copyWith(color: palette.ink),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                s.extCatalogSoonBody,
-                style: Styles.body.copyWith(color: palette.ink2),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-      );
     }
     if (_catalogError != null) {
       return Center(
@@ -1040,7 +1019,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 // the extension it toggles.
                 trailing: Semantics(
                   label: s.extToggleEnabled(inst.manifest.name),
-                  child: Switch(value: inst.enabled, onChanged: (v) => store.setEnabled(inst.id, v)),
+                  child: Switch(value: inst.enabled, onChanged: (v) => toggleExtension(context, store, inst.id, v)),
                 ),
               );
             },

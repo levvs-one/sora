@@ -16,11 +16,13 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 
 import 'catalog.dart';
 import 'manifest.dart';
 import 'package.dart';
 import 'permissions.dart';
+import 'revocations.dart';
 
 class ExtStoreError implements Exception {
   ExtStoreError(this.message);
@@ -141,6 +143,54 @@ class ExtensionStore extends ChangeNotifier {
   String get installId => _installId;
   String _installId = '';
 
+  /// Last verified team revocation list; null until one was fetched.
+  late final RevocationCache revocationCache = RevocationCache(_dir);
+  RevocationList? _revocations;
+
+  /// Why [id] at its installed version was revoked, or null.
+  RevocationEntry? revocationOf(String id) {
+    final inst = _installed[id];
+    return inst == null ? null : _revocations?.revocationOf(id, inst.version);
+  }
+
+  /// Fetches the team revocation list and disables installed matches.
+  /// Returns the extensions it disabled so the UI can tell the user.
+  Future<List<InstalledExtension>> refreshRevocations({http.Client? client}) async {
+    _revocations = await revocationCache.refresh(client: client);
+    return _enforceRevocations();
+  }
+
+  Future<List<InstalledExtension>> _enforceRevocations() async {
+    final list = _revocations;
+    if (list == null) return const [];
+    final disabled = <InstalledExtension>[];
+    for (final inst in _installed.values.toList()) {
+      if (inst.enabled && list.revocationOf(inst.id, inst.version) != null) {
+        final off = inst.copyWith(enabled: false);
+        _installed[inst.id] = off;
+        disabled.add(off);
+      }
+    }
+    if (disabled.isNotEmpty) {
+      await _save();
+      notifyListeners();
+    }
+    return disabled;
+  }
+
+  /// The core's policy (core/ext checkRevocationsLocked): a revoked
+  /// id@version is never installed or enabled, and an expired list blocks
+  /// new installs because it can no longer be trusted to be complete.
+  void _checkRevocation(String id, String version, {required bool installing}) {
+    final list = _revocations;
+    if (list == null) return;
+    if (installing && list.expired(DateTime.now())) {
+      throw ExtStoreError('the revocation list expired and could not be renewed; installs are blocked until it is');
+    }
+    final hit = list.revocationOf(id, version);
+    if (hit != null) throw ExtStoreError('$id@$version was revoked by the Sora team: ${hit.reason}');
+  }
+
   /// Offline team-catalog cache (verified bytes + fetch time).
   late final CatalogCache catalogCache = CatalogCache('$_dir${Platform.pathSeparator}catalog_cache');
 
@@ -172,6 +222,8 @@ class ExtensionStore extends ChangeNotifier {
         // Corrupt registry: start empty rather than crash the section.
       }
     }
+    _revocations = await revocationCache.load();
+    await _enforceRevocations();
     _loaded = true;
     notifyListeners();
   }
@@ -305,6 +357,7 @@ class ExtensionStore extends ChangeNotifier {
     if (missing.isNotEmpty) {
       throw ExtStoreError('install does not grant required permissions: ${missing.join(", ")}');
     }
+    _checkRevocation(m.id, m.version, installing: true);
     final cur = _installed[m.id];
     if (cur != null && compareVersions(m.version, cur.version) <= 0) {
       throw ExtStoreError('version ${m.version} is not newer than installed ${cur.version}');
@@ -420,6 +473,7 @@ class ExtensionStore extends ChangeNotifier {
   Future<void> setEnabled(String id, bool enabled) async {
     final cur = _installed[id];
     if (cur == null) throw ExtStoreError('"$id" is not installed');
+    if (enabled) _checkRevocation(id, cur.version, installing: false);
     _installed[id] = cur.copyWith(enabled: enabled);
     await _save();
     notifyListeners();
@@ -436,6 +490,7 @@ class ExtensionStore extends ChangeNotifier {
     if (cur == null) throw ExtStoreError('"$id" is not installed');
     final prev = cur.previous;
     if (prev == null) throw ExtStoreError('"$id" has no previous version');
+    _checkRevocation(id, prev, installing: false);
     final prevDir = Directory(_contentDir(id, prev));
     if (!await prevDir.exists()) throw ExtStoreError('previous version of "$id" is missing');
     // Re-read the previous manifest from disk (source of truth).

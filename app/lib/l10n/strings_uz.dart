@@ -1262,13 +1262,6 @@ class SUz extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2223,4 +2216,16 @@ class SUz extends S {
 
   @override
   String get diagnosticUnavailable => 'Ushbu diagnostika ushbu platformada mavjud emas.';
+
+  @override
+  String get extErrRevoked => 'Sora jamoasi bu kengaytma versiyasini xavfli yoki buzuq bo‘lgani uchun qaytarib oldi.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Qaytarib olingan kengaytmalar ro‘yxatini yangilab bo‘lmadi. Yangilanmaguncha o‘rnatish bloklangan: tarmoqni tekshirib, qayta urining.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Qaytarib olingan kengaytmalar o‘chirildi: $names';
+  }
 }

@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "Події Windows",
   "diagnosticCapture": "Зробіть знімок на 10 секунд",
   "diagnosticRequiresTun": "Для захоплення пакетів потрібне активне з’єднання Sora TUN.",
-  "diagnosticUnavailable": "Ця діагностика недоступна на цій платформі."
+  "diagnosticUnavailable": "Ця діагностика недоступна на цій платформі.",
+  "extErrRevoked": "Команда Sora відкликала цю версію розширення: вона небезпечна або зламана.",
+  "extErrRevocationsExpired": "Не вдалося оновити список відкликаних розширень. Встановлення недоступне, доки він не оновиться: перевірте мережу й спробуйте знову.",
+  "extRevokedDisabled": "Вимкнено відкликані розширення: {names}"
 }

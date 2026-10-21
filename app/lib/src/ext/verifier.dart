@@ -10,10 +10,9 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:cryptography/cryptography.dart' as cry;
 
-/// The team catalog key stays empty until the owner completes the key
-/// ceremony, so every team-signature check fails closed, exactly like
-/// core/ext TeamPublicKey.
-const String teamPublicKey = '';
+/// The team key that signs the catalog and the revocation list; the same
+/// key as core/ext TeamPublicKey.
+const String teamPublicKey = 'RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+';
 
 bool get teamSigningConfigured => teamPublicKey.isNotEmpty;
 

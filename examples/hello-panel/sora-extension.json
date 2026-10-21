@@ -6,9 +6,9 @@
   "min_app_version": "1.1.0",
   "description": "The official example extension: a panel with live connection statistics.",
   "author": {
-    "name": "Sora Team",
+    "name": "Sora",
     "identity": "github:levvs-one",
-    "public_key": "RWR4GRTQjDDhQUbdYob6IwCcKqOk1SpL2tripsiQMl+UVFC+XtUyp38Q"
+    "public_key": "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+"
   },
   "permissions": [
     "connections.read",

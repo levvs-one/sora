@@ -1247,13 +1247,6 @@ class SJa extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2206,4 +2199,15 @@ class SJa extends S {
 
   @override
   String get diagnosticUnavailable => 'この診断は、このプラットフォームでは使用できません。';
+
+  @override
+  String get extErrRevoked => 'この拡張機能のバージョンは安全でないか壊れているため、Sora チームが取り消しました。';
+
+  @override
+  String get extErrRevocationsExpired => '取り消された拡張機能のリストを更新できませんでした。更新されるまでインストールできません。ネットワークを確認して再試行してください。';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return '取り消された拡張機能をオフにしました: $names';
+  }
 }

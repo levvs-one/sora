@@ -13,9 +13,10 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
-// TeamPublicKey stays empty until the owner configures the offline team key.
-// No team-signed catalog or revocation list is trusted without that key.
-const TeamPublicKey = ""
+// TeamPublicKey verifies the team catalog and revocation list. Its secret
+// half signs extensions/catalog.json and extensions/revocations.json with
+// `sora-ext sign-file`; the app carries the same key (ext/verifier.dart).
+const TeamPublicKey = "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+"
 
 // SigningConfigured reports whether a valid team public key is configured.
 func SigningConfigured() bool {

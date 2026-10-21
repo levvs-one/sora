@@ -1262,13 +1262,6 @@ class SKk extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2222,4 +2215,16 @@ class SKk extends S {
 
   @override
   String get diagnosticUnavailable => 'Бұл диагностика бұл платформада қолжетімді емес.';
+
+  @override
+  String get extErrRevoked => 'Sora командасы кеңейтудің бұл нұсқасын қауіпті немесе бұзылған деп кері қайтарды.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Кері қайтарылған кеңейтулер тізімін жаңарту мүмкін болмады. Жаңартылғанша орнату бұғатталған: желіні тексеріп, қайталаңыз.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Кері қайтарылған кеңейтулер өшірілді: $names';
+  }
 }

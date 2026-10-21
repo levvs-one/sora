@@ -13,6 +13,7 @@ import '../../design/theme.dart';
 import '../kit.dart';
 import '../../ext/catalog.dart';
 import '../../ext/permissions.dart';
+import '../../ext/store.dart';
 
 /// 5-star rating display with the numeric value.
 ///
@@ -399,4 +400,22 @@ Future<void> showRatingHowDialog(BuildContext context) {
       ),
     ),
   );
+}
+
+/// Localized text for store refusals the user can act on.
+String extStoreErrorText(S s, ExtStoreError e) {
+  if (e.message.contains('was revoked')) return s.extErrRevoked;
+  if (e.message.contains('revocation list expired')) return s.extErrRevocationsExpired;
+  return s.extErrGeneric;
+}
+
+/// Enables or disables an extension, explaining a refusal (for example a
+/// revoked version) instead of failing silently.
+Future<void> toggleExtension(BuildContext context, ExtensionStore store, String id, bool enabled) async {
+  try {
+    await store.setEnabled(id, enabled);
+  } on ExtStoreError catch (e) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(extStoreErrorText(S.of(context), e))));
+  }
 }

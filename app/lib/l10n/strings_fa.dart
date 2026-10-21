@@ -1263,13 +1263,6 @@ class SFa extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2223,4 +2216,16 @@ class SFa extends S {
 
   @override
   String get diagnosticUnavailable => 'این تشخیص در این پلتفرم در دسترس نیست.';
+
+  @override
+  String get extErrRevoked => 'تیم Sora این نسخه از افزونه را لغو کرد، چون ناامن یا خراب است.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'فهرست افزونه‌های لغوشده به‌روز نشد. تا به‌روز شدن آن نصب ممکن نیست: شبکه را بررسی و دوباره تلاش کنید.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'افزونه‌های لغوشده خاموش شدند: $names';
+  }
 }

@@ -319,7 +319,11 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
           PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
         ],
         const SizedBox(height: 8),
-        SwitchTile(title: s.extEnabled, value: live.enabled, onChanged: (v) => store.setEnabled(live.id, v)),
+        SwitchTile(
+          title: s.extEnabled,
+          value: live.enabled,
+          onChanged: (v) => toggleExtension(context, store, live.id, v),
+        ),
         if (live.previous != null) ...[
           const SizedBox(height: 8),
           _QuietButton(

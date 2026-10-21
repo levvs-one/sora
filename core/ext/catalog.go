@@ -23,9 +23,9 @@ const CatalogVersion = 1
 // maxCatalogBytes bounds the catalog index itself (not the downloads).
 const maxCatalogBytes = 4 << 20
 
-// DefaultCatalogURL is where the app looks for the team catalog. The value
-// is a placeholder until the team publishes the catalog endpoint.
-const DefaultCatalogURL = "https://extensions.sora.example/v1/catalog.json"
+// DefaultCatalogURL is where the app looks for the team catalog: the signed
+// file in extensions/ of the repository's main branch.
+const DefaultCatalogURL = "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog.json"
 
 // Entry is one extension in the team catalog.
 type Entry struct {

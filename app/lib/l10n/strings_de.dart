@@ -1265,13 +1265,6 @@ class SDe extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2226,4 +2219,17 @@ class SDe extends S {
 
   @override
   String get diagnosticUnavailable => 'Diese Diagnose ist auf dieser Plattform nicht verfügbar.';
+
+  @override
+  String get extErrRevoked =>
+      'Das Sora-Team hat diese Version der Erweiterung zurückgezogen, weil sie unsicher oder defekt ist.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Die Liste zurückgezogener Erweiterungen konnte nicht erneuert werden. Installationen sind gesperrt, bis das gelingt: Netzwerk prüfen und erneut versuchen.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Zurückgezogene Erweiterungen wurden ausgeschaltet: $names';
+  }
 }

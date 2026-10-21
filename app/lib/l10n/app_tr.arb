@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "Windows etkinlikleri",
   "diagnosticCapture": "10 saniye boyunca çekim yapın",
   "diagnosticRequiresTun": "Paket yakalama, etkin bir Sora TUN bağlantısına ihtiyaç duyar.",
-  "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor."
+  "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor.",
+  "extErrRevoked": "Sora ekibi bu uzantı sürümünü güvensiz ya da bozuk olduğu için geri çekti.",
+  "extErrRevocationsExpired": "Geri çekilen uzantılar listesi yenilenemedi. Yenilenene kadar kurulum engellendi: ağı kontrol edip yeniden deneyin.",
+  "extRevokedDisabled": "Geri çekilen uzantılar kapatıldı: {names}"
 }

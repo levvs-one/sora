@@ -1262,13 +1262,6 @@ class STr extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2222,4 +2215,16 @@ class STr extends S {
 
   @override
   String get diagnosticUnavailable => 'Bu teşhis bu platformda kullanılamıyor.';
+
+  @override
+  String get extErrRevoked => 'Sora ekibi bu uzantı sürümünü güvensiz ya da bozuk olduğu için geri çekti.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Geri çekilen uzantılar listesi yenilenemedi. Yenilenene kadar kurulum engellendi: ağı kontrol edip yeniden deneyin.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Geri çekilen uzantılar kapatıldı: $names';
+  }
 }

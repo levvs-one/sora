@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "Windows hadisələri",
   "diagnosticCapture": "10 saniyə çəkin",
   "diagnosticRequiresTun": "Paket ələ keçirmək üçün aktiv Sora TUN bağlantısı lazımdır.",
-  "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil."
+  "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil.",
+  "extErrRevoked": "Sora komandası bu genişləndirmə versiyasını təhlükəli və ya xarab olduğu üçün geri çağırdı.",
+  "extErrRevocationsExpired": "Geri çağırılmış genişləndirmələr siyahısı yenilənmədi. Yenilənənə qədər quraşdırma bağlıdır: şəbəkəni yoxlayın və yenidən cəhd edin.",
+  "extRevokedDisabled": "Geri çağırılmış genişləndirmələr söndürüldü: {names}"
 }

@@ -1261,13 +1261,6 @@ class STh extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2221,4 +2214,16 @@ class STh extends S {
 
   @override
   String get diagnosticUnavailable => 'การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้';
+
+  @override
+  String get extErrRevoked => 'ทีม Sora ได้เพิกถอนส่วนขยายเวอร์ชันนี้ เพราะไม่ปลอดภัยหรือใช้งานไม่ได้';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'ต่ออายุรายการส่วนขยายที่ถูกเพิกถอนไม่สำเร็จ การติดตั้งถูกบล็อกจนกว่าจะต่ออายุได้ ตรวจสอบเครือข่ายแล้วลองอีกครั้ง';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'ปิดส่วนขยายที่ถูกเพิกถอนแล้ว: $names';
+  }
 }

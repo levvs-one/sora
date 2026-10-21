@@ -1263,13 +1263,6 @@ class SId extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2223,4 +2216,16 @@ class SId extends S {
 
   @override
   String get diagnosticUnavailable => 'Diagnostik ini tidak tersedia pada platform ini.';
+
+  @override
+  String get extErrRevoked => 'Tim Sora menarik versi ekstensi ini karena tidak aman atau rusak.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Daftar ekstensi yang ditarik tidak dapat diperbarui. Pemasangan diblokir sampai diperbarui: periksa jaringan lalu coba lagi.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Ekstensi yang ditarik dimatikan: $names';
+  }
 }

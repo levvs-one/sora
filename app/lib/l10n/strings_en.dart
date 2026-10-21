@@ -1245,13 +1245,6 @@ class SEn extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2205,4 +2198,16 @@ class SEn extends S {
 
   @override
   String get diagnosticUnavailable => 'This diagnostic is unavailable on this platform.';
+
+  @override
+  String get extErrRevoked => 'The Sora team revoked this extension version because it is unsafe or broken.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'The list of revoked extensions could not be renewed. Installing is blocked until it is: check the network and try again.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Revoked extensions were turned off: $names';
+  }
 }

@@ -1262,13 +1262,6 @@ class SBe extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2222,4 +2215,16 @@ class SBe extends S {
 
   @override
   String get diagnosticUnavailable => 'Гэтая дыягностыка недаступная на гэтай платформе.';
+
+  @override
+  String get extErrRevoked => 'Каманда Sora адклікала гэтую версію пашырэння: яна небяспечная або зламаная.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Не ўдалося абнавіць спіс адкліканых пашырэнняў. Усталёўка недаступная, пакуль ён не абновіцца: праверце сетку і паспрабуйце зноў.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Адкліканыя пашырэнні выключаны: $names';
+  }
 }

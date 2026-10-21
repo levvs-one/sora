@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "Windows-ის მოვლენები",
   "diagnosticCapture": "გადაიღეთ 10 წამის განმავლობაში",
   "diagnosticRequiresTun": "პაკეტის დაჭერას სჭირდება აქტიური Sora TUN კავშირი.",
-  "diagnosticUnavailable": "ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე."
+  "diagnosticUnavailable": "ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე.",
+  "extErrRevoked": "Sora-ს გუნდმა გაფართოების ეს ვერსია გააუქმა, რადგან ის სახიფათო ან გაუმართავია.",
+  "extErrRevocationsExpired": "გაუქმებული გაფართოებების სია ვერ განახლდა. განახლებამდე ინსტალაცია დაბლოკილია: შეამოწმეთ ქსელი და სცადეთ თავიდან.",
+  "extRevokedDisabled": "გაუქმებული გაფართოებები გაითიშა: {names}"
 }

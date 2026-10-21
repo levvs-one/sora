@@ -1266,13 +1266,6 @@ class SFr extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2227,4 +2220,17 @@ class SFr extends S {
 
   @override
   String get diagnosticUnavailable => 'Ce diagnostic n\'est pas disponible sur cette plateforme.';
+
+  @override
+  String get extErrRevoked =>
+      'L’équipe Sora a retiré cette version de l’extension, car elle est dangereuse ou défectueuse.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'La liste des extensions retirées n’a pas pu être renouvelée. L’installation est bloquée jusqu’à son renouvellement : vérifiez le réseau et réessayez.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Des extensions retirées ont été désactivées : $names';
+  }
 }

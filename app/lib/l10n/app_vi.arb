@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "Sự kiện Windows",
   "diagnosticCapture": "Chụp trong 10 giây",
   "diagnosticRequiresTun": "Việc chụp gói cần có kết nối Sora TUN đang hoạt động.",
-  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này."
+  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này.",
+  "extErrRevoked": "Nhóm Sora đã thu hồi phiên bản tiện ích này vì không an toàn hoặc bị lỗi.",
+  "extErrRevocationsExpired": "Không thể gia hạn danh sách tiện ích bị thu hồi. Việc cài đặt bị chặn cho đến khi gia hạn được: kiểm tra mạng rồi thử lại.",
+  "extRevokedDisabled": "Đã tắt các tiện ích bị thu hồi: {names}"
 }

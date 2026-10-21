@@ -1265,13 +1265,6 @@ class SEs extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2226,4 +2219,16 @@ class SEs extends S {
 
   @override
   String get diagnosticUnavailable => 'Este diagnóstico no está disponible en esta plataforma.';
+
+  @override
+  String get extErrRevoked => 'El equipo de Sora retiró esta versión de la extensión porque es insegura o no funciona.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'No se pudo renovar la lista de extensiones retiradas. La instalación está bloqueada hasta que se renueve: revisa la red e inténtalo de nuevo.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Se desactivaron extensiones retiradas: $names';
+  }
 }

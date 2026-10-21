@@ -19,8 +19,11 @@ class CatalogError implements Exception {
   String toString() => 'CatalogError: $message';
 }
 
-/// Placeholder until the team publishes the catalog endpoint.
-const String defaultCatalogUrl = 'https://extensions.sora.example/v1/catalog.json';
+/// The team catalog, served from the repository and signed with the team key.
+const String defaultCatalogUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog.json';
+
+/// The team revocation list, signed with the same key as the catalog.
+const String defaultRevocationUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/revocations.json';
 
 const Set<String> knownCatalogBadges = {'verified', 'top', 'new', 'staff'};
 

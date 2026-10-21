@@ -9,9 +9,8 @@
 //     warning because the author key is self-attested.
 //   - The team catalog is signed with the Sora team key. Catalog installs
 //     additionally verify the downloaded archive hash against the catalog
-//     entry. The team key is a placeholder until the owner completes the key
-//     ceremony; every team-signature check fails closed until then (same rule
-//     as packaging/install/install.sh).
+//     entry. The catalog and the revocation list live in extensions/ of the
+//     repository and are signed with `sora-ext sign-file`.
 //   - At runtime an enabled extension only reaches the core through
 //     ExtensionHost with a per-extension token scoped to its granted
 //     permissions. Disabling an extension revokes the token.

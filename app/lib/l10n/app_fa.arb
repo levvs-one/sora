@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "رویدادهای ویندوز",
   "diagnosticCapture": "به مدت 10 ثانیه عکس بگیرید",
   "diagnosticRequiresTun": "ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.",
-  "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست."
+  "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست.",
+  "extErrRevoked": "تیم Sora این نسخه از افزونه را لغو کرد، چون ناامن یا خراب است.",
+  "extErrRevocationsExpired": "فهرست افزونه‌های لغوشده به‌روز نشد. تا به‌روز شدن آن نصب ممکن نیست: شبکه را بررسی و دوباره تلاش کنید.",
+  "extRevokedDisabled": "افزونه‌های لغوشده خاموش شدند: {names}"
 }

@@ -30,8 +30,7 @@ it says so.
   catalog fetches, `net.fetch` traffic.
 - **The user**, trusted to make consent decisions, but must be told the
   truth in plain language, not security jargon.
-- **Sora team**, holds the catalog/revocation signing key (ceremony
-  pending; see §6).
+- **Sora team**, holds the catalog/revocation signing key.
 
 Out of scope: a compromised OS, a compromised build machine of the Sora
 team itself, physical device access.
@@ -192,12 +191,11 @@ is a load-bearing invariant, stated in `docs/extensions.md` §3.
   the installed one; reinstalling an older `.soraext` as an "update" is
   refused. Rollback to N-1 is an explicit user action, re-reading the
   previous manifest from disk.
-- **Team key ceremony pending**: `TeamPublicKey` is a placeholder;
-  `VerifyCatalogSignature` and `VerifyRevocationList` fail closed until
-  the owner completes the ceremony. Consequence, stated plainly: the
-  team catalog and the revocation list are both **non-functional**
-  today, catalog installs cannot be trusted, and emergency kill cannot
-  be delivered. Sideloads (author-key verified) are unaffected.
+- **Team key**: `TeamPublicKey` is compiled into the core and the app.
+  `VerifyCatalogSignature` and `VerifyRevocationList` (and their Dart
+  mirrors) refuse anything it did not sign. The secret is held by the
+  owner outside the repository; losing it means shipping a new key in a
+  release, leaking it means the same plus revoking what it signed.
 
 ## 7. Revocation (WS4)
 

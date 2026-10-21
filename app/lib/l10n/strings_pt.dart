@@ -1264,13 +1264,6 @@ class SPt extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2224,4 +2217,16 @@ class SPt extends S {
 
   @override
   String get diagnosticUnavailable => 'Este diagnóstico não está disponível nesta plataforma.';
+
+  @override
+  String get extErrRevoked => 'A equipe do Sora retirou esta versão da extensão porque é insegura ou está quebrada.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Não foi possível renovar a lista de extensões retiradas. A instalação fica bloqueada até que seja renovada: verifique a rede e tente novamente.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Extensões retiradas foram desativadas: $names';
+  }
 }

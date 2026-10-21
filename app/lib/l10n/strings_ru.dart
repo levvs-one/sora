@@ -1262,13 +1262,6 @@ class SRu extends S {
   String get extPanelUnavailable => 'Панель недоступна. Возможно, расширение отключено или удалено.';
 
   @override
-  String get extCatalogSoonTitle => 'Каталог команды скоро появится';
-
-  @override
-  String get extCatalogSoonBody =>
-      'А пока расширения можно устанавливать из файла или по ссылке — каждый пакет всё равно проверяется по подписи.';
-
-  @override
   String get extPermConnectionsRead => 'Видеть список активных соединений';
 
   @override
@@ -2245,4 +2238,16 @@ class SRu extends S {
 
   @override
   String get diagnosticUnavailable => 'Эта диагностика недоступна на данной платформе.';
+
+  @override
+  String get extErrRevoked => 'Команда Sora отозвала эту версию расширения: она небезопасна или сломана.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Не удалось обновить список отозванных расширений. Установка недоступна, пока он не обновится: проверьте сеть и попробуйте снова.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Выключены отозванные расширения: $names';
+  }
 }

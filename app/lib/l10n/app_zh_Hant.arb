@@ -837,8 +837,6 @@
     }
   },
   "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
-  "extCatalogSoonTitle": "The team catalog is coming soon",
-  "extCatalogSoonBody": "Until then, you can install extensions from a file or a link — every package is still signature-checked.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -1125,5 +1123,8 @@
   "diagnosticEvents": "Windows 事件",
   "diagnosticCapture": "捕捉10秒",
   "diagnosticRequiresTun": "封包擷取需要活動的 Sora TUN 連線。",
-  "diagnosticUnavailable": "此診斷在此平台上不可用。"
+  "diagnosticUnavailable": "此診斷在此平台上不可用。",
+  "extErrRevoked": "Sora 團隊已撤回此擴充功能版本，因為它不安全或已損壞。",
+  "extErrRevocationsExpired": "無法更新已撤回擴充功能的清單。在更新之前無法安裝：請檢查網路後重試。",
+  "extRevokedDisabled": "已關閉被撤回的擴充功能：{names}"
 }

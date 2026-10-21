@@ -1262,13 +1262,6 @@ class SKy extends S {
   String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
 
   @override
-  String get extCatalogSoonTitle => 'The team catalog is coming soon';
-
-  @override
-  String get extCatalogSoonBody =>
-      'Until then, you can install extensions from a file or a link — every package is still signature-checked.';
-
-  @override
   String get extPermConnectionsRead => 'See the list of active connections';
 
   @override
@@ -2222,4 +2215,16 @@ class SKy extends S {
 
   @override
   String get diagnosticUnavailable => 'Бул диагностика бул платформада жеткиликсиз.';
+
+  @override
+  String get extErrRevoked => 'Sora командасы кеңейтүүнүн бул версиясын коопсуз эмес же бузук деп кайтарып алды.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Кайтарылган кеңейтүүлөрдүн тизмесин жаңыртуу мүмкүн болгон жок. Жаңыртылганча орнотуу бөгөттөлгөн: тармакты текшерип, кайра аракет кылыңыз.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Кайтарылган кеңейтүүлөр өчүрүлдү: $names';
+  }
 }

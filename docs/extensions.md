@@ -230,8 +230,8 @@ The rating methodology (Bayesian average, freshness decay, one vote per
 account) is specified separately; the catalog carries the finished
 `rating` / `ratings_count` / `installs` numbers. Revocation uses
 `revocations.json` + `.minisig` (same team key): see the abuse-handling
-spec. Until the team key ceremony, every team-signature check fails
-closed and the app shows an honest "catalog coming soon" state.
+spec. Both files live in `extensions/` of the repository and are signed
+with `sora-ext sign-file` (see extensions/README.md).
 
 ## 6. Trust notes
 
@@ -240,10 +240,12 @@ closed and the app shows an honest "catalog coming soon" state.
   "not from the catalog" warning.
 - Catalog packages are verified against the catalog-pinned author key, and
   the catalog itself against the team key.
-- The team key is a placeholder until the owner completes the key ceremony;
-  catalog checks fail closed until then.
-- Revocation: removing an entry from the catalog stops new installs; the app
-  can additionally blocklist ids (wave 4: OCSP-style revocation list).
+- The team key is compiled into the app and the core; a catalog or
+  revocation list that does not verify is refused.
+- Revocation: removing an entry from the catalog stops new installs, and the
+  signed revocation list disables matching installed versions and refuses
+  installing, updating, rolling back to or enabling them. An expired list
+  blocks new installs until a fresh one is fetched.
 
 ## 7. Background workers & net.fetch (runtime v2)
 
