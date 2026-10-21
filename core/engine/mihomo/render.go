@@ -95,6 +95,12 @@ func Render(p *engine.Plan, rt Runtime) (string, error) {
 	for _, g := range p.Groups {
 		byID[g.Name] = sanitizeName(g.Name, "")
 	}
+	if x := p.ExtensionProxy; x != nil {
+		// The listener's proxy overrides rule/global/direct mode upstream.
+		c.Listeners = append(c.Listeners, extensionListener{Name: engine.ExtensionInbound, Type: "socks",
+			Listen: "127.0.0.1", Port: x.Port, Proxy: byID[x.Target],
+			Users: []extensionUser{{Username: x.Username, Password: x.Password}}})
+	}
 
 	for _, g := range p.Groups {
 		grp, err := buildGroup(g, byID, orDefault(p.Options.TestURL, rt.TestURL))
@@ -119,7 +125,7 @@ func Render(p *engine.Plan, rt Runtime) (string, error) {
 	if p.Tun.Enabled {
 		// Top-level tun derives IPv4 from fake-ip-range. A named listener
 		// accepts an independent adapter subnet on Linux and Windows.
-		c.Listeners = []*tunConfig{buildTun(p.Tun, p.DNS)}
+		c.Listeners = append(c.Listeners, buildTun(p.Tun, p.DNS))
 	}
 
 	out, err := yaml.Marshal(&c) //nolint:gosec // the config carries the controller secret by design and is never written to disk

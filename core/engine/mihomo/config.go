@@ -60,11 +60,27 @@ type config struct {
 	GeoX               map[string]string        `yaml:"geox-url,omitempty"`
 	Profile            *profile                 `yaml:"profile,omitempty"`
 	DNS                *dnsConfig               `yaml:"dns,omitempty"`
-	Listeners          []*tunConfig             `yaml:"listeners,omitempty"`
+	Listeners          []any                    `yaml:"listeners,omitempty"`
 	Proxies            []proxy                  `yaml:"proxies,omitempty"`
 	ProxyGroups        []proxyGroup             `yaml:"proxy-groups,omitempty"`
 	ProxyProviders     map[string]proxyProvider `yaml:"proxy-providers,omitempty"`
 	Rules              []string                 `yaml:"rules,omitempty"`
+}
+
+// extensionListener uses its own users and proxy rather than the global
+// authentication and routing mode shared by ordinary application traffic.
+type extensionListener struct {
+	Name   string          `yaml:"name"`
+	Type   string          `yaml:"type"`
+	Listen string          `yaml:"listen"`
+	Port   int             `yaml:"port"`
+	Proxy  string          `yaml:"proxy"`
+	Users  []extensionUser `yaml:"users"`
+}
+
+type extensionUser struct {
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
 }
 
 // profile keeps user choices across restarts.

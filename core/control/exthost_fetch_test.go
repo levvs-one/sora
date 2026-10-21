@@ -2,9 +2,6 @@ package control_test
 
 import (
 	"context"
-	"fmt"
-	"io"
-	"net"
 	"net/http"
 	"testing"
 
@@ -18,8 +15,8 @@ import (
 )
 
 // extFetchServer builds a control plane wired like production: an
-// extension scheduler and a local-proxy port are configured.
-func extFetchServer(t *testing.T, proxyPort int) (*control.Server, *ext.Scheduler, *secret.Store) {
+// extension scheduler is configured.
+func extFetchServer(t *testing.T) (*control.Server, *ext.Scheduler, *secret.Store) {
 	t.Helper()
 	store, err := secret.Open(secretTestDir(t), secret.Options{Protector: secret.FileProtector{}})
 	if err != nil {
@@ -39,8 +36,7 @@ func extFetchServer(t *testing.T, proxyPort int) (*control.Server, *ext.Schedule
 			TunUp:   noAdapter,
 			Factory: func(context.Context, *engine.Plan) (engine.Engine, error) { return newStubEngine(), nil },
 		}),
-		ExtScheduler:   sched,
-		LocalProxyPort: proxyPort,
+		ExtScheduler: sched,
 	})
 	if err != nil {
 		t.Fatalf("control.New: %v", err)
@@ -52,7 +48,7 @@ func extFetchServer(t *testing.T, proxyPort int) (*control.Server, *ext.Schedule
 // control layer: no live session ⇒ the extension fetch transport refuses
 // the request with ext.netfetch.no-tunnel instead of dialing direct.
 func TestExtFetchTransportFailsClosedWithoutSession(t *testing.T) {
-	server, _, _ := extFetchServer(t, 7897)
+	server, _, _ := extFetchServer(t)
 	rt := server.ExtFetchTransport()("com.example.hello")
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://example.com/", nil)
 	if err != nil {
@@ -66,84 +62,60 @@ func TestExtFetchTransportFailsClosedWithoutSession(t *testing.T) {
 	}
 }
 
-// TestExtFetchTransportUsesLiveSessionProxy is the end-to-end property:
-// with a session up whose plan opens the local proxy (the application /
-// system-proxy mode - a TUN plan has no listener by default and fails
-// closed instead, see TestExtFetchTransportTunPlanFailsClosed), an
-// extension fetch is proxied through the tunnel listener on the
-// configured port - the origin sees the proxy's stamp, never a direct
-// connection.
-func TestExtFetchTransportUsesLiveSessionProxy(t *testing.T) {
-	origin := startStampedOrigin(t)
-	proxyPort := startFakeTunnelProxy(t)
-
-	server, _, store := extFetchServer(t, proxyPort)
-	ctx := context.Background()
-	plan := validPlan(t, store)
-	plan.TunnelMode = corev1.TunnelMode_TUNNEL_MODE_APPLICATION
-	connected, err := server.Connect(ctx, &corev1.ConnectRequest{
-		ApiVersion: clientVersion(), SessionPlan: plan, ControlAuthenticator: testToken,
-	})
-	if err != nil || connected.GetError() != nil {
-		t.Fatalf("Connect = %v, %v", connected.GetError(), err)
-	}
-	t.Cleanup(func() {
-		_, _ = server.Disconnect(ctx, &corev1.DisconnectRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken})
-	})
-
-	rt := server.ExtFetchTransport()("com.example.hello")
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, origin, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	resp, err := rt.RoundTrip(req)
-	if err != nil {
-		t.Fatalf("extension fetch through the tunnel: %v", err)
-	}
-	defer func() { _ = resp.Body.Close() }()
-	body, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK || string(body) != "via-tunnel" {
-		t.Fatalf("got %d %q: the request did not ride the tunnel proxy", resp.StatusCode, body)
-	}
-
-	// After disconnect the same transport fails closed again.
-	if _, err := server.Disconnect(ctx, &corev1.DisconnectRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken}); err != nil {
-		t.Fatalf("Disconnect: %v", err)
-	}
-	req2, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, origin, nil)
-	if resp, err := rt.RoundTrip(req2); err == nil {
-		_ = resp.Body.Close()
-		t.Fatal("extension fetch after Disconnect must fail closed")
+// A custom engine without the isolated inbound must never fall back to its
+// ordinary listener, whether the session uses TUN or system proxy mode.
+func TestExtFetchTransportFailsClosedWithoutEngineInbound(t *testing.T) {
+	for _, mode := range []corev1.TunnelMode{corev1.TunnelMode_TUNNEL_MODE_SYSTEM, corev1.TunnelMode_TUNNEL_MODE_APPLICATION} {
+		server, _, store := extFetchServer(t)
+		plan := validPlan(t, store)
+		plan.TunnelMode = mode
+		connected, err := server.Connect(t.Context(), &corev1.ConnectRequest{
+			ApiVersion: clientVersion(), SessionPlan: plan, ControlAuthenticator: testToken,
+		})
+		if err != nil || connected.GetError() != nil {
+			t.Fatalf("Connect: %v, %v", connected.GetError(), err)
+		}
+		rt := server.ExtFetchTransport()("com.example.hello")
+		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "https://example.com/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp, err := rt.RoundTrip(req); err == nil {
+			_ = resp.Body.Close()
+			t.Fatal("an engine without the isolated inbound permitted fetch")
+		} else if errs.KeyOf(err) != ext.KeyNetFetchNoTunnel {
+			t.Fatalf("wrong error: %v", err)
+		}
+		_, err = server.Disconnect(t.Context(), &corev1.DisconnectRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken})
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 
-// TestExtFetchTransportTunPlanFailsClosed pins the TUN-mode behavior: a
-// TUN session opens no local listener by default, so extension fetches
-// fail closed (ext.netfetch.no-tunnel) instead of dialing direct around
-// the tunnel. Riding the TUN itself is future work (it needs an
-// authenticated private listener the plan layer does not provide yet).
-func TestExtFetchTransportTunPlanFailsClosed(t *testing.T) {
-	server, _, store := extFetchServer(t, 7899)
-	ctx := context.Background()
-	connected, err := server.Connect(ctx, &corev1.ConnectRequest{
-		ApiVersion: clientVersion(), SessionPlan: validPlan(t, store), ControlAuthenticator: testToken,
-	})
+func TestExtFetchTransportFailsClosedInBypassMode(t *testing.T) {
+	server, _, store := extFetchServer(t)
+	plan := validPlan(t, store)
+	plan.TunnelMode = corev1.TunnelMode_TUNNEL_MODE_APPLICATION
+	plan.Outbounds = []*corev1.OutboundSpec{{Id: "bypass", Protocol: "bypass", Bypass: &corev1.BypassStrategy{SplitPos: []string{"1"}}}}
+	plan.Routes = []*corev1.RoutingRule{{Destination: "443", OutboundId: "bypass"}}
+	plan.Routing = &corev1.RoutingOptions{ProxyTarget: "bypass"}
+	connected, err := server.Connect(t.Context(), &corev1.ConnectRequest{ApiVersion: clientVersion(), SessionPlan: plan, ControlAuthenticator: testToken})
 	if err != nil || connected.GetError() != nil {
-		t.Fatalf("Connect = %v, %v", connected.GetError(), err)
+		t.Fatalf("Connect: %v, %v", connected.GetError(), err)
 	}
 	t.Cleanup(func() {
-		_, _ = server.Disconnect(ctx, &corev1.DisconnectRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken})
+		_, _ = server.Disconnect(context.Background(), &corev1.DisconnectRequest{ApiVersion: clientVersion(), ControlAuthenticator: testToken})
 	})
-	rt := server.ExtFetchTransport()("com.example.hello")
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "https://example.com/", nil)
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "https://example.com/", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp, err := rt.RoundTrip(req); err == nil {
+	if resp, err := server.ExtFetchTransport()("com.example.hello").RoundTrip(req); err == nil {
 		_ = resp.Body.Close()
-		t.Fatal("TUN-mode extension fetch succeeded: it must fail closed without a tunnel listener")
-	} else if k := errs.KeyOf(err); k != ext.KeyNetFetchNoTunnel {
-		t.Fatalf("error key = %q, want %q (%v)", k, ext.KeyNetFetchNoTunnel, err)
+		t.Fatal("bypass mode permitted fetch")
+	} else if errs.KeyOf(err) != ext.KeyNetFetchNoTunnel {
+		t.Fatalf("wrong error: %v", err)
 	}
 }
 
@@ -151,7 +123,7 @@ func TestExtFetchTransportTunPlanFailsClosed(t *testing.T) {
 // the session's kill switch pauses background extension work; disarming
 // resumes it.
 func TestExtKillSwitchSyncsToScheduler(t *testing.T) {
-	server, sched, store := extFetchServer(t, 7898)
+	server, sched, store := extFetchServer(t)
 	ctx := context.Background()
 	connected, err := server.Connect(ctx, &corev1.ConnectRequest{
 		ApiVersion: clientVersion(), SessionPlan: validPlan(t, store), ControlAuthenticator: testToken,
@@ -183,61 +155,4 @@ func TestExtKillSwitchSyncsToScheduler(t *testing.T) {
 	if sched.Paused() {
 		t.Fatal("disarming the kill switch must resume background extension work")
 	}
-}
-
-// startStampedOrigin serves "via-tunnel" only to requests stamped by the
-// fake tunnel proxy; a direct request gets a teapot.
-func startStampedOrigin(t *testing.T) string {
-	t.Helper()
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-Via-Tunnel-Test") != "yes" {
-			http.Error(w, "direct", http.StatusTeapot)
-			return
-		}
-		_, _ = fmt.Fprint(w, "via-tunnel")
-	})
-	ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	srv := &http.Server{Handler: mux}
-	go func() { _ = srv.Serve(ln) }()
-	t.Cleanup(func() { _ = srv.Close() })
-	return "http://" + ln.Addr().String()
-}
-
-// startFakeTunnelProxy serves a minimal forward proxy on a free loopback
-// port and returns the port: it forwards absolute-URI requests and stamps
-// them X-Via-Tunnel-Test.
-func startFakeTunnelProxy(t *testing.T) int {
-	t.Helper()
-	ln, err := (&net.ListenConfig{}).Listen(context.Background(), "tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	port := ln.Addr().(*net.TCPAddr).Port
-	srv := &http.Server{Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !r.URL.IsAbs() {
-			http.Error(w, "proxy needs an absolute URI", http.StatusBadRequest)
-			return
-		}
-		out, err := http.NewRequestWithContext(context.Background(), r.Method, r.URL.String(), nil)
-		if err != nil {
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
-		out.Header.Set("X-Via-Tunnel-Test", "yes")
-		resp, err := http.DefaultTransport.RoundTrip(out)
-		if err != nil {
-			http.Error(w, "forward failed", http.StatusBadGateway)
-			return
-		}
-		defer func() { _ = resp.Body.Close() }()
-		w.WriteHeader(resp.StatusCode)
-		_, _ = io.Copy(w, resp.Body)
-	})}
-	go func() { _ = srv.Serve(ln) }()
-	t.Cleanup(func() { _ = srv.Close() })
-	return port
 }

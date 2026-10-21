@@ -43,6 +43,7 @@ const (
 	FeatureAmneziaWG      Feature = "amneziawg"
 	FeatureChains         Feature = "chains"
 	FeaturePrivateControl Feature = "private-control"
+	FeatureExtensionProxy Feature = "extension-proxy"
 )
 
 // Capabilities describes the protocols and features supported by an engine

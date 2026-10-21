@@ -24,6 +24,9 @@ func (p *Plan) Secrets() []string {
 	if len(p.LocalProxy.Password) >= 4 {
 		out = append(out, p.LocalProxy.Password)
 	}
+	if x := p.ExtensionProxy; x != nil {
+		out = append(out, x.Username, x.Password)
+	}
 	return out
 }
 
@@ -218,6 +221,15 @@ func (p *Plan) Validate() error {
 	}
 	if strings.ContainsAny(p.LocalProxy.Username, ":@ \r\n") {
 		errs = append(errs, errors.New("plan: the local proxy username contains a separator"))
+	}
+	if x := p.ExtensionProxy; x != nil {
+		if x.Port < 1024 || x.Port > 65535 || len(x.Username) < 16 || len(x.Username) > 255 ||
+			len(x.Password) < 32 || len(x.Password) > 255 || strings.ContainsAny(x.Username+x.Password, ":@ \r\n") {
+			errs = append(errs, errors.New("plan: the extension proxy needs a private port and a strong login"))
+		}
+		if !p.IsVPNTarget(x.Target) {
+			errs = append(errs, errors.New("plan: the extension proxy target must use only VPN outbounds"))
+		}
 	}
 	names := make(map[string]struct{}, len(p.Groups))
 	for _, g := range p.Groups {

@@ -359,10 +359,31 @@ Host-side enforcement (`core/ext/netfetch.go`):
   trail for extension network activity.
 - transport: the HTTP transport is injected by the host
   (`NewFetcherForExtensionWithTransport`, wired via
-  `Scheduler.SetFetchTransport`). Production must pass a transport bound
-  to the core's tunnel (local proxy), so extension traffic follows the
-  VPN and never leaks direct; a nil transport dials direct and is only
-  for tests/dev.
+  `Scheduler.SetFetchTransport`). Production uses a separate authenticated
+  SOCKS inbound on `127.0.0.1`, with a random free port and a fresh random
+  username/password for each session. It is independent of the ordinary
+  mixed listener and works in both TUN and system proxy mode. Credentials
+  remain inside the core and engine configuration, never in worker messages.
+  sing-box and Xray route this inbound to the selected VPN outbound, group
+  or chain exit before sniffing, DNS interception and all user/extension
+  rules. mihomo pins the listener's `proxy` to that target, overriding
+  rule/global/direct mode. Direct, regional and block rules therefore do
+  not affect extension fetches.
+- DNS: the core resolves destination names using DNS over TCP to
+  `1.1.1.1:53` through the same authenticated inbound and VPN target.
+  It then sends destination IPs through that inbound, retaining the original
+  HTTPS hostname for TLS SNI/certificate verification and HTTP Host.
+  Session DNS policy, engine DNS interception and the OS resolver do not
+  resolve these destination names. Proxy server hostname bootstrap remains
+  an engine responsibility. A failed DNS or VPN connection has no direct
+  or system-resolver fallback.
+- availability: every request looks up the connected session and a running
+  engine with this inbound. No session, reconnecting/recovering engines,
+  direct/serverless bypass selections and unsupported inbounds fail closed
+  with `ext.netfetch.no-tunnel` (`not-connected` in worker JS). Groups must
+  contain only VPN paths, including nested members and chain hops; mixed
+  direct/VPN groups and opaque provider Xray profiles fail closed too.
+  A nil transport dials direct and is only for tests/dev.
 - diagnostics: per-extension counters are available through `Fetcher.Stats()`;
   request decisions and byte counts are visible in the extension log.
 
