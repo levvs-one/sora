@@ -14,8 +14,7 @@ import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
-import 'package:protobuf/well_known_types/google/protobuf/timestamp.pb.dart'
-    as $1;
+import 'package:protobuf/well_known_types/google/protobuf/timestamp.pb.dart' as $1;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
@@ -41,12 +40,10 @@ class MintTokenRequest extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       MintTokenRequest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'MintTokenRequest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MintTokenRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: MintTokenRequest.$_createMessage)
-    ..a<$core.List<$core.int>>(
-        1, _omitFieldNames ? '' : 'controlToken', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(1, _omitFieldNames ? '' : 'controlToken', $pb.PbFieldType.OY)
     ..aOS(2, _omitFieldNames ? '' : 'extensionId')
     ..pPS(3, _omitFieldNames ? '' : 'permissions')
     ..hasRequiredFields = false;
@@ -55,8 +52,7 @@ class MintTokenRequest extends $pb.GeneratedMessage {
   MintTokenRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   MintTokenRequest copyWith(void Function(MintTokenRequest) updates) =>
-      super.copyWith((message) => updates(message as MintTokenRequest))
-          as MintTokenRequest;
+      super.copyWith((message) => updates(message as MintTokenRequest)) as MintTokenRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -69,8 +65,7 @@ class MintTokenRequest extends $pb.GeneratedMessage {
   MintTokenRequest createEmptyInstance() => MintTokenRequest._();
   @$core.pragma('dart2js:noInline')
   static MintTokenRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MintTokenRequest>(
-          MintTokenRequest.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MintTokenRequest>(MintTokenRequest.$_createMessage);
   static MintTokenRequest? _defaultInstance;
 
   /// The core control token. Proves the caller is the trusted app.
@@ -117,20 +112,17 @@ class MintTokenResponse extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       MintTokenResponse()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'MintTokenResponse',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MintTokenResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: MintTokenResponse.$_createMessage)
-    ..a<$core.List<$core.int>>(
-        1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   MintTokenResponse clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   MintTokenResponse copyWith(void Function(MintTokenResponse) updates) =>
-      super.copyWith((message) => updates(message as MintTokenResponse))
-          as MintTokenResponse;
+      super.copyWith((message) => updates(message as MintTokenResponse)) as MintTokenResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -143,8 +135,7 @@ class MintTokenResponse extends $pb.GeneratedMessage {
   MintTokenResponse createEmptyInstance() => MintTokenResponse._();
   @$core.pragma('dart2js:noInline')
   static MintTokenResponse getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MintTokenResponse>(
-          MintTokenResponse.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MintTokenResponse>(MintTokenResponse.$_createMessage);
   static MintTokenResponse? _defaultInstance;
 
   /// Opaque 32-byte token. Pass it as extension_token on every other call.
@@ -178,22 +169,18 @@ class RevokeTokenRequest extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       RevokeTokenRequest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'RevokeTokenRequest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RevokeTokenRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: RevokeTokenRequest.$_createMessage)
-    ..a<$core.List<$core.int>>(
-        1, _omitFieldNames ? '' : 'controlToken', $pb.PbFieldType.OY)
-    ..a<$core.List<$core.int>>(
-        2, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(1, _omitFieldNames ? '' : 'controlToken', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   RevokeTokenRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   RevokeTokenRequest copyWith(void Function(RevokeTokenRequest) updates) =>
-      super.copyWith((message) => updates(message as RevokeTokenRequest))
-          as RevokeTokenRequest;
+      super.copyWith((message) => updates(message as RevokeTokenRequest)) as RevokeTokenRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -205,9 +192,8 @@ class RevokeTokenRequest extends $pb.GeneratedMessage {
   @$core.override
   RevokeTokenRequest createEmptyInstance() => RevokeTokenRequest._();
   @$core.pragma('dart2js:noInline')
-  static RevokeTokenRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RevokeTokenRequest>(
-          RevokeTokenRequest.$_createMessage);
+  static RevokeTokenRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RevokeTokenRequest>(RevokeTokenRequest.$_createMessage);
   static RevokeTokenRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -241,8 +227,7 @@ class RevokeTokenResponse extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       RevokeTokenResponse()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'RevokeTokenResponse',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RevokeTokenResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: RevokeTokenResponse.$_createMessage)
     ..hasRequiredFields = false;
@@ -251,23 +236,20 @@ class RevokeTokenResponse extends $pb.GeneratedMessage {
   RevokeTokenResponse clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   RevokeTokenResponse copyWith(void Function(RevokeTokenResponse) updates) =>
-      super.copyWith((message) => updates(message as RevokeTokenResponse))
-          as RevokeTokenResponse;
+      super.copyWith((message) => updates(message as RevokeTokenResponse)) as RevokeTokenResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core
-      .Deprecated('Use RevokeTokenResponse() / RevokeTokenResponse.new instead')
+  @$core.Deprecated('Use RevokeTokenResponse() / RevokeTokenResponse.new instead')
   static RevokeTokenResponse create() => RevokeTokenResponse._();
   static $pb.GeneratedMessage $_createMessage() => RevokeTokenResponse._();
   @$core.override
   RevokeTokenResponse createEmptyInstance() => RevokeTokenResponse._();
   @$core.pragma('dart2js:noInline')
-  static RevokeTokenResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RevokeTokenResponse>(
-          RevokeTokenResponse.$_createMessage);
+  static RevokeTokenResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RevokeTokenResponse>(RevokeTokenResponse.$_createMessage);
   static RevokeTokenResponse? _defaultInstance;
 }
 
@@ -289,36 +271,30 @@ class GetConnectionsRequest extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       GetConnectionsRequest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'GetConnectionsRequest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetConnectionsRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: GetConnectionsRequest.$_createMessage)
-    ..a<$core.List<$core.int>>(
-        1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   GetConnectionsRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  GetConnectionsRequest copyWith(
-          void Function(GetConnectionsRequest) updates) =>
-      super.copyWith((message) => updates(message as GetConnectionsRequest))
-          as GetConnectionsRequest;
+  GetConnectionsRequest copyWith(void Function(GetConnectionsRequest) updates) =>
+      super.copyWith((message) => updates(message as GetConnectionsRequest)) as GetConnectionsRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use GetConnectionsRequest() / GetConnectionsRequest.new instead')
+  @$core.Deprecated('Use GetConnectionsRequest() / GetConnectionsRequest.new instead')
   static GetConnectionsRequest create() => GetConnectionsRequest._();
   static $pb.GeneratedMessage $_createMessage() => GetConnectionsRequest._();
   @$core.override
   GetConnectionsRequest createEmptyInstance() => GetConnectionsRequest._();
   @$core.pragma('dart2js:noInline')
   static GetConnectionsRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<GetConnectionsRequest>(
-          GetConnectionsRequest.$_createMessage);
+      $pb.GeneratedMessage.$_defaultFor<GetConnectionsRequest>(GetConnectionsRequest.$_createMessage);
   static GetConnectionsRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -357,41 +333,34 @@ class ExtensionConnection extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       ExtensionConnection()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'ExtensionConnection',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExtensionConnection',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: ExtensionConnection.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'process')
     ..aOS(3, _omitFieldNames ? '' : 'host')
-    ..a<$fixnum.Int64>(4, _omitFieldNames ? '' : 'upBytes', $pb.PbFieldType.OU6,
-        defaultOrMaker: $fixnum.Int64.ZERO)
-    ..a<$fixnum.Int64>(
-        5, _omitFieldNames ? '' : 'downBytes', $pb.PbFieldType.OU6,
-        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(4, _omitFieldNames ? '' : 'upBytes', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(5, _omitFieldNames ? '' : 'downBytes', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ExtensionConnection clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ExtensionConnection copyWith(void Function(ExtensionConnection) updates) =>
-      super.copyWith((message) => updates(message as ExtensionConnection))
-          as ExtensionConnection;
+      super.copyWith((message) => updates(message as ExtensionConnection)) as ExtensionConnection;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core
-      .Deprecated('Use ExtensionConnection() / ExtensionConnection.new instead')
+  @$core.Deprecated('Use ExtensionConnection() / ExtensionConnection.new instead')
   static ExtensionConnection create() => ExtensionConnection._();
   static $pb.GeneratedMessage $_createMessage() => ExtensionConnection._();
   @$core.override
   ExtensionConnection createEmptyInstance() => ExtensionConnection._();
   @$core.pragma('dart2js:noInline')
-  static ExtensionConnection getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ExtensionConnection>(
-          ExtensionConnection.$_createMessage);
+  static ExtensionConnection getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ExtensionConnection>(ExtensionConnection.$_createMessage);
   static ExtensionConnection? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -459,36 +428,30 @@ class GetConnectionsResponse extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       GetConnectionsResponse()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'GetConnectionsResponse',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetConnectionsResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: GetConnectionsResponse.$_createMessage)
-    ..pPM<ExtensionConnection>(1, _omitFieldNames ? '' : 'connections',
-        subBuilder: ExtensionConnection.$_createMessage)
+    ..pPM<ExtensionConnection>(1, _omitFieldNames ? '' : 'connections', subBuilder: ExtensionConnection.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   GetConnectionsResponse clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  GetConnectionsResponse copyWith(
-          void Function(GetConnectionsResponse) updates) =>
-      super.copyWith((message) => updates(message as GetConnectionsResponse))
-          as GetConnectionsResponse;
+  GetConnectionsResponse copyWith(void Function(GetConnectionsResponse) updates) =>
+      super.copyWith((message) => updates(message as GetConnectionsResponse)) as GetConnectionsResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use GetConnectionsResponse() / GetConnectionsResponse.new instead')
+  @$core.Deprecated('Use GetConnectionsResponse() / GetConnectionsResponse.new instead')
   static GetConnectionsResponse create() => GetConnectionsResponse._();
   static $pb.GeneratedMessage $_createMessage() => GetConnectionsResponse._();
   @$core.override
   GetConnectionsResponse createEmptyInstance() => GetConnectionsResponse._();
   @$core.pragma('dart2js:noInline')
   static GetConnectionsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<GetConnectionsResponse>(
-          GetConnectionsResponse.$_createMessage);
+      $pb.GeneratedMessage.$_defaultFor<GetConnectionsResponse>(GetConnectionsResponse.$_createMessage);
   static GetConnectionsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -513,20 +476,17 @@ class GetServersRequest extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       GetServersRequest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'GetServersRequest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetServersRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: GetServersRequest.$_createMessage)
-    ..a<$core.List<$core.int>>(
-        1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   GetServersRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   GetServersRequest copyWith(void Function(GetServersRequest) updates) =>
-      super.copyWith((message) => updates(message as GetServersRequest))
-          as GetServersRequest;
+      super.copyWith((message) => updates(message as GetServersRequest)) as GetServersRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -539,8 +499,7 @@ class GetServersRequest extends $pb.GeneratedMessage {
   GetServersRequest createEmptyInstance() => GetServersRequest._();
   @$core.pragma('dart2js:noInline')
   static GetServersRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetServersRequest>(
-          GetServersRequest.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetServersRequest>(GetServersRequest.$_createMessage);
   static GetServersRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -573,12 +532,10 @@ class ExtensionServer extends $pb.GeneratedMessage {
   factory ExtensionServer.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       ExtensionServer()..mergeFromBuffer(data, registry);
-  factory ExtensionServer.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+  factory ExtensionServer.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       ExtensionServer()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'ExtensionServer',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExtensionServer',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: ExtensionServer.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
@@ -591,8 +548,7 @@ class ExtensionServer extends $pb.GeneratedMessage {
   ExtensionServer clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ExtensionServer copyWith(void Function(ExtensionServer) updates) =>
-      super.copyWith((message) => updates(message as ExtensionServer))
-          as ExtensionServer;
+      super.copyWith((message) => updates(message as ExtensionServer)) as ExtensionServer;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -605,8 +561,7 @@ class ExtensionServer extends $pb.GeneratedMessage {
   ExtensionServer createEmptyInstance() => ExtensionServer._();
   @$core.pragma('dart2js:noInline')
   static ExtensionServer getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ExtensionServer>(
-          ExtensionServer.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ExtensionServer>(ExtensionServer.$_createMessage);
   static ExtensionServer? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -665,20 +620,17 @@ class GetServersResponse extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       GetServersResponse()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'GetServersResponse',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetServersResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: GetServersResponse.$_createMessage)
-    ..pPM<ExtensionServer>(1, _omitFieldNames ? '' : 'servers',
-        subBuilder: ExtensionServer.$_createMessage)
+    ..pPM<ExtensionServer>(1, _omitFieldNames ? '' : 'servers', subBuilder: ExtensionServer.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   GetServersResponse clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   GetServersResponse copyWith(void Function(GetServersResponse) updates) =>
-      super.copyWith((message) => updates(message as GetServersResponse))
-          as GetServersResponse;
+      super.copyWith((message) => updates(message as GetServersResponse)) as GetServersResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -690,9 +642,8 @@ class GetServersResponse extends $pb.GeneratedMessage {
   @$core.override
   GetServersResponse createEmptyInstance() => GetServersResponse._();
   @$core.pragma('dart2js:noInline')
-  static GetServersResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<GetServersResponse>(
-          GetServersResponse.$_createMessage);
+  static GetServersResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetServersResponse>(GetServersResponse.$_createMessage);
   static GetServersResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -717,16 +668,13 @@ class NotifyRequest extends $pb.GeneratedMessage {
   factory NotifyRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       NotifyRequest()..mergeFromBuffer(data, registry);
-  factory NotifyRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+  factory NotifyRequest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       NotifyRequest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'NotifyRequest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'NotifyRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: NotifyRequest.$_createMessage)
-    ..a<$core.List<$core.int>>(
-        1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
     ..aOS(2, _omitFieldNames ? '' : 'title')
     ..aOS(3, _omitFieldNames ? '' : 'body')
     ..hasRequiredFields = false;
@@ -735,8 +683,7 @@ class NotifyRequest extends $pb.GeneratedMessage {
   NotifyRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   NotifyRequest copyWith(void Function(NotifyRequest) updates) =>
-      super.copyWith((message) => updates(message as NotifyRequest))
-          as NotifyRequest;
+      super.copyWith((message) => updates(message as NotifyRequest)) as NotifyRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -749,8 +696,7 @@ class NotifyRequest extends $pb.GeneratedMessage {
   NotifyRequest createEmptyInstance() => NotifyRequest._();
   @$core.pragma('dart2js:noInline')
   static NotifyRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NotifyRequest>(
-          NotifyRequest.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NotifyRequest>(NotifyRequest.$_createMessage);
   static NotifyRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -789,12 +735,10 @@ class NotifyResponse extends $pb.GeneratedMessage {
   factory NotifyResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       NotifyResponse()..mergeFromBuffer(data, registry);
-  factory NotifyResponse.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+  factory NotifyResponse.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       NotifyResponse()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'NotifyResponse',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'NotifyResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: NotifyResponse.$_createMessage)
     ..hasRequiredFields = false;
@@ -803,8 +747,7 @@ class NotifyResponse extends $pb.GeneratedMessage {
   NotifyResponse clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   NotifyResponse copyWith(void Function(NotifyResponse) updates) =>
-      super.copyWith((message) => updates(message as NotifyResponse))
-          as NotifyResponse;
+      super.copyWith((message) => updates(message as NotifyResponse)) as NotifyResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -817,8 +760,7 @@ class NotifyResponse extends $pb.GeneratedMessage {
   NotifyResponse createEmptyInstance() => NotifyResponse._();
   @$core.pragma('dart2js:noInline')
   static NotifyResponse getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NotifyResponse>(
-          NotifyResponse.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NotifyResponse>(NotifyResponse.$_createMessage);
   static NotifyResponse? _defaultInstance;
 }
 
@@ -840,40 +782,30 @@ class WatchExtensionEventsRequest extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       WatchExtensionEventsRequest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'WatchExtensionEventsRequest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'WatchExtensionEventsRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: WatchExtensionEventsRequest.$_createMessage)
-    ..a<$core.List<$core.int>>(
-        1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(1, _omitFieldNames ? '' : 'extensionToken', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   WatchExtensionEventsRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  WatchExtensionEventsRequest copyWith(
-          void Function(WatchExtensionEventsRequest) updates) =>
-      super.copyWith(
-              (message) => updates(message as WatchExtensionEventsRequest))
-          as WatchExtensionEventsRequest;
+  WatchExtensionEventsRequest copyWith(void Function(WatchExtensionEventsRequest) updates) =>
+      super.copyWith((message) => updates(message as WatchExtensionEventsRequest)) as WatchExtensionEventsRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use WatchExtensionEventsRequest() / WatchExtensionEventsRequest.new instead')
-  static WatchExtensionEventsRequest create() =>
-      WatchExtensionEventsRequest._();
-  static $pb.GeneratedMessage $_createMessage() =>
-      WatchExtensionEventsRequest._();
+  @$core.Deprecated('Use WatchExtensionEventsRequest() / WatchExtensionEventsRequest.new instead')
+  static WatchExtensionEventsRequest create() => WatchExtensionEventsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => WatchExtensionEventsRequest._();
   @$core.override
-  WatchExtensionEventsRequest createEmptyInstance() =>
-      WatchExtensionEventsRequest._();
+  WatchExtensionEventsRequest createEmptyInstance() => WatchExtensionEventsRequest._();
   @$core.pragma('dart2js:noInline')
   static WatchExtensionEventsRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WatchExtensionEventsRequest>(
-          WatchExtensionEventsRequest.$_createMessage);
+      $pb.GeneratedMessage.$_defaultFor<WatchExtensionEventsRequest>(WatchExtensionEventsRequest.$_createMessage);
   static WatchExtensionEventsRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -904,26 +836,22 @@ class ExtensionEvent extends $pb.GeneratedMessage {
   factory ExtensionEvent.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       ExtensionEvent()..mergeFromBuffer(data, registry);
-  factory ExtensionEvent.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+  factory ExtensionEvent.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       ExtensionEvent()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'ExtensionEvent',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExtensionEvent',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.ext.v1'),
       createEmptyInstance: ExtensionEvent.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'kind')
     ..aOS(2, _omitFieldNames ? '' : 'detail')
-    ..aOM<$1.Timestamp>(3, _omitFieldNames ? '' : 'at',
-        subBuilder: $1.Timestamp.$_createMessage)
+    ..aOM<$1.Timestamp>(3, _omitFieldNames ? '' : 'at', subBuilder: $1.Timestamp.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ExtensionEvent clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ExtensionEvent copyWith(void Function(ExtensionEvent) updates) =>
-      super.copyWith((message) => updates(message as ExtensionEvent))
-          as ExtensionEvent;
+      super.copyWith((message) => updates(message as ExtensionEvent)) as ExtensionEvent;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -936,8 +864,7 @@ class ExtensionEvent extends $pb.GeneratedMessage {
   ExtensionEvent createEmptyInstance() => ExtensionEvent._();
   @$core.pragma('dart2js:noInline')
   static ExtensionEvent getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ExtensionEvent>(
-          ExtensionEvent.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ExtensionEvent>(ExtensionEvent.$_createMessage);
   static ExtensionEvent? _defaultInstance;
 
   /// One of "session.connected", "session.disconnected", "network.changed",
@@ -972,7 +899,5 @@ class ExtensionEvent extends $pb.GeneratedMessage {
   $1.Timestamp ensureAt() => $_ensure(2);
 }
 
-const $core.bool _omitFieldNames =
-    $core.bool.fromEnvironment('protobuf.omit_field_names');
-const $core.bool _omitMessageNames =
-    $core.bool.fromEnvironment('protobuf.omit_message_names');
+const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
+const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

@@ -503,7 +503,10 @@ class Sora extends ChangeNotifier {
     final chain = _activeChain;
     final hops = chain == null
         ? const <String>[]
-        : [for (final id in chain.hops) if (servers.any((o) => o.id == id)) id];
+        : [
+            for (final id in chain.hops)
+              if (servers.any((o) => o.id == id)) id,
+          ];
     return buildPlan(
       servers: servers,
       choice: selected,
@@ -595,10 +598,7 @@ class Sora extends ChangeNotifier {
           // transport below instead of stalling on the banner; the offer
           // still stands, because the gate below requires _pendingRestore to
           // be null before any auto-connect.
-          while (_pendingRestore != null &&
-              !_disposed &&
-              phase == Phase.off &&
-              !dropped.isCompleted) {
+          while (_pendingRestore != null && !_disposed && phase == Phase.off && !dropped.isCompleted) {
             await Future<void>.delayed(const Duration(milliseconds: 200));
           }
           if (phase == Phase.off && _pendingRestore == null && !_restoreDeclined) {
@@ -802,7 +802,9 @@ class Sora extends ChangeNotifier {
         if (_watchFailures == 1) {
           // First break in the streak: show the recovery attempt instead of
           // retrying silently.
-          unawaited(recordNotification(AppNotification(time: DateTime.now(), title: strings.coreRestoringLink, body: '')));
+          unawaited(
+            recordNotification(AppNotification(time: DateTime.now(), title: strings.coreRestoringLink, body: '')),
+          );
         }
         if (_watchFailures >= _maxWatchFailures) {
           // Stop auto-recovery and surface a visible error with a repair
@@ -891,9 +893,7 @@ class Sora extends ChangeNotifier {
       final decoded = jsonDecode(raw);
       if (decoded is Map<String, dynamic> && decoded['server'] is String) {
         final at = decoded['at'];
-        final age = at is int
-            ? DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(at))
-            : Duration.zero;
+        final age = at is int ? DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(at)) : Duration.zero;
         if (age > _sessionIntentTtl) {
           // Too old to be a session worth restoring: drop it instead of
           // offering to resurrect a choice the user made days ago.
@@ -1116,7 +1116,10 @@ class Sora extends ChangeNotifier {
     }
     final error = ChainsStore.validateHops(chain.hops);
     if (error != null) throw CoreFailure(error);
-    final missing = [for (final id in chain.hops) if (!servers.any((o) => o.id == id)) id];
+    final missing = [
+      for (final id in chain.hops)
+        if (!servers.any((o) => o.id == id)) id,
+    ];
     if (missing.isNotEmpty) {
       throw const CoreFailure('chainHopMissing');
     }
@@ -1170,7 +1173,8 @@ class Sora extends ChangeNotifier {
     // on firstWhere.
     final keepChain = via ?? _activeChain;
     if (keepChain != null) {
-      final broken = ChainsStore.validateHops(keepChain.hops) != null ||
+      final broken =
+          ChainsStore.validateHops(keepChain.hops) != null ||
           keepChain.hops.any((id) => !servers.any((o) => o.id == id));
       if (broken) {
         failure = const CoreFailure('chainHopMissing');
@@ -1616,8 +1620,7 @@ class Sora extends ChangeNotifier {
       final plain = id.startsWith(customServerPrefix) ? id.substring(customServerPrefix.length) : id;
       final key = '$customServerPrefix$plain';
       final answer = await link.custom.testCustomServer(
-        TestCustomServerRequest(
-            apiVersion: apiVersion, controlAuthenticator: link.token, id: plain, timeoutMs: 5000),
+        TestCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, id: plain, timeoutMs: 5000),
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
       final ms = answer.latencyMs.toInt();
@@ -1752,7 +1755,10 @@ class Sora extends ChangeNotifier {
     if (spec == null || isProfile(spec)) return;
     final now = DateTime.now();
     if (_lastAutoSwitch != null && now.difference(_lastAutoSwitch!) < autoSwitchCooldown) return;
-    final candidates = [for (final o in servers) if (!isProfile(o) && o.id != current) o];
+    final candidates = [
+      for (final o in servers)
+        if (!isProfile(o) && o.id != current) o,
+    ];
     if (candidates.isEmpty) return;
     final best = _fastest(
       candidates,
@@ -1964,19 +1970,16 @@ class Sora extends ChangeNotifier {
   /// behind the choice. Null when there is nothing to rank or nothing
   /// measured yet — the UI shows no "why" badge then.
   ({String id, int? ms, int? bps})? smartPick() {
-    final ordinary = [for (final o in servers) if (!isProfile(o)) o];
+    final ordinary = [
+      for (final o in servers)
+        if (!isProfile(o)) o,
+    ];
     if (ordinary.isEmpty) return null;
     final anyMeasured = ordinary.any(
       (o) => latency.containsKey(o.id) || bandwidth.containsKey(o.id) || probeStats.containsKey(o.id),
     );
     if (!anyMeasured) return null;
-    final best = _fastest(
-      ordinary,
-      latency,
-      bandwidth: bandwidth,
-      autoSelect: 'smart',
-      reliabilityOf: reliabilityOf,
-    );
+    final best = _fastest(ordinary, latency, bandwidth: bandwidth, autoSelect: 'smart', reliabilityOf: reliabilityOf);
     return (id: best.id, ms: latency[best.id], bps: freshBandwidth(best.id));
   }
 

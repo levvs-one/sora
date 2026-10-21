@@ -81,23 +81,19 @@ class CustomServersClient extends $grpc.Client {
 
   // method descriptors
 
-  static final _$saveCustomServer = $grpc.ClientMethod<
-          $0.SaveCustomServerRequest, $0.SaveCustomServerResponse>(
+  static final _$saveCustomServer = $grpc.ClientMethod<$0.SaveCustomServerRequest, $0.SaveCustomServerResponse>(
       '/sora.custom.v1.CustomServers/SaveCustomServer',
       ($0.SaveCustomServerRequest value) => value.writeToBuffer(),
       $0.SaveCustomServerResponse.fromBuffer);
-  static final _$listCustomServers = $grpc.ClientMethod<
-          $0.ListCustomServersRequest, $0.ListCustomServersResponse>(
+  static final _$listCustomServers = $grpc.ClientMethod<$0.ListCustomServersRequest, $0.ListCustomServersResponse>(
       '/sora.custom.v1.CustomServers/ListCustomServers',
       ($0.ListCustomServersRequest value) => value.writeToBuffer(),
       $0.ListCustomServersResponse.fromBuffer);
-  static final _$deleteCustomServer = $grpc.ClientMethod<
-          $0.DeleteCustomServerRequest, $0.DeleteCustomServerResponse>(
+  static final _$deleteCustomServer = $grpc.ClientMethod<$0.DeleteCustomServerRequest, $0.DeleteCustomServerResponse>(
       '/sora.custom.v1.CustomServers/DeleteCustomServer',
       ($0.DeleteCustomServerRequest value) => value.writeToBuffer(),
       $0.DeleteCustomServerResponse.fromBuffer);
-  static final _$testCustomServer = $grpc.ClientMethod<
-          $0.TestCustomServerRequest, $0.TestCustomServerResponse>(
+  static final _$testCustomServer = $grpc.ClientMethod<$0.TestCustomServerRequest, $0.TestCustomServerResponse>(
       '/sora.custom.v1.CustomServers/TestCustomServer',
       ($0.TestCustomServerRequest value) => value.writeToBuffer(),
       $0.TestCustomServerResponse.fromBuffer);
@@ -108,47 +104,38 @@ abstract class CustomServersServiceBase extends $grpc.Service {
   $core.String get $name => 'sora.custom.v1.CustomServers';
 
   CustomServersServiceBase() {
-    $addMethod($grpc.ServiceMethod<$0.SaveCustomServerRequest,
-            $0.SaveCustomServerResponse>(
+    $addMethod($grpc.ServiceMethod<$0.SaveCustomServerRequest, $0.SaveCustomServerResponse>(
         'SaveCustomServer',
         saveCustomServer_Pre,
         false,
         false,
-        ($core.List<$core.int> value) =>
-            $0.SaveCustomServerRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.SaveCustomServerRequest.fromBuffer(value),
         ($0.SaveCustomServerResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.ListCustomServersRequest,
-            $0.ListCustomServersResponse>(
+    $addMethod($grpc.ServiceMethod<$0.ListCustomServersRequest, $0.ListCustomServersResponse>(
         'ListCustomServers',
         listCustomServers_Pre,
         false,
         false,
-        ($core.List<$core.int> value) =>
-            $0.ListCustomServersRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.ListCustomServersRequest.fromBuffer(value),
         ($0.ListCustomServersResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.DeleteCustomServerRequest,
-            $0.DeleteCustomServerResponse>(
+    $addMethod($grpc.ServiceMethod<$0.DeleteCustomServerRequest, $0.DeleteCustomServerResponse>(
         'DeleteCustomServer',
         deleteCustomServer_Pre,
         false,
         false,
-        ($core.List<$core.int> value) =>
-            $0.DeleteCustomServerRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.DeleteCustomServerRequest.fromBuffer(value),
         ($0.DeleteCustomServerResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.TestCustomServerRequest,
-            $0.TestCustomServerResponse>(
+    $addMethod($grpc.ServiceMethod<$0.TestCustomServerRequest, $0.TestCustomServerResponse>(
         'TestCustomServer',
         testCustomServer_Pre,
         false,
         false,
-        ($core.List<$core.int> value) =>
-            $0.TestCustomServerRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.TestCustomServerRequest.fromBuffer(value),
         ($0.TestCustomServerResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.SaveCustomServerResponse> saveCustomServer_Pre(
-      $grpc.ServiceCall $call,
-      $async.Future<$0.SaveCustomServerRequest> $request) async {
+      $grpc.ServiceCall $call, $async.Future<$0.SaveCustomServerRequest> $request) async {
     return saveCustomServer($call, await $request);
   }
 
@@ -156,8 +143,7 @@ abstract class CustomServersServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $0.SaveCustomServerRequest request);
 
   $async.Future<$0.ListCustomServersResponse> listCustomServers_Pre(
-      $grpc.ServiceCall $call,
-      $async.Future<$0.ListCustomServersRequest> $request) async {
+      $grpc.ServiceCall $call, $async.Future<$0.ListCustomServersRequest> $request) async {
     return listCustomServers($call, await $request);
   }
 
@@ -165,8 +151,7 @@ abstract class CustomServersServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $0.ListCustomServersRequest request);
 
   $async.Future<$0.DeleteCustomServerResponse> deleteCustomServer_Pre(
-      $grpc.ServiceCall $call,
-      $async.Future<$0.DeleteCustomServerRequest> $request) async {
+      $grpc.ServiceCall $call, $async.Future<$0.DeleteCustomServerRequest> $request) async {
     return deleteCustomServer($call, await $request);
   }
 
@@ -174,8 +159,7 @@ abstract class CustomServersServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $0.DeleteCustomServerRequest request);
 
   $async.Future<$0.TestCustomServerResponse> testCustomServer_Pre(
-      $grpc.ServiceCall $call,
-      $async.Future<$0.TestCustomServerRequest> $request) async {
+      $grpc.ServiceCall $call, $async.Future<$0.TestCustomServerRequest> $request) async {
     return testCustomServer($call, await $request);
   }
 

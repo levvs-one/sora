@@ -200,8 +200,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
               style: Styles.figures(Styles.body).copyWith(color: palette.ink),
             ),
           ),
-          if (active != null)
-            Text(s.connConnectionsCount(active), style: Styles.caption.copyWith(color: palette.ink2)),
+          if (active != null) Text(s.connConnectionsCount(active), style: Styles.caption.copyWith(color: palette.ink2)),
         ],
       ),
     );
@@ -237,9 +236,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
               name: name,
               count: items.length,
               collapsed: collapsed,
-              onToggle: () => setState(
-                () => collapsed ? _collapsedGroups.remove(name) : _collapsedGroups.add(name),
-              ),
+              onToggle: () => setState(() => collapsed ? _collapsedGroups.remove(name) : _collapsedGroups.add(name)),
             ),
             if (!collapsed)
               for (final c in items)
@@ -286,8 +283,8 @@ class _GroupHeader extends StatelessWidget {
         trailing: Icon(
           collapsed
               ? (Directionality.of(context) == TextDirection.rtl
-                  ? Symbols.keyboard_arrow_left_rounded
-                  : Symbols.keyboard_arrow_right_rounded)
+                    ? Symbols.keyboard_arrow_left_rounded
+                    : Symbols.keyboard_arrow_right_rounded)
               : Symbols.keyboard_arrow_down_rounded,
           size: 18,
           color: palette.ink3,

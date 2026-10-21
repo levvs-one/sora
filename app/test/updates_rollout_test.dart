@@ -30,8 +30,7 @@ void main() {
 
     test('accepts the percent boundaries 0 and 100', () {
       const zero = '{"format":1,"rollout":{"version":"1.0.5","percent":0}}';
-      const hundred =
-          '{"format":1,"rollout":{"version":"1.0.5","percent":100}}';
+      const hundred = '{"format":1,"rollout":{"version":"1.0.5","percent":100}}';
       expect(RolloutPolicy.parse(zero)!.percent, 0);
       expect(RolloutPolicy.parse(hundred)!.percent, 100);
     });
@@ -87,13 +86,7 @@ void main() {
   group('updateCohort', () {
     test('is deterministic and stays within 0..99', () {
       expect(updateCohort('test-uuid-1'), updateCohort('test-uuid-1'));
-      for (final uuid in [
-        'a',
-        'b',
-        'test-uuid-1',
-        'test-uuid-2',
-        'some-long-uuid-1234',
-      ]) {
+      for (final uuid in ['a', 'b', 'test-uuid-1', 'test-uuid-2', 'some-long-uuid-1234']) {
         expect(updateCohort(uuid), inInclusiveRange(0, 99));
       }
     });
@@ -106,11 +99,7 @@ void main() {
   });
 
   group('policy decision table', () {
-    String policyBody({
-      String version = '1.0.5',
-      int percent = 100,
-      List<String> blocked = const [],
-    }) => jsonEncode({
+    String policyBody({String version = '1.0.5', int percent = 100, List<String> blocked = const []}) => jsonEncode({
       'format': 1,
       'rollout': {'version': version, 'percent': percent},
       'blocked_versions': blocked,
@@ -143,11 +132,7 @@ void main() {
               headers: {'content-type': 'application/json; charset=utf-8'},
             );
           }
-          return http.Response(
-            recorded,
-            200,
-            headers: {'content-type': 'application/json; charset=utf-8'},
-          );
+          return http.Response(recorded, 200, headers: {'content-type': 'application/json; charset=utf-8'});
         }),
       );
       addTearDown(updater.dispose);
@@ -170,11 +155,7 @@ void main() {
           policyThrows: throws,
         );
         expect(updater.error, isNull);
-        expect(
-          updater.hasUpdate,
-          isTrue,
-          reason: 'status=$status throws=$throws',
-        );
+        expect(updater.hasUpdate, isTrue, reason: 'status=$status throws=$throws');
         expect(notices, 1);
         expect(updater.versionRevoked, isFalse);
         expect(updater.rolloutPending, isFalse);
@@ -236,17 +217,11 @@ void main() {
 
     test('percent boundaries: 0 withholds all, 100 offers all', () async {
       final settings = await Settings.load();
-      final (updater: none, notices: noneNotices) = await checkWithPolicy(
-        settings,
-        policyBody: policyBody(percent: 0),
-      );
+      final (updater: none, notices: noneNotices) = await checkWithPolicy(settings, policyBody: policyBody(percent: 0));
       expect(none.hasUpdate, isFalse);
       expect(noneNotices, 0);
       expect(none.rolloutPending, isTrue);
-      final (updater: all, notices: allNotices) = await checkWithPolicy(
-        settings,
-        policyBody: policyBody(percent: 100),
-      );
+      final (updater: all, notices: allNotices) = await checkWithPolicy(settings, policyBody: policyBody(percent: 100));
       expect(all.hasUpdate, isTrue);
       expect(allNotices, 1);
       expect(all.rolloutPending, isFalse);

@@ -14,14 +14,14 @@ import 'kit.dart';
 /// Resolves a core-provided test label key such as "leakTest.check.directDns".
 /// Unknown keys fall through as-is so a newer core never renders a blank row.
 String _testLabel(S s, String key) => switch (key) {
-      'leakTest.check.directDns' => s.leakTestCheckDirectDns,
-      'leakTest.check.ipv6' => s.leakTestCheckIpv6,
-      'leakTest.check.icmpEcho' => s.leakTestCheckIcmpEcho,
-      'leakTest.check.systemResolvers' => s.leakTestCheckSystemResolvers,
-      'leakTest.check.tunnelConnectivity' => s.leakTestCheckTunnelConnectivity,
-      'leakTest.check.tunnelDns' => s.leakTestCheckTunnelDns,
-      _ => key,
-    };
+  'leakTest.check.directDns' => s.leakTestCheckDirectDns,
+  'leakTest.check.ipv6' => s.leakTestCheckIpv6,
+  'leakTest.check.icmpEcho' => s.leakTestCheckIcmpEcho,
+  'leakTest.check.systemResolvers' => s.leakTestCheckSystemResolvers,
+  'leakTest.check.tunnelConnectivity' => s.leakTestCheckTunnelConnectivity,
+  'leakTest.check.tunnelDns' => s.leakTestCheckTunnelDns,
+  _ => key,
+};
 
 /// Test ids whose failure the kill switch directly mitigates: the core
 /// reports them as "kill switch disarmed, so nothing blocks it". The button
@@ -186,10 +186,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
               CupertinoActivityIndicator(color: palette.ink),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  s.leakTestProgress(_results.length),
-                  style: Styles.secondary.copyWith(color: palette.ink2),
-                ),
+                child: Text(s.leakTestProgress(_results.length), style: Styles.secondary.copyWith(color: palette.ink2)),
               ),
             ],
           ),
@@ -211,7 +208,9 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
             children: [
               Icon(icon, size: 18, color: palette.ink2),
               const SizedBox(width: 10),
-              Expanded(child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2))),
+              Expanded(
+                child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2)),
+              ),
             ],
           ),
         ),
@@ -222,7 +221,10 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
   Widget _report(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
-    final failed = [for (final r in _results) if (!r.pass) r];
+    final failed = [
+      for (final r in _results)
+        if (!r.pass) r,
+    ];
     final clean = _finished && failed.isEmpty;
     return Group(
       children: [
@@ -231,11 +233,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
             child: Row(
               children: [
-                Icon(
-                  clean ? Symbols.check_circle_rounded : Symbols.warning_rounded,
-                  size: 22,
-                  color: palette.ink,
-                ),
+                Icon(clean ? Symbols.check_circle_rounded : Symbols.warning_rounded, size: 22, color: palette.ink),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -262,9 +260,8 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
     final palette = Palette.of(context);
     final failed = !result.pass;
     final skipped = result.skipped;
-    final canFix = _killSwitchFixApplies(result, sora.settings.killSwitch) &&
-        !_running &&
-        !_fixed.contains(result.test.id);
+    final canFix =
+        _killSwitchFixApplies(result, sora.settings.killSwitch) && !_running && !_fixed.contains(result.test.id);
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(44, 8, 12, 0),
       child: Column(
@@ -278,27 +275,21 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
                 failed
                     ? Symbols.warning_rounded
                     : skipped
-                        ? Symbols.info_rounded
-                        : Symbols.check_circle_rounded,
+                    ? Symbols.info_rounded
+                    : Symbols.check_circle_rounded,
                 size: 16,
                 color: skipped ? palette.ink2 : palette.ink,
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  _testLabel(s, result.test.label),
-                  style: Styles.body.copyWith(color: palette.ink),
-                ),
+                child: Text(_testLabel(s, result.test.label), style: Styles.body.copyWith(color: palette.ink)),
               ),
             ],
           ),
           if (result.details.isNotEmpty)
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 24, top: 2),
-              child: Text(
-                result.details,
-                style: Styles.caption.copyWith(color: palette.ink2),
-              ),
+              child: Text(result.details, style: Styles.caption.copyWith(color: palette.ink2)),
             ),
           if (result.skipped)
             Padding(
@@ -309,10 +300,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
                   Icon(Symbols.info_rounded, size: 14, color: palette.ink2),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(
-                      s.leakTestSkipped,
-                      style: Styles.caption.copyWith(color: palette.ink2),
-                    ),
+                    child: Text(s.leakTestSkipped, style: Styles.caption.copyWith(color: palette.ink2)),
                   ),
                 ],
               ),
@@ -331,10 +319,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
                   Icon(Symbols.check_circle_rounded, size: 14, color: palette.ink2),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(
-                      s.leakTestFixedNote,
-                      style: Styles.caption.copyWith(color: palette.ink2),
-                    ),
+                    child: Text(s.leakTestFixedNote, style: Styles.caption.copyWith(color: palette.ink2)),
                   ),
                 ],
               ),

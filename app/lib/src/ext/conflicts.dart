@@ -29,10 +29,10 @@ enum ExtConflictKind {
 
 /// The manifest permission id behind each conflict kind.
 String conflictPermission(ExtConflictKind kind) => switch (kind) {
-      ExtConflictKind.routingRules => 'routing.rules',
-      ExtConflictKind.themeApply => 'theme.apply',
-      ExtConflictKind.netHooks => 'net.hooks',
-    };
+  ExtConflictKind.routingRules => 'routing.rules',
+  ExtConflictKind.themeApply => 'theme.apply',
+  ExtConflictKind.netHooks => 'net.hooks',
+};
 
 /// One contested surface and the extensions fighting over it.
 class ExtConflict {
@@ -45,8 +45,7 @@ class ExtConflict {
 
   /// Stable identity: kind + sorted contender set. Re-resolving after an
   /// uninstall/reinstall of the same set reuses the stored winner.
-  String get key =>
-      '${kind.name}:${(List.of(extensionIds)..sort()).join(',')}';
+  String get key => '${kind.name}:${(List.of(extensionIds)..sort()).join(',')}';
 }
 
 /// Finds every contested surface among [installed]: for each conflict
@@ -69,14 +68,14 @@ List<ExtConflict> findConflicts(List<InstalledExtension> installed) {
 
 /// Contenders the user has not resolved yet: no stored winner, or the
 /// stored winner is gone / disabled / no longer granted the permission.
-List<ExtConflict> unresolvedConflicts(
-    List<InstalledExtension> installed, String? Function(String key) winnerOf) {
+List<ExtConflict> unresolvedConflicts(List<InstalledExtension> installed, String? Function(String key) winnerOf) {
   final byId = {for (final inst in installed) inst.id: inst};
   final out = <ExtConflict>[];
   for (final c in findConflicts(installed)) {
     final winner = winnerOf(c.key);
     final winnerInst = winner == null ? null : byId[winner];
-    final ok = winnerInst != null &&
+    final ok =
+        winnerInst != null &&
         winnerInst.enabled &&
         winnerInst.granted.contains(conflictPermission(c.kind)) &&
         c.extensionIds.contains(winner);

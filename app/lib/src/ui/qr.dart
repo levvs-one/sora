@@ -96,10 +96,7 @@ class _QrShareScreenState extends State<QrShareScreen> {
               decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(12),
-                child: SelectableText(
-                  widget.payload,
-                  style: Styles.caption.copyWith(color: palette.ink2),
-                ),
+                child: SelectableText(widget.payload, style: Styles.caption.copyWith(color: palette.ink2)),
               ),
             ),
           ),
@@ -241,7 +238,11 @@ class _QrScanScreenState extends State<QrScanScreen> {
         const SizedBox(height: 24),
         Center(child: Icon(Symbols.qr_code_scanner_rounded, size: 64, color: palette.ink3)),
         const SizedBox(height: 16),
-        Text(s.qrScanHint, textAlign: TextAlign.center, style: Styles.body.copyWith(color: palette.ink2)),
+        Text(
+          s.qrScanHint,
+          textAlign: TextAlign.center,
+          style: Styles.body.copyWith(color: palette.ink2),
+        ),
         const SizedBox(height: 24),
         PrimaryButton(label: s.qrFromImage, busy: _busy, onTap: _busy ? null : _fromImage),
         const SizedBox(height: 8),
@@ -249,7 +250,11 @@ class _QrScanScreenState extends State<QrScanScreen> {
         if (error != null)
           Padding(
             padding: const EdgeInsets.only(top: 12),
-            child: Text(error, textAlign: TextAlign.center, style: Styles.secondary.copyWith(color: palette.ink2)),
+            child: Text(
+              error,
+              textAlign: TextAlign.center,
+              style: Styles.secondary.copyWith(color: palette.ink2),
+            ),
           ),
       ],
     );

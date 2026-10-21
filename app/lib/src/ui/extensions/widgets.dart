@@ -27,9 +27,7 @@ class StarRating extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    final ratingText =
-        NumberFormat('0.0', Localizations.localeOf(context).toLanguageTag())
-            .format(rating);
+    final ratingText = NumberFormat('0.0', Localizations.localeOf(context).toLanguageTag()).format(rating);
     final s = S.of(context);
     return Semantics(
       label: s.extRatingLabel(ratingText),
@@ -69,19 +67,17 @@ class ExtBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: tone == ExtBadgeTone.warn
-            ? palette.danger.withValues(alpha: 0.1)
-            : palette.field.withValues(alpha: 0.6),
+        color: tone == ExtBadgeTone.warn ? palette.danger.withValues(alpha: 0.1) : palette.field.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[
-            Icon(icon, size: 12, color: fg),
-            const SizedBox(width: 4),
-          ],
-          Text(label, style: Styles.caption.copyWith(color: fg, fontWeight: FontWeight.w600)),
+          if (icon != null) ...[Icon(icon, size: 12, color: fg), const SizedBox(width: 4)],
+          Text(
+            label,
+            style: Styles.caption.copyWith(color: fg, fontWeight: FontWeight.w600),
+          ),
         ],
       ),
     );
@@ -178,21 +174,27 @@ class ExtensionCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: Styles.title.copyWith(color: palette.ink),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
+                    Text(
+                      title,
+                      style: Styles.title.copyWith(color: palette.ink),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 2),
-                    Text(s.extByAuthor(author),
-                        style: Styles.caption.copyWith(color: palette.ink2),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
+                    Text(
+                      s.extByAuthor(author),
+                      style: Styles.caption.copyWith(color: palette.ink2),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     if (subtitle != null) ...[
                       const SizedBox(height: 2),
-                      Text(subtitle!,
-                          style: Styles.caption.copyWith(color: palette.ink2),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
+                      Text(
+                        subtitle!,
+                        style: Styles.caption.copyWith(color: palette.ink2),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ],
                     const SizedBox(height: 6),
                     Wrap(
@@ -204,17 +206,17 @@ class ExtensionCard extends StatelessWidget {
                         ...badges,
                         if (installs != null && installs! > 0)
                           Text(
-                              installs! == 1
-                                  ? s.extInstallOne
-                                  : s.extInstallsCount(
-                                      _compact(context, installs!)),
-                              style: Styles.caption.copyWith(color: palette.ink2)),
+                            installs! == 1 ? s.extInstallOne : s.extInstallsCount(_compact(context, installs!)),
+                            style: Styles.caption.copyWith(color: palette.ink2),
+                          ),
                       ],
                     ),
-                    ...capabilityLines(context,
-                        capabilities: capabilities,
-                        permissions: permissions,
-                        networkHosts: networkHosts),
+                    ...capabilityLines(
+                      context,
+                      capabilities: capabilities,
+                      permissions: permissions,
+                      networkHosts: networkHosts,
+                    ),
                   ],
                 ),
               ),
@@ -227,9 +229,7 @@ class ExtensionCard extends StatelessWidget {
   }
 
   static String _compact(BuildContext context, int n) {
-    return NumberFormat.compact(
-            locale: Localizations.localeOf(context).toLanguageTag())
-        .format(n);
+    return NumberFormat.compact(locale: Localizations.localeOf(context).toLanguageTag()).format(n);
   }
 }
 
@@ -240,11 +240,7 @@ class ExtensionCard extends StatelessWidget {
 /// the semantic danger color. The tier is also part of the screen-reader
 /// label, so it is never color- or icon-only information.
 class PermissionRow extends StatelessWidget {
-  const PermissionRow({
-    super.key,
-    required this.blurb,
-    required this.risk,
-  });
+  const PermissionRow({super.key, required this.blurb, required this.risk});
   final String blurb;
   final ExtRisk risk;
 
@@ -304,12 +300,12 @@ List<Widget> capabilityLines(
     out.add(_CapabilityLine(icon: Symbols.schedule_rounded, text: s.extCapBackground));
   }
   if (permissions.any(isNetworkPermission)) {
-    out.add(_CapabilityLine(
-      icon: Symbols.public_rounded,
-      text: networkHosts.isEmpty
-          ? s.extCapNetwork
-          : s.extCapNetworkHosts(networkHosts.join(', ')),
-    ));
+    out.add(
+      _CapabilityLine(
+        icon: Symbols.public_rounded,
+        text: networkHosts.isEmpty ? s.extCapNetwork : s.extCapNetworkHosts(networkHosts.join(', ')),
+      ),
+    );
   }
   return out;
 }
@@ -344,7 +340,8 @@ class _CapabilityLine extends StatelessWidget {
 
 /// The host allowlist for the network permission, one row per host.
 /// Callers add the surrounding padding/indentation.
-class NetworkHostsList extends StatelessWidget {  const NetworkHostsList({super.key, required this.hosts});
+class NetworkHostsList extends StatelessWidget {
+  const NetworkHostsList({super.key, required this.hosts});
   final List<String> hosts;
 
   @override
@@ -361,8 +358,7 @@ class NetworkHostsList extends StatelessWidget {  const NetworkHostsList({super.
                 Icon(Symbols.dns_rounded, size: 14, color: palette.ink3),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(h,
-                      style: Styles.caption.copyWith(color: palette.ink2)),
+                  child: Text(h, style: Styles.caption.copyWith(color: palette.ink2)),
                 ),
               ],
             ),
@@ -392,14 +388,11 @@ Future<void> showRatingHowDialog(BuildContext context) {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(s.extRatingHow,
-                  style: Styles.title.copyWith(color: palette.ink)),
+              Text(s.extRatingHow, style: Styles.title.copyWith(color: palette.ink)),
               const SizedBox(height: 10),
-              Text(s.extRatingHowBody,
-                  style: Styles.body.copyWith(color: palette.ink2)),
+              Text(s.extRatingHowBody, style: Styles.body.copyWith(color: palette.ink2)),
               const SizedBox(height: 16),
-              PrimaryButton(
-                  label: s.extOk, onTap: () => Navigator.pop(context)),
+              PrimaryButton(label: s.extOk, onTap: () => Navigator.pop(context)),
             ],
           ),
         ),

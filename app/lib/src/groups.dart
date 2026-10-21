@@ -57,7 +57,10 @@ class Entry {
   /// Copy without [hidden] members, or null when none remain.
   Entry? withoutHidden(Set<String> hidden) {
     if (hidden.isEmpty) return this;
-    final visible = [for (final o in members) if (!hidden.contains(o.id)) o];
+    final visible = [
+      for (final o in members)
+        if (!hidden.contains(o.id)) o,
+    ];
     if (visible.isEmpty) return null;
     if (visible.length == members.length) return this;
     return Entry._(id, name, visible, {
@@ -74,7 +77,10 @@ class Entry {
   /// custom members return [this], so callers can skip rebuilding.
   Entry? withoutCustom() {
     if (id.startsWith(customServerPrefix)) return null;
-    final rest = [for (final o in members) if (!o.id.startsWith(customServerPrefix)) o];
+    final rest = [
+      for (final o in members)
+        if (!o.id.startsWith(customServerPrefix)) o,
+    ];
     if (rest.length == members.length) return this;
     if (rest.isEmpty) return null;
     return Entry._(id, name, rest, {
@@ -143,8 +149,7 @@ final _role = RegExp(
 /// arrive every 300ms, plus home-screen builds) would redo all of them.
 final _groupedEntries = Expando<List<Entry>>('sora.groupedEntries');
 
-List<Entry> entriesOf(SubscriptionState subscription) =>
-    _groupedEntries[subscription] ??= _groupEntries(subscription);
+List<Entry> entriesOf(SubscriptionState subscription) => _groupedEntries[subscription] ??= _groupEntries(subscription);
 
 List<Entry> _groupEntries(SubscriptionState subscription) {
   final byName = <String, List<OutboundSpec>>{};

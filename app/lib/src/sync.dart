@@ -46,9 +46,7 @@ class SyncPairing {
   /// because Dart's [Uri] lowercases the host (Go keeps its case), drops a
   /// bare trailing '#', and takes the last of duplicated keys (Go takes
   /// the first, then rejects the payload outright).
-  static ({String deviceId, List<int> publicKey, List<int> token, int port})? decodePairPayload(
-    String raw,
-  ) {
+  static ({String deviceId, List<int> publicKey, List<int> token, int port})? decodePairPayload(String raw) {
     final text = raw.trim();
     // No fragment, not even an empty one: the canonical form never
     // contains '#'.

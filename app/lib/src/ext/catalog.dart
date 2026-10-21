@@ -106,10 +106,7 @@ class CatalogEntry {
       minAppVersion: json['min_app_version'] as String? ?? '',
       rolloutFraction: (json['rollout_fraction'] as num? ?? 0).toDouble(),
       screenshotUrls: (json['screenshots'] as List? ?? []).map((e) => e.toString()).toList(),
-      changelog: [
-        for (final r in (json['changelog'] as List? ?? []))
-          CatalogChangelogEntry.fromJson(_changelogRow(r)),
-      ],
+      changelog: [for (final r in (json['changelog'] as List? ?? [])) CatalogChangelogEntry.fromJson(_changelogRow(r))],
     );
   }
 
@@ -143,9 +140,7 @@ class CatalogEntry {
     // '\x00' is not NUL (an unrecognized escape degrades to the escaped
     // character, so the hashed bytes were "x00"), which silently
     // bucketed this side differently from the Go implementation.
-    final digest = crypto.sha256
-        .convert(utf8.encode('$installId\u0000$id\u0000$version'))
-        .bytes;
+    final digest = crypto.sha256.convert(utf8.encode('$installId\u0000$id\u0000$version')).bytes;
     var mod = 0;
     for (var i = 0; i < 8; i++) {
       mod = (mod * 256 + digest[i]) % 10000;
@@ -186,8 +181,7 @@ class ExtensionCatalog {
   }
 
   /// True while the catalog is within its max_age freshness promise.
-  bool fresh(DateTime fetchedAt, DateTime now) =>
-      !now.isAfter(fetchedAt.add(Duration(seconds: maxAge)));
+  bool fresh(DateTime fetchedAt, DateTime now) => !now.isAfter(fetchedAt.add(Duration(seconds: maxAge)));
 
   static ExtensionCatalog parse(Uint8List data) {
     if (data.isEmpty || data.length > 4 * 1024 * 1024) {
@@ -217,10 +211,7 @@ class ExtensionCatalog {
       if (!seen.add(e.id)) throw CatalogError('catalog lists "${e.id}" twice');
       entries.add(e);
     }
-    return ExtensionCatalog(
-        updatedAt: updatedAt,
-        entries: entries,
-        maxAge: (maxAge ?? 3600).toInt());
+    return ExtensionCatalog(updatedAt: updatedAt, entries: entries, maxAge: (maxAge ?? 3600).toInt());
   }
 
   static void _validateEntry(CatalogEntry e) {
@@ -324,9 +315,7 @@ class CatalogCache {
     final tmp = File('${_rawFile.path}.tmp');
     await tmp.writeAsBytes(raw, flush: true);
     await tmp.rename(_rawFile.path);
-    await _metaFile.writeAsString(
-        jsonEncode({'fetched_at': DateTime.now().toUtc().toIso8601String()}),
-        flush: true);
+    await _metaFile.writeAsString(jsonEncode({'fetched_at': DateTime.now().toUtc().toIso8601String()}), flush: true);
   }
 
   /// Loads the cached catalog, or null when absent or corrupt (a corrupt
@@ -348,8 +337,10 @@ class CatalogCache {
   /// verification failure falls back to the cached catalog when one exists
   /// ([fromCache] is then true and the UI must say so). With no network
   /// and no cache, the fetch error is rethrown.
-  Future<({ExtensionCatalog catalog, bool fromCache, DateTime fetchedAt})> refresh(
-      {http.Client? client, String url = defaultCatalogUrl}) async {
+  Future<({ExtensionCatalog catalog, bool fromCache, DateTime fetchedAt})> refresh({
+    http.Client? client,
+    String url = defaultCatalogUrl,
+  }) async {
     try {
       final raw = await fetchRawCatalog(client: client, url: url);
       final catalog = ExtensionCatalog.parse(raw);

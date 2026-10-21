@@ -101,11 +101,7 @@ class _LocalPanelServer {
           await req.response.close();
           return;
         }
-        if (seg == '.' ||
-            seg == '..' ||
-            seg.contains('/') ||
-            seg.contains('\\') ||
-            seg.contains(':')) {
+        if (seg == '.' || seg == '..' || seg.contains('/') || seg.contains('\\') || seg.contains(':')) {
           req.response.statusCode = HttpStatus.forbidden;
           await req.response.close();
           return;
@@ -118,8 +114,7 @@ class _LocalPanelServer {
         return;
       }
       final rootCanonical = Directory(root).absolute.path;
-      final file = File(
-          '$rootCanonical${Platform.pathSeparator}${segments.join(Platform.pathSeparator)}');
+      final file = File('$rootCanonical${Platform.pathSeparator}${segments.join(Platform.pathSeparator)}');
       final canonical = file.absolute.path;
       if (canonical != '$rootCanonical${Platform.pathSeparator}${segments.join(Platform.pathSeparator)}' &&
           !canonical.startsWith('$rootCanonical${Platform.pathSeparator}')) {
@@ -148,8 +143,7 @@ class _LocalPanelServer {
       // Panel isolation (see the policy docs above): no network for panel
       // documents. Set before the body is written; error responses above
       // carry no body and need no policy.
-      req.response.headers.set(
-          'Content-Security-Policy', _panelContentSecurityPolicy);
+      req.response.headers.set('Content-Security-Policy', _panelContentSecurityPolicy);
       if (ext == 'html' && _isEntry(canonical)) {
         final html = await file.readAsString();
         req.response.write(_injectBootstrap(html));
@@ -229,8 +223,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     _manifest = inst.manifest;
     _panel = widget.panelId == null
         ? _manifest.panels.first
-        : _manifest.panels.firstWhere((p) => p.id == widget.panelId,
-            orElse: () => _manifest.panels.first);
+        : _manifest.panels.firstWhere((p) => p.id == widget.panelId, orElse: () => _manifest.panels.first);
     _bridge = PanelBridge(
       extensionId: widget.extensionId,
       granted: inst.granted.toSet(),
@@ -281,8 +274,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     final link = sora.link, session = sora.sessionId;
     if (link == null || session == null) throw BridgeError('not-connected', 'no session');
     final answer = await link.stub.listConnections(
-      ListConnectionsRequest(
-          apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: session),
+      ListConnectionsRequest(apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: session),
     );
     return [
       for (final c in answer.connections)
@@ -292,7 +284,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
           'host': c.host,
           'up_bytes': c.upload.toInt(),
           'down_bytes': c.download.toInt(),
-        }
+        },
     ];
   }
 
@@ -306,22 +298,15 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     // is -1 ("unknown") when unmeasured or unreachable (a null entry).
     return [
       for (final s in sora.servers)
-        {
-          'id': s.id,
-          'name': s.displayName,
-          'country': '',
-          'latency_ms': sora.latency[s.id] ?? -1,
-        }
+        {'id': s.id, 'name': s.displayName, 'country': '', 'latency_ms': sora.latency[s.id] ?? -1},
     ];
   }
 
   Future<void> _notify(String title, String body) async {
     final sora = SoraScope.read(context);
-    await sora.recordNotification(AppNotification(
-      time: DateTime.now(),
-      title: '${_manifest.name}: $title',
-      body: body,
-    ));
+    await sora.recordNotification(
+      AppNotification(time: DateTime.now(), title: '${_manifest.name}: $title', body: body),
+    );
   }
 
   Future<void> _start() async {
@@ -346,46 +331,48 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
           : WebViewController();
       await controller.setJavaScriptMode(JavaScriptMode.unrestricted);
       if (!mounted || generation != _generation) return;
-      await controller.setNavigationDelegate(NavigationDelegate(
-        onNavigationRequest: (request) {
-          final uri = Uri.tryParse(request.url);
-          final ok = uri != null &&
-              uri.scheme == 'http' &&
-              uri.host == '127.0.0.1' &&
-              uri.port == _origin!.port;
-          return ok ? NavigationDecision.navigate : NavigationDecision.prevent;
-        },
-        onPageFinished: (url) async {
-          if (!mounted || generation != _generation) return;
-          // The bootstrap is injected by the local server, so window.soraExt
-          // already exists; just announce readiness.
-          await _pushEvent('panel.ready', '');
-        },
-      ));
+      await controller.setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (request) {
+            final uri = Uri.tryParse(request.url);
+            final ok = uri != null && uri.scheme == 'http' && uri.host == '127.0.0.1' && uri.port == _origin!.port;
+            return ok ? NavigationDecision.navigate : NavigationDecision.prevent;
+          },
+          onPageFinished: (url) async {
+            if (!mounted || generation != _generation) return;
+            // The bootstrap is injected by the local server, so window.soraExt
+            // already exists; just announce readiness.
+            await _pushEvent('panel.ready', '');
+          },
+        ),
+      );
       if (!mounted || generation != _generation) return;
-      await controller.addJavaScriptChannel('soraExt',
-          onMessageReceived: (message) async {
-        if (!mounted || generation != _generation) return;
-        String reply;
-        try {
-          reply = await _bridge.handle(message.message);
-        } catch (_) {
-          reply = '{"ok":false,"error":"internal"}';
-        }
-        Map<String, dynamic> decoded;
-        try {
-          decoded = jsonDecode(reply) as Map<String, dynamic>;
-        } catch (_) {
-          return;
-        }
-        final id = decoded['id'];
-        final ok = decoded['ok'] == true;
-        final payload = ok ? decoded['result'] : decoded['error'];
-        try {
-          await controller.runJavaScript(
-              'window.soraExt && window.soraExt._resolve(${jsonEncode(id)}, ${ok ? 'true' : 'false'}, ${jsonEncode(payload)})');
-        } catch (_) {}
-      });
+      await controller.addJavaScriptChannel(
+        'soraExt',
+        onMessageReceived: (message) async {
+          if (!mounted || generation != _generation) return;
+          String reply;
+          try {
+            reply = await _bridge.handle(message.message);
+          } catch (_) {
+            reply = '{"ok":false,"error":"internal"}';
+          }
+          Map<String, dynamic> decoded;
+          try {
+            decoded = jsonDecode(reply) as Map<String, dynamic>;
+          } catch (_) {
+            return;
+          }
+          final id = decoded['id'];
+          final ok = decoded['ok'] == true;
+          final payload = ok ? decoded['result'] : decoded['error'];
+          try {
+            await controller.runJavaScript(
+              'window.soraExt && window.soraExt._resolve(${jsonEncode(id)}, ${ok ? 'true' : 'false'}, ${jsonEncode(payload)})',
+            );
+          } catch (_) {}
+        },
+      );
       if (!mounted || generation != _generation) return;
       await controller.loadRequest(_origin!.resolve(_panel.entry));
       _watchSora();
@@ -420,8 +407,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     final c = _controller;
     if (c == null || !mounted) return;
     try {
-      await c.runJavaScript(
-          'window.soraExt && window.soraExt._event(${jsonEncode(kind)}, ${jsonEncode(detail)})');
+      await c.runJavaScript('window.soraExt && window.soraExt._event(${jsonEncode(kind)}, ${jsonEncode(detail)})');
     } catch (_) {}
   }
 
@@ -438,15 +424,17 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
                 children: [
                   Icon(Symbols.extension_off_rounded, size: 40, color: palette.ink3),
                   const SizedBox(height: 12),
-                  Text(s.extPanelUnavailable,
-                      style: Styles.body.copyWith(color: palette.ink2),
-                      textAlign: TextAlign.center),
+                  Text(
+                    s.extPanelUnavailable,
+                    style: Styles.body.copyWith(color: palette.ink2),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             )
           : _controller == null
-              ? const Center(child: CircularProgressIndicator())
-              : WebViewWidget(controller: _controller!),
+          ? const Center(child: CircularProgressIndicator())
+          : WebViewWidget(controller: _controller!),
       children: const [],
     );
   }

@@ -28,8 +28,7 @@ class RunLeakTestsRequest extends $pb.GeneratedMessage {
   }) {
     final result = RunLeakTestsRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
-    if (controlAuthenticator != null)
-      result.controlAuthenticator = controlAuthenticator;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
     if (sessionId != null) result.sessionId = sessionId;
     if (testIds != null) result.testIds.addAll(testIds);
     return result;
@@ -44,14 +43,11 @@ class RunLeakTestsRequest extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       RunLeakTestsRequest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'RunLeakTestsRequest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RunLeakTestsRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.leak.v1'),
       createEmptyInstance: RunLeakTestsRequest.$_createMessage)
-    ..aOM<$1.ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion',
-        subBuilder: $1.ApiVersion.$_createMessage)
-    ..a<$core.List<$core.int>>(
-        2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOM<$1.ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: $1.ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
     ..aOS(3, _omitFieldNames ? '' : 'sessionId')
     ..pPS(4, _omitFieldNames ? '' : 'testIds')
     ..hasRequiredFields = false;
@@ -60,23 +56,20 @@ class RunLeakTestsRequest extends $pb.GeneratedMessage {
   RunLeakTestsRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   RunLeakTestsRequest copyWith(void Function(RunLeakTestsRequest) updates) =>
-      super.copyWith((message) => updates(message as RunLeakTestsRequest))
-          as RunLeakTestsRequest;
+      super.copyWith((message) => updates(message as RunLeakTestsRequest)) as RunLeakTestsRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core
-      .Deprecated('Use RunLeakTestsRequest() / RunLeakTestsRequest.new instead')
+  @$core.Deprecated('Use RunLeakTestsRequest() / RunLeakTestsRequest.new instead')
   static RunLeakTestsRequest create() => RunLeakTestsRequest._();
   static $pb.GeneratedMessage $_createMessage() => RunLeakTestsRequest._();
   @$core.override
   RunLeakTestsRequest createEmptyInstance() => RunLeakTestsRequest._();
   @$core.pragma('dart2js:noInline')
-  static RunLeakTestsRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RunLeakTestsRequest>(
-          RunLeakTestsRequest.$_createMessage);
+  static RunLeakTestsRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RunLeakTestsRequest>(RunLeakTestsRequest.$_createMessage);
   static RunLeakTestsRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -131,12 +124,10 @@ class LeakTest extends $pb.GeneratedMessage {
   factory LeakTest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       LeakTest()..mergeFromBuffer(data, registry);
-  factory LeakTest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+  factory LeakTest.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       LeakTest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'LeakTest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LeakTest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.leak.v1'),
       createEmptyInstance: LeakTest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
@@ -159,8 +150,8 @@ class LeakTest extends $pb.GeneratedMessage {
   @$core.override
   LeakTest createEmptyInstance() => LeakTest._();
   @$core.pragma('dart2js:noInline')
-  static LeakTest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LeakTest>(LeakTest.$_createMessage);
+  static LeakTest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LeakTest>(LeakTest.$_createMessage);
   static LeakTest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -205,16 +196,13 @@ class LeakTestResult extends $pb.GeneratedMessage {
   factory LeakTestResult.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       LeakTestResult()..mergeFromBuffer(data, registry);
-  factory LeakTestResult.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+  factory LeakTestResult.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       LeakTestResult()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'LeakTestResult',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LeakTestResult',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.leak.v1'),
       createEmptyInstance: LeakTestResult.$_createMessage)
-    ..aOM<LeakTest>(1, _omitFieldNames ? '' : 'test',
-        subBuilder: LeakTest.$_createMessage)
+    ..aOM<LeakTest>(1, _omitFieldNames ? '' : 'test', subBuilder: LeakTest.$_createMessage)
     ..aOB(2, _omitFieldNames ? '' : 'pass')
     ..aOB(3, _omitFieldNames ? '' : 'skipped')
     ..aOS(4, _omitFieldNames ? '' : 'details')
@@ -225,8 +213,7 @@ class LeakTestResult extends $pb.GeneratedMessage {
   LeakTestResult clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   LeakTestResult copyWith(void Function(LeakTestResult) updates) =>
-      super.copyWith((message) => updates(message as LeakTestResult))
-          as LeakTestResult;
+      super.copyWith((message) => updates(message as LeakTestResult)) as LeakTestResult;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -239,8 +226,7 @@ class LeakTestResult extends $pb.GeneratedMessage {
   LeakTestResult createEmptyInstance() => LeakTestResult._();
   @$core.pragma('dart2js:noInline')
   static LeakTestResult getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LeakTestResult>(
-          LeakTestResult.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LeakTestResult>(LeakTestResult.$_createMessage);
   static LeakTestResult? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -296,7 +282,5 @@ class LeakTestResult extends $pb.GeneratedMessage {
   void clearDurationMs() => $_clearField(5);
 }
 
-const $core.bool _omitFieldNames =
-    $core.bool.fromEnvironment('protobuf.omit_field_names');
-const $core.bool _omitMessageNames =
-    $core.bool.fromEnvironment('protobuf.omit_message_names');
+const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
+const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

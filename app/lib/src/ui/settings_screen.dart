@@ -272,8 +272,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: sora.profiles.profiles.isEmpty
                   ? null
                   : sora.profiles.activeId == null
-                      ? '${sora.profiles.profiles.length}'
-                      : s.profileActive,
+                  ? '${sora.profiles.profiles.length}'
+                  : s.profileActive,
               onTap: () => push<void>(context, const ProfilesScreen()),
             ),
             LinkTile(
@@ -281,10 +281,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: sora.chains.chains.isEmpty ? null : '${sora.chains.chains.length}',
               onTap: () => push<void>(context, const ChainsScreen()),
             ),
-            LinkTile(
-              title: s.sync,
-              onTap: () => push<void>(context, const SyncScreen()),
-            ),
+            LinkTile(title: s.sync, onTap: () => push<void>(context, const SyncScreen())),
             SwitchTile(title: s.fragment, value: settings.fragment, onChanged: (v) => set((x) => x.fragment = v)),
             if (settings.fragment) ...[
               LinkTile(

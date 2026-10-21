@@ -134,10 +134,10 @@ Future<void> verifyPayload(String pubKeyText, String sigText, String file, Uint8
   final ed = cry.Ed25519();
   final message = sig.hashed ? (await cry.Blake2b().hash(payload)).bytes : payload;
   final payloadOk = await ed.verify(message, signature: cry.Signature(sig.sig, publicKey: key));
-  final commentOk = await ed.verify(
-    [...sig.sig, ...sig.trustedComment],
-    signature: cry.Signature(sig.commentSig, publicKey: key),
-  );
+  final commentOk = await ed.verify([
+    ...sig.sig,
+    ...sig.trustedComment,
+  ], signature: cry.Signature(sig.commentSig, publicKey: key));
   if (!payloadOk || !commentOk) throw SignatureError('signature is not valid for this key');
 }
 
@@ -152,8 +152,7 @@ bool _constantTimeBytesEqual(List<int> a, List<int> b) {
 
 /// Verifies a .soraext's signature.minisig against the author's key and the
 /// checksums.txt bytes.
-Future<void> verifyPackageSignature(
-        String authorKeyLine, String sigText, Uint8List checksums) =>
+Future<void> verifyPackageSignature(String authorKeyLine, String sigText, Uint8List checksums) =>
     verifyPayload(authorKeyLine, sigText, 'checksums.txt', checksums);
 
 /// Verifies a catalog.json.minisig with the team key. Fails closed while the
@@ -161,8 +160,9 @@ Future<void> verifyPackageSignature(
 Future<void> verifyCatalogSignature(String sigText, Uint8List catalogJson) {
   if (!teamSigningConfigured) {
     throw SignatureError(
-        'team signing is not configured yet: no team public key is configured. '
-        'The owner must complete the key ceremony before team-signed artifacts can be trusted.');
+      'team signing is not configured yet: no team public key is configured. '
+      'The owner must complete the key ceremony before team-signed artifacts can be trusted.',
+    );
   }
   return verifyPayload(teamPublicKey, sigText, 'catalog.json', catalogJson);
 }

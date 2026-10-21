@@ -41,18 +41,15 @@ class LeakServiceClient extends $grpc.Client {
     $0.RunLeakTestsRequest request, {
     $grpc.CallOptions? options,
   }) {
-    return $createStreamingCall(
-        _$runLeakTests, $async.Stream.fromIterable([request]),
-        options: options);
+    return $createStreamingCall(_$runLeakTests, $async.Stream.fromIterable([request]), options: options);
   }
 
   // method descriptors
 
-  static final _$runLeakTests =
-      $grpc.ClientMethod<$0.RunLeakTestsRequest, $0.LeakTestResult>(
-          '/sora.leak.v1.LeakService/RunLeakTests',
-          ($0.RunLeakTestsRequest value) => value.writeToBuffer(),
-          $0.LeakTestResult.fromBuffer);
+  static final _$runLeakTests = $grpc.ClientMethod<$0.RunLeakTestsRequest, $0.LeakTestResult>(
+      '/sora.leak.v1.LeakService/RunLeakTests',
+      ($0.RunLeakTestsRequest value) => value.writeToBuffer(),
+      $0.LeakTestResult.fromBuffer);
 }
 
 @$pb.GrpcServiceName('sora.leak.v1.LeakService')
@@ -65,16 +62,14 @@ abstract class LeakServiceBase extends $grpc.Service {
         runLeakTests_Pre,
         false,
         true,
-        ($core.List<$core.int> value) =>
-            $0.RunLeakTestsRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.RunLeakTestsRequest.fromBuffer(value),
         ($0.LeakTestResult value) => value.writeToBuffer()));
   }
 
-  $async.Stream<$0.LeakTestResult> runLeakTests_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.RunLeakTestsRequest> $request) async* {
+  $async.Stream<$0.LeakTestResult> runLeakTests_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.RunLeakTestsRequest> $request) async* {
     yield* runLeakTests($call, await $request);
   }
 
-  $async.Stream<$0.LeakTestResult> runLeakTests(
-      $grpc.ServiceCall call, $0.RunLeakTestsRequest request);
+  $async.Stream<$0.LeakTestResult> runLeakTests($grpc.ServiceCall call, $0.RunLeakTestsRequest request);
 }

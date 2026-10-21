@@ -43,8 +43,7 @@ String? customCredentialDocument(CustomProtocol protocol, String secret) {
 
 /// Display name for a custom protocol: the generated enum keeps the
 /// CUSTOM_PROTOCOL_ prefix, the UI shows the bare name (VLESS, VMESS, ...).
-String customProtocolLabel(CustomProtocol protocol) =>
-    protocol.name.replaceFirst('CUSTOM_PROTOCOL_', '');
+String customProtocolLabel(CustomProtocol protocol) => protocol.name.replaceFirst('CUSTOM_PROTOCOL_', '');
 
 /// Hostnames, IPv4 and bracketed IPv6: letters, digits and . : - _ [ ].
 final _addressPattern = RegExp(r'^[A-Za-z0-9][A-Za-z0-9.:\-_\[\]]*$');
@@ -209,11 +208,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: PrimaryButton(
-            label: s.save,
-            busy: _saving,
-            onTap: _saving ? null : _save,
-          ),
+          child: PrimaryButton(label: s.save, busy: _saving, onTap: _saving ? null : _save),
         ),
         if (_saveFailure != null) _note(context, Symbols.info_rounded, describe(s, _saveFailure!)),
       ],
@@ -231,7 +226,9 @@ class _AddServerScreenState extends State<AddServerScreen> {
         children: [
           Icon(icon, size: 18, color: palette.ink2),
           const SizedBox(width: 10),
-          Expanded(child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2))),
+          Expanded(
+            child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2)),
+          ),
         ],
       ),
     );

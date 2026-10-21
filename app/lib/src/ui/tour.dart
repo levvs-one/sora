@@ -84,10 +84,8 @@ class TourScrim extends StatelessWidget {
       tween: RectTween(begin: rect, end: rect),
       duration: duration,
       curve: Curves.easeOutCubic,
-      builder: (_, value, _) => CustomPaint(
-        painter: _Cutout(value!, radius, Palette.of(context).scrim),
-        size: Size.infinite,
-      ),
+      builder: (_, value, _) =>
+          CustomPaint(painter: _Cutout(value!, radius, Palette.of(context).scrim), size: Size.infinite),
     ),
   );
 }

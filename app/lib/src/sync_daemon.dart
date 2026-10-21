@@ -188,10 +188,7 @@ class SyncDaemon extends ChangeNotifier {
     if (addr.isEmpty || token.isEmpty) return null;
     try {
       final res = await http
-          .get(
-            Uri.parse('http://$addr/v1/status'),
-            headers: {'Authorization': 'Bearer $token'},
-          )
+          .get(Uri.parse('http://$addr/v1/status'), headers: {'Authorization': 'Bearer $token'})
           .timeout(const Duration(seconds: 3));
       if (res.statusCode == 200) return (addr: addr, token: token);
     } catch (_) {
@@ -217,10 +214,12 @@ class SyncDaemon extends ChangeNotifier {
     unawaited(process.stdout.drain<List<int>>());
     var exited = false;
     int? exitCode;
-    unawaited(process.exitCode.then((code) {
-      exited = true;
-      exitCode = code;
-    }));
+    unawaited(
+      process.exitCode.then((code) {
+        exited = true;
+        exitCode = code;
+      }),
+    );
 
     final addrFile = File('${dir.path}${Platform.pathSeparator}http_addr');
     final stopwatch = Stopwatch()..start();
@@ -263,10 +262,7 @@ class SyncDaemon extends ChangeNotifier {
   Future<void> _healthCheck(String addr, String token) async {
     try {
       final res = await http
-          .get(
-            Uri.parse('http://$addr/v1/status'),
-            headers: {'Authorization': 'Bearer $token'},
-          )
+          .get(Uri.parse('http://$addr/v1/status'), headers: {'Authorization': 'Bearer $token'})
           .timeout(const Duration(seconds: 5));
       if (res.statusCode != 200) {
         throw SyncDaemonException('sora-sync health check failed: HTTP ${res.statusCode}');

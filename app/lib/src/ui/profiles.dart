@@ -48,11 +48,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
   }
 
   String _triggerSummary(NetworkProfile profile) {
-    final parts = <String>[
-      ...profile.ssids,
-      ...profile.gateways,
-      ...profile.asns.map((a) => 'AS$a'),
-    ];
+    final parts = <String>[...profile.ssids, ...profile.gateways, ...profile.asns.map((a) => 'AS$a')];
     return parts.join(', ');
   }
 
@@ -77,10 +73,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
             Tile(
               title: _fingerprintLine(s, sora.networkFingerprint),
               trailing: _refreshing
-                  ? const SizedBox.square(
-                      dimension: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
+                  ? const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2))
                   : RoundButton(icon: Symbols.refresh_rounded, label: s.refresh, onTap: _refresh),
             ),
           ],
@@ -119,10 +112,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                         if (sora.profiles.activeId == profile.id)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: palette.field,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(12)),
                             child: Text(s.profileActive, style: Styles.secondary.copyWith(color: palette.ink)),
                           ),
                         RoundButton(
@@ -136,10 +126,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                    child: Text(
-                      _triggerSummary(profile),
-                      style: Styles.secondary.copyWith(color: palette.ink2),
-                    ),
+                    child: Text(_triggerSummary(profile), style: Styles.secondary.copyWith(color: palette.ink2)),
                   ),
                 ],
               ),
@@ -150,11 +137,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
 
   Future<void> _delete(BuildContext context, NetworkProfile profile) async {
     final s = S.of(context);
-    if (!await confirm(
-      context,
-      question: s.profileDeleteConfirm(profile.name),
-      action: s.profileDelete,
-    )) {
+    if (!await confirm(context, question: s.profileDeleteConfirm(profile.name), action: s.profileDelete)) {
       return;
     }
     if (context.mounted) SoraScope.read(context).profiles.remove(profile.id);
@@ -184,9 +167,9 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
   }
 
   List<String> _split(String raw) => [
-        for (final part in raw.split(','))
-          if (part.trim().isNotEmpty) part.trim(),
-      ];
+    for (final part in raw.split(','))
+      if (part.trim().isNotEmpty) part.trim(),
+  ];
 
   /// One-line summary of the captured settings snapshot.
   String _snapshotSummary() {
@@ -282,17 +265,11 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
     final palette = Palette.of(context);
     return Screen(
       title: widget.profile == null ? s.profileAdd : s.profileName,
-      actions: [
-        RoundButton(icon: Symbols.check_rounded, label: s.save, onTap: _save),
-      ],
+      actions: [RoundButton(icon: Symbols.check_rounded, label: s.save, onTap: _save)],
       children: [
         Group(
           children: [
-            LinkTile(
-              title: s.profileName,
-              value: _draft.name.isEmpty ? null : _draft.name,
-              onTap: _editName,
-            ),
+            LinkTile(title: s.profileName, value: _draft.name.isEmpty ? null : _draft.name, onTap: _editName),
             LinkTile(
               title: s.profileSsids,
               value: _draft.ssids.isEmpty ? null : _draft.ssids.join(', '),

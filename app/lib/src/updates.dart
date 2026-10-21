@@ -360,11 +360,7 @@ class AppUpdater extends ChangeNotifier {
   String? rollbackTarget;
 
   bool get hasUpdate =>
-      !installed &&
-      latest != null &&
-      newerRelease(latest!.version, version) &&
-      !_updateWithheld &&
-      !rolloutPending;
+      !installed && latest != null && newerRelease(latest!.version, version) && !_updateWithheld && !rolloutPending;
 
   /// Visible phase of the update flow; idle when nothing is in flight.
   UpdateStage stage = UpdateStage.idle;
@@ -466,7 +462,9 @@ class AppUpdater extends ChangeNotifier {
       debugPrint('[updates] installed version $installedVersion is recalled by the rollout policy');
     }
     if (policy.blockedVersions.contains(release.version)) {
-      debugPrint('[updates] release ${release.version} is blocked by the rollout policy (kill-switch); not offering it');
+      debugPrint(
+        '[updates] release ${release.version} is blocked by the rollout policy (kill-switch); not offering it',
+      );
       _updateWithheld = true;
       return;
     }
@@ -699,11 +697,7 @@ class AppUpdater extends ChangeNotifier {
         // exits (no elevation, failed download, failed handoff) never reach
         // this line, so they never write a marker.
         await settings.savePendingUpdate(
-          PendingUpdate(
-            from: version,
-            to: release.version,
-            atMs: DateTime.now().millisecondsSinceEpoch,
-          ).encode(),
+          PendingUpdate(from: version, to: release.version, atMs: DateTime.now().millisecondsSinceEpoch).encode(),
         );
         installed = true;
         await restartLinux();

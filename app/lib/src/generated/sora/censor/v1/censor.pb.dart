@@ -26,12 +26,10 @@ class AttemptEvent extends $pb.GeneratedMessage {
   factory AttemptEvent.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       AttemptEvent()..mergeFromBuffer(data, registry);
-  factory AttemptEvent.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+  factory AttemptEvent.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       AttemptEvent()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'AttemptEvent',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AttemptEvent',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.censor.v1'),
       createEmptyInstance: AttemptEvent.$_createMessage)
     ..hasRequiredFields = false;
@@ -40,8 +38,7 @@ class AttemptEvent extends $pb.GeneratedMessage {
   AttemptEvent clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   AttemptEvent copyWith(void Function(AttemptEvent) updates) =>
-      super.copyWith((message) => updates(message as AttemptEvent))
-          as AttemptEvent;
+      super.copyWith((message) => updates(message as AttemptEvent)) as AttemptEvent;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -54,8 +51,7 @@ class AttemptEvent extends $pb.GeneratedMessage {
   AttemptEvent createEmptyInstance() => AttemptEvent._();
   @$core.pragma('dart2js:noInline')
   static AttemptEvent getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AttemptEvent>(
-          AttemptEvent.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AttemptEvent>(AttemptEvent.$_createMessage);
   static AttemptEvent? _defaultInstance;
 }
 
@@ -71,8 +67,7 @@ class ObfuscationProfileRef extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       ObfuscationProfileRef()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'ObfuscationProfileRef',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ObfuscationProfileRef',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.censor.v1'),
       createEmptyInstance: ObfuscationProfileRef.$_createMessage)
     ..hasRequiredFields = false;
@@ -80,25 +75,21 @@ class ObfuscationProfileRef extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   ObfuscationProfileRef clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  ObfuscationProfileRef copyWith(
-          void Function(ObfuscationProfileRef) updates) =>
-      super.copyWith((message) => updates(message as ObfuscationProfileRef))
-          as ObfuscationProfileRef;
+  ObfuscationProfileRef copyWith(void Function(ObfuscationProfileRef) updates) =>
+      super.copyWith((message) => updates(message as ObfuscationProfileRef)) as ObfuscationProfileRef;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use ObfuscationProfileRef() / ObfuscationProfileRef.new instead')
+  @$core.Deprecated('Use ObfuscationProfileRef() / ObfuscationProfileRef.new instead')
   static ObfuscationProfileRef create() => ObfuscationProfileRef._();
   static $pb.GeneratedMessage $_createMessage() => ObfuscationProfileRef._();
   @$core.override
   ObfuscationProfileRef createEmptyInstance() => ObfuscationProfileRef._();
   @$core.pragma('dart2js:noInline')
   static ObfuscationProfileRef getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ObfuscationProfileRef>(
-          ObfuscationProfileRef.$_createMessage);
+      $pb.GeneratedMessage.$_defaultFor<ObfuscationProfileRef>(ObfuscationProfileRef.$_createMessage);
   static ObfuscationProfileRef? _defaultInstance;
 }
 
@@ -114,8 +105,7 @@ class CensorshipVerdict extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       CensorshipVerdict()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'CensorshipVerdict',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CensorshipVerdict',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.censor.v1'),
       createEmptyInstance: CensorshipVerdict.$_createMessage)
     ..hasRequiredFields = false;
@@ -124,8 +114,7 @@ class CensorshipVerdict extends $pb.GeneratedMessage {
   CensorshipVerdict clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   CensorshipVerdict copyWith(void Function(CensorshipVerdict) updates) =>
-      super.copyWith((message) => updates(message as CensorshipVerdict))
-          as CensorshipVerdict;
+      super.copyWith((message) => updates(message as CensorshipVerdict)) as CensorshipVerdict;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
@@ -138,8 +127,7 @@ class CensorshipVerdict extends $pb.GeneratedMessage {
   CensorshipVerdict createEmptyInstance() => CensorshipVerdict._();
   @$core.pragma('dart2js:noInline')
   static CensorshipVerdict getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CensorshipVerdict>(
-          CensorshipVerdict.$_createMessage);
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CensorshipVerdict>(CensorshipVerdict.$_createMessage);
   static CensorshipVerdict? _defaultInstance;
 }
 
@@ -155,8 +143,7 @@ class DetectCensorshipRequest extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       DetectCensorshipRequest()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'DetectCensorshipRequest',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DetectCensorshipRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.censor.v1'),
       createEmptyInstance: DetectCensorshipRequest.$_createMessage)
     ..hasRequiredFields = false;
@@ -164,25 +151,21 @@ class DetectCensorshipRequest extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DetectCensorshipRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  DetectCensorshipRequest copyWith(
-          void Function(DetectCensorshipRequest) updates) =>
-      super.copyWith((message) => updates(message as DetectCensorshipRequest))
-          as DetectCensorshipRequest;
+  DetectCensorshipRequest copyWith(void Function(DetectCensorshipRequest) updates) =>
+      super.copyWith((message) => updates(message as DetectCensorshipRequest)) as DetectCensorshipRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use DetectCensorshipRequest() / DetectCensorshipRequest.new instead')
+  @$core.Deprecated('Use DetectCensorshipRequest() / DetectCensorshipRequest.new instead')
   static DetectCensorshipRequest create() => DetectCensorshipRequest._();
   static $pb.GeneratedMessage $_createMessage() => DetectCensorshipRequest._();
   @$core.override
   DetectCensorshipRequest createEmptyInstance() => DetectCensorshipRequest._();
   @$core.pragma('dart2js:noInline')
   static DetectCensorshipRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DetectCensorshipRequest>(
-          DetectCensorshipRequest.$_createMessage);
+      $pb.GeneratedMessage.$_defaultFor<DetectCensorshipRequest>(DetectCensorshipRequest.$_createMessage);
   static DetectCensorshipRequest? _defaultInstance;
 }
 
@@ -198,8 +181,7 @@ class DetectCensorshipResponse extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       DetectCensorshipResponse()..mergeFromJson(json, registry);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'DetectCensorshipResponse',
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DetectCensorshipResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.censor.v1'),
       createEmptyInstance: DetectCensorshipResponse.$_createMessage)
     ..hasRequiredFields = false;
@@ -207,28 +189,22 @@ class DetectCensorshipResponse extends $pb.GeneratedMessage {
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
   DetectCensorshipResponse clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  DetectCensorshipResponse copyWith(
-          void Function(DetectCensorshipResponse) updates) =>
-      super.copyWith((message) => updates(message as DetectCensorshipResponse))
-          as DetectCensorshipResponse;
+  DetectCensorshipResponse copyWith(void Function(DetectCensorshipResponse) updates) =>
+      super.copyWith((message) => updates(message as DetectCensorshipResponse)) as DetectCensorshipResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated(
-      'Use DetectCensorshipResponse() / DetectCensorshipResponse.new instead')
+  @$core.Deprecated('Use DetectCensorshipResponse() / DetectCensorshipResponse.new instead')
   static DetectCensorshipResponse create() => DetectCensorshipResponse._();
   static $pb.GeneratedMessage $_createMessage() => DetectCensorshipResponse._();
   @$core.override
-  DetectCensorshipResponse createEmptyInstance() =>
-      DetectCensorshipResponse._();
+  DetectCensorshipResponse createEmptyInstance() => DetectCensorshipResponse._();
   @$core.pragma('dart2js:noInline')
   static DetectCensorshipResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DetectCensorshipResponse>(
-          DetectCensorshipResponse.$_createMessage);
+      $pb.GeneratedMessage.$_defaultFor<DetectCensorshipResponse>(DetectCensorshipResponse.$_createMessage);
   static DetectCensorshipResponse? _defaultInstance;
 }
 
-const $core.bool _omitMessageNames =
-    $core.bool.fromEnvironment('protobuf.omit_message_names');
+const $core.bool _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

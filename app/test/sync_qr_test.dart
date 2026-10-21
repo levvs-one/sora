@@ -13,8 +13,7 @@ void main() {
   const pub31 = 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHg';
   const tok16 = 'AAECAwQFBgcICQoLDA0ODw';
   const tok15 = 'AAECAwQFBgcICQoLDA0O';
-  const t1 =
-      'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1';
+  const t1 = 'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1';
 
   group('T1 accept vector', () {
     test('decodes to the pinned fields', () {
@@ -53,38 +52,24 @@ void main() {
 
   group('reject vectors', () {
     final cases = <String, String>{
-      'wrong scheme':
-          'http://pair?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1',
-      'wrong host':
-          'sora-sync://join?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1',
-      'v=2':
-          'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok16&v=2',
-      'missing v':
-          'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok16',
-      'pub 31 bytes':
-          'sora-sync://pair?id=device-a&port=12345&pub=$pub31&token=$tok16&v=1',
-      'pub not base64':
-          'sora-sync://pair?id=device-a&port=12345&pub=!!!not-base64!!!&token=$tok16&v=1',
-      'token 15 bytes':
-          'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok15&v=1',
-      'token with padding':
-          'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok16==&v=1',
-      'port 0':
-          'sora-sync://pair?id=device-a&port=0&pub=$pub32&token=$tok16&v=1',
-      'port 65536':
-          'sora-sync://pair?id=device-a&port=65536&pub=$pub32&token=$tok16&v=1',
-      'port not a number':
-          'sora-sync://pair?id=device-a&port=abc&pub=$pub32&token=$tok16&v=1',
-      'empty id':
-          'sora-sync://pair?id=&port=12345&pub=$pub32&token=$tok16&v=1',
-      'missing id':
-          'sora-sync://pair?port=12345&pub=$pub32&token=$tok16&v=1',
+      'wrong scheme': 'http://pair?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1',
+      'wrong host': 'sora-sync://join?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1',
+      'v=2': 'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok16&v=2',
+      'missing v': 'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok16',
+      'pub 31 bytes': 'sora-sync://pair?id=device-a&port=12345&pub=$pub31&token=$tok16&v=1',
+      'pub not base64': 'sora-sync://pair?id=device-a&port=12345&pub=!!!not-base64!!!&token=$tok16&v=1',
+      'token 15 bytes': 'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok15&v=1',
+      'token with padding': 'sora-sync://pair?id=device-a&port=12345&pub=$pub32&token=$tok16==&v=1',
+      'port 0': 'sora-sync://pair?id=device-a&port=0&pub=$pub32&token=$tok16&v=1',
+      'port 65536': 'sora-sync://pair?id=device-a&port=65536&pub=$pub32&token=$tok16&v=1',
+      'port not a number': 'sora-sync://pair?id=device-a&port=abc&pub=$pub32&token=$tok16&v=1',
+      'empty id': 'sora-sync://pair?id=&port=12345&pub=$pub32&token=$tok16&v=1',
+      'missing id': 'sora-sync://pair?port=12345&pub=$pub32&token=$tok16&v=1',
       'fragment': '$t1#frag',
       'bare trailing fragment': '$t1#',
       'duplicated key': '$t1&port=1',
       'duplicated pub': '$t1&pub=$pub32',
-      'uppercase host is rejected':
-          'sora-sync://PAIR?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1',
+      'uppercase host is rejected': 'sora-sync://PAIR?id=device-a&port=12345&pub=$pub32&token=$tok16&v=1',
     };
     for (final entry in cases.entries) {
       test(entry.key, () {

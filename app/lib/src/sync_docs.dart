@@ -21,20 +21,20 @@ abstract final class SyncDocKinds {
   /// Fixed document name per kind: collections use `list`, singletons
   /// use `main`, so last-write-wins applies to the whole set at once.
   static String nameOf(String kind) => switch (kind) {
-        subscriptions => 'list',
-        _ => 'main',
-      };
+    subscriptions => 'list',
+    _ => 'main',
+  };
 }
 
 /// Localized label for a document kind, shown in the sync result.
 String syncDocKindLabel(S s, String kind) => switch (kind) {
-      SyncDocKinds.subscriptions => s.syncDocKindSubscriptions,
-      SyncDocKinds.appSettings => s.syncDocKindSettings,
-      SyncDocKinds.overrides => s.syncDocKindOverrides,
-      SyncDocKinds.profiles => s.syncDocKindProfiles,
-      SyncDocKinds.chains => s.syncDocKindChains,
-      _ => kind,
-    };
+  SyncDocKinds.subscriptions => s.syncDocKindSubscriptions,
+  SyncDocKinds.appSettings => s.syncDocKindSettings,
+  SyncDocKinds.overrides => s.syncDocKindOverrides,
+  SyncDocKinds.profiles => s.syncDocKindProfiles,
+  SyncDocKinds.chains => s.syncDocKindChains,
+  _ => kind,
+};
 
 /// Documents that arrived after [before]: new ones, or ones with a newer
 /// `updated_at`. Used after pairing, where the daemon ran the first sync
@@ -101,9 +101,7 @@ class SyncDocumentBridge {
     final docs = await _buildDocs();
     Map<String, String> storedHashes;
     try {
-      storedHashes = {
-        for (final meta in await client.documents()) '${meta.kind}/${meta.name}': meta.hash,
-      };
+      storedHashes = {for (final meta in await client.documents()) '${meta.kind}/${meta.name}': meta.hash};
     } on SyncApiException {
       storedHashes = const {}; // unknown state: publish everything
     }
@@ -119,12 +117,12 @@ class SyncDocumentBridge {
   static String _hashOf(List<int> payload) => sha256.convert(payload).toString();
 
   Future<Map<String, List<int>>> _buildDocs() async => {
-        SyncDocKinds.subscriptions: utf8.encode(await _subscriptionsJson()),
-        SyncDocKinds.appSettings: utf8.encode(jsonEncode(sora.settings.exportSyncableSettings())),
-        SyncDocKinds.overrides: utf8.encode(sora.settings.subscriptionOverrides),
-        SyncDocKinds.profiles: utf8.encode(sora.settings.networkProfiles),
-        SyncDocKinds.chains: utf8.encode(sora.settings.proxyChains),
-      };
+    SyncDocKinds.subscriptions: utf8.encode(await _subscriptionsJson()),
+    SyncDocKinds.appSettings: utf8.encode(jsonEncode(sora.settings.exportSyncableSettings())),
+    SyncDocKinds.overrides: utf8.encode(sora.settings.subscriptionOverrides),
+    SyncDocKinds.profiles: utf8.encode(sora.settings.networkProfiles),
+    SyncDocKinds.chains: utf8.encode(sora.settings.proxyChains),
+  };
 
   /// Serializes subscriptions with their URLs. The core keeps bearer URLs
   /// out of state snapshots by design; the dedicated
@@ -146,8 +144,7 @@ class SyncDocumentBridge {
         'url': url,
         'auto_update': sub.settings.autoUpdate,
         'user_agent': sub.settings.userAgent,
-        'update_interval_seconds':
-            sub.settings.hasUpdateInterval() ? sub.settings.updateInterval.seconds.toInt() : 0,
+        'update_interval_seconds': sub.settings.hasUpdateInterval() ? sub.settings.updateInterval.seconds.toInt() : 0,
       });
     }
     return jsonEncode({'v': 1, 'items': items});

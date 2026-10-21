@@ -471,9 +471,8 @@ class _ServerRow extends StatelessWidget {
                           Text(
                             s.speedMbps(mbpsOf(bps ?? staleBps!)),
                             textAlign: TextAlign.right,
-                            style: Styles.figures(
-                              Styles.caption,
-                            ).copyWith(color: bps != null ? palette.ink2 : palette.ink3),
+                            style: Styles.figures(Styles.caption)
+                                .copyWith(color: bps != null ? palette.ink2 : palette.ink3),
                           ),
                       ],
                     ),
@@ -881,11 +880,7 @@ class _CustomServerRowState extends State<_CustomServerRow> {
                       child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: _testing
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CupertinoActivityIndicator(radius: 9),
-                              )
+                            ? const SizedBox(width: 18, height: 18, child: CupertinoActivityIndicator(radius: 9))
                             : Icon(Symbols.network_check_rounded, size: 18, color: palette.ink2),
                       ),
                     ),

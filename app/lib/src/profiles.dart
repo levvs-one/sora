@@ -56,8 +56,7 @@ class NetworkProfile {
   /// naming both an SSID and a gateway applies only when both are seen.
   bool matches({String? ssid, String? gateway, String? asn}) {
     if (!hasTriggers) return false;
-    bool hit(List<String> triggers, String? value) =>
-        value != null && value.isNotEmpty && triggers.contains(value);
+    bool hit(List<String> triggers, String? value) => value != null && value.isNotEmpty && triggers.contains(value);
     if (ssids.isNotEmpty && !hit(ssids, ssid)) return false;
     if (gateways.isNotEmpty && !hit(gateways, gateway)) return false;
     if (asns.isNotEmpty && !hit(asns, asn)) return false;
@@ -83,19 +82,19 @@ class NetworkProfile {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'ssids': ssids,
-        'gateways': gateways,
-        'asns': asns,
-        'autoApply': autoApply,
-        if (tunnel != null) 'tunnel': tunnel,
-        if (preset != null) 'preset': preset,
-        if (dns != null) 'dns': dns,
-        if (dnsPreset != null) 'dnsPreset': dnsPreset,
-        if (serverId != null) 'serverId': serverId,
-        if (engine != null) 'engine': engine,
-      };
+    'id': id,
+    'name': name,
+    'ssids': ssids,
+    'gateways': gateways,
+    'asns': asns,
+    'autoApply': autoApply,
+    if (tunnel != null) 'tunnel': tunnel,
+    if (preset != null) 'preset': preset,
+    if (dns != null) 'dns': dns,
+    if (dnsPreset != null) 'dnsPreset': dnsPreset,
+    if (serverId != null) 'serverId': serverId,
+    if (engine != null) 'engine': engine,
+  };
 }
 
 /// Fingerprint of the currently joined network.

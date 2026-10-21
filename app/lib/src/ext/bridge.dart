@@ -122,12 +122,7 @@ class PanelBridge {
   /// `.code`, so `catch (e) { e.code }` works identically against the real
   /// host and the mock.
   String _reply(dynamic id, bool ok, String? error, [dynamic result]) {
-    return jsonEncode({
-      'id': id,
-      'ok': ok,
-      'error': ?error,
-      if (ok) 'result': result,
-    });
+    return jsonEncode({'id': id, 'ok': ok, 'error': ?error, if (ok) 'result': result});
   }
 
   /// Injected into the panel before any page script runs. `soraExt` here is

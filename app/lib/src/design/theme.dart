@@ -156,12 +156,9 @@ abstract final class Styles {
 
   /// Semantic error text styles. Use these for any error copy instead of
   /// tinting a base style with [Palette.danger] inline.
-  static TextStyle dangerCaption(BuildContext context) =>
-      caption.copyWith(color: Palette.of(context).danger);
-  static TextStyle dangerSecondary(BuildContext context) =>
-      secondary.copyWith(color: Palette.of(context).danger);
-  static TextStyle dangerStrong(BuildContext context) =>
-      bodyStrong.copyWith(color: Palette.of(context).danger);
+  static TextStyle dangerCaption(BuildContext context) => caption.copyWith(color: Palette.of(context).danger);
+  static TextStyle dangerSecondary(BuildContext context) => secondary.copyWith(color: Palette.of(context).danger);
+  static TextStyle dangerStrong(BuildContext context) => bodyStrong.copyWith(color: Palette.of(context).danger);
 }
 
 /// Shared animation durations and curves that respect the motion setting.

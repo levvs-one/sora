@@ -29,11 +29,11 @@ const CustomProtocol$json = {
 };
 
 /// Descriptor for `CustomProtocol`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List customProtocolDescriptor = $convert.base64Decode(
-    'Cg5DdXN0b21Qcm90b2NvbBIfChtDVVNUT01fUFJPVE9DT0xfVU5TUEVDSUZJRUQQABIZChVDVV'
-    'NUT01fUFJPVE9DT0xfVkxFU1MQARIZChVDVVNUT01fUFJPVE9DT0xfVk1FU1MQAhIaChZDVVNU'
-    'T01fUFJPVE9DT0xfVFJPSkFOEAMSHwobQ1VTVE9NX1BST1RPQ09MX1NIQURPV1NPQ0tTEAQSHQ'
-    'oZQ1VTVE9NX1BST1RPQ09MX1dJUkVHVUFSRBAF');
+final $typed_data.Uint8List customProtocolDescriptor =
+    $convert.base64Decode('Cg5DdXN0b21Qcm90b2NvbBIfChtDVVNUT01fUFJPVE9DT0xfVU5TUEVDSUZJRUQQABIZChVDVV'
+        'NUT01fUFJPVE9DT0xfVkxFU1MQARIZChVDVVNUT01fUFJPVE9DT0xfVk1FU1MQAhIaChZDVVNU'
+        'T01fUFJPVE9DT0xfVFJPSkFOEAMSHwobQ1VTVE9NX1BST1RPQ09MX1NIQURPV1NPQ0tTEAQSHQ'
+        'oZQ1VTVE9NX1BST1RPQ09MX1dJUkVHVUFSRBAF');
 
 @$core.Deprecated('Use customServerDescriptor instead')
 const CustomServer$json = {
@@ -41,14 +41,7 @@ const CustomServer$json = {
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
-    {
-      '1': 'protocol',
-      '3': 3,
-      '4': 1,
-      '5': 14,
-      '6': '.sora.custom.v1.CustomProtocol',
-      '10': 'protocol'
-    },
+    {'1': 'protocol', '3': 3, '4': 1, '5': 14, '6': '.sora.custom.v1.CustomProtocol', '10': 'protocol'},
     {'1': 'address', '3': 4, '4': 1, '5': 9, '10': 'address'},
     {'1': 'port', '3': 5, '4': 1, '5': 13, '10': 'port'},
     {'1': 'credentials', '3': 6, '4': 1, '5': 9, '10': 'credentials'},
@@ -57,216 +50,121 @@ const CustomServer$json = {
 };
 
 /// Descriptor for `CustomServer`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List customServerDescriptor = $convert.base64Decode(
-    'CgxDdXN0b21TZXJ2ZXISDgoCaWQYASABKAlSAmlkEhIKBG5hbWUYAiABKAlSBG5hbWUSOgoIcH'
-    'JvdG9jb2wYAyABKA4yHi5zb3JhLmN1c3RvbS52MS5DdXN0b21Qcm90b2NvbFIIcHJvdG9jb2wS'
-    'GAoHYWRkcmVzcxgEIAEoCVIHYWRkcmVzcxISCgRwb3J0GAUgASgNUgRwb3J0EiAKC2NyZWRlbn'
-    'RpYWxzGAYgASgJUgtjcmVkZW50aWFscxInCg9oYXNfY3JlZGVudGlhbHMYByABKAhSDmhhc0Ny'
-    'ZWRlbnRpYWxz');
+final $typed_data.Uint8List customServerDescriptor =
+    $convert.base64Decode('CgxDdXN0b21TZXJ2ZXISDgoCaWQYASABKAlSAmlkEhIKBG5hbWUYAiABKAlSBG5hbWUSOgoIcH'
+        'JvdG9jb2wYAyABKA4yHi5zb3JhLmN1c3RvbS52MS5DdXN0b21Qcm90b2NvbFIIcHJvdG9jb2wS'
+        'GAoHYWRkcmVzcxgEIAEoCVIHYWRkcmVzcxISCgRwb3J0GAUgASgNUgRwb3J0EiAKC2NyZWRlbn'
+        'RpYWxzGAYgASgJUgtjcmVkZW50aWFscxInCg9oYXNfY3JlZGVudGlhbHMYByABKAhSDmhhc0Ny'
+        'ZWRlbnRpYWxz');
 
 @$core.Deprecated('Use saveCustomServerRequestDescriptor instead')
 const SaveCustomServerRequest$json = {
   '1': 'SaveCustomServerRequest',
   '2': [
-    {
-      '1': 'api_version',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.core.v1.ApiVersion',
-      '10': 'apiVersion'
-    },
-    {
-      '1': 'control_authenticator',
-      '3': 2,
-      '4': 1,
-      '5': 12,
-      '10': 'controlAuthenticator'
-    },
-    {
-      '1': 'server',
-      '3': 3,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.custom.v1.CustomServer',
-      '10': 'server'
-    },
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'server', '3': 3, '4': 1, '5': 11, '6': '.sora.custom.v1.CustomServer', '10': 'server'},
   ],
 };
 
 /// Descriptor for `SaveCustomServerRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List saveCustomServerRequestDescriptor = $convert.base64Decode(
-    'ChdTYXZlQ3VzdG9tU2VydmVyUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY2'
-    '9yZS52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgC'
-    'IAEoDFIUY29udHJvbEF1dGhlbnRpY2F0b3ISNAoGc2VydmVyGAMgASgLMhwuc29yYS5jdXN0b2'
-    '0udjEuQ3VzdG9tU2VydmVyUgZzZXJ2ZXI=');
+final $typed_data.Uint8List saveCustomServerRequestDescriptor =
+    $convert.base64Decode('ChdTYXZlQ3VzdG9tU2VydmVyUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY2'
+        '9yZS52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgC'
+        'IAEoDFIUY29udHJvbEF1dGhlbnRpY2F0b3ISNAoGc2VydmVyGAMgASgLMhwuc29yYS5jdXN0b2'
+        '0udjEuQ3VzdG9tU2VydmVyUgZzZXJ2ZXI=');
 
 @$core.Deprecated('Use saveCustomServerResponseDescriptor instead')
 const SaveCustomServerResponse$json = {
   '1': 'SaveCustomServerResponse',
   '2': [
-    {
-      '1': 'server',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.custom.v1.CustomServer',
-      '10': 'server'
-    },
-    {
-      '1': 'error',
-      '3': 2,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.core.v1.SoraError',
-      '10': 'error'
-    },
+    {'1': 'server', '3': 1, '4': 1, '5': 11, '6': '.sora.custom.v1.CustomServer', '10': 'server'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
   ],
 };
 
 /// Descriptor for `SaveCustomServerResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List saveCustomServerResponseDescriptor = $convert.base64Decode(
-    'ChhTYXZlQ3VzdG9tU2VydmVyUmVzcG9uc2USNAoGc2VydmVyGAEgASgLMhwuc29yYS5jdXN0b2'
-    '0udjEuQ3VzdG9tU2VydmVyUgZzZXJ2ZXISLQoFZXJyb3IYAiABKAsyFy5zb3JhLmNvcmUudjEu'
-    'U29yYUVycm9yUgVlcnJvcg==');
+final $typed_data.Uint8List saveCustomServerResponseDescriptor =
+    $convert.base64Decode('ChhTYXZlQ3VzdG9tU2VydmVyUmVzcG9uc2USNAoGc2VydmVyGAEgASgLMhwuc29yYS5jdXN0b2'
+        '0udjEuQ3VzdG9tU2VydmVyUgZzZXJ2ZXISLQoFZXJyb3IYAiABKAsyFy5zb3JhLmNvcmUudjEu'
+        'U29yYUVycm9yUgVlcnJvcg==');
 
 @$core.Deprecated('Use listCustomServersRequestDescriptor instead')
 const ListCustomServersRequest$json = {
   '1': 'ListCustomServersRequest',
   '2': [
-    {
-      '1': 'api_version',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.core.v1.ApiVersion',
-      '10': 'apiVersion'
-    },
-    {
-      '1': 'control_authenticator',
-      '3': 2,
-      '4': 1,
-      '5': 12,
-      '10': 'controlAuthenticator'
-    },
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
   ],
 };
 
 /// Descriptor for `ListCustomServersRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List listCustomServersRequestDescriptor = $convert.base64Decode(
-    'ChhMaXN0Q3VzdG9tU2VydmVyc1JlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLm'
-    'NvcmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIzChVjb250cm9sX2F1dGhlbnRpY2F0b3IY'
-    'AiABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9y');
+final $typed_data.Uint8List listCustomServersRequestDescriptor =
+    $convert.base64Decode('ChhMaXN0Q3VzdG9tU2VydmVyc1JlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLm'
+        'NvcmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIzChVjb250cm9sX2F1dGhlbnRpY2F0b3IY'
+        'AiABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9y');
 
 @$core.Deprecated('Use listCustomServersResponseDescriptor instead')
 const ListCustomServersResponse$json = {
   '1': 'ListCustomServersResponse',
   '2': [
-    {
-      '1': 'servers',
-      '3': 1,
-      '4': 3,
-      '5': 11,
-      '6': '.sora.custom.v1.CustomServer',
-      '10': 'servers'
-    },
-    {
-      '1': 'error',
-      '3': 2,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.core.v1.SoraError',
-      '10': 'error'
-    },
+    {'1': 'servers', '3': 1, '4': 3, '5': 11, '6': '.sora.custom.v1.CustomServer', '10': 'servers'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
   ],
 };
 
 /// Descriptor for `ListCustomServersResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List listCustomServersResponseDescriptor = $convert.base64Decode(
-    'ChlMaXN0Q3VzdG9tU2VydmVyc1Jlc3BvbnNlEjYKB3NlcnZlcnMYASADKAsyHC5zb3JhLmN1c3'
-    'RvbS52MS5DdXN0b21TZXJ2ZXJSB3NlcnZlcnMSLQoFZXJyb3IYAiABKAsyFy5zb3JhLmNvcmUu'
-    'djEuU29yYUVycm9yUgVlcnJvcg==');
+final $typed_data.Uint8List listCustomServersResponseDescriptor =
+    $convert.base64Decode('ChlMaXN0Q3VzdG9tU2VydmVyc1Jlc3BvbnNlEjYKB3NlcnZlcnMYASADKAsyHC5zb3JhLmN1c3'
+        'RvbS52MS5DdXN0b21TZXJ2ZXJSB3NlcnZlcnMSLQoFZXJyb3IYAiABKAsyFy5zb3JhLmNvcmUu'
+        'djEuU29yYUVycm9yUgVlcnJvcg==');
 
 @$core.Deprecated('Use deleteCustomServerRequestDescriptor instead')
 const DeleteCustomServerRequest$json = {
   '1': 'DeleteCustomServerRequest',
   '2': [
-    {
-      '1': 'api_version',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.core.v1.ApiVersion',
-      '10': 'apiVersion'
-    },
-    {
-      '1': 'control_authenticator',
-      '3': 2,
-      '4': 1,
-      '5': 12,
-      '10': 'controlAuthenticator'
-    },
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
     {'1': 'id', '3': 3, '4': 1, '5': 9, '10': 'id'},
   ],
 };
 
 /// Descriptor for `DeleteCustomServerRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List deleteCustomServerRequestDescriptor = $convert.base64Decode(
-    'ChlEZWxldGVDdXN0b21TZXJ2ZXJSZXF1ZXN0EjkKC2FwaV92ZXJzaW9uGAEgASgLMhguc29yYS'
-    '5jb3JlLnYxLkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50aWNhdG9y'
-    'GAIgASgMUhRjb250cm9sQXV0aGVudGljYXRvchIOCgJpZBgDIAEoCVICaWQ=');
+final $typed_data.Uint8List deleteCustomServerRequestDescriptor =
+    $convert.base64Decode('ChlEZWxldGVDdXN0b21TZXJ2ZXJSZXF1ZXN0EjkKC2FwaV92ZXJzaW9uGAEgASgLMhguc29yYS'
+        '5jb3JlLnYxLkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50aWNhdG9y'
+        'GAIgASgMUhRjb250cm9sQXV0aGVudGljYXRvchIOCgJpZBgDIAEoCVICaWQ=');
 
 @$core.Deprecated('Use deleteCustomServerResponseDescriptor instead')
 const DeleteCustomServerResponse$json = {
   '1': 'DeleteCustomServerResponse',
   '2': [
-    {
-      '1': 'error',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.core.v1.SoraError',
-      '10': 'error'
-    },
+    {'1': 'error', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
   ],
 };
 
 /// Descriptor for `DeleteCustomServerResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List deleteCustomServerResponseDescriptor =
-    $convert.base64Decode(
-        'ChpEZWxldGVDdXN0b21TZXJ2ZXJSZXNwb25zZRItCgVlcnJvchgBIAEoCzIXLnNvcmEuY29yZS'
+    $convert.base64Decode('ChpEZWxldGVDdXN0b21TZXJ2ZXJSZXNwb25zZRItCgVlcnJvchgBIAEoCzIXLnNvcmEuY29yZS'
         '52MS5Tb3JhRXJyb3JSBWVycm9y');
 
 @$core.Deprecated('Use testCustomServerRequestDescriptor instead')
 const TestCustomServerRequest$json = {
   '1': 'TestCustomServerRequest',
   '2': [
-    {
-      '1': 'api_version',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.core.v1.ApiVersion',
-      '10': 'apiVersion'
-    },
-    {
-      '1': 'control_authenticator',
-      '3': 2,
-      '4': 1,
-      '5': 12,
-      '10': 'controlAuthenticator'
-    },
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
     {'1': 'id', '3': 3, '4': 1, '5': 9, '10': 'id'},
     {'1': 'timeout_ms', '3': 4, '4': 1, '5': 13, '10': 'timeoutMs'},
   ],
 };
 
 /// Descriptor for `TestCustomServerRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List testCustomServerRequestDescriptor = $convert.base64Decode(
-    'ChdUZXN0Q3VzdG9tU2VydmVyUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY2'
-    '9yZS52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgC'
-    'IAEoDFIUY29udHJvbEF1dGhlbnRpY2F0b3ISDgoCaWQYAyABKAlSAmlkEh0KCnRpbWVvdXRfbX'
-    'MYBCABKA1SCXRpbWVvdXRNcw==');
+final $typed_data.Uint8List testCustomServerRequestDescriptor =
+    $convert.base64Decode('ChdUZXN0Q3VzdG9tU2VydmVyUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY2'
+        '9yZS52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgC'
+        'IAEoDFIUY29udHJvbEF1dGhlbnRpY2F0b3ISDgoCaWQYAyABKAlSAmlkEh0KCnRpbWVvdXRfbX'
+        'MYBCABKA1SCXRpbWVvdXRNcw==');
 
 @$core.Deprecated('Use testCustomServerResponseDescriptor instead')
 const TestCustomServerResponse$json = {
@@ -274,19 +172,12 @@ const TestCustomServerResponse$json = {
   '2': [
     {'1': 'reachable', '3': 1, '4': 1, '5': 8, '10': 'reachable'},
     {'1': 'latency_ms', '3': 2, '4': 1, '5': 4, '10': 'latencyMs'},
-    {
-      '1': 'error',
-      '3': 3,
-      '4': 1,
-      '5': 11,
-      '6': '.sora.core.v1.SoraError',
-      '10': 'error'
-    },
+    {'1': 'error', '3': 3, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
   ],
 };
 
 /// Descriptor for `TestCustomServerResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List testCustomServerResponseDescriptor = $convert.base64Decode(
-    'ChhUZXN0Q3VzdG9tU2VydmVyUmVzcG9uc2USHAoJcmVhY2hhYmxlGAEgASgIUglyZWFjaGFibG'
-    'USHQoKbGF0ZW5jeV9tcxgCIAEoBFIJbGF0ZW5jeU1zEi0KBWVycm9yGAMgASgLMhcuc29yYS5j'
-    'b3JlLnYxLlNvcmFFcnJvclIFZXJyb3I=');
+final $typed_data.Uint8List testCustomServerResponseDescriptor =
+    $convert.base64Decode('ChhUZXN0Q3VzdG9tU2VydmVyUmVzcG9uc2USHAoJcmVhY2hhYmxlGAEgASgIUglyZWFjaGFibG'
+        'USHQoKbGF0ZW5jeV9tcxgCIAEoBFIJbGF0ZW5jeU1zEi0KBWVycm9yGAMgASgLMhcuc29yYS5j'
+        'b3JlLnYxLlNvcmFFcnJvclIFZXJyb3I=');

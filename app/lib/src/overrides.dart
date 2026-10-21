@@ -41,10 +41,7 @@ class SubscriptionOverride {
     return SubscriptionOverride(renames: renames, hidden: hidden);
   }
 
-  Map<String, dynamic> toJson() => {
-    'renames': renames,
-    'hidden': hidden.toList(),
-  };
+  Map<String, dynamic> toJson() => {'renames': renames, 'hidden': hidden.toList()};
 
   SubscriptionOverride copyWith({Map<String, String>? renames, Set<String>? hidden}) =>
       SubscriptionOverride(renames: renames ?? this.renames, hidden: hidden ?? this.hidden);

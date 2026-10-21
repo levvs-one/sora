@@ -96,10 +96,7 @@ class _AboutScreenState extends State<AboutScreen> {
             if (updates.versionRevoked)
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                child: Text(
-                  s.updateVersionRevoked,
-                  style: Styles.secondary.copyWith(color: palette.danger),
-                ),
+                child: Text(s.updateVersionRevoked, style: Styles.secondary.copyWith(color: palette.danger)),
               ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -124,10 +121,7 @@ class _AboutScreenState extends State<AboutScreen> {
             if (updates.rolloutPending && !updates.hasUpdate)
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: Text(
-                  s.updateRolloutPending,
-                  style: Styles.secondary.copyWith(color: palette.ink2),
-                ),
+                child: Text(s.updateRolloutPending, style: Styles.secondary.copyWith(color: palette.ink2)),
               ),
             if (release != null) ...[
               Padding(
@@ -181,8 +175,7 @@ class _AboutScreenState extends State<AboutScreen> {
                                   // on the app-wide navigator so leaving About
                                   // mid-download no longer silently discards
                                   // the verified update (audit M19).
-                                  final context =
-                                      desktop.navigator.currentContext;
+                                  final context = desktop.navigator.currentContext;
                                   if (context == null || !context.mounted) {
                                     return Future.value(false);
                                   }
@@ -211,17 +204,13 @@ class _AboutScreenState extends State<AboutScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              switch (updates.stage) {
-                                UpdateStage.checking => s.updateChecking,
-                                UpdateStage.installing => s.updateInstalling,
-                                _ => s.updateDownloading,
-                              },
-                              style: Styles.caption.copyWith(color: palette.ink2),
-                            ),
+                            child: Text(switch (updates.stage) {
+                              UpdateStage.checking => s.updateChecking,
+                              UpdateStage.installing => s.updateInstalling,
+                              _ => s.updateDownloading,
+                            }, style: Styles.caption.copyWith(color: palette.ink2)),
                           ),
-                          if (updates.stage == UpdateStage.downloading ||
-                              updates.stage == UpdateStage.checking)
+                          if (updates.stage == UpdateStage.downloading || updates.stage == UpdateStage.checking)
                             Pressable(
                               onTap: updates.cancel,
                               radius: 8,

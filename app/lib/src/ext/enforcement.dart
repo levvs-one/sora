@@ -32,56 +32,68 @@ class ExtEnforcementRow {
 
 const List<ExtEnforcementRow> extEnforcementTable = [
   ExtEnforcementRow(
-      'connections.read',
-      ExtEnforcementStatus.enforced,
-      'every GetConnections call is token- and permission-checked'),
+    'connections.read',
+    ExtEnforcementStatus.enforced,
+    'every GetConnections call is token- and permission-checked',
+  ),
   ExtEnforcementRow(
-      'servers.read',
-      ExtEnforcementStatus.enforced,
-      'every GetServers call is token- and permission-checked'),
+    'servers.read',
+    ExtEnforcementStatus.enforced,
+    'every GetServers call is token- and permission-checked',
+  ),
   ExtEnforcementRow(
-      'settings.read',
-      ExtEnforcementStatus.inert,
-      'no API exposes app settings; granting changes nothing today'),
+    'settings.read',
+    ExtEnforcementStatus.inert,
+    'no API exposes app settings; granting changes nothing today',
+  ),
   ExtEnforcementRow(
-      'settings.write',
-      ExtEnforcementStatus.inert,
-      'no API exposes app settings; granting changes nothing today'),
+    'settings.write',
+    ExtEnforcementStatus.inert,
+    'no API exposes app settings; granting changes nothing today',
+  ),
   ExtEnforcementRow(
-      'notifications',
-      ExtEnforcementStatus.enforced,
-      'every Notify call is checked; text is size-capped in the host'),
-  ExtEnforcementRow('tray', ExtEnforcementStatus.unimplemented,
-      'no tray API exists yet; granting changes nothing today'),
+    'notifications',
+    ExtEnforcementStatus.enforced,
+    'every Notify call is checked; text is size-capped in the host',
+  ),
   ExtEnforcementRow(
-      'ui.panel',
-      ExtEnforcementStatus.installTime,
-      'declared panels require the ui.panel permission: the prompt always mentions UI embedding'),
+    'tray',
+    ExtEnforcementStatus.unimplemented,
+    'no tray API exists yet; granting changes nothing today',
+  ),
   ExtEnforcementRow(
-      'theme.apply',
-      ExtEnforcementStatus.unimplemented,
-      'theme runtime not built yet; granting changes nothing today'),
+    'ui.panel',
+    ExtEnforcementStatus.installTime,
+    'declared panels require the ui.panel permission: the prompt always mentions UI embedding',
+  ),
   ExtEnforcementRow(
-      'routing.rules',
-      ExtEnforcementStatus.unimplemented,
-      'RiskDangerous with zero enforcement code: no consumer reads extension rules yet'),
+    'theme.apply',
+    ExtEnforcementStatus.unimplemented,
+    'theme runtime not built yet; granting changes nothing today',
+  ),
   ExtEnforcementRow(
-      'net.hooks',
-      ExtEnforcementStatus.unimplemented,
-      'RiskDangerous with zero enforcement code: no consumer runs extension hooks yet'),
+    'routing.rules',
+    ExtEnforcementStatus.unimplemented,
+    'RiskDangerous with zero enforcement code: no consumer reads extension rules yet',
+  ),
   ExtEnforcementRow(
-      'net.fetch',
-      ExtEnforcementStatus.enforced,
-      'allowlist + https/IP/port/redirect/rate/size checks; rides the VPN or fails closed'),
+    'net.hooks',
+    ExtEnforcementStatus.unimplemented,
+    'RiskDangerous with zero enforcement code: no consumer runs extension hooks yet',
+  ),
   ExtEnforcementRow(
-      'background',
-      ExtEnforcementStatus.enforced,
-      'capability + permission gate, interval clamp, overlap guard, circuit breaker; no worker executor wired yet'),
+    'net.fetch',
+    ExtEnforcementStatus.enforced,
+    'allowlist + https/IP/port/redirect/rate/size checks; rides the VPN or fails closed',
+  ),
+  ExtEnforcementRow(
+    'background',
+    ExtEnforcementStatus.enforced,
+    'capability + permission gate, interval clamp, overlap guard, circuit breaker; no worker executor wired yet',
+  ),
 ];
 
-final _enforcementIndex = {
-  for (final r in extEnforcementTable) r.id: r,
-};
+final _enforcementIndex = {for (final r in extEnforcementTable) r.id: r};
 
 ExtEnforcementRow? enforcementOf(String id) => _enforcementIndex[id];
 
@@ -90,16 +102,12 @@ ExtEnforcementRow? enforcementOf(String id) => _enforcementIndex[id];
 /// a protection.
 bool isEnforced(String id) {
   final row = enforcementOf(id);
-  return row != null &&
-      (row.status == ExtEnforcementStatus.enforced ||
-          row.status == ExtEnforcementStatus.installTime);
+  return row != null && (row.status == ExtEnforcementStatus.enforced || row.status == ExtEnforcementStatus.installTime);
 }
 
 /// True for permissions that are honestly "granted but doing nothing yet":
 /// inert or unimplemented. The prompt should say so in plain language.
 bool isNotYetActive(String id) {
   final row = enforcementOf(id);
-  return row != null &&
-      (row.status == ExtEnforcementStatus.inert ||
-          row.status == ExtEnforcementStatus.unimplemented);
+  return row != null && (row.status == ExtEnforcementStatus.inert || row.status == ExtEnforcementStatus.unimplemented);
 }

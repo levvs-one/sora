@@ -3,8 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/material.dart'
-    show SizedBox, Text, EditableText, Scrollable, ScrollableState, ValueKey;
+import 'package:flutter/material.dart' show SizedBox, Text, EditableText, Scrollable, ScrollableState, ValueKey;
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart' show Server, ServiceCall;
 import 'package:sora/main.dart';
@@ -81,9 +80,7 @@ class _Core extends CoreControlServiceBase {
 
   @override
   Future<GetAboutResponse> getAbout(ServiceCall call, GetAboutRequest request) async => GetAboutResponse(
-    about: About(
-      contract: apiVersion.deepCopy()..capabilities.addAll(['serverless', 'log-export-formats']),
-    ),
+    about: About(contract: apiVersion.deepCopy()..capabilities.addAll(['serverless', 'log-export-formats'])),
   );
 
   @override

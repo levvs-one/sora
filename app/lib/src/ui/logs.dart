@@ -289,11 +289,7 @@ class _LogsScreenState extends State<LogsScreen> {
         final link = sora.link;
         if (link == null || _capture != null) return;
         request = link.stub.exportDiagnostics(
-          ExportDiagnosticsRequest(
-            apiVersion: apiVersion,
-            controlAuthenticator: link.token,
-            sessionId: sora.sessionId,
-          ),
+          ExportDiagnosticsRequest(apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: sora.sessionId),
           options: CallOptions(timeout: const Duration(seconds: 30)),
         );
         setState(() {
@@ -368,10 +364,7 @@ class _LogsScreenState extends State<LogsScreen> {
                 ),
               ),
             const Divider(height: 12),
-            for (final (kind, icon) in [
-              ('har', Symbols.language_rounded),
-              ('archive', Symbols.article_rounded),
-            ])
+            for (final (kind, icon) in [('har', Symbols.language_rounded), ('archive', Symbols.article_rounded)])
               MenuItemButton(
                 onPressed: _capture == null ? () => unawaited(_diagnostic(kind)) : null,
                 leadingIcon: Icon(icon, size: 18, color: palette.ink),

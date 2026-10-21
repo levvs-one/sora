@@ -66,7 +66,14 @@ class CoreLink {
         options: CallOptions(timeout: const Duration(seconds: 5)),
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
-      return CoreLink._(channel, stub, CustomServersClient(channel), LeakServiceClient(channel), answer.controlAuthenticator, answer.negotiatedVersion.minor);
+      return CoreLink._(
+        channel,
+        stub,
+        CustomServersClient(channel),
+        LeakServiceClient(channel),
+        answer.controlAuthenticator,
+        answer.negotiatedVersion.minor,
+      );
     } catch (_) {
       await channel.shutdown();
       rethrow;

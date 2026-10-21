@@ -26,10 +26,10 @@ const MintTokenRequest$json = {
 };
 
 /// Descriptor for `MintTokenRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List mintTokenRequestDescriptor = $convert.base64Decode(
-    'ChBNaW50VG9rZW5SZXF1ZXN0EiMKDWNvbnRyb2xfdG9rZW4YASABKAxSDGNvbnRyb2xUb2tlbh'
-    'IhCgxleHRlbnNpb25faWQYAiABKAlSC2V4dGVuc2lvbklkEiAKC3Blcm1pc3Npb25zGAMgAygJ'
-    'UgtwZXJtaXNzaW9ucw==');
+final $typed_data.Uint8List mintTokenRequestDescriptor =
+    $convert.base64Decode('ChBNaW50VG9rZW5SZXF1ZXN0EiMKDWNvbnRyb2xfdG9rZW4YASABKAxSDGNvbnRyb2xUb2tlbh'
+        'IhCgxleHRlbnNpb25faWQYAiABKAlSC2V4dGVuc2lvbklkEiAKC3Blcm1pc3Npb25zGAMgAygJ'
+        'UgtwZXJtaXNzaW9ucw==');
 
 @$core.Deprecated('Use mintTokenResponseDescriptor instead')
 const MintTokenResponse$json = {
@@ -40,9 +40,9 @@ const MintTokenResponse$json = {
 };
 
 /// Descriptor for `MintTokenResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List mintTokenResponseDescriptor = $convert.base64Decode(
-    'ChFNaW50VG9rZW5SZXNwb25zZRInCg9leHRlbnNpb25fdG9rZW4YASABKAxSDmV4dGVuc2lvbl'
-    'Rva2Vu');
+final $typed_data.Uint8List mintTokenResponseDescriptor =
+    $convert.base64Decode('ChFNaW50VG9rZW5SZXNwb25zZRInCg9leHRlbnNpb25fdG9rZW4YASABKAxSDmV4dGVuc2lvbl'
+        'Rva2Vu');
 
 @$core.Deprecated('Use revokeTokenRequestDescriptor instead')
 const RevokeTokenRequest$json = {
@@ -54,9 +54,9 @@ const RevokeTokenRequest$json = {
 };
 
 /// Descriptor for `RevokeTokenRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List revokeTokenRequestDescriptor = $convert.base64Decode(
-    'ChJSZXZva2VUb2tlblJlcXVlc3QSIwoNY29udHJvbF90b2tlbhgBIAEoDFIMY29udHJvbFRva2'
-    'VuEicKD2V4dGVuc2lvbl90b2tlbhgCIAEoDFIOZXh0ZW5zaW9uVG9rZW4=');
+final $typed_data.Uint8List revokeTokenRequestDescriptor =
+    $convert.base64Decode('ChJSZXZva2VUb2tlblJlcXVlc3QSIwoNY29udHJvbF90b2tlbhgBIAEoDFIMY29udHJvbFRva2'
+        'VuEicKD2V4dGVuc2lvbl90b2tlbhgCIAEoDFIOZXh0ZW5zaW9uVG9rZW4=');
 
 @$core.Deprecated('Use revokeTokenResponseDescriptor instead')
 const RevokeTokenResponse$json = {
@@ -64,8 +64,7 @@ const RevokeTokenResponse$json = {
 };
 
 /// Descriptor for `RevokeTokenResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List revokeTokenResponseDescriptor =
-    $convert.base64Decode('ChNSZXZva2VUb2tlblJlc3BvbnNl');
+final $typed_data.Uint8List revokeTokenResponseDescriptor = $convert.base64Decode('ChNSZXZva2VUb2tlblJlc3BvbnNl');
 
 @$core.Deprecated('Use getConnectionsRequestDescriptor instead')
 const GetConnectionsRequest$json = {
@@ -76,9 +75,9 @@ const GetConnectionsRequest$json = {
 };
 
 /// Descriptor for `GetConnectionsRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getConnectionsRequestDescriptor = $convert.base64Decode(
-    'ChVHZXRDb25uZWN0aW9uc1JlcXVlc3QSJwoPZXh0ZW5zaW9uX3Rva2VuGAEgASgMUg5leHRlbn'
-    'Npb25Ub2tlbg==');
+final $typed_data.Uint8List getConnectionsRequestDescriptor =
+    $convert.base64Decode('ChVHZXRDb25uZWN0aW9uc1JlcXVlc3QSJwoPZXh0ZW5zaW9uX3Rva2VuGAEgASgMUg5leHRlbn'
+        'Npb25Ub2tlbg==');
 
 @$core.Deprecated('Use extensionConnectionDescriptor instead')
 const ExtensionConnection$json = {
@@ -93,30 +92,22 @@ const ExtensionConnection$json = {
 };
 
 /// Descriptor for `ExtensionConnection`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List extensionConnectionDescriptor = $convert.base64Decode(
-    'ChNFeHRlbnNpb25Db25uZWN0aW9uEg4KAmlkGAEgASgJUgJpZBIYCgdwcm9jZXNzGAIgASgJUg'
-    'dwcm9jZXNzEhIKBGhvc3QYAyABKAlSBGhvc3QSGQoIdXBfYnl0ZXMYBCABKARSB3VwQnl0ZXMS'
-    'HQoKZG93bl9ieXRlcxgFIAEoBFIJZG93bkJ5dGVz');
+final $typed_data.Uint8List extensionConnectionDescriptor =
+    $convert.base64Decode('ChNFeHRlbnNpb25Db25uZWN0aW9uEg4KAmlkGAEgASgJUgJpZBIYCgdwcm9jZXNzGAIgASgJUg'
+        'dwcm9jZXNzEhIKBGhvc3QYAyABKAlSBGhvc3QSGQoIdXBfYnl0ZXMYBCABKARSB3VwQnl0ZXMS'
+        'HQoKZG93bl9ieXRlcxgFIAEoBFIJZG93bkJ5dGVz');
 
 @$core.Deprecated('Use getConnectionsResponseDescriptor instead')
 const GetConnectionsResponse$json = {
   '1': 'GetConnectionsResponse',
   '2': [
-    {
-      '1': 'connections',
-      '3': 1,
-      '4': 3,
-      '5': 11,
-      '6': '.sora.ext.v1.ExtensionConnection',
-      '10': 'connections'
-    },
+    {'1': 'connections', '3': 1, '4': 3, '5': 11, '6': '.sora.ext.v1.ExtensionConnection', '10': 'connections'},
   ],
 };
 
 /// Descriptor for `GetConnectionsResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getConnectionsResponseDescriptor =
-    $convert.base64Decode(
-        'ChZHZXRDb25uZWN0aW9uc1Jlc3BvbnNlEkIKC2Nvbm5lY3Rpb25zGAEgAygLMiAuc29yYS5leH'
+    $convert.base64Decode('ChZHZXRDb25uZWN0aW9uc1Jlc3BvbnNlEkIKC2Nvbm5lY3Rpb25zGAEgAygLMiAuc29yYS5leH'
         'QudjEuRXh0ZW5zaW9uQ29ubmVjdGlvblILY29ubmVjdGlvbnM=');
 
 @$core.Deprecated('Use getServersRequestDescriptor instead')
@@ -128,9 +119,9 @@ const GetServersRequest$json = {
 };
 
 /// Descriptor for `GetServersRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getServersRequestDescriptor = $convert.base64Decode(
-    'ChFHZXRTZXJ2ZXJzUmVxdWVzdBInCg9leHRlbnNpb25fdG9rZW4YASABKAxSDmV4dGVuc2lvbl'
-    'Rva2Vu');
+final $typed_data.Uint8List getServersRequestDescriptor =
+    $convert.base64Decode('ChFHZXRTZXJ2ZXJzUmVxdWVzdBInCg9leHRlbnNpb25fdG9rZW4YASABKAxSDmV4dGVuc2lvbl'
+        'Rva2Vu');
 
 @$core.Deprecated('Use extensionServerDescriptor instead')
 const ExtensionServer$json = {
@@ -144,29 +135,22 @@ const ExtensionServer$json = {
 };
 
 /// Descriptor for `ExtensionServer`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List extensionServerDescriptor = $convert.base64Decode(
-    'Cg9FeHRlbnNpb25TZXJ2ZXISDgoCaWQYASABKAlSAmlkEhIKBG5hbWUYAiABKAlSBG5hbWUSGA'
-    'oHY291bnRyeRgDIAEoCVIHY291bnRyeRIdCgpsYXRlbmN5X21zGAQgASgDUglsYXRlbmN5TXM=');
+final $typed_data.Uint8List extensionServerDescriptor =
+    $convert.base64Decode('Cg9FeHRlbnNpb25TZXJ2ZXISDgoCaWQYASABKAlSAmlkEhIKBG5hbWUYAiABKAlSBG5hbWUSGA'
+        'oHY291bnRyeRgDIAEoCVIHY291bnRyeRIdCgpsYXRlbmN5X21zGAQgASgDUglsYXRlbmN5TXM=');
 
 @$core.Deprecated('Use getServersResponseDescriptor instead')
 const GetServersResponse$json = {
   '1': 'GetServersResponse',
   '2': [
-    {
-      '1': 'servers',
-      '3': 1,
-      '4': 3,
-      '5': 11,
-      '6': '.sora.ext.v1.ExtensionServer',
-      '10': 'servers'
-    },
+    {'1': 'servers', '3': 1, '4': 3, '5': 11, '6': '.sora.ext.v1.ExtensionServer', '10': 'servers'},
   ],
 };
 
 /// Descriptor for `GetServersResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getServersResponseDescriptor = $convert.base64Decode(
-    'ChJHZXRTZXJ2ZXJzUmVzcG9uc2USNgoHc2VydmVycxgBIAMoCzIcLnNvcmEuZXh0LnYxLkV4dG'
-    'Vuc2lvblNlcnZlclIHc2VydmVycw==');
+final $typed_data.Uint8List getServersResponseDescriptor =
+    $convert.base64Decode('ChJHZXRTZXJ2ZXJzUmVzcG9uc2USNgoHc2VydmVycxgBIAMoCzIcLnNvcmEuZXh0LnYxLkV4dG'
+        'Vuc2lvblNlcnZlclIHc2VydmVycw==');
 
 @$core.Deprecated('Use notifyRequestDescriptor instead')
 const NotifyRequest$json = {
@@ -179,9 +163,9 @@ const NotifyRequest$json = {
 };
 
 /// Descriptor for `NotifyRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List notifyRequestDescriptor = $convert.base64Decode(
-    'Cg1Ob3RpZnlSZXF1ZXN0EicKD2V4dGVuc2lvbl90b2tlbhgBIAEoDFIOZXh0ZW5zaW9uVG9rZW'
-    '4SFAoFdGl0bGUYAiABKAlSBXRpdGxlEhIKBGJvZHkYAyABKAlSBGJvZHk=');
+final $typed_data.Uint8List notifyRequestDescriptor =
+    $convert.base64Decode('Cg1Ob3RpZnlSZXF1ZXN0EicKD2V4dGVuc2lvbl90b2tlbhgBIAEoDFIOZXh0ZW5zaW9uVG9rZW'
+        '4SFAoFdGl0bGUYAiABKAlSBXRpdGxlEhIKBGJvZHkYAyABKAlSBGJvZHk=');
 
 @$core.Deprecated('Use notifyResponseDescriptor instead')
 const NotifyResponse$json = {
@@ -189,8 +173,7 @@ const NotifyResponse$json = {
 };
 
 /// Descriptor for `NotifyResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List notifyResponseDescriptor =
-    $convert.base64Decode('Cg5Ob3RpZnlSZXNwb25zZQ==');
+final $typed_data.Uint8List notifyResponseDescriptor = $convert.base64Decode('Cg5Ob3RpZnlSZXNwb25zZQ==');
 
 @$core.Deprecated('Use watchExtensionEventsRequestDescriptor instead')
 const WatchExtensionEventsRequest$json = {
@@ -202,8 +185,7 @@ const WatchExtensionEventsRequest$json = {
 
 /// Descriptor for `WatchExtensionEventsRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List watchExtensionEventsRequestDescriptor =
-    $convert.base64Decode(
-        'ChtXYXRjaEV4dGVuc2lvbkV2ZW50c1JlcXVlc3QSJwoPZXh0ZW5zaW9uX3Rva2VuGAEgASgMUg'
+    $convert.base64Decode('ChtXYXRjaEV4dGVuc2lvbkV2ZW50c1JlcXVlc3QSJwoPZXh0ZW5zaW9uX3Rva2VuGAEgASgMUg'
         '5leHRlbnNpb25Ub2tlbg==');
 
 @$core.Deprecated('Use extensionEventDescriptor instead')
@@ -212,18 +194,11 @@ const ExtensionEvent$json = {
   '2': [
     {'1': 'kind', '3': 1, '4': 1, '5': 9, '10': 'kind'},
     {'1': 'detail', '3': 2, '4': 1, '5': 9, '10': 'detail'},
-    {
-      '1': 'at',
-      '3': 3,
-      '4': 1,
-      '5': 11,
-      '6': '.google.protobuf.Timestamp',
-      '10': 'at'
-    },
+    {'1': 'at', '3': 3, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'at'},
   ],
 };
 
 /// Descriptor for `ExtensionEvent`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List extensionEventDescriptor = $convert.base64Decode(
-    'Cg5FeHRlbnNpb25FdmVudBISCgRraW5kGAEgASgJUgRraW5kEhYKBmRldGFpbBgCIAEoCVIGZG'
-    'V0YWlsEioKAmF0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFICYXQ=');
+final $typed_data.Uint8List extensionEventDescriptor =
+    $convert.base64Decode('Cg5FeHRlbnNpb25FdmVudBISCgRraW5kGAEgASgJUgRraW5kEhYKBmRldGFpbBgCIAEoCVIGZG'
+        'V0YWlsEioKAmF0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFICYXQ=');

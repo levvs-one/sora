@@ -23,30 +23,24 @@ class UtlsProfile extends $pb.ProtobufEnum {
     UTLS_PROFILE_UNSPECIFIED,
   ];
 
-  static final $core.List<UtlsProfile?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 0);
-  static UtlsProfile? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.List<UtlsProfile?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 0);
+  static UtlsProfile? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
 
   const UtlsProfile._(super.value, super.name);
 }
 
 class ObfsPreset extends $pb.ProtobufEnum {
   /// Reserved for obfs.
-  static const ObfsPreset OBFS_PRESET_UNSPECIFIED =
-      ObfsPreset._(0, _omitEnumNames ? '' : 'OBFS_PRESET_UNSPECIFIED');
+  static const ObfsPreset OBFS_PRESET_UNSPECIFIED = ObfsPreset._(0, _omitEnumNames ? '' : 'OBFS_PRESET_UNSPECIFIED');
 
   static const $core.List<ObfsPreset> values = <ObfsPreset>[
     OBFS_PRESET_UNSPECIFIED,
   ];
 
-  static final $core.List<ObfsPreset?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 0);
-  static ObfsPreset? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.List<ObfsPreset?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 0);
+  static ObfsPreset? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
 
   const ObfsPreset._(super.value, super.name);
 }
 
-const $core.bool _omitEnumNames =
-    $core.bool.fromEnvironment('protobuf.omit_enum_names');
+const $core.bool _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');

@@ -23,10 +23,8 @@ class CensorshipKind extends $pb.ProtobufEnum {
     CENSORSHIP_KIND_UNSPECIFIED,
   ];
 
-  static final $core.List<CensorshipKind?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 0);
-  static CensorshipKind? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.List<CensorshipKind?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 0);
+  static CensorshipKind? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
 
   const CensorshipKind._(super.value, super.name);
 }
@@ -40,10 +38,8 @@ class AttemptStage extends $pb.ProtobufEnum {
     ATTEMPT_STAGE_UNSPECIFIED,
   ];
 
-  static final $core.List<AttemptStage?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 0);
-  static AttemptStage? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.List<AttemptStage?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 0);
+  static AttemptStage? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
 
   const AttemptStage._(super.value, super.name);
 }
@@ -51,20 +47,16 @@ class AttemptStage extends $pb.ProtobufEnum {
 class AttemptEventKind extends $pb.ProtobufEnum {
   /// Reserved for censor.
   static const AttemptEventKind ATTEMPT_EVENT_KIND_UNSPECIFIED =
-      AttemptEventKind._(
-          0, _omitEnumNames ? '' : 'ATTEMPT_EVENT_KIND_UNSPECIFIED');
+      AttemptEventKind._(0, _omitEnumNames ? '' : 'ATTEMPT_EVENT_KIND_UNSPECIFIED');
 
   static const $core.List<AttemptEventKind> values = <AttemptEventKind>[
     ATTEMPT_EVENT_KIND_UNSPECIFIED,
   ];
 
-  static final $core.List<AttemptEventKind?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 0);
-  static AttemptEventKind? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.List<AttemptEventKind?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 0);
+  static AttemptEventKind? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
 
   const AttemptEventKind._(super.value, super.name);
 }
 
-const $core.bool _omitEnumNames =
-    $core.bool.fromEnvironment('protobuf.omit_enum_names');
+const $core.bool _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');

@@ -106,8 +106,10 @@ class ExtPackage {
       compressedTotal += compressed;
     }
     if (compressedTotal > 0 && declaredTotal > compressedTotal * _maxCompressionRatio) {
-      throw PackageError('suspicious compression ratio '
-          '(about ${declaredTotal ~/ compressedTotal}x, limit ${_maxCompressionRatio}x)');
+      throw PackageError(
+        'suspicious compression ratio '
+        '(about ${declaredTotal ~/ compressedTotal}x, limit ${_maxCompressionRatio}x)',
+      );
     }
     // Phase 3: inflate through a bounded sink. ArchiveFile content is
     // inflated lazily, so decodeStream on its own is cheap; the caps below
@@ -180,8 +182,7 @@ class ExtPackage {
     ];
     for (final entry in declared) {
       if (!files.containsKey(entry)) {
-        throw PackageError(
-            'the manifest declares "$entry", which is missing from the package');
+        throw PackageError('the manifest declares "$entry", which is missing from the package');
       }
     }
     final checksumsRaw = files[checksumsName]!;
@@ -205,8 +206,7 @@ class ExtPackage {
       }
     }
     try {
-      await verifyPackageSignature(
-          authorKeyLine ?? manifest.author.publicKey, sigText, checksumsRaw);
+      await verifyPackageSignature(authorKeyLine ?? manifest.author.publicKey, sigText, checksumsRaw);
     } on SignatureError catch (e) {
       throw PackageError(e.message);
     }

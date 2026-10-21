@@ -16,8 +16,7 @@ const chainCapability = 'chains';
 /// A named proxy chain: traffic enters at the first hop and exits at the
 /// last (F8).
 class ProxyChain {
-  ProxyChain({required this.id, required this.name, required List<String> hops})
-      : hops = List.unmodifiable(hops);
+  ProxyChain({required this.id, required this.name, required List<String> hops}) : hops = List.unmodifiable(hops);
 
   final String id;
   String name;
@@ -40,10 +39,10 @@ class ProxyChain {
   }
 
   factory ProxyChain.fromJson(Map<String, dynamic> json) => ProxyChain(
-        id: json['id'] as String? ?? '',
-        name: json['name'] as String? ?? '',
-        hops: [for (final v in (json['hops'] as List? ?? [])) v.toString()],
-      );
+    id: json['id'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    hops: [for (final v in (json['hops'] as List? ?? [])) v.toString()],
+  );
 
   Map<String, dynamic> toJson() => {'id': id, 'name': name, 'hops': hops};
 }

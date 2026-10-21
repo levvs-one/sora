@@ -73,7 +73,13 @@ class InstalledExtension {
   String get id => manifest.id;
   String get version => manifest.version;
 
-  InstalledExtension copyWith({bool? enabled, String? previous, ExtManifest? manifest, List<String>? granted, String? authorKey}) {
+  InstalledExtension copyWith({
+    bool? enabled,
+    String? previous,
+    ExtManifest? manifest,
+    List<String>? granted,
+    String? authorKey,
+  }) {
     return InstalledExtension(
       manifest: manifest ?? this.manifest,
       enabled: enabled ?? this.enabled,
@@ -86,14 +92,14 @@ class InstalledExtension {
   }
 
   Map<String, dynamic> toJson() => {
-        'manifest': manifest.toJson(),
-        'enabled': enabled,
-        'source': source,
-        'installed_at': installedAt.toIso8601String(),
-        'granted': granted,
-        if (previous != null) 'previous': previous,
-        if (authorKey != null) 'author_key': authorKey,
-      };
+    'manifest': manifest.toJson(),
+    'enabled': enabled,
+    'source': source,
+    'installed_at': installedAt.toIso8601String(),
+    'granted': granted,
+    if (previous != null) 'previous': previous,
+    if (authorKey != null) 'author_key': authorKey,
+  };
 
   static InstalledExtension fromJson(Map<String, dynamic> json) {
     return InstalledExtension(
@@ -111,8 +117,7 @@ class InstalledExtension {
 /// Compares two minisign .pub lines for the author-key continuity check.
 /// Only surrounding whitespace is forgiven — base64 is case-sensitive, so
 /// key content is never normalized.
-bool _sameAuthorKey(String a, String? b) =>
-    b != null && a.trim() == b.trim();
+bool _sameAuthorKey(String a, String? b) => b != null && a.trim() == b.trim();
 
 /// App-side extension store. One instance per Extensions section subtree,
 /// provided through [ExtScope].
@@ -137,11 +142,9 @@ class ExtensionStore extends ChangeNotifier {
   String _installId = '';
 
   /// Offline team-catalog cache (verified bytes + fetch time).
-  late final CatalogCache catalogCache =
-      CatalogCache('$_dir${Platform.pathSeparator}catalog_cache');
+  late final CatalogCache catalogCache = CatalogCache('$_dir${Platform.pathSeparator}catalog_cache');
 
-  String _contentDir(String id, String version) =>
-      '$_dir${Platform.pathSeparator}$id@$version';
+  String _contentDir(String id, String version) => '$_dir${Platform.pathSeparator}$id@$version';
 
   String contentDir(String id) {
     final inst = _installed[id];
@@ -176,9 +179,7 @@ class ExtensionStore extends ChangeNotifier {
   Future<void> _save() async {
     final reg = File('$_dir${Platform.pathSeparator}installed.json');
     final tmp = File('${reg.path}.tmp');
-    await tmp.writeAsString(
-        jsonEncode({for (final e in _installed.entries) e.key: e.value.toJson()}),
-        flush: true);
+    await tmp.writeAsString(jsonEncode({for (final e in _installed.entries) e.key: e.value.toJson()}), flush: true);
     await tmp.rename(reg.path);
   }
 
@@ -190,12 +191,10 @@ class ExtensionStore extends ChangeNotifier {
   final _conflictWinners = <String, String>{};
   Future<void>? _conflictsLoad;
 
-  String _conflictsFile() =>
-      '$_dir${Platform.pathSeparator}conflicts.json';
+  String _conflictsFile() => '$_dir${Platform.pathSeparator}conflicts.json';
 
   /// Loads once; concurrent callers share the same future.
-  Future<void> _loadConflicts() =>
-      _conflictsLoad ??= _doLoadConflicts();
+  Future<void> _loadConflicts() => _conflictsLoad ??= _doLoadConflicts();
 
   Future<void> _doLoadConflicts() async {
     final f = File(_conflictsFile());
@@ -262,9 +261,7 @@ class ExtensionStore extends ChangeNotifier {
       // Missing or unreadable: create below.
     }
     final rnd = Random.secure();
-    final id = List.generate(16, (_) => rnd.nextInt(256))
-        .map((b) => b.toRadixString(16).padLeft(2, '0'))
-        .join();
+    final id = List.generate(16, (_) => rnd.nextInt(256)).map((b) => b.toRadixString(16).padLeft(2, '0')).join();
     try {
       await f.writeAsString(id, flush: true);
     } catch (_) {
@@ -291,13 +288,20 @@ class ExtensionStore extends ChangeNotifier {
   ///
   /// Throws [ExtStoreError] / [PackageError] with developer messages; the UI
   /// maps them to localized text.
-  Future<List<String>> install(ExtPackage pkg,
-      {required String source, required List<String> granted, String? authorKeyPin}) async {
+  Future<List<String>> install(
+    ExtPackage pkg, {
+    required String source,
+    required List<String> granted,
+    String? authorKeyPin,
+  }) async {
     final m = pkg.manifest;
     for (final g in granted) {
       if (!isKnownPermission(g)) throw ExtStoreError('unknown granted permission "$g"');
     }
-    final missing = [for (final p in m.permissions) if (!granted.contains(p)) p];
+    final missing = [
+      for (final p in m.permissions)
+        if (!granted.contains(p)) p,
+    ];
     if (missing.isNotEmpty) {
       throw ExtStoreError('install does not grant required permissions: ${missing.join(", ")}');
     }
@@ -331,7 +335,8 @@ class ExtensionStore extends ChangeNotifier {
     await Directory(dst).create(recursive: true);
     try {
       for (final e in pkg.files.entries) {
-        final target = '$_dir${Platform.pathSeparator}${m.id}@${m.version}${Platform.pathSeparator}${e.key.replaceAll('/', Platform.pathSeparator)}';
+        final target =
+            '$_dir${Platform.pathSeparator}${m.id}@${m.version}${Platform.pathSeparator}${e.key.replaceAll('/', Platform.pathSeparator)}';
         final canonical = File(target).absolute.path;
         if (!canonical.startsWith('${Directory(dst).absolute.path}${Platform.pathSeparator}')) {
           throw ExtStoreError('unsafe extract path "${e.key}"');
@@ -381,8 +386,13 @@ class ExtensionStore extends ChangeNotifier {
   /// [authorKeyPin] is the catalog-pinned author key for catalog installs:
   /// the signature is verified against it (never against the manifest's
   /// self-attested key) and it becomes the extension's trust anchor.
-  Future<List<String>> installBytes(Uint8List data,
-      {required String source, required List<String> granted, String? expectedSha256, String? authorKeyPin}) async {
+  Future<List<String>> installBytes(
+    Uint8List data, {
+    required String source,
+    required List<String> granted,
+    String? expectedSha256,
+    String? authorKeyPin,
+  }) async {
     if (expectedSha256 != null) {
       final sum = crypto.sha256.convert(data).toString();
       if (sum != expectedSha256.toLowerCase()) {
@@ -441,12 +451,13 @@ class ExtensionStore extends ChangeNotifier {
     await for (final e in prevDir.list(recursive: true, followLinks: false)) {
       if (e is! File) continue;
       if (!e.path.startsWith(prefix)) continue; // paranoia: stay inside prevDir
-      files[e.path.substring(prefix.length).replaceAll(Platform.pathSeparator, '/')] =
-          await e.readAsBytes();
+      files[e.path.substring(prefix.length).replaceAll(Platform.pathSeparator, '/')] = await e.readAsBytes();
     }
     try {
-      await ExtPackage.fromFiles(files, prevManifest)
-          .verify(authorKeyLine: cur.authorKey ?? cur.manifest.author.publicKey);
+      await ExtPackage.fromFiles(
+        files,
+        prevManifest,
+      ).verify(authorKeyLine: cur.authorKey ?? cur.manifest.author.publicKey);
     } on PackageError catch (e) {
       throw ExtStoreError('previous version of "$id" failed its integrity re-check: ${e.message}');
     }
@@ -483,8 +494,7 @@ class ExtensionStore extends ChangeNotifier {
 
   // --- Background task (runtime v2) ---
 
-  String _backgroundFile(String id) =>
-      '$_dir${Platform.pathSeparator}$id.background.json';
+  String _backgroundFile(String id) => '$_dir${Platform.pathSeparator}$id.background.json';
 
   /// Reads the background task config. When never saved, the default seeds
   /// the interval from the manifest's declared `background_task` (the
@@ -505,8 +515,7 @@ class ExtensionStore extends ChangeNotifier {
     final declared = inst.manifest.backgroundTask?.intervalMinutes;
     return BackgroundTaskConfig(
       enabled: true,
-      intervalMinutes: BackgroundTaskConfig.clampInterval(
-          declared ?? BackgroundTaskConfig.defaultIntervalMinutes),
+      intervalMinutes: BackgroundTaskConfig.clampInterval(declared ?? BackgroundTaskConfig.defaultIntervalMinutes),
     );
   }
 
@@ -517,8 +526,7 @@ class ExtensionStore extends ChangeNotifier {
       enabled: config.enabled,
       intervalMinutes: BackgroundTaskConfig.clampInterval(config.intervalMinutes),
     );
-    await File(_backgroundFile(id))
-        .writeAsString(jsonEncode(clamped.toJson()), flush: true);
+    await File(_backgroundFile(id)).writeAsString(jsonEncode(clamped.toJson()), flush: true);
     notifyListeners();
   }
 
@@ -653,8 +661,7 @@ class BackgroundTaskConfig {
   factory BackgroundTaskConfig.fromJson(Map<String, dynamic> json) {
     return BackgroundTaskConfig(
       enabled: json['enabled'] as bool? ?? true,
-      intervalMinutes: clampInterval(
-          (json['interval_minutes'] as num?)?.toInt() ?? defaultIntervalMinutes),
+      intervalMinutes: clampInterval((json['interval_minutes'] as num?)?.toInt() ?? defaultIntervalMinutes),
     );
   }
 
@@ -663,8 +670,7 @@ class BackgroundTaskConfig {
 
 /// Provides the [ExtensionStore] to the extensions section subtree.
 class ExtScope extends InheritedNotifier<ExtensionStore> {
-  const ExtScope({super.key, required ExtensionStore store, required super.child})
-      : super(notifier: store);
+  const ExtScope({super.key, required ExtensionStore store, required super.child}) : super(notifier: store);
 
   static ExtensionStore of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<ExtScope>();

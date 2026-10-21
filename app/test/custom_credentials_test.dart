@@ -11,10 +11,10 @@ void main() {
     expect(jsonDecode(customCredentialDocument(CustomProtocol.CUSTOM_PROTOCOL_VLESS, 'id-1')!), {'uuid': 'id-1'});
     expect(jsonDecode(customCredentialDocument(CustomProtocol.CUSTOM_PROTOCOL_VMESS, 'id-2')!), {'uuid': 'id-2'});
     expect(jsonDecode(customCredentialDocument(CustomProtocol.CUSTOM_PROTOCOL_TROJAN, ' pw ')!), {'password': ' pw '});
-    expect(
-      jsonDecode(customCredentialDocument(CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS, 'aes-128-gcm:p:w')!),
-      {'method': 'aes-128-gcm', 'password': 'p:w'},
-    );
+    expect(jsonDecode(customCredentialDocument(CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS, 'aes-128-gcm:p:w')!), {
+      'method': 'aes-128-gcm',
+      'password': 'p:w',
+    });
   });
 
   test('an empty secret stores nothing and a malformed one is refused', () {

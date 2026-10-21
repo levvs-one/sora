@@ -35,11 +35,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
 
   Future<void> _delete(BuildContext context, ProxyChain chain) async {
     final s = S.of(context);
-    if (!await confirm(
-      context,
-      question: s.chainDeleteConfirm(chain.name),
-      action: s.chainDelete,
-    )) {
+    if (!await confirm(context, question: s.chainDeleteConfirm(chain.name), action: s.chainDelete)) {
       return;
     }
     if (context.mounted) SoraScope.read(context).chains.remove(chain.id);
@@ -66,9 +62,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
       children: [
         if (showUnsupported)
           Group(
-            children: [
-              Tile(title: s.chainUnsupported, titleColor: palette.ink2),
-            ],
+            children: [Tile(title: s.chainUnsupported, titleColor: palette.ink2)],
           ),
         if (showUnsupported) const SizedBox(height: 16),
         if (chains.isEmpty)
@@ -118,10 +112,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                    child: Text(
-                      _latencyLine(s, sora, chain),
-                      style: Styles.secondary.copyWith(color: palette.ink2),
-                    ),
+                    child: Text(_latencyLine(s, sora, chain), style: Styles.secondary.copyWith(color: palette.ink2)),
                   ),
                 ],
               ),
@@ -170,15 +161,14 @@ class _ServerPickRow extends StatelessWidget {
         ),
         child: SizedBox.square(
           dimension: 22,
-          child: selected
-              ? Icon(Symbols.check_rounded, size: 16, weight: 700, color: palette.surface)
-              : null,
+          child: selected ? Icon(Symbols.check_rounded, size: 16, weight: 700, color: palette.surface) : null,
         ),
       ),
       onTap: enabled ? onTap : null,
     );
   }
 }
+
 /// Builds or edits a proxy chain: picks 2–3 servers and orders them (F8).
 class ChainBuilderScreen extends StatefulWidget {
   const ChainBuilderScreen({super.key, this.chain});
@@ -270,18 +260,17 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
     final s = S.of(context);
     final palette = Palette.of(context);
     final hidden = sora.hiddenServerIds;
-    final servers = [for (final o in sora.servers) if (!hidden.contains(o.id)) o];
+    final servers = [
+      for (final o in sora.servers)
+        if (!hidden.contains(o.id)) o,
+    ];
     final estimate = ProxyChain(id: '', name: '', hops: _hops).estimatedLatency(sora.latency);
     return Screen(
       title: widget.chain == null ? s.chainAdd : s.chainName,
-      actions: [
-        RoundButton(icon: Symbols.check_rounded, label: s.chainSave, onTap: _save),
-      ],
+      actions: [RoundButton(icon: Symbols.check_rounded, label: s.chainSave, onTap: _save)],
       children: [
         Group(
-          children: [
-            LinkTile(title: s.chainName, value: _name.isEmpty ? null : _name, onTap: _editName),
-          ],
+          children: [LinkTile(title: s.chainName, value: _name.isEmpty ? null : _name, onTap: _editName)],
         ),
         const SizedBox(height: 16),
         Heading(s.chainPickServers),
@@ -301,9 +290,7 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
         Heading(s.chainOrderHint),
         if (_hops.isEmpty)
           Group(
-            children: [
-              Tile(title: s.chainTooFew, titleColor: palette.ink2),
-            ],
+            children: [Tile(title: s.chainTooFew, titleColor: palette.ink2)],
           )
         else
           Group(
@@ -323,10 +310,7 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
                       key: ValueKey(_hops[i]),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                       leading: Icon(Symbols.drag_handle_rounded, color: palette.ink3),
-                      title: Text(
-                        sora.displayNameOf(_hops[i]),
-                        style: Styles.body.copyWith(color: palette.ink),
-                      ),
+                      title: Text(sora.displayNameOf(_hops[i]), style: Styles.body.copyWith(color: palette.ink)),
                       subtitle: Text(
                         i == 0 ? s.chainEntry : (i == _hops.length - 1 ? s.chainExit : s.chainHop('${i + 1}')),
                         style: Styles.secondary.copyWith(color: palette.ink2),

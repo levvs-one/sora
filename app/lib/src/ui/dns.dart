@@ -34,23 +34,23 @@ const _presets = <String, List<String>>{
 /// Resolves a core-provided localization key such as "dnsLeak.check.tunnelDns".
 /// Unknown keys fall through as-is so a newer core never renders a blank row.
 String _checkLabel(S s, String key) => switch (key) {
-      'dnsLeak.check.tunnelDns' => s.dnsLeakCheckTunnelDns,
-      'dnsLeak.check.systemResolvers' => s.dnsLeakCheckSystemResolvers,
-      'dnsLeak.check.encryptedDns' => s.dnsLeakCheckEncryptedDns,
-      'dnsLeak.check.killSwitchDns' => s.dnsLeakCheckKillSwitchDns,
-      'dnsLeak.check.dnsSpoof' => s.dnsLeakCheckDnsSpoof,
-      _ => key,
-    };
+  'dnsLeak.check.tunnelDns' => s.dnsLeakCheckTunnelDns,
+  'dnsLeak.check.systemResolvers' => s.dnsLeakCheckSystemResolvers,
+  'dnsLeak.check.encryptedDns' => s.dnsLeakCheckEncryptedDns,
+  'dnsLeak.check.killSwitchDns' => s.dnsLeakCheckKillSwitchDns,
+  'dnsLeak.check.dnsSpoof' => s.dnsLeakCheckDnsSpoof,
+  _ => key,
+};
 
 /// Resolves a core-provided fix hint key such as "dnsLeak.fix.enableKillSwitch".
 String _checkHint(S s, String key) => switch (key) {
-      'dnsLeak.fix.configureTunnelDns' => s.dnsLeakFixConfigureTunnelDns,
-      'dnsLeak.fix.reviewSystemResolvers' => s.dnsLeakFixReviewSystemResolvers,
-      'dnsLeak.fix.reviewEncryptedDns' => s.dnsLeakFixReviewEncryptedDns,
-      'dnsLeak.fix.enableKillSwitch' => s.dnsLeakFixEnableKillSwitch,
-      'dnsLeak.fix.useEncryptedDns' => s.dnsLeakFixUseEncryptedDns,
-      _ => key,
-    };
+  'dnsLeak.fix.configureTunnelDns' => s.dnsLeakFixConfigureTunnelDns,
+  'dnsLeak.fix.reviewSystemResolvers' => s.dnsLeakFixReviewSystemResolvers,
+  'dnsLeak.fix.reviewEncryptedDns' => s.dnsLeakFixReviewEncryptedDns,
+  'dnsLeak.fix.enableKillSwitch' => s.dnsLeakFixEnableKillSwitch,
+  'dnsLeak.fix.useEncryptedDns' => s.dnsLeakFixUseEncryptedDns,
+  _ => key,
+};
 
 /// DNS manager: resolver presets, custom list and leak checking.
 class DnsScreen extends StatefulWidget {
@@ -92,7 +92,10 @@ class _DnsScreenState extends State<DnsScreen> {
         initial: sora.settings.dns.join(', '),
         allowEmpty: true,
         submit: (value) async {
-          final parts = [for (final p in value.split(RegExp(r'[,\s]+'))) if (p.isNotEmpty) p];
+          final parts = [
+            for (final p in value.split(RegExp(r'[,\s]+')))
+              if (p.isNotEmpty) p,
+          ];
           if (parts.any((p) => !_resolver.hasMatch(p))) return s.invalidValue;
           await sora.change((x) {
             x.dnsPreset = 'custom';
@@ -166,10 +169,7 @@ class _DnsScreenState extends State<DnsScreen> {
                 onTap: _editCustom,
               )
             else if (settings.dnsPreset != 'auto')
-              Tile(
-                title: s.dns,
-                detail: (_presets[settings.dnsPreset] ?? const []).join(', '),
-              ),
+              Tile(title: s.dns, detail: (_presets[settings.dnsPreset] ?? const []).join(', ')),
           ],
         ),
         Group(
@@ -178,22 +178,13 @@ class _DnsScreenState extends State<DnsScreen> {
               title: s.dnsLastCheck,
               detail: last == 0
                   ? s.dnsNeverChecked
-                  : DateFormat.yMMMd(locale)
-                      .add_Hm()
-                      .format(DateTime.fromMillisecondsSinceEpoch(last).toLocal()),
+                  : DateFormat.yMMMd(locale).add_Hm().format(DateTime.fromMillisecondsSinceEpoch(last).toLocal()),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-              child: PrimaryButton(
-                label: s.dnsCheck,
-                busy: _checking,
-                onTap: _checking ? null : _check,
-              ),
+              child: PrimaryButton(label: s.dnsCheck, busy: _checking, onTap: _checking ? null : _check),
             ),
-            LinkTile(
-              title: s.leakTestTitle,
-              onTap: () => push<void>(context, const LeakTestScreen()),
-            ),
+            LinkTile(title: s.leakTestTitle, onTap: () => push<void>(context, const LeakTestScreen())),
           ],
         ),
         if (_checking)
@@ -230,7 +221,9 @@ class _DnsScreenState extends State<DnsScreen> {
             children: [
               Icon(icon, size: 18, color: palette.ink2),
               const SizedBox(width: 10),
-              Expanded(child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2))),
+              Expanded(
+                child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2)),
+              ),
             ],
           ),
         ),
@@ -248,11 +241,7 @@ class _DnsScreenState extends State<DnsScreen> {
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
           child: Row(
             children: [
-              Icon(
-                leaked ? Symbols.warning_rounded : Symbols.check_circle_rounded,
-                size: 22,
-                color: palette.ink,
-              ),
+              Icon(leaked ? Symbols.warning_rounded : Symbols.check_circle_rounded, size: 22, color: palette.ink),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -289,28 +278,19 @@ class _DnsScreenState extends State<DnsScreen> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  _checkLabel(s, check.label),
-                  style: Styles.body.copyWith(color: palette.ink),
-                ),
+                child: Text(_checkLabel(s, check.label), style: Styles.body.copyWith(color: palette.ink)),
               ),
             ],
           ),
           if (check.expected.isNotEmpty)
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 24, top: 2),
-              child: Text(
-                '${s.dnsExpected}: ${check.expected}',
-                style: Styles.caption.copyWith(color: palette.ink2),
-              ),
+              child: Text('${s.dnsExpected}: ${check.expected}', style: Styles.caption.copyWith(color: palette.ink2)),
             ),
           if (check.actual.isNotEmpty)
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 24, top: 2),
-              child: Text(
-                '${s.dnsActual}: ${check.actual}',
-                style: Styles.caption.copyWith(color: palette.ink2),
-              ),
+              child: Text('${s.dnsActual}: ${check.actual}', style: Styles.caption.copyWith(color: palette.ink2)),
             ),
           if (hasHint)
             Padding(
@@ -321,10 +301,7 @@ class _DnsScreenState extends State<DnsScreen> {
                   Icon(Symbols.info_rounded, size: 14, color: palette.ink2),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(
-                      _checkHint(s, check.fixHint),
-                      style: Styles.caption.copyWith(color: palette.ink2),
-                    ),
+                    child: Text(_checkHint(s, check.fixHint), style: Styles.caption.copyWith(color: palette.ink2)),
                   ),
                 ],
               ),

@@ -169,7 +169,7 @@ class _SpeedtestScreenState extends State<SpeedtestScreen> {
                             ),
                           );
                         },
-                    );
+                      );
               },
             ),
           ),

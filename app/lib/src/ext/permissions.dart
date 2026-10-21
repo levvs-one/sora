@@ -42,12 +42,17 @@ bool requiresExplicitConfirm(String id) => _index[id]?.risk == ExtRisk.dangerous
 bool isNetworkPermission(String id) => id == 'net.fetch';
 
 /// Splits [wanted] into added/removed relative to [granted].
-({List<String> added, List<String> removed}) diffPermissions(
-    List<String> granted, List<String> wanted) {
+({List<String> added, List<String> removed}) diffPermissions(List<String> granted, List<String> wanted) {
   final have = granted.toSet();
   final want = wanted.toSet();
   return (
-    added: [for (final p in want) if (!have.contains(p)) p],
-    removed: [for (final p in have) if (!want.contains(p)) p],
+    added: [
+      for (final p in want)
+        if (!have.contains(p)) p,
+    ],
+    removed: [
+      for (final p in have)
+        if (!want.contains(p)) p,
+    ],
   );
 }

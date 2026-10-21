@@ -293,11 +293,7 @@ void main() {
           );
         }
         checks++;
-        return http.Response(
-          recorded,
-          200,
-          headers: {'content-type': 'application/json; charset=utf-8'},
-        );
+        return http.Response(recorded, 200, headers: {'content-type': 'application/json; charset=utf-8'});
       }),
     );
     updater.start();
@@ -335,11 +331,7 @@ void main() {
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         }
-        return http.Response(
-          recorded,
-          200,
-          headers: {'content-type': 'application/json; charset=utf-8'},
-        );
+        return http.Response(recorded, 200, headers: {'content-type': 'application/json; charset=utf-8'});
       }),
     );
     final checked = reloaded.check();
@@ -430,11 +422,7 @@ void main() {
             // S11b: the rollback cache is built from the previous release.
             if (path.endsWith('/releases/tags/v1.0.4')) {
               requests.add('old-release');
-              return http.Response(
-                oldReleaseJson,
-                200,
-                headers: {'content-type': 'application/json; charset=utf-8'},
-              );
+              return http.Response(oldReleaseJson, 200, headers: {'content-type': 'application/json; charset=utf-8'});
             }
             final name = request.url.pathSegments.last;
             requests.add(name);
@@ -501,11 +489,7 @@ void main() {
               expect(await File('${cache.path}/$name').exists(), isTrue, reason: name);
             }
             for (final name in oldNames) {
-              await verifyUpdateFile(
-                File('${cache.path}/$name'),
-                utf8.decode(oldData['SHA256SUMS']!),
-                name,
-              );
+              await verifyUpdateFile(File('${cache.path}/$name'), utf8.decode(oldData['SHA256SUMS']!), name);
             }
           } else {
             expect(settings.pendingUpdate, isEmpty);
@@ -572,10 +556,8 @@ void main() {
       final manifest = StringBuffer();
       for (final name in names) {
         final bytes = utf8.encode('Old bytes for $name');
-        await File('${cache.path}/$name').writeAsBytes(
-          tamper && name == names.last ? List<int>.filled(bytes.length, 0) : bytes,
-          flush: true,
-        );
+        await File('${cache.path}/$name')
+            .writeAsBytes(tamper && name == names.last ? List<int>.filled(bytes.length, 0) : bytes, flush: true);
         manifest.writeln('${sha256.convert(bytes)}  $name');
       }
       await File('${cache.path}/SHA256SUMS').writeAsString(manifest.toString(), flush: true);
@@ -591,9 +573,7 @@ void main() {
     }
 
     Future<void> saveMarker(Settings settings, {required int atMs}) =>
-        settings.savePendingUpdate(
-          PendingUpdate(from: '1.0.4', to: '1.0.5', atMs: atMs).encode(),
-        );
+        settings.savePendingUpdate(PendingUpdate(from: '1.0.4', to: '1.0.5', atMs: atMs).encode());
 
     test('marker parsing is strict', () {
       expect(PendingUpdate.parse(''), isNull);
@@ -601,9 +581,7 @@ void main() {
       expect(PendingUpdate.parse('{}'), isNull);
       expect(PendingUpdate.parse(jsonEncode({'from': '1.0.4', 'to': '1.0.5'})), isNull);
       expect(PendingUpdate.parse(jsonEncode({'from': '1.0.4', 'to': 'bogus', 'atMs': 1})), isNull);
-      final marker = PendingUpdate.parse(
-        jsonEncode({'from': 'v1.0.4', 'to': '1.0.5', 'atMs': 42}),
-      )!;
+      final marker = PendingUpdate.parse(jsonEncode({'from': 'v1.0.4', 'to': '1.0.5', 'atMs': 42}))!;
       expect(marker.from, '1.0.4');
       expect(marker.to, '1.0.5');
       expect(marker.atMs, 42);
@@ -699,10 +677,7 @@ void main() {
       final settings = await Settings.load();
       final root = await makeRoot();
       final cache = await makeCache(root);
-      await saveMarker(
-        settings,
-        atMs: DateTime.now().millisecondsSinceEpoch - 61 * 1000,
-      );
+      await saveMarker(settings, atMs: DateTime.now().millisecondsSinceEpoch - 61 * 1000);
       final pkexecArgs = <List<String>>[];
       var restarted = false;
       var didQuit = false;
@@ -740,10 +715,7 @@ void main() {
       final settings = await Settings.load();
       final root = await makeRoot();
       await makeCache(root, tamper: true);
-      await saveMarker(
-        settings,
-        atMs: DateTime.now().millisecondsSinceEpoch - 61 * 1000,
-      );
+      await saveMarker(settings, atMs: DateTime.now().millisecondsSinceEpoch - 61 * 1000);
       var elevated = false;
       final updater = makeUpdater(
         settings,
@@ -772,10 +744,7 @@ void main() {
       final settings = await Settings.load();
       final root = await makeRoot();
       await makeCache(root);
-      await saveMarker(
-        settings,
-        atMs: DateTime.now().millisecondsSinceEpoch - 61 * 1000,
-      );
+      await saveMarker(settings, atMs: DateTime.now().millisecondsSinceEpoch - 61 * 1000);
       final updater = makeUpdater(
         settings,
         rollbackRoot: root,
@@ -802,9 +771,7 @@ void main() {
       for (final name in names) {
         data[name] = utf8.encode('Test bytes for $name');
       }
-      data['SHA256SUMS'] = utf8.encode(
-        [for (final name in names) '${sha256.convert(data[name]!)}  $name\n'].join(),
-      );
+      data['SHA256SUMS'] = utf8.encode([for (final name in names) '${sha256.convert(data[name]!)}  $name\n'].join());
       final assets = {
         for (final name in [...names, 'SHA256SUMS'])
           name: ReleaseAsset(name, release.asset(name).url, data[name]!.length),

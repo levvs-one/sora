@@ -38,13 +38,10 @@ class CustomProtocol extends $pb.ProtobufEnum {
     CUSTOM_PROTOCOL_WIREGUARD,
   ];
 
-  static final $core.List<CustomProtocol?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 5);
-  static CustomProtocol? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
+  static final $core.List<CustomProtocol?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 5);
+  static CustomProtocol? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
 
   const CustomProtocol._(super.value, super.name);
 }
 
-const $core.bool _omitEnumNames =
-    $core.bool.fromEnvironment('protobuf.omit_enum_names');
+const $core.bool _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');

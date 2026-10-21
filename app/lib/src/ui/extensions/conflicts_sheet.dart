@@ -65,8 +65,7 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
     }
   }
 
-  bool get _complete =>
-      widget.conflicts.every((c) => _winners.containsKey(c.key));
+  bool get _complete => widget.conflicts.every((c) => _winners.containsKey(c.key));
 
   Future<void> _save() async {
     setState(() {
@@ -111,14 +110,12 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
                   Icon(Symbols.warning_rounded, color: palette.danger),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(s.extConflictsTitle,
-                        style: Styles.title.copyWith(color: palette.ink)),
+                    child: Text(s.extConflictsTitle, style: Styles.title.copyWith(color: palette.ink)),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
-              Text(s.extConflictsIntro,
-                  style: Styles.body.copyWith(color: palette.ink2)),
+              Text(s.extConflictsIntro, style: Styles.body.copyWith(color: palette.ink2)),
               const SizedBox(height: 16),
               for (final c in widget.conflicts) ...[
                 _ConflictBlock(
@@ -129,18 +126,13 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
                 ),
                 const SizedBox(height: 12),
               ],
-              Text(s.extConflictNote,
-                  style: Styles.caption.copyWith(color: palette.ink3)),
+              Text(s.extConflictNote, style: Styles.caption.copyWith(color: palette.ink3)),
               if (_error != null) ...[
                 const SizedBox(height: 8),
                 Text(_error!, style: Styles.body.copyWith(color: palette.danger)),
               ],
               const SizedBox(height: 16),
-              PrimaryButton(
-                label: s.extConfirm,
-                busy: _saving,
-                onTap: _complete && !_saving ? _save : null,
-              ),
+              PrimaryButton(label: s.extConfirm, busy: _saving, onTap: _complete && !_saving ? _save : null),
               const SizedBox(height: 8),
               TextButton(
                 onPressed: _saving ? null : () => Navigator.pop(context, false),
@@ -155,12 +147,7 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
 }
 
 class _ConflictBlock extends StatelessWidget {
-  const _ConflictBlock({
-    required this.conflict,
-    required this.store,
-    required this.winner,
-    required this.onPick,
-  });
+  const _ConflictBlock({required this.conflict, required this.store, required this.winner, required this.onPick});
   final ExtConflict conflict;
   final ExtensionStore store;
   final String? winner;
@@ -179,8 +166,7 @@ class _ConflictBlock extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_kindLabel(context, conflict.kind),
-              style: Styles.bodyStrong.copyWith(color: palette.ink)),
+          Text(_kindLabel(context, conflict.kind), style: Styles.bodyStrong.copyWith(color: palette.ink)),
           const SizedBox(height: 8),
           for (final id in conflict.extensionIds)
             _ContenderRow(
@@ -202,12 +188,7 @@ class _ConflictBlock extends StatelessWidget {
 }
 
 class _ContenderRow extends StatelessWidget {
-  const _ContenderRow({
-    required this.name,
-    required this.detail,
-    required this.selected,
-    required this.onTap,
-  });
+  const _ContenderRow({required this.name, required this.detail, required this.selected, required this.onTap});
   final String name;
   final String detail;
   final bool selected;
@@ -229,9 +210,7 @@ class _ContenderRow extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                selected
-                    ? Symbols.radio_button_checked_rounded
-                    : Symbols.radio_button_unchecked_rounded,
+                selected ? Symbols.radio_button_checked_rounded : Symbols.radio_button_unchecked_rounded,
                 size: 20,
                 color: selected ? palette.ink : palette.ink3,
               ),
@@ -240,14 +219,18 @@ class _ContenderRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name,
-                        style: Styles.body.copyWith(color: palette.ink),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
-                    Text(detail,
-                        style: Styles.caption.copyWith(color: palette.ink2),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
+                    Text(
+                      name,
+                      style: Styles.body.copyWith(color: palette.ink),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      detail,
+                      style: Styles.caption.copyWith(color: palette.ink2),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),

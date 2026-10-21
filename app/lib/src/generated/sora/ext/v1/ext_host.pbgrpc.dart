@@ -89,43 +89,33 @@ class ExtensionHostClient extends $grpc.Client {
     $0.WatchExtensionEventsRequest request, {
     $grpc.CallOptions? options,
   }) {
-    return $createStreamingCall(
-        _$watchExtensionEvents, $async.Stream.fromIterable([request]),
-        options: options);
+    return $createStreamingCall(_$watchExtensionEvents, $async.Stream.fromIterable([request]), options: options);
   }
 
   // method descriptors
 
-  static final _$mintToken =
-      $grpc.ClientMethod<$0.MintTokenRequest, $0.MintTokenResponse>(
-          '/sora.ext.v1.ExtensionHost/MintToken',
-          ($0.MintTokenRequest value) => value.writeToBuffer(),
-          $0.MintTokenResponse.fromBuffer);
-  static final _$revokeToken =
-      $grpc.ClientMethod<$0.RevokeTokenRequest, $0.RevokeTokenResponse>(
-          '/sora.ext.v1.ExtensionHost/RevokeToken',
-          ($0.RevokeTokenRequest value) => value.writeToBuffer(),
-          $0.RevokeTokenResponse.fromBuffer);
-  static final _$getConnections =
-      $grpc.ClientMethod<$0.GetConnectionsRequest, $0.GetConnectionsResponse>(
-          '/sora.ext.v1.ExtensionHost/GetConnections',
-          ($0.GetConnectionsRequest value) => value.writeToBuffer(),
-          $0.GetConnectionsResponse.fromBuffer);
-  static final _$getServers =
-      $grpc.ClientMethod<$0.GetServersRequest, $0.GetServersResponse>(
-          '/sora.ext.v1.ExtensionHost/GetServers',
-          ($0.GetServersRequest value) => value.writeToBuffer(),
-          $0.GetServersResponse.fromBuffer);
-  static final _$notify =
-      $grpc.ClientMethod<$0.NotifyRequest, $0.NotifyResponse>(
-          '/sora.ext.v1.ExtensionHost/Notify',
-          ($0.NotifyRequest value) => value.writeToBuffer(),
-          $0.NotifyResponse.fromBuffer);
-  static final _$watchExtensionEvents =
-      $grpc.ClientMethod<$0.WatchExtensionEventsRequest, $0.ExtensionEvent>(
-          '/sora.ext.v1.ExtensionHost/WatchExtensionEvents',
-          ($0.WatchExtensionEventsRequest value) => value.writeToBuffer(),
-          $0.ExtensionEvent.fromBuffer);
+  static final _$mintToken = $grpc.ClientMethod<$0.MintTokenRequest, $0.MintTokenResponse>(
+      '/sora.ext.v1.ExtensionHost/MintToken',
+      ($0.MintTokenRequest value) => value.writeToBuffer(),
+      $0.MintTokenResponse.fromBuffer);
+  static final _$revokeToken = $grpc.ClientMethod<$0.RevokeTokenRequest, $0.RevokeTokenResponse>(
+      '/sora.ext.v1.ExtensionHost/RevokeToken',
+      ($0.RevokeTokenRequest value) => value.writeToBuffer(),
+      $0.RevokeTokenResponse.fromBuffer);
+  static final _$getConnections = $grpc.ClientMethod<$0.GetConnectionsRequest, $0.GetConnectionsResponse>(
+      '/sora.ext.v1.ExtensionHost/GetConnections',
+      ($0.GetConnectionsRequest value) => value.writeToBuffer(),
+      $0.GetConnectionsResponse.fromBuffer);
+  static final _$getServers = $grpc.ClientMethod<$0.GetServersRequest, $0.GetServersResponse>(
+      '/sora.ext.v1.ExtensionHost/GetServers',
+      ($0.GetServersRequest value) => value.writeToBuffer(),
+      $0.GetServersResponse.fromBuffer);
+  static final _$notify = $grpc.ClientMethod<$0.NotifyRequest, $0.NotifyResponse>('/sora.ext.v1.ExtensionHost/Notify',
+      ($0.NotifyRequest value) => value.writeToBuffer(), $0.NotifyResponse.fromBuffer);
+  static final _$watchExtensionEvents = $grpc.ClientMethod<$0.WatchExtensionEventsRequest, $0.ExtensionEvent>(
+      '/sora.ext.v1.ExtensionHost/WatchExtensionEvents',
+      ($0.WatchExtensionEventsRequest value) => value.writeToBuffer(),
+      $0.ExtensionEvent.fromBuffer);
 }
 
 @$pb.GrpcServiceName('sora.ext.v1.ExtensionHost')
@@ -140,23 +130,19 @@ abstract class ExtensionHostServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.MintTokenRequest.fromBuffer(value),
         ($0.MintTokenResponse value) => value.writeToBuffer()));
-    $addMethod(
-        $grpc.ServiceMethod<$0.RevokeTokenRequest, $0.RevokeTokenResponse>(
-            'RevokeToken',
-            revokeToken_Pre,
-            false,
-            false,
-            ($core.List<$core.int> value) =>
-                $0.RevokeTokenRequest.fromBuffer(value),
-            ($0.RevokeTokenResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.GetConnectionsRequest,
-            $0.GetConnectionsResponse>(
+    $addMethod($grpc.ServiceMethod<$0.RevokeTokenRequest, $0.RevokeTokenResponse>(
+        'RevokeToken',
+        revokeToken_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.RevokeTokenRequest.fromBuffer(value),
+        ($0.RevokeTokenResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetConnectionsRequest, $0.GetConnectionsResponse>(
         'GetConnections',
         getConnections_Pre,
         false,
         false,
-        ($core.List<$core.int> value) =>
-            $0.GetConnectionsRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.GetConnectionsRequest.fromBuffer(value),
         ($0.GetConnectionsResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.GetServersRequest, $0.GetServersResponse>(
         'GetServers',
@@ -172,64 +158,53 @@ abstract class ExtensionHostServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.NotifyRequest.fromBuffer(value),
         ($0.NotifyResponse value) => value.writeToBuffer()));
-    $addMethod(
-        $grpc.ServiceMethod<$0.WatchExtensionEventsRequest, $0.ExtensionEvent>(
-            'WatchExtensionEvents',
-            watchExtensionEvents_Pre,
-            false,
-            true,
-            ($core.List<$core.int> value) =>
-                $0.WatchExtensionEventsRequest.fromBuffer(value),
-            ($0.ExtensionEvent value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.WatchExtensionEventsRequest, $0.ExtensionEvent>(
+        'WatchExtensionEvents',
+        watchExtensionEvents_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.WatchExtensionEventsRequest.fromBuffer(value),
+        ($0.ExtensionEvent value) => value.writeToBuffer()));
   }
 
-  $async.Future<$0.MintTokenResponse> mintToken_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.MintTokenRequest> $request) async {
+  $async.Future<$0.MintTokenResponse> mintToken_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.MintTokenRequest> $request) async {
     return mintToken($call, await $request);
   }
 
-  $async.Future<$0.MintTokenResponse> mintToken(
-      $grpc.ServiceCall call, $0.MintTokenRequest request);
+  $async.Future<$0.MintTokenResponse> mintToken($grpc.ServiceCall call, $0.MintTokenRequest request);
 
-  $async.Future<$0.RevokeTokenResponse> revokeToken_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.RevokeTokenRequest> $request) async {
+  $async.Future<$0.RevokeTokenResponse> revokeToken_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.RevokeTokenRequest> $request) async {
     return revokeToken($call, await $request);
   }
 
-  $async.Future<$0.RevokeTokenResponse> revokeToken(
-      $grpc.ServiceCall call, $0.RevokeTokenRequest request);
+  $async.Future<$0.RevokeTokenResponse> revokeToken($grpc.ServiceCall call, $0.RevokeTokenRequest request);
 
   $async.Future<$0.GetConnectionsResponse> getConnections_Pre(
-      $grpc.ServiceCall $call,
-      $async.Future<$0.GetConnectionsRequest> $request) async {
+      $grpc.ServiceCall $call, $async.Future<$0.GetConnectionsRequest> $request) async {
     return getConnections($call, await $request);
   }
 
-  $async.Future<$0.GetConnectionsResponse> getConnections(
-      $grpc.ServiceCall call, $0.GetConnectionsRequest request);
+  $async.Future<$0.GetConnectionsResponse> getConnections($grpc.ServiceCall call, $0.GetConnectionsRequest request);
 
-  $async.Future<$0.GetServersResponse> getServers_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.GetServersRequest> $request) async {
+  $async.Future<$0.GetServersResponse> getServers_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetServersRequest> $request) async {
     return getServers($call, await $request);
   }
 
-  $async.Future<$0.GetServersResponse> getServers(
-      $grpc.ServiceCall call, $0.GetServersRequest request);
+  $async.Future<$0.GetServersResponse> getServers($grpc.ServiceCall call, $0.GetServersRequest request);
 
-  $async.Future<$0.NotifyResponse> notify_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.NotifyRequest> $request) async {
+  $async.Future<$0.NotifyResponse> notify_Pre($grpc.ServiceCall $call, $async.Future<$0.NotifyRequest> $request) async {
     return notify($call, await $request);
   }
 
-  $async.Future<$0.NotifyResponse> notify(
-      $grpc.ServiceCall call, $0.NotifyRequest request);
+  $async.Future<$0.NotifyResponse> notify($grpc.ServiceCall call, $0.NotifyRequest request);
 
   $async.Stream<$0.ExtensionEvent> watchExtensionEvents_Pre(
-      $grpc.ServiceCall $call,
-      $async.Future<$0.WatchExtensionEventsRequest> $request) async* {
+      $grpc.ServiceCall $call, $async.Future<$0.WatchExtensionEventsRequest> $request) async* {
     yield* watchExtensionEvents($call, await $request);
   }
 
-  $async.Stream<$0.ExtensionEvent> watchExtensionEvents(
-      $grpc.ServiceCall call, $0.WatchExtensionEventsRequest request);
+  $async.Stream<$0.ExtensionEvent> watchExtensionEvents($grpc.ServiceCall call, $0.WatchExtensionEventsRequest request);
 }

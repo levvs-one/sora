@@ -365,13 +365,11 @@ void main() {
 
     test('a renamed group member splits out so the rename stays visible', () {
       final entries = entriesOf(
-        sub([
-          server('a', 'Нидерланды (основной)'),
-          server('b', 'Нидерланды (запасной)'),
-          server('c', 'Германия'),
-        ]),
+        sub([server('a', 'Нидерланды (основной)'), server('b', 'Нидерланды (запасной)'), server('c', 'Германия')]),
       );
-      final shown = [for (final e in entries) ...e.applyRenames({'b': 'NL быстрый'})];
+      final shown = [
+        for (final e in entries) ...e.applyRenames({'b': 'NL быстрый'}),
+      ];
       expect(shown.map((e) => e.name), ['Нидерланды', 'NL быстрый', 'Германия']);
       expect(shown[1].id, 'b', reason: 'the split entry keeps the server id');
       expect(shown[0].members.map((o) => o.id), ['a'], reason: 'the group keeps the rest');

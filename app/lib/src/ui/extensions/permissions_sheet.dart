@@ -159,8 +159,7 @@ class _InstallPromptState extends State<_InstallPrompt> {
                           style: Styles.title.copyWith(color: palette.ink),
                         ),
                         const SizedBox(height: 2),
-                        Text(s.extByAuthor(m.author.name),
-                            style: Styles.caption.copyWith(color: palette.ink2)),
+                        Text(s.extByAuthor(m.author.name), style: Styles.caption.copyWith(color: palette.ink2)),
                       ],
                     ),
                   ),
@@ -168,23 +167,18 @@ class _InstallPromptState extends State<_InstallPrompt> {
               ),
               if (widget.sideload) ...[
                 const SizedBox(height: 12),
-                ExtBadge(
-                  label: s.extSideloadWarning,
-                  tone: ExtBadgeTone.warn,
-                  icon: Symbols.warning_rounded,
-                ),
+                ExtBadge(label: s.extSideloadWarning, tone: ExtBadgeTone.warn, icon: Symbols.warning_rounded),
               ],
               const SizedBox(height: 12),
               if (widget.changelog != null && widget.changelog!.isNotEmpty) ...[
-                Text(s.extChangelog,
-                    style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                Text(s.extChangelog, style: Styles.bodyStrong.copyWith(color: palette.ink)),
                 const SizedBox(height: 4),
                 for (final c in widget.changelog!) ...[
-                  Text(c.version,
-                      style: Styles.caption.copyWith(
-                          color: palette.ink, fontWeight: FontWeight.w600)),
-                  Text(c.notes,
-                      style: Styles.caption.copyWith(color: palette.ink2)),
+                  Text(
+                    c.version,
+                    style: Styles.caption.copyWith(color: palette.ink, fontWeight: FontWeight.w600),
+                  ),
+                  Text(c.notes, style: Styles.caption.copyWith(color: palette.ink2)),
                   const SizedBox(height: 6),
                 ],
                 const SizedBox(height: 4),
@@ -195,20 +189,14 @@ class _InstallPromptState extends State<_InstallPrompt> {
               ),
               const SizedBox(height: 4),
               for (final p in perms) ...[
-                PermissionRow(
-                  blurb: permissionBlurb(context, p),
-                  risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
-                ),
+                PermissionRow(blurb: permissionBlurb(context, p), risk: lookupPermission(p)?.risk ?? ExtRisk.normal),
                 _permissionExtra(context, m, p),
               ],
-              if (widget.removedPermissions != null &&
-                  widget.removedPermissions!.isNotEmpty) ...[
+              if (widget.removedPermissions != null && widget.removedPermissions!.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                Text(s.extPermissionsRemoved,
-                    style: Styles.body.copyWith(color: palette.ink)),
+                Text(s.extPermissionsRemoved, style: Styles.body.copyWith(color: palette.ink)),
                 const SizedBox(height: 4),
-                for (final p in widget.removedPermissions!)
-                  _RemovedPermissionRow(blurb: permissionBlurb(context, p)),
+                for (final p in widget.removedPermissions!) _RemovedPermissionRow(blurb: permissionBlurb(context, p)),
               ],
               if (dangerous.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -226,15 +214,12 @@ class _InstallPromptState extends State<_InstallPrompt> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(
-                            _dangerousAck
-                                ? Symbols.check_box_rounded
-                                : Symbols.check_box_outline_blank_rounded,
+                            _dangerousAck ? Symbols.check_box_rounded : Symbols.check_box_outline_blank_rounded,
                             color: _dangerousAck ? palette.ink : palette.ink3,
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Text(s.extDangerousAck,
-                                style: Styles.body.copyWith(color: palette.ink)),
+                            child: Text(s.extDangerousAck, style: Styles.body.copyWith(color: palette.ink)),
                           ),
                         ],
                       ),
@@ -279,17 +264,12 @@ class _InstallPromptState extends State<_InstallPrompt> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (detail != null)
-            Text(detail, style: Styles.caption.copyWith(color: palette.ink2)),
+          if (detail != null) Text(detail, style: Styles.caption.copyWith(color: palette.ink2)),
           if (notYetActive) ...[
             if (detail != null) const SizedBox(height: 2),
-            Text(s.extPermNotYetActive,
-                style: Styles.caption.copyWith(color: palette.ink2)),
+            Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink2)),
           ],
-          if (hosts.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            NetworkHostsList(hosts: hosts),
-          ],
+          if (hosts.isNotEmpty) ...[const SizedBox(height: 4), NetworkHostsList(hosts: hosts)],
         ],
       ),
     );
@@ -313,8 +293,7 @@ class _RemovedPermissionRow extends StatelessWidget {
           Icon(Symbols.remove_circle_rounded, size: 18, color: palette.ink3),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(blurb,
-                style: Styles.body.copyWith(color: palette.ink2)),
+            child: Text(blurb, style: Styles.body.copyWith(color: palette.ink2)),
           ),
         ],
       ),

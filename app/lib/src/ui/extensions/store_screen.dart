@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+
 import 'dart:math' as math;
 
 import '../../../l10n/strings.dart';
@@ -73,9 +74,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
             onTap: _ready ? () => _installFromUrl(context) : null,
           ),
         ],
-        fill: _ready
-            ? const _ExtensionsBody()
-            : const Center(child: CircularProgressIndicator()),
+        fill: _ready ? const _ExtensionsBody() : const Center(child: CircularProgressIndicator()),
         children: const [],
       ),
     );
@@ -118,10 +117,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
                     onSubmitted: (_) => Navigator.pop(context, controller.text.trim()),
                   ),
                   const SizedBox(height: 16),
-                  PrimaryButton(
-                    label: s.extDownload,
-                    onTap: () => Navigator.pop(context, controller.text.trim()),
-                  ),
+                  PrimaryButton(label: s.extDownload, onTap: () => Navigator.pop(context, controller.text.trim())),
                 ],
               ),
             ),
@@ -137,8 +133,11 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     try {
       final client = http.Client();
       try {
-        final data = await _downloadCapped(client, Uri.parse(url), limit: maxPackageBytes)
-            .timeout(const Duration(seconds: 60));
+        final data = await _downloadCapped(
+          client,
+          Uri.parse(url),
+          limit: maxPackageBytes,
+        ).timeout(const Duration(seconds: 60));
         if (!context.mounted) return;
         await _installBytes(context, data, source: 'url', expectedSha256: null);
       } finally {
@@ -154,8 +153,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   /// structural checks. Throws on HTTP errors, timeouts and over-limit
   /// bodies; callers map every failure to a network error. Closing [client]
   /// aborts the download (used by the cancel button).
-  static Future<Uint8List> _downloadCapped(http.Client client, Uri url,
-      {required int limit}) async {
+  static Future<Uint8List> _downloadCapped(http.Client client, Uri url, {required int limit}) async {
     final response = await client.send(http.Request('GET', url));
     if (response.statusCode != 200) throw Exception('http ${response.statusCode}');
     final body = <int>[];
@@ -172,11 +170,14 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   /// update prompt so the user knows why before approving. Null when
   /// unknown (file/URL installs).
   /// Returns true when the new version was installed.
-  Future<bool> _installBytes(BuildContext context, Uint8List data,
-      {required String source,
-      required String? expectedSha256,
-      List<CatalogChangelogEntry>? changelog,
-      String? authorKeyPin}) async {
+  Future<bool> _installBytes(
+    BuildContext context,
+    Uint8List data, {
+    required String source,
+    required String? expectedSha256,
+    List<CatalogChangelogEntry>? changelog,
+    String? authorKeyPin,
+  }) async {
     final s = S.of(context);
     if (!context.mounted) return false;
     var progressOpen = false;
@@ -200,8 +201,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     void showFailure(BuildContext context, String message) {
       hideProgress();
       if (context.mounted) {
-        _showError(context,
-            isUpdate ? '$message\n\n${s.extUpdateFailedKept}' : message);
+        _showError(context, isUpdate ? '$message\n\n${s.extUpdateFailedKept}' : message);
       }
     }
 
@@ -226,24 +226,23 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       // "Update" title — instead of the full list under "Install". Dropped
       // permissions are shown too: losing access deserves the same honesty.
       final existing = _store.get(pkg.manifest.id);
-      final diff = existing == null
-          ? null
-          : diffPermissions(existing.granted, pkg.manifest.permissions);
+      final diff = existing == null ? null : diffPermissions(existing.granted, pkg.manifest.permissions);
       // Null for a fresh install; empty list for an update with no
       // additions (the prompt still titles itself "Update").
       final added = diff?.added;
       final removed = diff == null || diff.removed.isEmpty ? null : diff.removed;
-      final granted = await showInstallPrompt(context,
-          manifest: pkg.manifest,
-          sideload: source != 'catalog',
-          addedPermissions: added,
-          removedPermissions: removed,
-          changelog: changelog);
+      final granted = await showInstallPrompt(
+        context,
+        manifest: pkg.manifest,
+        sideload: source != 'catalog',
+        addedPermissions: added,
+        removedPermissions: removed,
+        changelog: changelog,
+      );
       if (granted == null || !context.mounted) return false;
       showProgress(s.extInstalling);
       try {
-        await _store.install(pkg,
-            source: source, granted: granted, authorKeyPin: authorKeyPin);
+        await _store.install(pkg, source: source, granted: granted, authorKeyPin: authorKeyPin);
       } finally {
         hideProgress();
       }
@@ -300,8 +299,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   /// dialog and runs [onCancel] (the caller aborts the work, e.g. closes
   /// the download client). A cancelled operation is not an error: the
   /// caller must stay silent instead of showing a failure dialog.
-  void _showProgressWithCancel(
-      BuildContext context, String label, VoidCallback onCancel) {
+  void _showProgressWithCancel(BuildContext context, String label, VoidCallback onCancel) {
     final palette = Palette.of(context);
     final s = S.of(context);
     showDialog<void>(
@@ -356,8 +354,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
                     Icon(Symbols.error_rounded, color: palette.danger),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(s.extInstallFailed,
-                          style: Styles.title.copyWith(color: palette.ink)),
+                      child: Text(s.extInstallFailed, style: Styles.title.copyWith(color: palette.ink)),
                     ),
                   ],
                 ),
@@ -505,9 +502,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
           onChanged: (v) => setState(() => _tab = v),
         ),
         const SizedBox(height: 12),
-        Expanded(
-          child: _tab == 0 ? _buildCatalog(context) : _buildInstalled(context),
-        ),
+        Expanded(child: _tab == 0 ? _buildCatalog(context) : _buildInstalled(context)),
       ],
     );
   }
@@ -524,15 +519,19 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
           children: [
             Icon(Symbols.store_rounded, size: 40, color: palette.ink3),
             const SizedBox(height: 12),
-            Text(s.extCatalogSoonTitle,
-                style: Styles.title.copyWith(color: palette.ink),
-                textAlign: TextAlign.center),
+            Text(
+              s.extCatalogSoonTitle,
+              style: Styles.title.copyWith(color: palette.ink),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(s.extCatalogSoonBody,
-                  style: Styles.body.copyWith(color: palette.ink2),
-                  textAlign: TextAlign.center),
+              child: Text(
+                s.extCatalogSoonBody,
+                style: Styles.body.copyWith(color: palette.ink2),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -553,10 +552,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       );
     }
     // Rebuild cards when the store changes (install finishes, etc.).
-    return AnimatedBuilder(
-      animation: ExtScope.of(context),
-      builder: (context, _) => _catalogList(context),
-    );
+    return AnimatedBuilder(animation: ExtScope.of(context), builder: (context, _) => _catalogList(context));
   }
 
   Widget _catalogList(BuildContext context) {
@@ -615,8 +611,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
         const SizedBox(height: 8),
         Align(
           alignment: AlignmentDirectional.centerStart,
-          child: Text(s.extCapFilterTitle,
-              style: Styles.caption.copyWith(color: palette.ink3)),
+          child: Text(s.extCapFilterTitle, style: Styles.caption.copyWith(color: palette.ink3)),
         ),
         const SizedBox(height: 4),
         SizedBox(
@@ -660,8 +655,8 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
               final entries = _filtered(value.text.trim().toLowerCase());
               return entries.isEmpty
                   ? Center(
-                      child: Text(s.extEmptySearch,
-                          style: Styles.body.copyWith(color: palette.ink2)))
+                      child: Text(s.extEmptySearch, style: Styles.body.copyWith(color: palette.ink2)),
+                    )
                   : RefreshIndicator(
                       onRefresh: _refreshCatalog,
                       child: ListView.separated(
@@ -687,15 +682,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
 
   /// Capability filter values: 'all' plus the manifest capability registry
   /// ids. Labels come from l10n (extCap*).
-  List<String> _capabilities() => const [
-        'all',
-        'theme',
-        'network-hook',
-        'routing',
-        'ui-panel',
-        'background',
-        'widget',
-      ];
+  List<String> _capabilities() => const ['all', 'theme', 'network-hook', 'routing', 'ui-panel', 'background', 'widget'];
 
   String _capabilityLabel(BuildContext context, String c) {
     final s = S.of(context);
@@ -757,10 +744,12 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     }
     if (query.isNotEmpty) {
       list = list
-          .where((e) =>
-              e.name.toLowerCase().contains(query) ||
-              e.author.toLowerCase().contains(query) ||
-              e.description.toLowerCase().contains(query))
+          .where(
+            (e) =>
+                e.name.toLowerCase().contains(query) ||
+                e.author.toLowerCase().contains(query) ||
+                e.description.toLowerCase().contains(query),
+          )
           .toList();
     }
     switch (_sort) {
@@ -808,14 +797,12 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       }
     }
     final rating = (e.rating / 5).clamp(0.0, 1.0);
-    final installs =
-        (math.log(e.installs + 1) / math.log(1000001)).clamp(0.0, 1.0);
+    final installs = (math.log(e.installs + 1) / math.log(1000001)).clamp(0.0, 1.0);
     return text * 0.55 + rating * 0.3 + installs * 0.15;
   }
 
   static String _formatDate(BuildContext context, DateTime date) {
-    return DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag())
-        .format(date.toLocal());
+    return DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag()).format(date.toLocal());
   }
 
   Widget _catalogCard(BuildContext context, CatalogEntry e) {
@@ -825,9 +812,8 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     // Staged rollout: the update button appears only for installs inside
     // this version's bucket. The listing itself is never gated: hiding a
     // published version from the catalog would be dishonest.
-    final needsUpdate = installed != null &&
-        compareVersions(e.version, installed.version) > 0 &&
-        e.rolloutEligible(store.installId);
+    final needsUpdate =
+        installed != null && compareVersions(e.version, installed.version) > 0 && e.rolloutEligible(store.installId);
     return ExtensionCard(
       key: ValueKey(e.id),
       title: e.name,
@@ -838,20 +824,14 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       subtitle: e.description,
       permissions: e.permissions,
       onTap: () => push<void>(
-          context,
-          ExtensionDetailScreen(
-              entry: e, onInstall: (entry) => _installFromCatalog(context, entry))),
+        context,
+        ExtensionDetailScreen(entry: e, onInstall: (entry) => _installFromCatalog(context, entry)),
+      ),
       trailing: installed == null
-          ? PrimaryButton(
-              label: s.extInstall,
-              onTap: () => _installFromCatalog(context, e),
-            )
+          ? PrimaryButton(label: s.extInstall, onTap: () => _installFromCatalog(context, e))
           : needsUpdate
-              ? PrimaryButton(
-                  label: s.extUpdate,
-                  onTap: () => _installFromCatalog(context, e),
-                )
-              : null,
+          ? PrimaryButton(label: s.extUpdate, onTap: () => _installFromCatalog(context, e))
+          : null,
     );
   }
 
@@ -884,8 +864,10 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       // The catalog entry carries the expected size; anything beyond it is
       // not the advertised package.
       final data = await _ExtensionsScreenState._downloadCapped(
-              client, Uri.parse(e.downloadUrl), limit: e.size)
-          .timeout(const Duration(seconds: 120));
+        client,
+        Uri.parse(e.downloadUrl),
+        limit: e.size,
+      ).timeout(const Duration(seconds: 120));
       closeDialog();
       if (!context.mounted) return false;
       // Changelog rows newer than the installed version, newest first.
@@ -893,15 +875,16 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       final installedVersion = state._store.get(e.id)?.version;
       final changelog = [
         for (final c in e.changelog)
-          if (installedVersion == null ||
-              compareVersions(c.version, installedVersion) > 0)
-            c,
+          if (installedVersion == null || compareVersions(c.version, installedVersion) > 0) c,
       ];
-      return await state._installBytes(context, data,
-          source: 'catalog',
-          expectedSha256: e.sha256,
-          authorKeyPin: e.authorKey,
-          changelog: changelog.isEmpty ? null : changelog);
+      return await state._installBytes(
+        context,
+        data,
+        source: 'catalog',
+        expectedSha256: e.sha256,
+        authorKeyPin: e.authorKey,
+        changelog: changelog.isEmpty ? null : changelog,
+      );
     } catch (_) {
       closeDialog();
       if (!cancelled && context.mounted) {
@@ -933,11 +916,8 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
             animation: ExtScope.of(context),
             builder: (context, _) => ValueListenableBuilder<TextEditingValue>(
               valueListenable: _installedSearch,
-              builder: (context, value, _) => _installedList(
-                context,
-                ExtScope.of(context),
-                value.text.trim().toLowerCase(),
-              ),
+              builder: (context, value, _) =>
+                  _installedList(context, ExtScope.of(context), value.text.trim().toLowerCase()),
             ),
           ),
         ),
@@ -964,9 +944,10 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     var list = store.installed;
     if (q.isNotEmpty) {
       list = list
-          .where((inst) =>
-              inst.manifest.name.toLowerCase().contains(q) ||
-              inst.manifest.author.name.toLowerCase().contains(q))
+          .where(
+            (inst) =>
+                inst.manifest.name.toLowerCase().contains(q) || inst.manifest.author.name.toLowerCase().contains(q),
+          )
           .toList();
     }
     if (list.isEmpty) {
@@ -977,9 +958,10 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
             Icon(Symbols.extension_off_rounded, size: 40, color: palette.ink3),
             const SizedBox(height: 12),
             Text(
-                q.isEmpty ? s.extEmptyInstalled : s.extEmptySearch,
-                style: Styles.body.copyWith(color: palette.ink2),
-                textAlign: TextAlign.center),
+              q.isEmpty ? s.extEmptyInstalled : s.extEmptySearch,
+              style: Styles.body.copyWith(color: palette.ink2),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       );
@@ -997,8 +979,10 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(s.extUpdatesAvailable(updates.length),
-                      style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                  child: Text(
+                    s.extUpdatesAvailable(updates.length),
+                    style: Styles.bodyStrong.copyWith(color: palette.ink),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 PrimaryButton(
@@ -1024,17 +1008,13 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 author: inst.manifest.author.name,
                 badges: [
                   if (inst.source != 'catalog')
-                    ExtBadge(
-                        label: s.extSideloadShort,
-                        tone: ExtBadgeTone.warn,
-                        icon: Symbols.warning_rounded),
+                    ExtBadge(label: s.extSideloadShort, tone: ExtBadgeTone.warn, icon: Symbols.warning_rounded),
                   if (needsUpdate) ExtBadge(label: s.extUpdateAvailable),
                   if (!inst.enabled) ExtBadge(label: s.extDisabled),
                   // Honest signal, not the form itself: the full
                   // settings form lives on the detail screen, one tap away.
                   if (inst.manifest.settingsSchema != null)
-                    ExtBadge(
-                        label: s.extSettings, icon: Symbols.settings_rounded),
+                    ExtBadge(label: s.extSettings, icon: Symbols.settings_rounded),
                 ],
                 subtitle: s.extVersionLabel(inst.version),
                 enabled: inst.enabled,
@@ -1046,10 +1026,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 // the extension it toggles.
                 trailing: Semantics(
                   label: s.extToggleEnabled(inst.manifest.name),
-                  child: Switch(
-                    value: inst.enabled,
-                    onChanged: (v) => store.setEnabled(inst.id, v),
-                  ),
+                  child: Switch(value: inst.enabled, onChanged: (v) => store.setEnabled(inst.id, v)),
                 ),
               );
             },
@@ -1063,8 +1040,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   /// still asks its own permission question; failures show their dialog
   /// and the run continues. The snackbar at the end counts only real
   /// successes — silence would let a half-finished run look complete.
-  Future<void> _updateAll(
-      BuildContext context, List<InstalledExtension> updates) async {
+  Future<void> _updateAll(BuildContext context, List<InstalledExtension> updates) async {
     final s = S.of(context);
     setState(() => _updatingAll = true);
     var done = 0;
@@ -1076,9 +1052,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
         // Re-check per item: the user may have updated or removed one
         // while this run was in flight.
         final current = store.get(inst.id);
-        if (entry == null ||
-            current == null ||
-            compareVersions(entry.version, current.version) <= 0) {
+        if (entry == null || current == null || compareVersions(entry.version, current.version) <= 0) {
           continue;
         }
         if (await _installFromCatalog(context, entry)) done++;
@@ -1130,15 +1104,13 @@ class _ConflictBannerState extends State<_ConflictBanner> {
     final winners = await widget.store.conflictWinners();
     if (!mounted) return;
     setState(() {
-      _conflicts =
-          unresolvedConflicts(widget.store.installed, (k) => winners[k]);
+      _conflicts = unresolvedConflicts(widget.store.installed, (k) => winners[k]);
       _ready = true;
     });
   }
 
   Future<void> _openSheet() async {
-    final saved = await showConflictsSheet(context,
-        conflicts: _conflicts, store: widget.store);
+    final saved = await showConflictsSheet(context, conflicts: _conflicts, store: widget.store);
     if (saved) unawaited(_refresh());
   }
 
@@ -1167,13 +1139,13 @@ class _ConflictBannerState extends State<_ConflictBanner> {
                 Icon(Symbols.warning_rounded, size: 20, color: palette.danger),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(s.extConflictsCount(_conflicts.length),
-                      style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                  child: Text(
+                    s.extConflictsCount(_conflicts.length),
+                    style: Styles.bodyStrong.copyWith(color: palette.ink),
+                  ),
                 ),
                 const SizedBox(width: 8),
-                Text(s.extConflictsResolve,
-                    style:
-                        Styles.bodyStrong.copyWith(color: palette.danger)),
+                Text(s.extConflictsResolve, style: Styles.bodyStrong.copyWith(color: palette.danger)),
               ],
             ),
           ),

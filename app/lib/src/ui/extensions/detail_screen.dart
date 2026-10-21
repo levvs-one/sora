@@ -24,7 +24,7 @@ import 'widgets.dart';
 
 class ExtensionDetailScreen extends StatefulWidget {
   const ExtensionDetailScreen({super.key, this.entry, this.installed, this.onInstall})
-      : assert(entry != null || installed != null);
+    : assert(entry != null || installed != null);
 
   final CatalogEntry? entry;
   final InstalledExtension? installed;
@@ -44,19 +44,20 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
   /// Synthetic manifest from a catalog entry, used only when the
   /// extension is not installed.
   ExtManifest get _syntheticManifest => ExtManifest(
-        id: widget.entry!.id,
-        name: widget.entry!.name,
-        version: widget.entry!.version,
-        minAppVersion: widget.entry!.minAppVersion,
-        description: widget.entry!.description,
-        author: ExtAuthor(
-            name: widget.entry!.author,
-            identity: widget.entry!.authorIdentity,
-            publicKey: widget.entry!.authorKey),
-        permissions: widget.entry!.permissions,
-        capabilities: const [],
-        panels: const [],
-      );
+    id: widget.entry!.id,
+    name: widget.entry!.name,
+    version: widget.entry!.version,
+    minAppVersion: widget.entry!.minAppVersion,
+    description: widget.entry!.description,
+    author: ExtAuthor(
+      name: widget.entry!.author,
+      identity: widget.entry!.authorIdentity,
+      publicKey: widget.entry!.authorKey,
+    ),
+    permissions: widget.entry!.permissions,
+    capabilities: const [],
+    panels: const [],
+  );
 
   bool _depsReady = false;
 
@@ -85,8 +86,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     final s = S.of(context), palette = Palette.of(context);
     final store = ExtScope.of(context);
     final entry = widget.entry;
-    final installed =
-        widget.installed ?? (entry != null ? store.get(entry.id) : null);
+    final installed = widget.installed ?? (entry != null ? store.get(entry.id) : null);
     final m = installed?.manifest ?? _syntheticManifest;
     return AnimatedBuilder(
       animation: store,
@@ -97,42 +97,41 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
           children: [
             _header(context, m, entry),
             const SizedBox(height: 16),
-            Group(children: [
-              Tile(
-                title: s.extAuthor,
-                trailing: Text(m.author.name, style: Styles.body.copyWith(color: palette.ink2)),
-              ),
-              if (entry != null) ...[
-                // Like the cards: missing data is no row, never a fake
-                // 0.0 rating or a "0 installs" line.
-                if (entry.rating > 0)
-                  Tile(
-                    title: s.extRating,
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        StarRating(rating: entry.rating),
-                        const SizedBox(width: 6),
-                        Icon(Symbols.info_rounded,
-                            size: 16, color: palette.ink3),
-                      ],
+            Group(
+              children: [
+                Tile(
+                  title: s.extAuthor,
+                  trailing: Text(m.author.name, style: Styles.body.copyWith(color: palette.ink2)),
+                ),
+                if (entry != null) ...[
+                  // Like the cards: missing data is no row, never a fake
+                  // 0.0 rating or a "0 installs" line.
+                  if (entry.rating > 0)
+                    Tile(
+                      title: s.extRating,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          StarRating(rating: entry.rating),
+                          const SizedBox(width: 6),
+                          Icon(Symbols.info_rounded, size: 16, color: palette.ink3),
+                        ],
+                      ),
+                      // The published rating methodology, in plain language.
+                      onTap: () => showRatingHowDialog(context),
                     ),
-                    // The published rating methodology, in plain language.
-                    onTap: () => showRatingHowDialog(context),
-                  ),
-                if (entry.installs > 0)
-                  Tile(
-                    title: s.extInstalls,
-                    trailing: Text('${entry.installs}',
-                        style: Styles.body.copyWith(color: palette.ink2)),
-                  ),
+                  if (entry.installs > 0)
+                    Tile(
+                      title: s.extInstalls,
+                      trailing: Text('${entry.installs}', style: Styles.body.copyWith(color: palette.ink2)),
+                    ),
+                ],
+                Tile(
+                  title: s.extVersion,
+                  trailing: Text(m.version, style: Styles.body.copyWith(color: palette.ink2)),
+                ),
               ],
-              Tile(
-                title: s.extVersion,
-                trailing:
-                    Text(m.version, style: Styles.body.copyWith(color: palette.ink2)),
-              ),
-            ]),
+            ),
             if (entry != null && entry.screenshotUrls.isNotEmpty) ...[
               Heading(s.extScreenshots),
               _ScreenshotsCarousel(urls: entry.screenshotUrls),
@@ -140,83 +139,80 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
             ],
             if (entry != null && entry.changelog.isNotEmpty) ...[
               Heading(s.extChangelog),
-              Group(children: [
-                for (final c in entry.changelog)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(c.version,
-                                style: Styles.bodyStrong
-                                    .copyWith(color: palette.ink)),
-                            const SizedBox(width: 8),
-                            Text(
-                                DateFormat.yMMMd(Localizations.localeOf(context)
-                                        .toLanguageTag())
+              Group(
+                children: [
+                  for (final c in entry.changelog)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(c.version, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                              const SizedBox(width: 8),
+                              Text(
+                                DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag())
                                     .format(c.date.toLocal()),
-                                style: Styles.caption
-                                    .copyWith(color: palette.ink3)),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(c.notes,
-                            style:
-                                Styles.body.copyWith(color: palette.ink2)),
-                      ],
+                                style: Styles.caption.copyWith(color: palette.ink3),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(c.notes, style: Styles.body.copyWith(color: palette.ink2)),
+                        ],
+                      ),
                     ),
-                  ),
-              ]),
+                ],
+              ),
               const SizedBox(height: 16),
             ],
             if (m.description.isNotEmpty) ...[
               Heading(s.extAbout),
-              Group(children: [
-                Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Text(m.description,
-                      style: Styles.body.copyWith(color: palette.ink)),
-                ),
-              ]),
+              Group(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Text(m.description, style: Styles.body.copyWith(color: palette.ink)),
+                  ),
+                ],
+              ),
             ],
             Heading(s.extPermissionsTitle),
-            Group(children: [
-              Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (m.permissions.isEmpty)
-                      Text(s.extNoPermissions,
-                          style: Styles.body.copyWith(color: palette.ink2))
-                    else
-                      for (final p in m.permissions) ...[
-                        PermissionRow(
-                          blurb: permissionBlurb(context, p),
-                          risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
-                        ),
-                        // Same honesty marker as the install prompt: a
-                        // permission whose runtime is not built must say
-                        // so here too, not only before the grant.
-                        if (isNotYetActive(p))
-                          Padding(
-                            padding: const EdgeInsets.only(left: 28, bottom: 4),
-                            child: Text(s.extPermNotYetActive,
-                                style: Styles.caption
-                                    .copyWith(color: palette.ink2)),
+            Group(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (m.permissions.isEmpty)
+                        Text(s.extNoPermissions, style: Styles.body.copyWith(color: palette.ink2))
+                      else
+                        for (final p in m.permissions) ...[
+                          PermissionRow(
+                            blurb: permissionBlurb(context, p),
+                            risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
                           ),
-                        if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 28, bottom: 4),
-                            child: NetworkHostsList(hosts: m.networkHosts),
-                          ),
-                      ],
-                  ],
+                          // Same honesty marker as the install prompt: a
+                          // permission whose runtime is not built must say
+                          // so here too, not only before the grant.
+                          if (isNotYetActive(p))
+                            Padding(
+                              padding: const EdgeInsets.only(left: 28, bottom: 4),
+                              child: Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink2)),
+                            ),
+                          if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 28, bottom: 4),
+                              child: NetworkHostsList(hosts: m.networkHosts),
+                            ),
+                        ],
+                    ],
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
             if (live != null && _hasBackgroundTask(live)) ...[
               Heading(s.extBgTitle),
               _BackgroundTaskSection(extensionId: live.id, interactive: live.enabled),
@@ -225,16 +221,15 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
             // single "open" button would silently pick the first one.
             if (live != null && live.enabled && m.panels.isNotEmpty) ...[
               Heading(s.extCapPanel),
-              Group(children: [
-                for (final p in m.panels)
-                  LinkTile(
-                    title: p.title,
-                    onTap: () => push<void>(
-                        context,
-                        ExtensionPanelScreen(
-                            extensionId: live.id, panelId: p.id)),
-                  ),
-              ]),
+              Group(
+                children: [
+                  for (final p in m.panels)
+                    LinkTile(
+                      title: p.title,
+                      onTap: () => push<void>(context, ExtensionPanelScreen(extensionId: live.id, panelId: p.id)),
+                    ),
+                ],
+              ),
             ],
             if (live != null && _settings != null && m.settingsSchema != null) ...[
               Heading(s.extSettings),
@@ -281,8 +276,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
               children: [
                 Text(m.name, style: Styles.heading.copyWith(color: palette.ink)),
                 const SizedBox(height: 2),
-                Text(s.extByAuthor(m.author.name),
-                    style: Styles.caption.copyWith(color: palette.ink2)),
+                Text(s.extByAuthor(m.author.name), style: Styles.caption.copyWith(color: palette.ink2)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
@@ -292,10 +286,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                       if (entry.rating > 0) StarRating(rating: entry.rating),
                       ...catalogBadges(context, entry),
                     ] else if (widget.installed?.source != 'catalog')
-                      ExtBadge(
-                          label: s.extSideloadShort,
-                          tone: ExtBadgeTone.warn,
-                          icon: Symbols.warning_rounded),
+                      ExtBadge(label: s.extSideloadShort, tone: ExtBadgeTone.warn, icon: Symbols.warning_rounded),
                   ],
                 ),
               ],
@@ -306,42 +297,35 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     );
   }
 
-  Widget _actions(BuildContext context, ExtensionStore store, ExtManifest m,
-      InstalledExtension? live, CatalogEntry? entry) {
+  Widget _actions(
+    BuildContext context,
+    ExtensionStore store,
+    ExtManifest m,
+    InstalledExtension? live,
+    CatalogEntry? entry,
+  ) {
     final s = S.of(context);
     if (live == null) {
       // Not installed: install straight from the detail screen.
-      return PrimaryButton(
-        label: s.extInstall,
-        onTap: entry == null ? null : () => widget.onInstall?.call(entry),
-      );
+      return PrimaryButton(label: s.extInstall, onTap: entry == null ? null : () => widget.onInstall?.call(entry));
     }
-    final needsUpdate = entry != null &&
-        compareVersions(entry.version, live.version) > 0 &&
-        entry.rolloutEligible(store.installId);
+    final needsUpdate =
+        entry != null && compareVersions(entry.version, live.version) > 0 && entry.rolloutEligible(store.installId);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (needsUpdate) ...[
           const SizedBox(height: 8),
-          PrimaryButton(
-            label: s.extUpdateTo(entry.version),
-            onTap: () => widget.onInstall?.call(entry),
-          ),
+          PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
         ],
         const SizedBox(height: 8),
-        SwitchTile(
-          title: s.extEnabled,
-          value: live.enabled,
-          onChanged: (v) => store.setEnabled(live.id, v),
-        ),
+        SwitchTile(title: s.extEnabled, value: live.enabled, onChanged: (v) => store.setEnabled(live.id, v)),
         if (live.previous != null) ...[
           const SizedBox(height: 8),
           _QuietButton(
             label: s.extRollbackTo(live.previous!),
             icon: Symbols.history_rounded,
-            onTap: () => _confirm(context, s.extRollbackConfirm(live.previous!),
-                () => store.rollback(live.id)),
+            onTap: () => _confirm(context, s.extRollbackConfirm(live.previous!), () => store.rollback(live.id)),
           ),
         ],
         const SizedBox(height: 8),
@@ -358,8 +342,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     );
   }
 
-  Future<void> _confirm(
-      BuildContext context, String message, Future<void> Function() action) async {
+  Future<void> _confirm(BuildContext context, String message, Future<void> Function() action) async {
     final s = S.of(context), palette = Palette.of(context);
     final ok = await showDialog<bool>(
       context: context,
@@ -377,8 +360,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
               children: [
                 Text(message, style: Styles.body.copyWith(color: palette.ink)),
                 const SizedBox(height: 16),
-                PrimaryButton(
-                    label: s.extConfirm, onTap: () => Navigator.pop(context, true)),
+                PrimaryButton(label: s.extConfirm, onTap: () => Navigator.pop(context, true)),
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
@@ -427,8 +409,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
 }
 
 class _QuietButton extends StatelessWidget {
-  const _QuietButton(
-      {required this.label, required this.icon, required this.onTap, this.danger = false});
+  const _QuietButton({required this.label, required this.icon, required this.onTap, this.danger = false});
   final String label;
   final IconData icon;
   final VoidCallback onTap;
@@ -456,10 +437,7 @@ class _QuietButton extends StatelessWidget {
             children: [
               Icon(icon, size: 18, color: danger ? palette.danger : palette.ink2),
               const SizedBox(width: 8),
-              Flexible(
-                child: Text(label,
-                    style: danger ? Styles.dangerStrong(context) : Styles.bodyStrong),
-              ),
+              Flexible(child: Text(label, style: danger ? Styles.dangerStrong(context) : Styles.bodyStrong)),
             ],
           ),
         ),
@@ -486,21 +464,23 @@ class _SettingsForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context), palette = Palette.of(context);
-    final props =
-        (manifest.settingsSchema?['properties'] as Map<String, dynamic>?) ?? {};
-    return Group(children: [
-      for (final e in props.entries) _field(context, e.key, e.value as Map<String, dynamic>),
-      Padding(
-        padding: const EdgeInsets.all(12),
-        child: PrimaryButton(label: s.extSaveSettings, onTap: saving ? null : () => onSave()),
-      ),
-      if (saving)
+    final props = (manifest.settingsSchema?['properties'] as Map<String, dynamic>?) ?? {};
+    return Group(
+      children: [
+        for (final e in props.entries) _field(context, e.key, e.value as Map<String, dynamic>),
         Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Center(
-              child: Text(s.extSaving, style: Styles.caption.copyWith(color: palette.ink2))),
+          padding: const EdgeInsets.all(12),
+          child: PrimaryButton(label: s.extSaveSettings, onTap: saving ? null : () => onSave()),
         ),
-    ]);
+        if (saving)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Center(
+              child: Text(s.extSaving, style: Styles.caption.copyWith(color: palette.ink2)),
+            ),
+          ),
+      ],
+    );
   }
 
   Widget _field(BuildContext context, String key, Map<String, dynamic> prop) {
@@ -509,11 +489,7 @@ class _SettingsForm extends StatelessWidget {
     final label = (prop['title'] as String?) ?? key;
     switch (type) {
       case 'boolean':
-        return SwitchTile(
-          title: label,
-          value: value == true,
-          onChanged: (v) => onChanged(key, v),
-        );
+        return SwitchTile(title: label, value: value == true, onChanged: (v) => onChanged(key, v));
       case 'string':
         final en = prop['enum'] as List?;
         if (en != null) {
@@ -561,8 +537,7 @@ class _SettingsForm extends StatelessWidget {
 /// validator already ties together. Gating on the declaration (rather than
 /// the capability/permission alone) keeps the section from offering
 /// controls for a task that could never run.
-bool _hasBackgroundTask(InstalledExtension inst) =>
-    inst.manifest.backgroundTask != null;
+bool _hasBackgroundTask(InstalledExtension inst) => inst.manifest.backgroundTask != null;
 
 /// Background task management for one installed extension: on/off plus the
 /// run interval, clamped by [BackgroundTaskConfig] to what the platform
@@ -617,9 +592,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
         _config = prev;
         _busy = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(S.of(context).extErrGeneric)),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).extErrGeneric)));
       return;
     }
     if (mounted) setState(() => _busy = false);
@@ -646,53 +619,44 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
     final s = S.of(context), palette = Palette.of(context);
     final config = _config;
     final editable = widget.interactive && !_busy;
-    return Group(children: [
-      // Honest status, not a fake runner: the switch below persists the
-      // user's schedule (<id>.background.json, the runtime contract), but
-      // no background runtime executes it in this build — the scheduler is
-      // never started and the worker script has no executor yet. The badge
-      // says so instead of letting the toggle pretend otherwise.
-      Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: ExtBadge(
-            label: s.extBgRuntimeBadge,
-            tone: ExtBadgeTone.warn,
-            icon: Symbols.info_rounded,
+    return Group(
+      children: [
+        // Honest status, not a fake runner: the switch below persists the
+        // user's schedule (<id>.background.json, the runtime contract), but
+        // no background runtime executes it in this build — the scheduler is
+        // never started and the worker script has no executor yet. The badge
+        // says so instead of letting the toggle pretend otherwise.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: ExtBadge(label: s.extBgRuntimeBadge, tone: ExtBadgeTone.warn, icon: Symbols.info_rounded),
           ),
         ),
-      ),
-      if (config == null)
-        const Padding(
-          padding: EdgeInsets.all(14),
-          child: Center(
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+        if (config == null)
+          const Padding(
+            padding: EdgeInsets.all(14),
+            child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+          )
+        else ...[
+          SwitchTile(
+            title: s.extBgEnabled,
+            value: config.enabled,
+            onChanged: editable
+                ? (v) => _apply(BackgroundTaskConfig(enabled: v, intervalMinutes: config.intervalMinutes))
+                : null,
+          ),
+          _intervalTile(config, editable),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
+            child: Text(
+              widget.interactive ? s.extBgNote : s.extBgDisabledNote,
+              style: Styles.caption.copyWith(color: palette.ink2),
             ),
           ),
-        )
-      else ...[
-        SwitchTile(
-          title: s.extBgEnabled,
-          value: config.enabled,
-          onChanged: editable
-              ? (v) => _apply(BackgroundTaskConfig(
-                  enabled: v, intervalMinutes: config.intervalMinutes))
-              : null,
-        ),
-        _intervalTile(config, editable),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
-          child: Text(
-            widget.interactive ? s.extBgNote : s.extBgDisabledNote,
-            style: Styles.caption.copyWith(color: palette.ink2),
-          ),
-        ),
+        ],
       ],
-    ]);
+    );
   }
 
   /// The run-interval row. [ChoiceTile.onChanged] is non-nullable, so a
@@ -703,8 +667,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
       title: S.of(context).extBgInterval,
       value: config.intervalMinutes,
       choices: _intervalChoices(context, config.intervalMinutes),
-      onChanged: (v) => _apply(BackgroundTaskConfig(
-          enabled: config.enabled, intervalMinutes: v)),
+      onChanged: (v) => _apply(BackgroundTaskConfig(enabled: config.enabled, intervalMinutes: v)),
     );
     return editable ? tile : AbsorbPointer(child: tile);
   }
@@ -753,9 +716,7 @@ class _ScreenshotsCarouselState extends State<_ScreenshotsCarousel> {
                     children: [
                       Icon(Symbols.broken_image_rounded, color: palette.ink3),
                       const SizedBox(height: 6),
-                      Text(s.extImageFailed,
-                          style:
-                              Styles.caption.copyWith(color: palette.ink2)),
+                      Text(s.extImageFailed, style: Styles.caption.copyWith(color: palette.ink2)),
                     ],
                   ),
                 ),

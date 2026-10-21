@@ -50,11 +50,7 @@ class _ToastTitle extends StatelessWidget {
       ],
     );
     if (notice.action.isEmpty) return body;
-    return Semantics(
-      button: true,
-      onTap: () => runNotificationAction(context, notice),
-      child: body,
-    );
+    return Semantics(button: true, onTap: () => runNotificationAction(context, notice), child: body);
   }
 }
 

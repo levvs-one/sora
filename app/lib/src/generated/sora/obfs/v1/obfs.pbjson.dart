@@ -48,13 +48,13 @@ const UtlsProfile$json = {
 };
 
 /// Descriptor for `UtlsProfile`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List utlsProfileDescriptor = $convert.base64Decode(
-    'CgtVdGxzUHJvZmlsZRIcChhVVExTX1BST0ZJTEVfVU5TUEVDSUZJRUQQACIECAEQASIECAIQAi'
-    'IECAMQAyIECAQQBCIECAUQBSIECAYQBiIECAcQByIECAgQCCIECAkQCSIECAoQCioTVVRMU19Q'
-    'Uk9GSUxFX0NIUk9NRSoUVVRMU19QUk9GSUxFX0ZJUkVGT1gqE1VUTFNfUFJPRklMRV9TQUZBUk'
-    'kqEFVUTFNfUFJPRklMRV9JT1MqFFVUTFNfUFJPRklMRV9BTkRST0lEKhFVVExTX1BST0ZJTEVf'
-    'RURHRSoQVVRMU19QUk9GSUxFXzM2MCoPVVRMU19QUk9GSUxFX1FRKhNVVExTX1BST0ZJTEVfUk'
-    'FORE9NKhdVVExTX1BST0ZJTEVfUkFORE9NSVpFRA==');
+final $typed_data.Uint8List utlsProfileDescriptor =
+    $convert.base64Decode('CgtVdGxzUHJvZmlsZRIcChhVVExTX1BST0ZJTEVfVU5TUEVDSUZJRUQQACIECAEQASIECAIQAi'
+        'IECAMQAyIECAQQBCIECAUQBSIECAYQBiIECAcQByIECAgQCCIECAkQCSIECAoQCioTVVRMU19Q'
+        'Uk9GSUxFX0NIUk9NRSoUVVRMU19QUk9GSUxFX0ZJUkVGT1gqE1VUTFNfUFJPRklMRV9TQUZBUk'
+        'kqEFVUTFNfUFJPRklMRV9JT1MqFFVUTFNfUFJPRklMRV9BTkRST0lEKhFVVExTX1BST0ZJTEVf'
+        'RURHRSoQVVRMU19QUk9GSUxFXzM2MCoPVVRMU19QUk9GSUxFX1FRKhNVVExTX1BST0ZJTEVfUk'
+        'FORE9NKhdVVExTX1BST0ZJTEVfUkFORE9NSVpFRA==');
 
 @$core.Deprecated('Use obfsPresetDescriptor instead')
 const ObfsPreset$json = {
@@ -68,19 +68,14 @@ const ObfsPreset$json = {
     {'1': 3, '2': 3},
     {'1': 4, '2': 4},
   ],
-  '5': [
-    'OBFS_PRESET_OFF',
-    'OBFS_PRESET_LIGHT',
-    'OBFS_PRESET_BALANCED',
-    'OBFS_PRESET_AGGRESSIVE'
-  ],
+  '5': ['OBFS_PRESET_OFF', 'OBFS_PRESET_LIGHT', 'OBFS_PRESET_BALANCED', 'OBFS_PRESET_AGGRESSIVE'],
 };
 
 /// Descriptor for `ObfsPreset`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List obfsPresetDescriptor = $convert.base64Decode(
-    'CgpPYmZzUHJlc2V0EhsKF09CRlNfUFJFU0VUX1VOU1BFQ0lGSUVEEAAiBAgBEAEiBAgCEAIiBA'
-    'gDEAMiBAgEEAQqD09CRlNfUFJFU0VUX09GRioRT0JGU19QUkVTRVRfTElHSFQqFE9CRlNfUFJF'
-    'U0VUX0JBTEFOQ0VEKhZPQkZTX1BSRVNFVF9BR0dSRVNTSVZF');
+final $typed_data.Uint8List obfsPresetDescriptor =
+    $convert.base64Decode('CgpPYmZzUHJlc2V0EhsKF09CRlNfUFJFU0VUX1VOU1BFQ0lGSUVEEAAiBAgBEAEiBAgCEAIiBA'
+        'gDEAMiBAgEEAQqD09CRlNfUFJFU0VUX09GRioRT0JGU19QUkVTRVRfTElHSFQqFE9CRlNfUFJF'
+        'U0VUX0JBTEFOQ0VEKhZPQkZTX1BSRVNFVF9BR0dSRVNTSVZF');
 
 @$core.Deprecated('Use obfuscationProfileDescriptor instead')
 const ObfuscationProfile$json = {
@@ -93,21 +88,14 @@ const ObfuscationProfile$json = {
     {'1': 5, '2': 6},
     {'1': 6, '2': 7},
   ],
-  '10': [
-    'preset',
-    'utls_profile',
-    'frag_sizes',
-    'frag_delay_ms',
-    'jitter_ms',
-    'fake_sni'
-  ],
+  '10': ['preset', 'utls_profile', 'frag_sizes', 'frag_delay_ms', 'jitter_ms', 'fake_sni'],
 };
 
 /// Descriptor for `ObfuscationProfile`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List obfuscationProfileDescriptor = $convert.base64Decode(
-    'ChJPYmZ1c2NhdGlvblByb2ZpbGVKBAgBEAJKBAgCEANKBAgDEARKBAgEEAVKBAgFEAZKBAgGEA'
-    'dSBnByZXNldFIMdXRsc19wcm9maWxlUgpmcmFnX3NpemVzUg1mcmFnX2RlbGF5X21zUglqaXR0'
-    'ZXJfbXNSCGZha2Vfc25p');
+final $typed_data.Uint8List obfuscationProfileDescriptor =
+    $convert.base64Decode('ChJPYmZ1c2NhdGlvblByb2ZpbGVKBAgBEAJKBAgCEANKBAgDEARKBAgEEAVKBAgFEAZKBAgGEA'
+        'dSBnByZXNldFIMdXRsc19wcm9maWxlUgpmcmFnX3NpemVzUg1mcmFnX2RlbGF5X21zUglqaXR0'
+        'ZXJfbXNSCGZha2Vfc25p');
 
 @$core.Deprecated('Use applyObfsProfileRequestDescriptor instead')
 const ApplyObfsProfileRequest$json = {
@@ -121,8 +109,7 @@ const ApplyObfsProfileRequest$json = {
 
 /// Descriptor for `ApplyObfsProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List applyObfsProfileRequestDescriptor =
-    $convert.base64Decode(
-        'ChdBcHBseU9iZnNQcm9maWxlUmVxdWVzdEoECAEQAkoECAIQA1ILYXBpX3ZlcnNpb25SB3Byb2'
+    $convert.base64Decode('ChdBcHBseU9iZnNQcm9maWxlUmVxdWVzdEoECAEQAkoECAIQA1ILYXBpX3ZlcnNpb25SB3Byb2'
         'ZpbGU=');
 
 @$core.Deprecated('Use applyObfsProfileResponseDescriptor instead')
@@ -139,8 +126,7 @@ const ApplyObfsProfileResponse$json = {
 
 /// Descriptor for `ApplyObfsProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List applyObfsProfileResponseDescriptor =
-    $convert.base64Decode(
-        'ChhBcHBseU9iZnNQcm9maWxlUmVzcG9uc2VKBAgBEAJKBAgCEANKBAgDEARKBAgEEAVSB2FwcG'
+    $convert.base64Decode('ChhBcHBseU9iZnNQcm9maWxlUmVzcG9uc2VKBAgBEAJKBAgCEANKBAgDEARKBAgEEAVSB2FwcG'
         'xpZWRSEmNvbXBhdGlibGVfZW5naW5lc1IId2FybmluZ3NSBWVycm9y');
 
 @$core.Deprecated('Use getObfsCapabilitiesRequestDescriptor instead')
@@ -154,8 +140,7 @@ const GetObfsCapabilitiesRequest$json = {
 
 /// Descriptor for `GetObfsCapabilitiesRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getObfsCapabilitiesRequestDescriptor =
-    $convert.base64Decode(
-        'ChpHZXRPYmZzQ2FwYWJpbGl0aWVzUmVxdWVzdEoECAEQAlILYXBpX3ZlcnNpb24=');
+    $convert.base64Decode('ChpHZXRPYmZzQ2FwYWJpbGl0aWVzUmVxdWVzdEoECAEQAlILYXBpX3ZlcnNpb24=');
 
 @$core.Deprecated('Use getObfsCapabilitiesResponseDescriptor instead')
 const GetObfsCapabilitiesResponse$json = {
@@ -169,8 +154,7 @@ const GetObfsCapabilitiesResponse$json = {
 
 /// Descriptor for `GetObfsCapabilitiesResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getObfsCapabilitiesResponseDescriptor =
-    $convert.base64Decode(
-        'ChtHZXRPYmZzQ2FwYWJpbGl0aWVzUmVzcG9uc2VKBAgBEAJKBAgCEANSB2VuZ2luZXNSBWVycm'
+    $convert.base64Decode('ChtHZXRPYmZzQ2FwYWJpbGl0aWVzUmVzcG9uc2VKBAgBEAJKBAgCEANSB2VuZ2luZXNSBWVycm'
         '9y');
 
 @$core.Deprecated('Use engineObfsCapabilitiesDescriptor instead')
@@ -199,8 +183,8 @@ const EngineObfsCapabilities$json = {
 };
 
 /// Descriptor for `EngineObfsCapabilities`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List engineObfsCapabilitiesDescriptor = $convert.base64Decode(
-    'ChZFbmdpbmVPYmZzQ2FwYWJpbGl0aWVzSgQIARACSgQIAhADSgQIAxAESgQIBBAFSgQIBRAGSg'
-    'QIBhAHSgQIBxAISgQICBAJUgZlbmdpbmVSBHV0bHNSDXV0bHNfcHJvZmlsZXNSGnN1cHBvcnRz'
-    'X3ZlcnNpb25lZF9wYXJyb3RzUg1mcmFnbWVudGF0aW9uUg9mcmFnbWVudF9wYXJhbXNSBmppdH'
-    'RlclIIZmFrZV9zbmk=');
+final $typed_data.Uint8List engineObfsCapabilitiesDescriptor =
+    $convert.base64Decode('ChZFbmdpbmVPYmZzQ2FwYWJpbGl0aWVzSgQIARACSgQIAhADSgQIAxAESgQIBBAFSgQIBRAGSg'
+        'QIBhAHSgQIBxAISgQICBAJUgZlbmdpbmVSBHV0bHNSDXV0bHNfcHJvZmlsZXNSGnN1cHBvcnRz'
+        'X3ZlcnNpb25lZF9wYXJyb3RzUg1mcmFnbWVudGF0aW9uUg9mcmFnbWVudF9wYXJhbXNSBmppdH'
+        'RlclIIZmFrZV9zbmk=');

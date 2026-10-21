@@ -286,10 +286,7 @@ class _SyncScreenState extends State<SyncScreen> {
           padding: const EdgeInsets.all(24),
           child: Row(
             children: [
-              const SizedBox.square(
-                dimension: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
+              const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2)),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(s.syncDaemonStarting, style: Styles.secondary.copyWith(color: palette.ink2)),
@@ -360,10 +357,7 @@ class _SyncScreenState extends State<SyncScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        PrimaryButton(
-          label: s.syncRetry,
-          onTap: () => unawaited(daemon.ensureRunning()),
-        ),
+        PrimaryButton(label: s.syncRetry, onTap: () => unawaited(daemon.ensureRunning())),
       ],
     );
   }
@@ -373,17 +367,14 @@ class _SyncScreenState extends State<SyncScreen> {
     final locale = Localizations.localeOf(context).languageCode;
     final status = _status;
     final peers = _peers;
-    String formatLastSync(DateTime when) =>
-        s.syncLastSync(DateFormat.yMMMd(locale).add_Hm().format(when.toLocal()));
+    String formatLastSync(DateTime when) => s.syncLastSync(DateFormat.yMMMd(locale).add_Hm().format(when.toLocal()));
     return [
       if (status != null)
         Group(
           children: [
             Tile(
               title: s.syncThisDevice,
-              detail: status.deviceName.isEmpty
-                  ? status.deviceId
-                  : '${status.deviceName} · ${status.deviceId}',
+              detail: status.deviceName.isEmpty ? status.deviceId : '${status.deviceName} · ${status.deviceId}',
               detailColor: palette.ink2,
             ),
           ],
@@ -400,12 +391,7 @@ class _SyncScreenState extends State<SyncScreen> {
           children: [
             Padding(
               padding: EdgeInsets.all(24),
-              child: Center(
-                child: SizedBox.square(
-                  dimension: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
+              child: Center(child: SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2))),
             ),
           ],
         )
@@ -439,10 +425,7 @@ class _SyncScreenState extends State<SyncScreen> {
                 trailing: _syncing.contains(peer.id)
                     ? const Padding(
                         padding: EdgeInsets.all(6),
-                        child: SizedBox.square(
-                          dimension: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
+                        child: SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2)),
                       )
                     : Row(
                         mainAxisSize: MainAxisSize.min,
@@ -466,14 +449,8 @@ class _SyncScreenState extends State<SyncScreen> {
       Heading(s.syncPair),
       Group(
         children: [
-          LinkTile(
-            title: s.syncShowCode,
-            onTap: () => unawaited(_showCode()),
-          ),
-          LinkTile(
-            title: s.syncScanCode,
-            onTap: () => unawaited(_scan()),
-          ),
+          LinkTile(title: s.syncShowCode, onTap: () => unawaited(_showCode())),
+          LinkTile(title: s.syncScanCode, onTap: () => unawaited(_scan())),
         ],
       ),
       if (_joining) ...[
@@ -484,10 +461,7 @@ class _SyncScreenState extends State<SyncScreen> {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  const SizedBox.square(
-                    dimension: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
+                  const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(s.syncJoining, style: Styles.secondary.copyWith(color: palette.ink2)),
@@ -536,10 +510,10 @@ class _SyncResultCard extends StatelessWidget {
     final peerName = peer.name.isEmpty ? peer.id : peer.name;
 
     Widget docRow(SyncDocMeta meta, String fromLabel) => Tile(
-          title: syncDocKindLabel(s, meta.kind),
-          detail: '${meta.name} · ${s.syncFrom(fromLabel)} · ${when(meta.updatedAt)}',
-          detailColor: palette.ink2,
-        );
+      title: syncDocKindLabel(s, meta.kind),
+      detail: '${meta.name} · ${s.syncFrom(fromLabel)} · ${when(meta.updatedAt)}',
+      detailColor: palette.ink2,
+    );
 
     return Center(
       child: Material(
@@ -577,16 +551,12 @@ class _SyncResultCard extends StatelessWidget {
                         else ...[
                           if (result.pulled.isNotEmpty) ...[
                             Heading(s.syncPulled),
-                            Group(
-                              children: [for (final meta in result.pulled) docRow(meta, peerName)],
-                            ),
+                            Group(children: [for (final meta in result.pulled) docRow(meta, peerName)]),
                             const SizedBox(height: 12),
                           ],
                           if (result.pushed.isNotEmpty) ...[
                             Heading(s.syncPushed),
-                            Group(
-                              children: [for (final meta in result.pushed) docRow(meta, s.syncThisDevice)],
-                            ),
+                            Group(children: [for (final meta in result.pushed) docRow(meta, s.syncThisDevice)]),
                             const SizedBox(height: 12),
                           ],
                         ],
@@ -766,12 +736,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
       children: [
         if (_starting) ...[
           const SizedBox(height: 64),
-          const Center(
-            child: SizedBox.square(
-              dimension: 28,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
+          const Center(child: SizedBox.square(dimension: 28, child: CircularProgressIndicator(strokeWidth: 2))),
           const SizedBox(height: 16),
           Center(
             child: Text(s.syncDaemonStarting, style: Styles.secondary.copyWith(color: palette.ink2)),
@@ -852,10 +817,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
           ),
           const SizedBox(height: 16),
           Center(
-            child: Text(
-              _countdown(s),
-              style: Styles.secondary.copyWith(color: palette.ink2),
-            ),
+            child: Text(_countdown(s), style: Styles.secondary.copyWith(color: palette.ink2)),
           ),
           const SizedBox(height: 8),
           Group(
@@ -864,10 +826,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    const SizedBox.square(
-                      dimension: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
+                    const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2)),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(s.syncWaiting, style: Styles.secondary.copyWith(color: palette.ink2)),
@@ -878,11 +837,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          PrimaryButton(
-            label: s.syncStopShowing,
-            busy: _stopping,
-            onTap: _stopping ? null : () => unawaited(_stop()),
-          ),
+          PrimaryButton(label: s.syncStopShowing, busy: _stopping, onTap: _stopping ? null : () => unawaited(_stop())),
           const SizedBox(height: 16),
           Group(
             children: [

@@ -125,11 +125,7 @@ class _SoraAppState extends State<SoraApp> {
             ],
             supportedLocales: S.supportedLocales,
             navigatorKey: _navigator,
-            builder: (_, child) => NotificationToasts(
-              sora: sora,
-              navigator: _navigator,
-              child: child!,
-            ),
+            builder: (_, child) => NotificationToasts(sora: sora, navigator: _navigator, child: child!),
             home: const DesktopShell(),
           ),
         ),

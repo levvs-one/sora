@@ -23,13 +23,7 @@ class SyncApiException implements Exception {
 /// A device paired through the daemon (F9). The daemon is the source of
 /// truth; the app keeps no registry of its own.
 class SyncPeer {
-  SyncPeer({
-    required this.id,
-    required this.name,
-    required this.identityKey,
-    required this.pairedAt,
-    this.lastSync,
-  });
+  SyncPeer({required this.id, required this.name, required this.identityKey, required this.pairedAt, this.lastSync});
 
   final String id;
   final String name;
@@ -47,12 +41,12 @@ class SyncPeer {
       v is int && v > 0 ? DateTime.fromMillisecondsSinceEpoch(v, isUtc: true) : null;
 
   factory SyncPeer.fromJson(Map<String, dynamic> json) => SyncPeer(
-        id: json['id'] as String? ?? '',
-        name: json['name'] as String? ?? '',
-        identityKey: json['identity_key'] as String? ?? '',
-        pairedAt: _unixMillis(json['paired_at']) ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
-        lastSync: _unixMillis(json['last_sync']),
-      );
+    id: json['id'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    identityKey: json['identity_key'] as String? ?? '',
+    pairedAt: _unixMillis(json['paired_at']) ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+    lastSync: _unixMillis(json['last_sync']),
+  );
 }
 
 /// `GET /v1/status` response (F9).
@@ -77,8 +71,9 @@ class SyncStatusInfo {
       deviceId: json['device_id'] as String? ?? '',
       deviceName: json['device_name'] as String? ?? '',
       pairingActive: json['pairing_active'] as bool? ?? false,
-      pairingExpiresAt:
-          expires is int && expires > 0 ? DateTime.fromMillisecondsSinceEpoch(expires * 1000, isUtc: true) : null,
+      pairingExpiresAt: expires is int && expires > 0
+          ? DateTime.fromMillisecondsSinceEpoch(expires * 1000, isUtc: true)
+          : null,
       peerCount: json['peers'] as int? ?? 0,
     );
   }
@@ -110,13 +105,7 @@ class PairingSession {
 /// the payload) and, on sync reports, `from` (the device id that sent the
 /// copy). A `GET /v1/documents/{kind}/{name}` meta has no `hash`.
 class SyncDocMeta {
-  SyncDocMeta({
-    required this.kind,
-    required this.name,
-    this.from = '',
-    required this.updatedAt,
-    this.hash = '',
-  });
+  SyncDocMeta({required this.kind, required this.name, this.from = '', required this.updatedAt, this.hash = ''});
 
   final String kind;
   final String name;
@@ -131,12 +120,12 @@ class SyncDocMeta {
   final String hash;
 
   factory SyncDocMeta.fromJson(Map<String, dynamic> json) => SyncDocMeta(
-        kind: json['kind'] as String? ?? '',
-        name: json['name'] as String? ?? '',
-        from: json['from'] as String? ?? '',
-        updatedAt: _syncUnixMillis(json['updated_at']),
-        hash: json['hash'] as String? ?? '',
-      );
+    kind: json['kind'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    from: json['from'] as String? ?? '',
+    updatedAt: _syncUnixMillis(json['updated_at']),
+    hash: json['hash'] as String? ?? '',
+  );
 }
 
 /// Unix-millisecond daemon timestamps (shared with [SyncPeer._unixMillis]).
@@ -154,15 +143,13 @@ class SyncResult {
   final List<SyncDocMeta> pushed;
 
   static List<SyncDocMeta> _metas(dynamic value) => [
-        if (value is List)
-          for (final item in value)
-            if (item is Map<String, dynamic>) SyncDocMeta.fromJson(item),
-      ];
+    if (value is List)
+      for (final item in value)
+        if (item is Map<String, dynamic>) SyncDocMeta.fromJson(item),
+  ];
 
-  factory SyncResult.fromJson(Map<String, dynamic> json) => SyncResult(
-        pulled: _metas(json['pulled']),
-        pushed: _metas(json['pushed']),
-      );
+  factory SyncResult.fromJson(Map<String, dynamic> json) =>
+      SyncResult(pulled: _metas(json['pulled']), pushed: _metas(json['pushed']));
 }
 
 /// Token-authenticated client for the sora-sync localhost HTTP API
@@ -171,8 +158,8 @@ class SyncResult {
 /// [SyncApiException].
 class SyncApiClient {
   SyncApiClient({required String baseUrl, required this._token, http.Client? httpClient})
-      : _base = baseUrl,
-        _http = httpClient ?? http.Client();
+    : _base = baseUrl,
+      _http = httpClient ?? http.Client();
 
   final String _base;
   final String _token;
@@ -180,10 +167,7 @@ class SyncApiClient {
 
   void close() => _http.close();
 
-  Map<String, String> get _headers => {
-        'Authorization': 'Bearer $_token',
-        'Content-Type': 'application/json',
-      };
+  Map<String, String> get _headers => {'Authorization': 'Bearer $_token', 'Content-Type': 'application/json'};
 
   Future<Map<String, dynamic>> _call(
     String method,
@@ -227,13 +211,11 @@ class SyncApiClient {
     return 'HTTP ${res.statusCode}';
   }
 
-  Future<SyncStatusInfo> status() async =>
-      SyncStatusInfo.fromJson(await _call('GET', '/v1/status'));
+  Future<SyncStatusInfo> status() async => SyncStatusInfo.fromJson(await _call('GET', '/v1/status'));
 
   /// Opens a pairing session. Throws with [SyncApiException.statusCode] 409
   /// when a session is already open.
-  Future<PairingSession> startPairing() async =>
-      PairingSession.fromJson(await _call('POST', '/v1/pairing/start'));
+  Future<PairingSession> startPairing() async => PairingSession.fromJson(await _call('POST', '/v1/pairing/start'));
 
   /// Closes the pairing session; a no-op when none is open.
   Future<void> stopPairing() async {
@@ -261,8 +243,7 @@ class SyncApiClient {
     if (list is! List) return const [];
     return [
       for (final item in list)
-        if (item is Map<String, dynamic> && (item['id'] as String? ?? '').isNotEmpty)
-          SyncPeer.fromJson(item),
+        if (item is Map<String, dynamic> && (item['id'] as String? ?? '').isNotEmpty) SyncPeer.fromJson(item),
     ];
   }
 
@@ -271,12 +252,8 @@ class SyncApiClient {
   }
 
   Future<SyncResult> syncPeer(String id) async => SyncResult.fromJson(
-        await _call(
-          'POST',
-          '/v1/peers/${Uri.encodeComponent(id)}/sync',
-          timeout: const Duration(seconds: 60),
-        ),
-      );
+    await _call('POST', '/v1/peers/${Uri.encodeComponent(id)}/sync', timeout: const Duration(seconds: 60)),
+  );
 
   /// Publishes one application document (contract §4). The payload is sent
   /// base64-encoded; the daemon stamps `updated_at` itself when
@@ -290,10 +267,7 @@ class SyncApiClient {
     await _call(
       'PUT',
       '/v1/documents/${Uri.encodeComponent(kind)}/${Uri.encodeComponent(name)}',
-      body: {
-        'payload': base64Encode(payload),
-        'updated_at': ?updatedAt,
-      },
+      body: {'payload': base64Encode(payload), 'updated_at': ?updatedAt},
       timeout: const Duration(seconds: 30),
     );
   }

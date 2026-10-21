@@ -105,8 +105,7 @@ class ExtManifest {
 
   static final _idPattern = RegExp(r'^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$');
   static final _panelIdPattern = RegExp(r'^[a-zA-Z0-9_-]{1,64}$');
-  static final _semverPattern =
-      RegExp(r'^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)([-+][0-9A-Za-z.-]+)?$');
+  static final _semverPattern = RegExp(r'^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)([-+][0-9A-Za-z.-]+)?$');
 
   /// Parses and validates sora-extension.json. Throws [ManifestError].
   factory ExtManifest.parse(String raw) {
@@ -120,9 +119,22 @@ class ExtManifest {
       throw ManifestError('top level must be an object');
     }
     const known = {
-      'manifest_version', 'id', 'name', 'version', 'min_app_version',
-      'description', 'author', 'permissions', 'capabilities', 'ui', 'settings_schema',
-      'network_hosts', 'background_task', 'theme', 'network_hook', 'routing',
+      'manifest_version',
+      'id',
+      'name',
+      'version',
+      'min_app_version',
+      'description',
+      'author',
+      'permissions',
+      'capabilities',
+      'ui',
+      'settings_schema',
+      'network_hosts',
+      'background_task',
+      'theme',
+      'network_hook',
+      'routing',
     };
     for (final key in decoded.keys) {
       if (!known.contains(key)) throw ManifestError('unknown field "$key"');
@@ -233,34 +245,31 @@ class ExtManifest {
     if (!permissions.contains(permission)) {
       throw ManifestError('$field requires the "$permission" permission');
     }
-    if (!_assetEntryPattern.hasMatch(entry) ||
-        entry.contains('..') ||
-        entry.startsWith('/')) {
-      throw ManifestError(
-          '$field entry "$entry" must be a relative .json path without traversal');
+    if (!_assetEntryPattern.hasMatch(entry) || entry.contains('..') || entry.startsWith('/')) {
+      throw ManifestError('$field entry "$entry" must be a relative .json path without traversal');
     }
   }
 
   Map<String, dynamic> toJson() => {
-        'manifest_version': 1,
-        'id': id,
-        'name': name,
-        'version': version,
-        'min_app_version': minAppVersion,
-        'description': description,
-        'author': author.toJson(),
-        'permissions': permissions,
-        'capabilities': capabilities,
-        'ui': {
-          'panels': [for (final p in panels) p.toJson()],
-        },
-        if (settingsSchema != null) 'settings_schema': settingsSchema,
-        if (networkHosts.isNotEmpty) 'network_hosts': networkHosts,
-        if (backgroundTask != null) 'background_task': backgroundTask!.toJson(),
-        if (themeEntry != null) 'theme': {'entry': themeEntry},
-        if (networkHookEntry != null) 'network_hook': {'entry': networkHookEntry},
-        if (routingEntry != null) 'routing': {'entry': routingEntry},
-      };
+    'manifest_version': 1,
+    'id': id,
+    'name': name,
+    'version': version,
+    'min_app_version': minAppVersion,
+    'description': description,
+    'author': author.toJson(),
+    'permissions': permissions,
+    'capabilities': capabilities,
+    'ui': {
+      'panels': [for (final p in panels) p.toJson()],
+    },
+    if (settingsSchema != null) 'settings_schema': settingsSchema,
+    if (networkHosts.isNotEmpty) 'network_hosts': networkHosts,
+    if (backgroundTask != null) 'background_task': backgroundTask!.toJson(),
+    if (themeEntry != null) 'theme': {'entry': themeEntry},
+    if (networkHookEntry != null) 'network_hook': {'entry': networkHookEntry},
+    if (routingEntry != null) 'routing': {'entry': routingEntry},
+  };
 }
 
 /// One declared background task (runtime v2, mirrors core/ext's
@@ -296,29 +305,22 @@ class ExtBackgroundTask {
       throw ManifestError('background_task requires the "background" permission');
     }
     if (intervalMinutes < 1 || intervalMinutes > maxIntervalMinutes) {
-      throw ManifestError(
-          'background_task interval_minutes must be 1..$maxIntervalMinutes');
+      throw ManifestError('background_task interval_minutes must be 1..$maxIntervalMinutes');
     }
-    if (!_workerEntryPattern.hasMatch(entry) ||
-        entry.contains('..') ||
-        entry.startsWith('/')) {
-      throw ManifestError(
-          'background_task entry "$entry" must be a relative .js path without traversal');
+    if (!_workerEntryPattern.hasMatch(entry) || entry.contains('..') || entry.startsWith('/')) {
+      throw ManifestError('background_task entry "$entry" must be a relative .js path without traversal');
     }
   }
 
-  Map<String, dynamic> toJson() =>
-      {'interval_minutes': intervalMinutes, 'entry': entry};
+  Map<String, dynamic> toJson() => {'interval_minutes': intervalMinutes, 'entry': entry};
 }
 
 /// Worker script names: relative .js path, no traversal (mirrors core/ext).
-final _workerEntryPattern =
-    RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.js$');
+final _workerEntryPattern = RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.js$');
 
 /// Capability-contract asset names: relative .json path, no traversal
 /// (mirrors core/ext's isSafeAssetPath).
-final _assetEntryPattern =
-    RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.json$');
+final _assetEntryPattern = RegExp(r'^[A-Za-z0-9_][A-Za-z0-9_./-]{0,255}\.json$');
 
 /// Parses one capability contract pointer ({entry: ...}). Null when the
 /// field is absent. Rejects non-objects and unknown inner fields, mirroring
@@ -346,7 +348,8 @@ ExtBackgroundTask? _parseBackgroundTask(dynamic raw) {
 /// Host allowlist for `net.fetch`: plain or wildcard (`*.example.com`)
 /// DNS names, at most 64 entries.
 final _networkHostPattern = RegExp(
-    r'^(\*\.)?([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$');
+  r'^(\*\.)?([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$',
+);
 
 List<String> _parseNetworkHosts(dynamic raw) {
   if (raw == null) return const [];

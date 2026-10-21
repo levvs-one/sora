@@ -207,10 +207,7 @@ class _OverrideSection extends StatelessWidget {
               trailing: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
               onTap: () => _pickServer(context, subscriptionId),
             ),
-            LinkTile(
-              title: s.overrideCustomRules,
-              onTap: () => push<void>(context, const RulesScreen()),
-            ),
+            LinkTile(title: s.overrideCustomRules, onTap: () => push<void>(context, const RulesScreen())),
             if (!override.isEmpty)
               Tile(
                 title: s.overrideClear,
@@ -322,7 +319,10 @@ Future<void> _renameServer(BuildContext context, Sora sora, String subscriptionI
 
 /// Server picker for adding an override: tap to rename, eye icon to hide.
 Future<void> _pickServer(BuildContext context, String subscriptionId) {
-  return showDialog<void>(context: context, builder: (_) => _ServerPicker(subscriptionId: subscriptionId));
+  return showDialog<void>(
+    context: context,
+    builder: (_) => _ServerPicker(subscriptionId: subscriptionId),
+  );
 }
 
 class _ServerPicker extends StatefulWidget {

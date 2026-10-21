@@ -598,26 +598,27 @@ class UsageBar extends StatelessWidget {
         width: double.infinity,
         child: DecoratedBox(
           decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(2)),
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(end: share),
-          duration: Motion.of(context, Motion.slow),
-          curve: Motion.curve,
-          builder: (context, value, _) => Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: FractionallySizedBox(
-              widthFactor: value,
-              heightFactor: 1,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: alarm ? palette.danger : palette.ink,
-                  borderRadius: BorderRadius.circular(2),
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(end: share),
+            duration: Motion.of(context, Motion.slow),
+            curve: Motion.curve,
+            builder: (context, value, _) => Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: FractionallySizedBox(
+                widthFactor: value,
+                heightFactor: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: alarm ? palette.danger : palette.ink,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 }
 

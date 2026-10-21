@@ -66,11 +66,7 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
       title: s.measureSpeed,
       actions: [
         if (sora.benchmarking)
-          RoundButton(
-            icon: Symbols.close_rounded,
-            label: s.cancel,
-            onTap: () => unawaited(sora.cancelBenchmark()),
-          ),
+          RoundButton(icon: Symbols.close_rounded, label: s.cancel, onTap: () => unawaited(sora.cancelBenchmark())),
       ],
       children: [
         if (progress != null) ...[
@@ -95,9 +91,7 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
             padding: const EdgeInsets.only(bottom: 16),
             child: PrimaryButton(
               label: s.measureSpeed,
-              onTap: sora.canBenchmark
-                  ? () => unawaited(sora.benchmarkServers(serverIds: widget.serverIds))
-                  : null,
+              onTap: sora.canBenchmark ? () => unawaited(sora.benchmarkServers(serverIds: widget.serverIds)) : null,
             ),
           ),
         if (ordered.isEmpty)
@@ -163,7 +157,10 @@ class _BenchmarkRow extends StatelessWidget {
                   // screen announces measurement progress.
                   ExcludeSemantics(
                     child: LinearProgressIndicator(
-                        value: pct / 100, color: palette.ink, backgroundColor: palette.field),
+                      value: pct / 100,
+                      color: palette.ink,
+                      backgroundColor: palette.field,
+                    ),
                   ),
                 ],
               ],
@@ -173,10 +170,7 @@ class _BenchmarkRow extends StatelessWidget {
           if (running && pct == null)
             SizedBox.square(dimension: 20, child: CupertinoActivityIndicator(color: palette.ink2))
           else if (bps != null)
-            Text(
-              s.speedMbps(mbpsOf(bps)),
-              style: Styles.figures(Styles.secondary).copyWith(color: palette.ink),
-            )
+            Text(s.speedMbps(mbpsOf(bps)), style: Styles.figures(Styles.secondary).copyWith(color: palette.ink))
           else if (stale != null)
             Text(
               '${s.speedMbps(mbpsOf(stale))} · ${s.benchmarkStale}',
