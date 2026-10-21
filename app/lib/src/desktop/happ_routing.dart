@@ -104,6 +104,11 @@ Map<String, dynamic>? _decode(String payload) {
       text = Uri.decodeComponent(text);
     } on FormatException {
       return null;
+    } on ArgumentError {
+      // decodeComponent reports a malformed percent escape (and the
+      // invalid UTF-8 it can decode to) as ArgumentError, not
+      // FormatException; both are "not a Happ document" here.
+      return null;
     }
   }
   String jsonText;

@@ -92,10 +92,18 @@ class SyncPairing {
     if (uri == null) return null;
     // Duplicate keys are rejected: Go's Values.Get takes the first value,
     // Dart's queryParameters the last, so a duplicated key could make the
-    // two sides disagree on the public key or token.
-    final all = uri.queryParametersAll;
+    // two sides disagree on the public key or token. The query getters
+    // decode lazily and throw FormatException on a malformed percent
+    // escape anywhere in the query; that is a bad payload, not a crash.
+    final Map<String, List<String>> all;
+    final Map<String, String> q;
+    try {
+      all = uri.queryParametersAll;
+      q = uri.queryParameters;
+    } on FormatException {
+      return null;
+    }
     if (all.values.any((values) => values.length != 1)) return null;
-    final q = uri.queryParameters;
     if (q['v'] != '$syncPairVersion') return null;
     final deviceId = q['id'] ?? '';
     // Go measures the id in bytes (len(id) > 128); a UTF-16 code-unit
