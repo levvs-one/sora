@@ -61,6 +61,14 @@ func (s *Server) extTunnelProxyAddr() (string, bool) {
 // to control-only).
 func (s *Server) ExtHostDeps() ext.Deps {
 	return ext.Deps{
+		Scheduler: s.extSched,
+		WorkerEvent: func() string {
+			current := s.sessions.Current()
+			if current != nil && current.State() == session.StateConnected {
+				return "session.connected"
+			}
+			return "session.disconnected"
+		},
 		VerifyControl: func(token []byte) bool {
 			return s.auth.Verify(token)
 		},

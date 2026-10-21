@@ -2222,4 +2222,10 @@ class SAz extends S {
 
   @override
   String get diagnosticUnavailable => 'Bu diaqnostika bu platformada əlçatan deyil.';
+
+  @override
+  String get extWorkerFailed => 'Əlavənin fon tapşırığı uğursuz oldu. Əlavənin jurnalını yoxlayın.';
+
+  @override
+  String get extAssetRejected => 'Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar.';
 }

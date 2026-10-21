@@ -2209,4 +2209,10 @@ class SAr extends S {
 
   @override
   String get diagnosticUnavailable => 'هذا التشخيص غير متوفر على هذا النظام الأساسي.';
+
+  @override
+  String get extWorkerFailed => 'فشلت المهمة الخلفية للإضافة. راجع سجل الإضافة.';
+
+  @override
+  String get extAssetRejected => 'تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة.';
 }

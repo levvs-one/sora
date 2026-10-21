@@ -17,6 +17,9 @@ option go_package = "github.com/levvs-one/sora-client/core/gen/sora/ext/v1;extv1
 // MintToken and RevokeToken are app-only: they require the core control
 // token, exactly like Connect and Disconnect on CoreControl.
 service ExtensionHost {
+  // App-owned lifecycle stream. Closing it unregisters and cancels the worker.
+  // Only the authenticated control app supplies verified source and grants.
+  rpc RunWorker(stream WorkerClientMessage) returns (stream WorkerHostMessage);
   // MintToken issues a scoped token for an enabled extension. App only.
   rpc MintToken(MintTokenRequest) returns (MintTokenResponse);
   // RevokeToken invalidates a previously minted token. App only.
@@ -106,4 +109,22 @@ message ExtensionEvent {
   string kind = 1;
   string detail = 2;
   google.protobuf.Timestamp at = 3;
+}
+
+// The first message configures the worker; later messages carry bridge replies.
+message WorkerClientMessage {
+  bytes control_token = 1;
+  string manifest_json = 2;
+  string source = 3;
+  string config_json = 4;
+  string reply_json = 5;
+}
+
+message WorkerHostMessage {
+  // Bridge call JSON, dispatched by the app using PanelBridge.
+  string call_json = 1;
+  // Bounded operational or script log, also retained in the core LogHub.
+  string log = 2;
+  // One failed run; the app emits a localized notification.
+  bool failed = 3;
 }

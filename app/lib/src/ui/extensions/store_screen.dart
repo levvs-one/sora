@@ -25,6 +25,7 @@ import '../../ext/permissions.dart';
 import '../../ext/store.dart';
 import '../../ext/verifier.dart';
 import '../../updates.dart';
+import '../../sora.dart';
 import 'conflicts_sheet.dart';
 import 'detail_screen.dart';
 import 'permissions_sheet.dart';
@@ -38,7 +39,7 @@ class ExtensionsScreen extends StatefulWidget {
 }
 
 class _ExtensionsScreenState extends State<ExtensionsScreen> {
-  late final ExtensionStore _store = ExtensionStore();
+  late final ExtensionStore _store = SoraScope.read(context).extensions;
   bool _ready = false;
   bool _failed = false;
 
@@ -59,7 +60,6 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
 
   @override
   void dispose() {
-    _store.dispose();
     super.dispose();
   }
 
@@ -261,6 +261,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         hideProgress();
       }
       return true;
+    } on ExtAssetError {
+      hideProgress();
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.extAssetRejected)));
     } on PackageError catch (e) {
       if (context.mounted) showFailure(context, _mapInstallError(context, e.message));
     } on SignatureError {
@@ -1040,7 +1043,18 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 // the extension it toggles.
                 trailing: Semantics(
                   label: s.extToggleEnabled(inst.manifest.name),
-                  child: Switch(value: inst.enabled, onChanged: (v) => store.setEnabled(inst.id, v)),
+                  child: Switch(
+                    value: inst.enabled,
+                    onChanged: (v) async {
+                      try {
+                        await store.setEnabled(inst.id, v);
+                      } catch (_) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.extAssetRejected)));
+                        }
+                      }
+                    },
+                  ),
                 ),
               );
             },

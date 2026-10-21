@@ -2221,4 +2221,10 @@ class SUr extends S {
 
   @override
   String get diagnosticUnavailable => 'یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔';
+
+  @override
+  String get extWorkerFailed => 'ایکسٹینشن کا پس منظر کا کام ناکام ہوگیا۔ ایکسٹینشن کا لاگ دیکھیں۔';
+
+  @override
+  String get extAssetRejected => 'ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔';
 }

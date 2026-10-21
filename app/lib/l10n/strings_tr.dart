@@ -2222,4 +2222,10 @@ class STr extends S {
 
   @override
   String get diagnosticUnavailable => 'Bu teşhis bu platformda kullanılamıyor.';
+
+  @override
+  String get extWorkerFailed => 'Uzantının arka plan görevi başarısız oldu. Uzantı günlüğünü kontrol edin.';
+
+  @override
+  String get extAssetRejected => 'Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar.';
 }

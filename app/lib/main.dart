@@ -10,6 +10,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'l10n/strings.dart';
 import 'src/design/theme.dart';
+import 'src/ext/store.dart';
+import 'src/ext/assets.dart';
 import 'src/desktop/desktop.dart';
 import 'src/settings.dart';
 import 'src/sora.dart';
@@ -76,6 +78,8 @@ class _SoraAppState extends State<SoraApp> {
   // component themes) on every rebuild. Build each once per app run.
   late final _lightTheme = buildTheme(Brightness.light);
   late final _darkTheme = buildTheme(Brightness.dark);
+  ExtensionTheme? _appliedExtensionTheme;
+  ThemeData? _extensionThemeData;
 
   @override
   void initState() {
@@ -95,39 +99,50 @@ class _SoraAppState extends State<SoraApp> {
   Widget build(BuildContext context) {
     final sora = widget.sora;
     final desktop = widget.desktop;
-    final app = SoraScope(
-      sora: sora,
-      child: ListenableBuilder(
-        listenable: sora,
-        builder: (context, _) => MotionScope(
-          enabled: sora.settings.animations,
-          child: MaterialApp(
-            title: 'Sora',
-            debugShowCheckedModeBanner: false,
-            theme: _lightTheme,
-            darkTheme: _darkTheme,
-            themeMode: switch (sora.settings.theme) {
-              'light' => ThemeMode.light,
-              'dark' => ThemeMode.dark,
-              _ => ThemeMode.system,
-            },
-            locale: sora.settings.locale,
-            themeAnimationDuration:
-                sora.settings.animations &&
-                    !WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations
-                ? const Duration(milliseconds: 150)
-                : Duration.zero,
-            localizationsDelegates: const [
-              S.delegate,
-              _LanguageDelegate<MaterialLocalizations>(GlobalMaterialLocalizations.delegate),
-              _LanguageDelegate<CupertinoLocalizations>(GlobalCupertinoLocalizations.delegate),
-              GlobalWidgetsLocalizations.delegate,
-            ],
-            supportedLocales: S.supportedLocales,
-            navigatorKey: _navigator,
-            builder: (_, child) => NotificationToasts(sora: sora, navigator: _navigator, child: child!),
-            home: const DesktopShell(),
-          ),
+
+    final app = ExtScope(
+      store: sora.extensions,
+      child: SoraScope(
+        sora: sora,
+        child: ListenableBuilder(
+          listenable: sora,
+          builder: (context, _) {
+            final extensionTheme = sora.extensions.activeTheme;
+            if (!identical(extensionTheme, _appliedExtensionTheme)) {
+              _appliedExtensionTheme = extensionTheme;
+              _extensionThemeData = extensionTheme == null
+                  ? null
+                  : buildTheme(extensionTheme.brightness, colors: extensionTheme.palette);
+            }
+            return MotionScope(
+              enabled: sora.settings.animations,
+              child: MaterialApp(
+                title: 'Sora',
+                debugShowCheckedModeBanner: false,
+                theme: _extensionThemeData ?? _lightTheme,
+                darkTheme: _extensionThemeData ?? _darkTheme,
+                themeMode: extensionTheme == null
+                    ? switch (sora.settings.theme) {
+                        'light' => ThemeMode.light,
+                        'dark' => ThemeMode.dark,
+                        _ => ThemeMode.system,
+                      }
+                    : (extensionTheme.brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light),
+                locale: sora.settings.locale,
+                themeAnimationDuration: Duration.zero,
+                localizationsDelegates: const [
+                  S.delegate,
+                  _LanguageDelegate<MaterialLocalizations>(GlobalMaterialLocalizations.delegate),
+                  _LanguageDelegate<CupertinoLocalizations>(GlobalCupertinoLocalizations.delegate),
+                  GlobalWidgetsLocalizations.delegate,
+                ],
+                supportedLocales: S.supportedLocales,
+                navigatorKey: _navigator,
+                builder: (_, child) => NotificationToasts(sora: sora, navigator: _navigator, child: child!),
+                home: const DesktopShell(),
+              ),
+            );
+          },
         ),
       ),
     );

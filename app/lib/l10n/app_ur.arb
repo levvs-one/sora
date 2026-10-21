@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "ونڈوز کے واقعات",
   "diagnosticCapture": "10 سیکنڈ کے لیے کیپچر کریں۔",
   "diagnosticRequiresTun": "پیکٹ کیپچر کو ایک فعال Sora TUN کنکشن کی ضرورت ہے۔",
-  "diagnosticUnavailable": "یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔"
+  "diagnosticUnavailable": "یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔",
+  "extWorkerFailed": "ایکسٹینشن کا پس منظر کا کام ناکام ہوگیا۔ ایکسٹینشن کا لاگ دیکھیں۔",
+  "extAssetRejected": "ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔"
 }

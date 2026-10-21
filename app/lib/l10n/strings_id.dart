@@ -2223,4 +2223,10 @@ class SId extends S {
 
   @override
   String get diagnosticUnavailable => 'Diagnostik ini tidak tersedia pada platform ini.';
+
+  @override
+  String get extWorkerFailed => 'Tugas latar belakang ekstensi gagal. Periksa log ekstensi.';
+
+  @override
+  String get extAssetRejected => 'Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.';
 }

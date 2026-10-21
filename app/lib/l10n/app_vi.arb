@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Sự kiện Windows",
   "diagnosticCapture": "Chụp trong 10 giây",
   "diagnosticRequiresTun": "Việc chụp gói cần có kết nối Sora TUN đang hoạt động.",
-  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này."
+  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này.",
+  "extWorkerFailed": "Tác vụ nền của tiện ích mở rộng thất bại. Kiểm tra nhật ký tiện ích.",
+  "extAssetRejected": "Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ."
 }

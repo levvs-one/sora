@@ -2205,6 +2205,12 @@ class SZh extends S {
 
   @override
   String get diagnosticUnavailable => '此诊断在此平台上不可用。';
+
+  @override
+  String get extWorkerFailed => '扩展的后台任务失败。请查看扩展日志。';
+
+  @override
+  String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4407,6 +4413,12 @@ class SZhHans extends SZh {
 
   @override
   String get diagnosticUnavailable => '此诊断在此平台上不可用。';
+
+  @override
+  String get extWorkerFailed => '扩展的后台任务失败。请查看扩展日志。';
+
+  @override
+  String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6609,4 +6621,10 @@ class SZhHant extends SZh {
 
   @override
   String get diagnosticUnavailable => '此診斷在此平台上不可用。';
+
+  @override
+  String get extWorkerFailed => '擴充功能的背景工作失敗。請查看擴充功能記錄。';
+
+  @override
+  String get extAssetRejected => '擴充功能檔案遭拒：顏色難以辨認或規則無效。';
 }

@@ -23,6 +23,27 @@ class UserRule {
     return UserRule(target, destination);
   }
 
+  /// Shared CIDR overlap check for extension diagnostics; parsing remains in
+  /// destinationOf, which is also used by the user rule editor.
+  static bool networksOverlap(String a, String b) {
+    List<int>? network(String value) {
+      final parts = value.split('/');
+      if (parts.length != 2) return null;
+      final ip = InternetAddress.tryParse(parts[0]), bits = int.tryParse(parts[1]);
+      if (ip == null || bits == null || bits < 0 || bits > ip.rawAddress.length * 8) return null;
+      return [bits, ...ip.rawAddress];
+    }
+
+    final x = network(a), y = network(b);
+    if (x == null || y == null || x.length != y.length) return false;
+    final bits = x.first < y.first ? x.first : y.first;
+    for (var i = 0; i < bits; i++) {
+      final mask = 1 << (7 - i % 8);
+      if (x[1 + i ~/ 8] & mask != y[1 + i ~/ 8] & mask) return false;
+    }
+    return true;
+  }
+
   String get stored => '${target.name} $destination';
 
   /// The destination text with its core-contract prefix removed.
@@ -34,10 +55,21 @@ class UserRule {
   static String? destinationOf(String input) {
     var text = input.trim();
     if (text.isEmpty || text.contains(RegExp(r'\s'))) return null;
+    for (final prefix in ['domain:', 'full:', 'process:']) {
+      if (!text.startsWith(prefix)) continue;
+      final value = text.substring(prefix.length);
+      if (prefix == 'process:') {
+        return RegExp(r'^[A-Za-z0-9._+-]{1,64}$').hasMatch(value) ? text : null;
+      }
+      final parsed = destinationOf(value);
+      return parsed != null && parsed.startsWith('domain:') ? '$prefix${parsed.substring(7)}' : null;
+    }
     final link = Uri.tryParse(text);
     if (link != null && link.hasScheme && link.host.isNotEmpty) text = link.host;
     if (text.contains('/')) {
-      final [address, bits] = [...text.split('/'), ''].take(2).toList();
+      final parts = text.split('/');
+      if (parts.length != 2) return null;
+      final [address, bits] = parts;
       final ip = InternetAddress.tryParse(address);
       final n = int.tryParse(bits);
       final max = ip?.type == InternetAddressType.IPv6 ? 128 : 32;

@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Événements Windows",
   "diagnosticCapture": "Capturez pendant 10 secondes",
   "diagnosticRequiresTun": "La capture de paquets nécessite une connexion Sora TUN active.",
-  "diagnosticUnavailable": "Ce diagnostic n'est pas disponible sur cette plateforme."
+  "diagnosticUnavailable": "Ce diagnostic n'est pas disponible sur cette plateforme.",
+  "extWorkerFailed": "La tâche en arrière-plan de l’extension a échoué. Consultez son journal.",
+  "extAssetRejected": "Fichier d’extension refusé : couleurs illisibles ou règles invalides."
 }

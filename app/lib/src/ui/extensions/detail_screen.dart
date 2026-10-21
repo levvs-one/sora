@@ -18,6 +18,7 @@ import '../../ext/enforcement.dart';
 import '../../ext/manifest.dart';
 import '../../ext/permissions.dart';
 import '../../ext/store.dart';
+import '../../rules.dart';
 import 'panel_screen.dart';
 import 'permissions_sheet.dart';
 import 'widgets.dart';
@@ -89,7 +90,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     final installed = widget.installed ?? (entry != null ? store.get(entry.id) : null);
     final m = installed?.manifest ?? _syntheticManifest;
     return AnimatedBuilder(
-      animation: store,
+      animation: Listenable.merge([store, store.logChanges]),
       builder: (context, _) {
         final live = store.get(m.id) ?? installed;
         return Screen(
@@ -217,6 +218,43 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
               Heading(s.extBgTitle),
               _BackgroundTaskSection(extensionId: live.id, interactive: live.enabled),
             ],
+            if (live != null && m.routingEntry != null) ...[
+              Heading(s.extCapRouting),
+              Group(
+                children: [
+                  for (final r in store.routingRules.where((r) => r.extensionId == live.id))
+                    Tile(
+                      title: r.rule.shown,
+                      detail: r.comment.isEmpty ? null : r.comment,
+                      trailing: Text(switch (r.rule.target) {
+                        RuleTarget.direct => s.ruleDirect,
+                        RuleTarget.proxy => s.ruleProxy,
+                        RuleTarget.block => s.ruleBlock,
+                      }, style: Styles.secondary.copyWith(color: palette.ink)),
+                    ),
+                  Tile(
+                    title:
+                        live.enabled &&
+                            live.granted.contains('routing.rules') &&
+                            !store.runtimeErrors.containsKey(live.id)
+                        ? s.extEnabled
+                        : s.extDisabled,
+                  ),
+                ],
+              ),
+            ],
+            if (live != null && store.runtimeLog(live.id).isNotEmpty) ...[
+              Heading(s.logs),
+              Group(
+                children: [
+                  for (final line in store.runtimeLog(live.id))
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text(line, style: Styles.caption.copyWith(color: palette.ink)),
+                    ),
+                ],
+              ),
+            ],
             // Every declared panel gets its own row: with several panels a
             // single "open" button would silently pick the first one.
             if (live != null && live.enabled && m.panels.isNotEmpty) ...[
@@ -319,7 +357,19 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
           PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
         ],
         const SizedBox(height: 8),
-        SwitchTile(title: s.extEnabled, value: live.enabled, onChanged: (v) => store.setEnabled(live.id, v)),
+        SwitchTile(
+          title: s.extEnabled,
+          value: live.enabled,
+          onChanged: (v) async {
+            try {
+              await store.setEnabled(live.id, v);
+            } catch (_) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.extAssetRejected)));
+              }
+            }
+          },
+        ),
         if (live.previous != null) ...[
           const SizedBox(height: 8),
           _QuietButton(
@@ -621,18 +671,6 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
     final editable = widget.interactive && !_busy;
     return Group(
       children: [
-        // Honest status, not a fake runner: the switch below persists the
-        // user's schedule (<id>.background.json, the runtime contract), but
-        // no background runtime executes it in this build — the scheduler is
-        // never started and the worker script has no executor yet. The badge
-        // says so instead of letting the toggle pretend otherwise.
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: ExtBadge(label: s.extBgRuntimeBadge, tone: ExtBadgeTone.warn, icon: Symbols.info_rounded),
-          ),
-        ),
         if (config == null)
           const Padding(
             padding: EdgeInsets.all(14),

@@ -2205,4 +2205,10 @@ class SEn extends S {
 
   @override
   String get diagnosticUnavailable => 'This diagnostic is unavailable on this platform.';
+
+  @override
+  String get extWorkerFailed => 'The extension background task failed. Check the extension log.';
+
+  @override
+  String get extAssetRejected => 'Extension asset rejected: unreadable colors or invalid rules.';
 }

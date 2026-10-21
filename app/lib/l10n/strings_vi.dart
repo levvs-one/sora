@@ -2223,4 +2223,10 @@ class SVi extends S {
 
   @override
   String get diagnosticUnavailable => 'Chẩn đoán này không có sẵn trên nền tảng này.';
+
+  @override
+  String get extWorkerFailed => 'Tác vụ nền của tiện ích mở rộng thất bại. Kiểm tra nhật ký tiện ích.';
+
+  @override
+  String get extAssetRejected => 'Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ.';
 }

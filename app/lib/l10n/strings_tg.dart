@@ -2224,4 +2224,10 @@ class STg extends S {
 
   @override
   String get diagnosticUnavailable => 'Ин ташхис дар ин платформа дастрас нест.';
+
+  @override
+  String get extWorkerFailed => 'Вазифаи пасзаминаи васеъкунанда иҷро нашуд. Сабтҳои васеъкунандаро санҷед.';
+
+  @override
+  String get extAssetRejected => 'Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст.';
 }

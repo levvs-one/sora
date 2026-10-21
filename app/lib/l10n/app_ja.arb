@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windowsイベント",
   "diagnosticCapture": "10秒間のキャプチャ",
   "diagnosticRequiresTun": "パケット キャプチャには、アクティブな Sora TUN 接続が必要です。",
-  "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。"
+  "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。",
+  "extWorkerFailed": "拡張機能のバックグラウンドタスクに失敗しました。拡張機能のログを確認してください。",
+  "extAssetRejected": "拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。"
 }

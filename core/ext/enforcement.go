@@ -19,7 +19,7 @@ package ext
 //     path beyond that gate to check.
 //   - Inert: no API exposes the asset at all; granting changes nothing.
 //   - Unimplemented: the runtime consumer is not built yet; granting
-//     changes nothing. Both Dangerous permissions are here today.
+//     changes nothing. Network hooks remain here.
 
 // EnforcementStatus classifies one permission's real enforcement.
 type EnforcementStatus int
@@ -110,19 +110,19 @@ var enforcementTable = []EnforcementRow{
 		Note:   "the prompt always mentions UI embedding now, because a manifest cannot declare a panel without this permission; there is no runtime call to check beyond the bridge, whose methods are individually permission-gated",
 	},
 	{
-		ID:     "theme.apply",
-		Status: EnforcementUnimplemented,
-		Note:   "the theme runtime is designed (contract pointer in manifest_v1ext.go, example examples/theme-midnight) but no consumer applies themes yet; granting this changes nothing today",
+		ID: "theme.apply", Status: EnforcementEnforced,
+		Where: "app/lib/src/ext/store.dart activeTheme + assets.dart ExtensionTheme.parse",
+		Note:  "enabled grants only; one conflict winner; color and contrast validation; immediate default restore",
 	},
 	{
-		ID:     "routing.rules",
-		Status: EnforcementUnimplemented,
-		Note:   "RiskDangerous with zero enforcement code: no routing consumer reads extension rules yet. The day one lands, this permission hands the extension the traffic path; it must ship with the strongest consent language and catalog review, and this row must move to Enforced in the same commit",
+		ID: "routing.rules", Status: EnforcementEnforced,
+		Where: "app/lib/src/ext/store.dart routingRules + assets.dart ExtensionRouting.parse + sora.dart buildPlan",
+		Note:  "enabled grants only; shared user match parser; direct/proxy/block only; ordered after user rules",
 	},
 	{
 		ID:     "net.hooks",
 		Status: EnforcementUnimplemented,
-		Note:   "RiskDangerous with zero enforcement code: no hook consumer runs extension code on the traffic path yet. Same rule as routing.rules: enforcement and consent land together, or this row does not move",
+		Note:   "RiskDangerous with zero enforcement code: no hook consumer runs extension code on the traffic path yet. Enforcement and consent must land together before this row moves",
 	},
 	{
 		ID:     "net.fetch",
@@ -133,8 +133,8 @@ var enforcementTable = []EnforcementRow{
 	{
 		ID:     "background",
 		Status: EnforcementEnforced,
-		Where:  "core/ext/worker.go Scheduler.RegisterConfig (capability + permission), interval clamp, overlap guard, circuit breaker, kill-switch pause",
-		Note:   "the permission gate and the scheduler machinery are real and unit-tested; the worker executor (a JS runner) is NOT wired in production yet, so no extension code actually runs - see the pass-1 report",
+		Where:  "core/ext/worker.go Scheduler.RegisterConfig (capability + permission), interval clamp, overlap guard, circuit breaker, kill-switch pause + core/ext/javascript.go process isolation",
+		Note:   "goja runs in a disposable process: 2 CPU seconds, 128 MiB committed memory, 30-second wall timeout; app stream cancellation stops the worker",
 	},
 }
 

@@ -7,6 +7,7 @@ toolchain go1.27.2
 require (
 	aead.dev/minisign v0.3.0
 	github.com/Microsoft/go-winio v0.6.2
+	github.com/dop251/goja v0.0.0-20261020172427-7b1a02208696
 	github.com/godbus/dbus/v5 v5.2.2
 	github.com/gopacket/gopacket v1.7.4
 	github.com/tailscale/wf v0.0.0-20240214030419-6fbb0a674ee6
@@ -20,15 +21,18 @@ require (
 
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
+	github.com/dlclark/regexp2/v2 v2.8.1 // indirect
+	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
+	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/txthinking/runnergroup v0.0.0-20210608031112-152c7c4432bf // indirect
 	go4.org/netipx v0.0.0-20220725152314-7e7bdc8411bf // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220218215828-6cf2b201936e // indirect
 	golang.org/x/mod v0.41.0 // indirect
-	golang.org/x/sync v0.23.0 // indirect
-	golang.org/x/text v0.42.0 // indirect
-	golang.org/x/tools v0.49.0 // indirect
+	golang.org/x/sync v0.24.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/tools v0.51.0 // indirect
 	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260706201446-f0a921348800 // indirect
 	honnef.co/go/tools v0.3.2 // indirect

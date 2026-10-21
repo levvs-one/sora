@@ -2221,4 +2221,10 @@ class SHi extends S {
 
   @override
   String get diagnosticUnavailable => 'यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.';
+
+  @override
+  String get extWorkerFailed => 'एक्सटेंशन का बैकग्राउंड कार्य विफल हुआ। एक्सटेंशन का लॉग देखें।';
+
+  @override
+  String get extAssetRejected => 'एक्सटेंशन फ़ाइल अस्वीकृत: अपठनीय रंग या अमान्य नियम।';
 }

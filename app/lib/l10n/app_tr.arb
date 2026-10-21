@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows etkinlikleri",
   "diagnosticCapture": "10 saniye boyunca çekim yapın",
   "diagnosticRequiresTun": "Paket yakalama, etkin bir Sora TUN bağlantısına ihtiyaç duyar.",
-  "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor."
+  "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor.",
+  "extWorkerFailed": "Uzantının arka plan görevi başarısız oldu. Uzantı günlüğünü kontrol edin.",
+  "extAssetRejected": "Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar."
 }

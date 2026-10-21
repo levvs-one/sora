@@ -2245,4 +2245,10 @@ class SRu extends S {
 
   @override
   String get diagnosticUnavailable => 'Эта диагностика недоступна на данной платформе.';
+
+  @override
+  String get extWorkerFailed => 'Фоновая задача расширения завершилась с ошибкой. Проверьте журнал расширения.';
+
+  @override
+  String get extAssetRejected => 'Файл расширения отклонён: нечитаемые цвета или неверные правила.';
 }

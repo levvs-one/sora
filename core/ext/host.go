@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"sync"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -46,6 +47,8 @@ type Server struct {
 // Deps are the core capabilities the host service needs. core/control will
 // adapt its session state to these when wiring the service.
 type Deps struct {
+	Scheduler   *Scheduler
+	WorkerEvent func() string
 	// VerifyControl checks the core control token (app-only calls).
 	VerifyControl func(token []byte) bool
 	// ListConnections returns the live connection list.
@@ -69,8 +72,10 @@ type Deps struct {
 type Host struct {
 	extv1.UnimplementedExtensionHostServer
 
-	issuer *TokenIssuer
-	deps   Deps
+	workerMu sync.Mutex
+	workers  map[string]*workerLease
+	issuer   *TokenIssuer
+	deps     Deps
 }
 
 // NewHost returns the service. issuer is usually the extension store's

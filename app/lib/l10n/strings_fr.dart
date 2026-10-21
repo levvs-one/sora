@@ -2227,4 +2227,10 @@ class SFr extends S {
 
   @override
   String get diagnosticUnavailable => 'Ce diagnostic n\'est pas disponible sur cette plateforme.';
+
+  @override
+  String get extWorkerFailed => 'La tâche en arrière-plan de l’extension a échoué. Consultez son journal.';
+
+  @override
+  String get extAssetRejected => 'Fichier d’extension refusé : couleurs illisibles ou règles invalides.';
 }

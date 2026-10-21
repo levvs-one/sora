@@ -2223,4 +2223,10 @@ class SKa extends S {
 
   @override
   String get diagnosticUnavailable => 'ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე.';
+
+  @override
+  String get extWorkerFailed => 'გაფართოების ფონური დავალება ვერ შესრულდა. შეამოწმეთ გაფართოების ჟურნალი.';
+
+  @override
+  String get extAssetRejected => 'გაფართოების ფაილი უარყოფილია: წაუკითხავი ფერები ან არასწორი წესები.';
 }

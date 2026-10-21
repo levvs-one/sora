@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Zdarzenia Windowsa",
   "diagnosticCapture": "Przechwytuj przez 10 sekund",
   "diagnosticRequiresTun": "Przechwytywanie pakietów wymaga aktywnego połączenia Sora TUN.",
-  "diagnosticUnavailable": "Ta diagnostyka jest niedostępna na tej platformie."
+  "diagnosticUnavailable": "Ta diagnostyka jest niedostępna na tej platformie.",
+  "extWorkerFailed": "Zadanie rozszerzenia w tle nie powiodło się. Sprawdź dziennik rozszerzenia.",
+  "extAssetRejected": "Odrzucono plik rozszerzenia: nieczytelne kolory lub nieprawidłowe reguły."
 }

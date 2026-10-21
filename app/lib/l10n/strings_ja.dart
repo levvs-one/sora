@@ -2206,4 +2206,10 @@ class SJa extends S {
 
   @override
   String get diagnosticUnavailable => 'この診断は、このプラットフォームでは使用できません。';
+
+  @override
+  String get extWorkerFailed => '拡張機能のバックグラウンドタスクに失敗しました。拡張機能のログを確認してください。';
+
+  @override
+  String get extAssetRejected => '拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。';
 }

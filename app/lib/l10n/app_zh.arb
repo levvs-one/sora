@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows 事件",
   "diagnosticCapture": "捕捉10秒",
   "diagnosticRequiresTun": "数据包捕获需要活动的 Sora TUN 连接。",
-  "diagnosticUnavailable": "此诊断在此平台上不可用。"
+  "diagnosticUnavailable": "此诊断在此平台上不可用。",
+  "extWorkerFailed": "扩展的后台任务失败。请查看扩展日志。",
+  "extAssetRejected": "扩展文件被拒绝：颜色难以辨认或规则无效。"
 }

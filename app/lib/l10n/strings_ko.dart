@@ -2205,4 +2205,10 @@ class SKo extends S {
 
   @override
   String get diagnosticUnavailable => '이 플랫폼에서는 이 진단을 사용할 수 없습니다.';
+
+  @override
+  String get extWorkerFailed => '확장 기능의 백그라운드 작업이 실패했습니다. 확장 기능 로그를 확인하세요.';
+
+  @override
+  String get extAssetRejected => '확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다.';
 }

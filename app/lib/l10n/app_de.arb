@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows-Ereignisse",
   "diagnosticCapture": "10 Sekunden lang einfangen",
   "diagnosticRequiresTun": "Für die Paketerfassung ist eine aktive Sora TUN-Verbindung erforderlich.",
-  "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar."
+  "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar.",
+  "extWorkerFailed": "Die Hintergrundaufgabe der Erweiterung ist fehlgeschlagen. Prüfe das Erweiterungsprotokoll.",
+  "extAssetRejected": "Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln."
 }

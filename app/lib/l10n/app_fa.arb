@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "رویدادهای ویندوز",
   "diagnosticCapture": "به مدت 10 ثانیه عکس بگیرید",
   "diagnosticRequiresTun": "ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.",
-  "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست."
+  "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست.",
+  "extWorkerFailed": "وظیفه پس‌زمینه افزونه ناموفق بود. گزارش افزونه را بررسی کنید.",
+  "extAssetRejected": "فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر."
 }

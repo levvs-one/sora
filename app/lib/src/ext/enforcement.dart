@@ -68,13 +68,13 @@ const List<ExtEnforcementRow> extEnforcementTable = [
   ),
   ExtEnforcementRow(
     'theme.apply',
-    ExtEnforcementStatus.unimplemented,
-    'theme runtime not built yet; granting changes nothing today',
+    ExtEnforcementStatus.enforced,
+    'enabled grants, conflict winner, validated colors and contrast; restores defaults on disable',
   ),
   ExtEnforcementRow(
     'routing.rules',
-    ExtEnforcementStatus.unimplemented,
-    'RiskDangerous with zero enforcement code: no consumer reads extension rules yet',
+    ExtEnforcementStatus.enforced,
+    'enabled grants, user match parser, ordered after user rules, direct/proxy/block only',
   ),
   ExtEnforcementRow(
     'net.hooks',
@@ -89,7 +89,7 @@ const List<ExtEnforcementRow> extEnforcementTable = [
   ExtEnforcementRow(
     'background',
     ExtEnforcementStatus.enforced,
-    'capability + permission gate, interval clamp, overlap guard, circuit breaker; no worker executor wired yet',
+    'capability + permission gate, clamped scheduler, isolated goja process with CPU/memory/wall budgets',
   ),
 ];
 

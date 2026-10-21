@@ -2222,4 +2222,10 @@ class SBe extends S {
 
   @override
   String get diagnosticUnavailable => 'Гэтая дыягностыка недаступная на гэтай платформе.';
+
+  @override
+  String get extWorkerFailed => 'Фонавае заданне пашырэння не выканана. Праверце журнал пашырэння.';
+
+  @override
+  String get extAssetRejected => 'Файл пашырэння адхілены: неразборлівыя колеры або няправільныя правілы.';
 }

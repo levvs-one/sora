@@ -2222,4 +2222,10 @@ class SKy extends S {
 
   @override
   String get diagnosticUnavailable => 'Бул диагностика бул платформада жеткиликсиз.';
+
+  @override
+  String get extWorkerFailed => 'Кеңейтменин фондогу тапшырмасы аткарылган жок. Кеңейтменин журналын текшериңиз.';
+
+  @override
+  String get extAssetRejected => 'Кеңейтменин файлы четке кагылды: окулбаган түстөр же жараксыз эрежелер.';
 }

@@ -2224,4 +2224,10 @@ class SPt extends S {
 
   @override
   String get diagnosticUnavailable => 'Este diagnóstico não está disponível nesta plataforma.';
+
+  @override
+  String get extWorkerFailed => 'A tarefa em segundo plano da extensão falhou. Verifique o registo da extensão.';
+
+  @override
+  String get extAssetRejected => 'Ficheiro da extensão rejeitado: cores ilegíveis ou regras inválidas.';
 }

@@ -26,6 +26,8 @@ import 'groups.dart';
 import 'overrides.dart';
 import 'profiles.dart';
 import 'rules.dart';
+import 'ext/store.dart';
+import 'ext/workers.dart';
 import 'settings.dart';
 import 'notifications.dart';
 import 'sync_daemon.dart';
@@ -86,8 +88,9 @@ final class ServerDegraded extends Notice {
 /// App state and core operations. Screens access it through [SoraScope] and
 /// rebuild on notifications.
 class Sora extends ChangeNotifier {
-  Sora(this.settings)
-    : history = settings.notificationHistory,
+  Sora(this.settings, {ExtensionStore? extensions})
+    : extensions = extensions ?? ExtensionStore(),
+      history = settings.notificationHistory,
       overrides = OverrideStore(() => settings.subscriptionOverrides, (v) => settings.subscriptionOverrides = v),
       profiles = ProfilesStore(() => settings.networkProfiles, (v) => settings.networkProfiles = v),
       chains = ChainsStore(() => settings.proxyChains, (v) => settings.proxyChains = v) {
@@ -101,8 +104,36 @@ class Sora extends ChangeNotifier {
     profiles.addListener(_noteSyncChanged);
     chains.addListener(notifyListeners);
     chains.addListener(_noteSyncChanged);
+    this.extensions.addListener(_extensionsChanged);
     _loadBandwidth();
   }
+  final ExtensionStore extensions;
+  ExtensionWorkers? _extensionWorkers;
+
+  final _extensionErrorsReported = <String, String>{};
+  void _extensionsChanged() {
+    for (final e in extensions.runtimeErrors.entries) {
+      if (_extensionErrorsReported[e.key] == e.value) continue;
+      _extensionErrorsReported[e.key] = e.value;
+      unawaited(
+        recordNotification(
+          AppNotification(
+            time: DateTime.now(),
+            title: extensions.get(e.key)?.manifest.name ?? e.key,
+            body: strings.extAssetRejected,
+          ),
+        ),
+      );
+    }
+    _extensionErrorsReported.removeWhere((id, _) => !extensions.runtimeErrors.containsKey(id));
+    notifyListeners();
+    unawaited(_replan());
+    if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
+      _pendingSelection = ++_selectionRevision;
+      unawaited(_applySelection());
+    }
+  }
+
   final browserDiagnostics = BrowserDiagnostics();
 
   AppUpdater get updates => _updates;
@@ -511,6 +542,7 @@ class Sora extends ChangeNotifier {
       servers: servers,
       choice: selected,
       settings: settings,
+      extensionRules: [for (final r in extensions.routingRules) r.rule],
       latency: latency,
       bandwidth: bandwidth,
       entry: selected.startsWith(groupPrefix)
@@ -535,6 +567,13 @@ class Sora extends ChangeNotifier {
   /// Maintains the core connection and watches subscriptions and session state,
   /// reopening the connection after a drop until disposal.
   Future<void> run() async {
+    try {
+      await extensions.load();
+    } catch (error) {
+      reportFailure(error, source: 'extensions');
+    }
+    if (_disposed) return;
+    _extensionWorkers = ExtensionWorkers(this);
     checkCrashIntent();
     while (!_disposed) {
       final opening = Stopwatch()..start();
@@ -1189,6 +1228,7 @@ class Sora extends ChangeNotifier {
             servers: servers,
             choice: 'auto',
             settings: settings,
+            extensionRules: [for (final r in extensions.routingRules) r.rule],
             latency: latency,
             bandwidth: bandwidth,
             chain: via.hops,
@@ -1336,6 +1376,7 @@ class Sora extends ChangeNotifier {
 
   /// Defers connection changes until the user explicitly reconnects.
   Future<void> _replan() async {
+    extensions.logRoutingOverlaps(settings.rules.map(UserRule.parse).nonNulls.map((r) => r.destination).toList());
     if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
       needsReconnect = _activePlan == null || currentPlan != _activePlan;
       notifyListeners();
@@ -1999,6 +2040,9 @@ class Sora extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _extensionWorkers?.dispose();
+    extensions.removeListener(_extensionsChanged);
+    extensions.dispose();
     browserDiagnostics.clear();
     unawaited(syncDaemon.stop());
     unawaited(_probeCall?.cancel());
@@ -2022,6 +2066,7 @@ SessionPlan buildPlan({
   Map<String, int?> latency = const {},
   Map<String, ({int bps, DateTime at})> bandwidth = const {},
   Entry? entry,
+  List<UserRule> extensionRules = const [],
   List<String> chain = const [],
   bool zapretWithVpn = false,
   double? Function(String id)? reliabilityOf,
@@ -2050,7 +2095,7 @@ SessionPlan buildPlan({
   // User rules take precedence over the preset; resolve proxy rules after the
   // default traffic target is known.
   void addRules(String proxy) {
-    for (final rule in settings.rules.map(UserRule.parse).nonNulls) {
+    for (final rule in [...settings.rules.map(UserRule.parse).nonNulls, ...extensionRules]) {
       final target = switch (rule.target) {
         RuleTarget.direct => 'direct',
         RuleTarget.block => 'reject',

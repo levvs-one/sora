@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows voqealari",
   "diagnosticCapture": "10 soniya davomida suratga oling",
   "diagnosticRequiresTun": "Paketlarni yozib olish uchun faol Sora TUN ulanishi kerak.",
-  "diagnosticUnavailable": "Ushbu diagnostika ushbu platformada mavjud emas."
+  "diagnosticUnavailable": "Ushbu diagnostika ushbu platformada mavjud emas.",
+  "extWorkerFailed": "Kengaytmaning fon vazifasi bajarilmadi. Kengaytma jurnalini tekshiring.",
+  "extAssetRejected": "Kengaytma fayli rad etildi: o‘qib bo‘lmaydigan ranglar yoki noto‘g‘ri qoidalar."
 }

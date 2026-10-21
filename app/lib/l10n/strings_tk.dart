@@ -2222,4 +2222,10 @@ class STk extends S {
 
   @override
   String get diagnosticUnavailable => 'Bu anyklaýyş bu platformada elýeterli däl.';
+
+  @override
+  String get extWorkerFailed => 'Giňeltmäniň fon işi şowsuz boldy. Giňeltmäniň ýazgylaryny barlaň.';
+
+  @override
+  String get extAssetRejected => 'Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler.';
 }

@@ -4178,6 +4178,18 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Эта диагностика недоступна на данной платформе.'**
   String get diagnosticUnavailable;
+
+  /// No description provided for @extWorkerFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фоновая задача расширения завершилась с ошибкой. Проверьте журнал расширения.'**
+  String get extWorkerFailed;
+
+  /// No description provided for @extAssetRejected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Файл расширения отклонён: нечитаемые цвета или неверные правила.'**
+  String get extAssetRejected;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

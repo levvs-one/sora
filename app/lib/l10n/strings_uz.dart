@@ -2223,4 +2223,10 @@ class SUz extends S {
 
   @override
   String get diagnosticUnavailable => 'Ushbu diagnostika ushbu platformada mavjud emas.';
+
+  @override
+  String get extWorkerFailed => 'Kengaytmaning fon vazifasi bajarilmadi. Kengaytma jurnalini tekshiring.';
+
+  @override
+  String get extAssetRejected => 'Kengaytma fayli rad etildi: o‘qib bo‘lmaydigan ranglar yoki noto‘g‘ri qoidalar.';
 }

@@ -1,0 +1,17 @@
+{
+  "name": "Midnight",
+  "variant": "dark",
+  "css_variables": {
+    "--sora-background": "#121820",
+    "--sora-surface": "#18212B",
+    "--sora-field": "#25303D",
+    "--sora-raised": "#202B37",
+    "--sora-raised-field": "#2B3745",
+    "--sora-text": "#F4F6FA",
+    "--sora-text-secondary": "#CED6DF",
+    "--sora-text-muted": "#B8C4D2",
+    "--sora-danger": "#FF938B",
+    "--sora-on-danger": "#231010"
+  },
+  "stylesheet": ""
+}

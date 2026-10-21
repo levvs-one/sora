@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "أحداث ويندوز",
   "diagnosticCapture": "التقاط لمدة 10 ثانية",
   "diagnosticRequiresTun": "يحتاج التقاط الحزم إلى اتصال Sora TUN نشط.",
-  "diagnosticUnavailable": "هذا التشخيص غير متوفر على هذا النظام الأساسي."
+  "diagnosticUnavailable": "هذا التشخيص غير متوفر على هذا النظام الأساسي.",
+  "extWorkerFailed": "فشلت المهمة الخلفية للإضافة. راجع سجل الإضافة.",
+  "extAssetRejected": "تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة."
 }

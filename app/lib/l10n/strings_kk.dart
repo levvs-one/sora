@@ -2222,4 +2222,10 @@ class SKk extends S {
 
   @override
   String get diagnosticUnavailable => 'Бұл диагностика бұл платформада қолжетімді емес.';
+
+  @override
+  String get extWorkerFailed => 'Кеңейтімнің фондық тапсырмасы орындалмады. Кеңейтім журналын тексеріңіз.';
+
+  @override
+  String get extAssetRejected => 'Кеңейтім файлы қабылданбады: оқылмайтын түстер немесе жарамсыз ережелер.';
 }

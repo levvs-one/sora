@@ -2226,4 +2226,10 @@ class SEs extends S {
 
   @override
   String get diagnosticUnavailable => 'Este diagnóstico no está disponible en esta plataforma.';
+
+  @override
+  String get extWorkerFailed => 'Falló la tarea en segundo plano de la extensión. Revisa su registro.';
+
+  @override
+  String get extAssetRejected => 'Archivo de extensión rechazado: colores ilegibles o reglas no válidas.';
 }

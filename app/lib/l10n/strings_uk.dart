@@ -2222,4 +2222,10 @@ class SUk extends S {
 
   @override
   String get diagnosticUnavailable => 'Ця діагностика недоступна на цій платформі.';
+
+  @override
+  String get extWorkerFailed => 'Фонове завдання розширення завершилося з помилкою. Перевірте журнал розширення.';
+
+  @override
+  String get extAssetRejected => 'Файл розширення відхилено: нечитабельні кольори або неправильні правила.';
 }

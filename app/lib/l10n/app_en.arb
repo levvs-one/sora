@@ -973,5 +973,7 @@
   "diagnosticEvents": "Windows events",
   "diagnosticCapture": "Capture for 10 seconds",
   "diagnosticRequiresTun": "Packet capture needs an active Sora TUN connection.",
-  "diagnosticUnavailable": "This diagnostic is unavailable on this platform."
+  "diagnosticUnavailable": "This diagnostic is unavailable on this platform.",
+  "extWorkerFailed": "The extension background task failed. Check the extension log.",
+  "extAssetRejected": "Extension asset rejected: unreadable colors or invalid rules."
 }

@@ -6,10 +6,9 @@
 /// permission-based (the stable, user-approved signal) rather than
 /// capability-contract based: the grant is what the user saw and approved.
 ///
-/// Resolution (which extension wins) is persisted by [ExtensionStore]; when
-/// the engine gains support it applies the stored winner. Until then the
-/// stored winner is the user's declared intent — the UI never pretends a
-/// quiet last-write-wins and never claims the engine applies it yet.
+/// Resolution (which extension wins) is persisted by [ExtensionStore]; themes use the stored winner.
+/// Routing rules merge deterministically and do not need an exclusive winner.
+/// Network hooks remain unapplied.
 library;
 
 import 'store.dart';
@@ -54,6 +53,7 @@ class ExtConflict {
 List<ExtConflict> findConflicts(List<InstalledExtension> installed) {
   final out = <ExtConflict>[];
   for (final kind in ExtConflictKind.values) {
+    if (kind == ExtConflictKind.routingRules) continue;
     final permission = conflictPermission(kind);
     final contenders = [
       for (final inst in installed)

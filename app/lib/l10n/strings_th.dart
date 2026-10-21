@@ -2221,4 +2221,10 @@ class STh extends S {
 
   @override
   String get diagnosticUnavailable => 'การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้';
+
+  @override
+  String get extWorkerFailed => 'งานเบื้องหลังของส่วนขยายล้มเหลว ตรวจสอบบันทึกของส่วนขยาย';
+
+  @override
+  String get extAssetRejected => 'ไฟล์ส่วนขยายถูกปฏิเสธ: สีอ่านยากหรือกฎไม่ถูกต้อง';
 }

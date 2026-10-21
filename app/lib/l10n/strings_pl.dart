@@ -2225,4 +2225,10 @@ class SPl extends S {
 
   @override
   String get diagnosticUnavailable => 'Ta diagnostyka jest niedostępna na tej platformie.';
+
+  @override
+  String get extWorkerFailed => 'Zadanie rozszerzenia w tle nie powiodło się. Sprawdź dziennik rozszerzenia.';
+
+  @override
+  String get extAssetRejected => 'Odrzucono plik rozszerzenia: nieczytelne kolory lub nieprawidłowe reguły.';
 }

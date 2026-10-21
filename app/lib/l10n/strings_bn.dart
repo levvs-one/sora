@@ -2218,4 +2218,10 @@ class SBn extends S {
 
   @override
   String get diagnosticUnavailable => 'এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.';
+
+  @override
+  String get extWorkerFailed => 'এক্সটেনশনের পটভূমির কাজ ব্যর্থ হয়েছে। এক্সটেনশনের লগ দেখুন।';
+
+  @override
+  String get extAssetRejected => 'এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।';
 }

@@ -6,9 +6,9 @@ package ext
 // A worker runs in WorkerEnv, a deliberately small sandbox: it can append
 // to the extension log and, only when the extension also holds "net.fetch",
 // make allowlisted HTTP requests through the extension's own Fetcher. There
-// is no filesystem, no process control, no raw network. The app-side JS
+// is no filesystem, no process control, no raw network. The isolated goja
 // runner executes the manifest's worker script inside this envelope; the
-// Go WorkerFunc below is the seam where the host plugs that runner in.
+// Go WorkerFunc below is the seam used by the authenticated app stream.
 //
 // Scheduling: the declared interval_minutes is clamped into
 // [MinWorkerInterval, MaxWorkerInterval]. Every run's outcome - success or
@@ -92,7 +92,7 @@ type WorkerTask struct {
 	ExtensionID string
 	// Interval is the effective, clamped schedule.
 	Interval time.Duration
-	// Entry is the manifest's worker script (for the app-side JS runner).
+	// Entry is the manifest's worker script (for the isolated JS runner).
 	Entry string
 
 	run     WorkerFunc

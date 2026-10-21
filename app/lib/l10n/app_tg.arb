@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Ҳодисаҳои Windows",
   "diagnosticCapture": "Барои 10 сония сабт кунед",
   "diagnosticRequiresTun": "Забти баста ба пайвасти фаъоли Sora TUN ниёз дорад.",
-  "diagnosticUnavailable": "Ин ташхис дар ин платформа дастрас нест."
+  "diagnosticUnavailable": "Ин ташхис дар ин платформа дастрас нест.",
+  "extWorkerFailed": "Вазифаи пасзаминаи васеъкунанда иҷро нашуд. Сабтҳои васеъкунандаро санҷед.",
+  "extAssetRejected": "Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст."
 }

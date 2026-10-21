@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Acara Windows",
   "diagnosticCapture": "Tangkap selama 10 detik",
   "diagnosticRequiresTun": "Pengambilan paket memerlukan koneksi Sora TUN yang aktif.",
-  "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini."
+  "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini.",
+  "extWorkerFailed": "Tugas latar belakang ekstensi gagal. Periksa log ekstensi.",
+  "extAssetRejected": "Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid."
 }

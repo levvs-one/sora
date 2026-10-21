@@ -2226,4 +2226,11 @@ class SDe extends S {
 
   @override
   String get diagnosticUnavailable => 'Diese Diagnose ist auf dieser Plattform nicht verfügbar.';
+
+  @override
+  String get extWorkerFailed =>
+      'Die Hintergrundaufgabe der Erweiterung ist fehlgeschlagen. Prüfe das Erweiterungsprotokoll.';
+
+  @override
+  String get extAssetRejected => 'Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln.';
 }

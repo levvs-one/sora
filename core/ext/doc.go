@@ -27,8 +27,8 @@
 //     paths use Get/Issuer, not the install lifecycle); the revocation
 //     cache arming at startup; and the background Scheduler plumbing -
 //     created and started at startup, its fetch transport wired to the
-//     tunnel - with no task registered until a worker executor exists
-//     (an owner decision, see the pass reports).
+//     tunnel. Authenticated app lifecycle streams register tasks and run
+//     their scripts in resource-limited disposable goja processes.
 //   - Reference half: package verification (Package.Verify /
 //     VerifyWithKey, including the declared-entry gate), the Store
 //     install/update/rollback lifecycle, the catalog fetch/cache, the
@@ -38,7 +38,6 @@
 //     calls it directly (ValidatePackage runs Package.Verify, the pack
 //     and publish gates run the Store checks), and it is the executable
 //     specification the Dart mirror is pinned against by tests on both
-//     sides. Its fate is tied to the executor decision; until then it
-//     must not be mistaken for the live path, and the live path must not
-//     be mistaken for it.
+//     sides. The app registry remains the source of truth for lifecycle
+//     streams; it is separate from the service-owned reference registry.
 package ext

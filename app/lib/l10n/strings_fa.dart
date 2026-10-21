@@ -2223,4 +2223,10 @@ class SFa extends S {
 
   @override
   String get diagnosticUnavailable => 'این تشخیص در این پلتفرم در دسترس نیست.';
+
+  @override
+  String get extWorkerFailed => 'وظیفه پس‌زمینه افزونه ناموفق بود. گزارش افزونه را بررسی کنید.';
+
+  @override
+  String get extAssetRejected => 'فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر.';
 }

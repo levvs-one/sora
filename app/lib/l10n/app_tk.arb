@@ -1125,5 +1125,7 @@
   "diagnosticEvents": "Windows wakalary",
   "diagnosticCapture": "10 sekuntlap ​​surata düşüriň",
   "diagnosticRequiresTun": "Paket almak üçin işjeň Sora TUN birikmesi gerek.",
-  "diagnosticUnavailable": "Bu anyklaýyş bu platformada elýeterli däl."
+  "diagnosticUnavailable": "Bu anyklaýyş bu platformada elýeterli däl.",
+  "extWorkerFailed": "Giňeltmäniň fon işi şowsuz boldy. Giňeltmäniň ýazgylaryny barlaň.",
+  "extAssetRejected": "Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler."
 }

@@ -2226,4 +2226,11 @@ class SIt extends S {
 
   @override
   String get diagnosticUnavailable => 'Questa diagnostica non è disponibile su questa piattaforma.';
+
+  @override
+  String get extWorkerFailed =>
+      'L’attività in background dell’estensione non è riuscita. Controlla il registro dell’estensione.';
+
+  @override
+  String get extAssetRejected => 'File dell’estensione rifiutato: colori illeggibili o regole non valide.';
 }

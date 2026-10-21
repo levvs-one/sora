@@ -2223,4 +2223,10 @@ class SHy extends S {
 
   @override
   String get diagnosticUnavailable => 'Այս ախտորոշումն անհասանելի է այս հարթակում:';
+
+  @override
+  String get extWorkerFailed => 'Ընդլայնման ֆոնային առաջադրանքը ձախողվեց։ Ստուգեք ընդլայնման մատյանը։';
+
+  @override
+  String get extAssetRejected => 'Ընդլայնման ֆայլը մերժվել է․ անընթեռնելի գույներ կամ անվավեր կանոններ։';
 }
