@@ -3,7 +3,7 @@ import 'package:sora/src/sync.dart';
 
 /// Dart mirror of the Go QR wire vectors
 /// (`service/sync/pairing/pairing_test.go`: `TestVectorT1Decodes` /
-/// `TestVectorsReject`, pinned by `F9-SYNC-CONTRACT.md` §1).
+/// `TestVectorsReject`, pinned by `service/sync/CONTRACT.md` §1).
 ///
 /// The contract is normative: a payload the app accepts is a payload the
 /// daemon accepts, so both sides must agree on every vector here.

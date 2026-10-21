@@ -6,7 +6,7 @@ import (
 )
 
 // Detail-level strictness of Decode, beyond the vector tests in
-// pairing_test.go: the canonical contract (F9-SYNC-CONTRACT.md) forbids
+// pairing_test.go: the canonical contract (service/sync/CONTRACT.md) forbids
 // fragments and duplicate query keys, and tolerates unknown keys.
 func TestDecodeRejectsFragmentAndDuplicates(t *testing.T) {
 	// Self-contained payloads: base64url of bytes 0..31 / 0..15.

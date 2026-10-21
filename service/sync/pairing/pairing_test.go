@@ -61,7 +61,7 @@ func TestGenerateRejectsEmptyDeviceID(t *testing.T) {
 	}
 }
 
-// Fixed wire vectors shared with the Dart side (see F9-SYNC-CONTRACT.md).
+// Fixed wire vectors shared with the Dart side (see service/sync/CONTRACT.md).
 // The key material is the byte sequence 0..31 / 0..15, base64url without
 // padding; these strings must decode byte-for-byte identically in Dart.
 const (

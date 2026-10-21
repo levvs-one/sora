@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"net"
@@ -69,22 +68,38 @@ func (d *Daemon) StartSyncListener() error {
 
 // handleSyncConn serves one incoming sync from a paired device.
 func (d *Daemon) handleSyncConn(netConn net.Conn, self transport.Identity) {
-	verify := func(peerKey [32]byte) bool {
-		_, ok := d.peerKeys()[peerKey]
-		return ok
-	}
 	ctx, cancel := context.WithTimeout(d.ctx, 3*time.Minute)
 	defer cancel()
+	var peer *Peer
+	var stopPeer func() bool
+	defer func() {
+		if stopPeer != nil {
+			stopPeer()
+		}
+	}()
+	verify := func(peerKey [32]byte) bool {
+		d.mu.Lock()
+		defer d.mu.Unlock()
+		for _, p := range d.peers {
+			key, err := p.keyBytes()
+			if err == nil && key == peerKey {
+				peer = p
+				stopPeer = context.AfterFunc(p.ctx, func() { cancel(); _ = netConn.Close() })
+				return true
+			}
+		}
+		return false
+	}
 	c, err := transport.AcceptKnown(ctx, netConn, d.identity.priv, self, verify)
 	if err != nil {
 		return
 	}
 	defer func() { _ = c.Close() }()
+	c.Peer.DeviceID = peer.ID
 	if _, err := syncpkg.Sync(ctx, c, d.identity.ID, d.store, false); err != nil {
 		return
 	}
-	if err := d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
-		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:])); err != nil {
+	if err := d.finishSync(peer, c.Peer.DeviceName); err != nil {
 		log.Printf("sync: save peers registry: %v", err)
 	}
 }
@@ -97,6 +112,10 @@ func (d *Daemon) SyncPeer(ctx context.Context, id string) (pulled, pushed []sync
 	if !ok {
 		return nil, nil, fmt.Errorf("api: unknown peer %q", id)
 	}
+	ctx, cancelPeer := context.WithCancel(ctx)
+	defer cancelPeer()
+	stopPeer := context.AfterFunc(peer.ctx, cancelPeer)
+	defer stopPeer()
 	peerKey, err := peer.keyBytes()
 	if err != nil {
 		return nil, nil, err
@@ -125,12 +144,12 @@ func (d *Daemon) SyncPeer(ctx context.Context, id string) (pulled, pushed []sync
 		return nil, nil, fmt.Errorf("api: sync failed: %w", err)
 	}
 	defer func() { _ = c.Close() }()
+	c.Peer.DeviceID = peer.ID
 	rep, err := syncpkg.Sync(dialCtx, c, d.identity.ID, d.store, true)
 	if err != nil {
 		return nil, nil, fmt.Errorf("api: sync failed: %w", err)
 	}
-	if err := d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
-		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:])); err != nil {
+	if err := d.finishSync(peer, c.Peer.DeviceName); err != nil {
 		return nil, nil, fmt.Errorf("api: sync succeeded but the peer registry was not saved: %w", err)
 	}
 	return rep.Pulled, rep.Pushed, nil

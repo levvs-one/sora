@@ -9,7 +9,7 @@ import 'sora.dart';
 import 'sync_api.dart';
 
 /// Document kinds the app publishes to the sora-sync daemon.
-/// Normative shapes live in `service/sync/F9-SYNC-CONTRACT.md` §4; this
+/// Normative shapes live in `service/sync/CONTRACT.md` §4; this
 /// file is the app-side implementation of that section.
 abstract final class SyncDocKinds {
   static const subscriptions = 'subscriptions';
@@ -77,7 +77,7 @@ class SyncBridgeException implements Exception {
 ///
 /// Apply is additive and idempotent: running it twice changes nothing the
 /// second time. Subscription deletions do not propagate (the doc carries
-/// no tombstones — see the contract); unknown kinds are ignored.
+/// no tombstones, see the contract); unknown kinds are ignored.
 class SyncDocumentBridge {
   SyncDocumentBridge({required this.sora, required this.client});
 
@@ -208,7 +208,7 @@ class SyncDocumentBridge {
 
   /// Additive merge by URL: missing subscriptions are added, present ones
   /// are renamed when the name differs. Deletions intentionally do not
-  /// propagate (no tombstones in the doc — see the contract §4).
+  /// propagate (no tombstones in the doc, see service/sync/CONTRACT.md §4).
   Future<void> _applySubscriptions(String raw) async {
     final decoded = _decodeDoc(raw, 'subscriptions');
     final items = decoded['items'];

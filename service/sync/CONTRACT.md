@@ -1,4 +1,4 @@
-# F9 sync contract
+# Device sync contract
 
 Normative wire contract between the Go sync daemon (`service/sync`) and the
 app UI. Both sides MUST implement exactly this; when they disagree, this
@@ -41,7 +41,21 @@ Rules:
   MUST NOT change the meaning of the defined ones.
 - `pub`/`token` MUST be base64url **without** padding; padded or hex forms
   are rejected. The private key NEVER appears in the payload.
-- The payload is single-use and expires with the pairing session (5 min).
+- The payload is valid only while its pairing session is open (at most 5 min).
+  Closing or expiring the invitation cancels accepted connections, including
+  handshakes and document exchanges. Peer registration rechecks the active
+  invitation and its deadline under the registry lock. The invitation may
+  pair multiple devices during this window; it is not consumed on first use.
+- Only explicit pairing may create a device or replace its identity key.
+  Ordinary sync binds the announced identity key to the verified Noise static
+  key and takes the device id from the local paired-device registry.
+- Revocation cancels that record's incoming and outgoing connections. Each
+  pairing creates a new record generation, including pairing the same key.
+  A finishing ordinary sync may update name and last-sync time only on the
+  exact existing record it authenticated, never add a record or change a key.
+- Document exchange has a two-minute limit, shortened by caller deadlines.
+  Read and write deadlines bound both directions; context cancellation closes
+  the connection, so a peer that stops reading cannot block daemon shutdown.
 
 ### Wire vectors (shared with Dart)
 
@@ -91,6 +105,10 @@ vectorTok16 = "AAECAwQFBgcICQoLDA0ODw"                      // bytes 0..15
   the whole install lifetime and there is no refresh flow; expiry would
   only create lockouts, not security (localhost + `0600` is the boundary).
 - The token MUST NOT appear in logs, QR payloads, or diagnostics bundles.
+- The app first probes a saved `http_addr` with the stored token to reuse a
+  live daemon. After a failed probe it removes the stale address before
+  spawning and retries address/token reads and health checks for up to ten
+  seconds, stopping early if its child exits.
 
 ## 4. Document kinds
 
@@ -102,14 +120,17 @@ to the whole set at once.
 | Kind | Name | Payload (JSON, UTF-8) | Merge when applying |
 |---|---|---|---|
 | `subscriptions` | `list` | `{"v":1,"items":[{"name","url","auto_update","user_agent","update_interval_seconds"}]}` | Additive by URL: missing subscriptions are added, present ones renamed; **deletions do not propagate**. The device-local subscription id is intentionally absent from the payload (the core assigns ids per device) so identical states hash identically and converge |
-| `app_settings` | `main` | `{"<key>":{"t":"s"\|"b"\|"i"\|"sl","v":<value>}}` for the keys in `Settings.syncableSettingsKeys` | Per-key merge; keys absent from the doc are left alone |
+| `app_settings` | `main` | `{"<key>":{"t":"s"\|"b"\|"i"\|"sl","v":<value>}}` for the keys in `Settings.syncableSettingsKeys` | Per-key merge; the tag and value must match the key's local type schema; unknown keys and malformed entries are ignored; absent keys are left alone |
 | `overrides` | `main` | Raw `subscriptionOverrides` JSON | Whole-value replace |
 | `profiles` | `main` | Raw `networkProfiles` JSON | Whole-value replace |
 | `chains` | `main` | Raw `proxyChains` JSON | Whole-value replace |
-| `obfs` | `main` | Raw `obfs` JSON (traffic obfuscation suite) | Whole-value replace |
 
 Rules:
 
+- Settings export reads raw stored values, never probes incompatible typed
+  getters. Each known key has one fixed tag: `s` for strings, `b` for booleans,
+  `i` for integers and `sl` for lists of strings. Import checks both the tag
+  and value against that key's schema before writing preferences.
 - The app publishes (`PUT /v1/documents/{kind}/{name}`) a fresh snapshot
   before every peer sync and debounced after subscription/server changes.
   It skips the PUT when the daemon's stored hash already matches, so an

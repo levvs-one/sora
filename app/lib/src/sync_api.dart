@@ -98,7 +98,7 @@ class PairingSession {
   }
 }
 
-/// Metadata of one synchronized document (F9 contract §4): what it is,
+/// Metadata of one synchronized document (service/sync/CONTRACT.md §4): what it is,
 /// where it came from and when that copy was written. The daemon reports
 /// metas as JSON objects with `kind`, `name`, `updated_at` (unix
 /// milliseconds, like every other daemon timestamp), `hash` (hex sha256 of
@@ -153,7 +153,7 @@ class SyncResult {
 }
 
 /// Token-authenticated client for the sora-sync localhost HTTP API
-/// (contract §3). Every request carries `Authorization: Bearer <token>`;
+/// (service/sync/CONTRACT.md §3). Every request carries `Authorization: Bearer <token>`;
 /// non-2xx responses surface the daemon's `{"error"}` text as
 /// [SyncApiException].
 class SyncApiClient {
@@ -255,7 +255,7 @@ class SyncApiClient {
     await _call('POST', '/v1/peers/${Uri.encodeComponent(id)}/sync', timeout: const Duration(seconds: 60)),
   );
 
-  /// Publishes one application document (contract §4). The payload is sent
+  /// Publishes one application document (service/sync/CONTRACT.md §4). The payload is sent
   /// base64-encoded; the daemon stamps `updated_at` itself when
   /// [updatedAt] is not given.
   Future<void> putDocument({
