@@ -2,7 +2,11 @@
 
 package ext
 
-import "golang.org/x/sys/unix"
+import (
+	"time"
+
+	"golang.org/x/sys/unix"
+)
 
 func limitWorkerProcess() error {
 	// RLIMIT_AS conflicts with Go's virtual heap reservation. RLIMIT_DATA
@@ -11,4 +15,13 @@ func limitWorkerProcess() error {
 		return err
 	}
 	return unix.Setrlimit(unix.RLIMIT_CPU, &unix.Rlimit{Cur: WorkerCPUSeconds, Max: WorkerCPUSeconds})
+}
+
+// processCPUTime is the user and system time this process has used.
+func processCPUTime() (time.Duration, error) {
+	var usage unix.Rusage
+	if err := unix.Getrusage(unix.RUSAGE_SELF, &usage); err != nil {
+		return 0, err
+	}
+	return time.Duration(usage.Utime.Nano() + usage.Stime.Nano()), nil
 }

@@ -1,6 +1,7 @@
 package ext
 
 import (
+	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -25,4 +26,15 @@ func limitWorkerProcess() error {
 		return err
 	}
 	return nil
+}
+
+// processCPUTime is the user and kernel time this process has used.
+func processCPUTime() (time.Duration, error) {
+	var creation, exit, kernel, user windows.Filetime
+	if err := windows.GetProcessTimes(windows.CurrentProcess(), &creation, &exit, &kernel, &user); err != nil {
+		return 0, err
+	}
+	// FILETIME counts 100 ns intervals.
+	ticks := func(f windows.Filetime) int64 { return int64(f.HighDateTime)<<32 | int64(f.LowDateTime) }
+	return time.Duration((ticks(kernel) + ticks(user)) * 100), nil
 }

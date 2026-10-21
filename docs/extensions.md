@@ -299,10 +299,12 @@ and imports are not. Each run must finish all its work and settle promises.
 per subscription per run; subscriptions do not survive runs. Panel event
 subscriptions continue to observe live changes while their panel is open.
 
-Budgets per run: 2 CPU seconds, 128 MiB committed process memory, 30 seconds
-wall time, 1 MiB source, 256 host calls (including log calls), and stack depth
-256. Linux enforces CPU/data limits with rlimits; Windows uses a Job Object
-with process memory and user CPU limits. Go's soft heap target is 64 MiB.
+Budgets per run: 2 CPU seconds, 128 MiB live heap, 30 seconds wall time,
+1 MiB source, 256 host calls (including log calls), and stack depth 256. The
+worker checks its own heap and CPU time every 20 ms and exits at the budget,
+the same way on every platform; rlimits on Linux and a Job Object on Windows
+sit at four times the memory budget as a hard backstop. Go's soft heap target
+is 64 MiB.
 Allocation failure, runaway JS and a blocked bridge end only the disposable
 process. The parent kills and reaps it on timeout or cancellation. A JS VM
 or native-runtime vulnerability is outside this resource-isolation claim.
