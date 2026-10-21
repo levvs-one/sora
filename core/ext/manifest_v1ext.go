@@ -3,8 +3,7 @@ package ext
 // Manifest v1 schema extension: background workers, net.fetch, and the
 // capability contract pointers (theme, network-hook, routing).
 //
-// The v1 decoder in manifest.go is frozen: it rejects unknown top-level
-// fields (DisallowUnknownFields). These optional fields stay additive, so
+// The decoder rejects unknown top-level fields. Optional fields are additive, so
 // manifest_version remains 1 and old manifests parse exactly as before:
 //
 //   - "background_task": periodic background work (capability "background",
@@ -21,8 +20,7 @@ package ext
 // ParseManifestFull is the entry point: it decodes the v1 core and the
 // extension keys in one pass (one struct holding both field sets, unknown
 // fields still rejected), runs the frozen v1 validation, then validates
-// the extension keys against the parsed manifest. Callers that only need
-// v1 keep using ParseManifest.
+// the extension keys against the parsed manifest.
 
 import (
 	"bytes"
@@ -113,7 +111,7 @@ const MaxBackgroundIntervalMinutes = 7 * 24 * 60
 
 // ParseManifestFull parses sora-extension.json including the optional
 // v2-runtime fields (background_task, network_hosts). The v1 core of the
-// document is validated by the frozen ParseManifest; the extension fields
+// document is validated by Manifest.Validate; the extension fields
 // are validated against the parsed manifest (capability/permission
 // cross-checks). Old manifests without the new keys behave exactly as
 // before.

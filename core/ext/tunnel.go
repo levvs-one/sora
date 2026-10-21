@@ -18,7 +18,6 @@ package ext
 // Server.ExtFetchTransport); this package only defines the mechanism.
 
 import (
-	"errors"
 	"net"
 	"net/http"
 	"net/url"
@@ -134,10 +133,4 @@ func (t *TunnelTransport) forAddr(addr string) (http.RoundTripper, error) {
 func noTunnelErr(detail string) error {
 	return errs.Newf(errs.CodeUnavailable, KeyNetFetchNoTunnel,
 		"ext: net.fetch needs the VPN tunnel: %s", detail)
-}
-
-// isNoTunnel reports whether err is the fail-closed no-tunnel error.
-func isNoTunnel(err error) bool {
-	var e *errs.Error
-	return errors.As(err, &e) && e.Key() == KeyNetFetchNoTunnel
 }

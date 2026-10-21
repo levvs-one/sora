@@ -123,9 +123,6 @@ func TestTunnelTransportFailsClosedWhenNoTunnel(t *testing.T) {
 	if err == nil {
 		t.Fatal("RoundTrip succeeded without a tunnel proxy")
 	}
-	if !isNoTunnel(err) {
-		t.Fatalf("error is not the no-tunnel fail-closed error: %v", err)
-	}
 	if k := errKey(t, err); k != KeyNetFetchNoTunnel {
 		t.Fatalf("error key = %q, want %q", k, KeyNetFetchNoTunnel)
 	}

@@ -37,21 +37,6 @@ const (
 	EnforcementUnimplemented
 )
 
-// String renders the status for logs, docs and the CLI.
-func (s EnforcementStatus) String() string {
-	switch s {
-	case EnforcementEnforced:
-		return "enforced"
-	case EnforcementInstallTime:
-		return "install-time"
-	case EnforcementInert:
-		return "inert"
-	case EnforcementUnimplemented:
-		return "unimplemented"
-	}
-	return "unknown"
-}
-
 // EnforcementRow is one permission's audited enforcement state.
 type EnforcementRow struct {
 	// ID is the registry permission id.
@@ -73,14 +58,14 @@ var enforcementTable = []EnforcementRow{
 	{
 		ID:     "connections.read",
 		Status: EnforcementEnforced,
-		Where:  "core/ext/host.go Host.check (rpcPermissions) + app/lib/src/ext/bridge.dart _methodPermission",
-		Note:   "every GetConnections call is token- and permission-checked",
+		Where:  "core/ext/worker_host.go workerBridgeCall + app/lib/src/ext/bridge.dart _methodPermission",
+		Note:   "getConnections is permission-checked by the worker bridge and app bridge",
 	},
 	{
 		ID:     "servers.read",
 		Status: EnforcementEnforced,
-		Where:  "core/ext/host.go Host.check (rpcPermissions) + app/lib/src/ext/bridge.dart _methodPermission",
-		Note:   "every GetServers call is token- and permission-checked",
+		Where:  "core/ext/worker_host.go workerBridgeCall + app/lib/src/ext/bridge.dart _methodPermission",
+		Note:   "getServers is permission-checked by the worker bridge and app bridge",
 	},
 	{
 		ID:     "settings.read",
@@ -95,8 +80,8 @@ var enforcementTable = []EnforcementRow{
 	{
 		ID:     "notifications",
 		Status: EnforcementEnforced,
-		Where:  "core/ext/host.go Host.check (rpcPermissions) + Notify text caps + app/lib/src/ext/bridge.dart _methodPermission",
-		Note:   "every Notify call is checked; title/body are size-capped in the host",
+		Where:  "core/ext/worker_host.go workerBridgeCall + app/lib/src/ext/bridge.dart _methodPermission",
+		Note:   "notify is permission-checked; title/body are size-capped in the app bridge",
 	},
 	{
 		ID:     "tray",
@@ -138,14 +123,6 @@ var enforcementTable = []EnforcementRow{
 	},
 }
 
-// EnforcementTable returns a copy of the audited enforcement matrix, in
-// registry order.
-func EnforcementTable() []EnforcementRow {
-	out := make([]EnforcementRow, len(enforcementTable))
-	copy(out, enforcementTable)
-	return out
-}
-
 // EnforcementOf returns the enforcement row for one permission id.
 func EnforcementOf(id string) (EnforcementRow, bool) {
 	for _, r := range enforcementTable {
@@ -154,12 +131,4 @@ func EnforcementOf(id string) (EnforcementRow, bool) {
 		}
 	}
 	return EnforcementRow{}, false
-}
-
-// Enforced reports whether the permission has a real runtime check today.
-// The CLI and the docs use it to avoid presenting a declared-only
-// permission as a protection.
-func Enforced(id string) bool {
-	r, ok := EnforcementOf(id)
-	return ok && (r.Status == EnforcementEnforced || r.Status == EnforcementInstallTime)
 }

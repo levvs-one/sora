@@ -2,7 +2,7 @@
 
 Hot-reload extension development without repackaging. Two halves: the CLI
 server (implemented, `sora-ext dev`) and the app side (contract specified
-below, implementation pending, no Dart SDK in this environment).
+below, implementation pending).
 
 ## The CLI half: `sora-ext dev`
 
@@ -54,9 +54,9 @@ this contract:
    nothing.
 
 3. **Permissions.** The permission prompt shows exactly the manifest's
-   list, same as a sideload. Granting mints a token scoped to those
-   permissions, identical to the installed flow (`MintToken`). No
-   elevation: a dev extension gets nothing an installed one wouldn't.
+   list, same as a sideload. The app bridge checks those grants on each
+   call, identical to the installed flow. A dev extension gets nothing
+   an installed one would not.
 
 4. **Panel loading.** The WebView loads the entry URL instead of the
    installed package file. The real `window.soraExt` bridge is injected -
@@ -67,8 +67,8 @@ this contract:
    badge in the Extensions list and on its panels, with the server URL.
    Tapping it offers Disconnect.
 
-6. **Lifecycle.** Disconnect revokes the token (`RevokeToken`) and tears
-   down the panels, like disabling. Dev extensions never auto-start with
+6. **Lifecycle.** Disconnect tears down the panels and cancels any
+   app-owned RunWorker stream, like disabling. Dev extensions never auto-start with
    the app and are forgotten on app restart (reconnect explicitly).
 
 7. **Release builds.** The Connect dev server entry point is compiled out
@@ -79,7 +79,7 @@ this contract:
 
 - Loopback-only kills the obvious attack (a LAN/Internet page pointing
   the app at evil JS).
-- Same-manifest, same-prompt, same-token rules mean dev mode grants no
+- Same-manifest, same-prompt, same-grant rules mean dev mode grants no
   extra power, it only skips packaging.
 - The DEV badge + no-auto-start make it impossible to mistake a dev
   extension for an installed one, or to persist one silently.

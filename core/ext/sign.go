@@ -13,17 +13,6 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
-// TeamPublicKey verifies the team catalog and revocation list. Its secret
-// half signs extensions/catalog.json and extensions/revocations.json with
-// `sora-ext sign-file`; the app carries the same key (ext/verifier.dart).
-const TeamPublicKey = "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+"
-
-// SigningConfigured reports whether a valid team public key is configured.
-func SigningConfigured() bool {
-	_, _, err := ParsePublicKey(TeamPublicKey)
-	return err == nil
-}
-
 // ParsePublicKey parses the "<base64>" line of a minisign .pub file and
 // returns the key id and the 32-byte ed25519 public key.
 func ParsePublicKey(line string) (keyID [8]byte, pub [32]byte, err error) {
@@ -49,10 +38,7 @@ func ParsePublicKey(line string) (keyID [8]byte, pub [32]byte, err error) {
 //
 // The sha256 binds the signature to the exact payload bytes: flipping one
 // byte anywhere breaks verification.
-const (
-	sigFileChecksums = "checksums.txt"
-	sigFileCatalog   = "catalog.json"
-)
+const sigFileChecksums = "checksums.txt"
 
 // makeTrustedComment builds the canonical trusted comment.
 func makeTrustedComment(timestamp int64, file, shaHex string) []byte {
@@ -125,17 +111,6 @@ func VerifyPayload(pubKeyLine, sigText string, file string, payload []byte) erro
 // against the author's key from the manifest and the checksums.txt bytes.
 func VerifyPackageSignature(authorKeyLine, sigText string, checksums []byte) error {
 	return VerifyPayload(authorKeyLine, sigText, sigFileChecksums, checksums)
-}
-
-// VerifyCatalogSignature verifies a catalog.json.minisig with the team key.
-// It fails closed while the key ceremony is pending.
-func VerifyCatalogSignature(sigText string, catalogJSON []byte) error {
-	if !SigningConfigured() {
-		return errs.Newf(errs.CodeUnavailable, KeySigningUnconfigured,
-			"ext: team signing is not configured yet: no team public key is configured. "+
-				"The owner must complete the key ceremony (FIX-PLAN.md, section 9) before team-signed artifacts can be trusted.")
-	}
-	return VerifyPayload(TeamPublicKey, sigText, sigFileCatalog, catalogJSON)
 }
 
 // SignPayload signs both the payload and its role, timestamp and digest.

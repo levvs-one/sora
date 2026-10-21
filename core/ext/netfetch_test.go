@@ -241,8 +241,8 @@ func TestFetchDeniedIsLogged(t *testing.T) {
 	srv := httptest.NewTLSServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {}))
 	defer srv.Close()
 	hub := NewLogHub()
-	f, err := NewFetcherForExtension("com.example.hello",
-		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, hub)
+	f, err := NewFetcherForExtensionWithTransport("com.example.hello",
+		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, nil, hub)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -267,14 +267,14 @@ func TestFetchDeniedIsLogged(t *testing.T) {
 
 func TestNewFetcherRejectsBadAllowlist(t *testing.T) {
 	hub := NewLogHub()
-	if _, err := NewFetcherForExtension("com.example.hello",
-		&ManifestExt{NetworkHosts: []string{"http://x"}}, FetchLimits{}, hub); err == nil {
+	if _, err := NewFetcherForExtensionWithTransport("com.example.hello",
+		&ManifestExt{NetworkHosts: []string{"http://x"}}, FetchLimits{}, nil, hub); err == nil {
 		t.Fatal("bad allowlist entry must fail construction")
 	}
-	if _, err := NewFetcherForExtension("", nil, FetchLimits{}, hub); err == nil {
+	if _, err := NewFetcherForExtensionWithTransport("", nil, FetchLimits{}, nil, hub); err == nil {
 		t.Fatal("empty extension id must fail construction")
 	}
-	if _, err := NewFetcherForExtension("x", nil, FetchLimits{}, nil); err == nil {
+	if _, err := NewFetcherForExtensionWithTransport("x", nil, FetchLimits{}, nil, nil); err == nil {
 		t.Fatal("nil hub must fail construction")
 	}
 }
@@ -285,8 +285,8 @@ func TestFetchQueryNotLogged(t *testing.T) {
 	}))
 	defer srv.Close()
 	hub := NewLogHub()
-	f, err := NewFetcherForExtension("com.example.hello",
-		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, hub)
+	f, err := NewFetcherForExtensionWithTransport("com.example.hello",
+		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, nil, hub)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -423,8 +423,8 @@ func TestFetcherTransportInjection(t *testing.T) {
 }
 
 func TestFetcherNilTransportDialsDirect(t *testing.T) {
-	f, err := NewFetcherForExtension("com.example.direct",
-		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, NewLogHub())
+	f, err := NewFetcherForExtensionWithTransport("com.example.direct",
+		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, nil, NewLogHub())
 	if err != nil {
 		t.Fatal(err)
 	}

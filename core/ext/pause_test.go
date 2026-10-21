@@ -203,7 +203,7 @@ func TestStandaloneFetcherNeverPauses(t *testing.T) {
 	// Fetchers built outside the scheduler have no pause gate wired: their
 	// behavior is unchanged.
 	m, x := bgPair(t, 60)
-	f, err := NewFetcherForExtension(m.ID, x, FetchLimits{}, NewLogHub())
+	f, err := NewFetcherForExtensionWithTransport(m.ID, x, FetchLimits{}, nil, NewLogHub())
 	if err != nil {
 		t.Fatal(err)
 	}

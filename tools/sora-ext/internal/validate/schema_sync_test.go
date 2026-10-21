@@ -70,8 +70,10 @@ func TestSchemaCapabilityEnumMatchesRegistry(t *testing.T) {
 		t.Errorf("schema capabilities enum = %v, want %v", got, want)
 	}
 	for _, c := range got {
-		if !ext.IsKnownCapability(c) {
-			t.Errorf("schema capability %q is not in the core registry", c)
+		m := minimalManifest()
+		m["capabilities"] = []string{c}
+		if err := parseMap(t, m); err != nil {
+			t.Errorf("schema capability %q is rejected by the core parser: %v", c, err)
 		}
 	}
 }

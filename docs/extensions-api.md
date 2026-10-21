@@ -1,6 +1,6 @@
 # `window.soraExt` API reference
 
-The only bridge between a panel and the app. Panels run in a WebView
+The app owns the store, grants and this bridge between a panel and the app. Panels run in a WebView
 without Node and without network access (v1); everything below is
 allow-listed per granted permission.
 
@@ -40,8 +40,8 @@ Notes:
   invalid values reject with `invalid-argument` and change nothing.
   Unknown properties reject too.
 - Calling a method without its permission rejects with
-  `permission-denied`. There is no way to escalate: the token is scoped at
-  install time, and disabling the extension revokes it.
+  `permission-denied`. The app bridge checks the installed grants;
+  disabling tears down panels and cancels the worker stream.
 
 ### Error codes
 
@@ -96,7 +96,9 @@ Supported types: `string`, `integer`, `number`, `boolean`; optional
 
 ## Worker and declarative runtimes
 
-Background workers execute in isolated goja processes while the app is open.
+The app starts background workers through the control-authenticated
+`ExtensionHost.RunWorker` stream, the sole extension RPC. They execute in
+isolated goja processes while the app is open.
 They receive the same `window.soraExt.call` API, enforced by granted
 permissions and the existing panel bridge. Extension-local settings remain
 permissionless. `console.log` writes to the extension log.

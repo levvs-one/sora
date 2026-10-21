@@ -33,12 +33,12 @@ func testManifestForFuzz() *Manifest {
 	}
 }
 
-// FuzzParseManifest throws malformed, overlong and unicode-hostile inputs at
-// the manifest validator. Invariants: it must never panic, and a successful
+// FuzzParseManifestCoreFields throws malformed, overlong and unicode-hostile inputs at
+// the full manifest validator. Invariants: it must never panic, and a successful
 // parse must always describe a manifest that re-validates and satisfies the
 // structural rules (id shape, semver, known/unique permissions and
 // capabilities, safe panel entries).
-func FuzzParseManifest(f *testing.F) {
+func FuzzParseManifestCoreFields(f *testing.F) {
 	// Seed corpus: the canonical valid manifest, plus hostile variants.
 	valid, err := json.Marshal(testManifestForFuzz())
 	if err != nil {
@@ -75,7 +75,7 @@ func FuzzParseManifest(f *testing.F) {
 	}
 
 	f.Fuzz(func(t *testing.T, data []byte) {
-		m, err := ParseManifest(data)
+		m, _, err := ParseManifestFull(data)
 		if err != nil {
 			return // rejection is always acceptable
 		}
@@ -148,8 +148,7 @@ func panelAttackManifestSeed(entry string) string {
 }
 
 // FuzzParseManifestFull throws hostile v2-runtime inputs at the full
-// manifest validator (manifest.go + manifest_v1ext.go): the v1 fuzz target
-// ignores unknown top-level keys, so it never reaches the
+// manifest validator (manifest.go + manifest_v1ext.go), including the
 // background/network-hosts/asset-pointer gates. Invariants: no panics, and
 // an accepted manifest must re-validate both halves.
 func FuzzParseManifestFull(f *testing.F) {

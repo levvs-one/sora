@@ -34,9 +34,10 @@ sora-ext dev
 ```
 
 This serves the project on `http://127.0.0.1:8377` (loopback only) with
-live reload, and re-validates the manifest on every save. In the app:
-**Extensions → Connect dev server** → paste the URL. The panel loads from
-your machine; edit `panel.html`, save, watch it refresh.
+live reload, and re-validates the manifest on every save. The app dev-server
+connection flow is still a [specified contract](extensions-devmode.md).
+For the current browser preview use `serve` below; for the real app build,
+sign and install a package as described later.
 
 No app at hand? Test in a desktop browser instead:
 
@@ -100,8 +101,9 @@ hash and a catalog-entry snippet ready to submit.
 ## 0:10, Install
 
 In the app: **Extensions → Install from file** → pick `/tmp/stats.soraext`.
-Review the permission prompt, enable, done. Updates are staged with
-rollback; widening permissions re-prompts.
+The app verifies the archive and signature, stores grants and handles
+install, update, rollback, enable, settings, catalog cache and revocations.
+Review the permission prompt and enable. Widening permissions re-prompts.
 
 ## Next
 

@@ -1,12 +1,6 @@
 package ext
 
-// Allocation benchmarks for the [opt40] ext runtime optimizations
-// (PASS-opt40): ParseCatalog/ParseManifestFull single-decode paths,
-// pre-sized limited reads for zip members and net.fetch bodies, the
-// allocation-free checksum comparison in Verify, and the copy-free
-// CSP head search. B/op and allocs/op are the decision metrics;
-// ns/op on this VM is noise. Rejected candidates (token verify,
-// hostAllowed) measured 0 B/op before any change and are not kept here.
+// Allocation benchmarks for manifest parsing, package verification and fetches.
 
 import (
 	"archive/zip"
@@ -16,52 +10,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"testing"
 	"time"
 )
-
-// --- token verify ---
-
-func benchCatalogJSON(b *testing.B, n int) []byte {
-	pub := testPubKeyLine(&testing.T{})
-	c := Catalog{Version: 1, UpdatedAt: "2026-10-20T00:00:00Z", MaxAge: 3600}
-	for i := 0; i < n; i++ {
-		c.Extensions = append(c.Extensions, Entry{
-			ID: fmt.Sprintf("com.example.ext%d", i), Name: "Ext", Version: "1.0.0",
-			Author: "A", AuthorID: "github:a", AuthorKey: pub,
-			Permissions: []string{"connections.read"}, DownloadURL: "https://example.com/x.soraext",
-			Sha256: strings.Repeat("ab", 32), Size: 1024, MinAppVer: "1.0.0",
-		})
-	}
-	raw, err := json.Marshal(c)
-	if err != nil {
-		b.Fatal(err)
-	}
-	return raw
-}
-
-func BenchmarkOpt40ParseCatalog100(b *testing.B) {
-	raw := benchCatalogJSON(b, 100)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		if _, err := ParseCatalog(raw); err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
-func BenchmarkOpt40ParseCatalog500(b *testing.B) {
-	raw := benchCatalogJSON(b, 500)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		if _, err := ParseCatalog(raw); err != nil {
-			b.Fatal(err)
-		}
-	}
-}
 
 // --- manifest ---
 
@@ -208,26 +159,6 @@ func BenchmarkOpt40VerifyLarge4MiB(b *testing.B) {
 		if err := pkg.Verify(); err != nil {
 			b.Fatal(err)
 		}
-	}
-}
-
-// --- CSP ---
-
-func BenchmarkOpt40InjectCSP64K(b *testing.B) {
-	html := append([]byte("<html><head><title>t</title></head><body>"), bytes.Repeat([]byte("y"), 64<<10)...)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = injectPanelCSP(html)
-	}
-}
-
-func BenchmarkOpt40InjectCSP1M(b *testing.B) {
-	html := append([]byte("<html><head><title>t</title></head><body>"), bytes.Repeat([]byte("y"), 1<<20)...)
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = injectPanelCSP(html)
 	}
 }
 

@@ -1,7 +1,9 @@
 # Extension cookbook
 
 Copy-paste recipes. Each assumes a scaffolded panel project
-(`sora-ext scaffold … --template panel`). Test every recipe with
+(`sora-ext scaffold … --template panel`). The app owns installation,
+settings and grants; workers run through its control-authenticated
+RunWorker stream. Test panel recipes with
 `sora-ext serve` before installing in the app.
 
 ## 1. Refresh on a setting

@@ -5,12 +5,15 @@
 @TestOn('linux')
 library;
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:grpc/grpc.dart' show GrpcError, StatusCode;
 import 'package:sora/src/core/link.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'package:sora/src/generated/sora/custom/v1/custom.pbgrpc.dart';
+import 'package:sora/src/generated/sora/ext/v1/ext_host.pbgrpc.dart';
 import 'package:sora/src/ui/addserver.dart';
 
 void main() {
@@ -48,6 +51,38 @@ void main() {
 
   test('the core negotiates the feature contract', () {
     expect(link.minor, apiVersion.minor);
+  }, skip: skip);
+
+  test('workers use the app control token without a service extension registry', () async {
+    final denied = link.extensions.runWorker(Stream.value(WorkerClientMessage(controlToken: [0])));
+    await expectLater(
+      denied.first,
+      throwsA(isA<GrpcError>().having((e) => e.code, 'code', StatusCode.unauthenticated)),
+    );
+
+    final input = StreamController<WorkerClientMessage>();
+    final stream = link.extensions.runWorker(input.stream);
+    input.add(
+      WorkerClientMessage(
+        controlToken: link.token,
+        manifestJson:
+            '{"manifest_version":1,"id":"com.example.live-worker","name":"Live Worker",'
+            '"version":"1.0.0","min_app_version":"1.0.0",'
+            '"author":{"name":"Test","identity":"github:example",'
+            '"public_key":"RWQAAAAAAAAAAHd26HC5M1TyoLJMI/KjbMToDiIyGMG5eSb90Bg5aiub"},'
+            '"permissions":["background"],"capabilities":["background"],'
+            '"background_task":{"interval_minutes":15,"entry":"worker.js"}}',
+        source: "console.log('live worker');",
+        configJson: '{"enabled":true,"interval_minutes":15}',
+      ),
+    );
+    try {
+      expect((await stream.first.timeout(const Duration(seconds: 5))).log, 'background worker scheduled');
+      expect(await Directory('${dir.path}/data/extensions').exists(), isFalse);
+    } finally {
+      await stream.cancel();
+      await input.close();
+    }
   }, skip: skip);
 
   test('a hand added server round-trips without exposing its secret', () async {

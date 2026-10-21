@@ -9,9 +9,8 @@ package ext
 //
 // It is the user's override of the manifest's declared background_task:
 // "enabled" toggles the worker on/off, "interval_minutes" replaces the
-// declared interval. The Go runtime reads the file through
-// Store.GetBackgroundConfig and the Scheduler applies it at Register time
-// via RegisterConfig.
+// declared interval. The app sends the resolved configuration over RunWorker;
+// the core never reads the app's store directory.
 //
 // Parsing is deliberately tolerant, mirroring the Dart side: a missing file
 // seeds defaults from the manifest declaration, a corrupt file or a bad
@@ -21,11 +20,7 @@ package ext
 
 import (
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"time"
-
-	"github.com/levvs-one/sora-client/core/errs"
 )
 
 // DefaultBackgroundIntervalMinutes is the fallback worker interval in
@@ -34,7 +29,7 @@ import (
 const DefaultBackgroundIntervalMinutes = 60
 
 // BackgroundConfig is the runtime user configuration for one extension's
-// background worker, read from <store>/<id>.background.json.
+// background worker, supplied by the app over RunWorker.
 //
 // JSON schema (mirrors the Dart BackgroundTaskConfig):
 //
@@ -89,12 +84,9 @@ func clampBackgroundMinutes(minutes int) int {
 	return minutes
 }
 
-// ParseBackgroundConfig parses one <id>.background.json document. It is
-// tolerant by design, mirroring the Dart side: unknown fields are ignored,
-// a missing field keeps its default, and ok=false (with defaults returned)
-// on any structural problem - a non-object document, a type mismatch, or a
-// JSON syntax error. The caller falls back to defaults; the next app-side
-// save repairs the file.
+// ParseBackgroundConfig parses the app configuration sent over RunWorker.
+// Unknown fields are ignored and absent fields keep their defaults. Bad
+// field types or JSON return ok=false; RunWorker rejects that configuration.
 func ParseBackgroundConfig(raw []byte) (cfg BackgroundConfig, ok bool) {
 	cfg = DefaultBackgroundConfig()
 	// Decode into anys so a wrong field type (e.g. "enabled": 1, which the
@@ -127,43 +119,4 @@ func ParseBackgroundConfig(raw []byte) (cfg BackgroundConfig, ok bool) {
 	}
 	cfg.IntervalMinutes = clampBackgroundMinutes(cfg.IntervalMinutes)
 	return cfg, true
-}
-
-// backgroundPath is the per-extension background task config file,
-// mirroring the Dart ExtensionStore._backgroundFile ("<id>.background.json").
-func (s *Store) backgroundPath(id string) string {
-	return filepath.Join(s.dir, id+".background.json")
-}
-
-// GetBackgroundConfig reads the user's background task override for an
-// installed extension. A missing file seeds defaults from the manifest's
-// declared background_task (enabled); a corrupt file falls back to the same
-// defaults, mirroring the Dart ExtensionStore.getBackgroundTask.
-func (s *Store) GetBackgroundConfig(id string) (BackgroundConfig, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	inst, ok := s.installed[id]
-	if !ok {
-		return BackgroundConfig{}, errs.Newf(errs.CodeNotFound, KeyLifecycle, "ext: %q is not installed", id)
-	}
-	var x ManifestExt
-	if len(inst.ExtJSON) > 0 {
-		// The registry only ever stores what marshalManifestExt wrote, so
-		// this cannot fail; a failure seeds the unseeded default instead
-		// of erroring the read.
-		_ = json.Unmarshal(inst.ExtJSON, &x)
-	}
-	def := BackgroundDefaults(&x)
-	raw, err := os.ReadFile(s.backgroundPath(id)) //nolint:gosec // fixed suffix inside the store dir
-	if err != nil {
-		if os.IsNotExist(err) {
-			return def, nil
-		}
-		return BackgroundConfig{}, errs.Newf(errs.CodeInternal, KeyLifecycle,
-			"ext: cannot read the background config of %q: %v", id, err)
-	}
-	if cfg, ok := ParseBackgroundConfig(raw); ok {
-		return cfg, nil
-	}
-	return def, nil
 }
