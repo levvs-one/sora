@@ -47,12 +47,21 @@ func TestStrictNftIntegration(t *testing.T) {
 	default:
 		for _, tool := range []string{"unshare", "nsenter", "ip", "nft"} {
 			if _, err := exec.LookPath(tool); err != nil {
+				if os.Getenv("SORA_NFT_REQUIRED") != "" {
+					t.Fatal(tool + " unavailable")
+				}
 				t.Skip(tool + " unavailable")
 			}
 		}
 		cmd := exec.CommandContext(t.Context(), "unshare", "-Urn", os.Args[0], "-test.run=^TestStrictNftIntegration$", "-test.v")
 		cmd.Env = append(os.Environ(), "SORA_NFT_STAGE=network")
 		output, err := cmd.CombinedOutput()
+		// Some hosts (Ubuntu 24.04 runners among them) forbid unprivileged
+		// user namespaces. CI runs this test again as root with
+		// SORA_NFT_REQUIRED=1, where a skip would hide a real failure.
+		if err != nil && strings.Contains(string(output), "uid_map") && os.Getenv("SORA_NFT_REQUIRED") == "" {
+			t.Skipf("unprivileged user namespaces are not allowed here: %s", strings.TrimSpace(string(output)))
+		}
 		if err != nil {
 			t.Fatalf("isolated nft integration: %v\n%s", err, output)
 		}

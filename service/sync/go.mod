@@ -2,6 +2,8 @@ module github.com/levvs-one/sora-client/sync
 
 go 1.26.9
 
+toolchain go1.27.3
+
 require (
 	github.com/flynn/noise v1.1.0
 	github.com/hashicorp/mdns v1.0.7

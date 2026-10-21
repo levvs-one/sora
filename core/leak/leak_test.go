@@ -551,8 +551,10 @@ func TestTunnelTCPProberHandshakeOnLoopback(t *testing.T) {
 	if err != nil {
 		t.Fatalf("production TCP prober failed on loopback: %v", err)
 	}
-	if rtt <= 0 {
-		t.Fatalf("production TCP prober reported non-positive RTT: %v", rtt)
+	// A loopback handshake can finish within one tick of the Windows clock,
+	// so zero is a valid reading there; a negative one never is.
+	if rtt < 0 {
+		t.Fatalf("production TCP prober reported a negative RTT: %v", rtt)
 	}
 }
 

@@ -96,6 +96,12 @@ jobs:
         run: go vet ./...
       - name: Test
         run: go test -race ./...
+      - name: Strict kill switch firewall in a private network
+        run: |
+          sudo apt-get install -y -qq nftables
+          go test -race -c -o "$RUNNER_TEMP/sora-guard-tests" ./guard
+          sudo env "PATH=$PATH" SORA_NFT_REQUIRED=1 "$RUNNER_TEMP/sora-guard-tests" \
+            -test.v -test.run '^TestStrictNftIntegration$' -test.timeout 3m
       - name: Real packet capture in a private network
         run: |
           go test -race -c -o "$RUNNER_TEMP/sora-packet-tests" ./diagnostics
