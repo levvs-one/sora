@@ -24,6 +24,7 @@ import '../../ext/permissions.dart';
 import '../../ext/revoke.dart';
 import '../../ext/store.dart';
 import '../../ext/verifier.dart';
+import '../../sora.dart';
 import 'conflicts_sheet.dart';
 import 'detail_screen.dart';
 import 'permissions_sheet.dart';
@@ -39,6 +40,7 @@ class ExtensionsScreen extends StatefulWidget {
 class _ExtensionsScreenState extends State<ExtensionsScreen> {
   late final ExtensionStore _store = ExtensionStore();
   bool _ready = false;
+  bool _wired = false;
 
   @override
   void initState() {
@@ -46,6 +48,26 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     _store.load().then((_) {
       if (mounted) setState(() => _ready = true);
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_wired) return;
+    _wired = true;
+    // Anti-DPI write-through cleanup: when the extension that owns the
+    // applied global strategy is disabled or removed, its strategy slot
+    // in app settings goes with it (the core side drops its layer in
+    // the plan merge for disabled extensions; this is the app-side
+    // half).
+    try {
+      final settings = SoraScope.read(context).settings;
+      _store.onExtensionGone = (id) {
+        if (settings.antidpiStrategySource == id) settings.clearAntidpiStrategy();
+      };
+    } catch (_) {
+      // No app state above this screen (widget tests): nothing to clear.
+    }
   }
 
   @override

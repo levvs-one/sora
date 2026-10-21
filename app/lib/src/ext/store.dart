@@ -130,6 +130,14 @@ class ExtensionStore extends ChangeNotifier {
   final _installed = <String, InstalledExtension>{};
   bool _loaded = false;
 
+  /// Called with an extension's id after it is disabled or uninstalled
+  /// (never on enable), including revocation-sweep disables. The app
+  /// wires this to drop app-side state the extension owned — the
+  /// Anti-DPI write-through strategy slot in app settings
+  /// (Settings.antidpiStrategySource). Set once by the section that owns
+  /// this store; null in tests and headless use.
+  void Function(String extensionId)? onExtensionGone;
+
   bool get loaded => _loaded;
   List<InstalledExtension> get installed =>
       _installed.values.toList()..sort((a, b) => a.manifest.name.compareTo(b.manifest.name));
@@ -263,7 +271,12 @@ class ExtensionStore extends ChangeNotifier {
         disabled.add(e.key);
       }
     }
-    if (disabled.isNotEmpty) await _save();
+    if (disabled.isNotEmpty) {
+      await _save();
+      for (final id in disabled) {
+        onExtensionGone?.call(id);
+      }
+    }
     return disabled;
   }
 
@@ -530,6 +543,7 @@ class ExtensionStore extends ChangeNotifier {
     if (enabled) _checkRevocations(id, cur.version);
     _installed[id] = cur.copyWith(enabled: enabled);
     await _save();
+    if (!enabled) onExtensionGone?.call(id);
     notifyListeners();
   }
 
@@ -596,6 +610,7 @@ class ExtensionStore extends ChangeNotifier {
     if (await background.exists()) await background.delete();
     _installed.remove(id);
     await _save();
+    onExtensionGone?.call(id);
     notifyListeners();
   }
 

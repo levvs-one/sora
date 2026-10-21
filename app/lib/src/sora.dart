@@ -14,6 +14,7 @@ import '../l10n/strings.dart';
 
 import 'core/link.dart';
 import 'core/censor.dart';
+import 'ext/bypass.dart';
 import 'browser_diagnostics.dart';
 import 'chains.dart';
 // The proto messages NetworkProfile/NetworkFingerprint collide with the
@@ -2498,6 +2499,31 @@ SessionPlan buildPlan({
       if (serverSubscription[o.id] != null) serverSubscription[o.id]!,
   ];
 
+  // The handshake strategy both zapret consumers (the bypass outbound
+  // and zapret-with-VPN) carry. Anti-DPI write-through wins wholesale: a
+  // full strategy an extension applied (Settings.antidpiStrategyJson) is
+  // complete, not a patch over the user's fields, so it replaces the
+  // four legacy fields entirely. A slot that does not parse falls back
+  // to the legacy fields instead of failing the connect — the slot is
+  // extension-written data and must never brick the plan.
+  BypassStrategy bypassStrategy() {
+    final raw = settings.antidpiStrategyJson;
+    if (raw.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map<String, dynamic>) return bypassStrategyFromJson(decoded);
+      } catch (_) {
+        // Fall through to the legacy fields.
+      }
+    }
+    return BypassStrategy(
+      splitPos: settings.splitPos,
+      disorder: settings.disorder,
+      tlsRecord: settings.tlsRecord,
+      hostCase: settings.hostCase,
+    );
+  }
+
   // F11: zapret's tpws alongside the VPN tunnel (Linux only, needs tpws in
   // the engines directory); never in serverless bypass mode.
   if (zapretWithVpn && choice != 'bypass') {
@@ -2506,12 +2532,7 @@ SessionPlan buildPlan({
     // back to its own defaults and silently ignores the zapret settings
     // (splitPos, disorder, tlsRecord, hostCase) the user configured for the
     // bypass outbound.
-    plan.zapretStrategy = BypassStrategy(
-      splitPos: settings.splitPos,
-      disorder: settings.disorder,
-      tlsRecord: settings.tlsRecord,
-      hostCase: settings.hostCase,
-    );
+    plan.zapretStrategy = bypassStrategy();
   }
 
   // F8: a proxy chain carries its hop outbounds and the ordered hop ids; the
@@ -2533,12 +2554,7 @@ SessionPlan buildPlan({
         id: Sora.bypassId,
         displayName: 'zapret',
         protocol: 'bypass',
-        bypass: BypassStrategy(
-          splitPos: settings.splitPos,
-          disorder: settings.disorder,
-          tlsRecord: settings.tlsRecord,
-          hostCase: settings.hostCase,
-        ),
+        bypass: bypassStrategy(),
       ),
     );
     plan.routing.proxyTarget = Sora.bypassId;

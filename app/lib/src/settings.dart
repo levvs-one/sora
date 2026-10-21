@@ -49,6 +49,8 @@ class Settings {
     'disorder',
     'tlsRecord',
     'hostCase',
+    'antidpiStrategyJson',
+    'antidpiStrategySource',
     'controlPort',
     'rules',
     'failover',
@@ -218,15 +220,52 @@ class Settings {
   /// zapret handshake splitting for bypass mode. Defaults match the strategy
   /// verified with real traffic by the interop test.
   List<String> get splitPos => _store.getStringList('splitPos') ?? const ['1', 'midsld'];
-  set splitPos(List<String> value) => _store.setStringList('splitPos', value);
+  set splitPos(List<String> value) {
+    _store.setStringList('splitPos', value);
+    clearAntidpiStrategy();
+  }
   bool get disorder => _store.getBool('disorder') ?? true;
-  set disorder(bool value) => _store.setBool('disorder', value);
+  set disorder(bool value) {
+    _store.setBool('disorder', value);
+    clearAntidpiStrategy();
+  }
 
   /// TLS ClientHello record split position; empty disables splitting.
   String get tlsRecord => _store.getString('tlsRecord') ?? '';
-  set tlsRecord(String value) => _store.setString('tlsRecord', value);
+  set tlsRecord(String value) {
+    _store.setString('tlsRecord', value);
+    clearAntidpiStrategy();
+  }
   bool get hostCase => _store.getBool('hostCase') ?? true;
-  set hostCase(bool value) => _store.setBool('hostCase', value);
+  set hostCase(bool value) {
+    _store.setBool('hostCase', value);
+    clearAntidpiStrategy();
+  }
+
+  /// Full Anti-DPI bypass strategy as bridge JSON (snake_case proto
+  /// field names, see ext/bypass.dart), written through by an extension
+  /// holding `bypass.write` when it applies a layer: the panel's
+  /// applyBypassLayer writes the layer's global strategy here after the
+  /// core accepts it, and buildPlan then uses the complete strategy
+  /// instead of the four legacy fields above. Empty when no extension
+  /// owns the global strategy. The user always wins: editing any legacy
+  /// field clears this slot (see the setters above), as does disabling
+  /// or uninstalling the owning extension.
+  String get antidpiStrategyJson => _store.getString('antidpiStrategyJson') ?? '';
+  set antidpiStrategyJson(String value) => _store.setString('antidpiStrategyJson', value);
+
+  /// Id of the extension that wrote [antidpiStrategyJson]; always
+  /// cleared together with it.
+  String get antidpiStrategySource => _store.getString('antidpiStrategySource') ?? '';
+  set antidpiStrategySource(String value) => _store.setString('antidpiStrategySource', value);
+
+  /// Drops the extension-owned Anti-DPI strategy slot. Fire-and-forget
+  /// like the setters: the in-memory cache updates synchronously, so the
+  /// next buildPlan already sees the slot gone.
+  void clearAntidpiStrategy() {
+    _store.remove('antidpiStrategyJson');
+    _store.remove('antidpiStrategySource');
+  }
 
   /// Allows loopback engine control, required by sing-box, which lacks
   /// connection listing and counters. Other apps can discover the port, so
