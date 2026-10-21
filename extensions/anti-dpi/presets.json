@@ -1,0 +1,481 @@
+{
+  "presets_version": 1,
+  "comment": "Anti-DPI preset library. Registry strategies are derived from core/tune/desync/registry.go Params through Params.BypassStrategy() (core/tune/desync/params.go) — see each preset's 'source'. The 'midsni' split position is the registry marker (core/engine/bypass MidSNIMarker): the core resolves it against the actual SNI before applying. Classics are the tpws strategies from core/engine/bypass Args and the app settings defaults.",
+  "presets": [
+    {
+      "id": "sni_block/split-midsni",
+      "name": {
+        "en": "Mid-SNI split",
+        "ru": "Сплит посередине SNI"
+      },
+      "description": {
+        "en": "Splits the TLS ClientHello in the middle of the actual SNI hostname. The 'midsni' position is a registry marker: the core resolves it against the real target SNI before the strategy is applied, so the cut always lands inside the hostname the censor tries to read.",
+        "ru": "Режет TLS ClientHello посередине фактического имени SNI. Позиция «midsni» — реестровый маркер: ядро разрешает его по реальному SNI цели до применения стратегии, поэтому разрез всегда попадает внутрь имени, которое пытается прочитать цензор."
+      },
+      "targets": {
+        "en": "SNI block: the censor reads the ClientHello SNI and kills the connection.",
+        "ru": "Блокировка по SNI: цензор читает SNI из ClientHello и рвёт соединение."
+      },
+      "cost": {
+        "en": "Cheapest possible footprint: no fake packets, no extra traffic. A censor that fully reassembles the stream before inspecting it is not fooled.",
+        "ru": "Минимальный след: без фейковых пакетов и лишнего трафика. Цензор, полностью собирающий поток до инспекции, не обманется."
+      },
+      "backends": [
+        "tpws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "midsni"
+        ]
+      },
+      "source": "core/tune/desync/registry.go sni_block/split-midsni via Params.BypassStrategy() (MethodSplit, marker position, tpws rendering)"
+    },
+    {
+      "id": "sni_block/fake-autottl-badseq",
+      "name": {
+        "en": "Fake ClientHello, autottl + badseq",
+        "ru": "Фейковый ClientHello, autottl + badseq"
+      },
+      "description": {
+        "en": "Injects a fake TLS ClientHello ahead of the real one. The censor classifies and bites the fake; autottl calibrates the fake's TTL from the path so it dies before reaching the server, and badseq fooling makes the censor's stack drop it while the real server would tolerate it.",
+        "ru": "Вставляет фейковый TLS ClientHello перед настоящим. Цензор классифицирует и «кусает» фейк; autottl калибрует TTL фейка по пути, чтобы он умер, не дойдя до сервера, а fooling badseq заставляет стек цензора его отбросить."
+      },
+      "targets": {
+        "en": "SNI block on nfqws-capable setups (Linux).",
+        "ru": "Блокировка по SNI, где доступен nfqws (Linux)."
+      },
+      "cost": {
+        "en": "Needs the nfqws backend (packet queue, elevated privileges). Autottl needs a short calibration; on paths where the calibration is wrong the fake can occasionally reach the server — the badseq fooling is what protects the real handshake then.",
+        "ru": "Нужен бэкенд nfqws (очередь пакетов, повышенные привилегии). Autottl требует короткой калибровки; если она ошиблась, фейк изредка может дойти до сервера — тогда настоящий handshake защищает fooling badseq."
+      },
+      "backends": [
+        "nfqws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "2"
+        ],
+        "desync": [
+          "fake"
+        ],
+        "fake_tls": "tls",
+        "fooling": "badseq",
+        "auto_ttl": true,
+        "filter_tcp": "80,443",
+        "filter_l7": "tls"
+      },
+      "source": "core/tune/desync/registry.go sni_block/fake-autottl-badseq via Params.BypassStrategy() (MethodFake)"
+    },
+    {
+      "id": "sni_block/disorder-midsni",
+      "name": {
+        "en": "Disorder mid-SNI, md5sig",
+        "ru": "Disorder посередине SNI, md5sig"
+      },
+      "description": {
+        "en": "Splits the ClientHello mid-SNI and sends the second part first (nfqws disorder2). A reassembly-based DPI has to hold and reorder segments before it can read the SNI; md5sig fooling degrades the out-of-order segment so the censor's stack drops it while the server reassembles the real stream.",
+        "ru": "Режет ClientHello посередине SNI и отправляет вторую часть первой (nfqws disorder2). DPI с реассемблингом вынужден держать и переупорядочивать сегменты, прежде чем прочитать SNI; fooling md5sig портит внеочередной сегмент так, что стек цензора его отбрасывает, а сервер собирает настоящий поток."
+      },
+      "targets": {
+        "en": "SNI block, including censors that reassemble TCP streams.",
+        "ru": "Блокировка по SNI, включая цензоров с реассемблингом TCP-потока."
+      },
+      "cost": {
+        "en": "Needs nfqws. Disorder breaks some strict servers and middleboxes: if a site stops opening with this preset, fall back to the plain mid-SNI split.",
+        "ru": "Нужен nfqws. Disorder ломает некоторые строгие серверы и мидлбоксы: если сайт перестал открываться, откатитесь на обычный сплит посередине SNI."
+      },
+      "backends": [
+        "nfqws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "midsni"
+        ],
+        "desync": [
+          "disorder2"
+        ],
+        "fooling": "md5sig",
+        "filter_tcp": "80,443",
+        "filter_l7": "tls"
+      },
+      "source": "core/tune/desync/registry.go sni_block/disorder-midsni via Params.BypassStrategy() (MethodDisorder + fooling forces nfqws disorder2)"
+    },
+    {
+      "id": "sni_block/tlsrec",
+      "name": {
+        "en": "TLS record split at SNI extension",
+        "ru": "Сплит TLS-записи на расширении SNI"
+      },
+      "description": {
+        "en": "Re-splits the ClientHello into two TLS records at sniext+1 — right after the SNI extension starts. Many censors parse only the first record, so the SNI is never seen whole. The cheapest trick in the set: plain tpws, no packet injection.",
+        "ru": "Перерезает ClientHello на две TLS-записи в точке sniext+1 — сразу после начала расширения SNI. Многие цензоры парсят только первую запись и не видят SNI целиком. Самый дешёвый приём набора: обычный tpws, без инжекции пакетов."
+      },
+      "targets": {
+        "en": "SNI block; first thing to try where nfqws is unavailable.",
+        "ru": "Блокировка по SNI; первый кандидат там, где nfqws недоступен."
+      },
+      "cost": {
+        "en": "A censor that reassembles TLS records across the stream defeats it. No effect on plain HTTP or QUIC.",
+        "ru": "Цензор, собирающий TLS-записи через весь поток, его обходит. Не действует на обычный HTTP и QUIC."
+      },
+      "backends": [
+        "tpws"
+      ],
+      "strategy": {
+        "tls_record": "sniext+1"
+      },
+      "source": "core/tune/desync/registry.go sni_block/tlsrec via Params.BypassStrategy() (MethodTLSRec clears split_pos into tls_record)"
+    },
+    {
+      "id": "stall/fake-repeats",
+      "name": {
+        "en": "Repeated fake, TTL 5",
+        "ru": "Повторный фейк, TTL 5"
+      },
+      "description": {
+        "en": "Injects the fake TLS ClientHello twice (repeats 2) with a fixed TTL of 5 hops. For censors that sample packets and stall the handshake while classifying: the repeated fake keeps the classifier busy on packets that never reach the server.",
+        "ru": "Вставляет фейковый TLS ClientHello дважды (repeats 2) с фиксированным TTL в 5 хопов. Для цензоров, которые сэмплируют пакеты и замораживают handshake на время классификации: повторный фейк занимает классификатор пакетами, которые никогда не дойдут до сервера."
+      },
+      "targets": {
+        "en": "Stall: the handshake (or the session right after it) freezes.",
+        "ru": "Зависание (stall): handshake или сессия сразу после него замерзает."
+      },
+      "cost": {
+        "en": "Fixed TTL is a guess about your path: too small and the fake dies before the censor (no effect), too large and it can reach the server. Honest limit from the registry: a stall that is pure post-handshake throttling is a data-plane freeze — desync only helps when the freeze is keyed on the handshake.",
+        "ru": "Фиксированный TTL — догадка о вашем пути: слишком мал — фейк умрёт до цензора (нет эффекта), слишком велик — может дойти до сервера. Честный предел из реестра: зависание как чистая пост-handshake троттлинг — это фриз плоскости данных; desync помогает, только если фриз завязан на handshake."
+      },
+      "backends": [
+        "nfqws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "2"
+        ],
+        "desync": [
+          "fake"
+        ],
+        "fake_tls": "tls",
+        "ttl": 5,
+        "repeats": 2,
+        "filter_tcp": "80,443",
+        "filter_l7": "tls"
+      },
+      "source": "core/tune/desync/registry.go stall/fake-repeats via Params.BypassStrategy() (MethodFake, TTL 5, Repeats 2)"
+    },
+    {
+      "id": "stall/fake-sniext-autottl",
+      "name": {
+        "en": "Fake at SNI extension, autottl",
+        "ru": "Фейк на расширении SNI, autottl"
+      },
+      "description": {
+        "en": "Injects a fake ClientHello at the SNI extension boundary (sniext+1) with autottl instead of a fixed TTL: changes the stall-triggering byte layout without betting on a hop count.",
+        "ru": "Вставляет фейковый ClientHello на границе расширения SNI (sniext+1) с autottl вместо фиксированного TTL: меняет байтовую раскладку, провоцирующую зависание, без ставки на число хопов."
+      },
+      "targets": {
+        "en": "Stall keyed on the handshake layout.",
+        "ru": "Зависание, завязанное на раскладку handshake."
+      },
+      "cost": {
+        "en": "Needs nfqws and a calibratable path for autottl. Like every stall preset, it cannot fix throttling that starts after the handshake.",
+        "ru": "Нужен nfqws и калибруемый путь для autottl. Как и все пресеты от зависаний, не чинит троттлинг, начинающийся после handshake."
+      },
+      "backends": [
+        "nfqws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "sniext+1"
+        ],
+        "desync": [
+          "fake"
+        ],
+        "fake_tls": "tls",
+        "auto_ttl": true,
+        "filter_tcp": "80,443",
+        "filter_l7": "tls"
+      },
+      "source": "core/tune/desync/registry.go stall/fake-sniext-autottl via Params.BypassStrategy() (MethodFake, AutoTTL)"
+    },
+    {
+      "id": "quic_throttle/fake-quic-ttl",
+      "name": {
+        "en": "Fake QUIC Initial, TTL 3",
+        "ru": "Фейковый QUIC Initial, TTL 3"
+      },
+      "description": {
+        "en": "Injects a fake QUIC Initial (the shipped payload file) with a TTL of 3 before the real Initial. The censor classifies the fake; the real Initial follows untouched. QUIC has no built-in fake in zapret, so the payload is the file the core ships (the 'quic' keyword resolves to it).",
+        "ru": "Вставляет фейковый QUIC Initial (поставляемый файл полезной нагрузки) с TTL 3 перед настоящим Initial. Цензор классифицирует фейк; настоящий Initial идёт следом нетронутым. Встроенного фейка для QUIC в zapret нет, поэтому нагрузка — файл, который поставляет ядро (ключевое слово «quic» разрешается в него)."
+      },
+      "targets": {
+        "en": "QUIC throttle: UDP/443 is dropped or squeezed.",
+        "ru": "Троттлинг QUIC: UDP/443 режется или ужимается."
+      },
+      "cost": {
+        "en": "Fixed TTL 3 is a short-path guess: on longer paths to the censor the fake may die too early. Needs nfqws with UDP filtering on port 443.",
+        "ru": "Фиксированный TTL 3 — ставка на короткий путь: если цензор дальше, фейк может умереть слишком рано. Нужен nfqws с фильтрацией UDP на порту 443."
+      },
+      "backends": [
+        "nfqws"
+      ],
+      "strategy": {
+        "desync": [
+          "fake"
+        ],
+        "fake_quic": "quic",
+        "ttl": 3,
+        "filter_udp": "443",
+        "filter_l7": "quic"
+      },
+      "source": "core/tune/desync/registry.go quic_throttle/fake-quic-ttl via Params.BypassStrategy() (MethodFake, FakeProto quic -> fake_quic + UDP filter)"
+    },
+    {
+      "id": "quic_throttle/fake-quic-split-autottl",
+      "name": {
+        "en": "Fake QUIC Initial + split, autottl",
+        "ru": "Фейковый QUIC Initial + сплит, autottl"
+      },
+      "description": {
+        "en": "Combines a fake QUIC Initial with a split of the real Initial at byte 2, with autottl calibration instead of a fixed TTL. For throttles keyed on the Initial's embedded SNI: the censor sees a fake, then a fragmented real handshake.",
+        "ru": "Сочетает фейковый QUIC Initial со сплитом настоящего Initial на байте 2, с калибровкой autottl вместо фиксированного TTL. Для троттлинга по SNI внутри Initial: цензор видит фейк, а затем фрагментированный настоящий handshake."
+      },
+      "targets": {
+        "en": "QUIC throttle keyed on the Initial's SNI.",
+        "ru": "Троттлинг QUIC по SNI внутри Initial."
+      },
+      "cost": {
+        "en": "Needs nfqws and autottl calibration. Splitting the Initial can break strict QUIC stacks; if QUIC fails entirely, the browser/app falls back to TCP — check whether that fallback is what you actually measured.",
+        "ru": "Нужен nfqws и калибровка autottl. Сплит Initial может ломать строгие QUIC-стеки; если QUIC упадёт полностью, браузер/приложение откатится на TCP — проверяйте, что вы измерили именно это."
+      },
+      "backends": [
+        "nfqws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "2"
+        ],
+        "desync": [
+          "fake"
+        ],
+        "fake_quic": "quic",
+        "auto_ttl": true,
+        "filter_udp": "443",
+        "filter_l7": "quic"
+      },
+      "source": "core/tune/desync/registry.go quic_throttle/fake-quic-split-autottl via Params.BypassStrategy() (MethodFake, AutoTTL, Scope QUIC)"
+    },
+    {
+      "id": "quic_throttle/split-quic",
+      "name": {
+        "en": "Split QUIC Initial, badseq",
+        "ru": "Сплит QUIC Initial, badseq"
+      },
+      "description": {
+        "en": "The lightest QUIC desync: nfqws split2 of the QUIC Initial at byte 1 with badseq fooling, and no fake payload at all. The censor's reassembly gives up on the out-of-window segment; the server reassembles the real Initial.",
+        "ru": "Самый лёгкий desync для QUIC: nfqws split2 QUIC Initial на байте 1 с fooling badseq и вообще без фейковой нагрузки. Реассемблинг цензора сдаётся на внеоконном сегменте; сервер собирает настоящий Initial."
+      },
+      "targets": {
+        "en": "QUIC throttle, minimal-footprint variant.",
+        "ru": "Троттлинг QUIC, вариант с минимальным следом."
+      },
+      "cost": {
+        "en": "Needs nfqws. No fake means nothing misleads a classifier that reads only the first fragment — if this fails, move to a fake-QUIC preset.",
+        "ru": "Нужен nfqws. Без фейка нечем обмануть классификатор, читающий только первый фрагмент, — если не сработало, переходите к пресетам с фейковым QUIC."
+      },
+      "backends": [
+        "nfqws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "1"
+        ],
+        "desync": [
+          "split2"
+        ],
+        "fooling": "badseq",
+        "filter_udp": "443",
+        "filter_l7": "quic"
+      },
+      "source": "core/tune/desync/registry.go quic_throttle/split-quic via Params.BypassStrategy() (MethodSplit + fooling forces nfqws split2, Scope QUIC filters)"
+    },
+    {
+      "id": "kz_variant/fake-md5sig-autottl",
+      "name": {
+        "en": "Fake with md5sig, autottl (KZ)",
+        "ru": "Фейк с md5sig, autottl (KZ)"
+      },
+      "description": {
+        "en": "Fake ClientHello with md5sig fooling and autottl, tuned for the Kazakh variant: a whitelist posture with MITM interception on non-whitelisted SNI, where SNI-keyed kills still occur at the border.",
+        "ru": "Фейковый ClientHello с fooling md5sig и autottl, настроенный на казахстанский вариант: whitelist-позиция с MITM-перехватом на не-whitelist SNI, где убийства по SNI на границе всё ещё встречаются."
+      },
+      "targets": {
+        "en": "KZ variant: border SNI kills under a whitelist/MITM posture.",
+        "ru": "Казахстанский вариант: убийства по SNI на границе при whitelist/MITM-позиции."
+      },
+      "cost": {
+        "en": "Honest limit from the registry: against a whitelist/MITM posture desync helps only the SNI-kill stage; a hard whitelist needs a whitelisted front, not a strategy. Needs nfqws.",
+        "ru": "Честный предел из реестра: против whitelist/MITM-позиции desync помогает только на стадии убийства по SNI; жёсткому whitelist нужен whitelist-фронт, а не стратегия. Нужен nfqws."
+      },
+      "backends": [
+        "nfqws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "1"
+        ],
+        "desync": [
+          "fake"
+        ],
+        "fake_tls": "tls",
+        "fooling": "md5sig",
+        "auto_ttl": true,
+        "filter_tcp": "80,443",
+        "filter_l7": "tls"
+      },
+      "source": "core/tune/desync/registry.go kz_variant/fake-md5sig-autottl via Params.BypassStrategy() (MethodFake, Fooling md5sig, AutoTTL)"
+    },
+    {
+      "id": "kz_variant/split-midsni",
+      "name": {
+        "en": "Mid-SNI split (KZ)",
+        "ru": "Сплит посередине SNI (KZ)"
+      },
+      "description": {
+        "en": "The marker-resolved mid-SNI split as the minimal-footprint strategy for the KZ border SNI check: one cut inside the hostname, nothing else on the wire.",
+        "ru": "Сплит посередине SNI с разрешением маркера — стратегия с минимальным следом для пограничной проверки SNI в KZ: один разрез внутри имени хоста и ничего лишнего на проводе."
+      },
+      "targets": {
+        "en": "KZ variant: the border SNI check stage.",
+        "ru": "Казахстанский вариант: стадия пограничной проверки SNI."
+      },
+      "cost": {
+        "en": "Same honest limit as every KZ preset: it answers only the SNI-kill stage, not a hard whitelist. Defeated by full stream reassembly.",
+        "ru": "Тот же честный предел, что у всех KZ-пресетов: отвечает только на стадию убийства по SNI, а не на жёсткий whitelist. Обходится полным реассемблингом потока."
+      },
+      "backends": [
+        "tpws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "midsni"
+        ]
+      },
+      "source": "core/tune/desync/registry.go kz_variant/split-midsni via Params.BypassStrategy() (MethodSplit, marker position, tpws rendering)"
+    },
+    {
+      "id": "classic/app-default-split",
+      "name": {
+        "en": "App default: split 1 + midsld, disorder",
+        "ru": "Дефолт приложения: сплит 1 + midsld, disorder"
+      },
+      "description": {
+        "en": "The application's own default bypass: split the handshake after the first byte and in the middle of the second-level domain (midsld), then send the second part first (disorder). This is the strategy Sora falls back to in its own settings, so it is the baseline everything else is compared against.",
+        "ru": "Собственный дефолт приложения: сплит handshake после первого байта и посередине домена второго уровня (midsld), затем вторая часть отправляется первой (disorder). Это стратегия, на которую Sora откатывается в своих настройках, — базовая линия для сравнения."
+      },
+      "targets": {
+        "en": "General first try: SNI block and keyword DPI on TCP (HTTP/TLS).",
+        "ru": "Общий первый кандидат: блокировка по SNI и ключевым словам на TCP (HTTP/TLS)."
+      },
+      "cost": {
+        "en": "Disorder breaks some strict servers and middleboxes. tpws is TCP-only: no QUIC/UDP effect.",
+        "ru": "Disorder ломает некоторые строгие серверы и мидлбоксы. tpws работает только с TCP: на QUIC/UDP не действует."
+      },
+      "backends": [
+        "tpws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "1",
+          "midsld"
+        ],
+        "disorder": true
+      },
+      "source": "App settings default (app/lib/src/settings.dart splitPos ['1','midsld']; settings_screen disorder default), as prescribed for this package"
+    },
+    {
+      "id": "classic/tls-record-split",
+      "name": {
+        "en": "Classic TLS record split",
+        "ru": "Классический сплит TLS-записи"
+      },
+      "description": {
+        "en": "The classic tpws trick as a standalone preset: re-split the ClientHello into two TLS records at sniext+1 so a censor parsing only the first record never sees the whole SNI. Same strategy the registry seeds for the sni_block class, kept here as the named classic for direct use.",
+        "ru": "Классический приём tpws отдельным пресетом: перерезать ClientHello на две TLS-записи в точке sniext+1, чтобы цензор, парсящий только первую запись, не увидел SNI целиком. Та же стратегия, что реестр сеет для класса sni_block, здесь — как именованная классика для прямого применения."
+      },
+      "targets": {
+        "en": "SNI block, where nfqws is unavailable.",
+        "ru": "Блокировка по SNI там, где nfqws недоступен."
+      },
+      "cost": {
+        "en": "Defeated by censors that reassemble TLS records. No effect on plain HTTP or QUIC.",
+        "ru": "Обходится цензорами с реассемблингом TLS-записей. Не действует на обычный HTTP и QUIC."
+      },
+      "backends": [
+        "tpws"
+      ],
+      "strategy": {
+        "tls_record": "sniext+1"
+      },
+      "source": "Classic tpws --tlsrec=sniext+1 (compare registry sni_block/tlsrec)"
+    },
+    {
+      "id": "classic/http-reform",
+      "name": {
+        "en": "HTTP request reform",
+        "ru": "Реформа HTTP-запроса"
+      },
+      "description": {
+        "en": "Reshapes plain-HTTP requests so keyword DPI cannot match them literally: mixed case in the Host header (host_case) and in the domain (domain_case), an extra EOL after the method (method_eol), a trailing dot after the host name (host_dot) and an extra space after the method (method_space). Host-tab and host-no-space are deliberately left out: they fight method_space over the same separators, and unix_eol is left out because method_eol already varies the line the censor keys on.",
+        "ru": "Перекраивает обычные HTTP-запросы, чтобы DPI по ключевым словам не мог сопоставить их буквально: смешанный регистр в заголовке Host (host_case) и в домене (domain_case), лишний EOL после метода (method_eol), точка после имени хоста (host_dot) и лишний пробел после метода (method_space). Host-tab и host-no-space сознательно не включены: они спорят с method_space за те же разделители; unix_eol не включён, потому что method_eol уже меняет строку, на которую смотрит цензор."
+      },
+      "targets": {
+        "en": "Plain-HTTP keyword/host blocking (port 80).",
+        "ru": "Блокировка обычного HTTP по ключевым словам/хосту (порт 80)."
+      },
+      "cost": {
+        "en": "Only plain HTTP is reshaped — HTTPS is untouched. A few strict origin servers reject malformed-looking request lines; if a specific HTTP site breaks, drop method_space first.",
+        "ru": "Перекраивается только обычный HTTP — HTTPS не трогается. Некоторые строгие origin-серверы отвергают «кривые» строки запроса; если конкретный HTTP-сайт сломался, сначала уберите method_space."
+      },
+      "backends": [
+        "tpws"
+      ],
+      "strategy": {
+        "host_case": true,
+        "domain_case": true,
+        "method_eol": true,
+        "host_dot": true,
+        "method_space": true
+      },
+      "source": "Classic tpws HTTP shaping family (--hostcase/--domcase/--methodeol/--hostdot/--methodspace in core/engine/bypass Args)"
+    },
+    {
+      "id": "classic/multisplit-sni",
+      "name": {
+        "en": "Multisplit at SNI, any protocol",
+        "ru": "Мультисплит на SNI, любой протокол"
+      },
+      "description": {
+        "en": "Splits at the SNI marker (midsld — the middle of the second-level domain, where the registrable name sits) and lifts the usual HTTP/TLS-only limit: split_any_protocol applies the cut to the first flight of other protocols too. The marker is used instead of a byte count because SNI offsets move with every hostname, while midsld always lands inside the name the censor matches.",
+        "ru": "Режет на маркере SNI (midsld — середина домена второго уровня, где сидит регистрируемое имя) и снимает обычное ограничение «только HTTP/TLS»: split_any_protocol применяет разрез и к первому полёту других протоколов. Маркер вместо числа байтов — потому что смещения SNI плавают с каждым именем хоста, а midsld всегда попадает внутрь имени, которое сопоставляет цензор."
+      },
+      "targets": {
+        "en": "SNI block on mixed traffic, including protocols beyond HTTP/TLS.",
+        "ru": "Блокировка по SNI на смешанном трафике, включая протоколы за пределами HTTP/TLS."
+      },
+      "cost": {
+        "en": "split_any_protocol can break protocols whose first flight is not a handshake the server tolerates fragmented. If something non-web breaks, scope back to the plain mid-SNI split.",
+        "ru": "split_any_protocol может ломать протоколы, чей первый полёт сервер не терпит фрагментированным. Если сломалось что-то не-вебное, откатитесь на обычный сплит посередине SNI."
+      },
+      "backends": [
+        "tpws"
+      ],
+      "strategy": {
+        "split_pos": [
+          "midsld"
+        ],
+        "split_any_protocol": true
+      },
+      "source": "Classic tpws multisplit (--split-pos=midsld --split-any-protocol in core/engine/bypass Args)"
+    }
+  ]
+}

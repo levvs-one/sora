@@ -1,0 +1,570 @@
+{
+  "strings_version": 1,
+  "comment": "Anti-DPI panel strings. panel.js embeds an identical copy (generated from this file) because panels cannot fetch at runtime under the panel CSP (connect-src 'none'); keep the two in sync by regenerating panel.js data blocks from this file and presets.json.",
+  "en": {
+    "app_title": "Anti-DPI",
+    "app_sub": "DPI-bypass strategies for this device: presets, a full strategy editor, per-host bindings and automatic tuning.",
+    "tab_overview": "Overview",
+    "tab_presets": "Presets",
+    "tab_editor": "Editor",
+    "tab_bindings": "Bindings",
+    "tab_tune": "Auto-tune",
+    "tab_monitor": "Monitor",
+    "tab_profiles": "Profiles",
+    "loading": "Loading…",
+    "bridge_missing": "The extension bridge is unavailable. Open this panel inside Sora, or run it with the sora-ext dev server (mock).",
+    "platform": "Platform",
+    "backends": "Backends",
+    "backend_available": "available",
+    "backend_unavailable": "unavailable",
+    "current_state": "Current state",
+    "global_source": "Global strategy source",
+    "source_user": "Your in-app bypass settings",
+    "source_extension": "An extension (this layer)",
+    "source_core_default": "Core default",
+    "source_none": "No bypass configured",
+    "source_unknown": "Unknown source",
+    "global_from": "Set by",
+    "session_active": "VPN session",
+    "session_on": "connected",
+    "session_off": "not connected",
+    "pending_apply": "Pending apply",
+    "pending_yes": "Changes apply on the next connection",
+    "pending_no": "Nothing pending",
+    "bindings_count": "Bindings in this layer",
+    "active_global": "Active global strategy",
+    "no_global": "No global strategy in this layer.",
+    "custom_strategy": "Custom strategy",
+    "updated_at": "Layer updated",
+    "refresh": "Refresh",
+    "apply": "Apply",
+    "apply_global": "Apply as global",
+    "apply_layer": "Apply layer to core",
+    "confirm_apply_title": "Apply this layer?",
+    "confirm_apply_body": "The layer is sent to the core now and takes effect on the next connection. Your in-app bypass rules keep priority over this extension's bindings.",
+    "confirm": "Apply",
+    "cancel": "Cancel",
+    "applied_ok": "Layer applied. It takes effect on the next connection.",
+    "dirty": "Unsaved changes (not yet applied to the core)",
+    "clean": "In sync with the core layer",
+    "preset_apply": "Apply",
+    "preset_to_editor": "To editor",
+    "preset_targets": "Targets",
+    "preset_cost": "Cost / risks",
+    "preset_backends": "Backends",
+    "editor_intro": "Every BypassStrategy field. Validation mirrors the core: a strategy the core would reject is flagged here before you apply it.",
+    "group_split": "Split & order",
+    "group_tls": "TLS record",
+    "group_http": "HTTP form",
+    "group_desync": "nfqws desync",
+    "group_filters": "Port & L7 filters",
+    "gate_nfqws": "nfqws only",
+    "gate_tpws": "tpws only",
+    "gate_unavailable": "backend unavailable on this device",
+    "reset_to_preset": "Reset to preset",
+    "choose_preset": "Choose a preset…",
+    "list_hint": "One value per line.",
+    "validation_errors": "Fix these before applying:",
+    "strategy_empty_ok": "Empty strategy (clears the global strategy when applied).",
+    "bindings_intro": "A binding applies its strategy to one match: a domain, an address or a network (as you type it — the core matches it). Bindings are applied together with the global strategy in one layer.",
+    "bindings_precedence": "Precedence: your in-app bypass rules win over this extension's bindings. On conflict, the app keeps your rule and the binding is ignored for that traffic.",
+    "binding_match": "Match (domain / address / network)",
+    "binding_strategy": "Strategy",
+    "binding_add": "Add binding",
+    "binding_delete": "Delete",
+    "binding_edit": "Edit in editor",
+    "binding_from_preset": "from preset",
+    "binding_from_editor": "Use current editor strategy",
+    "bindings_empty": "No bindings yet.",
+    "tune_intro": "The core tries candidate strategies against your current network and scores them live. Nothing is applied automatically.",
+    "tune_engine": "Engine",
+    "tune_engine_auto": "Auto (core chooses)",
+    "tune_run": "Run auto-tune",
+    "tune_running": "Tuning… this can take a while.",
+    "tune_winner": "Winner",
+    "tune_score": "Score",
+    "tune_attempts": "Attempts",
+    "tune_apply_winner": "Apply winner as global",
+    "tune_bound_to_profile": "The core bound this winner to your network profile instead of returning a raw strategy: it will take effect through that profile when this network is matched. There is nothing to apply here manually.",
+    "tune_no_winner": "No winner was returned.",
+    "monitor_intro": "Censorship events reported by the core for this session.",
+    "monitor_empty": "No events yet. When the core detects censorship on a connection, it will appear here.",
+    "monitor_clear": "Clear list",
+    "profiles_intro": "Export or import the whole layer (global strategy + bindings) as JSON. Panels have no file dialogs, so copy and paste the text.",
+    "export_label": "Exported layer JSON",
+    "import_label": "Paste a layer JSON to import",
+    "import_preview": "Import preview",
+    "import_load": "Load into draft",
+    "import_invalid": "That text is not a valid layer:",
+    "reset_all": "Reset everything",
+    "reset_all_body": "Clears the draft global strategy and all bindings. Apply afterwards to push the empty layer to the core.",
+    "settings_language": "Panel language",
+    "lang_auto": "Auto (app/browser)",
+    "error_permission": "Permission denied: this extension was not granted the bypass permission this action needs.",
+    "error_invalid": "The core rejected the arguments as invalid.",
+    "error_internal": "The core could not complete the call (internal error).",
+    "error_generic": "The call failed.",
+    "censorship_event": "Censorship detected",
+    "event_session_connected": "Session connected",
+    "event_session_disconnected": "Session disconnected",
+    "event_panel_ready": "Panel ready",
+    "at_time": "at",
+    "fields": {
+      "split_pos": {
+        "label": "Split positions",
+        "hint": "Where the handshake is cut: byte counts (\"1\", \"-10\" counts from the end) or markers method/host/endhost/sld/midsld/endsld/sniext with an optional +N/-N offset. \"midsni\" is the registry marker for the middle of the actual SNI — the core resolves it per target. Up to 8 positions. Needed by disorder and oob."
+      },
+      "disorder": {
+        "label": "Disorder (send 2nd part first)",
+        "hint": "tpws: sends the second part of a split first. On nfqws this is spelled as the disorder/disorder2 desync method instead — core validation rejects disorder together with desync methods."
+      },
+      "disorder_scope": {
+        "label": "Disorder scope",
+        "hint": "Limits disorder to one protocol: empty = both, http, or tls. Requires disorder."
+      },
+      "oob": {
+        "label": "Out-of-band byte",
+        "hint": "tpws: attaches an out-of-band (urgent) byte at the split so DPI misreads the stream. Requires a split position."
+      },
+      "oob_scope": {
+        "label": "OOB scope",
+        "hint": "Limits the out-of-band byte to one protocol: empty = both, http, or tls. Requires oob."
+      },
+      "oob_data": {
+        "label": "OOB byte value",
+        "hint": "Overrides the default 0x00 out-of-band byte: one character or 0xHH hex. Requires oob."
+      },
+      "split_any_protocol": {
+        "label": "Split any protocol",
+        "hint": "tpws: applies the split to every protocol's first flight, not only HTTP and TLS. Can break protocols whose servers dislike fragmented first flights. tpws-only: rejected together with desync methods."
+      },
+      "tamper_start": {
+        "label": "Tamper start",
+        "hint": "Handshake shaping starts at or after this stream position (zapret --tamper-start). Same syntax as split positions, with an optional leading \"n\" selecting a data block number. tpws-only."
+      },
+      "tamper_cutoff": {
+        "label": "Tamper cutoff",
+        "hint": "Handshake shaping stops after this position (zapret --tamper-cutoff). Same syntax as tamper start. tpws-only."
+      },
+      "mss": {
+        "label": "MSS clamp",
+        "hint": "Clamps the TCP maximum segment size, a plain byte count 64–65495 (zapret --mss). tpws-only."
+      },
+      "tls_record": {
+        "label": "TLS record split",
+        "hint": "Re-splits the ClientHello into two TLS records at this position (for example sniext+1). tpws-only: rejected together with desync methods."
+      },
+      "host_case": {
+        "label": "Host case shuffle",
+        "hint": "Randomizes letter case in the HTTP Host header (HoSt:). Plain HTTP only."
+      },
+      "domain_case": {
+        "label": "Domain case shuffle",
+        "hint": "Randomizes letter case in the requested domain. Plain HTTP only."
+      },
+      "method_eol": {
+        "label": "Method EOL",
+        "hint": "Adds an extra end-of-line after the HTTP method. Plain HTTP only."
+      },
+      "host_dot": {
+        "label": "Host trailing dot",
+        "hint": "Appends \".\" after the Host: name (example.com.). Plain HTTP only."
+      },
+      "host_tab": {
+        "label": "Host tab",
+        "hint": "Replaces the space after Host: with a tab. Plain HTTP only."
+      },
+      "host_no_space": {
+        "label": "Host no space",
+        "hint": "Removes the space after Host:. Plain HTTP only; fights host_tab over the same separator."
+      },
+      "method_space": {
+        "label": "Method extra space",
+        "hint": "Adds an extra space after the HTTP method. Plain HTTP only."
+      },
+      "unix_eol": {
+        "label": "Unix EOL",
+        "hint": "Replaces CRLF with LF in plain-HTTP requests. Plain HTTP only."
+      },
+      "desync": {
+        "label": "Desync methods (nfqws)",
+        "hint": "nfqws --dpi-desync methods, in order (fake, split2, disorder2, multisplit and the other modes core validation lists). Any entry selects the nfqws backend. A strategy with desync methods cannot also use tpws-only fields."
+      },
+      "fake_tls": {
+        "label": "Fake TLS payload",
+        "hint": "\"tls\" keeps zapret's built-in fake ClientHello; anything else is a file name under the zapret home. Requires the fake desync method."
+      },
+      "fake_quic": {
+        "label": "Fake QUIC payload",
+        "hint": "Fake payload for QUIC: a file name under the zapret home (QUIC has no built-in fake; the shipped Initial is used for the \"quic\" keyword). Requires the fake desync method and filter_udp covering 443."
+      },
+      "fooling": {
+        "label": "Fooling",
+        "hint": "Degrades the fake/disorder packet so the censor's stack drops it while the real server tolerates it: badseq, badack, md5sig, ts, badsum, datanoack (comma-separated list allowed). Requires a desync method."
+      },
+      "ttl": {
+        "label": "Fake TTL",
+        "hint": "Fixes the fake packet TTL (1–255) so it dies before the server. 0 = unset. Mutually exclusive with autottl. Requires the fake desync method. A fixed TTL is a path guess: too small dies before the censor, too large can reach the server."
+      },
+      "auto_ttl": {
+        "label": "Auto TTL",
+        "hint": "Derives the fake packet TTL from the path instead of fixing it. Mutually exclusive with a fixed TTL. Requires the fake desync method."
+      },
+      "repeats": {
+        "label": "Fake repeats",
+        "hint": "Duplicates the fake injection (1–16). 0 = unset. Requires the fake desync method."
+      },
+      "filter_tcp": {
+        "label": "Filter TCP ports",
+        "hint": "Intercepted TCP ports, e.g. \"80,443\" (port ranges allowed). nfqws-only: requires a desync method."
+      },
+      "filter_udp": {
+        "label": "Filter UDP ports",
+        "hint": "Intercepted UDP ports, e.g. \"443\". UDP/QUIC desync needs this. nfqws-only: requires a desync method."
+      },
+      "filter_l7": {
+        "label": "Filter L7",
+        "hint": "Limits desync to application layers, comma-separated: http, tls, quic, wireguard, dht, discord, stun, unknown. nfqws-only: requires a desync method."
+      }
+    },
+    "groups": {
+      "split": "Split & order",
+      "tls": "TLS record",
+      "http": "HTTP form",
+      "desync": "nfqws desync",
+      "filters": "Port & L7 filters"
+    },
+    "censorship_kinds": {
+      "sni_block": "SNI block",
+      "stall": "Handshake stall",
+      "quic_throttle": "QUIC throttling",
+      "kz_variant": "Whitelist/MITM variant (KZ)",
+      "dns_hijack": "DNS hijack",
+      "connection_reset": "Connection reset",
+      "timeout": "Connection timeout",
+      "unknown": "Censorship"
+    },
+    "sources": {
+      "user": "Your in-app bypass settings",
+      "extension": "An extension (this layer)",
+      "core_default": "Core default",
+      "none": "No bypass configured"
+    },
+    "v_changes_nothing": "The strategy changes nothing: set at least one of split positions, TLS record, MSS, a desync method, or an HTTP-form option.",
+    "v_splitpos_pattern": "is not a split position (byte count or marker with optional ±offset; \"midsni\" is allowed as the registry marker)",
+    "v_splitpos_max": "More than 8 split positions.",
+    "v_desync_max": "More than 8 desync methods.",
+    "v_desync_mode": "is not a dpi-desync method the core knows",
+    "v_mix_tpws": "is a tpws-only option: a strategy with desync methods runs on nfqws, which does not render it — clear the desync methods or this field",
+    "v_scope_val": "must be empty, \"http\" or \"tls\"",
+    "v_disorder_scope_req": "A disorder scope needs disorder.",
+    "v_oob_scope_req": "An out-of-band scope needs oob.",
+    "v_need_split": "Disorder and out-of-band bytes need a split position.",
+    "v_oob_data_req": "An out-of-band byte value needs oob.",
+    "v_oob_data_pattern": "The OOB byte must be one character or 0xHH.",
+    "v_mss_range": "MSS must be a byte count in 64–65495.",
+    "v_tamper_pattern": "is not a tamper position (split-position syntax, optional leading \"n\")",
+    "v_pos_pattern": "is not a valid position",
+    "v_fooling_req": "Fooling needs a desync method (nfqws-only).",
+    "v_fooling_mode": "is not a fooling mode (badseq, badack, md5sig, ts, badsum, datanoack, hopbyhop, hopbyhop2, none)",
+    "v_fake_req": "Fake payloads need the fake desync method.",
+    "v_fake_name": "must be a built-in keyword or a plain file name (no path)",
+    "v_fakequic_udp": "A QUIC fake needs filter_udp (QUIC runs over UDP).",
+    "v_ttl_range": "Fake TTL must be in 1–255 (0 = unset).",
+    "v_ttl_fake": "A fake TTL needs the fake desync method.",
+    "v_ttl_xor": "A fake TTL and autottl are mutually exclusive.",
+    "v_autottl_fake": "Autottl needs the fake desync method.",
+    "v_repeats_range": "Repeats must be in 1–16 (0 = unset).",
+    "v_repeats_fake": "Repeats need the fake desync method.",
+    "v_filter_req": "Port/L7 filters need a desync method (nfqws-only).",
+    "v_filter_ports": "is not a port list (e.g. 80,443 or 1000-2000)",
+    "v_filter_port_range": "Port out of range 1–65535 in",
+    "v_filter_l7_val": "is not a filter-l7 protocol (http, tls, quic, wireguard, dht, discord, stun, unknown)",
+    "field_prefix": "Field",
+    "value_prefix": "Value",
+    "desync_modes_label": "Known desync modes"
+  },
+  "ru": {
+    "app_title": "Anti-DPI",
+    "app_sub": "Стратегии обхода DPI для этого устройства: пресеты, полный редактор стратегии, привязки по хостам и автоподбор.",
+    "tab_overview": "Обзор",
+    "tab_presets": "Пресеты",
+    "tab_editor": "Редактор",
+    "tab_bindings": "Привязки",
+    "tab_tune": "Автоподбор",
+    "tab_monitor": "Монитор",
+    "tab_profiles": "Профили",
+    "loading": "Загрузка…",
+    "bridge_missing": "Мост расширения недоступен. Откройте панель внутри Sora или через dev-сервер sora-ext (mock).",
+    "platform": "Платформа",
+    "backends": "Бэкенды",
+    "backend_available": "доступен",
+    "backend_unavailable": "недоступен",
+    "current_state": "Текущее состояние",
+    "global_source": "Источник глобальной стратегии",
+    "source_user": "Ваши настройки обхода в приложении",
+    "source_extension": "Расширение (этот слой)",
+    "source_core_default": "Дефолт ядра",
+    "source_none": "Обход не настроен",
+    "source_unknown": "Неизвестный источник",
+    "global_from": "Установлено",
+    "session_active": "VPN-сессия",
+    "session_on": "подключена",
+    "session_off": "не подключена",
+    "pending_apply": "Ожидает применения",
+    "pending_yes": "Изменения применятся при следующем подключении",
+    "pending_no": "Нет ожидающих изменений",
+    "bindings_count": "Привязок в этом слое",
+    "active_global": "Активная глобальная стратегия",
+    "no_global": "В этом слое нет глобальной стратегии.",
+    "custom_strategy": "Своя стратегия",
+    "updated_at": "Слой обновлён",
+    "refresh": "Обновить",
+    "apply": "Применить",
+    "apply_global": "Применить как глобальную",
+    "apply_layer": "Применить слой в ядро",
+    "confirm_apply_title": "Применить этот слой?",
+    "confirm_apply_body": "Слой отправится в ядро сейчас и подействует при следующем подключении. Ваши правила обхода в приложении сохраняют приоритет над привязками этого расширения.",
+    "confirm": "Применить",
+    "cancel": "Отмена",
+    "applied_ok": "Слой применён. Подействует при следующем подключении.",
+    "dirty": "Несохранённые изменения (ещё не применены в ядро)",
+    "clean": "Синхронно со слоем ядра",
+    "preset_apply": "Применить",
+    "preset_to_editor": "В редактор",
+    "preset_targets": "Против чего",
+    "preset_cost": "Цена / риски",
+    "preset_backends": "Бэкенды",
+    "editor_intro": "Все поля BypassStrategy. Валидация зеркалит ядро: стратегия, которую ядро отклонило бы, подсветится здесь до применения.",
+    "group_split": "Сплит и порядок",
+    "group_tls": "TLS-запись",
+    "group_http": "HTTP-форма",
+    "group_desync": "nfqws-десинк",
+    "group_filters": "Фильтры портов и L7",
+    "gate_nfqws": "только nfqws",
+    "gate_tpws": "только tpws",
+    "gate_unavailable": "бэкенд недоступен на этом устройстве",
+    "reset_to_preset": "Сбросить к пресету",
+    "choose_preset": "Выберите пресет…",
+    "list_hint": "По одному значению на строку.",
+    "validation_errors": "Исправьте перед применением:",
+    "strategy_empty_ok": "Пустая стратегия (при применении очистит глобальную стратегию).",
+    "bindings_intro": "Привязка применяет свою стратегию к одному совпадению: домену, адресу или сети (как вы ввели — ядро сопоставляет само). Привязки применяются вместе с глобальной стратегией одним слоем.",
+    "bindings_precedence": "Приоритет: ваши правила обхода в приложении сильнее привязок этого расширения. При конфликте приложение оставит ваше правило, а привязка для этого трафика будет проигнорирована.",
+    "binding_match": "Совпадение (домен / адрес / сеть)",
+    "binding_strategy": "Стратегия",
+    "binding_add": "Добавить привязку",
+    "binding_delete": "Удалить",
+    "binding_edit": "В редактор",
+    "binding_from_preset": "из пресета",
+    "binding_from_editor": "Взять стратегию из редактора",
+    "bindings_empty": "Привязок пока нет.",
+    "tune_intro": "Ядро пробует стратегии-кандидаты на вашей текущей сети и оценивает их вживую. Автоматически ничего не применяется.",
+    "tune_engine": "Движок",
+    "tune_engine_auto": "Авто (выбирает ядро)",
+    "tune_run": "Запустить подбор",
+    "tune_running": "Подбор… это может занять время.",
+    "tune_winner": "Победитель",
+    "tune_score": "Оценка",
+    "tune_attempts": "Попыток",
+    "tune_apply_winner": "Применить победителя как глобальную",
+    "tune_bound_to_profile": "Ядро привязало этого победителя к вашему сетевому профилю вместо возврата сырой стратегии: он подействует через профиль при совпадении этой сети. Вручную здесь применять нечего.",
+    "tune_no_winner": "Победитель не возвращён.",
+    "monitor_intro": "События цензуры, о которых ядро сообщило в этой сессии.",
+    "monitor_empty": "Событий пока нет. Когда ядро обнаружит цензуру на соединении, событие появится здесь.",
+    "monitor_clear": "Очистить список",
+    "profiles_intro": "Экспорт и импорт всего слоя (глобальная стратегия + привязки) как JSON. Файловых диалогов у панелей нет — копируйте и вставляйте текст.",
+    "export_label": "JSON экспортированного слоя",
+    "import_label": "Вставьте JSON слоя для импорта",
+    "import_preview": "Предпросмотр импорта",
+    "import_load": "Загрузить в черновик",
+    "import_invalid": "Этот текст не является валидным слоем:",
+    "reset_all": "Сбросить всё",
+    "reset_all_body": "Очищает черновик глобальной стратегии и все привязки. Затем нажмите «Применить», чтобы отправить пустой слой в ядро.",
+    "settings_language": "Язык панели",
+    "lang_auto": "Авто (приложение/браузер)",
+    "error_permission": "Нет разрешения: этому расширению не выдано разрешение на обход, нужное для действия.",
+    "error_invalid": "Ядро отклонило аргументы как невалидные.",
+    "error_internal": "Ядро не смогло выполнить вызов (внутренняя ошибка).",
+    "error_generic": "Вызов не удался.",
+    "censorship_event": "Обнаружена цензура",
+    "event_session_connected": "Сессия подключена",
+    "event_session_disconnected": "Сессия отключена",
+    "event_panel_ready": "Панель готова",
+    "at_time": "в",
+    "fields": {
+      "split_pos": {
+        "label": "Позиции сплита",
+        "hint": "Где режется handshake: число байтов («1», «-10» — от конца) или маркеры method/host/endhost/sld/midsld/endsld/sniext с необязательным смещением +N/-N. «midsni» — реестровый маркер середины фактического SNI, ядро разрешает его по цели. До 8 позиций. Нужны для disorder и oob."
+      },
+      "disorder": {
+        "label": "Disorder (вторая часть первой)",
+        "hint": "tpws: отправляет вторую часть сплита первой. На nfqws это пишется методом desync disorder/disorder2 — валидация ядра отклоняет disorder вместе с методами desync."
+      },
+      "disorder_scope": {
+        "label": "Область disorder",
+        "hint": "Ограничивает disorder одним протоколом: пусто = оба, http или tls. Требует disorder."
+      },
+      "oob": {
+        "label": "Внеполосный байт (OOB)",
+        "hint": "tpws: добавляет внеполосный (urgent) байт на разрезе, чтобы DPI неверно прочитал поток. Требует позицию сплита."
+      },
+      "oob_scope": {
+        "label": "Область OOB",
+        "hint": "Ограничивает внеполосный байт одним протоколом: пусто = оба, http или tls. Требует oob."
+      },
+      "oob_data": {
+        "label": "Значение байта OOB",
+        "hint": "Переопределяет внеполосный байт 0x00 по умолчанию: один символ или 0xHH в hex. Требует oob."
+      },
+      "split_any_protocol": {
+        "label": "Сплит любого протокола",
+        "hint": "tpws: применяет сплит к первому полёту любого протокола, а не только HTTP и TLS. Может ломать протоколы, чьи серверы не любят фрагментированный первый полёт. Только tpws: отклоняется вместе с методами desync."
+      },
+      "tamper_start": {
+        "label": "Начало тамперинга",
+        "hint": "Формовка handshake начинается с этой позиции потока (zapret --tamper-start). Синтаксис как у позиций сплита, с необязательной ведущей «n» — номером блока данных. Только tpws."
+      },
+      "tamper_cutoff": {
+        "label": "Конец тамперинга",
+        "hint": "Формовка handshake прекращается после этой позиции (zapret --tamper-cutoff). Синтаксис как у начала тамперинга. Только tpws."
+      },
+      "mss": {
+        "label": "Ограничение MSS",
+        "hint": "Ограничивает максимальный размер сегмента TCP, число байтов 64–65495 (zapret --mss). Только tpws."
+      },
+      "tls_record": {
+        "label": "Сплит TLS-записи",
+        "hint": "Перерезает ClientHello на две TLS-записи в этой позиции (например, sniext+1). Только tpws: отклоняется вместе с методами desync."
+      },
+      "host_case": {
+        "label": "Регистр Host",
+        "hint": "Случайный регистр букв в заголовке Host (HoSt:). Только обычный HTTP."
+      },
+      "domain_case": {
+        "label": "Регистр домена",
+        "hint": "Случайный регистр букв в запрашиваемом домене. Только обычный HTTP."
+      },
+      "method_eol": {
+        "label": "EOL после метода",
+        "hint": "Добавляет лишний конец строки после HTTP-метода. Только обычный HTTP."
+      },
+      "host_dot": {
+        "label": "Точка после Host",
+        "hint": "Добавляет «.» после имени в Host: (example.com.). Только обычный HTTP."
+      },
+      "host_tab": {
+        "label": "Таб после Host",
+        "hint": "Заменяет пробел после Host: на табуляцию. Только обычный HTTP."
+      },
+      "host_no_space": {
+        "label": "Без пробела после Host",
+        "hint": "Убирает пробел после Host:. Только обычный HTTP; спорит с host_tab за тот же разделитель."
+      },
+      "method_space": {
+        "label": "Лишний пробел после метода",
+        "hint": "Добавляет лишний пробел после HTTP-метода. Только обычный HTTP."
+      },
+      "unix_eol": {
+        "label": "Unix EOL",
+        "hint": "Заменяет CRLF на LF в обычных HTTP-запросах. Только обычный HTTP."
+      },
+      "desync": {
+        "label": "Методы desync (nfqws)",
+        "hint": "Методы nfqws --dpi-desync по порядку (fake, split2, disorder2, multisplit и остальные из списка валидации ядра). Любая запись выбирает бэкенд nfqws. Стратегия с методами desync не может одновременно использовать поля только-tpws."
+      },
+      "fake_tls": {
+        "label": "Фейковая нагрузка TLS",
+        "hint": "«tls» — встроенный фейковый ClientHello zapret; иное — имя файла в домашнем каталоге zapret. Требует метод desync fake."
+      },
+      "fake_quic": {
+        "label": "Фейковая нагрузка QUIC",
+        "hint": "Фейковая нагрузка для QUIC: имя файла в домашнем каталоге zapret (встроенного фейка для QUIC нет; для ключевого слова «quic» используется поставляемый Initial). Требует метод desync fake и filter_udp с портом 443."
+      },
+      "fooling": {
+        "label": "Fooling",
+        "hint": "Порча фейкового/disorder-пакета, чтобы стек цензора его отбросил, а настоящий сервер стерпел: badseq, badack, md5sig, ts, badsum, datanoack (допустим список через запятую). Требует метод desync."
+      },
+      "ttl": {
+        "label": "TTL фейка",
+        "hint": "Фиксирует TTL фейкового пакета (1–255), чтобы он умирал до сервера. 0 = не задан. Взаимоисключается с autottl. Требует метод desync fake. Фиксированный TTL — догадка о пути: мал — умрёт до цензора, велик — может дойти до сервера."
+      },
+      "auto_ttl": {
+        "label": "Авто-TTL",
+        "hint": "Выводит TTL фейкового пакета из пути вместо фиксации. Взаимоисключается с фиксированным TTL. Требует метод desync fake."
+      },
+      "repeats": {
+        "label": "Повторы фейка",
+        "hint": "Дублирует инжекцию фейка (1–16). 0 = не задано. Требует метод desync fake."
+      },
+      "filter_tcp": {
+        "label": "Фильтр TCP-портов",
+        "hint": "Перехватываемые TCP-порты, например «80,443» (допустимы диапазоны). Только nfqws: требует метод desync."
+      },
+      "filter_udp": {
+        "label": "Фильтр UDP-портов",
+        "hint": "Перехватываемые UDP-порты, например «443». Для desync UDP/QUIC обязателен. Только nfqws: требует метод desync."
+      },
+      "filter_l7": {
+        "label": "Фильтр L7",
+        "hint": "Ограничивает desync прикладными уровнями, через запятую: http, tls, quic, wireguard, dht, discord, stun, unknown. Только nfqws: требует метод desync."
+      }
+    },
+    "groups": {
+      "split": "Сплит и порядок",
+      "tls": "TLS-запись",
+      "http": "HTTP-форма",
+      "desync": "nfqws-десинк",
+      "filters": "Фильтры портов и L7"
+    },
+    "censorship_kinds": {
+      "sni_block": "Блокировка по SNI",
+      "stall": "Зависание handshake",
+      "quic_throttle": "Троттлинг QUIC",
+      "kz_variant": "Whitelist/MITM-вариант (KZ)",
+      "dns_hijack": "Подмена DNS",
+      "connection_reset": "Сброс соединения",
+      "timeout": "Тайм-аут соединения",
+      "unknown": "Цензура"
+    },
+    "sources": {
+      "user": "Ваши настройки обхода в приложении",
+      "extension": "Расширение (этот слой)",
+      "core_default": "Дефолт ядра",
+      "none": "Обход не настроен"
+    },
+    "v_changes_nothing": "Стратегия ничего не меняет: задайте хотя бы одно из — позиции сплита, TLS-запись, MSS, метод desync или опцию HTTP-формы.",
+    "v_splitpos_pattern": "не является позицией сплита (число байтов или маркер с необязательным смещением ±; «midsni» допустим как реестровый маркер)",
+    "v_splitpos_max": "Больше 8 позиций сплита.",
+    "v_desync_max": "Больше 8 методов desync.",
+    "v_desync_mode": "не является методом dpi-desync, известным ядру",
+    "v_mix_tpws": "— опция только tpws: стратегия с методами desync работает на nfqws и её не отрендерит — очистите методы desync или это поле",
+    "v_scope_val": "должно быть пустым, «http» или «tls»",
+    "v_disorder_scope_req": "Область disorder требует включённого disorder.",
+    "v_oob_scope_req": "Область OOB требует включённого oob.",
+    "v_need_split": "Disorder и внеполосный байт требуют позицию сплита.",
+    "v_oob_data_req": "Значение внеполосного байта требует oob.",
+    "v_oob_data_pattern": "Байт OOB — один символ или 0xHH.",
+    "v_mss_range": "MSS — число байтов в диапазоне 64–65495.",
+    "v_tamper_pattern": "не является позицией тамперинга (синтаксис позиции сплита, необязательная ведущая «n»)",
+    "v_pos_pattern": "не является валидной позицией",
+    "v_fooling_req": "Fooling требует метод desync (только nfqws).",
+    "v_fooling_mode": "не является режимом fooling (badseq, badack, md5sig, ts, badsum, datanoack, hopbyhop, hopbyhop2, none)",
+    "v_fake_req": "Фейковые нагрузки требуют метод desync fake.",
+    "v_fake_name": "должно быть встроенным ключевым словом или простым именем файла (без пути)",
+    "v_fakequic_udp": "Фейк QUIC требует filter_udp (QUIC идёт поверх UDP).",
+    "v_ttl_range": "TTL фейка — в диапазоне 1–255 (0 = не задан).",
+    "v_ttl_fake": "TTL фейка требует метод desync fake.",
+    "v_ttl_xor": "TTL фейка и autottl взаимоисключаются.",
+    "v_autottl_fake": "Autottl требует метод desync fake.",
+    "v_repeats_range": "Повторы — в диапазоне 1–16 (0 = не задано).",
+    "v_repeats_fake": "Повторы требуют метод desync fake.",
+    "v_filter_req": "Фильтры портов/L7 требуют метод desync (только nfqws).",
+    "v_filter_ports": "не является списком портов (например, 80,443 или 1000-2000)",
+    "v_filter_port_range": "Порт вне диапазона 1–65535 в",
+    "v_filter_l7_val": "не является протоколом filter-l7 (http, tls, quic, wireguard, dht, discord, stun, unknown)",
+    "field_prefix": "Поле",
+    "value_prefix": "Значение",
+    "desync_modes_label": "Известные режимы desync"
+  }
+}

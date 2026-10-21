@@ -1,0 +1,57 @@
+{
+  "manifest_version": 1,
+  "id": "org.sora.anti-dpi",
+  "name": "Anti-DPI",
+  "version": "1.0.0",
+  "min_app_version": "1.9.0",
+  "description": "DPI-bypass control panel: a curated preset library (the core tuner registry plus classic tpws strategies), a full BypassStrategy editor with core-mirrored validation, per-host bindings, one-click auto-tuning and a live censorship-event monitor. Strategies are applied through the core as one layer and take effect on the next connection; your in-app bypass rules always win over this extension's bindings.",
+  "author": {
+    "identity": "github:levvs-one",
+    "name": "Sora Team",
+    "public_key": "RWRwJ0eqduk64mOMOS09rQfodowJAWURdyIVU+rb+yrkxLujGMe+4f3k"
+  },
+  "permissions": [
+    "ui.panel",
+    "bypass.read",
+    "bypass.write",
+    "bypass.tune",
+    "notifications"
+  ],
+  "capabilities": [
+    "ui-panel",
+    "network-hook"
+  ],
+  "ui": {
+    "panels": [
+      {
+        "entry": "panel.html",
+        "id": "main",
+        "title": "Anti-DPI"
+      }
+    ]
+  },
+  "settings_schema": {
+    "properties": {
+      "confirm_apply": {
+        "default": true,
+        "type": "boolean"
+      },
+      "language": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "en",
+          "ru"
+        ],
+        "type": "string"
+      },
+      "monitor_limit": {
+        "default": 50,
+        "maximum": 200,
+        "minimum": 20,
+        "type": "integer"
+      }
+    },
+    "type": "object"
+  }
+}
