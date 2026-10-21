@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime/debug"
+	"runtime/metrics"
 	"time"
 
 	"github.com/dop251/goja"
@@ -114,6 +115,7 @@ func JavaScriptMain(input io.Reader, output io.Writer) error {
 		return err
 	}
 	debug.SetMemoryLimit(WorkerMemoryBytes / 2)
+	go watchWorkerHeap(WorkerMemoryBytes)
 	scan := bufio.NewScanner(input)
 	scan.Buffer(make([]byte, 4096), maxWorkerMessage)
 	if !scan.Scan() {
@@ -209,3 +211,21 @@ const workerBootstrap = `
   if (!r.ok) throw new Error(r.error);
  }});
 })();`
+
+// workerHeapExceeded is the exit code of a worker stopped by watchWorkerHeap.
+const workerHeapExceeded = 3
+
+// watchWorkerHeap ends the worker once its live heap passes the budget. The
+// OS limits (RLIMIT_DATA, a Windows job) stay as the backstop, but how a
+// commit limit surfaces differs per platform and per host job nesting, and
+// this check behaves the same everywhere.
+func watchWorkerHeap(limit uint64) {
+	sample := []metrics.Sample{{Name: "/memory/classes/heap/objects:bytes"}}
+	for range time.Tick(20 * time.Millisecond) {
+		metrics.Read(sample)
+		if sample[0].Value.Kind() == metrics.KindUint64 && sample[0].Value.Uint64() > limit {
+			_, _ = fmt.Fprintln(os.Stderr, "extension worker exceeded its memory budget")
+			os.Exit(workerHeapExceeded)
+		}
+	}
+}
