@@ -404,6 +404,7 @@ Future<void> showRatingHowDialog(BuildContext context) {
 
 /// Localized text for store refusals the user can act on.
 String extStoreErrorText(S s, ExtStoreError e) {
+  if (e is ExtAssetError) return s.extAssetRejected;
   if (e.message.contains('was revoked')) return s.extErrRevoked;
   if (e.message.contains('revocation list expired')) return s.extErrRevocationsExpired;
   return s.extErrGeneric;

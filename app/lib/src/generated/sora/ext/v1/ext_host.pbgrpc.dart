@@ -42,6 +42,15 @@ class ExtensionHostClient extends $grpc.Client {
 
   ExtensionHostClient(super.channel, {super.options, super.interceptors});
 
+  /// App-owned lifecycle stream. Closing it unregisters and cancels the worker.
+  /// Only the authenticated control app supplies verified source and grants.
+  $grpc.ResponseStream<$0.WorkerHostMessage> runWorker(
+    $async.Stream<$0.WorkerClientMessage> request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createStreamingCall(_$runWorker, request, options: options);
+  }
+
   /// MintToken issues a scoped token for an enabled extension. App only.
   $grpc.ResponseFuture<$0.MintTokenResponse> mintToken(
     $0.MintTokenRequest request, {
@@ -94,6 +103,10 @@ class ExtensionHostClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$runWorker = $grpc.ClientMethod<$0.WorkerClientMessage, $0.WorkerHostMessage>(
+      '/sora.ext.v1.ExtensionHost/RunWorker',
+      ($0.WorkerClientMessage value) => value.writeToBuffer(),
+      $0.WorkerHostMessage.fromBuffer);
   static final _$mintToken = $grpc.ClientMethod<$0.MintTokenRequest, $0.MintTokenResponse>(
       '/sora.ext.v1.ExtensionHost/MintToken',
       ($0.MintTokenRequest value) => value.writeToBuffer(),
@@ -123,6 +136,13 @@ abstract class ExtensionHostServiceBase extends $grpc.Service {
   $core.String get $name => 'sora.ext.v1.ExtensionHost';
 
   ExtensionHostServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.WorkerClientMessage, $0.WorkerHostMessage>(
+        'RunWorker',
+        runWorker,
+        true,
+        true,
+        ($core.List<$core.int> value) => $0.WorkerClientMessage.fromBuffer(value),
+        ($0.WorkerHostMessage value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.MintTokenRequest, $0.MintTokenResponse>(
         'MintToken',
         mintToken_Pre,
@@ -166,6 +186,8 @@ abstract class ExtensionHostServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) => $0.WatchExtensionEventsRequest.fromBuffer(value),
         ($0.ExtensionEvent value) => value.writeToBuffer()));
   }
+
+  $async.Stream<$0.WorkerHostMessage> runWorker($grpc.ServiceCall call, $async.Stream<$0.WorkerClientMessage> request);
 
   $async.Future<$0.MintTokenResponse> mintToken_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.MintTokenRequest> $request) async {

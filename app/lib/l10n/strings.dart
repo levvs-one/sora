@@ -4250,6 +4250,18 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'После подключения блокирует трафик вне VPN даже при сбое, перезапуске ядра или выходе из приложения. Доступ вернётся только после отключения VPN или этой настройки. После перезагрузки блокировка возобновится только при включённом подключении при запуске.'**
   String get strictKillSwitchWarning;
+
+  /// No description provided for @extWorkerFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фоновая задача расширения завершилась с ошибкой. Проверьте журнал расширения.'**
+  String get extWorkerFailed;
+
+  /// No description provided for @extAssetRejected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Файл расширения отклонён: нечитаемые цвета или неверные правила.'**
+  String get extAssetRejected;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

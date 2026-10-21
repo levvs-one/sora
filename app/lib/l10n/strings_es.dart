@@ -2265,4 +2265,10 @@ class SEs extends S {
   @override
   String get strictKillSwitchWarning =>
       'Tras conectar, bloquea el tráfico fuera de la VPN incluso después de un fallo, reinicio o cierre de la aplicación. Solo desconectar o desactivar esta opción restablece el acceso. Tras reiniciar el equipo, el bloqueo se reanuda solo si está activada la conexión al inicio.';
+
+  @override
+  String get extWorkerFailed => 'Falló la tarea en segundo plano de la extensión. Revisa su registro.';
+
+  @override
+  String get extAssetRejected => 'Archivo de extensión rechazado: colores ilegibles o reglas no válidas.';
 }

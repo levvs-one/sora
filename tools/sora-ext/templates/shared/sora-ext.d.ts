@@ -1,5 +1,5 @@
 /**
- * Type definitions for the Sora extension panel API (`window.soraExt`).
+ * Type definitions for the Sora extension panel and worker API (`window.soraExt`).
  *
  * Panels are plain HTML/JS running in a WebView without Node, `dart:ffi`
  * or network access (v1). The ONLY bridge to the app is `window.soraExt`,
@@ -114,6 +114,11 @@ export interface SoraNotifyArgs {
  * a `SoraExtError` (never a bare string), so `catch (e) { e.code }` works.
  */
 export interface SoraExt {
+  /** Worker only: net.fetch permission, HTTPS network_hosts, VPN proxy or fail
+   * closed. No direct network. Each run has 2 CPU seconds, 128 MiB committed
+   * process memory and a 30-second wall timeout. console.log goes to its log.
+   */
+  call(method: 'net.fetch', args: {url: string; method?: string; headers?: Record<string, string>; body?: string}): Promise<{status: number; headers: Record<string, string[]>; body: string}>;
   /**
    * Live connection list (process, host, byte counters).
    * Needs the `connections.read` permission (sensitive).
@@ -145,7 +150,9 @@ export interface SoraExt {
    */
   call(method: 'setSettings', args: Record<string, unknown>): Promise<void>;
   /**
-   * Subscribe to lifecycle/network events. Returns an unsubscribe function.
+   * Panels: subscribe to live lifecycle events. Workers: a session snapshot
+   * once per subscription per run; subscriptions do not persist between runs.
+   * Returns an unsubscribe function.
    * Needs no permission: every enabled extension may know whether the
    * session is up.
    */
@@ -166,3 +173,27 @@ declare global {
 // This file is a module so the interfaces above can be imported in TS
 // projects, while the `declare global` block still augments `window`.
 export {};
+
+/** Declarative theme asset. Flutter ignores stylesheet. Tokens map to Palette
+ * as documented in docs/extensions.md; colors must be opaque #RRGGBB and
+ * text contrast >= 4.5:1. Only the enabled conflict winner applies.
+ */
+export interface SoraThemeAsset {
+  name: string;
+  variant: 'light' | 'dark';
+  css_variables: Partial<Record<
+    '--sora-background' | '--sora-surface' | '--sora-field' |
+    '--sora-text' | '--sora-text-secondary' | '--sora-text-muted' |
+    '--sora-danger' | '--sora-on-danger' | '--sora-raised' |
+    '--sora-raised-field' | '--sora-accent', string>>;
+  stylesheet?: string;
+}
+
+/** User rules first; extensions priority DESC, installed_at ASC, id ASC;
+ * engine defaults last. First match wins. Proxy uses the user's session
+ * target; extensions never name a server. Network hooks are not applied.
+ */
+export interface SoraRoutingAsset {
+  priority?: number;
+  rules: Array<{match: string; action: 'direct' | 'proxy' | 'block'; comment?: string}>;
+}

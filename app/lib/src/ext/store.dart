@@ -19,10 +19,16 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 import 'catalog.dart';
+import 'assets.dart';
+import 'conflicts.dart';
 import 'manifest.dart';
 import 'package.dart';
 import 'permissions.dart';
 import 'revocations.dart';
+
+class ExtAssetError extends ExtStoreError {
+  ExtAssetError(super.message);
+}
 
 class ExtStoreError implements Exception {
   ExtStoreError(this.message);
@@ -129,6 +135,97 @@ class ExtensionStore extends ChangeNotifier {
   final String _dir;
   final _installed = <String, InstalledExtension>{};
   bool _loaded = false;
+  bool _disposed = false;
+  final logChanges = ChangeNotifier();
+
+  @override
+  void dispose() {
+    _disposed = true;
+    logChanges.dispose();
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
+  final _themes = <String, ExtensionTheme>{};
+  final _routing = <String, ExtensionRouting>{};
+  final _runtimeLogs = <String, List<String>>{};
+  final runtimeErrors = <String, String>{};
+
+  void appendLog(String id, String message) {
+    if (_disposed) return;
+    final lines = _runtimeLogs.putIfAbsent(id, () => []);
+    lines.add(message.length > 1024 ? message.substring(0, 1024) : message);
+    if (lines.length > 256) lines.removeAt(0);
+    logChanges.notifyListeners();
+  }
+
+  List<String> runtimeLog(String id) => List.unmodifiable(_runtimeLogs[id] ?? const []);
+
+  ExtensionTheme? get activeTheme {
+    final candidates = installed
+        .where((e) => e.enabled && e.granted.contains('theme.apply') && _themes.containsKey(e.id))
+        .toList();
+    if (candidates.length == 1) return _themes[candidates.single.id];
+    if (candidates.isEmpty) return null;
+    final conflict = ExtConflict(kind: ExtConflictKind.themeApply, extensionIds: candidates.map((e) => e.id).toList());
+    final winner = _conflictWinners[conflict.key];
+    return candidates.any((e) => e.id == winner) ? _themes[winner] : null;
+  }
+
+  List<ExtensionRoutingRule> get routingRules {
+    final sources =
+        installed.where((e) => e.enabled && e.granted.contains('routing.rules') && _routing.containsKey(e.id)).toList()
+          ..sort((a, b) {
+            final priority = _routing[b.id]!.priority.compareTo(_routing[a.id]!.priority);
+            if (priority != 0) return priority;
+            final time = a.installedAt.compareTo(b.installedAt);
+            return time == 0 ? a.id.compareTo(b.id) : time;
+          });
+    return [for (final e in sources) ..._routing[e.id]!.rules];
+  }
+
+  void logRoutingOverlaps(List<String> userDestinations) {
+    final before = [...userDestinations];
+    for (final r in routingRules) {
+      for (final earlier in before) {
+        if (routingMatchesOverlap(earlier, r.rule.destination)) {
+          appendLog(r.extensionId, 'routing overlap: $earlier precedes ${r.rule.destination}');
+        }
+      }
+      before.add(r.rule.destination);
+    }
+  }
+
+  void _validateAssets(ExtManifest m, String Function(String) read) {
+    if (m.themeEntry != null) ExtensionTheme.parse(read(m.themeEntry!));
+    if (m.routingEntry != null) ExtensionRouting.parse(m.id, read(m.routingEntry!));
+  }
+
+  Future<void> _loadRuntimeAssets() async {
+    _themes.clear();
+    _routing.clear();
+    runtimeErrors.clear();
+    for (final inst in installed) {
+      try {
+        final root = contentDir(inst.id), m = inst.manifest;
+        Future<String> read(String entry) async {
+          final f = File('$root/$entry');
+          if (await f.length() > 1 << 20) throw const FormatException('extension asset exceeds 1 MiB');
+          return f.readAsString();
+        }
+
+        if (m.themeEntry != null) _themes[inst.id] = ExtensionTheme.parse(await read(m.themeEntry!));
+        if (m.routingEntry != null) _routing[inst.id] = ExtensionRouting.parse(inst.id, await read(m.routingEntry!));
+      } catch (e) {
+        runtimeErrors[inst.id] = e.toString();
+        appendLog(inst.id, 'asset rejected: $e');
+      }
+    }
+  }
 
   bool get loaded => _loaded;
   List<InstalledExtension> get installed =>
@@ -203,7 +300,10 @@ class ExtensionStore extends ChangeNotifier {
   }
 
   /// Loads the registry. Call once before use.
-  Future<void> load() async {
+  Future<void>? _loading;
+  Future<void> load() => _loading ??= _load();
+
+  Future<void> _load() async {
     final d = Directory(_dir);
     await d.create(recursive: true);
     _installId = await _loadOrCreateInstallId();
@@ -224,6 +324,8 @@ class ExtensionStore extends ChangeNotifier {
     }
     _revocations = await revocationCache.load();
     await _enforceRevocations();
+    await _loadConflicts();
+    await _loadRuntimeAssets();
     _loaded = true;
     notifyListeners();
   }
@@ -382,6 +484,15 @@ class ExtensionStore extends ChangeNotifier {
     // install prompt), but no package reaches the disk unverified through
     // here. Throws [PackageError] on any integrity/authenticity failure.
     await pkg.verify(authorKeyLine: source == 'catalog' ? authorKeyPin : null);
+    try {
+      _validateAssets(m, (entry) {
+        final bytes = pkg.files[entry]!;
+        if (bytes.length > 1 << 20) throw const FormatException('extension asset exceeds 1 MiB');
+        return utf8.decode(bytes);
+      });
+    } catch (e) {
+      throw ExtAssetError('invalid extension asset: $e');
+    }
     // Extract to a staging dir first; only touch the registry when the
     // content is fully on disk.
     final dst = _contentDir(m.id, m.version);
@@ -430,6 +541,7 @@ class ExtensionStore extends ChangeNotifier {
       authorKey: storedPin,
     );
     await _save();
+    await _loadRuntimeAssets();
     notifyListeners();
     return added;
   }
@@ -474,9 +586,10 @@ class ExtensionStore extends ChangeNotifier {
     final cur = _installed[id];
     if (cur == null) throw ExtStoreError('"$id" is not installed');
     if (enabled) _checkRevocation(id, cur.version, installing: false);
+    if (enabled && runtimeErrors.containsKey(id)) throw ExtAssetError(runtimeErrors[id]!);
     _installed[id] = cur.copyWith(enabled: enabled);
-    await _save();
     notifyListeners();
+    await _save();
   }
 
   /// Restores the N-1 version kept at install time.
@@ -516,6 +629,7 @@ class ExtensionStore extends ChangeNotifier {
     } on PackageError catch (e) {
       throw ExtStoreError('previous version of "$id" failed its integrity re-check: ${e.message}');
     }
+    _validateAssets(prevManifest, (entry) => utf8.decode(files[entry]!));
     await Directory(_contentDir(id, cur.version)).delete(recursive: true);
     _installed[id] = InstalledExtension(
       manifest: prevManifest,
@@ -528,12 +642,15 @@ class ExtensionStore extends ChangeNotifier {
       authorKey: cur.authorKey ?? cur.manifest.author.publicKey,
     );
     await _save();
+    await _loadRuntimeAssets();
     notifyListeners();
   }
 
   Future<void> uninstall(String id) async {
     final cur = _installed[id];
     if (cur == null) throw ExtStoreError('"$id" is not installed');
+    _installed[id] = cur.copyWith(enabled: false);
+    notifyListeners();
     for (final v in [cur.version, if (cur.previous != null) cur.previous!]) {
       final d = Directory(_contentDir(id, v));
       if (await d.exists()) await d.delete(recursive: true);
@@ -543,6 +660,10 @@ class ExtensionStore extends ChangeNotifier {
     final background = File(_backgroundFile(id));
     if (await background.exists()) await background.delete();
     _installed.remove(id);
+    _themes.remove(id);
+    _routing.remove(id);
+    _runtimeLogs.remove(id);
+    runtimeErrors.remove(id);
     await _save();
     notifyListeners();
   }

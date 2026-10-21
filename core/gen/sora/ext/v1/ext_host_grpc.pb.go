@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	ExtensionHost_RunWorker_FullMethodName            = "/sora.ext.v1.ExtensionHost/RunWorker"
 	ExtensionHost_MintToken_FullMethodName            = "/sora.ext.v1.ExtensionHost/MintToken"
 	ExtensionHost_RevokeToken_FullMethodName          = "/sora.ext.v1.ExtensionHost/RevokeToken"
 	ExtensionHost_GetConnections_FullMethodName       = "/sora.ext.v1.ExtensionHost/GetConnections"
@@ -42,6 +43,9 @@ const (
 // MintToken and RevokeToken are app-only: they require the core control
 // token, exactly like Connect and Disconnect on CoreControl.
 type ExtensionHostClient interface {
+	// App-owned lifecycle stream. Closing it unregisters and cancels the worker.
+	// Only the authenticated control app supplies verified source and grants.
+	RunWorker(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[WorkerClientMessage, WorkerHostMessage], error)
 	// MintToken issues a scoped token for an enabled extension. App only.
 	MintToken(ctx context.Context, in *MintTokenRequest, opts ...grpc.CallOption) (*MintTokenResponse, error)
 	// RevokeToken invalidates a previously minted token. App only.
@@ -65,6 +69,19 @@ type extensionHostClient struct {
 func NewExtensionHostClient(cc grpc.ClientConnInterface) ExtensionHostClient {
 	return &extensionHostClient{cc}
 }
+
+func (c *extensionHostClient) RunWorker(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[WorkerClientMessage, WorkerHostMessage], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ExtensionHost_ServiceDesc.Streams[0], ExtensionHost_RunWorker_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[WorkerClientMessage, WorkerHostMessage]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ExtensionHost_RunWorkerClient = grpc.BidiStreamingClient[WorkerClientMessage, WorkerHostMessage]
 
 func (c *extensionHostClient) MintToken(ctx context.Context, in *MintTokenRequest, opts ...grpc.CallOption) (*MintTokenResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -118,7 +135,7 @@ func (c *extensionHostClient) Notify(ctx context.Context, in *NotifyRequest, opt
 
 func (c *extensionHostClient) WatchExtensionEvents(ctx context.Context, in *WatchExtensionEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ExtensionEvent], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ExtensionHost_ServiceDesc.Streams[0], ExtensionHost_WatchExtensionEvents_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ExtensionHost_ServiceDesc.Streams[1], ExtensionHost_WatchExtensionEvents_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -150,6 +167,9 @@ type ExtensionHost_WatchExtensionEventsClient = grpc.ServerStreamingClient[Exten
 // MintToken and RevokeToken are app-only: they require the core control
 // token, exactly like Connect and Disconnect on CoreControl.
 type ExtensionHostServer interface {
+	// App-owned lifecycle stream. Closing it unregisters and cancels the worker.
+	// Only the authenticated control app supplies verified source and grants.
+	RunWorker(grpc.BidiStreamingServer[WorkerClientMessage, WorkerHostMessage]) error
 	// MintToken issues a scoped token for an enabled extension. App only.
 	MintToken(context.Context, *MintTokenRequest) (*MintTokenResponse, error)
 	// RevokeToken invalidates a previously minted token. App only.
@@ -174,6 +194,9 @@ type ExtensionHostServer interface {
 // pointer dereference when methods are called.
 type UnimplementedExtensionHostServer struct{}
 
+func (UnimplementedExtensionHostServer) RunWorker(grpc.BidiStreamingServer[WorkerClientMessage, WorkerHostMessage]) error {
+	return status.Errorf(codes.Unimplemented, "method RunWorker not implemented")
+}
 func (UnimplementedExtensionHostServer) MintToken(context.Context, *MintTokenRequest) (*MintTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MintToken not implemented")
 }
@@ -212,6 +235,13 @@ func RegisterExtensionHostServer(s grpc.ServiceRegistrar, srv ExtensionHostServe
 	}
 	s.RegisterService(&ExtensionHost_ServiceDesc, srv)
 }
+
+func _ExtensionHost_RunWorker_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ExtensionHostServer).RunWorker(&grpc.GenericServerStream[WorkerClientMessage, WorkerHostMessage]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ExtensionHost_RunWorkerServer = grpc.BidiStreamingServer[WorkerClientMessage, WorkerHostMessage]
 
 func _ExtensionHost_MintToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MintTokenRequest)
@@ -343,6 +373,12 @@ var ExtensionHost_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "RunWorker",
+			Handler:       _ExtensionHost_RunWorker_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
 		{
 			StreamName:    "WatchExtensionEvents",
 			Handler:       _ExtensionHost_WatchExtensionEvents_Handler,

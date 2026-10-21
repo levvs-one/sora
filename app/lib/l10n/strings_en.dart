@@ -2244,4 +2244,10 @@ class SEn extends S {
   @override
   String get strictKillSwitchWarning =>
       'After connecting, blocks traffic outside the VPN even after a crash, restart or app exit. Only Disconnect or turning this off restores access. After reboot, blocking resumes only when Connect on start is enabled.';
+
+  @override
+  String get extWorkerFailed => 'The extension background task failed. Check the extension log.';
+
+  @override
+  String get extAssetRejected => 'Extension asset rejected: unreadable colors or invalid rules.';
 }

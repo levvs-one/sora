@@ -92,9 +92,9 @@ function humanize(e) {
 Scaffold with `--template background`, then in `worker.js`:
 
 ```js
-const res = await worker.fetch('https://api.example.com/status');
+const res = await window.soraExt.call('net.fetch', {url: 'https://api.example.com/status'});
 if (res.status !== 200) throw new Error('HTTP ' + res.status);
-worker.log('poll ok');
+console.log('poll ok');
 ```
 
 Manifest needs: capability `background` + permission `background`,
@@ -142,8 +142,10 @@ permissions acknowledged. It prints the sha256 and a catalog-entry
 snippet. Before submitting, re-read the permission list and ask: does the
 extension really need each one? Fewer permissions = faster user trust.
 
-## 8. Theme / net-hook / routing extensions
+## 8. Themes and routing extensions
 
-These capabilities parse and validate today, but the app does not apply
-them yet: the asset formats are contract v0 (proposed), described in
-`docs/extensions.md`. Say so in your README if you publish one.
+Build and sign `examples/theme-midnight` or `examples/routing-split`, then
+install from file. The app applies validated theme colors and merges enabled
+routing contributions into the session plan. Theme stylesheets are ignored.
+See `docs/extensions.md` for token mappings, contrast checks and rule order.
+Network hooks are not applied.

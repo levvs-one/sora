@@ -51,10 +51,10 @@ func TestEnforcementDartMirrorMatches(t *testing.T) {
 			t.Errorf("%q: Dart status %s, Go status %s maps to %s", row.ID, rows[i][1], row.Status, want)
 		}
 	}
-	// The two RiskDangerous rows must stay unimplemented in the mirror
+	// The net.hooks row must stay unimplemented in the mirror
 	// too - said explicitly, not only via the table walk above, because
 	// this is the load-bearing honesty claim of the whole matrix.
-	for _, id := range []string{"routing.rules", "net.hooks"} {
+	for _, id := range []string{"net.hooks"} {
 		re := regexp.MustCompile(`ExtEnforcementRow\(\s*'` + regexp.QuoteMeta(id) + `',\s*ExtEnforcementStatus\.unimplemented`)
 		if !re.MatchString(string(raw)) {
 			t.Errorf("Dart mirror does not pin %q as unimplemented", id)

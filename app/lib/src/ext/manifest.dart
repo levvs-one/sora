@@ -94,11 +94,12 @@ class ExtManifest {
   /// settings.
   final ExtBackgroundTask? backgroundTask;
 
-  /// Capability contract pointers (v0, proposed — mirrors core/ext's
+  /// Capability contract pointers (mirrors core/ext's
   /// ManifestExt): entry files for the theme / network-hook / routing
   /// contracts. Null when not declared. Only the pointer (capability +
   /// permission cross-check, safe path) is validated here; the asset
-  /// files' own schemas are proposals, see docs/extensions.md.
+  /// files are validated by ExtensionStore before applying themes/rules.
+  /// Network hooks remain unapplied; see docs/extensions.md.
   final String? themeEntry;
   final String? networkHookEntry;
   final String? routingEntry;

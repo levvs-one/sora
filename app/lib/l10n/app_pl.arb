@@ -1137,5 +1137,7 @@
   "customServerWgCidrInvalid": "Wpisz prefiksy rozdzielone przecinkami, np. 10.0.0.2/32.",
   "customServerWgKeepaliveInvalid": "Wpisz liczbę sekund od 0 do 65535.",
   "strictKillSwitch": "Ścisła blokada sieci",
-  "strictKillSwitchWarning": "Po połączeniu blokuje ruch poza VPN także po awarii, ponownym uruchomieniu lub zamknięciu aplikacji. Dostęp przywraca tylko rozłączenie lub wyłączenie tej opcji. Po restarcie systemu blokada wraca tylko przy włączonym łączeniu podczas uruchamiania."
+  "strictKillSwitchWarning": "Po połączeniu blokuje ruch poza VPN także po awarii, ponownym uruchomieniu lub zamknięciu aplikacji. Dostęp przywraca tylko rozłączenie lub wyłączenie tej opcji. Po restarcie systemu blokada wraca tylko przy włączonym łączeniu podczas uruchamiania.",
+  "extWorkerFailed": "Zadanie rozszerzenia w tle nie powiodło się. Sprawdź dziennik rozszerzenia.",
+  "extAssetRejected": "Odrzucono plik rozszerzenia: nieczytelne kolory lub nieprawidłowe reguły."
 }

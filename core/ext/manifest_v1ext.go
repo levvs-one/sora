@@ -11,12 +11,12 @@ package ext
 //     permission "background").
 //   - "network_hosts": host allowlist for net.fetch (permission "net.fetch").
 //   - "theme": theme asset contract (capability "theme", permission
-//     "theme.apply"). Asset schema is v0/proposed; only the entry path and
-//     the capability/permission cross-checks are enforced.
+//     "theme.apply"). The app validates color tokens and contrast before use;
+//     this parser enforces the entry path and capability/permission pair.
 //   - "network_hook": DPI-bypass module contract (capability "network-hook",
-//     permission "net.hooks"). Same enforcement level as "theme".
+//     permission "net.hooks"). The descriptor is not applied at runtime.
 //   - "routing": routing-rules contract (capability "routing", permission
-//     "routing.rules"). Same enforcement level as "theme".
+//     "routing.rules"). The app validates and merges the rules into its plan.
 //
 // ParseManifestFull is the entry point: it decodes the v1 core and the
 // extension keys in one pass (one struct holding both field sets, unknown
@@ -71,7 +71,7 @@ type ManifestExt struct {
 	Routing      *RoutingExt     `json:"routing,omitempty"`
 }
 
-// ThemeExt points at the theme asset file (theme contract v0, proposed).
+// ThemeExt points at the color asset validated and applied by the app.
 type ThemeExt struct {
 	// Entry is the theme descriptor inside the package, e.g. "theme.json".
 	Entry string `json:"entry"`
@@ -84,8 +84,7 @@ type NetworkHookExt struct {
 	Entry string `json:"entry"`
 }
 
-// RoutingExt points at the routing-rules file (routing contract v0,
-// proposed).
+// RoutingExt points at the routing rules validated and merged by the app.
 type RoutingExt struct {
 	// Entry is the rules file inside the package, e.g. "rules.json".
 	Entry string `json:"entry"`
@@ -243,8 +242,8 @@ func (b *BackgroundTask) validate(m *Manifest) error {
 
 // validate cross-checks one capability contract pointer: the matching
 // capability and permission must be declared, and the entry must be a safe
-// relative .json path. The asset file's own schema is v0/proposed and is
-// NOT validated here - only the pointer is.
+// relative .json path. The app validates theme and routing asset contents;
+// this parser validates only the pointer.
 func (t *ThemeExt) validate(m *Manifest) error {
 	return validateAssetRef("theme", t.Entry, "theme", "theme.apply", KeyThemeInvalid, m)
 }

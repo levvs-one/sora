@@ -2261,4 +2261,10 @@ class STk extends S {
   @override
   String get strictKillSwitchWarning =>
       'Birikdirilenden soň näsazlyk, gaýtadan başlatmak ýa-da programmadan çykmak wagtynda hem VPN-den daşarky traffigi petikleýär. Giriş diňe baglanyşyk kesilende ýa-da bu sazlama öçürilende dikeldilýär. Enjam gaýtadan açylanda petikleme diňe başlangyçda birikmek işjeň bolsa dowam edýär.';
+
+  @override
+  String get extWorkerFailed => 'Giňeltmäniň fon işi şowsuz boldy. Giňeltmäniň ýazgylaryny barlaň.';
+
+  @override
+  String get extAssetRejected => 'Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler.';
 }

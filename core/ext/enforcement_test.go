@@ -81,12 +81,12 @@ func TestEnforcementBackgroundGateIsReal(t *testing.T) {
 }
 
 // TestEnforcementDangerousAreNotClaimedEnforced is the load-bearing
-// honesty pin: the two RiskDangerous permissions have zero enforcement
-// code today, and the matrix must say so. Flipping them to Enforced
+// honesty pin: net.hooks has zero enforcement code today, and the matrix
+// must say so. Flipping it to Enforced
 // requires a behavior pin in this test proving a real gate exists -
 // a docs edit must never be able to upgrade the claim on its own.
 func TestEnforcementDangerousAreNotClaimedEnforced(t *testing.T) {
-	for _, id := range []string{"routing.rules", "net.hooks"} {
+	for _, id := range []string{"net.hooks"} {
 		row, ok := EnforcementOf(id)
 		if !ok {
 			t.Fatalf("no enforcement row for %q", id)

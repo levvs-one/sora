@@ -1137,5 +1137,7 @@
   "customServerWgCidrInvalid": "Digite prefixos separados por vírgula, como 10.0.0.2/32.",
   "customServerWgKeepaliveInvalid": "Digite um número de segundos de 0 a 65535.",
   "strictKillSwitch": "Bloqueio de rede estrito",
-  "strictKillSwitchWarning": "Após a conexão, bloqueia o tráfego fora da VPN mesmo após uma falha, reinício ou saída do aplicativo. Apenas desconectar ou desativar esta opção restaura o acesso. Após reiniciar o sistema, o bloqueio só retorna se a conexão ao iniciar estiver ativada."
+  "strictKillSwitchWarning": "Após a conexão, bloqueia o tráfego fora da VPN mesmo após uma falha, reinício ou saída do aplicativo. Apenas desconectar ou desativar esta opção restaura o acesso. Após reiniciar o sistema, o bloqueio só retorna se a conexão ao iniciar estiver ativada.",
+  "extWorkerFailed": "A tarefa em segundo plano da extensão falhou. Verifique o registo da extensão.",
+  "extAssetRejected": "Ficheiro da extensão rejeitado: cores ilegíveis ou regras inválidas."
 }

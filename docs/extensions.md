@@ -150,8 +150,8 @@ Available methods and their permissions:
 | `getConnections`   | `connections.read` | id, process, host, up/down bytes   |
 | `getServers`       | `servers.read`     | id, name, country, latency         |
 | `notify`           | `notifications`    | title ≤ 120, body ≤ 500 chars      |
-| `getSettings`      |,                  | the extension's own settings       |
-| `setSettings`      |,                  | validated against settings_schema  |
+| `getSettings`      | none              | the extension's own settings       |
+| `setSettings`      | none              | validated against settings_schema  |
 
 Events: `session.connected`, `session.disconnected` (the two the current
 panel bridge emits). `network.changed` and `extension.disabled` are
@@ -217,7 +217,7 @@ Additive catalog fields (all optional):
   try to revalidate, and say "cached - <date>" when serving stale data.
 - `rollout_fraction` (0..1, default 1): staged rollout of a version.
   Eligibility is deterministic per install:
-  `sha256(install_id | ext id | version)` mod 10000 < fraction|10000.
+  `sha256(install_id | ext id | version)` mod 10000 < fraction * 10000.
   The update button shows only for eligible installs; the listing is never
   gated. A bad version is halted via the revocation list, not a zero
   fraction.
@@ -278,19 +278,49 @@ is rejected.
 - `entry`: the worker script inside the package, a relative `.js` path,
   no traversal.
 
-The worker runs in a deliberately small environment (`WorkerEnv`): it can
-append to the extension log and, only when the extension also holds
-`net.fetch`, make allowlisted HTTP requests through its own `Fetcher`.
-No filesystem, no process control, no raw sockets. (The Go `WorkerFunc` is
-the seam where the host plugs its JS runner in. Implementation status:
-the scheduler and `net.fetch` enforcement exist in `core/ext`, and the
-service creates and starts the scheduler at startup, but no worker
-tasks are registered with it yet and there is no JS executor, so worker
-scripts do not execute in practice; the app currently only persists the
-`background_task` config the user edits in the extension details screen.)
+The app registers enabled, consented workers through an authenticated
+`ExtensionHost.RunWorker` lifecycle stream. The service schedules them with
+`Scheduler.RegisterConfig` and executes each run in a fresh goja process.
+The first run is after the effective interval plus a deterministic stagger
+of up to 59 seconds. No runs overlap; ten consecutive failures stop the task
+until it is registered again. Workers run while the app is open, including
+when its window is hidden in the tray. Closing the app or losing its control
+stream unregisters the task. Reopening the app starts a new schedule.
 
-Every run's outcome, ok, failed, or panicked (recovered), is written to
-the extension log, which the app shows in the extension details screen.
+`window.soraExt.call` provides the same permission-checked methods as panels,
+including extension-local settings and notifications through `PanelBridge`.
+Workers additionally have `net.fetch` and `console.log`. No Node, DOM,
+filesystem, process, raw socket, global fetch or timer APIs are exposed.
+Source maps are disabled, including in eval, because the default goja
+source-map loader can read local files.
+Top-level await is supported by the host's async function wrapper; modules
+and imports are not. Each run must finish all its work and settle promises.
+`onEvent` receives the current session connected/disconnected snapshot once
+per subscription per run; subscriptions do not survive runs. Panel event
+subscriptions continue to observe live changes while their panel is open.
+
+Budgets per run: 2 CPU seconds, 128 MiB committed process memory, 30 seconds
+wall time, 1 MiB source, 256 host calls (including log calls), and stack depth
+256. Linux enforces CPU/data limits with rlimits; Windows uses a Job Object
+with process memory and user CPU limits. Go's soft heap target is 64 MiB.
+Allocation failure, runaway JS and a blocked bridge end only the disposable
+process. The parent kills and reaps it on timeout or cancellation. A JS VM
+or native-runtime vulnerability is outside this resource-isolation claim.
+
+`console.log` and every run outcome go to the bounded extension log (256
+entries, 1024 bytes per entry). Unhandled errors, rejected promises and
+budget failures also produce a localized notification. Disable, uninstall,
+worker-off and reconfiguration cancel the lifecycle stream and any in-flight
+process or fetch. The kill switch pauses scheduling and cancels active runs.
+
+```js
+const settings = await window.soraExt.call('getSettings');
+console.log('Background settings keys: ' + Object.keys(settings).join(', '));
+const response = await window.soraExt.call('net.fetch', {
+  url: 'https://api.example.com/status', method: 'GET'
+});
+console.log('HTTP ' + response.status);
+```
 
 ### 7.2 network_hosts, the net.fetch allowlist
 
@@ -322,50 +352,95 @@ Host-side enforcement (`core/ext/netfetch.go`):
   to the core's tunnel (local proxy), so extension traffic follows the
   VPN and never leaks direct; a nil transport dials direct and is only
   for tests/dev.
-- diagnostics: per-extension counters (requests, denied, bytes out/in)
-  via `Fetcher.Stats()`, surfaced in the extension details screen next
-  to the log.
+- diagnostics: per-extension counters are available through `Fetcher.Stats()`;
+  request decisions and byte counts are visible in the extension log.
 
-## 8. Capability contracts: theme, network-hook, routing (v0, proposed)
+## 8. Themes and routing rules
 
-Three capabilities exist in the v1 registry without a runtime yet. Their
-manifest side is real: `ParseManifestFull` (`core/ext/manifest_v1ext.go`)
-and the app's `ExtManifest.parse` accept three optional top-level keys,
-each a pointer to an asset file inside the package:
+Both declarative runtimes work in the Flutter app. The manifest pointers
+require the matching capability and granted permission, safe relative JSON
+entry paths, and no unknown pointer fields. Asset files are limited to 1 MiB.
+The CLI validates the pointer and package integrity; the app additionally
+validates theme colors/contrast and routing semantics before applying them.
 
 ```json
-{
-  "capabilities": ["theme"],
-  "permissions": ["theme.apply"],
-  "theme": {"entry": "theme.json"}
-}
+{"capabilities":["theme"],"permissions":["theme.apply"],"theme":{"entry":"theme.json"}}
 ```
 
-| Key | Capability | Permission (risk) | Entry |
-|---|---|---|---|
-| `theme` | `theme` | `theme.apply` (sensitive) | theme descriptor |
-| `network_hook` | `network-hook` | `net.hooks` (dangerous) | hook module descriptor |
-| `routing` | `routing` | `routing.rules` (dangerous) | routing rules file |
+### 8.1 Themes
 
-Rules, enforced on both sides:
+`theme.json` has `name` (1..80 characters), `variant` (`light` or `dark`),
+`css_variables` (an object of the color tokens below) and optional
+`stylesheet`. Flutter has no CSS: **stylesheet is ignored**, never executed
+or fetched. Unknown descriptor fields and tokens are rejected. Values must
+be opaque `#RRGGBB` colors, with no CSS expressions, named colors or alpha.
+Omitted tokens inherit the selected variant's default palette.
 
-- each key requires its capability **and** its permission; without either
-  the manifest is rejected;
-- `entry` is a relative `.json` path without traversal (same rule as
-  worker scripts);
-- unknown keys *inside* the pointer objects are rejected;
-- manifest version stays `1`: the keys are additive.
+| Token | Palette field |
+|---|---|
+| `--sora-background` | `background` |
+| `--sora-surface` | `surface` |
+| `--sora-field` | `field` |
+| `--sora-text` | `ink` |
+| `--sora-text-secondary` | `ink2` |
+| `--sora-text-muted` | `ink3` |
+| `--sora-danger` | `danger` |
+| `--sora-on-danger` | `onDanger` |
+| `--sora-raised` | `raised` |
+| `--sora-raised-field` | `raisedField` |
+| `--sora-accent` | `accent`, connection glow only |
 
-The asset files' own schemas are **contract v0 (proposed)**, only the
-pointers are enforced, not the asset contents:
+`shadow` and `scrim` keep variant defaults; hover/pressed colors derive from
+`ink`. Without `--sora-accent`, the connection glow keeps its spectrum.
+With it, the glow uses that single color; control/text colors do not change.
 
-- theme: `theme.json` with `name`, `variant`, `css_variables`,
-  `stylesheet`;
-- network-hook: `hook.json` with `module` and `strategies[]` of
-  `id`/`title`/`description`/`transports`;
-- routing: `rules.json` with `rules[]` of `match`/`action`/`comment`,
-  first match wins.
+Contrast must be at least 4.5:1 for `ink`, `ink2`, `ink3` and `danger` on
+background/surface/raised, for `ink` on field/raisedField, and for `onDanger`
+on danger. An invalid theme is rejected with a localized toast. Invalid
+assets found on startup are not applied and produce a notification/log.
 
-The runtime side (theme engine, hook loading, rule merging) is not built
-yet. Until it lands, such packages validate, pack, sign and install like
-any other extension, but the app does not apply them.
+Only one enabled, granted theme applies. If several contend, the existing
+conflict sheet selects the persisted winner; unresolved conflicts use the
+app default. Disabling or uninstalling the winner immediately recomputes the
+choice, restoring the app's configured default if no contender remains.
+The theme variant overrides the app brightness only while the theme applies.
+Fonts, spacing and component geometry stay under the app's control.
+
+### 8.2 Routing
+
+`rules.json` is `{"priority":0,"rules":[{"match":"example.org",
+"action":"proxy","comment":"Selected session proxy"}]}`.
+Priority is optional (default 0), integer -1000..1000. At most 256 rules
+per extension. Unknown fields are rejected. Comment is optional, at most
+500 characters. Actions are exactly `direct`, `proxy`, `block`; an extension
+can never select or name a server. `proxy` resolves to the current session
+proxy/group/chain, and `block` renders as the engine reject target.
+
+Matches use `UserRule.destinationOf`, the same parser as the user rule
+editor: domain names, `domain:` suffix matches, `full:` exact names,
+`process:` names, IPs and CIDRs. Bare names are process matches. URLs use
+their host. Invalid values reject the whole rules file.
+
+Order is **user rules first, extension rules by priority DESC,
+installed_at ASC, id ASC, engine defaults last**. An extension's own rule
+order is preserved. First match wins; routing extensions merge rather than
+participating in exclusive conflict resolution. Identical destinations,
+domain suffix overlaps and intersecting CIDRs are logged to the contributing
+extension's log, including overlaps with user rules. Rules are never removed
+because of an overlap: an overlap may be partial.
+
+Enable, disable, update, rollback and uninstall recompute the session plan.
+A live session reconnects through the app's serialized selection mechanism
+when its resulting plan changes. The extension detail screen lists enabled
+contributions with their match, action and comment; disabled extensions have
+no active contributions. Logs show overlaps and runtime failures.
+
+Source examples with throwaway public keys and local build/sign guides:
+`examples/theme-midnight`, `examples/routing-split`.
+
+### 8.3 Network hooks: not applied
+
+`network_hook` still requires capability `network-hook`, permission
+`net.hooks` and a safe descriptor entry. Packages can carry that descriptor,
+but **network hooks are not applied**. Hook loading and DPI bypass remain
+out of scope. No worker or declarative API exposes a traffic hook.

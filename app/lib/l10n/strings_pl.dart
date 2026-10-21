@@ -2264,4 +2264,10 @@ class SPl extends S {
   @override
   String get strictKillSwitchWarning =>
       'Po połączeniu blokuje ruch poza VPN także po awarii, ponownym uruchomieniu lub zamknięciu aplikacji. Dostęp przywraca tylko rozłączenie lub wyłączenie tej opcji. Po restarcie systemu blokada wraca tylko przy włączonym łączeniu podczas uruchamiania.';
+
+  @override
+  String get extWorkerFailed => 'Zadanie rozszerzenia w tle nie powiodło się. Sprawdź dziennik rozszerzenia.';
+
+  @override
+  String get extAssetRejected => 'Odrzucono plik rozszerzenia: nieczytelne kolory lub nieprawidłowe reguły.';
 }

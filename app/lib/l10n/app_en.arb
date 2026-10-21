@@ -985,5 +985,7 @@
   "customServerWgCidrInvalid": "Enter comma separated prefixes such as 10.0.0.2/32.",
   "customServerWgKeepaliveInvalid": "Enter a number of seconds from 0 to 65535.",
   "strictKillSwitch": "Strict kill switch",
-  "strictKillSwitchWarning": "After connecting, blocks traffic outside the VPN even after a crash, restart or app exit. Only Disconnect or turning this off restores access. After reboot, blocking resumes only when Connect on start is enabled."
+  "strictKillSwitchWarning": "After connecting, blocks traffic outside the VPN even after a crash, restart or app exit. Only Disconnect or turning this off restores access. After reboot, blocking resumes only when Connect on start is enabled.",
+  "extWorkerFailed": "The extension background task failed. Check the extension log.",
+  "extAssetRejected": "Extension asset rejected: unreadable colors or invalid rules."
 }

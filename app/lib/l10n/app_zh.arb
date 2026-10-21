@@ -1137,5 +1137,7 @@
   "customServerWgCidrInvalid": "请输入以逗号分隔的前缀，例如 10.0.0.2/32。",
   "customServerWgKeepaliveInvalid": "请输入 0 到 65535 之间的秒数。",
   "strictKillSwitch": "严格网络锁定",
-  "strictKillSwitchWarning": "连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。"
+  "strictKillSwitchWarning": "连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。",
+  "extWorkerFailed": "扩展的后台任务失败。请查看扩展日志。",
+  "extAssetRejected": "扩展文件被拒绝：颜色难以辨认或规则无效。"
 }

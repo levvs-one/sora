@@ -2244,4 +2244,10 @@ class SJa extends S {
   @override
   String get strictKillSwitchWarning =>
       '接続後は、クラッシュ、再起動、アプリ終了後も VPN 外の通信を遮断します。接続を切るか、この設定をオフにした場合のみアクセスが戻ります。端末の再起動後は、起動時の接続が有効な場合のみ遮断を再開します。';
+
+  @override
+  String get extWorkerFailed => '拡張機能のバックグラウンドタスクに失敗しました。拡張機能のログを確認してください。';
+
+  @override
+  String get extAssetRejected => '拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。';
 }

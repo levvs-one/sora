@@ -2262,4 +2262,10 @@ class SVi extends S {
   @override
   String get strictKillSwitchWarning =>
       'Sau khi kết nối, chặn lưu lượng ngoài VPN kể cả khi gặp sự cố, khởi động lại hoặc thoát ứng dụng. Chỉ ngắt kết nối hoặc tắt tùy chọn này mới khôi phục truy cập. Sau khi khởi động lại thiết bị, chỉ tiếp tục chặn nếu đã bật kết nối khi khởi động.';
+
+  @override
+  String get extWorkerFailed => 'Tác vụ nền của tiện ích mở rộng thất bại. Kiểm tra nhật ký tiện ích.';
+
+  @override
+  String get extAssetRejected => 'Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ.';
 }

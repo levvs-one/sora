@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/ext"
 )
 
 // flags holds operator settings with defaults for a standard installation.
@@ -35,6 +37,13 @@ type flags struct {
 }
 
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "--extension-worker" {
+		if err := ext.JavaScriptMain(os.Stdin, os.Stdout); err != nil {
+			_ = json.NewEncoder(os.Stdout).Encode(map[string]string{"worker_error": err.Error()})
+			os.Exit(1)
+		}
+		return
+	}
 	// Windows services must respond to SCM instead of using the console.
 	if handled, err := runService(os.Args[1:]); handled {
 		if err != nil {

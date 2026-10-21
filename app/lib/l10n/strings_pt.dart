@@ -2263,4 +2263,10 @@ class SPt extends S {
   @override
   String get strictKillSwitchWarning =>
       'Após a conexão, bloqueia o tráfego fora da VPN mesmo após uma falha, reinício ou saída do aplicativo. Apenas desconectar ou desativar esta opção restaura o acesso. Após reiniciar o sistema, o bloqueio só retorna se a conexão ao iniciar estiver ativada.';
+
+  @override
+  String get extWorkerFailed => 'A tarefa em segundo plano da extensão falhou. Verifique o registo da extensão.';
+
+  @override
+  String get extAssetRejected => 'Ficheiro da extensão rejeitado: cores ilegíveis ou regras inválidas.';
 }

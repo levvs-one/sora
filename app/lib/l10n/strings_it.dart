@@ -2266,4 +2266,11 @@ class SIt extends S {
   @override
   String get strictKillSwitchWarning =>
       'Dopo la connessione blocca il traffico esterno alla VPN anche in caso di arresto anomalo, riavvio o chiusura dell’app. Solo la disconnessione o la disattivazione di questa opzione ripristina l’accesso. Dopo il riavvio del sistema, il blocco riprende solo se è attiva la connessione all’avvio.';
+
+  @override
+  String get extWorkerFailed =>
+      'L’attività in background dell’estensione non è riuscita. Controlla il registro dell’estensione.';
+
+  @override
+  String get extAssetRejected => 'File dell’estensione rifiutato: colori illeggibili o regole non valide.';
 }

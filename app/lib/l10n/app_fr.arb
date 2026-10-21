@@ -1137,5 +1137,7 @@
   "customServerWgCidrInvalid": "Saisissez des préfixes séparés par des virgules, comme 10.0.0.2/32.",
   "customServerWgKeepaliveInvalid": "Saisissez un nombre de secondes entre 0 et 65535.",
   "strictKillSwitch": "Coupe-circuit strict",
-  "strictKillSwitchWarning": "Après la connexion, bloque le trafic hors VPN même après un plantage, un redémarrage ou la fermeture de l’application. Seule la déconnexion ou la désactivation de cette option rétablit l’accès. Après un redémarrage du système, le blocage reprend uniquement si la connexion au démarrage est activée."
+  "strictKillSwitchWarning": "Après la connexion, bloque le trafic hors VPN même après un plantage, un redémarrage ou la fermeture de l’application. Seule la déconnexion ou la désactivation de cette option rétablit l’accès. Après un redémarrage du système, le blocage reprend uniquement si la connexion au démarrage est activée.",
+  "extWorkerFailed": "La tâche en arrière-plan de l’extension a échoué. Consultez son journal.",
+  "extAssetRejected": "Fichier d’extension refusé : couleurs illisibles ou règles invalides."
 }

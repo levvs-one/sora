@@ -18,7 +18,11 @@ class Palette extends ThemeExtension<Palette> {
     required this.raised,
     required this.raisedField,
     required this.scrim,
+    this.accent,
   });
+
+  final Color? accent;
+  List<Color> get glowColors => accent == null ? spectrum : List.filled(spectrum.length, accent!);
 
   final Color background;
   final Color surface;
@@ -94,6 +98,7 @@ class Palette extends ThemeExtension<Palette> {
   Palette lerp(Palette? other, double t) {
     if (other == null) return this;
     return Palette(
+      accent: Color.lerp(accent, other.accent, t),
       background: Color.lerp(background, other.background, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
       field: Color.lerp(field, other.field, t)!,
@@ -191,8 +196,8 @@ class MotionScope extends InheritedWidget {
   bool updateShouldNotify(MotionScope oldWidget) => enabled != oldWidget.enabled;
 }
 
-ThemeData buildTheme(Brightness brightness) {
-  final palette = brightness == Brightness.dark ? Palette.dark : Palette.light;
+ThemeData buildTheme(Brightness brightness, {Palette? colors}) {
+  final palette = colors ?? (brightness == Brightness.dark ? Palette.dark : Palette.light);
   final base = ThemeData(
     brightness: brightness,
     useMaterial3: true,

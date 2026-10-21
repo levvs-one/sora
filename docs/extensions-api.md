@@ -23,11 +23,11 @@ try {
 
 | Method | Permission | Args | Returns |
 |---|---|---|---|
-| `getConnections` | `connections.read` (sensitive) |, | `[{id, process, host, up_bytes, down_bytes}]` |
-| `getServers` | `servers.read` |, | `[{id, name, country, latency_ms}]` (`-1` = unknown) |
+| `getConnections` | `connections.read` (sensitive) | none | `[{id, process, host, up_bytes, down_bytes}]` |
+| `getServers` | `servers.read` | none | `[{id, name, country, latency_ms}]` (`-1` = unknown) |
 | `notify` | `notifications` | `{title, body}` | `void` |
-| `getSettings` |, (own settings) |, | object |
-| `setSettings` |, (own settings) | object | `void` |
+| `getSettings` | none (own settings) | none | object |
+| `setSettings` | none (own settings) | object | `void` |
 
 Notes:
 
@@ -94,16 +94,31 @@ Supported types: `string`, `integer`, `number`, `boolean`; optional
   `setSettings`, not in-memory globals.
 - Keep panels light: they run inside the app process.
 
-## Planned (not in v1)
+## Worker and declarative runtimes
 
-| API | Status |
+Background workers execute in isolated goja processes while the app is open.
+They receive the same `window.soraExt.call` API, enforced by granted
+permissions and the existing panel bridge. Extension-local settings remain
+permissionless. `console.log` writes to the extension log.
+
+Worker-only method: `call('net.fetch', {url, method?, headers?, body?})`,
+permission `net.fetch`, returns `{status, headers, body}`. Headers map to
+arrays of response header values; request headers map to strings. Body is
+text. HTTPS, network_hosts allowlist, redirect/rate/size policy and a live
+VPN proxy are all required; without a proxy it rejects with `not-connected`.
+There is no direct-network fallback. Panel `net.fetch` remains unavailable.
+
+Worker `onEvent` receives a session-state snapshot once per subscription per
+run. A worker is a finite scheduled task, not a persistent event listener.
+See [runtime budgets and lifecycle](extensions.md#71-background_task).
+
+| Runtime | Status |
 |---|---|
-| Theme engine applying `theme.json` | contract v0 proposed |
-| Network-hook module loading (`hook.json`) | contract v0 proposed |
-| Routing-rule merging (`rules.json`) | contract v0 proposed |
-| Background worker JS runner (`worker.js`) | Go seam exists (`core/ext` `WorkerFunc`); app-side runner pending |
-| `tray` permission / widgets | reserved |
+| `theme.json` | applied by the app, validated palette and contrast, one conflict winner |
+| `rules.json` | merged into the session plan after user rules, deterministic first-match order |
+| `worker.js` | scheduled, permission checked, isolated, CPU/memory/wall budgets |
+| `network_hook` / `net.hooks` | not applied |
+| `tray` / widgets | reserved |
 
-"Planned" means: the manifest side parses and validates today, the
-runtime does not consume it yet. Examples above are valid, signed packages
-showing the exact shape the runtime will consume, their READMEs say so.
+The exact theme tokens, routing match syntax, priorities and reset behavior
+are specified in [extensions.md](extensions.md#8-themes-and-routing-rules).

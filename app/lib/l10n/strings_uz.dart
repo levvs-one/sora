@@ -2262,4 +2262,10 @@ class SUz extends S {
   @override
   String get strictKillSwitchWarning =>
       'Ulangandan keyin nosozlik, qayta ishga tushirish yoki ilovadan chiqishda ham VPN tashqarisidagi trafikni bloklaydi. Kirish faqat ulanish uzilganda yoki bu sozlama oʻchirilganda tiklanadi. Qurilma qayta yoqilganda bloklash faqat ishga tushishda ulanish yoqilgan boʻlsa davom etadi.';
+
+  @override
+  String get extWorkerFailed => 'Kengaytmaning fon vazifasi bajarilmadi. Kengaytma jurnalini tekshiring.';
+
+  @override
+  String get extAssetRejected => 'Kengaytma fayli rad etildi: o‘qib bo‘lmaydigan ranglar yoki noto‘g‘ri qoidalar.';
 }

@@ -2266,4 +2266,11 @@ class SDe extends S {
   @override
   String get strictKillSwitchWarning =>
       'Blockiert nach dem Verbinden Datenverkehr außerhalb des VPN auch bei Absturz, Neustart oder Beenden der App. Nur Trennen oder Ausschalten dieser Option gibt den Zugriff frei. Nach einem Systemneustart greift die Sperre nur bei aktivierter Verbindung beim Start.';
+
+  @override
+  String get extWorkerFailed =>
+      'Die Hintergrundaufgabe der Erweiterung ist fehlgeschlagen. Prüfe das Erweiterungsprotokoll.';
+
+  @override
+  String get extAssetRejected => 'Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln.';
 }

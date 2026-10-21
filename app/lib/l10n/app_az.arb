@@ -1137,5 +1137,7 @@
   "customServerWgCidrInvalid": "Vergüllə ayrılmış prefikslər daxil edin, məsələn 10.0.0.2/32.",
   "customServerWgKeepaliveInvalid": "0-dan 65535-ə qədər saniyə sayı daxil edin.",
   "strictKillSwitch": "Sərt şəbəkə kilidi",
-  "strictKillSwitchWarning": "Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir."
+  "strictKillSwitchWarning": "Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir.",
+  "extWorkerFailed": "Əlavənin fon tapşırığı uğursuz oldu. Əlavənin jurnalını yoxlayın.",
+  "extAssetRejected": "Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar."
 }

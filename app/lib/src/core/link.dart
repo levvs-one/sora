@@ -7,6 +7,7 @@ import 'package:retry/retry.dart';
 import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../generated/sora/leak/v1/leak.pbgrpc.dart';
+import '../generated/sora/ext/v1/ext_host.pbgrpc.dart';
 import 'pipe.dart';
 
 /// API 1.12 adds strict kill-switch intent; 1.11 adds the leak-test suite; 1.10 exposes proxy chains and
@@ -30,6 +31,8 @@ class CoreLink {
 
   /// Leak-test suite (sora.leak.v1, API 1.11).
   final LeakServiceClient leak;
+
+  late final extensions = ExtensionHostClient(_channel);
 
   final List<int> token;
   final int minor;

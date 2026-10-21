@@ -69,15 +69,18 @@ class PanelBridge {
     } catch (_) {
       return _reply(null, false, 'invalid-argument');
     }
-    final msg = decoded as Map<String, dynamic>?;
-    final id = msg?['id'];
-    final method = msg?['method'] as String?;
-    if (method == null) return _reply(id, false, 'invalid-argument');
+    if (decoded is! Map<String, dynamic>) return _reply(null, false, 'invalid-argument');
+    final msg = decoded;
+    final id = msg['id'];
+    final method = msg['method'];
+    if (method is! String) return _reply(id, false, 'invalid-argument');
+    final rawArgs = msg['args'];
+    if (rawArgs != null && rawArgs is! Map<String, dynamic>) return _reply(id, false, 'invalid-argument');
     final need = _methodPermission[method];
     if (need != null && !granted.contains(need)) {
       return _reply(id, false, 'permission-denied');
     }
-    final args = (msg?['args'] as Map<String, dynamic>?) ?? {};
+    final args = (rawArgs as Map<String, dynamic>?) ?? {};
     try {
       final result = await _dispatch(method, args);
       return _reply(id, true, null, result);

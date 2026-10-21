@@ -1137,5 +1137,7 @@
   "customServerWgCidrInvalid": "請輸入以逗號分隔的前綴，例如 10.0.0.2/32。",
   "customServerWgKeepaliveInvalid": "請輸入 0 到 65535 之間的秒數。",
   "strictKillSwitch": "嚴格網路鎖定",
-  "strictKillSwitchWarning": "連線後，即使當機、重新啟動或結束應用程式，也會阻擋 VPN 以外的流量。只有中斷連線或關閉此選項才會恢復存取。裝置重新啟動後，僅在啟用啟動時連線時恢復阻擋。"
+  "strictKillSwitchWarning": "連線後，即使當機、重新啟動或結束應用程式，也會阻擋 VPN 以外的流量。只有中斷連線或關閉此選項才會恢復存取。裝置重新啟動後，僅在啟用啟動時連線時恢復阻擋。",
+  "extWorkerFailed": "擴充功能的背景工作失敗。請查看擴充功能記錄。",
+  "extAssetRejected": "擴充功能檔案遭拒：顏色難以辨認或規則無效。"
 }

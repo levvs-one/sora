@@ -2261,4 +2261,10 @@ class STr extends S {
   @override
   String get strictKillSwitchWarning =>
       'Bağlandıktan sonra çökme, yeniden başlatma veya uygulamadan çıkma durumunda bile VPN dışındaki trafiği engeller. Erişim yalnızca bağlantıyı kesince veya bu seçeneği kapatınca geri gelir. Cihaz yeniden başlatıldığında engelleme yalnızca başlangıçta bağlanma etkinse devam eder.';
+
+  @override
+  String get extWorkerFailed => 'Uzantının arka plan görevi başarısız oldu. Uzantı günlüğünü kontrol edin.';
+
+  @override
+  String get extAssetRejected => 'Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar.';
 }

@@ -2262,4 +2262,10 @@ class SAz extends S {
   @override
   String get strictKillSwitchWarning =>
       'Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir.';
+
+  @override
+  String get extWorkerFailed => 'Əlavənin fon tapşırığı uğursuz oldu. Əlavənin jurnalını yoxlayın.';
+
+  @override
+  String get extAssetRejected => 'Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar.';
 }

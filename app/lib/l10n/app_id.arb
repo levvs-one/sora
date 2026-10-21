@@ -1137,5 +1137,7 @@
   "customServerWgCidrInvalid": "Masukkan prefiks dipisah koma, misalnya 10.0.0.2/32.",
   "customServerWgKeepaliveInvalid": "Masukkan jumlah detik dari 0 sampai 65535.",
   "strictKillSwitch": "Pemutus jaringan ketat",
-  "strictKillSwitchWarning": "Setelah terhubung, memblokir lalu lintas di luar VPN meskipun terjadi kerusakan, mulai ulang, atau aplikasi ditutup. Akses hanya pulih setelah memutus koneksi atau menonaktifkan opsi ini. Setelah perangkat dimulai ulang, pemblokiran berlanjut hanya jika koneksi saat mulai diaktifkan."
+  "strictKillSwitchWarning": "Setelah terhubung, memblokir lalu lintas di luar VPN meskipun terjadi kerusakan, mulai ulang, atau aplikasi ditutup. Akses hanya pulih setelah memutus koneksi atau menonaktifkan opsi ini. Setelah perangkat dimulai ulang, pemblokiran berlanjut hanya jika koneksi saat mulai diaktifkan.",
+  "extWorkerFailed": "Tugas latar belakang ekstensi gagal. Periksa log ekstensi.",
+  "extAssetRejected": "Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid."
 }

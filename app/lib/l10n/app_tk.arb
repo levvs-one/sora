@@ -1137,5 +1137,7 @@
   "customServerWgCidrInvalid": "Otur bilen bölünen prefiksleri giriziň, meselem 10.0.0.2/32.",
   "customServerWgKeepaliveInvalid": "0-dan 65535-e çenli sekunt sanyny giriziň.",
   "strictKillSwitch": "Berk tor gulpy",
-  "strictKillSwitchWarning": "Birikdirilenden soň näsazlyk, gaýtadan başlatmak ýa-da programmadan çykmak wagtynda hem VPN-den daşarky traffigi petikleýär. Giriş diňe baglanyşyk kesilende ýa-da bu sazlama öçürilende dikeldilýär. Enjam gaýtadan açylanda petikleme diňe başlangyçda birikmek işjeň bolsa dowam edýär."
+  "strictKillSwitchWarning": "Birikdirilenden soň näsazlyk, gaýtadan başlatmak ýa-da programmadan çykmak wagtynda hem VPN-den daşarky traffigi petikleýär. Giriş diňe baglanyşyk kesilende ýa-da bu sazlama öçürilende dikeldilýär. Enjam gaýtadan açylanda petikleme diňe başlangyçda birikmek işjeň bolsa dowam edýär.",
+  "extWorkerFailed": "Giňeltmäniň fon işi şowsuz boldy. Giňeltmäniň ýazgylaryny barlaň.",
+  "extAssetRejected": "Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler."
 }

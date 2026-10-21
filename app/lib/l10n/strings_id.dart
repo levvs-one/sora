@@ -2262,4 +2262,10 @@ class SId extends S {
   @override
   String get strictKillSwitchWarning =>
       'Setelah terhubung, memblokir lalu lintas di luar VPN meskipun terjadi kerusakan, mulai ulang, atau aplikasi ditutup. Akses hanya pulih setelah memutus koneksi atau menonaktifkan opsi ini. Setelah perangkat dimulai ulang, pemblokiran berlanjut hanya jika koneksi saat mulai diaktifkan.';
+
+  @override
+  String get extWorkerFailed => 'Tugas latar belakang ekstensi gagal. Periksa log ekstensi.';
+
+  @override
+  String get extAssetRejected => 'Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.';
 }

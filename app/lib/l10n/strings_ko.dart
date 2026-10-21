@@ -2243,4 +2243,10 @@ class SKo extends S {
   @override
   String get strictKillSwitchWarning =>
       '연결 후에는 충돌, 재시작 또는 앱 종료 후에도 VPN 외부 트래픽을 차단합니다. 연결을 끊거나 이 옵션을 꺼야 접근이 복원됩니다. 기기를 재부팅한 뒤에는 시작 시 연결이 활성화된 경우에만 차단을 재개합니다.';
+
+  @override
+  String get extWorkerFailed => '확장 기능의 백그라운드 작업이 실패했습니다. 확장 기능 로그를 확인하세요.';
+
+  @override
+  String get extAssetRejected => '확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다.';
 }
