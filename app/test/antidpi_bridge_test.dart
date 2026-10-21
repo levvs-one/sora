@@ -201,6 +201,37 @@ void main() {
       final reply = await call(b, 'tuneDesync', {'engine': 42});
       expect(reply['error'], 'invalid-argument');
     });
+
+    test('a BridgeError message reaches the reply next to the code (B-M1)', () async {
+      // The core rejected the layer with its own words: the code alone
+      // would leave the panel showing a generic sentence, so handle()
+      // must carry the message through — while `error` stays the bare
+      // code the d.ts contract pins.
+      final b = bridge(
+        granted: {'bypass.write'},
+        apply: (_) async => throw BridgeError('invalid-argument', 'ядро сказало X'),
+      );
+      final reply = await call(b, 'applyBypassLayer', {'global': null, 'bindings': <dynamic>[]});
+      expect(reply['ok'], isFalse);
+      expect(reply['error'], 'invalid-argument');
+      expect(reply['message'], 'ядро сказало X');
+    });
+
+    test('code-only failures carry no message key (B-M1)', () async {
+      final b = bridge(granted: const {});
+      final reply = await call(b, 'applyBypassLayer', {'global': null, 'bindings': <dynamic>[]});
+      expect(reply['error'], 'permission-denied');
+      expect(reply.containsKey('message'), isFalse);
+    });
+
+    test('the bootstrap shim maps {code, message} onto the rejection (B-M1)', () {
+      // The node suite (extensions/anti-dpi-tests) runs this shim for
+      // real; this pins the Dart side so the two cannot drift apart
+      // silently: code on .code, host message on .message.
+      expect(PanelBridge.bootstrapJs, contains('payload.code'));
+      expect(PanelBridge.bootstrapJs, contains('payload.message'));
+      expect(PanelBridge.bootstrapJs, contains('e.code = code'));
+    });
   });
 
   group('bypass host error mapping', () {

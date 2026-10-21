@@ -222,7 +222,15 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   List<int>? _controlToken;
   List<int>? _extToken;
   StreamSubscription<BypassCensorshipEvent>? _bypassSub;
-  bool _bypassMinting = false;
+
+  /// The in-flight token mint, kept so bypass bridge callbacks can
+  /// await it: a panel whose first bypass call lands while the mint is
+  /// still running must wait for the token, not fail 'internal' on a
+  /// race the user cannot see or fix. Null when no mint was started
+  /// (no bypass.* grant); a failed mint completes normally (the mint
+  /// swallows its own errors) and leaves [_bypassApi] null, which
+  /// [_bypass] then reports honestly as 'internal'.
+  Future<void>? _bypassMint;
 
   @override
   void initState() {
@@ -285,7 +293,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     // bypass grant never hold one (the bridge gates their calls on the
     // permission before any callback runs anyway).
     if (inst.granted.any((p) => p.startsWith('bypass.'))) {
-      unawaited(_mintBypassToken(inst.granted));
+      _bypassMint = _mintBypassToken(inst.granted);
     }
     // Tear the panel down the moment the extension is disabled/removed.
     store.addListener(_onStoreChanged);
@@ -336,8 +344,6 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   /// refused mint) leaves [_bypassApi] null: bypass bridge callbacks
   /// then answer 'internal' and the rest of the panel keeps working.
   Future<void> _mintBypassToken(List<String> granted) async {
-    if (_bypassMinting) return;
-    _bypassMinting = true;
     try {
       final link = SoraScope.read(context).link;
       if (link == null) return;
@@ -360,8 +366,6 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     } catch (_) {
       // See the doc above: a missing host is a degraded panel, not a
       // failed one.
-    } finally {
-      _bypassMinting = false;
     }
   }
 
@@ -379,8 +383,18 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
 
   Future<BypassHostApi> _bypass() async {
     final api = _bypassApi;
-    if (api == null) throw BridgeError('internal', 'bypass host unavailable');
-    return api;
+    if (api != null) return api;
+    // The mint may still be in flight (the panel's first bypass call
+    // can beat it): wait for it instead of answering 'internal' for a
+    // host that is about to exist. A failed mint leaves the API null
+    // and the error below stays the honest answer.
+    final mint = _bypassMint;
+    if (mint != null) {
+      await mint;
+      final ready = _bypassApi;
+      if (ready != null) return ready;
+    }
+    throw BridgeError('internal', 'bypass host unavailable');
   }
 
   Future<Map<String, dynamic>> _getBypassCapabilities() async {
@@ -408,6 +422,12 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   }
 
   Future<Map<String, dynamic>> _applyBypassLayer(Map<String, dynamic> args) async {
+    // Capture the settings the write-through below needs BEFORE the
+    // first await: once the core call is in flight this State may be
+    // unmounted (the panel tears down when its extension goes away),
+    // and reading them from context afterwards would be both an
+    // analyzer finding and a real use-after-dispose hazard.
+    final settings = SoraScope.read(context).settings;
     try {
       // Validate before the core call, so a malformed layer is
       // 'invalid-argument' even against a core without the bypass API.
@@ -419,7 +439,6 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       // zapret outbounds the app builds. The user still wins: editing
       // a legacy zapret field clears the slot (settings.dart), as does
       // disabling or removing this extension (store.dart hook).
-      final settings = SoraScope.read(context).settings;
       if (layer.global != null) {
         settings.antidpiStrategyJson = jsonEncode(bypassStrategyToJson(layer.global!));
         settings.antidpiStrategySource = widget.extensionId;
@@ -536,7 +555,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
         } catch (_) {
           reply = '{"ok":false,"error":"internal"}';
         }
-        dynamic decoded;
+        final Map<String, dynamic> decoded;
         try {
           decoded = jsonDecode(reply) as Map<String, dynamic>;
         } catch (_) {
@@ -544,7 +563,17 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
         }
         final id = decoded['id'];
         final ok = decoded['ok'] == true;
-        final payload = ok ? decoded['result'] : decoded['error'];
+        final hostMessage = decoded['message'];
+        // Error replies travel as {code, message}: the bootstrap shim
+        // puts the code on the rejection's .code and the host's message
+        // (the core's own words, when the reply carries one) on
+        // .message — the documented SoraExtError shape.
+        final payload = ok
+            ? decoded['result']
+            : {
+                'code': decoded['error'],
+                if (hostMessage is String) 'message': hostMessage,
+              };
         try {
           await controller.runJavaScript(
               'window.soraExt && window.soraExt._resolve(${jsonEncode(id)}, ${ok ? 'true' : 'false'}, ${jsonEncode(payload)})');

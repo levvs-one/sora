@@ -95,7 +95,12 @@ class PanelBridge {
   final Future<Map<String, dynamic>> Function(String engine) tuneDesync;
 
   /// Handles one JSON message posted to the `soraExt` JavaScript channel.
-  /// Always returns a JSON reply: {id, ok, result?} or {id, ok, error}.
+  /// Always returns a JSON reply: {id, ok, result?} or
+  /// {id, ok, error, message?} — `error` is always the machine-readable
+  /// code; `message` carries the human-readable failure text when the
+  /// failure has one (a [BridgeError], e.g. the core's own
+  /// invalid-argument wording), so the panel can show what the core
+  /// actually said instead of only a generic per-code sentence.
   Future<String> handle(String raw) async {
     dynamic decoded;
     try {
@@ -116,7 +121,7 @@ class PanelBridge {
       final result = await _dispatch(method, args);
       return _reply(id, true, null, result);
     } on BridgeError catch (e) {
-      return _reply(id, false, e.code);
+      return _reply(id, false, e.code, null, e.message);
     } catch (_) {
       return _reply(id, false, 'internal');
     }
@@ -167,10 +172,20 @@ class PanelBridge {
   /// message, unknown method, bad args), 'not-connected' (getConnections
   /// with no VPN session up), 'internal' (the host could not complete the
   /// call). The JS shim rejects with an Error carrying the code on
-  /// `.code`, so `catch (e) { e.code }` works identically against the real
-  /// host and the mock.
-  String _reply(dynamic id, bool ok, String? error, [dynamic result]) {
-    return jsonEncode({'id': id, 'ok': ok, if (error != null) 'error': error, if (ok) 'result': result});
+  /// `.code` and, when this reply carries a `message`, that text on
+  /// `.message` — so `catch (e) { e.code }` works identically against
+  /// the real host and the mock, and `e.message` shows the core's own
+  /// words when it sent any. The `error` field itself stays the bare
+  /// code: the documented contract pins it, and older shims reading only
+  /// `error` keep working.
+  String _reply(dynamic id, bool ok, String? error, [dynamic result, String? message]) {
+    return jsonEncode({
+      'id': id,
+      'ok': ok,
+      if (error != null) 'error': error,
+      if (message != null && message.isNotEmpty) 'message': message,
+      if (ok) 'result': result,
+    });
   }
 
   /// Injected into the panel before any page script runs. `soraExt` here is
@@ -191,9 +206,9 @@ window.soraExt = (() => {
       });
     },
     onEvent(cb) {
-      if (typeof cb !== 'function') return () {};
+      if (typeof cb !== 'function') return () => {};
       listeners.push(cb);
-      return () {
+      return () => {
         const i = listeners.indexOf(cb);
         if (i >= 0) listeners.splice(i, 1);
       };
@@ -208,9 +223,15 @@ window.soraExt = (() => {
         // The documented contract (sora-ext.d.ts): rejections are
         // SoraExtError-shaped — an Error whose `code` is the stable
         // machine-readable code, exactly like the mock's deny(). The
-        // payload here IS the code the host sent.
-        const e = new Error(payload);
-        e.code = payload;
+        // host sends the error payload as {code, message}: `code` goes
+        // on .code and the host's human-readable message (the core's
+        // own words, when it sent any) becomes .message. A bare string
+        // payload is the code itself (older reply shape) and is still
+        // accepted.
+        const code = (payload && typeof payload === 'object') ? payload.code : payload;
+        const msg = (payload && typeof payload === 'object' && payload.message) ? payload.message : code;
+        const e = new Error(msg);
+        e.code = code;
         p.reject(e);
       }
     },
