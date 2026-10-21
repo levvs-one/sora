@@ -8,8 +8,10 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/bypass"
 	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/ext"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
@@ -134,13 +136,33 @@ func (s *Server) buildPlan(in *corev1.SessionPlan, sessionID string) (*engine.Pl
 	return plan, nil
 }
 
+// canonicalDomainValue renders one domain in the canonical form
+// ruleFromProto produces for user rules: IDNA ASCII (lower-case /
+// punycode) with the same profile. An unconvertible value falls back
+// to its lower-case form, so comparison stays case-insensitive even
+// for a value ruleFromProto would have refused outright.
+func canonicalDomainValue(v string) string {
+	if ascii, err := ruleIDNA.ToASCII(v); err == nil {
+		return ascii
+	}
+	return strings.ToLower(v)
+}
+
 // canonicalBypassDestination renders a layer match or a BypassSettings
 // entry in the canonical destination form rules are compared in: a
 // prefixed destination stays as is, an address or network stays as is,
-// and a bare domain becomes its "domain:" form.
+// and a bare domain becomes its "domain:" form. Domain parts are
+// canonicalized (case/IDNA, L2) exactly as ruleFromProto canonicalizes
+// user rules, so "domain:EXAMPLE.com" from a layer and a user rule
+// for "example.com" compare equal.
 func canonicalBypassDestination(match string) string {
 	m := strings.TrimSpace(match)
-	for _, prefix := range []string{"domain:", "full:", "geosite:", "geoip:", "ruleset:", "process:"} {
+	for _, prefix := range []string{"domain:", "full:"} {
+		if strings.HasPrefix(m, prefix) {
+			return prefix + canonicalDomainValue(strings.TrimPrefix(m, prefix))
+		}
+	}
+	for _, prefix := range []string{"geosite:", "geoip:", "ruleset:", "process:"} {
 		if strings.HasPrefix(m, prefix) {
 			return m
 		}
@@ -151,7 +173,63 @@ func canonicalBypassDestination(match string) string {
 	if _, err := netip.ParsePrefix(m); err == nil {
 		return m
 	}
-	return "domain:" + m
+	return "domain:" + canonicalDomainValue(m)
+}
+
+// bypassDestDomain splits a canonical destination into its prefix
+// ("domain:" or "full:") and domain, reporting whether it is a domain
+// destination at all.
+func bypassDestDomain(dest string) (prefix, domain string, ok bool) {
+	for _, p := range []string{"domain:", "full:"} {
+		if strings.HasPrefix(dest, p) {
+			return p, strings.TrimPrefix(dest, p), true
+		}
+	}
+	return "", "", false
+}
+
+// domainSuffixCovered reports whether a canonical binding destination
+// is already covered by one of the collected user domain-suffix
+// domains: a user "domain:example.com" rule routes sub.example.com
+// (and example.com itself), so a binding for it — in either its
+// domain: or full: form — would never be reached (L2).
+func domainSuffixCovered(suffixes []string, dest string) bool {
+	_, dom, ok := bypassDestDomain(dest)
+	if !ok {
+		return false
+	}
+	for _, suf := range suffixes {
+		if dom == suf || strings.HasSuffix(dom, "."+suf) {
+			return true
+		}
+	}
+	return false
+}
+
+// extBypassOutboundName names a binding's synthetic outbound. The
+// name mirrors the match ("ext: "+match) while it fits the plan's
+// name limit; a longer match is shortened deterministically — the
+// tail is replaced with a hash suffix of the full match — so the
+// merge can never emit a name over engine.MaxNameBytes, whatever a
+// layer carries (M1, second line of defence behind the
+// ValidateBypassMatch cap in core/ext).
+func extBypassOutboundName(match string) string {
+	name := "ext: " + match
+	if len(name) <= engine.MaxNameBytes {
+		return name
+	}
+	sum := sha256.Sum256([]byte(match))
+	suffix := "-" + hex.EncodeToString(sum[:8])
+	budget := engine.MaxNameBytes - len("ext: ") - len(suffix)
+	truncated := match
+	for len(truncated) > budget {
+		_, size := utf8.DecodeLastRuneInString(truncated)
+		if size <= 0 {
+			size = 1
+		}
+		truncated = truncated[:len(truncated)-size]
+	}
+	return "ext: " + truncated + suffix
 }
 
 // ruleDestination renders a plan rule back into destination form, the
@@ -196,9 +274,26 @@ func mergeBypassBindings(plan *engine.Plan, in *corev1.SessionPlan, layers []ext
 	if plan == nil || len(layers) == 0 {
 		return
 	}
+	// An Xray profile runs alone (Plan.Validate): weaving in even one
+	// binding outbound or rule would invalidate an otherwise valid
+	// user plan, so a profile plan takes no bindings at all (M1b).
+	for _, o := range plan.Outbounds {
+		if o.Protocol == engine.ProtocolXrayProfile {
+			return
+		}
+	}
 	existing := make(map[string]bool, len(plan.Rules))
+	// suffixDomains collects the domains of user domain-suffix
+	// destinations: a binding covered by one is a conflict (L2).
+	var suffixDomains []string
+	noteExisting := func(dest string) {
+		existing[dest] = true
+		if prefix, dom, ok := bypassDestDomain(dest); ok && prefix == "domain:" {
+			suffixDomains = append(suffixDomains, dom)
+		}
+	}
 	for _, r := range plan.Rules {
-		existing[ruleDestination(r)] = true
+		noteExisting(ruleDestination(r))
 		if r.Type == engine.RuleDomainKeyword {
 			// A keyword rule matches the name anywhere inside a host;
 			// a binding for the same name would never be reached for
@@ -208,7 +303,7 @@ func mergeBypassBindings(plan *engine.Plan, in *corev1.SessionPlan, layers []ext
 		}
 	}
 	for _, entry := range in.GetBypassSettings().GetRules() {
-		existing[canonicalBypassDestination(entry)] = true
+		noteExisting(canonicalBypassDestination(entry))
 	}
 	outboundIDs := make(map[string]bool, len(plan.Outbounds))
 	for _, o := range plan.Outbounds {
@@ -232,6 +327,11 @@ func mergeBypassBindings(plan *engine.Plan, in *corev1.SessionPlan, layers []ext
 			if existing[dest] {
 				continue
 			}
+			// Suffix conflict (L2): a user domain-suffix rule
+			// already routes this destination's hosts.
+			if domainSuffixCovered(suffixDomains, dest) {
+				continue
+			}
 			if len(plan.Outbounds) >= engine.MaxOutbounds || len(plan.Rules)+len(added) >= engine.MaxRules {
 				continue
 			}
@@ -240,17 +340,35 @@ func mergeBypassBindings(plan *engine.Plan, in *corev1.SessionPlan, layers []ext
 				continue
 			}
 			strat := ext.ProtoToEngineStrategy(b.Strategy)
-			plan.Outbounds = append(plan.Outbounds, engine.Outbound{
-				ID: id, Name: "ext: " + b.Match,
-				Protocol: engine.ProtocolBypass, Bypass: &strat,
-			})
-			rule, err := ruleFromProto(&corev1.RoutingRule{Destination: dest, OutboundId: id})
-			if err != nil {
-				plan.Outbounds = plan.Outbounds[:len(plan.Outbounds)-1]
+			// Mid-SNI marker: resolve against this binding's
+			// domain now, while the target is known (see
+			// resolveBindingMarker); unresolvable → skip.
+			resolved, rok := resolveBindingMarker(strat, dest)
+			if !rok {
 				continue
 			}
+			strat = resolved
+			outbound := engine.Outbound{
+				ID: id, Name: extBypassOutboundName(b.Match),
+				Protocol: engine.ProtocolBypass, Bypass: &strat,
+			}
+			// The outbound must stand on its own before it may
+			// join the plan (M1c, the plan.go probe pattern): a
+			// binding whose strategy or name is invalid is
+			// skipped, never a reason to fail the user's plan.
+			if err := outbound.Validate(); err != nil {
+				continue
+			}
+			rule, err := ruleFromProto(&corev1.RoutingRule{Destination: dest, OutboundId: id})
+			if err != nil {
+				continue
+			}
+			plan.Outbounds = append(plan.Outbounds, outbound)
 			outboundIDs[id] = true
 			existing[dest] = true
+			if prefix, dom, ok := bypassDestDomain(dest); ok && prefix == "domain:" {
+				suffixDomains = append(suffixDomains, dom)
+			}
 			added = append(added, rule)
 		}
 	}
@@ -265,6 +383,40 @@ func mergeBypassBindings(plan *engine.Plan, in *corev1.SessionPlan, layers []ext
 	if prov != nil {
 		prov.Bindings += len(added)
 	}
+}
+
+// resolveBindingMarker resolves a binding strategy's mid-SNI
+// marker against the binding's own domain, with exactly the
+// semantics the tuner uses (bypass.ResolveStrategy against the
+// target SNI — here the binding destination IS the target). The
+// marker is sora's own registry marker, not an executor position:
+// the vendored zapret parsers (tpws and nfqws alike) accept only
+// method/host/endhost/sld/midsld/endsld/sniext, so an unresolved
+// marker must never reach a plan. A strategy without the marker
+// passes through unchanged; a marker strategy whose destination is
+// not a plain domain (or whose resolution fails) reports ok=false
+// and the caller skips the binding — the layer store already refuses
+// those at Apply, so this is the merge's defence in depth, in the
+// same skip-never-fail spirit as the outbound probe (M1c).
+func resolveBindingMarker(strat engine.BypassStrategy, dest string) (engine.BypassStrategy, bool) {
+	has := strat.TLSRecord == bypass.MidSNIMarker
+	for _, pos := range strat.SplitPos {
+		if pos == bypass.MidSNIMarker {
+			has = true
+		}
+	}
+	if !has {
+		return strat, true
+	}
+	_, dom, ok := bypassDestDomain(dest)
+	if !ok {
+		return engine.BypassStrategy{}, false
+	}
+	resolved, rok, err := bypass.ResolveStrategy(strat, dom, 0)
+	if err != nil || !rok {
+		return engine.BypassStrategy{}, false
+	}
+	return resolved, true
 }
 
 // bypassCapabilities adapts the wired capability source to the host
@@ -308,12 +460,18 @@ func (s *Server) bypassState(ctx context.Context, extensionID string) (*ext.Bypa
 	// timeout, fixed before this ever shipped in a build).
 	s.bypassMu.Lock()
 	prov := s.bypassProv
-	store := s.bypassLayerStore
 	s.bypassMu.Unlock()
 	// PendingApply: a layer that will change the next plan exists but
-	// the last built plan predates it — either any provider layer (the
-	// caller's own included), or no plan was built at all while layers
-	// exist.
+	// the last built plan predates it — either any provider layer, or
+	// no plan was built at all while layers exist.
+	//
+	// Only the provider's layers count (L1): bypassLayers already
+	// applies the enabled+granted bypass.write filter, and the
+	// caller's own layer is part of that list exactly when it passes
+	// the same filter as everyone else's. Reading the caller's layer
+	// straight from the store here (as this once did) both counted a
+	// disabled or ungranted extension's layer as pending — and, when
+	// the caller did pass the filter, counted its layer twice.
 	pending := func(layers []ext.LayerEntry, builtAt time.Time, hasPlan bool) bool {
 		for _, e := range layers {
 			if e.Layer.IsEmpty() {
@@ -326,11 +484,6 @@ func (s *Server) bypassState(ctx context.Context, extensionID string) (*ext.Bypa
 		return false
 	}
 	layers := s.bypassLayers()
-	if store != nil {
-		if own, ok := store.Get(extensionID); ok && !own.IsEmpty() {
-			layers = append(layers, ext.LayerEntry{ID: extensionID, Layer: own})
-		}
-	}
 	if prov == nil {
 		info.PendingApply = pending(layers, time.Time{}, false)
 		return info, nil

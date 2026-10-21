@@ -265,6 +265,265 @@ func TestBypassStateReflectsProvenanceAndPending(t *testing.T) {
 	}
 }
 
+// TestBypassMergeLongMatchNameShortened pins M1(a) at the merge: a
+// layer staged behind the store's back with a match whose
+// "ext: "+match name would exceed MaxNameBytes is still merged —
+// with a deterministically shortened, hash-suffixed name — and the
+// plan validates (Connect does not fail).
+func TestBypassMergeLongMatchNameShortened(t *testing.T) {
+	longMatch := "geosite:" + strings.Repeat("a", 300)
+	in := &corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		Outbounds:  []*corev1.OutboundSpec{{Id: "srv", Protocol: "direct"}},
+		Routing:    &corev1.RoutingOptions{ProxyTarget: "srv"},
+	}
+	layers := []ext.LayerEntry{layerEntry("com.example.anti", ext.Layer{Bindings: []ext.Binding{
+		{Match: longMatch, Strategy: tpwsProto()},
+	}})}
+	plan, prov, err := planFromProtoMerged(in, "s", nil, layers)
+	if err != nil {
+		t.Fatalf("planFromProtoMerged with an over-long match: %v", err)
+	}
+	if prov.Bindings != 1 {
+		t.Fatalf("applied bindings = %d, want 1", prov.Bindings)
+	}
+	for _, o := range plan.Outbounds {
+		if strings.HasPrefix(o.ID, "ext-bypass-") {
+			if len(o.Name) > engine.MaxNameBytes {
+				t.Errorf("merged outbound name is %d bytes, limit is %d", len(o.Name), engine.MaxNameBytes)
+			}
+			if !strings.HasPrefix(o.Name, "ext: geosite:aaaa") || !strings.Contains(o.Name, "-") {
+				t.Errorf("shortened name = %q, want the ext: prefix, a truncated match and a hash suffix", o.Name)
+			}
+		}
+	}
+	// Deterministic: rebuilding names the outbound identically.
+	plan2, _, err := planFromProtoMerged(in, "s", nil, layers)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := range plan.Outbounds {
+		if plan.Outbounds[i].Name != plan2.Outbounds[i].Name {
+			t.Errorf("rebuild renamed an outbound: %q vs %q", plan.Outbounds[i].Name, plan2.Outbounds[i].Name)
+		}
+	}
+}
+
+// TestBypassMergeSkipsInvalidBinding pins M1(c): a binding whose own
+// outbound does not validate is skipped, never a plan error.
+func TestBypassMergeSkipsInvalidBinding(t *testing.T) {
+	in := &corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		Outbounds:  []*corev1.OutboundSpec{{Id: "srv", Protocol: "direct"}},
+		Routing:    &corev1.RoutingOptions{ProxyTarget: "srv"},
+	}
+	layers := []ext.LayerEntry{layerEntry("com.example.anti", ext.Layer{Bindings: []ext.Binding{
+		{Match: "domain:empty.example.com", Strategy: &corev1.BypassStrategy{}}, // changes nothing
+		{Match: "domain:bogus.example.com", Strategy: &corev1.BypassStrategy{Desync: []string{"bogus"}}},
+		{Match: "domain:good.example.com", Strategy: tpwsProto()},
+	}})}
+	plan, prov, err := planFromProtoMerged(in, "s", nil, layers)
+	if err != nil {
+		t.Fatalf("planFromProtoMerged with invalid bindings: %v", err)
+	}
+	if prov.Bindings != 1 {
+		t.Errorf("applied bindings = %d, want exactly 1 (the valid one)", prov.Bindings)
+	}
+	for _, o := range plan.Outbounds {
+		if strings.HasPrefix(o.ID, "ext-bypass-") && o.Name != "ext: domain:good.example.com" {
+			t.Errorf("an invalid binding reached the plan: %+v", o)
+		}
+	}
+}
+
+// TestBypassMergeXrayProfileSkipsAllBindings pins M1(b): an Xray
+// profile runs alone, so the merge adds neither outbounds nor rules
+// to a profile plan and the plan stays valid.
+func TestBypassMergeXrayProfileSkipsAllBindings(t *testing.T) {
+	plan := &engine.Plan{
+		SessionID: "s",
+		Outbounds: []engine.Outbound{{
+			ID: "prof", Name: "Profile", Protocol: engine.ProtocolXrayProfile,
+			Server: "example.com", Port: 443,
+			Profile: []byte(`{"outbounds":[{"protocol":"vless"}]}`),
+		}},
+	}
+	prov := &bypassProvenance{Source: "none"}
+	layers := []ext.LayerEntry{layerEntry("com.example.anti", ext.Layer{Bindings: []ext.Binding{
+		{Match: "domain:ads.example.com", Strategy: tpwsProto()},
+	}})}
+	mergeBypassBindings(plan, &corev1.SessionPlan{}, layers, prov)
+	if len(plan.Outbounds) != 1 || len(plan.Rules) != 0 || prov.Bindings != 0 {
+		t.Fatalf("profile plan after merge = %d outbounds, %d rules, %d bindings; want 1/0/0",
+			len(plan.Outbounds), len(plan.Rules), prov.Bindings)
+	}
+	if err := plan.Validate(); err != nil {
+		t.Errorf("profile plan with a bypass layer must stay valid: %v", err)
+	}
+}
+
+// TestBypassMergeCanonicalConflicts pins L2 at merge time: matches
+// are compared in the canonical form ruleFromProto gives user rules,
+// so case and IDNA spellings of a user-routed host conflict.
+func TestBypassMergeCanonicalConflicts(t *testing.T) {
+	in := &corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		Outbounds:  []*corev1.OutboundSpec{{Id: "srv", Protocol: "direct"}},
+		Routes: []*corev1.RoutingRule{
+			{Destination: "domain:EXAMPLE.com", OutboundId: "direct"},
+			{Destination: "domain:xn--mnchen-3ya.de", OutboundId: "direct"},
+		},
+		Routing: &corev1.RoutingOptions{ProxyTarget: "srv"},
+	}
+	layers := []ext.LayerEntry{layerEntry("com.example.anti", ext.Layer{Bindings: []ext.Binding{
+		{Match: "example.com", Strategy: tpwsProto()},        // bare + case variant of a user rule
+		{Match: "domain:Example.COM", Strategy: tpwsProto()}, // case variant, prefixed
+		{Match: "domain:münchen.de", Strategy: tpwsProto()},  // IDNA variant of a user rule
+		{Match: "domain:free.example.org", Strategy: tpwsProto()},
+	}})}
+	plan, prov, err := planFromProtoMerged(in, "s", nil, layers)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if prov.Bindings != 1 {
+		t.Errorf("applied bindings = %d, want 1 (only the unrouted host)", prov.Bindings)
+	}
+	for _, o := range plan.Outbounds {
+		if strings.HasPrefix(o.ID, "ext-bypass-") && o.Name != "ext: domain:free.example.org" {
+			t.Errorf("a canonically conflicting binding reached the plan: %+v", o)
+		}
+	}
+}
+
+// TestBypassMergeSuffixConflicts pins L2's suffix rule: a user
+// domain:example.com rule (likewise a BypassSettings domain entry)
+// covers bindings for its subdomains in both domain: and full:
+// forms; covered bindings are skipped and not counted.
+func TestBypassMergeSuffixConflicts(t *testing.T) {
+	in := &corev1.SessionPlan{
+		TunnelMode:     corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		Outbounds:      []*corev1.OutboundSpec{{Id: "srv", Protocol: "direct"}},
+		Routes:         []*corev1.RoutingRule{{Destination: "domain:example.com", OutboundId: "direct"}},
+		Routing:        &corev1.RoutingOptions{ProxyTarget: "srv"},
+		BypassSettings: &corev1.BypassSettings{Rules: []string{"domain:settings.org"}},
+	}
+	layers := []ext.LayerEntry{layerEntry("com.example.anti", ext.Layer{Bindings: []ext.Binding{
+		{Match: "domain:sub.example.com", Strategy: tpwsProto()},
+		{Match: "full:sub.example.com", Strategy: tpwsProto()},
+		{Match: "full:example.com", Strategy: tpwsProto()},
+		{Match: "domain:deep.sub.example.com", Strategy: tpwsProto()},
+		{Match: "sub.settings.org", Strategy: tpwsProto()},
+		{Match: "domain:notexample.com", Strategy: tpwsProto()},
+		{Match: "domain:example.com.evil.org", Strategy: tpwsProto()},
+	}})}
+	plan, prov, err := planFromProtoMerged(in, "s", nil, layers)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if prov.Bindings != 2 {
+		t.Errorf("applied bindings = %d, want 2 (notexample.com and example.com.evil.org are not covered)", prov.Bindings)
+	}
+	for _, o := range plan.Outbounds {
+		if !strings.HasPrefix(o.ID, "ext-bypass-") {
+			continue
+		}
+		if o.Name != "ext: domain:notexample.com" && o.Name != "ext: domain:example.com.evil.org" {
+			t.Errorf("a suffix-covered binding reached the plan: %+v", o)
+		}
+	}
+}
+
+// TestBypassStateDisabledExtensionLayerNotPending pins L1: the
+// caller's own layer counts toward bypass state only through the
+// provider filter (enabled + granted bypass.write). A disabled
+// extension's stored layer makes nothing pending and is not the
+// global source.
+func TestBypassStateDisabledExtensionLayerNotPending(t *testing.T) {
+	srv := bypassTestServer(t)
+	store, err := ext.NewLayerStore("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Set("com.example.anti", ext.Layer{Global: tpwsProto()}); err != nil {
+		t.Fatal(err)
+	}
+	enabled := false
+	srv.SetBypassLayerStore(store, func(string) bool { return enabled })
+	info, err := srv.bypassState(context.Background(), "com.example.anti")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info.PendingApply {
+		t.Errorf("state for a disabled extension = %+v, want pending_apply=false", info)
+	}
+	if info.GlobalSource == "extension" {
+		t.Errorf("state for a disabled extension = %+v, global_source must not be extension on its account", info)
+	}
+	// Control: the same layer from an enabled+granted extension IS
+	// pending (the filter, not the caller, decides).
+	enabled = true
+	info, _ = srv.bypassState(context.Background(), "com.example.anti")
+	if !info.PendingApply {
+		t.Errorf("state for an enabled extension = %+v, want pending_apply=true", info)
+	}
+}
+
+// TestBypassMergeResolvesMidSNIMarker pins the merge half of the
+// midsni semantics: a binding strategy carrying the marker is
+// resolved against the binding's own domain — the same
+// bypass.ResolveStrategy semantics the tuner uses — so the merged
+// outbound carries the concrete "sniext+N" position (for
+// example.com: sniext + 9 + 11/2 = sniext+14) and the plan
+// validates; a marker binding on a non-domain destination is
+// skipped, never a plan failure.
+func TestBypassMergeResolvesMidSNIMarker(t *testing.T) {
+	in := &corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		Outbounds:  []*corev1.OutboundSpec{{Id: "srv", Protocol: "direct"}},
+		Routing:    &corev1.RoutingOptions{ProxyTarget: "srv"},
+	}
+	nfqMarker := &corev1.BypassStrategy{
+		SplitPos: []string{"midsni"}, Desync: []string{"disorder2"},
+		Fooling: "md5sig", FilterTcp: "80,443", FilterL7: "tls",
+	}
+	layers := []ext.LayerEntry{layerEntry("com.example.anti", ext.Layer{Bindings: []ext.Binding{
+		{Match: "domain:example.com", Strategy: &corev1.BypassStrategy{SplitPos: []string{"midsni"}}},
+		{Match: "domain:example.org", Strategy: nfqMarker},
+		{Match: "geosite:category-ads", Strategy: &corev1.BypassStrategy{SplitPos: []string{"midsni"}}},
+	}})}
+	plan, prov, err := planFromProtoMerged(in, "s", nil, layers)
+	if err != nil {
+		t.Fatalf("planFromProtoMerged with marker bindings: %v", err)
+	}
+	if prov.Bindings != 2 {
+		t.Errorf("applied bindings = %d, want 2 (the tag binding's marker cannot resolve and is skipped)", prov.Bindings)
+	}
+	byName := map[string]engine.Outbound{}
+	for _, o := range plan.Outbounds {
+		if strings.HasPrefix(o.ID, "ext-bypass-") {
+			byName[o.Name] = o
+		}
+	}
+	tpwsOut, ok := byName["ext: domain:example.com"]
+	if !ok || tpwsOut.Bypass == nil || len(tpwsOut.Bypass.SplitPos) != 1 || tpwsOut.Bypass.SplitPos[0] != "sniext+14" {
+		t.Errorf("tpws marker binding outbound = %+v, want SplitPos [sniext+14] (resolved against example.com)", tpwsOut)
+	}
+	nfqOut, ok := byName["ext: domain:example.org"]
+	if !ok || nfqOut.Bypass == nil || len(nfqOut.Bypass.SplitPos) != 1 || nfqOut.Bypass.SplitPos[0] != "sniext+14" {
+		t.Errorf("nfqws marker binding outbound = %+v, want SplitPos [sniext+14] (resolved against example.org)", nfqOut)
+	}
+	for _, o := range plan.Outbounds {
+		if o.Bypass == nil {
+			continue
+		}
+		for _, pos := range o.Bypass.SplitPos {
+			if pos == "midsni" {
+				t.Errorf("an unresolved marker reached the plan: %+v", o)
+			}
+		}
+	}
+}
+
 func TestBypassCapabilitiesUnwiredAreHonest(t *testing.T) {
 	srv := bypassTestServer(t)
 	platform, backends, err := srv.bypassCapabilities(context.Background())

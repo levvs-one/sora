@@ -611,24 +611,24 @@ func TestAntiDPIArgvFromBuiltPlan(t *testing.T) {
 }
 
 // TestAntiDPIPresetSweep: every preset in presets.json must parse as
-// protojson, name the backend its strategy actually selects, and
-// render for that backend without error. Validation is asserted with
-// one pinned exception:
+// protojson, be applicable through the plugin in its declared scope,
+// name the backend its strategy actually selects, and render for
+// that backend without error.
 //
-// FINDING (reported, not silently fixed — the presets are another
-// department's deliverable): the three presets whose split_pos is
-// the registry marker "midsni" (sni_block/split-midsni,
-// sni_block/disorder-midsni, kz_variant/split-midsni) FAIL
-// LayerStore validation as shipped, because engine strategy
-// validation refuses an unresolved marker. A user applying one of
-// these presets through the panel gets InvalidArgument from
-// ApplyBypassLayer; the strategies only become valid after
-// bypass.ResolveStrategy resolves the marker against a target SNI —
-// and the layer/plan path has no target SNI at apply time. The sweep
-// pins exactly that failure mode, and separately proves the resolved
-// form validates and renders, so a fix on either side (preset
-// strategies carrying a resolvable position, or the layer accepting
-// markers the executor resolves per target) flips this test loudly.
+// The three presets whose split_pos is the registry marker "midsni"
+// (sni_block/split-midsni, sni_block/disorder-midsni,
+// kz_variant/split-midsni) are BINDING-scoped: the marker is sora's
+// own, not an executor position (the vendored zapret parsers accept
+// only method/host/endhost/sld/midsld/endsld/sniext, and the shipped
+// tpws binary refuses --split-pos=midsni at parse time), so it can
+// only ever resolve against a concrete target domain. The sweep
+// pins the flipped semantics: as a global the marker strategy is
+// still honestly refused (unresolved marker), as a binding to a
+// plain domain it validates (ext.ValidateBypassBindingStrategy),
+// on a tag binding it is refused again, and the merge-resolved form
+// (bypass.ResolveStrategy against the binding domain) validates and
+// renders for the declared backend. The other twelve presets are
+// global-scoped and must pass plain strategy validation.
 func TestAntiDPIPresetSweep(t *testing.T) {
 	presets := antiDPIPresets(t)
 	if len(presets) != 15 {
@@ -648,8 +648,20 @@ func TestAntiDPIPresetSweep(t *testing.T) {
 		}
 		if err := ext.ValidateBypassStrategy(s); err != nil {
 			if marker && strings.Contains(err.Error(), "unresolved marker") {
-				// The pinned finding above: the raw preset is not
-				// layer-valid; its SNI-resolved form must be.
+				// Binding scope is this preset's declared scope:
+				// on a plain-domain binding the marker strategy
+				// must validate, on a tag binding it must not.
+				if berr := ext.ValidateBypassBindingStrategy("domain:example.org", s); berr != nil {
+					t.Errorf("%s: binding-scope validation on a plain domain: %v", p.ID, berr)
+					continue
+				}
+				if berr := ext.ValidateBypassBindingStrategy("geosite:category-ads", s); berr == nil {
+					t.Errorf("%s: marker strategy validated on a tag binding, want refusal", p.ID)
+					continue
+				}
+				// The plan merge resolves the marker against
+				// the binding's domain; that resolved form must
+				// validate as a plain strategy.
 				eng := ext.ProtoToEngineStrategy(s)
 				resolved, ok, rerr := bypass.ResolveStrategy(eng, "example.org", 0)
 				if rerr != nil || !ok {
@@ -665,6 +677,9 @@ func TestAntiDPIPresetSweep(t *testing.T) {
 				t.Errorf("%s: strategy validation: %v", p.ID, err)
 				continue
 			}
+		} else if marker {
+			t.Errorf("%s: a marker strategy passed global validation, want the unresolved-marker refusal", p.ID)
+			continue
 		}
 		if len(p.Backends) != 1 {
 			t.Errorf("%s: backends = %v, want exactly one", p.ID, p.Backends)
@@ -697,5 +712,54 @@ func TestAntiDPIPresetSweep(t *testing.T) {
 				t.Errorf("%s: nfqws render ok=%v err=%v args=%v", p.ID, ok, err, args)
 			}
 		}
+	}
+}
+
+// TestAntiDPIE2EMidsniPresetAsBinding is the acceptance pin for the
+// midsni presets' declared (binding) scope, end to end through the
+// host: a marker preset applied to a plain-domain binding succeeds,
+// the built plan carries the marker resolved against that domain
+// (example.org -> sniext+14), and the same preset applied as the
+// global strategy is refused InvalidArgument — no target exists to
+// resolve it against there.
+func TestAntiDPIE2EMidsniPresetAsBinding(t *testing.T) {
+	f := newAntiDPIFixture(t, 0)
+	ctx := context.Background()
+	tok := f.mint(t, f.granted...)
+	preset := antiDPIPresetStrategy(t, "sni_block/split-midsni")
+
+	if _, err := f.host.ApplyBypassLayer(ctx, &extv1.ApplyBypassLayerRequest{
+		ExtensionToken: tok, HasGlobal: true, Global: preset,
+	}); err == nil {
+		t.Fatal("midsni preset as global: ApplyBypassLayer succeeded, want refusal")
+	} else {
+		wantCode(t, err, codes.InvalidArgument, "midsni preset as global")
+	}
+	if _, err := f.host.ApplyBypassLayer(ctx, &extv1.ApplyBypassLayerRequest{
+		ExtensionToken: tok,
+		Bindings:       []*extv1.BypassBinding{{Match: "domain:example.org", Strategy: preset}},
+	}); err != nil {
+		t.Fatalf("midsni preset as a domain binding: ApplyBypassLayer: %v", err)
+	}
+	plan, err := f.srv.buildPlan(&corev1.SessionPlan{
+		TunnelMode: corev1.TunnelMode_TUNNEL_MODE_SYSTEM,
+		Outbounds:  []*corev1.OutboundSpec{{Id: "srv", Protocol: "direct"}},
+		Routing:    &corev1.RoutingOptions{ProxyTarget: "srv"},
+	}, "s")
+	if err != nil {
+		t.Fatalf("buildPlan: %v", err)
+	}
+	found := false
+	for _, o := range plan.Outbounds {
+		if !strings.HasPrefix(o.ID, "ext-bypass-") {
+			continue
+		}
+		found = true
+		if o.Bypass == nil || len(o.Bypass.SplitPos) != 1 || o.Bypass.SplitPos[0] != "sniext+14" {
+			t.Errorf("merged marker outbound = %+v, want SplitPos [sniext+14] resolved against example.org", o)
+		}
+	}
+	if !found {
+		t.Fatal("the midsni binding did not reach the plan")
 	}
 }
