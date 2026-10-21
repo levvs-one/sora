@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"runtime/debug"
 	"runtime/metrics"
+	"strings"
 	"time"
 
 	"github.com/dop251/goja"
@@ -62,9 +63,10 @@ func runJavaScriptCommand(ctx context.Context, cmd *exec.Cmd, source string, eve
 	if err != nil {
 		return err
 	}
-	// OOM dumps can be large and carry script data; the parent reports the
-	// process exit status and keeps its own bounded extension log instead.
-	cmd.Stderr = io.Discard
+	// OOM dumps can be large and carry script data; only the first line of
+	// a Go runtime failure is kept, which names the cause and nothing else.
+	fatal := &runtimeFailure{}
+	cmd.Stderr = fatal
 	if err = cmd.Start(); err != nil {
 		return err
 	}
@@ -102,6 +104,9 @@ func runJavaScriptCommand(ctx context.Context, cmd *exec.Cmd, source string, eve
 	if err = cmd.Wait(); err != nil {
 		if ctx.Err() != nil {
 			return ctx.Err()
+		}
+		if line := fatal.line(); line != "" {
+			return fmt.Errorf("worker process: %w: %s", err, line)
 		}
 		return fmt.Errorf("worker process: %w", err)
 	}
@@ -228,4 +233,33 @@ func watchWorkerHeap(limit uint64) {
 			os.Exit(workerHeapExceeded)
 		}
 	}
+}
+
+// runtimeFailure keeps the first stderr line of a worker when it is a Go
+// runtime failure ("fatal error: ..." or "runtime: ..."), capped at 200
+// bytes, and drops everything else.
+type runtimeFailure struct {
+	buf  []byte
+	done bool
+}
+
+func (r *runtimeFailure) Write(p []byte) (int, error) {
+	if !r.done {
+		for _, b := range p {
+			if b == '\n' || len(r.buf) >= 200 {
+				r.done = true
+				break
+			}
+			r.buf = append(r.buf, b)
+		}
+	}
+	return len(p), nil
+}
+
+func (r *runtimeFailure) line() string {
+	line := string(r.buf)
+	if strings.HasPrefix(line, "fatal error:") || strings.HasPrefix(line, "runtime:") {
+		return line
+	}
+	return ""
 }
