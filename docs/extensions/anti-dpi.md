@@ -70,13 +70,24 @@ its tokens at once (§5).
   targets, what it costs, and which backend it needs. Picking a
   preset fills the editor; nothing is applied until you press
   **Apply**.
-  - *Known issue:* the three `midsni` presets
-    (`sni_block/split-midsni`, `sni_block/disorder-midsni`,
-    `kz_variant/split-midsni`) currently fail to apply — the core
-    refuses the unresolved `midsni` marker at layer validation. The
-    same strategies work when the auto-tuner picks them (it resolves
-    the marker against the canary). This is tracked as a defect, not
-    a feature.
+  - *The three `midsni` presets are binding-scoped:*
+    `sni_block/split-midsni`, `sni_block/disorder-midsni` and
+    `kz_variant/split-midsni` carry the split position `midsni` —
+    "the middle of the actual SNI hostname". That marker is Sora's
+    own registry marker, **not** a zapret position: the executors'
+    native marker list is `method/host/endhost/sld/midsld/endsld/
+    sniext` (note `midsld`, the middle of the second-level domain —
+    a different cut), and tpws refuses `--split-pos=midsni`
+    outright. So a `midsni` strategy can only run where a concrete
+    target domain exists to resolve it against: apply these presets
+    to a **binding with a plain domain** (`domain:`/`full:`/bare),
+    and the core resolves the marker against that domain when the
+    plan is built (the same resolution the auto-tuner performs
+    against its canary). Applying one as the global strategy — or
+    on a `geosite:`/`geoip:`/`ruleset:`/IP binding — is refused at
+    Apply with the reason named, because there is no single SNI to
+    resolve against and the unresolved marker must never reach an
+    executor.
 - **Editor** — every field of the core's `BypassStrategy` (split
   positions, disorder/oob, TLS record, HTTP shaping, desync methods,
   fake payloads, fooling, TTL/autottl, repeats, filters). Validation
@@ -206,8 +217,11 @@ Other common states:
 - **Auto-tune refuses to start** — you are connected (disconnect
   first), or this network was tuned very recently (rate limit; the
   refusal says when it lifts).
-- **A preset fails to apply with "unresolved marker"** — the known
-  `midsni` issue in §3; use auto-tune or a sibling preset meanwhile.
+- **A preset fails to apply with a `midsni` refusal** — you applied
+  one of the three binding-scoped `midsni` presets (§3) as the
+  global strategy or onto a tag/IP binding. Apply it to a binding
+  with a plain domain instead; the core resolves the marker against
+  that domain at plan build.
 - **Everything reports unavailable** — on macOS/Android that is the
   honest current state (§7); on Linux it means the zapret helpers
   are not installed where the core looks for them.
