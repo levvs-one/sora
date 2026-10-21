@@ -41,6 +41,15 @@ toggles whether subscription fetches carry it, resets it, and supplies
 the companion platform facts (`ver_os`, `device_model`) the core stores
 with the identity.
 
+Contract 1.14 extends `sora.ext.v1.ExtensionHost` with the bypass surface
+the Anti-DPI extension is built on: `GetBypassCapabilities`,
+`GetBypassState`, `GetBypassLayer`, `ApplyBypassLayer`, `TuneDesync` and
+`WatchBypassEvents`, gated by the new `bypass.read` (sensitive),
+`bypass.write` (dangerous) and `bypass.tune` (dangerous) permissions. An
+extension's bypass layer — one global `BypassStrategy` plus per-domain
+bindings — is stored by the core and merged into session plans; the
+user's own strategy and rules always win.
+
 Contract 1.11 adds `sora.obfs.v1.ObfsControl` (uTLS, TLS fragmentation,
 jitter), `sora.leak.v1.LeakService` (egress self-tests),
 `sora.censor.v1.CensorControl` (censorship diagnosis), and
