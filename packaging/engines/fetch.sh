@@ -3,6 +3,7 @@
 # file whose SHA-256 differs from the lock, and lays them out as the core looks
 # for them: sing-box, xray, mihomo, geoip.dat and geosite.dat in one directory.
 # The geo databases come from the Xray archive, which is pinned like the rest.
+# tar uses --no-same-owner: chown can be forbidden in rootless containers, and extracted ownership is unused (files are installed via install -m).
 #
 #   packaging/engines/fetch.sh amd64|arm64|windows-amd64|win7-386 <destination>
 set -euo pipefail
@@ -120,7 +121,7 @@ while read -r engine line_arch digest url; do
 		*) echo "engines.lock: no olcrtc build for $arch" >&2; exit 1 ;;
 		esac
 		mkdir -p "$work/olcrtc-src"
-		tar --extract --gzip --file "$file" --directory "$work/olcrtc-src" --strip-components=1
+		tar --no-same-owner --extract --gzip --file "$file" --directory "$work/olcrtc-src" --strip-components=1
 		(cd "$work/olcrtc-src" && CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" \
 			go build -trimpath -ldflags="-s -w" -o "$work/olcrtc-bin" ./cmd/olcrtc)
 		if [[ "$goos" == windows ]]; then
@@ -166,7 +167,7 @@ while read -r engine line_arch digest url; do
 	fi
 	case "$engine" in
 	sing-box)
-		tar --extract --gzip --file "$file" --directory "$work" --wildcards '*/sing-box'
+		tar --no-same-owner --extract --gzip --file "$file" --directory "$work" --wildcards '*/sing-box'
 		install -m 0755 "$work"/sing-box-*/sing-box "$dest/sing-box"
 		record_digest "$dest/sing-box"
 		;;
