@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。",
   "extErrRevoked": "この拡張機能のバージョンは安全でないか壊れているため、Sora チームが取り消しました。",
   "extErrRevocationsExpired": "取り消された拡張機能のリストを更新できませんでした。更新されるまでインストールできません。ネットワークを確認して再試行してください。",
-  "extRevokedDisabled": "取り消された拡張機能をオフにしました: {names}"
+  "extRevokedDisabled": "取り消された拡張機能をオフにしました: {names}",
+  "customServerWgPrivateKey": "秘密鍵",
+  "customServerWgAddresses": "インターフェイスのアドレス",
+  "customServerWgPeerKey": "サーバーの公開鍵",
+  "customServerWgPresharedKey": "事前共有鍵",
+  "customServerWgAllowedIps": "許可する IP",
+  "customServerWgKeepalive": "Keepalive (秒)",
+  "customServerWgKeyInvalid": "鍵は wg genkey が出力するような base64 の 32 バイトにしてください。",
+  "customServerWgCidrInvalid": "10.0.0.2/32 のようなプレフィックスをカンマ区切りで入力してください。",
+  "customServerWgKeepaliveInvalid": "0 から 65535 までの秒数を入力してください。"
 }

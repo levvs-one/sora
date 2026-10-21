@@ -2228,4 +2228,31 @@ class SId extends S {
   String extRevokedDisabled(String names) {
     return 'Ekstensi yang ditarik dimatikan: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Kunci privat';
+
+  @override
+  String get customServerWgAddresses => 'Alamat antarmuka';
+
+  @override
+  String get customServerWgPeerKey => 'Kunci publik server';
+
+  @override
+  String get customServerWgPresharedKey => 'Kunci prabagi';
+
+  @override
+  String get customServerWgAllowedIps => 'IP yang diizinkan';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, detik';
+
+  @override
+  String get customServerWgKeyInvalid => 'Kunci harus 32 byte base64, seperti keluaran wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Masukkan prefiks dipisah koma, misalnya 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Masukkan jumlah detik dari 0 sampai 65535.';
 }

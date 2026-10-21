@@ -2231,4 +2231,31 @@ class SEs extends S {
   String extRevokedDisabled(String names) {
     return 'Se desactivaron extensiones retiradas: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Clave privada';
+
+  @override
+  String get customServerWgAddresses => 'Direcciones de la interfaz';
+
+  @override
+  String get customServerWgPeerKey => 'Clave pública del servidor';
+
+  @override
+  String get customServerWgPresharedKey => 'Clave precompartida';
+
+  @override
+  String get customServerWgAllowedIps => 'IP permitidas';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, segundos';
+
+  @override
+  String get customServerWgKeyInvalid => 'La clave debe tener 32 bytes en base64, como la imprime wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Escribe prefijos separados por comas, como 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Escribe un número de segundos entre 0 y 65535.';
 }

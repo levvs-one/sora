@@ -2228,4 +2228,31 @@ class SHy extends S {
   String extRevokedDisabled(String names) {
     return 'Հետ կանչված ընդլայնումներն անջատվեցին՝ $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Գաղտնի բանալի';
+
+  @override
+  String get customServerWgAddresses => 'Ինտերֆեյսի հասցեներ';
+
+  @override
+  String get customServerWgPeerKey => 'Սերվերի հանրային բանալի';
+
+  @override
+  String get customServerWgPresharedKey => 'Ընդհանուր բանալի';
+
+  @override
+  String get customServerWgAllowedIps => 'Թույլատրված IP-ներ';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, վայրկյան';
+
+  @override
+  String get customServerWgKeyInvalid => 'Բանալին պետք է լինի 32 բայթ base64-ով, ինչպես տպում է wg genkey-ը։';
+
+  @override
+  String get customServerWgCidrInvalid => 'Մուտքագրեք ստորակետով բաժանված նախածանցներ, օրինակ 10.0.0.2/32։';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Մուտքագրեք վայրկյանների թիվ 0-ից 65535։';
 }

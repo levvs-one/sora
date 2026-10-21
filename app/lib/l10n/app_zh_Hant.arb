@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "此診斷在此平台上不可用。",
   "extErrRevoked": "Sora 團隊已撤回此擴充功能版本，因為它不安全或已損壞。",
   "extErrRevocationsExpired": "無法更新已撤回擴充功能的清單。在更新之前無法安裝：請檢查網路後重試。",
-  "extRevokedDisabled": "已關閉被撤回的擴充功能：{names}"
+  "extRevokedDisabled": "已關閉被撤回的擴充功能：{names}",
+  "customServerWgPrivateKey": "私密金鑰",
+  "customServerWgAddresses": "介面位址",
+  "customServerWgPeerKey": "伺服器公開金鑰",
+  "customServerWgPresharedKey": "預先共用金鑰",
+  "customServerWgAllowedIps": "允許的 IP",
+  "customServerWgKeepalive": "Keepalive（秒）",
+  "customServerWgKeyInvalid": "金鑰必須是 base64 編碼的 32 位元組，與 wg genkey 的輸出相同。",
+  "customServerWgCidrInvalid": "請輸入以逗號分隔的前綴，例如 10.0.0.2/32。",
+  "customServerWgKeepaliveInvalid": "請輸入 0 到 65535 之間的秒數。"
 }

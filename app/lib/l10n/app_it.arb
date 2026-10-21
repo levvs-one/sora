@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Questa diagnostica non è disponibile su questa piattaforma.",
   "extErrRevoked": "Il team di Sora ha ritirato questa versione dell’estensione perché non è sicura o non funziona.",
   "extErrRevocationsExpired": "Non è stato possibile rinnovare l’elenco delle estensioni ritirate. L’installazione è bloccata finché non viene rinnovato: controlla la rete e riprova.",
-  "extRevokedDisabled": "Estensioni ritirate disattivate: {names}"
+  "extRevokedDisabled": "Estensioni ritirate disattivate: {names}",
+  "customServerWgPrivateKey": "Chiave privata",
+  "customServerWgAddresses": "Indirizzi dell’interfaccia",
+  "customServerWgPeerKey": "Chiave pubblica del server",
+  "customServerWgPresharedKey": "Chiave precondivisa",
+  "customServerWgAllowedIps": "IP consentiti",
+  "customServerWgKeepalive": "Keepalive, secondi",
+  "customServerWgKeyInvalid": "La chiave deve essere di 32 byte in base64, come la stampa wg genkey.",
+  "customServerWgCidrInvalid": "Inserisci prefissi separati da virgole, come 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Inserisci un numero di secondi da 0 a 65535."
 }

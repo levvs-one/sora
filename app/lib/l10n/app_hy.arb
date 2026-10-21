@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Այս ախտորոշումն անհասանելի է այս հարթակում:",
   "extErrRevoked": "Sora թիմը հետ է կանչել ընդլայնման այս տարբերակը, քանի որ այն անվտանգ չէ կամ անսարք է։",
   "extErrRevocationsExpired": "Հետ կանչված ընդլայնումների ցանկը չհաջողվեց թարմացնել։ Մինչ թարմացումը տեղադրումն արգելափակված է. ստուգեք ցանցը և կրկին փորձեք։",
-  "extRevokedDisabled": "Հետ կանչված ընդլայնումներն անջատվեցին՝ {names}"
+  "extRevokedDisabled": "Հետ կանչված ընդլայնումներն անջատվեցին՝ {names}",
+  "customServerWgPrivateKey": "Գաղտնի բանալի",
+  "customServerWgAddresses": "Ինտերֆեյսի հասցեներ",
+  "customServerWgPeerKey": "Սերվերի հանրային բանալի",
+  "customServerWgPresharedKey": "Ընդհանուր բանալի",
+  "customServerWgAllowedIps": "Թույլատրված IP-ներ",
+  "customServerWgKeepalive": "Keepalive, վայրկյան",
+  "customServerWgKeyInvalid": "Բանալին պետք է լինի 32 բայթ base64-ով, ինչպես տպում է wg genkey-ը։",
+  "customServerWgCidrInvalid": "Մուտքագրեք ստորակետով բաժանված նախածանցներ, օրինակ 10.0.0.2/32։",
+  "customServerWgKeepaliveInvalid": "Մուտքագրեք վայրկյանների թիվ 0-ից 65535։"
 }

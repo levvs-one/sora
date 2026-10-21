@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Ushbu diagnostika ushbu platformada mavjud emas.",
   "extErrRevoked": "Sora jamoasi bu kengaytma versiyasini xavfli yoki buzuq bo‘lgani uchun qaytarib oldi.",
   "extErrRevocationsExpired": "Qaytarib olingan kengaytmalar ro‘yxatini yangilab bo‘lmadi. Yangilanmaguncha o‘rnatish bloklangan: tarmoqni tekshirib, qayta urining.",
-  "extRevokedDisabled": "Qaytarib olingan kengaytmalar o‘chirildi: {names}"
+  "extRevokedDisabled": "Qaytarib olingan kengaytmalar o‘chirildi: {names}",
+  "customServerWgPrivateKey": "Maxfiy kalit",
+  "customServerWgAddresses": "Interfeys manzillari",
+  "customServerWgPeerKey": "Serverning ochiq kaliti",
+  "customServerWgPresharedKey": "Umumiy kalit",
+  "customServerWgAllowedIps": "Ruxsat etilgan IP",
+  "customServerWgKeepalive": "Keepalive, soniya",
+  "customServerWgKeyInvalid": "Kalit wg genkey chiqargandek base64’da 32 bayt bo‘lishi kerak.",
+  "customServerWgCidrInvalid": "Vergul bilan ajratilgan prefikslarni kiriting, masalan 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "0 dan 65535 gacha soniya sonini kiriting."
 }

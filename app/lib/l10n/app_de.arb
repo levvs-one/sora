@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar.",
   "extErrRevoked": "Das Sora-Team hat diese Version der Erweiterung zurückgezogen, weil sie unsicher oder defekt ist.",
   "extErrRevocationsExpired": "Die Liste zurückgezogener Erweiterungen konnte nicht erneuert werden. Installationen sind gesperrt, bis das gelingt: Netzwerk prüfen und erneut versuchen.",
-  "extRevokedDisabled": "Zurückgezogene Erweiterungen wurden ausgeschaltet: {names}"
+  "extRevokedDisabled": "Zurückgezogene Erweiterungen wurden ausgeschaltet: {names}",
+  "customServerWgPrivateKey": "Privater Schlüssel",
+  "customServerWgAddresses": "Schnittstellenadressen",
+  "customServerWgPeerKey": "Öffentlicher Schlüssel des Servers",
+  "customServerWgPresharedKey": "Gemeinsamer Schlüssel",
+  "customServerWgAllowedIps": "Erlaubte IPs",
+  "customServerWgKeepalive": "Keepalive, Sekunden",
+  "customServerWgKeyInvalid": "Der Schlüssel muss 32 Byte in Base64 sein, wie wg genkey ihn ausgibt.",
+  "customServerWgCidrInvalid": "Präfixe kommagetrennt eingeben, etwa 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Eine Sekundenzahl von 0 bis 65535 eingeben."
 }

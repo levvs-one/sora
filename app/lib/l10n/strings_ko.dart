@@ -2209,4 +2209,31 @@ class SKo extends S {
   String extRevokedDisabled(String names) {
     return '철회된 확장 프로그램을 껐습니다: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => '개인 키';
+
+  @override
+  String get customServerWgAddresses => '인터페이스 주소';
+
+  @override
+  String get customServerWgPeerKey => '서버 공개 키';
+
+  @override
+  String get customServerWgPresharedKey => '사전 공유 키';
+
+  @override
+  String get customServerWgAllowedIps => '허용된 IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive(초)';
+
+  @override
+  String get customServerWgKeyInvalid => '키는 wg genkey 출력처럼 base64 32바이트여야 합니다.';
+
+  @override
+  String get customServerWgCidrInvalid => '10.0.0.2/32 같은 접두사를 쉼표로 구분해 입력하세요.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0에서 65535 사이의 초를 입력하세요.';
 }

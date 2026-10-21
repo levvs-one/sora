@@ -2250,4 +2250,31 @@ class SRu extends S {
   String extRevokedDisabled(String names) {
     return 'Выключены отозванные расширения: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Приватный ключ';
+
+  @override
+  String get customServerWgAddresses => 'Адреса интерфейса';
+
+  @override
+  String get customServerWgPeerKey => 'Публичный ключ сервера';
+
+  @override
+  String get customServerWgPresharedKey => 'Общий ключ';
+
+  @override
+  String get customServerWgAllowedIps => 'Разрешённые IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, секунд';
+
+  @override
+  String get customServerWgKeyInvalid => 'Ключ должен быть 32 байтами в base64, как выводит wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Укажите адреса через запятую в виде 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Укажите число секунд от 0 до 65535.';
 }

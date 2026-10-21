@@ -2233,4 +2233,31 @@ class SFr extends S {
   String extRevokedDisabled(String names) {
     return 'Des extensions retirées ont été désactivées : $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Clé privée';
+
+  @override
+  String get customServerWgAddresses => 'Adresses de l’interface';
+
+  @override
+  String get customServerWgPeerKey => 'Clé publique du serveur';
+
+  @override
+  String get customServerWgPresharedKey => 'Clé prépartagée';
+
+  @override
+  String get customServerWgAllowedIps => 'IP autorisées';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, secondes';
+
+  @override
+  String get customServerWgKeyInvalid => 'La clé doit faire 32 octets en base64, comme l’affiche wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Saisissez des préfixes séparés par des virgules, comme 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Saisissez un nombre de secondes entre 0 et 65535.';
 }

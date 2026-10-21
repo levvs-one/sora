@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้",
   "extErrRevoked": "ทีม Sora ได้เพิกถอนส่วนขยายเวอร์ชันนี้ เพราะไม่ปลอดภัยหรือใช้งานไม่ได้",
   "extErrRevocationsExpired": "ต่ออายุรายการส่วนขยายที่ถูกเพิกถอนไม่สำเร็จ การติดตั้งถูกบล็อกจนกว่าจะต่ออายุได้ ตรวจสอบเครือข่ายแล้วลองอีกครั้ง",
-  "extRevokedDisabled": "ปิดส่วนขยายที่ถูกเพิกถอนแล้ว: {names}"
+  "extRevokedDisabled": "ปิดส่วนขยายที่ถูกเพิกถอนแล้ว: {names}",
+  "customServerWgPrivateKey": "คีย์ส่วนตัว",
+  "customServerWgAddresses": "ที่อยู่ของอินเทอร์เฟซ",
+  "customServerWgPeerKey": "คีย์สาธารณะของเซิร์ฟเวอร์",
+  "customServerWgPresharedKey": "คีย์ที่แชร์ล่วงหน้า",
+  "customServerWgAllowedIps": "IP ที่อนุญาต",
+  "customServerWgKeepalive": "Keepalive (วินาที)",
+  "customServerWgKeyInvalid": "คีย์ต้องเป็น base64 ขนาด 32 ไบต์ แบบที่ wg genkey แสดง",
+  "customServerWgCidrInvalid": "ป้อนพรีฟิกซ์คั่นด้วยจุลภาค เช่น 10.0.0.2/32",
+  "customServerWgKeepaliveInvalid": "ป้อนจำนวนวินาทีตั้งแต่ 0 ถึง 65535"
 }

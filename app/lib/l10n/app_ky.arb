@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Бул диагностика бул платформада жеткиликсиз.",
   "extErrRevoked": "Sora командасы кеңейтүүнүн бул версиясын коопсуз эмес же бузук деп кайтарып алды.",
   "extErrRevocationsExpired": "Кайтарылган кеңейтүүлөрдүн тизмесин жаңыртуу мүмкүн болгон жок. Жаңыртылганча орнотуу бөгөттөлгөн: тармакты текшерип, кайра аракет кылыңыз.",
-  "extRevokedDisabled": "Кайтарылган кеңейтүүлөр өчүрүлдү: {names}"
+  "extRevokedDisabled": "Кайтарылган кеңейтүүлөр өчүрүлдү: {names}",
+  "customServerWgPrivateKey": "Жеке ачкыч",
+  "customServerWgAddresses": "Интерфейс даректери",
+  "customServerWgPeerKey": "Сервердин ачык ачкычы",
+  "customServerWgPresharedKey": "Жалпы ачкыч",
+  "customServerWgAllowedIps": "Уруксат берилген IP",
+  "customServerWgKeepalive": "Keepalive, секунд",
+  "customServerWgKeyInvalid": "Ачкыч wg genkey чыгаргандай base64 түрүндөгү 32 байт болушу керек.",
+  "customServerWgCidrInvalid": "Үтүр менен бөлүнгөн префикстерди киргизиңиз, мисалы 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "0дөн 65535ке чейинки секунд санын киргизиңиз."
 }

@@ -2228,4 +2228,31 @@ class SKa extends S {
   String extRevokedDisabled(String names) {
     return 'გაუქმებული გაფართოებები გაითიშა: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'პირადი გასაღები';
+
+  @override
+  String get customServerWgAddresses => 'ინტერფეისის მისამართები';
+
+  @override
+  String get customServerWgPeerKey => 'სერვერის საჯარო გასაღები';
+
+  @override
+  String get customServerWgPresharedKey => 'საერთო გასაღები';
+
+  @override
+  String get customServerWgAllowedIps => 'დაშვებული IP-ები';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, წამი';
+
+  @override
+  String get customServerWgKeyInvalid => 'გასაღები უნდა იყოს 32 ბაიტი base64-ში, როგორც wg genkey ბეჭდავს.';
+
+  @override
+  String get customServerWgCidrInvalid => 'შეიყვანეთ მძიმით გამოყოფილი პრეფიქსები, მაგალითად 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'შეიყვანეთ წამების რაოდენობა 0-დან 65535-მდე.';
 }

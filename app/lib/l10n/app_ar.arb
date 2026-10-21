@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "هذا التشخيص غير متوفر على هذا النظام الأساسي.",
   "extErrRevoked": "سحب فريق Sora هذا الإصدار من الإضافة لأنه غير آمن أو معطّل.",
   "extErrRevocationsExpired": "تعذّر تحديث قائمة الإضافات المسحوبة. التثبيت متوقف حتى تُحدَّث: تحقّق من الشبكة وحاول مجددًا.",
-  "extRevokedDisabled": "تم إيقاف الإضافات المسحوبة: {names}"
+  "extRevokedDisabled": "تم إيقاف الإضافات المسحوبة: {names}",
+  "customServerWgPrivateKey": "المفتاح الخاص",
+  "customServerWgAddresses": "عناوين الواجهة",
+  "customServerWgPeerKey": "المفتاح العام للخادم",
+  "customServerWgPresharedKey": "المفتاح المشترك",
+  "customServerWgAllowedIps": "عناوين IP المسموح بها",
+  "customServerWgKeepalive": "Keepalive بالثواني",
+  "customServerWgKeyInvalid": "يجب أن يكون المفتاح 32 بايت بترميز base64 كما يطبعه wg genkey.",
+  "customServerWgCidrInvalid": "أدخل بادئات مفصولة بفواصل مثل 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "أدخل عدد ثوانٍ من 0 إلى 65535."
 }

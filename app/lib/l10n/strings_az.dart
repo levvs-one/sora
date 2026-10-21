@@ -2228,4 +2228,31 @@ class SAz extends S {
   String extRevokedDisabled(String names) {
     return 'Geri çağırılmış genişləndirmələr söndürüldü: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Gizli açar';
+
+  @override
+  String get customServerWgAddresses => 'İnterfeys ünvanları';
+
+  @override
+  String get customServerWgPeerKey => 'Serverin açıq açarı';
+
+  @override
+  String get customServerWgPresharedKey => 'Ümumi açar';
+
+  @override
+  String get customServerWgAllowedIps => 'İcazəli IP-lər';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, saniyə';
+
+  @override
+  String get customServerWgKeyInvalid => 'Açar wg genkey çıxardığı kimi base64-də 32 bayt olmalıdır.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Vergüllə ayrılmış prefikslər daxil edin, məsələn 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0-dan 65535-ə qədər saniyə sayı daxil edin.';
 }

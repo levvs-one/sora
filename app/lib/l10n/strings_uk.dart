@@ -2227,4 +2227,31 @@ class SUk extends S {
   String extRevokedDisabled(String names) {
     return 'Вимкнено відкликані розширення: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Приватний ключ';
+
+  @override
+  String get customServerWgAddresses => 'Адреси інтерфейсу';
+
+  @override
+  String get customServerWgPeerKey => 'Публічний ключ сервера';
+
+  @override
+  String get customServerWgPresharedKey => 'Спільний ключ';
+
+  @override
+  String get customServerWgAllowedIps => 'Дозволені IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, секунд';
+
+  @override
+  String get customServerWgKeyInvalid => 'Ключ має бути 32 байтами в base64, як виводить wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Вкажіть адреси через кому у вигляді 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Вкажіть кількість секунд від 0 до 65535.';
 }

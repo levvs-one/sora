@@ -2232,4 +2232,31 @@ class SDe extends S {
   String extRevokedDisabled(String names) {
     return 'Zurückgezogene Erweiterungen wurden ausgeschaltet: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Privater Schlüssel';
+
+  @override
+  String get customServerWgAddresses => 'Schnittstellenadressen';
+
+  @override
+  String get customServerWgPeerKey => 'Öffentlicher Schlüssel des Servers';
+
+  @override
+  String get customServerWgPresharedKey => 'Gemeinsamer Schlüssel';
+
+  @override
+  String get customServerWgAllowedIps => 'Erlaubte IPs';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, Sekunden';
+
+  @override
+  String get customServerWgKeyInvalid => 'Der Schlüssel muss 32 Byte in Base64 sein, wie wg genkey ihn ausgibt.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Präfixe kommagetrennt eingeben, etwa 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Eine Sekundenzahl von 0 bis 65535 eingeben.';
 }

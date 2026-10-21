@@ -2226,4 +2226,31 @@ class SHi extends S {
   String extRevokedDisabled(String names) {
     return 'वापस लिए गए एक्सटेंशन बंद किए गए: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'प्राइवेट की';
+
+  @override
+  String get customServerWgAddresses => 'इंटरफ़ेस पते';
+
+  @override
+  String get customServerWgPeerKey => 'सर्वर की पब्लिक की';
+
+  @override
+  String get customServerWgPresharedKey => 'प्री-शेयर्ड की';
+
+  @override
+  String get customServerWgAllowedIps => 'अनुमत IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, सेकंड';
+
+  @override
+  String get customServerWgKeyInvalid => 'की wg genkey की तरह base64 में 32 बाइट होनी चाहिए।';
+
+  @override
+  String get customServerWgCidrInvalid => 'कॉमा से अलग प्रीफ़िक्स दें, जैसे 10.0.0.2/32।';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0 से 65535 तक सेकंड की संख्या दें।';
 }

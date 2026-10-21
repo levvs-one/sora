@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,20 +12,83 @@ import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../sora.dart';
 import 'kit.dart';
 
-/// Protocols whose credentials fit one secret field. WireGuard needs peer
-/// keys and addresses, which arrive complete through a .conf import.
 const _protocols = [
   CustomProtocol.CUSTOM_PROTOCOL_VLESS,
   CustomProtocol.CUSTOM_PROTOCOL_VMESS,
   CustomProtocol.CUSTOM_PROTOCOL_TROJAN,
   CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS,
+  CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD,
 ];
+
+/// A WireGuard key: 32 bytes in standard base64, as `wg genkey` prints.
+bool isWireGuardKey(String key) {
+  try {
+    return base64.decode(key.trim()).length == 32;
+  } on FormatException {
+    return false;
+  }
+}
+
+/// An IPv4 or IPv6 prefix such as 10.0.0.2/32 or ::/0.
+bool isCidr(String value) {
+  final parts = value.trim().split('/');
+  if (parts.length != 2) return false;
+  final address = InternetAddress.tryParse(parts[0]);
+  final bits = int.tryParse(parts[1]);
+  if (address == null || bits == null) return false;
+  return bits >= 0 && bits <= (address.type == InternetAddressType.IPv6 ? 128 : 32);
+}
+
+List<String> _list(String text) => [
+  for (final part in text.split(','))
+    if (part.trim().isNotEmpty) part.trim(),
+];
+
+/// The WireGuard part of a hand-added server: the interface addresses and
+/// the server's peer entry. The peer endpoint is the server address and
+/// port, which the core fills in when it plans the connection.
+typedef WireGuardInput = ({String addresses, String peerKey, String presharedKey, String allowedIps, String keepalive});
+
+/// Which WireGuard field is wrong, or null when [privateKey] and [wg] make
+/// a usable document.
+String? wireGuardProblem(String privateKey, WireGuardInput wg) {
+  if (!isWireGuardKey(privateKey)) return 'credentials';
+  final addresses = _list(wg.addresses);
+  if (addresses.isEmpty || !addresses.every(isCidr)) return 'addresses';
+  if (!isWireGuardKey(wg.peerKey)) return 'peerKey';
+  if (wg.presharedKey.trim().isNotEmpty && !isWireGuardKey(wg.presharedKey)) return 'presharedKey';
+  final allowed = _list(wg.allowedIps);
+  if (allowed.isEmpty || !allowed.every(isCidr)) return 'allowedIps';
+  final keepalive = wg.keepalive.trim();
+  if (keepalive.isNotEmpty) {
+    final seconds = int.tryParse(keepalive);
+    if (seconds == null || seconds < 0 || seconds > 65535) return 'keepalive';
+  }
+  return null;
+}
 
 /// Builds the credential document the core stores in its vault and reads
 /// back when it plans a connection (core/control credentialDocument). An
-/// empty secret stores nothing; null means the secret does not fit the
-/// protocol (Shadowsocks needs `method:password`).
-String? customCredentialDocument(CustomProtocol protocol, String secret) {
+/// empty secret stores nothing; null means the input does not fit the
+/// protocol (Shadowsocks needs `method:password`, WireGuard needs [wg]).
+String? customCredentialDocument(CustomProtocol protocol, String secret, {WireGuardInput? wg}) {
+  if (protocol == CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD) {
+    if (wg == null || wireGuardProblem(secret, wg) != null) return null;
+    final keepalive = int.tryParse(wg.keepalive.trim()) ?? 0;
+    return jsonEncode({
+      'private_key': secret.trim(),
+      'addresses': _list(wg.addresses).join(','),
+      // The core reads peers as JSON of engine.WireGuardPeer.
+      'peers': jsonEncode([
+        {
+          'PublicKey': wg.peerKey.trim(),
+          if (wg.presharedKey.trim().isNotEmpty) 'PreSharedKey': wg.presharedKey.trim(),
+          'AllowedIPs': _list(wg.allowedIps),
+          if (keepalive > 0) 'PersistentKeepalive': keepalive,
+        },
+      ]),
+    });
+  }
   if (secret.isEmpty) return '';
   switch (protocol) {
     case CustomProtocol.CUSTOM_PROTOCOL_VLESS:
@@ -64,6 +128,21 @@ class _AddServerScreenState extends State<AddServerScreen> {
   final _address = TextEditingController();
   final _port = TextEditingController();
   final _credentials = TextEditingController();
+  final _wgAddresses = TextEditingController();
+  final _wgPeerKey = TextEditingController();
+  final _wgPresharedKey = TextEditingController();
+  final _wgAllowedIps = TextEditingController(text: '0.0.0.0/0, ::/0');
+  final _wgKeepalive = TextEditingController();
+
+  bool get _wireGuard => _protocol == CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD;
+
+  WireGuardInput get _wg => (
+    addresses: _wgAddresses.text,
+    peerKey: _wgPeerKey.text,
+    presharedKey: _wgPresharedKey.text,
+    allowedIps: _wgAllowedIps.text,
+    keepalive: _wgKeepalive.text,
+  );
 
   CustomProtocol _protocol = _protocols.first;
   final _errors = <String, String>{};
@@ -74,7 +153,17 @@ class _AddServerScreenState extends State<AddServerScreen> {
   @override
   void initState() {
     super.initState();
-    for (final entry in {'name': _name, 'address': _address, 'port': _port, 'credentials': _credentials}.entries) {
+    for (final entry in {
+      'name': _name,
+      'address': _address,
+      'port': _port,
+      'credentials': _credentials,
+      'addresses': _wgAddresses,
+      'peerKey': _wgPeerKey,
+      'presharedKey': _wgPresharedKey,
+      'allowedIps': _wgAllowedIps,
+      'keepalive': _wgKeepalive,
+    }.entries) {
       entry.value.addListener(() {
         if (_errors.remove(entry.key) != null && mounted) setState(() {});
       });
@@ -87,6 +176,9 @@ class _AddServerScreenState extends State<AddServerScreen> {
     _address.dispose();
     _port.dispose();
     _credentials.dispose();
+    for (final c in [_wgAddresses, _wgPeerKey, _wgPresharedKey, _wgAllowedIps, _wgKeepalive]) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -103,7 +195,16 @@ class _AddServerScreenState extends State<AddServerScreen> {
     }
     final port = int.tryParse(_port.text.trim());
     if (port == null || port < 1 || port > 65535) errors['port'] = s.customServerPortInvalid;
-    if (customCredentialDocument(_protocol, _credentials.text) == null) {
+    if (_wireGuard) {
+      final field = wireGuardProblem(_credentials.text, _wg);
+      if (field != null) {
+        errors[field] = switch (field) {
+          'addresses' || 'allowedIps' => s.customServerWgCidrInvalid,
+          'keepalive' => s.customServerWgKeepaliveInvalid,
+          _ => s.customServerWgKeyInvalid,
+        };
+      }
+    } else if (customCredentialDocument(_protocol, _credentials.text) == null) {
       errors['credentials'] = s.customServerShadowsocksCredentials;
     }
     setState(() {
@@ -121,7 +222,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
     address: _address.text.trim(),
     port: int.parse(_port.text.trim()),
     // Secrets are verbatim: never trim the credentials.
-    credentials: customCredentialDocument(_protocol, _credentials.text)!,
+    credentials: customCredentialDocument(_protocol, _credentials.text, wg: _wg)!,
   );
 
   Future<void> _save() async {
@@ -198,14 +299,38 @@ class _AddServerScreenState extends State<AddServerScreen> {
           children: [
             _SecretField(
               controller: _credentials,
-              label: s.customServerCredentials,
-              hint: _protocol == CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS
+              label: _wireGuard ? s.customServerWgPrivateKey : s.customServerCredentials,
+              hint: _wireGuard
+                  ? ''
+                  : _protocol == CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS
                   ? s.customServerShadowsocksCredentials
                   : s.customServerOptional,
               error: _errors['credentials'],
             ),
           ],
         ),
+        if (_wireGuard)
+          Group(
+            children: [
+              _plainField(s.customServerWgAddresses, _wgAddresses, 'addresses', hint: '10.0.0.2/32, fd00::2/128'),
+              _plainField(s.customServerWgPeerKey, _wgPeerKey, 'peerKey'),
+              _SecretField(
+                controller: _wgPresharedKey,
+                label: s.customServerWgPresharedKey,
+                hint: s.customServerOptional,
+                error: _errors['presharedKey'],
+              ),
+              _plainField(s.customServerWgAllowedIps, _wgAllowedIps, 'allowedIps'),
+              _plainField(
+                s.customServerWgKeepalive,
+                _wgKeepalive,
+                'keepalive',
+                hint: '25',
+                label2: s.customServerOptional,
+                digits: true,
+              ),
+            ],
+          ),
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: PrimaryButton(label: s.save, busy: _saving, onTap: _saving ? null : _save),
@@ -230,6 +355,32 @@ class _AddServerScreenState extends State<AddServerScreen> {
             child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2)),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _plainField(
+    String label,
+    TextEditingController controller,
+    String key, {
+    String? hint,
+    String? label2,
+    bool digits = false,
+  }) {
+    final palette = Palette.of(context);
+    return _LabeledField(
+      label: label,
+      hint: label2,
+      error: _errors[key],
+      child: TextField(
+        controller: controller,
+        autocorrect: false,
+        enableSuggestions: false,
+        keyboardType: digits ? TextInputType.number : TextInputType.text,
+        inputFormatters: digits ? [FilteringTextInputFormatter.digitsOnly] : null,
+        textInputAction: TextInputAction.next,
+        style: Styles.secondary.copyWith(color: palette.ink),
+        decoration: _decoration(hint, palette),
       ),
     );
   }
@@ -266,7 +417,7 @@ class _LabeledField extends StatelessWidget {
           Row(
             children: [
               Text(label, style: Styles.caption.copyWith(color: palette.ink2)),
-              if (hint != null) ...[
+              if (hint != null && hint!.isNotEmpty) ...[
                 const SizedBox(width: 6),
                 Text(hint!, style: Styles.caption.copyWith(color: palette.ink3)),
               ],

@@ -2230,4 +2230,31 @@ class SPl extends S {
   String extRevokedDisabled(String names) {
     return 'Wyłączono wycofane rozszerzenia: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Klucz prywatny';
+
+  @override
+  String get customServerWgAddresses => 'Adresy interfejsu';
+
+  @override
+  String get customServerWgPeerKey => 'Klucz publiczny serwera';
+
+  @override
+  String get customServerWgPresharedKey => 'Klucz współdzielony';
+
+  @override
+  String get customServerWgAllowedIps => 'Dozwolone IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, sekundy';
+
+  @override
+  String get customServerWgKeyInvalid => 'Klucz musi mieć 32 bajty w base64, jak wypisuje wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Wpisz prefiksy rozdzielone przecinkami, np. 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Wpisz liczbę sekund od 0 do 65535.';
 }

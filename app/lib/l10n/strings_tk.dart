@@ -2227,4 +2227,31 @@ class STk extends S {
   String extRevokedDisabled(String names) {
     return 'Yzyna alnan giňeltmeler öçürildi: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Gizlin açar';
+
+  @override
+  String get customServerWgAddresses => 'Interfeýs salgylary';
+
+  @override
+  String get customServerWgPeerKey => 'Serweriň açyk açary';
+
+  @override
+  String get customServerWgPresharedKey => 'Umumy açar';
+
+  @override
+  String get customServerWgAllowedIps => 'Rugsat berlen IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, sekunt';
+
+  @override
+  String get customServerWgKeyInvalid => 'Açar wg genkey çykarşy ýaly base64-de 32 baýt bolmaly.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Otur bilen bölünen prefiksleri giriziň, meselem 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0-dan 65535-e çenli sekunt sanyny giriziň.';
 }

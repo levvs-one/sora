@@ -2226,4 +2226,31 @@ class SUr extends S {
   String extRevokedDisabled(String names) {
     return 'واپس لیے گئے ایکسٹینشنز بند کر دیے گئے: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'نجی کلید';
+
+  @override
+  String get customServerWgAddresses => 'انٹرفیس پتے';
+
+  @override
+  String get customServerWgPeerKey => 'سرور کی عوامی کلید';
+
+  @override
+  String get customServerWgPresharedKey => 'پہلے سے مشترکہ کلید';
+
+  @override
+  String get customServerWgAllowedIps => 'اجازت یافتہ IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive، سیکنڈ';
+
+  @override
+  String get customServerWgKeyInvalid => 'کلید wg genkey کی طرح base64 میں 32 بائٹ ہونی چاہیے۔';
+
+  @override
+  String get customServerWgCidrInvalid => 'کوما سے الگ پری فکس درج کریں، جیسے 10.0.0.2/32۔';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0 سے 65535 تک سیکنڈ درج کریں۔';
 }

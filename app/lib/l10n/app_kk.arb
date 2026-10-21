@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Бұл диагностика бұл платформада қолжетімді емес.",
   "extErrRevoked": "Sora командасы кеңейтудің бұл нұсқасын қауіпті немесе бұзылған деп кері қайтарды.",
   "extErrRevocationsExpired": "Кері қайтарылған кеңейтулер тізімін жаңарту мүмкін болмады. Жаңартылғанша орнату бұғатталған: желіні тексеріп, қайталаңыз.",
-  "extRevokedDisabled": "Кері қайтарылған кеңейтулер өшірілді: {names}"
+  "extRevokedDisabled": "Кері қайтарылған кеңейтулер өшірілді: {names}",
+  "customServerWgPrivateKey": "Жеке кілт",
+  "customServerWgAddresses": "Интерфейс мекенжайлары",
+  "customServerWgPeerKey": "Сервердің ашық кілті",
+  "customServerWgPresharedKey": "Ортақ кілт",
+  "customServerWgAllowedIps": "Рұқсат етілген IP",
+  "customServerWgKeepalive": "Keepalive, секунд",
+  "customServerWgKeyInvalid": "Кілт wg genkey шығаратындай base64 түріндегі 32 байт болуы керек.",
+  "customServerWgCidrInvalid": "Үтірмен бөлінген префикстерді енгізіңіз, мысалы 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "0-ден 65535-ке дейінгі секунд санын енгізіңіз."
 }

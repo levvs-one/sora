@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Ta diagnostyka jest niedostępna na tej platformie.",
   "extErrRevoked": "Zespół Sora wycofał tę wersję rozszerzenia, ponieważ jest niebezpieczna lub uszkodzona.",
   "extErrRevocationsExpired": "Nie udało się odnowić listy wycofanych rozszerzeń. Instalacja jest zablokowana do czasu odnowienia: sprawdź sieć i spróbuj ponownie.",
-  "extRevokedDisabled": "Wyłączono wycofane rozszerzenia: {names}"
+  "extRevokedDisabled": "Wyłączono wycofane rozszerzenia: {names}",
+  "customServerWgPrivateKey": "Klucz prywatny",
+  "customServerWgAddresses": "Adresy interfejsu",
+  "customServerWgPeerKey": "Klucz publiczny serwera",
+  "customServerWgPresharedKey": "Klucz współdzielony",
+  "customServerWgAllowedIps": "Dozwolone IP",
+  "customServerWgKeepalive": "Keepalive, sekundy",
+  "customServerWgKeyInvalid": "Klucz musi mieć 32 bajty w base64, jak wypisuje wg genkey.",
+  "customServerWgCidrInvalid": "Wpisz prefiksy rozdzielone przecinkami, np. 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Wpisz liczbę sekund od 0 do 65535."
 }

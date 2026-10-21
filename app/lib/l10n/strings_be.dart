@@ -2227,4 +2227,31 @@ class SBe extends S {
   String extRevokedDisabled(String names) {
     return 'Адкліканыя пашырэнні выключаны: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Прыватны ключ';
+
+  @override
+  String get customServerWgAddresses => 'Адрасы інтэрфейсу';
+
+  @override
+  String get customServerWgPeerKey => 'Публічны ключ сервера';
+
+  @override
+  String get customServerWgPresharedKey => 'Агульны ключ';
+
+  @override
+  String get customServerWgAllowedIps => 'Дазволеныя IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, секунд';
+
+  @override
+  String get customServerWgKeyInvalid => 'Ключ павінен быць 32 байтамі ў base64, як выводзіць wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Пакажыце адрасы праз коску ў выглядзе 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Пакажыце колькасць секунд ад 0 да 65535.';
 }

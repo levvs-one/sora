@@ -4184,6 +4184,60 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Выключены отозванные расширения: {names}'**
   String extRevokedDisabled(String names);
+
+  /// No description provided for @customServerWgPrivateKey.
+  ///
+  /// In ru, this message translates to:
+  /// **'Приватный ключ'**
+  String get customServerWgPrivateKey;
+
+  /// No description provided for @customServerWgAddresses.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адреса интерфейса'**
+  String get customServerWgAddresses;
+
+  /// No description provided for @customServerWgPeerKey.
+  ///
+  /// In ru, this message translates to:
+  /// **'Публичный ключ сервера'**
+  String get customServerWgPeerKey;
+
+  /// No description provided for @customServerWgPresharedKey.
+  ///
+  /// In ru, this message translates to:
+  /// **'Общий ключ'**
+  String get customServerWgPresharedKey;
+
+  /// No description provided for @customServerWgAllowedIps.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешённые IP'**
+  String get customServerWgAllowedIps;
+
+  /// No description provided for @customServerWgKeepalive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Keepalive, секунд'**
+  String get customServerWgKeepalive;
+
+  /// No description provided for @customServerWgKeyInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ключ должен быть 32 байтами в base64, как выводит wg genkey.'**
+  String get customServerWgKeyInvalid;
+
+  /// No description provided for @customServerWgCidrInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите адреса через запятую в виде 10.0.0.2/32.'**
+  String get customServerWgCidrInvalid;
+
+  /// No description provided for @customServerWgKeepaliveInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите число секунд от 0 до 65535.'**
+  String get customServerWgKeepaliveInvalid;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

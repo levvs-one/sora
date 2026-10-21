@@ -2226,4 +2226,31 @@ class STh extends S {
   String extRevokedDisabled(String names) {
     return 'ปิดส่วนขยายที่ถูกเพิกถอนแล้ว: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'คีย์ส่วนตัว';
+
+  @override
+  String get customServerWgAddresses => 'ที่อยู่ของอินเทอร์เฟซ';
+
+  @override
+  String get customServerWgPeerKey => 'คีย์สาธารณะของเซิร์ฟเวอร์';
+
+  @override
+  String get customServerWgPresharedKey => 'คีย์ที่แชร์ล่วงหน้า';
+
+  @override
+  String get customServerWgAllowedIps => 'IP ที่อนุญาต';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive (วินาที)';
+
+  @override
+  String get customServerWgKeyInvalid => 'คีย์ต้องเป็น base64 ขนาด 32 ไบต์ แบบที่ wg genkey แสดง';
+
+  @override
+  String get customServerWgCidrInvalid => 'ป้อนพรีฟิกซ์คั่นด้วยจุลภาค เช่น 10.0.0.2/32';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'ป้อนจำนวนวินาทีตั้งแต่ 0 ถึง 65535';
 }

@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này.",
   "extErrRevoked": "Nhóm Sora đã thu hồi phiên bản tiện ích này vì không an toàn hoặc bị lỗi.",
   "extErrRevocationsExpired": "Không thể gia hạn danh sách tiện ích bị thu hồi. Việc cài đặt bị chặn cho đến khi gia hạn được: kiểm tra mạng rồi thử lại.",
-  "extRevokedDisabled": "Đã tắt các tiện ích bị thu hồi: {names}"
+  "extRevokedDisabled": "Đã tắt các tiện ích bị thu hồi: {names}",
+  "customServerWgPrivateKey": "Khóa riêng",
+  "customServerWgAddresses": "Địa chỉ giao diện",
+  "customServerWgPeerKey": "Khóa công khai của máy chủ",
+  "customServerWgPresharedKey": "Khóa chia sẻ trước",
+  "customServerWgAllowedIps": "IP được phép",
+  "customServerWgKeepalive": "Keepalive, giây",
+  "customServerWgKeyInvalid": "Khóa phải là 32 byte base64, như wg genkey in ra.",
+  "customServerWgCidrInvalid": "Nhập các tiền tố cách nhau bằng dấu phẩy, ví dụ 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Nhập số giây từ 0 đến 65535."
 }

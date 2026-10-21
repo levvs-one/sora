@@ -95,6 +95,31 @@ void main() {
     expect(deleted.hasError(), isFalse);
   }, skip: skip);
 
+  test('a hand added WireGuard server is accepted and a broken one refused', () async {
+    const key = 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=';
+    Future<SaveCustomServerResponse> save(String credentials) => link.custom.saveCustomServer(
+      SaveCustomServerRequest(
+        apiVersion: apiVersion,
+        controlAuthenticator: link.token,
+        server: CustomServer(
+          name: 'WG',
+          protocol: CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD,
+          address: '198.51.100.7',
+          port: 51820,
+          credentials: credentials,
+        ),
+      ),
+    );
+    final good = customCredentialDocument(
+      CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD,
+      key,
+      wg: (addresses: '10.0.0.2/32', peerKey: key, presharedKey: '', allowedIps: '0.0.0.0/0', keepalive: ''),
+    )!;
+    final saved = await save(good);
+    expect(saved.hasError(), isFalse, reason: saved.error.toString());
+    expect((await save('{"private_key":"$key"}')).hasError(), isTrue);
+  }, skip: skip);
+
   test('network profiles save, list and delete', () async {
     final saved = await link.stub.saveProfile(
       SaveProfileRequest(

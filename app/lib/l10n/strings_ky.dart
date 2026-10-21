@@ -2227,4 +2227,31 @@ class SKy extends S {
   String extRevokedDisabled(String names) {
     return 'Кайтарылган кеңейтүүлөр өчүрүлдү: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Жеке ачкыч';
+
+  @override
+  String get customServerWgAddresses => 'Интерфейс даректери';
+
+  @override
+  String get customServerWgPeerKey => 'Сервердин ачык ачкычы';
+
+  @override
+  String get customServerWgPresharedKey => 'Жалпы ачкыч';
+
+  @override
+  String get customServerWgAllowedIps => 'Уруксат берилген IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, секунд';
+
+  @override
+  String get customServerWgKeyInvalid => 'Ачкыч wg genkey чыгаргандай base64 түрүндөгү 32 байт болушу керек.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Үтүр менен бөлүнгөн префикстерди киргизиңиз, мисалы 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0дөн 65535ке чейинки секунд санын киргизиңиз.';
 }

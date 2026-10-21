@@ -2228,4 +2228,31 @@ class SFa extends S {
   String extRevokedDisabled(String names) {
     return 'افزونه‌های لغوشده خاموش شدند: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'کلید خصوصی';
+
+  @override
+  String get customServerWgAddresses => 'نشانی‌های رابط';
+
+  @override
+  String get customServerWgPeerKey => 'کلید عمومی سرور';
+
+  @override
+  String get customServerWgPresharedKey => 'کلید مشترک';
+
+  @override
+  String get customServerWgAllowedIps => 'IPهای مجاز';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive، ثانیه';
+
+  @override
+  String get customServerWgKeyInvalid => 'کلید باید ۳۲ بایت base64 باشد، مانند خروجی wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'پیشوندها را با ویرگول جدا کنید، مانند 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'عددی بین 0 تا 65535 ثانیه وارد کنید.';
 }

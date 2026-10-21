@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini.",
   "extErrRevoked": "Tim Sora menarik versi ekstensi ini karena tidak aman atau rusak.",
   "extErrRevocationsExpired": "Daftar ekstensi yang ditarik tidak dapat diperbarui. Pemasangan diblokir sampai diperbarui: periksa jaringan lalu coba lagi.",
-  "extRevokedDisabled": "Ekstensi yang ditarik dimatikan: {names}"
+  "extRevokedDisabled": "Ekstensi yang ditarik dimatikan: {names}",
+  "customServerWgPrivateKey": "Kunci privat",
+  "customServerWgAddresses": "Alamat antarmuka",
+  "customServerWgPeerKey": "Kunci publik server",
+  "customServerWgPresharedKey": "Kunci prabagi",
+  "customServerWgAllowedIps": "IP yang diizinkan",
+  "customServerWgKeepalive": "Keepalive, detik",
+  "customServerWgKeyInvalid": "Kunci harus 32 byte base64, seperti keluaran wg genkey.",
+  "customServerWgCidrInvalid": "Masukkan prefiks dipisah koma, misalnya 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Masukkan jumlah detik dari 0 sampai 65535."
 }

@@ -2232,4 +2232,31 @@ class SIt extends S {
   String extRevokedDisabled(String names) {
     return 'Estensioni ritirate disattivate: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Chiave privata';
+
+  @override
+  String get customServerWgAddresses => 'Indirizzi dell’interfaccia';
+
+  @override
+  String get customServerWgPeerKey => 'Chiave pubblica del server';
+
+  @override
+  String get customServerWgPresharedKey => 'Chiave precondivisa';
+
+  @override
+  String get customServerWgAllowedIps => 'IP consentiti';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, secondi';
+
+  @override
+  String get customServerWgKeyInvalid => 'La chiave deve essere di 32 byte in base64, come la stampa wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Inserisci prefissi separati da virgole, come 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Inserisci un numero di secondi da 0 a 65535.';
 }

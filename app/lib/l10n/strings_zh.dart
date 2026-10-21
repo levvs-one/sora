@@ -2209,6 +2209,33 @@ class SZh extends S {
   String extRevokedDisabled(String names) {
     return '已关闭被撤回的扩展：$names';
   }
+
+  @override
+  String get customServerWgPrivateKey => '私钥';
+
+  @override
+  String get customServerWgAddresses => '接口地址';
+
+  @override
+  String get customServerWgPeerKey => '服务器公钥';
+
+  @override
+  String get customServerWgPresharedKey => '预共享密钥';
+
+  @override
+  String get customServerWgAllowedIps => '允许的 IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive（秒）';
+
+  @override
+  String get customServerWgKeyInvalid => '密钥必须是 base64 编码的 32 字节，与 wg genkey 的输出相同。';
+
+  @override
+  String get customServerWgCidrInvalid => '请输入以逗号分隔的前缀，例如 10.0.0.2/32。';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '请输入 0 到 65535 之间的秒数。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4415,6 +4442,33 @@ class SZhHans extends SZh {
   String extRevokedDisabled(String names) {
     return '已关闭被撤回的扩展：$names';
   }
+
+  @override
+  String get customServerWgPrivateKey => '私钥';
+
+  @override
+  String get customServerWgAddresses => '接口地址';
+
+  @override
+  String get customServerWgPeerKey => '服务器公钥';
+
+  @override
+  String get customServerWgPresharedKey => '预共享密钥';
+
+  @override
+  String get customServerWgAllowedIps => '允许的 IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive（秒）';
+
+  @override
+  String get customServerWgKeyInvalid => '密钥必须是 base64 编码的 32 字节，与 wg genkey 的输出相同。';
+
+  @override
+  String get customServerWgCidrInvalid => '请输入以逗号分隔的前缀，例如 10.0.0.2/32。';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '请输入 0 到 65535 之间的秒数。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6621,4 +6675,31 @@ class SZhHant extends SZh {
   String extRevokedDisabled(String names) {
     return '已關閉被撤回的擴充功能：$names';
   }
+
+  @override
+  String get customServerWgPrivateKey => '私密金鑰';
+
+  @override
+  String get customServerWgAddresses => '介面位址';
+
+  @override
+  String get customServerWgPeerKey => '伺服器公開金鑰';
+
+  @override
+  String get customServerWgPresharedKey => '預先共用金鑰';
+
+  @override
+  String get customServerWgAllowedIps => '允許的 IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive（秒）';
+
+  @override
+  String get customServerWgKeyInvalid => '金鑰必須是 base64 編碼的 32 位元組，與 wg genkey 的輸出相同。';
+
+  @override
+  String get customServerWgCidrInvalid => '請輸入以逗號分隔的前綴，例如 10.0.0.2/32。';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '請輸入 0 到 65535 之間的秒數。';
 }

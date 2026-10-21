@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Bu anyklaýyş bu platformada elýeterli däl.",
   "extErrRevoked": "Sora topary bu giňeltmäniň wersiýasyny howply ýa-da bozuk bolany üçin yzyna aldy.",
   "extErrRevocationsExpired": "Yzyna alnan giňeltmeleriň sanawyny täzeläp bolmady. Täzelenýänçä gurnamak ýapyk: tory barlaň we täzeden synanyşyň.",
-  "extRevokedDisabled": "Yzyna alnan giňeltmeler öçürildi: {names}"
+  "extRevokedDisabled": "Yzyna alnan giňeltmeler öçürildi: {names}",
+  "customServerWgPrivateKey": "Gizlin açar",
+  "customServerWgAddresses": "Interfeýs salgylary",
+  "customServerWgPeerKey": "Serweriň açyk açary",
+  "customServerWgPresharedKey": "Umumy açar",
+  "customServerWgAllowedIps": "Rugsat berlen IP",
+  "customServerWgKeepalive": "Keepalive, sekunt",
+  "customServerWgKeyInvalid": "Açar wg genkey çykarşy ýaly base64-de 32 baýt bolmaly.",
+  "customServerWgCidrInvalid": "Otur bilen bölünen prefiksleri giriziň, meselem 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "0-dan 65535-e çenli sekunt sanyny giriziň."
 }

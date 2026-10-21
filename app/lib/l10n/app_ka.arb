@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე.",
   "extErrRevoked": "Sora-ს გუნდმა გაფართოების ეს ვერსია გააუქმა, რადგან ის სახიფათო ან გაუმართავია.",
   "extErrRevocationsExpired": "გაუქმებული გაფართოებების სია ვერ განახლდა. განახლებამდე ინსტალაცია დაბლოკილია: შეამოწმეთ ქსელი და სცადეთ თავიდან.",
-  "extRevokedDisabled": "გაუქმებული გაფართოებები გაითიშა: {names}"
+  "extRevokedDisabled": "გაუქმებული გაფართოებები გაითიშა: {names}",
+  "customServerWgPrivateKey": "პირადი გასაღები",
+  "customServerWgAddresses": "ინტერფეისის მისამართები",
+  "customServerWgPeerKey": "სერვერის საჯარო გასაღები",
+  "customServerWgPresharedKey": "საერთო გასაღები",
+  "customServerWgAllowedIps": "დაშვებული IP-ები",
+  "customServerWgKeepalive": "Keepalive, წამი",
+  "customServerWgKeyInvalid": "გასაღები უნდა იყოს 32 ბაიტი base64-ში, როგორც wg genkey ბეჭდავს.",
+  "customServerWgCidrInvalid": "შეიყვანეთ მძიმით გამოყოფილი პრეფიქსები, მაგალითად 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "შეიყვანეთ წამების რაოდენობა 0-დან 65535-მდე."
 }

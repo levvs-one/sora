@@ -2223,4 +2223,31 @@ class SBn extends S {
   String extRevokedDisabled(String names) {
     return 'প্রত্যাহার করা এক্সটেনশন বন্ধ করা হয়েছে: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'প্রাইভেট কী';
+
+  @override
+  String get customServerWgAddresses => 'ইন্টারফেস ঠিকানা';
+
+  @override
+  String get customServerWgPeerKey => 'সার্ভারের পাবলিক কী';
+
+  @override
+  String get customServerWgPresharedKey => 'প্রি-শেয়ার্ড কী';
+
+  @override
+  String get customServerWgAllowedIps => 'অনুমোদিত IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, সেকেন্ড';
+
+  @override
+  String get customServerWgKeyInvalid => 'কী-টি wg genkey-এর মতো base64-এ 32 বাইট হতে হবে।';
+
+  @override
+  String get customServerWgCidrInvalid => 'কমা দিয়ে আলাদা প্রিফিক্স দিন, যেমন 10.0.0.2/32।';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0 থেকে 65535 সেকেন্ডের মধ্যে একটি সংখ্যা দিন।';
 }

@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔",
   "extErrRevoked": "Sora ٹیم نے یہ ایکسٹینشن ورژن واپس لے لیا ہے کیونکہ یہ غیر محفوظ یا خراب ہے۔",
   "extErrRevocationsExpired": "واپس لیے گئے ایکسٹینشنز کی فہرست تازہ نہیں ہو سکی۔ تازہ ہونے تک انسٹال بند ہے: نیٹ ورک چیک کر کے دوبارہ کوشش کریں۔",
-  "extRevokedDisabled": "واپس لیے گئے ایکسٹینشنز بند کر دیے گئے: {names}"
+  "extRevokedDisabled": "واپس لیے گئے ایکسٹینشنز بند کر دیے گئے: {names}",
+  "customServerWgPrivateKey": "نجی کلید",
+  "customServerWgAddresses": "انٹرفیس پتے",
+  "customServerWgPeerKey": "سرور کی عوامی کلید",
+  "customServerWgPresharedKey": "پہلے سے مشترکہ کلید",
+  "customServerWgAllowedIps": "اجازت یافتہ IP",
+  "customServerWgKeepalive": "Keepalive، سیکنڈ",
+  "customServerWgKeyInvalid": "کلید wg genkey کی طرح base64 میں 32 بائٹ ہونی چاہیے۔",
+  "customServerWgCidrInvalid": "کوما سے الگ پری فکس درج کریں، جیسے 10.0.0.2/32۔",
+  "customServerWgKeepaliveInvalid": "0 سے 65535 تک سیکنڈ درج کریں۔"
 }

@@ -2228,4 +2228,31 @@ class SVi extends S {
   String extRevokedDisabled(String names) {
     return 'Đã tắt các tiện ích bị thu hồi: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Khóa riêng';
+
+  @override
+  String get customServerWgAddresses => 'Địa chỉ giao diện';
+
+  @override
+  String get customServerWgPeerKey => 'Khóa công khai của máy chủ';
+
+  @override
+  String get customServerWgPresharedKey => 'Khóa chia sẻ trước';
+
+  @override
+  String get customServerWgAllowedIps => 'IP được phép';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, giây';
+
+  @override
+  String get customServerWgKeyInvalid => 'Khóa phải là 32 byte base64, như wg genkey in ra.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Nhập các tiền tố cách nhau bằng dấu phẩy, ví dụ 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Nhập số giây từ 0 đến 65535.';
 }

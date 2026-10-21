@@ -2227,4 +2227,31 @@ class SKk extends S {
   String extRevokedDisabled(String names) {
     return 'Кері қайтарылған кеңейтулер өшірілді: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Жеке кілт';
+
+  @override
+  String get customServerWgAddresses => 'Интерфейс мекенжайлары';
+
+  @override
+  String get customServerWgPeerKey => 'Сервердің ашық кілті';
+
+  @override
+  String get customServerWgPresharedKey => 'Ортақ кілт';
+
+  @override
+  String get customServerWgAllowedIps => 'Рұқсат етілген IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, секунд';
+
+  @override
+  String get customServerWgKeyInvalid => 'Кілт wg genkey шығаратындай base64 түріндегі 32 байт болуы керек.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Үтірмен бөлінген префикстерді енгізіңіз, мысалы 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0-ден 65535-ке дейінгі секунд санын енгізіңіз.';
 }

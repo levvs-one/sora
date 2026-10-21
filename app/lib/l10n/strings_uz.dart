@@ -2228,4 +2228,31 @@ class SUz extends S {
   String extRevokedDisabled(String names) {
     return 'Qaytarib olingan kengaytmalar o‘chirildi: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Maxfiy kalit';
+
+  @override
+  String get customServerWgAddresses => 'Interfeys manzillari';
+
+  @override
+  String get customServerWgPeerKey => 'Serverning ochiq kaliti';
+
+  @override
+  String get customServerWgPresharedKey => 'Umumiy kalit';
+
+  @override
+  String get customServerWgAllowedIps => 'Ruxsat etilgan IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, soniya';
+
+  @override
+  String get customServerWgKeyInvalid => 'Kalit wg genkey chiqargandek base64’da 32 bayt bo‘lishi kerak.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Vergul bilan ajratilgan prefikslarni kiriting, masalan 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0 dan 65535 gacha soniya sonini kiriting.';
 }

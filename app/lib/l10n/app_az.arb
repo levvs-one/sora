@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil.",
   "extErrRevoked": "Sora komandası bu genişləndirmə versiyasını təhlükəli və ya xarab olduğu üçün geri çağırdı.",
   "extErrRevocationsExpired": "Geri çağırılmış genişləndirmələr siyahısı yenilənmədi. Yenilənənə qədər quraşdırma bağlıdır: şəbəkəni yoxlayın və yenidən cəhd edin.",
-  "extRevokedDisabled": "Geri çağırılmış genişləndirmələr söndürüldü: {names}"
+  "extRevokedDisabled": "Geri çağırılmış genişləndirmələr söndürüldü: {names}",
+  "customServerWgPrivateKey": "Gizli açar",
+  "customServerWgAddresses": "İnterfeys ünvanları",
+  "customServerWgPeerKey": "Serverin açıq açarı",
+  "customServerWgPresharedKey": "Ümumi açar",
+  "customServerWgAllowedIps": "İcazəli IP-lər",
+  "customServerWgKeepalive": "Keepalive, saniyə",
+  "customServerWgKeyInvalid": "Açar wg genkey çıxardığı kimi base64-də 32 bayt olmalıdır.",
+  "customServerWgCidrInvalid": "Vergüllə ayrılmış prefikslər daxil edin, məsələn 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "0-dan 65535-ə qədər saniyə sayı daxil edin."
 }

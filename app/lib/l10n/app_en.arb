@@ -974,5 +974,14 @@
   "diagnosticUnavailable": "This diagnostic is unavailable on this platform.",
   "extErrRevoked": "The Sora team revoked this extension version because it is unsafe or broken.",
   "extErrRevocationsExpired": "The list of revoked extensions could not be renewed. Installing is blocked until it is: check the network and try again.",
-  "extRevokedDisabled": "Revoked extensions were turned off: {names}"
+  "extRevokedDisabled": "Revoked extensions were turned off: {names}",
+  "customServerWgPrivateKey": "Private key",
+  "customServerWgAddresses": "Interface addresses",
+  "customServerWgPeerKey": "Server public key",
+  "customServerWgPresharedKey": "Preshared key",
+  "customServerWgAllowedIps": "Allowed IPs",
+  "customServerWgKeepalive": "Keepalive, seconds",
+  "customServerWgKeyInvalid": "The key must be 32 bytes of base64, as wg genkey prints.",
+  "customServerWgCidrInvalid": "Enter comma separated prefixes such as 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Enter a number of seconds from 0 to 65535."
 }

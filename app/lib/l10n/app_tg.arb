@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Ин ташхис дар ин платформа дастрас нест.",
   "extErrRevoked": "Дастаи Sora ин версияи васеъкуниро бозхонд, зеро он хатарнок ё вайрон аст.",
   "extErrRevocationsExpired": "Рӯйхати васеъкуниҳои бозхондашуда нав нашуд. То навшавӣ насб баста аст: шабакаро санҷед ва боз кӯшиш кунед.",
-  "extRevokedDisabled": "Васеъкуниҳои бозхондашуда хомӯш шуданд: {names}"
+  "extRevokedDisabled": "Васеъкуниҳои бозхондашуда хомӯш шуданд: {names}",
+  "customServerWgPrivateKey": "Калиди махфӣ",
+  "customServerWgAddresses": "Суроғаҳои интерфейс",
+  "customServerWgPeerKey": "Калиди ошкори сервер",
+  "customServerWgPresharedKey": "Калиди умумӣ",
+  "customServerWgAllowedIps": "IP-ҳои иҷозатдодашуда",
+  "customServerWgKeepalive": "Keepalive, сония",
+  "customServerWgKeyInvalid": "Калид бояд 32 байт дар base64 бошад, мисли он ки wg genkey чоп мекунад.",
+  "customServerWgCidrInvalid": "Префиксҳоро бо вергул ворид кунед, масалан 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Шумораи сонияҳоро аз 0 то 65535 ворид кунед."
 }

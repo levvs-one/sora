@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Este diagnóstico não está disponível nesta plataforma.",
   "extErrRevoked": "A equipe do Sora retirou esta versão da extensão porque é insegura ou está quebrada.",
   "extErrRevocationsExpired": "Não foi possível renovar a lista de extensões retiradas. A instalação fica bloqueada até que seja renovada: verifique a rede e tente novamente.",
-  "extRevokedDisabled": "Extensões retiradas foram desativadas: {names}"
+  "extRevokedDisabled": "Extensões retiradas foram desativadas: {names}",
+  "customServerWgPrivateKey": "Chave privada",
+  "customServerWgAddresses": "Endereços da interface",
+  "customServerWgPeerKey": "Chave pública do servidor",
+  "customServerWgPresharedKey": "Chave pré-compartilhada",
+  "customServerWgAllowedIps": "IPs permitidos",
+  "customServerWgKeepalive": "Keepalive, segundos",
+  "customServerWgKeyInvalid": "A chave deve ter 32 bytes em base64, como o wg genkey imprime.",
+  "customServerWgCidrInvalid": "Digite prefixos separados por vírgula, como 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Digite um número de segundos de 0 a 65535."
 }

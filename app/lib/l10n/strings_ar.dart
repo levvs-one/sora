@@ -2214,4 +2214,31 @@ class SAr extends S {
   String extRevokedDisabled(String names) {
     return 'تم إيقاف الإضافات المسحوبة: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'المفتاح الخاص';
+
+  @override
+  String get customServerWgAddresses => 'عناوين الواجهة';
+
+  @override
+  String get customServerWgPeerKey => 'المفتاح العام للخادم';
+
+  @override
+  String get customServerWgPresharedKey => 'المفتاح المشترك';
+
+  @override
+  String get customServerWgAllowedIps => 'عناوين IP المسموح بها';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive بالثواني';
+
+  @override
+  String get customServerWgKeyInvalid => 'يجب أن يكون المفتاح 32 بايت بترميز base64 كما يطبعه wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'أدخل بادئات مفصولة بفواصل مثل 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'أدخل عدد ثوانٍ من 0 إلى 65535.';
 }

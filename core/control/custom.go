@@ -2,13 +2,19 @@ package control
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"net/netip"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
 	"google.golang.org/grpc"
 
 	"github.com/levvs-one/sora-client/core/custom"
+	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	customv1 "github.com/levvs-one/sora-client/core/gen/sora/custom/v1"
@@ -109,9 +115,17 @@ func (c *customServer) SaveCustomServer(_ context.Context, req *customv1.SaveCus
 	// refuse anything that is not a credential document now instead of
 	// failing every later connect.
 	if material := in.GetCredentials(); material != "" {
-		if _, err := parseCredential([]byte(material)); err != nil {
+		values, err := parseCredential([]byte(material))
+		if err == nil && protocol == custom.ProtocolWireGuard {
+			err = checkWireGuardCredential(values)
+		}
+		if err != nil {
 			return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 		}
+	} else if protocol == custom.ProtocolWireGuard {
+		err := errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+			"control: a WireGuard server needs its private key, addresses and peer")
+		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
 	stored, err := st.Save(custom.Server{
 		ID:       in.GetId(),
@@ -264,10 +278,14 @@ func (s *Server) CustomOutbounds() []*corev1.OutboundSpec {
 			Protocol:    string(srv.Protocol),
 			Endpoint:    &corev1.Endpoint{Host: srv.Address, Port: uint32(srv.Port)},
 		}
-		// Shadowsocks carries its own encryption; outboundFromProto turns
-		// TLS on for every other security value.
-		if srv.Protocol == custom.ProtocolShadowsocks {
+		// Shadowsocks and WireGuard carry their own encryption;
+		// outboundFromProto turns TLS on for every other security value.
+		switch srv.Protocol {
+		case custom.ProtocolShadowsocks:
 			spec.Security = "none"
+		case custom.ProtocolWireGuard:
+			spec.Security = "none"
+			spec.Transport = "udp"
 		}
 		if srv.SecretRef != "" {
 			spec.Credentials = &corev1.CredentialsRef{Reference: srv.SecretRef}
@@ -275,4 +293,52 @@ func (s *Server) CustomOutbounds() []*corev1.OutboundSpec {
 		out = append(out, spec)
 	}
 	return out
+}
+
+// checkWireGuardCredential makes sure a hand-entered WireGuard document has
+// what the engines need: a private key, interface addresses and at least
+// one peer with a public key and allowed IPs. applyCredential reads the
+// same keys back at connect time.
+func checkWireGuardCredential(values map[string]string) error {
+	bad := func(what string) error {
+		return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds, "control: WireGuard %s", what)
+	}
+	if !isWireGuardKey(values["private_key"]) {
+		return bad("private key must be 32 bytes of base64")
+	}
+	addresses := strings.Split(values["addresses"], ",")
+	if values["addresses"] == "" {
+		return bad("needs at least one interface address")
+	}
+	for _, a := range addresses {
+		if _, err := netip.ParsePrefix(strings.TrimSpace(a)); err != nil {
+			return bad("address " + strconv.Quote(a) + " is not a CIDR")
+		}
+	}
+	var peers []engine.WireGuardPeer
+	if err := json.Unmarshal([]byte(values["peers"]), &peers); err != nil || len(peers) == 0 {
+		return bad("needs at least one peer")
+	}
+	for _, p := range peers {
+		if !isWireGuardKey(p.PublicKey) || (p.PreSharedKey != "" && !isWireGuardKey(p.PreSharedKey)) {
+			return bad("peer keys must be 32 bytes of base64")
+		}
+		if len(p.AllowedIPs) == 0 {
+			return bad("peer needs allowed IPs")
+		}
+		for _, a := range p.AllowedIPs {
+			if _, err := netip.ParsePrefix(a); err != nil {
+				return bad("allowed IP " + strconv.Quote(a) + " is not a CIDR")
+			}
+		}
+		if p.PersistentKeepalive < 0 || p.PersistentKeepalive > 65535 {
+			return bad("keepalive must be 0 to 65535 seconds")
+		}
+	}
+	return nil
+}
+
+func isWireGuardKey(key string) bool {
+	raw, err := base64.StdEncoding.DecodeString(key)
+	return err == nil && len(raw) == 32
 }

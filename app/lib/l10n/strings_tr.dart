@@ -2227,4 +2227,31 @@ class STr extends S {
   String extRevokedDisabled(String names) {
     return 'Geri çekilen uzantılar kapatıldı: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Özel anahtar';
+
+  @override
+  String get customServerWgAddresses => 'Arayüz adresleri';
+
+  @override
+  String get customServerWgPeerKey => 'Sunucu ortak anahtarı';
+
+  @override
+  String get customServerWgPresharedKey => 'Ön paylaşımlı anahtar';
+
+  @override
+  String get customServerWgAllowedIps => 'İzin verilen IP’ler';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, saniye';
+
+  @override
+  String get customServerWgKeyInvalid => 'Anahtar, wg genkey çıktısındaki gibi base64’te 32 bayt olmalı.';
+
+  @override
+  String get customServerWgCidrInvalid => '10.0.0.2/32 gibi virgülle ayrılmış önekler girin.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0 ile 65535 arasında bir saniye değeri girin.';
 }

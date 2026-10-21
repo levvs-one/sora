@@ -89,8 +89,9 @@ class RevocationList {
     if (decoded['revocation_version'] != 1) throw RevocationError('unsupported revocation_version');
     final updatedAt = DateTime.tryParse(decoded['updated_at'] as String? ?? '');
     final expiresAt = DateTime.tryParse(decoded['expires_at'] as String? ?? '');
-    if (updatedAt == null || expiresAt == null)
+    if (updatedAt == null || expiresAt == null) {
       throw RevocationError('revocation list needs updated_at and expires_at');
+    }
     if (!expiresAt.isAfter(updatedAt)) throw RevocationError('revocation list expires before it was updated');
     final rawEntries = decoded['entries'];
     if (rawEntries is! List) throw RevocationError('revocation list needs an entries array');

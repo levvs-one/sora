@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Ця діагностика недоступна на цій платформі.",
   "extErrRevoked": "Команда Sora відкликала цю версію розширення: вона небезпечна або зламана.",
   "extErrRevocationsExpired": "Не вдалося оновити список відкликаних розширень. Встановлення недоступне, доки він не оновиться: перевірте мережу й спробуйте знову.",
-  "extRevokedDisabled": "Вимкнено відкликані розширення: {names}"
+  "extRevokedDisabled": "Вимкнено відкликані розширення: {names}",
+  "customServerWgPrivateKey": "Приватний ключ",
+  "customServerWgAddresses": "Адреси інтерфейсу",
+  "customServerWgPeerKey": "Публічний ключ сервера",
+  "customServerWgPresharedKey": "Спільний ключ",
+  "customServerWgAllowedIps": "Дозволені IP",
+  "customServerWgKeepalive": "Keepalive, секунд",
+  "customServerWgKeyInvalid": "Ключ має бути 32 байтами в base64, як виводить wg genkey.",
+  "customServerWgCidrInvalid": "Вкажіть адреси через кому у вигляді 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Вкажіть кількість секунд від 0 до 65535."
 }

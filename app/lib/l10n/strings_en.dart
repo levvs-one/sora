@@ -2210,4 +2210,31 @@ class SEn extends S {
   String extRevokedDisabled(String names) {
     return 'Revoked extensions were turned off: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Private key';
+
+  @override
+  String get customServerWgAddresses => 'Interface addresses';
+
+  @override
+  String get customServerWgPeerKey => 'Server public key';
+
+  @override
+  String get customServerWgPresharedKey => 'Preshared key';
+
+  @override
+  String get customServerWgAllowedIps => 'Allowed IPs';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, seconds';
+
+  @override
+  String get customServerWgKeyInvalid => 'The key must be 32 bytes of base64, as wg genkey prints.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Enter comma separated prefixes such as 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Enter a number of seconds from 0 to 65535.';
 }

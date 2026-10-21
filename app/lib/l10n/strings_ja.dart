@@ -2210,4 +2210,31 @@ class SJa extends S {
   String extRevokedDisabled(String names) {
     return '取り消された拡張機能をオフにしました: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => '秘密鍵';
+
+  @override
+  String get customServerWgAddresses => 'インターフェイスのアドレス';
+
+  @override
+  String get customServerWgPeerKey => 'サーバーの公開鍵';
+
+  @override
+  String get customServerWgPresharedKey => '事前共有鍵';
+
+  @override
+  String get customServerWgAllowedIps => '許可する IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive (秒)';
+
+  @override
+  String get customServerWgKeyInvalid => '鍵は wg genkey が出力するような base64 の 32 バイトにしてください。';
+
+  @override
+  String get customServerWgCidrInvalid => '10.0.0.2/32 のようなプレフィックスをカンマ区切りで入力してください。';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0 から 65535 までの秒数を入力してください。';
 }

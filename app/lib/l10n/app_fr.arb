@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Ce diagnostic n'est pas disponible sur cette plateforme.",
   "extErrRevoked": "L’équipe Sora a retiré cette version de l’extension, car elle est dangereuse ou défectueuse.",
   "extErrRevocationsExpired": "La liste des extensions retirées n’a pas pu être renouvelée. L’installation est bloquée jusqu’à son renouvellement : vérifiez le réseau et réessayez.",
-  "extRevokedDisabled": "Des extensions retirées ont été désactivées : {names}"
+  "extRevokedDisabled": "Des extensions retirées ont été désactivées : {names}",
+  "customServerWgPrivateKey": "Clé privée",
+  "customServerWgAddresses": "Adresses de l’interface",
+  "customServerWgPeerKey": "Clé publique du serveur",
+  "customServerWgPresharedKey": "Clé prépartagée",
+  "customServerWgAllowedIps": "IP autorisées",
+  "customServerWgKeepalive": "Keepalive, secondes",
+  "customServerWgKeyInvalid": "La clé doit faire 32 octets en base64, comme l’affiche wg genkey.",
+  "customServerWgCidrInvalid": "Saisissez des préfixes séparés par des virgules, comme 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Saisissez un nombre de secondes entre 0 et 65535."
 }

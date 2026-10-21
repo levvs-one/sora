@@ -2229,4 +2229,31 @@ class STg extends S {
   String extRevokedDisabled(String names) {
     return 'Васеъкуниҳои бозхондашуда хомӯш шуданд: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Калиди махфӣ';
+
+  @override
+  String get customServerWgAddresses => 'Суроғаҳои интерфейс';
+
+  @override
+  String get customServerWgPeerKey => 'Калиди ошкори сервер';
+
+  @override
+  String get customServerWgPresharedKey => 'Калиди умумӣ';
+
+  @override
+  String get customServerWgAllowedIps => 'IP-ҳои иҷозатдодашуда';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, сония';
+
+  @override
+  String get customServerWgKeyInvalid => 'Калид бояд 32 байт дар base64 бошад, мисли он ки wg genkey чоп мекунад.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Префиксҳоро бо вергул ворид кунед, масалан 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Шумораи сонияҳоро аз 0 то 65535 ворид кунед.';
 }

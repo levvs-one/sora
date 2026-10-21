@@ -2229,4 +2229,31 @@ class SPt extends S {
   String extRevokedDisabled(String names) {
     return 'Extensões retiradas foram desativadas: $names';
   }
+
+  @override
+  String get customServerWgPrivateKey => 'Chave privada';
+
+  @override
+  String get customServerWgAddresses => 'Endereços da interface';
+
+  @override
+  String get customServerWgPeerKey => 'Chave pública do servidor';
+
+  @override
+  String get customServerWgPresharedKey => 'Chave pré-compartilhada';
+
+  @override
+  String get customServerWgAllowedIps => 'IPs permitidos';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, segundos';
+
+  @override
+  String get customServerWgKeyInvalid => 'A chave deve ter 32 bytes em base64, como o wg genkey imprime.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Digite prefixos separados por vírgula, como 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Digite um número de segundos de 0 a 65535.';
 }

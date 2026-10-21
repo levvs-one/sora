@@ -545,3 +545,60 @@ func TestCustomCredentialsBuildAConnectablePlan(t *testing.T) {
 		}
 	}
 }
+
+// TestCustomWireGuardBuildsAPeerFromTheServerAddress pins the hand-entered
+// WireGuard path: the document is checked on save and the planner fills the
+// peer endpoint from the server address, without TLS.
+func TestCustomWireGuardBuildsAPeerFromTheServerAddress(t *testing.T) {
+	srv, token := customTestPlane(t)
+	c := customImpl(t, srv)
+	key := "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="
+	save := func(doc string) *customv1.SaveCustomServerResponse {
+		t.Helper()
+		resp, err := c.SaveCustomServer(context.Background(), &customv1.SaveCustomServerRequest{
+			ApiVersion:           customVersion(),
+			ControlAuthenticator: token,
+			Server: &customv1.CustomServer{
+				Name: "WG", Protocol: customv1.CustomProtocol_CUSTOM_PROTOCOL_WIREGUARD,
+				Address: "198.51.100.7", Port: 51820, Credentials: doc,
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return resp
+	}
+	for _, bad := range []string{
+		"",
+		`{"private_key":"short","addresses":"10.0.0.2/32","peers":"[{\"PublicKey\":\"` + key + `\",\"AllowedIPs\":[\"0.0.0.0/0\"]}]"}`,
+		`{"private_key":"` + key + `","addresses":"10.0.0.2","peers":"[{\"PublicKey\":\"` + key + `\",\"AllowedIPs\":[\"0.0.0.0/0\"]}]"}`,
+		`{"private_key":"` + key + `","addresses":"10.0.0.2/32","peers":"[]"}`,
+		`{"private_key":"` + key + `","addresses":"10.0.0.2/32","peers":"[{\"PublicKey\":\"` + key + `\"}]"}`,
+	} {
+		if resp := save(bad); resp.GetError() == nil {
+			t.Errorf("accepted a broken WireGuard document: %s", bad)
+		}
+	}
+	good := `{"private_key":"` + key + `","addresses":"10.0.0.2/32,fd00::2/128","peers":"[{\"PublicKey\":\"` + key +
+		`\",\"AllowedIPs\":[\"0.0.0.0/0\",\"::/0\"],\"PersistentKeepalive\":25}]"}`
+	if resp := save(good); resp.GetError() != nil {
+		t.Fatalf("refused a valid document: %v", resp.GetError())
+	}
+	specs := srv.CustomOutbounds()
+	if len(specs) != 1 {
+		t.Fatalf("outbounds = %d", len(specs))
+	}
+	out, err := outboundFromProto(0, specs[0], srv.secrets)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if out.TLS.Enabled || out.Transport.Type != "udp" || out.PrivateKey != key || len(out.Addresses) != 2 {
+		t.Errorf("outbound = tls %v transport %q key %q addresses %v", out.TLS.Enabled, out.Transport.Type, out.PrivateKey, out.Addresses)
+	}
+	if len(out.Peers) != 1 || out.Peers[0].Endpoint != "198.51.100.7:51820" || out.Peers[0].PersistentKeepalive != 25 {
+		t.Errorf("peers = %+v", out.Peers)
+	}
+	if err := out.Validate(); err != nil {
+		t.Errorf("the planned outbound does not validate: %v", err)
+	}
+}

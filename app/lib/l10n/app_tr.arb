@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor.",
   "extErrRevoked": "Sora ekibi bu uzantı sürümünü güvensiz ya da bozuk olduğu için geri çekti.",
   "extErrRevocationsExpired": "Geri çekilen uzantılar listesi yenilenemedi. Yenilenene kadar kurulum engellendi: ağı kontrol edip yeniden deneyin.",
-  "extRevokedDisabled": "Geri çekilen uzantılar kapatıldı: {names}"
+  "extRevokedDisabled": "Geri çekilen uzantılar kapatıldı: {names}",
+  "customServerWgPrivateKey": "Özel anahtar",
+  "customServerWgAddresses": "Arayüz adresleri",
+  "customServerWgPeerKey": "Sunucu ortak anahtarı",
+  "customServerWgPresharedKey": "Ön paylaşımlı anahtar",
+  "customServerWgAllowedIps": "İzin verilen IP’ler",
+  "customServerWgKeepalive": "Keepalive, saniye",
+  "customServerWgKeyInvalid": "Anahtar, wg genkey çıktısındaki gibi base64’te 32 bayt olmalı.",
+  "customServerWgCidrInvalid": "10.0.0.2/32 gibi virgülle ayrılmış önekler girin.",
+  "customServerWgKeepaliveInvalid": "0 ile 65535 arasında bir saniye değeri girin."
 }

@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "Гэтая дыягностыка недаступная на гэтай платформе.",
   "extErrRevoked": "Каманда Sora адклікала гэтую версію пашырэння: яна небяспечная або зламаная.",
   "extErrRevocationsExpired": "Не ўдалося абнавіць спіс адкліканых пашырэнняў. Усталёўка недаступная, пакуль ён не абновіцца: праверце сетку і паспрабуйце зноў.",
-  "extRevokedDisabled": "Адкліканыя пашырэнні выключаны: {names}"
+  "extRevokedDisabled": "Адкліканыя пашырэнні выключаны: {names}",
+  "customServerWgPrivateKey": "Прыватны ключ",
+  "customServerWgAddresses": "Адрасы інтэрфейсу",
+  "customServerWgPeerKey": "Публічны ключ сервера",
+  "customServerWgPresharedKey": "Агульны ключ",
+  "customServerWgAllowedIps": "Дазволеныя IP",
+  "customServerWgKeepalive": "Keepalive, секунд",
+  "customServerWgKeyInvalid": "Ключ павінен быць 32 байтамі ў base64, як выводзіць wg genkey.",
+  "customServerWgCidrInvalid": "Пакажыце адрасы праз коску ў выглядзе 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Пакажыце колькасць секунд ад 0 да 65535."
 }

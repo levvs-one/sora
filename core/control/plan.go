@@ -406,6 +406,13 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 			return engine.Outbound{}, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
 				"control: outbound %q: %v", id, err)
 		}
+		// Hand-added WireGuard servers keep the endpoint in the server
+		// address and port, so editing them cannot leave a stale peer.
+		for i := range outbound.Peers {
+			if outbound.Peers[i].Endpoint == "" && outbound.Server != "" && outbound.Port != 0 {
+				outbound.Peers[i].Endpoint = net.JoinHostPort(outbound.Server, strconv.Itoa(int(outbound.Port)))
+			}
+		}
 	}
 	return outbound, nil
 }

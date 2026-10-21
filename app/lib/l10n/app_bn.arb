@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.",
   "extErrRevoked": "Sora দল এই এক্সটেনশন সংস্করণটি প্রত্যাহার করেছে, কারণ এটি অনিরাপদ বা ভাঙা।",
   "extErrRevocationsExpired": "প্রত্যাহার করা এক্সটেনশনের তালিকা নবায়ন করা যায়নি। নবায়ন না হওয়া পর্যন্ত ইনস্টল বন্ধ: নেটওয়ার্ক দেখে আবার চেষ্টা করুন।",
-  "extRevokedDisabled": "প্রত্যাহার করা এক্সটেনশন বন্ধ করা হয়েছে: {names}"
+  "extRevokedDisabled": "প্রত্যাহার করা এক্সটেনশন বন্ধ করা হয়েছে: {names}",
+  "customServerWgPrivateKey": "প্রাইভেট কী",
+  "customServerWgAddresses": "ইন্টারফেস ঠিকানা",
+  "customServerWgPeerKey": "সার্ভারের পাবলিক কী",
+  "customServerWgPresharedKey": "প্রি-শেয়ার্ড কী",
+  "customServerWgAllowedIps": "অনুমোদিত IP",
+  "customServerWgKeepalive": "Keepalive, সেকেন্ড",
+  "customServerWgKeyInvalid": "কী-টি wg genkey-এর মতো base64-এ 32 বাইট হতে হবে।",
+  "customServerWgCidrInvalid": "কমা দিয়ে আলাদা প্রিফিক্স দিন, যেমন 10.0.0.2/32।",
+  "customServerWgKeepaliveInvalid": "0 থেকে 65535 সেকেন্ডের মধ্যে একটি সংখ্যা দিন।"
 }

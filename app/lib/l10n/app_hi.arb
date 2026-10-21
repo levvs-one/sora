@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.",
   "extErrRevoked": "Sora टीम ने इस एक्सटेंशन संस्करण को वापस ले लिया है, क्योंकि यह असुरक्षित या खराब है।",
   "extErrRevocationsExpired": "वापस लिए गए एक्सटेंशन की सूची नवीनीकृत नहीं हो सकी। नवीनीकरण तक इंस्टॉल बंद है: नेटवर्क जांचें और फिर कोशिश करें।",
-  "extRevokedDisabled": "वापस लिए गए एक्सटेंशन बंद किए गए: {names}"
+  "extRevokedDisabled": "वापस लिए गए एक्सटेंशन बंद किए गए: {names}",
+  "customServerWgPrivateKey": "प्राइवेट की",
+  "customServerWgAddresses": "इंटरफ़ेस पते",
+  "customServerWgPeerKey": "सर्वर की पब्लिक की",
+  "customServerWgPresharedKey": "प्री-शेयर्ड की",
+  "customServerWgAllowedIps": "अनुमत IP",
+  "customServerWgKeepalive": "Keepalive, सेकंड",
+  "customServerWgKeyInvalid": "की wg genkey की तरह base64 में 32 बाइट होनी चाहिए।",
+  "customServerWgCidrInvalid": "कॉमा से अलग प्रीफ़िक्स दें, जैसे 10.0.0.2/32।",
+  "customServerWgKeepaliveInvalid": "0 से 65535 तक सेकंड की संख्या दें।"
 }

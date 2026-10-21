@@ -1126,5 +1126,14 @@
   "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست.",
   "extErrRevoked": "تیم Sora این نسخه از افزونه را لغو کرد، چون ناامن یا خراب است.",
   "extErrRevocationsExpired": "فهرست افزونه‌های لغوشده به‌روز نشد. تا به‌روز شدن آن نصب ممکن نیست: شبکه را بررسی و دوباره تلاش کنید.",
-  "extRevokedDisabled": "افزونه‌های لغوشده خاموش شدند: {names}"
+  "extRevokedDisabled": "افزونه‌های لغوشده خاموش شدند: {names}",
+  "customServerWgPrivateKey": "کلید خصوصی",
+  "customServerWgAddresses": "نشانی‌های رابط",
+  "customServerWgPeerKey": "کلید عمومی سرور",
+  "customServerWgPresharedKey": "کلید مشترک",
+  "customServerWgAllowedIps": "IPهای مجاز",
+  "customServerWgKeepalive": "Keepalive، ثانیه",
+  "customServerWgKeyInvalid": "کلید باید ۳۲ بایت base64 باشد، مانند خروجی wg genkey.",
+  "customServerWgCidrInvalid": "پیشوندها را با ویرگول جدا کنید، مانند 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "عددی بین 0 تا 65535 ثانیه وارد کنید."
 }

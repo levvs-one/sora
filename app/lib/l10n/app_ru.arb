@@ -1133,5 +1133,14 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerWgPrivateKey": "Приватный ключ",
+  "customServerWgAddresses": "Адреса интерфейса",
+  "customServerWgPeerKey": "Публичный ключ сервера",
+  "customServerWgPresharedKey": "Общий ключ",
+  "customServerWgAllowedIps": "Разрешённые IP",
+  "customServerWgKeepalive": "Keepalive, секунд",
+  "customServerWgKeyInvalid": "Ключ должен быть 32 байтами в base64, как выводит wg genkey.",
+  "customServerWgCidrInvalid": "Укажите адреса через запятую в виде 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Укажите число секунд от 0 до 65535."
 }
