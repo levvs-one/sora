@@ -43,3 +43,36 @@ func TestHandleFileStaysInsideTheProject(t *testing.T) {
 		}
 	}
 }
+
+// TestHandleFileHidesTheAuthorKey pins that the key scaffold writes into the
+// project is never served, nor any other hidden path or key file.
+func TestHandleFileHidesTheAuthorKey(t *testing.T) {
+	project := t.TempDir()
+	for name, body := range map[string]string{
+		".sora/author.key": "secret", ".env": "secret", "spare.key": "secret", "panel.js": "inside",
+	} {
+		p := filepath.Join(project, filepath.FromSlash(name))
+		if err := os.MkdirAll(filepath.Dir(p), 0o700); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	s := New(Options{Dir: project})
+	for _, path := range []string{"/.sora/author.key", "/.sora/", "/.env", "/spare.key", "/SPARE.KEY"} {
+		r := httptest.NewRequest(http.MethodGet, "/", nil)
+		r.URL.Path = path
+		w := httptest.NewRecorder()
+		s.handleFile(w, r)
+		if w.Code == http.StatusOK || strings.Contains(w.Body.String(), "secret") {
+			t.Errorf("%s was served: %d %q", path, w.Code, w.Body.String())
+		}
+	}
+	r := httptest.NewRequest(http.MethodGet, "/panel.js", nil)
+	w := httptest.NewRecorder()
+	s.handleFile(w, r)
+	if w.Code != http.StatusOK {
+		t.Fatalf("panel.js: %d", w.Code)
+	}
+}

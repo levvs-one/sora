@@ -3,6 +3,7 @@ package ext
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -389,6 +390,30 @@ func TestFetchDeniedRateLimitCounts(t *testing.T) {
 	}
 	if st := f.Stats(); st.Denied != 1 || st.Requests != 2 {
 		t.Fatalf("bad stats after rate limit: %+v", st)
+	}
+}
+
+func TestFetchFailureHidesTheQuery(t *testing.T) {
+	rt := roundTripFunc(func(*http.Request) (*http.Response, error) {
+		return nil, errors.New("connection refused")
+	})
+	hub := NewLogHub()
+	f, err := NewFetcherForExtensionWithTransport("com.example.hello",
+		&ManifestExt{NetworkHosts: []string{"api.example.com"}}, FetchLimits{}, rt, hub)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = f.Fetch(context.Background(), FetchRequest{URL: "https://api.example.com/x?api_key=topsecret"})
+	if err == nil {
+		t.Fatal("Fetch succeeded through a failing transport")
+	}
+	if strings.Contains(err.Error(), "topsecret") {
+		t.Fatalf("secret query leaked into the error: %v", err)
+	}
+	for _, e := range hub.Log("com.example.hello").Entries() {
+		if strings.Contains(e.Message, "topsecret") {
+			t.Fatalf("secret query leaked into log: %q", e.Message)
+		}
 	}
 }
 

@@ -195,6 +195,10 @@ func (s *Server) handleFile(w http.ResponseWriter, r *http.Request) {
 	}
 	defer func() { _ = root.Close() }()
 	name := filepath.FromSlash(strings.TrimPrefix(r.URL.Path, "/"))
+	if !servable(r.URL.Path) {
+		http.NotFound(w, r)
+		return
+	}
 	f, err := root.Open(name)
 	if err != nil {
 		http.NotFound(w, r)
@@ -217,6 +221,18 @@ func (s *Server) handleFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.ServeContent(w, r, st.Name(), st.ModTime(), f)
+}
+
+// servable keeps secrets out of reach of every local user who can open a
+// loopback port: scaffold writes the author key to .sora/author.key inside
+// the project, so hidden paths and key files are never served.
+func servable(urlPath string) bool {
+	for _, seg := range strings.Split(urlPath, "/") {
+		if strings.HasPrefix(seg, ".") {
+			return false
+		}
+	}
+	return !strings.HasSuffix(strings.ToLower(urlPath), ".key")
 }
 
 // inject adds the mock and/or live-reload scripts to HTML.

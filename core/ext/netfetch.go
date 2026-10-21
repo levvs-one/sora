@@ -309,8 +309,14 @@ func (f *Fetcher) Fetch(ctx context.Context, req FetchRequest) (*FetchResponse, 
 				return nil, denied
 			}
 		}
-		f.logf(LogError, "fetch FAILED %s: %v", mu, shortErr(err))
-		return nil, errs.Newf(errs.CodeUnavailable, KeyNetFetchFailed, "ext: net.fetch: %v", shortErr(err))
+		// url.Error repeats the full URL, query secrets included; only its
+		// cause may reach the log and the extension.
+		cause := err
+		if urlErr.Err != nil {
+			cause = urlErr.Err
+		}
+		f.logf(LogError, "fetch FAILED %s: %v", mu, shortErr(cause))
+		return nil, errs.Newf(errs.CodeUnavailable, KeyNetFetchFailed, "ext: net.fetch: %v", shortErr(cause))
 	}
 	defer func() { _ = resp.Body.Close() }()
 	body, err := f.readResponseBody(resp)
