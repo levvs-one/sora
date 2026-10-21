@@ -39,7 +39,7 @@ func TestStrictIntentLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	settings := session.Settings{StrictKillSwitch: true, Reconnect: true, Endpoints: []netip.AddrPort{netip.MustParseAddrPort("203.0.113.2:443")}}
+	settings := session.Settings{StrictKillSwitch: true, Reconnect: true, Endpoints: []session.Endpoint{{Address: netip.MustParseAddrPort("203.0.113.2:443"), Protocol: "tcp"}}}
 	if err := first.Apply(ctx, settings); err != nil {
 		t.Fatal(err)
 	}
@@ -98,9 +98,9 @@ func TestStrictRebootRequiresReconnect(t *testing.T) {
 }
 
 func TestStrictRulesExemptOnlyRecovery(t *testing.T) {
-	policy := session.Settings{StrictKillSwitch: true, Endpoints: []netip.AddrPort{netip.MustParseAddrPort("203.0.113.2:443"), netip.MustParseAddrPort("[2001:db8::2]:8443")}}
+	policy := session.Settings{StrictKillSwitch: true, Endpoints: []session.Endpoint{{Address: netip.MustParseAddrPort("203.0.113.2:443"), Protocol: "tcp"}, {Address: netip.MustParseAddrPort("[2001:db8::2]:8443"), Protocol: "udp"}}}
 	rules := StrictNftRuleset(999, policy)
-	for _, required := range []string{"ip daddr 203.0.113.2 meta l4proto { tcp, udp } th dport 443 accept", "ip6 daddr 2001:db8::2", "udp sport 68 udp dport 67", "icmpv6 type", "hoplimit 255", "meta skuid 999 meta l4proto"} {
+	for _, required := range []string{"meta skuid 999 ip daddr 203.0.113.2 tcp dport 443 accept", "meta skuid 999 ip6 daddr 2001:db8::2 udp dport 8443 accept", "udp sport 68 udp dport 67", "icmpv6 type", "hoplimit 255", "meta skuid 999 meta l4proto"} {
 		if !strings.Contains(rules, required) {
 			t.Fatalf("missing %s", required)
 		}
@@ -113,5 +113,20 @@ func TestStrictRulesExemptOnlyRecovery(t *testing.T) {
 	policy.AllowLAN = true
 	if !strings.Contains(StrictNftRuleset(999, policy), "ip daddr 192.168.0.0/16 accept") {
 		t.Fatal("explicit LAN permission lost")
+	}
+}
+
+func TestStrictLegacyEndpointRecoveryFailsClosed(t *testing.T) {
+	var settings session.Settings
+	if err := json.Unmarshal([]byte(`{"StrictKillSwitch":true,"Endpoints":["203.0.113.2:443"]}`), &settings); err != nil {
+		t.Fatal(err)
+	}
+	rules := StrictNftRuleset(999, settings)
+	if strings.Contains(rules, "203.0.113.2") || !strings.Contains(rules, "counter drop") {
+		t.Fatal("legacy intent granted an unknown endpoint transport")
+	}
+	settings.Endpoints[0].Protocol = "tcp, udp"
+	if strings.Contains(StrictNftRuleset(999, settings), "203.0.113.2") {
+		t.Fatal("unknown protocol allowed")
 	}
 }

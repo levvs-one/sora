@@ -4,6 +4,8 @@ package guard
 
 import (
 	"net/netip"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/tailscale/wf"
@@ -87,8 +89,25 @@ func TestWFPRefusesAnEmptyEnginesDir(t *testing.T) {
 
 func TestWFPStrictRulesRequireExplicitExemptions(t *testing.T) {
 	for _, reconnect := range []bool{false, true} {
-		policy := session.Settings{StrictKillSwitch: true, Reconnect: reconnect, Endpoints: []netip.AddrPort{netip.MustParseAddrPort("203.0.113.2:443"), netip.MustParseAddrPort("[2001:db8::2]:8443")}}
-		w := &WFP{enginesDir: t.TempDir(), bypass: []netip.Prefix{netip.MustParsePrefix("0.0.0.0/0")}, policy: policy}
+		policy := session.Settings{StrictKillSwitch: true, Reconnect: reconnect, Endpoints: []session.Endpoint{{Address: netip.MustParseAddrPort("203.0.113.2:443"), Protocol: "tcp"}, {Address: netip.MustParseAddrPort("[2001:db8::2]:8443"), Protocol: "udp"}}}
+		dir := t.TempDir()
+		expectedApps := map[string]bool{}
+		for _, name := range []string{"sing-box.exe", "xray.exe", "mihomo.exe"} {
+			path := filepath.Join(dir, name)
+			if err := os.WriteFile(path, []byte("engine identity fixture"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			id, err := wf.AppID(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			expectedApps[id] = true
+		}
+		owner, err := sameAccount()
+		if err != nil {
+			t.Fatal(err)
+		}
+		w := &WFP{enginesDir: dir, bypass: []netip.Prefix{netip.MustParsePrefix("0.0.0.0/0")}, policy: policy}
 		endpoints, blocks, apps := 0, 0, 0
 		if err := w.rules(func(rule *wf.Rule) error {
 			if rule.Persistent != reconnect {
@@ -99,8 +118,32 @@ func TestWFPStrictRulesRequireExplicitExemptions(t *testing.T) {
 			}
 			if rule.Name == "Sora: VPN endpoint" {
 				endpoints++
-				if len(rule.Conditions) != 2 || rule.Action != wf.ActionPermit {
-					t.Fatal("endpoint is not restricted by address and port")
+				if len(rule.Conditions) != 5 || rule.Action != wf.ActionPermit {
+					t.Fatal("endpoint needs address, port, protocol, application and account")
+				}
+				fields := map[wf.FieldID]any{}
+				for _, c := range rule.Conditions {
+					if c.Op != wf.MatchTypeEqual {
+						t.Fatal("endpoint match must be exact")
+					}
+					fields[c.Field] = c.Value
+				}
+				if !expectedApps[fields[wf.FieldALEAppID].(string)] {
+					t.Fatal("endpoint allows a process other than an installed engine")
+				}
+				gotOwner := fields[wf.FieldALEUserID].(*windows.SECURITY_DESCRIPTOR)
+				if gotOwner.String() != owner.String() {
+					t.Fatal("engine account changed")
+				}
+				index := 0
+				proto := wf.IPProtoTCP
+				if rule.Layer == wf.LayerALEAuthConnectV6 {
+					index = 1
+					proto = wf.IPProtoUDP
+				}
+				ep := policy.Endpoints[index].Address
+				if fields[wf.FieldIPRemoteAddress] != netip.PrefixFrom(ep.Addr(), ep.Addr().BitLen()) || fields[wf.FieldIPRemotePort] != ep.Port() || fields[wf.FieldIPProtocol] != proto {
+					t.Fatalf("endpoint transport widened: %v", fields)
 				}
 				if !applies(rule.Layer, rule.Conditions) {
 					t.Fatal("endpoint has wrong family")
@@ -118,7 +161,7 @@ func TestWFPStrictRulesRequireExplicitExemptions(t *testing.T) {
 							dnsOnly = true
 						}
 					}
-					if !dnsOnly {
+					if !dnsOnly && rule.Name != "Sora: VPN endpoint" {
 						t.Fatal("strict mode allowed unrestricted application traffic")
 					}
 				}
@@ -127,7 +170,7 @@ func TestWFPStrictRulesRequireExplicitExemptions(t *testing.T) {
 		}, strictSublayer); err != nil {
 			t.Fatal(err)
 		}
-		if endpoints != 2 || blocks != 2 || apps != 2 {
+		if endpoints != 6 || blocks != 2 || apps != 8 {
 			t.Fatalf("endpoints=%d blocks=%d apps=%d", endpoints, blocks, apps)
 		}
 		w.policy.AllowLAN = true
@@ -147,7 +190,7 @@ func TestWFPStrictRulesRequireExplicitExemptions(t *testing.T) {
 }
 
 // TestStrictFilterRecordRoundTrips pins the record Disarm relies on: the
-// IDs written after installing strict filters are read back unchanged and
+// IDs written before installing strict filters are read back unchanged and
 // clearing the record leaves nothing to delete.
 func TestStrictFilterRecordRoundTrips(t *testing.T) {
 	w := &WFP{stateDir: t.TempDir()}

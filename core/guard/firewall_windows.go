@@ -113,7 +113,7 @@ func (w *WFP) Arm(context.Context, []uint16) error {
 	return nil
 }
 
-// Disarm removes the filters by closing the session that owns them. The
+// Disarm deletes journaled strict filters and closes the live session. The
 // session handle is cleared only after a successful close: on failure the
 // filters may still be installed, and dropping the handle would make them
 // unreachable while Armed() wrongly reports false.
@@ -130,19 +130,7 @@ func (w *WFP) Disarm(context.Context) error {
 			return refused(err)
 		}
 		defer func() { _ = connection.Close() }()
-		for _, id := range ids {
-			if err := connection.DeleteRule(id); err != nil && !errors.Is(err, errFilterNotFound) {
-				failures = errors.Join(failures, err)
-			}
-		}
-		if failures == nil {
-			if err := connection.DeleteSublayer(strictSublayer); err != nil && !errors.Is(err, errSublayerNotFound) {
-				failures = err
-			}
-		}
-		if failures == nil {
-			failures = w.saveStrictIDs(nil)
-		}
+		failures = w.clearStrict(connection, ids)
 	}
 	if w.session != nil {
 		if err := w.session.Close(); err != nil {
@@ -227,7 +215,16 @@ func (w *WFP) saveStrictIDs(ids []wf.RuleID) error {
 	if err := errors.Join(writeErr, syncErr, closeErr); err != nil {
 		return err
 	}
-	return os.Rename(file.Name(), w.strictFile())
+	from, err := windows.UTF16PtrFromString(file.Name())
+	if err != nil {
+		return err
+	}
+	to, err := windows.UTF16PtrFromString(w.strictFile())
+	if err != nil {
+		return err
+	}
+	// Flush the replacement before persistent filters can depend on its IDs.
+	return windows.MoveFileEx(from, to, windows.MOVEFILE_REPLACE_EXISTING|windows.MOVEFILE_WRITE_THROUGH)
 }
 
 // SetPolicy is applied before replacing the rules.
@@ -235,7 +232,14 @@ func (w *WFP) SetPolicy(s session.Settings) { w.mu.Lock(); defer w.mu.Unlock(); 
 
 var strictSublayer = wf.SublayerID{Data1: 0x18ce701b, Data2: 0x251c, Data3: 0x4bc8, Data4: [8]byte{0x8f, 0x3b, 0x13, 0x23, 0x7b, 0x0e, 0x74, 0x91}}
 
-func (w *WFP) installStrict(connection *wf.Session) error {
+type strictConnection interface {
+	AddSublayer(*wf.Sublayer) error
+	AddRule(*wf.Rule) error
+	DeleteRule(wf.RuleID) error
+	DeleteSublayer(wf.SublayerID) error
+}
+
+func (w *WFP) installStrict(connection strictConnection) (failure error) {
 	if w.stateDir == "" {
 		return errors.New("guard: strict mode needs a data directory")
 	}
@@ -243,35 +247,62 @@ func (w *WFP) installStrict(connection *wf.Session) error {
 	if err != nil {
 		return err
 	}
+	var planned []*wf.Rule
+	if err := w.rules(func(rule *wf.Rule) error { planned = append(planned, rule); return nil }, strictSublayer); err != nil {
+		return err
+	}
+	ids := make([]wf.RuleID, 0, len(planned))
+	for _, rule := range planned {
+		ids = append(ids, rule.ID)
+	}
+	// Journal every possible filter before WFP can make any of them persistent.
+	// Missing entries after a crash are harmless during Disarm.
+	if err := w.saveStrictIDs(append(append([]wf.RuleID(nil), old...), ids...)); err != nil {
+		return err
+	}
+	var added []wf.RuleID
+	defer func() {
+		if failure != nil {
+			failure = errors.Join(failure, deleteStrictRules(connection, added))
+			// Retain the complete plan even if rollback failed, so the next Disarm
+			// can retry without enumerating unrelated WFP filters.
+		}
+	}()
 	if err := connection.AddSublayer(&wf.Sublayer{ID: strictSublayer, Name: "Sora strict kill switch", Weight: 0xffff, Persistent: true}); err != nil && !errors.Is(err, windows.ERROR_ALREADY_EXISTS) && !errors.Is(err, errAlreadyExists) {
 		return err
 	}
-	// Install the replacement before deleting the old block, including during recovery.
-	var added []wf.RuleID
-	if err := w.rules(func(rule *wf.Rule) error {
-		rule.Persistent = w.policy.Reconnect
+	// Keep the previous block until every replacement filter is installed.
+	for _, rule := range planned {
 		if err := connection.AddRule(rule); err != nil {
 			return err
 		}
 		added = append(added, rule.ID)
-		return nil
-	}, strictSublayer); err != nil {
-		for _, id := range added {
-			_ = connection.DeleteRule(id)
-		}
+	}
+	if err := deleteStrictRules(connection, old); err != nil {
 		return err
 	}
-	// Record old and new together first, so a crash before the old rules
-	// are gone still leaves every strict filter findable.
-	if err := w.saveStrictIDs(append(append([]wf.RuleID(nil), added...), old...)); err != nil {
-		return err
-	}
-	for _, id := range old {
+	return w.saveStrictIDs(ids)
+}
+
+func deleteStrictRules(connection strictConnection, ids []wf.RuleID) error {
+	var failures error
+	for _, id := range ids {
 		if err := connection.DeleteRule(id); err != nil && !errors.Is(err, errFilterNotFound) {
-			return err
+			failures = errors.Join(failures, err)
 		}
 	}
-	return w.saveStrictIDs(added)
+	return failures
+}
+
+// clearStrict includes planned filters left by a crash before AddRule.
+func (w *WFP) clearStrict(connection strictConnection, ids []wf.RuleID) error {
+	if err := deleteStrictRules(connection, ids); err != nil {
+		return err
+	}
+	if err := connection.DeleteSublayer(strictSublayer); err != nil && !errors.Is(err, errSublayerNotFound) {
+		return err
+	}
+	return w.saveStrictIDs(nil)
 }
 
 // errAlreadyExists is FWP_E_ALREADY_EXISTS for a sublayer added twice.
@@ -329,9 +360,6 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 		return err
 	}
 	for index, file := range apps {
-		if w.policy.StrictKillSwitch && index != 0 {
-			continue
-		}
 		id, err := wf.AppID(file)
 		if err != nil {
 			return err
@@ -341,6 +369,27 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 			{Field: wf.FieldALEUserID, Op: wf.MatchTypeEqual, Value: owner},
 		}
 		if w.policy.StrictKillSwitch {
+			if index != 0 {
+				for _, ep := range w.policy.Endpoints {
+					protocol := wf.IPProtoTCP
+					switch ep.Protocol {
+					case "tcp":
+					case "udp":
+						protocol = wf.IPProtoUDP
+					default:
+						continue
+					}
+					endpointConditions := append(append([]*wf.Match(nil), conditions...),
+						&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.PrefixFrom(ep.Address.Addr(), ep.Address.Addr().BitLen())},
+						&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: ep.Address.Port()},
+						&wf.Match{Field: wf.FieldIPProtocol, Op: wf.MatchTypeEqual, Value: protocol},
+					)
+					if err := add("VPN endpoint", wf.ActionPermit, 30, endpointConditions...); err != nil {
+						return err
+					}
+				}
+				continue
+			}
 			conditions = append(conditions, &wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(53)})
 		}
 		if err := add(filepath.Base(file), wf.ActionPermit, 30, conditions...); err != nil {
@@ -376,14 +425,6 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 	if err := add("DNS outside the tunnel", wf.ActionBlock, 20,
 		&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: uint16(53)}); err != nil {
 		return err
-	}
-	for _, ep := range w.policy.Endpoints {
-		if err := add("VPN endpoint", wf.ActionPermit, 30,
-			&wf.Match{Field: wf.FieldIPRemoteAddress, Op: wf.MatchTypeEqual, Value: netip.PrefixFrom(ep.Addr(), ep.Addr().BitLen())},
-			&wf.Match{Field: wf.FieldIPRemotePort, Op: wf.MatchTypeEqual, Value: ep.Port()},
-		); err != nil {
-			return err
-		}
 	}
 	bypass := w.bypass
 	if w.policy.StrictKillSwitch {
