@@ -7,6 +7,7 @@ package control
 
 import (
 	"context"
+	"slices"
 
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
@@ -111,10 +112,12 @@ func profileToWire(p profiles.Profile) *corev1.NetworkProfile {
 		},
 		Apply: &corev1.ProfileApply{
 			Mode:        p.Apply.Mode,
-			Dns:         append([]string(nil), p.Apply.DNS...),
+			Dns:         slices.Clone(p.Apply.DNS),
 			RulesPreset: p.Apply.RulesPreset,
 			ServerId:    p.Apply.ServerID,
 			Engine:      p.Apply.Engine,
+			DnsPreset:   p.Apply.DNSPreset,
+			DnsSet:      p.Apply.DNS != nil,
 		},
 		AutoApply: p.AutoApply,
 	}
@@ -133,11 +136,15 @@ func profileFromWire(in *corev1.NetworkProfile) profiles.Profile {
 	}
 	if a := in.GetApply(); a != nil {
 		p.Apply = profiles.Apply{
-			Mode:        a.GetMode(),
-			DNS:         append([]string(nil), a.GetDns()...),
-			RulesPreset: a.GetRulesPreset(),
-			ServerID:    a.GetServerId(),
-			Engine:      a.GetEngine(),
+			Mode:        a.Mode,
+			DNS:         slices.Clone(a.GetDns()),
+			RulesPreset: a.RulesPreset,
+			ServerID:    a.ServerId,
+			Engine:      a.Engine,
+			DNSPreset:   a.DnsPreset,
+		}
+		if a.GetDnsSet() && p.Apply.DNS == nil {
+			p.Apply.DNS = []string{}
 		}
 	}
 	return p

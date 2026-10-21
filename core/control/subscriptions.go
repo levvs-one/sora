@@ -118,9 +118,6 @@ type subscriptionBook struct {
 	backoff engine.Backoff
 	now     func() time.Time
 
-	// overrides reapplies user edits after every refresh.
-	overrides *subscription.OverrideStore
-
 	mu      sync.Mutex
 	records map[string]*subscriptionRecord
 	lists   map[string][]*corev1.OutboundSpec
@@ -142,7 +139,6 @@ func newSubscriptionBook(srv *Server) *subscriptionBook {
 		srv:          srv,
 		backoff:      engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
 		now:          time.Now,
-		overrides:    subscription.NewOverrideStore(srv.dataDir),
 		records:      map[string]*subscriptionRecord{},
 		lists:        map[string][]*corev1.OutboundSpec{},
 		pendingLists: map[string]bool{},
@@ -349,13 +345,6 @@ func (b *subscriptionBook) delete(id string) error {
 	}
 	if err := b.srv.secrets.Apply(nil, deletes); err != nil {
 		return err
-	}
-	// User overrides die with the subscription.
-	if b.overrides != nil {
-		if err := b.overrides.Delete(id); err != nil && b.srv.logs != nil {
-			b.srv.logs.Write(b.now(), logs.LevelWarning, logs.SourceSubscription,
-				"subscription override cleanup failed id="+id)
-		}
 	}
 	delete(b.records, id)
 	delete(b.lists, id)
@@ -605,24 +594,18 @@ func (b *subscriptionBook) list() []*corev1.SubscriptionState {
 	return out
 }
 
-// withCustomOutbounds appends the user's own servers (SW7) to a
-// subscription's outbound list so the client's combined server list - and
-// therefore the plan builder - sees them without touching the subscription
-// book. Subscription overrides (hide/rename/reorder) apply to the
-// subscription's servers only; custom servers travel as-is. The result is
-// always a fresh slice: the subscription list's backing array is shared
-// with the book and must not be rewritten by append.
-func withCustomOutbounds(b *subscriptionBook, specs []*corev1.OutboundSpec, o *subscription.Override) []*corev1.OutboundSpec {
-	sub := applySubscriptionOverride(specs, o)
+// withCustomOutbounds keeps the provider list unchanged while appending the
+// user's own servers. The fresh slice avoids changing the book's backing array.
+func withCustomOutbounds(b *subscriptionBook, specs []*corev1.OutboundSpec) []*corev1.OutboundSpec {
 	if b.srv == nil {
-		return sub
+		return specs
 	}
 	custom := b.srv.CustomOutbounds()
 	if len(custom) == 0 {
-		return sub
+		return specs
 	}
-	out := make([]*corev1.OutboundSpec, 0, len(sub)+len(custom))
-	out = append(out, sub...)
+	out := make([]*corev1.OutboundSpec, 0, len(specs)+len(custom))
+	out = append(out, specs...)
 	return append(out, custom...)
 }
 
@@ -647,7 +630,7 @@ func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 	state := &corev1.SubscriptionState{
 		Settings:    settings,
 		Info:        subscriptionInfoToWire(rec.Info),
-		Outbounds:   withCustomOutbounds(b, b.listLocked(id), b.loadOverride(id)),
+		Outbounds:   withCustomOutbounds(b, b.listLocked(id)),
 		Updating:    b.updating[id],
 		DisplayName: displayName(rec),
 	}

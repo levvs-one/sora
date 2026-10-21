@@ -2,22 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+import 'generated/sora/core/v1/core_control.pb.dart' as wire;
+
 /// A network profile: triggers identifying a network plus a snapshot of the
 /// connection settings to apply when that network is joined.
 ///
-/// Two stores exist for one concept. The Go core keeps its own profile store
-/// (`core/profiles/`) and matches it on network change
-/// (`session.Session.checkProfile`), emitting `ProfileMatched` events that
-/// the app dispatches (`Sora._watchSession` → `handleProfileMatched`). This
-/// Dart store is the source of truth for the editor UI and the app-side
-/// matcher. The app calls `GetNetworkFingerprint` (`Sora.refreshFingerprint`)
-/// so app-side matching is live — it fires when the profiles screen opens
-/// or refresh is tapped, not continuously in the background. The management
-/// RPCs (`ListProfiles`/`SaveProfile`/`DeleteProfile`) exist on both sides
-/// of the wire but the app still does not call them, so the core store stays
-/// empty and core-side matches never fire. Open owner decision: either wire
-/// the app to the core RPCs (one store of truth) or drop the core-side
-/// store — the dual-store split is tech debt until then.
+/// Settings are the editor's source of truth. Sora mirrors every change and
+/// each core reconnection through the profile RPCs. The core alone matches
+/// network changes and sends ProfileMatched; opening the editor only reads
+/// the fingerprint for display.
 class NetworkProfile {
   NetworkProfile({
     required this.id,
@@ -52,16 +45,39 @@ class NetworkProfile {
   /// True when at least one trigger can identify a network.
   bool get hasTriggers => ssids.isNotEmpty || gateways.isNotEmpty || asns.isNotEmpty;
 
-  /// Matches a fingerprint: every non-empty trigger list must hit. A profile
-  /// naming both an SSID and a gateway applies only when both are seen.
-  bool matches({String? ssid, String? gateway, String? asn}) {
-    if (!hasTriggers) return false;
-    bool hit(List<String> triggers, String? value) => value != null && value.isNotEmpty && triggers.contains(value);
-    if (ssids.isNotEmpty && !hit(ssids, ssid)) return false;
-    if (gateways.isNotEmpty && !hit(gateways, gateway)) return false;
-    if (asns.isNotEmpty && !hit(asns, asn)) return false;
-    return true;
+  factory NetworkProfile.fromWire(wire.NetworkProfile profile) {
+    final apply = profile.apply;
+    return NetworkProfile(
+      id: profile.id,
+      name: profile.name,
+      ssids: List.of(profile.triggers.ssids),
+      gateways: List.of(profile.triggers.gateways),
+      asns: List.of(profile.triggers.asns),
+      autoApply: profile.autoApply,
+      tunnel: apply.hasMode() ? apply.mode : null,
+      preset: apply.hasRulesPreset() ? apply.rulesPreset : null,
+      dns: apply.dnsSet || apply.dns.isNotEmpty ? List.of(apply.dns) : null,
+      dnsPreset: apply.hasDnsPreset() ? apply.dnsPreset : null,
+      serverId: apply.hasServerId() ? apply.serverId : null,
+      engine: apply.hasEngine() ? apply.engine : null,
+    );
   }
+
+  wire.NetworkProfile toWire() => wire.NetworkProfile(
+    id: id,
+    name: name,
+    triggers: wire.ProfileTriggers(ssids: ssids, gateways: gateways, asns: asns),
+    autoApply: autoApply,
+    apply: wire.ProfileApply(
+      mode: tunnel,
+      rulesPreset: preset,
+      dns: dns,
+      dnsSet: dns != null,
+      dnsPreset: dnsPreset,
+      serverId: serverId,
+      engine: engine,
+    ),
+  );
 
   factory NetworkProfile.fromJson(Map<String, dynamic> json) {
     final dnsJson = json['dns'] as List?;
@@ -184,15 +200,6 @@ class ProfilesStore extends ChangeNotifier {
   NetworkProfile? byId(String id) {
     for (final p in _profiles) {
       if (p.id == id) return p;
-    }
-    return null;
-  }
-
-  /// Returns the first profile matching [fingerprint], or null.
-  NetworkProfile? match(NetworkFingerprint fingerprint) {
-    if (!fingerprint.known) return null;
-    for (final p in _profiles) {
-      if (p.matches(ssid: fingerprint.ssid, gateway: fingerprint.gateway, asn: fingerprint.asn)) return p;
     }
     return null;
   }

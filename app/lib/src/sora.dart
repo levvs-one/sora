@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart' hide ConnectionState;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/io_client.dart';
 import 'package:grpc/grpc.dart' show CallOptions, ResponseStream, GrpcError, StatusCode;
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:retry/retry.dart';
 
 import '../l10n/strings.dart';
@@ -102,6 +103,7 @@ class Sora extends ChangeNotifier {
     };
     profiles.addListener(notifyListeners);
     profiles.addListener(_noteSyncChanged);
+    profiles.addListener(_profilesChanged);
     chains.addListener(notifyListeners);
     chains.addListener(_noteSyncChanged);
     this.extensions.addListener(_extensionsChanged);
@@ -618,6 +620,7 @@ class Sora extends ChangeNotifier {
         // the 60-second rollback window never fires on a healthy core.
         coreHandshakeDone = true;
         unawaited(_updates.noteCoreHealthy());
+        await syncProfiles();
         _watchSubscriptions();
         _watchSession();
         unawaited(loadCustomServers());
@@ -1029,6 +1032,60 @@ class Sora extends ChangeNotifier {
   /// in-flight disconnect lands, instead of being swallowed (audit L24).
   bool _connectQueued = false;
 
+  Future<void> _profileWork = Future.value();
+
+  void _profilesChanged() => unawaited(syncProfiles());
+
+  /// Reconciles the runtime mirror after edits, imports and core reconnects.
+  /// Serialized sends prevent an older save from restoring a deleted profile.
+  Future<void> syncProfiles() {
+    final link = _link;
+    return _profileWork = _profileWork.then((_) async {
+      if (_disposed || link == null || link != _link) return;
+      try {
+        if (link.minor < 10) {
+          if (profiles.profiles.isNotEmpty) throw const CoreFailure('core.api.version_mismatch');
+          return;
+        }
+        final desired = [for (final profile in profiles.profiles) profile.toWire()];
+        final listed = await link.stub.listProfiles(
+          ListProfilesRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
+          options: CallOptions(timeout: const Duration(seconds: 10)),
+        );
+        if (listed.hasError()) throw CoreFailure(listed.error.userMessageKey);
+        final ids = desired.map((p) => p.id).toSet();
+        final retained = listed.profiles.where((p) => ids.contains(p.id)).map((p) => p.id).toList();
+        final expected = desired.take(retained.length).map((p) => p.id).toList();
+        // Match priority follows editor order, including imported reorderings.
+        final reorder = !listEquals(retained, expected);
+        for (final old in listed.profiles) {
+          if (_disposed || link != _link) return;
+          if (!ids.contains(old.id) || reorder) {
+            final deleted = await link.stub.deleteProfile(
+              DeleteProfileRequest(apiVersion: apiVersion, controlAuthenticator: link.token, profileId: old.id),
+              options: CallOptions(timeout: const Duration(seconds: 10)),
+            );
+            if (deleted.hasError()) throw CoreFailure(deleted.error.userMessageKey);
+          }
+        }
+        for (final profile in desired) {
+          if (_disposed || link != _link) return;
+          if (!reorder && listed.profiles.any((old) => old == profile)) continue;
+          final saved = await link.stub.saveProfile(
+            SaveProfileRequest(apiVersion: apiVersion, controlAuthenticator: link.token, profile: profile),
+            options: CallOptions(timeout: const Duration(seconds: 10)),
+          );
+          if (saved.hasError()) throw CoreFailure(saved.error.userMessageKey);
+        }
+        recovered('profiles');
+      } catch (error) {
+        if (_disposed || link != _link) return;
+        reportFailure(error, source: 'profiles');
+        if (CoreFailure.from(error).key == CoreFailure.unavailable.key) _drop(error);
+      }
+    });
+  }
+
   /// Applies a network profile's settings snapshot. Only snapshot
   /// fields the profile captured are touched; the rest stays as-is.
   Future<void> applyProfile(NetworkProfile profile) async {
@@ -1038,8 +1095,12 @@ class Sora extends ChangeNotifier {
       if (profile.dns != null) x.dns = profile.dns!;
       if (profile.dnsPreset != null) x.dnsPreset = profile.dnsPreset!;
       if (profile.engine != null) x.engine = profile.engine!;
-      if (profile.serverId != null && profile.serverId!.isNotEmpty) x.server = profile.serverId!;
+      if (profile.serverId != null) x.server = profile.serverId!;
     });
+    if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
+      _pendingSelection = ++_selectionRevision;
+      await _applySelection();
+    }
   }
 
   /// Handles a core ProfileMatched event: marks the profile active and
@@ -1106,25 +1167,19 @@ class Sora extends ChangeNotifier {
         final engine = before['engine'];
         if (engine is String) x.engine = engine;
       });
+      if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
+        _pendingSelection = ++_selectionRevision;
+        await _applySelection();
+      }
     } catch (_) {
       // A corrupt snapshot must not break the UI; there is nothing sane to
       // restore, so the current settings simply stay.
     }
   }
 
-  /// Refreshes the current network fingerprint via the core's
-  /// GetNetworkFingerprint RPC (API 1.10) and runs the app-side profile
-  /// matcher on it: a match applies the profile (auto-apply) or asks the
-  /// user, via [handleProfileMatched]. Without a core link, with an older
-  /// core, or when the call fails, the fingerprint stays unknown and the
-  /// UI says so instead of guessing; matching then does not fire.
-  ///
-  /// The core also keeps its own profile store and matcher (network
-  /// change → session `checkProfile` → `ProfileMatched` event →
-  /// `_watchSession`), but the app does not push profiles via SaveProfile,
-  /// so the core store stays empty and this refresh — on opening the
-  /// profiles screen or tapping refresh — is the live trigger. Open owner
-  /// decision: one store of truth (see profiles.dart).
+  /// Refreshes the fingerprint for the editor display. Runtime matching is
+  /// owned by the core and arrives through ProfileMatched events, independent
+  /// of this screen. A failed lookup leaves the display unknown.
   Future<void> refreshFingerprint() async {
     var fingerprint = const NetworkFingerprint.unknown();
     final link = _link;
@@ -1148,12 +1203,7 @@ class Sora extends ChangeNotifier {
       }
     }
     networkFingerprint = fingerprint;
-    final matched = profiles.match(networkFingerprint);
-    if (matched != null && matched.id != profiles.activeId) {
-      await handleProfileMatched(matched.id);
-    } else {
-      notifyListeners();
-    }
+    notifyListeners();
   }
 
   /// Connects through a proxy chain. The chain backend landed with core
@@ -2107,6 +2157,10 @@ class Sora extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    profiles.removeListener(_profilesChanged);
+    profiles.removeListener(_noteSyncChanged);
+    profiles.removeListener(notifyListeners);
+    profiles.dispose();
     _extensionWorkers?.dispose();
     extensions.removeListener(_extensionsChanged);
     extensions.dispose();

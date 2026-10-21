@@ -2,7 +2,7 @@
 // lib/src/generated/sora/core/v1/core_control.pb.dart.
 //
 // Precedent: BenchmarkServersRequest once carried shifted wire tags and was
-// dead on the wire; the feature-wave messages (F2 history, F6 overrides, F5
+// dead on the wire; the feature-wave messages (F2 history, F5
 // profiles, F8 chains) and CoreEvent.profile_matched were added the same way.
 // This test pins every field number of those messages against the .proto
 // schema by encoding a single set field and asserting the exact tag varint
@@ -103,131 +103,6 @@ void main() {
     });
   });
 
-  group('subscription overrides', () {
-    test('SaveSubscriptionOverrideRequest tags', () {
-      expectFirstTag(
-        () => SaveSubscriptionOverrideRequest(),
-        (m) => (m as SaveSubscriptionOverrideRequest).subscriptionId = 'sub',
-        3,
-        2,
-        'SaveSubscriptionOverrideRequest.subscription_id',
-      );
-      expectFirstTag(
-        () => SaveSubscriptionOverrideRequest(),
-        (m) => (m as SaveSubscriptionOverrideRequest).renames['s1'] = 'Home',
-        4,
-        2,
-        'SaveSubscriptionOverrideRequest.renames',
-      );
-      expectFirstTag(
-        () => SaveSubscriptionOverrideRequest(),
-        (m) => (m as SaveSubscriptionOverrideRequest).hidden.add('s2'),
-        5,
-        2,
-        'SaveSubscriptionOverrideRequest.hidden',
-      );
-      expectFirstTag(
-        () => SaveSubscriptionOverrideRequest(),
-        (m) => (m as SaveSubscriptionOverrideRequest).pinnedOrder.add('s1'),
-        6,
-        2,
-        'SaveSubscriptionOverrideRequest.pinned_order',
-      );
-      expectFirstTag(
-        () => SaveSubscriptionOverrideRequest(),
-        (m) => (m as SaveSubscriptionOverrideRequest).clear_7 = true,
-        7,
-        0,
-        'SaveSubscriptionOverrideRequest.clear',
-      );
-    });
-    test('renames map round-trips', () {
-      final request = SaveSubscriptionOverrideRequest()
-        ..renames['srv-1'] = 'Home'
-        ..renames['srv-2'] = 'Work';
-      final back = SaveSubscriptionOverrideRequest.fromBuffer(request.writeToBuffer());
-      expect(back.renames, {'srv-1': 'Home', 'srv-2': 'Work'});
-    });
-    test('SaveSubscriptionOverrideResponse tags', () {
-      expectFirstTag(
-        () => SaveSubscriptionOverrideResponse(),
-        (m) => (m as SaveSubscriptionOverrideResponse).error = SoraError(),
-        1,
-        2,
-        'SaveSubscriptionOverrideResponse.error',
-      );
-      expectFirstTag(
-        () => SaveSubscriptionOverrideResponse(),
-        (m) => (m as SaveSubscriptionOverrideResponse).state = SubscriptionState(),
-        2,
-        2,
-        'SaveSubscriptionOverrideResponse.state',
-      );
-    });
-    test('GetSubscriptionOverrideRequest tags', () {
-      expectFirstTag(
-        () => GetSubscriptionOverrideRequest(),
-        (m) => (m as GetSubscriptionOverrideRequest).subscriptionId = 'sub',
-        3,
-        2,
-        'GetSubscriptionOverrideRequest.subscription_id',
-      );
-    });
-    test('GetSubscriptionOverrideResponse tags', () {
-      expectFirstTag(
-        () => GetSubscriptionOverrideResponse(),
-        (m) => (m as GetSubscriptionOverrideResponse).renames['s1'] = 'Home',
-        1,
-        2,
-        'GetSubscriptionOverrideResponse.renames',
-      );
-      expectFirstTag(
-        () => GetSubscriptionOverrideResponse(),
-        (m) => (m as GetSubscriptionOverrideResponse).hidden.add('s2'),
-        2,
-        2,
-        'GetSubscriptionOverrideResponse.hidden',
-      );
-      expectFirstTag(
-        () => GetSubscriptionOverrideResponse(),
-        (m) => (m as GetSubscriptionOverrideResponse).pinnedOrder.add('s1'),
-        3,
-        2,
-        'GetSubscriptionOverrideResponse.pinned_order',
-      );
-      expectFirstTag(
-        () => GetSubscriptionOverrideResponse(),
-        (m) => (m as GetSubscriptionOverrideResponse).extraRules.add(OverrideRule()),
-        4,
-        2,
-        'GetSubscriptionOverrideResponse.extra_rules',
-      );
-      expectFirstTag(
-        () => GetSubscriptionOverrideResponse(),
-        (m) => (m as GetSubscriptionOverrideResponse).error = SoraError(),
-        5,
-        2,
-        'GetSubscriptionOverrideResponse.error',
-      );
-    });
-    test('OverrideRule tags', () {
-      expectFirstTag(
-        () => OverrideRule(),
-        (m) => (m as OverrideRule).destination = 'geosite:ads',
-        1,
-        2,
-        'OverrideRule.destination',
-      );
-      expectFirstTag(
-        () => OverrideRule(),
-        (m) => (m as OverrideRule).outboundId = 'direct',
-        2,
-        2,
-        'OverrideRule.outbound_id',
-      );
-    });
-  });
-
   group('network profiles', () {
     test('ProfileMatched tags (incl. CoreEvent oneof)', () {
       expectFirstTag(
@@ -309,6 +184,14 @@ void main() {
       );
     });
     test('ProfileApply tags', () {
+      expectFirstTag(
+        () => ProfileApply(),
+        (m) => (m as ProfileApply).dnsPreset = 'auto',
+        6,
+        2,
+        'ProfileApply.dns_preset',
+      );
+      expectFirstTag(() => ProfileApply(), (m) => (m as ProfileApply).dnsSet = true, 7, 0, 'ProfileApply.dns_set');
       expectFirstTag(() => ProfileApply(), (m) => (m as ProfileApply).mode = 'tun', 1, 2, 'ProfileApply.mode');
       expectFirstTag(() => ProfileApply(), (m) => (m as ProfileApply).dns.add('1.1.1.1'), 2, 2, 'ProfileApply.dns');
       expectFirstTag(

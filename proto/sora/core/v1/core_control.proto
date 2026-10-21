@@ -77,11 +77,6 @@ service CoreControl {
   // compatibility; do not build on this method.
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksResponse);
 
-  // Since 1.9. User overrides on top of a subscription: renames, hidden
-  // servers, extra rules and pinned order survive subscription refreshes.
-  rpc SaveSubscriptionOverride(SaveSubscriptionOverrideRequest) returns (SaveSubscriptionOverrideResponse);
-  rpc GetSubscriptionOverride(GetSubscriptionOverrideRequest) returns (GetSubscriptionOverrideResponse);
-
   // Since 1.10. Network profiles with automatic matching: the core watches
   // the network fingerprint and reports ProfileMatched events when a saved
   // profile matches the current network. Requires the control authenticator:
@@ -739,45 +734,6 @@ message BenchmarkRecord {
   int64 measured_at_unix = 4;
 }
 
-// SaveSubscriptionOverrideRequest stores user edits on top of a subscription.
-// Only the fields present are replaced; omitted fields keep their values.
-message SaveSubscriptionOverrideRequest {
-  ApiVersion api_version = 1;
-  bytes control_authenticator = 2;
-  string subscription_id = 3;
-  // server_id -> display name. Empty value clears the rename.
-  map<string, string> renames = 4;
-  // Complete hidden set; replaces the stored one.
-  repeated string hidden = 5;
-  // Complete pinned order; servers not listed keep their relative order after.
-  repeated string pinned_order = 6;
-  // If true, deletes the whole override file.
-  bool clear = 7;
-}
-message SaveSubscriptionOverrideResponse {
-  SoraError error = 1;
-  // The subscription state with overrides applied.
-  SubscriptionState state = 2;
-}
-message GetSubscriptionOverrideRequest {
-  ApiVersion api_version = 1;
-  bytes control_authenticator = 2;
-  string subscription_id = 3;
-}
-message GetSubscriptionOverrideResponse {
-  map<string, string> renames = 1;
-  repeated string hidden = 2;
-  repeated string pinned_order = 3;
-  repeated OverrideRule extra_rules = 4;
-  SoraError error = 5;
-}
-// OverrideRule is one user routing rule bound to a subscription; the client
-// merges these into the session plan it builds.
-message OverrideRule {
-  string destination = 1;
-  string outbound_id = 2;
-}
-
 // Since 1.10. A network profile matched the current network. The client
 // applies the profile (automatically when auto_apply, otherwise it asks the
 // user) by rebuilding the session plan from the profile's apply settings.
@@ -810,16 +766,15 @@ message ProfileTriggers {
   repeated string asns = 3;
 }
 message ProfileApply {
-  // Tunnel mode: "tun" or "proxy".
-  string mode = 1;
-  // DNS servers to use on this network.
+  // Absent snapshot fields keep the current setting; present empty strings reset it.
+  optional string mode = 1;
   repeated string dns = 2;
-  // Routing preset id to apply.
-  string rules_preset = 3;
-  // Preferred server id for this network.
-  string server_id = 4;
-  // Preferred engine: "sing-box", "xray", "mihomo". Empty keeps the default.
-  string engine = 5;
+  optional string rules_preset = 3;
+  optional string server_id = 4;
+  optional string engine = 5;
+  optional string dns_preset = 6;
+  // Distinguishes a captured empty DNS list (use defaults) from no snapshot.
+  bool dns_set = 7;
 }
 message ListProfilesRequest {
   ApiVersion api_version = 1;

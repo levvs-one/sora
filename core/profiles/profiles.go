@@ -48,17 +48,18 @@ type Triggers struct {
 
 // Apply describes the settings to use on a matched network.
 type Apply struct {
-	// Mode is "tun" or "proxy". Empty keeps the current mode.
-	Mode string `json:"mode,omitempty"`
+	// Mode is "tun" or "proxy". Nil keeps the current mode.
+	Mode *string `json:"mode,omitempty"`
 	// DNS servers to use on this network.
-	DNS []string `json:"dns,omitempty"`
+	DNS []string `json:"dns"`
 	// RulesPreset is the routing preset id to apply.
-	RulesPreset string `json:"rules_preset,omitempty"`
+	RulesPreset *string `json:"rules_preset,omitempty"`
 	// ServerID is the preferred server on this network.
-	ServerID string `json:"server_id,omitempty"`
+	ServerID *string `json:"server_id,omitempty"`
 	// Engine is the preferred engine: "sing-box", "xray" or "mihomo".
-	// Empty keeps the default.
-	Engine string `json:"engine,omitempty"`
+	// Nil keeps the current engine; empty selects the default.
+	Engine    *string `json:"engine,omitempty"`
+	DNSPreset *string `json:"dns_preset,omitempty"`
 }
 
 // Profile is one saved network profile.
@@ -341,24 +342,34 @@ func validate(p Profile) error {
 			return fmt.Errorf("profiles: gateway %q is not an address", g)
 		}
 	}
-	switch p.Apply.Mode {
+	mode := ""
+	if p.Apply.Mode != nil {
+		mode = *p.Apply.Mode
+	}
+	switch mode {
 	case "", "tun", "proxy":
 	default:
-		return fmt.Errorf("profiles: mode %q must be tun or proxy", p.Apply.Mode)
+		return fmt.Errorf("profiles: mode %q must be tun or proxy", mode)
 	}
-	switch p.Apply.Engine {
+	engine := ""
+	if p.Apply.Engine != nil {
+		engine = *p.Apply.Engine
+	}
+	switch engine {
 	case "", "sing-box", "xray", "mihomo":
 	default:
-		return fmt.Errorf("profiles: engine %q is unknown", p.Apply.Engine)
+		return fmt.Errorf("profiles: engine %q is unknown", engine)
 	}
 	if len(p.Apply.DNS) > MaxDNS {
 		return fmt.Errorf("profiles: more than %d DNS servers", MaxDNS)
 	}
 	for _, d := range p.Apply.DNS {
-		if _, err := netip.ParseAddr(d); err != nil {
-			return fmt.Errorf("profiles: DNS server %q is not an address", d)
+		if len(d) > MaxTriggerLen || strings.ContainsAny(d, " \t\r\n") || d == "" {
+			return fmt.Errorf("profiles: DNS server %q is invalid", d)
 		}
 	}
+	// Resolver syntax belongs to plan validation; snapshots must preserve every
+	// supported form, including hostnames, custom ports and encrypted URLs.
 	return nil
 }
 

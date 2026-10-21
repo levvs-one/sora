@@ -9099,434 +9099,6 @@ class BenchmarkRecord extends $pb.GeneratedMessage {
   void clearMeasuredAtUnix() => $_clearField(4);
 }
 
-/// SaveSubscriptionOverrideRequest stores user edits on top of a subscription.
-/// Only the fields present are replaced; omitted fields keep their values.
-class SaveSubscriptionOverrideRequest extends $pb.GeneratedMessage {
-  factory SaveSubscriptionOverrideRequest({
-    ApiVersion? apiVersion,
-    $core.List<$core.int>? controlAuthenticator,
-    $core.String? subscriptionId,
-    $core.Iterable<$core.MapEntry<$core.String, $core.String>>? renames,
-    $core.Iterable<$core.String>? hidden,
-    $core.Iterable<$core.String>? pinnedOrder,
-    $core.bool? clear_7,
-  }) {
-    final result = SaveSubscriptionOverrideRequest._();
-    if (apiVersion != null) result.apiVersion = apiVersion;
-    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
-    if (subscriptionId != null) result.subscriptionId = subscriptionId;
-    if (renames != null) result.renames.addEntries(renames);
-    if (hidden != null) result.hidden.addAll(hidden);
-    if (pinnedOrder != null) result.pinnedOrder.addAll(pinnedOrder);
-    if (clear_7 != null) result.clear_7 = clear_7;
-    return result;
-  }
-
-  SaveSubscriptionOverrideRequest._();
-
-  factory SaveSubscriptionOverrideRequest.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      SaveSubscriptionOverrideRequest()..mergeFromBuffer(data, registry);
-  factory SaveSubscriptionOverrideRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      SaveSubscriptionOverrideRequest()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SaveSubscriptionOverrideRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
-      createEmptyInstance: SaveSubscriptionOverrideRequest.$_createMessage)
-    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
-    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
-    ..aOS(3, _omitFieldNames ? '' : 'subscriptionId')
-    ..m<$core.String, $core.String>(4, _omitFieldNames ? '' : 'renames',
-        entryClassName: 'SaveSubscriptionOverrideRequest.RenamesEntry',
-        keyFieldType: $pb.PbFieldType.OS,
-        valueFieldType: $pb.PbFieldType.OS,
-        packageName: const $pb.PackageName('sora.core.v1'))
-    ..pPS(5, _omitFieldNames ? '' : 'hidden')
-    ..pPS(6, _omitFieldNames ? '' : 'pinnedOrder')
-    ..aOB(7, _omitFieldNames ? '' : 'clear')
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  SaveSubscriptionOverrideRequest clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  SaveSubscriptionOverrideRequest copyWith(void Function(SaveSubscriptionOverrideRequest) updates) =>
-      super.copyWith((message) => updates(message as SaveSubscriptionOverrideRequest))
-          as SaveSubscriptionOverrideRequest;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use SaveSubscriptionOverrideRequest() / SaveSubscriptionOverrideRequest.new instead')
-  static SaveSubscriptionOverrideRequest create() => SaveSubscriptionOverrideRequest._();
-  static $pb.GeneratedMessage $_createMessage() => SaveSubscriptionOverrideRequest._();
-  @$core.override
-  SaveSubscriptionOverrideRequest createEmptyInstance() => SaveSubscriptionOverrideRequest._();
-  @$core.pragma('dart2js:noInline')
-  static SaveSubscriptionOverrideRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SaveSubscriptionOverrideRequest>(
-          SaveSubscriptionOverrideRequest.$_createMessage);
-  static SaveSubscriptionOverrideRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  ApiVersion get apiVersion => $_getN(0);
-  @$pb.TagNumber(1)
-  set apiVersion(ApiVersion value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasApiVersion() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearApiVersion() => $_clearField(1);
-  @$pb.TagNumber(1)
-  ApiVersion ensureApiVersion() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  $core.List<$core.int> get controlAuthenticator => $_getN(1);
-  @$pb.TagNumber(2)
-  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasControlAuthenticator() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearControlAuthenticator() => $_clearField(2);
-
-  @$pb.TagNumber(3)
-  $core.String get subscriptionId => $_getSZ(2);
-  @$pb.TagNumber(3)
-  set subscriptionId($core.String value) => $_setString(2, value);
-  @$pb.TagNumber(3)
-  $core.bool hasSubscriptionId() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearSubscriptionId() => $_clearField(3);
-
-  /// server_id -> display name. Empty value clears the rename.
-  @$pb.TagNumber(4)
-  $pb.PbMap<$core.String, $core.String> get renames => $_getMap(3);
-
-  /// Complete hidden set; replaces the stored one.
-  @$pb.TagNumber(5)
-  $pb.PbList<$core.String> get hidden => $_getList(4);
-
-  /// Complete pinned order; servers not listed keep their relative order after.
-  @$pb.TagNumber(6)
-  $pb.PbList<$core.String> get pinnedOrder => $_getList(5);
-
-  /// If true, deletes the whole override file.
-  @$pb.TagNumber(7)
-  $core.bool get clear_7 => $_getBF(6);
-  @$pb.TagNumber(7)
-  set clear_7($core.bool value) => $_setBool(6, value);
-  @$pb.TagNumber(7)
-  $core.bool hasClear_7() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearClear_7() => $_clearField(7);
-}
-
-class SaveSubscriptionOverrideResponse extends $pb.GeneratedMessage {
-  factory SaveSubscriptionOverrideResponse({
-    SoraError? error,
-    SubscriptionState? state,
-  }) {
-    final result = SaveSubscriptionOverrideResponse._();
-    if (error != null) result.error = error;
-    if (state != null) result.state = state;
-    return result;
-  }
-
-  SaveSubscriptionOverrideResponse._();
-
-  factory SaveSubscriptionOverrideResponse.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      SaveSubscriptionOverrideResponse()..mergeFromBuffer(data, registry);
-  factory SaveSubscriptionOverrideResponse.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      SaveSubscriptionOverrideResponse()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SaveSubscriptionOverrideResponse',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
-      createEmptyInstance: SaveSubscriptionOverrideResponse.$_createMessage)
-    ..aOM<SoraError>(1, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
-    ..aOM<SubscriptionState>(2, _omitFieldNames ? '' : 'state', subBuilder: SubscriptionState.$_createMessage)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  SaveSubscriptionOverrideResponse clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  SaveSubscriptionOverrideResponse copyWith(void Function(SaveSubscriptionOverrideResponse) updates) =>
-      super.copyWith((message) => updates(message as SaveSubscriptionOverrideResponse))
-          as SaveSubscriptionOverrideResponse;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use SaveSubscriptionOverrideResponse() / SaveSubscriptionOverrideResponse.new instead')
-  static SaveSubscriptionOverrideResponse create() => SaveSubscriptionOverrideResponse._();
-  static $pb.GeneratedMessage $_createMessage() => SaveSubscriptionOverrideResponse._();
-  @$core.override
-  SaveSubscriptionOverrideResponse createEmptyInstance() => SaveSubscriptionOverrideResponse._();
-  @$core.pragma('dart2js:noInline')
-  static SaveSubscriptionOverrideResponse getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SaveSubscriptionOverrideResponse>(
-          SaveSubscriptionOverrideResponse.$_createMessage);
-  static SaveSubscriptionOverrideResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  SoraError get error => $_getN(0);
-  @$pb.TagNumber(1)
-  set error(SoraError value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasError() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearError() => $_clearField(1);
-  @$pb.TagNumber(1)
-  SoraError ensureError() => $_ensure(0);
-
-  /// The subscription state with overrides applied.
-  @$pb.TagNumber(2)
-  SubscriptionState get state => $_getN(1);
-  @$pb.TagNumber(2)
-  set state(SubscriptionState value) => $_setField(2, value);
-  @$pb.TagNumber(2)
-  $core.bool hasState() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearState() => $_clearField(2);
-  @$pb.TagNumber(2)
-  SubscriptionState ensureState() => $_ensure(1);
-}
-
-class GetSubscriptionOverrideRequest extends $pb.GeneratedMessage {
-  factory GetSubscriptionOverrideRequest({
-    ApiVersion? apiVersion,
-    $core.List<$core.int>? controlAuthenticator,
-    $core.String? subscriptionId,
-  }) {
-    final result = GetSubscriptionOverrideRequest._();
-    if (apiVersion != null) result.apiVersion = apiVersion;
-    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
-    if (subscriptionId != null) result.subscriptionId = subscriptionId;
-    return result;
-  }
-
-  GetSubscriptionOverrideRequest._();
-
-  factory GetSubscriptionOverrideRequest.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      GetSubscriptionOverrideRequest()..mergeFromBuffer(data, registry);
-  factory GetSubscriptionOverrideRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      GetSubscriptionOverrideRequest()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetSubscriptionOverrideRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
-      createEmptyInstance: GetSubscriptionOverrideRequest.$_createMessage)
-    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
-    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
-    ..aOS(3, _omitFieldNames ? '' : 'subscriptionId')
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  GetSubscriptionOverrideRequest clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  GetSubscriptionOverrideRequest copyWith(void Function(GetSubscriptionOverrideRequest) updates) =>
-      super.copyWith((message) => updates(message as GetSubscriptionOverrideRequest)) as GetSubscriptionOverrideRequest;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use GetSubscriptionOverrideRequest() / GetSubscriptionOverrideRequest.new instead')
-  static GetSubscriptionOverrideRequest create() => GetSubscriptionOverrideRequest._();
-  static $pb.GeneratedMessage $_createMessage() => GetSubscriptionOverrideRequest._();
-  @$core.override
-  GetSubscriptionOverrideRequest createEmptyInstance() => GetSubscriptionOverrideRequest._();
-  @$core.pragma('dart2js:noInline')
-  static GetSubscriptionOverrideRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<GetSubscriptionOverrideRequest>(GetSubscriptionOverrideRequest.$_createMessage);
-  static GetSubscriptionOverrideRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  ApiVersion get apiVersion => $_getN(0);
-  @$pb.TagNumber(1)
-  set apiVersion(ApiVersion value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasApiVersion() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearApiVersion() => $_clearField(1);
-  @$pb.TagNumber(1)
-  ApiVersion ensureApiVersion() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  $core.List<$core.int> get controlAuthenticator => $_getN(1);
-  @$pb.TagNumber(2)
-  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasControlAuthenticator() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearControlAuthenticator() => $_clearField(2);
-
-  @$pb.TagNumber(3)
-  $core.String get subscriptionId => $_getSZ(2);
-  @$pb.TagNumber(3)
-  set subscriptionId($core.String value) => $_setString(2, value);
-  @$pb.TagNumber(3)
-  $core.bool hasSubscriptionId() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearSubscriptionId() => $_clearField(3);
-}
-
-class GetSubscriptionOverrideResponse extends $pb.GeneratedMessage {
-  factory GetSubscriptionOverrideResponse({
-    $core.Iterable<$core.MapEntry<$core.String, $core.String>>? renames,
-    $core.Iterable<$core.String>? hidden,
-    $core.Iterable<$core.String>? pinnedOrder,
-    $core.Iterable<OverrideRule>? extraRules,
-    SoraError? error,
-  }) {
-    final result = GetSubscriptionOverrideResponse._();
-    if (renames != null) result.renames.addEntries(renames);
-    if (hidden != null) result.hidden.addAll(hidden);
-    if (pinnedOrder != null) result.pinnedOrder.addAll(pinnedOrder);
-    if (extraRules != null) result.extraRules.addAll(extraRules);
-    if (error != null) result.error = error;
-    return result;
-  }
-
-  GetSubscriptionOverrideResponse._();
-
-  factory GetSubscriptionOverrideResponse.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      GetSubscriptionOverrideResponse()..mergeFromBuffer(data, registry);
-  factory GetSubscriptionOverrideResponse.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      GetSubscriptionOverrideResponse()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetSubscriptionOverrideResponse',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
-      createEmptyInstance: GetSubscriptionOverrideResponse.$_createMessage)
-    ..m<$core.String, $core.String>(1, _omitFieldNames ? '' : 'renames',
-        entryClassName: 'GetSubscriptionOverrideResponse.RenamesEntry',
-        keyFieldType: $pb.PbFieldType.OS,
-        valueFieldType: $pb.PbFieldType.OS,
-        packageName: const $pb.PackageName('sora.core.v1'))
-    ..pPS(2, _omitFieldNames ? '' : 'hidden')
-    ..pPS(3, _omitFieldNames ? '' : 'pinnedOrder')
-    ..pPM<OverrideRule>(4, _omitFieldNames ? '' : 'extraRules', subBuilder: OverrideRule.$_createMessage)
-    ..aOM<SoraError>(5, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  GetSubscriptionOverrideResponse clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  GetSubscriptionOverrideResponse copyWith(void Function(GetSubscriptionOverrideResponse) updates) =>
-      super.copyWith((message) => updates(message as GetSubscriptionOverrideResponse))
-          as GetSubscriptionOverrideResponse;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use GetSubscriptionOverrideResponse() / GetSubscriptionOverrideResponse.new instead')
-  static GetSubscriptionOverrideResponse create() => GetSubscriptionOverrideResponse._();
-  static $pb.GeneratedMessage $_createMessage() => GetSubscriptionOverrideResponse._();
-  @$core.override
-  GetSubscriptionOverrideResponse createEmptyInstance() => GetSubscriptionOverrideResponse._();
-  @$core.pragma('dart2js:noInline')
-  static GetSubscriptionOverrideResponse getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetSubscriptionOverrideResponse>(
-          GetSubscriptionOverrideResponse.$_createMessage);
-  static GetSubscriptionOverrideResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $pb.PbMap<$core.String, $core.String> get renames => $_getMap(0);
-
-  @$pb.TagNumber(2)
-  $pb.PbList<$core.String> get hidden => $_getList(1);
-
-  @$pb.TagNumber(3)
-  $pb.PbList<$core.String> get pinnedOrder => $_getList(2);
-
-  @$pb.TagNumber(4)
-  $pb.PbList<OverrideRule> get extraRules => $_getList(3);
-
-  @$pb.TagNumber(5)
-  SoraError get error => $_getN(4);
-  @$pb.TagNumber(5)
-  set error(SoraError value) => $_setField(5, value);
-  @$pb.TagNumber(5)
-  $core.bool hasError() => $_has(4);
-  @$pb.TagNumber(5)
-  void clearError() => $_clearField(5);
-  @$pb.TagNumber(5)
-  SoraError ensureError() => $_ensure(4);
-}
-
-/// OverrideRule is one user routing rule bound to a subscription; the client
-/// merges these into the session plan it builds.
-class OverrideRule extends $pb.GeneratedMessage {
-  factory OverrideRule({
-    $core.String? destination,
-    $core.String? outboundId,
-  }) {
-    final result = OverrideRule._();
-    if (destination != null) result.destination = destination;
-    if (outboundId != null) result.outboundId = outboundId;
-    return result;
-  }
-
-  OverrideRule._();
-
-  factory OverrideRule.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      OverrideRule()..mergeFromBuffer(data, registry);
-  factory OverrideRule.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      OverrideRule()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'OverrideRule',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
-      createEmptyInstance: OverrideRule.$_createMessage)
-    ..aOS(1, _omitFieldNames ? '' : 'destination')
-    ..aOS(2, _omitFieldNames ? '' : 'outboundId')
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  OverrideRule clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  OverrideRule copyWith(void Function(OverrideRule) updates) =>
-      super.copyWith((message) => updates(message as OverrideRule)) as OverrideRule;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use OverrideRule() / OverrideRule.new instead')
-  static OverrideRule create() => OverrideRule._();
-  static $pb.GeneratedMessage $_createMessage() => OverrideRule._();
-  @$core.override
-  OverrideRule createEmptyInstance() => OverrideRule._();
-  @$core.pragma('dart2js:noInline')
-  static OverrideRule getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<OverrideRule>(OverrideRule.$_createMessage);
-  static OverrideRule? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get destination => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set destination($core.String value) => $_setString(0, value);
-  @$pb.TagNumber(1)
-  $core.bool hasDestination() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearDestination() => $_clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get outboundId => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set outboundId($core.String value) => $_setString(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasOutboundId() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearOutboundId() => $_clearField(2);
-}
-
 /// Since 1.10. A network profile matched the current network. The client
 /// applies the profile (automatically when auto_apply, otherwise it asks the
 /// user) by rebuilding the session plan from the profile's apply settings.
@@ -9788,6 +9360,8 @@ class ProfileApply extends $pb.GeneratedMessage {
     $core.String? rulesPreset,
     $core.String? serverId,
     $core.String? engine,
+    $core.String? dnsPreset,
+    $core.bool? dnsSet,
   }) {
     final result = ProfileApply._();
     if (mode != null) result.mode = mode;
@@ -9795,6 +9369,8 @@ class ProfileApply extends $pb.GeneratedMessage {
     if (rulesPreset != null) result.rulesPreset = rulesPreset;
     if (serverId != null) result.serverId = serverId;
     if (engine != null) result.engine = engine;
+    if (dnsPreset != null) result.dnsPreset = dnsPreset;
+    if (dnsSet != null) result.dnsSet = dnsSet;
     return result;
   }
 
@@ -9814,6 +9390,8 @@ class ProfileApply extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'rulesPreset')
     ..aOS(4, _omitFieldNames ? '' : 'serverId')
     ..aOS(5, _omitFieldNames ? '' : 'engine')
+    ..aOS(6, _omitFieldNames ? '' : 'dnsPreset')
+    ..aOB(7, _omitFieldNames ? '' : 'dnsSet')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -9836,7 +9414,7 @@ class ProfileApply extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProfileApply>(ProfileApply.$_createMessage);
   static ProfileApply? _defaultInstance;
 
-  /// Tunnel mode: "tun" or "proxy".
+  /// Absent snapshot fields keep the current setting; present empty strings reset it.
   @$pb.TagNumber(1)
   $core.String get mode => $_getSZ(0);
   @$pb.TagNumber(1)
@@ -9846,11 +9424,9 @@ class ProfileApply extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearMode() => $_clearField(1);
 
-  /// DNS servers to use on this network.
   @$pb.TagNumber(2)
   $pb.PbList<$core.String> get dns => $_getList(1);
 
-  /// Routing preset id to apply.
   @$pb.TagNumber(3)
   $core.String get rulesPreset => $_getSZ(2);
   @$pb.TagNumber(3)
@@ -9860,7 +9436,6 @@ class ProfileApply extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   void clearRulesPreset() => $_clearField(3);
 
-  /// Preferred server id for this network.
   @$pb.TagNumber(4)
   $core.String get serverId => $_getSZ(3);
   @$pb.TagNumber(4)
@@ -9870,7 +9445,6 @@ class ProfileApply extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearServerId() => $_clearField(4);
 
-  /// Preferred engine: "sing-box", "xray", "mihomo". Empty keeps the default.
   @$pb.TagNumber(5)
   $core.String get engine => $_getSZ(4);
   @$pb.TagNumber(5)
@@ -9879,6 +9453,25 @@ class ProfileApply extends $pb.GeneratedMessage {
   $core.bool hasEngine() => $_has(4);
   @$pb.TagNumber(5)
   void clearEngine() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get dnsPreset => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set dnsPreset($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasDnsPreset() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearDnsPreset() => $_clearField(6);
+
+  /// Distinguishes a captured empty DNS list (use defaults) from no snapshot.
+  @$pb.TagNumber(7)
+  $core.bool get dnsSet => $_getBF(6);
+  @$pb.TagNumber(7)
+  set dnsSet($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasDnsSet() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearDnsSet() => $_clearField(7);
 }
 
 class ListProfilesRequest extends $pb.GeneratedMessage {

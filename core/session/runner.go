@@ -111,7 +111,8 @@ type Session struct {
 	stopping bool
 	// guardApplied tracks changes owned by this session so cleanup retries
 	// them without removing unrelated rules.
-	guardApplied bool
+	guardApplied       bool
+	lastProfileNetwork [4]string
 	// guardMu serializes kill-switch changes and shutdown restoration.
 	guardMu   sync.Mutex
 	crashes   *crashWatch
@@ -525,6 +526,9 @@ func (s *Session) supervise(events <-chan engine.Event) {
 			if why := watch.changed(); why != "" {
 				s.renewConnections(ctx, why)
 				s.checkProfile()
+			} else if watch.last == "" {
+				// Going offline must allow the same profile on the next join.
+				s.matchProfile(profiles.Fingerprint{})
 			}
 		case ev, ok := <-events:
 			if !ok {
@@ -802,8 +806,21 @@ func (s *Session) matchProfile(fp profiles.Fingerprint) {
 		return
 	}
 	m := s.cfg.Profiles.Match(fp)
-	if m == nil {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.state != StateConnected {
 		return
 	}
+	if m == nil {
+		s.lastProfileNetwork = [4]string{}
+		return
+	}
+	// Resume and address churn on the same network must not reapply a profile
+	// after the user undoes it. Leaving and rejoining still emits a new match.
+	key := [4]string{fp.SSID, fp.Gateway, fp.ASN, m.ProfileID}
+	if key == s.lastProfileNetwork {
+		return
+	}
+	s.lastProfileNetwork = key
 	s.log.Append(Event{Kind: EventProfile, Profile: m})
 }

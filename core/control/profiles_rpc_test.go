@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"google.golang.org/protobuf/proto"
+
 	"github.com/levvs-one/sora-client/core/control"
 	"github.com/levvs-one/sora-client/core/engine"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
@@ -63,7 +65,7 @@ func TestProfileRPCRoundTrip(t *testing.T) {
 		Profile: &corev1.NetworkProfile{
 			Name:     "Home",
 			Triggers: &corev1.ProfileTriggers{Ssids: []string{"Home_Network"}},
-			Apply:    &corev1.ProfileApply{Mode: "tun", Dns: []string{"1.1.1.1"}},
+			Apply:    &corev1.ProfileApply{Mode: new("tun"), Dns: []string{"1.1.1.1"}},
 		},
 	})
 	if err != nil {
@@ -105,7 +107,7 @@ func TestSaveProfileRejectsBadInput(t *testing.T) {
 	for _, p := range []*corev1.NetworkProfile{
 		{Name: ""},
 		{Name: "x", Triggers: &corev1.ProfileTriggers{Gateways: []string{"nope"}}},
-		{Name: "x", Apply: &corev1.ProfileApply{Mode: "turbo"}},
+		{Name: "x", Apply: &corev1.ProfileApply{Mode: new("turbo")}},
 	} {
 		resp, err := s.SaveProfile(ctx, &corev1.SaveProfileRequest{
 			ApiVersion: profileVersion(), ControlAuthenticator: testToken, Profile: p,
@@ -144,5 +146,35 @@ func TestGetNetworkFingerprintShape(t *testing.T) {
 	}
 	if resp.GetFingerprint() == nil {
 		t.Fatal("fingerprint must not be nil")
+	}
+}
+
+func TestProfileRPCPreservesSnapshotPresence(t *testing.T) {
+	s := newProfileServer(t)
+	for _, apply := range []*corev1.ProfileApply{
+		{},
+		{Mode: new("proxy"), RulesPreset: new(""), ServerId: new("auto"), Engine: new(""), DnsPreset: new("auto"), DnsSet: true},
+		{Dns: []string{"https://dns.example.com/dns-query", "tls://1.1.1.1"}, DnsSet: true, DnsPreset: new("custom")},
+		{Dns: []string{"dns.example.com", "1.1.1.1:5353", "[2001:db8::1]:5353"}, DnsSet: true},
+	} {
+		want := &corev1.NetworkProfile{Id: "home", Name: "Home", AutoApply: true,
+			Triggers: &corev1.ProfileTriggers{Ssids: []string{"Home"}, Gateways: []string{"192.168.1.1"}, Asns: []string{"64500"}}, Apply: apply}
+		saved, err := s.SaveProfile(context.Background(), &corev1.SaveProfileRequest{ApiVersion: profileVersion(), ControlAuthenticator: testToken, Profile: want})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if saved.GetError() != nil {
+			t.Fatal(saved.GetError())
+		}
+		if !proto.Equal(saved.GetProfile(), want) {
+			t.Fatalf("snapshot changed: got %v want %v", saved.GetProfile(), want)
+		}
+		listed, err := s.ListProfiles(context.Background(), &corev1.ListProfilesRequest{ApiVersion: profileVersion(), ControlAuthenticator: testToken})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !proto.Equal(listed.GetProfiles()[0], want) {
+			t.Fatalf("listed snapshot changed: %v", listed)
+		}
 	}
 }

@@ -13,7 +13,7 @@ func goodProfile() Profile {
 			SSIDs:    []string{"Home_Network"},
 			Gateways: []string{"192.168.1.1"},
 		},
-		Apply: Apply{Mode: "tun", DNS: []string{"1.1.1.1"}, ServerID: "srv-1", Engine: "sing-box"},
+		Apply: Apply{Mode: new("tun"), DNS: []string{"1.1.1.1"}, ServerID: new("srv-1"), Engine: new("sing-box")},
 	}
 }
 
@@ -31,9 +31,9 @@ func TestValidateRejectsBadProfiles(t *testing.T) {
 		{"empty name", func(p *Profile) { p.Name = "" }},
 		{"name with newline", func(p *Profile) { p.Name = "a\nb" }},
 		{"bad gateway", func(p *Profile) { p.Triggers.Gateways = []string{"not-an-ip"} }},
-		{"bad mode", func(p *Profile) { p.Apply.Mode = "turbo" }},
-		{"bad engine", func(p *Profile) { p.Apply.Engine = "wireguard-app" }},
-		{"bad dns", func(p *Profile) { p.Apply.DNS = []string{"dns.example"} }},
+		{"bad mode", func(p *Profile) { p.Apply.Mode = new("turbo") }},
+		{"bad engine", func(p *Profile) { p.Apply.Engine = new("wireguard-app") }},
+		{"bad dns", func(p *Profile) { p.Apply.DNS = []string{"dns example"} }},
 		{"bad id", func(p *Profile) { p.ID = "../evil" }},
 	}
 	for _, tc := range cases {
