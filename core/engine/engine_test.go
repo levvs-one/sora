@@ -470,13 +470,19 @@ func TestXrayMissesNameserverPolicy(t *testing.T) {
 // xmux-tuned plan must report the feature missing only where the
 // claim is honestly absent: the static (upstream) sing-box entry.
 func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
-	for kind, caps := range Catalog {
-		if caps.Supports(FeatureXHTTPXmux) && kind != KindMihomo {
-			t.Errorf("%s claims FeatureXHTTPXmux but its renderer emits no xmux", kind)
+	for _, kind := range []Kind{KindMihomo, KindXray} {
+		if !Catalog[kind].Supports(FeatureXHTTPXmux) {
+			t.Errorf("%s must claim FeatureXHTTPXmux: its renderer emits the tuning and the pin accepts it", kind)
 		}
 	}
-	if !Catalog[KindMihomo].Supports(FeatureXHTTPXmux) {
-		t.Error("mihomo must claim FeatureXHTTPXmux: render verified with mihomo -t on the pin")
+	if Catalog[KindSingBox].Supports(FeatureXHTTPXmux) {
+		t.Error("the static sing-box entry must not claim FeatureXHTTPXmux: the claim rides the probed lx build (BuildCapabilities)")
+	}
+	lx := BuildCapabilities(KindSingBox,
+		Version{Raw: "1.14.3-lx.22", Major: 1, Minor: 14, Patch: 3, PreRelease: "lx.22"},
+		[]string{"with_xhttp", "with_awg"})
+	if !lx.Supports(FeatureXHTTPXmux) {
+		t.Error("the probed lx+with_xhttp build must claim FeatureXHTTPXmux")
 	}
 	xhttpPlan := func(mutate func(*Transport)) *Plan {
 		p := validPlan()
@@ -486,14 +492,16 @@ func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
 		return p
 	}
 	xmux := xhttpPlan(func(tr *Transport) { tr.XmuxMaxConcurrency = 8 })
-	for _, kind := range []Kind{KindXray, KindSingBox} {
-		missing := strings.Join(Catalog[kind].Missing(xmux), " ")
-		if !strings.Contains(missing, string(FeatureXHTTPXmux)) {
-			t.Errorf("%s: xmux plan must report %s missing, got %q", kind, FeatureXHTTPXmux, missing)
+	for _, kind := range []Kind{KindXray, KindMihomo} {
+		if missing := strings.Join(Catalog[kind].Missing(xmux), " "); strings.Contains(missing, string(FeatureXHTTPXmux)) {
+			t.Errorf("%s carries xmux tuning, it must not report it missing: %q", kind, missing)
 		}
 	}
-	if missing := strings.Join(Catalog[KindMihomo].Missing(xmux), " "); strings.Contains(missing, string(FeatureXHTTPXmux)) {
-		t.Errorf("mihomo carries xmux tuning, it must not report it missing: %q", missing)
+	if missing := strings.Join(lx.Missing(xmux), " "); strings.Contains(missing, string(FeatureXHTTPXmux)) {
+		t.Errorf("the lx build carries xmux tuning, it must not report it missing: %q", missing)
+	}
+	if missing := strings.Join(Catalog[KindSingBox].Missing(xmux), " "); !strings.Contains(missing, string(FeatureXHTTPXmux)) {
+		t.Errorf("upstream sing-box must report %s missing, got %q", FeatureXHTTPXmux, missing)
 	}
 	split := xhttpPlan(func(tr *Transport) {
 		tr.Mode = "stream-up"
