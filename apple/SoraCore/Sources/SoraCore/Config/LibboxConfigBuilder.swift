@@ -13,15 +13,22 @@ import Foundation
 /// every level, so tests and diffs compare stable structures.
 public enum LibboxConfigBuilder {
 
-    public static func build(profile: ServerProfile, settings: AppSettings) throws -> String {
-        try buildChain(profiles: [profile], settings: settings)
+    /// Builds for one engine tier. The tier parameter defaults to
+    /// `.main`, so every pre-tier call site keeps building the main pin's
+    /// config unchanged. All tier differences go through
+    /// `tier.capabilities` (see EngineTier.swift); no helper branches on
+    /// the tier itself beyond reading that table.
+    public static func build(profile: ServerProfile, settings: AppSettings,
+                             tier: EngineTier = .main) throws -> String {
+        try buildChain(profiles: [profile], settings: settings, tier: tier)
     }
 
     /// Profiles are in path order: the first is the entry hop (closest to
     /// the client), the last is the exit. The exit carries tag "proxy"
     /// (the route final); every later hop dials through the previous one
     /// via `detour`, exactly like Go chains dial through `Via`.
-    public static func buildChain(profiles: [ServerProfile], settings: AppSettings) throws -> String {
+    public static func buildChain(profiles: [ServerProfile], settings: AppSettings,
+                                  tier: EngineTier = .main) throws -> String {
         guard !profiles.isEmpty else { throw SoraConfigError.emptyChain }
         var seen = Set<String>()
         for p in profiles {
@@ -29,6 +36,16 @@ public enum LibboxConfigBuilder {
                 throw SoraConfigError.duplicateChainProfile(id: p.id)
             }
             try ConfigValidation.validate(p)
+            // Mandatory tier gate (desktop catalog Missing() semantics):
+            // a feature this tier cannot emit that defines the
+            // connection refuses the build. Degradable features are not
+            // refused here — the section builders omit them via the
+            // capability table, and `tier.unavailableFeatures(for:)`
+            // marks them for the UI.
+            if let missing = tier.mandatoryUnavailableFeatures(for: p).first {
+                throw SoraConfigError.featureUnavailableOnTier(
+                    profileID: p.id, feature: missing.feature, tier: tier)
+            }
         }
 
         var outbounds: [[String: Any]] = []
@@ -41,7 +58,7 @@ public enum LibboxConfigBuilder {
             if p.protocol == .wireguard || p.protocol == .amneziaWG {
                 endpoints.append(wireGuardEndpoint(p, tag: tag, detour: detour))
             } else {
-                outbounds.append(proxyOutbound(p, tag: tag, detour: detour))
+                outbounds.append(proxyOutbound(p, tag: tag, detour: detour, tier: tier))
             }
         }
         outbounds.append(["type": "direct", "tag": "direct"])
@@ -53,10 +70,10 @@ public enum LibboxConfigBuilder {
 
         var config: [String: Any] = [
             "log": logConfig(settings.logLevel),
-            "dns": dnsConfig(settings),
+            "dns": try dnsConfig(settings, tier: tier),
             "inbounds": inbounds(settings),
             "outbounds": outbounds,
-            "route": routeConfig(settings),
+            "route": routeConfig(settings, tier: tier),
             "experimental": ["cache_file": ["enabled": true, "path": "cache.db",
                                             "store_fakeip": true]],
         ]
@@ -100,7 +117,20 @@ public enum LibboxConfigBuilder {
         }
     }
 
-    static func dnsConfig(_ s: AppSettings) -> [String: Any] {
+    /// DNS section for the tier: the new-format section, translated to
+    /// the pre-1.12 spelling when the tier's table says `dnsFormat` is
+    /// `.legacy` (ENGINES §4 row 1, §5.3).
+    static func dnsConfig(_ s: AppSettings, tier: EngineTier) throws -> [String: Any] {
+        let newFormat = dnsConfigNewFormat(s)
+        switch tier.capabilities.dnsFormat {
+        case .new:
+            return newFormat
+        case .legacy:
+            return try legacyDNSConfig(newFormat, tier: tier)
+        }
+    }
+
+    static func dnsConfigNewFormat(_ s: AppSettings) -> [String: Any] {
         let bootstrap = bootstrapDNSTag(s)
         var servers: [[String: Any]] = []
         for (i, raw) in s.dnsServers.enumerated() {
@@ -136,6 +166,91 @@ public enum LibboxConfigBuilder {
         rules.append(["query_type": ipv6 ? ["A", "AAAA"] : ["A"], "server": "fakeip"])
         return ["servers": servers, "rules": rules, "final": realTag,
                 "strategy": s.dnsStrategy ?? (ipv6 ? "prefer_ipv6" : "ipv4_only")]
+    }
+
+    /// Address-scheme spellings of the legacy DNS format, by new-format
+    /// server type (sing-box 1.11 `option/dns.go`: the address string's
+    /// scheme selects the transport; no scheme means UDP, and `h3://`
+    /// was the legacy H3 spelling the 1.14 format replaced with a typed
+    /// server — Go render.go says the same).
+    private static let legacyDNSAddressSchemes: [String: String] = [
+        "https": "https://", "tls": "tls://", "quic": "quic://",
+        "h3": "h3://", "tcp": "tcp://", "udp": "",
+    ]
+
+    /// Translates a new-format DNS section into the pre-1.12 format of
+    /// ENGINES §5.3, honestly: every new-format key must have an
+    /// old-format counterpart or the translation throws
+    /// `dnsUntranslatableForTier` — nothing is silently dropped.
+    ///
+    /// - typed servers become `address` strings (scheme + host + port +
+    ///   path); the per-server `domain_resolver` becomes the old
+    ///   `address_resolver` field of 1.11 (same semantics: the resolver
+    ///   that resolves this server's own name);
+    /// - the fakeip server leaves the server list's typed form and
+    ///   becomes the `dns.fakeip` block (ranges carried over), and —
+    ///   the spelling 1.11 routes the query_type rule through — a
+    ///   server entry `{"address": "fakeip"}` (1.11 registers the
+    ///   `fakeip` transport by that address; the translated corpus of
+    ///   ENGINES §5.3 keeps only the block, which passes `check` but
+    ///   leaves the fakeip rule without a transport at runtime);
+    /// - rules, `final` and `strategy` keep their spellings (1.11
+    ///   accepts them unchanged, corpus-verified).
+    static func legacyDNSConfig(_ new: [String: Any], tier: EngineTier) throws -> [String: Any] {
+        guard let servers = new["servers"] as? [[String: Any]] else {
+            throw SoraConfigError.dnsUntranslatableForTier(
+                tier: tier, detail: "dns.servers is not a server list")
+        }
+        // The complete key set a new-format server may carry here; any
+        // other key (a future `tls` skip-verify block, a `detour`, …)
+        // has no honest old spelling in this translation and gates.
+        let serverKeys: Set<String> = ["type", "tag", "server", "server_port",
+                                       "path", "domain_resolver",
+                                       "inet4_range", "inet6_range"]
+        var translated: [[String: Any]] = []
+        var fakeipBlock: [String: Any]?
+        for srv in servers {
+            for key in srv.keys where !serverKeys.contains(key) {
+                throw SoraConfigError.dnsUntranslatableForTier(
+                    tier: tier, detail: "dns server key \"\(key)\" has no legacy spelling")
+            }
+            guard let type = srv["type"] as? String, let tag = srv["tag"] as? String else {
+                throw SoraConfigError.dnsUntranslatableForTier(
+                    tier: tier, detail: "dns server without type/tag")
+            }
+            if type == "fakeip" {
+                var block: [String: Any] = ["enabled": true]
+                if let v4 = srv["inet4_range"] { block["inet4_range"] = v4 }
+                if let v6 = srv["inet6_range"] { block["inet6_range"] = v6 }
+                fakeipBlock = block
+                translated.append(["tag": tag, "address": "fakeip"])
+                continue
+            }
+            var out: [String: Any] = ["tag": tag]
+            if type == "local" {
+                out["address"] = "local"
+            } else {
+                guard let scheme = legacyDNSAddressSchemes[type],
+                      let host = srv["server"] as? String else {
+                    throw SoraConfigError.dnsUntranslatableForTier(
+                        tier: tier, detail: "dns server type \"\(type)\" has no legacy spelling")
+                }
+                var address = scheme + host
+                if let port = srv["server_port"] as? Int { address += ":\(port)" }
+                if let path = srv["path"] as? String { address += path }
+                out["address"] = address
+            }
+            if let resolver = srv["domain_resolver"] {
+                out["address_resolver"] = resolver
+            }
+            translated.append(out)
+        }
+        var out: [String: Any] = ["servers": translated]
+        if let rules = new["rules"] { out["rules"] = rules }
+        if let final = new["final"] { out["final"] = final }
+        if let strategy = new["strategy"] { out["strategy"] = strategy }
+        if let fakeipBlock { out["fakeip"] = fakeipBlock }
+        return out
     }
 
     static func dnsServer(_ raw: String, tag: String) -> [String: Any] {
@@ -189,7 +304,7 @@ public enum LibboxConfigBuilder {
         return [tun, mixed]
     }
 
-    static func routeConfig(_ s: AppSettings) -> [String: Any] {
+    static func routeConfig(_ s: AppSettings, tier: EngineTier) -> [String: Any] {
         // Sniff + DNS hijack first, like the Go route(): nothing may
         // resolve or route before those two actions see it. The Go
         // renderer spells the DNS rule {"protocol": "dns", …} — a plain
@@ -209,13 +324,22 @@ public enum LibboxConfigBuilder {
             rules.append(["ip_cidr": ["0.0.0.0/0", "::/0"], "inbound": ["mixed-in"],
                           "action": "route", "outbound": "proxy"])
         }
-        return ["rules": rules, "final": "proxy", "auto_detect_interface": true,
-                "default_domain_resolver": ["server": bootstrapDNSTag(s)]]
+        var out: [String: Any] = ["rules": rules, "final": "proxy",
+                                  "auto_detect_interface": true]
+        // ENGINES §4 row 2: pins without the field (1.11) reject the
+        // whole config on it, so it is emitted only where the table
+        // says it exists; bootstrap resolution there is the engine's
+        // own legacy behaviour (address_resolver per server).
+        if tier.capabilities.defaultDomainResolver {
+            out["default_domain_resolver"] = ["server": bootstrapDNSTag(s)]
+        }
+        return out
     }
 
     // MARK: - Outbounds
 
-    static func proxyOutbound(_ p: ServerProfile, tag: String, detour: String?) -> [String: Any] {
+    static func proxyOutbound(_ p: ServerProfile, tag: String, detour: String?,
+                              tier: EngineTier) -> [String: Any] {
         var out: [String: Any] = ["tag": tag, "server": p.address, "server_port": p.port]
         if let detour { out["detour"] = detour }
         var needsTLS = false
@@ -254,9 +378,45 @@ public enum LibboxConfigBuilder {
             if !p.hy2HopPorts.isEmpty {
                 out["server_ports"] = singBoxHopPorts(p.hy2HopPorts)
             }
-            if !p.hy2Obfs.isEmpty {
-                out["obfs"] = ["type": p.hy2Obfs, "password": p.hy2ObfsPassword]
+            // Hop interval exists on every tier (ENGINES §4 row 7) and
+            // renders as a duration, like the Go renderer.
+            if p.hy2HopInterval > 0 {
+                out["hop_interval"] = "\(p.hy2HopInterval)s"
             }
+            // 1.14-only tuning (rows 8–9): emitted only where the
+            // tier's table carries it; elsewhere the profile keeps the
+            // values and the assessment marks them unavailable.
+            if p.hy2HopIntervalMax > 0, tier.capabilities.hy2HopIntervalMax {
+                out["hop_interval_max"] = "\(p.hy2HopIntervalMax)s"
+            }
+            // Go: bbr_profile renders only while BBR is in charge —
+            // with bandwidth caps the client runs Brutal instead and
+            // the profile would be dead text.
+            if !p.hy2BBRProfile.isEmpty, tier.capabilities.hy2BBRProfile,
+               p.hy2UpMbps == 0, p.hy2DownMbps == 0 {
+                out["bbr_profile"] = p.hy2BBRProfile
+            }
+            if !p.hy2Obfs.isEmpty {
+                var obfs: [String: Any] = ["type": p.hy2Obfs,
+                                           "password": p.hy2ObfsPassword]
+                // Gecko packet sizes ride flattened in the obfs block
+                // (1.14 option.Hysteria2Obfs). A gecko profile reaches
+                // this line only on a gecko tier: the mandatory gate in
+                // buildChain refused it elsewhere.
+                if p.hy2Obfs == "gecko" {
+                    if p.hy2ObfsMinPacketSize > 0 {
+                        obfs["min_packet_size"] = p.hy2ObfsMinPacketSize
+                    }
+                    if p.hy2ObfsMaxPacketSize > 0 {
+                        obfs["max_packet_size"] = p.hy2ObfsMaxPacketSize
+                    }
+                }
+                out["obfs"] = obfs
+            }
+            needsTLS = true
+        case .anytls:
+            out["type"] = "anytls"
+            out["password"] = p.password
             needsTLS = true
         case .tuic:
             out["type"] = "tuic"
@@ -272,7 +432,7 @@ public enum LibboxConfigBuilder {
             preconditionFailure("wireguard renders as an endpoint")
         }
         if p.tls.enabled || p.tls.reality != nil || needsTLS {
-            out["tls"] = tlsConfig(p)
+            out["tls"] = tlsConfig(p, tier: tier)
         }
         if let transport = transportConfig(p) { out["transport"] = transport }
         // Multiplex: validation already refused mux+vision. Go emits it
@@ -288,8 +448,9 @@ public enum LibboxConfigBuilder {
     /// ECH carries its pinned config, spiderX is Xray-only and
     /// deliberately not emitted (the Go sing-box renderer has no field
     /// for it either).
-    static func tlsConfig(_ p: ServerProfile) -> [String: Any] {
+    static func tlsConfig(_ p: ServerProfile, tier: EngineTier) -> [String: Any] {
         let tls = p.tls
+        let caps = tier.capabilities
         var t: [String: Any] = ["enabled": true]
         t["server_name"] = tls.serverName.isEmpty ? p.address : tls.serverName
         if tls.allowInsecure { t["insecure"] = true }
@@ -301,13 +462,33 @@ public enum LibboxConfigBuilder {
             if !reality.shortId.isEmpty { r["short_id"] = reality.shortId }
             t["reality"] = r
         }
-        if !fingerprint.isEmpty {
+        // A fingerprint name outside the tier's uTLS set is refused by
+        // the engine at load (ENGINES §4 row 23), so it is never
+        // emitted: the profile keeps the name, the assessment marks it
+        // unavailable, and the handshake falls back to the engine's
+        // plain TLS — the degradable pattern, not a silent substitution
+        // with a different fingerprint.
+        if !fingerprint.isEmpty, caps.utlsFingerprints.contains(fingerprint) {
             t["utls"] = ["enabled": true, "fingerprint": fingerprint]
         }
         if let ech = tls.ech, !ech.isEmpty {
             // The profile keeps the link's ECH value verbatim; it is a
             // pinned ECHConfigList, rendered as the sing-box `config`.
-            t["ech"] = ["enabled": true, "config": [ech]] as [String: Any]
+            var echBlock: [String: Any] = ["enabled": true, "config": [ech]]
+            // ECH exists on every tier; only query_server_name is
+            // gated (ENGINES §4 rows 20–21): ECH without it is emitted
+            // where the field does not exist.
+            if !tls.echQueryServerName.isEmpty, caps.echQueryServerName {
+                echBlock["query_server_name"] = tls.echQueryServerName
+            }
+            t["ech"] = echBlock
+        }
+        // TLS fragment (row 22): emitted only where the tier carries
+        // it; the Go renderer likewise never fragments QUIC outbounds,
+        // whose ClientHello is not a TCP one to split.
+        if tls.fragment, caps.tlsFragment,
+           p.protocol != .hysteria2, p.protocol != .tuic {
+            t["fragment"] = true
         }
         return t
     }

@@ -10,6 +10,7 @@ public enum ProxyProtocol: String, Codable, CaseIterable {
     case vmess
     case hysteria2
     case tuic
+    case anytls
     case wireguard
     case amneziaWG
 }
@@ -91,20 +92,32 @@ public struct TLSSpec: Codable, Equatable {
     public var fingerprint: String
     public var reality: RealitySpec?
     public var ech: String?
+    /// ECH `query_server_name`: the domain used for the ECH DNS query
+    /// when it differs from the server name (Go TLS.ECH.QueryServerName).
+    /// Additive per tier: engines without it (ENGINES §4 row 21) keep the
+    /// field stored and receive ECH without it.
+    public var echQueryServerName: String
+    /// TLS ClientHello fragmentation (Go plan Fragment, rendered by
+    /// sing-box as `tls.fragment`). Additive per tier: engines without
+    /// it (ENGINES §4 row 22) keep the field stored, not emitted.
+    public var fragment: Bool
     /// REALITY ML-DSA-65 verify key (the link's `pqv` parameter).
     public var mldsa65Verify: String
 
     public init(enabled: Bool = false, serverName: String = "", allowInsecure: Bool = false,
                 alpn: [String] = [], fingerprint: String = "", reality: RealitySpec? = nil,
-                ech: String? = nil, mldsa65Verify: String = "") {
+                ech: String? = nil, echQueryServerName: String = "", fragment: Bool = false,
+                mldsa65Verify: String = "") {
         self.enabled = enabled; self.serverName = serverName
         self.allowInsecure = allowInsecure; self.alpn = alpn
         self.fingerprint = fingerprint; self.reality = reality; self.ech = ech
+        self.echQueryServerName = echQueryServerName; self.fragment = fragment
         self.mldsa65Verify = mldsa65Verify
     }
 
     private enum CodingKeys: String, CodingKey {
         case enabled, serverName, allowInsecure, alpn, fingerprint, reality, ech, mldsa65Verify
+        case echQueryServerName, fragment
     }
 
     public init(from decoder: Decoder) throws {
@@ -116,6 +129,8 @@ public struct TLSSpec: Codable, Equatable {
         fingerprint = try c.decodeIfPresent(String.self, forKey: .fingerprint) ?? ""
         reality = try c.decodeIfPresent(RealitySpec.self, forKey: .reality)
         ech = try c.decodeIfPresent(String.self, forKey: .ech)
+        echQueryServerName = try c.decodeIfPresent(String.self, forKey: .echQueryServerName) ?? ""
+        fragment = try c.decodeIfPresent(Bool.self, forKey: .fragment) ?? false
         mldsa65Verify = try c.decodeIfPresent(String.self, forKey: .mldsa65Verify) ?? ""
     }
 }
@@ -279,6 +294,21 @@ public struct ServerProfile: Codable, Equatable, Identifiable {
     public var hy2DownMbps: Int
     /// Hysteria2 hop ports verbatim ("20000-30000,40000"): mport/ports.
     public var hy2HopPorts: String
+    /// Hysteria2 port-hop interval, seconds (the link's `hop-interval`);
+    /// 0 = unset. Exists on every tier (ENGINES §4 row 7).
+    public var hy2HopInterval: Int
+    /// Hysteria2 randomized hop interval upper bound, seconds; 0 = unset.
+    /// A sing-box 1.14 field (ENGINES §4 row 8): tiers without it keep
+    /// the value stored and do not emit it.
+    public var hy2HopIntervalMax: Int
+    /// Hysteria2 BBR congestion profile ("standard"/"conservative"/
+    /// "aggressive"); "" = unset. A sing-box 1.14 field (ENGINES §4
+    /// row 9): tiers without it keep the value stored, not emitted.
+    public var hy2BBRProfile: String
+    /// Gecko obfs packet-size bounds; 0 = unset. Emitted only inside a
+    /// `gecko` obfs block on tiers that carry gecko (ENGINES §4 row 11).
+    public var hy2ObfsMinPacketSize: Int
+    public var hy2ObfsMaxPacketSize: Int
 
     public var tuicCongestionControl: String
     public var tuicUDPRelayMode: String
@@ -321,6 +351,8 @@ public struct ServerProfile: Codable, Equatable, Identifiable {
                 flow: String = "", ss2022Key: String = "",
                 hy2Obfs: String = "", hy2ObfsPassword: String = "",
                 hy2UpMbps: Int = 0, hy2DownMbps: Int = 0, hy2HopPorts: String = "",
+                hy2HopInterval: Int = 0, hy2HopIntervalMax: Int = 0, hy2BBRProfile: String = "",
+                hy2ObfsMinPacketSize: Int = 0, hy2ObfsMaxPacketSize: Int = 0,
                 tuicCongestionControl: String = "", tuicUDPRelayMode: String = "",
                 tuicToken: String = "", tuicHeartbeat: Int = 0, encryption: String = "",
                 wgPrivateKey: String = "", wgPeerPublicKey: String = "",
@@ -335,6 +367,10 @@ public struct ServerProfile: Codable, Equatable, Identifiable {
         self.vmessSecurity = vmessSecurity; self.flow = flow; self.ss2022Key = ss2022Key
         self.hy2Obfs = hy2Obfs; self.hy2ObfsPassword = hy2ObfsPassword
         self.hy2UpMbps = hy2UpMbps; self.hy2DownMbps = hy2DownMbps; self.hy2HopPorts = hy2HopPorts
+        self.hy2HopInterval = hy2HopInterval; self.hy2HopIntervalMax = hy2HopIntervalMax
+        self.hy2BBRProfile = hy2BBRProfile
+        self.hy2ObfsMinPacketSize = hy2ObfsMinPacketSize
+        self.hy2ObfsMaxPacketSize = hy2ObfsMaxPacketSize
         self.tuicCongestionControl = tuicCongestionControl
         self.tuicUDPRelayMode = tuicUDPRelayMode; self.tuicToken = tuicToken
         self.tuicHeartbeat = tuicHeartbeat; self.encryption = encryption
@@ -366,7 +402,7 @@ public struct ServerProfile: Codable, Equatable, Identifiable {
         let user: String
         switch proto {
         case .shadowsocks: user = method
-        case .trojan, .hysteria2: user = password
+        case .trojan, .hysteria2, .anytls: user = password
         default: user = ""
         }
         let material = protoName + "\u{0}" + address + "\u{0}" + String(port) + "\u{0}" + uuid + "\u{0}" + user
@@ -383,7 +419,9 @@ public struct ServerProfile: Codable, Equatable, Identifiable {
     private enum CodingKeys: String, CodingKey {
         case id, name, `protocol`, address, port, uuid, password, method, plugin, pluginOptions
         case vmessSecurity, flow, ss2022Key, hy2Obfs, hy2ObfsPassword, hy2UpMbps, hy2DownMbps
-        case hy2HopPorts, tuicCongestionControl, tuicUDPRelayMode, tuicToken, tuicHeartbeat, encryption
+        case hy2HopPorts, hy2HopInterval, hy2HopIntervalMax, hy2BBRProfile
+        case hy2ObfsMinPacketSize, hy2ObfsMaxPacketSize
+        case tuicCongestionControl, tuicUDPRelayMode, tuicToken, tuicHeartbeat, encryption
         case wgPrivateKey, wgPeerPublicKey, wgPreSharedKey, wgReserved, wgLocalAddresses
         case wgAllowedIPs, wgPersistentKeepalive, wgPeerEndpoint, awg, transport, tls, muxEnabled, subscriptionID
     }
@@ -411,6 +449,11 @@ public struct ServerProfile: Codable, Equatable, Identifiable {
         hy2UpMbps = try c.decodeIfPresent(Int.self, forKey: .hy2UpMbps) ?? 0
         hy2DownMbps = try c.decodeIfPresent(Int.self, forKey: .hy2DownMbps) ?? 0
         hy2HopPorts = try c.decodeIfPresent(String.self, forKey: .hy2HopPorts) ?? ""
+        hy2HopInterval = try c.decodeIfPresent(Int.self, forKey: .hy2HopInterval) ?? 0
+        hy2HopIntervalMax = try c.decodeIfPresent(Int.self, forKey: .hy2HopIntervalMax) ?? 0
+        hy2BBRProfile = try c.decodeIfPresent(String.self, forKey: .hy2BBRProfile) ?? ""
+        hy2ObfsMinPacketSize = try c.decodeIfPresent(Int.self, forKey: .hy2ObfsMinPacketSize) ?? 0
+        hy2ObfsMaxPacketSize = try c.decodeIfPresent(Int.self, forKey: .hy2ObfsMaxPacketSize) ?? 0
         tuicCongestionControl = try c.decodeIfPresent(String.self, forKey: .tuicCongestionControl) ?? ""
         tuicUDPRelayMode = try c.decodeIfPresent(String.self, forKey: .tuicUDPRelayMode) ?? ""
         tuicToken = try c.decodeIfPresent(String.self, forKey: .tuicToken) ?? ""

@@ -4,6 +4,11 @@ import Foundation
 /// core (`Outbound.Validate`, `ValidateReality`, `validateXHTTP`,
 /// `validateAmneziaWG`, `validateHysteria2Tuning`). The builder runs this
 /// first and never emits a config the Go core would have refused.
+///
+/// This validation is deliberately tier-agnostic: a feature the target
+/// tier lacks is not an import/validation error (the profile keeps the
+/// field; `EngineTier.unavailableFeatures(for:)` marks it). Tier gating
+/// lives in the builder, through `EngineTier.capabilities`.
 public enum ConfigValidation {
 
     public static func isVisionFlow(_ flow: String) -> Bool {
@@ -56,7 +61,7 @@ public enum ConfigValidation {
         switch p.protocol {
         case .vless, .vmess:
             if p.uuid.isEmpty { throw SoraConfigError.missingUUID(profileID: id) }
-        case .trojan, .hysteria2:
+        case .trojan, .hysteria2, .anytls:
             if p.password.isEmpty { throw SoraConfigError.missingPassword(profileID: id) }
         case .shadowsocks:
             if p.method.isEmpty { throw SoraConfigError.missingMethod(profileID: id) }

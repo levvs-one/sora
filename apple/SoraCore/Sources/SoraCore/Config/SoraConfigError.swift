@@ -50,6 +50,17 @@ public enum SoraConfigError: Error, Equatable {
     case unsupportedTransport(profileID: String, transport: String)
     case emptyChain
     case duplicateChainProfile(id: String)
+    /// A mandatory feature of the profile (protocol, transport or obfs
+    /// framing) that the target engine tier cannot emit — the mirror of
+    /// the desktop catalog's `Missing()` refusal: the build refuses
+    /// instead of emitting a different connection than the server
+    /// speaks. Degradable missing features never throw; they are marked
+    /// by `EngineTier.unavailableFeatures(for:)` and omitted.
+    case featureUnavailableOnTier(profileID: String, feature: EngineFeature, tier: EngineTier)
+    /// A generated DNS section the tier's legacy DNS format cannot spell
+    /// (a new-format key with no old-format counterpart). Refused
+    /// instead of silently dropped (ENGINES §5.3 translation contract).
+    case dnsUntranslatableForTier(tier: EngineTier, detail: String)
 
     /// Short problem name + what to do, in the UI glossary. The UI shows
     /// this verbatim next to the server; it never shows case names or
@@ -104,6 +115,24 @@ public enum SoraConfigError: Error, Equatable {
             return "Цепочка серверов пуста: добавьте хотя бы один сервер."
         case .duplicateChainProfile:
             return "Сервер встречается в цепочке дважды: уберите повтор."
+        case .featureUnavailableOnTier(_, let feature, _):
+            switch feature {
+            case .xhttpTransport:
+                return "Транспорт XHTTP недоступен на этой версии системы: выберите другой сервер."
+            case .anytls:
+                return "Протокол AnyTLS недоступен на этой версии системы: выберите другой сервер."
+            case .amneziaWG:
+                return "AmneziaWG недоступен на этой версии системы: выберите другой сервер."
+            case .hy2GeckoObfs:
+                return "Обфускация Hysteria2 недоступна на этой версии системы: выберите другой сервер."
+            case .tlsFragment, .echQueryServerName, .hy2HopIntervalMax,
+                 .hy2BBRProfile, .utlsFingerprint:
+                // Unreachable by construction (degradable features are
+                // omitted, never thrown); kept total over the enum.
+                return "Функция сервера недоступна на этой версии системы: выберите другой сервер."
+            }
+        case .dnsUntranslatableForTier:
+            return "Настройки DNS нельзя перенести на эту версию системы: выберите другой сервер DNS в настройках."
         }
     }
 }

@@ -514,6 +514,7 @@ public enum LinkParser {
         case "vmess": return .vmess
         case "hysteria2", "hysteria", "hy2": return .hysteria2
         case "tuic": return .tuic
+        case "anytls": return .anytls
         case "wireguard", "wg": return .wireguard
         case "amneziawg", "amnezia-wg": return .amneziaWG
         default: return nil
