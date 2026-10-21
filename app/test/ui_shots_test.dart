@@ -83,7 +83,7 @@ void main() {
           final settings = await Settings.load();
           await settings.completeTour();
           settings
-            ..language = 'ru'
+            ..language = Platform.environment['SORA_SHOTS_LANG'] ?? 'ru'
             ..theme = theme
             ..animations = false;
           // The published team catalog, served from the offline cache: the

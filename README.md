@@ -1,75 +1,126 @@
+<div align="center">
+
+<img src="docs/images/logo-512.png" width="88" alt="Логотип Sora">
+
+# Sora
+
+Открытый VPN-клиент для Windows и Linux. Вставьте ссылку подписки, выберите сервер, подключитесь.
+
+**Русский** | [English](README.en.md)
+
+[![Release](https://img.shields.io/github/v/release/levvs-one/sora?style=flat-square&label=release)](https://github.com/levvs-one/sora/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/levvs-one/sora/total?style=flat-square&logo=github)](https://github.com/levvs-one/sora/releases)
+[![Checks](https://img.shields.io/github/actions/workflow/status/levvs-one/sora/repository.yml?branch=main&style=flat-square&label=checks)](https://github.com/levvs-one/sora/actions/workflows/repository.yml)
+[![License](https://img.shields.io/github/license/levvs-one/sora?style=flat-square)](LICENSE)
+
+[Установка](#установка) | [Возможности](#возможности) | [Как это устроено](#как-это-устроено) | [Документация](docs/) | [Изменения](CHANGELOG.md)
+
+</div>
+
 <p align="center">
-  <img src="docs/images/logo-512.png" width="96" alt="Логотип Sora">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/home-1440x900-dark.png">
+    <img src="docs/images/home-1440x900-light.png" alt="Главное окно Sora: список серверов подписки и кнопка подключения" width="92%">
+  </picture>
 </p>
-<h1 align="center">Sora</h1>
-
-[English](README.en.md)
-
-[![Release](https://img.shields.io/github/v/release/levvs-one/sora)](https://github.com/levvs-one/sora/releases)
-[![Downloads](https://img.shields.io/github/downloads/levvs-one/sora/total)](https://github.com/levvs-one/sora/releases)
-[![License](https://img.shields.io/github/license/levvs-one/sora)](LICENSE)
-
-Открытый VPN-клиент для Windows и Linux. Работает с подпиской вашего VPN-провайдера: вставьте ссылку, выберите сервер, подключитесь.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/home-1440x900-dark.png">
-  <img src="docs/images/home-1440x900-light.png" alt="Главное окно Sora" width="1440">
-</picture>
 
 ## Установка
 
-Windows 10 1809+ или Windows 11, x64. В PowerShell:
+| Система | Файлы | Как поставить |
+| --- | --- | --- |
+| Windows 10 1809+ и Windows 11, x64 | `Sora-Setup-<версия>-x64.exe` | Скрипт ниже или установщик со страницы релизов |
+| Debian, Ubuntu | `sora_<версия>_amd64.deb` и `sora-core_<версия>_amd64.deb` | Скрипт ниже или `apt install ./sora*.deb` |
+| Fedora, openSUSE | `sora-<версия>-1.x86_64.rpm` и `sora-core-<версия>-1.x86_64.rpm` | Скрипт ниже или `dnf install ./sora*.rpm` |
+| Arch | `sora-<версия>-1-x86_64.pkg.tar.zst` и `sora-core-…` | Скрипт ниже или `pacman -U sora*.pkg.tar.zst` |
+
+Windows, в PowerShell:
 
 ```powershell
 irm https://github.com/levvs-one/sora/releases/latest/download/install.ps1 | iex
 ```
 
-Linux x64: Debian, Ubuntu, Fedora, openSUSE, Arch. В терминале:
+Linux, в терминале:
 
 ```sh
 curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
 ```
 
-Скрипты скачивают последний релиз, проверяют контрольные суммы и устанавливают приложение со службой. Нужны права администратора. Для ручной установки скачайте установщик или пакеты со страницы [релизов](https://github.com/levvs-one/sora/releases).
-
-Для старых версий Windows есть отдельный клиент [sora-legacy](https://github.com/levvs-one/sora-legacy).
-
-## Быстрый старт
-
-1. Вставьте ссылку подписки.
-2. Выберите сервер.
-3. Нажмите «Подключить».
+Скрипты скачивают последний [релиз](https://github.com/levvs-one/sora/releases/latest), сверяют контрольные суммы из `SHA256SUMS` и ставят приложение вместе со службой. Нужны права администратора. Дальше Sora обновляется сама из приложения. Для старых версий Windows есть отдельный клиент [sora-legacy](https://github.com/levvs-one/sora-legacy).
 
 ## Возможности
 
-- Подписки по ссылке, включая JSON-подписки Xray: обновление по расписанию, трафик, срок и объявления провайдера, правки поверх подписки, которые переживают её обновление.
-- Протоколы VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, WireGuard и AmneziaWG, транспорты REALITY и XHTTP. Три движка на выбор: sing-box, Xray, mihomo.
-- Автовыбор сервера по задержке и измеренной скорости, запасные серверы при сбое, цепочки из двух или трёх серверов, свои серверы, добавленные вручную.
-- Виртуальный адаптер (TUN) или системный прокси, kill switch, правила по сайтам, IP-адресам и программам.
-- Сетевые профили: настройки привязываются к Wi-Fi, шлюзу или провайдеру и применяются по запросу или автоматически, если вы это включили.
-- Проверка утечек DNS, IPv6 и туннеля, экран соединений с группировкой по программам, диагностика с экспортом.
-- QR-код подписки и чтение QR с картинки. Синхронизация подписок, правил и настроек между вашими компьютерами в локальной сети без облака, канал шифруется.
-- Расширения: каталог подписанных расширений, установка из файла, разрешения подтверждаются при установке. Подробнее в [docs/extensions.md](docs/extensions.md).
-- На Linux режим zapret без сервера и zapret вместе с VPN для прямого трафика. Он не скрывает IP-адрес и не заменяет VPN.
-- Работает из трея, запускается при входе в систему и обновляется из приложения. 31 вариант языка интерфейса, светлая и тёмная темы.
+- **Подписки.** Ссылка подписки, включая JSON-подписки Xray. Обновление по расписанию, остаток трафика, срок и объявления провайдера. Свои правки поверх подписки (переименовать, скрыть сервер) переживают её обновление.
+- **Протоколы и движки.** VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, WireGuard и AmneziaWG, транспорты REALITY и XHTTP. Три движка: sing-box, Xray и mihomo, движок выбирается под подключение.
+- **Выбор сервера.** Автовыбор по задержке, по измеренной скорости или по их сочетанию, переключение при сбое и при сильной деградации, цепочки из двух или трёх серверов, свои серверы, добавленные вручную.
+- **Защита трафика.** Виртуальный адаптер (TUN) или системный прокси. Kill switch, а по желанию строгий режим: он держит блокировку и после сбоя приложения, пока вы явно не отключитесь. Правила по сайтам, IP-адресам и программам.
+- **Проверки.** Тест утечек DNS, IPv6 и трафика мимо туннеля с подсказкой, как исправить. Экран соединений с группировкой по программам, журнал и экспорт диагностики.
+- **Сетевые профили.** Настройки привязываются к Wi-Fi, шлюзу или провайдеру и применяются по запросу или сами.
+- **Синхронизация.** Подписки, правила и настройки между вашими компьютерами в локальной сети: сопряжение по QR-коду, сквозное шифрование, без аккаунтов и облака.
+- **Расширения.** Каталог подписанных расширений: панели, темы, правила маршрутизации и фоновые задачи с запросами по белому списку адресов только через VPN. Разрешения подтверждаются при установке. Подробнее в [docs/extensions.md](docs/extensions.md).
+- **zapret на Linux.** Обход DPI без сервера, а также вместе с VPN для прямого трафика. Он не скрывает IP-адрес и не заменяет VPN.
+- **Остальное.** Трей, запуск при входе, обновление из приложения с поэтапной раскаткой и автоматическим откатом на Linux, если новая версия не запустилась. 31 вариант языка интерфейса, светлая и тёмная темы.
 
-## Безопасность
+<table>
+  <tr>
+    <td width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/images/extensions-1000x720-dark.png">
+        <img src="docs/images/extensions-1000x720-light.png" alt="Каталог расширений">
+      </picture>
+    </td>
+    <td width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/images/settings-1000x720-dark.png">
+        <img src="docs/images/settings-1000x720-light.png" alt="Настройки">
+      </picture>
+    </td>
+    <td width="33%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/images/notifications-1000x720-dark.png">
+        <img src="docs/images/notifications-1000x720-light.png" alt="Уведомления">
+      </picture>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">Каталог расширений</td>
+    <td align="center">Настройки</td>
+    <td align="center">Уведомления</td>
+  </tr>
+</table>
 
-- Релизы сопровождаются файлом `SHA256SUMS`. Установочные скрипты и обновление из приложения сверяют по нему контрольные суммы и ничего не ставят при расхождении. Сам `SHA256SUMS` пока не подписан, его подлинность держится на HTTPS-соединении с GitHub.
-- Каталог расширений и список отозванных расширений подписаны ключом команды Sora, вшитым в приложение. Пакеты расширений подписаны ключами авторов.
-- Телеметрии нет: Sora не отправляет аналитику и статистику разработчикам. Само приложение обращается только к GitHub: за сведениями об обновлениях (отключается в настройках) и, когда вы открываете магазин расширений, за каталогом и списком отзыва. GitHub при этом видит ваш IP-адрес, как при обычном посещении сайта.
+## Как это устроено
 
-Подробности в [docs/security.md](docs/security.md).
+```mermaid
+flowchart LR
+  app["Приложение<br>Flutter"] -- "gRPC по локальному сокету<br>или именованному каналу" --> core["Служба sora-core<br>Go"]
+  core --> engines["sing-box, Xray, mihomo"]
+  core --> guard["Kill switch<br>nftables или WFP"]
+  core --> workers["Фоновые задачи<br>расширений"]
+  engines --> tun["TUN или<br>системный прокси"]
+  app -- "HTTP на localhost" --> sync["sora-sync"]
+  sync -- "Noise_XX в локальной сети" --> peer["Ваш другой компьютер"]
+```
+
+Приложение не работает с сетью напрямую: всё, что требует прав, делает служба `sora-core`. Она собирает конфигурацию для выбранного движка, поднимает туннель, держит правила межсетевого экрана и запускает фоновые задачи расширений в отдельном процессе с ограничением памяти и процессорного времени. Синхронизация живёт в своём процессе `sora-sync` и общается только с сопряжёнными устройствами. Подробности в [docs/architecture.md](docs/architecture.md).
+
+## Безопасность и приватность
+
+- Телеметрии нет. Само приложение обращается только к GitHub: за сведениями об обновлениях (отключается в настройках) и, когда вы открываете магазин расширений, за каталогом и списком отзыва. GitHub при этом видит ваш IP-адрес, как при обычном посещении сайта.
+- Релизы сопровождаются `SHA256SUMS`. Скрипты установки и обновление из приложения сверяют по нему файлы и ничего не ставят при расхождении. Сам `SHA256SUMS` пока не подписан, его подлинность держится на HTTPS-соединении с GitHub.
+- Каталог расширений и список отзыва подписаны ключом команды Sora, вшитым в приложение. Пакеты расширений подписаны ключами авторов, ключ сверяется при каждом обновлении.
+
+Модель угроз и данные, которые хранит Sora, описаны в [docs/security.md](docs/security.md). Об уязвимостях пишите по [SECURITY.md](SECURITY.md).
 
 ## Документация
 
 - Пользователям: [установка](docs/install.md), [как пользоваться](docs/usage.md), [частые вопросы](docs/faq.md), [если что-то не работает](docs/troubleshooting.md).
 - Провайдерам: [форматы подписок](docs/providers.md).
 - Разработчикам: [архитектура](docs/architecture.md), [сборка из исходников](docs/development.md), [расширения](docs/extensions.md).
-- Безопасность: [модель приватности и данные](docs/security.md).
 - [История изменений](CHANGELOG.md) и [планы](PLANS.md).
 
-Полный указатель документации в [docs/](docs/).
+## Участие
+
+Ошибки и предложения в [issues](https://github.com/levvs-one/sora/issues). Перед пулл-реквестом прочитайте [docs/development.md](docs/development.md): там описаны сборка и проверки, которые запускает CI.
 
 ## Лицензия
 
