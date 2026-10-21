@@ -1246,9 +1246,6 @@ class SBn extends S {
   String get extCapBackground => 'Runs in the background';
 
   @override
-  String get extCapFilterTitle => 'Capabilities';
-
-  @override
   String get extCapNetHook => 'Bypasses & network hooks';
 
   @override

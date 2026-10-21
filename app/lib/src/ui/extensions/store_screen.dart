@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/cupertino.dart' show CupertinoSearchTextField, CupertinoSwitch;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart' as crypto;
@@ -554,6 +555,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   Widget _catalogList(BuildContext context) {
     final s = S.of(context), palette = Palette.of(context);
     final cachedAt = _cachedAt;
+    final categories = _categories(), capabilities = _capabilities();
     return Column(
       children: [
         if (cachedAt != null)
@@ -576,74 +578,66 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
               ],
             ),
           ),
-        TextField(
-          controller: _catalogSearch,
-          // No onChanged setState: the list below listens through
-          // ValueListenableBuilder, so typing rebuilds only the list.
-          decoration: InputDecoration(
-            hintText: s.extSearchHint,
-            prefixIcon: const Icon(Symbols.search_rounded),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        ),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: 40,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              for (final c in _categories())
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(end: 8),
-                  child: ChoiceChip(
-                    label: Text(_categoryLabel(context, c)),
-                    selected: _category == c,
-                    onSelected: (_) => setState(() => _category = c),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(s.extCapFilterTitle, style: Styles.caption.copyWith(color: palette.ink3)),
-        ),
-        const SizedBox(height: 4),
-        SizedBox(
-          height: 40,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              for (final c in _capabilities())
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(end: 8),
-                  child: ChoiceChip(
-                    label: Text(_capabilityLabel(context, c)),
-                    selected: _capability == c,
-                    onSelected: (_) => setState(() => _capability = c),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 4),
         Row(
           children: [
-            const Spacer(),
-            PopupMenuButton<int>(
-              icon: const Icon(Symbols.sort_rounded),
-              tooltip: s.extSortBy,
-              onSelected: (v) => setState(() => _sort = v),
-              itemBuilder: (_) => [
-                PopupMenuItem(value: 0, child: Text(s.extSortPopular)),
-                PopupMenuItem(value: 1, child: Text(s.extSortRating)),
-                PopupMenuItem(value: 2, child: Text(s.extSortName)),
-                PopupMenuItem(value: 3, child: Text(s.extSortRelevance)),
+            Expanded(
+              child: _SearchField(controller: _catalogSearch, placeholder: s.extSearchHint),
+            ),
+            const SizedBox(width: 8),
+            MenuAnchor(
+              menuChildren: [
+                for (final (value, label) in [
+                  (0, s.extSortPopular),
+                  (1, s.extSortRating),
+                  (2, s.extSortName),
+                  (3, s.extSortRelevance),
+                ])
+                  MenuItemButton(
+                    onPressed: () => setState(() => _sort = value),
+                    leadingIcon: _sort == value
+                        ? Icon(Symbols.check_rounded, size: 18, color: palette.ink)
+                        : const SizedBox(width: 18),
+                    child: Text(label),
+                  ),
               ],
+              builder: (context, controller, _) => RoundButton(
+                icon: Symbols.sort_rounded,
+                label: s.extSortBy,
+                onTap: () => controller.isOpen ? controller.close() : controller.open(),
+              ),
             ),
           ],
         ),
+        // A filter with a single choice filters nothing, so its row stays
+        // hidden until the catalog offers at least two.
+        if (categories.length > 2 || capabilities.length > 2) ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 32,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                if (categories.length > 2)
+                  for (final c in categories)
+                    _FilterPill(
+                      label: _categoryLabel(context, c),
+                      selected: _category == c,
+                      onTap: () => setState(() => _category = c),
+                    ),
+                if (categories.length > 2 && capabilities.length > 2) const SizedBox(width: 8),
+                if (capabilities.length > 2)
+                  for (final c in capabilities)
+                    if (c != 'all' || categories.length <= 2)
+                      _FilterPill(
+                        label: _capabilityLabel(context, c),
+                        selected: _capability == c,
+                        onTap: () => setState(() => _capability = _capability == c ? 'all' : c),
+                      ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 12),
         Expanded(
           child: ValueListenableBuilder<TextEditingValue>(
             valueListenable: _catalogSearch,
@@ -676,9 +670,15 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     return set.toList();
   }
 
-  /// Capability filter values: 'all' plus the manifest capability registry
-  /// ids. Labels come from l10n (extCap*).
-  List<String> _capabilities() => const ['all', 'theme', 'network-hook', 'routing', 'ui-panel', 'background', 'widget'];
+  /// Capability filter values: 'all' plus the capabilities the catalog's
+  /// entries declare. Labels come from l10n (extCap*).
+  List<String> _capabilities() {
+    final set = <String>{'all'};
+    for (final e in _catalog?.entries ?? const <CatalogEntry>[]) {
+      set.addAll(e.capabilities);
+    }
+    return set.toList();
+  }
 
   String _capabilityLabel(BuildContext context, String c) {
     final s = S.of(context);
@@ -824,9 +824,9 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
         ExtensionDetailScreen(entry: e, onInstall: (entry) => _installFromCatalog(context, entry)),
       ),
       trailing: installed == null
-          ? PrimaryButton(label: s.extInstall, onTap: () => _installFromCatalog(context, e))
+          ? PillButton(label: s.extInstall, onTap: () => _installFromCatalog(context, e))
           : needsUpdate
-          ? PrimaryButton(label: s.extUpdate, onTap: () => _installFromCatalog(context, e))
+          ? PillButton(label: s.extUpdate, onTap: () => _installFromCatalog(context, e))
           : null,
     );
   }
@@ -895,18 +895,11 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   Widget _buildInstalled(BuildContext context) {
     return Column(
       children: [
-        TextField(
-          controller: _installedSearch,
-          // No onChanged setState: the list below listens through
-          // ValueListenableBuilder, so typing rebuilds only the list, not
-          // the tab switch and search field.
-          decoration: InputDecoration(
-            hintText: S.of(context).extSearchInstalled,
-            prefixIcon: const Icon(Symbols.search_rounded),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        ),
-        const SizedBox(height: 10),
+        // No onChanged setState: the list below listens through
+        // ValueListenableBuilder, so typing rebuilds only the list, not the
+        // tab switch and search field.
+        _SearchField(controller: _installedSearch, placeholder: S.of(context).extSearchInstalled),
+        const SizedBox(height: 12),
         Expanded(
           child: AnimatedBuilder(
             animation: ExtScope.of(context),
@@ -1007,7 +1000,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                     ExtBadge(label: s.extSideloadShort, tone: ExtBadgeTone.warn, icon: Symbols.warning_rounded),
                   if (needsUpdate) ExtBadge(label: s.extUpdateAvailable),
                   if (!inst.enabled) ExtBadge(label: s.extDisabled),
-                  // Honest signal, not the form itself: the full
+                  // A signal, not the form itself: the full
                   // settings form lives on the detail screen, one tap away.
                   if (inst.manifest.settingsSchema != null)
                     ExtBadge(label: s.extSettings, icon: Symbols.settings_rounded),
@@ -1022,7 +1015,13 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 // the extension it toggles.
                 trailing: Semantics(
                   label: s.extToggleEnabled(inst.manifest.name),
-                  child: Switch(value: inst.enabled, onChanged: (v) => toggleExtension(context, store, inst.id, v)),
+                  child: CupertinoSwitch(
+                    value: inst.enabled,
+                    onChanged: (v) => toggleExtension(context, store, inst.id, v),
+                    activeTrackColor: palette.ink,
+                    inactiveTrackColor: palette.field,
+                    thumbColor: palette.surface,
+                  ),
                 ),
               );
             },
@@ -1144,6 +1143,67 @@ class _ConflictBannerState extends State<_ConflictBanner> {
                 Text(s.extConflictsResolve, style: Styles.bodyStrong.copyWith(color: palette.danger)),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The app's search field (see the servers and licenses screens).
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.controller, required this.placeholder});
+
+  final TextEditingController controller;
+  final String placeholder;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return CupertinoSearchTextField(
+      controller: controller,
+      placeholder: placeholder,
+      style: Styles.body.copyWith(color: palette.ink),
+      placeholderStyle: Styles.body.copyWith(color: palette.ink3),
+      backgroundColor: palette.field,
+      borderRadius: BorderRadius.circular(12),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
+      itemColor: palette.ink3,
+    );
+  }
+}
+
+/// A filter choice in the catalog's single row: ink when selected, like
+/// [Segments], quiet field color otherwise.
+class _FilterPill extends StatelessWidget {
+  const _FilterPill({required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(end: 8),
+      child: Semantics(
+        selected: selected,
+        button: true,
+        child: Pressable(
+          onTap: onTap,
+          radius: 16,
+          wash: false,
+          child: AnimatedContainer(
+            duration: Motion.of(context, Motion.fast),
+            height: 32,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: selected ? palette.ink : palette.field,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(label, style: Styles.secondary.copyWith(color: selected ? palette.surface : palette.ink2)),
           ),
         ),
       ),

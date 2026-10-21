@@ -2397,12 +2397,6 @@ abstract class S {
   /// **'Работает в фоновом режиме'**
   String get extCapBackground;
 
-  /// No description provided for @extCapFilterTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Возможности'**
-  String get extCapFilterTitle;
-
   /// No description provided for @extCapNetHook.
   ///
   /// In ru, this message translates to:

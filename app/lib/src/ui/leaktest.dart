@@ -308,7 +308,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
           if (canFix)
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 24, top: 8),
-              child: _FixButton(onTap: () => unawaited(_fix(result))),
+              child: PillButton(label: s.leakTestFix, onTap: () => unawaited(_fix(result))),
             )
           else if (_fixed.contains(result.test.id))
             Padding(
@@ -332,24 +332,3 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
 
 /// Compact tonal action button for a row-level autofix, echoing
 /// [PrimaryButton] at a smaller size.
-class _FixButton extends StatelessWidget {
-  const _FixButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = S.of(context);
-    final palette = Palette.of(context);
-    return Pressable(
-      onTap: onTap,
-      radius: 18,
-      wash: false,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(color: palette.ink, borderRadius: BorderRadius.circular(18)),
-        child: Text(s.leakTestFix, style: Styles.bodyStrong.copyWith(color: palette.surface)),
-      ),
-    );
-  }
-}

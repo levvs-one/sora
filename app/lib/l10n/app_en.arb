@@ -538,7 +538,6 @@
   "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.",
   "extPermNotYetActive": "This permission does nothing in this version of Sora yet.",
   "extCapBackground": "Runs in the background",
-  "extCapFilterTitle": "Capabilities",
   "extCapNetHook": "Bypasses & network hooks",
   "extCapPanel": "Panels",
   "extCapRouting": "Routing rules",

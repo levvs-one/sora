@@ -5,7 +5,7 @@ import 'package:sora/src/notifications.dart';
 import 'package:sora/src/sora.dart';
 
 class DesktopState extends Sora {
-  DesktopState(super.settings) {
+  DesktopState(super.settings, {super.extensions}) {
     phase = Phase.connected;
     serverlessAvailable = true;
     since = DateTime.now().subtract(const Duration(minutes: 14, seconds: 32));

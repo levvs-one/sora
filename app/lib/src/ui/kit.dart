@@ -667,6 +667,33 @@ class PrimaryButton extends StatelessWidget {
   }
 }
 
+/// A compact filled action for rows and cards, where [PrimaryButton]'s
+/// full-width 52 px bar does not fit.
+class PillButton extends StatelessWidget {
+  const PillButton({super.key, required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return Pressable(
+      onTap: onTap,
+      radius: 18,
+      wash: false,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: onTap == null ? palette.raisedField : palette.ink,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Text(label, style: Styles.bodyStrong.copyWith(color: onTap == null ? palette.ink3 : palette.surface)),
+      ),
+    );
+  }
+}
+
 /// Pushes a detail screen with slide and fade transitions. Disabled motion
 /// makes the transition immediate.
 Future<T?> push<T>(BuildContext context, Widget screen) {

@@ -83,7 +83,7 @@ class _ServersScreenState extends State<ServersScreen> {
         SizedBox.square(dimension: 36, child: CupertinoActivityIndicator(color: palette.ink))
       else
         RoundButton(
-          icon: Symbols.speed_rounded,
+          icon: Symbols.network_ping_rounded,
           label: s.probeServers,
           onTap: sora.canProbe ? () => unawaited(sora.probe()) : null,
         ),
@@ -581,7 +581,7 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                   message: '${s.probeServers}: ${state.displayName}',
                   child: RoundButton(
                     key: ValueKey('probe-subscription-${state.settings.id}'),
-                    icon: Symbols.speed_rounded,
+                    icon: Symbols.network_ping_rounded,
                     label: '${s.probeServers}: ${state.displayName}',
                     onTap: !sora.canProbe || state.outbounds.isEmpty
                         ? null

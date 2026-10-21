@@ -152,23 +152,16 @@ class ExtensionCard extends StatelessWidget {
       child: Opacity(
         opacity: enabled ? 1 : 0.55,
         child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: palette.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: palette.field),
-          ),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: palette.field.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(Symbols.extension_rounded, color: palette.ink2),
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(10)),
+                child: Icon(Symbols.extension_rounded, size: 20, color: palette.ink2),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -177,7 +170,7 @@ class ExtensionCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: Styles.title.copyWith(color: palette.ink),
+                      style: Styles.bodyStrong.copyWith(color: palette.ink),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -192,7 +185,7 @@ class ExtensionCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle!,
-                        style: Styles.caption.copyWith(color: palette.ink2),
+                        style: Styles.secondary.copyWith(color: palette.ink2),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),

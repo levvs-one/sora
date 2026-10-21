@@ -1245,9 +1245,6 @@ class SRu extends S {
   String get extCapBackground => 'Работает в фоновом режиме';
 
   @override
-  String get extCapFilterTitle => 'Возможности';
-
-  @override
   String get extCapNetHook => 'Обходы и сетевые хуки';
 
   @override
