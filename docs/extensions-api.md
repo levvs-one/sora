@@ -98,9 +98,9 @@ Supported types: `string`, `integer`, `number`, `boolean`; optional
 
 | API | Status |
 |---|---|
-| Theme engine applying `theme.json` | contract v0 proposed ([example](../examples/theme-midnight)) |
-| Network-hook module loading (`hook.json`) | contract v0 proposed ([example](../examples/net-hook-dpi)) |
-| Routing-rule merging (`rules.json`) | contract v0 proposed ([example](../examples/routing-split)) |
+| Theme engine applying `theme.json` | contract v0 proposed |
+| Network-hook module loading (`hook.json`) | contract v0 proposed |
+| Routing-rule merging (`rules.json`) | contract v0 proposed |
 | Background worker JS runner (`worker.js`) | Go seam exists (`core/ext` `WorkerFunc`); app-side runner pending |
 | `tray` permission / widgets | reserved |
 

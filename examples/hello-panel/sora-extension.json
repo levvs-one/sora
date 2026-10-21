@@ -3,12 +3,12 @@
   "id": "org.sora.hello-panel",
   "name": "Hello Panel",
   "version": "1.0.0",
-  "min_app_version": "1.9.0",
+  "min_app_version": "1.1.0",
   "description": "The official example extension: a panel with live connection statistics.",
   "author": {
     "name": "Sora Team",
     "identity": "github:levvs-one",
-    "public_key": "RWTf0MJzm5893ehOGZHNy30Aakl3WiTVtGt0KmFZBWsquiZjXK4dYw2m"
+    "public_key": "RWR4GRTQjDDhQUbdYob6IwCcKqOk1SpL2tripsiQMl+UVFC+XtUyp38Q"
   },
   "permissions": [
     "connections.read",

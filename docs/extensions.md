@@ -355,17 +355,15 @@ Rules, enforced on both sides:
 - manifest version stays `1`: the keys are additive.
 
 The asset files' own schemas are **contract v0 (proposed)**, only the
-pointers are enforced, not the asset contents. The proposals, with
-working signed example packages:
+pointers are enforced, not the asset contents:
 
-- theme: `examples/theme-midnight` (`theme.json`: `name`, `variant`,
-  `css_variables`, `stylesheet`);
-- network-hook: `examples/net-hook-dpi` (`hook.json`: `module`,
-  `strategies[]` with `id`/`title`/`description`/`transports`);
-- routing: `examples/routing-split` (`rules.json`: `rules[]` with
-  `match`/`action`/`comment`, first match wins).
+- theme: `theme.json` with `name`, `variant`, `css_variables`,
+  `stylesheet`;
+- network-hook: `hook.json` with `module` and `strategies[]` of
+  `id`/`title`/`description`/`transports`;
+- routing: `rules.json` with `rules[]` of `match`/`action`/`comment`,
+  first match wins.
 
-Each example README states the proposed status explicitly. The runtime
-side (theme engine, hook loading, rule merging) is planned; until it
-lands, these packages validate, pack, sign and verify exactly like any
-other extension.
+The runtime side (theme engine, hook loading, rule merging) is not built
+yet. Until it lands, such packages validate, pack, sign and install like
+any other extension, but the app does not apply them.

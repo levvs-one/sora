@@ -144,12 +144,6 @@ extension really need each one? Fewer permissions = faster user trust.
 
 ## 8. Theme / net-hook / routing extensions
 
-These capabilities parse and validate today; the runtimes are contract v0
-(proposed). Start from the examples, they are the contract:
-
-- `examples/theme-midnight`, `theme.json` + `theme.css`
-- `examples/net-hook-dpi`, `hook.json` strategies
-- `examples/routing-split`, `rules.json`
-
-Copy the shape, keep the `$comment` fields until the runtime lands, and
-note the proposed status in your README like the examples do.
+These capabilities parse and validate today, but the app does not apply
+them yet: the asset formats are contract v0 (proposed), described in
+`docs/extensions.md`. Say so in your README if you publish one.

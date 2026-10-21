@@ -109,5 +109,5 @@ rollback; widening permissions re-prompts.
 - [Cookbook](extensions-cookbook.md), settings forms, themes, background
   workers, testing patterns
 - [Dev mode & app contract](extensions-devmode.md), how the app side works
-- `examples/`, `hello-panel`, `theme-midnight`, `net-hook-dpi`,
-  `routing-split`: working, signed, minimal
+- `examples/hello-panel`: a minimal working panel to build, sign and
+  sideload
