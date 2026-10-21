@@ -1,297 +1,173 @@
 # Sora extensions, threat model
 
-Companion to `docs/extensions.md` (the normative spec) and
-`reports/EXTENSIONS-VISION.md` (the product vision). This document is the
-honest security accounting for the extension system: what we protect, how,
-and what we deliberately do **not** claim. Where a protection is missing,
-it says so.
+Companion to [the extension specification](../extensions.md). The app owns
+extension storage and consent. The core executes workers delegated by that
+app; the CLI shares manifest and package verification code with the core.
 
-## 1. Assets
+## 1. Assets and actors
 
-| # | Asset | Where it lives | Why it matters |
-|---|-------|----------------|----------------|
-| A1 | Subscription credentials (proxy UUIDs, passwords, private keys) | `srv.secrets` secret store in `core/control`; referenced by `CredentialsRef`, never inlined | Full account takeover / traffic decryption if leaked |
-| A2 | Live VPN traffic (what the user sends through the tunnel) | Engine + routing rule consumer; network hooks not applied | Confidentiality of everything the user does |
-| A3 | Connection metadata (which apps contact which hosts) | `core/control` session journal | Browsing/app-usage profile |
-| A4 | App settings | App (Dart) side | Integrity of the user's configuration |
-| A5 | Extension code integrity (what the author shipped) | `.soraext` on disk, `installed.json` registry | Supply-chain: a modified extension is the author's malware |
-| A6 | Author identity binding (this key ⇒ this author) | Manifest `author.public_key`, catalog pinning | Impersonation of trusted authors |
+| Asset | Location | Risk |
+|---|---|---|
+| Subscription credentials | Core secret store, opaque references in control messages | Account takeover if exposed |
+| VPN traffic | Engines and session routing | Traffic exposure or redirection |
+| Connection metadata | Core connection API, projected by the app bridge | Browsing and application usage profile |
+| App settings | User profile | Configuration integrity |
+| Extension code and grants | App store, installed.json and extracted packages | Supply chain compromise or excessive access |
+| Author identity | Manifest author key, catalog pin and persisted app pin | Impersonation |
 
-## 2. Actors
+Authors, compromised author keys, malicious panel scripts and network
+attackers are untrusted. The user decides consent; the app must show the
+actual permissions and sideload identity. The Sora team signs the catalog
+and revocation list. A compromised OS, core, app or build machine is outside
+this permission model.
 
-- **Benign author**, ships useful extensions, signs with their own key.
-- **Malicious author**, ships a trojaned extension, possibly sideloaded,
-  possibly via a compromised catalog entry; wants A1–A4.
-- **Compromised author key**, the author's signing key leaks; the attacker
-  ships "updates" the user trusts.
-- **Compromised panel**, XSS or a bug in the extension's own HTML/JS, or a
-  renderer exploit; the panel process holds a valid token.
-- **Network attacker**, observes or tampers with extension downloads,
-  catalog fetches, `net.fetch` traffic.
-- **The user**, trusted to make consent decisions, but must be told the
-  truth in plain language, not security jargon.
-- **Sora team**, holds the catalog/revocation signing key.
+## 2. Trust boundaries
 
-Out of scope: a compromised OS, a compromised build machine of the Sora
-team itself, physical device access.
-
-## 3. Trust boundaries
-
-```
-┌─────────────┐   minisign    ┌──────────────────┐
-│ .soraext    │──────────────▶│ core/ext package │
-│ (untrusted  │  checksums +  │ (verification,   │
-│  bytes)     │  signature    │  never trusts)    │
-└─────────────┘               └────────┬─────────┘
-                                       │ per-extension token + permission
-                                       │ check on EVERY call
-                              ┌────────▼─────────┐
-                              │ ExtensionHost    │◀── control token
-                              │ (gRPC, core)     │    (app-only Mint/Revoke)
-                              └────────┬─────────┘
-                                       │ Deps adapters (projection!)
-                              ┌────────▼─────────┐
-                              │ core/control     │
-                              │ sessions, secrets│  ← extensions NEVER cross
-                              │ (A1 lives here)  │    this line
-                              └──────────────────┘
+```text
+untrusted .soraext / signed catalog / signed revocations
+  -> app: verify signatures and checksums, pin author, store grants
+     -> panels: WebView -> PanelBridge -> allowed app callbacks
+     -> workers: control-authenticated ExtensionHost.RunWorker
+        -> Scheduler -> disposable goja process
+           -> permission-checked JSON bridge -> app PanelBridge
+           -> net.fetch -> allowlist and limits -> live VPN proxy
 ```
 
-The dependency arrow is one-way: `core/control` imports `core/ext`; `ext`
-never imports `control` and never references the secret store. The two
-`Deps` adapters (`ListConnections`, `ListServers` in
-`core/control/exthost.go`) **project** rich internal structs down to
-credential-free shapes before anything crosses the boundary.
+The app is the only live extension store. It handles installation, update,
+rollback, enable/disable, settings, catalog cache, rollout and revocations.
+The core never reads that registry or maintains a second one.
 
-## 4. Permission enforcement matrix (WS1 audit result)
+RunWorker is the sole ExtensionHost RPC. The transport restricts it to
+control peers, and the first message must pass the control-token check.
+The app supplies verified source, the manifest with granted permissions and
+resolved background configuration. JS receives neither the control token
+nor arbitrary native callbacks. Closing or replacing the stream cancels
+active work and unregisters its task. Disabling, uninstalling and worker
+reconfiguration cancel streams through app lifecycle reconciliation.
 
-"Real check in code on every call path, not a declaration." Audited
-2026-10-20 against `core/ext`, `core/control/exthost.go`, `proto/.../ext_host.proto`
-and the Dart mirror `app/lib/src/ext`. The machine-readable, test-pinned
-version of this matrix lives in `core/ext/enforcement.go`
-(`EnforcementTable`, with a Dart mirror in `app/lib/src/ext/enforcement.dart`);
-this section is its prose rendering, when they disagree, the code wins.
+The trusted app is responsible for grants and source integrity. The core
+validates the manifest and configuration again; it does not independently
+verify installation or ask an on-disk service registry for grants.
 
-| Permission | Go core enforcement | Dart app enforcement | Verdict |
-|---|---|---|---|
-| `connections.read` | `Host.check()` → `rpcPermissions["GetConnections"]`, every call | `bridge.dart` `_methodPermission` | ✅ enforced both layers |
-| `servers.read` | `Host.check()` → `GetServers` | `bridge.dart` | ✅ enforced both layers |
-| `notifications` | `Host.check()` → `Notify` (+120/500 char caps) | `bridge.dart` | ✅ enforced both layers |
-| `net.fetch` | `Fetcher` built only when granted (`Scheduler.RegisterConfig`); allowlist + https/IP/port/redirect/rate/size checks per request; transport is `ext.TunnelTransport`, every request rides the tunnel's loopback proxy and **fails closed** (`ext.netfetch.no-tunnel`) when no tunnel proxy is live, instead of dialing direct | no panel-side fetch (CSP `connect-src 'none'`) | ✅ enforced at construction, per request, and at the tunnel |
-| `background` | `Scheduler.RegisterConfig` requires capability **and** permission; interval clamped [15m, 7d]; overlap guard + circuit breaker; scheduler is created/started in sora-core with the kill switch wired through the control plane | background config UI (`<id>.background.json`) | enforced; isolated goja executor with CPU, memory and wall budgets |
-| `settings.read` | none | none | ⚠️ **no enforcement point; inert** (see below) |
-| `settings.write` | none | none | ⚠️ **no enforcement point; inert** |
-| `tray` | none | none | ⚠️ declared only (runtime v2) |
-| `ui.panel` | **gated at validation**: declared panels require the `ui-panel` capability **and** the `ui.panel` permission (`core/ext/manifest.go` + Dart mirror), the install prompt always consents to UI embedding | panel loader serves only declared panels; bridge methods individually gated | ✅ install-time, now a real gate (pass 1) |
-| `theme.apply` | manifest capability/permission validation | enabled grants, conflict winner, colors/contrast validation, reset on disable | enforced |
-| `routing.rules` | manifest capability/permission validation | enabled grants, user match parser, direct/proxy/block, ordered plan merge | enforced, RiskDangerous |
-| `net.hooks` | none | none | ⚠️ **declared only, RiskDangerous** |
+## 3. Permission enforcement
 
-Honest reading of the ⚠️ rows:
+`core/ext/enforcement.go` supplies CLI status lookups. Its statuses are
+pinned to `app/lib/src/ext/enforcement.dart`; behavior tests cover the
+worker gates and the app bridge.
 
-- `settings.read` / `settings.write` refer to **app** settings. No API -
-  gRPC or bridge, exposes app settings to extensions at all.
-  `getSettings`/`setSettings` are the extension's **own** settings
-  (permissionless by design). So these permissions are currently inert:
-  granting them changes nothing. If an app-settings API is ever added,
-  its adapter must project exactly like §5 and must exclude the secret
-  store; the permission prompt text must say what "settings" means.
-- `routing.rules` is dangerous: it can choose direct/proxy/block for matching
-  traffic, after user rules and before defaults. It never selects a server.
-  Consent remains mandatory. `net.hooks` is still not applied; granting it
-  changes no traffic behavior.
-- The closed `rpcPermissions` map (`host.go`) denies unknown RPC names,
-  so a future RPC cannot silently inherit token-only access
-  (`TestCheckRejectsUnknownRPC`). `TestRpcPermissionsCoverRegistry`
-  pins map ⊆ registry.
+| Permission | Core worker gate | App gate |
+|---|---|---|
+| connections.read | workerBridgeCall | PanelBridge grant check, projected connection fields |
+| servers.read | workerBridgeCall | PanelBridge grant check, projected server fields |
+| notifications | workerBridgeCall | PanelBridge grant check, title/body limits of 120/500 characters |
+| net.fetch | Fetcher constructed only with grant; HTTPS, allowlist and limits on each request | Unavailable to panels |
+| background | Manifest capability and permission, scheduler registration | Enabled extension and background configuration |
+| ui.panel | Manifest capability and permission validation | Install consent, declared panel loader |
+| theme.apply | Manifest validation | Enabled grants, conflict winner, colors/contrast validation, reset on disable |
+| routing.rules | Manifest validation | Enabled grants, shared match parser, ordered direct/proxy/block rules |
+| settings.read / settings.write | No app-settings API | Inert; own extension settings are permissionless |
+| tray | No consumer | Unimplemented |
+| net.hooks | No consumer | Unimplemented, dangerous permission |
 
-Token model (defense in depth, all enforced in `core/ext`):
+Unknown worker methods and unknown PanelBridge methods are rejected.
+Worker calls to getConnections, getServers and notify are checked before
+forwarding and again by the app bridge. Extension-local getSettings and
+setSettings need no app-settings permission; values are schema-validated
+by the app store. Granting settings.read/write exposes no app configuration.
 
-- 32-byte CSPRNG, opaque, server-side grant map; constant-time lookup.
-- Scoped to exactly the granted permissions; `MintToken` additionally
-  checks `Deps.GrantedPermissions` (wired to the store in
-  `core/cmd/sora-core/main.go`): unknown/disabled extensions and
-  ungranted permissions are refused even if the app's control plane is
-  confused (`TestMintTokenEnforcesGranted`).
-- TTL 24 h (`TokenTTL`); expired tokens are rejected and dropped.
-- In-memory only: a core restart invalidates everything; the app
-  re-mints at startup. Disable/uninstall/rollback revoke immediately
-  (`RevokeByExtension`), one tap cuts core access.
+Routing rules are dangerous: they can bypass or block matching traffic,
+after user rules and before defaults. They cannot select a server. Network
+hooks and DPI bypass remain out of scope.
 
-## 5. Secrets audit (WS5 result), the proof
+## 4. Credential boundary
 
-Claim: *an extension can never see subscription credentials (A1).*
+There is no extension permission for subscription credentials.
+`core/ext` does not import `core/control` or reference the secret store.
+The worker host exposes a closed set of JSON calls rather than core structs.
 
-1. **Storage**: credentials live in `srv.secrets` (`core/control`),
-   keyed by opaque refs (`u1_<id>_rec`). `OutboundSpec` carries only a
-   `CredentialsRef{reference}`, not the bytes.
-2. **No import path**: `core/ext` does not import `core/control`
-   (verified by grep; only comments mention it) and contains zero
-   references to the secret store. The dependency arrow is strictly
-   `control → ext`.
-3. **Projection at the boundary**: `ExthostDeps.ListServers` maps
-   `OutboundSpec` → `ext.Server{ID, Name}`, endpoint host/port and the
-   credentials *reference* are dropped, not just the bytes.
-   `ListConnections` → `{ID, Process, Host, Up, Down}`, no PIDs, no
-   paths, no tokens. The proto (`ext_host.proto`) has no secret-shaped
-   field on any response or event; `WatchExtensionEvents` deliberately
-   sends `detail: ""`.
-4. **Logs**: `net.fetch` audit lines strip query, fragment and userinfo
-   (`safeMethodURL`); worker/fetcher logs never receive credential
-   material from the core.
-5. **Dart mirror**: `app/lib/src/ext/*.dart` contains no secret/
-   credential/password references outside the two token fields
-   (`extension_token`, `control_token`), which are the auth mechanism
-   itself.
-6. **Registry guard**: `TestRpcPermissionsCoverRegistry` fails the build
-   if a future RPC/permission pair drifts; the closed map denies
-   unknown RPCs.
+The app's panel and worker adapters project connection data to id, process
+name, host and byte counters. Server data is projected to id, display name,
+country and latency. Endpoint configuration and credential references are
+not forwarded. Settings methods access only that extension's settings.
+RunWorker carries worker configuration, bridge calls/replies, logs and
+failure notices; it has no credential response type.
 
-What this does **not** prove: that a future contributor won't add a
-leaky adapter. The guardrails are the projection discipline (§3), the
-closed permission map, and this section as the review checklist.
+Fetcher audit lines strip query, fragment and userinfo. An extension can
+log its own data, so log redaction does not make arbitrary extension text
+safe. A renderer exploit or a compromised app can cross this boundary;
+permissions constrain scripts using the supported bridge.
 
-**Explicit credential permission? Rejected.** There is no permission
-that exposes A1, and none is planned. If a legitimate need ever appears
-(e.g. an extension that rotates the user's own subscription), it must
-arrive as a new `RiskDangerous` permission with its own consent screen,
-its own audit, and owner approval, not as an extension of an existing
-one. Until then, "extensions can never read subscription credentials"
-is a load-bearing invariant, stated in `docs/extensions.md` §3.
+## 5. Integrity and author identity
 
-## 6. Package integrity & signing (WS3)
+The app verifies every content file against checksums.txt and verifies its
+minisign signature. The trusted comment binds the signature to the payload
+role and hash. The CLI uses Package.Verify/VerifyWithKey and VerifyPayload
+for the same archive and signature contract.
 
-- `.soraext` = zip + `checksums.txt` (sha256 of every content file) +
-  `signature.minisig` (minisign over `checksums.txt`, author's key).
-  Verification: parse → trusted comment names `checksums.txt` with its
-  sha256 → payload hash matches (constant time) → ed25519 verifies.
-  Flipping any byte breaks step 2 or 3.
-- **Checksum coverage**: every file except `signature.minisig` and
-  `checksums.txt` must be listed exactly once (no extras, no missing);
-  those two are authenticated by the trusted comment's sha256.
-- **Zip-slip**: `isSafeArchivePath` rejects `..`, absolute paths,
-  overlong names, duplicates, and since 2026-10-20 also `\` and `:`
-  anywhere, because on the Windows/Dart extractor a backslash is a
-  separator (`..\..\evil`) and a colon is an ADS (`panel.html:evil`).
-  The Dart mirror must replicate this byte-for-byte. Pass 2 additionally
-  requires the canonical name (`name == path.Clean(name)`): aliases like
-  `./panel.html` or `a//b` made the panel CSP injector miss the file and
-  rollback re-verification fail against the canonical on-disk name.
-- **Declared entries**: `Verify` refuses a package whose manifest points
-  at a file it does not ship (panel entries, `background_task.entry`,
-  `theme` / `network_hook` / `routing` entries). Without the check the
-  checksummed file set and the consented surface silently diverged: a
-  panel that 404s, a worker that never starts. The Dart
-  `ExtPackage.verify` mirrors the check; the CLI has always enforced it
-  for projects (`missing-entry`).
-- **Downgrade**: `Store.Install` requires a strictly newer semver than
-  the installed one; reinstalling an older `.soraext` as an "update" is
-  refused. Rollback to N-1 is an explicit user action, re-reading the
-  previous manifest from disk.
-- **Team key**: `TeamPublicKey` is compiled into the core and the app.
-  `VerifyCatalogSignature` and `VerifyRevocationList` (and their Dart
-  mirrors) refuse anything it did not sign. The secret is held by the
-  owner outside the repository; losing it means shipping a new key in a
-  release, leaking it means the same plus revoking what it signed.
+Paths reject traversal, absolute or noncanonical names, backslashes,
+Windows alternate-stream colons and duplicates. Archive/file/count limits
+bound decompression. Declared panel, worker and asset entries must exist.
+The app injects CSP into extracted panel copies; signed bytes stay intact.
 
-## 7. Revocation (WS4)
+Catalog installs verify the download hash and the catalog-pinned author
+key. Sideload signatures are self-attested: they prove byte integrity,
+not the author's identity. App consent shows the author and fingerprint.
+The app persists the author pin and refuses a key-changing update. A
+newer version is required for updates; explicit rollback re-verifies the
+previous version with the pinned key before restoring it.
 
-Format: `revocations.json` + `revocations.json.minisig` (team key,
-trusted comment `file:revocations.json`), `core/ext/revoke.go`.
-Constraint language is deliberately tiny: `*`, `=x.y.z`, `<x.y.z`,
-`<=x.y.z`. Enforcement in `Store`: install/update of a revoked
-id@version refused; enabling a revoked extension refused.
+The app verifies catalog and revocation signatures against its compiled
+team key. Core startup does not fetch or enforce these documents. The
+private team key stays outside the repository.
 
-Offline policy (no theater):
+## 6. Revocations and offline behavior
 
-- **No cached list** → installs proceed. The catalog signature is the
-  primary gate; a missing list must not brick first-run installs.
-- **Expired cached list** → new installs/updates refused (fail closed),
-  already-installed extensions keep running.
-- **Emergency kill** (`"versions": "*"`) works only when the device can
-  fetch the list. An offline device cannot receive a kill order, and we
-  do not pretend otherwise. Disabling revokes tokens immediately.
+The app fetches revocations.json and its minisign signature, verifies and
+caches them, loads the cache on startup and rechecks installed versions.
+The constraint language is *, =x.y.z, <x.y.z and <=x.y.z.
+Matching enabled extensions are disabled; installing, updating, enabling
+or rolling back to a revoked version is refused.
 
-Pass-1 status of the re-check pipeline (honest): the transport and the
-storage exist, `core/ext/revocation_cache.go` (`RevocationCache`,
-`Refresh`: fetch `.json` + `.minisig`, verify, cache **verified bytes
-only**, fall back to cache on any failure), and sora-core applies the
-cached list to the store at startup (`cmd/sora-core`), so a kill order
-received earlier keeps applying offline and across restarts. What is
-still missing: **no production trigger calls `Refresh` yet** (there is no
-published team endpoint, and verification fails closed until the key
-ceremony anyway), so today the cache can only ever be empty. The day the
-ceremony completes, wiring `Refresh` into catalog sync is the last step -
-the mechanism needs no rework.
+With no cached list installs proceed. An expired cached list blocks new
+installs and updates; already installed extensions can continue running.
+A failed download falls back to the verified cache. A modified cache fails
+signature verification. An offline device cannot receive a new kill order.
+When a match disables an extension, panels close and worker streams cancel.
 
-## 8. Sideload consent (WS6)
+This policy lives in app/lib/src/ext/revocations.dart and store.dart.
+There is no service-side cache or revocation arm.
 
-A sideloaded package is verified against the author's **own** key from
-the manifest, self-attested. The signature proves the bytes were not
-modified after signing; it says nothing about whether the author is
-who they claim to be, and anyone can mint one in a minute.
+## 7. Worker and network limits
 
-`core/ext/sideload.go` builds the facts the prompt must show
-(`SideloadConsent`, after `pkg.Verify()`): author name/identity, key id
-+ SHA-256 fingerprint (`AuthorKeyFingerprint`), every permission with a
-blunt consequence (routing rules can bypass or block matching traffic,
-including banking and mail; they cannot choose a server), dangerous first, and
-the warning block: not from the catalog, self-attested, trust only if
-the fingerprint matches the author's published key.
+Scheduler clamps intervals to 15 minutes through 7 days, prevents overlap,
+stops tasks after ten consecutive failures, and pauses/cancels runs with
+the kill switch. Work exists only while the app lifecycle stream is open.
+Each run gets a new goja process: 2 CPU seconds, 128 MiB live heap,
+30 seconds wall time, 1 MiB source, 256 host calls and stack depth 256.
+The parent kills and reaps on cancellation or timeout. No Node, filesystem,
+process, raw socket, global fetch or timer API is exposed; source maps are
+disabled. This bounds resource exhaustion, not native-runtime exploits.
 
-Follow-ups for the app (Dart) side, spec'd not implemented: the consent
-screen itself; TOFU author-key pinning with a loud warning on key
-change (possible impersonation); "trust this author" as an explicit,
-un-pre-checked decision.
+net.fetch permits HTTPS DNS hosts from the manifest allowlist, rejects
+userinfo, literal IPs and explicit ports, rechecks redirects, and caps
+request/response bytes and rate. Production always uses TunnelTransport,
+which resolves the current loopback VPN proxy on each request. Without a
+live proxy, including pure TUN without a local listener, it fails closed.
+A nil transport is used only in tests/development. Allowlisted hosts can
+still turn malicious; an allowlist is not an assessment of their content.
 
-## 9. Residual risks (what we do not claim)
+## 8. Verification and residual risks
 
-1. **Renderer compromise.** Panels run in a WebView. A renderer RCE
-   escapes the permission model entirely; permissions bound a
-   well-behaved panel, not an exploited one. Mitigations: local files
-   only (no remote content), no Node/ffi, WebView kept updated. The
-   24 h token TTL bounds a stolen token's lifetime; it does not prevent
-   theft.
-2. **Routing consent.** routing.rules can bypass or block destinations,
-   including sensitive applications. Explicit dangerous-permission consent
-   is required. It cannot name a server; proxy means the session target.
-   Network hooks remain unapplied.
-3. **Author key compromise.** A leaked author key lets the attacker ship
-   trusted "updates" (version monotonicity does not help). Defenses:
-   TOFU pinning (planned), revocation (needs the key ceremony), user
-   vigilance. There is no silent recovery.
-4. **Offline kill gap** (§7). Stated, not solved.
-5. **Ceremony pending** (§6). Stated, not solved; the owner action is
-   tracked, not hand-waved.
-6. **Allowlist DNS.** `net.fetch` matches DNS names; since pass 1 the
-   request rides the tunnel proxy, so name resolution happens at the
-   engine, not on the local network, but the residual risk that an
-   allowlisted host itself turns malicious remains.
-7. **Unapplied network hooks.** `net.hooks` still has no runtime consumer
-   and is labeled not yet active. Themes, routing and background tasks now
-   have real consumers; see the machine-readable enforcement matrix.
-8. **Worker isolation.** The app's authenticated RunWorker stream delegates
-   its verified registry and granted permissions. JS cannot access the
-   control token or transport. It runs in a fresh process with CPU/memory
-   budgets and cancellation, JSON-only calls, the existing permission map,
-   PanelBridge, and tunnel-bound Fetcher. This protects against resource
-   exhaustion, not a vulnerability in Go/goja or a compromised OS/core.
+Go tests cover worker stream authentication/replacement/cancellation,
+scheduler and kill-switch behavior, JS budgets, tunnel transport, package
+integrity and manifest validation. Fuzz targets cover manifest core fields,
+full background/asset declarations, checksums and URL policy. App tests
+cover store lifecycle, grants, published signatures, revocations, panel
+bridge and declarative assets. CLI schema and TypeScript parity tests keep
+authoring contracts aligned.
 
-## 10. Fuzzing (WS8)
-
-`core/ext/manifest_fuzz_test.go`: `FuzzParseManifest` (malformed JSON,
-deep nesting, truncation, bad UTF-8, unicode lookalikes/RTL/zero-width
-in ids) and `FuzzParseChecksums`. Invariants: no panics; accept ⇒
-re-validates and satisfies the structural rules independently checked.
-Findings and fixes are recorded in the security report
-(`reports/extensions-40/partial-security.md`).
-
-Pass 1 added seeds from real cases (the full v2-runtime manifest, the
-dangerous-permission set, panel-entry attacks: percent-encoded traversal,
-Windows ADS, backslashes) and three more targets:
-`FuzzParseManifestFull` (the v2 half the v1 fuzzer never reaches -
-background/network-hosts/asset pointers/panels gate),
-`FuzzParseRevocationList` (the emergency-brake parser), and
-`FuzzFetchURLPolicy` (the `net.fetch` URL policy: https-only, no
-userinfo, no IP literals, no ports, allowlist, policy checked
-independently, no network issued).
+Remaining risks include WebView renderer vulnerabilities, Go/goja native
+vulnerabilities, author or team key compromise, malicious allowlisted
+hosts, routing consent mistakes and delayed offline revocations. Updating
+a public key requires an app release; pinning does not recover a stolen
+private key. Network hooks remain unapplied.

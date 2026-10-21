@@ -1,8 +1,9 @@
 # Sora extension manifest v1
 
 This document is the normative spec for Sora extensions (feature F10).
-Reference implementation: `core/ext` (Go). The app mirrors it in Dart
-(`app/lib/src/ext`).
+The app owns the extension store and runtime grants (`app/lib/src/ext`).
+`core/ext` provides the worker host and the manifest, package and signing
+functions used by the `sora-ext` authoring CLI.
 
 **Developer guides:** [your first extension in 10
 minutes](extensions-quickstart.md), [`window.soraExt` API
@@ -240,8 +241,8 @@ with `sora-ext sign-file` (see extensions/README.md).
   "not from the catalog" warning.
 - Catalog packages are verified against the catalog-pinned author key, and
   the catalog itself against the team key.
-- The team key is compiled into the app and the core; a catalog or
-  revocation list that does not verify is refused.
+- The app verifies the catalog and revocation list with its compiled team
+  key. It owns the catalog cache, staged rollout and revocation policy.
 - Revocation: removing an entry from the catalog stops new installs, and the
   signed revocation list disables matching installed versions and refuses
   installing, updating, rolling back to or enabling them. An expired list
@@ -250,8 +251,8 @@ with `sora-ext sign-file` (see extensions/README.md).
 ## 7. Background workers & net.fetch (runtime v2)
 
 Manifest version stays `1`: these are additive optional keys parsed by
-`ParseManifestFull` (`core/ext/manifest_v1ext.go`); the frozen v1 decoder is
-untouched.
+`ParseManifestFull` (`core/ext/manifest_v1ext.go`) in the core and CLI,
+and by `ExtManifest.parse` in the app.
 
 ```json
 {
@@ -278,8 +279,16 @@ is rejected.
 - `entry`: the worker script inside the package, a relative `.js` path,
   no traversal.
 
-The app registers enabled, consented workers through an authenticated
-`ExtensionHost.RunWorker` lifecycle stream. The service schedules them with
+The app installs, updates, rolls back, enables and removes extensions,
+validates settings, checks signatures and revocations, and stores grants.
+Panels call its permission-checked `PanelBridge` directly.
+
+The only extension RPC is the bidirectional `ExtensionHost.RunWorker`
+lifecycle stream, authenticated by the app control token and transport.
+The first message carries the verified manifest with granted permissions,
+script source and resolved background configuration; later messages carry
+bridge replies. The core sends bridge calls, bounded logs and run failures.
+It has no extension store and never reads the app registry or cache. The service schedules them with
 `Scheduler.RegisterConfig` and executes each run in a fresh goja process.
 The first run is after the effective interval plus a deterministic stagger
 of up to 59 seconds. No runs overlap; ten consecutive failures stop the task

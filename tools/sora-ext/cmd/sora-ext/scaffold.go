@@ -79,7 +79,7 @@ name.pub (public). Prints the public key line for the manifest.
 		fmt.Print(`Usage:
   sora-ext sign-file --key team.key --role catalog.json|revocations.json <file>
 
-Signs a team document with the trusted comment the app and the core check
+Signs a team document with the trusted comment the app checks
 (timestamp, role and sha256) and writes <file>.minisig next to it.
 `)
 	case "publish":
