@@ -161,10 +161,11 @@ func New(cfg Config) (*Session, error) {
 		log:   cfg.Journal,
 		state: StateDisconnected,
 		status: Status{
-			ChangedAt:  cfg.Now(),
-			KillSwitch: cfg.Settings.KillSwitch,
-			Bypass:     append([]string(nil), cfg.Settings.Bypass...),
-			TunnelMode: cfg.Settings.TunnelMode,
+			ChangedAt:        cfg.Now(),
+			KillSwitch:       cfg.Settings.KillSwitch || cfg.Settings.StrictKillSwitch,
+			StrictKillSwitch: cfg.Settings.StrictKillSwitch,
+			Bypass:           append([]string(nil), cfg.Settings.Bypass...),
+			TunnelMode:       cfg.Settings.TunnelMode,
 		},
 		crashes: newCrashWatch(),
 		done:    make(chan struct{}),
@@ -227,7 +228,17 @@ func (s *Session) Start(ctx context.Context) error {
 	s.mu.Lock()
 	s.guardApplied = true
 	s.mu.Unlock()
-	if err := s.guard.Apply(ctx, s.settings()); err != nil {
+	settings := s.settings()
+	if settings.StrictKillSwitch {
+		endpoints, err := planEndpoints(ctx, s.cfg.Plan)
+		if err != nil {
+			s.fail(err)
+			return err
+		}
+		settings.Endpoints = endpoints
+		s.cfg.Settings.Endpoints = endpoints
+	}
+	if err := s.guard.Apply(ctx, settings); err != nil {
 		wrapped := errs.Wrap(err, errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail)
 		s.fail(wrapped)
 		return wrapped
@@ -371,6 +382,11 @@ func (s *Session) restoreGuard(ctx context.Context) error {
 // prevent rearming after shutdown. Disabling remains allowed after failure
 // because failed sessions retain the block.
 func (s *Session) SetKillSwitch(ctx context.Context, enabled bool) error {
+	return s.SetProtection(ctx, enabled, nil)
+}
+
+// SetProtection also supports releasing a strict block on a failed session.
+func (s *Session) SetProtection(ctx context.Context, enabled bool, strict *bool) error {
 	s.guardMu.Lock()
 	defer s.guardMu.Unlock()
 	s.mu.Lock()
@@ -382,13 +398,33 @@ func (s *Session) SetKillSwitch(ctx context.Context, enabled bool) error {
 	}
 	settings := s.settingsLocked()
 	settings.KillSwitch = enabled
+	if strict != nil {
+		if !*strict && settings.StrictKillSwitch {
+			settings.KillSwitch = false
+		}
+		settings.StrictKillSwitch = *strict
+	}
+	if !enabled {
+		settings.StrictKillSwitch = false
+	}
+	if settings.StrictKillSwitch {
+		settings.KillSwitch = true
+	}
 	s.mu.Unlock()
+	if settings.StrictKillSwitch {
+		var err error
+		settings.Endpoints, err = planEndpoints(ctx, s.cfg.Plan)
+		if err != nil {
+			return err
+		}
+	}
 	if err := s.guard.Apply(ctx, settings); err != nil {
 		return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardFirewallFail)
 	}
 	s.mu.Lock()
 	s.guardApplied = true
-	s.status.KillSwitch = enabled
+	s.status.KillSwitch = settings.KillSwitch
+	s.status.StrictKillSwitch = settings.StrictKillSwitch
 	s.mu.Unlock()
 	return nil
 }
@@ -668,11 +704,15 @@ func (s *Session) settings() Settings {
 func (s *Session) settingsLocked() Settings {
 	fake, _ := netip.ParsePrefix(s.cfg.Plan.DNS.FakeIPRange)
 	return Settings{
-		FakeIPRange: fake,
-		TunNetworks: s.cfg.Plan.Tun.Networks(),
-		KillSwitch:  s.status.KillSwitch,
-		Bypass:      append([]string(nil), s.status.Bypass...),
-		TunnelMode:  s.status.TunnelMode,
+		FakeIPRange:      fake,
+		TunNetworks:      s.cfg.Plan.Tun.Networks(),
+		KillSwitch:       s.status.KillSwitch,
+		StrictKillSwitch: s.status.StrictKillSwitch,
+		Reconnect:        s.cfg.Settings.Reconnect,
+		Endpoints:        s.cfg.Settings.Endpoints,
+		AllowLAN:         s.cfg.Settings.AllowLAN,
+		Bypass:           append([]string(nil), s.status.Bypass...),
+		TunnelMode:       s.status.TunnelMode,
 	}
 }
 
@@ -706,15 +746,16 @@ func (s *Session) setStateLocked(next State, reason errs.Code, key errs.Key, det
 	masked := s.mask(detail)
 	s.state = next
 	s.status = Status{
-		State:      next,
-		SessionID:  s.status.SessionID,
-		Reason:     reason,
-		Key:        key,
-		Detail:     masked,
-		ChangedAt:  s.cfg.Now(),
-		KillSwitch: s.status.KillSwitch,
-		Bypass:     s.status.Bypass,
-		TunnelMode: s.status.TunnelMode,
+		State:            next,
+		SessionID:        s.status.SessionID,
+		Reason:           reason,
+		Key:              key,
+		Detail:           masked,
+		ChangedAt:        s.cfg.Now(),
+		KillSwitch:       s.status.KillSwitch,
+		StrictKillSwitch: s.status.StrictKillSwitch,
+		Bypass:           s.status.Bypass,
+		TunnelMode:       s.status.TunnelMode,
 	}
 	s.log.Append(Event{
 		Kind:   EventState,

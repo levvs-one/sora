@@ -6,6 +6,7 @@ package guard
 import (
 	"context"
 	"net/netip"
+	"reflect"
 	"sync"
 
 	"github.com/levvs-one/sora-client/core/errs"
@@ -53,6 +54,8 @@ type FirewallOptions struct {
 // Options identifies engine listener ports that must stay reachable for tunnel
 // recovery.
 type Options struct {
+	// DataDir holds crash recovery intent with owner-only permissions.
+	DataDir string
 	// EnginePorts are the local ports the kill switch must never block.
 	EnginePorts []uint16
 }
@@ -98,12 +101,26 @@ func (g *Guard) Apply(ctx context.Context, settings session.Settings) error {
 		}
 		f.SetBlockedNetworks(networks)
 	}
-	if settings.KillSwitch && !g.applied.KillSwitch {
+	if g.applied.StrictKillSwitch && !settings.StrictKillSwitch {
+		settings.KillSwitch = false
+	}
+	if settings.StrictKillSwitch {
+		settings.KillSwitch = true
+	}
+	if f, ok := g.firewall.(interface{ SetPolicy(session.Settings) }); ok {
+		f.SetPolicy(settings)
+	}
+	if settings.StrictKillSwitch || g.applied.StrictKillSwitch {
+		if err := g.saveIntent(settings); err != nil {
+			return err
+		}
+	}
+	if settings.KillSwitch && (!g.applied.KillSwitch || !reflect.DeepEqual(settings, g.applied)) {
 		if err := g.firewall.Arm(ctx, g.opts.EnginePorts); err != nil {
 			return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardFirewallFail)
 		}
 	}
-	if !settings.KillSwitch && g.applied.KillSwitch {
+	if !settings.KillSwitch && (g.applied.KillSwitch || g.applied.StrictKillSwitch) {
 		if err := g.firewall.Disarm(ctx); err != nil {
 			return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardFirewallFail)
 		}
@@ -116,6 +133,9 @@ func (g *Guard) Apply(ctx context.Context, settings session.Settings) error {
 func (g *Guard) Restore(ctx context.Context) error {
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	if g.applied.StrictKillSwitch {
+		return nil
+	}
 	g.restoring = true
 	defer func() { g.restoring = false }()
 

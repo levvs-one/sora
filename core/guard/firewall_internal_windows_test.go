@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/tailscale/wf"
+
+	"github.com/levvs-one/sora-client/core/session"
 )
 
 func TestWFPTunnelFiltersAllowInboundReauthorization(t *testing.T) {
@@ -79,5 +81,66 @@ func TestWFPRefusesAnEmptyEnginesDir(t *testing.T) {
 	w = &WFP{enginesDir: "  "}
 	if _, err := w.executables(); err == nil {
 		t.Fatal("a blank enginesDir must fail closed")
+	}
+}
+
+func TestWFPStrictRulesRequireExplicitExemptions(t *testing.T) {
+	for _, reconnect := range []bool{false, true} {
+		policy := session.Settings{StrictKillSwitch: true, Reconnect: reconnect, Endpoints: []netip.AddrPort{netip.MustParseAddrPort("203.0.113.2:443"), netip.MustParseAddrPort("[2001:db8::2]:8443")}}
+		w := &WFP{enginesDir: t.TempDir(), bypass: []netip.Prefix{netip.MustParsePrefix("0.0.0.0/0")}, policy: policy}
+		endpoints, blocks, apps := 0, 0, 0
+		if err := w.rules(func(rule *wf.Rule) error {
+			if rule.Persistent != reconnect {
+				t.Fatal("reboot policy lost")
+			}
+			if rule.Name == "Sora: local network" {
+				t.Fatal("LAN allowed without consent")
+			}
+			if rule.Name == "Sora: VPN endpoint" {
+				endpoints++
+				if len(rule.Conditions) != 2 || rule.Action != wf.ActionPermit {
+					t.Fatal("endpoint is not restricted by address and port")
+				}
+				if !applies(rule.Layer, rule.Conditions) {
+					t.Fatal("endpoint has wrong family")
+				}
+			}
+			if rule.Name == "Sora: everything else" {
+				blocks++
+			}
+			for _, condition := range rule.Conditions {
+				if condition.Field == wf.FieldALEAppID {
+					apps++
+					dnsOnly := false
+					for _, match := range rule.Conditions {
+						if match.Field == wf.FieldIPRemotePort && match.Value == uint16(53) {
+							dnsOnly = true
+						}
+					}
+					if !dnsOnly {
+						t.Fatal("strict mode allowed unrestricted application traffic")
+					}
+				}
+			}
+			return nil
+		}, strictSublayer); err != nil {
+			t.Fatal(err)
+		}
+		if endpoints != 2 || blocks != 2 || apps != 2 {
+			t.Fatalf("endpoints=%d blocks=%d apps=%d", endpoints, blocks, apps)
+		}
+		w.policy.AllowLAN = true
+		lan := 0
+		if err := w.rules(func(rule *wf.Rule) error {
+			if rule.Name == "Sora: local network" {
+				lan++
+			}
+			return nil
+		}, strictSublayer); err != nil {
+			t.Fatal(err)
+		}
+		if lan != len(DefaultBypassNetworks()) {
+			t.Fatal("explicit LAN permission lost")
+		}
 	}
 }

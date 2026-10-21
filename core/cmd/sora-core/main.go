@@ -45,7 +45,7 @@ import (
 
 // Version defines the API contract served by this build. Contract changes must
 // update this value and the generated code together.
-var Version = control.Version{Major: 1, Minor: 11, MinSupportedMinor: 1}
+var Version = control.Version{Major: 1, Minor: 12, MinSupportedMinor: 1}
 
 // Options configures a core instance.
 type Options struct {
@@ -167,6 +167,24 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		return nil, errs.Wrap(err, errs.CodeInternal, errs.KeyEngineStartFailed)
 	}
 
+	firewall, err := guard.PlatformFirewall(guard.FirewallOptions{
+		EngineUID: os.Getuid(), EnginesDir: opts.EnginesDir, Bypass: opts.Bypass,
+	})
+	if err != nil {
+		return nil, err
+	}
+	system, err := guard.New(guard.Options{
+		EnginePorts: []uint16{tunnelPort}, DataDir: opts.DataDir,
+	}, firewall)
+	if err != nil {
+		return nil, err
+	}
+	if !opts.Diagnostic {
+		if err := system.Recover(ctx); err != nil {
+			return nil, err
+		}
+	}
+
 	// The control token persists with owner-only permissions and is printed
 	// only on explicit request.
 	auth, err := control.LoadOrCreateToken(opts.DataDir)
@@ -204,20 +222,6 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		}
 	}
 
-	firewall, err := guard.PlatformFirewall(guard.FirewallOptions{
-		EngineUID: os.Getuid(), EnginesDir: opts.EnginesDir, Bypass: opts.Bypass,
-	})
-	if err != nil {
-		_ = store.Close()
-		return nil, err
-	}
-	system, err := guard.New(guard.Options{
-		EnginePorts: []uint16{tunnelPort},
-	}, firewall)
-	if err != nil {
-		_ = store.Close()
-		return nil, err
-	}
 	redactor := engine.NewRedactor()
 	// Network profiles are auxiliary: a corrupt file disables matching with
 	// a warning instead of failing the core.

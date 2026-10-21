@@ -113,6 +113,10 @@ message ConnectRequest {
   // Since 1.5. Arms the kill switch before the engine starts, so no traffic
   // leaves outside the tunnel between connecting and a later SetKillSwitch.
   bool kill_switch = 6;
+  // Since 1.12. Opt-in, persists a block until explicit disconnect or disable.
+  bool strict_kill_switch = 7;
+  // Reapply after a reboot only when the user intends automatic reconnect.
+  bool reconnect = 8;
 }
 message ConnectResponse { SessionStatus status = 1; SoraError error = 2; }
 message DisconnectRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bytes control_authenticator = 4; }
@@ -253,7 +257,7 @@ message DnsPolicy { repeated string servers = 1; bool block_private = 2; }
 message BypassSettings { bool enabled = 1; repeated string rules = 2; }
 enum TunnelMode { TUNNEL_MODE_UNSPECIFIED = 0; TUNNEL_MODE_SYSTEM = 1; TUNNEL_MODE_APPLICATION = 2; }
 
-message SessionStatus { ConnectionState connection = 1; ApiVersion negotiated_version = 2; }
+message SessionStatus { ConnectionState connection = 1; ApiVersion negotiated_version = 2; bool kill_switch = 3; bool strict_kill_switch = 4; }
 message GetStatsRequest { ApiVersion api_version = 1; string session_id = 2; }
 message GetStatsResponse { StatsTick stats = 1; SoraError error = 2; }
 message ConnectionState { ConnectionStateValue value = 1; string session_id = 2; SoraErrorCode reason = 3; google.protobuf.Timestamp changed_at = 4; google.protobuf.Duration retry_after = 5; }
@@ -384,8 +388,8 @@ message ExportDiagnosticsRequest {
   bytes control_authenticator = 5;
 }
 message ExportDiagnosticsResponse { bytes archive = 1; SoraError error = 2; }
-message SetKillSwitchRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bool enabled = 4; }
-message SetKillSwitchResponse { bool enabled = 1; SoraError error = 2; }
+message SetKillSwitchRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; bool enabled = 4; optional bool strict = 5; }
+message SetKillSwitchResponse { bool enabled = 1; SoraError error = 2; bool strict = 3; }
 message DiagnosticReport { repeated string lines = 1; }
 message HandshakeRequest { ApiVersion client_version = 1; }
 message HandshakeResponse {
