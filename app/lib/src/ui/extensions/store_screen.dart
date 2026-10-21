@@ -40,13 +40,21 @@ class ExtensionsScreen extends StatefulWidget {
 class _ExtensionsScreenState extends State<ExtensionsScreen> {
   late final ExtensionStore _store = ExtensionStore();
   bool _ready = false;
+  bool _failed = false;
 
   @override
   void initState() {
     super.initState();
-    _store.load().then((_) {
-      if (mounted) setState(() => _ready = true);
-    });
+    // An unreadable data directory must end the spinner, not leave it
+    // turning forever.
+    _store.load().then(
+      (_) {
+        if (mounted) setState(() => _ready = true);
+      },
+      onError: (Object _) {
+        if (mounted) setState(() => _failed = true);
+      },
+    );
   }
 
   @override
@@ -74,7 +82,13 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
             onTap: _ready ? () => _installFromUrl(context) : null,
           ),
         ],
-        fill: _ready ? const _ExtensionsBody() : const Center(child: CircularProgressIndicator()),
+        fill: _ready
+            ? const _ExtensionsBody()
+            : _failed
+            ? Center(
+                child: Text(s.extErrGeneric, style: Styles.body.copyWith(color: Palette.of(context).ink2)),
+              )
+            : const Center(child: CircularProgressIndicator()),
         children: const [],
       ),
     );
