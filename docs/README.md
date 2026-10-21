@@ -21,6 +21,7 @@
 - [Расширения: API `window.soraExt`](extensions-api.md) (in English)
 - [Расширения: cookbook](extensions-cookbook.md) (in English)
 - [Расширения: dev-режим](extensions-devmode.md) (in English)
+- [Расширение Anti-DPI: руководство пользователя](extensions/anti-dpi.md) (in English)
 - [Android VpnService: архитектура будущего клиента](android-vpnservice.md)
 - [Политика поэтапного обновления](update-rollout.md)
 

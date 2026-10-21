@@ -7,7 +7,8 @@ Reference implementation: `core/ext` (Go). The app mirrors it in Dart
 **Developer guides:** [your first extension in 10
 minutes](extensions-quickstart.md), [`window.soraExt` API
 reference](extensions-api.md), [cookbook](extensions-cookbook.md), [dev
-mode](extensions-devmode.md). Tooling: `tools/sora-ext` (`sora-ext
+mode](extensions-devmode.md). **Shipped extensions:** [Anti-DPI user
+guide](extensions/anti-dpi.md). Tooling: `tools/sora-ext` (`sora-ext
 scaffold|validate|pack|sign|keygen|publish|dev|serve`).
 
 ## 1. Package layout
