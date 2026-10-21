@@ -109,8 +109,12 @@ export interface SoraBypassLayer {
 export interface SoraBypassLayerState {
   global: SoraBypassStrategy | null;
   bindings: Array<{ match: string; strategy: SoraBypassStrategy }>;
-  /** RFC 3339 UTC timestamp of the last apply. */
-  updated_at: string;
+  /**
+   * RFC 3339 UTC timestamp of the last apply. Optional: a layer that
+   * was never applied has no timestamp, and the host omits the key
+   * entirely (the mock does the same).
+   */
+  updated_at?: string;
 }
 
 /** One desync backend's availability on this host. */
@@ -225,6 +229,13 @@ export type SoraExtErrorCode =
 export interface SoraExtError extends Error {
   /** Stable code — switch on this, not on `message`. */
   code: SoraExtErrorCode;
+  /**
+   * The host's human-readable failure text, when it sent one: for
+   * `invalid-argument` this is the core's own rejection wording (the
+   * bridge carries it next to the code), otherwise a short host
+   * sentence. Safe to show to the user as-is; never parse it.
+   */
+  message: string;
 }
 
 /** Arguments for `notify`. */

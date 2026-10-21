@@ -107,7 +107,10 @@
   // Anti-DPI bypass layer, held in memory like the real host's layer:
   // applyBypassLayer replaces it wholesale, getBypassLayer reads it back.
   var bypassLayer = { global: null, bindings: [] };
-  var bypassUpdatedAt = new Date(0).toISOString();
+  // Null until the first applyBypassLayer: like the real host, an
+  // untouched layer's state omits updated_at entirely (the key is
+  // optional in sora-ext.d.ts SoraBypassLayerState).
+  var bypassUpdatedAt = null;
   var listeners = [];
 
   function logCall(method, args, outcome) {
@@ -208,11 +211,12 @@
       case 'getBypassLayer': {
         var layerDenied = check('bypass.read');
         if (layerDenied) return layerDenied.then(null, function (e) { logCall(method, args, 'denied:' + e.code); throw e; });
-        p = Promise.resolve(JSON.parse(JSON.stringify({
+        var layerState = {
           global: bypassLayer.global,
           bindings: bypassLayer.bindings,
-          updated_at: bypassUpdatedAt,
-        })));
+        };
+        if (bypassUpdatedAt !== null) layerState.updated_at = bypassUpdatedAt;
+        p = Promise.resolve(JSON.parse(JSON.stringify(layerState)));
         break;
       }
       case 'applyBypassLayer': {
@@ -237,22 +241,47 @@
         if (tuneDenied) return tuneDenied.then(null, function (e) { logCall(method, args, 'denied:' + e.code); throw e; });
         // A mock winner, labelled as one: the real tuner probes the
         // core's canary endpoints; the mock never touches the network.
+        // The strategy is the FULL 29-field shape the real host returns
+        // (bypassStrategyToJson) and a combination core validation
+        // accepts: a clean nfqws fake profile (the registry's
+        // sni_block/fake-autottl-badseq). An earlier mock shape mixed
+        // the tpws-only `disorder` flag with desync methods — a mix
+        // the core (and the panel's mirrored validator) rejects.
         p = Promise.resolve({
           winner_id: 'mock/d/fake:fake',
           winner_describe: 'MOCK winner from sora-ext serve — not a real tuning result',
           score: 1,
           attempts: 1,
           strategy: {
-            split_pos: ['1', 'midsld'],
-            disorder: true,
+            split_pos: ['2'],
+            disorder: false,
             oob: false,
             tls_record: '',
-            host_case: true,
+            host_case: false,
+            domain_case: false,
+            method_eol: false,
+            disorder_scope: '',
+            oob_scope: '',
+            host_dot: false,
+            host_tab: false,
+            host_no_space: false,
+            method_space: false,
+            unix_eol: false,
+            split_any_protocol: false,
+            tamper_start: '',
+            tamper_cutoff: '',
+            oob_data: '',
+            mss: '',
             desync: ['fake'],
             fake_tls: 'tls',
+            fake_quic: '',
+            fooling: 'badseq',
             ttl: 0,
-            auto_ttl: false,
+            auto_ttl: true,
             repeats: 0,
+            filter_tcp: '80,443',
+            filter_udp: '',
+            filter_l7: 'tls',
           },
         });
         break;
