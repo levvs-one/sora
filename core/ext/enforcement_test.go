@@ -52,6 +52,16 @@ func TestEnforcementRPCClaimsMatchHost(t *testing.T) {
 		"GetConnections": "connections.read",
 		"GetServers":     "servers.read",
 		"Notify":         "notifications",
+		// Anti-DPI bypass RPCs (M3): the matrix's bypass rows claim
+		// enforcement at exactly these gates — reads under
+		// bypass.read, the layer write under bypass.write, the tuner
+		// under bypass.tune.
+		"GetBypassCapabilities": "bypass.read",
+		"GetBypassState":        "bypass.read",
+		"GetBypassLayer":        "bypass.read",
+		"WatchBypassEvents":     "bypass.read",
+		"ApplyBypassLayer":      "bypass.write",
+		"TuneDesync":            "bypass.tune",
 	}
 	for rpc, perm := range want {
 		if got := rpcPermissions[rpc]; got != perm {

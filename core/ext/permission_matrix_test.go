@@ -19,14 +19,37 @@ func TestRpcPermissionsCoverRegistry(t *testing.T) {
 			t.Errorf("rpcPermissions[%q] = %q: not a known permission", rpc, perm)
 		}
 	}
-	// The extension-served RPCs must all be present: an RPC missing from
-	// the closed map is denied, which would be a silent outage, not a
+	// The extension-served RPCs must all be present, each demanding
+	// exactly its intended permission: an RPC missing from the closed
+	// map is denied, which would be a silent outage, not a
 	// vulnerability — but the test pins the intended shape either way.
+	// All ten RPCs are listed (M3): the four original ones plus the six
+	// Anti-DPI bypass RPCs of contract 1.14.
 	// MintToken/RevokeToken are app-only (control-token gated) and are
 	// correctly absent from the extension-token map.
-	for _, m := range []string{"GetConnections", "GetServers", "Notify", "WatchExtensionEvents"} {
-		if _, ok := rpcPermissions[m]; !ok {
+	want := map[string]string{
+		"GetConnections":        "connections.read",
+		"GetServers":            "servers.read",
+		"Notify":                "notifications",
+		"WatchExtensionEvents":  "",
+		"GetBypassCapabilities": "bypass.read",
+		"GetBypassState":        "bypass.read",
+		"GetBypassLayer":        "bypass.read",
+		"WatchBypassEvents":     "bypass.read",
+		"ApplyBypassLayer":      "bypass.write",
+		"TuneDesync":            "bypass.tune",
+	}
+	if len(rpcPermissions) != len(want) {
+		t.Errorf("rpcPermissions has %d entries, want exactly the %d served extension RPCs", len(rpcPermissions), len(want))
+	}
+	for m, perm := range want {
+		got, ok := rpcPermissions[m]
+		if !ok {
 			t.Errorf("served RPC %q is missing from rpcPermissions", m)
+			continue
+		}
+		if got != perm {
+			t.Errorf("rpcPermissions[%q] = %q, want %q", m, got, perm)
 		}
 	}
 	for _, m := range []string{"MintToken", "RevokeToken"} {
