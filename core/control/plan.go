@@ -122,6 +122,51 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 			amnezia = string(raw)
 		}
 	}
+	// OpenLibre (olcrtc): the whole server definition rides the
+	// document — provider, room, transport and every transport
+	// parameter of the link — because the proto contract carries
+	// only a room-shaped endpoint and the key (as "password"). Without
+	// this block an imported olcrtc server lost everything but the
+	// room and the key at the first restart (IMPORT.md blocker).
+	var olcProvider, olcRoom, olcTransport, olcChannel, olcAuthToken, olcMode, olcParams, olcMeta string
+	if strings.EqualFold(spec.Protocol, "olcrtc") {
+		olcProvider = spec.Options["olcrtc_provider"]
+		olcRoom = spec.Options["olcrtc_room"]
+		if olcRoom == "" {
+			olcRoom = spec.Host
+		}
+		olcTransport = spec.Transport
+		olcChannel = spec.Options["olcrtc_channel"]
+		olcAuthToken = spec.Options["olcrtc_auth_token"]
+		olcMode = spec.Options["olcrtc_mode"]
+		params := map[string]string{}
+		meta := map[string]string{}
+		for k, v := range spec.Options {
+			switch {
+			case k == "olcrtc_provider" || k == "olcrtc_room" || k == "olcrtc_channel" ||
+				k == "olcrtc_auth_token" || k == "olcrtc_mode":
+				// Carried by their own document fields above.
+			case strings.HasPrefix(k, "olcrtc_meta_"):
+				meta[strings.TrimPrefix(k, "olcrtc_meta_")] = v
+			default:
+				params[k] = v
+			}
+		}
+		if len(params) > 0 {
+			raw, err := json.Marshal(params)
+			if err != nil {
+				return nil, errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
+			}
+			olcParams = string(raw)
+		}
+		if len(meta) > 0 {
+			raw, err := json.Marshal(meta)
+			if err != nil {
+				return nil, errs.Wrap(err, errs.CodeInternal, errs.KeySecretStoreUnavailable)
+			}
+			olcMeta = string(raw)
+		}
+	}
 	insecure := ""
 	if spec.AllowInsecure {
 		insecure = "1"
@@ -169,6 +214,15 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 	doc.field("mode", spec.Mode)
 	doc.field("obfs", spec.Options["obfs"])
 	doc.field("obfs_param", obfsParam)
+	// OpenLibre fields, in the same sorted order (see above).
+	doc.field("olcrtc_auth_token", olcAuthToken)
+	doc.field("olcrtc_channel", olcChannel)
+	doc.field("olcrtc_meta", olcMeta)
+	doc.field("olcrtc_mode", olcMode)
+	doc.field("olcrtc_params", olcParams)
+	doc.field("olcrtc_provider", olcProvider)
+	doc.field("olcrtc_room", olcRoom)
+	doc.field("olcrtc_transport", olcTransport)
 	doc.field("password", spec.Password)
 	doc.field("path", spec.Path)
 	doc.field("peers", peers)
@@ -718,6 +772,23 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 				"control: outbound %q: %v", id, err)
 		}
 	}
+	if outbound.Protocol == engine.ProtocolOLCRTC {
+		// Normalize the contract spelling into the engine's shape,
+		// mirroring the WireGuard normalization above: the proto
+		// transport carries the olcrtc transport name (datachannel,
+		// ...), which is not a stream transport, and the proto
+		// security "olc2" names the OLC2 record layer, not TLS. The
+		// credential document, when one was resolved, has already
+		// filled Olcrtc from its authoritative fields; otherwise the
+		// proto fields alone define the (credential-less) config.
+		if outbound.Olcrtc == nil {
+			outbound.Olcrtc = &engine.OlcrtcConfig{Transport: outbound.Transport.Type, Room: outbound.Server}
+		}
+		outbound.Transport.Type = ""
+		outbound.TLS = engine.TLS{}
+		outbound.Server = outbound.Olcrtc.Room
+		outbound.Port = 0
+	}
 	// S2 auto-vision: VLESS + TCP + REALITY/TLS with an empty flow
 	// gets xtls-rprx-vision here, at plan level, instead of passing the
 	// empty flow through. Trojan is excluded: no engine honours a vision
@@ -838,6 +909,35 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 			return err
 		}
 		outbound.Amnezia = awg
+	}
+	// OpenLibre: the document is authoritative for the olcrtc
+	// configuration (the proto endpoint carries only the room). A
+	// document without olcrtc fields leaves the outbound untouched,
+	// so non-olcrtc servers restore exactly as before.
+	if values["olcrtc_provider"] != "" || values["olcrtc_transport"] != "" || values["olcrtc_params"] != "" {
+		cfg := &engine.OlcrtcConfig{
+			Provider:  values["olcrtc_provider"],
+			Transport: values["olcrtc_transport"],
+			Room:      values["olcrtc_room"],
+			Channel:   values["olcrtc_channel"],
+			AuthToken: values["olcrtc_auth_token"],
+			Mode:      values["olcrtc_mode"],
+		}
+		if cfg.Room == "" {
+			cfg.Room = outbound.Server
+		}
+		if cfg.Transport == "" {
+			cfg.Transport = outbound.Transport.Type
+		}
+		if raw := values["olcrtc_params"]; raw != "" {
+			// Fail closed like the WireGuard peers above: a broken
+			// parameter document must not silently become a
+			// default-tuned tunnel.
+			if err := json.Unmarshal([]byte(raw), &cfg.Params); err != nil {
+				return fmt.Errorf("invalid olcrtc parameters: %w", err)
+			}
+		}
+		outbound.Olcrtc = cfg
 	}
 	return nil
 }
