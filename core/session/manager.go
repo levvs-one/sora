@@ -156,7 +156,7 @@ func (m *Manager) buildSession(ctx context.Context, plan *engine.Plan, settings 
 		if closeErr := built.Close(); closeErr != nil {
 			err = errors.Join(err, closeErr)
 		}
-		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+		return nil, validationErr(err)
 	}
 	if err := ctx.Err(); err != nil {
 		if closeErr := built.Close(); closeErr != nil {

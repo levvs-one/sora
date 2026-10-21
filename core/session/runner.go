@@ -149,6 +149,26 @@ type Session struct {
 	deadAt time.Time
 }
 
+// validationErr classifies a plan or engine validation failure for
+// the caller. A failure that already carries a catalog key — an
+// engine gate such as the olcrtc connect rules, whose keys clients
+// localize — keeps that key and code: wrapping it in the generic
+// outbounds key would demote the specific, localized refusal to a
+// substring of the generic error's detail, which is where the
+// olcrtc keys used to live (INTEROP.md). Only an unclassified
+// failure — the plain joined errors of plan validation, a stub
+// engine's bare refusal — becomes the generic outbounds key. The
+// engine factory's catalog errors pass through buildSession
+// unwrapped for the same reason; this is that convention applied
+// to validation.
+func validationErr(err error) error {
+	var catalogErr *errs.Error
+	if errors.As(err, &catalogErr) {
+		return err
+	}
+	return errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+}
+
 // New constructs a stopped session. Start changes the system after plan
 // validation and engine construction.
 func New(cfg Config) (*Session, error) {
@@ -180,7 +200,7 @@ func New(cfg Config) (*Session, error) {
 		cfg.Now = time.Now
 	}
 	if err := cfg.Plan.Validate(); err != nil {
-		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+		return nil, validationErr(err)
 	}
 	return &Session{
 		cfg:   cfg,
@@ -260,7 +280,7 @@ func (s *Session) Start(ctx context.Context) error {
 	s.mu.Unlock()
 
 	if err := s.eng.Validate(ctx, s.cfg.Plan); err != nil {
-		wrapped := errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+		wrapped := validationErr(err)
 		s.fail(wrapped)
 		return wrapped
 	}

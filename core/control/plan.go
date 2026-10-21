@@ -21,6 +21,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/engine/bypass"
+	"github.com/levvs-one/sora-client/core/engine/olcwrap"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	"github.com/levvs-one/sora-client/core/parser"
@@ -485,6 +486,28 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 		probe := engine.Outbound{ID: o.ID, Protocol: engine.ProtocolBypass, Bypass: o.Bypass}
 		if err := probe.Validate(); err != nil {
 			return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanBypassStrategyInvalid)
+		}
+	}
+	// The OpenLibre connect gates get the same treatment, for the
+	// same reason: they are checked on their own before the
+	// plan-wide validation below, because that validation joins
+	// every failure into one error and the wrap below (or the
+	// session layer's outbounds wrap) would leave the gate's
+	// specific, localized key visible only inside the generic
+	// error's detail — a live Connect answered token_required
+	// plans with the generic outbounds key (INTEROP.md).
+	// ValidateConnect can fail for nothing but an olcrtc reason and
+	// already carries the catalog key and code of the refusal, so
+	// its error returns unwrapped, exactly as the engine factory's
+	// catalog errors pass through the session layer. The gates do
+	// not read the resolver, so ConfigFromOutbound needs none here;
+	// the wrapper re-checks them at Apply regardless.
+	for _, o := range plan.Outbounds {
+		if o.Protocol != engine.ProtocolOLCRTC {
+			continue
+		}
+		if err := olcwrap.ValidateConnect(olcwrap.ConfigFromOutbound(o, "")); err != nil {
+			return nil, err
 		}
 	}
 	if err := plan.Validate(); err != nil {
