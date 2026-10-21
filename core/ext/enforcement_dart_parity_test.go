@@ -38,7 +38,7 @@ func TestEnforcementDartMirrorMatches(t *testing.T) {
 	for _, m := range matches {
 		rows = append(rows, [2]string{m[1], m[2]})
 	}
-	table := EnforcementTable()
+	table := enforcementTable
 	if len(rows) != len(table) {
 		t.Fatalf("Dart mirror has %d rows, Go table has %d", len(rows), len(table))
 	}
@@ -48,7 +48,7 @@ func TestEnforcementDartMirrorMatches(t *testing.T) {
 			continue
 		}
 		if want := dartStatus[row.Status]; rows[i][1] != want {
-			t.Errorf("%q: Dart status %s, Go status %s maps to %s", row.ID, rows[i][1], row.Status, want)
+			t.Errorf("%q: Dart status %v, Go status %v maps to %v", row.ID, rows[i][1], row.Status, want)
 		}
 	}
 	// The net.hooks row must stay unimplemented in the mirror

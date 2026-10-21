@@ -20,8 +20,8 @@ type workerLease struct {
 	done   chan struct{}
 }
 
-// RunWorker uses the app's verified registry, not the separate service-owned
-// registry. The control token and transport authenticate this delegation.
+// RunWorker uses the app's verified registry. The control token and
+// transport authenticate this delegation.
 // No manifest, source, token or arbitrary native callback is exposed to JS.
 func (h *Host) RunWorker(stream extv1.ExtensionHost_RunWorkerServer) error {
 	first, err := stream.Recv()
@@ -157,8 +157,8 @@ func (h *Host) RunWorker(stream extv1.ExtensionHost_RunWorkerServer) error {
 	}
 }
 
-// The same permission registry as Host.check gates every core-side worker
-// call, followed by PanelBridge for the app-owned settings and notifications.
+// Worker calls are permission-checked before forwarding to PanelBridge,
+// which checks the app-owned grants and handles settings and notifications.
 func workerBridgeCall(ctx context.Context, m *Manifest, env *WorkerEnv, raw json.RawMessage, forward func() (json.RawMessage, error)) (json.RawMessage, error) {
 	var msg struct {
 		ID     any             `json:"id"`
@@ -204,8 +204,8 @@ func workerBridgeCall(ctx context.Context, m *Manifest, env *WorkerEnv, raw json
 		}
 		return reply(map[string]any{"status": response.Status, "headers": response.Headers, "body": string(response.Body)}, "")
 	case "getConnections", "getServers", "notify":
-		rpc := map[string]string{"getConnections": "GetConnections", "getServers": "GetServers", "notify": "Notify"}[msg.Method]
-		if !hasPermission(m, rpcPermissions[rpc]) {
+		permission := map[string]string{"getConnections": "connections.read", "getServers": "servers.read", "notify": "notifications"}[msg.Method]
+		if !hasPermission(m, permission) {
 			env.log.Append(LogWarn, msg.Method+" DENIED: permission not granted")
 			return reply(nil, "permission-denied")
 		}

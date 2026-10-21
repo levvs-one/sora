@@ -60,25 +60,3 @@ func LookupPermission(id string) (Permission, bool) {
 	p, ok := permissionIndex[id]
 	return p, ok
 }
-
-// DiffPermissions splits wanted into added and removed relative to granted,
-// so an update that widens permissions can re-prompt the user.
-func DiffPermissions(granted, wanted []string) (added, removed []string) {
-	have := make(map[string]bool, len(granted))
-	for _, p := range granted {
-		have[p] = true
-	}
-	want := make(map[string]bool, len(wanted))
-	for _, p := range wanted {
-		want[p] = true
-		if !have[p] {
-			added = append(added, p)
-		}
-	}
-	for _, p := range granted {
-		if !want[p] {
-			removed = append(removed, p)
-		}
-	}
-	return added, removed
-}

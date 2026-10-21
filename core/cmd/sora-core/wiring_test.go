@@ -70,10 +70,13 @@ func TestAllProtoServicesMounted(t *testing.T) {
 	}
 	gs := grpc.NewServer()
 	t.Cleanup(gs.Stop)
-	if err := mountControlServices(gs, plane, dir); err != nil {
-		t.Fatalf("mountControlServices: %v", err)
-	}
+	mountControlServices(gs, plane)
 	info := gs.GetServiceInfo()
+	extMethods := info["sora.ext.v1.ExtensionHost"].Methods
+	if len(extMethods) != 1 || extMethods[0].Name != "RunWorker" ||
+		!extMethods[0].IsClientStream || !extMethods[0].IsServerStream {
+		t.Fatalf("extension service must expose only bidirectional RunWorker: %+v", extMethods)
+	}
 	got := make([]string, 0, len(info))
 	for name, svc := range info {
 		got = append(got, name)

@@ -33,7 +33,7 @@ func TestScaffoldKeepsSigningKeyOutOfPackage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	manifest, err := ext.ParseManifest(files["sora-extension.json"])
+	manifest, _, err := ext.ParseManifestFull(files["sora-extension.json"])
 	if err != nil {
 		t.Fatal(err)
 	}

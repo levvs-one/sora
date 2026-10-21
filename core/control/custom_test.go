@@ -461,39 +461,6 @@ func TestCustomServerChangeBroadcastsToSubscriptionWatchers(t *testing.T) {
 	}
 }
 
-func TestExtHostListServersIncludesCustomsOnce(t *testing.T) {
-	srv, token := customTestPlane(t)
-	injectSubscription(t, srv, "sub1",
-		&corev1.OutboundSpec{Id: "sub-server-1", DisplayName: "Sub"})
-	injectSubscription(t, srv, "sub2",
-		&corev1.OutboundSpec{Id: "sub-server-2", DisplayName: "Sub2"})
-	c := customImpl(t, srv)
-	id := saveCustomForHook(t, c, token, "Home")
-
-	servers, err := srv.ExtHostDeps().ListServers(context.Background())
-	if err != nil {
-		t.Fatalf("ListServers: %v", err)
-	}
-	// Two subscription servers plus the custom one, each exactly once
-	// (the custom server reaches ListServers through the merged states,
-	// once per subscription, so dedup matters).
-	if len(servers) != 3 {
-		t.Fatalf("servers = %d, want 3: %+v", len(servers), servers)
-	}
-	seen := map[string]int{}
-	for _, s := range servers {
-		seen[s.ID]++
-		if s.ID == "custom/"+id && s.Name != "Home" {
-			t.Errorf("custom server name = %q, want Home", s.Name)
-		}
-	}
-	for sid, n := range seen {
-		if n != 1 {
-			t.Errorf("server %q listed %d times", sid, n)
-		}
-	}
-}
-
 // TestCustomCredentialsBuildAConnectablePlan pins the contract between the
 // client form and the planner: only a credential document is accepted, and
 // what is stored comes back as engine credentials at connect time.

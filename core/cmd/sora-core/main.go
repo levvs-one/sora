@@ -311,9 +311,7 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		// exhaustion. Active streams are not idle.
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 10 * time.Minute}),
 	)
-	if err := mountControlServices(app.server, plane, opts.DataDir); err != nil {
-		return nil, err
-	}
+	mountControlServices(app.server, plane)
 	extSched.SetFetchTransport(plane.ExtFetchTransport())
 	app.extSched = extSched
 	built = true
@@ -502,7 +500,7 @@ func portOf(address string) (uint16, error) {
 	return uint16(port), err
 }
 
-func mountControlServices(server *grpc.Server, plane *control.Server, dataDir string) error {
+func mountControlServices(server *grpc.Server, plane *control.Server) {
 	corev1.RegisterCoreControlServer(server, plane)
 	// User-added servers (SW7): shares the control socket and its auth
 	// interceptors; every RPC additionally checks the API version and the
@@ -512,36 +510,6 @@ func mountControlServices(server *grpc.Server, plane *control.Server, dataDir st
 	// service shares the socket's auth interceptors, so only control peers
 	// reach it; the handler additionally checks the control authenticator.
 	leakv1.RegisterLeakServiceServer(server, plane)
-	// Extensions: the host service shares the control socket and its auth
-	// interceptors, so only control peers reach it; per-extension tokens
-	// and permission scopes are enforced inside the host.
-	extStore, err := ext.OpenStore(filepath.Join(dataDir, "extensions"))
-	if err != nil {
-		return err
-	}
-	// GrantedPermissions closes the mint hole: without it Host.MintToken
-	// trusts the app's permission list, so a confused control plane could
-	// mint tokens for disabled extensions or with ungranted permissions.
-	// With it, the core mints only for installed+enabled extensions and
-	// only within the user-granted set.
-	extDeps := plane.ExtHostDeps()
-	extDeps.GrantedPermissions = func(id string) ([]string, bool) {
-		inst, ok := extStore.Get(id)
-		if !ok || !inst.Enabled {
-			return nil, false
-		}
-		return inst.Granted, true
-	}
-	extv1.RegisterExtensionHostServer(server, ext.NewHost(extStore.Issuer(), extDeps))
-	// Arm revocation enforcement from the on-disk cache of the last
-	// signature-verified list, so a kill order received in an earlier run
-	// keeps applying offline and across restarts (see ext.RevocationCache).
-	// Best-effort: no cache is the documented policy state (installs
-	// proceed), and a cache problem must not brick core startup.
-	if rc, err := ext.NewRevocationCache(filepath.Join(dataDir, "extensions")); err == nil {
-		if l, ok := rc.Load(); ok {
-			ext.ApplyToStore(extStore, l)
-		}
-	}
-	return nil
+	// The authenticated app supplies verified workers from its own store.
+	extv1.RegisterExtensionHostServer(server, ext.NewHost(plane.ExtHostDeps()))
 }

@@ -148,7 +148,7 @@ type FetchStats struct {
 }
 
 // Fetcher is a per-extension HTTP client bound to that extension's
-// network_hosts allowlist. Use NewFetcherForExtension.
+// network_hosts allowlist. Use NewFetcherForExtensionWithTransport.
 //
 // The permission is enforced at construction: a Fetcher is only built for
 // an extension that holds "net.fetch", and a nil Fetcher fails closed in
@@ -176,22 +176,9 @@ type Fetcher struct {
 	statBytesIn  atomic.Uint64
 }
 
-// NewFetcherForExtension builds the fetcher for one extension from its
-// validated v2 manifest fields. x may carry an empty allowlist: every
-// request is then denied (logged), which is the safe default.
-//
-// The transport dials direct. Production code must use
-// NewFetcherForExtensionWithTransport with a tunnel-bound transport (see
-// below); direct dials bypass the VPN.
-func NewFetcherForExtension(extID string, x *ManifestExt, limits FetchLimits, hub *LogHub) (*Fetcher, error) {
-	return NewFetcherForExtensionWithTransport(extID, x, limits, nil, hub)
-}
-
-// NewFetcherForExtensionWithTransport is NewFetcherForExtension with an
-// explicit HTTP transport. rt carries the request end to end: pass a
-// transport bound to the core's tunnel (local proxy / SOCKS5 dialer) so
-// extension traffic follows the VPN and never leaks direct. A nil rt
-// selects direct dials (tests and dev only).
+// NewFetcherForExtensionWithTransport binds the manifest allowlist to an HTTP
+// transport. Production passes a tunnel-bound transport; nil selects the
+// default transport for tests and development only.
 func NewFetcherForExtensionWithTransport(extID string, x *ManifestExt, limits FetchLimits, rt http.RoundTripper, hub *LogHub) (*Fetcher, error) {
 	if strings.TrimSpace(extID) == "" {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyNetFetchDenied, "ext: net.fetch needs an extension id")

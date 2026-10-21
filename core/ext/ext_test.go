@@ -111,13 +111,13 @@ func buildPackageWithSeed(t *testing.T, m *Manifest, seed []byte, extra map[stri
 func TestManifestValid(t *testing.T) {
 	m := testManifest(t)
 	raw, _ := json.Marshal(m)
-	if _, err := ParseManifest(raw); err != nil {
+	if _, _, err := ParseManifestFull(raw); err != nil {
 		t.Fatalf("valid manifest rejected: %v", err)
 	}
 	// Hyphens inside labels are legal reverse-DNS.
 	m.ID = "org.sora.hello-panel"
 	raw, _ = json.Marshal(m)
-	if _, err := ParseManifest(raw); err != nil {
+	if _, _, err := ParseManifestFull(raw); err != nil {
 		t.Fatalf("hyphenated id rejected: %v", err)
 	}
 }
@@ -158,7 +158,7 @@ func TestManifestRejects(t *testing.T) {
 			m.Author = base.Author
 			tc.mutate(&m)
 			raw, _ := json.Marshal(m)
-			if _, err := ParseManifest(raw); err == nil {
+			if _, _, err := ParseManifestFull(raw); err == nil {
 				t.Fatalf("expected rejection for %s", tc.name)
 			}
 		})
@@ -174,7 +174,7 @@ func TestManifestWithoutPanelsNeedsNoUiPermission(t *testing.T) {
 	m.Permissions = []string{"connections.read"}
 	m.Capabilities = []string{}
 	raw, _ := json.Marshal(m)
-	if _, err := ParseManifest(raw); err != nil {
+	if _, _, err := ParseManifestFull(raw); err != nil {
 		t.Fatalf("a panel-less manifest must not need ui.panel: %v", err)
 	}
 }
@@ -188,7 +188,7 @@ func TestManifestUnknownFieldsRejected(t *testing.T) {
 	}
 	obj["future_field"] = true
 	raw2, _ := json.Marshal(obj)
-	if _, err := ParseManifest(raw2); err == nil {
+	if _, _, err := ParseManifestFull(raw2); err == nil {
 		t.Fatal("unknown manifest fields must be rejected")
 	}
 }
@@ -224,19 +224,6 @@ func TestSignTamperFails(t *testing.T) {
 	otherLine := base64.StdEncoding.EncodeToString(append(raw, pub...))
 	if err := VerifyPayload(otherLine, sig, sigFileChecksums, payload); err == nil {
 		t.Fatal("wrong key must fail verification")
-	}
-}
-
-func TestTeamSignatureFailsClosed(t *testing.T) {
-	if SigningConfigured() {
-		t.Skip("team key is configured; placeholder test not applicable")
-	}
-	sig, err := SignPayload(testPrivateKey(testSeed), "test", sigFileCatalog, 1700000000, []byte("{}"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := VerifyCatalogSignature(sig, []byte("{}")); err == nil {
-		t.Fatal("team signature check must fail closed while the key is a placeholder")
 	}
 }
 

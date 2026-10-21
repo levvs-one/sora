@@ -19,47 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ExtensionHost_RunWorker_FullMethodName            = "/sora.ext.v1.ExtensionHost/RunWorker"
-	ExtensionHost_MintToken_FullMethodName            = "/sora.ext.v1.ExtensionHost/MintToken"
-	ExtensionHost_RevokeToken_FullMethodName          = "/sora.ext.v1.ExtensionHost/RevokeToken"
-	ExtensionHost_GetConnections_FullMethodName       = "/sora.ext.v1.ExtensionHost/GetConnections"
-	ExtensionHost_GetServers_FullMethodName           = "/sora.ext.v1.ExtensionHost/GetServers"
-	ExtensionHost_Notify_FullMethodName               = "/sora.ext.v1.ExtensionHost/Notify"
-	ExtensionHost_WatchExtensionEvents_FullMethodName = "/sora.ext.v1.ExtensionHost/WatchExtensionEvents"
+	ExtensionHost_RunWorker_FullMethodName = "/sora.ext.v1.ExtensionHost/RunWorker"
 )
 
 // ExtensionHostClient is the client API for ExtensionHost service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ExtensionHost is the core-side API for installed extensions. Since 1.10.
-//
-// Panels run in a WebView inside the app and talk to the app over a JS
-// bridge. The app forwards the calls an extension is permitted to make to
-// this service. Every extension call carries a per-extension token minted by
-// MintToken; the token is scoped to the extension's granted permissions, so a
-// compromised or malicious panel cannot reach APIs it was not granted.
-//
-// MintToken and RevokeToken are app-only: they require the core control
-// token, exactly like Connect and Disconnect on CoreControl.
+// ExtensionHost runs workers for the app, which owns extension installation,
+// signature verification, grants, settings and revocation enforcement.
+// The control token and transport authenticate the app's delegation.
 type ExtensionHostClient interface {
-	// App-owned lifecycle stream. Closing it unregisters and cancels the worker.
-	// Only the authenticated control app supplies verified source and grants.
+	// Closing the app-owned lifecycle stream unregisters and cancels the worker.
 	RunWorker(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[WorkerClientMessage, WorkerHostMessage], error)
-	// MintToken issues a scoped token for an enabled extension. App only.
-	MintToken(ctx context.Context, in *MintTokenRequest, opts ...grpc.CallOption) (*MintTokenResponse, error)
-	// RevokeToken invalidates a previously minted token. App only.
-	RevokeToken(ctx context.Context, in *RevokeTokenRequest, opts ...grpc.CallOption) (*RevokeTokenResponse, error)
-	// GetConnections needs the "connections.read" permission.
-	GetConnections(ctx context.Context, in *GetConnectionsRequest, opts ...grpc.CallOption) (*GetConnectionsResponse, error)
-	// GetServers needs the "servers.read" permission.
-	GetServers(ctx context.Context, in *GetServersRequest, opts ...grpc.CallOption) (*GetServersResponse, error)
-	// Notify needs the "notifications" permission.
-	Notify(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*NotifyResponse, error)
-	// WatchExtensionEvents streams lifecycle and network events. It needs no
-	// extra permission beyond a valid token: every enabled extension may know
-	// whether the session is up.
-	WatchExtensionEvents(ctx context.Context, in *WatchExtensionEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ExtensionEvent], error)
 }
 
 type extensionHostClient struct {
@@ -83,107 +55,16 @@ func (c *extensionHostClient) RunWorker(ctx context.Context, opts ...grpc.CallOp
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ExtensionHost_RunWorkerClient = grpc.BidiStreamingClient[WorkerClientMessage, WorkerHostMessage]
 
-func (c *extensionHostClient) MintToken(ctx context.Context, in *MintTokenRequest, opts ...grpc.CallOption) (*MintTokenResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MintTokenResponse)
-	err := c.cc.Invoke(ctx, ExtensionHost_MintToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *extensionHostClient) RevokeToken(ctx context.Context, in *RevokeTokenRequest, opts ...grpc.CallOption) (*RevokeTokenResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RevokeTokenResponse)
-	err := c.cc.Invoke(ctx, ExtensionHost_RevokeToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *extensionHostClient) GetConnections(ctx context.Context, in *GetConnectionsRequest, opts ...grpc.CallOption) (*GetConnectionsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetConnectionsResponse)
-	err := c.cc.Invoke(ctx, ExtensionHost_GetConnections_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *extensionHostClient) GetServers(ctx context.Context, in *GetServersRequest, opts ...grpc.CallOption) (*GetServersResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetServersResponse)
-	err := c.cc.Invoke(ctx, ExtensionHost_GetServers_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *extensionHostClient) Notify(ctx context.Context, in *NotifyRequest, opts ...grpc.CallOption) (*NotifyResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(NotifyResponse)
-	err := c.cc.Invoke(ctx, ExtensionHost_Notify_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *extensionHostClient) WatchExtensionEvents(ctx context.Context, in *WatchExtensionEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ExtensionEvent], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ExtensionHost_ServiceDesc.Streams[1], ExtensionHost_WatchExtensionEvents_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[WatchExtensionEventsRequest, ExtensionEvent]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type ExtensionHost_WatchExtensionEventsClient = grpc.ServerStreamingClient[ExtensionEvent]
-
 // ExtensionHostServer is the server API for ExtensionHost service.
 // All implementations must embed UnimplementedExtensionHostServer
 // for forward compatibility.
 //
-// ExtensionHost is the core-side API for installed extensions. Since 1.10.
-//
-// Panels run in a WebView inside the app and talk to the app over a JS
-// bridge. The app forwards the calls an extension is permitted to make to
-// this service. Every extension call carries a per-extension token minted by
-// MintToken; the token is scoped to the extension's granted permissions, so a
-// compromised or malicious panel cannot reach APIs it was not granted.
-//
-// MintToken and RevokeToken are app-only: they require the core control
-// token, exactly like Connect and Disconnect on CoreControl.
+// ExtensionHost runs workers for the app, which owns extension installation,
+// signature verification, grants, settings and revocation enforcement.
+// The control token and transport authenticate the app's delegation.
 type ExtensionHostServer interface {
-	// App-owned lifecycle stream. Closing it unregisters and cancels the worker.
-	// Only the authenticated control app supplies verified source and grants.
+	// Closing the app-owned lifecycle stream unregisters and cancels the worker.
 	RunWorker(grpc.BidiStreamingServer[WorkerClientMessage, WorkerHostMessage]) error
-	// MintToken issues a scoped token for an enabled extension. App only.
-	MintToken(context.Context, *MintTokenRequest) (*MintTokenResponse, error)
-	// RevokeToken invalidates a previously minted token. App only.
-	RevokeToken(context.Context, *RevokeTokenRequest) (*RevokeTokenResponse, error)
-	// GetConnections needs the "connections.read" permission.
-	GetConnections(context.Context, *GetConnectionsRequest) (*GetConnectionsResponse, error)
-	// GetServers needs the "servers.read" permission.
-	GetServers(context.Context, *GetServersRequest) (*GetServersResponse, error)
-	// Notify needs the "notifications" permission.
-	Notify(context.Context, *NotifyRequest) (*NotifyResponse, error)
-	// WatchExtensionEvents streams lifecycle and network events. It needs no
-	// extra permission beyond a valid token: every enabled extension may know
-	// whether the session is up.
-	WatchExtensionEvents(*WatchExtensionEventsRequest, grpc.ServerStreamingServer[ExtensionEvent]) error
 	mustEmbedUnimplementedExtensionHostServer()
 }
 
@@ -196,24 +77,6 @@ type UnimplementedExtensionHostServer struct{}
 
 func (UnimplementedExtensionHostServer) RunWorker(grpc.BidiStreamingServer[WorkerClientMessage, WorkerHostMessage]) error {
 	return status.Errorf(codes.Unimplemented, "method RunWorker not implemented")
-}
-func (UnimplementedExtensionHostServer) MintToken(context.Context, *MintTokenRequest) (*MintTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method MintToken not implemented")
-}
-func (UnimplementedExtensionHostServer) RevokeToken(context.Context, *RevokeTokenRequest) (*RevokeTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RevokeToken not implemented")
-}
-func (UnimplementedExtensionHostServer) GetConnections(context.Context, *GetConnectionsRequest) (*GetConnectionsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetConnections not implemented")
-}
-func (UnimplementedExtensionHostServer) GetServers(context.Context, *GetServersRequest) (*GetServersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetServers not implemented")
-}
-func (UnimplementedExtensionHostServer) Notify(context.Context, *NotifyRequest) (*NotifyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Notify not implemented")
-}
-func (UnimplementedExtensionHostServer) WatchExtensionEvents(*WatchExtensionEventsRequest, grpc.ServerStreamingServer[ExtensionEvent]) error {
-	return status.Errorf(codes.Unimplemented, "method WatchExtensionEvents not implemented")
 }
 func (UnimplementedExtensionHostServer) mustEmbedUnimplementedExtensionHostServer() {}
 func (UnimplementedExtensionHostServer) testEmbeddedByValue()                       {}
@@ -243,146 +106,19 @@ func _ExtensionHost_RunWorker_Handler(srv interface{}, stream grpc.ServerStream)
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ExtensionHost_RunWorkerServer = grpc.BidiStreamingServer[WorkerClientMessage, WorkerHostMessage]
 
-func _ExtensionHost_MintToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MintTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExtensionHostServer).MintToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ExtensionHost_MintToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExtensionHostServer).MintToken(ctx, req.(*MintTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ExtensionHost_RevokeToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RevokeTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExtensionHostServer).RevokeToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ExtensionHost_RevokeToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExtensionHostServer).RevokeToken(ctx, req.(*RevokeTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ExtensionHost_GetConnections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetConnectionsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExtensionHostServer).GetConnections(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ExtensionHost_GetConnections_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExtensionHostServer).GetConnections(ctx, req.(*GetConnectionsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ExtensionHost_GetServers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetServersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExtensionHostServer).GetServers(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ExtensionHost_GetServers_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExtensionHostServer).GetServers(ctx, req.(*GetServersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ExtensionHost_Notify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NotifyRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExtensionHostServer).Notify(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ExtensionHost_Notify_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExtensionHostServer).Notify(ctx, req.(*NotifyRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ExtensionHost_WatchExtensionEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(WatchExtensionEventsRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(ExtensionHostServer).WatchExtensionEvents(m, &grpc.GenericServerStream[WatchExtensionEventsRequest, ExtensionEvent]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type ExtensionHost_WatchExtensionEventsServer = grpc.ServerStreamingServer[ExtensionEvent]
-
 // ExtensionHost_ServiceDesc is the grpc.ServiceDesc for ExtensionHost service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ExtensionHost_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "sora.ext.v1.ExtensionHost",
 	HandlerType: (*ExtensionHostServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "MintToken",
-			Handler:    _ExtensionHost_MintToken_Handler,
-		},
-		{
-			MethodName: "RevokeToken",
-			Handler:    _ExtensionHost_RevokeToken_Handler,
-		},
-		{
-			MethodName: "GetConnections",
-			Handler:    _ExtensionHost_GetConnections_Handler,
-		},
-		{
-			MethodName: "GetServers",
-			Handler:    _ExtensionHost_GetServers_Handler,
-		},
-		{
-			MethodName: "Notify",
-			Handler:    _ExtensionHost_Notify_Handler,
-		},
-	},
+	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "RunWorker",
 			Handler:       _ExtensionHost_RunWorker_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
-		},
-		{
-			StreamName:    "WatchExtensionEvents",
-			Handler:       _ExtensionHost_WatchExtensionEvents_Handler,
-			ServerStreams: true,
 		},
 	},
 	Metadata: "sora/ext/v1/ext_host.proto",

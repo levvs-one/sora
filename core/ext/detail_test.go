@@ -1,18 +1,10 @@
 package ext
 
-// Detail-hunt D19: weak checks and lying security guarantees around
-// per-extension tokens and permissions. Every fix here gets a positive and
-// a negative case.
-//
-// Note: the zip-bomb, panel-CSP and rollback-manifest fixes live in
-// package.go/store.go, which a sibling agent is actively developing; their
-// tests land with that commit. The zip tests below pin the fail-closed
-// property that already holds on this toolchain.
+// Archive size limits must hold even when zip headers lie.
 
 import (
 	"bytes"
 	"compress/flate"
-	"context"
 	"encoding/binary"
 	"encoding/json"
 	"hash/crc32"
@@ -175,61 +167,5 @@ func TestZipHonestDeclaredSizesAccepted(t *testing.T) {
 	}
 	if len(pkg.Files["honest.dat"]) != len(content) {
 		t.Fatal("honest file content mangled")
-	}
-}
-
-func TestMintTokenEnforcesGranted(t *testing.T) {
-	s := testStore(t)
-	installHello(t, s, "1.0.0") // grants: connections.read, notifications
-	h := NewHost(s.Issuer(), Deps{
-		VerifyControl: func(tok []byte) bool { return string(tok) == "control" },
-		GrantedPermissions: func(id string) ([]string, bool) {
-			inst, ok := s.Get(id)
-			if !ok || !inst.Enabled {
-				return nil, false
-			}
-			return inst.Granted, true
-		},
-	})
-	ctx := context.Background()
-	// Positive: a granted permission mints fine.
-	if _, err := h.MintToken(ctx, mintReq("control", "com.example.hello", []string{"connections.read"})); err != nil {
-		t.Fatalf("mint of a granted permission failed: %v", err)
-	}
-	// Negative: a permission the user never granted is refused.
-	if _, err := h.MintToken(ctx, mintReq("control", "com.example.hello",
-		[]string{"connections.read", "servers.read"})); err == nil {
-		t.Fatal("mint of an ungranted permission must fail")
-	}
-	// Negative: unknown extension.
-	if _, err := h.MintToken(ctx, mintReq("control", "com.example.nope",
-		[]string{"notifications"})); err == nil {
-		t.Fatal("mint for an unknown extension must fail")
-	}
-	// Negative: disabled extension.
-	if err := s.SetEnabled("com.example.hello", false); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := h.MintToken(ctx, mintReq("control", "com.example.hello",
-		[]string{"notifications"})); err == nil {
-		t.Fatal("mint for a disabled extension must fail")
-	}
-}
-
-func TestCheckRejectsUnknownRPC(t *testing.T) {
-	issuer := NewTokenIssuer()
-	tok, err := issuer.Mint("com.example.hello", []string{"notifications"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	h := NewHost(issuer, Deps{})
-	// Fail closed: an RPC name outside the permission map is denied, not
-	// treated as "any valid token".
-	if _, err := h.check([]byte(tok), "NopeRPC"); err == nil {
-		t.Fatal("unknown RPC must be denied")
-	}
-	// The deliberate token-only RPC still works.
-	if _, err := h.check([]byte(tok), "WatchExtensionEvents"); err != nil {
-		t.Fatalf("WatchExtensionEvents must stay token-only: %v", err)
 	}
 }

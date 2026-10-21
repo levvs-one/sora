@@ -34,12 +34,12 @@ const List<ExtEnforcementRow> extEnforcementTable = [
   ExtEnforcementRow(
     'connections.read',
     ExtEnforcementStatus.enforced,
-    'every GetConnections call is token- and permission-checked',
+    'getConnections is permission-checked by the worker bridge and app bridge',
   ),
   ExtEnforcementRow(
     'servers.read',
     ExtEnforcementStatus.enforced,
-    'every GetServers call is token- and permission-checked',
+    'getServers is permission-checked by the worker bridge and app bridge',
   ),
   ExtEnforcementRow(
     'settings.read',
@@ -54,7 +54,7 @@ const List<ExtEnforcementRow> extEnforcementTable = [
   ExtEnforcementRow(
     'notifications',
     ExtEnforcementStatus.enforced,
-    'every Notify call is checked; text is size-capped in the host',
+    'notify is permission-checked; text is size-capped in the app bridge',
   ),
   ExtEnforcementRow(
     'tray',

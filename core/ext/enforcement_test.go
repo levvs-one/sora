@@ -9,7 +9,7 @@ import (
 // registry: every registry permission has exactly one row, in registry
 // order, and there are no rows for nonexistent permissions.
 func TestEnforcementTableCoversRegistry(t *testing.T) {
-	table := EnforcementTable()
+	table := enforcementTable
 	if len(table) != len(AllPermissions) {
 		t.Fatalf("table has %d rows, registry has %d permissions", len(table), len(AllPermissions))
 	}
@@ -27,39 +27,19 @@ func TestEnforcementTableCoversRegistry(t *testing.T) {
 // itself: a row that claims enforcement must name the check; a row that
 // admits none must not point at code as if it did.
 func TestEnforcementRowsAreHonestShape(t *testing.T) {
-	for _, row := range EnforcementTable() {
+	for _, row := range enforcementTable {
 		switch row.Status {
 		case EnforcementEnforced, EnforcementInstallTime:
 			if row.Where == "" {
-				t.Errorf("%q claims %s but names no code location", row.ID, row.Status)
+				t.Errorf("%q claims %v but names no code location", row.ID, row.Status)
 			}
 		case EnforcementInert, EnforcementUnimplemented:
 			if row.Where != "" {
-				t.Errorf("%q is %s but names code (%q): an unenforced row must not borrow credibility",
+				t.Errorf("%q is %v but names code (%q): an unenforced row must not borrow credibility",
 					row.ID, row.Status, row.Where)
 			}
 		default:
 			t.Errorf("%q has unknown status %v", row.ID, row.Status)
-		}
-	}
-}
-
-// TestEnforcementRPCClaimsMatchHost verifies the Enforced rows for the
-// host RPC permissions against the actual gate: the closed rpcPermissions
-// map must demand exactly them.
-func TestEnforcementRPCClaimsMatchHost(t *testing.T) {
-	want := map[string]string{
-		"GetConnections": "connections.read",
-		"GetServers":     "servers.read",
-		"Notify":         "notifications",
-	}
-	for rpc, perm := range want {
-		if got := rpcPermissions[rpc]; got != perm {
-			t.Errorf("rpcPermissions[%q] = %q, the matrix claims %q is enforced there", rpc, got, perm)
-		}
-		row, ok := EnforcementOf(perm)
-		if !ok || row.Status != EnforcementEnforced {
-			t.Errorf("matrix says %q is %v, but the host enforces it", perm, row.Status)
 		}
 	}
 }
@@ -96,14 +76,11 @@ func TestEnforcementDangerousAreNotClaimedEnforced(t *testing.T) {
 			t.Fatalf("%q risk = %v in the registry, want RiskDangerous", id, perm.Risk)
 		}
 		if row.Status == EnforcementEnforced || row.Status == EnforcementInstallTime {
-			t.Errorf("%q is claimed %s, but no enforcement point exists; "+
+			t.Errorf("%q is claimed %v, but no enforcement point exists; "+
 				"if one landed, add a behavior pin here in the same commit", id, row.Status)
 		}
 		if !strings.Contains(row.Note, "zero enforcement code") {
 			t.Errorf("%q note must stay blunt until a real gate lands: %q", id, row.Note)
-		}
-		if Enforced(id) {
-			t.Errorf("Enforced(%q) = true, want false while unimplemented", id)
 		}
 	}
 }
@@ -116,9 +93,6 @@ func TestEnforcementSettingsAreInert(t *testing.T) {
 		row, _ := EnforcementOf(id)
 		if row.Status != EnforcementInert {
 			t.Errorf("%q status = %v, want Inert (no app-settings API exists)", id, row.Status)
-		}
-		if Enforced(id) {
-			t.Errorf("Enforced(%q) = true, want false", id)
 		}
 	}
 }

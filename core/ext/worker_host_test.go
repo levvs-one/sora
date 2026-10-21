@@ -2,6 +2,7 @@ package ext
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"net"
@@ -19,7 +20,7 @@ import (
 
 func TestWorkerLifecycleStream(t *testing.T) {
 	scheduler := NewScheduler(nil)
-	host := NewHost(nil, Deps{Scheduler: scheduler, VerifyControl: func(token []byte) bool { return string(token) == "control" }})
+	host := NewHost(Deps{Scheduler: scheduler, VerifyControl: func(token []byte) bool { return string(token) == "control" }})
 	listener := bufconn.Listen(1 << 20)
 	server := grpc.NewServer()
 	extv1.RegisterExtensionHostServer(server, host)
@@ -106,6 +107,52 @@ func TestWorkerLifecycleStream(t *testing.T) {
 		case <-deadline.C:
 			t.Fatal("stream close did not unregister worker")
 		case <-tick.C:
+		}
+	}
+}
+
+// Keep the worker permission gate independent of the app-side bridge gate.
+func TestWorkerBridgePermissions(t *testing.T) {
+	for method, permission := range map[string]string{
+		"getConnections": "connections.read",
+		"getServers":     "servers.read",
+		"notify":         "notifications",
+		"getSettings":    "",
+		"setSettings":    "",
+		"unknown":        "",
+	} {
+		for _, granted := range []bool{false, true} {
+			m := testManifest(t)
+			m.Permissions = nil
+			if granted && permission != "" {
+				m.Permissions = []string{permission}
+			}
+			env := &WorkerEnv{log: NewLogHub().Log(m.ID)}
+			forwarded := false
+			raw, err := workerBridgeCall(t.Context(), m, env,
+				json.RawMessage(`{"id":1,"method":"`+method+`"}`),
+				func() (json.RawMessage, error) {
+					forwarded = true
+					return json.RawMessage(`{"id":1,"ok":true}`), nil
+				})
+			if err != nil {
+				t.Fatal(err)
+			}
+			var reply struct {
+				Error string `json:"error"`
+			}
+			if err := json.Unmarshal(raw, &reply); err != nil {
+				t.Fatal(err)
+			}
+			wantError := ""
+			if method == "unknown" {
+				wantError = "invalid-argument"
+			} else if permission != "" && !granted {
+				wantError = "permission-denied"
+			}
+			if reply.Error != wantError || forwarded != (wantError == "") {
+				t.Errorf("%s granted=%v: error=%q forwarded=%v, want error=%q", method, granted, reply.Error, forwarded, wantError)
+			}
 		}
 	}
 }

@@ -33,11 +33,11 @@ type Package struct {
 	Manifest *Manifest
 	// ManifestExt holds the optional v2-runtime manifest fields
 	// (background_task, network_hosts); nil when the manifest declares
-	// none. Needed to restore them on rollback (see Store.Rollback).
+	// none. Package verification checks each declared entry.
 	ManifestExt *ManifestExt
 }
 
-// OpenBytes is Open for an in-memory archive (downloads, tests).
+// OpenBytes reads an in-memory archive for CLI validation and tests.
 func OpenBytes(data []byte) (*Package, error) {
 	if len(data) > maxPackageBytes {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
@@ -247,7 +247,7 @@ func isSafeArchivePath(name string) bool {
 //
 // The signature is checked against the manifest's self-attested author key;
 // for catalog installs use VerifyWithKey with the catalog-pinned key
-// instead (see Store.Install). On success the package is trusted to match
+// instead. On success the package is trusted to match
 // what the author signed.
 func (p *Package) Verify() error {
 	return p.VerifyWithKey(p.Manifest.Author.PublicKey)

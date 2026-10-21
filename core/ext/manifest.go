@@ -1,7 +1,6 @@
 package ext
 
 import (
-	"bytes"
 	"encoding/json"
 	"regexp"
 	"strings"
@@ -16,14 +15,9 @@ const ManifestVersion = 1
 // maps them to localized text. They live here (not in core/errs) so the ext
 // package stays self-contained.
 const (
-	KeyManifestInvalid     errs.Key = "ext.manifest.invalid"
-	KeyPackageInvalid      errs.Key = "ext.package.invalid"
-	KeySignatureInvalid    errs.Key = "ext.signature.invalid"
-	KeyAuthorKeyChanged    errs.Key = "ext.author_key.changed"
-	KeySigningUnconfigured errs.Key = "ext.signing.unconfigured"
-	KeyPermissionDenied    errs.Key = "ext.permission.denied"
-	KeyCatalogInvalid      errs.Key = "ext.catalog.invalid"
-	KeyLifecycle           errs.Key = "ext.lifecycle.error"
+	KeyManifestInvalid  errs.Key = "ext.manifest.invalid"
+	KeyPackageInvalid   errs.Key = "ext.package.invalid"
+	KeySignatureInvalid errs.Key = "ext.signature.invalid"
 )
 
 // Author identifies who built and signed the extension.
@@ -85,26 +79,6 @@ var (
 	panelIDPattern = regexp.MustCompile(`^[a-zA-Z0-9_-]{1,64}$`)
 	semverPattern  = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)([-+][0-9A-Za-z.-]+)?$`)
 )
-
-// ParseManifest parses and validates sora-extension.json.
-func ParseManifest(data []byte) (*Manifest, error) {
-	if len(data) == 0 {
-		return nil, errs.Newf(errs.CodeInvalidArgument, KeyManifestInvalid, "ext: the manifest is empty")
-	}
-	if len(data) > 1<<20 {
-		return nil, errs.Newf(errs.CodeInvalidArgument, KeyManifestInvalid, "ext: the manifest exceeds 1 MiB")
-	}
-	var m Manifest
-	dec := json.NewDecoder(bytes.NewReader(data))
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&m); err != nil {
-		return nil, errs.Newf(errs.CodeInvalidArgument, KeyManifestInvalid, "ext: the manifest is not valid JSON: %v", err)
-	}
-	if err := m.Validate(); err != nil {
-		return nil, err
-	}
-	return &m, nil
-}
 
 // Validate checks every manifest field against the v1 rules.
 func (m *Manifest) Validate() error {
@@ -221,40 +195,6 @@ func isSafeEntry(entry string) bool {
 		}
 	}
 	return true
-}
-
-// CompareVersions compares two semver strings: -1, 0, +1.
-func CompareVersions(a, b string) int {
-	pa, pb := parseSemver(a), parseSemver(b)
-	for i := 0; i < 3; i++ {
-		if pa[i] != pb[i] {
-			if pa[i] < pb[i] {
-				return -1
-			}
-			return 1
-		}
-	}
-	return 0
-}
-
-func parseSemver(v string) [3]int {
-	var out [3]int
-	// Strip pre-release/build metadata for the numeric comparison.
-	if i := strings.IndexAny(v, "-+"); i >= 0 {
-		v = v[:i]
-	}
-	parts := strings.Split(v, ".")
-	for i := 0; i < 3 && i < len(parts); i++ {
-		n := 0
-		for _, c := range parts[i] {
-			if c < '0' || c > '9' {
-				break
-			}
-			n = n*10 + int(c-'0')
-		}
-		out[i] = n
-	}
-	return out
 }
 
 // checkSettingsSchema validates the supported JSON-Schema subset used for the
