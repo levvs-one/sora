@@ -591,7 +591,7 @@ func (s *Server) Disconnect(ctx context.Context, req *corev1.DisconnectRequest) 
 	}
 	if wanted := strings.TrimSpace(req.GetSessionId()); wanted != "" {
 		running := s.sessions.Current()
-		if running == nil || running.ID() != wanted {
+		if (running == nil && !s.sessions.Status().StrictKillSwitch) || (running != nil && running.ID() != wanted) {
 			err := errs.Newf(errs.CodeNotFound, errs.KeyUnknownSession,
 				"control: the request names a session that is not running")
 			return &corev1.DisconnectResponse{Error: toWire(err, nil, id)}, nil

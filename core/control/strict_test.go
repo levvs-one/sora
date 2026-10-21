@@ -76,3 +76,35 @@ func TestStrictContractRecoversAndDisablesWithoutSession(t *testing.T) {
 		t.Fatal("explicit disable was undone on restart")
 	}
 }
+
+func TestStrictDisconnectAcceptsStaleSessionAfterRecovery(t *testing.T) {
+	firewall := &strictFirewall{}
+	opts := guard.Options{DataDir: t.TempDir(), EnginePorts: []uint16{7890}}
+	first, err := guard.New(opts, firewall)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := first.Apply(t.Context(), session.Settings{StrictKillSwitch: true}); err != nil {
+		t.Fatal(err)
+	}
+	recovered, err := guard.New(opts, firewall)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := recovered.Recover(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	manager := session.NewManager(session.ManagerConfig{Guard: recovered, Factory: func(context.Context, *engine.Plan) (engine.Engine, error) { return newStubEngine(), nil }})
+	auth, err := control.NewAuthenticator(testToken)
+	if err != nil {
+		t.Fatal(err)
+	}
+	server, err := control.New(control.Config{Sessions: manager, Authenticator: auth, Version: control.Version{Major: 1, Minor: 12}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := server.Disconnect(t.Context(), &corev1.DisconnectRequest{ApiVersion: &corev1.ApiVersion{Major: 1, Minor: 12}, ControlAuthenticator: testToken, SessionId: "before-the-core-crashed"})
+	if err != nil || result.GetError() != nil || firewall.armed {
+		t.Fatalf("disconnect=%v, %v, armed=%v", result, err, firewall.armed)
+	}
+}
