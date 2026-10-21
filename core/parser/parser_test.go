@@ -60,10 +60,27 @@ func TestLimit(t *testing.T) {
 }
 func FuzzDetect(f *testing.F) {
 	f.Add([]byte("vless://x.example:443"))
+	f.Add([]byte("olcrtc://wbstream?datachannel@room-01#0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef$seed"))
+	f.Add([]byte("{\"version\":2,\"servers\":[]}"))
+	f.Add([]byte("proxies:\n  - name: x\n    type: ss\n    server: a.example\n    port: 8388"))
+	f.Add([]byte("[Interface]\nPrivateKey = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n[Peer]\nEndpoint = a.example:51820"))
 	f.Fuzz(func(_ *testing.T, b []byte) { _, _ = (ImportDetector{}).Detect(b) })
 }
 func FuzzParseLink(f *testing.F) {
 	f.Add("vless://123e4567-e89b-12d3-a456-426614174000@example.com:443")
+	// Wave-B fuzz seeds: one per format family the detector routes, so the
+	// engine starts from valid structure in every branch instead of only
+	// the vless one.
+	f.Add("olcrtc://wbstream?datachannel@room-01#0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef$seed")
+	f.Add("olcrtc://wbstream?seichannel<fps=60&batch=64&frag=900&ack-ms=2000>@room-01#0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef$seed")
+	f.Add("olcrtc://telemost?videochannel<video-w=1080&video-h=1080&video-fps=60&video-codec=qrcode>@https://telemost.yandex.ru/j/123#0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+	f.Add("{\"version\":2,\"servers\":[{\"id\":1,\"remarks\":\"sip008\",\"server\":\"a.example\",\"server_port\":8388,\"method\":\"aes-256-gcm\",\"password\":\"pw\"}]}")
+	f.Add("{\"outbounds\":[{\"type\":\"vless\",\"tag\":\"p\",\"server\":\"a.example\",\"server_port\":443,\"uuid\":\"123e4567-e89b-12d3-a456-426614174000\"}]}")
+	f.Add("[{\"remarks\":\"x\",\"outbounds\":[{\"protocol\":\"vless\",\"settings\":{\"vnext\":[{\"address\":\"a.example\",\"port\":443,\"users\":[{\"id\":\"123e4567-e89b-12d3-a456-426614174000\"}]}]}}]}]")
+	f.Add("proxies:\n  - name: clash-ss\n    type: ss\n    server: a.example\n    port: 8388\n    cipher: aes-256-gcm\n    password: pw\n  - name: clash-vless\n    type: vless\n    server: b.example\n    port: 443\n    uuid: 123e4567-e89b-12d3-a456-426614174000\n    network: ws")
+	f.Add("[Interface]\nPrivateKey = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\nAddress = 10.0.0.2/32\n[Peer]\nPublicKey = BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBE=\nEndpoint = a.example:51820\nAllowedIPs = 0.0.0.0/0")
+	f.Add("ss://YWVzLTI1Ni1nY206cGFzc3dvcmQ=@a.example:8388#seed\ntrojan://pw@b.example:443?sni=b.example#t")
+	f.Add("aHR0cHM6Ly9leGFtcGxlLmNvbS9zdWI=") // base64 of an https URL (rejected shape)
 	f.Fuzz(func(_ *testing.T, s string) { _, _ = (LinkParser{MaxItems: 100}).Parse([]byte(s)) })
 }
 func BenchmarkParseBase64Subscription(b *testing.B) {
