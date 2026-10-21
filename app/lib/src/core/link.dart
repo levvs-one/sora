@@ -11,7 +11,9 @@ import '../generated/sora/leak/v1/leak.pbgrpc.dart';
 import '../obfs.dart';
 import 'pipe.dart';
 
-/// API 1.13 adds GetDeviceIdentity/SetDeviceIdentity (the provider
+/// API 1.14 adds the ExtensionHost bypass seam (bypass capabilities,
+/// state, layers, desync tuning and bypass events for the Anti-DPI
+/// extension); 1.13 adds GetDeviceIdentity/SetDeviceIdentity (the provider
 /// device identity settings surface, C1); 1.12 adds SelectServer (fast
 /// in-session server switch) and
 /// GroupSpec.selected; 1.11 adds the leak-test suite and the traffic
@@ -22,7 +24,7 @@ import 'pipe.dart';
 /// open subscription pages without exposing links in states. The client offers
 /// the newest minor it speaks and the core negotiates down, so older cores
 /// keep working for the fields they know.
-final apiVersion = ApiVersion(major: 1, minor: 13, minSupportedMinor: 6);
+final apiVersion = ApiVersion(major: 1, minor: 14, minSupportedMinor: 6);
 
 /// A gRPC channel to the core over a Unix socket or Windows named pipe, with
 /// the Handshake authentication token.
