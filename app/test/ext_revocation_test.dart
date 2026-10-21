@@ -12,12 +12,16 @@ import 'package:cryptography/cryptography.dart' as cry;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import 'package:sora/src/ext/manifest.dart';
 import 'package:sora/src/ext/package.dart';
 import 'package:sora/src/ext/revoke.dart';
 import 'package:sora/src/ext/store.dart';
 import 'package:sora/src/ext/verifier.dart';
+import 'package:sora/src/settings.dart';
+import 'package:sora/src/sora.dart';
 
 // ---------------------------------------------------------------------------
 // Minisign signing helper (mirrors core/ext SignPayload + testPubKeyLine).
@@ -449,6 +453,66 @@ void main() {
       expect(store2.isEnabled('com.example.hello'), isFalse);
       await expectLater(store2.setEnabled('com.example.hello', true),
           throwsA(isA<RevocationError>()));
+    });
+
+    test('app-start sweep drops a revoked extension antidpi slot (B-M2)', () async {
+      // Regression (review B-M2): the revocation sweep and the
+      // onExtensionGone slot cleanup used to exist only inside the
+      // Extensions screen's own store instance, created when the user
+      // opened that section. A revoked extension's applied strategy
+      // therefore survived every restart in Settings.antidpiStrategyJson
+      // and buildPlan kept applying it. Now Sora owns the one store,
+      // wires onExtensionGone in its constructor, and main() loads the
+      // store before the first connect — this test replays exactly
+      // that startup sequence.
+      SharedPreferencesAsyncPlatform.instance =
+          InMemorySharedPreferencesAsync.empty();
+      final settings = await Settings.load();
+
+      final store = ExtensionStore(dir: dir.path);
+      final sora = Sora(settings, extensionStore: store);
+      addTearDown(sora.dispose);
+      await store.load();
+      final pkg = await _buildPackage(author, 'com.example.hello', '1.0.0');
+      await store.install(pkg, source: 'sideload', granted: const []);
+      // The extension applied a global strategy through the panel:
+      // the write-through slot is owned by it.
+      settings.antidpiStrategyJson = '{"split_pos":["1"]}';
+      settings.antidpiStrategySource = 'com.example.hello';
+      expect(
+          buildPlan(servers: const [], choice: 'bypass', settings: settings)
+              .outbounds
+              .single
+              .bypass
+              .splitPos,
+          ['1']);
+
+      // The kill order lands in the cache while the app is closed.
+      await RevocationCache(dir.path).store(utf8.encode(_revJson([
+        {'id': 'com.example.hello', 'versions': '*', 'reason': 'kill'},
+      ])));
+
+      // Restart: a fresh Sora + fresh store over the same directory
+      // and settings; main()'s startup load runs before any connect.
+      final store2 = ExtensionStore(dir: dir.path);
+      final sora2 = Sora(settings, extensionStore: store2);
+      addTearDown(sora2.dispose);
+      await store2.load();
+
+      expect(store2.isEnabled('com.example.hello'), isFalse);
+      // The slot is gone with its owner — the user never opened the
+      // Extensions section in this "run".
+      expect(settings.antidpiStrategyJson, isEmpty);
+      expect(settings.antidpiStrategySource, isEmpty);
+      // And the next plan no longer carries the revoked strategy: it
+      // falls back to the legacy fields (the settings defaults).
+      expect(
+          buildPlan(servers: const [], choice: 'bypass', settings: settings)
+              .outbounds
+              .single
+              .bypass
+              .splitPos,
+          ['1', 'midsld']);
     });
 
     test('rollback after a revocation sweep returns to the clean previous version', () async {

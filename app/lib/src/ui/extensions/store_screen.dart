@@ -38,68 +38,55 @@ class ExtensionsScreen extends StatefulWidget {
 }
 
 class _ExtensionsScreenState extends State<ExtensionsScreen> {
-  late final ExtensionStore _store = ExtensionStore();
+  /// The ONE app-wide store: Sora owns it, main() loads it before the
+  /// first connect, and the app-level ExtScope (main.dart) provides it
+  /// to this whole subtree. This screen used to create, load and wire
+  /// its own instance — which meant the load-time revocation sweep and
+  /// the Anti-DPI slot cleanup (onExtensionGone, wired once by Sora)
+  /// existed only after the user opened this section, so a revoked
+  /// extension's applied strategy survived restarts until then.
+  late final ExtensionStore _store;
   bool _ready = false;
   bool _wired = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _store.load().then((_) {
-      if (mounted) setState(() => _ready = true);
-    });
-  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_wired) return;
     _wired = true;
-    // Anti-DPI write-through cleanup: when the extension that owns the
-    // applied global strategy is disabled or removed, its strategy slot
-    // in app settings goes with it (the core side drops its layer in
-    // the plan merge for disabled extensions; this is the app-side
-    // half).
-    try {
-      final settings = SoraScope.read(context).settings;
-      _store.onExtensionGone = (id) {
-        if (settings.antidpiStrategySource == id) settings.clearAntidpiStrategy();
-      };
-    } catch (_) {
-      // No app state above this screen (widget tests): nothing to clear.
+    _store = SoraScope.read(context).extensions;
+    if (_store.loaded) {
+      _ready = true;
+    } else {
+      // Normally already loaded by main(); the fallback covers hosts
+      // that mount this screen before the app-level load finished.
+      _store.load().then((_) {
+        if (mounted) setState(() => _ready = true);
+      });
     }
-  }
-
-  @override
-  void dispose() {
-    _store.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    return ExtScope(
-      store: _store,
-      child: Screen(
-        title: s.extensions,
-        children: const [],
-        actions: [
-          RoundButton(
-            icon: Symbols.install_desktop_rounded,
-            label: s.extInstallFromFile,
-            onTap: _ready ? () => _installFromFile(context) : null,
-          ),
-          RoundButton(
-            icon: Symbols.link_rounded,
-            label: s.extInstallFromUrl,
-            onTap: _ready ? () => _installFromUrl(context) : null,
-          ),
-        ],
-        fill: _ready
-            ? const _ExtensionsBody()
-            : const Center(child: CircularProgressIndicator()),
-      ),
+    return Screen(
+      title: s.extensions,
+      children: const [],
+      actions: [
+        RoundButton(
+          icon: Symbols.install_desktop_rounded,
+          label: s.extInstallFromFile,
+          onTap: _ready ? () => _installFromFile(context) : null,
+        ),
+        RoundButton(
+          icon: Symbols.link_rounded,
+          label: s.extInstallFromUrl,
+          onTap: _ready ? () => _installFromUrl(context) : null,
+        ),
+      ],
+      fill: _ready
+          ? const _ExtensionsBody()
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 

@@ -15,6 +15,7 @@ import '../l10n/strings.dart';
 import 'core/link.dart';
 import 'core/censor.dart';
 import 'ext/bypass.dart';
+import 'ext/store.dart';
 import 'browser_diagnostics.dart';
 import 'chains.dart';
 // The proto messages NetworkProfile/NetworkFingerprint collide with the
@@ -89,13 +90,25 @@ final class ServerDegraded extends Notice {
 /// App state and core operations. Screens access it through [SoraScope] and
 /// rebuild on notifications.
 class Sora extends ChangeNotifier {
-  Sora(this.settings)
+  Sora(this.settings, {ExtensionStore? extensionStore})
     : history = settings.notificationHistory,
       overrides = OverrideStore(() => settings.subscriptionOverrides, (v) => settings.subscriptionOverrides = v),
       profiles = ProfilesStore(() => settings.networkProfiles, (v) => settings.networkProfiles = v),
       chains = ChainsStore(() => settings.proxyChains, (v) => settings.proxyChains = v),
       censor = CensorDetector(() => settings.censorVerdicts, (v) => settings.censorVerdicts = v),
+      extensions = extensionStore ?? ExtensionStore(),
       obfs = ObfsSettings(() => settings.obfs, (v) => settings.obfs = v) {
+    // Anti-DPI write-through cleanup, wired ONCE here at app level —
+    // not by the Extensions screen: when the extension that owns the
+    // applied global strategy is disabled, uninstalled or swept away by
+    // a revocation list, its strategy slot in app settings goes with
+    // it. Because the store loads at app start (see main), the
+    // load-time revocation sweep fires this before the first connect,
+    // so a revoked extension's strategy cannot survive a restart in
+    // the slot even if the user never opens the Extensions section.
+    extensions.onExtensionGone = (id) {
+      if (settings.antidpiStrategySource == id) settings.clearAntidpiStrategy();
+    };
     overrides.onChanged = () {
       notifyListeners();
       // Hiding a server changes the plan; renaming does not (IDs are stable).
@@ -206,6 +219,17 @@ class Sora extends ChangeNotifier {
   }
 
   final Settings settings;
+
+  /// The one app-wide extension store. Created with the app, provided
+  /// to the widget tree through ExtScope at app level (see main.dart),
+  /// and loaded by main() before [run] starts the core — the load runs
+  /// the revocation sweep, so a revoked extension is already disabled
+  /// (and its Anti-DPI strategy slot already dropped via
+  /// [ExtensionStore.onExtensionGone]) before the first plan is built.
+  /// The Extensions section uses this store; it never creates a second
+  /// one.
+  final ExtensionStore extensions;
+
   List<AppNotification> history;
   int get unreadCount => history.where((n) => !n.read).length;
   Future<void> _historyWork = Future.value();
@@ -2375,6 +2399,7 @@ class Sora extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    extensions.dispose();
     browserDiagnostics.clear();
     unawaited(syncDaemon.stop());
     unawaited(_probeCall?.cancel());

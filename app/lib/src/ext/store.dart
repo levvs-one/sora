@@ -121,8 +121,10 @@ class InstalledExtension {
 bool _sameAuthorKey(String a, String? b) =>
     b != null && a.trim() == b.trim();
 
-/// App-side extension store. One instance per Extensions section subtree,
-/// provided through [ExtScope].
+/// App-side extension store. Exactly ONE instance per app run: Sora
+/// creates it, main() loads it before the first connect (so the
+/// load-time revocation sweep has already run), and the app-level
+/// [ExtScope] in main.dart provides it to every screen.
 class ExtensionStore extends ChangeNotifier {
   ExtensionStore({String? dir}) : _dir = dir ?? extensionsDir();
 
@@ -131,11 +133,13 @@ class ExtensionStore extends ChangeNotifier {
   bool _loaded = false;
 
   /// Called with an extension's id after it is disabled or uninstalled
-  /// (never on enable), including revocation-sweep disables. The app
-  /// wires this to drop app-side state the extension owned — the
-  /// Anti-DPI write-through strategy slot in app settings
-  /// (Settings.antidpiStrategySource). Set once by the section that owns
-  /// this store; null in tests and headless use.
+  /// (never on enable), including revocation-sweep disables — the
+  /// load-time sweep included, so a slot owned by an extension revoked
+  /// while the app was closed is dropped at startup, before the first
+  /// connect. The app wires this to drop app-side state the extension
+  /// owned — the Anti-DPI write-through strategy slot in app settings
+  /// (Settings.antidpiStrategySource). Set once by Sora, the app-level
+  /// owner of this store; null in tests and headless use.
   void Function(String extensionId)? onExtensionGone;
 
   bool get loaded => _loaded;

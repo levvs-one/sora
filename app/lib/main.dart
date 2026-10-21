@@ -11,6 +11,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/strings.dart';
 import 'src/design/theme.dart';
 import 'src/desktop/desktop.dart';
+import 'src/ext/store.dart';
 import 'src/settings.dart';
 import 'src/sora.dart';
 import 'src/ui/shell.dart';
@@ -20,6 +21,14 @@ import 'src/ui/censor.dart';
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   final sora = Sora(await Settings.load());
+  // Load the app-wide extension store BEFORE the core starts: the load
+  // runs the revocation sweep, so an extension revoked by the cached
+  // list is disabled — and its Anti-DPI strategy slot dropped through
+  // the onExtensionGone hook Sora wires — before the first connect can
+  // build a plan from it. Without this, the sweep only ran when the
+  // user opened the Extensions section, and a revoked extension's
+  // applied strategy survived every restart until then.
+  await sora.extensions.load();
   unawaited(sora.run());
   final navigator = GlobalKey<NavigatorState>();
   // A link passed on the command line launches the app (cold start).
@@ -96,9 +105,17 @@ class _SoraAppState extends State<SoraApp> {
   Widget build(BuildContext context) {
     final sora = widget.sora;
     final desktop = widget.desktop;
-    final app = SoraScope(
-      sora: sora,
-      child: ListenableBuilder(
+    // The app-wide extension store is provided at app level, so every
+    // screen (the Extensions section, detail and panel screens alike,
+    // including pushed routes) resolves the ONE store Sora owns and
+    // main() already loaded — never a per-screen second instance whose
+    // revocation sweep and onExtensionGone wiring would exist only
+    // while that screen does.
+    final app = ExtScope(
+      store: sora.extensions,
+      child: SoraScope(
+        sora: sora,
+        child: ListenableBuilder(
         listenable: sora,
         builder: (context, _) => MotionScope(
           enabled: sora.settings.animations,
@@ -133,6 +150,7 @@ class _SoraAppState extends State<SoraApp> {
             ),
             home: const DesktopShell(),
           ),
+        ),
         ),
       ),
     );
