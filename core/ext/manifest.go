@@ -24,6 +24,13 @@ const (
 	KeyPermissionDenied    errs.Key = "ext.permission.denied"
 	KeyCatalogInvalid      errs.Key = "ext.catalog.invalid"
 	KeyLifecycle           errs.Key = "ext.lifecycle.error"
+	// Bypass layer keys (Anti-DPI seam, contract 1.14): a stored layer
+	// that fails validation is refused with KeyBypassLayerInvalid; a
+	// layer past the size/binding limits with KeyBypassLayerTooLarge;
+	// persistence failures with KeyBypassLayerStore.
+	KeyBypassLayerInvalid  errs.Key = "ext.bypass_layer.invalid"
+	KeyBypassLayerTooLarge errs.Key = "ext.bypass_layer.too_large"
+	KeyBypassLayerStore    errs.Key = "ext.bypass_layer.store"
 )
 
 // Author identifies who built and signed the extension.

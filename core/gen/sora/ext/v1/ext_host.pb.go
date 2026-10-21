@@ -7,6 +7,7 @@
 package extv1
 
 import (
+	v1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -743,11 +744,858 @@ func (x *ExtensionEvent) GetAt() *timestamppb.Timestamp {
 	return nil
 }
 
+// BypassBinding binds one destination to a bypass strategy. Match is a
+// plan-rule destination ("domain:example.com", "full:example.com", an IP
+// literal, a CIDR, "geosite:...", "geoip:...", "ruleset:..."; a bare
+// domain is shorthand for "domain:<domain>").
+type BypassBinding struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Match         string                 `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
+	Strategy      *v1.BypassStrategy     `protobuf:"bytes,2,opt,name=strategy,proto3" json:"strategy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BypassBinding) Reset() {
+	*x = BypassBinding{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BypassBinding) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BypassBinding) ProtoMessage() {}
+
+func (x *BypassBinding) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BypassBinding.ProtoReflect.Descriptor instead.
+func (*BypassBinding) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *BypassBinding) GetMatch() string {
+	if x != nil {
+		return x.Match
+	}
+	return ""
+}
+
+func (x *BypassBinding) GetStrategy() *v1.BypassStrategy {
+	if x != nil {
+		return x.Strategy
+	}
+	return nil
+}
+
+type GetBypassCapabilitiesRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ExtensionToken []byte                 `protobuf:"bytes,1,opt,name=extension_token,json=extensionToken,proto3" json:"extension_token,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetBypassCapabilitiesRequest) Reset() {
+	*x = GetBypassCapabilitiesRequest{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBypassCapabilitiesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBypassCapabilitiesRequest) ProtoMessage() {}
+
+func (x *GetBypassCapabilitiesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBypassCapabilitiesRequest.ProtoReflect.Descriptor instead.
+func (*GetBypassCapabilitiesRequest) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GetBypassCapabilitiesRequest) GetExtensionToken() []byte {
+	if x != nil {
+		return x.ExtensionToken
+	}
+	return nil
+}
+
+// BackendInfo is one bypass backend's measured availability.
+type BackendInfo struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// "tpws" or "nfqws".
+	Kind      string `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`
+	Available bool   `protobuf:"varint,2,opt,name=available,proto3" json:"available,omitempty"`
+	// Why the backend is unavailable (the missing capability and the
+	// remedy), empty when available.
+	Reason        string `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BackendInfo) Reset() {
+	*x = BackendInfo{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BackendInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BackendInfo) ProtoMessage() {}
+
+func (x *BackendInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BackendInfo.ProtoReflect.Descriptor instead.
+func (*BackendInfo) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *BackendInfo) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *BackendInfo) GetAvailable() bool {
+	if x != nil {
+		return x.Available
+	}
+	return false
+}
+
+func (x *BackendInfo) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+type GetBypassCapabilitiesResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The executor family of this host, e.g. "linux-nfqueue".
+	Platform      string         `protobuf:"bytes,1,opt,name=platform,proto3" json:"platform,omitempty"`
+	Backends      []*BackendInfo `protobuf:"bytes,2,rep,name=backends,proto3" json:"backends,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBypassCapabilitiesResponse) Reset() {
+	*x = GetBypassCapabilitiesResponse{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBypassCapabilitiesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBypassCapabilitiesResponse) ProtoMessage() {}
+
+func (x *GetBypassCapabilitiesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBypassCapabilitiesResponse.ProtoReflect.Descriptor instead.
+func (*GetBypassCapabilitiesResponse) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetBypassCapabilitiesResponse) GetPlatform() string {
+	if x != nil {
+		return x.Platform
+	}
+	return ""
+}
+
+func (x *GetBypassCapabilitiesResponse) GetBackends() []*BackendInfo {
+	if x != nil {
+		return x.Backends
+	}
+	return nil
+}
+
+type GetBypassStateRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ExtensionToken []byte                 `protobuf:"bytes,1,opt,name=extension_token,json=extensionToken,proto3" json:"extension_token,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetBypassStateRequest) Reset() {
+	*x = GetBypassStateRequest{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBypassStateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBypassStateRequest) ProtoMessage() {}
+
+func (x *GetBypassStateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBypassStateRequest.ProtoReflect.Descriptor instead.
+func (*GetBypassStateRequest) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetBypassStateRequest) GetExtensionToken() []byte {
+	if x != nil {
+		return x.ExtensionToken
+	}
+	return nil
+}
+
+type GetBypassStateResponse struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Platform string                 `protobuf:"bytes,1,opt,name=platform,proto3" json:"platform,omitempty"`
+	// Where the global bypass strategy of the last built plan came from:
+	// "user", "extension", "core_default" or "none" (no plan built yet, or
+	// the plan carries no global bypass).
+	GlobalSource string `protobuf:"bytes,2,opt,name=global_source,json=globalSource,proto3" json:"global_source,omitempty"`
+	// The extension id the global strategy came from, when global_source
+	// is "extension"; empty otherwise.
+	GlobalFrom    string `protobuf:"bytes,3,opt,name=global_from,json=globalFrom,proto3" json:"global_from,omitempty"`
+	SessionActive bool   `protobuf:"varint,4,opt,name=session_active,json=sessionActive,proto3" json:"session_active,omitempty"`
+	// A stored layer is newer than the last built plan: it will only take
+	// effect at the next Connect.
+	PendingApply bool `protobuf:"varint,5,opt,name=pending_apply,json=pendingApply,proto3" json:"pending_apply,omitempty"`
+	// Bindings the last built plan actually carries from extension layers
+	// (conflicts with user rules are skipped at merge time and not counted).
+	BindingsCount int32 `protobuf:"varint,6,opt,name=bindings_count,json=bindingsCount,proto3" json:"bindings_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBypassStateResponse) Reset() {
+	*x = GetBypassStateResponse{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBypassStateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBypassStateResponse) ProtoMessage() {}
+
+func (x *GetBypassStateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBypassStateResponse.ProtoReflect.Descriptor instead.
+func (*GetBypassStateResponse) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetBypassStateResponse) GetPlatform() string {
+	if x != nil {
+		return x.Platform
+	}
+	return ""
+}
+
+func (x *GetBypassStateResponse) GetGlobalSource() string {
+	if x != nil {
+		return x.GlobalSource
+	}
+	return ""
+}
+
+func (x *GetBypassStateResponse) GetGlobalFrom() string {
+	if x != nil {
+		return x.GlobalFrom
+	}
+	return ""
+}
+
+func (x *GetBypassStateResponse) GetSessionActive() bool {
+	if x != nil {
+		return x.SessionActive
+	}
+	return false
+}
+
+func (x *GetBypassStateResponse) GetPendingApply() bool {
+	if x != nil {
+		return x.PendingApply
+	}
+	return false
+}
+
+func (x *GetBypassStateResponse) GetBindingsCount() int32 {
+	if x != nil {
+		return x.BindingsCount
+	}
+	return 0
+}
+
+type GetBypassLayerRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ExtensionToken []byte                 `protobuf:"bytes,1,opt,name=extension_token,json=extensionToken,proto3" json:"extension_token,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *GetBypassLayerRequest) Reset() {
+	*x = GetBypassLayerRequest{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBypassLayerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBypassLayerRequest) ProtoMessage() {}
+
+func (x *GetBypassLayerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBypassLayerRequest.ProtoReflect.Descriptor instead.
+func (*GetBypassLayerRequest) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetBypassLayerRequest) GetExtensionToken() []byte {
+	if x != nil {
+		return x.ExtensionToken
+	}
+	return nil
+}
+
+type GetBypassLayerResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The layer's global strategy; meaningful only when has_global is set.
+	Global    *v1.BypassStrategy `protobuf:"bytes,1,opt,name=global,proto3" json:"global,omitempty"`
+	HasGlobal bool               `protobuf:"varint,2,opt,name=has_global,json=hasGlobal,proto3" json:"has_global,omitempty"`
+	Bindings  []*BypassBinding   `protobuf:"bytes,3,rep,name=bindings,proto3" json:"bindings,omitempty"`
+	// When the layer was stored, seconds since the epoch. Zero when the
+	// calling extension has no layer.
+	UpdatedAtUnix int64 `protobuf:"varint,4,opt,name=updated_at_unix,json=updatedAtUnix,proto3" json:"updated_at_unix,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBypassLayerResponse) Reset() {
+	*x = GetBypassLayerResponse{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBypassLayerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBypassLayerResponse) ProtoMessage() {}
+
+func (x *GetBypassLayerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBypassLayerResponse.ProtoReflect.Descriptor instead.
+func (*GetBypassLayerResponse) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetBypassLayerResponse) GetGlobal() *v1.BypassStrategy {
+	if x != nil {
+		return x.Global
+	}
+	return nil
+}
+
+func (x *GetBypassLayerResponse) GetHasGlobal() bool {
+	if x != nil {
+		return x.HasGlobal
+	}
+	return false
+}
+
+func (x *GetBypassLayerResponse) GetBindings() []*BypassBinding {
+	if x != nil {
+		return x.Bindings
+	}
+	return nil
+}
+
+func (x *GetBypassLayerResponse) GetUpdatedAtUnix() int64 {
+	if x != nil {
+		return x.UpdatedAtUnix
+	}
+	return 0
+}
+
+type ApplyBypassLayerRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ExtensionToken []byte                 `protobuf:"bytes,1,opt,name=extension_token,json=extensionToken,proto3" json:"extension_token,omitempty"`
+	HasGlobal      bool                   `protobuf:"varint,2,opt,name=has_global,json=hasGlobal,proto3" json:"has_global,omitempty"`
+	// The global strategy; ignored when has_global is false.
+	Global        *v1.BypassStrategy `protobuf:"bytes,3,opt,name=global,proto3" json:"global,omitempty"`
+	Bindings      []*BypassBinding   `protobuf:"bytes,4,rep,name=bindings,proto3" json:"bindings,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ApplyBypassLayerRequest) Reset() {
+	*x = ApplyBypassLayerRequest{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ApplyBypassLayerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApplyBypassLayerRequest) ProtoMessage() {}
+
+func (x *ApplyBypassLayerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApplyBypassLayerRequest.ProtoReflect.Descriptor instead.
+func (*ApplyBypassLayerRequest) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *ApplyBypassLayerRequest) GetExtensionToken() []byte {
+	if x != nil {
+		return x.ExtensionToken
+	}
+	return nil
+}
+
+func (x *ApplyBypassLayerRequest) GetHasGlobal() bool {
+	if x != nil {
+		return x.HasGlobal
+	}
+	return false
+}
+
+func (x *ApplyBypassLayerRequest) GetGlobal() *v1.BypassStrategy {
+	if x != nil {
+		return x.Global
+	}
+	return nil
+}
+
+func (x *ApplyBypassLayerRequest) GetBindings() []*BypassBinding {
+	if x != nil {
+		return x.Bindings
+	}
+	return nil
+}
+
+type ApplyBypassLayerResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UpdatedAtUnix int64                  `protobuf:"varint,1,opt,name=updated_at_unix,json=updatedAtUnix,proto3" json:"updated_at_unix,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ApplyBypassLayerResponse) Reset() {
+	*x = ApplyBypassLayerResponse{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ApplyBypassLayerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApplyBypassLayerResponse) ProtoMessage() {}
+
+func (x *ApplyBypassLayerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApplyBypassLayerResponse.ProtoReflect.Descriptor instead.
+func (*ApplyBypassLayerResponse) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ApplyBypassLayerResponse) GetUpdatedAtUnix() int64 {
+	if x != nil {
+		return x.UpdatedAtUnix
+	}
+	return 0
+}
+
+type TuneDesyncRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ExtensionToken []byte                 `protobuf:"bytes,1,opt,name=extension_token,json=extensionToken,proto3" json:"extension_token,omitempty"`
+	// Executor to tune for: "nfqws" or "tpws". Empty means the core
+	// default (nfqws), exactly as in sora.censor.v1.
+	Engine        string `protobuf:"bytes,2,opt,name=engine,proto3" json:"engine,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TuneDesyncRequest) Reset() {
+	*x = TuneDesyncRequest{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TuneDesyncRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TuneDesyncRequest) ProtoMessage() {}
+
+func (x *TuneDesyncRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TuneDesyncRequest.ProtoReflect.Descriptor instead.
+func (*TuneDesyncRequest) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *TuneDesyncRequest) GetExtensionToken() []byte {
+	if x != nil {
+		return x.ExtensionToken
+	}
+	return nil
+}
+
+func (x *TuneDesyncRequest) GetEngine() string {
+	if x != nil {
+		return x.Engine
+	}
+	return ""
+}
+
+type TuneDesyncResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The winning strategy's stable id: a registry profile id, or the
+	// genome id ("d/...") when the winner is known only as a genome.
+	// Empty when no candidate worked.
+	WinnerId       string `protobuf:"bytes,1,opt,name=winner_id,json=winnerId,proto3" json:"winner_id,omitempty"`
+	WinnerDescribe string `protobuf:"bytes,2,opt,name=winner_describe,json=winnerDescribe,proto3" json:"winner_describe,omitempty"`
+	// The winner's fitness in [0,1].
+	Score float64 `protobuf:"fixed64,3,opt,name=score,proto3" json:"score,omitempty"`
+	// How many candidates were probed.
+	Attempts int32 `protobuf:"varint,4,opt,name=attempts,proto3" json:"attempts,omitempty"`
+	// Whether strategy carries the winner's strategy. A winner whose
+	// genome has no faithful strategy rendering reports false while the
+	// other fields stay honest.
+	HasStrategy   bool               `protobuf:"varint,5,opt,name=has_strategy,json=hasStrategy,proto3" json:"has_strategy,omitempty"`
+	Strategy      *v1.BypassStrategy `protobuf:"bytes,6,opt,name=strategy,proto3" json:"strategy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TuneDesyncResponse) Reset() {
+	*x = TuneDesyncResponse{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TuneDesyncResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TuneDesyncResponse) ProtoMessage() {}
+
+func (x *TuneDesyncResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TuneDesyncResponse.ProtoReflect.Descriptor instead.
+func (*TuneDesyncResponse) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *TuneDesyncResponse) GetWinnerId() string {
+	if x != nil {
+		return x.WinnerId
+	}
+	return ""
+}
+
+func (x *TuneDesyncResponse) GetWinnerDescribe() string {
+	if x != nil {
+		return x.WinnerDescribe
+	}
+	return ""
+}
+
+func (x *TuneDesyncResponse) GetScore() float64 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+func (x *TuneDesyncResponse) GetAttempts() int32 {
+	if x != nil {
+		return x.Attempts
+	}
+	return 0
+}
+
+func (x *TuneDesyncResponse) GetHasStrategy() bool {
+	if x != nil {
+		return x.HasStrategy
+	}
+	return false
+}
+
+func (x *TuneDesyncResponse) GetStrategy() *v1.BypassStrategy {
+	if x != nil {
+		return x.Strategy
+	}
+	return nil
+}
+
+type WatchBypassEventsRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ExtensionToken []byte                 `protobuf:"bytes,1,opt,name=extension_token,json=extensionToken,proto3" json:"extension_token,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *WatchBypassEventsRequest) Reset() {
+	*x = WatchBypassEventsRequest{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WatchBypassEventsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WatchBypassEventsRequest) ProtoMessage() {}
+
+func (x *WatchBypassEventsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WatchBypassEventsRequest.ProtoReflect.Descriptor instead.
+func (*WatchBypassEventsRequest) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *WatchBypassEventsRequest) GetExtensionToken() []byte {
+	if x != nil {
+		return x.ExtensionToken
+	}
+	return nil
+}
+
+type BypassEvent struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// One of "censorship", "strategy", "session". The session journal
+	// today emits censorship verdicts and session state changes; "strategy"
+	// is reserved for strategy-change events the journal does not produce
+	// yet and is never synthesized.
+	Kind string `protobuf:"bytes,1,opt,name=kind,proto3" json:"kind,omitempty"`
+	// The censorship classification ("sni_blocking", "rst_injection", ...)
+	// when kind is "censorship"; empty otherwise.
+	CensorshipKind string `protobuf:"bytes,2,opt,name=censorship_kind,json=censorshipKind,proto3" json:"censorship_kind,omitempty"`
+	// Plain-language account of the event, as journaled.
+	Explanation   string                 `protobuf:"bytes,3,opt,name=explanation,proto3" json:"explanation,omitempty"`
+	At            *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=at,proto3" json:"at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BypassEvent) Reset() {
+	*x = BypassEvent{}
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BypassEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BypassEvent) ProtoMessage() {}
+
+func (x *BypassEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_sora_ext_v1_ext_host_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BypassEvent.ProtoReflect.Descriptor instead.
+func (*BypassEvent) Descriptor() ([]byte, []int) {
+	return file_sora_ext_v1_ext_host_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *BypassEvent) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *BypassEvent) GetCensorshipKind() string {
+	if x != nil {
+		return x.CensorshipKind
+	}
+	return ""
+}
+
+func (x *BypassEvent) GetExplanation() string {
+	if x != nil {
+		return x.Explanation
+	}
+	return ""
+}
+
+func (x *BypassEvent) GetAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.At
+	}
+	return nil
+}
+
 var File_sora_ext_v1_ext_host_proto protoreflect.FileDescriptor
 
 const file_sora_ext_v1_ext_host_proto_rawDesc = "" +
 	"\n" +
-	"\x1asora/ext/v1/ext_host.proto\x12\vsora.ext.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"|\n" +
+	"\x1asora/ext/v1/ext_host.proto\x12\vsora.ext.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1fsora/core/v1/core_control.proto\"|\n" +
 	"\x10MintTokenRequest\x12#\n" +
 	"\rcontrol_token\x18\x01 \x01(\fR\fcontrolToken\x12!\n" +
 	"\fextension_id\x18\x02 \x01(\tR\vextensionId\x12 \n" +
@@ -789,7 +1637,62 @@ const file_sora_ext_v1_ext_host_proto_rawDesc = "" +
 	"\x0eExtensionEvent\x12\x12\n" +
 	"\x04kind\x18\x01 \x01(\tR\x04kind\x12\x16\n" +
 	"\x06detail\x18\x02 \x01(\tR\x06detail\x12*\n" +
-	"\x02at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x02at2\xfb\x03\n" +
+	"\x02at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x02at\"_\n" +
+	"\rBypassBinding\x12\x14\n" +
+	"\x05match\x18\x01 \x01(\tR\x05match\x128\n" +
+	"\bstrategy\x18\x02 \x01(\v2\x1c.sora.core.v1.BypassStrategyR\bstrategy\"G\n" +
+	"\x1cGetBypassCapabilitiesRequest\x12'\n" +
+	"\x0fextension_token\x18\x01 \x01(\fR\x0eextensionToken\"W\n" +
+	"\vBackendInfo\x12\x12\n" +
+	"\x04kind\x18\x01 \x01(\tR\x04kind\x12\x1c\n" +
+	"\tavailable\x18\x02 \x01(\bR\tavailable\x12\x16\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"q\n" +
+	"\x1dGetBypassCapabilitiesResponse\x12\x1a\n" +
+	"\bplatform\x18\x01 \x01(\tR\bplatform\x124\n" +
+	"\bbackends\x18\x02 \x03(\v2\x18.sora.ext.v1.BackendInfoR\bbackends\"@\n" +
+	"\x15GetBypassStateRequest\x12'\n" +
+	"\x0fextension_token\x18\x01 \x01(\fR\x0eextensionToken\"\xed\x01\n" +
+	"\x16GetBypassStateResponse\x12\x1a\n" +
+	"\bplatform\x18\x01 \x01(\tR\bplatform\x12#\n" +
+	"\rglobal_source\x18\x02 \x01(\tR\fglobalSource\x12\x1f\n" +
+	"\vglobal_from\x18\x03 \x01(\tR\n" +
+	"globalFrom\x12%\n" +
+	"\x0esession_active\x18\x04 \x01(\bR\rsessionActive\x12#\n" +
+	"\rpending_apply\x18\x05 \x01(\bR\fpendingApply\x12%\n" +
+	"\x0ebindings_count\x18\x06 \x01(\x05R\rbindingsCount\"@\n" +
+	"\x15GetBypassLayerRequest\x12'\n" +
+	"\x0fextension_token\x18\x01 \x01(\fR\x0eextensionToken\"\xcd\x01\n" +
+	"\x16GetBypassLayerResponse\x124\n" +
+	"\x06global\x18\x01 \x01(\v2\x1c.sora.core.v1.BypassStrategyR\x06global\x12\x1d\n" +
+	"\n" +
+	"has_global\x18\x02 \x01(\bR\thasGlobal\x126\n" +
+	"\bbindings\x18\x03 \x03(\v2\x1a.sora.ext.v1.BypassBindingR\bbindings\x12&\n" +
+	"\x0fupdated_at_unix\x18\x04 \x01(\x03R\rupdatedAtUnix\"\xcf\x01\n" +
+	"\x17ApplyBypassLayerRequest\x12'\n" +
+	"\x0fextension_token\x18\x01 \x01(\fR\x0eextensionToken\x12\x1d\n" +
+	"\n" +
+	"has_global\x18\x02 \x01(\bR\thasGlobal\x124\n" +
+	"\x06global\x18\x03 \x01(\v2\x1c.sora.core.v1.BypassStrategyR\x06global\x126\n" +
+	"\bbindings\x18\x04 \x03(\v2\x1a.sora.ext.v1.BypassBindingR\bbindings\"B\n" +
+	"\x18ApplyBypassLayerResponse\x12&\n" +
+	"\x0fupdated_at_unix\x18\x01 \x01(\x03R\rupdatedAtUnix\"T\n" +
+	"\x11TuneDesyncRequest\x12'\n" +
+	"\x0fextension_token\x18\x01 \x01(\fR\x0eextensionToken\x12\x16\n" +
+	"\x06engine\x18\x02 \x01(\tR\x06engine\"\xe9\x01\n" +
+	"\x12TuneDesyncResponse\x12\x1b\n" +
+	"\twinner_id\x18\x01 \x01(\tR\bwinnerId\x12'\n" +
+	"\x0fwinner_describe\x18\x02 \x01(\tR\x0ewinnerDescribe\x12\x14\n" +
+	"\x05score\x18\x03 \x01(\x01R\x05score\x12\x1a\n" +
+	"\battempts\x18\x04 \x01(\x05R\battempts\x12!\n" +
+	"\fhas_strategy\x18\x05 \x01(\bR\vhasStrategy\x128\n" +
+	"\bstrategy\x18\x06 \x01(\v2\x1c.sora.core.v1.BypassStrategyR\bstrategy\"C\n" +
+	"\x18WatchBypassEventsRequest\x12'\n" +
+	"\x0fextension_token\x18\x01 \x01(\fR\x0eextensionToken\"\x98\x01\n" +
+	"\vBypassEvent\x12\x12\n" +
+	"\x04kind\x18\x01 \x01(\tR\x04kind\x12'\n" +
+	"\x0fcensorship_kind\x18\x02 \x01(\tR\x0ecensorshipKind\x12 \n" +
+	"\vexplanation\x18\x03 \x01(\tR\vexplanation\x12*\n" +
+	"\x02at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x02at2\xa9\b\n" +
 	"\rExtensionHost\x12J\n" +
 	"\tMintToken\x12\x1d.sora.ext.v1.MintTokenRequest\x1a\x1e.sora.ext.v1.MintTokenResponse\x12P\n" +
 	"\vRevokeToken\x12\x1f.sora.ext.v1.RevokeTokenRequest\x1a .sora.ext.v1.RevokeTokenResponse\x12Y\n" +
@@ -797,7 +1700,14 @@ const file_sora_ext_v1_ext_host_proto_rawDesc = "" +
 	"\n" +
 	"GetServers\x12\x1e.sora.ext.v1.GetServersRequest\x1a\x1f.sora.ext.v1.GetServersResponse\x12A\n" +
 	"\x06Notify\x12\x1a.sora.ext.v1.NotifyRequest\x1a\x1b.sora.ext.v1.NotifyResponse\x12_\n" +
-	"\x14WatchExtensionEvents\x12(.sora.ext.v1.WatchExtensionEventsRequest\x1a\x1b.sora.ext.v1.ExtensionEvent0\x01B=Z;github.com/levvs-one/sora-client/core/gen/sora/ext/v1;extv1b\x06proto3"
+	"\x14WatchExtensionEvents\x12(.sora.ext.v1.WatchExtensionEventsRequest\x1a\x1b.sora.ext.v1.ExtensionEvent0\x01\x12n\n" +
+	"\x15GetBypassCapabilities\x12).sora.ext.v1.GetBypassCapabilitiesRequest\x1a*.sora.ext.v1.GetBypassCapabilitiesResponse\x12Y\n" +
+	"\x0eGetBypassState\x12\".sora.ext.v1.GetBypassStateRequest\x1a#.sora.ext.v1.GetBypassStateResponse\x12Y\n" +
+	"\x0eGetBypassLayer\x12\".sora.ext.v1.GetBypassLayerRequest\x1a#.sora.ext.v1.GetBypassLayerResponse\x12_\n" +
+	"\x10ApplyBypassLayer\x12$.sora.ext.v1.ApplyBypassLayerRequest\x1a%.sora.ext.v1.ApplyBypassLayerResponse\x12M\n" +
+	"\n" +
+	"TuneDesync\x12\x1e.sora.ext.v1.TuneDesyncRequest\x1a\x1f.sora.ext.v1.TuneDesyncResponse\x12V\n" +
+	"\x11WatchBypassEvents\x12%.sora.ext.v1.WatchBypassEventsRequest\x1a\x18.sora.ext.v1.BypassEvent0\x01B=Z;github.com/levvs-one/sora-client/core/gen/sora/ext/v1;extv1b\x06proto3"
 
 var (
 	file_sora_ext_v1_ext_host_proto_rawDescOnce sync.Once
@@ -811,45 +1721,80 @@ func file_sora_ext_v1_ext_host_proto_rawDescGZIP() []byte {
 	return file_sora_ext_v1_ext_host_proto_rawDescData
 }
 
-var file_sora_ext_v1_ext_host_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_sora_ext_v1_ext_host_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_sora_ext_v1_ext_host_proto_goTypes = []any{
-	(*MintTokenRequest)(nil),            // 0: sora.ext.v1.MintTokenRequest
-	(*MintTokenResponse)(nil),           // 1: sora.ext.v1.MintTokenResponse
-	(*RevokeTokenRequest)(nil),          // 2: sora.ext.v1.RevokeTokenRequest
-	(*RevokeTokenResponse)(nil),         // 3: sora.ext.v1.RevokeTokenResponse
-	(*GetConnectionsRequest)(nil),       // 4: sora.ext.v1.GetConnectionsRequest
-	(*ExtensionConnection)(nil),         // 5: sora.ext.v1.ExtensionConnection
-	(*GetConnectionsResponse)(nil),      // 6: sora.ext.v1.GetConnectionsResponse
-	(*GetServersRequest)(nil),           // 7: sora.ext.v1.GetServersRequest
-	(*ExtensionServer)(nil),             // 8: sora.ext.v1.ExtensionServer
-	(*GetServersResponse)(nil),          // 9: sora.ext.v1.GetServersResponse
-	(*NotifyRequest)(nil),               // 10: sora.ext.v1.NotifyRequest
-	(*NotifyResponse)(nil),              // 11: sora.ext.v1.NotifyResponse
-	(*WatchExtensionEventsRequest)(nil), // 12: sora.ext.v1.WatchExtensionEventsRequest
-	(*ExtensionEvent)(nil),              // 13: sora.ext.v1.ExtensionEvent
-	(*timestamppb.Timestamp)(nil),       // 14: google.protobuf.Timestamp
+	(*MintTokenRequest)(nil),              // 0: sora.ext.v1.MintTokenRequest
+	(*MintTokenResponse)(nil),             // 1: sora.ext.v1.MintTokenResponse
+	(*RevokeTokenRequest)(nil),            // 2: sora.ext.v1.RevokeTokenRequest
+	(*RevokeTokenResponse)(nil),           // 3: sora.ext.v1.RevokeTokenResponse
+	(*GetConnectionsRequest)(nil),         // 4: sora.ext.v1.GetConnectionsRequest
+	(*ExtensionConnection)(nil),           // 5: sora.ext.v1.ExtensionConnection
+	(*GetConnectionsResponse)(nil),        // 6: sora.ext.v1.GetConnectionsResponse
+	(*GetServersRequest)(nil),             // 7: sora.ext.v1.GetServersRequest
+	(*ExtensionServer)(nil),               // 8: sora.ext.v1.ExtensionServer
+	(*GetServersResponse)(nil),            // 9: sora.ext.v1.GetServersResponse
+	(*NotifyRequest)(nil),                 // 10: sora.ext.v1.NotifyRequest
+	(*NotifyResponse)(nil),                // 11: sora.ext.v1.NotifyResponse
+	(*WatchExtensionEventsRequest)(nil),   // 12: sora.ext.v1.WatchExtensionEventsRequest
+	(*ExtensionEvent)(nil),                // 13: sora.ext.v1.ExtensionEvent
+	(*BypassBinding)(nil),                 // 14: sora.ext.v1.BypassBinding
+	(*GetBypassCapabilitiesRequest)(nil),  // 15: sora.ext.v1.GetBypassCapabilitiesRequest
+	(*BackendInfo)(nil),                   // 16: sora.ext.v1.BackendInfo
+	(*GetBypassCapabilitiesResponse)(nil), // 17: sora.ext.v1.GetBypassCapabilitiesResponse
+	(*GetBypassStateRequest)(nil),         // 18: sora.ext.v1.GetBypassStateRequest
+	(*GetBypassStateResponse)(nil),        // 19: sora.ext.v1.GetBypassStateResponse
+	(*GetBypassLayerRequest)(nil),         // 20: sora.ext.v1.GetBypassLayerRequest
+	(*GetBypassLayerResponse)(nil),        // 21: sora.ext.v1.GetBypassLayerResponse
+	(*ApplyBypassLayerRequest)(nil),       // 22: sora.ext.v1.ApplyBypassLayerRequest
+	(*ApplyBypassLayerResponse)(nil),      // 23: sora.ext.v1.ApplyBypassLayerResponse
+	(*TuneDesyncRequest)(nil),             // 24: sora.ext.v1.TuneDesyncRequest
+	(*TuneDesyncResponse)(nil),            // 25: sora.ext.v1.TuneDesyncResponse
+	(*WatchBypassEventsRequest)(nil),      // 26: sora.ext.v1.WatchBypassEventsRequest
+	(*BypassEvent)(nil),                   // 27: sora.ext.v1.BypassEvent
+	(*timestamppb.Timestamp)(nil),         // 28: google.protobuf.Timestamp
+	(*v1.BypassStrategy)(nil),             // 29: sora.core.v1.BypassStrategy
 }
 var file_sora_ext_v1_ext_host_proto_depIdxs = []int32{
 	5,  // 0: sora.ext.v1.GetConnectionsResponse.connections:type_name -> sora.ext.v1.ExtensionConnection
 	8,  // 1: sora.ext.v1.GetServersResponse.servers:type_name -> sora.ext.v1.ExtensionServer
-	14, // 2: sora.ext.v1.ExtensionEvent.at:type_name -> google.protobuf.Timestamp
-	0,  // 3: sora.ext.v1.ExtensionHost.MintToken:input_type -> sora.ext.v1.MintTokenRequest
-	2,  // 4: sora.ext.v1.ExtensionHost.RevokeToken:input_type -> sora.ext.v1.RevokeTokenRequest
-	4,  // 5: sora.ext.v1.ExtensionHost.GetConnections:input_type -> sora.ext.v1.GetConnectionsRequest
-	7,  // 6: sora.ext.v1.ExtensionHost.GetServers:input_type -> sora.ext.v1.GetServersRequest
-	10, // 7: sora.ext.v1.ExtensionHost.Notify:input_type -> sora.ext.v1.NotifyRequest
-	12, // 8: sora.ext.v1.ExtensionHost.WatchExtensionEvents:input_type -> sora.ext.v1.WatchExtensionEventsRequest
-	1,  // 9: sora.ext.v1.ExtensionHost.MintToken:output_type -> sora.ext.v1.MintTokenResponse
-	3,  // 10: sora.ext.v1.ExtensionHost.RevokeToken:output_type -> sora.ext.v1.RevokeTokenResponse
-	6,  // 11: sora.ext.v1.ExtensionHost.GetConnections:output_type -> sora.ext.v1.GetConnectionsResponse
-	9,  // 12: sora.ext.v1.ExtensionHost.GetServers:output_type -> sora.ext.v1.GetServersResponse
-	11, // 13: sora.ext.v1.ExtensionHost.Notify:output_type -> sora.ext.v1.NotifyResponse
-	13, // 14: sora.ext.v1.ExtensionHost.WatchExtensionEvents:output_type -> sora.ext.v1.ExtensionEvent
-	9,  // [9:15] is the sub-list for method output_type
-	3,  // [3:9] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	28, // 2: sora.ext.v1.ExtensionEvent.at:type_name -> google.protobuf.Timestamp
+	29, // 3: sora.ext.v1.BypassBinding.strategy:type_name -> sora.core.v1.BypassStrategy
+	16, // 4: sora.ext.v1.GetBypassCapabilitiesResponse.backends:type_name -> sora.ext.v1.BackendInfo
+	29, // 5: sora.ext.v1.GetBypassLayerResponse.global:type_name -> sora.core.v1.BypassStrategy
+	14, // 6: sora.ext.v1.GetBypassLayerResponse.bindings:type_name -> sora.ext.v1.BypassBinding
+	29, // 7: sora.ext.v1.ApplyBypassLayerRequest.global:type_name -> sora.core.v1.BypassStrategy
+	14, // 8: sora.ext.v1.ApplyBypassLayerRequest.bindings:type_name -> sora.ext.v1.BypassBinding
+	29, // 9: sora.ext.v1.TuneDesyncResponse.strategy:type_name -> sora.core.v1.BypassStrategy
+	28, // 10: sora.ext.v1.BypassEvent.at:type_name -> google.protobuf.Timestamp
+	0,  // 11: sora.ext.v1.ExtensionHost.MintToken:input_type -> sora.ext.v1.MintTokenRequest
+	2,  // 12: sora.ext.v1.ExtensionHost.RevokeToken:input_type -> sora.ext.v1.RevokeTokenRequest
+	4,  // 13: sora.ext.v1.ExtensionHost.GetConnections:input_type -> sora.ext.v1.GetConnectionsRequest
+	7,  // 14: sora.ext.v1.ExtensionHost.GetServers:input_type -> sora.ext.v1.GetServersRequest
+	10, // 15: sora.ext.v1.ExtensionHost.Notify:input_type -> sora.ext.v1.NotifyRequest
+	12, // 16: sora.ext.v1.ExtensionHost.WatchExtensionEvents:input_type -> sora.ext.v1.WatchExtensionEventsRequest
+	15, // 17: sora.ext.v1.ExtensionHost.GetBypassCapabilities:input_type -> sora.ext.v1.GetBypassCapabilitiesRequest
+	18, // 18: sora.ext.v1.ExtensionHost.GetBypassState:input_type -> sora.ext.v1.GetBypassStateRequest
+	20, // 19: sora.ext.v1.ExtensionHost.GetBypassLayer:input_type -> sora.ext.v1.GetBypassLayerRequest
+	22, // 20: sora.ext.v1.ExtensionHost.ApplyBypassLayer:input_type -> sora.ext.v1.ApplyBypassLayerRequest
+	24, // 21: sora.ext.v1.ExtensionHost.TuneDesync:input_type -> sora.ext.v1.TuneDesyncRequest
+	26, // 22: sora.ext.v1.ExtensionHost.WatchBypassEvents:input_type -> sora.ext.v1.WatchBypassEventsRequest
+	1,  // 23: sora.ext.v1.ExtensionHost.MintToken:output_type -> sora.ext.v1.MintTokenResponse
+	3,  // 24: sora.ext.v1.ExtensionHost.RevokeToken:output_type -> sora.ext.v1.RevokeTokenResponse
+	6,  // 25: sora.ext.v1.ExtensionHost.GetConnections:output_type -> sora.ext.v1.GetConnectionsResponse
+	9,  // 26: sora.ext.v1.ExtensionHost.GetServers:output_type -> sora.ext.v1.GetServersResponse
+	11, // 27: sora.ext.v1.ExtensionHost.Notify:output_type -> sora.ext.v1.NotifyResponse
+	13, // 28: sora.ext.v1.ExtensionHost.WatchExtensionEvents:output_type -> sora.ext.v1.ExtensionEvent
+	17, // 29: sora.ext.v1.ExtensionHost.GetBypassCapabilities:output_type -> sora.ext.v1.GetBypassCapabilitiesResponse
+	19, // 30: sora.ext.v1.ExtensionHost.GetBypassState:output_type -> sora.ext.v1.GetBypassStateResponse
+	21, // 31: sora.ext.v1.ExtensionHost.GetBypassLayer:output_type -> sora.ext.v1.GetBypassLayerResponse
+	23, // 32: sora.ext.v1.ExtensionHost.ApplyBypassLayer:output_type -> sora.ext.v1.ApplyBypassLayerResponse
+	25, // 33: sora.ext.v1.ExtensionHost.TuneDesync:output_type -> sora.ext.v1.TuneDesyncResponse
+	27, // 34: sora.ext.v1.ExtensionHost.WatchBypassEvents:output_type -> sora.ext.v1.BypassEvent
+	23, // [23:35] is the sub-list for method output_type
+	11, // [11:23] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_sora_ext_v1_ext_host_proto_init() }
@@ -863,7 +1808,7 @@ func file_sora_ext_v1_ext_host_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sora_ext_v1_ext_host_proto_rawDesc), len(file_sora_ext_v1_ext_host_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

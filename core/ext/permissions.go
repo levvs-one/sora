@@ -38,6 +38,14 @@ var AllPermissions = []Permission{
 	{ID: "net.hooks", BlurbKey: "extPerm.netHooks", Risk: RiskDangerous},
 	{ID: "net.fetch", BlurbKey: "extPerm.netFetch", Risk: RiskSensitive},
 	{ID: "background", BlurbKey: "extPerm.background", Risk: RiskSensitive},
+	// Anti-DPI (bypass) permissions, since the ExtensionHost bypass seam
+	// (contract 1.14). Reading the effective bypass state is sensitive —
+	// it reveals how the user's traffic evades censorship; writing a
+	// layer or running the tuner changes the network path itself, so
+	// both are dangerous.
+	{ID: "bypass.read", BlurbKey: "extPerm.bypassRead", Risk: RiskSensitive},
+	{ID: "bypass.write", BlurbKey: "extPerm.bypassWrite", Risk: RiskDangerous},
+	{ID: "bypass.tune", BlurbKey: "extPerm.bypassTune", Risk: RiskDangerous},
 }
 
 // permissionIndex is built once for O(1) lookups.

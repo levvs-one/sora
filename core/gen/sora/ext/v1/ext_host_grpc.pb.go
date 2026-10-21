@@ -19,12 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ExtensionHost_MintToken_FullMethodName            = "/sora.ext.v1.ExtensionHost/MintToken"
-	ExtensionHost_RevokeToken_FullMethodName          = "/sora.ext.v1.ExtensionHost/RevokeToken"
-	ExtensionHost_GetConnections_FullMethodName       = "/sora.ext.v1.ExtensionHost/GetConnections"
-	ExtensionHost_GetServers_FullMethodName           = "/sora.ext.v1.ExtensionHost/GetServers"
-	ExtensionHost_Notify_FullMethodName               = "/sora.ext.v1.ExtensionHost/Notify"
-	ExtensionHost_WatchExtensionEvents_FullMethodName = "/sora.ext.v1.ExtensionHost/WatchExtensionEvents"
+	ExtensionHost_MintToken_FullMethodName             = "/sora.ext.v1.ExtensionHost/MintToken"
+	ExtensionHost_RevokeToken_FullMethodName           = "/sora.ext.v1.ExtensionHost/RevokeToken"
+	ExtensionHost_GetConnections_FullMethodName        = "/sora.ext.v1.ExtensionHost/GetConnections"
+	ExtensionHost_GetServers_FullMethodName            = "/sora.ext.v1.ExtensionHost/GetServers"
+	ExtensionHost_Notify_FullMethodName                = "/sora.ext.v1.ExtensionHost/Notify"
+	ExtensionHost_WatchExtensionEvents_FullMethodName  = "/sora.ext.v1.ExtensionHost/WatchExtensionEvents"
+	ExtensionHost_GetBypassCapabilities_FullMethodName = "/sora.ext.v1.ExtensionHost/GetBypassCapabilities"
+	ExtensionHost_GetBypassState_FullMethodName        = "/sora.ext.v1.ExtensionHost/GetBypassState"
+	ExtensionHost_GetBypassLayer_FullMethodName        = "/sora.ext.v1.ExtensionHost/GetBypassLayer"
+	ExtensionHost_ApplyBypassLayer_FullMethodName      = "/sora.ext.v1.ExtensionHost/ApplyBypassLayer"
+	ExtensionHost_TuneDesync_FullMethodName            = "/sora.ext.v1.ExtensionHost/TuneDesync"
+	ExtensionHost_WatchBypassEvents_FullMethodName     = "/sora.ext.v1.ExtensionHost/WatchBypassEvents"
 )
 
 // ExtensionHostClient is the client API for ExtensionHost service.
@@ -56,6 +62,30 @@ type ExtensionHostClient interface {
 	// extra permission beyond a valid token: every enabled extension may know
 	// whether the session is up.
 	WatchExtensionEvents(ctx context.Context, in *WatchExtensionEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ExtensionEvent], error)
+	// GetBypassCapabilities reports which DPI-bypass backends this host can
+	// actually run, measured — never assumed. Needs "bypass.read". Since 1.14.
+	GetBypassCapabilities(ctx context.Context, in *GetBypassCapabilitiesRequest, opts ...grpc.CallOption) (*GetBypassCapabilitiesResponse, error)
+	// GetBypassState reports the effective bypass state of the last built
+	// plan: where the global strategy came from, whether a session is live,
+	// and whether a stored layer is newer than the plan. Needs
+	// "bypass.read". Since 1.14.
+	GetBypassState(ctx context.Context, in *GetBypassStateRequest, opts ...grpc.CallOption) (*GetBypassStateResponse, error)
+	// GetBypassLayer returns the calling extension's own stored bypass
+	// layer. Needs "bypass.read". Since 1.14.
+	GetBypassLayer(ctx context.Context, in *GetBypassLayerRequest, opts ...grpc.CallOption) (*GetBypassLayerResponse, error)
+	// ApplyBypassLayer replaces the calling extension's stored bypass layer;
+	// an empty layer (no global, no bindings) clears it. The layer takes
+	// effect at the next plan build (Connect) and never overrides user
+	// rules. Needs "bypass.write". Since 1.14.
+	ApplyBypassLayer(ctx context.Context, in *ApplyBypassLayerRequest, opts ...grpc.CallOption) (*ApplyBypassLayerResponse, error)
+	// TuneDesync runs the core's desync tuner once for the named engine
+	// ("tpws"/"nfqws"; empty means the core default) and returns the winner.
+	// It probes only the core's own canary endpoints — the request carries
+	// no target. Needs "bypass.tune". Since 1.14.
+	TuneDesync(ctx context.Context, in *TuneDesyncRequest, opts ...grpc.CallOption) (*TuneDesyncResponse, error)
+	// WatchBypassEvents streams bypass-relevant session events: censorship
+	// verdicts and session state changes. Needs "bypass.read". Since 1.14.
+	WatchBypassEvents(ctx context.Context, in *WatchBypassEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BypassEvent], error)
 }
 
 type extensionHostClient struct {
@@ -135,6 +165,75 @@ func (c *extensionHostClient) WatchExtensionEvents(ctx context.Context, in *Watc
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ExtensionHost_WatchExtensionEventsClient = grpc.ServerStreamingClient[ExtensionEvent]
 
+func (c *extensionHostClient) GetBypassCapabilities(ctx context.Context, in *GetBypassCapabilitiesRequest, opts ...grpc.CallOption) (*GetBypassCapabilitiesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBypassCapabilitiesResponse)
+	err := c.cc.Invoke(ctx, ExtensionHost_GetBypassCapabilities_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *extensionHostClient) GetBypassState(ctx context.Context, in *GetBypassStateRequest, opts ...grpc.CallOption) (*GetBypassStateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBypassStateResponse)
+	err := c.cc.Invoke(ctx, ExtensionHost_GetBypassState_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *extensionHostClient) GetBypassLayer(ctx context.Context, in *GetBypassLayerRequest, opts ...grpc.CallOption) (*GetBypassLayerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBypassLayerResponse)
+	err := c.cc.Invoke(ctx, ExtensionHost_GetBypassLayer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *extensionHostClient) ApplyBypassLayer(ctx context.Context, in *ApplyBypassLayerRequest, opts ...grpc.CallOption) (*ApplyBypassLayerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ApplyBypassLayerResponse)
+	err := c.cc.Invoke(ctx, ExtensionHost_ApplyBypassLayer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *extensionHostClient) TuneDesync(ctx context.Context, in *TuneDesyncRequest, opts ...grpc.CallOption) (*TuneDesyncResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TuneDesyncResponse)
+	err := c.cc.Invoke(ctx, ExtensionHost_TuneDesync_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *extensionHostClient) WatchBypassEvents(ctx context.Context, in *WatchBypassEventsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BypassEvent], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ExtensionHost_ServiceDesc.Streams[1], ExtensionHost_WatchBypassEvents_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[WatchBypassEventsRequest, BypassEvent]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ExtensionHost_WatchBypassEventsClient = grpc.ServerStreamingClient[BypassEvent]
+
 // ExtensionHostServer is the server API for ExtensionHost service.
 // All implementations must embed UnimplementedExtensionHostServer
 // for forward compatibility.
@@ -164,6 +263,30 @@ type ExtensionHostServer interface {
 	// extra permission beyond a valid token: every enabled extension may know
 	// whether the session is up.
 	WatchExtensionEvents(*WatchExtensionEventsRequest, grpc.ServerStreamingServer[ExtensionEvent]) error
+	// GetBypassCapabilities reports which DPI-bypass backends this host can
+	// actually run, measured — never assumed. Needs "bypass.read". Since 1.14.
+	GetBypassCapabilities(context.Context, *GetBypassCapabilitiesRequest) (*GetBypassCapabilitiesResponse, error)
+	// GetBypassState reports the effective bypass state of the last built
+	// plan: where the global strategy came from, whether a session is live,
+	// and whether a stored layer is newer than the plan. Needs
+	// "bypass.read". Since 1.14.
+	GetBypassState(context.Context, *GetBypassStateRequest) (*GetBypassStateResponse, error)
+	// GetBypassLayer returns the calling extension's own stored bypass
+	// layer. Needs "bypass.read". Since 1.14.
+	GetBypassLayer(context.Context, *GetBypassLayerRequest) (*GetBypassLayerResponse, error)
+	// ApplyBypassLayer replaces the calling extension's stored bypass layer;
+	// an empty layer (no global, no bindings) clears it. The layer takes
+	// effect at the next plan build (Connect) and never overrides user
+	// rules. Needs "bypass.write". Since 1.14.
+	ApplyBypassLayer(context.Context, *ApplyBypassLayerRequest) (*ApplyBypassLayerResponse, error)
+	// TuneDesync runs the core's desync tuner once for the named engine
+	// ("tpws"/"nfqws"; empty means the core default) and returns the winner.
+	// It probes only the core's own canary endpoints — the request carries
+	// no target. Needs "bypass.tune". Since 1.14.
+	TuneDesync(context.Context, *TuneDesyncRequest) (*TuneDesyncResponse, error)
+	// WatchBypassEvents streams bypass-relevant session events: censorship
+	// verdicts and session state changes. Needs "bypass.read". Since 1.14.
+	WatchBypassEvents(*WatchBypassEventsRequest, grpc.ServerStreamingServer[BypassEvent]) error
 	mustEmbedUnimplementedExtensionHostServer()
 }
 
@@ -191,6 +314,24 @@ func (UnimplementedExtensionHostServer) Notify(context.Context, *NotifyRequest) 
 }
 func (UnimplementedExtensionHostServer) WatchExtensionEvents(*WatchExtensionEventsRequest, grpc.ServerStreamingServer[ExtensionEvent]) error {
 	return status.Errorf(codes.Unimplemented, "method WatchExtensionEvents not implemented")
+}
+func (UnimplementedExtensionHostServer) GetBypassCapabilities(context.Context, *GetBypassCapabilitiesRequest) (*GetBypassCapabilitiesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBypassCapabilities not implemented")
+}
+func (UnimplementedExtensionHostServer) GetBypassState(context.Context, *GetBypassStateRequest) (*GetBypassStateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBypassState not implemented")
+}
+func (UnimplementedExtensionHostServer) GetBypassLayer(context.Context, *GetBypassLayerRequest) (*GetBypassLayerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBypassLayer not implemented")
+}
+func (UnimplementedExtensionHostServer) ApplyBypassLayer(context.Context, *ApplyBypassLayerRequest) (*ApplyBypassLayerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyBypassLayer not implemented")
+}
+func (UnimplementedExtensionHostServer) TuneDesync(context.Context, *TuneDesyncRequest) (*TuneDesyncResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TuneDesync not implemented")
+}
+func (UnimplementedExtensionHostServer) WatchBypassEvents(*WatchBypassEventsRequest, grpc.ServerStreamingServer[BypassEvent]) error {
+	return status.Errorf(codes.Unimplemented, "method WatchBypassEvents not implemented")
 }
 func (UnimplementedExtensionHostServer) mustEmbedUnimplementedExtensionHostServer() {}
 func (UnimplementedExtensionHostServer) testEmbeddedByValue()                       {}
@@ -314,6 +455,107 @@ func _ExtensionHost_WatchExtensionEvents_Handler(srv interface{}, stream grpc.Se
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ExtensionHost_WatchExtensionEventsServer = grpc.ServerStreamingServer[ExtensionEvent]
 
+func _ExtensionHost_GetBypassCapabilities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBypassCapabilitiesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExtensionHostServer).GetBypassCapabilities(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExtensionHost_GetBypassCapabilities_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExtensionHostServer).GetBypassCapabilities(ctx, req.(*GetBypassCapabilitiesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ExtensionHost_GetBypassState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBypassStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExtensionHostServer).GetBypassState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExtensionHost_GetBypassState_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExtensionHostServer).GetBypassState(ctx, req.(*GetBypassStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ExtensionHost_GetBypassLayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBypassLayerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExtensionHostServer).GetBypassLayer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExtensionHost_GetBypassLayer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExtensionHostServer).GetBypassLayer(ctx, req.(*GetBypassLayerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ExtensionHost_ApplyBypassLayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplyBypassLayerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExtensionHostServer).ApplyBypassLayer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExtensionHost_ApplyBypassLayer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExtensionHostServer).ApplyBypassLayer(ctx, req.(*ApplyBypassLayerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ExtensionHost_TuneDesync_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TuneDesyncRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExtensionHostServer).TuneDesync(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExtensionHost_TuneDesync_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExtensionHostServer).TuneDesync(ctx, req.(*TuneDesyncRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ExtensionHost_WatchBypassEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(WatchBypassEventsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ExtensionHostServer).WatchBypassEvents(m, &grpc.GenericServerStream[WatchBypassEventsRequest, BypassEvent]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ExtensionHost_WatchBypassEventsServer = grpc.ServerStreamingServer[BypassEvent]
+
 // ExtensionHost_ServiceDesc is the grpc.ServiceDesc for ExtensionHost service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -341,11 +583,36 @@ var ExtensionHost_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Notify",
 			Handler:    _ExtensionHost_Notify_Handler,
 		},
+		{
+			MethodName: "GetBypassCapabilities",
+			Handler:    _ExtensionHost_GetBypassCapabilities_Handler,
+		},
+		{
+			MethodName: "GetBypassState",
+			Handler:    _ExtensionHost_GetBypassState_Handler,
+		},
+		{
+			MethodName: "GetBypassLayer",
+			Handler:    _ExtensionHost_GetBypassLayer_Handler,
+		},
+		{
+			MethodName: "ApplyBypassLayer",
+			Handler:    _ExtensionHost_ApplyBypassLayer_Handler,
+		},
+		{
+			MethodName: "TuneDesync",
+			Handler:    _ExtensionHost_TuneDesync_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "WatchExtensionEvents",
 			Handler:       _ExtensionHost_WatchExtensionEvents_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "WatchBypassEvents",
+			Handler:       _ExtensionHost_WatchBypassEvents_Handler,
 			ServerStreams: true,
 		},
 	},

@@ -3,6 +3,7 @@ syntax = "proto3";
 package sora.ext.v1;
 
 import "google/protobuf/timestamp.proto";
+import "sora/core/v1/core_control.proto";
 
 option go_package = "github.com/levvs-one/sora-client/core/gen/sora/ext/v1;extv1";
 
@@ -31,6 +32,30 @@ service ExtensionHost {
   // extra permission beyond a valid token: every enabled extension may know
   // whether the session is up.
   rpc WatchExtensionEvents(WatchExtensionEventsRequest) returns (stream ExtensionEvent);
+  // GetBypassCapabilities reports which DPI-bypass backends this host can
+  // actually run, measured — never assumed. Needs "bypass.read". Since 1.14.
+  rpc GetBypassCapabilities(GetBypassCapabilitiesRequest) returns (GetBypassCapabilitiesResponse);
+  // GetBypassState reports the effective bypass state of the last built
+  // plan: where the global strategy came from, whether a session is live,
+  // and whether a stored layer is newer than the plan. Needs
+  // "bypass.read". Since 1.14.
+  rpc GetBypassState(GetBypassStateRequest) returns (GetBypassStateResponse);
+  // GetBypassLayer returns the calling extension's own stored bypass
+  // layer. Needs "bypass.read". Since 1.14.
+  rpc GetBypassLayer(GetBypassLayerRequest) returns (GetBypassLayerResponse);
+  // ApplyBypassLayer replaces the calling extension's stored bypass layer;
+  // an empty layer (no global, no bindings) clears it. The layer takes
+  // effect at the next plan build (Connect) and never overrides user
+  // rules. Needs "bypass.write". Since 1.14.
+  rpc ApplyBypassLayer(ApplyBypassLayerRequest) returns (ApplyBypassLayerResponse);
+  // TuneDesync runs the core's desync tuner once for the named engine
+  // ("tpws"/"nfqws"; empty means the core default) and returns the winner.
+  // It probes only the core's own canary endpoints — the request carries
+  // no target. Needs "bypass.tune". Since 1.14.
+  rpc TuneDesync(TuneDesyncRequest) returns (TuneDesyncResponse);
+  // WatchBypassEvents streams bypass-relevant session events: censorship
+  // verdicts and session state changes. Needs "bypass.read". Since 1.14.
+  rpc WatchBypassEvents(WatchBypassEventsRequest) returns (stream BypassEvent);
 }
 
 message MintTokenRequest {
@@ -106,4 +131,123 @@ message ExtensionEvent {
   string kind = 1;
   string detail = 2;
   google.protobuf.Timestamp at = 3;
+}
+
+// BypassBinding binds one destination to a bypass strategy. Match is a
+// plan-rule destination ("domain:example.com", "full:example.com", an IP
+// literal, a CIDR, "geosite:...", "geoip:...", "ruleset:..."; a bare
+// domain is shorthand for "domain:<domain>").
+message BypassBinding {
+  string match = 1;
+  sora.core.v1.BypassStrategy strategy = 2;
+}
+
+message GetBypassCapabilitiesRequest {
+  bytes extension_token = 1;
+}
+
+// BackendInfo is one bypass backend's measured availability.
+message BackendInfo {
+  // "tpws" or "nfqws".
+  string kind = 1;
+  bool available = 2;
+  // Why the backend is unavailable (the missing capability and the
+  // remedy), empty when available.
+  string reason = 3;
+}
+
+message GetBypassCapabilitiesResponse {
+  // The executor family of this host, e.g. "linux-nfqueue".
+  string platform = 1;
+  repeated BackendInfo backends = 2;
+}
+
+message GetBypassStateRequest {
+  bytes extension_token = 1;
+}
+
+message GetBypassStateResponse {
+  string platform = 1;
+  // Where the global bypass strategy of the last built plan came from:
+  // "user", "extension", "core_default" or "none" (no plan built yet, or
+  // the plan carries no global bypass).
+  string global_source = 2;
+  // The extension id the global strategy came from, when global_source
+  // is "extension"; empty otherwise.
+  string global_from = 3;
+  bool session_active = 4;
+  // A stored layer is newer than the last built plan: it will only take
+  // effect at the next Connect.
+  bool pending_apply = 5;
+  // Bindings the last built plan actually carries from extension layers
+  // (conflicts with user rules are skipped at merge time and not counted).
+  int32 bindings_count = 6;
+}
+
+message GetBypassLayerRequest {
+  bytes extension_token = 1;
+}
+
+message GetBypassLayerResponse {
+  // The layer's global strategy; meaningful only when has_global is set.
+  sora.core.v1.BypassStrategy global = 1;
+  bool has_global = 2;
+  repeated BypassBinding bindings = 3;
+  // When the layer was stored, seconds since the epoch. Zero when the
+  // calling extension has no layer.
+  int64 updated_at_unix = 4;
+}
+
+message ApplyBypassLayerRequest {
+  bytes extension_token = 1;
+  bool has_global = 2;
+  // The global strategy; ignored when has_global is false.
+  sora.core.v1.BypassStrategy global = 3;
+  repeated BypassBinding bindings = 4;
+}
+
+message ApplyBypassLayerResponse {
+  int64 updated_at_unix = 1;
+}
+
+message TuneDesyncRequest {
+  bytes extension_token = 1;
+  // Executor to tune for: "nfqws" or "tpws". Empty means the core
+  // default (nfqws), exactly as in sora.censor.v1.
+  string engine = 2;
+}
+
+message TuneDesyncResponse {
+  // The winning strategy's stable id: a registry profile id, or the
+  // genome id ("d/...") when the winner is known only as a genome.
+  // Empty when no candidate worked.
+  string winner_id = 1;
+  string winner_describe = 2;
+  // The winner's fitness in [0,1].
+  double score = 3;
+  // How many candidates were probed.
+  int32 attempts = 4;
+  // Whether strategy carries the winner's strategy. A winner whose
+  // genome has no faithful strategy rendering reports false while the
+  // other fields stay honest.
+  bool has_strategy = 5;
+  sora.core.v1.BypassStrategy strategy = 6;
+}
+
+message WatchBypassEventsRequest {
+  bytes extension_token = 1;
+}
+
+message BypassEvent {
+  // One of "censorship", "strategy", "session". The session journal
+  // today emits censorship verdicts and session state changes; "strategy"
+  // is reserved for strategy-change events the journal does not produce
+  // yet and is never synthesized.
+  string kind = 1;
+  // The censorship classification ("sni_blocking", "rst_injection", ...)
+  // when kind is "censorship"; empty otherwise.
+  string censorship_kind = 2;
+  // Plain-language account of the event, as journaled.
+  string explanation = 3;
+  google.protobuf.Timestamp at = 4;
 }

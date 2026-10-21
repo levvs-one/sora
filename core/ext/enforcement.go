@@ -135,6 +135,24 @@ var enforcementTable = []EnforcementRow{
 		Where:  "core/ext/worker.go Scheduler.RegisterConfig (capability + permission), interval clamp, overlap guard, circuit breaker, kill-switch pause",
 		Note:   "the permission gate and the scheduler machinery are real and unit-tested; the worker executor (a JS runner) is NOT wired in production yet, so no extension code actually runs — see the pass-1 report",
 	},
+	{
+		ID:     "bypass.read",
+		Status: EnforcementEnforced,
+		Where:  "core/ext/host.go Host.check (rpcPermissions: GetBypassCapabilities/GetBypassState/GetBypassLayer/WatchBypassEvents)",
+		Note:   "every bypass read call is token- and permission-checked in the host; the state an extension sees is the core's measured state, never another extension's layer contents",
+	},
+	{
+		ID:     "bypass.write",
+		Status: EnforcementEnforced,
+		Where:  "core/ext/host.go Host.check (rpcPermissions: ApplyBypassLayer) + core/ext/bypass_layer.go LayerStore.Set validation; plan merge in core/control takes layers only from enabled extensions granted bypass.write",
+		Note:   "RiskDangerous: an applied layer changes the network path (zapret global + per-destination bypass outbounds) at the next Connect; layers are validated fail-closed before they are stored, and user rules always win over a layer at merge time",
+	},
+	{
+		ID:     "bypass.tune",
+		Status: EnforcementEnforced,
+		Where:  "core/ext/host.go Host.check (rpcPermissions: TuneDesync) + core/control desync tuner (explicit trigger, canary-only probes, per-network rate limit)",
+		Note:   "RiskDangerous: tuning runs active probes against the core's own canaries and binds the winner; it never probes an extension-named target because the request carries none",
+	},
 }
 
 // EnforcementTable returns a copy of the audited enforcement matrix, in
