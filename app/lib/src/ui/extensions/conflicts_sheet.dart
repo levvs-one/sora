@@ -1,12 +1,11 @@
 /// Conflict resolution sheet: when two enabled extensions are granted the
-/// same exclusive permission (routing rules, theme, network hooks), the
-/// user picks the winner instead of suffering a quiet last-write-wins.
+/// same exclusive permission (theme, network hooks), the user picks the
+/// winner instead of suffering a quiet last-write-wins.
 ///
 /// The choice is persisted per conflict key ([ExtConflict.key]) so it
-/// survives reinstalls of the same contender set. It is the user's declared
-/// intent: the engine will apply the stored winner once it gains support
-/// for these capabilities; until then nothing is applied silently — the
-/// install prompt and the conflict texts say so explicitly.
+/// survives reinstalls of the same contender set. The theme runtime applies
+/// the winner at once; network hooks are not run, which the install prompt
+/// and the note below say.
 library;
 
 import 'package:flutter/material.dart';
@@ -34,7 +33,6 @@ Future<bool> showConflictsSheet(
 String _kindLabel(BuildContext context, ExtConflictKind kind) {
   final s = S.of(context);
   return switch (kind) {
-    ExtConflictKind.routingRules => s.extConflictRoutingRules,
     ExtConflictKind.themeApply => s.extConflictTheme,
     ExtConflictKind.netHooks => s.extConflictNetHooks,
   };

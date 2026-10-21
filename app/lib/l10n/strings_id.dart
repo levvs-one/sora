@@ -1114,9 +1114,6 @@ class SId extends S {
       'Ekstensi ini menginginkan hal yang sama. Pilih mana yang berjalan; yang lain tetap terpasang.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

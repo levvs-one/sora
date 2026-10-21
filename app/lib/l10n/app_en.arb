@@ -450,7 +450,6 @@
   "extUpdateFailedKept": "The previous version is still installed.",
   "extConflictsTitle": "Extension conflicts",
   "extConflictsIntro": "These extensions want the same thing. Choose which one runs; the other stays installed.",
-  "extConflictRoutingRules": "Routing rules",
   "extConflictTheme": "App theme",
   "extConflictNetHooks": "Network hooks",
   "extConflictWinner": "{name} wins",
@@ -470,7 +469,7 @@
     }
   },
   "extConflictsResolve": "Resolve",
-  "extConflictNote": "Your choice is saved on this device and will be applied once the engine supports these capabilities.",
+  "extConflictNote": "Your choice is saved on this device. A theme switches right away; network hooks are not run in this version.",
   "extVersionLabel": "Version {version}",
   "@extVersionLabel": {
     "placeholders": {

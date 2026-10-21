@@ -1112,9 +1112,6 @@ class SRu extends S {
       'Эти расширения претендуют на одно и то же. Выберите, какое будет работать, второе останется установленным.';
 
   @override
-  String get extConflictRoutingRules => 'Правила маршрутизации';
-
-  @override
   String get extConflictTheme => 'Тема приложения';
 
   @override
@@ -1135,7 +1132,7 @@ class SRu extends S {
 
   @override
   String get extConflictNote =>
-      'Ваш выбор сохраняется на этом устройстве и будет применён, когда движок начнёт поддерживать эти возможности.';
+      'Выбор сохраняется на этом устройстве. Тема переключается сразу, сетевые хуки в этой версии не запускаются.';
 
   @override
   String extVersionLabel(String version) {

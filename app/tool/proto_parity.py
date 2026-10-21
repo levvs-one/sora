@@ -310,7 +310,7 @@ BUILDER_PATTERNS = [
     (re.compile(r"\.\.m<[^,]+,\s*[^>]+>\((\d+),"), "map"),
     (re.compile(r"\.\.aOS\((\d+),"), "string"),
     (re.compile(r"\.\.aOB\((\d+),"), "bool"),
-    (re.compile(r"\.\.aI\((\d+),"), "int"),  # ..aI(tag, fieldType: OU3) — uint32
+    (re.compile(r"\.\.aI\((\d+),"), "int"),  # ..aI(tag, fieldType: OU3), uint32
     (re.compile(r"\.\.a<\$core\.int>\((\d+),"), "int"),
     (re.compile(r"\.\.a<\$fixnum\.Int64>\((\d+),"), "int64"),
     (re.compile(r"\.\.a<\$core\.double>\((\d+),"), "double"),

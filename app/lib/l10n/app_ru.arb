@@ -595,7 +595,6 @@
   "extUpdateFailedKept": "Предыдущая версия осталась установлена.",
   "extConflictsTitle": "Конфликты расширений",
   "extConflictsIntro": "Эти расширения претендуют на одно и то же. Выберите, какое будет работать, второе останется установленным.",
-  "extConflictRoutingRules": "Правила маршрутизации",
   "extConflictTheme": "Тема приложения",
   "extConflictNetHooks": "Сетевые хуки",
   "extConflictWinner": "Побеждает: {name}",
@@ -615,7 +614,7 @@
     }
   },
   "extConflictsResolve": "Решить",
-  "extConflictNote": "Ваш выбор сохраняется на этом устройстве и будет применён, когда движок начнёт поддерживать эти возможности.",
+  "extConflictNote": "Выбор сохраняется на этом устройстве. Тема переключается сразу, сетевые хуки в этой версии не запускаются.",
   "extVersionLabel": "Версия {version}",
   "@extVersionLabel": {
     "placeholders": {

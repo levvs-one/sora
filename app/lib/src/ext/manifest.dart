@@ -359,7 +359,7 @@ List<String> _parseNetworkHosts(dynamic raw) {
   final out = <String>[];
   for (final e in raw) {
     // Mirrors core/ext (encoding/json rejects non-strings): entries must be
-    // strings. Normalized to lowercase like core/ext — the allowlist is DNS
+    // strings. Normalized to lowercase like core/ext: the allowlist is DNS
     // names only, and matching is case-insensitive.
     if (e is! String) throw ManifestError('network_hosts entries must be strings');
     final h = e.trim().toLowerCase();
@@ -370,7 +370,7 @@ List<String> _parseNetworkHosts(dynamic raw) {
 }
 
 /// True for IP-literal-like hosts, which the allowlist rejects: it holds DNS
-/// names only. Mirrors core/ext's isIPLike — plain IPv4 literals plus the
+/// names only. Mirrors core/ext's isIPLike: plain IPv4 literals plus the
 /// notations some system resolvers still dial as IPs: hex (`0x7f000001`,
 /// `0x7f.1`), octal (`017700000001`) and all-digit (`2130706433`) forms.
 /// (IPv6 cannot pass the host pattern since ':' is not allowed there.)

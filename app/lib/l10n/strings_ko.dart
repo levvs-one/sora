@@ -1100,9 +1100,6 @@ class SKo extends S {
   String get extConflictsIntro => '이 확장 프로그램들은 같은 것을 원합니다. 실행할 것을 고르세요. 다른 하나는 설치된 채로 남습니다.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

@@ -215,7 +215,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
       groups.putIfAbsent(c.process.isEmpty ? '—' : c.process, () => []).add(c);
     }
     // Traffic totals are the sort keys: compute them once per build pass,
-    // not per comparison — _traffic sums every connection in the group, so
+    // not per comparison: _traffic sums every connection in the group, so
     // the comparator made grouping O(g log g × group size) on every poll
     // tick and search keystroke (the benchmark screen's sort-keys
     // pattern). The totals cannot change during the sort, so the order is

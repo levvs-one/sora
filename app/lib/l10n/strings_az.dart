@@ -1114,9 +1114,6 @@ class SAz extends S {
       'Bu genişləndirmələr eyni şeyi istəyir. Hansının işləyəcəyini seçin, digəri quraşdırılmış qalacaq.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

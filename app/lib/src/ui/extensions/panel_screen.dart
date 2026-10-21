@@ -33,7 +33,7 @@ import '../../generated/sora/core/v1/core_control.pbgrpc.dart';
 /// panels): a panel must never make its own network requests, or a
 /// compromised panel exfiltrates data with a single request.
 ///
-/// `connect-src 'none'` alone is NOT enough — it blocks only fetch/XHR,
+/// `connect-src 'none'` alone is NOT enough: it blocks only fetch/XHR,
 /// WebSocket, EventSource and beacons. Subresource loads (images, media,
 /// fonts, styles, workers) are governed by their own directives, so the
 /// policy locks those to the panel's own origin as well: an exfiltration
@@ -54,7 +54,7 @@ const String _panelContentSecurityPolicy =
 /// `<head>`, so `window.soraExt` exists before any page script runs.
 ///
 /// Every served response carries [_panelContentSecurityPolicy]: panel
-/// documents must never make their own network requests — the panel's only
+/// documents must never make their own network requests; the panel's only
 /// sanctioned way out is the soraExt JS channel (net.fetch through the core
 /// exists for background workers, not panels; neither is governed by the
 /// page CSP).
@@ -161,7 +161,8 @@ class LocalPanelServer {
   }
 
   bool _isEntry(String canonical) {
-    final want = '${Directory(root).absolute.path}${Platform.pathSeparator}${entry.replaceAll('/', Platform.pathSeparator)}';
+    final want =
+        '${Directory(root).absolute.path}${Platform.pathSeparator}${entry.replaceAll('/', Platform.pathSeparator)}';
     return canonical == want;
   }
 

@@ -162,9 +162,9 @@ class Desktop with WindowListener {
     disconnect = disconnect && !sora.settings.strictKillSwitch && !sora.strictBlocked;
     _dropping = disconnect;
     // A quit that reaches here is a clean shutdown, not a crash: never offer
-    // to "restore" this run's session on next launch (F7 honesty). This covers
-    // the paths disconnect() never sees — quit(disconnect: false) leaving the
-    // core session running, and the offline phase skipping the disconnect.
+    // to "restore" this run's session on next launch. This covers the paths
+    // disconnect() never sees: quit(disconnect: false) leaving the core
+    // session running, and the offline phase skipping the disconnect.
     sora.noteCleanShutdown();
     // An off session may still hold the kill switch after failure; disconnect
     // releases it.
@@ -344,9 +344,9 @@ class Desktop with WindowListener {
   };
 
   /// Server entries for the tray menu, mirroring the main servers list:
-  /// custom servers live in the «Мои серверы» card and are dropped here too
-  /// (INT-1); hidden servers are dropped — selecting one would silently fall
-  /// back to auto — and subscription renames apply.
+  /// custom servers live in the «Мои серверы» card and are dropped here too;
+  /// hidden servers are dropped (selecting one would silently fall back to
+  /// auto) and subscription renames apply.
   List<Entry> _trayEntries() {
     final out = <Entry>[];
     for (final sub in sora.subscriptions) {
@@ -533,7 +533,7 @@ class Desktop with WindowListener {
 
   /// Delivers links that arrived before the UI was ready. Called once from
   /// main() after startup: the command-line link that launched the app (cold
-  /// start — app_links only reports links received while the app runs) and
+  /// start: app_links only reports links received while the app runs) and
   /// any link the native side queued while Dart was starting.
   Future<void> handleInitialLinks(String? launchLink) async {
     final links = <String>[];

@@ -1113,9 +1113,6 @@ class STr extends S {
   String get extConflictsIntro => 'Bu uzantılar aynı şeyi istiyor. Hangisinin çalışacağını seçin; diğeri kurulu kalır.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

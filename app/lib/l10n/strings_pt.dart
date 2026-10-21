@@ -1116,9 +1116,6 @@ class SPt extends S {
       'Estas extensões querem a mesma coisa. Escolha qual funciona; a outra continua instalada.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

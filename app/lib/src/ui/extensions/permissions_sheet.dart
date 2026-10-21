@@ -2,7 +2,7 @@
 /// installed or when an update widens permissions.
 ///
 /// Least privilege, stated plainly: every permission is rendered as a
-/// human-readable "will be able to" line with its honest risk tier.
+/// human-readable "will be able to" line with its risk tier.
 /// Dangerous permissions are highlighted and need an explicit confirmation
 /// checkbox. A widening update shows only what is new (plus what the
 /// update drops), with the changelog on top so the user knows why.
@@ -24,7 +24,7 @@ import 'widgets.dart';
 /// when the user cancelled.
 ///
 /// [addedPermissions] / [removedPermissions] describe a widening update:
-/// only the delta is shown, with the honest "Update" title. [changelog]
+/// only the delta is shown, with the "Update" title. [changelog]
 /// lists the new versions' notes newest-first; null when unknown (sideload).
 Future<List<String>?> showInstallPrompt(
   BuildContext context, {
@@ -118,7 +118,7 @@ class _InstallPromptState extends State<_InstallPrompt> {
   Widget build(BuildContext context) {
     final s = S.of(context), palette = Palette.of(context);
     final m = widget.manifest;
-    // Three honest states: fresh install (null) shows the full list under
+    // Three states: fresh install (null) shows the full list under
     // "Install"; an update shows the delta under "Update"; an update with
     // no additions falls back to the full list with the neutral intro.
     final isUpdate = widget.addedPermissions != null;
@@ -246,7 +246,7 @@ class _InstallPromptState extends State<_InstallPrompt> {
 
   /// The plain-language explanation (and, for network access, the exact
   /// host allowlist) rendered under a permission row. Also carries the
-  /// honest "not yet active" marker for permissions whose runtime is not
+  /// "not yet active" marker for permissions whose runtime is not
   /// built (enforcement.dart is the source of truth): the prompt must
   /// never present an inert or unimplemented grant as live protection.
   /// Empty when the blurb says it all.

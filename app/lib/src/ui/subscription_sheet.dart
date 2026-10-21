@@ -11,7 +11,7 @@ import 'kit.dart';
 
 /// Prompts for a subscription URL. Prefills [link] from a browser or messenger
 /// import; otherwise checks the clipboard for a URL or an import link
-/// (sora://, v2rayn://, …) the user copied from a messenger — the QR import
+/// (sora://, v2rayn://, …) the user copied from a messenger; the QR import
 /// already routes those here, so the sheet accepts them too.
 Future<void> showSubscriptionSheet(BuildContext context, {String? link, String name = ''}) async {
   final sora = SoraScope.read(context);

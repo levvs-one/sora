@@ -1101,9 +1101,6 @@ class SEn extends S {
       'These extensions want the same thing. Choose which one runs; the other stays installed.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override
@@ -1124,7 +1121,7 @@ class SEn extends S {
 
   @override
   String get extConflictNote =>
-      'Your choice is saved on this device and will be applied once the engine supports these capabilities.';
+      'Your choice is saved on this device. A theme switches right away; network hooks are not run in this version.';
 
   @override
   String extVersionLabel(String version) {

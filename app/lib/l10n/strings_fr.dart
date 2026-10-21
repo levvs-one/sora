@@ -1118,9 +1118,6 @@ class SFr extends S {
       'Ces extensions veulent la même chose. Choisissez celle qui fonctionne ; l’autre reste installée.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

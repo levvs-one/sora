@@ -173,7 +173,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
   }
 
   /// Live progress: the core streams bare results with no total, so the
-  /// honest progress is the completed count, not a fraction.
+  /// progress is the completed count, not a fraction.
   Widget _progress(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
@@ -252,7 +252,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
 
   /// One test: status icon, title, what the probe observed, and the one-tap
   /// fix where it applies. Pass is a calm accent, fail is a warning icon in
-  /// calm ink — never red. A skipped test passes by definition but is marked
+  /// calm ink, never red. A skipped test passes by definition but is marked
   /// so it is never mistaken for a verified pass.
   Widget _resultRow(BuildContext context, LeakTestResult result) {
     final s = S.of(context);

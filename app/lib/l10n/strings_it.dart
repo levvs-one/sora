@@ -1118,9 +1118,6 @@ class SIt extends S {
       'Queste estensioni vogliono la stessa cosa. Scegli quale funziona; l’altra resta installata.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

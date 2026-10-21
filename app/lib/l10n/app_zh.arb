@@ -666,7 +666,6 @@
   "extUpdateFailedKept": "The previous version is still installed.",
   "extConflictsTitle": "Extension conflicts",
   "extConflictsIntro": "这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。",
-  "extConflictRoutingRules": "Routing rules",
   "extConflictTheme": "App theme",
   "extConflictNetHooks": "Network hooks",
   "extConflictWinner": "{name} wins",

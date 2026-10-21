@@ -73,7 +73,7 @@ class InstalledExtension {
 
   /// Pinned author public key (minisign .pub line): the catalog-pinned key
   /// for catalog installs, the manifest's self-attested key otherwise
-  /// (trust on first use). Updates must carry the same key — a changed key
+  /// (trust on first use). Updates must carry the same key: a changed key
   /// is refused, never silently adopted. Null in registries written before
   /// pinning; readers fall back to the manifest's key for those.
   final String? authorKey;
@@ -123,7 +123,7 @@ class InstalledExtension {
 }
 
 /// Compares two minisign .pub lines for the author-key continuity check.
-/// Only surrounding whitespace is forgiven — base64 is case-sensitive, so
+/// Only surrounding whitespace is forgiven: base64 is case-sensitive, so
 /// key content is never normalized.
 bool _sameAuthorKey(String a, String? b) => b != null && a.trim() == b.trim();
 
@@ -430,14 +430,14 @@ class ExtensionStore extends ChangeNotifier {
   ///
   /// Installs an already-opened package.
   ///
-  /// The signature and checksums are verified here — this is the single
+  /// The signature and checksums are verified here. This is the single
   /// gate, so callers must not be relied upon to verify first.
   /// installs and is required then: the package signature is verified
   /// against the pin, never against the manifest's
   /// self-attested key, and the pin becomes the extension's trust anchor.
   /// For other sources the pin is ignored and the manifest's key is
   /// trusted on first use. An update whose author key differs from the
-  /// pinned one is refused outright — key continuity, never a silent
+  /// pinned one is refused outright: key continuity, never a silent
   /// substitution.
   ///
   /// Throws [ExtStoreError] / [PackageError] with developer messages; the UI
@@ -465,7 +465,7 @@ class ExtensionStore extends ChangeNotifier {
       throw ExtStoreError('version ${m.version} is not newer than installed ${cur.version}');
     }
     // Author-key continuity: an update signed by a different key than the
-    // pinned one is refused outright — a silent substitution of the trust
+    // pinned one is refused outright: a silent substitution of the trust
     // anchor (id squatting, catalog -> sideload cross-source swaps) must
     // never happen. The user can still get the new build by uninstalling
     // and installing it explicitly.

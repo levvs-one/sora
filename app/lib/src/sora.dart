@@ -175,7 +175,7 @@ class Sora extends ChangeNotifier {
   bool serverlessAvailable = false;
 
   /// Set once the core answers the control channel (the getStatus/getAbout
-  /// handshake in [run]); the S11b post-update health signal.
+  /// handshake in [run]); the post-update health signal.
   bool coreHandshakeDone = false;
   Set<String> coreCapabilities = {};
 
@@ -419,7 +419,7 @@ class Sora extends ChangeNotifier {
 
   /// Lifecycle manager for the sora-sync device-sync daemon. The daemon
   /// is spawned on demand (first opened sync screen) and stopped on app exit;
-  /// it is the source of truth for paired devices — the app keeps no device
+  /// it is the source of truth for paired devices; the app keeps no device
   /// registry of its own.
   final SyncDaemon syncDaemon = SyncDaemon();
 
@@ -480,7 +480,7 @@ class Sora extends ChangeNotifier {
   /// Memo for [servers], dropped by [notifyListeners]. A single build pass
   /// reads [servers] from the connection pane, from every server row (via
   /// [selected]) and from the plan builder, and each read used to rebuild
-  /// the whole deduped list — O(reads × servers) allocations on the first
+  /// the whole deduped list: O(reads × servers) allocations on the first
   /// builds and on every probe tick. Every write to the inputs
   /// (_subscriptions, subscription overrides) already ends in
   /// [notifyListeners], so the memo can never outlive a mutation; it is
@@ -491,8 +491,8 @@ class Sora extends ChangeNotifier {
   /// Current selection; falls back to auto if the selected server or group is
   /// no longer present. Always the canonical outbound id: custom servers are
   /// stored with plain ids, but the core merges them into subscription
-  /// outbound lists as `custom/<id>` (INT-1), so the plain form is mapped on
-  /// read — and on write by [select] — keeping the plan builder, latency
+  /// outbound lists as `custom/<id>`, so the plain form is mapped on
+  /// read (and on write by [select]), keeping the plan builder, latency
   /// keys and selection comparisons in one namespace.
   String get selected {
     final chosen = settings.server;
@@ -503,13 +503,13 @@ class Sora extends ChangeNotifier {
       // auto instead of building a plan the core would reject.
       return entryOf(chosen, _subscriptions.values)?.withoutHidden(hiddenServerIds) == null ? 'auto' : chosen;
     }
-    // Legacy plain custom ids (stored before INT-1 canonicalization) resolve
+    // Legacy plain custom ids (stored before custom ids were canonicalized) resolve
     // here; everything else already lives in the outbound namespace.
     final canonical = canonicalServerId(chosen);
     return servers.any((o) => o.id == canonical) ? canonical : 'auto';
   }
 
-  /// Maps a selection to the core's outbound id namespace (INT-1):
+  /// Maps a selection to the core's outbound id namespace:
   /// `custom/<id>` for custom servers, everything else unchanged. See
   /// [canonicalCustomId].
   String canonicalServerId(String id) => canonicalCustomId(id, [for (final s in customServers) s.id]);
@@ -530,7 +530,7 @@ class Sora extends ChangeNotifier {
   SessionPlan get currentPlan {
     // Hops that vanished (a server was deleted mid-session) are dropped
     // instead of throwing inside a getter the UI calls on every rebuild;
-    // the mismatch then honestly reports as pending changes.
+    // the mismatch then reports as pending changes.
     final chain = _activeChain;
     final hops = chain == null
         ? const <String>[]
@@ -613,7 +613,7 @@ class Sora extends ChangeNotifier {
         localProxy = about.about.hasLocalProxy() ? about.about.localProxy : null;
         if (failure?.key == CoreFailure.unavailable.key) failure = null;
         recovered('core');
-        // S11b: getStatus + getAbout answered — the honest post-update
+        // GetStatus + getAbout answered: the post-update
         // health signal. The updater clears its pending-update marker here;
         // the 60-second rollback window never fires on a healthy core.
         coreHandshakeDone = true;
@@ -631,7 +631,7 @@ class Sora extends ChangeNotifier {
           // subscription watch.
           await Future<void>.delayed(const Duration(milliseconds: 600));
           // A pending crash-restore offer owns the connection decision: wait
-          // for it instead of connecting underneath the banner (F7 honesty).
+          // for it instead of connecting underneath the banner.
           // An explicit dismiss stands the auto-connect down for this launch.
           // A dropped core link ends the wait: the run loop must recover the
           // transport below instead of stalling on the banner; the offer
@@ -895,7 +895,7 @@ class Sora extends ChangeNotifier {
 
   /// How long a session intent stays restorable. An offer older than this
   /// refers to a session the user has long forgotten, so the stored `at`
-  /// timestamp is read and stale intents are silently dropped (F7 honesty).
+  /// timestamp is read and stale intents are silently dropped.
   static const _sessionIntentTtl = Duration(hours: 24);
 
   /// Server choice saved after a successful connect; offered for restore when
@@ -907,7 +907,7 @@ class Sora extends ChangeNotifier {
 
   /// Set when the user explicitly dismisses the crash-restore offer: the
   /// pending auto-connect stands down for this launch instead of connecting
-  /// right after the user's "not now" (F7 honesty).
+  /// right after the user's "not now".
   bool _restoreDeclined = false;
 
   void _writeSessionIntent(String choice) {
@@ -921,7 +921,7 @@ class Sora extends ChangeNotifier {
   }
 
   /// Marks a clean shutdown. A quit that reaches this point is not a crash,
-  /// so no restore may be offered for this run's session on next launch —
+  /// so no restore may be offered for this run's session on next launch,
   /// even when the core session is intentionally left running
   /// (`quit(disconnect: false)`) or the disconnect is skipped because the
   /// core is offline.
@@ -1158,7 +1158,7 @@ class Sora extends ChangeNotifier {
 
   /// Connects through a proxy chain. The chain backend landed with core
   /// API 1.10; older cores and engines without the chains capability get an
-  /// honest, localized failure instead of a silent misconnect.
+  /// localized failure instead of a silent misconnect.
   Future<void> connectChain(ProxyChain chain) async {
     if (!chainsSupported) {
       throw const CoreFailure('chainUnsupported');
@@ -1180,7 +1180,7 @@ class Sora extends ChangeNotifier {
       await disconnect();
     } else if (phase == Phase.off || phase == Phase.offline) {
       // Offline means the core link is down: connect() then reports
-      // app.core_unavailable honestly instead of silently ignoring the tap.
+      // app.core_unavailable instead of silently ignoring the tap.
       await connect();
     } else if (phase == Phase.disconnecting) {
       _connectQueued = true;
@@ -1332,7 +1332,7 @@ class Sora extends ChangeNotifier {
       if (phase == Phase.connecting) phase = Phase.off;
       if (!_stopping && _emitted == before) _emit(ConnectionFailed(failure!));
       // The session never came up: this was a failed connect, not a crash,
-      // so no restore intent may linger for the next startup (F7 honesty).
+      // so no restore intent may linger for the next startup.
       // Profile-group failover re-runs connect() and re-writes its intent.
       _clearSessionIntent();
     } finally {
@@ -1413,7 +1413,7 @@ class Sora extends ChangeNotifier {
   }
 
   Future<void> select(String server) async {
-    // Persist the canonical outbound id (INT-1): the plan builder, latency
+    // Persist the canonical outbound id: the plan builder, latency
     // keys and selection checks all speak the core's `custom/<id>` namespace
     // for custom servers, so the plain card id is mapped once, here.
     final canonical = canonicalServerId(server);
@@ -1724,7 +1724,7 @@ class Sora extends ChangeNotifier {
     try {
       // The core API takes the plain custom id; the latency map lives in the
       // outbound namespace, where passive probes already key custom results
-      // by `custom/<id>` — one key for both, or the card never shows a manual
+      // by `custom/<id>`: one key for both, or the card never shows a manual
       // test result.
       final plain = id.startsWith(customServerPrefix) ? id.substring(customServerPrefix.length) : id;
       final key = '$customServerPrefix$plain';
@@ -1884,14 +1884,14 @@ class Sora extends ChangeNotifier {
 
   /// True when [current] stopped answering or is clearly slower than [best]:
   /// at least twice the ping and 100 ms behind. Unknown measurements never
-  /// trigger a switch — no blind moves.
+  /// trigger a switch: no blind moves.
   bool _degraded(String current, String best) {
     if (best == current) return false;
     final curMs = latency[current];
     final bestMs = latency[best];
     // The pinned server stopped answering: move only to a server with real
     // measurements. Hopping to an unprobed candidate would trade a known-bad
-    // server for an unknown one — and a needless reconnect.
+    // server for an unknown one, and a needless reconnect.
     if (latency.containsKey(current) && curMs == null) return bestMs != null;
     if (curMs == null || bestMs == null) return false;
     return bestMs * 2 <= curMs && curMs - bestMs >= 100;
@@ -1939,7 +1939,7 @@ class Sora extends ChangeNotifier {
   int? freshBandwidth(String id) => freshBandwidthOf(bandwidth, id);
 
   /// Recent probe outcomes per server: answered vs missed probes. In-memory
-  /// only — probes are cheap, so reliability always reflects fresh data and
+  /// only: probes are cheap, so reliability always reflects fresh data and
   /// needs no migration or persistence.
   final Map<String, ({int ok, int fail})> probeStats = {};
 
@@ -2017,7 +2017,7 @@ class Sora extends ChangeNotifier {
         if (sample.hasError()) {
           // One failed server fails only itself, never the batch: the core
           // sends a per-server error sample and keeps measuring the rest.
-          // Failed servers simply show no result ("—").
+          // Failed servers simply show no result (a dash).
           firstFailure ??= CoreFailure(sample.error.userMessageKey);
           failed++;
           done++;
@@ -2077,7 +2077,7 @@ class Sora extends ChangeNotifier {
 
   /// The server the smart auto-select ranks first right now, with the metrics
   /// behind the choice. Null when there is nothing to rank or nothing
-  /// measured yet — the UI shows no "why" badge then.
+  /// measured yet; the UI shows no "why" badge then.
   ({String id, int? ms, int? bps})? smartPick() {
     final ordinary = [
       for (final o in servers)
@@ -2353,7 +2353,7 @@ int? freshBandwidthOf(Map<String, ({int bps, DateTime at})> bandwidth, String id
 double mbpsOf(int bytesPerSec) => bytesPerSec * 8 / 1000000;
 
 /// Smart score in [0, 1] (higher is better): ping 40%, speed 40%,
-/// measurement freshness 20%, scaled by [reliability] when known — a server
+/// measurement freshness 20%, scaled by [reliability] when known: a server
 /// answering half of its recent probes keeps three quarters of its score.
 double smartScoreOf(
   String id,
@@ -2395,17 +2395,6 @@ double smartScoreOf(
 
 /// Compares two servers for auto-selection. [mode] is ping, speed or smart;
 /// unknown modes fall back to ping. Ties break by ping.
-///
-/// T011 NOT WIRED here: this selection (and [_fastest]/[pickMember])
-/// has no subnet-reputation input, so a server in a carpet-banned /24
-/// is NOT rejected or demoted on that basis. The core tracks subnet
-/// reputation (probe.SubnetReputation, fed by real probe dials) and
-/// the designed Go consumer exists (serversel.Picker.WithSubnets in
-/// core/select), but ProbeResult carries no subnet field and the
-/// proto cannot be extended in this repo (no buf/protoc); the Go
-/// picker itself has no production caller (owner decision SW3 — see
-/// core/select/select.go). Until one of those lands, auto-selection
-/// must not be described as avoiding burned subnets.
 int compareAutoSelect(
   String a,
   String b,

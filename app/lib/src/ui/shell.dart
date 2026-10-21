@@ -50,7 +50,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
 
   // Section widgets by section index. All are const constructors and only
   // the selected one is ever inflated (by the content Navigator below), so
-  // the list itself is built once instead of on every shell rebuild — the
+  // the list itself is built once instead of on every shell rebuild, and the
   // shell rebuilds on every Sora notification.
   static const _pages = <Widget>[
     HomeScreen(),

@@ -2163,12 +2163,6 @@ abstract class S {
   /// **'Эти расширения претендуют на одно и то же. Выберите, какое будет работать, второе останется установленным.'**
   String get extConflictsIntro;
 
-  /// No description provided for @extConflictRoutingRules.
-  ///
-  /// In ru, this message translates to:
-  /// **'Правила маршрутизации'**
-  String get extConflictRoutingRules;
-
   /// No description provided for @extConflictTheme.
   ///
   /// In ru, this message translates to:
@@ -2202,7 +2196,7 @@ abstract class S {
   /// No description provided for @extConflictNote.
   ///
   /// In ru, this message translates to:
-  /// **'Ваш выбор сохраняется на этом устройстве и будет применён, когда движок начнёт поддерживать эти возможности.'**
+  /// **'Выбор сохраняется на этом устройстве. Тема переключается сразу, сетевые хуки в этой версии не запускаются.'**
   String get extConflictNote;
 
   /// No description provided for @extVersionLabel.

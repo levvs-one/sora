@@ -69,10 +69,10 @@ class Entry {
     });
   }
 
-  /// Copy without custom (SW7) members, or null when none remain. INT-1
+  /// Copy without custom members, or null when none remain. The core
   /// merges custom servers into every subscription's outbound list so the
   /// plan builder sees them; subscription views drop them because the UI
-  /// already shows them in the «Мои серверы» card — keeping them would list
+  /// already shows them in the «Мои серверы» card, and keeping them would list
   /// every custom server twice (once per subscription). Entries with no
   /// custom members return [this], so callers can skip rebuilding.
   Entry? withoutCustom() {
@@ -101,16 +101,16 @@ class Entry {
 
 const groupPrefix = 'group:';
 
-/// Id prefix the core assigns to custom (user-added, SW7) servers when it
-/// merges them into subscription outbound lists (INT-1): `custom/<server id>`.
+/// Id prefix the core assigns to custom (user-added) servers when it
+/// merges them into subscription outbound lists: `custom/<server id>`.
 const customServerPrefix = 'custom/';
 
 /// Canonical id for a server selection in the core's outbound namespace.
 ///
-/// INT-1: the core merges custom (user-added, SW7) servers into subscription
+/// The core merges custom (user-added) servers into subscription
 /// outbound lists as `custom/<server id>`, but the UI stores custom servers
 /// with plain ids. A plain custom id must therefore map to the prefixed form
-/// for anything that speaks the outbound namespace — the plan builder, the
+/// for anything that speaks the outbound namespace: the plan builder, the
 /// latency maps, selection comparisons. Everything else (subscription
 /// servers, groups, auto/bypass) already uses outbound-namespace ids and
 /// passes through unchanged, so existing subscription selections are

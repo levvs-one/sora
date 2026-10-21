@@ -115,7 +115,7 @@ class CatalogEntry {
 
   /// A changelog row must be an object; a malformed row fails the whole
   /// entry rather than silently disappearing (the Go validator is strict
-  /// too — a team-signed catalog with a broken row is a team bug that
+  /// too: a team-signed catalog with a broken row is a team bug that
   /// must surface).
   static Map<String, dynamic> _changelogRow(dynamic r) {
     if (r is Map<String, dynamic>) return r;

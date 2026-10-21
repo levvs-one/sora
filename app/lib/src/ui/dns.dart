@@ -17,7 +17,7 @@ import 'subscription_sheet.dart';
 /// defaults (empty list); `custom` edits [Settings.dns] directly.
 ///
 /// Every preset speaks DoH: the presets used to carry bare IPs, which the
-/// core parses as plaintext UDP/53 — picking the "Cloudflare" preset
+/// core parses as plaintext UDP/53, so picking the "Cloudflare" preset
 /// silently *downgraded* the user below the encrypted `auto` default the
 /// docs promise (usage.md "DNS по умолчанию"). Cloudflare and Google are
 /// IP-addressed, like the core defaults, so they need no bootstrap;

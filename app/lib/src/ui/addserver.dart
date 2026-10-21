@@ -113,7 +113,7 @@ String customProtocolLabel(CustomProtocol protocol) => protocol.name.replaceFirs
 final _addressPattern = RegExp(r'^[A-Za-z0-9][A-Za-z0-9.:\-_\[\]]*$');
 
 /// Adds a user-owned server: name, protocol, address, port and an optional
-/// write-only secret (UUID, password, key — the core never returns it).
+/// write-only secret (UUID, password or key; the core never returns it).
 /// Reachability is tested from the servers list after saving: the core API
 /// tests only saved servers, by id, so there is no pre-save test here.
 class AddServerScreen extends StatefulWidget {

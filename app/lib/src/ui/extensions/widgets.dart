@@ -133,7 +133,7 @@ class ExtensionCard extends StatelessWidget {
   final VoidCallback? onTap;
   final bool enabled;
 
-  /// Manifest capabilities (installed) — used for the human-language
+  /// Manifest capabilities (installed), used for the human-language
   /// capability lines below the badges.
   final List<String> capabilities;
 
@@ -236,7 +236,7 @@ class ExtensionCard extends StatelessWidget {
 
 /// Permission row for the install prompt and the detail screen.
 ///
-/// The risk tier is visually honest: normal permissions get a plain check,
+/// The risk tier is visible at a glance: normal permissions get a plain check,
 /// sensitive ones a stronger info mark, dangerous ones the warning icon in
 /// the semantic danger color. The tier is also part of the screen-reader
 /// label, so it is never color- or icon-only information.
@@ -288,7 +288,7 @@ class PermissionRow extends StatelessWidget {
 /// [capabilities] are manifest capabilities (installed extensions),
 /// [permissions] the granted/requested permission ids, [networkHosts] the
 /// manifest `network_hosts` allowlist. Returns an empty list when the
-/// extension declares neither — the card stays exactly as before.
+/// extension declares neither, and the card stays exactly as before.
 List<Widget> capabilityLines(
   BuildContext context, {
   required List<String> capabilities,

@@ -1117,9 +1117,6 @@ class SEs extends S {
       'Estas extensiones quieren lo mismo. Elige cuál se ejecuta; la otra seguirá instalada.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

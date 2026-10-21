@@ -58,7 +58,7 @@ class UpdateSora extends Sora {
         : UpdateConnection.changing,
     client: () => MockClient((request) async {
       requests++;
-      // S11a: the rollout policy feed gets a valid policy; the release API
+      // The rollout policy feed gets a valid policy; the release API
       // gets the recorded release JSON.
       if (request.url.toString() == rolloutPolicyUrl) {
         return http.Response(
@@ -252,7 +252,7 @@ void main() {
         notices++;
       },
       client: () => MockClient((request) async {
-        // S11a: a valid policy for the rollout feed, the recorded release
+        // A valid policy for the rollout feed, the recorded release
         // for everything else. Serving the release JSON on the rollout URL
         // would fail RolloutPolicy.parse and withhold the update.
         if (request.url.toString() == rolloutPolicyUrl) {
@@ -283,7 +283,7 @@ void main() {
         notices++;
       },
       client: () => MockClient((request) async {
-        // S11a: the rollout feed gets a valid policy; only release-API
+        // The rollout feed gets a valid policy; only release-API
         // fetches count as update checks.
         if (request.url.toString() == rolloutPolicyUrl) {
           return http.Response(
@@ -321,7 +321,7 @@ void main() {
         notices++;
       },
       client: () => MockClient((request) async {
-        // S11a: the rollout feed gets a valid policy, like in the updater
+        // The rollout feed gets a valid policy, like in the updater
         // above; the notices stay at 1 either way because the version was
         // already announced.
         if (request.url.toString() == rolloutPolicyUrl) {
@@ -370,7 +370,7 @@ void main() {
             name: ReleaseAsset(name, release.asset(name).url, data[name]!.length),
         };
         if (scenario == 'missing') assets.remove(names.last);
-        // S11b: the previous release the rollback cache is built from.
+        // The previous release the rollback cache is built from.
         final oldInstall = manager == 'windows'
             ? null
             : LinuxInstallation(
@@ -403,7 +403,7 @@ void main() {
               },
           ],
         });
-        // S11b: point the rollback cache at a temp dir, never the real cache.
+        // Point the rollback cache at a temp dir, never the real cache.
         final rollbackRoot = await Directory.systemTemp.createTemp('sora-rollback-test-');
         addTearDown(() => rollbackRoot.delete(recursive: true));
         final updater = AppUpdater(
@@ -419,7 +419,7 @@ void main() {
           rollbackDir: (v) => Directory('${rollbackRoot.path}/$v'),
           client: () => MockClient((request) async {
             final path = request.url.path;
-            // S11b: the rollback cache is built from the previous release.
+            // The rollback cache is built from the previous release.
             if (path.endsWith('/releases/tags/v1.0.4')) {
               requests.add('old-release');
               return http.Response(oldReleaseJson, 200, headers: {'content-type': 'application/json; charset=utf-8'});
@@ -479,7 +479,7 @@ void main() {
           expect(order, manager == 'windows' ? ['warn', 'install', 'quit'] : ['warn', 'install', 'restart', 'quit']);
           expect(updater.error, isNull);
           if (manager != 'windows') {
-            // S11b: the health-check marker names the handoff, and the
+            // The health-check marker names the handoff, and the
             // rollback cache holds verified copies of the old packages.
             final marker = PendingUpdate.parse(settings.pendingUpdate);
             expect(marker?.from, '1.0.4');
@@ -526,7 +526,7 @@ void main() {
     }
   }
 
-  group('post-update health check and automatic rollback (S11b)', () {
+  group('post-update health check and automatic rollback', () {
     AppUpdater makeUpdater(
       Settings settings, {
       required Directory rollbackRoot,

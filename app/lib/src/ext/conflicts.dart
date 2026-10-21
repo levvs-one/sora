@@ -1,14 +1,14 @@
 /// Extension conflict detection (pure, UI-side).
 ///
 /// Two enabled extensions conflict when both are granted the same
-/// *contested* permission: only one of them can own the routing table, the
-/// app theme, or the network hooks at a time. Detection is deliberately
+/// *contested* permission: only one of them can own the app theme or the
+/// network hooks at a time. Detection is deliberately
 /// permission-based (the stable, user-approved signal) rather than
 /// capability-contract based: the grant is what the user saw and approved.
 ///
 /// Resolution (which extension wins) is persisted by [ExtensionStore]; themes use the stored winner.
-/// Routing rules merge deterministically and do not need an exclusive winner.
-/// Network hooks remain unapplied.
+/// Routing rules are not contested: they merge in a fixed order after the user's rules.
+/// Network hooks are not run by the app.
 library;
 
 import 'store.dart';
@@ -16,19 +16,15 @@ import 'store.dart';
 /// A permission whose grant is exclusive: two enabled holders fight over
 /// the same system surface.
 enum ExtConflictKind {
-  /// `routing.rules` — both extensions add routing rules.
-  routingRules,
-
-  /// `theme.apply` — both extensions want to theme the app.
+  /// `theme.apply`: both extensions want to theme the app.
   themeApply,
 
-  /// `net.hooks` — both extensions hook the network path.
+  /// `net.hooks`: both extensions hook the network path.
   netHooks,
 }
 
 /// The manifest permission id behind each conflict kind.
 String conflictPermission(ExtConflictKind kind) => switch (kind) {
-  ExtConflictKind.routingRules => 'routing.rules',
   ExtConflictKind.themeApply => 'theme.apply',
   ExtConflictKind.netHooks => 'net.hooks',
 };
@@ -53,7 +49,6 @@ class ExtConflict {
 List<ExtConflict> findConflicts(List<InstalledExtension> installed) {
   final out = <ExtConflict>[];
   for (final kind in ExtConflictKind.values) {
-    if (kind == ExtConflictKind.routingRules) continue;
     final permission = conflictPermission(kind);
     final contenders = [
       for (final inst in installed)

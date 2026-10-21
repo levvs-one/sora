@@ -251,9 +251,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       isUpdate = _store.get(pkg.manifest.id) != null;
       hideProgress();
       if (!context.mounted) return false;
-      // A widening update shows exactly what is new — with the honest
-      // "Update" title — instead of the full list under "Install". Dropped
-      // permissions are shown too: losing access deserves the same honesty.
+      // A widening update shows exactly what is new, under the "Update"
+      // title, instead of the full list under "Install". Dropped
+      // permissions are shown too: the user should see lost access as well.
       final existing = _store.get(pkg.manifest.id);
       final diff = existing == null ? null : diffPermissions(existing.granted, pkg.manifest.permissions);
       // Null for a fresh install; empty list for an update with no
@@ -773,7 +773,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   }
 
   /// Relevance for sort-by-relevance: text match first (name > author >
-  /// description), then the honest rating, then a logarithmic installs
+  /// description), then the rating, then a logarithmic installs
   /// term. Log installs break ties without letting a huge install base
   /// bury a better-rated newcomer.
   double _relevance(CatalogEntry e, String query) {
@@ -807,7 +807,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     final s = S.of(context);
     // Staged rollout: the update button appears only for installs inside
     // this version's bucket. The listing itself is never gated: hiding a
-    // published version from the catalog would be dishonest.
+    // published version from the catalog would be misleading.
     final needsUpdate =
         installed != null && compareVersions(e.version, installed.version) > 0 && e.rolloutEligible(store.installId);
     return ExtensionCard(
@@ -839,7 +839,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     final state = context.findAncestorStateOfType<_ExtensionsScreenState>();
     if (state == null || !context.mounted) return false;
     // The download is cancellable: closing the client aborts the stream.
-    // A user-cancelled download is not an error — stay silent.
+    // A user-cancelled download is not an error: stay silent.
     final client = http.Client();
     var cancelled = false;
     var dialogOpen = false;
@@ -1035,7 +1035,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   /// Updates every outdated extension in sequence. Each widening update
   /// still asks its own permission question; failures show their dialog
   /// and the run continues. The snackbar at the end counts only real
-  /// successes — silence would let a half-finished run look complete.
+  /// successes: silence would let a half-finished run look complete.
   Future<void> _updateAll(BuildContext context, List<InstalledExtension> updates) async {
     final s = S.of(context);
     setState(() => _updatingAll = true);

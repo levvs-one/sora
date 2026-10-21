@@ -43,7 +43,7 @@ class PanelBridge {
   /// () -> [{id, process, host, up_bytes, down_bytes}]
   final Future<List<Map<String, dynamic>>> Function() getConnections;
 
-  /// () -> [{id, name, country, latency_ms}] — the documented panel API
+  /// () -> [{id, name, country, latency_ms}], the documented panel API
   /// shape (docs/extensions-api.md); country is '' and latency_ms is -1
   /// when the app has no value for them, never an invented one.
   final List<Map<String, dynamic>> Function() servers;
@@ -55,8 +55,8 @@ class PanelBridge {
 
   /// Writes settings (merge semantics: unmentioned keys keep their
   /// values). Implementations must surface a schema rejection as
-  /// BridgeError('invalid-argument', ...) — the documented error
-  /// contract — not as a bare store error, which [handle] would report
+  /// BridgeError('invalid-argument', ...), the documented error
+  /// contract, not as a bare store error, which [handle] would report
   /// to the panel as 'internal'.
   final Future<void> Function(Map<String, dynamic>) setSettings;
 
@@ -161,7 +161,7 @@ window.soraExt = (() => {
         p.resolve(payload);
       } else {
         // The documented contract (sora-ext.d.ts): rejections are
-        // SoraExtError-shaped — an Error whose `code` is the stable
+        // SoraExtError-shaped: an Error whose `code` is the stable
         // machine-readable code, exactly like the mock's deny(). The
         // payload here IS the code the host sent.
         const e = new Error(payload);

@@ -281,9 +281,9 @@ List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty
 /// of its group so the rename stays visible instead of being swallowed by the
 /// shared group title.
 ///
-/// Custom servers (SW7) are dropped everywhere below: INT-1 merges them into
+/// Custom servers are dropped everywhere below: the core merges them into
 /// each subscription's outbound list so the plan builder sees them, but in
-/// the UI they already live in the «Мои серверы» card — keeping them here
+/// the UI they already live in the «Мои серверы» card, and keeping them here
 /// would show every custom server again inside each subscription. The drop
 /// runs before overrides: overrides apply to subscription servers only, and
 /// a renamed custom member must not slip back in through [Entry.applyRenames].
@@ -308,7 +308,7 @@ List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
 ///
 /// [shownCache] optionally collects each group entry's prospective active
 /// member: the sort keys and the rows below both need it, and [pickMember]
-/// scans every member — computing it once per entry per build pass instead
+/// scans every member; computing it once per entry per build pass instead
 /// of once per sort comparison plus once per row removes the probe-tick
 /// hotspot (latency ticks rebuild this screen about three times a second).
 List<Entry> _sortEntries(List<Entry> entries, Sora sora, [Map<Entry, OutboundSpec?>? shownCache]) {
@@ -323,8 +323,8 @@ List<Entry> _sortEntries(List<Entry> entries, Sora sora, [Map<Entry, OutboundSpe
     entries.sort((a, b) => nameKeys[a]!.compareTo(nameKeys[b]!));
     return entries;
   }
-  // Groups are represented by the prospective active member — the same one
-  // whose metrics the row shows — so the visible numbers match the sort order.
+  // Groups are represented by the prospective active member (the same one
+  // whose metrics the row shows), so the visible numbers match the sort order.
   // Keys are computed once per entry: keyOf used to call pickMember on every
   // comparison (O(n log n) member scans per build).
   String keyOf(Entry e) {
@@ -804,7 +804,7 @@ class _CustomServerRowState extends State<_CustomServerRow> {
     final s = S.of(context);
     final server = widget.server;
     // Selection and latency live in the core's outbound namespace, where
-    // custom servers are `custom/<id>` (INT-1); the card's CustomServer
+    // custom servers are `custom/<id>`; the card's CustomServer
     // carries the plain id, so it is canonicalized once here.
     final customId = sora.canonicalServerId(server.id);
     final chosen = sora.selected == customId;

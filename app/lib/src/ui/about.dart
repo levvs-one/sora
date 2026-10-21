@@ -91,7 +91,7 @@ class _AboutScreenState extends State<AboutScreen> {
         ),
         Group(
           children: [
-            // S11a: persistent, non-alarming notice when the installed
+            // Persistent, non-alarming notice when the installed
             // version was recalled via the rollout policy's blocked_versions.
             if (updates.versionRevoked)
               Padding(
@@ -115,8 +115,8 @@ class _AboutScreenState extends State<AboutScreen> {
                       ),
               ),
             ),
-            // S11a: a newer release exists but this install's cohort is not
-            // included in the staged rollout yet — say so honestly instead
+            // A newer release exists but this install's cohort is not
+            // included in the staged rollout yet: say so instead
             // of silently showing nothing.
             if (updates.rolloutPending && !updates.hasUpdate)
               Padding(
@@ -248,7 +248,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   UpdateError.rollbackCache => s.updateRollbackCacheError,
                 }, style: Styles.dangerSecondary(context)),
               ),
-            // S11b: automatic rollback status. The notice survives the
+            // Automatic rollback status. The notice survives the
             // restart the rollback performs (persisted in settings).
             if (updates.rollbackTarget case final target? when updates.rollbackBusy)
               Padding(
@@ -412,8 +412,8 @@ class _LicensesScreenState extends State<_LicensesScreen> {
               // Lowercased keys are computed once per pass, not once per
               // filter candidate and again per sort comparison (the
               // benchmark screen's sort-keys pattern). The comparator's
-              // values are unchanged, so the order — Sora first, then
-              // case-insensitive — is identical.
+              // values are unchanged, so the order (Sora first, then
+              // case-insensitive) is identical.
               final lower = {for (final name in data.keys) name: name.toLowerCase()};
               final names = data.keys.where((name) => lower[name]!.contains(query)).toList()
                 ..sort(

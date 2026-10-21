@@ -14,7 +14,10 @@ void main() {
   Future<String> get(Uri base, String path) async {
     final socket = await Socket.connect(base.host, base.port);
     socket.write('GET $path HTTP/1.1\r\nHost: ${base.host}\r\nConnection: close\r\n\r\n');
-    return String.fromCharCodes(await socket.expand((b) => b).toList());
+    await socket.flush();
+    final answer = String.fromCharCodes(await socket.expand((b) => b).toList());
+    await socket.close();
+    return answer;
   }
 
   test('the panel entry gets the bridge bootstrap, other pages and files outside do not', () async {

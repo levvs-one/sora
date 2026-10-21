@@ -1100,9 +1100,6 @@ class SZh extends S {
   String get extConflictsIntro => '这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override
@@ -3136,9 +3133,6 @@ class SZhHans extends SZh {
   String get extConflictsIntro => '这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override
@@ -5170,9 +5164,6 @@ class SZhHant extends SZh {
 
   @override
   String get extConflictsIntro => '這些擴充功能想要同一樣東西。選擇要讓哪個執行，另一個仍保持安裝。';
-
-  @override
-  String get extConflictRoutingRules => 'Routing rules';
 
   @override
   String get extConflictTheme => 'App theme';

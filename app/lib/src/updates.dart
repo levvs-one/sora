@@ -15,9 +15,9 @@ const releaseRepository = 'https://github.com/levvs-one/sora';
 const updateHelper = '/usr/lib/sora/sora-update';
 const updatePolicy = '/usr/share/polkit-1/actions/io.github.levvs-one.sora.update.policy';
 
-/// Staged-rollout policy feed (S11a): `updates/releases.json` at the repo
+/// Staged-rollout policy feed: `updates/releases.json` at the repo
 /// root on the default branch, fetched over plain HTTPS on every update
-/// check. The feed carries POLICY ONLY — which installs are offered a
+/// check. The feed carries POLICY ONLY: which installs are offered a
 /// release. Artifacts, hashes and signatures always come from the GitHub
 /// release API; the feed can never substitute artifact URLs or hashes.
 /// Documented in docs/update-rollout.md.
@@ -63,7 +63,7 @@ bool newerRelease(String candidate, String installed) {
 String? normalizedVersion(Object? text) => text is String ? releaseVersion(text)?.toString() : null;
 
 /// Parsed `updates/releases.json` (format v1). Strict parsing: any deviation
-/// from the schema yields null and the feed is ignored (fail-closed) — a
+/// from the schema yields null and the feed is ignored (fail-closed): a
 /// half-understood policy must never steer updates.
 class RolloutPolicy {
   const RolloutPolicy({required this.version, required this.percent, required this.blockedVersions});
@@ -76,7 +76,7 @@ class RolloutPolicy {
   final int percent;
 
   /// Recalled versions, normalized. A listed candidate is never offered;
-  /// a listed installed version triggers a persistent honest warning.
+  /// a listed installed version triggers a persistent warning.
   final Set<String> blockedVersions;
 
   static RolloutPolicy? parse(String body) {
@@ -185,7 +185,7 @@ Future<void> verifyUpdateFile(File file, String manifest, String name) async {
 }
 
 /// Marker written to settings after a Linux update's privileged helper
-/// reported success, right before the restart (S11b). After the restart the
+/// reported success, right before the restart. After the restart the
 /// new build sees it and
 /// runs the post-update health check: the marker is cleared only when the
 /// core answers the control channel within 60 s; otherwise the install
@@ -200,7 +200,7 @@ class PendingUpdate {
   String encode() => jsonEncode({'from': from, 'to': to, 'atMs': atMs});
 
   /// Strict parsing: anything unexpected yields null and the marker is
-  /// ignored — a half-understood marker must never trigger a downgrade.
+  /// ignored: a half-understood marker must never trigger a downgrade.
   static PendingUpdate? parse(String raw) {
     try {
       if (raw.isEmpty) return null;
@@ -322,7 +322,7 @@ class AppUpdater extends ChangeNotifier {
   final String _executable;
   final bool _windows;
 
-  /// Test seam for the rollback cache location (S11b): production uses the
+  /// Test seam for the rollback cache location: production uses the
   /// XDG cache dir, tests point it at a temp directory.
   final Directory Function(String fromVersion)? _rollbackDirOverride;
   final Future<bool> Function() _canElevate;
@@ -339,17 +339,17 @@ class AppUpdater extends ChangeNotifier {
   Directory? _work;
   final _clients = <http.Client>{};
 
-  /// Kill-switch / staged-rollout state from the policy feed (S11a),
+  /// Kill-switch / staged-rollout state from the policy feed,
   /// recomputed on every successful release check:
-  /// - [versionRevoked] — the INSTALLED version is listed in the feed's
+  /// - [versionRevoked]: the INSTALLED version is listed in the feed's
   ///   blocked_versions: the UI shows a persistent, non-alarming warning.
-  /// - [rolloutPending] — a newer release exists but this install's cohort
+  /// - [rolloutPending]: a newer release exists but this install's cohort
   ///   is not included in the staged rollout yet.
   bool versionRevoked = false;
   bool rolloutPending = false;
   bool _updateWithheld = false;
 
-  /// Post-update health-check state (S11b). [_healthCheckArmed] while the
+  /// Post-update health-check state. [_healthCheckArmed] while the
   /// 60-second window after an update is open; [noteCoreHealthy] disarms it.
   /// [rollbackBusy]/[rollbackTarget] while the automatic rollback runs.
   static const healthCheckWindow = Duration(seconds: 60);
@@ -398,7 +398,7 @@ class AppUpdater extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Applies the staged-rollout policy feed to [release] (S11a), setting
+  /// Applies the staged-rollout policy feed to [release], setting
   /// [versionRevoked], [rolloutPending] and [_updateWithheld]. Decision
   /// table (every branch is logged with the `[updates]` tag):
   /// - feed unreachable (network error, 404, timeout) -> legacy behavior:
@@ -475,9 +475,9 @@ class AppUpdater extends ChangeNotifier {
         'of ${release.version}; withholding the update for now',
       );
       // Surface the "pending" note only when a newer release actually exists:
-      // if this install is already on (or ahead of) the rolled-out version —
-      // e.g. the user updated while percent was 100 and the owner later
-      // lowered it — the note would falsely claim a newer version is on its
+      // if this install is already on (or ahead of) the rolled-out version
+      // (e.g. the user updated while percent was 100 and the owner later
+      // lowered it), the note would falsely claim a newer version is on its
       // way. hasUpdate stays false either way.
       rolloutPending = newerRelease(release.version, version);
       return;
@@ -668,7 +668,7 @@ class AppUpdater extends ChangeNotifier {
         _guard();
         await settings.saveResumeAfterUpdate(connection() == UpdateConnection.connected);
         _guard();
-        // S11b: the rollback safety net is prepared BEFORE the handoff —
+        // The rollback safety net is prepared BEFORE the handoff:
         // verified copies of the currently installed packages, so a broken
         // update can be reverted offline without trusting the new build.
         // Fail-closed: without the cache the update does not proceed.
@@ -689,7 +689,7 @@ class AppUpdater extends ChangeNotifier {
           manualCommand = installation.manualCommand(paths);
           throw const UpdateFailure(UpdateError.installation);
         }
-        // S11b: the marker is written only AFTER the helper reported success,
+        // The marker is written only AFTER the helper reported success,
         // so atMs ≈ the moment the new build will start. Writing it before
         // the handoff would stamp the pre-install time; on a slow machine the
         // two packages can take minutes to install, and the new build would
@@ -723,15 +723,15 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
-  /// Post-update health check (S11b). Call once at startup with desktop
+  /// Post-update health check. Call once at startup with desktop
   /// restart/quit operations. When a [PendingUpdate] marker from an update
   /// installed by this app is present and names the running build:
   /// - core already answered this launch ([coreHealthy]) → the update is
   ///   healthy; the marker is cleared immediately;
   /// - otherwise a 60-second window opens: [noteCoreHealthy] (called when
   ///   the core answers the control channel) clears the marker;
-  /// - if the window expires — or the marker is already stale because the
-  ///   app crashed before clearing it — the install rolls back to the
+  /// - if the window expires (or the marker is already stale because the
+  ///   app crashed before clearing it), the install rolls back to the
   ///   pre-update version via the privileged helper with --allow-downgrade,
   ///   using the verified rollback cache (fail-closed: no cache or a hash
   ///   mismatch → no rollback, error + manual command instead).
@@ -788,7 +788,7 @@ class AppUpdater extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
-  /// Rolls back to [marker.from] using the verified rollback cache (S11b).
+  /// Rolls back to [marker.from] using the verified rollback cache.
   /// Fail-closed at every step: missing cache, hash mismatch, no elevation
   /// or a failed helper run → no downgrade happens; the error and a manual
   /// reinstall command stay visible in About instead.
@@ -875,7 +875,7 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
-  /// Persistent cache of the pre-update packages (S11b). Outside the temp
+  /// Persistent cache of the pre-update packages. Outside the temp
   /// work dir: it must survive the restart the update performs.
   Directory? _rollbackDir(String fromVersion) {
     final override = _rollbackDirOverride;
@@ -928,7 +928,7 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
-  /// The last automatic rollback notice, parsed from settings (S11b).
+  /// The last automatic rollback notice, parsed from settings.
   /// Survives the restart the rollback performs so About can report it.
   ({String from, String to})? get lastRollback {
     try {

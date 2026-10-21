@@ -1114,9 +1114,6 @@ class SUk extends S {
       'Ці розширення претендують на одне й те саме. Виберіть, яке працюватиме, друге залишиться встановленим.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

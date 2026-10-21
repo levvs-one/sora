@@ -11,7 +11,7 @@ import 'package:sora/src/updates.dart';
 
 final recorded = File('test/fixtures/releases/latest.json').readAsStringSync();
 
-/// S11a staged-rollout policy: parsing strictness, the client decision
+/// Staged-rollout policy: parsing strictness, the client decision
 /// table, and the versionRevoked warning. The kill-switch must be a tested
 /// mechanism, not a declaration.
 void main() {

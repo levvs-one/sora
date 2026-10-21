@@ -195,7 +195,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                             blurb: permissionBlurb(context, p),
                             risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
                           ),
-                          // Same honesty marker as the install prompt: a
+                          // Same marker as the install prompt: a
                           // permission whose runtime is not built must say
                           // so here too, not only before the grant.
                           if (isNotYetActive(p))
@@ -651,7 +651,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
       1440: s.extBgHours(24),
     };
     // A hand-edited config file may hold a non-preset interval; show it
-    // honestly instead of a blank row.
+    // instead of a blank row.
     choices.putIfAbsent(current, () => s.extBgMinutes(current));
     return choices;
   }
@@ -705,7 +705,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
 
 /// Screenshot carousel for the extension detail page: a horizontally
 /// swipable strip of the catalog's screenshot URLs. A failed image is an
-/// honest placeholder (extImageFailed), never a blank hole or a crash.
+/// placeholder (extImageFailed), never a blank hole or a crash.
 class _ScreenshotsCarousel extends StatefulWidget {
   const _ScreenshotsCarousel({required this.urls});
   final List<String> urls;

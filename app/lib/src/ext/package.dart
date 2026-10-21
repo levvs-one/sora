@@ -51,7 +51,7 @@ class ExtPackage {
   /// Opens and structurally checks a .soraext. Call [verify] next.
   ///
   /// Zip-bomb defense, in three phases:
-  /// 1. the central directory is read on its own — no inflation yet;
+  /// 1. the central directory is read on its own, with no inflation yet;
   /// 2. header-declared limits are enforced (file count, per-file declared
   ///    size, total declared size, overall compression ratio, no encrypted
   ///    entries, no exotic compression methods) so an obvious bomb fails
@@ -163,7 +163,7 @@ class ExtPackage {
   /// 3. signature.minisig is a valid author signature over checksums.txt.
   ///
   /// [authorKeyLine], when given, is the key the signature is checked
-  /// against — the catalog-pinned key for catalog installs. Without it the
+  /// against: the catalog-pinned key for catalog installs. Without it the
   /// manifest's self-attested key is used (sideload/URL trust on first
   /// use). A catalog install must always pass the pin: verifying against
   /// the manifest's own key would let a package smuggle in its own trust
@@ -252,10 +252,10 @@ class ExtPackage {
 
 /// An [OutputMemoryStream] that throws [PackageError] instead of growing
 /// past [limit] bytes. Every write path the inflater can use is capped:
-/// [writeByte]/[writeBytes] carry the streamed deflate output — the native
+/// [writeByte]/[writeBytes] carry the streamed deflate output (the native
 /// decoder writes decoded chunks through [writeBytes], so the cap trips
 /// mid-inflation and a lying header cannot cause unbounded in-memory
-/// expansion — and [writeStream] covers stored entries and whole-buffer
+/// expansion) and [writeStream] covers stored entries and whole-buffer
 /// copies. (package:archive 4.0.7 has no back-reference write path: LZ77
 /// matches are expanded inside the decoder, never through this sink.)
 class _CappedOutput extends OutputMemoryStream {

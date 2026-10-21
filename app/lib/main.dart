@@ -32,7 +32,7 @@ Future<void> main(List<String> args) async {
   runApp(SoraApp(sora: sora, navigator: navigator, desktop: desktop));
   WidgetsBinding.instance.addPostFrameCallback((_) {
     sora.updates.start();
-    // S11b: post-update health check / automatic rollback. No-op unless a
+    // Post-update health check / automatic rollback. No-op unless a
     // pending-update marker was written by the previous build (Linux only).
     if (desktop != null) {
       unawaited(
@@ -73,8 +73,8 @@ class _SoraAppState extends State<SoraApp> {
   late final _navigator = widget.navigator ?? GlobalKey<NavigatorState>();
 
   // buildTheme is a pure function of brightness (fixed palettes), but
-  // SoraApp rebuilds on every Sora notification — probe ticks, state
-  // changes — and used to construct both ThemeData trees (ColorScheme,
+  // SoraApp rebuilds on every Sora notification (probe ticks, state
+  // changes) and used to construct both ThemeData trees (ColorScheme,
   // component themes) on every rebuild. Build each once per app run.
   late final _lightTheme = buildTheme(Brightness.light);
   late final _darkTheme = buildTheme(Brightness.dark);

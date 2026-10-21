@@ -1117,9 +1117,6 @@ class SDe extends S {
       'Diese Erweiterungen wollen dasselbe. Wähle, welche läuft; die andere bleibt installiert.';
 
   @override
-  String get extConflictRoutingRules => 'Routing rules';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override

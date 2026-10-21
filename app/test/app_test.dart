@@ -410,7 +410,7 @@ void main() {
     });
   });
 
-  group('custom servers (INT-1)', () {
+  group('custom servers', () {
     test('canonicalCustomId maps plain custom ids to the core outbound namespace', () {
       // The core merges custom servers into subscription outbound lists as
       // `custom/<id>`; the UI stores them with plain ids.
@@ -486,7 +486,7 @@ class _SubscriptionSora extends Sora {
 }
 
 /// Simulates the core merging a saved custom server into the subscription
-/// outbound list as `custom/<id>` (INT-1): [servers] carries the merged
+/// outbound list as `custom/<id>`: [servers] carries the merged
 /// outbound while [customServers] carries the plain-id record, exactly like
 /// the real core state after loadCustomServers.
 class _CustomSora extends Sora {
