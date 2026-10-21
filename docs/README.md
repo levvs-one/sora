@@ -20,14 +20,10 @@
 - [Расширения: API `window.soraExt`](extensions-api.md) (in English)
 - [Расширения: cookbook](extensions-cookbook.md) (in English)
 - [Расширения: dev-режим](extensions-devmode.md) (in English)
+- [Android VpnService: архитектура будущего клиента](android-vpnservice.md)
 - [Политика поэтапного обновления](update-rollout.md)
 
 ## Безопасность
 
 - [Безопасность и приватность](security.md)
 - [Threat model sora-sync](sync-threat-model.md) (in English)
-
-## Исследования
-
-R&D-заметки, не руководство пользователя:
-
