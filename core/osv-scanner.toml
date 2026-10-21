@@ -1,0 +1,8 @@
+# GO-2026-5932 marks the whole golang.org/x/crypto module because of its
+# openpgp packages, which have no fixed version. The core imports only
+# blake2b, pbkdf2 and scrypt from that module (through aead.dev/minisign),
+# never openpgp, and govulncheck, which checks reachable symbols, reports
+# nothing. Drop this entry if anything here starts importing openpgp.
+[[IgnoredVulns]]
+id = "GO-2026-5932"
+reason = "only the unused golang.org/x/crypto/openpgp packages are affected"
