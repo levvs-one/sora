@@ -1,0 +1,204 @@
+package interop_test
+
+import (
+	"context"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"os"
+	"sort"
+	"strconv"
+	"testing"
+	"time"
+
+	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/registry"
+	"github.com/levvs-one/sora-client/core/engine/supervise"
+	"github.com/levvs-one/sora-client/core/engine/xray"
+	"github.com/levvs-one/sora-client/core/session"
+)
+
+// probeOnce makes a single short-timeout request through the engine's local
+// proxy. Unlike fetch it never retries: it exists to timestamp failures
+// during a switch, so a retry would hide the outage it measures.
+func probeOnce(local int, target string) bool {
+	proxy, _ := url.Parse("http://127.0.0.1:" + strconv.Itoa(local))
+	client := &http.Client{
+		Timeout:   400 * time.Millisecond,
+		Transport: &http.Transport{Proxy: http.ProxyURL(proxy), DisableKeepAlives: true},
+	}
+	resp, err := client.Get(target)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	_, _ = io.Copy(io.Discard, resp.Body)
+	return resp.StatusCode == http.StatusOK
+}
+
+// TestSwitchTimingAndGap measures what a user feels today when switching
+// servers: the full-restart Connect duration and the traffic outage window
+// inside it. Timings are evidence (logged), correctness is asserted: traffic
+// must flow after every switch and a switch must never wedge the manager.
+func TestSwitchTimingAndGap(t *testing.T) {
+	dir := os.Getenv("SORA_ENGINES_DIR")
+	if dir == "" {
+		t.Skip("set SORA_ENGINES_DIR to a directory with sing-box, xray and mihomo")
+	}
+	targetSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { _, _ = io.WriteString(w, reply) }))
+	t.Cleanup(targetSrv.Close)
+	target := targetSrv.URL
+	svcs := services(t)
+	byName := map[string]service{}
+	for _, s := range svcs {
+		byName[s.name] = s
+	}
+	serverBin, err := xray.Prober.Discover(t.Context(), dir, supervise.DiscoveryOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	startServer(t, serverBin, []service{byName["shadowsocks"], byName["vless-tcp"]})
+
+	local := port(t)
+	reg := registry.Discover(t.Context(), dir, supervise.Config{HomeDir: t.TempDir(), LocalPort: local, StartTimeout: 15 * time.Second})
+	manager := session.NewManager(session.ManagerConfig{Factory: reg.Factory()})
+	t.Cleanup(func() { _ = manager.Disconnect(context.Background()) })
+
+	planFor := func(id string, kind engine.Kind, svc service) *engine.Plan {
+		return &engine.Plan{
+			SessionID:      id,
+			Engines:        []engine.Kind{kind},
+			PrivateControl: engine.Catalog[kind].Supports(engine.FeaturePrivateControl),
+			LocalProxy:     engine.LocalProxy{Enabled: true},
+			Outbounds:      []engine.Outbound{svc.outbound},
+			Rules:          []engine.Rule{{Type: engine.RuleMatchAll, Target: svc.name}},
+			DNS:            engine.DNS{Servers: []engine.DNSServer{{Tag: "resolver", Address: "1.1.1.1", Transport: engine.DNSPlain}}},
+		}
+	}
+	connect := func(p *engine.Plan) time.Duration {
+		t.Helper()
+		ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
+		defer cancel()
+		start := time.Now()
+		if _, err := manager.Connect(ctx, p, session.Settings{}); err != nil {
+			t.Fatalf("connect %s: %v", p.SessionID, err)
+		}
+		return time.Since(start)
+	}
+	waitTraffic := func(what string) {
+		t.Helper()
+		deadline := time.Now().Add(10 * time.Second)
+		for time.Now().Before(deadline) {
+			if probeOnce(local, target) {
+				return
+			}
+			time.Sleep(25 * time.Millisecond)
+		}
+		t.Fatalf("no traffic after %s", what)
+	}
+
+	ss, vless := byName["shadowsocks"], byName["vless-tcp"]
+
+	cold := connect(planFor("sw-cold", engine.KindSingBox, ss))
+	waitTraffic("cold connect")
+	t.Logf("cold connect (sing-box, shadowsocks): %v", cold)
+
+	// Traffic prober: timestamps every failure so the outage window inside
+	// a switch can be measured, not guessed.
+	type outage struct{ start, end time.Time }
+	var outages []outage
+	stopProbing := make(chan struct{})
+	probingDone := make(chan struct{})
+	go func() {
+		defer close(probingDone)
+		var downSince time.Time
+		for {
+			select {
+			case <-stopProbing:
+				return
+			default:
+			}
+			if probeOnce(local, target) {
+				if !downSince.IsZero() {
+					outages = append(outages, outage{downSince, time.Now()})
+					downSince = time.Time{}
+				}
+			} else if downSince.IsZero() {
+				downSince = time.Now()
+			}
+			time.Sleep(20 * time.Millisecond)
+		}
+	}()
+
+	var switches []time.Duration
+	var cross []time.Duration
+	steps := []struct {
+		id   string
+		kind engine.Kind
+		svc  service
+	}{
+		{"sw-1", engine.KindSingBox, vless},
+		{"sw-2", engine.KindSingBox, ss},
+		{"sw-3", engine.KindSingBox, vless},
+		{"sw-4", engine.KindSingBox, ss},
+	}
+	for _, st := range steps {
+		d := connect(planFor(st.id, st.kind, st.svc))
+		switches = append(switches, d)
+		waitTraffic("switch " + st.id)
+	}
+	// One cross-engine switch for reference.
+	cross = append(cross, connect(planFor("sw-x", engine.KindMihomo, ss)))
+	waitTraffic("cross-engine switch")
+	close(stopProbing)
+	<-probingDone
+
+	sort.Slice(switches, func(i, j int) bool { return switches[i] < switches[j] })
+	t.Logf("same-engine server switch (full Connect): all=%v median=%v", switches, switches[len(switches)/2])
+	t.Logf("cross-engine switch (sing-box -> mihomo): %v", cross)
+	var worst time.Duration
+	for _, o := range outages {
+		if d := o.end.Sub(o.start); d > worst {
+			worst = d
+		}
+	}
+	t.Logf("traffic outage windows during switches: count=%d worst=%v", len(outages), worst)
+	if worst > 30*time.Second {
+		t.Fatalf("switch outage window %v exceeds the wedge bound", worst)
+	}
+
+	// Phase 2: the same two servers in one sing-box plan behind a select
+	// group, switched through Session.Select (the engine-level fast path).
+	// This is the number the full-Connect path above has to be replaced by.
+	if err := manager.Disconnect(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	groupPlan := &engine.Plan{
+		SessionID:      "sw-group",
+		Engines:        []engine.Kind{engine.KindSingBox},
+		PrivateControl: engine.Catalog[engine.KindSingBox].Supports(engine.FeaturePrivateControl),
+		LocalProxy:     engine.LocalProxy{Enabled: true},
+		Outbounds:      []engine.Outbound{ss.outbound, vless.outbound},
+		Groups:         []engine.Group{{Name: "pick", Type: engine.GroupSelect, Outbounds: []string{ss.name, vless.name}}},
+		Rules:          []engine.Rule{{Type: engine.RuleMatchAll, Target: "pick"}},
+		DNS:            engine.DNS{Servers: []engine.DNSServer{{Tag: "resolver", Address: "1.1.1.1", Transport: engine.DNSPlain}}},
+	}
+	connect(groupPlan)
+	waitTraffic("select-group connect")
+	cur := manager.Current()
+	if cur == nil {
+		t.Fatal("no session for select phase")
+	}
+	var selects []time.Duration
+	for i, target := range []string{vless.name, ss.name, vless.name, ss.name} {
+		start := time.Now()
+		if err := cur.Select(t.Context(), "pick", target); err != nil {
+			t.Fatalf("select %d to %s: %v", i, target, err)
+		}
+		selects = append(selects, time.Since(start))
+		waitTraffic("select to " + target)
+	}
+	sort.Slice(selects, func(i, j int) bool { return selects[i] < selects[j] })
+	t.Logf("engine Select switch (sing-box selector): all=%v median=%v", selects, selects[len(selects)/2])
+}

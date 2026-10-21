@@ -1,0 +1,729 @@
+diff --git a/core/engine/catalog.go b/core/engine/catalog.go
+index d9c6e3e7..8859b8bc 100644
+--- a/core/engine/catalog.go
++++ b/core/engine/catalog.go
+@@ -89,10 +89,6 @@ var Catalog = map[Kind]Capabilities{
+ 			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureChains: true,
+ 			FeatureHy2PortHop: true, FeatureHy2Obfs: true, FeatureDoH3: true, FeatureECH: true,
+ 			FeatureRealityKeyShare: true,
+-			// FeatureH2Headers: the lx http (h2) transport spells a
+-			// headers map — probed with `sing-box check` on lx.22,
+-			// which rejects unknown keys (CENSOR-P2 fix).
+-			FeatureH2Headers: true,
+ 			// Deliberately no FeatureXHTTPDownloadSplit: the lx
+ 			// fork's xhttp transport has no download_settings field
+ 			// at all (probed on lx.22: unknown field, CENSOR-P1).
+@@ -100,7 +96,6 @@ var Catalog = map[Kind]Capabilities{
+ 			// with_xhttp build in BuildCapabilities, exactly like
+ 			// FeatureXHTTP itself — upstream sing-box spells
+ 			// neither, so the static entry claims neither.
+-
+ 		},
+ 	},
+ 	KindXray: {
+diff --git a/core/engine/censor_p2_headers_test.go b/core/engine/censor_p2_headers_test.go
+deleted file mode 100644
+index e4d99e29..00000000
+--- a/core/engine/censor_p2_headers_test.go
++++ /dev/null
+@@ -1,112 +0,0 @@
+-package engine
+-
+-import (
+-	"strings"
+-	"testing"
+-)
+-
+-// CENSOR-P2 fix (review §3): Transport.Headers was gated only for the
+-// transports P2 touched. On grpc and tcp/raw no pinned engine spells a
+-// generic header set at all, and on h2 only sing-box does — so a plan
+-// carrying headers there lost them silently (sing-box rejects a
+-// headers key on its gRPC transport as unknown; mihomo and Xray ignore
+-// one). The set now either reaches a renderer that spells it or fails
+-// with a named error, and the error never echoes header keys/values
+-// (values can carry secrets).
+-
+-const p2HeaderSecret = "HeaderSecretValue"
+-
+-func p2Headers() map[string]string {
+-	return map[string]string{"X-Auth": p2HeaderSecret, "User-Agent": "ua/1.0"}
+-}
+-
+-func TestValidateHeadersNeedHTTPTransport(t *testing.T) {
+-	// No engine carries generic headers on these transports: plan
+-	// validation refuses the set, naming the transport.
+-	for _, typ := range []string{"", "tcp", "grpc"} {
+-		o := p2Outbound(ProtocolTrojan)
+-		o.Transport = Transport{Type: typ, Headers: p2Headers()}
+-		err := o.Validate()
+-		if err == nil {
+-			t.Errorf("transport %q with headers: Validate = nil, want a headers error", typ)
+-			continue
+-		}
+-		if !strings.Contains(err.Error(), "headers need the ws, httpupgrade, xhttp or h2 transport") {
+-			t.Errorf("transport %q: Validate = %v, want the named headers error", typ, err)
+-		}
+-		name := typ
+-		if name == "" {
+-			name = "tcp" // the empty type renders as tcp everywhere
+-		}
+-		if !strings.Contains(err.Error(), "\""+name+"\"") {
+-			t.Errorf("transport %q: Validate = %v, want the transport named", typ, err)
+-		}
+-		if strings.Contains(err.Error(), p2HeaderSecret) || strings.Contains(err.Error(), "X-Auth") {
+-			t.Errorf("transport %q: error leaks header data: %v", typ, err)
+-		}
+-	}
+-	// Empty vs absent: no headers is valid data on every transport.
+-	for _, typ := range []string{"", "tcp", "grpc", "ws", "httpupgrade", "xhttp", "h2"} {
+-		o := p2Outbound(ProtocolTrojan)
+-		o.Transport = Transport{Type: typ}
+-		if err := o.Validate(); err != nil {
+-			t.Errorf("transport %q without headers: Validate = %v", typ, err)
+-		}
+-		o.Transport.Headers = map[string]string{}
+-		if err := o.Validate(); err != nil {
+-			t.Errorf("transport %q with an empty header set: Validate = %v", typ, err)
+-		}
+-	}
+-}
+-
+-func TestValidateHeadersCarriedTransports(t *testing.T) {
+-	// Regression: the P2 transports keep accepting the header set at
+-	// plan level (every renderer spells it there; h2 is sing-box-only
+-	// and catalog-gated below, not plan-rejected).
+-	for _, typ := range []string{"ws", "httpupgrade", "xhttp", "h2"} {
+-		o := p2Outbound(ProtocolTrojan)
+-		o.Transport = Transport{Type: typ, Path: "/p", Headers: p2Headers()}
+-		if err := o.Validate(); err != nil {
+-			t.Errorf("transport %q with headers: Validate = %v, want nil", typ, err)
+-		}
+-	}
+-}
+-
+-func TestCatalogH2HeadersGate(t *testing.T) {
+-	mk := func(headers map[string]string) *Plan {
+-		o := p2Outbound(ProtocolTrojan)
+-		o.Transport = Transport{Type: "h2", Path: "/h2", Headers: headers}
+-		return &Plan{SessionID: "p2", Outbounds: []Outbound{o}}
+-	}
+-	withHeaders := mk(p2Headers())
+-	if !withHeaders.RequiredFeatures()[FeatureH2Headers] {
+-		t.Fatal("h2 plan with headers must require FeatureH2Headers")
+-	}
+-	if got := mk(nil); got.RequiredFeatures()[FeatureH2Headers] {
+-		t.Fatal("h2 plan without headers must not require FeatureH2Headers")
+-	}
+-	// sing-box spells h2 headers (probed on lx.22); the other engines
+-	// report the feature missing instead of receiving the plan.
+-	if missing := Catalog[KindSingBox].Missing(withHeaders); len(missing) != 0 {
+-		t.Errorf("sing-box: Missing = %v, want none for h2 headers", missing)
+-	}
+-	for _, kind := range []Kind{KindMihomo, KindXray} {
+-		found := false
+-		for _, m := range Catalog[kind].Missing(withHeaders) {
+-			if strings.Contains(m, string(FeatureH2Headers)) {
+-				found = true
+-			}
+-		}
+-		if !found {
+-			t.Errorf("%s: Missing = %v, want the h2-headers gate", kind, Catalog[kind].Missing(withHeaders))
+-		}
+-	}
+-	// Without headers there is no gate anywhere.
+-	for _, kind := range []Kind{KindSingBox, KindMihomo, KindXray} {
+-		for _, m := range Catalog[kind].Missing(mk(nil)) {
+-			if strings.Contains(m, string(FeatureH2Headers)) {
+-				t.Errorf("%s: Missing = %v, unexpected h2-headers gate without headers", kind, Catalog[kind].Missing(mk(nil)))
+-			}
+-		}
+-	}
+-}
+diff --git a/core/engine/engine.go b/core/engine/engine.go
+index b0a32710..8a3fd253 100644
+--- a/core/engine/engine.go
++++ b/core/engine/engine.go
+@@ -68,17 +68,6 @@ const (
+ 	// x_padding_bytes; binary-verified on the pins). Before the
+ 	// split, padding rode the xmux gate (S2 seams audit).
+ 	FeatureXHTTPPadding Feature = "xhttp-padding"
+-	// FeatureH2Headers marks engines that spell the plan's custom
+-	// header set on the h2 (V2Ray HTTP) transport. Only sing-box
+-	// does: its http transport carries a headers map, probed on the
+-	// pinned lx.22 binary (`sing-box check` rejects unknown keys yet
+-	// accepts headers there, CENSOR-P2 fix). Mihomo's h2-opts has no
+-	// headers key and its YAML loader silently ignores unknown keys;
+-	// Xray removed the h2 transport entirely. On ws, httpupgrade and
+-	// xhttp every renderer emits the header set, so no gate is needed
+-	// there; on grpc and tcp/raw no engine spells generic headers at
+-	// all, so plan validation rejects the set there instead of gating.
+-	FeatureH2Headers    Feature = "h2-headers"
+ 	FeatureVLESSEncrypt Feature = "vless-encryption"
+ 	FeatureAmneziaWG    Feature = "amneziawg"
+ 	// FeatureAmneziaWG3 marks engines whose AmneziaWG stack implements
+diff --git a/core/engine/engine_test.go b/core/engine/engine_test.go
+index f73bffd1..a52cbb93 100644
+--- a/core/engine/engine_test.go
++++ b/core/engine/engine_test.go
+@@ -175,8 +175,8 @@ func TestSingBoxFloorKeepsTheLXFork(t *testing.T) {
+ 		{"1.15.0", nil, true}, // a future stable stays accepted
+ 		// Less ignores the pre-release, like the fork floor does.
+ 		{"1.15.0-alpha.12", nil, true},
+-		{"1.14.3-lx.22", []string{"with_awg"}, true}, // shipped fork
+-		{"1.14.3-lx.14", []string{"with_awg"}, true}, // older fork build stays accepted
++		{"1.14.3-lx.22", []string{"with_awg"}, true},  // shipped fork
++		{"1.14.3-lx.14", []string{"with_awg"}, true},  // older fork build stays accepted
+ 		{"1.14.2-lx.14", []string{"with_awg"}, false}, // fork below its own floor
+ 	} {
+ 		_, err := SelectEngine(p, []Availability{{
+@@ -470,13 +470,19 @@ func TestXrayMissesNameserverPolicy(t *testing.T) {
+ // xmux-tuned plan must report the feature missing only where the
+ // claim is honestly absent: the static (upstream) sing-box entry.
+ func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
+-	for kind, caps := range Catalog {
+-		if caps.Supports(FeatureXHTTPXmux) && kind != KindMihomo {
+-			t.Errorf("%s claims FeatureXHTTPXmux but its renderer emits no xmux", kind)
++	for _, kind := range []Kind{KindMihomo, KindXray} {
++		if !Catalog[kind].Supports(FeatureXHTTPXmux) {
++			t.Errorf("%s must claim FeatureXHTTPXmux: its renderer emits the tuning and the pin accepts it", kind)
+ 		}
+ 	}
+-	if !Catalog[KindMihomo].Supports(FeatureXHTTPXmux) {
+-		t.Error("mihomo must claim FeatureXHTTPXmux: render verified with mihomo -t on the pin")
++	if Catalog[KindSingBox].Supports(FeatureXHTTPXmux) {
++		t.Error("the static sing-box entry must not claim FeatureXHTTPXmux: the claim rides the probed lx build (BuildCapabilities)")
++	}
++	lx := BuildCapabilities(KindSingBox,
++		Version{Raw: "1.14.3-lx.22", Major: 1, Minor: 14, Patch: 3, PreRelease: "lx.22"},
++		[]string{"with_xhttp", "with_awg"})
++	if !lx.Supports(FeatureXHTTPXmux) {
++		t.Error("the probed lx+with_xhttp build must claim FeatureXHTTPXmux")
+ 	}
+ 	xhttpPlan := func(mutate func(*Transport)) *Plan {
+ 		p := validPlan()
+@@ -486,14 +492,16 @@ func TestCatalogXmuxClaimMatchesRenderers(t *testing.T) {
+ 		return p
+ 	}
+ 	xmux := xhttpPlan(func(tr *Transport) { tr.XmuxMaxConcurrency = 8 })
+-	for _, kind := range []Kind{KindXray, KindSingBox} {
+-		missing := strings.Join(Catalog[kind].Missing(xmux), " ")
+-		if !strings.Contains(missing, string(FeatureXHTTPXmux)) {
+-			t.Errorf("%s: xmux plan must report %s missing, got %q", kind, FeatureXHTTPXmux, missing)
++	for _, kind := range []Kind{KindXray, KindMihomo} {
++		if missing := strings.Join(Catalog[kind].Missing(xmux), " "); strings.Contains(missing, string(FeatureXHTTPXmux)) {
++			t.Errorf("%s carries xmux tuning, it must not report it missing: %q", kind, missing)
+ 		}
+ 	}
+-	if missing := strings.Join(Catalog[KindMihomo].Missing(xmux), " "); strings.Contains(missing, string(FeatureXHTTPXmux)) {
+-		t.Errorf("mihomo carries xmux tuning, it must not report it missing: %q", missing)
++	if missing := strings.Join(lx.Missing(xmux), " "); strings.Contains(missing, string(FeatureXHTTPXmux)) {
++		t.Errorf("the lx build carries xmux tuning, it must not report it missing: %q", missing)
++	}
++	if missing := strings.Join(Catalog[KindSingBox].Missing(xmux), " "); !strings.Contains(missing, string(FeatureXHTTPXmux)) {
++		t.Errorf("upstream sing-box must report %s missing, got %q", FeatureXHTTPXmux, missing)
+ 	}
+ 	split := xhttpPlan(func(tr *Transport) {
+ 		tr.Mode = "stream-up"
+diff --git a/core/engine/interop/interop_test.go b/core/engine/interop/interop_test.go
+index 61f78d13..a7775657 100644
+--- a/core/engine/interop/interop_test.go
++++ b/core/engine/interop/interop_test.go
+@@ -600,7 +600,7 @@ func TestRealityThroughEveryEngine(t *testing.T) {
+ 		ID: "vless-reality", Name: "vless-reality", Protocol: engine.ProtocolVLESS,
+ 		Server: "127.0.0.1", Port: uint16(serverPort), UUID: uuid, Flow: "xtls-rprx-vision",
+ 		TLS: engine.TLS{Enabled: true, Reality: true, ServerName: "www.example.com",
+-			Fingerprint: "chrome",
++			Fingerprint:      "chrome",
+ 			RealityPublicKey: base64.RawURLEncoding.EncodeToString(keys.PublicKey().Bytes()),
+ 			RealityShortID:   "0123456789abcdef"},
+ 	}
+diff --git a/core/engine/mihomo/censor_p2_headers_test.go b/core/engine/mihomo/censor_p2_headers_test.go
+deleted file mode 100644
+index b9d2ed3e..00000000
+--- a/core/engine/mihomo/censor_p2_headers_test.go
++++ /dev/null
+@@ -1,66 +0,0 @@
+-package mihomo
+-
+-import (
+-	"strings"
+-	"testing"
+-
+-	"github.com/levvs-one/sora-client/core/engine"
+-	"github.com/levvs-one/sora-client/core/engine/enginetest"
+-)
+-
+-// CENSOR-P2 fix (review §3): mihomo's grpc-opts and h2-opts spell no
+-// headers key and its YAML loader silently ignores unknown keys, so
+-// the renderer refuses a header set on grpc, h2 and tcp instead of
+-// dropping it (plan validation is the primary gate for grpc/tcp; the
+-// h2 set is sing-box-only and catalog-gated via FeatureH2Headers).
+-
+-func TestCensorP2FixHeadersRefusedOnGRPCAndTCPAndH2(t *testing.T) {
+-	mk := func(typ string, headers map[string]string) *engine.Plan {
+-		p := enginetest.Plan(engine.ProtocolTrojan)
+-		tr := engine.Transport{Type: typ, Path: "/p", Headers: headers}
+-		if typ == "grpc" {
+-			tr.Service = "tun"
+-		}
+-		p.Outbounds[0].Transport = tr
+-		return p
+-	}
+-	for _, typ := range []string{"grpc", "tcp", "", "h2"} {
+-		p := mk(typ, map[string]string{"User-Agent": "Mozilla/5.0"})
+-		if _, err := Render(p, testRuntime(t)); err == nil || !strings.Contains(err.Error(), "headers") {
+-			t.Errorf("transport %q with headers: Render = %v, want a named headers refusal", typ, err)
+-		}
+-	}
+-	for _, typ := range []string{"grpc", "tcp", "h2"} {
+-		if _, err := Render(mk(typ, nil), testRuntime(t)); err != nil {
+-			t.Errorf("transport %q without headers: Render = %v", typ, err)
+-		}
+-	}
+-}
+-
+-func TestCensorP2FixHeadersStillCarriedOnWSAndXHTTP(t *testing.T) {
+-	p := enginetest.Plan(engine.ProtocolVMess)
+-	p.Outbounds[0].Transport = engine.Transport{
+-		Type: "ws", Path: "/ws",
+-		Headers: map[string]string{"User-Agent": "Mozilla/5.0"},
+-	}
+-	out, err := Render(p, testRuntime(t))
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	if !strings.Contains(out, "User-Agent: Mozilla/5.0") {
+-		t.Fatalf("ws render lost the header set:\n%s", out)
+-	}
+-
+-	p2 := enginetest.Plan(engine.ProtocolVMess)
+-	p2.Outbounds[0].Transport = engine.Transport{
+-		Type: "xhttp", Path: "/x",
+-		Headers: map[string]string{"User-Agent": "Mozilla/5.0"},
+-	}
+-	out, err = Render(p2, testRuntime(t))
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	if !strings.Contains(out, "User-Agent: Mozilla/5.0") {
+-		t.Fatalf("xhttp render lost the header set:\n%s", out)
+-	}
+-}
+diff --git a/core/engine/mihomo/proxy.go b/core/engine/mihomo/proxy.go
+index a543b8af..fbe26581 100644
+--- a/core/engine/mihomo/proxy.go
++++ b/core/engine/mihomo/proxy.go
+@@ -220,15 +220,6 @@ func applyTransport(px *proxy, t engine.Transport) error {
+ 	}
+ 	switch t.Type {
+ 	case "", "tcp", "raw":
+-		if len(t.Headers) > 0 {
+-			// A raw stream has no HTTP handshake to carry headers;
+-			// plan validation rejects the set, and this is the
+-			// render-time backstop (CENSOR-P2 fix). The check reads
+-			// t.Headers, not the merged headers map above: that map
+-			// can hold the Host field alone, which must not trigger
+-			// this refusal.
+-			return fmt.Errorf("mihomo: headers have no spelling on a raw stream and mihomo does not render them")
+-		}
+ 		px.Network = "tcp"
+ 	case "ws":
+ 		px.Network = "ws"
+@@ -246,23 +237,9 @@ func applyTransport(px *proxy, t engine.Transport) error {
+ 			// keeps such plans on Xray; this is the render backstop.
+ 			return fmt.Errorf("mihomo: grpc authority and multi-mode are Xray-only and mihomo does not render them")
+ 		}
+-		if len(t.Headers) > 0 {
+-			// grpc-opts spells only the service name and user agent;
+-			// a headers key would be silently ignored by the YAML
+-			// loader. Plan validation rejects the set; this is the
+-			// render backstop (CENSOR-P2 fix).
+-			return fmt.Errorf("mihomo: headers have no spelling on the grpc transport and mihomo does not render them")
+-		}
+ 		px.Network = "grpc"
+ 		px.GRPCOpts = &grpcOpts{ServiceName: t.Service, UserAgent: t.GRPCUserAgent}
+ 	case "h2":
+-		if len(t.Headers) > 0 {
+-			// h2-opts spells only host and path; the header set is a
+-			// sing-box-only spelling on this transport, catalog-gated
+-			// via FeatureH2Headers, and this refusal is the render
+-			// backstop (CENSOR-P2 fix).
+-			return fmt.Errorf("mihomo: headers on the h2 transport are sing-box-only and mihomo does not render them")
+-		}
+ 		px.Network = "h2"
+ 		px.H2Opts = &h2Opts{Path: t.Path}
+ 		if t.Host != "" {
+diff --git a/core/engine/plan.go b/core/engine/plan.go
+index a119b492..ee5807fb 100644
+--- a/core/engine/plan.go
++++ b/core/engine/plan.go
+@@ -139,14 +139,6 @@ type Transport struct {
+ 	Path    string
+ 	Host    string
+ 	Service string
+-	// Headers is the custom HTTP header set of the stream transport
+-	// (browser-masquerade data: User-Agent and friends). Every
+-	// renderer spells it on ws, httpupgrade and xhttp; sing-box alone
+-	// spells it on h2 (catalog FeatureH2Headers). The grpc and raw
+-	// (tcp) transports have no generic-headers spelling on any pinned
+-	// engine — gRPC customisation lives in the GRPC* fields below —
+-	// so plan validation rejects a non-empty set there instead of
+-	// letting a renderer drop it silently (CENSOR-P2).
+ 	Headers map[string]string
+ 	// EarlyData caps WebSocket 0-RTT: the first payload bytes ride the
+ 	// handshake instead of waiting for it. Zero disables it; only the
+diff --git a/core/engine/refs.go b/core/engine/refs.go
+index 9450e426..443aba5d 100644
+--- a/core/engine/refs.go
++++ b/core/engine/refs.go
+@@ -85,14 +85,6 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
+ 				out[FeatureXHTTPPadding] = true
+ 			}
+ 		}
+-		if o.Transport.Type == "h2" && len(o.Transport.Headers) > 0 {
+-			// Only the sing-box renderer spells the header set on
+-			// the h2 transport (FeatureH2Headers); without the gate
+-			// an h2 plan carrying headers would lose them silently
+-			// on mihomo, whose h2-opts has no headers key
+-			// (CENSOR-P2 fix).
+-			out[FeatureH2Headers] = true
+-		}
+ 		if o.Encryption != "" && o.Encryption != "none" {
+ 			out[FeatureVLESSEncrypt] = true
+ 		}
+diff --git a/core/engine/singbox/censor_p2_headers_binary_test.go b/core/engine/singbox/censor_p2_headers_binary_test.go
+deleted file mode 100644
+index cb0cb56f..00000000
+--- a/core/engine/singbox/censor_p2_headers_binary_test.go
++++ /dev/null
+@@ -1,45 +0,0 @@
+-package singbox
+-
+-import (
+-	"os"
+-	"os/exec"
+-	"path/filepath"
+-	"testing"
+-
+-	"github.com/levvs-one/sora-client/core/engine"
+-	"github.com/levvs-one/sora-client/core/engine/enginetest"
+-)
+-
+-// TestBinaryAcceptsCensorP2FixH2Headers is the runtime probe behind
+-// the CENSOR-P2 fix h2 claim: the rendered http transport carrying the
+-// plan's header set must be accepted by the pinned binary (`sing-box
+-// check` rejects unknown keys, so acceptance proves the field). The
+-// same probe run rejected a headers key on the gRPC transport as an
+-// unknown field — the fact behind the plan-level grpc refusal.
+-func TestBinaryAcceptsCensorP2FixH2Headers(t *testing.T) {
+-	bin := os.Getenv("SORA_SINGBOX_BIN")
+-	if bin == "" {
+-		dir := os.Getenv("SORA_ENGINES_DIR")
+-		if dir == "" {
+-			t.Skip("set SORA_ENGINES_DIR or SORA_SINGBOX_BIN to check the render with sing-box")
+-		}
+-		bin = filepath.Join(dir, "sing-box")
+-	}
+-	p := enginetest.Plan(engine.ProtocolVMess)
+-	p.Outbounds[0].Transport = engine.Transport{
+-		Type: "h2", Path: "/h2", Host: "cdn.example.com",
+-		Headers: map[string]string{"User-Agent": "Mozilla/5.0"},
+-	}
+-	raw, err := Render(p, testRuntime)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	cfg := filepath.Join(t.TempDir(), "config.json")
+-	if err := os.WriteFile(cfg, raw, 0o600); err != nil {
+-		t.Fatal(err)
+-	}
+-	cmd := exec.CommandContext(t.Context(), bin, "check", "-c", cfg)
+-	if out, err := cmd.CombinedOutput(); err != nil {
+-		t.Fatalf("sing-box refused the h2 headers render: %v\n%s\n--- render ---\n%s", err, out, raw)
+-	}
+-}
+diff --git a/core/engine/singbox/censor_p2_headers_test.go b/core/engine/singbox/censor_p2_headers_test.go
+deleted file mode 100644
+index 76094b3f..00000000
+--- a/core/engine/singbox/censor_p2_headers_test.go
++++ /dev/null
+@@ -1,81 +0,0 @@
+-package singbox
+-
+-import (
+-	"strings"
+-	"testing"
+-
+-	"github.com/levvs-one/sora-client/core/engine"
+-	"github.com/levvs-one/sora-client/core/engine/enginetest"
+-)
+-
+-// CENSOR-P2 fix (review §3): the sing-box http (h2) transport spells a
+-// headers map on the pin but this renderer emitted only host/path, so
+-// the masquerade set dropped; on grpc and tcp the renderer now refuses
+-// a header set no engine can spell (plan validation is the primary
+-// gate, this is the backstop).
+-
+-func TestCensorP2FixH2HeadersRendered(t *testing.T) {
+-	p := enginetest.Plan(engine.ProtocolVMess)
+-	p.Outbounds[0].Transport = engine.Transport{
+-		Type: "h2", Path: "/h2", Host: "cdn.example.com",
+-		Headers: map[string]string{"User-Agent": "Mozilla/5.0", "X-A": "1"},
+-	}
+-	tr := p2Transport(t, p, "vmess")
+-	if tr["type"] != "http" {
+-		t.Fatalf("h2 transport type = %v, want http", tr["type"])
+-	}
+-	headers, _ := tr["headers"].(map[string]any)
+-	if headers["User-Agent"] != "Mozilla/5.0" || headers["X-A"] != "1" {
+-		t.Fatalf("h2 headers = %v, want the full plan set in %v", headers, tr)
+-	}
+-	// The Host field keeps its own spelling (the host list), it is not
+-	// folded into the header set on this transport.
+-	if _, ok := headers["Host"]; ok {
+-		t.Fatalf("h2 headers must not gain a folded Host entry: %v", headers)
+-	}
+-}
+-
+-func TestCensorP2FixHeadersRefusedOnGRPCAndTCP(t *testing.T) {
+-	for _, typ := range []string{"grpc", "tcp", ""} {
+-		p := enginetest.Plan(engine.ProtocolTrojan)
+-		tr := engine.Transport{Type: typ, Headers: map[string]string{"User-Agent": "Mozilla/5.0"}}
+-		if typ == "grpc" {
+-			tr.Service = "tun"
+-		}
+-		p.Outbounds[0].Transport = tr
+-		if _, err := Render(p, testRuntime); err == nil || !strings.Contains(err.Error(), "headers") {
+-			t.Errorf("transport %q with headers: Render = %v, want a named headers refusal", typ, err)
+-		}
+-	}
+-	// Empty set still renders on both transports.
+-	for _, typ := range []string{"grpc", "tcp"} {
+-		p := enginetest.Plan(engine.ProtocolTrojan)
+-		tr := engine.Transport{Type: typ}
+-		if typ == "grpc" {
+-			tr.Service = "tun"
+-		}
+-		p.Outbounds[0].Transport = tr
+-		if _, err := Render(p, testRuntime); err != nil {
+-			t.Errorf("transport %q without headers: Render = %v", typ, err)
+-		}
+-	}
+-}
+-
+-func TestCensorP2FixH2DeterministicRender(t *testing.T) {
+-	p := enginetest.Plan(engine.ProtocolTrojan)
+-	p.Outbounds[0].Transport = engine.Transport{
+-		Type: "h2", Path: "/h2",
+-		Headers: map[string]string{"User-Agent": "ua", "X-B": "2", "X-A": "1", "Accept": "*/*"},
+-	}
+-	a, err := Render(p, testRuntime)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	b, err := Render(p, testRuntime)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	if string(a) != string(b) {
+-		t.Fatal("repeated h2 render with headers is not byte-identical")
+-	}
+-}
+diff --git a/core/engine/singbox/render.go b/core/engine/singbox/render.go
+index 890fc10f..2de7249a 100644
+--- a/core/engine/singbox/render.go
++++ b/core/engine/singbox/render.go
+@@ -494,12 +494,6 @@ func transport(t engine.Transport) (obj, error) {
+ 	}
+ 	switch t.Type {
+ 	case "", "tcp":
+-		if len(t.Headers) > 0 {
+-			// A raw stream has no HTTP handshake to carry headers;
+-			// plan validation rejects the set, and this is the
+-			// render-time backstop (CENSOR-P2 fix).
+-			return nil, fmt.Errorf("transport tcp: headers have no spelling on a raw stream and sing-box does not render them")
+-		}
+ 		return nil, nil
+ 	case "ws":
+ 		out := obj{"type": "ws"}.set("path", t.Path).set("headers", wsHeaders())
+@@ -518,27 +512,12 @@ func transport(t engine.Transport) (obj, error) {
+ 		if t.GRPCAuthority != "" || t.GRPCMultiMode || t.GRPCUserAgent != "" {
+ 			return nil, fmt.Errorf("transport grpc: authority, multi-mode and user-agent are Xray-only and sing-box does not render them")
+ 		}
+-		if len(t.Headers) > 0 {
+-			// The pin's gRPC transport has no headers key at all
+-			// (`sing-box check` on lx.22: json: unknown field
+-			// "headers"); plan validation rejects the set and this
+-			// refusal is the backstop (CENSOR-P2 fix).
+-			return nil, fmt.Errorf("transport grpc: headers have no spelling on the grpc transport and sing-box does not render them")
+-		}
+ 		return obj{"type": "grpc"}.set("service_name", t.Service), nil
+ 	case "h2":
+ 		out := obj{"type": "http"}.set("path", t.Path)
+ 		if t.Host != "" {
+ 			out["host"] = []string{t.Host}
+ 		}
+-		if len(t.Headers) > 0 {
+-			// The http transport spells a headers map (probed with
+-			// `sing-box check` on lx.22, which rejects unknown keys);
+-			// this renderer emitted only host/path and the masquerade
+-			// set dropped silently (CENSOR-P2 fix). The Host field
+-			// stays in its own host list above, as the pin spells it.
+-			out["headers"] = t.Headers
+-		}
+ 		return out, nil
+ 	case "httpupgrade":
+ 		out := obj{"type": "httpupgrade"}.set("host", t.Host).set("path", t.Path)
+diff --git a/core/engine/validate.go b/core/engine/validate.go
+index a1dbab05..c19a5569 100644
+--- a/core/engine/validate.go
++++ b/core/engine/validate.go
+@@ -330,27 +330,6 @@ func validateTransportFields(o Outbound) []error {
+ 			bad("early data header name %q is not a safe HTTP header name", t.EarlyDataHeaderName)
+ 		}
+ 	}
+-	// Headers are HTTP-handshake data. Every renderer spells them on
+-	// ws, httpupgrade and xhttp, and sing-box spells them on h2 (the
+-	// catalog gates that combination via FeatureH2Headers). On grpc
+-	// and on a raw stream ("" or "tcp") no pinned engine has a generic
+-	// headers spelling at all — gRPC customisation lives in the GRPC*
+-	// fields, and sing-box rejects a headers key on its gRPC transport
+-	// as unknown while mihomo and Xray silently ignore one — so a
+-	// non-empty set here is a plan error, never a silent drop
+-	// (CENSOR-P2 review §3). The error names the transport only: header
+-	// values can carry secrets and are never echoed.
+-	if len(t.Headers) > 0 {
+-		switch t.Type {
+-		case "ws", "httpupgrade", "xhttp", "h2":
+-		default:
+-			name := t.Type
+-			if name == "" {
+-				name = "tcp"
+-			}
+-			bad("headers need the ws, httpupgrade, xhttp or h2 transport, not %q", name)
+-		}
+-	}
+ 	if t.Service != "" && t.Type != "grpc" {
+ 		bad("grpc service name %q needs the grpc transport, not %q", t.Service, t.Type)
+ 	}
+diff --git a/core/engine/xray/censor_p2_headers_test.go b/core/engine/xray/censor_p2_headers_test.go
+deleted file mode 100644
+index 99c68191..00000000
+--- a/core/engine/xray/censor_p2_headers_test.go
++++ /dev/null
+@@ -1,63 +0,0 @@
+-package xray
+-
+-import (
+-	"strings"
+-	"testing"
+-
+-	"github.com/levvs-one/sora-client/core/engine"
+-	"github.com/levvs-one/sora-client/core/engine/enginetest"
+-)
+-
+-// CENSOR-P2 fix (review §3): Xray's grpcSettings spells no generic
+-// headers map and a raw stream has no handshake to carry one, so the
+-// renderer refuses a header set on grpc/tcp instead of dropping it
+-// (plan validation is the primary gate, this is the backstop). WS and
+-// HTTPUpgrade keep carrying the set — the original P2 regression
+-// surface.
+-
+-func TestCensorP2FixHeadersRefusedOnGRPCAndTCP(t *testing.T) {
+-	for _, typ := range []string{"grpc", "tcp", ""} {
+-		p := enginetest.Plan(engine.ProtocolTrojan)
+-		tr := engine.Transport{Type: typ, Headers: map[string]string{"User-Agent": "Mozilla/5.0"}}
+-		if typ == "grpc" {
+-			tr.Service = "tun"
+-		}
+-		p.Outbounds[0].Transport = tr
+-		if _, err := Render(p, testRuntime, nil); err == nil || !strings.Contains(err.Error(), "headers") {
+-			t.Errorf("transport %q with headers: Render = %v, want a named headers refusal", typ, err)
+-		}
+-	}
+-	for _, typ := range []string{"grpc", "tcp"} {
+-		p := enginetest.Plan(engine.ProtocolTrojan)
+-		tr := engine.Transport{Type: typ}
+-		if typ == "grpc" {
+-			tr.Service = "tun"
+-		}
+-		p.Outbounds[0].Transport = tr
+-		if _, err := Render(p, testRuntime, nil); err != nil {
+-			t.Errorf("transport %q without headers: Render = %v", typ, err)
+-		}
+-	}
+-}
+-
+-func TestCensorP2FixHeadersStillCarriedOnWSAndHTTPUpgrade(t *testing.T) {
+-	for _, tc := range []struct {
+-		typ, settings string
+-	}{
+-		{"ws", "wsSettings"},
+-		{"httpupgrade", "httpupgradeSettings"},
+-		{"xhttp", "xhttpSettings"},
+-	} {
+-		p := enginetest.Plan(engine.ProtocolVMess)
+-		p.Outbounds[0].Transport = engine.Transport{
+-			Type: tc.typ, Path: "/p", Host: "cdn.example.com",
+-			Headers: map[string]string{"User-Agent": "Mozilla/5.0"},
+-		}
+-		ss := p2Stream(t, p, "vmess")
+-		settings, _ := ss[tc.settings].(map[string]any)
+-		headers, _ := settings["headers"].(map[string]any)
+-		if headers["User-Agent"] != "Mozilla/5.0" {
+-			t.Errorf("transport %q: headers = %v, want the plan set carried in %v", tc.typ, headers, settings)
+-		}
+-	}
+-}
+diff --git a/core/engine/xray/render.go b/core/engine/xray/render.go
+index f1bb3528..558e3981 100644
+--- a/core/engine/xray/render.go
++++ b/core/engine/xray/render.go
+@@ -302,12 +302,6 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
+ 	}
+ 	switch t.Type {
+ 	case "", "tcp":
+-		if len(t.Headers) > 0 {
+-			// A raw stream has no HTTP handshake to carry headers;
+-			// plan validation rejects the set, and this is the
+-			// render-time backstop (CENSOR-P2 fix).
+-			return nil, fmt.Errorf("transport tcp: headers have no spelling on a raw stream and Xray does not render them")
+-		}
+ 	case "ws":
+ 		s["network"] = "ws"
+ 		ws := obj{}.set("path", t.Path).set("host", t.Host).set("maxEarlyData", t.EarlyData).
+@@ -321,13 +315,6 @@ func (r *renderer) stream(o engine.Outbound) (obj, error) {
+ 		}
+ 		s["wsSettings"] = ws
+ 	case "grpc":
+-		if len(t.Headers) > 0 {
+-			// grpcSettings spells serviceName/authority/multiMode/
+-			// user_agent only — no generic headers map; plan
+-			// validation rejects the set and this refusal is the
+-			// backstop (CENSOR-P2 fix).
+-			return nil, fmt.Errorf("transport grpc: headers have no spelling on the grpc transport and Xray does not render them")
+-		}
+ 		s["network"] = "grpc"
+ 		// authority, multiMode and user_agent are Xray's spellings
+ 		// (verified on the pin); sing-box renders none of them and
+@@ -532,7 +519,6 @@ func (r *renderer) xhttpDownloadSettings(o engine.Outbound) (obj, error) {
+ 	}
+ 	ds := obj{"address": t.DownloadAddress, "port": int(t.DownloadPort), "network": "xhttp"}.
+ 		set("xhttpSettings", dxs)
+-
+ 	switch {
+ 	case o.TLS.Reality:
+ 		ds["security"] = "reality"
+diff --git a/core/wgobfusc/generate_test.go b/core/wgobfusc/generate_test.go
+index baf73e5c..5705d068 100644
+--- a/core/wgobfusc/generate_test.go
++++ b/core/wgobfusc/generate_test.go
+@@ -76,7 +76,7 @@ func TestGenerateUnique(t *testing.T) {
+ 	// point (published configs are censor-signatured).
+ 	seen := map[string]bool{}
+ 	for i := 0; i < 8; i++ {
+-		a, err := GenerateWith(&lcg{s: uint64(i) * 7919 + 13}, PresetQUIC)
++		a, err := GenerateWith(&lcg{s: uint64(i)*7919 + 13}, PresetQUIC)
+ 		if err != nil {
+ 			t.Fatal(err)
+ 		}
