@@ -104,6 +104,10 @@
   }
 
   var settingsStore = null; // lazy: defaults merged with setSettings
+  // Anti-DPI bypass layer, held in memory like the real host's layer:
+  // applyBypassLayer replaces it wholesale, getBypassLayer reads it back.
+  var bypassLayer = { global: null, bindings: [] };
+  var bypassUpdatedAt = new Date(0).toISOString();
   var listeners = [];
 
   function logCall(method, args, outcome) {
@@ -173,6 +177,84 @@
           if (Object.prototype.hasOwnProperty.call(args, k)) settingsStore[k] = args[k];
         }
         p = Promise.resolve();
+        break;
+      }
+      case 'getBypassCapabilities': {
+        var capDenied = check('bypass.read');
+        if (capDenied) return capDenied.then(null, function (e) { logCall(method, args, 'denied:' + e.code); throw e; });
+        var caps = (fixtures && fixtures.bypass_capabilities) || {
+          platform: 'linux (mock)',
+          backends: [
+            { kind: 'nfqws', available: true, reason: '' },
+            { kind: 'tpws', available: true, reason: '' },
+          ],
+        };
+        p = Promise.resolve(caps);
+        break;
+      }
+      case 'getBypassState': {
+        var stateDenied = check('bypass.read');
+        if (stateDenied) return stateDenied.then(null, function (e) { logCall(method, args, 'denied:' + e.code); throw e; });
+        p = Promise.resolve({
+          platform: 'linux (mock)',
+          global_source: bypassLayer.global ? 'extension' : '',
+          global_from: bypassLayer.global ? (manifest && manifest.id) || '' : '',
+          session_active: false,
+          pending_apply: false,
+          bindings_count: bypassLayer.bindings.length,
+        });
+        break;
+      }
+      case 'getBypassLayer': {
+        var layerDenied = check('bypass.read');
+        if (layerDenied) return layerDenied.then(null, function (e) { logCall(method, args, 'denied:' + e.code); throw e; });
+        p = Promise.resolve(JSON.parse(JSON.stringify({
+          global: bypassLayer.global,
+          bindings: bypassLayer.bindings,
+          updated_at: bypassUpdatedAt,
+        })));
+        break;
+      }
+      case 'applyBypassLayer': {
+        var applyDenied = check('bypass.write');
+        if (applyDenied) return applyDenied.then(null, function (e) { logCall(method, args, 'denied:' + e.code); throw e; });
+        if (!args || typeof args !== 'object' ||
+            (args.global !== null && args.global !== undefined && typeof args.global !== 'object') ||
+            (args.bindings !== undefined && !Array.isArray(args.bindings))) {
+          p = deny('invalid-argument', 'applyBypassLayer needs {global: strategy|null, bindings: [...]}');
+          break;
+        }
+        bypassLayer = JSON.parse(JSON.stringify({
+          global: args.global || null,
+          bindings: args.bindings || [],
+        }));
+        bypassUpdatedAt = new Date().toISOString();
+        p = Promise.resolve({ updated_at: bypassUpdatedAt });
+        break;
+      }
+      case 'tuneDesync': {
+        var tuneDenied = check('bypass.tune');
+        if (tuneDenied) return tuneDenied.then(null, function (e) { logCall(method, args, 'denied:' + e.code); throw e; });
+        // A mock winner, labelled as one: the real tuner probes the
+        // core's canary endpoints; the mock never touches the network.
+        p = Promise.resolve({
+          winner_id: 'mock/d/fake:fake',
+          winner_describe: 'MOCK winner from sora-ext serve — not a real tuning result',
+          score: 1,
+          attempts: 1,
+          strategy: {
+            split_pos: ['1', 'midsld'],
+            disorder: true,
+            oob: false,
+            tls_record: '',
+            host_case: true,
+            desync: ['fake'],
+            fake_tls: 'tls',
+            ttl: 0,
+            auto_ttl: false,
+            repeats: 0,
+          },
+        });
         break;
       }
       default:

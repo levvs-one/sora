@@ -52,6 +52,128 @@ export interface SoraExtensionServer {
 }
 
 /**
+ * A DPI-bypass strategy: the snake_case JSON shape of
+ * `sora.core.v1.BypassStrategy` (all 29 fields). Reads always carry the
+ * full shape; writes may omit fields (proto defaults apply), but unknown
+ * fields or wrong types reject with `invalid-argument`.
+ */
+export interface SoraBypassStrategy {
+  split_pos: string[];
+  disorder: boolean;
+  oob: boolean;
+  tls_record: string;
+  host_case: boolean;
+  domain_case: boolean;
+  method_eol: boolean;
+  disorder_scope: string;
+  oob_scope: string;
+  host_dot: boolean;
+  host_tab: boolean;
+  host_no_space: boolean;
+  method_space: boolean;
+  unix_eol: boolean;
+  split_any_protocol: boolean;
+  tamper_start: string;
+  tamper_cutoff: string;
+  oob_data: string;
+  mss: string;
+  desync: string[];
+  fake_tls: string;
+  fake_quic: string;
+  fooling: string;
+  ttl: number;
+  auto_ttl: boolean;
+  repeats: number;
+  filter_tcp: string;
+  filter_udp: string;
+  filter_l7: string;
+}
+
+/** A partial strategy for writes: omitted fields take proto defaults. */
+export type SoraBypassStrategyInput = Partial<SoraBypassStrategy>;
+
+/** One per-destination binding of a bypass layer. */
+export interface SoraBypassBinding {
+  /** Destination in the core's form, e.g. "domain:example.com". */
+  match: string;
+  strategy: SoraBypassStrategyInput;
+}
+
+/** A bypass layer: one global strategy plus per-destination bindings. */
+export interface SoraBypassLayer {
+  global: SoraBypassStrategyInput | null;
+  bindings: SoraBypassBinding[];
+}
+
+/** A layer as read back: full strategies plus the apply timestamp. */
+export interface SoraBypassLayerState {
+  global: SoraBypassStrategy | null;
+  bindings: Array<{ match: string; strategy: SoraBypassStrategy }>;
+  /** RFC 3339 UTC timestamp of the last apply. */
+  updated_at: string;
+}
+
+/** One desync backend's availability on this host. */
+export interface SoraBypassBackend {
+  /** Backend kind, e.g. "nfqws" or "tpws". */
+  kind: string;
+  available: boolean;
+  /** Why the backend cannot run here; '' when it can. */
+  reason: string;
+}
+
+/** Result of `getBypassCapabilities` (needs `bypass.read`). */
+export interface SoraBypassCapabilities {
+  platform: string;
+  backends: SoraBypassBackend[];
+}
+
+/** Result of `getBypassState` (needs `bypass.read`). */
+export interface SoraBypassState {
+  platform: string;
+  /** Where the current global strategy came from, e.g. "extension". */
+  global_source: string;
+  /** The extension id that applied it; '' when none did. */
+  global_from: string;
+  session_active: boolean;
+  /** An applied layer is waiting for the next connect to take effect. */
+  pending_apply: boolean;
+  bindings_count: number;
+}
+
+/** Arguments for `tuneDesync`. */
+export interface SoraTuneDesyncArgs {
+  /** Executor to tune for: "nfqws" or "tpws"; '' = the core's default. */
+  engine: string;
+}
+
+/** Result of `tuneDesync` (needs `bypass.tune`). */
+export interface SoraTuneDesyncResult {
+  /** Winning strategy id; '' when no candidate worked (an outcome, not an error). */
+  winner_id: string;
+  winner_describe: string;
+  /** Winner fitness in [0, 1]. */
+  score: number;
+  attempts: number;
+  /** The winning strategy, or null when no candidate worked. */
+  strategy: SoraBypassStrategy | null;
+}
+
+/**
+ * Detail payload of a `bypass.event` (delivered to `onEvent` as a JSON
+ * string — parse it). Pushed while a bypass panel is open when the core
+ * detects censorship.
+ */
+export interface SoraBypassEventDetail {
+  kind: 'censorship';
+  /** Detector classification, e.g. "sni_blocking". */
+  censorship_kind: string;
+  explanation: string;
+  /** RFC 3339 UTC. */
+  at: string;
+}
+
+/**
  * Lifecycle and network events delivered to `onEvent`.
  *
  * Only `session.connected` / `session.disconnected` are emitted by the
@@ -68,7 +190,13 @@ export type SoraExtensionEventKind =
    * Reserved: when the extension is disabled, the current panel bridge
    * tears the panel down without delivering this event first.
    */
-  | 'extension.disabled';
+  | 'extension.disabled'
+  /**
+   * Censorship detected by the core; `detail` is a JSON string holding a
+   * SoraBypassEventDetail. Sent only to panels of extensions granted a
+   * bypass permission, while the panel is open.
+   */
+  | 'bypass.event';
 
 /** Listener for extension events. `detail` carries extra context when present. */
 export type SoraExtensionEventListener = (
@@ -144,6 +272,36 @@ export interface SoraExt {
    * Needs no permission.
    */
   call(method: 'setSettings', args: Record<string, unknown>): Promise<void>;
+  /**
+   * Which desync backends can run on this host.
+   * Needs the `bypass.read` permission (sensitive).
+   */
+  call(method: 'getBypassCapabilities'): Promise<SoraBypassCapabilities>;
+  /**
+   * Current bypass state: strategy provenance, session, pending apply.
+   * Needs the `bypass.read` permission (sensitive).
+   */
+  call(method: 'getBypassState'): Promise<SoraBypassState>;
+  /**
+   * The current bypass layer (global strategy + bindings).
+   * Needs the `bypass.read` permission (sensitive).
+   */
+  call(method: 'getBypassLayer'): Promise<SoraBypassLayerState>;
+  /**
+   * Replace the bypass layer wholesale. Takes effect at the next
+   * connect; the app also writes the global strategy through to its own
+   * settings (the user can override it there at any time — the user
+   * wins). Needs the `bypass.write` permission (dangerous).
+   */
+  call(
+    method: 'applyBypassLayer',
+    args: SoraBypassLayer,
+  ): Promise<{ updated_at: string }>;
+  /**
+   * Run the core's desync tuner once and return the winner.
+   * Needs the `bypass.tune` permission (dangerous).
+   */
+  call(method: 'tuneDesync', args: SoraTuneDesyncArgs): Promise<SoraTuneDesyncResult>;
   /**
    * Subscribe to lifecycle/network events. Returns an unsubscribe function.
    * Needs no permission: every enabled extension may know whether the
