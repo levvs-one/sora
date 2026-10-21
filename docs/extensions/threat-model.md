@@ -11,7 +11,7 @@ it says so.
 | # | Asset | Where it lives | Why it matters |
 |---|-------|----------------|----------------|
 | A1 | Subscription credentials (proxy UUIDs, passwords, private keys) | `srv.secrets` secret store in `core/control`; referenced by `CredentialsRef`, never inlined | Full account takeover / traffic decryption if leaked |
-| A2 | Live VPN traffic (what the user sends through the tunnel) | Engine + `routing.rules` / `net.hooks` consumers (when implemented) | Confidentiality of everything the user does |
+| A2 | Live VPN traffic (what the user sends through the tunnel) | Engine + routing rule consumer; network hooks not applied | Confidentiality of everything the user does |
 | A3 | Connection metadata (which apps contact which hosts) | `core/control` session journal | Browsing/app-usage profile |
 | A4 | App settings | App (Dart) side | Integrity of the user's configuration |
 | A5 | Extension code integrity (what the author shipped) | `.soraext` on disk, `installed.json` registry | Supply-chain: a modified extension is the author's malware |
@@ -79,14 +79,14 @@ this section is its prose rendering, when they disagree, the code wins.
 | `servers.read` | `Host.check()` → `GetServers` | `bridge.dart` | ✅ enforced both layers |
 | `notifications` | `Host.check()` → `Notify` (+120/500 char caps) | `bridge.dart` | ✅ enforced both layers |
 | `net.fetch` | `Fetcher` built only when granted (`Scheduler.RegisterConfig`); allowlist + https/IP/port/redirect/rate/size checks per request; transport is `ext.TunnelTransport`, every request rides the tunnel's loopback proxy and **fails closed** (`ext.netfetch.no-tunnel`) when no tunnel proxy is live, instead of dialing direct | no panel-side fetch (CSP `connect-src 'none'`) | ✅ enforced at construction, per request, and at the tunnel |
-| `background` | `Scheduler.RegisterConfig` requires capability **and** permission; interval clamped [15m, 7d]; overlap guard + circuit breaker; scheduler is created/started in sora-core with the kill switch wired through the control plane | background config UI (`<id>.background.json`) | ✅ enforced; **no worker executor is wired yet, so no extension code runs** |
-| `settings.read` |, none, |, none, | ⚠️ **no enforcement point; inert** (see below) |
-| `settings.write` |, none, |, none, | ⚠️ **no enforcement point; inert** |
-| `tray` |, none, |, none, | ⚠️ declared only (runtime v2) |
+| `background` | `Scheduler.RegisterConfig` requires capability **and** permission; interval clamped [15m, 7d]; overlap guard + circuit breaker; scheduler is created/started in sora-core with the kill switch wired through the control plane | background config UI (`<id>.background.json`) | enforced; isolated goja executor with CPU, memory and wall budgets |
+| `settings.read` | none | none | ⚠️ **no enforcement point; inert** (see below) |
+| `settings.write` | none | none | ⚠️ **no enforcement point; inert** |
+| `tray` | none | none | ⚠️ declared only (runtime v2) |
 | `ui.panel` | **gated at validation**: declared panels require the `ui-panel` capability **and** the `ui.panel` permission (`core/ext/manifest.go` + Dart mirror), the install prompt always consents to UI embedding | panel loader serves only declared panels; bridge methods individually gated | ✅ install-time, now a real gate (pass 1) |
-| `theme.apply` |, none, |, none, | ⚠️ declared only |
-| `routing.rules` |, none, |, none, | ⚠️ **declared only, RiskDangerous** |
-| `net.hooks` |, none, |, none, | ⚠️ **declared only, RiskDangerous** |
+| `theme.apply` | manifest capability/permission validation | enabled grants, conflict winner, colors/contrast validation, reset on disable | enforced |
+| `routing.rules` | manifest capability/permission validation | enabled grants, user match parser, direct/proxy/block, ordered plan merge | enforced, RiskDangerous |
+| `net.hooks` | none | none | ⚠️ **declared only, RiskDangerous** |
 
 Honest reading of the ⚠️ rows:
 
@@ -97,13 +97,10 @@ Honest reading of the ⚠️ rows:
   granting them changes nothing. If an app-settings API is ever added,
   its adapter must project exactly like §5 and must exclude the secret
   store; the permission prompt text must say what "settings" means.
-- `routing.rules` and `net.hooks` are `RiskDangerous` **with zero
-  enforcement code**. Today granting them is inert. The day the first
-  enforcement point lands, these permissions become "game over for A2"
-  by design (a routing-rules contributor chooses where traffic goes; a
-  net-hook reshapes it). The install prompt must not present them as
-  ordinary toggles then, they need the strongest consent language we
-  have, plus catalog review for catalog extensions.
+- `routing.rules` is dangerous: it can choose direct/proxy/block for matching
+  traffic, after user rules and before defaults. It never selects a server.
+  Consent remains mandatory. `net.hooks` is still not applied; granting it
+  changes no traffic behavior.
 - The closed `rpcPermissions` map (`host.go`) denies unknown RPC names,
   so a future RPC cannot silently inherit token-only access
   (`TestCheckRejectsUnknownRPC`). `TestRpcPermissionsCoverRegistry`
@@ -239,8 +236,8 @@ who they claim to be, and anyone can mint one in a minute.
 `core/ext/sideload.go` builds the facts the prompt must show
 (`SideloadConsent`, after `pkg.Verify()`): author name/identity, key id
 + SHA-256 fingerprint (`AuthorKeyFingerprint`), every permission with a
-blunt consequence ("will be able to redirect your traffic, including
-banking and mail, through servers it chooses"), dangerous first, and
+blunt consequence (routing rules can bypass or block matching traffic,
+including banking and mail; they cannot choose a server), dangerous first, and
 the warning block: not from the catalog, self-attested, trust only if
 the fingerprint matches the author's published key.
 
@@ -257,11 +254,10 @@ un-pre-checked decision.
    only (no remote content), no Node/ffi, WebView kept updated. The
    24 h token TTL bounds a stolen token's lifetime; it does not prevent
    theft.
-2. **Dangerous permissions are inherently total.** Once `routing.rules`
-   / `net.hooks` are implemented, granting them hands the extension the
-   traffic path (A2). No technical control can make that safe, only
-   consent, catalog review, and revocation. We say so on the prompt
-   instead of implying sandboxing.
+2. **Routing consent.** routing.rules can bypass or block destinations,
+   including sensitive applications. Explicit dangerous-permission consent
+   is required. It cannot name a server; proxy means the session target.
+   Network hooks remain unapplied.
 3. **Author key compromise.** A leaked author key lets the attacker ship
    trusted "updates" (version monotonicity does not help). Defenses:
    TOFU pinning (planned), revocation (needs the key ceremony), user
@@ -273,13 +269,15 @@ un-pre-checked decision.
    request rides the tunnel proxy, so name resolution happens at the
    engine, not on the local network, but the residual risk that an
    allowlisted host itself turns malicious remains.
-7. **Inert-but-dangerous permissions.** Until enforced, `routing.rules`
-   / `net.hooks` in the prompt must be labeled "not yet supported",
-   not granted silently. A permission the app cannot enforce must not
-   be presented as a protection. The machine-readable status is
-   `core/ext/enforcement.go`; the CLI already warns authors about it
-   (`sora-ext validate`), and the install prompt is the remaining
-   consumer (l10n key `extPermNotYetActive`, proposed).
+7. **Unapplied network hooks.** `net.hooks` still has no runtime consumer
+   and is labeled not yet active. Themes, routing and background tasks now
+   have real consumers; see the machine-readable enforcement matrix.
+8. **Worker isolation.** The app's authenticated RunWorker stream delegates
+   its verified registry and granted permissions. JS cannot access the
+   control token or transport. It runs in a fresh process with CPU/memory
+   budgets and cancellation, JSON-only calls, the existing permission map,
+   PanelBridge, and tunnel-bound Fetcher. This protects against resource
+   exhaustion, not a vulnerability in Go/goja or a compromised OS/core.
 
 ## 10. Fuzzing (WS8)
 

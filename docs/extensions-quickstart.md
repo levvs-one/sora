@@ -24,7 +24,7 @@ cd stats
 
 You get: `sora-extension.json` (manifest), `panel.html`, `sora-ext.d.ts`
 (TypeScript definitions for `window.soraExt`), a README, and a fresh
-signing keypair (`author.key` secret, keep offline, never commit;
+signing keypair (`.sora/author.key` secret, keep offline, never commit;
 `author.pub`).
 
 ## 0:02, Dev mode
@@ -88,9 +88,9 @@ error[unknown-permission]: unknown permission "net.fech"
 ## 0:08, Pack, sign, publish
 
 ```sh
-sora-ext pack . -o stats.soraext
-sora-ext sign --key author.key stats.soraext
-sora-ext publish stats.soraext
+sora-ext pack . -o /tmp/stats.soraext
+sora-ext sign --key .sora/author.key /tmp/stats.soraext
+sora-ext publish /tmp/stats.soraext
 ```
 
 `publish` checks: validation passes, the package is signed, dangerous
@@ -99,7 +99,7 @@ hash and a catalog-entry snippet ready to submit.
 
 ## 0:10, Install
 
-In the app: **Extensions → Install from file** → pick `stats.soraext`.
+In the app: **Extensions → Install from file** → pick `/tmp/stats.soraext`.
 Review the permission prompt, enable, done. Updates are staged with
 rollback; widening permissions re-prompts.
 
@@ -111,3 +111,10 @@ rollback; widening permissions re-prompts.
 - [Dev mode & app contract](extensions-devmode.md), how the app side works
 - `examples/hello-panel`: a minimal working panel to build, sign and
   sideload
+
+Background workers, themes and routing rules also run in the app now. Start
+from `sora-ext scaffold --template background`, `examples/theme-midnight` or
+`examples/routing-split`. Workers use `window.soraExt.call` and `console.log`;
+they run on the core scheduler while the app is open. Theme stylesheets are
+ignored; network hooks are not applied. See the normative runtime contracts
+in [extensions.md](extensions.md).
