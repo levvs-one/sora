@@ -107,8 +107,16 @@ Worker-only method: `call('net.fetch', {url, method?, headers?, body?})`,
 permission `net.fetch`, returns `{status, headers, body}`. Headers map to
 arrays of response header values; request headers map to strings. Body is
 text. HTTPS, network_hosts allowlist, redirect/rate/size policy and a live
-VPN proxy are all required; without a proxy it rejects with `not-connected`.
-There is no direct-network fallback. Panel `net.fetch` remains unavailable.
+VPN proxy are all required; without a connected VPN session and its private
+authenticated SOCKS inbound it rejects with `not-connected`. This inbound
+has a random loopback port and per-session credentials kept inside the core.
+Its route is pinned to the selected VPN or chain, ahead of user and extension
+rules, even if a matching ordinary route is direct or blocked. DNS over TCP
+to `1.1.1.1:53` uses the same VPN path; destination IPs then travel through it
+with the original HTTPS identity. Direct/serverless bypass, mixed direct/VPN
+groups and opaque Xray profiles are unavailable. Pure TUN needs no ordinary
+local proxy. There is no direct-network or OS DNS fallback.
+Panel `net.fetch` remains unavailable.
 
 Worker `onEvent` receives a session-state snapshot once per subscription per
 run. A worker is a finite scheduled task, not a persistent event listener.

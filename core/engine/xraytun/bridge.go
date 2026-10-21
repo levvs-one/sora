@@ -132,6 +132,8 @@ func (e *Engine) plans(p *engine.Plan) (*engine.Plan, *engine.Plan, error) {
 	}
 	x.Options.AllowLAN = false
 	tun := *p
+	// The extension socket belongs to Xray, not its packet bridge.
+	tun.ExtensionProxy = nil
 	tun.Engines = []engine.Kind{engine.KindMihomo}
 	tun.PrivateControl = true
 	tun.Outbounds = []engine.Outbound{{ID: bridgeID, Name: bridgeID, Protocol: engine.ProtocolSOCKS5,

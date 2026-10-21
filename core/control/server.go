@@ -148,22 +148,19 @@ type Server struct {
 	sessions *session.Manager
 	// extSched is the extension background scheduler (Config.ExtScheduler);
 	// it follows the kill switch via syncExtKillSwitch.
-	extSched *ext.Scheduler
-	// extProxyPort is the loopback mixed-listener port backing
-	// ExtFetchTransport (Config.LocalProxyPort).
-	extProxyPort int
-	secrets      SecretStore
-	parser       parser.LinkParser
-	redactors    *redactorCache
-	prober       Prober
-	measurer     Measurer
-	subs         *subscriptionBook
-	logs         *logs.Center
-	about        func() *corev1.About
-	diagnostics  Diagnostics
-	fetcher      Fetcher
-	dataDir      string
-	benchmarker  Benchmarker
+	extSched    *ext.Scheduler
+	secrets     SecretStore
+	parser      parser.LinkParser
+	redactors   *redactorCache
+	prober      Prober
+	measurer    Measurer
+	subs        *subscriptionBook
+	logs        *logs.Center
+	about       func() *corev1.About
+	diagnostics Diagnostics
+	fetcher     Fetcher
+	dataDir     string
+	benchmarker Benchmarker
 	// profiles stores network profiles for automatic matching. Nil
 	// disables the profile RPCs with explicit errors.
 	profiles  *profiles.Store
@@ -234,12 +231,6 @@ type Config struct {
 	// extension work pauses while traffic is blocked. Nil means no
 	// extension scheduler runs in this process (tests, diagnostics).
 	ExtScheduler *ext.Scheduler
-	// LocalProxyPort is the loopback port of the tunnel's mixed
-	// (HTTP+SOCKS5) listener - the port supervise gives every engine.
-	// Extension net.fetch rides it when the session plan enables the
-	// local proxy (see Server.ExtFetchTransport). Zero disables the
-	// tunnel transport: extension fetches then fail closed.
-	LocalProxyPort int
 }
 
 // New creates a control plane, supplying the default version when unset.
@@ -256,23 +247,22 @@ func New(cfg Config) (*Server, error) {
 		cfg.Version = Version{Major: 1, Minor: 0, MinSupportedMinor: 0}
 	}
 	server := &Server{
-		version:      cfg.Version,
-		auth:         cfg.Authenticator,
-		sessions:     cfg.Sessions,
-		secrets:      cfg.Secrets,
-		parser:       parser.LinkParser{MaxItems: cfg.MaxImportItems},
-		redactors:    &redactorCache{byRef: make(map[string]*engine.Redactor)},
-		extSched:     cfg.ExtScheduler,
-		extProxyPort: cfg.LocalProxyPort,
-		prober:       cfg.Prober,
-		measurer:     cfg.Measurer,
-		logs:         cfg.Logs,
-		about:        cfg.About,
-		diagnostics:  cfg.Diagnostics,
-		fetcher:      cfg.Fetcher,
-		dataDir:      cfg.DataDir,
-		benchmarker:  cfg.Benchmarker,
-		profiles:     cfg.Profiles,
+		version:     cfg.Version,
+		auth:        cfg.Authenticator,
+		sessions:    cfg.Sessions,
+		secrets:     cfg.Secrets,
+		parser:      parser.LinkParser{MaxItems: cfg.MaxImportItems},
+		redactors:   &redactorCache{byRef: make(map[string]*engine.Redactor)},
+		extSched:    cfg.ExtScheduler,
+		prober:      cfg.Prober,
+		measurer:    cfg.Measurer,
+		logs:        cfg.Logs,
+		about:       cfg.About,
+		diagnostics: cfg.Diagnostics,
+		fetcher:     cfg.Fetcher,
+		dataDir:     cfg.DataDir,
+		benchmarker: cfg.Benchmarker,
+		profiles:    cfg.Profiles,
 	}
 	server.subs = newSubscriptionBook(server)
 	return server, nil
@@ -557,6 +547,9 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	}
 	plan, err := planFromProto(req.GetSessionPlan(), sessionID, s.secrets)
 	if err != nil {
+		return &corev1.ConnectResponse{Error: toWire(err, nil, id)}, nil
+	}
+	if err := prepareExtensionProxy(plan, req.GetSessionPlan()); err != nil {
 		return &corev1.ConnectResponse{Error: toWire(err, nil, id)}, nil
 	}
 	mask := s.mask(plan)

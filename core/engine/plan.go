@@ -314,6 +314,18 @@ type LocalProxy struct {
 	Password string
 }
 
+// ExtensionProxy is core-only session material, never part of the wire plan.
+// Target must contain only VPN outbounds, including every possible group member.
+type ExtensionProxy struct {
+	Port     int
+	Username string
+	Password string
+	Target   string
+}
+
+// ExtensionInbound identifies the isolated, authenticated extension listener.
+const ExtensionInbound = "sora-extension-in"
+
 // Plan is a complete, engine-independent description of one session.
 type Plan struct {
 	SessionID string
@@ -324,6 +336,7 @@ type Plan struct {
 	// preventing discovery through listening network ports.
 	PrivateControl bool
 	LocalProxy     LocalProxy
+	ExtensionProxy *ExtensionProxy
 
 	Outbounds []Outbound
 	Groups    []Group

@@ -30,7 +30,7 @@ untrusted .soraext / signed catalog / signed revocations
      -> workers: control-authenticated ExtensionHost.RunWorker
         -> Scheduler -> disposable goja process
            -> permission-checked JSON bridge -> app PanelBridge
-           -> net.fetch -> allowlist and limits -> live VPN proxy
+           -> net.fetch -> allowlist and limits -> private authenticated inbound -> VPN
 ```
 
 The app is the only live extension store. It handles installation, update,
@@ -151,8 +151,41 @@ disabled. This bounds resource exhaustion, not native-runtime exploits.
 net.fetch permits HTTPS DNS hosts from the manifest allowlist, rejects
 userinfo, literal IPs and explicit ports, rechecks redirects, and caps
 request/response bytes and rate. Production always uses TunnelTransport,
-which resolves the current loopback VPN proxy on each request. Without a
-live proxy, including pure TUN without a local listener, it fails closed.
+which looks up a connected session and running engine on each request.
+The engine plan opens a separate SOCKS listener tagged `sora-extension-in`
+on `127.0.0.1` and a random free port. Fresh random per-session credentials
+are passed only to the engine configuration and core transport, masked in
+logs and never exposed through the control API, worker or app. Authentication
+rejects other local processes lacking the credential. This does not protect
+against a compromised core/engine, privileged process or an attacker able to
+read their memory. Loopback ports can still be discovered or denied service.
+
+For sing-box and Xray, an unconditional inbound-tag route to the VPN target
+is first, ahead of sniffing, DNS interception, user and extension rules.
+For mihomo, the named listener's `proxy` field selects the VPN target before
+mode and rule processing; its own `users` list requires authentication even
+when the ordinary listener allows anonymous or skip-auth loopback traffic.
+The target is the selected VPN outbound/group or the active chain's exit.
+Every group member and every chain hop must be a known VPN path. Direct and
+serverless bypass paths, mixed direct/VPN groups, cycles, unknown targets
+and opaque Xray profiles cannot obtain this inbound. Rule rejection and
+regional direct exceptions do not override the private route.
+
+Destination DNS is DNS over TCP to `1.1.1.1:53` over that same authenticated
+SOCKS/VPN path. The core passes destination IPs to engines, avoiding local
+resolution by IP-only VPN transports such as WireGuard. HTTPS retains the
+original SNI, certificate hostname verification and Host. OS search domains,
+session DNS policies and engine DNS interception do not resolve extension
+destinations. Engine bootstrap DNS for the VPN server itself is separate.
+The VPN exit and chosen resolver can observe DNS queries; this mechanism
+does not add DNS encryption beyond the VPN transport.
+
+The inbound is independent of LocalProxy and works in pure TUN too. Missing
+or disconnected sessions, recovering engines and engines without support
+return `ext.netfetch.no-tunnel`, projected as `not-connected` to worker JS.
+DNS/connection failure never falls back to direct dialing or the OS resolver.
+Changing sessions retires cached idle transports and credentials. In-flight
+traffic remains on its original VPN path until engine shutdown or cancellation.
 A nil transport is used only in tests/development. Allowlisted hosts can
 still turn malicious; an allowlist is not an assessment of their content.
 
@@ -165,6 +198,13 @@ full background/asset declarations, checksums and URL policy. App tests
 cover store lifecycle, grants, published signatures, revocations, panel
 bridge and declarative assets. CLI schema and TypeScript parity tests keep
 authoring contracts aligned.
+
+Engine config tests assert the private route and authentication for all three
+engines. Opt-in native interop tests distinguish VPN and direct origins and
+reject missing/wrong inbound credentials. `live_core_features_test.dart`
+has an opt-in `SORA_LIVE_EXTENSION_FETCH=1` check using a real core, local VPN
+exit, destination DNS and HTTPS origin in `unshare -Urn`. It keeps the real
+15-minute worker scheduling floor, so allow up to 18 minutes for this check.
 
 Remaining risks include WebView renderer vulnerabilities, Go/goja native
 vulnerabilities, author or team key compromise, malicious allowlisted

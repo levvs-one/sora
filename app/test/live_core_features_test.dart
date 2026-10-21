@@ -6,6 +6,7 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -25,6 +26,8 @@ void main() {
   final binary = Platform.environment['SORA_CORE_BIN'];
   final socket = Platform.environment['SORA_CORE_SOCKET'];
   final enabled = binary != null && socket != null;
+  final engines = Platform.environment['SORA_ENGINES_DIR'];
+  final fetchEnabled = enabled && engines != null && Platform.environment['SORA_LIVE_EXTENSION_FETCH'] == '1';
   late Directory dir;
   late Process core;
   late CoreLink link;
@@ -32,15 +35,37 @@ void main() {
   setUpAll(() async {
     if (!enabled) return;
     dir = await Directory.systemTemp.createTemp('sora-live-');
+    if (fetchEnabled) {
+      final certificate = await Process.run('openssl', [
+        'req',
+        '-x509',
+        '-newkey',
+        'rsa:2048',
+        '-nodes',
+        '-days',
+        '1',
+        '-subj',
+        '/CN=example.com',
+        '-addext',
+        'subjectAltName=DNS:example.com',
+        '-keyout',
+        '${dir.path}/key.pem',
+        '-out',
+        '${dir.path}/cert.pem',
+      ]);
+      expect(certificate.exitCode, 0, reason: certificate.stderr.toString());
+    }
     core = await Process.start(binary, [
       '-socket',
       socket,
       '-data-dir',
       '${dir.path}/data',
       '-engines-dir',
-      '${dir.path}/none',
+      engines ?? '${dir.path}/none',
       '-allow-file-keys',
-    ]);
+    ], environment: fetchEnabled ? {'SSL_CERT_FILE': '${dir.path}/cert.pem'} : null);
+    unawaited(core.stdout.drain<void>());
+    unawaited(core.stderr.drain<void>());
     link = await CoreLink.open().timeout(const Duration(seconds: 20));
   });
 
@@ -233,4 +258,147 @@ void main() {
       await running.timeout(const Duration(seconds: 10));
     }
   }, skip: skip);
+
+  // The production scheduler intentionally waits at least fifteen minutes.
+  // Opt in separately so ordinary test runs never shorten that boundary.
+  test(
+    'extension fetch and its DNS use the VPN despite matching direct rules',
+    () async {
+      final tls = SecurityContext()
+        ..useCertificateChain('${dir.path}/cert.pem')
+        ..usePrivateKey('${dir.path}/key.pem');
+      final origin = await HttpServer.bindSecure(InternetAddress.loopbackIPv4, 0, tls);
+      var requests = 0;
+      final serving = origin.listen((request) async {
+        requests++;
+        expect(request.headers.value('proxy-authorization'), isNull);
+        request.response.write('through-private-vpn');
+        await request.response.close();
+      });
+      final reservation = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+      final vpnPort = reservation.port;
+      await reservation.close();
+      final config = {
+        'log': {'loglevel': 'warning'},
+        'inbounds': [
+          {
+            'listen': '127.0.0.1',
+            'port': vpnPort,
+            'protocol': 'shadowsocks',
+            'settings': {'method': 'aes-256-gcm', 'password': 'live-extension-vpn-password'},
+          },
+        ],
+        'dns': {
+          'hosts': {
+            'example.com': ['127.0.0.2', '::1'],
+          },
+        },
+        'routing': {
+          'rules': [
+            {'port': '53', 'outboundTag': 'dns'},
+          ],
+        },
+        'outbounds': [
+          {
+            'tag': 'origin',
+            'protocol': 'freedom',
+            'settings': {'redirect': '127.0.0.1:${origin.port}'},
+          },
+          {'tag': 'dns', 'protocol': 'dns'},
+        ],
+      };
+      final vpn = await Process.start('$engines/xray', ['run', '-c', 'stdin:']);
+      unawaited(vpn.stdout.drain<void>());
+      unawaited(vpn.stderr.drain<void>());
+      vpn.stdin.write(jsonEncode(config));
+      await vpn.stdin.close();
+      final input = StreamController<WorkerClientMessage>();
+      final output = link.extensions.runWorker(input.stream);
+      try {
+        final stored = await link.stub.putSecret(
+          PutSecretRequest(
+            apiVersion: apiVersion,
+            credentials: CredentialsRef(reference: 'fetch_vpn'),
+            material: utf8.encode('{"method":"aes-256-gcm","password":"live-extension-vpn-password"}'),
+          ),
+        );
+        expect(stored.hasError(), isFalse, reason: stored.error.toString());
+        for (final kind in ['sing-box', 'xray', 'mihomo']) {
+          final connected = await link.stub.connect(
+            ConnectRequest(
+              apiVersion: apiVersion,
+              controlAuthenticator: link.token,
+              sessionPlan: SessionPlan(
+                tunnelMode: TunnelMode.TUNNEL_MODE_APPLICATION,
+                engines: [kind],
+                networkControlAllowed: true,
+                outbounds: [
+                  OutboundSpec(
+                    id: 'vpn',
+                    displayName: 'VPN',
+                    protocol: 'shadowsocks',
+                    security: 'none',
+                    endpoint: Endpoint(host: '127.0.0.1', port: vpnPort),
+                    credentials: CredentialsRef(reference: 'fetch_vpn'),
+                  ),
+                ],
+                routes: [
+                  RoutingRule(destination: 'full:example.com', outboundId: 'direct'),
+                  RoutingRule(destination: '127.0.0.0/8', outboundId: 'direct'),
+                  RoutingRule(destination: '53', outboundId: 'direct'),
+                ],
+                routing: RoutingOptions(proxyTarget: 'vpn'),
+              ),
+            ),
+          );
+          expect(connected.hasError(), isFalse, reason: connected.error.toString());
+          if (kind != 'mihomo') continue;
+          input.add(
+            WorkerClientMessage(
+              controlToken: link.token,
+              manifestJson: jsonEncode({
+                'manifest_version': 1,
+                'id': 'com.example.live-fetch',
+                'name': 'Live Fetch',
+                'version': '1.0.0',
+                'min_app_version': '1.0.0',
+                'author': {
+                  'name': 'Test',
+                  'identity': 'github:example',
+                  'public_key': 'RWQAAAAAAAAAAHd26HC5M1TyoLJMI/KjbMToDiIyGMG5eSb90Bg5aiub',
+                },
+                'permissions': ['background', 'net.fetch'],
+                'capabilities': ['background'],
+                'background_task': {'interval_minutes': 15, 'entry': 'worker.js'},
+                'network_hosts': ['example.com'],
+              }),
+              source:
+                  "const r = await window.soraExt.call('net.fetch', {url:'https://example.com/'}); "
+                  "if(r.status !== 200 || r.body !== 'through-private-vpn') throw new Error('wrong VPN origin'); "
+                  "console.log('fetch-vpn-verified');",
+              configJson: '{"enabled":true,"interval_minutes":15}',
+            ),
+          );
+        }
+        final result = await output
+            .firstWhere((message) => message.failed || message.log == 'fetch-vpn-verified')
+            .timeout(const Duration(minutes: 17));
+        expect(result.failed, isFalse, reason: result.log);
+        expect(result.log, 'fetch-vpn-verified');
+        expect(requests, 1);
+      } finally {
+        await output.cancel();
+        await input.close();
+        await link.stub.disconnect(DisconnectRequest(apiVersion: apiVersion, controlAuthenticator: link.token));
+        vpn.kill();
+        await vpn.exitCode;
+        await origin.close(force: true);
+        await serving.cancel();
+      }
+    },
+    skip: fetchEnabled
+        ? false
+        : 'set SORA_LIVE_EXTENSION_FETCH=1 with SORA_CORE_BIN, SORA_CORE_SOCKET and SORA_ENGINES_DIR',
+    timeout: const Timeout(Duration(minutes: 18)),
+  );
 }

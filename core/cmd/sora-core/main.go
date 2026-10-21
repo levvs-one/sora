@@ -276,20 +276,19 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	}
 	extSched := ext.NewScheduler(nil)
 	plane, err := control.New(control.Config{
-		Version:        Version,
-		Authenticator:  auth,
-		Sessions:       manager,
-		Secrets:        store,
-		Prober:         probe.New(probe.Config{}),
-		Measurer:       measurer,
-		Benchmarker:    benchmarker,
-		DataDir:        opts.DataDir,
-		Profiles:       profStore,
-		ExtScheduler:   extSched,
-		LocalProxyPort: int(tunnelPort),
-		Logs:           center,
-		About:          app.about,
-		Fetcher:        subscription.New(subscription.Options{}),
+		Version:       Version,
+		Authenticator: auth,
+		Sessions:      manager,
+		Secrets:       store,
+		Prober:        probe.New(probe.Config{}),
+		Measurer:      measurer,
+		Benchmarker:   benchmarker,
+		DataDir:       opts.DataDir,
+		Profiles:      profStore,
+		ExtScheduler:  extSched,
+		Logs:          center,
+		About:         app.about,
+		Fetcher:       subscription.New(subscription.Options{}),
 	})
 	if err != nil {
 		_ = store.Close()

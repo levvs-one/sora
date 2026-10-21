@@ -107,6 +107,13 @@ Remember: the declared interval is a wish, the runtime clamps it into
 [15 min, 7 days]. `network_hosts` is strict: `api.example.com` matches
 only itself; `*.example.com` matches subdomains, not the bare domain.
 
+Connect a VPN before running the worker. Its HTTPS connections and destination
+DNS use a private authenticated loopback inbound pinned to the VPN or chain;
+ordinary direct/block rules do not apply to it. This also works in pure TUN.
+Direct/serverless bypass selections, mixed direct/VPN groups, opaque Xray
+profiles and disconnected/recovering sessions reject with `not-connected`.
+DNS uses `1.1.1.1:53` over TCP inside the VPN, without an OS resolver fallback.
+
 ## 6. Test matrix for a panel
 
 ```sh

@@ -2,212 +2,215 @@ package ext
 
 import (
 	"context"
-	"fmt"
+	"encoding/binary"
+	"errors"
 	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
+
+	"github.com/txthinking/socks5"
+	"golang.org/x/net/dns/dnsmessage"
 )
 
-var _ = net.IPv4len // documented: net is used by the test server helpers
-
-// fakeProxy is a minimal forward HTTP proxy for tests: it forwards the
-// absolute-URI request to the target, stamps a header so the origin can
-// prove the request arrived through the proxy, and counts requests.
-type fakeProxy struct {
-	t        *testing.T
-	srv      *httptest.Server
-	requests atomic.Int64
-}
-
-func newFakeProxy(t *testing.T) *fakeProxy {
+func testTunnel(t *testing.T, dial func(string) (net.Conn, error)) TunnelProxy {
 	t.Helper()
-	p := &fakeProxy{t: t}
-	p.srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		p.requests.Add(1)
-		if !r.URL.IsAbs() {
-			http.Error(w, "proxy needs an absolute URI", http.StatusBadRequest)
-			return
-		}
-		out, err := http.NewRequestWithContext(context.Background(), r.Method, r.URL.String(), r.Body)
-		if err != nil {
-			http.Error(w, "bad request", http.StatusBadRequest)
-			return
-		}
-		out.Header.Set("X-Via-Ext-Test", "tunnel")
-		for k, vv := range r.Header {
-			if k == "X-Via-Ext-Test" {
-				continue
+	ln, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := TunnelProxy{Addr: ln.Addr().String(), Username: "extension-session-user", Password: "extension-session-password"}
+	s := &socks5.Server{Method: socks5.MethodUsernamePassword, UserName: p.Username, Password: p.Password,
+		SupportedCommands: []byte{socks5.CmdConnect}}
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		for {
+			conn, err := ln.Accept()
+			if err != nil {
+				return
 			}
-			out.Header[k] = vv
+			wg.Go(func() {
+				defer func() { _ = conn.Close() }()
+				_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
+				if s.Negotiate(conn) != nil {
+					return
+				}
+				r, err := s.GetRequest(conn)
+				if err != nil {
+					return
+				}
+				upstream, err := dial(r.Address())
+				if err != nil {
+					return
+				}
+				defer func() { _ = upstream.Close() }()
+				if _, err := socks5.NewReply(socks5.RepSuccess, socks5.ATYPIPv4, []byte{127, 0, 0, 1}, []byte{0, 0}).WriteTo(conn); err != nil {
+					return
+				}
+				done := make(chan struct{})
+				go func() {
+					_, _ = io.Copy(upstream, conn)
+					_ = upstream.Close()
+					close(done)
+				}()
+				_, _ = io.Copy(conn, upstream)
+				_ = conn.Close()
+				<-done
+			})
 		}
-		resp, err := http.DefaultTransport.RoundTrip(out)
-		if err != nil {
-			http.Error(w, "forward failed", http.StatusBadGateway)
-			return
-		}
-		defer func() { _ = resp.Body.Close() }()
-		for k, vv := range resp.Header {
-			w.Header()[k] = vv
-		}
-		w.WriteHeader(resp.StatusCode)
-		_, _ = io.Copy(w, resp.Body)
-	}))
-	t.Cleanup(p.srv.Close)
+	})
+	t.Cleanup(func() { _ = ln.Close(); wg.Wait() })
 	return p
 }
 
-func proxyAddr(s *httptest.Server) string {
-	return strings.TrimPrefix(s.URL, "http://")
-}
-
-// TestProxyRoundTripperRoutesThroughProxy proves the e2e property the
-// whole mechanism exists for: with a tunnel proxy address, the request
-// reaches the origin THROUGH the proxy (the origin sees the stamp), and
-// the proxy observed the request.
-func TestProxyRoundTripperRoutesThroughProxy(t *testing.T) {
-	origin := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-Via-Ext-Test") != "tunnel" {
-			http.Error(w, "did not arrive through the proxy", http.StatusTeapot)
-			return
-		}
-		_, _ = fmt.Fprint(w, "hello")
-	}))
-	t.Cleanup(origin.Close)
-	proxy := newFakeProxy(t)
-
-	rt, err := ProxyRoundTripper(proxyAddr(proxy.srv))
-	if err != nil {
-		t.Fatalf("ProxyRoundTripper: %v", err)
-	}
-	resp, err := rt.RoundTrip(mustReq(t, "GET", origin.URL))
-	if err != nil {
-		t.Fatalf("RoundTrip: %v", err)
-	}
-	defer func() { _ = resp.Body.Close() }()
-	body, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK || string(body) != "hello" {
-		t.Fatalf("got %d %q", resp.StatusCode, body)
-	}
-	if n := proxy.requests.Load(); n != 1 {
-		t.Fatalf("proxy saw %d requests, want 1", n)
-	}
-}
-
-// TestProxyRoundTripperRejectsNonLoopback is the anti-miswire pin: an
-// extension fetch must never be handed to a remote proxy.
-func TestProxyRoundTripperRejectsNonLoopback(t *testing.T) {
-	for _, addr := range []string{"203.0.113.7:8080", "example.com:8080", "10.0.0.1:1080", "[::1", ":8080"} {
-		if _, err := ProxyRoundTripper(addr); err == nil {
-			t.Errorf("ProxyRoundTripper(%q) accepted a non-loopback address", addr)
-		}
-	}
-	for _, addr := range []string{"127.0.0.1:8080", "127.0.0.2:1080", "[::1]:7890"} {
-		if _, err := ProxyRoundTripper(addr); err != nil {
-			t.Errorf("ProxyRoundTripper(%q) rejected a loopback address: %v", addr, err)
-		}
-	}
-}
-
-// TestTunnelTransportFailsClosedWhenNoTunnel is the leak guard: with no
-// tunnel proxy available the request is refused, not dialed direct.
-func TestTunnelTransportFailsClosedWhenNoTunnel(t *testing.T) {
-	tr := &TunnelTransport{Lookup: func() (string, bool) { return "", false }}
-	resp, err := tr.RoundTrip(mustReq(t, "GET", "https://example.com/"))
-	if resp != nil {
-		_ = resp.Body.Close()
-	}
-	if err == nil {
-		t.Fatal("RoundTrip succeeded without a tunnel proxy")
-	}
-	if k := errKey(t, err); k != KeyNetFetchNoTunnel {
-		t.Fatalf("error key = %q, want %q", k, KeyNetFetchNoTunnel)
-	}
-}
-
-// TestTunnelTransportReResolvesOnEveryRoundTrip proves the lookup is live:
-// the session can change underneath, and the transport follows without
-// being rebuilt.
-func TestTunnelTransportReResolvesOnEveryRoundTrip(t *testing.T) {
-	hit := func(name string) (*httptest.Server, *atomic.Int64) {
-		var n atomic.Int64
-		s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			n.Add(1)
-			_, _ = fmt.Fprint(w, name)
-		}))
-		t.Cleanup(s.Close)
-		return s, &n
-	}
-	one, n1 := hit("one")
-	two, n2 := hit("two")
-	proxies := []*fakeProxy{newFakeProxy(t), newFakeProxy(t)}
-	current := atomic.Int64{} // index into proxies
-
-	tr := &TunnelTransport{Lookup: func() (string, bool) {
-		return proxyAddr(proxies[current.Load()].srv), true
-	}}
-	fetch := func(want string) {
-		t.Helper()
-		target := one
-		if want == "two" {
-			target = two
-		}
-		resp, err := tr.RoundTrip(mustReq(t, "GET", target.URL))
-		if err != nil {
-			t.Fatalf("RoundTrip: %v", err)
-		}
-		defer func() { _ = resp.Body.Close() }()
-		body, _ := io.ReadAll(resp.Body)
-		if string(body) != want {
-			t.Fatalf("got %q, want %q", body, want)
-		}
-	}
-	fetch("one")
-	if got := n1.Load(); got != 1 {
-		t.Fatalf("origin one saw %d requests, want 1", got)
-	}
-	current.Store(1) // the session moved: a different tunnel proxy
-	fetch("two")
-	if got := n2.Load(); got != 1 {
-		t.Fatalf("origin two saw %d requests, want 1", got)
-	}
-}
-
-// TestFetcherFailsClosedWithoutTunnel wires the mechanism into the
-// production path: an extension Fetcher built on a TunnelTransport whose
-// lookup reports no tunnel refuses the fetch with the honest key instead
-// of dialing direct.
-func TestFetcherFailsClosedWithoutTunnel(t *testing.T) {
-	hub := NewLogHub()
-	f, err := NewFetcherForExtensionWithTransport("com.example.hello",
-		&ManifestExt{NetworkHosts: []string{"example.com"}},
-		FetchLimits{},
-		&TunnelTransport{Lookup: func() (string, bool) { return "", false }},
-		hub)
-	if err != nil {
-		t.Fatalf("NewFetcherForExtensionWithTransport: %v", err)
-	}
-	_, err = f.Fetch(t.Context(), FetchRequest{Method: "GET", URL: "https://example.com/api"})
-	if err == nil {
-		t.Fatal("Fetch succeeded without a tunnel proxy")
-	}
-	if k := errKey(t, err); k != KeyNetFetchNoTunnel {
-		t.Fatalf("error key = %q, want %q", k, KeyNetFetchNoTunnel)
-	}
-	// The denial is part of the audit trail, like every other refused fetch.
-	if got := f.Stats().Denied; got != 1 {
-		t.Fatalf("denied stats = %d, want 1", got)
-	}
-}
-
-func mustReq(t *testing.T, method, rawURL string) *http.Request {
+func mustReq(t *testing.T, method, target string) *http.Request {
 	t.Helper()
-	req, err := http.NewRequestWithContext(context.Background(), method, rawURL, nil)
+	req, err := http.NewRequestWithContext(t.Context(), method, target, nil)
 	if err != nil {
-		t.Fatalf("NewRequest: %v", err)
+		t.Fatal(err)
 	}
 	return req
+}
+
+func TestProxyRoundTripperRequiresPrivateAddressAndLogin(t *testing.T) {
+	for _, p := range []TunnelProxy{
+		{}, {Addr: "127.0.0.1:1234"}, {Addr: "localhost:1234", Username: "u", Password: "p"},
+		{Addr: "203.0.113.1:1234", Username: "u", Password: "p"},
+		{Addr: "127.0.0.1:1234", Password: "p"},
+	} {
+		if _, err := ProxyRoundTripper(p); err == nil {
+			t.Fatal("accepted an untrusted proxy or a missing login")
+		}
+	}
+}
+
+func TestTunnelTransportAuthenticatesAndFollowsSessions(t *testing.T) {
+	origin := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Proxy-Authorization") != "" {
+			t.Error("proxy credential reached origin")
+		}
+		_, _ = io.WriteString(w, "via-vpn")
+	}))
+	defer origin.Close()
+	var counts [2]atomic.Int64
+	var proxies [2]TunnelProxy
+	for i := range proxies {
+		proxies[i] = testTunnel(t, func(addr string) (net.Conn, error) {
+			counts[i].Add(1)
+			return (&net.Dialer{}).DialContext(t.Context(), "tcp", addr)
+		})
+	}
+	current := 0
+	tr := &TunnelTransport{Lookup: func() (TunnelProxy, bool) { return proxies[current], true }}
+	for i := range proxies {
+		current = i
+		resp, err := tr.RoundTrip(mustReq(t, "GET", origin.URL))
+		if err != nil {
+			t.Fatal(err)
+		}
+		body, _ := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
+		if string(body) != "via-vpn" || counts[i].Load() != 1 {
+			t.Fatal("request did not use the current tunnel")
+		}
+	}
+	tr.cached.CloseIdleConnections()
+	bad := proxies[1]
+	bad.Password = "wrong-password"
+	rt, err := ProxyRoundTripper(bad)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp, err := rt.RoundTrip(mustReq(t, "GET", origin.URL)); err == nil {
+		_ = resp.Body.Close()
+		t.Fatal("wrong proxy password succeeded")
+	}
+}
+
+func TestTunnelDNSStaysInsideProxy(t *testing.T) {
+	var dnsQueries, destinations atomic.Int64
+	origin := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Host != "example.com" || r.TLS.ServerName != "example.com" {
+			t.Error("transport lost original HTTPS identity")
+		}
+		_, _ = io.WriteString(w, "resolved-inside-vpn")
+	}))
+	defer origin.Close()
+	p := testTunnel(t, func(addr string) (net.Conn, error) {
+		if addr == "1.1.1.1:53" {
+			dnsQueries.Add(1)
+			client, server := net.Pipe()
+			go func() {
+				defer func() { _ = server.Close() }()
+				var size [2]byte
+				if _, err := io.ReadFull(server, size[:]); err != nil {
+					return
+				}
+				packet := make([]byte, binary.BigEndian.Uint16(size[:]))
+				if _, err := io.ReadFull(server, packet); err != nil {
+					return
+				}
+				var query dnsmessage.Message
+				if err := query.Unpack(packet); err != nil || len(query.Questions) != 1 {
+					return
+				}
+				question := query.Questions[0]
+				if question.Name.String() != "example.com." {
+					t.Error("unexpected DNS search suffix")
+				}
+				answer := dnsmessage.Message{Header: dnsmessage.Header{ID: query.ID, Response: true}, Questions: query.Questions}
+				if question.Type == dnsmessage.TypeA {
+					answer.Answers = []dnsmessage.Resource{{Header: dnsmessage.ResourceHeader{Name: question.Name,
+						Type: dnsmessage.TypeA, Class: dnsmessage.ClassINET, TTL: 30},
+						Body: &dnsmessage.AResource{A: [4]byte{203, 0, 113, 9}}}}
+				}
+				packet, err := answer.Pack()
+				if err != nil {
+					return
+				}
+				binary.BigEndian.PutUint16(size[:], uint16(len(packet)))
+				_, _ = server.Write(append(size[:], packet...))
+			}()
+			return client, nil
+		}
+		if addr != "203.0.113.9:443" {
+			return nil, errors.New("engine received a domain or an unexpected address")
+		}
+		destinations.Add(1)
+		return (&net.Dialer{}).DialContext(t.Context(), "tcp", strings.TrimPrefix(origin.URL, "https://"))
+	})
+	rt, err := ProxyRoundTripper(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rt.TLSClientConfig = origin.Client().Transport.(*http.Transport).TLSClientConfig
+	defer rt.CloseIdleConnections()
+	resp, err := rt.RoundTrip(mustReq(t, "GET", "https://example.com/"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, _ := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
+	if string(body) != "resolved-inside-vpn" || dnsQueries.Load() == 0 || destinations.Load() != 1 {
+		t.Fatalf("DNS or HTTPS escaped the proxy: %q, dns=%d, https=%d", body, dnsQueries.Load(), destinations.Load())
+	}
+}
+
+func TestFetcherFailsClosedWithoutTunnel(t *testing.T) {
+	for _, lookup := range []func() (TunnelProxy, bool){nil, func() (TunnelProxy, bool) { return TunnelProxy{}, false }} {
+		f, err := NewFetcherForExtensionWithTransport("com.example.hello",
+			&ManifestExt{NetworkHosts: []string{"example.com"}}, FetchLimits{}, &TunnelTransport{Lookup: lookup}, NewLogHub())
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, err = f.Fetch(context.Background(), FetchRequest{Method: "GET", URL: "https://example.com/api"})
+		if k := errKey(t, err); k != KeyNetFetchNoTunnel || f.Stats().Denied != 1 {
+			t.Fatalf("error=%q, denied=%d", k, f.Stats().Denied)
+		}
+	}
 }

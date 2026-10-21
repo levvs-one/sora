@@ -37,7 +37,7 @@ var Catalog = map[Kind]Capabilities{
 			FeatureProxyProviders: true, FeatureURLTest: true, FeatureLatencyTest: true,
 			FeatureHotApply: true, FeatureGeoData: true, FeatureFallbackGroup: true,
 			FeatureLoadBalance: true, FeatureXHTTP: true, FeatureVLESSEncrypt: true,
-			FeatureAmneziaWG: true, FeaturePrivateControl: true,
+			FeatureAmneziaWG: true, FeaturePrivateControl: true, FeatureExtensionProxy: true,
 		},
 	},
 	KindSingBox: {
@@ -54,7 +54,7 @@ var Catalog = map[Kind]Capabilities{
 		Features: map[Feature]bool{
 			FeatureChains: true, FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
 			FeatureURLTest: true, FeatureLatencyTest: true, FeatureGeoData: true,
-			FeaturePerAppRouting: true, FeatureTLSFragment: true,
+			FeaturePerAppRouting: true, FeatureTLSFragment: true, FeatureExtensionProxy: true,
 		},
 	},
 	KindXray: {
@@ -73,7 +73,7 @@ var Catalog = map[Kind]Capabilities{
 			// catalog_*.go).
 			FeatureChains: true, FeatureURLTest: true, FeatureLoadBalance: true, FeatureLatencyTest: true,
 			FeatureGeoData: true, FeatureTLSFragment: true,
-			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true,
+			FeatureXHTTP: true, FeatureVLESSEncrypt: true, FeaturePrivateControl: true, FeatureExtensionProxy: true,
 		},
 	},
 }

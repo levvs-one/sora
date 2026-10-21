@@ -30,6 +30,9 @@ func (p *Plan) Protocols() map[Protocol]bool {
 // RequiredFeatures returns the features the plan asks an engine to provide.
 func (p *Plan) RequiredFeatures() map[Feature]bool {
 	out := map[Feature]bool{}
+	if p.ExtensionProxy != nil {
+		out[FeatureExtensionProxy] = true
+	}
 	if p.Tun.Enabled {
 		out[FeatureTun] = true
 	}
