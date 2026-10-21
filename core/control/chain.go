@@ -1,6 +1,6 @@
 package control
 
-// Proxy chain probing (F8). ProbeChain checks a 2-3 server chain before
+// Proxy chain probing. ProbeChain checks a 2-3 server chain before
 // connecting: per-hop reachability via a fast TCP probe, the summed latency
 // estimate, and which installed engines can carry the chain.
 //

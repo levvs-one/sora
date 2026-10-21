@@ -55,7 +55,7 @@ type Options struct {
 	// MaxConnections caps simultaneously open connections; connections
 	// beyond the cap are refused without a reply. Zero selects
 	// DefaultMaxConnections. It bounds local FD-exhaustion denial of
-	// service (SORA-M1).
+	// service.
 	MaxConnections int
 }
 
@@ -109,8 +109,7 @@ func (l *Listener) Address() string { return l.address }
 
 // Accept returns the next authorized connection. Checking peers here also
 // protects gRPC servers using the listener directly. Connections beyond the
-// configured cap are refused without a reply to bound local FD exhaustion
-// (SORA-M1).
+// configured cap are refused without a reply to bound local FD exhaustion.
 func (l *Listener) Accept() (net.Conn, error) {
 	for {
 		connection, err := l.Listener.Accept()
@@ -201,7 +200,7 @@ func (l *Listener) Serve(ctx context.Context, handle func(context.Context, net.C
 // The budget stays in force for the whole handler call: handlers serving
 // long-lived streams must clear or extend the deadline once the peer has
 // introduced itself. Clearing it before the handler runs would leave silent
-// connections unbounded (SORA-M1).
+// connections unbounded.
 func (l *Listener) dispatch(ctx context.Context, connection net.Conn, handle func(context.Context, net.Conn) error) {
 	connectionCtx, cancel := context.WithCancel(ctx)
 	defer cancel()

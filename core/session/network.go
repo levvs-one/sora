@@ -82,7 +82,7 @@ func newNetworkWatch(probe func() string, interval time.Duration) *networkWatch 
 
 // changed reports why the session should renew its connections, or "".
 // A network move is reported only after two consecutive polls agree on the
-// new fingerprint, debouncing flapping interfaces (SORA-M11). Waking from
+// new fingerprint, debouncing flapping interfaces. Waking from
 // sleep is reported immediately: the old path is certainly dead.
 func (w *networkWatch) changed() string {
 	now := time.Now()
@@ -116,7 +116,7 @@ func (s *Session) renewConnections(ctx context.Context, why string) {
 	if s.State() != StateConnected {
 		return
 	}
-	// F7: surface the network move itself, not just the renewal, so the
+	// Surface the network move itself, not just the renewal, so the
 	// client can show the connection state while flows re-establish.
 	s.log.Append(Event{Kind: EventNetwork, Detail: why})
 	s.log.Append(Event{Kind: EventLog, Detail: why + "; connections reopen"})

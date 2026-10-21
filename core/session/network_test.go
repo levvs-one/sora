@@ -40,7 +40,7 @@ func TestNetworkWatchSeesAnotherNetworkAndAReturn(t *testing.T) {
 	}
 }
 
-// TestNetworkWatchDebouncesAFlappingInterface locks SORA-M11: a transient
+// TestNetworkWatchDebouncesAFlappingInterface: a transient
 // fingerprint that flips back before confirmation must not renew
 // connections.
 func TestNetworkWatchDebouncesAFlappingInterface(t *testing.T) {

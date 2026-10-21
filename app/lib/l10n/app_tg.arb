@@ -5,7 +5,6 @@
   "stateConnected": "пайваст",
   "stateReconnecting": "Аз нав пайваст шудан",
   "stateDisconnecting": "Хомӯш шудан",
-  "stateFailed": "Пайваст нест",
   "coreMissing": "Хидмати Sora ҷавоб намедиҳад",
   "serverAuto": "Тезтарин",
   "serverBypass": "Сервер нест",
@@ -76,7 +75,6 @@
   "errSubScheme": "Истинод бояд бо https:// оғоз шавад",
   "errSecretStore": "Захираи Sora осеб дидааст ё дастнорас аст",
   "errNoServers": "Барои пайваст шудан обуна илова кунед",
-  "exportText": "Матн",
   "connections": "Пайвастшавӣ",
   "close": "Пӯшед",
   "chainDirect": "Бевосита",
@@ -150,7 +148,6 @@
   "trafficLow": "{name}: {left} чап",
   "ruleInvalid": "Ин ба сайт, IP ё барнома монанд нест",
   "tunnelMode": "Режим",
-  "tunnelTun": "Ҳама трафик",
   "tunnelProxy": "Прокси System",
   "proxyAddress": "Суроғаи прокси",
   "copied": "Нусхабардорӣ",
@@ -187,12 +184,6 @@
   "sidebarToggle": "Паҳлӯи паҳлӯро иваз кунед",
   "more": "Бештар",
   "less": "Камтар",
-  "currentServer": "Сервери ҷорӣ",
-  "trafficDown": "Боргиришуда",
-  "trafficUp": "Бор карда шуд",
-  "perSecond": "{value}/с",
-  "activeRules": "Қоидаҳои фаъол: {count}",
-  "recentNotifications": "Огоҳиҳои охирин",
   "notificationsEmpty": "Ҳодисаҳои пайвастшавӣ ва обуна дар ин ҷо пайдо мешаванд",
   "retryConnect": "Пайвастшавӣ аз нав кӯшиш кунед",
   "openLogs": "Сабтҳоро кушоед",
@@ -210,12 +201,9 @@
   "chooseProgram": "Барномаро интихоб кунед",
   "installedApps": "Барномаҳои насбшуда",
   "runningProcesses": "Равандҳои иҷрошаванда",
-  "programsFailed": "Барномаҳо бор карда нашуд",
   "programsEmpty": "Ягон барнома ёфт нашуд. Номи дигарро санҷед.",
   "selectExe": "Файли .exe-ро интихоб кунед",
-  "trafficUnavailable": "Ҳисобкунакҳо ҳанӯз дастрас нестанд",
   "speedtest": "Суръат",
-  "speedtestCheck": "Суръатро тафтиш кунед",
   "speedtestSearch": "Хидматро пайдо кунед",
   "speedtestEmpty": "Ягон мувофиқат. Ҷустуҷӯро тағир диҳед.",
   "speedtestBackToList": "Бозгашт ба хидматҳо",
@@ -269,14 +257,12 @@
   "telegramChannel": "Канали Telegram",
   "licenses": "Иҷозатномаҳо",
   "componentLicenses": "Литсензияҳои компонентҳо",
-  "appCopyright": "© 2026 levvs-one ва саҳмгузорон",
   "collapseServers": "Барҳам додани серверҳо",
   "expandServers": "Серверҳоро васеъ кунед",
   "hideDescription": "Пинҳон кардани тавсиф",
   "showDescription": "Тавсифро нишон диҳед",
   "pendingConnectionChanges": "Барои татбиқи ин тағйирот дубора пайваст шавед.",
   "reconnectNow": "Муроҷиат кунед ва дубора пайваст кунед",
-  "bypassLimitations": "Ин режим DPI-ро танҳо барои HTTP ва TLS мегузарад, UDP-ро дастгирӣ намекунад ё IP-и шуморо тағир намедиҳад. Барои садои Discord, зангҳо ва суроғаҳои басташудаи Telegram сервери VPN-ро истифода баред.",
   "errEngineUnsupported": "Муҳаррики интихобшуда ин профил ё танзимотро дастгирӣ намекунад. Авто ё муҳаррики мувофиқро интихоб кунед.",
   "errRestore": "Тозакунии пайвастшавӣ нопурра буд. Кӯшиш кунед, ки пайвастшавиро қатъ кунед; барои тафсилот ба гузориш нигаред.",
   "errSessionEnded": "Ин сессия аллакай ба охир расид. Ҳолати пайвастшавиро нав кунед.",
@@ -286,9 +272,8 @@
   "modesGuideTitle": "Модулҳо ва муҳаррикҳо",
   "probeServers": "Серверҳоро тафтиш кунед",
   "expiresIn": "{name}: {days, plural, =0{обуна баъди чанд соат ба охир мерасад} one{обуна дар рӯзи # ба охир мерасад} other{обуна дар рӯзҳои # ба охир мерасад}}",
-  "groupOrdered": "{count, plural, one{Сервери #, дар навбати худ} other{Серверҳои #, дар навбати худ}}",
   "groupBest": "{count, plural, one{Сервери #, зудтарин} other{Серверҳои #, зудтарин}}",
-  "modesGuide": "Агар шумо боварӣ надошта бошед, ки ба сервери шумо ба кадом муҳаррик ниёз дорад, Auto-ро интихоб кунед. Sora пеш аз пайвастшавӣ профил ва танзимотро тафтиш мекунад. Муҳаррик наметавонад маҷрои нақшаи шуморо зиёд кунад: иҷроиш аз сервер, масир, протокол ва шабака вобаста аст.\n\n## Модҳо\n\n### Ҳама трафик (TUN)\n\nSora интерфейси шабакаи маҷозӣ эҷод мекунад ва трафики барномаҳоро тавассути он, аз ҷумла TCP ва UDP, масир мекунад. Ин режимро барои Telegram, бозиҳо ва овози Discord истифода баред. Қоидаҳо метавонанд сайтҳо ё барномаҳои мушаххасро мустақиман фиристанд ё онҳоро маҳкам кунанд. Хидмати шабака ба иҷозат ва сервере ниёз дорад, ки протоколи лозимиро дастгирӣ мекунад.\n\n### Прокси System\n\nSora прокси маҳаллии HTTP/SOCKS-ро танзим мекунад. Барномаҳое, ки танзимоти прокси системаро эҳтиром мекунанд, онро истифода мебаранд. Барномаҳо бо стеки шабакавии худ метавонанд мустақиман пайваст шаванд; UDP ва зангҳои овозӣ умуман ба TUN ниёз доранд. Ин режим ба браузерҳо ва барномаҳо бо дастгирии прокси мувофиқат мекунад.\n\n### Сервер нест\n\nДар Linux, Sora [zapret](https://github.com/bol-van/zapret) -ро барои тақсим кардан ва тағир додани дархостҳои HTTP/TLS ва гузаштан аз баъзе санҷишҳои DPI истифода мебарад. IP-и шумо бетағйир мемонад ва пайвастҳо мустақиман ба вебсайт мераванд. Натиҷаҳо аз провайдери шумо ва усули басташавӣ вобастаанд.\n\nИнтегратсияи ҷорӣ tpws-ро барои HTTP ва TLS тавассути TCP истифода мебарад. Он масдудкунии IP ё интиқоли UDP-ро фаро намегирад ва пайвастҳои Telegram-и MTProto-ро кафолат дода наметавонад. Сервери VPN-ро бо TUN барои овози Discord, зангҳои Telegram ва ин гуна маҳдудиятҳо истифода баред.\n\n## Моторҳо\n\n### Авто\n\nSora муҳаррики насбшударо интихоб мекунад, ки тамоми нақшаи пайвастшавиро дастгирӣ мекунад: протоколҳои сервер, интиқолҳо, гурӯҳҳо, тақсимот ва режим. Интихоби дастӣ номувофиқ пеш аз қатъ кардани пайвасти ҷорӣ рад карда мешавад. Авто ё муҳаррики дигарро интихоб кунед ва танзимотро дубора татбиқ кунед.\n\n### sing-box\n\nБастаҳои нави Sora иборатанд аз [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), як фардкунандаи [sing-box](https://github.com/SagerNet/sing-box), илова кардани муштарии XHTTP ва VLESS Encryption. Sora сохтмон ва қобилиятҳои онро эътироф мекунад. Сохтмони болооб бидуни XHTTP ин қобилиятро танҳо аз номи худ ба даст намеорад.\n\nПротоколҳои дастгирӣшаванда VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ва Z8x/parameters. Sora метавонад ворид кунад. Профилҳои пурраи Xray JSON Xray-ро талаб мекунанд. Майдонҳои нави AWG 3.x ҳанӯз ворид карда намешаванд. sing-box порти назорати маҳаллии бо парол ҳифзшударо истифода мебарад, ки дигар замимаҳои компютер метавонанд онро ошкор кунанд.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) пораҳои VLESS, REALITY, XHTTP, VLESS Encryption ва TLS-ро дастгирӣ мекунад. Он инчунин профилҳои пурраи провайдери Xray -ро ҳангоми нигоҳ доштани масир ва гурӯҳҳои онҳо иҷро мекунад. Чунин профилҳоро бидуни тағир додани рафтори худ ба таври худкор ба муҳаррики дигар табдил додан мумкин нест.\n\nXray маҷмӯӣ танзимеро, ки санҷиши сертификати TLS-ро ғайрифаъол мекунад (`allowInsecure`) хориҷ кард. Барои серверҳои оддӣ, ки ин танзимотро талаб мекунанд, худкор sing-box ё mihomo-ро интихоб мекунад. Интихоби Xray пеш аз қатъ кардани пайвасти ҷорӣ дастӣ дар бораи номувофиқатӣ хабар медиҳад. Профилҳои пурраи JSON-и кӯҳна ба профили провайдери навшуда бо шаҳодатномаи тасдиқшаванда ё PIN сертификат ниёз доранд.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) гурӯҳҳои фармоишии бозгашт ва мувозинати сарборӣ, XHTTP ва AmneziaWG -ро дастгирӣ мекунад. Вақте ки интиқоли автоматӣ ба сервери эҳтиётӣ муҳим аст, онро интихоб кунед. Танзими тақсимоти TLS-и Sora бо ин муҳаррик дастнорас аст.\n\n## Мутобиқат дар Sora\n\n| Хусусият | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ва TCP/UDP | Бале | Бале | Бале |\n| XHTTP | Бале | Бале | Бале |\n| VLESS Encryption | Бале | Бале | Бале |\n| Профили пурраи Xray | Не | Бале | Не |\n| TUIC / AnyTLS | Ҳарду | Не | TUIC |\n| Фрагментатсияи TLS | Бале | Бале | Не |\n| AmneziaWG 1.x/2.x | Ҳа¹ | Не | Бале |\n| Гурӯҳи бозгашти фармоишӣ | Не | No² | Бале |\n\n¹ Профилҳо бо J1/J2/J3/Itime mihomo-ро истифода мебаранд; ин майдонхоро хеч гох хомушона партофтан лозим нест. ² Барои як гурӯҳи профилҳои пурраи Xray, барнома профили эҳтиётиро интихоб мекунад. Дастгирӣ аз сохтори насбшуда вобаста аст; версияи онро дар бораи санҷед.\n\n## Стеки TUN\n\nСтек TCP ва UDP-ро дар дохили интерфейси виртуалӣ идора мекунад. Дар панели режимҳо, Xray ва mihomo gVisor, System, Mixed ва MIPS -ро пешниҳод мекунанд. Ҳар як муҳаррик афзалияти худро захира мекунад. System прокси ва режимҳои бе сервер ин афзалиятро истифода намебаранд.\n\n- **Mixed** — TCP стеки системаро истифода мебарад, дар ҳоле ки gVisor UDP-ро идора мекунад. Ин пешфарз барои mihomo дар Linux аст. Дар Windows, Xray ва mihomo ба таври пешфарз MIPS-ро истифода мебаранд.\n- **System** — стеки системаро истифода мебарад. Варианти дигарро санҷед, агар барномаҳои шабакавӣ ба мушкилот дучор шаванд.\n- **gVisor** — трафикро дар фазои корбарон идора мекунад.\n- **MIPS** — стеки IP-и худи mihomo, ки дар версияи маҷмӯии 1.19.32 дастрас аст.\n\nДар Linux, Xray бо нобаёнӣ gVisor-и дарунсохтро истифода мебарад. System, Mixed ва MIPS дар Linux mihomo-ро ҳамчун муҳаррики TUN истифода мебаранд, TCP ва UDP-ро ба Xray тавассути истиноди SOCKS тасдиқшудаи маҳаллӣ интиқол медиҳанд. Xray протокол, профили провайдер ва масирро нигоҳ медорад. Ин се имконоти насбшуда mihomo талаб мекунанд. Дар Windows, Xray барои ҳамаи чор стеки TUN mihomo 1.19.32 ё навтарро истифода мебарад. Протоколҳо ва масирбандӣ дар Xray мемонанд. Қоидаҳои барномаҳо дар ин пайваст танҳо пайвасти мустақим ва бастанро дастгирӣ мекунанд; дар Linux ин қоидаҳо gVisor-и дарунсохти Xray-ро талаб мекунанд.\n\nПул процесси дуюмро пеш мебарад. Дар се андозагирии бекор дар Linux, он нисбат ба Xray TUN-и аслӣ тақрибан 32–36 МБ зиёдтар хотираи физикиро истифода бурд. Ин сарбории зеркаширо чен намекунад: хароҷоти CPU ва хотира аз пайвастшавӣ вобаста аст. sing-box ягон селектори стек надорад. Ягон стек иҷрои беҳтарро дар ҳар як шабака кафолат намедиҳад. Стекро интихоб кунед ва Apply-ро интихоб кунед ва аз нав пайваст шавед, то онро дар шабакаи худ санҷед.\n\n## Татбиқи танзимот\n\nИнтихоби сервер ба таври худкор дубора пайваст мешавад. Режим, муҳаррик, DNS ва танзимоти қоида фавран захира карда мешаванд; ҳангоми пайвасти фаъол, Apply-ро клик кунед ва барои истифодаи онҳо дубора пайваст шавед. Аз нав ба кор андохтани муҳаррик метавонад зеркашиҳо ва зангҳоро қатъ кунад. Кликҳои такрорӣ пайвастҳои мувозиро оғоз намекунанд; ҷудокунӣ гузаришро ба итмом мерасонад ва пайвастро озод мекунад.\n\nИнтернет танҳо тавассути VPN трафики мустақимро ҳангоми фурӯ рафтани нақб манъ мекунад. Он ба тамоми мошин таъсир мерасонад. Қатъи возеҳ қоидаҳои Sora-ро нест мекунад. Агар тозакунӣ анҷом наёбад, аз нав ҷудо кунед ва сабтро кушоед.\n\n## Ҳуҷҷатҳои лоиҳа\n\n- [sing-box-lx: конфигуратсия ва дастгирӣ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Ҳуҷҷатҳои sing-box](https://sing-box.sagernet.org/)\n- [Ҳуҷҷатҳои Xray](https://xtls.github.io/)\n- [Ҳуҷҷатҳои mihomo](https://wiki.metacubex.one/)\n- [zapret: амалиёт ва маҳдудиятҳо](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Агар шумо боварӣ надошта бошед, ки ба сервери шумо ба кадом муҳаррик ниёз дорад, Auto-ро интихоб кунед. Sora пеш аз пайвастшавӣ профил ва танзимотро тафтиш мекунад. Муҳаррик наметавонад маҷрои нақшаи шуморо зиёд кунад: иҷроиш аз сервер, масир, протокол ва шабака вобаста аст.\n\n## Модҳо\n\n### Ҳама трафик (TUN)\n\nSora интерфейси шабакаи маҷозӣ эҷод мекунад ва трафики барномаҳоро тавассути он, аз ҷумла TCP ва UDP, масир мекунад. Ин режимро барои Telegram, бозиҳо ва овози Discord истифода баред. Қоидаҳо метавонанд сайтҳо ё барномаҳои мушаххасро мустақиман фиристанд ё онҳоро маҳкам кунанд. Хидмати шабака ба иҷозат ва сервере ниёз дорад, ки протоколи лозимиро дастгирӣ мекунад.\n\n### Прокси System\n\nSora прокси маҳаллии HTTP/SOCKS-ро танзим мекунад. Барномаҳое, ки танзимоти прокси системаро эҳтиром мекунанд, онро истифода мебаранд. Барномаҳо бо стеки шабакавии худ метавонанд мустақиман пайваст шаванд; UDP ва зангҳои овозӣ умуман ба TUN ниёз доранд. Ин режим ба браузерҳо ва барномаҳо бо дастгирии прокси мувофиқат мекунад.\n\n### Сервер нест\n\nДар Linux, Sora [zapret](https://github.com/bol-van/zapret) -ро барои тақсим кардан ва тағир додани дархостҳои HTTP/TLS ва гузаштан аз баъзе санҷишҳои DPI истифода мебарад. IP-и шумо бетағйир мемонад ва пайвастҳо мустақиман ба вебсайт мераванд. Натиҷаҳо аз провайдери шумо ва усули басташавӣ вобастаанд.\n\nИнтегратсияи ҷорӣ tpws-ро барои HTTP ва TLS тавассути TCP истифода мебарад. Он масдудкунии IP ё интиқоли UDP-ро фаро намегирад ва пайвастҳои Telegram-и MTProto-ро кафолат дода наметавонад. Сервери VPN-ро бо TUN барои овози Discord, зангҳои Telegram ва ин гуна маҳдудиятҳо истифода баред.\n\n## Моторҳо\n\n### Авто\n\nSora муҳаррики насбшударо интихоб мекунад, ки тамоми нақшаи пайвастшавиро дастгирӣ мекунад: протоколҳои сервер, интиқолҳо, гурӯҳҳо, тақсимот ва режим. Интихоби дастӣ номувофиқ пеш аз қатъ кардани пайвасти ҷорӣ рад карда мешавад. Авто ё муҳаррики дигарро интихоб кунед ва танзимотро дубора татбиқ кунед.\n\n### sing-box\n\nБастаҳои нави Sora иборатанд аз [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), як фардкунандаи [sing-box](https://github.com/SagerNet/sing-box), илова кардани муштарии XHTTP ва VLESS Encryption. Sora сохтмон ва қобилиятҳои онро эътироф мекунад. Сохтмони болооб бидуни XHTTP ин қобилиятро танҳо аз номи худ ба даст намеорад.\n\nПротоколҳои дастгирӣшаванда VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ва Z8x/parameters. Sora метавонад ворид кунад. Профилҳои пурраи Xray JSON Xray-ро талаб мекунанд. Майдонҳои нави AWG 3.x ҳанӯз ворид карда намешаванд. sing-box порти назорати маҳаллии бо парол ҳифзшударо истифода мебарад, ки дигар замимаҳои компютер метавонанд онро ошкор кунанд.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) пораҳои VLESS, REALITY, XHTTP, VLESS Encryption ва TLS-ро дастгирӣ мекунад. Он инчунин профилҳои пурраи провайдери Xray -ро ҳангоми нигоҳ доштани масир ва гурӯҳҳои онҳо иҷро мекунад. Чунин профилҳоро бидуни тағир додани рафтори худ ба таври худкор ба муҳаррики дигар табдил додан мумкин нест.\n\nXray маҷмӯӣ танзимеро, ки санҷиши сертификати TLS-ро ғайрифаъол мекунад (`allowInsecure`) хориҷ кард. Барои серверҳои оддӣ, ки ин танзимотро талаб мекунанд, худкор sing-box ё mihomo-ро интихоб мекунад. Интихоби Xray пеш аз қатъ кардани пайвасти ҷорӣ дастӣ дар бораи номувофиқатӣ хабар медиҳад. Профилҳои пурраи JSON-и кӯҳна ба профили провайдери навшуда бо шаҳодатномаи тасдиқшаванда ё PIN сертификат ниёз доранд.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) гурӯҳҳои фармоишии бозгашт ва мувозинати сарборӣ, XHTTP ва AmneziaWG -ро дастгирӣ мекунад. Вақте ки интиқоли автоматӣ ба сервери эҳтиётӣ муҳим аст, онро интихоб кунед. Танзими тақсимоти TLS-и Sora бо ин муҳаррик дастнорас аст.\n\n## Мутобиқат дар Sora\n\n| Хусусият | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ва TCP/UDP | Бале | Бале | Бале |\n| XHTTP | Бале | Бале | Бале |\n| VLESS Encryption | Бале | Бале | Бале |\n| Профили пурраи Xray | Не | Бале | Не |\n| TUIC / AnyTLS | Ҳарду | Не | TUIC |\n| Фрагментатсияи TLS | Бале | Бале | Не |\n| AmneziaWG 1.x/2.x | Ҳа¹ | Не | Бале |\n| Гурӯҳи бозгашти фармоишӣ | Не | No² | Бале |\n\n¹ Профилҳо бо J1/J2/J3/Itime mihomo-ро истифода мебаранд; ин майдонхоро хеч гох хомушона партофтан лозим нест. ² Барои як гурӯҳи профилҳои пурраи Xray, барнома профили эҳтиётиро интихоб мекунад. Дастгирӣ аз сохтори насбшуда вобаста аст; версияи онро дар бораи санҷед.\n\n## Стеки TUN\n\nСтек TCP ва UDP-ро дар дохили интерфейси виртуалӣ идора мекунад. Дар панели режимҳо, Xray ва mihomo gVisor, System, Mixed ва MIPS -ро пешниҳод мекунанд. Ҳар як муҳаррик афзалияти худро захира мекунад. System прокси ва режимҳои бе сервер ин афзалиятро истифода намебаранд.\n\n- **Mixed**: TCP стеки системаро истифода мебарад, дар ҳоле ки gVisor UDP-ро идора мекунад. Ин пешфарз барои mihomo дар Linux аст. Дар Windows, Xray ва mihomo ба таври пешфарз MIPS-ро истифода мебаранд.\n- **System**: стеки системаро истифода мебарад. Варианти дигарро санҷед, агар барномаҳои шабакавӣ ба мушкилот дучор шаванд.\n- **gVisor**: трафикро дар фазои корбарон идора мекунад.\n- **MIPS**: стеки IP-и худи mihomo, ки дар версияи маҷмӯии 1.19.32 дастрас аст.\n\nДар Linux, Xray бо нобаёнӣ gVisor-и дарунсохтро истифода мебарад. System, Mixed ва MIPS дар Linux mihomo-ро ҳамчун муҳаррики TUN истифода мебаранд, TCP ва UDP-ро ба Xray тавассути истиноди SOCKS тасдиқшудаи маҳаллӣ интиқол медиҳанд. Xray протокол, профили провайдер ва масирро нигоҳ медорад. Ин се имконоти насбшуда mihomo талаб мекунанд. Дар Windows, Xray барои ҳамаи чор стеки TUN mihomo 1.19.32 ё навтарро истифода мебарад. Протоколҳо ва масирбандӣ дар Xray мемонанд. Қоидаҳои барномаҳо дар ин пайваст танҳо пайвасти мустақим ва бастанро дастгирӣ мекунанд; дар Linux ин қоидаҳо gVisor-и дарунсохти Xray-ро талаб мекунанд.\n\nПул процесси дуюмро пеш мебарад. Дар се андозагирии бекор дар Linux, он нисбат ба Xray TUN-и аслӣ тақрибан 32–36 МБ зиёдтар хотираи физикиро истифода бурд. Ин сарбории зеркаширо чен намекунад: хароҷоти CPU ва хотира аз пайвастшавӣ вобаста аст. sing-box ягон селектори стек надорад. Ягон стек иҷрои беҳтарро дар ҳар як шабака кафолат намедиҳад. Стекро интихоб кунед ва Apply-ро интихоб кунед ва аз нав пайваст шавед, то онро дар шабакаи худ санҷед.\n\n## Татбиқи танзимот\n\nИнтихоби сервер ба таври худкор дубора пайваст мешавад. Режим, муҳаррик, DNS ва танзимоти қоида фавран захира карда мешаванд; ҳангоми пайвасти фаъол, Apply-ро клик кунед ва барои истифодаи онҳо дубора пайваст шавед. Аз нав ба кор андохтани муҳаррик метавонад зеркашиҳо ва зангҳоро қатъ кунад. Кликҳои такрорӣ пайвастҳои мувозиро оғоз намекунанд; ҷудокунӣ гузаришро ба итмом мерасонад ва пайвастро озод мекунад.\n\nИнтернет танҳо тавассути VPN трафики мустақимро ҳангоми фурӯ рафтани нақб манъ мекунад. Он ба тамоми мошин таъсир мерасонад. Қатъи возеҳ қоидаҳои Sora-ро нест мекунад. Агар тозакунӣ анҷом наёбад, аз нав ҷудо кунед ва сабтро кушоед.\n\n## Ҳуҷҷатҳои лоиҳа\n\n- [sing-box-lx: конфигуратсия ва дастгирӣ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Ҳуҷҷатҳои sing-box](https://sing-box.sagernet.org/)\n- [Ҳуҷҷатҳои Xray](https://xtls.github.io/)\n- [Ҳуҷҷатҳои mihomo](https://wiki.metacubex.one/)\n- [zapret: амалиёт ва маҳдудиятҳо](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -410,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -448,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -477,7 +441,6 @@
     }
   },
   "diagnosticHttp": "Ташхиси HTTP",
-  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "Ҳанӯз ягон дархост сабт нашудааст. Аввал вебсайти санҷиши суръатро кушоед.",
   "extensions": "Васеъшавӣ",
   "exportLogFile": "Ба {name}",
@@ -488,40 +451,6 @@
       }
     }
   },
-  "censorTitle": "Blocking diagnostics",
-  "censorHistory": "Check history",
-  "censorEmpty": "No checks yet. If a connection fails, the detector will check whether your provider is blocking it.",
-  "censorExplainer": "This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.",
-  "censorNoProfile": "No suitable profile for this verdict",
-  "censorApplyProfile": "Apply recommended profile",
-  "censorEnable": "Enable",
-  "censorDetails": "Details",
-  "censorNotNow": "Not now",
-  "censorPromptTitle": "Connection may be blocked",
-  "censorPromptBody": "It looks like your provider is blocking the connection (confidence {confidence}%). Try masking?",
-  "@censorPromptBody": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorConfidence": "Confidence: {confidence}%",
-  "@censorConfidence": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorKindBlocked": "Blocking detected",
-  "censorKindLikely": "Looks like blocking",
-  "censorKindClear": "No blocking detected",
-  "censorKindUnknown": "Could not determine",
-  "censorReasonTlsReset": "TLS connections are being reset — a typical sign of filtering",
-  "censorReasonHttpBlock": "HTTP requests are being blocked",
-  "censorReasonDnsSpoofed": "DNS responses are being spoofed",
-  "censorReasonConnectTimeout": "Connections keep timing out",
   "customServerAdd": "Add custom server",
   "customServers": "My servers",
   "customServerName": "Name",
@@ -540,7 +469,6 @@
   "customServerShowSecret": "Show secret",
   "customServerHideSecret": "Hide secret",
   "customServerBadge": "custom",
-  "flowAuto": "auto",
   "customServerDeleteConfirm": "Delete server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -551,7 +479,6 @@
   },
   "customServerEmptyHint": "Add a server manually: address, port and protocol",
   "customServerTest": "Test",
-  "errObfsUnsupported": "The installed core is too old for obfuscation profiles. Update Sora to apply them.",
   "leakTestTitle": "Leak test",
   "leakTestIntro": "Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.",
   "leakTestRun": "Run test",
@@ -574,41 +501,17 @@
       }
     }
   },
-  "leakTestSkipped": "Skipped — not applicable in this session",
+  "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Fix",
-  "leakTestFixedNote": "Kill switch is on — run the test again to verify.",
+  "leakTestFixedNote": "Kill switch is on, run the test again to verify.",
   "leakTestCheckDirectDns": "Direct DNS",
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
   "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
   "leakTestCheckTunnelDns": "Tunnel DNS",
-  "noticeDegraded": "The server slowed down — switched to the best measured one",
+  "noticeDegraded": "The server slowed down, switched to the best measured one",
   "obfs": "Traffic obfuscation",
-  "obfsPreset": "Preset",
-  "obfsPresetAggressive": "Maximum obfuscation",
-  "obfsPresetBalanced": "Balanced",
-  "obfsPresetOff": "Speed",
-  "obfsPresetCustom": "Custom",
-  "obfsManual": "Manual settings",
-  "obfsUtls": "uTLS profile",
-  "obfsUtlsAuto": "Auto",
-  "obfsJitter": "Timing jitter",
-  "obfsJitterNeedsFragment": "Jitter only works with fragmentation enabled.",
-  "obfsFineTune": "Sizes and delays",
-  "obfsDetecting": "Detecting capabilities…",
-  "obfsCapabilities": "Engine capabilities",
-  "obfsCompatibleEngines": "Compatible engines: {engines}",
-  "@obfsCompatibleEngines": {
-    "placeholders": {
-      "engines": {
-        "type": "String"
-      }
-    }
-  },
-  "obfsSupported": "Supported",
-  "obfsUnsupported": "Not supported",
-  "obfsUnknown": "Capabilities are still being detected.",
   "latencyMs": "{value} ms",
   "@latencyMs": {
     "placeholders": {
@@ -625,8 +528,8 @@
       }
     }
   },
-  "updateSignaturePending": "Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.",
-  "updateManualSigWarning": "Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.",
+  "updateSignaturePending": "Файлҳои навсозӣ бо суммаҳои назоратии бо релиз нашршуда муқоиса мешаванд.",
+  "updateManualSigWarning": "Файлҳои зерин ба суммаҳои назоратии релиз мувофиқанд. Агар онҳоро аз релизи расмӣ боргирӣ карда бошед, фармонро иҷро кунед.",
   "updateVersionRevoked": "This version has been recalled by the developer. Please wait for a fixed release.",
   "updateRolloutPending": "A newer version is rolling out gradually and will be offered to you automatically.",
   "updateRollbacking": "Rolling back to version {version}...",
@@ -762,7 +665,7 @@
   "extPermissionsRemoved": "No longer requested:",
   "extUpdateFailedKept": "The previous version is still installed.",
   "extConflictsTitle": "Extension conflicts",
-  "extConflictsIntro": "These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.",
+  "extConflictsIntro": "Ин васеъкуниҳо як чизро мехоҳанд. Интихоб кунед, ки кадомаш кор кунад, дигаре насбшуда мемонад.",
   "extConflictRoutingRules": "Routing rules",
   "extConflictTheme": "App theme",
   "extConflictNetHooks": "Network hooks",
@@ -849,8 +752,8 @@
   "extPermNetHooks": "Hook into the network path (DPI bypass modules)",
   "extPermNetFetch": "Fetch URLs from an allowlist",
   "extPermBackground": "Run background tasks",
-  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.",
-  "extPermNotYetActive": "Not active in this version of Sora yet — granting it changes nothing today.",
+  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Runs in the background",
   "extCapFilterTitle": "Capabilities",
   "extCapNetHook": "Bypasses & network hooks",
@@ -858,7 +761,7 @@
   "extCapRouting": "Routing rules",
   "extCapTheme": "Themes",
   "extCapWidget": "Widgets",
-  "extCatalogCached": "Cached catalog · {date}",
+  "extCatalogCached": "Cached catalog, {date}",
   "@extCatalogCached": {
     "placeholders": {
       "date": {
@@ -872,7 +775,7 @@
   "extRatingHowBody": "Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.",
   "extScreenshots": "Screenshots",
   "extSortRelevance": "Relevance",
-  "extPermNetworkDetail": "Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.",
+  "extPermNetworkDetail": "Маълумотро аз интернет тавассути VPN мегирад. Танҳо хостҳои рӯйхати зерин иҷозат доранд, боқимонда баста аст.",
   "extBgTitle": "Background task",
   "extBgEnabled": "Run in the background",
   "extBgInterval": "Run every",
@@ -892,8 +795,7 @@
       }
     }
   },
-  "extBgNote": "Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.",
-  "extBgRuntimeBadge": "Not available yet",
+  "extBgNote": "Вазифа то он даме ки Sora кушода аст, аз ҷумла дар трей, мувофиқи ҷадвал иҷро мешавад. Кӯтоҳтарин фосила 15 дақиқа аст.",
   "extBgDisabledNote": "Enable the extension to manage its background task.",
   "extCapNetwork": "Network access",
   "extCapNetworkHosts": "Network: {hosts}",
@@ -977,7 +879,7 @@
   "profileAdd": "Add profile",
   "profileName": "Profile name",
   "profileSsids": "Wi-Fi networks (SSID)",
-  "profileSsidsHint": "Home, Office — comma separated",
+  "profileSsidsHint": "Home, Office, comma separated",
   "profileGateways": "Gateways",
   "profileAsns": "AS numbers",
   "profileAutoApply": "Apply automatically",
@@ -1021,8 +923,6 @@
   "syncRevokeConfirm": "Revoke \"{name}\"?",
   "syncLastSync": "Last sync: {time}",
   "syncNever": "Never",
-  "syncWhat": "What syncs",
-  "syncWhatBody": "Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.",
   "syncNoLan": "Devices must be on the same local network",
   "syncPaired": "Device paired",
   "syncPairingTitle": "Pair with this device",
@@ -1034,7 +934,7 @@
   "edit": "Edit",
   "remove": "Remove",
   "autoSwitchOnDegrade": "Auto-switch on degradation",
-  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.",
+  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.",
   "tunStackMixed": "Mixed",
   "tunStackSystem": "System",
   "syncCodeExpired": "The code expired",
@@ -1055,7 +955,7 @@
     }
   },
   "syncJoining": "Pairing with the device…",
-  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.",
+  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.",
   "syncNewCode": "New code",
   "syncPairedWith": "{name} paired",
   "@syncPairedWith": {
@@ -1068,7 +968,7 @@
   "syncRetry": "Try again",
   "syncStopShowing": "Stop showing",
   "syncSyncNow": "Sync now",
-  "syncSyncResult": "Received {pulled} · sent {pushed}",
+  "syncSyncResult": "Received {pulled}, sent {pushed}",
   "@syncSyncResult": {
     "placeholders": {
       "pulled": {
@@ -1088,7 +988,6 @@
   "syncDocKindOverrides": "Subscription overrides",
   "syncDocKindProfiles": "Network profiles",
   "syncDocKindChains": "Proxy chains",
-  "syncDocKindObfs": "Traffic obfuscation",
   "syncFrom": "from {name}",
   "@syncFrom": {
     "placeholders": {
@@ -1098,26 +997,7 @@
     }
   },
   "syncThisDevice": "This device",
-  "syncUnavailableAndroid": "Device sync isn't available on Android yet — the sync service can't run there.",
-  "smartPickReason": "Picked by smart mode: ping {ping}, speed {speed}",
-  "@smartPickReason": {
-    "placeholders": {
-      "ping": {
-        "type": "String"
-      },
-      "speed": {
-        "type": "String"
-      }
-    }
-  },
-  "serverReliability": "Reliability {pct}%",
-  "@serverReliability": {
-    "placeholders": {
-      "pct": {
-        "type": "int"
-      }
-    }
-  },
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
   "customServerShadowsocksCredentials": "Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Гирифтани пакет",
   "diagnosticEvents": "Ҳодисаҳои Windows",

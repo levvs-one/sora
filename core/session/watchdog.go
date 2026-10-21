@@ -1,6 +1,6 @@
 package session
 
-// Engine crash watchdog (F7). The supervisor restarts crashed engines with
+// Engine crash watchdog. The supervisor restarts crashed engines with
 // backoff inside its own budget; this watchdog watches from the session
 // side and reports instability once: maxCrashes engine crashes within
 // crashWindow. The client shows an "engine unstable" banner with a

@@ -5,7 +5,6 @@
   "stateConnected": "Bağlı",
   "stateReconnecting": "Yeniden bağlanılıyor",
   "stateDisconnecting": "Bağlantı kesiliyor",
-  "stateFailed": "Bağlı değil",
   "coreMissing": "Sora hizmeti yanıt vermiyor",
   "serverAuto": "En hızlı",
   "serverBypass": "Sunucu yok",
@@ -76,7 +75,6 @@
   "errSubScheme": "Bağlantı https:// ile başlamalıdır",
   "errSecretStore": "Sora depolama alanı hasarlı veya kullanılamıyor",
   "errNoServers": "Bağlanmak için bir abonelik ekleyin",
-  "exportText": "Metin",
   "connections": "Bağlantılar",
   "close": "Kapalı",
   "chainDirect": "Doğrudan",
@@ -150,7 +148,6 @@
   "trafficLow": "{name}: {left} sol",
   "ruleInvalid": "Bu bir siteye, IP'ye veya programa benzemiyor",
   "tunnelMode": "Mod",
-  "tunnelTun": "Tüm trafik",
   "tunnelProxy": "System proxy",
   "proxyAddress": "Proxy adresi",
   "copied": "Kopyalandı",
@@ -187,12 +184,6 @@
   "sidebarToggle": "Kenar çubuğunu aç/kapat",
   "more": "Daha",
   "less": "Az",
-  "currentServer": "Mevcut sunucu",
-  "trafficDown": "İndirildi",
-  "trafficUp": "Yüklendi",
-  "perSecond": "{value}/s",
-  "activeRules": "Aktif kurallar: {count}",
-  "recentNotifications": "Son bildirimler",
   "notificationsEmpty": "Bağlantı ve abonelik etkinlikleri burada görünecek",
   "retryConnect": "Bağlantıyı yeniden dene",
   "openLogs": "Günlükleri aç",
@@ -210,12 +201,9 @@
   "chooseProgram": "Bir program seçin",
   "installedApps": "Yüklü uygulamalar",
   "runningProcesses": "Çalışan işlemler",
-  "programsFailed": "Uygulamalar yüklenemedi",
   "programsEmpty": "Hiçbir uygulama bulunamadı. Başka bir ad deneyin.",
   "selectExe": "Bir .exe dosyası seçin",
-  "trafficUnavailable": "Sayaçlar henüz kullanılamıyor",
   "speedtest": "Hız",
-  "speedtestCheck": "Hızı kontrol edin",
   "speedtestSearch": "Bir hizmet bulun",
   "speedtestEmpty": "Eşleşme yok. Aramayı değiştirin.",
   "speedtestBackToList": "Hizmetlere geri dön",
@@ -269,14 +257,12 @@
   "telegramChannel": "Telegram kanalı",
   "licenses": "Lisanslar",
   "componentLicenses": "Bileşen lisansları",
-  "appCopyright": "© 2026 levvs-one ve katkıda bulunanlar",
   "collapseServers": "Sunucuları daralt",
   "expandServers": "Sunucuları genişlet",
   "hideDescription": "Açıklamayı gizle",
   "showDescription": "Açıklamayı göster",
   "pendingConnectionChanges": "Bu değişiklikleri uygulamak için yeniden bağlanın.",
   "reconnectNow": "Uygula ve yeniden bağlan",
-  "bypassLimitations": "Bu mod DPI'yi yalnızca HTTP ve TLS için atlar, UDP'yi desteklemez veya IP'nizi değiştirmez. Discord sesleri, aramaları ve engellenen Telegram adresleri için bir VPN sunucusu kullanın.",
   "errEngineUnsupported": "Seçilen motor bu profili veya ayarları desteklemiyor. Otomatik'i veya uyumlu bir motoru seçin.",
   "errRestore": "Bağlantı temizliği tamamlanmadı. Bağlantıyı kesmeyi yeniden deneyin; ayrıntılar için günlüğe bakın.",
   "errSessionEnded": "Bu oturum zaten sona erdi. Bağlantı durumunu yenileyin.",
@@ -286,9 +272,8 @@
   "modesGuideTitle": "Modlar ve motorlar",
   "probeServers": "Sunucuları kontrol edin",
   "expiresIn": "{name}: {days, plural, =0{abonelik birkaç saat içinde bitiyor} one{abonelik # gününde sona eriyor} other{abonelik # gün içinde sona eriyor}}",
-  "groupOrdered": "{count, plural, one{# sunucusu sırasıyla} other{# sunucuları sırasıyla}}",
   "groupBest": "{count, plural, one{# sunucusu, en hızlısı} other{# sunucuları, en hızlısı}}",
-  "modesGuide": "Sunucunuzun hangi motora ihtiyacı olduğundan emin değilseniz Otomatik'i seçin. Sora bağlanmadan önce profili ve ayarları kontrol eder. Bir motor planınızın bant genişliğini artıramaz: performans sunucuya, rotaya, protokole ve ağa bağlıdır.\n\n## Modlar\n\n### Tüm trafik (TUN)\n\nSora bir sanal ağ arayüzü oluşturur ve TCP ve UDP dahil olmak üzere uygulama trafiğini bu arayüz üzerinden yönlendirir. Bu modu Telegram, oyunlar ve Discord ses için kullanın. Kurallar belirli siteleri veya programları doğrudan gönderebilir veya engelleyebilir. Ağ hizmetinin izne ve gerekli protokolü destekleyen bir sunucuya ihtiyacı vardır.\n\n### System proxy\n\nSora, yerel bir HTTP/SOCKS proxy'sini yapılandırır. Sistem proxy ayarlarına saygı duyan uygulamalar bunu kullanır. Kendi ağ yığınına sahip uygulamalar doğrudan bağlanabilir; UDP ve sesli aramalar genellikle TUN'a ihtiyaç duyar. Bu mod, proxy desteği olan tarayıcılara ve uygulamalara uygundur.\n\n### Sunucu yok\n\nLinux'de Sora, HTTP/TLS isteklerini bölmek ve yeniden şekillendirmek ve bazı DPI kontrollerini atlamak için [zapret](https://github.com/bol-van/zapret) kullanır. IP'niz aynı kalır ve bağlantılar doğrudan web sitesine gider. Sonuçlar sağlayıcınıza ve engelleme yöntemine bağlıdır.\n\nMevcut entegrasyon HTTP için tpws ve TCP üzerinden TLS kullanıyor. IP engellemeyi veya aktarma UDP'sini atlamaz ve Telegram'nin MTProto bağlantılarını garanti edemez. Discord ses, Telegram aramaları ve bu tür kısıtlamalar için TUN'lu bir VPN sunucusu kullanın.\n\n## Motorlar\n\n### Otomatik\n\nSora, bağlantı planının tamamını destekleyen kurulu bir motoru seçer: sunucu protokolleri, aktarımlar, gruplar, parçalanma ve mod. Uyumsuz bir manuel seçim, mevcut bağlantı durdurulmadan önce reddedilir. Otomatik veya başka bir motoru seçin ve ayarları tekrar uygulayın.\n\n### sing-box\n\nYeni Sora paketleri, istemci tarafı XHTTP ve VLESS Encryption'yi ekleyen [sing-box](https://github.com/SagerNet/sing-box) çatalı olan [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)'yi içerir. Sora, yapıyı ve yeteneklerini tanır. XHTTP'siz bir yukarı akış yapısı bu yeteneği yalnızca adından kazanmaz.\n\nDesteklenen protokoller arasında VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ve AmneziaWG 1.x/2.x parametreleri bulunur Sora içe aktarabilir. Tam Xray JSON profilleri Xray gerektirir. Yeni AWG 3.x alanları henüz içe aktarılamıyor. sing-box, bilgisayardaki diğer uygulamaların algılayabileceği, parola korumalı bir yerel kontrol bağlantı noktası kullanır.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core), VLESS, REALITY, XHTTP, VLESS Encryption ve TLS parçalanmasını destekler. Ayrıca yönlendirmelerini ve gruplarını korurken sağlayıcı Xray profillerinin tamamını çalıştırır. Bu tür profiller, davranışları değiştirilmeden otomatik olarak başka bir motora dönüştürülemez.\n\nBirlikte verilen Xray, TLS sertifika doğrulamasını devre dışı bırakan ayarı (\"allowInsecure\") kaldırdı. Otomatik, bu ayarı gerektiren sıradan sunucular için sing-box veya mihomo'yi seçer. Xray seçildiğinde, mevcut bağlantı durdurulmadan önce uyumsuzluk manuel olarak raporlanır. Daha eski tam JSON profilleri, doğrulanabilir bir sertifikaya veya sertifika pinine sahip güncellenmiş bir sağlayıcı profiline ihtiyaç duyar.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo), sıralı geri dönüş ve yük dengeleme grupları olan XHTTP ve AmneziaWG'yi destekler. Yedekleme sunucusuna otomatik yük devretme önemli olduğunda bunu seçin. Sora'nin TLS parçalanma ayarı bu motorda kullanılamaz.\n\n## Sora ile uyumluluk\n\n| Özellik | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ve TCP/UDP | Evet | Evet | Evet |\n| XHTTP | Evet | Evet | Evet |\n| VLESS Encryption | Evet | Evet | Evet |\n| Tam Xray profili | Hayır | Evet | Hayır |\n| TUIC / AnyTLS | Her ikisi de | Hayır | TUIC |\n| TLS parçalanması | Evet | Evet | Hayır |\n| AmneziaWG 1.x/2.x | Evet¹ | Hayır | Evet |\n| Sıralı yedek grup | Hayır | No² | Evet |\n\n¹ J1/J2/J3/Itime içeren profiller mihomo kullanır; bu alanlar asla sessizce atılmamalıdır. ² Tam Xray profillerinden oluşan bir grup için uygulama bir yedekleme profili seçer. Destek, kurulu yapıya bağlıdır; Hakkında bölümünden sürümünü kontrol edin.\n\n## TUN yığını\n\nYığın, sanal arabirim içindeki TCP ve UDP'yi yönetir. Modlar panelinde Xray ve mihomo, gVisor, System, Mixed ve MIPS'yi sunar. Her motor kendi tercihini kaydeder. System proxy ve Sunucusuz modları bu tercihi kullanmaz.\n\n- **Mixed** — TCP sistem yığınını kullanırken gVisor UDP'yi yönetir. Bu, Linux üzerinde mihomo için varsayılandır. Windows üzerinde Xray ve mihomo varsayılan olarak MIPS kullanır.\n- **System** — sistem yığınını kullanır. Ağ uygulamaları sorunlarla karşılaşırsa başka bir seçeneği deneyin.\n- **gVisor** — kullanıcı alanındaki trafiği yönetir.\n- **MIPS** — mihomo'nin kendi IP yığını, paket halindeki 1.19.32 sürümünde mevcuttur.\n\nLinux'de Xray, varsayılan olarak yerleşik gVisor'yi kullanır. Linux üzerindeki System, Mixed ve MIPS, TUN motoru olarak mihomo'yi kullanır ve kimliği doğrulanmış bir yerel SOCKS bağlantısı üzerinden TCP ve UDP'yi Xray'ye iletir. Xray protokolü, sağlayıcı profilini ve yönlendirmeyi korur. Bu üç seçenek mihomo'nin kurulu olmasını gerektirir. Windows üzerinde Xray, dört TUN yığınının tümü için mihomo 1.19.32 veya daha yenisini kullanır. Protokoller ve yönlendirme Xray içinde kalır. Bu birleşimde uygulama kuralları yalnızca doğrudan bağlantı ve engellemeyi destekler; Linux üzerinde bu kurallar Xray’ın yerleşik gVisor yığınını gerektirir.\n\nKöprü ikinci bir süreci yürütür. Linux üzerindeki üç boşta ölçümde, yerel Xray TUN'dan yaklaşık 32-36 MiB daha fazla fiziksel bellek kullandı. Bu, indirme yükünü ölçmez: CPU ve bellek maliyetleri bağlantılara bağlıdır. sing-box'de yığın seçici yoktur. Hiçbir yığın her ağda daha iyi performansı garanti etmez. Bir yığın seçin ve ağınızda denemek için Uygula ve yeniden bağlan'ı seçin.\n\n## Ayarları uygulama\n\nBir sunucu seçildiğinde otomatik olarak yeniden bağlanır. Mod, motor, DNS ve kural ayarları anında kaydedilir; etkin bir bağlantı sırasında bunları kullanmak için Uygula ve yeniden bağlan'a tıklayın. Motorun yeniden başlatılması indirme ve çağrıların kesintiye uğramasına neden olabilir. Tekrarlanan tıklamalar paralel bağlantıları başlatmaz; bağlantıyı kesmek geçişi sonlandırır ve bağlantıyı serbest bırakır.\n\nYalnızca VPN aracılığıyla İnternet, bir tünel kapandığında doğrudan trafiği engeller. Tüm makineyi etkiler. Açık bir bağlantı kesilmesi Sora'nin kurallarını kaldırır. Temizleme işlemi bitmezse bağlantıyı kesmeyi ve günlüğü açmayı yeniden deneyin.\n\n## Proje dokümantasyonu\n\n- [sing-box-lx: yapılandırma ve destek](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box belgeleri](https://sing-box.sagernet.org/)\n- [Xray belgeleri](https://xtls.github.io/)\n- [mihomo belgeleri](https://wiki.metacubex.one/)\n- [zapret: çalışma ve sınırlamalar](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Sunucunuzun hangi motora ihtiyacı olduğundan emin değilseniz Otomatik'i seçin. Sora bağlanmadan önce profili ve ayarları kontrol eder. Bir motor planınızın bant genişliğini artıramaz: performans sunucuya, rotaya, protokole ve ağa bağlıdır.\n\n## Modlar\n\n### Tüm trafik (TUN)\n\nSora bir sanal ağ arayüzü oluşturur ve TCP ve UDP dahil olmak üzere uygulama trafiğini bu arayüz üzerinden yönlendirir. Bu modu Telegram, oyunlar ve Discord ses için kullanın. Kurallar belirli siteleri veya programları doğrudan gönderebilir veya engelleyebilir. Ağ hizmetinin izne ve gerekli protokolü destekleyen bir sunucuya ihtiyacı vardır.\n\n### System proxy\n\nSora, yerel bir HTTP/SOCKS proxy'sini yapılandırır. Sistem proxy ayarlarına saygı duyan uygulamalar bunu kullanır. Kendi ağ yığınına sahip uygulamalar doğrudan bağlanabilir; UDP ve sesli aramalar genellikle TUN'a ihtiyaç duyar. Bu mod, proxy desteği olan tarayıcılara ve uygulamalara uygundur.\n\n### Sunucu yok\n\nLinux'de Sora, HTTP/TLS isteklerini bölmek ve yeniden şekillendirmek ve bazı DPI kontrollerini atlamak için [zapret](https://github.com/bol-van/zapret) kullanır. IP'niz aynı kalır ve bağlantılar doğrudan web sitesine gider. Sonuçlar sağlayıcınıza ve engelleme yöntemine bağlıdır.\n\nMevcut entegrasyon HTTP için tpws ve TCP üzerinden TLS kullanıyor. IP engellemeyi veya aktarma UDP'sini atlamaz ve Telegram'nin MTProto bağlantılarını garanti edemez. Discord ses, Telegram aramaları ve bu tür kısıtlamalar için TUN'lu bir VPN sunucusu kullanın.\n\n## Motorlar\n\n### Otomatik\n\nSora, bağlantı planının tamamını destekleyen kurulu bir motoru seçer: sunucu protokolleri, aktarımlar, gruplar, parçalanma ve mod. Uyumsuz bir manuel seçim, mevcut bağlantı durdurulmadan önce reddedilir. Otomatik veya başka bir motoru seçin ve ayarları tekrar uygulayın.\n\n### sing-box\n\nYeni Sora paketleri, istemci tarafı XHTTP ve VLESS Encryption'yi ekleyen [sing-box](https://github.com/SagerNet/sing-box) çatalı olan [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)'yi içerir. Sora, yapıyı ve yeteneklerini tanır. XHTTP'siz bir yukarı akış yapısı bu yeteneği yalnızca adından kazanmaz.\n\nDesteklenen protokoller arasında VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ve AmneziaWG 1.x/2.x parametreleri bulunur Sora içe aktarabilir. Tam Xray JSON profilleri Xray gerektirir. Yeni AWG 3.x alanları henüz içe aktarılamıyor. sing-box, bilgisayardaki diğer uygulamaların algılayabileceği, parola korumalı bir yerel kontrol bağlantı noktası kullanır.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core), VLESS, REALITY, XHTTP, VLESS Encryption ve TLS parçalanmasını destekler. Ayrıca yönlendirmelerini ve gruplarını korurken sağlayıcı Xray profillerinin tamamını çalıştırır. Bu tür profiller, davranışları değiştirilmeden otomatik olarak başka bir motora dönüştürülemez.\n\nBirlikte verilen Xray, TLS sertifika doğrulamasını devre dışı bırakan ayarı (\"allowInsecure\") kaldırdı. Otomatik, bu ayarı gerektiren sıradan sunucular için sing-box veya mihomo'yi seçer. Xray seçildiğinde, mevcut bağlantı durdurulmadan önce uyumsuzluk manuel olarak raporlanır. Daha eski tam JSON profilleri, doğrulanabilir bir sertifikaya veya sertifika pinine sahip güncellenmiş bir sağlayıcı profiline ihtiyaç duyar.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo), sıralı geri dönüş ve yük dengeleme grupları olan XHTTP ve AmneziaWG'yi destekler. Yedekleme sunucusuna otomatik yük devretme önemli olduğunda bunu seçin. Sora'nin TLS parçalanma ayarı bu motorda kullanılamaz.\n\n## Sora ile uyumluluk\n\n| Özellik | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ve TCP/UDP | Evet | Evet | Evet |\n| XHTTP | Evet | Evet | Evet |\n| VLESS Encryption | Evet | Evet | Evet |\n| Tam Xray profili | Hayır | Evet | Hayır |\n| TUIC / AnyTLS | Her ikisi de | Hayır | TUIC |\n| TLS parçalanması | Evet | Evet | Hayır |\n| AmneziaWG 1.x/2.x | Evet¹ | Hayır | Evet |\n| Sıralı yedek grup | Hayır | No² | Evet |\n\n¹ J1/J2/J3/Itime içeren profiller mihomo kullanır; bu alanlar asla sessizce atılmamalıdır. ² Tam Xray profillerinden oluşan bir grup için uygulama bir yedekleme profili seçer. Destek, kurulu yapıya bağlıdır; Hakkında bölümünden sürümünü kontrol edin.\n\n## TUN yığını\n\nYığın, sanal arabirim içindeki TCP ve UDP'yi yönetir. Modlar panelinde Xray ve mihomo, gVisor, System, Mixed ve MIPS'yi sunar. Her motor kendi tercihini kaydeder. System proxy ve Sunucusuz modları bu tercihi kullanmaz.\n\n- **Mixed**: TCP sistem yığınını kullanırken gVisor UDP'yi yönetir. Bu, Linux üzerinde mihomo için varsayılandır. Windows üzerinde Xray ve mihomo varsayılan olarak MIPS kullanır.\n- **System**: sistem yığınını kullanır. Ağ uygulamaları sorunlarla karşılaşırsa başka bir seçeneği deneyin.\n- **gVisor**: kullanıcı alanındaki trafiği yönetir.\n- **MIPS**: mihomo'nin kendi IP yığını, paket halindeki 1.19.32 sürümünde mevcuttur.\n\nLinux'de Xray, varsayılan olarak yerleşik gVisor'yi kullanır. Linux üzerindeki System, Mixed ve MIPS, TUN motoru olarak mihomo'yi kullanır ve kimliği doğrulanmış bir yerel SOCKS bağlantısı üzerinden TCP ve UDP'yi Xray'ye iletir. Xray protokolü, sağlayıcı profilini ve yönlendirmeyi korur. Bu üç seçenek mihomo'nin kurulu olmasını gerektirir. Windows üzerinde Xray, dört TUN yığınının tümü için mihomo 1.19.32 veya daha yenisini kullanır. Protokoller ve yönlendirme Xray içinde kalır. Bu birleşimde uygulama kuralları yalnızca doğrudan bağlantı ve engellemeyi destekler; Linux üzerinde bu kurallar Xray’ın yerleşik gVisor yığınını gerektirir.\n\nKöprü ikinci bir süreci yürütür. Linux üzerindeki üç boşta ölçümde, yerel Xray TUN'dan yaklaşık 32-36 MiB daha fazla fiziksel bellek kullandı. Bu, indirme yükünü ölçmez: CPU ve bellek maliyetleri bağlantılara bağlıdır. sing-box'de yığın seçici yoktur. Hiçbir yığın her ağda daha iyi performansı garanti etmez. Bir yığın seçin ve ağınızda denemek için Uygula ve yeniden bağlan'ı seçin.\n\n## Ayarları uygulama\n\nBir sunucu seçildiğinde otomatik olarak yeniden bağlanır. Mod, motor, DNS ve kural ayarları anında kaydedilir; etkin bir bağlantı sırasında bunları kullanmak için Uygula ve yeniden bağlan'a tıklayın. Motorun yeniden başlatılması indirme ve çağrıların kesintiye uğramasına neden olabilir. Tekrarlanan tıklamalar paralel bağlantıları başlatmaz; bağlantıyı kesmek geçişi sonlandırır ve bağlantıyı serbest bırakır.\n\nYalnızca VPN aracılığıyla İnternet, bir tünel kapandığında doğrudan trafiği engeller. Tüm makineyi etkiler. Açık bir bağlantı kesilmesi Sora'nin kurallarını kaldırır. Temizleme işlemi bitmezse bağlantıyı kesmeyi ve günlüğü açmayı yeniden deneyin.\n\n## Proje dokümantasyonu\n\n- [sing-box-lx: yapılandırma ve destek](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box belgeleri](https://sing-box.sagernet.org/)\n- [Xray belgeleri](https://xtls.github.io/)\n- [mihomo belgeleri](https://wiki.metacubex.one/)\n- [zapret: çalışma ve sınırlamalar](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -410,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -448,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -479,7 +443,6 @@
   "extensions": "Uzantılar",
   "diagnosticNoData": "Henüz kayıtlı istek yok. Önce bir hız testi web sitesi açın.",
   "diagnosticHttp": "HTTP teşhisi",
-  "diagnosticArchive": "Core diagnostics archive",
   "exportLogFile": "Dosyaya {name}",
   "@exportLogFile": {
     "placeholders": {
@@ -488,40 +451,6 @@
       }
     }
   },
-  "censorTitle": "Blocking diagnostics",
-  "censorHistory": "Check history",
-  "censorEmpty": "No checks yet. If a connection fails, the detector will check whether your provider is blocking it.",
-  "censorExplainer": "This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.",
-  "censorNoProfile": "No suitable profile for this verdict",
-  "censorApplyProfile": "Apply recommended profile",
-  "censorEnable": "Enable",
-  "censorDetails": "Details",
-  "censorNotNow": "Not now",
-  "censorPromptTitle": "Connection may be blocked",
-  "censorPromptBody": "It looks like your provider is blocking the connection (confidence {confidence}%). Try masking?",
-  "@censorPromptBody": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorConfidence": "Confidence: {confidence}%",
-  "@censorConfidence": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorKindBlocked": "Blocking detected",
-  "censorKindLikely": "Looks like blocking",
-  "censorKindClear": "No blocking detected",
-  "censorKindUnknown": "Could not determine",
-  "censorReasonTlsReset": "TLS connections are being reset — a typical sign of filtering",
-  "censorReasonHttpBlock": "HTTP requests are being blocked",
-  "censorReasonDnsSpoofed": "DNS responses are being spoofed",
-  "censorReasonConnectTimeout": "Connections keep timing out",
   "customServerAdd": "Add custom server",
   "customServers": "My servers",
   "customServerName": "Name",
@@ -540,7 +469,6 @@
   "customServerShowSecret": "Show secret",
   "customServerHideSecret": "Hide secret",
   "customServerBadge": "custom",
-  "flowAuto": "auto",
   "customServerDeleteConfirm": "Delete server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -551,7 +479,6 @@
   },
   "customServerEmptyHint": "Add a server manually: address, port and protocol",
   "customServerTest": "Test",
-  "errObfsUnsupported": "The installed core is too old for obfuscation profiles. Update Sora to apply them.",
   "leakTestTitle": "Leak test",
   "leakTestIntro": "Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.",
   "leakTestRun": "Run test",
@@ -574,41 +501,17 @@
       }
     }
   },
-  "leakTestSkipped": "Skipped — not applicable in this session",
+  "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Fix",
-  "leakTestFixedNote": "Kill switch is on — run the test again to verify.",
+  "leakTestFixedNote": "Kill switch is on, run the test again to verify.",
   "leakTestCheckDirectDns": "Direct DNS",
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
   "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
   "leakTestCheckTunnelDns": "Tunnel DNS",
-  "noticeDegraded": "The server slowed down — switched to the best measured one",
+  "noticeDegraded": "The server slowed down, switched to the best measured one",
   "obfs": "Traffic obfuscation",
-  "obfsPreset": "Preset",
-  "obfsPresetAggressive": "Maximum obfuscation",
-  "obfsPresetBalanced": "Balanced",
-  "obfsPresetOff": "Speed",
-  "obfsPresetCustom": "Custom",
-  "obfsManual": "Manual settings",
-  "obfsUtls": "uTLS profile",
-  "obfsUtlsAuto": "Auto",
-  "obfsJitter": "Timing jitter",
-  "obfsJitterNeedsFragment": "Jitter only works with fragmentation enabled.",
-  "obfsFineTune": "Sizes and delays",
-  "obfsDetecting": "Detecting capabilities…",
-  "obfsCapabilities": "Engine capabilities",
-  "obfsCompatibleEngines": "Compatible engines: {engines}",
-  "@obfsCompatibleEngines": {
-    "placeholders": {
-      "engines": {
-        "type": "String"
-      }
-    }
-  },
-  "obfsSupported": "Supported",
-  "obfsUnsupported": "Not supported",
-  "obfsUnknown": "Capabilities are still being detected.",
   "latencyMs": "{value} ms",
   "@latencyMs": {
     "placeholders": {
@@ -625,8 +528,8 @@
       }
     }
   },
-  "updateSignaturePending": "Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.",
-  "updateManualSigWarning": "Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.",
+  "updateSignaturePending": "Güncelleme dosyaları sürümle birlikte yayımlanan sağlama toplamlarıyla karşılaştırılır.",
+  "updateManualSigWarning": "Aşağıdaki dosyalar sürümün sağlama toplamlarıyla eşleşiyor. Bunları resmi sürümden indirdiyseniz komutu çalıştırın.",
   "updateVersionRevoked": "This version has been recalled by the developer. Please wait for a fixed release.",
   "updateRolloutPending": "A newer version is rolling out gradually and will be offered to you automatically.",
   "updateRollbacking": "Rolling back to version {version}...",
@@ -762,7 +665,7 @@
   "extPermissionsRemoved": "No longer requested:",
   "extUpdateFailedKept": "The previous version is still installed.",
   "extConflictsTitle": "Extension conflicts",
-  "extConflictsIntro": "These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.",
+  "extConflictsIntro": "Bu uzantılar aynı şeyi istiyor. Hangisinin çalışacağını seçin; diğeri kurulu kalır.",
   "extConflictRoutingRules": "Routing rules",
   "extConflictTheme": "App theme",
   "extConflictNetHooks": "Network hooks",
@@ -849,8 +752,8 @@
   "extPermNetHooks": "Hook into the network path (DPI bypass modules)",
   "extPermNetFetch": "Fetch URLs from an allowlist",
   "extPermBackground": "Run background tasks",
-  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.",
-  "extPermNotYetActive": "Not active in this version of Sora yet — granting it changes nothing today.",
+  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Runs in the background",
   "extCapFilterTitle": "Capabilities",
   "extCapNetHook": "Bypasses & network hooks",
@@ -858,7 +761,7 @@
   "extCapRouting": "Routing rules",
   "extCapTheme": "Themes",
   "extCapWidget": "Widgets",
-  "extCatalogCached": "Cached catalog · {date}",
+  "extCatalogCached": "Cached catalog, {date}",
   "@extCatalogCached": {
     "placeholders": {
       "date": {
@@ -872,7 +775,7 @@
   "extRatingHowBody": "Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.",
   "extScreenshots": "Screenshots",
   "extSortRelevance": "Relevance",
-  "extPermNetworkDetail": "Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.",
+  "extPermNetworkDetail": "İnternetten VPN üzerinden veri alır. Yalnızca aşağıdaki sunuculara izin verilir, diğer her şey engellenir.",
   "extBgTitle": "Background task",
   "extBgEnabled": "Run in the background",
   "extBgInterval": "Run every",
@@ -892,8 +795,7 @@
       }
     }
   },
-  "extBgNote": "Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.",
-  "extBgRuntimeBadge": "Not available yet",
+  "extBgNote": "Görev, Sora açık olduğu sürece, tepside dahil, zamanlamaya göre çalışır. En kısa aralık 15 dakikadır.",
   "extBgDisabledNote": "Enable the extension to manage its background task.",
   "extCapNetwork": "Network access",
   "extCapNetworkHosts": "Network: {hosts}",
@@ -977,7 +879,7 @@
   "profileAdd": "Add profile",
   "profileName": "Profile name",
   "profileSsids": "Wi-Fi networks (SSID)",
-  "profileSsidsHint": "Home, Office — comma separated",
+  "profileSsidsHint": "Home, Office, comma separated",
   "profileGateways": "Gateways",
   "profileAsns": "AS numbers",
   "profileAutoApply": "Apply automatically",
@@ -1021,8 +923,6 @@
   "syncRevokeConfirm": "Revoke \"{name}\"?",
   "syncLastSync": "Last sync: {time}",
   "syncNever": "Never",
-  "syncWhat": "What syncs",
-  "syncWhatBody": "Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.",
   "syncNoLan": "Devices must be on the same local network",
   "syncPaired": "Device paired",
   "syncPairingTitle": "Pair with this device",
@@ -1034,7 +934,7 @@
   "edit": "Edit",
   "remove": "Remove",
   "autoSwitchOnDegrade": "Auto-switch on degradation",
-  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.",
+  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.",
   "tunStackMixed": "Mixed",
   "tunStackSystem": "System",
   "syncCodeExpired": "The code expired",
@@ -1055,7 +955,7 @@
     }
   },
   "syncJoining": "Pairing with the device…",
-  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.",
+  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.",
   "syncNewCode": "New code",
   "syncPairedWith": "{name} paired",
   "@syncPairedWith": {
@@ -1068,7 +968,7 @@
   "syncRetry": "Try again",
   "syncStopShowing": "Stop showing",
   "syncSyncNow": "Sync now",
-  "syncSyncResult": "Received {pulled} · sent {pushed}",
+  "syncSyncResult": "Received {pulled}, sent {pushed}",
   "@syncSyncResult": {
     "placeholders": {
       "pulled": {
@@ -1088,7 +988,6 @@
   "syncDocKindOverrides": "Subscription overrides",
   "syncDocKindProfiles": "Network profiles",
   "syncDocKindChains": "Proxy chains",
-  "syncDocKindObfs": "Traffic obfuscation",
   "syncFrom": "from {name}",
   "@syncFrom": {
     "placeholders": {
@@ -1098,26 +997,7 @@
     }
   },
   "syncThisDevice": "This device",
-  "syncUnavailableAndroid": "Device sync isn't available on Android yet — the sync service can't run there.",
-  "smartPickReason": "Picked by smart mode: ping {ping}, speed {speed}",
-  "@smartPickReason": {
-    "placeholders": {
-      "ping": {
-        "type": "String"
-      },
-      "speed": {
-        "type": "String"
-      }
-    }
-  },
-  "serverReliability": "Reliability {pct}%",
-  "@serverReliability": {
-    "placeholders": {
-      "pct": {
-        "type": "int"
-      }
-    }
-  },
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
   "customServerShadowsocksCredentials": "Shadowsocks için: yöntem:parola, örneğin chacha20-ietf-poly1305:parola",
   "diagnosticPackets": "Paket yakalama",
   "diagnosticEvents": "Windows etkinlikleri",

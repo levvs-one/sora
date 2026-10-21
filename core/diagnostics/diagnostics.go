@@ -98,8 +98,7 @@ func (c *Collector) Run(_ context.Context, _ session.Status) ([]string, error) {
 			"diagnostics: the source produced nothing to report")
 	}
 	// Mask in memory before the lines leave the core: engine lines and the
-	// environment section can carry hostnames, addresses, or credentials
-	// (SORA-M6).
+	// environment section can carry hostnames, addresses, or credentials.
 	for i, line := range lines {
 		lines[i] = c.mask(line)
 	}

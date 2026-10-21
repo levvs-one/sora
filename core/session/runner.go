@@ -81,7 +81,7 @@ func interfaceUp(ctx context.Context, device string) error {
 	ctx, cancel := context.WithTimeout(ctx, tunWait)
 	defer cancel()
 	// One ticker for the whole wait instead of a fresh time.After per
-	// iteration (SORA-L21).
+	// iteration.
 	ticker := time.NewTicker(50 * time.Millisecond)
 	defer ticker.Stop()
 	for {
@@ -209,7 +209,7 @@ func (s *Session) Start(ctx context.Context) error {
 	}
 	// The supervise loop, the done channel, and the engine subscription are
 	// single-use. A stop in flight (or finished) poisons the session, so a
-	// second Start is refused instead of corrupting them (SORA-M12).
+	// second Start is refused instead of corrupting them.
 	if s.stopping {
 		s.mu.Unlock()
 		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
@@ -249,8 +249,7 @@ func (s *Session) Start(ctx context.Context) error {
 	} else if tun := s.cfg.Plan.Tun; tun.Enabled && tun.DeviceName != "" {
 		if err = s.cfg.TunUp(ctx, tun.DeviceName); err != nil {
 			// The engine is torn down because the tunnel never came up;
-			// keep the stop failure visible instead of swallowing it
-			// (SORA-M16).
+			// keep the stop failure visible instead of swallowing it.
 			if stopErr := s.eng.Stop(context.WithoutCancel(ctx)); stopErr != nil {
 				s.log.Append(Event{
 					Kind:   EventError,
@@ -295,7 +294,7 @@ func (s *Session) Done() <-chan struct{} { return s.done }
 // disconnected. Repeated calls are safe from user, shutdown, and failure paths.
 // The engine shutdown has a bounded budget detached from the caller's
 // context: a cancelled Disconnect must not strand a half-stopped engine and
-// wedge the manager busy forever (SORA-H7).
+// wedge the manager busy forever.
 func (s *Session) Stop(ctx context.Context) error {
 	// Detach the shutdown budget from the caller: eng.Stop must run to
 	// completion (or the shutdown timeout) even if the Disconnect RPC that
@@ -340,7 +339,7 @@ func (s *Session) Stop(ctx context.Context) error {
 		s.engineSub = nil
 	}
 	// A failing Close can leak descriptors; keep it visible in the journal
-	// instead of swallowing it (SORA-L13).
+	// instead of swallowing it.
 	if closeErr := s.eng.Close(); closeErr != nil {
 		s.log.Append(Event{
 			Kind:   EventError,

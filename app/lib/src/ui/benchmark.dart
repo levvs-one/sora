@@ -9,7 +9,7 @@ import '../design/theme.dart';
 import '../sora.dart';
 import 'kit.dart';
 
-/// Throughput benchmark screen (FEATURE-PLAN.md F2).
+/// Throughput benchmark screen.
 ///
 /// Starts measuring [serverIds] (all servers when null) on open and shows
 /// per-server progress and results. Measurements persist across restarts and

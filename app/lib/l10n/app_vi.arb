@@ -5,7 +5,6 @@
   "stateConnected": "Đã kết nối",
   "stateReconnecting": "Đang kết nối lại",
   "stateDisconnecting": "Ngắt kết nối",
-  "stateFailed": "Không được kết nối",
   "coreMissing": "Dịch vụ Sora không phản hồi",
   "serverAuto": "Nhanh nhất",
   "serverBypass": "Không có máy chủ",
@@ -76,7 +75,6 @@
   "errSubScheme": "Liên kết phải bắt đầu bằng https://",
   "errSecretStore": "Bộ lưu trữ Sora bị hỏng hoặc không khả dụng",
   "errNoServers": "Thêm đăng ký để kết nối",
-  "exportText": "Chữ",
   "connections": "Kết nối",
   "close": "Đóng",
   "chainDirect": "Trực tiếp",
@@ -150,7 +148,6 @@
   "trafficLow": "{name}: {left} còn lại",
   "ruleInvalid": "Đây không giống một trang web, IP hay một chương trình",
   "tunnelMode": "Cách thức",
-  "tunnelTun": "Tất cả lưu lượng truy cập",
   "tunnelProxy": "Proxy System",
   "proxyAddress": "Địa chỉ proxy",
   "copied": "Đã sao chép",
@@ -187,12 +184,6 @@
   "sidebarToggle": "Chuyển đổi thanh bên",
   "more": "Hơn",
   "less": "Ít hơn",
-  "currentServer": "Máy chủ hiện tại",
-  "trafficDown": "Đã tải xuống",
-  "trafficUp": "Đã tải lên",
-  "perSecond": "{value}/s",
-  "activeRules": "Quy tắc hoạt động: {count}",
-  "recentNotifications": "Thông báo gần đây",
   "notificationsEmpty": "Sự kiện kết nối và đăng ký sẽ xuất hiện ở đây",
   "retryConnect": "Thử lại kết nối",
   "openLogs": "Mở nhật ký",
@@ -210,12 +201,9 @@
   "chooseProgram": "Chọn một chương trình",
   "installedApps": "Ứng dụng đã cài đặt",
   "runningProcesses": "Tiến trình đang chạy",
-  "programsFailed": "Không thể tải ứng dụng",
   "programsEmpty": "Không tìm thấy ứng dụng nào. Hãy thử một tên khác.",
   "selectExe": "Chọn tệp .exe",
-  "trafficUnavailable": "Bộ đếm chưa có sẵn",
   "speedtest": "Tốc độ",
-  "speedtestCheck": "Kiểm tra tốc độ",
   "speedtestSearch": "Tìm một dịch vụ",
   "speedtestEmpty": "Không có trận đấu nào. Thay đổi tìm kiếm.",
   "speedtestBackToList": "Quay lại dịch vụ",
@@ -269,14 +257,12 @@
   "telegramChannel": "Kênh Telegram",
   "licenses": "Giấy phép",
   "componentLicenses": "Giấy phép thành phần",
-  "appCopyright": "© 2026 levvs-one và những người đóng góp",
   "collapseServers": "Thu gọn máy chủ",
   "expandServers": "Mở rộng máy chủ",
   "hideDescription": "Ẩn mô tả",
   "showDescription": "Hiển thị mô tả",
   "pendingConnectionChanges": "Kết nối lại để áp dụng những thay đổi này.",
   "reconnectNow": "Áp dụng và kết nối lại",
-  "bypassLimitations": "Chế độ này chỉ bỏ qua DPI cho HTTP và TLS, không hỗ trợ UDP hoặc thay đổi IP của bạn. Sử dụng máy chủ VPN cho cuộc gọi, cuộc gọi và địa chỉ Telegram bị chặn.",
   "errEngineUnsupported": "Công cụ đã chọn không hỗ trợ cấu hình hoặc cài đặt này. Chọn Tự động hoặc động cơ tương thích.",
   "errRestore": "Việc dọn dẹp kết nối chưa hoàn tất. Thử ngắt kết nối lại; xem nhật ký để biết chi tiết.",
   "errSessionEnded": "Phiên này đã kết thúc. Làm mới trạng thái kết nối.",
@@ -286,9 +272,8 @@
   "modesGuideTitle": "Các chế độ và động cơ",
   "probeServers": "Kiểm tra máy chủ",
   "expiresIn": "{name}: {days, plural, =0{đăng ký sẽ kết thúc sau vài giờ nữa} one{đăng ký kết thúc vào ngày #} other{đăng ký kết thúc sau # ngày}}",
-  "groupOrdered": "{count, plural, one{Lần lượt máy chủ #} other{Lần lượt các máy chủ #}}",
   "groupBest": "{count, plural, one{Máy chủ #, nhanh nhất} other{Máy chủ #, nhanh nhất}}",
-  "modesGuide": "Chọn Tự động nếu bạn không chắc máy chủ của mình cần công cụ nào. Sora kiểm tra cấu hình và cài đặt trước khi kết nối. Công cụ không thể tăng băng thông gói của bạn: hiệu suất phụ thuộc vào máy chủ, tuyến đường, giao thức và mạng.\n\n## Chế độ\n\n### Tất cả lưu lượng truy cập (TUN)\n\nSora tạo giao diện mạng ảo và định tuyến lưu lượng ứng dụng qua đó, bao gồm TCP và UDP. Sử dụng chế độ này cho Telegram, trò chơi và giọng nói Discord. Các quy tắc có thể gửi trực tiếp các trang web hoặc chương trình cụ thể hoặc chặn chúng. Dịch vụ mạng cần có sự cho phép và máy chủ hỗ trợ giao thức được yêu cầu.\n\n### Proxy System\n\nSora định cấu hình proxy HTTP/SOCKS cục bộ. Các ứng dụng tôn trọng cài đặt proxy hệ thống sẽ sử dụng nó. Các ứng dụng có ngăn xếp mạng riêng có thể kết nối trực tiếp; UDP và cuộc gọi thoại thường cần TUN. Chế độ này phù hợp với các trình duyệt và ứng dụng có hỗ trợ proxy.\n\n### Không có máy chủ\n\nTrên Linux, Sora sử dụng [zapret](https://github.com/bol-van/zapret) để phân tách và định hình lại các yêu cầu HTTP/TLS cũng như bỏ qua một số kiểm tra DPI. IP của bạn vẫn giữ nguyên và các kết nối sẽ truy cập trực tiếp vào trang web. Kết quả phụ thuộc vào nhà cung cấp của bạn và phương pháp chặn.\n\nTích hợp hiện tại sử dụng tpws cho HTTP và TLS qua TCP. Nó không bỏ qua việc chặn IP hoặc chuyển tiếp UDP và không thể đảm bảo các kết nối MTProto của Telegram. Sử dụng máy chủ VPN có TUN cho giọng nói Discord, cuộc gọi Telegram và các loại hạn chế này.\n\n## Động cơ\n\n### Tự động\n\nSora chọn một công cụ được cài đặt hỗ trợ toàn bộ gói kết nối: giao thức máy chủ, truyền tải, nhóm, phân mảnh và chế độ. Lựa chọn thủ công không tương thích sẽ bị từ chối trước khi dừng kết nối hiện tại. Chọn Tự động hoặc công cụ khác và áp dụng lại cài đặt.\n\n###sing-box\n\nCác gói Sora mới bao gồm [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), một nhánh của [sing-box](https://github.com/SagerNet/sing-box), thêm XHTTP và VLESS Encryption phía máy khách. Sora công nhận bản dựng và khả năng của nó. Một bản dựng ngược dòng không có XHTTP sẽ không có được khả năng này chỉ từ tên của nó.\n\nCác giao thức được hỗ trợ bao gồm VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard và các tham số AmneziaWG 1.x/2.x Sora có thể nhập. Cấu hình JSON Xray đầy đủ yêu cầu Xray. Chưa thể nhập các trường AWG 3.x mới. sing-box sử dụng cổng điều khiển cục bộ được bảo vệ bằng mật khẩu mà các ứng dụng khác trên máy tính có thể phát hiện.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) hỗ trợ phân mảnh VLESS, REALITY, XHTTP, VLESS Encryption và TLS. Nó cũng chạy các hồ sơ Xray hoàn chỉnh của nhà cung cấp trong khi vẫn bảo toàn định tuyến và nhóm của họ. Những cấu hình như vậy không thể được tự động chuyển đổi sang một công cụ khác mà không thay đổi hành vi của chúng.\n\nXray đi kèm đã xóa cài đặt tắt xác minh chứng chỉ TLS (`allowInsecure`). Tự động chọn sing-box hoặc mihomo cho các máy chủ thông thường yêu cầu cài đặt này. Việc chọn Xray sẽ báo cáo sự không tương thích theo cách thủ công trước khi dừng kết nối hiện tại. Hồ sơ JSON đầy đủ cũ hơn cần hồ sơ nhà cung cấp được cập nhật với chứng chỉ hoặc mã chứng chỉ có thể xác minh được.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) hỗ trợ các nhóm cân bằng tải và dự phòng theo thứ tự, XHTTP và AmneziaWG. Chọn nó khi việc tự động chuyển đổi dự phòng sang máy chủ dự phòng có vấn đề. Cài đặt phân mảnh TLS của Sora không khả dụng với công cụ này.\n\n## Khả năng tương thích trong Sora\n\n| Tính năng | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN và TCP/UDP | Có | Có | Có |\n| XHTTP | Có | Có | Có |\n| VLESS Encryption | Có | Có | Có |\n| Hồ sơ Xray đầy đủ | Không | Có | Không |\n| TUIC / AnyTLS | Cả hai | Không | TUIC |\n| Phân mảnh TLS | Có | Có | Không |\n| AmneziaWG 1.x/2.x | Có¹ | Không | Có |\n| Nhóm dự phòng được đặt hàng | Không | Không có | Có |\n\n¹ Cấu hình có J1/J2/J3/Itime sử dụng mihomo; những trường này không bao giờ được loại bỏ một cách âm thầm. ² Đối với một nhóm cấu hình Xray hoàn chỉnh, ứng dụng sẽ chọn một cấu hình dự phòng. Hỗ trợ tùy thuộc vào bản dựng được cài đặt; kiểm tra phiên bản của nó trong Giới thiệu.\n\n## ngăn xếp TUN\n\nNgăn xếp xử lý TCP và UDP bên trong giao diện ảo. Trong bảng chế độ, Xray và mihomo cung cấp gVisor, System, Mixed và MIPS. Mỗi động cơ lưu tùy chọn riêng của mình. Chế độ proxy và Serverless System không sử dụng tùy chọn này.\n\n- **Mixed** — TCP sử dụng ngăn xếp hệ thống, trong khi gVisor xử lý UDP. Đây là mặc định của mihomo trên Linux. Trên Windows, Xray và mihomo mặc định dùng MIPS.\n- **System** — sử dụng ngăn xếp hệ thống. Hãy thử tùy chọn khác nếu ứng dụng mạng gặp sự cố.\n- **gVisor** — xử lý lưu lượng truy cập trong không gian người dùng.\n- **MIPS** — Ngăn xếp IP riêng của mihomo, có sẵn trong phiên bản đi kèm 1.19.32.\n\nTrên Linux, Xray sử dụng gVisor tích hợp theo mặc định. System, Mixed và MIPS trên Linux sử dụng mihomo làm công cụ TUN, chuyển tiếp TCP và UDP tới Xray qua liên kết SOCKS cục bộ đã được xác thực. Xray giữ lại giao thức, hồ sơ nhà cung cấp và định tuyến. Ba tùy chọn này yêu cầu cài đặt mihomo. Trên Windows, Xray sử dụng mihomo 1.19.32 trở lên cho cả bốn ngăn xếp TUN. Giao thức và định tuyến vẫn do Xray xử lý. Quy tắc ứng dụng trong cấu hình này chỉ hỗ trợ kết nối trực tiếp và chặn; trên Linux, các quy tắc này cần gVisor tích hợp của Xray.\n\nCây cầu chạy một quá trình thứ hai. Trong ba phép đo không hoạt động trên Linux, nó sử dụng bộ nhớ vật lý nhiều hơn khoảng 32–36 MiB so với Xray TUN gốc. Điều này không đo lường tải tải xuống: chi phí CPU và bộ nhớ phụ thuộc vào kết nối. sing-box không có bộ chọn ngăn xếp. Không có ngăn xếp nào đảm bảo hiệu suất tốt hơn trong mọi mạng. Chọn một ngăn xếp rồi chọn Áp dụng và kết nối lại để thử trong mạng của bạn.\n\n## Áp dụng cài đặt\n\nViệc chọn máy chủ sẽ tự động kết nối lại. Cài đặt chế độ, công cụ, DNS và quy tắc được lưu ngay lập tức; trong khi kết nối đang hoạt động, hãy nhấp vào Áp dụng và kết nối lại để sử dụng chúng. Việc khởi động lại công cụ có thể làm gián đoạn quá trình tải xuống và cuộc gọi. Nhấp chuột lặp đi lặp lại không bắt đầu kết nối song song; ngắt kết nối kết thúc quá trình chuyển đổi và giải phóng kết nối.\n\nInternet chỉ thông qua VPN chặn lưu lượng truy cập trực tiếp khi đường hầm bị hỏng. Nó ảnh hưởng đến toàn bộ máy. Việc ngắt kết nối rõ ràng sẽ loại bỏ các quy tắc của Sora. Nếu việc dọn dẹp không hoàn tất, hãy thử ngắt kết nối lại và mở nhật ký.\n\n## Tài liệu dự án\n\n- [sing-box-lx: cấu hình và hỗ trợ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Tài liệu sing-box](https://sing-box.sagernet.org/)\n- [Tài liệu Xray](https://xtls.github.io/)\n- [Tài liệu mihomo](https://wiki.metacubex.one/)\n- [zapret: hoạt động và những hạn chế](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Chọn Tự động nếu bạn không chắc máy chủ của mình cần công cụ nào. Sora kiểm tra cấu hình và cài đặt trước khi kết nối. Công cụ không thể tăng băng thông gói của bạn: hiệu suất phụ thuộc vào máy chủ, tuyến đường, giao thức và mạng.\n\n## Chế độ\n\n### Tất cả lưu lượng truy cập (TUN)\n\nSora tạo giao diện mạng ảo và định tuyến lưu lượng ứng dụng qua đó, bao gồm TCP và UDP. Sử dụng chế độ này cho Telegram, trò chơi và giọng nói Discord. Các quy tắc có thể gửi trực tiếp các trang web hoặc chương trình cụ thể hoặc chặn chúng. Dịch vụ mạng cần có sự cho phép và máy chủ hỗ trợ giao thức được yêu cầu.\n\n### Proxy System\n\nSora định cấu hình proxy HTTP/SOCKS cục bộ. Các ứng dụng tôn trọng cài đặt proxy hệ thống sẽ sử dụng nó. Các ứng dụng có ngăn xếp mạng riêng có thể kết nối trực tiếp; UDP và cuộc gọi thoại thường cần TUN. Chế độ này phù hợp với các trình duyệt và ứng dụng có hỗ trợ proxy.\n\n### Không có máy chủ\n\nTrên Linux, Sora sử dụng [zapret](https://github.com/bol-van/zapret) để phân tách và định hình lại các yêu cầu HTTP/TLS cũng như bỏ qua một số kiểm tra DPI. IP của bạn vẫn giữ nguyên và các kết nối sẽ truy cập trực tiếp vào trang web. Kết quả phụ thuộc vào nhà cung cấp của bạn và phương pháp chặn.\n\nTích hợp hiện tại sử dụng tpws cho HTTP và TLS qua TCP. Nó không bỏ qua việc chặn IP hoặc chuyển tiếp UDP và không thể đảm bảo các kết nối MTProto của Telegram. Sử dụng máy chủ VPN có TUN cho giọng nói Discord, cuộc gọi Telegram và các loại hạn chế này.\n\n## Động cơ\n\n### Tự động\n\nSora chọn một công cụ được cài đặt hỗ trợ toàn bộ gói kết nối: giao thức máy chủ, truyền tải, nhóm, phân mảnh và chế độ. Lựa chọn thủ công không tương thích sẽ bị từ chối trước khi dừng kết nối hiện tại. Chọn Tự động hoặc công cụ khác và áp dụng lại cài đặt.\n\n###sing-box\n\nCác gói Sora mới bao gồm [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), một nhánh của [sing-box](https://github.com/SagerNet/sing-box), thêm XHTTP và VLESS Encryption phía máy khách. Sora công nhận bản dựng và khả năng của nó. Một bản dựng ngược dòng không có XHTTP sẽ không có được khả năng này chỉ từ tên của nó.\n\nCác giao thức được hỗ trợ bao gồm VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard và các tham số AmneziaWG 1.x/2.x Sora có thể nhập. Cấu hình JSON Xray đầy đủ yêu cầu Xray. Chưa thể nhập các trường AWG 3.x mới. sing-box sử dụng cổng điều khiển cục bộ được bảo vệ bằng mật khẩu mà các ứng dụng khác trên máy tính có thể phát hiện.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) hỗ trợ phân mảnh VLESS, REALITY, XHTTP, VLESS Encryption và TLS. Nó cũng chạy các hồ sơ Xray hoàn chỉnh của nhà cung cấp trong khi vẫn bảo toàn định tuyến và nhóm của họ. Những cấu hình như vậy không thể được tự động chuyển đổi sang một công cụ khác mà không thay đổi hành vi của chúng.\n\nXray đi kèm đã xóa cài đặt tắt xác minh chứng chỉ TLS (`allowInsecure`). Tự động chọn sing-box hoặc mihomo cho các máy chủ thông thường yêu cầu cài đặt này. Việc chọn Xray sẽ báo cáo sự không tương thích theo cách thủ công trước khi dừng kết nối hiện tại. Hồ sơ JSON đầy đủ cũ hơn cần hồ sơ nhà cung cấp được cập nhật với chứng chỉ hoặc mã chứng chỉ có thể xác minh được.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) hỗ trợ các nhóm cân bằng tải và dự phòng theo thứ tự, XHTTP và AmneziaWG. Chọn nó khi việc tự động chuyển đổi dự phòng sang máy chủ dự phòng có vấn đề. Cài đặt phân mảnh TLS của Sora không khả dụng với công cụ này.\n\n## Khả năng tương thích trong Sora\n\n| Tính năng | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN và TCP/UDP | Có | Có | Có |\n| XHTTP | Có | Có | Có |\n| VLESS Encryption | Có | Có | Có |\n| Hồ sơ Xray đầy đủ | Không | Có | Không |\n| TUIC / AnyTLS | Cả hai | Không | TUIC |\n| Phân mảnh TLS | Có | Có | Không |\n| AmneziaWG 1.x/2.x | Có¹ | Không | Có |\n| Nhóm dự phòng được đặt hàng | Không | Không có | Có |\n\n¹ Cấu hình có J1/J2/J3/Itime sử dụng mihomo; những trường này không bao giờ được loại bỏ một cách âm thầm. ² Đối với một nhóm cấu hình Xray hoàn chỉnh, ứng dụng sẽ chọn một cấu hình dự phòng. Hỗ trợ tùy thuộc vào bản dựng được cài đặt; kiểm tra phiên bản của nó trong Giới thiệu.\n\n## ngăn xếp TUN\n\nNgăn xếp xử lý TCP và UDP bên trong giao diện ảo. Trong bảng chế độ, Xray và mihomo cung cấp gVisor, System, Mixed và MIPS. Mỗi động cơ lưu tùy chọn riêng của mình. Chế độ proxy và Serverless System không sử dụng tùy chọn này.\n\n- **Mixed**: TCP sử dụng ngăn xếp hệ thống, trong khi gVisor xử lý UDP. Đây là mặc định của mihomo trên Linux. Trên Windows, Xray và mihomo mặc định dùng MIPS.\n- **System**: sử dụng ngăn xếp hệ thống. Hãy thử tùy chọn khác nếu ứng dụng mạng gặp sự cố.\n- **gVisor**: xử lý lưu lượng truy cập trong không gian người dùng.\n- **MIPS**: Ngăn xếp IP riêng của mihomo, có sẵn trong phiên bản đi kèm 1.19.32.\n\nTrên Linux, Xray sử dụng gVisor tích hợp theo mặc định. System, Mixed và MIPS trên Linux sử dụng mihomo làm công cụ TUN, chuyển tiếp TCP và UDP tới Xray qua liên kết SOCKS cục bộ đã được xác thực. Xray giữ lại giao thức, hồ sơ nhà cung cấp và định tuyến. Ba tùy chọn này yêu cầu cài đặt mihomo. Trên Windows, Xray sử dụng mihomo 1.19.32 trở lên cho cả bốn ngăn xếp TUN. Giao thức và định tuyến vẫn do Xray xử lý. Quy tắc ứng dụng trong cấu hình này chỉ hỗ trợ kết nối trực tiếp và chặn; trên Linux, các quy tắc này cần gVisor tích hợp của Xray.\n\nCây cầu chạy một quá trình thứ hai. Trong ba phép đo không hoạt động trên Linux, nó sử dụng bộ nhớ vật lý nhiều hơn khoảng 32–36 MiB so với Xray TUN gốc. Điều này không đo lường tải tải xuống: chi phí CPU và bộ nhớ phụ thuộc vào kết nối. sing-box không có bộ chọn ngăn xếp. Không có ngăn xếp nào đảm bảo hiệu suất tốt hơn trong mọi mạng. Chọn một ngăn xếp rồi chọn Áp dụng và kết nối lại để thử trong mạng của bạn.\n\n## Áp dụng cài đặt\n\nViệc chọn máy chủ sẽ tự động kết nối lại. Cài đặt chế độ, công cụ, DNS và quy tắc được lưu ngay lập tức; trong khi kết nối đang hoạt động, hãy nhấp vào Áp dụng và kết nối lại để sử dụng chúng. Việc khởi động lại công cụ có thể làm gián đoạn quá trình tải xuống và cuộc gọi. Nhấp chuột lặp đi lặp lại không bắt đầu kết nối song song; ngắt kết nối kết thúc quá trình chuyển đổi và giải phóng kết nối.\n\nInternet chỉ thông qua VPN chặn lưu lượng truy cập trực tiếp khi đường hầm bị hỏng. Nó ảnh hưởng đến toàn bộ máy. Việc ngắt kết nối rõ ràng sẽ loại bỏ các quy tắc của Sora. Nếu việc dọn dẹp không hoàn tất, hãy thử ngắt kết nối lại và mở nhật ký.\n\n## Tài liệu dự án\n\n- [sing-box-lx: cấu hình và hỗ trợ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Tài liệu sing-box](https://sing-box.sagernet.org/)\n- [Tài liệu Xray](https://xtls.github.io/)\n- [Tài liệu mihomo](https://wiki.metacubex.one/)\n- [zapret: hoạt động và những hạn chế](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -410,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -448,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -479,7 +443,6 @@
   "extensions": "Tiện ích mở rộng",
   "diagnosticNoData": "Chưa có yêu cầu nào được ghi lại. Trước tiên hãy mở một trang web kiểm tra tốc độ.",
   "diagnosticHttp": "Chẩn đoán HTTP",
-  "diagnosticArchive": "Core diagnostics archive",
   "exportLogFile": "Lưu vào {name}",
   "@exportLogFile": {
     "placeholders": {
@@ -488,40 +451,6 @@
       }
     }
   },
-  "censorTitle": "Blocking diagnostics",
-  "censorHistory": "Check history",
-  "censorEmpty": "No checks yet. If a connection fails, the detector will check whether your provider is blocking it.",
-  "censorExplainer": "This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.",
-  "censorNoProfile": "No suitable profile for this verdict",
-  "censorApplyProfile": "Apply recommended profile",
-  "censorEnable": "Enable",
-  "censorDetails": "Details",
-  "censorNotNow": "Not now",
-  "censorPromptTitle": "Connection may be blocked",
-  "censorPromptBody": "It looks like your provider is blocking the connection (confidence {confidence}%). Try masking?",
-  "@censorPromptBody": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorConfidence": "Confidence: {confidence}%",
-  "@censorConfidence": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorKindBlocked": "Blocking detected",
-  "censorKindLikely": "Looks like blocking",
-  "censorKindClear": "No blocking detected",
-  "censorKindUnknown": "Could not determine",
-  "censorReasonTlsReset": "TLS connections are being reset — a typical sign of filtering",
-  "censorReasonHttpBlock": "HTTP requests are being blocked",
-  "censorReasonDnsSpoofed": "DNS responses are being spoofed",
-  "censorReasonConnectTimeout": "Connections keep timing out",
   "customServerAdd": "Add custom server",
   "customServers": "My servers",
   "customServerName": "Name",
@@ -540,7 +469,6 @@
   "customServerShowSecret": "Show secret",
   "customServerHideSecret": "Hide secret",
   "customServerBadge": "custom",
-  "flowAuto": "auto",
   "customServerDeleteConfirm": "Delete server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -551,7 +479,6 @@
   },
   "customServerEmptyHint": "Add a server manually: address, port and protocol",
   "customServerTest": "Test",
-  "errObfsUnsupported": "The installed core is too old for obfuscation profiles. Update Sora to apply them.",
   "leakTestTitle": "Leak test",
   "leakTestIntro": "Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.",
   "leakTestRun": "Run test",
@@ -574,41 +501,17 @@
       }
     }
   },
-  "leakTestSkipped": "Skipped — not applicable in this session",
+  "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Fix",
-  "leakTestFixedNote": "Kill switch is on — run the test again to verify.",
+  "leakTestFixedNote": "Kill switch is on, run the test again to verify.",
   "leakTestCheckDirectDns": "Direct DNS",
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
   "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
   "leakTestCheckTunnelDns": "Tunnel DNS",
-  "noticeDegraded": "The server slowed down — switched to the best measured one",
+  "noticeDegraded": "The server slowed down, switched to the best measured one",
   "obfs": "Traffic obfuscation",
-  "obfsPreset": "Preset",
-  "obfsPresetAggressive": "Maximum obfuscation",
-  "obfsPresetBalanced": "Balanced",
-  "obfsPresetOff": "Speed",
-  "obfsPresetCustom": "Custom",
-  "obfsManual": "Manual settings",
-  "obfsUtls": "uTLS profile",
-  "obfsUtlsAuto": "Auto",
-  "obfsJitter": "Timing jitter",
-  "obfsJitterNeedsFragment": "Jitter only works with fragmentation enabled.",
-  "obfsFineTune": "Sizes and delays",
-  "obfsDetecting": "Detecting capabilities…",
-  "obfsCapabilities": "Engine capabilities",
-  "obfsCompatibleEngines": "Compatible engines: {engines}",
-  "@obfsCompatibleEngines": {
-    "placeholders": {
-      "engines": {
-        "type": "String"
-      }
-    }
-  },
-  "obfsSupported": "Supported",
-  "obfsUnsupported": "Not supported",
-  "obfsUnknown": "Capabilities are still being detected.",
   "latencyMs": "{value} ms",
   "@latencyMs": {
     "placeholders": {
@@ -625,8 +528,8 @@
       }
     }
   },
-  "updateSignaturePending": "Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.",
-  "updateManualSigWarning": "Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.",
+  "updateSignaturePending": "Tệp cập nhật được đối chiếu với checksum công bố kèm bản phát hành.",
+  "updateManualSigWarning": "Các tệp dưới đây khớp với checksum của bản phát hành. Hãy chạy lệnh nếu bạn tải chúng từ bản phát hành chính thức.",
   "updateVersionRevoked": "This version has been recalled by the developer. Please wait for a fixed release.",
   "updateRolloutPending": "A newer version is rolling out gradually and will be offered to you automatically.",
   "updateRollbacking": "Rolling back to version {version}...",
@@ -762,7 +665,7 @@
   "extPermissionsRemoved": "No longer requested:",
   "extUpdateFailedKept": "The previous version is still installed.",
   "extConflictsTitle": "Extension conflicts",
-  "extConflictsIntro": "These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.",
+  "extConflictsIntro": "Các tiện ích này muốn cùng một thứ. Chọn tiện ích sẽ chạy; tiện ích còn lại vẫn được cài đặt.",
   "extConflictRoutingRules": "Routing rules",
   "extConflictTheme": "App theme",
   "extConflictNetHooks": "Network hooks",
@@ -849,8 +752,8 @@
   "extPermNetHooks": "Hook into the network path (DPI bypass modules)",
   "extPermNetFetch": "Fetch URLs from an allowlist",
   "extPermBackground": "Run background tasks",
-  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.",
-  "extPermNotYetActive": "Not active in this version of Sora yet — granting it changes nothing today.",
+  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Runs in the background",
   "extCapFilterTitle": "Capabilities",
   "extCapNetHook": "Bypasses & network hooks",
@@ -858,7 +761,7 @@
   "extCapRouting": "Routing rules",
   "extCapTheme": "Themes",
   "extCapWidget": "Widgets",
-  "extCatalogCached": "Cached catalog · {date}",
+  "extCatalogCached": "Cached catalog, {date}",
   "@extCatalogCached": {
     "placeholders": {
       "date": {
@@ -872,7 +775,7 @@
   "extRatingHowBody": "Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.",
   "extScreenshots": "Screenshots",
   "extSortRelevance": "Relevance",
-  "extPermNetworkDetail": "Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.",
+  "extPermNetworkDetail": "Tải dữ liệu từ internet qua VPN. Chỉ các máy chủ bên dưới được phép, còn lại đều bị chặn.",
   "extBgTitle": "Background task",
   "extBgEnabled": "Run in the background",
   "extBgInterval": "Run every",
@@ -892,8 +795,7 @@
       }
     }
   },
-  "extBgNote": "Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.",
-  "extBgRuntimeBadge": "Not available yet",
+  "extBgNote": "Tác vụ chạy theo lịch khi Sora đang mở, kể cả khi ở khay hệ thống. Khoảng cách ngắn nhất là 15 phút.",
   "extBgDisabledNote": "Enable the extension to manage its background task.",
   "extCapNetwork": "Network access",
   "extCapNetworkHosts": "Network: {hosts}",
@@ -977,7 +879,7 @@
   "profileAdd": "Add profile",
   "profileName": "Profile name",
   "profileSsids": "Wi-Fi networks (SSID)",
-  "profileSsidsHint": "Home, Office — comma separated",
+  "profileSsidsHint": "Home, Office, comma separated",
   "profileGateways": "Gateways",
   "profileAsns": "AS numbers",
   "profileAutoApply": "Apply automatically",
@@ -1021,8 +923,6 @@
   "syncRevokeConfirm": "Revoke \"{name}\"?",
   "syncLastSync": "Last sync: {time}",
   "syncNever": "Never",
-  "syncWhat": "What syncs",
-  "syncWhatBody": "Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.",
   "syncNoLan": "Devices must be on the same local network",
   "syncPaired": "Device paired",
   "syncPairingTitle": "Pair with this device",
@@ -1034,7 +934,7 @@
   "edit": "Edit",
   "remove": "Remove",
   "autoSwitchOnDegrade": "Auto-switch on degradation",
-  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.",
+  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.",
   "tunStackMixed": "Mixed",
   "tunStackSystem": "System",
   "syncCodeExpired": "The code expired",
@@ -1055,7 +955,7 @@
     }
   },
   "syncJoining": "Pairing with the device…",
-  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.",
+  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.",
   "syncNewCode": "New code",
   "syncPairedWith": "{name} paired",
   "@syncPairedWith": {
@@ -1068,7 +968,7 @@
   "syncRetry": "Try again",
   "syncStopShowing": "Stop showing",
   "syncSyncNow": "Sync now",
-  "syncSyncResult": "Received {pulled} · sent {pushed}",
+  "syncSyncResult": "Received {pulled}, sent {pushed}",
   "@syncSyncResult": {
     "placeholders": {
       "pulled": {
@@ -1088,7 +988,6 @@
   "syncDocKindOverrides": "Subscription overrides",
   "syncDocKindProfiles": "Network profiles",
   "syncDocKindChains": "Proxy chains",
-  "syncDocKindObfs": "Traffic obfuscation",
   "syncFrom": "from {name}",
   "@syncFrom": {
     "placeholders": {
@@ -1098,26 +997,7 @@
     }
   },
   "syncThisDevice": "This device",
-  "syncUnavailableAndroid": "Device sync isn't available on Android yet — the sync service can't run there.",
-  "smartPickReason": "Picked by smart mode: ping {ping}, speed {speed}",
-  "@smartPickReason": {
-    "placeholders": {
-      "ping": {
-        "type": "String"
-      },
-      "speed": {
-        "type": "String"
-      }
-    }
-  },
-  "serverReliability": "Reliability {pct}%",
-  "@serverReliability": {
-    "placeholders": {
-      "pct": {
-        "type": "int"
-      }
-    }
-  },
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
   "customServerShadowsocksCredentials": "Với Shadowsocks: phương thức:mật khẩu, ví dụ chacha20-ietf-poly1305:matkhau",
   "diagnosticPackets": "Chụp gói",
   "diagnosticEvents": "Sự kiện Windows",

@@ -1,5 +1,5 @@
 /// The extensions section: catalog and installed tabs, search, categories,
-/// one-tap install / enable / update. Replaces the "coming soon" stub.
+/// one-tap install / enable / update.
 library;
 
 import 'dart:async';

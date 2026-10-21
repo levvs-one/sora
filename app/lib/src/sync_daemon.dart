@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 import 'sync_api.dart';
 
-/// Lifecycle states of the sora-sync device-sync daemon (F9).
+/// Lifecycle states of the sora-sync device-sync daemon.
 enum SyncDaemonState {
   /// Not started yet.
   idle,
@@ -47,7 +47,7 @@ class SyncDaemonException implements Exception {
   String toString() => 'SyncDaemonException: $message';
 }
 
-/// Owns the sora-sync device-sync daemon process (F9).
+/// Owns the sora-sync device-sync daemon process.
 ///
 /// The daemon is a separate Go service (`service/sync`, binary `sora-sync`).
 /// The app resolves the binary per platform, spawns it on demand with

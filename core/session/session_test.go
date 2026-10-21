@@ -573,7 +573,7 @@ func (e *hangingEngine) Stop(ctx context.Context) error {
 	return ctx.Err()
 }
 
-// TestStopBoundsAHungEngine locks SORA-H7: a running engine that never
+// TestStopBoundsAHungEngine: a running engine that never
 // completes Stop must exhaust the shutdown budget without wedging the manager.
 func TestStopBoundsAHungEngine(t *testing.T) {
 	eng := &hangingEngine{fakeEngine: newFakeEngine()}
@@ -605,7 +605,7 @@ func TestStopBoundsAHungEngine(t *testing.T) {
 	}
 }
 
-// TestSessionRefusesASecondStartAfterStop locks SORA-M12: the supervise
+// TestSessionRefusesASecondStartAfterStop: the supervise
 // loop, the done channel, and the engine subscription are single-use, so a
 // Start after Stop must fail instead of corrupting them.
 func TestSessionRefusesASecondStartAfterStop(t *testing.T) {
@@ -642,7 +642,7 @@ func TestStopOnAFreshSessionLeavesItUsable(t *testing.T) {
 	t.Cleanup(func() { _ = s.Stop(context.Background()) })
 }
 
-// TestSessionLogsTheTeardownStopFailure locks SORA-M16: when the tunnel
+// TestSessionLogsTheTeardownStopFailure: when the tunnel
 // never comes up, the engine is torn down and a failing Stop must be
 // visible in the journal instead of swallowed.
 func TestSessionLogsTheTeardownStopFailure(t *testing.T) {

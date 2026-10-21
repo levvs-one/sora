@@ -60,7 +60,7 @@ func (o Outbound) Identifiers() []string {
 	if o.TLS.ServerName != "" {
 		out = append(out, o.TLS.ServerName)
 	}
-	// REALITY parameters are public but identify the server (SORA-L9).
+	// REALITY parameters are public but identify the server.
 	for _, id := range []string{o.TLS.RealityPublicKey, o.TLS.RealityShortID, o.TLS.SpiderX} {
 		if id != "" {
 			out = append(out, id)
@@ -100,7 +100,7 @@ func (o Outbound) Warnings() []string {
 
 // validProtocols whitelists the protocols a plan may hold, so an unknown
 // protocol fails validation with a clear error instead of surfacing late at
-// eng.Apply (SORA-L16).
+// eng.Apply.
 var validProtocols = map[Protocol]bool{
 	ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 	ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,

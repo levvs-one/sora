@@ -25,9 +25,6 @@ class SDe extends S {
   String get stateDisconnecting => 'Trennen';
 
   @override
-  String get stateFailed => 'Nicht verbunden';
-
-  @override
   String get coreMissing => 'Der Sora-Dienst antwortet nicht';
 
   @override
@@ -268,9 +265,6 @@ class SDe extends S {
   String get errNoServers => 'Fügen Sie ein Abonnement hinzu, um eine Verbindung herzustellen';
 
   @override
-  String get exportText => 'Text';
-
-  @override
   String get connections => 'Verbindungen';
 
   @override
@@ -509,17 +503,6 @@ class SDe extends S {
   String get ruleInvalid => 'Dies sieht nicht nach einer Site, einer IP oder einem Programm aus';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '#-Server wiederum',
-      one: '#-Server wiederum',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -532,9 +515,6 @@ class SDe extends S {
 
   @override
   String get tunnelMode => 'Modus';
-
-  @override
-  String get tunnelTun => 'Der gesamte Verkehr';
 
   @override
   String get tunnelProxy => 'System-Proxy';
@@ -650,28 +630,6 @@ class SDe extends S {
   String get less => 'Weniger';
 
   @override
-  String get currentServer => 'Aktueller Server';
-
-  @override
-  String get trafficDown => 'Heruntergeladen';
-
-  @override
-  String get trafficUp => 'Hochgeladen';
-
-  @override
-  String perSecond(String value) {
-    return '$value/s';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Aktive Regeln: $count';
-  }
-
-  @override
-  String get recentNotifications => 'Aktuelle Benachrichtigungen';
-
-  @override
   String get notificationsEmpty => 'Hier werden Verbindungs- und Abonnementereignisse angezeigt';
 
   @override
@@ -725,22 +683,13 @@ class SDe extends S {
   String get runningProcesses => 'Laufende Prozesse';
 
   @override
-  String get programsFailed => 'Anwendungen konnten nicht geladen werden';
-
-  @override
   String get programsEmpty => 'Keine Anwendungen gefunden. Versuchen Sie es mit einem anderen Namen.';
 
   @override
   String get selectExe => 'Wählen Sie eine .exe-Datei';
 
   @override
-  String get trafficUnavailable => 'Zähler sind noch nicht verfügbar';
-
-  @override
   String get speedtest => 'Geschwindigkeit';
-
-  @override
-  String get speedtestCheck => 'Geschwindigkeit prüfen';
 
   @override
   String get speedtestSearch => 'Finden Sie einen Dienst';
@@ -838,11 +787,11 @@ class SDe extends S {
 
   @override
   String get updateSignaturePending =>
-      'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+      'Update-Dateien werden mit den Prüfsummen abgeglichen, die mit dem Release veröffentlicht werden.';
 
   @override
   String get updateManualSigWarning =>
-      'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
+      'Die Dateien unten passen zu den Prüfsummen des Releases. Führe den Befehl aus, wenn du sie aus dem offiziellen Release geladen hast.';
 
   @override
   String get updateVersionRevoked =>
@@ -895,9 +844,6 @@ class SDe extends S {
   String get componentLicenses => 'Komponentenlizenzen';
 
   @override
-  String get appCopyright => '© 2026 levvs-one und Mitwirkende';
-
-  @override
   String get collapseServers => 'Server zusammenbrechen lassen';
 
   @override
@@ -914,10 +860,6 @@ class SDe extends S {
 
   @override
   String get reconnectNow => 'Anwenden und erneut verbinden';
-
-  @override
-  String get bypassLimitations =>
-      'Dieser Modus umgeht DPI nur für HTTP und TLS, unterstützt kein UDP und ändert Ihre IP nicht. Verwenden Sie einen VPN-Server für Discord-Sprache, Anrufe und blockierte Telegram-Adressen.';
 
   @override
   String get errEngineUnsupported =>
@@ -1172,7 +1114,7 @@ class SDe extends S {
 
   @override
   String get extConflictsIntro =>
-      'These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.';
+      'Diese Erweiterungen wollen dasselbe. Wähle, welche läuft; die andere bleibt installiert.';
 
   @override
   String get extConflictRoutingRules => 'Routing rules';
@@ -1302,10 +1244,10 @@ class SDe extends S {
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
+      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet — granting it changes nothing today.';
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
   String get extCapBackground => 'Runs in the background';
@@ -1330,7 +1272,7 @@ class SDe extends S {
 
   @override
   String extCatalogCached(String date) {
-    return 'Cached catalog · $date';
+    return 'Cached catalog, $date';
   }
 
   @override
@@ -1354,7 +1296,7 @@ class SDe extends S {
 
   @override
   String get extPermNetworkDetail =>
-      'Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.';
+      'Lädt Daten über das VPN aus dem Internet. Nur die Hosts unten sind erlaubt, alles andere ist gesperrt.';
 
   @override
   String get extBgTitle => 'Background task';
@@ -1379,10 +1321,7 @@ class SDe extends S {
 
   @override
   String get extBgNote =>
-      'Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.';
-
-  @override
-  String get extBgRuntimeBadge => 'Not available yet';
+      'Die Aufgabe läuft nach Zeitplan, solange Sora geöffnet ist, auch im Tray. Das kürzeste Intervall sind 15 Minuten.';
 
   @override
   String get extBgDisabledNote => 'Enable the extension to manage its background task.';
@@ -1402,9 +1341,6 @@ class SDe extends S {
 
   @override
   String get diagnosticHttp => 'HTTP-Diagnose';
-
-  @override
-  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData =>
@@ -1636,7 +1572,7 @@ class SDe extends S {
   String get profileSsids => 'Wi-Fi networks (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office — comma separated';
+  String get profileSsidsHint => 'Home, Office, comma separated';
 
   @override
   String get profileGateways => 'Gateways';
@@ -1784,13 +1720,6 @@ class SDe extends S {
   String get syncNever => 'Never';
 
   @override
-  String get syncWhat => 'What syncs';
-
-  @override
-  String get syncWhatBody =>
-      'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.';
-
-  @override
   String get syncNoLan => 'Devices must be on the same local network';
 
   @override
@@ -1826,79 +1755,13 @@ class SDe extends S {
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.';
+      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
 
   @override
   String get tunStackMixed => 'Mixed';
 
   @override
   String get tunStackSystem => 'System';
-
-  @override
-  String get censorTitle => 'Blocking diagnostics';
-
-  @override
-  String get censorHistory => 'Check history';
-
-  @override
-  String get censorEmpty =>
-      'No checks yet. If a connection fails, the detector will check whether your provider is blocking it.';
-
-  @override
-  String get censorExplainer =>
-      'This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.';
-
-  @override
-  String get censorNoProfile => 'No suitable profile for this verdict';
-
-  @override
-  String get censorApplyProfile => 'Apply recommended profile';
-
-  @override
-  String get censorEnable => 'Enable';
-
-  @override
-  String get censorDetails => 'Details';
-
-  @override
-  String get censorNotNow => 'Not now';
-
-  @override
-  String get censorPromptTitle => 'Connection may be blocked';
-
-  @override
-  String censorPromptBody(int confidence) {
-    return 'It looks like your provider is blocking the connection (confidence $confidence%). Try masking?';
-  }
-
-  @override
-  String censorConfidence(int confidence) {
-    return 'Confidence: $confidence%';
-  }
-
-  @override
-  String get censorKindBlocked => 'Blocking detected';
-
-  @override
-  String get censorKindLikely => 'Looks like blocking';
-
-  @override
-  String get censorKindClear => 'No blocking detected';
-
-  @override
-  String get censorKindUnknown => 'Could not determine';
-
-  @override
-  String get censorReasonTlsReset => 'TLS connections are being reset — a typical sign of filtering';
-
-  @override
-  String get censorReasonHttpBlock => 'HTTP requests are being blocked';
-
-  @override
-  String get censorReasonDnsSpoofed => 'DNS responses are being spoofed';
-
-  @override
-  String get censorReasonConnectTimeout => 'Connections keep timing out';
 
   @override
   String get customServerAdd => 'Add custom server';
@@ -1955,9 +1818,6 @@ class SDe extends S {
   String get customServerBadge => 'custom';
 
   @override
-  String get flowAuto => 'auto';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Delete server “$name”?';
   }
@@ -1967,9 +1827,6 @@ class SDe extends S {
 
   @override
   String get customServerTest => 'Test';
-
-  @override
-  String get errObfsUnsupported => 'The installed core is too old for obfuscation profiles. Update Sora to apply them.';
 
   @override
   String get leakTestTitle => 'Leak test';
@@ -2002,13 +1859,13 @@ class SDe extends S {
   }
 
   @override
-  String get leakTestSkipped => 'Skipped — not applicable in this session';
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
   String get leakTestFix => 'Fix';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on — run the test again to verify.';
+  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';
@@ -2029,63 +1886,10 @@ class SDe extends S {
   String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
-  String get noticeDegraded => 'The server slowed down — switched to the best measured one';
+  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
 
   @override
   String get obfs => 'Traffic obfuscation';
-
-  @override
-  String get obfsPreset => 'Preset';
-
-  @override
-  String get obfsPresetAggressive => 'Maximum obfuscation';
-
-  @override
-  String get obfsPresetBalanced => 'Balanced';
-
-  @override
-  String get obfsPresetOff => 'Speed';
-
-  @override
-  String get obfsPresetCustom => 'Custom';
-
-  @override
-  String get obfsManual => 'Manual settings';
-
-  @override
-  String get obfsUtls => 'uTLS profile';
-
-  @override
-  String get obfsUtlsAuto => 'Auto';
-
-  @override
-  String get obfsJitter => 'Timing jitter';
-
-  @override
-  String get obfsJitterNeedsFragment => 'Jitter only works with fragmentation enabled.';
-
-  @override
-  String get obfsFineTune => 'Sizes and delays';
-
-  @override
-  String get obfsDetecting => 'Detecting capabilities…';
-
-  @override
-  String get obfsCapabilities => 'Engine capabilities';
-
-  @override
-  String obfsCompatibleEngines(String engines) {
-    return 'Compatible engines: $engines';
-  }
-
-  @override
-  String get obfsSupported => 'Supported';
-
-  @override
-  String get obfsUnsupported => 'Not supported';
-
-  @override
-  String get obfsUnknown => 'Capabilities are still being detected.';
 
   @override
   String get syncCodeExpired => 'The code expired';
@@ -2125,7 +1929,7 @@ class SDe extends S {
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.';
+      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
 
   @override
   String get syncNewCode => 'New code';
@@ -2146,7 +1950,7 @@ class SDe extends S {
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled · sent $pushed';
+    return 'Received $pulled, sent $pushed';
   }
 
   @override
@@ -2177,9 +1981,6 @@ class SDe extends S {
   String get syncDocKindChains => 'Proxy chains';
 
   @override
-  String get syncDocKindObfs => 'Traffic obfuscation';
-
-  @override
   String syncFrom(String name) {
     return 'from $name';
   }
@@ -2189,17 +1990,7 @@ class SDe extends S {
 
   @override
   String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet — the sync service can\'t run there.';
-
-  @override
-  String smartPickReason(String ping, String speed) {
-    return 'Picked by smart mode: ping $ping, speed $speed';
-  }
-
-  @override
-  String serverReliability(int pct) {
-    return 'Reliability $pct%';
-  }
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
   String get customServerShadowsocksCredentials =>

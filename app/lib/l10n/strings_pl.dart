@@ -25,9 +25,6 @@ class SPl extends S {
   String get stateDisconnecting => 'Rozłączanie';
 
   @override
-  String get stateFailed => 'Nie podłączony';
-
-  @override
   String get coreMissing => 'Usługa Sora nie odpowiada';
 
   @override
@@ -268,9 +265,6 @@ class SPl extends S {
   String get errNoServers => 'Dodaj subskrypcję, aby się połączyć';
 
   @override
-  String get exportText => 'Tekst';
-
-  @override
   String get connections => 'Znajomości';
 
   @override
@@ -509,17 +503,6 @@ class SPl extends S {
   String get ruleInvalid => 'To nie wygląda na witrynę, adres IP ani program';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Z kolei serwery #',
-      one: 'Z kolei serwer #',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -532,9 +515,6 @@ class SPl extends S {
 
   @override
   String get tunnelMode => 'Tryb';
-
-  @override
-  String get tunnelTun => 'Cały ruch';
 
   @override
   String get tunnelProxy => 'Serwer proxy System';
@@ -651,28 +631,6 @@ class SPl extends S {
   String get less => 'Mniej';
 
   @override
-  String get currentServer => 'Obecny serwer';
-
-  @override
-  String get trafficDown => 'Pobrano';
-
-  @override
-  String get trafficUp => 'Załadowany';
-
-  @override
-  String perSecond(String value) {
-    return '$value/s';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Aktywne reguły: $count';
-  }
-
-  @override
-  String get recentNotifications => 'Najnowsze powiadomienia';
-
-  @override
   String get notificationsEmpty => 'Tutaj pojawią się zdarzenia połączenia i subskrypcji';
 
   @override
@@ -726,22 +684,13 @@ class SPl extends S {
   String get runningProcesses => 'Uruchomione procesy';
 
   @override
-  String get programsFailed => 'Nie można załadować aplikacji';
-
-  @override
   String get programsEmpty => 'Nie znaleziono żadnych aplikacji. Spróbuj innej nazwy.';
 
   @override
   String get selectExe => 'Wybierz plik .exe';
 
   @override
-  String get trafficUnavailable => 'Liczniki nie są jeszcze dostępne';
-
-  @override
   String get speedtest => 'Prędkość';
-
-  @override
-  String get speedtestCheck => 'Sprawdź prędkość';
 
   @override
   String get speedtestSearch => 'Znajdź usługę';
@@ -838,11 +787,11 @@ class SPl extends S {
 
   @override
   String get updateSignaturePending =>
-      'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+      'Pliki aktualizacji są porównywane z sumami kontrolnymi opublikowanymi z wydaniem.';
 
   @override
   String get updateManualSigWarning =>
-      'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
+      'Pliki poniżej zgadzają się z sumami kontrolnymi wydania. Uruchom polecenie, jeśli pobrano je z oficjalnego wydania.';
 
   @override
   String get updateVersionRevoked =>
@@ -895,9 +844,6 @@ class SPl extends S {
   String get componentLicenses => 'Licencje na komponenty';
 
   @override
-  String get appCopyright => '© 2026 levvs-one i współautorzy';
-
-  @override
   String get collapseServers => 'Zwiń serwery';
 
   @override
@@ -914,10 +860,6 @@ class SPl extends S {
 
   @override
   String get reconnectNow => 'Zastosuj i połącz ponownie';
-
-  @override
-  String get bypassLimitations =>
-      'Ten tryb omija DPI tylko dla HTTP i TLS, nie obsługuje UDP ani nie zmienia adresu IP. Użyj serwera VPN dla głosu, połączeń i zablokowanych adresów Telegram Discord.';
 
   @override
   String get errEngineUnsupported =>
@@ -944,7 +886,7 @@ class SPl extends S {
 
   @override
   String get modesGuide =>
-      'Wybierz opcję Auto, jeśli nie masz pewności, jakiego silnika potrzebuje Twój serwer. Sora sprawdza profil i ustawienia przed połączeniem. Silnik nie może zwiększyć przepustowości Twojego planu: wydajność zależy od serwera, trasy, protokołu i sieci.\n\n## Tryby\n\n### Cały ruch (TUN)\n\nSora tworzy wirtualny interfejs sieciowy i kieruje przez niego ruch aplikacji, w tym TCP i UDP. Użyj tego trybu dla Telegram, gier i głosu Discord. Reguły mogą bezpośrednio wysyłać określone witryny lub programy lub je blokować. Usługa sieciowa wymaga pozwolenia i serwera obsługującego wymagany protokół.\n\n### Serwer proxy System\n\nSora konfiguruje lokalny serwer proxy HTTP/SOCKS. Używają go aplikacje, które respektują systemowe ustawienia proxy. Aplikacje posiadające własny stos sieciowy mogą łączyć się bezpośrednio; Połączenia UDP i głosowe zazwyczaj wymagają TUN. Ten tryb jest odpowiedni dla przeglądarek i aplikacji obsługujących proxy.\n\n### Brak serwera\n\nW przypadku Linux Sora używa [zapret](https://github.com/bol-van/zapret) do dzielenia i przekształcania żądań HTTP/TLS oraz omijania niektórych kontroli DPI. Twój adres IP pozostaje taki sam, a połączenia przechodzą bezpośrednio na stronę internetową. Wyniki zależą od dostawcy i metody blokowania.\n\nObecna integracja wykorzystuje tpws dla HTTP i TLS przez TCP. Nie omija blokowania IP ani przekazywania UDP i nie może zagwarantować połączeń MTProto Telegram. Użyj serwera VPN z TUN dla głosu Discord, połączeń Telegram i tego rodzaju ograniczeń.\n\n## Silniki\n\n### Automatycznie\n\nSora wybiera zainstalowany silnik, który obsługuje cały plan połączeń: protokoły serwera, transporty, grupy, fragmentację i tryb. Niezgodny wybór ręczny zostanie odrzucony przed zatrzymaniem bieżącego połączenia. Wybierz Auto lub inny silnik i ponownie zastosuj ustawienia.\n\n### sing-box\n\nNowe pakiety Sora obejmują [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), rozwidlenie [sing-box](https://github.com/SagerNet/sing-box), dodanie XHTTP i VLESS Encryption po stronie klienta. Sora rozpoznaje konstrukcję i jej możliwości. Wersja wcześniejsza bez XHTTP nie zyskuje tej możliwości dzięki samej nazwie.\n\nObsługiwane protokoły obejmują parametry VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard i AmneziaWG 1.x/2.x Sora może importować. Pełne profile JSON Xray wymagają Xray. Nie można jeszcze importować nowych pól AWG 3.x. sing-box wykorzystuje chroniony hasłem port sterowania lokalnego, który mogą wykryć inne aplikacje na komputerze.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) obsługuje fragmentację VLESS, REALITY, XHTTP, VLESS Encryption i TLS. Obsługuje również kompletne profile dostawców Xray, zachowując jednocześnie ich routing i grupy. Takich profili nie można automatycznie przekonwertować na inny silnik bez zmiany ich zachowania.\n\nW zestawie Xray usunięto ustawienie wyłączające weryfikację certyfikatu TLS („allowInsecure”). Automatycznie wybiera sing-box lub mihomo dla zwykłych serwerów wymagających tego ustawienia. Wybranie Xray powoduje ręczne zgłoszenie niezgodności przed zatrzymaniem bieżącego połączenia. Starsze pełne profile JSON wymagają zaktualizowanego profilu dostawcy z weryfikowalnym certyfikatem lub kodem PIN certyfikatu.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) obsługuje uporządkowane grupy awaryjne i równoważące obciążenie, XHTTP i AmneziaWG. Wybierz tę opcję, gdy liczy się automatyczne przełączanie awaryjne na serwer zapasowy. Ustawienie fragmentacji TLS w Sora jest niedostępne w tym silniku.\n\n## Zgodność z Sora\n\n| Funkcja | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN i TCP/UDP | Tak | Tak | Tak |\n| XHTTP | Tak | Tak | Tak |\n| VLESS Encryption | Tak | Tak | Tak |\n| Pełny profil Xray | Nie | Tak | Nie |\n| TUIC / AnyTLS | Obydwa | Nie | TUIC |\n| Fragmentacja TLS | Tak | Tak | Nie |\n| AmneziaWG 1.x/2.x | Tak¹ | Nie | Tak |\n| Zamówiona grupa rezerwowa | Nie | Nie² | Tak |\n\n¹ Profile z J1/J2/J3/Itime wykorzystują mihomo; tych pól nie można nigdy po cichu odrzucić. ² Dla grupy kompletnych profili Xray aplikacja wybiera profil zapasowy. Wsparcie zależy od zainstalowanej kompilacji; sprawdź jego wersję w About.\n\n## Stos TUN\n\nStos obsługuje protokoły TCP i UDP wewnątrz interfejsu wirtualnego. W panelu trybów Xray i mihomo oferują gVisor, System, Mixed i MIPS. Każdy silnik zapisuje swoje własne preferencje. Tryby proxy i bezserwerowe System nie korzystają z tej preferencji.\n\n- **Mixed** — TCP korzysta ze stosu systemowego, natomiast gVisor obsługuje UDP. Jest to domyślne ustawienie mihomo w systemie Linux. W systemie Windows Xray i mihomo domyślnie używają MIPS.\n- **System** — używa stosu systemowego. Wypróbuj inną opcję, jeśli aplikacje sieciowe napotykają problemy.\n- **gVisor** — obsługuje ruch w przestrzeni użytkownika.\n- **MIPS** — własny stos IP mihomo, dostępny w dołączonej wersji 1.19.32.\n\nW Linux Xray domyślnie używa wbudowanego gVisor. System, Mixed i MIPS w Linux używają mihomo jako silnika TUN, przekazując TCP i UDP do Xray przez uwierzytelnione lokalne łącze SOCKS. Xray zachowuje protokół, profil dostawcy i routing. Te trzy opcje wymagają zainstalowanego mihomo. W przypadku Windows Xray używa mihomo 1.19.32 lub nowszego dla wszystkich czterech stosów TUN. Protokoły i routing pozostają w Xray. Reguły aplikacji w tym połączeniu obsługują tylko połączenia bezpośrednie i blokowanie; w Linux wymagają wbudowanego gVisor Xray.\n\nMost uruchamia drugi proces. W trzech pomiarach bezczynności Linux zużywał on około 32–36 MiB więcej pamięci fizycznej niż natywny Xray TUN. Nie mierzy to obciążenia pobierania: koszty procesora i pamięci zależą od połączeń. sing-box nie ma selektora stosu. Brak stosu gwarantuje lepszą wydajność w każdej sieci. Wybierz stos, a następnie wybierz Zastosuj i połącz ponownie, aby wypróbować go w swojej sieci.\n\n## Stosowanie ustawień\n\nWybranie serwera powoduje automatyczne ponowne połączenie. Ustawienia trybu, silnika, DNS i reguł są zapisywane natychmiast; podczas aktywnego połączenia kliknij Zastosuj i połącz się ponownie, aby z nich skorzystać. Ponowne uruchomienie silnika może przerwać pobieranie i połączenia. Powtarzające się kliknięcia nie uruchamiają połączeń równoległych; rozłączenie kończy przejście i zwalnia połączenie.\n\nInternet tylko przez VPN blokuje bezpośredni ruch w przypadku opadnięcia tunelu. Ma to wpływ na całą maszynę. Wyraźne rozłączenie usuwa reguły Sora. Jeśli czyszczenie nie zakończy się, spróbuj ponownie rozłączyć się i otwórz dziennik.\n\n## Dokumentacja projektu\n\n- [sing-box-lx: konfiguracja i wsparcie](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Dokumentacja sing-box](https://sing-box.sagernet.org/)\n- [Dokumentacja Xray](https://xtls.github.io/)\n- [Dokumentacja mihomo](https://wiki.metacubex.one/)\n- [zapret: działanie i ograniczenia](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Wybierz opcję Auto, jeśli nie masz pewności, jakiego silnika potrzebuje Twój serwer. Sora sprawdza profil i ustawienia przed połączeniem. Silnik nie może zwiększyć przepustowości Twojego planu: wydajność zależy od serwera, trasy, protokołu i sieci.\n\n## Tryby\n\n### Cały ruch (TUN)\n\nSora tworzy wirtualny interfejs sieciowy i kieruje przez niego ruch aplikacji, w tym TCP i UDP. Użyj tego trybu dla Telegram, gier i głosu Discord. Reguły mogą bezpośrednio wysyłać określone witryny lub programy lub je blokować. Usługa sieciowa wymaga pozwolenia i serwera obsługującego wymagany protokół.\n\n### Serwer proxy System\n\nSora konfiguruje lokalny serwer proxy HTTP/SOCKS. Używają go aplikacje, które respektują systemowe ustawienia proxy. Aplikacje posiadające własny stos sieciowy mogą łączyć się bezpośrednio; Połączenia UDP i głosowe zazwyczaj wymagają TUN. Ten tryb jest odpowiedni dla przeglądarek i aplikacji obsługujących proxy.\n\n### Brak serwera\n\nW przypadku Linux Sora używa [zapret](https://github.com/bol-van/zapret) do dzielenia i przekształcania żądań HTTP/TLS oraz omijania niektórych kontroli DPI. Twój adres IP pozostaje taki sam, a połączenia przechodzą bezpośrednio na stronę internetową. Wyniki zależą od dostawcy i metody blokowania.\n\nObecna integracja wykorzystuje tpws dla HTTP i TLS przez TCP. Nie omija blokowania IP ani przekazywania UDP i nie może zagwarantować połączeń MTProto Telegram. Użyj serwera VPN z TUN dla głosu Discord, połączeń Telegram i tego rodzaju ograniczeń.\n\n## Silniki\n\n### Automatycznie\n\nSora wybiera zainstalowany silnik, który obsługuje cały plan połączeń: protokoły serwera, transporty, grupy, fragmentację i tryb. Niezgodny wybór ręczny zostanie odrzucony przed zatrzymaniem bieżącego połączenia. Wybierz Auto lub inny silnik i ponownie zastosuj ustawienia.\n\n### sing-box\n\nNowe pakiety Sora obejmują [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), rozwidlenie [sing-box](https://github.com/SagerNet/sing-box), dodanie XHTTP i VLESS Encryption po stronie klienta. Sora rozpoznaje konstrukcję i jej możliwości. Wersja wcześniejsza bez XHTTP nie zyskuje tej możliwości dzięki samej nazwie.\n\nObsługiwane protokoły obejmują parametry VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard i AmneziaWG 1.x/2.x Sora może importować. Pełne profile JSON Xray wymagają Xray. Nie można jeszcze importować nowych pól AWG 3.x. sing-box wykorzystuje chroniony hasłem port sterowania lokalnego, który mogą wykryć inne aplikacje na komputerze.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) obsługuje fragmentację VLESS, REALITY, XHTTP, VLESS Encryption i TLS. Obsługuje również kompletne profile dostawców Xray, zachowując jednocześnie ich routing i grupy. Takich profili nie można automatycznie przekonwertować na inny silnik bez zmiany ich zachowania.\n\nW zestawie Xray usunięto ustawienie wyłączające weryfikację certyfikatu TLS („allowInsecure”). Automatycznie wybiera sing-box lub mihomo dla zwykłych serwerów wymagających tego ustawienia. Wybranie Xray powoduje ręczne zgłoszenie niezgodności przed zatrzymaniem bieżącego połączenia. Starsze pełne profile JSON wymagają zaktualizowanego profilu dostawcy z weryfikowalnym certyfikatem lub kodem PIN certyfikatu.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) obsługuje uporządkowane grupy awaryjne i równoważące obciążenie, XHTTP i AmneziaWG. Wybierz tę opcję, gdy liczy się automatyczne przełączanie awaryjne na serwer zapasowy. Ustawienie fragmentacji TLS w Sora jest niedostępne w tym silniku.\n\n## Zgodność z Sora\n\n| Funkcja | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN i TCP/UDP | Tak | Tak | Tak |\n| XHTTP | Tak | Tak | Tak |\n| VLESS Encryption | Tak | Tak | Tak |\n| Pełny profil Xray | Nie | Tak | Nie |\n| TUIC / AnyTLS | Obydwa | Nie | TUIC |\n| Fragmentacja TLS | Tak | Tak | Nie |\n| AmneziaWG 1.x/2.x | Tak¹ | Nie | Tak |\n| Zamówiona grupa rezerwowa | Nie | Nie² | Tak |\n\n¹ Profile z J1/J2/J3/Itime wykorzystują mihomo; tych pól nie można nigdy po cichu odrzucić. ² Dla grupy kompletnych profili Xray aplikacja wybiera profil zapasowy. Wsparcie zależy od zainstalowanej kompilacji; sprawdź jego wersję w About.\n\n## Stos TUN\n\nStos obsługuje protokoły TCP i UDP wewnątrz interfejsu wirtualnego. W panelu trybów Xray i mihomo oferują gVisor, System, Mixed i MIPS. Każdy silnik zapisuje swoje własne preferencje. Tryby proxy i bezserwerowe System nie korzystają z tej preferencji.\n\n- **Mixed**: TCP korzysta ze stosu systemowego, natomiast gVisor obsługuje UDP. Jest to domyślne ustawienie mihomo w systemie Linux. W systemie Windows Xray i mihomo domyślnie używają MIPS.\n- **System**: używa stosu systemowego. Wypróbuj inną opcję, jeśli aplikacje sieciowe napotykają problemy.\n- **gVisor**: obsługuje ruch w przestrzeni użytkownika.\n- **MIPS**: własny stos IP mihomo, dostępny w dołączonej wersji 1.19.32.\n\nW Linux Xray domyślnie używa wbudowanego gVisor. System, Mixed i MIPS w Linux używają mihomo jako silnika TUN, przekazując TCP i UDP do Xray przez uwierzytelnione lokalne łącze SOCKS. Xray zachowuje protokół, profil dostawcy i routing. Te trzy opcje wymagają zainstalowanego mihomo. W przypadku Windows Xray używa mihomo 1.19.32 lub nowszego dla wszystkich czterech stosów TUN. Protokoły i routing pozostają w Xray. Reguły aplikacji w tym połączeniu obsługują tylko połączenia bezpośrednie i blokowanie; w Linux wymagają wbudowanego gVisor Xray.\n\nMost uruchamia drugi proces. W trzech pomiarach bezczynności Linux zużywał on około 32–36 MiB więcej pamięci fizycznej niż natywny Xray TUN. Nie mierzy to obciążenia pobierania: koszty procesora i pamięci zależą od połączeń. sing-box nie ma selektora stosu. Brak stosu gwarantuje lepszą wydajność w każdej sieci. Wybierz stos, a następnie wybierz Zastosuj i połącz ponownie, aby wypróbować go w swojej sieci.\n\n## Stosowanie ustawień\n\nWybranie serwera powoduje automatyczne ponowne połączenie. Ustawienia trybu, silnika, DNS i reguł są zapisywane natychmiast; podczas aktywnego połączenia kliknij Zastosuj i połącz się ponownie, aby z nich skorzystać. Ponowne uruchomienie silnika może przerwać pobieranie i połączenia. Powtarzające się kliknięcia nie uruchamiają połączeń równoległych; rozłączenie kończy przejście i zwalnia połączenie.\n\nInternet tylko przez VPN blokuje bezpośredni ruch w przypadku opadnięcia tunelu. Ma to wpływ na całą maszynę. Wyraźne rozłączenie usuwa reguły Sora. Jeśli czyszczenie nie zakończy się, spróbuj ponownie rozłączyć się i otwórz dziennik.\n\n## Dokumentacja projektu\n\n- [sing-box-lx: konfiguracja i wsparcie](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Dokumentacja sing-box](https://sing-box.sagernet.org/)\n- [Dokumentacja Xray](https://xtls.github.io/)\n- [Dokumentacja mihomo](https://wiki.metacubex.one/)\n- [zapret: działanie i ograniczenia](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'Sprawdź serwery';
@@ -1172,7 +1114,7 @@ class SPl extends S {
 
   @override
   String get extConflictsIntro =>
-      'These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.';
+      'Te rozszerzenia chcą tego samego. Wybierz, które ma działać; drugie zostanie zainstalowane.';
 
   @override
   String get extConflictRoutingRules => 'Routing rules';
@@ -1302,10 +1244,10 @@ class SPl extends S {
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
+      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet — granting it changes nothing today.';
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
   String get extCapBackground => 'Runs in the background';
@@ -1330,7 +1272,7 @@ class SPl extends S {
 
   @override
   String extCatalogCached(String date) {
-    return 'Cached catalog · $date';
+    return 'Cached catalog, $date';
   }
 
   @override
@@ -1354,7 +1296,7 @@ class SPl extends S {
 
   @override
   String get extPermNetworkDetail =>
-      'Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.';
+      'Pobiera dane z internetu przez VPN. Dozwolone są tylko hosty z listy poniżej, wszystko inne jest blokowane.';
 
   @override
   String get extBgTitle => 'Background task';
@@ -1379,10 +1321,7 @@ class SPl extends S {
 
   @override
   String get extBgNote =>
-      'Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.';
-
-  @override
-  String get extBgRuntimeBadge => 'Not available yet';
+      'Zadanie działa według harmonogramu, dopóki Sora jest otwarta, także w zasobniku. Najkrótszy odstęp to 15 minut.';
 
   @override
   String get extBgDisabledNote => 'Enable the extension to manage its background task.';
@@ -1402,9 +1341,6 @@ class SPl extends S {
 
   @override
   String get diagnosticHttp => 'Diagnostyka HTTP';
-
-  @override
-  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'Nie ma jeszcze zarejestrowanych żądań. Najpierw otwórz witrynę z testami prędkości.';
@@ -1635,7 +1571,7 @@ class SPl extends S {
   String get profileSsids => 'Wi-Fi networks (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office — comma separated';
+  String get profileSsidsHint => 'Home, Office, comma separated';
 
   @override
   String get profileGateways => 'Gateways';
@@ -1783,13 +1719,6 @@ class SPl extends S {
   String get syncNever => 'Never';
 
   @override
-  String get syncWhat => 'What syncs';
-
-  @override
-  String get syncWhatBody =>
-      'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.';
-
-  @override
   String get syncNoLan => 'Devices must be on the same local network';
 
   @override
@@ -1825,79 +1754,13 @@ class SPl extends S {
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.';
+      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
 
   @override
   String get tunStackMixed => 'Mixed';
 
   @override
   String get tunStackSystem => 'System';
-
-  @override
-  String get censorTitle => 'Blocking diagnostics';
-
-  @override
-  String get censorHistory => 'Check history';
-
-  @override
-  String get censorEmpty =>
-      'No checks yet. If a connection fails, the detector will check whether your provider is blocking it.';
-
-  @override
-  String get censorExplainer =>
-      'This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.';
-
-  @override
-  String get censorNoProfile => 'No suitable profile for this verdict';
-
-  @override
-  String get censorApplyProfile => 'Apply recommended profile';
-
-  @override
-  String get censorEnable => 'Enable';
-
-  @override
-  String get censorDetails => 'Details';
-
-  @override
-  String get censorNotNow => 'Not now';
-
-  @override
-  String get censorPromptTitle => 'Connection may be blocked';
-
-  @override
-  String censorPromptBody(int confidence) {
-    return 'It looks like your provider is blocking the connection (confidence $confidence%). Try masking?';
-  }
-
-  @override
-  String censorConfidence(int confidence) {
-    return 'Confidence: $confidence%';
-  }
-
-  @override
-  String get censorKindBlocked => 'Blocking detected';
-
-  @override
-  String get censorKindLikely => 'Looks like blocking';
-
-  @override
-  String get censorKindClear => 'No blocking detected';
-
-  @override
-  String get censorKindUnknown => 'Could not determine';
-
-  @override
-  String get censorReasonTlsReset => 'TLS connections are being reset — a typical sign of filtering';
-
-  @override
-  String get censorReasonHttpBlock => 'HTTP requests are being blocked';
-
-  @override
-  String get censorReasonDnsSpoofed => 'DNS responses are being spoofed';
-
-  @override
-  String get censorReasonConnectTimeout => 'Connections keep timing out';
 
   @override
   String get customServerAdd => 'Add custom server';
@@ -1954,9 +1817,6 @@ class SPl extends S {
   String get customServerBadge => 'custom';
 
   @override
-  String get flowAuto => 'auto';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Delete server “$name”?';
   }
@@ -1966,9 +1826,6 @@ class SPl extends S {
 
   @override
   String get customServerTest => 'Test';
-
-  @override
-  String get errObfsUnsupported => 'The installed core is too old for obfuscation profiles. Update Sora to apply them.';
 
   @override
   String get leakTestTitle => 'Leak test';
@@ -2001,13 +1858,13 @@ class SPl extends S {
   }
 
   @override
-  String get leakTestSkipped => 'Skipped — not applicable in this session';
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
   String get leakTestFix => 'Fix';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on — run the test again to verify.';
+  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';
@@ -2028,63 +1885,10 @@ class SPl extends S {
   String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
-  String get noticeDegraded => 'The server slowed down — switched to the best measured one';
+  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
 
   @override
   String get obfs => 'Traffic obfuscation';
-
-  @override
-  String get obfsPreset => 'Preset';
-
-  @override
-  String get obfsPresetAggressive => 'Maximum obfuscation';
-
-  @override
-  String get obfsPresetBalanced => 'Balanced';
-
-  @override
-  String get obfsPresetOff => 'Speed';
-
-  @override
-  String get obfsPresetCustom => 'Custom';
-
-  @override
-  String get obfsManual => 'Manual settings';
-
-  @override
-  String get obfsUtls => 'uTLS profile';
-
-  @override
-  String get obfsUtlsAuto => 'Auto';
-
-  @override
-  String get obfsJitter => 'Timing jitter';
-
-  @override
-  String get obfsJitterNeedsFragment => 'Jitter only works with fragmentation enabled.';
-
-  @override
-  String get obfsFineTune => 'Sizes and delays';
-
-  @override
-  String get obfsDetecting => 'Detecting capabilities…';
-
-  @override
-  String get obfsCapabilities => 'Engine capabilities';
-
-  @override
-  String obfsCompatibleEngines(String engines) {
-    return 'Compatible engines: $engines';
-  }
-
-  @override
-  String get obfsSupported => 'Supported';
-
-  @override
-  String get obfsUnsupported => 'Not supported';
-
-  @override
-  String get obfsUnknown => 'Capabilities are still being detected.';
 
   @override
   String get syncCodeExpired => 'The code expired';
@@ -2124,7 +1928,7 @@ class SPl extends S {
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.';
+      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
 
   @override
   String get syncNewCode => 'New code';
@@ -2145,7 +1949,7 @@ class SPl extends S {
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled · sent $pushed';
+    return 'Received $pulled, sent $pushed';
   }
 
   @override
@@ -2176,9 +1980,6 @@ class SPl extends S {
   String get syncDocKindChains => 'Proxy chains';
 
   @override
-  String get syncDocKindObfs => 'Traffic obfuscation';
-
-  @override
   String syncFrom(String name) {
     return 'from $name';
   }
@@ -2188,17 +1989,7 @@ class SPl extends S {
 
   @override
   String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet — the sync service can\'t run there.';
-
-  @override
-  String smartPickReason(String ping, String speed) {
-    return 'Picked by smart mode: ping $ping, speed $speed';
-  }
-
-  @override
-  String serverReliability(int pct) {
-    return 'Reliability $pct%';
-  }
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
   String get customServerShadowsocksCredentials =>

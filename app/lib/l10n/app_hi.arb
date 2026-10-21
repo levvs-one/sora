@@ -5,7 +5,6 @@
   "stateConnected": "जुड़े हुए",
   "stateReconnecting": "पुनः कनेक्ट हो",
   "stateDisconnecting": "डिस्कनेक्ट कर रहा है",
-  "stateFailed": "जुड़े नहीं हैं",
   "coreMissing": "Sora सेवा प्रतिसाद नहीं दे रही है",
   "serverAuto": "सबसे तेजी से",
   "serverBypass": "कोई सर्वर नहीं",
@@ -76,7 +75,6 @@
   "errSubScheme": "लिंक https:// से शुरू होना चाहिए",
   "errSecretStore": "Sora भंडारण क्षतिग्रस्त या अनुपलब्ध है",
   "errNoServers": "कनेक्ट करने के लिए सदस्यता जोड़ें",
-  "exportText": "मूलपाठ",
   "connections": "कनेक्शन",
   "close": "बंद करना",
   "chainDirect": "प्रत्यक्ष",
@@ -150,7 +148,6 @@
   "trafficLow": "{name}: {left} बाएँ",
   "ruleInvalid": "यह किसी साइट, आईपी या प्रोग्राम जैसा नहीं दिखता है",
   "tunnelMode": "तरीका",
-  "tunnelTun": "सारा यातायात",
   "tunnelProxy": "System प्रॉक्सी",
   "proxyAddress": "प्रॉक्सी पता",
   "copied": "कॉपी किया गया",
@@ -187,12 +184,6 @@
   "sidebarToggle": "साइडबार टॉगल करें",
   "more": "अधिक",
   "less": "कम",
-  "currentServer": "वर्तमान सर्वर",
-  "trafficDown": "डाउनलोड",
-  "trafficUp": "अपलोड किए गए",
-  "perSecond": "{value}/s",
-  "activeRules": "सक्रिय नियम: {count}",
-  "recentNotifications": "हाल की सूचनाएं",
   "notificationsEmpty": "कनेक्शन और सदस्यता ईवेंट यहां दिखाई देंगे",
   "retryConnect": "कनेक्शन पुनः प्रयास करें",
   "openLogs": "लॉग खोलें",
@@ -210,12 +201,9 @@
   "chooseProgram": "एक प्रोग्राम चुनें",
   "installedApps": "इंस्टॉल किए गए एप्लिकेशन",
   "runningProcesses": "चल रही प्रक्रियाएँ",
-  "programsFailed": "एप्लिकेशन लोड नहीं हो सके",
   "programsEmpty": "कोई एप्लिकेशन नहीं मिला. कोई दूसरा नाम आज़माएं.",
   "selectExe": "कोई .exe फ़ाइल चुनें",
-  "trafficUnavailable": "अभी तक काउंटर उपलब्ध नहीं हैं",
   "speedtest": "रफ़्तार",
-  "speedtestCheck": "गति की जाँच करें",
   "speedtestSearch": "एक सेवा खोजें",
   "speedtestEmpty": "कोई मेल नहीं। खोज बदलें.",
   "speedtestBackToList": "सेवाओं पर वापस जाएँ",
@@ -269,14 +257,12 @@
   "telegramChannel": "Telegram चैनल",
   "licenses": "लाइसेंस",
   "componentLicenses": "घटक लाइसेंस",
-  "appCopyright": "© 2026 लेव्स-वन और योगदानकर्ता",
   "collapseServers": "सर्वर संक्षिप्त करें",
   "expandServers": "सर्वर का विस्तार करें",
   "hideDescription": "विवरण छिपाएँ",
   "showDescription": "विवरण दिखाएँ",
   "pendingConnectionChanges": "इन परिवर्तनों को लागू करने के लिए पुनः कनेक्ट करें।",
   "reconnectNow": "आवेदन करें और पुनः कनेक्ट करें",
-  "bypassLimitations": "यह मोड केवल HTTP और TLS के लिए DPI को बायपास करता है, UDP का समर्थन नहीं करता है या आपके IP को नहीं बदलता है। Discord आवाज, कॉल और अवरुद्ध Telegram पतों के लिए वीपीएन सर्वर का उपयोग करें।",
   "errEngineUnsupported": "चयनित इंजन इस प्रोफ़ाइल या सेटिंग्स का समर्थन नहीं करता है. ऑटो या संगत इंजन चुनें.",
   "errRestore": "कनेक्शन सफ़ाई अधूरी थी. डिस्कनेक्ट करने का पुनः प्रयास करें; विवरण के लिए लॉग देखें.",
   "errSessionEnded": "यह सत्र पहले ही समाप्त हो चुका है. कनेक्शन स्थिति ताज़ा करें.",
@@ -286,7 +272,6 @@
   "modesGuideTitle": "मोड और इंजन",
   "probeServers": "सर्वरों की जाँच करें",
   "expiresIn": "{name}: {days, plural, =0{सदस्यता कुछ ही घंटों में समाप्त हो जाती है} one{सदस्यता # दिन में समाप्त होती है} other{सदस्यता # दिनों में समाप्त हो जाती है}}",
-  "groupOrdered": "{count, plural, one{# सर्वर, बदले में} other{# सर्वर, बदले में}}",
   "groupBest": "{count, plural, one{# सर्वर, सबसे तेज़} other{# सर्वर, सबसे तेज़}}",
   "modesGuide": "यदि आप अनिश्चित हैं कि आपके सर्वर को किस इंजन की आवश्यकता है तो ऑटो चुनें। Sora कनेक्ट करने से पहले प्रोफ़ाइल और सेटिंग्स की जाँच करता है। कोई इंजन आपके प्लान की बैंडविड्थ नहीं बढ़ा सकता: प्रदर्शन सर्वर, रूट, प्रोटोकॉल और नेटवर्क पर निर्भर करता है।\n\n## मोड\n\n### समस्त ट्रैफ़िक (TUN)\n\nSora एक वर्चुअल नेटवर्क इंटरफ़ेस बनाता है और टीसीपी और यूडीपी सहित इसके माध्यम से एप्लिकेशन ट्रैफ़िक को रूट करता है। इस मोड का उपयोग Telegram, गेम्स और Discord वॉयस के लिए करें। नियम विशिष्ट साइटों या कार्यक्रमों को सीधे भेज सकते हैं या उन्हें ब्लॉक कर सकते हैं। नेटवर्क सेवा को अनुमति और एक सर्वर की आवश्यकता होती है जो आवश्यक प्रोटोकॉल का समर्थन करता हो।\n\n### System प्रॉक्सी\n\nSora एक स्थानीय HTTP/SOCKS प्रॉक्सी को कॉन्फ़िगर करता है। सिस्टम प्रॉक्सी सेटिंग्स का सम्मान करने वाले एप्लिकेशन इसका उपयोग करते हैं। अपने स्वयं के नेटवर्क स्टैक वाले एप्लिकेशन सीधे कनेक्ट हो सकते हैं; यूडीपी और वॉयस कॉल के लिए आम तौर पर TUN की आवश्यकता होती है। यह मोड प्रॉक्सी समर्थन वाले ब्राउज़र और एप्लिकेशन के लिए उपयुक्त है।\n\n### कोई सर्वर नहीं\n\nLinux पर, Sora HTTP/TLS अनुरोधों को विभाजित और नया आकार देने और कुछ DPI जांचों को बायपास करने के लिए [zapret](https://github.com/bol-van/zapret) का उपयोग करता है। आपका आईपी वही रहता है और कनेक्शन सीधे वेबसाइट पर चले जाते हैं। परिणाम आपके प्रदाता और अवरुद्ध करने की विधि पर निर्भर करते हैं।\n\nवर्तमान एकीकरण टीसीपी पर HTTP और TLS के लिए tpws का उपयोग करता है। यह आईपी ब्लॉकिंग या रिले यूडीपी को बायपास नहीं करता है, और Telegram के MTProto कनेक्शन की गारंटी नहीं दे सकता है। Discord वॉयस, Telegram कॉल और इस प्रकार के प्रतिबंधों के लिए TUN वाले वीपीएन सर्वर का उपयोग करें।\n\n## इंजन\n\n### ऑटो\n\nSora एक स्थापित इंजन का चयन करता है जो संपूर्ण कनेक्शन योजना का समर्थन करता है: सर्वर प्रोटोकॉल, ट्रांसपोर्ट, समूह, विखंडन और मोड। वर्तमान कनेक्शन को रोकने से पहले एक असंगत मैन्युअल विकल्प को अस्वीकार कर दिया जाता है। ऑटो या अन्य इंजन चुनें और सेटिंग्स फिर से लागू करें।\n\n### sing-box\n\nनए Sora पैकेज में [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) का एक कांटा, क्लाइंट-साइड XHTTP और VLESS Encryption शामिल है। Sora निर्माण और उसकी क्षमताओं को पहचानता है। XHTTP के बिना एक अपस्ट्रीम बिल्ड केवल इसके नाम से यह क्षमता हासिल नहीं करता है।\n\nसमर्थित प्रोटोकॉल में VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard और AmneziaWG 1.x/2.x पैरामीटर शामिल हैं। Sora आयात कर सकते हैं. पूर्ण Xray JSON प्रोफाइल के लिए Xray की आवश्यकता होती है। नई AWG 3.x फ़ील्ड अभी तक आयात नहीं की जा सकतीं. sing-box एक पासवर्ड-संरक्षित स्थानीय नियंत्रण पोर्ट का उपयोग करता है, जिसे कंप्यूटर पर अन्य एप्लिकेशन पता लगा सकते हैं।\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption और TLS विखंडन का समर्थन करता है। यह उनकी रूटिंग और समूहों को संरक्षित करते हुए संपूर्ण प्रदाता Xray प्रोफाइल भी चलाता है। ऐसी प्रोफ़ाइलों को उनके व्यवहार को बदले बिना स्वचालित रूप से किसी अन्य इंजन में परिवर्तित नहीं किया जा सकता है।\n\nबंडल किए गए Xray ने उस सेटिंग को हटा दिया जो TLS प्रमाणपत्र सत्यापन (`allowInsecure`) को अक्षम कर देती है। इस सेटिंग की आवश्यकता वाले सामान्य सर्वर के लिए स्वतः sing-box या mihomo का चयन करता है। Xray का चयन वर्तमान कनेक्शन को रोकने से पहले मैन्युअल रूप से असंगतता की रिपोर्ट करता है। पुराने पूर्ण JSON प्रोफाइल को सत्यापन योग्य प्रमाणपत्र या प्रमाणपत्र पिन के साथ एक अद्यतन प्रदाता प्रोफ़ाइल की आवश्यकता होती है।\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) ऑर्डर किए गए फ़ॉलबैक और लोड-बैलेंसिंग समूहों, XHTTP और AmneziaWG का समर्थन करता है। जब बैकअप सर्वर पर स्वचालित विफलता मायने रखती है तो इसे चुनें। इस इंजन के साथ Sora की TLS फ़्रेग्मेंटेशन सेटिंग उपलब्ध नहीं है।\n\n## Sora में अनुकूलता\n\n| फ़ीचर | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows ट्यून और टीसीपी/यूडीपी | हाँ | हाँ | हाँ |\n| XHTTP | हाँ | हाँ | हाँ |\n| VLESS Encryption | हाँ | हाँ | हाँ |\n| पूर्ण Xray प्रोफ़ाइल | नहीं | हाँ | नहीं |\n| TUIC / AnyTLS | दोनों | नहीं | TUIC |\n| टीएलएस विखंडन | हाँ | हाँ | नहीं |\n| AmneziaWG 1.x/2.x | हाँ¹ | नहीं | हाँ |\n| आदेशित फ़ॉलबैक समूह | नहीं | नहीं² | हाँ |\n\n¹ J1/J2/J3/Itime वाली प्रोफ़ाइलें mihomo का उपयोग करती हैं; इन क्षेत्रों को कभी भी चुपचाप नहीं छोड़ा जाना चाहिए। ² संपूर्ण Xray प्रोफाइल के समूह के लिए, ऐप एक बैकअप प्रोफ़ाइल का चयन करता है। समर्थन स्थापित बिल्ड पर निर्भर करता है; अबाउट में इसका संस्करण जांचें।\n\n## ट्यून स्टैक\n\nस्टैक वर्चुअल इंटरफ़ेस के अंदर टीसीपी और यूडीपी को संभालता है। मोड पैनल में, Xray और mihomo gVisor, System, Mixed और MIPS ऑफर करते हैं। प्रत्येक इंजन अपनी प्राथमिकता बचाता है। System प्रॉक्सी और सर्वर रहित मोड इस प्राथमिकता का उपयोग नहीं करते हैं।\n\n- **Mixed** - टीसीपी सिस्टम स्टैक का उपयोग करता है, जबकि gVisor यूडीपी को संभालता है। Linux पर यह mihomo का डिफ़ॉल्ट है। Windows पर Xray और mihomo डिफ़ॉल्ट रूप से MIPS का उपयोग करते हैं।\n- **System** - सिस्टम स्टैक का उपयोग करता है। यदि नेटवर्क अनुप्रयोगों में समस्याएँ आती हैं तो दूसरा विकल्प आज़माएँ।\n- **gVisor** - यूजरस्पेस में ट्रैफिक को संभालता है।\n- **MIPS** - mihomo का अपना आईपी स्टैक, बंडल संस्करण 1.19.32 में उपलब्ध है।\n\nLinux पर, Xray डिफ़ॉल्ट रूप से अपने अंतर्निहित gVisor का उपयोग करता है। System, Mixed और Linux पर MIPS TUN इंजन के रूप में mihomo का उपयोग करते हैं, एक प्रमाणित स्थानीय SOCKS लिंक पर TCP और UDP को Xray पर अग्रेषित करते हैं। Xray प्रोटोकॉल, प्रदाता प्रोफ़ाइल और रूटिंग को बरकरार रखता है। इन तीन विकल्पों के लिए एक स्थापित mihomo की आवश्यकता होती है। Windows पर Xray चारों TUN स्टैक के लिए mihomo 1.19.32 या नया संस्करण उपयोग करता है। प्रोटोकॉल और रूटिंग Xray में रहते हैं। इस संयोजन में ऐप के नियम केवल सीधे कनेक्शन और ब्लॉक करने का समर्थन करते हैं; Linux पर इन नियमों के लिए Xray का अंतर्निहित gVisor आवश्यक है।\n\nब्रिज दूसरी प्रक्रिया चलाता है। Linux पर तीन निष्क्रिय मापों में, इसने मूल Xray TUN की तुलना में लगभग 32-36 MiB अधिक भौतिक मेमोरी का उपयोग किया। यह डाउनलोड लोड को मापता नहीं है: सीपीयू और मेमोरी की लागत कनेक्शन पर निर्भर करती है। sing-box में कोई स्टैक चयनकर्ता नहीं है। कोई भी स्टैक हर नेटवर्क में बेहतर प्रदर्शन की गारंटी नहीं देता। एक स्टैक चुनें और इसे अपने नेटवर्क में आज़माने के लिए लागू करें और पुनः कनेक्ट करें चुनें।\n\n## सेटिंग्स लागू करना\n\nसर्वर का चयन स्वचालित रूप से पुनः कनेक्ट हो जाता है। मोड, इंजन, डीएनएस और नियम सेटिंग्स तुरंत सहेजी जाती हैं; सक्रिय कनेक्शन के दौरान, लागू करें पर क्लिक करें और उनका उपयोग करने के लिए पुनः कनेक्ट करें। इंजन को पुनः आरंभ करने से डाउनलोड और कॉल बाधित हो सकते हैं। बार-बार क्लिक करने से समानांतर कनेक्शन प्रारंभ नहीं होते; डिस्कनेक्ट करने से संक्रमण समाप्त हो जाता है और कनेक्शन रिलीज़ हो जाता है।\n\nसुरंग गिरने पर केवल वीपीएन के माध्यम से इंटरनेट सीधे यातायात को अवरुद्ध करता है। इसका असर पूरी मशीन पर पड़ता है. एक स्पष्ट डिस्कनेक्ट Sora के नियमों को हटा देता है। यदि सफ़ाई समाप्त नहीं होती है, तो डिस्कनेक्ट करने का पुनः प्रयास करें और लॉग खोलें।\n\n## परियोजना दस्तावेज़ीकरण\n\n- [sing-box-lx: कॉन्फ़िगरेशन और समर्थन](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box दस्तावेज़](https://sing-box.sagernet.org/)\n- [Xray दस्तावेज़](https://xtls.github.io/)\n- [mihomo दस्तावेज़](https://wiki.metacubex.one/)\n- [zapret: संचालन और सीमाएं](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
@@ -410,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -448,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -478,7 +442,6 @@
   },
   "extensions": "एक्सटेंशन",
   "diagnosticHttp": "HTTP डायग्नोस्टिक्स",
-  "diagnosticArchive": "Core diagnostics archive",
   "exportLogFile": "फ़ाइल में {name}",
   "diagnosticNoData": "अभी तक कोई रिकॉर्डेड अनुरोध नहीं. सबसे पहले एक स्पीड टेस्ट वेबसाइट खोलें।",
   "@exportLogFile": {
@@ -488,40 +451,6 @@
       }
     }
   },
-  "censorTitle": "Blocking diagnostics",
-  "censorHistory": "Check history",
-  "censorEmpty": "No checks yet. If a connection fails, the detector will check whether your provider is blocking it.",
-  "censorExplainer": "This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.",
-  "censorNoProfile": "No suitable profile for this verdict",
-  "censorApplyProfile": "Apply recommended profile",
-  "censorEnable": "Enable",
-  "censorDetails": "Details",
-  "censorNotNow": "Not now",
-  "censorPromptTitle": "Connection may be blocked",
-  "censorPromptBody": "It looks like your provider is blocking the connection (confidence {confidence}%). Try masking?",
-  "@censorPromptBody": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorConfidence": "Confidence: {confidence}%",
-  "@censorConfidence": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorKindBlocked": "Blocking detected",
-  "censorKindLikely": "Looks like blocking",
-  "censorKindClear": "No blocking detected",
-  "censorKindUnknown": "Could not determine",
-  "censorReasonTlsReset": "TLS connections are being reset — a typical sign of filtering",
-  "censorReasonHttpBlock": "HTTP requests are being blocked",
-  "censorReasonDnsSpoofed": "DNS responses are being spoofed",
-  "censorReasonConnectTimeout": "Connections keep timing out",
   "customServerAdd": "Add custom server",
   "customServers": "My servers",
   "customServerName": "Name",
@@ -540,7 +469,6 @@
   "customServerShowSecret": "Show secret",
   "customServerHideSecret": "Hide secret",
   "customServerBadge": "custom",
-  "flowAuto": "auto",
   "customServerDeleteConfirm": "Delete server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -551,7 +479,6 @@
   },
   "customServerEmptyHint": "Add a server manually: address, port and protocol",
   "customServerTest": "Test",
-  "errObfsUnsupported": "The installed core is too old for obfuscation profiles. Update Sora to apply them.",
   "leakTestTitle": "Leak test",
   "leakTestIntro": "Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.",
   "leakTestRun": "Run test",
@@ -574,41 +501,17 @@
       }
     }
   },
-  "leakTestSkipped": "Skipped — not applicable in this session",
+  "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Fix",
-  "leakTestFixedNote": "Kill switch is on — run the test again to verify.",
+  "leakTestFixedNote": "Kill switch is on, run the test again to verify.",
   "leakTestCheckDirectDns": "Direct DNS",
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
   "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
   "leakTestCheckTunnelDns": "Tunnel DNS",
-  "noticeDegraded": "The server slowed down — switched to the best measured one",
+  "noticeDegraded": "The server slowed down, switched to the best measured one",
   "obfs": "Traffic obfuscation",
-  "obfsPreset": "Preset",
-  "obfsPresetAggressive": "Maximum obfuscation",
-  "obfsPresetBalanced": "Balanced",
-  "obfsPresetOff": "Speed",
-  "obfsPresetCustom": "Custom",
-  "obfsManual": "Manual settings",
-  "obfsUtls": "uTLS profile",
-  "obfsUtlsAuto": "Auto",
-  "obfsJitter": "Timing jitter",
-  "obfsJitterNeedsFragment": "Jitter only works with fragmentation enabled.",
-  "obfsFineTune": "Sizes and delays",
-  "obfsDetecting": "Detecting capabilities…",
-  "obfsCapabilities": "Engine capabilities",
-  "obfsCompatibleEngines": "Compatible engines: {engines}",
-  "@obfsCompatibleEngines": {
-    "placeholders": {
-      "engines": {
-        "type": "String"
-      }
-    }
-  },
-  "obfsSupported": "Supported",
-  "obfsUnsupported": "Not supported",
-  "obfsUnknown": "Capabilities are still being detected.",
   "latencyMs": "{value} ms",
   "@latencyMs": {
     "placeholders": {
@@ -625,8 +528,8 @@
       }
     }
   },
-  "updateSignaturePending": "Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.",
-  "updateManualSigWarning": "Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.",
+  "updateSignaturePending": "अपडेट फ़ाइलों का मिलान रिलीज़ के साथ प्रकाशित चेकसम से किया जाता है।",
+  "updateManualSigWarning": "नीचे की फ़ाइलें रिलीज़ के चेकसम से मेल खाती हैं। अगर आपने इन्हें आधिकारिक रिलीज़ से डाउनलोड किया है, तो कमांड चलाएँ।",
   "updateVersionRevoked": "This version has been recalled by the developer. Please wait for a fixed release.",
   "updateRolloutPending": "A newer version is rolling out gradually and will be offered to you automatically.",
   "updateRollbacking": "Rolling back to version {version}...",
@@ -762,7 +665,7 @@
   "extPermissionsRemoved": "No longer requested:",
   "extUpdateFailedKept": "The previous version is still installed.",
   "extConflictsTitle": "Extension conflicts",
-  "extConflictsIntro": "These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.",
+  "extConflictsIntro": "ये एक्सटेंशन एक ही चीज़ चाहते हैं। चुनें कि कौन-सा चलेगा, दूसरा इंस्टॉल रहेगा।",
   "extConflictRoutingRules": "Routing rules",
   "extConflictTheme": "App theme",
   "extConflictNetHooks": "Network hooks",
@@ -849,8 +752,8 @@
   "extPermNetHooks": "Hook into the network path (DPI bypass modules)",
   "extPermNetFetch": "Fetch URLs from an allowlist",
   "extPermBackground": "Run background tasks",
-  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.",
-  "extPermNotYetActive": "Not active in this version of Sora yet — granting it changes nothing today.",
+  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Runs in the background",
   "extCapFilterTitle": "Capabilities",
   "extCapNetHook": "Bypasses & network hooks",
@@ -858,7 +761,7 @@
   "extCapRouting": "Routing rules",
   "extCapTheme": "Themes",
   "extCapWidget": "Widgets",
-  "extCatalogCached": "Cached catalog · {date}",
+  "extCatalogCached": "Cached catalog, {date}",
   "@extCatalogCached": {
     "placeholders": {
       "date": {
@@ -872,7 +775,7 @@
   "extRatingHowBody": "Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.",
   "extScreenshots": "Screenshots",
   "extSortRelevance": "Relevance",
-  "extPermNetworkDetail": "Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.",
+  "extPermNetworkDetail": "VPN के ज़रिए इंटरनेट से डेटा लाता है। केवल नीचे दिए होस्ट की अनुमति है, बाकी सब ब्लॉक है।",
   "extBgTitle": "Background task",
   "extBgEnabled": "Run in the background",
   "extBgInterval": "Run every",
@@ -892,8 +795,7 @@
       }
     }
   },
-  "extBgNote": "Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.",
-  "extBgRuntimeBadge": "Not available yet",
+  "extBgNote": "Sora खुला रहने तक, ट्रे में होने पर भी, कार्य शेड्यूल के अनुसार चलता है। सबसे छोटा अंतराल 15 मिनट है।",
   "extBgDisabledNote": "Enable the extension to manage its background task.",
   "extCapNetwork": "Network access",
   "extCapNetworkHosts": "Network: {hosts}",
@@ -977,7 +879,7 @@
   "profileAdd": "Add profile",
   "profileName": "Profile name",
   "profileSsids": "Wi-Fi networks (SSID)",
-  "profileSsidsHint": "Home, Office — comma separated",
+  "profileSsidsHint": "Home, Office, comma separated",
   "profileGateways": "Gateways",
   "profileAsns": "AS numbers",
   "profileAutoApply": "Apply automatically",
@@ -1021,8 +923,6 @@
   "syncRevokeConfirm": "Revoke \"{name}\"?",
   "syncLastSync": "Last sync: {time}",
   "syncNever": "Never",
-  "syncWhat": "What syncs",
-  "syncWhatBody": "Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.",
   "syncNoLan": "Devices must be on the same local network",
   "syncPaired": "Device paired",
   "syncPairingTitle": "Pair with this device",
@@ -1034,7 +934,7 @@
   "edit": "Edit",
   "remove": "Remove",
   "autoSwitchOnDegrade": "Auto-switch on degradation",
-  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.",
+  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.",
   "tunStackMixed": "Mixed",
   "tunStackSystem": "System",
   "syncCodeExpired": "The code expired",
@@ -1055,7 +955,7 @@
     }
   },
   "syncJoining": "Pairing with the device…",
-  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.",
+  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.",
   "syncNewCode": "New code",
   "syncPairedWith": "{name} paired",
   "@syncPairedWith": {
@@ -1068,7 +968,7 @@
   "syncRetry": "Try again",
   "syncStopShowing": "Stop showing",
   "syncSyncNow": "Sync now",
-  "syncSyncResult": "Received {pulled} · sent {pushed}",
+  "syncSyncResult": "Received {pulled}, sent {pushed}",
   "@syncSyncResult": {
     "placeholders": {
       "pulled": {
@@ -1088,7 +988,6 @@
   "syncDocKindOverrides": "Subscription overrides",
   "syncDocKindProfiles": "Network profiles",
   "syncDocKindChains": "Proxy chains",
-  "syncDocKindObfs": "Traffic obfuscation",
   "syncFrom": "from {name}",
   "@syncFrom": {
     "placeholders": {
@@ -1098,26 +997,7 @@
     }
   },
   "syncThisDevice": "This device",
-  "syncUnavailableAndroid": "Device sync isn't available on Android yet — the sync service can't run there.",
-  "smartPickReason": "Picked by smart mode: ping {ping}, speed {speed}",
-  "@smartPickReason": {
-    "placeholders": {
-      "ping": {
-        "type": "String"
-      },
-      "speed": {
-        "type": "String"
-      }
-    }
-  },
-  "serverReliability": "Reliability {pct}%",
-  "@serverReliability": {
-    "placeholders": {
-      "pct": {
-        "type": "int"
-      }
-    }
-  },
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
   "customServerShadowsocksCredentials": "Shadowsocks के लिए: method:password, जैसे chacha20-ietf-poly1305:password",
   "diagnosticPackets": "पैकेट पर कब्जा",
   "diagnosticEvents": "विंडोज़ घटनाएँ",

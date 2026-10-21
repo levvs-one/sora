@@ -11,7 +11,7 @@ import (
 
 // AuthLevel is the privilege a peer holds on the control API. The transport
 // admits AuthRead and AuthControl peers; method-level checks in the control
-// plane decide which of the two may call a given RPC (SORA-H2).
+// plane decide which of the two may call a given RPC.
 type AuthLevel int
 
 const (
@@ -90,7 +90,7 @@ type connUnwrapper interface {
 
 // unwrapConn strips listener accounting wrappers so peerOf inspects the
 // real transport connection. Without it, ServerHandshake would see the
-// wrapper (e.g. *countedConn from the SORA-M1 connection cap), fail the
+// wrapper (e.g. *countedConn from the connection cap), fail the
 // platform type assertion in peerOf, treat a legitimate peer as
 // unverified, and refuse the handshake.
 func unwrapConn(c net.Conn) net.Conn {

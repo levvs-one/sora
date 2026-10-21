@@ -164,7 +164,7 @@ type Server struct {
 	fetcher      Fetcher
 	dataDir      string
 	benchmarker  Benchmarker
-	// profiles stores network profiles for automatic matching (F5). Nil
+	// profiles stores network profiles for automatic matching. Nil
 	// disables the profile RPCs with explicit errors.
 	profiles  *profiles.Store
 	captureMu sync.Mutex
@@ -226,7 +226,7 @@ type Config struct {
 	// Benchmarker measures server throughput; nil answers that
 	// benchmarking is unavailable.
 	Benchmarker Benchmarker
-	// Profiles stores network profiles for automatic matching (F5); nil
+	// Profiles stores network profiles for automatic matching; nil
 	// disables the profile RPCs with explicit errors.
 	Profiles *profiles.Store
 	// ExtScheduler is the extension background-work scheduler (core/ext).
@@ -513,7 +513,7 @@ const (
 // initialize. Incompatible clients still receive the core's version to
 // determine the required update. The control token is issued only to
 // control-authorized peers; read-only peers never receive it, so the token
-// cannot smuggle control rights past the method checks (SORA-H2).
+// cannot smuggle control rights past the method checks.
 func (s *Server) Handshake(ctx context.Context, req *corev1.HandshakeRequest) (*corev1.HandshakeResponse, error) {
 	negotiated, err := s.checkVersion(req.GetClientVersion())
 	if err != nil {
@@ -903,7 +903,7 @@ func toWireEvent(event session.Event, redactor *engine.Redactor) *corev1.CoreEve
 		}}
 	case session.EventProfile:
 		// A saved network profile matched the current network; the client
-		// applies it (F5).
+		// applies it.
 		matched := &corev1.ProfileMatched{}
 		if event.Profile != nil {
 			matched.ProfileId = event.Profile.ProfileID
@@ -1367,7 +1367,7 @@ func (s *Server) RunDiagnostics(ctx context.Context, req *corev1.RunDiagnosticsR
 // ExportDiagnostics returns an archive built from already-redacted core values.
 // Clients cannot expand its contents. Raw capture formats (PCAPNG, EVTX) are
 // refused outright: packet payloads and event logs cannot be redacted to the
-// archive's guarantee, so the core will not produce them (SORA-H3).
+// archive's guarantee, so the core will not produce them.
 func (s *Server) ExportDiagnostics(ctx context.Context, req *corev1.ExportDiagnosticsRequest) (*corev1.ExportDiagnosticsResponse, error) {
 	id := requestID(req.GetRequestId())
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {

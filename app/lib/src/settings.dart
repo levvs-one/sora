@@ -70,7 +70,6 @@ class Settings {
     'subscriptionOverrides',
     'networkProfiles',
     'proxyChains',
-    'syncedDevices',
     'zapretWithVpn',
   };
 
@@ -321,20 +320,13 @@ class Settings {
   set subscriptionOverrides(String value) => _store.setString('subscriptionOverrides', value);
 
   /// Network profiles as JSON: [{id, name, ssids, gateways, asns, autoApply,
-  /// apply: {tunnel, preset, dns, dnsPreset, serverId, engine}}] (F5).
+  /// apply: {tunnel, preset, dns, dnsPreset, serverId, engine}}].
   String get networkProfiles => _store.getString('networkProfiles') ?? '';
   set networkProfiles(String value) => _store.setString('networkProfiles', value);
 
-  /// Named proxy chains as JSON: [{id, name, hops: [serverId, ...]}] (F8).
+  /// Named proxy chains as JSON: [{id, name, hops: [serverId, ...]}].
   String get proxyChains => _store.getString('proxyChains') ?? '';
   set proxyChains(String value) => _store.setString('proxyChains', value);
-
-  /// Legacy pre-wiring sync device list (F9). The pre-2026-10-20 screen added
-  /// an entry per scanned code without any handshake, so the entries were
-  /// never paired; the sync screen clears this once with an explanation and
-  /// never writes it again. The daemon is the source of truth for peers.
-  String get syncedDevices => _store.getString('syncedDevices') ?? '';
-  set syncedDevices(String value) => _store.setString('syncedDevices', value);
 
   /// Run zapret for direct traffic alongside the VPN tunnel (F11, Linux only).
   bool get zapretWithVpn => _store.getBool('zapretWithVpn') ?? false;
@@ -376,7 +368,7 @@ class Settings {
   /// crash-recovery marker `sessionIntent`, the system-proxy snapshot
   /// `proxySnapshot`, `benchmarkHistory`, `notificationHistory`, and UI
   /// chrome (`trayHintShown`, `sidebarExpanded`, `tourDone`,
-  /// `speedtestService`, `syncedDevices`, `dnsLeakLastCheck`). The JSON-backed
+  /// `speedtestService`, `dnsLeakLastCheck`). The JSON-backed
   /// stores (`subscriptionOverrides`, `networkProfiles`, `proxyChains`) sync as their own document
   /// kinds so their stores can reload after an import.
   static const syncableSettingsKeys = <String>{

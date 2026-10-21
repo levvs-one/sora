@@ -1,6 +1,6 @@
 # sora-sync threat model
 
-`sora-sync` is the device-to-device sync daemon (F9). It pairs devices over a
+`sora-sync` is the device-to-device sync daemon. It pairs devices over a
 QR code shown on one device and scanned by the other, discovers peers on the
 LAN via mDNS, and exchanges VPN documents (subscriptions, rules, settings)
 over a Noise_XX-encrypted TCP channel. There is no cloud, no account, and no

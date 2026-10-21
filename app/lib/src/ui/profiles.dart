@@ -16,7 +16,7 @@ String newLocalId(String prefix) =>
     '$prefix${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}${Random().nextInt(1 << 20).toRadixString(36)}';
 
 /// Network profiles: triggers plus a settings snapshot applied when the
-/// network is joined (FEATURE-PLAN.md F5).
+/// network is joined.
 class ProfilesScreen extends StatefulWidget {
   const ProfilesScreen({super.key});
 
@@ -144,7 +144,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
   }
 }
 
-/// Creates or edits a network profile (F5).
+/// Creates or edits a network profile.
 class ProfileEditorScreen extends StatefulWidget {
   const ProfileEditorScreen({super.key, this.profile});
 

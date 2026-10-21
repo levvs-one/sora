@@ -21,7 +21,7 @@ const PolkitAction = "io.github.levvs-one.sora.control"
 
 // PolkitReadAction authorizes read-only access (status, statistics, events,
 // logs) via service/linux/sora.policy. Active local users need no password;
-// anything mutating or private requires PolkitAction (SORA-H2).
+// anything mutating or private requires PolkitAction.
 const PolkitReadAction = "io.github.levvs-one.sora.read"
 
 // polkitTimeout bounds authorization requests; timeout rejects the peer.

@@ -116,7 +116,7 @@ func (m *Manager) Connect(ctx context.Context, plan *engine.Plan, settings Setti
 		Profiles:      m.cfg.Profiles,
 	})
 	if err != nil {
-		// Surface a failing Close instead of swallowing it (SORA-L13).
+		// Surface a failing Close instead of swallowing it.
 		if closeErr := built.Close(); closeErr != nil {
 			err = errors.Join(err, closeErr)
 		}

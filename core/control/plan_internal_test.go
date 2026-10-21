@@ -418,7 +418,7 @@ func TestProfileDisplayMetadataKeepsAdapterAndCredentialsPrivate(t *testing.T) {
 	}
 }
 
-// TestParseCredentialRejectsForeignMaterial locks SORA-M8: only the JSON
+// TestParseCredentialRejectsForeignMaterial: only the JSON
 // credential document is accepted; raw proxy URLs, empty or truncated
 // bytes fail closed instead of producing an empty credential.
 func TestParseCredentialRejectsForeignMaterial(t *testing.T) {
@@ -440,7 +440,7 @@ func TestParseCredentialRejectsForeignMaterial(t *testing.T) {
 	}
 }
 
-// TestSplitDNSServerParsesPortsSafely locks SORA-M13: host:port and
+// TestSplitDNSServerParsesPortsSafely: host:port and
 // [ipv6]:port go through net.SplitHostPort, and bare IPv6 literals are
 // never split on a colon.
 func TestSplitDNSServerParsesPortsSafely(t *testing.T) {
@@ -470,7 +470,7 @@ func TestSplitDNSServerParsesPortsSafely(t *testing.T) {
 	}
 }
 
-// TestRuleTypeOfDetectsIPAddresses locks SORA-M14: IPv6 literals contain
+// TestRuleTypeOfDetectsIPAddresses: IPv6 literals contain
 // colons but are IP rules, not ports.
 func TestRuleTypeOfDetectsIPAddresses(t *testing.T) {
 	for destination, want := range map[string]engine.RuleType{
@@ -492,7 +492,7 @@ func TestRuleTypeOfDetectsIPAddresses(t *testing.T) {
 	}
 }
 
-// TestApplyCredentialRejectsBrokenPeerJSON locks SORA-L17: a broken
+// TestApplyCredentialRejectsBrokenPeerJSON: a broken
 // WireGuard peer document must fail plan building, not silently produce a
 // peerless outbound.
 func TestApplyCredentialRejectsBrokenPeerJSON(t *testing.T) {

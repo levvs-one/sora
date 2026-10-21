@@ -1,6 +1,6 @@
 package control
 
-// Network profiles (F5). The core stores profiles, fingerprints the current
+// Network profiles. The core stores profiles, fingerprints the current
 // network, and reports a ProfileMatched event when a saved profile matches
 // after a network change. The client applies the profile by rebuilding the
 // session plan from its apply settings.

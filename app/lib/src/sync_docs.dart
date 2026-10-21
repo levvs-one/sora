@@ -8,7 +8,7 @@ import 'generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'sora.dart';
 import 'sync_api.dart';
 
-/// Document kinds the app publishes to the sora-sync daemon (F9).
+/// Document kinds the app publishes to the sora-sync daemon.
 /// Normative shapes live in `service/sync/F9-SYNC-CONTRACT.md` §4; this
 /// file is the app-side implementation of that section.
 abstract final class SyncDocKinds {
@@ -65,7 +65,7 @@ class SyncBridgeException implements Exception {
   String toString() => 'SyncBridgeException: $message';
 }
 
-/// App ⇄ daemon document bridge (F9): serializes app state into the
+/// App ⇄ daemon document bridge: serializes app state into the
 /// daemon's document store and applies documents pulled from a peer back
 /// into the app and the core.
 ///

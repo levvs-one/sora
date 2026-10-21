@@ -54,7 +54,7 @@ func (t Tun) validate() error {
 		errs = append(errs, fmt.Errorf("tun: mtu %d out of range 576..1500", t.MTU))
 	}
 	// The device name reaches privileged `ip` invocations; validate it as a
-	// kernel interface name, not a display name (SORA-M2). Empty is filled
+	// kernel interface name, not a display name. Empty is filled
 	// with the default by PrepareTun.
 	if t.DeviceName != "" {
 		errs = append(errs, validateInterfaceName("tun", t.DeviceName))

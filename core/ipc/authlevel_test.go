@@ -10,7 +10,7 @@ import (
 )
 
 // TestServerHandshakeSeesThroughListenerWrapping is a regression test for
-// the SORA-H2/SORA-M1 interaction: Listener.Accept wraps admitted
+// the interaction of the control/read-only split with the connection cap: Listener.Accept wraps admitted
 // connections in an accounting wrapper, and the transport credentials used
 // by the gRPC server must still inspect the real peer. Before the fix,
 // peerOf saw the wrapper instead of the unix socket, classified the
@@ -62,7 +62,7 @@ func TestServerHandshakeSeesThroughListenerWrapping(t *testing.T) {
 	}
 	if runtime.GOOS == "linux" {
 		// The test client runs as the same user as the listener, so it
-		// holds full control under the SORA-H2 policy.
+		// holds full control.
 		if info.Level != ipc.AuthControl {
 			t.Errorf("the same-user peer got level %v, want control", info.Level)
 		}

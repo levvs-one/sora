@@ -20,7 +20,7 @@ class SyncApiException implements Exception {
   String toString() => 'SyncApiException${statusCode == null ? '' : '($statusCode)'}: $message';
 }
 
-/// A device paired through the daemon (F9). The daemon is the source of
+/// A device paired through the daemon. The daemon is the source of
 /// truth; the app keeps no registry of its own.
 class SyncPeer {
   SyncPeer({required this.id, required this.name, required this.identityKey, required this.pairedAt, this.lastSync});
@@ -49,7 +49,7 @@ class SyncPeer {
   );
 }
 
-/// `GET /v1/status` response (F9).
+/// `GET /v1/status` response.
 class SyncStatusInfo {
   SyncStatusInfo({
     required this.deviceId,
@@ -79,7 +79,7 @@ class SyncStatusInfo {
   }
 }
 
-/// An open pairing session from `POST /v1/pairing/start` (F9). The daemon is
+/// An open pairing session from `POST /v1/pairing/start`. The daemon is
 /// the only generator of the QR payload; the app shows it as-is.
 class PairingSession {
   PairingSession({required this.qrPayload, required this.expiresAt});
@@ -133,7 +133,7 @@ DateTime _syncUnixMillis(dynamic v) => v is int && v > 0
     ? DateTime.fromMillisecondsSinceEpoch(v, isUtc: true)
     : DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
 
-/// Result of `POST /v1/peers/{id}/sync` (F9). The daemon reports the moved
+/// Result of `POST /v1/peers/{id}/sync`. The daemon reports the moved
 /// documents as metas; the UI shows them per document (kind, name, from,
 /// updated_at) instead of bare counters.
 class SyncResult {

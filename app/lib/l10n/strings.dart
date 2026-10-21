@@ -183,12 +183,6 @@ abstract class S {
   /// **'Отключение'**
   String get stateDisconnecting;
 
-  /// No description provided for @stateFailed.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не подключено'**
-  String get stateFailed;
-
   /// No description provided for @coreMissing.
   ///
   /// In ru, this message translates to:
@@ -620,12 +614,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Добавьте подписку, чтобы подключиться'**
   String get errNoServers;
-
-  /// No description provided for @exportText.
-  ///
-  /// In ru, this message translates to:
-  /// **'Текст'**
-  String get exportText;
 
   /// No description provided for @connections.
   ///
@@ -1065,12 +1053,6 @@ abstract class S {
   /// **'Не похоже на сайт, IP или программу'**
   String get ruleInvalid;
 
-  /// No description provided for @groupOrdered.
-  ///
-  /// In ru, this message translates to:
-  /// **'{count, plural, one{# сервер} few{# сервера} other{# серверов}}, по очереди'**
-  String groupOrdered(int count);
-
   /// No description provided for @groupBest.
   ///
   /// In ru, this message translates to:
@@ -1082,12 +1064,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Режим'**
   String get tunnelMode;
-
-  /// No description provided for @tunnelTun.
-  ///
-  /// In ru, this message translates to:
-  /// **'Весь трафик'**
-  String get tunnelTun;
 
   /// No description provided for @tunnelProxy.
   ///
@@ -1305,42 +1281,6 @@ abstract class S {
   /// **'Свернуть'**
   String get less;
 
-  /// No description provided for @currentServer.
-  ///
-  /// In ru, this message translates to:
-  /// **'Текущий сервер'**
-  String get currentServer;
-
-  /// No description provided for @trafficDown.
-  ///
-  /// In ru, this message translates to:
-  /// **'Получено'**
-  String get trafficDown;
-
-  /// No description provided for @trafficUp.
-  ///
-  /// In ru, this message translates to:
-  /// **'Отправлено'**
-  String get trafficUp;
-
-  /// No description provided for @perSecond.
-  ///
-  /// In ru, this message translates to:
-  /// **'{value}/с'**
-  String perSecond(String value);
-
-  /// No description provided for @activeRules.
-  ///
-  /// In ru, this message translates to:
-  /// **'Активные правила: {count}'**
-  String activeRules(int count);
-
-  /// No description provided for @recentNotifications.
-  ///
-  /// In ru, this message translates to:
-  /// **'Последние уведомления'**
-  String get recentNotifications;
-
   /// No description provided for @notificationsEmpty.
   ///
   /// In ru, this message translates to:
@@ -1443,12 +1383,6 @@ abstract class S {
   /// **'Запущенные процессы'**
   String get runningProcesses;
 
-  /// No description provided for @programsFailed.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не удалось получить список программ'**
-  String get programsFailed;
-
   /// No description provided for @programsEmpty.
   ///
   /// In ru, this message translates to:
@@ -1461,23 +1395,11 @@ abstract class S {
   /// **'Выбрать файл .exe'**
   String get selectExe;
 
-  /// No description provided for @trafficUnavailable.
-  ///
-  /// In ru, this message translates to:
-  /// **'Счётчики пока недоступны'**
-  String get trafficUnavailable;
-
   /// No description provided for @speedtest.
   ///
   /// In ru, this message translates to:
   /// **'Скорость'**
   String get speedtest;
-
-  /// No description provided for @speedtestCheck.
-  ///
-  /// In ru, this message translates to:
-  /// **'Проверить скорость'**
-  String get speedtestCheck;
 
   /// No description provided for @speedtestSearch.
   ///
@@ -1650,13 +1572,13 @@ abstract class S {
   /// No description provided for @updateSignaturePending.
   ///
   /// In ru, this message translates to:
-  /// **'Подлинность релиза пока не проверяется подписью — церемония ключа подписи ещё не проведена. Файлы сверяются по SHA-256 с манифестом, полученным по TLS.'**
+  /// **'Файлы обновления сверяются с контрольными суммами из релиза.'**
   String get updateSignaturePending;
 
   /// No description provided for @updateManualSigWarning.
   ///
   /// In ru, this message translates to:
-  /// **'Внимание: подпись манифеста не проверена — файлы ниже сверены только по хэшам. Выполняйте команду, только если доверяете каналу релиза.'**
+  /// **'Файлы ниже сверены с контрольными суммами релиза. Выполните команду, если скачивали их из официального релиза.'**
   String get updateManualSigWarning;
 
   /// No description provided for @updateVersionRevoked.
@@ -1743,12 +1665,6 @@ abstract class S {
   /// **'Лицензии компонентов'**
   String get componentLicenses;
 
-  /// No description provided for @appCopyright.
-  ///
-  /// In ru, this message translates to:
-  /// **'© 2026 levvs-one и участники проекта'**
-  String get appCopyright;
-
   /// No description provided for @collapseServers.
   ///
   /// In ru, this message translates to:
@@ -1785,12 +1701,6 @@ abstract class S {
   /// **'Применить и переподключить'**
   String get reconnectNow;
 
-  /// No description provided for @bypassLimitations.
-  ///
-  /// In ru, this message translates to:
-  /// **'Этот режим обходит DPI только для HTTP и TLS, не поддерживает UDP и не меняет IP. Для голоса Discord, звонков и заблокированных адресов Telegram используйте VPN-сервер.'**
-  String get bypassLimitations;
-
   /// No description provided for @errEngineUnsupported.
   ///
   /// In ru, this message translates to:
@@ -1800,7 +1710,7 @@ abstract class S {
   /// No description provided for @errRestore.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось полностью очистить подключение. Повторите отключение; подробности — в журнале.'**
+  /// **'Не удалось полностью очистить подключение. Повторите отключение, подробности в журнале.'**
   String get errRestore;
 
   /// No description provided for @errSessionEnded.
@@ -1836,7 +1746,7 @@ abstract class S {
   /// No description provided for @modesGuide.
   ///
   /// In ru, this message translates to:
-  /// **'Выбирайте «Авто», если не знаете, какое ядро нужно серверу. Sora сверяет поддержку профиля и настроек перед подключением. Само ядро не меняет скорость тарифа: результат зависит от сервера, маршрута, протокола и сети.\n\n## Режимы\n\n### Весь трафик (TUN)\n\nSora создаёт виртуальный сетевой интерфейс и направляет через него трафик приложений, включая TCP и UDP. Это подходящий режим для Telegram, игр и голосовой связи Discord. Правила могут отправлять отдельные сайты и программы напрямую или блокировать их. Для работы нужны права сетевой службы и сервер, поддерживающий нужный протокол.\n\n### Системный прокси\n\nSora задаёт локальный HTTP/SOCKS-прокси. Его используют приложения, которые учитывают системные настройки прокси. Программа со своим сетевым стеком может пройти напрямую; UDP и голосовые звонки обычно требуют TUN. Этот режим удобен для браузеров и приложений с поддержкой прокси.\n\n### Без сервера\n\nВ Linux Sora использует [zapret](https://github.com/bol-van/zapret): разбивает и меняет HTTP/TLS-запросы, чтобы обходить некоторые проверки DPI. Адрес IP остаётся вашим, соединение идёт к сайту напрямую. Результат зависит от провайдера и способа блокировки.\n\nТекущая интеграция использует tpws и обрабатывает TCP для HTTP и TLS. Она не обходит блокировку по IP, не пересылает UDP и не гарантирует работу Telegram с MTProto. Для голоса Discord, звонков Telegram и таких блокировок выберите VPN-сервер и TUN.\n\n## Ядра\n\n### Авто\n\nSora выбирает установленное ядро, которое поддерживает весь план подключения. Важно всё сразу: протоколы серверов, транспорт, группы, фрагментация и режим. Если выбранный вручную движок несовместим, новое подключение отклоняется до отключения текущего. Выберите «Авто» или другое ядро и примените настройки снова.\n\n### sing-box\n\nВ новых пакетах Sora используется [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box). Он добавляет клиентский XHTTP и VLESS Encryption. Sora распознаёт сборку и её возможности; стандартный sing-box без XHTTP не получает эту возможность по одному лишь названию.\n\nПоддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard и параметры AmneziaWG 1.x/2.x, которые умеет импортировать Sora. Полные JSON-профили Xray требуют Xray. Новые параметры AWG 3.x ещё не импортируются. Управление sing-box использует защищённый паролем локальный порт; другие программы на компьютере могут заметить его наличие.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) подходит для VLESS, REALITY, XHTTP, VLESS Encryption и TLS-фрагментации. Он также запускает полные профили Xray от провайдера, сохраняя их маршрутизацию и группы. Профиль такого вида нельзя автоматически превратить в конфиг другого движка без изменения его поведения.\n\nВ поставляемом Xray удалён параметр отключения проверки TLS-сертификата (`allowInsecure`). Для таких обычных серверов «Авто» выбирает sing-box или mihomo. При ручном выборе Xray Sora сообщает о несовместимости до отключения текущего соединения. Для старого полного JSON-профиля нужен обновлённый профиль провайдера с проверяемым сертификатом или его отпечатком.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) поддерживает группы с последовательным резервом и балансировкой, а также XHTTP и AmneziaWG. Выбирайте его, если важен автоматический переход на запасной сервер. Фрагментация TLS из настроек Sora для этого ядра недоступна.\n\n## Совместимость в Sora\n\n| Возможность | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| TUN и TCP/UDP в Linux | Да | Да | Да |\n| XHTTP | Да | Да | Да |\n| VLESS Encryption | Да | Да | Да |\n| Полный профиль Xray | Нет | Да | Нет |\n| TUIC / AnyTLS | Оба | Нет | TUIC |\n| TLS-фрагментация | Да | Да | Нет |\n| AmneziaWG 1.x/2.x | Да¹ | Нет | Да |\n| Группа с резервом | Нет | Нет² | Да |\n\n¹ Профили с J1/J2/J3/Itime направляются в mihomo; эти параметры нельзя молча отбрасывать. ² Для группы полных профилей Xray запасной профиль выбирает приложение. Точная поддержка зависит от установленной сборки. Её версию можно посмотреть в «О приложении».\n\n## Стек TUN\n\nСтек обрабатывает TCP и UDP внутри виртуального интерфейса. В панели режимов у Xray и mihomo можно выбрать gVisor, System, Mixed или MIPS. Выбор сохраняется отдельно для каждого ядра. В режиме системного прокси и «Без сервера» этот выбор не используется.\n\n- **Mixed** — TCP использует системный стек, UDP обрабатывает gVisor. Это вариант по умолчанию для mihomo в Linux. В Windows Xray и mihomo по умолчанию используют MIPS.\n- **System** — использует системный стек. При проблемах с сетевыми программами попробуйте другой вариант.\n- **gVisor** — обрабатывает трафик в пользовательском пространстве.\n- **MIPS** — собственный IP-стек mihomo, доступный в поставляемой версии 1.19.32.\n\nВ Linux у Xray gVisor работает встроенно и выбран по умолчанию. System, Mixed и MIPS в Linux подключаются через TUN-движок mihomo: он передаёт TCP и UDP в Xray по защищённому локальному SOCKS. Протокол, профиль провайдера и маршрутизация остаются в Xray. Для этих трёх вариантов нужен установленный mihomo. В Windows Xray использует mihomo 1.19.32 или новее для всех четырёх стеков TUN. Протоколы и маршрутизация остаются в Xray. Правила приложений в этой связке поддерживают только прямое соединение и блокировку; на Linux они требуют встроенного gVisor Xray.\n\nСвязка запускает второй процесс. В трёх замерах в Linux без трафика она потребляла примерно на 32–36 МиБ больше физической памяти, чем встроенный TUN Xray. Это не оценка нагрузки при скачивании: расходы процессора и память зависят от соединений. Для sing-box переключатель не добавляется. Ни один вариант не гарантирует более высокую скорость во всех сетях. Смените стек и нажмите «Применить и переподключить», чтобы проверить результат в своей сети.\n\n## Когда применяются настройки\n\nВыбор сервера автоматически переподключает соединение. Режим, ядро, DNS и правила сохраняются сразу; при активном соединении нажмите «Применить и переподключить», чтобы они вступили в силу. Перезапуск ядра может прервать загрузки и звонки. Частые нажатия не запускают параллельные подключения; отключение завершает переход и освобождает соединение.\n\n«Интернет только через VPN» блокирует прямой выход при обрыве туннеля. Это ограничение действует на всю машину, поэтому используйте его осознанно. При явном отключении Sora снимает свои правила. Если очистка не завершилась, повторите отключение и откройте журнал.\n\n## Документация проектов\n\n- [sing-box-lx: настройки и поддержка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.ru.md)\n- [sing-box: документация](https://sing-box.sagernet.org/)\n- [Xray: документация](https://xtls.github.io/)\n- [mihomo: документация](https://wiki.metacubex.one/)\n- [zapret: описание и ограничения](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n'**
+  /// **'Выбирайте «Авто», если не знаете, какое ядро нужно серверу. Sora сверяет поддержку профиля и настроек перед подключением. Само ядро не меняет скорость тарифа: результат зависит от сервера, маршрута, протокола и сети.\n\n## Режимы\n\n### Весь трафик (TUN)\n\nSora создаёт виртуальный сетевой интерфейс и направляет через него трафик приложений, включая TCP и UDP. Это подходящий режим для Telegram, игр и голосовой связи Discord. Правила могут отправлять отдельные сайты и программы напрямую или блокировать их. Для работы нужны права сетевой службы и сервер, поддерживающий нужный протокол.\n\n### Системный прокси\n\nSora задаёт локальный HTTP/SOCKS-прокси. Его используют приложения, которые учитывают системные настройки прокси. Программа со своим сетевым стеком может пройти напрямую; UDP и голосовые звонки обычно требуют TUN. Этот режим удобен для браузеров и приложений с поддержкой прокси.\n\n### Без сервера\n\nВ Linux Sora использует [zapret](https://github.com/bol-van/zapret): разбивает и меняет HTTP/TLS-запросы, чтобы обходить некоторые проверки DPI. Адрес IP остаётся вашим, соединение идёт к сайту напрямую. Результат зависит от провайдера и способа блокировки.\n\nТекущая интеграция использует tpws и обрабатывает TCP для HTTP и TLS. Она не обходит блокировку по IP, не пересылает UDP и не гарантирует работу Telegram с MTProto. Для голоса Discord, звонков Telegram и таких блокировок выберите VPN-сервер и TUN.\n\n## Ядра\n\n### Авто\n\nSora выбирает установленное ядро, которое поддерживает весь план подключения. Важно всё сразу: протоколы серверов, транспорт, группы, фрагментация и режим. Если выбранный вручную движок несовместим, новое подключение отклоняется до отключения текущего. Выберите «Авто» или другое ядро и примените настройки снова.\n\n### sing-box\n\nВ новых пакетах Sora используется [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box). Он добавляет клиентский XHTTP и VLESS Encryption. Sora распознаёт сборку и её возможности; стандартный sing-box без XHTTP не получает эту возможность по одному лишь названию.\n\nПоддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard и параметры AmneziaWG 1.x/2.x, которые умеет импортировать Sora. Полные JSON-профили Xray требуют Xray. Новые параметры AWG 3.x ещё не импортируются. Управление sing-box использует защищённый паролем локальный порт; другие программы на компьютере могут заметить его наличие.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) подходит для VLESS, REALITY, XHTTP, VLESS Encryption и TLS-фрагментации. Он также запускает полные профили Xray от провайдера, сохраняя их маршрутизацию и группы. Профиль такого вида нельзя автоматически превратить в конфиг другого движка без изменения его поведения.\n\nВ поставляемом Xray удалён параметр отключения проверки TLS-сертификата (`allowInsecure`). Для таких обычных серверов «Авто» выбирает sing-box или mihomo. При ручном выборе Xray Sora сообщает о несовместимости до отключения текущего соединения. Для старого полного JSON-профиля нужен обновлённый профиль провайдера с проверяемым сертификатом или его отпечатком.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) поддерживает группы с последовательным резервом и балансировкой, а также XHTTP и AmneziaWG. Выбирайте его, если важен автоматический переход на запасной сервер. Фрагментация TLS из настроек Sora для этого ядра недоступна.\n\n## Совместимость в Sora\n\n| Возможность | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| TUN и TCP/UDP в Linux | Да | Да | Да |\n| XHTTP | Да | Да | Да |\n| VLESS Encryption | Да | Да | Да |\n| Полный профиль Xray | Нет | Да | Нет |\n| TUIC / AnyTLS | Оба | Нет | TUIC |\n| TLS-фрагментация | Да | Да | Нет |\n| AmneziaWG 1.x/2.x | Да¹ | Нет | Да |\n| Группа с резервом | Нет | Нет² | Да |\n\n¹ Профили с J1/J2/J3/Itime направляются в mihomo; эти параметры нельзя молча отбрасывать. ² Для группы полных профилей Xray запасной профиль выбирает приложение. Точная поддержка зависит от установленной сборки. Её версию можно посмотреть в «О приложении».\n\n## Стек TUN\n\nСтек обрабатывает TCP и UDP внутри виртуального интерфейса. В панели режимов у Xray и mihomo можно выбрать gVisor, System, Mixed или MIPS. Выбор сохраняется отдельно для каждого ядра. В режиме системного прокси и «Без сервера» этот выбор не используется.\n\n- **Mixed**: TCP использует системный стек, UDP обрабатывает gVisor. Это вариант по умолчанию для mihomo в Linux. В Windows Xray и mihomo по умолчанию используют MIPS.\n- **System**: использует системный стек. При проблемах с сетевыми программами попробуйте другой вариант.\n- **gVisor**: обрабатывает трафик в пользовательском пространстве.\n- **MIPS**: собственный IP-стек mihomo, доступный в поставляемой версии 1.19.32.\n\nВ Linux у Xray gVisor работает встроенно и выбран по умолчанию. System, Mixed и MIPS в Linux подключаются через TUN-движок mihomo: он передаёт TCP и UDP в Xray по защищённому локальному SOCKS. Протокол, профиль провайдера и маршрутизация остаются в Xray. Для этих трёх вариантов нужен установленный mihomo. В Windows Xray использует mihomo 1.19.32 или новее для всех четырёх стеков TUN. Протоколы и маршрутизация остаются в Xray. Правила приложений в этой связке поддерживают только прямое соединение и блокировку; на Linux они требуют встроенного gVisor Xray.\n\nСвязка запускает второй процесс. В трёх замерах в Linux без трафика она потребляла примерно на 32–36 МиБ больше физической памяти, чем встроенный TUN Xray. Это не оценка нагрузки при скачивании: расходы процессора и память зависят от соединений. Для sing-box переключатель не добавляется. Ни один вариант не гарантирует более высокую скорость во всех сетях. Смените стек и нажмите «Применить и переподключить», чтобы проверить результат в своей сети.\n\n## Когда применяются настройки\n\nВыбор сервера автоматически переподключает соединение. Режим, ядро, DNS и правила сохраняются сразу; при активном соединении нажмите «Применить и переподключить», чтобы они вступили в силу. Перезапуск ядра может прервать загрузки и звонки. Частые нажатия не запускают параллельные подключения; отключение завершает переход и освобождает соединение.\n\n«Интернет только через VPN» блокирует прямой выход при обрыве туннеля. Это ограничение действует на всю машину, поэтому используйте его осознанно. При явном отключении Sora снимает свои правила. Если очистка не завершилась, повторите отключение и откройте журнал.\n\n## Документация проектов\n\n- [sing-box-lx: настройки и поддержка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.ru.md)\n- [sing-box: документация](https://sing-box.sagernet.org/)\n- [Xray: документация](https://xtls.github.io/)\n- [mihomo: документация](https://wiki.metacubex.one/)\n- [zapret: описание и ограничения](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n'**
   String get modesGuide;
 
   /// No description provided for @probeServers.
@@ -2250,7 +2160,7 @@ abstract class S {
   /// No description provided for @extConflictsIntro.
   ///
   /// In ru, this message translates to:
-  /// **'Эти расширения претендуют на одно и то же. Выберите победителя — другое останется установлено. Когда спорная возможность появится в движке, работать будет только победитель.'**
+  /// **'Эти расширения претендуют на одно и то же. Выберите, какое будет работать, второе останется установленным.'**
   String get extConflictsIntro;
 
   /// No description provided for @extConflictRoutingRules.
@@ -2478,13 +2388,13 @@ abstract class S {
   /// No description provided for @extPermBackgroundDetail.
   ///
   /// In ru, this message translates to:
-  /// **'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения. Фоновое выполнение пока недоступно в этой версии Sora.'**
+  /// **'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения.'**
   String get extPermBackgroundDetail;
 
   /// No description provided for @extPermNotYetActive.
   ///
   /// In ru, this message translates to:
-  /// **'Пока не активно в этой версии Sora — это разрешение сейчас ничего не изменит.'**
+  /// **'В этой версии Sora это разрешение ещё ничего не делает.'**
   String get extPermNotYetActive;
 
   /// No description provided for @extCapBackground.
@@ -2532,7 +2442,7 @@ abstract class S {
   /// No description provided for @extCatalogCached.
   ///
   /// In ru, this message translates to:
-  /// **'Кэш каталога · {date}'**
+  /// **'Кэш каталога от {date}'**
   String extCatalogCached(String date);
 
   /// No description provided for @extChangelog.
@@ -2556,7 +2466,7 @@ abstract class S {
   /// No description provided for @extRatingHowBody.
   ///
   /// In ru, this message translates to:
-  /// **'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, — один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.'**
+  /// **'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, поэтому один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.'**
   String get extRatingHowBody;
 
   /// No description provided for @extScreenshots.
@@ -2574,7 +2484,7 @@ abstract class S {
   /// No description provided for @extPermNetworkDetail.
   ///
   /// In ru, this message translates to:
-  /// **'Загружает данные из интернета. Разрешены только хосты из списка ниже — всё остальное заблокировано. Сетевые запросы пока недоступны в этой версии Sora.'**
+  /// **'Загружает данные из интернета через VPN. Разрешены только хосты из списка ниже, остальные заблокированы.'**
   String get extPermNetworkDetail;
 
   /// No description provided for @extBgTitle.
@@ -2610,14 +2520,8 @@ abstract class S {
   /// No description provided for @extBgNote.
   ///
   /// In ru, this message translates to:
-  /// **'Фоновое выполнение недоступно в этой версии Sora. Ваше расписание сохранено и начнёт действовать автоматически, когда появится фоновый рантайм. Минимальный интервал — 15 минут.'**
+  /// **'Задача запускается по расписанию, пока Sora открыта, в том числе свёрнутой в трей. Минимальный интервал 15 минут.'**
   String get extBgNote;
-
-  /// No description provided for @extBgRuntimeBadge.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пока недоступно'**
-  String get extBgRuntimeBadge;
 
   /// No description provided for @extBgDisabledNote.
   ///
@@ -2648,12 +2552,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'HTTP-диагностика'**
   String get diagnosticHttp;
-
-  /// No description provided for @diagnosticArchive.
-  ///
-  /// In ru, this message translates to:
-  /// **'Архив диагностики ядра'**
-  String get diagnosticArchive;
 
   /// No description provided for @diagnosticNoData.
   ///
@@ -3102,7 +3000,7 @@ abstract class S {
   /// No description provided for @profileSsidsHint.
   ///
   /// In ru, this message translates to:
-  /// **'Дом, Офис — через запятую'**
+  /// **'Дом, Офис через запятую'**
   String get profileSsidsHint;
 
   /// No description provided for @profileGateways.
@@ -3126,7 +3024,7 @@ abstract class S {
   /// No description provided for @profileAutoApplyHint.
   ///
   /// In ru, this message translates to:
-  /// **'Если выключено — спрашивать перед применением'**
+  /// **'Если выключено, Sora спросит перед применением'**
   String get profileAutoApplyHint;
 
   /// No description provided for @profileSnapshot.
@@ -3363,18 +3261,6 @@ abstract class S {
   /// **'Никогда'**
   String get syncNever;
 
-  /// No description provided for @syncWhat.
-  ///
-  /// In ru, this message translates to:
-  /// **'Что синхронизируется'**
-  String get syncWhat;
-
-  /// No description provided for @syncWhatBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Подписки, правила, настройки и сетевые профили. Никогда не синхронизируются: локальные логи, IPC-токены.'**
-  String get syncWhatBody;
-
   /// No description provided for @syncNoLan.
   ///
   /// In ru, this message translates to:
@@ -3414,13 +3300,13 @@ abstract class S {
   /// No description provided for @zapretWithVpnHint.
   ///
   /// In ru, this message translates to:
-  /// **'Запускает zapret рядом с VPN-туннелем: туннелированный трафик идёт через VPN, прямой — через обход.'**
+  /// **'Запускает zapret рядом с VPN-туннелем: трафик туннеля идёт через VPN, прямой трафик через обход.'**
   String get zapretWithVpnHint;
 
   /// No description provided for @chainDuplicate.
   ///
   /// In ru, this message translates to:
-  /// **'Каждый сервер — только один раз'**
+  /// **'Каждый сервер можно выбрать только один раз'**
   String get chainDuplicate;
 
   /// No description provided for @edit.
@@ -3444,7 +3330,7 @@ abstract class S {
   /// No description provided for @autoSwitchOnDegradeDetail.
   ///
   /// In ru, this message translates to:
-  /// **'Если выбранный сервер сильно замедлится или перестанет отвечать, Sora переключится на лучший из измеренных — не чаще одного раза в 10 минут.'**
+  /// **'Если выбранный сервер сильно замедлится или перестанет отвечать, Sora переключится на лучший из измеренных, но не чаще раза в 10 минут.'**
   String get autoSwitchOnDegradeDetail;
 
   /// No description provided for @tunStackMixed.
@@ -3458,126 +3344,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Системный'**
   String get tunStackSystem;
-
-  /// No description provided for @censorTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Диагностика блокировок'**
-  String get censorTitle;
-
-  /// No description provided for @censorHistory.
-  ///
-  /// In ru, this message translates to:
-  /// **'История проверок'**
-  String get censorHistory;
-
-  /// No description provided for @censorEmpty.
-  ///
-  /// In ru, this message translates to:
-  /// **'Проверок пока не было. Если соединение не удастся установить, детектор проверит, не блокирует ли его провайдер.'**
-  String get censorEmpty;
-
-  /// No description provided for @censorExplainer.
-  ///
-  /// In ru, this message translates to:
-  /// **'Это не ошибка приложения: похоже, провайдер ограничивает соединение. Маскировка меняет способ подключения и часто помогает.'**
-  String get censorExplainer;
-
-  /// No description provided for @censorNoProfile.
-  ///
-  /// In ru, this message translates to:
-  /// **'Для этого вердикта нет подходящего профиля'**
-  String get censorNoProfile;
-
-  /// No description provided for @censorApplyProfile.
-  ///
-  /// In ru, this message translates to:
-  /// **'Применить рекомендованный профиль'**
-  String get censorApplyProfile;
-
-  /// No description provided for @censorEnable.
-  ///
-  /// In ru, this message translates to:
-  /// **'Включить'**
-  String get censorEnable;
-
-  /// No description provided for @censorDetails.
-  ///
-  /// In ru, this message translates to:
-  /// **'Подробнее'**
-  String get censorDetails;
-
-  /// No description provided for @censorNotNow.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не сейчас'**
-  String get censorNotNow;
-
-  /// No description provided for @censorPromptTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Возможно, соединение блокируют'**
-  String get censorPromptTitle;
-
-  /// No description provided for @censorPromptBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Похоже, провайдер блокирует соединение (уверенность {confidence}%). Попробовать маскировку?'**
-  String censorPromptBody(int confidence);
-
-  /// No description provided for @censorConfidence.
-  ///
-  /// In ru, this message translates to:
-  /// **'Уверенность: {confidence}%'**
-  String censorConfidence(int confidence);
-
-  /// No description provided for @censorKindBlocked.
-  ///
-  /// In ru, this message translates to:
-  /// **'Блокировка обнаружена'**
-  String get censorKindBlocked;
-
-  /// No description provided for @censorKindLikely.
-  ///
-  /// In ru, this message translates to:
-  /// **'Похоже на блокировку'**
-  String get censorKindLikely;
-
-  /// No description provided for @censorKindClear.
-  ///
-  /// In ru, this message translates to:
-  /// **'Блокировка не обнаружена'**
-  String get censorKindClear;
-
-  /// No description provided for @censorKindUnknown.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не удалось определить'**
-  String get censorKindUnknown;
-
-  /// No description provided for @censorReasonTlsReset.
-  ///
-  /// In ru, this message translates to:
-  /// **'TLS-соединения сбрасываются — характерный признак фильтрации'**
-  String get censorReasonTlsReset;
-
-  /// No description provided for @censorReasonHttpBlock.
-  ///
-  /// In ru, this message translates to:
-  /// **'HTTP-запросы блокируются'**
-  String get censorReasonHttpBlock;
-
-  /// No description provided for @censorReasonDnsSpoofed.
-  ///
-  /// In ru, this message translates to:
-  /// **'DNS-ответы подменяются'**
-  String get censorReasonDnsSpoofed;
-
-  /// No description provided for @censorReasonConnectTimeout.
-  ///
-  /// In ru, this message translates to:
-  /// **'Соединения обрываются по таймауту'**
-  String get censorReasonConnectTimeout;
 
   /// No description provided for @customServerAdd.
   ///
@@ -3648,7 +3414,7 @@ abstract class S {
   /// No description provided for @customServerPortInvalid.
   ///
   /// In ru, this message translates to:
-  /// **'Порт — число от 1 до 65535'**
+  /// **'Порт должен быть числом от 1 до 65535'**
   String get customServerPortInvalid;
 
   /// No description provided for @customServerProtocol.
@@ -3687,12 +3453,6 @@ abstract class S {
   /// **'свой'**
   String get customServerBadge;
 
-  /// No description provided for @flowAuto.
-  ///
-  /// In ru, this message translates to:
-  /// **'авто'**
-  String get flowAuto;
-
   /// No description provided for @customServerDeleteConfirm.
   ///
   /// In ru, this message translates to:
@@ -3710,12 +3470,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Проверить'**
   String get customServerTest;
-
-  /// No description provided for @errObfsUnsupported.
-  ///
-  /// In ru, this message translates to:
-  /// **'Установленный core слишком стар для профилей маскировки. Обновите Sora, чтобы применять их.'**
-  String get errObfsUnsupported;
 
   /// No description provided for @leakTestTitle.
   ///
@@ -3768,7 +3522,7 @@ abstract class S {
   /// No description provided for @leakTestSkipped.
   ///
   /// In ru, this message translates to:
-  /// **'Пропущен — неприменим в этой сессии'**
+  /// **'Пропущен: в этой сессии неприменим'**
   String get leakTestSkipped;
 
   /// No description provided for @leakTestFix.
@@ -3780,7 +3534,7 @@ abstract class S {
   /// No description provided for @leakTestFixedNote.
   ///
   /// In ru, this message translates to:
-  /// **'Kill switch включён — запустите проверку снова.'**
+  /// **'Kill switch включён, запустите проверку снова.'**
   String get leakTestFixedNote;
 
   /// No description provided for @leakTestCheckDirectDns.
@@ -3822,7 +3576,7 @@ abstract class S {
   /// No description provided for @noticeDegraded.
   ///
   /// In ru, this message translates to:
-  /// **'Сервер замедлился — переключено на лучший из измеренных'**
+  /// **'Сервер замедлился, Sora переключилась на лучший из измеренных'**
   String get noticeDegraded;
 
   /// No description provided for @obfs.
@@ -3830,108 +3584,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Маскировка трафика'**
   String get obfs;
-
-  /// No description provided for @obfsPreset.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пресет'**
-  String get obfsPreset;
-
-  /// No description provided for @obfsPresetAggressive.
-  ///
-  /// In ru, this message translates to:
-  /// **'Максимальная маскировка'**
-  String get obfsPresetAggressive;
-
-  /// No description provided for @obfsPresetBalanced.
-  ///
-  /// In ru, this message translates to:
-  /// **'Баланс'**
-  String get obfsPresetBalanced;
-
-  /// No description provided for @obfsPresetOff.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скорость'**
-  String get obfsPresetOff;
-
-  /// No description provided for @obfsPresetCustom.
-  ///
-  /// In ru, this message translates to:
-  /// **'Вручную'**
-  String get obfsPresetCustom;
-
-  /// No description provided for @obfsManual.
-  ///
-  /// In ru, this message translates to:
-  /// **'Ручные настройки'**
-  String get obfsManual;
-
-  /// No description provided for @obfsUtls.
-  ///
-  /// In ru, this message translates to:
-  /// **'uTLS-профиль'**
-  String get obfsUtls;
-
-  /// No description provided for @obfsUtlsAuto.
-  ///
-  /// In ru, this message translates to:
-  /// **'Авто'**
-  String get obfsUtlsAuto;
-
-  /// No description provided for @obfsJitter.
-  ///
-  /// In ru, this message translates to:
-  /// **'Джиттер'**
-  String get obfsJitter;
-
-  /// No description provided for @obfsJitterNeedsFragment.
-  ///
-  /// In ru, this message translates to:
-  /// **'Джиттер работает только при включённой фрагментации.'**
-  String get obfsJitterNeedsFragment;
-
-  /// No description provided for @obfsFineTune.
-  ///
-  /// In ru, this message translates to:
-  /// **'Размеры и задержки'**
-  String get obfsFineTune;
-
-  /// No description provided for @obfsDetecting.
-  ///
-  /// In ru, this message translates to:
-  /// **'Определение возможностей…'**
-  String get obfsDetecting;
-
-  /// No description provided for @obfsCapabilities.
-  ///
-  /// In ru, this message translates to:
-  /// **'Возможности движка'**
-  String get obfsCapabilities;
-
-  /// No description provided for @obfsCompatibleEngines.
-  ///
-  /// In ru, this message translates to:
-  /// **'Совместимые движки: {engines}'**
-  String obfsCompatibleEngines(String engines);
-
-  /// No description provided for @obfsSupported.
-  ///
-  /// In ru, this message translates to:
-  /// **'Поддерживается'**
-  String get obfsSupported;
-
-  /// No description provided for @obfsUnsupported.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не поддерживается'**
-  String get obfsUnsupported;
-
-  /// No description provided for @obfsUnknown.
-  ///
-  /// In ru, this message translates to:
-  /// **'Возможности пока определяются.'**
-  String get obfsUnknown;
 
   /// No description provided for @syncCodeExpired.
   ///
@@ -4002,7 +3654,7 @@ abstract class S {
   /// No description provided for @syncLegacyCleared.
   ///
   /// In ru, this message translates to:
-  /// **'Старый список устройств никогда не был по-настоящему спарен, поэтому он очищен. Спарьте устройства заново — теперь по-настоящему.'**
+  /// **'Старый список устройств никогда не был по-настоящему спарен, поэтому он очищен. Спарьте устройства заново, теперь по-настоящему.'**
   String get syncLegacyCleared;
 
   /// No description provided for @syncNewCode.
@@ -4038,7 +3690,7 @@ abstract class S {
   /// No description provided for @syncSyncResult.
   ///
   /// In ru, this message translates to:
-  /// **'Получено: {pulled} · отправлено: {pushed}'**
+  /// **'Получено: {pulled}, отправлено: {pushed}'**
   String syncSyncResult(int pulled, int pushed);
 
   /// No description provided for @syncResultTitle.
@@ -4095,12 +3747,6 @@ abstract class S {
   /// **'Цепочки прокси'**
   String get syncDocKindChains;
 
-  /// No description provided for @syncDocKindObfs.
-  ///
-  /// In ru, this message translates to:
-  /// **'Маскировка трафика'**
-  String get syncDocKindObfs;
-
   /// No description provided for @syncFrom.
   ///
   /// In ru, this message translates to:
@@ -4116,20 +3762,8 @@ abstract class S {
   /// No description provided for @syncUnavailableAndroid.
   ///
   /// In ru, this message translates to:
-  /// **'Синхронизация устройств пока недоступна на Android — там не может работать служба синхронизации.'**
+  /// **'Синхронизация устройств пока недоступна на Android: там не работает служба синхронизации.'**
   String get syncUnavailableAndroid;
-
-  /// No description provided for @smartPickReason.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выбран умным режимом: пинг {ping}, скорость {speed}'**
-  String smartPickReason(String ping, String speed);
-
-  /// No description provided for @serverReliability.
-  ///
-  /// In ru, this message translates to:
-  /// **'Надёжность {pct}%'**
-  String serverReliability(int pct);
 
   /// No description provided for @customServerShadowsocksCredentials.
   ///

@@ -25,9 +25,6 @@ class SHi extends S {
   String get stateDisconnecting => 'डिस्कनेक्ट कर रहा है';
 
   @override
-  String get stateFailed => 'जुड़े नहीं हैं';
-
-  @override
   String get coreMissing => 'Sora सेवा प्रतिसाद नहीं दे रही है';
 
   @override
@@ -268,9 +265,6 @@ class SHi extends S {
   String get errNoServers => 'कनेक्ट करने के लिए सदस्यता जोड़ें';
 
   @override
-  String get exportText => 'मूलपाठ';
-
-  @override
   String get connections => 'कनेक्शन';
 
   @override
@@ -509,17 +503,6 @@ class SHi extends S {
   String get ruleInvalid => 'यह किसी साइट, आईपी या प्रोग्राम जैसा नहीं दिखता है';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '# सर्वर, बदले में',
-      one: '# सर्वर, बदले में',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -532,9 +515,6 @@ class SHi extends S {
 
   @override
   String get tunnelMode => 'तरीका';
-
-  @override
-  String get tunnelTun => 'सारा यातायात';
 
   @override
   String get tunnelProxy => 'System प्रॉक्सी';
@@ -650,28 +630,6 @@ class SHi extends S {
   String get less => 'कम';
 
   @override
-  String get currentServer => 'वर्तमान सर्वर';
-
-  @override
-  String get trafficDown => 'डाउनलोड';
-
-  @override
-  String get trafficUp => 'अपलोड किए गए';
-
-  @override
-  String perSecond(String value) {
-    return '$value/s';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'सक्रिय नियम: $count';
-  }
-
-  @override
-  String get recentNotifications => 'हाल की सूचनाएं';
-
-  @override
   String get notificationsEmpty => 'कनेक्शन और सदस्यता ईवेंट यहां दिखाई देंगे';
 
   @override
@@ -725,22 +683,13 @@ class SHi extends S {
   String get runningProcesses => 'चल रही प्रक्रियाएँ';
 
   @override
-  String get programsFailed => 'एप्लिकेशन लोड नहीं हो सके';
-
-  @override
   String get programsEmpty => 'कोई एप्लिकेशन नहीं मिला. कोई दूसरा नाम आज़माएं.';
 
   @override
   String get selectExe => 'कोई .exe फ़ाइल चुनें';
 
   @override
-  String get trafficUnavailable => 'अभी तक काउंटर उपलब्ध नहीं हैं';
-
-  @override
   String get speedtest => 'रफ़्तार';
-
-  @override
-  String get speedtestCheck => 'गति की जाँच करें';
 
   @override
   String get speedtestSearch => 'एक सेवा खोजें';
@@ -834,12 +783,11 @@ class SHi extends S {
       'दोनों सत्यापित पैकेजों को स्थापित करने के लिए इस कमांड को टर्मिनल में चलाएँ, फिर Sora को फिर से खोलें। फ़ाइलें डाउनलोड निर्देशिका में रहती हैं। वीपीएन कनेक्शन बंद हो जाएगा.';
 
   @override
-  String get updateSignaturePending =>
-      'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+  String get updateSignaturePending => 'अपडेट फ़ाइलों का मिलान रिलीज़ के साथ प्रकाशित चेकसम से किया जाता है।';
 
   @override
   String get updateManualSigWarning =>
-      'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
+      'नीचे की फ़ाइलें रिलीज़ के चेकसम से मेल खाती हैं। अगर आपने इन्हें आधिकारिक रिलीज़ से डाउनलोड किया है, तो कमांड चलाएँ।';
 
   @override
   String get updateVersionRevoked =>
@@ -892,9 +840,6 @@ class SHi extends S {
   String get componentLicenses => 'घटक लाइसेंस';
 
   @override
-  String get appCopyright => '© 2026 लेव्स-वन और योगदानकर्ता';
-
-  @override
   String get collapseServers => 'सर्वर संक्षिप्त करें';
 
   @override
@@ -911,10 +856,6 @@ class SHi extends S {
 
   @override
   String get reconnectNow => 'आवेदन करें और पुनः कनेक्ट करें';
-
-  @override
-  String get bypassLimitations =>
-      'यह मोड केवल HTTP और TLS के लिए DPI को बायपास करता है, UDP का समर्थन नहीं करता है या आपके IP को नहीं बदलता है। Discord आवाज, कॉल और अवरुद्ध Telegram पतों के लिए वीपीएन सर्वर का उपयोग करें।';
 
   @override
   String get errEngineUnsupported =>
@@ -1167,8 +1108,7 @@ class SHi extends S {
   String get extConflictsTitle => 'Extension conflicts';
 
   @override
-  String get extConflictsIntro =>
-      'These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.';
+  String get extConflictsIntro => 'ये एक्सटेंशन एक ही चीज़ चाहते हैं। चुनें कि कौन-सा चलेगा, दूसरा इंस्टॉल रहेगा।';
 
   @override
   String get extConflictRoutingRules => 'Routing rules';
@@ -1298,10 +1238,10 @@ class SHi extends S {
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
+      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet — granting it changes nothing today.';
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
   String get extCapBackground => 'Runs in the background';
@@ -1326,7 +1266,7 @@ class SHi extends S {
 
   @override
   String extCatalogCached(String date) {
-    return 'Cached catalog · $date';
+    return 'Cached catalog, $date';
   }
 
   @override
@@ -1350,7 +1290,7 @@ class SHi extends S {
 
   @override
   String get extPermNetworkDetail =>
-      'Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.';
+      'VPN के ज़रिए इंटरनेट से डेटा लाता है। केवल नीचे दिए होस्ट की अनुमति है, बाकी सब ब्लॉक है।';
 
   @override
   String get extBgTitle => 'Background task';
@@ -1375,10 +1315,7 @@ class SHi extends S {
 
   @override
   String get extBgNote =>
-      'Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.';
-
-  @override
-  String get extBgRuntimeBadge => 'Not available yet';
+      'Sora खुला रहने तक, ट्रे में होने पर भी, कार्य शेड्यूल के अनुसार चलता है। सबसे छोटा अंतराल 15 मिनट है।';
 
   @override
   String get extBgDisabledNote => 'Enable the extension to manage its background task.';
@@ -1398,9 +1335,6 @@ class SHi extends S {
 
   @override
   String get diagnosticHttp => 'HTTP डायग्नोस्टिक्स';
-
-  @override
-  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'अभी तक कोई रिकॉर्डेड अनुरोध नहीं. सबसे पहले एक स्पीड टेस्ट वेबसाइट खोलें।';
@@ -1631,7 +1565,7 @@ class SHi extends S {
   String get profileSsids => 'Wi-Fi networks (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office — comma separated';
+  String get profileSsidsHint => 'Home, Office, comma separated';
 
   @override
   String get profileGateways => 'Gateways';
@@ -1779,13 +1713,6 @@ class SHi extends S {
   String get syncNever => 'Never';
 
   @override
-  String get syncWhat => 'What syncs';
-
-  @override
-  String get syncWhatBody =>
-      'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.';
-
-  @override
   String get syncNoLan => 'Devices must be on the same local network';
 
   @override
@@ -1821,79 +1748,13 @@ class SHi extends S {
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.';
+      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
 
   @override
   String get tunStackMixed => 'Mixed';
 
   @override
   String get tunStackSystem => 'System';
-
-  @override
-  String get censorTitle => 'Blocking diagnostics';
-
-  @override
-  String get censorHistory => 'Check history';
-
-  @override
-  String get censorEmpty =>
-      'No checks yet. If a connection fails, the detector will check whether your provider is blocking it.';
-
-  @override
-  String get censorExplainer =>
-      'This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.';
-
-  @override
-  String get censorNoProfile => 'No suitable profile for this verdict';
-
-  @override
-  String get censorApplyProfile => 'Apply recommended profile';
-
-  @override
-  String get censorEnable => 'Enable';
-
-  @override
-  String get censorDetails => 'Details';
-
-  @override
-  String get censorNotNow => 'Not now';
-
-  @override
-  String get censorPromptTitle => 'Connection may be blocked';
-
-  @override
-  String censorPromptBody(int confidence) {
-    return 'It looks like your provider is blocking the connection (confidence $confidence%). Try masking?';
-  }
-
-  @override
-  String censorConfidence(int confidence) {
-    return 'Confidence: $confidence%';
-  }
-
-  @override
-  String get censorKindBlocked => 'Blocking detected';
-
-  @override
-  String get censorKindLikely => 'Looks like blocking';
-
-  @override
-  String get censorKindClear => 'No blocking detected';
-
-  @override
-  String get censorKindUnknown => 'Could not determine';
-
-  @override
-  String get censorReasonTlsReset => 'TLS connections are being reset — a typical sign of filtering';
-
-  @override
-  String get censorReasonHttpBlock => 'HTTP requests are being blocked';
-
-  @override
-  String get censorReasonDnsSpoofed => 'DNS responses are being spoofed';
-
-  @override
-  String get censorReasonConnectTimeout => 'Connections keep timing out';
 
   @override
   String get customServerAdd => 'Add custom server';
@@ -1950,9 +1811,6 @@ class SHi extends S {
   String get customServerBadge => 'custom';
 
   @override
-  String get flowAuto => 'auto';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Delete server “$name”?';
   }
@@ -1962,9 +1820,6 @@ class SHi extends S {
 
   @override
   String get customServerTest => 'Test';
-
-  @override
-  String get errObfsUnsupported => 'The installed core is too old for obfuscation profiles. Update Sora to apply them.';
 
   @override
   String get leakTestTitle => 'Leak test';
@@ -1997,13 +1852,13 @@ class SHi extends S {
   }
 
   @override
-  String get leakTestSkipped => 'Skipped — not applicable in this session';
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
   String get leakTestFix => 'Fix';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on — run the test again to verify.';
+  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';
@@ -2024,63 +1879,10 @@ class SHi extends S {
   String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
-  String get noticeDegraded => 'The server slowed down — switched to the best measured one';
+  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
 
   @override
   String get obfs => 'Traffic obfuscation';
-
-  @override
-  String get obfsPreset => 'Preset';
-
-  @override
-  String get obfsPresetAggressive => 'Maximum obfuscation';
-
-  @override
-  String get obfsPresetBalanced => 'Balanced';
-
-  @override
-  String get obfsPresetOff => 'Speed';
-
-  @override
-  String get obfsPresetCustom => 'Custom';
-
-  @override
-  String get obfsManual => 'Manual settings';
-
-  @override
-  String get obfsUtls => 'uTLS profile';
-
-  @override
-  String get obfsUtlsAuto => 'Auto';
-
-  @override
-  String get obfsJitter => 'Timing jitter';
-
-  @override
-  String get obfsJitterNeedsFragment => 'Jitter only works with fragmentation enabled.';
-
-  @override
-  String get obfsFineTune => 'Sizes and delays';
-
-  @override
-  String get obfsDetecting => 'Detecting capabilities…';
-
-  @override
-  String get obfsCapabilities => 'Engine capabilities';
-
-  @override
-  String obfsCompatibleEngines(String engines) {
-    return 'Compatible engines: $engines';
-  }
-
-  @override
-  String get obfsSupported => 'Supported';
-
-  @override
-  String get obfsUnsupported => 'Not supported';
-
-  @override
-  String get obfsUnknown => 'Capabilities are still being detected.';
 
   @override
   String get syncCodeExpired => 'The code expired';
@@ -2120,7 +1922,7 @@ class SHi extends S {
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.';
+      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
 
   @override
   String get syncNewCode => 'New code';
@@ -2141,7 +1943,7 @@ class SHi extends S {
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled · sent $pushed';
+    return 'Received $pulled, sent $pushed';
   }
 
   @override
@@ -2172,9 +1974,6 @@ class SHi extends S {
   String get syncDocKindChains => 'Proxy chains';
 
   @override
-  String get syncDocKindObfs => 'Traffic obfuscation';
-
-  @override
   String syncFrom(String name) {
     return 'from $name';
   }
@@ -2184,17 +1983,7 @@ class SHi extends S {
 
   @override
   String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet — the sync service can\'t run there.';
-
-  @override
-  String smartPickReason(String ping, String speed) {
-    return 'Picked by smart mode: ping $ping, speed $speed';
-  }
-
-  @override
-  String serverReliability(int pct) {
-    return 'Reliability $pct%';
-  }
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
   String get customServerShadowsocksCredentials =>

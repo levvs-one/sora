@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// TestJournalUnsubscribeDuringAppend locks SORA-H6: unsubscribing while Append
+// TestJournalUnsubscribeDuringAppend: unsubscribing while Append
 // publishes must not panic (send on closed channel) and must not race.
 func TestJournalUnsubscribeDuringAppend(_ *testing.T) {
 	j := NewJournal(64)

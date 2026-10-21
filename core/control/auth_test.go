@@ -9,7 +9,7 @@ import (
 	"github.com/levvs-one/sora-client/core/control"
 )
 
-// TestRotatePersistsTheToken locks SORA-L1: rotation must survive a restart.
+// TestRotatePersistsTheToken: rotation must survive a restart.
 // After Rotate, the new token verifies and the old one does not, both in
 // memory and after reloading from disk.
 func TestRotatePersistsTheToken(t *testing.T) {

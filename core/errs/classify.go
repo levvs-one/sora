@@ -90,7 +90,7 @@ func fromPathError(err *fs.PathError) *Error {
 func netDetail(err error) error {
 	// DNS errors carry the queried name, and a *net.OpError often wraps the
 	// *net.DNSError. Classify DNS first so the hostname never leaks through
-	// opErrCause rendering (SORA-M7).
+	// opErrCause rendering.
 	var dnsErr *net.DNSError
 	if errors.As(err, &dnsErr) {
 		if dnsErr.Err == "" {

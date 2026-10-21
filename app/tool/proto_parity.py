@@ -51,7 +51,7 @@ MAPPINGS = {
 # protos intentionally without a Dart stub (checked, not failures)
 EXPECTED_GAPS = {
     "proto/sora/censor/v1/censor.proto": "no Dart stub yet (client not written)",
-    "proto/sora/ext/v1/ext_host.proto": "no Dart client by design (see analysis-20/03 P0-3)",
+    "proto/sora/ext/v1/ext_host.proto": "no Dart client by design: the app never talks to the extension host directly",
 }
 
 # proto scalar -> canonical dart-side type used in BuilderInfo generics

@@ -25,8 +25,7 @@ func PrepareTun(p *Plan) error {
 		p.Tun.DeviceName = TunDevice
 	}
 	// The device name reaches privileged `ip` invocations; reject anything
-	// but a plain kernel interface name here as well as in Tun.validate
-	// (SORA-M2).
+	// but a plain kernel interface name here as well as in Tun.validate.
 	if err := validateInterfaceName("tun", p.Tun.DeviceName); err != nil {
 		return err
 	}

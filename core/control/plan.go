@@ -48,7 +48,7 @@ type resolver interface {
 // parseCredential reads the import pipeline's flat credential map. Only the
 // JSON document produced by credentialDocument is accepted; anything else
 // (a raw proxy URL, truncated or foreign bytes) fails closed instead of
-// yielding an empty, partially configured credential (SORA-M8).
+// yielding an empty, partially configured credential.
 func parseCredential(material []byte) (map[string]string, error) {
 	if len(bytes.TrimSpace(material)) == 0 {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
@@ -457,7 +457,7 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 	}
 	if peers := values["peers"]; peers != "" {
 		// Fail closed: a broken peer document must not silently become a
-		// peerless outbound (SORA-L17).
+		// peerless outbound.
 		if err := json.Unmarshal([]byte(peers), &outbound.Peers); err != nil {
 			return fmt.Errorf("invalid WireGuard peers: %w", err)
 		}
@@ -640,7 +640,7 @@ func ruleTypeOf(destination string) engine.RuleType {
 		return engine.RuleIPCIDR
 	default:
 		// An IP literal is an IP rule even though IPv6 literals contain
-		// colons; only a bare number is a port (SORA-M14).
+		// colons; only a bare number is a port.
 		if addr, err := netip.ParseAddr(destination); err == nil && addr.IsValid() {
 			return engine.RuleIPCIDR
 		}
@@ -708,7 +708,7 @@ func splitDNSServer(address string) (host string, port uint16, transport engine.
 	}
 	rest = strings.TrimSuffix(rest, "/dns-query")
 	// Prefer net.SplitHostPort for host:port and [ipv6]:port; a naive cut
-	// on the first colon mangles IPv6 literals (SORA-M13).
+	// on the first colon mangles IPv6 literals.
 	if host, portStr, err := net.SplitHostPort(rest); err == nil {
 		if parsed, err := strconv.ParseUint(portStr, 10, 16); err == nil {
 			return host, uint16(parsed), transport

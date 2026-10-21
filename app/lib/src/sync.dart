@@ -3,10 +3,10 @@ import 'dart:convert';
 /// Pairing payload version. Bump when the QR format changes.
 const syncPairVersion = 1;
 
-/// mDNS service type the Go sync service advertises in the LAN (F9).
+/// mDNS service type the Go sync service advertises in the LAN.
 const syncMdnsService = '_sora-sync._tcp';
 
-/// Pairing handshake data (F9).
+/// Pairing handshake data.
 ///
 /// The QR payload is the Go `service/sync/pairing` Invitation, contract for
 /// contract: `sora-sync://pair?v=1&id={device}&pub={base64url 32B}`

@@ -167,7 +167,7 @@ class SubscriptionScreen extends StatelessWidget {
   }
 }
 
-/// "My edits" — user overrides layered over a subscription (FEATURE-PLAN.md F6).
+/// "My edits" — user overrides layered over a subscription.
 ///
 /// Edits are stored locally (settings) until the core implements override
 /// RPCs, and survive subscription refreshes: they key off server IDs, not

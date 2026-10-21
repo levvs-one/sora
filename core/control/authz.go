@@ -13,7 +13,7 @@ import (
 // readOnlyMethods lists RPCs an AuthRead peer may call: version negotiation,
 // status, statistics, events, and log inspection. Every other RPC mutates
 // state, touches secrets or subscriptions, or exposes private data, and
-// requires AuthControl (SORA-H2).
+// requires AuthControl.
 var readOnlyMethods = map[string]bool{
 	corev1.CoreControl_Handshake_FullMethodName:         true,
 	corev1.CoreControl_GetAbout_FullMethodName:          true,

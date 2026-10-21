@@ -11,8 +11,7 @@ import 'kit.dart';
 import 'profiles.dart' show newLocalId;
 import 'subscription_sheet.dart';
 
-/// Proxy chains: named 2–3 hop routes through the user's servers
-/// (FEATURE-PLAN.md F8).
+/// Proxy chains: named 2–3 hop routes through the user's servers.
 class ChainsScreen extends StatefulWidget {
   const ChainsScreen({super.key});
 
@@ -130,7 +129,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
   }
 }
 
-/// One server row in the chain picker: tap toggles membership (F8).
+/// One server row in the chain picker: tap toggles membership.
 class _ServerPickRow extends StatelessWidget {
   const _ServerPickRow({
     required this.name,
@@ -169,7 +168,7 @@ class _ServerPickRow extends StatelessWidget {
   }
 }
 
-/// Builds or edits a proxy chain: picks 2–3 servers and orders them (F8).
+/// Builds or edits a proxy chain: picks 2–3 servers and orders them.
 class ChainBuilderScreen extends StatefulWidget {
   const ChainBuilderScreen({super.key, this.chain});
 

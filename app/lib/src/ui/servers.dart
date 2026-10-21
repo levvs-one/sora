@@ -277,7 +277,7 @@ List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty
       ];
 
 /// Applies subscription overrides: hides servers the user hid and renames the
-/// ones they renamed (FEATURE-PLAN.md F6). A renamed group member splits out
+/// ones they renamed. A renamed group member splits out
 /// of its group so the rename stays visible instead of being swallowed by the
 /// shared group title.
 ///
@@ -304,7 +304,7 @@ List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
   return out;
 }
 
-/// Sorts server entries by the user's sort mode (FEATURE-PLAN.md F2).
+/// Sorts server entries by the user's sort mode.
 ///
 /// [shownCache] optionally collects each group entry's prospective active
 /// member: the sort keys and the rows below both need it, and [pickMember]

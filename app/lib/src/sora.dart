@@ -408,22 +408,22 @@ class Sora extends ChangeNotifier {
   /// Server latency in milliseconds; null means the server did not respond.
   final Map<String, int?> latency = {};
 
-  /// User edits layered over subscriptions (FEATURE-PLAN.md F6).
+  /// User edits layered over subscriptions.
   final OverrideStore overrides;
 
-  /// Network profiles with auto-apply triggers (FEATURE-PLAN.md F5).
+  /// Network profiles with auto-apply triggers.
   final ProfilesStore profiles;
 
-  /// Named proxy chains (FEATURE-PLAN.md F8).
+  /// Named proxy chains.
   final ChainsStore chains;
 
-  /// Lifecycle manager for the sora-sync device-sync daemon (F9). The daemon
+  /// Lifecycle manager for the sora-sync device-sync daemon. The daemon
   /// is spawned on demand (first opened sync screen) and stopped on app exit;
   /// it is the source of truth for paired devices — the app keeps no device
   /// registry of its own.
   final SyncDaemon syncDaemon = SyncDaemon();
 
-  /// App ⇄ daemon document bridge (F9). Wired to the daemon's current API
+  /// App ⇄ daemon document bridge. Wired to the daemon's current API
   /// client by [ensureSyncBridge]; null while the daemon is unavailable.
   SyncDocumentBridge? _syncBridge;
 
@@ -444,13 +444,12 @@ class Sora extends ChangeNotifier {
   void _noteSyncChanged() => _syncBridge?.noteChanged();
 
   /// Fingerprint of the currently joined network, filled by
-  /// [refreshFingerprint] from the core's GetNetworkFingerprint RPC (F5).
+  /// [refreshFingerprint] from the core's GetNetworkFingerprint RPC.
   /// Unknown until the first successful refresh.
   NetworkFingerprint networkFingerprint = const NetworkFingerprint.unknown();
 
   /// True when the core advertises proxy-chain support for the active
-  /// engine. The engine registry sets the [chainCapability] flag per engine
-  /// (F8).
+  /// engine. The engine registry sets the [chainCapability] flag per engine.
   bool get chainsSupported => coreCapabilities.contains(chainCapability);
 
   /// Server IDs hidden by subscription overrides.
@@ -824,7 +823,7 @@ class Sora extends ChangeNotifier {
             event.stateChanged.state.sessionId != id) {
           return;
         }
-        // A healthy event resets the watchdog streak (FEATURE-PLAN.md F7).
+        // A healthy event resets the watchdog streak.
         if (_watchFailures != 0) {
           _watchFailures = 0;
           if (failure?.key == 'app.core_watch_unstable') failure = null;
@@ -880,7 +879,7 @@ class Sora extends ChangeNotifier {
   int _watchFailures = 0;
 
   /// After this many consecutive watch failures the app stops silent retries
-  /// and asks the user to repair the link (FEATURE-PLAN.md F7).
+  /// and asks the user to repair the link.
   static const _maxWatchFailures = 5;
 
   /// Whether the session watch gave up auto-recovery.
@@ -900,7 +899,7 @@ class Sora extends ChangeNotifier {
   static const _sessionIntentTtl = Duration(hours: 24);
 
   /// Server choice saved after a successful connect; offered for restore when
-  /// the app restarts after a crash (FEATURE-PLAN.md F7).
+  /// the app restarts after a crash.
   String? _pendingRestore;
 
   /// A crashed session is waiting for the user's restore decision.
@@ -1030,7 +1029,7 @@ class Sora extends ChangeNotifier {
   /// in-flight disconnect lands, instead of being swallowed (audit L24).
   bool _connectQueued = false;
 
-  /// Applies a network profile's settings snapshot (F5). Only snapshot
+  /// Applies a network profile's settings snapshot. Only snapshot
   /// fields the profile captured are touched; the rest stays as-is.
   Future<void> applyProfile(NetworkProfile profile) async {
     await change((x) {
@@ -1043,7 +1042,7 @@ class Sora extends ChangeNotifier {
     });
   }
 
-  /// Handles a core ProfileMatched event (F5): marks the profile active and
+  /// Handles a core ProfileMatched event: marks the profile active and
   /// either applies it (auto-apply) or asks first. Applying posts an undo
   /// snapshot so the previous settings are one tap away.
   Future<void> handleProfileMatched(String profileId) async {
@@ -1067,7 +1066,7 @@ class Sora extends ChangeNotifier {
   }
 
   /// Applies a profile and posts an undo snapshot so the previous settings
-  /// are one tap away (F5).
+  /// are one tap away.
   Future<void> applyProfileWithUndo(NetworkProfile profile) async {
     final before = jsonEncode({
       'tunnel': settings.tunnel,
@@ -1089,7 +1088,7 @@ class Sora extends ChangeNotifier {
     );
   }
 
-  /// Restores the settings snapshot saved by [applyProfileWithUndo] (F5).
+  /// Restores the settings snapshot saved by [applyProfileWithUndo].
   Future<void> undoProfileApply(String snapshotJson) async {
     try {
       final before = jsonDecode(snapshotJson) as Map<String, dynamic>;
@@ -1113,7 +1112,7 @@ class Sora extends ChangeNotifier {
     }
   }
 
-  /// Refreshes the current network fingerprint (F5) via the core's
+  /// Refreshes the current network fingerprint via the core's
   /// GetNetworkFingerprint RPC (API 1.10) and runs the app-side profile
   /// matcher on it: a match applies the profile (auto-apply) or asks the
   /// user, via [handleProfileMatched]. Without a core link, with an older
@@ -1157,7 +1156,7 @@ class Sora extends ChangeNotifier {
     }
   }
 
-  /// Connects through a proxy chain (F8). The chain backend landed with core
+  /// Connects through a proxy chain. The chain backend landed with core
   /// API 1.10; older cores and engines without the chains capability get an
   /// honest, localized failure instead of a silent misconnect.
   Future<void> connectChain(ProxyChain chain) async {
@@ -1215,7 +1214,7 @@ class Sora extends ChangeNotifier {
     }
     final choice = selected;
     final entry = choice.startsWith(groupPrefix) ? entryOf(choice, _subscriptions.values) : null;
-    // A plain reconnect during a chain session keeps the chain (F8): via is
+    // A plain reconnect during a chain session keeps the chain: via is
     // only set for a fresh chain connect, while select()/disconnect() clear
     // the tracked chain explicitly. A hop deleted mid-session breaks the
     // chain: fail loudly with chainHopMissing instead of silently connecting
@@ -1306,17 +1305,17 @@ class Sora extends ChangeNotifier {
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
       _applyState(answer.status.connection);
       _activePlan = plan;
-      // via == null on a plain reconnect keeps the tracked chain (F8).
+      // via == null on a plain reconnect keeps the tracked chain.
       _activeChain = keepChain;
       needsReconnect = currentPlan != plan;
       connected = true;
       strictBlocked = strict;
-      // Remember the intent only once the session is truly up (F7): writing
+      // Remember the intent only once the session is truly up: writing
       // it before the RPC would offer to "restore" a session that never
       // existed if the connect failed. Chain connects are recorded by chain
       // id and restored through connectChain rather than the server
       // selector; a plain reconnect during a chain session keeps the chain
-      // id too (F8).
+      // id too.
       _writeSessionIntent(keepChain == null ? choice : 'chain:${keepChain.id}');
       // Swapped together with the watch, so events of the previous session
       // never meet the groups of this one.
@@ -1366,7 +1365,7 @@ class Sora extends ChangeNotifier {
     _stopping = true;
     cleanupPending = true;
     _lostAnnounced = false;
-    // A clean disconnect is not a crash: drop the restore intent (F7).
+    // A clean disconnect is not a crash: drop the restore intent.
     _clearSessionIntent();
     notifyListeners();
     try {
@@ -2173,7 +2172,7 @@ SessionPlan buildPlan({
     }
   }
 
-  // F11: zapret's tpws alongside the VPN tunnel (Linux only, needs tpws in
+  // Zapret's tpws alongside the VPN tunnel (Linux only, needs tpws in
   // the engines directory); never in serverless bypass mode.
   if (zapretWithVpn && choice != 'bypass') {
     plan.zapretWithVpn = true;
@@ -2189,7 +2188,7 @@ SessionPlan buildPlan({
     );
   }
 
-  // F8: a proxy chain carries its hop outbounds and the ordered hop ids; the
+  // A proxy chain carries its hop outbounds and the ordered hop ids; the
   // core renders each hop to dial through the next one. Traffic enters the
   // first hop, so it becomes the routing target.
   if (chain.isNotEmpty) {

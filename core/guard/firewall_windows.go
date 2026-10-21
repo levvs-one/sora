@@ -116,7 +116,7 @@ func (w *WFP) Arm(context.Context, []uint16) error {
 // Disarm removes the filters by closing the session that owns them. The
 // session handle is cleared only after a successful close: on failure the
 // filters may still be installed, and dropping the handle would make them
-// unreachable while Armed() wrongly reports false (SORA-M10).
+// unreachable while Armed() wrongly reports false.
 func (w *WFP) Disarm(context.Context) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -449,7 +449,7 @@ func (w *WFP) executables() ([]string, error) {
 	files := []string{self}
 	// An empty enginesDir would turn the glob into "*.exe" and permit
 	// arbitrary executables from the working directory: fail closed
-	// instead (SORA-L20).
+	// instead.
 	if strings.TrimSpace(w.enginesDir) == "" {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyGuardFirewallFail,
 			"wfp: the engines directory is not set")

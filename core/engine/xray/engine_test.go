@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// TestMetricsBypassTheProxy locks SORA-L10: the loopback metrics client must
+// TestMetricsBypassTheProxy: the loopback metrics client must
 // not honor HTTP_PROXY from the environment.
 func TestMetricsBypassTheProxy(t *testing.T) {
 	t.Setenv("HTTP_PROXY", "http://proxy.example:8080")

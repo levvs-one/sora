@@ -24,7 +24,7 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	// The handle is closed exactly once: context.AfterFunc closes it from
 	// its own goroutine to unblock the packet read below, and the deferred
 	// call covers every other exit. A second close could release an fd
-	// number already reused by another goroutine (SORA-M15).
+	// number already reused by another goroutine.
 	var closeOnce sync.Once
 	closeHandle := func() { closeOnce.Do(func() { _ = handle.Close() }) }
 	defer closeHandle()

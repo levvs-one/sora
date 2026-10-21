@@ -30,8 +30,8 @@ func TestClientTalksToTheCoreOverTheTransport(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// Owner-only dir: the secret store fails closed on weakened permissions
-	// (SORA-L3), and testing.TempDir subdirs inherit the process umask.
+	// Owner-only dir: the secret store fails closed on weakened permissions,
+	// and testing.TempDir subdirs inherit the process umask.
 	dir := t.TempDir()
 	if err := os.Chmod(dir, 0o700); err != nil {
 		t.Fatal(err)
@@ -74,7 +74,7 @@ func TestClientTalksToTheCoreOverTheTransport(t *testing.T) {
 		grpc.MaxSendMsgSize(16<<20),
 		// Peer credentials and method checks mirror the real service:
 		// the test client runs as the same user, so it is
-		// control-authorized (SORA-H2).
+		// control-authorized.
 		grpc.Creds(ipc.PeerCredentials(ipc.DefaultAuthorize(ipc.Options{Address: address}))),
 		grpc.UnaryInterceptor(plane.UnaryAuthInterceptor()),
 		grpc.StreamInterceptor(plane.StreamAuthInterceptor()),

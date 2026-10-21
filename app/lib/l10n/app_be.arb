@@ -5,7 +5,6 @@
   "stateConnected": "Падключана",
   "stateReconnecting": "Паўторнае падключэнне",
   "stateDisconnecting": "Адключэнне",
-  "stateFailed": "Не падключана",
   "coreMissing": "Служба Sora не адказвае",
   "serverAuto": "Самы хуткі",
   "serverBypass": "Няма сервера",
@@ -76,7 +75,6 @@
   "errSubScheme": "Спасылка павінна пачынацца з https://",
   "errSecretStore": "Назапашвальнік Sora пашкоджаны або недаступны",
   "errNoServers": "Каб падключыцца, дадайце падпіску",
-  "exportText": "Тэкст",
   "connections": "Сувязі",
   "close": "Блізка",
   "chainDirect": "Прамы",
@@ -150,7 +148,6 @@
   "trafficLow": "{name}: {left} злева",
   "ruleInvalid": "Гэта не падобна на сайт, IP або праграму",
   "tunnelMode": "Рэжым",
-  "tunnelTun": "Увесь трафік",
   "tunnelProxy": "System проксі",
   "proxyAddress": "Адрас проксі",
   "copied": "Скапіравана",
@@ -187,12 +184,6 @@
   "sidebarToggle": "Пераключыць бакавую панэль",
   "more": "больш",
   "less": "менш",
-  "currentServer": "Бягучы сервер",
-  "trafficDown": "Спампавана",
-  "trafficUp": "Запампавана",
-  "perSecond": "{value}/с",
-  "activeRules": "Актыўныя правілы: {count}",
-  "recentNotifications": "Апошнія апавяшчэнні",
   "notificationsEmpty": "Тут з'явяцца падзеі падключэння і падпіскі",
   "retryConnect": "Паўтарыце падключэнне",
   "openLogs": "Адкрытыя лагі",
@@ -210,12 +201,9 @@
   "chooseProgram": "Выберыце праграму",
   "installedApps": "Усталяваныя прыкладанні",
   "runningProcesses": "Запушчаныя працэсы",
-  "programsFailed": "Не атрымалася загрузіць праграмы",
   "programsEmpty": "Праграмы не знойдзены. Паспрабуйце іншую назву.",
   "selectExe": "Выберыце файл .exe",
-  "trafficUnavailable": "Лічыльнікаў пакуль няма",
   "speedtest": "хуткасць",
-  "speedtestCheck": "Праверце хуткасць",
   "speedtestSearch": "Знайдзіце паслугу",
   "speedtestEmpty": "Супадзенняў няма. Змяніць пошук.",
   "speedtestBackToList": "Вярнуцца да паслуг",
@@ -269,14 +257,12 @@
   "telegramChannel": "Канал Telegram",
   "licenses": "Ліцэнзіі",
   "componentLicenses": "Ліцэнзіі на кампаненты",
-  "appCopyright": "© 2026 levvs-one і ўдзельнікі",
   "collapseServers": "Згарнуць серверы",
   "expandServers": "Пашырыць серверы",
   "hideDescription": "Схаваць апісанне",
   "showDescription": "Паказаць апісанне",
   "pendingConnectionChanges": "Падключыцеся паўторна, каб прымяніць гэтыя змены.",
   "reconnectNow": "Падайце заяўку і паўторна падключыцеся",
-  "bypassLimitations": "Гэты рэжым абыходзіць DPI толькі для HTTP і TLS, не падтрымлівае UDP і не змяняе ваш IP. Выкарыстоўвайце сервер VPN для галасавых выклікаў, выклікаў і заблакіраваных адрасоў Telegram.",
   "errEngineUnsupported": "Абраны механізм не падтрымлівае гэты профіль або налады. Выберыце Аўто або сумяшчальны рухавік.",
   "errRestore": "Ачыстка злучэння была няпоўная. Паўтарыць адключэнне; падрабязнасці глядзіце ў журнале.",
   "errSessionEnded": "Гэты сеанс ужо скончыўся. Абнавіць стан злучэння.",
@@ -286,9 +272,8 @@
   "modesGuideTitle": "Рэжымы і рухавікі",
   "probeServers": "Праверце серверы",
   "expiresIn": "{name}: {days, plural, =0{падпіска заканчваецца праз некалькі гадзін} one{падпіска заканчваецца праз дзень #} other{падпіска заканчваецца праз # дзён}}",
-  "groupOrdered": "{count, plural, one{Сервер #, у сваю чаргу} other{Серверы #, у сваю чаргу}}",
   "groupBest": "{count, plural, one{Сервер #, самы хуткі} other{Серверы #, самыя хуткія}}",
-  "modesGuide": "Выберыце «Аўта», калі вы не ўпэўненыя, які механізм патрэбны вашаму серверу. Sora правярае профіль і налады перад падключэннем. Механізм не можа павялічыць прапускную здольнасць вашага плана: прадукцыйнасць залежыць ад сервера, маршруту, пратакола і сеткі.\n\n## Рэжымы\n\n### Увесь трафік (TUN)\n\nSora стварае віртуальны сеткавы інтэрфейс і накіроўвае праз яго трафік прыкладанняў, уключаючы TCP і UDP. Выкарыстоўвайце гэты рэжым для Telegram, гульняў і голасу Discord. Правілы могуць адпраўляць пэўныя сайты або праграмы непасрэдна або блакіраваць іх. Сеткавай службе патрэбны дазвол і сервер, які падтрымлівае патрэбны пратакол.\n\n### System проксі\n\nSora канфігуруе лакальны проксі HTTP/SOCKS. Праграмы, якія выконваюць сістэмныя налады проксі, выкарыстоўваюць яго. Прыкладанні з уласным сеткавым стэкам могуць падключацца напрамую; UDP і галасавыя выклікі звычайна патрабуюць TUN. Гэты рэжым падыходзіць для браўзераў і праграм з падтрымкай проксі.\n\n### Няма сервера\n\nНа Linux Sora выкарыстоўвае [zapret](https://github.com/bol-van/zapret) для падзелу і змены формы запытаў HTTP/TLS і абыходу некаторых праверак DPI. Ваш IP-адрас застаецца ранейшым, і злучэнне ідзе непасрэдна на вэб-сайт. Вынікі залежаць ад вашага правайдэра і спосабу блакіроўкі.\n\nБягучая інтэграцыя выкарыстоўвае tpws для HTTP і TLS праз TCP. Ён не абыходзіць блакіроўку IP і не рэтранслюе UDP і не можа гарантаваць злучэнні MTProto Telegram. Выкарыстоўвайце сервер VPN з TUN для голасу Discord, выклікаў Telegram і такіх абмежаванняў.\n\n## Рухавікі\n\n### Аўта\n\nSora выбірае ўсталяваны механізм, які падтрымлівае ўвесь план злучэння: пратаколы сервера, транспарты, групы, фрагментацыю і рэжым. Несумяшчальны ручной выбар адхіляецца перад спыненнем бягучага злучэння. Выберыце «Аўта» або іншы механізм і прымяніце налады яшчэ раз.\n\n### sing-box\n\nНовыя пакеты Sora уключаюць [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box), дадаючы на ​​баку кліента XHTTP і VLESS Encryption. Sora распазнае зборку і яе магчымасці. Верхняя зборка без XHTTP не атрымлівае гэтай магчымасці толькі з-за назвы.\n\nПадтрымліваюцца пратаколы VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard і параметры AmneziaWG 1.x/2.x Sora можна імпартаваць. Поўныя профілі Xray JSON патрабуюць Xray. Новыя палі AWG 3.x пакуль нельга імпартаваць. sing-box выкарыстоўвае лакальны порт кіравання, абаронены паролем, які могуць выявіць іншыя прыкладанні на кампутары.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) падтрымлівае VLESS, REALITY, XHTTP, VLESS Encryption і фрагментацыю TLS. Ён таксама запускае поўныя профілі правайдэраў Xray, захоўваючы іх маршрутызацыю і групы. Такія профілі нельга аўтаматычна пераўтварыць у іншы рухавік без змены іх паводзін.\n\nУ камплекце Xray выдалена налада, якая адключае праверку сертыфіката TLS (`allowInsecure`). Аўтаматычна выбірае sing-box або mihomo для звычайных сервераў, якія патрабуюць гэтай налады. Выбар Xray паведамляе аб несумяшчальнасці ўручную перад спыненнем бягучага злучэння. Для старых поўных профіляў JSON патрабуецца абноўлены профіль пастаўшчыка з сертыфікатам, які можна правяраць, або PIN-кодам сертыфіката.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) падтрымлівае ўпарадкаваныя рэзервовыя групы і групы балансавання нагрузкі, XHTTP і AmneziaWG. Выберыце яго, калі важны аўтаматычны пераход на рэзервовы сервер. Налада фрагментацыі TLS Sora недаступная з гэтым рухавіком.\n\n## Сумяшчальнасць у Sora\n\n| Функцыя | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN і TCP/UDP | Так | Так | Так |\n| XHTTP | Так | Так | Так |\n| VLESS Encryption | Так | Так | Так |\n| Поўны профіль Xray | Няма | Так | Няма |\n| TUIC / AnyTLS | Абодва | Няма | TUIC |\n| Фрагментацыя TLS | Так | Так | Няма |\n| AmneziaWG 1.x/2.x | Так¹ | Няма | Так |\n| Упарадкаваная рэзервовая група | Няма | №² | Так |\n\n¹ Профілі з J1/J2/J3/Itime выкарыстоўваюць mihomo; гэтыя палі ніколі не павінны моўчкі адкідвацца. ² Для групы поўных профіляў Xray праграма выбірае рэзервовы профіль. Падтрымка залежыць ад усталяванай зборкі; праверце яго версію ў About.\n\n## Стэк TUN\n\nСтэк апрацоўвае TCP і UDP у віртуальным інтэрфейсе. На панэлі рэжымаў Xray і mihomo прапануюць gVisor, System, Mixed і MIPS. Кожны рухавік захоўвае свае перавагі. Рэжымы System проксі і бессерверны не выкарыстоўваюць гэты параметр.\n\n- **Mixed** — TCP выкарыстоўвае сістэмны стэк, а gVisor апрацоўвае UDP. Гэта варыянт па змаўчанні для mihomo у Linux. У Windows Xray і mihomo па змаўчанні выкарыстоўваюць MIPS.\n- **System** — выкарыстоўвае сістэмны стэк. Паспрабуйце іншы варыянт, калі сеткавыя праграмы сутыкнуцца з праблемамі.\n- **gVisor** — апрацоўвае трафік у карыстальніцкай прасторы.\n- **MIPS** — уласны IP-стэк mihomo, даступны ў камплектаванай версіі 1.19.32.\n\nНа Linux Xray выкарыстоўвае ўбудаваны gVisor па змаўчанні. System, Mixed і MIPS на Linux выкарыстоўваюць mihomo у якасці рухавіка TUN, перанакіроўваючы TCP і UDP на Xray па аўтэнтыфікаванай лакальнай спасылцы SOCKS. Xray захоўвае пратакол, профіль правайдэра і маршрутызацыю. Гэтыя тры варыянты патрабуюць усталяванага mihomo. На Windows Xray выкарыстоўвае mihomo 1.19.32 або навейшы для ўсіх чатырох стэкаў TUN. Пратаколы і маршрутызацыя застаюцца ў Xray. Правілы праграм у гэтай звязцы падтрымліваюць толькі прамое злучэнне і блакіроўку; на Linux яны патрабуюць убудаванага gVisor Xray.\n\nМост запускае другі працэс. У трох вымярэннях без працы на Linux ён выкарыстаў прыблізна на 32–36 МіБ больш фізічнай памяці, чым уласны Xray TUN. Гэта не вымярае загрузку загрузкі: кошт працэсара і памяці залежыць ад злучэнняў. sing-box не мае селектара стэка. Ні адзін стэк не гарантуе лепшай прадукцыйнасці ў любой сетцы. Выберыце стэк і выберыце «Ужыць» і паўторна падключыцеся, каб паспрабаваць яго ў вашай сетцы.\n\n## Прымяненне налад\n\nПры выбары сервера падключэнне адбываецца аўтаматычна. Налады рэжыму, рухавіка, DNS і правіл захоўваюцца неадкладна; падчас актыўнага злучэння націсніце \"Ужыць\" і паўторна падключыцеся, каб выкарыстоўваць іх. Перазапуск рухавіка можа перапыніць загрузку і выклікі. Паўторныя пстрычкі не запускаюць паралельныя злучэнні; адключэнне завяршае пераход і вызваляе злучэнне.\n\nІнтэрнэт толькі праз VPN блакуе прамы трафік пры абрыве тунэля. Гэта ўплывае на ўсю машыну. Яўнае адключэнне выдаляе правілы Sora. Калі ачыстка не завершана, паўтарыце спробу адключэння і адкрыйце журнал.\n\n## Праектная дакументацыя\n\n- [sing-box-lx: канфігурацыя і падтрымка] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box дакументацыя] (https://sing-box.sagernet.org/)\n- [Xray дакументацыя](https://xtls.github.io/)\n- [Дакументацыя mihomo] (https://wiki.metacubex.one/)\n- [zapret: праца і абмежаванні] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Выберыце «Аўта», калі вы не ўпэўненыя, які механізм патрэбны вашаму серверу. Sora правярае профіль і налады перад падключэннем. Механізм не можа павялічыць прапускную здольнасць вашага плана: прадукцыйнасць залежыць ад сервера, маршруту, пратакола і сеткі.\n\n## Рэжымы\n\n### Увесь трафік (TUN)\n\nSora стварае віртуальны сеткавы інтэрфейс і накіроўвае праз яго трафік прыкладанняў, уключаючы TCP і UDP. Выкарыстоўвайце гэты рэжым для Telegram, гульняў і голасу Discord. Правілы могуць адпраўляць пэўныя сайты або праграмы непасрэдна або блакіраваць іх. Сеткавай службе патрэбны дазвол і сервер, які падтрымлівае патрэбны пратакол.\n\n### System проксі\n\nSora канфігуруе лакальны проксі HTTP/SOCKS. Праграмы, якія выконваюць сістэмныя налады проксі, выкарыстоўваюць яго. Прыкладанні з уласным сеткавым стэкам могуць падключацца напрамую; UDP і галасавыя выклікі звычайна патрабуюць TUN. Гэты рэжым падыходзіць для браўзераў і праграм з падтрымкай проксі.\n\n### Няма сервера\n\nНа Linux Sora выкарыстоўвае [zapret](https://github.com/bol-van/zapret) для падзелу і змены формы запытаў HTTP/TLS і абыходу некаторых праверак DPI. Ваш IP-адрас застаецца ранейшым, і злучэнне ідзе непасрэдна на вэб-сайт. Вынікі залежаць ад вашага правайдэра і спосабу блакіроўкі.\n\nБягучая інтэграцыя выкарыстоўвае tpws для HTTP і TLS праз TCP. Ён не абыходзіць блакіроўку IP і не рэтранслюе UDP і не можа гарантаваць злучэнні MTProto Telegram. Выкарыстоўвайце сервер VPN з TUN для голасу Discord, выклікаў Telegram і такіх абмежаванняў.\n\n## Рухавікі\n\n### Аўта\n\nSora выбірае ўсталяваны механізм, які падтрымлівае ўвесь план злучэння: пратаколы сервера, транспарты, групы, фрагментацыю і рэжым. Несумяшчальны ручной выбар адхіляецца перад спыненнем бягучага злучэння. Выберыце «Аўта» або іншы механізм і прымяніце налады яшчэ раз.\n\n### sing-box\n\nНовыя пакеты Sora уключаюць [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box), дадаючы на ​​баку кліента XHTTP і VLESS Encryption. Sora распазнае зборку і яе магчымасці. Верхняя зборка без XHTTP не атрымлівае гэтай магчымасці толькі з-за назвы.\n\nПадтрымліваюцца пратаколы VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard і параметры AmneziaWG 1.x/2.x Sora можна імпартаваць. Поўныя профілі Xray JSON патрабуюць Xray. Новыя палі AWG 3.x пакуль нельга імпартаваць. sing-box выкарыстоўвае лакальны порт кіравання, абаронены паролем, які могуць выявіць іншыя прыкладанні на кампутары.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) падтрымлівае VLESS, REALITY, XHTTP, VLESS Encryption і фрагментацыю TLS. Ён таксама запускае поўныя профілі правайдэраў Xray, захоўваючы іх маршрутызацыю і групы. Такія профілі нельга аўтаматычна пераўтварыць у іншы рухавік без змены іх паводзін.\n\nУ камплекце Xray выдалена налада, якая адключае праверку сертыфіката TLS (`allowInsecure`). Аўтаматычна выбірае sing-box або mihomo для звычайных сервераў, якія патрабуюць гэтай налады. Выбар Xray паведамляе аб несумяшчальнасці ўручную перад спыненнем бягучага злучэння. Для старых поўных профіляў JSON патрабуецца абноўлены профіль пастаўшчыка з сертыфікатам, які можна правяраць, або PIN-кодам сертыфіката.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) падтрымлівае ўпарадкаваныя рэзервовыя групы і групы балансавання нагрузкі, XHTTP і AmneziaWG. Выберыце яго, калі важны аўтаматычны пераход на рэзервовы сервер. Налада фрагментацыі TLS Sora недаступная з гэтым рухавіком.\n\n## Сумяшчальнасць у Sora\n\n| Функцыя | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN і TCP/UDP | Так | Так | Так |\n| XHTTP | Так | Так | Так |\n| VLESS Encryption | Так | Так | Так |\n| Поўны профіль Xray | Няма | Так | Няма |\n| TUIC / AnyTLS | Абодва | Няма | TUIC |\n| Фрагментацыя TLS | Так | Так | Няма |\n| AmneziaWG 1.x/2.x | Так¹ | Няма | Так |\n| Упарадкаваная рэзервовая група | Няма | №² | Так |\n\n¹ Профілі з J1/J2/J3/Itime выкарыстоўваюць mihomo; гэтыя палі ніколі не павінны моўчкі адкідвацца. ² Для групы поўных профіляў Xray праграма выбірае рэзервовы профіль. Падтрымка залежыць ад усталяванай зборкі; праверце яго версію ў About.\n\n## Стэк TUN\n\nСтэк апрацоўвае TCP і UDP у віртуальным інтэрфейсе. На панэлі рэжымаў Xray і mihomo прапануюць gVisor, System, Mixed і MIPS. Кожны рухавік захоўвае свае перавагі. Рэжымы System проксі і бессерверны не выкарыстоўваюць гэты параметр.\n\n- **Mixed**: TCP выкарыстоўвае сістэмны стэк, а gVisor апрацоўвае UDP. Гэта варыянт па змаўчанні для mihomo у Linux. У Windows Xray і mihomo па змаўчанні выкарыстоўваюць MIPS.\n- **System**: выкарыстоўвае сістэмны стэк. Паспрабуйце іншы варыянт, калі сеткавыя праграмы сутыкнуцца з праблемамі.\n- **gVisor**: апрацоўвае трафік у карыстальніцкай прасторы.\n- **MIPS**: уласны IP-стэк mihomo, даступны ў камплектаванай версіі 1.19.32.\n\nНа Linux Xray выкарыстоўвае ўбудаваны gVisor па змаўчанні. System, Mixed і MIPS на Linux выкарыстоўваюць mihomo у якасці рухавіка TUN, перанакіроўваючы TCP і UDP на Xray па аўтэнтыфікаванай лакальнай спасылцы SOCKS. Xray захоўвае пратакол, профіль правайдэра і маршрутызацыю. Гэтыя тры варыянты патрабуюць усталяванага mihomo. На Windows Xray выкарыстоўвае mihomo 1.19.32 або навейшы для ўсіх чатырох стэкаў TUN. Пратаколы і маршрутызацыя застаюцца ў Xray. Правілы праграм у гэтай звязцы падтрымліваюць толькі прамое злучэнне і блакіроўку; на Linux яны патрабуюць убудаванага gVisor Xray.\n\nМост запускае другі працэс. У трох вымярэннях без працы на Linux ён выкарыстаў прыблізна на 32–36 МіБ больш фізічнай памяці, чым уласны Xray TUN. Гэта не вымярае загрузку загрузкі: кошт працэсара і памяці залежыць ад злучэнняў. sing-box не мае селектара стэка. Ні адзін стэк не гарантуе лепшай прадукцыйнасці ў любой сетцы. Выберыце стэк і выберыце «Ужыць» і паўторна падключыцеся, каб паспрабаваць яго ў вашай сетцы.\n\n## Прымяненне налад\n\nПры выбары сервера падключэнне адбываецца аўтаматычна. Налады рэжыму, рухавіка, DNS і правіл захоўваюцца неадкладна; падчас актыўнага злучэння націсніце \"Ужыць\" і паўторна падключыцеся, каб выкарыстоўваць іх. Перазапуск рухавіка можа перапыніць загрузку і выклікі. Паўторныя пстрычкі не запускаюць паралельныя злучэнні; адключэнне завяршае пераход і вызваляе злучэнне.\n\nІнтэрнэт толькі праз VPN блакуе прамы трафік пры абрыве тунэля. Гэта ўплывае на ўсю машыну. Яўнае адключэнне выдаляе правілы Sora. Калі ачыстка не завершана, паўтарыце спробу адключэння і адкрыйце журнал.\n\n## Праектная дакументацыя\n\n- [sing-box-lx: канфігурацыя і падтрымка] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box дакументацыя] (https://sing-box.sagernet.org/)\n- [Xray дакументацыя](https://xtls.github.io/)\n- [Дакументацыя mihomo] (https://wiki.metacubex.one/)\n- [zapret: праца і абмежаванні] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -410,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -448,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -479,7 +443,6 @@
   "extensions": "Пашырэнні",
   "exportLogFile": "У {name}",
   "diagnosticHttp": "HTTP дыягностыка",
-  "diagnosticArchive": "Core diagnostics archive",
   "diagnosticNoData": "Пакуль няма запісаных запытаў. Спачатку адкрыйце вэб-сайт для праверкі хуткасці.",
   "@exportLogFile": {
     "placeholders": {
@@ -488,40 +451,6 @@
       }
     }
   },
-  "censorTitle": "Blocking diagnostics",
-  "censorHistory": "Check history",
-  "censorEmpty": "No checks yet. If a connection fails, the detector will check whether your provider is blocking it.",
-  "censorExplainer": "This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.",
-  "censorNoProfile": "No suitable profile for this verdict",
-  "censorApplyProfile": "Apply recommended profile",
-  "censorEnable": "Enable",
-  "censorDetails": "Details",
-  "censorNotNow": "Not now",
-  "censorPromptTitle": "Connection may be blocked",
-  "censorPromptBody": "It looks like your provider is blocking the connection (confidence {confidence}%). Try masking?",
-  "@censorPromptBody": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorConfidence": "Confidence: {confidence}%",
-  "@censorConfidence": {
-    "placeholders": {
-      "confidence": {
-        "type": "int"
-      }
-    }
-  },
-  "censorKindBlocked": "Blocking detected",
-  "censorKindLikely": "Looks like blocking",
-  "censorKindClear": "No blocking detected",
-  "censorKindUnknown": "Could not determine",
-  "censorReasonTlsReset": "TLS connections are being reset — a typical sign of filtering",
-  "censorReasonHttpBlock": "HTTP requests are being blocked",
-  "censorReasonDnsSpoofed": "DNS responses are being spoofed",
-  "censorReasonConnectTimeout": "Connections keep timing out",
   "customServerAdd": "Add custom server",
   "customServers": "My servers",
   "customServerName": "Name",
@@ -540,7 +469,6 @@
   "customServerShowSecret": "Show secret",
   "customServerHideSecret": "Hide secret",
   "customServerBadge": "custom",
-  "flowAuto": "auto",
   "customServerDeleteConfirm": "Delete server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -551,7 +479,6 @@
   },
   "customServerEmptyHint": "Add a server manually: address, port and protocol",
   "customServerTest": "Test",
-  "errObfsUnsupported": "The installed core is too old for obfuscation profiles. Update Sora to apply them.",
   "leakTestTitle": "Leak test",
   "leakTestIntro": "Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.",
   "leakTestRun": "Run test",
@@ -574,41 +501,17 @@
       }
     }
   },
-  "leakTestSkipped": "Skipped — not applicable in this session",
+  "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Fix",
-  "leakTestFixedNote": "Kill switch is on — run the test again to verify.",
+  "leakTestFixedNote": "Kill switch is on, run the test again to verify.",
   "leakTestCheckDirectDns": "Direct DNS",
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
   "leakTestCheckSystemResolvers": "System resolvers",
   "leakTestCheckTunnelConnectivity": "Tunnel connectivity",
   "leakTestCheckTunnelDns": "Tunnel DNS",
-  "noticeDegraded": "The server slowed down — switched to the best measured one",
+  "noticeDegraded": "The server slowed down, switched to the best measured one",
   "obfs": "Traffic obfuscation",
-  "obfsPreset": "Preset",
-  "obfsPresetAggressive": "Maximum obfuscation",
-  "obfsPresetBalanced": "Balanced",
-  "obfsPresetOff": "Speed",
-  "obfsPresetCustom": "Custom",
-  "obfsManual": "Manual settings",
-  "obfsUtls": "uTLS profile",
-  "obfsUtlsAuto": "Auto",
-  "obfsJitter": "Timing jitter",
-  "obfsJitterNeedsFragment": "Jitter only works with fragmentation enabled.",
-  "obfsFineTune": "Sizes and delays",
-  "obfsDetecting": "Detecting capabilities…",
-  "obfsCapabilities": "Engine capabilities",
-  "obfsCompatibleEngines": "Compatible engines: {engines}",
-  "@obfsCompatibleEngines": {
-    "placeholders": {
-      "engines": {
-        "type": "String"
-      }
-    }
-  },
-  "obfsSupported": "Supported",
-  "obfsUnsupported": "Not supported",
-  "obfsUnknown": "Capabilities are still being detected.",
   "latencyMs": "{value} ms",
   "@latencyMs": {
     "placeholders": {
@@ -625,8 +528,8 @@
       }
     }
   },
-  "updateSignaturePending": "Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.",
-  "updateManualSigWarning": "Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.",
+  "updateSignaturePending": "Файлы абнаўлення зверваюцца з кантрольнымі сумамі, апублікаванымі разам з рэлізам.",
+  "updateManualSigWarning": "Файлы ніжэй супадаюць з кантрольнымі сумамі рэлізу. Выканайце каманду, калі спампавалі іх з афіцыйнага рэлізу.",
   "updateVersionRevoked": "This version has been recalled by the developer. Please wait for a fixed release.",
   "updateRolloutPending": "A newer version is rolling out gradually and will be offered to you automatically.",
   "updateRollbacking": "Rolling back to version {version}...",
@@ -762,7 +665,7 @@
   "extPermissionsRemoved": "No longer requested:",
   "extUpdateFailedKept": "The previous version is still installed.",
   "extConflictsTitle": "Extension conflicts",
-  "extConflictsIntro": "These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.",
+  "extConflictsIntro": "Гэтыя пашырэнні прэтэндуюць на адно і тое ж. Выберыце, якое будзе працаваць, другое застанецца ўсталяваным.",
   "extConflictRoutingRules": "Routing rules",
   "extConflictTheme": "App theme",
   "extConflictNetHooks": "Network hooks",
@@ -849,8 +752,8 @@
   "extPermNetHooks": "Hook into the network path (DPI bypass modules)",
   "extPermNetFetch": "Fetch URLs from an allowlist",
   "extPermBackground": "Run background tasks",
-  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.",
-  "extPermNotYetActive": "Not active in this version of Sora yet — granting it changes nothing today.",
+  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Runs in the background",
   "extCapFilterTitle": "Capabilities",
   "extCapNetHook": "Bypasses & network hooks",
@@ -858,7 +761,7 @@
   "extCapRouting": "Routing rules",
   "extCapTheme": "Themes",
   "extCapWidget": "Widgets",
-  "extCatalogCached": "Cached catalog · {date}",
+  "extCatalogCached": "Cached catalog, {date}",
   "@extCatalogCached": {
     "placeholders": {
       "date": {
@@ -872,7 +775,7 @@
   "extRatingHowBody": "Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.",
   "extScreenshots": "Screenshots",
   "extSortRelevance": "Relevance",
-  "extPermNetworkDetail": "Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.",
+  "extPermNetworkDetail": "Загружае даныя з інтэрнэту праз VPN. Дазволены толькі хасты са спіса ніжэй, астатнія заблакаваны.",
   "extBgTitle": "Background task",
   "extBgEnabled": "Run in the background",
   "extBgInterval": "Run every",
@@ -892,8 +795,7 @@
       }
     }
   },
-  "extBgNote": "Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.",
-  "extBgRuntimeBadge": "Not available yet",
+  "extBgNote": "Задача запускаецца па раскладзе, пакуль Sora адкрыта, у тым ліку згорнутай у трэй. Мінімальны інтэрвал 15 хвілін.",
   "extBgDisabledNote": "Enable the extension to manage its background task.",
   "extCapNetwork": "Network access",
   "extCapNetworkHosts": "Network: {hosts}",
@@ -977,7 +879,7 @@
   "profileAdd": "Add profile",
   "profileName": "Profile name",
   "profileSsids": "Wi-Fi networks (SSID)",
-  "profileSsidsHint": "Home, Office — comma separated",
+  "profileSsidsHint": "Home, Office, comma separated",
   "profileGateways": "Gateways",
   "profileAsns": "AS numbers",
   "profileAutoApply": "Apply automatically",
@@ -1021,8 +923,6 @@
   "syncRevokeConfirm": "Revoke \"{name}\"?",
   "syncLastSync": "Last sync: {time}",
   "syncNever": "Never",
-  "syncWhat": "What syncs",
-  "syncWhatBody": "Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.",
   "syncNoLan": "Devices must be on the same local network",
   "syncPaired": "Device paired",
   "syncPairingTitle": "Pair with this device",
@@ -1034,7 +934,7 @@
   "edit": "Edit",
   "remove": "Remove",
   "autoSwitchOnDegrade": "Auto-switch on degradation",
-  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.",
+  "autoSwitchOnDegradeDetail": "If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.",
   "tunStackMixed": "Mixed",
   "tunStackSystem": "System",
   "syncCodeExpired": "The code expired",
@@ -1055,7 +955,7 @@
     }
   },
   "syncJoining": "Pairing with the device…",
-  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.",
+  "syncLegacyCleared": "The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.",
   "syncNewCode": "New code",
   "syncPairedWith": "{name} paired",
   "@syncPairedWith": {
@@ -1068,7 +968,7 @@
   "syncRetry": "Try again",
   "syncStopShowing": "Stop showing",
   "syncSyncNow": "Sync now",
-  "syncSyncResult": "Received {pulled} · sent {pushed}",
+  "syncSyncResult": "Received {pulled}, sent {pushed}",
   "@syncSyncResult": {
     "placeholders": {
       "pulled": {
@@ -1088,7 +988,6 @@
   "syncDocKindOverrides": "Subscription overrides",
   "syncDocKindProfiles": "Network profiles",
   "syncDocKindChains": "Proxy chains",
-  "syncDocKindObfs": "Traffic obfuscation",
   "syncFrom": "from {name}",
   "@syncFrom": {
     "placeholders": {
@@ -1098,26 +997,7 @@
     }
   },
   "syncThisDevice": "This device",
-  "syncUnavailableAndroid": "Device sync isn't available on Android yet — the sync service can't run there.",
-  "smartPickReason": "Picked by smart mode: ping {ping}, speed {speed}",
-  "@smartPickReason": {
-    "placeholders": {
-      "ping": {
-        "type": "String"
-      },
-      "speed": {
-        "type": "String"
-      }
-    }
-  },
-  "serverReliability": "Reliability {pct}%",
-  "@serverReliability": {
-    "placeholders": {
-      "pct": {
-        "type": "int"
-      }
-    }
-  },
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
   "customServerShadowsocksCredentials": "Для Shadowsocks: метад:пароль, напрыклад chacha20-ietf-poly1305:пароль",
   "diagnosticPackets": "Захоп пакета",
   "diagnosticEvents": "Windows падзеі",

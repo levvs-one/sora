@@ -38,7 +38,7 @@ void expectFirstTag(
 }
 
 void main() {
-  group('wave F2: benchmark history', () {
+  group('benchmark history', () {
     test('GetBenchmarksRequest tags', () {
       expectFirstTag(
         () => GetBenchmarksRequest(),
@@ -103,7 +103,7 @@ void main() {
     });
   });
 
-  group('wave F6: subscription overrides', () {
+  group('subscription overrides', () {
     test('SaveSubscriptionOverrideRequest tags', () {
       expectFirstTag(
         () => SaveSubscriptionOverrideRequest(),
@@ -228,7 +228,7 @@ void main() {
     });
   });
 
-  group('wave F5: network profiles', () {
+  group('network profiles', () {
     test('ProfileMatched tags (incl. CoreEvent oneof)', () {
       expectFirstTag(
         () => ProfileMatched(),
@@ -419,7 +419,7 @@ void main() {
     });
   });
 
-  group('wave F8: proxy chains', () {
+  group('proxy chains', () {
     test('ProbeChainRequest tags', () {
       expectFirstTag(
         () => ProbeChainRequest(),

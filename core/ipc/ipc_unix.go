@@ -69,8 +69,8 @@ func defaultAllow(opts Options) func(Peer) bool {
 	return func(peer Peer) bool { return authorize(peer) != AuthNone }
 }
 
-// DefaultAuthorize maps an admitted peer to its control-API privilege level
-// (SORA-H2): the core user and socket-group members hold full control, Linux
+// DefaultAuthorize maps an admitted peer to its control-API privilege level:
+// the core user and socket-group members hold full control, Linux
 // peers authorized by the polkit control action hold full control, peers
 // authorized only by the polkit read action are limited to read-only RPCs.
 // Where the platform cannot verify identity (macOS), socket permissions are

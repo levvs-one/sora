@@ -148,7 +148,7 @@ class _Orb extends StatelessWidget {
   }
 }
 
-/// Visible when the session watch gave up auto-recovery (FEATURE-PLAN.md F7).
+/// Visible when the session watch gave up auto-recovery.
 class _WatchBanner extends StatelessWidget {
   const _WatchBanner();
 
@@ -192,7 +192,7 @@ class _WatchBanner extends StatelessWidget {
   }
 }
 
-/// Offer to restore the session left by a crashed run (FEATURE-PLAN.md F7).
+/// Offer to restore the session left by a crashed run.
 class _RestoreBanner extends StatelessWidget {
   const _RestoreBanner();
 

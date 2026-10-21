@@ -72,7 +72,7 @@ func TestWFPTunnelFiltersAllowInboundReauthorization(t *testing.T) {
 	}
 }
 
-// TestWFPRefusesAnEmptyEnginesDir locks SORA-L20: an empty enginesDir must
+// TestWFPRefusesAnEmptyEnginesDir: an empty enginesDir must
 // fail closed instead of globbing "*.exe" in the working directory.
 func TestWFPRefusesAnEmptyEnginesDir(t *testing.T) {
 	w := &WFP{enginesDir: ""}

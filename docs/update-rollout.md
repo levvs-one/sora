@@ -154,7 +154,7 @@ When the window expires (or the marker is stale), the app rolls back to
    plus a manual reinstall command in About.
 3. The install goes through the same privileged helper with
    `--allow-downgrade`; the helper re-verifies the manifest **signature as
-   root** before trusting any hash (SORA-H1), same as for upgrades.
+   root** before trusting any hash, same as for upgrades.
 4. On success the marker is cleared, a persistent "rolled back to X" notice
    is stored, and the app restarts into the old build.
 
@@ -206,7 +206,7 @@ update replaces it.
 - **Manual install on openSUSE (zypper):** when the privileged helper is not
   available, the app prints a manual fallback command built from the same
   arguments the helper uses, plain `zypper --non-interactive install` with
-  GPG signature verification intact, matching the helper (SORA-H1). The app
+  GPG signature verification intact, matching the helper. The app
   does not silently weaken verification on the fallback path, so the RPMs
   must be GPG-signed; the release-signing key ceremony is still pending
   (owner blocker). Until it is done, installing on openSUSE requires either

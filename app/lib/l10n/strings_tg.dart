@@ -25,9 +25,6 @@ class STg extends S {
   String get stateDisconnecting => 'Хомӯш шудан';
 
   @override
-  String get stateFailed => 'Пайваст нест';
-
-  @override
   String get coreMissing => 'Хидмати Sora ҷавоб намедиҳад';
 
   @override
@@ -268,9 +265,6 @@ class STg extends S {
   String get errNoServers => 'Барои пайваст шудан обуна илова кунед';
 
   @override
-  String get exportText => 'Матн';
-
-  @override
   String get connections => 'Пайвастшавӣ';
 
   @override
@@ -509,17 +503,6 @@ class STg extends S {
   String get ruleInvalid => 'Ин ба сайт, IP ё барнома монанд нест';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Серверҳои #, дар навбати худ',
-      one: 'Сервери #, дар навбати худ',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -532,9 +515,6 @@ class STg extends S {
 
   @override
   String get tunnelMode => 'Режим';
-
-  @override
-  String get tunnelTun => 'Ҳама трафик';
 
   @override
   String get tunnelProxy => 'Прокси System';
@@ -650,28 +630,6 @@ class STg extends S {
   String get less => 'Камтар';
 
   @override
-  String get currentServer => 'Сервери ҷорӣ';
-
-  @override
-  String get trafficDown => 'Боргиришуда';
-
-  @override
-  String get trafficUp => 'Бор карда шуд';
-
-  @override
-  String perSecond(String value) {
-    return '$value/с';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Қоидаҳои фаъол: $count';
-  }
-
-  @override
-  String get recentNotifications => 'Огоҳиҳои охирин';
-
-  @override
   String get notificationsEmpty => 'Ҳодисаҳои пайвастшавӣ ва обуна дар ин ҷо пайдо мешаванд';
 
   @override
@@ -725,22 +683,13 @@ class STg extends S {
   String get runningProcesses => 'Равандҳои иҷрошаванда';
 
   @override
-  String get programsFailed => 'Барномаҳо бор карда нашуд';
-
-  @override
   String get programsEmpty => 'Ягон барнома ёфт нашуд. Номи дигарро санҷед.';
 
   @override
   String get selectExe => 'Файли .exe-ро интихоб кунед';
 
   @override
-  String get trafficUnavailable => 'Ҳисобкунакҳо ҳанӯз дастрас нестанд';
-
-  @override
   String get speedtest => 'Суръат';
-
-  @override
-  String get speedtestCheck => 'Суръатро тафтиш кунед';
 
   @override
   String get speedtestSearch => 'Хидматро пайдо кунед';
@@ -836,12 +785,11 @@ class STg extends S {
       'Ин фармонро дар терминал иҷро кунед, то ҳарду бастаи тасдиқшударо насб кунед, пас Sora-ро аз нав кушоед. Файлҳо дар директорияи зеркашӣ мемонанд. Пайвасти VPN қатъ мешавад.';
 
   @override
-  String get updateSignaturePending =>
-      'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+  String get updateSignaturePending => 'Файлҳои навсозӣ бо суммаҳои назоратии бо релиз нашршуда муқоиса мешаванд.';
 
   @override
   String get updateManualSigWarning =>
-      'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
+      'Файлҳои зерин ба суммаҳои назоратии релиз мувофиқанд. Агар онҳоро аз релизи расмӣ боргирӣ карда бошед, фармонро иҷро кунед.';
 
   @override
   String get updateVersionRevoked =>
@@ -894,9 +842,6 @@ class STg extends S {
   String get componentLicenses => 'Литсензияҳои компонентҳо';
 
   @override
-  String get appCopyright => '© 2026 levvs-one ва саҳмгузорон';
-
-  @override
   String get collapseServers => 'Барҳам додани серверҳо';
 
   @override
@@ -913,10 +858,6 @@ class STg extends S {
 
   @override
   String get reconnectNow => 'Муроҷиат кунед ва дубора пайваст кунед';
-
-  @override
-  String get bypassLimitations =>
-      'Ин режим DPI-ро танҳо барои HTTP ва TLS мегузарад, UDP-ро дастгирӣ намекунад ё IP-и шуморо тағир намедиҳад. Барои садои Discord, зангҳо ва суроғаҳои басташудаи Telegram сервери VPN-ро истифода баред.';
 
   @override
   String get errEngineUnsupported =>
@@ -943,7 +884,7 @@ class STg extends S {
 
   @override
   String get modesGuide =>
-      'Агар шумо боварӣ надошта бошед, ки ба сервери шумо ба кадом муҳаррик ниёз дорад, Auto-ро интихоб кунед. Sora пеш аз пайвастшавӣ профил ва танзимотро тафтиш мекунад. Муҳаррик наметавонад маҷрои нақшаи шуморо зиёд кунад: иҷроиш аз сервер, масир, протокол ва шабака вобаста аст.\n\n## Модҳо\n\n### Ҳама трафик (TUN)\n\nSora интерфейси шабакаи маҷозӣ эҷод мекунад ва трафики барномаҳоро тавассути он, аз ҷумла TCP ва UDP, масир мекунад. Ин режимро барои Telegram, бозиҳо ва овози Discord истифода баред. Қоидаҳо метавонанд сайтҳо ё барномаҳои мушаххасро мустақиман фиристанд ё онҳоро маҳкам кунанд. Хидмати шабака ба иҷозат ва сервере ниёз дорад, ки протоколи лозимиро дастгирӣ мекунад.\n\n### Прокси System\n\nSora прокси маҳаллии HTTP/SOCKS-ро танзим мекунад. Барномаҳое, ки танзимоти прокси системаро эҳтиром мекунанд, онро истифода мебаранд. Барномаҳо бо стеки шабакавии худ метавонанд мустақиман пайваст шаванд; UDP ва зангҳои овозӣ умуман ба TUN ниёз доранд. Ин режим ба браузерҳо ва барномаҳо бо дастгирии прокси мувофиқат мекунад.\n\n### Сервер нест\n\nДар Linux, Sora [zapret](https://github.com/bol-van/zapret) -ро барои тақсим кардан ва тағир додани дархостҳои HTTP/TLS ва гузаштан аз баъзе санҷишҳои DPI истифода мебарад. IP-и шумо бетағйир мемонад ва пайвастҳо мустақиман ба вебсайт мераванд. Натиҷаҳо аз провайдери шумо ва усули басташавӣ вобастаанд.\n\nИнтегратсияи ҷорӣ tpws-ро барои HTTP ва TLS тавассути TCP истифода мебарад. Он масдудкунии IP ё интиқоли UDP-ро фаро намегирад ва пайвастҳои Telegram-и MTProto-ро кафолат дода наметавонад. Сервери VPN-ро бо TUN барои овози Discord, зангҳои Telegram ва ин гуна маҳдудиятҳо истифода баред.\n\n## Моторҳо\n\n### Авто\n\nSora муҳаррики насбшударо интихоб мекунад, ки тамоми нақшаи пайвастшавиро дастгирӣ мекунад: протоколҳои сервер, интиқолҳо, гурӯҳҳо, тақсимот ва режим. Интихоби дастӣ номувофиқ пеш аз қатъ кардани пайвасти ҷорӣ рад карда мешавад. Авто ё муҳаррики дигарро интихоб кунед ва танзимотро дубора татбиқ кунед.\n\n### sing-box\n\nБастаҳои нави Sora иборатанд аз [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), як фардкунандаи [sing-box](https://github.com/SagerNet/sing-box), илова кардани муштарии XHTTP ва VLESS Encryption. Sora сохтмон ва қобилиятҳои онро эътироф мекунад. Сохтмони болооб бидуни XHTTP ин қобилиятро танҳо аз номи худ ба даст намеорад.\n\nПротоколҳои дастгирӣшаванда VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ва Z8x/parameters. Sora метавонад ворид кунад. Профилҳои пурраи Xray JSON Xray-ро талаб мекунанд. Майдонҳои нави AWG 3.x ҳанӯз ворид карда намешаванд. sing-box порти назорати маҳаллии бо парол ҳифзшударо истифода мебарад, ки дигар замимаҳои компютер метавонанд онро ошкор кунанд.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) пораҳои VLESS, REALITY, XHTTP, VLESS Encryption ва TLS-ро дастгирӣ мекунад. Он инчунин профилҳои пурраи провайдери Xray -ро ҳангоми нигоҳ доштани масир ва гурӯҳҳои онҳо иҷро мекунад. Чунин профилҳоро бидуни тағир додани рафтори худ ба таври худкор ба муҳаррики дигар табдил додан мумкин нест.\n\nXray маҷмӯӣ танзимеро, ки санҷиши сертификати TLS-ро ғайрифаъол мекунад (`allowInsecure`) хориҷ кард. Барои серверҳои оддӣ, ки ин танзимотро талаб мекунанд, худкор sing-box ё mihomo-ро интихоб мекунад. Интихоби Xray пеш аз қатъ кардани пайвасти ҷорӣ дастӣ дар бораи номувофиқатӣ хабар медиҳад. Профилҳои пурраи JSON-и кӯҳна ба профили провайдери навшуда бо шаҳодатномаи тасдиқшаванда ё PIN сертификат ниёз доранд.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) гурӯҳҳои фармоишии бозгашт ва мувозинати сарборӣ, XHTTP ва AmneziaWG -ро дастгирӣ мекунад. Вақте ки интиқоли автоматӣ ба сервери эҳтиётӣ муҳим аст, онро интихоб кунед. Танзими тақсимоти TLS-и Sora бо ин муҳаррик дастнорас аст.\n\n## Мутобиқат дар Sora\n\n| Хусусият | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ва TCP/UDP | Бале | Бале | Бале |\n| XHTTP | Бале | Бале | Бале |\n| VLESS Encryption | Бале | Бале | Бале |\n| Профили пурраи Xray | Не | Бале | Не |\n| TUIC / AnyTLS | Ҳарду | Не | TUIC |\n| Фрагментатсияи TLS | Бале | Бале | Не |\n| AmneziaWG 1.x/2.x | Ҳа¹ | Не | Бале |\n| Гурӯҳи бозгашти фармоишӣ | Не | No² | Бале |\n\n¹ Профилҳо бо J1/J2/J3/Itime mihomo-ро истифода мебаранд; ин майдонхоро хеч гох хомушона партофтан лозим нест. ² Барои як гурӯҳи профилҳои пурраи Xray, барнома профили эҳтиётиро интихоб мекунад. Дастгирӣ аз сохтори насбшуда вобаста аст; версияи онро дар бораи санҷед.\n\n## Стеки TUN\n\nСтек TCP ва UDP-ро дар дохили интерфейси виртуалӣ идора мекунад. Дар панели режимҳо, Xray ва mihomo gVisor, System, Mixed ва MIPS -ро пешниҳод мекунанд. Ҳар як муҳаррик афзалияти худро захира мекунад. System прокси ва режимҳои бе сервер ин афзалиятро истифода намебаранд.\n\n- **Mixed** — TCP стеки системаро истифода мебарад, дар ҳоле ки gVisor UDP-ро идора мекунад. Ин пешфарз барои mihomo дар Linux аст. Дар Windows, Xray ва mihomo ба таври пешфарз MIPS-ро истифода мебаранд.\n- **System** — стеки системаро истифода мебарад. Варианти дигарро санҷед, агар барномаҳои шабакавӣ ба мушкилот дучор шаванд.\n- **gVisor** — трафикро дар фазои корбарон идора мекунад.\n- **MIPS** — стеки IP-и худи mihomo, ки дар версияи маҷмӯии 1.19.32 дастрас аст.\n\nДар Linux, Xray бо нобаёнӣ gVisor-и дарунсохтро истифода мебарад. System, Mixed ва MIPS дар Linux mihomo-ро ҳамчун муҳаррики TUN истифода мебаранд, TCP ва UDP-ро ба Xray тавассути истиноди SOCKS тасдиқшудаи маҳаллӣ интиқол медиҳанд. Xray протокол, профили провайдер ва масирро нигоҳ медорад. Ин се имконоти насбшуда mihomo талаб мекунанд. Дар Windows, Xray барои ҳамаи чор стеки TUN mihomo 1.19.32 ё навтарро истифода мебарад. Протоколҳо ва масирбандӣ дар Xray мемонанд. Қоидаҳои барномаҳо дар ин пайваст танҳо пайвасти мустақим ва бастанро дастгирӣ мекунанд; дар Linux ин қоидаҳо gVisor-и дарунсохти Xray-ро талаб мекунанд.\n\nПул процесси дуюмро пеш мебарад. Дар се андозагирии бекор дар Linux, он нисбат ба Xray TUN-и аслӣ тақрибан 32–36 МБ зиёдтар хотираи физикиро истифода бурд. Ин сарбории зеркаширо чен намекунад: хароҷоти CPU ва хотира аз пайвастшавӣ вобаста аст. sing-box ягон селектори стек надорад. Ягон стек иҷрои беҳтарро дар ҳар як шабака кафолат намедиҳад. Стекро интихоб кунед ва Apply-ро интихоб кунед ва аз нав пайваст шавед, то онро дар шабакаи худ санҷед.\n\n## Татбиқи танзимот\n\nИнтихоби сервер ба таври худкор дубора пайваст мешавад. Режим, муҳаррик, DNS ва танзимоти қоида фавран захира карда мешаванд; ҳангоми пайвасти фаъол, Apply-ро клик кунед ва барои истифодаи онҳо дубора пайваст шавед. Аз нав ба кор андохтани муҳаррик метавонад зеркашиҳо ва зангҳоро қатъ кунад. Кликҳои такрорӣ пайвастҳои мувозиро оғоз намекунанд; ҷудокунӣ гузаришро ба итмом мерасонад ва пайвастро озод мекунад.\n\nИнтернет танҳо тавассути VPN трафики мустақимро ҳангоми фурӯ рафтани нақб манъ мекунад. Он ба тамоми мошин таъсир мерасонад. Қатъи возеҳ қоидаҳои Sora-ро нест мекунад. Агар тозакунӣ анҷом наёбад, аз нав ҷудо кунед ва сабтро кушоед.\n\n## Ҳуҷҷатҳои лоиҳа\n\n- [sing-box-lx: конфигуратсия ва дастгирӣ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Ҳуҷҷатҳои sing-box](https://sing-box.sagernet.org/)\n- [Ҳуҷҷатҳои Xray](https://xtls.github.io/)\n- [Ҳуҷҷатҳои mihomo](https://wiki.metacubex.one/)\n- [zapret: амалиёт ва маҳдудиятҳо](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Агар шумо боварӣ надошта бошед, ки ба сервери шумо ба кадом муҳаррик ниёз дорад, Auto-ро интихоб кунед. Sora пеш аз пайвастшавӣ профил ва танзимотро тафтиш мекунад. Муҳаррик наметавонад маҷрои нақшаи шуморо зиёд кунад: иҷроиш аз сервер, масир, протокол ва шабака вобаста аст.\n\n## Модҳо\n\n### Ҳама трафик (TUN)\n\nSora интерфейси шабакаи маҷозӣ эҷод мекунад ва трафики барномаҳоро тавассути он, аз ҷумла TCP ва UDP, масир мекунад. Ин режимро барои Telegram, бозиҳо ва овози Discord истифода баред. Қоидаҳо метавонанд сайтҳо ё барномаҳои мушаххасро мустақиман фиристанд ё онҳоро маҳкам кунанд. Хидмати шабака ба иҷозат ва сервере ниёз дорад, ки протоколи лозимиро дастгирӣ мекунад.\n\n### Прокси System\n\nSora прокси маҳаллии HTTP/SOCKS-ро танзим мекунад. Барномаҳое, ки танзимоти прокси системаро эҳтиром мекунанд, онро истифода мебаранд. Барномаҳо бо стеки шабакавии худ метавонанд мустақиман пайваст шаванд; UDP ва зангҳои овозӣ умуман ба TUN ниёз доранд. Ин режим ба браузерҳо ва барномаҳо бо дастгирии прокси мувофиқат мекунад.\n\n### Сервер нест\n\nДар Linux, Sora [zapret](https://github.com/bol-van/zapret) -ро барои тақсим кардан ва тағир додани дархостҳои HTTP/TLS ва гузаштан аз баъзе санҷишҳои DPI истифода мебарад. IP-и шумо бетағйир мемонад ва пайвастҳо мустақиман ба вебсайт мераванд. Натиҷаҳо аз провайдери шумо ва усули басташавӣ вобастаанд.\n\nИнтегратсияи ҷорӣ tpws-ро барои HTTP ва TLS тавассути TCP истифода мебарад. Он масдудкунии IP ё интиқоли UDP-ро фаро намегирад ва пайвастҳои Telegram-и MTProto-ро кафолат дода наметавонад. Сервери VPN-ро бо TUN барои овози Discord, зангҳои Telegram ва ин гуна маҳдудиятҳо истифода баред.\n\n## Моторҳо\n\n### Авто\n\nSora муҳаррики насбшударо интихоб мекунад, ки тамоми нақшаи пайвастшавиро дастгирӣ мекунад: протоколҳои сервер, интиқолҳо, гурӯҳҳо, тақсимот ва режим. Интихоби дастӣ номувофиқ пеш аз қатъ кардани пайвасти ҷорӣ рад карда мешавад. Авто ё муҳаррики дигарро интихоб кунед ва танзимотро дубора татбиқ кунед.\n\n### sing-box\n\nБастаҳои нави Sora иборатанд аз [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), як фардкунандаи [sing-box](https://github.com/SagerNet/sing-box), илова кардани муштарии XHTTP ва VLESS Encryption. Sora сохтмон ва қобилиятҳои онро эътироф мекунад. Сохтмони болооб бидуни XHTTP ин қобилиятро танҳо аз номи худ ба даст намеорад.\n\nПротоколҳои дастгирӣшаванда VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ва Z8x/parameters. Sora метавонад ворид кунад. Профилҳои пурраи Xray JSON Xray-ро талаб мекунанд. Майдонҳои нави AWG 3.x ҳанӯз ворид карда намешаванд. sing-box порти назорати маҳаллии бо парол ҳифзшударо истифода мебарад, ки дигар замимаҳои компютер метавонанд онро ошкор кунанд.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) пораҳои VLESS, REALITY, XHTTP, VLESS Encryption ва TLS-ро дастгирӣ мекунад. Он инчунин профилҳои пурраи провайдери Xray -ро ҳангоми нигоҳ доштани масир ва гурӯҳҳои онҳо иҷро мекунад. Чунин профилҳоро бидуни тағир додани рафтори худ ба таври худкор ба муҳаррики дигар табдил додан мумкин нест.\n\nXray маҷмӯӣ танзимеро, ки санҷиши сертификати TLS-ро ғайрифаъол мекунад (`allowInsecure`) хориҷ кард. Барои серверҳои оддӣ, ки ин танзимотро талаб мекунанд, худкор sing-box ё mihomo-ро интихоб мекунад. Интихоби Xray пеш аз қатъ кардани пайвасти ҷорӣ дастӣ дар бораи номувофиқатӣ хабар медиҳад. Профилҳои пурраи JSON-и кӯҳна ба профили провайдери навшуда бо шаҳодатномаи тасдиқшаванда ё PIN сертификат ниёз доранд.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) гурӯҳҳои фармоишии бозгашт ва мувозинати сарборӣ, XHTTP ва AmneziaWG -ро дастгирӣ мекунад. Вақте ки интиқоли автоматӣ ба сервери эҳтиётӣ муҳим аст, онро интихоб кунед. Танзими тақсимоти TLS-и Sora бо ин муҳаррик дастнорас аст.\n\n## Мутобиқат дар Sora\n\n| Хусусият | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ва TCP/UDP | Бале | Бале | Бале |\n| XHTTP | Бале | Бале | Бале |\n| VLESS Encryption | Бале | Бале | Бале |\n| Профили пурраи Xray | Не | Бале | Не |\n| TUIC / AnyTLS | Ҳарду | Не | TUIC |\n| Фрагментатсияи TLS | Бале | Бале | Не |\n| AmneziaWG 1.x/2.x | Ҳа¹ | Не | Бале |\n| Гурӯҳи бозгашти фармоишӣ | Не | No² | Бале |\n\n¹ Профилҳо бо J1/J2/J3/Itime mihomo-ро истифода мебаранд; ин майдонхоро хеч гох хомушона партофтан лозим нест. ² Барои як гурӯҳи профилҳои пурраи Xray, барнома профили эҳтиётиро интихоб мекунад. Дастгирӣ аз сохтори насбшуда вобаста аст; версияи онро дар бораи санҷед.\n\n## Стеки TUN\n\nСтек TCP ва UDP-ро дар дохили интерфейси виртуалӣ идора мекунад. Дар панели режимҳо, Xray ва mihomo gVisor, System, Mixed ва MIPS -ро пешниҳод мекунанд. Ҳар як муҳаррик афзалияти худро захира мекунад. System прокси ва режимҳои бе сервер ин афзалиятро истифода намебаранд.\n\n- **Mixed**: TCP стеки системаро истифода мебарад, дар ҳоле ки gVisor UDP-ро идора мекунад. Ин пешфарз барои mihomo дар Linux аст. Дар Windows, Xray ва mihomo ба таври пешфарз MIPS-ро истифода мебаранд.\n- **System**: стеки системаро истифода мебарад. Варианти дигарро санҷед, агар барномаҳои шабакавӣ ба мушкилот дучор шаванд.\n- **gVisor**: трафикро дар фазои корбарон идора мекунад.\n- **MIPS**: стеки IP-и худи mihomo, ки дар версияи маҷмӯии 1.19.32 дастрас аст.\n\nДар Linux, Xray бо нобаёнӣ gVisor-и дарунсохтро истифода мебарад. System, Mixed ва MIPS дар Linux mihomo-ро ҳамчун муҳаррики TUN истифода мебаранд, TCP ва UDP-ро ба Xray тавассути истиноди SOCKS тасдиқшудаи маҳаллӣ интиқол медиҳанд. Xray протокол, профили провайдер ва масирро нигоҳ медорад. Ин се имконоти насбшуда mihomo талаб мекунанд. Дар Windows, Xray барои ҳамаи чор стеки TUN mihomo 1.19.32 ё навтарро истифода мебарад. Протоколҳо ва масирбандӣ дар Xray мемонанд. Қоидаҳои барномаҳо дар ин пайваст танҳо пайвасти мустақим ва бастанро дастгирӣ мекунанд; дар Linux ин қоидаҳо gVisor-и дарунсохти Xray-ро талаб мекунанд.\n\nПул процесси дуюмро пеш мебарад. Дар се андозагирии бекор дар Linux, он нисбат ба Xray TUN-и аслӣ тақрибан 32–36 МБ зиёдтар хотираи физикиро истифода бурд. Ин сарбории зеркаширо чен намекунад: хароҷоти CPU ва хотира аз пайвастшавӣ вобаста аст. sing-box ягон селектори стек надорад. Ягон стек иҷрои беҳтарро дар ҳар як шабака кафолат намедиҳад. Стекро интихоб кунед ва Apply-ро интихоб кунед ва аз нав пайваст шавед, то онро дар шабакаи худ санҷед.\n\n## Татбиқи танзимот\n\nИнтихоби сервер ба таври худкор дубора пайваст мешавад. Режим, муҳаррик, DNS ва танзимоти қоида фавран захира карда мешаванд; ҳангоми пайвасти фаъол, Apply-ро клик кунед ва барои истифодаи онҳо дубора пайваст шавед. Аз нав ба кор андохтани муҳаррик метавонад зеркашиҳо ва зангҳоро қатъ кунад. Кликҳои такрорӣ пайвастҳои мувозиро оғоз намекунанд; ҷудокунӣ гузаришро ба итмом мерасонад ва пайвастро озод мекунад.\n\nИнтернет танҳо тавассути VPN трафики мустақимро ҳангоми фурӯ рафтани нақб манъ мекунад. Он ба тамоми мошин таъсир мерасонад. Қатъи возеҳ қоидаҳои Sora-ро нест мекунад. Агар тозакунӣ анҷом наёбад, аз нав ҷудо кунед ва сабтро кушоед.\n\n## Ҳуҷҷатҳои лоиҳа\n\n- [sing-box-lx: конфигуратсия ва дастгирӣ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Ҳуҷҷатҳои sing-box](https://sing-box.sagernet.org/)\n- [Ҳуҷҷатҳои Xray](https://xtls.github.io/)\n- [Ҳуҷҷатҳои mihomo](https://wiki.metacubex.one/)\n- [zapret: амалиёт ва маҳдудиятҳо](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'Серверҳоро тафтиш кунед';
@@ -1171,7 +1112,7 @@ class STg extends S {
 
   @override
   String get extConflictsIntro =>
-      'These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.';
+      'Ин васеъкуниҳо як чизро мехоҳанд. Интихоб кунед, ки кадомаш кор кунад, дигаре насбшуда мемонад.';
 
   @override
   String get extConflictRoutingRules => 'Routing rules';
@@ -1301,10 +1242,10 @@ class STg extends S {
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
+      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet — granting it changes nothing today.';
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
   String get extCapBackground => 'Runs in the background';
@@ -1329,7 +1270,7 @@ class STg extends S {
 
   @override
   String extCatalogCached(String date) {
-    return 'Cached catalog · $date';
+    return 'Cached catalog, $date';
   }
 
   @override
@@ -1353,7 +1294,7 @@ class STg extends S {
 
   @override
   String get extPermNetworkDetail =>
-      'Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.';
+      'Маълумотро аз интернет тавассути VPN мегирад. Танҳо хостҳои рӯйхати зерин иҷозат доранд, боқимонда баста аст.';
 
   @override
   String get extBgTitle => 'Background task';
@@ -1378,10 +1319,7 @@ class STg extends S {
 
   @override
   String get extBgNote =>
-      'Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.';
-
-  @override
-  String get extBgRuntimeBadge => 'Not available yet';
+      'Вазифа то он даме ки Sora кушода аст, аз ҷумла дар трей, мувофиқи ҷадвал иҷро мешавад. Кӯтоҳтарин фосила 15 дақиқа аст.';
 
   @override
   String get extBgDisabledNote => 'Enable the extension to manage its background task.';
@@ -1401,9 +1339,6 @@ class STg extends S {
 
   @override
   String get diagnosticHttp => 'Ташхиси HTTP';
-
-  @override
-  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => 'Ҳанӯз ягон дархост сабт нашудааст. Аввал вебсайти санҷиши суръатро кушоед.';
@@ -1634,7 +1569,7 @@ class STg extends S {
   String get profileSsids => 'Wi-Fi networks (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office — comma separated';
+  String get profileSsidsHint => 'Home, Office, comma separated';
 
   @override
   String get profileGateways => 'Gateways';
@@ -1782,13 +1717,6 @@ class STg extends S {
   String get syncNever => 'Never';
 
   @override
-  String get syncWhat => 'What syncs';
-
-  @override
-  String get syncWhatBody =>
-      'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.';
-
-  @override
   String get syncNoLan => 'Devices must be on the same local network';
 
   @override
@@ -1824,79 +1752,13 @@ class STg extends S {
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.';
+      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
 
   @override
   String get tunStackMixed => 'Mixed';
 
   @override
   String get tunStackSystem => 'System';
-
-  @override
-  String get censorTitle => 'Blocking diagnostics';
-
-  @override
-  String get censorHistory => 'Check history';
-
-  @override
-  String get censorEmpty =>
-      'No checks yet. If a connection fails, the detector will check whether your provider is blocking it.';
-
-  @override
-  String get censorExplainer =>
-      'This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.';
-
-  @override
-  String get censorNoProfile => 'No suitable profile for this verdict';
-
-  @override
-  String get censorApplyProfile => 'Apply recommended profile';
-
-  @override
-  String get censorEnable => 'Enable';
-
-  @override
-  String get censorDetails => 'Details';
-
-  @override
-  String get censorNotNow => 'Not now';
-
-  @override
-  String get censorPromptTitle => 'Connection may be blocked';
-
-  @override
-  String censorPromptBody(int confidence) {
-    return 'It looks like your provider is blocking the connection (confidence $confidence%). Try masking?';
-  }
-
-  @override
-  String censorConfidence(int confidence) {
-    return 'Confidence: $confidence%';
-  }
-
-  @override
-  String get censorKindBlocked => 'Blocking detected';
-
-  @override
-  String get censorKindLikely => 'Looks like blocking';
-
-  @override
-  String get censorKindClear => 'No blocking detected';
-
-  @override
-  String get censorKindUnknown => 'Could not determine';
-
-  @override
-  String get censorReasonTlsReset => 'TLS connections are being reset — a typical sign of filtering';
-
-  @override
-  String get censorReasonHttpBlock => 'HTTP requests are being blocked';
-
-  @override
-  String get censorReasonDnsSpoofed => 'DNS responses are being spoofed';
-
-  @override
-  String get censorReasonConnectTimeout => 'Connections keep timing out';
 
   @override
   String get customServerAdd => 'Add custom server';
@@ -1953,9 +1815,6 @@ class STg extends S {
   String get customServerBadge => 'custom';
 
   @override
-  String get flowAuto => 'auto';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Delete server “$name”?';
   }
@@ -1965,9 +1824,6 @@ class STg extends S {
 
   @override
   String get customServerTest => 'Test';
-
-  @override
-  String get errObfsUnsupported => 'The installed core is too old for obfuscation profiles. Update Sora to apply them.';
 
   @override
   String get leakTestTitle => 'Leak test';
@@ -2000,13 +1856,13 @@ class STg extends S {
   }
 
   @override
-  String get leakTestSkipped => 'Skipped — not applicable in this session';
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
   String get leakTestFix => 'Fix';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on — run the test again to verify.';
+  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';
@@ -2027,63 +1883,10 @@ class STg extends S {
   String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
-  String get noticeDegraded => 'The server slowed down — switched to the best measured one';
+  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
 
   @override
   String get obfs => 'Traffic obfuscation';
-
-  @override
-  String get obfsPreset => 'Preset';
-
-  @override
-  String get obfsPresetAggressive => 'Maximum obfuscation';
-
-  @override
-  String get obfsPresetBalanced => 'Balanced';
-
-  @override
-  String get obfsPresetOff => 'Speed';
-
-  @override
-  String get obfsPresetCustom => 'Custom';
-
-  @override
-  String get obfsManual => 'Manual settings';
-
-  @override
-  String get obfsUtls => 'uTLS profile';
-
-  @override
-  String get obfsUtlsAuto => 'Auto';
-
-  @override
-  String get obfsJitter => 'Timing jitter';
-
-  @override
-  String get obfsJitterNeedsFragment => 'Jitter only works with fragmentation enabled.';
-
-  @override
-  String get obfsFineTune => 'Sizes and delays';
-
-  @override
-  String get obfsDetecting => 'Detecting capabilities…';
-
-  @override
-  String get obfsCapabilities => 'Engine capabilities';
-
-  @override
-  String obfsCompatibleEngines(String engines) {
-    return 'Compatible engines: $engines';
-  }
-
-  @override
-  String get obfsSupported => 'Supported';
-
-  @override
-  String get obfsUnsupported => 'Not supported';
-
-  @override
-  String get obfsUnknown => 'Capabilities are still being detected.';
 
   @override
   String get syncCodeExpired => 'The code expired';
@@ -2123,7 +1926,7 @@ class STg extends S {
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.';
+      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
 
   @override
   String get syncNewCode => 'New code';
@@ -2144,7 +1947,7 @@ class STg extends S {
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled · sent $pushed';
+    return 'Received $pulled, sent $pushed';
   }
 
   @override
@@ -2175,9 +1978,6 @@ class STg extends S {
   String get syncDocKindChains => 'Proxy chains';
 
   @override
-  String get syncDocKindObfs => 'Traffic obfuscation';
-
-  @override
   String syncFrom(String name) {
     return 'from $name';
   }
@@ -2187,17 +1987,7 @@ class STg extends S {
 
   @override
   String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet — the sync service can\'t run there.';
-
-  @override
-  String smartPickReason(String ping, String speed) {
-    return 'Picked by smart mode: ping $ping, speed $speed';
-  }
-
-  @override
-  String serverReliability(int pct) {
-    return 'Reliability $pct%';
-  }
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
   String get customServerShadowsocksCredentials =>

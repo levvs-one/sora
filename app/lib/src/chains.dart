@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-/// Maximum hops in a chain (FEATURE-PLAN.md F8).
+/// Maximum hops in a chain.
 const maxChainHops = 3;
 
 /// Minimum hops: a chain of one is just a server.
@@ -14,7 +14,7 @@ const minChainHops = 2;
 const chainCapability = 'chains';
 
 /// A named proxy chain: traffic enters at the first hop and exits at the
-/// last (F8).
+/// last.
 class ProxyChain {
   ProxyChain({required this.id, required this.name, required List<String> hops}) : hops = List.unmodifiable(hops);
 
@@ -47,7 +47,7 @@ class ProxyChain {
   Map<String, dynamic> toJson() => {'id': id, 'name': name, 'hops': hops};
 }
 
-/// App-side chain store, persisted as JSON in settings (F8).
+/// App-side chain store, persisted as JSON in settings.
 class ChainsStore extends ChangeNotifier {
   ChainsStore(this._read, this._write) {
     _load();

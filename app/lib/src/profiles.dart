@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 /// A network profile: triggers identifying a network plus a snapshot of the
-/// connection settings to apply when that network is joined (F5).
+/// connection settings to apply when that network is joined.
 ///
 /// Two stores exist for one concept. The Go core keeps its own profile store
 /// (`core/profiles/`) and matches it on network change
@@ -115,7 +115,7 @@ class NetworkFingerprint {
   bool get known => ssid != null || gateway != null || asn != null;
 }
 
-/// App-side profile store, persisted as JSON in settings (F5).
+/// App-side profile store, persisted as JSON in settings.
 class ProfilesStore extends ChangeNotifier {
   ProfilesStore(this._read, this._write) {
     _load();

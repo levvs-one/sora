@@ -27,7 +27,7 @@ enum UpdateConnection { idle, connected, changing, unknown }
 
 enum UpdateError { network, release, checksum, installation, connecting, unsupported, rollback, rollbackCache }
 
-/// Visible phase of an in-flight update flow (FEATURE-PLAN.md F7).
+/// Visible phase of an in-flight update flow.
 /// There is deliberately no "verifying" stage: file hashes are checked
 /// against the manifest, but releases are not signed yet, so the UI must
 /// not claim verification.

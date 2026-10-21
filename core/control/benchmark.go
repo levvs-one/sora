@@ -1,6 +1,6 @@
 package control
 
-// Throughput benchmarks (F2). BenchmarkServers measures real download
+// Throughput benchmarks. BenchmarkServers measures real download
 // goodput per server through temporary engine sessions and streams progress;
 // results are live samples only - the app stores whatever history it
 // shows. Benchmarks need the control authenticator: they burn traffic

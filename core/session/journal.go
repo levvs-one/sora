@@ -83,7 +83,7 @@ type Journal struct {
 // subscription is one live listener. The closed flag is set under the
 // journal mutex; the channel itself is never closed, because Append may
 // hold a copied reference and closing it would race the send and panic
-// the whole core (SORA-H6). Consumers terminate on context cancellation.
+// the whole core. Consumers terminate on context cancellation.
 type subscription struct {
 	ch     chan Event
 	closed bool
@@ -108,7 +108,7 @@ func NewJournal(capacity int) *Journal {
 // Append assigns sequence and time, stores and publishes the event, and returns
 // the stamped value for log correlation. Publishing holds the mutex for the
 // whole send loop: sends are non-blocking, and no unsubscribe can interleave
-// between the subscriber snapshot and the send (SORA-H6).
+// between the subscriber snapshot and the send.
 func (j *Journal) Append(ev Event) Event {
 	j.mu.Lock()
 	defer j.mu.Unlock()

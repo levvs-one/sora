@@ -196,7 +196,7 @@ func TestFromUnknownAndCatalogErrors(t *testing.T) {
 	}
 }
 
-// TestFromDNSErrorHidesTheQueriedName locks SORA-M7: a DNS failure wrapped
+// TestFromDNSErrorHidesTheQueriedName: a DNS failure wrapped
 // in an *net.OpError must be classified as a DNS error first, so the
 // queried hostname never reaches the detail.
 func TestFromDNSErrorHidesTheQueriedName(t *testing.T) {

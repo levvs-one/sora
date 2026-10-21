@@ -25,9 +25,6 @@ class SKo extends S {
   String get stateDisconnecting => '연결 끊기';
 
   @override
-  String get stateFailed => '연결되지 않음';
-
-  @override
   String get coreMissing => 'Sora 서비스가 응답하지 않습니다.';
 
   @override
@@ -268,9 +265,6 @@ class SKo extends S {
   String get errNoServers => '연결하려면 구독을 추가하세요.';
 
   @override
-  String get exportText => '텍스트';
-
-  @override
   String get connections => '사이';
 
   @override
@@ -509,12 +503,6 @@ class SKo extends S {
   String get ruleInvalid => '사이트나 IP, 프로그램처럼 보이지 않습니다.';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 서버, 차례로', one: '# 서버, 차례로');
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '가장 빠른 # 서버', one: '가장 빠른 # 서버');
     return '$_temp0';
@@ -522,9 +510,6 @@ class SKo extends S {
 
   @override
   String get tunnelMode => '방법';
-
-  @override
-  String get tunnelTun => '모든 트래픽';
 
   @override
   String get tunnelProxy => 'System 프록시';
@@ -639,28 +624,6 @@ class SKo extends S {
   String get less => '더 적은';
 
   @override
-  String get currentServer => '현재 서버';
-
-  @override
-  String get trafficDown => '다운로드됨';
-
-  @override
-  String get trafficUp => '업로드됨';
-
-  @override
-  String perSecond(String value) {
-    return '$value/초';
-  }
-
-  @override
-  String activeRules(int count) {
-    return '활성 규칙: $count';
-  }
-
-  @override
-  String get recentNotifications => '최근 알림';
-
-  @override
   String get notificationsEmpty => '연결 및 구독 이벤트가 여기에 표시됩니다.';
 
   @override
@@ -714,22 +677,13 @@ class SKo extends S {
   String get runningProcesses => '실행 중인 프로세스';
 
   @override
-  String get programsFailed => '애플리케이션을 로드할 수 없습니다.';
-
-  @override
   String get programsEmpty => '애플리케이션을 찾을 수 없습니다. 다른 이름을 사용해 보세요.';
 
   @override
   String get selectExe => '.exe 파일을 선택하세요';
 
   @override
-  String get trafficUnavailable => '카운터는 아직 사용할 수 없습니다.';
-
-  @override
   String get speedtest => '속도';
-
-  @override
-  String get speedtestCheck => '속도 확인';
 
   @override
   String get speedtestSearch => '서비스 찾기';
@@ -820,12 +774,10 @@ class SKo extends S {
   String get updateManual => '터미널에서 이 명령을 실행하여 확인된 두 패키지를 모두 설치한 다음 Sora를 다시 엽니다. 파일은 다운로드 디렉터리에 유지됩니다. VPN 연결이 끊어집니다.';
 
   @override
-  String get updateSignaturePending =>
-      'Release authenticity is not signature-verified yet — the signing-key ceremony is still pending. Files are integrity-checked (SHA-256) against the manifest fetched over TLS.';
+  String get updateSignaturePending => '업데이트 파일은 릴리스와 함께 게시된 체크섬과 대조합니다.';
 
   @override
-  String get updateManualSigWarning =>
-      'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
+  String get updateManualSigWarning => '아래 파일은 릴리스 체크섬과 일치합니다. 공식 릴리스에서 내려받았다면 명령을 실행하세요.';
 
   @override
   String get updateVersionRevoked =>
@@ -878,9 +830,6 @@ class SKo extends S {
   String get componentLicenses => '구성요소 라이선스';
 
   @override
-  String get appCopyright => '© 2026 levvs-one 및 기여자';
-
-  @override
   String get collapseServers => '서버 축소';
 
   @override
@@ -897,10 +846,6 @@ class SKo extends S {
 
   @override
   String get reconnectNow => '적용하고 다시 연결하세요';
-
-  @override
-  String get bypassLimitations =>
-      '이 모드는 HTTP 및 TLS에 대해서만 DPI를 우회하고 UDP를 지원하지 않으며 IP를 변경하지 않습니다. Discord 음성, 통화 및 차단된 Telegram 주소에 VPN 서버를 사용하세요.';
 
   @override
   String get errEngineUnsupported => '선택한 엔진은 이 프로필이나 설정을 지원하지 않습니다. 자동 또는 호환 엔진을 선택하세요.';
@@ -925,7 +870,7 @@ class SKo extends S {
 
   @override
   String get modesGuide =>
-      '서버에 어떤 엔진이 필요한지 확실하지 않은 경우 자동을 선택하십시오. Sora는 연결하기 전에 프로필과 설정을 확인합니다. 엔진은 계획의 대역폭을 늘릴 수 없습니다. 성능은 서버, 경로, 프로토콜 및 네트워크에 따라 다릅니다.\n\n## 모드\n\n### 모든 트래픽(TUN)\n\nSora는 가상 네트워크 인터페이스를 생성하고 이를 통해 TCP 및 UDP를 포함한 애플리케이션 트래픽을 라우팅합니다. Telegram, 게임 및 Discord 음성에 이 모드를 사용하십시오. 규칙은 특정 사이트나 프로그램을 직접 보내거나 차단할 수 있습니다. 네트워크 서비스에는 권한이 필요하며 필요한 프로토콜을 지원하는 서버가 필요합니다.\n\n### System 프록시\n\nSora는 로컬 HTTP/SOCKS 프록시를 구성합니다. 시스템 프록시 설정을 존중하는 응용 프로그램이 이를 사용합니다. 자체 네트워크 스택이 있는 애플리케이션은 직접 연결할 수 있습니다. UDP 및 음성 통화에는 일반적으로 TUN이 필요합니다. 이 모드는 프록시를 지원하는 브라우저 및 애플리케이션에 적합합니다.\n\n### 서버 없음\n\nLinux에서 Sora는 [zapret](https://github.com/bol-van/zapret)를 사용하여 HTTP/TLS 요청을 분할 및 재구성하고 일부 DPI 검사를 우회합니다. 귀하의 IP는 동일하게 유지되며 연결은 웹사이트로 직접 연결됩니다. 결과는 공급자와 차단 방법에 따라 다릅니다.\n\n현재 통합에서는 HTTP 및 TCP를 통한 TLS에 tpws를 사용합니다. IP 차단이나 UDP 중계를 우회하지 않으며 Telegram의 MTProto 연결을 보장할 수 없습니다. Discord 음성, Telegram 통화 및 이러한 종류의 제한 사항에는 TUN이 포함된 VPN 서버를 사용하세요.\n\n## 엔진\n\n### 자동\n\nSora는 서버 프로토콜, 전송, 그룹, 조각화 및 모드 등 전체 연결 계획을 지원하는 설치된 엔진을 선택합니다. 현재 연결을 중단하기 전에 호환되지 않는 수동 선택이 거부됩니다. 자동 또는 다른 엔진을 선택하고 설정을 다시 적용하십시오.\n\n### sing-box\n\n새로운 Sora 패키지에는 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box)의 포크가 포함되어 있으며 클라이언트 측 XHTTP 및 VLESS Encryption가 추가되었습니다. Sora는 ​​빌드와 해당 기능을 인식합니다. XHTTP가 없는 업스트림 빌드는 이름만으로는 이 기능을 얻을 수 없습니다.\n\n지원되는 프로토콜에는 VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard 및 AmneziaWG 1.x/2.x 매개변수가 포함됩니다. Sora는 가져올 수 있습니다. 전체 Xray JSON 프로필에는 Xray가 필요합니다. 새로운 AWG 3.x 필드는 아직 가져올 수 없습니다. sing-box는 컴퓨터의 다른 응용 프로그램이 감지할 수 있는 비밀번호로 보호된 로컬 제어 포트를 사용합니다.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core)는 VLESS, REALITY, XHTTP, VLESS Encryption 및 TLS 조각화를 지원합니다. 또한 라우팅과 그룹을 유지하면서 완전한 공급자 Xray 프로필을 실행합니다. 이러한 프로필은 동작을 변경하지 않고는 자동으로 다른 엔진으로 변환될 수 없습니다.\n\n번들로 제공되는 Xray는 TLS 인증서 확인을 비활성화하는 설정(`allowInsecure`)을 제거했습니다. 이 설정이 필요한 일반 서버에 대해서는 sing-box 또는 mihomo를 자동으로 선택합니다. Xray를 선택하면 현재 연결을 중단하기 전에 비호환성을 수동으로 보고합니다. 이전 전체 JSON 프로필에는 확인 가능한 인증서 또는 인증서 핀이 포함된 업데이트된 공급자 프로필이 필요합니다.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo)는 순서가 지정된 대체 및 로드 밸런싱 그룹인 XHTTP 및 AmneziaWG를 지원합니다. 백업 서버로의 자동 장애 조치가 중요한 경우 선택하세요. 이 엔진에서는 Sora의 TLS 조각화 설정을 사용할 수 없습니다.\n\n## Sora의 호환성\n\n| 기능 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 및 TCP/UDP | 예 | 예 | 예 |\n| XHTTP | 예 | 예 | 예 |\n| VLESS Encryption | 예 | 예 | 예 |\n| 전체 Xray 프로필 | 아니요 | 예 | 아니요 |\n| TUIC / AnyTLS | 둘 다 | 아니요 | TUIC |\n| TLS 조각화 | 예 | 예 | 아니요 |\n| AmneziaWG 1.x/2.x | 예1 | 아니요 | 예 |\n| 정렬된 대체 그룹 | 아니요 | 노² | 예 |\n\n¹ J1/J2/J3/Itime가 포함된 프로필은 mihomo를 사용합니다. 이러한 필드는 자동으로 삭제되어서는 안 됩니다. ² 완전한 Xray 프로필 그룹의 경우 앱은 백업 프로필을 선택합니다. 지원은 설치된 빌드에 따라 다릅니다. 정보에서 버전을 확인하세요.\n\n## TUN 스택\n\n스택은 가상 인터페이스 내부에서 TCP 및 UDP를 처리합니다. 모드 패널에서 Xray 및 mihomo는 ​​gVisor, System, Mixed 및 MIPS를 제공합니다. 각 엔진은 고유한 기본 설정을 저장합니다. System 프록시 및 서버리스 모드에서는 이 기본 설정을 사용하지 않습니다.\n\n- **Mixed** — TCP는 시스템 스택을 사용하고 gVisor는 UDP를 처리합니다. Linux에서 mihomo의 기본값입니다. Windows에서는 Xray와 mihomo가 기본적으로 MIPS를 사용합니다.\n- **System** — 시스템 스택을 사용합니다. 네트워크 응용 프로그램에 문제가 발생하면 다른 옵션을 시도해 보십시오.\n- **gVisor** — 사용자 공간의 트래픽을 처리합니다.\n- **MIPS** — mihomo의 자체 IP 스택은 번들 버전 1.19.32에서 사용할 수 있습니다.\n\nLinux에서 Xray는 기본적으로 내장된 gVisor를 사용합니다. Linux의 System, Mixed 및 MIPS는 mihomo를 TUN 엔진으로 사용하여 인증된 로컬 SOCKS 링크를 통해 TCP 및 UDP를 Xray로 전달합니다. Xray는 프로토콜, 공급자 프로필 및 라우팅을 유지합니다. 이 세 가지 옵션에는 mihomo가 설치되어 있어야 합니다. Windows에서 Xray는 네 가지 TUN 스택 모두에 mihomo 1.19.32 이상을 사용합니다. 프로토콜과 라우팅은 Xray가 처리합니다. 이 구성의 앱 규칙은 직접 연결과 차단만 지원합니다. Linux에서는 이러한 규칙에 Xray 내장 gVisor가 필요합니다.\n\n브리지는 두 번째 프로세스를 실행합니다. Linux에 대한 세 가지 유휴 측정에서 기본 Xray TUN보다 약 32~36MiB 더 많은 물리적 메모리를 사용했습니다. 이는 다운로드 로드를 측정하지 않습니다. CPU 및 메모리 비용은 연결에 따라 달라집니다. sing-box에는 스택 선택기가 없습니다. 어떤 스택도 모든 네트워크에서 더 나은 성능을 보장하지 않습니다. 스택을 선택하고 적용 및 다시 연결을 선택하여 네트워크에서 사용해 보세요.\n\n## 설정 적용 중\n\n서버를 선택하면 자동으로 다시 연결됩니다. 모드, 엔진, DNS 및 규칙 설정은 즉시 저장됩니다. 활성 연결 중에 적용을 클릭하고 다시 연결하여 사용하세요. 엔진을 다시 시작하면 다운로드 및 호출이 중단될 수 있습니다. 반복해서 클릭해도 병렬 연결이 시작되지 않습니다. 연결을 끊으면 전환이 종료되고 연결이 해제됩니다.\n\nVPN을 통한 인터넷만 터널이 끊어지면 직접 트래픽을 차단합니다. 이는 전체 기계에 영향을 미칩니다. 명시적인 연결 해제는 Sora의 규칙을 제거합니다. 정리가 완료되지 않으면 연결을 끊고 로그를 다시 열어보세요.\n\n## 프로젝트 문서\n\n- [sing-box-lx: 구성 및 지원](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 문서](https://sing-box.sagernet.org/)\n- [Xray 문서](https://xtls.github.io/)\n- [mihomo 문서](https://wiki.metacubex.one/)\n- [zapret: 동작 및 제한사항](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      '서버에 어떤 엔진이 필요한지 확실하지 않은 경우 자동을 선택하십시오. Sora는 연결하기 전에 프로필과 설정을 확인합니다. 엔진은 계획의 대역폭을 늘릴 수 없습니다. 성능은 서버, 경로, 프로토콜 및 네트워크에 따라 다릅니다.\n\n## 모드\n\n### 모든 트래픽(TUN)\n\nSora는 가상 네트워크 인터페이스를 생성하고 이를 통해 TCP 및 UDP를 포함한 애플리케이션 트래픽을 라우팅합니다. Telegram, 게임 및 Discord 음성에 이 모드를 사용하십시오. 규칙은 특정 사이트나 프로그램을 직접 보내거나 차단할 수 있습니다. 네트워크 서비스에는 권한이 필요하며 필요한 프로토콜을 지원하는 서버가 필요합니다.\n\n### System 프록시\n\nSora는 로컬 HTTP/SOCKS 프록시를 구성합니다. 시스템 프록시 설정을 존중하는 응용 프로그램이 이를 사용합니다. 자체 네트워크 스택이 있는 애플리케이션은 직접 연결할 수 있습니다. UDP 및 음성 통화에는 일반적으로 TUN이 필요합니다. 이 모드는 프록시를 지원하는 브라우저 및 애플리케이션에 적합합니다.\n\n### 서버 없음\n\nLinux에서 Sora는 [zapret](https://github.com/bol-van/zapret)를 사용하여 HTTP/TLS 요청을 분할 및 재구성하고 일부 DPI 검사를 우회합니다. 귀하의 IP는 동일하게 유지되며 연결은 웹사이트로 직접 연결됩니다. 결과는 공급자와 차단 방법에 따라 다릅니다.\n\n현재 통합에서는 HTTP 및 TCP를 통한 TLS에 tpws를 사용합니다. IP 차단이나 UDP 중계를 우회하지 않으며 Telegram의 MTProto 연결을 보장할 수 없습니다. Discord 음성, Telegram 통화 및 이러한 종류의 제한 사항에는 TUN이 포함된 VPN 서버를 사용하세요.\n\n## 엔진\n\n### 자동\n\nSora는 서버 프로토콜, 전송, 그룹, 조각화 및 모드 등 전체 연결 계획을 지원하는 설치된 엔진을 선택합니다. 현재 연결을 중단하기 전에 호환되지 않는 수동 선택이 거부됩니다. 자동 또는 다른 엔진을 선택하고 설정을 다시 적용하십시오.\n\n### sing-box\n\n새로운 Sora 패키지에는 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box)의 포크가 포함되어 있으며 클라이언트 측 XHTTP 및 VLESS Encryption가 추가되었습니다. Sora는 ​​빌드와 해당 기능을 인식합니다. XHTTP가 없는 업스트림 빌드는 이름만으로는 이 기능을 얻을 수 없습니다.\n\n지원되는 프로토콜에는 VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard 및 AmneziaWG 1.x/2.x 매개변수가 포함됩니다. Sora는 가져올 수 있습니다. 전체 Xray JSON 프로필에는 Xray가 필요합니다. 새로운 AWG 3.x 필드는 아직 가져올 수 없습니다. sing-box는 컴퓨터의 다른 응용 프로그램이 감지할 수 있는 비밀번호로 보호된 로컬 제어 포트를 사용합니다.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core)는 VLESS, REALITY, XHTTP, VLESS Encryption 및 TLS 조각화를 지원합니다. 또한 라우팅과 그룹을 유지하면서 완전한 공급자 Xray 프로필을 실행합니다. 이러한 프로필은 동작을 변경하지 않고는 자동으로 다른 엔진으로 변환될 수 없습니다.\n\n번들로 제공되는 Xray는 TLS 인증서 확인을 비활성화하는 설정(`allowInsecure`)을 제거했습니다. 이 설정이 필요한 일반 서버에 대해서는 sing-box 또는 mihomo를 자동으로 선택합니다. Xray를 선택하면 현재 연결을 중단하기 전에 비호환성을 수동으로 보고합니다. 이전 전체 JSON 프로필에는 확인 가능한 인증서 또는 인증서 핀이 포함된 업데이트된 공급자 프로필이 필요합니다.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo)는 순서가 지정된 대체 및 로드 밸런싱 그룹인 XHTTP 및 AmneziaWG를 지원합니다. 백업 서버로의 자동 장애 조치가 중요한 경우 선택하세요. 이 엔진에서는 Sora의 TLS 조각화 설정을 사용할 수 없습니다.\n\n## Sora의 호환성\n\n| 기능 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 및 TCP/UDP | 예 | 예 | 예 |\n| XHTTP | 예 | 예 | 예 |\n| VLESS Encryption | 예 | 예 | 예 |\n| 전체 Xray 프로필 | 아니요 | 예 | 아니요 |\n| TUIC / AnyTLS | 둘 다 | 아니요 | TUIC |\n| TLS 조각화 | 예 | 예 | 아니요 |\n| AmneziaWG 1.x/2.x | 예1 | 아니요 | 예 |\n| 정렬된 대체 그룹 | 아니요 | 노² | 예 |\n\n¹ J1/J2/J3/Itime가 포함된 프로필은 mihomo를 사용합니다. 이러한 필드는 자동으로 삭제되어서는 안 됩니다. ² 완전한 Xray 프로필 그룹의 경우 앱은 백업 프로필을 선택합니다. 지원은 설치된 빌드에 따라 다릅니다. 정보에서 버전을 확인하세요.\n\n## TUN 스택\n\n스택은 가상 인터페이스 내부에서 TCP 및 UDP를 처리합니다. 모드 패널에서 Xray 및 mihomo는 ​​gVisor, System, Mixed 및 MIPS를 제공합니다. 각 엔진은 고유한 기본 설정을 저장합니다. System 프록시 및 서버리스 모드에서는 이 기본 설정을 사용하지 않습니다.\n\n- **Mixed**: TCP는 시스템 스택을 사용하고 gVisor는 UDP를 처리합니다. Linux에서 mihomo의 기본값입니다. Windows에서는 Xray와 mihomo가 기본적으로 MIPS를 사용합니다.\n- **System**: 시스템 스택을 사용합니다. 네트워크 응용 프로그램에 문제가 발생하면 다른 옵션을 시도해 보십시오.\n- **gVisor**: 사용자 공간의 트래픽을 처리합니다.\n- **MIPS**: mihomo의 자체 IP 스택은 번들 버전 1.19.32에서 사용할 수 있습니다.\n\nLinux에서 Xray는 기본적으로 내장된 gVisor를 사용합니다. Linux의 System, Mixed 및 MIPS는 mihomo를 TUN 엔진으로 사용하여 인증된 로컬 SOCKS 링크를 통해 TCP 및 UDP를 Xray로 전달합니다. Xray는 프로토콜, 공급자 프로필 및 라우팅을 유지합니다. 이 세 가지 옵션에는 mihomo가 설치되어 있어야 합니다. Windows에서 Xray는 네 가지 TUN 스택 모두에 mihomo 1.19.32 이상을 사용합니다. 프로토콜과 라우팅은 Xray가 처리합니다. 이 구성의 앱 규칙은 직접 연결과 차단만 지원합니다. Linux에서는 이러한 규칙에 Xray 내장 gVisor가 필요합니다.\n\n브리지는 두 번째 프로세스를 실행합니다. Linux에 대한 세 가지 유휴 측정에서 기본 Xray TUN보다 약 32~36MiB 더 많은 물리적 메모리를 사용했습니다. 이는 다운로드 로드를 측정하지 않습니다. CPU 및 메모리 비용은 연결에 따라 달라집니다. sing-box에는 스택 선택기가 없습니다. 어떤 스택도 모든 네트워크에서 더 나은 성능을 보장하지 않습니다. 스택을 선택하고 적용 및 다시 연결을 선택하여 네트워크에서 사용해 보세요.\n\n## 설정 적용 중\n\n서버를 선택하면 자동으로 다시 연결됩니다. 모드, 엔진, DNS 및 규칙 설정은 즉시 저장됩니다. 활성 연결 중에 적용을 클릭하고 다시 연결하여 사용하세요. 엔진을 다시 시작하면 다운로드 및 호출이 중단될 수 있습니다. 반복해서 클릭해도 병렬 연결이 시작되지 않습니다. 연결을 끊으면 전환이 종료되고 연결이 해제됩니다.\n\nVPN을 통한 인터넷만 터널이 끊어지면 직접 트래픽을 차단합니다. 이는 전체 기계에 영향을 미칩니다. 명시적인 연결 해제는 Sora의 규칙을 제거합니다. 정리가 완료되지 않으면 연결을 끊고 로그를 다시 열어보세요.\n\n## 프로젝트 문서\n\n- [sing-box-lx: 구성 및 지원](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 문서](https://sing-box.sagernet.org/)\n- [Xray 문서](https://xtls.github.io/)\n- [mihomo 문서](https://wiki.metacubex.one/)\n- [zapret: 동작 및 제한사항](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => '서버 확인';
@@ -1152,8 +1097,7 @@ class SKo extends S {
   String get extConflictsTitle => 'Extension conflicts';
 
   @override
-  String get extConflictsIntro =>
-      'These extensions want the same thing. Choose which one wins — the other stays installed. When the contested capability is wired into the engine, only the winner will run.';
+  String get extConflictsIntro => '이 확장 프로그램들은 같은 것을 원합니다. 실행할 것을 고르세요. 다른 하나는 설치된 채로 남습니다.';
 
   @override
   String get extConflictRoutingRules => 'Routing rules';
@@ -1283,10 +1227,10 @@ class SKo extends S {
 
   @override
   String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
+      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet — granting it changes nothing today.';
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
   String get extCapBackground => 'Runs in the background';
@@ -1311,7 +1255,7 @@ class SKo extends S {
 
   @override
   String extCatalogCached(String date) {
-    return 'Cached catalog · $date';
+    return 'Cached catalog, $date';
   }
 
   @override
@@ -1334,8 +1278,7 @@ class SKo extends S {
   String get extSortRelevance => 'Relevance';
 
   @override
-  String get extPermNetworkDetail =>
-      'Fetches data from the internet. Only the hosts below are allowed — everything else is blocked. Network fetch is not available in this version of Sora yet.';
+  String get extPermNetworkDetail => 'VPN을 통해 인터넷에서 데이터를 가져옵니다. 아래 호스트만 허용되며 나머지는 모두 차단됩니다.';
 
   @override
   String get extBgTitle => 'Background task';
@@ -1359,11 +1302,7 @@ class SKo extends S {
   }
 
   @override
-  String get extBgNote =>
-      'Background execution is not available in this version of Sora. Your schedule is saved and will apply automatically once the background runtime ships. The shortest interval is 15 minutes.';
-
-  @override
-  String get extBgRuntimeBadge => 'Not available yet';
+  String get extBgNote => 'Sora가 열려 있는 동안 트레이에 있을 때도 일정에 따라 작업이 실행됩니다. 최소 간격은 15분입니다.';
 
   @override
   String get extBgDisabledNote => 'Enable the extension to manage its background task.';
@@ -1383,9 +1322,6 @@ class SKo extends S {
 
   @override
   String get diagnosticHttp => 'HTTP 진단';
-
-  @override
-  String get diagnosticArchive => 'Core diagnostics archive';
 
   @override
   String get diagnosticNoData => '아직 기록된 요청이 없습니다. 먼저 속도 테스트 웹사이트를 열어보세요.';
@@ -1616,7 +1552,7 @@ class SKo extends S {
   String get profileSsids => 'Wi-Fi networks (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office — comma separated';
+  String get profileSsidsHint => 'Home, Office, comma separated';
 
   @override
   String get profileGateways => 'Gateways';
@@ -1764,13 +1700,6 @@ class SKo extends S {
   String get syncNever => 'Never';
 
   @override
-  String get syncWhat => 'What syncs';
-
-  @override
-  String get syncWhatBody =>
-      'Subscriptions, rules, settings and network profiles. Never synced: local logs, IPC tokens.';
-
-  @override
   String get syncNoLan => 'Devices must be on the same local network';
 
   @override
@@ -1806,79 +1735,13 @@ class SKo extends S {
 
   @override
   String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one — at most once every 10 minutes.';
+      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
 
   @override
   String get tunStackMixed => 'Mixed';
 
   @override
   String get tunStackSystem => 'System';
-
-  @override
-  String get censorTitle => 'Blocking diagnostics';
-
-  @override
-  String get censorHistory => 'Check history';
-
-  @override
-  String get censorEmpty =>
-      'No checks yet. If a connection fails, the detector will check whether your provider is blocking it.';
-
-  @override
-  String get censorExplainer =>
-      'This is not an app error: your provider seems to be limiting the connection. Masking changes how the app connects and often helps.';
-
-  @override
-  String get censorNoProfile => 'No suitable profile for this verdict';
-
-  @override
-  String get censorApplyProfile => 'Apply recommended profile';
-
-  @override
-  String get censorEnable => 'Enable';
-
-  @override
-  String get censorDetails => 'Details';
-
-  @override
-  String get censorNotNow => 'Not now';
-
-  @override
-  String get censorPromptTitle => 'Connection may be blocked';
-
-  @override
-  String censorPromptBody(int confidence) {
-    return 'It looks like your provider is blocking the connection (confidence $confidence%). Try masking?';
-  }
-
-  @override
-  String censorConfidence(int confidence) {
-    return 'Confidence: $confidence%';
-  }
-
-  @override
-  String get censorKindBlocked => 'Blocking detected';
-
-  @override
-  String get censorKindLikely => 'Looks like blocking';
-
-  @override
-  String get censorKindClear => 'No blocking detected';
-
-  @override
-  String get censorKindUnknown => 'Could not determine';
-
-  @override
-  String get censorReasonTlsReset => 'TLS connections are being reset — a typical sign of filtering';
-
-  @override
-  String get censorReasonHttpBlock => 'HTTP requests are being blocked';
-
-  @override
-  String get censorReasonDnsSpoofed => 'DNS responses are being spoofed';
-
-  @override
-  String get censorReasonConnectTimeout => 'Connections keep timing out';
 
   @override
   String get customServerAdd => 'Add custom server';
@@ -1935,9 +1798,6 @@ class SKo extends S {
   String get customServerBadge => 'custom';
 
   @override
-  String get flowAuto => 'auto';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Delete server “$name”?';
   }
@@ -1947,9 +1807,6 @@ class SKo extends S {
 
   @override
   String get customServerTest => 'Test';
-
-  @override
-  String get errObfsUnsupported => 'The installed core is too old for obfuscation profiles. Update Sora to apply them.';
 
   @override
   String get leakTestTitle => 'Leak test';
@@ -1982,13 +1839,13 @@ class SKo extends S {
   }
 
   @override
-  String get leakTestSkipped => 'Skipped — not applicable in this session';
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
 
   @override
   String get leakTestFix => 'Fix';
 
   @override
-  String get leakTestFixedNote => 'Kill switch is on — run the test again to verify.';
+  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';
@@ -2009,63 +1866,10 @@ class SKo extends S {
   String get leakTestCheckTunnelDns => 'Tunnel DNS';
 
   @override
-  String get noticeDegraded => 'The server slowed down — switched to the best measured one';
+  String get noticeDegraded => 'The server slowed down, switched to the best measured one';
 
   @override
   String get obfs => 'Traffic obfuscation';
-
-  @override
-  String get obfsPreset => 'Preset';
-
-  @override
-  String get obfsPresetAggressive => 'Maximum obfuscation';
-
-  @override
-  String get obfsPresetBalanced => 'Balanced';
-
-  @override
-  String get obfsPresetOff => 'Speed';
-
-  @override
-  String get obfsPresetCustom => 'Custom';
-
-  @override
-  String get obfsManual => 'Manual settings';
-
-  @override
-  String get obfsUtls => 'uTLS profile';
-
-  @override
-  String get obfsUtlsAuto => 'Auto';
-
-  @override
-  String get obfsJitter => 'Timing jitter';
-
-  @override
-  String get obfsJitterNeedsFragment => 'Jitter only works with fragmentation enabled.';
-
-  @override
-  String get obfsFineTune => 'Sizes and delays';
-
-  @override
-  String get obfsDetecting => 'Detecting capabilities…';
-
-  @override
-  String get obfsCapabilities => 'Engine capabilities';
-
-  @override
-  String obfsCompatibleEngines(String engines) {
-    return 'Compatible engines: $engines';
-  }
-
-  @override
-  String get obfsSupported => 'Supported';
-
-  @override
-  String get obfsUnsupported => 'Not supported';
-
-  @override
-  String get obfsUnknown => 'Capabilities are still being detected.';
 
   @override
   String get syncCodeExpired => 'The code expired';
@@ -2105,7 +1909,7 @@ class SKo extends S {
 
   @override
   String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again — for real this time.';
+      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
 
   @override
   String get syncNewCode => 'New code';
@@ -2126,7 +1930,7 @@ class SKo extends S {
 
   @override
   String syncSyncResult(int pulled, int pushed) {
-    return 'Received $pulled · sent $pushed';
+    return 'Received $pulled, sent $pushed';
   }
 
   @override
@@ -2157,9 +1961,6 @@ class SKo extends S {
   String get syncDocKindChains => 'Proxy chains';
 
   @override
-  String get syncDocKindObfs => 'Traffic obfuscation';
-
-  @override
   String syncFrom(String name) {
     return 'from $name';
   }
@@ -2169,17 +1970,7 @@ class SKo extends S {
 
   @override
   String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet — the sync service can\'t run there.';
-
-  @override
-  String smartPickReason(String ping, String speed) {
-    return 'Picked by smart mode: ping $ping, speed $speed';
-  }
-
-  @override
-  String serverReliability(int pct) {
-    return 'Reliability $pct%';
-  }
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
   String get customServerShadowsocksCredentials => 'Shadowsocks의 경우: 방식:비밀번호 (예: chacha20-ietf-poly1305:password)';
