@@ -18,6 +18,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/engine/bypass"
 	"github.com/levvs-one/sora-client/core/engine/mihomo"
+	"github.com/levvs-one/sora-client/core/engine/olcwrap"
 	"github.com/levvs-one/sora-client/core/engine/singbox"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/xray"
@@ -68,6 +69,9 @@ type Registry struct {
 	// directory holding its fake/ payloads.
 	nfqws        string
 	zapretAssets string
+	// olcrtc is the OpenLibre sidecar for olcrtc outbounds; empty
+	// when not installed (or not digest-verified).
+	olcrtc string
 
 	mu   sync.Mutex
 	last engine.Selection
@@ -124,6 +128,20 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 		// The shipped fake payloads live next to the binaries; the
 		// nfqws executor resolves strategy fake names under it.
 		r.zapretAssets = filepath.Join(enginesDir, "zapret")
+		// The olcrtc sidecar gets exactly the tpws treatment: a
+		// helper that cannot be verified against engines.digests is
+		// not run, and olcrtc outbounds are then honestly
+		// unavailable (the Factory gate names the missing binary).
+		olcrtcName := "olcrtc"
+		if runtime.GOOS == "windows" {
+			olcrtcName = "olcrtc.exe"
+		}
+		candidate = filepath.Join(enginesDir, olcrtcName)
+		if info, err := os.Stat(candidate); err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 { //nolint:gosec // the engines directory is set by the service, not by a client
+			if verr := supervise.VerifyNamedInDir(enginesDir, olcrtcName); verr == nil {
+				r.olcrtc = candidate
+			}
+		}
 	}
 	discovery := supervise.DiscoveryOptions{AllowEnvBin: base.AllowEnvBin}
 	// Probe the host (TUN device, kernel WireGuard): the facts
@@ -205,6 +223,10 @@ func (r *Registry) BypassBackends() (tpws, nfqws bool) {
 	return r.tpws != "", r.nfqws != ""
 }
 
+// OlcrtcAvailable reports whether the OpenLibre sidecar was found
+// (and digest-verified) in the engines directory.
+func (r *Registry) OlcrtcAvailable() bool { return r.olcrtc != "" }
+
 // LastSelection returns the latest engine choice and rejection reasons for
 // diagnostics.
 func (r *Registry) LastSelection() engine.Selection {
@@ -253,6 +275,11 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 			order = engine.PrivatePreference
 		}
 		withBypass := bypass.Has(p)
+		withOlcrtc := olcwrap.Has(p)
+		if withOlcrtc && r.olcrtc == "" {
+			return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
+				"registry: olcrtc outbounds need the olcrtc sidecar in the engines directory")
+		}
 		// Missing installations use the missing-engine key rather than
 		// an invalid-plan error. The gate is per backend: a plan whose
 		// bypass outbounds are all nfqws-bound needs nfqws, not tpws,
@@ -289,7 +316,14 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		// TestXrayBridgeAdjustmentNeverMutatesTheCallerPlan.
 		selectPlan := p
 		if withBypass {
-			selectPlan = bypass.Rewrite(p, nil)
+			selectPlan = bypass.Rewrite(selectPlan, nil)
+		}
+		if withOlcrtc {
+			// Selection runs against the SOCKS5 plan the sidecar
+			// rewrite produces; the resolver only feeds the dedup
+			// keys, which a nil listener map never consults.
+			dns, _ := olcwrap.PlanResolver(selectPlan)
+			selectPlan = olcwrap.Rewrite(selectPlan, dns, nil)
 		}
 		sel, bridge, err := r.selectPlan(selectPlan, order)
 		r.mu.Lock()
@@ -310,8 +344,18 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		} else {
 			built, err = drivers[sel.Kind].build(cfg)
 		}
-		if err != nil || !withBypass {
+		if err != nil {
 			return built, err
+		}
+		// Decorator order is explicit: olcrtc inside, bypass
+		// outside — the sidecar rewrite turns olcrtc outbounds into
+		// plain SOCKS5 before the engine (or the bypass wrapper)
+		// ever sees them, exactly like a tpws strategy's rewrite.
+		if withOlcrtc {
+			built = olcwrap.Wrap(built, r.olcrtc, filepath.Join(r.base.HomeDir, "olcrtc"), r.base.Logs)
+		}
+		if !withBypass {
+			return built, nil
 		}
 		return bypass.Wrap(built, bypass.Binaries{TPWS: r.tpws, NFQWS: r.nfqws, Assets: r.zapretAssets},
 			filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs), nil
