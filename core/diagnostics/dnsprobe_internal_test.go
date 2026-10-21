@@ -164,16 +164,29 @@ func dotTestServer(t *testing.T, addrs []string) net.Addr {
 		t.Fatal(err)
 	}
 	tmpl := &x509.Certificate{
-		SerialNumber: big.NewInt(1),
-		Subject:      pkix.Name{CommonName: "dot.test"},
-		NotBefore:    time.Now().Add(-time.Hour),
-		NotAfter:     time.Now().Add(time.Hour),
-		DNSNames:     []string{"dot.test"},
+		SerialNumber:          big.NewInt(1),
+		Subject:               pkix.Name{CommonName: "dot.test"},
+		NotBefore:             time.Now().Add(-time.Hour),
+		NotAfter:              time.Now().Add(time.Hour),
+		DNSNames:              []string{"dot.test"},
+		IPAddresses:           []net.IP{net.IPv4(127, 0, 0, 1)},
+		IsCA:                  true,
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
 	}
+	pool := x509.NewCertPool()
+	t.Cleanup(func() { dotRootCAs = nil })
 	der, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, &key.PublicKey, key)
 	if err != nil {
 		t.Fatal(err)
 	}
+	parsed, err := x509.ParseCertificate(der)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pool.AddCert(parsed)
+	dotRootCAs = pool
 	certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
 	keyDER, err := x509.MarshalPKCS8PrivateKey(key)
 	if err != nil {
@@ -229,6 +242,14 @@ func TestDotVia(t *testing.T) {
 	want := []string{"203.0.113.7", "2001:db8::7"}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+func TestDotViaRejectsAnUntrustedCertificate(t *testing.T) {
+	addr := dotTestServer(t, []string{"203.0.113.7"})
+	dotRootCAs = x509.NewCertPool()
+	if _, err := dotVia(context.Background(), addr.String(), "example.com"); err == nil {
+		t.Fatal("a resolver with an untrusted certificate passed the DoT check")
 	}
 }
 

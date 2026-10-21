@@ -138,12 +138,11 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 			rejected = append(rejected, string(kind)+": "+why)
 			continue
 		}
-		caps, ok := Catalog[kind]
-		if !ok {
+		if _, ok := Catalog[kind]; !ok {
 			rejected = append(rejected, string(kind)+": no capability matrix")
 			continue
 		}
-		caps = BuildCapabilities(kind, avail.Version, avail.BuildTags)
+		caps := BuildCapabilities(kind, avail.Version, avail.BuildTags)
 		if lowest, err := ParseVersion(caps.MinVersion); err == nil && avail.Version.Less(lowest) {
 			rejected = append(rejected, fmt.Sprintf("%s: version %s is older than %s", kind, avail.Version, caps.MinVersion))
 			continue

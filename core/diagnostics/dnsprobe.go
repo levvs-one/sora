@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"io"
@@ -157,21 +158,28 @@ func dohVia(ctx context.Context, endpoint, host string) ([]string, error) {
 	return out, nil
 }
 
+// dotRootCAs replaces the system roots when set; tests pin their server.
+var dotRootCAs *x509.CertPool
+
 // dotVia performs DNS-over-TLS queries (RFC 7858) for host through addr
-// ("ip" or "ip:port", default port 853). The TLS identity is not verified:
-// the canary checks reachability and answer sanity, exactly like the
-// plain-DNS prober, and authenticating a configured resolver address is
-// the session's job, not the diagnostic's.
+// ("ip" or "ip:port", default port 853). The resolver must present a
+// certificate valid for the address it was configured with: an encrypted
+// DNS check that accepted any certificate would report a hijacked resolver
+// as working.
 func dotVia(ctx context.Context, addr, host string) ([]string, error) {
 	if _, _, err := net.SplitHostPort(addr); err != nil {
 		addr = net.JoinHostPort(strings.Trim(addr, "[]"), "853")
+	}
+	serverName, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return nil, err
 	}
 	timeout := probeTimeout(ctx, defaultResolveTimeout)
 	if timeout <= 0 {
 		return nil, errors.New("dot: no time left")
 	}
 	conn, err := (&tls.Dialer{NetDialer: &net.Dialer{Timeout: timeout},
-		Config: &tls.Config{InsecureSkipVerify: true}}).DialContext(ctx, "tcp", addr) //nolint:gosec // diagnostic canary, see above
+		Config: &tls.Config{ServerName: serverName, RootCAs: dotRootCAs, MinVersion: tls.VersionTLS12}}).DialContext(ctx, "tcp", addr)
 	if err != nil {
 		return nil, err
 	}

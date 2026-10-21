@@ -186,23 +186,37 @@ func (s *Server) handleCalls(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleFile(w http.ResponseWriter, r *http.Request) {
-	p := filepath.Join(s.opts.Dir, filepath.FromSlash(strings.TrimPrefix(r.URL.Path, "/")))
-	if st, err := os.Stat(p); err != nil || st.IsDir() {
+	// os.Root confines every lookup to the project directory, so a request
+	// path with "..", an absolute path or a symlink cannot leave it.
+	root, err := os.OpenRoot(s.opts.Dir)
+	if err != nil {
+		http.Error(w, "project directory unavailable", http.StatusInternalServerError)
+		return
+	}
+	defer func() { _ = root.Close() }()
+	name := filepath.FromSlash(strings.TrimPrefix(r.URL.Path, "/"))
+	f, err := root.Open(name)
+	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
-	b, err := os.ReadFile(p)
-	if err != nil {
-		http.Error(w, "read error", http.StatusInternalServerError)
+	defer func() { _ = f.Close() }()
+	st, err := f.Stat()
+	if err != nil || st.IsDir() {
+		http.NotFound(w, r)
 		return
 	}
-	if strings.HasSuffix(strings.ToLower(p), ".html") {
-		b = s.inject(b)
+	if strings.HasSuffix(strings.ToLower(name), ".html") {
+		b, err := io.ReadAll(f)
+		if err != nil {
+			http.Error(w, "read error", http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_, _ = w.Write(b)
+		_, _ = w.Write(s.inject(b))
 		return
 	}
-	http.ServeFile(w, r, p)
+	http.ServeContent(w, r, st.Name(), st.ModTime(), f)
 }
 
 // inject adds the mock and/or live-reload scripts to HTML.
