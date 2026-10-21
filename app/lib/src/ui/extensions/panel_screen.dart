@@ -62,8 +62,9 @@ const String _panelContentSecurityPolicy =
 /// time (core/ext extract); the header here also covers non-entry HTML
 /// files, which the navigation delegate would otherwise let the panel load
 /// without any policy.
-class _LocalPanelServer {
-  _LocalPanelServer(this.root, {required this.entry, required this.bootstrap});
+@visibleForTesting
+class LocalPanelServer {
+  LocalPanelServer(this.root, {required this.entry, required this.bootstrap});
   final String root;
   final String entry;
   final String bootstrap;
@@ -160,7 +161,7 @@ class _LocalPanelServer {
   }
 
   bool _isEntry(String canonical) {
-    final want = File('$root${entry.replaceAll('/', Platform.pathSeparator)}').absolute.path;
+    final want = '${Directory(root).absolute.path}${Platform.pathSeparator}${entry.replaceAll('/', Platform.pathSeparator)}';
     return canonical == want;
   }
 
@@ -189,7 +190,7 @@ class ExtensionPanelScreen extends StatefulWidget {
 
 class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   WebViewController? _controller;
-  _LocalPanelServer? _server;
+  LocalPanelServer? _server;
   Uri? _origin;
   late final PanelBridge _bridge;
   late ExtManifest _manifest;
@@ -317,7 +318,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       final store = ExtScope.of(context);
       final dir = store.contentDir(widget.extensionId);
       if (dir.isEmpty) throw StateError('gone');
-      _server = _LocalPanelServer(dir, entry: _panel.entry, bootstrap: PanelBridge.bootstrapJs);
+      _server = LocalPanelServer(dir, entry: _panel.entry, bootstrap: PanelBridge.bootstrapJs);
       _origin = await _server!.start();
       if (!mounted || generation != _generation) return;
       final controller = _controller ??= WebViewPlatform.instance is LinuxWebViewPlatform

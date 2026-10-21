@@ -94,7 +94,7 @@ class InstalledExtension {
       source: source,
       installedAt: installedAt,
       granted: granted ?? this.granted,
-      previous: previous,
+      previous: previous ?? this.previous,
       authorKey: authorKey ?? this.authorKey,
     );
   }

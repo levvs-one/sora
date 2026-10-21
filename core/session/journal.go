@@ -76,17 +76,8 @@ type Journal struct {
 	next     uint64
 	capacity int
 	history  []Event
-	subs     map[*subscription]struct{}
+	subs     map[chan Event]struct{}
 	dropped  uint64
-}
-
-// subscription is one live listener. The closed flag is set under the
-// journal mutex; the channel itself is never closed, because Append may
-// hold a copied reference and closing it would race the send and panic
-// the whole core. Consumers terminate on context cancellation.
-type subscription struct {
-	ch     chan Event
-	closed bool
 }
 
 // DefaultJournalCapacity retains roughly a minute of counters and state changes
@@ -101,7 +92,7 @@ func NewJournal(capacity int) *Journal {
 	return &Journal{
 		capacity: capacity,
 		history:  make([]Event, 0, capacity),
-		subs:     make(map[*subscription]struct{}),
+		subs:     make(map[chan Event]struct{}),
 	}
 }
 
@@ -123,12 +114,9 @@ func (j *Journal) Append(ev Event) Event {
 		// tick.
 		j.history = append(j.history[:0], j.history[len(j.history)-j.capacity:]...)
 	}
-	for sub := range j.subs {
-		if sub.closed {
-			continue
-		}
+	for ch := range j.subs {
 		select {
-		case sub.ch <- ev:
+		case ch <- ev:
 		default:
 			j.dropped++
 		}
@@ -175,23 +163,22 @@ func (j *Journal) Dropped() uint64 {
 
 // Subscribe creates a buffered live listener. The returned cancellation
 // function unregisters it safely on repeated calls. The channel is never
-// closed (see subscription); consumers must stop on context cancellation.
+// closed, so consumers must stop on context cancellation.
 func (j *Journal) Subscribe(buffer int) (<-chan Event, func()) {
 	if buffer <= 0 {
 		buffer = 64
 	}
-	sub := &subscription{ch: make(chan Event, buffer)}
+	ch := make(chan Event, buffer)
 	j.mu.Lock()
-	j.subs[sub] = struct{}{}
+	j.subs[ch] = struct{}{}
 	j.mu.Unlock()
 	var once sync.Once
 	cancel := func() {
 		once.Do(func() {
 			j.mu.Lock()
 			defer j.mu.Unlock()
-			sub.closed = true
-			delete(j.subs, sub)
+			delete(j.subs, ch)
 		})
 	}
-	return sub.ch, cancel
+	return ch, cancel
 }
