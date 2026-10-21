@@ -26,6 +26,7 @@ import (
 	"github.com/levvs-one/sora-client/core/control"
 	"github.com/levvs-one/sora-client/core/diagnostics"
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/bypass"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/tunroute"
 	"github.com/levvs-one/sora-client/core/errs"
@@ -387,6 +388,29 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		return nil, err
 	}
 	plane.SetDiagnostics(app.report)
+	// Anti-DPI capabilities (1.14): measured, never assumed — the
+	// platform probe of the bypass package over the digest-verified
+	// binaries discovery found, gated per backend with the same Gate
+	// Apply uses. A backend with no verified binary reports
+	// unavailable with the gate's own reason.
+	if app.engines != nil {
+		engines := app.engines
+		plane.SetBypassCapabilities(func(ctx context.Context) (string, []ext.BackendState, error) {
+			tpwsPath, nfqwsPath := engines.BypassBinaries()
+			caps := bypass.ProbeCapabilities(ctx, bypass.Binaries{TPWS: tpwsPath, NFQWS: nfqwsPath})
+			backend := func(kind string, strat engine.BypassStrategy) ext.BackendState {
+				st := ext.BackendState{Kind: kind, Available: true}
+				if err := caps.Gate(strat); err != nil {
+					st.Available, st.Reason = false, err.Error()
+				}
+				return st
+			}
+			return caps.Platform, []ext.BackendState{
+				backend("tpws", engine.BypassStrategy{SplitPos: []string{"1"}}),
+				backend("nfqws", bypass.DefaultStrategy()),
+			}, nil
+		})
+	}
 	app.plane = plane
 	// T042: session censorship verdicts expedite the refresh of the
 	// subscription owning the failed server (block-wave endpoint
@@ -471,12 +495,35 @@ func mountControlServices(server *grpc.Server, plane *control.Server, dataDir st
 	if err != nil {
 		return err
 	}
+	// Anti-DPI layers (1.14): ONE LayerStore is shared by the extension
+	// host (ApplyBypassLayer writes the caller's layer into it) and the
+	// control plane's plan merge (which reads it through this provider
+	// filter: only installed+enabled extensions still granted
+	// bypass.write contribute a layer, so disabling an extension or
+	// revoking the grant drops its layer from the next Connect).
+	layerStore, err := ext.NewLayerStore(filepath.Join(dataDir, "extensions"))
+	if err != nil {
+		return err
+	}
+	plane.SetBypassLayerStore(layerStore, func(id string) bool {
+		inst, ok := extStore.Get(id)
+		if !ok || !inst.Enabled {
+			return false
+		}
+		for _, p := range inst.Granted {
+			if p == "bypass.write" {
+				return true
+			}
+		}
+		return false
+	})
 	// GrantedPermissions closes the mint hole: without it Host.MintToken
 	// trusts the app's permission list, so a confused control plane could
 	// mint tokens for disabled extensions or with ungranted permissions.
 	// With it, the core mints only for installed+enabled extensions and
 	// only within the user-granted set.
 	extDeps := plane.ExtHostDeps()
+	extDeps.BypassLayers = layerStore
 	extDeps.GrantedPermissions = func(id string) ([]string, bool) {
 		inst, ok := extStore.Get(id)
 		if !ok || !inst.Enabled {

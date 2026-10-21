@@ -346,6 +346,20 @@ func ValidateBypassMatch(match string) error {
 	if _, err := netip.ParsePrefix(m); err == nil {
 		return nil
 	}
+	// A purely numeric name is a port (single label) or a malformed IP
+	// literal (several labels), never a domain: refuse it here instead
+	// of letting the plan layer reinterpret it as a keyword.
+	allNumeric := true
+	for _, label := range strings.Split(m, ".") {
+		for _, c := range label {
+			if c < '0' || c > '9' {
+				allNumeric = false
+			}
+		}
+	}
+	if allNumeric {
+		return invalid("ext: a bypass match %q is not a domain, an address or a network", match)
+	}
 	if err := validDomainName(m); err != nil {
 		return invalid("ext: a bypass match %q is not a domain, an address or a network", match)
 	}

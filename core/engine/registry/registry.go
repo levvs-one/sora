@@ -223,6 +223,15 @@ func (r *Registry) BypassBackends() (tpws, nfqws bool) {
 	return r.tpws != "", r.nfqws != ""
 }
 
+// BypassBinaries returns the discovered (and digest-verified) zapret
+// binary paths, empty for a backend discovery did not find. It backs
+// measured capability reporting (bypass.ProbeCapabilities) for callers
+// that hold no engine: the paths are set only after the same
+// executable-bit and digest gates BypassBackends reports on.
+func (r *Registry) BypassBinaries() (tpws, nfqws string) {
+	return r.tpws, r.nfqws
+}
+
 // OlcrtcAvailable reports whether the OpenLibre sidecar was found
 // (and digest-verified) in the engines directory.
 func (r *Registry) OlcrtcAvailable() bool { return r.olcrtc != "" }

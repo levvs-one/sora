@@ -80,7 +80,7 @@ func EngineToProtoStrategy(s engine.BypassStrategy) *corev1.BypassStrategy {
 		FakeTls:          s.FakeTLS,
 		FakeQuic:         s.FakeQUIC,
 		Fooling:          s.Fooling,
-		Ttl:              int32(s.TTL),    //nolint:gosec // validated to 0..255 before a strategy reaches here
+		Ttl:              int32(s.TTL), //nolint:gosec // validated to 0..255 before a strategy reaches here
 		AutoTtl:          s.AutoTTL,
 		Repeats:          int32(s.Repeats), //nolint:gosec // validated to 0..16 before a strategy reaches here
 		FilterTcp:        s.FilterTCP,

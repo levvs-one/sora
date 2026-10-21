@@ -23,6 +23,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/bypass"
 	"github.com/levvs-one/sora-client/core/engine/olcwrap"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/ext"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	"github.com/levvs-one/sora-client/core/parser"
 	"github.com/levvs-one/sora-client/core/routing"
@@ -309,6 +310,33 @@ func kinds(names []string) []engine.Kind {
 // credential references into the engine plan. Credentials remain inside the
 // core.
 func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (*engine.Plan, error) {
+	plan, _, err := planFromProtoMerged(in, sessionID, secrets, nil)
+	return plan, err
+}
+
+// planFromProtoMerged is planFromProto plus the Anti-DPI layer merge
+// (core/control/bypass_ext.go): layers from enabled extensions granted
+// bypass.write are woven in after the zapret handling and the outbound
+// assembly, before plan.Validate — the freshest layer's global fills an
+// empty zapret strategy, and layer bindings become bypass outbounds
+// with routing rules that never override user rules. The returned
+// provenance records what the merge did, for GetBypassState. A nil
+// layers slice merges nothing and preserves the classic behaviour.
+func planFromProtoMerged(in *corev1.SessionPlan, sessionID string, secrets resolver, layers []ext.LayerEntry) (*engine.Plan, *bypassProvenance, error) {
+	prov := &bypassProvenance{Source: "none", BuiltAt: time.Now()}
+	for _, e := range layers {
+		if e.Layer.UpdatedAt.After(prov.NewestLayer) {
+			prov.NewestLayer = e.Layer.UpdatedAt
+		}
+	}
+	plan, err := planFromProtoLayers(in, sessionID, secrets, layers, prov)
+	if err != nil {
+		return nil, nil, err
+	}
+	return plan, prov, nil
+}
+
+func planFromProtoLayers(in *corev1.SessionPlan, sessionID string, secrets resolver, layers []ext.LayerEntry, prov *bypassProvenance) (*engine.Plan, error) {
 	if in == nil {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanEmpty, "control: the request carries no plan")
 	}
@@ -462,9 +490,40 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 	}
 	// zapret alongside the VPN tunnel (1.10, F11): direct traffic gets
 	// DPI-resistant handshakes while the tunnel carries the rest.
+	//
+	// Anti-DPI layer merge (1.14): an empty request strategy (nil or all
+	// fields unset) is "no strategy given", so the freshest layer
+	// global fills it and the provenance names that extension; a
+	// non-empty request strategy is the user's and always wins. With
+	// neither, applyZapretWithVPN's nil path applies the core default.
 	if in.GetZapretWithVpn() {
-		if err := applyZapretWithVPN(plan, in.GetZapretStrategy()); err != nil {
-			return nil, err
+		reqStrategy := in.GetZapretStrategy()
+		switch {
+		case !ext.IsEmptyBypassStrategy(reqStrategy):
+			if err := applyZapretWithVPN(plan, reqStrategy); err != nil {
+				return nil, err
+			}
+			prov.Source, prov.From = "user", ""
+		default:
+			var globalFrom string
+			var globalStrategy *corev1.BypassStrategy
+			for _, e := range layers {
+				if e.Layer.Global != nil {
+					globalFrom, globalStrategy = e.ID, e.Layer.Global
+					break // layers arrive freshest first (LayerStore.List)
+				}
+			}
+			if globalStrategy != nil {
+				if err := applyZapretWithVPN(plan, globalStrategy); err != nil {
+					return nil, err
+				}
+				prov.Source, prov.From = "extension", globalFrom
+			} else {
+				if err := applyZapretWithVPN(plan, nil); err != nil {
+					return nil, err
+				}
+				prov.Source, prov.From = "core_default", ""
+			}
 		}
 	}
 	for _, entry := range in.GetBypassSettings().GetRules() {
@@ -510,6 +569,12 @@ func planFromProto(in *corev1.SessionPlan, sessionID string, secrets resolver) (
 			return nil, err
 		}
 	}
+	// Anti-DPI bindings merge (1.14): layer bindings become bypass
+	// outbounds plus routing rules, inserted after the user's rules and
+	// before the final proxy-target rule. Conflicts with user rules are
+	// skipped (the user wins); the merge counts what it applied into
+	// the provenance for GetBypassState.
+	mergeBypassBindings(plan, in, layers, prov)
 	if err := plan.Validate(); err != nil {
 		return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanGroupsInvalid)
 	}

@@ -239,3 +239,17 @@ func (e *Engine) gateStrategies(ctx context.Context, tpwsNeeded, nfqNeeded map[s
 func (e *Engine) CapabilitiesNow(ctx context.Context) Capabilities {
 	return e.capabilities(ctx)
 }
+
+// ProbeCapabilities measures a capability snapshot for the given
+// binaries without an Engine: the platform probe (kernel, nft,
+// privilege, queues) plus the same executable-file check withBinaries
+// layers onto engine snapshots. It backs surfaces that must report
+// measured availability without a live engine — the extension host's
+// GetBypassCapabilities — with exactly the Gate semantics Apply uses,
+// so a backend reported available here is one the gate would admit.
+func ProbeCapabilities(ctx context.Context, bins Binaries) Capabilities {
+	caps := probeCapabilities(ctx)
+	caps.TPWSBinary = executableFile(bins.TPWS)
+	caps.NFQWSBinary = executableFile(bins.NFQWS)
+	return caps
+}

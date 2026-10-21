@@ -111,6 +111,89 @@ func (b profileBinder) BindDesyncProfile(_ context.Context, fp profiles.Fingerpr
 	return nil
 }
 
+// desyncTuneResult is the shared outcome of one tuner run, in
+// transport-neutral form: the censor RPC renders it as a
+// TuneDesyncResponse and the extension host's TuneDesync dep renders
+// it as an ext.TuneOutcome, from the same run core (runDesyncTune), so
+// the two surfaces can never drift apart.
+type desyncTuneResult struct {
+	// WinnerID is the profile id when the winner bound to a registry
+	// profile, else the winner genome's id ("d/..."). Empty when no
+	// candidate worked.
+	WinnerID string
+	// BoundProfileID is the registry profile id bound to the matched
+	// F5 network profile ("" when none matched or the winner is a
+	// genome only).
+	BoundProfileID string
+	WinnerDescribe string
+	Score          float64
+	Attempts       int32
+	HasWinner      bool
+	// WinnerParams is the winning genome verbatim (markers already
+	// resolved against the blocked canary), for strategy resolution.
+	WinnerParams desync.Params
+}
+
+// runDesyncTune is the inner core of TuneDesync: engine validation and
+// the control-authenticator checks stay with the callers (each
+// transport authenticates its own way); everything from the
+// session-busy refusal to the winner binding lives here, returning
+// errs errors with exactly the codes and keys the censor RPC has
+// always embedded in its wire responses. engineName must already be
+// normalized to "nfqws" or "tpws".
+func (s *Server) runDesyncTune(ctx context.Context, engineName string) (*desyncTuneResult, error) {
+	if s.sessions.Current() != nil {
+		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
+			"control: desync tuning runs probe sessions of its own; disconnect the current session first")
+	}
+	if s.extProxyPort == 0 {
+		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyInternal,
+			"control: desync tuning needs the engine local proxy port, which this core was not configured with")
+	}
+	svc, err := s.desyncService()
+	if err != nil {
+		return nil, errs.Wrap(err, errs.CodeInternal, errs.KeyInternal)
+	}
+	fp := profiles.Current()
+	if s.profiles != nil {
+		fp.ASN = s.profiles.Fingerprint().ASN
+	}
+	prober := &desyncSessionProber{srv: s}
+	res, tuneErr := svc.Tune(ctx, fp, engineName, prober.Probe)
+	if tuneErr != nil && !errors.Is(tuneErr, desync.ErrNoWorking) {
+		var code errs.Code = errs.CodeInternal
+		var key errs.Key = errs.KeyInternal
+		if errors.Is(tuneErr, desync.ErrRateLimited) {
+			code, key = errs.CodeResourceExhausted, errs.KeyInvalidRequest
+		}
+		return nil, errs.Newf(code, key, "control: %v", tuneErr)
+	}
+	if errors.Is(tuneErr, desync.ErrNoWorking) && prober.capabilityErr != nil {
+		// Every candidate failed for the same host reason: the honest
+		// answer is the capability refusal, not "no strategy worked".
+		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyInternal,
+			"control: desync tuning cannot run on this host: %v", prober.capabilityErr)
+	}
+	out := &desyncTuneResult{Attempts: int32(res.Attempts)} //nolint:gosec // attempts are bounded by the search (<= 64)
+	if res.Succeeded() {
+		out.HasWinner = true
+		out.WinnerID = res.Best.Params.ID()
+		out.WinnerDescribe = res.Best.Params.Describe()
+		out.Score = res.Best.Score
+		out.WinnerParams = res.Best.Params
+		if b, ok := svc.Store.Lookup(fp); ok {
+			out.BoundProfileID = b.ProfileID
+			if b.ProfileID != "" {
+				out.WinnerID = b.ProfileID
+			}
+		}
+	}
+	if s.logs != nil {
+		s.logs.Write(time.Time{}, logs.LevelInfo, bypass.Source, res.Summary())
+	}
+	return out, nil
+}
+
 // TuneDesync implements sora.censor.v1.CensorControl.TuneDesync.
 func (s *Server) TuneDesync(ctx context.Context, req *censorv1.TuneDesyncRequest) (*censorv1.TuneDesyncResponse, error) {
 	id := requestID(req.GetRequestId())
@@ -131,57 +214,16 @@ func (s *Server) TuneDesync(ctx context.Context, req *censorv1.TuneDesyncRequest
 	if engineName == "" {
 		engineName = "nfqws"
 	}
-	if s.sessions.Current() != nil {
-		err := errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
-			"control: desync tuning runs probe sessions of its own; disconnect the current session first")
-		return &censorv1.TuneDesyncResponse{Error: toWire(err, nil, id)}, nil
-	}
-	if s.extProxyPort == 0 {
-		err := errs.Newf(errs.CodeFailedPrecondition, errs.KeyInternal,
-			"control: desync tuning needs the engine local proxy port, which this core was not configured with")
-		return &censorv1.TuneDesyncResponse{Error: toWire(err, nil, id)}, nil
-	}
-	svc, err := s.desyncService()
+	res, err := s.runDesyncTune(ctx, engineName)
 	if err != nil {
-		cerr := errs.Wrap(err, errs.CodeInternal, errs.KeyInternal)
-		return &censorv1.TuneDesyncResponse{Error: toWire(cerr, nil, id)}, nil
+		return &censorv1.TuneDesyncResponse{Error: toWire(err, nil, id)}, nil
 	}
-	fp := profiles.Current()
-	if s.profiles != nil {
-		fp.ASN = s.profiles.Fingerprint().ASN
-	}
-	prober := &desyncSessionProber{srv: s}
-	res, tuneErr := svc.Tune(ctx, fp, engineName, prober.Probe)
-	if tuneErr != nil && !errors.Is(tuneErr, desync.ErrNoWorking) {
-		var code errs.Code = errs.CodeInternal
-		var key errs.Key = errs.KeyInternal
-		if errors.Is(tuneErr, desync.ErrRateLimited) {
-			code, key = errs.CodeResourceExhausted, errs.KeyInvalidRequest
-		}
-		cerr := errs.Newf(code, key, "control: %v", tuneErr)
-		return &censorv1.TuneDesyncResponse{Error: toWire(cerr, nil, id)}, nil
-	}
-	if errors.Is(tuneErr, desync.ErrNoWorking) && prober.capabilityErr != nil {
-		// Every candidate failed for the same host reason: the honest
-		// answer is the capability refusal, not "no strategy worked".
-		cerr := errs.Newf(errs.CodeFailedPrecondition, errs.KeyInternal,
-			"control: desync tuning cannot run on this host: %v", prober.capabilityErr)
-		return &censorv1.TuneDesyncResponse{Error: toWire(cerr, nil, id)}, nil
-	}
-	out := &censorv1.TuneDesyncResponse{Attempts: int32(res.Attempts), ProbeRan: true} //nolint:gosec // attempts are bounded by the search (<= 64)
-	if res.Succeeded() {
-		out.WinnerId = res.Best.Params.ID()
-		out.WinnerDescribe = res.Best.Params.Describe()
-		out.Score = res.Best.Score
-		if b, ok := svc.Store.Lookup(fp); ok {
-			out.BoundProfileId = b.ProfileID
-			if b.ProfileID != "" {
-				out.WinnerId = b.ProfileID
-			}
-		}
-	}
-	if s.logs != nil {
-		s.logs.Write(time.Time{}, logs.LevelInfo, bypass.Source, res.Summary())
+	out := &censorv1.TuneDesyncResponse{Attempts: res.Attempts, ProbeRan: true}
+	if res.HasWinner {
+		out.WinnerId = res.WinnerID
+		out.WinnerDescribe = res.WinnerDescribe
+		out.Score = res.Score
+		out.BoundProfileId = res.BoundProfileID
 	}
 	return out, nil
 }

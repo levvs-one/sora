@@ -117,6 +117,15 @@ func (s *Server) ExtHostDeps() ext.Deps {
 			s.logs.Write(time.Time{}, logs.LevelInfo, "ext:"+extensionID, mask(title+": "+body))
 			return nil
 		},
+		// Anti-DPI seam (1.14): the implementations live in
+		// bypass_ext.go (capabilities, state, tuner, bypass events);
+		// the layer store is the one main wired into the server, so
+		// the host's ApplyBypassLayer and the plan merge share it.
+		BypassCapabilities: s.bypassCapabilities,
+		BypassLayers:       s.extLayerStore(),
+		BypassState:        s.bypassState,
+		TuneDesync:         s.tuneDesyncForExt,
+		WatchBypassEvents:  s.watchBypassEvents,
 		WatchEvents: func(ctx context.Context) (<-chan [2]string, error) {
 			running := s.sessions.Current()
 			if running == nil {

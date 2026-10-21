@@ -120,6 +120,11 @@ func (l *lazyEngines) Usable() bool { return l.get().Usable() }
 // platform.
 func (l *lazyEngines) BypassAvailable() bool { return l.get().BypassAvailable() }
 
+// BypassBinaries returns the digest-verified zapret binary paths
+// discovery found (empty for a missing backend), for measured bypass
+// capability reporting.
+func (l *lazyEngines) BypassBinaries() (tpws, nfqws string) { return l.get().BypassBinaries() }
+
 // LastSelection returns the latest engine choice and rejection reasons
 // for diagnostics.
 func (l *lazyEngines) LastSelection() engine.Selection { return l.get().LastSelection() }

@@ -182,6 +182,15 @@ type Server struct {
 	obfsMu          sync.Mutex
 	obfs            *obfsv1.ObfuscationProfile
 	obfsLoadWarning string
+	// bypassMu guards the Anti-DPI seam state (core/control/bypass_ext.go):
+	// the extension layer source merged into every Connect, the measured
+	// capability source behind GetBypassCapabilities, and the provenance
+	// of the last built plan behind GetBypassState.
+	bypassMu           sync.Mutex
+	bypassLayerStore   *ext.LayerStore
+	bypassLayerEnabled func(id string) bool
+	bypassCapsFn       func(ctx context.Context) (string, []ext.BackendState, error)
+	bypassProv         *bypassProvenance
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -586,7 +595,7 @@ func (s *Server) Connect(ctx context.Context, req *corev1.ConnectRequest) (*core
 	if err != nil {
 		return &corev1.ConnectResponse{Error: toWire(err, nil, id)}, nil
 	}
-	plan, err := planFromProto(req.GetSessionPlan(), sessionID, s.secrets)
+	plan, err := s.buildPlan(req.GetSessionPlan(), sessionID)
 	if err != nil {
 		return &corev1.ConnectResponse{Error: toWire(err, nil, id)}, nil
 	}
