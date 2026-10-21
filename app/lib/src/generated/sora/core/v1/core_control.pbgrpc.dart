@@ -293,22 +293,6 @@ class CoreControlClient extends $grpc.Client {
     return $createUnaryCall(_$getBenchmarks, request, options: options);
   }
 
-  /// Since 1.9. User overrides on top of a subscription: renames, hidden
-  /// servers, extra rules and pinned order survive subscription refreshes.
-  $grpc.ResponseFuture<$0.SaveSubscriptionOverrideResponse> saveSubscriptionOverride(
-    $0.SaveSubscriptionOverrideRequest request, {
-    $grpc.CallOptions? options,
-  }) {
-    return $createUnaryCall(_$saveSubscriptionOverride, request, options: options);
-  }
-
-  $grpc.ResponseFuture<$0.GetSubscriptionOverrideResponse> getSubscriptionOverride(
-    $0.GetSubscriptionOverrideRequest request, {
-    $grpc.CallOptions? options,
-  }) {
-    return $createUnaryCall(_$getSubscriptionOverride, request, options: options);
-  }
-
   /// Since 1.10. Network profiles with automatic matching: the core watches
   /// the network fingerprint and reports ProfileMatched events when a saved
   /// profile matches the current network. Requires the control authenticator:
@@ -485,16 +469,6 @@ class CoreControlClient extends $grpc.Client {
       '/sora.core.v1.CoreControl/GetBenchmarks',
       ($0.GetBenchmarksRequest value) => value.writeToBuffer(),
       $0.GetBenchmarksResponse.fromBuffer);
-  static final _$saveSubscriptionOverride =
-      $grpc.ClientMethod<$0.SaveSubscriptionOverrideRequest, $0.SaveSubscriptionOverrideResponse>(
-          '/sora.core.v1.CoreControl/SaveSubscriptionOverride',
-          ($0.SaveSubscriptionOverrideRequest value) => value.writeToBuffer(),
-          $0.SaveSubscriptionOverrideResponse.fromBuffer);
-  static final _$getSubscriptionOverride =
-      $grpc.ClientMethod<$0.GetSubscriptionOverrideRequest, $0.GetSubscriptionOverrideResponse>(
-          '/sora.core.v1.CoreControl/GetSubscriptionOverride',
-          ($0.GetSubscriptionOverrideRequest value) => value.writeToBuffer(),
-          $0.GetSubscriptionOverrideResponse.fromBuffer);
   static final _$listProfiles = $grpc.ClientMethod<$0.ListProfilesRequest, $0.ListProfilesResponse>(
       '/sora.core.v1.CoreControl/ListProfiles',
       ($0.ListProfilesRequest value) => value.writeToBuffer(),
@@ -754,20 +728,6 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.GetBenchmarksRequest.fromBuffer(value),
         ($0.GetBenchmarksResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.SaveSubscriptionOverrideRequest, $0.SaveSubscriptionOverrideResponse>(
-        'SaveSubscriptionOverride',
-        saveSubscriptionOverride_Pre,
-        false,
-        false,
-        ($core.List<$core.int> value) => $0.SaveSubscriptionOverrideRequest.fromBuffer(value),
-        ($0.SaveSubscriptionOverrideResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.GetSubscriptionOverrideRequest, $0.GetSubscriptionOverrideResponse>(
-        'GetSubscriptionOverride',
-        getSubscriptionOverride_Pre,
-        false,
-        false,
-        ($core.List<$core.int> value) => $0.GetSubscriptionOverrideRequest.fromBuffer(value),
-        ($0.GetSubscriptionOverrideResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.ListProfilesRequest, $0.ListProfilesResponse>(
         'ListProfiles',
         listProfiles_Pre,
@@ -1043,22 +1003,6 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.GetBenchmarksResponse> getBenchmarks($grpc.ServiceCall call, $0.GetBenchmarksRequest request);
-
-  $async.Future<$0.SaveSubscriptionOverrideResponse> saveSubscriptionOverride_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.SaveSubscriptionOverrideRequest> $request) async {
-    return saveSubscriptionOverride($call, await $request);
-  }
-
-  $async.Future<$0.SaveSubscriptionOverrideResponse> saveSubscriptionOverride(
-      $grpc.ServiceCall call, $0.SaveSubscriptionOverrideRequest request);
-
-  $async.Future<$0.GetSubscriptionOverrideResponse> getSubscriptionOverride_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.GetSubscriptionOverrideRequest> $request) async {
-    return getSubscriptionOverride($call, await $request);
-  }
-
-  $async.Future<$0.GetSubscriptionOverrideResponse> getSubscriptionOverride(
-      $grpc.ServiceCall call, $0.GetSubscriptionOverrideRequest request);
 
   $async.Future<$0.ListProfilesResponse> listProfiles_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.ListProfilesRequest> $request) async {

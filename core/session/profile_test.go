@@ -16,7 +16,7 @@ func profileStore(t *testing.T) *profiles.Store {
 	saved, err := s.Save(profiles.Profile{
 		Name:      "Home",
 		Triggers:  profiles.Triggers{SSIDs: []string{"Home_Network"}},
-		Apply:     profiles.Apply{Mode: "tun"},
+		Apply:     profiles.Apply{Mode: new("tun")},
 		AutoApply: true,
 	})
 	if err != nil {
@@ -105,5 +105,42 @@ func TestProfileHookWithoutStoreIsSilent(t *testing.T) {
 		if e.Kind == EventProfile {
 			t.Fatal("no store must mean no profile events")
 		}
+	}
+}
+
+func TestProfileMatchDoesNotRepeatOnTheSameNetwork(t *testing.T) {
+	s := startSessionWithProfiles(t, profileStore(t))
+	home := profiles.Fingerprint{SSID: "Home_Network", Gateway: "192.168.1.1"}
+	s.matchProfile(home)
+	s.matchProfile(home)
+	home.Fingerprint = "new privacy address"
+	s.matchProfile(home)
+	count := func() int {
+		n := 0
+		for _, event := range s.Journal().Since(0, 64) {
+			if event.Kind == EventProfile {
+				n++
+			}
+		}
+		return n
+	}
+	if got := count(); got != 1 {
+		t.Fatalf("same network emitted %d matches, want 1", got)
+	}
+	s.matchProfile(profiles.Fingerprint{SSID: "Cafe"})
+	s.matchProfile(home)
+	if got := count(); got != 2 {
+		t.Fatalf("returning home emitted %d matches, want 2", got)
+	}
+	home.Gateway = "192.168.2.1"
+	s.matchProfile(home)
+	if got := count(); got != 3 {
+		t.Fatalf("another matching network emitted %d matches, want 3", got)
+	}
+
+	s.matchProfile(profiles.Fingerprint{})
+	s.matchProfile(home)
+	if got := count(); got != 4 {
+		t.Fatalf("rejoining after going offline emitted %d matches, want 4", got)
 	}
 }

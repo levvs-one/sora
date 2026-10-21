@@ -19,46 +19,44 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CoreControl_Connect_FullMethodName                  = "/sora.core.v1.CoreControl/Connect"
-	CoreControl_Disconnect_FullMethodName               = "/sora.core.v1.CoreControl/Disconnect"
-	CoreControl_GetStatus_FullMethodName                = "/sora.core.v1.CoreControl/GetStatus"
-	CoreControl_WatchEvents_FullMethodName              = "/sora.core.v1.CoreControl/WatchEvents"
-	CoreControl_ParseImport_FullMethodName              = "/sora.core.v1.CoreControl/ParseImport"
-	CoreControl_FetchSubscription_FullMethodName        = "/sora.core.v1.CoreControl/FetchSubscription"
-	CoreControl_ProbeServers_FullMethodName             = "/sora.core.v1.CoreControl/ProbeServers"
-	CoreControl_GetStats_FullMethodName                 = "/sora.core.v1.CoreControl/GetStats"
-	CoreControl_RunDiagnostics_FullMethodName           = "/sora.core.v1.CoreControl/RunDiagnostics"
-	CoreControl_ExportDiagnostics_FullMethodName        = "/sora.core.v1.CoreControl/ExportDiagnostics"
-	CoreControl_SetKillSwitch_FullMethodName            = "/sora.core.v1.CoreControl/SetKillSwitch"
-	CoreControl_Handshake_FullMethodName                = "/sora.core.v1.CoreControl/Handshake"
-	CoreControl_GetAbout_FullMethodName                 = "/sora.core.v1.CoreControl/GetAbout"
-	CoreControl_GetRoutingPresets_FullMethodName        = "/sora.core.v1.CoreControl/GetRoutingPresets"
-	CoreControl_QueryLogs_FullMethodName                = "/sora.core.v1.CoreControl/QueryLogs"
-	CoreControl_WatchLogs_FullMethodName                = "/sora.core.v1.CoreControl/WatchLogs"
-	CoreControl_ExportLogs_FullMethodName               = "/sora.core.v1.CoreControl/ExportLogs"
-	CoreControl_ClearLogs_FullMethodName                = "/sora.core.v1.CoreControl/ClearLogs"
-	CoreControl_GetLogSettings_FullMethodName           = "/sora.core.v1.CoreControl/GetLogSettings"
-	CoreControl_SetLogSettings_FullMethodName           = "/sora.core.v1.CoreControl/SetLogSettings"
-	CoreControl_ListConnections_FullMethodName          = "/sora.core.v1.CoreControl/ListConnections"
-	CoreControl_CloseConnection_FullMethodName          = "/sora.core.v1.CoreControl/CloseConnection"
-	CoreControl_SaveSubscription_FullMethodName         = "/sora.core.v1.CoreControl/SaveSubscription"
-	CoreControl_ListSubscriptions_FullMethodName        = "/sora.core.v1.CoreControl/ListSubscriptions"
-	CoreControl_DeleteSubscription_FullMethodName       = "/sora.core.v1.CoreControl/DeleteSubscription"
-	CoreControl_RefreshSubscription_FullMethodName      = "/sora.core.v1.CoreControl/RefreshSubscription"
-	CoreControl_WatchSubscriptions_FullMethodName       = "/sora.core.v1.CoreControl/WatchSubscriptions"
-	CoreControl_GetSubscriptionLink_FullMethodName      = "/sora.core.v1.CoreControl/GetSubscriptionLink"
-	CoreControl_PutSecret_FullMethodName                = "/sora.core.v1.CoreControl/PutSecret"
-	CoreControl_DeleteSecret_FullMethodName             = "/sora.core.v1.CoreControl/DeleteSecret"
-	CoreControl_CheckDnsLeaks_FullMethodName            = "/sora.core.v1.CoreControl/CheckDnsLeaks"
-	CoreControl_BenchmarkServers_FullMethodName         = "/sora.core.v1.CoreControl/BenchmarkServers"
-	CoreControl_GetBenchmarks_FullMethodName            = "/sora.core.v1.CoreControl/GetBenchmarks"
-	CoreControl_SaveSubscriptionOverride_FullMethodName = "/sora.core.v1.CoreControl/SaveSubscriptionOverride"
-	CoreControl_GetSubscriptionOverride_FullMethodName  = "/sora.core.v1.CoreControl/GetSubscriptionOverride"
-	CoreControl_ListProfiles_FullMethodName             = "/sora.core.v1.CoreControl/ListProfiles"
-	CoreControl_SaveProfile_FullMethodName              = "/sora.core.v1.CoreControl/SaveProfile"
-	CoreControl_DeleteProfile_FullMethodName            = "/sora.core.v1.CoreControl/DeleteProfile"
-	CoreControl_GetNetworkFingerprint_FullMethodName    = "/sora.core.v1.CoreControl/GetNetworkFingerprint"
-	CoreControl_ProbeChain_FullMethodName               = "/sora.core.v1.CoreControl/ProbeChain"
+	CoreControl_Connect_FullMethodName               = "/sora.core.v1.CoreControl/Connect"
+	CoreControl_Disconnect_FullMethodName            = "/sora.core.v1.CoreControl/Disconnect"
+	CoreControl_GetStatus_FullMethodName             = "/sora.core.v1.CoreControl/GetStatus"
+	CoreControl_WatchEvents_FullMethodName           = "/sora.core.v1.CoreControl/WatchEvents"
+	CoreControl_ParseImport_FullMethodName           = "/sora.core.v1.CoreControl/ParseImport"
+	CoreControl_FetchSubscription_FullMethodName     = "/sora.core.v1.CoreControl/FetchSubscription"
+	CoreControl_ProbeServers_FullMethodName          = "/sora.core.v1.CoreControl/ProbeServers"
+	CoreControl_GetStats_FullMethodName              = "/sora.core.v1.CoreControl/GetStats"
+	CoreControl_RunDiagnostics_FullMethodName        = "/sora.core.v1.CoreControl/RunDiagnostics"
+	CoreControl_ExportDiagnostics_FullMethodName     = "/sora.core.v1.CoreControl/ExportDiagnostics"
+	CoreControl_SetKillSwitch_FullMethodName         = "/sora.core.v1.CoreControl/SetKillSwitch"
+	CoreControl_Handshake_FullMethodName             = "/sora.core.v1.CoreControl/Handshake"
+	CoreControl_GetAbout_FullMethodName              = "/sora.core.v1.CoreControl/GetAbout"
+	CoreControl_GetRoutingPresets_FullMethodName     = "/sora.core.v1.CoreControl/GetRoutingPresets"
+	CoreControl_QueryLogs_FullMethodName             = "/sora.core.v1.CoreControl/QueryLogs"
+	CoreControl_WatchLogs_FullMethodName             = "/sora.core.v1.CoreControl/WatchLogs"
+	CoreControl_ExportLogs_FullMethodName            = "/sora.core.v1.CoreControl/ExportLogs"
+	CoreControl_ClearLogs_FullMethodName             = "/sora.core.v1.CoreControl/ClearLogs"
+	CoreControl_GetLogSettings_FullMethodName        = "/sora.core.v1.CoreControl/GetLogSettings"
+	CoreControl_SetLogSettings_FullMethodName        = "/sora.core.v1.CoreControl/SetLogSettings"
+	CoreControl_ListConnections_FullMethodName       = "/sora.core.v1.CoreControl/ListConnections"
+	CoreControl_CloseConnection_FullMethodName       = "/sora.core.v1.CoreControl/CloseConnection"
+	CoreControl_SaveSubscription_FullMethodName      = "/sora.core.v1.CoreControl/SaveSubscription"
+	CoreControl_ListSubscriptions_FullMethodName     = "/sora.core.v1.CoreControl/ListSubscriptions"
+	CoreControl_DeleteSubscription_FullMethodName    = "/sora.core.v1.CoreControl/DeleteSubscription"
+	CoreControl_RefreshSubscription_FullMethodName   = "/sora.core.v1.CoreControl/RefreshSubscription"
+	CoreControl_WatchSubscriptions_FullMethodName    = "/sora.core.v1.CoreControl/WatchSubscriptions"
+	CoreControl_GetSubscriptionLink_FullMethodName   = "/sora.core.v1.CoreControl/GetSubscriptionLink"
+	CoreControl_PutSecret_FullMethodName             = "/sora.core.v1.CoreControl/PutSecret"
+	CoreControl_DeleteSecret_FullMethodName          = "/sora.core.v1.CoreControl/DeleteSecret"
+	CoreControl_CheckDnsLeaks_FullMethodName         = "/sora.core.v1.CoreControl/CheckDnsLeaks"
+	CoreControl_BenchmarkServers_FullMethodName      = "/sora.core.v1.CoreControl/BenchmarkServers"
+	CoreControl_GetBenchmarks_FullMethodName         = "/sora.core.v1.CoreControl/GetBenchmarks"
+	CoreControl_ListProfiles_FullMethodName          = "/sora.core.v1.CoreControl/ListProfiles"
+	CoreControl_SaveProfile_FullMethodName           = "/sora.core.v1.CoreControl/SaveProfile"
+	CoreControl_DeleteProfile_FullMethodName         = "/sora.core.v1.CoreControl/DeleteProfile"
+	CoreControl_GetNetworkFingerprint_FullMethodName = "/sora.core.v1.CoreControl/GetNetworkFingerprint"
+	CoreControl_ProbeChain_FullMethodName            = "/sora.core.v1.CoreControl/ProbeChain"
 )
 
 // CoreControlClient is the client API for CoreControl service.
@@ -129,10 +127,6 @@ type CoreControlClient interface {
 	// stored history behind it was removed. The messages stay for wire
 	// compatibility; do not build on this method.
 	GetBenchmarks(ctx context.Context, in *GetBenchmarksRequest, opts ...grpc.CallOption) (*GetBenchmarksResponse, error)
-	// Since 1.9. User overrides on top of a subscription: renames, hidden
-	// servers, extra rules and pinned order survive subscription refreshes.
-	SaveSubscriptionOverride(ctx context.Context, in *SaveSubscriptionOverrideRequest, opts ...grpc.CallOption) (*SaveSubscriptionOverrideResponse, error)
-	GetSubscriptionOverride(ctx context.Context, in *GetSubscriptionOverrideRequest, opts ...grpc.CallOption) (*GetSubscriptionOverrideResponse, error)
 	// Since 1.10. Network profiles with automatic matching: the core watches
 	// the network fingerprint and reports ProfileMatched events when a saved
 	// profile matches the current network. Requires the control authenticator:
@@ -530,26 +524,6 @@ func (c *coreControlClient) GetBenchmarks(ctx context.Context, in *GetBenchmarks
 	return out, nil
 }
 
-func (c *coreControlClient) SaveSubscriptionOverride(ctx context.Context, in *SaveSubscriptionOverrideRequest, opts ...grpc.CallOption) (*SaveSubscriptionOverrideResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SaveSubscriptionOverrideResponse)
-	err := c.cc.Invoke(ctx, CoreControl_SaveSubscriptionOverride_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *coreControlClient) GetSubscriptionOverride(ctx context.Context, in *GetSubscriptionOverrideRequest, opts ...grpc.CallOption) (*GetSubscriptionOverrideResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetSubscriptionOverrideResponse)
-	err := c.cc.Invoke(ctx, CoreControl_GetSubscriptionOverride_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *coreControlClient) ListProfiles(ctx context.Context, in *ListProfilesRequest, opts ...grpc.CallOption) (*ListProfilesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListProfilesResponse)
@@ -668,10 +642,6 @@ type CoreControlServer interface {
 	// stored history behind it was removed. The messages stay for wire
 	// compatibility; do not build on this method.
 	GetBenchmarks(context.Context, *GetBenchmarksRequest) (*GetBenchmarksResponse, error)
-	// Since 1.9. User overrides on top of a subscription: renames, hidden
-	// servers, extra rules and pinned order survive subscription refreshes.
-	SaveSubscriptionOverride(context.Context, *SaveSubscriptionOverrideRequest) (*SaveSubscriptionOverrideResponse, error)
-	GetSubscriptionOverride(context.Context, *GetSubscriptionOverrideRequest) (*GetSubscriptionOverrideResponse, error)
 	// Since 1.10. Network profiles with automatic matching: the core watches
 	// the network fingerprint and reports ProfileMatched events when a saved
 	// profile matches the current network. Requires the control authenticator:
@@ -792,12 +762,6 @@ func (UnimplementedCoreControlServer) BenchmarkServers(*BenchmarkServersRequest,
 }
 func (UnimplementedCoreControlServer) GetBenchmarks(context.Context, *GetBenchmarksRequest) (*GetBenchmarksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBenchmarks not implemented")
-}
-func (UnimplementedCoreControlServer) SaveSubscriptionOverride(context.Context, *SaveSubscriptionOverrideRequest) (*SaveSubscriptionOverrideResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SaveSubscriptionOverride not implemented")
-}
-func (UnimplementedCoreControlServer) GetSubscriptionOverride(context.Context, *GetSubscriptionOverrideRequest) (*GetSubscriptionOverrideResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptionOverride not implemented")
 }
 func (UnimplementedCoreControlServer) ListProfiles(context.Context, *ListProfilesRequest) (*ListProfilesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProfiles not implemented")
@@ -1394,42 +1358,6 @@ func _CoreControl_GetBenchmarks_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CoreControl_SaveSubscriptionOverride_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SaveSubscriptionOverrideRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CoreControlServer).SaveSubscriptionOverride(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CoreControl_SaveSubscriptionOverride_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoreControlServer).SaveSubscriptionOverride(ctx, req.(*SaveSubscriptionOverrideRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CoreControl_GetSubscriptionOverride_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSubscriptionOverrideRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CoreControlServer).GetSubscriptionOverride(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CoreControl_GetSubscriptionOverride_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CoreControlServer).GetSubscriptionOverride(ctx, req.(*GetSubscriptionOverrideRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _CoreControl_ListProfiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListProfilesRequest)
 	if err := dec(in); err != nil {
@@ -1638,14 +1566,6 @@ var CoreControl_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBenchmarks",
 			Handler:    _CoreControl_GetBenchmarks_Handler,
-		},
-		{
-			MethodName: "SaveSubscriptionOverride",
-			Handler:    _CoreControl_SaveSubscriptionOverride_Handler,
-		},
-		{
-			MethodName: "GetSubscriptionOverride",
-			Handler:    _CoreControl_GetSubscriptionOverride_Handler,
 		},
 		{
 			MethodName: "ListProfiles",

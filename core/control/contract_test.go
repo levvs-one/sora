@@ -75,25 +75,13 @@ func TestNewFieldTagsAreStable(t *testing.T) {
 		"BenchmarkRecord": {
 			"server_id": 1, "bytes_per_sec": 2, "latency_ms": 3, "measured_at_unix": 4,
 		},
-		"SaveSubscriptionOverrideRequest": {
-			"api_version": 1, "control_authenticator": 2, "subscription_id": 3,
-			"renames": 4, "hidden": 5, "pinned_order": 6, "clear": 7,
-		},
-		"SaveSubscriptionOverrideResponse": {"error": 1, "state": 2},
-		"GetSubscriptionOverrideRequest": {
-			"api_version": 1, "control_authenticator": 2, "subscription_id": 3,
-		},
-		"GetSubscriptionOverrideResponse": {
-			"renames": 1, "hidden": 2, "pinned_order": 3, "extra_rules": 4, "error": 5,
-		},
-		"OverrideRule":   {"destination": 1, "outbound_id": 2},
 		"ProfileMatched": {"profile_id": 1, "profile_name": 2, "auto_apply": 3},
 		"NetworkProfile": {
 			"id": 1, "name": 2, "triggers": 3, "apply": 4, "auto_apply": 5,
 		},
 		"ProfileTriggers": {"ssids": 1, "gateways": 2, "asns": 3},
 		"ProfileApply": {
-			"mode": 1, "dns": 2, "rules_preset": 3, "server_id": 4, "engine": 5,
+			"mode": 1, "dns": 2, "rules_preset": 3, "server_id": 4, "engine": 5, "dns_preset": 6, "dns_set": 7,
 		},
 		"ListProfilesRequest":  {"api_version": 1, "control_authenticator": 2},
 		"ListProfilesResponse": {"profiles": 1, "error": 2},

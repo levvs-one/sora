@@ -4,15 +4,9 @@ import 'package:flutter/foundation.dart';
 
 /// User edits layered over a subscription: server renames and hidden servers.
 ///
-/// Stored locally in settings (`subscriptionOverrides`). The core has its own
-/// override store with the SaveSubscriptionOverride/GetSubscriptionOverride
-/// RPCs (`core/control/override.go`, `core/subscription/override.go`) —
-/// implemented, but the app never calls them: this local store is the source
-/// of truth the UI edits and the plan builder applies. Note the core still
-/// applies its (normally empty) overrides to the subscription states it
-/// serves (`subscriptionBook.stateLocked`), so the two stores must not be
-/// confused when debugging server lists. Open owner decision: either
-/// delegate this store to the core RPCs or accept the permanent split.
+/// Settings hold the only override store. The app applies hidden server IDs
+/// when building plans and renames when displaying provider server lists, so
+/// edits survive subscription refreshes without changing the core's data.
 class SubscriptionOverride {
   const SubscriptionOverride({this.renames = const {}, this.hidden = const {}});
 

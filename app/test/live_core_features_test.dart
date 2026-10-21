@@ -8,6 +8,11 @@ library;
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:sora/src/profiles.dart' as editor;
+import 'package:sora/src/settings.dart';
+import 'package:sora/src/sora.dart';
 import 'package:sora/src/core/link.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'package:sora/src/generated/sora/custom/v1/custom.pbgrpc.dart';
@@ -145,5 +150,52 @@ void main() {
       GetNetworkFingerprintRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
     );
     expect(fingerprint.hasError(), isFalse, reason: fingerprint.error.toString());
+  }, skip: skip);
+
+  test('editor auto-apply profile reaches the real core on startup and every edit', () async {
+    SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    final settings = await Settings.load();
+    final sora = Sora(settings);
+    final profile = editor.NetworkProfile(
+      id: 'editor-home',
+      name: 'Editor home',
+      ssids: ['Home'],
+      gateways: ['192.168.1.1'],
+      asns: ['64500'],
+      autoApply: true,
+      tunnel: 'proxy',
+      preset: '',
+      engine: '',
+      dns: ['https://dns.example.com/dns-query'],
+      dnsPreset: 'custom',
+      serverId: 'auto',
+    );
+    sora.profiles.add(profile);
+    final running = sora.run();
+    try {
+      final deadline = DateTime.now().add(const Duration(seconds: 20));
+      while (!sora.coreHandshakeDone) {
+        if (DateTime.now().isAfter(deadline)) fail('Core handshake timed out');
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+      await sora.syncProfiles();
+      Future<ListProfilesResponse> list() =>
+          link.stub.listProfiles(ListProfilesRequest(apiVersion: apiVersion, controlAuthenticator: link.token));
+      var listed = await list();
+      expect(listed.hasError(), isFalse);
+      expect(editor.NetworkProfile.fromWire(listed.profiles.single).toJson(), profile.toJson());
+      profile.name = 'Edited home';
+      profile.dns = [];
+      sora.profiles.update(profile);
+      await sora.syncProfiles();
+      listed = await list();
+      expect(editor.NetworkProfile.fromWire(listed.profiles.single).toJson(), profile.toJson());
+      sora.profiles.remove(profile.id);
+      await sora.syncProfiles();
+      expect((await list()).profiles, isEmpty);
+    } finally {
+      sora.dispose();
+      await running.timeout(const Duration(seconds: 10));
+    }
   }, skip: skip);
 }

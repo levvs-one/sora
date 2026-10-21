@@ -1993,135 +1993,6 @@ final $typed_data.Uint8List benchmarkRecordDescriptor =
         '9wZXJfc2VjGAIgASgEUgtieXRlc1BlclNlYxIdCgpsYXRlbmN5X21zGAMgASgNUglsYXRlbmN5'
         'TXMSKAoQbWVhc3VyZWRfYXRfdW5peBgEIAEoA1IObWVhc3VyZWRBdFVuaXg=');
 
-@$core.Deprecated('Use saveSubscriptionOverrideRequestDescriptor instead')
-const SaveSubscriptionOverrideRequest$json = {
-  '1': 'SaveSubscriptionOverrideRequest',
-  '2': [
-    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
-    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
-    {'1': 'subscription_id', '3': 3, '4': 1, '5': 9, '10': 'subscriptionId'},
-    {
-      '1': 'renames',
-      '3': 4,
-      '4': 3,
-      '5': 11,
-      '6': '.sora.core.v1.SaveSubscriptionOverrideRequest.RenamesEntry',
-      '10': 'renames'
-    },
-    {'1': 'hidden', '3': 5, '4': 3, '5': 9, '10': 'hidden'},
-    {'1': 'pinned_order', '3': 6, '4': 3, '5': 9, '10': 'pinnedOrder'},
-    {'1': 'clear', '3': 7, '4': 1, '5': 8, '10': 'clear'},
-  ],
-  '3': [SaveSubscriptionOverrideRequest_RenamesEntry$json],
-};
-
-@$core.Deprecated('Use saveSubscriptionOverrideRequestDescriptor instead')
-const SaveSubscriptionOverrideRequest_RenamesEntry$json = {
-  '1': 'RenamesEntry',
-  '2': [
-    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
-    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
-  ],
-  '7': {'7': true},
-};
-
-/// Descriptor for `SaveSubscriptionOverrideRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List saveSubscriptionOverrideRequestDescriptor =
-    $convert.base64Decode('Ch9TYXZlU3Vic2NyaXB0aW9uT3ZlcnJpZGVSZXF1ZXN0EjkKC2FwaV92ZXJzaW9uGAEgASgLMh'
-        'guc29yYS5jb3JlLnYxLkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50'
-        'aWNhdG9yGAIgASgMUhRjb250cm9sQXV0aGVudGljYXRvchInCg9zdWJzY3JpcHRpb25faWQYAy'
-        'ABKAlSDnN1YnNjcmlwdGlvbklkElQKB3JlbmFtZXMYBCADKAsyOi5zb3JhLmNvcmUudjEuU2F2'
-        'ZVN1YnNjcmlwdGlvbk92ZXJyaWRlUmVxdWVzdC5SZW5hbWVzRW50cnlSB3JlbmFtZXMSFgoGaG'
-        'lkZGVuGAUgAygJUgZoaWRkZW4SIQoMcGlubmVkX29yZGVyGAYgAygJUgtwaW5uZWRPcmRlchIU'
-        'CgVjbGVhchgHIAEoCFIFY2xlYXIaOgoMUmVuYW1lc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5Eh'
-        'QKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
-
-@$core.Deprecated('Use saveSubscriptionOverrideResponseDescriptor instead')
-const SaveSubscriptionOverrideResponse$json = {
-  '1': 'SaveSubscriptionOverrideResponse',
-  '2': [
-    {'1': 'error', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
-    {'1': 'state', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SubscriptionState', '10': 'state'},
-  ],
-};
-
-/// Descriptor for `SaveSubscriptionOverrideResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List saveSubscriptionOverrideResponseDescriptor =
-    $convert.base64Decode('CiBTYXZlU3Vic2NyaXB0aW9uT3ZlcnJpZGVSZXNwb25zZRItCgVlcnJvchgBIAEoCzIXLnNvcm'
-        'EuY29yZS52MS5Tb3JhRXJyb3JSBWVycm9yEjUKBXN0YXRlGAIgASgLMh8uc29yYS5jb3JlLnYx'
-        'LlN1YnNjcmlwdGlvblN0YXRlUgVzdGF0ZQ==');
-
-@$core.Deprecated('Use getSubscriptionOverrideRequestDescriptor instead')
-const GetSubscriptionOverrideRequest$json = {
-  '1': 'GetSubscriptionOverrideRequest',
-  '2': [
-    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
-    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
-    {'1': 'subscription_id', '3': 3, '4': 1, '5': 9, '10': 'subscriptionId'},
-  ],
-};
-
-/// Descriptor for `GetSubscriptionOverrideRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getSubscriptionOverrideRequestDescriptor =
-    $convert.base64Decode('Ch5HZXRTdWJzY3JpcHRpb25PdmVycmlkZVJlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC'
-        '5zb3JhLmNvcmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIzChVjb250cm9sX2F1dGhlbnRp'
-        'Y2F0b3IYAiABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9yEicKD3N1YnNjcmlwdGlvbl9pZBgDIA'
-        'EoCVIOc3Vic2NyaXB0aW9uSWQ=');
-
-@$core.Deprecated('Use getSubscriptionOverrideResponseDescriptor instead')
-const GetSubscriptionOverrideResponse$json = {
-  '1': 'GetSubscriptionOverrideResponse',
-  '2': [
-    {
-      '1': 'renames',
-      '3': 1,
-      '4': 3,
-      '5': 11,
-      '6': '.sora.core.v1.GetSubscriptionOverrideResponse.RenamesEntry',
-      '10': 'renames'
-    },
-    {'1': 'hidden', '3': 2, '4': 3, '5': 9, '10': 'hidden'},
-    {'1': 'pinned_order', '3': 3, '4': 3, '5': 9, '10': 'pinnedOrder'},
-    {'1': 'extra_rules', '3': 4, '4': 3, '5': 11, '6': '.sora.core.v1.OverrideRule', '10': 'extraRules'},
-    {'1': 'error', '3': 5, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
-  ],
-  '3': [GetSubscriptionOverrideResponse_RenamesEntry$json],
-};
-
-@$core.Deprecated('Use getSubscriptionOverrideResponseDescriptor instead')
-const GetSubscriptionOverrideResponse_RenamesEntry$json = {
-  '1': 'RenamesEntry',
-  '2': [
-    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
-    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
-  ],
-  '7': {'7': true},
-};
-
-/// Descriptor for `GetSubscriptionOverrideResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getSubscriptionOverrideResponseDescriptor =
-    $convert.base64Decode('Ch9HZXRTdWJzY3JpcHRpb25PdmVycmlkZVJlc3BvbnNlElQKB3JlbmFtZXMYASADKAsyOi5zb3'
-        'JhLmNvcmUudjEuR2V0U3Vic2NyaXB0aW9uT3ZlcnJpZGVSZXNwb25zZS5SZW5hbWVzRW50cnlS'
-        'B3JlbmFtZXMSFgoGaGlkZGVuGAIgAygJUgZoaWRkZW4SIQoMcGlubmVkX29yZGVyGAMgAygJUg'
-        'twaW5uZWRPcmRlchI7CgtleHRyYV9ydWxlcxgEIAMoCzIaLnNvcmEuY29yZS52MS5PdmVycmlk'
-        'ZVJ1bGVSCmV4dHJhUnVsZXMSLQoFZXJyb3IYBSABKAsyFy5zb3JhLmNvcmUudjEuU29yYUVycm'
-        '9yUgVlcnJvcho6CgxSZW5hbWVzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiAB'
-        'KAlSBXZhbHVlOgI4AQ==');
-
-@$core.Deprecated('Use overrideRuleDescriptor instead')
-const OverrideRule$json = {
-  '1': 'OverrideRule',
-  '2': [
-    {'1': 'destination', '3': 1, '4': 1, '5': 9, '10': 'destination'},
-    {'1': 'outbound_id', '3': 2, '4': 1, '5': 9, '10': 'outboundId'},
-  ],
-};
-
-/// Descriptor for `OverrideRule`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List overrideRuleDescriptor =
-    $convert.base64Decode('CgxPdmVycmlkZVJ1bGUSIAoLZGVzdGluYXRpb24YASABKAlSC2Rlc3RpbmF0aW9uEh8KC291dG'
-        'JvdW5kX2lkGAIgASgJUgpvdXRib3VuZElk');
-
 @$core.Deprecated('Use profileMatchedDescriptor instead')
 const ProfileMatched$json = {
   '1': 'ProfileMatched',
@@ -2176,19 +2047,31 @@ final $typed_data.Uint8List profileTriggersDescriptor =
 const ProfileApply$json = {
   '1': 'ProfileApply',
   '2': [
-    {'1': 'mode', '3': 1, '4': 1, '5': 9, '10': 'mode'},
+    {'1': 'mode', '3': 1, '4': 1, '5': 9, '9': 0, '10': 'mode', '17': true},
     {'1': 'dns', '3': 2, '4': 3, '5': 9, '10': 'dns'},
-    {'1': 'rules_preset', '3': 3, '4': 1, '5': 9, '10': 'rulesPreset'},
-    {'1': 'server_id', '3': 4, '4': 1, '5': 9, '10': 'serverId'},
-    {'1': 'engine', '3': 5, '4': 1, '5': 9, '10': 'engine'},
+    {'1': 'rules_preset', '3': 3, '4': 1, '5': 9, '9': 1, '10': 'rulesPreset', '17': true},
+    {'1': 'server_id', '3': 4, '4': 1, '5': 9, '9': 2, '10': 'serverId', '17': true},
+    {'1': 'engine', '3': 5, '4': 1, '5': 9, '9': 3, '10': 'engine', '17': true},
+    {'1': 'dns_preset', '3': 6, '4': 1, '5': 9, '9': 4, '10': 'dnsPreset', '17': true},
+    {'1': 'dns_set', '3': 7, '4': 1, '5': 8, '10': 'dnsSet'},
+  ],
+  '8': [
+    {'1': '_mode'},
+    {'1': '_rules_preset'},
+    {'1': '_server_id'},
+    {'1': '_engine'},
+    {'1': '_dns_preset'},
   ],
 };
 
 /// Descriptor for `ProfileApply`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List profileApplyDescriptor =
-    $convert.base64Decode('CgxQcm9maWxlQXBwbHkSEgoEbW9kZRgBIAEoCVIEbW9kZRIQCgNkbnMYAiADKAlSA2RucxIhCg'
-        'xydWxlc19wcmVzZXQYAyABKAlSC3J1bGVzUHJlc2V0EhsKCXNlcnZlcl9pZBgEIAEoCVIIc2Vy'
-        'dmVySWQSFgoGZW5naW5lGAUgASgJUgZlbmdpbmU=');
+    $convert.base64Decode('CgxQcm9maWxlQXBwbHkSFwoEbW9kZRgBIAEoCUgAUgRtb2RliAEBEhAKA2RucxgCIAMoCVIDZG'
+        '5zEiYKDHJ1bGVzX3ByZXNldBgDIAEoCUgBUgtydWxlc1ByZXNldIgBARIgCglzZXJ2ZXJfaWQY'
+        'BCABKAlIAlIIc2VydmVySWSIAQESGwoGZW5naW5lGAUgASgJSANSBmVuZ2luZYgBARIiCgpkbn'
+        'NfcHJlc2V0GAYgASgJSARSCWRuc1ByZXNldIgBARIXCgdkbnNfc2V0GAcgASgIUgZkbnNTZXRC'
+        'BwoFX21vZGVCDwoNX3J1bGVzX3ByZXNldEIMCgpfc2VydmVyX2lkQgkKB19lbmdpbmVCDQoLX2'
+        'Ruc19wcmVzZXQ=');
 
 @$core.Deprecated('Use listProfilesRequestDescriptor instead')
 const ListProfilesRequest$json = {

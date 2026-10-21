@@ -13,8 +13,7 @@ proto/ is the source of truth (Go gen/ is protoc-built from it).
 Usage:  python3 app/tool/proto_parity.py
 Exit code 0 = parity, 1 = mismatch (details on stdout).
 
-Known gaps are listed in EXPECTED_GAPS: protos with no Dart stub yet
-(censor: client not written; ext_host: no client by design).
+Excluded contracts are listed in EXPECTED_GAPS.
 """
 
 import os
@@ -40,18 +39,17 @@ MAPPINGS = {
         None,
         "app/lib/src/generated/sora/leak/v1/leak.pbgrpc.dart",
     ),
-    # Hand-written; messages + enums + client live in one file, protoc-gen-dart style.
     "proto/sora/obfs/v1/obfs.proto": (
-        "app/lib/src/obfs.dart",
+        "app/lib/src/generated/sora/obfs/v1/obfs.pb.dart",
+        "app/lib/src/generated/sora/obfs/v1/obfs.pbenum.dart",
         None,
-        "app/lib/src/obfs.dart",
     ),
 }
 
-# protos intentionally without a Dart stub (checked, not failures)
+# The extension host and censorship contracts are outside this checker.
 EXPECTED_GAPS = {
-    "proto/sora/censor/v1/censor.proto": "no Dart stub yet (client not written)",
-    "proto/sora/ext/v1/ext_host.proto": "no Dart client by design: the app never talks to the extension host directly",
+    "proto/sora/censor/v1/censor.proto": "reserved contract without a client",
+    "proto/sora/ext/v1/ext_host.proto": "extension host checked separately",
 }
 
 # proto scalar -> canonical dart-side type used in BuilderInfo generics
@@ -176,9 +174,10 @@ def parse_message(model, name, body, prefix, enums):
         elif kind == "enum":
             model.enums[fullname + "." + sub] = parse_enum(subbody)
     # fields (nested blocks blanked out)
+    body2 = body2.strip()
     for line in body2.split(";"):
         line = line.strip()
-        if not line or line.startswith(("reserved", "option", "extensions")):
+        if not line or line.startswith(("reserved", "option ", "extensions")):
             continue
         fm = FIELD_RE.match(line)
         if fm:
@@ -296,7 +295,7 @@ def parse_service(body):
 
 CLASS_RE = re.compile(r"^class (\w+) extends \$pb\.GeneratedMessage \{", re.M)
 ENUM_RE = re.compile(r"^class (\w+) extends \$pb\.ProtobufEnum \{", re.M)
-DART_ENUM_VALUE_RE = re.compile(r"static const \w+ (\w+)\s*=\s*\w+\._\((-?\d+),")
+DART_ENUM_VALUE_RE = re.compile(r"static const \w+ (\w+)\s*=\s*\w+\._\(\s*(-?\d+),")
 # BuilderInfo field entries. Order matters: more specific first.
 BUILDER_PATTERNS = [
     (re.compile(r"\.\.aOM<\$(?:\d+)\.(\w+)>\((\d+),"), "msg"),
@@ -312,6 +311,7 @@ BUILDER_PATTERNS = [
     (re.compile(r"\.\.aOB\((\d+),"), "bool"),
     (re.compile(r"\.\.aI\((\d+),"), "int"),  # ..aI(tag, fieldType: OU3), uint32
     (re.compile(r"\.\.a<\$core\.int>\((\d+),"), "int"),
+    (re.compile(r"\.\.aInt64\((\d+),"), "int64"),
     (re.compile(r"\.\.a<\$fixnum\.Int64>\((\d+),"), "int64"),
     (re.compile(r"\.\.a<\$core\.double>\((\d+),"), "double"),
     (re.compile(r"\.\.a<\$core\.List<\$core\.int>>\((\d+),"), "bytes"),
@@ -496,6 +496,9 @@ def check(proto_path, pb_path, pbenum_path, pbgrpc_path):
             if dcs != cs or dss != ss:
                 errors.append(f"[{proto_path}] RPC {rname}: streaming mismatch "
                               f"proto=(c={cs},s={ss}) dart=(c={dcs},s={dss})")
+    expected_rpcs = {name for rpcs in proto.services.values() for name in rpcs}
+    for name in sorted(set(dart.rpcs) - expected_rpcs):
+        errors.append(f"[{proto_path}] Dart RPC {name}: no such proto method")
     if hasattr(dart, "paths"):
         for sname, rpcs in proto.services.items():
             for rname in rpcs:
