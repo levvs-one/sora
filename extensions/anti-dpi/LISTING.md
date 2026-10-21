@@ -25,7 +25,11 @@ Anti-DPI puts Sora's DPI-bypass machinery into one panel.
 - **Presets.** The core tuner's own registry (SNI-block, stall,
   QUIC-throttle and KZ-variant strategies) plus the classic tpws
   strategies — each with an honest explanation of the mechanism, the
-  censorship class it targets, and its costs and risks.
+  censorship class it targets, and its costs and risks. Each preset
+  declares a `scope`: three `midsni` presets are binding-only (the
+  marker resolves against a concrete domain, so they apply solely to
+  a plain-domain binding, never as the global strategy); the rest are
+  global-scoped.
 - **Editor.** Every `BypassStrategy` field, grouped (split & order,
   TLS record, HTTP form, nfqws desync, port/L7 filters), with hints
   per field and validation that mirrors the core: what the core would
@@ -54,7 +58,10 @@ Anti-DPI собирает механизмы обхода DPI из Sora в од�
   блокировки по SNI, зависаний, троттлинга QUIC и казахстанского
   варианта) плюс классические стратегии tpws — каждая с честным
   объяснением механизма, класса цензуры, против которого она работает,
-  и её цены и рисков.
+  и её цены и рисков. У каждого пресета указана область применения
+  (scope): три пресета с маркером midsni — только для привязок (маркер разрешается по
+  конкретному домену, поэтому они применимы лишь к привязке с обычным
+  доменом, а не как глобальная стратегия); остальные — глобальные.
 - **Редактор.** Все поля `BypassStrategy`, сгруппированные (сплит и
   порядок, TLS-запись, HTTP-форма, nfqws-десинк, фильтры портов и
   L7), с подсказками по каждому полю и валидацией, зеркалящей ядро:

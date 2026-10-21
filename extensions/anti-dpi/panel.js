@@ -67,6 +67,10 @@ var STRINGS = {
   "preset_targets": "Targets",
   "preset_cost": "Cost / risks",
   "preset_backends": "Backends",
+  "preset_scope_global": "Global",
+  "preset_scope_bindings": "Binding only",
+  "preset_apply_binding": "Apply to a binding…",
+  "preset_bind_hint": "This preset is binding-scoped: enter the plain domain it should run for, add the binding, then Apply layer. It cannot be applied as the global strategy.",
   "editor_intro": "Every BypassStrategy field. Validation mirrors the core: a strategy the core would reject is flagged here before you apply it.",
   "group_split": "Split & order",
   "group_tls": "TLS record",
@@ -99,6 +103,7 @@ var STRINGS = {
   "tune_winner": "Winner",
   "tune_score": "Score",
   "tune_attempts": "Attempts",
+  "tune_winner_id": "Winner id",
   "tune_apply_winner": "Apply winner as global",
   "tune_bound_to_profile": "The core bound this winner to your network profile instead of returning a raw strategy: it will take effect through that profile when this network is matched. There is nothing to apply here manually.",
   "tune_no_winner": "No winner was returned.",
@@ -215,7 +220,7 @@ var STRINGS = {
    },
    "fooling": {
     "label": "Fooling",
-    "hint": "Degrades the fake/disorder packet so the censor's stack drops it while the real server tolerates it: badseq, badack, md5sig, ts, badsum, datanoack (comma-separated list allowed). Requires a desync method."
+    "hint": "Degrades the fake/disorder packet so the censor's stack drops it while the real server tolerates it: badseq, md5sig, ts, badsum, datanoack (comma-separated list allowed). Requires a desync method."
    },
    "ttl": {
     "label": "Fake TTL",
@@ -281,7 +286,7 @@ var STRINGS = {
   "v_tamper_pattern": "is not a tamper position (split-position syntax, optional leading \"n\")",
   "v_pos_pattern": "is not a valid position",
   "v_fooling_req": "Fooling needs a desync method (nfqws-only).",
-  "v_fooling_mode": "is not a fooling mode (badseq, badack, md5sig, ts, badsum, datanoack, hopbyhop, hopbyhop2, none)",
+  "v_fooling_mode": "is not a fooling mode (md5sig, ts, badsum, badseq, datanoack, hopbyhop, hopbyhop2, none)",
   "v_fake_req": "Fake payloads need the fake desync method.",
   "v_fake_name": "must be a built-in keyword or a plain file name (no path)",
   "v_fakequic_udp": "A QUIC fake needs filter_udp (QUIC runs over UDP).",
@@ -295,6 +300,8 @@ var STRINGS = {
   "v_filter_ports": "is not a port list (e.g. 80,443 or 1000-2000)",
   "v_filter_port_range": "Port out of range 1–65535 in",
   "v_filter_l7_val": "is not a filter-l7 protocol (http, tls, quic, wireguard, dht, discord, stun, unknown)",
+  "v_midsni_global": "This strategy uses the \"midsni\" marker, which the core resolves against a concrete domain: it can only be applied to a binding with a plain domain (domain:/full:/bare), not as the global strategy.",
+  "v_midsni_match": "This strategy uses the \"midsni\" marker, which the core resolves against a concrete domain: the binding must be a plain domain (domain:/full:/bare) — geosite:/geoip:/ruleset:/IP/CIDR matches name no single SNI.",
   "field_prefix": "Field",
   "value_prefix": "Value",
   "desync_modes_label": "Known desync modes"
@@ -350,6 +357,10 @@ var STRINGS = {
   "preset_targets": "Против чего",
   "preset_cost": "Цена / риски",
   "preset_backends": "Бэкенды",
+  "preset_scope_global": "Глобальный",
+  "preset_scope_bindings": "Только привязка",
+  "preset_apply_binding": "Применить к привязке…",
+  "preset_bind_hint": "Этот пресет — только для привязки: введите обычный домен, для которого он должен работать, добавьте привязку и нажмите «Применить слой». Как глобальную стратегию его применить нельзя.",
   "editor_intro": "Все поля BypassStrategy. Валидация зеркалит ядро: стратегия, которую ядро отклонило бы, подсветится здесь до применения.",
   "group_split": "Сплит и порядок",
   "group_tls": "TLS-запись",
@@ -382,6 +393,7 @@ var STRINGS = {
   "tune_winner": "Победитель",
   "tune_score": "Оценка",
   "tune_attempts": "Попыток",
+  "tune_winner_id": "ID победителя",
   "tune_apply_winner": "Применить победителя как глобальную",
   "tune_bound_to_profile": "Ядро привязало этого победителя к вашему сетевому профилю вместо возврата сырой стратегии: он подействует через профиль при совпадении этой сети. Вручную здесь применять нечего.",
   "tune_no_winner": "Победитель не возвращён.",
@@ -498,7 +510,7 @@ var STRINGS = {
    },
    "fooling": {
     "label": "Fooling",
-    "hint": "Порча фейкового/disorder-пакета, чтобы стек цензора его отбросил, а настоящий сервер стерпел: badseq, badack, md5sig, ts, badsum, datanoack (допустим список через запятую). Требует метод desync."
+    "hint": "Порча фейкового/disorder-пакета, чтобы стек цензора его отбросил, а настоящий сервер стерпел: badseq, md5sig, ts, badsum, datanoack (допустим список через запятую). Требует метод desync."
    },
    "ttl": {
     "label": "TTL фейка",
@@ -564,7 +576,7 @@ var STRINGS = {
   "v_tamper_pattern": "не является позицией тамперинга (синтаксис позиции сплита, необязательная ведущая «n»)",
   "v_pos_pattern": "не является валидной позицией",
   "v_fooling_req": "Fooling требует метод desync (только nfqws).",
-  "v_fooling_mode": "не является режимом fooling (badseq, badack, md5sig, ts, badsum, datanoack, hopbyhop, hopbyhop2, none)",
+  "v_fooling_mode": "не является режимом fooling (md5sig, ts, badsum, badseq, datanoack, hopbyhop, hopbyhop2, none)",
   "v_fake_req": "Фейковые нагрузки требуют метод desync fake.",
   "v_fake_name": "должно быть встроенным ключевым словом или простым именем файла (без пути)",
   "v_fakequic_udp": "Фейк QUIC требует filter_udp (QUIC идёт поверх UDP).",
@@ -578,6 +590,8 @@ var STRINGS = {
   "v_filter_ports": "не является списком портов (например, 80,443 или 1000-2000)",
   "v_filter_port_range": "Порт вне диапазона 1–65535 в",
   "v_filter_l7_val": "не является протоколом filter-l7 (http, tls, quic, wireguard, dht, discord, stun, unknown)",
+  "v_midsni_global": "Эта стратегия использует маркер «midsni», который ядро разрешает по конкретному домену: её можно применить только к привязке с обычным доменом (domain:/full:/голый домен), а не как глобальную стратегию.",
+  "v_midsni_match": "Эта стратегия использует маркер «midsni», который ядро разрешает по конкретному домену: привязка должна быть обычным доменом (domain:/full:/голый домен) — совпадения geosite:/geoip:/ruleset:/IP/CIDR не называют один SNI.",
   "field_prefix": "Поле",
   "value_prefix": "Значение",
   "desync_modes_label": "Известные режимы desync"
@@ -605,6 +619,7 @@ var PRESETS = [
   "backends": [
    "tpws"
   ],
+  "scope": "bindings",
   "strategy": {
    "split_pos": [
     "midsni"
@@ -633,6 +648,7 @@ var PRESETS = [
   "backends": [
    "nfqws"
   ],
+  "scope": "global",
   "strategy": {
    "split_pos": [
     "2"
@@ -669,6 +685,7 @@ var PRESETS = [
   "backends": [
    "nfqws"
   ],
+  "scope": "bindings",
   "strategy": {
    "split_pos": [
     "midsni"
@@ -703,6 +720,7 @@ var PRESETS = [
   "backends": [
    "tpws"
   ],
+  "scope": "global",
   "strategy": {
    "tls_record": "sniext+1"
   },
@@ -729,6 +747,7 @@ var PRESETS = [
   "backends": [
    "nfqws"
   ],
+  "scope": "global",
   "strategy": {
    "split_pos": [
     "2"
@@ -765,6 +784,7 @@ var PRESETS = [
   "backends": [
    "nfqws"
   ],
+  "scope": "global",
   "strategy": {
    "split_pos": [
     "sniext+1"
@@ -800,6 +820,7 @@ var PRESETS = [
   "backends": [
    "nfqws"
   ],
+  "scope": "global",
   "strategy": {
    "desync": [
     "fake"
@@ -832,6 +853,7 @@ var PRESETS = [
   "backends": [
    "nfqws"
   ],
+  "scope": "global",
   "strategy": {
    "split_pos": [
     "2"
@@ -867,6 +889,7 @@ var PRESETS = [
   "backends": [
    "nfqws"
   ],
+  "scope": "global",
   "strategy": {
    "split_pos": [
     "1"
@@ -901,6 +924,7 @@ var PRESETS = [
   "backends": [
    "nfqws"
   ],
+  "scope": "global",
   "strategy": {
    "split_pos": [
     "1"
@@ -937,6 +961,7 @@ var PRESETS = [
   "backends": [
    "tpws"
   ],
+  "scope": "bindings",
   "strategy": {
    "split_pos": [
     "midsni"
@@ -965,6 +990,7 @@ var PRESETS = [
   "backends": [
    "tpws"
   ],
+  "scope": "global",
   "strategy": {
    "split_pos": [
     "1",
@@ -995,6 +1021,7 @@ var PRESETS = [
   "backends": [
    "tpws"
   ],
+  "scope": "global",
   "strategy": {
    "tls_record": "sniext+1"
   },
@@ -1021,6 +1048,7 @@ var PRESETS = [
   "backends": [
    "tpws"
   ],
+  "scope": "global",
   "strategy": {
    "host_case": true,
    "domain_case": true,
@@ -1051,6 +1079,7 @@ var PRESETS = [
   "backends": [
    "tpws"
   ],
+  "scope": "global",
   "strategy": {
    "split_pos": [
     "midsld"
@@ -1128,6 +1157,7 @@ var editorBuf = emptyStrategy();
 var editorSourcePreset = '';
 var monitorEvents = [];
 var tuneResult = null;
+var bindingPresetPrefill = ''; /* preset id handed from a bindings-scoped preset card to the Bindings tab's add form */
 var activeTab = 'overview';
 var bridgeOK = typeof window !== 'undefined' && !!window.soraExt;
 
@@ -1330,6 +1360,130 @@ function validateStrategy(full) {
   return errs;
 }
 
+/* ---------------- midsni scope: mirrors core/ext
+ * (ValidateBypassStrategy / ValidateBypassBindingStrategy +
+ * matchResolvesMidSNI). The 'midsni' marker (in split_pos or
+ * tls_record) resolves against a concrete domain, so a strategy
+ * carrying it is valid ONLY on a binding whose match is a plain
+ * domain — never as the layer's global strategy and never on a
+ * geosite:/geoip:/ruleset:/process:/IP/CIDR match. ---------------- */
+function strategyHasMidsni(full) {
+  return full.split_pos.indexOf('midsni') >= 0 || full.tls_record === 'midsni';
+}
+function matchIsPlainDomain(match) {
+  var m = String(match || '').trim();
+  if (m.indexOf('domain:') === 0) return m.length > 'domain:'.length;
+  if (m.indexOf('full:') === 0) return m.length > 'full:'.length;
+  if (m.indexOf(':') >= 0) return false; /* tags, process:, host:port, IPv6 */
+  if (m.indexOf('/') >= 0) return false; /* CIDR */
+  if (/^[0-9]{1,3}(\.[0-9]{1,3}){3}$/.test(m)) return false; /* IPv4 */
+  return m.length > 0;
+}
+/* Scope errors for one strategy used as the global strategy ([match]
+ * null) or on a binding to [match]. Empty list = scope is fine. */
+function validateMidsniScope(full, match) {
+  if (!strategyHasMidsni(full)) return [];
+  if (match === null || match === undefined) return [t('v_midsni_global')];
+  if (!matchIsPlainDomain(match)) {
+    return [t('v_midsni_match') + ' (' + String(match) + ')'];
+  }
+  return [];
+}
+
+/* ---------------- strict layer import: mirrors the host parser
+ * (app/lib/src/ext/bypass.dart bypassLayerFromJson /
+ * bypassStrategyFromJson FormatException semantics). Imported JSON is
+ * untrusted input, so unlike normalizeStrategy (which leniently
+ * normalizes the panel's OWN data) this path refuses: unknown fields
+ * are named, wrong types are named, bindings must be a list, global
+ * must be an object or null. No String()/!!/trunc coercion anywhere.
+ * Returns {global: fullStrategy|null, bindings: [{match, fullStrategy}]}
+ * with full (normalized-shape) strategies; throws Error on refusal. */
+var STRATEGY_FIELD_TYPES = {};
+FIELD_DEFS.forEach(function (fd) { STRATEGY_FIELD_TYPES[fd.key] = fd.type; });
+function strictStrategyFromJson(obj) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+    throw new Error('bypass strategy must be an object');
+  }
+  Object.keys(obj).forEach(function (k) {
+    if (!(k in STRATEGY_FIELD_TYPES)) {
+      throw new Error('unknown bypass strategy field "' + k + '"');
+    }
+  });
+  var out = emptyStrategy();
+  FIELD_DEFS.forEach(function (fd) {
+    if (!(fd.key in obj)) return;
+    var v = obj[fd.key];
+    if (fd.type === 'list') {
+      if (!Array.isArray(v) || v.some(function (e) { return typeof e !== 'string'; })) {
+        throw new Error('bypass strategy field "' + fd.key + '" must be a list of strings');
+      }
+      out[fd.key] = v.slice();
+    } else if (fd.type === 'bool') {
+      if (typeof v !== 'boolean') {
+        throw new Error('bypass strategy field "' + fd.key + '" must be a boolean');
+      }
+      out[fd.key] = v;
+    } else if (fd.type === 'int') {
+      if (typeof v !== 'number' || !isFinite(v) || Math.trunc(v) !== v) {
+        throw new Error('bypass strategy field "' + fd.key + '" must be an integer');
+      }
+      out[fd.key] = v;
+    } else {
+      if (typeof v !== 'string') {
+        throw new Error('bypass strategy field "' + fd.key + '" must be a string');
+      }
+      out[fd.key] = v;
+    }
+  });
+  return out;
+}
+function strictLayerFromJson(obj) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+    throw new Error('bypass layer must be an object');
+  }
+  Object.keys(obj).forEach(function (k) {
+    if (k !== 'global' && k !== 'bindings' && k !== 'updated_at') {
+      throw new Error('unknown bypass layer field "' + k + '"');
+    }
+  });
+  var global = null;
+  if (obj.global !== undefined && obj.global !== null) {
+    if (typeof obj.global !== 'object' || Array.isArray(obj.global)) {
+      throw new Error('bypass layer "global" must be an object or null');
+    }
+    global = strictStrategyFromJson(obj.global);
+  }
+  var bindings = [];
+  if (obj.bindings !== undefined) {
+    if (!Array.isArray(obj.bindings)) {
+      throw new Error('bypass layer "bindings" must be a list');
+    }
+    bindings = obj.bindings.map(function (b) {
+      if (!b || typeof b !== 'object' || Array.isArray(b)) {
+        throw new Error('bypass binding must be an object');
+      }
+      if (typeof b.match !== 'string' || !b.match) {
+        throw new Error('bypass binding "match" must be a non-empty string');
+      }
+      if (!b.strategy || typeof b.strategy !== 'object' || Array.isArray(b.strategy)) {
+        throw new Error('bypass binding "strategy" must be an object');
+      }
+      return { match: b.match, strategy: strictStrategyFromJson(b.strategy) };
+    });
+  }
+  return { global: global, bindings: bindings };
+}
+
+/* The tuneDesync contract pins the winner's score to [0, 1]
+ * (sora-ext.d.ts SoraTuneDesyncResult, ext_host.proto): the percent
+ * shown is round(clamp(score, 0, 1) * 100) — out-of-range values from
+ * a misbehaving host clamp instead of printing nonsense like 170%. */
+function tuneScorePercent(score) {
+  var s = Math.min(1, Math.max(0, score));
+  return Math.round(s * 100);
+}
+
 /* ---------------- bridge ---------------- */
 function api(method, args) {
   if (!bridgeOK) {
@@ -1409,9 +1563,17 @@ function askConfirm() {
 }
 async function applyLayer() {
   var problems = [];
-  if (draft.global) problems = problems.concat(validateStrategy(normalizeStrategy(draft.global)));
+  if (draft.global) {
+    var gFull = normalizeStrategy(draft.global);
+    problems = problems.concat(validateStrategy(gFull));
+    validateMidsniScope(gFull, null).forEach(function (msg) { problems.push(msg); });
+  }
   draft.bindings.forEach(function (b, i) {
-    validateStrategy(normalizeStrategy(b.strategy)).forEach(function (msg) {
+    var bFull = normalizeStrategy(b.strategy);
+    validateStrategy(bFull).forEach(function (msg) {
+      problems.push(t('binding_match') + ' #' + (i + 1) + ' (' + b.match + '): ' + msg);
+    });
+    validateMidsniScope(bFull, b.match).forEach(function (msg) {
       problems.push(t('binding_match') + ' #' + (i + 1) + ' (' + b.match + '): ' + msg);
     });
     if (!b.match) problems.push(t('binding_match') + ' #' + (i + 1) + ': ∅');
@@ -1547,14 +1709,31 @@ function presetCard(p) {
     var avail = backendAvailable(b);
     head.appendChild(badge(b, avail === false ? 'bad' : 'ok'));
   });
+  /* Scope badge: 'bindings' presets carry the midsni marker and are
+   * valid only on a plain-domain binding (the core refuses them as
+   * the global strategy); everything else is global-scoped. */
+  var bindingsScoped = p.scope === 'bindings';
+  head.appendChild(badge(bindingsScoped ? t('preset_scope_bindings') : t('preset_scope_global'),
+    bindingsScoped ? '' : 'dim'));
   card.appendChild(head);
   card.appendChild(el('p', '', loc(p.description)));
   card.appendChild(el('p', 'muted', t('preset_targets') + ': ' + loc(p.targets)));
   card.appendChild(el('p', 'muted', t('preset_cost') + ': ' + loc(p.cost)));
   card.appendChild(el('p', 'mono muted', JSON.stringify(p.strategy)));
   var row = el('div', 'row');
-  var applyBtn = el('button', 'btn btn-primary', t('preset_apply'));
+  var applyBtn = el('button', 'btn btn-primary', bindingsScoped ? t('preset_apply_binding') : t('preset_apply'));
   applyBtn.addEventListener('click', async function () {
+    if (bindingsScoped) {
+      /* A bindings preset must NOT go through the global apply: lead
+       * into the binding flow instead — the Bindings tab asks for the
+       * plain domain, adds the binding with this strategy, and its
+       * Apply layer sends the whole layer as usual. */
+      bindingPresetPrefill = p.id;
+      activeTab = 'bindings';
+      renderAll();
+      showBanner(t('preset_bind_hint'), false);
+      return;
+    }
     draft.global = clone(p.strategy);
     await applyLayer();
   });
@@ -1788,6 +1967,16 @@ function renderBindings(section) {
     o.value = p.id;
     newPreset.appendChild(o);
   });
+  if (bindingPresetPrefill) {
+    /* Arriving from a bindings-scoped preset card: preselect the
+     * preset and put the cursor in the domain field — the remaining
+     * steps are "type the domain, Add binding, Apply layer". The
+     * prefill is consumed here so later re-renders leave the form
+     * alone. */
+    newPreset.value = bindingPresetPrefill;
+    bindingPresetPrefill = '';
+    setTimeout(function () { newMatch.focus(); }, 0);
+  }
   addRow.appendChild(newPreset);
   addCard.appendChild(addRow);
   var addBtns = el('div', 'row');
@@ -1845,12 +2034,9 @@ function renderTune(section) {
     var box = el('div', 'card');
     box.appendChild(el('h3', '', t('tune_winner')));
     if (tuneResult.winner_describe) kv(box, t('tune_winner'), String(tuneResult.winner_describe));
-    if (tuneResult.winner_id) kv(box, 'id', String(tuneResult.winner_id));
+    if (tuneResult.winner_id) kv(box, t('tune_winner_id'), String(tuneResult.winner_id));
     if (typeof tuneResult.score === 'number') {
-      /* The contract does not pin the scale: <= 1.5 reads as a
-       * fraction, anything larger as an already-percent value. */
-      var pct = tuneResult.score <= 1.5 ? tuneResult.score * 100 : tuneResult.score;
-      kv(box, t('tune_score'), String(Math.round(pct)) + '%');
+      kv(box, t('tune_score'), String(tuneScorePercent(tuneResult.score)) + '%');
     }
     if (typeof tuneResult.attempts === 'number') kv(box, t('tune_attempts'), String(tuneResult.attempts));
     if (tuneResult.strategy) {
@@ -1928,18 +2114,26 @@ function renderProfiles(section) {
     loadBtn.disabled = true;
     if (!imp.value.trim()) return;
     try {
-      var obj = JSON.parse(imp.value);
-      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) throw new Error('not an object');
-      var g = obj.global ? normalizeStrategy(obj.global) : null;
-      var binds = Array.isArray(obj.bindings) ? obj.bindings : [];
-      var normBinds = binds.map(function (b) {
-        if (!b || typeof b.match !== 'string' || !b.match) throw new Error('binding without match');
-        return { match: b.match, strategy: toWire(normalizeStrategy(b.strategy || {})), preset_id: '' };
+      /* Strict parse (strictLayerFromJson): imported JSON is held to
+       * the host's standard — an unknown field, a wrong type, a
+       * non-list bindings or a non-object global refuses the import
+       * by name instead of being silently coerced into a different
+       * layer than the text says. */
+      var layer = strictLayerFromJson(JSON.parse(imp.value));
+      var g = layer.global;
+      var normBinds = layer.bindings.map(function (b) {
+        return { match: b.match, strategy: toWire(b.strategy), preset_id: '' };
       });
       var problems = [];
-      if (g && !isEmptyWire(toWire(g))) problems = problems.concat(validateStrategy(g));
-      normBinds.forEach(function (b) {
-        problems = problems.concat(validateStrategy(normalizeStrategy(b.strategy)));
+      if (g && !isEmptyWire(toWire(g))) {
+        problems = problems.concat(validateStrategy(g));
+        problems = problems.concat(validateMidsniScope(g, null));
+      }
+      layer.bindings.forEach(function (b) {
+        problems = problems.concat(validateStrategy(b.strategy));
+        validateMidsniScope(b.strategy, b.match).forEach(function (msg) {
+          problems.push(t('binding_match') + ' (' + b.match + '): ' + msg);
+        });
       });
       if (problems.length) throw new Error(problems.join('; '));
       parsed = { global: g ? (isEmptyWire(toWire(g)) ? null : toWire(g)) : null, bindings: normBinds };

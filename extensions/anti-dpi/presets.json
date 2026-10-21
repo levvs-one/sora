@@ -1,6 +1,6 @@
 {
   "presets_version": 1,
-  "comment": "Anti-DPI preset library. Registry strategies are derived from core/tune/desync/registry.go Params through Params.BypassStrategy() (core/tune/desync/params.go) — see each preset's 'source'. The 'midsni' split position is the registry marker (core/engine/bypass MidSNIMarker): the core resolves it against the actual SNI before applying. Classics are the tpws strategies from core/engine/bypass Args and the app settings defaults.",
+  "comment": "Anti-DPI preset library. Registry strategies are derived from core/tune/desync/registry.go Params through Params.BypassStrategy() (core/tune/desync/params.go) — see each preset's 'source'. The 'midsni' split position is the registry marker (core/engine/bypass MidSNIMarker): the core resolves it against the actual SNI before applying. Each preset's 'scope' says where it may be applied: 'global' presets may become the layer's global strategy or a binding; the three 'bindings' presets carry the midsni marker and are valid ONLY on a binding to a plain domain — the core refuses them as the global strategy and on geosite:/geoip:/ruleset:/IP/CIDR bindings, and the panel mirrors that refusal. Classics are the tpws strategies from core/engine/bypass Args and the app settings defaults.",
   "presets": [
     {
       "id": "sni_block/split-midsni",
@@ -23,6 +23,7 @@
       "backends": [
         "tpws"
       ],
+      "scope": "bindings",
       "strategy": {
         "split_pos": [
           "midsni"
@@ -51,6 +52,7 @@
       "backends": [
         "nfqws"
       ],
+      "scope": "global",
       "strategy": {
         "split_pos": [
           "2"
@@ -87,6 +89,7 @@
       "backends": [
         "nfqws"
       ],
+      "scope": "bindings",
       "strategy": {
         "split_pos": [
           "midsni"
@@ -121,6 +124,7 @@
       "backends": [
         "tpws"
       ],
+      "scope": "global",
       "strategy": {
         "tls_record": "sniext+1"
       },
@@ -147,6 +151,7 @@
       "backends": [
         "nfqws"
       ],
+      "scope": "global",
       "strategy": {
         "split_pos": [
           "2"
@@ -183,6 +188,7 @@
       "backends": [
         "nfqws"
       ],
+      "scope": "global",
       "strategy": {
         "split_pos": [
           "sniext+1"
@@ -218,6 +224,7 @@
       "backends": [
         "nfqws"
       ],
+      "scope": "global",
       "strategy": {
         "desync": [
           "fake"
@@ -250,6 +257,7 @@
       "backends": [
         "nfqws"
       ],
+      "scope": "global",
       "strategy": {
         "split_pos": [
           "2"
@@ -285,6 +293,7 @@
       "backends": [
         "nfqws"
       ],
+      "scope": "global",
       "strategy": {
         "split_pos": [
           "1"
@@ -319,6 +328,7 @@
       "backends": [
         "nfqws"
       ],
+      "scope": "global",
       "strategy": {
         "split_pos": [
           "1"
@@ -355,6 +365,7 @@
       "backends": [
         "tpws"
       ],
+      "scope": "bindings",
       "strategy": {
         "split_pos": [
           "midsni"
@@ -383,6 +394,7 @@
       "backends": [
         "tpws"
       ],
+      "scope": "global",
       "strategy": {
         "split_pos": [
           "1",
@@ -413,6 +425,7 @@
       "backends": [
         "tpws"
       ],
+      "scope": "global",
       "strategy": {
         "tls_record": "sniext+1"
       },
@@ -439,6 +452,7 @@
       "backends": [
         "tpws"
       ],
+      "scope": "global",
       "strategy": {
         "host_case": true,
         "domain_case": true,
@@ -469,6 +483,7 @@
       "backends": [
         "tpws"
       ],
+      "scope": "global",
       "strategy": {
         "split_pos": [
           "midsld"

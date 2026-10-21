@@ -56,6 +56,10 @@ events the panel keeps).
   shows the core's `pending_apply` state).
 - **The user wins:** your in-app bypass rules have priority over this
   extension's bindings. On conflict the app keeps your rule.
+- **Profile import is strict, like the host parser:** an unknown
+  field, a wrong type, a non-list `bindings` or a non-object `global`
+  refuses the import by name in the preview and Load stays disabled —
+  imported JSON is never silently coerced into a different layer.
 - Editor validation mirrors `core/engine/validate.go`
   (`BypassStrategy.validate` + `validateDesync`): ranges, the
   ttl/autottl mutual exclusion, fooling/fake-needs-desync dependencies,
@@ -81,6 +85,24 @@ resolves it against the actual SNI before the strategy runs. Every
 preset documents, in EN and RU, what it does, which censorship class
 it targets, and its honest cost/risks (from the registry `Note`s and
 validation semantics).
+
+### Preset scope
+
+Every preset carries an explicit `scope` field (this package writes
+it on all 15; a missing `scope` reads as `"global"`):
+
+- `"global"` — the preset may be applied as the layer's global
+  strategy or on any binding.
+- `"bindings"` — the three `midsni` presets
+  (`sni_block/split-midsni`, `sni_block/disorder-midsni`,
+  `kz_variant/split-midsni`). The marker resolves only against a
+  concrete domain, so these are valid **only on a binding whose match
+  is a plain domain** (`domain:`/`full:`/bare). The core refuses them
+  as the global strategy and on `geosite:`/`geoip:`/`ruleset:`/IP/CIDR
+  bindings (`InvalidArgument`), and the panel mirrors that refusal
+  client-side before Apply. The preset card shows the scope badge;
+  its Apply button leads into the binding flow (enter the domain →
+  add the binding → Apply layer), never into the global apply.
 
 ## i18n
 
@@ -165,3 +187,18 @@ confirmation for them. The bypass bridge itself (permissions, host
 RPCs, Dart seam) is contract 1.14 in `core/ext` /
 `app/lib/src/ext/bypass.dart`; the panel's shapes were checked
 against that seam field by field.
+
+## Tests
+
+The panel's node test suite lives OUTSIDE this directory (pack ships
+every package file) at `extensions/anti-dpi-tests/panel.test.js`:
+
+```sh
+node extensions/anti-dpi-tests/panel.test.js
+```
+
+It pins the embedded-copy drift (STRINGS/PRESETS vs the JSON
+sources), the strict profile import (host-parser semantics), the
+midsni scope rules and preset scopes, the tune-score scale, the
+fooling-mode set, the bridge error-message path (panel + the Dart
+bootstrap shim) and the sora-ext mock's winner/layer shapes.

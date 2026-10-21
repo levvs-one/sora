@@ -52,6 +52,10 @@
     "preset_targets": "Targets",
     "preset_cost": "Cost / risks",
     "preset_backends": "Backends",
+    "preset_scope_global": "Global",
+    "preset_scope_bindings": "Binding only",
+    "preset_apply_binding": "Apply to a binding…",
+    "preset_bind_hint": "This preset is binding-scoped: enter the plain domain it should run for, add the binding, then Apply layer. It cannot be applied as the global strategy.",
     "editor_intro": "Every BypassStrategy field. Validation mirrors the core: a strategy the core would reject is flagged here before you apply it.",
     "group_split": "Split & order",
     "group_tls": "TLS record",
@@ -84,6 +88,7 @@
     "tune_winner": "Winner",
     "tune_score": "Score",
     "tune_attempts": "Attempts",
+    "tune_winner_id": "Winner id",
     "tune_apply_winner": "Apply winner as global",
     "tune_bound_to_profile": "The core bound this winner to your network profile instead of returning a raw strategy: it will take effect through that profile when this network is matched. There is nothing to apply here manually.",
     "tune_no_winner": "No winner was returned.",
@@ -200,7 +205,7 @@
       },
       "fooling": {
         "label": "Fooling",
-        "hint": "Degrades the fake/disorder packet so the censor's stack drops it while the real server tolerates it: badseq, badack, md5sig, ts, badsum, datanoack (comma-separated list allowed). Requires a desync method."
+        "hint": "Degrades the fake/disorder packet so the censor's stack drops it while the real server tolerates it: badseq, md5sig, ts, badsum, datanoack (comma-separated list allowed). Requires a desync method."
       },
       "ttl": {
         "label": "Fake TTL",
@@ -266,7 +271,7 @@
     "v_tamper_pattern": "is not a tamper position (split-position syntax, optional leading \"n\")",
     "v_pos_pattern": "is not a valid position",
     "v_fooling_req": "Fooling needs a desync method (nfqws-only).",
-    "v_fooling_mode": "is not a fooling mode (badseq, badack, md5sig, ts, badsum, datanoack, hopbyhop, hopbyhop2, none)",
+    "v_fooling_mode": "is not a fooling mode (md5sig, ts, badsum, badseq, datanoack, hopbyhop, hopbyhop2, none)",
     "v_fake_req": "Fake payloads need the fake desync method.",
     "v_fake_name": "must be a built-in keyword or a plain file name (no path)",
     "v_fakequic_udp": "A QUIC fake needs filter_udp (QUIC runs over UDP).",
@@ -280,6 +285,8 @@
     "v_filter_ports": "is not a port list (e.g. 80,443 or 1000-2000)",
     "v_filter_port_range": "Port out of range 1–65535 in",
     "v_filter_l7_val": "is not a filter-l7 protocol (http, tls, quic, wireguard, dht, discord, stun, unknown)",
+    "v_midsni_global": "This strategy uses the \"midsni\" marker, which the core resolves against a concrete domain: it can only be applied to a binding with a plain domain (domain:/full:/bare), not as the global strategy.",
+    "v_midsni_match": "This strategy uses the \"midsni\" marker, which the core resolves against a concrete domain: the binding must be a plain domain (domain:/full:/bare) — geosite:/geoip:/ruleset:/IP/CIDR matches name no single SNI.",
     "field_prefix": "Field",
     "value_prefix": "Value",
     "desync_modes_label": "Known desync modes"
@@ -335,6 +342,10 @@
     "preset_targets": "Против чего",
     "preset_cost": "Цена / риски",
     "preset_backends": "Бэкенды",
+    "preset_scope_global": "Глобальный",
+    "preset_scope_bindings": "Только привязка",
+    "preset_apply_binding": "Применить к привязке…",
+    "preset_bind_hint": "Этот пресет — только для привязки: введите обычный домен, для которого он должен работать, добавьте привязку и нажмите «Применить слой». Как глобальную стратегию его применить нельзя.",
     "editor_intro": "Все поля BypassStrategy. Валидация зеркалит ядро: стратегия, которую ядро отклонило бы, подсветится здесь до применения.",
     "group_split": "Сплит и порядок",
     "group_tls": "TLS-запись",
@@ -367,6 +378,7 @@
     "tune_winner": "Победитель",
     "tune_score": "Оценка",
     "tune_attempts": "Попыток",
+    "tune_winner_id": "ID победителя",
     "tune_apply_winner": "Применить победителя как глобальную",
     "tune_bound_to_profile": "Ядро привязало этого победителя к вашему сетевому профилю вместо возврата сырой стратегии: он подействует через профиль при совпадении этой сети. Вручную здесь применять нечего.",
     "tune_no_winner": "Победитель не возвращён.",
@@ -483,7 +495,7 @@
       },
       "fooling": {
         "label": "Fooling",
-        "hint": "Порча фейкового/disorder-пакета, чтобы стек цензора его отбросил, а настоящий сервер стерпел: badseq, badack, md5sig, ts, badsum, datanoack (допустим список через запятую). Требует метод desync."
+        "hint": "Порча фейкового/disorder-пакета, чтобы стек цензора его отбросил, а настоящий сервер стерпел: badseq, md5sig, ts, badsum, datanoack (допустим список через запятую). Требует метод desync."
       },
       "ttl": {
         "label": "TTL фейка",
@@ -549,7 +561,7 @@
     "v_tamper_pattern": "не является позицией тамперинга (синтаксис позиции сплита, необязательная ведущая «n»)",
     "v_pos_pattern": "не является валидной позицией",
     "v_fooling_req": "Fooling требует метод desync (только nfqws).",
-    "v_fooling_mode": "не является режимом fooling (badseq, badack, md5sig, ts, badsum, datanoack, hopbyhop, hopbyhop2, none)",
+    "v_fooling_mode": "не является режимом fooling (md5sig, ts, badsum, badseq, datanoack, hopbyhop, hopbyhop2, none)",
     "v_fake_req": "Фейковые нагрузки требуют метод desync fake.",
     "v_fake_name": "должно быть встроенным ключевым словом или простым именем файла (без пути)",
     "v_fakequic_udp": "Фейк QUIC требует filter_udp (QUIC идёт поверх UDP).",
@@ -563,6 +575,8 @@
     "v_filter_ports": "не является списком портов (например, 80,443 или 1000-2000)",
     "v_filter_port_range": "Порт вне диапазона 1–65535 в",
     "v_filter_l7_val": "не является протоколом filter-l7 (http, tls, quic, wireguard, dht, discord, stun, unknown)",
+    "v_midsni_global": "Эта стратегия использует маркер «midsni», который ядро разрешает по конкретному домену: её можно применить только к привязке с обычным доменом (domain:/full:/голый домен), а не как глобальную стратегию.",
+    "v_midsni_match": "Эта стратегия использует маркер «midsni», который ядро разрешает по конкретному домену: привязка должна быть обычным доменом (domain:/full:/голый домен) — совпадения geosite:/geoip:/ruleset:/IP/CIDR не называют один SNI.",
     "field_prefix": "Поле",
     "value_prefix": "Значение",
     "desync_modes_label": "Известные режимы desync"
