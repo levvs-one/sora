@@ -1326,6 +1326,15 @@ class SZh extends S {
   String get extPermBackground => 'Run background tasks';
 
   @override
+  String get extPermBypassRead => 'See the DPI-bypass state and capabilities';
+
+  @override
+  String get extPermBypassWrite => 'Change the DPI-bypass strategy (affects how traffic is reshaped)';
+
+  @override
+  String get extPermBypassTune => 'Run automatic DPI-bypass tuning (probes the network)';
+
+  @override
   String get extPermBackgroundDetail =>
       'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
 
@@ -3681,6 +3690,15 @@ class SZhHans extends SZh {
   String get extPermBackground => 'Run background tasks';
 
   @override
+  String get extPermBypassRead => 'See the DPI-bypass state and capabilities';
+
+  @override
+  String get extPermBypassWrite => 'Change the DPI-bypass strategy (affects how traffic is reshaped)';
+
+  @override
+  String get extPermBypassTune => 'Run automatic DPI-bypass tuning (probes the network)';
+
+  @override
   String get extPermBackgroundDetail =>
       'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings. Background execution is not available in this version of Sora yet.';
 
@@ -6034,6 +6052,15 @@ class SZhHant extends SZh {
 
   @override
   String get extPermBackground => 'Run background tasks';
+
+  @override
+  String get extPermBypassRead => 'See the DPI-bypass state and capabilities';
+
+  @override
+  String get extPermBypassWrite => 'Change the DPI-bypass strategy (affects how traffic is reshaped)';
+
+  @override
+  String get extPermBypassTune => 'Run automatic DPI-bypass tuning (probes the network)';
 
   @override
   String get extPermBackgroundDetail =>

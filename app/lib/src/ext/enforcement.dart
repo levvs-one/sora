@@ -77,6 +77,18 @@ const List<ExtEnforcementRow> extEnforcementTable = [
       'background',
       ExtEnforcementStatus.enforced,
       'capability + permission gate, interval clamp, overlap guard, circuit breaker; no worker executor wired yet'),
+  ExtEnforcementRow(
+      'bypass.read',
+      ExtEnforcementStatus.enforced,
+      'every bypass capabilities/state/layer read is token- and permission-checked in the ExtensionHost'),
+  ExtEnforcementRow(
+      'bypass.write',
+      ExtEnforcementStatus.enforced,
+      'every ApplyBypassLayer call is token- and permission-checked in the ExtensionHost'),
+  ExtEnforcementRow(
+      'bypass.tune',
+      ExtEnforcementStatus.enforced,
+      'every TuneDesync call is token- and permission-checked in the ExtensionHost'),
 ];
 
 final _enforcementIndex = {

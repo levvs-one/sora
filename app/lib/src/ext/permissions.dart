@@ -27,6 +27,9 @@ const List<ExtPermission> extPermissions = [
   ExtPermission('net.hooks', 'extPermNetHooks', ExtRisk.dangerous),
   ExtPermission('net.fetch', 'extPermNetFetch', ExtRisk.sensitive),
   ExtPermission('background', 'extPermBackground', ExtRisk.sensitive),
+  ExtPermission('bypass.read', 'extPermBypassRead', ExtRisk.sensitive),
+  ExtPermission('bypass.write', 'extPermBypassWrite', ExtRisk.dangerous),
+  ExtPermission('bypass.tune', 'extPermBypassTune', ExtRisk.dangerous),
 ];
 
 final _index = {for (final p in extPermissions) p.id: p};

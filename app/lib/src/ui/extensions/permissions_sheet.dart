@@ -73,6 +73,12 @@ String permissionBlurb(BuildContext context, String id) {
       return s.extPermNetFetch;
     case 'background':
       return s.extPermBackground;
+    case 'bypass.read':
+      return s.extPermBypassRead;
+    case 'bypass.write':
+      return s.extPermBypassWrite;
+    case 'bypass.tune':
+      return s.extPermBypassTune;
     default:
       return id;
   }

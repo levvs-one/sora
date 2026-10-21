@@ -1343,6 +1343,15 @@ class SRu extends S {
   String get extPermBackground => 'Выполнять фоновые задачи';
 
   @override
+  String get extPermBypassRead => 'Видеть состояние и возможности обхода DPI';
+
+  @override
+  String get extPermBypassWrite => 'Изменять стратегию обхода DPI (влияет на обработку трафика)';
+
+  @override
+  String get extPermBypassTune => 'Запускать автоматическую настройку обхода DPI (проверяет сеть пробами)';
+
+  @override
   String get extPermBackgroundDetail =>
       'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения. Фоновое выполнение пока недоступно в этой версии Sora.';
 

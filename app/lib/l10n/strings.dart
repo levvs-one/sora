@@ -2553,6 +2553,24 @@ abstract class S {
   /// **'Выполнять фоновые задачи'**
   String get extPermBackground;
 
+  /// No description provided for @extPermBypassRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Видеть состояние и возможности обхода DPI'**
+  String get extPermBypassRead;
+
+  /// No description provided for @extPermBypassWrite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменять стратегию обхода DPI (влияет на обработку трафика)'**
+  String get extPermBypassWrite;
+
+  /// No description provided for @extPermBypassTune.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запускать автоматическую настройку обхода DPI (проверяет сеть пробами)'**
+  String get extPermBypassTune;
+
   /// No description provided for @extPermBackgroundDetail.
   ///
   /// In ru, this message translates to:
