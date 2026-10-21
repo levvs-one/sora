@@ -14,7 +14,7 @@ func limitWorkerProcess() error {
 	limits := windows.JOBOBJECT_EXTENDED_LIMIT_INFORMATION{}
 	limits.BasicLimitInformation.LimitFlags = windows.JOB_OBJECT_LIMIT_PROCESS_MEMORY | windows.JOB_OBJECT_LIMIT_PROCESS_TIME | windows.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
 	limits.BasicLimitInformation.PerProcessUserTimeLimit = WorkerCPUSeconds * 10000000
-	limits.ProcessMemoryLimit = WorkerMemoryBytes
+	limits.ProcessMemoryLimit = workerOSMemoryBytes
 	if _, err = windows.SetInformationJobObject(job, windows.JobObjectExtendedLimitInformation, uintptr(unsafe.Pointer(&limits)), uint32(unsafe.Sizeof(limits))); err != nil {
 		_ = windows.CloseHandle(job)
 		return err

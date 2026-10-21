@@ -21,11 +21,15 @@ import (
 // Worker budgets bound committed memory, CPU time, wall time and source size.
 const (
 	WorkerMemoryBytes = 128 << 20
-	WorkerCPUSeconds  = 2
-	WorkerWallTimeout = 30 * time.Second
-	MaxWorkerSource   = 1 << 20
-	maxWorkerMessage  = 12 << 20
-	maxWorkerCalls    = 256
+	// workerOSMemoryBytes is the hard OS backstop. The Go runtime maps heap
+	// in 64 MiB arenas, so an OS limit at the budget itself fails runtime
+	// start-up on some kernels; watchWorkerHeap enforces the budget instead.
+	workerOSMemoryBytes = 4 * WorkerMemoryBytes
+	WorkerCPUSeconds    = 2
+	WorkerWallTimeout   = 30 * time.Second
+	MaxWorkerSource     = 1 << 20
+	maxWorkerMessage    = 12 << 20
+	maxWorkerCalls      = 256
 )
 
 // WorkerCall uses JSON only: no Go objects or native handles reach JavaScript.
