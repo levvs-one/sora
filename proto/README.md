@@ -28,4 +28,4 @@ the app owns benchmark history, and this core does not implement that RPC.
 The censor and obfs schemas retain reserved wire identities only. They expose
 no services. See docs/architecture.md for field numbers and integration points.
 The sync daemon has a separate authenticated localhost HTTP API, not a gRPC
-schema; see service/sync/F9-SYNC-CONTRACT.md.
+schema; see service/sync/CONTRACT.md.

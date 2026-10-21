@@ -371,18 +371,45 @@ class Settings {
   /// `speedtestService`, `dnsLeakLastCheck`). The JSON-backed
   /// stores (`subscriptionOverrides`, `networkProfiles`, `proxyChains`) sync as their own document
   /// kinds so their stores can reload after an import.
-  static const syncableSettingsKeys = <String>{
-    'preset', 'blockAds', 'killSwitch', 'engine', 'animations', 'theme', 'language', //
-    'fragment', 'fragmentPackets', 'fragmentLength', 'fragmentInterval', //
-    'ipv6', 'dns', 'dnsPreset', //
-    'probeMethod', 'probeUrl', 'probeTimeout', //
-    'splitPos', 'disorder', 'tlsRecord', 'hostCase', //
-    'rules', 'failover', 'connectOnStart', 'tunnel', //
-    'mihomoTunStack', 'xrayTunStack', //
-    'launchAtLogin', 'closeToTray', 'notifications', //
-    'serverSortMode', 'autoSelectMode', 'autoSwitchOnDegrade', 'restoreOnCrash', //
-    'zapretWithVpn',
+  static const _syncableSettingTypes = <String, String>{
+    'preset': 's',
+    'engine': 's',
+    'theme': 's',
+    'language': 's',
+    'fragmentPackets': 's',
+    'fragmentLength': 's',
+    'fragmentInterval': 's',
+    'dnsPreset': 's',
+    'probeMethod': 's',
+    'probeUrl': 's',
+    'tlsRecord': 's',
+    'tunnel': 's',
+    'mihomoTunStack': 's',
+    'xrayTunStack': 's',
+    'serverSortMode': 's',
+    'autoSelectMode': 's',
+    'blockAds': 'b',
+    'killSwitch': 'b',
+    'animations': 'b',
+    'fragment': 'b',
+    'ipv6': 'b',
+    'disorder': 'b',
+    'hostCase': 'b',
+    'failover': 'b',
+    'connectOnStart': 'b',
+    'launchAtLogin': 'b',
+    'closeToTray': 'b',
+    'notifications': 'b',
+    'autoSwitchOnDegrade': 'b',
+    'restoreOnCrash': 'b',
+    'zapretWithVpn': 'b',
+    'probeTimeout': 'i',
+    'dns': 'sl',
+    'splitPos': 'sl',
+    'rules': 'sl',
   };
+
+  static final syncableSettingsKeys = Set<String>.unmodifiable(_syncableSettingTypes.keys);
 
   /// Raw stored values of the syncable subset, in a JSON-encodable shape:
   /// `{key: {t: 's'|'b'|'i'|'sl', v: value}}`. Keys never written are
@@ -390,31 +417,23 @@ class Settings {
   Map<String, dynamic> exportSyncableSettings() {
     final out = <String, dynamic>{};
     for (final key in syncableSettingsKeys) {
-      final asString = _store.getString(key);
-      if (asString != null) {
-        out[key] = {'t': 's', 'v': asString};
-        continue;
-      }
-      final asBool = _store.getBool(key);
-      if (asBool != null) {
-        out[key] = {'t': 'b', 'v': asBool};
-        continue;
-      }
-      final asInt = _store.getInt(key);
-      if (asInt != null) {
-        out[key] = {'t': 'i', 'v': asInt};
-        continue;
-      }
-      final asList = _store.getStringList(key);
-      if (asList != null) {
-        out[key] = {'t': 'sl', 'v': asList};
+      final value = _store.get(key);
+      final tag = switch (value) {
+        String() => 's',
+        bool() => 'b',
+        int() => 'i',
+        List() when value.every((e) => e is String) => 'sl',
+        _ => null,
+      };
+      if (tag != null && tag == _syncableSettingTypes[key]) {
+        out[key] = {'t': tag, 'v': value is List ? List<String>.from(value) : value};
       }
     }
     return out;
   }
 
   /// Applies a synced settings document (see [exportSyncableSettings]).
-  /// Only allowlisted keys with a well-typed tagged value are written;
+  /// Only allowlisted keys whose tag and value match the local schema are written;
   /// everything else is ignored, so a hostile or newer-version doc cannot
   /// smuggle arbitrary preferences in. Keys absent from the doc are left
   /// alone (per-key merge, not a wipe).
@@ -423,7 +442,7 @@ class Settings {
       final key = entry.key;
       if (!syncableSettingsKeys.contains(key)) continue;
       final tagged = entry.value;
-      if (tagged is! Map<String, dynamic>) continue;
+      if (tagged is! Map<String, dynamic> || tagged['t'] != _syncableSettingTypes[key]) continue;
       final value = tagged['v'];
       switch (tagged['t']) {
         case 's':

@@ -82,7 +82,7 @@ func Decode(s string) (*Invitation, error) {
 	if strings.Contains(s, "#") {
 		// No fragment, not even an empty one: url.Parse silently drops a
 		// bare trailing '#', so the raw string is checked. The canonical
-		// form (F9-SYNC-CONTRACT.md) never contains '#'.
+		// form (service/sync/CONTRACT.md) never contains '#'.
 		return nil, errors.New("pairing: the payload must not have a fragment")
 	}
 	u, err := url.Parse(s)
@@ -96,7 +96,7 @@ func Decode(s string) (*Invitation, error) {
 	// Duplicate keys are rejected: url.Values.Get takes the first value,
 	// while other parsers (notably Dart's Uri.queryParameters) may take
 	// the last, so a duplicated key could make the two sides disagree on
-	// the public key or token. The contract (F9-SYNC-CONTRACT.md) forbids
+	// the public key or token. The contract (service/sync/CONTRACT.md) forbids
 	// them.
 	for key, vals := range q {
 		if len(vals) != 1 {

@@ -72,7 +72,7 @@ func pairViaHTTP(t *testing.T) (a, b *Daemon, aAddr, bAddr string) {
 	return a, b, aAddr, bAddr
 }
 
-// contractDoc is one F9-SYNC-CONTRACT.md §4 document kind with a payload
+// contractDoc is one service/sync/CONTRACT.md §4 document kind with a payload
 // shaped like the app really publishes it.
 type contractDoc struct {
 	kind, name, payload string
@@ -88,7 +88,7 @@ var contractDocs = []contractDoc{
 }
 
 // TestDocumentKindsEndToEnd is the document-bridge contract test: A
-// publishes one document per contract §4 kind, B syncs, and every document
+// publishes one document per service/sync/CONTRACT.md §4 kind, B syncs, and every document
 // arrives byte-identical with kind/name/from/updated_at in the report.
 func TestDocumentKindsEndToEnd(t *testing.T) {
 	a, b, aAddr, bAddr := pairViaHTTP(t)

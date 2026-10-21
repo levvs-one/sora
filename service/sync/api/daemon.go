@@ -38,9 +38,11 @@ type Peer struct {
 	IdentityKey string `json:"identity_key"` // base64 rawurl of the X25519 key
 	PairedAt    int64  `json:"paired_at"`
 	LastSync    int64  `json:"last_sync"`
+	ctx         context.Context
+	cancel      context.CancelFunc
 }
 
-func (p Peer) keyBytes() ([32]byte, error) {
+func (p *Peer) keyBytes() ([32]byte, error) {
 	var k [32]byte
 	raw, err := base64.RawURLEncoding.DecodeString(p.IdentityKey)
 	if err != nil || len(raw) != 32 {
@@ -96,6 +98,9 @@ func New(dir string) (*Daemon, error) {
 		return nil, err
 	}
 	ctx, cancel := context.WithCancel(context.Background())
+	for _, p := range peers {
+		p.ctx, p.cancel = context.WithCancel(ctx)
+	}
 	return &Daemon{
 		dir: dir, identity: identity, store: store,
 		peers: peers, token: token,
@@ -256,17 +261,34 @@ func (d *Daemon) savePeersLocked() error {
 func (d *Daemon) upsertPeer(id, name, identityKey string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	return d.upsertPeerLocked(id, name, identityKey)
+}
+
+func (d *Daemon) upsertPeerLocked(id, name, identityKey string) error {
 	now := time.Now().UnixMilli()
-	if p, ok := d.peers[id]; ok {
-		p.Name = name
-		p.IdentityKey = identityKey
-		p.LastSync = now
-	} else {
-		d.peers[id] = &Peer{
-			ID: id, Name: name, IdentityKey: identityKey,
-			PairedAt: now, LastSync: now,
-		}
+	pairedAt := now
+	if old := d.peers[id]; old != nil {
+		pairedAt = old.PairedAt
+		old.cancel()
 	}
+	ctx, cancel := context.WithCancel(d.ctx)
+	// A fresh record is also a generation token, even when re-pairing the same key.
+	d.peers[id] = &Peer{
+		ID: id, Name: name, IdentityKey: identityKey,
+		PairedAt: pairedAt, LastSync: now, ctx: ctx, cancel: cancel,
+	}
+	return d.savePeersLocked()
+}
+
+// finishSync refreshes metadata only for the exact record authenticated at startup.
+func (d *Daemon) finishSync(peer *Peer, name string) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.peers[peer.ID] != peer || peer.ctx.Err() != nil {
+		return errors.New("api: peer was revoked or re-paired during sync")
+	}
+	peer.Name = name
+	peer.LastSync = time.Now().UnixMilli()
 	return d.savePeersLocked()
 }
 
@@ -295,29 +317,16 @@ func (d *Daemon) peerCount() int {
 func (d *Daemon) RevokePeer(id string) (bool, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	if _, ok := d.peers[id]; !ok {
+	peer, ok := d.peers[id]
+	if !ok {
 		return false, nil
 	}
+	peer.cancel()
 	delete(d.peers, id)
 	if err := d.savePeersLocked(); err != nil {
 		return true, err
 	}
 	return true, nil
-}
-
-// peerKeys returns the identity keys of paired devices for AcceptKnown.
-func (d *Daemon) peerKeys() map[[32]byte]string {
-	d.mu.Lock()
-	defer d.mu.Unlock()
-	out := map[[32]byte]string{}
-	for _, p := range d.peers {
-		k, err := p.keyBytes()
-		if err != nil {
-			continue
-		}
-		out[k] = p.ID
-	}
-	return out
 }
 
 func writeFileAtomic(path string, data []byte, perm os.FileMode) error {

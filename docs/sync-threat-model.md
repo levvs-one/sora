@@ -6,13 +6,13 @@ LAN via mDNS, and exchanges VPN documents (subscriptions, rules, settings)
 over a Noise_XX-encrypted TCP channel. There is no cloud, no account, and no
 telemetry.
 
-> **Implementation status (2026-10-20).** The Go service (`service/sync`)
+> **Implementation status (2026-10-21).** The Go service (`service/sync`)
 > is implemented and its honesty properties are verified by tests, not just
 > by reading:
 > - QR wire format is pinned by fixed vectors (`pairing/pairing_test.go`:
 >   `TestVectorT1Decodes` positive T1 plus `TestVectorsReject` negatives -
 >   wrong scheme/host, v=2, 31-byte pub, 15-byte token, bad ports, empty id;
->   the literals are copied into `reports/F9-SYNC-CONTRACT.md` for the Dart
+>   the literals are copied into `service/sync/CONTRACT.md` for the Dart
 >   cross-check).
 > - The full contract flow is exercised over the real HTTP API
 >   (`api/e2e_test.go`: `TestHTTPAPIEndToEnd`, `POST /v1/pairing/start` →
@@ -24,7 +24,8 @@ telemetry.
 >   /v1/status` with the dir's bearer token at startup and refuses to
 >   start a second daemon (exit 1); a stale `http_addr` from a crashed
 >   daemon does not block restart. The app uses the same probe to reuse a
->   running daemon.
+>   running daemon. If reuse fails, the app removes the stale file and retries
+>   address/token reads and health checks until readiness or child exit.
 > - `transport.Dial` rejects a peer whose presented device id differs from
 >   the QR's; `upsertPeer` replaces a peer's identity key on re-pairing so
 >   a reinstalled device does not leave a stale key that would fail every
@@ -38,7 +39,7 @@ telemetry.
   `http_addr` probe, the old probe-then-start had a startup race where
   two daemons could both conclude "no live instance".
 - The app side is wired (2026-10-20): the sync screen spawns the daemon,
-  publishes the contract §4 document kinds (`PUT /v1/documents/...`)
+  publishes service/sync/CONTRACT.md §4 document kinds (`PUT /v1/documents/...`)
   before every peer sync (skipping unchanged snapshots by hash, so no
   timestamp churn), applies exactly the `pulled` metas after the sync,
   and shows a per-document result (kind, name, `from`, `updated_at`)
@@ -96,7 +97,21 @@ check stops an attacker from substituting their own QR-time key.
 Subsequent syncs use Noise_XX with the **long-term identity keys** as the
 static keys. Each side verifies the peer's static key against the paired
 device list (`peers.json`); unknown keys are rejected before any document
-moves. No token is needed, pairing already established trust.
+moves. The announced identity key must also match that verified channel key.
+The device id used for registry updates comes from the local registry, never
+from the peer's identity JSON. Ordinary sync can only refresh the existing
+record's name and last-sync time, never create a device or replace its key.
+No token is needed, pairing already established trust.
+
+Revocation cancels active incoming and outgoing connections for that record.
+A new pairing creates a new record generation even for the same key. A sync
+that authenticated an older generation cannot update the new record or
+resurrect a revoked device. Documents already committed before cancellation
+remain; revocation is not a rollback or remote wipe.
+
+Each exchange sets read and write deadlines (at most two minutes, shortened
+by the caller's deadline) and closes its channel when the context ends.
+A peer that stops reading therefore cannot hold a handler or shutdown open.
 
 ### Discovery
 
@@ -116,6 +131,9 @@ the joiner to an attacker, who then fails the cryptographic checks.
 - `kind`/`name` are restricted to `[A-Za-z0-9._-]` (max 128 chars); anything
   else is rejected before touching the filesystem. Writes are atomic and
   `0600`.
+- The app exports settings through raw preference values. Imports require
+  each allowlisted key's expected tag and value type; unknown keys and
+  incompatible entries cannot change a local setting's storage type.
 - Single documents are capped at 16 MiB; the transport reassembles at most
   64 MiB per message.
 
@@ -132,6 +150,11 @@ the joiner to an attacker, who then fails the cryptographic checks.
 - Binds `0.0.0.0` (the joiner is on the LAN) but lives only for the pairing
   TTL (5 minutes) or until the user stops it. An unauthenticated peer gets
   nothing: the Noise handshake plus token confirmation gate everything.
+- Each invitation owns a cancellable context. Stop, expiry and daemon
+  shutdown cancel accepted connections as well as the listener. Registration
+  checks the invitation and deadline under the registry lock immediately
+  before writing a peer, so a finishing exchange cannot commit after closure.
+  An invitation is reusable while open, up to the same five-minute limit.
 - The persistent sync listener also binds `0.0.0.0` but only talks to
   already-paired identity keys.
 

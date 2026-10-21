@@ -344,6 +344,10 @@ func dial(ctx context.Context, netConn net.Conn, priv [32]byte, self Identity,
 		_ = netConn.Close()
 		return nil, err
 	}
+	if token == nil && !hmac.Equal(peer.PublicKey[:], res.peerKey) {
+		_ = netConn.Close()
+		return nil, errors.New("transport: announced identity key does not match the channel key")
+	}
 	c.Peer = peer
 	return c, nil
 }
@@ -385,6 +389,10 @@ func accept(ctx context.Context, netConn net.Conn, priv [32]byte, self Identity,
 		_ = netConn.Close()
 		return nil, err
 	}
+	if token == nil && !hmac.Equal(peer.PublicKey[:], res.peerKey) {
+		_ = netConn.Close()
+		return nil, errors.New("transport: announced identity key does not match the channel key")
+	}
 	c.Peer = peer
 	return c, nil
 }
@@ -397,22 +405,9 @@ func withDeadline[T any](ctx context.Context, conn net.Conn, fn func() (T, error
 		_ = conn.SetDeadline(d)
 		defer func() { _ = conn.SetDeadline(time.Time{}) }()
 	}
-	type result struct {
-		v   T
-		err error
-	}
-	done := make(chan result, 1)
-	go func() {
-		v, err := fn()
-		done <- result{v, err}
-	}()
-	select {
-	case r := <-done:
-		return r.v, r.err
-	case <-deadline.Done():
-		var zero T
-		return zero, deadline.Err()
-	}
+	stop := context.AfterFunc(deadline, func() { _ = conn.Close() })
+	defer stop()
+	return fn()
 }
 
 // withDeadlineErr runs fn with a handshake deadline on the connection.

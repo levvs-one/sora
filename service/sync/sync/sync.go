@@ -123,6 +123,14 @@ const syncTimeout = 2 * time.Minute
 func Sync(ctx context.Context, conn *transport.Conn, selfID string, store Store, initiator bool) (Report, error) {
 	ctx, cancel := context.WithTimeout(ctx, syncTimeout)
 	defer cancel()
+	// Closing on cancellation also interrupts writes to a peer that stopped reading.
+	stop := context.AfterFunc(ctx, func() { _ = conn.Close() })
+	defer stop()
+	deadline, _ := ctx.Deadline()
+	if err := conn.SetDeadline(deadline); err != nil {
+		return Report{}, err
+	}
+	defer func() { _ = conn.SetDeadline(time.Time{}) }()
 	s := &session{conn: conn, selfID: selfID, store: store}
 	if initiator {
 		return s.runInitiator(ctx)
@@ -145,30 +153,18 @@ func (s *session) send(m message) error {
 }
 
 func (s *session) recv(ctx context.Context) (message, error) {
-	type result struct {
-		m   message
-		err error
+	if err := ctx.Err(); err != nil {
+		return message{}, err
 	}
-	done := make(chan result, 1)
-	go func() {
-		raw, err := s.conn.ReadMsg()
-		if err != nil {
-			done <- result{err: err}
-			return
-		}
-		var m message
-		if err := json.Unmarshal(raw, &m); err != nil {
-			done <- result{err: fmt.Errorf("sync: bad frame: %w", err)}
-			return
-		}
-		done <- result{m: m}
-	}()
-	select {
-	case r := <-done:
-		return r.m, r.err
-	case <-ctx.Done():
-		return message{}, ctx.Err()
+	raw, err := s.conn.ReadMsg()
+	if err != nil {
+		return message{}, err
 	}
+	var m message
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return message{}, fmt.Errorf("sync: bad frame: %w", err)
+	}
+	return m, nil
 }
 
 // runInitiator drives the exchange: hellos, inventories, then pulls and

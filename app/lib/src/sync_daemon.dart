@@ -29,7 +29,7 @@ enum SyncDaemonState {
 
 /// Why the daemon is [SyncDaemonState.unavailable].
 enum SyncDaemonUnavailableReason {
-  /// Android cannot spawn the Go binary as a child process (contract §5).
+  /// Android cannot spawn the Go binary as a child process (service/sync/CONTRACT.md §5).
   android,
 
   /// No sora-sync binary was found for this platform.
@@ -59,13 +59,18 @@ class SyncDaemonException implements Exception {
 ///
 /// The daemon is stopped when the app quits (SIGTERM, wait, then SIGKILL).
 /// A daemon this run did not spawn (reused from a previous run) is left
-/// alone — its owner manages it.
+/// alone: its owner manages it.
 ///
-/// Status (2026-10-20): wired — the sync screen drives pairing, peers and
-/// sync through [SyncApiClient], and the app-to-daemon document bridge
-/// (`sync_docs.dart`, contract §4) publishes application documents before
-/// every sync and applies the pulled ones after it.
+/// The sync screen drives pairing, peers and sync through [SyncApiClient],
+/// and the app-to-daemon document bridge (`sync_docs.dart`,
+/// service/sync/CONTRACT.md §4) publishes application documents before every
+/// sync and applies the pulled ones after it.
 class SyncDaemon extends ChangeNotifier {
+  SyncDaemon({this._binaryPath, this._dataDir});
+
+  final String? _binaryPath;
+  final String? _dataDir;
+
   SyncDaemonState _state = SyncDaemonState.idle;
 
   /// Current lifecycle state; notifies listeners on change.
@@ -105,7 +110,7 @@ class SyncDaemon extends ChangeNotifier {
 
   /// Resolves the sora-sync binary for this platform, or null when absent.
   /// Linux: `/usr/bin/sora-sync` from the package; Windows: next to the app
-  /// executable. Android cannot spawn it (contract §5).
+  /// executable. Android cannot spawn it (service/sync/CONTRACT.md §5).
   static String? resolveBinary() {
     if (Platform.isAndroid) return null;
     if (Platform.isWindows) {
@@ -138,14 +143,14 @@ class SyncDaemon extends ChangeNotifier {
       _setState(SyncDaemonState.unavailable);
       return;
     }
-    final binary = resolveBinary();
+    final binary = _binaryPath ?? resolveBinary();
     if (binary == null) {
       _unavailableReason = SyncDaemonUnavailableReason.binaryMissing;
       _setState(SyncDaemonState.unavailable);
       return;
     }
     _setState(SyncDaemonState.starting);
-    final dir = Directory(syncDaemonDataDir());
+    final dir = Directory(_dataDir ?? syncDaemonDataDir());
     try {
       await dir.create(recursive: true);
       final reused = await _tryReuse(dir);
@@ -200,6 +205,8 @@ class SyncDaemon extends ChangeNotifier {
   /// Spawns the daemon and waits for it to publish its HTTP address, then
   /// health-checks the API before returning.
   Future<({String addr, String token})> _spawn(String binary, Directory dir) async {
+    final addrFile = File('${dir.path}${Platform.pathSeparator}http_addr');
+    if (await addrFile.exists()) await addrFile.delete();
     final stderrTail = <String>[];
     final Process process;
     try {
@@ -221,7 +228,6 @@ class SyncDaemon extends ChangeNotifier {
       }),
     );
 
-    final addrFile = File('${dir.path}${Platform.pathSeparator}http_addr');
     final stopwatch = Stopwatch()..start();
     while (stopwatch.elapsed < addrTimeout) {
       if (exited) {
@@ -231,13 +237,26 @@ class SyncDaemon extends ChangeNotifier {
           'sora-sync exited during startup (code $exitCode)${detail.isEmpty ? '' : ': $detail'}',
         );
       }
-      if (await addrFile.exists()) {
-        final addr = (await addrFile.readAsString()).trim();
-        if (addr.isNotEmpty) {
-          final token = await _readToken(dir);
-          await _healthCheck(addr, token);
-          return (addr: addr, token: token);
+      try {
+        if (await addrFile.exists()) {
+          final addr = (await addrFile.readAsString()).trim();
+          if (addr.isNotEmpty) {
+            final token = await _readToken(dir);
+            final remaining = addrTimeout - stopwatch.elapsed;
+            if (remaining <= Duration.zero) break;
+            // The address can be visible before the HTTP server is ready.
+            // Bound each probe so child exit and the readiness limit stay observable.
+            final probeTimeout = remaining < const Duration(milliseconds: 500)
+                ? remaining
+                : const Duration(milliseconds: 500);
+            await _healthCheck(addr, token, probeTimeout);
+            if (!exited) return (addr: addr, token: token);
+          }
         }
+      } on FileSystemException {
+        // Publication may replace a file between the existence check and read.
+      } on SyncDaemonException {
+        // Retry until the readiness deadline or child exit.
       }
       await Future<void>.delayed(const Duration(milliseconds: 100));
     }
@@ -259,11 +278,11 @@ class SyncDaemon extends ChangeNotifier {
     return token;
   }
 
-  Future<void> _healthCheck(String addr, String token) async {
+  Future<void> _healthCheck(String addr, String token, Duration timeout) async {
     try {
       final res = await http
           .get(Uri.parse('http://$addr/v1/status'), headers: {'Authorization': 'Bearer $token'})
-          .timeout(const Duration(seconds: 5));
+          .timeout(timeout);
       if (res.statusCode != 200) {
         throw SyncDaemonException('sora-sync health check failed: HTTP ${res.statusCode}');
       }

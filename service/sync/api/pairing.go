@@ -30,6 +30,8 @@ type pairingSession struct {
 	advertiser *discovery.Advertiser
 	expiresAt  time.Time
 	done       chan struct{}
+	ctx        context.Context
+	cancel     context.CancelFunc
 }
 
 // transportSelf builds the transport identity of this device.
@@ -100,6 +102,7 @@ func (d *Daemon) StartPairing() (qr string, expiresAt int64, err error) {
 		expiresAt: time.Now().Add(pairingTTL),
 		done:      make(chan struct{}),
 	}
+	s.ctx, s.cancel = context.WithDeadline(d.ctx, s.expiresAt)
 	d.pairing = s
 	d.wg.Add(1)
 	go d.pairingLoop(s, self)
@@ -109,10 +112,9 @@ func (d *Daemon) StartPairing() (qr string, expiresAt int64, err error) {
 	go func() {
 		defer d.wg.Done()
 		select {
-		case <-time.After(pairingTTL):
+		case <-s.ctx.Done():
 			_ = d.stopPairingSession(s)
 		case <-s.done:
-		case <-d.ctx.Done():
 		}
 	}()
 	return inv.Encode(), s.expiresAt.Unix(), nil
@@ -144,8 +146,10 @@ func (d *Daemon) pairingLoop(s *pairingSession, self transport.Identity) {
 }
 
 func (d *Daemon) handlePairingConn(s *pairingSession, netConn net.Conn, self transport.Identity) {
-	ctx, cancel := context.WithTimeout(d.ctx, 2*time.Minute)
+	ctx, cancel := context.WithTimeout(s.ctx, 2*time.Minute)
 	defer cancel()
+	stop := context.AfterFunc(ctx, func() { _ = netConn.Close() })
+	defer stop()
 	c, err := transport.Accept(ctx, netConn, s.epriv, s.inv.Token, self)
 	if err != nil {
 		return
@@ -159,7 +163,12 @@ func (d *Daemon) handlePairingConn(s *pairingSession, netConn net.Conn, self tra
 	if _, err := syncpkg.Sync(ctx, c, d.identity.ID, d.store, false); err != nil {
 		return
 	}
-	if err := d.upsertPeer(c.Peer.DeviceID, c.Peer.DeviceName,
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.pairing != s || s.ctx.Err() != nil || !time.Now().Before(s.expiresAt) {
+		return
+	}
+	if err := d.upsertPeerLocked(c.Peer.DeviceID, c.Peer.DeviceName,
 		base64.RawURLEncoding.EncodeToString(c.Peer.PublicKey[:])); err != nil {
 		log.Printf("sync: save peers registry: %v", err)
 	}
@@ -174,6 +183,7 @@ func (d *Daemon) stopPairingSession(s *pairingSession) error {
 		return nil
 	}
 	d.pairing = nil
+	s.cancel()
 	d.mu.Unlock()
 	_ = s.advertiser.Close()
 	return s.listener.Close()

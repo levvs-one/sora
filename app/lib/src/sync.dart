@@ -16,10 +16,9 @@ const syncMdnsService = '_sora-sync._tcp';
 /// (`api.StartPairing`); Dart never invents key material, device ids or
 /// ports.
 ///
-/// Status (2026-10-20): wired — the app spawns the daemon ([SyncDaemon]),
-/// shows the daemon-minted QR, and joins through the daemon's HTTP API. The
-/// daemon is the source of truth for paired devices; the old app-side
-/// device registry is gone.
+/// The app spawns the daemon ([SyncDaemon]), shows the daemon-minted QR and
+/// joins through the daemon's HTTP API. The daemon is the source of truth for
+/// paired devices.
 class SyncPairing {
   SyncPairing._();
 
@@ -39,9 +38,9 @@ class SyncPairing {
 
   /// Parses a scanned payload; null when it is not a valid pairing
   /// invitation. A byte-exact mirror of Go `pairing.Decode`
-  /// (F9-SYNC-CONTRACT.md §1): a wrong scheme, host or version, a fragment,
+  /// (service/sync/CONTRACT.md §1): a wrong scheme, host or version, a fragment,
   /// duplicated query keys, and any malformed field, are rejected instead
-  /// of being half-accepted. The raw string — not the parsed URI — is
+  /// of being half-accepted. The raw string, not the parsed URI, is
   /// checked for the fragment, the scheme/host case, and duplicates,
   /// because Dart's [Uri] lowercases the host (Go keeps its case), drops a
   /// bare trailing '#', and takes the last of duplicated keys (Go takes
