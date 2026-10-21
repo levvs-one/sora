@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/session"
 )
 
 // Nftables manages a Linux output-hook table, removing it when the session
@@ -21,6 +22,7 @@ type Nftables struct {
 	command string
 	armed   bool
 	blocked []netip.Prefix
+	policy  session.Settings
 }
 
 // NewNftables permits engine traffic owned by uid and the supplied bypass
@@ -47,7 +49,13 @@ func (n *Nftables) SetBlockedNetworks(networks []netip.Prefix) {
 func (n *Nftables) Arm(ctx context.Context, _ []uint16) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	if err := n.apply(ctx, NftRuleset(n.uid, n.bypass, n.blocked...)); err != nil {
+	rules := NftRuleset(n.uid, n.bypass, n.blocked...)
+	if n.policy.StrictKillSwitch {
+		rules = StrictNftRuleset(n.uid, n.policy, n.blocked...)
+	}
+	// Add creates the table if missing; flush and rebuild happen in one transaction.
+	rules = "add table inet sora\nflush table inet sora\n" + rules
+	if err := n.apply(ctx, rules); err != nil {
 		return err
 	}
 	n.armed = true
@@ -58,18 +66,26 @@ func (n *Nftables) Arm(ctx context.Context, _ []uint16) error {
 func (n *Nftables) Disarm(ctx context.Context) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	if err := n.apply(ctx, NftRemove()); err != nil {
+	if err := n.apply(ctx, "add table inet sora\n"+NftRemove()); err != nil {
 		return err
 	}
 	n.armed = false
 	return nil
 }
 
-// Armed reports whether this process installed the table.
-func (n *Nftables) Armed(context.Context) (bool, error) {
+// SetPolicy selects the strict exemptions for the next atomic replacement.
+func (n *Nftables) SetPolicy(s session.Settings) { n.mu.Lock(); defer n.mu.Unlock(); n.policy = s }
+
+// Armed probes the kernel table, including rules left by an earlier process.
+func (n *Nftables) Armed(ctx context.Context) (bool, error) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
-	return n.armed, nil
+	cmd := exec.CommandContext(ctx, n.command, "list", "table", "inet", nftTable) //nolint:gosec // fixed nft command
+	output, err := cmd.CombinedOutput()
+	if err != nil && strings.Contains(string(output), "No such file or directory") {
+		return false, nil
+	}
+	return err == nil, err
 }
 
 // Name identifies the implementation in a diagnostics line.

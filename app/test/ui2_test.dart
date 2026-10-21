@@ -8,6 +8,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:sora/main.dart';
+import 'package:sora/src/chains.dart';
 import 'package:sora/src/core/link.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pb.dart';
 import 'package:sora/src/notifications.dart';
@@ -30,7 +31,7 @@ class _EmptySora extends Sora {
   }
   int connects = 0;
   @override
-  Future<void> connect({bool retry = false}) async {
+  Future<void> connect({bool retry = false, ProxyChain? via}) async {
     connects++;
   }
 }
@@ -337,7 +338,7 @@ void main() {
       await tester.pumpAndSettle();
       final menu = find.byKey(const ValueKey('mihomo-tun-stack'));
       await tester.ensureVisible(menu);
-      await tester.tap(find.descendant(of: menu, matching: find.text('Mixed')));
+      await tester.tap(find.descendant(of: menu, matching: find.text('Смешанный')));
       await tester.pumpAndSettle();
       expect(find.byType(MenuItemButton), findsNWidgets(4));
       await tester.tap(find.text('MIPS'));
@@ -349,6 +350,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(menu, findsNothing);
       expect(find.text('Стек TUN'), findsNothing);
+      await tester.ensureVisible(find.byKey(const ValueKey('mode-tun')));
       await tester.tap(find.byKey(const ValueKey('mode-tun')));
       await tester.pumpAndSettle();
       expect(menu, findsOneWidget);
@@ -362,7 +364,7 @@ void main() {
       await tester.tap(find.descendant(of: xrayMenu, matching: find.text('gVisor')));
       await tester.pumpAndSettle();
       expect(find.byType(MenuItemButton), findsNWidgets(4));
-      await tester.tap(find.text('System'));
+      await tester.tap(find.text('Системный'));
       await tester.pumpAndSettle();
       expect(sora.settings.xrayTunStack, 'system');
       expect((await Settings.load()).xrayTunStack, 'system');

@@ -4,9 +4,14 @@ package guard
 
 import (
 	"net/netip"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/tailscale/wf"
+	"golang.org/x/sys/windows"
+
+	"github.com/levvs-one/sora-client/core/session"
 )
 
 func TestWFPTunnelFiltersAllowInboundReauthorization(t *testing.T) {
@@ -69,7 +74,7 @@ func TestWFPTunnelFiltersAllowInboundReauthorization(t *testing.T) {
 	}
 }
 
-// TestWFPRefusesAnEmptyEnginesDir locks SORA-L20: an empty enginesDir must
+// TestWFPRefusesAnEmptyEnginesDir: an empty enginesDir must
 // fail closed instead of globbing "*.exe" in the working directory.
 func TestWFPRefusesAnEmptyEnginesDir(t *testing.T) {
 	w := &WFP{enginesDir: ""}
@@ -79,5 +84,134 @@ func TestWFPRefusesAnEmptyEnginesDir(t *testing.T) {
 	w = &WFP{enginesDir: "  "}
 	if _, err := w.executables(); err == nil {
 		t.Fatal("a blank enginesDir must fail closed")
+	}
+}
+
+func TestWFPStrictRulesRequireExplicitExemptions(t *testing.T) {
+	for _, reconnect := range []bool{false, true} {
+		policy := session.Settings{StrictKillSwitch: true, Reconnect: reconnect, Endpoints: []session.Endpoint{{Address: netip.MustParseAddrPort("203.0.113.2:443"), Protocol: "tcp"}, {Address: netip.MustParseAddrPort("[2001:db8::2]:8443"), Protocol: "udp"}}}
+		dir := t.TempDir()
+		expectedApps := map[string]bool{}
+		for _, name := range []string{"sing-box.exe", "xray.exe", "mihomo.exe"} {
+			path := filepath.Join(dir, name)
+			if err := os.WriteFile(path, []byte("engine identity fixture"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			id, err := wf.AppID(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			expectedApps[id] = true
+		}
+		owner, err := sameAccount()
+		if err != nil {
+			t.Fatal(err)
+		}
+		w := &WFP{enginesDir: dir, bypass: []netip.Prefix{netip.MustParsePrefix("0.0.0.0/0")}, policy: policy}
+		endpoints, blocks, apps := 0, 0, 0
+		if err := w.rules(func(rule *wf.Rule) error {
+			if rule.Persistent != reconnect {
+				t.Fatal("reboot policy lost")
+			}
+			if rule.Name == "Sora: local network" {
+				t.Fatal("LAN allowed without consent")
+			}
+			if rule.Name == "Sora: VPN endpoint" {
+				endpoints++
+				if len(rule.Conditions) != 5 || rule.Action != wf.ActionPermit {
+					t.Fatal("endpoint needs address, port, protocol, application and account")
+				}
+				fields := map[wf.FieldID]any{}
+				for _, c := range rule.Conditions {
+					if c.Op != wf.MatchTypeEqual {
+						t.Fatal("endpoint match must be exact")
+					}
+					fields[c.Field] = c.Value
+				}
+				if !expectedApps[fields[wf.FieldALEAppID].(string)] {
+					t.Fatal("endpoint allows a process other than an installed engine")
+				}
+				gotOwner := fields[wf.FieldALEUserID].(*windows.SECURITY_DESCRIPTOR)
+				if gotOwner.String() != owner.String() {
+					t.Fatal("engine account changed")
+				}
+				index := 0
+				proto := wf.IPProtoTCP
+				if rule.Layer == wf.LayerALEAuthConnectV6 {
+					index = 1
+					proto = wf.IPProtoUDP
+				}
+				ep := policy.Endpoints[index].Address
+				if fields[wf.FieldIPRemoteAddress] != netip.PrefixFrom(ep.Addr(), ep.Addr().BitLen()) || fields[wf.FieldIPRemotePort] != ep.Port() || fields[wf.FieldIPProtocol] != proto {
+					t.Fatalf("endpoint transport widened: %v", fields)
+				}
+				if !applies(rule.Layer, rule.Conditions) {
+					t.Fatal("endpoint has wrong family")
+				}
+			}
+			if rule.Name == "Sora: everything else" {
+				blocks++
+			}
+			for _, condition := range rule.Conditions {
+				if condition.Field == wf.FieldALEAppID {
+					apps++
+					dnsOnly := false
+					for _, match := range rule.Conditions {
+						if match.Field == wf.FieldIPRemotePort && match.Value == uint16(53) {
+							dnsOnly = true
+						}
+					}
+					if !dnsOnly && rule.Name != "Sora: VPN endpoint" {
+						t.Fatal("strict mode allowed unrestricted application traffic")
+					}
+				}
+			}
+			return nil
+		}, strictSublayer); err != nil {
+			t.Fatal(err)
+		}
+		if endpoints != 6 || blocks != 2 || apps != 8 {
+			t.Fatalf("endpoints=%d blocks=%d apps=%d", endpoints, blocks, apps)
+		}
+		w.policy.AllowLAN = true
+		lan := 0
+		if err := w.rules(func(rule *wf.Rule) error {
+			if rule.Name == "Sora: local network" {
+				lan++
+			}
+			return nil
+		}, strictSublayer); err != nil {
+			t.Fatal(err)
+		}
+		if lan != len(DefaultBypassNetworks()) {
+			t.Fatal("explicit LAN permission lost")
+		}
+	}
+}
+
+// TestStrictFilterRecordRoundTrips pins the record Disarm relies on: the
+// IDs written before installing strict filters are read back unchanged and
+// clearing the record leaves nothing to delete.
+func TestStrictFilterRecordRoundTrips(t *testing.T) {
+	w := &WFP{stateDir: t.TempDir()}
+	if ids, err := w.strictIDs(); err != nil || len(ids) != 0 {
+		t.Fatalf("empty record = %v, %v", ids, err)
+	}
+	want := []wf.RuleID{
+		wf.RuleID(windows.GUID{Data1: 1, Data2: 2, Data3: 3, Data4: [8]byte{4, 5, 6, 7, 8, 9, 10, 11}}),
+		wf.RuleID(windows.GUID{Data1: 12}),
+	}
+	if err := w.saveStrictIDs(want); err != nil {
+		t.Fatal(err)
+	}
+	got, err := w.strictIDs()
+	if err != nil || len(got) != len(want) || got[0] != want[0] || got[1] != want[1] {
+		t.Fatalf("record = %v, %v; want %v", got, err, want)
+	}
+	if err := w.saveStrictIDs(nil); err != nil {
+		t.Fatal(err)
+	}
+	if ids, _ := w.strictIDs(); len(ids) != 0 {
+		t.Fatalf("cleared record still lists %v", ids)
 	}
 }

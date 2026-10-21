@@ -5,7 +5,6 @@
   "stateConnected": "Qoşuldu",
   "stateReconnecting": "Yenidən qoşulur",
   "stateDisconnecting": "Bağlantı kəsilir",
-  "stateFailed": "Qoşulmayıb",
   "coreMissing": "Sora xidməti cavab vermir",
   "serverAuto": "Ən sürətli",
   "serverBypass": "Server yoxdur",
@@ -41,6 +40,7 @@
   "export": "Faylda saxla",
   "clear": "Təmiz",
   "logsEmpty": "Burada heç nə",
+  "connEmpty": "Bağlantı yoxdur",
   "appVersion": "Versiya {version}",
   "notInstalled": "Quraşdırılmayıb",
   "sourceCode": "Mənbə kodu",
@@ -75,17 +75,16 @@
   "errSubScheme": "Link https:// ilə başlamalıdır",
   "errSecretStore": "Sora yaddaşı zədələnib və ya əlçatan deyil",
   "errNoServers": "Qoşulmaq üçün abunə əlavə edin",
-  "exportText": "Mətn",
   "connections": "Əlaqələr",
   "close": "Bağlayın",
   "chainDirect": "Birbaşa",
   "chainBlocked": "Blok edilib",
   "theme": "Mövzu",
-  "themeSystem": "System",
+  "themeSystem": "Sistem kimi",
   "themeLight": "İşıq",
   "themeDark": "Qaranlıq",
   "language": "Dil",
-  "languageSystem": "System",
+  "languageSystem": "Sistem kimi",
   "sectionConnection": "Əlaqə",
   "sectionNoServer": "Server yoxdur",
   "sectionPing": "Ping",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} sol",
   "ruleInvalid": "Bu sayta, IP-yə və ya proqrama bənzəmir",
   "tunnelMode": "Rejim",
-  "tunnelTun": "Bütün trafik",
   "tunnelProxy": "System proxy",
   "proxyAddress": "Proksi ünvanı",
   "copied": "Kopyalandı",
   "launchAtLogin": "Sistemdən başlayın",
+  "launchAtLoginDetail": "Daxil olduqda Sora avtomatik işə düşəcək və nimçədə qalacaq.",
   "closeToTray": "Bağlı halda nimçədə saxlayın",
   "notifications": "Bildirişlər",
   "trayOpen": "Sora-ni açın",
@@ -185,12 +184,6 @@
   "sidebarToggle": "Yan panelə keçin",
   "more": "Daha çox",
   "less": "Daha az",
-  "currentServer": "Cari server",
-  "trafficDown": "Endirildi",
-  "trafficUp": "Yükləndi",
-  "perSecond": "{value}/s",
-  "activeRules": "Aktiv qaydalar: {count}",
-  "recentNotifications": "Son bildirişlər",
   "notificationsEmpty": "Bağlantı və abunə hadisələri burada görünəcək",
   "retryConnect": "Bağlantıya yenidən cəhd edin",
   "openLogs": "Qeydləri açın",
@@ -208,12 +201,9 @@
   "chooseProgram": "Proqram seçin",
   "installedApps": "Quraşdırılmış proqramlar",
   "runningProcesses": "Çalışan proseslər",
-  "programsFailed": "Proqramları yükləmək mümkün olmadı",
   "programsEmpty": "Heç bir tətbiq tapılmadı. Başqa bir ad sınayın.",
   "selectExe": ".exe faylı seçin",
-  "trafficUnavailable": "Sayğaclar hələ mövcud deyil",
   "speedtest": "Sürət",
-  "speedtestCheck": "Sürəti yoxlayın",
   "speedtestSearch": "Xidmət tapın",
   "speedtestEmpty": "Uyğunluq yoxdur. Axtarışı dəyişdirin.",
   "speedtestBackToList": "Xidmətlərə qayıt",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "Kopyalama əmri",
   "updateChecksDisabled": "Avtomatik yoxlamalar Parametrlərdə deaktiv edilib.",
   "updateInstalled": "Yeniləmə quraşdırılıb. Sora-ni yenidən açın.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "Layihə",
   "githubReleases": "Buraxılışlar və yükləmələr",
   "telegramChannel": "Telegram kanalı",
   "licenses": "Lisenziyalar",
   "componentLicenses": "Komponent lisenziyaları",
-  "appCopyright": "© 2026 levvs-one və ianəçilər",
   "collapseServers": "Serverləri yığışdırın",
   "expandServers": "Serverləri genişləndirin",
   "hideDescription": "Təsviri gizlədin",
   "showDescription": "Təsviri göstərin",
   "pendingConnectionChanges": "Bu dəyişiklikləri tətbiq etmək üçün yenidən qoşulun.",
   "reconnectNow": "Tətbiq edin və yenidən qoşulun",
-  "bypassLimitations": "Bu rejim yalnız HTTP və TLS üçün DPI-dən yan keçir, UDP-ni dəstəkləmir və ya IP-ni dəyişdirmir. Discord səs, zənglər və bloklanmış Telegram ünvanları üçün VPN serverindən istifadə edin.",
   "errEngineUnsupported": "Seçilmiş mühərrik bu profili və ya parametrləri dəstəkləmir. Avtomatik və ya uyğun mühərriki seçin.",
   "errRestore": "Bağlantının təmizlənməsi tamamlanmadı. Bağlantını kəsməyə yenidən cəhd edin; təfərrüatlar üçün jurnala baxın.",
   "errSessionEnded": "Bu sessiya artıq başa çatıb. Bağlantı vəziyyətini yeniləyin.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "Rejimlər və mühərriklər",
   "probeServers": "Serverləri yoxlayın",
   "expiresIn": "{name}: {days, plural, =0{abunə bir neçə saat ərzində başa çatır} one{abunə # günündə başa çatır} other{abunə # günlərində başa çatır}}",
-  "groupOrdered": "{count, plural, one{# server, öz növbəsində} other{# serverləri öz növbəsində}}",
   "groupBest": "{count, plural, one{# server, ən sürətli} other{# serverləri, ən sürətli}}",
-  "modesGuide": "Serverinizin hansı mühərrikə ehtiyacı olduğuna əmin deyilsinizsə, Avtomatik seçin. Sora qoşulmazdan əvvəl profili və parametrləri yoxlayır. Mühərrik planınızın bant genişliyini artıra bilməz: performans serverdən, marşrutdan, protokoldan və şəbəkədən asılıdır.\n\n## Rejimlər\n\n### Bütün trafik (TUN)\n\nSora virtual şəbəkə interfeysi yaradır və TCP və UDP daxil olmaqla proqram trafikini onun vasitəsilə yönləndirir. Telegram, oyunlar və Discord səsi üçün bu rejimi istifadə edin. Qaydalar xüsusi saytları və ya proqramları birbaşa göndərə və ya onları bloklaya bilər. Şəbəkə xidmətinə icazə və tələb olunan protokolu dəstəkləyən server lazımdır.\n\n### System proksi\n\nSora yerli HTTP/SOCKS proksisini konfiqurasiya edir. Sistem proxy parametrlərinə hörmət edən proqramlar ondan istifadə edir. Öz şəbəkə yığını olan proqramlar birbaşa qoşula bilər; UDP və səsli zənglər üçün ümumiyyətlə TUN lazımdır. Bu rejim proxy dəstəyi olan brauzerlər və proqramlar üçün uyğundur.\n\n### Server yoxdur\n\nLinux-də Sora HTTP/TLS sorğularını bölmək və yenidən formalaşdırmaq və bəzi DPI yoxlamalarını keçmək üçün [zapret](https://github.com/bol-van/zapret) istifadə edir. IP-niz eyni qalır və bağlantılar birbaşa vebsayta keçir. Nəticələr provayderinizdən və bloklama metodunuzdan asılıdır.\n\nCari inteqrasiya TCP üzərindən HTTP və TLS üçün tpws istifadə edir. O, IP-nin bloklanmasını və ya UDP-nin ötürülməsini keçmir və Telegram-nin MTProto bağlantılarına zəmanət verə bilməz. Discord səs, Telegram zəngləri və bu cür məhdudiyyətlər üçün TUN ilə VPN serverindən istifadə edin.\n\n## Mühərriklər\n\n### Avtomatik\n\nSora bütün qoşulma planını dəstəkləyən quraşdırılmış mühərriki seçir: server protokolları, daşımalar, qruplar, parçalanma və rejim. Uyğun olmayan əl seçimi cari əlaqəni dayandırmazdan əvvəl rədd edilir. Avtomatik və ya başqa mühərriki seçin və parametrləri yenidən tətbiq edin.\n\n### sing-box\n\nYeni Sora paketlərinə müştəri tərəfi XHTTP və VLESS Encryption əlavə edən [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) çəngəl daxildir. Sora quruluşu və onun imkanlarını tanıyır. XHTTP olmadan yuxarı axın quruluşu bu qabiliyyəti təkcə adından əldə etmir.\n\nDəstəklənən protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard və ZX0/parametrləri daxildir. Sora idxal edə bilər. Tam Xray JSON profilləri üçün Xray tələb olunur. Yeni AWG 3.x sahələri hələ idxal edilə bilməz. sing-box, kompüterdəki digər proqramların aşkarlaya biləcəyi parolla qorunan yerli idarəetmə portundan istifadə edir.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption və TLS fraqmentasiyasını dəstəkləyir. O, həmçinin marşrutlaşdırma və qruplarını qoruyarkən Xray tam provayder profillərini idarə edir. Bu cür profillər davranışlarını dəyişdirmədən avtomatik olaraq başqa bir mühərrikə çevrilə bilməz.\n\nBirləşdirilmiş Xray TLS sertifikatının doğrulamasını deaktiv edən ayarı sildi (`allowInsecure`). Bu parametri tələb edən adi serverlər üçün avtomatik sing-box və ya mihomo seçir. Xray seçimi cari əlaqəni dayandırmazdan əvvəl uyğunsuzluğu əl ilə bildirir. Köhnə tam JSON profilləri təsdiq edilə bilən sertifikat və ya sertifikat pininə malik yenilənmiş provayder profilinə ehtiyac duyur.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) sifarişli ehtiyat və yük balanslaşdırma qruplarını, XHTTP və AmneziaWG-ni dəstəkləyir. Yedək serverə avtomatik keçid vacib olduqda onu seçin. Sora-nin TLS parçalanma parametri bu mühərriklə əlçatan deyil.\n\n## Sora-də uyğunluq\n\n| Xüsusiyyət | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN və TCP/UDP | Bəli | Bəli | Bəli |\n| XHTTP | Bəli | Bəli | Bəli |\n| VLESS Encryption | Bəli | Bəli | Bəli |\n| Tam Xray profili | Yox | Bəli | Yox |\n| TUIC / AnyTLS | Hər ikisi | Yox | TUIC |\n| TLS parçalanması | Bəli | Bəli | Yox |\n| AmneziaWG 1.x/2.x | Bəli¹ | Yox | Bəli |\n| Sifarişli ehtiyat qrupu | Yox | No² | Bəli |\n\n¹ J1/J2/J3/Itime ilə profillər mihomo istifadə edir; bu sahələr heç vaxt səssizcə atılmamalıdır. ² Tam Xray profilləri qrupu üçün proqram ehtiyat profili seçir. Dəstək quraşdırılmış quruluşdan asılıdır; Haqqında onun versiyasını yoxlayın.\n\n## TUN yığını\n\nYığın virtual interfeys daxilində TCP və UDP-ni idarə edir. Rejimlər panelində Xray və mihomo gVisor, System, Mixed və MIPS təklif edir. Hər bir mühərrik öz üstünlüklərini saxlayır. System proxy və Serversiz rejimlər bu üstünlükdən istifadə etmir.\n\n- **Mixed** — TCP sistem yığınından istifadə edir, gVisor isə UDP-ni idarə edir. Bu, Linux-da mihomo üçün standartdır. Windows-da Xray və mihomo standart olaraq MIPS istifadə edir.\n- **System** — sistem yığınından istifadə edir. Şəbəkə proqramlarında problem yaranarsa, başqa variantı sınayın.\n- **gVisor** — istifadəçi məkanında trafiki idarə edir.\n- **MIPS** — mihomo-nin 1.19.32 paket versiyasında mövcud olan öz IP yığını.\n\nLinux-də Xray standart olaraq daxili gVisor-dən istifadə edir. Linux-də System, Mixed və MIPS TUN mühərriki kimi mihomo-dən istifadə edir, TCP və UDP-ni təsdiqlənmiş yerli SOCKS linki üzərindən Xray-ə yönləndirir. Xray protokolu, provayder profilini və marşrutu saxlayır. Bu üç seçim quraşdırılmış mihomo tələb edir. Windows-də Xray dörd TUN stekinin hamısı üçün mihomo 1.19.32 və ya daha yeni versiyadan istifadə edir. Protokollar və marşrutlaşdırma Xray-də qalır. Bu bağlantıda tətbiq qaydaları yalnız birbaşa əlaqəni və bloklamanı dəstəkləyir; Linux-də bu qaydalar Xray-in daxili gVisor stekini tələb edir.\n\nKörpü ikinci prosesi həyata keçirir. Linux-də üç boş ölçmədə o, yerli Xray TUN-dan təxminən 32-36 MiB daha çox fiziki yaddaş istifadə etdi. Bu, yükləmə yükünü ölçmür: CPU və yaddaş xərcləri bağlantılardan asılıdır. sing-box-də yığın seçicisi yoxdur. Heç bir yığın hər şəbəkədə daha yaxşı performansa zəmanət vermir. Yığın seçin və onu şəbəkənizdə sınamaq üçün Tətbiq edin və yenidən qoşulun seçin.\n\n## Parametrlər tətbiq edilir\n\nServerin seçilməsi avtomatik olaraq yenidən qoşulur. Rejim, mühərrik, DNS və qayda parametrləri dərhal saxlanılır; aktiv əlaqə zamanı Tətbiq et üzərinə klikləyin və onlardan istifadə etmək üçün yenidən qoşulun. Mühərrikin yenidən işə salınması endirmələri və zəngləri dayandıra bilər. Təkrarlanan kliklər paralel əlaqələri başlatmır; əlaqənin kəsilməsi keçidi bitirir və əlaqəni buraxır.\n\nTunel düşdükdə yalnız VPN vasitəsilə İnternet birbaşa trafiki bloklayır. Bütün maşına təsir edir. Açıq-aşkar əlaqənin kəsilməsi Sora qaydalarını aradan qaldırır. Təmizləmə başa çatmazsa, yenidən ayırmağa cəhd edin və jurnalı açın.\n\n## Layihə sənədləri\n\n- [sing-box-lx: konfiqurasiya və dəstək](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box sənədləri](https://sing-box.sagernet.org/)\n- [Xray sənədləri](https://xtls.github.io/)\n- [mihomo sənədləri](https://wiki.metacubex.one/)\n- [zapret: əməliyyat və məhdudiyyətlər](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Serverinizin hansı mühərrikə ehtiyacı olduğuna əmin deyilsinizsə, Avtomatik seçin. Sora qoşulmazdan əvvəl profili və parametrləri yoxlayır. Mühərrik planınızın bant genişliyini artıra bilməz: performans serverdən, marşrutdan, protokoldan və şəbəkədən asılıdır.\n\n## Rejimlər\n\n### Bütün trafik (TUN)\n\nSora virtual şəbəkə interfeysi yaradır və TCP və UDP daxil olmaqla proqram trafikini onun vasitəsilə yönləndirir. Telegram, oyunlar və Discord səsi üçün bu rejimi istifadə edin. Qaydalar xüsusi saytları və ya proqramları birbaşa göndərə və ya onları bloklaya bilər. Şəbəkə xidmətinə icazə və tələb olunan protokolu dəstəkləyən server lazımdır.\n\n### System proksi\n\nSora yerli HTTP/SOCKS proksisini konfiqurasiya edir. Sistem proxy parametrlərinə hörmət edən proqramlar ondan istifadə edir. Öz şəbəkə yığını olan proqramlar birbaşa qoşula bilər; UDP və səsli zənglər üçün ümumiyyətlə TUN lazımdır. Bu rejim proxy dəstəyi olan brauzerlər və proqramlar üçün uyğundur.\n\n### Server yoxdur\n\nLinux-də Sora HTTP/TLS sorğularını bölmək və yenidən formalaşdırmaq və bəzi DPI yoxlamalarını keçmək üçün [zapret](https://github.com/bol-van/zapret) istifadə edir. IP-niz eyni qalır və bağlantılar birbaşa vebsayta keçir. Nəticələr provayderinizdən və bloklama metodunuzdan asılıdır.\n\nCari inteqrasiya TCP üzərindən HTTP və TLS üçün tpws istifadə edir. O, IP-nin bloklanmasını və ya UDP-nin ötürülməsini keçmir və Telegram-nin MTProto bağlantılarına zəmanət verə bilməz. Discord səs, Telegram zəngləri və bu cür məhdudiyyətlər üçün TUN ilə VPN serverindən istifadə edin.\n\n## Mühərriklər\n\n### Avtomatik\n\nSora bütün qoşulma planını dəstəkləyən quraşdırılmış mühərriki seçir: server protokolları, daşımalar, qruplar, parçalanma və rejim. Uyğun olmayan əl seçimi cari əlaqəni dayandırmazdan əvvəl rədd edilir. Avtomatik və ya başqa mühərriki seçin və parametrləri yenidən tətbiq edin.\n\n### sing-box\n\nYeni Sora paketlərinə müştəri tərəfi XHTTP və VLESS Encryption əlavə edən [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) çəngəl daxildir. Sora quruluşu və onun imkanlarını tanıyır. XHTTP olmadan yuxarı axın quruluşu bu qabiliyyəti təkcə adından əldə etmir.\n\nDəstəklənən protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard və ZX0/parametrləri daxildir. Sora idxal edə bilər. Tam Xray JSON profilləri üçün Xray tələb olunur. Yeni AWG 3.x sahələri hələ idxal edilə bilməz. sing-box, kompüterdəki digər proqramların aşkarlaya biləcəyi parolla qorunan yerli idarəetmə portundan istifadə edir.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption və TLS fraqmentasiyasını dəstəkləyir. O, həmçinin marşrutlaşdırma və qruplarını qoruyarkən Xray tam provayder profillərini idarə edir. Bu cür profillər davranışlarını dəyişdirmədən avtomatik olaraq başqa bir mühərrikə çevrilə bilməz.\n\nBirləşdirilmiş Xray TLS sertifikatının doğrulamasını deaktiv edən ayarı sildi (`allowInsecure`). Bu parametri tələb edən adi serverlər üçün avtomatik sing-box və ya mihomo seçir. Xray seçimi cari əlaqəni dayandırmazdan əvvəl uyğunsuzluğu əl ilə bildirir. Köhnə tam JSON profilləri təsdiq edilə bilən sertifikat və ya sertifikat pininə malik yenilənmiş provayder profilinə ehtiyac duyur.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) sifarişli ehtiyat və yük balanslaşdırma qruplarını, XHTTP və AmneziaWG-ni dəstəkləyir. Yedək serverə avtomatik keçid vacib olduqda onu seçin. Sora-nin TLS parçalanma parametri bu mühərriklə əlçatan deyil.\n\n## Sora-də uyğunluq\n\n| Xüsusiyyət | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN və TCP/UDP | Bəli | Bəli | Bəli |\n| XHTTP | Bəli | Bəli | Bəli |\n| VLESS Encryption | Bəli | Bəli | Bəli |\n| Tam Xray profili | Yox | Bəli | Yox |\n| TUIC / AnyTLS | Hər ikisi | Yox | TUIC |\n| TLS parçalanması | Bəli | Bəli | Yox |\n| AmneziaWG 1.x/2.x | Bəli¹ | Yox | Bəli |\n| Sifarişli ehtiyat qrupu | Yox | No² | Bəli |\n\n¹ J1/J2/J3/Itime ilə profillər mihomo istifadə edir; bu sahələr heç vaxt səssizcə atılmamalıdır. ² Tam Xray profilləri qrupu üçün proqram ehtiyat profili seçir. Dəstək quraşdırılmış quruluşdan asılıdır; Haqqında onun versiyasını yoxlayın.\n\n## TUN yığını\n\nYığın virtual interfeys daxilində TCP və UDP-ni idarə edir. Rejimlər panelində Xray və mihomo gVisor, System, Mixed və MIPS təklif edir. Hər bir mühərrik öz üstünlüklərini saxlayır. System proxy və Serversiz rejimlər bu üstünlükdən istifadə etmir.\n\n- **Mixed**: TCP sistem yığınından istifadə edir, gVisor isə UDP-ni idarə edir. Bu, Linux-da mihomo üçün standartdır. Windows-da Xray və mihomo standart olaraq MIPS istifadə edir.\n- **System**: sistem yığınından istifadə edir. Şəbəkə proqramlarında problem yaranarsa, başqa variantı sınayın.\n- **gVisor**: istifadəçi məkanında trafiki idarə edir.\n- **MIPS**: mihomo-nin 1.19.32 paket versiyasında mövcud olan öz IP yığını.\n\nLinux-də Xray standart olaraq daxili gVisor-dən istifadə edir. Linux-də System, Mixed və MIPS TUN mühərriki kimi mihomo-dən istifadə edir, TCP və UDP-ni təsdiqlənmiş yerli SOCKS linki üzərindən Xray-ə yönləndirir. Xray protokolu, provayder profilini və marşrutu saxlayır. Bu üç seçim quraşdırılmış mihomo tələb edir. Windows-də Xray dörd TUN stekinin hamısı üçün mihomo 1.19.32 və ya daha yeni versiyadan istifadə edir. Protokollar və marşrutlaşdırma Xray-də qalır. Bu bağlantıda tətbiq qaydaları yalnız birbaşa əlaqəni və bloklamanı dəstəkləyir; Linux-də bu qaydalar Xray-in daxili gVisor stekini tələb edir.\n\nKörpü ikinci prosesi həyata keçirir. Linux-də üç boş ölçmədə o, yerli Xray TUN-dan təxminən 32-36 MiB daha çox fiziki yaddaş istifadə etdi. Bu, yükləmə yükünü ölçmür: CPU və yaddaş xərcləri bağlantılardan asılıdır. sing-box-də yığın seçicisi yoxdur. Heç bir yığın hər şəbəkədə daha yaxşı performansa zəmanət vermir. Yığın seçin və onu şəbəkənizdə sınamaq üçün Tətbiq edin və yenidən qoşulun seçin.\n\n## Parametrlər tətbiq edilir\n\nServerin seçilməsi avtomatik olaraq yenidən qoşulur. Rejim, mühərrik, DNS və qayda parametrləri dərhal saxlanılır; aktiv əlaqə zamanı Tətbiq et üzərinə klikləyin və onlardan istifadə etmək üçün yenidən qoşulun. Mühərrikin yenidən işə salınması endirmələri və zəngləri dayandıra bilər. Təkrarlanan kliklər paralel əlaqələri başlatmır; əlaqənin kəsilməsi keçidi bitirir və əlaqəni buraxır.\n\nTunel düşdükdə yalnız VPN vasitəsilə İnternet birbaşa trafiki bloklayır. Bütün maşına təsir edir. Açıq-aşkar əlaqənin kəsilməsi Sora qaydalarını aradan qaldırır. Təmizləmə başa çatmazsa, yenidən ayırmağa cəhd edin və jurnalı açın.\n\n## Layihə sənədləri\n\n- [sing-box-lx: konfiqurasiya və dəstək](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box sənədləri](https://sing-box.sagernet.org/)\n- [Xray sənədləri](https://xtls.github.io/)\n- [mihomo sənədləri](https://wiki.metacubex.one/)\n- [zapret: əməliyyat və məhdudiyyətlər](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,15 +440,9 @@
       }
     }
   },
-  "diagnosticRequiresTun": "Paket ələ keçirmək üçün aktiv Sora TUN bağlantısı lazımdır.",
-  "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil.",
   "extensions": "Genişləndiricilər",
-  "diagnosticCapture": "10 saniyə çəkin",
-  "diagnosticEvents": "Windows hadisələri",
   "exportLogFile": "Fayla {name}",
-  "diagnosticPackets": "Paket tutma",
   "diagnosticHttp": "HTTP diaqnostikası",
-  "extensionsSoon": "Tezliklə",
   "diagnosticNoData": "Hələ qeydə alınmış sorğu yoxdur. Əvvəlcə sürət testi veb saytını açın.",
   "@exportLogFile": {
     "placeholders": {
@@ -473,5 +450,572 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "Fərdi server əlavə edin",
+  "customServers": "Mənim serverlərim",
+  "customServerName": "Adı",
+  "customServerNameHint": "Məsələn: mənim VPS",
+  "customServerNameRequired": "Adı daxil edin",
+  "customServerAddress": "Ünvan",
+  "customServerAddressHint": "example.com və ya 192.0.2.1",
+  "customServerAddressRequired": "Server ünvanını daxil edin",
+  "customServerAddressInvalid": "Yanlış ünvan",
+  "customServerPort": "Port",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "Port 1-dən 65535-ə qədər rəqəm olmalıdır",
+  "customServerProtocol": "Protokol",
+  "customServerCredentials": "Giriş məlumatı",
+  "customServerOptional": "Könüllü",
+  "customServerShowSecret": "Sirri göstərin",
+  "customServerHideSecret": "Sirri gizlədin",
+  "customServerBadge": "fərdi",
+  "customServerDeleteConfirm": "“{name}” server silinsin?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "Serveri əl ilə əlavə edin: ünvan, port və protokol",
+  "customServerTest": "Test",
+  "leakTestTitle": "Məlumat sızması üçün test edin",
+  "leakTestIntro": "Trafikin cihazdan tuneldən kənar çıxa bilib-bilmədiyini yoxlayır: birbaşa DNS və ICMP sorğuları, IPv6 çıxışı və sistem həllediciləri. Bağlantı aktiv olduqda başladın.",
+  "leakTestRun": "Yoxlayın",
+  "leakTestCancel": "Ləğv et",
+  "leakTestNeedsConnection": "Məlumat sızmasını yoxlamaq üçün VPN-ə qoşulun.",
+  "leakTestProgress": "Testlər tamamlandı: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "Heç bir sızma tapılmadı",
+  "leakTestFound": "{count, plural, one{# sızma tapıldı} other{# sızma tapıldı}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "Düzəlt",
+  "leakTestFixedNote": "Şəbəkə kilidi aktivdir. Yoxlamaq üçün testi yenidən başladın.",
+  "leakTestCheckDirectDns": "Birbaşa DNS",
+  "leakTestCheckIcmpEcho": "ICMP əks-səda",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "Sistemin ad həllediciləri",
+  "leakTestCheckTunnelConnectivity": "Tunel əlaqəsi",
+  "leakTestCheckTunnelDns": "DNS tunel vasitəsilə",
+  "noticeDegraded": "Server yavaşladı. Sora ölçmə zamanı tapılan ən yaxşı serverə keçdi.",
+  "obfs": "Trafikin maskalanması",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "Yeniləmə faylları buraxılışla dərc olunan yoxlama cəmləri ilə tutuşdurulur.",
+  "updateManualSigWarning": "Aşağıdakı fayllar buraxılışın yoxlama cəmlərinə uyğundur. Onları rəsmi buraxılışdan yükləmisinizsə, əmri icra edin.",
+  "updateVersionRevoked": "Tərtibatçı bu versiyanı geri götürdü. Lütfən, düzəliş edilmiş buraxılışı gözləyin.",
+  "updateRolloutPending": "Daha yeni versiya tədricən yayılır və avtomatik olaraq sizə təklif olunacaq.",
+  "updateRollbacking": "{version} versiyasına qayıdır...",
+  "updateRolledBack": "{version} yeniləməsi işləkliyin yoxlanışından keçmədi, buna görə Sora {fromVersion} versiyasına qaytarıldı.",
+  "updateRollbackError": "Avtomatik geri qaytarma uğursuz oldu. Yeni versiya işləmirsə, əvvəlki buraxılışı əl ilə yenidən quraşdırın.",
+  "updateRollbackCacheError": "Cari versiyanın təsdiqlənmiş geriyə qaytarma nüsxəsini hazırlamaq mümkün olmadı, ona görə də yeniləmə quraşdırılmadı.",
+  "extRatingLabel": "Qiymətləndirmə {rating}/5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "{author} tərəfindən",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "Quraşdırmalar: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 quraşdırma",
+  "extBadgeVerified": "Doğrulanmış",
+  "extBadgeTop": "Bu həftə ən populyar",
+  "extBadgeNew": "Yeni",
+  "extBadgeStaff": "Sora komandası",
+  "extSideloadShort": "Kataloqdan deyil",
+  "extSideloadWarning": "Bu genişləndirici komanda kataloqundan deyil. Onların açarına yalnız müəllif zəmanət verib: onu yalnız müəllifə güvəndiyiniz halda quraşdırın.",
+  "extInstallTitle": "«{name}» quraşdır",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "«{name}» yenilə",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "Bu genişləndirici aşağıdakıları edə biləcək:",
+  "extPermissionsWidened": "Yeniləmə yeni icazələr tələb edir:",
+  "extDangerousAck": "Mən başa düşürəm ki, bu icazələr ciddidir",
+  "extInstall": "Quraşdırın",
+  "extUpdate": "Yenilə",
+  "extCancel": "Ləğv et",
+  "extConfirm": "Təsdiq edin",
+  "extOk": "OK",
+  "extCatalog": "Kataloq",
+  "extInstalled": "Quraşdırılmış genişləndiricilər",
+  "extSearchHint": "Genişləndiriciləri axtar",
+  "extCatAll": "Hamısı",
+  "extCatTools": "Alətlər",
+  "extCatThemes": "Mövzular",
+  "extCatAutomation": "Avtomatlaşdırma",
+  "extCatStats": "Statistika",
+  "extCatNetwork": "Şəbəkə",
+  "extSortBy": "Sırala",
+  "extSortPopular": "Ən məşhur",
+  "extSortRating": "Ən yüksək reytinq",
+  "extSortName": "Adı",
+  "extCatalogError": "Kataloqu yükləmək mümkün olmadı",
+  "extRetry": "Yenidən cəhd edin",
+  "extEmptySearch": "Heç nə tapılmadı",
+  "extEmptyInstalled": "Hələlik əlavələr quraşdırılmayıb.\nKataloqda birini tapın və ya fayldan quraşdırın.",
+  "extInstallFromFile": "Fayldan quraşdırın",
+  "extInstallFromUrl": "URL-dan quraşdırın",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "Yüklə",
+  "extDownloading": "Endirilir...",
+  "extVerifying": "Doğrulanır...",
+  "extInstalling": "Quraşdırılır...",
+  "extInstallFailed": "Quraşdırma uğursuz oldu",
+  "extErrSignature": "İmza yoxlaması uğursuz oldu. Fayl zədələnmiş və ya dəyişdirilmiş ola bilər.",
+  "extErrManifest": "Genişləndirici manifesti etibarsızdır.",
+  "extErrNetwork": "Şəbəkə xətası. Bağlantınızı yoxlayın və yenidən cəhd edin.",
+  "extErrHash": "Yükləmə kataloqa uyğun gəlmir. Ola bilsin ki, ona müdaxilə edilib.",
+  "extErrMinApp": "Bu genişləndirici üçün tətbiqin {version} və ya daha yeni versiyası lazımdır.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "Yalnız https:// keçidlərə icazə verilir",
+  "extErrGeneric": "Nəsə xəta baş verdi. Yenidən cəhd edin.",
+  "extErrAuthorKeyChanged": "Bu yeniləmə quraşdırılmış versiyadan fərqli müəllif açarı ilə imzalanıb, ona görə də bloklanıb. Yeni açara güvənirsinizsə, genişləndiricini silin və açıq şəkildə yenidən quraşdırın.",
+  "extUpdateAvailable": "Yeniləmə mövcuddur",
+  "extDisabled": "Söndürülüb",
+  "extToggleEnabled": "{name} aktivləşdirin",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "Quraşdırılmış genişləndiricilərdə axtar",
+  "extUpdateAll": "Hamısını yeniləyin",
+  "extUpdatesAvailable": "{count} yeniləmələr mövcuddur",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} yeniləndi",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "Normal",
+  "extRiskSensitive": "Həssas",
+  "extRiskDangerous": "Yüksək risk",
+  "extPermissionsRemoved": "Artıq tələb olunmur:",
+  "extUpdateFailedKept": "Əvvəlki versiya hələ də quraşdırılıb.",
+  "extConflictsTitle": "Genişləndirici münaqişələri",
+  "extConflictsIntro": "Bu genişləndirmələr eyni şeyi istəyir. Hansının işləyəcəyini seçin, digəri quraşdırılmış qalacaq.",
+  "extConflictTheme": "Tətbiq mövzusu",
+  "extConflictNetHooks": "Şəbəkə qarmaqları",
+  "extConflictWinner": "Üstünlük: {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} münaqişələr sizin qərarınıza ehtiyac duyur",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "Münaqişələri həll edin",
+  "extConflictNote": "Seçiminiz bu cihazda saxlanılır. Mövzu dərhal dəyişir, şəbəkə hook-ları isə bu versiyada işləmir.",
+  "extVersionLabel": "Versiya {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "Müəllif",
+  "extRating": "Qiymətləndirmə",
+  "extInstalls": "Quraşdırmalar",
+  "extVersion": "Versiya",
+  "extAbout": "Bu genişləndirici haqqında",
+  "extPermissionsTitle": "İcazələr",
+  "extNoPermissions": "Xüsusi icazələr yoxdur.",
+  "extSettings": "Parametrlər",
+  "extSaveSettings": "Parametrləri yadda saxlayın",
+  "extSaving": "Saxlanır...",
+  "extUpdateTo": "{version} versiyasına yenilə",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "Aktivdir",
+  "extRollbackTo": "{version} versiyasına qaytar",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "{version} versiyasına geri qaytarılsın?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "Silin",
+  "extUninstallConfirm": "“{name}” və onun parametrləri silinsin?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "Panel əlçatan deyil. Genişləndirici söndürülmüş və ya silinmiş ola bilər.",
+  "extPermConnectionsRead": "Aktiv qoşulmaların siyahısına baxın",
+  "extPermServersRead": "Serverlərinizin siyahısına baxın",
+  "extPermSettingsRead": "Proqram parametrlərini oxuyun",
+  "extPermSettingsWrite": "Proqram parametrlərini dəyişdirin",
+  "extPermNotifications": "Bildirişləri göstərin",
+  "extPermTray": "Tepsi menyusuna elementlər əlavə edin",
+  "extPermUiPanel": "Proqram daxilində panelləri göstərin",
+  "extPermThemeApply": "Mövzuları tətbiq edin",
+  "extPermRoutingRules": "Marşrutlaşdırma qaydaları əlavə edin (şəbəkə trafikinin getdiyi yerə təsir edir)",
+  "extPermNetHooks": "Şəbəkə yoluna inteqrasiya edin (DPI bypass modulları)",
+  "extPermNetFetch": "İcazə verilən siyahıdan URL tələb edin",
+  "extPermBackground": "Fon tapşırıqlarını yerinə yetirin",
+  "extPermBackgroundDetail": "Panel bağlı olsa belə, planlaşdırılmış tapşırıqları icra edir. Siz onu dayandıra və ya genişləndirici parametrlərində nə qədər işlədiyini dəyişə bilərsiniz.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "Arxa fonda çalışır",
+  "extCapNetHook": "Bloklamadan yan keçid və şəbəkə müdaxilələri",
+  "extCapPanel": "İnterfeys panelləri",
+  "extCapRouting": "Marşrutlaşdırma qaydaları",
+  "extCapTheme": "Mövzular",
+  "extCapWidget": "Vidjetlər",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "Dəyişikliklər jurnalı",
+  "extImageFailed": "Şəkli yükləmək mümkün olmadı",
+  "extRatingHow": "Reytinqlər necə işləyir",
+  "extRatingHowBody": "Reytinqlər Bayes ortalamasından istifadə edir: bir neçə reytinqə malik genişləndirici daha çox insan səs verənə qədər ortada qalır, beləliklə, tək 5 ulduzlu baxış yeni genişləndiricini zirvəyə qaldıra bilməz. Son reytinqlər köhnələrdən daha ağırdır və hər hesab üçün yalnız bir reytinq sayılır.",
+  "extScreenshots": "Ekran görüntüləri",
+  "extSortRelevance": "Uyğunluq",
+  "extPermNetworkDetail": "İnternetdən VPN vasitəsilə məlumat yükləyir. Yalnız aşağıdakı siyahıdakı hostlara icazə var, qalanları bloklanır.",
+  "extBgTitle": "Fon tapşırığı",
+  "extBgEnabled": "Arxa fonda işləyin",
+  "extBgInterval": "İcra intervalı",
+  "extBgMinutes": "{count, plural, one{# dəqiqə} other{# dəqiqə}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# saat} other{# saat}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Tapşırıq Sora açıq olduqca, o cümlədən tray-də olanda cədvəl üzrə işləyir. Ən qısa interval 15 dəqiqədir.",
+  "extBgDisabledNote": "Fon tapşırığını idarə etmək üçün genişləndiricini aktivləşdirin.",
+  "extCapNetwork": "Şəbəkəyə giriş",
+  "extCapNetworkHosts": "Şəbəkə: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "QR kodunu paylaşın",
+  "qrScanTitle": "QR kodunu skan edin",
+  "qrCopyLink": "Linki kopyalayın",
+  "qrShowLink": "Linki göstər",
+  "qrHideLink": "Linki gizlədin",
+  "qrWarning": "Bu QR kodu əlaqə detallarını ehtiva edir. Yad adamlara göstərməyin.",
+  "qrScanHint": "QR kodlu ekran görüntüsü və ya foto seçin, ya da keçid yapışdırın",
+  "qrFromClipboard": "Buferdən yapışdırın",
+  "qrNoCode": "Bu şəkildə QR kod tapılmadı.",
+  "qrInvalid": "Bu QR kodunda etibarlı keçid yoxdur.",
+  "qrScan": "Skan QR",
+  "qrFromImage": "Şəkli aç",
+  "connGroupByProcess": "Prosesə görə qruplaşdırın",
+  "connListView": "Siyahı",
+  "connCopyHost": "Hostu kopyalayın",
+  "connAddRule": "Qayda əlavə edin",
+  "connConnectionsCount": "{count, plural, one{# bağlantı} other{# bağlantı}}",
+  "dnsPreset": "Əvvəlcədən",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "Fərdi",
+  "dnsCheck": "Məlumat sızmalarını yoxlayın",
+  "dnsChecking": "Yoxlanır...",
+  "dnsNoLeak": "Heç bir sızma tapılmadı",
+  "dnsLeakFound": "Sızma aşkar edildi",
+  "dnsLastCheck": "Son yoxlama",
+  "dnsNeverChecked": "Hələ sınaqdan keçirilməyib",
+  "dnsLeakCheckTunnelDns": "Tunelin DNS həllediciləri",
+  "dnsLeakCheckSystemResolvers": "Sistemin ad həllediciləri",
+  "dnsLeakCheckKillSwitchDns": "Şəbəkə kilidinin DNS qoruması",
+  "dnsLeakFixConfigureTunnelDns": "Yuxarıdakı DNS parametrlərində tunel üçün DNS konfiqurasiya edin.",
+  "dnsLeakFixReviewSystemResolvers": "Sisteminizin tuneldən kənarda hansı həlledicilərdən istifadə edəcəyini yoxlayın.",
+  "dnsLeakFixEnableKillSwitch": "DNS trafikinin tuneldə qalması üçün şəbəkə kilidini aktivləşdirin.",
+  "dnsLeakCheckEncryptedDns": "Əməliyyat sisteminin şifrələnmiş DNS-i",
+  "dnsLeakCheckDnsSpoof": "Saxta DNS cavablar",
+  "dnsLeakFixReviewEncryptedDns": "Sisteminizin tuneldən kənarda hansı şifrələnmiş DNS son nöqtələrindən istifadə etdiyini yoxlayın.",
+  "dnsLeakFixUseEncryptedDns": "Tunel üçün şifrələnmiş DNS (DoT və ya DoH) istifadə edin ki, həlledicilər cavabları saxtalaşdırmasın.",
+  "dnsCheckNeedsConnection": "Əvvəlcə VPN-ə qoşulun, sonra sızma olub olmadığını yoxlayın.",
+  "dnsExpected": "Gözlənilir",
+  "dnsActual": "Müşahidə edilmişdir",
+  "sortBy": "Sırala",
+  "sortPing": "Ping",
+  "sortSpeed": "Sürət",
+  "sortName": "Adı",
+  "measureSpeed": "Sürəti ölçün",
+  "benchmarkStale": "köhnəlmişdir",
+  "autoSelectMode": "Avtomatik server seçin",
+  "autoSelectPing": "Ən sürətli ping",
+  "autoSelectSpeed": "Ən sürətli sürət",
+  "autoSelectSmart": "Ağıllı seçim",
+  "coreWatchUnstable": "Sora nüvəsi ilə əlaqə qeyri-sabitdir",
+  "watchReconnect": "Yenidən qoşun",
+  "coreRestoringLink": "Sora nüvəsi ilə əlaqə bərpa edilir...",
+  "crashRestoreTitle": "Son seans yarımçıq kəsildi",
+  "restoreOnCrash": "Qəzadan sonra sessiyanı bərpa edin",
+  "crashRestore": "Bərpa edin",
+  "crashDismiss": "İndi yox",
+  "overrideTitle": "Düzəlişlərim",
+  "overrideEdit": "Serverləri redaktə edin",
+  "overrideHide": "Gizlət",
+  "overrideUnhide": "Göstər",
+  "overrideClear": "Redaktələri sıfırlayın",
+  "overrideEmpty": "Hələ redaktə yoxdur",
+  "overrideCustomRules": "Öz qaydaları",
+  "errBenchmarkUnsupported": "Sürətin ölçülməsi daha yeni bir nüvəyə ehtiyac duyur",
+  "benchmarkProgress": "{total}-dən {done} ölçülməsi…",
+  "profiles": "Şəbəkə profilləri",
+  "profilesEmpty": "Hələ profil yoxdur. Məlum şəbəkələrdə parametrləri avtomatik tətbiq etmək üçün birini yaradın.",
+  "profileAdd": "Profil əlavə edin",
+  "profileName": "Profil adı",
+  "profileSsids": "Wi-Fi şəbəkələri (SSID)",
+  "profileSsidsHint": "Ev, Ofis vergüllə ayrılmışdır",
+  "profileGateways": "Şəbəkə şlüzləri",
+  "profileAsns": "AS nömrələri",
+  "profileAutoApply": "Avtomatik tətbiq et",
+  "profileAutoApplyHint": "Söndürülübsə, profil tətbiq edilməzdən əvvəl təsdiq istənilir.",
+  "profileSnapshot": "Cari parametrləri yadda saxla",
+  "profileSnapshotDone": "Cari parametrlər profildə saxlandı",
+  "profileDelete": "Profili silin",
+  "profileDeleteConfirm": "\"{name}\" profili silinsin?",
+  "profileApplyAsk": "\"{name}\" profili tətbiq edilsin?",
+  "profileApply": "Tətbiq et",
+  "profileApplied": "“{name}” profili tətbiq edildi",
+  "profileUndo": "Ləğv et",
+  "profileActive": "Aktivdir",
+  "networkNow": "İndi: {info}",
+  "networkUnknown": "Şəbəkə məlumatı mövcud deyil",
+  "profileNoTriggers": "Ən azı bir tətik əlavə edin: SSID, şlüz və ya ASN",
+  "chains": "Proksi zəncirləri",
+  "chainsEmpty": "Hələ zəncir yoxdur. 2-3 serveri birləşdirin ki, trafik onların hər birindən keçsin.",
+  "chainAdd": "Yeni zəncir",
+  "chainName": "Zəncir adı",
+  "chainPickServers": "2-3 server seçin",
+  "chainOrderHint": "Yenidən sıralamaq üçün sürükləyin: trafik yuxarıdan daxil olur və aşağıdan çıxır.",
+  "chainTooFew": "Ən azı 2 server seçin",
+  "chainTooMany": "Zəncir ən çox 3 serverə malikdir",
+  "chainEstimate": "Təxmini gecikmə",
+  "chainSave": "Zənciri saxla",
+  "chainDelete": "Zənciri silin",
+  "chainDeleteConfirm": "\"{name}\" zənciri silinsin?",
+  "chainUnsupported": "Cari mühərrik zəncir qura bilməz",
+  "chainHopMissing": "Zəncir serverlərindən biri artıq mövcud deyil",
+  "chainHop": "Keçid {n}",
+  "chainEntry": "Giriş",
+  "chainExit": "Çıxış",
+  "sync": "Cihaz sinxronizasiyası",
+  "syncDevices": "Cihazlarım",
+  "syncEmpty": "Qoşalaşdırılmış cihazlar yoxdur. Yerli şəbəkə üzərindən başqa cihazı cütləşdirin.",
+  "syncPair": "Cihazı cütləşdirin",
+  "syncShowCode": "Kodumu göstər",
+  "syncScanCode": "Skan kodu",
+  "syncRevoke": "Geri götürün",
+  "syncRevokeConfirm": "\"{name}\" ləğv edilsin?",
+  "syncLastSync": "Son sinxronizasiya: {time}",
+  "syncNever": "Heç vaxt",
+  "syncNoLan": "Cihazlar eyni lokal şəbəkədə olmalıdır",
+  "syncPaired": "Cihaz qoşalaşdırıldı",
+  "syncPairingTitle": "Bu cihazla cütləşdirin",
+  "syncWaiting": "Digər cihaz gözlənilir...",
+  "syncSecureNote": "Uçdan uca şifrələnmiş kanal. Hesab yoxdur, bulud serverləri yoxdur.",
+  "zapretWithVpn": "Birbaşa şəbəkə trafiki üçün DPI filtrindən keçin",
+  "zapretWithVpnHint": "zapret VPN tuneli ilə yanaşı işləyir: tunel trafiki VPN-dən, birbaşa trafik isə bloklamadan yan keçid vasitəsindən keçir.",
+  "chainDuplicate": "Hər bir server yalnız bir dəfə görünə bilər",
+  "edit": "Redaktə et",
+  "remove": "Sil",
+  "autoSwitchOnDegrade": "Deqradasiyaya avtomatik keçid",
+  "autoSwitchOnDegradeDetail": "Seçilmiş server xeyli yavaşlayarsa və ya cavab verməzsə, Sora ölçmələrə görə ən yaxşı serverə keçir, lakin 10 dəqiqədə bir dəfədən çox olmayaraq.",
+  "tunStackMixed": "Qarışıq",
+  "tunStackSystem": "Sistem",
+  "syncCodeExpired": "Kodun müddəti bitib",
+  "syncDaemonFailed": "Sinxronizasiya xidmətini başlatmaq mümkün olmadı",
+  "syncDaemonMissing": "sora-sync komponenti tapılmadı. Cihaz sinxronizasiyasını aktivləşdirmək üçün proqramı yenidən quraşdırın.",
+  "syncDaemonStarting": "Sinxronizasiya xidmətinə start verilir...",
+  "syncErrAuth": "Sinxronizasiya xidməti giriş nişanını rədd etdi. Proqramı yenidən başladın və yenidən cəhd edin.",
+  "syncErrNotFound": "Cihaz artıq qoşalaşdırılmayıb",
+  "syncErrPairingActive": "Cütləşdirmə sessiyası artıq açıqdır",
+  "syncErrUnreachable": "Digər cihaz cavab vermədi. Onun eyni şəbəkədə olduğuna və kodunu göstərdiyinə əmin olun.",
+  "syncError": "Sinxronizasiya xətası",
+  "syncExpiresIn": "Kodun etibarlılığı {duration} sonra bitir",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "Cihazla qoşalaşır...",
+  "syncLegacyCleared": "Köhnə cihaz siyahısı heç vaxt faktiki olaraq qoşalaşdırılmamışdı, ona görə də təmizləndi. Bu dəfə real olaraq cihazlarınızı yenidən cütləşdirin.",
+  "syncNewCode": "Yeni kod",
+  "syncPairedWith": "{name} ilə qoşalaşmışdır",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "Təkrarlayın",
+  "syncStopShowing": "Kodu gizlət",
+  "syncSyncNow": "İndi sinxronlaşdır",
+  "syncSyncResult": "{pulled} alındı, göndərildi {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "Sinxronizasiya nəticəsi",
+  "syncPulled": "Qəbul edildi",
+  "syncPushed": "Göndərildi",
+  "syncNoChanges": "Heç bir dəyişiklik aşkar edilmədi",
+  "syncDocKindSubscriptions": "Abunəliklər",
+  "syncDocKindSettings": "Proqram parametrləri",
+  "syncDocKindOverrides": "Abunəlik düzəlişləri",
+  "syncDocKindProfiles": "Şəbəkə profilləri",
+  "syncDocKindChains": "Proksi zəncirləri",
+  "syncFrom": "{name} cihazından",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "Bu cihaz",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Shadowsocks üçün: üsul:parol, məsələn chacha20-ietf-poly1305:parol",
+  "diagnosticPackets": "Paket tutma",
+  "diagnosticEvents": "Windows hadisələri",
+  "diagnosticCapture": "10 saniyə çəkin",
+  "diagnosticRequiresTun": "Paket ələ keçirmək üçün aktiv Sora TUN bağlantısı lazımdır.",
+  "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil.",
+  "extErrRevoked": "Sora komandası bu genişləndirmə versiyasını təhlükəli və ya xarab olduğu üçün geri çağırdı.",
+  "extErrRevocationsExpired": "Geri çağırılmış genişləndirmələr siyahısı yenilənmədi. Yenilənənə qədər quraşdırma bağlıdır: şəbəkəni yoxlayın və yenidən cəhd edin.",
+  "extRevokedDisabled": "Geri çağırılmış genişləndirmələr söndürüldü: {names}",
+  "customServerWgPrivateKey": "Gizli açar",
+  "customServerWgAddresses": "İnterfeys ünvanları",
+  "customServerWgPeerKey": "Serverin açıq açarı",
+  "customServerWgPresharedKey": "Ümumi açar",
+  "customServerWgAllowedIps": "İcazəli IP-lər",
+  "customServerWgKeepalive": "Keepalive, saniyə",
+  "customServerWgKeyInvalid": "Açar wg genkey çıxardığı kimi base64-də 32 bayt olmalıdır.",
+  "customServerWgCidrInvalid": "Vergüllə ayrılmış prefikslər daxil edin, məsələn 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "0-dan 65535-ə qədər saniyə sayı daxil edin.",
+  "strictKillSwitch": "Sərt şəbəkə kilidi",
+  "strictKillSwitchWarning": "Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir.",
+  "extWorkerFailed": "Əlavənin fon tapşırığı uğursuz oldu. Əlavənin jurnalını yoxlayın.",
+  "extAssetRejected": "Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar."
 }

@@ -45,7 +45,11 @@ jobs:
         with:
           # osv-scanner 2 reads Go dependencies from go.mod; go.sum alone has no
           # extractor, and --skip-gitignore no longer exists.
+          # Reachability is the govulncheck job's work on the pinned Go; the
+          # action image ships an older Go than core/go.mod requires, so its
+          # own call analysis cannot load the packages.
           scan-args: |-
+            --no-call-analysis=go
             --lockfile=go.mod:core/go.mod
 
   codeql:

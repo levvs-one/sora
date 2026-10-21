@@ -25,9 +25,6 @@ class SId extends S {
   String get stateDisconnecting => 'Memutuskan sambungan';
 
   @override
-  String get stateFailed => 'Tidak terhubung';
-
-  @override
   String get coreMissing => 'Layanan Sora tidak merespons';
 
   @override
@@ -135,6 +132,9 @@ class SId extends S {
   String get logsEmpty => 'Tidak ada apa pun di sini';
 
   @override
+  String get connEmpty => 'Tidak ada koneksi';
+
+  @override
   String appVersion(String version) {
     return 'Versi $version';
   }
@@ -164,6 +164,16 @@ class SId extends S {
   @override
   String milliseconds(int n) {
     return '$n ms';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Mbps';
   }
 
   @override
@@ -255,9 +265,6 @@ class SId extends S {
   String get errNoServers => 'Tambahkan langganan untuk terhubung';
 
   @override
-  String get exportText => 'Teks';
-
-  @override
   String get connections => 'Koneksi';
 
   @override
@@ -273,7 +280,7 @@ class SId extends S {
   String get theme => 'Tema';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Ikuti sistem';
 
   @override
   String get themeLight => 'Lampu';
@@ -285,7 +292,7 @@ class SId extends S {
   String get language => 'Bahasa';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Ikuti sistem';
 
   @override
   String get sectionConnection => 'Koneksi';
@@ -496,17 +503,6 @@ class SId extends S {
   String get ruleInvalid => 'Ini tidak terlihat seperti situs, IP, atau program';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Server #, pada gilirannya',
-      one: 'Server #, pada gilirannya',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -521,9 +517,6 @@ class SId extends S {
   String get tunnelMode => 'Mode';
 
   @override
-  String get tunnelTun => 'Semua lalu lintas';
-
-  @override
   String get tunnelProxy => 'Proksi System';
 
   @override
@@ -534,6 +527,9 @@ class SId extends S {
 
   @override
   String get launchAtLogin => 'Mulailah dengan sistem';
+
+  @override
+  String get launchAtLoginDetail => 'Sora akan berjalan otomatis saat Anda masuk dan tetap berada di tray.';
 
   @override
   String get closeToTray => 'Simpan di dalam baki dalam keadaan tertutup';
@@ -634,28 +630,6 @@ class SId extends S {
   String get less => 'Lebih sedikit';
 
   @override
-  String get currentServer => 'Server saat ini';
-
-  @override
-  String get trafficDown => 'Diunduh';
-
-  @override
-  String get trafficUp => 'Diunggah';
-
-  @override
-  String perSecond(String value) {
-    return '$value/dtk';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Aturan aktif: $count';
-  }
-
-  @override
-  String get recentNotifications => 'Pemberitahuan terkini';
-
-  @override
   String get notificationsEmpty => 'Peristiwa koneksi dan langganan akan muncul di sini';
 
   @override
@@ -709,22 +683,13 @@ class SId extends S {
   String get runningProcesses => 'Proses yang berjalan';
 
   @override
-  String get programsFailed => 'Tidak dapat memuat aplikasi';
-
-  @override
   String get programsEmpty => 'Tidak ada aplikasi yang ditemukan. Coba nama lain.';
 
   @override
   String get selectExe => 'Pilih file .exe';
 
   @override
-  String get trafficUnavailable => 'Counter belum tersedia';
-
-  @override
   String get speedtest => 'Kecepatan';
-
-  @override
-  String get speedtestCheck => 'Periksa kecepatan';
 
   @override
   String get speedtestSearch => 'Temukan layanan';
@@ -819,6 +784,38 @@ class SId extends S {
       'Jalankan perintah ini di terminal untuk menginstal kedua paket terverifikasi, lalu buka kembali Sora. File-file tersebut tetap berada di direktori unduhan. Koneksi VPN akan terputus.';
 
   @override
+  String get updateSignaturePending => 'File pembaruan dicocokkan dengan checksum yang diterbitkan bersama rilis.';
+
+  @override
+  String get updateManualSigWarning =>
+      'File di bawah cocok dengan checksum rilis. Jalankan perintah jika Anda mengunduhnya dari rilis resmi.';
+
+  @override
+  String get updateVersionRevoked => 'Pengembang telah menarik versi ini. Harap tunggu rilis yang diperbaiki.';
+
+  @override
+  String get updateRolloutPending =>
+      'Versi yang lebih baru diluncurkan secara bertahap dan akan ditawarkan kepada Anda secara otomatis.';
+
+  @override
+  String updateRollbacking(String version) {
+    return 'Mengembalikan ke versi $version...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return 'Pembaruan ke $version tidak lolos pemeriksaan kesehatan, jadi Sora dibatalkan ke $fromVersion.';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'Pengembalian otomatis gagal. Jika versi baru tidak berfungsi, instal ulang rilis sebelumnya secara manual.';
+
+  @override
+  String get updateRollbackCacheError =>
+      'Tidak dapat menyiapkan salinan rollback terverifikasi dari versi saat ini, sehingga pembaruan tidak diinstal.';
+
+  @override
   String get updateCopyCommand => 'Salin perintah';
 
   @override
@@ -843,9 +840,6 @@ class SId extends S {
   String get componentLicenses => 'Lisensi komponen';
 
   @override
-  String get appCopyright => '© 2026 levvs-one dan kontributor';
-
-  @override
   String get collapseServers => 'Ciutkan server';
 
   @override
@@ -862,10 +856,6 @@ class SId extends S {
 
   @override
   String get reconnectNow => 'Terapkan dan sambungkan kembali';
-
-  @override
-  String get bypassLimitations =>
-      'Mode ini melewati DPI hanya untuk HTTP dan TLS, tidak mendukung UDP atau mengubah IP Anda. Gunakan server VPN untuk suara Discord, panggilan, dan alamat Telegram yang diblokir.';
 
   @override
   String get errEngineUnsupported =>
@@ -892,7 +882,7 @@ class SId extends S {
 
   @override
   String get modesGuide =>
-      'Pilih Otomatis jika Anda tidak yakin mesin mana yang dibutuhkan server Anda. Sora memeriksa profil dan pengaturan sebelum menghubungkan. Mesin tidak dapat meningkatkan bandwidth paket Anda: kinerja bergantung pada server, rute, protokol, dan jaringan.\n\n## Mode\n\n### Semua lalu lintas (TUN)\n\nSora membuat antarmuka jaringan virtual dan merutekan lalu lintas aplikasi melaluinya, termasuk TCP dan UDP. Gunakan mode ini untuk Telegram, game, dan suara Discord. Aturan dapat mengirim situs atau program tertentu secara langsung atau memblokirnya. Layanan jaringan memerlukan izin dan server yang mendukung protokol yang diperlukan.\n\n### Proksi System\n\nSora mengonfigurasi proksi HTTP/SOCKS lokal. Aplikasi yang menghormati pengaturan proxy sistem menggunakannya. Aplikasi dengan tumpukan jaringannya sendiri dapat terhubung secara langsung; UDP dan panggilan suara umumnya memerlukan TUN. Mode ini cocok untuk browser dan aplikasi dengan dukungan proxy.\n\n### Tidak ada server\n\nDi Linux, Sora menggunakan [zapret](https://github.com/bol-van/zapret) untuk membagi dan membentuk ulang permintaan HTTP/TLS dan melewati beberapa pemeriksaan DPI. IP Anda tetap sama dan koneksi langsung ke situs web. Hasil bergantung pada penyedia Anda dan metode pemblokiran.\n\nIntegrasi saat ini menggunakan tpws untuk HTTP dan TLS melalui TCP. Ini tidak melewati pemblokiran IP atau menyampaikan UDP, dan tidak dapat menjamin koneksi MTProto MTProto. Gunakan server VPN dengan TUN untuk suara Discord, panggilan Telegram dan pembatasan semacam ini.\n\n## Mesin\n\n### Otomatis\n\nSora memilih mesin terinstal yang mendukung seluruh paket koneksi: protokol server, transport, grup, fragmentasi, dan mode. Pilihan manual yang tidak kompatibel ditolak sebelum menghentikan koneksi saat ini. Pilih Otomatis atau mesin lain dan terapkan kembali pengaturannya.\n\n### sing-box\n\nPaket Sora baru mencakup [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), fork dari [sing-box](https://github.com/SagerNet/sing-box), menambahkan XHTTP dan VLESS Encryption sisi klien. Sora mengenali build dan kemampuannya. Build upstream tanpa XHTTP tidak mendapatkan kemampuan ini hanya dari namanya saja.\n\nProtokol yang didukung mencakup parameter VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard dan AmneziaWG 1.x/2.x Sora dapat mengimpor. Profil JSON Xray lengkap memerlukan Xray. Bidang AWG 3.x baru belum dapat diimpor. sing-box menggunakan port kontrol lokal yang dilindungi kata sandi, yang dapat dideteksi oleh aplikasi lain di komputer.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) mendukung fragmentasi VLESS, REALITY, XHTTP, VLESS Encryption dan TLS. Ini juga menjalankan profil lengkap penyedia Xray sambil mempertahankan perutean dan grupnya. Profil tersebut tidak dapat secara otomatis dikonversi ke mesin lain tanpa mengubah perilakunya.\n\nXray yang dibundel menghapus pengaturan yang menonaktifkan verifikasi sertifikat TLS (`allowInsecure`). Otomatis memilih sing-box atau mihomo untuk server biasa yang memerlukan pengaturan ini. Memilih Xray secara manual melaporkan ketidakcocokan sebelum menghentikan koneksi saat ini. Profil JSON lengkap yang lebih lama memerlukan profil penyedia yang diperbarui dengan sertifikat atau pin sertifikat yang dapat diverifikasi.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) mendukung grup fallback dan penyeimbang beban yang dipesan, XHTTP dan AmneziaWG. Pilih ketika failover otomatis ke server cadangan penting. Pengaturan fragmentasi TLS Sora tidak tersedia dengan mesin ini.\n\n## Kompatibilitas di Sora\n\n| Fitur | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN dan TCP/UDP | Ya | Ya | Ya |\n| XHTTP | Ya | Ya | Ya |\n| VLESS Encryption | Ya | Ya | Ya |\n| Profil lengkap Xray | Tidak | Ya | Tidak |\n| TUIC / AnyTLS | Keduanya | Tidak | TUIC |\n| Fragmentasi TLS | Ya | Ya | Tidak |\n| AmneziaWG 1.x/2.x | Ya¹ | Tidak | Ya |\n| Grup cadangan yang dipesan | Tidak | Tidak² | Ya |\n\n¹ Profil dengan J1/J2/J3/Itime menggunakan mihomo; bidang-bidang ini tidak boleh dibuang secara diam-diam. ² Untuk grup profil Xray lengkap, aplikasi memilih profil cadangan. Dukungan bergantung pada build yang diinstal; periksa versinya di Tentang.\n\n## Tumpukan TUN\n\nTumpukan menangani TCP dan UDP di dalam antarmuka virtual. Di panel mode, Xray dan mihomo menawarkan gVisor, System, Mixed dan MIPS. Setiap mesin menyimpan preferensinya sendiri. Proksi System dan mode Tanpa Server tidak menggunakan preferensi ini.\n\n- **Mixed** — TCP menggunakan tumpukan sistem, sedangkan gVisor menangani UDP. Ini adalah bawaan mihomo di Linux. Di Windows, Xray dan mihomo menggunakan MIPS secara bawaan.\n- **System** — menggunakan tumpukan sistem. Coba opsi lain jika aplikasi jaringan mengalami masalah.\n- **gVisor** — menangani lalu lintas di ruang pengguna.\n- **MIPS** — tumpukan IP milik mihomo, tersedia dalam paket versi 1.19.32.\n\nPada Linux, Xray menggunakan gVisor bawaannya secara default. System, Mixed dan MIPS di Linux menggunakan mihomo sebagai mesin TUN, meneruskan TCP dan UDP ke Xray melalui tautan SOCKS lokal yang diautentikasi. Xray mempertahankan protokol, profil penyedia, dan perutean. Ketiga opsi ini memerlukan mihomo yang diinstal. Pada Windows, Xray menggunakan mihomo 1.19.32 atau lebih baru untuk keempat tumpukan TUN. Protokol dan perutean tetap di Xray. Aturan aplikasi dalam kombinasi ini hanya mendukung koneksi langsung dan pemblokiran; di Linux aturan ini memerlukan gVisor bawaan Xray.\n\nJembatan menjalankan proses kedua. Dalam tiga pengukuran idle di Linux, memori fisik menggunakan sekitar 32–36 MiB lebih banyak daripada Xray TUN asli. Ini tidak mengukur beban pengunduhan: biaya CPU dan memori bergantung pada koneksi. sing-box tidak memiliki pemilih tumpukan. Tidak ada tumpukan yang menjamin kinerja lebih baik di setiap jaringan. Pilih tumpukan dan pilih Terapkan dan sambungkan kembali untuk mencobanya di jaringan Anda.\n\n## Menerapkan pengaturan\n\nMemilih server akan terhubung kembali secara otomatis. Pengaturan mode, mesin, DNS, dan aturan segera disimpan; selama koneksi aktif, klik Terapkan dan sambungkan kembali untuk menggunakannya. Memulai ulang mesin dapat mengganggu pengunduhan dan panggilan. Klik berulang kali tidak memulai koneksi paralel; pemutusan mengakhiri transisi dan melepaskan koneksi.\n\nInternet hanya melalui VPN memblokir lalu lintas langsung ketika terowongan terputus. Ini mempengaruhi keseluruhan mesin. Pemutusan hubungan secara eksplisit menghapus aturan Sora. Jika pembersihan tidak selesai, coba lagi putuskan sambungan dan buka log.\n\n## Dokumentasi proyek\n\n- [sing-box-lx: konfigurasi dan dukungan](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [dokumentasi sing-box](https://sing-box.sagernet.org/)\n- [dokumentasi Xray](https://xtls.github.io/)\n- [dokumentasi mihomo](https://wiki.metacubex.one/)\n- [zapret: pengoperasian dan batasan](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Pilih Otomatis jika Anda tidak yakin mesin mana yang dibutuhkan server Anda. Sora memeriksa profil dan pengaturan sebelum menghubungkan. Mesin tidak dapat meningkatkan bandwidth paket Anda: kinerja bergantung pada server, rute, protokol, dan jaringan.\n\n## Mode\n\n### Semua lalu lintas (TUN)\n\nSora membuat antarmuka jaringan virtual dan merutekan lalu lintas aplikasi melaluinya, termasuk TCP dan UDP. Gunakan mode ini untuk Telegram, game, dan suara Discord. Aturan dapat mengirim situs atau program tertentu secara langsung atau memblokirnya. Layanan jaringan memerlukan izin dan server yang mendukung protokol yang diperlukan.\n\n### Proksi System\n\nSora mengonfigurasi proksi HTTP/SOCKS lokal. Aplikasi yang menghormati pengaturan proxy sistem menggunakannya. Aplikasi dengan tumpukan jaringannya sendiri dapat terhubung secara langsung; UDP dan panggilan suara umumnya memerlukan TUN. Mode ini cocok untuk browser dan aplikasi dengan dukungan proxy.\n\n### Tidak ada server\n\nDi Linux, Sora menggunakan [zapret](https://github.com/bol-van/zapret) untuk membagi dan membentuk ulang permintaan HTTP/TLS dan melewati beberapa pemeriksaan DPI. IP Anda tetap sama dan koneksi langsung ke situs web. Hasil bergantung pada penyedia Anda dan metode pemblokiran.\n\nIntegrasi saat ini menggunakan tpws untuk HTTP dan TLS melalui TCP. Ini tidak melewati pemblokiran IP atau menyampaikan UDP, dan tidak dapat menjamin koneksi MTProto MTProto. Gunakan server VPN dengan TUN untuk suara Discord, panggilan Telegram dan pembatasan semacam ini.\n\n## Mesin\n\n### Otomatis\n\nSora memilih mesin terinstal yang mendukung seluruh paket koneksi: protokol server, transport, grup, fragmentasi, dan mode. Pilihan manual yang tidak kompatibel ditolak sebelum menghentikan koneksi saat ini. Pilih Otomatis atau mesin lain dan terapkan kembali pengaturannya.\n\n### sing-box\n\nPaket Sora baru mencakup [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), fork dari [sing-box](https://github.com/SagerNet/sing-box), menambahkan XHTTP dan VLESS Encryption sisi klien. Sora mengenali build dan kemampuannya. Build upstream tanpa XHTTP tidak mendapatkan kemampuan ini hanya dari namanya saja.\n\nProtokol yang didukung mencakup parameter VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard dan AmneziaWG 1.x/2.x Sora dapat mengimpor. Profil JSON Xray lengkap memerlukan Xray. Bidang AWG 3.x baru belum dapat diimpor. sing-box menggunakan port kontrol lokal yang dilindungi kata sandi, yang dapat dideteksi oleh aplikasi lain di komputer.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) mendukung fragmentasi VLESS, REALITY, XHTTP, VLESS Encryption dan TLS. Ini juga menjalankan profil lengkap penyedia Xray sambil mempertahankan perutean dan grupnya. Profil tersebut tidak dapat secara otomatis dikonversi ke mesin lain tanpa mengubah perilakunya.\n\nXray yang dibundel menghapus pengaturan yang menonaktifkan verifikasi sertifikat TLS (`allowInsecure`). Otomatis memilih sing-box atau mihomo untuk server biasa yang memerlukan pengaturan ini. Memilih Xray secara manual melaporkan ketidakcocokan sebelum menghentikan koneksi saat ini. Profil JSON lengkap yang lebih lama memerlukan profil penyedia yang diperbarui dengan sertifikat atau pin sertifikat yang dapat diverifikasi.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) mendukung grup fallback dan penyeimbang beban yang dipesan, XHTTP dan AmneziaWG. Pilih ketika failover otomatis ke server cadangan penting. Pengaturan fragmentasi TLS Sora tidak tersedia dengan mesin ini.\n\n## Kompatibilitas di Sora\n\n| Fitur | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN dan TCP/UDP | Ya | Ya | Ya |\n| XHTTP | Ya | Ya | Ya |\n| VLESS Encryption | Ya | Ya | Ya |\n| Profil lengkap Xray | Tidak | Ya | Tidak |\n| TUIC / AnyTLS | Keduanya | Tidak | TUIC |\n| Fragmentasi TLS | Ya | Ya | Tidak |\n| AmneziaWG 1.x/2.x | Ya¹ | Tidak | Ya |\n| Grup cadangan yang dipesan | Tidak | Tidak² | Ya |\n\n¹ Profil dengan J1/J2/J3/Itime menggunakan mihomo; bidang-bidang ini tidak boleh dibuang secara diam-diam. ² Untuk grup profil Xray lengkap, aplikasi memilih profil cadangan. Dukungan bergantung pada build yang diinstal; periksa versinya di Tentang.\n\n## Tumpukan TUN\n\nTumpukan menangani TCP dan UDP di dalam antarmuka virtual. Di panel mode, Xray dan mihomo menawarkan gVisor, System, Mixed dan MIPS. Setiap mesin menyimpan preferensinya sendiri. Proksi System dan mode Tanpa Server tidak menggunakan preferensi ini.\n\n- **Mixed**: TCP menggunakan tumpukan sistem, sedangkan gVisor menangani UDP. Ini adalah bawaan mihomo di Linux. Di Windows, Xray dan mihomo menggunakan MIPS secara bawaan.\n- **System**: menggunakan tumpukan sistem. Coba opsi lain jika aplikasi jaringan mengalami masalah.\n- **gVisor**: menangani lalu lintas di ruang pengguna.\n- **MIPS**: tumpukan IP milik mihomo, tersedia dalam paket versi 1.19.32.\n\nPada Linux, Xray menggunakan gVisor bawaannya secara default. System, Mixed dan MIPS di Linux menggunakan mihomo sebagai mesin TUN, meneruskan TCP dan UDP ke Xray melalui tautan SOCKS lokal yang diautentikasi. Xray mempertahankan protokol, profil penyedia, dan perutean. Ketiga opsi ini memerlukan mihomo yang diinstal. Pada Windows, Xray menggunakan mihomo 1.19.32 atau lebih baru untuk keempat tumpukan TUN. Protokol dan perutean tetap di Xray. Aturan aplikasi dalam kombinasi ini hanya mendukung koneksi langsung dan pemblokiran; di Linux aturan ini memerlukan gVisor bawaan Xray.\n\nJembatan menjalankan proses kedua. Dalam tiga pengukuran idle di Linux, memori fisik menggunakan sekitar 32–36 MiB lebih banyak daripada Xray TUN asli. Ini tidak mengukur beban pengunduhan: biaya CPU dan memori bergantung pada koneksi. sing-box tidak memiliki pemilih tumpukan. Tidak ada tumpukan yang menjamin kinerja lebih baik di setiap jaringan. Pilih tumpukan dan pilih Terapkan dan sambungkan kembali untuk mencobanya di jaringan Anda.\n\n## Menerapkan pengaturan\n\nMemilih server akan terhubung kembali secara otomatis. Pengaturan mode, mesin, DNS, dan aturan segera disimpan; selama koneksi aktif, klik Terapkan dan sambungkan kembali untuk menggunakannya. Memulai ulang mesin dapat mengganggu pengunduhan dan panggilan. Klik berulang kali tidak memulai koneksi paralel; pemutusan mengakhiri transisi dan melepaskan koneksi.\n\nInternet hanya melalui VPN memblokir lalu lintas langsung ketika terowongan terputus. Ini mempengaruhi keseluruhan mesin. Pemutusan hubungan secara eksplisit menghapus aturan Sora. Jika pembersihan tidak selesai, coba lagi putuskan sambungan dan buka log.\n\n## Dokumentasi proyek\n\n- [sing-box-lx: konfigurasi dan dukungan](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [dokumentasi sing-box](https://sing-box.sagernet.org/)\n- [dokumentasi Xray](https://xtls.github.io/)\n- [dokumentasi mihomo](https://wiki.metacubex.one/)\n- [zapret: pengoperasian dan batasan](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'Periksa server';
@@ -901,7 +891,438 @@ class SId extends S {
   String get extensions => 'Ekstensi';
 
   @override
-  String get extensionsSoon => 'Segera hadir';
+  String extRatingLabel(String rating) {
+    return 'Peringkat $rating dari 5';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return 'oleh $author';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'Instalasi: $count';
+  }
+
+  @override
+  String get extInstallOne => '1 pemasangan';
+
+  @override
+  String get extBadgeVerified => 'Terverifikasi';
+
+  @override
+  String get extBadgeTop => 'Paling populer minggu ini';
+
+  @override
+  String get extBadgeNew => 'Baru';
+
+  @override
+  String get extBadgeStaff => 'Tim Sora';
+
+  @override
+  String get extSideloadShort => 'Bukan dari katalog';
+
+  @override
+  String get extSideloadWarning =>
+      'Ekstensi ini bukan dari katalog tim. Hanya penulis yang menjamin kuncinya: instal hanya jika Anda memercayai penulisnya.';
+
+  @override
+  String extInstallTitle(String name) {
+    return 'Pasang “$name”';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return 'Perbarui “$name”';
+  }
+
+  @override
+  String get extPermissionsIntro => 'Ekstensi ini akan dapat:';
+
+  @override
+  String get extPermissionsWidened => 'Pembaruan meminta izin baru:';
+
+  @override
+  String get extDangerousAck => 'Saya memahami bahwa izin ini serius';
+
+  @override
+  String get extInstall => 'Pasang';
+
+  @override
+  String get extUpdate => 'Perbarui';
+
+  @override
+  String get extCancel => 'Batal';
+
+  @override
+  String get extConfirm => 'Konfirmasi';
+
+  @override
+  String get extOk => 'OK';
+
+  @override
+  String get extCatalog => 'Katalog';
+
+  @override
+  String get extInstalled => 'Ekstensi terpasang';
+
+  @override
+  String get extSearchHint => 'Cari ekstensi';
+
+  @override
+  String get extCatAll => 'Semuanya';
+
+  @override
+  String get extCatTools => 'Alat';
+
+  @override
+  String get extCatThemes => 'Tema';
+
+  @override
+  String get extCatAutomation => 'Otomatisasi';
+
+  @override
+  String get extCatStats => 'Statistik';
+
+  @override
+  String get extCatNetwork => 'Jaringan';
+
+  @override
+  String get extSortBy => 'Urutkan berdasarkan';
+
+  @override
+  String get extSortPopular => 'Paling populer';
+
+  @override
+  String get extSortRating => 'Nilai tertinggi';
+
+  @override
+  String get extSortName => 'Nama';
+
+  @override
+  String get extCatalogError => 'Tidak dapat memuat katalog';
+
+  @override
+  String get extRetry => 'Coba lagi';
+
+  @override
+  String get extEmptySearch => 'Tidak ada yang ditemukan';
+
+  @override
+  String get extEmptyInstalled => 'Belum ada ekstensi yang dipasang.\nTemukan satu di katalog atau instal dari file.';
+
+  @override
+  String get extInstallFromFile => 'Instal dari file';
+
+  @override
+  String get extInstallFromUrl => 'Instal dari URL';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'Unduh';
+
+  @override
+  String get extDownloading => 'Mengunduh…';
+
+  @override
+  String get extVerifying => 'Memverifikasi…';
+
+  @override
+  String get extInstalling => 'Memasang…';
+
+  @override
+  String get extInstallFailed => 'Penginstalan gagal';
+
+  @override
+  String get extErrSignature => 'Pemeriksaan tanda tangan gagal. File mungkin rusak atau diubah.';
+
+  @override
+  String get extErrManifest => 'Manifes ekstensi tidak valid.';
+
+  @override
+  String get extErrNetwork => 'Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.';
+
+  @override
+  String get extErrHash => 'Unduhan tidak sesuai dengan katalog. Ini mungkin telah dirusak.';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'Ekstensi ini memerlukan versi aplikasi $version atau lebih baru.';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'Hanya tautan https:// yang diperbolehkan';
+
+  @override
+  String get extErrGeneric => 'Ada yang tidak beres. Silakan coba lagi.';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'Pembaruan ini ditandatangani dengan kunci penulis yang berbeda dari versi yang diinstal, sehingga diblokir. Jika Anda memercayai kunci baru, copot pemasangan ekstensi dan pasang kembali secara eksplisit.';
+
+  @override
+  String get extUpdateAvailable => 'Pembaruan tersedia';
+
+  @override
+  String get extDisabled => 'Dinonaktifkan';
+
+  @override
+  String extToggleEnabled(String name) {
+    return 'Aktifkan $name';
+  }
+
+  @override
+  String get extSearchInstalled => 'Cari ekstensi terpasang';
+
+  @override
+  String get extUpdateAll => 'Perbarui semua';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return '$count pembaruan tersedia';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return '$count diperbarui';
+  }
+
+  @override
+  String get extRiskNormal => 'Biasa';
+
+  @override
+  String get extRiskSensitive => 'Sensitif';
+
+  @override
+  String get extRiskDangerous => 'Resiko tinggi';
+
+  @override
+  String get extPermissionsRemoved => 'Tidak lagi diminta:';
+
+  @override
+  String get extUpdateFailedKept => 'Versi sebelumnya masih terinstal.';
+
+  @override
+  String get extConflictsTitle => 'Konflik perluasan';
+
+  @override
+  String get extConflictsIntro =>
+      'Ekstensi ini menginginkan hal yang sama. Pilih mana yang berjalan; yang lain tetap terpasang.';
+
+  @override
+  String get extConflictTheme => 'Tema aplikasi';
+
+  @override
+  String get extConflictNetHooks => 'Kait jaringan';
+
+  @override
+  String extConflictWinner(String name) {
+    return '$name menang';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return '$count konflik membutuhkan keputusan Anda';
+  }
+
+  @override
+  String get extConflictsResolve => 'Selesaikan konflik';
+
+  @override
+  String get extConflictNote =>
+      'Pilihan Anda disimpan di perangkat ini. Tema langsung berganti; hook jaringan tidak dijalankan di versi ini.';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'Versi $version';
+  }
+
+  @override
+  String get extAuthor => 'Penulis';
+
+  @override
+  String get extRating => 'Peringkat';
+
+  @override
+  String get extInstalls => 'Instalasi';
+
+  @override
+  String get extVersion => 'Versi';
+
+  @override
+  String get extAbout => 'Tentang ekstensi ini';
+
+  @override
+  String get extPermissionsTitle => 'Izin';
+
+  @override
+  String get extNoPermissions => 'Tidak ada izin khusus.';
+
+  @override
+  String get extSettings => 'Pengaturan';
+
+  @override
+  String get extSaveSettings => 'Simpan pengaturan';
+
+  @override
+  String get extSaving => 'Menyimpan…';
+
+  @override
+  String extUpdateTo(String version) {
+    return 'Perbarui ke $version';
+  }
+
+  @override
+  String get extEnabled => 'Diaktifkan';
+
+  @override
+  String extRollbackTo(String version) {
+    return 'Kembalikan ke $version';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return 'Kembalikan ke versi $version?';
+  }
+
+  @override
+  String get extUninstall => 'Copot pemasangan';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return 'Hapus “$name” dan pengaturannya?';
+  }
+
+  @override
+  String get extPanelUnavailable => 'Panel tidak tersedia. Ekstensi mungkin telah dinonaktifkan atau dihapus.';
+
+  @override
+  String get extPermConnectionsRead => 'Lihat daftar koneksi aktif';
+
+  @override
+  String get extPermServersRead => 'Lihat daftar server Anda';
+
+  @override
+  String get extPermSettingsRead => 'Baca pengaturan aplikasi';
+
+  @override
+  String get extPermSettingsWrite => 'Mengubah pengaturan aplikasi';
+
+  @override
+  String get extPermNotifications => 'Tampilkan notifikasi';
+
+  @override
+  String get extPermTray => 'Tambahkan item ke menu baki';
+
+  @override
+  String get extPermUiPanel => 'Tampilkan panel di dalam aplikasi';
+
+  @override
+  String get extPermThemeApply => 'Terapkan tema';
+
+  @override
+  String get extPermRoutingRules => 'Tambahkan aturan perutean (mempengaruhi kemana lalu lintas jaringan pergi)';
+
+  @override
+  String get extPermNetHooks => 'Integrasikan ke jalur jaringan (DPI modul bypass)';
+
+  @override
+  String get extPermNetFetch => 'Minta URL dari daftar yang diizinkan';
+
+  @override
+  String get extPermBackground => 'Jalankan tugas latar belakang';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'Menjalankan tugas terjadwal bahkan ketika panel ditutup. Anda dapat menjeda atau mengubah frekuensi dijalankannya di pengaturan ekstensi.';
+
+  @override
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+
+  @override
+  String get extCapBackground => 'Berjalan di latar belakang';
+
+  @override
+  String get extCapNetHook => 'Pengelakan dan kait jaringan';
+
+  @override
+  String get extCapPanel => 'Panel antarmuka';
+
+  @override
+  String get extCapRouting => 'Aturan perutean';
+
+  @override
+  String get extCapTheme => 'Tema';
+
+  @override
+  String get extCapWidget => 'Widget';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Cached catalog, $date';
+  }
+
+  @override
+  String get extChangelog => 'Catatan Perubahan';
+
+  @override
+  String get extImageFailed => 'Tidak dapat memuat gambar';
+
+  @override
+  String get extRatingHow => 'Cara kerja pemeringkatan';
+
+  @override
+  String get extRatingHowBody =>
+      'Peringkat menggunakan rata-rata Bayesian: ekstensi dengan sedikit peringkat tetap berada di tengah hingga lebih banyak orang memilih, sehingga satu ulasan bintang 5 tidak dapat mendorong ekstensi baru ke atas. Peringkat terbaru lebih berbobot dibandingkan peringkat lama, dan hanya satu peringkat per akun yang dihitung.';
+
+  @override
+  String get extScreenshots => 'Tangkapan Layar';
+
+  @override
+  String get extSortRelevance => 'Relevansi';
+
+  @override
+  String get extPermNetworkDetail =>
+      'Mengambil data dari internet melalui VPN. Hanya host di bawah yang diizinkan, sisanya diblokir.';
+
+  @override
+  String get extBgTitle => 'Tugas latar belakang';
+
+  @override
+  String get extBgEnabled => 'Jalankan di latar belakang';
+
+  @override
+  String get extBgInterval => 'Jalankan setiap';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# menit');
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# jam');
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote =>
+      'Tugas berjalan sesuai jadwal selama Sora terbuka, termasuk saat di baki. Interval terpendek 15 menit.';
+
+  @override
+  String get extBgDisabledNote => 'Aktifkan ekstensi untuk mengelola tugas latar belakangnya.';
+
+  @override
+  String get extCapNetwork => 'Akses jaringan';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'Jaringan: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -910,6 +1331,664 @@ class SId extends S {
 
   @override
   String get diagnosticHttp => 'Diagnostik HTTP';
+
+  @override
+  String get diagnosticNoData => 'Belum ada permintaan yang tercatat. Buka situs tes kecepatan terlebih dahulu.';
+
+  @override
+  String get qrShareTitle => 'Bagikan kode QR';
+
+  @override
+  String get qrScanTitle => 'Pindai kode QR';
+
+  @override
+  String get qrCopyLink => 'Salin tautan';
+
+  @override
+  String get qrShowLink => 'Tampilkan tautan';
+
+  @override
+  String get qrHideLink => 'Sembunyikan tautan';
+
+  @override
+  String get qrWarning => 'Kode QR ini berisi detail koneksi. Jangan perlihatkan kepada orang asing.';
+
+  @override
+  String get qrScanHint => 'Pilih tangkapan layar atau foto berisi kode QR, atau tempel tautan';
+
+  @override
+  String get qrFromClipboard => 'Tempel dari papan klip';
+
+  @override
+  String get qrNoCode => 'Tidak ada kode QR di gambar ini.';
+
+  @override
+  String get qrInvalid => 'Kode QR ini tidak berisi tautan yang valid.';
+
+  @override
+  String get qrScan => 'Pindai QR';
+
+  @override
+  String get qrFromImage => 'Buka gambar';
+
+  @override
+  String get connGroupByProcess => 'Kelompokkan berdasarkan proses';
+
+  @override
+  String get connListView => 'Daftar';
+
+  @override
+  String get connCopyHost => 'Salin hostnya';
+
+  @override
+  String get connAddRule => 'Tambahkan aturan';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# koneksi');
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'Prasetel';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'Khusus';
+
+  @override
+  String get dnsCheck => 'Periksa kebocoran data';
+
+  @override
+  String get dnsChecking => 'Memeriksa...';
+
+  @override
+  String get dnsNoLeak => 'Tidak ditemukan kebocoran';
+
+  @override
+  String get dnsLeakFound => 'Kebocoran terdeteksi';
+
+  @override
+  String get dnsLastCheck => 'Pemeriksaan terakhir';
+
+  @override
+  String get dnsNeverChecked => 'Belum diuji';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'Resolver DNS terowongan';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'Resolver sistem';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Perlindungan DNS oleh pemutus jaringan';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Konfigurasikan DNS untuk terowongan dalam pengaturan DNS di atas.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Periksa penyelesai mana yang akan digunakan sistem Anda di luar terowongan.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Aktifkan pemutus jaringan agar lalu lintas DNS tetap di dalam terowongan.';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'DNS terenkripsi sistem operasi';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'Tanggapan DNS palsu';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Periksa titik akhir DNS terenkripsi mana yang digunakan sistem Anda di luar terowongan.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Gunakan DNS terenkripsi (DoT atau DoH) untuk terowongan agar resolver tidak dapat memalsukan jawaban.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Hubungkan ke VPN terlebih dahulu, lalu periksa kebocorannya.';
+
+  @override
+  String get dnsExpected => 'Diharapkan';
+
+  @override
+  String get dnsActual => 'Diamati';
+
+  @override
+  String get sortBy => 'Urutkan berdasarkan';
+
+  @override
+  String get sortPing => 'Ping';
+
+  @override
+  String get sortSpeed => 'Kecepatan';
+
+  @override
+  String get sortName => 'Nama';
+
+  @override
+  String get measureSpeed => 'Ukur kecepatan';
+
+  @override
+  String get benchmarkStale => 'ketinggalan jaman';
+
+  @override
+  String get autoSelectMode => 'Pilih server secara otomatis';
+
+  @override
+  String get autoSelectPing => 'Ping tercepat';
+
+  @override
+  String get autoSelectSpeed => 'Kecepatan tercepat';
+
+  @override
+  String get autoSelectSmart => 'Pilihan cerdas';
+
+  @override
+  String get coreWatchUnstable => 'Koneksi ke inti Sora tidak stabil';
+
+  @override
+  String get watchReconnect => 'Sambungkan kembali';
+
+  @override
+  String get coreRestoringLink => 'Memulihkan koneksi ke inti Sora…';
+
+  @override
+  String get crashRestoreTitle => 'Sesi terakhir diinterupsi';
+
+  @override
+  String get restoreOnCrash => 'Pulihkan sesi setelah crash';
+
+  @override
+  String get crashRestore => 'Pulihkan';
+
+  @override
+  String get crashDismiss => 'Tidak sekarang';
+
+  @override
+  String get overrideTitle => 'Hasil edit saya';
+
+  @override
+  String get overrideEdit => 'Mengedit server';
+
+  @override
+  String get overrideHide => 'Sembunyikan';
+
+  @override
+  String get overrideUnhide => 'Tunjukkan';
+
+  @override
+  String get overrideClear => 'Setel ulang pengeditan';
+
+  @override
+  String get overrideEmpty => 'Belum ada pengeditan';
+
+  @override
+  String get overrideCustomRules => 'Aturan sendiri';
+
+  @override
+  String get errBenchmarkUnsupported => 'Pengukuran kecepatan membutuhkan inti yang lebih baru';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return 'Pengukuran $done dari $total…';
+  }
+
+  @override
+  String get profiles => 'Profil jaringan';
+
+  @override
+  String get profilesEmpty =>
+      'Belum ada profil. Buat satu untuk menerapkan pengaturan secara otomatis pada jaringan yang dikenal.';
+
+  @override
+  String get profileAdd => 'Tambahkan profil';
+
+  @override
+  String get profileName => 'Nama profil';
+
+  @override
+  String get profileSsids => 'Wi-Fi jaringan (SSID)';
+
+  @override
+  String get profileSsidsHint => 'Beranda, Kantor dipisahkan dengan koma';
+
+  @override
+  String get profileGateways => 'Gerbang jaringan';
+
+  @override
+  String get profileAsns => 'AS nomor';
+
+  @override
+  String get profileAutoApply => 'Terapkan otomatis';
+
+  @override
+  String get profileAutoApplyHint => 'Jika dinonaktifkan, minta konfirmasi sebelum menerapkan profil.';
+
+  @override
+  String get profileSnapshot => 'Ingat pengaturan saat ini';
+
+  @override
+  String get profileSnapshotDone => 'Pengaturan saat ini disimpan ke dalam profil';
+
+  @override
+  String get profileDelete => 'Hapus profil';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return 'Hapus profil \"$name\"?';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return 'Terapkan profil \"$name\"?';
+  }
+
+  @override
+  String get profileApply => 'Terapkan';
+
+  @override
+  String profileApplied(Object name) {
+    return 'Profil “$name” diterapkan';
+  }
+
+  @override
+  String get profileUndo => 'Batal';
+
+  @override
+  String get profileActive => 'Aktif';
+
+  @override
+  String networkNow(Object info) {
+    return 'Sekarang: $info';
+  }
+
+  @override
+  String get networkUnknown => 'Info jaringan tidak tersedia';
+
+  @override
+  String get profileNoTriggers => 'Tambahkan setidaknya satu pemicu: SSID, gateway atau ASN';
+
+  @override
+  String get chains => 'Rantai proksi';
+
+  @override
+  String get chainsEmpty => 'Belum ada rantai. Tautkan 2–3 server sehingga lalu lintas melewati masing-masing server.';
+
+  @override
+  String get chainAdd => 'Rantai baru';
+
+  @override
+  String get chainName => 'Nama rantai';
+
+  @override
+  String get chainPickServers => 'Pilih 2–3 server';
+
+  @override
+  String get chainOrderHint => 'Seret untuk menyusun ulang: lalu lintas masuk di atas dan keluar di bawah.';
+
+  @override
+  String get chainTooFew => 'Pilih setidaknya 2 server';
+
+  @override
+  String get chainTooMany => 'Sebuah rantai menampung paling banyak 3 server';
+
+  @override
+  String get chainEstimate => 'Perkiraan latensi';
+
+  @override
+  String get chainSave => 'Simpan rantai';
+
+  @override
+  String get chainDelete => 'Hapus rantai';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return 'Hapus rantai \"$name\"?';
+  }
+
+  @override
+  String get chainUnsupported => 'Mesin yang ada saat ini tidak dapat membuat rantai';
+
+  @override
+  String get chainHopMissing => 'Salah satu server rantai tidak lagi tersedia';
+
+  @override
+  String chainHop(Object n) {
+    return 'Hop $n';
+  }
+
+  @override
+  String get chainEntry => 'Masuk';
+
+  @override
+  String get chainExit => 'Keluar';
+
+  @override
+  String get sync => 'Sinkronisasi perangkat';
+
+  @override
+  String get syncDevices => 'Perangkatku';
+
+  @override
+  String get syncEmpty => 'Tidak ada perangkat yang dipasangkan. Pasangkan perangkat lain melalui jaringan lokal.';
+
+  @override
+  String get syncPair => 'Pasangkan perangkat';
+
+  @override
+  String get syncShowCode => 'Tunjukkan kode saya';
+
+  @override
+  String get syncScanCode => 'Pindai kode';
+
+  @override
+  String get syncRevoke => 'Mundur';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return 'Cabut \"$name\"?';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'Sinkronisasi terakhir: $time';
+  }
+
+  @override
+  String get syncNever => 'Tidak pernah';
+
+  @override
+  String get syncNoLan => 'Perangkat harus berada di jaringan lokal yang sama';
+
+  @override
+  String get syncPaired => 'Perangkat dipasangkan';
+
+  @override
+  String get syncPairingTitle => 'Pasangkan dengan perangkat ini';
+
+  @override
+  String get syncWaiting => 'Menunggu perangkat lain…';
+
+  @override
+  String get syncSecureNote => 'Saluran terenkripsi ujung ke ujung. Tidak ada akun, tidak ada server cloud.';
+
+  @override
+  String get zapretWithVpn => 'Lewati pemfilteran DPI untuk lalu lintas jaringan langsung';
+
+  @override
+  String get zapretWithVpnHint =>
+      'Menjalankan zapret bersama terowongan VPN: lalu lintas terowongan memakai VPN, lalu lintas langsung melewati mekanisme pengelakan.';
+
+  @override
+  String get chainDuplicate => 'Setiap server hanya dapat muncul satu kali';
+
+  @override
+  String get edit => 'Sunting';
+
+  @override
+  String get remove => 'Hapus';
+
+  @override
+  String get autoSwitchOnDegrade => 'Aktifkan degradasi secara otomatis';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'Jika server yang dipilih sangat melambat atau berhenti merespons, Sora beralih ke server dengan hasil pengukuran terbaik, paling sering sekali setiap 10 menit.';
+
+  @override
+  String get tunStackMixed => 'Campur aduk';
+
+  @override
+  String get tunStackSystem => 'Sistem';
+
+  @override
+  String get customServerAdd => 'Tambahkan server khusus';
+
+  @override
+  String get customServers => 'Serverku';
+
+  @override
+  String get customServerName => 'Nama';
+
+  @override
+  String get customServerNameHint => 'Misalnya: VPS saya';
+
+  @override
+  String get customServerNameRequired => 'Masukkan nama';
+
+  @override
+  String get customServerAddress => 'Alamat';
+
+  @override
+  String get customServerAddressHint => 'example.com atau 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'Masukkan alamat server';
+
+  @override
+  String get customServerAddressInvalid => 'Alamat tidak valid';
+
+  @override
+  String get customServerPort => 'Port';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'Port harus berupa angka dari 1 hingga 65535';
+
+  @override
+  String get customServerProtocol => 'Protokol';
+
+  @override
+  String get customServerCredentials => 'Informasi masuk';
+
+  @override
+  String get customServerOptional => 'Opsional';
+
+  @override
+  String get customServerShowSecret => 'Tampilkan rahasia';
+
+  @override
+  String get customServerHideSecret => 'Sembunyikan rahasia';
+
+  @override
+  String get customServerBadge => 'khusus';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'Hapus server “$name”?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'Tambahkan server secara manual: alamat, port dan protokol';
+
+  @override
+  String get customServerTest => 'Tes';
+
+  @override
+  String get leakTestTitle => 'Uji kebocoran data';
+
+  @override
+  String get leakTestIntro =>
+      'Memeriksa apakah lalu lintas dapat keluar dari perangkat di luar terowongan: DNS dan ICMP langsung, lalu lintas keluar IPv6, serta resolver sistem. Jalankan saat terhubung.';
+
+  @override
+  String get leakTestRun => 'Periksa';
+
+  @override
+  String get leakTestCancel => 'Batal';
+
+  @override
+  String get leakTestNeedsConnection => 'Hubungkan ke VPN untuk menguji kebocoran data.';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'Tes selesai: $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'Tidak ditemukan kebocoran';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# kebocoran ditemukan');
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
+
+  @override
+  String get leakTestFix => 'Perbaiki';
+
+  @override
+  String get leakTestFixedNote => 'Pemutus jaringan aktif. Jalankan pengujian lagi untuk memastikannya.';
+
+  @override
+  String get leakTestCheckDirectDns => 'Langsung DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP gema';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'Resolver sistem';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Konektivitas terowongan';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS melalui terowongan';
+
+  @override
+  String get noticeDegraded =>
+      'Server menjadi lambat. Sora beralih ke server terbaik yang ditemukan selama pengukuran.';
+
+  @override
+  String get obfs => 'Penyamaran lalu lintas';
+
+  @override
+  String get syncCodeExpired => 'Kode telah kedaluwarsa';
+
+  @override
+  String get syncDaemonFailed => 'Tidak dapat memulai layanan sinkronisasi';
+
+  @override
+  String get syncDaemonMissing =>
+      'Komponen sora-sync tidak ditemukan. Instal ulang aplikasi untuk mengaktifkan sinkronisasi perangkat.';
+
+  @override
+  String get syncDaemonStarting => 'Memulai layanan sinkronisasi…';
+
+  @override
+  String get syncErrAuth => 'Layanan sinkronisasi menolak token akses. Mulai ulang aplikasi dan coba lagi.';
+
+  @override
+  String get syncErrNotFound => 'Perangkat tidak lagi dipasangkan';
+
+  @override
+  String get syncErrPairingActive => 'Sesi berpasangan sudah terbuka';
+
+  @override
+  String get syncErrUnreachable =>
+      'Perangkat lain tidak menjawab. Pastikan itu berada di jaringan yang sama dan menampilkan kodenya.';
+
+  @override
+  String get syncError => 'Kesalahan sinkronisasi';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'Kode kedaluwarsa dalam $duration';
+  }
+
+  @override
+  String get syncJoining => 'Memasangkan dengan perangkat…';
+
+  @override
+  String get syncLegacyCleared =>
+      'Daftar perangkat lama tidak pernah benar-benar dipasangkan, jadi daftar tersebut dihapus. Pasangkan kembali perangkat Anda, kali ini secara nyata.';
+
+  @override
+  String get syncNewCode => 'Kode baru';
+
+  @override
+  String syncPairedWith(String name) {
+    return 'Dipasangkan dengan $name';
+  }
+
+  @override
+  String get syncRetry => 'Ulangi';
+
+  @override
+  String get syncStopShowing => 'Sembunyikan kode';
+
+  @override
+  String get syncSyncNow => 'Sinkronkan sekarang';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Menerima $pulled, mengirim $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'Hasil sinkronisasi';
+
+  @override
+  String get syncPulled => 'Diterima';
+
+  @override
+  String get syncPushed => 'Terkirim';
+
+  @override
+  String get syncNoChanges => 'Tidak ada perubahan yang terdeteksi';
+
+  @override
+  String get syncDocKindSubscriptions => 'Langganan';
+
+  @override
+  String get syncDocKindSettings => 'Pengaturan aplikasi';
+
+  @override
+  String get syncDocKindOverrides => 'Penyesuaian berlangganan';
+
+  @override
+  String get syncDocKindProfiles => 'Profil jaringan';
+
+  @override
+  String get syncDocKindChains => 'Rantai proksi';
+
+  @override
+  String syncFrom(String name) {
+    return 'dari $name';
+  }
+
+  @override
+  String get syncThisDevice => 'Perangkat ini';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Untuk Shadowsocks: metode:kata sandi, misalnya chacha20-ietf-poly1305:sandi';
 
   @override
   String get diagnosticPackets => 'Penangkapan paket';
@@ -921,11 +2000,60 @@ class SId extends S {
   String get diagnosticCapture => 'Tangkap selama 10 detik';
 
   @override
-  String get diagnosticNoData => 'Belum ada permintaan yang tercatat. Buka situs tes kecepatan terlebih dahulu.';
-
-  @override
   String get diagnosticRequiresTun => 'Pengambilan paket memerlukan koneksi Sora TUN yang aktif.';
 
   @override
   String get diagnosticUnavailable => 'Diagnostik ini tidak tersedia pada platform ini.';
+
+  @override
+  String get extErrRevoked => 'Tim Sora menarik versi ekstensi ini karena tidak aman atau rusak.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Daftar ekstensi yang ditarik tidak dapat diperbarui. Pemasangan diblokir sampai diperbarui: periksa jaringan lalu coba lagi.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Ekstensi yang ditarik dimatikan: $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'Kunci privat';
+
+  @override
+  String get customServerWgAddresses => 'Alamat antarmuka';
+
+  @override
+  String get customServerWgPeerKey => 'Kunci publik server';
+
+  @override
+  String get customServerWgPresharedKey => 'Kunci prabagi';
+
+  @override
+  String get customServerWgAllowedIps => 'IP yang diizinkan';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, detik';
+
+  @override
+  String get customServerWgKeyInvalid => 'Kunci harus 32 byte base64, seperti keluaran wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Masukkan prefiks dipisah koma, misalnya 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Masukkan jumlah detik dari 0 sampai 65535.';
+
+  @override
+  String get strictKillSwitch => 'Pemutus jaringan ketat';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Setelah terhubung, memblokir lalu lintas di luar VPN meskipun terjadi kerusakan, mulai ulang, atau aplikasi ditutup. Akses hanya pulih setelah memutus koneksi atau menonaktifkan opsi ini. Setelah perangkat dimulai ulang, pemblokiran berlanjut hanya jika koneksi saat mulai diaktifkan.';
+
+  @override
+  String get extWorkerFailed => 'Tugas latar belakang ekstensi gagal. Periksa log ekstensi.';
+
+  @override
+  String get extAssetRejected => 'Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.';
 }

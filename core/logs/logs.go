@@ -149,7 +149,7 @@ func (c *Center) SetSettings(s Settings) Settings {
 }
 
 // truncateUTF8 cuts s to at most n bytes at a UTF-8 rune boundary, so the
-// result is always valid UTF-8 (SORA-L15).
+// result is always valid UTF-8.
 func truncateUTF8(s string, n int) string {
 	if len(s) <= n {
 		return s
@@ -169,8 +169,7 @@ func (c *Center) Write(at time.Time, level Level, source, message string) {
 		return
 	}
 	if len(message) > MaxMessageBytes {
-		// Cut at a rune boundary so the stored text stays valid UTF-8
-		// (SORA-L15).
+		// Cut at a rune boundary so the stored text stays valid UTF-8.
 		message = truncateUTF8(message, MaxMessageBytes) + " [cut]"
 	}
 	if at.IsZero() {

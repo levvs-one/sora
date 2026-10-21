@@ -91,6 +91,13 @@ class _AboutScreenState extends State<AboutScreen> {
         ),
         Group(
           children: [
+            // Persistent, non-alarming notice when the installed
+            // version was recalled via the rollout policy's blocked_versions.
+            if (updates.versionRevoked)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                child: Text(s.updateVersionRevoked, style: Styles.secondary.copyWith(color: palette.danger)),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: LayoutBuilder(
@@ -108,6 +115,14 @@ class _AboutScreenState extends State<AboutScreen> {
                       ),
               ),
             ),
+            // A newer release exists but this install's cohort is not
+            // included in the staged rollout yet: say so instead
+            // of silently showing nothing.
+            if (updates.rolloutPending && !updates.hasUpdate)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                child: Text(s.updateRolloutPending, style: Styles.secondary.copyWith(color: palette.ink2)),
+              ),
             if (release != null) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
@@ -155,14 +170,22 @@ class _AboutScreenState extends State<AboutScreen> {
                       onTap: canInstall && desktop != null
                           ? () => unawaited(
                               updates.install(
-                                confirmDrop: () => !mounted
-                                    ? Future.value(false)
-                                    : confirm(
-                                        context,
-                                        question: s.updateDropWarning,
-                                        action: s.refresh,
-                                        destructive: false,
-                                      ),
+                                confirmDrop: () {
+                                  // The download can outlive this screen; ask
+                                  // on the app-wide navigator so leaving About
+                                  // mid-download no longer silently discards
+                                  // the verified update (audit M19).
+                                  final context = desktop.navigator.currentContext;
+                                  if (context == null || !context.mounted) {
+                                    return Future.value(false);
+                                  }
+                                  return confirm(
+                                    context,
+                                    question: s.updateDropWarning,
+                                    action: s.refresh,
+                                    destructive: false,
+                                  );
+                                },
                                 launchWindows: desktop.launchUpdate,
                                 restartLinux: desktop.restartAfterUpdate,
                                 quit: desktop.quit,
@@ -178,10 +201,31 @@ class _AboutScreenState extends State<AboutScreen> {
                         backgroundColor: palette.field,
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        updates.progress == null ? s.updateInstalling : s.updateDownloading,
-                        style: Styles.caption.copyWith(color: palette.ink2),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(switch (updates.stage) {
+                              UpdateStage.checking => s.updateChecking,
+                              UpdateStage.installing => s.updateInstalling,
+                              _ => s.updateDownloading,
+                            }, style: Styles.caption.copyWith(color: palette.ink2)),
+                          ),
+                          if (updates.stage == UpdateStage.downloading || updates.stage == UpdateStage.checking)
+                            Pressable(
+                              onTap: updates.cancel,
+                              radius: 8,
+                              semanticButton: true,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                child: Text(s.cancel, style: Styles.caption.copyWith(color: palette.ink2)),
+                              ),
+                            ),
+                        ],
                       ),
+                      const SizedBox(height: 4),
+                      // Honest limitation (D15): file hashes are checked, but
+                      // the release signature is not verified in-app yet.
+                      Text(s.updateSignaturePending, style: Styles.caption.copyWith(color: palette.ink2)),
                     ],
                     if (!canInstall) ...[
                       const SizedBox(height: 8),
@@ -200,7 +244,39 @@ class _AboutScreenState extends State<AboutScreen> {
                   UpdateError.installation => s.updateInstallError,
                   UpdateError.connecting => s.updateWaitConnection,
                   UpdateError.unsupported => s.updateUnsupported,
-                }, style: Styles.secondary.copyWith(color: palette.danger)),
+                  UpdateError.rollback => s.updateRollbackError,
+                  UpdateError.rollbackCache => s.updateRollbackCacheError,
+                }, style: Styles.dangerSecondary(context)),
+              ),
+            // Automatic rollback status. The notice survives the
+            // restart the rollback performs (persisted in settings).
+            if (updates.rollbackTarget case final target? when updates.rollbackBusy)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(s.updateRollbacking(target), style: Styles.secondary.copyWith(color: palette.ink2)),
+              ),
+            if (updates.lastRollback case final notice?)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      s.updateRolledBack(notice.to, notice.from),
+                      style: Styles.secondary.copyWith(color: palette.ink2),
+                    ),
+                    const SizedBox(height: 8),
+                    Pressable(
+                      onTap: () => unawaited(updates.dismissRollbackNotice()),
+                      radius: 8,
+                      semanticButton: true,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Text(s.close, style: Styles.secondary.copyWith(color: palette.ink)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             if (updates.manualCommand case final command?)
               Padding(
@@ -208,6 +284,10 @@ class _AboutScreenState extends State<AboutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Honest fail-closed warning (D15): the manifest
+                    // signature was not verified, only the file hashes.
+                    Text(s.updateManualSigWarning, style: Styles.dangerSecondary(context)),
+                    const SizedBox(height: 8),
                     Text(s.updateManual, style: Styles.secondary.copyWith(color: palette.ink2)),
                     const SizedBox(height: 8),
                     SelectableText(
@@ -322,42 +402,56 @@ class _LicensesScreenState extends State<_LicensesScreen> {
           }
           final data = snapshot.data;
           if (data == null) return const Center(child: CircularProgressIndicator(strokeWidth: 2));
-          final query = _search.text.trim().toLowerCase();
-          final names = data.keys.where((name) => name.toLowerCase().contains(query)).toList()
-            ..sort(
-              (a, b) => a == b
-                  ? 0
-                  : a == 'Sora'
-                  ? -1
-                  : b == 'Sora'
-                  ? 1
-                  : a.toLowerCase().compareTo(b.toLowerCase()),
-            );
-          if (names.isEmpty) {
-            return Center(
-              child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
-            );
-          }
-          return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.sizeOf(context).width < 720 ? 72 : 20),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: ColoredBox(
-                color: palette.surface,
-                child: ListView.separated(
-                  key: const ValueKey('license-components'),
-                  padding: const EdgeInsets.all(4),
-                  itemCount: names.length,
-                  separatorBuilder: (_, _) =>
-                      Divider(height: 1, thickness: 0.5, indent: 12, endIndent: 12, color: palette.field),
-                  itemBuilder: (_, i) => LinkTile(
-                    key: ValueKey('license-${names[i]}'),
-                    title: names[i],
-                    onTap: () => unawaited(push(context, _LicenseText(name: names[i], entries: data[names[i]]!))),
+          // The component list listens to the search field through a
+          // ValueListenableBuilder, so typing rebuilds only the list, not
+          // the whole licenses screen (the program-picker pattern).
+          return ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _search,
+            builder: (context, value, _) {
+              final query = value.text.trim().toLowerCase();
+              // Lowercased keys are computed once per pass, not once per
+              // filter candidate and again per sort comparison (the
+              // benchmark screen's sort-keys pattern). The comparator's
+              // values are unchanged, so the order (Sora first, then
+              // case-insensitive) is identical.
+              final lower = {for (final name in data.keys) name: name.toLowerCase()};
+              final names = data.keys.where((name) => lower[name]!.contains(query)).toList()
+                ..sort(
+                  (a, b) => a == b
+                      ? 0
+                      : a == 'Sora'
+                      ? -1
+                      : b == 'Sora'
+                      ? 1
+                      : lower[a]!.compareTo(lower[b]!),
+                );
+              if (names.isEmpty) {
+                return Center(
+                  child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
+                );
+              }
+              return Padding(
+                padding: EdgeInsets.only(bottom: MediaQuery.sizeOf(context).width < 720 ? 72 : 20),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: ColoredBox(
+                    color: palette.surface,
+                    child: ListView.separated(
+                      key: const ValueKey('license-components'),
+                      padding: const EdgeInsets.all(4),
+                      itemCount: names.length,
+                      separatorBuilder: (_, _) =>
+                          Divider(height: 1, thickness: 0.5, indent: 12, endIndent: 12, color: palette.field),
+                      itemBuilder: (_, i) => LinkTile(
+                        key: ValueKey('license-${names[i]}'),
+                        title: names[i],
+                        onTap: () => unawaited(push(context, _LicenseText(name: names[i], entries: data[names[i]]!))),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),
@@ -372,7 +466,8 @@ class _LicensesScreenState extends State<_LicensesScreen> {
           borderRadius: BorderRadius.circular(12),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
           itemColor: palette.ink3,
-          onChanged: (_) => setState(() {}),
+          // No onChanged setState: the list above listens through
+          // ValueListenableBuilder on [_search].
         ),
         const SizedBox(height: 12),
       ],

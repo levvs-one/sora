@@ -5,7 +5,6 @@
   "stateConnected": "متصل شد",
   "stateReconnecting": "اتصال مجدد",
   "stateDisconnecting": "قطع شدن",
-  "stateFailed": "متصل نیست",
   "coreMissing": "سرویس Sora پاسخ نمی دهد",
   "serverAuto": "سریع ترین",
   "serverBypass": "بدون سرور",
@@ -41,6 +40,7 @@
   "export": "ذخیره در فایل",
   "clear": "پاک کردن",
   "logsEmpty": "اینجا هیچی",
+  "connEmpty": "بدون اتصال",
   "appVersion": "نسخه {version}",
   "notInstalled": "نصب نشده است",
   "sourceCode": "کد منبع",
@@ -75,17 +75,16 @@
   "errSubScheme": "پیوند باید با https:// شروع شود",
   "errSecretStore": "فضای ذخیره سازی Sora آسیب دیده یا در دسترس نیست",
   "errNoServers": "برای اتصال اشتراکی اضافه کنید",
-  "exportText": "متن",
   "connections": "اتصالات",
   "close": "بستن",
   "chainDirect": "مستقیم",
   "chainBlocked": "مسدود شده است",
   "theme": "موضوع",
-  "themeSystem": "System",
+  "themeSystem": "مطابق سیستم",
   "themeLight": "نور",
   "themeDark": "تاریک",
   "language": "زبان",
-  "languageSystem": "System",
+  "languageSystem": "مطابق سیستم",
   "sectionConnection": "اتصال",
   "sectionNoServer": "بدون سرور",
   "sectionPing": "پینگ کنید",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} باقی مانده است",
   "ruleInvalid": "این شبیه یک سایت، یک IP یا یک برنامه نیست",
   "tunnelMode": "حالت",
-  "tunnelTun": "تمام ترافیک",
   "tunnelProxy": "پروکسی System",
   "proxyAddress": "آدرس پروکسی",
   "copied": "کپی شده",
   "launchAtLogin": "با سیستم شروع کنید",
+  "launchAtLoginDetail": "Sora هنگام ورود به سیستم به‌طور خودکار اجرا می‌شود و در سینی سیستم باقی می‌ماند.",
   "closeToTray": "وقتی بسته است در سینی نگه دارید",
   "notifications": "اطلاعیه ها",
   "trayOpen": "Sora را باز کنید",
@@ -185,12 +184,6 @@
   "sidebarToggle": "نوار کناری را تغییر دهید",
   "more": "بیشتر",
   "less": "کمتر",
-  "currentServer": "سرور فعلی",
-  "trafficDown": "دانلود شد",
-  "trafficUp": "آپلود شد",
-  "perSecond": "{value}/s",
-  "activeRules": "قوانین فعال: {count}",
-  "recentNotifications": "اطلاعیه های اخیر",
   "notificationsEmpty": "رویدادهای اتصال و اشتراک در اینجا ظاهر می شوند",
   "retryConnect": "اتصال را دوباره امتحان کنید",
   "openLogs": "لاگ ها را باز کنید",
@@ -208,12 +201,9 @@
   "chooseProgram": "یک برنامه را انتخاب کنید",
   "installedApps": "برنامه های نصب شده",
   "runningProcesses": "فرآیندهای در حال اجرا",
-  "programsFailed": "برنامه ها بارگیری نشد",
   "programsEmpty": "هیچ برنامه ای یافت نشد نام دیگری را امتحان کنید.",
   "selectExe": "یک فایل exe را انتخاب کنید",
-  "trafficUnavailable": "شمارنده ها هنوز در دسترس نیستند",
   "speedtest": "سرعت",
-  "speedtestCheck": "سرعت را بررسی کنید",
   "speedtestSearch": "یک سرویس پیدا کنید",
   "speedtestEmpty": "هیچ مسابقه ای وجود ندارد. جستجو را تغییر دهید",
   "speedtestBackToList": "بازگشت به خدمات",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "دستور کپی",
   "updateChecksDisabled": "بررسی خودکار در تنظیمات غیرفعال است.",
   "updateInstalled": "آپدیت نصب شد Sora را دوباره باز کنید.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "پروژه",
   "githubReleases": "منتشر و دانلود می شود",
   "telegramChannel": "کانال Telegram",
   "licenses": "مجوزها",
   "componentLicenses": "مجوزهای کامپوننت",
-  "appCopyright": "© 2026 levvs-one و همکاران",
   "collapseServers": "جمع کردن سرورها",
   "expandServers": "سرورها را گسترش دهید",
   "hideDescription": "مخفی کردن توضیحات",
   "showDescription": "نمایش توضیحات",
   "pendingConnectionChanges": "برای اعمال این تغییرات دوباره وصل شوید.",
   "reconnectNow": "درخواست کنید و دوباره وصل شوید",
-  "bypassLimitations": "این حالت DPI را فقط برای HTTP و TLS دور می‌زند، از UDP پشتیبانی نمی‌کند یا IP شما را تغییر نمی‌دهد. از سرور VPN برای صدای Discord، تماس ها و آدرس های مسدود شده Telegram استفاده کنید.",
   "errEngineUnsupported": "موتور انتخاب شده از این نمایه یا تنظیمات پشتیبانی نمی کند. Auto یا موتور سازگار را انتخاب کنید.",
   "errRestore": "پاکسازی اتصال ناقص بود. قطع ارتباط مجدد را امتحان کنید. برای جزئیات به لاگ مراجعه کنید",
   "errSessionEnded": "این جلسه قبلاً به پایان رسیده است. وضعیت اتصال را بازخوانی کنید.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "حالت ها و موتورها",
   "probeServers": "سرورها را بررسی کنید",
   "expiresIn": "{name}: {days, plural, =0{اشتراک در چند ساعت به پایان می رسد} one{اشتراک در روز # به پایان می رسد} other{اشتراک در روزهای # به پایان می رسد}}",
-  "groupOrdered": "{count, plural, one{سرور # به نوبه خود} other{سرورهای # به نوبه خود}}",
   "groupBest": "{count, plural, one{سرور #، سریعترین} other{سرورهای #، سریعترین}}",
-  "modesGuide": "اگر مطمئن نیستید که سرور شما به کدام موتور نیاز دارد، Auto را انتخاب کنید. Sora نمایه و تنظیمات را قبل از اتصال بررسی می کند. یک موتور نمی تواند پهنای باند طرح شما را افزایش دهد: عملکرد به سرور، مسیر، پروتکل و شبکه بستگی دارد.\n\n## حالت ها\n\n### همه ترافیک (TUN)\n\nSora یک رابط شبکه مجازی ایجاد می کند و ترافیک برنامه ها از جمله TCP و UDP را از طریق آن هدایت می کند. از این حالت برای Telegram، بازی ها و صدای Discord استفاده کنید. قوانین می توانند سایت ها یا برنامه های خاصی را مستقیما ارسال کنند یا آنها را مسدود کنند. سرویس شبکه به مجوز و سروری نیاز دارد که از پروتکل مورد نیاز پشتیبانی کند.\n\n### پروکسی System\n\nSora یک پروکسی محلی HTTP/SOCKS را پیکربندی می کند. برنامه هایی که به تنظیمات پراکسی سیستم احترام می گذارند از آن استفاده می کنند. برنامه های کاربردی با پشته شبکه خود ممکن است مستقیماً متصل شوند. UDP و تماس های صوتی به طور کلی به TUN نیاز دارند. این حالت برای مرورگرها و برنامه های دارای پشتیبانی از پروکسی مناسب است.\n\n### بدون سرور\n\nدر Linux، Sora از [zapret](https://github.com/bol-van/zapret) برای تقسیم و تغییر شکل درخواست‌های HTTP/TLS و دور زدن برخی از بررسی‌های DPI استفاده می‌کند. IP شما ثابت می ماند و اتصالات مستقیماً به وب سایت می روند. نتایج به ارائه دهنده شما و روش مسدود کردن بستگی دارد.\n\nادغام فعلی از tpws برای HTTP و TLS روی TCP استفاده می کند. از مسدود کردن IP یا رله UDP عبور نمی کند و نمی تواند اتصالات Telegram MTProto را تضمین کند. از یک سرور VPN با TUN برای صدای Discord، تماس های Telegram و این نوع محدودیت ها استفاده کنید.\n\n## موتورها\n\n### خودکار\n\nSora موتور نصب شده ای را انتخاب می کند که از کل طرح اتصال پشتیبانی می کند: پروتکل های سرور، حمل و نقل، گروه ها، تکه تکه شدن و حالت. انتخاب دستی ناسازگار قبل از توقف اتصال فعلی رد می شود. Auto یا موتور دیگری را انتخاب کنید و دوباره تنظیمات را اعمال کنید.\n\n### sing-box\n\nبسته‌های جدید Sora شامل [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)، چنگال [sing-box](https://github.com/SagerNet/sing-box)، اضافه کردن XHTTP و VLESS Encryption سمت مشتری است. Sora ساخت و قابلیت های آن را تشخیص می دهد. یک ساخت بالادستی بدون XHTTP این قابلیت را به تنهایی از نام خود به دست نمی آورد.\n\nپروتکل‌های پشتیبانی‌شده شامل VLESS، VMess، Trojan، Shadowsocks، Hysteria2، TUIC، AnyTLS، WireGuard و پارامترهای AmneziaWG 1.x/2.x هستند که Sora می‌تواند وارد کند. پروفایل کامل Xray JSON به Xray نیاز دارد. وارد کردن فیلدهای جدید AWG 3.x هنوز امکان‌پذیر نیست. sing-box از یک درگاه کنترل محلی محافظت‌شده با گذرواژه استفاده می‌کند که برنامه‌های دیگر روی رایانه می‌توانند آن را شناسایی کنند.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) از تکه تکه شدن VLESS، REALITY، XHTTP، VLESS Encryption و TLS پشتیبانی می کند. همچنین پروفیل های کامل ارائه دهنده Xray را اجرا می کند و در عین حال مسیریابی و گروه های آنها را حفظ می کند. چنین پروفایل هایی را نمی توان بدون تغییر رفتار به طور خودکار به موتور دیگری تبدیل کرد.\n\nXray همراه، تنظیمی را که تأیید گواهی TLS را غیرفعال می‌کرد («allowInsecure») حذف کرد. خودکار sing-box یا mihomo را برای سرورهای معمولی که به این تنظیم نیاز دارند انتخاب می کند. انتخاب Xray به صورت دستی ناسازگاری را قبل از توقف اتصال فعلی گزارش می کند. نمایه‌های کامل JSON قدیمی‌تر به نمایه ارائه‌دهنده به‌روزرسانی شده با گواهی یا پین گواهی قابل تأیید نیاز دارند.\n\n### mihomo\n\n[mihomo] (https://github.com/MetaCubeX/mihomo) از گروه‌های بازگشتی و متعادل‌کننده بار سفارش‌داده‌شده، XHTTP و AmneziaWG پشتیبانی می‌کند. زمانی آن را انتخاب کنید که خطای خودکار به سرور پشتیبان مهم است. تنظیم تکه تکه شدن TLS Sora با این موتور در دسترس نیست.\n\n## سازگاری در Sora\n\n| ویژگی | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN و TCP/UDP | بله | بله | بله |\n| XHTTP | بله | بله | بله |\n| VLESS Encryption | بله | بله | بله |\n| پروفایل کامل Xray | نه | بله | نه |\n| TUIC / AnyTLS | هر دو | نه | TUIC |\n| تکه تکه شدن TLS | بله | بله | نه |\n| AmneziaWG 1.x/2.x | بله¹ | نه | بله |\n| گروه بازگشتی سفارشی | نه | No² | بله |\n\n¹ نمایه‌های دارای J1/J2/J3/Itime از mihomo استفاده می‌کنند. این زمینه ها هرگز نباید بی سر و صدا کنار گذاشته شوند. ² برای گروهی از نمایه‌های کامل Xray، برنامه یک نمایه پشتیبان انتخاب می‌کند. پشتیبانی بستگی به ساخت نصب شده دارد. نسخه آن را در About چک کنید.\n\n## پشته TUN\n\nپشته TCP و UDP را در داخل رابط مجازی کنترل می کند. در پانل حالت ها، Xray و mihomo gVisor، System، Mixed و MIPS را ارائه می دهند. هر موتور اولویت خود را ذخیره می کند. پروکسی System و حالت‌های بدون سرور از این اولویت استفاده نمی‌کنند.\n\n- **Mixed** - TCP از پشته سیستم استفاده می کند، در حالی که gVisor UDP را کنترل می کند. این پیش‌فرض mihomo در Linux است. در Windows، Xray و mihomo به‌طور پیش‌فرض از MIPS استفاده می‌کنند.\n- **System** - از پشته سیستم استفاده می کند. اگر برنامه های شبکه با مشکل مواجه شدند، گزینه دیگری را امتحان کنید.\n- **gVisor** - ترافیک در فضای کاربران را کنترل می کند.\n- **MIPS** — پشته IP اختصاصی mihomo، موجود در نسخه همراه 1.19.32.\n\nدر Linux، Xray به طور پیش فرض از gVisor داخلی خود استفاده می کند. System، Mixed و MIPS در Linux از mihomo به عنوان موتور TUN استفاده می‌کنند و TCP و UDP را به Xray از طریق پیوند محلی SOCKS تأیید شده ارسال می‌کنند. Xray پروتکل، مشخصات ارائه دهنده و مسیریابی را حفظ می کند. این سه گزینه به mihomo نصب شده نیاز دارند. در Windows، Xray برای هر چهار پشته TUN از mihomo 1.19.32 یا جدیدتر استفاده می‌کند. پروتکل‌ها و مسیریابی در Xray باقی می‌مانند. قوانین برنامه‌ها در این ترکیب فقط اتصال مستقیم و مسدودسازی را پشتیبانی می‌کنند؛ در Linux این قوانین به gVisor داخلی Xray نیاز دارند.\n\nپل فرآیند دوم را اجرا می کند. در سه اندازه گیری غیرفعال در Linux، از حافظه فیزیکی 32 تا 36 مگابایت بیشتر از Xray TUN استفاده کرد. این بار دانلود را اندازه نمی‌گیرد: هزینه‌های CPU و حافظه به اتصالات بستگی دارد. sing-box انتخابگر پشته ندارد. هیچ پشته ای عملکرد بهتر را در هر شبکه ای تضمین نمی کند. یک پشته را انتخاب کنید و Apply را انتخاب کنید و دوباره متصل شوید تا آن را در شبکه خود امتحان کنید.\n\n## اعمال تنظیمات\n\nانتخاب سرور به طور خودکار دوباره متصل می شود. تنظیمات حالت، موتور، DNS و قوانین بلافاصله ذخیره می شوند. در طول یک اتصال فعال، روی Apply کلیک کنید و دوباره متصل شوید تا از آنها استفاده کنید. راه اندازی مجدد موتور ممکن است بارگیری ها و تماس ها را قطع کند. کلیک های مکرر اتصالات موازی را شروع نمی کنند. قطع کردن انتقال به پایان می رسد و اتصال آزاد می شود.\n\nاینترنت فقط از طریق VPN ترافیک مستقیم را هنگام سقوط یک تونل مسدود می کند. کل دستگاه را تحت تأثیر قرار می دهد. قطع صریح قوانین Sora را حذف می کند. اگر پاکسازی تمام نشد، دوباره سعی کنید اتصال را قطع کرده و گزارش را باز کنید.\n\n## مستندات پروژه\n\n- [sing-box-lx: پیکربندی و پشتیبانی] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [مستندات sing-box] (https://sing-box.sagernet.org/)\n- [اسناد Xray] (https://xtls.github.io/)\n- [مستندات mihomo] (https://wiki.metacubex.one/)\n- [zapret: عملیات و محدودیت ها] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "اگر مطمئن نیستید که سرور شما به کدام موتور نیاز دارد، Auto را انتخاب کنید. Sora نمایه و تنظیمات را قبل از اتصال بررسی می کند. یک موتور نمی تواند پهنای باند طرح شما را افزایش دهد: عملکرد به سرور، مسیر، پروتکل و شبکه بستگی دارد.\n\n## حالت ها\n\n### همه ترافیک (TUN)\n\nSora یک رابط شبکه مجازی ایجاد می کند و ترافیک برنامه ها از جمله TCP و UDP را از طریق آن هدایت می کند. از این حالت برای Telegram، بازی ها و صدای Discord استفاده کنید. قوانین می توانند سایت ها یا برنامه های خاصی را مستقیما ارسال کنند یا آنها را مسدود کنند. سرویس شبکه به مجوز و سروری نیاز دارد که از پروتکل مورد نیاز پشتیبانی کند.\n\n### پروکسی System\n\nSora یک پروکسی محلی HTTP/SOCKS را پیکربندی می کند. برنامه هایی که به تنظیمات پراکسی سیستم احترام می گذارند از آن استفاده می کنند. برنامه های کاربردی با پشته شبکه خود ممکن است مستقیماً متصل شوند. UDP و تماس های صوتی به طور کلی به TUN نیاز دارند. این حالت برای مرورگرها و برنامه های دارای پشتیبانی از پروکسی مناسب است.\n\n### بدون سرور\n\nدر Linux، Sora از [zapret](https://github.com/bol-van/zapret) برای تقسیم و تغییر شکل درخواست‌های HTTP/TLS و دور زدن برخی از بررسی‌های DPI استفاده می‌کند. IP شما ثابت می ماند و اتصالات مستقیماً به وب سایت می روند. نتایج به ارائه دهنده شما و روش مسدود کردن بستگی دارد.\n\nادغام فعلی از tpws برای HTTP و TLS روی TCP استفاده می کند. از مسدود کردن IP یا رله UDP عبور نمی کند و نمی تواند اتصالات Telegram MTProto را تضمین کند. از یک سرور VPN با TUN برای صدای Discord، تماس های Telegram و این نوع محدودیت ها استفاده کنید.\n\n## موتورها\n\n### خودکار\n\nSora موتور نصب شده ای را انتخاب می کند که از کل طرح اتصال پشتیبانی می کند: پروتکل های سرور، حمل و نقل، گروه ها، تکه تکه شدن و حالت. انتخاب دستی ناسازگار قبل از توقف اتصال فعلی رد می شود. Auto یا موتور دیگری را انتخاب کنید و دوباره تنظیمات را اعمال کنید.\n\n### sing-box\n\nبسته‌های جدید Sora شامل [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)، چنگال [sing-box](https://github.com/SagerNet/sing-box)، اضافه کردن XHTTP و VLESS Encryption سمت مشتری است. Sora ساخت و قابلیت های آن را تشخیص می دهد. یک ساخت بالادستی بدون XHTTP این قابلیت را به تنهایی از نام خود به دست نمی آورد.\n\nپروتکل‌های پشتیبانی‌شده شامل VLESS، VMess، Trojan، Shadowsocks، Hysteria2، TUIC، AnyTLS، WireGuard و پارامترهای AmneziaWG 1.x/2.x هستند که Sora می‌تواند وارد کند. پروفایل کامل Xray JSON به Xray نیاز دارد. وارد کردن فیلدهای جدید AWG 3.x هنوز امکان‌پذیر نیست. sing-box از یک درگاه کنترل محلی محافظت‌شده با گذرواژه استفاده می‌کند که برنامه‌های دیگر روی رایانه می‌توانند آن را شناسایی کنند.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) از تکه تکه شدن VLESS، REALITY، XHTTP، VLESS Encryption و TLS پشتیبانی می کند. همچنین پروفیل های کامل ارائه دهنده Xray را اجرا می کند و در عین حال مسیریابی و گروه های آنها را حفظ می کند. چنین پروفایل هایی را نمی توان بدون تغییر رفتار به طور خودکار به موتور دیگری تبدیل کرد.\n\nXray همراه، تنظیمی را که تأیید گواهی TLS را غیرفعال می‌کرد («allowInsecure») حذف کرد. خودکار sing-box یا mihomo را برای سرورهای معمولی که به این تنظیم نیاز دارند انتخاب می کند. انتخاب Xray به صورت دستی ناسازگاری را قبل از توقف اتصال فعلی گزارش می کند. نمایه‌های کامل JSON قدیمی‌تر به نمایه ارائه‌دهنده به‌روزرسانی شده با گواهی یا پین گواهی قابل تأیید نیاز دارند.\n\n### mihomo\n\n[mihomo] (https://github.com/MetaCubeX/mihomo) از گروه‌های بازگشتی و متعادل‌کننده بار سفارش‌داده‌شده، XHTTP و AmneziaWG پشتیبانی می‌کند. زمانی آن را انتخاب کنید که خطای خودکار به سرور پشتیبان مهم است. تنظیم تکه تکه شدن TLS Sora با این موتور در دسترس نیست.\n\n## سازگاری در Sora\n\n| ویژگی | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN و TCP/UDP | بله | بله | بله |\n| XHTTP | بله | بله | بله |\n| VLESS Encryption | بله | بله | بله |\n| پروفایل کامل Xray | نه | بله | نه |\n| TUIC / AnyTLS | هر دو | نه | TUIC |\n| تکه تکه شدن TLS | بله | بله | نه |\n| AmneziaWG 1.x/2.x | بله¹ | نه | بله |\n| گروه بازگشتی سفارشی | نه | No² | بله |\n\n¹ نمایه‌های دارای J1/J2/J3/Itime از mihomo استفاده می‌کنند. این زمینه ها هرگز نباید بی سر و صدا کنار گذاشته شوند. ² برای گروهی از نمایه‌های کامل Xray، برنامه یک نمایه پشتیبان انتخاب می‌کند. پشتیبانی بستگی به ساخت نصب شده دارد. نسخه آن را در About چک کنید.\n\n## پشته TUN\n\nپشته TCP و UDP را در داخل رابط مجازی کنترل می کند. در پانل حالت ها، Xray و mihomo gVisor، System، Mixed و MIPS را ارائه می دهند. هر موتور اولویت خود را ذخیره می کند. پروکسی System و حالت‌های بدون سرور از این اولویت استفاده نمی‌کنند.\n\n- **Mixed** - TCP از پشته سیستم استفاده می کند، در حالی که gVisor UDP را کنترل می کند. این پیش‌فرض mihomo در Linux است. در Windows، Xray و mihomo به‌طور پیش‌فرض از MIPS استفاده می‌کنند.\n- **System** - از پشته سیستم استفاده می کند. اگر برنامه های شبکه با مشکل مواجه شدند، گزینه دیگری را امتحان کنید.\n- **gVisor** - ترافیک در فضای کاربران را کنترل می کند.\n- **MIPS**: پشته IP اختصاصی mihomo، موجود در نسخه همراه 1.19.32.\n\nدر Linux، Xray به طور پیش فرض از gVisor داخلی خود استفاده می کند. System، Mixed و MIPS در Linux از mihomo به عنوان موتور TUN استفاده می‌کنند و TCP و UDP را به Xray از طریق پیوند محلی SOCKS تأیید شده ارسال می‌کنند. Xray پروتکل، مشخصات ارائه دهنده و مسیریابی را حفظ می کند. این سه گزینه به mihomo نصب شده نیاز دارند. در Windows، Xray برای هر چهار پشته TUN از mihomo 1.19.32 یا جدیدتر استفاده می‌کند. پروتکل‌ها و مسیریابی در Xray باقی می‌مانند. قوانین برنامه‌ها در این ترکیب فقط اتصال مستقیم و مسدودسازی را پشتیبانی می‌کنند؛ در Linux این قوانین به gVisor داخلی Xray نیاز دارند.\n\nپل فرآیند دوم را اجرا می کند. در سه اندازه گیری غیرفعال در Linux، از حافظه فیزیکی 32 تا 36 مگابایت بیشتر از Xray TUN استفاده کرد. این بار دانلود را اندازه نمی‌گیرد: هزینه‌های CPU و حافظه به اتصالات بستگی دارد. sing-box انتخابگر پشته ندارد. هیچ پشته ای عملکرد بهتر را در هر شبکه ای تضمین نمی کند. یک پشته را انتخاب کنید و Apply را انتخاب کنید و دوباره متصل شوید تا آن را در شبکه خود امتحان کنید.\n\n## اعمال تنظیمات\n\nانتخاب سرور به طور خودکار دوباره متصل می شود. تنظیمات حالت، موتور، DNS و قوانین بلافاصله ذخیره می شوند. در طول یک اتصال فعال، روی Apply کلیک کنید و دوباره متصل شوید تا از آنها استفاده کنید. راه اندازی مجدد موتور ممکن است بارگیری ها و تماس ها را قطع کند. کلیک های مکرر اتصالات موازی را شروع نمی کنند. قطع کردن انتقال به پایان می رسد و اتصال آزاد می شود.\n\nاینترنت فقط از طریق VPN ترافیک مستقیم را هنگام سقوط یک تونل مسدود می کند. کل دستگاه را تحت تأثیر قرار می دهد. قطع صریح قوانین Sora را حذف می کند. اگر پاکسازی تمام نشد، دوباره سعی کنید اتصال را قطع کرده و گزارش را باز کنید.\n\n## مستندات پروژه\n\n- [sing-box-lx: پیکربندی و پشتیبانی] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [مستندات sing-box] (https://sing-box.sagernet.org/)\n- [اسناد Xray] (https://xtls.github.io/)\n- [مستندات mihomo] (https://wiki.metacubex.one/)\n- [zapret: عملیات و محدودیت ها] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -458,20 +441,581 @@
     }
   },
   "extensions": "برنامه های افزودنی",
-  "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست.",
-  "diagnosticEvents": "رویدادهای ویندوز",
-  "diagnosticCapture": "به مدت 10 ثانیه عکس بگیرید",
   "diagnosticNoData": "هنوز درخواستی ثبت نشده است. ابتدا یک وب سایت تست سرعت باز کنید.",
-  "diagnosticRequiresTun": "ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.",
-  "extensionsSoon": "به زودی",
   "exportLogFile": "در {name}",
   "diagnosticHttp": "تشخیص HTTP",
-  "diagnosticPackets": "ضبط بسته",
   "@exportLogFile": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "افزودن سرور سفارشی",
+  "customServers": "سرورهای من",
+  "customServerName": "نام",
+  "customServerNameHint": "به عنوان مثال: VPS من",
+  "customServerNameRequired": "نام را وارد کنید",
+  "customServerAddress": "نشانی",
+  "customServerAddressHint": "example.com یا 192.0.2.1",
+  "customServerAddressRequired": "آدرس سرور را وارد کنید",
+  "customServerAddressInvalid": "آدرس نامعتبر است",
+  "customServerPort": "درگاه",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "پورت باید از 1 تا 65535 باشد",
+  "customServerProtocol": "پروتکل",
+  "customServerCredentials": "اطلاعات ورود",
+  "customServerOptional": "اختیاری",
+  "customServerShowSecret": "نمایش راز",
+  "customServerHideSecret": "مخفی کردن راز",
+  "customServerBadge": "سفارشی",
+  "customServerDeleteConfirm": "سرور \"{name}\" حذف شود؟",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "سرور را به صورت دستی اضافه کنید: آدرس، پورت و پروتکل",
+  "customServerTest": "آزمایش",
+  "leakTestTitle": "تست نشت داده ها",
+  "leakTestIntro": "بررسی می‌کند آیا ترافیک می‌تواند خارج از تونل از دستگاه خارج شود: درخواست‌های مستقیم DNS و ICMP، خروجی IPv6 و تحلیلگرهای نام سیستم. هنگام اتصال اجرا کنید.",
+  "leakTestRun": "بررسی کنید",
+  "leakTestCancel": "لغو",
+  "leakTestNeedsConnection": "برای آزمایش نشت داده به VPN متصل شوید.",
+  "leakTestProgress": "آزمایشات تکمیل شده: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "هیچ نشتی یافت نشد",
+  "leakTestFound": "{count, plural, one{# نشت پیدا شد} other{# نشت پیدا شد}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "رفع کنید",
+  "leakTestFixedNote": "قطع اضطراری روشن است. برای بررسی، آزمایش را دوباره اجرا کنید.",
+  "leakTestCheckDirectDns": "مستقیم DNS",
+  "leakTestCheckIcmpEcho": "ICMP اکو",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "تحلیلگرهای نام سیستم",
+  "leakTestCheckTunnelConnectivity": "اتصال تونل",
+  "leakTestCheckTunnelDns": "DNS از طریق تونل",
+  "noticeDegraded": "سرور کند شد. Sora به بهترین سروری که در حین اندازه‌گیری یافت شد تغییر داد.",
+  "obfs": "مبهم‌سازی ترافیک",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "فایل‌های به‌روزرسانی با چک‌سام‌های منتشرشده همراه نسخه مقایسه می‌شوند.",
+  "updateManualSigWarning": "فایل‌های زیر با چک‌سام‌های نسخه مطابقت دارند. اگر آن‌ها را از نسخهٔ رسمی دانلود کرده‌اید، فرمان را اجرا کنید.",
+  "updateVersionRevoked": "توسعه دهنده این نسخه را پس گرفته است. لطفا منتظر انتشار تصحیح شده باشید.",
+  "updateRolloutPending": "نسخه جدیدتر به تدریج در حال انتشار است و به طور خودکار به شما ارائه می شود.",
+  "updateRollbacking": "بازگشت به نسخه {version}...",
+  "updateRolledBack": "به‌روزرسانی {version} از بررسی سلامت عبور نکرد، بنابراین Sora به {fromVersion} بازگشت.",
+  "updateRollbackError": "بازگشت خودکار شکست خورد. اگر نسخه جدید کار نمی کند، نسخه قبلی را دوباره به صورت دستی نصب کنید.",
+  "updateRollbackCacheError": "یک کپی بازگشتی تأیید شده از نسخه فعلی تهیه نشد، بنابراین به‌روزرسانی نصب نشد.",
+  "extRatingLabel": "رتبه {rating} از 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "توسط {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "نصب: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 نصب",
+  "extBadgeVerified": "تأیید شد",
+  "extBadgeTop": "محبوب ترین این هفته",
+  "extBadgeNew": "جدید",
+  "extBadgeStaff": "تیم Sora",
+  "extSideloadShort": "نه از کاتالوگ",
+  "extSideloadWarning": "این برنامه افزودنی از کاتالوگ تیم نیست. فقط نویسنده کلید خود را تضمین کرده است: فقط در صورتی آن را نصب کنید که به نویسنده اعتماد دارید.",
+  "extInstallTitle": "نصب «{name}»",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "به‌روزرسانی «{name}»",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "این برنامه افزودنی قادر خواهد بود:",
+  "extPermissionsWidened": "به روز رسانی مجوزهای جدید را می خواهد:",
+  "extDangerousAck": "می‌دانم که این مجوزها جدی هستند",
+  "extInstall": "نصب",
+  "extUpdate": "به‌روزرسانی",
+  "extCancel": "لغو",
+  "extConfirm": "تأیید کنید",
+  "extOk": "OK",
+  "extCatalog": "کاتالوگ",
+  "extInstalled": "برنامه های افزودنی نصب شده",
+  "extSearchHint": "جستجوی برنامه‌های افزودنی",
+  "extCatAll": "همه",
+  "extCatTools": "ابزار",
+  "extCatThemes": "پوسته‌ها",
+  "extCatAutomation": "اتوماسیون",
+  "extCatStats": "آمار",
+  "extCatNetwork": "شبکه",
+  "extSortBy": "مرتب سازی بر اساس",
+  "extSortPopular": "محبوب ترین",
+  "extSortRating": "بالاترین امتیاز",
+  "extSortName": "نام",
+  "extCatalogError": "کاتالوگ بارگیری نشد",
+  "extRetry": "دوباره امتحان کنید",
+  "extEmptySearch": "چیزی پیدا نشد",
+  "extEmptyInstalled": "هنوز هیچ برنامه افزودنی نصب نشده است.\nیکی را در کاتالوگ پیدا کنید یا از یک فایل نصب کنید.",
+  "extInstallFromFile": "نصب از فایل",
+  "extInstallFromUrl": "نصب از URL",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "دانلود کنید",
+  "extDownloading": "در حال بارگیری…",
+  "extVerifying": "در حال تأیید…",
+  "extInstalling": "در حال نصب…",
+  "extInstallFailed": "نصب انجام نشد",
+  "extErrSignature": "بررسی امضا انجام نشد. ممکن است فایل آسیب دیده یا دستکاری شده باشد.",
+  "extErrManifest": "مانیفست افزونه نامعتبر است.",
+  "extErrNetwork": "خطای شبکه. اتصال خود را بررسی کنید و دوباره امتحان کنید.",
+  "extErrHash": "دانلود با کاتالوگ مطابقت ندارد. ممکن است دستکاری شده باشد.",
+  "extErrMinApp": "این برنامه افزودنی به نسخه برنامه {version} یا جدیدتر نیاز دارد.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "فقط پیوندهای https:// مجاز هستند",
+  "extErrGeneric": "مشکلی پیش آمد. لطفا دوباره امتحان کنید.",
+  "extErrAuthorKeyChanged": "این به روز رسانی با یک کلید نویسنده متفاوت از نسخه نصب شده امضا شده است، بنابراین مسدود شد. اگر به کلید جدید اعتماد دارید، برنامه افزودنی را حذف نصب کنید و دوباره آن را به صراحت نصب کنید.",
+  "extUpdateAvailable": "به‌روزرسانی موجود است",
+  "extDisabled": "غیرفعال",
+  "extToggleEnabled": "{name} را فعال کنید",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "جستجوی برنامه‌های افزودنی نصب‌شده",
+  "extUpdateAll": "به روز رسانی همه",
+  "extUpdatesAvailable": "{count} به روز رسانی موجود است",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} به روز شد",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "عادی",
+  "extRiskSensitive": "حساس",
+  "extRiskDangerous": "ریسک بالا",
+  "extPermissionsRemoved": "دیگر درخواست نمی‌شود:",
+  "extUpdateFailedKept": "نسخه قبلی هنوز نصب است.",
+  "extConflictsTitle": "تعارضات پسوند",
+  "extConflictsIntro": "این افزونه‌ها یک چیز را می‌خواهند. انتخاب کنید کدام اجرا شود؛ دیگری نصب‌شده می‌ماند.",
+  "extConflictTheme": "تم برنامه",
+  "extConflictNetHooks": "قلاب های شبکه",
+  "extConflictWinner": "اولویت با {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "تعارضات {count} به تصمیم شما نیاز دارد",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "تعارضات را حل کنید",
+  "extConflictNote": "انتخاب شما روی این دستگاه ذخیره می‌شود. پوسته فوراً عوض می‌شود، اما هوک‌های شبکه در این نسخه اجرا نمی‌شوند.",
+  "extVersionLabel": "نسخه {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "نویسنده",
+  "extRating": "رتبه بندی",
+  "extInstalls": "دفعات نصب",
+  "extVersion": "نسخه",
+  "extAbout": "درباره این پسوند",
+  "extPermissionsTitle": "مجوزها",
+  "extNoPermissions": "بدون مجوزهای خاص.",
+  "extSettings": "تنظیمات",
+  "extSaveSettings": "ذخیرهٔ تنظیمات",
+  "extSaving": "در حال ذخیره…",
+  "extUpdateTo": "ارتقا به {version}",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "فعال",
+  "extRollbackTo": "بازگشت به {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "بازگشت به نسخه {version}؟",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "حذف نصب کنید",
+  "extUninstallConfirm": "\"{name}\" و تنظیمات آن حذف شود؟",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "پانل در دسترس نیست. پسوند ممکن است غیرفعال یا حذف شده باشد.",
+  "extPermConnectionsRead": "لیست اتصالات فعال را ببینید",
+  "extPermServersRead": "فهرستی از سرورهای خود را ببینید",
+  "extPermSettingsRead": "تنظیمات برنامه را بخوانید",
+  "extPermSettingsWrite": "تنظیمات برنامه را تغییر دهید",
+  "extPermNotifications": "نمایش اعلان‌ها",
+  "extPermTray": "موارد را به منوی سینی اضافه کنید",
+  "extPermUiPanel": "نمایش پانل های داخل برنامه",
+  "extPermThemeApply": "تم ها را اعمال کنید",
+  "extPermRoutingRules": "قوانین مسیریابی را اضافه کنید (بر جایی که ترافیک شبکه می رود تأثیر می گذارد)",
+  "extPermNetHooks": "ادغام در مسیر شبکه (DPI ماژول های دور زدن)",
+  "extPermNetFetch": "URL را از لیست مجاز درخواست کنید",
+  "extPermBackground": "وظایف پس زمینه را اجرا کنید",
+  "extPermBackgroundDetail": "کارهای برنامه ریزی شده را حتی زمانی که پانل بسته است اجرا می کند. می‌توانید آن را موقتاً متوقف کنید یا تعداد دفعات اجرای آن را در تنظیمات برنامه افزودنی تغییر دهید.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "در پس‌زمینه اجرا می‌شود",
+  "extCapNetHook": "دور زدن محدودیت‌ها و قلاب‌های شبکه",
+  "extCapPanel": "پانل های رابط",
+  "extCapRouting": "قوانین مسیریابی",
+  "extCapTheme": "پوسته‌ها",
+  "extCapWidget": "ابزارک‌ها",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "تغییرات",
+  "extImageFailed": "تصویر بارگیری نشد",
+  "extRatingHow": "رتبه بندی چگونه کار می کند",
+  "extRatingHowBody": "رتبه‌بندی‌ها از میانگین بیزی استفاده می‌کنند: برنامه‌های افزودنی با رتبه‌بندی‌های کم تا زمانی که افراد بیشتری رای دهند، نزدیک به وسط می‌ماند، بنابراین یک بررسی 5 ستاره نمی‌تواند یک برنامه افزودنی جدید را به بالاترین سطح برساند. رتبه‌بندی‌های اخیر بیشتر از رتبه‌بندی‌های قدیمی هستند و تنها یک رتبه برای هر حساب حساب می‌شود.",
+  "extScreenshots": "تصاویر",
+  "extSortRelevance": "ربط",
+  "extPermNetworkDetail": "داده‌ها را از طریق VPN از اینترنت دریافت می‌کند. فقط میزبان‌های فهرست زیر مجازند و بقیه مسدودند.",
+  "extBgTitle": "کار پس‌زمینه",
+  "extBgEnabled": "در پس‌زمینه اجرا شود",
+  "extBgInterval": "فاصلهٔ اجرا",
+  "extBgMinutes": "{count, plural, one{# دقیقه} other{# دقیقه}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# ساعت} other{# ساعت}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "وظیفه تا وقتی Sora باز است، حتی در سینی سیستم، طبق زمان‌بندی اجرا می‌شود. کوتاه‌ترین فاصله ۱۵ دقیقه است.",
+  "extBgDisabledNote": "برنامه افزودنی را برای مدیریت وظیفه پس‌زمینه خود فعال کنید.",
+  "extCapNetwork": "دسترسی به شبکه",
+  "extCapNetworkHosts": "شبکه: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "کد QR را به اشتراک بگذارید",
+  "qrScanTitle": "کد QR را اسکن کنید",
+  "qrCopyLink": "پیوند را کپی کنید",
+  "qrShowLink": "نمایش پیوند",
+  "qrHideLink": "پنهان کردن پیوند",
+  "qrWarning": "این کد QR حاوی جزئیات اتصال است. آن را به غریبه ها نشان ندهید.",
+  "qrScanHint": "یک اسکرین‌شات یا عکس دارای کد QR انتخاب کنید یا پیوندی را جای‌گذاری کنید",
+  "qrFromClipboard": "چسباندن از کلیپ بورد",
+  "qrNoCode": "در این تصویر کد QR پیدا نشد.",
+  "qrInvalid": "این کد QR حاوی پیوند معتبری نیست.",
+  "qrScan": "اسکن QR",
+  "qrFromImage": "باز کردن تصویر",
+  "connGroupByProcess": "گروه بر اساس فرآیند",
+  "connListView": "فهرست",
+  "connCopyHost": "کپی میزبان",
+  "connAddRule": "قانون اضافه کنید",
+  "connConnectionsCount": "{count, plural, one{# اتصال} other{# اتصال}}",
+  "dnsPreset": "از پیش تنظیم شده",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "سفارشی",
+  "dnsCheck": "نشت داده را بررسی کنید",
+  "dnsChecking": "در حال بررسی...",
+  "dnsNoLeak": "هیچ نشتی یافت نشد",
+  "dnsLeakFound": "نشت شناسایی شد",
+  "dnsLastCheck": "آخرین بررسی",
+  "dnsNeverChecked": "هنوز تست نشده است",
+  "dnsLeakCheckTunnelDns": "تحلیلگرهای DNS تونل",
+  "dnsLeakCheckSystemResolvers": "تحلیلگرهای نام سیستم",
+  "dnsLeakCheckKillSwitchDns": "محافظت DNS با قطع اضطراری",
+  "dnsLeakFixConfigureTunnelDns": "DNS را برای تونل در تنظیمات DNS بالا پیکربندی کنید.",
+  "dnsLeakFixReviewSystemResolvers": "بررسی کنید که سیستم شما از کدام حل کننده ها در خارج از تونل استفاده می کند.",
+  "dnsLeakFixEnableKillSwitch": "قطع اضطراری را روشن کنید تا ترافیک DNS درون تونل بماند.",
+  "dnsLeakCheckEncryptedDns": "DNS رمزگذاری‌شدهٔ سیستم‌عامل",
+  "dnsLeakCheckDnsSpoof": "پاسخ های جعلی DNS",
+  "dnsLeakFixReviewEncryptedDns": "بررسی کنید که سیستم شما از کدام نقاط پایانی DNS رمزگذاری شده در خارج از تونل استفاده می کند.",
+  "dnsLeakFixUseEncryptedDns": "از DNS (DoT یا DoH) رمزگذاری شده برای تونل استفاده کنید تا حل‌کننده‌ها نتوانند پاسخ‌ها را جعل کنند.",
+  "dnsCheckNeedsConnection": "ابتدا به VPN متصل شوید، سپس نشتی را بررسی کنید.",
+  "dnsExpected": "مورد انتظار",
+  "dnsActual": "مشاهده شد",
+  "sortBy": "مرتب سازی بر اساس",
+  "sortPing": "پینگ",
+  "sortSpeed": "سرعت",
+  "sortName": "نام",
+  "measureSpeed": "اندازه گیری سرعت",
+  "benchmarkStale": "منسوخ شده است",
+  "autoSelectMode": "انتخاب خودکار سرور",
+  "autoSelectPing": "سریعترین پینگ",
+  "autoSelectSpeed": "سریعترین سرعت",
+  "autoSelectSmart": "انتخاب هوشمندانه",
+  "coreWatchUnstable": "اتصال به هسته Sora ناپایدار است",
+  "watchReconnect": "دوباره وصل شوید",
+  "coreRestoringLink": "در حال بازیابی اتصال به هسته Sora…",
+  "crashRestoreTitle": "آخرین جلسه قطع شد",
+  "restoreOnCrash": "بازیابی جلسه پس از خرابی",
+  "crashRestore": "بازیابی",
+  "crashDismiss": "اکنون نه",
+  "overrideTitle": "ویرایش های من",
+  "overrideEdit": "ویرایش سرورها",
+  "overrideHide": "پنهان کردن",
+  "overrideUnhide": "نمایش",
+  "overrideClear": "ویرایش ها را بازنشانی کنید",
+  "overrideEmpty": "هنوز هیچ ویرایشی انجام نشده است",
+  "overrideCustomRules": "قوانین خود را",
+  "errBenchmarkUnsupported": "اندازه گیری سرعت به هسته جدیدتری نیاز دارد",
+  "benchmarkProgress": "اندازه گیری {done} از {total}…",
+  "profiles": "نمایه های شبکه",
+  "profilesEmpty": "هنوز پروفایلی وجود ندارد. یکی ایجاد کنید تا تنظیمات به طور خودکار در شبکه های شناخته شده اعمال شود.",
+  "profileAdd": "افزودن نمایه",
+  "profileName": "نام نمایه",
+  "profileSsids": "Wi-Fi شبکه (SSID)",
+  "profileSsidsHint": "خانه، دفتر با کاما جدا شده است",
+  "profileGateways": "دروازه های شبکه",
+  "profileAsns": "AS شماره",
+  "profileAutoApply": "اعمال خودکار",
+  "profileAutoApplyHint": "اگر خاموش باشد، پیش از اعمال نمایه تأیید خواسته می‌شود.",
+  "profileSnapshot": "تنظیمات فعلی را به خاطر بسپارید",
+  "profileSnapshotDone": "تنظیمات فعلی در نمایه ذخیره شده است",
+  "profileDelete": "حذف نمایه",
+  "profileDeleteConfirm": "نمایه \"{name}\" حذف شود؟",
+  "profileApplyAsk": "نمایه \"{name}\" اعمال شود؟",
+  "profileApply": "اعمال",
+  "profileApplied": "نمایه «{name}» اعمال شد",
+  "profileUndo": "لغو",
+  "profileActive": "فعال",
+  "networkNow": "اکنون: {info}",
+  "networkUnknown": "اطلاعات شبکه در دسترس نیست",
+  "profileNoTriggers": "حداقل یک محرک اضافه کنید: SSID، دروازه یا ASN",
+  "chains": "زنجیره های پروکسی",
+  "chainsEmpty": "هنوز زنجیر وجود ندارد. 2-3 سرور را پیوند دهید تا ترافیک از طریق هر یک از آنها افزایش یابد.",
+  "chainAdd": "زنجیره جدید",
+  "chainName": "نام زنجیر",
+  "chainPickServers": "2 تا 3 سرور را انتخاب کنید",
+  "chainOrderHint": "برای ترتیب مجدد بکشید: ترافیک در بالا وارد می شود و در پایین خارج می شود.",
+  "chainTooFew": "حداقل 2 سرور انتخاب کنید",
+  "chainTooMany": "یک زنجیره حداکثر 3 سرور را در خود جای می دهد",
+  "chainEstimate": "تأخیر تخمینی",
+  "chainSave": "ذخیره زنجیره",
+  "chainDelete": "حذف زنجیره",
+  "chainDeleteConfirm": "زنجیره \"{name}\" حذف شود؟",
+  "chainUnsupported": "موتور فعلی نمی تواند زنجیر بسازد",
+  "chainHopMissing": "یکی از سرورهای زنجیره ای دیگر در دسترس نیست",
+  "chainHop": "گام {n}",
+  "chainEntry": "ورود",
+  "chainExit": "خروج",
+  "sync": "همگام سازی دستگاه",
+  "syncDevices": "دستگاه های من",
+  "syncEmpty": "هیچ دستگاه جفت شده ای وجود ندارد. دستگاه دیگری را از طریق شبکه محلی جفت کنید.",
+  "syncPair": "جفت کردن دستگاه",
+  "syncShowCode": "نمایش کد من",
+  "syncScanCode": "کد را اسکن کنید",
+  "syncRevoke": "برداشت",
+  "syncRevokeConfirm": "\"{name}\" لغو شود؟",
+  "syncLastSync": "آخرین همگام سازی: {time}",
+  "syncNever": "هرگز",
+  "syncNoLan": "دستگاه ها باید در یک شبکه محلی باشند",
+  "syncPaired": "دستگاه جفت شد",
+  "syncPairingTitle": "با این دستگاه جفت شود",
+  "syncWaiting": "در انتظار دستگاه دیگر…",
+  "syncSecureNote": "کانال رمزگذاری شده سرتاسر. بدون حساب، بدون سرور ابری.",
+  "zapretWithVpn": "برای ترافیک مستقیم شبکه، فیلتر DPI را دور بزنید",
+  "zapretWithVpnHint": "zapret را در کنار تونل VPN اجرا می‌کند: ترافیک تونل از VPN و ترافیک مستقیم از مسیر دور زدن محدودیت عبور می‌کند.",
+  "chainDuplicate": "هر سرور فقط یک بار می تواند ظاهر شود",
+  "edit": "ویرایش",
+  "remove": "حذف کنید",
+  "autoSwitchOnDegrade": "تغییر خودکار در تخریب",
+  "autoSwitchOnDegradeDetail": "اگر سرور انتخابی بسیار کند شود یا پاسخ ندهد، Sora به بهترین سرور طبق اندازه‌گیری‌ها تغییر می‌کند، اما حداکثر یک بار در هر 10 دقیقه.",
+  "tunStackMixed": "مختلط",
+  "tunStackSystem": "سیستم",
+  "syncCodeExpired": "کد منقضی شده است",
+  "syncDaemonFailed": "سرویس همگام‌سازی راه‌اندازی نشد",
+  "syncDaemonMissing": "مؤلفه sora-sync پیدا نشد. برای فعال کردن همگام سازی دستگاه، برنامه را دوباره نصب کنید.",
+  "syncDaemonStarting": "شروع سرویس همگام سازی…",
+  "syncErrAuth": "سرویس همگام‌سازی رمز دسترسی را رد کرد. برنامه را مجددا راه اندازی کنید و دوباره امتحان کنید.",
+  "syncErrNotFound": "دستگاه دیگر جفت نشده است",
+  "syncErrPairingActive": "یک جلسه جفت سازی از قبل باز است",
+  "syncErrUnreachable": "دستگاه دیگر پاسخ نداد. مطمئن شوید که در همان شبکه است و کد آن را نشان می دهد.",
+  "syncError": "خطای همگام سازی",
+  "syncExpiresIn": "کد پس از {duration} منقضی می‌شود",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "جفت شدن با دستگاه…",
+  "syncLegacyCleared": "لیست دستگاه های قدیمی هرگز جفت نشد، بنابراین پاک شد. دستگاه های خود را دوباره جفت کنید، این بار به صورت واقعی.",
+  "syncNewCode": "کد جدید",
+  "syncPairedWith": "جفت شده با {name}",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "تکرار کنید",
+  "syncStopShowing": "پنهان کردن کد",
+  "syncSyncNow": "همگام‌سازی اکنون",
+  "syncSyncResult": "{pulled} را دریافت کرد، {pushed} را ارسال کرد",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "نتیجه همگام سازی",
+  "syncPulled": "دریافت شد",
+  "syncPushed": "ارسال شد",
+  "syncNoChanges": "بدون تغییر",
+  "syncDocKindSubscriptions": "اشتراک ها",
+  "syncDocKindSettings": "تنظیمات برنامه",
+  "syncDocKindOverrides": "تنظیمات جایگزین اشتراک‌ها",
+  "syncDocKindProfiles": "نمایه های شبکه",
+  "syncDocKindChains": "زنجیره های پروکسی",
+  "syncFrom": "از {name}",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "این دستگاه",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "برای Shadowsocks: روش:گذرواژه، مثلاً chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "ضبط بسته",
+  "diagnosticEvents": "رویدادهای ویندوز",
+  "diagnosticCapture": "به مدت 10 ثانیه عکس بگیرید",
+  "diagnosticRequiresTun": "ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.",
+  "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست.",
+  "extErrRevoked": "تیم Sora این نسخه از افزونه را لغو کرد، چون ناامن یا خراب است.",
+  "extErrRevocationsExpired": "فهرست افزونه‌های لغوشده به‌روز نشد. تا به‌روز شدن آن نصب ممکن نیست: شبکه را بررسی و دوباره تلاش کنید.",
+  "extRevokedDisabled": "افزونه‌های لغوشده خاموش شدند: {names}",
+  "customServerWgPrivateKey": "کلید خصوصی",
+  "customServerWgAddresses": "نشانی‌های رابط",
+  "customServerWgPeerKey": "کلید عمومی سرور",
+  "customServerWgPresharedKey": "کلید مشترک",
+  "customServerWgAllowedIps": "IPهای مجاز",
+  "customServerWgKeepalive": "Keepalive، ثانیه",
+  "customServerWgKeyInvalid": "کلید باید ۳۲ بایت base64 باشد، مانند خروجی wg genkey.",
+  "customServerWgCidrInvalid": "پیشوندها را با ویرگول جدا کنید، مانند 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "عددی بین 0 تا 65535 ثانیه وارد کنید.",
+  "strictKillSwitch": "قطع اضطراری سخت‌گیرانه",
+  "strictKillSwitchWarning": "پس از اتصال، ترافیک خارج از VPN را حتی پس از خرابی، راه‌اندازی مجدد یا خروج از برنامه مسدود می‌کند. دسترسی فقط با قطع اتصال یا خاموش کردن این گزینه برمی‌گردد. پس از راه‌اندازی مجدد دستگاه، مسدودسازی فقط در صورت فعال بودن اتصال هنگام شروع از سر گرفته می‌شود.",
+  "extWorkerFailed": "وظیفه پس‌زمینه افزونه ناموفق بود. گزارش افزونه را بررسی کنید.",
+  "extAssetRejected": "فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر."
 }

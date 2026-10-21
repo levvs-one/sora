@@ -5,7 +5,6 @@
   "stateConnected": "დაკავშირებულია",
   "stateReconnecting": "ხელახლა დაკავშირება",
   "stateDisconnecting": "გათიშვა",
-  "stateFailed": "არ არის დაკავშირებული",
   "coreMissing": "Sora სერვისი არ პასუხობს",
   "serverAuto": "ყველაზე სწრაფი",
   "serverBypass": "სერვერი არ არის",
@@ -41,6 +40,7 @@
   "export": "ფაილში შენახვა",
   "clear": "წმინდა",
   "logsEmpty": "აქ არაფერი",
+  "connEmpty": "არანაირი კავშირი",
   "appVersion": "ვერსია {version}",
   "notInstalled": "არ არის დაინსტალირებული",
   "sourceCode": "წყაროს კოდი",
@@ -75,17 +75,16 @@
   "errSubScheme": "ბმული უნდა დაიწყოს https://",
   "errSecretStore": "Sora საცავი დაზიანებულია ან მიუწვდომელია",
   "errNoServers": "დასაკავშირებლად დაამატეთ გამოწერა",
-  "exportText": "ტექსტი",
   "connections": "კავშირები",
   "close": "დახურვა",
   "chainDirect": "პირდაპირი",
   "chainBlocked": "დაბლოკილია",
   "theme": "თემა",
-  "themeSystem": "System",
+  "themeSystem": "სისტემის მიხედვით",
   "themeLight": "სინათლე",
   "themeDark": "ბნელი",
   "language": "ენა",
-  "languageSystem": "System",
+  "languageSystem": "სისტემის მიხედვით",
   "sectionConnection": "კავშირი",
   "sectionNoServer": "სერვერი არ არის",
   "sectionPing": "პინგი",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} დარჩა",
   "ruleInvalid": "ეს არ ჰგავს საიტს, IP-ს ან პროგრამას",
   "tunnelMode": "რეჟიმი",
-  "tunnelTun": "მთელი მოძრაობა",
   "tunnelProxy": "System პროქსი",
   "proxyAddress": "პროქსის მისამართი",
   "copied": "კოპირებულია",
   "launchAtLogin": "დაიწყეთ სისტემით",
+  "launchAtLoginDetail": "შესვლისას Sora ავტომატურად გაეშვება და დარჩება სისტემურ უჯრაში.",
   "closeToTray": "შეინახეთ უჯრაში დახურვისას",
   "notifications": "შეტყობინებები",
   "trayOpen": "გახსენით Sora",
@@ -185,12 +184,6 @@
   "sidebarToggle": "გვერდითი ზოლის გადართვა",
   "more": "მეტი",
   "less": "ნაკლები",
-  "currentServer": "მიმდინარე სერვერი",
-  "trafficDown": "ჩამოტვირთულია",
-  "trafficUp": "ატვირთულია",
-  "perSecond": "{value}/წმ",
-  "activeRules": "აქტიური წესები: {count}",
-  "recentNotifications": "ბოლო შეტყობინებები",
   "notificationsEmpty": "კავშირისა და გამოწერის მოვლენები აქ გამოჩნდება",
   "retryConnect": "ხელახლა სცადეთ კავშირი",
   "openLogs": "გახსენით ჟურნალები",
@@ -208,12 +201,9 @@
   "chooseProgram": "აირჩიეთ პროგრამა",
   "installedApps": "დაინსტალირებული აპლიკაციები",
   "runningProcesses": "მიმდინარე პროცესები",
-  "programsFailed": "აპლიკაციების ჩატვირთვა ვერ მოხერხდა",
   "programsEmpty": "აპლიკაციები ვერ მოიძებნა. სცადეთ სხვა სახელი.",
   "selectExe": "აირჩიეთ .exe ფაილი",
-  "trafficUnavailable": "მრიცხველები ჯერ არ არის ხელმისაწვდომი",
   "speedtest": "სიჩქარე",
-  "speedtestCheck": "შეამოწმეთ სიჩქარე",
   "speedtestSearch": "მოძებნეთ სერვისი",
   "speedtestEmpty": "არანაირი მატჩი. შეცვალეთ ძებნა.",
   "speedtestBackToList": "დაუბრუნდით სერვისებს",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "დააკოპირეთ ბრძანება",
   "updateChecksDisabled": "ავტომატური შემოწმება გამორთულია პარამეტრებში.",
   "updateInstalled": "დაინსტალირებულია განახლება. ხელახლა გახსენით Sora.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "პროექტი",
   "githubReleases": "გამოშვება და ჩამოტვირთვები",
   "telegramChannel": "Telegram არხი",
   "licenses": "ლიცენზიები",
   "componentLicenses": "კომპონენტების ლიცენზიები",
-  "appCopyright": "© 2026 levvs-one და კონტრიბუტორები",
   "collapseServers": "სერვერების ჩაკეცვა",
   "expandServers": "სერვერების გაფართოება",
   "hideDescription": "აღწერილობის დამალვა",
   "showDescription": "აღწერილობის ჩვენება",
   "pendingConnectionChanges": "ხელახლა დაუკავშირდით ამ ცვლილებების გამოსაყენებლად.",
   "reconnectNow": "მიმართეთ და ხელახლა დაუკავშირდით",
-  "bypassLimitations": "ეს რეჟიმი გვერდს უვლის DPI-ს მხოლოდ HTTP-სთვის და TLS-ისთვის, არ უჭერს მხარს UDP-ს და არ ცვლის თქვენს IP-ს. გამოიყენეთ VPN სერვერი Discord ხმისთვის, ზარებისთვის და დაბლოკილი Telegram მისამართებისთვის.",
   "errEngineUnsupported": "არჩეული ძრავა არ უჭერს მხარს ამ პროფილს ან პარამეტრებს. აირჩიეთ ავტო ან თავსებადი ძრავა.",
   "errRestore": "კავშირის გასუფთავება არასრული იყო. ხელახლა სცადეთ გათიშვა; იხილეთ ჟურნალი დეტალებისთვის.",
   "errSessionEnded": "ეს სესია უკვე დასრულდა. განაახლეთ კავშირის მდგომარეობა.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "რეჟიმები და ძრავები",
   "probeServers": "შეამოწმეთ სერვერები",
   "expiresIn": "{name}: {days, plural, =0{გამოწერა მთავრდება რამდენიმე საათში} one{გამოწერა მთავრდება # დღეში} other{გამოწერა მთავრდება # დღეში}}",
-  "groupOrdered": "{count, plural, one{თავის მხრივ, # სერვერი} other{თავის მხრივ, # სერვერები}}",
   "groupBest": "{count, plural, one{# სერვერი, ყველაზე სწრაფი} other{# სერვერები, ყველაზე სწრაფი}}",
-  "modesGuide": "აირჩიეთ ავტო, თუ არ ხართ დარწმუნებული, რომელი ძრავა სჭირდება თქვენს სერვერს. Sora ამოწმებს პროფილს და პარამეტრებს დაკავშირებამდე. ძრავას არ შეუძლია გაზარდოს თქვენი გეგმის გამტარუნარიანობა: შესრულება დამოკიდებულია სერვერზე, მარშრუტზე, პროტოკოლზე და ქსელზე.\n\n## რეჟიმები\n\n### მთელი ტრაფიკი (TUN)\n\nSora ქმნის ვირტუალურ ქსელურ ინტერფეისს და მარშრუტებს აპლიკაციის ტრაფიკს, მათ შორის TCP და UDP. გამოიყენეთ ეს რეჟიმი Telegram, თამაშებისთვის და Discord ხმისთვის. წესებს შეუძლიათ გააგზავნონ კონკრეტული საიტები ან პროგრამები პირდაპირ ან დაბლოკონ ისინი. ქსელის სერვისს სჭირდება ნებართვა და სერვერი, რომელიც მხარს უჭერს საჭირო პროტოკოლს.\n\n### System პროქსი\n\nSora აკონფიგურირებს ადგილობრივ HTTP/SOCKS პროქსის. აპლიკაციები, რომლებიც პატივს სცემენ სისტემის პროქსის პარამეტრებს, იყენებენ მას. აპლიკაციები საკუთარი ქსელის სტეკით შეიძლება პირდაპირ დაუკავშირდნენ; UDP და ხმოვანი ზარები ზოგადად საჭიროებენ TUN. ეს რეჟიმი შეესაბამება ბრაუზერებს და აპლიკაციებს პროქსი მხარდაჭერით.\n\n### სერვერი არ არის\n\nLinux-ზე Sora იყენებს [zapret](https://github.com/bol-van/zapret) HTTP/TLS მოთხოვნების გაყოფისა და ფორმის გადასაჭრელად და ზოგიერთი DPI შემოწმების გვერდის ავლით. თქვენი IP იგივე რჩება და კავშირები პირდაპირ ვებსაიტზე მიდის. შედეგები დამოკიდებულია თქვენს პროვაიდერზე და დაბლოკვის მეთოდზე.\n\nმიმდინარე ინტეგრაცია იყენებს tpws-ს HTTP-სთვის და TLS-ისთვის TCP-ზე. ის არ გვერდს უვლის IP ბლოკირებას ან გადასცემს UDP-ს და ვერ უზრუნველყოფს Telegram-ის MTProto კავშირების გარანტიას. გამოიყენეთ VPN სერვერი TUN-ით Discord ხმის, Telegram ზარებისთვის და ამ სახის შეზღუდვებისთვის.\n\n## ძრავები\n\n### ავტო\n\nSora ირჩევს დაყენებულ ძრავას, რომელიც მხარს უჭერს კავშირის მთელ გეგმას: სერვერის პროტოკოლებს, ტრანსპორტებს, ჯგუფებს, ფრაგმენტაციას და რეჟიმს. შეუთავსებელი ხელით არჩევანი უარყოფილია მიმდინარე კავშირის შეწყვეტამდე. აირჩიეთ Auto ან სხვა ძრავა და კვლავ გამოიყენეთ პარამეტრები.\n\n### sing-box\n\nახალი Sora პაკეტები მოიცავს [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), ჩანგალი [sing-box](https://github.com/SagerNet/sing-box), კლიენტის მხარეს XHTTP და VLESS Encryption დამატება. Sora აღიარებს კონსტრუქციას და მის შესაძლებლობებს. ზემოთ ნაგებობა XHTTP-ის გარეშე არ იძენს ამ შესაძლებლობას მხოლოდ მისი სახელიდან.\n\nმხარდაჭერილია VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard და AmneziaWG 1.x/2.x-ის ის პარამეტრები, რომელთა იმპორტიც Sora-ს შეუძლია. სრულ Xray JSON პროფილებს Xray სჭირდება. ახალი AWG 3.x ველების იმპორტი ჯერ შეუძლებელია. sing-box იყენებს პაროლით დაცულ ადგილობრივ მართვის პორტს, რომლის აღმოჩენაც კომპიუტერის სხვა პროგრამებს შეუძლიათ.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) მხარს უჭერს VLESS, REALITY, XHTTP, VLESS Encryption და TLS ფრაგმენტაციას. ის ასევე აწარმოებს სრულ პროვაიდერის Xray პროფილებს მათი მარშრუტიზაციისა და ჯგუფების შენარჩუნებით. ასეთი პროფილები არ შეიძლება ავტომატურად გადაიზარდოს სხვა ძრავზე მათი ქცევის შეცვლის გარეშე.\n\nშეფუთულმა Xray-მ წაშალა პარამეტრი, რომელიც გამორთავს TLS სერტიფიკატის დადასტურებას (`allowInsecure`). ავტომატურად ირჩევს sing-box ან mihomo ჩვეულებრივი სერვერებისთვის, რომლებიც საჭიროებენ ამ პარამეტრს. Xray-ის არჩევა ხელით აცნობებს შეუთავსებლობას მიმდინარე კავშირის შეწყვეტამდე. ძველ სრულ JSON პროფილებს სჭირდებათ განახლებული პროვაიდერის პროფილი დამოწმებადი სერტიფიკატით ან სერტიფიკატის პინით.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) მხარს უჭერს შეკვეთილ სარეზერვო და დატვირთვის დაბალანსების ჯგუფებს, XHTTP და AmneziaWG. აირჩიეთ ის, როდესაც მნიშვნელოვანია სარეზერვო სერვერზე ავტომატური ჩავარდნა. Sora-ის TLS ფრაგმენტაციის პარამეტრი მიუწვდომელია ამ ძრავით.\n\n## თავსებადობა Sora-ში\n\n| თვისება | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN და TCP/UDP | დიახ | დიახ | დიახ |\n| XHTTP | დიახ | დიახ | დიახ |\n| VLESS Encryption | დიახ | დიახ | დიახ |\n| სრული Xray პროფილი | არა | დიახ | არა |\n| TUIC / AnyTLS | ორივე | არა | TUIC |\n| TLS ფრაგმენტაცია | დიახ | დიახ | არა |\n| AmneziaWG 1.x/2.x | დიახ¹ | არა | დიახ |\n| შეკვეთილი სარეზერვო ჯგუფი | არა | No² | დიახ |\n\n¹ პროფილები J1/J2/J3/Itime იყენებენ mihomo; ეს ველები არასოდეს არ უნდა იყოს ჩუმად გაუქმებული. ² სრული Xray პროფილების ჯგუფისთვის აპლიკაცია ირჩევს სარეზერვო პროფილს. მხარდაჭერა დამოკიდებულია დაყენებულ კონსტრუქციაზე; შეამოწმეთ მისი ვერსია შესახებ.\n\n## TUN დასტა\n\nსტეკი ამუშავებს TCP და UDP-ს ვირტუალურ ინტერფეისში. რეჟიმების პანელში Xray და mihomo გვთავაზობენ gVisor, System, Mixed და MIPS. თითოეული ძრავა ინახავს საკუთარ უპირატესობას. System პროქსი და სერვერის რეჟიმი არ იყენებს ამ პარამეტრს.\n\n- **Mixed** — TCP იყენებს სისტემის დასტას, ხოლო gVisor ამუშავებს UDP-ს. ეს არის mihomo-ს ნაგულისხმევი ვარიანტი Linux-ზე. Windows-ზე Xray და mihomo ნაგულისხმევად MIPS-ს იყენებენ.\n- **System** — იყენებს სისტემის დასტას. სცადეთ სხვა ვარიანტი, თუ ქსელის აპლიკაციებს პრობლემები შეექმნათ.\n- **gVisor** — მართავს ტრაფიკს მომხმარებლის სივრცეში.\n- **MIPS** — mihomo-ის საკუთარი IP დასტა, ხელმისაწვდომია შეფუთულ ვერსიაში 1.19.32.\n\nLinux-ზე, Xray ნაგულისხმევად იყენებს ჩაშენებულ gVisor-ს. System, Mixed და MIPS Linux-ზე იყენებენ mihomo, როგორც TUN ძრავას, გადაგზავნის TCP და UDP-ს Xray ავთენტიფიცირებულ ლოკალურ SOCKS ბმულზე. Xray ინარჩუნებს პროტოკოლს, პროვაიდერის პროფილს და მარშრუტიზაციას. ამ სამ ვარიანტს სჭირდება დაინსტალირებული mihomo. Windows-ზე Xray ოთხივე TUN სტეკისთვის იყენებს mihomo 1.19.32-ს ან უფრო ახალ ვერსიას. პროტოკოლები და მარშრუტიზაცია რჩება Xray-ში. ამ კომბინაციაში აპლიკაციების წესები მხარს უჭერს მხოლოდ პირდაპირ კავშირს და დაბლოკვას; Linux-ზე ამ წესებს სჭირდება Xray-ის ჩაშენებული gVisor.\n\nხიდი გადის მეორე პროცესს. სამი უმოქმედო გაზომვისას Linux-ზე, მან გამოიყენა დაახლოებით 32–36 MiB მეტი ფიზიკური მეხსიერება, ვიდრე მშობლიურ Xray TUN. ეს არ ზომავს ჩამოტვირთვის დატვირთვას: CPU და მეხსიერების ხარჯები დამოკიდებულია კავშირებზე. sing-box-ს არ აქვს სტეკის ამომრჩევი. არცერთი დასტა არ იძლევა გარანტიას უკეთესი მუშაობის ყველა ქსელში. აირჩიეთ დასტა და აირჩიეთ მიმართვა და ხელახლა დაკავშირება თქვენს ქსელში საცდელად.\n\n## პარამეტრების გამოყენება\n\nსერვერის არჩევა ხელახლა დაკავშირდება ავტომატურად. რეჟიმი, ძრავა, DNS და წესების პარამეტრები დაუყოვნებლივ ინახება; აქტიური კავშირის დროს დააწკაპუნეთ Apply-ზე და ხელახლა დაუკავშირდით მათ გამოსაყენებლად. ძრავის გადატვირთვამ შეიძლება შეაფერხოს ჩამოტვირთვები და ზარები. განმეორებითი დაწკაპუნება არ იწყებს პარალელურ კავშირებს; გათიშვა წყვეტს გადასვლას და ათავისუფლებს კავშირს.\n\nინტერნეტი მხოლოდ VPN-ის საშუალებით ბლოკავს პირდაპირ ტრაფიკს, როდესაც გვირაბი ჩამოვარდება. ეს გავლენას ახდენს მთელ მანქანაზე. აშკარა გათიშვა შლის Sora-ის წესებს. თუ გასუფთავება არ დასრულებულა, ხელახლა სცადეთ გათიშვა და გახსენით ჟურნალი.\n\n## პროექტის დოკუმენტაცია\n\n- [sing-box-lx: კონფიგურაცია და მხარდაჭერა] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box დოკუმენტაცია] (https://sing-box.sagernet.org/)\n- [Xray დოკუმენტაცია] (https://xtls.github.io/)\n- [mihomo დოკუმენტაცია] (https://wiki.metacubex.one/)\n- [zapret: ოპერაცია და შეზღუდვები] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "აირჩიეთ ავტო, თუ არ ხართ დარწმუნებული, რომელი ძრავა სჭირდება თქვენს სერვერს. Sora ამოწმებს პროფილს და პარამეტრებს დაკავშირებამდე. ძრავას არ შეუძლია გაზარდოს თქვენი გეგმის გამტარუნარიანობა: შესრულება დამოკიდებულია სერვერზე, მარშრუტზე, პროტოკოლზე და ქსელზე.\n\n## რეჟიმები\n\n### მთელი ტრაფიკი (TUN)\n\nSora ქმნის ვირტუალურ ქსელურ ინტერფეისს და მარშრუტებს აპლიკაციის ტრაფიკს, მათ შორის TCP და UDP. გამოიყენეთ ეს რეჟიმი Telegram, თამაშებისთვის და Discord ხმისთვის. წესებს შეუძლიათ გააგზავნონ კონკრეტული საიტები ან პროგრამები პირდაპირ ან დაბლოკონ ისინი. ქსელის სერვისს სჭირდება ნებართვა და სერვერი, რომელიც მხარს უჭერს საჭირო პროტოკოლს.\n\n### System პროქსი\n\nSora აკონფიგურირებს ადგილობრივ HTTP/SOCKS პროქსის. აპლიკაციები, რომლებიც პატივს სცემენ სისტემის პროქსის პარამეტრებს, იყენებენ მას. აპლიკაციები საკუთარი ქსელის სტეკით შეიძლება პირდაპირ დაუკავშირდნენ; UDP და ხმოვანი ზარები ზოგადად საჭიროებენ TUN. ეს რეჟიმი შეესაბამება ბრაუზერებს და აპლიკაციებს პროქსი მხარდაჭერით.\n\n### სერვერი არ არის\n\nLinux-ზე Sora იყენებს [zapret](https://github.com/bol-van/zapret) HTTP/TLS მოთხოვნების გაყოფისა და ფორმის გადასაჭრელად და ზოგიერთი DPI შემოწმების გვერდის ავლით. თქვენი IP იგივე რჩება და კავშირები პირდაპირ ვებსაიტზე მიდის. შედეგები დამოკიდებულია თქვენს პროვაიდერზე და დაბლოკვის მეთოდზე.\n\nმიმდინარე ინტეგრაცია იყენებს tpws-ს HTTP-სთვის და TLS-ისთვის TCP-ზე. ის არ გვერდს უვლის IP ბლოკირებას ან გადასცემს UDP-ს და ვერ უზრუნველყოფს Telegram-ის MTProto კავშირების გარანტიას. გამოიყენეთ VPN სერვერი TUN-ით Discord ხმის, Telegram ზარებისთვის და ამ სახის შეზღუდვებისთვის.\n\n## ძრავები\n\n### ავტო\n\nSora ირჩევს დაყენებულ ძრავას, რომელიც მხარს უჭერს კავშირის მთელ გეგმას: სერვერის პროტოკოლებს, ტრანსპორტებს, ჯგუფებს, ფრაგმენტაციას და რეჟიმს. შეუთავსებელი ხელით არჩევანი უარყოფილია მიმდინარე კავშირის შეწყვეტამდე. აირჩიეთ Auto ან სხვა ძრავა და კვლავ გამოიყენეთ პარამეტრები.\n\n### sing-box\n\nახალი Sora პაკეტები მოიცავს [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), ჩანგალი [sing-box](https://github.com/SagerNet/sing-box), კლიენტის მხარეს XHTTP და VLESS Encryption დამატება. Sora აღიარებს კონსტრუქციას და მის შესაძლებლობებს. ზემოთ ნაგებობა XHTTP-ის გარეშე არ იძენს ამ შესაძლებლობას მხოლოდ მისი სახელიდან.\n\nმხარდაჭერილია VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard და AmneziaWG 1.x/2.x-ის ის პარამეტრები, რომელთა იმპორტიც Sora-ს შეუძლია. სრულ Xray JSON პროფილებს Xray სჭირდება. ახალი AWG 3.x ველების იმპორტი ჯერ შეუძლებელია. sing-box იყენებს პაროლით დაცულ ადგილობრივ მართვის პორტს, რომლის აღმოჩენაც კომპიუტერის სხვა პროგრამებს შეუძლიათ.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) მხარს უჭერს VLESS, REALITY, XHTTP, VLESS Encryption და TLS ფრაგმენტაციას. ის ასევე აწარმოებს სრულ პროვაიდერის Xray პროფილებს მათი მარშრუტიზაციისა და ჯგუფების შენარჩუნებით. ასეთი პროფილები არ შეიძლება ავტომატურად გადაიზარდოს სხვა ძრავზე მათი ქცევის შეცვლის გარეშე.\n\nშეფუთულმა Xray-მ წაშალა პარამეტრი, რომელიც გამორთავს TLS სერტიფიკატის დადასტურებას (`allowInsecure`). ავტომატურად ირჩევს sing-box ან mihomo ჩვეულებრივი სერვერებისთვის, რომლებიც საჭიროებენ ამ პარამეტრს. Xray-ის არჩევა ხელით აცნობებს შეუთავსებლობას მიმდინარე კავშირის შეწყვეტამდე. ძველ სრულ JSON პროფილებს სჭირდებათ განახლებული პროვაიდერის პროფილი დამოწმებადი სერტიფიკატით ან სერტიფიკატის პინით.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) მხარს უჭერს შეკვეთილ სარეზერვო და დატვირთვის დაბალანსების ჯგუფებს, XHTTP და AmneziaWG. აირჩიეთ ის, როდესაც მნიშვნელოვანია სარეზერვო სერვერზე ავტომატური ჩავარდნა. Sora-ის TLS ფრაგმენტაციის პარამეტრი მიუწვდომელია ამ ძრავით.\n\n## თავსებადობა Sora-ში\n\n| თვისება | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN და TCP/UDP | დიახ | დიახ | დიახ |\n| XHTTP | დიახ | დიახ | დიახ |\n| VLESS Encryption | დიახ | დიახ | დიახ |\n| სრული Xray პროფილი | არა | დიახ | არა |\n| TUIC / AnyTLS | ორივე | არა | TUIC |\n| TLS ფრაგმენტაცია | დიახ | დიახ | არა |\n| AmneziaWG 1.x/2.x | დიახ¹ | არა | დიახ |\n| შეკვეთილი სარეზერვო ჯგუფი | არა | No² | დიახ |\n\n¹ პროფილები J1/J2/J3/Itime იყენებენ mihomo; ეს ველები არასოდეს არ უნდა იყოს ჩუმად გაუქმებული. ² სრული Xray პროფილების ჯგუფისთვის აპლიკაცია ირჩევს სარეზერვო პროფილს. მხარდაჭერა დამოკიდებულია დაყენებულ კონსტრუქციაზე; შეამოწმეთ მისი ვერსია შესახებ.\n\n## TUN დასტა\n\nსტეკი ამუშავებს TCP და UDP-ს ვირტუალურ ინტერფეისში. რეჟიმების პანელში Xray და mihomo გვთავაზობენ gVisor, System, Mixed და MIPS. თითოეული ძრავა ინახავს საკუთარ უპირატესობას. System პროქსი და სერვერის რეჟიმი არ იყენებს ამ პარამეტრს.\n\n- **Mixed**: TCP იყენებს სისტემის დასტას, ხოლო gVisor ამუშავებს UDP-ს. ეს არის mihomo-ს ნაგულისხმევი ვარიანტი Linux-ზე. Windows-ზე Xray და mihomo ნაგულისხმევად MIPS-ს იყენებენ.\n- **System**: იყენებს სისტემის დასტას. სცადეთ სხვა ვარიანტი, თუ ქსელის აპლიკაციებს პრობლემები შეექმნათ.\n- **gVisor**: მართავს ტრაფიკს მომხმარებლის სივრცეში.\n- **MIPS**: mihomo-ის საკუთარი IP დასტა, ხელმისაწვდომია შეფუთულ ვერსიაში 1.19.32.\n\nLinux-ზე, Xray ნაგულისხმევად იყენებს ჩაშენებულ gVisor-ს. System, Mixed და MIPS Linux-ზე იყენებენ mihomo, როგორც TUN ძრავას, გადაგზავნის TCP და UDP-ს Xray ავთენტიფიცირებულ ლოკალურ SOCKS ბმულზე. Xray ინარჩუნებს პროტოკოლს, პროვაიდერის პროფილს და მარშრუტიზაციას. ამ სამ ვარიანტს სჭირდება დაინსტალირებული mihomo. Windows-ზე Xray ოთხივე TUN სტეკისთვის იყენებს mihomo 1.19.32-ს ან უფრო ახალ ვერსიას. პროტოკოლები და მარშრუტიზაცია რჩება Xray-ში. ამ კომბინაციაში აპლიკაციების წესები მხარს უჭერს მხოლოდ პირდაპირ კავშირს და დაბლოკვას; Linux-ზე ამ წესებს სჭირდება Xray-ის ჩაშენებული gVisor.\n\nხიდი გადის მეორე პროცესს. სამი უმოქმედო გაზომვისას Linux-ზე, მან გამოიყენა დაახლოებით 32–36 MiB მეტი ფიზიკური მეხსიერება, ვიდრე მშობლიურ Xray TUN. ეს არ ზომავს ჩამოტვირთვის დატვირთვას: CPU და მეხსიერების ხარჯები დამოკიდებულია კავშირებზე. sing-box-ს არ აქვს სტეკის ამომრჩევი. არცერთი დასტა არ იძლევა გარანტიას უკეთესი მუშაობის ყველა ქსელში. აირჩიეთ დასტა და აირჩიეთ მიმართვა და ხელახლა დაკავშირება თქვენს ქსელში საცდელად.\n\n## პარამეტრების გამოყენება\n\nსერვერის არჩევა ხელახლა დაკავშირდება ავტომატურად. რეჟიმი, ძრავა, DNS და წესების პარამეტრები დაუყოვნებლივ ინახება; აქტიური კავშირის დროს დააწკაპუნეთ Apply-ზე და ხელახლა დაუკავშირდით მათ გამოსაყენებლად. ძრავის გადატვირთვამ შეიძლება შეაფერხოს ჩამოტვირთვები და ზარები. განმეორებითი დაწკაპუნება არ იწყებს პარალელურ კავშირებს; გათიშვა წყვეტს გადასვლას და ათავისუფლებს კავშირს.\n\nინტერნეტი მხოლოდ VPN-ის საშუალებით ბლოკავს პირდაპირ ტრაფიკს, როდესაც გვირაბი ჩამოვარდება. ეს გავლენას ახდენს მთელ მანქანაზე. აშკარა გათიშვა შლის Sora-ის წესებს. თუ გასუფთავება არ დასრულებულა, ხელახლა სცადეთ გათიშვა და გახსენით ჟურნალი.\n\n## პროექტის დოკუმენტაცია\n\n- [sing-box-lx: კონფიგურაცია და მხარდაჭერა] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box დოკუმენტაცია] (https://sing-box.sagernet.org/)\n- [Xray დოკუმენტაცია] (https://xtls.github.io/)\n- [mihomo დოკუმენტაცია] (https://wiki.metacubex.one/)\n- [zapret: ოპერაცია და შეზღუდვები] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,14 +440,8 @@
       }
     }
   },
-  "diagnosticRequiresTun": "პაკეტის დაჭერას სჭირდება აქტიური Sora TUN კავშირი.",
-  "diagnosticUnavailable": "ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე.",
   "diagnosticNoData": "ჯერ არ არის ჩაწერილი მოთხოვნა. ჯერ გახსენით სიჩქარის ტესტის ვებსაიტი.",
   "diagnosticHttp": "HTTP დიაგნოსტიკა",
-  "diagnosticPackets": "პაკეტის დაჭერა",
-  "diagnosticCapture": "გადაიღეთ 10 წამის განმავლობაში",
-  "diagnosticEvents": "Windows-ის მოვლენები",
-  "extensionsSoon": "მალე მოვა",
   "extensions": "გაფართოებები",
   "exportLogFile": "ფაილში {name}",
   "@exportLogFile": {
@@ -473,5 +450,572 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "მორგებული სერვერის დამატება",
+  "customServers": "ჩემი სერვერები",
+  "customServerName": "სახელი",
+  "customServerNameHint": "მაგალითად: ჩემი VPS",
+  "customServerNameRequired": "შეიყვანეთ სახელი",
+  "customServerAddress": "მისამართი",
+  "customServerAddressHint": "example.com ან 192.0.2.1",
+  "customServerAddressRequired": "შეიყვანეთ სერვერის მისამართი",
+  "customServerAddressInvalid": "არასწორი მისამართი",
+  "customServerPort": "პორტი",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "პორტი უნდა იყოს რიცხვი 1-დან 65535-მდე",
+  "customServerProtocol": "ოქმი",
+  "customServerCredentials": "შესვლის ინფორმაცია",
+  "customServerOptional": "სურვილისამებრ",
+  "customServerShowSecret": "საიდუმლოს ჩვენება",
+  "customServerHideSecret": "საიდუმლოს დამალვა",
+  "customServerBadge": "საკუთარი",
+  "customServerDeleteConfirm": "წაშალოთ სერვერი „{name}“?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "ხელით დაამატეთ სერვერი: მისამართი, პორტი და პროტოკოლი",
+  "customServerTest": "ტესტი",
+  "leakTestTitle": "ტესტი მონაცემთა გაჟონვისთვის",
+  "leakTestIntro": "ამოწმებს, შეუძლია თუ არა ტრაფიკს მოწყობილობიდან გვირაბის გარეთ გასვლა: პირდაპირი DNS და ICMP მოთხოვნები, IPv6 გასასვლელი და სისტემის რეზოლვერები. გაუშვით აქტიური კავშირისას.",
+  "leakTestRun": "შეამოწმეთ",
+  "leakTestCancel": "გაუქმება",
+  "leakTestNeedsConnection": "დაუკავშირდით VPN-ს მონაცემთა გაჟონვის შესამოწმებლად.",
+  "leakTestProgress": "დასრულებული ტესტები: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "გაჟონვა არ მოიძებნა",
+  "leakTestFound": "{count, plural, one{აღმოჩენილია # გაჟონვა} other{აღმოჩენილია # გაჟონვა}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "დაფიქსირება",
+  "leakTestFixedNote": "ქსელის ბლოკირება ჩართულია. შესამოწმებლად ტესტი ხელახლა გაუშვით.",
+  "leakTestCheckDirectDns": "პირდაპირი DNS",
+  "leakTestCheckIcmpEcho": "ICMP ექო",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "სისტემის რეზოლვერები",
+  "leakTestCheckTunnelConnectivity": "გვირაბის კავშირი",
+  "leakTestCheckTunnelDns": "DNS გვირაბით",
+  "noticeDegraded": "სერვერი შენელდა. Sora გადაერთო გაზომვის დროს ნაპოვნი საუკეთესო სერვერზე.",
+  "obfs": "ტრაფიკის შენიღბვა",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "განახლების ფაილები მოწმდება გამოშვებასთან ერთად გამოქვეყნებული საკონტროლო ჯამებით.",
+  "updateManualSigWarning": "ქვემოთ მოცემული ფაილები ემთხვევა გამოშვების საკონტროლო ჯამებს. გაუშვით ბრძანება, თუ ისინი ოფიციალური გამოშვებიდან ჩამოტვირთეთ.",
+  "updateVersionRevoked": "დეველოპერმა გააუქმა ეს ვერსია. გთხოვთ, დაელოდოთ შესწორებულ გამოცემას.",
+  "updateRolloutPending": "უფრო ახალი ვერსია გამოდის თანდათანობით და შემოგთავაზებთ ავტომატურად.",
+  "updateRollbacking": "დაბრუნება ვერსიაზე {version}...",
+  "updateRolledBack": "{version}-ის განახლებამ ვერ გაიარა ჯანმრთელობის შემოწმება, ამიტომ Sora დაბრუნდა {fromVersion}-ზე.",
+  "updateRollbackError": "ავტომატური დაბრუნება ვერ მოხერხდა. თუ ახალი ვერსია არ მუშაობს, ხელახლა დააინსტალირეთ წინა ვერსია ხელით.",
+  "updateRollbackCacheError": "ვერ მოვამზადე მიმდინარე ვერსიის დადასტურებული ასლი, ამიტომ განახლება არ იყო დაინსტალირებული.",
+  "extRatingLabel": "რეიტინგი {rating} 5-დან",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "{author}-ის მიერ",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "ინსტალაციები: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 ინსტალაცია",
+  "extBadgeVerified": "დამოწმებულია",
+  "extBadgeTop": "ყველაზე პოპულარული ამ კვირაში",
+  "extBadgeNew": "ახალი",
+  "extBadgeStaff": "Sora გუნდი",
+  "extSideloadShort": "არა კატალოგიდან",
+  "extSideloadWarning": "ეს გაფართოება არ არის გუნდის კატალოგიდან. მხოლოდ ავტორმა დადო გარანტია მათი გასაღებისთვის: დააინსტალირეთ მხოლოდ იმ შემთხვევაში, თუ ენდობით ავტორს.",
+  "extInstallTitle": "„{name}“-ის დაყენება",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "„{name}“-ის განახლება",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "ამ გაფართოებას შეეძლება:",
+  "extPermissionsWidened": "განახლება ითხოვს ახალ ნებართვებს:",
+  "extDangerousAck": "მესმის, რომ ეს ნებართვები სერიოზულია",
+  "extInstall": "დააინსტალირეთ",
+  "extUpdate": "განახლება",
+  "extCancel": "გაუქმება",
+  "extConfirm": "დაადასტურეთ",
+  "extOk": "OK",
+  "extCatalog": "კატალოგი",
+  "extInstalled": "დაინსტალირებული გაფართოებები",
+  "extSearchHint": "გაფართოებების ძიება",
+  "extCatAll": "ყველა",
+  "extCatTools": "ხელსაწყოები",
+  "extCatThemes": "თემები",
+  "extCatAutomation": "ავტომატიზაცია",
+  "extCatStats": "სტატისტიკა",
+  "extCatNetwork": "ქსელი",
+  "extSortBy": "დალაგება",
+  "extSortPopular": "ყველაზე პოპულარული",
+  "extSortRating": "ყველაზე მაღალი რეიტინგი",
+  "extSortName": "დასახელება",
+  "extCatalogError": "კატალოგის ჩატვირთვა ვერ მოხერხდა",
+  "extRetry": "ხელახლა სცადეთ",
+  "extEmptySearch": "ვერაფერი მოიძებნა",
+  "extEmptyInstalled": "გაფართოებები ჯერ არ არის დაინსტალირებული.\nიპოვეთ ერთი კატალოგში ან დააინსტალირეთ ფაილიდან.",
+  "extInstallFromFile": "ინსტალაცია ფაილიდან",
+  "extInstallFromUrl": "ინსტალაცია URL-დან",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "ჩამოტვირთვა",
+  "extDownloading": "მიმდინარეობს ჩამოტვირთვა…",
+  "extVerifying": "დადასტურება…",
+  "extInstalling": "ინსტალაცია…",
+  "extInstallFailed": "ინსტალაცია ვერ მოხერხდა",
+  "extErrSignature": "ხელმოწერის შემოწმება ვერ მოხერხდა. ფაილი შეიძლება იყოს დაზიანებული ან დაზიანებული.",
+  "extErrManifest": "გაფართოების manifest არასწორია.",
+  "extErrNetwork": "ქსელის შეცდომა. შეამოწმეთ თქვენი კავშირი და სცადეთ ხელახლა.",
+  "extErrHash": "ჩამოტვირთვა არ ემთხვევა კატალოგს. შესაძლოა, ის გატეხილი იყო.",
+  "extErrMinApp": "ამ გაფართოებას სჭირდება აპის ვერსია {version} ან უფრო ახალი.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "დასაშვებია მხოლოდ https:// ბმული",
+  "extErrGeneric": "რაღაც შეფერხდა. გთხოვთ, სცადოთ ხელახლა.",
+  "extErrAuthorKeyChanged": "ეს განახლება ხელმოწერილია სხვა ავტორის გასაღებით, ვიდრე დაინსტალირებული ვერსია, ამიტომ დაბლოკილია. თუ ენდობით ახალ გასაღებს, წაშალეთ გაფართოება და ხელახლა დააინსტალირეთ იგი აშკარად.",
+  "extUpdateAvailable": "განახლება ხელმისაწვდომია",
+  "extDisabled": "გამორთულია",
+  "extToggleEnabled": "ჩართეთ {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "დაყენებული გაფართოებების ძიება",
+  "extUpdateAll": "განაახლეთ ყველაფერი",
+  "extUpdatesAvailable": "{count} განახლებები ხელმისაწვდომია",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} განახლებულია",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "ნორმალური",
+  "extRiskSensitive": "მგრძნობიარე",
+  "extRiskDangerous": "მაღალი რისკი",
+  "extPermissionsRemoved": "აღარ არის მოთხოვნილი:",
+  "extUpdateFailedKept": "წინა ვერსია ჯერ კიდევ დაინსტალირებულია.",
+  "extConflictsTitle": "გაფართოების კონფლიქტები",
+  "extConflictsIntro": "ეს გაფართოებები ერთსა და იმავეს ითხოვს. აირჩიეთ, რომელი იმუშავებს, მეორე დაინსტალირებული დარჩება.",
+  "extConflictTheme": "აპლიკაციის თემა",
+  "extConflictNetHooks": "ქსელის კაკვები",
+  "extConflictWinner": "უპირატესობა: {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} კონფლიქტებს თქვენი გადაწყვეტილება სჭირდება",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "კონფლიქტების მოგვარება",
+  "extConflictNote": "თქვენი არჩევანი ინახება ამ მოწყობილობაზე. თემა მაშინვე იცვლება, ქსელური ჰუკები კი ამ ვერსიაში არ ეშვება.",
+  "extVersionLabel": "ვერსია {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "ავტორი",
+  "extRating": "რეიტინგი",
+  "extInstalls": "ინსტალაციები",
+  "extVersion": "ვერსია",
+  "extAbout": "ამ გაფართოების შესახებ",
+  "extPermissionsTitle": "ნებართვები",
+  "extNoPermissions": "არ არის სპეციალური ნებართვები.",
+  "extSettings": "პარამეტრები",
+  "extSaveSettings": "პარამეტრების შენახვა",
+  "extSaving": "ინახება…",
+  "extUpdateTo": "განახლება {version}-ზე",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "ჩართულია",
+  "extRollbackTo": "დაბრუნება {version}-ზე",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "დაბრუნება ვერსიაზე {version}?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "დეინსტალაცია",
+  "extUninstallConfirm": "წაიშალოს „{name}“ და მისი პარამეტრები?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "პანელი მიუწვდომელია. გაფართოება შესაძლოა გათიშული ან წაშლილი იყოს.",
+  "extPermConnectionsRead": "იხილეთ აქტიური კავშირების სია",
+  "extPermServersRead": "იხილეთ თქვენი სერვერების სია",
+  "extPermSettingsRead": "წაიკითხეთ აპის პარამეტრები",
+  "extPermSettingsWrite": "შეცვალეთ აპის პარამეტრები",
+  "extPermNotifications": "შეტყობინებების ჩვენება",
+  "extPermTray": "დაამატეთ ელემენტები უჯრის მენიუში",
+  "extPermUiPanel": "აპის შიგნით პანელების ჩვენება",
+  "extPermThemeApply": "თემების გამოყენება",
+  "extPermRoutingRules": "მარშრუტიზაციის წესების დამატება (იმოქმედებს სად მიდის ქსელის ტრაფიკი)",
+  "extPermNetHooks": "ინტეგრირება ქსელის გზაზე (DPI შემოვლითი მოდულები)",
+  "extPermNetFetch": "მოითხოვეთ URL დაშვებული სიიდან",
+  "extPermBackground": "გაუშვით ფონური ამოცანები",
+  "extPermBackgroundDetail": "ასრულებს დაგეგმილ ამოცანებს მაშინაც კი, როდესაც პანელი დახურულია. შეგიძლიათ დააპაუზოთ ან შეცვალოთ მისი გაშვების სიხშირე გაფართოების პარამეტრებში.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "გადის ფონზე",
+  "extCapNetHook": "ბლოკირების გვერდის ავლა და ქსელის ჩარევები",
+  "extCapPanel": "ინტერფეისის პანელები",
+  "extCapRouting": "მარშრუტიზაციის წესები",
+  "extCapTheme": "თემები",
+  "extCapWidget": "ვიჯეტები",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "ცვლილებები",
+  "extImageFailed": "სურათის ჩატვირთვა ვერ მოხერხდა",
+  "extRatingHow": "როგორ მუშაობს რეიტინგები",
+  "extRatingHowBody": "რეიტინგები იყენებს ბაიესის საშუალოს: გაფართოება მცირე რეიტინგით რჩება შუათან ახლოს, სანამ მეტი ადამიანი არ მისცემს ხმას, ასე რომ, ერთი 5 ვარსკვლავიანი მიმოხილვა ვერ აიყვანს ახალ გაფართოებას ზევით. ბოლო რეიტინგები უფრო მეტს იწონის, ვიდრე ძველები და ანგარიშზე მხოლოდ ერთი რეიტინგი ითვლება.",
+  "extScreenshots": "ეკრანის ანაბეჭდები",
+  "extSortRelevance": "აქტუალობა",
+  "extPermNetworkDetail": "ტვირთავს მონაცემებს ინტერნეტიდან VPN-ის გავლით. დაშვებულია მხოლოდ ქვემოთ მოცემული ჰოსტები, დანარჩენი დაბლოკილია.",
+  "extBgTitle": "ფონური ამოცანა",
+  "extBgEnabled": "გაშვება ფონზე",
+  "extBgInterval": "გაშვების ინტერვალი",
+  "extBgMinutes": "{count, plural, one{# წუთი} other{# წუთი}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# საათი} other{# საათი}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "დავალება გრაფიკით ეშვება, სანამ Sora ღიაა, მათ შორის უჯრაში. მინიმალური ინტერვალი 15 წუთია.",
+  "extBgDisabledNote": "ჩართეთ გაფართოება მისი ფონის ამოცანის მართვისთვის.",
+  "extCapNetwork": "ქსელის წვდომა",
+  "extCapNetworkHosts": "ქსელი: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "გააზიარეთ QR კოდი",
+  "qrScanTitle": "QR კოდის სკანირება",
+  "qrCopyLink": "დააკოპირეთ ბმული",
+  "qrShowLink": "ბმული ჩვენება",
+  "qrHideLink": "ბმულის დამალვა",
+  "qrWarning": "ეს QR კოდი შეიცავს კავშირის დეტალებს. არ აჩვენო ის უცნობებს.",
+  "qrScanHint": "აირჩიეთ ეკრანის სურათი ან ფოტო QR კოდით, ან ჩასვით ბმული",
+  "qrFromClipboard": "ჩასმა ბუფერიდან",
+  "qrNoCode": "ამ სურათში QR კოდი ვერ მოიძებნა.",
+  "qrInvalid": "ეს QR კოდი არ შეიცავს მოქმედ ბმულს.",
+  "qrScan": "სკანირება QR",
+  "qrFromImage": "სურათის გახსნა",
+  "connGroupByProcess": "დაჯგუფება პროცესის მიხედვით",
+  "connListView": "სია",
+  "connCopyHost": "დააკოპირეთ მასპინძელი",
+  "connAddRule": "დაამატე წესი",
+  "connConnectionsCount": "{count, plural, one{# კავშირი} other{# კავშირი}}",
+  "dnsPreset": "წინასწარ დაყენებული",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "საკუთარი",
+  "dnsCheck": "შეამოწმეთ მონაცემთა გაჟონვა",
+  "dnsChecking": "შემოწმება...",
+  "dnsNoLeak": "გაჟონვა არ მოიძებნა",
+  "dnsLeakFound": "აღმოჩენილია გაჟონვა",
+  "dnsLastCheck": "ბოლო შემოწმება",
+  "dnsNeverChecked": "ჯერ არ არის გამოცდილი",
+  "dnsLeakCheckTunnelDns": "გვირაბის DNS რეზოლვერები",
+  "dnsLeakCheckSystemResolvers": "სისტემის რეზოლვერები",
+  "dnsLeakCheckKillSwitchDns": "DNS-ის დაცვა ქსელის ბლოკირებით",
+  "dnsLeakFixConfigureTunnelDns": "დააკონფიგურირეთ DNS გვირაბისთვის ზემოთ DNS პარამეტრებში.",
+  "dnsLeakFixReviewSystemResolvers": "შეამოწმეთ, რომელ გადამწყვეტებს გამოიყენებდა თქვენი სისტემა გვირაბის გარეთ.",
+  "dnsLeakFixEnableKillSwitch": "ჩართეთ ქსელის ბლოკირება, რათა DNS ტრაფიკი გვირაბში დარჩეს.",
+  "dnsLeakCheckEncryptedDns": "სისტემის დაშიფრული DNS",
+  "dnsLeakCheckDnsSpoof": "ყალბი DNS პასუხი",
+  "dnsLeakFixReviewEncryptedDns": "შეამოწმეთ, რომელ დაშიფრულ DNS ბოლო წერტილებს იყენებს თქვენი სისტემა გვირაბის გარეთ.",
+  "dnsLeakFixUseEncryptedDns": "გვირაბისთვის გამოიყენეთ დაშიფრული DNS (DoT ან DoH), რათა რეზოლვერებმა პასუხები ვერ გააყალბონ.",
+  "dnsCheckNeedsConnection": "ჯერ დაუკავშირდით VPN-ს, შემდეგ შეამოწმეთ გაჟონვა.",
+  "dnsExpected": "მოსალოდნელია",
+  "dnsActual": "დაფიქსირდა",
+  "sortBy": "დალაგება",
+  "sortPing": "პინგი",
+  "sortSpeed": "სიჩქარე",
+  "sortName": "სახელი",
+  "measureSpeed": "გაზომეთ სიჩქარე",
+  "benchmarkStale": "მოძველებულია",
+  "autoSelectMode": "ავტომატური არჩევის სერვერი",
+  "autoSelectPing": "ყველაზე სწრაფი პინგი",
+  "autoSelectSpeed": "ყველაზე სწრაფი სიჩქარე",
+  "autoSelectSmart": "ჭკვიანი არჩევანი",
+  "coreWatchUnstable": "Sora ბირთვთან კავშირი არასტაბილურია",
+  "watchReconnect": "ხელახლა დაკავშირება",
+  "coreRestoringLink": "მიმდინარეობს კავშირის აღდგენა Sora ბირთვთან…",
+  "crashRestoreTitle": "ბოლო სხდომა შეწყდა",
+  "restoreOnCrash": "სესიის აღდგენა ავარიის შემდეგ",
+  "crashRestore": "აღდგენა",
+  "crashDismiss": "ახლა არა",
+  "overrideTitle": "ჩემი რედაქტირებები",
+  "overrideEdit": "სერვერების რედაქტირება",
+  "overrideHide": "დამალვა",
+  "overrideUnhide": "ჩვენება",
+  "overrideClear": "რედაქტირების გადატვირთვა",
+  "overrideEmpty": "ჯერ არ არის შესწორებები",
+  "overrideCustomRules": "საკუთარი წესები",
+  "errBenchmarkUnsupported": "სიჩქარის გაზომვას უფრო ახალი ბირთვი სჭირდება",
+  "benchmarkProgress": "{done}-ის გაზომვა {total}-დან…",
+  "profiles": "ქსელის პროფილები",
+  "profilesEmpty": "ჯერ არ არის პროფილები. შექმენით ერთი, რომ ავტომატურად გამოიყენოს პარამეტრები ცნობილ ქსელებში.",
+  "profileAdd": "პროფილის დამატება",
+  "profileName": "პროფილის სახელი",
+  "profileSsids": "Wi-Fi ქსელები (SSID)",
+  "profileSsidsHint": "სახლი, ოფისი გამოყოფილია მძიმეებით",
+  "profileGateways": "ქსელის კარიბჭეები",
+  "profileAsns": "AS ნომრები",
+  "profileAutoApply": "ავტომატურად გამოყენება",
+  "profileAutoApplyHint": "თუ გამორთულია, პროფილის გამოყენებამდე დადასტურებას მოგთხოვთ.",
+  "profileSnapshot": "დაიმახსოვრე მიმდინარე პარამეტრები",
+  "profileSnapshotDone": "მიმდინარე პარამეტრები შენახულია პროფილში",
+  "profileDelete": "პროფილის წაშლა",
+  "profileDeleteConfirm": "წაშალოთ პროფილი „{name}“?",
+  "profileApplyAsk": "გსურთ პროფილის „{name}“ გამოყენება?",
+  "profileApply": "გამოყენება",
+  "profileApplied": "პროფილი „{name}“ გამოყენებულია",
+  "profileUndo": "გაუქმება",
+  "profileActive": "აქტიური",
+  "networkNow": "ახლა: {info}",
+  "networkUnknown": "ქსელის ინფორმაცია მიუწვდომელია",
+  "profileNoTriggers": "დაამატეთ მინიმუმ ერთი ტრიგერი: SSID, კარიბჭე ან ASN",
+  "chains": "პროქსი ჯაჭვები",
+  "chainsEmpty": "ჯაჭვები ჯერ არ არის. დააკავშირეთ 2–3 სერვერი, რათა ტრეფიკი გადაიტანოს თითოეულ მათგანში.",
+  "chainAdd": "ახალი ჯაჭვი",
+  "chainName": "ჯაჭვის სახელწოდება",
+  "chainPickServers": "აირჩიეთ 2–3 სერვერი",
+  "chainOrderHint": "გადაათრიეთ ხელახლა შეკვეთისთვის: ტრაფიკი შედის ზევით და გამოდის ქვემოდან.",
+  "chainTooFew": "აირჩიეთ მინიმუმ 2 სერვერი",
+  "chainTooMany": "ჯაჭვი ინახავს მაქსიმუმ 3 სერვერს",
+  "chainEstimate": "სავარაუდო შეყოვნება",
+  "chainSave": "ჯაჭვის შენახვა",
+  "chainDelete": "ჯაჭვის წაშლა",
+  "chainDeleteConfirm": "წაშალოთ ჯაჭვი \"{name}\"?",
+  "chainUnsupported": "მიმდინარე ძრავას არ შეუძლია ჯაჭვების აშენება",
+  "chainHopMissing": "ერთ-ერთი ჯაჭვის სერვერი აღარ არის ხელმისაწვდომი",
+  "chainHop": "გადასვლა {n}",
+  "chainEntry": "შესასვლელი",
+  "chainExit": "გასასვლელი",
+  "sync": "მოწყობილობის სინქრონიზაცია",
+  "syncDevices": "ჩემი მოწყობილობები",
+  "syncEmpty": "არ არის დაწყვილებული მოწყობილობები. სხვა მოწყობილობის დაწყვილება ლოკალურ ქსელში.",
+  "syncPair": "მოწყობილობის დაწყვილება",
+  "syncShowCode": "აჩვენე ჩემი კოდი",
+  "syncScanCode": "კოდის სკანირება",
+  "syncRevoke": "გატანა",
+  "syncRevokeConfirm": "გააუქმოს \"{name}\"?",
+  "syncLastSync": "ბოლო სინქრონიზაცია: {time}",
+  "syncNever": "არასოდეს",
+  "syncNoLan": "მოწყობილობები უნდა იყოს იმავე ლოკალურ ქსელში",
+  "syncPaired": "მოწყობილობა დაწყვილებულია",
+  "syncPairingTitle": "დაწყვილება ამ მოწყობილობასთან",
+  "syncWaiting": "ელოდება სხვა მოწყობილობას…",
+  "syncSecureNote": "ბოლოდან ბოლომდე დაშიფრული არხი. არც ანგარიშები, არც ღრუბლოვანი სერვერები.",
+  "zapretWithVpn": "გვერდის ავლით DPI ფილტრაცია პირდაპირი ქსელის ტრაფიკისთვის",
+  "zapretWithVpnHint": "უშვებს zapret-ს VPN გვირაბთან ერთად: გვირაბის ტრაფიკი გადის VPN-ით, პირდაპირი ტრაფიკი კი ბლოკირების გვერდის ავლის მექანიზმით.",
+  "chainDuplicate": "თითოეული სერვერი შეიძლება გამოჩნდეს მხოლოდ ერთხელ",
+  "edit": "რედაქტირება",
+  "remove": "ამოღება",
+  "autoSwitchOnDegrade": "ავტომატური ჩართვა დეგრადაციაზე",
+  "autoSwitchOnDegradeDetail": "თუ არჩეული სერვერი მნიშვნელოვნად შენელდება ან პასუხს შეწყვეტს, Sora გაზომვის შედეგებით საუკეთესო სერვერზე გადაერთვება, მაგრამ არა უმეტეს ერთხელ ყოველ 10 წუთში.",
+  "tunStackMixed": "შერეული",
+  "tunStackSystem": "სისტემა",
+  "syncCodeExpired": "კოდს ვადა გაუვიდა",
+  "syncDaemonFailed": "სინქრონიზაციის სერვისის დაწყება ვერ მოხერხდა",
+  "syncDaemonMissing": "sora-sync კომპონენტი ვერ მოიძებნა. ხელახლა დააინსტალირეთ აპი მოწყობილობის სინქრონიზაციის გასააქტიურებლად.",
+  "syncDaemonStarting": "სინქრონიზაციის სერვისის დაწყება…",
+  "syncErrAuth": "სინქრონიზაციის სერვისმა უარყო წვდომის ჟეტონი. გადატვირთეთ აპი და სცადეთ ხელახლა.",
+  "syncErrNotFound": "მოწყობილობა აღარ არის დაწყვილებული",
+  "syncErrPairingActive": "დაწყვილების სესია უკვე ღიაა",
+  "syncErrUnreachable": "მეორე მოწყობილობამ არ უპასუხა. დარწმუნდით, რომ ის იმავე ქსელშია და აჩვენებს მის კოდს.",
+  "syncError": "სინქრონიზაციის შეცდომა",
+  "syncExpiresIn": "კოდის ვადა ამოიწურება {duration}-ში",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "მოწყობილობასთან დაწყვილება…",
+  "syncLegacyCleared": "ძველი მოწყობილობების სია ფაქტობრივად არასოდეს ყოფილა დაწყვილებული, ამიტომ ის გასუფთავდა. ხელახლა დააწყვილეთ თქვენი მოწყობილობები, ამჯერად რეალურად.",
+  "syncNewCode": "ახალი კოდი",
+  "syncPairedWith": "დაწყვილებულია {name}-თან",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "გაიმეორეთ",
+  "syncStopShowing": "კოდის დამალვა",
+  "syncSyncNow": "სინქრონიზაცია ახლა",
+  "syncSyncResult": "მიღებული {pulled}, გაგზავნილი {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "სინქრონიზაციის შედეგი",
+  "syncPulled": "მიღებულია",
+  "syncPushed": "გაგზავნილი",
+  "syncNoChanges": "ცვლილებები არ გამოვლენილა",
+  "syncDocKindSubscriptions": "გამოწერები",
+  "syncDocKindSettings": "აპის პარამეტრები",
+  "syncDocKindOverrides": "გამოწერების შეცვლილი პარამეტრები",
+  "syncDocKindProfiles": "ქსელის პროფილები",
+  "syncDocKindChains": "პროქსი ჯაჭვები",
+  "syncFrom": "{name}-დან",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "ეს მოწყობილობა",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Shadowsocks-ისთვის: მეთოდი:პაროლი, მაგალითად chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "პაკეტის დაჭერა",
+  "diagnosticEvents": "Windows-ის მოვლენები",
+  "diagnosticCapture": "გადაიღეთ 10 წამის განმავლობაში",
+  "diagnosticRequiresTun": "პაკეტის დაჭერას სჭირდება აქტიური Sora TUN კავშირი.",
+  "diagnosticUnavailable": "ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე.",
+  "extErrRevoked": "Sora-ს გუნდმა გაფართოების ეს ვერსია გააუქმა, რადგან ის სახიფათო ან გაუმართავია.",
+  "extErrRevocationsExpired": "გაუქმებული გაფართოებების სია ვერ განახლდა. განახლებამდე ინსტალაცია დაბლოკილია: შეამოწმეთ ქსელი და სცადეთ თავიდან.",
+  "extRevokedDisabled": "გაუქმებული გაფართოებები გაითიშა: {names}",
+  "customServerWgPrivateKey": "პირადი გასაღები",
+  "customServerWgAddresses": "ინტერფეისის მისამართები",
+  "customServerWgPeerKey": "სერვერის საჯარო გასაღები",
+  "customServerWgPresharedKey": "საერთო გასაღები",
+  "customServerWgAllowedIps": "დაშვებული IP-ები",
+  "customServerWgKeepalive": "Keepalive, წამი",
+  "customServerWgKeyInvalid": "გასაღები უნდა იყოს 32 ბაიტი base64-ში, როგორც wg genkey ბეჭდავს.",
+  "customServerWgCidrInvalid": "შეიყვანეთ მძიმით გამოყოფილი პრეფიქსები, მაგალითად 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "შეიყვანეთ წამების რაოდენობა 0-დან 65535-მდე.",
+  "strictKillSwitch": "ქსელის მკაცრი ბლოკირება",
+  "strictKillSwitchWarning": "დაკავშირების შემდეგ ბლოკავს VPN-ის გარეთ ტრაფიკს შეფერხების, გადატვირთვის ან აპიდან გასვლის შემდეგაც. წვდომა აღდგება მხოლოდ კავშირის გაწყვეტით ან ამ პარამეტრის გამორთვით. მოწყობილობის გადატვირთვის შემდეგ ბლოკირება განახლდება მხოლოდ გაშვებისას დაკავშირების ჩართვის შემთხვევაში.",
+  "extWorkerFailed": "გაფართოების ფონური დავალება ვერ შესრულდა. შეამოწმეთ გაფართოების ჟურნალი.",
+  "extAssetRejected": "გაფართოების ფაილი უარყოფილია: წაუკითხავი ფერები ან არასწორი წესები."
 }

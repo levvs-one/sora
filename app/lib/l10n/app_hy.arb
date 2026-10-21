@@ -5,7 +5,6 @@
   "stateConnected": "Միացված է",
   "stateReconnecting": "Վերամիացում",
   "stateDisconnecting": "Անջատում",
-  "stateFailed": "Միացված չէ",
   "coreMissing": "Sora ծառայությունը չի արձագանքում",
   "serverAuto": "Ամենաարագ",
   "serverBypass": "Սերվեր չկա",
@@ -41,6 +40,7 @@
   "export": "Պահել ֆայլում",
   "clear": "Պարզ",
   "logsEmpty": "Այստեղ ոչինչ",
+  "connEmpty": "Կապ չկա",
   "appVersion": "Տարբերակ {version}",
   "notInstalled": "Տեղադրված չէ",
   "sourceCode": "Աղբյուրի կոդը",
@@ -75,17 +75,16 @@
   "errSubScheme": "Հղումը պետք է սկսվի https://-ով",
   "errSecretStore": "Sora պահեստը վնասված է կամ անհասանելի է",
   "errNoServers": "Միանալու համար ավելացրեք բաժանորդագրություն",
-  "exportText": "Տեքստ",
   "connections": "Միացումներ",
   "close": "Փակել",
   "chainDirect": "Ուղղակի",
   "chainBlocked": "Արգելափակված",
   "theme": "Թեմա",
-  "themeSystem": "System",
+  "themeSystem": "Ինչպես համակարգում",
   "themeLight": "Լույս",
   "themeDark": "Մութ",
   "language": "Լեզու",
-  "languageSystem": "System",
+  "languageSystem": "Ինչպես համակարգում",
   "sectionConnection": "Միացում",
   "sectionNoServer": "Սերվեր չկա",
   "sectionPing": "Պինգ",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} մնացել է",
   "ruleInvalid": "Սա նման չէ կայքի, IP-ի կամ ծրագրի",
   "tunnelMode": "Ռեժիմ",
-  "tunnelTun": "Ամբողջ երթեւեկությունը",
   "tunnelProxy": "System վստահված անձ",
   "proxyAddress": "Վստահված անձի հասցե",
   "copied": "Պատճենվել է",
   "launchAtLogin": "Սկսեք համակարգից",
+  "launchAtLoginDetail": "Մուտք գործելիս Sora-ն կգործարկվի ավտոմատ և կմնա համակարգային սկուտեղում։",
   "closeToTray": "Փակված վիճակում պահել սկուտեղի մեջ",
   "notifications": "Ծանուցումներ",
   "trayOpen": "Բացեք Sora",
@@ -185,12 +184,6 @@
   "sidebarToggle": "Միացնել կողագոտին",
   "more": "Ավելին",
   "less": "Ավելի քիչ",
-  "currentServer": "Ընթացիկ սերվեր",
-  "trafficDown": "Ներբեռնված",
-  "trafficUp": "Վերբեռնված է",
-  "perSecond": "{value}/վ",
-  "activeRules": "Ակտիվ կանոններ՝ {count}",
-  "recentNotifications": "Վերջին ծանուցումները",
   "notificationsEmpty": "Կապի և բաժանորդագրության իրադարձությունները կհայտնվեն այստեղ",
   "retryConnect": "Կրկին փորձեք կապը",
   "openLogs": "Բացեք տեղեկամատյանները",
@@ -208,12 +201,9 @@
   "chooseProgram": "Ընտրեք ծրագիր",
   "installedApps": "Տեղադրված հավելվածներ",
   "runningProcesses": "Գործող գործընթացներ",
-  "programsFailed": "Չհաջողվեց բեռնել հավելվածները",
   "programsEmpty": "Հայտեր չեն գտնվել: Փորձեք մեկ այլ անուն:",
   "selectExe": "Ընտրեք .exe ֆայլ",
-  "trafficUnavailable": "Հաշվիչները դեռ հասանելի չեն",
   "speedtest": "Արագություն",
-  "speedtestCheck": "Ստուգեք արագությունը",
   "speedtestSearch": "Գտեք ծառայություն",
   "speedtestEmpty": "Համընկնումներ չկան: Փոխեք որոնումը:",
   "speedtestBackToList": "Վերադարձ դեպի ծառայություններ",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "Պատճենել հրամանը",
   "updateChecksDisabled": "Ավտոմատ ստուգումները անջատված են Կարգավորումներում:",
   "updateInstalled": "Տեղադրված է թարմացում: Վերաբացեք Sora:",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "Նախագիծ",
   "githubReleases": "Թողարկումներ և ներբեռնումներ",
   "telegramChannel": "Telegram ալիք",
   "licenses": "Լիցենզիաներ",
   "componentLicenses": "Բաղադրիչների լիցենզիաներ",
-  "appCopyright": "© 2026 levvs-one և ներդրողներ",
   "collapseServers": "Ծալել սերվերները",
   "expandServers": "Ընդլայնել սերվերները",
   "hideDescription": "Թաքցնել նկարագրությունը",
   "showDescription": "Ցույց տալ նկարագրությունը",
   "pendingConnectionChanges": "Այս փոփոխությունները կիրառելու համար նորից միացեք:",
   "reconnectNow": "Դիմեք և նորից միացեք",
-  "bypassLimitations": "Այս ռեժիմը շրջանցում է DPI-ն միայն HTTP-ի և TLS-ի համար, չի աջակցում UDP և չի փոխում ձեր IP-ն: Օգտագործեք VPN սերվեր Discord ձայնի, զանգերի և արգելափակված Telegram հասցեների համար:",
   "errEngineUnsupported": "Ընտրված շարժիչը չի աջակցում այս պրոֆիլը կամ կարգավորումները: Ընտրեք Ավտո կամ համատեղելի շարժիչ:",
   "errRestore": "Կապի մաքրումը թերի էր: Կրկին փորձեք անջատել; մանրամասների համար տես գրանցամատյանը:",
   "errSessionEnded": "Այս նիստն արդեն ավարտվել է։ Թարմացրեք կապի վիճակը:",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "Ռեժիմներ և շարժիչներ",
   "probeServers": "Ստուգեք սերվերները",
   "expiresIn": "{name}: {days, plural, =0{բաժանորդագրությունն ավարտվում է մի քանի ժամից} one{բաժանորդագրությունն ավարտվում է # օրը} other{բաժանորդագրությունն ավարտվում է # օրից}}",
-  "groupOrdered": "{count, plural, one{# սերվերը, իր հերթին} other{# սերվերները, իր հերթին}}",
   "groupBest": "{count, plural, one{# սերվեր, ամենաարագը} other{# սերվերներ, ամենաարագը}}",
-  "modesGuide": "Ընտրեք Ավտոմատ, եթե վստահ չեք, թե որ շարժիչն է անհրաժեշտ ձեր սերվերին: Sora-ը ստուգում է պրոֆիլը և կարգավորումները միանալուց առաջ: Շարժիչը չի կարող մեծացնել ձեր պլանի թողունակությունը. կատարումը կախված է սերվերից, երթուղուց, արձանագրությունից և ցանցից:\n\n## ռեժիմներ\n\n### Ամբողջ երթևեկությունը (TUN)\n\nSora-ը ստեղծում է վիրտուալ ցանցային ինտերֆեյս և երթուղավորում է հավելվածների տրաֆիկը դրա միջով, ներառյալ TCP և UDP: Օգտագործեք այս ռեժիմը Telegram, խաղերի և Discord ձայնի համար: Կանոնները կարող են ուղղակիորեն ուղարկել կոնկրետ կայքեր կամ ծրագրեր կամ արգելափակել դրանք: Ցանցային ծառայությանը անհրաժեշտ է թույլտվություն և սերվեր, որն աջակցում է պահանջվող արձանագրությանը:\n\n### System վստահված անձ\n\nSora-ը կարգավորում է տեղական HTTP/SOCKS վստահված անձը: Այն օգտագործում են այն հավելվածները, որոնք հարգում են համակարգի վստահված անձի կարգավորումները: Ծրագրերն իրենց սեփական ցանցային փաթեթով կարող են ուղղակիորեն միանալ. UDP-ին և ձայնային զանգերին ընդհանուր առմամբ անհրաժեշտ է TUN: Այս ռեժիմը համապատասխանում է պրոքսի աջակցությամբ բրաուզերներին և հավելվածներին:\n\n### Սերվեր չկա\n\nLinux-ում Sora-ն օգտագործում է [zapret](https://github.com/bol-van/zapret) HTTP/TLS հարցումները բաժանելու և ձևափոխելու և որոշ DPI ստուգումներ շրջանցելու համար: Ձեր IP-ն մնում է նույնը, և կապերն անմիջապես գնում են դեպի կայք: Արդյունքները կախված են ձեր մատակարարից և արգելափակման եղանակից:\n\nԸնթացիկ ինտեգրումն օգտագործում է tpws HTTP-ի և TLS-ի համար TCP-ի միջոցով: Այն չի շրջանցում IP արգելափակումը կամ փոխանցում UDP-ն և չի կարող երաշխավորել Telegram-ի MTProto կապերը: Օգտագործեք VPN սերվեր TUN-ով Discord ձայնի, Telegram զանգերի և այս տեսակի սահմանափակումների համար:\n\n## Շարժիչներ\n\n### Ավտո\n\nSora-ն ընտրում է տեղադրված շարժիչ, որն աջակցում է կապի ամբողջ պլանին՝ սերվերի արձանագրություններ, փոխադրումներ, խմբեր, մասնատում և ռեժիմ: Անհամատեղելի ձեռքով ընտրությունը մերժվում է մինչ ընթացիկ կապը դադարեցնելը: Ընտրեք Ավտո կամ մեկ այլ շարժիչ և նորից կիրառեք կարգավորումները:\n\n### sing-box\n\nSora նոր փաթեթները ներառում են [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), մի պատառաքաղ [sing-box] (https://github.com/SagerNet/sing-box), ավելացնելով հաճախորդի կողմից XHTTP և VLESS Encryption: Sora-ը ճանաչում է կառուցվածքը և դրա հնարավորությունները: Առանց XHTTP-ի վերին հոսանքով կառուցված սարքը միայն իր անունից չի ստանում այս հնարավորությունը:\n\nԱջակցվող արձանագրություններն են VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard և AmneziaWG 1.x/2.x-ի այն պարամետրերը, որոնք Sora-ն կարող է ներմուծել։ Ամբողջական Xray JSON պրոֆիլների համար անհրաժեշտ է Xray։ Նոր AWG 3.x դաշտերը դեռ հնարավոր չէ ներմուծել։ sing-box-ն օգտագործում է գաղտնաբառով պաշտպանված տեղային կառավարման պորտ, որը համակարգչի մյուս ծրագրերը կարող են հայտնաբերել։\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) աջակցում է VLESS, REALITY, XHTTP, VLESS Encryption և TLS մասնատումը: Այն նաև գործարկում է ամբողջական մատակարար Xray պրոֆիլները՝ պահպանելով դրանց երթուղին և խմբերը: Նման պրոֆիլները չեն կարող ավտոմատ կերպով փոխակերպվել մեկ այլ շարժիչի՝ առանց դրանց վարքագիծը փոխելու:\n\nՄիավորված Xray-ը հեռացրեց TLS վկայագրի ստուգումն անջատող կարգավորումը («allowInsecure»): Այս պարամետրը պահանջող սովորական սերվերների համար ավտոմատ ընտրում է sing-box կամ mihomo: Xray ընտրելը ձեռքով հայտնում է անհամատեղելիության մասին՝ մինչ ընթացիկ կապը դադարեցնելը: Ավելի հին ամբողջական JSON պրոֆիլներին անհրաժեշտ է թարմացված մատակարարի պրոֆիլ՝ ստուգելի վկայականով կամ վկայագրի փինով:\n\n### mihomo\n\n[mihomo] (https://github.com/MetaCubeX/mihomo) աջակցում է պատվիրված հետադարձ և բեռը հավասարակշռող խմբեր, XHTTP և AmneziaWG: Ընտրեք այն, երբ պահուստային սերվերի ավտոմատ ձախողումը կարևոր է: Sora-ի TLS մասնատման կարգավորումն անհասանելի է այս շարժիչով:\n\n## Համատեղելիություն Sora-ում\n\n| Առանձնահատկություն | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN և TCP/UDP | Այո | Այո | Այո |\n| XHTTP | Այո | Այո | Այո |\n| VLESS Encryption | Այո | Այո | Այո |\n| Ամբողջական Xray պրոֆիլը | Ոչ | Այո | Ոչ |\n| TUIC / AnyTLS | Երկուսն էլ | Ոչ | TUIC |\n| TLS մասնատում | Այո | Այո | Ոչ |\n| AmneziaWG 1.x/2.x | Այո¹ | Ոչ | Այո |\n| Պատվիրված հետադարձ խումբ | Ոչ | No² | Այո |\n\n¹ J1/J2/J3/Itime-ով պրոֆիլներն օգտագործում են mihomo; այս դաշտերը երբեք չպետք է լուռ անտեսվեն: ² Ամբողջական Xray պրոֆիլների խմբի համար հավելվածն ընտրում է պահուստային պրոֆիլ: Աջակցությունը կախված է տեղադրված կառուցվածքից; ստուգեք դրա տարբերակը About-ում:\n\n## TUN կույտ\n\nԿույտը մշակում է TCP և UDP վիրտուալ ինտերֆեյսի ներսում: Ռեժիմների վահանակում Xray և mihomo առաջարկում են gVisor, System, Mixed և MIPS: Յուրաքանչյուր շարժիչ պահպանում է իր նախապատվությունը: System վստահված անձը և առանց սերվերի ռեժիմները չեն օգտագործում այս նախապատվությունը:\n\n- **Mixed** — TCP-ն օգտագործում է համակարգի կույտը, մինչդեռ gVisor-ը մշակում է UDP-ն: Սա mihomo-ի կանխադրված տարբերակն է Linux-ում։ Windows-ում Xray-ն և mihomo-ն լռելյայն օգտագործում են MIPS։\n- **System** — օգտագործում է համակարգի կույտը: Փորձեք մեկ այլ տարբերակ, եթե ցանցային հավելվածները խնդիրներ ունենան:\n- **gVisor** — կարգավորում է երթևեկությունը օգտվողների տարածքում:\n- **MIPS** — mihomo-ի սեփական IP փաթեթը, հասանելի է փաթեթավորված 1.19.32 տարբերակում:\n\nLinux-ում Xray-ն օգտագործում է իր ներկառուցված gVisor լռելյայն: System, Mixed և MIPS Linux-ում օգտագործում են mihomo որպես TUN շարժիչ՝ TCP-ն և UDP-ն փոխանցելով Xray-ին վավերացված տեղական SOCKS հղման միջոցով: Xray-ը պահպանում է արձանագրությունը, մատակարարի պրոֆիլը և երթուղին: Այս երեք տարբերակները պահանջում են տեղադրված mihomo: Windows-ում Xray-ը բոլոր չորս TUN ստեկերի համար օգտագործում է mihomo 1.19.32 կամ ավելի նոր տարբերակ։ Արձանագրություններն ու երթուղավորումը մնում են Xray-ում։ Այս համակցությունում հավելվածների կանոնները աջակցում են միայն ուղիղ միացմանը և արգելափակմանը․ Linux-ում այդ կանոնները պահանջում են Xray-ի ներկառուցված gVisor-ը։\n\nԿամուրջն իրականացնում է երկրորդ գործընթացը: Linux-ի երեք անգործուն չափումների ժամանակ այն օգտագործել է մոտ 32–36 ՄԲ-ով ավելի ֆիզիկական հիշողություն, քան բնիկ Xray TUN-ը: Սա չի չափում ներբեռնման բեռը. պրոցեսորի և հիշողության ծախսերը կախված են միացումներից: sing-box չունի կույտերի ընտրիչ: Ոչ մի կույտ չի երաշխավորում ավելի լավ կատարում յուրաքանչյուր ցանցում: Ընտրեք կույտ և ընտրեք Դիմել և նորից միացեք՝ այն ձեր ցանցում փորձելու համար:\n\n## Կարգավորումների կիրառում\n\nՍերվեր ընտրելը ավտոմատ կերպով նորից միանում է: Ռեժիմը, շարժիչը, DNS-ը և կանոնների կարգավորումները անմիջապես պահվում են. ակտիվ կապի ժամանակ սեղմեք Դիմել և նորից միացեք դրանք օգտագործելու համար: Շարժիչի վերագործարկումը կարող է ընդհատել ներբեռնումները և զանգերը: Կրկնվող սեղմումները չեն սկսում զուգահեռ կապեր; անջատումը ավարտում է անցումը և ազատում կապը:\n\nԻնտերնետը միայն VPN-ի միջոցով արգելափակում է ուղիղ երթևեկությունը, երբ թունելն ընկնում է: Այն ազդում է ամբողջ մեքենայի վրա: Հստակ անջատումը վերացնում է Sora-ի կանոնները: Եթե ​​մաքրումը չի ավարտվում, նորից փորձեք անջատել և բացել գրանցամատյանը:\n\n## Ծրագրի փաստաթղթեր\n\n- [sing-box-lx. կոնֆիգուրացիա և աջակցություն] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box փաստաթղթեր] (https://sing-box.sagernet.org/)\n- [Xray փաստաթղթեր] (https://xtls.github.io/)\n- [mihomo փաստաթղթեր] (https://wiki.metacubex.one/)\n- [zapret. գործողություն և սահմանափակումներ] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Ընտրեք Ավտոմատ, եթե վստահ չեք, թե որ շարժիչն է անհրաժեշտ ձեր սերվերին: Sora-ը ստուգում է պրոֆիլը և կարգավորումները միանալուց առաջ: Շարժիչը չի կարող մեծացնել ձեր պլանի թողունակությունը. կատարումը կախված է սերվերից, երթուղուց, արձանագրությունից և ցանցից:\n\n## ռեժիմներ\n\n### Ամբողջ երթևեկությունը (TUN)\n\nSora-ը ստեղծում է վիրտուալ ցանցային ինտերֆեյս և երթուղավորում է հավելվածների տրաֆիկը դրա միջով, ներառյալ TCP և UDP: Օգտագործեք այս ռեժիմը Telegram, խաղերի և Discord ձայնի համար: Կանոնները կարող են ուղղակիորեն ուղարկել կոնկրետ կայքեր կամ ծրագրեր կամ արգելափակել դրանք: Ցանցային ծառայությանը անհրաժեշտ է թույլտվություն և սերվեր, որն աջակցում է պահանջվող արձանագրությանը:\n\n### System վստահված անձ\n\nSora-ը կարգավորում է տեղական HTTP/SOCKS վստահված անձը: Այն օգտագործում են այն հավելվածները, որոնք հարգում են համակարգի վստահված անձի կարգավորումները: Ծրագրերն իրենց սեփական ցանցային փաթեթով կարող են ուղղակիորեն միանալ. UDP-ին և ձայնային զանգերին ընդհանուր առմամբ անհրաժեշտ է TUN: Այս ռեժիմը համապատասխանում է պրոքսի աջակցությամբ բրաուզերներին և հավելվածներին:\n\n### Սերվեր չկա\n\nLinux-ում Sora-ն օգտագործում է [zapret](https://github.com/bol-van/zapret) HTTP/TLS հարցումները բաժանելու և ձևափոխելու և որոշ DPI ստուգումներ շրջանցելու համար: Ձեր IP-ն մնում է նույնը, և կապերն անմիջապես գնում են դեպի կայք: Արդյունքները կախված են ձեր մատակարարից և արգելափակման եղանակից:\n\nԸնթացիկ ինտեգրումն օգտագործում է tpws HTTP-ի և TLS-ի համար TCP-ի միջոցով: Այն չի շրջանցում IP արգելափակումը կամ փոխանցում UDP-ն և չի կարող երաշխավորել Telegram-ի MTProto կապերը: Օգտագործեք VPN սերվեր TUN-ով Discord ձայնի, Telegram զանգերի և այս տեսակի սահմանափակումների համար:\n\n## Շարժիչներ\n\n### Ավտո\n\nSora-ն ընտրում է տեղադրված շարժիչ, որն աջակցում է կապի ամբողջ պլանին՝ սերվերի արձանագրություններ, փոխադրումներ, խմբեր, մասնատում և ռեժիմ: Անհամատեղելի ձեռքով ընտրությունը մերժվում է մինչ ընթացիկ կապը դադարեցնելը: Ընտրեք Ավտո կամ մեկ այլ շարժիչ և նորից կիրառեք կարգավորումները:\n\n### sing-box\n\nSora նոր փաթեթները ներառում են [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), մի պատառաքաղ [sing-box] (https://github.com/SagerNet/sing-box), ավելացնելով հաճախորդի կողմից XHTTP և VLESS Encryption: Sora-ը ճանաչում է կառուցվածքը և դրա հնարավորությունները: Առանց XHTTP-ի վերին հոսանքով կառուցված սարքը միայն իր անունից չի ստանում այս հնարավորությունը:\n\nԱջակցվող արձանագրություններն են VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard և AmneziaWG 1.x/2.x-ի այն պարամետրերը, որոնք Sora-ն կարող է ներմուծել։ Ամբողջական Xray JSON պրոֆիլների համար անհրաժեշտ է Xray։ Նոր AWG 3.x դաշտերը դեռ հնարավոր չէ ներմուծել։ sing-box-ն օգտագործում է գաղտնաբառով պաշտպանված տեղային կառավարման պորտ, որը համակարգչի մյուս ծրագրերը կարող են հայտնաբերել։\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) աջակցում է VLESS, REALITY, XHTTP, VLESS Encryption և TLS մասնատումը: Այն նաև գործարկում է ամբողջական մատակարար Xray պրոֆիլները՝ պահպանելով դրանց երթուղին և խմբերը: Նման պրոֆիլները չեն կարող ավտոմատ կերպով փոխակերպվել մեկ այլ շարժիչի՝ առանց դրանց վարքագիծը փոխելու:\n\nՄիավորված Xray-ը հեռացրեց TLS վկայագրի ստուգումն անջատող կարգավորումը («allowInsecure»): Այս պարամետրը պահանջող սովորական սերվերների համար ավտոմատ ընտրում է sing-box կամ mihomo: Xray ընտրելը ձեռքով հայտնում է անհամատեղելիության մասին՝ մինչ ընթացիկ կապը դադարեցնելը: Ավելի հին ամբողջական JSON պրոֆիլներին անհրաժեշտ է թարմացված մատակարարի պրոֆիլ՝ ստուգելի վկայականով կամ վկայագրի փինով:\n\n### mihomo\n\n[mihomo] (https://github.com/MetaCubeX/mihomo) աջակցում է պատվիրված հետադարձ և բեռը հավասարակշռող խմբեր, XHTTP և AmneziaWG: Ընտրեք այն, երբ պահուստային սերվերի ավտոմատ ձախողումը կարևոր է: Sora-ի TLS մասնատման կարգավորումն անհասանելի է այս շարժիչով:\n\n## Համատեղելիություն Sora-ում\n\n| Առանձնահատկություն | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN և TCP/UDP | Այո | Այո | Այո |\n| XHTTP | Այո | Այո | Այո |\n| VLESS Encryption | Այո | Այո | Այո |\n| Ամբողջական Xray պրոֆիլը | Ոչ | Այո | Ոչ |\n| TUIC / AnyTLS | Երկուսն էլ | Ոչ | TUIC |\n| TLS մասնատում | Այո | Այո | Ոչ |\n| AmneziaWG 1.x/2.x | Այո¹ | Ոչ | Այո |\n| Պատվիրված հետադարձ խումբ | Ոչ | No² | Այո |\n\n¹ J1/J2/J3/Itime-ով պրոֆիլներն օգտագործում են mihomo; այս դաշտերը երբեք չպետք է լուռ անտեսվեն: ² Ամբողջական Xray պրոֆիլների խմբի համար հավելվածն ընտրում է պահուստային պրոֆիլ: Աջակցությունը կախված է տեղադրված կառուցվածքից; ստուգեք դրա տարբերակը About-ում:\n\n## TUN կույտ\n\nԿույտը մշակում է TCP և UDP վիրտուալ ինտերֆեյսի ներսում: Ռեժիմների վահանակում Xray և mihomo առաջարկում են gVisor, System, Mixed և MIPS: Յուրաքանչյուր շարժիչ պահպանում է իր նախապատվությունը: System վստահված անձը և առանց սերվերի ռեժիմները չեն օգտագործում այս նախապատվությունը:\n\n- **Mixed**: TCP-ն օգտագործում է համակարգի կույտը, մինչդեռ gVisor-ը մշակում է UDP-ն: Սա mihomo-ի կանխադրված տարբերակն է Linux-ում։ Windows-ում Xray-ն և mihomo-ն լռելյայն օգտագործում են MIPS։\n- **System**: օգտագործում է համակարգի կույտը: Փորձեք մեկ այլ տարբերակ, եթե ցանցային հավելվածները խնդիրներ ունենան:\n- **gVisor**: կարգավորում է երթևեկությունը օգտվողների տարածքում:\n- **MIPS**: mihomo-ի սեփական IP փաթեթը, հասանելի է փաթեթավորված 1.19.32 տարբերակում:\n\nLinux-ում Xray-ն օգտագործում է իր ներկառուցված gVisor լռելյայն: System, Mixed և MIPS Linux-ում օգտագործում են mihomo որպես TUN շարժիչ՝ TCP-ն և UDP-ն փոխանցելով Xray-ին վավերացված տեղական SOCKS հղման միջոցով: Xray-ը պահպանում է արձանագրությունը, մատակարարի պրոֆիլը և երթուղին: Այս երեք տարբերակները պահանջում են տեղադրված mihomo: Windows-ում Xray-ը բոլոր չորս TUN ստեկերի համար օգտագործում է mihomo 1.19.32 կամ ավելի նոր տարբերակ։ Արձանագրություններն ու երթուղավորումը մնում են Xray-ում։ Այս համակցությունում հավելվածների կանոնները աջակցում են միայն ուղիղ միացմանը և արգելափակմանը․ Linux-ում այդ կանոնները պահանջում են Xray-ի ներկառուցված gVisor-ը։\n\nԿամուրջն իրականացնում է երկրորդ գործընթացը: Linux-ի երեք անգործուն չափումների ժամանակ այն օգտագործել է մոտ 32–36 ՄԲ-ով ավելի ֆիզիկական հիշողություն, քան բնիկ Xray TUN-ը: Սա չի չափում ներբեռնման բեռը. պրոցեսորի և հիշողության ծախսերը կախված են միացումներից: sing-box չունի կույտերի ընտրիչ: Ոչ մի կույտ չի երաշխավորում ավելի լավ կատարում յուրաքանչյուր ցանցում: Ընտրեք կույտ և ընտրեք Դիմել և նորից միացեք՝ այն ձեր ցանցում փորձելու համար:\n\n## Կարգավորումների կիրառում\n\nՍերվեր ընտրելը ավտոմատ կերպով նորից միանում է: Ռեժիմը, շարժիչը, DNS-ը և կանոնների կարգավորումները անմիջապես պահվում են. ակտիվ կապի ժամանակ սեղմեք Դիմել և նորից միացեք դրանք օգտագործելու համար: Շարժիչի վերագործարկումը կարող է ընդհատել ներբեռնումները և զանգերը: Կրկնվող սեղմումները չեն սկսում զուգահեռ կապեր; անջատումը ավարտում է անցումը և ազատում կապը:\n\nԻնտերնետը միայն VPN-ի միջոցով արգելափակում է ուղիղ երթևեկությունը, երբ թունելն ընկնում է: Այն ազդում է ամբողջ մեքենայի վրա: Հստակ անջատումը վերացնում է Sora-ի կանոնները: Եթե ​​մաքրումը չի ավարտվում, նորից փորձեք անջատել և բացել գրանցամատյանը:\n\n## Ծրագրի փաստաթղթեր\n\n- [sing-box-lx. կոնֆիգուրացիա և աջակցություն] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box փաստաթղթեր] (https://sing-box.sagernet.org/)\n- [Xray փաստաթղթեր] (https://xtls.github.io/)\n- [mihomo փաստաթղթեր] (https://wiki.metacubex.one/)\n- [zapret. գործողություն և սահմանափակումներ] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -461,17 +444,578 @@
   "exportLogFile": "Դեպի {name}",
   "extensions": "Ընդլայնումներ",
   "diagnosticHttp": "HTTP ախտորոշում",
-  "diagnosticUnavailable": "Այս ախտորոշումն անհասանելի է այս հարթակում:",
-  "diagnosticCapture": "Լուսանկարեք 10 վայրկյան",
-  "extensionsSoon": "Շուտով",
-  "diagnosticPackets": "Փաթեթի գրավում",
-  "diagnosticEvents": "Windows-ի իրադարձություններ",
-  "diagnosticRequiresTun": "Փաթեթների գրավման համար անհրաժեշտ է ակտիվ Sora TUN կապ:",
   "@exportLogFile": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "Ավելացնել հատուկ սերվեր",
+  "customServers": "Իմ սերվերները",
+  "customServerName": "Անուն",
+  "customServerNameHint": "Օրինակ՝ իմ VPS-ը",
+  "customServerNameRequired": "Մուտքագրեք անունը",
+  "customServerAddress": "Հասցե",
+  "customServerAddressHint": "example.com կամ 192.0.2.1",
+  "customServerAddressRequired": "Մուտքագրեք սերվերի հասցեն",
+  "customServerAddressInvalid": "Անվավեր հասցե",
+  "customServerPort": "Պորտ",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "Նավահանգիստը պետք է լինի 1-ից մինչև 65535 համար",
+  "customServerProtocol": "Արձանագրություն",
+  "customServerCredentials": "Մուտքի տվյալներ",
+  "customServerOptional": "Ըստ ցանկության",
+  "customServerShowSecret": "Ցույց տալ գաղտնիքը",
+  "customServerHideSecret": "Թաքցնել գաղտնիքը",
+  "customServerBadge": "սեփական",
+  "customServerDeleteConfirm": "Ջնջե՞լ «{name}» սերվերը:",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "Ձեռքով ավելացրեք սերվեր՝ հասցե, նավահանգիստ և արձանագրություն",
+  "customServerTest": "Թեստ",
+  "leakTestTitle": "Տվյալների արտահոսքի ստուգում",
+  "leakTestIntro": "Ստուգում է՝ արդյոք տրաֆիկը կարող է սարքից դուրս գալ թունելից դուրս ուղով․ ուղիղ DNS և ICMP հարցումներ, IPv6 ելք և համակարգային անվան լուծիչներ։ Գործարկեք ակտիվ կապի ժամանակ։",
+  "leakTestRun": "Ստուգեք",
+  "leakTestCancel": "Չեղարկել",
+  "leakTestNeedsConnection": "Միացեք VPN-ին՝ տվյալների արտահոսքի ստուգման համար:",
+  "leakTestProgress": "Կատարված թեստեր՝ {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "Արտահոսքեր չեն հայտնաբերվել",
+  "leakTestFound": "{count, plural, one{Հայտնաբերվել է # արտահոսք} other{Հայտնաբերվել է # արտահոսք}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "Ամրագրել",
+  "leakTestFixedNote": "Ցանցի արգելափակումը միացված է։ Ստուգելու համար կրկին գործարկեք թեստը։",
+  "leakTestCheckDirectDns": "Ուղիղ DNS",
+  "leakTestCheckIcmpEcho": "ICMP արձագանք",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "Համակարգային անվան լուծիչներ",
+  "leakTestCheckTunnelConnectivity": "Թունելի միացում",
+  "leakTestCheckTunnelDns": "DNS թունելի միջով",
+  "noticeDegraded": "Սերվերը դանդաղեց: Sora-ն անցել է չափման ընթացքում հայտնաբերված լավագույն սերվերին:",
+  "obfs": "Տրաֆիկի քողարկում",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "Թարմացման ֆայլերը համեմատվում են թողարկման հետ հրապարակված ստուգիչ գումարների հետ։",
+  "updateManualSigWarning": "Ստորև նշված ֆայլերը համապատասխանում են թողարկման ստուգիչ գումարներին։ Գործարկեք հրամանը, եթե դրանք ներբեռնել եք պաշտոնական թողարկումից։",
+  "updateVersionRevoked": "Մշակողը հանել է այս տարբերակը: Խնդրում ենք սպասել շտկված թողարկման:",
+  "updateRolloutPending": "Ավելի նոր տարբերակ է տարածվում աստիճանաբար և ավտոմատ կերպով կառաջարկվի ձեզ:",
+  "updateRollbacking": "Վերադառնալ {version} տարբերակին...",
+  "updateRolledBack": "{version}-ի թարմացումը չի անցել առողջության ստուգումը, ուստի Sora-ը հետ է վերադարձվել {fromVersion}:",
+  "updateRollbackError": "Ավտոմատ հետ վերադարձը ձախողվեց: Եթե ​​նոր տարբերակը չի աշխատում, ձեռքով նորից տեղադրեք նախորդ թողարկումը:",
+  "updateRollbackCacheError": "Չհաջողվեց պատրաստել ընթացիկ տարբերակի հաստատված հետադարձ պատճենը, ուստի թարմացումը չի տեղադրվել:",
+  "extRatingLabel": "Վարկանիշ {rating} 5-ից",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "{author}-ի կողմից",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "Տեղադրումներ՝ {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 տեղադրում",
+  "extBadgeVerified": "Ստուգված",
+  "extBadgeTop": "Ամենատարածվածն այս շաբաթ",
+  "extBadgeNew": "Նոր",
+  "extBadgeStaff": "Sora թիմ",
+  "extSideloadShort": "Ոչ կատալոգից",
+  "extSideloadWarning": "Այս ընդլայնումը թիմի կատալոգից չէ: Միայն հեղինակն է երաշխավորել իր բանալին. տեղադրել այն միայն եթե վստահում եք հեղինակին:",
+  "extInstallTitle": "Տեղադրել «{name}»",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "Թարմացնել «{name}»",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "Այս ընդլայնումը կկարողանա՝",
+  "extPermissionsWidened": "Թարմացումը պահանջում է նոր թույլտվություններ.",
+  "extDangerousAck": "Ես հասկանում եմ, որ այս թույլտվությունները լուրջ են",
+  "extInstall": "Տեղադրել",
+  "extUpdate": "Թարմացնել",
+  "extCancel": "Չեղարկել",
+  "extConfirm": "Հաստատել",
+  "extOk": "OK",
+  "extCatalog": "Կատալոգ",
+  "extInstalled": "Տեղադրված ընդլայնումներ",
+  "extSearchHint": "Որոնել ընդլայնումներ",
+  "extCatAll": "Բոլոր",
+  "extCatTools": "Գործիքներ",
+  "extCatThemes": "Թեմաներ",
+  "extCatAutomation": "Ավտոմատացում",
+  "extCatStats": "Վիճակագրություն",
+  "extCatNetwork": "Ցանց",
+  "extSortBy": "Դասավորել ըստ",
+  "extSortPopular": "Ամենատարածված",
+  "extSortRating": "Ամենաբարձր վարկանիշը",
+  "extSortName": "Անուն",
+  "extCatalogError": "Չհաջողվեց բեռնել կատալոգը",
+  "extRetry": "Կրկին փորձեք",
+  "extEmptySearch": "Ոչինչ չի գտնվել",
+  "extEmptyInstalled": "Դեռևս տեղադրված ընդլայնումներ չկան:\nԳտեք մեկը կատալոգում կամ տեղադրեք ֆայլից:",
+  "extInstallFromFile": "Տեղադրել ֆայլից",
+  "extInstallFromUrl": "Տեղադրել URL-ից",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "Ներբեռնեք",
+  "extDownloading": "Ներբեռնվում է…",
+  "extVerifying": "Ստուգվում է…",
+  "extInstalling": "Տեղադրվում է…",
+  "extInstallFailed": "Չհաջողվեց տեղադրել",
+  "extErrSignature": "Ստորագրության ստուգումը ձախողվեց։ Ֆայլը կարող է վնասվել կամ կեղծվել:",
+  "extErrManifest": "Ընդլայնման մանիֆեստն անվավեր է:",
+  "extErrNetwork": "Ցանցի սխալ. Ստուգեք ձեր կապը և նորից փորձեք:",
+  "extErrHash": "Ներբեռնումը չի համապատասխանում կատալոգին։ Հնարավոր է, որ այն կեղծվել է:",
+  "extErrMinApp": "Այս ընդլայնման համար անհրաժեշտ է հավելվածի {version} կամ ավելի նոր տարբերակը:",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "Միայն https:// հղումներ են թույլատրվում",
+  "extErrGeneric": "Սխալ առաջացավ: Խնդրում ենք կրկին փորձել:",
+  "extErrAuthorKeyChanged": "Այս թարմացումը ստորագրված է այլ հեղինակային բանալիով, քան տեղադրված տարբերակը, ուստի այն արգելափակված է: Եթե ​​վստահում եք նոր բանալին, ապատեղադրեք ընդլայնումը և նորից տեղադրեք այն հստակորեն:",
+  "extUpdateAvailable": "Թարմացումը հասանելի է",
+  "extDisabled": "Անջատված է",
+  "extToggleEnabled": "Միացնել {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "Որոնել տեղադրված ընդլայնումները",
+  "extUpdateAll": "Թարմացրեք բոլորը",
+  "extUpdatesAvailable": "{count} թարմացումները հասանելի են",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} թարմացվել է",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "Նորմալ",
+  "extRiskSensitive": "Զգայուն",
+  "extRiskDangerous": "Բարձր ռիսկ",
+  "extPermissionsRemoved": "Այլևս չի պահանջվում.",
+  "extUpdateFailedKept": "Նախորդ տարբերակը դեռ տեղադրված է։",
+  "extConflictsTitle": "Ընդլայնման կոնֆլիկտներ",
+  "extConflictsIntro": "Այս ընդլայնումները նույն բանն են ուզում։ Ընտրեք, թե որը կաշխատի, մյուսը կմնա տեղադրված։",
+  "extConflictTheme": "Հավելվածի թեմա",
+  "extConflictNetHooks": "Ցանցային կեռիկներ",
+  "extConflictWinner": "Առաջնահերթություն՝ {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} կոնֆլիկտները ձեր որոշման կարիքն ունեն",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "Լուծել հակամարտությունները",
+  "extConflictNote": "Ձեր ընտրությունը պահվում է այս սարքում։ Թեման փոխվում է անմիջապես, իսկ ցանցային hook-երը այս տարբերակում չեն աշխատում։",
+  "extVersionLabel": "Տարբերակ {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "Հեղինակ",
+  "extRating": "Վարկանիշ",
+  "extInstalls": "Տեղադրումներ",
+  "extVersion": "Տարբերակ",
+  "extAbout": "Այս ընդլայնման մասին",
+  "extPermissionsTitle": "Թույլտվություններ",
+  "extNoPermissions": "Հատուկ թույլտվություններ չկան:",
+  "extSettings": "Կարգավորումներ",
+  "extSaveSettings": "Պահպանել կարգավորումները",
+  "extSaving": "Պահվում է…",
+  "extUpdateTo": "Թարմացրեք {version}",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "Միացված է",
+  "extRollbackTo": "Վերադարձ դեպի {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "Վերադառնալ {version} տարբերակին:",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "Տեղահանել",
+  "extUninstallConfirm": "Հեռացնե՞լ «{name}»-ն ու դրա կարգավորումները:",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "Վահանակն անհասանելի է։ Ընդլայնումը կարող է անջատված լինել կամ հեռացվել:",
+  "extPermConnectionsRead": "Տես ակտիվ կապերի ցանկը",
+  "extPermServersRead": "Տեսեք ձեր սերվերների ցանկը",
+  "extPermSettingsRead": "Կարդացեք հավելվածի կարգավորումները",
+  "extPermSettingsWrite": "Փոխեք հավելվածի կարգավորումները",
+  "extPermNotifications": "Ցույց տալ ծանուցումները",
+  "extPermTray": "Ավելացնել տարրեր սկուտեղի ընտրացանկում",
+  "extPermUiPanel": "Ցուցադրել վահանակները հավելվածի ներսում",
+  "extPermThemeApply": "Կիրառել թեմաներ",
+  "extPermRoutingRules": "Ավելացնել երթուղային կանոններ (ազդում է ցանցի երթևեկության վրա)",
+  "extPermNetHooks": "Ինտեգրվել ցանցի ուղու մեջ (DPI շրջանցող մոդուլներ)",
+  "extPermNetFetch": "Խնդրեք URL-ը թույլատրված ցանկից",
+  "extPermBackground": "Գործարկել ֆոնային առաջադրանքները",
+  "extPermBackgroundDetail": "Աշխատում է պլանավորված առաջադրանքները նույնիսկ երբ վահանակը փակ է: Դուք կարող եք դադարեցնել այն կամ փոխել, թե որքան հաճախ է այն աշխատում ընդլայնման կարգավորումներում:",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "Աշխատում է հետին պլանում",
+  "extCapNetHook": "Շրջանցումներ և ցանցային միջամտություններ",
+  "extCapPanel": "Ինտերֆեյսի վահանակներ",
+  "extCapRouting": "Երթուղային կանոններ",
+  "extCapTheme": "Թեմաներ",
+  "extCapWidget": "Վիջեթներ",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "Փոփոխություններ",
+  "extImageFailed": "Չհաջողվեց բեռնել պատկերը",
+  "extRatingHow": "Ինչպես են աշխատում վարկանիշները",
+  "extRatingHowBody": "Վարկանիշներն օգտագործում են Բայեսյան միջինը. քիչ վարկանիշ ունեցող ընդլայնումը մնում է միջինին մոտ, մինչև ավելի շատ մարդիկ քվեարկեն, ուստի 5 աստղանի մեկ վերանայումը չի կարող նոր ընդլայնում առաջ մղել վերև: Վերջին գնահատականներն ավելի շատ են, քան հինները, և յուրաքանչյուր հաշվի համար միայն մեկ վարկանիշ է հաշվում:",
+  "extScreenshots": "Սքրինշոթներ",
+  "extSortRelevance": "Համապատասխանություն",
+  "extPermNetworkDetail": "Բեռնում է տվյալներ ինտերնետից VPN-ի միջոցով։ Թույլատրված են միայն ստորև նշված հոսթերը, մնացածն արգելափակված է։",
+  "extBgTitle": "Ֆոնային առաջադրանք",
+  "extBgEnabled": "Գործարկել հետին պլանում",
+  "extBgInterval": "Գործարկման պարբերականություն",
+  "extBgMinutes": "{count, plural, one{# րոպե} other{# րոպե}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# ժամ} other{# ժամ}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Առաջադրանքը գործարկվում է ժամանակացույցով, քանի դեռ Sora-ն բաց է, այդ թվում՝ սկուտեղում։ Նվազագույն միջակայքը 15 րոպե է։",
+  "extBgDisabledNote": "Միացրեք ընդլայնումը իր ֆոնային առաջադրանքը կառավարելու համար:",
+  "extCapNetwork": "Ցանցի հասանելիություն",
+  "extCapNetworkHosts": "Ցանց՝ {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "Համօգտագործեք QR կոդը",
+  "qrScanTitle": "Սկան QR կոդը",
+  "qrCopyLink": "Պատճենել հղումը",
+  "qrShowLink": "Ցույց տալ հղումը",
+  "qrHideLink": "Թաքցնել հղումը",
+  "qrWarning": "Այս QR կոդը պարունակում է կապի մանրամասներ: Մի ցուցադրեք այն անծանոթներին:",
+  "qrScanHint": "Ընտրեք QR կոդով էկրանի պատկեր կամ լուսանկար, կամ տեղադրեք հղում",
+  "qrFromClipboard": "Կպցնել սեղմատախտակից",
+  "qrNoCode": "Այս պատկերում QR կոդ չի գտնվել։",
+  "qrInvalid": "Այս QR կոդը վավեր հղում չի պարունակում:",
+  "qrScan": "Սկան QR",
+  "qrFromImage": "Բացել պատկերը",
+  "connGroupByProcess": "Խմբավորում ըստ գործընթացի",
+  "connListView": "Ցուցակ",
+  "connCopyHost": "Պատճենել հաղորդավարը",
+  "connAddRule": "Ավելացնել կանոն",
+  "connConnectionsCount": "{count, plural, one{# կապ} other{# կապ}}",
+  "dnsPreset": "Նախադրված",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "Սեփական",
+  "dnsCheck": "Ստուգեք տվյալների արտահոսքի համար",
+  "dnsChecking": "Ստուգում...",
+  "dnsNoLeak": "Արտահոսքեր չեն հայտնաբերվել",
+  "dnsLeakFound": "Հայտնաբերվել է արտահոսք",
+  "dnsLastCheck": "Վերջին ստուգումը",
+  "dnsNeverChecked": "Դեռ փորձարկված չէ",
+  "dnsLeakCheckTunnelDns": "Թունելի DNS լուծիչներ",
+  "dnsLeakCheckSystemResolvers": "Համակարգային անվան լուծիչներ",
+  "dnsLeakCheckKillSwitchDns": "DNS-ի պաշտպանություն ցանցի արգելափակմամբ",
+  "dnsLeakFixConfigureTunnelDns": "Կազմաձևեք DNS թունելի համար վերը նշված DNS կարգավորումներում:",
+  "dnsLeakFixReviewSystemResolvers": "Ստուգեք, թե որ լուծիչները կօգտագործի ձեր համակարգը թունելից դուրս:",
+  "dnsLeakFixEnableKillSwitch": "Միացրեք ցանցի արգելափակումը, որպեսզի DNS տրաֆիկը մնա թունելի ներսում։",
+  "dnsLeakCheckEncryptedDns": "Համակարգի գաղտնագրված DNS",
+  "dnsLeakCheckDnsSpoof": "Կեղծված DNS պատասխաններ",
+  "dnsLeakFixReviewEncryptedDns": "Ստուգեք, թե որ կոդավորված DNS վերջնակետերն է օգտագործում ձեր համակարգը թունելից դուրս:",
+  "dnsLeakFixUseEncryptedDns": "Թունելի համար օգտագործեք գաղտնագրված DNS (DoT կամ DoH), որպեսզի անվան լուծիչները չկարողանան կեղծել պատասխանները։",
+  "dnsCheckNeedsConnection": "Նախ միացեք VPN-ին, ապա ստուգեք արտահոսքի համար:",
+  "dnsExpected": "Ակնկալվում էր",
+  "dnsActual": "Դիտարկված",
+  "sortBy": "Դասավորել ըստ",
+  "sortPing": "Ping",
+  "sortSpeed": "Արագություն",
+  "sortName": "Անուն",
+  "measureSpeed": "Չափել արագությունը",
+  "benchmarkStale": "հնացած",
+  "autoSelectMode": "Ավտո-ընտրության սերվեր",
+  "autoSelectPing": "Ամենաարագ պինգ",
+  "autoSelectSpeed": "Ամենաարագ արագությունը",
+  "autoSelectSmart": "Խելացի ընտրություն",
+  "coreWatchUnstable": "Կապը Sora միջուկին անկայուն է",
+  "watchReconnect": "Նորից միացեք",
+  "coreRestoringLink": "Կապը վերականգնվում է Sora միջուկին…",
+  "crashRestoreTitle": "Վերջին նիստն ընդհատվեց",
+  "restoreOnCrash": "Վերականգնել նիստը վթարից հետո",
+  "crashRestore": "Վերականգնել",
+  "crashDismiss": "Ոչ հիմա",
+  "overrideTitle": "Իմ խմբագրումները",
+  "overrideEdit": "Խմբագրել սերվերները",
+  "overrideHide": "Թաքցնել",
+  "overrideUnhide": "Ցուցադրել",
+  "overrideClear": "Վերականգնել խմբագրումները",
+  "overrideEmpty": "Դեռ ոչ մի խմբագրում",
+  "overrideCustomRules": "Սեփական կանոններ",
+  "errBenchmarkUnsupported": "Արագության չափման համար անհրաժեշտ է ավելի նոր միջուկ",
+  "benchmarkProgress": "{done}-ի չափում {total}-ից…",
+  "profiles": "Ցանցային պրոֆիլներ",
+  "profilesEmpty": "Դեռևս պրոֆիլներ չկան։ Ստեղծեք մեկը՝ հայտնի ցանցերում ավտոմատ կերպով կարգավորումներ կիրառելու համար:",
+  "profileAdd": "Ավելացնել պրոֆիլ",
+  "profileName": "Պրոֆիլի անուն",
+  "profileSsids": "Wi-Fi ցանցեր (SSID)",
+  "profileSsidsHint": "Տուն, գրասենյակ՝ բաժանված ստորակետերով",
+  "profileGateways": "Ցանցային դարպասներ",
+  "profileAsns": "AS համարներ",
+  "profileAutoApply": "Ինքնաբերաբար կիրառել",
+  "profileAutoApplyHint": "Եթե անջատված է, պրոֆիլը կիրառելուց առաջ հաստատում կպահանջվի։",
+  "profileSnapshot": "Հիշեք ընթացիկ կարգավորումները",
+  "profileSnapshotDone": "Ընթացիկ կարգավորումները պահված են պրոֆիլում",
+  "profileDelete": "Ջնջել պրոֆիլը",
+  "profileDeleteConfirm": "Ջնջե՞լ «{name}» պրոֆիլը:",
+  "profileApplyAsk": "Կիրառե՞լ «{name}» պրոֆիլը:",
+  "profileApply": "Կիրառել",
+  "profileApplied": "«{name}» պրոֆիլը կիրառվեց",
+  "profileUndo": "Չեղարկել",
+  "profileActive": "Ակտիվ",
+  "networkNow": "Այժմ՝ {info}",
+  "networkUnknown": "Ցանցի մասին տեղեկությունները անհասանելի են",
+  "profileNoTriggers": "Ավելացրեք առնվազն մեկ ձգան՝ SSID, gateway կամ ASN",
+  "chains": "Պրոքսի շղթաներ",
+  "chainsEmpty": "Շղթաներ դեռ չկան։ Կապեք 2–3 սերվեր, որպեսզի երթևեկությունը անցնի դրանցից յուրաքանչյուրի միջով:",
+  "chainAdd": "Նոր շղթա",
+  "chainName": "Շղթայի անվանումը",
+  "chainPickServers": "Ընտրեք 2–3 սերվեր",
+  "chainOrderHint": "Քաշեք՝ վերադասավորելու համար. երթևեկությունը մտնում է վերևից և դուրս գալիս ներքևից:",
+  "chainTooFew": "Ընտրեք առնվազն 2 սերվեր",
+  "chainTooMany": "Շղթան պահում է առավելագույնը 3 սերվեր",
+  "chainEstimate": "Մոտավոր ուշացում",
+  "chainSave": "Պահպանել շղթան",
+  "chainDelete": "Ջնջել շղթան",
+  "chainDeleteConfirm": "Ջնջե՞լ «{name}» շղթան:",
+  "chainUnsupported": "Ներկայիս շարժիչը չի կարող շղթաներ կառուցել",
+  "chainHopMissing": "Շղթայական սերվերներից մեկն այլևս հասանելի չէ",
+  "chainHop": "Անցում {n}",
+  "chainEntry": "Մուտք",
+  "chainExit": "Ելք",
+  "sync": "Սարքի համաժամացում",
+  "syncDevices": "Իմ սարքերը",
+  "syncEmpty": "Զուգակցված սարքեր չկան: Զուգակցել մեկ այլ սարք տեղական ցանցի միջոցով:",
+  "syncPair": "Զուգավորել սարքը",
+  "syncShowCode": "Ցույց տալ իմ կոդը",
+  "syncScanCode": "Սկանավորել կոդը",
+  "syncRevoke": "հանել",
+  "syncRevokeConfirm": "Չեղարկե՞լ «{name}»-ը:",
+  "syncLastSync": "Վերջին համաժամացումը՝ {time}",
+  "syncNever": "Երբեք",
+  "syncNoLan": "Սարքերը պետք է լինեն նույն տեղական ցանցում",
+  "syncPaired": "Սարքը զուգակցված է",
+  "syncPairingTitle": "Զուգակցել այս սարքի հետ",
+  "syncWaiting": "Սպասում է մյուս սարքին…",
+  "syncSecureNote": "End-to-end ծածկագրված ալիք: Ոչ հաշիվներ, ոչ ամպային սերվերներ:",
+  "zapretWithVpn": "Շրջանցեք DPI զտումը ուղիղ ցանցային տրաֆիկի համար",
+  "zapretWithVpnHint": "Գործարկում է zapret-ը VPN թունելի հետ միասին․ թունելի տրաֆիկն անցնում է VPN-ով, իսկ ուղիղ տրաֆիկը՝ շրջանցման միջոցով։",
+  "chainDuplicate": "Յուրաքանչյուր սերվեր կարող է հայտնվել միայն մեկ անգամ",
+  "edit": "Խմբագրել",
+  "remove": "Հեռացնել",
+  "autoSwitchOnDegrade": "Ավտոմատ անջատում դեգրադացիայի վրա",
+  "autoSwitchOnDegradeDetail": "Եթե ընտրված սերվերը զգալիորեն դանդաղում է կամ դադարում է պատասխանել, Sora-ն անցնում է չափումների արդյունքով լավագույն սերվերին, բայց ոչ ավելի հաճախ, քան 10 րոպեն մեկ։",
+  "tunStackMixed": "Խառը",
+  "tunStackSystem": "Համակարգ",
+  "syncCodeExpired": "Կոդը սպառվել է",
+  "syncDaemonFailed": "Չհաջողվեց գործարկել համաժամացման ծառայությունը",
+  "syncDaemonMissing": "sora-sync բաղադրիչը չի գտնվել: Սարքի համաժամացումը միացնելու համար նորից տեղադրեք հավելվածը:",
+  "syncDaemonStarting": "Համաժամացման ծառայության գործարկում…",
+  "syncErrAuth": "Համաժամացման ծառայությունը մերժեց մուտքի նշանը: Վերագործարկեք հավելվածը և նորից փորձեք:",
+  "syncErrNotFound": "Սարքն այլևս զուգակցված չէ",
+  "syncErrPairingActive": "Զույգավորման նիստն արդեն բաց է",
+  "syncErrUnreachable": "Մյուս սարքը չպատասխանեց։ Համոզվեք, որ այն նույն ցանցում է և ցուցադրում է իր կոդը:",
+  "syncError": "Համաժամացման սխալ",
+  "syncExpiresIn": "Կոդի ժամկետը կլրանա {duration} անց",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "Սարքի հետ զուգակցում…",
+  "syncLegacyCleared": "Հին սարքերի ցանկը իրականում երբեք չի զուգակցվել, ուստի այն մաքրվել է: Նորից զուգակցեք ձեր սարքերը, այս անգամ իրականում:",
+  "syncNewCode": "Նոր կոդ",
+  "syncPairedWith": "Զուգտկված է {name}-ի հետ",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "Կրկնել",
+  "syncStopShowing": "Թաքցնել կոդը",
+  "syncSyncNow": "Համաժամացնել հիմա",
+  "syncSyncResult": "Ստացվեց {pulled}, ուղարկվեց {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "Համաժամացման արդյունք",
+  "syncPulled": "Ստացվել է",
+  "syncPushed": "Ուղարկված է",
+  "syncNoChanges": "Փոփոխություններ չեն հայտնաբերվել",
+  "syncDocKindSubscriptions": "Բաժանորդագրություններ",
+  "syncDocKindSettings": "Հավելվածի կարգավորումներ",
+  "syncDocKindOverrides": "Բաժանորդագրությունների վերասահմանումներ",
+  "syncDocKindProfiles": "Ցանցային պրոֆիլներ",
+  "syncDocKindChains": "Պրոքսի շղթաներ",
+  "syncFrom": "{name}-ից",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "Այս սարքը",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Shadowsocks-ի համար՝ մեթոդ:գաղտնաբառ, օրինակ chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "Փաթեթի գրավում",
+  "diagnosticEvents": "Windows-ի իրադարձություններ",
+  "diagnosticCapture": "Լուսանկարեք 10 վայրկյան",
+  "diagnosticRequiresTun": "Փաթեթների գրավման համար անհրաժեշտ է ակտիվ Sora TUN կապ:",
+  "diagnosticUnavailable": "Այս ախտորոշումն անհասանելի է այս հարթակում:",
+  "extErrRevoked": "Sora թիմը հետ է կանչել ընդլայնման այս տարբերակը, քանի որ այն անվտանգ չէ կամ անսարք է։",
+  "extErrRevocationsExpired": "Հետ կանչված ընդլայնումների ցանկը չհաջողվեց թարմացնել։ Մինչ թարմացումը տեղադրումն արգելափակված է. ստուգեք ցանցը և կրկին փորձեք։",
+  "extRevokedDisabled": "Հետ կանչված ընդլայնումներն անջատվեցին՝ {names}",
+  "customServerWgPrivateKey": "Գաղտնի բանալի",
+  "customServerWgAddresses": "Ինտերֆեյսի հասցեներ",
+  "customServerWgPeerKey": "Սերվերի հանրային բանալի",
+  "customServerWgPresharedKey": "Ընդհանուր բանալի",
+  "customServerWgAllowedIps": "Թույլատրված IP-ներ",
+  "customServerWgKeepalive": "Keepalive, վայրկյան",
+  "customServerWgKeyInvalid": "Բանալին պետք է լինի 32 բայթ base64-ով, ինչպես տպում է wg genkey-ը։",
+  "customServerWgCidrInvalid": "Մուտքագրեք ստորակետով բաժանված նախածանցներ, օրինակ 10.0.0.2/32։",
+  "customServerWgKeepaliveInvalid": "Մուտքագրեք վայրկյանների թիվ 0-ից 65535։",
+  "strictKillSwitch": "Ցանցի խիստ արգելափակում",
+  "strictKillSwitchWarning": "Միանալուց հետո արգելափակում է VPN-ից դուրս երթևեկությունը նույնիսկ խափանումից, վերագործարկումից կամ հավելվածից դուրս գալուց հետո։ Մուտքը վերականգնվում է միայն կապն անջատելիս կամ այս կարգավորումն անջատելիս։ Սարքը վերագործարկելիս արգելափակումը վերսկսվում է միայն մեկնարկին միանալու միացված տարբերակի դեպքում։",
+  "extWorkerFailed": "Ընդլայնման ֆոնային առաջադրանքը ձախողվեց։ Ստուգեք ընդլայնման մատյանը։",
+  "extAssetRejected": "Ընդլայնման ֆայլը մերժվել է․ անընթեռնելի գույներ կամ անվավեր կանոններ։"
 }

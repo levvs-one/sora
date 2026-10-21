@@ -5,7 +5,6 @@
   "stateConnected": "연결됨",
   "stateReconnecting": "다시 연결하는 중",
   "stateDisconnecting": "연결 끊기",
-  "stateFailed": "연결되지 않음",
   "coreMissing": "Sora 서비스가 응답하지 않습니다.",
   "serverAuto": "가장 빠른",
   "serverBypass": "서버 없음",
@@ -41,6 +40,7 @@
   "export": "파일에 저장",
   "clear": "분명한",
   "logsEmpty": "여기에는 아무것도 없습니다",
+  "connEmpty": "연결 없음",
   "appVersion": "버전 {version}",
   "notInstalled": "설치되지 않음",
   "sourceCode": "소스 코드",
@@ -75,17 +75,16 @@
   "errSubScheme": "링크는 https://로 시작해야 합니다.",
   "errSecretStore": "Sora 스토리지가 손상되었거나 사용할 수 없습니다.",
   "errNoServers": "연결하려면 구독을 추가하세요.",
-  "exportText": "텍스트",
   "connections": "사이",
   "close": "닫다",
   "chainDirect": "직접",
   "chainBlocked": "막힌",
   "theme": "주제",
-  "themeSystem": "System",
+  "themeSystem": "시스템 설정",
   "themeLight": "빛",
   "themeDark": "어두운",
   "language": "언어",
-  "languageSystem": "System",
+  "languageSystem": "시스템 설정",
   "sectionConnection": "연결",
   "sectionNoServer": "서버 없음",
   "sectionPing": "핑",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} 왼쪽",
   "ruleInvalid": "사이트나 IP, 프로그램처럼 보이지 않습니다.",
   "tunnelMode": "방법",
-  "tunnelTun": "모든 트래픽",
   "tunnelProxy": "System 프록시",
   "proxyAddress": "프록시 주소",
   "copied": "복사됨",
   "launchAtLogin": "시스템으로 시작하세요",
+  "launchAtLoginDetail": "로그인 시 Sora가 자동으로 시작되어 트레이에 상주합니다.",
   "closeToTray": "닫은 후에는 트레이에 보관하세요.",
   "notifications": "알림",
   "trayOpen": "Sora 열기",
@@ -185,12 +184,6 @@
   "sidebarToggle": "사이드바 전환",
   "more": "더",
   "less": "더 적은",
-  "currentServer": "현재 서버",
-  "trafficDown": "다운로드됨",
-  "trafficUp": "업로드됨",
-  "perSecond": "{value}/초",
-  "activeRules": "활성 규칙: {count}",
-  "recentNotifications": "최근 알림",
   "notificationsEmpty": "연결 및 구독 이벤트가 여기에 표시됩니다.",
   "retryConnect": "연결 재시도",
   "openLogs": "로그 열기",
@@ -208,12 +201,9 @@
   "chooseProgram": "프로그램을 선택하세요",
   "installedApps": "설치된 애플리케이션",
   "runningProcesses": "실행 중인 프로세스",
-  "programsFailed": "애플리케이션을 로드할 수 없습니다.",
   "programsEmpty": "애플리케이션을 찾을 수 없습니다. 다른 이름을 사용해 보세요.",
   "selectExe": ".exe 파일을 선택하세요",
-  "trafficUnavailable": "카운터는 아직 사용할 수 없습니다.",
   "speedtest": "속도",
-  "speedtestCheck": "속도 확인",
   "speedtestSearch": "서비스 찾기",
   "speedtestEmpty": "일치하는 항목이 없습니다. 검색을 변경하세요.",
   "speedtestBackToList": "서비스로 돌아가기",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "복사 명령",
   "updateChecksDisabled": "설정에서 자동 검사가 비활성화되어 있습니다.",
   "updateInstalled": "업데이트가 설치되었습니다. Sora를 다시 엽니다.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "프로젝트",
   "githubReleases": "릴리스 및 다운로드",
   "telegramChannel": "Telegram 채널",
   "licenses": "라이센스",
   "componentLicenses": "구성요소 라이선스",
-  "appCopyright": "© 2026 levvs-one 및 기여자",
   "collapseServers": "서버 축소",
   "expandServers": "서버 확장",
   "hideDescription": "설명 숨기기",
   "showDescription": "설명 표시",
   "pendingConnectionChanges": "변경사항을 적용하려면 다시 연결하세요.",
   "reconnectNow": "적용하고 다시 연결하세요",
-  "bypassLimitations": "이 모드는 HTTP 및 TLS에 대해서만 DPI를 우회하고 UDP를 지원하지 않으며 IP를 변경하지 않습니다. Discord 음성, 통화 및 차단된 Telegram 주소에 VPN 서버를 사용하세요.",
   "errEngineUnsupported": "선택한 엔진은 이 프로필이나 설정을 지원하지 않습니다. 자동 또는 호환 엔진을 선택하세요.",
   "errRestore": "연결 정리가 완료되지 않았습니다. 연결 해제를 다시 시도하세요. 자세한 내용은 로그를 참조하세요.",
   "errSessionEnded": "이 세션은 이미 종료되었습니다. 연결 상태를 새로 고칩니다.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "모드 및 엔진",
   "probeServers": "서버 확인",
   "expiresIn": "{name}: {days, plural, =0{구독이 몇 시간 후에 종료됩니다} one{구독은 #일에 종료됩니다} other{구독이 #일 후에 종료됩니다}}",
-  "groupOrdered": "{count, plural, one{# 서버, 차례로} other{# 서버, 차례로}}",
   "groupBest": "{count, plural, one{가장 빠른 # 서버} other{가장 빠른 # 서버}}",
-  "modesGuide": "서버에 어떤 엔진이 필요한지 확실하지 않은 경우 자동을 선택하십시오. Sora는 연결하기 전에 프로필과 설정을 확인합니다. 엔진은 계획의 대역폭을 늘릴 수 없습니다. 성능은 서버, 경로, 프로토콜 및 네트워크에 따라 다릅니다.\n\n## 모드\n\n### 모든 트래픽(TUN)\n\nSora는 가상 네트워크 인터페이스를 생성하고 이를 통해 TCP 및 UDP를 포함한 애플리케이션 트래픽을 라우팅합니다. Telegram, 게임 및 Discord 음성에 이 모드를 사용하십시오. 규칙은 특정 사이트나 프로그램을 직접 보내거나 차단할 수 있습니다. 네트워크 서비스에는 권한이 필요하며 필요한 프로토콜을 지원하는 서버가 필요합니다.\n\n### System 프록시\n\nSora는 로컬 HTTP/SOCKS 프록시를 구성합니다. 시스템 프록시 설정을 존중하는 응용 프로그램이 이를 사용합니다. 자체 네트워크 스택이 있는 애플리케이션은 직접 연결할 수 있습니다. UDP 및 음성 통화에는 일반적으로 TUN이 필요합니다. 이 모드는 프록시를 지원하는 브라우저 및 애플리케이션에 적합합니다.\n\n### 서버 없음\n\nLinux에서 Sora는 [zapret](https://github.com/bol-van/zapret)를 사용하여 HTTP/TLS 요청을 분할 및 재구성하고 일부 DPI 검사를 우회합니다. 귀하의 IP는 동일하게 유지되며 연결은 웹사이트로 직접 연결됩니다. 결과는 공급자와 차단 방법에 따라 다릅니다.\n\n현재 통합에서는 HTTP 및 TCP를 통한 TLS에 tpws를 사용합니다. IP 차단이나 UDP 중계를 우회하지 않으며 Telegram의 MTProto 연결을 보장할 수 없습니다. Discord 음성, Telegram 통화 및 이러한 종류의 제한 사항에는 TUN이 포함된 VPN 서버를 사용하세요.\n\n## 엔진\n\n### 자동\n\nSora는 서버 프로토콜, 전송, 그룹, 조각화 및 모드 등 전체 연결 계획을 지원하는 설치된 엔진을 선택합니다. 현재 연결을 중단하기 전에 호환되지 않는 수동 선택이 거부됩니다. 자동 또는 다른 엔진을 선택하고 설정을 다시 적용하십시오.\n\n### sing-box\n\n새로운 Sora 패키지에는 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box)의 포크가 포함되어 있으며 클라이언트 측 XHTTP 및 VLESS Encryption가 추가되었습니다. Sora는 ​​빌드와 해당 기능을 인식합니다. XHTTP가 없는 업스트림 빌드는 이름만으로는 이 기능을 얻을 수 없습니다.\n\n지원되는 프로토콜에는 VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard 및 AmneziaWG 1.x/2.x 매개변수가 포함됩니다. Sora는 가져올 수 있습니다. 전체 Xray JSON 프로필에는 Xray가 필요합니다. 새로운 AWG 3.x 필드는 아직 가져올 수 없습니다. sing-box는 컴퓨터의 다른 응용 프로그램이 감지할 수 있는 비밀번호로 보호된 로컬 제어 포트를 사용합니다.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core)는 VLESS, REALITY, XHTTP, VLESS Encryption 및 TLS 조각화를 지원합니다. 또한 라우팅과 그룹을 유지하면서 완전한 공급자 Xray 프로필을 실행합니다. 이러한 프로필은 동작을 변경하지 않고는 자동으로 다른 엔진으로 변환될 수 없습니다.\n\n번들로 제공되는 Xray는 TLS 인증서 확인을 비활성화하는 설정(`allowInsecure`)을 제거했습니다. 이 설정이 필요한 일반 서버에 대해서는 sing-box 또는 mihomo를 자동으로 선택합니다. Xray를 선택하면 현재 연결을 중단하기 전에 비호환성을 수동으로 보고합니다. 이전 전체 JSON 프로필에는 확인 가능한 인증서 또는 인증서 핀이 포함된 업데이트된 공급자 프로필이 필요합니다.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo)는 순서가 지정된 대체 및 로드 밸런싱 그룹인 XHTTP 및 AmneziaWG를 지원합니다. 백업 서버로의 자동 장애 조치가 중요한 경우 선택하세요. 이 엔진에서는 Sora의 TLS 조각화 설정을 사용할 수 없습니다.\n\n## Sora의 호환성\n\n| 기능 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 및 TCP/UDP | 예 | 예 | 예 |\n| XHTTP | 예 | 예 | 예 |\n| VLESS Encryption | 예 | 예 | 예 |\n| 전체 Xray 프로필 | 아니요 | 예 | 아니요 |\n| TUIC / AnyTLS | 둘 다 | 아니요 | TUIC |\n| TLS 조각화 | 예 | 예 | 아니요 |\n| AmneziaWG 1.x/2.x | 예1 | 아니요 | 예 |\n| 정렬된 대체 그룹 | 아니요 | 노² | 예 |\n\n¹ J1/J2/J3/Itime가 포함된 프로필은 mihomo를 사용합니다. 이러한 필드는 자동으로 삭제되어서는 안 됩니다. ² 완전한 Xray 프로필 그룹의 경우 앱은 백업 프로필을 선택합니다. 지원은 설치된 빌드에 따라 다릅니다. 정보에서 버전을 확인하세요.\n\n## TUN 스택\n\n스택은 가상 인터페이스 내부에서 TCP 및 UDP를 처리합니다. 모드 패널에서 Xray 및 mihomo는 ​​gVisor, System, Mixed 및 MIPS를 제공합니다. 각 엔진은 고유한 기본 설정을 저장합니다. System 프록시 및 서버리스 모드에서는 이 기본 설정을 사용하지 않습니다.\n\n- **Mixed** — TCP는 시스템 스택을 사용하고 gVisor는 UDP를 처리합니다. Linux에서 mihomo의 기본값입니다. Windows에서는 Xray와 mihomo가 기본적으로 MIPS를 사용합니다.\n- **System** — 시스템 스택을 사용합니다. 네트워크 응용 프로그램에 문제가 발생하면 다른 옵션을 시도해 보십시오.\n- **gVisor** — 사용자 공간의 트래픽을 처리합니다.\n- **MIPS** — mihomo의 자체 IP 스택은 번들 버전 1.19.32에서 사용할 수 있습니다.\n\nLinux에서 Xray는 기본적으로 내장된 gVisor를 사용합니다. Linux의 System, Mixed 및 MIPS는 mihomo를 TUN 엔진으로 사용하여 인증된 로컬 SOCKS 링크를 통해 TCP 및 UDP를 Xray로 전달합니다. Xray는 프로토콜, 공급자 프로필 및 라우팅을 유지합니다. 이 세 가지 옵션에는 mihomo가 설치되어 있어야 합니다. Windows에서 Xray는 네 가지 TUN 스택 모두에 mihomo 1.19.32 이상을 사용합니다. 프로토콜과 라우팅은 Xray가 처리합니다. 이 구성의 앱 규칙은 직접 연결과 차단만 지원합니다. Linux에서는 이러한 규칙에 Xray 내장 gVisor가 필요합니다.\n\n브리지는 두 번째 프로세스를 실행합니다. Linux에 대한 세 가지 유휴 측정에서 기본 Xray TUN보다 약 32~36MiB 더 많은 물리적 메모리를 사용했습니다. 이는 다운로드 로드를 측정하지 않습니다. CPU 및 메모리 비용은 연결에 따라 달라집니다. sing-box에는 스택 선택기가 없습니다. 어떤 스택도 모든 네트워크에서 더 나은 성능을 보장하지 않습니다. 스택을 선택하고 적용 및 다시 연결을 선택하여 네트워크에서 사용해 보세요.\n\n## 설정 적용 중\n\n서버를 선택하면 자동으로 다시 연결됩니다. 모드, 엔진, DNS 및 규칙 설정은 즉시 저장됩니다. 활성 연결 중에 적용을 클릭하고 다시 연결하여 사용하세요. 엔진을 다시 시작하면 다운로드 및 호출이 중단될 수 있습니다. 반복해서 클릭해도 병렬 연결이 시작되지 않습니다. 연결을 끊으면 전환이 종료되고 연결이 해제됩니다.\n\nVPN을 통한 인터넷만 터널이 끊어지면 직접 트래픽을 차단합니다. 이는 전체 기계에 영향을 미칩니다. 명시적인 연결 해제는 Sora의 규칙을 제거합니다. 정리가 완료되지 않으면 연결을 끊고 로그를 다시 열어보세요.\n\n## 프로젝트 문서\n\n- [sing-box-lx: 구성 및 지원](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 문서](https://sing-box.sagernet.org/)\n- [Xray 문서](https://xtls.github.io/)\n- [mihomo 문서](https://wiki.metacubex.one/)\n- [zapret: 동작 및 제한사항](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "서버에 어떤 엔진이 필요한지 확실하지 않은 경우 자동을 선택하십시오. Sora는 연결하기 전에 프로필과 설정을 확인합니다. 엔진은 계획의 대역폭을 늘릴 수 없습니다. 성능은 서버, 경로, 프로토콜 및 네트워크에 따라 다릅니다.\n\n## 모드\n\n### 모든 트래픽(TUN)\n\nSora는 가상 네트워크 인터페이스를 생성하고 이를 통해 TCP 및 UDP를 포함한 애플리케이션 트래픽을 라우팅합니다. Telegram, 게임 및 Discord 음성에 이 모드를 사용하십시오. 규칙은 특정 사이트나 프로그램을 직접 보내거나 차단할 수 있습니다. 네트워크 서비스에는 권한이 필요하며 필요한 프로토콜을 지원하는 서버가 필요합니다.\n\n### System 프록시\n\nSora는 로컬 HTTP/SOCKS 프록시를 구성합니다. 시스템 프록시 설정을 존중하는 응용 프로그램이 이를 사용합니다. 자체 네트워크 스택이 있는 애플리케이션은 직접 연결할 수 있습니다. UDP 및 음성 통화에는 일반적으로 TUN이 필요합니다. 이 모드는 프록시를 지원하는 브라우저 및 애플리케이션에 적합합니다.\n\n### 서버 없음\n\nLinux에서 Sora는 [zapret](https://github.com/bol-van/zapret)를 사용하여 HTTP/TLS 요청을 분할 및 재구성하고 일부 DPI 검사를 우회합니다. 귀하의 IP는 동일하게 유지되며 연결은 웹사이트로 직접 연결됩니다. 결과는 공급자와 차단 방법에 따라 다릅니다.\n\n현재 통합에서는 HTTP 및 TCP를 통한 TLS에 tpws를 사용합니다. IP 차단이나 UDP 중계를 우회하지 않으며 Telegram의 MTProto 연결을 보장할 수 없습니다. Discord 음성, Telegram 통화 및 이러한 종류의 제한 사항에는 TUN이 포함된 VPN 서버를 사용하세요.\n\n## 엔진\n\n### 자동\n\nSora는 서버 프로토콜, 전송, 그룹, 조각화 및 모드 등 전체 연결 계획을 지원하는 설치된 엔진을 선택합니다. 현재 연결을 중단하기 전에 호환되지 않는 수동 선택이 거부됩니다. 자동 또는 다른 엔진을 선택하고 설정을 다시 적용하십시오.\n\n### sing-box\n\n새로운 Sora 패키지에는 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box)의 포크가 포함되어 있으며 클라이언트 측 XHTTP 및 VLESS Encryption가 추가되었습니다. Sora는 ​​빌드와 해당 기능을 인식합니다. XHTTP가 없는 업스트림 빌드는 이름만으로는 이 기능을 얻을 수 없습니다.\n\n지원되는 프로토콜에는 VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard 및 AmneziaWG 1.x/2.x 매개변수가 포함됩니다. Sora는 가져올 수 있습니다. 전체 Xray JSON 프로필에는 Xray가 필요합니다. 새로운 AWG 3.x 필드는 아직 가져올 수 없습니다. sing-box는 컴퓨터의 다른 응용 프로그램이 감지할 수 있는 비밀번호로 보호된 로컬 제어 포트를 사용합니다.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core)는 VLESS, REALITY, XHTTP, VLESS Encryption 및 TLS 조각화를 지원합니다. 또한 라우팅과 그룹을 유지하면서 완전한 공급자 Xray 프로필을 실행합니다. 이러한 프로필은 동작을 변경하지 않고는 자동으로 다른 엔진으로 변환될 수 없습니다.\n\n번들로 제공되는 Xray는 TLS 인증서 확인을 비활성화하는 설정(`allowInsecure`)을 제거했습니다. 이 설정이 필요한 일반 서버에 대해서는 sing-box 또는 mihomo를 자동으로 선택합니다. Xray를 선택하면 현재 연결을 중단하기 전에 비호환성을 수동으로 보고합니다. 이전 전체 JSON 프로필에는 확인 가능한 인증서 또는 인증서 핀이 포함된 업데이트된 공급자 프로필이 필요합니다.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo)는 순서가 지정된 대체 및 로드 밸런싱 그룹인 XHTTP 및 AmneziaWG를 지원합니다. 백업 서버로의 자동 장애 조치가 중요한 경우 선택하세요. 이 엔진에서는 Sora의 TLS 조각화 설정을 사용할 수 없습니다.\n\n## Sora의 호환성\n\n| 기능 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 및 TCP/UDP | 예 | 예 | 예 |\n| XHTTP | 예 | 예 | 예 |\n| VLESS Encryption | 예 | 예 | 예 |\n| 전체 Xray 프로필 | 아니요 | 예 | 아니요 |\n| TUIC / AnyTLS | 둘 다 | 아니요 | TUIC |\n| TLS 조각화 | 예 | 예 | 아니요 |\n| AmneziaWG 1.x/2.x | 예1 | 아니요 | 예 |\n| 정렬된 대체 그룹 | 아니요 | 노² | 예 |\n\n¹ J1/J2/J3/Itime가 포함된 프로필은 mihomo를 사용합니다. 이러한 필드는 자동으로 삭제되어서는 안 됩니다. ² 완전한 Xray 프로필 그룹의 경우 앱은 백업 프로필을 선택합니다. 지원은 설치된 빌드에 따라 다릅니다. 정보에서 버전을 확인하세요.\n\n## TUN 스택\n\n스택은 가상 인터페이스 내부에서 TCP 및 UDP를 처리합니다. 모드 패널에서 Xray 및 mihomo는 ​​gVisor, System, Mixed 및 MIPS를 제공합니다. 각 엔진은 고유한 기본 설정을 저장합니다. System 프록시 및 서버리스 모드에서는 이 기본 설정을 사용하지 않습니다.\n\n- **Mixed**: TCP는 시스템 스택을 사용하고 gVisor는 UDP를 처리합니다. Linux에서 mihomo의 기본값입니다. Windows에서는 Xray와 mihomo가 기본적으로 MIPS를 사용합니다.\n- **System**: 시스템 스택을 사용합니다. 네트워크 응용 프로그램에 문제가 발생하면 다른 옵션을 시도해 보십시오.\n- **gVisor**: 사용자 공간의 트래픽을 처리합니다.\n- **MIPS**: mihomo의 자체 IP 스택은 번들 버전 1.19.32에서 사용할 수 있습니다.\n\nLinux에서 Xray는 기본적으로 내장된 gVisor를 사용합니다. Linux의 System, Mixed 및 MIPS는 mihomo를 TUN 엔진으로 사용하여 인증된 로컬 SOCKS 링크를 통해 TCP 및 UDP를 Xray로 전달합니다. Xray는 프로토콜, 공급자 프로필 및 라우팅을 유지합니다. 이 세 가지 옵션에는 mihomo가 설치되어 있어야 합니다. Windows에서 Xray는 네 가지 TUN 스택 모두에 mihomo 1.19.32 이상을 사용합니다. 프로토콜과 라우팅은 Xray가 처리합니다. 이 구성의 앱 규칙은 직접 연결과 차단만 지원합니다. Linux에서는 이러한 규칙에 Xray 내장 gVisor가 필요합니다.\n\n브리지는 두 번째 프로세스를 실행합니다. Linux에 대한 세 가지 유휴 측정에서 기본 Xray TUN보다 약 32~36MiB 더 많은 물리적 메모리를 사용했습니다. 이는 다운로드 로드를 측정하지 않습니다. CPU 및 메모리 비용은 연결에 따라 달라집니다. sing-box에는 스택 선택기가 없습니다. 어떤 스택도 모든 네트워크에서 더 나은 성능을 보장하지 않습니다. 스택을 선택하고 적용 및 다시 연결을 선택하여 네트워크에서 사용해 보세요.\n\n## 설정 적용 중\n\n서버를 선택하면 자동으로 다시 연결됩니다. 모드, 엔진, DNS 및 규칙 설정은 즉시 저장됩니다. 활성 연결 중에 적용을 클릭하고 다시 연결하여 사용하세요. 엔진을 다시 시작하면 다운로드 및 호출이 중단될 수 있습니다. 반복해서 클릭해도 병렬 연결이 시작되지 않습니다. 연결을 끊으면 전환이 종료되고 연결이 해제됩니다.\n\nVPN을 통한 인터넷만 터널이 끊어지면 직접 트래픽을 차단합니다. 이는 전체 기계에 영향을 미칩니다. 명시적인 연결 해제는 Sora의 규칙을 제거합니다. 정리가 완료되지 않으면 연결을 끊고 로그를 다시 열어보세요.\n\n## 프로젝트 문서\n\n- [sing-box-lx: 구성 및 지원](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 문서](https://sing-box.sagernet.org/)\n- [Xray 문서](https://xtls.github.io/)\n- [mihomo 문서](https://wiki.metacubex.one/)\n- [zapret: 동작 및 제한사항](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -460,18 +443,579 @@
   "extensions": "확장",
   "diagnosticHttp": "HTTP 진단",
   "exportLogFile": "저장: {name}",
-  "diagnosticEvents": "윈도우 이벤트",
-  "diagnosticRequiresTun": "패킷 캡처에는 활성 Sora TUN 연결이 필요합니다.",
-  "diagnosticUnavailable": "이 플랫폼에서는 이 진단을 사용할 수 없습니다.",
-  "diagnosticPackets": "패킷 캡처",
   "diagnosticNoData": "아직 기록된 요청이 없습니다. 먼저 속도 테스트 웹사이트를 열어보세요.",
-  "diagnosticCapture": "10초 동안 캡처",
-  "extensionsSoon": "곧 출시 예정",
   "@exportLogFile": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "사용자 정의 서버 추가",
+  "customServers": "내 서버",
+  "customServerName": "이름",
+  "customServerNameHint": "예: 내 VPS",
+  "customServerNameRequired": "이름을 입력하세요",
+  "customServerAddress": "주소",
+  "customServerAddressHint": "example.com 또는 192.0.2.1",
+  "customServerAddressRequired": "서버 주소를 입력하세요",
+  "customServerAddressInvalid": "잘못된 주소",
+  "customServerPort": "포트",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "포트는 1~65535 사이의 숫자여야 합니다.",
+  "customServerProtocol": "프로토콜",
+  "customServerCredentials": "로그인 정보",
+  "customServerOptional": "선택사항",
+  "customServerShowSecret": "비밀 표시",
+  "customServerHideSecret": "비밀 숨기기",
+  "customServerBadge": "사용자 지정",
+  "customServerDeleteConfirm": "서버 \"{name}\"을 삭제하시겠습니까?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "수동으로 서버 추가: 주소, 포트 및 프로토콜",
+  "customServerTest": "테스트",
+  "leakTestTitle": "데이터 유출 테스트",
+  "leakTestIntro": "트래픽이 터널 밖으로 기기를 빠져나갈 수 있는지 확인합니다. 직접 DNS 및 ICMP 요청, IPv6 외부 통신, 시스템 리졸버를 검사합니다. 연결된 상태에서 실행하세요.",
+  "leakTestRun": "확인",
+  "leakTestCancel": "취소",
+  "leakTestNeedsConnection": "VPN에 연결하여 데이터 유출을 테스트합니다.",
+  "leakTestProgress": "테스트 완료: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "누출이 발견되지 않았습니다.",
+  "leakTestFound": "{count, plural, other{유출 #건 발견}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "수정",
+  "leakTestFixedNote": "네트워크 차단이 켜져 있습니다. 테스트를 다시 실행해 확인하세요.",
+  "leakTestCheckDirectDns": "직접 DNS",
+  "leakTestCheckIcmpEcho": "ICMP 에코",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "시스템 리졸버",
+  "leakTestCheckTunnelConnectivity": "터널 연결",
+  "leakTestCheckTunnelDns": "DNS 터널을 통과",
+  "noticeDegraded": "서버가 느려졌습니다. Sora은 측정 중에 찾은 최적의 서버로 전환했습니다.",
+  "obfs": "트래픽 난독화",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "업데이트 파일은 릴리스와 함께 게시된 체크섬과 대조합니다.",
+  "updateManualSigWarning": "아래 파일은 릴리스 체크섬과 일치합니다. 공식 릴리스에서 내려받았다면 명령을 실행하세요.",
+  "updateVersionRevoked": "개발자가 이 버전을 철회했습니다. 수정된 릴리스를 기다려 주십시오.",
+  "updateRolloutPending": "최신 버전이 점진적으로 출시되고 자동으로 제공됩니다.",
+  "updateRollbacking": "{version} 버전으로 롤백하는 중...",
+  "updateRolledBack": "{version} 업데이트가 상태 검사를 통과하지 못해 Sora가 {fromVersion}로 롤백되었습니다.",
+  "updateRollbackError": "자동 롤백에 실패했습니다. 새 버전이 작동하지 않으면 이전 릴리스를 수동으로 다시 설치하십시오.",
+  "updateRollbackCacheError": "현재 버전의 확인된 롤백 복사본을 준비할 수 없어 업데이트가 설치되지 않았습니다.",
+  "extRatingLabel": "평가 {rating}/5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "작성자: {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "설치 {count}회",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "설치 1회",
+  "extBadgeVerified": "확인됨",
+  "extBadgeTop": "이번 주 가장 인기 있는 항목",
+  "extBadgeNew": "신규",
+  "extBadgeStaff": "Sora 팀",
+  "extSideloadShort": "카탈로그에 없음",
+  "extSideloadWarning": "이 확장은 팀 카탈로그에 없습니다. 작성자만이 키를 보증했습니다. 작성자를 신뢰하는 경우에만 키를 설치하세요.",
+  "extInstallTitle": "“{name}” 설치",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "“{name}” 업데이트",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "이 확장 프로그램은 다음을 수행할 수 있습니다.",
+  "extPermissionsWidened": "업데이트에서 새 권한을 요청합니다.",
+  "extDangerousAck": "나는 이러한 권한이 심각한 것임을 이해합니다",
+  "extInstall": "설치",
+  "extUpdate": "업데이트",
+  "extCancel": "취소",
+  "extConfirm": "확인",
+  "extOk": "OK",
+  "extCatalog": "카탈로그",
+  "extInstalled": "설치된 확장 프로그램",
+  "extSearchHint": "확장 검색",
+  "extCatAll": "모두",
+  "extCatTools": "도구",
+  "extCatThemes": "테마",
+  "extCatAutomation": "자동화",
+  "extCatStats": "통계",
+  "extCatNetwork": "네트워크",
+  "extSortBy": "정렬 기준",
+  "extSortPopular": "가장 인기 있는",
+  "extSortRating": "최고 평점",
+  "extSortName": "이름",
+  "extCatalogError": "카탈로그를 로드할 수 없습니다.",
+  "extRetry": "재시도",
+  "extEmptySearch": "아무것도 발견되지 않았습니다",
+  "extEmptyInstalled": "아직 확장 프로그램이 설치되지 않았습니다.\n카탈로그에서 찾거나 파일에서 설치하세요.",
+  "extInstallFromFile": "파일에서 설치",
+  "extInstallFromUrl": "URL에서 설치",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "다운로드",
+  "extDownloading": "다운로드 중…",
+  "extVerifying": "확인 중…",
+  "extInstalling": "설치 중…",
+  "extInstallFailed": "설치 실패",
+  "extErrSignature": "서명 확인에 실패했습니다. 파일이 손상되었거나 변조되었을 수 있습니다.",
+  "extErrManifest": "확장 매니페스트가 잘못되었습니다.",
+  "extErrNetwork": "네트워크 오류입니다. 연결을 확인하고 다시 시도하세요.",
+  "extErrHash": "다운로드가 카탈로그와 일치하지 않습니다. 조작되었을 수도 있습니다.",
+  "extErrMinApp": "이 확장 프로그램에는 앱 버전 {version} 이상이 필요합니다.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "https:// 링크만 허용됩니다.",
+  "extErrGeneric": "문제가 발생했습니다. 다시 시도해 주세요.",
+  "extErrAuthorKeyChanged": "이 업데이트는 설치된 버전과 다른 작성자 키로 서명되었으므로 차단되었습니다. 새 키를 신뢰하는 경우 확장 프로그램을 제거하고 명시적으로 다시 설치하세요.",
+  "extUpdateAvailable": "업데이트 가능",
+  "extDisabled": "비활성화됨",
+  "extToggleEnabled": "{name} 활성화",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "설치된 확장 검색",
+  "extUpdateAll": "모두 업데이트",
+  "extUpdatesAvailable": "{count} 업데이트 사용 가능",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} 업데이트됨",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "정상",
+  "extRiskSensitive": "민감함",
+  "extRiskDangerous": "높은 위험",
+  "extPermissionsRemoved": "더 이상 요청되지 않음:",
+  "extUpdateFailedKept": "이전 버전이 아직 설치되어 있습니다.",
+  "extConflictsTitle": "확장 프로그램 충돌",
+  "extConflictsIntro": "이 확장 프로그램들은 같은 것을 원합니다. 실행할 것을 고르세요. 다른 하나는 설치된 채로 남습니다.",
+  "extConflictTheme": "앱 테마",
+  "extConflictNetHooks": "네트워크 후크",
+  "extConflictWinner": "{name} 승리",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} 충돌에는 귀하의 결정이 필요합니다",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "충돌 해결",
+  "extConflictNote": "선택 사항은 이 기기에 저장됩니다. 테마는 바로 바뀌며, 네트워크 훅은 이 버전에서 실행되지 않습니다.",
+  "extVersionLabel": "버전 {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "작성자",
+  "extRating": "평가",
+  "extInstalls": "설치 수",
+  "extVersion": "버전",
+  "extAbout": "이 확장 프로그램 정보",
+  "extPermissionsTitle": "권한",
+  "extNoPermissions": "특별한 권한이 없습니다.",
+  "extSettings": "설정",
+  "extSaveSettings": "설정 저장",
+  "extSaving": "저장 중…",
+  "extUpdateTo": "{version}(으)로 업그레이드",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "활성화됨",
+  "extRollbackTo": "{version}으로 롤백",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "버전 {version}로 롤백하시겠습니까?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "제거",
+  "extUninstallConfirm": "\"{name}\" 및 해당 설정을 제거하시겠습니까?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "패널을 사용할 수 없습니다. 확장 프로그램이 비활성화되었거나 제거되었을 수 있습니다.",
+  "extPermConnectionsRead": "활성 연결 목록 보기",
+  "extPermServersRead": "서버 목록 보기",
+  "extPermSettingsRead": "앱 설정 읽기",
+  "extPermSettingsWrite": "앱 설정 변경",
+  "extPermNotifications": "알림 표시",
+  "extPermTray": "트레이 메뉴에 항목 추가",
+  "extPermUiPanel": "앱 내부에 패널 표시",
+  "extPermThemeApply": "테마 적용",
+  "extPermRoutingRules": "라우팅 규칙 추가(네트워크 트래픽이 이동하는 위치에 영향을 줌)",
+  "extPermNetHooks": "네트워크 경로에 통합(DPI 우회 모듈)",
+  "extPermNetFetch": "허용 목록에서 URL 요청",
+  "extPermBackground": "백그라운드 작업 실행",
+  "extPermBackgroundDetail": "패널이 닫혀 있어도 예약된 작업을 실행합니다. 확장 프로그램 설정에서 일시 중지하거나 실행 빈도를 변경할 수 있습니다.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "백그라운드에서 실행됩니다.",
+  "extCapNetHook": "우회 기능 및 네트워크 후크",
+  "extCapPanel": "패널",
+  "extCapRouting": "라우팅 규칙",
+  "extCapTheme": "테마",
+  "extCapWidget": "위젯",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "변경 로그",
+  "extImageFailed": "이미지를 로드할 수 없습니다.",
+  "extRatingHow": "평가 작동 방식",
+  "extRatingHowBody": "평점은 베이지안 평균을 사용합니다. 평점이 거의 없는 확장 프로그램은 더 많은 사람들이 투표할 때까지 중간 근처에 유지되므로 별 5개짜리 단일 리뷰로는 새 확장 프로그램을 맨 위로 올릴 수 없습니다. 최근 평가는 이전 평가보다 중요하며 계정당 하나의 평가만 계산됩니다.",
+  "extScreenshots": "스크린샷",
+  "extSortRelevance": "관련성",
+  "extPermNetworkDetail": "VPN을 통해 인터넷에서 데이터를 가져옵니다. 아래 호스트만 허용되며 나머지는 모두 차단됩니다.",
+  "extBgTitle": "백그라운드 작업",
+  "extBgEnabled": "백그라운드에서 실행",
+  "extBgInterval": "실행 간격",
+  "extBgMinutes": "{count, plural, other{#분}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, other{#시간}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Sora가 열려 있는 동안 트레이에 있을 때도 일정에 따라 작업이 실행됩니다. 최소 간격은 15분입니다.",
+  "extBgDisabledNote": "백그라운드 작업을 관리하려면 확장 프로그램을 활성화하세요.",
+  "extCapNetwork": "네트워크 액세스",
+  "extCapNetworkHosts": "네트워크: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "QR로 공유",
+  "qrScanTitle": "QR 코드 스캔",
+  "qrCopyLink": "링크 복사",
+  "qrShowLink": "링크 표시",
+  "qrHideLink": "링크 숨기기",
+  "qrWarning": "이 QR 코드에는 연결 세부정보가 포함되어 있습니다. 낯선 사람에게 보여주지 마세요.",
+  "qrScanHint": "QR 코드가 있는 스크린샷이나 사진을 선택하거나 링크를 붙여 넣으세요",
+  "qrFromClipboard": "클립보드에서 붙여넣기",
+  "qrNoCode": "이 이미지에서 QR 코드를 찾을 수 없습니다.",
+  "qrInvalid": "이 QR 코드에는 유효한 링크가 포함되어 있지 않습니다.",
+  "qrScan": "스캔 QR",
+  "qrFromImage": "이미지 열기",
+  "connGroupByProcess": "프로세스별 그룹화",
+  "connListView": "목록",
+  "connCopyHost": "호스트 복사",
+  "connAddRule": "규칙 추가",
+  "connConnectionsCount": "{count, plural, other{연결 #개}}",
+  "dnsPreset": "사전 설정",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "사용자 지정",
+  "dnsCheck": "데이터 유출 확인",
+  "dnsChecking": "확인 중...",
+  "dnsNoLeak": "누출이 발견되지 않았습니다.",
+  "dnsLeakFound": "누출이 감지되었습니다.",
+  "dnsLastCheck": "마지막 확인",
+  "dnsNeverChecked": "아직 테스트되지 않았습니다.",
+  "dnsLeakCheckTunnelDns": "터널 DNS 리졸버",
+  "dnsLeakCheckSystemResolvers": "시스템 리졸버",
+  "dnsLeakCheckKillSwitchDns": "네트워크 차단을 통한 DNS 보호",
+  "dnsLeakFixConfigureTunnelDns": "위의 DNS 설정에서 터널에 대해 DNS을 구성합니다.",
+  "dnsLeakFixReviewSystemResolvers": "시스템이 터널 외부에서 사용할 확인 프로그램을 확인하세요.",
+  "dnsLeakFixEnableKillSwitch": "DNS 트래픽이 터널 안에 머물도록 네트워크 차단을 켜세요.",
+  "dnsLeakCheckEncryptedDns": "운영 체제의 암호화 DNS",
+  "dnsLeakCheckDnsSpoof": "위조된 DNS 응답",
+  "dnsLeakFixReviewEncryptedDns": "시스템이 터널 외부에서 사용하는 암호화된 DNS 엔드포인트를 확인하세요.",
+  "dnsLeakFixUseEncryptedDns": "리졸버가 응답을 위조할 수 없도록 터널에 암호화 DNS(DoT 또는 DoH)를 사용하세요.",
+  "dnsCheckNeedsConnection": "먼저 VPN에 연결한 후 누출이 있는지 확인하세요.",
+  "dnsExpected": "예상됨",
+  "dnsActual": "관찰됨",
+  "sortBy": "정렬 기준",
+  "sortPing": "핑",
+  "sortSpeed": "속도",
+  "sortName": "이름",
+  "measureSpeed": "속도 측정",
+  "benchmarkStale": "오래됨",
+  "autoSelectMode": "서버 자동 선택",
+  "autoSelectPing": "가장 빠른 핑",
+  "autoSelectSpeed": "가장 빠른 속도",
+  "autoSelectSmart": "현명한 선택",
+  "coreWatchUnstable": "Sora 코어에 대한 연결이 불안정합니다.",
+  "watchReconnect": "다시 연결",
+  "coreRestoringLink": "Sora 코어에 대한 연결을 복원하는 중…",
+  "crashRestoreTitle": "마지막 세션이 중단되었습니다.",
+  "restoreOnCrash": "충돌 후 세션 복원",
+  "crashRestore": "복원",
+  "crashDismiss": "지금은 아님",
+  "overrideTitle": "내 편집 내용",
+  "overrideEdit": "서버 편집",
+  "overrideHide": "숨기기",
+  "overrideUnhide": "표시",
+  "overrideClear": "편집 내용 재설정",
+  "overrideEmpty": "아직 수정사항이 없습니다.",
+  "overrideCustomRules": "자체 규칙",
+  "errBenchmarkUnsupported": "속도 측정에는 최신 코어가 필요합니다.",
+  "benchmarkProgress": "{total}에서 {done} 측정…",
+  "profiles": "네트워크 프로필",
+  "profilesEmpty": "아직 프로필이 없습니다. 알려진 네트워크에 자동으로 설정을 적용하려면 네트워크를 만드세요.",
+  "profileAdd": "프로필 추가",
+  "profileName": "프로필 이름",
+  "profileSsids": "Wi-Fi 네트워크(SSID)",
+  "profileSsidsHint": "집, 사무실은 쉼표로 구분됩니다.",
+  "profileGateways": "네트워크 게이트웨이",
+  "profileAsns": "AS 번호",
+  "profileAutoApply": "자동 적용",
+  "profileAutoApplyHint": "끄면 프로필을 적용하기 전에 확인합니다.",
+  "profileSnapshot": "현재 설정 기억",
+  "profileSnapshotDone": "프로필에 저장된 현재 설정",
+  "profileDelete": "프로필 삭제",
+  "profileDeleteConfirm": "프로필 \"{name}\"을(를) 삭제하시겠습니까?",
+  "profileApplyAsk": "프로필 \"{name}\"을 적용하시겠습니까?",
+  "profileApply": "적용",
+  "profileApplied": "프로필 '{name}'이 적용됨",
+  "profileUndo": "취소",
+  "profileActive": "활성",
+  "networkNow": "현재: {info}",
+  "networkUnknown": "네트워크 정보를 사용할 수 없습니다.",
+  "profileNoTriggers": "하나 이상의 트리거 추가: SSID, 게이트웨이 또는 ASN",
+  "chains": "프록시 체인",
+  "chainsEmpty": "아직 체인이 없습니다. 2~3개의 서버를 연결하여 트래픽이 각 서버를 통과하도록 합니다.",
+  "chainAdd": "새 체인",
+  "chainName": "체인 이름",
+  "chainPickServers": "2~3개의 서버 선택",
+  "chainOrderHint": "드래그하여 재정렬: 트래픽이 위쪽으로 들어오고 아래쪽으로 나갑니다.",
+  "chainTooFew": "서버를 2개 이상 선택하세요.",
+  "chainTooMany": "체인은 최대 3개의 서버를 보유합니다.",
+  "chainEstimate": "예상 대기 시간",
+  "chainSave": "저장 체인",
+  "chainDelete": "체인 삭제",
+  "chainDeleteConfirm": "체인 \"{name}\"을 삭제하시겠습니까?",
+  "chainUnsupported": "현재 엔진은 체인을 구축할 수 없습니다.",
+  "chainHopMissing": "체인 서버 중 하나를 더 이상 사용할 수 없습니다.",
+  "chainHop": "홉 {n}",
+  "chainEntry": "입구",
+  "chainExit": "출구",
+  "sync": "장치 동기화",
+  "syncDevices": "내 장치",
+  "syncEmpty": "페어링된 장치가 없습니다. 로컬 네트워크를 통해 다른 장치를 페어링합니다.",
+  "syncPair": "장치 페어링",
+  "syncShowCode": "내 코드 표시",
+  "syncScanCode": "스캔 코드",
+  "syncRevoke": "철회",
+  "syncRevokeConfirm": "\"{name}\"을(를) 취소하시겠습니까?",
+  "syncLastSync": "마지막 동기화: {time}",
+  "syncNever": "절대 안함",
+  "syncNoLan": "장치는 동일한 로컬 네트워크에 있어야 합니다.",
+  "syncPaired": "장치가 페어링되었습니다",
+  "syncPairingTitle": "이 장치와 페어링",
+  "syncWaiting": "다른 장치를 기다리는 중…",
+  "syncSecureNote": "종단 간 암호화된 채널입니다. 계정도 없고 클라우드 서버도 없습니다.",
+  "zapretWithVpn": "우회 DPI 직접 네트워크 트래픽 필터링",
+  "zapretWithVpnHint": "VPN 터널과 함께 zapret을 실행합니다. 터널 트래픽은 VPN을 사용하고 직접 트래픽은 우회 기능을 사용합니다.",
+  "chainDuplicate": "각 서버는 한 번만 나타날 수 있습니다.",
+  "edit": "편집",
+  "remove": "제거",
+  "autoSwitchOnDegrade": "성능 저하 시 자동 전환",
+  "autoSwitchOnDegradeDetail": "선택한 서버가 크게 느려지거나 응답하지 않으면 Sora가 측정 결과가 가장 좋은 서버로 전환합니다. 전환은 10분에 한 번으로 제한됩니다.",
+  "tunStackMixed": "혼합",
+  "tunStackSystem": "시스템",
+  "syncCodeExpired": "코드가 만료되었습니다",
+  "syncDaemonFailed": "동기화 서비스를 시작할 수 없습니다.",
+  "syncDaemonMissing": "sora-sync 구성 요소를 찾을 수 없습니다. 기기 동기화를 활성화하려면 앱을 다시 설치하세요.",
+  "syncDaemonStarting": "동기화 서비스를 시작하는 중…",
+  "syncErrAuth": "동기화 서비스가 액세스 토큰을 거부했습니다. 앱을 다시 시작한 후 다시 시도해 보세요.",
+  "syncErrNotFound": "장치가 더 이상 페어링되지 않습니다.",
+  "syncErrPairingActive": "페어링 세션이 이미 열려 있습니다.",
+  "syncErrUnreachable": "다른 장치가 응답하지 않았습니다. 동일한 네트워크에 있고 해당 코드가 표시되는지 확인하세요.",
+  "syncError": "동기화 오류",
+  "syncExpiresIn": "코드는 {duration} 후에 만료됩니다",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "기기와 페어링 중…",
+  "syncLegacyCleared": "이전 장치 목록은 실제로 페어링된 적이 없으므로 삭제되었습니다. 이번에는 실제로 장치를 다시 페어링하십시오.",
+  "syncNewCode": "새 코드",
+  "syncPairedWith": "은 {name}과 페어링됨",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "반복",
+  "syncStopShowing": "코드 숨기기",
+  "syncSyncNow": "지금 동기화",
+  "syncSyncResult": "수신 {pulled}, 전송 {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "동기화 결과",
+  "syncPulled": "수신됨",
+  "syncPushed": "보냄",
+  "syncNoChanges": "변경 사항이 감지되지 않았습니다.",
+  "syncDocKindSubscriptions": "구독",
+  "syncDocKindSettings": "앱 설정",
+  "syncDocKindOverrides": "신청 설정 재정의",
+  "syncDocKindProfiles": "네트워크 프로필",
+  "syncDocKindChains": "프록시 체인",
+  "syncFrom": "{name}에서",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "이 장치",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Shadowsocks의 경우: 방식:비밀번호 (예: chacha20-ietf-poly1305:password)",
+  "diagnosticPackets": "패킷 캡처",
+  "diagnosticEvents": "윈도우 이벤트",
+  "diagnosticCapture": "10초 동안 캡처",
+  "diagnosticRequiresTun": "패킷 캡처에는 활성 Sora TUN 연결이 필요합니다.",
+  "diagnosticUnavailable": "이 플랫폼에서는 이 진단을 사용할 수 없습니다.",
+  "extErrRevoked": "Sora 팀이 안전하지 않거나 손상된 이 확장 프로그램 버전을 철회했습니다.",
+  "extErrRevocationsExpired": "철회된 확장 프로그램 목록을 갱신하지 못했습니다. 갱신될 때까지 설치할 수 없습니다. 네트워크를 확인하고 다시 시도하세요.",
+  "extRevokedDisabled": "철회된 확장 프로그램을 껐습니다: {names}",
+  "customServerWgPrivateKey": "개인 키",
+  "customServerWgAddresses": "인터페이스 주소",
+  "customServerWgPeerKey": "서버 공개 키",
+  "customServerWgPresharedKey": "사전 공유 키",
+  "customServerWgAllowedIps": "허용된 IP",
+  "customServerWgKeepalive": "Keepalive(초)",
+  "customServerWgKeyInvalid": "키는 wg genkey 출력처럼 base64 32바이트여야 합니다.",
+  "customServerWgCidrInvalid": "10.0.0.2/32 같은 접두사를 쉼표로 구분해 입력하세요.",
+  "customServerWgKeepaliveInvalid": "0에서 65535 사이의 초를 입력하세요.",
+  "strictKillSwitch": "엄격한 네트워크 차단",
+  "strictKillSwitchWarning": "연결 후에는 충돌, 재시작 또는 앱 종료 후에도 VPN 외부 트래픽을 차단합니다. 연결을 끊거나 이 옵션을 꺼야 접근이 복원됩니다. 기기를 재부팅한 뒤에는 시작 시 연결이 활성화된 경우에만 차단을 재개합니다.",
+  "extWorkerFailed": "확장 기능의 백그라운드 작업이 실패했습니다. 확장 기능 로그를 확인하세요.",
+  "extAssetRejected": "확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다."
 }

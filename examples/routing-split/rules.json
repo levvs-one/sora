@@ -1,0 +1,20 @@
+{
+  "priority": 10,
+  "rules": [
+    {
+      "match": "10.0.0.0/8",
+      "action": "direct",
+      "comment": "Private IPv4 network"
+    },
+    {
+      "match": "192.168.0.0/16",
+      "action": "direct",
+      "comment": "Private IPv4 network"
+    },
+    {
+      "match": "example.org",
+      "action": "proxy",
+      "comment": "Use the currently selected proxy; no server ID is embedded"
+    }
+  ]
+}

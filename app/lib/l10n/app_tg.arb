@@ -5,7 +5,6 @@
   "stateConnected": "пайваст",
   "stateReconnecting": "Аз нав пайваст шудан",
   "stateDisconnecting": "Хомӯш шудан",
-  "stateFailed": "Пайваст нест",
   "coreMissing": "Хидмати Sora ҷавоб намедиҳад",
   "serverAuto": "Тезтарин",
   "serverBypass": "Сервер нест",
@@ -41,6 +40,7 @@
   "export": "Ба файл захира кунед",
   "clear": "Тоза",
   "logsEmpty": "Ҳеҷ чиз дар ин ҷо",
+  "connEmpty": "Пайвастшавӣ нест",
   "appVersion": "Версияи {version}",
   "notInstalled": "Насб карда нашудааст",
   "sourceCode": "Рамзи манбаъ",
@@ -75,17 +75,16 @@
   "errSubScheme": "Истинод бояд бо https:// оғоз шавад",
   "errSecretStore": "Захираи Sora осеб дидааст ё дастнорас аст",
   "errNoServers": "Барои пайваст шудан обуна илова кунед",
-  "exportText": "Матн",
   "connections": "Пайвастшавӣ",
   "close": "Пӯшед",
   "chainDirect": "Бевосита",
   "chainBlocked": "Бастан",
   "theme": "Мавзӯъ",
-  "themeSystem": "System",
+  "themeSystem": "Мисли система",
   "themeLight": "Нур",
   "themeDark": "Торик",
   "language": "Забон",
-  "languageSystem": "System",
+  "languageSystem": "Мисли система",
   "sectionConnection": "Пайвастшавӣ",
   "sectionNoServer": "Сервер нест",
   "sectionPing": "Пинг",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} чап",
   "ruleInvalid": "Ин ба сайт, IP ё барнома монанд нест",
   "tunnelMode": "Режим",
-  "tunnelTun": "Ҳама трафик",
   "tunnelProxy": "Прокси System",
   "proxyAddress": "Суроғаи прокси",
   "copied": "Нусхабардорӣ",
   "launchAtLogin": "Бо система оғоз кунед",
+  "launchAtLoginDetail": "Ҳангоми воридшавӣ ба система Sora ба таври худкор оғоз шуда, дар tray мемонад.",
   "closeToTray": "Ҳангоми пӯшидан дар табақ нигоҳ доред",
   "notifications": "Огоҳиномаҳо",
   "trayOpen": "Sora-ро кушоед",
@@ -185,12 +184,6 @@
   "sidebarToggle": "Паҳлӯи паҳлӯро иваз кунед",
   "more": "Бештар",
   "less": "Камтар",
-  "currentServer": "Сервери ҷорӣ",
-  "trafficDown": "Боргиришуда",
-  "trafficUp": "Бор карда шуд",
-  "perSecond": "{value}/с",
-  "activeRules": "Қоидаҳои фаъол: {count}",
-  "recentNotifications": "Огоҳиҳои охирин",
   "notificationsEmpty": "Ҳодисаҳои пайвастшавӣ ва обуна дар ин ҷо пайдо мешаванд",
   "retryConnect": "Пайвастшавӣ аз нав кӯшиш кунед",
   "openLogs": "Сабтҳоро кушоед",
@@ -208,12 +201,9 @@
   "chooseProgram": "Барномаро интихоб кунед",
   "installedApps": "Барномаҳои насбшуда",
   "runningProcesses": "Равандҳои иҷрошаванда",
-  "programsFailed": "Барномаҳо бор карда нашуд",
   "programsEmpty": "Ягон барнома ёфт нашуд. Номи дигарро санҷед.",
   "selectExe": "Файли .exe-ро интихоб кунед",
-  "trafficUnavailable": "Ҳисобкунакҳо ҳанӯз дастрас нестанд",
   "speedtest": "Суръат",
-  "speedtestCheck": "Суръатро тафтиш кунед",
   "speedtestSearch": "Хидматро пайдо кунед",
   "speedtestEmpty": "Ягон мувофиқат. Ҷустуҷӯро тағир диҳед.",
   "speedtestBackToList": "Бозгашт ба хидматҳо",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "Фармони нусхабардорӣ",
   "updateChecksDisabled": "Санҷишҳои худкор дар Танзимот ғайрифаъол карда мешаванд.",
   "updateInstalled": "Навсозии насбшуда. Sora-ро аз нав кушоед.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "Лоиҳа",
   "githubReleases": "Нашрияҳо ва зеркашиҳо",
   "telegramChannel": "Канали Telegram",
   "licenses": "Иҷозатномаҳо",
   "componentLicenses": "Литсензияҳои компонентҳо",
-  "appCopyright": "© 2026 levvs-one ва саҳмгузорон",
   "collapseServers": "Барҳам додани серверҳо",
   "expandServers": "Серверҳоро васеъ кунед",
   "hideDescription": "Пинҳон кардани тавсиф",
   "showDescription": "Тавсифро нишон диҳед",
   "pendingConnectionChanges": "Барои татбиқи ин тағйирот дубора пайваст шавед.",
   "reconnectNow": "Муроҷиат кунед ва дубора пайваст кунед",
-  "bypassLimitations": "Ин режим DPI-ро танҳо барои HTTP ва TLS мегузарад, UDP-ро дастгирӣ намекунад ё IP-и шуморо тағир намедиҳад. Барои садои Discord, зангҳо ва суроғаҳои басташудаи Telegram сервери VPN-ро истифода баред.",
   "errEngineUnsupported": "Муҳаррики интихобшуда ин профил ё танзимотро дастгирӣ намекунад. Авто ё муҳаррики мувофиқро интихоб кунед.",
   "errRestore": "Тозакунии пайвастшавӣ нопурра буд. Кӯшиш кунед, ки пайвастшавиро қатъ кунед; барои тафсилот ба гузориш нигаред.",
   "errSessionEnded": "Ин сессия аллакай ба охир расид. Ҳолати пайвастшавиро нав кунед.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "Модулҳо ва муҳаррикҳо",
   "probeServers": "Серверҳоро тафтиш кунед",
   "expiresIn": "{name}: {days, plural, =0{обуна баъди чанд соат ба охир мерасад} one{обуна дар рӯзи # ба охир мерасад} other{обуна дар рӯзҳои # ба охир мерасад}}",
-  "groupOrdered": "{count, plural, one{Сервери #, дар навбати худ} other{Серверҳои #, дар навбати худ}}",
   "groupBest": "{count, plural, one{Сервери #, зудтарин} other{Серверҳои #, зудтарин}}",
-  "modesGuide": "Агар шумо боварӣ надошта бошед, ки ба сервери шумо ба кадом муҳаррик ниёз дорад, Auto-ро интихоб кунед. Sora пеш аз пайвастшавӣ профил ва танзимотро тафтиш мекунад. Муҳаррик наметавонад маҷрои нақшаи шуморо зиёд кунад: иҷроиш аз сервер, масир, протокол ва шабака вобаста аст.\n\n## Модҳо\n\n### Ҳама трафик (TUN)\n\nSora интерфейси шабакаи маҷозӣ эҷод мекунад ва трафики барномаҳоро тавассути он, аз ҷумла TCP ва UDP, масир мекунад. Ин режимро барои Telegram, бозиҳо ва овози Discord истифода баред. Қоидаҳо метавонанд сайтҳо ё барномаҳои мушаххасро мустақиман фиристанд ё онҳоро маҳкам кунанд. Хидмати шабака ба иҷозат ва сервере ниёз дорад, ки протоколи лозимиро дастгирӣ мекунад.\n\n### Прокси System\n\nSora прокси маҳаллии HTTP/SOCKS-ро танзим мекунад. Барномаҳое, ки танзимоти прокси системаро эҳтиром мекунанд, онро истифода мебаранд. Барномаҳо бо стеки шабакавии худ метавонанд мустақиман пайваст шаванд; UDP ва зангҳои овозӣ умуман ба TUN ниёз доранд. Ин режим ба браузерҳо ва барномаҳо бо дастгирии прокси мувофиқат мекунад.\n\n### Сервер нест\n\nДар Linux, Sora [zapret](https://github.com/bol-van/zapret) -ро барои тақсим кардан ва тағир додани дархостҳои HTTP/TLS ва гузаштан аз баъзе санҷишҳои DPI истифода мебарад. IP-и шумо бетағйир мемонад ва пайвастҳо мустақиман ба вебсайт мераванд. Натиҷаҳо аз провайдери шумо ва усули басташавӣ вобастаанд.\n\nИнтегратсияи ҷорӣ tpws-ро барои HTTP ва TLS тавассути TCP истифода мебарад. Он масдудкунии IP ё интиқоли UDP-ро фаро намегирад ва пайвастҳои Telegram-и MTProto-ро кафолат дода наметавонад. Сервери VPN-ро бо TUN барои овози Discord, зангҳои Telegram ва ин гуна маҳдудиятҳо истифода баред.\n\n## Моторҳо\n\n### Авто\n\nSora муҳаррики насбшударо интихоб мекунад, ки тамоми нақшаи пайвастшавиро дастгирӣ мекунад: протоколҳои сервер, интиқолҳо, гурӯҳҳо, тақсимот ва режим. Интихоби дастӣ номувофиқ пеш аз қатъ кардани пайвасти ҷорӣ рад карда мешавад. Авто ё муҳаррики дигарро интихоб кунед ва танзимотро дубора татбиқ кунед.\n\n### sing-box\n\nБастаҳои нави Sora иборатанд аз [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), як фардкунандаи [sing-box](https://github.com/SagerNet/sing-box), илова кардани муштарии XHTTP ва VLESS Encryption. Sora сохтмон ва қобилиятҳои онро эътироф мекунад. Сохтмони болооб бидуни XHTTP ин қобилиятро танҳо аз номи худ ба даст намеорад.\n\nПротоколҳои дастгирӣшаванда VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ва Z8x/parameters. Sora метавонад ворид кунад. Профилҳои пурраи Xray JSON Xray-ро талаб мекунанд. Майдонҳои нави AWG 3.x ҳанӯз ворид карда намешаванд. sing-box порти назорати маҳаллии бо парол ҳифзшударо истифода мебарад, ки дигар замимаҳои компютер метавонанд онро ошкор кунанд.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) пораҳои VLESS, REALITY, XHTTP, VLESS Encryption ва TLS-ро дастгирӣ мекунад. Он инчунин профилҳои пурраи провайдери Xray -ро ҳангоми нигоҳ доштани масир ва гурӯҳҳои онҳо иҷро мекунад. Чунин профилҳоро бидуни тағир додани рафтори худ ба таври худкор ба муҳаррики дигар табдил додан мумкин нест.\n\nXray маҷмӯӣ танзимеро, ки санҷиши сертификати TLS-ро ғайрифаъол мекунад (`allowInsecure`) хориҷ кард. Барои серверҳои оддӣ, ки ин танзимотро талаб мекунанд, худкор sing-box ё mihomo-ро интихоб мекунад. Интихоби Xray пеш аз қатъ кардани пайвасти ҷорӣ дастӣ дар бораи номувофиқатӣ хабар медиҳад. Профилҳои пурраи JSON-и кӯҳна ба профили провайдери навшуда бо шаҳодатномаи тасдиқшаванда ё PIN сертификат ниёз доранд.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) гурӯҳҳои фармоишии бозгашт ва мувозинати сарборӣ, XHTTP ва AmneziaWG -ро дастгирӣ мекунад. Вақте ки интиқоли автоматӣ ба сервери эҳтиётӣ муҳим аст, онро интихоб кунед. Танзими тақсимоти TLS-и Sora бо ин муҳаррик дастнорас аст.\n\n## Мутобиқат дар Sora\n\n| Хусусият | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ва TCP/UDP | Бале | Бале | Бале |\n| XHTTP | Бале | Бале | Бале |\n| VLESS Encryption | Бале | Бале | Бале |\n| Профили пурраи Xray | Не | Бале | Не |\n| TUIC / AnyTLS | Ҳарду | Не | TUIC |\n| Фрагментатсияи TLS | Бале | Бале | Не |\n| AmneziaWG 1.x/2.x | Ҳа¹ | Не | Бале |\n| Гурӯҳи бозгашти фармоишӣ | Не | No² | Бале |\n\n¹ Профилҳо бо J1/J2/J3/Itime mihomo-ро истифода мебаранд; ин майдонхоро хеч гох хомушона партофтан лозим нест. ² Барои як гурӯҳи профилҳои пурраи Xray, барнома профили эҳтиётиро интихоб мекунад. Дастгирӣ аз сохтори насбшуда вобаста аст; версияи онро дар бораи санҷед.\n\n## Стеки TUN\n\nСтек TCP ва UDP-ро дар дохили интерфейси виртуалӣ идора мекунад. Дар панели режимҳо, Xray ва mihomo gVisor, System, Mixed ва MIPS -ро пешниҳод мекунанд. Ҳар як муҳаррик афзалияти худро захира мекунад. System прокси ва режимҳои бе сервер ин афзалиятро истифода намебаранд.\n\n- **Mixed** — TCP стеки системаро истифода мебарад, дар ҳоле ки gVisor UDP-ро идора мекунад. Ин пешфарз барои mihomo дар Linux аст. Дар Windows, Xray ва mihomo ба таври пешфарз MIPS-ро истифода мебаранд.\n- **System** — стеки системаро истифода мебарад. Варианти дигарро санҷед, агар барномаҳои шабакавӣ ба мушкилот дучор шаванд.\n- **gVisor** — трафикро дар фазои корбарон идора мекунад.\n- **MIPS** — стеки IP-и худи mihomo, ки дар версияи маҷмӯии 1.19.32 дастрас аст.\n\nДар Linux, Xray бо нобаёнӣ gVisor-и дарунсохтро истифода мебарад. System, Mixed ва MIPS дар Linux mihomo-ро ҳамчун муҳаррики TUN истифода мебаранд, TCP ва UDP-ро ба Xray тавассути истиноди SOCKS тасдиқшудаи маҳаллӣ интиқол медиҳанд. Xray протокол, профили провайдер ва масирро нигоҳ медорад. Ин се имконоти насбшуда mihomo талаб мекунанд. Дар Windows, Xray барои ҳамаи чор стеки TUN mihomo 1.19.32 ё навтарро истифода мебарад. Протоколҳо ва масирбандӣ дар Xray мемонанд. Қоидаҳои барномаҳо дар ин пайваст танҳо пайвасти мустақим ва бастанро дастгирӣ мекунанд; дар Linux ин қоидаҳо gVisor-и дарунсохти Xray-ро талаб мекунанд.\n\nПул процесси дуюмро пеш мебарад. Дар се андозагирии бекор дар Linux, он нисбат ба Xray TUN-и аслӣ тақрибан 32–36 МБ зиёдтар хотираи физикиро истифода бурд. Ин сарбории зеркаширо чен намекунад: хароҷоти CPU ва хотира аз пайвастшавӣ вобаста аст. sing-box ягон селектори стек надорад. Ягон стек иҷрои беҳтарро дар ҳар як шабака кафолат намедиҳад. Стекро интихоб кунед ва Apply-ро интихоб кунед ва аз нав пайваст шавед, то онро дар шабакаи худ санҷед.\n\n## Татбиқи танзимот\n\nИнтихоби сервер ба таври худкор дубора пайваст мешавад. Режим, муҳаррик, DNS ва танзимоти қоида фавран захира карда мешаванд; ҳангоми пайвасти фаъол, Apply-ро клик кунед ва барои истифодаи онҳо дубора пайваст шавед. Аз нав ба кор андохтани муҳаррик метавонад зеркашиҳо ва зангҳоро қатъ кунад. Кликҳои такрорӣ пайвастҳои мувозиро оғоз намекунанд; ҷудокунӣ гузаришро ба итмом мерасонад ва пайвастро озод мекунад.\n\nИнтернет танҳо тавассути VPN трафики мустақимро ҳангоми фурӯ рафтани нақб манъ мекунад. Он ба тамоми мошин таъсир мерасонад. Қатъи возеҳ қоидаҳои Sora-ро нест мекунад. Агар тозакунӣ анҷом наёбад, аз нав ҷудо кунед ва сабтро кушоед.\n\n## Ҳуҷҷатҳои лоиҳа\n\n- [sing-box-lx: конфигуратсия ва дастгирӣ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Ҳуҷҷатҳои sing-box](https://sing-box.sagernet.org/)\n- [Ҳуҷҷатҳои Xray](https://xtls.github.io/)\n- [Ҳуҷҷатҳои mihomo](https://wiki.metacubex.one/)\n- [zapret: амалиёт ва маҳдудиятҳо](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Агар шумо боварӣ надошта бошед, ки ба сервери шумо ба кадом муҳаррик ниёз дорад, Auto-ро интихоб кунед. Sora пеш аз пайвастшавӣ профил ва танзимотро тафтиш мекунад. Муҳаррик наметавонад маҷрои нақшаи шуморо зиёд кунад: иҷроиш аз сервер, масир, протокол ва шабака вобаста аст.\n\n## Модҳо\n\n### Ҳама трафик (TUN)\n\nSora интерфейси шабакаи маҷозӣ эҷод мекунад ва трафики барномаҳоро тавассути он, аз ҷумла TCP ва UDP, масир мекунад. Ин режимро барои Telegram, бозиҳо ва овози Discord истифода баред. Қоидаҳо метавонанд сайтҳо ё барномаҳои мушаххасро мустақиман фиристанд ё онҳоро маҳкам кунанд. Хидмати шабака ба иҷозат ва сервере ниёз дорад, ки протоколи лозимиро дастгирӣ мекунад.\n\n### Прокси System\n\nSora прокси маҳаллии HTTP/SOCKS-ро танзим мекунад. Барномаҳое, ки танзимоти прокси системаро эҳтиром мекунанд, онро истифода мебаранд. Барномаҳо бо стеки шабакавии худ метавонанд мустақиман пайваст шаванд; UDP ва зангҳои овозӣ умуман ба TUN ниёз доранд. Ин режим ба браузерҳо ва барномаҳо бо дастгирии прокси мувофиқат мекунад.\n\n### Сервер нест\n\nДар Linux, Sora [zapret](https://github.com/bol-van/zapret) -ро барои тақсим кардан ва тағир додани дархостҳои HTTP/TLS ва гузаштан аз баъзе санҷишҳои DPI истифода мебарад. IP-и шумо бетағйир мемонад ва пайвастҳо мустақиман ба вебсайт мераванд. Натиҷаҳо аз провайдери шумо ва усули басташавӣ вобастаанд.\n\nИнтегратсияи ҷорӣ tpws-ро барои HTTP ва TLS тавассути TCP истифода мебарад. Он масдудкунии IP ё интиқоли UDP-ро фаро намегирад ва пайвастҳои Telegram-и MTProto-ро кафолат дода наметавонад. Сервери VPN-ро бо TUN барои овози Discord, зангҳои Telegram ва ин гуна маҳдудиятҳо истифода баред.\n\n## Моторҳо\n\n### Авто\n\nSora муҳаррики насбшударо интихоб мекунад, ки тамоми нақшаи пайвастшавиро дастгирӣ мекунад: протоколҳои сервер, интиқолҳо, гурӯҳҳо, тақсимот ва режим. Интихоби дастӣ номувофиқ пеш аз қатъ кардани пайвасти ҷорӣ рад карда мешавад. Авто ё муҳаррики дигарро интихоб кунед ва танзимотро дубора татбиқ кунед.\n\n### sing-box\n\nБастаҳои нави Sora иборатанд аз [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), як фардкунандаи [sing-box](https://github.com/SagerNet/sing-box), илова кардани муштарии XHTTP ва VLESS Encryption. Sora сохтмон ва қобилиятҳои онро эътироф мекунад. Сохтмони болооб бидуни XHTTP ин қобилиятро танҳо аз номи худ ба даст намеорад.\n\nПротоколҳои дастгирӣшаванда VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ва Z8x/parameters. Sora метавонад ворид кунад. Профилҳои пурраи Xray JSON Xray-ро талаб мекунанд. Майдонҳои нави AWG 3.x ҳанӯз ворид карда намешаванд. sing-box порти назорати маҳаллии бо парол ҳифзшударо истифода мебарад, ки дигар замимаҳои компютер метавонанд онро ошкор кунанд.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) пораҳои VLESS, REALITY, XHTTP, VLESS Encryption ва TLS-ро дастгирӣ мекунад. Он инчунин профилҳои пурраи провайдери Xray -ро ҳангоми нигоҳ доштани масир ва гурӯҳҳои онҳо иҷро мекунад. Чунин профилҳоро бидуни тағир додани рафтори худ ба таври худкор ба муҳаррики дигар табдил додан мумкин нест.\n\nXray маҷмӯӣ танзимеро, ки санҷиши сертификати TLS-ро ғайрифаъол мекунад (`allowInsecure`) хориҷ кард. Барои серверҳои оддӣ, ки ин танзимотро талаб мекунанд, худкор sing-box ё mihomo-ро интихоб мекунад. Интихоби Xray пеш аз қатъ кардани пайвасти ҷорӣ дастӣ дар бораи номувофиқатӣ хабар медиҳад. Профилҳои пурраи JSON-и кӯҳна ба профили провайдери навшуда бо шаҳодатномаи тасдиқшаванда ё PIN сертификат ниёз доранд.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) гурӯҳҳои фармоишии бозгашт ва мувозинати сарборӣ, XHTTP ва AmneziaWG -ро дастгирӣ мекунад. Вақте ки интиқоли автоматӣ ба сервери эҳтиётӣ муҳим аст, онро интихоб кунед. Танзими тақсимоти TLS-и Sora бо ин муҳаррик дастнорас аст.\n\n## Мутобиқат дар Sora\n\n| Хусусият | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ва TCP/UDP | Бале | Бале | Бале |\n| XHTTP | Бале | Бале | Бале |\n| VLESS Encryption | Бале | Бале | Бале |\n| Профили пурраи Xray | Не | Бале | Не |\n| TUIC / AnyTLS | Ҳарду | Не | TUIC |\n| Фрагментатсияи TLS | Бале | Бале | Не |\n| AmneziaWG 1.x/2.x | Ҳа¹ | Не | Бале |\n| Гурӯҳи бозгашти фармоишӣ | Не | No² | Бале |\n\n¹ Профилҳо бо J1/J2/J3/Itime mihomo-ро истифода мебаранд; ин майдонхоро хеч гох хомушона партофтан лозим нест. ² Барои як гурӯҳи профилҳои пурраи Xray, барнома профили эҳтиётиро интихоб мекунад. Дастгирӣ аз сохтори насбшуда вобаста аст; версияи онро дар бораи санҷед.\n\n## Стеки TUN\n\nСтек TCP ва UDP-ро дар дохили интерфейси виртуалӣ идора мекунад. Дар панели режимҳо, Xray ва mihomo gVisor, System, Mixed ва MIPS -ро пешниҳод мекунанд. Ҳар як муҳаррик афзалияти худро захира мекунад. System прокси ва режимҳои бе сервер ин афзалиятро истифода намебаранд.\n\n- **Mixed**: TCP стеки системаро истифода мебарад, дар ҳоле ки gVisor UDP-ро идора мекунад. Ин пешфарз барои mihomo дар Linux аст. Дар Windows, Xray ва mihomo ба таври пешфарз MIPS-ро истифода мебаранд.\n- **System**: стеки системаро истифода мебарад. Варианти дигарро санҷед, агар барномаҳои шабакавӣ ба мушкилот дучор шаванд.\n- **gVisor**: трафикро дар фазои корбарон идора мекунад.\n- **MIPS**: стеки IP-и худи mihomo, ки дар версияи маҷмӯии 1.19.32 дастрас аст.\n\nДар Linux, Xray бо нобаёнӣ gVisor-и дарунсохтро истифода мебарад. System, Mixed ва MIPS дар Linux mihomo-ро ҳамчун муҳаррики TUN истифода мебаранд, TCP ва UDP-ро ба Xray тавассути истиноди SOCKS тасдиқшудаи маҳаллӣ интиқол медиҳанд. Xray протокол, профили провайдер ва масирро нигоҳ медорад. Ин се имконоти насбшуда mihomo талаб мекунанд. Дар Windows, Xray барои ҳамаи чор стеки TUN mihomo 1.19.32 ё навтарро истифода мебарад. Протоколҳо ва масирбандӣ дар Xray мемонанд. Қоидаҳои барномаҳо дар ин пайваст танҳо пайвасти мустақим ва бастанро дастгирӣ мекунанд; дар Linux ин қоидаҳо gVisor-и дарунсохти Xray-ро талаб мекунанд.\n\nПул процесси дуюмро пеш мебарад. Дар се андозагирии бекор дар Linux, он нисбат ба Xray TUN-и аслӣ тақрибан 32–36 МБ зиёдтар хотираи физикиро истифода бурд. Ин сарбории зеркаширо чен намекунад: хароҷоти CPU ва хотира аз пайвастшавӣ вобаста аст. sing-box ягон селектори стек надорад. Ягон стек иҷрои беҳтарро дар ҳар як шабака кафолат намедиҳад. Стекро интихоб кунед ва Apply-ро интихоб кунед ва аз нав пайваст шавед, то онро дар шабакаи худ санҷед.\n\n## Татбиқи танзимот\n\nИнтихоби сервер ба таври худкор дубора пайваст мешавад. Режим, муҳаррик, DNS ва танзимоти қоида фавран захира карда мешаванд; ҳангоми пайвасти фаъол, Apply-ро клик кунед ва барои истифодаи онҳо дубора пайваст шавед. Аз нав ба кор андохтани муҳаррик метавонад зеркашиҳо ва зангҳоро қатъ кунад. Кликҳои такрорӣ пайвастҳои мувозиро оғоз намекунанд; ҷудокунӣ гузаришро ба итмом мерасонад ва пайвастро озод мекунад.\n\nИнтернет танҳо тавассути VPN трафики мустақимро ҳангоми фурӯ рафтани нақб манъ мекунад. Он ба тамоми мошин таъсир мерасонад. Қатъи возеҳ қоидаҳои Sora-ро нест мекунад. Агар тозакунӣ анҷом наёбад, аз нав ҷудо кунед ва сабтро кушоед.\n\n## Ҳуҷҷатҳои лоиҳа\n\n- [sing-box-lx: конфигуратсия ва дастгирӣ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Ҳуҷҷатҳои sing-box](https://sing-box.sagernet.org/)\n- [Ҳуҷҷатҳои Xray](https://xtls.github.io/)\n- [Ҳуҷҷатҳои mihomo](https://wiki.metacubex.one/)\n- [zapret: амалиёт ва маҳдудиятҳо](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,21 +440,582 @@
       }
     }
   },
-  "extensionsSoon": "Ба зудӣ",
-  "diagnosticEvents": "Ҳодисаҳои Windows",
-  "diagnosticPackets": "Гирифтани пакет",
   "diagnosticHttp": "Ташхиси HTTP",
   "diagnosticNoData": "Ҳанӯз ягон дархост сабт нашудааст. Аввал вебсайти санҷиши суръатро кушоед.",
-  "diagnosticUnavailable": "Ин ташхис дар ин платформа дастрас нест.",
   "extensions": "Васеъшавӣ",
-  "diagnosticCapture": "Барои 10 сония сабт кунед",
   "exportLogFile": "Ба {name}",
-  "diagnosticRequiresTun": "Забти баста ба пайвасти фаъоли Sora TUN ниёз дорад.",
   "@exportLogFile": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "Илова кардани сервери фармоишӣ",
+  "customServers": "Серверҳои ман",
+  "customServerName": "Ном",
+  "customServerNameHint": "Масалан: VPS-и ман",
+  "customServerNameRequired": "Номро ворид кунед",
+  "customServerAddress": "Суроға",
+  "customServerAddressHint": "example.com ё 192.0.2.1",
+  "customServerAddressRequired": "Суроғаи серверро ворид кунед",
+  "customServerAddressInvalid": "Суроғаи нодуруст",
+  "customServerPort": "Порт",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "Порт бояд аз 1 то 65535 бошад",
+  "customServerProtocol": "Протокол",
+  "customServerCredentials": "Маълумоти воридшавӣ",
+  "customServerOptional": "Ихтиёрӣ",
+  "customServerShowSecret": "Сиррро нишон диҳед",
+  "customServerHideSecret": "Пинҳон кардани асрор",
+  "customServerBadge": "шахсӣ",
+  "customServerDeleteConfirm": "Сервери \"{name}\" нест карда шавад?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "Серверро дастӣ илова кунед: суроға, порт ва протокол",
+  "customServerTest": "Санҷиш",
+  "leakTestTitle": "Санҷиши ихроҷи маълумот",
+  "leakTestIntro": "Месанҷад, ки трафик метавонад аз дастгоҳ берун аз нақб барояд ё не: дархостҳои мустақими DNS ва ICMP, баромади IPv6 ва ҳалкунандаҳои номи система. Ҳангоми пайвасти фаъол иҷро кунед.",
+  "leakTestRun": "Санҷед",
+  "leakTestCancel": "Бекор кардан",
+  "leakTestNeedsConnection": "Барои санҷидани ихроҷи маълумот ба VPN пайваст шавед.",
+  "leakTestProgress": "Санҷишҳо анҷом ёфтанд: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "Ягон ихроҷ ёфт нашуд",
+  "leakTestFound": "{count, plural, other{# ихроҷ ёфт шуд}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "Ислоҳ",
+  "leakTestFixedNote": "Бастани шабака фаъол аст. Барои санҷидан озмоишро такрор кунед.",
+  "leakTestCheckDirectDns": "мустақим DNS",
+  "leakTestCheckIcmpEcho": "ICMP акси садо",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "Ҳалкунандаҳои номи система",
+  "leakTestCheckTunnelConnectivity": "Пайвасти нақб",
+  "leakTestCheckTunnelDns": "DNS тавассути нақб",
+  "noticeDegraded": "Сервер суст шуд. Sora ба беҳтарин сервере, ки ҳангоми андозагирӣ ёфт шуд, гузашт.",
+  "obfs": "Пинҳонкунии трафик",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "Файлҳои навсозӣ бо суммаҳои назоратии бо релиз нашршуда муқоиса мешаванд.",
+  "updateManualSigWarning": "Файлҳои зерин ба суммаҳои назоратии релиз мувофиқанд. Агар онҳоро аз релизи расмӣ боргирӣ карда бошед, фармонро иҷро кунед.",
+  "updateVersionRevoked": "Таҳиягар ин версияро бозпас гирифт. Лутфан нашри ислоҳшударо интизор шавед.",
+  "updateRolloutPending": "Версияи навтар тадриҷан паҳн мешавад ва ба таври худкор ба шумо пешниҳод карда мешавад.",
+  "updateRollbacking": "Бозгашт ба версияи {version}...",
+  "updateRolledBack": "Навсозӣ ба {version} аз санҷиши коршоямӣ нагузашт, бинобар ин Sora ба {fromVersion} баргардонида шуд.",
+  "updateRollbackError": "Бозгашти худкор ноком шуд. Агар версияи нав кор накунад, версияи қаблиро дастӣ аз нав насб кунед.",
+  "updateRollbackCacheError": "Нусхаи санҷидашудаи версияи ҷорӣ барои бозгашт омода нашуд, бинобар ин навсозӣ насб нашуд.",
+  "extRatingLabel": "Рейтинг {rating} аз 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "аз ҷониби {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "Насбкунӣ: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 насб",
+  "extBadgeVerified": "Тасдиқ карда шудааст",
+  "extBadgeTop": "Маъмултарин дар ин ҳафта",
+  "extBadgeNew": "Нав",
+  "extBadgeStaff": "Дастаи Sora",
+  "extSideloadShort": "Аз каталог нест",
+  "extSideloadWarning": "Ин васеъшавӣ аз каталоги даста нест. Калиди онҳоро танҳо муаллиф кафолат додааст: онро танҳо агар шумо ба муаллиф бовар кунед, насб кунед.",
+  "extInstallTitle": "Насб кардани «{name}»",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "Навсозии «{name}»",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "Ин васеъшавӣ қодир аст:",
+  "extPermissionsWidened": "Навсозӣ иҷозатҳои навро талаб мекунад:",
+  "extDangerousAck": "Ман мефаҳмам, ки ин иҷозатҳо ҷиддӣ ҳастанд",
+  "extInstall": "Насб кунед",
+  "extUpdate": "Навсозӣ",
+  "extCancel": "Бекор кардан",
+  "extConfirm": "Тасдиқ кунед",
+  "extOk": "OK",
+  "extCatalog": "Каталог",
+  "extInstalled": "Васеъкуниҳои насбшуда",
+  "extSearchHint": "Ҷустуҷӯи васеъшавиҳо",
+  "extCatAll": "Ҳама",
+  "extCatTools": "Асбобҳо",
+  "extCatThemes": "Мавзӯъҳо",
+  "extCatAutomation": "Автоматикунонӣ",
+  "extCatStats": "Омор",
+  "extCatNetwork": "Шабака",
+  "extSortBy": "Мураттабсозӣ аз рӯйи",
+  "extSortPopular": "Маъмултарин",
+  "extSortRating": "Баҳои баландтарин",
+  "extSortName": "Ном",
+  "extCatalogError": "Каталогро бор кардан муяссар нашуд",
+  "extRetry": "Боз кӯшиш кунед",
+  "extEmptySearch": "Ҳеҷ чиз ёфт нашуд",
+  "extEmptyInstalled": "То ҳол ягон васеъкунӣ насб нашудааст.\nЯкеро дар каталог пайдо кунед ё аз файл насб кунед.",
+  "extInstallFromFile": "Аз файл насб кунед",
+  "extInstallFromUrl": "Аз URL насб кунед",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "Зеркашӣ кунед",
+  "extDownloading": "Зеркашӣ карда мешавад…",
+  "extVerifying": "Тасдиқ карда мешавад…",
+  "extInstalling": "Насб карда мешавад…",
+  "extInstallFailed": "Насб карда нашуд",
+  "extErrSignature": "Санҷиши имзо ноком шуд. Файл метавонад вайрон ё таҳриф карда шавад.",
+  "extErrManifest": "Манифести васеъкунӣ беэътибор аст.",
+  "extErrNetwork": "Хатои шабака. Пайвасти худро санҷед ва бори дигар кӯшиш кунед.",
+  "extErrHash": "Зеркашӣ ба каталог мувофиқат намекунад. Мумкин аст, ки онро вайрон карда бошанд.",
+  "extErrMinApp": "Ин васеъшавӣ версияи барнома {version} ё навтарро талаб мекунад.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "Танҳо https:// истинодҳо иҷозат дода шудаанд",
+  "extErrGeneric": "Чизе хато кард. Лутфан бори дигар кӯшиш кунед.",
+  "extErrAuthorKeyChanged": "Ин навсозӣ бо калиди дигари муаллиф аз версияи насбшуда имзо шудааст, бинобар ин он баста шуд. Агар шумо ба калиди нав бовар кунед, васеъкуниро нест кунед ва онро дубора насб кунед.",
+  "extUpdateAvailable": "Навсозии дастрас",
+  "extDisabled": "Хомӯш",
+  "extToggleEnabled": "Фаъол {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "Ҷустуҷӯ дар васеъшавиҳои насбшуда",
+  "extUpdateAll": "Ҳамаашро нав кунед",
+  "extUpdatesAvailable": "{count} навсозиҳо дастрасанд",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} нав карда шуд",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "Муқаррарӣ",
+  "extRiskSensitive": "Ҳассос",
+  "extRiskDangerous": "Хавфи баланд",
+  "extPermissionsRemoved": "Дигар дархост карда намешавад:",
+  "extUpdateFailedKept": "Версияи қаблӣ ҳанӯз насб карда шудааст.",
+  "extConflictsTitle": "Ихтилофоти васеъшавӣ",
+  "extConflictsIntro": "Ин васеъкуниҳо як чизро мехоҳанд. Интихоб кунед, ки кадомаш кор кунад, дигаре насбшуда мемонад.",
+  "extConflictTheme": "Мавзӯи барнома",
+  "extConflictNetHooks": "Қалмоқҳои шабакавӣ",
+  "extConflictWinner": "Афзалият: {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} ихтилофҳо ба қарори шумо ниёз доранд",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "ихтилофотро ҳал кунед",
+  "extConflictNote": "Интихоби шумо дар ҳамин дастгоҳ нигоҳ дошта мешавад. Мавзӯъ фавран иваз мешавад, хукҳои шабака дар ин версия кор намекунанд.",
+  "extVersionLabel": "Версияи {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "Муаллиф",
+  "extRating": "Рейтинг",
+  "extInstalls": "Насбкунӣ",
+  "extVersion": "Версия",
+  "extAbout": "Дар бораи ин тамдид",
+  "extPermissionsTitle": "Иҷозатҳо",
+  "extNoPermissions": "Иҷозатҳои махсус надоранд.",
+  "extSettings": "Танзимотҳо",
+  "extSaveSettings": "Танзимотро захира кунед",
+  "extSaving": "Захира…",
+  "extUpdateTo": "Навсозӣ ба {version}",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "Фаъол",
+  "extRollbackTo": "Бозгашт ба {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "Бозгашт ба версияи {version}?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "Хориҷ кунед",
+  "extUninstallConfirm": "\"{name}\" ва танзимоти онро нест кунед?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "Панел дастнорас аст. Мумкин аст васеъшавӣ ғайрифаъол ё хориҷ карда шуда бошад.",
+  "extPermConnectionsRead": "Ба рӯйхати пайвастҳои фаъол нигаред",
+  "extPermServersRead": "Рӯйхати серверҳои худро бубинед",
+  "extPermSettingsRead": "Танзимоти барномаро хонед",
+  "extPermSettingsWrite": "Танзимоти барномаро тағир диҳед",
+  "extPermNotifications": "Огоҳиҳоро нишон диҳед",
+  "extPermTray": "Ба менюи табақи ҷузъҳо илова кунед",
+  "extPermUiPanel": "Панелҳоро дар дохили барнома нишон диҳед",
+  "extPermThemeApply": "Мавзӯъҳоро татбиқ кунед",
+  "extPermRoutingRules": "Илова кардани қоидаҳои масир (ба куҷо рафтани трафики шабака таъсир мерасонад)",
+  "extPermNetHooks": "Интегратсия ба роҳи шабака (DPI модулҳои гузариш)",
+  "extPermNetFetch": "Аз рӯйхати иҷозатдодашуда URL дархост кунед",
+  "extPermBackground": "Вазифаҳои заминаро иҷро кунед",
+  "extPermBackgroundDetail": "Вазифаҳои ба нақша гирифташударо ҳатто ҳангоми пӯшида будани панел иҷро мекунад. Шумо метавонед онро таваққуф кунед ё дар танзимоти васеъшавӣ чанд маротиба кор кардани онро тағир диҳед.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "Дар замина кор мекунад",
+  "extCapNetHook": "Давр задани маҳдудиятҳо ва қалмоқҳои шабака",
+  "extCapPanel": "Панелҳои интерфейс",
+  "extCapRouting": "Қоидаҳои масирдиҳӣ",
+  "extCapTheme": "Мавзӯъҳо",
+  "extCapWidget": "Виҷетҳо",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "Тағйирот",
+  "extImageFailed": "Тасвирро бор карда натавонист",
+  "extRatingHow": "Рейтингҳо чӣ гуна кор мекунанд",
+  "extRatingHowBody": "Рейтингҳо ҳисоби миёнаи Байесиро истифода мебаранд: тамдиди дорои чанд рейтинг то он даме, ки шумораи бештари одамон овоз медиҳанд, дар наздикии мобайн боқӣ мемонад, аз ин рӯ як баррасии 5-ситорадор наметавонад тамдиди навро ба боло тела диҳад. Рейтингҳои охирин нисбат ба рейтингҳои кӯҳна зиёдтаранд ва танҳо як рейтинг барои як ҳисоб ҳисоб карда мешавад.",
+  "extScreenshots": "Скриншотҳо",
+  "extSortRelevance": "Муносибат",
+  "extPermNetworkDetail": "Маълумотро аз интернет тавассути VPN мегирад. Танҳо хостҳои рӯйхати зерин иҷозат доранд, боқимонда баста аст.",
+  "extBgTitle": "Вазифаи пасзамина",
+  "extBgEnabled": "Дар замина иҷро кунед",
+  "extBgInterval": "Фосилаи иҷро",
+  "extBgMinutes": "{count, plural, other{# дақиқа}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, other{# соат}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Вазифа то он даме ки Sora кушода аст, аз ҷумла дар трей, мувофиқи ҷадвал иҷро мешавад. Кӯтоҳтарин фосила 15 дақиқа аст.",
+  "extBgDisabledNote": "Барои идоракунии вазифаи пасзамина васеъшавиро фаъол кунед.",
+  "extCapNetwork": "Дастрасии шабака",
+  "extCapNetworkHosts": "Шабака: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "Рамзи QR мубодила кунед",
+  "qrScanTitle": "Рамзи QR скан кунед",
+  "qrCopyLink": "Истиноди нусхабардорӣ",
+  "qrShowLink": "Истинодро нишон диҳед",
+  "qrHideLink": "Пинҳон кардани пайванд",
+  "qrWarning": "Ин рамзи QR дорои тафсилоти пайвастшавӣ мебошад. Онро ба бегонагон нишон надиҳед.",
+  "qrScanHint": "Скриншот ё акси дорои рамзи QR-ро интихоб кунед ё истинодро гузоред",
+  "qrFromClipboard": "Аз буфер часбонед",
+  "qrNoCode": "Дар ин тасвир рамзи QR ёфт нашуд.",
+  "qrInvalid": "Ин рамзи QR дорои истиноди дуруст нест.",
+  "qrScan": "Скан QR",
+  "qrFromImage": "Кушодани тасвир",
+  "connGroupByProcess": "Аз рӯи раванд гурӯҳбандӣ кунед",
+  "connListView": "Рӯйхат",
+  "connCopyHost": "Хостро нусхабардорӣ кунед",
+  "connAddRule": "Илова кардани қоида",
+  "connConnectionsCount": "{count, plural, other{# пайваст}}",
+  "dnsPreset": "Пешакӣ",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "Шахсӣ",
+  "dnsCheck": "ихроҷи маълумотро тафтиш кунед",
+  "dnsChecking": "Санҷиш...",
+  "dnsNoLeak": "Ягон ихроҷ ёфт нашуд",
+  "dnsLeakFound": "Ихроҷ ошкор шуд",
+  "dnsLastCheck": "Санҷиши охирин",
+  "dnsNeverChecked": "Ҳанӯз санҷида нашудааст",
+  "dnsLeakCheckTunnelDns": "Ҳалкунандаҳои DNS-и нақб",
+  "dnsLeakCheckSystemResolvers": "Ҳалкунандаҳои номи система",
+  "dnsLeakCheckKillSwitchDns": "Ҳифзи DNS бо бастани шабака",
+  "dnsLeakFixConfigureTunnelDns": "DNS-ро барои нақб дар танзимоти DNS дар боло танзим кунед.",
+  "dnsLeakFixReviewSystemResolvers": "Санҷед, ки кадом ҳалкунандаҳои системаи шумо берун аз нақб истифода мешавад.",
+  "dnsLeakFixEnableKillSwitch": "Бастани шабакаро фаъол кунед, то трафики DNS дар нақб бимонад.",
+  "dnsLeakCheckEncryptedDns": "DNS-и рамзгузоришудаи система",
+  "dnsLeakCheckDnsSpoof": "Ҷавобҳои қалбакӣ DNS",
+  "dnsLeakFixReviewEncryptedDns": "Санҷед, ки кадом нуқтаи ниҳоии рамзгузоришудаи DNS системаи шумо берун аз нақб истифода мебарад.",
+  "dnsLeakFixUseEncryptedDns": "Дар нақб DNS-и рамзгузоришуда (DoT ё DoH) истифода баред, то ҳалкунандаҳои ном ҷавобҳоро сохта натавонанд.",
+  "dnsCheckNeedsConnection": "Аввал ба VPN пайваст шавед, сипас ихроҷро тафтиш кунед.",
+  "dnsExpected": "Дар назар аст",
+  "dnsActual": "мушохида карда шуд",
+  "sortBy": "Мураттабсозӣ аз рӯйи",
+  "sortPing": "Пинг",
+  "sortSpeed": "Суръат",
+  "sortName": "Ном",
+  "measureSpeed": "Суръатро чен кунед",
+  "benchmarkStale": "кӯҳна шудааст",
+  "autoSelectMode": "Сервери худкори интихоб",
+  "autoSelectPing": "Пинги зудтарин",
+  "autoSelectSpeed": "Суръати баландтарин",
+  "autoSelectSmart": "Интихоби оқилона",
+  "coreWatchUnstable": "Пайвастшавӣ ба ядрои Sora ноустувор аст",
+  "watchReconnect": "Аз нав пайваст кунед",
+  "coreRestoringLink": "Барқарор кардани пайвастшавӣ ба ядрои Sora…",
+  "crashRestoreTitle": "Сеанси охирин катъ гардид",
+  "restoreOnCrash": "Сеансро пас аз садама барқарор кунед",
+  "crashRestore": "Барқарор кардан",
+  "crashDismiss": "Ҳоло не",
+  "overrideTitle": "Таҳрири ман",
+  "overrideEdit": "Серверҳоро таҳрир кунед",
+  "overrideHide": "Пинҳон кардан",
+  "overrideUnhide": "Намоиш",
+  "overrideClear": "Таҳрирҳоро аз нав танзим кунед",
+  "overrideEmpty": "Ҳанӯз таҳрир нашудааст",
+  "overrideCustomRules": "Қоидаҳои худ",
+  "errBenchmarkUnsupported": "Андозагирии суръат ба ядрои навтар ниёз дорад",
+  "benchmarkProgress": "Андозаи {done} аз {total}…",
+  "profiles": "Профилҳои шабакавӣ",
+  "profilesEmpty": "Ҳоло профилҳо нест. Барои ба таври худкор татбиқ кардани танзимот дар шабакаҳои маълум якеро эҷод кунед.",
+  "profileAdd": "Профил илова кунед",
+  "profileName": "Номи профил",
+  "profileSsids": "Wi-Fi шабакаҳо (SSID)",
+  "profileSsidsHint": "Хона, Офис бо вергул ҷудо карда шудааст",
+  "profileGateways": "Шлюзҳои шабакавӣ",
+  "profileAsns": "AS рақамҳо",
+  "profileAutoApply": "Ба таври худкор татбиқ кардан",
+  "profileAutoApplyHint": "Агар хомӯш бошад, пеш аз татбиқи профил тасдиқ пурсида мешавад.",
+  "profileSnapshot": "Танзимоти ҷориро дар хотир доред",
+  "profileSnapshotDone": "Танзимоти ҷорӣ дар профил захира карда шудаанд",
+  "profileDelete": "Профилро нест кунед",
+  "profileDeleteConfirm": "Профили \"{name}\" нест карда шавад?",
+  "profileApplyAsk": "Профили \"{name}\"-ро татбиқ кунед?",
+  "profileApply": "Татбиқ кардан",
+  "profileApplied": "Профили \"{name}\" татбиқ карда шуд",
+  "profileUndo": "Бекор кардан",
+  "profileActive": "Фаъол",
+  "networkNow": "Ҳоло: {info}",
+  "networkUnknown": "Маълумот дар бораи шабака дастрас нест",
+  "profileNoTriggers": "Ҳадди ақал як триггер илова кунед: SSID, дарвоза ё ASN",
+  "chains": "Занҷирҳои прокси",
+  "chainsEmpty": "Ҳанӯз занҷир нест. 2–3 серверро пайваст кунед, то трафик тавассути ҳар яки онҳо гузаред.",
+  "chainAdd": "занҷири нав",
+  "chainName": "Номи занҷир",
+  "chainPickServers": "2–3 серверро интихоб кунед",
+  "chainOrderHint": "Барои аз нав тартиб додан кашола кунед: трафик аз боло ворид мешавад ва аз поён мебарояд.",
+  "chainTooFew": "Ақаллан 2 серверро интихоб кунед",
+  "chainTooMany": "Як занҷир ҳадди аксар 3 серверро дар бар мегирад",
+  "chainEstimate": "Вақти тахминии",
+  "chainSave": "Занҷираи захира кунед",
+  "chainDelete": "Занҷирро нест кунед",
+  "chainDeleteConfirm": "Занҷираи \"{name}\" нест карда шавад?",
+  "chainUnsupported": "Мотори ҷорӣ занҷир сохта наметавонад",
+  "chainHopMissing": "Яке аз серверҳои занҷир дигар дастрас нест",
+  "chainHop": "Гузариш {n}",
+  "chainEntry": "Вуруд",
+  "chainExit": "Баромад",
+  "sync": "Синхронизатсияи дастгоҳ",
+  "syncDevices": "Дастгоҳҳои ман",
+  "syncEmpty": "Ягон дастгоҳҳои ҷуфтшуда. Дастгоҳи дигарро тавассути шабакаи маҳаллӣ пайваст кунед.",
+  "syncPair": "Дастгоҳро ҷуфт кунед",
+  "syncShowCode": "Рамзи маро нишон диҳед",
+  "syncScanCode": "Рамзи скан",
+  "syncRevoke": "Бозхонд",
+  "syncRevokeConfirm": "\"{name}\" бекор карда шавад?",
+  "syncLastSync": "Синхронизатсияи охирин: {time}",
+  "syncNever": "Ҳеҷ гоҳ",
+  "syncNoLan": "Дастгоҳҳо бояд дар як шабакаи маҳаллӣ бошанд",
+  "syncPaired": "Дастгоҳ ҷуфт карда шуд",
+  "syncPairingTitle": "Бо ин дастгоҳ ҷуфт кунед",
+  "syncWaiting": "Дастгоҳи дигар интизор аст…",
+  "syncSecureNote": "Канали рамзгузоришуда. Не ҳисобҳо, на серверҳои абрӣ.",
+  "zapretWithVpn": "Гузаронидани DPI филтр барои трафики мустақими шабака",
+  "zapretWithVpnHint": "zapret-ро ҳамроҳи нақби VPN иҷро мекунад: трафики нақб аз VPN ва трафики мустақим аз воситаи давр задани маҳдудият мегузарад.",
+  "chainDuplicate": "Ҳар як сервер метавонад танҳо як маротиба пайдо шавад",
+  "edit": "Таҳрир",
+  "remove": "Хориҷ кунед",
+  "autoSwitchOnDegrade": "Гузариши худкор дар таназзул",
+  "autoSwitchOnDegradeDetail": "Агар сервери интихобшуда хеле суст шавад ё ҷавоб надиҳад, Sora ба сервери беҳтарин аз рӯйи ченкунӣ мегузарад, вале на бештар аз як бор дар ҳар 10 дақиқа.",
+  "tunStackMixed": "Омехта",
+  "tunStackSystem": "Система",
+  "syncCodeExpired": "Рамз ба охир расид",
+  "syncDaemonFailed": "Хидмати ҳамоҳангсозиро оғоз карда натавонист",
+  "syncDaemonMissing": "Ҷузъи sora-sync ёфт нашуд. Барои фаъол кардани ҳамоҳангсозии дастгоҳ барномаро аз нав насб кунед.",
+  "syncDaemonStarting": "Оғози хидмати ҳамоҳангсозӣ…",
+  "syncErrAuth": "Хидмати ҳамоҳангсозӣ аломати дастрасиро рад кард. Барномаро аз нав оғоз кунед ва бори дигар кӯшиш кунед.",
+  "syncErrNotFound": "Дастгоҳ дигар ҷуфт карда нашудааст",
+  "syncErrPairingActive": "Сеанси ҷуфткунӣ аллакай кушода аст",
+  "syncErrUnreachable": "Дастгоҳи дигар ҷавоб надод. Боварӣ ҳосил кунед, ки он дар ҳамон шабака аст ва рамзи онро нишон медиҳад.",
+  "syncError": "Хатои синхронизатсия",
+  "syncExpiresIn": "Рамз пас аз {duration} беэътибор мешавад",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "Ҷуфткунӣ бо дастгоҳ…",
+  "syncLegacyCleared": "Рӯйхати дастгоҳҳои кӯҳна ҳеҷ гоҳ воқеан ҷуфт карда нашудааст, аз ин рӯ тоза карда шуд. Дастгоҳҳои худро дубора ҷуфт кунед, ин дафъа воқеӣ.",
+  "syncNewCode": "Рамзи нав",
+  "syncPairedWith": "{name} ҷуфт шуд",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "Такрор кунед",
+  "syncStopShowing": "Пинҳон кардани рамз",
+  "syncSyncNow": "Ҳозир ҳамоҳанг кардан",
+  "syncSyncResult": "Қабул карда шуд {pulled}, фиристодашуда {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "Натиҷаи ҳамоҳангсозӣ",
+  "syncPulled": "гирифта шудааст",
+  "syncPushed": "Фиристода шуд",
+  "syncNoChanges": "Ягон тағирот ошкор нашудааст",
+  "syncDocKindSubscriptions": "Обунаҳо",
+  "syncDocKindSettings": "Танзимоти барнома",
+  "syncDocKindOverrides": "Тағйироти шахсии обунаҳо",
+  "syncDocKindProfiles": "Профилҳои шабакавӣ",
+  "syncDocKindChains": "Занҷирҳои прокси",
+  "syncFrom": "аз {name}",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "Ин дастгоҳ",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "Гирифтани пакет",
+  "diagnosticEvents": "Ҳодисаҳои Windows",
+  "diagnosticCapture": "Барои 10 сония сабт кунед",
+  "diagnosticRequiresTun": "Забти баста ба пайвасти фаъоли Sora TUN ниёз дорад.",
+  "diagnosticUnavailable": "Ин ташхис дар ин платформа дастрас нест.",
+  "extErrRevoked": "Дастаи Sora ин версияи васеъкуниро бозхонд, зеро он хатарнок ё вайрон аст.",
+  "extErrRevocationsExpired": "Рӯйхати васеъкуниҳои бозхондашуда нав нашуд. То навшавӣ насб баста аст: шабакаро санҷед ва боз кӯшиш кунед.",
+  "extRevokedDisabled": "Васеъкуниҳои бозхондашуда хомӯш шуданд: {names}",
+  "customServerWgPrivateKey": "Калиди махфӣ",
+  "customServerWgAddresses": "Суроғаҳои интерфейс",
+  "customServerWgPeerKey": "Калиди ошкори сервер",
+  "customServerWgPresharedKey": "Калиди умумӣ",
+  "customServerWgAllowedIps": "IP-ҳои иҷозатдодашуда",
+  "customServerWgKeepalive": "Keepalive, сония",
+  "customServerWgKeyInvalid": "Калид бояд 32 байт дар base64 бошад, мисли он ки wg genkey чоп мекунад.",
+  "customServerWgCidrInvalid": "Префиксҳоро бо вергул ворид кунед, масалан 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Шумораи сонияҳоро аз 0 то 65535 ворид кунед.",
+  "strictKillSwitch": "Бастани қатъии шабака",
+  "strictKillSwitchWarning": "Пас аз пайвастшавӣ трафики берун аз VPN-ро ҳатто ҳангоми хато, оғози дубора ё баромадан аз барнома мебандад. Дастрасӣ танҳо пас аз қатъи пайваст ё хомӯш кардани ин танзим барқарор мешавад. Пас аз оғози дубораи дастгоҳ бастан танҳо бо фаъол будани пайвастшавӣ ҳангоми оғоз идома меёбад.",
+  "extWorkerFailed": "Вазифаи пасзаминаи васеъкунанда иҷро нашуд. Сабтҳои васеъкунандаро санҷед.",
+  "extAssetRejected": "Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст."
 }

@@ -290,7 +290,7 @@ type privateKey struct{}
 // isPrivateHost reports whether host is a private IP literal or localhost.
 // DNS answers are deliberately ignored: an attacker controlling DNS could
 // otherwise flip a hostname into the private range and permit dials to
-// internal addresses (SORA-L11). Hostnames resolving to private addresses
+// internal addresses. Hostnames resolving to private addresses
 // are not trusted; use an IP literal for local subscriptions.
 func isPrivateHost(host string) bool {
 	addr, err := netip.ParseAddr(host)

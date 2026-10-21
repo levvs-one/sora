@@ -25,9 +25,6 @@ class SRu extends S {
   String get stateDisconnecting => 'Отключение';
 
   @override
-  String get stateFailed => 'Не подключено';
-
-  @override
   String get coreMissing => 'Служба Sora не отвечает';
 
   @override
@@ -135,6 +132,9 @@ class SRu extends S {
   String get logsEmpty => 'Здесь пусто';
 
   @override
+  String get connEmpty => 'Нет соединений';
+
+  @override
   String appVersion(String version) {
     return 'Версия $version';
   }
@@ -164,6 +164,16 @@ class SRu extends S {
   @override
   String milliseconds(int n) {
     return '$n мс';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value мс';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Мбит/с';
   }
 
   @override
@@ -253,9 +263,6 @@ class SRu extends S {
 
   @override
   String get errNoServers => 'Добавьте подписку, чтобы подключиться';
-
-  @override
-  String get exportText => 'Текст';
 
   @override
   String get connections => 'Соединения';
@@ -497,18 +504,6 @@ class SRu extends S {
   String get ruleInvalid => 'Не похоже на сайт, IP или программу';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '# серверов',
-      few: '# сервера',
-      one: '# сервер',
-    );
-    return '$_temp0, по очереди';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -524,9 +519,6 @@ class SRu extends S {
   String get tunnelMode => 'Режим';
 
   @override
-  String get tunnelTun => 'Весь трафик';
-
-  @override
   String get tunnelProxy => 'Системный прокси';
 
   @override
@@ -537,6 +529,9 @@ class SRu extends S {
 
   @override
   String get launchAtLogin => 'Запускать вместе с системой';
+
+  @override
+  String get launchAtLoginDetail => 'Sora будет автоматически запускаться при входе в систему и оставаться в трее.';
 
   @override
   String get closeToTray => 'Сворачивать в трей при закрытии';
@@ -637,28 +632,6 @@ class SRu extends S {
   String get less => 'Свернуть';
 
   @override
-  String get currentServer => 'Текущий сервер';
-
-  @override
-  String get trafficDown => 'Получено';
-
-  @override
-  String get trafficUp => 'Отправлено';
-
-  @override
-  String perSecond(String value) {
-    return '$value/с';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Активные правила: $count';
-  }
-
-  @override
-  String get recentNotifications => 'Последние уведомления';
-
-  @override
   String get notificationsEmpty => 'Здесь появятся события подключения и подписок';
 
   @override
@@ -712,22 +685,13 @@ class SRu extends S {
   String get runningProcesses => 'Запущенные процессы';
 
   @override
-  String get programsFailed => 'Не удалось получить список программ';
-
-  @override
   String get programsEmpty => 'Программы не найдены. Попробуйте другое имя.';
 
   @override
   String get selectExe => 'Выбрать файл .exe';
 
   @override
-  String get trafficUnavailable => 'Счётчики пока недоступны';
-
-  @override
   String get speedtest => 'Скорость';
-
-  @override
-  String get speedtestCheck => 'Проверить скорость';
 
   @override
   String get speedtestSearch => 'Найти сервис';
@@ -821,6 +785,37 @@ class SRu extends S {
       'Выполните команду в терминале для установки обоих проверенных пакетов, затем откройте Sora снова. Файлы сохранены в каталоге загрузки. VPN-соединение прервётся.';
 
   @override
+  String get updateSignaturePending => 'Файлы обновления сверяются с контрольными суммами из релиза.';
+
+  @override
+  String get updateManualSigWarning =>
+      'Файлы ниже сверены с контрольными суммами релиза. Выполните команду, если скачивали их из официального релиза.';
+
+  @override
+  String get updateVersionRevoked => 'Эта версия отозвана разработчиком. Дождитесь исправленного релиза.';
+
+  @override
+  String get updateRolloutPending => 'Новая версия распространяется постепенно и будет предложена вам автоматически.';
+
+  @override
+  String updateRollbacking(String version) {
+    return 'Откатываемся к версии $version...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return 'Обновление до $version не прошло проверку работоспособности, поэтому Sora откатилась к $fromVersion.';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'Автоматический откат не удался. Если новая версия не работает, переустановите предыдущий релиз вручную.';
+
+  @override
+  String get updateRollbackCacheError =>
+      'Не удалось подготовить проверенную копию текущей версии для отката, поэтому обновление не установлено.';
+
+  @override
   String get updateCopyCommand => 'Скопировать команду';
 
   @override
@@ -845,9 +840,6 @@ class SRu extends S {
   String get componentLicenses => 'Лицензии компонентов';
 
   @override
-  String get appCopyright => '© 2026 levvs-one и участники проекта';
-
-  @override
   String get collapseServers => 'Свернуть серверы';
 
   @override
@@ -866,15 +858,11 @@ class SRu extends S {
   String get reconnectNow => 'Применить и переподключить';
 
   @override
-  String get bypassLimitations =>
-      'Этот режим обходит DPI только для HTTP и TLS, не поддерживает UDP и не меняет IP. Для голоса Discord, звонков и заблокированных адресов Telegram используйте VPN-сервер.';
-
-  @override
   String get errEngineUnsupported =>
       'Выбранное ядро не поддерживает этот профиль или настройки. Выберите «Авто» либо совместимое ядро.';
 
   @override
-  String get errRestore => 'Не удалось полностью очистить подключение. Повторите отключение; подробности — в журнале.';
+  String get errRestore => 'Не удалось полностью очистить подключение. Повторите отключение, подробности в журнале.';
 
   @override
   String get errSessionEnded => 'Эта сессия уже завершена. Обновите состояние подключения.';
@@ -893,7 +881,7 @@ class SRu extends S {
 
   @override
   String get modesGuide =>
-      'Выбирайте «Авто», если не знаете, какое ядро нужно серверу. Sora сверяет поддержку профиля и настроек перед подключением. Само ядро не меняет скорость тарифа: результат зависит от сервера, маршрута, протокола и сети.\n\n## Режимы\n\n### Весь трафик (TUN)\n\nSora создаёт виртуальный сетевой интерфейс и направляет через него трафик приложений, включая TCP и UDP. Это подходящий режим для Telegram, игр и голосовой связи Discord. Правила могут отправлять отдельные сайты и программы напрямую или блокировать их. Для работы нужны права сетевой службы и сервер, поддерживающий нужный протокол.\n\n### Системный прокси\n\nSora задаёт локальный HTTP/SOCKS-прокси. Его используют приложения, которые учитывают системные настройки прокси. Программа со своим сетевым стеком может пройти напрямую; UDP и голосовые звонки обычно требуют TUN. Этот режим удобен для браузеров и приложений с поддержкой прокси.\n\n### Без сервера\n\nВ Linux Sora использует [zapret](https://github.com/bol-van/zapret): разбивает и меняет HTTP/TLS-запросы, чтобы обходить некоторые проверки DPI. Адрес IP остаётся вашим, соединение идёт к сайту напрямую. Результат зависит от провайдера и способа блокировки.\n\nТекущая интеграция использует tpws и обрабатывает TCP для HTTP и TLS. Она не обходит блокировку по IP, не пересылает UDP и не гарантирует работу Telegram с MTProto. Для голоса Discord, звонков Telegram и таких блокировок выберите VPN-сервер и TUN.\n\n## Ядра\n\n### Авто\n\nSora выбирает установленное ядро, которое поддерживает весь план подключения. Важно всё сразу: протоколы серверов, транспорт, группы, фрагментация и режим. Если выбранный вручную движок несовместим, новое подключение отклоняется до отключения текущего. Выберите «Авто» или другое ядро и примените настройки снова.\n\n### sing-box\n\nВ новых пакетах Sora используется [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box). Он добавляет клиентский XHTTP и VLESS Encryption. Sora распознаёт сборку и её возможности; стандартный sing-box без XHTTP не получает эту возможность по одному лишь названию.\n\nПоддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard и параметры AmneziaWG 1.x/2.x, которые умеет импортировать Sora. Полные JSON-профили Xray требуют Xray. Новые параметры AWG 3.x ещё не импортируются. Управление sing-box использует защищённый паролем локальный порт; другие программы на компьютере могут заметить его наличие.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) подходит для VLESS, REALITY, XHTTP, VLESS Encryption и TLS-фрагментации. Он также запускает полные профили Xray от провайдера, сохраняя их маршрутизацию и группы. Профиль такого вида нельзя автоматически превратить в конфиг другого движка без изменения его поведения.\n\nВ поставляемом Xray удалён параметр отключения проверки TLS-сертификата (`allowInsecure`). Для таких обычных серверов «Авто» выбирает sing-box или mihomo. При ручном выборе Xray Sora сообщает о несовместимости до отключения текущего соединения. Для старого полного JSON-профиля нужен обновлённый профиль провайдера с проверяемым сертификатом или его отпечатком.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) поддерживает группы с последовательным резервом и балансировкой, а также XHTTP и AmneziaWG. Выбирайте его, если важен автоматический переход на запасной сервер. Фрагментация TLS из настроек Sora для этого ядра недоступна.\n\n## Совместимость в Sora\n\n| Возможность | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| TUN и TCP/UDP в Linux | Да | Да | Да |\n| XHTTP | Да | Да | Да |\n| VLESS Encryption | Да | Да | Да |\n| Полный профиль Xray | Нет | Да | Нет |\n| TUIC / AnyTLS | Оба | Нет | TUIC |\n| TLS-фрагментация | Да | Да | Нет |\n| AmneziaWG 1.x/2.x | Да¹ | Нет | Да |\n| Группа с резервом | Нет | Нет² | Да |\n\n¹ Профили с J1/J2/J3/Itime направляются в mihomo; эти параметры нельзя молча отбрасывать. ² Для группы полных профилей Xray запасной профиль выбирает приложение. Точная поддержка зависит от установленной сборки. Её версию можно посмотреть в «О приложении».\n\n## Стек TUN\n\nСтек обрабатывает TCP и UDP внутри виртуального интерфейса. В панели режимов у Xray и mihomo можно выбрать gVisor, System, Mixed или MIPS. Выбор сохраняется отдельно для каждого ядра. В режиме системного прокси и «Без сервера» этот выбор не используется.\n\n- **Mixed** — TCP использует системный стек, UDP обрабатывает gVisor. Это вариант по умолчанию для mihomo в Linux. В Windows Xray и mihomo по умолчанию используют MIPS.\n- **System** — использует системный стек. При проблемах с сетевыми программами попробуйте другой вариант.\n- **gVisor** — обрабатывает трафик в пользовательском пространстве.\n- **MIPS** — собственный IP-стек mihomo, доступный в поставляемой версии 1.19.32.\n\nВ Linux у Xray gVisor работает встроенно и выбран по умолчанию. System, Mixed и MIPS в Linux подключаются через TUN-движок mihomo: он передаёт TCP и UDP в Xray по защищённому локальному SOCKS. Протокол, профиль провайдера и маршрутизация остаются в Xray. Для этих трёх вариантов нужен установленный mihomo. В Windows Xray использует mihomo 1.19.32 или новее для всех четырёх стеков TUN. Протоколы и маршрутизация остаются в Xray. Правила приложений в этой связке поддерживают только прямое соединение и блокировку; на Linux они требуют встроенного gVisor Xray.\n\nСвязка запускает второй процесс. В трёх замерах в Linux без трафика она потребляла примерно на 32–36 МиБ больше физической памяти, чем встроенный TUN Xray. Это не оценка нагрузки при скачивании: расходы процессора и память зависят от соединений. Для sing-box переключатель не добавляется. Ни один вариант не гарантирует более высокую скорость во всех сетях. Смените стек и нажмите «Применить и переподключить», чтобы проверить результат в своей сети.\n\n## Когда применяются настройки\n\nВыбор сервера автоматически переподключает соединение. Режим, ядро, DNS и правила сохраняются сразу; при активном соединении нажмите «Применить и переподключить», чтобы они вступили в силу. Перезапуск ядра может прервать загрузки и звонки. Частые нажатия не запускают параллельные подключения; отключение завершает переход и освобождает соединение.\n\n«Интернет только через VPN» блокирует прямой выход при обрыве туннеля. Это ограничение действует на всю машину, поэтому используйте его осознанно. При явном отключении Sora снимает свои правила. Если очистка не завершилась, повторите отключение и откройте журнал.\n\n## Документация проектов\n\n- [sing-box-lx: настройки и поддержка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.ru.md)\n- [sing-box: документация](https://sing-box.sagernet.org/)\n- [Xray: документация](https://xtls.github.io/)\n- [mihomo: документация](https://wiki.metacubex.one/)\n- [zapret: описание и ограничения](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Выбирайте «Авто», если не знаете, какое ядро нужно серверу. Sora сверяет поддержку профиля и настроек перед подключением. Само ядро не меняет скорость тарифа: результат зависит от сервера, маршрута, протокола и сети.\n\n## Режимы\n\n### Весь трафик (TUN)\n\nSora создаёт виртуальный сетевой интерфейс и направляет через него трафик приложений, включая TCP и UDP. Это подходящий режим для Telegram, игр и голосовой связи Discord. Правила могут отправлять отдельные сайты и программы напрямую или блокировать их. Для работы нужны права сетевой службы и сервер, поддерживающий нужный протокол.\n\n### Системный прокси\n\nSora задаёт локальный HTTP/SOCKS-прокси. Его используют приложения, которые учитывают системные настройки прокси. Программа со своим сетевым стеком может пройти напрямую; UDP и голосовые звонки обычно требуют TUN. Этот режим удобен для браузеров и приложений с поддержкой прокси.\n\n### Без сервера\n\nВ Linux Sora использует [zapret](https://github.com/bol-van/zapret): разбивает и меняет HTTP/TLS-запросы, чтобы обходить некоторые проверки DPI. Адрес IP остаётся вашим, соединение идёт к сайту напрямую. Результат зависит от провайдера и способа блокировки.\n\nТекущая интеграция использует tpws и обрабатывает TCP для HTTP и TLS. Она не обходит блокировку по IP, не пересылает UDP и не гарантирует работу Telegram с MTProto. Для голоса Discord, звонков Telegram и таких блокировок выберите VPN-сервер и TUN.\n\n## Ядра\n\n### Авто\n\nSora выбирает установленное ядро, которое поддерживает весь план подключения. Важно всё сразу: протоколы серверов, транспорт, группы, фрагментация и режим. Если выбранный вручную движок несовместим, новое подключение отклоняется до отключения текущего. Выберите «Авто» или другое ядро и примените настройки снова.\n\n### sing-box\n\nВ новых пакетах Sora используется [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box). Он добавляет клиентский XHTTP и VLESS Encryption. Sora распознаёт сборку и её возможности; стандартный sing-box без XHTTP не получает эту возможность по одному лишь названию.\n\nПоддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard и параметры AmneziaWG 1.x/2.x, которые умеет импортировать Sora. Полные JSON-профили Xray требуют Xray. Новые параметры AWG 3.x ещё не импортируются. Управление sing-box использует защищённый паролем локальный порт; другие программы на компьютере могут заметить его наличие.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) подходит для VLESS, REALITY, XHTTP, VLESS Encryption и TLS-фрагментации. Он также запускает полные профили Xray от провайдера, сохраняя их маршрутизацию и группы. Профиль такого вида нельзя автоматически превратить в конфиг другого движка без изменения его поведения.\n\nВ поставляемом Xray удалён параметр отключения проверки TLS-сертификата (`allowInsecure`). Для таких обычных серверов «Авто» выбирает sing-box или mihomo. При ручном выборе Xray Sora сообщает о несовместимости до отключения текущего соединения. Для старого полного JSON-профиля нужен обновлённый профиль провайдера с проверяемым сертификатом или его отпечатком.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) поддерживает группы с последовательным резервом и балансировкой, а также XHTTP и AmneziaWG. Выбирайте его, если важен автоматический переход на запасной сервер. Фрагментация TLS из настроек Sora для этого ядра недоступна.\n\n## Совместимость в Sora\n\n| Возможность | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| TUN и TCP/UDP в Linux | Да | Да | Да |\n| XHTTP | Да | Да | Да |\n| VLESS Encryption | Да | Да | Да |\n| Полный профиль Xray | Нет | Да | Нет |\n| TUIC / AnyTLS | Оба | Нет | TUIC |\n| TLS-фрагментация | Да | Да | Нет |\n| AmneziaWG 1.x/2.x | Да¹ | Нет | Да |\n| Группа с резервом | Нет | Нет² | Да |\n\n¹ Профили с J1/J2/J3/Itime направляются в mihomo; эти параметры нельзя молча отбрасывать. ² Для группы полных профилей Xray запасной профиль выбирает приложение. Точная поддержка зависит от установленной сборки. Её версию можно посмотреть в «О приложении».\n\n## Стек TUN\n\nСтек обрабатывает TCP и UDP внутри виртуального интерфейса. В панели режимов у Xray и mihomo можно выбрать gVisor, System, Mixed или MIPS. Выбор сохраняется отдельно для каждого ядра. В режиме системного прокси и «Без сервера» этот выбор не используется.\n\n- **Mixed**: TCP использует системный стек, UDP обрабатывает gVisor. Это вариант по умолчанию для mihomo в Linux. В Windows Xray и mihomo по умолчанию используют MIPS.\n- **System**: использует системный стек. При проблемах с сетевыми программами попробуйте другой вариант.\n- **gVisor**: обрабатывает трафик в пользовательском пространстве.\n- **MIPS**: собственный IP-стек mihomo, доступный в поставляемой версии 1.19.32.\n\nВ Linux у Xray gVisor работает встроенно и выбран по умолчанию. System, Mixed и MIPS в Linux подключаются через TUN-движок mihomo: он передаёт TCP и UDP в Xray по защищённому локальному SOCKS. Протокол, профиль провайдера и маршрутизация остаются в Xray. Для этих трёх вариантов нужен установленный mihomo. В Windows Xray использует mihomo 1.19.32 или новее для всех четырёх стеков TUN. Протоколы и маршрутизация остаются в Xray. Правила приложений в этой связке поддерживают только прямое соединение и блокировку; на Linux они требуют встроенного gVisor Xray.\n\nСвязка запускает второй процесс. В трёх замерах в Linux без трафика она потребляла примерно на 32–36 МиБ больше физической памяти, чем встроенный TUN Xray. Это не оценка нагрузки при скачивании: расходы процессора и память зависят от соединений. Для sing-box переключатель не добавляется. Ни один вариант не гарантирует более высокую скорость во всех сетях. Смените стек и нажмите «Применить и переподключить», чтобы проверить результат в своей сети.\n\n## Когда применяются настройки\n\nВыбор сервера автоматически переподключает соединение. Режим, ядро, DNS и правила сохраняются сразу; при активном соединении нажмите «Применить и переподключить», чтобы они вступили в силу. Перезапуск ядра может прервать загрузки и звонки. Частые нажатия не запускают параллельные подключения; отключение завершает переход и освобождает соединение.\n\n«Интернет только через VPN» блокирует прямой выход при обрыве туннеля. Это ограничение действует на всю машину, поэтому используйте его осознанно. При явном отключении Sora снимает свои правила. Если очистка не завершилась, повторите отключение и откройте журнал.\n\n## Документация проектов\n\n- [sing-box-lx: настройки и поддержка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.ru.md)\n- [sing-box: документация](https://sing-box.sagernet.org/)\n- [Xray: документация](https://xtls.github.io/)\n- [mihomo: документация](https://wiki.metacubex.one/)\n- [zapret: описание и ограничения](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'Проверить серверы';
@@ -902,7 +890,444 @@ class SRu extends S {
   String get extensions => 'Расширения';
 
   @override
-  String get extensionsSoon => 'Скоро появится';
+  String extRatingLabel(String rating) {
+    return 'Оценка $rating из 5';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return '$author';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'установок: $count';
+  }
+
+  @override
+  String get extInstallOne => '1 установка';
+
+  @override
+  String get extBadgeVerified => 'Проверено';
+
+  @override
+  String get extBadgeTop => 'Топ недели';
+
+  @override
+  String get extBadgeNew => 'Новое';
+
+  @override
+  String get extBadgeStaff => 'Команда Sora';
+
+  @override
+  String get extSideloadShort => 'Не из каталога';
+
+  @override
+  String get extSideloadWarning =>
+      'Не из каталога команды. Ключ автора не проверен: устанавливайте, только если доверяете автору.';
+
+  @override
+  String extInstallTitle(String name) {
+    return 'Установить «$name»';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return 'Обновить «$name»';
+  }
+
+  @override
+  String get extPermissionsIntro => 'Расширение сможет:';
+
+  @override
+  String get extPermissionsWidened => 'Обновление запрашивает новые разрешения:';
+
+  @override
+  String get extDangerousAck => 'Я понимаю, что эти разрешения серьёзные';
+
+  @override
+  String get extInstall => 'Установить';
+
+  @override
+  String get extUpdate => 'Обновить';
+
+  @override
+  String get extCancel => 'Отмена';
+
+  @override
+  String get extConfirm => 'Подтвердить';
+
+  @override
+  String get extOk => 'ОК';
+
+  @override
+  String get extCatalog => 'Каталог';
+
+  @override
+  String get extInstalled => 'Установленные';
+
+  @override
+  String get extSearchHint => 'Поиск расширений';
+
+  @override
+  String get extCatAll => 'Все';
+
+  @override
+  String get extCatTools => 'Инструменты';
+
+  @override
+  String get extCatThemes => 'Темы';
+
+  @override
+  String get extCatAutomation => 'Автоматизация';
+
+  @override
+  String get extCatStats => 'Статистика';
+
+  @override
+  String get extCatNetwork => 'Сеть';
+
+  @override
+  String get extSortBy => 'Сортировка';
+
+  @override
+  String get extSortPopular => 'По популярности';
+
+  @override
+  String get extSortRating => 'По рейтингу';
+
+  @override
+  String get extSortName => 'По названию';
+
+  @override
+  String get extCatalogError => 'Не удалось загрузить каталог';
+
+  @override
+  String get extRetry => 'Повторить';
+
+  @override
+  String get extEmptySearch => 'Ничего не найдено';
+
+  @override
+  String get extEmptyInstalled => 'Пока нет установленных расширений.\nНайдите в каталоге или установите из файла.';
+
+  @override
+  String get extInstallFromFile => 'Установить из файла';
+
+  @override
+  String get extInstallFromUrl => 'Установить по ссылке';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'Скачать';
+
+  @override
+  String get extDownloading => 'Скачивание…';
+
+  @override
+  String get extVerifying => 'Проверка…';
+
+  @override
+  String get extInstalling => 'Установка…';
+
+  @override
+  String get extInstallFailed => 'Не удалось установить';
+
+  @override
+  String get extErrSignature => 'Проверка подписи не пройдена. Файл может быть повреждён или подменён.';
+
+  @override
+  String get extErrManifest => 'Манифест расширения некорректен.';
+
+  @override
+  String get extErrNetwork => 'Ошибка сети. Проверьте соединение и попробуйте снова.';
+
+  @override
+  String get extErrHash => 'Скачанный файл не совпадает с каталогом. Возможно, он подменён.';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'Расширению нужна версия приложения $version или новее.';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'Разрешены только ссылки https://';
+
+  @override
+  String get extErrGeneric => 'Что-то пошло не так. Попробуйте снова.';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.';
+
+  @override
+  String get extUpdateAvailable => 'Доступно обновление';
+
+  @override
+  String get extDisabled => 'Отключено';
+
+  @override
+  String extToggleEnabled(String name) {
+    return 'Включить $name';
+  }
+
+  @override
+  String get extSearchInstalled => 'Поиск установленных';
+
+  @override
+  String get extUpdateAll => 'Обновить все';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return 'Доступно обновлений: $count';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return 'Обновлено: $count';
+  }
+
+  @override
+  String get extRiskNormal => 'Обычный';
+
+  @override
+  String get extRiskSensitive => 'Чувствительный';
+
+  @override
+  String get extRiskDangerous => 'Высокий риск';
+
+  @override
+  String get extPermissionsRemoved => 'Больше не запрашивается:';
+
+  @override
+  String get extUpdateFailedKept => 'Предыдущая версия осталась установлена.';
+
+  @override
+  String get extConflictsTitle => 'Конфликты расширений';
+
+  @override
+  String get extConflictsIntro =>
+      'Эти расширения претендуют на одно и то же. Выберите, какое будет работать, второе останется установленным.';
+
+  @override
+  String get extConflictTheme => 'Тема приложения';
+
+  @override
+  String get extConflictNetHooks => 'Сетевые хуки';
+
+  @override
+  String extConflictWinner(String name) {
+    return 'Побеждает: $name';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return 'Требуют решения: $count';
+  }
+
+  @override
+  String get extConflictsResolve => 'Решить';
+
+  @override
+  String get extConflictNote =>
+      'Выбор сохраняется на этом устройстве. Тема переключается сразу, сетевые хуки в этой версии не запускаются.';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'Версия $version';
+  }
+
+  @override
+  String get extAuthor => 'Автор';
+
+  @override
+  String get extRating => 'Оценка';
+
+  @override
+  String get extInstalls => 'Установки';
+
+  @override
+  String get extVersion => 'Версия';
+
+  @override
+  String get extAbout => 'Описание';
+
+  @override
+  String get extPermissionsTitle => 'Разрешения';
+
+  @override
+  String get extNoPermissions => 'Особых разрешений не требуется.';
+
+  @override
+  String get extSettings => 'Настройки';
+
+  @override
+  String get extSaveSettings => 'Сохранить настройки';
+
+  @override
+  String get extSaving => 'Сохранение…';
+
+  @override
+  String extUpdateTo(String version) {
+    return 'Обновить до $version';
+  }
+
+  @override
+  String get extEnabled => 'Включено';
+
+  @override
+  String extRollbackTo(String version) {
+    return 'Откатить до $version';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return 'Откатить до версии $version?';
+  }
+
+  @override
+  String get extUninstall => 'Удалить';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return 'Удалить «$name» и его настройки?';
+  }
+
+  @override
+  String get extPanelUnavailable => 'Панель недоступна. Возможно, расширение отключено или удалено.';
+
+  @override
+  String get extPermConnectionsRead => 'Видеть список активных соединений';
+
+  @override
+  String get extPermServersRead => 'Видеть список ваших серверов';
+
+  @override
+  String get extPermSettingsRead => 'Читать настройки приложения';
+
+  @override
+  String get extPermSettingsWrite => 'Изменять настройки приложения';
+
+  @override
+  String get extPermNotifications => 'Показывать уведомления';
+
+  @override
+  String get extPermTray => 'Добавлять пункты в меню трея';
+
+  @override
+  String get extPermUiPanel => 'Показывать панели в приложении';
+
+  @override
+  String get extPermThemeApply => 'Применять темы оформления';
+
+  @override
+  String get extPermRoutingRules => 'Добавлять правила маршрутизации (влияет на трафик)';
+
+  @override
+  String get extPermNetHooks => 'Встраиваться в сетевой тракт (модули обхода DPI)';
+
+  @override
+  String get extPermNetFetch => 'Запрашивать URL из разрешённого списка';
+
+  @override
+  String get extPermBackground => 'Выполнять фоновые задачи';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения.';
+
+  @override
+  String get extPermNotYetActive => 'В этой версии Sora это разрешение ещё ничего не делает.';
+
+  @override
+  String get extCapBackground => 'Работает в фоновом режиме';
+
+  @override
+  String get extCapNetHook => 'Обходы и сетевые хуки';
+
+  @override
+  String get extCapPanel => 'Панели';
+
+  @override
+  String get extCapRouting => 'Правила маршрутизации';
+
+  @override
+  String get extCapTheme => 'Темы';
+
+  @override
+  String get extCapWidget => 'Виджеты';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Кэш каталога от $date';
+  }
+
+  @override
+  String get extChangelog => 'История версий';
+
+  @override
+  String get extImageFailed => 'Не удалось загрузить изображение';
+
+  @override
+  String get extRatingHow => 'Как считаются оценки';
+
+  @override
+  String get extRatingHowBody =>
+      'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, поэтому один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.';
+
+  @override
+  String get extScreenshots => 'Скриншоты';
+
+  @override
+  String get extSortRelevance => 'Сначала подходящие';
+
+  @override
+  String get extPermNetworkDetail =>
+      'Загружает данные из интернета через VPN. Разрешены только хосты из списка ниже, остальные заблокированы.';
+
+  @override
+  String get extBgTitle => 'Фоновая задача';
+
+  @override
+  String get extBgEnabled => 'Выполнять в фоне';
+
+  @override
+  String get extBgInterval => 'Запускать каждые';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# минут',
+      few: '# минуты',
+      one: '# минуту',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# часов', few: '# часа', one: '# час');
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote =>
+      'Задача запускается по расписанию, пока Sora открыта, в том числе свёрнутой в трей. Минимальный интервал 15 минут.';
+
+  @override
+  String get extBgDisabledNote => 'Включите расширение, чтобы управлять его фоновой задачей.';
+
+  @override
+  String get extCapNetwork => 'Доступ к сети';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'Сеть: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -911,6 +1336,675 @@ class SRu extends S {
 
   @override
   String get diagnosticHttp => 'HTTP-диагностика';
+
+  @override
+  String get diagnosticNoData => 'Запросов пока нет. Сначала откройте сайт проверки скорости.';
+
+  @override
+  String get qrShareTitle => 'Поделиться QR-кодом';
+
+  @override
+  String get qrScanTitle => 'Сканировать QR-код';
+
+  @override
+  String get qrCopyLink => 'Скопировать ссылку';
+
+  @override
+  String get qrShowLink => 'Показать ссылку';
+
+  @override
+  String get qrHideLink => 'Скрыть ссылку';
+
+  @override
+  String get qrWarning => 'QR-код содержит данные для подключения. Не показывайте его посторонним.';
+
+  @override
+  String get qrScanHint => 'Выберите снимок экрана или фото с QR-кодом либо вставьте ссылку';
+
+  @override
+  String get qrFromClipboard => 'Вставить из буфера обмена';
+
+  @override
+  String get qrNoCode => 'На изображении не найден QR-код.';
+
+  @override
+  String get qrInvalid => 'В этом QR-коде нет корректной ссылки.';
+
+  @override
+  String get qrScan => 'Сканировать QR';
+
+  @override
+  String get qrFromImage => 'Открыть изображение';
+
+  @override
+  String get connGroupByProcess => 'По процессам';
+
+  @override
+  String get connListView => 'Списком';
+
+  @override
+  String get connCopyHost => 'Скопировать хост';
+
+  @override
+  String get connAddRule => 'Добавить правило';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# соединений',
+      few: '# соединения',
+      one: '# соединение',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'Пресет';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'Свой';
+
+  @override
+  String get dnsCheck => 'Проверить утечки';
+
+  @override
+  String get dnsChecking => 'Проверка...';
+
+  @override
+  String get dnsNoLeak => 'Утечек не найдено';
+
+  @override
+  String get dnsLeakFound => 'Обнаружена утечка';
+
+  @override
+  String get dnsLastCheck => 'Последняя проверка';
+
+  @override
+  String get dnsNeverChecked => 'Ещё не проверялось';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'Резолверы DNS туннеля';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'Системные резолверы';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Kill switch закрывает DNS';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Задайте DNS туннеля в настройках выше.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Проверьте, какие резолверы система использует вне туннеля.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Включите kill switch, чтобы DNS оставался в туннеле.';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'Зашифрованный DNS системы';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'Подмена ответов DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Проверьте, какие конечные точки зашифрованного DNS система использует вне туннеля.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Используйте зашифрованный DNS (DoT или DoH) в туннеле, чтобы резолверы не могли подделывать ответы.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Сначала подключитесь к VPN, затем проверьте утечки.';
+
+  @override
+  String get dnsExpected => 'Ожидалось';
+
+  @override
+  String get dnsActual => 'Обнаружено';
+
+  @override
+  String get sortBy => 'Сортировать';
+
+  @override
+  String get sortPing => 'Пинг';
+
+  @override
+  String get sortSpeed => 'Скорость';
+
+  @override
+  String get sortName => 'Имя';
+
+  @override
+  String get measureSpeed => 'Замерить скорость';
+
+  @override
+  String get benchmarkStale => 'устарело';
+
+  @override
+  String get autoSelectMode => 'Автовыбор сервера';
+
+  @override
+  String get autoSelectPing => 'Самый быстрый пинг';
+
+  @override
+  String get autoSelectSpeed => 'Самая высокая скорость';
+
+  @override
+  String get autoSelectSmart => 'Умный выбор';
+
+  @override
+  String get coreWatchUnstable => 'Связь с ядром нестабильна';
+
+  @override
+  String get watchReconnect => 'Переподключить';
+
+  @override
+  String get coreRestoringLink => 'Восстанавливаю связь с ядром…';
+
+  @override
+  String get crashRestoreTitle => 'Прошлое соединение оборвалось';
+
+  @override
+  String get restoreOnCrash => 'Восстанавливать сессию после сбоя';
+
+  @override
+  String get crashRestore => 'Восстановить';
+
+  @override
+  String get crashDismiss => 'Не сейчас';
+
+  @override
+  String get overrideTitle => 'Мои правки';
+
+  @override
+  String get overrideEdit => 'Редактировать серверы';
+
+  @override
+  String get overrideHide => 'Скрыть';
+
+  @override
+  String get overrideUnhide => 'Показать';
+
+  @override
+  String get overrideClear => 'Сбросить правки';
+
+  @override
+  String get overrideEmpty => 'Пока нет правок';
+
+  @override
+  String get overrideCustomRules => 'Свои правила';
+
+  @override
+  String get errBenchmarkUnsupported => 'Для замера скорости нужна новая версия ядра';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return 'Замер $done из $total…';
+  }
+
+  @override
+  String get profiles => 'Сетевые профили';
+
+  @override
+  String get profilesEmpty =>
+      'Профилей пока нет. Создайте профиль, чтобы настройки применялись автоматически в известных сетях.';
+
+  @override
+  String get profileAdd => 'Добавить профиль';
+
+  @override
+  String get profileName => 'Название профиля';
+
+  @override
+  String get profileSsids => 'Wi-Fi-сети (SSID)';
+
+  @override
+  String get profileSsidsHint => 'Дом, Офис через запятую';
+
+  @override
+  String get profileGateways => 'Шлюзы';
+
+  @override
+  String get profileAsns => 'Номера AS';
+
+  @override
+  String get profileAutoApply => 'Применять автоматически';
+
+  @override
+  String get profileAutoApplyHint => 'Если выключено, Sora спросит перед применением';
+
+  @override
+  String get profileSnapshot => 'Запомнить текущие настройки';
+
+  @override
+  String get profileSnapshotDone => 'Текущие настройки сохранены в профиль';
+
+  @override
+  String get profileDelete => 'Удалить профиль';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return 'Удалить профиль «$name»?';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return 'Применить профиль «$name»?';
+  }
+
+  @override
+  String get profileApply => 'Применить';
+
+  @override
+  String profileApplied(Object name) {
+    return 'Профиль «$name» применён';
+  }
+
+  @override
+  String get profileUndo => 'Отменить';
+
+  @override
+  String get profileActive => 'Активен';
+
+  @override
+  String networkNow(Object info) {
+    return 'Сейчас: $info';
+  }
+
+  @override
+  String get networkUnknown => 'Нет данных о сети';
+
+  @override
+  String get profileNoTriggers => 'Добавьте хотя бы один триггер: SSID, шлюз или ASN';
+
+  @override
+  String get chains => 'Цепочки прокси';
+
+  @override
+  String get chainsEmpty => 'Цепочек пока нет. Свяжите 2–3 сервера, чтобы трафик шёл через каждый из них.';
+
+  @override
+  String get chainAdd => 'Новая цепочка';
+
+  @override
+  String get chainName => 'Название цепочки';
+
+  @override
+  String get chainPickServers => 'Выберите 2–3 сервера';
+
+  @override
+  String get chainOrderHint => 'Перетащите, чтобы изменить порядок: трафик входит сверху, выходит снизу.';
+
+  @override
+  String get chainTooFew => 'Выберите минимум 2 сервера';
+
+  @override
+  String get chainTooMany => 'В цепочке максимум 3 сервера';
+
+  @override
+  String get chainEstimate => 'Примерная задержка';
+
+  @override
+  String get chainSave => 'Сохранить цепочку';
+
+  @override
+  String get chainDelete => 'Удалить цепочку';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return 'Удалить цепочку «$name»?';
+  }
+
+  @override
+  String get chainUnsupported => 'Текущий движок не умеет строить цепочки';
+
+  @override
+  String get chainHopMissing => 'Один из серверов цепочки больше недоступен';
+
+  @override
+  String chainHop(Object n) {
+    return 'Хоп $n';
+  }
+
+  @override
+  String get chainEntry => 'Вход';
+
+  @override
+  String get chainExit => 'Выход';
+
+  @override
+  String get sync => 'Синхронизация устройств';
+
+  @override
+  String get syncDevices => 'Мои устройства';
+
+  @override
+  String get syncEmpty => 'Нет спаренных устройств. Спарьте другое устройство в локальной сети.';
+
+  @override
+  String get syncPair => 'Спарить устройство';
+
+  @override
+  String get syncShowCode => 'Показать мой код';
+
+  @override
+  String get syncScanCode => 'Сканировать код';
+
+  @override
+  String get syncRevoke => 'Отозвать';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return 'Отозвать «$name»?';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'Последняя синхронизация: $time';
+  }
+
+  @override
+  String get syncNever => 'Никогда';
+
+  @override
+  String get syncNoLan => 'Устройства должны быть в одной локальной сети';
+
+  @override
+  String get syncPaired => 'Устройство спарено';
+
+  @override
+  String get syncPairingTitle => 'Спарить с этим устройством';
+
+  @override
+  String get syncWaiting => 'Ожидание другого устройства…';
+
+  @override
+  String get syncSecureNote => 'Канал защищён сквозным шифрованием. Никаких аккаунтов и облачных серверов.';
+
+  @override
+  String get zapretWithVpn => 'DPI-обход для прямого трафика';
+
+  @override
+  String get zapretWithVpnHint =>
+      'Запускает zapret рядом с VPN-туннелем: трафик туннеля идёт через VPN, прямой трафик через обход.';
+
+  @override
+  String get chainDuplicate => 'Каждый сервер можно выбрать только один раз';
+
+  @override
+  String get edit => 'Изменить';
+
+  @override
+  String get remove => 'Убрать';
+
+  @override
+  String get autoSwitchOnDegrade => 'Автопереключение при деградации';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'Если выбранный сервер сильно замедлится или перестанет отвечать, Sora переключится на лучший из измеренных, но не чаще раза в 10 минут.';
+
+  @override
+  String get tunStackMixed => 'Смешанный';
+
+  @override
+  String get tunStackSystem => 'Системный';
+
+  @override
+  String get customServerAdd => 'Добавить свой сервер';
+
+  @override
+  String get customServers => 'Мои серверы';
+
+  @override
+  String get customServerName => 'Название';
+
+  @override
+  String get customServerNameHint => 'Например: мой VPS';
+
+  @override
+  String get customServerNameRequired => 'Введите название';
+
+  @override
+  String get customServerAddress => 'Адрес';
+
+  @override
+  String get customServerAddressHint => 'example.com или 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'Введите адрес сервера';
+
+  @override
+  String get customServerAddressInvalid => 'Некорректный адрес';
+
+  @override
+  String get customServerPort => 'Порт';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'Порт должен быть числом от 1 до 65535';
+
+  @override
+  String get customServerProtocol => 'Протокол';
+
+  @override
+  String get customServerCredentials => 'Данные для входа';
+
+  @override
+  String get customServerOptional => 'Необязательно';
+
+  @override
+  String get customServerShowSecret => 'Показать секрет';
+
+  @override
+  String get customServerHideSecret => 'Скрыть секрет';
+
+  @override
+  String get customServerBadge => 'свой';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'Удалить сервер «$name»?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'Добавьте сервер вручную: адрес, порт и протокол';
+
+  @override
+  String get customServerTest => 'Проверить';
+
+  @override
+  String get leakTestTitle => 'Проверка утечек';
+
+  @override
+  String get leakTestIntro =>
+      'Проверяет, может ли трафик покинуть устройство в обход туннеля: прямые DNS- и ICMP-запросы, утечки IPv6 и системные резолверы. Запускайте при активном подключении.';
+
+  @override
+  String get leakTestRun => 'Проверить';
+
+  @override
+  String get leakTestCancel => 'Отмена';
+
+  @override
+  String get leakTestNeedsConnection => 'Подключитесь, чтобы проверить утечки.';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'Выполнено тестов: $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'Утечек не найдено';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Найдено # утечек',
+      few: 'Найдены # утечки',
+      one: 'Найдена # утечка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Пропущен: в этой сессии неприменим';
+
+  @override
+  String get leakTestFix => 'Исправить';
+
+  @override
+  String get leakTestFixedNote => 'Kill switch включён, запустите проверку снова.';
+
+  @override
+  String get leakTestCheckDirectDns => 'Прямой DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP echo';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'Системные резолверы';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Связность туннеля';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS через туннель';
+
+  @override
+  String get noticeDegraded => 'Сервер замедлился, Sora переключилась на лучший из измеренных';
+
+  @override
+  String get obfs => 'Маскировка трафика';
+
+  @override
+  String get syncCodeExpired => 'Срок действия кода истёк';
+
+  @override
+  String get syncDaemonFailed => 'Не удалось запустить службу синхронизации';
+
+  @override
+  String get syncDaemonMissing =>
+      'Компонент sora-sync не найден. Переустановите приложение, чтобы включить синхронизацию устройств.';
+
+  @override
+  String get syncDaemonStarting => 'Запуск службы синхронизации…';
+
+  @override
+  String get syncErrAuth =>
+      'Служба синхронизации отклонила токен доступа. Перезапустите приложение и попробуйте снова.';
+
+  @override
+  String get syncErrNotFound => 'Устройство больше не спарено';
+
+  @override
+  String get syncErrPairingActive => 'Сессия спаривания уже открыта';
+
+  @override
+  String get syncErrUnreachable =>
+      'Другое устройство не отвечает. Убедитесь, что оно в той же сети и показывает свой код.';
+
+  @override
+  String get syncError => 'Ошибка синхронизации';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'Код истечёт через $duration';
+  }
+
+  @override
+  String get syncJoining => 'Спаривание с устройством…';
+
+  @override
+  String get syncLegacyCleared =>
+      'Старый список устройств никогда не был по-настоящему спарен, поэтому он очищен. Спарьте устройства заново, теперь по-настоящему.';
+
+  @override
+  String get syncNewCode => 'Новый код';
+
+  @override
+  String syncPairedWith(String name) {
+    return '«$name» спарено';
+  }
+
+  @override
+  String get syncRetry => 'Повторить';
+
+  @override
+  String get syncStopShowing => 'Прекратить показ';
+
+  @override
+  String get syncSyncNow => 'Синхронизировать';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Получено: $pulled, отправлено: $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'Результат синхронизации';
+
+  @override
+  String get syncPulled => 'Получено';
+
+  @override
+  String get syncPushed => 'Отправлено';
+
+  @override
+  String get syncNoChanges => 'Нет изменений';
+
+  @override
+  String get syncDocKindSubscriptions => 'Подписки';
+
+  @override
+  String get syncDocKindSettings => 'Настройки';
+
+  @override
+  String get syncDocKindOverrides => 'Переопределения подписок';
+
+  @override
+  String get syncDocKindProfiles => 'Сетевые профили';
+
+  @override
+  String get syncDocKindChains => 'Цепочки прокси';
+
+  @override
+  String syncFrom(String name) {
+    return 'с $name';
+  }
+
+  @override
+  String get syncThisDevice => 'Это устройство';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Синхронизация устройств пока недоступна на Android: там не работает служба синхронизации.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль';
 
   @override
   String get diagnosticPackets => 'Захват пакетов';
@@ -922,11 +2016,60 @@ class SRu extends S {
   String get diagnosticCapture => 'Записать 10 секунд';
 
   @override
-  String get diagnosticNoData => 'Запросов пока нет. Сначала откройте сайт проверки скорости.';
-
-  @override
   String get diagnosticRequiresTun => 'Для захвата пакетов нужно активное TUN-подключение Sora.';
 
   @override
   String get diagnosticUnavailable => 'Эта диагностика недоступна на данной платформе.';
+
+  @override
+  String get extErrRevoked => 'Команда Sora отозвала эту версию расширения: она небезопасна или сломана.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Не удалось обновить список отозванных расширений. Установка недоступна, пока он не обновится: проверьте сеть и попробуйте снова.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Выключены отозванные расширения: $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'Приватный ключ';
+
+  @override
+  String get customServerWgAddresses => 'Адреса интерфейса';
+
+  @override
+  String get customServerWgPeerKey => 'Публичный ключ сервера';
+
+  @override
+  String get customServerWgPresharedKey => 'Общий ключ';
+
+  @override
+  String get customServerWgAllowedIps => 'Разрешённые IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, секунд';
+
+  @override
+  String get customServerWgKeyInvalid => 'Ключ должен быть 32 байтами в base64, как выводит wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Укажите адреса через запятую в виде 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Укажите число секунд от 0 до 65535.';
+
+  @override
+  String get strictKillSwitch => 'Строгий kill switch';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'После подключения блокирует трафик вне VPN даже при сбое, перезапуске ядра или выходе из приложения. Доступ вернётся только после отключения VPN или этой настройки. После перезагрузки блокировка возобновится только при включённом подключении при запуске.';
+
+  @override
+  String get extWorkerFailed => 'Фоновая задача расширения завершилась с ошибкой. Проверьте журнал расширения.';
+
+  @override
+  String get extAssetRejected => 'Файл расширения отклонён: нечитаемые цвета или неверные правила.';
 }

@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package sora.obfs.v1;
+
+
+option go_package = "github.com/levvs-one/sora-client/core/gen/sora/obfs/v1;obfsv1";
+
+
+// Reserved RPC name (obfs): /sora.obfs.v1.ObfsControl/ApplyObfsProfile.
+
+// Reserved RPC name (obfs): /sora.obfs.v1.ObfsControl/GetObfsCapabilities.
+
+// These wire identities belong to the excluded obfs subsystem.
+
+enum UtlsProfile {
+  // Reserved for obfs.
+  UTLS_PROFILE_UNSPECIFIED = 0;
+  reserved 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;
+  reserved "UTLS_PROFILE_CHROME", "UTLS_PROFILE_FIREFOX", "UTLS_PROFILE_SAFARI", "UTLS_PROFILE_IOS", "UTLS_PROFILE_ANDROID", "UTLS_PROFILE_EDGE", "UTLS_PROFILE_360", "UTLS_PROFILE_QQ", "UTLS_PROFILE_RANDOM", "UTLS_PROFILE_RANDOMIZED";
+}
+
+enum ObfsPreset {
+  // Reserved for obfs.
+  OBFS_PRESET_UNSPECIFIED = 0;
+  reserved 1, 2, 3, 4;
+  reserved "OBFS_PRESET_OFF", "OBFS_PRESET_LIGHT", "OBFS_PRESET_BALANCED", "OBFS_PRESET_AGGRESSIVE";
+}
+
+message ObfuscationProfile {
+  // Reserved for obfs.
+  reserved 1, 2, 3, 4, 5, 6;
+  reserved "preset", "utls_profile", "frag_sizes", "frag_delay_ms", "jitter_ms", "fake_sni";
+}
+
+message ApplyObfsProfileRequest {
+  // Reserved for obfs.
+  reserved 1, 2;
+  reserved "api_version", "profile";
+}
+
+message ApplyObfsProfileResponse {
+  // Reserved for obfs.
+  reserved 1, 2, 3, 4;
+  reserved "applied", "compatible_engines", "warnings", "error";
+}
+
+message GetObfsCapabilitiesRequest {
+  // Reserved for obfs.
+  reserved 1;
+  reserved "api_version";
+}
+
+message GetObfsCapabilitiesResponse {
+  // Reserved for obfs.
+  reserved 1, 2;
+  reserved "engines", "error";
+}
+
+message EngineObfsCapabilities {
+  // Reserved for obfs.
+  reserved 1, 2, 3, 4, 5, 6, 7, 8;
+  reserved "engine", "utls", "utls_profiles", "supports_versioned_parrots", "fragmentation", "fragment_params", "jitter", "fake_sni";
+}

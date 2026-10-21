@@ -198,6 +198,8 @@ const ConnectRequest$json = {
     {'1': 'session_plan', '3': 4, '4': 1, '5': 11, '6': '.sora.core.v1.SessionPlan', '10': 'sessionPlan'},
     {'1': 'control_authenticator', '3': 5, '4': 1, '5': 12, '10': 'controlAuthenticator'},
     {'1': 'kill_switch', '3': 6, '4': 1, '5': 8, '10': 'killSwitch'},
+    {'1': 'strict_kill_switch', '3': 7, '4': 1, '5': 8, '10': 'strictKillSwitch'},
+    {'1': 'reconnect', '3': 8, '4': 1, '5': 8, '10': 'reconnect'},
   ],
 };
 
@@ -208,7 +210,8 @@ final $typed_data.Uint8List connectRequestDescriptor =
         'ZXNzaW9uX2lkGAMgASgJUglzZXNzaW9uSWQSPAoMc2Vzc2lvbl9wbGFuGAQgASgLMhkuc29yYS'
         '5jb3JlLnYxLlNlc3Npb25QbGFuUgtzZXNzaW9uUGxhbhIzChVjb250cm9sX2F1dGhlbnRpY2F0'
         'b3IYBSABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9yEh8KC2tpbGxfc3dpdGNoGAYgASgIUgpraW'
-        'xsU3dpdGNo');
+        'xsU3dpdGNoEiwKEnN0cmljdF9raWxsX3N3aXRjaBgHIAEoCFIQc3RyaWN0S2lsbFN3aXRjaBIc'
+        'CglyZWNvbm5lY3QYCCABKAhSCXJlY29ubmVjdA==');
 
 @$core.Deprecated('Use connectResponseDescriptor instead')
 const ConnectResponse$json = {
@@ -321,6 +324,9 @@ const SessionPlan$json = {
     {'1': 'routing', '3': 12, '4': 1, '5': 11, '6': '.sora.core.v1.RoutingOptions', '10': 'routing'},
     {'1': 'ipv6', '3': 13, '4': 1, '5': 8, '10': 'ipv6'},
     {'1': 'tun_stack', '3': 14, '4': 1, '5': 9, '10': 'tunStack'},
+    {'1': 'chain', '3': 15, '4': 3, '5': 9, '10': 'chain'},
+    {'1': 'zapret_with_vpn', '3': 16, '4': 1, '5': 8, '10': 'zapretWithVpn'},
+    {'1': 'zapret_strategy', '3': 17, '4': 1, '5': 11, '6': '.sora.core.v1.BypassStrategy', '10': 'zapretStrategy'},
   ],
 };
 
@@ -338,7 +344,10 @@ final $typed_data.Uint8List sessionPlanDescriptor =
         'xvd2VkEjkKC2xvY2FsX3Byb3h5GAogASgLMhguc29yYS5jb3JlLnYxLkxvY2FsUHJveHlSCmxv'
         'Y2FsUHJveHkSLwoGZ3JvdXBzGAsgAygLMhcuc29yYS5jb3JlLnYxLkdyb3VwU3BlY1IGZ3JvdX'
         'BzEjYKB3JvdXRpbmcYDCABKAsyHC5zb3JhLmNvcmUudjEuUm91dGluZ09wdGlvbnNSB3JvdXRp'
-        'bmcSEgoEaXB2NhgNIAEoCFIEaXB2NhIbCgl0dW5fc3RhY2sYDiABKAlSCHR1blN0YWNr');
+        'bmcSEgoEaXB2NhgNIAEoCFIEaXB2NhIbCgl0dW5fc3RhY2sYDiABKAlSCHR1blN0YWNrEhQKBW'
+        'NoYWluGA8gAygJUgVjaGFpbhImCg96YXByZXRfd2l0aF92cG4YECABKAhSDXphcHJldFdpdGhW'
+        'cG4SRQoPemFwcmV0X3N0cmF0ZWd5GBEgASgLMhwuc29yYS5jb3JlLnYxLkJ5cGFzc1N0cmF0ZW'
+        'd5Ug56YXByZXRTdHJhdGVneQ==');
 
 @$core.Deprecated('Use groupSpecDescriptor instead')
 const GroupSpec$json = {
@@ -423,6 +432,11 @@ const OutboundSpec$json = {
     {'1': 'credentials', '3': 7, '4': 1, '5': 11, '6': '.sora.core.v1.CredentialsRef', '10': 'credentials'},
     {'1': 'display_protocol', '3': 9, '4': 1, '5': 9, '10': 'displayProtocol'},
   ],
+  '9': [
+    {'1': 10, '2': 11},
+    {'1': 11, '2': 12},
+  ],
+  '10': ['flow', 'flow_auto'],
 };
 
 /// Descriptor for `OutboundSpec`. Decode as a `google.protobuf.DescriptorProto`.
@@ -433,7 +447,8 @@ final $typed_data.Uint8List outboundSpecDescriptor =
         'IJdHJhbnNwb3J0EhoKCHNlY3VyaXR5GAUgASgJUghzZWN1cml0eRIyCghlbmRwb2ludBgGIAEo'
         'CzIWLnNvcmEuY29yZS52MS5FbmRwb2ludFIIZW5kcG9pbnQSPgoLY3JlZGVudGlhbHMYByABKA'
         'syHC5zb3JhLmNvcmUudjEuQ3JlZGVudGlhbHNSZWZSC2NyZWRlbnRpYWxzEikKEGRpc3BsYXlf'
-        'cHJvdG9jb2wYCSABKAlSD2Rpc3BsYXlQcm90b2NvbA==');
+        'cHJvdG9jb2wYCSABKAlSD2Rpc3BsYXlQcm90b2NvbEoECAoQC0oECAsQDFIEZmxvd1IJZmxvd1'
+        '9hdXRv');
 
 @$core.Deprecated('Use endpointDescriptor instead')
 const Endpoint$json = {
@@ -508,6 +523,8 @@ const SessionStatus$json = {
   '2': [
     {'1': 'connection', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ConnectionState', '10': 'connection'},
     {'1': 'negotiated_version', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'negotiatedVersion'},
+    {'1': 'kill_switch', '3': 3, '4': 1, '5': 8, '10': 'killSwitch'},
+    {'1': 'strict_kill_switch', '3': 4, '4': 1, '5': 8, '10': 'strictKillSwitch'},
   ],
 };
 
@@ -515,7 +532,9 @@ const SessionStatus$json = {
 final $typed_data.Uint8List sessionStatusDescriptor =
     $convert.base64Decode('Cg1TZXNzaW9uU3RhdHVzEj0KCmNvbm5lY3Rpb24YASABKAsyHS5zb3JhLmNvcmUudjEuQ29ubm'
         'VjdGlvblN0YXRlUgpjb25uZWN0aW9uEkcKEm5lZ290aWF0ZWRfdmVyc2lvbhgCIAEoCzIYLnNv'
-        'cmEuY29yZS52MS5BcGlWZXJzaW9uUhFuZWdvdGlhdGVkVmVyc2lvbg==');
+        'cmEuY29yZS52MS5BcGlWZXJzaW9uUhFuZWdvdGlhdGVkVmVyc2lvbhIfCgtraWxsX3N3aXRjaB'
+        'gDIAEoCFIKa2lsbFN3aXRjaBIsChJzdHJpY3Rfa2lsbF9zd2l0Y2gYBCABKAhSEHN0cmljdEtp'
+        'bGxTd2l0Y2g=');
 
 @$core.Deprecated('Use getStatsRequestDescriptor instead')
 const GetStatsRequest$json = {
@@ -606,10 +625,23 @@ const CoreEvent$json = {
       '9': 0,
       '10': 'groupSwitched'
     },
+    {
+      '1': 'profile_matched',
+      '3': 12,
+      '4': 1,
+      '5': 11,
+      '6': '.sora.core.v1.ProfileMatched',
+      '9': 0,
+      '10': 'profileMatched'
+    },
   ],
   '8': [
     {'1': 'payload'},
   ],
+  '9': [
+    {'1': 13, '2': 14},
+  ],
+  '10': ['censorship_detected'],
 };
 
 /// Descriptor for `CoreEvent`. Decode as a `google.protobuf.DescriptorProto`.
@@ -626,7 +658,9 @@ final $typed_data.Uint8List coreEventDescriptor =
         'NvcmFFcnJvckgAUgVlcnJvchJRChNraWxsX3N3aXRjaF9jaGFuZ2VkGAogASgLMh8uc29yYS5j'
         'b3JlLnYxLktpbGxTd2l0Y2hDaGFuZ2VkSABSEWtpbGxTd2l0Y2hDaGFuZ2VkEkQKDmdyb3VwX3'
         'N3aXRjaGVkGAsgASgLMhsuc29yYS5jb3JlLnYxLkdyb3VwU3dpdGNoZWRIAFINZ3JvdXBTd2l0'
-        'Y2hlZEIJCgdwYXlsb2Fk');
+        'Y2hlZBJHCg9wcm9maWxlX21hdGNoZWQYDCABKAsyHC5zb3JhLmNvcmUudjEuUHJvZmlsZU1hdG'
+        'NoZWRIAFIOcHJvZmlsZU1hdGNoZWRCCQoHcGF5bG9hZEoECA0QDlITY2Vuc29yc2hpcF9kZXRl'
+        'Y3RlZA==');
 
 @$core.Deprecated('Use stateChangedDescriptor instead')
 const StateChanged$json = {
@@ -936,6 +970,10 @@ const SetKillSwitchRequest$json = {
     {'1': 'request_id', '3': 2, '4': 1, '5': 9, '10': 'requestId'},
     {'1': 'session_id', '3': 3, '4': 1, '5': 9, '10': 'sessionId'},
     {'1': 'enabled', '3': 4, '4': 1, '5': 8, '10': 'enabled'},
+    {'1': 'strict', '3': 5, '4': 1, '5': 8, '9': 0, '10': 'strict', '17': true},
+  ],
+  '8': [
+    {'1': '_strict'},
   ],
 };
 
@@ -944,7 +982,7 @@ final $typed_data.Uint8List setKillSwitchRequestDescriptor =
     $convert.base64Decode('ChRTZXRLaWxsU3dpdGNoUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29yZS'
         '52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEh0KCnJlcXVlc3RfaWQYAiABKAlSCXJlcXVlc3RJ'
         'ZBIdCgpzZXNzaW9uX2lkGAMgASgJUglzZXNzaW9uSWQSGAoHZW5hYmxlZBgEIAEoCFIHZW5hYm'
-        'xlZA==');
+        'xlZBIbCgZzdHJpY3QYBSABKAhIAFIGc3RyaWN0iAEBQgkKB19zdHJpY3Q=');
 
 @$core.Deprecated('Use setKillSwitchResponseDescriptor instead')
 const SetKillSwitchResponse$json = {
@@ -952,13 +990,15 @@ const SetKillSwitchResponse$json = {
   '2': [
     {'1': 'enabled', '3': 1, '4': 1, '5': 8, '10': 'enabled'},
     {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+    {'1': 'strict', '3': 3, '4': 1, '5': 8, '10': 'strict'},
   ],
 };
 
 /// Descriptor for `SetKillSwitchResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List setKillSwitchResponseDescriptor =
     $convert.base64Decode('ChVTZXRLaWxsU3dpdGNoUmVzcG9uc2USGAoHZW5hYmxlZBgBIAEoCFIHZW5hYmxlZBItCgVlcn'
-        'JvchgCIAEoCzIXLnNvcmEuY29yZS52MS5Tb3JhRXJyb3JSBWVycm9y');
+        'JvchgCIAEoCzIXLnNvcmEuY29yZS52MS5Tb3JhRXJyb3JSBWVycm9yEhYKBnN0cmljdBgDIAEo'
+        'CFIGc3RyaWN0');
 
 @$core.Deprecated('Use diagnosticReportDescriptor instead')
 const DiagnosticReport$json = {
@@ -1812,3 +1852,429 @@ final $typed_data.Uint8List bypassStrategyDescriptor =
         'VyGAIgASgIUghkaXNvcmRlchIQCgNvb2IYAyABKAhSA29vYhIdCgp0bHNfcmVjb3JkGAQgASgJ'
         'Ugl0bHNSZWNvcmQSGwoJaG9zdF9jYXNlGAUgASgIUghob3N0Q2FzZRIfCgtkb21haW5fY2FzZR'
         'gGIAEoCFIKZG9tYWluQ2FzZRIdCgptZXRob2RfZW9sGAcgASgIUgltZXRob2RFb2w=');
+
+@$core.Deprecated('Use dnsLeakCheckDescriptor instead')
+const DnsLeakCheck$json = {
+  '1': 'DnsLeakCheck',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'label', '3': 2, '4': 1, '5': 9, '10': 'label'},
+    {'1': 'expected', '3': 3, '4': 1, '5': 9, '10': 'expected'},
+    {'1': 'actual', '3': 4, '4': 1, '5': 9, '10': 'actual'},
+    {'1': 'leaked', '3': 5, '4': 1, '5': 8, '10': 'leaked'},
+    {'1': 'fix_hint', '3': 6, '4': 1, '5': 9, '10': 'fixHint'},
+  ],
+};
+
+/// Descriptor for `DnsLeakCheck`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List dnsLeakCheckDescriptor =
+    $convert.base64Decode('CgxEbnNMZWFrQ2hlY2sSDgoCaWQYASABKAlSAmlkEhQKBWxhYmVsGAIgASgJUgVsYWJlbBIaCg'
+        'hleHBlY3RlZBgDIAEoCVIIZXhwZWN0ZWQSFgoGYWN0dWFsGAQgASgJUgZhY3R1YWwSFgoGbGVh'
+        'a2VkGAUgASgIUgZsZWFrZWQSGQoIZml4X2hpbnQYBiABKAlSB2ZpeEhpbnQ=');
+
+@$core.Deprecated('Use checkDnsLeaksRequestDescriptor instead')
+const CheckDnsLeaksRequest$json = {
+  '1': 'CheckDnsLeaksRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'session_id', '3': 3, '4': 1, '5': 9, '10': 'sessionId'},
+  ],
+};
+
+/// Descriptor for `CheckDnsLeaksRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List checkDnsLeaksRequestDescriptor =
+    $convert.base64Decode('ChRDaGVja0Ruc0xlYWtzUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29yZS'
+        '52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEo'
+        'DFIUY29udHJvbEF1dGhlbnRpY2F0b3ISHQoKc2Vzc2lvbl9pZBgDIAEoCVIJc2Vzc2lvbklk');
+
+@$core.Deprecated('Use checkDnsLeaksResponseDescriptor instead')
+const CheckDnsLeaksResponse$json = {
+  '1': 'CheckDnsLeaksResponse',
+  '2': [
+    {'1': 'checks', '3': 1, '4': 3, '5': 11, '6': '.sora.core.v1.DnsLeakCheck', '10': 'checks'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `CheckDnsLeaksResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List checkDnsLeaksResponseDescriptor =
+    $convert.base64Decode('ChVDaGVja0Ruc0xlYWtzUmVzcG9uc2USMgoGY2hlY2tzGAEgAygLMhouc29yYS5jb3JlLnYxLk'
+        'Ruc0xlYWtDaGVja1IGY2hlY2tzEi0KBWVycm9yGAIgASgLMhcuc29yYS5jb3JlLnYxLlNvcmFF'
+        'cnJvclIFZXJyb3I=');
+
+@$core.Deprecated('Use benchmarkServersRequestDescriptor instead')
+const BenchmarkServersRequest$json = {
+  '1': 'BenchmarkServersRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'request_id', '3': 3, '4': 1, '5': 9, '10': 'requestId'},
+    {'1': 'server_ids', '3': 4, '4': 3, '5': 9, '10': 'serverIds'},
+    {'1': 'duration_s', '3': 5, '4': 1, '5': 13, '10': 'durationS'},
+    {'1': 'concurrency', '3': 6, '4': 1, '5': 13, '10': 'concurrency'},
+    {'1': 'url', '3': 7, '4': 1, '5': 9, '10': 'url'},
+  ],
+};
+
+/// Descriptor for `BenchmarkServersRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List benchmarkServersRequestDescriptor =
+    $convert.base64Decode('ChdCZW5jaG1hcmtTZXJ2ZXJzUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY2'
+        '9yZS52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgC'
+        'IAEoDFIUY29udHJvbEF1dGhlbnRpY2F0b3ISHQoKcmVxdWVzdF9pZBgDIAEoCVIJcmVxdWVzdE'
+        'lkEh0KCnNlcnZlcl9pZHMYBCADKAlSCXNlcnZlcklkcxIdCgpkdXJhdGlvbl9zGAUgASgNUglk'
+        'dXJhdGlvblMSIAoLY29uY3VycmVuY3kYBiABKA1SC2NvbmN1cnJlbmN5EhAKA3VybBgHIAEoCV'
+        'IDdXJs');
+
+@$core.Deprecated('Use bandwidthSampleDescriptor instead')
+const BandwidthSample$json = {
+  '1': 'BandwidthSample',
+  '2': [
+    {'1': 'server_id', '3': 1, '4': 1, '5': 9, '10': 'serverId'},
+    {'1': 'bytes_per_sec', '3': 2, '4': 1, '5': 4, '10': 'bytesPerSec'},
+    {'1': 'progress_pct', '3': 3, '4': 1, '5': 13, '10': 'progressPct'},
+    {'1': 'done', '3': 4, '4': 1, '5': 8, '10': 'done'},
+    {'1': 'error', '3': 5, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `BandwidthSample`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List bandwidthSampleDescriptor =
+    $convert.base64Decode('Cg9CYW5kd2lkdGhTYW1wbGUSGwoJc2VydmVyX2lkGAEgASgJUghzZXJ2ZXJJZBIiCg1ieXRlc1'
+        '9wZXJfc2VjGAIgASgEUgtieXRlc1BlclNlYxIhCgxwcm9ncmVzc19wY3QYAyABKA1SC3Byb2dy'
+        'ZXNzUGN0EhIKBGRvbmUYBCABKAhSBGRvbmUSLQoFZXJyb3IYBSABKAsyFy5zb3JhLmNvcmUudj'
+        'EuU29yYUVycm9yUgVlcnJvcg==');
+
+@$core.Deprecated('Use getBenchmarksRequestDescriptor instead')
+const GetBenchmarksRequest$json = {
+  '1': 'GetBenchmarksRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'server_ids', '3': 3, '4': 3, '5': 9, '10': 'serverIds'},
+  ],
+};
+
+/// Descriptor for `GetBenchmarksRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getBenchmarksRequestDescriptor =
+    $convert.base64Decode('ChRHZXRCZW5jaG1hcmtzUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29yZS'
+        '52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEo'
+        'DFIUY29udHJvbEF1dGhlbnRpY2F0b3ISHQoKc2VydmVyX2lkcxgDIAMoCVIJc2VydmVySWRz');
+
+@$core.Deprecated('Use getBenchmarksResponseDescriptor instead')
+const GetBenchmarksResponse$json = {
+  '1': 'GetBenchmarksResponse',
+  '2': [
+    {'1': 'benchmarks', '3': 1, '4': 3, '5': 11, '6': '.sora.core.v1.BenchmarkRecord', '10': 'benchmarks'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `GetBenchmarksResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getBenchmarksResponseDescriptor =
+    $convert.base64Decode('ChVHZXRCZW5jaG1hcmtzUmVzcG9uc2USPQoKYmVuY2htYXJrcxgBIAMoCzIdLnNvcmEuY29yZS'
+        '52MS5CZW5jaG1hcmtSZWNvcmRSCmJlbmNobWFya3MSLQoFZXJyb3IYAiABKAsyFy5zb3JhLmNv'
+        'cmUudjEuU29yYUVycm9yUgVlcnJvcg==');
+
+@$core.Deprecated('Use benchmarkRecordDescriptor instead')
+const BenchmarkRecord$json = {
+  '1': 'BenchmarkRecord',
+  '2': [
+    {'1': 'server_id', '3': 1, '4': 1, '5': 9, '10': 'serverId'},
+    {'1': 'bytes_per_sec', '3': 2, '4': 1, '5': 4, '10': 'bytesPerSec'},
+    {'1': 'latency_ms', '3': 3, '4': 1, '5': 13, '10': 'latencyMs'},
+    {'1': 'measured_at_unix', '3': 4, '4': 1, '5': 3, '10': 'measuredAtUnix'},
+  ],
+};
+
+/// Descriptor for `BenchmarkRecord`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List benchmarkRecordDescriptor =
+    $convert.base64Decode('Cg9CZW5jaG1hcmtSZWNvcmQSGwoJc2VydmVyX2lkGAEgASgJUghzZXJ2ZXJJZBIiCg1ieXRlc1'
+        '9wZXJfc2VjGAIgASgEUgtieXRlc1BlclNlYxIdCgpsYXRlbmN5X21zGAMgASgNUglsYXRlbmN5'
+        'TXMSKAoQbWVhc3VyZWRfYXRfdW5peBgEIAEoA1IObWVhc3VyZWRBdFVuaXg=');
+
+@$core.Deprecated('Use profileMatchedDescriptor instead')
+const ProfileMatched$json = {
+  '1': 'ProfileMatched',
+  '2': [
+    {'1': 'profile_id', '3': 1, '4': 1, '5': 9, '10': 'profileId'},
+    {'1': 'profile_name', '3': 2, '4': 1, '5': 9, '10': 'profileName'},
+    {'1': 'auto_apply', '3': 3, '4': 1, '5': 8, '10': 'autoApply'},
+  ],
+};
+
+/// Descriptor for `ProfileMatched`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List profileMatchedDescriptor =
+    $convert.base64Decode('Cg5Qcm9maWxlTWF0Y2hlZBIdCgpwcm9maWxlX2lkGAEgASgJUglwcm9maWxlSWQSIQoMcHJvZm'
+        'lsZV9uYW1lGAIgASgJUgtwcm9maWxlTmFtZRIdCgphdXRvX2FwcGx5GAMgASgIUglhdXRvQXBw'
+        'bHk=');
+
+@$core.Deprecated('Use networkProfileDescriptor instead')
+const NetworkProfile$json = {
+  '1': 'NetworkProfile',
+  '2': [
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'triggers', '3': 3, '4': 1, '5': 11, '6': '.sora.core.v1.ProfileTriggers', '10': 'triggers'},
+    {'1': 'apply', '3': 4, '4': 1, '5': 11, '6': '.sora.core.v1.ProfileApply', '10': 'apply'},
+    {'1': 'auto_apply', '3': 5, '4': 1, '5': 8, '10': 'autoApply'},
+  ],
+};
+
+/// Descriptor for `NetworkProfile`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List networkProfileDescriptor =
+    $convert.base64Decode('Cg5OZXR3b3JrUHJvZmlsZRIOCgJpZBgBIAEoCVICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRI5Cg'
+        'h0cmlnZ2VycxgDIAEoCzIdLnNvcmEuY29yZS52MS5Qcm9maWxlVHJpZ2dlcnNSCHRyaWdnZXJz'
+        'EjAKBWFwcGx5GAQgASgLMhouc29yYS5jb3JlLnYxLlByb2ZpbGVBcHBseVIFYXBwbHkSHQoKYX'
+        'V0b19hcHBseRgFIAEoCFIJYXV0b0FwcGx5');
+
+@$core.Deprecated('Use profileTriggersDescriptor instead')
+const ProfileTriggers$json = {
+  '1': 'ProfileTriggers',
+  '2': [
+    {'1': 'ssids', '3': 1, '4': 3, '5': 9, '10': 'ssids'},
+    {'1': 'gateways', '3': 2, '4': 3, '5': 9, '10': 'gateways'},
+    {'1': 'asns', '3': 3, '4': 3, '5': 9, '10': 'asns'},
+  ],
+};
+
+/// Descriptor for `ProfileTriggers`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List profileTriggersDescriptor =
+    $convert.base64Decode('Cg9Qcm9maWxlVHJpZ2dlcnMSFAoFc3NpZHMYASADKAlSBXNzaWRzEhoKCGdhdGV3YXlzGAIgAy'
+        'gJUghnYXRld2F5cxISCgRhc25zGAMgAygJUgRhc25z');
+
+@$core.Deprecated('Use profileApplyDescriptor instead')
+const ProfileApply$json = {
+  '1': 'ProfileApply',
+  '2': [
+    {'1': 'mode', '3': 1, '4': 1, '5': 9, '9': 0, '10': 'mode', '17': true},
+    {'1': 'dns', '3': 2, '4': 3, '5': 9, '10': 'dns'},
+    {'1': 'rules_preset', '3': 3, '4': 1, '5': 9, '9': 1, '10': 'rulesPreset', '17': true},
+    {'1': 'server_id', '3': 4, '4': 1, '5': 9, '9': 2, '10': 'serverId', '17': true},
+    {'1': 'engine', '3': 5, '4': 1, '5': 9, '9': 3, '10': 'engine', '17': true},
+    {'1': 'dns_preset', '3': 6, '4': 1, '5': 9, '9': 4, '10': 'dnsPreset', '17': true},
+    {'1': 'dns_set', '3': 7, '4': 1, '5': 8, '10': 'dnsSet'},
+  ],
+  '8': [
+    {'1': '_mode'},
+    {'1': '_rules_preset'},
+    {'1': '_server_id'},
+    {'1': '_engine'},
+    {'1': '_dns_preset'},
+  ],
+};
+
+/// Descriptor for `ProfileApply`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List profileApplyDescriptor =
+    $convert.base64Decode('CgxQcm9maWxlQXBwbHkSFwoEbW9kZRgBIAEoCUgAUgRtb2RliAEBEhAKA2RucxgCIAMoCVIDZG'
+        '5zEiYKDHJ1bGVzX3ByZXNldBgDIAEoCUgBUgtydWxlc1ByZXNldIgBARIgCglzZXJ2ZXJfaWQY'
+        'BCABKAlIAlIIc2VydmVySWSIAQESGwoGZW5naW5lGAUgASgJSANSBmVuZ2luZYgBARIiCgpkbn'
+        'NfcHJlc2V0GAYgASgJSARSCWRuc1ByZXNldIgBARIXCgdkbnNfc2V0GAcgASgIUgZkbnNTZXRC'
+        'BwoFX21vZGVCDwoNX3J1bGVzX3ByZXNldEIMCgpfc2VydmVyX2lkQgkKB19lbmdpbmVCDQoLX2'
+        'Ruc19wcmVzZXQ=');
+
+@$core.Deprecated('Use listProfilesRequestDescriptor instead')
+const ListProfilesRequest$json = {
+  '1': 'ListProfilesRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+  ],
+};
+
+/// Descriptor for `ListProfilesRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listProfilesRequestDescriptor =
+    $convert.base64Decode('ChNMaXN0UHJvZmlsZXNSZXF1ZXN0EjkKC2FwaV92ZXJzaW9uGAEgASgLMhguc29yYS5jb3JlLn'
+        'YxLkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50aWNhdG9yGAIgASgM'
+        'UhRjb250cm9sQXV0aGVudGljYXRvcg==');
+
+@$core.Deprecated('Use listProfilesResponseDescriptor instead')
+const ListProfilesResponse$json = {
+  '1': 'ListProfilesResponse',
+  '2': [
+    {'1': 'profiles', '3': 1, '4': 3, '5': 11, '6': '.sora.core.v1.NetworkProfile', '10': 'profiles'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `ListProfilesResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List listProfilesResponseDescriptor =
+    $convert.base64Decode('ChRMaXN0UHJvZmlsZXNSZXNwb25zZRI4Cghwcm9maWxlcxgBIAMoCzIcLnNvcmEuY29yZS52MS'
+        '5OZXR3b3JrUHJvZmlsZVIIcHJvZmlsZXMSLQoFZXJyb3IYAiABKAsyFy5zb3JhLmNvcmUudjEu'
+        'U29yYUVycm9yUgVlcnJvcg==');
+
+@$core.Deprecated('Use saveProfileRequestDescriptor instead')
+const SaveProfileRequest$json = {
+  '1': 'SaveProfileRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'profile', '3': 3, '4': 1, '5': 11, '6': '.sora.core.v1.NetworkProfile', '10': 'profile'},
+  ],
+};
+
+/// Descriptor for `SaveProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List saveProfileRequestDescriptor =
+    $convert.base64Decode('ChJTYXZlUHJvZmlsZVJlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLmNvcmUudj'
+        'EuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIzChVjb250cm9sX2F1dGhlbnRpY2F0b3IYAiABKAxS'
+        'FGNvbnRyb2xBdXRoZW50aWNhdG9yEjYKB3Byb2ZpbGUYAyABKAsyHC5zb3JhLmNvcmUudjEuTm'
+        'V0d29ya1Byb2ZpbGVSB3Byb2ZpbGU=');
+
+@$core.Deprecated('Use saveProfileResponseDescriptor instead')
+const SaveProfileResponse$json = {
+  '1': 'SaveProfileResponse',
+  '2': [
+    {'1': 'profile', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.NetworkProfile', '10': 'profile'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `SaveProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List saveProfileResponseDescriptor =
+    $convert.base64Decode('ChNTYXZlUHJvZmlsZVJlc3BvbnNlEjYKB3Byb2ZpbGUYASABKAsyHC5zb3JhLmNvcmUudjEuTm'
+        'V0d29ya1Byb2ZpbGVSB3Byb2ZpbGUSLQoFZXJyb3IYAiABKAsyFy5zb3JhLmNvcmUudjEuU29y'
+        'YUVycm9yUgVlcnJvcg==');
+
+@$core.Deprecated('Use deleteProfileRequestDescriptor instead')
+const DeleteProfileRequest$json = {
+  '1': 'DeleteProfileRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'profile_id', '3': 3, '4': 1, '5': 9, '10': 'profileId'},
+  ],
+};
+
+/// Descriptor for `DeleteProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deleteProfileRequestDescriptor =
+    $convert.base64Decode('ChREZWxldGVQcm9maWxlUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29yZS'
+        '52MS5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEo'
+        'DFIUY29udHJvbEF1dGhlbnRpY2F0b3ISHQoKcHJvZmlsZV9pZBgDIAEoCVIJcHJvZmlsZUlk');
+
+@$core.Deprecated('Use deleteProfileResponseDescriptor instead')
+const DeleteProfileResponse$json = {
+  '1': 'DeleteProfileResponse',
+  '2': [
+    {'1': 'error', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `DeleteProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deleteProfileResponseDescriptor =
+    $convert.base64Decode('ChVEZWxldGVQcm9maWxlUmVzcG9uc2USLQoFZXJyb3IYASABKAsyFy5zb3JhLmNvcmUudjEuU2'
+        '9yYUVycm9yUgVlcnJvcg==');
+
+@$core.Deprecated('Use getNetworkFingerprintRequestDescriptor instead')
+const GetNetworkFingerprintRequest$json = {
+  '1': 'GetNetworkFingerprintRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+  ],
+};
+
+/// Descriptor for `GetNetworkFingerprintRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getNetworkFingerprintRequestDescriptor =
+    $convert.base64Decode('ChxHZXROZXR3b3JrRmluZ2VycHJpbnRSZXF1ZXN0EjkKC2FwaV92ZXJzaW9uGAEgASgLMhguc2'
+        '9yYS5jb3JlLnYxLkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50aWNh'
+        'dG9yGAIgASgMUhRjb250cm9sQXV0aGVudGljYXRvcg==');
+
+@$core.Deprecated('Use getNetworkFingerprintResponseDescriptor instead')
+const GetNetworkFingerprintResponse$json = {
+  '1': 'GetNetworkFingerprintResponse',
+  '2': [
+    {'1': 'fingerprint', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.NetworkFingerprint', '10': 'fingerprint'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `GetNetworkFingerprintResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getNetworkFingerprintResponseDescriptor =
+    $convert.base64Decode('Ch1HZXROZXR3b3JrRmluZ2VycHJpbnRSZXNwb25zZRJCCgtmaW5nZXJwcmludBgBIAEoCzIgLn'
+        'NvcmEuY29yZS52MS5OZXR3b3JrRmluZ2VycHJpbnRSC2ZpbmdlcnByaW50Ei0KBWVycm9yGAIg'
+        'ASgLMhcuc29yYS5jb3JlLnYxLlNvcmFFcnJvclIFZXJyb3I=');
+
+@$core.Deprecated('Use networkFingerprintDescriptor instead')
+const NetworkFingerprint$json = {
+  '1': 'NetworkFingerprint',
+  '2': [
+    {'1': 'ssid', '3': 1, '4': 1, '5': 9, '10': 'ssid'},
+    {'1': 'gateway', '3': 2, '4': 1, '5': 9, '10': 'gateway'},
+    {'1': 'asn', '3': 3, '4': 1, '5': 9, '10': 'asn'},
+    {'1': 'fingerprint', '3': 4, '4': 1, '5': 9, '10': 'fingerprint'},
+  ],
+};
+
+/// Descriptor for `NetworkFingerprint`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List networkFingerprintDescriptor =
+    $convert.base64Decode('ChJOZXR3b3JrRmluZ2VycHJpbnQSEgoEc3NpZBgBIAEoCVIEc3NpZBIYCgdnYXRld2F5GAIgAS'
+        'gJUgdnYXRld2F5EhAKA2FzbhgDIAEoCVIDYXNuEiAKC2ZpbmdlcnByaW50GAQgASgJUgtmaW5n'
+        'ZXJwcmludA==');
+
+@$core.Deprecated('Use probeChainRequestDescriptor instead')
+const ProbeChainRequest$json = {
+  '1': 'ProbeChainRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'request_id', '3': 3, '4': 1, '5': 9, '10': 'requestId'},
+    {'1': 'server_ids', '3': 4, '4': 3, '5': 9, '10': 'serverIds'},
+  ],
+};
+
+/// Descriptor for `ProbeChainRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List probeChainRequestDescriptor =
+    $convert.base64Decode('ChFQcm9iZUNoYWluUmVxdWVzdBI5CgthcGlfdmVyc2lvbhgBIAEoCzIYLnNvcmEuY29yZS52MS'
+        '5BcGlWZXJzaW9uUgphcGlWZXJzaW9uEjMKFWNvbnRyb2xfYXV0aGVudGljYXRvchgCIAEoDFIU'
+        'Y29udHJvbEF1dGhlbnRpY2F0b3ISHQoKcmVxdWVzdF9pZBgDIAEoCVIJcmVxdWVzdElkEh0KCn'
+        'NlcnZlcl9pZHMYBCADKAlSCXNlcnZlcklkcw==');
+
+@$core.Deprecated('Use probeChainResponseDescriptor instead')
+const ProbeChainResponse$json = {
+  '1': 'ProbeChainResponse',
+  '2': [
+    {'1': 'hops', '3': 1, '4': 3, '5': 11, '6': '.sora.core.v1.ChainHop', '10': 'hops'},
+    {'1': 'total_latency_ms', '3': 2, '4': 1, '5': 13, '10': 'totalLatencyMs'},
+    {'1': 'engines', '3': 3, '4': 3, '5': 9, '10': 'engines'},
+    {'1': 'error', '3': 4, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `ProbeChainResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List probeChainResponseDescriptor =
+    $convert.base64Decode('ChJQcm9iZUNoYWluUmVzcG9uc2USKgoEaG9wcxgBIAMoCzIWLnNvcmEuY29yZS52MS5DaGFpbk'
+        'hvcFIEaG9wcxIoChB0b3RhbF9sYXRlbmN5X21zGAIgASgNUg50b3RhbExhdGVuY3lNcxIYCgdl'
+        'bmdpbmVzGAMgAygJUgdlbmdpbmVzEi0KBWVycm9yGAQgASgLMhcuc29yYS5jb3JlLnYxLlNvcm'
+        'FFcnJvclIFZXJyb3I=');
+
+@$core.Deprecated('Use chainHopDescriptor instead')
+const ChainHop$json = {
+  '1': 'ChainHop',
+  '2': [
+    {'1': 'server_id', '3': 1, '4': 1, '5': 9, '10': 'serverId'},
+    {'1': 'reachable', '3': 2, '4': 1, '5': 8, '10': 'reachable'},
+    {'1': 'latency_ms', '3': 3, '4': 1, '5': 13, '10': 'latencyMs'},
+  ],
+};
+
+/// Descriptor for `ChainHop`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List chainHopDescriptor =
+    $convert.base64Decode('CghDaGFpbkhvcBIbCglzZXJ2ZXJfaWQYASABKAlSCHNlcnZlcklkEhwKCXJlYWNoYWJsZRgCIA'
+        'EoCFIJcmVhY2hhYmxlEh0KCmxhdGVuY3lfbXMYAyABKA1SCWxhdGVuY3lNcw==');
+
+@$core.Deprecated('Use censorshipDetectedDescriptor instead')
+const CensorshipDetected$json = {
+  '1': 'CensorshipDetected',
+  '9': [
+    {'1': 1, '2': 2},
+    {'1': 2, '2': 3},
+    {'1': 3, '2': 4},
+    {'1': 4, '2': 5},
+  ],
+  '10': ['kind', 'confidence', 'explanation', 'evidence'],
+};
+
+/// Descriptor for `CensorshipDetected`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List censorshipDetectedDescriptor =
+    $convert.base64Decode('ChJDZW5zb3JzaGlwRGV0ZWN0ZWRKBAgBEAJKBAgCEANKBAgDEARKBAgEEAVSBGtpbmRSCmNvbm'
+        'ZpZGVuY2VSC2V4cGxhbmF0aW9uUghldmlkZW5jZQ==');

@@ -60,6 +60,9 @@ func Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 	if p == nil {
 		return nil, errors.New("singbox: nil plan")
 	}
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
 	r := renderer{plan: p, tags: map[string]string{}, used: map[string]bool{"direct": true}}
 	if err := r.assignTags(); err != nil {
 		return nil, err
@@ -85,6 +88,11 @@ func Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 	// Open only requested listeners because all local applications can
 	// reach loopback.
 	inbounds := []obj{}
+	if x := p.ExtensionProxy; x != nil {
+		inbounds = append(inbounds, obj{"type": "socks", "tag": engine.ExtensionInbound,
+			"listen": "127.0.0.1", "listen_port": x.Port,
+			"users": []obj{{"username": x.Username, "password": x.Password}}})
+	}
 	if lp := p.LocalProxy; lp.Enabled {
 		mixed := obj{"type": "mixed", "tag": "mixed-in", "listen": listen, "listen_port": rt.LocalPort}
 		if lp.Username != "" {
@@ -184,6 +192,9 @@ func (r *renderer) outbounds() (outbounds, endpoints []obj, err error) {
 
 func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	out := obj{"tag": r.tags[o.ID]}
+	if o.Via != "" {
+		out["detour"] = r.tags[o.Via]
+	}
 	if o.Protocol != engine.ProtocolDirect && o.Protocol != engine.ProtocolWireGuard {
 		out.set("server", o.Server).set("server_port", int(o.Port))
 	}
@@ -356,7 +367,16 @@ func (r *renderer) group(g engine.Group) (obj, error) {
 
 // route orders sniffing and DNS hijacking before the unchanged plan rule order.
 func (r *renderer) route() (obj, error) {
-	rules := []obj{{"action": "sniff"}, {"protocol": "dns", "action": "hijack-dns"}}
+	var rules []obj
+	if x := r.plan.ExtensionProxy; x != nil {
+		tag, err := r.target(x.Target)
+		if err != nil {
+			return nil, err
+		}
+		// Route before sniffing, DNS hijacking, and every user rule.
+		rules = append(rules, obj{"inbound": []string{engine.ExtensionInbound}, "action": "route", "outbound": tag})
+	}
+	rules = append(rules, obj{"action": "sniff"}, obj{"protocol": "dns", "action": "hijack-dns"})
 	final := "direct"
 	for _, rule := range r.plan.Rules {
 		if rule.Type == engine.RuleMatchAll {

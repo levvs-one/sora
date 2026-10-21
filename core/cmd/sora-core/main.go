@@ -29,11 +29,15 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/tunroute"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/ext"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	extv1 "github.com/levvs-one/sora-client/core/gen/sora/ext/v1"
+	leakv1 "github.com/levvs-one/sora-client/core/gen/sora/leak/v1"
 	"github.com/levvs-one/sora-client/core/guard"
 	"github.com/levvs-one/sora-client/core/ipc"
 	"github.com/levvs-one/sora-client/core/logs"
 	"github.com/levvs-one/sora-client/core/probe"
+	"github.com/levvs-one/sora-client/core/profiles"
 	"github.com/levvs-one/sora-client/core/secret"
 	"github.com/levvs-one/sora-client/core/session"
 	"github.com/levvs-one/sora-client/core/subscription"
@@ -41,7 +45,7 @@ import (
 
 // Version defines the API contract served by this build. Contract changes must
 // update this value and the generated code together.
-var Version = control.Version{Major: 1, Minor: 7, MinSupportedMinor: 1}
+var Version = control.Version{Major: 1, Minor: 12, MinSupportedMinor: 1}
 
 // Options configures a core instance.
 type Options struct {
@@ -91,6 +95,7 @@ type App struct {
 	address  string
 	local    string
 	engines  *registry.Registry
+	extSched *ext.Scheduler
 	instance io.Closer
 }
 
@@ -162,6 +167,24 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		return nil, errs.Wrap(err, errs.CodeInternal, errs.KeyEngineStartFailed)
 	}
 
+	firewall, err := guard.PlatformFirewall(guard.FirewallOptions{
+		EngineUID: os.Getuid(), EnginesDir: opts.EnginesDir, Bypass: opts.Bypass, StateDir: opts.DataDir,
+	})
+	if err != nil {
+		return nil, err
+	}
+	system, err := guard.New(guard.Options{
+		EnginePorts: []uint16{tunnelPort}, DataDir: opts.DataDir,
+	}, firewall)
+	if err != nil {
+		return nil, err
+	}
+	if !opts.Diagnostic {
+		if err := system.Recover(ctx); err != nil {
+			return nil, err
+		}
+	}
+
 	// The control token persists with owner-only permissions and is printed
 	// only on explicit request.
 	auth, err := control.LoadOrCreateToken(opts.DataDir)
@@ -199,26 +222,20 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		}
 	}
 
-	firewall, err := guard.PlatformFirewall(guard.FirewallOptions{
-		EngineUID: os.Getuid(), EnginesDir: opts.EnginesDir, Bypass: opts.Bypass,
-	})
-	if err != nil {
-		_ = store.Close()
-		return nil, err
-	}
-	system, err := guard.New(guard.Options{
-		EnginePorts: []uint16{tunnelPort},
-	}, firewall)
-	if err != nil {
-		_ = store.Close()
-		return nil, err
-	}
 	redactor := engine.NewRedactor()
+	// Network profiles are auxiliary: a corrupt file disables matching with
+	// a warning instead of failing the core.
+	profStore, err := profiles.NewStore(opts.DataDir)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "sora-core: network profiles disabled: %v\n", err)
+		profStore, _ = profiles.NewStore("")
+	}
 	manager := session.NewManager(session.ManagerConfig{
 		Factory:  factory,
 		Guard:    system,
 		Redactor: redactor,
 		Network:  session.NetworkFingerprint,
+		Profiles: profStore,
 	})
 	app.sessions = manager
 
@@ -236,9 +253,28 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	// Keep a nil registry as a nil interface to avoid calling through a nil
 	// pointer.
 	var measurer control.Measurer
+	var benchmarker control.Benchmarker
 	if app.engines != nil {
 		measurer = app.engines
+		b, err := probe.NewBenchmarker(probe.BenchmarkerConfig{
+			NewEngine: app.engines.BenchmarkEngine,
+			SelectKind: func(o engine.Outbound) (engine.Kind, error) {
+				sel, err := engine.SelectEngine(
+					&engine.Plan{Outbounds: []engine.Outbound{o}},
+					app.engines.Availability(), nil)
+				if err != nil {
+					return "", err
+				}
+				return sel.Kind, nil
+			},
+		})
+		if err != nil {
+			_ = store.Close()
+			return nil, err
+		}
+		benchmarker = b
 	}
+	extSched := ext.NewScheduler(nil)
 	plane, err := control.New(control.Config{
 		Version:       Version,
 		Authenticator: auth,
@@ -246,6 +282,10 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		Secrets:       store,
 		Prober:        probe.New(probe.Config{}),
 		Measurer:      measurer,
+		Benchmarker:   benchmarker,
+		DataDir:       opts.DataDir,
+		Profiles:      profStore,
+		ExtScheduler:  extSched,
 		Logs:          center,
 		About:         app.about,
 		Fetcher:       subscription.New(subscription.Options{}),
@@ -262,12 +302,17 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		// limit before allocating their payload.
 		grpc.MaxRecvMsgSize(control.MaxRecvMsgBytes),
 		grpc.MaxSendMsgSize(control.MaxSendMsgBytes),
+		grpc.Creds(ipc.PeerCredentials(ipc.DefaultAuthorize(ipc.Options{Address: opts.Socket}))),
+		grpc.UnaryInterceptor(plane.UnaryAuthInterceptor()),
+		grpc.StreamInterceptor(plane.StreamAuthInterceptor()),
 		// Reap connections that never do anything: together with the
 		// listener's connection cap this bounds silent-connection FD
 		// exhaustion. Active streams are not idle.
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 10 * time.Minute}),
 	)
-	corev1.RegisterCoreControlServer(app.server, plane)
+	mountControlServices(app.server, plane)
+	extSched.SetFetchTransport(plane.ExtFetchTransport())
+	app.extSched = extSched
 	built = true
 	return app, nil
 }
@@ -376,6 +421,10 @@ func (a *App) Serve(ctx context.Context) error {
 	a.log.Info("core listening", "endpoint", a.address, "tunnel", a.local)
 	// Subscription updates must continue without a connected UI.
 	go a.plane.Run(ctx)
+	if a.extSched != nil {
+		a.extSched.Start(ctx)
+		defer a.extSched.Stop()
+	}
 	err := a.server.Serve(a.listener)
 	if ctx.Err() != nil {
 		// Closing the listener on cancellation is a normal service
@@ -448,4 +497,18 @@ func portOf(address string) (uint16, error) {
 	}
 	port, err := strconv.ParseUint(portText, 10, 16)
 	return uint16(port), err
+}
+
+func mountControlServices(server *grpc.Server, plane *control.Server) {
+	corev1.RegisterCoreControlServer(server, plane)
+	// User-added servers (SW7): shares the control socket and its auth
+	// interceptors; every RPC additionally checks the API version and the
+	// control authenticator, like the rest of the control plane.
+	plane.MountCustomServices(server)
+	// Leak self-tests: active egress probes over the control socket. The
+	// service shares the socket's auth interceptors, so only control peers
+	// reach it; the handler additionally checks the control authenticator.
+	leakv1.RegisterLeakServiceServer(server, plane)
+	// The authenticated app supplies verified workers from its own store.
+	extv1.RegisterExtensionHostServer(server, ext.NewHost(plane.ExtHostDeps()))
 }

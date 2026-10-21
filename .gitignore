@@ -11,6 +11,8 @@
 
 # Go
 /core/bin/
+/core/sora-core
+/core/sora-core.exe
 /core/dist/
 *.test
 *.out

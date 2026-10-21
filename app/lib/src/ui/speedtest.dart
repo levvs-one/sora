@@ -92,10 +92,6 @@ class _SpeedtestScreenState extends State<SpeedtestScreen> {
 
   Widget _list() {
     final palette = Palette.of(context), s = S.of(context);
-    final query = _search.text.trim().toLowerCase();
-    final shown = speedtestServices
-        .where((service) => '${service.name} ${service.url}'.toLowerCase().contains(query))
-        .toList();
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
@@ -106,7 +102,9 @@ class _SpeedtestScreenState extends State<SpeedtestScreen> {
           TextField(
             key: const ValueKey('speedtest-search'),
             controller: _search,
-            onChanged: (_) => setState(() {}),
+            // No onChanged setState: the list below listens through
+            // ValueListenableBuilder, so typing rebuilds only the list, not
+            // the heading, search field and the webview pane.
             enableInteractiveSelection: false,
             style: Styles.secondary.copyWith(color: palette.ink),
             decoration: InputDecoration(
@@ -122,49 +120,58 @@ class _SpeedtestScreenState extends State<SpeedtestScreen> {
           ),
           const SizedBox(height: 12),
           Expanded(
-            child: shown.isEmpty
-                ? Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink2)),
-                  )
-                : ListView.builder(
-                    key: const PageStorageKey('speedtest-list'),
-                    padding: const EdgeInsets.only(bottom: 24),
-                    itemCount: shown.length,
-                    itemBuilder: (context, index) {
-                      final service = shown[index];
-                      final chosen = service == _selected;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Semantics(
-                          selected: chosen,
-                          button: true,
-                          child: Material(
-                            color: chosen ? palette.field : palette.surface,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            child: InkWell(
-                              key: ValueKey('speedtest-service-${service.url}'),
-                              borderRadius: BorderRadius.circular(8),
-                              onTap: () => _choose(service),
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(minHeight: 28),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                  child: Center(
-                                    child: Text(
-                                      service.name,
-                                      textAlign: TextAlign.center,
-                                      style: Styles.bodyStrong.copyWith(color: palette.ink),
+            child: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _search,
+              builder: (context, value, _) {
+                final query = value.text.trim().toLowerCase();
+                final shown = speedtestServices
+                    .where((service) => '${service.name} ${service.url}'.toLowerCase().contains(query))
+                    .toList();
+                return shown.isEmpty
+                    ? Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink2)),
+                      )
+                    : ListView.builder(
+                        key: const PageStorageKey('speedtest-list'),
+                        padding: const EdgeInsets.only(bottom: 24),
+                        itemCount: shown.length,
+                        itemBuilder: (context, index) {
+                          final service = shown[index];
+                          final chosen = service == _selected;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Semantics(
+                              selected: chosen,
+                              button: true,
+                              child: Material(
+                                color: chosen ? palette.field : palette.surface,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                child: InkWell(
+                                  key: ValueKey('speedtest-service-${service.url}'),
+                                  borderRadius: BorderRadius.circular(8),
+                                  onTap: () => _choose(service),
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(minHeight: 28),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                      child: Center(
+                                        child: Text(
+                                          service.name,
+                                          textAlign: TextAlign.center,
+                                          style: Styles.bodyStrong.copyWith(color: palette.ink),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       );
-                    },
-                  ),
+              },
+            ),
           ),
           if (MediaQuery.sizeOf(context).width >= 1000)
             Padding(

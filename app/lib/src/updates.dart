@@ -15,9 +15,23 @@ const releaseRepository = 'https://github.com/levvs-one/sora';
 const updateHelper = '/usr/lib/sora/sora-update';
 const updatePolicy = '/usr/share/polkit-1/actions/io.github.levvs-one.sora.update.policy';
 
+/// Staged-rollout policy feed: `updates/releases.json` at the repo
+/// root on the default branch, fetched over plain HTTPS on every update
+/// check. The feed carries POLICY ONLY: which installs are offered a
+/// release. Artifacts, hashes and signatures always come from the GitHub
+/// release API; the feed can never substitute artifact URLs or hashes.
+/// Documented in docs/update-rollout.md.
+const rolloutPolicyUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/updates/releases.json';
+
 enum UpdateConnection { idle, connected, changing, unknown }
 
-enum UpdateError { network, release, checksum, installation, connecting, unsupported }
+enum UpdateError { network, release, checksum, installation, connecting, unsupported, rollback, rollbackCache }
+
+/// Visible phase of an in-flight update flow.
+/// There is deliberately no "verifying" stage: file hashes are checked
+/// against the manifest, but releases are not signed yet, so the UI must
+/// not claim verification.
+enum UpdateStage { idle, checking, downloading, installing }
 
 class UpdateFailure implements Exception {
   const UpdateFailure(this.reason);
@@ -42,6 +56,69 @@ Version? releaseVersion(String text) {
 bool newerRelease(String candidate, String installed) {
   final next = releaseVersion(candidate), current = releaseVersion(installed);
   return next != null && !next.isPreRelease && current != null && next > current;
+}
+
+/// Normalizes a version string the way release tags are normalized
+/// ("v1.2.3" -> "1.2.3"); null when it is not a usable version.
+String? normalizedVersion(Object? text) => text is String ? releaseVersion(text)?.toString() : null;
+
+/// Parsed `updates/releases.json` (format v1). Strict parsing: any deviation
+/// from the schema yields null and the feed is ignored (fail-closed): a
+/// half-understood policy must never steer updates.
+class RolloutPolicy {
+  const RolloutPolicy({required this.version, required this.percent, required this.blockedVersions});
+
+  /// Release this policy applies to, normalized. The policy is ignored unless
+  /// it names exactly the release reported by the GitHub API.
+  final String version;
+
+  /// Share of the install base (by cohort) offered this release, 0..100.
+  final int percent;
+
+  /// Recalled versions, normalized. A listed candidate is never offered;
+  /// a listed installed version triggers a persistent warning.
+  final Set<String> blockedVersions;
+
+  static RolloutPolicy? parse(String body) {
+    try {
+      final json = jsonDecode(body);
+      if (json is! Map<String, dynamic> || json['format'] != 1) return null;
+      final rollout = json['rollout'];
+      if (rollout is! Map<String, dynamic>) return null;
+      final version = normalizedVersion(rollout['version']);
+      final percent = rollout['percent'];
+      if (version == null || percent is! int || percent < 0 || percent > 100) return null;
+      final blocked = json['blocked_versions'];
+      final blockedVersions = <String>{};
+      if (blocked != null) {
+        if (blocked is! List) return null;
+        for (final entry in blocked) {
+          final normalized = normalizedVersion(entry);
+          if (normalized == null) return null;
+          blockedVersions.add(normalized);
+        }
+      }
+      return RolloutPolicy(version: version, percent: percent, blockedVersions: blockedVersions);
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+/// Staged-rollout cohort of this install: SHA-256 of the stable install
+/// UUID, mod 100. Deterministic across checks and uniformly distributed, so
+/// a rollout at N% reaches roughly N% of installs. The cohort never changes
+/// unless the stored UUID is wiped.
+int updateCohort(String installUuid) {
+  final digest = sha256.convert(utf8.encode(installUuid)).bytes;
+  // The first 8 digest bytes are an unsigned 64-bit number on the server
+  // side; Dart ints are signed, so reduce while folding instead of letting
+  // the top bit turn the value negative.
+  var cohort = 0;
+  for (var i = 0; i < 8; i++) {
+    cohort = (cohort * 256 + digest[i]) % 100;
+  }
+  return cohort;
 }
 
 class ReleaseAsset {
@@ -107,6 +184,39 @@ Future<void> verifyUpdateFile(File file, String manifest, String name) async {
   if (actual.toString() != expected) throw const UpdateFailure(UpdateError.checksum);
 }
 
+/// Marker written to settings after a Linux update's privileged helper
+/// reported success, right before the restart. After the restart the
+/// new build sees it and
+/// runs the post-update health check: the marker is cleared only when the
+/// core answers the control channel within 60 s; otherwise the install
+/// rolls back to [from].
+class PendingUpdate {
+  const PendingUpdate({required this.from, required this.to, required this.atMs});
+
+  final String from;
+  final String to;
+  final int atMs;
+
+  String encode() => jsonEncode({'from': from, 'to': to, 'atMs': atMs});
+
+  /// Strict parsing: anything unexpected yields null and the marker is
+  /// ignored: a half-understood marker must never trigger a downgrade.
+  static PendingUpdate? parse(String raw) {
+    try {
+      if (raw.isEmpty) return null;
+      final json = jsonDecode(raw);
+      if (json is! Map<String, dynamic>) return null;
+      final from = normalizedVersion(json['from']);
+      final to = normalizedVersion(json['to']);
+      final atMs = json['atMs'];
+      if (from == null || to == null || atMs is! int || atMs < 0) return null;
+      return PendingUpdate(from: from, to: to, atMs: atMs);
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
 enum PackageFormat { deb, rpm, arch }
 
 typedef UpdateProcess = Future<ProcessResult> Function(String executable, List<String> arguments);
@@ -125,7 +235,7 @@ class LinuxInstallation {
   List<String> installArguments(List<String> files) => switch (manager) {
     'apt-get' => ['install', '-y', ...files],
     'dnf' => ['install', '-y', ...files],
-    'zypper' => ['--non-interactive', 'install', '--allow-unsigned-rpm', ...files],
+    'zypper' => ['--non-interactive', 'install', ...files],
     'pacman' => ['-U', '--noconfirm', ...files],
     _ => throw const UpdateFailure(UpdateError.unsupported),
   };
@@ -190,10 +300,12 @@ class AppUpdater extends ChangeNotifier {
     String? executable,
     bool? windows,
     Future<bool> Function()? canElevate,
+    Directory Function(String fromVersion)? rollbackDir,
   }) : _client = client ?? (() => IOClient(HttpClient()..findProxy = HttpClient.findProxyFromEnvironment)),
        _run = run ?? ((exe, args) => Process.run(exe, args)),
        _executable = executable ?? Platform.resolvedExecutable,
        _windows = windows ?? Platform.isWindows,
+       _rollbackDirOverride = rollbackDir,
        _canElevate =
            canElevate ??
            (() async =>
@@ -209,6 +321,10 @@ class AppUpdater extends ChangeNotifier {
   final UpdateProcess _run;
   final String _executable;
   final bool _windows;
+
+  /// Test seam for the rollback cache location: production uses the
+  /// XDG cache dir, tests point it at a temp directory.
+  final Directory Function(String fromVersion)? _rollbackDirOverride;
   final Future<bool> Function() _canElevate;
   Timer? _timer;
   bool _disposed = false;
@@ -222,7 +338,45 @@ class AppUpdater extends ChangeNotifier {
   String? manualCommand;
   Directory? _work;
   final _clients = <http.Client>{};
-  bool get hasUpdate => !installed && latest != null && newerRelease(latest!.version, version);
+
+  /// Kill-switch / staged-rollout state from the policy feed,
+  /// recomputed on every successful release check:
+  /// - [versionRevoked]: the INSTALLED version is listed in the feed's
+  ///   blocked_versions: the UI shows a persistent, non-alarming warning.
+  /// - [rolloutPending]: a newer release exists but this install's cohort
+  ///   is not included in the staged rollout yet.
+  bool versionRevoked = false;
+  bool rolloutPending = false;
+  bool _updateWithheld = false;
+
+  /// Post-update health-check state. [_healthCheckArmed] while the
+  /// 60-second window after an update is open; [noteCoreHealthy] disarms it.
+  /// [rollbackBusy]/[rollbackTarget] while the automatic rollback runs.
+  static const healthCheckWindow = Duration(seconds: 60);
+  Timer? _healthTimer;
+  bool _healthCheckArmed = false;
+  bool Function()? _coreHealthy;
+  bool rollbackBusy = false;
+  String? rollbackTarget;
+
+  bool get hasUpdate =>
+      !installed && latest != null && newerRelease(latest!.version, version) && !_updateWithheld && !rolloutPending;
+
+  /// Visible phase of the update flow; idle when nothing is in flight.
+  UpdateStage stage = UpdateStage.idle;
+
+  Completer<void>? _abort;
+  bool _cancelled = false;
+
+  /// Cancels an in-flight update check or download. The install handoff
+  /// itself (package manager / setup launch) cannot be cancelled.
+  void cancel() {
+    if (_disposed) return;
+    _cancelled = true;
+    final abort = _abort;
+    if (abort != null && !abort.isCompleted) abort.complete();
+    notifyListeners();
+  }
 
   void start() {
     if (_started || _disposed) return;
@@ -244,9 +398,98 @@ class AppUpdater extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Applies the staged-rollout policy feed to [release], setting
+  /// [versionRevoked], [rolloutPending] and [_updateWithheld]. Decision
+  /// table (every branch is logged with the `[updates]` tag):
+  /// - feed unreachable (network error, 404, timeout) -> legacy behavior:
+  ///   the update is offered to everyone; a missing feed must not brick
+  ///   updates;
+  /// - feed fetched but malformed -> fail-closed: the update is NOT offered
+  ///   this round; a corrupt policy channel must not silently degrade to
+  ///   "offer to all" and bypass an intended kill-switch;
+  /// - feed parsed but naming another version -> ignored (fail-closed): the
+  ///   feed must not steer a release it does not name, so the update is NOT
+  ///   offered until the feed names it;
+  /// - feed parsed and version matches -> a candidate in blocked_versions
+  ///   is never offered (kill-switch); otherwise the update is offered iff
+  ///   this install's cohort is below rollout.percent.
+  /// The installed version being listed in blocked_versions sets
+  /// [versionRevoked] independently of the candidate decision.
+  Future<void> _applyRolloutPolicy(SoraRelease release) async {
+    versionRevoked = false;
+    rolloutPending = false;
+    _updateWithheld = false;
+    final List<int> body;
+    try {
+      body = await _fetch(Uri.parse(rolloutPolicyUrl), limit: 64 * 1024);
+    } catch (e) {
+      if (_cancelled) {
+        // The check was cancelled mid-fetch: withhold rather than fall
+        // back to legacy offer-all on a possibly-aborted fetch.
+        _updateWithheld = true;
+        return;
+      }
+      // Transport failure (DNS, TLS, 404, timeout): keep the legacy
+      // behavior so an unreachable policy host cannot brick updates.
+      debugPrint('[updates] rollout feed unreachable ($e); falling back to offering the update to everyone');
+      return;
+    }
+    // Decode failures are content failures, not transport failures: an
+    // undecodable body is malformed (fail-closed below), never "unreachable".
+    String text;
+    try {
+      text = utf8.decode(body);
+    } on FormatException {
+      text = '';
+    }
+    final policy = RolloutPolicy.parse(text);
+    if (policy == null) {
+      debugPrint('[updates] rollout feed is malformed; ignoring it (fail-closed: update withheld this round)');
+      _updateWithheld = true;
+      return;
+    }
+    if (policy.version != release.version) {
+      debugPrint(
+        '[updates] rollout policy targets ${policy.version} but the latest release is ${release.version}; '
+        'ignoring the policy (fail-closed: update withheld until the feed names this release)',
+      );
+      _updateWithheld = true;
+      return;
+    }
+    final installedVersion = normalizedVersion(version);
+    if (installedVersion != null && policy.blockedVersions.contains(installedVersion)) {
+      versionRevoked = true;
+      debugPrint('[updates] installed version $installedVersion is recalled by the rollout policy');
+    }
+    if (policy.blockedVersions.contains(release.version)) {
+      debugPrint(
+        '[updates] release ${release.version} is blocked by the rollout policy (kill-switch); not offering it',
+      );
+      _updateWithheld = true;
+      return;
+    }
+    final cohort = updateCohort(settings.installUuid);
+    if (cohort >= policy.percent) {
+      debugPrint(
+        '[updates] install cohort $cohort is not included in the ${policy.percent}% rollout '
+        'of ${release.version}; withholding the update for now',
+      );
+      // Surface the "pending" note only when a newer release actually exists:
+      // if this install is already on (or ahead of) the rolled-out version
+      // (e.g. the user updated while percent was 100 and the owner later
+      // lowered it), the note would falsely claim a newer version is on its
+      // way. hasUpdate stays false either way.
+      rolloutPending = newerRelease(release.version, version);
+      return;
+    }
+    debugPrint('[updates] install cohort $cohort is included in the ${policy.percent}% rollout of ${release.version}');
+  }
+
   Future<void> check({bool manual = false}) async {
     if (_disposed || checking || busy || (!manual && !settings.checkUpdates)) return;
     checking = true;
+    stage = UpdateStage.checking;
+    _cancelled = false;
     if (manual) error = null;
     notifyListeners();
     try {
@@ -258,24 +501,42 @@ class AppUpdater extends ChangeNotifier {
       if (_disposed || (!manual && !settings.checkUpdates)) return;
       latest = release;
       error = null;
+      await _applyRolloutPolicy(release);
       if (hasUpdate && settings.notifiedUpdate != release.version) {
         await settings.saveNotifiedUpdate(release.version);
         if (!_disposed) await available(release);
       }
     } catch (e) {
-      if (manual) error = e is UpdateFailure ? e.reason : UpdateError.network;
+      if (_cancelled) {
+        error = null;
+      } else if (manual) {
+        error = e is UpdateFailure ? e.reason : UpdateError.network;
+      }
     } finally {
       checking = false;
+      stage = UpdateStage.idle;
       if (!_disposed) notifyListeners();
     }
   }
 
-  Future<List<int>> _fetch(Uri uri, {required int limit, File? target, int? size}) async {
+  /// Fetches [uri] into memory or [target]. When [target] is given, [size]
+  /// drives the progress indicator: [progressBase] bytes were already
+  /// downloaded by earlier files of the same flow and [progressTotal] is the
+  /// sum of all their sizes, so the bar fills once across the whole download
+  /// instead of restarting for every file.
+  Future<List<int>> _fetch(
+    Uri uri, {
+    required int limit,
+    File? target,
+    int? size,
+    int progressBase = 0,
+    int? progressTotal,
+  }) async {
     final client = _client();
     _clients.add(client);
     IOSink? sink;
     final bytes = <int>[];
-    final abort = Completer<void>();
+    final abort = _abort = Completer<void>();
     final deadline = Timer(
       target == null ? const Duration(seconds: 20) : const Duration(minutes: 30),
       () => abort.complete(),
@@ -303,7 +564,8 @@ class AppUpdater extends ChangeNotifier {
           sink.add(chunk);
           // Flush each chunk to bound memory while fetching large core packages.
           await sink.flush();
-          final next = size == null ? null : received / size;
+          final total = progressTotal ?? size ?? 0;
+          final next = total <= 0 ? null : (progressBase + received).clamp(0, total) / total;
           if (next != null && (progress == null || (next * 100).floor() != (progress! * 100).floor())) {
             progress = next;
             notifyListeners();
@@ -320,6 +582,7 @@ class AppUpdater extends ChangeNotifier {
       deadline.cancel();
       client.close();
       _clients.remove(client);
+      if (identical(_abort, abort)) _abort = null;
       await sink?.close();
     }
   }
@@ -342,6 +605,8 @@ class AppUpdater extends ChangeNotifier {
     manualCommand = null;
     busy = true;
     progress = null;
+    stage = UpdateStage.checking;
+    _cancelled = false;
     notifyListeners();
     bool handedOff = false;
     try {
@@ -360,9 +625,27 @@ class AppUpdater extends ChangeNotifier {
         expectedHash(manifest, asset.name);
       }
       await File('${work.path}/SHA256SUMS').writeAsString(manifest, flush: true);
+      // Progress spans the whole download phase, so the bar fills once across
+      // all package files instead of restarting at zero for every file.
+      final totalSize = assets.fold<int>(0, (sum, asset) => sum + asset.size);
+      var downloaded = 0;
       for (final asset in assets) {
         final file = File('${work.path}/${asset.name}');
-        await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);
+        stage = UpdateStage.downloading;
+        notifyListeners();
+        await _fetch(
+          asset.url,
+          limit: asset.size,
+          target: file,
+          size: asset.size,
+          progressBase: downloaded,
+          progressTotal: totalSize,
+        );
+        downloaded += asset.size;
+        // Integrity check only: the file hash must match the manifest, which
+        // the TLS transport to GitHub authenticates. Releases are not signed
+        // yet, so the UI must not present this step as signature
+        // verification.
         await verifyUpdateFile(file, manifest, asset.name);
       }
       _guard();
@@ -371,6 +654,8 @@ class AppUpdater extends ChangeNotifier {
       if (_windows) {
         await settings.saveResumeAfterUpdate(connection() == UpdateConnection.connected);
         _guard();
+        stage = UpdateStage.installing;
+        notifyListeners();
         await launchWindows(File('${work.path}/${names.single}'));
         handedOff = true;
         await quit();
@@ -383,26 +668,52 @@ class AppUpdater extends ChangeNotifier {
         _guard();
         await settings.saveResumeAfterUpdate(connection() == UpdateConnection.connected);
         _guard();
+        // The rollback safety net is prepared BEFORE the handoff:
+        // verified copies of the currently installed packages, so a broken
+        // update can be reverted offline without trusting the new build.
+        // Fail-closed: without the cache the update does not proceed.
+        await _prepareRollbackCache(installation!);
+        _guard();
+        stage = UpdateStage.installing;
+        notifyListeners();
         final result = await _run('/usr/bin/pkexec', [
           updateHelper,
-          installation!.format.name,
+          installation.format.name,
           release.version,
           work.path,
         ]);
         if (result.exitCode != 0) {
+          // The handoff failed: nothing was installed, the marker must not
+          // survive to arm a health check for an update that never landed.
+          await settings.clearPendingUpdate();
           manualCommand = installation.manualCommand(paths);
           throw const UpdateFailure(UpdateError.installation);
         }
+        // The marker is written only AFTER the helper reported success,
+        // so atMs ≈ the moment the new build will start. Writing it before
+        // the handoff would stamp the pre-install time; on a slow machine the
+        // two packages can take minutes to install, and the new build would
+        // then see a "stale" marker and roll back a working install. Early
+        // exits (no elevation, failed download, failed handoff) never reach
+        // this line, so they never write a marker.
+        await settings.savePendingUpdate(
+          PendingUpdate(from: version, to: release.version, atMs: DateTime.now().millisecondsSinceEpoch).encode(),
+        );
         installed = true;
         await restartLinux();
         await quit();
       }
     } catch (e) {
-      error = e is UpdateFailure ? e.reason : UpdateError.installation;
+      error = _cancelled ? null : (e is UpdateFailure ? e.reason : UpdateError.installation);
     } finally {
       busy = false;
       progress = null;
+      stage = UpdateStage.idle;
       if (!handedOff && !installed) await settings.saveResumeAfterUpdate(false);
+      // The marker survives only when the helper confirmed the install:
+      // any earlier failure leaves the old build running, and a stale
+      // marker must never arm a health check for it.
+      if (!installed) await settings.clearPendingUpdate();
       // Keep verified files for the manual command or a launched Windows setup.
       if (!handedOff && manualCommand == null && _work != null) {
         await _work!.delete(recursive: true);
@@ -412,10 +723,236 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
+  /// Post-update health check. Call once at startup with desktop
+  /// restart/quit operations. When a [PendingUpdate] marker from an update
+  /// installed by this app is present and names the running build:
+  /// - core already answered this launch ([coreHealthy]) → the update is
+  ///   healthy; the marker is cleared immediately;
+  /// - otherwise a 60-second window opens: [noteCoreHealthy] (called when
+  ///   the core answers the control channel) clears the marker;
+  /// - if the window expires (or the marker is already stale because the
+  ///   app crashed before clearing it), the install rolls back to the
+  ///   pre-update version via the privileged helper with --allow-downgrade,
+  ///   using the verified rollback cache (fail-closed: no cache or a hash
+  ///   mismatch → no rollback, error + manual command instead).
+  /// A marker naming any other build, or a corrupt one, is cleared
+  /// silently: its premise is void and it must never trigger a downgrade.
+  /// No-op on Windows: the in-app path is blocked fail-closed there (A2),
+  /// so a marker can never exist.
+  Future<void> checkPendingUpdate({
+    required bool Function() coreHealthy,
+    required Future<void> Function() restart,
+    required Future<void> Function() quit,
+  }) async {
+    if (_disposed || _windows || _healthCheckArmed) return;
+    final marker = PendingUpdate.parse(settings.pendingUpdate);
+    if (marker == null) return;
+    if (marker.to != normalizedVersion(version)) {
+      debugPrint('[updates] pending-update marker targets ${marker.to} but this is $version; clearing it');
+      await settings.clearPendingUpdate();
+      return;
+    }
+    _coreHealthy = coreHealthy;
+    if (coreHealthy()) {
+      debugPrint('[updates] core already answered; post-update health check passed immediately');
+      await settings.clearPendingUpdate();
+      return;
+    }
+    final age = DateTime.now().millisecondsSinceEpoch - marker.atMs;
+    if (age >= healthCheckWindow.inMilliseconds) {
+      debugPrint('[updates] pending-update marker is stale (age ${age}ms); rolling back to ${marker.from}');
+      await _rollback(marker, restart: restart, quit: quit);
+      return;
+    }
+    _healthCheckArmed = true;
+    final remaining = healthCheckWindow - Duration(milliseconds: age.clamp(0, healthCheckWindow.inMilliseconds));
+    _healthTimer = Timer(remaining, () {
+      _healthCheckArmed = false;
+      _healthTimer = null;
+      debugPrint('[updates] post-update health check timed out; rolling back to ${marker.from}');
+      unawaited(_rollback(marker, restart: restart, quit: quit));
+    });
+    debugPrint('[updates] post-update health check armed for ${remaining.inMilliseconds}ms');
+  }
+
+  /// Called when the core answers the control channel (Sora.run, after the
+  /// getStatus/getAbout handshake). Clears a pending post-update marker:
+  /// the update is healthy. Idempotent; a no-op outside the health window.
+  Future<void> noteCoreHealthy() async {
+    if (!_healthCheckArmed) return;
+    _healthCheckArmed = false;
+    _healthTimer?.cancel();
+    _healthTimer = null;
+    debugPrint('[updates] core answered the control channel; post-update health check passed');
+    await settings.clearPendingUpdate();
+    if (!_disposed) notifyListeners();
+  }
+
+  /// Rolls back to [marker.from] using the verified rollback cache.
+  /// Fail-closed at every step: missing cache, hash mismatch, no elevation
+  /// or a failed helper run → no downgrade happens; the error and a manual
+  /// reinstall command stay visible in About instead.
+  Future<void> _rollback(
+    PendingUpdate marker, {
+    required Future<void> Function() restart,
+    required Future<void> Function() quit,
+  }) async {
+    if (_disposed || _windows || rollbackBusy) return;
+    // Final gate against races (e.g. the core answered between arming the
+    // timer and its expiry): never downgrade a healthy install.
+    final healthy = _coreHealthy;
+    if (healthy != null && healthy()) {
+      debugPrint('[updates] core answered before the rollback; clearing the marker instead');
+      await settings.clearPendingUpdate();
+      return;
+    }
+    rollbackBusy = true;
+    rollbackTarget = marker.from;
+    error = null;
+    manualCommand = null;
+    notifyListeners();
+    try {
+      final installation = await LinuxInstallation.detect(_run, _executable);
+      if (installation == null) throw const UpdateFailure(UpdateError.unsupported);
+      final dir = _rollbackDir(marker.from);
+      if (dir == null || !await dir.exists()) {
+        debugPrint('[updates] no rollback cache for ${marker.from}; cannot roll back');
+        throw const UpdateFailure(UpdateError.rollback);
+      }
+      // Re-verify against the cached manifest: the cache was hash-verified
+      // at download time, but it lived on user-writable disk since.
+      final manifestFile = File('${dir.path}/SHA256SUMS');
+      if (!await manifestFile.exists()) {
+        throw const UpdateFailure(UpdateError.rollback);
+      }
+      final manifest = await manifestFile.readAsString();
+      final names = installation.filenames(marker.from);
+      final paths = <String>[];
+      for (final name in names) {
+        final file = File('${dir.path}/$name');
+        if (!await file.exists()) throw const UpdateFailure(UpdateError.rollback);
+        try {
+          await verifyUpdateFile(file, manifest, name);
+        } on UpdateFailure {
+          debugPrint('[updates] rollback cache hash mismatch for $name; refusing to roll back');
+          throw const UpdateFailure(UpdateError.rollback);
+        }
+        paths.add(file.path);
+      }
+      debugPrint('[updates] rollback cache verified for ${marker.from}; invoking the privileged helper');
+      if (!await _canElevate()) {
+        manualCommand = installation.manualCommand(paths);
+        throw const UpdateFailure(UpdateError.rollback);
+      }
+      final result = await _run('/usr/bin/pkexec', [
+        updateHelper,
+        installation.format.name,
+        marker.from,
+        dir.path,
+        '--allow-downgrade',
+      ]);
+      if (result.exitCode != 0) {
+        manualCommand = installation.manualCommand(paths);
+        throw const UpdateFailure(UpdateError.rollback);
+      }
+      await settings.clearPendingUpdate();
+      await settings.saveLastRollback(marker.from, marker.to);
+      debugPrint('[updates] rolled back to ${marker.from}');
+      await restart();
+      await quit();
+    } catch (e) {
+      error = e is UpdateFailure ? e.reason : UpdateError.rollback;
+      // Fail-closed: never retry a failed rollback automatically (no pkexec
+      // prompt loop on every launch). The marker is cleared so a broken
+      // updater cannot keep downgrading; the error and the manual command
+      // stay visible in About.
+      await settings.clearPendingUpdate();
+      debugPrint('[updates] automatic rollback failed: $e');
+    } finally {
+      rollbackBusy = false;
+      rollbackTarget = null;
+      if (!_disposed) notifyListeners();
+    }
+  }
+
+  /// Persistent cache of the pre-update packages. Outside the temp
+  /// work dir: it must survive the restart the update performs.
+  Directory? _rollbackDir(String fromVersion) {
+    final override = _rollbackDirOverride;
+    if (override != null) return override(fromVersion);
+    final env = Platform.environment;
+    final base = env['XDG_CACHE_HOME'] ?? (env['HOME'] == null ? null : '${env['HOME']}/.cache');
+    if (base == null || base.isEmpty) return null;
+    return Directory('$base/sora/rollback/$fromVersion');
+  }
+
+  /// Downloads and hash-verifies the currently installed release's packages
+  /// into the rollback cache, so a broken update can be reverted offline.
+  /// Any failure (network, missing release assets, hash mismatch) aborts the
+  /// whole update (fail-closed): installing without a rollback path is not
+  /// an option once the safety net is promised.
+  Future<void> _prepareRollbackCache(LinuxInstallation installation) async {
+    // hasUpdate is false on dev builds (releaseVersion('dev') is null), so
+    // the from-version is always a real release here.
+    final from = releaseVersion(version)?.toString();
+    final dir = from == null ? null : _rollbackDir(from);
+    if (dir == null) throw const UpdateFailure(UpdateError.rollbackCache);
+    try {
+      final parent = dir.parent;
+      if (await parent.exists()) await parent.delete(recursive: true);
+      final bytes = await _fetch(
+        Uri.parse('https://api.github.com/repos/levvs-one/sora/releases/tags/v$from'),
+        limit: 2 * 1024 * 1024,
+      );
+      final previous = SoraRelease.parse(utf8.decode(bytes));
+      if (previous.version != from) throw const UpdateFailure(UpdateError.release);
+      final names = installation.filenames(previous.version);
+      final assets = [for (final name in names) previous.asset(name)];
+      final sums = previous.asset('SHA256SUMS');
+      await dir.create(recursive: true);
+      final manifest = utf8.decode(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
+      for (final asset in assets) {
+        expectedHash(manifest, asset.name);
+      }
+      await File('${dir.path}/SHA256SUMS').writeAsString(manifest, flush: true);
+      for (final asset in assets) {
+        final file = File('${dir.path}/${asset.name}');
+        await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);
+        await verifyUpdateFile(file, manifest, asset.name);
+      }
+      debugPrint('[updates] rollback cache ready for $from (${assets.length} packages, hashes verified)');
+    } on UpdateFailure catch (e) {
+      debugPrint('[updates] rollback cache failed (${e.reason}); aborting the update');
+      if (await dir.exists()) await dir.delete(recursive: true);
+      throw const UpdateFailure(UpdateError.rollbackCache);
+    }
+  }
+
+  /// The last automatic rollback notice, parsed from settings.
+  /// Survives the restart the rollback performs so About can report it.
+  ({String from, String to})? get lastRollback {
+    try {
+      final json = jsonDecode(settings.lastRollback);
+      if (json is! Map<String, dynamic>) return null;
+      final from = normalizedVersion(json['from']);
+      final to = normalizedVersion(json['to']);
+      if (from == null || to == null) return null;
+      return (from: from, to: to);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> dismissRollbackNotice() async {
+    await settings.clearLastRollback();
+    if (!_disposed) notifyListeners();
+  }
+
   @override
   void dispose() {
     _disposed = true;
     _timer?.cancel();
+    _healthTimer?.cancel();
     for (final client in _clients.toList()) {
       client.close();
     }

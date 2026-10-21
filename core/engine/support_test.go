@@ -133,7 +133,7 @@ func TestAProfileHidesItsCredentials(t *testing.T) {
 	}
 }
 
-// TestRedactorMasksRealityAndModernSchemes locks SORA-L9: REALITY
+// TestRedactorMasksRealityAndModernSchemes: REALITY
 // parameters registered via Identifiers, key=value pairs, and userinfo in
 // hysteria2/tuic/wireguard URLs must all be masked.
 func TestRedactorMasksRealityAndModernSchemes(t *testing.T) {

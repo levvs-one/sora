@@ -25,9 +25,6 @@ class SPl extends S {
   String get stateDisconnecting => 'Rozłączanie';
 
   @override
-  String get stateFailed => 'Nie podłączony';
-
-  @override
   String get coreMissing => 'Usługa Sora nie odpowiada';
 
   @override
@@ -135,6 +132,9 @@ class SPl extends S {
   String get logsEmpty => 'Nic tutaj';
 
   @override
+  String get connEmpty => 'Brak połączeń';
+
+  @override
   String appVersion(String version) {
     return 'Wersja $version';
   }
@@ -164,6 +164,16 @@ class SPl extends S {
   @override
   String milliseconds(int n) {
     return '$n ms';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Mbps';
   }
 
   @override
@@ -255,9 +265,6 @@ class SPl extends S {
   String get errNoServers => 'Dodaj subskrypcję, aby się połączyć';
 
   @override
-  String get exportText => 'Tekst';
-
-  @override
   String get connections => 'Znajomości';
 
   @override
@@ -273,7 +280,7 @@ class SPl extends S {
   String get theme => 'Temat';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Jak w systemie';
 
   @override
   String get themeLight => 'Światło';
@@ -285,7 +292,7 @@ class SPl extends S {
   String get language => 'Język';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Jak w systemie';
 
   @override
   String get sectionConnection => 'Połączenie';
@@ -496,17 +503,6 @@ class SPl extends S {
   String get ruleInvalid => 'To nie wygląda na witrynę, adres IP ani program';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Z kolei serwery #',
-      one: 'Z kolei serwer #',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -521,9 +517,6 @@ class SPl extends S {
   String get tunnelMode => 'Tryb';
 
   @override
-  String get tunnelTun => 'Cały ruch';
-
-  @override
   String get tunnelProxy => 'Serwer proxy System';
 
   @override
@@ -534,6 +527,10 @@ class SPl extends S {
 
   @override
   String get launchAtLogin => 'Zacznij od systemu';
+
+  @override
+  String get launchAtLoginDetail =>
+      'Sora będzie automatycznie uruchamiana przy logowaniu i pozostanie w zasobniku systemowym.';
 
   @override
   String get closeToTray => 'Przechowywać na tacy po zamknięciu';
@@ -634,28 +631,6 @@ class SPl extends S {
   String get less => 'Mniej';
 
   @override
-  String get currentServer => 'Obecny serwer';
-
-  @override
-  String get trafficDown => 'Pobrano';
-
-  @override
-  String get trafficUp => 'Załadowany';
-
-  @override
-  String perSecond(String value) {
-    return '$value/s';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Aktywne reguły: $count';
-  }
-
-  @override
-  String get recentNotifications => 'Najnowsze powiadomienia';
-
-  @override
   String get notificationsEmpty => 'Tutaj pojawią się zdarzenia połączenia i subskrypcji';
 
   @override
@@ -709,22 +684,13 @@ class SPl extends S {
   String get runningProcesses => 'Uruchomione procesy';
 
   @override
-  String get programsFailed => 'Nie można załadować aplikacji';
-
-  @override
   String get programsEmpty => 'Nie znaleziono żadnych aplikacji. Spróbuj innej nazwy.';
 
   @override
   String get selectExe => 'Wybierz plik .exe';
 
   @override
-  String get trafficUnavailable => 'Liczniki nie są jeszcze dostępne';
-
-  @override
   String get speedtest => 'Prędkość';
-
-  @override
-  String get speedtestCheck => 'Sprawdź prędkość';
 
   @override
   String get speedtestSearch => 'Znajdź usługę';
@@ -820,6 +786,38 @@ class SPl extends S {
       'Uruchom to polecenie w terminalu, aby zainstalować oba zweryfikowane pakiety, a następnie otwórz ponownie Sora. Pliki pozostają w katalogu pobierania. Połączenie VPN zostanie zerwane.';
 
   @override
+  String get updateSignaturePending =>
+      'Pliki aktualizacji są porównywane z sumami kontrolnymi opublikowanymi z wydaniem.';
+
+  @override
+  String get updateManualSigWarning =>
+      'Pliki poniżej zgadzają się z sumami kontrolnymi wydania. Uruchom polecenie, jeśli pobrano je z oficjalnego wydania.';
+
+  @override
+  String get updateVersionRevoked => 'Deweloper wycofał tę wersję. Proszę poczekać na poprawioną wersję.';
+
+  @override
+  String get updateRolloutPending => 'Nowsza wersja jest wprowadzana stopniowo i będzie oferowana automatycznie.';
+
+  @override
+  String updateRollbacking(String version) {
+    return 'Wycofywanie do wersji $version...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return 'Aktualizacja $version nie przeszła kontroli stanu, więc Sora została przywrócona do $fromVersion.';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'Automatyczne przywracanie nie powiodło się. Jeśli nowa wersja nie działa, zainstaluj ponownie ręcznie poprzednią wersję.';
+
+  @override
+  String get updateRollbackCacheError =>
+      'Nie można przygotować zweryfikowanej kopii przywracającej bieżącej wersji, więc aktualizacja nie została zainstalowana.';
+
+  @override
   String get updateCopyCommand => 'Kopiuj polecenie';
 
   @override
@@ -844,9 +842,6 @@ class SPl extends S {
   String get componentLicenses => 'Licencje na komponenty';
 
   @override
-  String get appCopyright => '© 2026 levvs-one i współautorzy';
-
-  @override
   String get collapseServers => 'Zwiń serwery';
 
   @override
@@ -863,10 +858,6 @@ class SPl extends S {
 
   @override
   String get reconnectNow => 'Zastosuj i połącz ponownie';
-
-  @override
-  String get bypassLimitations =>
-      'Ten tryb omija DPI tylko dla HTTP i TLS, nie obsługuje UDP ani nie zmienia adresu IP. Użyj serwera VPN dla głosu, połączeń i zablokowanych adresów Telegram Discord.';
 
   @override
   String get errEngineUnsupported =>
@@ -893,7 +884,7 @@ class SPl extends S {
 
   @override
   String get modesGuide =>
-      'Wybierz opcję Auto, jeśli nie masz pewności, jakiego silnika potrzebuje Twój serwer. Sora sprawdza profil i ustawienia przed połączeniem. Silnik nie może zwiększyć przepustowości Twojego planu: wydajność zależy od serwera, trasy, protokołu i sieci.\n\n## Tryby\n\n### Cały ruch (TUN)\n\nSora tworzy wirtualny interfejs sieciowy i kieruje przez niego ruch aplikacji, w tym TCP i UDP. Użyj tego trybu dla Telegram, gier i głosu Discord. Reguły mogą bezpośrednio wysyłać określone witryny lub programy lub je blokować. Usługa sieciowa wymaga pozwolenia i serwera obsługującego wymagany protokół.\n\n### Serwer proxy System\n\nSora konfiguruje lokalny serwer proxy HTTP/SOCKS. Używają go aplikacje, które respektują systemowe ustawienia proxy. Aplikacje posiadające własny stos sieciowy mogą łączyć się bezpośrednio; Połączenia UDP i głosowe zazwyczaj wymagają TUN. Ten tryb jest odpowiedni dla przeglądarek i aplikacji obsługujących proxy.\n\n### Brak serwera\n\nW przypadku Linux Sora używa [zapret](https://github.com/bol-van/zapret) do dzielenia i przekształcania żądań HTTP/TLS oraz omijania niektórych kontroli DPI. Twój adres IP pozostaje taki sam, a połączenia przechodzą bezpośrednio na stronę internetową. Wyniki zależą od dostawcy i metody blokowania.\n\nObecna integracja wykorzystuje tpws dla HTTP i TLS przez TCP. Nie omija blokowania IP ani przekazywania UDP i nie może zagwarantować połączeń MTProto Telegram. Użyj serwera VPN z TUN dla głosu Discord, połączeń Telegram i tego rodzaju ograniczeń.\n\n## Silniki\n\n### Automatycznie\n\nSora wybiera zainstalowany silnik, który obsługuje cały plan połączeń: protokoły serwera, transporty, grupy, fragmentację i tryb. Niezgodny wybór ręczny zostanie odrzucony przed zatrzymaniem bieżącego połączenia. Wybierz Auto lub inny silnik i ponownie zastosuj ustawienia.\n\n### sing-box\n\nNowe pakiety Sora obejmują [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), rozwidlenie [sing-box](https://github.com/SagerNet/sing-box), dodanie XHTTP i VLESS Encryption po stronie klienta. Sora rozpoznaje konstrukcję i jej możliwości. Wersja wcześniejsza bez XHTTP nie zyskuje tej możliwości dzięki samej nazwie.\n\nObsługiwane protokoły obejmują parametry VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard i AmneziaWG 1.x/2.x Sora może importować. Pełne profile JSON Xray wymagają Xray. Nie można jeszcze importować nowych pól AWG 3.x. sing-box wykorzystuje chroniony hasłem port sterowania lokalnego, który mogą wykryć inne aplikacje na komputerze.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) obsługuje fragmentację VLESS, REALITY, XHTTP, VLESS Encryption i TLS. Obsługuje również kompletne profile dostawców Xray, zachowując jednocześnie ich routing i grupy. Takich profili nie można automatycznie przekonwertować na inny silnik bez zmiany ich zachowania.\n\nW zestawie Xray usunięto ustawienie wyłączające weryfikację certyfikatu TLS („allowInsecure”). Automatycznie wybiera sing-box lub mihomo dla zwykłych serwerów wymagających tego ustawienia. Wybranie Xray powoduje ręczne zgłoszenie niezgodności przed zatrzymaniem bieżącego połączenia. Starsze pełne profile JSON wymagają zaktualizowanego profilu dostawcy z weryfikowalnym certyfikatem lub kodem PIN certyfikatu.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) obsługuje uporządkowane grupy awaryjne i równoważące obciążenie, XHTTP i AmneziaWG. Wybierz tę opcję, gdy liczy się automatyczne przełączanie awaryjne na serwer zapasowy. Ustawienie fragmentacji TLS w Sora jest niedostępne w tym silniku.\n\n## Zgodność z Sora\n\n| Funkcja | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN i TCP/UDP | Tak | Tak | Tak |\n| XHTTP | Tak | Tak | Tak |\n| VLESS Encryption | Tak | Tak | Tak |\n| Pełny profil Xray | Nie | Tak | Nie |\n| TUIC / AnyTLS | Obydwa | Nie | TUIC |\n| Fragmentacja TLS | Tak | Tak | Nie |\n| AmneziaWG 1.x/2.x | Tak¹ | Nie | Tak |\n| Zamówiona grupa rezerwowa | Nie | Nie² | Tak |\n\n¹ Profile z J1/J2/J3/Itime wykorzystują mihomo; tych pól nie można nigdy po cichu odrzucić. ² Dla grupy kompletnych profili Xray aplikacja wybiera profil zapasowy. Wsparcie zależy od zainstalowanej kompilacji; sprawdź jego wersję w About.\n\n## Stos TUN\n\nStos obsługuje protokoły TCP i UDP wewnątrz interfejsu wirtualnego. W panelu trybów Xray i mihomo oferują gVisor, System, Mixed i MIPS. Każdy silnik zapisuje swoje własne preferencje. Tryby proxy i bezserwerowe System nie korzystają z tej preferencji.\n\n- **Mixed** — TCP korzysta ze stosu systemowego, natomiast gVisor obsługuje UDP. Jest to domyślne ustawienie mihomo w systemie Linux. W systemie Windows Xray i mihomo domyślnie używają MIPS.\n- **System** — używa stosu systemowego. Wypróbuj inną opcję, jeśli aplikacje sieciowe napotykają problemy.\n- **gVisor** — obsługuje ruch w przestrzeni użytkownika.\n- **MIPS** — własny stos IP mihomo, dostępny w dołączonej wersji 1.19.32.\n\nW Linux Xray domyślnie używa wbudowanego gVisor. System, Mixed i MIPS w Linux używają mihomo jako silnika TUN, przekazując TCP i UDP do Xray przez uwierzytelnione lokalne łącze SOCKS. Xray zachowuje protokół, profil dostawcy i routing. Te trzy opcje wymagają zainstalowanego mihomo. W przypadku Windows Xray używa mihomo 1.19.32 lub nowszego dla wszystkich czterech stosów TUN. Protokoły i routing pozostają w Xray. Reguły aplikacji w tym połączeniu obsługują tylko połączenia bezpośrednie i blokowanie; w Linux wymagają wbudowanego gVisor Xray.\n\nMost uruchamia drugi proces. W trzech pomiarach bezczynności Linux zużywał on około 32–36 MiB więcej pamięci fizycznej niż natywny Xray TUN. Nie mierzy to obciążenia pobierania: koszty procesora i pamięci zależą od połączeń. sing-box nie ma selektora stosu. Brak stosu gwarantuje lepszą wydajność w każdej sieci. Wybierz stos, a następnie wybierz Zastosuj i połącz ponownie, aby wypróbować go w swojej sieci.\n\n## Stosowanie ustawień\n\nWybranie serwera powoduje automatyczne ponowne połączenie. Ustawienia trybu, silnika, DNS i reguł są zapisywane natychmiast; podczas aktywnego połączenia kliknij Zastosuj i połącz się ponownie, aby z nich skorzystać. Ponowne uruchomienie silnika może przerwać pobieranie i połączenia. Powtarzające się kliknięcia nie uruchamiają połączeń równoległych; rozłączenie kończy przejście i zwalnia połączenie.\n\nInternet tylko przez VPN blokuje bezpośredni ruch w przypadku opadnięcia tunelu. Ma to wpływ na całą maszynę. Wyraźne rozłączenie usuwa reguły Sora. Jeśli czyszczenie nie zakończy się, spróbuj ponownie rozłączyć się i otwórz dziennik.\n\n## Dokumentacja projektu\n\n- [sing-box-lx: konfiguracja i wsparcie](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Dokumentacja sing-box](https://sing-box.sagernet.org/)\n- [Dokumentacja Xray](https://xtls.github.io/)\n- [Dokumentacja mihomo](https://wiki.metacubex.one/)\n- [zapret: działanie i ograniczenia](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Wybierz opcję Auto, jeśli nie masz pewności, jakiego silnika potrzebuje Twój serwer. Sora sprawdza profil i ustawienia przed połączeniem. Silnik nie może zwiększyć przepustowości Twojego planu: wydajność zależy od serwera, trasy, protokołu i sieci.\n\n## Tryby\n\n### Cały ruch (TUN)\n\nSora tworzy wirtualny interfejs sieciowy i kieruje przez niego ruch aplikacji, w tym TCP i UDP. Użyj tego trybu dla Telegram, gier i głosu Discord. Reguły mogą bezpośrednio wysyłać określone witryny lub programy lub je blokować. Usługa sieciowa wymaga pozwolenia i serwera obsługującego wymagany protokół.\n\n### Serwer proxy System\n\nSora konfiguruje lokalny serwer proxy HTTP/SOCKS. Używają go aplikacje, które respektują systemowe ustawienia proxy. Aplikacje posiadające własny stos sieciowy mogą łączyć się bezpośrednio; Połączenia UDP i głosowe zazwyczaj wymagają TUN. Ten tryb jest odpowiedni dla przeglądarek i aplikacji obsługujących proxy.\n\n### Brak serwera\n\nW przypadku Linux Sora używa [zapret](https://github.com/bol-van/zapret) do dzielenia i przekształcania żądań HTTP/TLS oraz omijania niektórych kontroli DPI. Twój adres IP pozostaje taki sam, a połączenia przechodzą bezpośrednio na stronę internetową. Wyniki zależą od dostawcy i metody blokowania.\n\nObecna integracja wykorzystuje tpws dla HTTP i TLS przez TCP. Nie omija blokowania IP ani przekazywania UDP i nie może zagwarantować połączeń MTProto Telegram. Użyj serwera VPN z TUN dla głosu Discord, połączeń Telegram i tego rodzaju ograniczeń.\n\n## Silniki\n\n### Automatycznie\n\nSora wybiera zainstalowany silnik, który obsługuje cały plan połączeń: protokoły serwera, transporty, grupy, fragmentację i tryb. Niezgodny wybór ręczny zostanie odrzucony przed zatrzymaniem bieżącego połączenia. Wybierz Auto lub inny silnik i ponownie zastosuj ustawienia.\n\n### sing-box\n\nNowe pakiety Sora obejmują [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), rozwidlenie [sing-box](https://github.com/SagerNet/sing-box), dodanie XHTTP i VLESS Encryption po stronie klienta. Sora rozpoznaje konstrukcję i jej możliwości. Wersja wcześniejsza bez XHTTP nie zyskuje tej możliwości dzięki samej nazwie.\n\nObsługiwane protokoły obejmują parametry VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard i AmneziaWG 1.x/2.x Sora może importować. Pełne profile JSON Xray wymagają Xray. Nie można jeszcze importować nowych pól AWG 3.x. sing-box wykorzystuje chroniony hasłem port sterowania lokalnego, który mogą wykryć inne aplikacje na komputerze.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) obsługuje fragmentację VLESS, REALITY, XHTTP, VLESS Encryption i TLS. Obsługuje również kompletne profile dostawców Xray, zachowując jednocześnie ich routing i grupy. Takich profili nie można automatycznie przekonwertować na inny silnik bez zmiany ich zachowania.\n\nW zestawie Xray usunięto ustawienie wyłączające weryfikację certyfikatu TLS („allowInsecure”). Automatycznie wybiera sing-box lub mihomo dla zwykłych serwerów wymagających tego ustawienia. Wybranie Xray powoduje ręczne zgłoszenie niezgodności przed zatrzymaniem bieżącego połączenia. Starsze pełne profile JSON wymagają zaktualizowanego profilu dostawcy z weryfikowalnym certyfikatem lub kodem PIN certyfikatu.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) obsługuje uporządkowane grupy awaryjne i równoważące obciążenie, XHTTP i AmneziaWG. Wybierz tę opcję, gdy liczy się automatyczne przełączanie awaryjne na serwer zapasowy. Ustawienie fragmentacji TLS w Sora jest niedostępne w tym silniku.\n\n## Zgodność z Sora\n\n| Funkcja | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN i TCP/UDP | Tak | Tak | Tak |\n| XHTTP | Tak | Tak | Tak |\n| VLESS Encryption | Tak | Tak | Tak |\n| Pełny profil Xray | Nie | Tak | Nie |\n| TUIC / AnyTLS | Obydwa | Nie | TUIC |\n| Fragmentacja TLS | Tak | Tak | Nie |\n| AmneziaWG 1.x/2.x | Tak¹ | Nie | Tak |\n| Zamówiona grupa rezerwowa | Nie | Nie² | Tak |\n\n¹ Profile z J1/J2/J3/Itime wykorzystują mihomo; tych pól nie można nigdy po cichu odrzucić. ² Dla grupy kompletnych profili Xray aplikacja wybiera profil zapasowy. Wsparcie zależy od zainstalowanej kompilacji; sprawdź jego wersję w About.\n\n## Stos TUN\n\nStos obsługuje protokoły TCP i UDP wewnątrz interfejsu wirtualnego. W panelu trybów Xray i mihomo oferują gVisor, System, Mixed i MIPS. Każdy silnik zapisuje swoje własne preferencje. Tryby proxy i bezserwerowe System nie korzystają z tej preferencji.\n\n- **Mixed**: TCP korzysta ze stosu systemowego, natomiast gVisor obsługuje UDP. Jest to domyślne ustawienie mihomo w systemie Linux. W systemie Windows Xray i mihomo domyślnie używają MIPS.\n- **System**: używa stosu systemowego. Wypróbuj inną opcję, jeśli aplikacje sieciowe napotykają problemy.\n- **gVisor**: obsługuje ruch w przestrzeni użytkownika.\n- **MIPS**: własny stos IP mihomo, dostępny w dołączonej wersji 1.19.32.\n\nW Linux Xray domyślnie używa wbudowanego gVisor. System, Mixed i MIPS w Linux używają mihomo jako silnika TUN, przekazując TCP i UDP do Xray przez uwierzytelnione lokalne łącze SOCKS. Xray zachowuje protokół, profil dostawcy i routing. Te trzy opcje wymagają zainstalowanego mihomo. W przypadku Windows Xray używa mihomo 1.19.32 lub nowszego dla wszystkich czterech stosów TUN. Protokoły i routing pozostają w Xray. Reguły aplikacji w tym połączeniu obsługują tylko połączenia bezpośrednie i blokowanie; w Linux wymagają wbudowanego gVisor Xray.\n\nMost uruchamia drugi proces. W trzech pomiarach bezczynności Linux zużywał on około 32–36 MiB więcej pamięci fizycznej niż natywny Xray TUN. Nie mierzy to obciążenia pobierania: koszty procesora i pamięci zależą od połączeń. sing-box nie ma selektora stosu. Brak stosu gwarantuje lepszą wydajność w każdej sieci. Wybierz stos, a następnie wybierz Zastosuj i połącz ponownie, aby wypróbować go w swojej sieci.\n\n## Stosowanie ustawień\n\nWybranie serwera powoduje automatyczne ponowne połączenie. Ustawienia trybu, silnika, DNS i reguł są zapisywane natychmiast; podczas aktywnego połączenia kliknij Zastosuj i połącz się ponownie, aby z nich skorzystać. Ponowne uruchomienie silnika może przerwać pobieranie i połączenia. Powtarzające się kliknięcia nie uruchamiają połączeń równoległych; rozłączenie kończy przejście i zwalnia połączenie.\n\nInternet tylko przez VPN blokuje bezpośredni ruch w przypadku opadnięcia tunelu. Ma to wpływ na całą maszynę. Wyraźne rozłączenie usuwa reguły Sora. Jeśli czyszczenie nie zakończy się, spróbuj ponownie rozłączyć się i otwórz dziennik.\n\n## Dokumentacja projektu\n\n- [sing-box-lx: konfiguracja i wsparcie](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Dokumentacja sing-box](https://sing-box.sagernet.org/)\n- [Dokumentacja Xray](https://xtls.github.io/)\n- [Dokumentacja mihomo](https://wiki.metacubex.one/)\n- [zapret: działanie i ograniczenia](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'Sprawdź serwery';
@@ -902,7 +893,453 @@ class SPl extends S {
   String get extensions => 'Rozszerzenia';
 
   @override
-  String get extensionsSoon => 'Już wkrótce';
+  String extRatingLabel(String rating) {
+    return 'Ocena $rating z 5';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return 'autor: $author';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'Instalacje: $count';
+  }
+
+  @override
+  String get extInstallOne => '1 instalacja';
+
+  @override
+  String get extBadgeVerified => 'Zweryfikowano';
+
+  @override
+  String get extBadgeTop => 'Najpopularniejsze w tym tygodniu';
+
+  @override
+  String get extBadgeNew => 'Nowość';
+
+  @override
+  String get extBadgeStaff => 'Zespół Sora';
+
+  @override
+  String get extSideloadShort => 'Nie z katalogu';
+
+  @override
+  String get extSideloadWarning =>
+      'To rozszerzenie nie pochodzi z katalogu zespołu. Tylko autor poręczył za swój klucz: zainstaluj go tylko wtedy, gdy ufasz autorowi.';
+
+  @override
+  String extInstallTitle(String name) {
+    return 'Zainstaluj „$name”';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return 'Aktualizuj „$name”';
+  }
+
+  @override
+  String get extPermissionsIntro => 'To rozszerzenie będzie mogło:';
+
+  @override
+  String get extPermissionsWidened => 'Aktualizacja prosi o nowe uprawnienia:';
+
+  @override
+  String get extDangerousAck => 'Rozumiem, że te uprawnienia są poważne';
+
+  @override
+  String get extInstall => 'Zainstaluj';
+
+  @override
+  String get extUpdate => 'Aktualizuj';
+
+  @override
+  String get extCancel => 'Anuluj';
+
+  @override
+  String get extConfirm => 'Potwierdź';
+
+  @override
+  String get extOk => 'OK';
+
+  @override
+  String get extCatalog => 'Katalog';
+
+  @override
+  String get extInstalled => 'Zainstalowane rozszerzenia';
+
+  @override
+  String get extSearchHint => 'Szukaj rozszerzeń';
+
+  @override
+  String get extCatAll => 'Wszystko';
+
+  @override
+  String get extCatTools => 'Narzędzia';
+
+  @override
+  String get extCatThemes => 'Motywy';
+
+  @override
+  String get extCatAutomation => 'Automatyzacja';
+
+  @override
+  String get extCatStats => 'Statystyki';
+
+  @override
+  String get extCatNetwork => 'Sieć';
+
+  @override
+  String get extSortBy => 'Sortuj według';
+
+  @override
+  String get extSortPopular => 'Najpopularniejszy';
+
+  @override
+  String get extSortRating => 'Najwyżej oceniane';
+
+  @override
+  String get extSortName => 'Imię';
+
+  @override
+  String get extCatalogError => 'Nie można załadować katalogu';
+
+  @override
+  String get extRetry => 'Spróbuj ponownie';
+
+  @override
+  String get extEmptySearch => 'Nic nie znaleziono';
+
+  @override
+  String get extEmptyInstalled =>
+      'Nie zainstalowano jeszcze żadnych rozszerzeń.\nZnajdź taki w katalogu lub zainstaluj z pliku.';
+
+  @override
+  String get extInstallFromFile => 'Zainstaluj z pliku';
+
+  @override
+  String get extInstallFromUrl => 'Zainstaluj z URL';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'Pobierz';
+
+  @override
+  String get extDownloading => 'Pobieranie…';
+
+  @override
+  String get extVerifying => 'Sprawdzam…';
+
+  @override
+  String get extInstalling => 'Instalowanie…';
+
+  @override
+  String get extInstallFailed => 'Instalacja nie powiodła się';
+
+  @override
+  String get extErrSignature => 'Sprawdzanie podpisu nie powiodło się. Plik może zostać uszkodzony lub naruszony.';
+
+  @override
+  String get extErrManifest => 'Manifest rozszerzenia jest nieprawidłowy.';
+
+  @override
+  String get extErrNetwork => 'Błąd sieci. Sprawdź połączenie i spróbuj ponownie.';
+
+  @override
+  String get extErrHash => 'Pobrany plik nie jest zgodny z katalogiem. Być może zostało to zmanipulowane.';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'To rozszerzenie wymaga aplikacji w wersji $version lub nowszej.';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'Dozwolone są tylko linki https://';
+
+  @override
+  String get extErrGeneric => 'Coś poszło nie tak. Spróbuj ponownie.';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'Ta aktualizacja jest podpisana innym kluczem autora niż wersja zainstalowana, więc została zablokowana. Jeśli ufasz nowemu kluczowi, odinstaluj rozszerzenie i zainstaluj je ponownie.';
+
+  @override
+  String get extUpdateAvailable => 'Dostępna aktualizacja';
+
+  @override
+  String get extDisabled => 'Wyłączone';
+
+  @override
+  String extToggleEnabled(String name) {
+    return 'Włącz $name';
+  }
+
+  @override
+  String get extSearchInstalled => 'Szukaj w zainstalowanych rozszerzeniach';
+
+  @override
+  String get extUpdateAll => 'Zaktualizuj wszystko';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return '$count dostępne aktualizacje';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return '$count zaktualizowano';
+  }
+
+  @override
+  String get extRiskNormal => 'Normalny';
+
+  @override
+  String get extRiskSensitive => 'Wrażliwe';
+
+  @override
+  String get extRiskDangerous => 'Wysokie ryzyko';
+
+  @override
+  String get extPermissionsRemoved => 'Nie jest już wymagane:';
+
+  @override
+  String get extUpdateFailedKept => 'Poprzednia wersja jest nadal zainstalowana.';
+
+  @override
+  String get extConflictsTitle => 'Konflikty rozszerzeń';
+
+  @override
+  String get extConflictsIntro =>
+      'Te rozszerzenia chcą tego samego. Wybierz, które ma działać; drugie zostanie zainstalowane.';
+
+  @override
+  String get extConflictTheme => 'Motyw aplikacji';
+
+  @override
+  String get extConflictNetHooks => 'Haki sieciowe';
+
+  @override
+  String extConflictWinner(String name) {
+    return '$name wygrywa';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return '$count konflikty wymagają Twojej decyzji';
+  }
+
+  @override
+  String get extConflictsResolve => 'Rozwiązuj konflikty';
+
+  @override
+  String get extConflictNote =>
+      'Twój wybór jest zapisywany na tym urządzeniu. Motyw zmienia się od razu, a hooki sieciowe nie są uruchamiane w tej wersji.';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'Wersja $version';
+  }
+
+  @override
+  String get extAuthor => 'Autor';
+
+  @override
+  String get extRating => 'Ocena';
+
+  @override
+  String get extInstalls => 'Instalacje';
+
+  @override
+  String get extVersion => 'Wersja';
+
+  @override
+  String get extAbout => 'Informacje o tym rozszerzeniu';
+
+  @override
+  String get extPermissionsTitle => 'Uprawnienia';
+
+  @override
+  String get extNoPermissions => 'Brak specjalnych uprawnień.';
+
+  @override
+  String get extSettings => 'Ustawienia';
+
+  @override
+  String get extSaveSettings => 'Zapisz ustawienia';
+
+  @override
+  String get extSaving => 'Zapisywanie…';
+
+  @override
+  String extUpdateTo(String version) {
+    return 'Aktualizacja do $version';
+  }
+
+  @override
+  String get extEnabled => 'Włączone';
+
+  @override
+  String extRollbackTo(String version) {
+    return 'Przywróć do $version';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return 'Przywrócić wersję $version?';
+  }
+
+  @override
+  String get extUninstall => 'Odinstaluj';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return 'Usunąć „$name” i jego ustawienia?';
+  }
+
+  @override
+  String get extPanelUnavailable => 'Panel jest niedostępny. Rozszerzenie mogło zostać wyłączone lub usunięte.';
+
+  @override
+  String get extPermConnectionsRead => 'Zobacz listę aktywnych połączeń';
+
+  @override
+  String get extPermServersRead => 'Zobacz listę swoich serwerów';
+
+  @override
+  String get extPermSettingsRead => 'Przeczytaj ustawienia aplikacji';
+
+  @override
+  String get extPermSettingsWrite => 'Zmień ustawienia aplikacji';
+
+  @override
+  String get extPermNotifications => 'Pokaż powiadomienia';
+
+  @override
+  String get extPermTray => 'Dodaj elementy do menu zasobnika';
+
+  @override
+  String get extPermUiPanel => 'Pokaż panele w aplikacji';
+
+  @override
+  String get extPermThemeApply => 'Zastosuj motywy';
+
+  @override
+  String get extPermRoutingRules => 'Dodaj reguły routingu (wpływa na to, dokąd idzie ruch sieciowy)';
+
+  @override
+  String get extPermNetHooks => 'Integracja ze ścieżką sieciową (DPI moduły obejściowe)';
+
+  @override
+  String get extPermNetFetch => 'Żądanie URL z listy dozwolonych';
+
+  @override
+  String get extPermBackground => 'Uruchom zadania w tle';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'Uruchamia zaplanowane zadania nawet wtedy, gdy panel jest zamknięty. Możesz je wstrzymać lub zmienić częstotliwość jego uruchamiania w ustawieniach rozszerzenia.';
+
+  @override
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+
+  @override
+  String get extCapBackground => 'Działa w tle';
+
+  @override
+  String get extCapNetHook => 'Obchodzenie blokad i haki sieciowe';
+
+  @override
+  String get extCapPanel => 'Panele interfejsu';
+
+  @override
+  String get extCapRouting => 'Reguły routingu';
+
+  @override
+  String get extCapTheme => 'Motywy';
+
+  @override
+  String get extCapWidget => 'Widżety';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Cached catalog, $date';
+  }
+
+  @override
+  String get extChangelog => 'Dziennik zmian';
+
+  @override
+  String get extImageFailed => 'Nie można załadować obrazu';
+
+  @override
+  String get extRatingHow => 'Jak działają oceny';
+
+  @override
+  String get extRatingHowBody =>
+      'Oceny opierają się na średniej Bayesa: rozszerzenie z kilkoma ocenami pozostaje w pobliżu środka, dopóki więcej osób nie zagłosuje, więc pojedyncza 5-gwiazdkowa recenzja nie może wysunąć nowego rozszerzenia na sam szczyt. Najnowsze oceny mają większą wagę niż stare i liczy się tylko jedna ocena na konto.';
+
+  @override
+  String get extScreenshots => 'Zrzuty ekranu';
+
+  @override
+  String get extSortRelevance => 'Trafność';
+
+  @override
+  String get extPermNetworkDetail =>
+      'Pobiera dane z internetu przez VPN. Dozwolone są tylko hosty z listy poniżej, wszystko inne jest blokowane.';
+
+  @override
+  String get extBgTitle => 'Zadanie w tle';
+
+  @override
+  String get extBgEnabled => 'Uruchom w tle';
+
+  @override
+  String get extBgInterval => 'Uruchamiaj co';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# minuty',
+      many: '# minut',
+      few: '# minuty',
+      one: '# minuta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# godziny',
+      many: '# godzin',
+      few: '# godziny',
+      one: '# godzina',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote =>
+      'Zadanie działa według harmonogramu, dopóki Sora jest otwarta, także w zasobniku. Najkrótszy odstęp to 15 minut.';
+
+  @override
+  String get extBgDisabledNote => 'Włącz rozszerzenie, aby zarządzać zadaniami w tle.';
+
+  @override
+  String get extCapNetwork => 'Dostęp do sieci';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'Sieć: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -911,6 +1348,679 @@ class SPl extends S {
 
   @override
   String get diagnosticHttp => 'Diagnostyka HTTP';
+
+  @override
+  String get diagnosticNoData => 'Nie ma jeszcze zarejestrowanych żądań. Najpierw otwórz witrynę z testami prędkości.';
+
+  @override
+  String get qrShareTitle => 'Udostępnij kod QR';
+
+  @override
+  String get qrScanTitle => 'Zeskanuj kod QR';
+
+  @override
+  String get qrCopyLink => 'Skopiuj link';
+
+  @override
+  String get qrShowLink => 'Pokaż link';
+
+  @override
+  String get qrHideLink => 'Ukryj link';
+
+  @override
+  String get qrWarning => 'Ten kod QR zawiera szczegóły połączenia. Nie pokazuj go nieznajomym.';
+
+  @override
+  String get qrScanHint => 'Wybierz zrzut ekranu lub zdjęcie z kodem QR albo wklej link';
+
+  @override
+  String get qrFromClipboard => 'Wklej ze schowka';
+
+  @override
+  String get qrNoCode => 'Na tym obrazie nie znaleziono kodu QR.';
+
+  @override
+  String get qrInvalid => 'Ten kod QR nie zawiera prawidłowego łącza.';
+
+  @override
+  String get qrScan => 'Skanuj QR';
+
+  @override
+  String get qrFromImage => 'Otwórz obraz';
+
+  @override
+  String get connGroupByProcess => 'Grupuj według procesu';
+
+  @override
+  String get connListView => 'Lista';
+
+  @override
+  String get connCopyHost => 'Skopiuj hosta';
+
+  @override
+  String get connAddRule => 'Dodaj regułę';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# połączenia',
+      many: '# połączeń',
+      few: '# połączenia',
+      one: '# połączenie',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'Ustawienie wstępne';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'Własne';
+
+  @override
+  String get dnsCheck => 'Sprawdź, czy nie ma wycieków danych';
+
+  @override
+  String get dnsChecking => 'Sprawdzam...';
+
+  @override
+  String get dnsNoLeak => 'Nie stwierdzono wycieków';
+
+  @override
+  String get dnsLeakFound => 'Wykryto wyciek';
+
+  @override
+  String get dnsLastCheck => 'Ostatnia kontrola';
+
+  @override
+  String get dnsNeverChecked => 'Jeszcze nie testowano';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'Resolwery DNS tunelu';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'Systemowe resolwery';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Ochrona DNS przez blokadę sieci';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Skonfiguruj DNS dla tunelu w ustawieniach DNS powyżej.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Sprawdź, jakich algorytmów rozpoznawania nazw Twój system użyłby poza tunelem.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Włącz blokadę sieci, aby ruch DNS pozostał w tunelu.';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'Szyfrowany DNS systemu';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'Sfałszowane odpowiedzi DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Sprawdź, jakich zaszyfrowanych DNS punktów końcowych używa Twój system poza tunelem.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Użyj zaszyfrowanego DNS (DoT lub DoH) dla tunelu, aby mechanizmy rozpoznawania nazw nie mogły sfałszować odpowiedzi.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Najpierw podłącz do VPN, a następnie sprawdź, czy nie ma wycieków.';
+
+  @override
+  String get dnsExpected => 'Oczekiwano';
+
+  @override
+  String get dnsActual => 'Zaobserwowano';
+
+  @override
+  String get sortBy => 'Sortuj według';
+
+  @override
+  String get sortPing => 'Ping';
+
+  @override
+  String get sortSpeed => 'Prędkość';
+
+  @override
+  String get sortName => 'Imię';
+
+  @override
+  String get measureSpeed => 'Zmierz prędkość';
+
+  @override
+  String get benchmarkStale => 'nieaktualny';
+
+  @override
+  String get autoSelectMode => 'Automatycznie wybierz serwer';
+
+  @override
+  String get autoSelectPing => 'Najszybszy ping';
+
+  @override
+  String get autoSelectSpeed => 'Największa prędkość';
+
+  @override
+  String get autoSelectSmart => 'Mądry wybór';
+
+  @override
+  String get coreWatchUnstable => 'Połączenie z rdzeniem Sora jest niestabilne';
+
+  @override
+  String get watchReconnect => 'Połącz ponownie';
+
+  @override
+  String get coreRestoringLink => 'Przywracanie połączenia z rdzeniem Sora…';
+
+  @override
+  String get crashRestoreTitle => 'Ostatnia sesja została przerwana';
+
+  @override
+  String get restoreOnCrash => 'Przywróć sesję po awarii';
+
+  @override
+  String get crashRestore => 'Przywróć';
+
+  @override
+  String get crashDismiss => 'Nie teraz';
+
+  @override
+  String get overrideTitle => 'Moje zmiany';
+
+  @override
+  String get overrideEdit => 'Edytuj serwery';
+
+  @override
+  String get overrideHide => 'Ukryj';
+
+  @override
+  String get overrideUnhide => 'Pokaż';
+
+  @override
+  String get overrideClear => 'Zresetuj zmiany';
+
+  @override
+  String get overrideEmpty => 'Nie ma jeszcze żadnych zmian';
+
+  @override
+  String get overrideCustomRules => 'Własne zasady';
+
+  @override
+  String get errBenchmarkUnsupported => 'Pomiar prędkości wymaga nowszego rdzenia';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return 'Pomiar $done z $total…';
+  }
+
+  @override
+  String get profiles => 'Profile sieciowe';
+
+  @override
+  String get profilesEmpty =>
+      'Nie ma jeszcze profili. Utwórz taki, aby automatycznie zastosować ustawienia w znanych sieciach.';
+
+  @override
+  String get profileAdd => 'Dodaj profil';
+
+  @override
+  String get profileName => 'Nazwa profilu';
+
+  @override
+  String get profileSsids => 'Wi-Fi sieci (SSID)';
+
+  @override
+  String get profileSsidsHint => 'Dom, Biuro oddzielone przecinkami';
+
+  @override
+  String get profileGateways => 'Bramy sieciowe';
+
+  @override
+  String get profileAsns => 'AS numery';
+
+  @override
+  String get profileAutoApply => 'Zastosuj automatycznie';
+
+  @override
+  String get profileAutoApplyHint => 'Gdy wyłączone, pytaj przed zastosowaniem profilu.';
+
+  @override
+  String get profileSnapshot => 'Zapamiętaj bieżące ustawienia';
+
+  @override
+  String get profileSnapshotDone => 'Bieżące ustawienia zapisane w profilu';
+
+  @override
+  String get profileDelete => 'Usuń profil';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return 'Usunąć profil „$name”?';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return 'Zastosować profil „$name”?';
+  }
+
+  @override
+  String get profileApply => 'Zastosuj';
+
+  @override
+  String profileApplied(Object name) {
+    return 'Zastosowano profil „$name”.';
+  }
+
+  @override
+  String get profileUndo => 'Anuluj';
+
+  @override
+  String get profileActive => 'Aktywny';
+
+  @override
+  String networkNow(Object info) {
+    return 'Teraz: $info';
+  }
+
+  @override
+  String get networkUnknown => 'Informacje o sieci są niedostępne';
+
+  @override
+  String get profileNoTriggers => 'Dodaj co najmniej jeden wyzwalacz: SSID, bramka lub ASN';
+
+  @override
+  String get chains => 'Łańcuchy proxy';
+
+  @override
+  String get chainsEmpty => 'Nie ma jeszcze łańcuchów. Połącz 2–3 serwery, aby ruch przepływał przez każdy z nich.';
+
+  @override
+  String get chainAdd => 'Nowy łańcuch';
+
+  @override
+  String get chainName => 'Nazwa łańcucha';
+
+  @override
+  String get chainPickServers => 'Wybierz 2–3 serwery';
+
+  @override
+  String get chainOrderHint => 'Przeciągnij, aby zmienić kolejność: ruch wjeżdża na górze, a wychodzi na dole.';
+
+  @override
+  String get chainTooFew => 'Wybierz co najmniej 2 serwery';
+
+  @override
+  String get chainTooMany => 'Łańcuch zawiera maksymalnie 3 serwery';
+
+  @override
+  String get chainEstimate => 'Szacowane opóźnienie';
+
+  @override
+  String get chainSave => 'Zapisz łańcuch';
+
+  @override
+  String get chainDelete => 'Usuń łańcuch';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return 'Usunąć łańcuch „$name”?';
+  }
+
+  @override
+  String get chainUnsupported => 'Bieżący silnik nie może tworzyć łańcuchów';
+
+  @override
+  String get chainHopMissing => 'Jeden z serwerów sieciowych nie jest już dostępny';
+
+  @override
+  String chainHop(Object n) {
+    return 'Skok $n';
+  }
+
+  @override
+  String get chainEntry => 'Wejście';
+
+  @override
+  String get chainExit => 'Wyjście';
+
+  @override
+  String get sync => 'Synchronizacja urządzenia';
+
+  @override
+  String get syncDevices => 'Moje urządzenia';
+
+  @override
+  String get syncEmpty => 'Brak sparowanych urządzeń. Sparuj kolejne urządzenie przez sieć lokalną.';
+
+  @override
+  String get syncPair => 'Sparuj urządzenie';
+
+  @override
+  String get syncShowCode => 'Pokaż mój kod';
+
+  @override
+  String get syncScanCode => 'Zeskanuj kod';
+
+  @override
+  String get syncRevoke => 'Wypłata';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return 'Unieważnić „$name”?';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'Ostatnia synchronizacja: $time';
+  }
+
+  @override
+  String get syncNever => 'Nigdy';
+
+  @override
+  String get syncNoLan => 'Urządzenia muszą znajdować się w tej samej sieci lokalnej';
+
+  @override
+  String get syncPaired => 'Urządzenie sparowane';
+
+  @override
+  String get syncPairingTitle => 'Sparuj z tym urządzeniem';
+
+  @override
+  String get syncWaiting => 'Oczekiwanie na drugie urządzenie…';
+
+  @override
+  String get syncSecureNote => 'Kanał szyfrowany od końca do końca. Żadnych kont, żadnych serwerów w chmurze.';
+
+  @override
+  String get zapretWithVpn => 'Pomiń filtrowanie DPI dla bezpośredniego ruchu sieciowego';
+
+  @override
+  String get zapretWithVpnHint =>
+      'Uruchamia zapret obok tunelu VPN: ruch tunelowany korzysta z VPN, a ruch bezpośredni z mechanizmu obchodzenia blokad.';
+
+  @override
+  String get chainDuplicate => 'Każdy serwer może pojawić się tylko raz';
+
+  @override
+  String get edit => 'Edytuj';
+
+  @override
+  String get remove => 'Usuń';
+
+  @override
+  String get autoSwitchOnDegrade => 'Automatyczne włączenie degradacji';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'Jeśli wybrany serwer znacznie zwolni lub przestanie odpowiadać, Sora przełączy się na najlepszy według pomiarów, nie częściej niż raz na 10 minut.';
+
+  @override
+  String get tunStackMixed => 'Mieszane';
+
+  @override
+  String get tunStackSystem => 'Systemu';
+
+  @override
+  String get customServerAdd => 'Dodaj serwer niestandardowy';
+
+  @override
+  String get customServers => 'Moje serwery';
+
+  @override
+  String get customServerName => 'Imię';
+
+  @override
+  String get customServerNameHint => 'Na przykład: mój VPS';
+
+  @override
+  String get customServerNameRequired => 'Wprowadź nazwę';
+
+  @override
+  String get customServerAddress => 'Adres';
+
+  @override
+  String get customServerAddressHint => 'example.com lub 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'Wprowadź adres serwera';
+
+  @override
+  String get customServerAddressInvalid => 'Nieprawidłowy adres';
+
+  @override
+  String get customServerPort => 'Port';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'Port musi być liczbą z zakresu od 1 do 65535';
+
+  @override
+  String get customServerProtocol => 'Protokół';
+
+  @override
+  String get customServerCredentials => 'Dane logowania';
+
+  @override
+  String get customServerOptional => 'Opcjonalnie';
+
+  @override
+  String get customServerShowSecret => 'Pokaż sekret';
+
+  @override
+  String get customServerHideSecret => 'Ukryj sekret';
+
+  @override
+  String get customServerBadge => 'własny';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'Usunąć serwer „$name”?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'Dodaj serwer ręcznie: adres, port i protokół';
+
+  @override
+  String get customServerTest => 'Test';
+
+  @override
+  String get leakTestTitle => 'Test pod kątem wycieków danych';
+
+  @override
+  String get leakTestIntro =>
+      'Sprawdza, czy ruch może opuścić urządzenie poza tunelem: bezpośrednie zapytania DNS i ICMP, ruch wychodzący IPv6 oraz systemowe resolwery. Uruchom przy aktywnym połączeniu.';
+
+  @override
+  String get leakTestRun => 'Sprawdź';
+
+  @override
+  String get leakTestCancel => 'Anuluj';
+
+  @override
+  String get leakTestNeedsConnection => 'Połącz się z VPN, aby przetestować wycieki danych.';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'Ukończone testy: $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'Nie stwierdzono wycieków';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Wykryto # wycieku',
+      many: 'Wykryto # wycieków',
+      few: 'Wykryto # wycieki',
+      one: 'Wykryto # wyciek',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
+
+  @override
+  String get leakTestFix => 'Poprawka';
+
+  @override
+  String get leakTestFixedNote => 'Blokada sieci jest włączona. Uruchom test ponownie, aby to sprawdzić.';
+
+  @override
+  String get leakTestCheckDirectDns => 'Bezpośrednio DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP echo';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'Systemowe resolwery';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Łączność tunelowa';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS przez tunel';
+
+  @override
+  String get noticeDegraded =>
+      'Serwer stał się powolny. Sora przełączył się na najlepszy serwer znaleziony podczas pomiaru.';
+
+  @override
+  String get obfs => 'Maskowanie ruchu';
+
+  @override
+  String get syncCodeExpired => 'Kod wygasł';
+
+  @override
+  String get syncDaemonFailed => 'Nie można uruchomić usługi synchronizacji';
+
+  @override
+  String get syncDaemonMissing =>
+      'Nie znaleziono komponentu sora-sync. Zainstaluj ponownie aplikację, aby włączyć synchronizację urządzenia.';
+
+  @override
+  String get syncDaemonStarting => 'Uruchamiam usługę synchronizacji…';
+
+  @override
+  String get syncErrAuth =>
+      'Usługa synchronizacji odrzuciła token dostępu. Uruchom ponownie aplikację i spróbuj ponownie.';
+
+  @override
+  String get syncErrNotFound => 'Urządzenie nie jest już sparowane';
+
+  @override
+  String get syncErrPairingActive => 'Sesja parowania jest już otwarta';
+
+  @override
+  String get syncErrUnreachable =>
+      'Drugie urządzenie nie odpowiedziało. Upewnij się, że znajduje się w tej samej sieci i wyświetla swój kod.';
+
+  @override
+  String get syncError => 'Błąd synchronizacji';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'Kod wygaśnie za $duration';
+  }
+
+  @override
+  String get syncJoining => 'Parowanie z urządzeniem…';
+
+  @override
+  String get syncLegacyCleared =>
+      'Stara lista urządzeń nigdy nie została sparowana, więc została wyczyszczona. Sparuj swoje urządzenia ponownie, tym razem naprawdę.';
+
+  @override
+  String get syncNewCode => 'Nowy kod';
+
+  @override
+  String syncPairedWith(String name) {
+    return 'W połączeniu z $name';
+  }
+
+  @override
+  String get syncRetry => 'Powtórz';
+
+  @override
+  String get syncStopShowing => 'Ukryj kod';
+
+  @override
+  String get syncSyncNow => 'Synchronizuj teraz';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Odebrane $pulled, wysłane $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'Wynik synchronizacji';
+
+  @override
+  String get syncPulled => 'Otrzymano';
+
+  @override
+  String get syncPushed => 'Wysłano';
+
+  @override
+  String get syncNoChanges => 'Nie wykryto żadnych zmian';
+
+  @override
+  String get syncDocKindSubscriptions => 'Prenumeraty';
+
+  @override
+  String get syncDocKindSettings => 'Ustawienia aplikacji';
+
+  @override
+  String get syncDocKindOverrides => 'Modyfikacje prenumerat';
+
+  @override
+  String get syncDocKindProfiles => 'Profile sieciowe';
+
+  @override
+  String get syncDocKindChains => 'Łańcuchy proxy';
+
+  @override
+  String syncFrom(String name) {
+    return 'z $name';
+  }
+
+  @override
+  String get syncThisDevice => 'To urządzenie';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Dla Shadowsocks: metoda:hasło, na przykład chacha20-ietf-poly1305:haslo';
 
   @override
   String get diagnosticPackets => 'Przechwytywanie pakietów';
@@ -922,11 +2032,60 @@ class SPl extends S {
   String get diagnosticCapture => 'Przechwytuj przez 10 sekund';
 
   @override
-  String get diagnosticNoData => 'Nie ma jeszcze zarejestrowanych żądań. Najpierw otwórz witrynę z testami prędkości.';
-
-  @override
   String get diagnosticRequiresTun => 'Przechwytywanie pakietów wymaga aktywnego połączenia Sora TUN.';
 
   @override
   String get diagnosticUnavailable => 'Ta diagnostyka jest niedostępna na tej platformie.';
+
+  @override
+  String get extErrRevoked => 'Zespół Sora wycofał tę wersję rozszerzenia, ponieważ jest niebezpieczna lub uszkodzona.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Nie udało się odnowić listy wycofanych rozszerzeń. Instalacja jest zablokowana do czasu odnowienia: sprawdź sieć i spróbuj ponownie.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Wyłączono wycofane rozszerzenia: $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'Klucz prywatny';
+
+  @override
+  String get customServerWgAddresses => 'Adresy interfejsu';
+
+  @override
+  String get customServerWgPeerKey => 'Klucz publiczny serwera';
+
+  @override
+  String get customServerWgPresharedKey => 'Klucz współdzielony';
+
+  @override
+  String get customServerWgAllowedIps => 'Dozwolone IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, sekundy';
+
+  @override
+  String get customServerWgKeyInvalid => 'Klucz musi mieć 32 bajty w base64, jak wypisuje wg genkey.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Wpisz prefiksy rozdzielone przecinkami, np. 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Wpisz liczbę sekund od 0 do 65535.';
+
+  @override
+  String get strictKillSwitch => 'Ścisła blokada sieci';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Po połączeniu blokuje ruch poza VPN także po awarii, ponownym uruchomieniu lub zamknięciu aplikacji. Dostęp przywraca tylko rozłączenie lub wyłączenie tej opcji. Po restarcie systemu blokada wraca tylko przy włączonym łączeniu podczas uruchamiania.';
+
+  @override
+  String get extWorkerFailed => 'Zadanie rozszerzenia w tle nie powiodło się. Sprawdź dziennik rozszerzenia.';
+
+  @override
+  String get extAssetRejected => 'Odrzucono plik rozszerzenia: nieczytelne kolory lub nieprawidłowe reguły.';
 }

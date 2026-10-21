@@ -24,6 +24,9 @@ func (p *Plan) Secrets() []string {
 	if len(p.LocalProxy.Password) >= 4 {
 		out = append(out, p.LocalProxy.Password)
 	}
+	if x := p.ExtensionProxy; x != nil {
+		out = append(out, x.Username, x.Password)
+	}
 	return out
 }
 
@@ -60,7 +63,7 @@ func (o Outbound) Identifiers() []string {
 	if o.TLS.ServerName != "" {
 		out = append(out, o.TLS.ServerName)
 	}
-	// REALITY parameters are public but identify the server (SORA-L9).
+	// REALITY parameters are public but identify the server.
 	for _, id := range []string{o.TLS.RealityPublicKey, o.TLS.RealityShortID, o.TLS.SpiderX} {
 		if id != "" {
 			out = append(out, id)
@@ -100,7 +103,7 @@ func (o Outbound) Warnings() []string {
 
 // validProtocols whitelists the protocols a plan may hold, so an unknown
 // protocol fails validation with a clear error instead of surfacing late at
-// eng.Apply (SORA-L16).
+// eng.Apply.
 var validProtocols = map[Protocol]bool{
 	ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 	ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
@@ -117,7 +120,7 @@ var validTransports = map[string]bool{
 	"h2": true, "httpupgrade": true, "xhttp": true, "hysteria": true,
 }
 
-// Validate checks one outbound on its own, without engine capabilities.
+// Validate checks one outbound before rendering.
 func (o Outbound) Validate() error {
 	var errs []error
 	if o.ID == "" {
@@ -219,6 +222,15 @@ func (p *Plan) Validate() error {
 	if strings.ContainsAny(p.LocalProxy.Username, ":@ \r\n") {
 		errs = append(errs, errors.New("plan: the local proxy username contains a separator"))
 	}
+	if x := p.ExtensionProxy; x != nil {
+		if x.Port < 1024 || x.Port > 65535 || len(x.Username) < 16 || len(x.Username) > 255 ||
+			len(x.Password) < 32 || len(x.Password) > 255 || strings.ContainsAny(x.Username+x.Password, ":@ \r\n") {
+			errs = append(errs, errors.New("plan: the extension proxy needs a private port and a strong login"))
+		}
+		if !p.IsVPNTarget(x.Target) {
+			errs = append(errs, errors.New("plan: the extension proxy target must use only VPN outbounds"))
+		}
+	}
 	names := make(map[string]struct{}, len(p.Groups))
 	for _, g := range p.Groups {
 		errs = append(errs, g.validate())
@@ -233,7 +245,7 @@ func (p *Plan) Validate() error {
 		for _, ref := range g.Outbounds {
 			_, isOutbound := ids[ref]
 			_, isGroup := members[ref]
-			if !isOutbound && !isGroup && !isBuiltInTarget(ref) {
+			if !isOutbound && !isGroup && !IsBuiltInTarget(ref) {
 				errs = append(errs, fmt.Errorf("group %q: unknown outbound %q", g.Name, ref))
 			}
 		}
@@ -250,12 +262,13 @@ func (p *Plan) Validate() error {
 		}
 		_, isOutbound := ids[r.Target]
 		_, isGroup := names[r.Target]
-		if !isOutbound && !isGroup && !isBuiltInTarget(r.Target) {
+		if !isOutbound && !isGroup && !IsBuiltInTarget(r.Target) {
 			errs = append(errs, fmt.Errorf("rule %s %q: unknown target %q", r.Type, r.Value, r.Target))
 		}
 	}
 
 	errs = append(errs, p.DNS.validate(), p.Tun.validate(), p.Options.validate())
+	errs = append(errs, validateChains(p.Outbounds, ids))
 	return errors.Join(errs...)
 }
 
@@ -295,6 +308,47 @@ func (s *BypassStrategy) validate(id string) error {
 	}
 	if (s.Disorder || s.OOB) && len(s.SplitPos) == 0 {
 		return fmt.Errorf("outbound %s: disorder and out-of-band bytes need a split position", id)
+	}
+	return nil
+}
+
+// MaxChainHops bounds an entry and its proxy hops.
+const MaxChainHops = 3
+
+func validateChains(outbounds []Outbound, ids map[string]struct{}) error {
+	via := make(map[string]string, len(outbounds))
+	for _, o := range outbounds {
+		if o.Via == "" {
+			continue
+		}
+		if o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass {
+			return fmt.Errorf("outbound %s: a %s outbound cannot dial through another", o.ID, o.Protocol)
+		}
+		if o.Via == o.ID {
+			return fmt.Errorf("outbound %s: dials through itself", o.ID)
+		}
+		if _, ok := ids[o.Via]; !ok {
+			return fmt.Errorf("outbound %s: dials through unknown outbound %q", o.ID, o.Via)
+		}
+		via[o.ID] = o.Via
+	}
+	for _, o := range outbounds {
+		if o.Via == "" {
+			continue
+		}
+		seen := map[string]bool{o.ID: true}
+		depth := 1
+		for next := o.Via; next != ""; {
+			if seen[next] {
+				return fmt.Errorf("outbound %s: its chain loops back through %q", o.ID, next)
+			}
+			seen[next] = true
+			depth++
+			if depth > MaxChainHops {
+				return fmt.Errorf("outbound %s: its chain is longer than %d hops", o.ID, MaxChainHops)
+			}
+			next = via[next]
+		}
 	}
 	return nil
 }

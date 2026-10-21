@@ -260,6 +260,81 @@ class CoreControlClient extends $grpc.Client {
     return $createUnaryCall(_$deleteSecret, request, options: options);
   }
 
+  /// Since 1.8. DNS leak diagnostics: which resolvers the session uses versus
+  /// what the OS would use, and whether the kill switch covers DNS. Requires
+  /// the control authenticator: the answers describe the machine's network.
+  $grpc.ResponseFuture<$0.CheckDnsLeaksResponse> checkDnsLeaks(
+    $0.CheckDnsLeaksRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$checkDnsLeaks, request, options: options);
+  }
+
+  /// Since 1.9. Throughput benchmark: measures real download goodput through
+  /// each server by spinning up a temporary engine session. Streams progress
+  /// samples; each server reports done=true once. Requires the control
+  /// authenticator: benchmarks burn traffic and spawn engine processes.
+  $grpc.ResponseStream<$0.BandwidthSample> benchmarkServers(
+    $0.BenchmarkServersRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createStreamingCall(_$benchmarkServers, $async.Stream.fromIterable([request]), options: options);
+  }
+
+  /// Since 1.9. RETIRED (2026-10-20, PASS1 M3): no client ever called
+  /// this RPC - the app keeps its benchmark history locally - so the
+  /// core no longer implements it (callers get Unimplemented) and the
+  /// stored history behind it was removed. The messages stay for wire
+  /// compatibility; do not build on this method.
+  $grpc.ResponseFuture<$0.GetBenchmarksResponse> getBenchmarks(
+    $0.GetBenchmarksRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getBenchmarks, request, options: options);
+  }
+
+  /// Since 1.10. Network profiles with automatic matching: the core watches
+  /// the network fingerprint and reports ProfileMatched events when a saved
+  /// profile matches the current network. Requires the control authenticator:
+  /// profiles describe the machine's networks.
+  $grpc.ResponseFuture<$0.ListProfilesResponse> listProfiles(
+    $0.ListProfilesRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$listProfiles, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.SaveProfileResponse> saveProfile(
+    $0.SaveProfileRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$saveProfile, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.DeleteProfileResponse> deleteProfile(
+    $0.DeleteProfileRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$deleteProfile, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetNetworkFingerprintResponse> getNetworkFingerprint(
+    $0.GetNetworkFingerprintRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getNetworkFingerprint, request, options: options);
+  }
+
+  /// Since 1.10. Probes a proxy chain of 2-3 servers: per-hop reachability,
+  /// the summed latency estimate, and which installed engines can carry it.
+  /// Requires the control authenticator: probes burn traffic.
+  $grpc.ResponseFuture<$0.ProbeChainResponse> probeChain(
+    $0.ProbeChainRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$probeChain, request, options: options);
+  }
+
   // method descriptors
 
   static final _$connect = $grpc.ClientMethod<$0.ConnectRequest, $0.ConnectResponse>(
@@ -382,6 +457,39 @@ class CoreControlClient extends $grpc.Client {
       '/sora.core.v1.CoreControl/DeleteSecret',
       ($0.DeleteSecretRequest value) => value.writeToBuffer(),
       $0.DeleteSecretResponse.fromBuffer);
+  static final _$checkDnsLeaks = $grpc.ClientMethod<$0.CheckDnsLeaksRequest, $0.CheckDnsLeaksResponse>(
+      '/sora.core.v1.CoreControl/CheckDnsLeaks',
+      ($0.CheckDnsLeaksRequest value) => value.writeToBuffer(),
+      $0.CheckDnsLeaksResponse.fromBuffer);
+  static final _$benchmarkServers = $grpc.ClientMethod<$0.BenchmarkServersRequest, $0.BandwidthSample>(
+      '/sora.core.v1.CoreControl/BenchmarkServers',
+      ($0.BenchmarkServersRequest value) => value.writeToBuffer(),
+      $0.BandwidthSample.fromBuffer);
+  static final _$getBenchmarks = $grpc.ClientMethod<$0.GetBenchmarksRequest, $0.GetBenchmarksResponse>(
+      '/sora.core.v1.CoreControl/GetBenchmarks',
+      ($0.GetBenchmarksRequest value) => value.writeToBuffer(),
+      $0.GetBenchmarksResponse.fromBuffer);
+  static final _$listProfiles = $grpc.ClientMethod<$0.ListProfilesRequest, $0.ListProfilesResponse>(
+      '/sora.core.v1.CoreControl/ListProfiles',
+      ($0.ListProfilesRequest value) => value.writeToBuffer(),
+      $0.ListProfilesResponse.fromBuffer);
+  static final _$saveProfile = $grpc.ClientMethod<$0.SaveProfileRequest, $0.SaveProfileResponse>(
+      '/sora.core.v1.CoreControl/SaveProfile',
+      ($0.SaveProfileRequest value) => value.writeToBuffer(),
+      $0.SaveProfileResponse.fromBuffer);
+  static final _$deleteProfile = $grpc.ClientMethod<$0.DeleteProfileRequest, $0.DeleteProfileResponse>(
+      '/sora.core.v1.CoreControl/DeleteProfile',
+      ($0.DeleteProfileRequest value) => value.writeToBuffer(),
+      $0.DeleteProfileResponse.fromBuffer);
+  static final _$getNetworkFingerprint =
+      $grpc.ClientMethod<$0.GetNetworkFingerprintRequest, $0.GetNetworkFingerprintResponse>(
+          '/sora.core.v1.CoreControl/GetNetworkFingerprint',
+          ($0.GetNetworkFingerprintRequest value) => value.writeToBuffer(),
+          $0.GetNetworkFingerprintResponse.fromBuffer);
+  static final _$probeChain = $grpc.ClientMethod<$0.ProbeChainRequest, $0.ProbeChainResponse>(
+      '/sora.core.v1.CoreControl/ProbeChain',
+      ($0.ProbeChainRequest value) => value.writeToBuffer(),
+      $0.ProbeChainResponse.fromBuffer);
 }
 
 @$pb.GrpcServiceName('sora.core.v1.CoreControl')
@@ -599,6 +707,62 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.DeleteSecretRequest.fromBuffer(value),
         ($0.DeleteSecretResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.CheckDnsLeaksRequest, $0.CheckDnsLeaksResponse>(
+        'CheckDnsLeaks',
+        checkDnsLeaks_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.CheckDnsLeaksRequest.fromBuffer(value),
+        ($0.CheckDnsLeaksResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.BenchmarkServersRequest, $0.BandwidthSample>(
+        'BenchmarkServers',
+        benchmarkServers_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.BenchmarkServersRequest.fromBuffer(value),
+        ($0.BandwidthSample value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetBenchmarksRequest, $0.GetBenchmarksResponse>(
+        'GetBenchmarks',
+        getBenchmarks_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetBenchmarksRequest.fromBuffer(value),
+        ($0.GetBenchmarksResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.ListProfilesRequest, $0.ListProfilesResponse>(
+        'ListProfiles',
+        listProfiles_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.ListProfilesRequest.fromBuffer(value),
+        ($0.ListProfilesResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SaveProfileRequest, $0.SaveProfileResponse>(
+        'SaveProfile',
+        saveProfile_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.SaveProfileRequest.fromBuffer(value),
+        ($0.SaveProfileResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.DeleteProfileRequest, $0.DeleteProfileResponse>(
+        'DeleteProfile',
+        deleteProfile_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.DeleteProfileRequest.fromBuffer(value),
+        ($0.DeleteProfileResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetNetworkFingerprintRequest, $0.GetNetworkFingerprintResponse>(
+        'GetNetworkFingerprint',
+        getNetworkFingerprint_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetNetworkFingerprintRequest.fromBuffer(value),
+        ($0.GetNetworkFingerprintResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.ProbeChainRequest, $0.ProbeChainResponse>(
+        'ProbeChain',
+        probeChain_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.ProbeChainRequest.fromBuffer(value),
+        ($0.ProbeChainResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.ConnectResponse> connect_Pre(
@@ -818,4 +982,61 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.DeleteSecretResponse> deleteSecret($grpc.ServiceCall call, $0.DeleteSecretRequest request);
+
+  $async.Future<$0.CheckDnsLeaksResponse> checkDnsLeaks_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.CheckDnsLeaksRequest> $request) async {
+    return checkDnsLeaks($call, await $request);
+  }
+
+  $async.Future<$0.CheckDnsLeaksResponse> checkDnsLeaks($grpc.ServiceCall call, $0.CheckDnsLeaksRequest request);
+
+  $async.Stream<$0.BandwidthSample> benchmarkServers_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.BenchmarkServersRequest> $request) async* {
+    yield* benchmarkServers($call, await $request);
+  }
+
+  $async.Stream<$0.BandwidthSample> benchmarkServers($grpc.ServiceCall call, $0.BenchmarkServersRequest request);
+
+  $async.Future<$0.GetBenchmarksResponse> getBenchmarks_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetBenchmarksRequest> $request) async {
+    return getBenchmarks($call, await $request);
+  }
+
+  $async.Future<$0.GetBenchmarksResponse> getBenchmarks($grpc.ServiceCall call, $0.GetBenchmarksRequest request);
+
+  $async.Future<$0.ListProfilesResponse> listProfiles_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.ListProfilesRequest> $request) async {
+    return listProfiles($call, await $request);
+  }
+
+  $async.Future<$0.ListProfilesResponse> listProfiles($grpc.ServiceCall call, $0.ListProfilesRequest request);
+
+  $async.Future<$0.SaveProfileResponse> saveProfile_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.SaveProfileRequest> $request) async {
+    return saveProfile($call, await $request);
+  }
+
+  $async.Future<$0.SaveProfileResponse> saveProfile($grpc.ServiceCall call, $0.SaveProfileRequest request);
+
+  $async.Future<$0.DeleteProfileResponse> deleteProfile_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.DeleteProfileRequest> $request) async {
+    return deleteProfile($call, await $request);
+  }
+
+  $async.Future<$0.DeleteProfileResponse> deleteProfile($grpc.ServiceCall call, $0.DeleteProfileRequest request);
+
+  $async.Future<$0.GetNetworkFingerprintResponse> getNetworkFingerprint_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetNetworkFingerprintRequest> $request) async {
+    return getNetworkFingerprint($call, await $request);
+  }
+
+  $async.Future<$0.GetNetworkFingerprintResponse> getNetworkFingerprint(
+      $grpc.ServiceCall call, $0.GetNetworkFingerprintRequest request);
+
+  $async.Future<$0.ProbeChainResponse> probeChain_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.ProbeChainRequest> $request) async {
+    return probeChain($call, await $request);
+  }
+
+  $async.Future<$0.ProbeChainResponse> probeChain($grpc.ServiceCall call, $0.ProbeChainRequest request);
 }

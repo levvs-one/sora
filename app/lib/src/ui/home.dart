@@ -72,6 +72,9 @@ class _ConnectionPane extends StatelessWidget {
               onPressed: SoraScope.of(context).busy ? null : () => unawaited(SoraScope.read(context).disconnect()),
               child: Text(S.of(context).retryDisconnect),
             ),
+          if (SoraScope.of(context).watchUnstable) const _WatchBanner(),
+          if (SoraScope.of(context).pendingRestore != null) const _RestoreBanner(),
+          const ConnectionChanges(),
           const SizedBox(height: 24),
           const Center(child: TourTarget(step: 2, radius: 88, child: _Orb())),
           const SizedBox(height: 28),
@@ -145,9 +148,101 @@ class _Orb extends StatelessWidget {
   }
 }
 
+/// Visible when the session watch gave up auto-recovery.
+class _WatchBanner extends StatelessWidget {
+  const _WatchBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final sora = SoraScope.of(context);
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: palette.danger.withValues(alpha: 0.4)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          child: Row(
+            children: [
+              Icon(Symbols.link_off_rounded, size: 20, color: palette.danger),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(s.coreWatchUnstable, style: Styles.secondary.copyWith(color: palette.ink)),
+              ),
+              const SizedBox(width: 8),
+              Pressable(
+                onTap: () => unawaited(sora.repairWatch()),
+                radius: 8,
+                semanticButton: true,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Text(s.watchReconnect, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Offer to restore the session left by a crashed run.
+class _RestoreBanner extends StatelessWidget {
+  const _RestoreBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final sora = SoraScope.of(context);
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          child: Row(
+            children: [
+              Icon(Symbols.history_rounded, size: 20, color: palette.ink2),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(s.crashRestoreTitle, style: Styles.secondary.copyWith(color: palette.ink)),
+              ),
+              const SizedBox(width: 8),
+              Pressable(
+                onTap: () => unawaited(sora.restoreCrashedSession()),
+                radius: 8,
+                semanticButton: true,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Text(s.crashRestore, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                ),
+              ),
+              Pressable(
+                onTap: sora.dismissCrashRestore,
+                radius: 8,
+                semanticButton: true,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: Text(s.crashDismiss, style: Styles.secondary.copyWith(color: palette.ink2)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _Status extends StatelessWidget {
   const _Status();
-
   @override
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context);
@@ -256,7 +351,7 @@ class _ServerCard extends StatelessWidget {
         : switch (selected) {
             'auto' => s.serverAuto,
             'bypass' => s.serverBypass,
-            _ => sora.nameOf(selected),
+            _ => sora.displayNameOf(selected),
           };
     // Use the prospective active member's latency for a group selection.
     final group = selected.startsWith(groupPrefix) ? entryOf(selected, sora.subscriptions) : null;
@@ -268,6 +363,7 @@ class _ServerCard extends StatelessWidget {
         radius: 12,
         give: 0.98,
         wash: false,
+        semanticButton: true,
         onTap: offline
             ? null
             : () => empty ? showSubscriptionSheet(context) : push<void>(context, const ServersScreen()),

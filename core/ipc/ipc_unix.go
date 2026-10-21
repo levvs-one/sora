@@ -65,17 +65,40 @@ func dialLocal(ctx context.Context, address string) (net.Conn, error) {
 // local users authorized by polkit. The dedicated service UID separates engine
 // traffic for the kill switch.
 func defaultAllow(opts Options) func(Peer) bool {
+	authorize := DefaultAuthorize(opts)
+	return func(peer Peer) bool { return authorize(peer) != AuthNone }
+}
+
+// DefaultAuthorize maps an admitted peer to its control-API privilege level:
+// the core user and socket-group members hold full control, Linux
+// peers authorized by the polkit control action hold full control, peers
+// authorized only by the polkit read action are limited to read-only RPCs.
+// Where the platform cannot verify identity (macOS), socket permissions are
+// the boundary and admitted peers keep their previous privilege.
+func DefaultAuthorize(opts Options) func(Peer) AuthLevel {
 	group := opts.Group
 	if group == "" {
 		group = defaultSocketGroup
 	}
-	return func(peer Peer) bool {
+	return func(peer Peer) AuthLevel {
 		if !peer.Verified {
 			// Without verified identity, refuse sockets lacking
 			// restrictive permissions.
-			return socketMode&0o007 == 0
+			if socketMode&0o007 == 0 {
+				return AuthControl
+			}
+			return AuthNone
 		}
-		return peer.UID == os.Getuid() || inGroup(peer.UID, group) || polkitAllows(peer, PolkitAction)
+		if peer.UID == os.Getuid() || inGroup(peer.UID, group) {
+			return AuthControl
+		}
+		if polkitAllows(peer, PolkitAction) {
+			return AuthControl
+		}
+		if polkitAllows(peer, PolkitReadAction) {
+			return AuthRead
+		}
+		return AuthNone
 	}
 }
 

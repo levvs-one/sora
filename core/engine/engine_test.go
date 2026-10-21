@@ -194,7 +194,7 @@ func TestTunStackNeverSilentlyChangesWithTheEngine(t *testing.T) {
 	}
 }
 
-// TestPlanValidateRejectsUnknownProtocolAndTransport locks SORA-L16: an
+// TestPlanValidateRejectsUnknownProtocolAndTransport: an
 // unknown protocol or transport must fail plan validation with a clear
 // error, not surface late at eng.Apply.
 func TestPlanValidateRejectsUnknownProtocolAndTransport(t *testing.T) {

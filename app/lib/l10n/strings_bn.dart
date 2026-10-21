@@ -25,9 +25,6 @@ class SBn extends S {
   String get stateDisconnecting => 'সংযোগ বিচ্ছিন্ন করা হচ্ছে';
 
   @override
-  String get stateFailed => 'সংযুক্ত নয়';
-
-  @override
   String get coreMissing => 'Sora পরিষেবা সাড়া দিচ্ছে না৷';
 
   @override
@@ -135,6 +132,9 @@ class SBn extends S {
   String get logsEmpty => 'এখানে কিছুই নেই';
 
   @override
+  String get connEmpty => 'কোন সংযোগ নেই';
+
+  @override
   String appVersion(String version) {
     return 'সংস্করণ $version';
   }
@@ -164,6 +164,16 @@ class SBn extends S {
   @override
   String milliseconds(int n) {
     return '$n ms';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Mbps';
   }
 
   @override
@@ -255,9 +265,6 @@ class SBn extends S {
   String get errNoServers => 'সংযোগ করতে একটি সদস্যতা যোগ করুন';
 
   @override
-  String get exportText => 'পাঠ্য';
-
-  @override
   String get connections => 'সংযোগ';
 
   @override
@@ -273,7 +280,7 @@ class SBn extends S {
   String get theme => 'থিম';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'সিস্টেম অনুযায়ী';
 
   @override
   String get themeLight => 'আলো';
@@ -285,7 +292,7 @@ class SBn extends S {
   String get language => 'ভাষা';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'সিস্টেম অনুযায়ী';
 
   @override
   String get sectionConnection => 'সংযোগ';
@@ -496,12 +503,6 @@ class SBn extends S {
   String get ruleInvalid => 'এটি একটি সাইট, একটি আইপি বা একটি প্রোগ্রাম মত দেখায় না';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# সার্ভার, ঘুরে', one: '# সার্ভার, ঘুরে');
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -516,9 +517,6 @@ class SBn extends S {
   String get tunnelMode => 'মোড';
 
   @override
-  String get tunnelTun => 'সমস্ত ট্রাফিক';
-
-  @override
   String get tunnelProxy => 'System প্রক্সি';
 
   @override
@@ -529,6 +527,9 @@ class SBn extends S {
 
   @override
   String get launchAtLogin => 'সিস্টেম দিয়ে শুরু করুন';
+
+  @override
+  String get launchAtLoginDetail => 'সাইন ইন করলে Sora স্বয়ংক্রিয়ভাবে চালু হবে এবং ট্রেতে থাকবে।';
 
   @override
   String get closeToTray => 'বন্ধ হয়ে গেলে ট্রেতে রাখুন';
@@ -629,28 +630,6 @@ class SBn extends S {
   String get less => 'কম';
 
   @override
-  String get currentServer => 'বর্তমান সার্ভার';
-
-  @override
-  String get trafficDown => 'ডাউনলোড করা হয়েছে';
-
-  @override
-  String get trafficUp => 'আপলোড করা হয়েছে';
-
-  @override
-  String perSecond(String value) {
-    return '$value/s';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'সক্রিয় নিয়ম: $count';
-  }
-
-  @override
-  String get recentNotifications => 'সাম্প্রতিক বিজ্ঞপ্তি';
-
-  @override
   String get notificationsEmpty => 'সংযোগ এবং সদস্যতা ইভেন্ট এখানে প্রদর্শিত হবে';
 
   @override
@@ -704,22 +683,13 @@ class SBn extends S {
   String get runningProcesses => 'চলমান প্রক্রিয়া';
 
   @override
-  String get programsFailed => 'অ্যাপ্লিকেশন লোড করা যায়নি';
-
-  @override
   String get programsEmpty => 'কোন অ্যাপ্লিকেশন পাওয়া যায়নি. অন্য নাম চেষ্টা করুন.';
 
   @override
   String get selectExe => 'একটি .exe ফাইল নির্বাচন করুন';
 
   @override
-  String get trafficUnavailable => 'কাউন্টার এখনও উপলব্ধ নেই';
-
-  @override
   String get speedtest => 'গতি';
-
-  @override
-  String get speedtestCheck => 'গতি পরীক্ষা করুন';
 
   @override
   String get speedtestSearch => 'একটি পরিষেবা খুঁজুন';
@@ -814,6 +784,37 @@ class SBn extends S {
       'উভয় যাচাইকৃত প্যাকেজ ইনস্টল করতে একটি টার্মিনালে এই কমান্ডটি চালান, তারপর Sora পুনরায় খুলুন। ফাইলগুলি ডাউনলোড ডিরেক্টরিতে থাকে। ভিপিএন কানেকশন বন্ধ হয়ে যাবে।';
 
   @override
+  String get updateSignaturePending => 'আপডেট ফাইলগুলো রিলিজের সঙ্গে প্রকাশিত চেকসামের সঙ্গে মেলানো হয়।';
+
+  @override
+  String get updateManualSigWarning =>
+      'নিচের ফাইলগুলো রিলিজের চেকসামের সঙ্গে মেলে। অফিসিয়াল রিলিজ থেকে নামিয়ে থাকলে কমান্ডটি চালান।';
+
+  @override
+  String get updateVersionRevoked => 'বিকাশকারী এই সংস্করণটি প্রত্যাহার করেছে। একটি সংশোধন রিলিজ জন্য অপেক্ষা করুন.';
+
+  @override
+  String get updateRolloutPending => 'একটি নতুন সংস্করণ ধীরে ধীরে চালু হচ্ছে এবং স্বয়ংক্রিয়ভাবে আপনাকে অফার করা হবে।';
+
+  @override
+  String updateRollbacking(String version) {
+    return '$version সংস্করণে ফিরে আসছে...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return '$version-এর আপডেট স্বাস্থ্য পরীক্ষায় উত্তীর্ণ হয়নি, তাই Sora কে $fromVersion এ ফিরিয়ে আনা হয়েছে।';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'স্বয়ংক্রিয় রোলব্যাক ব্যর্থ হয়েছে. যদি নতুন সংস্করণটি কাজ না করে তবে পূর্ববর্তী রিলিজটি ম্যানুয়ালি পুনরায় ইনস্টল করুন।';
+
+  @override
+  String get updateRollbackCacheError =>
+      'বর্তমান সংস্করণের একটি যাচাইকৃত রোলব্যাক কপি প্রস্তুত করা যায়নি, তাই আপডেটটি ইনস্টল করা হয়নি।';
+
+  @override
   String get updateCopyCommand => 'কমান্ড অনুলিপি করুন';
 
   @override
@@ -838,9 +839,6 @@ class SBn extends S {
   String get componentLicenses => 'কম্পোনেন্ট লাইসেন্স';
 
   @override
-  String get appCopyright => '© 2026 levvs-one এবং অবদানকারী';
-
-  @override
   String get collapseServers => 'সার্ভার সঙ্কুচিত করুন';
 
   @override
@@ -857,10 +855,6 @@ class SBn extends S {
 
   @override
   String get reconnectNow => 'আবেদন করুন এবং পুনরায় সংযোগ করুন';
-
-  @override
-  String get bypassLimitations =>
-      'এই মোডটি শুধুমাত্র HTTP এবং TLS-এর জন্য DPI বাইপাস করে, UDP সমর্থন করে না বা আপনার IP পরিবর্তন করে না। Discord ভয়েস, কল এবং ব্লক করা Telegram ঠিকানাগুলির জন্য একটি VPN সার্ভার ব্যবহার করুন৷';
 
   @override
   String get errEngineUnsupported =>
@@ -887,7 +881,7 @@ class SBn extends S {
 
   @override
   String get modesGuide =>
-      'আপনার সার্ভারের কোন ইঞ্জিনের প্রয়োজন তা আপনি নিশ্চিত না হলে অটো বেছে নিন। Sora সংযোগ করার আগে প্রোফাইল এবং সেটিংস পরীক্ষা করে। একটি ইঞ্জিন আপনার পরিকল্পনার ব্যান্ডউইথ বাড়াতে পারে না: কর্মক্ষমতা সার্ভার, রুট, প্রোটোকল এবং নেটওয়ার্কের উপর নির্ভর করে।\n\n## মোড\n\n### সমস্ত ট্রাফিক (TUN)\n\nSora একটি ভার্চুয়াল নেটওয়ার্ক ইন্টারফেস তৈরি করে এবং TCP এবং UDP সহ এর মাধ্যমে অ্যাপ্লিকেশন ট্র্যাফিককে রুট করে। Telegram, গেমস এবং Discord ভয়েসের জন্য এই মোডটি ব্যবহার করুন। নিয়ম নির্দিষ্ট সাইট বা প্রোগ্রাম সরাসরি পাঠাতে বা তাদের ব্লক করতে পারে। নেটওয়ার্ক পরিষেবার অনুমতি প্রয়োজন এবং একটি সার্ভার যা প্রয়োজনীয় প্রোটোকল সমর্থন করে৷\n\n### System প্রক্সি\n\nSora একটি স্থানীয় HTTP/SOCKS প্রক্সি কনফিগার করে। যে অ্যাপ্লিকেশনগুলি সিস্টেম প্রক্সি সেটিংসকে সম্মান করে তারা এটি ব্যবহার করে। তাদের নিজস্ব নেটওয়ার্ক স্ট্যাকের সাথে অ্যাপ্লিকেশন সরাসরি সংযুক্ত হতে পারে; UDP এবং ভয়েস কলের জন্য সাধারণত TUN প্রয়োজন। এই মোডটি প্রক্সি সমর্থন সহ ব্রাউজার এবং অ্যাপ্লিকেশনগুলির জন্য উপযুক্ত৷\n\n### সার্ভার নেই\n\nLinux-এ, Sora HTTP/TLS অনুরোধগুলিকে বিভক্ত ও পুনরায় আকার দিতে এবং কিছু DPI চেক বাইপাস করতে [zapret](https://github.com/bol-van/zapret) ব্যবহার করে। আপনার আইপি একই থাকে এবং সংযোগগুলি সরাসরি ওয়েবসাইটে যায়। ফলাফল আপনার প্রদানকারী এবং ব্লকিং পদ্ধতির উপর নির্ভর করে।\n\nবর্তমান ইন্টিগ্রেশন টিসিপির উপর HTTP এবং TLS এর জন্য tpws ব্যবহার করে। এটি আইপি ব্লকিং বা রিলে ইউডিপি বাইপাস করে না এবং Telegram এর MTProto সংযোগের গ্যারান্টি দিতে পারে না। Discord ভয়েস, Telegram কল এবং এই ধরনের বিধিনিষেধের জন্য TUN সহ একটি VPN সার্ভার ব্যবহার করুন৷\n\n## ইঞ্জিন\n\n### অটো\n\nSora একটি ইনস্টল করা ইঞ্জিন নির্বাচন করে যা সম্পূর্ণ সংযোগ পরিকল্পনা সমর্থন করে: সার্ভার প্রোটোকল, পরিবহন, গ্রুপ, ফ্র্যাগমেন্টেশন এবং মোড। বর্তমান সংযোগ বন্ধ করার আগে একটি বেমানান ম্যানুয়াল পছন্দ প্রত্যাখ্যান করা হয়। অটো বা অন্য ইঞ্জিন নির্বাচন করুন এবং সেটিংস আবার প্রয়োগ করুন।\n\n### sing-box\n\nনতুন Sora প্যাকেজগুলির মধ্যে রয়েছে [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) এর একটি কাঁটা, ক্লায়েন্ট-সাইড XHTTP এবং VLESS Encryption যোগ করা। Sora বিল্ড এবং এর ক্ষমতাকে স্বীকৃতি দেয়। XHTTP ছাড়া একটি আপস্ট্রিম বিল্ড শুধুমাত্র তার নাম থেকে এই ক্ষমতা অর্জন করে না।\n\nসমর্থিত প্রোটোকলগুলির মধ্যে রয়েছে VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard এবং AmneziaWG 1.x/2.x-এর সেই প্যারামিটারগুলি যা Sora আমদানি করতে পারে। সম্পূর্ণ Xray JSON প্রোফাইলের জন্য Xray প্রয়োজন। নতুন AWG 3.x ফিল্ড এখনও আমদানি করা যায় না। sing-box একটি পাসওয়ার্ড-সুরক্ষিত স্থানীয় নিয়ন্ত্রণ পোর্ট ব্যবহার করে, যা কম্পিউটারের অন্য অ্যাপ্লিকেশনগুলি শনাক্ত করতে পারে।\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption এবং TLS ফ্র্যাগমেন্টেশন সমর্থন করে। এটি সম্পূর্ণ প্রদানকারী Xray প্রোফাইলগুলিকে তাদের রাউটিং এবং গোষ্ঠীগুলি সংরক্ষণ করে চালায়। এই ধরনের প্রোফাইলগুলি তাদের আচরণ পরিবর্তন না করে স্বয়ংক্রিয়ভাবে অন্য ইঞ্জিনে রূপান্তরিত হতে পারে না।\n\nবান্ডেল করা Xray সেটিংটি সরিয়ে দিয়েছে যা TLS শংসাপত্র যাচাইকরণ (`allowInsecure`) অক্ষম করে। স্বয়ংক্রিয়ভাবে sing-box বা mihomo সাধারণ সার্ভারগুলির জন্য এই সেটিং প্রয়োজন। Xray নির্বাচন করা বর্তমান সংযোগ বন্ধ করার আগে ম্যানুয়ালি অসামঞ্জস্যতার প্রতিবেদন করে। পুরানো সম্পূর্ণ JSON প্রোফাইলগুলির একটি যাচাইযোগ্য শংসাপত্র বা শংসাপত্র পিন সহ একটি আপডেট প্রদানকারী প্রোফাইল প্রয়োজন৷\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) অর্ডার করা ফলব্যাক এবং লোড-ব্যালেন্সিং গ্রুপ, XHTTP এবং AmneziaWG সমর্থন করে। ব্যাকআপ সার্ভারে স্বয়ংক্রিয়ভাবে ব্যর্থ হলে এটি নির্বাচন করুন। Sora এর TLS ফ্র্যাগমেন্টেশন সেটিং এই ইঞ্জিনের সাথে অনুপলব্ধ৷\n\n## Sora এ সামঞ্জস্যপূর্ণ\n\n| বৈশিষ্ট্য | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN এবং TCP/UDP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| XHTTP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| VLESS Encryption | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| সম্পূর্ণ Xray প্রোফাইল | না | হ্যাঁ | না |\n| TUIC / AnyTLS | উভয় | না | TUIC |\n| TLS ফ্র্যাগমেন্টেশন | হ্যাঁ | হ্যাঁ | না |\n| AmneziaWG 1.x/2.x | হ্যাঁ¹ | না | হ্যাঁ |\n| অর্ডার ফলব্যাক গ্রুপ | না | No² | হ্যাঁ |\n\nJ1/J2/J3/Itime সহ প্রোফাইল mihomo ব্যবহার করে; এই ক্ষেত্রগুলি কখনই নীরবে বাতিল করা উচিত নয়। ² সম্পূর্ণ Xray প্রোফাইলের একটি গোষ্ঠীর জন্য, অ্যাপটি একটি ব্যাকআপ প্রোফাইল নির্বাচন করে। সমর্থন ইনস্টল করা বিল্ড উপর নির্ভর করে; সম্পর্কে এর সংস্করণ পরীক্ষা করুন।\n\n## TUN স্ট্যাক\n\nস্ট্যাক ভার্চুয়াল ইন্টারফেসের ভিতরে TCP এবং UDP পরিচালনা করে। মোড প্যানেলে, Xray এবং mihomo gVisor, System, Mixed এবং MIPS অফার করে। প্রতিটি ইঞ্জিন তার নিজস্ব পছন্দ সংরক্ষণ করে। System প্রক্সি এবং সার্ভারহীন মোড এই পছন্দ ব্যবহার করে না।\n\n- **Mixed** — TCP সিস্টেম স্ট্যাক ব্যবহার করে, যখন gVisor UDP পরিচালনা করে। Linux-এ এটি mihomo-এর ডিফল্ট। Windows-এ Xray এবং mihomo ডিফল্ট হিসেবে MIPS ব্যবহার করে।\n- **System** — সিস্টেম স্ট্যাক ব্যবহার করে। নেটওয়ার্ক অ্যাপ্লিকেশন সমস্যা সম্মুখীন হলে অন্য বিকল্প চেষ্টা করুন.\n- **gVisor** — ইউজারস্পেসে ট্রাফিক পরিচালনা করে।\n- **MIPS** — mihomo এর নিজস্ব আইপি স্ট্যাক, বান্ডেল করা সংস্করণ 1.19.32-এ উপলব্ধ৷\n\nLinux-এ, Xray ডিফল্টরূপে এর অন্তর্নির্মিত gVisor ব্যবহার করে। System, Mixed এবং Linux-এ MIPS TUN ইঞ্জিন হিসাবে mihomo ব্যবহার করে, একটি প্রমাণীকৃত স্থানীয় SOCKS লিঙ্কের মাধ্যমে TCP এবং UDPকে Xray-এ ফরওয়ার্ড করে৷ Xray প্রোটোকল, প্রদানকারীর প্রোফাইল এবং রাউটিং ধরে রাখে। এই তিনটি বিকল্পের জন্য একটি ইনস্টল করা mihomo প্রয়োজন৷ Windows-এ Xray চারটি TUN স্ট্যাকের জন্য mihomo 1.19.32 বা নতুন সংস্করণ ব্যবহার করে। প্রোটোকল ও রাউটিং Xray-তে থাকে। এই সংযোগে অ্যাপের নিয়ম শুধু সরাসরি সংযোগ ও ব্লক করা সমর্থন করে; Linux-এ এই নিয়মগুলির জন্য Xray-এর অন্তর্নির্মিত gVisor প্রয়োজন।\n\nসেতুটি একটি দ্বিতীয় প্রক্রিয়া চালায়। Linux-এ তিনটি নিষ্ক্রিয় পরিমাপে, এটি নেটিভ Xray TUN থেকে প্রায় 32-36 MiB বেশি শারীরিক মেমরি ব্যবহার করেছে। এটি ডাউনলোড লোড পরিমাপ করে না: CPU এবং মেমরি খরচ সংযোগের উপর নির্ভর করে। sing-box কোনো স্ট্যাক নির্বাচক নেই। কোনও স্ট্যাক প্রতিটি নেটওয়ার্কে আরও ভাল পারফরম্যান্সের গ্যারান্টি দেয় না। একটি স্ট্যাক চয়ন করুন এবং আপনার নেটওয়ার্কে চেষ্টা করতে প্রয়োগ করুন এবং পুনরায় সংযোগ করুন নির্বাচন করুন৷\n\n## সেটিংস প্রয়োগ করা হচ্ছে\n\nএকটি সার্ভার নির্বাচন স্বয়ংক্রিয়ভাবে পুনরায় সংযোগ. মোড, ইঞ্জিন, DNS এবং নিয়ম সেটিংস অবিলম্বে সংরক্ষিত হয়; একটি সক্রিয় সংযোগের সময়, প্রয়োগ ক্লিক করুন এবং সেগুলি ব্যবহার করতে পুনরায় সংযোগ করুন৷ একটি ইঞ্জিন রিস্টার্ট করলে ডাউনলোড এবং কল বাধাগ্রস্ত হতে পারে। বারবার ক্লিক সমান্তরাল সংযোগ শুরু করে না; সংযোগ বিচ্ছিন্ন করা রূপান্তর শেষ করে এবং সংযোগটি ছেড়ে দেয়।\n\nএকটি টানেল নেমে গেলে শুধুমাত্র VPN এর মাধ্যমে ইন্টারনেট সরাসরি ট্রাফিক ব্লক করে। এটি পুরো মেশিনকে প্রভাবিত করে। একটি সুস্পষ্ট সংযোগ বিচ্ছিন্ন হলে Sora এর নিয়মগুলি সরিয়ে দেওয়া হয়। যদি ক্লিনআপ শেষ না হয়, আবার সংযোগ বিচ্ছিন্ন করার চেষ্টা করুন এবং লগটি খুলুন।\n\n## প্রকল্প ডকুমেন্টেশন\n\n- [sing-box-lx: কনফিগারেশন এবং সমর্থন](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ডকুমেন্টেশন](https://sing-box.sagernet.org/)\n- [Xray ডকুমেন্টেশন](https://xtls.github.io/)\n- [mihomo ডকুমেন্টেশন](https://wiki.metacubex.one/)\n- [zapret: অপারেশন এবং সীমাবদ্ধতা](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'আপনার সার্ভারের কোন ইঞ্জিনের প্রয়োজন তা আপনি নিশ্চিত না হলে অটো বেছে নিন। Sora সংযোগ করার আগে প্রোফাইল এবং সেটিংস পরীক্ষা করে। একটি ইঞ্জিন আপনার পরিকল্পনার ব্যান্ডউইথ বাড়াতে পারে না: কর্মক্ষমতা সার্ভার, রুট, প্রোটোকল এবং নেটওয়ার্কের উপর নির্ভর করে।\n\n## মোড\n\n### সমস্ত ট্রাফিক (TUN)\n\nSora একটি ভার্চুয়াল নেটওয়ার্ক ইন্টারফেস তৈরি করে এবং TCP এবং UDP সহ এর মাধ্যমে অ্যাপ্লিকেশন ট্র্যাফিককে রুট করে। Telegram, গেমস এবং Discord ভয়েসের জন্য এই মোডটি ব্যবহার করুন। নিয়ম নির্দিষ্ট সাইট বা প্রোগ্রাম সরাসরি পাঠাতে বা তাদের ব্লক করতে পারে। নেটওয়ার্ক পরিষেবার অনুমতি প্রয়োজন এবং একটি সার্ভার যা প্রয়োজনীয় প্রোটোকল সমর্থন করে৷\n\n### System প্রক্সি\n\nSora একটি স্থানীয় HTTP/SOCKS প্রক্সি কনফিগার করে। যে অ্যাপ্লিকেশনগুলি সিস্টেম প্রক্সি সেটিংসকে সম্মান করে তারা এটি ব্যবহার করে। তাদের নিজস্ব নেটওয়ার্ক স্ট্যাকের সাথে অ্যাপ্লিকেশন সরাসরি সংযুক্ত হতে পারে; UDP এবং ভয়েস কলের জন্য সাধারণত TUN প্রয়োজন। এই মোডটি প্রক্সি সমর্থন সহ ব্রাউজার এবং অ্যাপ্লিকেশনগুলির জন্য উপযুক্ত৷\n\n### সার্ভার নেই\n\nLinux-এ, Sora HTTP/TLS অনুরোধগুলিকে বিভক্ত ও পুনরায় আকার দিতে এবং কিছু DPI চেক বাইপাস করতে [zapret](https://github.com/bol-van/zapret) ব্যবহার করে। আপনার আইপি একই থাকে এবং সংযোগগুলি সরাসরি ওয়েবসাইটে যায়। ফলাফল আপনার প্রদানকারী এবং ব্লকিং পদ্ধতির উপর নির্ভর করে।\n\nবর্তমান ইন্টিগ্রেশন টিসিপির উপর HTTP এবং TLS এর জন্য tpws ব্যবহার করে। এটি আইপি ব্লকিং বা রিলে ইউডিপি বাইপাস করে না এবং Telegram এর MTProto সংযোগের গ্যারান্টি দিতে পারে না। Discord ভয়েস, Telegram কল এবং এই ধরনের বিধিনিষেধের জন্য TUN সহ একটি VPN সার্ভার ব্যবহার করুন৷\n\n## ইঞ্জিন\n\n### অটো\n\nSora একটি ইনস্টল করা ইঞ্জিন নির্বাচন করে যা সম্পূর্ণ সংযোগ পরিকল্পনা সমর্থন করে: সার্ভার প্রোটোকল, পরিবহন, গ্রুপ, ফ্র্যাগমেন্টেশন এবং মোড। বর্তমান সংযোগ বন্ধ করার আগে একটি বেমানান ম্যানুয়াল পছন্দ প্রত্যাখ্যান করা হয়। অটো বা অন্য ইঞ্জিন নির্বাচন করুন এবং সেটিংস আবার প্রয়োগ করুন।\n\n### sing-box\n\nনতুন Sora প্যাকেজগুলির মধ্যে রয়েছে [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) এর একটি কাঁটা, ক্লায়েন্ট-সাইড XHTTP এবং VLESS Encryption যোগ করা। Sora বিল্ড এবং এর ক্ষমতাকে স্বীকৃতি দেয়। XHTTP ছাড়া একটি আপস্ট্রিম বিল্ড শুধুমাত্র তার নাম থেকে এই ক্ষমতা অর্জন করে না।\n\nসমর্থিত প্রোটোকলগুলির মধ্যে রয়েছে VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard এবং AmneziaWG 1.x/2.x-এর সেই প্যারামিটারগুলি যা Sora আমদানি করতে পারে। সম্পূর্ণ Xray JSON প্রোফাইলের জন্য Xray প্রয়োজন। নতুন AWG 3.x ফিল্ড এখনও আমদানি করা যায় না। sing-box একটি পাসওয়ার্ড-সুরক্ষিত স্থানীয় নিয়ন্ত্রণ পোর্ট ব্যবহার করে, যা কম্পিউটারের অন্য অ্যাপ্লিকেশনগুলি শনাক্ত করতে পারে।\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption এবং TLS ফ্র্যাগমেন্টেশন সমর্থন করে। এটি সম্পূর্ণ প্রদানকারী Xray প্রোফাইলগুলিকে তাদের রাউটিং এবং গোষ্ঠীগুলি সংরক্ষণ করে চালায়। এই ধরনের প্রোফাইলগুলি তাদের আচরণ পরিবর্তন না করে স্বয়ংক্রিয়ভাবে অন্য ইঞ্জিনে রূপান্তরিত হতে পারে না।\n\nবান্ডেল করা Xray সেটিংটি সরিয়ে দিয়েছে যা TLS শংসাপত্র যাচাইকরণ (`allowInsecure`) অক্ষম করে। স্বয়ংক্রিয়ভাবে sing-box বা mihomo সাধারণ সার্ভারগুলির জন্য এই সেটিং প্রয়োজন। Xray নির্বাচন করা বর্তমান সংযোগ বন্ধ করার আগে ম্যানুয়ালি অসামঞ্জস্যতার প্রতিবেদন করে। পুরানো সম্পূর্ণ JSON প্রোফাইলগুলির একটি যাচাইযোগ্য শংসাপত্র বা শংসাপত্র পিন সহ একটি আপডেট প্রদানকারী প্রোফাইল প্রয়োজন৷\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) অর্ডার করা ফলব্যাক এবং লোড-ব্যালেন্সিং গ্রুপ, XHTTP এবং AmneziaWG সমর্থন করে। ব্যাকআপ সার্ভারে স্বয়ংক্রিয়ভাবে ব্যর্থ হলে এটি নির্বাচন করুন। Sora এর TLS ফ্র্যাগমেন্টেশন সেটিং এই ইঞ্জিনের সাথে অনুপলব্ধ৷\n\n## Sora এ সামঞ্জস্যপূর্ণ\n\n| বৈশিষ্ট্য | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN এবং TCP/UDP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| XHTTP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| VLESS Encryption | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| সম্পূর্ণ Xray প্রোফাইল | না | হ্যাঁ | না |\n| TUIC / AnyTLS | উভয় | না | TUIC |\n| TLS ফ্র্যাগমেন্টেশন | হ্যাঁ | হ্যাঁ | না |\n| AmneziaWG 1.x/2.x | হ্যাঁ¹ | না | হ্যাঁ |\n| অর্ডার ফলব্যাক গ্রুপ | না | No² | হ্যাঁ |\n\nJ1/J2/J3/Itime সহ প্রোফাইল mihomo ব্যবহার করে; এই ক্ষেত্রগুলি কখনই নীরবে বাতিল করা উচিত নয়। ² সম্পূর্ণ Xray প্রোফাইলের একটি গোষ্ঠীর জন্য, অ্যাপটি একটি ব্যাকআপ প্রোফাইল নির্বাচন করে। সমর্থন ইনস্টল করা বিল্ড উপর নির্ভর করে; সম্পর্কে এর সংস্করণ পরীক্ষা করুন।\n\n## TUN স্ট্যাক\n\nস্ট্যাক ভার্চুয়াল ইন্টারফেসের ভিতরে TCP এবং UDP পরিচালনা করে। মোড প্যানেলে, Xray এবং mihomo gVisor, System, Mixed এবং MIPS অফার করে। প্রতিটি ইঞ্জিন তার নিজস্ব পছন্দ সংরক্ষণ করে। System প্রক্সি এবং সার্ভারহীন মোড এই পছন্দ ব্যবহার করে না।\n\n- **Mixed**: TCP সিস্টেম স্ট্যাক ব্যবহার করে, যখন gVisor UDP পরিচালনা করে। Linux-এ এটি mihomo-এর ডিফল্ট। Windows-এ Xray এবং mihomo ডিফল্ট হিসেবে MIPS ব্যবহার করে।\n- **System**: সিস্টেম স্ট্যাক ব্যবহার করে। নেটওয়ার্ক অ্যাপ্লিকেশন সমস্যা সম্মুখীন হলে অন্য বিকল্প চেষ্টা করুন.\n- **gVisor**: ইউজারস্পেসে ট্রাফিক পরিচালনা করে।\n- **MIPS**: mihomo এর নিজস্ব আইপি স্ট্যাক, বান্ডেল করা সংস্করণ 1.19.32-এ উপলব্ধ৷\n\nLinux-এ, Xray ডিফল্টরূপে এর অন্তর্নির্মিত gVisor ব্যবহার করে। System, Mixed এবং Linux-এ MIPS TUN ইঞ্জিন হিসাবে mihomo ব্যবহার করে, একটি প্রমাণীকৃত স্থানীয় SOCKS লিঙ্কের মাধ্যমে TCP এবং UDPকে Xray-এ ফরওয়ার্ড করে৷ Xray প্রোটোকল, প্রদানকারীর প্রোফাইল এবং রাউটিং ধরে রাখে। এই তিনটি বিকল্পের জন্য একটি ইনস্টল করা mihomo প্রয়োজন৷ Windows-এ Xray চারটি TUN স্ট্যাকের জন্য mihomo 1.19.32 বা নতুন সংস্করণ ব্যবহার করে। প্রোটোকল ও রাউটিং Xray-তে থাকে। এই সংযোগে অ্যাপের নিয়ম শুধু সরাসরি সংযোগ ও ব্লক করা সমর্থন করে; Linux-এ এই নিয়মগুলির জন্য Xray-এর অন্তর্নির্মিত gVisor প্রয়োজন।\n\nসেতুটি একটি দ্বিতীয় প্রক্রিয়া চালায়। Linux-এ তিনটি নিষ্ক্রিয় পরিমাপে, এটি নেটিভ Xray TUN থেকে প্রায় 32-36 MiB বেশি শারীরিক মেমরি ব্যবহার করেছে। এটি ডাউনলোড লোড পরিমাপ করে না: CPU এবং মেমরি খরচ সংযোগের উপর নির্ভর করে। sing-box কোনো স্ট্যাক নির্বাচক নেই। কোনও স্ট্যাক প্রতিটি নেটওয়ার্কে আরও ভাল পারফরম্যান্সের গ্যারান্টি দেয় না। একটি স্ট্যাক চয়ন করুন এবং আপনার নেটওয়ার্কে চেষ্টা করতে প্রয়োগ করুন এবং পুনরায় সংযোগ করুন নির্বাচন করুন৷\n\n## সেটিংস প্রয়োগ করা হচ্ছে\n\nএকটি সার্ভার নির্বাচন স্বয়ংক্রিয়ভাবে পুনরায় সংযোগ. মোড, ইঞ্জিন, DNS এবং নিয়ম সেটিংস অবিলম্বে সংরক্ষিত হয়; একটি সক্রিয় সংযোগের সময়, প্রয়োগ ক্লিক করুন এবং সেগুলি ব্যবহার করতে পুনরায় সংযোগ করুন৷ একটি ইঞ্জিন রিস্টার্ট করলে ডাউনলোড এবং কল বাধাগ্রস্ত হতে পারে। বারবার ক্লিক সমান্তরাল সংযোগ শুরু করে না; সংযোগ বিচ্ছিন্ন করা রূপান্তর শেষ করে এবং সংযোগটি ছেড়ে দেয়।\n\nএকটি টানেল নেমে গেলে শুধুমাত্র VPN এর মাধ্যমে ইন্টারনেট সরাসরি ট্রাফিক ব্লক করে। এটি পুরো মেশিনকে প্রভাবিত করে। একটি সুস্পষ্ট সংযোগ বিচ্ছিন্ন হলে Sora এর নিয়মগুলি সরিয়ে দেওয়া হয়। যদি ক্লিনআপ শেষ না হয়, আবার সংযোগ বিচ্ছিন্ন করার চেষ্টা করুন এবং লগটি খুলুন।\n\n## প্রকল্প ডকুমেন্টেশন\n\n- [sing-box-lx: কনফিগারেশন এবং সমর্থন](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ডকুমেন্টেশন](https://sing-box.sagernet.org/)\n- [Xray ডকুমেন্টেশন](https://xtls.github.io/)\n- [mihomo ডকুমেন্টেশন](https://wiki.metacubex.one/)\n- [zapret: অপারেশন এবং সীমাবদ্ধতা](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'সার্ভার চেক করুন';
@@ -896,7 +890,437 @@ class SBn extends S {
   String get extensions => 'এক্সটেনশন';
 
   @override
-  String get extensionsSoon => 'শীঘ্রই আসছে';
+  String extRatingLabel(String rating) {
+    return 'রেটিং $rating, ৫-এর মধ্যে';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return '$author-এর তৈরি';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'ইনস্টলেশন: $count';
+  }
+
+  @override
+  String get extInstallOne => '1 ইনস্টল করুন';
+
+  @override
+  String get extBadgeVerified => 'যাচাই করা হয়েছে';
+
+  @override
+  String get extBadgeTop => 'এই সপ্তাহে সবচেয়ে জনপ্রিয়';
+
+  @override
+  String get extBadgeNew => 'নতুন';
+
+  @override
+  String get extBadgeStaff => 'Sora দল';
+
+  @override
+  String get extSideloadShort => 'ক্যাটালগ থেকে না';
+
+  @override
+  String get extSideloadWarning =>
+      'এই এক্সটেনশন টিম ক্যাটালগ থেকে নয়। শুধুমাত্র লেখক তাদের কীটির জন্য প্রমাণ দিয়েছেন: আপনি যদি লেখককে বিশ্বাস করেন তবেই এটি ইনস্টল করুন।';
+
+  @override
+  String extInstallTitle(String name) {
+    return '«$name» ইনস্টল করুন';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return '«$name» আপডেট করুন';
+  }
+
+  @override
+  String get extPermissionsIntro => 'এই এক্সটেনশনটি সক্ষম হবে:';
+
+  @override
+  String get extPermissionsWidened => 'আপডেটটি নতুন অনুমতির জন্য জিজ্ঞাসা করে:';
+
+  @override
+  String get extDangerousAck => 'আমি বুঝি যে এই অনুমতিগুলি গুরুতর৷';
+
+  @override
+  String get extInstall => 'ইনস্টল করুন';
+
+  @override
+  String get extUpdate => 'আপডেট করুন';
+
+  @override
+  String get extCancel => 'বাতিল';
+
+  @override
+  String get extConfirm => 'নিশ্চিত করুন';
+
+  @override
+  String get extOk => 'OK';
+
+  @override
+  String get extCatalog => 'ক্যাটালগ';
+
+  @override
+  String get extInstalled => 'ইনস্টল করা এক্সটেনশন';
+
+  @override
+  String get extSearchHint => 'এক্সটেনশন খুঁজুন';
+
+  @override
+  String get extCatAll => 'সব';
+
+  @override
+  String get extCatTools => 'সরঞ্জাম';
+
+  @override
+  String get extCatThemes => 'থিম';
+
+  @override
+  String get extCatAutomation => 'অটোমেশন';
+
+  @override
+  String get extCatStats => 'পরিসংখ্যান';
+
+  @override
+  String get extCatNetwork => 'নেটওয়ার্ক';
+
+  @override
+  String get extSortBy => 'দ্বারা সাজান';
+
+  @override
+  String get extSortPopular => 'সর্বাধিক জনপ্রিয়';
+
+  @override
+  String get extSortRating => 'সর্বোচ্চ রেট';
+
+  @override
+  String get extSortName => 'নাম';
+
+  @override
+  String get extCatalogError => 'ক্যাটালগ লোড করা যায়নি';
+
+  @override
+  String get extRetry => 'পুনরায় চেষ্টা করুন';
+
+  @override
+  String get extEmptySearch => 'কিছুই পাওয়া যায়নি';
+
+  @override
+  String get extEmptyInstalled =>
+      'কোনো এক্সটেনশন এখনো ইনস্টল করা হয়নি.\nক্যাটালগে একটি খুঁজুন বা একটি ফাইল থেকে ইনস্টল করুন।';
+
+  @override
+  String get extInstallFromFile => 'ফাইল থেকে ইনস্টল করুন';
+
+  @override
+  String get extInstallFromUrl => 'URL থেকে ইনস্টল করুন';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'ডাউনলোড করুন';
+
+  @override
+  String get extDownloading => 'ডাউনলোড হচ্ছে...';
+
+  @override
+  String get extVerifying => 'যাচাই করা হচ্ছে...';
+
+  @override
+  String get extInstalling => 'ইনস্টল করা হচ্ছে...';
+
+  @override
+  String get extInstallFailed => 'ইনস্টল ব্যর্থ হয়েছে';
+
+  @override
+  String get extErrSignature => 'স্বাক্ষর চেক ব্যর্থ হয়েছে. ফাইলটি ক্ষতিগ্রস্ত বা টেম্পারড হতে পারে।';
+
+  @override
+  String get extErrManifest => 'এক্সটেনশন ম্যানিফেস্ট অবৈধ.';
+
+  @override
+  String get extErrNetwork => 'নেটওয়ার্ক ত্রুটি. আপনার সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন.';
+
+  @override
+  String get extErrHash => 'ডাউনলোড ক্যাটালগের সাথে মেলে না। এর সাথে কারসাজি করা হতে পারে।';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'এই এক্সটেনশনটির অ্যাপ সংস্করণ $version বা নতুন প্রয়োজন।';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'শুধুমাত্র https:// লিঙ্ক অনুমোদিত';
+
+  @override
+  String get extErrGeneric => 'কিছু ভুল হয়েছে. আবার চেষ্টা করুন.';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'এই আপডেটটি ইনস্টল করা সংস্করণের চেয়ে একটি ভিন্ন লেখক কী দিয়ে স্বাক্ষরিত, তাই এটি ব্লক করা হয়েছে। আপনি যদি নতুন কী বিশ্বাস করেন তবে এক্সটেনশনটি আনইনস্টল করুন এবং স্পষ্টভাবে আবার ইনস্টল করুন।';
+
+  @override
+  String get extUpdateAvailable => 'আপডেট উপলব্ধ';
+
+  @override
+  String get extDisabled => 'বন্ধ';
+
+  @override
+  String extToggleEnabled(String name) {
+    return 'সক্ষম করুন $name';
+  }
+
+  @override
+  String get extSearchInstalled => 'ইনস্টল করা এক্সটেনশন খুঁজুন';
+
+  @override
+  String get extUpdateAll => 'সব আপডেট';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return '$count আপডেট উপলব্ধ';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return '$count আপডেট করা হয়েছে৷';
+  }
+
+  @override
+  String get extRiskNormal => 'স্বাভাবিক';
+
+  @override
+  String get extRiskSensitive => 'সংবেদনশীল';
+
+  @override
+  String get extRiskDangerous => 'উচ্চ ঝুঁকি';
+
+  @override
+  String get extPermissionsRemoved => 'আর চাওয়া হচ্ছে না:';
+
+  @override
+  String get extUpdateFailedKept => 'পূর্ববর্তী সংস্করণ এখনও ইনস্টল করা আছে.';
+
+  @override
+  String get extConflictsTitle => 'এক্সটেনশন দ্বন্দ্ব';
+
+  @override
+  String get extConflictsIntro => 'এই এক্সটেনশনগুলো একই জিনিস চায়। কোনটি চলবে বেছে নিন, অন্যটি ইনস্টল থাকবে।';
+
+  @override
+  String get extConflictTheme => 'অ্যাপ থিম';
+
+  @override
+  String get extConflictNetHooks => 'নেটওয়ার্ক হুক';
+
+  @override
+  String extConflictWinner(String name) {
+    return 'অগ্রাধিকার: $name';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return '$count দ্বন্দ্ব আপনার সিদ্ধান্ত প্রয়োজন';
+  }
+
+  @override
+  String get extConflictsResolve => 'দ্বন্দ্ব সমাধান';
+
+  @override
+  String get extConflictNote =>
+      'আপনার পছন্দ এই ডিভাইসে সংরক্ষিত হয়। থিম সঙ্গে সঙ্গে বদলায়, নেটওয়ার্ক হুক এই সংস্করণে চলে না।';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'সংস্করণ $version';
+  }
+
+  @override
+  String get extAuthor => 'লেখক';
+
+  @override
+  String get extRating => 'রেটিং';
+
+  @override
+  String get extInstalls => 'ইনস্টল সংখ্যা';
+
+  @override
+  String get extVersion => 'সংস্করণ';
+
+  @override
+  String get extAbout => 'এই এক্সটেনশন সম্পর্কে';
+
+  @override
+  String get extPermissionsTitle => 'অনুমতি';
+
+  @override
+  String get extNoPermissions => 'কোন বিশেষ অনুমতি নেই.';
+
+  @override
+  String get extSettings => 'সেটিংস';
+
+  @override
+  String get extSaveSettings => 'সেটিংস সংরক্ষণ করুন';
+
+  @override
+  String get extSaving => 'সংরক্ষণ করা হচ্ছে...';
+
+  @override
+  String extUpdateTo(String version) {
+    return '$version এ আপগ্রেড করুন';
+  }
+
+  @override
+  String get extEnabled => 'চালু';
+
+  @override
+  String extRollbackTo(String version) {
+    return 'রোলব্যাক $version এ';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return 'সংস্করণে রোলব্যাক $version?';
+  }
+
+  @override
+  String get extUninstall => 'আনইনস্টল';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return '\"$name\" এবং এর সেটিংস সরান?';
+  }
+
+  @override
+  String get extPanelUnavailable => 'প্যানেল অনুপলব্ধ. এক্সটেনশনটি নিষ্ক্রিয় বা সরানো হতে পারে৷';
+
+  @override
+  String get extPermConnectionsRead => 'সক্রিয় সংযোগের তালিকা দেখুন';
+
+  @override
+  String get extPermServersRead => 'আপনার সার্ভারের একটি তালিকা দেখুন';
+
+  @override
+  String get extPermSettingsRead => 'অ্যাপ সেটিংস পড়ুন';
+
+  @override
+  String get extPermSettingsWrite => 'অ্যাপ সেটিংস পরিবর্তন করুন';
+
+  @override
+  String get extPermNotifications => 'বিজ্ঞপ্তি দেখান';
+
+  @override
+  String get extPermTray => 'ট্রে মেনুতে আইটেম যোগ করুন';
+
+  @override
+  String get extPermUiPanel => 'অ্যাপের ভিতরে প্যানেল দেখান';
+
+  @override
+  String get extPermThemeApply => 'থিম প্রয়োগ করুন অনুমোদিত তালিকা থেকে';
+
+  @override
+  String get extPermRoutingRules => 'রাউটিং নিয়ম যোগ করুন (নেটওয়ার্ক ট্রাফিক যেখানে যায় সেখানে প্রভাবিত করে)';
+
+  @override
+  String get extPermNetHooks => 'নেটওয়ার্ক পাথে একীভূত করুন (DPI বাইপাস মডিউল)';
+
+  @override
+  String get extPermNetFetch => 'অনুরোধ URL';
+
+  @override
+  String get extPermBackground => 'ব্যাকগ্রাউন্ড কাজ চালান';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'প্যানেল বন্ধ থাকা অবস্থায়ও নির্ধারিত কাজ চালায়। আপনি এটিকে বিরতি দিতে পারেন বা এক্সটেনশন সেটিংসে এটি কতবার চলে তা পরিবর্তন করতে পারেন৷';
+
+  @override
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+
+  @override
+  String get extCapBackground => 'ব্যাকগ্রাউন্ডে রান';
+
+  @override
+  String get extCapNetHook => 'ব্লক এড়ানো ও নেটওয়ার্ক হুক';
+
+  @override
+  String get extCapPanel => 'ইন্টারফেস প্যানেল';
+
+  @override
+  String get extCapRouting => 'রাউটিং নিয়ম';
+
+  @override
+  String get extCapTheme => 'থিম';
+
+  @override
+  String get extCapWidget => 'উইজেট';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Cached catalog, $date';
+  }
+
+  @override
+  String get extChangelog => 'চেঞ্জলগ';
+
+  @override
+  String get extImageFailed => 'ইমেজ লোড করা যায়নি';
+
+  @override
+  String get extRatingHow => 'রেটিং কীভাবে গণনা করা হয়';
+
+  @override
+  String get extRatingHowBody =>
+      'রেটিং একটি Bayesian গড় ব্যবহার করে: কিছু রেটিং সহ একটি এক্সটেনশন মাঝামাঝি কাছাকাছি থাকে যতক্ষণ না আরও বেশি লোক ভোট দেয়, তাই একটি একক 5-স্টার পর্যালোচনা শীর্ষে একটি নতুন এক্সটেনশনকে ঠেলে দিতে পারে না। সাম্প্রতিক রেটিংগুলি পুরানোগুলির থেকে বেশি ওজন করে এবং প্রতি অ্যাকাউন্টে শুধুমাত্র একটি রেটিং গণনা করা হয়৷';
+
+  @override
+  String get extScreenshots => 'স্ক্রিনশট';
+
+  @override
+  String get extSortRelevance => 'প্রাসঙ্গিকতা';
+
+  @override
+  String get extPermNetworkDetail =>
+      'VPN-এর মাধ্যমে ইন্টারনেট থেকে ডেটা আনে। শুধু নিচের তালিকার হোস্ট অনুমোদিত, বাকি সব বন্ধ।';
+
+  @override
+  String get extBgTitle => 'পটভূমির কাজ';
+
+  @override
+  String get extBgEnabled => 'ব্যাকগ্রাউন্ডে চালান';
+
+  @override
+  String get extBgInterval => 'চালানোর ব্যবধান';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# মিনিট', one: '# মিনিট');
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ঘণ্টা', one: '# ঘণ্টা');
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote => 'Sora খোলা থাকলে, ট্রেতে থাকলেও, কাজটি সময়সূচি অনুযায়ী চলে। সবচেয়ে কম ব্যবধান ১৫ মিনিট।';
+
+  @override
+  String get extBgDisabledNote => 'এর ব্যাকগ্রাউন্ড টাস্ক পরিচালনা করতে এক্সটেনশন সক্রিয় করুন।';
+
+  @override
+  String get extCapNetwork => 'নেটওয়ার্ক অ্যাক্সেস';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'নেটওয়ার্ক: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -905,6 +1329,669 @@ class SBn extends S {
 
   @override
   String get diagnosticHttp => 'HTTP ডায়াগনস্টিকস';
+
+  @override
+  String get diagnosticNoData => 'এখনও কোন রেকর্ড করা অনুরোধ. প্রথমে একটি গতি পরীক্ষার ওয়েবসাইট খুলুন।';
+
+  @override
+  String get qrShareTitle => 'শেয়ার করুন QR কোড';
+
+  @override
+  String get qrScanTitle => 'স্ক্যান করুন QR কোড';
+
+  @override
+  String get qrCopyLink => 'কপি লিঙ্ক';
+
+  @override
+  String get qrShowLink => 'লিঙ্ক দেখান';
+
+  @override
+  String get qrHideLink => 'লিঙ্ক লুকান';
+
+  @override
+  String get qrWarning => 'এই QR কোডটিতে সংযোগের বিবরণ রয়েছে। অপরিচিতদের দেখাবেন না।';
+
+  @override
+  String get qrScanHint => 'QR কোডসহ একটি স্ক্রিনশট বা ছবি বেছে নিন, অথবা একটি লিংক পেস্ট করুন';
+
+  @override
+  String get qrFromClipboard => 'ক্লিপবোর্ড থেকে পেস্ট করুন';
+
+  @override
+  String get qrNoCode => 'এই ছবিতে কোনো QR কোড পাওয়া যায়নি।';
+
+  @override
+  String get qrInvalid => 'এই QR কোডটিতে কোনো বৈধ লিঙ্ক নেই।';
+
+  @override
+  String get qrScan => 'স্ক্যান QR';
+
+  @override
+  String get qrFromImage => 'ছবি খুলুন';
+
+  @override
+  String get connGroupByProcess => 'প্রক্রিয়া দ্বারা গ্রুপ';
+
+  @override
+  String get connListView => 'তালিকা';
+
+  @override
+  String get connCopyHost => 'কপি হোস্ট';
+
+  @override
+  String get connAddRule => 'নিয়ম যোগ করুন';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# সংযোগ', one: '# সংযোগ');
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'প্রিসেট';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'নিজস্ব';
+
+  @override
+  String get dnsCheck => 'ডেটা ফাঁসের জন্য পরীক্ষা করুন';
+
+  @override
+  String get dnsChecking => 'পরীক্ষা করা হচ্ছে...';
+
+  @override
+  String get dnsNoLeak => 'কোন ফাঁস পাওয়া যায় নি';
+
+  @override
+  String get dnsLeakFound => 'লিক সনাক্ত';
+
+  @override
+  String get dnsLastCheck => 'শেষ চেক';
+
+  @override
+  String get dnsNeverChecked => 'এখনো পরীক্ষা করা হয়নি';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'টানেলের DNS রিজলভার';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'সিস্টেমের DNS রিজলভার';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'নেটওয়ার্ক অবরোধের DNS সুরক্ষা';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'উপরের DNS সেটিংসে টানেলের জন্য DNS কনফিগার করুন।';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'আপনার সিস্টেম টানেলের বাইরে ব্যবহার করবে কোন সমাধানকারী পরীক্ষা করুন.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS ট্রাফিক টানেলের ভেতরে রাখতে নেটওয়ার্ক অবরোধ চালু করুন।';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'সিস্টেমের এনক্রিপ্ট করা DNS';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'নকল DNS প্রতিক্রিয়া';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'আপনার সিস্টেম টানেলের বাইরে কোন এনক্রিপ্টেড DNS এন্ডপয়েন্ট ব্যবহার করে তা পরীক্ষা করে দেখুন।';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'টানেলের জন্য এনক্রিপ্ট করা DNS (DoT বা DoH) ব্যবহার করুন যাতে সমাধানকারীরা উত্তর জাল করতে না পারে।';
+
+  @override
+  String get dnsCheckNeedsConnection => 'প্রথমে VPN এর সাথে সংযোগ করুন, তারপরে ফাঁস পরীক্ষা করুন।';
+
+  @override
+  String get dnsExpected => 'প্রত্যাশিত';
+
+  @override
+  String get dnsActual => 'পালন করা হয়েছে';
+
+  @override
+  String get sortBy => 'দ্বারা সাজান';
+
+  @override
+  String get sortPing => 'পিং';
+
+  @override
+  String get sortSpeed => 'গতি';
+
+  @override
+  String get sortName => 'নাম';
+
+  @override
+  String get measureSpeed => 'গতি পরিমাপ';
+
+  @override
+  String get benchmarkStale => 'পুরানো';
+
+  @override
+  String get autoSelectMode => 'অটো-সিলেক্ট সার্ভার';
+
+  @override
+  String get autoSelectPing => 'দ্রুততম পিং';
+
+  @override
+  String get autoSelectSpeed => 'দ্রুততম গতি';
+
+  @override
+  String get autoSelectSmart => 'স্মার্ট পছন্দ';
+
+  @override
+  String get coreWatchUnstable => 'Sora কোরের সাথে সংযোগটি অস্থির';
+
+  @override
+  String get watchReconnect => 'পুনরায় সংযোগ করুন';
+
+  @override
+  String get coreRestoringLink => 'Sora কোরে সংযোগ পুনরুদ্ধার করা হচ্ছে...';
+
+  @override
+  String get crashRestoreTitle => 'শেষ অধিবেশন বিঘ্নিত হয়';
+
+  @override
+  String get restoreOnCrash => 'একটি ক্র্যাশ পরে সেশন পুনরুদ্ধার';
+
+  @override
+  String get crashRestore => 'পুনরুদ্ধার';
+
+  @override
+  String get crashDismiss => 'এখন না';
+
+  @override
+  String get overrideTitle => 'আমার সম্পাদনা';
+
+  @override
+  String get overrideEdit => 'সার্ভার সম্পাদনা করুন';
+
+  @override
+  String get overrideHide => 'লুকান';
+
+  @override
+  String get overrideUnhide => 'দেখান';
+
+  @override
+  String get overrideClear => 'সম্পাদনাগুলি পুনরায় সেট করুন৷';
+
+  @override
+  String get overrideEmpty => 'এখনও কোন সম্পাদনা';
+
+  @override
+  String get overrideCustomRules => 'নিজস্ব নিয়ম';
+
+  @override
+  String get errBenchmarkUnsupported => 'গতি পরিমাপ একটি নতুন কোর প্রয়োজন';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return '$total থেকে $done এর পরিমাপ…';
+  }
+
+  @override
+  String get profiles => 'নেটওয়ার্ক প্রোফাইল';
+
+  @override
+  String get profilesEmpty =>
+      'এখনও কোন প্রোফাইল. পরিচিত নেটওয়ার্কগুলিতে স্বয়ংক্রিয়ভাবে সেটিংস প্রয়োগ করতে একটি তৈরি করুন৷';
+
+  @override
+  String get profileAdd => 'প্রোফাইল যোগ করুন';
+
+  @override
+  String get profileName => 'প্রোফাইল নাম';
+
+  @override
+  String get profileSsids => 'Wi-Fi নেটওয়ার্ক (SSID)';
+
+  @override
+  String get profileSsidsHint => 'বাড়ি, অফিস কমা দ্বারা পৃথক করা হয়েছে';
+
+  @override
+  String get profileGateways => 'নেটওয়ার্ক গেটওয়ে';
+
+  @override
+  String get profileAsns => 'AS নম্বর';
+
+  @override
+  String get profileAutoApply => 'স্বয়ংক্রিয়ভাবে প্রয়োগ করুন';
+
+  @override
+  String get profileAutoApplyHint => 'বন্ধ থাকলে প্রোফাইল প্রয়োগের আগে অনুমতি চাওয়া হবে।';
+
+  @override
+  String get profileSnapshot => 'বর্তমান সেটিংস মনে রাখবেন';
+
+  @override
+  String get profileSnapshotDone => 'বর্তমান সেটিংস প্রোফাইলে সংরক্ষিত';
+
+  @override
+  String get profileDelete => 'প্রোফাইল মুছুন';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return 'প্রোফাইল \"$name\" মুছবেন?';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return 'প্রোফাইল \"$name\" প্রয়োগ করবেন?';
+  }
+
+  @override
+  String get profileApply => 'প্রয়োগ করুন';
+
+  @override
+  String profileApplied(Object name) {
+    return 'প্রোফাইল \"$name\" প্রয়োগ করা হয়েছে';
+  }
+
+  @override
+  String get profileUndo => 'বাতিল করুন';
+
+  @override
+  String get profileActive => 'সক্রিয়';
+
+  @override
+  String networkNow(Object info) {
+    return 'এখন: $info';
+  }
+
+  @override
+  String get networkUnknown => 'নেটওয়ার্ক তথ্য অনুপলব্ধ';
+
+  @override
+  String get profileNoTriggers => 'অন্তত একটি ট্রিগার যোগ করুন: SSID, গেটওয়ে বা ASN';
+
+  @override
+  String get chains => 'প্রক্সি চেইন';
+
+  @override
+  String get chainsEmpty =>
+      'এখনও কোন চেইন. 2-3 সার্ভারগুলিকে লিঙ্ক করুন যাতে তাদের প্রতিটির মধ্য দিয়ে ট্র্যাফিক চলে যায়।';
+
+  @override
+  String get chainAdd => 'নতুন চেইন';
+
+  @override
+  String get chainName => 'চেইন নাম';
+
+  @override
+  String get chainPickServers => '2-3 সার্ভার বাছাই করুন';
+
+  @override
+  String get chainOrderHint => 'পুনরায় সাজাতে টেনে আনুন: ট্র্যাফিক উপরে প্রবেশ করে এবং নীচে প্রস্থান করে।';
+
+  @override
+  String get chainTooFew => 'অন্তত 2 সার্ভার চয়ন করুন';
+
+  @override
+  String get chainTooMany => 'একটি চেইন সর্বাধিক 3 সার্ভার ধারণ করে';
+
+  @override
+  String get chainEstimate => 'আনুমানিক লেটেন্সি';
+
+  @override
+  String get chainSave => 'সেভ চেইন';
+
+  @override
+  String get chainDelete => 'চেইন মুছুন';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return 'চেইন \"$name\" মুছুন?';
+  }
+
+  @override
+  String get chainUnsupported => 'বর্তমান ইঞ্জিন চেইন তৈরি করতে পারে না';
+
+  @override
+  String get chainHopMissing => 'চেইন সার্ভারের একটি আর উপলব্ধ নেই';
+
+  @override
+  String chainHop(Object n) {
+    return 'হপ $n';
+  }
+
+  @override
+  String get chainEntry => 'প্রবেশ';
+
+  @override
+  String get chainExit => 'প্রস্থান';
+
+  @override
+  String get sync => 'ডিভাইস সিঙ্ক্রোনাইজেশন';
+
+  @override
+  String get syncDevices => 'আমার ডিভাইস';
+
+  @override
+  String get syncEmpty => 'কোন জোড়া ডিভাইস. স্থানীয় নেটওয়ার্কে অন্য ডিভাইস যুক্ত করুন।';
+
+  @override
+  String get syncPair => 'ডিভাইস জোড়া লাগান';
+
+  @override
+  String get syncShowCode => 'আমার কোড দেখান';
+
+  @override
+  String get syncScanCode => 'স্ক্যান কোড';
+
+  @override
+  String get syncRevoke => 'প্রত্যাহার করুন';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return '\"$name\" প্রত্যাহার করবেন?';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'শেষ সিঙ্ক: $time';
+  }
+
+  @override
+  String get syncNever => 'কখনোই না';
+
+  @override
+  String get syncNoLan => 'ডিভাইসগুলি অবশ্যই একই স্থানীয় নেটওয়ার্কে থাকতে হবে';
+
+  @override
+  String get syncPaired => 'ডিভাইস পেয়ার করা হয়েছে';
+
+  @override
+  String get syncPairingTitle => 'এই ডিভাইসের সাথে পেয়ার করুন';
+
+  @override
+  String get syncWaiting => 'অন্য ডিভাইসের জন্য অপেক্ষা করা হচ্ছে...';
+
+  @override
+  String get syncSecureNote => 'এন্ড-টু-এন্ড এনক্রিপ্ট করা চ্যানেল। কোনো অ্যাকাউন্ট নেই, কোনো ক্লাউড সার্ভার নেই।';
+
+  @override
+  String get zapretWithVpn => 'সরাসরি নেটওয়ার্ক ট্রাফিকের জন্য বাইপাস DPI ফিল্টারিং';
+
+  @override
+  String get zapretWithVpnHint =>
+      'VPN টানেলের পাশাপাশি zapret চালায়: টানেলের ট্রাফিক VPN দিয়ে যায়, সরাসরি ট্রাফিক ব্লক এড়ানোর ব্যবস্থা দিয়ে যায়।';
+
+  @override
+  String get chainDuplicate => 'প্রতিটি সার্ভার শুধুমাত্র একবার প্রদর্শিত হতে পারে';
+
+  @override
+  String get edit => 'সম্পাদনা';
+
+  @override
+  String get remove => 'সরান';
+
+  @override
+  String get autoSwitchOnDegrade => 'অটো-সুইচ অন ডিগ্রেডেশন';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'নির্বাচিত সার্ভার খুব ধীর হয়ে গেলে বা সাড়া না দিলে, Sora মাপা সার্ভারগুলোর মধ্যে সেরাটিতে বদলে যায়, তবে প্রতি 10 মিনিটে একবারের বেশি নয়।';
+
+  @override
+  String get tunStackMixed => 'মিশ্র';
+
+  @override
+  String get tunStackSystem => 'সিস্টেম';
+
+  @override
+  String get customServerAdd => 'কাস্টম সার্ভার যোগ করুন';
+
+  @override
+  String get customServers => 'আমার সার্ভার';
+
+  @override
+  String get customServerName => 'নাম';
+
+  @override
+  String get customServerNameHint => 'যেমন: আমার VPS';
+
+  @override
+  String get customServerNameRequired => 'নাম লিখুন';
+
+  @override
+  String get customServerAddress => 'ঠিকানা';
+
+  @override
+  String get customServerAddressHint => 'example.com বা 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'সার্ভার ঠিকানা লিখুন';
+
+  @override
+  String get customServerAddressInvalid => 'অবৈধ ঠিকানা';
+
+  @override
+  String get customServerPort => 'পোর্ট';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'পোর্ট 1 থেকে 65535 পর্যন্ত একটি সংখ্যা হতে হবে';
+
+  @override
+  String get customServerProtocol => 'প্রোটোকল';
+
+  @override
+  String get customServerCredentials => 'লগইন তথ্য';
+
+  @override
+  String get customServerOptional => 'ঐচ্ছিক';
+
+  @override
+  String get customServerShowSecret => 'গোপন দেখান';
+
+  @override
+  String get customServerHideSecret => 'গোপনীয়তা লুকান';
+
+  @override
+  String get customServerBadge => 'নিজস্ব';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return '\"$name\" সার্ভার মুছুন?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'ম্যানুয়ালি একটি সার্ভার যোগ করুন: ঠিকানা, পোর্ট এবং প্রোটোকল';
+
+  @override
+  String get customServerTest => 'পরীক্ষা';
+
+  @override
+  String get leakTestTitle => 'তথ্য ফাঁস জন্য পরীক্ষা';
+
+  @override
+  String get leakTestIntro =>
+      'টানেলের বাইরে দিয়ে ডিভাইস থেকে ট্রাফিক বেরোতে পারে কি না যাচাই করে: সরাসরি DNS ও ICMP অনুরোধ, IPv6 বহির্গমন এবং সিস্টেম রিজলভার। সংযোগ চালু থাকা অবস্থায় পরীক্ষা চালান।';
+
+  @override
+  String get leakTestRun => 'চেক করুন';
+
+  @override
+  String get leakTestCancel => 'বাতিল';
+
+  @override
+  String get leakTestNeedsConnection => 'ডেটা ফাঁস পরীক্ষা করতে VPN-এর সাথে সংযোগ করুন।';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'পরীক্ষা সম্পন্ন হয়েছে: $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'কোন ফাঁস পাওয়া যায় নি';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '#টি লিক পাওয়া গেছে',
+      one: '#টি লিক পাওয়া গেছে',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
+
+  @override
+  String get leakTestFix => 'ফিক্স';
+
+  @override
+  String get leakTestFixedNote => 'নেটওয়ার্ক অবরোধ চালু আছে। যাচাই করতে আবার পরীক্ষা চালান।';
+
+  @override
+  String get leakTestCheckDirectDns => 'সরাসরি DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP প্রতিধ্বনি';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'সিস্টেমের DNS রিজলভার';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'টানেল সংযোগ';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS টানেলের মধ্য দিয়ে';
+
+  @override
+  String get noticeDegraded => 'সার্ভার ধীর হয়ে গেল। Sora পরিমাপের সময় পাওয়া সেরা সার্ভারে স্যুইচ করা হয়েছে।';
+
+  @override
+  String get obfs => 'ট্রাফিক আড়াল করা';
+
+  @override
+  String get syncCodeExpired => 'কোডের মেয়াদ শেষ হয়েছে';
+
+  @override
+  String get syncDaemonFailed => 'সিঙ্ক পরিষেবা শুরু করতে পারেনি';
+
+  @override
+  String get syncDaemonMissing =>
+      'sora-sync উপাদানটি পাওয়া যায়নি। ডিভাইস সিঙ্ক সক্ষম করতে অ্যাপটি পুনরায় ইনস্টল করুন।';
+
+  @override
+  String get syncDaemonStarting => 'সিঙ্ক পরিষেবা শুরু হচ্ছে...';
+
+  @override
+  String get syncErrAuth =>
+      'সিঙ্ক পরিষেবা অ্যাক্সেস টোকেন প্রত্যাখ্যান করেছে। অ্যাপটি পুনরায় চালু করুন এবং আবার চেষ্টা করুন।';
+
+  @override
+  String get syncErrNotFound => 'ডিভাইসটি আর জোড়া লাগানো নেই';
+
+  @override
+  String get syncErrPairingActive => 'একটি জোড়া সেশন ইতিমধ্যে খোলা আছে';
+
+  @override
+  String get syncErrUnreachable =>
+      'অন্য ডিভাইস উত্তর দেয়নি. নিশ্চিত করুন যে এটি একই নেটওয়ার্কে রয়েছে এবং এর কোড দেখাচ্ছে৷';
+
+  @override
+  String get syncError => 'সিঙ্ক্রোনাইজেশন ত্রুটি';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'কোডের মেয়াদ শেষ হবে $duration পরে';
+  }
+
+  @override
+  String get syncJoining => 'ডিভাইসের সাথে পেয়ার করা হচ্ছে...';
+
+  @override
+  String get syncLegacyCleared =>
+      'পুরানো ডিভাইস তালিকা আসলে জোড়া ছিল না, তাই এটি সাফ করা হয়েছে. আপনার ডিভাইসগুলিকে আবার যুক্ত করুন, এইবার বাস্তবে৷';
+
+  @override
+  String get syncNewCode => 'নতুন কোড';
+
+  @override
+  String syncPairedWith(String name) {
+    return '$name এর সাথে যুক্ত';
+  }
+
+  @override
+  String get syncRetry => 'পুনরাবৃত্তি করুন';
+
+  @override
+  String get syncStopShowing => 'কোড লুকান';
+
+  @override
+  String get syncSyncNow => 'এখন সিঙ্ক করুন';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'গৃহীত $pulled, পাঠানো $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'সিঙ্ক্রোনাইজেশন ফলাফল';
+
+  @override
+  String get syncPulled => 'প্রাপ্ত';
+
+  @override
+  String get syncPushed => 'পাঠানো হয়েছে';
+
+  @override
+  String get syncNoChanges => 'কোনো পরিবর্তন নেই';
+
+  @override
+  String get syncDocKindSubscriptions => 'সাবস্ক্রিপশন';
+
+  @override
+  String get syncDocKindSettings => 'অ্যাপ সেটিংস';
+
+  @override
+  String get syncDocKindOverrides => 'সাবস্ক্রিপশনের নিজস্ব পরিবর্তন';
+
+  @override
+  String get syncDocKindProfiles => 'নেটওয়ার্ক প্রোফাইল';
+
+  @override
+  String get syncDocKindChains => 'প্রক্সি চেইন';
+
+  @override
+  String syncFrom(String name) {
+    return '$name থেকে';
+  }
+
+  @override
+  String get syncThisDevice => 'এই ডিভাইস';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Shadowsocks-এর জন্য: method:password, যেমন chacha20-ietf-poly1305:password';
 
   @override
   String get diagnosticPackets => 'প্যাকেট ক্যাপচার';
@@ -916,11 +2003,60 @@ class SBn extends S {
   String get diagnosticCapture => '10 সেকেন্ডের জন্য ক্যাপচার করুন';
 
   @override
-  String get diagnosticNoData => 'এখনও কোন রেকর্ড করা অনুরোধ. প্রথমে একটি গতি পরীক্ষার ওয়েবসাইট খুলুন।';
-
-  @override
   String get diagnosticRequiresTun => 'প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।';
 
   @override
   String get diagnosticUnavailable => 'এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.';
+
+  @override
+  String get extErrRevoked => 'Sora দল এই এক্সটেনশন সংস্করণটি প্রত্যাহার করেছে, কারণ এটি অনিরাপদ বা ভাঙা।';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'প্রত্যাহার করা এক্সটেনশনের তালিকা নবায়ন করা যায়নি। নবায়ন না হওয়া পর্যন্ত ইনস্টল বন্ধ: নেটওয়ার্ক দেখে আবার চেষ্টা করুন।';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'প্রত্যাহার করা এক্সটেনশন বন্ধ করা হয়েছে: $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'প্রাইভেট কী';
+
+  @override
+  String get customServerWgAddresses => 'ইন্টারফেস ঠিকানা';
+
+  @override
+  String get customServerWgPeerKey => 'সার্ভারের পাবলিক কী';
+
+  @override
+  String get customServerWgPresharedKey => 'প্রি-শেয়ার্ড কী';
+
+  @override
+  String get customServerWgAllowedIps => 'অনুমোদিত IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, সেকেন্ড';
+
+  @override
+  String get customServerWgKeyInvalid => 'কী-টি wg genkey-এর মতো base64-এ 32 বাইট হতে হবে।';
+
+  @override
+  String get customServerWgCidrInvalid => 'কমা দিয়ে আলাদা প্রিফিক্স দিন, যেমন 10.0.0.2/32।';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0 থেকে 65535 সেকেন্ডের মধ্যে একটি সংখ্যা দিন।';
+
+  @override
+  String get strictKillSwitch => 'কঠোর নেটওয়ার্ক অবরোধ';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'সংযোগের পর, ক্র্যাশ, পুনরায় চালু বা অ্যাপ বন্ধ হলেও VPN-এর বাইরের ট্র্যাফিক আটকায়। শুধু সংযোগ বিচ্ছিন্ন করলে বা এই বিকল্প বন্ধ করলে প্রবেশাধিকার ফিরে আসে। ডিভাইস পুনরায় চালু হলে শুরুতে সংযোগের বিকল্প চালু থাকলেই অবরোধ আবার কার্যকর হয়।';
+
+  @override
+  String get extWorkerFailed => 'এক্সটেনশনের পটভূমির কাজ ব্যর্থ হয়েছে। এক্সটেনশনের লগ দেখুন।';
+
+  @override
+  String get extAssetRejected => 'এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।';
 }

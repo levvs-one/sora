@@ -5,7 +5,6 @@
   "stateConnected": "Підключено",
   "stateReconnecting": "Повторне підключення",
   "stateDisconnecting": "Відключення",
-  "stateFailed": "Не підключено",
   "coreMissing": "Служба Sora не відповідає",
   "serverAuto": "Найшвидший",
   "serverBypass": "Немає сервера",
@@ -41,6 +40,7 @@
   "export": "Зберегти у файл",
   "clear": "ясно",
   "logsEmpty": "Тут нічого немає",
+  "connEmpty": "Немає з’єднань",
   "appVersion": "Версія {version}",
   "notInstalled": "Не встановлено",
   "sourceCode": "Вихідний код",
@@ -75,17 +75,16 @@
   "errSubScheme": "Посилання має починатися з https://",
   "errSecretStore": "Пам’ять Sora пошкоджена або недоступна",
   "errNoServers": "Щоб підключитися, додайте підписку",
-  "exportText": "текст",
   "connections": "Зв'язки",
   "close": "Закрити",
   "chainDirect": "Прямий",
   "chainBlocked": "заблоковано",
   "theme": "Тема",
-  "themeSystem": "System",
+  "themeSystem": "Як у системі",
   "themeLight": "світло",
   "themeDark": "Темний",
   "language": "Мова",
-  "languageSystem": "System",
+  "languageSystem": "Як у системі",
   "sectionConnection": "Підключення",
   "sectionNoServer": "Немає сервера",
   "sectionPing": "Пінг",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} ліворуч",
   "ruleInvalid": "Це не схоже на сайт, IP чи програму",
   "tunnelMode": "Режим",
-  "tunnelTun": "Весь трафік",
   "tunnelProxy": "Проксі System",
   "proxyAddress": "Адреса проксі",
   "copied": "Скопійовано",
   "launchAtLogin": "Почніть із системи",
+  "launchAtLoginDetail": "Sora автоматично запускатиметься під час входу в систему й залишатиметься в треї.",
   "closeToTray": "Зберігати в закритому лотку",
   "notifications": "Сповіщення",
   "trayOpen": "Відкрийте Sora",
@@ -185,12 +184,6 @@
   "sidebarToggle": "Перемкнути бічну панель",
   "more": "більше",
   "less": "менше",
-  "currentServer": "Поточний сервер",
-  "trafficDown": "Завантажено",
-  "trafficUp": "Завантажено",
-  "perSecond": "{value}/s",
-  "activeRules": "Активні правила: {count}",
-  "recentNotifications": "Останні сповіщення",
   "notificationsEmpty": "Тут відображатимуться події підключення та підписки",
   "retryConnect": "Повторити підключення",
   "openLogs": "Відкриті журнали",
@@ -208,12 +201,9 @@
   "chooseProgram": "Виберіть програму",
   "installedApps": "Встановлені програми",
   "runningProcesses": "Запущені процеси",
-  "programsFailed": "Не вдалося завантажити програми",
   "programsEmpty": "Додатків не знайдено. Спробуйте інше ім'я.",
   "selectExe": "Виберіть файл .exe",
-  "trafficUnavailable": "Лічильників ще немає",
   "speedtest": "швидкість",
-  "speedtestCheck": "Перевірте швидкість",
   "speedtestSearch": "Знайдіть послугу",
   "speedtestEmpty": "Немає збігів. Змінити пошук.",
   "speedtestBackToList": "Назад до послуг",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "Копіювати команду",
   "updateChecksDisabled": "Автоматичні перевірки вимкнено в налаштуваннях.",
   "updateInstalled": "Оновлення встановлено. Повторно відкрийте Sora.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "Демонструвати",
   "githubReleases": "Релізи та завантаження",
   "telegramChannel": "Канал Telegram",
   "licenses": "Ліцензії",
   "componentLicenses": "Ліцензії на компоненти",
-  "appCopyright": "© 2026 levvs-one та співавтори",
   "collapseServers": "Згорнути сервери",
   "expandServers": "Розгорнути сервери",
   "hideDescription": "Приховати опис",
   "showDescription": "Показати опис",
   "pendingConnectionChanges": "Повторно підключіться, щоб застосувати ці зміни.",
   "reconnectNow": "Застосуйте та повторно підключіться",
-  "bypassLimitations": "Цей режим обходить DPI лише для HTTP та TLS, не підтримує UDP і не змінює ваш IP. Використовуйте сервер VPN для голосу Discord, дзвінків і заблокованих адрес Telegram.",
   "errEngineUnsupported": "Вибраний механізм не підтримує цей профіль або налаштування. Виберіть Авто або сумісний двигун.",
   "errRestore": "Очищення підключення не завершено. Повторити відключення; подробиці дивіться в журналі.",
   "errSessionEnded": "Ця сесія вже закінчилася. Оновіть стан підключення.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "Режими і двигуни",
   "probeServers": "Перевірити сервери",
   "expiresIn": "{name}: {days, plural, =0{підписка закінчується через кілька годин} one{підписка закінчується через день #} other{термін дії підписки закінчується через # днів}}",
-  "groupOrdered": "{count, plural, one{Сервер #, у свою чергу} other{Сервери #, у свою чергу}}",
   "groupBest": "{count, plural, one{Сервер #, найшвидший} other{Сервери #, найшвидші}}",
-  "modesGuide": "Виберіть «Авто», якщо ви не впевнені, яка система потрібна вашому серверу. Sora перевіряє профіль і налаштування перед підключенням. Механізм не може збільшити пропускну здатність вашого плану: продуктивність залежить від сервера, маршруту, протоколу та мережі.\n\n## Режими\n\n### Весь трафік (TUN)\n\nSora створює віртуальний мережевий інтерфейс і направляє через нього трафік додатків, включаючи TCP і UDP. Використовуйте цей режим для Telegram, ігор і голосу Discord. Правила можуть безпосередньо надсилати певні сайти чи програми або блокувати їх. Службі мережі потрібен дозвіл і сервер, який підтримує необхідний протокол.\n\n### System проксі\n\nSora налаштовує локальний проксі HTTP/SOCKS. Програми, які поважають системні налаштування проксі-сервера, використовують його. Програми з власним мережевим стеком можуть підключатися безпосередньо; Для UDP і голосових викликів зазвичай потрібен TUN. Цей режим підходить для браузерів і програм з підтримкою проксі.\n\n### Немає сервера\n\nНа Linux Sora використовує [zapret](https://github.com/bol-van/zapret) для розділення та зміни форми запитів HTTP/TLS та обходу деяких перевірок DPI. Ваша IP-адреса залишається незмінною, а з’єднання йдуть безпосередньо на веб-сайт. Результати залежать від вашого провайдера та методу блокування.\n\nПоточна інтеграція використовує tpws для HTTP та TLS через TCP. Він не обходить IP-блокування та не ретранслює UDP і не може гарантувати з’єднання MTProto Telegram. Використовуйте сервер VPN із TUN для голосу Discord, дзвінків Telegram і подібних обмежень.\n\n## Двигуни\n\n### Авто\n\nSora вибирає встановлений механізм, який підтримує весь план підключення: протоколи сервера, транспорти, групи, фрагментацію та режим. Несумісний вибір вручну відхиляється перед припиненням поточного підключення. Виберіть «Авто» або інший механізм і знову застосуйте налаштування.\n\n### sing-box\n\nНові пакети Sora включають [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), розгалуження [sing-box](https://github.com/SagerNet/sing-box), додавання XHTTP і VLESS Encryption на стороні клієнта. Sora розпізнає конструкцію та її можливості. Вихідна збірка без XHTTP не отримує цю можливість лише через назву.\n\nПідтримувані протоколи включають VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard і параметри AmneziaWG 1.x/2.x Sora може імпортувати. Повні профілі Xray JSON потребують Xray. Нові поля AWG 3.x ще не можна імпортувати. sing-box використовує локальний порт керування, захищений паролем, який можуть виявити інші програми на комп’ютері.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) підтримує фрагментацію VLESS, REALITY, XHTTP, VLESS Encryption і TLS. Він також запускає повні профілі постачальника Xray, зберігаючи їх маршрутизацію та групи. Такі профілі не можна автоматично конвертувати в інший механізм без зміни їхньої поведінки.\n\nУ комплекті Xray видалено параметр, який вимикає перевірку сертифіката TLS (`allowInsecure`). Автоматично вибирає sing-box або mihomo для звичайних серверів, які потребують цього параметра. Вибір Xray вручну повідомляє про несумісність перед припиненням поточного з’єднання. Старіші повні профілі JSON потребують оновленого профілю постачальника з сертифікатом, який можна перевірити, або PIN-кодом сертифіката.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) підтримує впорядковані резервні групи та групи балансування навантаження, XHTTP і AmneziaWG. Виберіть його, коли автоматичне перемикання після відмови на резервний сервер має значення. Налаштування фрагментації TLS Sora недоступне з цим механізмом.\n\n## Сумісність у Sora\n\n| Особливість | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN і TCP/UDP | Так | Так | Так |\n| XHTTP | Так | Так | Так |\n| VLESS Encryption | Так | Так | Так |\n| Повний профіль Xray | Ні | Так | Ні |\n| TUIC / AnyTLS | Обидва | Ні | TUIC |\n| Фрагментація TLS | Так | Так | Ні |\n| AmneziaWG 1.x/2.x | Так¹ | Ні | Так |\n| Замовлена ​​резервна група | Ні | №² | Так |\n\n¹ Профілі з J1/J2/J3/Itime використовують mihomo; ці поля ніколи не можна мовчки відкидати. ² Для групи повних профілів Xray програма вибирає резервний профіль. Підтримка залежить від встановленої збірки; перевірте його версію в Про програму.\n\n## Стек TUN\n\nСтек обробляє TCP і UDP у віртуальному інтерфейсі. На панелі режимів Xray і mihomo пропонують gVisor, System, Mixed і MIPS. Кожен двигун зберігає власні переваги. Режими проксі System і режим без сервера не використовують цей параметр.\n\n- **Mixed** — TCP використовує системний стек, тоді як gVisor обробляє UDP. Це типовий варіант для mihomo в Linux. У Windows Xray і mihomo типово використовують MIPS.\n- **System** — використовує системний стек. Спробуйте інший варіант, якщо мережеві програми стикаються з проблемами.\n- **gVisor** — обробляє трафік у просторі користувача.\n- **MIPS** — власний IP-стек mihomo, доступний у пакетній версії 1.19.32.\n\nНа Linux Xray використовує свій вбудований gVisor за замовчуванням. System, Mixed і MIPS на Linux використовують mihomo як механізм TUN, пересилаючи TCP і UDP на Xray через автентифіковане локальне посилання SOCKS. Xray зберігає протокол, профіль провайдера та маршрутизацію. Для цих трьох опцій потрібен встановлений mihomo. На Windows Xray використовує mihomo 1.19.32 або новіший для всіх чотирьох стеків TUN. Протоколи й маршрутизація залишаються в Xray. Правила застосунків у цій зв’язці підтримують лише пряме з’єднання та блокування; на Linux вони потребують вбудованого gVisor Xray.\n\nМіст запускає другий процес. У трьох вимірюваннях бездіяльності на Linux він використовував приблизно на 32–36 МБ більше фізичної пам’яті, ніж рідний Xray TUN. Це не вимірює навантаження на завантаження: вартість процесора та пам’яті залежить від з’єднань. sing-box не має селектора стека. Жоден стек не гарантує кращої продуктивності в кожній мережі. Виберіть стек, виберіть «Застосувати» та повторно підключіться, щоб спробувати його у своїй мережі.\n\n## Застосування налаштувань\n\nВибір сервера повторює підключення автоматично. Налаштування режиму, механізму, DNS і правил зберігаються негайно; під час активного підключення натисніть «Застосувати» та підключіться повторно, щоб використовувати їх. Перезапуск двигуна може перервати завантаження та дзвінки. Повторні клацання не запускають паралельні підключення; від'єднання завершує перехід і розриває з'єднання.\n\nІнтернет лише через VPN блокує прямий трафік у разі обриву тунелю. Це впливає на всю машину. Явне відключення видаляє правила Sora. Якщо очищення не завершується, повторіть спробу від’єднання та відкрийте журнал.\n\n## Проектна документація\n\n- [sing-box-lx: налаштування та підтримка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Документація sing-box](https://sing-box.sagernet.org/)\n- [Документація Xray](https://xtls.github.io/)\n- [Документація mihomo](https://wiki.metacubex.one/)\n- [zapret: робота та обмеження] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Виберіть «Авто», якщо ви не впевнені, яка система потрібна вашому серверу. Sora перевіряє профіль і налаштування перед підключенням. Механізм не може збільшити пропускну здатність вашого плану: продуктивність залежить від сервера, маршруту, протоколу та мережі.\n\n## Режими\n\n### Весь трафік (TUN)\n\nSora створює віртуальний мережевий інтерфейс і направляє через нього трафік додатків, включаючи TCP і UDP. Використовуйте цей режим для Telegram, ігор і голосу Discord. Правила можуть безпосередньо надсилати певні сайти чи програми або блокувати їх. Службі мережі потрібен дозвіл і сервер, який підтримує необхідний протокол.\n\n### System проксі\n\nSora налаштовує локальний проксі HTTP/SOCKS. Програми, які поважають системні налаштування проксі-сервера, використовують його. Програми з власним мережевим стеком можуть підключатися безпосередньо; Для UDP і голосових викликів зазвичай потрібен TUN. Цей режим підходить для браузерів і програм з підтримкою проксі.\n\n### Немає сервера\n\nНа Linux Sora використовує [zapret](https://github.com/bol-van/zapret) для розділення та зміни форми запитів HTTP/TLS та обходу деяких перевірок DPI. Ваша IP-адреса залишається незмінною, а з’єднання йдуть безпосередньо на веб-сайт. Результати залежать від вашого провайдера та методу блокування.\n\nПоточна інтеграція використовує tpws для HTTP та TLS через TCP. Він не обходить IP-блокування та не ретранслює UDP і не може гарантувати з’єднання MTProto Telegram. Використовуйте сервер VPN із TUN для голосу Discord, дзвінків Telegram і подібних обмежень.\n\n## Двигуни\n\n### Авто\n\nSora вибирає встановлений механізм, який підтримує весь план підключення: протоколи сервера, транспорти, групи, фрагментацію та режим. Несумісний вибір вручну відхиляється перед припиненням поточного підключення. Виберіть «Авто» або інший механізм і знову застосуйте налаштування.\n\n### sing-box\n\nНові пакети Sora включають [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), розгалуження [sing-box](https://github.com/SagerNet/sing-box), додавання XHTTP і VLESS Encryption на стороні клієнта. Sora розпізнає конструкцію та її можливості. Вихідна збірка без XHTTP не отримує цю можливість лише через назву.\n\nПідтримувані протоколи включають VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard і параметри AmneziaWG 1.x/2.x Sora може імпортувати. Повні профілі Xray JSON потребують Xray. Нові поля AWG 3.x ще не можна імпортувати. sing-box використовує локальний порт керування, захищений паролем, який можуть виявити інші програми на комп’ютері.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) підтримує фрагментацію VLESS, REALITY, XHTTP, VLESS Encryption і TLS. Він також запускає повні профілі постачальника Xray, зберігаючи їх маршрутизацію та групи. Такі профілі не можна автоматично конвертувати в інший механізм без зміни їхньої поведінки.\n\nУ комплекті Xray видалено параметр, який вимикає перевірку сертифіката TLS (`allowInsecure`). Автоматично вибирає sing-box або mihomo для звичайних серверів, які потребують цього параметра. Вибір Xray вручну повідомляє про несумісність перед припиненням поточного з’єднання. Старіші повні профілі JSON потребують оновленого профілю постачальника з сертифікатом, який можна перевірити, або PIN-кодом сертифіката.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) підтримує впорядковані резервні групи та групи балансування навантаження, XHTTP і AmneziaWG. Виберіть його, коли автоматичне перемикання після відмови на резервний сервер має значення. Налаштування фрагментації TLS Sora недоступне з цим механізмом.\n\n## Сумісність у Sora\n\n| Особливість | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN і TCP/UDP | Так | Так | Так |\n| XHTTP | Так | Так | Так |\n| VLESS Encryption | Так | Так | Так |\n| Повний профіль Xray | Ні | Так | Ні |\n| TUIC / AnyTLS | Обидва | Ні | TUIC |\n| Фрагментація TLS | Так | Так | Ні |\n| AmneziaWG 1.x/2.x | Так¹ | Ні | Так |\n| Замовлена ​​резервна група | Ні | №² | Так |\n\n¹ Профілі з J1/J2/J3/Itime використовують mihomo; ці поля ніколи не можна мовчки відкидати. ² Для групи повних профілів Xray програма вибирає резервний профіль. Підтримка залежить від встановленої збірки; перевірте його версію в Про програму.\n\n## Стек TUN\n\nСтек обробляє TCP і UDP у віртуальному інтерфейсі. На панелі режимів Xray і mihomo пропонують gVisor, System, Mixed і MIPS. Кожен двигун зберігає власні переваги. Режими проксі System і режим без сервера не використовують цей параметр.\n\n- **Mixed**: TCP використовує системний стек, тоді як gVisor обробляє UDP. Це типовий варіант для mihomo в Linux. У Windows Xray і mihomo типово використовують MIPS.\n- **System**: використовує системний стек. Спробуйте інший варіант, якщо мережеві програми стикаються з проблемами.\n- **gVisor**: обробляє трафік у просторі користувача.\n- **MIPS**: власний IP-стек mihomo, доступний у пакетній версії 1.19.32.\n\nНа Linux Xray використовує свій вбудований gVisor за замовчуванням. System, Mixed і MIPS на Linux використовують mihomo як механізм TUN, пересилаючи TCP і UDP на Xray через автентифіковане локальне посилання SOCKS. Xray зберігає протокол, профіль провайдера та маршрутизацію. Для цих трьох опцій потрібен встановлений mihomo. На Windows Xray використовує mihomo 1.19.32 або новіший для всіх чотирьох стеків TUN. Протоколи й маршрутизація залишаються в Xray. Правила застосунків у цій зв’язці підтримують лише пряме з’єднання та блокування; на Linux вони потребують вбудованого gVisor Xray.\n\nМіст запускає другий процес. У трьох вимірюваннях бездіяльності на Linux він використовував приблизно на 32–36 МБ більше фізичної пам’яті, ніж рідний Xray TUN. Це не вимірює навантаження на завантаження: вартість процесора та пам’яті залежить від з’єднань. sing-box не має селектора стека. Жоден стек не гарантує кращої продуктивності в кожній мережі. Виберіть стек, виберіть «Застосувати» та повторно підключіться, щоб спробувати його у своїй мережі.\n\n## Застосування налаштувань\n\nВибір сервера повторює підключення автоматично. Налаштування режиму, механізму, DNS і правил зберігаються негайно; під час активного підключення натисніть «Застосувати» та підключіться повторно, щоб використовувати їх. Перезапуск двигуна може перервати завантаження та дзвінки. Повторні клацання не запускають паралельні підключення; від'єднання завершує перехід і розриває з'єднання.\n\nІнтернет лише через VPN блокує прямий трафік у разі обриву тунелю. Це впливає на всю машину. Явне відключення видаляє правила Sora. Якщо очищення не завершується, повторіть спробу від’єднання та відкрийте журнал.\n\n## Проектна документація\n\n- [sing-box-lx: налаштування та підтримка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Документація sing-box](https://sing-box.sagernet.org/)\n- [Документація Xray](https://xtls.github.io/)\n- [Документація mihomo](https://wiki.metacubex.one/)\n- [zapret: робота та обмеження] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,21 +440,582 @@
       }
     }
   },
-  "diagnosticPackets": "Перехоплення пакетів",
   "exportLogFile": "У {name}",
-  "extensionsSoon": "Скоро буде",
   "diagnosticHttp": "HTTP діагностика",
-  "diagnosticEvents": "Події Windows",
-  "diagnosticCapture": "Зробіть знімок на 10 секунд",
   "extensions": "Розширення",
   "diagnosticNoData": "Ще немає записаних запитів. Спочатку відкрийте сайт тесту швидкості.",
-  "diagnosticUnavailable": "Ця діагностика недоступна на цій платформі.",
-  "diagnosticRequiresTun": "Для захоплення пакетів потрібне активне з’єднання Sora TUN.",
   "@exportLogFile": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "Додати спеціальний сервер",
+  "customServers": "Мої сервери",
+  "customServerName": "Назва",
+  "customServerNameHint": "Наприклад: мій VPS",
+  "customServerNameRequired": "Введіть назву",
+  "customServerAddress": "Адреса",
+  "customServerAddressHint": "example.com або 192.0.2.1",
+  "customServerAddressRequired": "Введіть адресу сервера",
+  "customServerAddressInvalid": "Недійсна адреса",
+  "customServerPort": "Порт",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "Порт має бути числом від 1 до 65535",
+  "customServerProtocol": "Протокол",
+  "customServerCredentials": "Дані для входу",
+  "customServerOptional": "Необов'язково",
+  "customServerShowSecret": "Показати секрет",
+  "customServerHideSecret": "Сховати секрет",
+  "customServerBadge": "власний",
+  "customServerDeleteConfirm": "Видалити сервер “{name}”?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "Додайте сервер вручну: адреса, порт і протокол",
+  "customServerTest": "Тест",
+  "leakTestTitle": "Перевірка на витік даних",
+  "leakTestIntro": "Перевіряє, чи може трафік залишити пристрій поза тунелем: прямі запити DNS та ICMP, вихід IPv6 і системні резолвери. Запускайте під час активного підключення.",
+  "leakTestRun": "Перевірити",
+  "leakTestCancel": "Скасувати",
+  "leakTestNeedsConnection": "Підключіться до VPN, щоб перевірити наявність витоку даних.",
+  "leakTestProgress": "Тести завершено: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "Витоків не знайдено",
+  "leakTestFound": "{count, plural, one{Знайдено # витік} few{Знайдено # витоки} many{Знайдено # витоків} other{Знайдено # витоку}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "Виправити",
+  "leakTestFixedNote": "Kill switch увімкнено. Повторіть перевірку.",
+  "leakTestCheckDirectDns": "Прямий DNS",
+  "leakTestCheckIcmpEcho": "ICMP відлуння",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "Системні резолвери",
+  "leakTestCheckTunnelConnectivity": "Підключення тунелю",
+  "leakTestCheckTunnelDns": "DNS через тунель",
+  "noticeDegraded": "Сервер став повільним. Sora перейшов на найкращий сервер, знайдений під час вимірювання.",
+  "obfs": "Маскування трафіку",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "Файли оновлення звіряються з контрольними сумами, опублікованими разом із релізом.",
+  "updateManualSigWarning": "Файли нижче збігаються з контрольними сумами релізу. Виконайте команду, якщо завантажили їх з офіційного релізу.",
+  "updateVersionRevoked": "Розробник відкликав цю версію. Зачекайте на виправлений випуск.",
+  "updateRolloutPending": "Поступово розгортається новіша версія, яка буде запропонована вам автоматично.",
+  "updateRollbacking": "Повернення до версії {version}...",
+  "updateRolledBack": "Оновлення до {version} не пройшло перевірку справності, тому Sora було відкочено до {fromVersion}.",
+  "updateRollbackError": "Помилка автоматичного відкоту. Якщо нова версія не працює, перевстановіть попередню версію вручну.",
+  "updateRollbackCacheError": "Не вдалося підготувати перевірену відкочену копію поточної версії, тому оновлення не встановлено.",
+  "extRatingLabel": "Рейтинг {rating} з 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "від {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "Встановлення: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 встановлення",
+  "extBadgeVerified": "Перевірено",
+  "extBadgeTop": "Найпопулярніший цього тижня",
+  "extBadgeNew": "Нове",
+  "extBadgeStaff": "Команда Sora",
+  "extSideloadShort": "Не з каталогу",
+  "extSideloadWarning": "Це розширення не з каталогу команди. За свій ключ поручився лише автор: встановлюйте його, лише якщо довіряєте автору.",
+  "extInstallTitle": "Установити «{name}»",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "Оновити «{name}»",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "Це розширення зможе:",
+  "extPermissionsWidened": "Оновлення запитує нові дозволи:",
+  "extDangerousAck": "Я розумію, що ці дозволи серйозні",
+  "extInstall": "Встановити",
+  "extUpdate": "Оновити",
+  "extCancel": "Скасувати",
+  "extConfirm": "Підтвердити",
+  "extOk": "OK",
+  "extCatalog": "Каталог",
+  "extInstalled": "Встановлені розширення",
+  "extSearchHint": "Пошук розширень",
+  "extCatAll": "Усі",
+  "extCatTools": "Інструменти",
+  "extCatThemes": "Теми",
+  "extCatAutomation": "Автоматизація",
+  "extCatStats": "Статистика",
+  "extCatNetwork": "Мережа",
+  "extSortBy": "Сортувати за",
+  "extSortPopular": "Найпопулярніший",
+  "extSortRating": "Найвищий рейтинг",
+  "extSortName": "Назва",
+  "extCatalogError": "Не вдалося завантажити каталог",
+  "extRetry": "Повторіть спробу",
+  "extEmptySearch": "Нічого не знайдено",
+  "extEmptyInstalled": "Розширень ще не встановлено.\nЗнайдіть його в каталозі або встановіть із файлу.",
+  "extInstallFromFile": "Встановити з файлу",
+  "extInstallFromUrl": "Встановити з URL",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "Завантажити",
+  "extDownloading": "Завантаження…",
+  "extVerifying": "Перевірка…",
+  "extInstalling": "Встановлення…",
+  "extInstallFailed": "Помилка встановлення",
+  "extErrSignature": "Не вдалося перевірити підпис. Файл може бути пошкоджено або підроблено.",
+  "extErrManifest": "Маніфест розширення недійсний.",
+  "extErrNetwork": "Помилка мережі. Перевірте підключення та повторіть спробу.",
+  "extErrHash": "Завантаження не відповідає каталогу. Можливо, це було підроблено.",
+  "extErrMinApp": "Для цього розширення потрібна версія програми {version} або новіша.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "Дозволено лише посилання https://",
+  "extErrGeneric": "Щось пішло не так. Спробуйте ще раз.",
+  "extErrAuthorKeyChanged": "Це оновлення підписано іншим ключем автора, ніж встановлена ​​версія, тому його було заблоковано. Якщо ви довіряєте новому ключу, видаліть розширення та встановіть його знову явно.",
+  "extUpdateAvailable": "Доступне оновлення",
+  "extDisabled": "Вимкнено",
+  "extToggleEnabled": "Увімкнути {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "Пошук серед установлених",
+  "extUpdateAll": "Оновити все Доступні оновлення",
+  "extUpdatesAvailable": "{count}",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} оновлено",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "Нормальний",
+  "extRiskSensitive": "Чутливий",
+  "extRiskDangerous": "Високий ризик",
+  "extPermissionsRemoved": "Більше не вимагається:",
+  "extUpdateFailedKept": "Попередня версія все ще встановлена.",
+  "extConflictsTitle": "Конфлікти розширень",
+  "extConflictsIntro": "Ці розширення претендують на одне й те саме. Виберіть, яке працюватиме, друге залишиться встановленим.",
+  "extConflictTheme": "Тема програми",
+  "extConflictNetHooks": "Мережеві перехоплення",
+  "extConflictWinner": "Перевага: {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} конфлікти потребують вашого рішення",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "Вирішення конфліктів",
+  "extConflictNote": "Вибір зберігається на цьому пристрої. Тема перемикається одразу, мережеві хуки в цій версії не запускаються.",
+  "extVersionLabel": "Версія {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "Автор",
+  "extRating": "Рейтинг",
+  "extInstalls": "Встановлення",
+  "extVersion": "Версія",
+  "extAbout": "Про це розширення",
+  "extPermissionsTitle": "Дозволи",
+  "extNoPermissions": "Немає спеціальних дозволів.",
+  "extSettings": "Налаштування",
+  "extSaveSettings": "Зберегти налаштування",
+  "extSaving": "Збереження…",
+  "extUpdateTo": "Оновити до {version}",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "Увімкнено",
+  "extRollbackTo": "Відкотити до {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "Відкотити до версії {version}?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "Видалити",
+  "extUninstallConfirm": "Видалити «{name}» та його налаштування?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "Панель недоступна. Можливо, розширення було вимкнено або видалено.",
+  "extPermConnectionsRead": "Перегляд активних з'єднань",
+  "extPermServersRead": "Бачити список серверів",
+  "extPermSettingsRead": "Прочитайте налаштування програми",
+  "extPermSettingsWrite": "Змінити налаштування програми",
+  "extPermNotifications": "Показати сповіщення",
+  "extPermTray": "Додавати пункти до меню трею",
+  "extPermUiPanel": "Показати панелі всередині програми",
+  "extPermThemeApply": "Застосовувати теми оформлення",
+  "extPermRoutingRules": "Додати правила маршрутизації (впливає на те, куди йде мережевий трафік)",
+  "extPermNetHooks": "Інтеграція в мережевий шлях (модулі обходу DPI)",
+  "extPermNetFetch": "Запитувати URL із дозволеного списку",
+  "extPermBackground": "Запуск фонових завдань",
+  "extPermBackgroundDetail": "Виконує заплановані завдання, навіть якщо панель закрита. Ви можете призупинити його або змінити частоту його запуску в налаштуваннях розширення.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "Працює у фоновому режимі",
+  "extCapNetHook": "Обходи блокувань і мережеві хуки",
+  "extCapPanel": "Інтерфейсні панелі",
+  "extCapRouting": "Правила маршрутизації",
+  "extCapTheme": "Теми",
+  "extCapWidget": "Віджети",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "Журнал змін",
+  "extImageFailed": "Не вдалося завантажити зображення",
+  "extRatingHow": "Як працюють рейтинги",
+  "extRatingHowBody": "Для оцінок використовується середнє байєсівське значення: розширення з невеликою кількістю оцінок залишається біля середини, доки не проголосує більше людей, тому один відгук із 5 зірками не може підняти нове розширення наверх. Останні рейтинги важливіші за старі, і враховується лише один рейтинг на обліковий запис.",
+  "extScreenshots": "Скріншоти",
+  "extSortRelevance": "Релевантність",
+  "extPermNetworkDetail": "Завантажує дані з інтернету через VPN. Дозволені лише хости зі списку нижче, решту заблоковано.",
+  "extBgTitle": "Фонове завдання",
+  "extBgEnabled": "Виконувати у фоні",
+  "extBgInterval": "Запускати кожні",
+  "extBgMinutes": "{count, plural, one{# хвилина} few{# хвилини} many{# хвилин} other{# хвилини}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# година} few{# години} many{# годин} other{# години}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Завдання запускається за розкладом, поки Sora відкрита, зокрема згорнута в трей. Мінімальний інтервал 15 хвилин.",
+  "extBgDisabledNote": "Увімкніть розширення для керування його фоновим завданням.",
+  "extCapNetwork": "Доступ до мережі",
+  "extCapNetworkHosts": "Мережа: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "Поділитися QR-кодом",
+  "qrScanTitle": "Сканувати QR-код",
+  "qrCopyLink": "Копіювати посилання",
+  "qrShowLink": "Показати посилання",
+  "qrHideLink": "Приховати посилання",
+  "qrWarning": "Цей код QR містить деталі підключення. Не показуйте його стороннім.",
+  "qrScanHint": "Виберіть знімок екрана або фото з QR-кодом чи вставте посилання",
+  "qrFromClipboard": "Вставити з буфера обміну",
+  "qrNoCode": "На зображенні не знайдено QR-код.",
+  "qrInvalid": "Цей код QR не містить дійсного посилання.",
+  "qrScan": "Сканувати QR",
+  "qrFromImage": "Відкрити зображення",
+  "connGroupByProcess": "Згрупувати за процесом",
+  "connListView": "Списком",
+  "connCopyHost": "Копіювати хост",
+  "connAddRule": "Додати правило",
+  "connConnectionsCount": "{count, plural, one{# з’єднання} few{# з’єднання} many{# з’єднань} other{# з’єднання}}",
+  "dnsPreset": "Пресет",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "Власний",
+  "dnsCheck": "Перевірте наявність витоку даних",
+  "dnsChecking": "Перевірка...",
+  "dnsNoLeak": "Витоків не знайдено",
+  "dnsLeakFound": "Витоку виявлено",
+  "dnsLastCheck": "Остання перевірка",
+  "dnsNeverChecked": "Ще не перевірялося",
+  "dnsLeakCheckTunnelDns": "Резолвери DNS тунелю",
+  "dnsLeakCheckSystemResolvers": "Системні резолвери",
+  "dnsLeakCheckKillSwitchDns": "Захист DNS через kill switch",
+  "dnsLeakFixConfigureTunnelDns": "Налаштуйте DNS для тунелю в налаштуваннях DNS вище.",
+  "dnsLeakFixReviewSystemResolvers": "Перевірте, які резолвери ваша система використовуватиме поза тунелем.",
+  "dnsLeakFixEnableKillSwitch": "Увімкніть kill switch, щоб трафік DNS залишався в тунелі.",
+  "dnsLeakCheckEncryptedDns": "Зашифрований DNS системи",
+  "dnsLeakCheckDnsSpoof": "Підроблені відповіді DNS",
+  "dnsLeakFixReviewEncryptedDns": "Перевірте, які зашифровані кінцеві точки DNS використовує ваша система поза тунелем.",
+  "dnsLeakFixUseEncryptedDns": "Використовуйте зашифрований DNS (DoT або DoH) для тунелю, щоб резолвери не могли підробити відповіді.",
+  "dnsCheckNeedsConnection": "Спочатку підключіться до VPN, а потім перевірте наявність витоків.",
+  "dnsExpected": "Очікується",
+  "dnsActual": "Дотримується",
+  "sortBy": "Сортувати за",
+  "sortPing": "Пінг",
+  "sortSpeed": "Швидкість",
+  "sortName": "Ім'я",
+  "measureSpeed": "Виміряйте швидкість",
+  "benchmarkStale": "застарілий",
+  "autoSelectMode": "Автоматичний вибір сервера",
+  "autoSelectPing": "Найшвидший пінг",
+  "autoSelectSpeed": "Найшвидша швидкість",
+  "autoSelectSmart": "Розумний вибір",
+  "coreWatchUnstable": "Підключення до ядра Sora нестабільне",
+  "watchReconnect": "Перепідключити",
+  "coreRestoringLink": "Відновлення підключення до ядра Sora…",
+  "crashRestoreTitle": "Останній сеанс було перервано",
+  "restoreOnCrash": "Відновити сеанс після збою",
+  "crashRestore": "Відновити",
+  "crashDismiss": "Не зараз",
+  "overrideTitle": "Мої редагування",
+  "overrideEdit": "Редагувати сервери",
+  "overrideHide": "Сховати",
+  "overrideUnhide": "Показати",
+  "overrideClear": "Скинути правки",
+  "overrideEmpty": "Ще жодних змін",
+  "overrideCustomRules": "Свої правила",
+  "errBenchmarkUnsupported": "Для вимірювання швидкості потрібне нове ядро",
+  "benchmarkProgress": "Замір {done} з {total}…",
+  "profiles": "Профілі мережі",
+  "profilesEmpty": "Ще немає профілів. Створіть його, щоб автоматично застосувати налаштування до відомих мереж.",
+  "profileAdd": "Додати профіль",
+  "profileName": "Назва профілю",
+  "profileSsids": "Wi-Fi мережі (SSID)",
+  "profileSsidsHint": "Будинок, Офіс через кому",
+  "profileGateways": "Мережеві шлюзи",
+  "profileAsns": "AS чисел",
+  "profileAutoApply": "Застосовувати автоматично",
+  "profileAutoApplyHint": "Якщо вимкнено, запитувати перед застосуванням профілю.",
+  "profileSnapshot": "Запам'ятати поточні налаштування",
+  "profileSnapshotDone": "Поточні налаштування збережено в профілі",
+  "profileDelete": "Видалити профіль",
+  "profileDeleteConfirm": "Видалити профіль \"{name}\"?",
+  "profileApplyAsk": "Застосувати профіль \"{name}\"?",
+  "profileApply": "Застосувати",
+  "profileApplied": "Профіль «{name}» застосований",
+  "profileUndo": "Скасувати",
+  "profileActive": "Активний",
+  "networkNow": "Зараз: {info}",
+  "networkUnknown": "Інформація про мережу недоступна",
+  "profileNoTriggers": "Додайте принаймні один тригер: SSID, шлюз або ASN",
+  "chains": "Ланцюжки проксі",
+  "chainsEmpty": "Ланцюгів ще немає. Зв’яжіть 2–3 сервери, щоб трафік проходив через кожен із них.",
+  "chainAdd": "Новий ланцюг",
+  "chainName": "Назва ланцюга",
+  "chainPickServers": "Виберіть 2–3 сервери",
+  "chainOrderHint": "Перетягніть, щоб змінити порядок: рух в’їжджає вгорі, а виходить – унизу.",
+  "chainTooFew": "Виберіть принаймні 2 сервери",
+  "chainTooMany": "Ланцюжок містить щонайбільше 3 сервери",
+  "chainEstimate": "Розрахункова затримка",
+  "chainSave": "Зберегти ланцюжок",
+  "chainDelete": "Видалити ланцюжок",
+  "chainDeleteConfirm": "Видалити ланцюжок \"{name}\"?",
+  "chainUnsupported": "Поточний двигун не підтримує ланцюжки",
+  "chainHopMissing": "Один із ланцюжкових серверів більше не доступний",
+  "chainHop": "Перехід {n}",
+  "chainEntry": "Вхід",
+  "chainExit": "Вихід",
+  "sync": "Синхронізація пристроїв",
+  "syncDevices": "Мої пристрої",
+  "syncEmpty": "Немає сполучених пристроїв. Підключіть інший пристрій через локальну мережу.",
+  "syncPair": "Спарити пристрій",
+  "syncShowCode": "Показати мій код",
+  "syncScanCode": "Сканувати код",
+  "syncRevoke": "Відкликати",
+  "syncRevokeConfirm": "Відкликати \"{name}\"?",
+  "syncLastSync": "Остання синхронізація: {time}",
+  "syncNever": "Ніколи",
+  "syncNoLan": "Пристрої мають бути в одній локальній мережі",
+  "syncPaired": "Пристрій спарений",
+  "syncPairingTitle": "Спарити з цим пристроєм",
+  "syncWaiting": "Очікування іншого пристрою…",
+  "syncSecureNote": "Канал із наскрізним шифруванням. Ні облікових записів, ні хмарних серверів.",
+  "zapretWithVpn": "Обхід фільтрації DPI для прямого мережевого трафіку",
+  "zapretWithVpnHint": "Запускає zapret разом із VPN-тунелем: трафік тунелю йде через VPN, а прямий трафік через засіб обходу блокувань.",
+  "chainDuplicate": "Кожен сервер може з'явитися лише один раз",
+  "edit": "Редагувати",
+  "remove": "Видалити",
+  "autoSwitchOnDegrade": "Автоматичне перемикання при деградації",
+  "autoSwitchOnDegradeDetail": "Якщо вибраний сервер сильно сповільниться або перестане відповідати, Sora перемкнеться на найкращий за вимірюваннями, але не частіше ніж раз на 10 хвилин.",
+  "tunStackMixed": "Змішаний",
+  "tunStackSystem": "Системний",
+  "syncCodeExpired": "Строк дії коду минув",
+  "syncDaemonFailed": "Не вдалося запустити службу синхронізації",
+  "syncDaemonMissing": "Компонент sora-sync не знайдено. Перевстановіть програму, щоб увімкнути синхронізацію пристрою.",
+  "syncDaemonStarting": "Запуск служби синхронізації…",
+  "syncErrAuth": "Служба синхронізації відхилила маркер доступу. Перезапустіть програму та повторіть спробу.",
+  "syncErrNotFound": "Пристрій більше не підключено",
+  "syncErrPairingActive": "Сеанс створення пари вже відкрито",
+  "syncErrUnreachable": "Інший пристрій не відповідає. Переконайтеся, що він у тій самій мережі та відображає його код.",
+  "syncError": "Помилка синхронізації",
+  "syncExpiresIn": "Термін дії коду спливе через {duration}",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "Сполучення з пристроєм…",
+  "syncLegacyCleared": "Старий список пристроїв насправді ніколи не сполучався, тому його було очищено. З’єднайте свої пристрої знову, цього разу по-справжньому.",
+  "syncNewCode": "Новий код",
+  "syncPairedWith": "в парі з {name}",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "Повторити",
+  "syncStopShowing": "Сховати код",
+  "syncSyncNow": "Синхронізувати",
+  "syncSyncResult": "Отримано {pulled}, надіслано {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "Результат синхронізації",
+  "syncPulled": "Отримано",
+  "syncPushed": "Відправлено",
+  "syncNoChanges": "Змін не виявлено",
+  "syncDocKindSubscriptions": "Підписки",
+  "syncDocKindSettings": "Налаштування програми",
+  "syncDocKindOverrides": "Перевизначення підписок",
+  "syncDocKindProfiles": "Профілі мережі",
+  "syncDocKindChains": "Ланцюжки проксі",
+  "syncFrom": "з {name}",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "Цей пристрій",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Для Shadowsocks: метод:пароль, наприклад chacha20-ietf-poly1305:пароль",
+  "diagnosticPackets": "Перехоплення пакетів",
+  "diagnosticEvents": "Події Windows",
+  "diagnosticCapture": "Зробіть знімок на 10 секунд",
+  "diagnosticRequiresTun": "Для захоплення пакетів потрібне активне з’єднання Sora TUN.",
+  "diagnosticUnavailable": "Ця діагностика недоступна на цій платформі.",
+  "extErrRevoked": "Команда Sora відкликала цю версію розширення: вона небезпечна або зламана.",
+  "extErrRevocationsExpired": "Не вдалося оновити список відкликаних розширень. Встановлення недоступне, доки він не оновиться: перевірте мережу й спробуйте знову.",
+  "extRevokedDisabled": "Вимкнено відкликані розширення: {names}",
+  "customServerWgPrivateKey": "Приватний ключ",
+  "customServerWgAddresses": "Адреси інтерфейсу",
+  "customServerWgPeerKey": "Публічний ключ сервера",
+  "customServerWgPresharedKey": "Спільний ключ",
+  "customServerWgAllowedIps": "Дозволені IP",
+  "customServerWgKeepalive": "Keepalive, секунд",
+  "customServerWgKeyInvalid": "Ключ має бути 32 байтами в base64, як виводить wg genkey.",
+  "customServerWgCidrInvalid": "Вкажіть адреси через кому у вигляді 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Вкажіть кількість секунд від 0 до 65535.",
+  "strictKillSwitch": "Суворий kill switch",
+  "strictKillSwitchWarning": "Після підключення блокує трафік поза VPN навіть після збою, перезапуску чи виходу з програми. Доступ відновиться лише після відключення VPN або цієї опції. Після перезавантаження блокування відновлюється лише з увімкненим підключенням під час запуску.",
+  "extWorkerFailed": "Фонове завдання розширення завершилося з помилкою. Перевірте журнал розширення.",
+  "extAssetRejected": "Файл розширення відхилено: нечитабельні кольори або неправильні правила."
 }

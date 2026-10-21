@@ -5,7 +5,6 @@
   "stateConnected": "Conectada",
   "stateReconnecting": "Reconectando",
   "stateDisconnecting": "Desconectando",
-  "stateFailed": "No conectada",
   "coreMissing": "El servicio Sora no responde",
   "serverAuto": "Más rápida",
   "serverBypass": "Sin servidor",
@@ -41,6 +40,7 @@
   "export": "Guardar en archivo",
   "clear": "Clara",
   "logsEmpty": "Nada aquí",
+  "connEmpty": "Sin conexiones",
   "appVersion": "Versión {version}",
   "notInstalled": "No instalado",
   "sourceCode": "código fuente",
@@ -75,17 +75,16 @@
   "errSubScheme": "El enlace debe comenzar con https://",
   "errSecretStore": "El almacenamiento Sora está dañado o no está disponible",
   "errNoServers": "Añade una suscripción para conectarte",
-  "exportText": "Texto",
   "connections": "Conexiones",
   "close": "Cerca",
   "chainDirect": "Directa",
   "chainBlocked": "Obstruida",
   "theme": "Tema",
-  "themeSystem": "System",
+  "themeSystem": "Según el sistema",
   "themeLight": "Ligera",
   "themeDark": "Oscura",
   "language": "Idioma",
-  "languageSystem": "System",
+  "languageSystem": "Según el sistema",
   "sectionConnection": "Conexión",
   "sectionNoServer": "Sin servidor",
   "sectionPing": "Silbido",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} izquierda",
   "ruleInvalid": "Esto no parece un sitio, una IP o un programa.",
   "tunnelMode": "Modo",
-  "tunnelTun": "Todo el tráfico",
   "tunnelProxy": "Proxy System",
   "proxyAddress": "dirección proxy",
   "copied": "Copiada",
   "launchAtLogin": "Comience con el sistema",
+  "launchAtLoginDetail": "Sora se iniciará automáticamente al iniciar sesión y quedará en la bandeja del sistema.",
   "closeToTray": "Mantener en la bandeja cuando esté cerrada.",
   "notifications": "Notificaciones",
   "trayOpen": "Abierto Sora",
@@ -185,12 +184,6 @@
   "sidebarToggle": "Alternar barra lateral",
   "more": "Más",
   "less": "Menos",
-  "currentServer": "Servidor actual",
-  "trafficDown": "Descargada",
-  "trafficUp": "subido",
-  "perSecond": "{value}/s",
-  "activeRules": "Reglas activas: {count}",
-  "recentNotifications": "Notificaciones recientes",
   "notificationsEmpty": "Los eventos de conexión y suscripción aparecerán aquí",
   "retryConnect": "Reintentar conexión",
   "openLogs": "Abrir registros",
@@ -208,12 +201,9 @@
   "chooseProgram": "Elige un programa",
   "installedApps": "Aplicaciones instaladas",
   "runningProcesses": "Procesos en ejecución",
-  "programsFailed": "No se pudieron cargar aplicaciones",
   "programsEmpty": "No se encontraron aplicaciones. Prueba con otro nombre.",
   "selectExe": "Elija un archivo .exe",
-  "trafficUnavailable": "Los contadores aún no están disponibles",
   "speedtest": "Velocidad",
-  "speedtestCheck": "comprobar velocidad",
   "speedtestSearch": "encontrar un servicio",
   "speedtestEmpty": "Sin coincidencias. Cambia la búsqueda.",
   "speedtestBackToList": "Volver a servicios",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "comando copiar",
   "updateChecksDisabled": "Las comprobaciones automáticas están deshabilitadas en Configuración.",
   "updateInstalled": "Actualización instalada. Vuelva a abrir Sora.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "Proyecto",
   "githubReleases": "Lanzamientos y descargas",
   "telegramChannel": "Canal Telegram",
   "licenses": "Licencias",
   "componentLicenses": "Licencias de componentes",
-  "appCopyright": "© 2026 levvs-one y colaboradores",
   "collapseServers": "Colapsar servidores",
   "expandServers": "Ampliar servidores",
   "hideDescription": "Ocultar descripción",
   "showDescription": "Mostrar descripción",
   "pendingConnectionChanges": "Vuelva a conectarse para aplicar estos cambios.",
   "reconnectNow": "Aplicar y reconectar",
-  "bypassLimitations": "Este modo omite DPI solo para HTTP y TLS, no admite UDP ni cambia su IP. Utilice un servidor VPN para voz Discord, llamadas y direcciones Telegram bloqueadas.",
   "errEngineUnsupported": "El motor seleccionado no admite este perfil o configuración. Elija Auto o un motor compatible.",
   "errRestore": "La limpieza de la conexión fue incompleta. Vuelva a intentar desconectarse; consulte el registro para obtener más detalles.",
   "errSessionEnded": "Esta sesión ya ha terminado. Actualiza el estado de la conexión.",
@@ -267,7 +272,6 @@
   "modesGuideTitle": "Modos y motores",
   "probeServers": "comprobar servidores",
   "expiresIn": "{name}: {days, plural, =0{la suscripción finaliza en unas horas} one{la suscripción finaliza el día #} other{la suscripción finaliza en días #}}",
-  "groupOrdered": "{count, plural, one{Servidor #, a su vez} other{Servidores #, a su vez}}",
   "groupBest": "{count, plural, one{Servidor #, la más rápida} other{Servidores #, la más rápida}}",
   "modesGuide": "Elija Auto si no está seguro de qué motor necesita su servidor. Sora comprueba el perfil y la configuración antes de conectarse. Un motor no puede aumentar el ancho de banda de su plan: el rendimiento depende del servidor, la ruta, el protocolo y la red.\n\n## Modos\n\n### Todo el tráfico (TUN)\n\nSora crea una interfaz de red virtual y enruta el tráfico de aplicaciones a través de ella, incluidos TCP y UDP. Utilice este modo para Telegram, juegos y voz Discord. Las reglas pueden enviar sitios o programas específicos directamente o bloquearlos. El servicio de red necesita permiso y un servidor que admita el protocolo requerido.\n\n### Proxy System\n\nSora configura un proxy HTTP/SOCKS local. Las aplicaciones que respetan la configuración del proxy del sistema lo utilizan. Las aplicaciones con su propia pila de red pueden conectarse directamente; UDP y las llamadas de voz generalmente necesitan TUN. Este modo se adapta a navegadores y aplicaciones compatibles con proxy.\n\n### Sin servidor\n\nEn Linux, Sora usa [zapret](https://github.com/bol-van/zapret) para dividir y remodelar solicitudes HTTP/TLS y omitir algunas comprobaciones de DPI. Su IP sigue siendo la misma y las conexiones van directamente al sitio web. Los resultados dependen de su proveedor y del método de bloqueo.\n\nLa integración actual utiliza tpws para HTTP y TLS sobre TCP. No evita el bloqueo de IP ni retransmite UDP y no puede garantizar las conexiones MTProto del Telegram. Utilice un servidor VPN con TUN para voz Discord, llamadas Telegram y este tipo de restricciones.\n\n## Motores\n\n### Automático\n\nSora selecciona un motor instalado que soporta todo el plan de conexión: protocolos de servidor, transportes, grupos, fragmentación y modo. Una elección manual incompatible se rechaza antes de detener la conexión actual. Elija Auto u otro motor y aplique la configuración nuevamente.\n\n### sing-box\n\nLos nuevos paquetes Sora incluyen [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), una bifurcación de [sing-box](https://github.com/SagerNet/sing-box), agregando XHTTP y VLESS Encryption del lado del cliente. Sora reconoce la construcción y sus capacidades. Una versión ascendente sin XHTTP no obtiene esta capacidad solo por su nombre.\n\nLos protocolos admitidos incluyen VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard y los parámetros AmneziaWG 1.x/2.x que Sora puede importar. Los perfiles JSON Xray completos requieren Xray. Aún no se pueden importar nuevos campos AWG 3.x. sing-box utiliza un puerto de control local protegido con contraseña, que otras aplicaciones de la computadora pueden detectar.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) admite fragmentación VLESS, REALITY, XHTTP, VLESS Encryption y TLS. También ejecuta perfiles completos del proveedor Xray conservando al mismo tiempo sus enrutamientos y grupos. Estos perfiles no se pueden convertir automáticamente a otro motor sin cambiar su comportamiento.\n\nEl Xray incluido eliminó la configuración que deshabilita la verificación del certificado TLS (`allowInsecure`). Selecciona automáticamente sing-box o mihomo para servidores normales que requieren esta configuración. Al seleccionar Xray manualmente se informa de incompatibilidad antes de detener la conexión actual. Los perfiles JSON completos más antiguos necesitan un perfil de proveedor actualizado con un certificado verificable o un PIN de certificado.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) admite grupos de equilibrio de carga y respaldo ordenados, XHTTP y AmneziaWG. Elíjalo cuando sea importante la conmutación por error automática a un servidor de respaldo. La configuración de fragmentación TLS de Sora no está disponible con este motor.\n\n## Compatibilidad en Sora\n\n| Característica | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN y TCP/UDP | Sí | Sí | Sí |\n| XHTTP | Sí | Sí | Sí |\n| VLESS Encryption | Sí | Sí | Sí |\n| Perfil completo Xray | No | Sí | No |\n| TUIC / AnyTLS | Ambos | No | TUIC |\n| Fragmentación TLS | Sí | Sí | No |\n| AmneziaWG 1.x/2.x | Sí¹ | No | Sí |\n| Grupo de reserva ordenado | No | No² | Sí |\n\n¹ Los perfiles con J1/J2/J3/Itime utilizan mihomo; estos campos nunca deben descartarse silenciosamente. ² Para un grupo de perfiles Xray completos, la aplicación selecciona un perfil de respaldo. El soporte depende de la compilación instalada; consulte su versión en Acerca de.\n\n## pila TUN\n\nLa pila maneja TCP y UDP dentro de la interfaz virtual. En el panel de modos, Xray y mihomo ofrecen gVisor, System, Mixed y MIPS. Cada motor guarda sus propias preferencias. Los modos System proxy y Serverless no utilizan esta preferencia.\n\n- **Mixed**: TCP utiliza la pila del sistema, mientras que gVisor maneja UDP. Este es el valor predeterminado para mihomo en Linux. En Windows, Xray y mihomo usan MIPS de forma predeterminada.\n- **System**: utiliza la pila del sistema. Pruebe otra opción si las aplicaciones de red encuentran problemas.\n- **gVisor**: maneja el tráfico en el espacio de usuario.\n- **MIPS**: pila de IP propia de mihomo, disponible en la versión incluida 1.19.32.\n\nEn Linux, Xray utiliza su gVisor integrado de forma predeterminada. System, Mixed y MIPS en Linux utilizan mihomo como motor TUN, reenviando TCP y UDP a Xray a través de un enlace SOCKS local autenticado. Xray conserva el protocolo, el perfil del proveedor y el enrutamiento. Estas tres opciones requieren un mihomo instalado. En Windows, Xray utiliza mihomo 1.19.32 o posterior para las cuatro pilas TUN. Los protocolos y el enrutamiento permanecen en Xray. Las reglas de aplicaciones en esta combinación solo admiten conexiones directas y bloqueo; en Linux requieren el gVisor integrado de Xray.\n\nEl puente ejecuta un segundo proceso. En tres mediciones inactivas en Linux, utilizó entre 32 y 36 MiB más de memoria física que el Xray TUN nativo. Esto no mide la carga de descarga: los costos de CPU y memoria dependen de las conexiones. sing-box no tiene selector de pila. Ninguna pila garantiza un mejor rendimiento en todas las redes. Elija una pila y seleccione Aplicar y volver a conectarse para probarla en su red.\n\n## Aplicar configuración\n\nAl seleccionar un servidor se vuelve a conectar automáticamente. La configuración de modo, motor, DNS y reglas se guarda inmediatamente; durante una conexión activa, haga clic en Aplicar y vuelva a conectarse para usarlos. Reiniciar un motor puede interrumpir las descargas y las llamadas. Los clics repetidos no inician conexiones paralelas; la desconexión finaliza la transición y libera la conexión.\n\nInternet solo a través de VPN bloquea el tráfico directo cuando cae un túnel. Afecta a toda la máquina. Una desconexión explícita elimina las reglas de Sora. Si la limpieza no finaliza, vuelva a intentar desconectarse y abra el registro.\n\n## Documentación del proyecto\n\n- [sing-box-lx: configuración y soporte](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Documentación sing-box](https://sing-box.sagernet.org/)\n- [Documentación Xray](https://xtls.github.io/)\n- [Documentación mihomo](https://wiki.metacubex.one/)\n- [zapret: funcionamiento y limitaciones](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,15 +440,9 @@
       }
     }
   },
-  "extensionsSoon": "Muy pronto",
-  "diagnosticRequiresTun": "La captura de paquetes necesita una conexión Sora TUN activa.",
   "extensions": "Extensiones",
-  "diagnosticPackets": "captura de paquetes",
   "diagnosticHttp": "Diagnóstico HTTP",
-  "diagnosticUnavailable": "Este diagnóstico no está disponible en esta plataforma.",
-  "diagnosticEvents": "Eventos de Windows",
   "diagnosticNoData": "Aún no hay solicitudes registradas. Primero abra un sitio web de prueba de velocidad.",
-  "diagnosticCapture": "Captura durante 10 segundos",
   "exportLogFile": "En {name}",
   "@exportLogFile": {
     "placeholders": {
@@ -473,5 +450,572 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "Agregar servidor personalizado",
+  "customServers": "Mis servidores",
+  "customServerName": "Nombre",
+  "customServerNameHint": "Por ejemplo: mi VPS",
+  "customServerNameRequired": "Introduzca el nombre",
+  "customServerAddress": "Dirección",
+  "customServerAddressHint": "example.com o 192.0.2.1",
+  "customServerAddressRequired": "Ingrese la dirección del servidor",
+  "customServerAddressInvalid": "Dirección no válida",
+  "customServerPort": "Puerto",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "El puerto debe ser un número del 1 al 65535",
+  "customServerProtocol": "Protocolo",
+  "customServerCredentials": "Información de inicio de sesión",
+  "customServerOptional": "Opcional",
+  "customServerShowSecret": "Mostrar secreto",
+  "customServerHideSecret": "Ocultar secreto",
+  "customServerBadge": "personalizado",
+  "customServerDeleteConfirm": "¿Eliminar el servidor “{name}”?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "Agregar un servidor manualmente: dirección, puerto y protocolo",
+  "customServerTest": "Prueba",
+  "leakTestTitle": "Prueba de fugas de datos",
+  "leakTestIntro": "Comprueba si el tráfico puede salir del dispositivo fuera del túnel: solicitudes directas de DNS e ICMP, salida IPv6 y resolutores del sistema. Ejecute la prueba con la conexión activa.",
+  "leakTestRun": "Comprobar",
+  "leakTestCancel": "Cancelar",
+  "leakTestNeedsConnection": "Conéctese al VPN para probar si hay fugas de datos.",
+  "leakTestProgress": "Pruebas completadas: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "No se encontraron fugas",
+  "leakTestFound": "{count, plural, one{# fuga encontrada} other{# fugas encontradas}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "Arreglar",
+  "leakTestFixedNote": "El bloqueo de red está activado. Repita la prueba para verificarlo.",
+  "leakTestCheckDirectDns": "Directo DNS",
+  "leakTestCheckIcmpEcho": "ICMP eco",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "Resolutores del sistema",
+  "leakTestCheckTunnelConnectivity": "Conectividad del túnel",
+  "leakTestCheckTunnelDns": "DNS a través del túnel",
+  "noticeDegraded": "El servidor se volvió lento. Sora cambió al mejor servidor encontrado durante la medición.",
+  "obfs": "Ofuscación del tráfico",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "Los archivos de actualización se comprueban con las sumas de verificación publicadas con la versión.",
+  "updateManualSigWarning": "Los archivos de abajo coinciden con las sumas de verificación de la versión. Ejecuta el comando si los descargaste de la versión oficial.",
+  "updateVersionRevoked": "El desarrollador ha retirado esta versión. Espere una publicación corregida.",
+  "updateRolloutPending": "Una versión más nueva se está implementando gradualmente y se le ofrecerá automáticamente.",
+  "updateRollbacking": "Regresando a la versión {version}...",
+  "updateRolledBack": "La actualización a {version} no pasó la verificación de estado, por lo que Sora se revirtió a {fromVersion}.",
+  "updateRollbackError": "Falló la reversión automática. Si la nueva versión no funciona, reinstale la versión anterior manualmente.",
+  "updateRollbackCacheError": "No se pudo preparar una copia de reversión verificada de la versión actual, por lo que no se instaló la actualización.",
+  "extRatingLabel": "Calificación {rating} de 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "por {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "Instalaciones: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 instalación",
+  "extBadgeVerified": "Verificado",
+  "extBadgeTop": "Más popular esta semana",
+  "extBadgeNew": "Nuevo",
+  "extBadgeStaff": "El equipo Sora",
+  "extSideloadShort": "No del catálogo",
+  "extSideloadWarning": "Esta extensión no es del catálogo del equipo. Sólo el autor ha respondido por su clave: instálela sólo si confía en el autor.",
+  "extInstallTitle": "Instalar «{name}»",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "Actualizar «{name}»",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "Esta extensión podrá:",
+  "extPermissionsWidened": "La actualización solicita nuevos permisos:",
+  "extDangerousAck": "Entiendo que estos permisos son serios",
+  "extInstall": "Instalar",
+  "extUpdate": "Actualizar",
+  "extCancel": "Cancelar",
+  "extConfirm": "Confirmar",
+  "extOk": "OK",
+  "extCatalog": "Catálogo",
+  "extInstalled": "Extensiones instaladas",
+  "extSearchHint": "Buscar extensiones",
+  "extCatAll": "Todos",
+  "extCatTools": "Herramientas",
+  "extCatThemes": "Temas",
+  "extCatAutomation": "Automatización",
+  "extCatStats": "Estadísticas",
+  "extCatNetwork": "Red",
+  "extSortBy": "Ordenar por",
+  "extSortPopular": "Más popular",
+  "extSortRating": "Mejor calificado",
+  "extSortName": "Nombre",
+  "extCatalogError": "No se pudo cargar el catálogo",
+  "extRetry": "Reintentar",
+  "extEmptySearch": "No se encontró nada",
+  "extEmptyInstalled": "Aún no hay extensiones instaladas.\nBusque uno en el catálogo o instálelo desde un archivo.",
+  "extInstallFromFile": "Instalar desde archivo",
+  "extInstallFromUrl": "Instalar desde URL",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "Descargar",
+  "extDownloading": "Descargando…",
+  "extVerifying": "Verificando…",
+  "extInstalling": "Instalando…",
+  "extInstallFailed": "Instalación fallida",
+  "extErrSignature": "La verificación de firma falló. El archivo puede estar dañado o alterado.",
+  "extErrManifest": "El manifiesto de extensión no es válido.",
+  "extErrNetwork": "Error de red. Comprueba tu conexión y vuelve a intentarlo.",
+  "extErrHash": "La descarga no coincide con el catálogo. Es posible que haya sido manipulado.",
+  "extErrMinApp": "Esta extensión necesita la versión de la aplicación {version} o más reciente.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "Sólo se permiten enlaces https://",
+  "extErrGeneric": "Algo salió mal. Por favor inténtalo de nuevo.",
+  "extErrAuthorKeyChanged": "Esta actualización está firmada con una clave de autor diferente a la versión instalada, por lo que fue bloqueada. Si confía en la nueva clave, desinstale la extensión y vuelva a instalarla explícitamente.",
+  "extUpdateAvailable": "Actualización disponible",
+  "extDisabled": "Desactivado",
+  "extToggleEnabled": "Habilitar {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "Buscar extensiones instaladas",
+  "extUpdateAll": "Actualizar todo",
+  "extUpdatesAvailable": "{count} actualizaciones disponibles",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} actualizado",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "Normal",
+  "extRiskSensitive": "Sensible",
+  "extRiskDangerous": "Alto riesgo",
+  "extPermissionsRemoved": "Ya no se solicita:",
+  "extUpdateFailedKept": "La versión anterior aún está instalada.",
+  "extConflictsTitle": "Conflictos de extensión",
+  "extConflictsIntro": "Estas extensiones quieren lo mismo. Elige cuál se ejecuta; la otra seguirá instalada.",
+  "extConflictTheme": "Tema de la aplicación",
+  "extConflictNetHooks": "Ganchos de red",
+  "extConflictWinner": "{name} gana",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} los conflictos necesitan tu decisión",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "Resolver conflictos",
+  "extConflictNote": "Tu elección se guarda en este dispositivo. El tema cambia al instante; los hooks de red no se ejecutan en esta versión.",
+  "extVersionLabel": "Versión {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "Autor",
+  "extRating": "Clasificación",
+  "extInstalls": "Instalaciones",
+  "extVersion": "Versión",
+  "extAbout": "Acerca de esta extensión",
+  "extPermissionsTitle": "Permisos",
+  "extNoPermissions": "Sin permisos especiales.",
+  "extSettings": "Ajustes",
+  "extSaveSettings": "Guardar ajustes",
+  "extSaving": "Guardando…",
+  "extUpdateTo": "Actualizar a {version}",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "Activado",
+  "extRollbackTo": "Volver a {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "¿Revertir a la versión {version}?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "Desinstalar",
+  "extUninstallConfirm": "¿Eliminar “{name}” y sus configuraciones?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "El panel no está disponible. Es posible que la extensión se haya desactivado o eliminado.",
+  "extPermConnectionsRead": "Ver lista de conexiones activas",
+  "extPermServersRead": "Ver una lista de sus servidores",
+  "extPermSettingsRead": "Leer la configuración de la aplicación",
+  "extPermSettingsWrite": "Cambiar la configuración de la aplicación",
+  "extPermNotifications": "Mostrar notificaciones",
+  "extPermTray": "Agregar elementos al menú de la bandeja",
+  "extPermUiPanel": "Mostrar paneles dentro de la aplicación",
+  "extPermThemeApply": "Aplicar temas",
+  "extPermRoutingRules": "Agregar reglas de enrutamiento (afecta hacia dónde va el tráfico de la red)",
+  "extPermNetHooks": "Integrar en la ruta de red (módulos de derivación DPI)",
+  "extPermNetFetch": "Solicitar URL de la lista permitida",
+  "extPermBackground": "Ejecutar tareas en segundo plano",
+  "extPermBackgroundDetail": "Ejecuta tareas programadas incluso cuando el panel está cerrado. Puede pausarlo o cambiar la frecuencia con la que se ejecuta en la configuración de la extensión.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "Se ejecuta en segundo plano",
+  "extCapNetHook": "Evasión de bloqueos y enganches de red",
+  "extCapPanel": "Paneles de interfaz",
+  "extCapRouting": "Reglas de enrutamiento",
+  "extCapTheme": "Temas",
+  "extCapWidget": "Widgets",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "Registro de cambios",
+  "extImageFailed": "No se pudo cargar la imagen",
+  "extRatingHow": "Cómo funcionan las calificaciones",
+  "extRatingHowBody": "Las calificaciones utilizan un promedio bayesiano: una extensión con pocas calificaciones permanece cerca del medio hasta que más personas votan, por lo que una sola reseña de 5 estrellas no puede llevar una nueva extensión a la cima. Las calificaciones recientes pesan más que las antiguas y solo cuenta una calificación por cuenta.",
+  "extScreenshots": "Capturas de pantalla",
+  "extSortRelevance": "Relevancia",
+  "extPermNetworkDetail": "Descarga datos de internet a través de la VPN. Solo se permiten los hosts de abajo; todo lo demás está bloqueado.",
+  "extBgTitle": "Tarea en segundo plano",
+  "extBgEnabled": "Ejecutar en segundo plano",
+  "extBgInterval": "Ejecutar cada",
+  "extBgMinutes": "{count, plural, one{# minuto} other{# minutos}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# hora} other{# horas}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "La tarea se ejecuta según el horario mientras Sora está abierto, también en la bandeja. El intervalo mínimo es de 15 minutos.",
+  "extBgDisabledNote": "Habilite la extensión para administrar su tarea en segundo plano.",
+  "extCapNetwork": "Acceso a la red",
+  "extCapNetworkHosts": "Red: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "Compartir código QR",
+  "qrScanTitle": "Escanear código QR",
+  "qrCopyLink": "Copiar enlace",
+  "qrShowLink": "Mostrar enlace",
+  "qrHideLink": "Ocultar enlace",
+  "qrWarning": "Este código QR contiene detalles de conexión. No se lo muestres a extraños.",
+  "qrScanHint": "Elige una captura o foto con un código QR, o pega un enlace",
+  "qrFromClipboard": "Pegar desde el portapapeles",
+  "qrNoCode": "No se encontró ningún código QR en esta imagen.",
+  "qrInvalid": "Este código QR no contiene un enlace válido.",
+  "qrScan": "Escanear QR",
+  "qrFromImage": "Abrir imagen",
+  "connGroupByProcess": "Agrupar por proceso",
+  "connListView": "Lista",
+  "connCopyHost": "Copiar host",
+  "connAddRule": "Agregar regla",
+  "connConnectionsCount": "{count, plural, one{# conexión} other{# conexiones}}",
+  "dnsPreset": "Preestablecido",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "Personalizado",
+  "dnsCheck": "Verificar fugas de datos",
+  "dnsChecking": "Comprobando...",
+  "dnsNoLeak": "No se encontraron fugas",
+  "dnsLeakFound": "Fuga detectada",
+  "dnsLastCheck": "Última comprobación",
+  "dnsNeverChecked": "Aún no probado",
+  "dnsLeakCheckTunnelDns": "Resolutores DNS del túnel",
+  "dnsLeakCheckSystemResolvers": "Resolutores del sistema",
+  "dnsLeakCheckKillSwitchDns": "Protección DNS del bloqueo de red",
+  "dnsLeakFixConfigureTunnelDns": "Configure DNS para el túnel en la configuración DNS anterior.",
+  "dnsLeakFixReviewSystemResolvers": "Verifique qué resolutores usaría su sistema fuera del túnel.",
+  "dnsLeakFixEnableKillSwitch": "Active el bloqueo de red para mantener el tráfico DNS dentro del túnel.",
+  "dnsLeakCheckEncryptedDns": "DNS cifrado del sistema operativo",
+  "dnsLeakCheckDnsSpoof": "Respuestas DNS falsificadas",
+  "dnsLeakFixReviewEncryptedDns": "Verifique qué puntos finales DNS cifrados utiliza su sistema fuera del túnel.",
+  "dnsLeakFixUseEncryptedDns": "Utilice DNS (DoT o DoH) cifrado para el túnel para que los resolutores no puedan falsificar respuestas.",
+  "dnsCheckNeedsConnection": "Conéctese primero a la VPN y luego compruebe si hay fugas.",
+  "dnsExpected": "Esperado",
+  "dnsActual": "Observado",
+  "sortBy": "Ordenar por",
+  "sortPing": "Hacer ping",
+  "sortSpeed": "Velocidad",
+  "sortName": "Nombre",
+  "measureSpeed": "Medir velocidad",
+  "benchmarkStale": "anticuado",
+  "autoSelectMode": "Servidor de selección automática",
+  "autoSelectPing": "Ping más rápido",
+  "autoSelectSpeed": "Velocidad más rápida",
+  "autoSelectSmart": "Elección inteligente",
+  "coreWatchUnstable": "La conexión al núcleo Sora es inestable",
+  "watchReconnect": "Reconectar",
+  "coreRestoringLink": "Restaurando la conexión al núcleo Sora…",
+  "crashRestoreTitle": "La última sesión fue interrumpida",
+  "restoreOnCrash": "Restaurar sesión después de un bloqueo",
+  "crashRestore": "Restaurar",
+  "crashDismiss": "Ahora no",
+  "overrideTitle": "Mis ediciones",
+  "overrideEdit": "Editar servidores",
+  "overrideHide": "Ocultar",
+  "overrideUnhide": "Mostrar",
+  "overrideClear": "Restablecer ediciones",
+  "overrideEmpty": "Aún no hay ediciones",
+  "overrideCustomRules": "Reglas propias",
+  "errBenchmarkUnsupported": "La medición de velocidad necesita un núcleo más nuevo",
+  "benchmarkProgress": "Medición de {done} de {total}…",
+  "profiles": "Perfiles de red",
+  "profilesEmpty": "Aún no hay perfiles. Cree uno para aplicar la configuración automáticamente en redes conocidas.",
+  "profileAdd": "Agregar perfil",
+  "profileName": "Nombre del perfil",
+  "profileSsids": "Redes Wi-Fi (SSID)",
+  "profileSsidsHint": "Hogar, Oficina separados por comas",
+  "profileGateways": "Pasarelas de red",
+  "profileAsns": "AS números",
+  "profileAutoApply": "Aplicar automáticamente",
+  "profileAutoApplyHint": "Si está desactivado, se pedirá confirmación antes de aplicar el perfil.",
+  "profileSnapshot": "Recordar la configuración actual",
+  "profileSnapshotDone": "Configuraciones actuales guardadas en el perfil",
+  "profileDelete": "Eliminar perfil",
+  "profileDeleteConfirm": "¿Eliminar perfil \"{name}\"?",
+  "profileApplyAsk": "¿Aplicar perfil \"{name}\"?",
+  "profileApply": "Aplicar",
+  "profileApplied": "Perfil “{name}” aplicado",
+  "profileUndo": "Cancelar",
+  "profileActive": "Activo",
+  "networkNow": "Ahora: {info}",
+  "networkUnknown": "Información de red no disponible",
+  "profileNoTriggers": "Agregue al menos un activador: SSID, puerta de enlace o ASN",
+  "chains": "Cadenas de proxy",
+  "chainsEmpty": "Aún no hay cadenas. Vincule 2 o 3 servidores para que el tráfico pase por cada uno de ellos.",
+  "chainAdd": "Nueva cadena",
+  "chainName": "Nombre de la cadena",
+  "chainPickServers": "Elija 2 o 3 servidores",
+  "chainOrderHint": "Arrastrar para reordenar: el tráfico entra por la parte superior y sale por la parte inferior.",
+  "chainTooFew": "Elige al menos 2 servidores",
+  "chainTooMany": "Una cadena tiene como máximo 3 servidores",
+  "chainEstimate": "Latencia estimada",
+  "chainSave": "Guardar cadena",
+  "chainDelete": "Eliminar cadena",
+  "chainDeleteConfirm": "¿Eliminar la cadena \"{name}\"?",
+  "chainUnsupported": "El motor actual no puede construir cadenas.",
+  "chainHopMissing": "Uno de los servidores de la cadena ya no está disponible",
+  "chainHop": "Salto {n}",
+  "chainEntry": "Entrada",
+  "chainExit": "Salida",
+  "sync": "Sincronización de dispositivos",
+  "syncDevices": "Mis dispositivos",
+  "syncEmpty": "No hay dispositivos emparejados. Empareje otro dispositivo a través de la red local.",
+  "syncPair": "Emparejar dispositivo",
+  "syncShowCode": "Mostrar mi código",
+  "syncScanCode": "Código de escaneo",
+  "syncRevoke": "Retirar",
+  "syncRevokeConfirm": "¿Revocar \"{name}\"?",
+  "syncLastSync": "Última sincronización: {time}",
+  "syncNever": "Nunca",
+  "syncNoLan": "Los dispositivos deben estar en la misma red local",
+  "syncPaired": "Dispositivo emparejado",
+  "syncPairingTitle": "Emparejar con este dispositivo",
+  "syncWaiting": "Esperando el otro dispositivo…",
+  "syncSecureNote": "Canal cifrado de extremo a extremo. Sin cuentas, sin servidores en la nube.",
+  "zapretWithVpn": "Omitir el filtrado DPI para el tráfico directo de red",
+  "zapretWithVpnHint": "Ejecuta zapret junto al túnel VPN: el tráfico del túnel usa la VPN y el tráfico directo pasa por el mecanismo de evasión.",
+  "chainDuplicate": "Cada servidor puede aparecer solo una vez",
+  "edit": "Editar",
+  "remove": "Quitar",
+  "autoSwitchOnDegrade": "Autoencendido en degradación",
+  "autoSwitchOnDegradeDetail": "Si el servidor seleccionado se ralentiza mucho o deja de responder, Sora cambia al mejor según las mediciones, como máximo una vez cada 10 minutos.",
+  "tunStackMixed": "Mixto",
+  "tunStackSystem": "Sistema",
+  "syncCodeExpired": "El código ha caducado",
+  "syncDaemonFailed": "No se pudo iniciar el servicio de sincronización",
+  "syncDaemonMissing": "No se encontró el componente sora-sync. Reinstale la aplicación para habilitar la sincronización del dispositivo.",
+  "syncDaemonStarting": "Iniciando el servicio de sincronización…",
+  "syncErrAuth": "El servicio de sincronización rechazó el token de acceso. Reinicie la aplicación y vuelva a intentarlo.",
+  "syncErrNotFound": "El dispositivo ya no está emparejado",
+  "syncErrPairingActive": "Ya hay una sesión de emparejamiento abierta",
+  "syncErrUnreachable": "El otro dispositivo no respondió. Asegúrate de que esté en la misma red y muestre su código.",
+  "syncError": "Error de sincronización",
+  "syncExpiresIn": "El código caduca en {duration}",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "Emparejamiento con el dispositivo…",
+  "syncLegacyCleared": "La antigua lista de dispositivos nunca se emparejó, por lo que se borró. Vuelve a emparejar tus dispositivos, esta vez de verdad.",
+  "syncNewCode": "Nuevo código",
+  "syncPairedWith": "Emparejado con {name}",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "Repetir",
+  "syncStopShowing": "Ocultar código",
+  "syncSyncNow": "Sincronizar ahora",
+  "syncSyncResult": "Recibido {pulled}, enviado {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "Resultado de sincronización",
+  "syncPulled": "Recibido",
+  "syncPushed": "Enviado",
+  "syncNoChanges": "No se detectaron cambios",
+  "syncDocKindSubscriptions": "Suscripciones",
+  "syncDocKindSettings": "Configuración de la aplicación",
+  "syncDocKindOverrides": "Ajustes personalizados de suscripciones",
+  "syncDocKindProfiles": "Perfiles de red",
+  "syncDocKindChains": "Cadenas de proxy",
+  "syncFrom": "de {name}",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "Este dispositivo",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Para Shadowsocks: método:contraseña, por ejemplo chacha20-ietf-poly1305:contraseña",
+  "diagnosticPackets": "captura de paquetes",
+  "diagnosticEvents": "Eventos de Windows",
+  "diagnosticCapture": "Captura durante 10 segundos",
+  "diagnosticRequiresTun": "La captura de paquetes necesita una conexión Sora TUN activa.",
+  "diagnosticUnavailable": "Este diagnóstico no está disponible en esta plataforma.",
+  "extErrRevoked": "El equipo de Sora retiró esta versión de la extensión porque es insegura o no funciona.",
+  "extErrRevocationsExpired": "No se pudo renovar la lista de extensiones retiradas. La instalación está bloqueada hasta que se renueve: revisa la red e inténtalo de nuevo.",
+  "extRevokedDisabled": "Se desactivaron extensiones retiradas: {names}",
+  "customServerWgPrivateKey": "Clave privada",
+  "customServerWgAddresses": "Direcciones de la interfaz",
+  "customServerWgPeerKey": "Clave pública del servidor",
+  "customServerWgPresharedKey": "Clave precompartida",
+  "customServerWgAllowedIps": "IP permitidas",
+  "customServerWgKeepalive": "Keepalive, segundos",
+  "customServerWgKeyInvalid": "La clave debe tener 32 bytes en base64, como la imprime wg genkey.",
+  "customServerWgCidrInvalid": "Escribe prefijos separados por comas, como 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Escribe un número de segundos entre 0 y 65535.",
+  "strictKillSwitch": "Bloqueo de red estricto",
+  "strictKillSwitchWarning": "Tras conectar, bloquea el tráfico fuera de la VPN incluso después de un fallo, reinicio o cierre de la aplicación. Solo desconectar o desactivar esta opción restablece el acceso. Tras reiniciar el equipo, el bloqueo se reanuda solo si está activada la conexión al inicio.",
+  "extWorkerFailed": "Falló la tarea en segundo plano de la extensión. Revisa su registro.",
+  "extAssetRejected": "Archivo de extensión rechazado: colores ilegibles o reglas no válidas."
 }

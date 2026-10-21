@@ -1,0 +1,22 @@
+{
+  "manifest_version": 1,
+  "id": "org.sora.routing-split",
+  "name": "Split routing",
+  "version": "1.0.0",
+  "min_app_version": "1.1.0",
+  "description": "Send private networks directly and example.org through the selected proxy.",
+  "author": {
+    "name": "Sora Team",
+    "identity": "github:levvs-one",
+    "public_key": "RWR4GRTQjDDhQUbdYob6IwCcKqOk1SpL2tripsiQMl+UVFC+XtUyp38Q"
+  },
+  "permissions": [
+    "routing.rules"
+  ],
+  "capabilities": [
+    "routing"
+  ],
+  "routing": {
+    "entry": "rules.json"
+  }
+}

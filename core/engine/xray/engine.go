@@ -143,7 +143,7 @@ type traffic struct {
 
 // metricsClient talks to the loopback metrics endpoint directly: it must
 // never honor HTTP_PROXY from the environment, or internal stats would be
-// sent to a proxy (SORA-L10).
+// sent to a proxy.
 var metricsClient = &http.Client{Transport: directTransport()}
 
 // directTransport clones the default transport without its ProxyFromEnvironment.

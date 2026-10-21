@@ -209,7 +209,7 @@ func TestSlogRecordsTheCoreInTheCenter(t *testing.T) {
 	}
 }
 
-// TestWriteCutsAtARuneBoundary locks SORA-L15: a message cut at
+// TestWriteCutsAtARuneBoundary: a message cut at
 // MaxMessageBytes must stay valid UTF-8 even when multibyte runes straddle
 // the limit.
 func TestWriteCutsAtARuneBoundary(t *testing.T) {

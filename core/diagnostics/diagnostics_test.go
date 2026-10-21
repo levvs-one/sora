@@ -187,7 +187,7 @@ func TestInterfaceLinesNeverListAnAddress(t *testing.T) {
 
 var _ = errors.New
 
-// TestRunMasksEveryLine locks SORA-M6: Collector.Run promises to mask each
+// TestRunMasksEveryLine: Collector.Run promises to mask each
 // line before it leaves the core, including engine lines that may carry
 // hostnames or credentials.
 func TestRunMasksEveryLine(t *testing.T) {

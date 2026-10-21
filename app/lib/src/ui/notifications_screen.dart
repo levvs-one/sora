@@ -59,6 +59,8 @@ class NotificationRow extends StatelessWidget {
       'subscription' => s.subscription,
       'speedtest' => s.refresh,
       'update' => s.updateOpenAbout,
+      'apply-profile' => s.profileApply,
+      'undo-profile' => s.profileUndo,
       _ => null,
     };
     return Container(
@@ -85,6 +87,7 @@ class NotificationRow extends StatelessWidget {
               child: Pressable(
                 onTap: () => runNotificationAction(context, notice),
                 radius: 8,
+                semanticButton: true,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Text(action, style: Styles.secondary.copyWith(color: palette.ink)),
@@ -111,5 +114,10 @@ void runNotificationAction(BuildContext context, AppNotification notice) {
     case 'speedtest':
       final service = speedtestServices.where((s) => s.url == notice.argument).firstOrNull;
       if (service != null) unawaited(push<void>(context, Scaffold(body: SpeedtestScreen(initialService: service))));
+    case 'apply-profile':
+      final profile = sora.profiles.byId(notice.argument);
+      if (profile != null) unawaited(sora.applyProfileWithUndo(profile));
+    case 'undo-profile':
+      unawaited(sora.undoProfileApply(notice.argument));
   }
 }

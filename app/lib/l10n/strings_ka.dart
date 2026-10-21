@@ -25,9 +25,6 @@ class SKa extends S {
   String get stateDisconnecting => 'გათიშვა';
 
   @override
-  String get stateFailed => 'არ არის დაკავშირებული';
-
-  @override
   String get coreMissing => 'Sora სერვისი არ პასუხობს';
 
   @override
@@ -135,6 +132,9 @@ class SKa extends S {
   String get logsEmpty => 'აქ არაფერი';
 
   @override
+  String get connEmpty => 'არანაირი კავშირი';
+
+  @override
   String appVersion(String version) {
     return 'ვერსია $version';
   }
@@ -164,6 +164,16 @@ class SKa extends S {
   @override
   String milliseconds(int n) {
     return '$n ms';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Mbps';
   }
 
   @override
@@ -255,9 +265,6 @@ class SKa extends S {
   String get errNoServers => 'დასაკავშირებლად დაამატეთ გამოწერა';
 
   @override
-  String get exportText => 'ტექსტი';
-
-  @override
   String get connections => 'კავშირები';
 
   @override
@@ -273,7 +280,7 @@ class SKa extends S {
   String get theme => 'თემა';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'სისტემის მიხედვით';
 
   @override
   String get themeLight => 'სინათლე';
@@ -285,7 +292,7 @@ class SKa extends S {
   String get language => 'ენა';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'სისტემის მიხედვით';
 
   @override
   String get sectionConnection => 'კავშირი';
@@ -496,17 +503,6 @@ class SKa extends S {
   String get ruleInvalid => 'ეს არ ჰგავს საიტს, IP-ს ან პროგრამას';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'თავის მხრივ, # სერვერები',
-      one: 'თავის მხრივ, # სერვერი',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -521,9 +517,6 @@ class SKa extends S {
   String get tunnelMode => 'რეჟიმი';
 
   @override
-  String get tunnelTun => 'მთელი მოძრაობა';
-
-  @override
   String get tunnelProxy => 'System პროქსი';
 
   @override
@@ -534,6 +527,9 @@ class SKa extends S {
 
   @override
   String get launchAtLogin => 'დაიწყეთ სისტემით';
+
+  @override
+  String get launchAtLoginDetail => 'შესვლისას Sora ავტომატურად გაეშვება და დარჩება სისტემურ უჯრაში.';
 
   @override
   String get closeToTray => 'შეინახეთ უჯრაში დახურვისას';
@@ -634,28 +630,6 @@ class SKa extends S {
   String get less => 'ნაკლები';
 
   @override
-  String get currentServer => 'მიმდინარე სერვერი';
-
-  @override
-  String get trafficDown => 'ჩამოტვირთულია';
-
-  @override
-  String get trafficUp => 'ატვირთულია';
-
-  @override
-  String perSecond(String value) {
-    return '$value/წმ';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'აქტიური წესები: $count';
-  }
-
-  @override
-  String get recentNotifications => 'ბოლო შეტყობინებები';
-
-  @override
   String get notificationsEmpty => 'კავშირისა და გამოწერის მოვლენები აქ გამოჩნდება';
 
   @override
@@ -709,22 +683,13 @@ class SKa extends S {
   String get runningProcesses => 'მიმდინარე პროცესები';
 
   @override
-  String get programsFailed => 'აპლიკაციების ჩატვირთვა ვერ მოხერხდა';
-
-  @override
   String get programsEmpty => 'აპლიკაციები ვერ მოიძებნა. სცადეთ სხვა სახელი.';
 
   @override
   String get selectExe => 'აირჩიეთ .exe ფაილი';
 
   @override
-  String get trafficUnavailable => 'მრიცხველები ჯერ არ არის ხელმისაწვდომი';
-
-  @override
   String get speedtest => 'სიჩქარე';
-
-  @override
-  String get speedtestCheck => 'შეამოწმეთ სიჩქარე';
 
   @override
   String get speedtestSearch => 'მოძებნეთ სერვისი';
@@ -820,6 +785,38 @@ class SKa extends S {
       'გაუშვით ეს ბრძანება ტერმინალში ორივე დამოწმებული პაკეტის დასაყენებლად, შემდეგ ხელახლა გახსენით Sora. ფაილები რჩება ჩამოტვირთვის დირექტორიაში. VPN კავშირი შეწყდება.';
 
   @override
+  String get updateSignaturePending =>
+      'განახლების ფაილები მოწმდება გამოშვებასთან ერთად გამოქვეყნებული საკონტროლო ჯამებით.';
+
+  @override
+  String get updateManualSigWarning =>
+      'ქვემოთ მოცემული ფაილები ემთხვევა გამოშვების საკონტროლო ჯამებს. გაუშვით ბრძანება, თუ ისინი ოფიციალური გამოშვებიდან ჩამოტვირთეთ.';
+
+  @override
+  String get updateVersionRevoked => 'დეველოპერმა გააუქმა ეს ვერსია. გთხოვთ, დაელოდოთ შესწორებულ გამოცემას.';
+
+  @override
+  String get updateRolloutPending => 'უფრო ახალი ვერსია გამოდის თანდათანობით და შემოგთავაზებთ ავტომატურად.';
+
+  @override
+  String updateRollbacking(String version) {
+    return 'დაბრუნება ვერსიაზე $version...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return '$version-ის განახლებამ ვერ გაიარა ჯანმრთელობის შემოწმება, ამიტომ Sora დაბრუნდა $fromVersion-ზე.';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'ავტომატური დაბრუნება ვერ მოხერხდა. თუ ახალი ვერსია არ მუშაობს, ხელახლა დააინსტალირეთ წინა ვერსია ხელით.';
+
+  @override
+  String get updateRollbackCacheError =>
+      'ვერ მოვამზადე მიმდინარე ვერსიის დადასტურებული ასლი, ამიტომ განახლება არ იყო დაინსტალირებული.';
+
+  @override
   String get updateCopyCommand => 'დააკოპირეთ ბრძანება';
 
   @override
@@ -844,9 +841,6 @@ class SKa extends S {
   String get componentLicenses => 'კომპონენტების ლიცენზიები';
 
   @override
-  String get appCopyright => '© 2026 levvs-one და კონტრიბუტორები';
-
-  @override
   String get collapseServers => 'სერვერების ჩაკეცვა';
 
   @override
@@ -863,10 +857,6 @@ class SKa extends S {
 
   @override
   String get reconnectNow => 'მიმართეთ და ხელახლა დაუკავშირდით';
-
-  @override
-  String get bypassLimitations =>
-      'ეს რეჟიმი გვერდს უვლის DPI-ს მხოლოდ HTTP-სთვის და TLS-ისთვის, არ უჭერს მხარს UDP-ს და არ ცვლის თქვენს IP-ს. გამოიყენეთ VPN სერვერი Discord ხმისთვის, ზარებისთვის და დაბლოკილი Telegram მისამართებისთვის.';
 
   @override
   String get errEngineUnsupported =>
@@ -892,7 +882,7 @@ class SKa extends S {
 
   @override
   String get modesGuide =>
-      'აირჩიეთ ავტო, თუ არ ხართ დარწმუნებული, რომელი ძრავა სჭირდება თქვენს სერვერს. Sora ამოწმებს პროფილს და პარამეტრებს დაკავშირებამდე. ძრავას არ შეუძლია გაზარდოს თქვენი გეგმის გამტარუნარიანობა: შესრულება დამოკიდებულია სერვერზე, მარშრუტზე, პროტოკოლზე და ქსელზე.\n\n## რეჟიმები\n\n### მთელი ტრაფიკი (TUN)\n\nSora ქმნის ვირტუალურ ქსელურ ინტერფეისს და მარშრუტებს აპლიკაციის ტრაფიკს, მათ შორის TCP და UDP. გამოიყენეთ ეს რეჟიმი Telegram, თამაშებისთვის და Discord ხმისთვის. წესებს შეუძლიათ გააგზავნონ კონკრეტული საიტები ან პროგრამები პირდაპირ ან დაბლოკონ ისინი. ქსელის სერვისს სჭირდება ნებართვა და სერვერი, რომელიც მხარს უჭერს საჭირო პროტოკოლს.\n\n### System პროქსი\n\nSora აკონფიგურირებს ადგილობრივ HTTP/SOCKS პროქსის. აპლიკაციები, რომლებიც პატივს სცემენ სისტემის პროქსის პარამეტრებს, იყენებენ მას. აპლიკაციები საკუთარი ქსელის სტეკით შეიძლება პირდაპირ დაუკავშირდნენ; UDP და ხმოვანი ზარები ზოგადად საჭიროებენ TUN. ეს რეჟიმი შეესაბამება ბრაუზერებს და აპლიკაციებს პროქსი მხარდაჭერით.\n\n### სერვერი არ არის\n\nLinux-ზე Sora იყენებს [zapret](https://github.com/bol-van/zapret) HTTP/TLS მოთხოვნების გაყოფისა და ფორმის გადასაჭრელად და ზოგიერთი DPI შემოწმების გვერდის ავლით. თქვენი IP იგივე რჩება და კავშირები პირდაპირ ვებსაიტზე მიდის. შედეგები დამოკიდებულია თქვენს პროვაიდერზე და დაბლოკვის მეთოდზე.\n\nმიმდინარე ინტეგრაცია იყენებს tpws-ს HTTP-სთვის და TLS-ისთვის TCP-ზე. ის არ გვერდს უვლის IP ბლოკირებას ან გადასცემს UDP-ს და ვერ უზრუნველყოფს Telegram-ის MTProto კავშირების გარანტიას. გამოიყენეთ VPN სერვერი TUN-ით Discord ხმის, Telegram ზარებისთვის და ამ სახის შეზღუდვებისთვის.\n\n## ძრავები\n\n### ავტო\n\nSora ირჩევს დაყენებულ ძრავას, რომელიც მხარს უჭერს კავშირის მთელ გეგმას: სერვერის პროტოკოლებს, ტრანსპორტებს, ჯგუფებს, ფრაგმენტაციას და რეჟიმს. შეუთავსებელი ხელით არჩევანი უარყოფილია მიმდინარე კავშირის შეწყვეტამდე. აირჩიეთ Auto ან სხვა ძრავა და კვლავ გამოიყენეთ პარამეტრები.\n\n### sing-box\n\nახალი Sora პაკეტები მოიცავს [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), ჩანგალი [sing-box](https://github.com/SagerNet/sing-box), კლიენტის მხარეს XHTTP და VLESS Encryption დამატება. Sora აღიარებს კონსტრუქციას და მის შესაძლებლობებს. ზემოთ ნაგებობა XHTTP-ის გარეშე არ იძენს ამ შესაძლებლობას მხოლოდ მისი სახელიდან.\n\nმხარდაჭერილია VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard და AmneziaWG 1.x/2.x-ის ის პარამეტრები, რომელთა იმპორტიც Sora-ს შეუძლია. სრულ Xray JSON პროფილებს Xray სჭირდება. ახალი AWG 3.x ველების იმპორტი ჯერ შეუძლებელია. sing-box იყენებს პაროლით დაცულ ადგილობრივ მართვის პორტს, რომლის აღმოჩენაც კომპიუტერის სხვა პროგრამებს შეუძლიათ.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) მხარს უჭერს VLESS, REALITY, XHTTP, VLESS Encryption და TLS ფრაგმენტაციას. ის ასევე აწარმოებს სრულ პროვაიდერის Xray პროფილებს მათი მარშრუტიზაციისა და ჯგუფების შენარჩუნებით. ასეთი პროფილები არ შეიძლება ავტომატურად გადაიზარდოს სხვა ძრავზე მათი ქცევის შეცვლის გარეშე.\n\nშეფუთულმა Xray-მ წაშალა პარამეტრი, რომელიც გამორთავს TLS სერტიფიკატის დადასტურებას (`allowInsecure`). ავტომატურად ირჩევს sing-box ან mihomo ჩვეულებრივი სერვერებისთვის, რომლებიც საჭიროებენ ამ პარამეტრს. Xray-ის არჩევა ხელით აცნობებს შეუთავსებლობას მიმდინარე კავშირის შეწყვეტამდე. ძველ სრულ JSON პროფილებს სჭირდებათ განახლებული პროვაიდერის პროფილი დამოწმებადი სერტიფიკატით ან სერტიფიკატის პინით.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) მხარს უჭერს შეკვეთილ სარეზერვო და დატვირთვის დაბალანსების ჯგუფებს, XHTTP და AmneziaWG. აირჩიეთ ის, როდესაც მნიშვნელოვანია სარეზერვო სერვერზე ავტომატური ჩავარდნა. Sora-ის TLS ფრაგმენტაციის პარამეტრი მიუწვდომელია ამ ძრავით.\n\n## თავსებადობა Sora-ში\n\n| თვისება | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN და TCP/UDP | დიახ | დიახ | დიახ |\n| XHTTP | დიახ | დიახ | დიახ |\n| VLESS Encryption | დიახ | დიახ | დიახ |\n| სრული Xray პროფილი | არა | დიახ | არა |\n| TUIC / AnyTLS | ორივე | არა | TUIC |\n| TLS ფრაგმენტაცია | დიახ | დიახ | არა |\n| AmneziaWG 1.x/2.x | დიახ¹ | არა | დიახ |\n| შეკვეთილი სარეზერვო ჯგუფი | არა | No² | დიახ |\n\n¹ პროფილები J1/J2/J3/Itime იყენებენ mihomo; ეს ველები არასოდეს არ უნდა იყოს ჩუმად გაუქმებული. ² სრული Xray პროფილების ჯგუფისთვის აპლიკაცია ირჩევს სარეზერვო პროფილს. მხარდაჭერა დამოკიდებულია დაყენებულ კონსტრუქციაზე; შეამოწმეთ მისი ვერსია შესახებ.\n\n## TUN დასტა\n\nსტეკი ამუშავებს TCP და UDP-ს ვირტუალურ ინტერფეისში. რეჟიმების პანელში Xray და mihomo გვთავაზობენ gVisor, System, Mixed და MIPS. თითოეული ძრავა ინახავს საკუთარ უპირატესობას. System პროქსი და სერვერის რეჟიმი არ იყენებს ამ პარამეტრს.\n\n- **Mixed** — TCP იყენებს სისტემის დასტას, ხოლო gVisor ამუშავებს UDP-ს. ეს არის mihomo-ს ნაგულისხმევი ვარიანტი Linux-ზე. Windows-ზე Xray და mihomo ნაგულისხმევად MIPS-ს იყენებენ.\n- **System** — იყენებს სისტემის დასტას. სცადეთ სხვა ვარიანტი, თუ ქსელის აპლიკაციებს პრობლემები შეექმნათ.\n- **gVisor** — მართავს ტრაფიკს მომხმარებლის სივრცეში.\n- **MIPS** — mihomo-ის საკუთარი IP დასტა, ხელმისაწვდომია შეფუთულ ვერსიაში 1.19.32.\n\nLinux-ზე, Xray ნაგულისხმევად იყენებს ჩაშენებულ gVisor-ს. System, Mixed და MIPS Linux-ზე იყენებენ mihomo, როგორც TUN ძრავას, გადაგზავნის TCP და UDP-ს Xray ავთენტიფიცირებულ ლოკალურ SOCKS ბმულზე. Xray ინარჩუნებს პროტოკოლს, პროვაიდერის პროფილს და მარშრუტიზაციას. ამ სამ ვარიანტს სჭირდება დაინსტალირებული mihomo. Windows-ზე Xray ოთხივე TUN სტეკისთვის იყენებს mihomo 1.19.32-ს ან უფრო ახალ ვერსიას. პროტოკოლები და მარშრუტიზაცია რჩება Xray-ში. ამ კომბინაციაში აპლიკაციების წესები მხარს უჭერს მხოლოდ პირდაპირ კავშირს და დაბლოკვას; Linux-ზე ამ წესებს სჭირდება Xray-ის ჩაშენებული gVisor.\n\nხიდი გადის მეორე პროცესს. სამი უმოქმედო გაზომვისას Linux-ზე, მან გამოიყენა დაახლოებით 32–36 MiB მეტი ფიზიკური მეხსიერება, ვიდრე მშობლიურ Xray TUN. ეს არ ზომავს ჩამოტვირთვის დატვირთვას: CPU და მეხსიერების ხარჯები დამოკიდებულია კავშირებზე. sing-box-ს არ აქვს სტეკის ამომრჩევი. არცერთი დასტა არ იძლევა გარანტიას უკეთესი მუშაობის ყველა ქსელში. აირჩიეთ დასტა და აირჩიეთ მიმართვა და ხელახლა დაკავშირება თქვენს ქსელში საცდელად.\n\n## პარამეტრების გამოყენება\n\nსერვერის არჩევა ხელახლა დაკავშირდება ავტომატურად. რეჟიმი, ძრავა, DNS და წესების პარამეტრები დაუყოვნებლივ ინახება; აქტიური კავშირის დროს დააწკაპუნეთ Apply-ზე და ხელახლა დაუკავშირდით მათ გამოსაყენებლად. ძრავის გადატვირთვამ შეიძლება შეაფერხოს ჩამოტვირთვები და ზარები. განმეორებითი დაწკაპუნება არ იწყებს პარალელურ კავშირებს; გათიშვა წყვეტს გადასვლას და ათავისუფლებს კავშირს.\n\nინტერნეტი მხოლოდ VPN-ის საშუალებით ბლოკავს პირდაპირ ტრაფიკს, როდესაც გვირაბი ჩამოვარდება. ეს გავლენას ახდენს მთელ მანქანაზე. აშკარა გათიშვა შლის Sora-ის წესებს. თუ გასუფთავება არ დასრულებულა, ხელახლა სცადეთ გათიშვა და გახსენით ჟურნალი.\n\n## პროექტის დოკუმენტაცია\n\n- [sing-box-lx: კონფიგურაცია და მხარდაჭერა] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box დოკუმენტაცია] (https://sing-box.sagernet.org/)\n- [Xray დოკუმენტაცია] (https://xtls.github.io/)\n- [mihomo დოკუმენტაცია] (https://wiki.metacubex.one/)\n- [zapret: ოპერაცია და შეზღუდვები] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'აირჩიეთ ავტო, თუ არ ხართ დარწმუნებული, რომელი ძრავა სჭირდება თქვენს სერვერს. Sora ამოწმებს პროფილს და პარამეტრებს დაკავშირებამდე. ძრავას არ შეუძლია გაზარდოს თქვენი გეგმის გამტარუნარიანობა: შესრულება დამოკიდებულია სერვერზე, მარშრუტზე, პროტოკოლზე და ქსელზე.\n\n## რეჟიმები\n\n### მთელი ტრაფიკი (TUN)\n\nSora ქმნის ვირტუალურ ქსელურ ინტერფეისს და მარშრუტებს აპლიკაციის ტრაფიკს, მათ შორის TCP და UDP. გამოიყენეთ ეს რეჟიმი Telegram, თამაშებისთვის და Discord ხმისთვის. წესებს შეუძლიათ გააგზავნონ კონკრეტული საიტები ან პროგრამები პირდაპირ ან დაბლოკონ ისინი. ქსელის სერვისს სჭირდება ნებართვა და სერვერი, რომელიც მხარს უჭერს საჭირო პროტოკოლს.\n\n### System პროქსი\n\nSora აკონფიგურირებს ადგილობრივ HTTP/SOCKS პროქსის. აპლიკაციები, რომლებიც პატივს სცემენ სისტემის პროქსის პარამეტრებს, იყენებენ მას. აპლიკაციები საკუთარი ქსელის სტეკით შეიძლება პირდაპირ დაუკავშირდნენ; UDP და ხმოვანი ზარები ზოგადად საჭიროებენ TUN. ეს რეჟიმი შეესაბამება ბრაუზერებს და აპლიკაციებს პროქსი მხარდაჭერით.\n\n### სერვერი არ არის\n\nLinux-ზე Sora იყენებს [zapret](https://github.com/bol-van/zapret) HTTP/TLS მოთხოვნების გაყოფისა და ფორმის გადასაჭრელად და ზოგიერთი DPI შემოწმების გვერდის ავლით. თქვენი IP იგივე რჩება და კავშირები პირდაპირ ვებსაიტზე მიდის. შედეგები დამოკიდებულია თქვენს პროვაიდერზე და დაბლოკვის მეთოდზე.\n\nმიმდინარე ინტეგრაცია იყენებს tpws-ს HTTP-სთვის და TLS-ისთვის TCP-ზე. ის არ გვერდს უვლის IP ბლოკირებას ან გადასცემს UDP-ს და ვერ უზრუნველყოფს Telegram-ის MTProto კავშირების გარანტიას. გამოიყენეთ VPN სერვერი TUN-ით Discord ხმის, Telegram ზარებისთვის და ამ სახის შეზღუდვებისთვის.\n\n## ძრავები\n\n### ავტო\n\nSora ირჩევს დაყენებულ ძრავას, რომელიც მხარს უჭერს კავშირის მთელ გეგმას: სერვერის პროტოკოლებს, ტრანსპორტებს, ჯგუფებს, ფრაგმენტაციას და რეჟიმს. შეუთავსებელი ხელით არჩევანი უარყოფილია მიმდინარე კავშირის შეწყვეტამდე. აირჩიეთ Auto ან სხვა ძრავა და კვლავ გამოიყენეთ პარამეტრები.\n\n### sing-box\n\nახალი Sora პაკეტები მოიცავს [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), ჩანგალი [sing-box](https://github.com/SagerNet/sing-box), კლიენტის მხარეს XHTTP და VLESS Encryption დამატება. Sora აღიარებს კონსტრუქციას და მის შესაძლებლობებს. ზემოთ ნაგებობა XHTTP-ის გარეშე არ იძენს ამ შესაძლებლობას მხოლოდ მისი სახელიდან.\n\nმხარდაჭერილია VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard და AmneziaWG 1.x/2.x-ის ის პარამეტრები, რომელთა იმპორტიც Sora-ს შეუძლია. სრულ Xray JSON პროფილებს Xray სჭირდება. ახალი AWG 3.x ველების იმპორტი ჯერ შეუძლებელია. sing-box იყენებს პაროლით დაცულ ადგილობრივ მართვის პორტს, რომლის აღმოჩენაც კომპიუტერის სხვა პროგრამებს შეუძლიათ.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) მხარს უჭერს VLESS, REALITY, XHTTP, VLESS Encryption და TLS ფრაგმენტაციას. ის ასევე აწარმოებს სრულ პროვაიდერის Xray პროფილებს მათი მარშრუტიზაციისა და ჯგუფების შენარჩუნებით. ასეთი პროფილები არ შეიძლება ავტომატურად გადაიზარდოს სხვა ძრავზე მათი ქცევის შეცვლის გარეშე.\n\nშეფუთულმა Xray-მ წაშალა პარამეტრი, რომელიც გამორთავს TLS სერტიფიკატის დადასტურებას (`allowInsecure`). ავტომატურად ირჩევს sing-box ან mihomo ჩვეულებრივი სერვერებისთვის, რომლებიც საჭიროებენ ამ პარამეტრს. Xray-ის არჩევა ხელით აცნობებს შეუთავსებლობას მიმდინარე კავშირის შეწყვეტამდე. ძველ სრულ JSON პროფილებს სჭირდებათ განახლებული პროვაიდერის პროფილი დამოწმებადი სერტიფიკატით ან სერტიფიკატის პინით.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) მხარს უჭერს შეკვეთილ სარეზერვო და დატვირთვის დაბალანსების ჯგუფებს, XHTTP და AmneziaWG. აირჩიეთ ის, როდესაც მნიშვნელოვანია სარეზერვო სერვერზე ავტომატური ჩავარდნა. Sora-ის TLS ფრაგმენტაციის პარამეტრი მიუწვდომელია ამ ძრავით.\n\n## თავსებადობა Sora-ში\n\n| თვისება | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN და TCP/UDP | დიახ | დიახ | დიახ |\n| XHTTP | დიახ | დიახ | დიახ |\n| VLESS Encryption | დიახ | დიახ | დიახ |\n| სრული Xray პროფილი | არა | დიახ | არა |\n| TUIC / AnyTLS | ორივე | არა | TUIC |\n| TLS ფრაგმენტაცია | დიახ | დიახ | არა |\n| AmneziaWG 1.x/2.x | დიახ¹ | არა | დიახ |\n| შეკვეთილი სარეზერვო ჯგუფი | არა | No² | დიახ |\n\n¹ პროფილები J1/J2/J3/Itime იყენებენ mihomo; ეს ველები არასოდეს არ უნდა იყოს ჩუმად გაუქმებული. ² სრული Xray პროფილების ჯგუფისთვის აპლიკაცია ირჩევს სარეზერვო პროფილს. მხარდაჭერა დამოკიდებულია დაყენებულ კონსტრუქციაზე; შეამოწმეთ მისი ვერსია შესახებ.\n\n## TUN დასტა\n\nსტეკი ამუშავებს TCP და UDP-ს ვირტუალურ ინტერფეისში. რეჟიმების პანელში Xray და mihomo გვთავაზობენ gVisor, System, Mixed და MIPS. თითოეული ძრავა ინახავს საკუთარ უპირატესობას. System პროქსი და სერვერის რეჟიმი არ იყენებს ამ პარამეტრს.\n\n- **Mixed**: TCP იყენებს სისტემის დასტას, ხოლო gVisor ამუშავებს UDP-ს. ეს არის mihomo-ს ნაგულისხმევი ვარიანტი Linux-ზე. Windows-ზე Xray და mihomo ნაგულისხმევად MIPS-ს იყენებენ.\n- **System**: იყენებს სისტემის დასტას. სცადეთ სხვა ვარიანტი, თუ ქსელის აპლიკაციებს პრობლემები შეექმნათ.\n- **gVisor**: მართავს ტრაფიკს მომხმარებლის სივრცეში.\n- **MIPS**: mihomo-ის საკუთარი IP დასტა, ხელმისაწვდომია შეფუთულ ვერსიაში 1.19.32.\n\nLinux-ზე, Xray ნაგულისხმევად იყენებს ჩაშენებულ gVisor-ს. System, Mixed და MIPS Linux-ზე იყენებენ mihomo, როგორც TUN ძრავას, გადაგზავნის TCP და UDP-ს Xray ავთენტიფიცირებულ ლოკალურ SOCKS ბმულზე. Xray ინარჩუნებს პროტოკოლს, პროვაიდერის პროფილს და მარშრუტიზაციას. ამ სამ ვარიანტს სჭირდება დაინსტალირებული mihomo. Windows-ზე Xray ოთხივე TUN სტეკისთვის იყენებს mihomo 1.19.32-ს ან უფრო ახალ ვერსიას. პროტოკოლები და მარშრუტიზაცია რჩება Xray-ში. ამ კომბინაციაში აპლიკაციების წესები მხარს უჭერს მხოლოდ პირდაპირ კავშირს და დაბლოკვას; Linux-ზე ამ წესებს სჭირდება Xray-ის ჩაშენებული gVisor.\n\nხიდი გადის მეორე პროცესს. სამი უმოქმედო გაზომვისას Linux-ზე, მან გამოიყენა დაახლოებით 32–36 MiB მეტი ფიზიკური მეხსიერება, ვიდრე მშობლიურ Xray TUN. ეს არ ზომავს ჩამოტვირთვის დატვირთვას: CPU და მეხსიერების ხარჯები დამოკიდებულია კავშირებზე. sing-box-ს არ აქვს სტეკის ამომრჩევი. არცერთი დასტა არ იძლევა გარანტიას უკეთესი მუშაობის ყველა ქსელში. აირჩიეთ დასტა და აირჩიეთ მიმართვა და ხელახლა დაკავშირება თქვენს ქსელში საცდელად.\n\n## პარამეტრების გამოყენება\n\nსერვერის არჩევა ხელახლა დაკავშირდება ავტომატურად. რეჟიმი, ძრავა, DNS და წესების პარამეტრები დაუყოვნებლივ ინახება; აქტიური კავშირის დროს დააწკაპუნეთ Apply-ზე და ხელახლა დაუკავშირდით მათ გამოსაყენებლად. ძრავის გადატვირთვამ შეიძლება შეაფერხოს ჩამოტვირთვები და ზარები. განმეორებითი დაწკაპუნება არ იწყებს პარალელურ კავშირებს; გათიშვა წყვეტს გადასვლას და ათავისუფლებს კავშირს.\n\nინტერნეტი მხოლოდ VPN-ის საშუალებით ბლოკავს პირდაპირ ტრაფიკს, როდესაც გვირაბი ჩამოვარდება. ეს გავლენას ახდენს მთელ მანქანაზე. აშკარა გათიშვა შლის Sora-ის წესებს. თუ გასუფთავება არ დასრულებულა, ხელახლა სცადეთ გათიშვა და გახსენით ჟურნალი.\n\n## პროექტის დოკუმენტაცია\n\n- [sing-box-lx: კონფიგურაცია და მხარდაჭერა] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box დოკუმენტაცია] (https://sing-box.sagernet.org/)\n- [Xray დოკუმენტაცია] (https://xtls.github.io/)\n- [mihomo დოკუმენტაცია] (https://wiki.metacubex.one/)\n- [zapret: ოპერაცია და შეზღუდვები] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'შეამოწმეთ სერვერები';
@@ -901,7 +891,438 @@ class SKa extends S {
   String get extensions => 'გაფართოებები';
 
   @override
-  String get extensionsSoon => 'მალე მოვა';
+  String extRatingLabel(String rating) {
+    return 'რეიტინგი $rating 5-დან';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return '$author-ის მიერ';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'ინსტალაციები: $count';
+  }
+
+  @override
+  String get extInstallOne => '1 ინსტალაცია';
+
+  @override
+  String get extBadgeVerified => 'დამოწმებულია';
+
+  @override
+  String get extBadgeTop => 'ყველაზე პოპულარული ამ კვირაში';
+
+  @override
+  String get extBadgeNew => 'ახალი';
+
+  @override
+  String get extBadgeStaff => 'Sora გუნდი';
+
+  @override
+  String get extSideloadShort => 'არა კატალოგიდან';
+
+  @override
+  String get extSideloadWarning =>
+      'ეს გაფართოება არ არის გუნდის კატალოგიდან. მხოლოდ ავტორმა დადო გარანტია მათი გასაღებისთვის: დააინსტალირეთ მხოლოდ იმ შემთხვევაში, თუ ენდობით ავტორს.';
+
+  @override
+  String extInstallTitle(String name) {
+    return '„$name“-ის დაყენება';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return '„$name“-ის განახლება';
+  }
+
+  @override
+  String get extPermissionsIntro => 'ამ გაფართოებას შეეძლება:';
+
+  @override
+  String get extPermissionsWidened => 'განახლება ითხოვს ახალ ნებართვებს:';
+
+  @override
+  String get extDangerousAck => 'მესმის, რომ ეს ნებართვები სერიოზულია';
+
+  @override
+  String get extInstall => 'დააინსტალირეთ';
+
+  @override
+  String get extUpdate => 'განახლება';
+
+  @override
+  String get extCancel => 'გაუქმება';
+
+  @override
+  String get extConfirm => 'დაადასტურეთ';
+
+  @override
+  String get extOk => 'OK';
+
+  @override
+  String get extCatalog => 'კატალოგი';
+
+  @override
+  String get extInstalled => 'დაინსტალირებული გაფართოებები';
+
+  @override
+  String get extSearchHint => 'გაფართოებების ძიება';
+
+  @override
+  String get extCatAll => 'ყველა';
+
+  @override
+  String get extCatTools => 'ხელსაწყოები';
+
+  @override
+  String get extCatThemes => 'თემები';
+
+  @override
+  String get extCatAutomation => 'ავტომატიზაცია';
+
+  @override
+  String get extCatStats => 'სტატისტიკა';
+
+  @override
+  String get extCatNetwork => 'ქსელი';
+
+  @override
+  String get extSortBy => 'დალაგება';
+
+  @override
+  String get extSortPopular => 'ყველაზე პოპულარული';
+
+  @override
+  String get extSortRating => 'ყველაზე მაღალი რეიტინგი';
+
+  @override
+  String get extSortName => 'დასახელება';
+
+  @override
+  String get extCatalogError => 'კატალოგის ჩატვირთვა ვერ მოხერხდა';
+
+  @override
+  String get extRetry => 'ხელახლა სცადეთ';
+
+  @override
+  String get extEmptySearch => 'ვერაფერი მოიძებნა';
+
+  @override
+  String get extEmptyInstalled =>
+      'გაფართოებები ჯერ არ არის დაინსტალირებული.\nიპოვეთ ერთი კატალოგში ან დააინსტალირეთ ფაილიდან.';
+
+  @override
+  String get extInstallFromFile => 'ინსტალაცია ფაილიდან';
+
+  @override
+  String get extInstallFromUrl => 'ინსტალაცია URL-დან';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'ჩამოტვირთვა';
+
+  @override
+  String get extDownloading => 'მიმდინარეობს ჩამოტვირთვა…';
+
+  @override
+  String get extVerifying => 'დადასტურება…';
+
+  @override
+  String get extInstalling => 'ინსტალაცია…';
+
+  @override
+  String get extInstallFailed => 'ინსტალაცია ვერ მოხერხდა';
+
+  @override
+  String get extErrSignature => 'ხელმოწერის შემოწმება ვერ მოხერხდა. ფაილი შეიძლება იყოს დაზიანებული ან დაზიანებული.';
+
+  @override
+  String get extErrManifest => 'გაფართოების manifest არასწორია.';
+
+  @override
+  String get extErrNetwork => 'ქსელის შეცდომა. შეამოწმეთ თქვენი კავშირი და სცადეთ ხელახლა.';
+
+  @override
+  String get extErrHash => 'ჩამოტვირთვა არ ემთხვევა კატალოგს. შესაძლოა, ის გატეხილი იყო.';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'ამ გაფართოებას სჭირდება აპის ვერსია $version ან უფრო ახალი.';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'დასაშვებია მხოლოდ https:// ბმული';
+
+  @override
+  String get extErrGeneric => 'რაღაც შეფერხდა. გთხოვთ, სცადოთ ხელახლა.';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'ეს განახლება ხელმოწერილია სხვა ავტორის გასაღებით, ვიდრე დაინსტალირებული ვერსია, ამიტომ დაბლოკილია. თუ ენდობით ახალ გასაღებს, წაშალეთ გაფართოება და ხელახლა დააინსტალირეთ იგი აშკარად.';
+
+  @override
+  String get extUpdateAvailable => 'განახლება ხელმისაწვდომია';
+
+  @override
+  String get extDisabled => 'გამორთულია';
+
+  @override
+  String extToggleEnabled(String name) {
+    return 'ჩართეთ $name';
+  }
+
+  @override
+  String get extSearchInstalled => 'დაყენებული გაფართოებების ძიება';
+
+  @override
+  String get extUpdateAll => 'განაახლეთ ყველაფერი';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return '$count განახლებები ხელმისაწვდომია';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return '$count განახლებულია';
+  }
+
+  @override
+  String get extRiskNormal => 'ნორმალური';
+
+  @override
+  String get extRiskSensitive => 'მგრძნობიარე';
+
+  @override
+  String get extRiskDangerous => 'მაღალი რისკი';
+
+  @override
+  String get extPermissionsRemoved => 'აღარ არის მოთხოვნილი:';
+
+  @override
+  String get extUpdateFailedKept => 'წინა ვერსია ჯერ კიდევ დაინსტალირებულია.';
+
+  @override
+  String get extConflictsTitle => 'გაფართოების კონფლიქტები';
+
+  @override
+  String get extConflictsIntro =>
+      'ეს გაფართოებები ერთსა და იმავეს ითხოვს. აირჩიეთ, რომელი იმუშავებს, მეორე დაინსტალირებული დარჩება.';
+
+  @override
+  String get extConflictTheme => 'აპლიკაციის თემა';
+
+  @override
+  String get extConflictNetHooks => 'ქსელის კაკვები';
+
+  @override
+  String extConflictWinner(String name) {
+    return 'უპირატესობა: $name';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return '$count კონფლიქტებს თქვენი გადაწყვეტილება სჭირდება';
+  }
+
+  @override
+  String get extConflictsResolve => 'კონფლიქტების მოგვარება';
+
+  @override
+  String get extConflictNote =>
+      'თქვენი არჩევანი ინახება ამ მოწყობილობაზე. თემა მაშინვე იცვლება, ქსელური ჰუკები კი ამ ვერსიაში არ ეშვება.';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'ვერსია $version';
+  }
+
+  @override
+  String get extAuthor => 'ავტორი';
+
+  @override
+  String get extRating => 'რეიტინგი';
+
+  @override
+  String get extInstalls => 'ინსტალაციები';
+
+  @override
+  String get extVersion => 'ვერსია';
+
+  @override
+  String get extAbout => 'ამ გაფართოების შესახებ';
+
+  @override
+  String get extPermissionsTitle => 'ნებართვები';
+
+  @override
+  String get extNoPermissions => 'არ არის სპეციალური ნებართვები.';
+
+  @override
+  String get extSettings => 'პარამეტრები';
+
+  @override
+  String get extSaveSettings => 'პარამეტრების შენახვა';
+
+  @override
+  String get extSaving => 'ინახება…';
+
+  @override
+  String extUpdateTo(String version) {
+    return 'განახლება $version-ზე';
+  }
+
+  @override
+  String get extEnabled => 'ჩართულია';
+
+  @override
+  String extRollbackTo(String version) {
+    return 'დაბრუნება $version-ზე';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return 'დაბრუნება ვერსიაზე $version?';
+  }
+
+  @override
+  String get extUninstall => 'დეინსტალაცია';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return 'წაიშალოს „$name“ და მისი პარამეტრები?';
+  }
+
+  @override
+  String get extPanelUnavailable => 'პანელი მიუწვდომელია. გაფართოება შესაძლოა გათიშული ან წაშლილი იყოს.';
+
+  @override
+  String get extPermConnectionsRead => 'იხილეთ აქტიური კავშირების სია';
+
+  @override
+  String get extPermServersRead => 'იხილეთ თქვენი სერვერების სია';
+
+  @override
+  String get extPermSettingsRead => 'წაიკითხეთ აპის პარამეტრები';
+
+  @override
+  String get extPermSettingsWrite => 'შეცვალეთ აპის პარამეტრები';
+
+  @override
+  String get extPermNotifications => 'შეტყობინებების ჩვენება';
+
+  @override
+  String get extPermTray => 'დაამატეთ ელემენტები უჯრის მენიუში';
+
+  @override
+  String get extPermUiPanel => 'აპის შიგნით პანელების ჩვენება';
+
+  @override
+  String get extPermThemeApply => 'თემების გამოყენება';
+
+  @override
+  String get extPermRoutingRules => 'მარშრუტიზაციის წესების დამატება (იმოქმედებს სად მიდის ქსელის ტრაფიკი)';
+
+  @override
+  String get extPermNetHooks => 'ინტეგრირება ქსელის გზაზე (DPI შემოვლითი მოდულები)';
+
+  @override
+  String get extPermNetFetch => 'მოითხოვეთ URL დაშვებული სიიდან';
+
+  @override
+  String get extPermBackground => 'გაუშვით ფონური ამოცანები';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'ასრულებს დაგეგმილ ამოცანებს მაშინაც კი, როდესაც პანელი დახურულია. შეგიძლიათ დააპაუზოთ ან შეცვალოთ მისი გაშვების სიხშირე გაფართოების პარამეტრებში.';
+
+  @override
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+
+  @override
+  String get extCapBackground => 'გადის ფონზე';
+
+  @override
+  String get extCapNetHook => 'ბლოკირების გვერდის ავლა და ქსელის ჩარევები';
+
+  @override
+  String get extCapPanel => 'ინტერფეისის პანელები';
+
+  @override
+  String get extCapRouting => 'მარშრუტიზაციის წესები';
+
+  @override
+  String get extCapTheme => 'თემები';
+
+  @override
+  String get extCapWidget => 'ვიჯეტები';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Cached catalog, $date';
+  }
+
+  @override
+  String get extChangelog => 'ცვლილებები';
+
+  @override
+  String get extImageFailed => 'სურათის ჩატვირთვა ვერ მოხერხდა';
+
+  @override
+  String get extRatingHow => 'როგორ მუშაობს რეიტინგები';
+
+  @override
+  String get extRatingHowBody =>
+      'რეიტინგები იყენებს ბაიესის საშუალოს: გაფართოება მცირე რეიტინგით რჩება შუათან ახლოს, სანამ მეტი ადამიანი არ მისცემს ხმას, ასე რომ, ერთი 5 ვარსკვლავიანი მიმოხილვა ვერ აიყვანს ახალ გაფართოებას ზევით. ბოლო რეიტინგები უფრო მეტს იწონის, ვიდრე ძველები და ანგარიშზე მხოლოდ ერთი რეიტინგი ითვლება.';
+
+  @override
+  String get extScreenshots => 'ეკრანის ანაბეჭდები';
+
+  @override
+  String get extSortRelevance => 'აქტუალობა';
+
+  @override
+  String get extPermNetworkDetail =>
+      'ტვირთავს მონაცემებს ინტერნეტიდან VPN-ის გავლით. დაშვებულია მხოლოდ ქვემოთ მოცემული ჰოსტები, დანარჩენი დაბლოკილია.';
+
+  @override
+  String get extBgTitle => 'ფონური ამოცანა';
+
+  @override
+  String get extBgEnabled => 'გაშვება ფონზე';
+
+  @override
+  String get extBgInterval => 'გაშვების ინტერვალი';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# წუთი', one: '# წუთი');
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# საათი', one: '# საათი');
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote => 'დავალება გრაფიკით ეშვება, სანამ Sora ღიაა, მათ შორის უჯრაში. მინიმალური ინტერვალი 15 წუთია.';
+
+  @override
+  String get extBgDisabledNote => 'ჩართეთ გაფართოება მისი ფონის ამოცანის მართვისთვის.';
+
+  @override
+  String get extCapNetwork => 'ქსელის წვდომა';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'ქსელი: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -910,6 +1331,668 @@ class SKa extends S {
 
   @override
   String get diagnosticHttp => 'HTTP დიაგნოსტიკა';
+
+  @override
+  String get diagnosticNoData => 'ჯერ არ არის ჩაწერილი მოთხოვნა. ჯერ გახსენით სიჩქარის ტესტის ვებსაიტი.';
+
+  @override
+  String get qrShareTitle => 'გააზიარეთ QR კოდი';
+
+  @override
+  String get qrScanTitle => 'QR კოდის სკანირება';
+
+  @override
+  String get qrCopyLink => 'დააკოპირეთ ბმული';
+
+  @override
+  String get qrShowLink => 'ბმული ჩვენება';
+
+  @override
+  String get qrHideLink => 'ბმულის დამალვა';
+
+  @override
+  String get qrWarning => 'ეს QR კოდი შეიცავს კავშირის დეტალებს. არ აჩვენო ის უცნობებს.';
+
+  @override
+  String get qrScanHint => 'აირჩიეთ ეკრანის სურათი ან ფოტო QR კოდით, ან ჩასვით ბმული';
+
+  @override
+  String get qrFromClipboard => 'ჩასმა ბუფერიდან';
+
+  @override
+  String get qrNoCode => 'ამ სურათში QR კოდი ვერ მოიძებნა.';
+
+  @override
+  String get qrInvalid => 'ეს QR კოდი არ შეიცავს მოქმედ ბმულს.';
+
+  @override
+  String get qrScan => 'სკანირება QR';
+
+  @override
+  String get qrFromImage => 'სურათის გახსნა';
+
+  @override
+  String get connGroupByProcess => 'დაჯგუფება პროცესის მიხედვით';
+
+  @override
+  String get connListView => 'სია';
+
+  @override
+  String get connCopyHost => 'დააკოპირეთ მასპინძელი';
+
+  @override
+  String get connAddRule => 'დაამატე წესი';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# კავშირი', one: '# კავშირი');
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'წინასწარ დაყენებული';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'საკუთარი';
+
+  @override
+  String get dnsCheck => 'შეამოწმეთ მონაცემთა გაჟონვა';
+
+  @override
+  String get dnsChecking => 'შემოწმება...';
+
+  @override
+  String get dnsNoLeak => 'გაჟონვა არ მოიძებნა';
+
+  @override
+  String get dnsLeakFound => 'აღმოჩენილია გაჟონვა';
+
+  @override
+  String get dnsLastCheck => 'ბოლო შემოწმება';
+
+  @override
+  String get dnsNeverChecked => 'ჯერ არ არის გამოცდილი';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'გვირაბის DNS რეზოლვერები';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'სისტემის რეზოლვერები';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'DNS-ის დაცვა ქსელის ბლოკირებით';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'დააკონფიგურირეთ DNS გვირაბისთვის ზემოთ DNS პარამეტრებში.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'შეამოწმეთ, რომელ გადამწყვეტებს გამოიყენებდა თქვენი სისტემა გვირაბის გარეთ.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'ჩართეთ ქსელის ბლოკირება, რათა DNS ტრაფიკი გვირაბში დარჩეს.';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'სისტემის დაშიფრული DNS';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'ყალბი DNS პასუხი';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'შეამოწმეთ, რომელ დაშიფრულ DNS ბოლო წერტილებს იყენებს თქვენი სისტემა გვირაბის გარეთ.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'გვირაბისთვის გამოიყენეთ დაშიფრული DNS (DoT ან DoH), რათა რეზოლვერებმა პასუხები ვერ გააყალბონ.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'ჯერ დაუკავშირდით VPN-ს, შემდეგ შეამოწმეთ გაჟონვა.';
+
+  @override
+  String get dnsExpected => 'მოსალოდნელია';
+
+  @override
+  String get dnsActual => 'დაფიქსირდა';
+
+  @override
+  String get sortBy => 'დალაგება';
+
+  @override
+  String get sortPing => 'პინგი';
+
+  @override
+  String get sortSpeed => 'სიჩქარე';
+
+  @override
+  String get sortName => 'სახელი';
+
+  @override
+  String get measureSpeed => 'გაზომეთ სიჩქარე';
+
+  @override
+  String get benchmarkStale => 'მოძველებულია';
+
+  @override
+  String get autoSelectMode => 'ავტომატური არჩევის სერვერი';
+
+  @override
+  String get autoSelectPing => 'ყველაზე სწრაფი პინგი';
+
+  @override
+  String get autoSelectSpeed => 'ყველაზე სწრაფი სიჩქარე';
+
+  @override
+  String get autoSelectSmart => 'ჭკვიანი არჩევანი';
+
+  @override
+  String get coreWatchUnstable => 'Sora ბირთვთან კავშირი არასტაბილურია';
+
+  @override
+  String get watchReconnect => 'ხელახლა დაკავშირება';
+
+  @override
+  String get coreRestoringLink => 'მიმდინარეობს კავშირის აღდგენა Sora ბირთვთან…';
+
+  @override
+  String get crashRestoreTitle => 'ბოლო სხდომა შეწყდა';
+
+  @override
+  String get restoreOnCrash => 'სესიის აღდგენა ავარიის შემდეგ';
+
+  @override
+  String get crashRestore => 'აღდგენა';
+
+  @override
+  String get crashDismiss => 'ახლა არა';
+
+  @override
+  String get overrideTitle => 'ჩემი რედაქტირებები';
+
+  @override
+  String get overrideEdit => 'სერვერების რედაქტირება';
+
+  @override
+  String get overrideHide => 'დამალვა';
+
+  @override
+  String get overrideUnhide => 'ჩვენება';
+
+  @override
+  String get overrideClear => 'რედაქტირების გადატვირთვა';
+
+  @override
+  String get overrideEmpty => 'ჯერ არ არის შესწორებები';
+
+  @override
+  String get overrideCustomRules => 'საკუთარი წესები';
+
+  @override
+  String get errBenchmarkUnsupported => 'სიჩქარის გაზომვას უფრო ახალი ბირთვი სჭირდება';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return '$done-ის გაზომვა $total-დან…';
+  }
+
+  @override
+  String get profiles => 'ქსელის პროფილები';
+
+  @override
+  String get profilesEmpty =>
+      'ჯერ არ არის პროფილები. შექმენით ერთი, რომ ავტომატურად გამოიყენოს პარამეტრები ცნობილ ქსელებში.';
+
+  @override
+  String get profileAdd => 'პროფილის დამატება';
+
+  @override
+  String get profileName => 'პროფილის სახელი';
+
+  @override
+  String get profileSsids => 'Wi-Fi ქსელები (SSID)';
+
+  @override
+  String get profileSsidsHint => 'სახლი, ოფისი გამოყოფილია მძიმეებით';
+
+  @override
+  String get profileGateways => 'ქსელის კარიბჭეები';
+
+  @override
+  String get profileAsns => 'AS ნომრები';
+
+  @override
+  String get profileAutoApply => 'ავტომატურად გამოყენება';
+
+  @override
+  String get profileAutoApplyHint => 'თუ გამორთულია, პროფილის გამოყენებამდე დადასტურებას მოგთხოვთ.';
+
+  @override
+  String get profileSnapshot => 'დაიმახსოვრე მიმდინარე პარამეტრები';
+
+  @override
+  String get profileSnapshotDone => 'მიმდინარე პარამეტრები შენახულია პროფილში';
+
+  @override
+  String get profileDelete => 'პროფილის წაშლა';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return 'წაშალოთ პროფილი „$name“?';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return 'გსურთ პროფილის „$name“ გამოყენება?';
+  }
+
+  @override
+  String get profileApply => 'გამოყენება';
+
+  @override
+  String profileApplied(Object name) {
+    return 'პროფილი „$name“ გამოყენებულია';
+  }
+
+  @override
+  String get profileUndo => 'გაუქმება';
+
+  @override
+  String get profileActive => 'აქტიური';
+
+  @override
+  String networkNow(Object info) {
+    return 'ახლა: $info';
+  }
+
+  @override
+  String get networkUnknown => 'ქსელის ინფორმაცია მიუწვდომელია';
+
+  @override
+  String get profileNoTriggers => 'დაამატეთ მინიმუმ ერთი ტრიგერი: SSID, კარიბჭე ან ASN';
+
+  @override
+  String get chains => 'პროქსი ჯაჭვები';
+
+  @override
+  String get chainsEmpty => 'ჯაჭვები ჯერ არ არის. დააკავშირეთ 2–3 სერვერი, რათა ტრეფიკი გადაიტანოს თითოეულ მათგანში.';
+
+  @override
+  String get chainAdd => 'ახალი ჯაჭვი';
+
+  @override
+  String get chainName => 'ჯაჭვის სახელწოდება';
+
+  @override
+  String get chainPickServers => 'აირჩიეთ 2–3 სერვერი';
+
+  @override
+  String get chainOrderHint => 'გადაათრიეთ ხელახლა შეკვეთისთვის: ტრაფიკი შედის ზევით და გამოდის ქვემოდან.';
+
+  @override
+  String get chainTooFew => 'აირჩიეთ მინიმუმ 2 სერვერი';
+
+  @override
+  String get chainTooMany => 'ჯაჭვი ინახავს მაქსიმუმ 3 სერვერს';
+
+  @override
+  String get chainEstimate => 'სავარაუდო შეყოვნება';
+
+  @override
+  String get chainSave => 'ჯაჭვის შენახვა';
+
+  @override
+  String get chainDelete => 'ჯაჭვის წაშლა';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return 'წაშალოთ ჯაჭვი \"$name\"?';
+  }
+
+  @override
+  String get chainUnsupported => 'მიმდინარე ძრავას არ შეუძლია ჯაჭვების აშენება';
+
+  @override
+  String get chainHopMissing => 'ერთ-ერთი ჯაჭვის სერვერი აღარ არის ხელმისაწვდომი';
+
+  @override
+  String chainHop(Object n) {
+    return 'გადასვლა $n';
+  }
+
+  @override
+  String get chainEntry => 'შესასვლელი';
+
+  @override
+  String get chainExit => 'გასასვლელი';
+
+  @override
+  String get sync => 'მოწყობილობის სინქრონიზაცია';
+
+  @override
+  String get syncDevices => 'ჩემი მოწყობილობები';
+
+  @override
+  String get syncEmpty => 'არ არის დაწყვილებული მოწყობილობები. სხვა მოწყობილობის დაწყვილება ლოკალურ ქსელში.';
+
+  @override
+  String get syncPair => 'მოწყობილობის დაწყვილება';
+
+  @override
+  String get syncShowCode => 'აჩვენე ჩემი კოდი';
+
+  @override
+  String get syncScanCode => 'კოდის სკანირება';
+
+  @override
+  String get syncRevoke => 'გატანა';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return 'გააუქმოს \"$name\"?';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'ბოლო სინქრონიზაცია: $time';
+  }
+
+  @override
+  String get syncNever => 'არასოდეს';
+
+  @override
+  String get syncNoLan => 'მოწყობილობები უნდა იყოს იმავე ლოკალურ ქსელში';
+
+  @override
+  String get syncPaired => 'მოწყობილობა დაწყვილებულია';
+
+  @override
+  String get syncPairingTitle => 'დაწყვილება ამ მოწყობილობასთან';
+
+  @override
+  String get syncWaiting => 'ელოდება სხვა მოწყობილობას…';
+
+  @override
+  String get syncSecureNote => 'ბოლოდან ბოლომდე დაშიფრული არხი. არც ანგარიშები, არც ღრუბლოვანი სერვერები.';
+
+  @override
+  String get zapretWithVpn => 'გვერდის ავლით DPI ფილტრაცია პირდაპირი ქსელის ტრაფიკისთვის';
+
+  @override
+  String get zapretWithVpnHint =>
+      'უშვებს zapret-ს VPN გვირაბთან ერთად: გვირაბის ტრაფიკი გადის VPN-ით, პირდაპირი ტრაფიკი კი ბლოკირების გვერდის ავლის მექანიზმით.';
+
+  @override
+  String get chainDuplicate => 'თითოეული სერვერი შეიძლება გამოჩნდეს მხოლოდ ერთხელ';
+
+  @override
+  String get edit => 'რედაქტირება';
+
+  @override
+  String get remove => 'ამოღება';
+
+  @override
+  String get autoSwitchOnDegrade => 'ავტომატური ჩართვა დეგრადაციაზე';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'თუ არჩეული სერვერი მნიშვნელოვნად შენელდება ან პასუხს შეწყვეტს, Sora გაზომვის შედეგებით საუკეთესო სერვერზე გადაერთვება, მაგრამ არა უმეტეს ერთხელ ყოველ 10 წუთში.';
+
+  @override
+  String get tunStackMixed => 'შერეული';
+
+  @override
+  String get tunStackSystem => 'სისტემა';
+
+  @override
+  String get customServerAdd => 'მორგებული სერვერის დამატება';
+
+  @override
+  String get customServers => 'ჩემი სერვერები';
+
+  @override
+  String get customServerName => 'სახელი';
+
+  @override
+  String get customServerNameHint => 'მაგალითად: ჩემი VPS';
+
+  @override
+  String get customServerNameRequired => 'შეიყვანეთ სახელი';
+
+  @override
+  String get customServerAddress => 'მისამართი';
+
+  @override
+  String get customServerAddressHint => 'example.com ან 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'შეიყვანეთ სერვერის მისამართი';
+
+  @override
+  String get customServerAddressInvalid => 'არასწორი მისამართი';
+
+  @override
+  String get customServerPort => 'პორტი';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'პორტი უნდა იყოს რიცხვი 1-დან 65535-მდე';
+
+  @override
+  String get customServerProtocol => 'ოქმი';
+
+  @override
+  String get customServerCredentials => 'შესვლის ინფორმაცია';
+
+  @override
+  String get customServerOptional => 'სურვილისამებრ';
+
+  @override
+  String get customServerShowSecret => 'საიდუმლოს ჩვენება';
+
+  @override
+  String get customServerHideSecret => 'საიდუმლოს დამალვა';
+
+  @override
+  String get customServerBadge => 'საკუთარი';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'წაშალოთ სერვერი „$name“?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'ხელით დაამატეთ სერვერი: მისამართი, პორტი და პროტოკოლი';
+
+  @override
+  String get customServerTest => 'ტესტი';
+
+  @override
+  String get leakTestTitle => 'ტესტი მონაცემთა გაჟონვისთვის';
+
+  @override
+  String get leakTestIntro =>
+      'ამოწმებს, შეუძლია თუ არა ტრაფიკს მოწყობილობიდან გვირაბის გარეთ გასვლა: პირდაპირი DNS და ICMP მოთხოვნები, IPv6 გასასვლელი და სისტემის რეზოლვერები. გაუშვით აქტიური კავშირისას.';
+
+  @override
+  String get leakTestRun => 'შეამოწმეთ';
+
+  @override
+  String get leakTestCancel => 'გაუქმება';
+
+  @override
+  String get leakTestNeedsConnection => 'დაუკავშირდით VPN-ს მონაცემთა გაჟონვის შესამოწმებლად.';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'დასრულებული ტესტები: $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'გაჟონვა არ მოიძებნა';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'აღმოჩენილია # გაჟონვა',
+      one: 'აღმოჩენილია # გაჟონვა',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
+
+  @override
+  String get leakTestFix => 'დაფიქსირება';
+
+  @override
+  String get leakTestFixedNote => 'ქსელის ბლოკირება ჩართულია. შესამოწმებლად ტესტი ხელახლა გაუშვით.';
+
+  @override
+  String get leakTestCheckDirectDns => 'პირდაპირი DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP ექო';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'სისტემის რეზოლვერები';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'გვირაბის კავშირი';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS გვირაბით';
+
+  @override
+  String get noticeDegraded => 'სერვერი შენელდა. Sora გადაერთო გაზომვის დროს ნაპოვნი საუკეთესო სერვერზე.';
+
+  @override
+  String get obfs => 'ტრაფიკის შენიღბვა';
+
+  @override
+  String get syncCodeExpired => 'კოდს ვადა გაუვიდა';
+
+  @override
+  String get syncDaemonFailed => 'სინქრონიზაციის სერვისის დაწყება ვერ მოხერხდა';
+
+  @override
+  String get syncDaemonMissing =>
+      'sora-sync კომპონენტი ვერ მოიძებნა. ხელახლა დააინსტალირეთ აპი მოწყობილობის სინქრონიზაციის გასააქტიურებლად.';
+
+  @override
+  String get syncDaemonStarting => 'სინქრონიზაციის სერვისის დაწყება…';
+
+  @override
+  String get syncErrAuth => 'სინქრონიზაციის სერვისმა უარყო წვდომის ჟეტონი. გადატვირთეთ აპი და სცადეთ ხელახლა.';
+
+  @override
+  String get syncErrNotFound => 'მოწყობილობა აღარ არის დაწყვილებული';
+
+  @override
+  String get syncErrPairingActive => 'დაწყვილების სესია უკვე ღიაა';
+
+  @override
+  String get syncErrUnreachable =>
+      'მეორე მოწყობილობამ არ უპასუხა. დარწმუნდით, რომ ის იმავე ქსელშია და აჩვენებს მის კოდს.';
+
+  @override
+  String get syncError => 'სინქრონიზაციის შეცდომა';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'კოდის ვადა ამოიწურება $duration-ში';
+  }
+
+  @override
+  String get syncJoining => 'მოწყობილობასთან დაწყვილება…';
+
+  @override
+  String get syncLegacyCleared =>
+      'ძველი მოწყობილობების სია ფაქტობრივად არასოდეს ყოფილა დაწყვილებული, ამიტომ ის გასუფთავდა. ხელახლა დააწყვილეთ თქვენი მოწყობილობები, ამჯერად რეალურად.';
+
+  @override
+  String get syncNewCode => 'ახალი კოდი';
+
+  @override
+  String syncPairedWith(String name) {
+    return 'დაწყვილებულია $name-თან';
+  }
+
+  @override
+  String get syncRetry => 'გაიმეორეთ';
+
+  @override
+  String get syncStopShowing => 'კოდის დამალვა';
+
+  @override
+  String get syncSyncNow => 'სინქრონიზაცია ახლა';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'მიღებული $pulled, გაგზავნილი $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'სინქრონიზაციის შედეგი';
+
+  @override
+  String get syncPulled => 'მიღებულია';
+
+  @override
+  String get syncPushed => 'გაგზავნილი';
+
+  @override
+  String get syncNoChanges => 'ცვლილებები არ გამოვლენილა';
+
+  @override
+  String get syncDocKindSubscriptions => 'გამოწერები';
+
+  @override
+  String get syncDocKindSettings => 'აპის პარამეტრები';
+
+  @override
+  String get syncDocKindOverrides => 'გამოწერების შეცვლილი პარამეტრები';
+
+  @override
+  String get syncDocKindProfiles => 'ქსელის პროფილები';
+
+  @override
+  String get syncDocKindChains => 'პროქსი ჯაჭვები';
+
+  @override
+  String syncFrom(String name) {
+    return '$name-დან';
+  }
+
+  @override
+  String get syncThisDevice => 'ეს მოწყობილობა';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Shadowsocks-ისთვის: მეთოდი:პაროლი, მაგალითად chacha20-ietf-poly1305:password';
 
   @override
   String get diagnosticPackets => 'პაკეტის დაჭერა';
@@ -921,11 +2004,60 @@ class SKa extends S {
   String get diagnosticCapture => 'გადაიღეთ 10 წამის განმავლობაში';
 
   @override
-  String get diagnosticNoData => 'ჯერ არ არის ჩაწერილი მოთხოვნა. ჯერ გახსენით სიჩქარის ტესტის ვებსაიტი.';
-
-  @override
   String get diagnosticRequiresTun => 'პაკეტის დაჭერას სჭირდება აქტიური Sora TUN კავშირი.';
 
   @override
   String get diagnosticUnavailable => 'ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე.';
+
+  @override
+  String get extErrRevoked => 'Sora-ს გუნდმა გაფართოების ეს ვერსია გააუქმა, რადგან ის სახიფათო ან გაუმართავია.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'გაუქმებული გაფართოებების სია ვერ განახლდა. განახლებამდე ინსტალაცია დაბლოკილია: შეამოწმეთ ქსელი და სცადეთ თავიდან.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'გაუქმებული გაფართოებები გაითიშა: $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'პირადი გასაღები';
+
+  @override
+  String get customServerWgAddresses => 'ინტერფეისის მისამართები';
+
+  @override
+  String get customServerWgPeerKey => 'სერვერის საჯარო გასაღები';
+
+  @override
+  String get customServerWgPresharedKey => 'საერთო გასაღები';
+
+  @override
+  String get customServerWgAllowedIps => 'დაშვებული IP-ები';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, წამი';
+
+  @override
+  String get customServerWgKeyInvalid => 'გასაღები უნდა იყოს 32 ბაიტი base64-ში, როგორც wg genkey ბეჭდავს.';
+
+  @override
+  String get customServerWgCidrInvalid => 'შეიყვანეთ მძიმით გამოყოფილი პრეფიქსები, მაგალითად 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'შეიყვანეთ წამების რაოდენობა 0-დან 65535-მდე.';
+
+  @override
+  String get strictKillSwitch => 'ქსელის მკაცრი ბლოკირება';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'დაკავშირების შემდეგ ბლოკავს VPN-ის გარეთ ტრაფიკს შეფერხების, გადატვირთვის ან აპიდან გასვლის შემდეგაც. წვდომა აღდგება მხოლოდ კავშირის გაწყვეტით ან ამ პარამეტრის გამორთვით. მოწყობილობის გადატვირთვის შემდეგ ბლოკირება განახლდება მხოლოდ გაშვებისას დაკავშირების ჩართვის შემთხვევაში.';
+
+  @override
+  String get extWorkerFailed => 'გაფართოების ფონური დავალება ვერ შესრულდა. შეამოწმეთ გაფართოების ჟურნალი.';
+
+  @override
+  String get extAssetRejected => 'გაფართოების ფაილი უარყოფილია: წაუკითხავი ფერები ან არასწორი წესები.';
 }

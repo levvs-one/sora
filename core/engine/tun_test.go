@@ -101,7 +101,7 @@ func TestTunAndFakeIPAvoidLANAndEachOther(t *testing.T) {
 	}
 }
 
-// TestDeviceNameValidation locks SORA-M2: the TUN device name reaches
+// TestDeviceNameValidation: the TUN device name reaches
 // privileged `ip` invocations, so only plain kernel interface names pass.
 func TestDeviceNameValidation(t *testing.T) {
 	for _, name := range []string{"sora0", "tun0", "sora-1", "sora_2", "sora.3", "a12345678901234"} {
@@ -133,7 +133,7 @@ func TestTunValidateRejectsEvilDeviceName(t *testing.T) {
 	}
 }
 
-// TestPrepareTunRejectsExplicitPrefixOverlappingLAN locks SORA-L19:
+// TestPrepareTunRejectsExplicitPrefixOverlappingLAN:
 // caller-provided adapter prefixes must be checked against LAN interfaces,
 // not just auto-selected ones. 127.0.0.0/8 is always present via loopback.
 func TestPrepareTunRejectsExplicitPrefixOverlappingLAN(t *testing.T) {

@@ -124,7 +124,7 @@ func TestDialFailsFastWhenNothingListens(t *testing.T) {
 	}
 }
 
-// TestConnectionCapRefusesExcessSilently locks SORA-M1: connections beyond
+// TestConnectionCapRefusesExcessSilently: connections beyond
 // MaxConnections are refused without a reply, and released slots admit new
 // connections again.
 func TestConnectionCapRefusesExcessSilently(t *testing.T) {

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart' show Theme;
 
 import 'theme.dart';
 
@@ -137,6 +138,7 @@ class _GlowState extends State<Glow> with SingleTickerProviderStateMixin {
         final painter = energy <= 0.001
             ? null
             : _GlowPainter(
+                colors: Theme.of(context).extension<Palette>()?.glowColors ?? Palette.spectrum,
                 layers: _layers,
                 clock: _clock,
                 turn: () => _turn,
@@ -159,6 +161,7 @@ class _GlowState extends State<Glow> with SingleTickerProviderStateMixin {
 
 class _GlowPainter extends CustomPainter {
   _GlowPainter({
+    required this.colors,
     required this.layers,
     required this.clock,
     required this.turn,
@@ -167,6 +170,7 @@ class _GlowPainter extends CustomPainter {
     required this.scale,
   }) : super(repaint: clock);
 
+  final List<Color> colors;
   final List<_Layer> layers;
   final ValueNotifier<double> clock;
   final double Function() turn;
@@ -178,7 +182,6 @@ class _GlowPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
     final shape = RRect.fromRectAndRadius(rect, Radius.circular(radius));
-    final colors = Palette.spectrum;
     for (final layer in layers.reversed) {
       final places = layer.at(clock.value);
       final order = List.generate(colors.length, (i) => i)..sort((a, b) => places[a].compareTo(places[b]));
@@ -197,11 +200,14 @@ class _GlowPainter extends CustomPainter {
           transform: GradientRotation(turn()),
         ).createShader(rect)
         ..colorFilter = ColorFilter.mode(Color.fromRGBO(255, 255, 255, energy), BlendMode.modulate);
-      if (layer.blur > 0) paint.maskFilter = MaskFilter.blur(BlurStyle.normal, layer.blur * scale);
+      if (layer.blur > 0) {
+        paint.maskFilter = MaskFilter.blur(BlurStyle.normal, layer.blur * scale);
+      }
       canvas.drawRRect(shape, paint);
     }
   }
 
   @override
-  bool shouldRepaint(_GlowPainter old) => old.energy != energy || old.radius != radius || old.scale != scale;
+  bool shouldRepaint(_GlowPainter old) =>
+      old.colors != colors || old.energy != energy || old.radius != radius || old.scale != scale;
 }

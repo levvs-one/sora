@@ -8,8 +8,32 @@ umask 077
 
 die() { printf 'sora-update: %s\n' "$*" >&2; exit 1; }
 [ "$(id -u)" -eq 0 ] || die 'administrator rights are required'
-[ "$#" -eq 3 ] || die 'expected format, version and download directory'
+# The app's automatic rollback (app/lib/src/updates.dart) installs the
+# previous release and says so with --allow-downgrade; without it an older
+# version is refused, so a direct call cannot silently downgrade.
+allow_downgrade=
+case "$#" in
+3) ;;
+4)
+    [ "$4" = --allow-downgrade ] || die 'the fourth argument must be --allow-downgrade'
+    allow_downgrade=1
+    ;;
+*) die 'expected format, version, download directory and optional --allow-downgrade' ;;
+esac
 format=$1 version=$2 source=$3
+
+# version_ge reports whether dotted-numeric A >= B.
+version_ge() {
+    _i=1
+    while [ "$_i" -le 3 ]; do
+        _x=$(printf '%s' "$1" | cut -d. -f"$_i")
+        _y=$(printf '%s' "$2" | cut -d. -f"$_i")
+        [ "$_x" -gt "$_y" ] && return 0
+        [ "$_x" -lt "$_y" ] && return 1
+        _i=$((_i + 1))
+    done
+    return 0
+}
 printf '%s\n' "$version" | LC_ALL=C grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' || die 'invalid version'
 case "$source" in /*) ;; *) die 'download directory must be absolute' ;; esac
 [ "$(uname -m)" = x86_64 ] || die 'the desktop update requires x86_64'
@@ -36,6 +60,21 @@ arch)
     ;;
 *) die 'unsupported package format' ;;
 esac
+
+installed_version() {
+    case "$format" in
+    deb) dpkg-query -W -f='${Version}' sora-core ;;
+    rpm) rpm -q --qf '%{VERSION}' sora-core ;;
+    arch) pacman -Q sora-core | awk '{print $2}' | sed 's/-[^-]*$//' ;;
+    esac
+}
+current=$(installed_version)
+printf '%s\n' "$current" | LC_ALL=C grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' || die "cannot determine the installed version ('$current')"
+downgrade=
+if ! version_ge "$version" "$current"; then
+    [ -n "$allow_downgrade" ] || die "downgrade from $current to $version refused; pass --allow-downgrade to override"
+    downgrade=1
+fi
 
 work=$(mktemp -d /var/tmp/sora-update.XXXXXXXX)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -74,12 +113,22 @@ done
 set --
 for name in $files; do set -- "$@" "$work/$name"; done
 case "$format" in
-deb) apt-get install -y "$@" ;;
+deb)
+    if [ -n "$downgrade" ]; then
+        apt-get install -y --allow-downgrades "$@"
+    else
+        apt-get install -y "$@"
+    fi
+    ;;
 rpm)
     if command -v dnf >/dev/null 2>&1; then
-        dnf install -y "$@"
+        if [ -n "$downgrade" ]; then dnf downgrade -y "$@"; else dnf install -y "$@"; fi
     elif command -v zypper >/dev/null 2>&1; then
-        zypper --non-interactive install --allow-unsigned-rpm "$@"
+        if [ -n "$downgrade" ]; then
+            zypper --non-interactive install --oldpackage --allow-unsigned-rpm "$@"
+        else
+            zypper --non-interactive install --allow-unsigned-rpm "$@"
+        fi
     else
         die 'dnf or zypper is required'
     fi

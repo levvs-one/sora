@@ -13,6 +13,7 @@ import 'package:sora/src/ui/subscription.dart';
 import 'package:sora/main.dart';
 import 'package:sora/src/core/link.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pb.dart';
+import 'package:sora/src/generated/sora/custom/v1/custom.pb.dart';
 import 'package:sora/src/groups.dart';
 import 'package:sora/src/rules.dart';
 import 'package:sora/src/settings.dart';
@@ -362,6 +363,22 @@ void main() {
       );
     });
 
+    test('a renamed group member splits out so the rename stays visible', () {
+      final entries = entriesOf(
+        sub([server('a', 'Нидерланды (основной)'), server('b', 'Нидерланды (запасной)'), server('c', 'Германия')]),
+      );
+      final shown = [
+        for (final e in entries) ...e.applyRenames({'b': 'NL быстрый'}),
+      ];
+      expect(shown.map((e) => e.name), ['Нидерланды', 'NL быстрый', 'Германия']);
+      expect(shown[1].id, 'b', reason: 'the split entry keeps the server id');
+      expect(shown[0].members.map((o) => o.id), ['a'], reason: 'the group keeps the rest');
+      // No renames: entries pass through unchanged.
+      final untouched = [for (final e in entries) ...e.applyRenames(const {})];
+      expect(untouched.map((e) => e.name), ['Нидерланды', 'Германия']);
+      expect(identical(untouched[0], entries[0]), isTrue);
+    });
+
     test('ordered servers become a fallback group on mihomo, the main ones alone elsewhere', () async {
       SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
       final settings = await Settings.load();
@@ -392,6 +409,60 @@ void main() {
       expect(pickMember(best, {'x': 90, 'y': null}).id, 'x');
     });
   });
+
+  group('custom servers', () {
+    test('canonicalCustomId maps plain custom ids to the core outbound namespace', () {
+      // The core merges custom servers into subscription outbound lists as
+      // `custom/<id>`; the UI stores them with plain ids.
+      expect(canonicalCustomId('abc', ['abc', 'def']), 'custom/abc');
+      expect(canonicalCustomId('custom/abc', ['abc']), 'custom/abc', reason: 'idempotent');
+      expect(canonicalCustomId('srv-1', ['abc']), 'srv-1', reason: 'subscription ids pass through');
+      expect(canonicalCustomId('auto', ['abc']), 'auto');
+      expect(canonicalCustomId('group:s:x', ['abc']), 'group:s:x');
+      expect(canonicalCustomId('abc', []), 'abc', reason: 'a deleted custom stays plain');
+    });
+
+    test('selecting a custom server plans the canonical id the core accepts', () async {
+      SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+      final settings = await Settings.load();
+      final sora = _CustomSora(settings);
+      addTearDown(sora.dispose);
+      // The card passes the plain custom id, like the UI does.
+      await sora.select('abc');
+      expect(settings.server, 'custom/abc', reason: 'settings store the canonical outbound id');
+      expect(sora.selected, 'custom/abc');
+      final plan = sora.currentPlan;
+      expect(plan.outbounds.map((o) => o.id), contains('custom/abc'));
+      // Failover is on by default: the custom server is tried first by its
+      // canonical id, never by the plain id the core would reject.
+      expect(plan.routing.proxyTarget, Sora.failoverGroup);
+      expect(plan.groups.single.members, contains('custom/abc'));
+      expect(plan.groups.single.members, isNot(contains('abc')));
+    });
+
+    test('a pinned custom server without failover is the routing target itself', () async {
+      SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+      final settings = await Settings.load();
+      settings.failover = false;
+      final sora = _CustomSora(settings);
+      addTearDown(sora.dispose);
+      await sora.select('abc');
+      final plan = sora.currentPlan;
+      expect(plan.routing.proxyTarget, 'custom/abc', reason: 'the core validates the target against outbound ids');
+    });
+
+    test('passive probes and the card share one latency key', () async {
+      SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+      final sora = _CustomSora(await Settings.load());
+      addTearDown(sora.dispose);
+      // Passive probes arrive keyed by the merged outbound id the core
+      // reports; the card looks the plain custom id up through the same
+      // canonical key, so manual tests and probes never miss each other.
+      sora.latency['custom/abc'] = 42;
+      expect(sora.latency[sora.canonicalServerId('abc')], 42);
+      expect(sora.canonicalServerId('abc'), 'custom/abc');
+    });
+  });
 }
 
 class _SubscriptionSora extends Sora {
@@ -412,4 +483,21 @@ class _SubscriptionSora extends Sora {
     opened.add(id);
     return null;
   }
+}
+
+/// Simulates the core merging a saved custom server into the subscription
+/// outbound list as `custom/<id>`: [servers] carries the merged
+/// outbound while [customServers] carries the plain-id record, exactly like
+/// the real core state after loadCustomServers.
+class _CustomSora extends Sora {
+  _CustomSora(super.settings);
+
+  @override
+  List<CustomServer> get customServers => [CustomServer(id: 'abc', name: 'Мой сервер')];
+
+  @override
+  List<OutboundSpec> get servers => [
+    OutboundSpec(id: 'a', displayName: 'A', protocol: 'vless'),
+    OutboundSpec(id: 'custom/abc', displayName: 'Мой сервер', protocol: 'vless'),
+  ];
 }

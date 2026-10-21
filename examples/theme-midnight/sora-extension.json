@@ -1,0 +1,22 @@
+{
+  "manifest_version": 1,
+  "id": "org.sora.theme-midnight",
+  "name": "Midnight",
+  "version": "1.0.0",
+  "min_app_version": "1.1.0",
+  "description": "A readable dark palette for Sora.",
+  "author": {
+    "name": "Sora Team",
+    "identity": "github:levvs-one",
+    "public_key": "RWR4GRTQjDDhQUbdYob6IwCcKqOk1SpL2tripsiQMl+UVFC+XtUyp38Q"
+  },
+  "permissions": [
+    "theme.apply"
+  ],
+  "capabilities": [
+    "theme"
+  ],
+  "theme": {
+    "entry": "theme.json"
+  }
+}

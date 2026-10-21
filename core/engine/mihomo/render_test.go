@@ -162,7 +162,10 @@ func TestTunUsesSeparateAddressesEvenWithoutFakeDNS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var c config
+	var c struct {
+		DNS       *dnsConfig   `yaml:"dns"`
+		Listeners []*tunConfig `yaml:"listeners"`
+	}
 	if err := yaml.Unmarshal([]byte(out), &c); err != nil {
 		t.Fatal(err)
 	}

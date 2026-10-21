@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package sora.ext.v1;
+
+option go_package = "github.com/levvs-one/sora-client/core/gen/sora/ext/v1;extv1";
+
+// ExtensionHost runs workers for the app, which owns extension installation,
+// signature verification, grants, settings and revocation enforcement.
+// The control token and transport authenticate the app's delegation.
+service ExtensionHost {
+  // Closing the app-owned lifecycle stream unregisters and cancels the worker.
+  rpc RunWorker(stream WorkerClientMessage) returns (stream WorkerHostMessage);
+}
+
+// The first message configures the worker; later messages carry bridge replies.
+message WorkerClientMessage {
+  bytes control_token = 1;
+  string manifest_json = 2;
+  string source = 3;
+  string config_json = 4;
+  string reply_json = 5;
+}
+
+message WorkerHostMessage {
+  // Bridge call JSON, dispatched by the app using PanelBridge.
+  string call_json = 1;
+  // Bounded operational or script log, also retained in the core LogHub.
+  string log = 2;
+  // One failed run; the app emits a localized notification.
+  bool failed = 3;
+}

@@ -65,6 +65,9 @@ func Render(p *engine.Plan, rt supervise.Runtime, sel Selection) ([]byte, error)
 	if p == nil {
 		return nil, errors.New("xray: nil plan")
 	}
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
 	if p.Tun.Enabled && p.Tun.Stack != "" && p.Tun.Stack != "gvisor" {
 		return nil, fmt.Errorf("xray: TUN uses gvisor; stack %q is not supported", p.Tun.Stack)
 	}
@@ -115,6 +118,10 @@ func sessionInbounds(p *engine.Plan, rt supervise.Runtime) []obj {
 	// Xray's SOCKS inbound also handles HTTP. Open it only on request
 	// because any local application can reach loopback.
 	inbounds := []obj{}
+	if x := p.ExtensionProxy; x != nil {
+		inbounds = append(inbounds, obj{"tag": engine.ExtensionInbound, "protocol": "socks", "listen": "127.0.0.1", "port": x.Port,
+			"settings": obj{"auth": "password", "accounts": []obj{{"user": x.Username, "pass": x.Password}}, "udp": false}})
+	}
 	if lp := p.LocalProxy; lp.Enabled {
 		settings := obj{"udp": true}
 		if lp.Username != "" {
@@ -170,6 +177,19 @@ func (r *renderer) outbounds() ([]obj, error) {
 		ob, err := r.outbound(o)
 		if err != nil {
 			return nil, err
+		}
+		if o.Via != "" {
+			stream, _ := ob["streamSettings"].(obj)
+			if stream == nil {
+				stream = obj{}
+				ob["streamSettings"] = stream
+			}
+			sockopt, _ := stream["sockopt"].(obj)
+			if sockopt == nil {
+				sockopt = obj{}
+				stream["sockopt"] = sockopt
+			}
+			sockopt["dialerProxy"] = r.tags[o.Via]
 		}
 		out = append(out, ob)
 	}
@@ -387,6 +407,13 @@ func (r *renderer) observed() []string {
 
 func (r *renderer) routing() (obj, error) {
 	var rules []obj
+	if x := r.plan.ExtensionProxy; x != nil {
+		field, tag, err := r.target(x.Target, 0)
+		if err != nil {
+			return nil, err
+		}
+		rules = append(rules, obj{"inboundTag": []string{engine.ExtensionInbound}, field: tag})
+	}
 	if r.plan.Tun.Enabled {
 		// TCP carries retries after truncated UDP responses and must use the
 		// same resolver instead of forwarding the machine's DNS address abroad.

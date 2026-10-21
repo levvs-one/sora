@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:sora/main.dart';
+import 'package:sora/src/ext/store.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
 import 'package:sora/src/core/link.dart';
@@ -82,10 +83,20 @@ void main() {
           final settings = await Settings.load();
           await settings.completeTour();
           settings
-            ..language = 'ru'
+            ..language = Platform.environment['SORA_SHOTS_LANG'] ?? 'ru'
             ..theme = theme
             ..animations = false;
-          final sora = DesktopState(settings);
+          // The published team catalog, served from the offline cache: the
+          // test binding answers every HTTP request with 400.
+          final extensions = await tester.runAsync(() async {
+            final dir = await Directory.systemTemp.createTemp('sora-shots-ext-');
+            addTearDown(() => dir.delete(recursive: true));
+            final store = ExtensionStore(dir: dir.path);
+            await store.catalogCache.store(await File('../extensions/catalog.json').readAsBytes());
+            await store.load();
+            return store;
+          });
+          final sora = DesktopState(settings, extensions: extensions);
           size(tester, width, height);
           await tester.pumpWidget(
             RepaintBoundary(
@@ -96,6 +107,16 @@ void main() {
           await tester.pumpAndSettle();
           for (final (id, name) in sections) {
             tester.widget<ShellScope>(find.byType(ShellScope)).select(id);
+            if (name == 'extensions') {
+              // Store load and catalog cache read are real file IO that only
+              // completes outside the fake clock; settling first would fire
+              // the catalog's 45 s timeout instead.
+              await tester.pump();
+              for (var i = 0; i < 50 && find.byType(CircularProgressIndicator).evaluate().isNotEmpty; i++) {
+                await tester.pump(const Duration(milliseconds: 100));
+                await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+              }
+            }
             await tester.pump(const Duration(seconds: 6));
             await tester.pumpAndSettle();
             expect(tester.takeException(), isNull, reason: '$name $theme $width');

@@ -30,6 +30,9 @@ func (p *Plan) Protocols() map[Protocol]bool {
 // RequiredFeatures returns the features the plan asks an engine to provide.
 func (p *Plan) RequiredFeatures() map[Feature]bool {
 	out := map[Feature]bool{}
+	if p.ExtensionProxy != nil {
+		out[FeatureExtensionProxy] = true
+	}
 	if p.Tun.Enabled {
 		out[FeatureTun] = true
 	}
@@ -55,6 +58,9 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 		}
 	}
 	for _, o := range p.Outbounds {
+		if o.Via != "" {
+			out[FeatureChains] = true
+		}
 		if o.Transport.Type == "xhttp" {
 			out[FeatureXHTTP] = true
 		}
@@ -77,7 +83,8 @@ func (p *Plan) RequiredFeatures() map[Feature]bool {
 	return out
 }
 
-func isBuiltInTarget(t string) bool {
+// IsBuiltInTarget identifies destinations supplied by engines rather than plans.
+func IsBuiltInTarget(t string) bool {
 	switch t {
 	case "direct", "reject", "pass", "dns":
 		return true

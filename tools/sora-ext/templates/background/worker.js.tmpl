@@ -1,0 +1,3 @@
+const settings = await window.soraExt.call('getSettings');
+console.log('Background run, settings keys: ' + Object.keys(settings).join(', '));
+window.soraExt.onEvent((kind) => console.log(kind));

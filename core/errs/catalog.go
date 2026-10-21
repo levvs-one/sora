@@ -100,6 +100,7 @@ type Entry struct {
 }
 
 var catalog = map[Key]Entry{
+	KeyEngineUnstable: {CodeUnavailable, true, "the engine keeps crashing"},
 	// Contract and transport.
 	KeyAPIVersionMismatch: {CodeVersionMismatch, false, "the interface and the core speak different contract versions"},
 	KeyUnauthenticated:    {CodeUnauthenticated, false, "control-plane authentication failed or the token is stale"},
@@ -205,3 +206,6 @@ func DefaultKey(code Code) Key {
 	}
 	return KeyInternal
 }
+
+// KeyEngineUnstable identifies repeated crashes within the watchdog window.
+const KeyEngineUnstable Key = "core.engine.unstable"

@@ -5,7 +5,6 @@
   "stateConnected": "جڑا ہوا",
   "stateReconnecting": "دوبارہ جڑ رہا ہے۔",
   "stateDisconnecting": "منقطع ہو رہا ہے۔",
-  "stateFailed": "منسلک نہیں",
   "coreMissing": "Sora سروس جواب نہیں دے رہی ہے۔",
   "serverAuto": "تیز ترین",
   "serverBypass": "کوئی سرور نہیں۔",
@@ -41,6 +40,7 @@
   "export": "فائل میں محفوظ کریں۔",
   "clear": "صاف",
   "logsEmpty": "یہاں کچھ نہیں۔",
+  "connEmpty": "کوئی کنکشن نہیں ہے۔",
   "appVersion": "ورژن {version}",
   "notInstalled": "انسٹال نہیں ہے۔",
   "sourceCode": "سورس کوڈ",
@@ -75,17 +75,16 @@
   "errSubScheme": "لنک https:// سے شروع ہونا چاہیے",
   "errSecretStore": "Sora اسٹوریج خراب ہے یا دستیاب نہیں ہے۔",
   "errNoServers": "جڑنے کے لیے سبسکرپشن شامل کریں۔",
-  "exportText": "متن",
   "connections": "کنکشنز",
   "close": "بند",
   "chainDirect": "براہ راست",
   "chainBlocked": "مسدود",
   "theme": "تھیم",
-  "themeSystem": "System",
+  "themeSystem": "سسٹم کے مطابق",
   "themeLight": "روشنی",
   "themeDark": "اندھیرا",
   "language": "زبان",
-  "languageSystem": "System",
+  "languageSystem": "سسٹم کے مطابق",
   "sectionConnection": "کنکشن",
   "sectionNoServer": "کوئی سرور نہیں۔",
   "sectionPing": "پنگ",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} چھوڑ دیا۔",
   "ruleInvalid": "یہ کسی سائٹ، آئی پی یا پروگرام کی طرح نہیں لگتا ہے۔",
   "tunnelMode": "موڈ",
-  "tunnelTun": "تمام ٹریفک",
   "tunnelProxy": "System پراکسی",
   "proxyAddress": "پراکسی ایڈریس",
   "copied": "کاپی",
   "launchAtLogin": "سسٹم کے ساتھ شروع کریں۔",
+  "launchAtLoginDetail": "سائن ان کرنے پر Sora خودکار طور پر شروع ہوگا اور ٹرے میں رہے گا۔",
   "closeToTray": "بند ہونے پر ٹرے میں رکھیں",
   "notifications": "اطلاعات",
   "trayOpen": "Sora کھولیں۔",
@@ -185,12 +184,6 @@
   "sidebarToggle": "سائڈبار کو ٹوگل کریں۔",
   "more": "مزید",
   "less": "کم",
-  "currentServer": "موجودہ سرور",
-  "trafficDown": "ڈاؤن لوڈ کیا گیا۔",
-  "trafficUp": "اپ لوڈ کیا گیا",
-  "perSecond": "{value}/s",
-  "activeRules": "فعال قوانین: {count}",
-  "recentNotifications": "حالیہ اطلاعات",
   "notificationsEmpty": "کنکشن اور سبسکرپشن ایونٹس یہاں ظاہر ہوں گے۔",
   "retryConnect": "کنکشن کی دوبارہ کوشش کریں۔",
   "openLogs": "نوشتہ جات کھولیں۔",
@@ -208,12 +201,9 @@
   "chooseProgram": "ایک پروگرام کا انتخاب کریں۔",
   "installedApps": "انسٹال کردہ ایپلیکیشنز",
   "runningProcesses": "چلنے والے عمل",
-  "programsFailed": "ایپلیکیشنز کو لوڈ نہیں کیا جا سکا",
   "programsEmpty": "کوئی درخواستیں نہیں ملی۔ دوسرا نام آزمائیں۔",
   "selectExe": "ایک .exe فائل کا انتخاب کریں۔",
-  "trafficUnavailable": "کاؤنٹر ابھی تک دستیاب نہیں ہیں۔",
   "speedtest": "رفتار",
-  "speedtestCheck": "رفتار چیک کریں۔",
   "speedtestSearch": "ایک سروس تلاش کریں۔",
   "speedtestEmpty": "کوئی میچ نہیں تلاش کو تبدیل کریں۔",
   "speedtestBackToList": "خدمات پر واپس جائیں۔",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "کمانڈ کاپی کریں۔",
   "updateChecksDisabled": "خودکار چیک سیٹنگز میں غیر فعال ہیں۔",
   "updateInstalled": "اپ ڈیٹ انسٹال ہو گیا۔ Sora دوبارہ کھولیں۔",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "پروجیکٹ",
   "githubReleases": "ریلیز اور ڈاؤن لوڈز",
   "telegramChannel": "Telegram چینل",
   "licenses": "لائسنس",
   "componentLicenses": "اجزاء کے لائسنس",
-  "appCopyright": "© 2026 levvs-one اور تعاون کنندگان",
   "collapseServers": "سرورز کو سمیٹیں۔",
   "expandServers": "سرورز کو پھیلائیں۔",
   "hideDescription": "تفصیل چھپائیں۔",
   "showDescription": "تفصیل دکھائیں۔",
   "pendingConnectionChanges": "ان تبدیلیوں کو لاگو کرنے کے لیے دوبارہ جڑیں۔",
   "reconnectNow": "لاگو کریں اور دوبارہ جڑیں۔",
-  "bypassLimitations": "یہ موڈ صرف HTTP اور TLS کے لیے DPI کو نظرانداز کرتا ہے، نہ UDP کو سپورٹ کرتا ہے اور نہ ہی آپ کے IP کو تبدیل کرتا ہے۔ Discord آواز، کالز اور بلاک شدہ Telegram پتوں کے لیے VPN سرور استعمال کریں۔",
   "errEngineUnsupported": "منتخب انجن اس پروفائل یا سیٹنگز کو سپورٹ نہیں کرتا ہے۔ آٹو یا ہم آہنگ انجن کا انتخاب کریں۔",
   "errRestore": "کنکشن کی صفائی نامکمل تھی۔ منقطع کرنے کی دوبارہ کوشش کریں؛ تفصیلات کے لیے لاگ دیکھیں۔",
   "errSessionEnded": "یہ سیشن پہلے ہی ختم ہو چکا ہے۔ کنکشن کی حالت کو تازہ کریں۔",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "موڈز اور انجن",
   "probeServers": "سرورز کو چیک کریں۔",
   "expiresIn": "{name}: {days, plural, =0{رکنیت چند گھنٹوں میں ختم ہو جاتی ہے۔} one{رکنیت # دن میں ختم ہو جاتی ہے۔} other{سبسکرپشن # دنوں میں ختم ہو جاتی ہے۔}}",
-  "groupOrdered": "{count, plural, one{# سرور، بدلے میں} other{# سرورز، بدلے میں}}",
   "groupBest": "{count, plural, one{# سرور، تیز ترین} other{# سرورز، تیز ترین}}",
-  "modesGuide": "اگر آپ کو یقین نہیں ہے کہ آپ کے سرور کو کس انجن کی ضرورت ہے تو آٹو کا انتخاب کریں۔ Sora کنیکٹ کرنے سے پہلے پروفائل اور سیٹنگز کو چیک کرتا ہے۔ ایک انجن آپ کے پلان کی بینڈوتھ کو نہیں بڑھا سکتا: کارکردگی کا انحصار سرور، روٹ، پروٹوکول اور نیٹ ورک پر ہوتا ہے۔\n\n## موڈز\n\n### تمام ٹریفک (TUN)\n\nSora ایک ورچوئل نیٹ ورک انٹرفیس بناتا ہے اور اس کے ذریعے ایپلیکیشن ٹریفک کو روٹ کرتا ہے، بشمول TCP اور UDP۔ اس موڈ کو Telegram، گیمز اور Discord آواز کے لیے استعمال کریں۔ قواعد مخصوص سائٹوں یا پروگراموں کو براہ راست بھیج سکتے ہیں یا انہیں بلاک کر سکتے ہیں۔ نیٹ ورک سروس کو اجازت اور سرور کی ضرورت ہے جو مطلوبہ پروٹوکول کو سپورٹ کرتا ہو۔\n\n### System پراکسی\n\nSora ایک مقامی HTTP/SOCKS پراکسی کو ترتیب دیتا ہے۔ وہ ایپلیکیشنز جو سسٹم پراکسی سیٹنگز کا احترام کرتی ہیں اسے استعمال کرتی ہیں۔ ان کے اپنے نیٹ ورک اسٹیک والی درخواستیں براہ راست جڑ سکتی ہیں۔ UDP اور وائس کالز کو عام طور پر TUN کی ضرورت ہوتی ہے۔ یہ موڈ پراکسی سپورٹ والے براؤزرز اور ایپلیکیشنز کے لیے موزوں ہے۔\n\n### کوئی سرور نہیں۔\n\nLinux پر، Sora HTTP/TLS درخواستوں کو تقسیم کرنے اور نئی شکل دینے اور کچھ DPI چیکس کو نظرانداز کرنے کے لیے [zapret](https://github.com/bol-van/zapret) کا استعمال کرتا ہے۔ آپ کا IP وہی رہتا ہے اور کنکشن براہ راست ویب سائٹ پر جاتے ہیں۔ نتائج کا انحصار آپ کے فراہم کنندہ اور بلاک کرنے کے طریقہ پر ہے۔\n\nموجودہ انضمام TCP پر HTTP اور TLS کے لیے tpws استعمال کرتا ہے۔ یہ IP بلاکنگ یا ریلے UDP کو نظرانداز نہیں کرتا ہے، اور Telegram کے MTProto کنکشن کی ضمانت نہیں دے سکتا ہے۔ Discord آواز، Telegram کالز اور اس قسم کی پابندیوں کے لیے TUN کے ساتھ VPN سرور استعمال کریں۔\n\n## انجن\n\n### آٹو\n\nSora ایک انسٹال شدہ انجن کا انتخاب کرتا ہے جو پورے کنکشن پلان کو سپورٹ کرتا ہے: سرور پروٹوکول، ٹرانسپورٹ، گروپس، فریگمنٹیشن اور موڈ۔ موجودہ کنکشن کو روکنے سے پہلے ایک غیر موازن دستی انتخاب کو مسترد کر دیا جاتا ہے۔ آٹو یا دوسرا انجن منتخب کریں اور سیٹنگز کو دوبارہ لاگو کریں۔\n\n### sing-box\n\nنئے Sora پیکیجز میں [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) شامل ہیں، [sing-box](https://github.com/SagerNet/sing-box) کا ایک کانٹا، کلائنٹ سائیڈ XHTTP اور VLESS Encryption شامل کرنا۔ Sora تعمیر اور اس کی صلاحیتوں کو تسلیم کرتا ہے۔ XHTTP کے بغیر اپ اسٹریم کی تعمیر صرف اپنے نام سے یہ صلاحیت حاصل نہیں کرتی ہے۔\n\nمعاون پروٹوکول میں VLESS، VMess، Trojan، Shadowsocks، Hysteria2، TUIC، AnyTLS، WireGuard اور AmneziaWG 1.x/2.x کے وہ پیرامیٹر شامل ہیں جنہیں Sora درآمد کر سکتا ہے۔ مکمل Xray JSON پروفائل کے لیے Xray درکار ہے۔ نئے AWG 3.x فیلڈ ابھی درآمد نہیں کیے جا سکتے۔ sing-box پاس ورڈ سے محفوظ مقامی کنٹرول پورٹ استعمال کرتا ہے، جسے کمپیوٹر کی دوسری ایپلیکیشنز تلاش کر سکتی ہیں۔\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption اور TLS فریگمنٹیشن کو سپورٹ کرتا ہے۔ یہ مکمل فراہم کنندہ Xray پروفائلز کو بھی چلاتا ہے جبکہ ان کی روٹنگ اور گروپس کو محفوظ رکھتا ہے۔ ایسے پروفائلز کو ان کے رویے کو تبدیل کیے بغیر خود بخود دوسرے انجن میں تبدیل نہیں کیا جا سکتا۔\n\nبنڈل شدہ Xray نے اس ترتیب کو ہٹا دیا جو TLS سرٹیفکیٹ کی تصدیق کو غیر فعال کرتی ہے (`allowInsecure`)۔ آٹو sing-box یا mihomo کو اس ترتیب کی ضرورت والے عام سرورز کے لیے منتخب کرتا ہے۔ موجودہ کنکشن کو روکنے سے پہلے Xray کو منتخب کرنا دستی طور پر عدم مطابقت کی اطلاع دیتا ہے۔ پرانے مکمل JSON پروفائلز کو قابل تصدیق سرٹیفکیٹ یا سرٹیفکیٹ پن کے ساتھ ایک اپ ڈیٹ فراہم کنندہ پروفائل کی ضرورت ہے۔\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) آرڈر شدہ فال بیک اور لوڈ بیلنسنگ گروپس، XHTTP اور AmneziaWG کو سپورٹ کرتا ہے۔ اسے منتخب کریں جب بیک اپ سرور میں خودکار طور پر ناکام ہو جائے۔ Sora کی TLS فریگمنٹیشن سیٹنگ اس انجن کے ساتھ دستیاب نہیں ہے۔\n\n## Sora میں مطابقت\n\n| خصوصیت | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN اور TCP/UDP | جی ہاں | جی ہاں | جی ہاں |\n| XHTTP | جی ہاں | جی ہاں | جی ہاں |\n| VLESS Encryption | جی ہاں | جی ہاں | جی ہاں |\n| مکمل Xray پروفائل | نہیں | جی ہاں | نہیں |\n| TUIC / AnyTLS | دونوں | نہیں | TUIC |\n| TLS فریگمنٹیشن | جی ہاں | جی ہاں | نہیں |\n| AmneziaWG 1.x/2.x | ہاں¹ | نہیں | جی ہاں |\n| حکم دیا فال بیک گروپ | نہیں | No² | جی ہاں |\n\nJ1/J2/J3/Itime والے پروفائلز mihomo استعمال کرتے ہیں؛ ان شعبوں کو کبھی بھی خاموشی سے ضائع نہیں کیا جانا چاہیے۔ ² مکمل Xray پروفائلز کے گروپ کے لیے، ایپ بیک اپ پروفائل کا انتخاب کرتی ہے۔ سپورٹ نصب شدہ تعمیر پر منحصر ہے؛ اس کا ورژن About میں چیک کریں۔\n\n## TUN اسٹیک\n\nاسٹیک ورچوئل انٹرفیس کے اندر TCP اور UDP کو ہینڈل کرتا ہے۔ موڈز پینل میں، Xray اور mihomo gVisor، System، Mixed اور MIPS پیش کرتے ہیں۔ ہر انجن اپنی ترجیح بچاتا ہے۔ System پراکسی اور سرور لیس موڈز اس ترجیح کو استعمال نہیں کرتے ہیں۔\n\n- **Mixed** — TCP سسٹم اسٹیک کا استعمال کرتا ہے، جبکہ gVisor UDP کو ہینڈل کرتا ہے۔ Linux پر یہ mihomo کے لیے ڈیفالٹ ہے۔ Windows پر Xray اور mihomo ڈیفالٹ طور پر MIPS استعمال کرتے ہیں۔\n- **System** — سسٹم اسٹیک استعمال کرتا ہے۔ اگر نیٹ ورک ایپلیکیشنز کو مسائل کا سامنا کرنا پڑتا ہے تو دوسرا آپشن آزمائیں۔\n- **gVisor** — یوزر اسپیس میں ٹریفک کو ہینڈل کرتا ہے۔\n- **MIPS** — mihomo کا اپنا IP اسٹیک، بنڈل ورژن 1.19.32 میں دستیاب ہے۔\n\nLinux پر، Xray اپنے بلٹ ان gVisor کو بطور ڈیفالٹ استعمال کرتا ہے۔ System، Mixed اور MIPS Linux پر mihomo کو TUN انجن کے طور پر استعمال کرتے ہیں، TCP اور UDP کو ایک مستند مقامی SOCKS لنک کے ذریعے Xray کو فارورڈ کرتے ہیں۔ Xray پروٹوکول، فراہم کنندہ پروفائل اور روٹنگ کو برقرار رکھتا ہے۔ ان تینوں اختیارات کے لیے انسٹال mihomo کی ضرورت ہے۔ Windows پر Xray چاروں TUN اسٹیکس کے لیے mihomo 1.19.32 یا نیا ورژن استعمال کرتا ہے۔ پروٹوکول اور روٹنگ Xray میں رہتے ہیں۔ اس امتزاج میں ایپ کے قواعد صرف براہ راست کنکشن اور بلاک کرنے کی حمایت کرتے ہیں؛ Linux پر ان قواعد کے لیے Xray کا بلٹ ان gVisor درکار ہے۔\n\nپل ایک دوسرا عمل چلاتا ہے۔ Linux پر تین بیکار پیمائشوں میں، اس نے مقامی Xray TUN سے تقریباً 32–36 MiB زیادہ جسمانی میموری استعمال کی۔ یہ ڈاؤن لوڈ لوڈ کی پیمائش نہیں کرتا ہے: CPU اور میموری کے اخراجات کنکشن پر منحصر ہیں۔ sing-box میں کوئی اسٹیک سلیکٹر نہیں ہے۔ کوئی اسٹیک ہر نیٹ ورک میں بہتر کارکردگی کی ضمانت نہیں دیتا۔ ایک اسٹیک کا انتخاب کریں اور اسے اپنے نیٹ ورک میں آزمانے کے لیے اپلائی کریں اور دوبارہ جڑیں کو منتخب کریں۔\n\n## ترتیبات کا اطلاق کرنا\n\nسرور کا انتخاب خود بخود دوبارہ جڑ جاتا ہے۔ موڈ، انجن، DNS اور اصول کی ترتیبات فوری طور پر محفوظ ہو جاتی ہیں۔ ایک فعال کنکشن کے دوران، لاگو کریں پر کلک کریں اور انہیں استعمال کرنے کے لیے دوبارہ جڑیں۔ انجن کو دوبارہ شروع کرنے سے ڈاؤن لوڈز اور کالز میں خلل پڑ سکتا ہے۔ بار بار کلک کرنے سے متوازی کنکشن شروع نہیں ہوتے ہیں۔ منقطع ہونے سے منتقلی ختم ہوجاتی ہے اور کنکشن جاری ہوجاتا ہے۔\n\nسرنگ گرنے پر صرف VPN کے ذریعے انٹرنیٹ براہ راست ٹریفک کو روکتا ہے۔ یہ پوری مشین کو متاثر کرتا ہے۔ واضح طور پر منقطع ہونا Sora کے قواعد کو ہٹا دیتا ہے۔ اگر کلین اپ ختم نہیں ہوتا ہے تو دوبارہ رابطہ منقطع کرنے کی کوشش کریں اور لاگ کو کھولیں۔\n\n## پروجیکٹ کی دستاویزات\n\n- [sing-box-lx: کنفیگریشن اور سپورٹ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box دستاویزات](https://sing-box.sagernet.org/)\n- [Xray دستاویزات](https://xtls.github.io/)\n- [mihomo دستاویزات](https://wiki.metacubex.one/)\n- [zapret: آپریشن اور حدود](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "اگر آپ کو یقین نہیں ہے کہ آپ کے سرور کو کس انجن کی ضرورت ہے تو آٹو کا انتخاب کریں۔ Sora کنیکٹ کرنے سے پہلے پروفائل اور سیٹنگز کو چیک کرتا ہے۔ ایک انجن آپ کے پلان کی بینڈوتھ کو نہیں بڑھا سکتا: کارکردگی کا انحصار سرور، روٹ، پروٹوکول اور نیٹ ورک پر ہوتا ہے۔\n\n## موڈز\n\n### تمام ٹریفک (TUN)\n\nSora ایک ورچوئل نیٹ ورک انٹرفیس بناتا ہے اور اس کے ذریعے ایپلیکیشن ٹریفک کو روٹ کرتا ہے، بشمول TCP اور UDP۔ اس موڈ کو Telegram، گیمز اور Discord آواز کے لیے استعمال کریں۔ قواعد مخصوص سائٹوں یا پروگراموں کو براہ راست بھیج سکتے ہیں یا انہیں بلاک کر سکتے ہیں۔ نیٹ ورک سروس کو اجازت اور سرور کی ضرورت ہے جو مطلوبہ پروٹوکول کو سپورٹ کرتا ہو۔\n\n### System پراکسی\n\nSora ایک مقامی HTTP/SOCKS پراکسی کو ترتیب دیتا ہے۔ وہ ایپلیکیشنز جو سسٹم پراکسی سیٹنگز کا احترام کرتی ہیں اسے استعمال کرتی ہیں۔ ان کے اپنے نیٹ ورک اسٹیک والی درخواستیں براہ راست جڑ سکتی ہیں۔ UDP اور وائس کالز کو عام طور پر TUN کی ضرورت ہوتی ہے۔ یہ موڈ پراکسی سپورٹ والے براؤزرز اور ایپلیکیشنز کے لیے موزوں ہے۔\n\n### کوئی سرور نہیں۔\n\nLinux پر، Sora HTTP/TLS درخواستوں کو تقسیم کرنے اور نئی شکل دینے اور کچھ DPI چیکس کو نظرانداز کرنے کے لیے [zapret](https://github.com/bol-van/zapret) کا استعمال کرتا ہے۔ آپ کا IP وہی رہتا ہے اور کنکشن براہ راست ویب سائٹ پر جاتے ہیں۔ نتائج کا انحصار آپ کے فراہم کنندہ اور بلاک کرنے کے طریقہ پر ہے۔\n\nموجودہ انضمام TCP پر HTTP اور TLS کے لیے tpws استعمال کرتا ہے۔ یہ IP بلاکنگ یا ریلے UDP کو نظرانداز نہیں کرتا ہے، اور Telegram کے MTProto کنکشن کی ضمانت نہیں دے سکتا ہے۔ Discord آواز، Telegram کالز اور اس قسم کی پابندیوں کے لیے TUN کے ساتھ VPN سرور استعمال کریں۔\n\n## انجن\n\n### آٹو\n\nSora ایک انسٹال شدہ انجن کا انتخاب کرتا ہے جو پورے کنکشن پلان کو سپورٹ کرتا ہے: سرور پروٹوکول، ٹرانسپورٹ، گروپس، فریگمنٹیشن اور موڈ۔ موجودہ کنکشن کو روکنے سے پہلے ایک غیر موازن دستی انتخاب کو مسترد کر دیا جاتا ہے۔ آٹو یا دوسرا انجن منتخب کریں اور سیٹنگز کو دوبارہ لاگو کریں۔\n\n### sing-box\n\nنئے Sora پیکیجز میں [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) شامل ہیں، [sing-box](https://github.com/SagerNet/sing-box) کا ایک کانٹا، کلائنٹ سائیڈ XHTTP اور VLESS Encryption شامل کرنا۔ Sora تعمیر اور اس کی صلاحیتوں کو تسلیم کرتا ہے۔ XHTTP کے بغیر اپ اسٹریم کی تعمیر صرف اپنے نام سے یہ صلاحیت حاصل نہیں کرتی ہے۔\n\nمعاون پروٹوکول میں VLESS، VMess، Trojan، Shadowsocks، Hysteria2، TUIC، AnyTLS، WireGuard اور AmneziaWG 1.x/2.x کے وہ پیرامیٹر شامل ہیں جنہیں Sora درآمد کر سکتا ہے۔ مکمل Xray JSON پروفائل کے لیے Xray درکار ہے۔ نئے AWG 3.x فیلڈ ابھی درآمد نہیں کیے جا سکتے۔ sing-box پاس ورڈ سے محفوظ مقامی کنٹرول پورٹ استعمال کرتا ہے، جسے کمپیوٹر کی دوسری ایپلیکیشنز تلاش کر سکتی ہیں۔\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption اور TLS فریگمنٹیشن کو سپورٹ کرتا ہے۔ یہ مکمل فراہم کنندہ Xray پروفائلز کو بھی چلاتا ہے جبکہ ان کی روٹنگ اور گروپس کو محفوظ رکھتا ہے۔ ایسے پروفائلز کو ان کے رویے کو تبدیل کیے بغیر خود بخود دوسرے انجن میں تبدیل نہیں کیا جا سکتا۔\n\nبنڈل شدہ Xray نے اس ترتیب کو ہٹا دیا جو TLS سرٹیفکیٹ کی تصدیق کو غیر فعال کرتی ہے (`allowInsecure`)۔ آٹو sing-box یا mihomo کو اس ترتیب کی ضرورت والے عام سرورز کے لیے منتخب کرتا ہے۔ موجودہ کنکشن کو روکنے سے پہلے Xray کو منتخب کرنا دستی طور پر عدم مطابقت کی اطلاع دیتا ہے۔ پرانے مکمل JSON پروفائلز کو قابل تصدیق سرٹیفکیٹ یا سرٹیفکیٹ پن کے ساتھ ایک اپ ڈیٹ فراہم کنندہ پروفائل کی ضرورت ہے۔\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) آرڈر شدہ فال بیک اور لوڈ بیلنسنگ گروپس، XHTTP اور AmneziaWG کو سپورٹ کرتا ہے۔ اسے منتخب کریں جب بیک اپ سرور میں خودکار طور پر ناکام ہو جائے۔ Sora کی TLS فریگمنٹیشن سیٹنگ اس انجن کے ساتھ دستیاب نہیں ہے۔\n\n## Sora میں مطابقت\n\n| خصوصیت | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN اور TCP/UDP | جی ہاں | جی ہاں | جی ہاں |\n| XHTTP | جی ہاں | جی ہاں | جی ہاں |\n| VLESS Encryption | جی ہاں | جی ہاں | جی ہاں |\n| مکمل Xray پروفائل | نہیں | جی ہاں | نہیں |\n| TUIC / AnyTLS | دونوں | نہیں | TUIC |\n| TLS فریگمنٹیشن | جی ہاں | جی ہاں | نہیں |\n| AmneziaWG 1.x/2.x | ہاں¹ | نہیں | جی ہاں |\n| حکم دیا فال بیک گروپ | نہیں | No² | جی ہاں |\n\nJ1/J2/J3/Itime والے پروفائلز mihomo استعمال کرتے ہیں؛ ان شعبوں کو کبھی بھی خاموشی سے ضائع نہیں کیا جانا چاہیے۔ ² مکمل Xray پروفائلز کے گروپ کے لیے، ایپ بیک اپ پروفائل کا انتخاب کرتی ہے۔ سپورٹ نصب شدہ تعمیر پر منحصر ہے؛ اس کا ورژن About میں چیک کریں۔\n\n## TUN اسٹیک\n\nاسٹیک ورچوئل انٹرفیس کے اندر TCP اور UDP کو ہینڈل کرتا ہے۔ موڈز پینل میں، Xray اور mihomo gVisor، System، Mixed اور MIPS پیش کرتے ہیں۔ ہر انجن اپنی ترجیح بچاتا ہے۔ System پراکسی اور سرور لیس موڈز اس ترجیح کو استعمال نہیں کرتے ہیں۔\n\n- **Mixed**: TCP سسٹم اسٹیک کا استعمال کرتا ہے، جبکہ gVisor UDP کو ہینڈل کرتا ہے۔ Linux پر یہ mihomo کے لیے ڈیفالٹ ہے۔ Windows پر Xray اور mihomo ڈیفالٹ طور پر MIPS استعمال کرتے ہیں۔\n- **System**: سسٹم اسٹیک استعمال کرتا ہے۔ اگر نیٹ ورک ایپلیکیشنز کو مسائل کا سامنا کرنا پڑتا ہے تو دوسرا آپشن آزمائیں۔\n- **gVisor**: یوزر اسپیس میں ٹریفک کو ہینڈل کرتا ہے۔\n- **MIPS**: mihomo کا اپنا IP اسٹیک، بنڈل ورژن 1.19.32 میں دستیاب ہے۔\n\nLinux پر، Xray اپنے بلٹ ان gVisor کو بطور ڈیفالٹ استعمال کرتا ہے۔ System، Mixed اور MIPS Linux پر mihomo کو TUN انجن کے طور پر استعمال کرتے ہیں، TCP اور UDP کو ایک مستند مقامی SOCKS لنک کے ذریعے Xray کو فارورڈ کرتے ہیں۔ Xray پروٹوکول، فراہم کنندہ پروفائل اور روٹنگ کو برقرار رکھتا ہے۔ ان تینوں اختیارات کے لیے انسٹال mihomo کی ضرورت ہے۔ Windows پر Xray چاروں TUN اسٹیکس کے لیے mihomo 1.19.32 یا نیا ورژن استعمال کرتا ہے۔ پروٹوکول اور روٹنگ Xray میں رہتے ہیں۔ اس امتزاج میں ایپ کے قواعد صرف براہ راست کنکشن اور بلاک کرنے کی حمایت کرتے ہیں؛ Linux پر ان قواعد کے لیے Xray کا بلٹ ان gVisor درکار ہے۔\n\nپل ایک دوسرا عمل چلاتا ہے۔ Linux پر تین بیکار پیمائشوں میں، اس نے مقامی Xray TUN سے تقریباً 32–36 MiB زیادہ جسمانی میموری استعمال کی۔ یہ ڈاؤن لوڈ لوڈ کی پیمائش نہیں کرتا ہے: CPU اور میموری کے اخراجات کنکشن پر منحصر ہیں۔ sing-box میں کوئی اسٹیک سلیکٹر نہیں ہے۔ کوئی اسٹیک ہر نیٹ ورک میں بہتر کارکردگی کی ضمانت نہیں دیتا۔ ایک اسٹیک کا انتخاب کریں اور اسے اپنے نیٹ ورک میں آزمانے کے لیے اپلائی کریں اور دوبارہ جڑیں کو منتخب کریں۔\n\n## ترتیبات کا اطلاق کرنا\n\nسرور کا انتخاب خود بخود دوبارہ جڑ جاتا ہے۔ موڈ، انجن، DNS اور اصول کی ترتیبات فوری طور پر محفوظ ہو جاتی ہیں۔ ایک فعال کنکشن کے دوران، لاگو کریں پر کلک کریں اور انہیں استعمال کرنے کے لیے دوبارہ جڑیں۔ انجن کو دوبارہ شروع کرنے سے ڈاؤن لوڈز اور کالز میں خلل پڑ سکتا ہے۔ بار بار کلک کرنے سے متوازی کنکشن شروع نہیں ہوتے ہیں۔ منقطع ہونے سے منتقلی ختم ہوجاتی ہے اور کنکشن جاری ہوجاتا ہے۔\n\nسرنگ گرنے پر صرف VPN کے ذریعے انٹرنیٹ براہ راست ٹریفک کو روکتا ہے۔ یہ پوری مشین کو متاثر کرتا ہے۔ واضح طور پر منقطع ہونا Sora کے قواعد کو ہٹا دیتا ہے۔ اگر کلین اپ ختم نہیں ہوتا ہے تو دوبارہ رابطہ منقطع کرنے کی کوشش کریں اور لاگ کو کھولیں۔\n\n## پروجیکٹ کی دستاویزات\n\n- [sing-box-lx: کنفیگریشن اور سپورٹ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box دستاویزات](https://sing-box.sagernet.org/)\n- [Xray دستاویزات](https://xtls.github.io/)\n- [mihomo دستاویزات](https://wiki.metacubex.one/)\n- [zapret: آپریشن اور حدود](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,21 +440,582 @@
       }
     }
   },
-  "extensionsSoon": "جلد آرہا ہے۔",
-  "diagnosticUnavailable": "یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔",
-  "diagnosticPackets": "پیکٹ کی گرفتاری",
   "diagnosticHttp": "HTTP تشخیص",
-  "diagnosticCapture": "10 سیکنڈ کے لیے کیپچر کریں۔",
   "extensions": "ایکسٹینشنز",
-  "diagnosticRequiresTun": "پیکٹ کیپچر کو ایک فعال Sora TUN کنکشن کی ضرورت ہے۔",
   "diagnosticNoData": "ابھی تک کوئی ریکارڈ شدہ درخواستیں نہیں ہیں۔ پہلے اسپیڈ ٹیسٹ کی ویب سائٹ کھولیں۔",
   "exportLogFile": "فائل میں {name}",
-  "diagnosticEvents": "ونڈوز کے واقعات",
   "@exportLogFile": {
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "حسب ضرورت سرور شامل کریں۔",
+  "customServers": "میرے سرورز",
+  "customServerName": "نام",
+  "customServerNameHint": "مثال کے طور پر: میرا VPS",
+  "customServerNameRequired": "نام درج کریں۔",
+  "customServerAddress": "پتہ",
+  "customServerAddressHint": "example.com یا 192.0.2.1",
+  "customServerAddressRequired": "سرور کا پتہ درج کریں۔",
+  "customServerAddressInvalid": "غلط پتہ",
+  "customServerPort": "پورٹ",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "پورٹ کا نمبر 1 سے 65535 تک ہونا چاہیے۔",
+  "customServerProtocol": "پروٹوکول",
+  "customServerCredentials": "لاگ ان کی معلومات",
+  "customServerOptional": "اختیاری",
+  "customServerShowSecret": "راز دکھائیں۔",
+  "customServerHideSecret": "راز چھپائیں۔",
+  "customServerBadge": "ذاتی",
+  "customServerDeleteConfirm": "سرور \"{name}\" کو حذف کریں؟",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "دستی طور پر سرور شامل کریں: ایڈریس، پورٹ اور پروٹوکول",
+  "customServerTest": "ٹیسٹ",
+  "leakTestTitle": "ڈیٹا لیک کے لیے ٹیسٹ",
+  "leakTestIntro": "جانچتا ہے کہ آیا ٹریفک ٹنل کے باہر سے ڈیوائس سے نکل سکتی ہے: براہ راست DNS اور ICMP درخواستیں، IPv6 اخراج اور سسٹم ریزولورز۔ کنکشن فعال ہونے پر چلائیں۔",
+  "leakTestRun": "چیک کریں۔",
+  "leakTestCancel": "منسوخ کریں۔",
+  "leakTestNeedsConnection": "لیک ٹیسٹ چلانے کے لیے جڑیں۔",
+  "leakTestProgress": "ٹیسٹ مکمل ہوئے: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "کوئی لیک نہیں ملا",
+  "leakTestFound": "{count, plural, one{# لیک ملا} other{# لیک ملے}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "درست کریں۔",
+  "leakTestFixedNote": "نیٹ ورک بندش فعال ہے۔ تصدیق کے لیے دوبارہ ٹیسٹ چلائیں۔",
+  "leakTestCheckDirectDns": "براہ راست DNS",
+  "leakTestCheckIcmpEcho": "ICMP بازگشت",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "سسٹم ریزولورز",
+  "leakTestCheckTunnelConnectivity": "ٹنل کنیکٹیویٹی",
+  "leakTestCheckTunnelDns": "DNS سرنگ کے ذریعے",
+  "noticeDegraded": "سرور سست ہو گیا۔ Sora پیمائش کے دوران پائے جانے والے بہترین سرور پر تبدیل ہو گیا۔",
+  "obfs": "ٹریفک چھپانا",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "اپڈیٹ فائلوں کا موازنہ ریلیز کے ساتھ شائع کردہ چیک سم سے کیا جاتا ہے۔",
+  "updateManualSigWarning": "نیچے دی گئی فائلیں ریلیز کے چیک سم سے ملتی ہیں۔ اگر آپ نے انہیں سرکاری ریلیز سے ڈاؤن لوڈ کیا ہے تو کمانڈ چلائیں۔",
+  "updateVersionRevoked": "ڈویلپر نے یہ ورژن واپس لے لیا ہے۔ براہ کرم درست ریلیز کا انتظار کریں۔",
+  "updateRolloutPending": "ایک نیا ورژن بتدریج شروع ہو رہا ہے اور خود بخود آپ کو پیش کیا جائے گا۔",
+  "updateRollbacking": "ورژن {version} پر واپس جا رہا ہے...",
+  "updateRolledBack": "{version} کی تازہ کاری نے ہیلتھ چیک پاس نہیں کیا، لہذا Sora کو {fromVersion} پر واپس کر دیا گیا۔",
+  "updateRollbackError": "خودکار رول بیک ناکام ہوگیا۔ اگر نیا ورژن کام نہیں کرتا ہے تو پچھلی ریلیز کو دستی طور پر دوبارہ انسٹال کریں۔",
+  "updateRollbackCacheError": "موجودہ ورژن کی تصدیق شدہ رول بیک کاپی تیار نہیں کر سکا، اس لیے اپ ڈیٹ انسٹال نہیں ہوا۔",
+  "extRatingLabel": "درجہ بندی {rating} از 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "بذریعہ {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "تنصیبات: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 انسٹال کریں۔",
+  "extBadgeVerified": "تصدیق شدہ",
+  "extBadgeTop": "اس ہفتے سب سے زیادہ مقبول",
+  "extBadgeNew": "نیا",
+  "extBadgeStaff": "Sora ٹیم",
+  "extSideloadShort": "کیٹلاگ سے نہیں۔",
+  "extSideloadWarning": "یہ توسیع ٹیم کیٹلاگ سے نہیں ہے۔ صرف مصنف نے اپنی کلید کی تصدیق کی ہے: اسے صرف اس صورت میں انسٹال کریں جب آپ مصنف پر بھروسہ کریں۔",
+  "extInstallTitle": "«{name}» نصب کریں",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "«{name}» اپ ڈیٹ کریں",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "یہ ایکسٹینشن اس قابل ہو گی:",
+  "extPermissionsWidened": "اپ ڈیٹ نئی اجازتیں مانگتا ہے:",
+  "extDangerousAck": "میں سمجھتا ہوں کہ یہ اجازتیں سنجیدہ ہیں۔",
+  "extInstall": "انسٹال کریں۔",
+  "extUpdate": "اپ ڈیٹ کریں",
+  "extCancel": "منسوخ کریں۔",
+  "extConfirm": "تصدیق کریں۔",
+  "extOk": "OK",
+  "extCatalog": "کیٹلاگ",
+  "extInstalled": "انسٹال شدہ ایکسٹینشنز",
+  "extSearchHint": "ایکسٹینشنز تلاش کریں",
+  "extCatAll": "سبھی",
+  "extCatTools": "ٹولز",
+  "extCatThemes": "تھیمز",
+  "extCatAutomation": "آٹومیشن",
+  "extCatStats": "شماریات",
+  "extCatNetwork": "نیٹ ورک",
+  "extSortBy": "ترتیب دیں",
+  "extSortPopular": "سب سے زیادہ مقبول",
+  "extSortRating": "سب سے زیادہ درجہ بندی",
+  "extSortName": "نام",
+  "extCatalogError": "کیٹلاگ لوڈ نہیں ہو سکا",
+  "extRetry": "دوبارہ کوشش کریں۔",
+  "extEmptySearch": "کچھ نہیں ملا",
+  "extEmptyInstalled": "ابھی تک کوئی ایکسٹینشن انسٹال نہیں ہے۔\nکیٹلاگ میں ایک تلاش کریں یا فائل سے انسٹال کریں۔",
+  "extInstallFromFile": "فائل سے انسٹال کریں۔",
+  "extInstallFromUrl": "URL سے انسٹال کریں",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "ڈاؤن لوڈ کریں۔",
+  "extDownloading": "ڈاؤن لوڈ ہو رہا ہے…",
+  "extVerifying": "تصدیق ہو رہی ہے…",
+  "extInstalling": "انسٹال ہو رہا ہے…",
+  "extInstallFailed": "انسٹال ناکام ہو گیا۔",
+  "extErrSignature": "دستخطی چیک ناکام ہو گیا۔ فائل کو نقصان پہنچا یا اس کے ساتھ چھیڑ چھاڑ ہوسکتی ہے۔",
+  "extErrManifest": "ایکسٹینشن مینی فیسٹ غلط ہے۔",
+  "extErrNetwork": "نیٹ ورک کی خرابی۔ اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔",
+  "extErrHash": "ڈاؤن لوڈ کیٹلاگ سے میل نہیں کھاتا۔ ہو سکتا ہے اس کے ساتھ چھیڑ چھاڑ کی گئی ہو۔",
+  "extErrMinApp": "اس ایکسٹینشن کو ایپ ورژن کی ضرورت ہے {version} یا جدید تر۔",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "صرف https:// لنکس کی اجازت ہے۔",
+  "extErrGeneric": "کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔",
+  "extErrAuthorKeyChanged": "اس اپ ڈیٹ پر انسٹال شدہ ورژن سے مختلف مصنف کی کلید کے ساتھ دستخط کیے گئے ہیں، اس لیے اسے بلاک کر دیا گیا تھا۔ اگر آپ کو نئی کلید پر بھروسہ ہے، تو ایکسٹینشن اَن انسٹال کریں اور اسے دوبارہ واضح طور پر انسٹال کریں۔",
+  "extUpdateAvailable": "اپ ڈیٹ دستیاب ہے۔",
+  "extDisabled": "غیر فعال",
+  "extToggleEnabled": "فعال کریں {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "نصب شدہ ایکسٹینشنز تلاش کریں",
+  "extUpdateAll": "سبھی کو اپ ڈیٹ کریں۔",
+  "extUpdatesAvailable": "{count} اپ ڈیٹس دستیاب ہیں۔",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} اپ ڈیٹ ہو گیا۔",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "نارمل",
+  "extRiskSensitive": "حساس",
+  "extRiskDangerous": "زیادہ خطرہ",
+  "extPermissionsRemoved": "مزید درخواست نہیں کی گئی:",
+  "extUpdateFailedKept": "پچھلا ورژن اب بھی انسٹال ہے۔",
+  "extConflictsTitle": "توسیع کے تنازعات",
+  "extConflictsIntro": "یہ ایکسٹینشنز ایک ہی چیز چاہتی ہیں۔ چنیں کہ کون سی چلے گی، دوسری انسٹال رہے گی۔",
+  "extConflictTheme": "ایپ تھیم",
+  "extConflictNetHooks": "نیٹ ورک ہکس",
+  "extConflictWinner": "ترجیح: {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} تنازعات کو آپ کے فیصلے کی ضرورت ہے۔",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "تنازعات کو حل کریں۔",
+  "extConflictNote": "آپ کا انتخاب اس آلے پر محفوظ ہوتا ہے۔ تھیم فوراً بدل جاتی ہے، نیٹ ورک ہُکس اس ورژن میں نہیں چلتے۔",
+  "extVersionLabel": "ورژن {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "مصنف",
+  "extRating": "درجہ بندی",
+  "extInstalls": "تنصیبات",
+  "extVersion": "ورژن",
+  "extAbout": "اس توسیع کے بارے میں",
+  "extPermissionsTitle": "اجازتیں۔",
+  "extNoPermissions": "کوئی خاص اجازت نہیں ہے۔",
+  "extSettings": "ترتیبات",
+  "extSaveSettings": "ترتیبات کو محفوظ کریں۔",
+  "extSaving": "محفوظ ہو رہا ہے…",
+  "extUpdateTo": "{version} میں اپ گریڈ کریں",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "فعال",
+  "extRollbackTo": "{version} پر رول بیک",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "ورژن {version} پر رول بیک؟",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "ان انسٹال کریں۔",
+  "extUninstallConfirm": "\"{name}\" اور اس کی ترتیبات کو ہٹائیں؟",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "پینل دستیاب نہیں ہے۔ ہو سکتا ہے کہ توسیع کو غیر فعال یا ہٹا دیا گیا ہو۔",
+  "extPermConnectionsRead": "فعال رابطوں کی فہرست دیکھیں",
+  "extPermServersRead": "اپنے سرورز کی فہرست دیکھیں",
+  "extPermSettingsRead": "ایپ کی ترتیبات پڑھیں",
+  "extPermSettingsWrite": "ایپ کی ترتیبات تبدیل کریں۔",
+  "extPermNotifications": "اطلاعات دکھائیں۔",
+  "extPermTray": "ٹرے مینو میں آئٹمز شامل کریں۔",
+  "extPermUiPanel": "ایپ کے اندر پینلز دکھائیں۔",
+  "extPermThemeApply": "تھیمز کا اطلاق کریں۔",
+  "extPermRoutingRules": "روٹنگ کے اصول شامل کریں (جہاں نیٹ ورک ٹریفک جاتا ہے اس پر اثر پڑتا ہے)",
+  "extPermNetHooks": "نیٹ ورک پاتھ میں ضم کریں (DPI بائی پاس ماڈیولز)",
+  "extPermNetFetch": "URL کی اجازت دی گئی فہرست سے درخواست کریں۔",
+  "extPermBackground": "پس منظر کے کام چلائیں۔",
+  "extPermBackgroundDetail": "پینل بند ہونے پر بھی طے شدہ کام چلاتا ہے۔ آپ ایکسٹینشن کی ترتیبات میں اسے روک سکتے ہیں یا اسے تبدیل کر سکتے ہیں کہ یہ کتنی بار چلتا ہے۔",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "پس منظر میں چلتا ہے۔",
+  "extCapNetHook": "پابندی سے بچاؤ اور نیٹ ورک ہکس",
+  "extCapPanel": "انٹرفیس پینلز",
+  "extCapRouting": "روٹنگ کے اصول",
+  "extCapTheme": "تھیمز",
+  "extCapWidget": "وجیٹس",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "چینج لاگ",
+  "extImageFailed": "تصویر کو لوڈ نہیں کیا جا سکا",
+  "extRatingHow": "درجہ بندی کیسے کام کرتی ہے۔",
+  "extRatingHowBody": "ریٹنگز ایک Bayesian اوسط کا استعمال کرتی ہیں: چند ریٹنگز کے ساتھ ایک توسیع اس وقت تک وسط کے قریب رہتی ہے جب تک کہ زیادہ لوگ ووٹ نہ دیں، اس لیے ایک 5-اسٹار جائزہ کسی نئی توسیع کو اوپر نہیں لے جا سکتا۔ حالیہ درجہ بندیوں کا وزن پرانے سے زیادہ ہے، اور فی اکاؤنٹ صرف ایک درجہ بندی شمار ہوتی ہے۔",
+  "extScreenshots": "اسکرین شاٹس",
+  "extSortRelevance": "مطابقت",
+  "extPermNetworkDetail": "VPN کے ذریعے انٹرنیٹ سے ڈیٹا لاتی ہے۔ صرف نیچے دیے گئے ہوسٹ کی اجازت ہے، باقی سب بلاک ہے۔",
+  "extBgTitle": "پس منظر کا کام",
+  "extBgEnabled": "پس منظر میں چلائیں۔",
+  "extBgInterval": "چلانے کا وقفہ",
+  "extBgMinutes": "{count, plural, one{# منٹ} other{# منٹ}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# گھنٹہ} other{# گھنٹے}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "جب تک Sora کھلا ہے، ٹرے میں ہونے پر بھی، کام شیڈول کے مطابق چلتا ہے۔ کم سے کم وقفہ 15 منٹ ہے۔",
+  "extBgDisabledNote": "اس کے پس منظر کے کام کو منظم کرنے کے لیے ایکسٹینشن کو فعال کریں۔",
+  "extCapNetwork": "نیٹ ورک تک رسائی",
+  "extCapNetworkHosts": "نیٹ ورک: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "شیئر کریں QR کوڈ",
+  "qrScanTitle": "اسکین کریں QR کوڈ",
+  "qrCopyLink": "لنک کاپی کریں۔",
+  "qrShowLink": "لنک دکھائیں۔",
+  "qrHideLink": "لنک چھپائیں۔",
+  "qrWarning": "یہ QR کوڈ کنکشن کی تفصیلات پر مشتمل ہے۔ اسے اجنبیوں کو نہ دکھائیں۔",
+  "qrScanHint": "QR کوڈ والا اسکرین شاٹ یا تصویر منتخب کریں، یا لنک پیسٹ کریں",
+  "qrFromClipboard": "کلپ بورڈ سے پیسٹ کریں۔",
+  "qrNoCode": "اس تصویر میں کوئی QR کوڈ نہیں ملا۔",
+  "qrInvalid": "اس QR کوڈ میں درست لنک نہیں ہے۔",
+  "qrScan": "اسکین QR",
+  "qrFromImage": "تصویر کھولیں",
+  "connGroupByProcess": "عمل کے لحاظ سے گروپ کریں۔",
+  "connListView": "فہرست",
+  "connCopyHost": "میزبان کاپی کریں۔",
+  "connAddRule": "اصول شامل کریں۔",
+  "connConnectionsCount": "{count, plural, one{# کنکشن} other{# کنکشن}}",
+  "dnsPreset": "پیش سیٹ",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "ذاتی",
+  "dnsCheck": "ڈیٹا لیک کی جانچ کریں۔",
+  "dnsChecking": "چیک ہو رہا ہے...",
+  "dnsNoLeak": "کوئی لیک نہیں ملا",
+  "dnsLeakFound": "لیک کا پتہ چلا",
+  "dnsLastCheck": "آخری چیک",
+  "dnsNeverChecked": "ابھی تک ٹیسٹ نہیں کیا گیا۔",
+  "dnsLeakCheckTunnelDns": "ٹنل کے DNS ریزولورز",
+  "dnsLeakCheckSystemResolvers": "سسٹم ریزولورز",
+  "dnsLeakCheckKillSwitchDns": "نیٹ ورک بندش سے DNS کا تحفظ",
+  "dnsLeakFixConfigureTunnelDns": "اوپر دی گئی DNS ترتیبات میں سرنگ کے لئے DNS کو ترتیب دیں۔",
+  "dnsLeakFixReviewSystemResolvers": "چیک کریں کہ آپ کا سسٹم سرنگ کے باہر کون سے ریزولورز استعمال کرے گا۔",
+  "dnsLeakFixEnableKillSwitch": "DNS ٹریفک کو ٹنل کے اندر رکھنے کے لیے نیٹ ورک بندش فعال کریں۔",
+  "dnsLeakCheckEncryptedDns": "سسٹم کا خفیہ کردہ DNS",
+  "dnsLeakCheckDnsSpoof": "جعلی DNS جوابات",
+  "dnsLeakFixReviewEncryptedDns": "چیک کریں کہ کون سے خفیہ کردہ DNS اینڈ پوائنٹس کو آپ کا سسٹم ٹنل کے باہر استعمال کرتا ہے۔",
+  "dnsLeakFixUseEncryptedDns": "ٹنل کے لیے خفیہ کردہ DNS (DoT یا DoH) استعمال کریں تاکہ ریزولورز جعلی جواب نہ دے سکیں۔",
+  "dnsCheckNeedsConnection": "پہلے VPN سے جڑیں، پھر لیک کی جانچ کریں۔",
+  "dnsExpected": "متوقع",
+  "dnsActual": "مشاہدہ کیا گیا۔",
+  "sortBy": "ترتیب دیں۔",
+  "sortPing": "پنگ",
+  "sortSpeed": "رفتار",
+  "sortName": "نام",
+  "measureSpeed": "رفتار کی پیمائش کریں۔",
+  "benchmarkStale": "پرانا",
+  "autoSelectMode": "سرور کو خودکار طور پر منتخب کریں۔",
+  "autoSelectPing": "تیز ترین پنگ",
+  "autoSelectSpeed": "تیز ترین رفتار",
+  "autoSelectSmart": "سمارٹ انتخاب",
+  "coreWatchUnstable": "Sora کور سے کنکشن غیر مستحکم ہے۔",
+  "watchReconnect": "دوبارہ جڑیں۔",
+  "coreRestoringLink": "Sora کور سے کنکشن بحال ہو رہا ہے…",
+  "crashRestoreTitle": "آخری سیشن میں خلل پڑا تھا۔",
+  "restoreOnCrash": "کریش کے بعد سیشن بحال کریں۔",
+  "crashRestore": "بحال کریں۔",
+  "crashDismiss": "ابھی نہیں۔",
+  "overrideTitle": "میری ترامیم",
+  "overrideEdit": "سرورز میں ترمیم کریں۔",
+  "overrideHide": "چھپائیں۔",
+  "overrideUnhide": "دکھائیں۔",
+  "overrideClear": "ترامیم کو دوبارہ ترتیب دیں۔",
+  "overrideEmpty": "ابھی تک کوئی ترمیم نہیں۔",
+  "overrideCustomRules": "اپنے اصول",
+  "errBenchmarkUnsupported": "رفتار کی پیمائش کو ایک نئے کور کی ضرورت ہے۔",
+  "benchmarkProgress": "{total} سے {done} کی پیمائش…",
+  "profiles": "نیٹ ورک پروفائلز",
+  "profilesEmpty": "ابھی تک کوئی پروفائل نہیں ہے۔ معلوم نیٹ ورکس پر خود بخود ترتیبات کو لاگو کرنے کے لیے ایک بنائیں۔",
+  "profileAdd": "پروفائل شامل کریں۔",
+  "profileName": "پروفائل کا نام",
+  "profileSsids": "Wi-Fi نیٹ ورکس (SSID)",
+  "profileSsidsHint": "گھر، دفتر کوما سے الگ کیا گیا۔",
+  "profileGateways": "نیٹ ورک گیٹ ویز",
+  "profileAsns": "AS نمبرز",
+  "profileAutoApply": "خود بخود لاگو کریں",
+  "profileAutoApplyHint": "بند ہونے پر پروفائل لاگو کرنے سے پہلے تصدیق مانگی جائے گی۔",
+  "profileSnapshot": "موجودہ ترتیبات کو یاد رکھیں",
+  "profileSnapshotDone": "موجودہ ترتیبات کو پروفائل میں محفوظ کیا گیا۔",
+  "profileDelete": "پروفائل حذف کریں۔",
+  "profileDeleteConfirm": "پروفائل \"{name}\" کو حذف کریں؟",
+  "profileApplyAsk": "پروفائل \"{name}\" کا اطلاق کریں؟",
+  "profileApply": "لاگو کریں",
+  "profileApplied": "پروفائل \"{name}\" لاگو کیا گیا۔",
+  "profileUndo": "منسوخ کریں۔",
+  "profileActive": "فعال",
+  "networkNow": "ابھی: {info}",
+  "networkUnknown": "نیٹ ورک کی معلومات دستیاب نہیں ہے۔",
+  "profileNoTriggers": "کم از کم ایک ٹرگر شامل کریں: SSID، گیٹ وے یا ASN",
+  "chains": "پراکسی چینز",
+  "chainsEmpty": "ابھی تک کوئی زنجیر نہیں ہے۔ 2–3 سرورز کو لنک کریں تاکہ ٹریفک ان میں سے ہر ایک سے گزر جائے۔",
+  "chainAdd": "نیا سلسلہ",
+  "chainName": "سلسلہ کا نام",
+  "chainPickServers": "2–3 سرور چنیں۔",
+  "chainOrderHint": "دوبارہ ترتیب دینے کے لیے گھسیٹیں: ٹریفک اوپر سے داخل ہوتا ہے اور نیچے سے باہر نکلتا ہے۔",
+  "chainTooFew": "کم از کم 2 سرور چنیں۔",
+  "chainTooMany": "ایک سلسلہ زیادہ سے زیادہ 3 سرور رکھتا ہے۔",
+  "chainEstimate": "تخمینی تاخیر",
+  "chainSave": "سیو چین",
+  "chainDelete": "سلسلہ حذف کریں۔",
+  "chainDeleteConfirm": "چین \"{name}\" کو حذف کریں؟",
+  "chainUnsupported": "موجودہ انجن زنجیریں نہیں بنا سکتا",
+  "chainHopMissing": "سلسلہ سرورز میں سے ایک اب دستیاب نہیں ہے۔",
+  "chainHop": "ہاپ {n}",
+  "chainEntry": "داخلہ",
+  "chainExit": "اخراج",
+  "sync": "ڈیوائس کی مطابقت پذیری",
+  "syncDevices": "میرے آلات",
+  "syncEmpty": "کوئی جوڑا بنائے گئے آلات نہیں ہیں۔ مقامی نیٹ ورک پر دوسرے آلے کو جوڑیں۔",
+  "syncPair": "ڈیوائس جوڑیں",
+  "syncShowCode": "میرا کوڈ دکھائیں۔",
+  "syncScanCode": "کوڈ اسکین کریں۔",
+  "syncRevoke": "واپس لینا",
+  "syncRevokeConfirm": "\"{name}\" کو منسوخ کریں؟",
+  "syncLastSync": "آخری مطابقت پذیری: {time}",
+  "syncNever": "کبھی نہیں۔",
+  "syncNoLan": "آلات کا ایک ہی مقامی نیٹ ورک پر ہونا ضروری ہے۔",
+  "syncPaired": "ڈیوائس کا جوڑا بنایا گیا۔",
+  "syncPairingTitle": "اس آلہ کے ساتھ جوڑا بنائیں",
+  "syncWaiting": "دوسرے آلے کا انتظار کر رہا ہے…",
+  "syncSecureNote": "اینڈ ٹو اینڈ انکرپٹڈ چینل۔ کوئی اکاؤنٹ نہیں، کوئی کلاؤڈ سرور نہیں۔ براہ راست نیٹ ورک ٹریفک کے لیے",
+  "zapretWithVpn": "بائی پاس DPI فلٹرنگ",
+  "zapretWithVpnHint": "VPN ٹنل کے ساتھ zapret چلاتا ہے: ٹنل کی ٹریفک VPN سے اور براہ راست ٹریفک پابندی سے بچنے کے طریقے سے گزرتی ہے۔",
+  "chainDuplicate": "ہر سرور صرف ایک بار ظاہر ہو سکتا ہے۔",
+  "edit": "ترمیم کریں۔",
+  "remove": "ہٹائیں",
+  "autoSwitchOnDegrade": "انحطاط پر آٹو سوئچ",
+  "autoSwitchOnDegradeDetail": "اگر منتخب سرور بہت سست ہو جائے یا جواب دینا بند کر دے، تو Sora پیمائش کے مطابق بہترین سرور پر منتقل ہوتا ہے، لیکن ہر 10 منٹ میں زیادہ سے زیادہ ایک بار۔",
+  "tunStackMixed": "مخلوط",
+  "tunStackSystem": "سسٹم",
+  "syncCodeExpired": "کوڈ کی میعاد ختم ہو گئی ہے۔",
+  "syncDaemonFailed": "مطابقت پذیری سروس شروع نہیں کی جا سکی",
+  "syncDaemonMissing": "sora-sync جزو نہیں ملا۔ ڈیوائس کی مطابقت پذیری کو فعال کرنے کے لیے ایپ کو دوبارہ انسٹال کریں۔",
+  "syncDaemonStarting": "مطابقت پذیری سروس شروع ہو رہی ہے…",
+  "syncErrAuth": "مطابقت پذیری سروس نے رسائی ٹوکن کو مسترد کر دیا۔ ایپ کو دوبارہ شروع کریں اور دوبارہ کوشش کریں۔",
+  "syncErrNotFound": "آلہ اب جوڑا نہیں ہے۔",
+  "syncErrPairingActive": "جوڑا بنانے کا سیشن پہلے ہی کھلا ہوا ہے۔",
+  "syncErrUnreachable": "دوسرے آلے نے جواب نہیں دیا۔ یقینی بنائیں کہ یہ ایک ہی نیٹ ورک پر ہے اور اس کا کوڈ دکھا رہا ہے۔",
+  "syncError": "مطابقت پذیری کی خرابی۔",
+  "syncExpiresIn": "کوڈ {duration} بعد ختم ہوگا",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "آلہ کے ساتھ جوڑا بنایا جا رہا ہے…",
+  "syncLegacyCleared": "پرانی ڈیوائس کی فہرست کبھی بھی اصل میں جوڑی نہیں بنی تھی، اس لیے اسے صاف کر دیا گیا۔ اپنے آلات کو دوبارہ جوڑیں، اس بار حقیقی طور پر۔",
+  "syncNewCode": "نیا کوڈ",
+  "syncPairedWith": "{name} کے ساتھ جوڑا بنایا",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "دہرائیں۔",
+  "syncStopShowing": "کوڈ چھپائیں",
+  "syncSyncNow": "ابھی ہم آہنگ کریں",
+  "syncSyncResult": "موصول ہوا {pulled}، بھیجا گیا {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "مطابقت پذیری کا نتیجہ",
+  "syncPulled": "موصول ہوا۔",
+  "syncPushed": "بھیجا گیا۔",
+  "syncNoChanges": "کوئی تبدیلی نہیں ملی",
+  "syncDocKindSubscriptions": "رکنیتیں",
+  "syncDocKindSettings": "ایپ کی ترتیبات",
+  "syncDocKindOverrides": "رکنیت کی ذاتی تبدیلیاں",
+  "syncDocKindProfiles": "نیٹ ورک پروفائلز",
+  "syncDocKindChains": "پراکسی چینز",
+  "syncFrom": "{name} سے",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "یہ آلہ",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Shadowsocks کے لیے: method:password، مثلاً chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "پیکٹ کی گرفتاری",
+  "diagnosticEvents": "ونڈوز کے واقعات",
+  "diagnosticCapture": "10 سیکنڈ کے لیے کیپچر کریں۔",
+  "diagnosticRequiresTun": "پیکٹ کیپچر کو ایک فعال Sora TUN کنکشن کی ضرورت ہے۔",
+  "diagnosticUnavailable": "یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔",
+  "extErrRevoked": "Sora ٹیم نے یہ ایکسٹینشن ورژن واپس لے لیا ہے کیونکہ یہ غیر محفوظ یا خراب ہے۔",
+  "extErrRevocationsExpired": "واپس لیے گئے ایکسٹینشنز کی فہرست تازہ نہیں ہو سکی۔ تازہ ہونے تک انسٹال بند ہے: نیٹ ورک چیک کر کے دوبارہ کوشش کریں۔",
+  "extRevokedDisabled": "واپس لیے گئے ایکسٹینشنز بند کر دیے گئے: {names}",
+  "customServerWgPrivateKey": "نجی کلید",
+  "customServerWgAddresses": "انٹرفیس پتے",
+  "customServerWgPeerKey": "سرور کی عوامی کلید",
+  "customServerWgPresharedKey": "پہلے سے مشترکہ کلید",
+  "customServerWgAllowedIps": "اجازت یافتہ IP",
+  "customServerWgKeepalive": "Keepalive، سیکنڈ",
+  "customServerWgKeyInvalid": "کلید wg genkey کی طرح base64 میں 32 بائٹ ہونی چاہیے۔",
+  "customServerWgCidrInvalid": "کوما سے الگ پری فکس درج کریں، جیسے 10.0.0.2/32۔",
+  "customServerWgKeepaliveInvalid": "0 سے 65535 تک سیکنڈ درج کریں۔",
+  "strictKillSwitch": "سخت نیٹ ورک بندش",
+  "strictKillSwitchWarning": "اتصال کے بعد، خرابی، دوبارہ آغاز یا ایپ بند ہونے پر بھی VPN سے باہر کی ٹریفک روکتا ہے۔ رسائی صرف اتصال منقطع کرنے یا اس اختیار کو بند کرنے سے بحال ہوتی ہے۔ آلہ دوبارہ شروع ہونے پر بندش صرف اسی وقت بحال ہوتی ہے جب آغاز پر اتصال فعال ہو۔",
+  "extWorkerFailed": "ایکسٹینشن کا پس منظر کا کام ناکام ہوگیا۔ ایکسٹینشن کا لاگ دیکھیں۔",
+  "extAssetRejected": "ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔"
 }

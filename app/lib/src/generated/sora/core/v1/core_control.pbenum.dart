@@ -113,7 +113,11 @@ class ProbeMethod extends $pb.ProtobufEnum {
   const ProbeMethod._(super.value, super.name);
 }
 
-/// Native captures require the authenticator and the native-diagnostics capability.
+/// The core only exports the redacted archive (DIAGNOSTIC_FORMAT_UNSPECIFIED).
+/// DIAGNOSTIC_FORMAT_PCAPNG and DIAGNOSTIC_FORMAT_EVTX are retired: raw
+/// captures cannot be redacted to the archive's guarantee, so the core
+/// refuses them outright (SORA-H3). The values stay reserved for wire
+/// compatibility and must not be sent.
 class DiagnosticFormat extends $pb.ProtobufEnum {
   static const DiagnosticFormat DIAGNOSTIC_FORMAT_UNSPECIFIED =
       DiagnosticFormat._(0, _omitEnumNames ? '' : 'DIAGNOSTIC_FORMAT_UNSPECIFIED');

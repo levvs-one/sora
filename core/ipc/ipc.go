@@ -55,7 +55,7 @@ type Options struct {
 	// MaxConnections caps simultaneously open connections; connections
 	// beyond the cap are refused without a reply. Zero selects
 	// DefaultMaxConnections. It bounds local FD-exhaustion denial of
-	// service (SORA-M1).
+	// service.
 	MaxConnections int
 }
 
@@ -109,8 +109,7 @@ func (l *Listener) Address() string { return l.address }
 
 // Accept returns the next authorized connection. Checking peers here also
 // protects gRPC servers using the listener directly. Connections beyond the
-// configured cap are refused without a reply to bound local FD exhaustion
-// (SORA-M1).
+// configured cap are refused without a reply to bound local FD exhaustion.
 func (l *Listener) Accept() (net.Conn, error) {
 	for {
 		connection, err := l.Listener.Accept()
@@ -163,6 +162,13 @@ type countedConn struct {
 	once sync.Once
 }
 
+// UnderlyingConn exposes the wrapped transport connection. Peer inspection
+// (SO_PEERCRED on Linux, named-pipe tokens on Windows) must see the real
+// endpoint: the wrapper's dynamic type would otherwise defeat the platform
+// type assertions in peerOf and make the transport credentials reject
+// legitimate peers.
+func (c *countedConn) UnderlyingConn() net.Conn { return c.Conn }
+
 // Close implements net.Conn.
 func (c *countedConn) Close() error {
 	c.once.Do(c.done)
@@ -194,7 +200,7 @@ func (l *Listener) Serve(ctx context.Context, handle func(context.Context, net.C
 // The budget stays in force for the whole handler call: handlers serving
 // long-lived streams must clear or extend the deadline once the peer has
 // introduced itself. Clearing it before the handler runs would leave silent
-// connections unbounded (SORA-M1).
+// connections unbounded.
 func (l *Listener) dispatch(ctx context.Context, connection net.Conn, handle func(context.Context, net.Conn) error) {
 	connectionCtx, cancel := context.WithCancel(ctx)
 	defer cancel()

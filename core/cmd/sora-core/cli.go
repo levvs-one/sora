@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -13,6 +16,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/ext"
 )
 
 // flags holds operator settings with defaults for a standard installation.
@@ -33,6 +37,13 @@ type flags struct {
 }
 
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "--extension-worker" {
+		if err := ext.JavaScriptMain(os.Stdin, os.Stdout); err != nil {
+			_ = json.NewEncoder(os.Stdout).Encode(map[string]string{"worker_error": err.Error()})
+			os.Exit(1)
+		}
+		return
+	}
 	// Windows services must respond to SCM instead of using the console.
 	if handled, err := runService(os.Args[1:]); handled {
 		if err != nil {
@@ -139,6 +150,17 @@ func run(ctx context.Context, arguments []string) error {
 				"core: the installation is not ready")
 		}
 		return nil
+	}
+	if runtime.GOOS == "linux" && os.Getenv("NOTIFY_SOCKET") != "" {
+		// Type=notify holds network-pre.target until persisted protection is restored.
+		connection, err := (&net.Dialer{}).DialContext(ctx, "unixgram", os.Getenv("NOTIFY_SOCKET"))
+		if err != nil {
+			return err
+		}
+		_, writeErr := connection.Write([]byte("READY=1"))
+		if err := errors.Join(writeErr, connection.Close()); err != nil {
+			return err
+		}
 	}
 	return app.Serve(ctx)
 }

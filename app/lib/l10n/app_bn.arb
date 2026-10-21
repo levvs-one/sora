@@ -5,7 +5,6 @@
   "stateConnected": "সংযুক্ত",
   "stateReconnecting": "পুনরায় সংযোগ করা হচ্ছে",
   "stateDisconnecting": "সংযোগ বিচ্ছিন্ন করা হচ্ছে",
-  "stateFailed": "সংযুক্ত নয়",
   "coreMissing": "Sora পরিষেবা সাড়া দিচ্ছে না৷",
   "serverAuto": "দ্রুততম",
   "serverBypass": "সার্ভার নেই",
@@ -41,6 +40,7 @@
   "export": "ফাইলে সংরক্ষণ করুন",
   "clear": "পরিষ্কার",
   "logsEmpty": "এখানে কিছুই নেই",
+  "connEmpty": "কোন সংযোগ নেই",
   "appVersion": "সংস্করণ {version}",
   "notInstalled": "ইনস্টল করা হয়নি",
   "sourceCode": "সোর্স কোড",
@@ -75,17 +75,16 @@
   "errSubScheme": "লিঙ্কটি অবশ্যই https:// দিয়ে শুরু হবে",
   "errSecretStore": "Sora স্টোরেজ ক্ষতিগ্রস্ত বা অনুপলব্ধ",
   "errNoServers": "সংযোগ করতে একটি সদস্যতা যোগ করুন",
-  "exportText": "পাঠ্য",
   "connections": "সংযোগ",
   "close": "বন্ধ",
   "chainDirect": "সরাসরি",
   "chainBlocked": "অবরুদ্ধ",
   "theme": "থিম",
-  "themeSystem": "System",
+  "themeSystem": "সিস্টেম অনুযায়ী",
   "themeLight": "আলো",
   "themeDark": "অন্ধকার",
   "language": "ভাষা",
-  "languageSystem": "System",
+  "languageSystem": "সিস্টেম অনুযায়ী",
   "sectionConnection": "সংযোগ",
   "sectionNoServer": "সার্ভার নেই",
   "sectionPing": "পিং",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} বাকি",
   "ruleInvalid": "এটি একটি সাইট, একটি আইপি বা একটি প্রোগ্রাম মত দেখায় না",
   "tunnelMode": "মোড",
-  "tunnelTun": "সমস্ত ট্রাফিক",
   "tunnelProxy": "System প্রক্সি",
   "proxyAddress": "প্রক্সি ঠিকানা",
   "copied": "কপি করা হয়েছে",
   "launchAtLogin": "সিস্টেম দিয়ে শুরু করুন",
+  "launchAtLoginDetail": "সাইন ইন করলে Sora স্বয়ংক্রিয়ভাবে চালু হবে এবং ট্রেতে থাকবে।",
   "closeToTray": "বন্ধ হয়ে গেলে ট্রেতে রাখুন",
   "notifications": "বিজ্ঞপ্তি",
   "trayOpen": "Sora খুলুন",
@@ -185,12 +184,6 @@
   "sidebarToggle": "সাইডবার টগল করুন",
   "more": "আরও",
   "less": "কম",
-  "currentServer": "বর্তমান সার্ভার",
-  "trafficDown": "ডাউনলোড করা হয়েছে",
-  "trafficUp": "আপলোড করা হয়েছে",
-  "perSecond": "{value}/s",
-  "activeRules": "সক্রিয় নিয়ম: {count}",
-  "recentNotifications": "সাম্প্রতিক বিজ্ঞপ্তি",
   "notificationsEmpty": "সংযোগ এবং সদস্যতা ইভেন্ট এখানে প্রদর্শিত হবে",
   "retryConnect": "সংযোগ পুনরায় চেষ্টা করুন",
   "openLogs": "লগ খুলুন",
@@ -208,12 +201,9 @@
   "chooseProgram": "একটি প্রোগ্রাম চয়ন করুন",
   "installedApps": "ইনস্টল করা অ্যাপ্লিকেশন",
   "runningProcesses": "চলমান প্রক্রিয়া",
-  "programsFailed": "অ্যাপ্লিকেশন লোড করা যায়নি",
   "programsEmpty": "কোন অ্যাপ্লিকেশন পাওয়া যায়নি. অন্য নাম চেষ্টা করুন.",
   "selectExe": "একটি .exe ফাইল নির্বাচন করুন",
-  "trafficUnavailable": "কাউন্টার এখনও উপলব্ধ নেই",
   "speedtest": "গতি",
-  "speedtestCheck": "গতি পরীক্ষা করুন",
   "speedtestSearch": "একটি পরিষেবা খুঁজুন",
   "speedtestEmpty": "কোন মিল নেই। অনুসন্ধান পরিবর্তন করুন.",
   "speedtestBackToList": "পরিষেবাগুলিতে ফিরে যান",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "কমান্ড অনুলিপি করুন",
   "updateChecksDisabled": "সেটিংসে স্বয়ংক্রিয় চেক অক্ষম করা হয়েছে৷",
   "updateInstalled": "আপডেট ইনস্টল করা হয়েছে। Sora আবার খুলুন।",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "প্রকল্প",
   "githubReleases": "রিলিজ এবং ডাউনলোড",
   "telegramChannel": "Telegram চ্যানেল",
   "licenses": "লাইসেন্স",
   "componentLicenses": "কম্পোনেন্ট লাইসেন্স",
-  "appCopyright": "© 2026 levvs-one এবং অবদানকারী",
   "collapseServers": "সার্ভার সঙ্কুচিত করুন",
   "expandServers": "সার্ভার প্রসারিত করুন",
   "hideDescription": "বর্ণনা লুকান",
   "showDescription": "বর্ণনা দেখান",
   "pendingConnectionChanges": "এই পরিবর্তনগুলি প্রয়োগ করতে পুনরায় সংযোগ করুন৷",
   "reconnectNow": "আবেদন করুন এবং পুনরায় সংযোগ করুন",
-  "bypassLimitations": "এই মোডটি শুধুমাত্র HTTP এবং TLS-এর জন্য DPI বাইপাস করে, UDP সমর্থন করে না বা আপনার IP পরিবর্তন করে না। Discord ভয়েস, কল এবং ব্লক করা Telegram ঠিকানাগুলির জন্য একটি VPN সার্ভার ব্যবহার করুন৷",
   "errEngineUnsupported": "নির্বাচিত ইঞ্জিন এই প্রোফাইল বা সেটিংস সমর্থন করে না। অটো বা একটি সামঞ্জস্যপূর্ণ ইঞ্জিন চয়ন করুন.",
   "errRestore": "সংযোগ পরিষ্কার অসম্পূর্ণ ছিল. সংযোগ বিচ্ছিন্ন করার পুনরায় চেষ্টা করুন; বিস্তারিত জানার জন্য লগ দেখুন।",
   "errSessionEnded": "এই অধিবেশন ইতিমধ্যে শেষ হয়েছে. সংযোগের অবস্থা রিফ্রেশ করুন।",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "মোড এবং ইঞ্জিন",
   "probeServers": "সার্ভার চেক করুন",
   "expiresIn": "{name}: {days, plural, =0{সাবস্ক্রিপশন কয়েক ঘন্টার মধ্যে শেষ হয়} one{সদস্যতা # দিনে শেষ হয়} other{সদস্যতা # দিনের মধ্যে শেষ হয়}}",
-  "groupOrdered": "{count, plural, one{# সার্ভার, ঘুরে} other{# সার্ভার, ঘুরে}}",
   "groupBest": "{count, plural, one{# সার্ভার, দ্রুততম} other{# সার্ভার, দ্রুততম}}",
-  "modesGuide": "আপনার সার্ভারের কোন ইঞ্জিনের প্রয়োজন তা আপনি নিশ্চিত না হলে অটো বেছে নিন। Sora সংযোগ করার আগে প্রোফাইল এবং সেটিংস পরীক্ষা করে। একটি ইঞ্জিন আপনার পরিকল্পনার ব্যান্ডউইথ বাড়াতে পারে না: কর্মক্ষমতা সার্ভার, রুট, প্রোটোকল এবং নেটওয়ার্কের উপর নির্ভর করে।\n\n## মোড\n\n### সমস্ত ট্রাফিক (TUN)\n\nSora একটি ভার্চুয়াল নেটওয়ার্ক ইন্টারফেস তৈরি করে এবং TCP এবং UDP সহ এর মাধ্যমে অ্যাপ্লিকেশন ট্র্যাফিককে রুট করে। Telegram, গেমস এবং Discord ভয়েসের জন্য এই মোডটি ব্যবহার করুন। নিয়ম নির্দিষ্ট সাইট বা প্রোগ্রাম সরাসরি পাঠাতে বা তাদের ব্লক করতে পারে। নেটওয়ার্ক পরিষেবার অনুমতি প্রয়োজন এবং একটি সার্ভার যা প্রয়োজনীয় প্রোটোকল সমর্থন করে৷\n\n### System প্রক্সি\n\nSora একটি স্থানীয় HTTP/SOCKS প্রক্সি কনফিগার করে। যে অ্যাপ্লিকেশনগুলি সিস্টেম প্রক্সি সেটিংসকে সম্মান করে তারা এটি ব্যবহার করে। তাদের নিজস্ব নেটওয়ার্ক স্ট্যাকের সাথে অ্যাপ্লিকেশন সরাসরি সংযুক্ত হতে পারে; UDP এবং ভয়েস কলের জন্য সাধারণত TUN প্রয়োজন। এই মোডটি প্রক্সি সমর্থন সহ ব্রাউজার এবং অ্যাপ্লিকেশনগুলির জন্য উপযুক্ত৷\n\n### সার্ভার নেই\n\nLinux-এ, Sora HTTP/TLS অনুরোধগুলিকে বিভক্ত ও পুনরায় আকার দিতে এবং কিছু DPI চেক বাইপাস করতে [zapret](https://github.com/bol-van/zapret) ব্যবহার করে। আপনার আইপি একই থাকে এবং সংযোগগুলি সরাসরি ওয়েবসাইটে যায়। ফলাফল আপনার প্রদানকারী এবং ব্লকিং পদ্ধতির উপর নির্ভর করে।\n\nবর্তমান ইন্টিগ্রেশন টিসিপির উপর HTTP এবং TLS এর জন্য tpws ব্যবহার করে। এটি আইপি ব্লকিং বা রিলে ইউডিপি বাইপাস করে না এবং Telegram এর MTProto সংযোগের গ্যারান্টি দিতে পারে না। Discord ভয়েস, Telegram কল এবং এই ধরনের বিধিনিষেধের জন্য TUN সহ একটি VPN সার্ভার ব্যবহার করুন৷\n\n## ইঞ্জিন\n\n### অটো\n\nSora একটি ইনস্টল করা ইঞ্জিন নির্বাচন করে যা সম্পূর্ণ সংযোগ পরিকল্পনা সমর্থন করে: সার্ভার প্রোটোকল, পরিবহন, গ্রুপ, ফ্র্যাগমেন্টেশন এবং মোড। বর্তমান সংযোগ বন্ধ করার আগে একটি বেমানান ম্যানুয়াল পছন্দ প্রত্যাখ্যান করা হয়। অটো বা অন্য ইঞ্জিন নির্বাচন করুন এবং সেটিংস আবার প্রয়োগ করুন।\n\n### sing-box\n\nনতুন Sora প্যাকেজগুলির মধ্যে রয়েছে [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) এর একটি কাঁটা, ক্লায়েন্ট-সাইড XHTTP এবং VLESS Encryption যোগ করা। Sora বিল্ড এবং এর ক্ষমতাকে স্বীকৃতি দেয়। XHTTP ছাড়া একটি আপস্ট্রিম বিল্ড শুধুমাত্র তার নাম থেকে এই ক্ষমতা অর্জন করে না।\n\nসমর্থিত প্রোটোকলগুলির মধ্যে রয়েছে VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard এবং AmneziaWG 1.x/2.x-এর সেই প্যারামিটারগুলি যা Sora আমদানি করতে পারে। সম্পূর্ণ Xray JSON প্রোফাইলের জন্য Xray প্রয়োজন। নতুন AWG 3.x ফিল্ড এখনও আমদানি করা যায় না। sing-box একটি পাসওয়ার্ড-সুরক্ষিত স্থানীয় নিয়ন্ত্রণ পোর্ট ব্যবহার করে, যা কম্পিউটারের অন্য অ্যাপ্লিকেশনগুলি শনাক্ত করতে পারে।\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption এবং TLS ফ্র্যাগমেন্টেশন সমর্থন করে। এটি সম্পূর্ণ প্রদানকারী Xray প্রোফাইলগুলিকে তাদের রাউটিং এবং গোষ্ঠীগুলি সংরক্ষণ করে চালায়। এই ধরনের প্রোফাইলগুলি তাদের আচরণ পরিবর্তন না করে স্বয়ংক্রিয়ভাবে অন্য ইঞ্জিনে রূপান্তরিত হতে পারে না।\n\nবান্ডেল করা Xray সেটিংটি সরিয়ে দিয়েছে যা TLS শংসাপত্র যাচাইকরণ (`allowInsecure`) অক্ষম করে। স্বয়ংক্রিয়ভাবে sing-box বা mihomo সাধারণ সার্ভারগুলির জন্য এই সেটিং প্রয়োজন। Xray নির্বাচন করা বর্তমান সংযোগ বন্ধ করার আগে ম্যানুয়ালি অসামঞ্জস্যতার প্রতিবেদন করে। পুরানো সম্পূর্ণ JSON প্রোফাইলগুলির একটি যাচাইযোগ্য শংসাপত্র বা শংসাপত্র পিন সহ একটি আপডেট প্রদানকারী প্রোফাইল প্রয়োজন৷\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) অর্ডার করা ফলব্যাক এবং লোড-ব্যালেন্সিং গ্রুপ, XHTTP এবং AmneziaWG সমর্থন করে। ব্যাকআপ সার্ভারে স্বয়ংক্রিয়ভাবে ব্যর্থ হলে এটি নির্বাচন করুন। Sora এর TLS ফ্র্যাগমেন্টেশন সেটিং এই ইঞ্জিনের সাথে অনুপলব্ধ৷\n\n## Sora এ সামঞ্জস্যপূর্ণ\n\n| বৈশিষ্ট্য | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN এবং TCP/UDP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| XHTTP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| VLESS Encryption | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| সম্পূর্ণ Xray প্রোফাইল | না | হ্যাঁ | না |\n| TUIC / AnyTLS | উভয় | না | TUIC |\n| TLS ফ্র্যাগমেন্টেশন | হ্যাঁ | হ্যাঁ | না |\n| AmneziaWG 1.x/2.x | হ্যাঁ¹ | না | হ্যাঁ |\n| অর্ডার ফলব্যাক গ্রুপ | না | No² | হ্যাঁ |\n\nJ1/J2/J3/Itime সহ প্রোফাইল mihomo ব্যবহার করে; এই ক্ষেত্রগুলি কখনই নীরবে বাতিল করা উচিত নয়। ² সম্পূর্ণ Xray প্রোফাইলের একটি গোষ্ঠীর জন্য, অ্যাপটি একটি ব্যাকআপ প্রোফাইল নির্বাচন করে। সমর্থন ইনস্টল করা বিল্ড উপর নির্ভর করে; সম্পর্কে এর সংস্করণ পরীক্ষা করুন।\n\n## TUN স্ট্যাক\n\nস্ট্যাক ভার্চুয়াল ইন্টারফেসের ভিতরে TCP এবং UDP পরিচালনা করে। মোড প্যানেলে, Xray এবং mihomo gVisor, System, Mixed এবং MIPS অফার করে। প্রতিটি ইঞ্জিন তার নিজস্ব পছন্দ সংরক্ষণ করে। System প্রক্সি এবং সার্ভারহীন মোড এই পছন্দ ব্যবহার করে না।\n\n- **Mixed** — TCP সিস্টেম স্ট্যাক ব্যবহার করে, যখন gVisor UDP পরিচালনা করে। Linux-এ এটি mihomo-এর ডিফল্ট। Windows-এ Xray এবং mihomo ডিফল্ট হিসেবে MIPS ব্যবহার করে।\n- **System** — সিস্টেম স্ট্যাক ব্যবহার করে। নেটওয়ার্ক অ্যাপ্লিকেশন সমস্যা সম্মুখীন হলে অন্য বিকল্প চেষ্টা করুন.\n- **gVisor** — ইউজারস্পেসে ট্রাফিক পরিচালনা করে।\n- **MIPS** — mihomo এর নিজস্ব আইপি স্ট্যাক, বান্ডেল করা সংস্করণ 1.19.32-এ উপলব্ধ৷\n\nLinux-এ, Xray ডিফল্টরূপে এর অন্তর্নির্মিত gVisor ব্যবহার করে। System, Mixed এবং Linux-এ MIPS TUN ইঞ্জিন হিসাবে mihomo ব্যবহার করে, একটি প্রমাণীকৃত স্থানীয় SOCKS লিঙ্কের মাধ্যমে TCP এবং UDPকে Xray-এ ফরওয়ার্ড করে৷ Xray প্রোটোকল, প্রদানকারীর প্রোফাইল এবং রাউটিং ধরে রাখে। এই তিনটি বিকল্পের জন্য একটি ইনস্টল করা mihomo প্রয়োজন৷ Windows-এ Xray চারটি TUN স্ট্যাকের জন্য mihomo 1.19.32 বা নতুন সংস্করণ ব্যবহার করে। প্রোটোকল ও রাউটিং Xray-তে থাকে। এই সংযোগে অ্যাপের নিয়ম শুধু সরাসরি সংযোগ ও ব্লক করা সমর্থন করে; Linux-এ এই নিয়মগুলির জন্য Xray-এর অন্তর্নির্মিত gVisor প্রয়োজন।\n\nসেতুটি একটি দ্বিতীয় প্রক্রিয়া চালায়। Linux-এ তিনটি নিষ্ক্রিয় পরিমাপে, এটি নেটিভ Xray TUN থেকে প্রায় 32-36 MiB বেশি শারীরিক মেমরি ব্যবহার করেছে। এটি ডাউনলোড লোড পরিমাপ করে না: CPU এবং মেমরি খরচ সংযোগের উপর নির্ভর করে। sing-box কোনো স্ট্যাক নির্বাচক নেই। কোনও স্ট্যাক প্রতিটি নেটওয়ার্কে আরও ভাল পারফরম্যান্সের গ্যারান্টি দেয় না। একটি স্ট্যাক চয়ন করুন এবং আপনার নেটওয়ার্কে চেষ্টা করতে প্রয়োগ করুন এবং পুনরায় সংযোগ করুন নির্বাচন করুন৷\n\n## সেটিংস প্রয়োগ করা হচ্ছে\n\nএকটি সার্ভার নির্বাচন স্বয়ংক্রিয়ভাবে পুনরায় সংযোগ. মোড, ইঞ্জিন, DNS এবং নিয়ম সেটিংস অবিলম্বে সংরক্ষিত হয়; একটি সক্রিয় সংযোগের সময়, প্রয়োগ ক্লিক করুন এবং সেগুলি ব্যবহার করতে পুনরায় সংযোগ করুন৷ একটি ইঞ্জিন রিস্টার্ট করলে ডাউনলোড এবং কল বাধাগ্রস্ত হতে পারে। বারবার ক্লিক সমান্তরাল সংযোগ শুরু করে না; সংযোগ বিচ্ছিন্ন করা রূপান্তর শেষ করে এবং সংযোগটি ছেড়ে দেয়।\n\nএকটি টানেল নেমে গেলে শুধুমাত্র VPN এর মাধ্যমে ইন্টারনেট সরাসরি ট্রাফিক ব্লক করে। এটি পুরো মেশিনকে প্রভাবিত করে। একটি সুস্পষ্ট সংযোগ বিচ্ছিন্ন হলে Sora এর নিয়মগুলি সরিয়ে দেওয়া হয়। যদি ক্লিনআপ শেষ না হয়, আবার সংযোগ বিচ্ছিন্ন করার চেষ্টা করুন এবং লগটি খুলুন।\n\n## প্রকল্প ডকুমেন্টেশন\n\n- [sing-box-lx: কনফিগারেশন এবং সমর্থন](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ডকুমেন্টেশন](https://sing-box.sagernet.org/)\n- [Xray ডকুমেন্টেশন](https://xtls.github.io/)\n- [mihomo ডকুমেন্টেশন](https://wiki.metacubex.one/)\n- [zapret: অপারেশন এবং সীমাবদ্ধতা](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "আপনার সার্ভারের কোন ইঞ্জিনের প্রয়োজন তা আপনি নিশ্চিত না হলে অটো বেছে নিন। Sora সংযোগ করার আগে প্রোফাইল এবং সেটিংস পরীক্ষা করে। একটি ইঞ্জিন আপনার পরিকল্পনার ব্যান্ডউইথ বাড়াতে পারে না: কর্মক্ষমতা সার্ভার, রুট, প্রোটোকল এবং নেটওয়ার্কের উপর নির্ভর করে।\n\n## মোড\n\n### সমস্ত ট্রাফিক (TUN)\n\nSora একটি ভার্চুয়াল নেটওয়ার্ক ইন্টারফেস তৈরি করে এবং TCP এবং UDP সহ এর মাধ্যমে অ্যাপ্লিকেশন ট্র্যাফিককে রুট করে। Telegram, গেমস এবং Discord ভয়েসের জন্য এই মোডটি ব্যবহার করুন। নিয়ম নির্দিষ্ট সাইট বা প্রোগ্রাম সরাসরি পাঠাতে বা তাদের ব্লক করতে পারে। নেটওয়ার্ক পরিষেবার অনুমতি প্রয়োজন এবং একটি সার্ভার যা প্রয়োজনীয় প্রোটোকল সমর্থন করে৷\n\n### System প্রক্সি\n\nSora একটি স্থানীয় HTTP/SOCKS প্রক্সি কনফিগার করে। যে অ্যাপ্লিকেশনগুলি সিস্টেম প্রক্সি সেটিংসকে সম্মান করে তারা এটি ব্যবহার করে। তাদের নিজস্ব নেটওয়ার্ক স্ট্যাকের সাথে অ্যাপ্লিকেশন সরাসরি সংযুক্ত হতে পারে; UDP এবং ভয়েস কলের জন্য সাধারণত TUN প্রয়োজন। এই মোডটি প্রক্সি সমর্থন সহ ব্রাউজার এবং অ্যাপ্লিকেশনগুলির জন্য উপযুক্ত৷\n\n### সার্ভার নেই\n\nLinux-এ, Sora HTTP/TLS অনুরোধগুলিকে বিভক্ত ও পুনরায় আকার দিতে এবং কিছু DPI চেক বাইপাস করতে [zapret](https://github.com/bol-van/zapret) ব্যবহার করে। আপনার আইপি একই থাকে এবং সংযোগগুলি সরাসরি ওয়েবসাইটে যায়। ফলাফল আপনার প্রদানকারী এবং ব্লকিং পদ্ধতির উপর নির্ভর করে।\n\nবর্তমান ইন্টিগ্রেশন টিসিপির উপর HTTP এবং TLS এর জন্য tpws ব্যবহার করে। এটি আইপি ব্লকিং বা রিলে ইউডিপি বাইপাস করে না এবং Telegram এর MTProto সংযোগের গ্যারান্টি দিতে পারে না। Discord ভয়েস, Telegram কল এবং এই ধরনের বিধিনিষেধের জন্য TUN সহ একটি VPN সার্ভার ব্যবহার করুন৷\n\n## ইঞ্জিন\n\n### অটো\n\nSora একটি ইনস্টল করা ইঞ্জিন নির্বাচন করে যা সম্পূর্ণ সংযোগ পরিকল্পনা সমর্থন করে: সার্ভার প্রোটোকল, পরিবহন, গ্রুপ, ফ্র্যাগমেন্টেশন এবং মোড। বর্তমান সংযোগ বন্ধ করার আগে একটি বেমানান ম্যানুয়াল পছন্দ প্রত্যাখ্যান করা হয়। অটো বা অন্য ইঞ্জিন নির্বাচন করুন এবং সেটিংস আবার প্রয়োগ করুন।\n\n### sing-box\n\nনতুন Sora প্যাকেজগুলির মধ্যে রয়েছে [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) এর একটি কাঁটা, ক্লায়েন্ট-সাইড XHTTP এবং VLESS Encryption যোগ করা। Sora বিল্ড এবং এর ক্ষমতাকে স্বীকৃতি দেয়। XHTTP ছাড়া একটি আপস্ট্রিম বিল্ড শুধুমাত্র তার নাম থেকে এই ক্ষমতা অর্জন করে না।\n\nসমর্থিত প্রোটোকলগুলির মধ্যে রয়েছে VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard এবং AmneziaWG 1.x/2.x-এর সেই প্যারামিটারগুলি যা Sora আমদানি করতে পারে। সম্পূর্ণ Xray JSON প্রোফাইলের জন্য Xray প্রয়োজন। নতুন AWG 3.x ফিল্ড এখনও আমদানি করা যায় না। sing-box একটি পাসওয়ার্ড-সুরক্ষিত স্থানীয় নিয়ন্ত্রণ পোর্ট ব্যবহার করে, যা কম্পিউটারের অন্য অ্যাপ্লিকেশনগুলি শনাক্ত করতে পারে।\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption এবং TLS ফ্র্যাগমেন্টেশন সমর্থন করে। এটি সম্পূর্ণ প্রদানকারী Xray প্রোফাইলগুলিকে তাদের রাউটিং এবং গোষ্ঠীগুলি সংরক্ষণ করে চালায়। এই ধরনের প্রোফাইলগুলি তাদের আচরণ পরিবর্তন না করে স্বয়ংক্রিয়ভাবে অন্য ইঞ্জিনে রূপান্তরিত হতে পারে না।\n\nবান্ডেল করা Xray সেটিংটি সরিয়ে দিয়েছে যা TLS শংসাপত্র যাচাইকরণ (`allowInsecure`) অক্ষম করে। স্বয়ংক্রিয়ভাবে sing-box বা mihomo সাধারণ সার্ভারগুলির জন্য এই সেটিং প্রয়োজন। Xray নির্বাচন করা বর্তমান সংযোগ বন্ধ করার আগে ম্যানুয়ালি অসামঞ্জস্যতার প্রতিবেদন করে। পুরানো সম্পূর্ণ JSON প্রোফাইলগুলির একটি যাচাইযোগ্য শংসাপত্র বা শংসাপত্র পিন সহ একটি আপডেট প্রদানকারী প্রোফাইল প্রয়োজন৷\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) অর্ডার করা ফলব্যাক এবং লোড-ব্যালেন্সিং গ্রুপ, XHTTP এবং AmneziaWG সমর্থন করে। ব্যাকআপ সার্ভারে স্বয়ংক্রিয়ভাবে ব্যর্থ হলে এটি নির্বাচন করুন। Sora এর TLS ফ্র্যাগমেন্টেশন সেটিং এই ইঞ্জিনের সাথে অনুপলব্ধ৷\n\n## Sora এ সামঞ্জস্যপূর্ণ\n\n| বৈশিষ্ট্য | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN এবং TCP/UDP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| XHTTP | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| VLESS Encryption | হ্যাঁ | হ্যাঁ | হ্যাঁ |\n| সম্পূর্ণ Xray প্রোফাইল | না | হ্যাঁ | না |\n| TUIC / AnyTLS | উভয় | না | TUIC |\n| TLS ফ্র্যাগমেন্টেশন | হ্যাঁ | হ্যাঁ | না |\n| AmneziaWG 1.x/2.x | হ্যাঁ¹ | না | হ্যাঁ |\n| অর্ডার ফলব্যাক গ্রুপ | না | No² | হ্যাঁ |\n\nJ1/J2/J3/Itime সহ প্রোফাইল mihomo ব্যবহার করে; এই ক্ষেত্রগুলি কখনই নীরবে বাতিল করা উচিত নয়। ² সম্পূর্ণ Xray প্রোফাইলের একটি গোষ্ঠীর জন্য, অ্যাপটি একটি ব্যাকআপ প্রোফাইল নির্বাচন করে। সমর্থন ইনস্টল করা বিল্ড উপর নির্ভর করে; সম্পর্কে এর সংস্করণ পরীক্ষা করুন।\n\n## TUN স্ট্যাক\n\nস্ট্যাক ভার্চুয়াল ইন্টারফেসের ভিতরে TCP এবং UDP পরিচালনা করে। মোড প্যানেলে, Xray এবং mihomo gVisor, System, Mixed এবং MIPS অফার করে। প্রতিটি ইঞ্জিন তার নিজস্ব পছন্দ সংরক্ষণ করে। System প্রক্সি এবং সার্ভারহীন মোড এই পছন্দ ব্যবহার করে না।\n\n- **Mixed**: TCP সিস্টেম স্ট্যাক ব্যবহার করে, যখন gVisor UDP পরিচালনা করে। Linux-এ এটি mihomo-এর ডিফল্ট। Windows-এ Xray এবং mihomo ডিফল্ট হিসেবে MIPS ব্যবহার করে।\n- **System**: সিস্টেম স্ট্যাক ব্যবহার করে। নেটওয়ার্ক অ্যাপ্লিকেশন সমস্যা সম্মুখীন হলে অন্য বিকল্প চেষ্টা করুন.\n- **gVisor**: ইউজারস্পেসে ট্রাফিক পরিচালনা করে।\n- **MIPS**: mihomo এর নিজস্ব আইপি স্ট্যাক, বান্ডেল করা সংস্করণ 1.19.32-এ উপলব্ধ৷\n\nLinux-এ, Xray ডিফল্টরূপে এর অন্তর্নির্মিত gVisor ব্যবহার করে। System, Mixed এবং Linux-এ MIPS TUN ইঞ্জিন হিসাবে mihomo ব্যবহার করে, একটি প্রমাণীকৃত স্থানীয় SOCKS লিঙ্কের মাধ্যমে TCP এবং UDPকে Xray-এ ফরওয়ার্ড করে৷ Xray প্রোটোকল, প্রদানকারীর প্রোফাইল এবং রাউটিং ধরে রাখে। এই তিনটি বিকল্পের জন্য একটি ইনস্টল করা mihomo প্রয়োজন৷ Windows-এ Xray চারটি TUN স্ট্যাকের জন্য mihomo 1.19.32 বা নতুন সংস্করণ ব্যবহার করে। প্রোটোকল ও রাউটিং Xray-তে থাকে। এই সংযোগে অ্যাপের নিয়ম শুধু সরাসরি সংযোগ ও ব্লক করা সমর্থন করে; Linux-এ এই নিয়মগুলির জন্য Xray-এর অন্তর্নির্মিত gVisor প্রয়োজন।\n\nসেতুটি একটি দ্বিতীয় প্রক্রিয়া চালায়। Linux-এ তিনটি নিষ্ক্রিয় পরিমাপে, এটি নেটিভ Xray TUN থেকে প্রায় 32-36 MiB বেশি শারীরিক মেমরি ব্যবহার করেছে। এটি ডাউনলোড লোড পরিমাপ করে না: CPU এবং মেমরি খরচ সংযোগের উপর নির্ভর করে। sing-box কোনো স্ট্যাক নির্বাচক নেই। কোনও স্ট্যাক প্রতিটি নেটওয়ার্কে আরও ভাল পারফরম্যান্সের গ্যারান্টি দেয় না। একটি স্ট্যাক চয়ন করুন এবং আপনার নেটওয়ার্কে চেষ্টা করতে প্রয়োগ করুন এবং পুনরায় সংযোগ করুন নির্বাচন করুন৷\n\n## সেটিংস প্রয়োগ করা হচ্ছে\n\nএকটি সার্ভার নির্বাচন স্বয়ংক্রিয়ভাবে পুনরায় সংযোগ. মোড, ইঞ্জিন, DNS এবং নিয়ম সেটিংস অবিলম্বে সংরক্ষিত হয়; একটি সক্রিয় সংযোগের সময়, প্রয়োগ ক্লিক করুন এবং সেগুলি ব্যবহার করতে পুনরায় সংযোগ করুন৷ একটি ইঞ্জিন রিস্টার্ট করলে ডাউনলোড এবং কল বাধাগ্রস্ত হতে পারে। বারবার ক্লিক সমান্তরাল সংযোগ শুরু করে না; সংযোগ বিচ্ছিন্ন করা রূপান্তর শেষ করে এবং সংযোগটি ছেড়ে দেয়।\n\nএকটি টানেল নেমে গেলে শুধুমাত্র VPN এর মাধ্যমে ইন্টারনেট সরাসরি ট্রাফিক ব্লক করে। এটি পুরো মেশিনকে প্রভাবিত করে। একটি সুস্পষ্ট সংযোগ বিচ্ছিন্ন হলে Sora এর নিয়মগুলি সরিয়ে দেওয়া হয়। যদি ক্লিনআপ শেষ না হয়, আবার সংযোগ বিচ্ছিন্ন করার চেষ্টা করুন এবং লগটি খুলুন।\n\n## প্রকল্প ডকুমেন্টেশন\n\n- [sing-box-lx: কনফিগারেশন এবং সমর্থন](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ডকুমেন্টেশন](https://sing-box.sagernet.org/)\n- [Xray ডকুমেন্টেশন](https://xtls.github.io/)\n- [mihomo ডকুমেন্টেশন](https://wiki.metacubex.one/)\n- [zapret: অপারেশন এবং সীমাবদ্ধতা](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,15 +440,9 @@
       }
     }
   },
-  "diagnosticPackets": "প্যাকেট ক্যাপচার",
-  "diagnosticCapture": "10 সেকেন্ডের জন্য ক্যাপচার করুন",
   "diagnosticHttp": "HTTP ডায়াগনস্টিকস",
   "diagnosticNoData": "এখনও কোন রেকর্ড করা অনুরোধ. প্রথমে একটি গতি পরীক্ষার ওয়েবসাইট খুলুন।",
-  "diagnosticEvents": "উইন্ডোজ ইভেন্ট",
-  "extensionsSoon": "শীঘ্রই আসছে",
   "extensions": "এক্সটেনশন",
-  "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.",
-  "diagnosticRequiresTun": "প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।",
   "exportLogFile": "ফাইলে {name}",
   "@exportLogFile": {
     "placeholders": {
@@ -473,5 +450,572 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "কাস্টম সার্ভার যোগ করুন",
+  "customServers": "আমার সার্ভার",
+  "customServerName": "নাম",
+  "customServerNameHint": "যেমন: আমার VPS",
+  "customServerNameRequired": "নাম লিখুন",
+  "customServerAddress": "ঠিকানা",
+  "customServerAddressHint": "example.com বা 192.0.2.1",
+  "customServerAddressRequired": "সার্ভার ঠিকানা লিখুন",
+  "customServerAddressInvalid": "অবৈধ ঠিকানা",
+  "customServerPort": "পোর্ট",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "পোর্ট 1 থেকে 65535 পর্যন্ত একটি সংখ্যা হতে হবে",
+  "customServerProtocol": "প্রোটোকল",
+  "customServerCredentials": "লগইন তথ্য",
+  "customServerOptional": "ঐচ্ছিক",
+  "customServerShowSecret": "গোপন দেখান",
+  "customServerHideSecret": "গোপনীয়তা লুকান",
+  "customServerBadge": "নিজস্ব",
+  "customServerDeleteConfirm": "\"{name}\" সার্ভার মুছুন?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "ম্যানুয়ালি একটি সার্ভার যোগ করুন: ঠিকানা, পোর্ট এবং প্রোটোকল",
+  "customServerTest": "পরীক্ষা",
+  "leakTestTitle": "তথ্য ফাঁস জন্য পরীক্ষা",
+  "leakTestIntro": "টানেলের বাইরে দিয়ে ডিভাইস থেকে ট্রাফিক বেরোতে পারে কি না যাচাই করে: সরাসরি DNS ও ICMP অনুরোধ, IPv6 বহির্গমন এবং সিস্টেম রিজলভার। সংযোগ চালু থাকা অবস্থায় পরীক্ষা চালান।",
+  "leakTestRun": "চেক করুন",
+  "leakTestCancel": "বাতিল",
+  "leakTestNeedsConnection": "ডেটা ফাঁস পরীক্ষা করতে VPN-এর সাথে সংযোগ করুন।",
+  "leakTestProgress": "পরীক্ষা সম্পন্ন হয়েছে: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "কোন ফাঁস পাওয়া যায় নি",
+  "leakTestFound": "{count, plural, one{#টি লিক পাওয়া গেছে} other{#টি লিক পাওয়া গেছে}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "ফিক্স",
+  "leakTestFixedNote": "নেটওয়ার্ক অবরোধ চালু আছে। যাচাই করতে আবার পরীক্ষা চালান।",
+  "leakTestCheckDirectDns": "সরাসরি DNS",
+  "leakTestCheckIcmpEcho": "ICMP প্রতিধ্বনি",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "সিস্টেমের DNS রিজলভার",
+  "leakTestCheckTunnelConnectivity": "টানেল সংযোগ",
+  "leakTestCheckTunnelDns": "DNS টানেলের মধ্য দিয়ে",
+  "noticeDegraded": "সার্ভার ধীর হয়ে গেল। Sora পরিমাপের সময় পাওয়া সেরা সার্ভারে স্যুইচ করা হয়েছে।",
+  "obfs": "ট্রাফিক আড়াল করা",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "আপডেট ফাইলগুলো রিলিজের সঙ্গে প্রকাশিত চেকসামের সঙ্গে মেলানো হয়।",
+  "updateManualSigWarning": "নিচের ফাইলগুলো রিলিজের চেকসামের সঙ্গে মেলে। অফিসিয়াল রিলিজ থেকে নামিয়ে থাকলে কমান্ডটি চালান।",
+  "updateVersionRevoked": "বিকাশকারী এই সংস্করণটি প্রত্যাহার করেছে। একটি সংশোধন রিলিজ জন্য অপেক্ষা করুন.",
+  "updateRolloutPending": "একটি নতুন সংস্করণ ধীরে ধীরে চালু হচ্ছে এবং স্বয়ংক্রিয়ভাবে আপনাকে অফার করা হবে।",
+  "updateRollbacking": "{version} সংস্করণে ফিরে আসছে...",
+  "updateRolledBack": "{version}-এর আপডেট স্বাস্থ্য পরীক্ষায় উত্তীর্ণ হয়নি, তাই Sora কে {fromVersion} এ ফিরিয়ে আনা হয়েছে।",
+  "updateRollbackError": "স্বয়ংক্রিয় রোলব্যাক ব্যর্থ হয়েছে. যদি নতুন সংস্করণটি কাজ না করে তবে পূর্ববর্তী রিলিজটি ম্যানুয়ালি পুনরায় ইনস্টল করুন।",
+  "updateRollbackCacheError": "বর্তমান সংস্করণের একটি যাচাইকৃত রোলব্যাক কপি প্রস্তুত করা যায়নি, তাই আপডেটটি ইনস্টল করা হয়নি।",
+  "extRatingLabel": "রেটিং {rating}, ৫-এর মধ্যে",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "{author}-এর তৈরি",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "ইনস্টলেশন: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 ইনস্টল করুন",
+  "extBadgeVerified": "যাচাই করা হয়েছে",
+  "extBadgeTop": "এই সপ্তাহে সবচেয়ে জনপ্রিয়",
+  "extBadgeNew": "নতুন",
+  "extBadgeStaff": "Sora দল",
+  "extSideloadShort": "ক্যাটালগ থেকে না",
+  "extSideloadWarning": "এই এক্সটেনশন টিম ক্যাটালগ থেকে নয়। শুধুমাত্র লেখক তাদের কীটির জন্য প্রমাণ দিয়েছেন: আপনি যদি লেখককে বিশ্বাস করেন তবেই এটি ইনস্টল করুন।",
+  "extInstallTitle": "«{name}» ইনস্টল করুন",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "«{name}» আপডেট করুন",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "এই এক্সটেনশনটি সক্ষম হবে:",
+  "extPermissionsWidened": "আপডেটটি নতুন অনুমতির জন্য জিজ্ঞাসা করে:",
+  "extDangerousAck": "আমি বুঝি যে এই অনুমতিগুলি গুরুতর৷",
+  "extInstall": "ইনস্টল করুন",
+  "extUpdate": "আপডেট করুন",
+  "extCancel": "বাতিল",
+  "extConfirm": "নিশ্চিত করুন",
+  "extOk": "OK",
+  "extCatalog": "ক্যাটালগ",
+  "extInstalled": "ইনস্টল করা এক্সটেনশন",
+  "extSearchHint": "এক্সটেনশন খুঁজুন",
+  "extCatAll": "সব",
+  "extCatTools": "সরঞ্জাম",
+  "extCatThemes": "থিম",
+  "extCatAutomation": "অটোমেশন",
+  "extCatStats": "পরিসংখ্যান",
+  "extCatNetwork": "নেটওয়ার্ক",
+  "extSortBy": "দ্বারা সাজান",
+  "extSortPopular": "সর্বাধিক জনপ্রিয়",
+  "extSortRating": "সর্বোচ্চ রেট",
+  "extSortName": "নাম",
+  "extCatalogError": "ক্যাটালগ লোড করা যায়নি",
+  "extRetry": "পুনরায় চেষ্টা করুন",
+  "extEmptySearch": "কিছুই পাওয়া যায়নি",
+  "extEmptyInstalled": "কোনো এক্সটেনশন এখনো ইনস্টল করা হয়নি.\nক্যাটালগে একটি খুঁজুন বা একটি ফাইল থেকে ইনস্টল করুন।",
+  "extInstallFromFile": "ফাইল থেকে ইনস্টল করুন",
+  "extInstallFromUrl": "URL থেকে ইনস্টল করুন",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "ডাউনলোড করুন",
+  "extDownloading": "ডাউনলোড হচ্ছে...",
+  "extVerifying": "যাচাই করা হচ্ছে...",
+  "extInstalling": "ইনস্টল করা হচ্ছে...",
+  "extInstallFailed": "ইনস্টল ব্যর্থ হয়েছে",
+  "extErrSignature": "স্বাক্ষর চেক ব্যর্থ হয়েছে. ফাইলটি ক্ষতিগ্রস্ত বা টেম্পারড হতে পারে।",
+  "extErrManifest": "এক্সটেনশন ম্যানিফেস্ট অবৈধ.",
+  "extErrNetwork": "নেটওয়ার্ক ত্রুটি. আপনার সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন.",
+  "extErrHash": "ডাউনলোড ক্যাটালগের সাথে মেলে না। এর সাথে কারসাজি করা হতে পারে।",
+  "extErrMinApp": "এই এক্সটেনশনটির অ্যাপ সংস্করণ {version} বা নতুন প্রয়োজন।",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "শুধুমাত্র https:// লিঙ্ক অনুমোদিত",
+  "extErrGeneric": "কিছু ভুল হয়েছে. আবার চেষ্টা করুন.",
+  "extErrAuthorKeyChanged": "এই আপডেটটি ইনস্টল করা সংস্করণের চেয়ে একটি ভিন্ন লেখক কী দিয়ে স্বাক্ষরিত, তাই এটি ব্লক করা হয়েছে। আপনি যদি নতুন কী বিশ্বাস করেন তবে এক্সটেনশনটি আনইনস্টল করুন এবং স্পষ্টভাবে আবার ইনস্টল করুন।",
+  "extUpdateAvailable": "আপডেট উপলব্ধ",
+  "extDisabled": "বন্ধ",
+  "extToggleEnabled": "সক্ষম করুন {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "ইনস্টল করা এক্সটেনশন খুঁজুন",
+  "extUpdateAll": "সব আপডেট",
+  "extUpdatesAvailable": "{count} আপডেট উপলব্ধ",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} আপডেট করা হয়েছে৷",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "স্বাভাবিক",
+  "extRiskSensitive": "সংবেদনশীল",
+  "extRiskDangerous": "উচ্চ ঝুঁকি",
+  "extPermissionsRemoved": "আর চাওয়া হচ্ছে না:",
+  "extUpdateFailedKept": "পূর্ববর্তী সংস্করণ এখনও ইনস্টল করা আছে.",
+  "extConflictsTitle": "এক্সটেনশন দ্বন্দ্ব",
+  "extConflictsIntro": "এই এক্সটেনশনগুলো একই জিনিস চায়। কোনটি চলবে বেছে নিন, অন্যটি ইনস্টল থাকবে।",
+  "extConflictTheme": "অ্যাপ থিম",
+  "extConflictNetHooks": "নেটওয়ার্ক হুক",
+  "extConflictWinner": "অগ্রাধিকার: {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} দ্বন্দ্ব আপনার সিদ্ধান্ত প্রয়োজন",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "দ্বন্দ্ব সমাধান",
+  "extConflictNote": "আপনার পছন্দ এই ডিভাইসে সংরক্ষিত হয়। থিম সঙ্গে সঙ্গে বদলায়, নেটওয়ার্ক হুক এই সংস্করণে চলে না।",
+  "extVersionLabel": "সংস্করণ {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "লেখক",
+  "extRating": "রেটিং",
+  "extInstalls": "ইনস্টল সংখ্যা",
+  "extVersion": "সংস্করণ",
+  "extAbout": "এই এক্সটেনশন সম্পর্কে",
+  "extPermissionsTitle": "অনুমতি",
+  "extNoPermissions": "কোন বিশেষ অনুমতি নেই.",
+  "extSettings": "সেটিংস",
+  "extSaveSettings": "সেটিংস সংরক্ষণ করুন",
+  "extSaving": "সংরক্ষণ করা হচ্ছে...",
+  "extUpdateTo": "{version} এ আপগ্রেড করুন",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "চালু",
+  "extRollbackTo": "রোলব্যাক {version} এ",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "সংস্করণে রোলব্যাক {version}?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "আনইনস্টল",
+  "extUninstallConfirm": "\"{name}\" এবং এর সেটিংস সরান?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "প্যানেল অনুপলব্ধ. এক্সটেনশনটি নিষ্ক্রিয় বা সরানো হতে পারে৷",
+  "extPermConnectionsRead": "সক্রিয় সংযোগের তালিকা দেখুন",
+  "extPermServersRead": "আপনার সার্ভারের একটি তালিকা দেখুন",
+  "extPermSettingsRead": "অ্যাপ সেটিংস পড়ুন",
+  "extPermSettingsWrite": "অ্যাপ সেটিংস পরিবর্তন করুন",
+  "extPermNotifications": "বিজ্ঞপ্তি দেখান",
+  "extPermTray": "ট্রে মেনুতে আইটেম যোগ করুন",
+  "extPermUiPanel": "অ্যাপের ভিতরে প্যানেল দেখান",
+  "extPermThemeApply": "থিম প্রয়োগ করুন অনুমোদিত তালিকা থেকে",
+  "extPermRoutingRules": "রাউটিং নিয়ম যোগ করুন (নেটওয়ার্ক ট্রাফিক যেখানে যায় সেখানে প্রভাবিত করে)",
+  "extPermNetHooks": "নেটওয়ার্ক পাথে একীভূত করুন (DPI বাইপাস মডিউল)",
+  "extPermNetFetch": "অনুরোধ URL",
+  "extPermBackground": "ব্যাকগ্রাউন্ড কাজ চালান",
+  "extPermBackgroundDetail": "প্যানেল বন্ধ থাকা অবস্থায়ও নির্ধারিত কাজ চালায়। আপনি এটিকে বিরতি দিতে পারেন বা এক্সটেনশন সেটিংসে এটি কতবার চলে তা পরিবর্তন করতে পারেন৷",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "ব্যাকগ্রাউন্ডে রান",
+  "extCapNetHook": "ব্লক এড়ানো ও নেটওয়ার্ক হুক",
+  "extCapPanel": "ইন্টারফেস প্যানেল",
+  "extCapRouting": "রাউটিং নিয়ম",
+  "extCapTheme": "থিম",
+  "extCapWidget": "উইজেট",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "চেঞ্জলগ",
+  "extImageFailed": "ইমেজ লোড করা যায়নি",
+  "extRatingHow": "রেটিং কীভাবে গণনা করা হয়",
+  "extRatingHowBody": "রেটিং একটি Bayesian গড় ব্যবহার করে: কিছু রেটিং সহ একটি এক্সটেনশন মাঝামাঝি কাছাকাছি থাকে যতক্ষণ না আরও বেশি লোক ভোট দেয়, তাই একটি একক 5-স্টার পর্যালোচনা শীর্ষে একটি নতুন এক্সটেনশনকে ঠেলে দিতে পারে না। সাম্প্রতিক রেটিংগুলি পুরানোগুলির থেকে বেশি ওজন করে এবং প্রতি অ্যাকাউন্টে শুধুমাত্র একটি রেটিং গণনা করা হয়৷",
+  "extScreenshots": "স্ক্রিনশট",
+  "extSortRelevance": "প্রাসঙ্গিকতা",
+  "extPermNetworkDetail": "VPN-এর মাধ্যমে ইন্টারনেট থেকে ডেটা আনে। শুধু নিচের তালিকার হোস্ট অনুমোদিত, বাকি সব বন্ধ।",
+  "extBgTitle": "পটভূমির কাজ",
+  "extBgEnabled": "ব্যাকগ্রাউন্ডে চালান",
+  "extBgInterval": "চালানোর ব্যবধান",
+  "extBgMinutes": "{count, plural, one{# মিনিট} other{# মিনিট}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# ঘণ্টা} other{# ঘণ্টা}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Sora খোলা থাকলে, ট্রেতে থাকলেও, কাজটি সময়সূচি অনুযায়ী চলে। সবচেয়ে কম ব্যবধান ১৫ মিনিট।",
+  "extBgDisabledNote": "এর ব্যাকগ্রাউন্ড টাস্ক পরিচালনা করতে এক্সটেনশন সক্রিয় করুন।",
+  "extCapNetwork": "নেটওয়ার্ক অ্যাক্সেস",
+  "extCapNetworkHosts": "নেটওয়ার্ক: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "শেয়ার করুন QR কোড",
+  "qrScanTitle": "স্ক্যান করুন QR কোড",
+  "qrCopyLink": "কপি লিঙ্ক",
+  "qrShowLink": "লিঙ্ক দেখান",
+  "qrHideLink": "লিঙ্ক লুকান",
+  "qrWarning": "এই QR কোডটিতে সংযোগের বিবরণ রয়েছে। অপরিচিতদের দেখাবেন না।",
+  "qrScanHint": "QR কোডসহ একটি স্ক্রিনশট বা ছবি বেছে নিন, অথবা একটি লিংক পেস্ট করুন",
+  "qrFromClipboard": "ক্লিপবোর্ড থেকে পেস্ট করুন",
+  "qrNoCode": "এই ছবিতে কোনো QR কোড পাওয়া যায়নি।",
+  "qrInvalid": "এই QR কোডটিতে কোনো বৈধ লিঙ্ক নেই।",
+  "qrScan": "স্ক্যান QR",
+  "qrFromImage": "ছবি খুলুন",
+  "connGroupByProcess": "প্রক্রিয়া দ্বারা গ্রুপ",
+  "connListView": "তালিকা",
+  "connCopyHost": "কপি হোস্ট",
+  "connAddRule": "নিয়ম যোগ করুন",
+  "connConnectionsCount": "{count, plural, one{# সংযোগ} other{# সংযোগ}}",
+  "dnsPreset": "প্রিসেট",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "নিজস্ব",
+  "dnsCheck": "ডেটা ফাঁসের জন্য পরীক্ষা করুন",
+  "dnsChecking": "পরীক্ষা করা হচ্ছে...",
+  "dnsNoLeak": "কোন ফাঁস পাওয়া যায় নি",
+  "dnsLeakFound": "লিক সনাক্ত",
+  "dnsLastCheck": "শেষ চেক",
+  "dnsNeverChecked": "এখনো পরীক্ষা করা হয়নি",
+  "dnsLeakCheckTunnelDns": "টানেলের DNS রিজলভার",
+  "dnsLeakCheckSystemResolvers": "সিস্টেমের DNS রিজলভার",
+  "dnsLeakCheckKillSwitchDns": "নেটওয়ার্ক অবরোধের DNS সুরক্ষা",
+  "dnsLeakFixConfigureTunnelDns": "উপরের DNS সেটিংসে টানেলের জন্য DNS কনফিগার করুন।",
+  "dnsLeakFixReviewSystemResolvers": "আপনার সিস্টেম টানেলের বাইরে ব্যবহার করবে কোন সমাধানকারী পরীক্ষা করুন.",
+  "dnsLeakFixEnableKillSwitch": "DNS ট্রাফিক টানেলের ভেতরে রাখতে নেটওয়ার্ক অবরোধ চালু করুন।",
+  "dnsLeakCheckEncryptedDns": "সিস্টেমের এনক্রিপ্ট করা DNS",
+  "dnsLeakCheckDnsSpoof": "নকল DNS প্রতিক্রিয়া",
+  "dnsLeakFixReviewEncryptedDns": "আপনার সিস্টেম টানেলের বাইরে কোন এনক্রিপ্টেড DNS এন্ডপয়েন্ট ব্যবহার করে তা পরীক্ষা করে দেখুন।",
+  "dnsLeakFixUseEncryptedDns": "টানেলের জন্য এনক্রিপ্ট করা DNS (DoT বা DoH) ব্যবহার করুন যাতে সমাধানকারীরা উত্তর জাল করতে না পারে।",
+  "dnsCheckNeedsConnection": "প্রথমে VPN এর সাথে সংযোগ করুন, তারপরে ফাঁস পরীক্ষা করুন।",
+  "dnsExpected": "প্রত্যাশিত",
+  "dnsActual": "পালন করা হয়েছে",
+  "sortBy": "দ্বারা সাজান",
+  "sortPing": "পিং",
+  "sortSpeed": "গতি",
+  "sortName": "নাম",
+  "measureSpeed": "গতি পরিমাপ",
+  "benchmarkStale": "পুরানো",
+  "autoSelectMode": "অটো-সিলেক্ট সার্ভার",
+  "autoSelectPing": "দ্রুততম পিং",
+  "autoSelectSpeed": "দ্রুততম গতি",
+  "autoSelectSmart": "স্মার্ট পছন্দ",
+  "coreWatchUnstable": "Sora কোরের সাথে সংযোগটি অস্থির",
+  "watchReconnect": "পুনরায় সংযোগ করুন",
+  "coreRestoringLink": "Sora কোরে সংযোগ পুনরুদ্ধার করা হচ্ছে...",
+  "crashRestoreTitle": "শেষ অধিবেশন বিঘ্নিত হয়",
+  "restoreOnCrash": "একটি ক্র্যাশ পরে সেশন পুনরুদ্ধার",
+  "crashRestore": "পুনরুদ্ধার",
+  "crashDismiss": "এখন না",
+  "overrideTitle": "আমার সম্পাদনা",
+  "overrideEdit": "সার্ভার সম্পাদনা করুন",
+  "overrideHide": "লুকান",
+  "overrideUnhide": "দেখান",
+  "overrideClear": "সম্পাদনাগুলি পুনরায় সেট করুন৷",
+  "overrideEmpty": "এখনও কোন সম্পাদনা",
+  "overrideCustomRules": "নিজস্ব নিয়ম",
+  "errBenchmarkUnsupported": "গতি পরিমাপ একটি নতুন কোর প্রয়োজন",
+  "benchmarkProgress": "{total} থেকে {done} এর পরিমাপ…",
+  "profiles": "নেটওয়ার্ক প্রোফাইল",
+  "profilesEmpty": "এখনও কোন প্রোফাইল. পরিচিত নেটওয়ার্কগুলিতে স্বয়ংক্রিয়ভাবে সেটিংস প্রয়োগ করতে একটি তৈরি করুন৷",
+  "profileAdd": "প্রোফাইল যোগ করুন",
+  "profileName": "প্রোফাইল নাম",
+  "profileSsids": "Wi-Fi নেটওয়ার্ক (SSID)",
+  "profileSsidsHint": "বাড়ি, অফিস কমা দ্বারা পৃথক করা হয়েছে",
+  "profileGateways": "নেটওয়ার্ক গেটওয়ে",
+  "profileAsns": "AS নম্বর",
+  "profileAutoApply": "স্বয়ংক্রিয়ভাবে প্রয়োগ করুন",
+  "profileAutoApplyHint": "বন্ধ থাকলে প্রোফাইল প্রয়োগের আগে অনুমতি চাওয়া হবে।",
+  "profileSnapshot": "বর্তমান সেটিংস মনে রাখবেন",
+  "profileSnapshotDone": "বর্তমান সেটিংস প্রোফাইলে সংরক্ষিত",
+  "profileDelete": "প্রোফাইল মুছুন",
+  "profileDeleteConfirm": "প্রোফাইল \"{name}\" মুছবেন?",
+  "profileApplyAsk": "প্রোফাইল \"{name}\" প্রয়োগ করবেন?",
+  "profileApply": "প্রয়োগ করুন",
+  "profileApplied": "প্রোফাইল \"{name}\" প্রয়োগ করা হয়েছে",
+  "profileUndo": "বাতিল করুন",
+  "profileActive": "সক্রিয়",
+  "networkNow": "এখন: {info}",
+  "networkUnknown": "নেটওয়ার্ক তথ্য অনুপলব্ধ",
+  "profileNoTriggers": "অন্তত একটি ট্রিগার যোগ করুন: SSID, গেটওয়ে বা ASN",
+  "chains": "প্রক্সি চেইন",
+  "chainsEmpty": "এখনও কোন চেইন. 2-3 সার্ভারগুলিকে লিঙ্ক করুন যাতে তাদের প্রতিটির মধ্য দিয়ে ট্র্যাফিক চলে যায়।",
+  "chainAdd": "নতুন চেইন",
+  "chainName": "চেইন নাম",
+  "chainPickServers": "2-3 সার্ভার বাছাই করুন",
+  "chainOrderHint": "পুনরায় সাজাতে টেনে আনুন: ট্র্যাফিক উপরে প্রবেশ করে এবং নীচে প্রস্থান করে।",
+  "chainTooFew": "অন্তত 2 সার্ভার চয়ন করুন",
+  "chainTooMany": "একটি চেইন সর্বাধিক 3 সার্ভার ধারণ করে",
+  "chainEstimate": "আনুমানিক লেটেন্সি",
+  "chainSave": "সেভ চেইন",
+  "chainDelete": "চেইন মুছুন",
+  "chainDeleteConfirm": "চেইন \"{name}\" মুছুন?",
+  "chainUnsupported": "বর্তমান ইঞ্জিন চেইন তৈরি করতে পারে না",
+  "chainHopMissing": "চেইন সার্ভারের একটি আর উপলব্ধ নেই",
+  "chainHop": "হপ {n}",
+  "chainEntry": "প্রবেশ",
+  "chainExit": "প্রস্থান",
+  "sync": "ডিভাইস সিঙ্ক্রোনাইজেশন",
+  "syncDevices": "আমার ডিভাইস",
+  "syncEmpty": "কোন জোড়া ডিভাইস. স্থানীয় নেটওয়ার্কে অন্য ডিভাইস যুক্ত করুন।",
+  "syncPair": "ডিভাইস জোড়া লাগান",
+  "syncShowCode": "আমার কোড দেখান",
+  "syncScanCode": "স্ক্যান কোড",
+  "syncRevoke": "প্রত্যাহার করুন",
+  "syncRevokeConfirm": "\"{name}\" প্রত্যাহার করবেন?",
+  "syncLastSync": "শেষ সিঙ্ক: {time}",
+  "syncNever": "কখনোই না",
+  "syncNoLan": "ডিভাইসগুলি অবশ্যই একই স্থানীয় নেটওয়ার্কে থাকতে হবে",
+  "syncPaired": "ডিভাইস পেয়ার করা হয়েছে",
+  "syncPairingTitle": "এই ডিভাইসের সাথে পেয়ার করুন",
+  "syncWaiting": "অন্য ডিভাইসের জন্য অপেক্ষা করা হচ্ছে...",
+  "syncSecureNote": "এন্ড-টু-এন্ড এনক্রিপ্ট করা চ্যানেল। কোনো অ্যাকাউন্ট নেই, কোনো ক্লাউড সার্ভার নেই।",
+  "zapretWithVpn": "সরাসরি নেটওয়ার্ক ট্রাফিকের জন্য বাইপাস DPI ফিল্টারিং",
+  "zapretWithVpnHint": "VPN টানেলের পাশাপাশি zapret চালায়: টানেলের ট্রাফিক VPN দিয়ে যায়, সরাসরি ট্রাফিক ব্লক এড়ানোর ব্যবস্থা দিয়ে যায়।",
+  "chainDuplicate": "প্রতিটি সার্ভার শুধুমাত্র একবার প্রদর্শিত হতে পারে",
+  "edit": "সম্পাদনা",
+  "remove": "সরান",
+  "autoSwitchOnDegrade": "অটো-সুইচ অন ডিগ্রেডেশন",
+  "autoSwitchOnDegradeDetail": "নির্বাচিত সার্ভার খুব ধীর হয়ে গেলে বা সাড়া না দিলে, Sora মাপা সার্ভারগুলোর মধ্যে সেরাটিতে বদলে যায়, তবে প্রতি 10 মিনিটে একবারের বেশি নয়।",
+  "tunStackMixed": "মিশ্র",
+  "tunStackSystem": "সিস্টেম",
+  "syncCodeExpired": "কোডের মেয়াদ শেষ হয়েছে",
+  "syncDaemonFailed": "সিঙ্ক পরিষেবা শুরু করতে পারেনি",
+  "syncDaemonMissing": "sora-sync উপাদানটি পাওয়া যায়নি। ডিভাইস সিঙ্ক সক্ষম করতে অ্যাপটি পুনরায় ইনস্টল করুন।",
+  "syncDaemonStarting": "সিঙ্ক পরিষেবা শুরু হচ্ছে...",
+  "syncErrAuth": "সিঙ্ক পরিষেবা অ্যাক্সেস টোকেন প্রত্যাখ্যান করেছে। অ্যাপটি পুনরায় চালু করুন এবং আবার চেষ্টা করুন।",
+  "syncErrNotFound": "ডিভাইসটি আর জোড়া লাগানো নেই",
+  "syncErrPairingActive": "একটি জোড়া সেশন ইতিমধ্যে খোলা আছে",
+  "syncErrUnreachable": "অন্য ডিভাইস উত্তর দেয়নি. নিশ্চিত করুন যে এটি একই নেটওয়ার্কে রয়েছে এবং এর কোড দেখাচ্ছে৷",
+  "syncError": "সিঙ্ক্রোনাইজেশন ত্রুটি",
+  "syncExpiresIn": "কোডের মেয়াদ শেষ হবে {duration} পরে",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "ডিভাইসের সাথে পেয়ার করা হচ্ছে...",
+  "syncLegacyCleared": "পুরানো ডিভাইস তালিকা আসলে জোড়া ছিল না, তাই এটি সাফ করা হয়েছে. আপনার ডিভাইসগুলিকে আবার যুক্ত করুন, এইবার বাস্তবে৷",
+  "syncNewCode": "নতুন কোড",
+  "syncPairedWith": "{name} এর সাথে যুক্ত",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "পুনরাবৃত্তি করুন",
+  "syncStopShowing": "কোড লুকান",
+  "syncSyncNow": "এখন সিঙ্ক করুন",
+  "syncSyncResult": "গৃহীত {pulled}, পাঠানো {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "সিঙ্ক্রোনাইজেশন ফলাফল",
+  "syncPulled": "প্রাপ্ত",
+  "syncPushed": "পাঠানো হয়েছে",
+  "syncNoChanges": "কোনো পরিবর্তন নেই",
+  "syncDocKindSubscriptions": "সাবস্ক্রিপশন",
+  "syncDocKindSettings": "অ্যাপ সেটিংস",
+  "syncDocKindOverrides": "সাবস্ক্রিপশনের নিজস্ব পরিবর্তন",
+  "syncDocKindProfiles": "নেটওয়ার্ক প্রোফাইল",
+  "syncDocKindChains": "প্রক্সি চেইন",
+  "syncFrom": "{name} থেকে",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "এই ডিভাইস",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Shadowsocks-এর জন্য: method:password, যেমন chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "প্যাকেট ক্যাপচার",
+  "diagnosticEvents": "উইন্ডোজ ইভেন্ট",
+  "diagnosticCapture": "10 সেকেন্ডের জন্য ক্যাপচার করুন",
+  "diagnosticRequiresTun": "প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।",
+  "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.",
+  "extErrRevoked": "Sora দল এই এক্সটেনশন সংস্করণটি প্রত্যাহার করেছে, কারণ এটি অনিরাপদ বা ভাঙা।",
+  "extErrRevocationsExpired": "প্রত্যাহার করা এক্সটেনশনের তালিকা নবায়ন করা যায়নি। নবায়ন না হওয়া পর্যন্ত ইনস্টল বন্ধ: নেটওয়ার্ক দেখে আবার চেষ্টা করুন।",
+  "extRevokedDisabled": "প্রত্যাহার করা এক্সটেনশন বন্ধ করা হয়েছে: {names}",
+  "customServerWgPrivateKey": "প্রাইভেট কী",
+  "customServerWgAddresses": "ইন্টারফেস ঠিকানা",
+  "customServerWgPeerKey": "সার্ভারের পাবলিক কী",
+  "customServerWgPresharedKey": "প্রি-শেয়ার্ড কী",
+  "customServerWgAllowedIps": "অনুমোদিত IP",
+  "customServerWgKeepalive": "Keepalive, সেকেন্ড",
+  "customServerWgKeyInvalid": "কী-টি wg genkey-এর মতো base64-এ 32 বাইট হতে হবে।",
+  "customServerWgCidrInvalid": "কমা দিয়ে আলাদা প্রিফিক্স দিন, যেমন 10.0.0.2/32।",
+  "customServerWgKeepaliveInvalid": "0 থেকে 65535 সেকেন্ডের মধ্যে একটি সংখ্যা দিন।",
+  "strictKillSwitch": "কঠোর নেটওয়ার্ক অবরোধ",
+  "strictKillSwitchWarning": "সংযোগের পর, ক্র্যাশ, পুনরায় চালু বা অ্যাপ বন্ধ হলেও VPN-এর বাইরের ট্র্যাফিক আটকায়। শুধু সংযোগ বিচ্ছিন্ন করলে বা এই বিকল্প বন্ধ করলে প্রবেশাধিকার ফিরে আসে। ডিভাইস পুনরায় চালু হলে শুরুতে সংযোগের বিকল্প চালু থাকলেই অবরোধ আবার কার্যকর হয়।",
+  "extWorkerFailed": "এক্সটেনশনের পটভূমির কাজ ব্যর্থ হয়েছে। এক্সটেনশনের লগ দেখুন।",
+  "extAssetRejected": "এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।"
 }

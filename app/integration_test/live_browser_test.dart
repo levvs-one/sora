@@ -84,7 +84,7 @@ void main() {
               if (previous != null && !recovered) expect(identical(controller, previous), isTrue);
               previous = controller;
               final title = await controller.getTitle();
-              debugPrint('Browser cycle $reopen: $current — $title');
+              debugPrint('Browser cycle $reopen: $current: $title');
               if (Platform.isLinux && reopen == 0 && Platform.environment['SORA_SHOTS'] != null) {
                 final output = '${Platform.environment['HOME']!}/.local/share/sora-dev/shots';
                 await Directory(output).create(recursive: true);

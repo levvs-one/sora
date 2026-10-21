@@ -1,0 +1,34 @@
+# {{.Name}}
+
+A scheduled Sora JavaScript worker. Uses the same permission-checked
+`window.soraExt.call` methods as panels and `console.log` for its extension
+log. The source uses real extension settings and the current session state.
+
+Workers run in fresh goja processes while the app is open (including hidden
+in the tray). Effective interval: 15 minutes to 7 days. Per-run budgets:
+2 CPU seconds, 128 MiB committed process memory, 30 seconds wall time.
+No filesystem, process, raw socket, DOM, module loader or timers.
+`onEvent` gives a session snapshot once per subscription per run.
+
+For network requests, explicitly add the net.fetch permission and
+network_hosts allowlist, then use:
+
+```js
+const response = await window.soraExt.call('net.fetch', {url: 'https://api.example.com/status'});
+console.log('HTTP ' + response.status);
+```
+
+Replace the example host with your actual endpoint. Fetch is HTTPS-only,
+allowlisted, and uses the VPN proxy or fails closed. Disable, uninstall or
+closing the app stops the worker. Failures produce a notification and log.
+
+## Build and sign
+
+```sh
+sora-ext validate
+sora-ext pack . -o /tmp/{{.ID}}.soraext
+sora-ext sign --key .sora/author.key /tmp/{{.ID}}.soraext
+```
+
+Keep .sora/author.key private and offline; never put it in a package or Git.
+See docs/extensions.md for the full runtime and security contract.

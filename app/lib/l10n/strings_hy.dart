@@ -25,9 +25,6 @@ class SHy extends S {
   String get stateDisconnecting => 'Անջատում';
 
   @override
-  String get stateFailed => 'Միացված չէ';
-
-  @override
   String get coreMissing => 'Sora ծառայությունը չի արձագանքում';
 
   @override
@@ -135,6 +132,9 @@ class SHy extends S {
   String get logsEmpty => 'Այստեղ ոչինչ';
 
   @override
+  String get connEmpty => 'Կապ չկա';
+
+  @override
   String appVersion(String version) {
     return 'Տարբերակ $version';
   }
@@ -164,6 +164,16 @@ class SHy extends S {
   @override
   String milliseconds(int n) {
     return '$n ms';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Mbps';
   }
 
   @override
@@ -255,9 +265,6 @@ class SHy extends S {
   String get errNoServers => 'Միանալու համար ավելացրեք բաժանորդագրություն';
 
   @override
-  String get exportText => 'Տեքստ';
-
-  @override
   String get connections => 'Միացումներ';
 
   @override
@@ -273,7 +280,7 @@ class SHy extends S {
   String get theme => 'Թեմա';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Ինչպես համակարգում';
 
   @override
   String get themeLight => 'Լույս';
@@ -285,7 +292,7 @@ class SHy extends S {
   String get language => 'Լեզու';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Ինչպես համակարգում';
 
   @override
   String get sectionConnection => 'Միացում';
@@ -496,17 +503,6 @@ class SHy extends S {
   String get ruleInvalid => 'Սա նման չէ կայքի, IP-ի կամ ծրագրի';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '# սերվերները, իր հերթին',
-      one: '# սերվերը, իր հերթին',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -521,9 +517,6 @@ class SHy extends S {
   String get tunnelMode => 'Ռեժիմ';
 
   @override
-  String get tunnelTun => 'Ամբողջ երթեւեկությունը';
-
-  @override
   String get tunnelProxy => 'System վստահված անձ';
 
   @override
@@ -534,6 +527,9 @@ class SHy extends S {
 
   @override
   String get launchAtLogin => 'Սկսեք համակարգից';
+
+  @override
+  String get launchAtLoginDetail => 'Մուտք գործելիս Sora-ն կգործարկվի ավտոմատ և կմնա համակարգային սկուտեղում։';
 
   @override
   String get closeToTray => 'Փակված վիճակում պահել սկուտեղի մեջ';
@@ -634,28 +630,6 @@ class SHy extends S {
   String get less => 'Ավելի քիչ';
 
   @override
-  String get currentServer => 'Ընթացիկ սերվեր';
-
-  @override
-  String get trafficDown => 'Ներբեռնված';
-
-  @override
-  String get trafficUp => 'Վերբեռնված է';
-
-  @override
-  String perSecond(String value) {
-    return '$value/վ';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Ակտիվ կանոններ՝ $count';
-  }
-
-  @override
-  String get recentNotifications => 'Վերջին ծանուցումները';
-
-  @override
   String get notificationsEmpty => 'Կապի և բաժանորդագրության իրադարձությունները կհայտնվեն այստեղ';
 
   @override
@@ -709,22 +683,13 @@ class SHy extends S {
   String get runningProcesses => 'Գործող գործընթացներ';
 
   @override
-  String get programsFailed => 'Չհաջողվեց բեռնել հավելվածները';
-
-  @override
   String get programsEmpty => 'Հայտեր չեն գտնվել: Փորձեք մեկ այլ անուն:';
 
   @override
   String get selectExe => 'Ընտրեք .exe ֆայլ';
 
   @override
-  String get trafficUnavailable => 'Հաշվիչները դեռ հասանելի չեն';
-
-  @override
   String get speedtest => 'Արագություն';
-
-  @override
-  String get speedtestCheck => 'Ստուգեք արագությունը';
 
   @override
   String get speedtestSearch => 'Գտեք ծառայություն';
@@ -820,6 +785,38 @@ class SHy extends S {
       'Գործարկեք այս հրամանը տերմինալում՝ երկու ստուգված փաթեթները տեղադրելու համար, այնուհետև նորից բացեք Sora: Ֆայլերը մնում են ներբեռնման գրացուցակում: VPN կապը կդադարի:';
 
   @override
+  String get updateSignaturePending =>
+      'Թարմացման ֆայլերը համեմատվում են թողարկման հետ հրապարակված ստուգիչ գումարների հետ։';
+
+  @override
+  String get updateManualSigWarning =>
+      'Ստորև նշված ֆայլերը համապատասխանում են թողարկման ստուգիչ գումարներին։ Գործարկեք հրամանը, եթե դրանք ներբեռնել եք պաշտոնական թողարկումից։';
+
+  @override
+  String get updateVersionRevoked => 'Մշակողը հանել է այս տարբերակը: Խնդրում ենք սպասել շտկված թողարկման:';
+
+  @override
+  String get updateRolloutPending => 'Ավելի նոր տարբերակ է տարածվում աստիճանաբար և ավտոմատ կերպով կառաջարկվի ձեզ:';
+
+  @override
+  String updateRollbacking(String version) {
+    return 'Վերադառնալ $version տարբերակին...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return '$version-ի թարմացումը չի անցել առողջության ստուգումը, ուստի Sora-ը հետ է վերադարձվել $fromVersion:';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'Ավտոմատ հետ վերադարձը ձախողվեց: Եթե ​​նոր տարբերակը չի աշխատում, ձեռքով նորից տեղադրեք նախորդ թողարկումը:';
+
+  @override
+  String get updateRollbackCacheError =>
+      'Չհաջողվեց պատրաստել ընթացիկ տարբերակի հաստատված հետադարձ պատճենը, ուստի թարմացումը չի տեղադրվել:';
+
+  @override
   String get updateCopyCommand => 'Պատճենել հրամանը';
 
   @override
@@ -844,9 +841,6 @@ class SHy extends S {
   String get componentLicenses => 'Բաղադրիչների լիցենզիաներ';
 
   @override
-  String get appCopyright => '© 2026 levvs-one և ներդրողներ';
-
-  @override
   String get collapseServers => 'Ծալել սերվերները';
 
   @override
@@ -863,10 +857,6 @@ class SHy extends S {
 
   @override
   String get reconnectNow => 'Դիմեք և նորից միացեք';
-
-  @override
-  String get bypassLimitations =>
-      'Այս ռեժիմը շրջանցում է DPI-ն միայն HTTP-ի և TLS-ի համար, չի աջակցում UDP և չի փոխում ձեր IP-ն: Օգտագործեք VPN սերվեր Discord ձայնի, զանգերի և արգելափակված Telegram հասցեների համար:';
 
   @override
   String get errEngineUnsupported =>
@@ -892,7 +882,7 @@ class SHy extends S {
 
   @override
   String get modesGuide =>
-      'Ընտրեք Ավտոմատ, եթե վստահ չեք, թե որ շարժիչն է անհրաժեշտ ձեր սերվերին: Sora-ը ստուգում է պրոֆիլը և կարգավորումները միանալուց առաջ: Շարժիչը չի կարող մեծացնել ձեր պլանի թողունակությունը. կատարումը կախված է սերվերից, երթուղուց, արձանագրությունից և ցանցից:\n\n## ռեժիմներ\n\n### Ամբողջ երթևեկությունը (TUN)\n\nSora-ը ստեղծում է վիրտուալ ցանցային ինտերֆեյս և երթուղավորում է հավելվածների տրաֆիկը դրա միջով, ներառյալ TCP և UDP: Օգտագործեք այս ռեժիմը Telegram, խաղերի և Discord ձայնի համար: Կանոնները կարող են ուղղակիորեն ուղարկել կոնկրետ կայքեր կամ ծրագրեր կամ արգելափակել դրանք: Ցանցային ծառայությանը անհրաժեշտ է թույլտվություն և սերվեր, որն աջակցում է պահանջվող արձանագրությանը:\n\n### System վստահված անձ\n\nSora-ը կարգավորում է տեղական HTTP/SOCKS վստահված անձը: Այն օգտագործում են այն հավելվածները, որոնք հարգում են համակարգի վստահված անձի կարգավորումները: Ծրագրերն իրենց սեփական ցանցային փաթեթով կարող են ուղղակիորեն միանալ. UDP-ին և ձայնային զանգերին ընդհանուր առմամբ անհրաժեշտ է TUN: Այս ռեժիմը համապատասխանում է պրոքսի աջակցությամբ բրաուզերներին և հավելվածներին:\n\n### Սերվեր չկա\n\nLinux-ում Sora-ն օգտագործում է [zapret](https://github.com/bol-van/zapret) HTTP/TLS հարցումները բաժանելու և ձևափոխելու և որոշ DPI ստուգումներ շրջանցելու համար: Ձեր IP-ն մնում է նույնը, և կապերն անմիջապես գնում են դեպի կայք: Արդյունքները կախված են ձեր մատակարարից և արգելափակման եղանակից:\n\nԸնթացիկ ինտեգրումն օգտագործում է tpws HTTP-ի և TLS-ի համար TCP-ի միջոցով: Այն չի շրջանցում IP արգելափակումը կամ փոխանցում UDP-ն և չի կարող երաշխավորել Telegram-ի MTProto կապերը: Օգտագործեք VPN սերվեր TUN-ով Discord ձայնի, Telegram զանգերի և այս տեսակի սահմանափակումների համար:\n\n## Շարժիչներ\n\n### Ավտո\n\nSora-ն ընտրում է տեղադրված շարժիչ, որն աջակցում է կապի ամբողջ պլանին՝ սերվերի արձանագրություններ, փոխադրումներ, խմբեր, մասնատում և ռեժիմ: Անհամատեղելի ձեռքով ընտրությունը մերժվում է մինչ ընթացիկ կապը դադարեցնելը: Ընտրեք Ավտո կամ մեկ այլ շարժիչ և նորից կիրառեք կարգավորումները:\n\n### sing-box\n\nSora նոր փաթեթները ներառում են [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), մի պատառաքաղ [sing-box] (https://github.com/SagerNet/sing-box), ավելացնելով հաճախորդի կողմից XHTTP և VLESS Encryption: Sora-ը ճանաչում է կառուցվածքը և դրա հնարավորությունները: Առանց XHTTP-ի վերին հոսանքով կառուցված սարքը միայն իր անունից չի ստանում այս հնարավորությունը:\n\nԱջակցվող արձանագրություններն են VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard և AmneziaWG 1.x/2.x-ի այն պարամետրերը, որոնք Sora-ն կարող է ներմուծել։ Ամբողջական Xray JSON պրոֆիլների համար անհրաժեշտ է Xray։ Նոր AWG 3.x դաշտերը դեռ հնարավոր չէ ներմուծել։ sing-box-ն օգտագործում է գաղտնաբառով պաշտպանված տեղային կառավարման պորտ, որը համակարգչի մյուս ծրագրերը կարող են հայտնաբերել։\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) աջակցում է VLESS, REALITY, XHTTP, VLESS Encryption և TLS մասնատումը: Այն նաև գործարկում է ամբողջական մատակարար Xray պրոֆիլները՝ պահպանելով դրանց երթուղին և խմբերը: Նման պրոֆիլները չեն կարող ավտոմատ կերպով փոխակերպվել մեկ այլ շարժիչի՝ առանց դրանց վարքագիծը փոխելու:\n\nՄիավորված Xray-ը հեռացրեց TLS վկայագրի ստուգումն անջատող կարգավորումը («allowInsecure»): Այս պարամետրը պահանջող սովորական սերվերների համար ավտոմատ ընտրում է sing-box կամ mihomo: Xray ընտրելը ձեռքով հայտնում է անհամատեղելիության մասին՝ մինչ ընթացիկ կապը դադարեցնելը: Ավելի հին ամբողջական JSON պրոֆիլներին անհրաժեշտ է թարմացված մատակարարի պրոֆիլ՝ ստուգելի վկայականով կամ վկայագրի փինով:\n\n### mihomo\n\n[mihomo] (https://github.com/MetaCubeX/mihomo) աջակցում է պատվիրված հետադարձ և բեռը հավասարակշռող խմբեր, XHTTP և AmneziaWG: Ընտրեք այն, երբ պահուստային սերվերի ավտոմատ ձախողումը կարևոր է: Sora-ի TLS մասնատման կարգավորումն անհասանելի է այս շարժիչով:\n\n## Համատեղելիություն Sora-ում\n\n| Առանձնահատկություն | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN և TCP/UDP | Այո | Այո | Այո |\n| XHTTP | Այո | Այո | Այո |\n| VLESS Encryption | Այո | Այո | Այո |\n| Ամբողջական Xray պրոֆիլը | Ոչ | Այո | Ոչ |\n| TUIC / AnyTLS | Երկուսն էլ | Ոչ | TUIC |\n| TLS մասնատում | Այո | Այո | Ոչ |\n| AmneziaWG 1.x/2.x | Այո¹ | Ոչ | Այո |\n| Պատվիրված հետադարձ խումբ | Ոչ | No² | Այո |\n\n¹ J1/J2/J3/Itime-ով պրոֆիլներն օգտագործում են mihomo; այս դաշտերը երբեք չպետք է լուռ անտեսվեն: ² Ամբողջական Xray պրոֆիլների խմբի համար հավելվածն ընտրում է պահուստային պրոֆիլ: Աջակցությունը կախված է տեղադրված կառուցվածքից; ստուգեք դրա տարբերակը About-ում:\n\n## TUN կույտ\n\nԿույտը մշակում է TCP և UDP վիրտուալ ինտերֆեյսի ներսում: Ռեժիմների վահանակում Xray և mihomo առաջարկում են gVisor, System, Mixed և MIPS: Յուրաքանչյուր շարժիչ պահպանում է իր նախապատվությունը: System վստահված անձը և առանց սերվերի ռեժիմները չեն օգտագործում այս նախապատվությունը:\n\n- **Mixed** — TCP-ն օգտագործում է համակարգի կույտը, մինչդեռ gVisor-ը մշակում է UDP-ն: Սա mihomo-ի կանխադրված տարբերակն է Linux-ում։ Windows-ում Xray-ն և mihomo-ն լռելյայն օգտագործում են MIPS։\n- **System** — օգտագործում է համակարգի կույտը: Փորձեք մեկ այլ տարբերակ, եթե ցանցային հավելվածները խնդիրներ ունենան:\n- **gVisor** — կարգավորում է երթևեկությունը օգտվողների տարածքում:\n- **MIPS** — mihomo-ի սեփական IP փաթեթը, հասանելի է փաթեթավորված 1.19.32 տարբերակում:\n\nLinux-ում Xray-ն օգտագործում է իր ներկառուցված gVisor լռելյայն: System, Mixed և MIPS Linux-ում օգտագործում են mihomo որպես TUN շարժիչ՝ TCP-ն և UDP-ն փոխանցելով Xray-ին վավերացված տեղական SOCKS հղման միջոցով: Xray-ը պահպանում է արձանագրությունը, մատակարարի պրոֆիլը և երթուղին: Այս երեք տարբերակները պահանջում են տեղադրված mihomo: Windows-ում Xray-ը բոլոր չորս TUN ստեկերի համար օգտագործում է mihomo 1.19.32 կամ ավելի նոր տարբերակ։ Արձանագրություններն ու երթուղավորումը մնում են Xray-ում։ Այս համակցությունում հավելվածների կանոնները աջակցում են միայն ուղիղ միացմանը և արգելափակմանը․ Linux-ում այդ կանոնները պահանջում են Xray-ի ներկառուցված gVisor-ը։\n\nԿամուրջն իրականացնում է երկրորդ գործընթացը: Linux-ի երեք անգործուն չափումների ժամանակ այն օգտագործել է մոտ 32–36 ՄԲ-ով ավելի ֆիզիկական հիշողություն, քան բնիկ Xray TUN-ը: Սա չի չափում ներբեռնման բեռը. պրոցեսորի և հիշողության ծախսերը կախված են միացումներից: sing-box չունի կույտերի ընտրիչ: Ոչ մի կույտ չի երաշխավորում ավելի լավ կատարում յուրաքանչյուր ցանցում: Ընտրեք կույտ և ընտրեք Դիմել և նորից միացեք՝ այն ձեր ցանցում փորձելու համար:\n\n## Կարգավորումների կիրառում\n\nՍերվեր ընտրելը ավտոմատ կերպով նորից միանում է: Ռեժիմը, շարժիչը, DNS-ը և կանոնների կարգավորումները անմիջապես պահվում են. ակտիվ կապի ժամանակ սեղմեք Դիմել և նորից միացեք դրանք օգտագործելու համար: Շարժիչի վերագործարկումը կարող է ընդհատել ներբեռնումները և զանգերը: Կրկնվող սեղմումները չեն սկսում զուգահեռ կապեր; անջատումը ավարտում է անցումը և ազատում կապը:\n\nԻնտերնետը միայն VPN-ի միջոցով արգելափակում է ուղիղ երթևեկությունը, երբ թունելն ընկնում է: Այն ազդում է ամբողջ մեքենայի վրա: Հստակ անջատումը վերացնում է Sora-ի կանոնները: Եթե ​​մաքրումը չի ավարտվում, նորից փորձեք անջատել և բացել գրանցամատյանը:\n\n## Ծրագրի փաստաթղթեր\n\n- [sing-box-lx. կոնֆիգուրացիա և աջակցություն] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box փաստաթղթեր] (https://sing-box.sagernet.org/)\n- [Xray փաստաթղթեր] (https://xtls.github.io/)\n- [mihomo փաստաթղթեր] (https://wiki.metacubex.one/)\n- [zapret. գործողություն և սահմանափակումներ] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Ընտրեք Ավտոմատ, եթե վստահ չեք, թե որ շարժիչն է անհրաժեշտ ձեր սերվերին: Sora-ը ստուգում է պրոֆիլը և կարգավորումները միանալուց առաջ: Շարժիչը չի կարող մեծացնել ձեր պլանի թողունակությունը. կատարումը կախված է սերվերից, երթուղուց, արձանագրությունից և ցանցից:\n\n## ռեժիմներ\n\n### Ամբողջ երթևեկությունը (TUN)\n\nSora-ը ստեղծում է վիրտուալ ցանցային ինտերֆեյս և երթուղավորում է հավելվածների տրաֆիկը դրա միջով, ներառյալ TCP և UDP: Օգտագործեք այս ռեժիմը Telegram, խաղերի և Discord ձայնի համար: Կանոնները կարող են ուղղակիորեն ուղարկել կոնկրետ կայքեր կամ ծրագրեր կամ արգելափակել դրանք: Ցանցային ծառայությանը անհրաժեշտ է թույլտվություն և սերվեր, որն աջակցում է պահանջվող արձանագրությանը:\n\n### System վստահված անձ\n\nSora-ը կարգավորում է տեղական HTTP/SOCKS վստահված անձը: Այն օգտագործում են այն հավելվածները, որոնք հարգում են համակարգի վստահված անձի կարգավորումները: Ծրագրերն իրենց սեփական ցանցային փաթեթով կարող են ուղղակիորեն միանալ. UDP-ին և ձայնային զանգերին ընդհանուր առմամբ անհրաժեշտ է TUN: Այս ռեժիմը համապատասխանում է պրոքսի աջակցությամբ բրաուզերներին և հավելվածներին:\n\n### Սերվեր չկա\n\nLinux-ում Sora-ն օգտագործում է [zapret](https://github.com/bol-van/zapret) HTTP/TLS հարցումները բաժանելու և ձևափոխելու և որոշ DPI ստուգումներ շրջանցելու համար: Ձեր IP-ն մնում է նույնը, և կապերն անմիջապես գնում են դեպի կայք: Արդյունքները կախված են ձեր մատակարարից և արգելափակման եղանակից:\n\nԸնթացիկ ինտեգրումն օգտագործում է tpws HTTP-ի և TLS-ի համար TCP-ի միջոցով: Այն չի շրջանցում IP արգելափակումը կամ փոխանցում UDP-ն և չի կարող երաշխավորել Telegram-ի MTProto կապերը: Օգտագործեք VPN սերվեր TUN-ով Discord ձայնի, Telegram զանգերի և այս տեսակի սահմանափակումների համար:\n\n## Շարժիչներ\n\n### Ավտո\n\nSora-ն ընտրում է տեղադրված շարժիչ, որն աջակցում է կապի ամբողջ պլանին՝ սերվերի արձանագրություններ, փոխադրումներ, խմբեր, մասնատում և ռեժիմ: Անհամատեղելի ձեռքով ընտրությունը մերժվում է մինչ ընթացիկ կապը դադարեցնելը: Ընտրեք Ավտո կամ մեկ այլ շարժիչ և նորից կիրառեք կարգավորումները:\n\n### sing-box\n\nSora նոր փաթեթները ներառում են [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), մի պատառաքաղ [sing-box] (https://github.com/SagerNet/sing-box), ավելացնելով հաճախորդի կողմից XHTTP և VLESS Encryption: Sora-ը ճանաչում է կառուցվածքը և դրա հնարավորությունները: Առանց XHTTP-ի վերին հոսանքով կառուցված սարքը միայն իր անունից չի ստանում այս հնարավորությունը:\n\nԱջակցվող արձանագրություններն են VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard և AmneziaWG 1.x/2.x-ի այն պարամետրերը, որոնք Sora-ն կարող է ներմուծել։ Ամբողջական Xray JSON պրոֆիլների համար անհրաժեշտ է Xray։ Նոր AWG 3.x դաշտերը դեռ հնարավոր չէ ներմուծել։ sing-box-ն օգտագործում է գաղտնաբառով պաշտպանված տեղային կառավարման պորտ, որը համակարգչի մյուս ծրագրերը կարող են հայտնաբերել։\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) աջակցում է VLESS, REALITY, XHTTP, VLESS Encryption և TLS մասնատումը: Այն նաև գործարկում է ամբողջական մատակարար Xray պրոֆիլները՝ պահպանելով դրանց երթուղին և խմբերը: Նման պրոֆիլները չեն կարող ավտոմատ կերպով փոխակերպվել մեկ այլ շարժիչի՝ առանց դրանց վարքագիծը փոխելու:\n\nՄիավորված Xray-ը հեռացրեց TLS վկայագրի ստուգումն անջատող կարգավորումը («allowInsecure»): Այս պարամետրը պահանջող սովորական սերվերների համար ավտոմատ ընտրում է sing-box կամ mihomo: Xray ընտրելը ձեռքով հայտնում է անհամատեղելիության մասին՝ մինչ ընթացիկ կապը դադարեցնելը: Ավելի հին ամբողջական JSON պրոֆիլներին անհրաժեշտ է թարմացված մատակարարի պրոֆիլ՝ ստուգելի վկայականով կամ վկայագրի փինով:\n\n### mihomo\n\n[mihomo] (https://github.com/MetaCubeX/mihomo) աջակցում է պատվիրված հետադարձ և բեռը հավասարակշռող խմբեր, XHTTP և AmneziaWG: Ընտրեք այն, երբ պահուստային սերվերի ավտոմատ ձախողումը կարևոր է: Sora-ի TLS մասնատման կարգավորումն անհասանելի է այս շարժիչով:\n\n## Համատեղելիություն Sora-ում\n\n| Առանձնահատկություն | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN և TCP/UDP | Այո | Այո | Այո |\n| XHTTP | Այո | Այո | Այո |\n| VLESS Encryption | Այո | Այո | Այո |\n| Ամբողջական Xray պրոֆիլը | Ոչ | Այո | Ոչ |\n| TUIC / AnyTLS | Երկուսն էլ | Ոչ | TUIC |\n| TLS մասնատում | Այո | Այո | Ոչ |\n| AmneziaWG 1.x/2.x | Այո¹ | Ոչ | Այո |\n| Պատվիրված հետադարձ խումբ | Ոչ | No² | Այո |\n\n¹ J1/J2/J3/Itime-ով պրոֆիլներն օգտագործում են mihomo; այս դաշտերը երբեք չպետք է լուռ անտեսվեն: ² Ամբողջական Xray պրոֆիլների խմբի համար հավելվածն ընտրում է պահուստային պրոֆիլ: Աջակցությունը կախված է տեղադրված կառուցվածքից; ստուգեք դրա տարբերակը About-ում:\n\n## TUN կույտ\n\nԿույտը մշակում է TCP և UDP վիրտուալ ինտերֆեյսի ներսում: Ռեժիմների վահանակում Xray և mihomo առաջարկում են gVisor, System, Mixed և MIPS: Յուրաքանչյուր շարժիչ պահպանում է իր նախապատվությունը: System վստահված անձը և առանց սերվերի ռեժիմները չեն օգտագործում այս նախապատվությունը:\n\n- **Mixed**: TCP-ն օգտագործում է համակարգի կույտը, մինչդեռ gVisor-ը մշակում է UDP-ն: Սա mihomo-ի կանխադրված տարբերակն է Linux-ում։ Windows-ում Xray-ն և mihomo-ն լռելյայն օգտագործում են MIPS։\n- **System**: օգտագործում է համակարգի կույտը: Փորձեք մեկ այլ տարբերակ, եթե ցանցային հավելվածները խնդիրներ ունենան:\n- **gVisor**: կարգավորում է երթևեկությունը օգտվողների տարածքում:\n- **MIPS**: mihomo-ի սեփական IP փաթեթը, հասանելի է փաթեթավորված 1.19.32 տարբերակում:\n\nLinux-ում Xray-ն օգտագործում է իր ներկառուցված gVisor լռելյայն: System, Mixed և MIPS Linux-ում օգտագործում են mihomo որպես TUN շարժիչ՝ TCP-ն և UDP-ն փոխանցելով Xray-ին վավերացված տեղական SOCKS հղման միջոցով: Xray-ը պահպանում է արձանագրությունը, մատակարարի պրոֆիլը և երթուղին: Այս երեք տարբերակները պահանջում են տեղադրված mihomo: Windows-ում Xray-ը բոլոր չորս TUN ստեկերի համար օգտագործում է mihomo 1.19.32 կամ ավելի նոր տարբերակ։ Արձանագրություններն ու երթուղավորումը մնում են Xray-ում։ Այս համակցությունում հավելվածների կանոնները աջակցում են միայն ուղիղ միացմանը և արգելափակմանը․ Linux-ում այդ կանոնները պահանջում են Xray-ի ներկառուցված gVisor-ը։\n\nԿամուրջն իրականացնում է երկրորդ գործընթացը: Linux-ի երեք անգործուն չափումների ժամանակ այն օգտագործել է մոտ 32–36 ՄԲ-ով ավելի ֆիզիկական հիշողություն, քան բնիկ Xray TUN-ը: Սա չի չափում ներբեռնման բեռը. պրոցեսորի և հիշողության ծախսերը կախված են միացումներից: sing-box չունի կույտերի ընտրիչ: Ոչ մի կույտ չի երաշխավորում ավելի լավ կատարում յուրաքանչյուր ցանցում: Ընտրեք կույտ և ընտրեք Դիմել և նորից միացեք՝ այն ձեր ցանցում փորձելու համար:\n\n## Կարգավորումների կիրառում\n\nՍերվեր ընտրելը ավտոմատ կերպով նորից միանում է: Ռեժիմը, շարժիչը, DNS-ը և կանոնների կարգավորումները անմիջապես պահվում են. ակտիվ կապի ժամանակ սեղմեք Դիմել և նորից միացեք դրանք օգտագործելու համար: Շարժիչի վերագործարկումը կարող է ընդհատել ներբեռնումները և զանգերը: Կրկնվող սեղմումները չեն սկսում զուգահեռ կապեր; անջատումը ավարտում է անցումը և ազատում կապը:\n\nԻնտերնետը միայն VPN-ի միջոցով արգելափակում է ուղիղ երթևեկությունը, երբ թունելն ընկնում է: Այն ազդում է ամբողջ մեքենայի վրա: Հստակ անջատումը վերացնում է Sora-ի կանոնները: Եթե ​​մաքրումը չի ավարտվում, նորից փորձեք անջատել և բացել գրանցամատյանը:\n\n## Ծրագրի փաստաթղթեր\n\n- [sing-box-lx. կոնֆիգուրացիա և աջակցություն] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box փաստաթղթեր] (https://sing-box.sagernet.org/)\n- [Xray փաստաթղթեր] (https://xtls.github.io/)\n- [mihomo փաստաթղթեր] (https://wiki.metacubex.one/)\n- [zapret. գործողություն և սահմանափակումներ] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'Ստուգեք սերվերները';
@@ -901,7 +891,438 @@ class SHy extends S {
   String get extensions => 'Ընդլայնումներ';
 
   @override
-  String get extensionsSoon => 'Շուտով';
+  String extRatingLabel(String rating) {
+    return 'Վարկանիշ $rating 5-ից';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return '$author-ի կողմից';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'Տեղադրումներ՝ $count';
+  }
+
+  @override
+  String get extInstallOne => '1 տեղադրում';
+
+  @override
+  String get extBadgeVerified => 'Ստուգված';
+
+  @override
+  String get extBadgeTop => 'Ամենատարածվածն այս շաբաթ';
+
+  @override
+  String get extBadgeNew => 'Նոր';
+
+  @override
+  String get extBadgeStaff => 'Sora թիմ';
+
+  @override
+  String get extSideloadShort => 'Ոչ կատալոգից';
+
+  @override
+  String get extSideloadWarning =>
+      'Այս ընդլայնումը թիմի կատալոգից չէ: Միայն հեղինակն է երաշխավորել իր բանալին. տեղադրել այն միայն եթե վստահում եք հեղինակին:';
+
+  @override
+  String extInstallTitle(String name) {
+    return 'Տեղադրել «$name»';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return 'Թարմացնել «$name»';
+  }
+
+  @override
+  String get extPermissionsIntro => 'Այս ընդլայնումը կկարողանա՝';
+
+  @override
+  String get extPermissionsWidened => 'Թարմացումը պահանջում է նոր թույլտվություններ.';
+
+  @override
+  String get extDangerousAck => 'Ես հասկանում եմ, որ այս թույլտվությունները լուրջ են';
+
+  @override
+  String get extInstall => 'Տեղադրել';
+
+  @override
+  String get extUpdate => 'Թարմացնել';
+
+  @override
+  String get extCancel => 'Չեղարկել';
+
+  @override
+  String get extConfirm => 'Հաստատել';
+
+  @override
+  String get extOk => 'OK';
+
+  @override
+  String get extCatalog => 'Կատալոգ';
+
+  @override
+  String get extInstalled => 'Տեղադրված ընդլայնումներ';
+
+  @override
+  String get extSearchHint => 'Որոնել ընդլայնումներ';
+
+  @override
+  String get extCatAll => 'Բոլոր';
+
+  @override
+  String get extCatTools => 'Գործիքներ';
+
+  @override
+  String get extCatThemes => 'Թեմաներ';
+
+  @override
+  String get extCatAutomation => 'Ավտոմատացում';
+
+  @override
+  String get extCatStats => 'Վիճակագրություն';
+
+  @override
+  String get extCatNetwork => 'Ցանց';
+
+  @override
+  String get extSortBy => 'Դասավորել ըստ';
+
+  @override
+  String get extSortPopular => 'Ամենատարածված';
+
+  @override
+  String get extSortRating => 'Ամենաբարձր վարկանիշը';
+
+  @override
+  String get extSortName => 'Անուն';
+
+  @override
+  String get extCatalogError => 'Չհաջողվեց բեռնել կատալոգը';
+
+  @override
+  String get extRetry => 'Կրկին փորձեք';
+
+  @override
+  String get extEmptySearch => 'Ոչինչ չի գտնվել';
+
+  @override
+  String get extEmptyInstalled => 'Դեռևս տեղադրված ընդլայնումներ չկան:\nԳտեք մեկը կատալոգում կամ տեղադրեք ֆայլից:';
+
+  @override
+  String get extInstallFromFile => 'Տեղադրել ֆայլից';
+
+  @override
+  String get extInstallFromUrl => 'Տեղադրել URL-ից';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'Ներբեռնեք';
+
+  @override
+  String get extDownloading => 'Ներբեռնվում է…';
+
+  @override
+  String get extVerifying => 'Ստուգվում է…';
+
+  @override
+  String get extInstalling => 'Տեղադրվում է…';
+
+  @override
+  String get extInstallFailed => 'Չհաջողվեց տեղադրել';
+
+  @override
+  String get extErrSignature => 'Ստորագրության ստուգումը ձախողվեց։ Ֆայլը կարող է վնասվել կամ կեղծվել:';
+
+  @override
+  String get extErrManifest => 'Ընդլայնման մանիֆեստն անվավեր է:';
+
+  @override
+  String get extErrNetwork => 'Ցանցի սխալ. Ստուգեք ձեր կապը և նորից փորձեք:';
+
+  @override
+  String get extErrHash => 'Ներբեռնումը չի համապատասխանում կատալոգին։ Հնարավոր է, որ այն կեղծվել է:';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'Այս ընդլայնման համար անհրաժեշտ է հավելվածի $version կամ ավելի նոր տարբերակը:';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'Միայն https:// հղումներ են թույլատրվում';
+
+  @override
+  String get extErrGeneric => 'Սխալ առաջացավ: Խնդրում ենք կրկին փորձել:';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'Այս թարմացումը ստորագրված է այլ հեղինակային բանալիով, քան տեղադրված տարբերակը, ուստի այն արգելափակված է: Եթե ​​վստահում եք նոր բանալին, ապատեղադրեք ընդլայնումը և նորից տեղադրեք այն հստակորեն:';
+
+  @override
+  String get extUpdateAvailable => 'Թարմացումը հասանելի է';
+
+  @override
+  String get extDisabled => 'Անջատված է';
+
+  @override
+  String extToggleEnabled(String name) {
+    return 'Միացնել $name';
+  }
+
+  @override
+  String get extSearchInstalled => 'Որոնել տեղադրված ընդլայնումները';
+
+  @override
+  String get extUpdateAll => 'Թարմացրեք բոլորը';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return '$count թարմացումները հասանելի են';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return '$count թարմացվել է';
+  }
+
+  @override
+  String get extRiskNormal => 'Նորմալ';
+
+  @override
+  String get extRiskSensitive => 'Զգայուն';
+
+  @override
+  String get extRiskDangerous => 'Բարձր ռիսկ';
+
+  @override
+  String get extPermissionsRemoved => 'Այլևս չի պահանջվում.';
+
+  @override
+  String get extUpdateFailedKept => 'Նախորդ տարբերակը դեռ տեղադրված է։';
+
+  @override
+  String get extConflictsTitle => 'Ընդլայնման կոնֆլիկտներ';
+
+  @override
+  String get extConflictsIntro =>
+      'Այս ընդլայնումները նույն բանն են ուզում։ Ընտրեք, թե որը կաշխատի, մյուսը կմնա տեղադրված։';
+
+  @override
+  String get extConflictTheme => 'Հավելվածի թեմա';
+
+  @override
+  String get extConflictNetHooks => 'Ցանցային կեռիկներ';
+
+  @override
+  String extConflictWinner(String name) {
+    return 'Առաջնահերթություն՝ $name';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return '$count կոնֆլիկտները ձեր որոշման կարիքն ունեն';
+  }
+
+  @override
+  String get extConflictsResolve => 'Լուծել հակամարտությունները';
+
+  @override
+  String get extConflictNote =>
+      'Ձեր ընտրությունը պահվում է այս սարքում։ Թեման փոխվում է անմիջապես, իսկ ցանցային hook-երը այս տարբերակում չեն աշխատում։';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'Տարբերակ $version';
+  }
+
+  @override
+  String get extAuthor => 'Հեղինակ';
+
+  @override
+  String get extRating => 'Վարկանիշ';
+
+  @override
+  String get extInstalls => 'Տեղադրումներ';
+
+  @override
+  String get extVersion => 'Տարբերակ';
+
+  @override
+  String get extAbout => 'Այս ընդլայնման մասին';
+
+  @override
+  String get extPermissionsTitle => 'Թույլտվություններ';
+
+  @override
+  String get extNoPermissions => 'Հատուկ թույլտվություններ չկան:';
+
+  @override
+  String get extSettings => 'Կարգավորումներ';
+
+  @override
+  String get extSaveSettings => 'Պահպանել կարգավորումները';
+
+  @override
+  String get extSaving => 'Պահվում է…';
+
+  @override
+  String extUpdateTo(String version) {
+    return 'Թարմացրեք $version';
+  }
+
+  @override
+  String get extEnabled => 'Միացված է';
+
+  @override
+  String extRollbackTo(String version) {
+    return 'Վերադարձ դեպի $version';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return 'Վերադառնալ $version տարբերակին:';
+  }
+
+  @override
+  String get extUninstall => 'Տեղահանել';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return 'Հեռացնե՞լ «$name»-ն ու դրա կարգավորումները:';
+  }
+
+  @override
+  String get extPanelUnavailable => 'Վահանակն անհասանելի է։ Ընդլայնումը կարող է անջատված լինել կամ հեռացվել:';
+
+  @override
+  String get extPermConnectionsRead => 'Տես ակտիվ կապերի ցանկը';
+
+  @override
+  String get extPermServersRead => 'Տեսեք ձեր սերվերների ցանկը';
+
+  @override
+  String get extPermSettingsRead => 'Կարդացեք հավելվածի կարգավորումները';
+
+  @override
+  String get extPermSettingsWrite => 'Փոխեք հավելվածի կարգավորումները';
+
+  @override
+  String get extPermNotifications => 'Ցույց տալ ծանուցումները';
+
+  @override
+  String get extPermTray => 'Ավելացնել տարրեր սկուտեղի ընտրացանկում';
+
+  @override
+  String get extPermUiPanel => 'Ցուցադրել վահանակները հավելվածի ներսում';
+
+  @override
+  String get extPermThemeApply => 'Կիրառել թեմաներ';
+
+  @override
+  String get extPermRoutingRules => 'Ավելացնել երթուղային կանոններ (ազդում է ցանցի երթևեկության վրա)';
+
+  @override
+  String get extPermNetHooks => 'Ինտեգրվել ցանցի ուղու մեջ (DPI շրջանցող մոդուլներ)';
+
+  @override
+  String get extPermNetFetch => 'Խնդրեք URL-ը թույլատրված ցանկից';
+
+  @override
+  String get extPermBackground => 'Գործարկել ֆոնային առաջադրանքները';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'Աշխատում է պլանավորված առաջադրանքները նույնիսկ երբ վահանակը փակ է: Դուք կարող եք դադարեցնել այն կամ փոխել, թե որքան հաճախ է այն աշխատում ընդլայնման կարգավորումներում:';
+
+  @override
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+
+  @override
+  String get extCapBackground => 'Աշխատում է հետին պլանում';
+
+  @override
+  String get extCapNetHook => 'Շրջանցումներ և ցանցային միջամտություններ';
+
+  @override
+  String get extCapPanel => 'Ինտերֆեյսի վահանակներ';
+
+  @override
+  String get extCapRouting => 'Երթուղային կանոններ';
+
+  @override
+  String get extCapTheme => 'Թեմաներ';
+
+  @override
+  String get extCapWidget => 'Վիջեթներ';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Cached catalog, $date';
+  }
+
+  @override
+  String get extChangelog => 'Փոփոխություններ';
+
+  @override
+  String get extImageFailed => 'Չհաջողվեց բեռնել պատկերը';
+
+  @override
+  String get extRatingHow => 'Ինչպես են աշխատում վարկանիշները';
+
+  @override
+  String get extRatingHowBody =>
+      'Վարկանիշներն օգտագործում են Բայեսյան միջինը. քիչ վարկանիշ ունեցող ընդլայնումը մնում է միջինին մոտ, մինչև ավելի շատ մարդիկ քվեարկեն, ուստի 5 աստղանի մեկ վերանայումը չի կարող նոր ընդլայնում առաջ մղել վերև: Վերջին գնահատականներն ավելի շատ են, քան հինները, և յուրաքանչյուր հաշվի համար միայն մեկ վարկանիշ է հաշվում:';
+
+  @override
+  String get extScreenshots => 'Սքրինշոթներ';
+
+  @override
+  String get extSortRelevance => 'Համապատասխանություն';
+
+  @override
+  String get extPermNetworkDetail =>
+      'Բեռնում է տվյալներ ինտերնետից VPN-ի միջոցով։ Թույլատրված են միայն ստորև նշված հոսթերը, մնացածն արգելափակված է։';
+
+  @override
+  String get extBgTitle => 'Ֆոնային առաջադրանք';
+
+  @override
+  String get extBgEnabled => 'Գործարկել հետին պլանում';
+
+  @override
+  String get extBgInterval => 'Գործարկման պարբերականություն';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# րոպե', one: '# րոպե');
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ժամ', one: '# ժամ');
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote =>
+      'Առաջադրանքը գործարկվում է ժամանակացույցով, քանի դեռ Sora-ն բաց է, այդ թվում՝ սկուտեղում։ Նվազագույն միջակայքը 15 րոպե է։';
+
+  @override
+  String get extBgDisabledNote => 'Միացրեք ընդլայնումը իր ֆոնային առաջադրանքը կառավարելու համար:';
+
+  @override
+  String get extCapNetwork => 'Ցանցի հասանելիություն';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'Ցանց՝ $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -910,6 +1331,667 @@ class SHy extends S {
 
   @override
   String get diagnosticHttp => 'HTTP ախտորոշում';
+
+  @override
+  String get diagnosticNoData => 'Դեռևս գրանցված հարցումներ չկան: Սկզբում բացեք արագության թեստավորման կայք:';
+
+  @override
+  String get qrShareTitle => 'Համօգտագործեք QR կոդը';
+
+  @override
+  String get qrScanTitle => 'Սկան QR կոդը';
+
+  @override
+  String get qrCopyLink => 'Պատճենել հղումը';
+
+  @override
+  String get qrShowLink => 'Ցույց տալ հղումը';
+
+  @override
+  String get qrHideLink => 'Թաքցնել հղումը';
+
+  @override
+  String get qrWarning => 'Այս QR կոդը պարունակում է կապի մանրամասներ: Մի ցուցադրեք այն անծանոթներին:';
+
+  @override
+  String get qrScanHint => 'Ընտրեք QR կոդով էկրանի պատկեր կամ լուսանկար, կամ տեղադրեք հղում';
+
+  @override
+  String get qrFromClipboard => 'Կպցնել սեղմատախտակից';
+
+  @override
+  String get qrNoCode => 'Այս պատկերում QR կոդ չի գտնվել։';
+
+  @override
+  String get qrInvalid => 'Այս QR կոդը վավեր հղում չի պարունակում:';
+
+  @override
+  String get qrScan => 'Սկան QR';
+
+  @override
+  String get qrFromImage => 'Բացել պատկերը';
+
+  @override
+  String get connGroupByProcess => 'Խմբավորում ըստ գործընթացի';
+
+  @override
+  String get connListView => 'Ցուցակ';
+
+  @override
+  String get connCopyHost => 'Պատճենել հաղորդավարը';
+
+  @override
+  String get connAddRule => 'Ավելացնել կանոն';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# կապ', one: '# կապ');
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'Նախադրված';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'Սեփական';
+
+  @override
+  String get dnsCheck => 'Ստուգեք տվյալների արտահոսքի համար';
+
+  @override
+  String get dnsChecking => 'Ստուգում...';
+
+  @override
+  String get dnsNoLeak => 'Արտահոսքեր չեն հայտնաբերվել';
+
+  @override
+  String get dnsLeakFound => 'Հայտնաբերվել է արտահոսք';
+
+  @override
+  String get dnsLastCheck => 'Վերջին ստուգումը';
+
+  @override
+  String get dnsNeverChecked => 'Դեռ փորձարկված չէ';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'Թունելի DNS լուծիչներ';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'Համակարգային անվան լուծիչներ';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'DNS-ի պաշտպանություն ցանցի արգելափակմամբ';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Կազմաձևեք DNS թունելի համար վերը նշված DNS կարգավորումներում:';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Ստուգեք, թե որ լուծիչները կօգտագործի ձեր համակարգը թունելից դուրս:';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Միացրեք ցանցի արգելափակումը, որպեսզի DNS տրաֆիկը մնա թունելի ներսում։';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'Համակարգի գաղտնագրված DNS';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'Կեղծված DNS պատասխաններ';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Ստուգեք, թե որ կոդավորված DNS վերջնակետերն է օգտագործում ձեր համակարգը թունելից դուրս:';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Թունելի համար օգտագործեք գաղտնագրված DNS (DoT կամ DoH), որպեսզի անվան լուծիչները չկարողանան կեղծել պատասխանները։';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Նախ միացեք VPN-ին, ապա ստուգեք արտահոսքի համար:';
+
+  @override
+  String get dnsExpected => 'Ակնկալվում էր';
+
+  @override
+  String get dnsActual => 'Դիտարկված';
+
+  @override
+  String get sortBy => 'Դասավորել ըստ';
+
+  @override
+  String get sortPing => 'Ping';
+
+  @override
+  String get sortSpeed => 'Արագություն';
+
+  @override
+  String get sortName => 'Անուն';
+
+  @override
+  String get measureSpeed => 'Չափել արագությունը';
+
+  @override
+  String get benchmarkStale => 'հնացած';
+
+  @override
+  String get autoSelectMode => 'Ավտո-ընտրության սերվեր';
+
+  @override
+  String get autoSelectPing => 'Ամենաարագ պինգ';
+
+  @override
+  String get autoSelectSpeed => 'Ամենաարագ արագությունը';
+
+  @override
+  String get autoSelectSmart => 'Խելացի ընտրություն';
+
+  @override
+  String get coreWatchUnstable => 'Կապը Sora միջուկին անկայուն է';
+
+  @override
+  String get watchReconnect => 'Նորից միացեք';
+
+  @override
+  String get coreRestoringLink => 'Կապը վերականգնվում է Sora միջուկին…';
+
+  @override
+  String get crashRestoreTitle => 'Վերջին նիստն ընդհատվեց';
+
+  @override
+  String get restoreOnCrash => 'Վերականգնել նիստը վթարից հետո';
+
+  @override
+  String get crashRestore => 'Վերականգնել';
+
+  @override
+  String get crashDismiss => 'Ոչ հիմա';
+
+  @override
+  String get overrideTitle => 'Իմ խմբագրումները';
+
+  @override
+  String get overrideEdit => 'Խմբագրել սերվերները';
+
+  @override
+  String get overrideHide => 'Թաքցնել';
+
+  @override
+  String get overrideUnhide => 'Ցուցադրել';
+
+  @override
+  String get overrideClear => 'Վերականգնել խմբագրումները';
+
+  @override
+  String get overrideEmpty => 'Դեռ ոչ մի խմբագրում';
+
+  @override
+  String get overrideCustomRules => 'Սեփական կանոններ';
+
+  @override
+  String get errBenchmarkUnsupported => 'Արագության չափման համար անհրաժեշտ է ավելի նոր միջուկ';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return '$done-ի չափում $total-ից…';
+  }
+
+  @override
+  String get profiles => 'Ցանցային պրոֆիլներ';
+
+  @override
+  String get profilesEmpty =>
+      'Դեռևս պրոֆիլներ չկան։ Ստեղծեք մեկը՝ հայտնի ցանցերում ավտոմատ կերպով կարգավորումներ կիրառելու համար:';
+
+  @override
+  String get profileAdd => 'Ավելացնել պրոֆիլ';
+
+  @override
+  String get profileName => 'Պրոֆիլի անուն';
+
+  @override
+  String get profileSsids => 'Wi-Fi ցանցեր (SSID)';
+
+  @override
+  String get profileSsidsHint => 'Տուն, գրասենյակ՝ բաժանված ստորակետերով';
+
+  @override
+  String get profileGateways => 'Ցանցային դարպասներ';
+
+  @override
+  String get profileAsns => 'AS համարներ';
+
+  @override
+  String get profileAutoApply => 'Ինքնաբերաբար կիրառել';
+
+  @override
+  String get profileAutoApplyHint => 'Եթե անջատված է, պրոֆիլը կիրառելուց առաջ հաստատում կպահանջվի։';
+
+  @override
+  String get profileSnapshot => 'Հիշեք ընթացիկ կարգավորումները';
+
+  @override
+  String get profileSnapshotDone => 'Ընթացիկ կարգավորումները պահված են պրոֆիլում';
+
+  @override
+  String get profileDelete => 'Ջնջել պրոֆիլը';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return 'Ջնջե՞լ «$name» պրոֆիլը:';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return 'Կիրառե՞լ «$name» պրոֆիլը:';
+  }
+
+  @override
+  String get profileApply => 'Կիրառել';
+
+  @override
+  String profileApplied(Object name) {
+    return '«$name» պրոֆիլը կիրառվեց';
+  }
+
+  @override
+  String get profileUndo => 'Չեղարկել';
+
+  @override
+  String get profileActive => 'Ակտիվ';
+
+  @override
+  String networkNow(Object info) {
+    return 'Այժմ՝ $info';
+  }
+
+  @override
+  String get networkUnknown => 'Ցանցի մասին տեղեկությունները անհասանելի են';
+
+  @override
+  String get profileNoTriggers => 'Ավելացրեք առնվազն մեկ ձգան՝ SSID, gateway կամ ASN';
+
+  @override
+  String get chains => 'Պրոքսի շղթաներ';
+
+  @override
+  String get chainsEmpty =>
+      'Շղթաներ դեռ չկան։ Կապեք 2–3 սերվեր, որպեսզի երթևեկությունը անցնի դրանցից յուրաքանչյուրի միջով:';
+
+  @override
+  String get chainAdd => 'Նոր շղթա';
+
+  @override
+  String get chainName => 'Շղթայի անվանումը';
+
+  @override
+  String get chainPickServers => 'Ընտրեք 2–3 սերվեր';
+
+  @override
+  String get chainOrderHint => 'Քաշեք՝ վերադասավորելու համար. երթևեկությունը մտնում է վերևից և դուրս գալիս ներքևից:';
+
+  @override
+  String get chainTooFew => 'Ընտրեք առնվազն 2 սերվեր';
+
+  @override
+  String get chainTooMany => 'Շղթան պահում է առավելագույնը 3 սերվեր';
+
+  @override
+  String get chainEstimate => 'Մոտավոր ուշացում';
+
+  @override
+  String get chainSave => 'Պահպանել շղթան';
+
+  @override
+  String get chainDelete => 'Ջնջել շղթան';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return 'Ջնջե՞լ «$name» շղթան:';
+  }
+
+  @override
+  String get chainUnsupported => 'Ներկայիս շարժիչը չի կարող շղթաներ կառուցել';
+
+  @override
+  String get chainHopMissing => 'Շղթայական սերվերներից մեկն այլևս հասանելի չէ';
+
+  @override
+  String chainHop(Object n) {
+    return 'Անցում $n';
+  }
+
+  @override
+  String get chainEntry => 'Մուտք';
+
+  @override
+  String get chainExit => 'Ելք';
+
+  @override
+  String get sync => 'Սարքի համաժամացում';
+
+  @override
+  String get syncDevices => 'Իմ սարքերը';
+
+  @override
+  String get syncEmpty => 'Զուգակցված սարքեր չկան: Զուգակցել մեկ այլ սարք տեղական ցանցի միջոցով:';
+
+  @override
+  String get syncPair => 'Զուգավորել սարքը';
+
+  @override
+  String get syncShowCode => 'Ցույց տալ իմ կոդը';
+
+  @override
+  String get syncScanCode => 'Սկանավորել կոդը';
+
+  @override
+  String get syncRevoke => 'հանել';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return 'Չեղարկե՞լ «$name»-ը:';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'Վերջին համաժամացումը՝ $time';
+  }
+
+  @override
+  String get syncNever => 'Երբեք';
+
+  @override
+  String get syncNoLan => 'Սարքերը պետք է լինեն նույն տեղական ցանցում';
+
+  @override
+  String get syncPaired => 'Սարքը զուգակցված է';
+
+  @override
+  String get syncPairingTitle => 'Զուգակցել այս սարքի հետ';
+
+  @override
+  String get syncWaiting => 'Սպասում է մյուս սարքին…';
+
+  @override
+  String get syncSecureNote => 'End-to-end ծածկագրված ալիք: Ոչ հաշիվներ, ոչ ամպային սերվերներ:';
+
+  @override
+  String get zapretWithVpn => 'Շրջանցեք DPI զտումը ուղիղ ցանցային տրաֆիկի համար';
+
+  @override
+  String get zapretWithVpnHint =>
+      'Գործարկում է zapret-ը VPN թունելի հետ միասին․ թունելի տրաֆիկն անցնում է VPN-ով, իսկ ուղիղ տրաֆիկը՝ շրջանցման միջոցով։';
+
+  @override
+  String get chainDuplicate => 'Յուրաքանչյուր սերվեր կարող է հայտնվել միայն մեկ անգամ';
+
+  @override
+  String get edit => 'Խմբագրել';
+
+  @override
+  String get remove => 'Հեռացնել';
+
+  @override
+  String get autoSwitchOnDegrade => 'Ավտոմատ անջատում դեգրադացիայի վրա';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'Եթե ընտրված սերվերը զգալիորեն դանդաղում է կամ դադարում է պատասխանել, Sora-ն անցնում է չափումների արդյունքով լավագույն սերվերին, բայց ոչ ավելի հաճախ, քան 10 րոպեն մեկ։';
+
+  @override
+  String get tunStackMixed => 'Խառը';
+
+  @override
+  String get tunStackSystem => 'Համակարգ';
+
+  @override
+  String get customServerAdd => 'Ավելացնել հատուկ սերվեր';
+
+  @override
+  String get customServers => 'Իմ սերվերները';
+
+  @override
+  String get customServerName => 'Անուն';
+
+  @override
+  String get customServerNameHint => 'Օրինակ՝ իմ VPS-ը';
+
+  @override
+  String get customServerNameRequired => 'Մուտքագրեք անունը';
+
+  @override
+  String get customServerAddress => 'Հասցե';
+
+  @override
+  String get customServerAddressHint => 'example.com կամ 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'Մուտքագրեք սերվերի հասցեն';
+
+  @override
+  String get customServerAddressInvalid => 'Անվավեր հասցե';
+
+  @override
+  String get customServerPort => 'Պորտ';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'Նավահանգիստը պետք է լինի 1-ից մինչև 65535 համար';
+
+  @override
+  String get customServerProtocol => 'Արձանագրություն';
+
+  @override
+  String get customServerCredentials => 'Մուտքի տվյալներ';
+
+  @override
+  String get customServerOptional => 'Ըստ ցանկության';
+
+  @override
+  String get customServerShowSecret => 'Ցույց տալ գաղտնիքը';
+
+  @override
+  String get customServerHideSecret => 'Թաքցնել գաղտնիքը';
+
+  @override
+  String get customServerBadge => 'սեփական';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'Ջնջե՞լ «$name» սերվերը:';
+  }
+
+  @override
+  String get customServerEmptyHint => 'Ձեռքով ավելացրեք սերվեր՝ հասցե, նավահանգիստ և արձանագրություն';
+
+  @override
+  String get customServerTest => 'Թեստ';
+
+  @override
+  String get leakTestTitle => 'Տվյալների արտահոսքի ստուգում';
+
+  @override
+  String get leakTestIntro =>
+      'Ստուգում է՝ արդյոք տրաֆիկը կարող է սարքից դուրս գալ թունելից դուրս ուղով․ ուղիղ DNS և ICMP հարցումներ, IPv6 ելք և համակարգային անվան լուծիչներ։ Գործարկեք ակտիվ կապի ժամանակ։';
+
+  @override
+  String get leakTestRun => 'Ստուգեք';
+
+  @override
+  String get leakTestCancel => 'Չեղարկել';
+
+  @override
+  String get leakTestNeedsConnection => 'Միացեք VPN-ին՝ տվյալների արտահոսքի ստուգման համար:';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'Կատարված թեստեր՝ $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'Արտահոսքեր չեն հայտնաբերվել';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Հայտնաբերվել է # արտահոսք',
+      one: 'Հայտնաբերվել է # արտահոսք',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
+
+  @override
+  String get leakTestFix => 'Ամրագրել';
+
+  @override
+  String get leakTestFixedNote => 'Ցանցի արգելափակումը միացված է։ Ստուգելու համար կրկին գործարկեք թեստը։';
+
+  @override
+  String get leakTestCheckDirectDns => 'Ուղիղ DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP արձագանք';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'Համակարգային անվան լուծիչներ';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Թունելի միացում';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS թունելի միջով';
+
+  @override
+  String get noticeDegraded => 'Սերվերը դանդաղեց: Sora-ն անցել է չափման ընթացքում հայտնաբերված լավագույն սերվերին:';
+
+  @override
+  String get obfs => 'Տրաֆիկի քողարկում';
+
+  @override
+  String get syncCodeExpired => 'Կոդը սպառվել է';
+
+  @override
+  String get syncDaemonFailed => 'Չհաջողվեց գործարկել համաժամացման ծառայությունը';
+
+  @override
+  String get syncDaemonMissing =>
+      'sora-sync բաղադրիչը չի գտնվել: Սարքի համաժամացումը միացնելու համար նորից տեղադրեք հավելվածը:';
+
+  @override
+  String get syncDaemonStarting => 'Համաժամացման ծառայության գործարկում…';
+
+  @override
+  String get syncErrAuth => 'Համաժամացման ծառայությունը մերժեց մուտքի նշանը: Վերագործարկեք հավելվածը և նորից փորձեք:';
+
+  @override
+  String get syncErrNotFound => 'Սարքն այլևս զուգակցված չէ';
+
+  @override
+  String get syncErrPairingActive => 'Զույգավորման նիստն արդեն բաց է';
+
+  @override
+  String get syncErrUnreachable => 'Մյուս սարքը չպատասխանեց։ Համոզվեք, որ այն նույն ցանցում է և ցուցադրում է իր կոդը:';
+
+  @override
+  String get syncError => 'Համաժամացման սխալ';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'Կոդի ժամկետը կլրանա $duration անց';
+  }
+
+  @override
+  String get syncJoining => 'Սարքի հետ զուգակցում…';
+
+  @override
+  String get syncLegacyCleared =>
+      'Հին սարքերի ցանկը իրականում երբեք չի զուգակցվել, ուստի այն մաքրվել է: Նորից զուգակցեք ձեր սարքերը, այս անգամ իրականում:';
+
+  @override
+  String get syncNewCode => 'Նոր կոդ';
+
+  @override
+  String syncPairedWith(String name) {
+    return 'Զուգտկված է $name-ի հետ';
+  }
+
+  @override
+  String get syncRetry => 'Կրկնել';
+
+  @override
+  String get syncStopShowing => 'Թաքցնել կոդը';
+
+  @override
+  String get syncSyncNow => 'Համաժամացնել հիմա';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Ստացվեց $pulled, ուղարկվեց $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'Համաժամացման արդյունք';
+
+  @override
+  String get syncPulled => 'Ստացվել է';
+
+  @override
+  String get syncPushed => 'Ուղարկված է';
+
+  @override
+  String get syncNoChanges => 'Փոփոխություններ չեն հայտնաբերվել';
+
+  @override
+  String get syncDocKindSubscriptions => 'Բաժանորդագրություններ';
+
+  @override
+  String get syncDocKindSettings => 'Հավելվածի կարգավորումներ';
+
+  @override
+  String get syncDocKindOverrides => 'Բաժանորդագրությունների վերասահմանումներ';
+
+  @override
+  String get syncDocKindProfiles => 'Ցանցային պրոֆիլներ';
+
+  @override
+  String get syncDocKindChains => 'Պրոքսի շղթաներ';
+
+  @override
+  String syncFrom(String name) {
+    return '$name-ից';
+  }
+
+  @override
+  String get syncThisDevice => 'Այս սարքը';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Shadowsocks-ի համար՝ մեթոդ:գաղտնաբառ, օրինակ chacha20-ietf-poly1305:password';
 
   @override
   String get diagnosticPackets => 'Փաթեթի գրավում';
@@ -921,11 +2003,60 @@ class SHy extends S {
   String get diagnosticCapture => 'Լուսանկարեք 10 վայրկյան';
 
   @override
-  String get diagnosticNoData => 'Դեռևս գրանցված հարցումներ չկան: Սկզբում բացեք արագության թեստավորման կայք:';
-
-  @override
   String get diagnosticRequiresTun => 'Փաթեթների գրավման համար անհրաժեշտ է ակտիվ Sora TUN կապ:';
 
   @override
   String get diagnosticUnavailable => 'Այս ախտորոշումն անհասանելի է այս հարթակում:';
+
+  @override
+  String get extErrRevoked => 'Sora թիմը հետ է կանչել ընդլայնման այս տարբերակը, քանի որ այն անվտանգ չէ կամ անսարք է։';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Հետ կանչված ընդլայնումների ցանկը չհաջողվեց թարմացնել։ Մինչ թարմացումը տեղադրումն արգելափակված է. ստուգեք ցանցը և կրկին փորձեք։';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Հետ կանչված ընդլայնումներն անջատվեցին՝ $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'Գաղտնի բանալի';
+
+  @override
+  String get customServerWgAddresses => 'Ինտերֆեյսի հասցեներ';
+
+  @override
+  String get customServerWgPeerKey => 'Սերվերի հանրային բանալի';
+
+  @override
+  String get customServerWgPresharedKey => 'Ընդհանուր բանալի';
+
+  @override
+  String get customServerWgAllowedIps => 'Թույլատրված IP-ներ';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, վայրկյան';
+
+  @override
+  String get customServerWgKeyInvalid => 'Բանալին պետք է լինի 32 բայթ base64-ով, ինչպես տպում է wg genkey-ը։';
+
+  @override
+  String get customServerWgCidrInvalid => 'Մուտքագրեք ստորակետով բաժանված նախածանցներ, օրինակ 10.0.0.2/32։';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Մուտքագրեք վայրկյանների թիվ 0-ից 65535։';
+
+  @override
+  String get strictKillSwitch => 'Ցանցի խիստ արգելափակում';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Միանալուց հետո արգելափակում է VPN-ից դուրս երթևեկությունը նույնիսկ խափանումից, վերագործարկումից կամ հավելվածից դուրս գալուց հետո։ Մուտքը վերականգնվում է միայն կապն անջատելիս կամ այս կարգավորումն անջատելիս։ Սարքը վերագործարկելիս արգելափակումը վերսկսվում է միայն մեկնարկին միանալու միացված տարբերակի դեպքում։';
+
+  @override
+  String get extWorkerFailed => 'Ընդլայնման ֆոնային առաջադրանքը ձախողվեց։ Ստուգեք ընդլայնման մատյանը։';
+
+  @override
+  String get extAssetRejected => 'Ընդլայնման ֆայլը մերժվել է․ անընթեռնելի գույներ կամ անվավեր կանոններ։';
 }

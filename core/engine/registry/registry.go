@@ -340,3 +340,12 @@ func measureThroughController(build func(supervise.Config) (engine.Engine, error
 		return nil
 	}
 }
+
+// BenchmarkEngine uses isolated state and a fresh listener for one temporary
+// measurement. The caller owns home and removes it after closing the engine.
+func (r *Registry) BenchmarkEngine(ctx context.Context, plan *engine.Plan, home string) (engine.Engine, error) {
+	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, tpws: r.tpws}
+	isolated.base.HomeDir = home
+	isolated.base.LocalPort = 0
+	return isolated.Factory()(ctx, plan)
+}

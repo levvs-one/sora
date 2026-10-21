@@ -6,6 +6,7 @@ import 'dart:isolate';
 
 import 'package:app_links/app_links.dart';
 import 'package:dbus/dbus.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:nativeapi/nativeapi.dart' show LaunchAtLogin;
@@ -42,6 +43,15 @@ class Desktop with WindowListener {
 
   final _notifications = FlutterLocalNotificationsPlugin();
   final _links = AppLinks();
+
+  /// Native runner channel carrying links opened while the app runs (Linux).
+  /// The app_links plugin may deliver the same link; [_open] dedups those.
+  static const _deepLinkChannel = MethodChannel('sora.linux/deep_link');
+
+  /// Last link passed to [_open] and when, to collapse duplicate deliveries.
+  String? _lastOpenedLink;
+  DateTime? _lastOpenedAt;
+
   final List<StreamSubscription<Object?>> _watches = [];
 
   tray.TrayIcon? _icon;
@@ -101,6 +111,7 @@ class Desktop with WindowListener {
     _watches
       ..add(sora.notices.listen(_notice))
       ..add(_links.stringLinkStream.listen(_open));
+    if (Platform.isLinux) _deepLinkChannel.setMethodCallHandler(_onDeepLinkCall);
     _changed();
   }
 
@@ -147,7 +158,14 @@ class Desktop with WindowListener {
   /// session.
   Future<void> quit({bool disconnect = true}) async {
     _closing = true;
+    // Quitting is not explicit permission to release a strict block.
+    disconnect = disconnect && !sora.settings.strictKillSwitch && !sora.strictBlocked;
     _dropping = disconnect;
+    // A quit that reaches here is a clean shutdown, not a crash: never offer
+    // to "restore" this run's session on next launch. This covers the paths
+    // disconnect() never sees: quit(disconnect: false) leaving the core
+    // session running, and the offline phase skipping the disconnect.
+    sora.noteCleanShutdown();
     // An off session may still hold the kill switch after failure; disconnect
     // releases it.
     if (disconnect && sora.phase != Phase.offline) await sora.disconnect();
@@ -157,6 +175,9 @@ class Desktop with WindowListener {
     }
     sora.removeListener(_changed);
     await _bus?.close();
+    // Stop the sync daemon this run spawned (SIGTERM, wait, then SIGKILL); a
+    // daemon reused from a previous run is left alone.
+    await sora.syncDaemon.stop();
     _icon?.setVisible(false);
     await windowManager.setPreventClose(false);
     await windowManager.destroy();
@@ -191,11 +212,15 @@ class Desktop with WindowListener {
   Future<void> restartAfterUpdate() async {
     // Wait for this process to release Flutter's shared libraries before loading
     // the newly installed ones. The watcher runs with the desktop user's UID.
+    // Relaunch the same binary that is running, not a hardcoded path: packed
+    // and unpacked installs live in different places (audit L28).
+    final executable = Platform.resolvedExecutable;
     await Process.start('/bin/sh', [
       '-c',
-      'while kill -0 "\$1" 2>/dev/null; do sleep 1; done; exec /usr/bin/sora',
+      'while kill -0 "\$1" 2>/dev/null; do sleep 1; done; exec "\$2"',
       'sora-restart',
       '$pid',
+      executable,
     ], mode: ProcessStartMode.detached);
   }
 
@@ -280,7 +305,7 @@ class Desktop with WindowListener {
     final server = sora.phase == Phase.connected || sora.phase == Phase.reconnecting ? _serverText(s) : null;
     icon.setTooltip(server == null ? s.trayTooltip(state) : s.trayTooltipServer(state, server));
 
-    final entries = [for (final sub in sora.subscriptions) ...entriesOf(sub)];
+    final entries = _trayEntries();
     // Rebuilding an open menu closes it, so update only when its contents
     // change.
     final key = [
@@ -315,8 +340,30 @@ class Desktop with WindowListener {
   String _serverText(S s) => switch (sora.selected) {
     'auto' => s.serverAuto,
     'bypass' => s.serverBypass,
-    final id => sora.nameOf(id),
+    final id => sora.displayNameOf(id),
   };
+
+  /// Server entries for the tray menu, mirroring the main servers list:
+  /// custom servers live in the «Мои серверы» card and are dropped here too;
+  /// hidden servers are dropped (selecting one would silently fall back to
+  /// auto) and subscription renames apply.
+  List<Entry> _trayEntries() {
+    final out = <Entry>[];
+    for (final sub in sora.subscriptions) {
+      final override = sora.overrides.of(sub.settings.id);
+      for (final entry in entriesOf(sub)) {
+        // Drop customs before overrides, like the main list: overrides apply
+        // to subscription servers only, and a renamed custom member must not
+        // slip back in through applyRenames.
+        final deduped = entry.withoutCustom();
+        if (deduped == null) continue;
+        final visible = deduped.withoutHidden(override.hidden);
+        if (visible == null) continue;
+        out.addAll(visible.applyRenames(override.renames));
+      }
+    }
+    return out;
+  }
 
   tray.Menu? _menu(S s, String state, String? server, List<Entry> entries) {
     final menu = tray.Menu.create();
@@ -446,15 +493,20 @@ class Desktop with WindowListener {
     // Suppress duplicate notifications when the focused window already shows
     // the event.
     if (!sora.settings.notifications || (!always && _visible && _focused)) return;
-    await _notifications.show(
-      id: title.hashCode & 0x7fffffff,
-      title: title,
-      body: body,
-      notificationDetails: const NotificationDetails(
-        linux: LinuxNotificationDetails(),
-        windows: WindowsNotificationDetails(),
-      ),
-    );
+    try {
+      await _notifications.show(
+        id: title.hashCode & 0x7fffffff,
+        title: title,
+        body: body,
+        notificationDetails: const NotificationDetails(
+          linux: LinuxNotificationDetails(),
+          windows: WindowsNotificationDetails(),
+        ),
+      );
+    } catch (_) {
+      // A failing notification backend (e.g. D-Bus) must not surface as an
+      // unhandled async error (audit L27).
+    }
   }
 
   void _notice(Notice notice) {
@@ -479,7 +531,62 @@ class Desktop with WindowListener {
 
   // Show the window before presenting an import prompt.
 
+  /// Delivers links that arrived before the UI was ready. Called once from
+  /// main() after startup: the command-line link that launched the app (cold
+  /// start: app_links only reports links received while the app runs) and
+  /// any link the native side queued while Dart was starting.
+  Future<void> handleInitialLinks(String? launchLink) async {
+    final links = <String>[];
+    if (Platform.isLinux) {
+      try {
+        // Marks Dart ready on the native side, so later links are invoked
+        // directly instead of queued.
+        final pending = await _deepLinkChannel.invokeMethod<String>('getPendingLink');
+        if (pending != null && pending.isNotEmpty) links.add(pending);
+      } catch (_) {
+        // The runner predates the pull protocol; the launch argument below
+        // still covers cold start.
+      }
+    }
+    if (Platform.isWindows) {
+      try {
+        // A second instance may have delivered a link while the stream had
+        // no subscriber yet; the plugin keeps the latest one.
+        final latest = await _links.getLatestLinkString();
+        if (latest != null && latest.isNotEmpty) links.add(latest);
+      } catch (_) {}
+    }
+    if (launchLink != null && launchLink.isNotEmpty) links.add(launchLink);
+    if (links.isEmpty) return;
+    // The root navigator mounts on the first frame; _open needs its context.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // _open dedups identical links, so the same cold-start link arriving
+      // through both channels opens a single dialog.
+      for (final link in links) {
+        unawaited(_open(link));
+      }
+    });
+  }
+
+  /// Deep link forwarded by the Linux runner while the app runs.
+  Future<void> _onDeepLinkCall(MethodCall call) async {
+    if (call.method == 'onDeepLink') {
+      final link = call.arguments;
+      if (link is String && link.isNotEmpty) unawaited(_open(link));
+    }
+  }
+
   Future<void> _open(String text) async {
+    // The runner and the app_links plugin can both deliver the same link;
+    // collapse near-duplicate deliveries so one click opens one dialog.
+    final now = DateTime.now();
+    if (text == _lastOpenedLink &&
+        _lastOpenedAt != null &&
+        now.difference(_lastOpenedAt!) < const Duration(seconds: 5)) {
+      return;
+    }
+    _lastOpenedLink = text;
+    _lastOpenedAt = now;
     final link = parseImportLink(text);
     if (link == null) return;
     await show();

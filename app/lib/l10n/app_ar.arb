@@ -5,7 +5,6 @@
   "stateConnected": "متصل",
   "stateReconnecting": "إعادة الاتصال",
   "stateDisconnecting": "قطع الاتصال",
-  "stateFailed": "غير متصل",
   "coreMissing": "خدمة Sora لا تستجيب",
   "serverAuto": "الأسرع",
   "serverBypass": "لا يوجد خادم",
@@ -41,6 +40,7 @@
   "export": "حفظ إلى ملف",
   "clear": "واضح",
   "logsEmpty": "لا شيء هنا",
+  "connEmpty": "لا توجد اتصالات",
   "appVersion": "الإصدار {version}",
   "notInstalled": "غير مثبت",
   "sourceCode": "كود المصدر",
@@ -75,17 +75,16 @@
   "errSubScheme": "الرابط يجب أن يبدأ ب https://",
   "errSecretStore": "وحدة تخزين Sora تالفة أو غير متوفرة",
   "errNoServers": "إضافة اشتراك للاتصال",
-  "exportText": "نص",
   "connections": "اتصالات",
   "close": "يغلق",
   "chainDirect": "مباشر",
   "chainBlocked": "محظور",
   "theme": "سمة",
-  "themeSystem": "System",
+  "themeSystem": "حسب النظام",
   "themeLight": "ضوء",
   "themeDark": "مظلم",
   "language": "لغة",
-  "languageSystem": "System",
+  "languageSystem": "حسب النظام",
   "sectionConnection": "اتصال",
   "sectionNoServer": "لا يوجد خادم",
   "sectionPing": "بينغ",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} يسار",
   "ruleInvalid": "لا يبدو هذا كموقع أو عنوان IP أو برنامج",
   "tunnelMode": "وضع",
-  "tunnelTun": "كل حركة المرور",
   "tunnelProxy": "وكيل System",
   "proxyAddress": "عنوان الوكيل",
   "copied": "منقول",
   "launchAtLogin": "ابدأ بالنظام",
+  "launchAtLoginDetail": "سيبدأ Sora تلقائيًا عند تسجيل الدخول ويبقى في علبة النظام.",
   "closeToTray": "احتفظ بها في الدرج عند إغلاقها",
   "notifications": "إشعارات",
   "trayOpen": "افتح Sora",
@@ -185,12 +184,6 @@
   "sidebarToggle": "تبديل الشريط الجانبي",
   "more": "أكثر",
   "less": "أقل",
-  "currentServer": "الخادم الحالي",
-  "trafficDown": "تم التنزيل",
-  "trafficUp": "تم الرفع",
-  "perSecond": "{value}/ث",
-  "activeRules": "القواعد النشطة: {count}",
-  "recentNotifications": "الإخطارات الأخيرة",
   "notificationsEmpty": "ستظهر أحداث الاتصال والاشتراك هنا",
   "retryConnect": "أعد محاولة الاتصال",
   "openLogs": "فتح السجلات",
@@ -208,12 +201,9 @@
   "chooseProgram": "اختر برنامجا",
   "installedApps": "التطبيقات المثبتة",
   "runningProcesses": "العمليات الجارية",
-  "programsFailed": "لا يمكن تحميل التطبيقات",
   "programsEmpty": "لم يتم العثور على أي تطبيقات. حاول اسم آخر.",
   "selectExe": "اختر ملف .exe",
-  "trafficUnavailable": "العدادات غير متوفرة بعد",
   "speedtest": "سرعة",
-  "speedtestCheck": "تحقق من السرعة",
   "speedtestSearch": "ابحث عن خدمة",
   "speedtestEmpty": "لا توجد مباريات. تغيير البحث.",
   "speedtestBackToList": "العودة إلى الخدمات",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "أمر النسخ",
   "updateChecksDisabled": "تم تعطيل عمليات التحقق التلقائية في الإعدادات.",
   "updateInstalled": "تم تثبيت التحديث. أعد فتح Sora.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "مشروع",
   "githubReleases": "الإصدارات والتنزيلات",
   "telegramChannel": "قناة Telegram",
   "licenses": "التراخيص",
   "componentLicenses": "تراخيص المكونات",
-  "appCopyright": "© 2026 levvs-one والمساهمين",
   "collapseServers": "طي الخوادم",
   "expandServers": "قم بتوسيع الخوادم",
   "hideDescription": "إخفاء الوصف",
   "showDescription": "إظهار الوصف",
   "pendingConnectionChanges": "أعد الاتصال لتطبيق هذه التغييرات.",
   "reconnectNow": "تطبيق وإعادة الاتصال",
-  "bypassLimitations": "يتجاوز هذا الوضع DPI فقط لـ HTTP وTLS، ولا يدعم UDP أو يغير عنوان IP الخاص بك. استخدم خادم VPN للصوت والمكالمات وعناوين Telegram المحظورة.",
   "errEngineUnsupported": "المحرك المحدد لا يدعم ملف التعريف هذا أو الإعدادات. اختر تلقائي أو محرك متوافق.",
   "errRestore": "لم تكن عملية تنظيف الاتصال كاملة. أعد محاولة قطع الاتصال؛ راجع السجل للحصول على التفاصيل.",
   "errSessionEnded": "لقد انتهت هذه الجلسة بالفعل. قم بتحديث حالة الاتصال.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "الأوضاع والمحركات",
   "probeServers": "فحص الخوادم",
   "expiresIn": "{name}: {days, plural, =0{ينتهي الاشتراك في غضون ساعات قليلة} one{ينتهي الاشتراك في يوم #} other{ينتهي الاشتراك بعد أيام #}}",
-  "groupOrdered": "{count, plural, one{خادم # بدوره} other{خوادم # بدورها}}",
   "groupBest": "{count, plural, one{خادم #، الأسرع} other{خوادم #، الأسرع}}",
-  "modesGuide": "اختر تلقائي إذا لم تكن متأكدًا من المحرك الذي يحتاجه خادمك. يقوم Sora بالتحقق من ملف التعريف والإعدادات قبل الاتصال. لا يمكن للمحرك زيادة النطاق الترددي لخطتك: يعتمد الأداء على الخادم والمسار والبروتوكول والشبكة.\n\n## وسائط\n\n### كل حركة المرور (TUN)\n\nيقوم Sora بإنشاء واجهة شبكة افتراضية وتوجيه حركة مرور التطبيقات من خلالها، بما في ذلك TCP وUDP. استخدم هذا الوضع لـ Telegram والألعاب وصوت Discord. يمكن للقواعد إرسال مواقع أو برامج محددة مباشرة أو حظرها. تحتاج خدمة الشبكة إلى إذن وخادم يدعم البروتوكول المطلوب.\n\n### وكيل System\n\nيقوم Sora بتكوين وكيل HTTP/SOCKS محلي. تستخدمه التطبيقات التي تحترم إعدادات وكيل النظام. قد تتصل التطبيقات التي تحتوي على مكدس الشبكة الخاص بها مباشرةً؛ تحتاج UDP والمكالمات الصوتية عمومًا إلى TUN. يناسب هذا الوضع المتصفحات والتطبيقات التي تدعم الوكيل.\n\n### لا يوجد خادم\n\nفي Linux، يستخدم Sora [zapret](https://github.com/bol-van/zapret) لتقسيم طلبات HTTP/TLS وإعادة تشكيلها وتجاوز بعض عمليات فحص DPI. يظل عنوان IP الخاص بك كما هو وتنتقل الاتصالات مباشرة إلى موقع الويب. تعتمد النتائج على المزود الخاص بك وطريقة الحظر.\n\nيستخدم التكامل الحالي tpws لـ HTTP وTLS عبر TCP. فهو لا يتجاوز حظر IP أو يقوم بترحيل UDP، ولا يمكنه ضمان اتصالات Telegram الخاصة بـ MTProto. استخدم خادم VPN مع TUN للصوت Discord ومكالمات Telegram وهذه الأنواع من القيود.\n\n## المحركات\n\n### آلي\n\nيختار Sora محركًا مثبتًا يدعم خطة الاتصال بأكملها: بروتوكولات الخادم ووسائل النقل والمجموعات والتجزئة والوضع. يتم رفض الاختيار اليدوي غير المتوافق قبل إيقاف الاتصال الحالي. اختر Auto أو محرك آخر وقم بتطبيق الإعدادات مرة أخرى.\n\n### sing-box\n\nتشتمل حزم Sora الجديدة على [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)، وشوكة [sing-box](https://github.com/SagerNet/sing-box)، وإضافة XHTTP وVLESS Encryption من جانب العميل. يتعرف Sora على البنية وقدراتها. لا يكتسب الإصدار الأولي بدون XHTTP هذه الإمكانية من اسمه وحده.\n\nتتضمن البروتوكولات المدعومة VLESS، وVMess، وTrojan، وShadowsocks، وHysteria2، وTUIC، وAnyTLS، وWireGuard ومعلمات AmneziaWG 1.x/2.x يمكن استيراد Sora. تتطلب ملفات تعريف Xray JSON الكاملة Xray. لا يمكن استيراد حقول AWG 3.x الجديدة بعد. يستخدم sing-box منفذ تحكم محلي محمي بكلمة مرور، والذي يمكن للتطبيقات الأخرى الموجودة على الكمبيوتر اكتشافه.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) يدعم تجزئة VLESS وREALITY وXHTTP وVLESS Encryption وTLS. كما أنه يدير ملفات تعريف Xray الكاملة للموفر مع الحفاظ على التوجيه والمجموعات الخاصة بهم. لا يمكن تحويل ملفات التعريف هذه تلقائيًا إلى محرك آخر دون تغيير سلوكها.\n\nقام Xray المجمّع بإزالة الإعداد الذي يعطل التحقق من شهادة TLS ('allowInsecure`). يقوم Auto بتحديد sing-box أو mihomo للخوادم العادية التي تتطلب هذا الإعداد. يؤدي تحديد Xray يدويًا إلى الإبلاغ عن عدم التوافق قبل إيقاف الاتصال الحالي. تحتاج ملفات تعريف JSON الكاملة الأقدم إلى ملف تعريف موفر محدث مع شهادة أو دبوس شهادة يمكن التحقق منه.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) يدعم المجموعات الاحتياطية وموازنة التحميل المرتبة، XHTTP وAmneziaWG. اختره عندما يكون تجاوز الفشل التلقائي إلى خادم النسخ الاحتياطي مهمًا. لا يتوفر إعداد تجزئة TLS الخاص بـ Sora مع هذا المحرك.\n\n## التوافق في Sora\n\n| ميزة | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN وTCP/UDP | نعم | نعم | نعم |\n| XHTTP | نعم | نعم | نعم |\n| VLESS Encryption | نعم | نعم | نعم |\n| الملف الشخصي الكامل لـ Xray | لا | نعم | لا |\n| TUIC / AnyTLS | كلاهما | لا | TUIC |\n| تجزئة TLS | نعم | نعم | لا |\n| AmneziaWG 1.x/2.x | نعم¹ | لا | نعم |\n| أمرت مجموعة احتياطية | لا | رقم² | نعم |\n\n¹ تستخدم ملفات التعريف ذات J1/J2/J3/Itime mihomo؛ لا يجب أبدًا التخلص من هذه الحقول بصمت. ² بالنسبة لمجموعة ملفات تعريف Xray الكاملة، يقوم التطبيق بتحديد ملف تعريف احتياطي. يعتمد الدعم على البنية المثبتة؛ تحقق من نسخته في حول.\n\n## مكدس TUN\n\nيتعامل المكدس مع TCP وUDP داخل الواجهة الافتراضية. في لوحة الأوضاع، تقدم Xray وmihomo gVisor، وSystem، وMixed، وMIPS. يحفظ كل محرك تفضيلاته الخاصة. لا يستخدم الوكيل System والأوضاع بدون خادم هذا التفضيل.\n\n- **Mixed** — يستخدم TCP مكدس النظام، بينما يتعامل gVisor مع UDP. هذا هو الإعداد الافتراضي لـ mihomo على Linux. في Windows، يستخدم Xray وmihomo مكدس MIPS افتراضيًا.\n- **System** — يستخدم مكدس النظام. جرب خيارًا آخر إذا واجهت تطبيقات الشبكة مشكلات.\n- **gVisor** — يتعامل مع حركة المرور في مساحة المستخدمين.\n- **MIPS** — حزمة IP الخاصة بـ mihomo، المتوفرة في الإصدار المجمع 1.19.32.\n\nفي Linux، يستخدم Xray gVisor المدمج بشكل افتراضي. تستخدم System وMixed وMIPS على Linux mihomo كمحرك TUN، حيث تقوم بإعادة توجيه TCP وUDP إلى Xray عبر رابط SOCKS محلي معتمد. يحتفظ Xray بالبروتوكول وملف تعريف الموفر والتوجيه. تتطلب هذه الخيارات الثلاثة تثبيت mihomo. في Windows، يستخدم Xray المحرك mihomo 1.19.32 أو أحدث لجميع مكدسات TUN الأربعة. تبقى البروتوكولات والتوجيه في Xray. تدعم قواعد التطبيقات في هذا الربط الاتصال المباشر والحظر فقط؛ على Linux تتطلب هذه القواعد gVisor المدمج في Xray.\n\nيدير الجسر عملية ثانية. في ثلاثة قياسات خاملة على Linux، استخدمت حوالي 32-36 ميجابايت من الذاكرة الفعلية أكثر من Xray TUN الأصلي. هذا لا يقيس حمل التنزيل: تعتمد تكاليف وحدة المعالجة المركزية والذاكرة على الاتصالات. لا يحتوي sing-box على محدد المكدس. لا يضمن عدم وجود مكدس أداءً أفضل في كل شبكة. اختر مكدسًا وحدد تطبيق وأعد الاتصال لتجربته في شبكتك.\n\n## تطبيق الإعدادات\n\nيؤدي تحديد الخادم إلى إعادة الاتصال تلقائيًا. يتم حفظ إعدادات الوضع والمحرك وDNS والقاعدة على الفور؛ أثناء الاتصال النشط، انقر فوق \"تطبيق\" ثم أعد الاتصال لاستخدامها. قد تؤدي إعادة تشغيل المحرك إلى مقاطعة التنزيلات والمكالمات. النقرات المتكررة لا تؤدي إلى بدء اتصالات متوازية؛ يؤدي قطع الاتصال إلى إنهاء عملية النقل وتحرير الاتصال.\n\nالإنترنت فقط من خلال VPN يحظر حركة المرور المباشرة عند انقطاع النفق. إنه يؤثر على الجهاز بأكمله. يؤدي قطع الاتصال الصريح إلى إزالة قواعد Sora. إذا لم تنتهي عملية التنظيف، أعد محاولة قطع الاتصال وافتح السجل.\n\n## وثائق المشروع\n\n- [sing-box-lx: التكوين والدعم](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [وثائق sing-box](https://sing-box.sagernet.org/)\n- [وثائق Xray](https://xtls.github.io/)\n- [وثائق mihomo](https://wiki.metacubex.one/)\n- [zapret: التشغيل والقيود](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "اختر تلقائي إذا لم تكن متأكدًا من المحرك الذي يحتاجه خادمك. يقوم Sora بالتحقق من ملف التعريف والإعدادات قبل الاتصال. لا يمكن للمحرك زيادة النطاق الترددي لخطتك: يعتمد الأداء على الخادم والمسار والبروتوكول والشبكة.\n\n## وسائط\n\n### كل حركة المرور (TUN)\n\nيقوم Sora بإنشاء واجهة شبكة افتراضية وتوجيه حركة مرور التطبيقات من خلالها، بما في ذلك TCP وUDP. استخدم هذا الوضع لـ Telegram والألعاب وصوت Discord. يمكن للقواعد إرسال مواقع أو برامج محددة مباشرة أو حظرها. تحتاج خدمة الشبكة إلى إذن وخادم يدعم البروتوكول المطلوب.\n\n### وكيل System\n\nيقوم Sora بتكوين وكيل HTTP/SOCKS محلي. تستخدمه التطبيقات التي تحترم إعدادات وكيل النظام. قد تتصل التطبيقات التي تحتوي على مكدس الشبكة الخاص بها مباشرةً؛ تحتاج UDP والمكالمات الصوتية عمومًا إلى TUN. يناسب هذا الوضع المتصفحات والتطبيقات التي تدعم الوكيل.\n\n### لا يوجد خادم\n\nفي Linux، يستخدم Sora [zapret](https://github.com/bol-van/zapret) لتقسيم طلبات HTTP/TLS وإعادة تشكيلها وتجاوز بعض عمليات فحص DPI. يظل عنوان IP الخاص بك كما هو وتنتقل الاتصالات مباشرة إلى موقع الويب. تعتمد النتائج على المزود الخاص بك وطريقة الحظر.\n\nيستخدم التكامل الحالي tpws لـ HTTP وTLS عبر TCP. فهو لا يتجاوز حظر IP أو يقوم بترحيل UDP، ولا يمكنه ضمان اتصالات Telegram الخاصة بـ MTProto. استخدم خادم VPN مع TUN للصوت Discord ومكالمات Telegram وهذه الأنواع من القيود.\n\n## المحركات\n\n### آلي\n\nيختار Sora محركًا مثبتًا يدعم خطة الاتصال بأكملها: بروتوكولات الخادم ووسائل النقل والمجموعات والتجزئة والوضع. يتم رفض الاختيار اليدوي غير المتوافق قبل إيقاف الاتصال الحالي. اختر Auto أو محرك آخر وقم بتطبيق الإعدادات مرة أخرى.\n\n### sing-box\n\nتشتمل حزم Sora الجديدة على [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)، وشوكة [sing-box](https://github.com/SagerNet/sing-box)، وإضافة XHTTP وVLESS Encryption من جانب العميل. يتعرف Sora على البنية وقدراتها. لا يكتسب الإصدار الأولي بدون XHTTP هذه الإمكانية من اسمه وحده.\n\nتتضمن البروتوكولات المدعومة VLESS، وVMess، وTrojan، وShadowsocks، وHysteria2، وTUIC، وAnyTLS، وWireGuard ومعلمات AmneziaWG 1.x/2.x يمكن استيراد Sora. تتطلب ملفات تعريف Xray JSON الكاملة Xray. لا يمكن استيراد حقول AWG 3.x الجديدة بعد. يستخدم sing-box منفذ تحكم محلي محمي بكلمة مرور، والذي يمكن للتطبيقات الأخرى الموجودة على الكمبيوتر اكتشافه.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) يدعم تجزئة VLESS وREALITY وXHTTP وVLESS Encryption وTLS. كما أنه يدير ملفات تعريف Xray الكاملة للموفر مع الحفاظ على التوجيه والمجموعات الخاصة بهم. لا يمكن تحويل ملفات التعريف هذه تلقائيًا إلى محرك آخر دون تغيير سلوكها.\n\nقام Xray المجمّع بإزالة الإعداد الذي يعطل التحقق من شهادة TLS ('allowInsecure`). يقوم Auto بتحديد sing-box أو mihomo للخوادم العادية التي تتطلب هذا الإعداد. يؤدي تحديد Xray يدويًا إلى الإبلاغ عن عدم التوافق قبل إيقاف الاتصال الحالي. تحتاج ملفات تعريف JSON الكاملة الأقدم إلى ملف تعريف موفر محدث مع شهادة أو دبوس شهادة يمكن التحقق منه.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) يدعم المجموعات الاحتياطية وموازنة التحميل المرتبة، XHTTP وAmneziaWG. اختره عندما يكون تجاوز الفشل التلقائي إلى خادم النسخ الاحتياطي مهمًا. لا يتوفر إعداد تجزئة TLS الخاص بـ Sora مع هذا المحرك.\n\n## التوافق في Sora\n\n| ميزة | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN وTCP/UDP | نعم | نعم | نعم |\n| XHTTP | نعم | نعم | نعم |\n| VLESS Encryption | نعم | نعم | نعم |\n| الملف الشخصي الكامل لـ Xray | لا | نعم | لا |\n| TUIC / AnyTLS | كلاهما | لا | TUIC |\n| تجزئة TLS | نعم | نعم | لا |\n| AmneziaWG 1.x/2.x | نعم¹ | لا | نعم |\n| أمرت مجموعة احتياطية | لا | رقم² | نعم |\n\n¹ تستخدم ملفات التعريف ذات J1/J2/J3/Itime mihomo؛ لا يجب أبدًا التخلص من هذه الحقول بصمت. ² بالنسبة لمجموعة ملفات تعريف Xray الكاملة، يقوم التطبيق بتحديد ملف تعريف احتياطي. يعتمد الدعم على البنية المثبتة؛ تحقق من نسخته في حول.\n\n## مكدس TUN\n\nيتعامل المكدس مع TCP وUDP داخل الواجهة الافتراضية. في لوحة الأوضاع، تقدم Xray وmihomo gVisor، وSystem، وMixed، وMIPS. يحفظ كل محرك تفضيلاته الخاصة. لا يستخدم الوكيل System والأوضاع بدون خادم هذا التفضيل.\n\n- **Mixed**: يستخدم TCP مكدس النظام، بينما يتعامل gVisor مع UDP. هذا هو الإعداد الافتراضي لـ mihomo على Linux. في Windows، يستخدم Xray وmihomo مكدس MIPS افتراضيًا.\n- **System**: يستخدم مكدس النظام. جرب خيارًا آخر إذا واجهت تطبيقات الشبكة مشكلات.\n- **gVisor**: يتعامل مع حركة المرور في مساحة المستخدمين.\n- **MIPS**: حزمة IP الخاصة بـ mihomo، المتوفرة في الإصدار المجمع 1.19.32.\n\nفي Linux، يستخدم Xray gVisor المدمج بشكل افتراضي. تستخدم System وMixed وMIPS على Linux mihomo كمحرك TUN، حيث تقوم بإعادة توجيه TCP وUDP إلى Xray عبر رابط SOCKS محلي معتمد. يحتفظ Xray بالبروتوكول وملف تعريف الموفر والتوجيه. تتطلب هذه الخيارات الثلاثة تثبيت mihomo. في Windows، يستخدم Xray المحرك mihomo 1.19.32 أو أحدث لجميع مكدسات TUN الأربعة. تبقى البروتوكولات والتوجيه في Xray. تدعم قواعد التطبيقات في هذا الربط الاتصال المباشر والحظر فقط؛ على Linux تتطلب هذه القواعد gVisor المدمج في Xray.\n\nيدير الجسر عملية ثانية. في ثلاثة قياسات خاملة على Linux، استخدمت حوالي 32-36 ميجابايت من الذاكرة الفعلية أكثر من Xray TUN الأصلي. هذا لا يقيس حمل التنزيل: تعتمد تكاليف وحدة المعالجة المركزية والذاكرة على الاتصالات. لا يحتوي sing-box على محدد المكدس. لا يضمن عدم وجود مكدس أداءً أفضل في كل شبكة. اختر مكدسًا وحدد تطبيق وأعد الاتصال لتجربته في شبكتك.\n\n## تطبيق الإعدادات\n\nيؤدي تحديد الخادم إلى إعادة الاتصال تلقائيًا. يتم حفظ إعدادات الوضع والمحرك وDNS والقاعدة على الفور؛ أثناء الاتصال النشط، انقر فوق \"تطبيق\" ثم أعد الاتصال لاستخدامها. قد تؤدي إعادة تشغيل المحرك إلى مقاطعة التنزيلات والمكالمات. النقرات المتكررة لا تؤدي إلى بدء اتصالات متوازية؛ يؤدي قطع الاتصال إلى إنهاء عملية النقل وتحرير الاتصال.\n\nالإنترنت فقط من خلال VPN يحظر حركة المرور المباشرة عند انقطاع النفق. إنه يؤثر على الجهاز بأكمله. يؤدي قطع الاتصال الصريح إلى إزالة قواعد Sora. إذا لم تنتهي عملية التنظيف، أعد محاولة قطع الاتصال وافتح السجل.\n\n## وثائق المشروع\n\n- [sing-box-lx: التكوين والدعم](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [وثائق sing-box](https://sing-box.sagernet.org/)\n- [وثائق Xray](https://xtls.github.io/)\n- [وثائق mihomo](https://wiki.metacubex.one/)\n- [zapret: التشغيل والقيود](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -458,13 +441,7 @@
     }
   },
   "extensions": "ملحقات",
-  "diagnosticUnavailable": "هذا التشخيص غير متوفر على هذا النظام الأساسي.",
-  "diagnosticRequiresTun": "يحتاج التقاط الحزم إلى اتصال Sora TUN نشط.",
-  "diagnosticCapture": "التقاط لمدة 10 ثانية",
-  "diagnosticPackets": "التقاط الحزمة",
   "diagnosticHttp": "تشخيصات HTTP",
-  "diagnosticEvents": "أحداث ويندوز",
-  "extensionsSoon": "قريباً",
   "diagnosticNoData": "لا توجد طلبات مسجلة حتى الآن. افتح موقع اختبار السرعة أولاً.",
   "exportLogFile": "إلى {name}",
   "@exportLogFile": {
@@ -473,5 +450,572 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "إضافة خادم مخصص",
+  "customServers": "خوادمي",
+  "customServerName": "الاسم",
+  "customServerNameHint": "على سبيل المثال: خادم VPS الخاص بي",
+  "customServerNameRequired": "أدخل الاسم",
+  "customServerAddress": "العنوان",
+  "customServerAddressHint": "example.com أو 192.0.2.1",
+  "customServerAddressRequired": "أدخل عنوان الخادم",
+  "customServerAddressInvalid": "عنوان غير صالح",
+  "customServerPort": "المنفذ",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "يجب أن يكون المنفذ رقمًا من 1 إلى 65535",
+  "customServerProtocol": "البروتوكول",
+  "customServerCredentials": "معلومات تسجيل الدخول",
+  "customServerOptional": "اختياري",
+  "customServerShowSecret": "إظهار السر",
+  "customServerHideSecret": "إخفاء السر",
+  "customServerBadge": "مخصص",
+  "customServerDeleteConfirm": "حذف الخادم \"{name}\"؟",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "إضافة خادم يدويًا: العنوان والمنفذ والبروتوكول",
+  "customServerTest": "الاختبار",
+  "leakTestTitle": "اختبار تسرب البيانات",
+  "leakTestIntro": "يتحقق مما إذا كانت حركة البيانات قد تغادر الجهاز خارج النفق: طلبات DNS وICMP المباشرة، وخروج IPv6، ومحللات النظام. شغّل الاختبار أثناء الاتصال.",
+  "leakTestRun": "تحقق",
+  "leakTestCancel": "إلغاء",
+  "leakTestNeedsConnection": "اتصل بـ VPN لاختبار تسرب البيانات.",
+  "leakTestProgress": "الاختبارات المنجزة: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "لم يتم العثور على أي تسريبات",
+  "leakTestFound": "{count, plural, zero{لم يُعثر على تسربات (#)} one{عُثر على تسرب واحد (#)} two{عُثر على تسربين (#)} few{عُثر على # تسربات} many{عُثر على # تسربًا} other{عُثر على # تسرب}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "الإصلاح",
+  "leakTestFixedNote": "مفتاح الإيقاف مفعّل. أعد الاختبار للتحقق.",
+  "leakTestCheckDirectDns": "مباشر DNS",
+  "leakTestCheckIcmpEcho": "ICMP الصدى",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "محللات أسماء النظام",
+  "leakTestCheckTunnelConnectivity": "اتصال النفق",
+  "leakTestCheckTunnelDns": "DNS عبر النفق",
+  "noticeDegraded": "تباطأ الخادم، فانتقل Sora إلى أفضل خادم حسب القياسات",
+  "obfs": "تمويه حركة البيانات",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "تُطابَق ملفات التحديث مع المجاميع الاختبارية المنشورة مع الإصدار.",
+  "updateManualSigWarning": "الملفات أدناه تطابق المجاميع الاختبارية للإصدار. شغّل الأمر إذا نزّلتها من الإصدار الرسمي.",
+  "updateVersionRevoked": "قام المطور بسحب هذا الإصدار. يرجى الانتظار لإصدار مصحح.",
+  "updateRolloutPending": "يتم طرح إصدار أحدث تدريجيًا وسيتم تقديمه لك تلقائيًا.",
+  "updateRollbacking": "العودة إلى الإصدار {version}...",
+  "updateRolledBack": "لم ينجح التحديث إلى {version} في اجتياز فحص الصحة، لذا تم إرجاع Sora إلى {fromVersion}.",
+  "updateRollbackError": "فشل التراجع التلقائي. إذا لم يعمل الإصدار الجديد، فأعد تثبيت الإصدار السابق يدويًا.",
+  "updateRollbackCacheError": "تعذر إعداد نسخة التراجع التي تم التحقق منها من الإصدار الحالي، لذلك لم يتم تثبيت التحديث.",
+  "extRatingLabel": "التقييم {rating} من 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "بواسطة {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "عدد التثبيتات: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "تثبيت واحد",
+  "extBadgeVerified": "تم التحقق منه",
+  "extBadgeTop": "الأكثر شعبية هذا الأسبوع",
+  "extBadgeNew": "جديد",
+  "extBadgeStaff": "فريق Sora",
+  "extSideloadShort": "ليس من الكتالوج",
+  "extSideloadWarning": "هذا الملحق ليس من كتالوج الفريق. لقد كفل المؤلف فقط مفتاحه: قم بتثبيته فقط إذا كنت تثق في المؤلف.",
+  "extInstallTitle": "تثبيت «{name}»",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "تحديث «{name}»",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "سيتمكن هذا الملحق من:",
+  "extPermissionsWidened": "التحديث يطلب أذونات جديدة:",
+  "extDangerousAck": "أدرك أن هذه الأذونات خطيرة",
+  "extInstall": "تثبيت",
+  "extUpdate": "تحديث",
+  "extCancel": "إلغاء",
+  "extConfirm": "تأكيد",
+  "extOk": "OK",
+  "extCatalog": "الكتالوج",
+  "extInstalled": "الملحقات المثبتة",
+  "extSearchHint": "البحث عن ملحقات",
+  "extCatAll": "الكل",
+  "extCatTools": "الأدوات",
+  "extCatThemes": "السمات",
+  "extCatAutomation": "الأتمتة",
+  "extCatStats": "الإحصائيات",
+  "extCatNetwork": "الشبكة",
+  "extSortBy": "الترتيب حسب",
+  "extSortPopular": "الأكثر شعبية",
+  "extSortRating": "الأعلى تقييمًا",
+  "extSortName": "الاسم",
+  "extCatalogError": "تعذر تحميل الكتالوج",
+  "extRetry": "إعادة المحاولة",
+  "extEmptySearch": "لم يتم العثور على شيء",
+  "extEmptyInstalled": "لم يتم تثبيت أي ملحقات بعد.\nابحث عن واحد في الكتالوج أو قم بتثبيته من ملف.",
+  "extInstallFromFile": "التثبيت من الملف",
+  "extInstallFromUrl": "التثبيت من URL",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "تحميل",
+  "extDownloading": "جارٍ التحميل...",
+  "extVerifying": "التحقق…",
+  "extInstalling": "التثبيت...",
+  "extInstallFailed": "فشل التثبيت",
+  "extErrSignature": "فشل فحص التوقيع. قد يكون الملف تالفًا أو تم العبث به.",
+  "extErrManifest": "ملف تعريف الملحق غير صالح.",
+  "extErrNetwork": "خطأ في الشبكة. تحقق من اتصالك وحاول مرة أخرى.",
+  "extErrHash": "التنزيل لا يطابق الكتالوج. ربما تم العبث بها.",
+  "extErrMinApp": "يحتاج هذا الملحق إلى إصدار التطبيق {version} أو أحدث.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "يُسمح فقط بروابط https://",
+  "extErrGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+  "extErrAuthorKeyChanged": "تم توقيع هذا التحديث باستخدام مفتاح مؤلف مختلف عن الإصدار المثبت، لذلك تم حظره. إذا كنت تثق في المفتاح الجديد، فقم بإلغاء تثبيت الملحق وتثبيته مرة أخرى بشكل صريح.",
+  "extUpdateAvailable": "التحديث متاح",
+  "extDisabled": "معطل",
+  "extToggleEnabled": "تمكين {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "البحث في الملحقات المثبتة",
+  "extUpdateAll": "تحديث الكل",
+  "extUpdatesAvailable": "{count} التحديثات متاحة",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} محدث",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "عادي",
+  "extRiskSensitive": "حساس",
+  "extRiskDangerous": "مخاطر عالية",
+  "extPermissionsRemoved": "لم يعد مطلوبًا:",
+  "extUpdateFailedKept": "لا يزال الإصدار السابق مثبتًا.",
+  "extConflictsTitle": "تعارضات الملحق",
+  "extConflictsIntro": "تريد هذه الإضافات الشيء نفسه. اختر أيّها يعمل، وستبقى الأخرى مثبّتة.",
+  "extConflictTheme": "سمة التطبيق",
+  "extConflictNetHooks": "خطافات الشبكة",
+  "extConflictWinner": "الأولوية لـ {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "تعارضات تتطلب قرارك: {count}",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "حل النزاعات",
+  "extConflictNote": "يُحفظ اختيارك على هذا الجهاز. يتغيّر المظهر فورًا، أما خطافات الشبكة فلا تعمل في هذا الإصدار.",
+  "extVersionLabel": "النسخة {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "المؤلف",
+  "extRating": "التقييم",
+  "extInstalls": "عمليات التثبيت",
+  "extVersion": "النسخة",
+  "extAbout": "حول هذا الملحق",
+  "extPermissionsTitle": "الأذونات",
+  "extNoPermissions": "لا توجد أذونات خاصة.",
+  "extSettings": "الإعدادات",
+  "extSaveSettings": "حفظ الإعدادات",
+  "extSaving": "الحفظ...",
+  "extUpdateTo": "الترقية إلى {version}",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "مفعّل",
+  "extRollbackTo": "العودة إلى {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "العودة إلى الإصدار {version}؟",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "إلغاء التثبيت",
+  "extUninstallConfirm": "إزالة \"{name}\" وإعداداته؟",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "اللوحة غير متوفرة. ربما تم تعطيل الملحق أو إزالته.",
+  "extPermConnectionsRead": "راجع قائمة الاتصالات النشطة",
+  "extPermServersRead": "عرض قائمة خوادمك",
+  "extPermSettingsRead": "قراءة إعدادات التطبيق",
+  "extPermSettingsWrite": "تغيير إعدادات التطبيق",
+  "extPermNotifications": "إظهار الإشعارات",
+  "extPermTray": "إضافة عناصر إلى قائمة الدرج",
+  "extPermUiPanel": "إظهار اللوحات داخل التطبيق",
+  "extPermThemeApply": "تطبيق السمات",
+  "extPermRoutingRules": "إضافة قواعد التوجيه (تؤثر على المكان الذي تنتقل إليه حركة مرور الشبكة)",
+  "extPermNetHooks": "التدخل في مسار الشبكة (وحدات تجاوز DPI)",
+  "extPermNetFetch": "اطلب URL من القائمة المسموح بها",
+  "extPermBackground": "تشغيل المهام الخلفية",
+  "extPermBackgroundDetail": "يقوم بتشغيل المهام المجدولة حتى عندما تكون اللوحة مغلقة. يمكنك إيقافه مؤقتًا أو تغيير عدد مرات تشغيله في إعدادات الملحق.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "يعمل في الخلفية",
+  "extCapNetHook": "تجاوز الحجب واعتراضات الشبكة",
+  "extCapPanel": "اللوحات",
+  "extCapRouting": "قواعد التوجيه",
+  "extCapTheme": "السمات",
+  "extCapWidget": "عناصر واجهة",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "سجل التغيير",
+  "extImageFailed": "تعذر تحميل الصورة",
+  "extRatingHow": "كيفية عمل التقييمات",
+  "extRatingHowBody": "تستخدم التقييمات متوسط بايزي: يظل الملحق الذي يحتوي على عدد قليل من التقييمات بالقرب من المنتصف حتى يصوت المزيد من الأشخاص، لذلك لا يمكن لمراجعة واحدة من فئة 5 نجوم دفع الملحق الجديد إلى الأعلى. التقييمات الحديثة لها وزن أكبر من التقييمات القديمة، ويتم احتساب تقييم واحد فقط لكل حساب.",
+  "extScreenshots": "لقطات الشاشة",
+  "extSortRelevance": "الصلة",
+  "extPermNetworkDetail": "تجلب بيانات من الإنترنت عبر VPN. يُسمح فقط بالمضيفين في القائمة أدناه، وكل ما عداهم محظور.",
+  "extBgTitle": "مهمة في الخلفية",
+  "extBgEnabled": "تشغيل في الخلفية",
+  "extBgInterval": "التشغيل كل",
+  "extBgMinutes": "{count, plural, zero{# دقيقة} one{دقيقة واحدة (#)} two{دقيقتان (#)} few{# دقائق} many{# دقيقة} other{# دقيقة}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, zero{# ساعة} one{ساعة واحدة (#)} two{ساعتان (#)} few{# ساعات} many{# ساعة} other{# ساعة}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "تعمل المهمة وفق الجدول ما دام Sora مفتوحًا، بما في ذلك عند وجوده في علبة النظام. أقصر فاصل 15 دقيقة.",
+  "extBgDisabledNote": "قم بتمكين الملحق لإدارة مهمة الخلفية الخاصة به.",
+  "extCapNetwork": "الوصول إلى الشبكة",
+  "extCapNetworkHosts": "الشبكة: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "شارك كود QR",
+  "qrScanTitle": "مسح الكود QR",
+  "qrCopyLink": "نسخ الرابط",
+  "qrShowLink": "إظهار الرابط",
+  "qrHideLink": "إخفاء الرابط",
+  "qrWarning": "يحتوي هذا الرمز QR على تفاصيل الاتصال. لا تظهر ذلك للغرباء.",
+  "qrScanHint": "اختر لقطة شاشة أو صورة تحتوي على رمز QR، أو الصق رابطًا",
+  "qrFromClipboard": "لصق من الحافظة",
+  "qrNoCode": "لم يتم العثور على رمز QR في هذه الصورة.",
+  "qrInvalid": "لا يحتوي رمز QR هذا على رابط صالح.",
+  "qrScan": "مسح QR",
+  "qrFromImage": "فتح صورة",
+  "connGroupByProcess": "التجميع حسب العملية",
+  "connListView": "القائمة",
+  "connCopyHost": "نسخ المضيف",
+  "connAddRule": "أضف القاعدة",
+  "connConnectionsCount": "{count, plural, zero{# اتصالات} one{اتصال واحد (#)} two{اتصالان (#)} few{# اتصالات} many{# اتصالًا} other{# اتصال}}",
+  "dnsPreset": "إعداد مسبق",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "مخصص",
+  "dnsCheck": "التحقق من عدم وجود تسرب للبيانات",
+  "dnsChecking": "التحقق...",
+  "dnsNoLeak": "لم يتم العثور على أي تسريبات",
+  "dnsLeakFound": "تم اكتشاف تسرب",
+  "dnsLastCheck": "آخر فحص",
+  "dnsNeverChecked": "لم يتم اختباره بعد",
+  "dnsLeakCheckTunnelDns": "محللات DNS للنفق",
+  "dnsLeakCheckSystemResolvers": "محللات أسماء النظام",
+  "dnsLeakCheckKillSwitchDns": "حماية DNS بمفتاح الإيقاف",
+  "dnsLeakFixConfigureTunnelDns": "قم بتكوين DNS للنفق في إعدادات DNS أعلاه.",
+  "dnsLeakFixReviewSystemResolvers": "تحقق من وحدات الحل التي سيستخدمها نظامك خارج النفق.",
+  "dnsLeakFixEnableKillSwitch": "فعّل مفتاح الإيقاف لإبقاء حركة DNS داخل النفق.",
+  "dnsLeakCheckEncryptedDns": "DNS المشفّر في نظام التشغيل",
+  "dnsLeakCheckDnsSpoof": "ردود DNS مزورة",
+  "dnsLeakFixReviewEncryptedDns": "تحقق من نقاط النهاية المشفرة DNS التي يستخدمها نظامك خارج النفق.",
+  "dnsLeakFixUseEncryptedDns": "استخدم DNS (DoT أو DoH) المشفر للنفق حتى لا تتمكن أدوات الحل من تزوير الإجابات.",
+  "dnsCheckNeedsConnection": "اتصل بـ VPN أولاً، ثم تحقق من عدم وجود تسربات.",
+  "dnsExpected": "المنتظر",
+  "dnsActual": "ملاحظ",
+  "sortBy": "الترتيب حسب",
+  "sortPing": "بينغ",
+  "sortSpeed": "السرعة",
+  "sortName": "الاسم",
+  "measureSpeed": "قياس السرعة",
+  "benchmarkStale": "عفا عليه الزمن",
+  "autoSelectMode": "خادم التحديد التلقائي",
+  "autoSelectPing": "أسرع بينغ",
+  "autoSelectSpeed": "السرعة القصوى",
+  "autoSelectSmart": "الاختيار الذكي",
+  "coreWatchUnstable": "الاتصال بالنواة غير مستقر",
+  "watchReconnect": "أعد الاتصال",
+  "coreRestoringLink": "جارٍ استعادة الاتصال بالنواة…",
+  "crashRestoreTitle": "تمت مقاطعة الجلسة الأخيرة",
+  "restoreOnCrash": "استعادة الجلسة بعد حدوث عطل",
+  "crashRestore": "إعادة",
+  "crashDismiss": "ليس الآن",
+  "overrideTitle": "تعديلاتي",
+  "overrideEdit": "تحرير الخوادم",
+  "overrideHide": "إخفاء",
+  "overrideUnhide": "عرض",
+  "overrideClear": "إعادة ضبط التعديلات",
+  "overrideEmpty": "لم يتم التعديل بعد",
+  "overrideCustomRules": "القواعد الخاصة",
+  "errBenchmarkUnsupported": "يحتاج قياس السرعة إلى نواة أحدث",
+  "benchmarkProgress": "قياس {done} من {total}…",
+  "profiles": "ملفات تعريف الشبكة",
+  "profilesEmpty": "لا توجد ملفات شخصية بعد. قم بإنشاء واحدة لتطبيق الإعدادات تلقائيًا على الشبكات المعروفة.",
+  "profileAdd": "إضافة ملف شخصي",
+  "profileName": "اسم الملف الشخصي",
+  "profileSsids": "شبكات Wi-Fi (SSID)",
+  "profileSsidsHint": "المنزل، المكتب مفصولة بفواصل",
+  "profileGateways": "بوابات الشبكة",
+  "profileAsns": "أرقام AS",
+  "profileAutoApply": "التطبيق تلقائيًا",
+  "profileAutoApplyHint": "عند إيقاف هذا الخيار، يُطلب التأكيد قبل تطبيق ملف التعريف.",
+  "profileSnapshot": "تذكر الإعدادات الحالية تم تطبيق الملف الشخصي",
+  "profileSnapshotDone": "تم حفظ الإعدادات الحالية في ملف التعريف",
+  "profileDelete": "حذف الملف الشخصي",
+  "profileDeleteConfirm": "حذف الملف الشخصي \"{name}\"؟",
+  "profileApplyAsk": "تطبيق الملف الشخصي \"{name}\"؟",
+  "profileApply": "تطبيق",
+  "profileApplied": "\"{name}\".",
+  "profileUndo": "إلغاء",
+  "profileActive": "نشط",
+  "networkNow": "الآن: {info}",
+  "networkUnknown": "معلومات الشبكة غير متاحة",
+  "profileNoTriggers": "أضف مشغلًا واحدًا على الأقل: SSID أو البوابة أو ASN",
+  "chains": "سلاسل الوكيل",
+  "chainsEmpty": "لا توجد سلاسل بعد. قم بربط 2-3 خوادم بحيث تنتقل حركة المرور عبر كل منها.",
+  "chainAdd": "السلسلة الجديدة",
+  "chainName": "اسم السلسلة",
+  "chainPickServers": "اختر 2-3 خوادم",
+  "chainOrderHint": "اسحب لإعادة الترتيب: تدخل حركة المرور من الأعلى وتخرج من الأسفل.",
+  "chainTooFew": "اختر خادمين على الأقل",
+  "chainTooMany": "تحتوي السلسلة على 3 خوادم على الأكثر",
+  "chainEstimate": "الكمون المقدر",
+  "chainSave": "حفظ السلسلة",
+  "chainDelete": "حذف السلسلة",
+  "chainDeleteConfirm": "حذف السلسلة \"{name}\"؟",
+  "chainUnsupported": "لا يستطيع المحرك الحالي بناء السلاسل",
+  "chainHopMissing": "أحد خوادم السلسلة لم يعد متاحًا",
+  "chainHop": "القفزة {n}",
+  "chainEntry": "الدخول",
+  "chainExit": "الخروج",
+  "sync": "مزامنة الجهاز",
+  "syncDevices": "أجهزتي",
+  "syncEmpty": "لا توجد أجهزة مقترنة. قم بإقران جهاز آخر عبر الشبكة المحلية.",
+  "syncPair": "إقران الجهاز",
+  "syncShowCode": "أظهر الكود الخاص بي",
+  "syncScanCode": "رمز المسح",
+  "syncRevoke": "انسحاب",
+  "syncRevokeConfirm": "إلغاء \"{name}\"؟",
+  "syncLastSync": "آخر مزامنة: {time}",
+  "syncNever": "أبدًا",
+  "syncNoLan": "يجب أن تكون الأجهزة على نفس الشبكة المحلية",
+  "syncPaired": "تم إقران الجهاز",
+  "syncPairingTitle": "إقران مع هذا الجهاز",
+  "syncWaiting": "في انتظار الجهاز الآخر...",
+  "syncSecureNote": "قناة مشفرة من طرف إلى طرف. لا حسابات ولا خوادم سحابية.",
+  "zapretWithVpn": "تجاوز تصفية DPI لحركة مرور الشبكة المباشرة",
+  "zapretWithVpnHint": "يشغّل zapret إلى جانب نفق VPN: تمر حركة النفق عبر VPN، وتمر الحركة المباشرة عبر مسار تجاوز الحجب.",
+  "chainDuplicate": "يمكن لكل خادم أن يظهر مرة واحدة فقط",
+  "edit": "تحرير",
+  "remove": "إزالة",
+  "autoSwitchOnDegrade": "التبديل التلقائي عند التدهور",
+  "autoSwitchOnDegradeDetail": "إذا تباطأ الخادم المحدد كثيرًا أو توقف عن الاستجابة، ينتقل Sora إلى أفضل خادم حسب القياسات، بما لا يزيد عن مرة واحدة كل 10 دقائق.",
+  "tunStackMixed": "مختلط",
+  "tunStackSystem": "النظام",
+  "syncCodeExpired": "انتهت صلاحية الرمز",
+  "syncDaemonFailed": "لا يمكن بدء خدمة المزامنة",
+  "syncDaemonMissing": "لم يتم العثور على المكون sora-sync. أعد تثبيت التطبيق لتمكين مزامنة الجهاز.",
+  "syncDaemonStarting": "بدء خدمة المزامنة...",
+  "syncErrAuth": "رفضت خدمة المزامنة رمز الوصول. أعد تشغيل التطبيق وحاول مرة أخرى.",
+  "syncErrNotFound": "لم يعد الجهاز مقترنًا",
+  "syncErrPairingActive": "جلسة الاقتران مفتوحة بالفعل",
+  "syncErrUnreachable": "الجهاز الآخر لم يرد. تأكد من وجوده على نفس الشبكة وإظهار الكود الخاص به.",
+  "syncError": "خطأ في المزامنة",
+  "syncExpiresIn": "تنتهي صلاحية الرمز بعد {duration}",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "الاقتران بالجهاز...",
+  "syncLegacyCleared": "لم يتم إقران قائمة الأجهزة القديمة مطلقًا، لذلك تمت محوها. قم بإقران أجهزتك مرة أخرى، بشكل حقيقي هذه المرة.",
+  "syncNewCode": "كود جديد",
+  "syncPairedWith": "مقترن بـ {name}",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "كرر",
+  "syncStopShowing": "إخفاء الرمز",
+  "syncSyncNow": "مزامنة الآن",
+  "syncSyncResult": "تم استلام {pulled}، إرسال {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "نتيجة المزامنة",
+  "syncPulled": "تم الاستلام",
+  "syncPushed": "تم الإرسال",
+  "syncNoChanges": "لم يتم اكتشاف أي تغييرات",
+  "syncDocKindSubscriptions": "الاشتراكات",
+  "syncDocKindSettings": "إعدادات التطبيق",
+  "syncDocKindOverrides": "تجاوزات إعدادات الاشتراكات",
+  "syncDocKindProfiles": "ملفات تعريف الشبكة",
+  "syncDocKindChains": "سلاسل الوكيل",
+  "syncFrom": "من {name}",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "هذا الجهاز",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "لـ Shadowsocks: الطريقة:كلمة المرور، مثل chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "التقاط الحزمة",
+  "diagnosticEvents": "أحداث ويندوز",
+  "diagnosticCapture": "التقاط لمدة 10 ثانية",
+  "diagnosticRequiresTun": "يحتاج التقاط الحزم إلى اتصال Sora TUN نشط.",
+  "diagnosticUnavailable": "هذا التشخيص غير متوفر على هذا النظام الأساسي.",
+  "extErrRevoked": "سحب فريق Sora هذا الإصدار من الإضافة لأنه غير آمن أو معطّل.",
+  "extErrRevocationsExpired": "تعذّر تحديث قائمة الإضافات المسحوبة. التثبيت متوقف حتى تُحدَّث: تحقّق من الشبكة وحاول مجددًا.",
+  "extRevokedDisabled": "تم إيقاف الإضافات المسحوبة: {names}",
+  "customServerWgPrivateKey": "المفتاح الخاص",
+  "customServerWgAddresses": "عناوين الواجهة",
+  "customServerWgPeerKey": "المفتاح العام للخادم",
+  "customServerWgPresharedKey": "المفتاح المشترك",
+  "customServerWgAllowedIps": "عناوين IP المسموح بها",
+  "customServerWgKeepalive": "Keepalive بالثواني",
+  "customServerWgKeyInvalid": "يجب أن يكون المفتاح 32 بايت بترميز base64 كما يطبعه wg genkey.",
+  "customServerWgCidrInvalid": "أدخل بادئات مفصولة بفواصل مثل 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "أدخل عدد ثوانٍ من 0 إلى 65535.",
+  "strictKillSwitch": "مفتاح إيقاف صارم",
+  "strictKillSwitchWarning": "بعد الاتصال، يحظر حركة البيانات خارج VPN حتى بعد التعطل أو إعادة التشغيل أو إغلاق التطبيق. لا تعود إمكانية الوصول إلا بقطع الاتصال أو تعطيل هذا الخيار. بعد إعادة تشغيل الجهاز، يُستأنف الحظر فقط إذا كان الاتصال عند بدء التشغيل مفعّلاً.",
+  "extWorkerFailed": "فشلت المهمة الخلفية للإضافة. راجع سجل الإضافة.",
+  "extAssetRejected": "تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة."
 }

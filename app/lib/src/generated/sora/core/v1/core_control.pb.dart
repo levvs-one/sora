@@ -114,6 +114,8 @@ class ConnectRequest extends $pb.GeneratedMessage {
     SessionPlan? sessionPlan,
     $core.List<$core.int>? controlAuthenticator,
     $core.bool? killSwitch,
+    $core.bool? strictKillSwitch,
+    $core.bool? reconnect,
   }) {
     final result = ConnectRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
@@ -122,6 +124,8 @@ class ConnectRequest extends $pb.GeneratedMessage {
     if (sessionPlan != null) result.sessionPlan = sessionPlan;
     if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
     if (killSwitch != null) result.killSwitch = killSwitch;
+    if (strictKillSwitch != null) result.strictKillSwitch = strictKillSwitch;
+    if (reconnect != null) result.reconnect = reconnect;
     return result;
   }
 
@@ -142,6 +146,8 @@ class ConnectRequest extends $pb.GeneratedMessage {
     ..aOM<SessionPlan>(4, _omitFieldNames ? '' : 'sessionPlan', subBuilder: SessionPlan.$_createMessage)
     ..a<$core.List<$core.int>>(5, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
     ..aOB(6, _omitFieldNames ? '' : 'killSwitch')
+    ..aOB(7, _omitFieldNames ? '' : 'strictKillSwitch')
+    ..aOB(8, _omitFieldNames ? '' : 'reconnect')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -223,6 +229,26 @@ class ConnectRequest extends $pb.GeneratedMessage {
   $core.bool hasKillSwitch() => $_has(5);
   @$pb.TagNumber(6)
   void clearKillSwitch() => $_clearField(6);
+
+  /// Since 1.12. Opt-in, persists a block until explicit disconnect or disable.
+  @$pb.TagNumber(7)
+  $core.bool get strictKillSwitch => $_getBF(6);
+  @$pb.TagNumber(7)
+  set strictKillSwitch($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasStrictKillSwitch() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearStrictKillSwitch() => $_clearField(7);
+
+  /// Reapply after a reboot only when the user intends automatic reconnect.
+  @$pb.TagNumber(8)
+  $core.bool get reconnect => $_getBF(7);
+  @$pb.TagNumber(8)
+  set reconnect($core.bool value) => $_setBool(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasReconnect() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearReconnect() => $_clearField(8);
 }
 
 class ConnectResponse extends $pb.GeneratedMessage {
@@ -691,6 +717,9 @@ class SessionPlan extends $pb.GeneratedMessage {
     RoutingOptions? routing,
     $core.bool? ipv6,
     $core.String? tunStack,
+    $core.Iterable<$core.String>? chain,
+    $core.bool? zapretWithVpn,
+    BypassStrategy? zapretStrategy,
   }) {
     final result = SessionPlan._();
     if (tunnelMode != null) result.tunnelMode = tunnelMode;
@@ -707,6 +736,9 @@ class SessionPlan extends $pb.GeneratedMessage {
     if (routing != null) result.routing = routing;
     if (ipv6 != null) result.ipv6 = ipv6;
     if (tunStack != null) result.tunStack = tunStack;
+    if (chain != null) result.chain.addAll(chain);
+    if (zapretWithVpn != null) result.zapretWithVpn = zapretWithVpn;
+    if (zapretStrategy != null) result.zapretStrategy = zapretStrategy;
     return result;
   }
 
@@ -735,6 +767,9 @@ class SessionPlan extends $pb.GeneratedMessage {
     ..aOM<RoutingOptions>(12, _omitFieldNames ? '' : 'routing', subBuilder: RoutingOptions.$_createMessage)
     ..aOB(13, _omitFieldNames ? '' : 'ipv6')
     ..aOS(14, _omitFieldNames ? '' : 'tunStack')
+    ..pPS(15, _omitFieldNames ? '' : 'chain')
+    ..aOB(16, _omitFieldNames ? '' : 'zapretWithVpn')
+    ..aOM<BypassStrategy>(17, _omitFieldNames ? '' : 'zapretStrategy', subBuilder: BypassStrategy.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -886,6 +921,37 @@ class SessionPlan extends $pb.GeneratedMessage {
   $core.bool hasTunStack() => $_has(13);
   @$pb.TagNumber(14)
   void clearTunStack() => $_clearField(14);
+
+  /// Since 1.10. Ordered server ids forming a proxy chain: traffic enters the
+  /// first and exits the last (egress IP of the last hop). 2 to 3 entries;
+  /// empty means no chaining. Requires an engine with the "chains" feature.
+  @$pb.TagNumber(15)
+  $pb.PbList<$core.String> get chain => $_getList(14);
+
+  /// Since 1.10. Runs zapret's tpws alongside the VPN tunnel so direct traffic
+  /// (routing exceptions) gets DPI-resistant handshakes while VPN traffic uses
+  /// the tunnel. Linux only; needs tpws in the engines directory.
+  @$pb.TagNumber(16)
+  $core.bool get zapretWithVpn => $_getBF(15);
+  @$pb.TagNumber(16)
+  set zapretWithVpn($core.bool value) => $_setBool(15, value);
+  @$pb.TagNumber(16)
+  $core.bool hasZapretWithVpn() => $_has(15);
+  @$pb.TagNumber(16)
+  void clearZapretWithVpn() => $_clearField(16);
+
+  /// Since 1.10. The tpws strategy shaping direct traffic when zapret_with_vpn
+  /// is set. Empty uses the core default strategy.
+  @$pb.TagNumber(17)
+  BypassStrategy get zapretStrategy => $_getN(16);
+  @$pb.TagNumber(17)
+  set zapretStrategy(BypassStrategy value) => $_setField(17, value);
+  @$pb.TagNumber(17)
+  $core.bool hasZapretStrategy() => $_has(16);
+  @$pb.TagNumber(17)
+  void clearZapretStrategy() => $_clearField(17);
+  @$pb.TagNumber(17)
+  BypassStrategy ensureZapretStrategy() => $_ensure(16);
 }
 
 /// GroupSpec is one group of outbounds.
@@ -1164,7 +1230,7 @@ class LocalProxy extends $pb.GeneratedMessage {
   void clearPassword() => $_clearField(3);
 }
 
-/// AntiCensorship holds the per-session defences against DPI.
+/// AntiCensorship holds the existing per-session TLS fragmentation options.
 class AntiCensorship extends $pb.GeneratedMessage {
   factory AntiCensorship({
     $core.bool? tlsFragment,
@@ -1728,10 +1794,14 @@ class SessionStatus extends $pb.GeneratedMessage {
   factory SessionStatus({
     ConnectionState? connection,
     ApiVersion? negotiatedVersion,
+    $core.bool? killSwitch,
+    $core.bool? strictKillSwitch,
   }) {
     final result = SessionStatus._();
     if (connection != null) result.connection = connection;
     if (negotiatedVersion != null) result.negotiatedVersion = negotiatedVersion;
+    if (killSwitch != null) result.killSwitch = killSwitch;
+    if (strictKillSwitch != null) result.strictKillSwitch = strictKillSwitch;
     return result;
   }
 
@@ -1748,6 +1818,8 @@ class SessionStatus extends $pb.GeneratedMessage {
       createEmptyInstance: SessionStatus.$_createMessage)
     ..aOM<ConnectionState>(1, _omitFieldNames ? '' : 'connection', subBuilder: ConnectionState.$_createMessage)
     ..aOM<ApiVersion>(2, _omitFieldNames ? '' : 'negotiatedVersion', subBuilder: ApiVersion.$_createMessage)
+    ..aOB(3, _omitFieldNames ? '' : 'killSwitch')
+    ..aOB(4, _omitFieldNames ? '' : 'strictKillSwitch')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1791,6 +1863,24 @@ class SessionStatus extends $pb.GeneratedMessage {
   void clearNegotiatedVersion() => $_clearField(2);
   @$pb.TagNumber(2)
   ApiVersion ensureNegotiatedVersion() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  $core.bool get killSwitch => $_getBF(2);
+  @$pb.TagNumber(3)
+  set killSwitch($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasKillSwitch() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearKillSwitch() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get strictKillSwitch => $_getBF(3);
+  @$pb.TagNumber(4)
+  set strictKillSwitch($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasStrictKillSwitch() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearStrictKillSwitch() => $_clearField(4);
 }
 
 class GetStatsRequest extends $pb.GeneratedMessage {
@@ -2044,6 +2134,7 @@ enum CoreEvent_Payload {
   error,
   killSwitchChanged,
   groupSwitched,
+  profileMatched,
   notSet
 }
 
@@ -2060,6 +2151,7 @@ class CoreEvent extends $pb.GeneratedMessage {
     SoraError? error,
     KillSwitchChanged? killSwitchChanged,
     GroupSwitched? groupSwitched,
+    ProfileMatched? profileMatched,
   }) {
     final result = CoreEvent._();
     if (sequence != null) result.sequence = sequence;
@@ -2073,6 +2165,7 @@ class CoreEvent extends $pb.GeneratedMessage {
     if (error != null) result.error = error;
     if (killSwitchChanged != null) result.killSwitchChanged = killSwitchChanged;
     if (groupSwitched != null) result.groupSwitched = groupSwitched;
+    if (profileMatched != null) result.profileMatched = profileMatched;
     return result;
   }
 
@@ -2093,12 +2186,13 @@ class CoreEvent extends $pb.GeneratedMessage {
     9: CoreEvent_Payload.error,
     10: CoreEvent_Payload.killSwitchChanged,
     11: CoreEvent_Payload.groupSwitched,
+    12: CoreEvent_Payload.profileMatched,
     0: CoreEvent_Payload.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CoreEvent',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
       createEmptyInstance: CoreEvent.$_createMessage)
-    ..oo(0, [4, 5, 6, 7, 8, 9, 10, 11])
+    ..oo(0, [4, 5, 6, 7, 8, 9, 10, 11, 12])
     ..a<$fixnum.Int64>(1, _omitFieldNames ? '' : 'sequence', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(2, _omitFieldNames ? '' : 'sessionId')
     ..aOM<$2.Timestamp>(3, _omitFieldNames ? '' : 'emittedAt', subBuilder: $2.Timestamp.$_createMessage)
@@ -2112,6 +2206,7 @@ class CoreEvent extends $pb.GeneratedMessage {
     ..aOM<KillSwitchChanged>(10, _omitFieldNames ? '' : 'killSwitchChanged',
         subBuilder: KillSwitchChanged.$_createMessage)
     ..aOM<GroupSwitched>(11, _omitFieldNames ? '' : 'groupSwitched', subBuilder: GroupSwitched.$_createMessage)
+    ..aOM<ProfileMatched>(12, _omitFieldNames ? '' : 'profileMatched', subBuilder: ProfileMatched.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2142,6 +2237,7 @@ class CoreEvent extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   @$pb.TagNumber(10)
   @$pb.TagNumber(11)
+  @$pb.TagNumber(12)
   CoreEvent_Payload whichPayload() => _CoreEvent_PayloadByTag[$_whichOneof(0)]!;
   @$pb.TagNumber(4)
   @$pb.TagNumber(5)
@@ -2151,6 +2247,7 @@ class CoreEvent extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   @$pb.TagNumber(10)
   @$pb.TagNumber(11)
+  @$pb.TagNumber(12)
   void clearPayload() => $_clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
@@ -2269,6 +2366,17 @@ class CoreEvent extends $pb.GeneratedMessage {
   void clearGroupSwitched() => $_clearField(11);
   @$pb.TagNumber(11)
   GroupSwitched ensureGroupSwitched() => $_ensure(10);
+
+  @$pb.TagNumber(12)
+  ProfileMatched get profileMatched => $_getN(11);
+  @$pb.TagNumber(12)
+  set profileMatched(ProfileMatched value) => $_setField(12, value);
+  @$pb.TagNumber(12)
+  $core.bool hasProfileMatched() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearProfileMatched() => $_clearField(12);
+  @$pb.TagNumber(12)
+  ProfileMatched ensureProfileMatched() => $_ensure(11);
 }
 
 class StateChanged extends $pb.GeneratedMessage {
@@ -2484,6 +2592,10 @@ class StatsTick extends $pb.GeneratedMessage {
   void clearActiveConnections() => $_clearField(3);
 }
 
+/// NOT WIRED (2026-10-20): no core code emits this event and no client reads
+/// it; bypass/obfs strategy notices travel as journal log lines (LogBatch)
+/// instead. The message stays for wire compatibility; do not build on this
+/// payload until it is emitted.
 class BypassStrategyChanged extends $pb.GeneratedMessage {
   factory BypassStrategyChanged({
     $core.String? strategy,
@@ -2708,6 +2820,12 @@ class LogBatch extends $pb.GeneratedMessage {
 /// the packet filter the core still records the request, and the interface has to
 /// be able to show a switch that is on but not blocking rather than a switch that
 /// protects the user when it does not.
+///
+/// NOT WIRED (2026-10-20): no core code emits this event and no client reads
+/// it. The live kill-switch state flows through the SetKillSwitch response and
+/// GetStatus (arming either applies or returns an error, so an enabled-but-not-
+/// enforced state cannot occur silently today). The message stays for wire
+/// compatibility; do not build on this payload until it is emitted.
 class KillSwitchChanged extends $pb.GeneratedMessage {
   factory KillSwitchChanged({
     $core.bool? enabled,
@@ -3794,12 +3912,14 @@ class SetKillSwitchRequest extends $pb.GeneratedMessage {
     $core.String? requestId,
     $core.String? sessionId,
     $core.bool? enabled,
+    $core.bool? strict,
   }) {
     final result = SetKillSwitchRequest._();
     if (apiVersion != null) result.apiVersion = apiVersion;
     if (requestId != null) result.requestId = requestId;
     if (sessionId != null) result.sessionId = sessionId;
     if (enabled != null) result.enabled = enabled;
+    if (strict != null) result.strict = strict;
     return result;
   }
 
@@ -3819,6 +3939,7 @@ class SetKillSwitchRequest extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'requestId')
     ..aOS(3, _omitFieldNames ? '' : 'sessionId')
     ..aOB(4, _omitFieldNames ? '' : 'enabled')
+    ..aOB(5, _omitFieldNames ? '' : 'strict')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3878,16 +3999,27 @@ class SetKillSwitchRequest extends $pb.GeneratedMessage {
   $core.bool hasEnabled() => $_has(3);
   @$pb.TagNumber(4)
   void clearEnabled() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get strict => $_getBF(4);
+  @$pb.TagNumber(5)
+  set strict($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasStrict() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearStrict() => $_clearField(5);
 }
 
 class SetKillSwitchResponse extends $pb.GeneratedMessage {
   factory SetKillSwitchResponse({
     $core.bool? enabled,
     SoraError? error,
+    $core.bool? strict,
   }) {
     final result = SetKillSwitchResponse._();
     if (enabled != null) result.enabled = enabled;
     if (error != null) result.error = error;
+    if (strict != null) result.strict = strict;
     return result;
   }
 
@@ -3905,6 +4037,7 @@ class SetKillSwitchResponse extends $pb.GeneratedMessage {
       createEmptyInstance: SetKillSwitchResponse.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'enabled')
     ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..aOB(3, _omitFieldNames ? '' : 'strict')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -3946,6 +4079,15 @@ class SetKillSwitchResponse extends $pb.GeneratedMessage {
   void clearError() => $_clearField(2);
   @$pb.TagNumber(2)
   SoraError ensureError() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  $core.bool get strict => $_getBF(2);
+  @$pb.TagNumber(3)
+  set strict($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasStrict() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearStrict() => $_clearField(3);
 }
 
 class DiagnosticReport extends $pb.GeneratedMessage {
@@ -8225,6 +8367,2048 @@ class BypassStrategy extends $pb.GeneratedMessage {
   $core.bool hasMethodEol() => $_has(6);
   @$pb.TagNumber(7)
   void clearMethodEol() => $_clearField(7);
+}
+
+/// Since 1.8. One DNS leak check. label and fix_hint are localization keys
+/// for the UI, never free text; expected and actual carry raw values such as
+/// resolver addresses.
+class DnsLeakCheck extends $pb.GeneratedMessage {
+  factory DnsLeakCheck({
+    $core.String? id,
+    $core.String? label,
+    $core.String? expected,
+    $core.String? actual,
+    $core.bool? leaked,
+    $core.String? fixHint,
+  }) {
+    final result = DnsLeakCheck._();
+    if (id != null) result.id = id;
+    if (label != null) result.label = label;
+    if (expected != null) result.expected = expected;
+    if (actual != null) result.actual = actual;
+    if (leaked != null) result.leaked = leaked;
+    if (fixHint != null) result.fixHint = fixHint;
+    return result;
+  }
+
+  DnsLeakCheck._();
+
+  factory DnsLeakCheck.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DnsLeakCheck()..mergeFromBuffer(data, registry);
+  factory DnsLeakCheck.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DnsLeakCheck()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DnsLeakCheck',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: DnsLeakCheck.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'label')
+    ..aOS(3, _omitFieldNames ? '' : 'expected')
+    ..aOS(4, _omitFieldNames ? '' : 'actual')
+    ..aOB(5, _omitFieldNames ? '' : 'leaked')
+    ..aOS(6, _omitFieldNames ? '' : 'fixHint')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DnsLeakCheck clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DnsLeakCheck copyWith(void Function(DnsLeakCheck) updates) =>
+      super.copyWith((message) => updates(message as DnsLeakCheck)) as DnsLeakCheck;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DnsLeakCheck() / DnsLeakCheck.new instead')
+  static DnsLeakCheck create() => DnsLeakCheck._();
+  static $pb.GeneratedMessage $_createMessage() => DnsLeakCheck._();
+  @$core.override
+  DnsLeakCheck createEmptyInstance() => DnsLeakCheck._();
+  @$core.pragma('dart2js:noInline')
+  static DnsLeakCheck getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DnsLeakCheck>(DnsLeakCheck.$_createMessage);
+  static DnsLeakCheck? _defaultInstance;
+
+  /// Stable machine id: "tunnel-dns", "system-resolvers", "killswitch-dns".
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  /// Localization key for the check title, e.g. "dnsLeak.check.tunnelDns".
+  @$pb.TagNumber(2)
+  $core.String get label => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set label($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasLabel() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLabel() => $_clearField(2);
+
+  /// What the core expects, e.g. the tunnel resolvers.
+  @$pb.TagNumber(3)
+  $core.String get expected => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set expected($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasExpected() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearExpected() => $_clearField(3);
+
+  /// What was actually observed, e.g. the OS resolvers.
+  @$pb.TagNumber(4)
+  $core.String get actual => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set actual($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasActual() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearActual() => $_clearField(4);
+
+  /// True when the check found a leak.
+  @$pb.TagNumber(5)
+  $core.bool get leaked => $_getBF(4);
+  @$pb.TagNumber(5)
+  set leaked($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasLeaked() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearLeaked() => $_clearField(5);
+
+  /// Localization key for the suggested fix, e.g.
+  /// "dnsLeak.fix.enableKillSwitch". Empty when nothing needs doing. A check
+  /// can carry a hint without being a leak: the UI shows those as warnings.
+  @$pb.TagNumber(6)
+  $core.String get fixHint => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set fixHint($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasFixHint() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearFixHint() => $_clearField(6);
+}
+
+class CheckDnsLeaksRequest extends $pb.GeneratedMessage {
+  factory CheckDnsLeaksRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.String? sessionId,
+  }) {
+    final result = CheckDnsLeaksRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (sessionId != null) result.sessionId = sessionId;
+    return result;
+  }
+
+  CheckDnsLeaksRequest._();
+
+  factory CheckDnsLeaksRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CheckDnsLeaksRequest()..mergeFromBuffer(data, registry);
+  factory CheckDnsLeaksRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CheckDnsLeaksRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CheckDnsLeaksRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: CheckDnsLeaksRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOS(3, _omitFieldNames ? '' : 'sessionId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CheckDnsLeaksRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CheckDnsLeaksRequest copyWith(void Function(CheckDnsLeaksRequest) updates) =>
+      super.copyWith((message) => updates(message as CheckDnsLeaksRequest)) as CheckDnsLeaksRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CheckDnsLeaksRequest() / CheckDnsLeaksRequest.new instead')
+  static CheckDnsLeaksRequest create() => CheckDnsLeaksRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CheckDnsLeaksRequest._();
+  @$core.override
+  CheckDnsLeaksRequest createEmptyInstance() => CheckDnsLeaksRequest._();
+  @$core.pragma('dart2js:noInline')
+  static CheckDnsLeaksRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CheckDnsLeaksRequest>(CheckDnsLeaksRequest.$_createMessage);
+  static CheckDnsLeaksRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get sessionId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set sessionId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasSessionId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSessionId() => $_clearField(3);
+}
+
+class CheckDnsLeaksResponse extends $pb.GeneratedMessage {
+  factory CheckDnsLeaksResponse({
+    $core.Iterable<DnsLeakCheck>? checks,
+    SoraError? error,
+  }) {
+    final result = CheckDnsLeaksResponse._();
+    if (checks != null) result.checks.addAll(checks);
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  CheckDnsLeaksResponse._();
+
+  factory CheckDnsLeaksResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CheckDnsLeaksResponse()..mergeFromBuffer(data, registry);
+  factory CheckDnsLeaksResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CheckDnsLeaksResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CheckDnsLeaksResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: CheckDnsLeaksResponse.$_createMessage)
+    ..pPM<DnsLeakCheck>(1, _omitFieldNames ? '' : 'checks', subBuilder: DnsLeakCheck.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CheckDnsLeaksResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CheckDnsLeaksResponse copyWith(void Function(CheckDnsLeaksResponse) updates) =>
+      super.copyWith((message) => updates(message as CheckDnsLeaksResponse)) as CheckDnsLeaksResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CheckDnsLeaksResponse() / CheckDnsLeaksResponse.new instead')
+  static CheckDnsLeaksResponse create() => CheckDnsLeaksResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CheckDnsLeaksResponse._();
+  @$core.override
+  CheckDnsLeaksResponse createEmptyInstance() => CheckDnsLeaksResponse._();
+  @$core.pragma('dart2js:noInline')
+  static CheckDnsLeaksResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CheckDnsLeaksResponse>(CheckDnsLeaksResponse.$_createMessage);
+  static CheckDnsLeaksResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<DnsLeakCheck> get checks => $_getList(0);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
+/// BenchmarkServersRequest starts a throughput benchmark for the listed
+/// servers. At most 32 servers per call; duration_s is clamped to 5..60,
+/// concurrency to 1..4.
+class BenchmarkServersRequest extends $pb.GeneratedMessage {
+  factory BenchmarkServersRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.String? requestId,
+    $core.Iterable<$core.String>? serverIds,
+    $core.int? durationS,
+    $core.int? concurrency,
+    $core.String? url,
+  }) {
+    final result = BenchmarkServersRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (requestId != null) result.requestId = requestId;
+    if (serverIds != null) result.serverIds.addAll(serverIds);
+    if (durationS != null) result.durationS = durationS;
+    if (concurrency != null) result.concurrency = concurrency;
+    if (url != null) result.url = url;
+    return result;
+  }
+
+  BenchmarkServersRequest._();
+
+  factory BenchmarkServersRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BenchmarkServersRequest()..mergeFromBuffer(data, registry);
+  factory BenchmarkServersRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BenchmarkServersRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'BenchmarkServersRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: BenchmarkServersRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOS(3, _omitFieldNames ? '' : 'requestId')
+    ..pPS(4, _omitFieldNames ? '' : 'serverIds')
+    ..aI(5, _omitFieldNames ? '' : 'durationS', fieldType: $pb.PbFieldType.OU3)
+    ..aI(6, _omitFieldNames ? '' : 'concurrency', fieldType: $pb.PbFieldType.OU3)
+    ..aOS(7, _omitFieldNames ? '' : 'url')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BenchmarkServersRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BenchmarkServersRequest copyWith(void Function(BenchmarkServersRequest) updates) =>
+      super.copyWith((message) => updates(message as BenchmarkServersRequest)) as BenchmarkServersRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use BenchmarkServersRequest() / BenchmarkServersRequest.new instead')
+  static BenchmarkServersRequest create() => BenchmarkServersRequest._();
+  static $pb.GeneratedMessage $_createMessage() => BenchmarkServersRequest._();
+  @$core.override
+  BenchmarkServersRequest createEmptyInstance() => BenchmarkServersRequest._();
+  @$core.pragma('dart2js:noInline')
+  static BenchmarkServersRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<BenchmarkServersRequest>(BenchmarkServersRequest.$_createMessage);
+  static BenchmarkServersRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get requestId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set requestId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRequestId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRequestId() => $_clearField(3);
+
+  /// Server ids as known to the client (subscription or manual ids).
+  @$pb.TagNumber(4)
+  $pb.PbList<$core.String> get serverIds => $_getList(3);
+
+  /// Per-server measurement budget in seconds.
+  @$pb.TagNumber(5)
+  $core.int get durationS => $_getIZ(4);
+  @$pb.TagNumber(5)
+  set durationS($core.int value) => $_setUnsignedInt32(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasDurationS() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearDurationS() => $_clearField(5);
+
+  /// How many servers are benchmarked at once.
+  @$pb.TagNumber(6)
+  $core.int get concurrency => $_getIZ(5);
+  @$pb.TagNumber(6)
+  set concurrency($core.int value) => $_setUnsignedInt32(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasConcurrency() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearConcurrency() => $_clearField(6);
+
+  /// Speed-test URL; empty uses the core default (documented).
+  @$pb.TagNumber(7)
+  $core.String get url => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set url($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasUrl() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearUrl() => $_clearField(7);
+}
+
+/// BandwidthSample is one progress or final sample of a benchmark.
+class BandwidthSample extends $pb.GeneratedMessage {
+  factory BandwidthSample({
+    $core.String? serverId,
+    $fixnum.Int64? bytesPerSec,
+    $core.int? progressPct,
+    $core.bool? done,
+    SoraError? error,
+  }) {
+    final result = BandwidthSample._();
+    if (serverId != null) result.serverId = serverId;
+    if (bytesPerSec != null) result.bytesPerSec = bytesPerSec;
+    if (progressPct != null) result.progressPct = progressPct;
+    if (done != null) result.done = done;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  BandwidthSample._();
+
+  factory BandwidthSample.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BandwidthSample()..mergeFromBuffer(data, registry);
+  factory BandwidthSample.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BandwidthSample()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'BandwidthSample',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: BandwidthSample.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'serverId')
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'bytesPerSec', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aI(3, _omitFieldNames ? '' : 'progressPct', fieldType: $pb.PbFieldType.OU3)
+    ..aOB(4, _omitFieldNames ? '' : 'done')
+    ..aOM<SoraError>(5, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BandwidthSample clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BandwidthSample copyWith(void Function(BandwidthSample) updates) =>
+      super.copyWith((message) => updates(message as BandwidthSample)) as BandwidthSample;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use BandwidthSample() / BandwidthSample.new instead')
+  static BandwidthSample create() => BandwidthSample._();
+  static $pb.GeneratedMessage $_createMessage() => BandwidthSample._();
+  @$core.override
+  BandwidthSample createEmptyInstance() => BandwidthSample._();
+  @$core.pragma('dart2js:noInline')
+  static BandwidthSample getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<BandwidthSample>(BandwidthSample.$_createMessage);
+  static BandwidthSample? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get serverId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set serverId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasServerId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearServerId() => $_clearField(1);
+
+  /// Measured goodput in bytes per second (meaningful when done=true).
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get bytesPerSec => $_getI64(1);
+  @$pb.TagNumber(2)
+  set bytesPerSec($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasBytesPerSec() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearBytesPerSec() => $_clearField(2);
+
+  /// 0..100 progress of this server's measurement.
+  @$pb.TagNumber(3)
+  $core.int get progressPct => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set progressPct($core.int value) => $_setUnsignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasProgressPct() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearProgressPct() => $_clearField(3);
+
+  /// True on the final sample for this server.
+  @$pb.TagNumber(4)
+  $core.bool get done => $_getBF(3);
+  @$pb.TagNumber(4)
+  set done($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasDone() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearDone() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  SoraError get error => $_getN(4);
+  @$pb.TagNumber(5)
+  set error(SoraError value) => $_setField(5, value);
+  @$pb.TagNumber(5)
+  $core.bool hasError() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearError() => $_clearField(5);
+  @$pb.TagNumber(5)
+  SoraError ensureError() => $_ensure(4);
+}
+
+/// GetBenchmarksRequest reads the stored benchmark history.
+class GetBenchmarksRequest extends $pb.GeneratedMessage {
+  factory GetBenchmarksRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.Iterable<$core.String>? serverIds,
+  }) {
+    final result = GetBenchmarksRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (serverIds != null) result.serverIds.addAll(serverIds);
+    return result;
+  }
+
+  GetBenchmarksRequest._();
+
+  factory GetBenchmarksRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetBenchmarksRequest()..mergeFromBuffer(data, registry);
+  factory GetBenchmarksRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetBenchmarksRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetBenchmarksRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: GetBenchmarksRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..pPS(3, _omitFieldNames ? '' : 'serverIds')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetBenchmarksRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetBenchmarksRequest copyWith(void Function(GetBenchmarksRequest) updates) =>
+      super.copyWith((message) => updates(message as GetBenchmarksRequest)) as GetBenchmarksRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetBenchmarksRequest() / GetBenchmarksRequest.new instead')
+  static GetBenchmarksRequest create() => GetBenchmarksRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetBenchmarksRequest._();
+  @$core.override
+  GetBenchmarksRequest createEmptyInstance() => GetBenchmarksRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetBenchmarksRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetBenchmarksRequest>(GetBenchmarksRequest.$_createMessage);
+  static GetBenchmarksRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  /// Empty returns all entries.
+  @$pb.TagNumber(3)
+  $pb.PbList<$core.String> get serverIds => $_getList(2);
+}
+
+class GetBenchmarksResponse extends $pb.GeneratedMessage {
+  factory GetBenchmarksResponse({
+    $core.Iterable<BenchmarkRecord>? benchmarks,
+    SoraError? error,
+  }) {
+    final result = GetBenchmarksResponse._();
+    if (benchmarks != null) result.benchmarks.addAll(benchmarks);
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  GetBenchmarksResponse._();
+
+  factory GetBenchmarksResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetBenchmarksResponse()..mergeFromBuffer(data, registry);
+  factory GetBenchmarksResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetBenchmarksResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetBenchmarksResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: GetBenchmarksResponse.$_createMessage)
+    ..pPM<BenchmarkRecord>(1, _omitFieldNames ? '' : 'benchmarks', subBuilder: BenchmarkRecord.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetBenchmarksResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetBenchmarksResponse copyWith(void Function(GetBenchmarksResponse) updates) =>
+      super.copyWith((message) => updates(message as GetBenchmarksResponse)) as GetBenchmarksResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetBenchmarksResponse() / GetBenchmarksResponse.new instead')
+  static GetBenchmarksResponse create() => GetBenchmarksResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetBenchmarksResponse._();
+  @$core.override
+  GetBenchmarksResponse createEmptyInstance() => GetBenchmarksResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetBenchmarksResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetBenchmarksResponse>(GetBenchmarksResponse.$_createMessage);
+  static GetBenchmarksResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<BenchmarkRecord> get benchmarks => $_getList(0);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
+/// BenchmarkRecord is one stored measurement (TTL 24h, see history docs).
+class BenchmarkRecord extends $pb.GeneratedMessage {
+  factory BenchmarkRecord({
+    $core.String? serverId,
+    $fixnum.Int64? bytesPerSec,
+    $core.int? latencyMs,
+    $fixnum.Int64? measuredAtUnix,
+  }) {
+    final result = BenchmarkRecord._();
+    if (serverId != null) result.serverId = serverId;
+    if (bytesPerSec != null) result.bytesPerSec = bytesPerSec;
+    if (latencyMs != null) result.latencyMs = latencyMs;
+    if (measuredAtUnix != null) result.measuredAtUnix = measuredAtUnix;
+    return result;
+  }
+
+  BenchmarkRecord._();
+
+  factory BenchmarkRecord.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BenchmarkRecord()..mergeFromBuffer(data, registry);
+  factory BenchmarkRecord.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      BenchmarkRecord()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'BenchmarkRecord',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: BenchmarkRecord.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'serverId')
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'bytesPerSec', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aI(3, _omitFieldNames ? '' : 'latencyMs', fieldType: $pb.PbFieldType.OU3)
+    ..aInt64(4, _omitFieldNames ? '' : 'measuredAtUnix')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BenchmarkRecord clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BenchmarkRecord copyWith(void Function(BenchmarkRecord) updates) =>
+      super.copyWith((message) => updates(message as BenchmarkRecord)) as BenchmarkRecord;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use BenchmarkRecord() / BenchmarkRecord.new instead')
+  static BenchmarkRecord create() => BenchmarkRecord._();
+  static $pb.GeneratedMessage $_createMessage() => BenchmarkRecord._();
+  @$core.override
+  BenchmarkRecord createEmptyInstance() => BenchmarkRecord._();
+  @$core.pragma('dart2js:noInline')
+  static BenchmarkRecord getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<BenchmarkRecord>(BenchmarkRecord.$_createMessage);
+  static BenchmarkRecord? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get serverId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set serverId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasServerId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearServerId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get bytesPerSec => $_getI64(1);
+  @$pb.TagNumber(2)
+  set bytesPerSec($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasBytesPerSec() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearBytesPerSec() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get latencyMs => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set latencyMs($core.int value) => $_setUnsignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasLatencyMs() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearLatencyMs() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get measuredAtUnix => $_getI64(3);
+  @$pb.TagNumber(4)
+  set measuredAtUnix($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasMeasuredAtUnix() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearMeasuredAtUnix() => $_clearField(4);
+}
+
+/// Since 1.10. A network profile matched the current network. The client
+/// applies the profile (automatically when auto_apply, otherwise it asks the
+/// user) by rebuilding the session plan from the profile's apply settings.
+class ProfileMatched extends $pb.GeneratedMessage {
+  factory ProfileMatched({
+    $core.String? profileId,
+    $core.String? profileName,
+    $core.bool? autoApply,
+  }) {
+    final result = ProfileMatched._();
+    if (profileId != null) result.profileId = profileId;
+    if (profileName != null) result.profileName = profileName;
+    if (autoApply != null) result.autoApply = autoApply;
+    return result;
+  }
+
+  ProfileMatched._();
+
+  factory ProfileMatched.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProfileMatched()..mergeFromBuffer(data, registry);
+  factory ProfileMatched.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProfileMatched()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileMatched',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: ProfileMatched.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'profileId')
+    ..aOS(2, _omitFieldNames ? '' : 'profileName')
+    ..aOB(3, _omitFieldNames ? '' : 'autoApply')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProfileMatched clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProfileMatched copyWith(void Function(ProfileMatched) updates) =>
+      super.copyWith((message) => updates(message as ProfileMatched)) as ProfileMatched;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ProfileMatched() / ProfileMatched.new instead')
+  static ProfileMatched create() => ProfileMatched._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileMatched._();
+  @$core.override
+  ProfileMatched createEmptyInstance() => ProfileMatched._();
+  @$core.pragma('dart2js:noInline')
+  static ProfileMatched getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProfileMatched>(ProfileMatched.$_createMessage);
+  static ProfileMatched? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get profileId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set profileId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasProfileId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearProfileId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get profileName => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set profileName($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasProfileName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearProfileName() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get autoApply => $_getBF(2);
+  @$pb.TagNumber(3)
+  set autoApply($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAutoApply() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAutoApply() => $_clearField(3);
+}
+
+/// Since 1.10. A saved network profile: triggers describe the networks it
+/// matches (SSID, default gateway, ASN), apply describes the settings to use
+/// there. A profile with no triggers never matches automatically.
+class NetworkProfile extends $pb.GeneratedMessage {
+  factory NetworkProfile({
+    $core.String? id,
+    $core.String? name,
+    ProfileTriggers? triggers,
+    ProfileApply? apply,
+    $core.bool? autoApply,
+  }) {
+    final result = NetworkProfile._();
+    if (id != null) result.id = id;
+    if (name != null) result.name = name;
+    if (triggers != null) result.triggers = triggers;
+    if (apply != null) result.apply = apply;
+    if (autoApply != null) result.autoApply = autoApply;
+    return result;
+  }
+
+  NetworkProfile._();
+
+  factory NetworkProfile.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      NetworkProfile()..mergeFromBuffer(data, registry);
+  factory NetworkProfile.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      NetworkProfile()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'NetworkProfile',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: NetworkProfile.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'name')
+    ..aOM<ProfileTriggers>(3, _omitFieldNames ? '' : 'triggers', subBuilder: ProfileTriggers.$_createMessage)
+    ..aOM<ProfileApply>(4, _omitFieldNames ? '' : 'apply', subBuilder: ProfileApply.$_createMessage)
+    ..aOB(5, _omitFieldNames ? '' : 'autoApply')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  NetworkProfile clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  NetworkProfile copyWith(void Function(NetworkProfile) updates) =>
+      super.copyWith((message) => updates(message as NetworkProfile)) as NetworkProfile;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use NetworkProfile() / NetworkProfile.new instead')
+  static NetworkProfile create() => NetworkProfile._();
+  static $pb.GeneratedMessage $_createMessage() => NetworkProfile._();
+  @$core.override
+  NetworkProfile createEmptyInstance() => NetworkProfile._();
+  @$core.pragma('dart2js:noInline')
+  static NetworkProfile getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NetworkProfile>(NetworkProfile.$_createMessage);
+  static NetworkProfile? _defaultInstance;
+
+  /// Opaque id assigned by the core on first save; empty when creating.
+  @$pb.TagNumber(1)
+  $core.String get id => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set id($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => $_clearField(1);
+
+  /// Display name. Limit: 1 to 128 UTF-8 bytes.
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  ProfileTriggers get triggers => $_getN(2);
+  @$pb.TagNumber(3)
+  set triggers(ProfileTriggers value) => $_setField(3, value);
+  @$pb.TagNumber(3)
+  $core.bool hasTriggers() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearTriggers() => $_clearField(3);
+  @$pb.TagNumber(3)
+  ProfileTriggers ensureTriggers() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  ProfileApply get apply => $_getN(3);
+  @$pb.TagNumber(4)
+  set apply(ProfileApply value) => $_setField(4, value);
+  @$pb.TagNumber(4)
+  $core.bool hasApply() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearApply() => $_clearField(4);
+  @$pb.TagNumber(4)
+  ProfileApply ensureApply() => $_ensure(3);
+
+  /// Apply without asking when the network matches.
+  @$pb.TagNumber(5)
+  $core.bool get autoApply => $_getBF(4);
+  @$pb.TagNumber(5)
+  set autoApply($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasAutoApply() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearAutoApply() => $_clearField(5);
+}
+
+class ProfileTriggers extends $pb.GeneratedMessage {
+  factory ProfileTriggers({
+    $core.Iterable<$core.String>? ssids,
+    $core.Iterable<$core.String>? gateways,
+    $core.Iterable<$core.String>? asns,
+  }) {
+    final result = ProfileTriggers._();
+    if (ssids != null) result.ssids.addAll(ssids);
+    if (gateways != null) result.gateways.addAll(gateways);
+    if (asns != null) result.asns.addAll(asns);
+    return result;
+  }
+
+  ProfileTriggers._();
+
+  factory ProfileTriggers.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProfileTriggers()..mergeFromBuffer(data, registry);
+  factory ProfileTriggers.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProfileTriggers()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileTriggers',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: ProfileTriggers.$_createMessage)
+    ..pPS(1, _omitFieldNames ? '' : 'ssids')
+    ..pPS(2, _omitFieldNames ? '' : 'gateways')
+    ..pPS(3, _omitFieldNames ? '' : 'asns')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProfileTriggers clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProfileTriggers copyWith(void Function(ProfileTriggers) updates) =>
+      super.copyWith((message) => updates(message as ProfileTriggers)) as ProfileTriggers;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ProfileTriggers() / ProfileTriggers.new instead')
+  static ProfileTriggers create() => ProfileTriggers._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileTriggers._();
+  @$core.override
+  ProfileTriggers createEmptyInstance() => ProfileTriggers._();
+  @$core.pragma('dart2js:noInline')
+  static ProfileTriggers getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProfileTriggers>(ProfileTriggers.$_createMessage);
+  static ProfileTriggers? _defaultInstance;
+
+  /// Wi-Fi SSIDs, exact match, case-sensitive.
+  @$pb.TagNumber(1)
+  $pb.PbList<$core.String> get ssids => $_getList(0);
+
+  /// Default gateway addresses, e.g. "192.168.1.1".
+  @$pb.TagNumber(2)
+  $pb.PbList<$core.String> get gateways => $_getList(1);
+
+  /// Autonomous system numbers as strings, e.g. "12389". Matched against the
+  /// optional local ASN table; empty when the table is absent.
+  @$pb.TagNumber(3)
+  $pb.PbList<$core.String> get asns => $_getList(2);
+}
+
+class ProfileApply extends $pb.GeneratedMessage {
+  factory ProfileApply({
+    $core.String? mode,
+    $core.Iterable<$core.String>? dns,
+    $core.String? rulesPreset,
+    $core.String? serverId,
+    $core.String? engine,
+    $core.String? dnsPreset,
+    $core.bool? dnsSet,
+  }) {
+    final result = ProfileApply._();
+    if (mode != null) result.mode = mode;
+    if (dns != null) result.dns.addAll(dns);
+    if (rulesPreset != null) result.rulesPreset = rulesPreset;
+    if (serverId != null) result.serverId = serverId;
+    if (engine != null) result.engine = engine;
+    if (dnsPreset != null) result.dnsPreset = dnsPreset;
+    if (dnsSet != null) result.dnsSet = dnsSet;
+    return result;
+  }
+
+  ProfileApply._();
+
+  factory ProfileApply.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProfileApply()..mergeFromBuffer(data, registry);
+  factory ProfileApply.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProfileApply()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileApply',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: ProfileApply.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'mode')
+    ..pPS(2, _omitFieldNames ? '' : 'dns')
+    ..aOS(3, _omitFieldNames ? '' : 'rulesPreset')
+    ..aOS(4, _omitFieldNames ? '' : 'serverId')
+    ..aOS(5, _omitFieldNames ? '' : 'engine')
+    ..aOS(6, _omitFieldNames ? '' : 'dnsPreset')
+    ..aOB(7, _omitFieldNames ? '' : 'dnsSet')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProfileApply clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProfileApply copyWith(void Function(ProfileApply) updates) =>
+      super.copyWith((message) => updates(message as ProfileApply)) as ProfileApply;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ProfileApply() / ProfileApply.new instead')
+  static ProfileApply create() => ProfileApply._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileApply._();
+  @$core.override
+  ProfileApply createEmptyInstance() => ProfileApply._();
+  @$core.pragma('dart2js:noInline')
+  static ProfileApply getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProfileApply>(ProfileApply.$_createMessage);
+  static ProfileApply? _defaultInstance;
+
+  /// Absent snapshot fields keep the current setting; present empty strings reset it.
+  @$pb.TagNumber(1)
+  $core.String get mode => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set mode($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMode() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMode() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $pb.PbList<$core.String> get dns => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $core.String get rulesPreset => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set rulesPreset($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRulesPreset() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRulesPreset() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get serverId => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set serverId($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasServerId() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearServerId() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get engine => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set engine($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasEngine() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearEngine() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get dnsPreset => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set dnsPreset($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasDnsPreset() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearDnsPreset() => $_clearField(6);
+
+  /// Distinguishes a captured empty DNS list (use defaults) from no snapshot.
+  @$pb.TagNumber(7)
+  $core.bool get dnsSet => $_getBF(6);
+  @$pb.TagNumber(7)
+  set dnsSet($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasDnsSet() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearDnsSet() => $_clearField(7);
+}
+
+class ListProfilesRequest extends $pb.GeneratedMessage {
+  factory ListProfilesRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+  }) {
+    final result = ListProfilesRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    return result;
+  }
+
+  ListProfilesRequest._();
+
+  factory ListProfilesRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListProfilesRequest()..mergeFromBuffer(data, registry);
+  factory ListProfilesRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListProfilesRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ListProfilesRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: ListProfilesRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListProfilesRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListProfilesRequest copyWith(void Function(ListProfilesRequest) updates) =>
+      super.copyWith((message) => updates(message as ListProfilesRequest)) as ListProfilesRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ListProfilesRequest() / ListProfilesRequest.new instead')
+  static ListProfilesRequest create() => ListProfilesRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ListProfilesRequest._();
+  @$core.override
+  ListProfilesRequest createEmptyInstance() => ListProfilesRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ListProfilesRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ListProfilesRequest>(ListProfilesRequest.$_createMessage);
+  static ListProfilesRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+}
+
+class ListProfilesResponse extends $pb.GeneratedMessage {
+  factory ListProfilesResponse({
+    $core.Iterable<NetworkProfile>? profiles,
+    SoraError? error,
+  }) {
+    final result = ListProfilesResponse._();
+    if (profiles != null) result.profiles.addAll(profiles);
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  ListProfilesResponse._();
+
+  factory ListProfilesResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListProfilesResponse()..mergeFromBuffer(data, registry);
+  factory ListProfilesResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ListProfilesResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ListProfilesResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: ListProfilesResponse.$_createMessage)
+    ..pPM<NetworkProfile>(1, _omitFieldNames ? '' : 'profiles', subBuilder: NetworkProfile.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListProfilesResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ListProfilesResponse copyWith(void Function(ListProfilesResponse) updates) =>
+      super.copyWith((message) => updates(message as ListProfilesResponse)) as ListProfilesResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ListProfilesResponse() / ListProfilesResponse.new instead')
+  static ListProfilesResponse create() => ListProfilesResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ListProfilesResponse._();
+  @$core.override
+  ListProfilesResponse createEmptyInstance() => ListProfilesResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ListProfilesResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ListProfilesResponse>(ListProfilesResponse.$_createMessage);
+  static ListProfilesResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<NetworkProfile> get profiles => $_getList(0);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
+class SaveProfileRequest extends $pb.GeneratedMessage {
+  factory SaveProfileRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    NetworkProfile? profile,
+  }) {
+    final result = SaveProfileRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (profile != null) result.profile = profile;
+    return result;
+  }
+
+  SaveProfileRequest._();
+
+  factory SaveProfileRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SaveProfileRequest()..mergeFromBuffer(data, registry);
+  factory SaveProfileRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SaveProfileRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SaveProfileRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: SaveProfileRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOM<NetworkProfile>(3, _omitFieldNames ? '' : 'profile', subBuilder: NetworkProfile.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SaveProfileRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SaveProfileRequest copyWith(void Function(SaveProfileRequest) updates) =>
+      super.copyWith((message) => updates(message as SaveProfileRequest)) as SaveProfileRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SaveProfileRequest() / SaveProfileRequest.new instead')
+  static SaveProfileRequest create() => SaveProfileRequest._();
+  static $pb.GeneratedMessage $_createMessage() => SaveProfileRequest._();
+  @$core.override
+  SaveProfileRequest createEmptyInstance() => SaveProfileRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SaveProfileRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SaveProfileRequest>(SaveProfileRequest.$_createMessage);
+  static SaveProfileRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  NetworkProfile get profile => $_getN(2);
+  @$pb.TagNumber(3)
+  set profile(NetworkProfile value) => $_setField(3, value);
+  @$pb.TagNumber(3)
+  $core.bool hasProfile() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearProfile() => $_clearField(3);
+  @$pb.TagNumber(3)
+  NetworkProfile ensureProfile() => $_ensure(2);
+}
+
+class SaveProfileResponse extends $pb.GeneratedMessage {
+  factory SaveProfileResponse({
+    NetworkProfile? profile,
+    SoraError? error,
+  }) {
+    final result = SaveProfileResponse._();
+    if (profile != null) result.profile = profile;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  SaveProfileResponse._();
+
+  factory SaveProfileResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SaveProfileResponse()..mergeFromBuffer(data, registry);
+  factory SaveProfileResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SaveProfileResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SaveProfileResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: SaveProfileResponse.$_createMessage)
+    ..aOM<NetworkProfile>(1, _omitFieldNames ? '' : 'profile', subBuilder: NetworkProfile.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SaveProfileResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SaveProfileResponse copyWith(void Function(SaveProfileResponse) updates) =>
+      super.copyWith((message) => updates(message as SaveProfileResponse)) as SaveProfileResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SaveProfileResponse() / SaveProfileResponse.new instead')
+  static SaveProfileResponse create() => SaveProfileResponse._();
+  static $pb.GeneratedMessage $_createMessage() => SaveProfileResponse._();
+  @$core.override
+  SaveProfileResponse createEmptyInstance() => SaveProfileResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SaveProfileResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SaveProfileResponse>(SaveProfileResponse.$_createMessage);
+  static SaveProfileResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  NetworkProfile get profile => $_getN(0);
+  @$pb.TagNumber(1)
+  set profile(NetworkProfile value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasProfile() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearProfile() => $_clearField(1);
+  @$pb.TagNumber(1)
+  NetworkProfile ensureProfile() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
+class DeleteProfileRequest extends $pb.GeneratedMessage {
+  factory DeleteProfileRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.String? profileId,
+  }) {
+    final result = DeleteProfileRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (profileId != null) result.profileId = profileId;
+    return result;
+  }
+
+  DeleteProfileRequest._();
+
+  factory DeleteProfileRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteProfileRequest()..mergeFromBuffer(data, registry);
+  factory DeleteProfileRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteProfileRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeleteProfileRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: DeleteProfileRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOS(3, _omitFieldNames ? '' : 'profileId')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteProfileRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteProfileRequest copyWith(void Function(DeleteProfileRequest) updates) =>
+      super.copyWith((message) => updates(message as DeleteProfileRequest)) as DeleteProfileRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DeleteProfileRequest() / DeleteProfileRequest.new instead')
+  static DeleteProfileRequest create() => DeleteProfileRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DeleteProfileRequest._();
+  @$core.override
+  DeleteProfileRequest createEmptyInstance() => DeleteProfileRequest._();
+  @$core.pragma('dart2js:noInline')
+  static DeleteProfileRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DeleteProfileRequest>(DeleteProfileRequest.$_createMessage);
+  static DeleteProfileRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get profileId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set profileId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasProfileId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearProfileId() => $_clearField(3);
+}
+
+class DeleteProfileResponse extends $pb.GeneratedMessage {
+  factory DeleteProfileResponse({
+    SoraError? error,
+  }) {
+    final result = DeleteProfileResponse._();
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  DeleteProfileResponse._();
+
+  factory DeleteProfileResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteProfileResponse()..mergeFromBuffer(data, registry);
+  factory DeleteProfileResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeleteProfileResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeleteProfileResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: DeleteProfileResponse.$_createMessage)
+    ..aOM<SoraError>(1, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteProfileResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeleteProfileResponse copyWith(void Function(DeleteProfileResponse) updates) =>
+      super.copyWith((message) => updates(message as DeleteProfileResponse)) as DeleteProfileResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DeleteProfileResponse() / DeleteProfileResponse.new instead')
+  static DeleteProfileResponse create() => DeleteProfileResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DeleteProfileResponse._();
+  @$core.override
+  DeleteProfileResponse createEmptyInstance() => DeleteProfileResponse._();
+  @$core.pragma('dart2js:noInline')
+  static DeleteProfileResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DeleteProfileResponse>(DeleteProfileResponse.$_createMessage);
+  static DeleteProfileResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  SoraError get error => $_getN(0);
+  @$pb.TagNumber(1)
+  set error(SoraError value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasError() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearError() => $_clearField(1);
+  @$pb.TagNumber(1)
+  SoraError ensureError() => $_ensure(0);
+}
+
+/// Since 1.10. The machine's current network fingerprint for profile editing.
+class GetNetworkFingerprintRequest extends $pb.GeneratedMessage {
+  factory GetNetworkFingerprintRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+  }) {
+    final result = GetNetworkFingerprintRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    return result;
+  }
+
+  GetNetworkFingerprintRequest._();
+
+  factory GetNetworkFingerprintRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetNetworkFingerprintRequest()..mergeFromBuffer(data, registry);
+  factory GetNetworkFingerprintRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetNetworkFingerprintRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetNetworkFingerprintRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: GetNetworkFingerprintRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetNetworkFingerprintRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetNetworkFingerprintRequest copyWith(void Function(GetNetworkFingerprintRequest) updates) =>
+      super.copyWith((message) => updates(message as GetNetworkFingerprintRequest)) as GetNetworkFingerprintRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetNetworkFingerprintRequest() / GetNetworkFingerprintRequest.new instead')
+  static GetNetworkFingerprintRequest create() => GetNetworkFingerprintRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetNetworkFingerprintRequest._();
+  @$core.override
+  GetNetworkFingerprintRequest createEmptyInstance() => GetNetworkFingerprintRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetNetworkFingerprintRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetNetworkFingerprintRequest>(GetNetworkFingerprintRequest.$_createMessage);
+  static GetNetworkFingerprintRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+}
+
+class GetNetworkFingerprintResponse extends $pb.GeneratedMessage {
+  factory GetNetworkFingerprintResponse({
+    NetworkFingerprint? fingerprint,
+    SoraError? error,
+  }) {
+    final result = GetNetworkFingerprintResponse._();
+    if (fingerprint != null) result.fingerprint = fingerprint;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  GetNetworkFingerprintResponse._();
+
+  factory GetNetworkFingerprintResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetNetworkFingerprintResponse()..mergeFromBuffer(data, registry);
+  factory GetNetworkFingerprintResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetNetworkFingerprintResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetNetworkFingerprintResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: GetNetworkFingerprintResponse.$_createMessage)
+    ..aOM<NetworkFingerprint>(1, _omitFieldNames ? '' : 'fingerprint', subBuilder: NetworkFingerprint.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetNetworkFingerprintResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetNetworkFingerprintResponse copyWith(void Function(GetNetworkFingerprintResponse) updates) =>
+      super.copyWith((message) => updates(message as GetNetworkFingerprintResponse)) as GetNetworkFingerprintResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetNetworkFingerprintResponse() / GetNetworkFingerprintResponse.new instead')
+  static GetNetworkFingerprintResponse create() => GetNetworkFingerprintResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetNetworkFingerprintResponse._();
+  @$core.override
+  GetNetworkFingerprintResponse createEmptyInstance() => GetNetworkFingerprintResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetNetworkFingerprintResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetNetworkFingerprintResponse>(GetNetworkFingerprintResponse.$_createMessage);
+  static GetNetworkFingerprintResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  NetworkFingerprint get fingerprint => $_getN(0);
+  @$pb.TagNumber(1)
+  set fingerprint(NetworkFingerprint value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasFingerprint() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearFingerprint() => $_clearField(1);
+  @$pb.TagNumber(1)
+  NetworkFingerprint ensureFingerprint() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
+class NetworkFingerprint extends $pb.GeneratedMessage {
+  factory NetworkFingerprint({
+    $core.String? ssid,
+    $core.String? gateway,
+    $core.String? asn,
+    $core.String? fingerprint,
+  }) {
+    final result = NetworkFingerprint._();
+    if (ssid != null) result.ssid = ssid;
+    if (gateway != null) result.gateway = gateway;
+    if (asn != null) result.asn = asn;
+    if (fingerprint != null) result.fingerprint = fingerprint;
+    return result;
+  }
+
+  NetworkFingerprint._();
+
+  factory NetworkFingerprint.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      NetworkFingerprint()..mergeFromBuffer(data, registry);
+  factory NetworkFingerprint.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      NetworkFingerprint()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'NetworkFingerprint',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: NetworkFingerprint.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'ssid')
+    ..aOS(2, _omitFieldNames ? '' : 'gateway')
+    ..aOS(3, _omitFieldNames ? '' : 'asn')
+    ..aOS(4, _omitFieldNames ? '' : 'fingerprint')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  NetworkFingerprint clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  NetworkFingerprint copyWith(void Function(NetworkFingerprint) updates) =>
+      super.copyWith((message) => updates(message as NetworkFingerprint)) as NetworkFingerprint;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use NetworkFingerprint() / NetworkFingerprint.new instead')
+  static NetworkFingerprint create() => NetworkFingerprint._();
+  static $pb.GeneratedMessage $_createMessage() => NetworkFingerprint._();
+  @$core.override
+  NetworkFingerprint createEmptyInstance() => NetworkFingerprint._();
+  @$core.pragma('dart2js:noInline')
+  static NetworkFingerprint getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NetworkFingerprint>(NetworkFingerprint.$_createMessage);
+  static NetworkFingerprint? _defaultInstance;
+
+  /// Current Wi-Fi SSID; empty on wired networks or when unreadable.
+  @$pb.TagNumber(1)
+  $core.String get ssid => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set ssid($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSsid() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSsid() => $_clearField(1);
+
+  /// Default gateway address; empty when offline.
+  @$pb.TagNumber(2)
+  $core.String get gateway => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set gateway($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasGateway() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearGateway() => $_clearField(2);
+
+  /// ASN from the optional local table; empty when unknown.
+  @$pb.TagNumber(3)
+  $core.String get asn => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set asn($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAsn() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAsn() => $_clearField(3);
+
+  /// Stable string identifying the network (interface addresses), for display.
+  @$pb.TagNumber(4)
+  $core.String get fingerprint => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set fingerprint($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasFingerprint() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearFingerprint() => $_clearField(4);
+}
+
+/// Since 1.10. Probes a proxy chain of 2-3 servers before connecting.
+class ProbeChainRequest extends $pb.GeneratedMessage {
+  factory ProbeChainRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.String? requestId,
+    $core.Iterable<$core.String>? serverIds,
+  }) {
+    final result = ProbeChainRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (requestId != null) result.requestId = requestId;
+    if (serverIds != null) result.serverIds.addAll(serverIds);
+    return result;
+  }
+
+  ProbeChainRequest._();
+
+  factory ProbeChainRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProbeChainRequest()..mergeFromBuffer(data, registry);
+  factory ProbeChainRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProbeChainRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProbeChainRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: ProbeChainRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOS(3, _omitFieldNames ? '' : 'requestId')
+    ..pPS(4, _omitFieldNames ? '' : 'serverIds')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProbeChainRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProbeChainRequest copyWith(void Function(ProbeChainRequest) updates) =>
+      super.copyWith((message) => updates(message as ProbeChainRequest)) as ProbeChainRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ProbeChainRequest() / ProbeChainRequest.new instead')
+  static ProbeChainRequest create() => ProbeChainRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ProbeChainRequest._();
+  @$core.override
+  ProbeChainRequest createEmptyInstance() => ProbeChainRequest._();
+  @$core.pragma('dart2js:noInline')
+  static ProbeChainRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProbeChainRequest>(ProbeChainRequest.$_createMessage);
+  static ProbeChainRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get requestId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set requestId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasRequestId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearRequestId() => $_clearField(3);
+
+  /// Ordered server ids: traffic enters the first, exits the last.
+  @$pb.TagNumber(4)
+  $pb.PbList<$core.String> get serverIds => $_getList(3);
+}
+
+class ProbeChainResponse extends $pb.GeneratedMessage {
+  factory ProbeChainResponse({
+    $core.Iterable<ChainHop>? hops,
+    $core.int? totalLatencyMs,
+    $core.Iterable<$core.String>? engines,
+    SoraError? error,
+  }) {
+    final result = ProbeChainResponse._();
+    if (hops != null) result.hops.addAll(hops);
+    if (totalLatencyMs != null) result.totalLatencyMs = totalLatencyMs;
+    if (engines != null) result.engines.addAll(engines);
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  ProbeChainResponse._();
+
+  factory ProbeChainResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProbeChainResponse()..mergeFromBuffer(data, registry);
+  factory ProbeChainResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ProbeChainResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProbeChainResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: ProbeChainResponse.$_createMessage)
+    ..pPM<ChainHop>(1, _omitFieldNames ? '' : 'hops', subBuilder: ChainHop.$_createMessage)
+    ..aI(2, _omitFieldNames ? '' : 'totalLatencyMs', fieldType: $pb.PbFieldType.OU3)
+    ..pPS(3, _omitFieldNames ? '' : 'engines')
+    ..aOM<SoraError>(4, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProbeChainResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ProbeChainResponse copyWith(void Function(ProbeChainResponse) updates) =>
+      super.copyWith((message) => updates(message as ProbeChainResponse)) as ProbeChainResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ProbeChainResponse() / ProbeChainResponse.new instead')
+  static ProbeChainResponse create() => ProbeChainResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ProbeChainResponse._();
+  @$core.override
+  ProbeChainResponse createEmptyInstance() => ProbeChainResponse._();
+  @$core.pragma('dart2js:noInline')
+  static ProbeChainResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProbeChainResponse>(ProbeChainResponse.$_createMessage);
+  static ProbeChainResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $pb.PbList<ChainHop> get hops => $_getList(0);
+
+  /// Summed per-hop latency estimate in milliseconds.
+  @$pb.TagNumber(2)
+  $core.int get totalLatencyMs => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set totalLatencyMs($core.int value) => $_setUnsignedInt32(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasTotalLatencyMs() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearTotalLatencyMs() => $_clearField(2);
+
+  /// Installed engines able to carry a chain, best first.
+  @$pb.TagNumber(3)
+  $pb.PbList<$core.String> get engines => $_getList(2);
+
+  @$pb.TagNumber(4)
+  SoraError get error => $_getN(3);
+  @$pb.TagNumber(4)
+  set error(SoraError value) => $_setField(4, value);
+  @$pb.TagNumber(4)
+  $core.bool hasError() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearError() => $_clearField(4);
+  @$pb.TagNumber(4)
+  SoraError ensureError() => $_ensure(3);
+}
+
+class ChainHop extends $pb.GeneratedMessage {
+  factory ChainHop({
+    $core.String? serverId,
+    $core.bool? reachable,
+    $core.int? latencyMs,
+  }) {
+    final result = ChainHop._();
+    if (serverId != null) result.serverId = serverId;
+    if (reachable != null) result.reachable = reachable;
+    if (latencyMs != null) result.latencyMs = latencyMs;
+    return result;
+  }
+
+  ChainHop._();
+
+  factory ChainHop.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChainHop()..mergeFromBuffer(data, registry);
+  factory ChainHop.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      ChainHop()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ChainHop',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: ChainHop.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'serverId')
+    ..aOB(2, _omitFieldNames ? '' : 'reachable')
+    ..aI(3, _omitFieldNames ? '' : 'latencyMs', fieldType: $pb.PbFieldType.OU3)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChainHop clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  ChainHop copyWith(void Function(ChainHop) updates) =>
+      super.copyWith((message) => updates(message as ChainHop)) as ChainHop;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use ChainHop() / ChainHop.new instead')
+  static ChainHop create() => ChainHop._();
+  static $pb.GeneratedMessage $_createMessage() => ChainHop._();
+  @$core.override
+  ChainHop createEmptyInstance() => ChainHop._();
+  @$core.pragma('dart2js:noInline')
+  static ChainHop getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ChainHop>(ChainHop.$_createMessage);
+  static ChainHop? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get serverId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set serverId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasServerId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearServerId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get reachable => $_getBF(1);
+  @$pb.TagNumber(2)
+  set reachable($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasReachable() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearReachable() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get latencyMs => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set latencyMs($core.int value) => $_setUnsignedInt32(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasLatencyMs() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearLatencyMs() => $_clearField(3);
+}
+
+/// Reserved for censorship detection.
+class CensorshipDetected extends $pb.GeneratedMessage {
+  factory CensorshipDetected() => CensorshipDetected._();
+
+  CensorshipDetected._();
+
+  factory CensorshipDetected.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CensorshipDetected()..mergeFromBuffer(data, registry);
+  factory CensorshipDetected.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      CensorshipDetected()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CensorshipDetected',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: CensorshipDetected.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CensorshipDetected clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CensorshipDetected copyWith(void Function(CensorshipDetected) updates) =>
+      super.copyWith((message) => updates(message as CensorshipDetected)) as CensorshipDetected;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CensorshipDetected() / CensorshipDetected.new instead')
+  static CensorshipDetected create() => CensorshipDetected._();
+  static $pb.GeneratedMessage $_createMessage() => CensorshipDetected._();
+  @$core.override
+  CensorshipDetected createEmptyInstance() => CensorshipDetected._();
+  @$core.pragma('dart2js:noInline')
+  static CensorshipDetected getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CensorshipDetected>(CensorshipDetected.$_createMessage);
+  static CensorshipDetected? _defaultInstance;
 }
 
 const $core.bool _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');

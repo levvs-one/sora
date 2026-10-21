@@ -5,7 +5,6 @@
   "stateConnected": "Đã kết nối",
   "stateReconnecting": "Đang kết nối lại",
   "stateDisconnecting": "Ngắt kết nối",
-  "stateFailed": "Không được kết nối",
   "coreMissing": "Dịch vụ Sora không phản hồi",
   "serverAuto": "Nhanh nhất",
   "serverBypass": "Không có máy chủ",
@@ -41,6 +40,7 @@
   "export": "Lưu vào tập tin",
   "clear": "Thông thoáng",
   "logsEmpty": "Không có gì ở đây",
+  "connEmpty": "Không có kết nối",
   "appVersion": "Phiên bản {version}",
   "notInstalled": "Chưa được cài đặt",
   "sourceCode": "Mã nguồn",
@@ -75,17 +75,16 @@
   "errSubScheme": "Liên kết phải bắt đầu bằng https://",
   "errSecretStore": "Bộ lưu trữ Sora bị hỏng hoặc không khả dụng",
   "errNoServers": "Thêm đăng ký để kết nối",
-  "exportText": "Chữ",
   "connections": "Kết nối",
   "close": "Đóng",
   "chainDirect": "Trực tiếp",
   "chainBlocked": "Bị chặn",
   "theme": "chủ đề",
-  "themeSystem": "System",
+  "themeSystem": "Theo hệ thống",
   "themeLight": "Ánh sáng",
   "themeDark": "Tối tăm",
   "language": "Ngôn ngữ",
-  "languageSystem": "System",
+  "languageSystem": "Theo hệ thống",
   "sectionConnection": "Sự liên quan",
   "sectionNoServer": "Không có máy chủ",
   "sectionPing": "Ping",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} còn lại",
   "ruleInvalid": "Đây không giống một trang web, IP hay một chương trình",
   "tunnelMode": "Cách thức",
-  "tunnelTun": "Tất cả lưu lượng truy cập",
   "tunnelProxy": "Proxy System",
   "proxyAddress": "Địa chỉ proxy",
   "copied": "Đã sao chép",
   "launchAtLogin": "Bắt đầu với hệ thống",
+  "launchAtLoginDetail": "Sora sẽ tự động khởi động khi bạn đăng nhập và nằm ở khay hệ thống.",
   "closeToTray": "Giữ trong khay khi đóng lại",
   "notifications": "Thông báo",
   "trayOpen": "Mở Sora",
@@ -185,12 +184,6 @@
   "sidebarToggle": "Chuyển đổi thanh bên",
   "more": "Hơn",
   "less": "Ít hơn",
-  "currentServer": "Máy chủ hiện tại",
-  "trafficDown": "Đã tải xuống",
-  "trafficUp": "Đã tải lên",
-  "perSecond": "{value}/s",
-  "activeRules": "Quy tắc hoạt động: {count}",
-  "recentNotifications": "Thông báo gần đây",
   "notificationsEmpty": "Sự kiện kết nối và đăng ký sẽ xuất hiện ở đây",
   "retryConnect": "Thử lại kết nối",
   "openLogs": "Mở nhật ký",
@@ -208,12 +201,9 @@
   "chooseProgram": "Chọn một chương trình",
   "installedApps": "Ứng dụng đã cài đặt",
   "runningProcesses": "Tiến trình đang chạy",
-  "programsFailed": "Không thể tải ứng dụng",
   "programsEmpty": "Không tìm thấy ứng dụng nào. Hãy thử một tên khác.",
   "selectExe": "Chọn tệp .exe",
-  "trafficUnavailable": "Bộ đếm chưa có sẵn",
   "speedtest": "Tốc độ",
-  "speedtestCheck": "Kiểm tra tốc độ",
   "speedtestSearch": "Tìm một dịch vụ",
   "speedtestEmpty": "Không có trận đấu nào. Thay đổi tìm kiếm.",
   "speedtestBackToList": "Quay lại dịch vụ",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "Sao chép lệnh",
   "updateChecksDisabled": "Kiểm tra tự động bị tắt trong Cài đặt.",
   "updateInstalled": "Đã cài đặt bản cập nhật. Mở lại Sora.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "Dự án",
   "githubReleases": "Phát hành và tải xuống",
   "telegramChannel": "Kênh Telegram",
   "licenses": "Giấy phép",
   "componentLicenses": "Giấy phép thành phần",
-  "appCopyright": "© 2026 levvs-one và những người đóng góp",
   "collapseServers": "Thu gọn máy chủ",
   "expandServers": "Mở rộng máy chủ",
   "hideDescription": "Ẩn mô tả",
   "showDescription": "Hiển thị mô tả",
   "pendingConnectionChanges": "Kết nối lại để áp dụng những thay đổi này.",
   "reconnectNow": "Áp dụng và kết nối lại",
-  "bypassLimitations": "Chế độ này chỉ bỏ qua DPI cho HTTP và TLS, không hỗ trợ UDP hoặc thay đổi IP của bạn. Sử dụng máy chủ VPN cho cuộc gọi, cuộc gọi và địa chỉ Telegram bị chặn.",
   "errEngineUnsupported": "Công cụ đã chọn không hỗ trợ cấu hình hoặc cài đặt này. Chọn Tự động hoặc động cơ tương thích.",
   "errRestore": "Việc dọn dẹp kết nối chưa hoàn tất. Thử ngắt kết nối lại; xem nhật ký để biết chi tiết.",
   "errSessionEnded": "Phiên này đã kết thúc. Làm mới trạng thái kết nối.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "Các chế độ và động cơ",
   "probeServers": "Kiểm tra máy chủ",
   "expiresIn": "{name}: {days, plural, =0{đăng ký sẽ kết thúc sau vài giờ nữa} one{đăng ký kết thúc vào ngày #} other{đăng ký kết thúc sau # ngày}}",
-  "groupOrdered": "{count, plural, one{Lần lượt máy chủ #} other{Lần lượt các máy chủ #}}",
   "groupBest": "{count, plural, one{Máy chủ #, nhanh nhất} other{Máy chủ #, nhanh nhất}}",
-  "modesGuide": "Chọn Tự động nếu bạn không chắc máy chủ của mình cần công cụ nào. Sora kiểm tra cấu hình và cài đặt trước khi kết nối. Công cụ không thể tăng băng thông gói của bạn: hiệu suất phụ thuộc vào máy chủ, tuyến đường, giao thức và mạng.\n\n## Chế độ\n\n### Tất cả lưu lượng truy cập (TUN)\n\nSora tạo giao diện mạng ảo và định tuyến lưu lượng ứng dụng qua đó, bao gồm TCP và UDP. Sử dụng chế độ này cho Telegram, trò chơi và giọng nói Discord. Các quy tắc có thể gửi trực tiếp các trang web hoặc chương trình cụ thể hoặc chặn chúng. Dịch vụ mạng cần có sự cho phép và máy chủ hỗ trợ giao thức được yêu cầu.\n\n### Proxy System\n\nSora định cấu hình proxy HTTP/SOCKS cục bộ. Các ứng dụng tôn trọng cài đặt proxy hệ thống sẽ sử dụng nó. Các ứng dụng có ngăn xếp mạng riêng có thể kết nối trực tiếp; UDP và cuộc gọi thoại thường cần TUN. Chế độ này phù hợp với các trình duyệt và ứng dụng có hỗ trợ proxy.\n\n### Không có máy chủ\n\nTrên Linux, Sora sử dụng [zapret](https://github.com/bol-van/zapret) để phân tách và định hình lại các yêu cầu HTTP/TLS cũng như bỏ qua một số kiểm tra DPI. IP của bạn vẫn giữ nguyên và các kết nối sẽ truy cập trực tiếp vào trang web. Kết quả phụ thuộc vào nhà cung cấp của bạn và phương pháp chặn.\n\nTích hợp hiện tại sử dụng tpws cho HTTP và TLS qua TCP. Nó không bỏ qua việc chặn IP hoặc chuyển tiếp UDP và không thể đảm bảo các kết nối MTProto của Telegram. Sử dụng máy chủ VPN có TUN cho giọng nói Discord, cuộc gọi Telegram và các loại hạn chế này.\n\n## Động cơ\n\n### Tự động\n\nSora chọn một công cụ được cài đặt hỗ trợ toàn bộ gói kết nối: giao thức máy chủ, truyền tải, nhóm, phân mảnh và chế độ. Lựa chọn thủ công không tương thích sẽ bị từ chối trước khi dừng kết nối hiện tại. Chọn Tự động hoặc công cụ khác và áp dụng lại cài đặt.\n\n###sing-box\n\nCác gói Sora mới bao gồm [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), một nhánh của [sing-box](https://github.com/SagerNet/sing-box), thêm XHTTP và VLESS Encryption phía máy khách. Sora công nhận bản dựng và khả năng của nó. Một bản dựng ngược dòng không có XHTTP sẽ không có được khả năng này chỉ từ tên của nó.\n\nCác giao thức được hỗ trợ bao gồm VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard và các tham số AmneziaWG 1.x/2.x Sora có thể nhập. Cấu hình JSON Xray đầy đủ yêu cầu Xray. Chưa thể nhập các trường AWG 3.x mới. sing-box sử dụng cổng điều khiển cục bộ được bảo vệ bằng mật khẩu mà các ứng dụng khác trên máy tính có thể phát hiện.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) hỗ trợ phân mảnh VLESS, REALITY, XHTTP, VLESS Encryption và TLS. Nó cũng chạy các hồ sơ Xray hoàn chỉnh của nhà cung cấp trong khi vẫn bảo toàn định tuyến và nhóm của họ. Những cấu hình như vậy không thể được tự động chuyển đổi sang một công cụ khác mà không thay đổi hành vi của chúng.\n\nXray đi kèm đã xóa cài đặt tắt xác minh chứng chỉ TLS (`allowInsecure`). Tự động chọn sing-box hoặc mihomo cho các máy chủ thông thường yêu cầu cài đặt này. Việc chọn Xray sẽ báo cáo sự không tương thích theo cách thủ công trước khi dừng kết nối hiện tại. Hồ sơ JSON đầy đủ cũ hơn cần hồ sơ nhà cung cấp được cập nhật với chứng chỉ hoặc mã chứng chỉ có thể xác minh được.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) hỗ trợ các nhóm cân bằng tải và dự phòng theo thứ tự, XHTTP và AmneziaWG. Chọn nó khi việc tự động chuyển đổi dự phòng sang máy chủ dự phòng có vấn đề. Cài đặt phân mảnh TLS của Sora không khả dụng với công cụ này.\n\n## Khả năng tương thích trong Sora\n\n| Tính năng | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN và TCP/UDP | Có | Có | Có |\n| XHTTP | Có | Có | Có |\n| VLESS Encryption | Có | Có | Có |\n| Hồ sơ Xray đầy đủ | Không | Có | Không |\n| TUIC / AnyTLS | Cả hai | Không | TUIC |\n| Phân mảnh TLS | Có | Có | Không |\n| AmneziaWG 1.x/2.x | Có¹ | Không | Có |\n| Nhóm dự phòng được đặt hàng | Không | Không có | Có |\n\n¹ Cấu hình có J1/J2/J3/Itime sử dụng mihomo; những trường này không bao giờ được loại bỏ một cách âm thầm. ² Đối với một nhóm cấu hình Xray hoàn chỉnh, ứng dụng sẽ chọn một cấu hình dự phòng. Hỗ trợ tùy thuộc vào bản dựng được cài đặt; kiểm tra phiên bản của nó trong Giới thiệu.\n\n## ngăn xếp TUN\n\nNgăn xếp xử lý TCP và UDP bên trong giao diện ảo. Trong bảng chế độ, Xray và mihomo cung cấp gVisor, System, Mixed và MIPS. Mỗi động cơ lưu tùy chọn riêng của mình. Chế độ proxy và Serverless System không sử dụng tùy chọn này.\n\n- **Mixed** — TCP sử dụng ngăn xếp hệ thống, trong khi gVisor xử lý UDP. Đây là mặc định của mihomo trên Linux. Trên Windows, Xray và mihomo mặc định dùng MIPS.\n- **System** — sử dụng ngăn xếp hệ thống. Hãy thử tùy chọn khác nếu ứng dụng mạng gặp sự cố.\n- **gVisor** — xử lý lưu lượng truy cập trong không gian người dùng.\n- **MIPS** — Ngăn xếp IP riêng của mihomo, có sẵn trong phiên bản đi kèm 1.19.32.\n\nTrên Linux, Xray sử dụng gVisor tích hợp theo mặc định. System, Mixed và MIPS trên Linux sử dụng mihomo làm công cụ TUN, chuyển tiếp TCP và UDP tới Xray qua liên kết SOCKS cục bộ đã được xác thực. Xray giữ lại giao thức, hồ sơ nhà cung cấp và định tuyến. Ba tùy chọn này yêu cầu cài đặt mihomo. Trên Windows, Xray sử dụng mihomo 1.19.32 trở lên cho cả bốn ngăn xếp TUN. Giao thức và định tuyến vẫn do Xray xử lý. Quy tắc ứng dụng trong cấu hình này chỉ hỗ trợ kết nối trực tiếp và chặn; trên Linux, các quy tắc này cần gVisor tích hợp của Xray.\n\nCây cầu chạy một quá trình thứ hai. Trong ba phép đo không hoạt động trên Linux, nó sử dụng bộ nhớ vật lý nhiều hơn khoảng 32–36 MiB so với Xray TUN gốc. Điều này không đo lường tải tải xuống: chi phí CPU và bộ nhớ phụ thuộc vào kết nối. sing-box không có bộ chọn ngăn xếp. Không có ngăn xếp nào đảm bảo hiệu suất tốt hơn trong mọi mạng. Chọn một ngăn xếp rồi chọn Áp dụng và kết nối lại để thử trong mạng của bạn.\n\n## Áp dụng cài đặt\n\nViệc chọn máy chủ sẽ tự động kết nối lại. Cài đặt chế độ, công cụ, DNS và quy tắc được lưu ngay lập tức; trong khi kết nối đang hoạt động, hãy nhấp vào Áp dụng và kết nối lại để sử dụng chúng. Việc khởi động lại công cụ có thể làm gián đoạn quá trình tải xuống và cuộc gọi. Nhấp chuột lặp đi lặp lại không bắt đầu kết nối song song; ngắt kết nối kết thúc quá trình chuyển đổi và giải phóng kết nối.\n\nInternet chỉ thông qua VPN chặn lưu lượng truy cập trực tiếp khi đường hầm bị hỏng. Nó ảnh hưởng đến toàn bộ máy. Việc ngắt kết nối rõ ràng sẽ loại bỏ các quy tắc của Sora. Nếu việc dọn dẹp không hoàn tất, hãy thử ngắt kết nối lại và mở nhật ký.\n\n## Tài liệu dự án\n\n- [sing-box-lx: cấu hình và hỗ trợ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Tài liệu sing-box](https://sing-box.sagernet.org/)\n- [Tài liệu Xray](https://xtls.github.io/)\n- [Tài liệu mihomo](https://wiki.metacubex.one/)\n- [zapret: hoạt động và những hạn chế](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Chọn Tự động nếu bạn không chắc máy chủ của mình cần công cụ nào. Sora kiểm tra cấu hình và cài đặt trước khi kết nối. Công cụ không thể tăng băng thông gói của bạn: hiệu suất phụ thuộc vào máy chủ, tuyến đường, giao thức và mạng.\n\n## Chế độ\n\n### Tất cả lưu lượng truy cập (TUN)\n\nSora tạo giao diện mạng ảo và định tuyến lưu lượng ứng dụng qua đó, bao gồm TCP và UDP. Sử dụng chế độ này cho Telegram, trò chơi và giọng nói Discord. Các quy tắc có thể gửi trực tiếp các trang web hoặc chương trình cụ thể hoặc chặn chúng. Dịch vụ mạng cần có sự cho phép và máy chủ hỗ trợ giao thức được yêu cầu.\n\n### Proxy System\n\nSora định cấu hình proxy HTTP/SOCKS cục bộ. Các ứng dụng tôn trọng cài đặt proxy hệ thống sẽ sử dụng nó. Các ứng dụng có ngăn xếp mạng riêng có thể kết nối trực tiếp; UDP và cuộc gọi thoại thường cần TUN. Chế độ này phù hợp với các trình duyệt và ứng dụng có hỗ trợ proxy.\n\n### Không có máy chủ\n\nTrên Linux, Sora sử dụng [zapret](https://github.com/bol-van/zapret) để phân tách và định hình lại các yêu cầu HTTP/TLS cũng như bỏ qua một số kiểm tra DPI. IP của bạn vẫn giữ nguyên và các kết nối sẽ truy cập trực tiếp vào trang web. Kết quả phụ thuộc vào nhà cung cấp của bạn và phương pháp chặn.\n\nTích hợp hiện tại sử dụng tpws cho HTTP và TLS qua TCP. Nó không bỏ qua việc chặn IP hoặc chuyển tiếp UDP và không thể đảm bảo các kết nối MTProto của Telegram. Sử dụng máy chủ VPN có TUN cho giọng nói Discord, cuộc gọi Telegram và các loại hạn chế này.\n\n## Động cơ\n\n### Tự động\n\nSora chọn một công cụ được cài đặt hỗ trợ toàn bộ gói kết nối: giao thức máy chủ, truyền tải, nhóm, phân mảnh và chế độ. Lựa chọn thủ công không tương thích sẽ bị từ chối trước khi dừng kết nối hiện tại. Chọn Tự động hoặc công cụ khác và áp dụng lại cài đặt.\n\n###sing-box\n\nCác gói Sora mới bao gồm [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), một nhánh của [sing-box](https://github.com/SagerNet/sing-box), thêm XHTTP và VLESS Encryption phía máy khách. Sora công nhận bản dựng và khả năng của nó. Một bản dựng ngược dòng không có XHTTP sẽ không có được khả năng này chỉ từ tên của nó.\n\nCác giao thức được hỗ trợ bao gồm VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard và các tham số AmneziaWG 1.x/2.x Sora có thể nhập. Cấu hình JSON Xray đầy đủ yêu cầu Xray. Chưa thể nhập các trường AWG 3.x mới. sing-box sử dụng cổng điều khiển cục bộ được bảo vệ bằng mật khẩu mà các ứng dụng khác trên máy tính có thể phát hiện.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) hỗ trợ phân mảnh VLESS, REALITY, XHTTP, VLESS Encryption và TLS. Nó cũng chạy các hồ sơ Xray hoàn chỉnh của nhà cung cấp trong khi vẫn bảo toàn định tuyến và nhóm của họ. Những cấu hình như vậy không thể được tự động chuyển đổi sang một công cụ khác mà không thay đổi hành vi của chúng.\n\nXray đi kèm đã xóa cài đặt tắt xác minh chứng chỉ TLS (`allowInsecure`). Tự động chọn sing-box hoặc mihomo cho các máy chủ thông thường yêu cầu cài đặt này. Việc chọn Xray sẽ báo cáo sự không tương thích theo cách thủ công trước khi dừng kết nối hiện tại. Hồ sơ JSON đầy đủ cũ hơn cần hồ sơ nhà cung cấp được cập nhật với chứng chỉ hoặc mã chứng chỉ có thể xác minh được.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) hỗ trợ các nhóm cân bằng tải và dự phòng theo thứ tự, XHTTP và AmneziaWG. Chọn nó khi việc tự động chuyển đổi dự phòng sang máy chủ dự phòng có vấn đề. Cài đặt phân mảnh TLS của Sora không khả dụng với công cụ này.\n\n## Khả năng tương thích trong Sora\n\n| Tính năng | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN và TCP/UDP | Có | Có | Có |\n| XHTTP | Có | Có | Có |\n| VLESS Encryption | Có | Có | Có |\n| Hồ sơ Xray đầy đủ | Không | Có | Không |\n| TUIC / AnyTLS | Cả hai | Không | TUIC |\n| Phân mảnh TLS | Có | Có | Không |\n| AmneziaWG 1.x/2.x | Có¹ | Không | Có |\n| Nhóm dự phòng được đặt hàng | Không | Không có | Có |\n\n¹ Cấu hình có J1/J2/J3/Itime sử dụng mihomo; những trường này không bao giờ được loại bỏ một cách âm thầm. ² Đối với một nhóm cấu hình Xray hoàn chỉnh, ứng dụng sẽ chọn một cấu hình dự phòng. Hỗ trợ tùy thuộc vào bản dựng được cài đặt; kiểm tra phiên bản của nó trong Giới thiệu.\n\n## ngăn xếp TUN\n\nNgăn xếp xử lý TCP và UDP bên trong giao diện ảo. Trong bảng chế độ, Xray và mihomo cung cấp gVisor, System, Mixed và MIPS. Mỗi động cơ lưu tùy chọn riêng của mình. Chế độ proxy và Serverless System không sử dụng tùy chọn này.\n\n- **Mixed**: TCP sử dụng ngăn xếp hệ thống, trong khi gVisor xử lý UDP. Đây là mặc định của mihomo trên Linux. Trên Windows, Xray và mihomo mặc định dùng MIPS.\n- **System**: sử dụng ngăn xếp hệ thống. Hãy thử tùy chọn khác nếu ứng dụng mạng gặp sự cố.\n- **gVisor**: xử lý lưu lượng truy cập trong không gian người dùng.\n- **MIPS**: Ngăn xếp IP riêng của mihomo, có sẵn trong phiên bản đi kèm 1.19.32.\n\nTrên Linux, Xray sử dụng gVisor tích hợp theo mặc định. System, Mixed và MIPS trên Linux sử dụng mihomo làm công cụ TUN, chuyển tiếp TCP và UDP tới Xray qua liên kết SOCKS cục bộ đã được xác thực. Xray giữ lại giao thức, hồ sơ nhà cung cấp và định tuyến. Ba tùy chọn này yêu cầu cài đặt mihomo. Trên Windows, Xray sử dụng mihomo 1.19.32 trở lên cho cả bốn ngăn xếp TUN. Giao thức và định tuyến vẫn do Xray xử lý. Quy tắc ứng dụng trong cấu hình này chỉ hỗ trợ kết nối trực tiếp và chặn; trên Linux, các quy tắc này cần gVisor tích hợp của Xray.\n\nCây cầu chạy một quá trình thứ hai. Trong ba phép đo không hoạt động trên Linux, nó sử dụng bộ nhớ vật lý nhiều hơn khoảng 32–36 MiB so với Xray TUN gốc. Điều này không đo lường tải tải xuống: chi phí CPU và bộ nhớ phụ thuộc vào kết nối. sing-box không có bộ chọn ngăn xếp. Không có ngăn xếp nào đảm bảo hiệu suất tốt hơn trong mọi mạng. Chọn một ngăn xếp rồi chọn Áp dụng và kết nối lại để thử trong mạng của bạn.\n\n## Áp dụng cài đặt\n\nViệc chọn máy chủ sẽ tự động kết nối lại. Cài đặt chế độ, công cụ, DNS và quy tắc được lưu ngay lập tức; trong khi kết nối đang hoạt động, hãy nhấp vào Áp dụng và kết nối lại để sử dụng chúng. Việc khởi động lại công cụ có thể làm gián đoạn quá trình tải xuống và cuộc gọi. Nhấp chuột lặp đi lặp lại không bắt đầu kết nối song song; ngắt kết nối kết thúc quá trình chuyển đổi và giải phóng kết nối.\n\nInternet chỉ thông qua VPN chặn lưu lượng truy cập trực tiếp khi đường hầm bị hỏng. Nó ảnh hưởng đến toàn bộ máy. Việc ngắt kết nối rõ ràng sẽ loại bỏ các quy tắc của Sora. Nếu việc dọn dẹp không hoàn tất, hãy thử ngắt kết nối lại và mở nhật ký.\n\n## Tài liệu dự án\n\n- [sing-box-lx: cấu hình và hỗ trợ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Tài liệu sing-box](https://sing-box.sagernet.org/)\n- [Tài liệu Xray](https://xtls.github.io/)\n- [Tài liệu mihomo](https://wiki.metacubex.one/)\n- [zapret: hoạt động và những hạn chế](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,15 +440,9 @@
       }
     }
   },
-  "extensionsSoon": "Sắp ra mắt",
   "extensions": "Tiện ích mở rộng",
-  "diagnosticRequiresTun": "Việc chụp gói cần có kết nối Sora TUN đang hoạt động.",
-  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này.",
   "diagnosticNoData": "Chưa có yêu cầu nào được ghi lại. Trước tiên hãy mở một trang web kiểm tra tốc độ.",
   "diagnosticHttp": "Chẩn đoán HTTP",
-  "diagnosticEvents": "Sự kiện Windows",
-  "diagnosticCapture": "Chụp trong 10 giây",
-  "diagnosticPackets": "Chụp gói",
   "exportLogFile": "Lưu vào {name}",
   "@exportLogFile": {
     "placeholders": {
@@ -473,5 +450,572 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "Thêm máy chủ tùy chỉnh",
+  "customServers": "Máy chủ của tôi",
+  "customServerName": "Tên",
+  "customServerNameHint": "Ví dụ: VPS của tôi",
+  "customServerNameRequired": "Nhập tên",
+  "customServerAddress": "Địa chỉ",
+  "customServerAddressHint": "example.com hoặc 192.0.2.1",
+  "customServerAddressRequired": "Nhập địa chỉ máy chủ",
+  "customServerAddressInvalid": "Địa chỉ không hợp lệ",
+  "customServerPort": "Cổng",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "Cổng phải là số từ 1 đến 65535",
+  "customServerProtocol": "Giao thức",
+  "customServerCredentials": "Thông tin đăng nhập",
+  "customServerOptional": "Tùy chọn",
+  "customServerShowSecret": "Hiển thị bí mật",
+  "customServerHideSecret": "Ẩn bí mật",
+  "customServerBadge": "tùy chỉnh",
+  "customServerDeleteConfirm": "Xóa máy chủ “{name}”?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "Thêm máy chủ theo cách thủ công: địa chỉ, cổng và giao thức",
+  "customServerTest": "Kiểm tra",
+  "leakTestTitle": "Kiểm tra rò rỉ dữ liệu",
+  "leakTestIntro": "Kiểm tra xem lưu lượng có thể rời thiết bị ngoài đường hầm hay không: DNS và ICMP trực tiếp, lưu lượng IPv6 đi ra và trình phân giải của hệ thống. Chạy khi đang kết nối.",
+  "leakTestRun": "Kiểm tra",
+  "leakTestCancel": "Hủy",
+  "leakTestNeedsConnection": "Kết nối với VPN để kiểm tra rò rỉ dữ liệu.",
+  "leakTestProgress": "Đã hoàn thành kiểm tra: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "Không tìm thấy rò rỉ",
+  "leakTestFound": "{count, plural, other{Phát hiện # rò rỉ}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "Sửa",
+  "leakTestFixedNote": "Đã bật chặn mạng. Chạy lại kiểm tra để xác nhận.",
+  "leakTestCheckDirectDns": "Trực tiếp DNS",
+  "leakTestCheckIcmpEcho": "ICMP tiếng vọng",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "Trình phân giải hệ thống",
+  "leakTestCheckTunnelConnectivity": "Kết nối đường hầm",
+  "leakTestCheckTunnelDns": "DNS xuyên qua đường hầm",
+  "noticeDegraded": "Máy chủ trở nên chậm. Sora đã chuyển sang máy chủ tốt nhất được tìm thấy trong quá trình đo.",
+  "obfs": "Ngụy trang lưu lượng",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "Tệp cập nhật được đối chiếu với checksum công bố kèm bản phát hành.",
+  "updateManualSigWarning": "Các tệp dưới đây khớp với checksum của bản phát hành. Hãy chạy lệnh nếu bạn tải chúng từ bản phát hành chính thức.",
+  "updateVersionRevoked": "Nhà phát triển đã rút phiên bản này. Vui lòng chờ bản phát hành được sửa chữa.",
+  "updateRolloutPending": "Một phiên bản mới hơn đang được triển khai dần dần và sẽ tự động được cung cấp cho bạn.",
+  "updateRollbacking": "Quay lại phiên bản {version}...",
+  "updateRolledBack": "Bản cập nhật cho {version} không vượt qua được quá trình kiểm tra tình trạng nên Sora đã được khôi phục về {fromVersion}.",
+  "updateRollbackError": "Tự động khôi phục không thành công. Nếu phiên bản mới không hoạt động, hãy cài đặt lại bản phát hành trước đó theo cách thủ công.",
+  "updateRollbackCacheError": "Không thể chuẩn bị bản sao khôi phục đã được xác minh của phiên bản hiện tại, do đó bản cập nhật chưa được cài đặt.",
+  "extRatingLabel": "Xếp hạng {rating} trên 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "bởi {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "{count} lượt cài đặt",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 lượt cài đặt",
+  "extBadgeVerified": "Đã xác minh",
+  "extBadgeTop": "Phổ biến nhất tuần này",
+  "extBadgeNew": "Mới",
+  "extBadgeStaff": "Đội Sora",
+  "extSideloadShort": "Không có trong danh mục",
+  "extSideloadWarning": "Tiện ích mở rộng này không có trong danh mục của nhóm. Chỉ tác giả mới xác nhận khóa của họ: chỉ cài đặt nó nếu bạn tin tưởng tác giả.",
+  "extInstallTitle": "Cài đặt “{name}”",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "Cập nhật “{name}”",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "Tiện ích mở rộng này sẽ có thể:",
+  "extPermissionsWidened": "Bản cập nhật yêu cầu quyền mới:",
+  "extDangerousAck": "Tôi hiểu rằng những quyền này là nghiêm trọng",
+  "extInstall": "Cài đặt",
+  "extUpdate": "Cập nhật",
+  "extCancel": "Hủy",
+  "extConfirm": "Xác nhận",
+  "extOk": "OK",
+  "extCatalog": "Danh mục",
+  "extInstalled": "Tiện ích mở rộng đã cài đặt",
+  "extSearchHint": "Tìm tiện ích mở rộng",
+  "extCatAll": "Tất cả",
+  "extCatTools": "Dụng cụ",
+  "extCatThemes": "Giao diện",
+  "extCatAutomation": "Tự động hóa",
+  "extCatStats": "Thống kê",
+  "extCatNetwork": "Mạng",
+  "extSortBy": "Sắp xếp theo",
+  "extSortPopular": "Phổ biến nhất",
+  "extSortRating": "Được đánh giá cao nhất",
+  "extSortName": "Tên",
+  "extCatalogError": "Không thể tải danh mục",
+  "extRetry": "Thử lại",
+  "extEmptySearch": "Không tìm thấy gì",
+  "extEmptyInstalled": "Chưa cài đặt tiện ích mở rộng nào.\nTìm một cái trong danh mục hoặc cài đặt từ một tập tin.",
+  "extInstallFromFile": "Cài đặt từ tập tin",
+  "extInstallFromUrl": "Cài đặt từ URL",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "Tải xuống",
+  "extDownloading": "Đang tải xuống…",
+  "extVerifying": "Đang xác minh…",
+  "extInstalling": "Đang cài đặt…",
+  "extInstallFailed": "Cài đặt không thành công",
+  "extErrSignature": "Kiểm tra chữ ký không thành công. Tệp có thể bị hỏng hoặc bị giả mạo.",
+  "extErrManifest": "Tệp kê khai tiện ích mở rộng không hợp lệ.",
+  "extErrNetwork": "Lỗi mạng. Hãy kiểm tra kết nối của bạn và thử lại.",
+  "extErrHash": "Bản tải xuống không khớp với danh mục. Nó có thể đã bị giả mạo.",
+  "extErrMinApp": "Tiện ích mở rộng này cần phiên bản ứng dụng {version} hoặc mới hơn.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "Chỉ cho phép liên kết https://",
+  "extErrGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
+  "extErrAuthorKeyChanged": "Bản cập nhật này được ký bằng khóa tác giả khác với phiên bản đã cài đặt nên đã bị chặn. Nếu bạn tin cậy khóa mới, hãy gỡ cài đặt tiện ích mở rộng và cài đặt lại một cách rõ ràng.",
+  "extUpdateAvailable": "Đã có bản cập nhật",
+  "extDisabled": "Đã tắt",
+  "extToggleEnabled": "Kích hoạt {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "Tìm tiện ích đã cài đặt",
+  "extUpdateAll": "Cập nhật tất cả",
+  "extUpdatesAvailable": "{count} có bản cập nhật",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} đã cập nhật",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "Bình thường",
+  "extRiskSensitive": "Nhạy cảm",
+  "extRiskDangerous": "Rủi ro cao",
+  "extPermissionsRemoved": "Không còn được yêu cầu:",
+  "extUpdateFailedKept": "Phiên bản trước đó vẫn được cài đặt.",
+  "extConflictsTitle": "Xung đột tiện ích mở rộng",
+  "extConflictsIntro": "Các tiện ích này muốn cùng một thứ. Chọn tiện ích sẽ chạy; tiện ích còn lại vẫn được cài đặt.",
+  "extConflictTheme": "Chủ đề ứng dụng",
+  "extConflictNetHooks": "Móc mạng",
+  "extConflictWinner": "{name} thắng",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} xung đột cần bạn quyết định",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "Giải quyết xung đột",
+  "extConflictNote": "Lựa chọn của bạn được lưu trên thiết bị này. Giao diện đổi ngay, còn hook mạng không chạy trong phiên bản này.",
+  "extVersionLabel": "Phiên bản {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "Tác giả",
+  "extRating": "Đánh giá",
+  "extInstalls": "Lượt cài đặt",
+  "extVersion": "Phiên bản",
+  "extAbout": "Giới thiệu về tiện ích mở rộng này",
+  "extPermissionsTitle": "Quyền",
+  "extNoPermissions": "Không có quyền đặc biệt.",
+  "extSettings": "Cài đặt",
+  "extSaveSettings": "Lưu cài đặt",
+  "extSaving": "Đang lưu…",
+  "extUpdateTo": "Nâng cấp lên {version}",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "Đã bật",
+  "extRollbackTo": "Quay lại {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "Quay lại phiên bản {version}?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "Gỡ cài đặt",
+  "extUninstallConfirm": "Xóa “{name}” và các cài đặt của nó?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "Bảng điều khiển không có sẵn. Tiện ích mở rộng có thể đã bị vô hiệu hóa hoặc bị xóa.",
+  "extPermConnectionsRead": "Xem danh sách các kết nối đang hoạt động",
+  "extPermServersRead": "Xem danh sách máy chủ của bạn",
+  "extPermSettingsRead": "Đọc cài đặt ứng dụng",
+  "extPermSettingsWrite": "Thay đổi cài đặt ứng dụng",
+  "extPermNotifications": "Hiển thị thông báo",
+  "extPermTray": "Thêm các mục vào menu khay",
+  "extPermUiPanel": "Hiển thị các bảng bên trong ứng dụng",
+  "extPermThemeApply": "Áp dụng chủ đề",
+  "extPermRoutingRules": "Thêm quy tắc định tuyến (ảnh hưởng đến nơi lưu lượng truy cập mạng đi)",
+  "extPermNetHooks": "Tích hợp vào đường dẫn mạng (DPI mô-đun bỏ qua)",
+  "extPermNetFetch": "Yêu cầu URL từ danh sách được phép",
+  "extPermBackground": "Chạy các tác vụ nền",
+  "extPermBackgroundDetail": "Chạy các tác vụ đã lên lịch ngay cả khi đóng bảng điều khiển. Bạn có thể tạm dừng hoặc thay đổi tần suất chạy trong cài đặt tiện ích mở rộng.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "Chạy ở chế độ nền",
+  "extCapNetHook": "Vượt chặn và hook mạng",
+  "extCapPanel": "Bảng giao diện",
+  "extCapRouting": "Quy tắc định tuyến",
+  "extCapTheme": "Giao diện",
+  "extCapWidget": "Widget",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "Nhật ký thay đổi",
+  "extImageFailed": "Không thể tải hình ảnh",
+  "extRatingHow": "Cách xếp hạng hoạt động",
+  "extRatingHowBody": "Xếp hạng sử dụng mức trung bình Bayes: tiện ích mở rộng có ít xếp hạng sẽ ở gần giữa cho đến khi có nhiều người bỏ phiếu hơn, do đó, một đánh giá 5 sao không thể đẩy tiện ích mở rộng mới lên đầu. Xếp hạng gần đây nặng hơn xếp hạng cũ và chỉ tính một xếp hạng cho mỗi tài khoản.",
+  "extScreenshots": "Ảnh chụp màn hình",
+  "extSortRelevance": "Mức độ liên quan",
+  "extPermNetworkDetail": "Tải dữ liệu từ internet qua VPN. Chỉ các máy chủ bên dưới được phép, còn lại đều bị chặn.",
+  "extBgTitle": "Tác vụ nền",
+  "extBgEnabled": "Chạy ở chế độ nền",
+  "extBgInterval": "Chạy mỗi",
+  "extBgMinutes": "{count, plural, other{# phút}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, other{# giờ}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Tác vụ chạy theo lịch khi Sora đang mở, kể cả khi ở khay hệ thống. Khoảng cách ngắn nhất là 15 phút.",
+  "extBgDisabledNote": "Kích hoạt tiện ích mở rộng để quản lý tác vụ nền của nó.",
+  "extCapNetwork": "Truy cập mạng",
+  "extCapNetworkHosts": "Mạng: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "Chia sẻ mã QR",
+  "qrScanTitle": "Quét mã QR",
+  "qrCopyLink": "Sao chép liên kết",
+  "qrShowLink": "Hiển thị liên kết",
+  "qrHideLink": "Ẩn liên kết",
+  "qrWarning": "Mã QR này chứa chi tiết kết nối. Đừng cho người lạ xem.",
+  "qrScanHint": "Chọn ảnh chụp màn hình hoặc ảnh có mã QR, hoặc dán liên kết",
+  "qrFromClipboard": "Dán từ bảng nhớ tạm",
+  "qrNoCode": "Không tìm thấy mã QR trong hình ảnh này.",
+  "qrInvalid": "Mã QR này không chứa liên kết hợp lệ.",
+  "qrScan": "Quét QR",
+  "qrFromImage": "Mở hình ảnh",
+  "connGroupByProcess": "Nhóm theo quy trình",
+  "connListView": "Danh sách",
+  "connCopyHost": "Sao chép máy chủ",
+  "connAddRule": "Thêm quy tắc",
+  "connConnectionsCount": "{count, plural, other{# kết nối}}",
+  "dnsPreset": "cài sẵn",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "Tùy chỉnh",
+  "dnsCheck": "Kiểm tra rò rỉ dữ liệu",
+  "dnsChecking": "Đang kiểm tra...",
+  "dnsNoLeak": "Không tìm thấy rò rỉ",
+  "dnsLeakFound": "Phát hiện rò rỉ",
+  "dnsLastCheck": "Kiểm tra lần cuối",
+  "dnsNeverChecked": "Chưa được thử nghiệm",
+  "dnsLeakCheckTunnelDns": "Trình phân giải DNS của đường hầm",
+  "dnsLeakCheckSystemResolvers": "Trình phân giải hệ thống",
+  "dnsLeakCheckKillSwitchDns": "Bảo vệ DNS bằng chặn mạng",
+  "dnsLeakFixConfigureTunnelDns": "Định cấu hình DNS cho đường hầm trong cài đặt DNS ở trên.",
+  "dnsLeakFixReviewSystemResolvers": "Kiểm tra xem hệ thống của bạn sẽ sử dụng bộ phân giải nào bên ngoài đường hầm.",
+  "dnsLeakFixEnableKillSwitch": "Bật chặn mạng để lưu lượng DNS luôn đi trong đường hầm.",
+  "dnsLeakCheckEncryptedDns": "DNS mã hóa của hệ điều hành",
+  "dnsLeakCheckDnsSpoof": "Giả mạo DNS phản hồi",
+  "dnsLeakFixReviewEncryptedDns": "Kiểm tra xem điểm cuối DNS được mã hóa nào mà hệ thống của bạn sử dụng bên ngoài đường hầm.",
+  "dnsLeakFixUseEncryptedDns": "Dùng DNS mã hóa (DoT hoặc DoH) cho đường hầm để trình phân giải không thể giả mạo câu trả lời.",
+  "dnsCheckNeedsConnection": "Trước tiên hãy kết nối với VPN, sau đó kiểm tra xem có rò rỉ không.",
+  "dnsExpected": "Dự kiến",
+  "dnsActual": "Đã quan sát",
+  "sortBy": "Sắp xếp theo",
+  "sortPing": "Ping",
+  "sortSpeed": "Tốc độ",
+  "sortName": "Tên",
+  "measureSpeed": "Đo tốc độ",
+  "benchmarkStale": "lỗi thời",
+  "autoSelectMode": "Tự động chọn máy chủ",
+  "autoSelectPing": "Ping nhanh nhất",
+  "autoSelectSpeed": "Tốc độ nhanh nhất",
+  "autoSelectSmart": "Lựa chọn thông minh",
+  "coreWatchUnstable": "Kết nối tới lõi Sora không ổn định",
+  "watchReconnect": "Kết nối lại",
+  "coreRestoringLink": "Đang khôi phục kết nối tới lõi Sora…",
+  "crashRestoreTitle": "Phiên cuối cùng bị gián đoạn",
+  "restoreOnCrash": "Khôi phục phiên sau sự cố",
+  "crashRestore": "Khôi phục",
+  "crashDismiss": "Không phải bây giờ",
+  "overrideTitle": "Chỉnh sửa của tôi",
+  "overrideEdit": "Chỉnh sửa máy chủ",
+  "overrideHide": "Ẩn",
+  "overrideUnhide": "Hiển thị",
+  "overrideClear": "Đặt lại chỉnh sửa",
+  "overrideEmpty": "Chưa có chỉnh sửa nào",
+  "overrideCustomRules": "Quy tắc riêng",
+  "errBenchmarkUnsupported": "Đo tốc độ cần lõi mới hơn",
+  "benchmarkProgress": "Đo {done} từ {total}…",
+  "profiles": "Cấu hình mạng",
+  "profilesEmpty": "Chưa có hồ sơ nào. Tạo một cái để tự động áp dụng cài đặt trên các mạng đã biết.",
+  "profileAdd": "Thêm hồ sơ",
+  "profileName": "Tên hồ sơ",
+  "profileSsids": "Wi-Fi mạng (SSID)",
+  "profileSsidsHint": "Nhà, Văn phòng cách nhau bằng dấu phẩy",
+  "profileGateways": "Cổng mạng",
+  "profileAsns": "AS số",
+  "profileAutoApply": "Tự động áp dụng",
+  "profileAutoApplyHint": "Khi tắt, yêu cầu xác nhận trước khi áp dụng hồ sơ.",
+  "profileSnapshot": "Ghi nhớ cài đặt hiện tại",
+  "profileSnapshotDone": "Cài đặt hiện tại được lưu vào hồ sơ",
+  "profileDelete": "Xóa hồ sơ",
+  "profileDeleteConfirm": "Xóa hồ sơ \"{name}\"?",
+  "profileApplyAsk": "Đăng ký hồ sơ \"{name}\"?",
+  "profileApply": "Áp dụng",
+  "profileApplied": "Đã áp dụng hồ sơ “{name}”",
+  "profileUndo": "Hủy",
+  "profileActive": "Đang hoạt động",
+  "networkNow": "Bây giờ: {info}",
+  "networkUnknown": "Không có thông tin mạng",
+  "profileNoTriggers": "Thêm ít nhất một trình kích hoạt: SSID, cổng hoặc ASN",
+  "chains": "Chuỗi proxy",
+  "chainsEmpty": "Chưa có dây chuyền nào. Liên kết 2–3 máy chủ để lưu lượng truy cập đi qua từng máy chủ.",
+  "chainAdd": "Dây chuyền mới",
+  "chainName": "Tên dây chuyền",
+  "chainPickServers": "Chọn 2–3 máy chủ",
+  "chainOrderHint": "Kéo để sắp xếp lại: lưu lượng vào ở trên cùng và thoát ra ở dưới cùng.",
+  "chainTooFew": "Chọn ít nhất 2 máy chủ",
+  "chainTooMany": "Một chuỗi chứa tối đa 3 máy chủ",
+  "chainEstimate": "Độ trễ ước tính",
+  "chainSave": "Lưu chuỗi",
+  "chainDelete": "Xóa chuỗi",
+  "chainDeleteConfirm": "Xóa chuỗi \"{name}\"?",
+  "chainUnsupported": "Động cơ hiện tại không hỗ trợ tạo chuỗi",
+  "chainHopMissing": "Một trong các máy chủ của chuỗi không còn khả dụng",
+  "chainHop": "Chặng {n}",
+  "chainEntry": "Đầu vào",
+  "chainExit": "Đầu ra",
+  "sync": "Đồng bộ hóa thiết bị",
+  "syncDevices": "Thiết bị của tôi",
+  "syncEmpty": "Không có thiết bị nào được ghép nối. Ghép nối một thiết bị khác qua mạng cục bộ.",
+  "syncPair": "Ghép nối thiết bị",
+  "syncShowCode": "Hiển thị mã của tôi",
+  "syncScanCode": "Quét mã",
+  "syncRevoke": "Rút tiền",
+  "syncRevokeConfirm": "Thu hồi \"{name}\"?",
+  "syncLastSync": "Đồng bộ hóa lần cuối: {time}",
+  "syncNever": "Không bao giờ",
+  "syncNoLan": "Các thiết bị phải nằm trên cùng một mạng cục bộ",
+  "syncPaired": "Đã ghép nối thiết bị",
+  "syncPairingTitle": "Ghép nối với thiết bị này",
+  "syncWaiting": "Đang chờ thiết bị kia…",
+  "syncSecureNote": "Kênh được mã hóa hai đầu. Không có tài khoản, không có máy chủ đám mây.",
+  "zapretWithVpn": "Bỏ qua DPI lọc lưu lượng truy cập mạng trực tiếp",
+  "zapretWithVpnHint": "Chạy zapret song song với đường hầm VPN: lưu lượng trong đường hầm dùng VPN, lưu lượng trực tiếp đi qua cơ chế vượt chặn.",
+  "chainDuplicate": "Mỗi máy chủ chỉ có thể xuất hiện một lần",
+  "edit": "Chỉnh sửa",
+  "remove": "Xóa",
+  "autoSwitchOnDegrade": "Tự động chuyển đổi khi xuống cấp",
+  "autoSwitchOnDegradeDetail": "Nếu máy chủ đã chọn chậm đi nhiều hoặc ngừng phản hồi, Sora chuyển sang máy chủ tốt nhất theo kết quả đo, tối đa một lần mỗi 10 phút.",
+  "tunStackMixed": "Hỗn hợp",
+  "tunStackSystem": "Hệ thống",
+  "syncCodeExpired": "Mã đã hết hạn",
+  "syncDaemonFailed": "Không thể khởi động dịch vụ đồng bộ hóa",
+  "syncDaemonMissing": "Không tìm thấy thành phần sora-sync. Cài đặt lại ứng dụng để bật đồng bộ hóa thiết bị.",
+  "syncDaemonStarting": "Đang bắt đầu dịch vụ đồng bộ hóa…",
+  "syncErrAuth": "Dịch vụ đồng bộ hóa đã từ chối mã thông báo truy cập. Khởi động lại ứng dụng và thử lại.",
+  "syncErrNotFound": "Thiết bị không còn được ghép nối",
+  "syncErrPairingActive": "Phiên ghép nối đã được mở",
+  "syncErrUnreachable": "Thiết bị kia không trả lời. Đảm bảo nó nằm trên cùng một mạng và hiển thị mã của nó.",
+  "syncError": "Lỗi đồng bộ hóa",
+  "syncExpiresIn": "Mã hết hạn sau {duration}",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "Đang ghép nối với thiết bị…",
+  "syncLegacyCleared": "Danh sách thiết bị cũ chưa bao giờ thực sự được ghép nối nên đã bị xóa. Ghép nối lại các thiết bị của bạn, lần này là thực sự.",
+  "syncNewCode": "Mã mới",
+  "syncPairedWith": "Ghép nối với {name}",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "Lặp lại",
+  "syncStopShowing": "Ẩn mã",
+  "syncSyncNow": "Đồng bộ ngay",
+  "syncSyncResult": "Đã nhận {pulled}, đã gửi {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "Kết quả đồng bộ hóa",
+  "syncPulled": "Đã nhận được",
+  "syncPushed": "Đã gửi",
+  "syncNoChanges": "Không phát hiện thấy thay đổi nào",
+  "syncDocKindSubscriptions": "Đăng ký",
+  "syncDocKindSettings": "Cài đặt ứng dụng",
+  "syncDocKindOverrides": "Tùy chỉnh đăng ký",
+  "syncDocKindProfiles": "Cấu hình mạng",
+  "syncDocKindChains": "Chuỗi proxy",
+  "syncFrom": "từ {name}",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "Thiết bị này",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Với Shadowsocks: phương thức:mật khẩu, ví dụ chacha20-ietf-poly1305:matkhau",
+  "diagnosticPackets": "Chụp gói",
+  "diagnosticEvents": "Sự kiện Windows",
+  "diagnosticCapture": "Chụp trong 10 giây",
+  "diagnosticRequiresTun": "Việc chụp gói cần có kết nối Sora TUN đang hoạt động.",
+  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này.",
+  "extErrRevoked": "Nhóm Sora đã thu hồi phiên bản tiện ích này vì không an toàn hoặc bị lỗi.",
+  "extErrRevocationsExpired": "Không thể gia hạn danh sách tiện ích bị thu hồi. Việc cài đặt bị chặn cho đến khi gia hạn được: kiểm tra mạng rồi thử lại.",
+  "extRevokedDisabled": "Đã tắt các tiện ích bị thu hồi: {names}",
+  "customServerWgPrivateKey": "Khóa riêng",
+  "customServerWgAddresses": "Địa chỉ giao diện",
+  "customServerWgPeerKey": "Khóa công khai của máy chủ",
+  "customServerWgPresharedKey": "Khóa chia sẻ trước",
+  "customServerWgAllowedIps": "IP được phép",
+  "customServerWgKeepalive": "Keepalive, giây",
+  "customServerWgKeyInvalid": "Khóa phải là 32 byte base64, như wg genkey in ra.",
+  "customServerWgCidrInvalid": "Nhập các tiền tố cách nhau bằng dấu phẩy, ví dụ 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "Nhập số giây từ 0 đến 65535.",
+  "strictKillSwitch": "Chặn mạng nghiêm ngặt",
+  "strictKillSwitchWarning": "Sau khi kết nối, chặn lưu lượng ngoài VPN kể cả khi gặp sự cố, khởi động lại hoặc thoát ứng dụng. Chỉ ngắt kết nối hoặc tắt tùy chọn này mới khôi phục truy cập. Sau khi khởi động lại thiết bị, chỉ tiếp tục chặn nếu đã bật kết nối khi khởi động.",
+  "extWorkerFailed": "Tác vụ nền của tiện ích mở rộng thất bại. Kiểm tra nhật ký tiện ích.",
+  "extAssetRejected": "Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ."
 }

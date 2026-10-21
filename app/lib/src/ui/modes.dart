@@ -241,7 +241,7 @@ class _Modes extends StatelessWidget {
                   key: const ValueKey('mihomo-tun-stack'),
                   title: s.tunStack,
                   value: settings.mihomoTunStack,
-                  choices: const {'mixed': 'Mixed', 'system': 'System', 'gvisor': 'gVisor', 'mips': 'MIPS'},
+                  choices: {'mixed': s.tunStackMixed, 'system': s.tunStackSystem, 'gvisor': 'gVisor', 'mips': 'MIPS'},
                   onChanged: (value) => unawaited(sora.change((x) => x.mihomoTunStack = value)),
                 ),
                 const SizedBox(height: 12),
@@ -251,7 +251,7 @@ class _Modes extends StatelessWidget {
                   key: const ValueKey('xray-tun-stack'),
                   title: s.tunStack,
                   value: settings.xrayTunStack,
-                  choices: const {'gvisor': 'gVisor', 'system': 'System', 'mixed': 'Mixed', 'mips': 'MIPS'},
+                  choices: {'gvisor': 'gVisor', 'system': s.tunStackSystem, 'mixed': s.tunStackMixed, 'mips': 'MIPS'},
                   onChanged: (value) => unawaited(sora.change((x) => x.xrayTunStack = value)),
                 ),
                 const SizedBox(height: 12),
@@ -263,6 +263,41 @@ class _Modes extends StatelessWidget {
                 value: settings.killSwitch,
                 onChanged: (v) => unawaited(sora.setKillSwitch(v)),
               ),
+              if (Platform.isLinux || Platform.isWindows)
+                ExpansionTile(
+                  key: const ValueKey('advanced-protection'),
+                  title: Text(s.more, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+                  tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                  childrenPadding: const EdgeInsets.only(bottom: 12),
+                  iconColor: palette.ink2,
+                  collapsedIconColor: palette.ink2,
+                  shape: const Border(),
+                  collapsedShape: const Border(),
+                  children: [
+                    SwitchTile(
+                      key: const ValueKey('strict-kill-switch'),
+                      title: s.strictKillSwitch,
+                      value: settings.strictKillSwitch,
+                      onChanged: (v) => unawaited(sora.setStrictKillSwitch(v)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                      child: Text(s.strictKillSwitchWarning, style: Styles.secondary.copyWith(color: palette.ink2)),
+                    ),
+                  ],
+                ),
+              if (Platform.isLinux && sora.serverlessAvailable) ...[
+                const SizedBox(height: 12),
+                SwitchTile(
+                  title: s.zapretWithVpn,
+                  value: settings.zapretWithVpn,
+                  onChanged: (v) => unawaited(sora.change((x) => x.zapretWithVpn = v)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                  child: Text(s.zapretWithVpnHint, style: Styles.secondary.copyWith(color: palette.ink2)),
+                ),
+              ],
               const SizedBox(height: 12),
               Wrap(
                 alignment: WrapAlignment.spaceBetween,

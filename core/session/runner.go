@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/netip"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/profiles"
 )
 
 // Session deadlines bound readiness waits and shutdown for slow engines.
@@ -50,6 +52,7 @@ type Config struct {
 	Network func() string
 	// NetworkInterval is how often Network is read.
 	NetworkInterval time.Duration
+	Profiles        *profiles.Store
 	// Settings defines system state owned while running; fill it before
 	// Start.
 	Settings Settings
@@ -78,7 +81,7 @@ func interfaceUp(ctx context.Context, device string) error {
 	ctx, cancel := context.WithTimeout(ctx, tunWait)
 	defer cancel()
 	// One ticker for the whole wait instead of a fresh time.After per
-	// iteration (SORA-L21).
+	// iteration.
 	ticker := time.NewTicker(50 * time.Millisecond)
 	defer ticker.Stop()
 	for {
@@ -108,9 +111,11 @@ type Session struct {
 	stopping bool
 	// guardApplied tracks changes owned by this session so cleanup retries
 	// them without removing unrelated rules.
-	guardApplied bool
+	guardApplied       bool
+	lastProfileNetwork [4]string
 	// guardMu serializes kill-switch changes and shutdown restoration.
 	guardMu   sync.Mutex
+	crashes   *crashWatch
 	engineSub func()
 	ctx       context.Context
 	cancel    context.CancelFunc
@@ -157,12 +162,14 @@ func New(cfg Config) (*Session, error) {
 		log:   cfg.Journal,
 		state: StateDisconnected,
 		status: Status{
-			ChangedAt:  cfg.Now(),
-			KillSwitch: cfg.Settings.KillSwitch,
-			Bypass:     append([]string(nil), cfg.Settings.Bypass...),
-			TunnelMode: cfg.Settings.TunnelMode,
+			ChangedAt:        cfg.Now(),
+			KillSwitch:       cfg.Settings.KillSwitch || cfg.Settings.StrictKillSwitch,
+			StrictKillSwitch: cfg.Settings.StrictKillSwitch,
+			Bypass:           append([]string(nil), cfg.Settings.Bypass...),
+			TunnelMode:       cfg.Settings.TunnelMode,
 		},
-		done: make(chan struct{}),
+		crashes: newCrashWatch(),
+		done:    make(chan struct{}),
 	}, nil
 }
 
@@ -203,7 +210,7 @@ func (s *Session) Start(ctx context.Context) error {
 	}
 	// The supervise loop, the done channel, and the engine subscription are
 	// single-use. A stop in flight (or finished) poisons the session, so a
-	// second Start is refused instead of corrupting them (SORA-M12).
+	// second Start is refused instead of corrupting them.
 	if s.stopping {
 		s.mu.Unlock()
 		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
@@ -222,7 +229,17 @@ func (s *Session) Start(ctx context.Context) error {
 	s.mu.Lock()
 	s.guardApplied = true
 	s.mu.Unlock()
-	if err := s.guard.Apply(ctx, s.settings()); err != nil {
+	settings := s.settings()
+	if settings.StrictKillSwitch {
+		endpoints, err := planEndpoints(ctx, s.cfg.Plan)
+		if err != nil {
+			s.fail(err)
+			return err
+		}
+		settings.Endpoints = endpoints
+		s.cfg.Settings.Endpoints = endpoints
+	}
+	if err := s.guard.Apply(ctx, settings); err != nil {
 		wrapped := errs.Wrap(err, errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail)
 		s.fail(wrapped)
 		return wrapped
@@ -233,8 +250,7 @@ func (s *Session) Start(ctx context.Context) error {
 	} else if tun := s.cfg.Plan.Tun; tun.Enabled && tun.DeviceName != "" {
 		if err = s.cfg.TunUp(ctx, tun.DeviceName); err != nil {
 			// The engine is torn down because the tunnel never came up;
-			// keep the stop failure visible instead of swallowing it
-			// (SORA-M16).
+			// keep the stop failure visible instead of swallowing it.
 			if stopErr := s.eng.Stop(context.WithoutCancel(ctx)); stopErr != nil {
 				s.log.Append(Event{
 					Kind:   EventError,
@@ -279,7 +295,7 @@ func (s *Session) Done() <-chan struct{} { return s.done }
 // disconnected. Repeated calls are safe from user, shutdown, and failure paths.
 // The engine shutdown has a bounded budget detached from the caller's
 // context: a cancelled Disconnect must not strand a half-stopped engine and
-// wedge the manager busy forever (SORA-H7).
+// wedge the manager busy forever.
 func (s *Session) Stop(ctx context.Context) error {
 	// Detach the shutdown budget from the caller: eng.Stop must run to
 	// completion (or the shutdown timeout) even if the Disconnect RPC that
@@ -324,7 +340,7 @@ func (s *Session) Stop(ctx context.Context) error {
 		s.engineSub = nil
 	}
 	// A failing Close can leak descriptors; keep it visible in the journal
-	// instead of swallowing it (SORA-L13).
+	// instead of swallowing it.
 	if closeErr := s.eng.Close(); closeErr != nil {
 		s.log.Append(Event{
 			Kind:   EventError,
@@ -366,6 +382,11 @@ func (s *Session) restoreGuard(ctx context.Context) error {
 // prevent rearming after shutdown. Disabling remains allowed after failure
 // because failed sessions retain the block.
 func (s *Session) SetKillSwitch(ctx context.Context, enabled bool) error {
+	return s.SetProtection(ctx, enabled, nil)
+}
+
+// SetProtection also supports releasing a strict block on a failed session.
+func (s *Session) SetProtection(ctx context.Context, enabled bool, strict *bool) error {
 	s.guardMu.Lock()
 	defer s.guardMu.Unlock()
 	s.mu.Lock()
@@ -377,13 +398,33 @@ func (s *Session) SetKillSwitch(ctx context.Context, enabled bool) error {
 	}
 	settings := s.settingsLocked()
 	settings.KillSwitch = enabled
+	if strict != nil {
+		if !*strict && settings.StrictKillSwitch {
+			settings.KillSwitch = false
+		}
+		settings.StrictKillSwitch = *strict
+	}
+	if !enabled {
+		settings.StrictKillSwitch = false
+	}
+	if settings.StrictKillSwitch {
+		settings.KillSwitch = true
+	}
 	s.mu.Unlock()
+	if settings.StrictKillSwitch {
+		var err error
+		settings.Endpoints, err = planEndpoints(ctx, s.cfg.Plan)
+		if err != nil {
+			return err
+		}
+	}
 	if err := s.guard.Apply(ctx, settings); err != nil {
 		return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardFirewallFail)
 	}
 	s.mu.Lock()
 	s.guardApplied = true
-	s.status.KillSwitch = enabled
+	s.status.KillSwitch = settings.KillSwitch
+	s.status.StrictKillSwitch = settings.StrictKillSwitch
 	s.mu.Unlock()
 	return nil
 }
@@ -484,6 +525,10 @@ func (s *Session) supervise(events <-chan engine.Event) {
 		case <-network:
 			if why := watch.changed(); why != "" {
 				s.renewConnections(ctx, why)
+				s.checkProfile()
+			} else if watch.last == "" {
+				// Going offline must allow the same profile on the next join.
+				s.matchProfile(profiles.Fingerprint{})
 			}
 		case ev, ok := <-events:
 			if !ok {
@@ -500,6 +545,9 @@ func (s *Session) supervise(events <-chan engine.Event) {
 					reason, key = errs.CodeOf(ev.Err), errs.KeyOf(ev.Err)
 				}
 				s.setStateReconnecting(reason, key, 0)
+				if s.crashes.note() {
+					s.log.Append(Event{Kind: EventError, Reason: errs.CodeUnavailable, Key: errs.KeyEngineUnstable, Detail: "the engine keeps crashing"})
+				}
 			case engine.EventState:
 				if ev.State == engine.StateRunning && s.State() == StateReconnecting {
 					// A restarted engine starts its fallback groups over
@@ -511,8 +559,27 @@ func (s *Session) supervise(events <-chan engine.Event) {
 					s.setState(StateConnected, errs.Code(""), errs.Key(""), "")
 				}
 			case engine.EventFatal:
-				s.fail(errs.Newf(errs.CodeUnavailable, errs.KeyEngineStopped,
-					"session: the engine reported a fatal error"))
+				// Keep the supervisor's reason (restart budget exhausted,
+				// restart failure) in the failure status: a generic line
+				// here hides the actual cause from the client.
+				fatal := ev.Err
+				if ev.Message != "" {
+					// The budget message ("more than 5 restarts within
+					// 10m0s") is not part of ev.Err; carry it along so the
+					// status detail names the real reason.
+					if fatal == nil {
+						fatal = errors.New(ev.Message)
+					} else {
+						fatal = errors.Join(fatal, errors.New(ev.Message))
+					}
+				}
+				if fatal == nil {
+					fatal = errs.Newf(errs.CodeUnavailable, errs.KeyEngineStopped,
+						"session: the engine reported a fatal error")
+				} else {
+					fatal = errs.Wrap(fatal, errs.CodeUnavailable, errs.KeyEngineStopped)
+				}
+				s.fail(fatal)
 				return
 			}
 		}
@@ -640,11 +707,15 @@ func (s *Session) settings() Settings {
 func (s *Session) settingsLocked() Settings {
 	fake, _ := netip.ParsePrefix(s.cfg.Plan.DNS.FakeIPRange)
 	return Settings{
-		FakeIPRange: fake,
-		TunNetworks: s.cfg.Plan.Tun.Networks(),
-		KillSwitch:  s.status.KillSwitch,
-		Bypass:      append([]string(nil), s.status.Bypass...),
-		TunnelMode:  s.status.TunnelMode,
+		FakeIPRange:      fake,
+		TunNetworks:      s.cfg.Plan.Tun.Networks(),
+		KillSwitch:       s.status.KillSwitch,
+		StrictKillSwitch: s.status.StrictKillSwitch,
+		Reconnect:        s.cfg.Settings.Reconnect,
+		Endpoints:        s.cfg.Settings.Endpoints,
+		AllowLAN:         s.cfg.Settings.AllowLAN,
+		Bypass:           append([]string(nil), s.status.Bypass...),
+		TunnelMode:       s.status.TunnelMode,
 	}
 }
 
@@ -678,15 +749,16 @@ func (s *Session) setStateLocked(next State, reason errs.Code, key errs.Key, det
 	masked := s.mask(detail)
 	s.state = next
 	s.status = Status{
-		State:      next,
-		SessionID:  s.status.SessionID,
-		Reason:     reason,
-		Key:        key,
-		Detail:     masked,
-		ChangedAt:  s.cfg.Now(),
-		KillSwitch: s.status.KillSwitch,
-		Bypass:     s.status.Bypass,
-		TunnelMode: s.status.TunnelMode,
+		State:            next,
+		SessionID:        s.status.SessionID,
+		Reason:           reason,
+		Key:              key,
+		Detail:           masked,
+		ChangedAt:        s.cfg.Now(),
+		KillSwitch:       s.status.KillSwitch,
+		StrictKillSwitch: s.status.StrictKillSwitch,
+		Bypass:           s.status.Bypass,
+		TunnelMode:       s.status.TunnelMode,
 	}
 	s.log.Append(Event{
 		Kind:   EventState,
@@ -720,4 +792,35 @@ func (s *Session) setStateReconnecting(reason errs.Code, key errs.Key, delay tim
 		Key:        key,
 		RetryAfter: delay,
 	})
+}
+
+func (s *Session) checkProfile() {
+	if s.cfg.Profiles == nil || s.State() != StateConnected {
+		return
+	}
+	s.matchProfile(s.cfg.Profiles.Fingerprint())
+}
+
+func (s *Session) matchProfile(fp profiles.Fingerprint) {
+	if s.cfg.Profiles == nil {
+		return
+	}
+	m := s.cfg.Profiles.Match(fp)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.state != StateConnected {
+		return
+	}
+	if m == nil {
+		s.lastProfileNetwork = [4]string{}
+		return
+	}
+	// Resume and address churn on the same network must not reapply a profile
+	// after the user undoes it. Leaving and rejoining still emits a new match.
+	key := [4]string{fp.SSID, fp.Gateway, fp.ASN, m.ProfileID}
+	if key == s.lastProfileNetwork {
+		return
+	}
+	s.lastProfileNetwork = key
+	s.log.Append(Event{Kind: EventProfile, Profile: m})
 }

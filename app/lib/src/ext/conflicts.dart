@@ -1,0 +1,80 @@
+/// Extension conflict detection (pure, UI-side).
+///
+/// Two enabled extensions conflict when both are granted the same
+/// *contested* permission: only one of them can own the app theme or the
+/// network hooks at a time. Detection is deliberately
+/// permission-based (the stable, user-approved signal) rather than
+/// capability-contract based: the grant is what the user saw and approved.
+///
+/// Resolution (which extension wins) is persisted by [ExtensionStore]; themes use the stored winner.
+/// Routing rules are not contested: they merge in a fixed order after the user's rules.
+/// Network hooks are not run by the app.
+library;
+
+import 'store.dart';
+
+/// A permission whose grant is exclusive: two enabled holders fight over
+/// the same system surface.
+enum ExtConflictKind {
+  /// `theme.apply`: both extensions want to theme the app.
+  themeApply,
+
+  /// `net.hooks`: both extensions hook the network path.
+  netHooks,
+}
+
+/// The manifest permission id behind each conflict kind.
+String conflictPermission(ExtConflictKind kind) => switch (kind) {
+  ExtConflictKind.themeApply => 'theme.apply',
+  ExtConflictKind.netHooks => 'net.hooks',
+};
+
+/// One contested surface and the extensions fighting over it.
+class ExtConflict {
+  const ExtConflict({required this.kind, required this.extensionIds});
+
+  final ExtConflictKind kind;
+
+  /// Contender extension ids, sorted for a stable key.
+  final List<String> extensionIds;
+
+  /// Stable identity: kind + sorted contender set. Re-resolving after an
+  /// uninstall/reinstall of the same set reuses the stored winner.
+  String get key => '${kind.name}:${(List.of(extensionIds)..sort()).join(',')}';
+}
+
+/// Finds every contested surface among [installed]: for each conflict
+/// kind, the enabled extensions granted that permission. A kind with fewer
+/// than two contenders is not a conflict.
+List<ExtConflict> findConflicts(List<InstalledExtension> installed) {
+  final out = <ExtConflict>[];
+  for (final kind in ExtConflictKind.values) {
+    final permission = conflictPermission(kind);
+    final contenders = [
+      for (final inst in installed)
+        if (inst.enabled && inst.granted.contains(permission)) inst.id,
+    ]..sort();
+    if (contenders.length >= 2) {
+      out.add(ExtConflict(kind: kind, extensionIds: contenders));
+    }
+  }
+  return out;
+}
+
+/// Contenders the user has not resolved yet: no stored winner, or the
+/// stored winner is gone / disabled / no longer granted the permission.
+List<ExtConflict> unresolvedConflicts(List<InstalledExtension> installed, String? Function(String key) winnerOf) {
+  final byId = {for (final inst in installed) inst.id: inst};
+  final out = <ExtConflict>[];
+  for (final c in findConflicts(installed)) {
+    final winner = winnerOf(c.key);
+    final winnerInst = winner == null ? null : byId[winner];
+    final ok =
+        winnerInst != null &&
+        winnerInst.enabled &&
+        winnerInst.granted.contains(conflictPermission(c.kind)) &&
+        c.extensionIds.contains(winner);
+    if (!ok) out.add(c);
+  }
+  return out;
+}

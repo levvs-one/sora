@@ -13,11 +13,16 @@ class Palette extends ThemeExtension<Palette> {
     required this.ink2,
     required this.ink3,
     required this.danger,
+    required this.onDanger,
     required this.shadow,
     required this.raised,
     required this.raisedField,
     required this.scrim,
+    this.accent,
   });
+
+  final Color? accent;
+  List<Color> get glowColors => accent == null ? spectrum : List.filled(spectrum.length, accent!);
 
   final Color background;
   final Color surface;
@@ -26,6 +31,12 @@ class Palette extends ThemeExtension<Palette> {
   final Color ink2;
   final Color ink3;
   final Color danger;
+
+  /// Label colour on a filled [danger] background. White in light mode, black
+  /// in dark mode: no single light label reaches WCAG AA on the bright dark
+  /// red, and no single dark label works on the deep light red.
+  final Color onDanger;
+
   final Color shadow;
 
   /// Elevated sheet and menu surfaces, lighter than the page in dark mode.
@@ -45,7 +56,8 @@ class Palette extends ThemeExtension<Palette> {
     ink: Color(0xFF1D1D1F),
     ink2: Color(0xFF63666C),
     ink3: Color(0xFF666B73),
-    danger: Color(0xFFE5332A),
+    danger: Color(0xFFD02A22),
+    onDanger: Color(0xFFFFFFFF),
     shadow: Color(0x14000000),
     raised: Color(0xFFFFFFFF),
     raisedField: Color(0xFFEBEBEF),
@@ -59,7 +71,8 @@ class Palette extends ThemeExtension<Palette> {
     ink: Color(0xFFF5F5F7),
     ink2: Color(0xFF98989F),
     ink3: Color(0xFF92949C),
-    danger: Color(0xFFFF5147),
+    danger: Color(0xFFFF5D52),
+    onDanger: Color(0xFF000000),
     shadow: Color(0x66000000),
     raised: Color(0xFF2C2C2E),
     raisedField: Color(0xFF3A3A3C),
@@ -85,6 +98,7 @@ class Palette extends ThemeExtension<Palette> {
   Palette lerp(Palette? other, double t) {
     if (other == null) return this;
     return Palette(
+      accent: Color.lerp(accent, other.accent, t),
       background: Color.lerp(background, other.background, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
       field: Color.lerp(field, other.field, t)!,
@@ -92,6 +106,7 @@ class Palette extends ThemeExtension<Palette> {
       ink2: Color.lerp(ink2, other.ink2, t)!,
       ink3: Color.lerp(ink3, other.ink3, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
+      onDanger: Color.lerp(onDanger, other.onDanger, t)!,
       shadow: Color.lerp(shadow, other.shadow, t)!,
       raised: Color.lerp(raised, other.raised, t)!,
       raisedField: Color.lerp(raisedField, other.raisedField, t)!,
@@ -143,6 +158,12 @@ abstract final class Styles {
   static final secondary = _inter(13, 400, 0, 1.3);
   static final caption = _inter(12, 400, 0, 1.3);
   static final timestamp = figures(_inter(12, 600, 0, 4 / 3));
+
+  /// Semantic error text styles. Use these for any error copy instead of
+  /// tinting a base style with [Palette.danger] inline.
+  static TextStyle dangerCaption(BuildContext context) => caption.copyWith(color: Palette.of(context).danger);
+  static TextStyle dangerSecondary(BuildContext context) => secondary.copyWith(color: Palette.of(context).danger);
+  static TextStyle dangerStrong(BuildContext context) => bodyStrong.copyWith(color: Palette.of(context).danger);
 }
 
 /// Shared animation durations and curves that respect the motion setting.
@@ -175,8 +196,8 @@ class MotionScope extends InheritedWidget {
   bool updateShouldNotify(MotionScope oldWidget) => enabled != oldWidget.enabled;
 }
 
-ThemeData buildTheme(Brightness brightness) {
-  final palette = brightness == Brightness.dark ? Palette.dark : Palette.light;
+ThemeData buildTheme(Brightness brightness, {Palette? colors}) {
+  final palette = colors ?? (brightness == Brightness.dark ? Palette.dark : Palette.light);
   final base = ThemeData(
     brightness: brightness,
     useMaterial3: true,
@@ -205,7 +226,7 @@ ThemeData buildTheme(Brightness brightness) {
         backgroundColor: WidgetStatePropertyAll(palette.raised),
         surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
         elevation: const WidgetStatePropertyAll(2),
-        shadowColor: WidgetStatePropertyAll(Colors.black.withValues(alpha: brightness == Brightness.dark ? 0.6 : 0.28)),
+        shadowColor: WidgetStatePropertyAll(palette.shadow),
         padding: const WidgetStatePropertyAll(EdgeInsets.all(6)),
         shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
       ),

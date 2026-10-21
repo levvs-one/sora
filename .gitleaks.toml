@@ -18,4 +18,13 @@ regexes = [
   '''2022-blake3-aes-128-gcm''',
   # The redaction test feeds an obviously fake token through the masker.
   '''abcdef123456''',
+  # The redaction tests' compound tokens, numbered fakes.
+  '''CompoundSecret[0-9]{3}''',
+  # WireGuard and sync test vectors: the bytes 0 to 31 (or 0 to 14) in base64.
+  '''AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=''',
+  '''AAECAwQFBgcICQoLDA0O''',
+  # "hello-world-key-base64-000" in base64, a credential document fixture.
+  '''aGVsbG8td29ybGQta2V5LWJhc2U2NC0wMDA=''',
+  # A warning code name, not a key.
+  '''shadowsocks-2022-bad-key''',
 ]

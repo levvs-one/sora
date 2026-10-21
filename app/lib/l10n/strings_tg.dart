@@ -25,9 +25,6 @@ class STg extends S {
   String get stateDisconnecting => 'Хомӯш шудан';
 
   @override
-  String get stateFailed => 'Пайваст нест';
-
-  @override
   String get coreMissing => 'Хидмати Sora ҷавоб намедиҳад';
 
   @override
@@ -135,6 +132,9 @@ class STg extends S {
   String get logsEmpty => 'Ҳеҷ чиз дар ин ҷо';
 
   @override
+  String get connEmpty => 'Пайвастшавӣ нест';
+
+  @override
   String appVersion(String version) {
     return 'Версияи $version';
   }
@@ -164,6 +164,16 @@ class STg extends S {
   @override
   String milliseconds(int n) {
     return '$n мс';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Mbps';
   }
 
   @override
@@ -255,9 +265,6 @@ class STg extends S {
   String get errNoServers => 'Барои пайваст шудан обуна илова кунед';
 
   @override
-  String get exportText => 'Матн';
-
-  @override
   String get connections => 'Пайвастшавӣ';
 
   @override
@@ -273,7 +280,7 @@ class STg extends S {
   String get theme => 'Мавзӯъ';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Мисли система';
 
   @override
   String get themeLight => 'Нур';
@@ -285,7 +292,7 @@ class STg extends S {
   String get language => 'Забон';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Мисли система';
 
   @override
   String get sectionConnection => 'Пайвастшавӣ';
@@ -496,17 +503,6 @@ class STg extends S {
   String get ruleInvalid => 'Ин ба сайт, IP ё барнома монанд нест';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Серверҳои #, дар навбати худ',
-      one: 'Сервери #, дар навбати худ',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -521,9 +517,6 @@ class STg extends S {
   String get tunnelMode => 'Режим';
 
   @override
-  String get tunnelTun => 'Ҳама трафик';
-
-  @override
   String get tunnelProxy => 'Прокси System';
 
   @override
@@ -534,6 +527,9 @@ class STg extends S {
 
   @override
   String get launchAtLogin => 'Бо система оғоз кунед';
+
+  @override
+  String get launchAtLoginDetail => 'Ҳангоми воридшавӣ ба система Sora ба таври худкор оғоз шуда, дар tray мемонад.';
 
   @override
   String get closeToTray => 'Ҳангоми пӯшидан дар табақ нигоҳ доред';
@@ -634,28 +630,6 @@ class STg extends S {
   String get less => 'Камтар';
 
   @override
-  String get currentServer => 'Сервери ҷорӣ';
-
-  @override
-  String get trafficDown => 'Боргиришуда';
-
-  @override
-  String get trafficUp => 'Бор карда шуд';
-
-  @override
-  String perSecond(String value) {
-    return '$value/с';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Қоидаҳои фаъол: $count';
-  }
-
-  @override
-  String get recentNotifications => 'Огоҳиҳои охирин';
-
-  @override
   String get notificationsEmpty => 'Ҳодисаҳои пайвастшавӣ ва обуна дар ин ҷо пайдо мешаванд';
 
   @override
@@ -709,22 +683,13 @@ class STg extends S {
   String get runningProcesses => 'Равандҳои иҷрошаванда';
 
   @override
-  String get programsFailed => 'Барномаҳо бор карда нашуд';
-
-  @override
   String get programsEmpty => 'Ягон барнома ёфт нашуд. Номи дигарро санҷед.';
 
   @override
   String get selectExe => 'Файли .exe-ро интихоб кунед';
 
   @override
-  String get trafficUnavailable => 'Ҳисобкунакҳо ҳанӯз дастрас нестанд';
-
-  @override
   String get speedtest => 'Суръат';
-
-  @override
-  String get speedtestCheck => 'Суръатро тафтиш кунед';
 
   @override
   String get speedtestSearch => 'Хидматро пайдо кунед';
@@ -820,6 +785,38 @@ class STg extends S {
       'Ин фармонро дар терминал иҷро кунед, то ҳарду бастаи тасдиқшударо насб кунед, пас Sora-ро аз нав кушоед. Файлҳо дар директорияи зеркашӣ мемонанд. Пайвасти VPN қатъ мешавад.';
 
   @override
+  String get updateSignaturePending => 'Файлҳои навсозӣ бо суммаҳои назоратии бо релиз нашршуда муқоиса мешаванд.';
+
+  @override
+  String get updateManualSigWarning =>
+      'Файлҳои зерин ба суммаҳои назоратии релиз мувофиқанд. Агар онҳоро аз релизи расмӣ боргирӣ карда бошед, фармонро иҷро кунед.';
+
+  @override
+  String get updateVersionRevoked => 'Таҳиягар ин версияро бозпас гирифт. Лутфан нашри ислоҳшударо интизор шавед.';
+
+  @override
+  String get updateRolloutPending =>
+      'Версияи навтар тадриҷан паҳн мешавад ва ба таври худкор ба шумо пешниҳод карда мешавад.';
+
+  @override
+  String updateRollbacking(String version) {
+    return 'Бозгашт ба версияи $version...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return 'Навсозӣ ба $version аз санҷиши коршоямӣ нагузашт, бинобар ин Sora ба $fromVersion баргардонида шуд.';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'Бозгашти худкор ноком шуд. Агар версияи нав кор накунад, версияи қаблиро дастӣ аз нав насб кунед.';
+
+  @override
+  String get updateRollbackCacheError =>
+      'Нусхаи санҷидашудаи версияи ҷорӣ барои бозгашт омода нашуд, бинобар ин навсозӣ насб нашуд.';
+
+  @override
   String get updateCopyCommand => 'Фармони нусхабардорӣ';
 
   @override
@@ -844,9 +841,6 @@ class STg extends S {
   String get componentLicenses => 'Литсензияҳои компонентҳо';
 
   @override
-  String get appCopyright => '© 2026 levvs-one ва саҳмгузорон';
-
-  @override
   String get collapseServers => 'Барҳам додани серверҳо';
 
   @override
@@ -863,10 +857,6 @@ class STg extends S {
 
   @override
   String get reconnectNow => 'Муроҷиат кунед ва дубора пайваст кунед';
-
-  @override
-  String get bypassLimitations =>
-      'Ин режим DPI-ро танҳо барои HTTP ва TLS мегузарад, UDP-ро дастгирӣ намекунад ё IP-и шуморо тағир намедиҳад. Барои садои Discord, зангҳо ва суроғаҳои басташудаи Telegram сервери VPN-ро истифода баред.';
 
   @override
   String get errEngineUnsupported =>
@@ -893,7 +883,7 @@ class STg extends S {
 
   @override
   String get modesGuide =>
-      'Агар шумо боварӣ надошта бошед, ки ба сервери шумо ба кадом муҳаррик ниёз дорад, Auto-ро интихоб кунед. Sora пеш аз пайвастшавӣ профил ва танзимотро тафтиш мекунад. Муҳаррик наметавонад маҷрои нақшаи шуморо зиёд кунад: иҷроиш аз сервер, масир, протокол ва шабака вобаста аст.\n\n## Модҳо\n\n### Ҳама трафик (TUN)\n\nSora интерфейси шабакаи маҷозӣ эҷод мекунад ва трафики барномаҳоро тавассути он, аз ҷумла TCP ва UDP, масир мекунад. Ин режимро барои Telegram, бозиҳо ва овози Discord истифода баред. Қоидаҳо метавонанд сайтҳо ё барномаҳои мушаххасро мустақиман фиристанд ё онҳоро маҳкам кунанд. Хидмати шабака ба иҷозат ва сервере ниёз дорад, ки протоколи лозимиро дастгирӣ мекунад.\n\n### Прокси System\n\nSora прокси маҳаллии HTTP/SOCKS-ро танзим мекунад. Барномаҳое, ки танзимоти прокси системаро эҳтиром мекунанд, онро истифода мебаранд. Барномаҳо бо стеки шабакавии худ метавонанд мустақиман пайваст шаванд; UDP ва зангҳои овозӣ умуман ба TUN ниёз доранд. Ин режим ба браузерҳо ва барномаҳо бо дастгирии прокси мувофиқат мекунад.\n\n### Сервер нест\n\nДар Linux, Sora [zapret](https://github.com/bol-van/zapret) -ро барои тақсим кардан ва тағир додани дархостҳои HTTP/TLS ва гузаштан аз баъзе санҷишҳои DPI истифода мебарад. IP-и шумо бетағйир мемонад ва пайвастҳо мустақиман ба вебсайт мераванд. Натиҷаҳо аз провайдери шумо ва усули басташавӣ вобастаанд.\n\nИнтегратсияи ҷорӣ tpws-ро барои HTTP ва TLS тавассути TCP истифода мебарад. Он масдудкунии IP ё интиқоли UDP-ро фаро намегирад ва пайвастҳои Telegram-и MTProto-ро кафолат дода наметавонад. Сервери VPN-ро бо TUN барои овози Discord, зангҳои Telegram ва ин гуна маҳдудиятҳо истифода баред.\n\n## Моторҳо\n\n### Авто\n\nSora муҳаррики насбшударо интихоб мекунад, ки тамоми нақшаи пайвастшавиро дастгирӣ мекунад: протоколҳои сервер, интиқолҳо, гурӯҳҳо, тақсимот ва режим. Интихоби дастӣ номувофиқ пеш аз қатъ кардани пайвасти ҷорӣ рад карда мешавад. Авто ё муҳаррики дигарро интихоб кунед ва танзимотро дубора татбиқ кунед.\n\n### sing-box\n\nБастаҳои нави Sora иборатанд аз [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), як фардкунандаи [sing-box](https://github.com/SagerNet/sing-box), илова кардани муштарии XHTTP ва VLESS Encryption. Sora сохтмон ва қобилиятҳои онро эътироф мекунад. Сохтмони болооб бидуни XHTTP ин қобилиятро танҳо аз номи худ ба даст намеорад.\n\nПротоколҳои дастгирӣшаванда VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ва Z8x/parameters. Sora метавонад ворид кунад. Профилҳои пурраи Xray JSON Xray-ро талаб мекунанд. Майдонҳои нави AWG 3.x ҳанӯз ворид карда намешаванд. sing-box порти назорати маҳаллии бо парол ҳифзшударо истифода мебарад, ки дигар замимаҳои компютер метавонанд онро ошкор кунанд.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) пораҳои VLESS, REALITY, XHTTP, VLESS Encryption ва TLS-ро дастгирӣ мекунад. Он инчунин профилҳои пурраи провайдери Xray -ро ҳангоми нигоҳ доштани масир ва гурӯҳҳои онҳо иҷро мекунад. Чунин профилҳоро бидуни тағир додани рафтори худ ба таври худкор ба муҳаррики дигар табдил додан мумкин нест.\n\nXray маҷмӯӣ танзимеро, ки санҷиши сертификати TLS-ро ғайрифаъол мекунад (`allowInsecure`) хориҷ кард. Барои серверҳои оддӣ, ки ин танзимотро талаб мекунанд, худкор sing-box ё mihomo-ро интихоб мекунад. Интихоби Xray пеш аз қатъ кардани пайвасти ҷорӣ дастӣ дар бораи номувофиқатӣ хабар медиҳад. Профилҳои пурраи JSON-и кӯҳна ба профили провайдери навшуда бо шаҳодатномаи тасдиқшаванда ё PIN сертификат ниёз доранд.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) гурӯҳҳои фармоишии бозгашт ва мувозинати сарборӣ, XHTTP ва AmneziaWG -ро дастгирӣ мекунад. Вақте ки интиқоли автоматӣ ба сервери эҳтиётӣ муҳим аст, онро интихоб кунед. Танзими тақсимоти TLS-и Sora бо ин муҳаррик дастнорас аст.\n\n## Мутобиқат дар Sora\n\n| Хусусият | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ва TCP/UDP | Бале | Бале | Бале |\n| XHTTP | Бале | Бале | Бале |\n| VLESS Encryption | Бале | Бале | Бале |\n| Профили пурраи Xray | Не | Бале | Не |\n| TUIC / AnyTLS | Ҳарду | Не | TUIC |\n| Фрагментатсияи TLS | Бале | Бале | Не |\n| AmneziaWG 1.x/2.x | Ҳа¹ | Не | Бале |\n| Гурӯҳи бозгашти фармоишӣ | Не | No² | Бале |\n\n¹ Профилҳо бо J1/J2/J3/Itime mihomo-ро истифода мебаранд; ин майдонхоро хеч гох хомушона партофтан лозим нест. ² Барои як гурӯҳи профилҳои пурраи Xray, барнома профили эҳтиётиро интихоб мекунад. Дастгирӣ аз сохтори насбшуда вобаста аст; версияи онро дар бораи санҷед.\n\n## Стеки TUN\n\nСтек TCP ва UDP-ро дар дохили интерфейси виртуалӣ идора мекунад. Дар панели режимҳо, Xray ва mihomo gVisor, System, Mixed ва MIPS -ро пешниҳод мекунанд. Ҳар як муҳаррик афзалияти худро захира мекунад. System прокси ва режимҳои бе сервер ин афзалиятро истифода намебаранд.\n\n- **Mixed** — TCP стеки системаро истифода мебарад, дар ҳоле ки gVisor UDP-ро идора мекунад. Ин пешфарз барои mihomo дар Linux аст. Дар Windows, Xray ва mihomo ба таври пешфарз MIPS-ро истифода мебаранд.\n- **System** — стеки системаро истифода мебарад. Варианти дигарро санҷед, агар барномаҳои шабакавӣ ба мушкилот дучор шаванд.\n- **gVisor** — трафикро дар фазои корбарон идора мекунад.\n- **MIPS** — стеки IP-и худи mihomo, ки дар версияи маҷмӯии 1.19.32 дастрас аст.\n\nДар Linux, Xray бо нобаёнӣ gVisor-и дарунсохтро истифода мебарад. System, Mixed ва MIPS дар Linux mihomo-ро ҳамчун муҳаррики TUN истифода мебаранд, TCP ва UDP-ро ба Xray тавассути истиноди SOCKS тасдиқшудаи маҳаллӣ интиқол медиҳанд. Xray протокол, профили провайдер ва масирро нигоҳ медорад. Ин се имконоти насбшуда mihomo талаб мекунанд. Дар Windows, Xray барои ҳамаи чор стеки TUN mihomo 1.19.32 ё навтарро истифода мебарад. Протоколҳо ва масирбандӣ дар Xray мемонанд. Қоидаҳои барномаҳо дар ин пайваст танҳо пайвасти мустақим ва бастанро дастгирӣ мекунанд; дар Linux ин қоидаҳо gVisor-и дарунсохти Xray-ро талаб мекунанд.\n\nПул процесси дуюмро пеш мебарад. Дар се андозагирии бекор дар Linux, он нисбат ба Xray TUN-и аслӣ тақрибан 32–36 МБ зиёдтар хотираи физикиро истифода бурд. Ин сарбории зеркаширо чен намекунад: хароҷоти CPU ва хотира аз пайвастшавӣ вобаста аст. sing-box ягон селектори стек надорад. Ягон стек иҷрои беҳтарро дар ҳар як шабака кафолат намедиҳад. Стекро интихоб кунед ва Apply-ро интихоб кунед ва аз нав пайваст шавед, то онро дар шабакаи худ санҷед.\n\n## Татбиқи танзимот\n\nИнтихоби сервер ба таври худкор дубора пайваст мешавад. Режим, муҳаррик, DNS ва танзимоти қоида фавран захира карда мешаванд; ҳангоми пайвасти фаъол, Apply-ро клик кунед ва барои истифодаи онҳо дубора пайваст шавед. Аз нав ба кор андохтани муҳаррик метавонад зеркашиҳо ва зангҳоро қатъ кунад. Кликҳои такрорӣ пайвастҳои мувозиро оғоз намекунанд; ҷудокунӣ гузаришро ба итмом мерасонад ва пайвастро озод мекунад.\n\nИнтернет танҳо тавассути VPN трафики мустақимро ҳангоми фурӯ рафтани нақб манъ мекунад. Он ба тамоми мошин таъсир мерасонад. Қатъи возеҳ қоидаҳои Sora-ро нест мекунад. Агар тозакунӣ анҷом наёбад, аз нав ҷудо кунед ва сабтро кушоед.\n\n## Ҳуҷҷатҳои лоиҳа\n\n- [sing-box-lx: конфигуратсия ва дастгирӣ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Ҳуҷҷатҳои sing-box](https://sing-box.sagernet.org/)\n- [Ҳуҷҷатҳои Xray](https://xtls.github.io/)\n- [Ҳуҷҷатҳои mihomo](https://wiki.metacubex.one/)\n- [zapret: амалиёт ва маҳдудиятҳо](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Агар шумо боварӣ надошта бошед, ки ба сервери шумо ба кадом муҳаррик ниёз дорад, Auto-ро интихоб кунед. Sora пеш аз пайвастшавӣ профил ва танзимотро тафтиш мекунад. Муҳаррик наметавонад маҷрои нақшаи шуморо зиёд кунад: иҷроиш аз сервер, масир, протокол ва шабака вобаста аст.\n\n## Модҳо\n\n### Ҳама трафик (TUN)\n\nSora интерфейси шабакаи маҷозӣ эҷод мекунад ва трафики барномаҳоро тавассути он, аз ҷумла TCP ва UDP, масир мекунад. Ин режимро барои Telegram, бозиҳо ва овози Discord истифода баред. Қоидаҳо метавонанд сайтҳо ё барномаҳои мушаххасро мустақиман фиристанд ё онҳоро маҳкам кунанд. Хидмати шабака ба иҷозат ва сервере ниёз дорад, ки протоколи лозимиро дастгирӣ мекунад.\n\n### Прокси System\n\nSora прокси маҳаллии HTTP/SOCKS-ро танзим мекунад. Барномаҳое, ки танзимоти прокси системаро эҳтиром мекунанд, онро истифода мебаранд. Барномаҳо бо стеки шабакавии худ метавонанд мустақиман пайваст шаванд; UDP ва зангҳои овозӣ умуман ба TUN ниёз доранд. Ин режим ба браузерҳо ва барномаҳо бо дастгирии прокси мувофиқат мекунад.\n\n### Сервер нест\n\nДар Linux, Sora [zapret](https://github.com/bol-van/zapret) -ро барои тақсим кардан ва тағир додани дархостҳои HTTP/TLS ва гузаштан аз баъзе санҷишҳои DPI истифода мебарад. IP-и шумо бетағйир мемонад ва пайвастҳо мустақиман ба вебсайт мераванд. Натиҷаҳо аз провайдери шумо ва усули басташавӣ вобастаанд.\n\nИнтегратсияи ҷорӣ tpws-ро барои HTTP ва TLS тавассути TCP истифода мебарад. Он масдудкунии IP ё интиқоли UDP-ро фаро намегирад ва пайвастҳои Telegram-и MTProto-ро кафолат дода наметавонад. Сервери VPN-ро бо TUN барои овози Discord, зангҳои Telegram ва ин гуна маҳдудиятҳо истифода баред.\n\n## Моторҳо\n\n### Авто\n\nSora муҳаррики насбшударо интихоб мекунад, ки тамоми нақшаи пайвастшавиро дастгирӣ мекунад: протоколҳои сервер, интиқолҳо, гурӯҳҳо, тақсимот ва режим. Интихоби дастӣ номувофиқ пеш аз қатъ кардани пайвасти ҷорӣ рад карда мешавад. Авто ё муҳаррики дигарро интихоб кунед ва танзимотро дубора татбиқ кунед.\n\n### sing-box\n\nБастаҳои нави Sora иборатанд аз [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), як фардкунандаи [sing-box](https://github.com/SagerNet/sing-box), илова кардани муштарии XHTTP ва VLESS Encryption. Sora сохтмон ва қобилиятҳои онро эътироф мекунад. Сохтмони болооб бидуни XHTTP ин қобилиятро танҳо аз номи худ ба даст намеорад.\n\nПротоколҳои дастгирӣшаванда VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ва Z8x/parameters. Sora метавонад ворид кунад. Профилҳои пурраи Xray JSON Xray-ро талаб мекунанд. Майдонҳои нави AWG 3.x ҳанӯз ворид карда намешаванд. sing-box порти назорати маҳаллии бо парол ҳифзшударо истифода мебарад, ки дигар замимаҳои компютер метавонанд онро ошкор кунанд.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) пораҳои VLESS, REALITY, XHTTP, VLESS Encryption ва TLS-ро дастгирӣ мекунад. Он инчунин профилҳои пурраи провайдери Xray -ро ҳангоми нигоҳ доштани масир ва гурӯҳҳои онҳо иҷро мекунад. Чунин профилҳоро бидуни тағир додани рафтори худ ба таври худкор ба муҳаррики дигар табдил додан мумкин нест.\n\nXray маҷмӯӣ танзимеро, ки санҷиши сертификати TLS-ро ғайрифаъол мекунад (`allowInsecure`) хориҷ кард. Барои серверҳои оддӣ, ки ин танзимотро талаб мекунанд, худкор sing-box ё mihomo-ро интихоб мекунад. Интихоби Xray пеш аз қатъ кардани пайвасти ҷорӣ дастӣ дар бораи номувофиқатӣ хабар медиҳад. Профилҳои пурраи JSON-и кӯҳна ба профили провайдери навшуда бо шаҳодатномаи тасдиқшаванда ё PIN сертификат ниёз доранд.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) гурӯҳҳои фармоишии бозгашт ва мувозинати сарборӣ, XHTTP ва AmneziaWG -ро дастгирӣ мекунад. Вақте ки интиқоли автоматӣ ба сервери эҳтиётӣ муҳим аст, онро интихоб кунед. Танзими тақсимоти TLS-и Sora бо ин муҳаррик дастнорас аст.\n\n## Мутобиқат дар Sora\n\n| Хусусият | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ва TCP/UDP | Бале | Бале | Бале |\n| XHTTP | Бале | Бале | Бале |\n| VLESS Encryption | Бале | Бале | Бале |\n| Профили пурраи Xray | Не | Бале | Не |\n| TUIC / AnyTLS | Ҳарду | Не | TUIC |\n| Фрагментатсияи TLS | Бале | Бале | Не |\n| AmneziaWG 1.x/2.x | Ҳа¹ | Не | Бале |\n| Гурӯҳи бозгашти фармоишӣ | Не | No² | Бале |\n\n¹ Профилҳо бо J1/J2/J3/Itime mihomo-ро истифода мебаранд; ин майдонхоро хеч гох хомушона партофтан лозим нест. ² Барои як гурӯҳи профилҳои пурраи Xray, барнома профили эҳтиётиро интихоб мекунад. Дастгирӣ аз сохтори насбшуда вобаста аст; версияи онро дар бораи санҷед.\n\n## Стеки TUN\n\nСтек TCP ва UDP-ро дар дохили интерфейси виртуалӣ идора мекунад. Дар панели режимҳо, Xray ва mihomo gVisor, System, Mixed ва MIPS -ро пешниҳод мекунанд. Ҳар як муҳаррик афзалияти худро захира мекунад. System прокси ва режимҳои бе сервер ин афзалиятро истифода намебаранд.\n\n- **Mixed**: TCP стеки системаро истифода мебарад, дар ҳоле ки gVisor UDP-ро идора мекунад. Ин пешфарз барои mihomo дар Linux аст. Дар Windows, Xray ва mihomo ба таври пешфарз MIPS-ро истифода мебаранд.\n- **System**: стеки системаро истифода мебарад. Варианти дигарро санҷед, агар барномаҳои шабакавӣ ба мушкилот дучор шаванд.\n- **gVisor**: трафикро дар фазои корбарон идора мекунад.\n- **MIPS**: стеки IP-и худи mihomo, ки дар версияи маҷмӯии 1.19.32 дастрас аст.\n\nДар Linux, Xray бо нобаёнӣ gVisor-и дарунсохтро истифода мебарад. System, Mixed ва MIPS дар Linux mihomo-ро ҳамчун муҳаррики TUN истифода мебаранд, TCP ва UDP-ро ба Xray тавассути истиноди SOCKS тасдиқшудаи маҳаллӣ интиқол медиҳанд. Xray протокол, профили провайдер ва масирро нигоҳ медорад. Ин се имконоти насбшуда mihomo талаб мекунанд. Дар Windows, Xray барои ҳамаи чор стеки TUN mihomo 1.19.32 ё навтарро истифода мебарад. Протоколҳо ва масирбандӣ дар Xray мемонанд. Қоидаҳои барномаҳо дар ин пайваст танҳо пайвасти мустақим ва бастанро дастгирӣ мекунанд; дар Linux ин қоидаҳо gVisor-и дарунсохти Xray-ро талаб мекунанд.\n\nПул процесси дуюмро пеш мебарад. Дар се андозагирии бекор дар Linux, он нисбат ба Xray TUN-и аслӣ тақрибан 32–36 МБ зиёдтар хотираи физикиро истифода бурд. Ин сарбории зеркаширо чен намекунад: хароҷоти CPU ва хотира аз пайвастшавӣ вобаста аст. sing-box ягон селектори стек надорад. Ягон стек иҷрои беҳтарро дар ҳар як шабака кафолат намедиҳад. Стекро интихоб кунед ва Apply-ро интихоб кунед ва аз нав пайваст шавед, то онро дар шабакаи худ санҷед.\n\n## Татбиқи танзимот\n\nИнтихоби сервер ба таври худкор дубора пайваст мешавад. Режим, муҳаррик, DNS ва танзимоти қоида фавран захира карда мешаванд; ҳангоми пайвасти фаъол, Apply-ро клик кунед ва барои истифодаи онҳо дубора пайваст шавед. Аз нав ба кор андохтани муҳаррик метавонад зеркашиҳо ва зангҳоро қатъ кунад. Кликҳои такрорӣ пайвастҳои мувозиро оғоз намекунанд; ҷудокунӣ гузаришро ба итмом мерасонад ва пайвастро озод мекунад.\n\nИнтернет танҳо тавассути VPN трафики мустақимро ҳангоми фурӯ рафтани нақб манъ мекунад. Он ба тамоми мошин таъсир мерасонад. Қатъи возеҳ қоидаҳои Sora-ро нест мекунад. Агар тозакунӣ анҷом наёбад, аз нав ҷудо кунед ва сабтро кушоед.\n\n## Ҳуҷҷатҳои лоиҳа\n\n- [sing-box-lx: конфигуратсия ва дастгирӣ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Ҳуҷҷатҳои sing-box](https://sing-box.sagernet.org/)\n- [Ҳуҷҷатҳои Xray](https://xtls.github.io/)\n- [Ҳуҷҷатҳои mihomo](https://wiki.metacubex.one/)\n- [zapret: амалиёт ва маҳдудиятҳо](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
 
   @override
   String get probeServers => 'Серверҳоро тафтиш кунед';
@@ -902,7 +892,439 @@ class STg extends S {
   String get extensions => 'Васеъшавӣ';
 
   @override
-  String get extensionsSoon => 'Ба зудӣ';
+  String extRatingLabel(String rating) {
+    return 'Рейтинг $rating аз 5';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return 'аз ҷониби $author';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'Насбкунӣ: $count';
+  }
+
+  @override
+  String get extInstallOne => '1 насб';
+
+  @override
+  String get extBadgeVerified => 'Тасдиқ карда шудааст';
+
+  @override
+  String get extBadgeTop => 'Маъмултарин дар ин ҳафта';
+
+  @override
+  String get extBadgeNew => 'Нав';
+
+  @override
+  String get extBadgeStaff => 'Дастаи Sora';
+
+  @override
+  String get extSideloadShort => 'Аз каталог нест';
+
+  @override
+  String get extSideloadWarning =>
+      'Ин васеъшавӣ аз каталоги даста нест. Калиди онҳоро танҳо муаллиф кафолат додааст: онро танҳо агар шумо ба муаллиф бовар кунед, насб кунед.';
+
+  @override
+  String extInstallTitle(String name) {
+    return 'Насб кардани «$name»';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return 'Навсозии «$name»';
+  }
+
+  @override
+  String get extPermissionsIntro => 'Ин васеъшавӣ қодир аст:';
+
+  @override
+  String get extPermissionsWidened => 'Навсозӣ иҷозатҳои навро талаб мекунад:';
+
+  @override
+  String get extDangerousAck => 'Ман мефаҳмам, ки ин иҷозатҳо ҷиддӣ ҳастанд';
+
+  @override
+  String get extInstall => 'Насб кунед';
+
+  @override
+  String get extUpdate => 'Навсозӣ';
+
+  @override
+  String get extCancel => 'Бекор кардан';
+
+  @override
+  String get extConfirm => 'Тасдиқ кунед';
+
+  @override
+  String get extOk => 'OK';
+
+  @override
+  String get extCatalog => 'Каталог';
+
+  @override
+  String get extInstalled => 'Васеъкуниҳои насбшуда';
+
+  @override
+  String get extSearchHint => 'Ҷустуҷӯи васеъшавиҳо';
+
+  @override
+  String get extCatAll => 'Ҳама';
+
+  @override
+  String get extCatTools => 'Асбобҳо';
+
+  @override
+  String get extCatThemes => 'Мавзӯъҳо';
+
+  @override
+  String get extCatAutomation => 'Автоматикунонӣ';
+
+  @override
+  String get extCatStats => 'Омор';
+
+  @override
+  String get extCatNetwork => 'Шабака';
+
+  @override
+  String get extSortBy => 'Мураттабсозӣ аз рӯйи';
+
+  @override
+  String get extSortPopular => 'Маъмултарин';
+
+  @override
+  String get extSortRating => 'Баҳои баландтарин';
+
+  @override
+  String get extSortName => 'Ном';
+
+  @override
+  String get extCatalogError => 'Каталогро бор кардан муяссар нашуд';
+
+  @override
+  String get extRetry => 'Боз кӯшиш кунед';
+
+  @override
+  String get extEmptySearch => 'Ҳеҷ чиз ёфт нашуд';
+
+  @override
+  String get extEmptyInstalled =>
+      'То ҳол ягон васеъкунӣ насб нашудааст.\nЯкеро дар каталог пайдо кунед ё аз файл насб кунед.';
+
+  @override
+  String get extInstallFromFile => 'Аз файл насб кунед';
+
+  @override
+  String get extInstallFromUrl => 'Аз URL насб кунед';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'Зеркашӣ кунед';
+
+  @override
+  String get extDownloading => 'Зеркашӣ карда мешавад…';
+
+  @override
+  String get extVerifying => 'Тасдиқ карда мешавад…';
+
+  @override
+  String get extInstalling => 'Насб карда мешавад…';
+
+  @override
+  String get extInstallFailed => 'Насб карда нашуд';
+
+  @override
+  String get extErrSignature => 'Санҷиши имзо ноком шуд. Файл метавонад вайрон ё таҳриф карда шавад.';
+
+  @override
+  String get extErrManifest => 'Манифести васеъкунӣ беэътибор аст.';
+
+  @override
+  String get extErrNetwork => 'Хатои шабака. Пайвасти худро санҷед ва бори дигар кӯшиш кунед.';
+
+  @override
+  String get extErrHash => 'Зеркашӣ ба каталог мувофиқат намекунад. Мумкин аст, ки онро вайрон карда бошанд.';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'Ин васеъшавӣ версияи барнома $version ё навтарро талаб мекунад.';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'Танҳо https:// истинодҳо иҷозат дода шудаанд';
+
+  @override
+  String get extErrGeneric => 'Чизе хато кард. Лутфан бори дигар кӯшиш кунед.';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'Ин навсозӣ бо калиди дигари муаллиф аз версияи насбшуда имзо шудааст, бинобар ин он баста шуд. Агар шумо ба калиди нав бовар кунед, васеъкуниро нест кунед ва онро дубора насб кунед.';
+
+  @override
+  String get extUpdateAvailable => 'Навсозии дастрас';
+
+  @override
+  String get extDisabled => 'Хомӯш';
+
+  @override
+  String extToggleEnabled(String name) {
+    return 'Фаъол $name';
+  }
+
+  @override
+  String get extSearchInstalled => 'Ҷустуҷӯ дар васеъшавиҳои насбшуда';
+
+  @override
+  String get extUpdateAll => 'Ҳамаашро нав кунед';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return '$count навсозиҳо дастрасанд';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return '$count нав карда шуд';
+  }
+
+  @override
+  String get extRiskNormal => 'Муқаррарӣ';
+
+  @override
+  String get extRiskSensitive => 'Ҳассос';
+
+  @override
+  String get extRiskDangerous => 'Хавфи баланд';
+
+  @override
+  String get extPermissionsRemoved => 'Дигар дархост карда намешавад:';
+
+  @override
+  String get extUpdateFailedKept => 'Версияи қаблӣ ҳанӯз насб карда шудааст.';
+
+  @override
+  String get extConflictsTitle => 'Ихтилофоти васеъшавӣ';
+
+  @override
+  String get extConflictsIntro =>
+      'Ин васеъкуниҳо як чизро мехоҳанд. Интихоб кунед, ки кадомаш кор кунад, дигаре насбшуда мемонад.';
+
+  @override
+  String get extConflictTheme => 'Мавзӯи барнома';
+
+  @override
+  String get extConflictNetHooks => 'Қалмоқҳои шабакавӣ';
+
+  @override
+  String extConflictWinner(String name) {
+    return 'Афзалият: $name';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return '$count ихтилофҳо ба қарори шумо ниёз доранд';
+  }
+
+  @override
+  String get extConflictsResolve => 'ихтилофотро ҳал кунед';
+
+  @override
+  String get extConflictNote =>
+      'Интихоби шумо дар ҳамин дастгоҳ нигоҳ дошта мешавад. Мавзӯъ фавран иваз мешавад, хукҳои шабака дар ин версия кор намекунанд.';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'Версияи $version';
+  }
+
+  @override
+  String get extAuthor => 'Муаллиф';
+
+  @override
+  String get extRating => 'Рейтинг';
+
+  @override
+  String get extInstalls => 'Насбкунӣ';
+
+  @override
+  String get extVersion => 'Версия';
+
+  @override
+  String get extAbout => 'Дар бораи ин тамдид';
+
+  @override
+  String get extPermissionsTitle => 'Иҷозатҳо';
+
+  @override
+  String get extNoPermissions => 'Иҷозатҳои махсус надоранд.';
+
+  @override
+  String get extSettings => 'Танзимотҳо';
+
+  @override
+  String get extSaveSettings => 'Танзимотро захира кунед';
+
+  @override
+  String get extSaving => 'Захира…';
+
+  @override
+  String extUpdateTo(String version) {
+    return 'Навсозӣ ба $version';
+  }
+
+  @override
+  String get extEnabled => 'Фаъол';
+
+  @override
+  String extRollbackTo(String version) {
+    return 'Бозгашт ба $version';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return 'Бозгашт ба версияи $version?';
+  }
+
+  @override
+  String get extUninstall => 'Хориҷ кунед';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return '\"$name\" ва танзимоти онро нест кунед?';
+  }
+
+  @override
+  String get extPanelUnavailable => 'Панел дастнорас аст. Мумкин аст васеъшавӣ ғайрифаъол ё хориҷ карда шуда бошад.';
+
+  @override
+  String get extPermConnectionsRead => 'Ба рӯйхати пайвастҳои фаъол нигаред';
+
+  @override
+  String get extPermServersRead => 'Рӯйхати серверҳои худро бубинед';
+
+  @override
+  String get extPermSettingsRead => 'Танзимоти барномаро хонед';
+
+  @override
+  String get extPermSettingsWrite => 'Танзимоти барномаро тағир диҳед';
+
+  @override
+  String get extPermNotifications => 'Огоҳиҳоро нишон диҳед';
+
+  @override
+  String get extPermTray => 'Ба менюи табақи ҷузъҳо илова кунед';
+
+  @override
+  String get extPermUiPanel => 'Панелҳоро дар дохили барнома нишон диҳед';
+
+  @override
+  String get extPermThemeApply => 'Мавзӯъҳоро татбиқ кунед';
+
+  @override
+  String get extPermRoutingRules => 'Илова кардани қоидаҳои масир (ба куҷо рафтани трафики шабака таъсир мерасонад)';
+
+  @override
+  String get extPermNetHooks => 'Интегратсия ба роҳи шабака (DPI модулҳои гузариш)';
+
+  @override
+  String get extPermNetFetch => 'Аз рӯйхати иҷозатдодашуда URL дархост кунед';
+
+  @override
+  String get extPermBackground => 'Вазифаҳои заминаро иҷро кунед';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'Вазифаҳои ба нақша гирифташударо ҳатто ҳангоми пӯшида будани панел иҷро мекунад. Шумо метавонед онро таваққуф кунед ё дар танзимоти васеъшавӣ чанд маротиба кор кардани онро тағир диҳед.';
+
+  @override
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+
+  @override
+  String get extCapBackground => 'Дар замина кор мекунад';
+
+  @override
+  String get extCapNetHook => 'Давр задани маҳдудиятҳо ва қалмоқҳои шабака';
+
+  @override
+  String get extCapPanel => 'Панелҳои интерфейс';
+
+  @override
+  String get extCapRouting => 'Қоидаҳои масирдиҳӣ';
+
+  @override
+  String get extCapTheme => 'Мавзӯъҳо';
+
+  @override
+  String get extCapWidget => 'Виҷетҳо';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Cached catalog, $date';
+  }
+
+  @override
+  String get extChangelog => 'Тағйирот';
+
+  @override
+  String get extImageFailed => 'Тасвирро бор карда натавонист';
+
+  @override
+  String get extRatingHow => 'Рейтингҳо чӣ гуна кор мекунанд';
+
+  @override
+  String get extRatingHowBody =>
+      'Рейтингҳо ҳисоби миёнаи Байесиро истифода мебаранд: тамдиди дорои чанд рейтинг то он даме, ки шумораи бештари одамон овоз медиҳанд, дар наздикии мобайн боқӣ мемонад, аз ин рӯ як баррасии 5-ситорадор наметавонад тамдиди навро ба боло тела диҳад. Рейтингҳои охирин нисбат ба рейтингҳои кӯҳна зиёдтаранд ва танҳо як рейтинг барои як ҳисоб ҳисоб карда мешавад.';
+
+  @override
+  String get extScreenshots => 'Скриншотҳо';
+
+  @override
+  String get extSortRelevance => 'Муносибат';
+
+  @override
+  String get extPermNetworkDetail =>
+      'Маълумотро аз интернет тавассути VPN мегирад. Танҳо хостҳои рӯйхати зерин иҷозат доранд, боқимонда баста аст.';
+
+  @override
+  String get extBgTitle => 'Вазифаи пасзамина';
+
+  @override
+  String get extBgEnabled => 'Дар замина иҷро кунед';
+
+  @override
+  String get extBgInterval => 'Фосилаи иҷро';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# дақиқа');
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# соат');
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote =>
+      'Вазифа то он даме ки Sora кушода аст, аз ҷумла дар трей, мувофиқи ҷадвал иҷро мешавад. Кӯтоҳтарин фосила 15 дақиқа аст.';
+
+  @override
+  String get extBgDisabledNote => 'Барои идоракунии вазифаи пасзамина васеъшавиро фаъол кунед.';
+
+  @override
+  String get extCapNetwork => 'Дастрасии шабака';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'Шабака: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -911,6 +1333,665 @@ class STg extends S {
 
   @override
   String get diagnosticHttp => 'Ташхиси HTTP';
+
+  @override
+  String get diagnosticNoData => 'Ҳанӯз ягон дархост сабт нашудааст. Аввал вебсайти санҷиши суръатро кушоед.';
+
+  @override
+  String get qrShareTitle => 'Рамзи QR мубодила кунед';
+
+  @override
+  String get qrScanTitle => 'Рамзи QR скан кунед';
+
+  @override
+  String get qrCopyLink => 'Истиноди нусхабардорӣ';
+
+  @override
+  String get qrShowLink => 'Истинодро нишон диҳед';
+
+  @override
+  String get qrHideLink => 'Пинҳон кардани пайванд';
+
+  @override
+  String get qrWarning => 'Ин рамзи QR дорои тафсилоти пайвастшавӣ мебошад. Онро ба бегонагон нишон надиҳед.';
+
+  @override
+  String get qrScanHint => 'Скриншот ё акси дорои рамзи QR-ро интихоб кунед ё истинодро гузоред';
+
+  @override
+  String get qrFromClipboard => 'Аз буфер часбонед';
+
+  @override
+  String get qrNoCode => 'Дар ин тасвир рамзи QR ёфт нашуд.';
+
+  @override
+  String get qrInvalid => 'Ин рамзи QR дорои истиноди дуруст нест.';
+
+  @override
+  String get qrScan => 'Скан QR';
+
+  @override
+  String get qrFromImage => 'Кушодани тасвир';
+
+  @override
+  String get connGroupByProcess => 'Аз рӯи раванд гурӯҳбандӣ кунед';
+
+  @override
+  String get connListView => 'Рӯйхат';
+
+  @override
+  String get connCopyHost => 'Хостро нусхабардорӣ кунед';
+
+  @override
+  String get connAddRule => 'Илова кардани қоида';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# пайваст');
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'Пешакӣ';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'Шахсӣ';
+
+  @override
+  String get dnsCheck => 'ихроҷи маълумотро тафтиш кунед';
+
+  @override
+  String get dnsChecking => 'Санҷиш...';
+
+  @override
+  String get dnsNoLeak => 'Ягон ихроҷ ёфт нашуд';
+
+  @override
+  String get dnsLeakFound => 'Ихроҷ ошкор шуд';
+
+  @override
+  String get dnsLastCheck => 'Санҷиши охирин';
+
+  @override
+  String get dnsNeverChecked => 'Ҳанӯз санҷида нашудааст';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'Ҳалкунандаҳои DNS-и нақб';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'Ҳалкунандаҳои номи система';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Ҳифзи DNS бо бастани шабака';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'DNS-ро барои нақб дар танзимоти DNS дар боло танзим кунед.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Санҷед, ки кадом ҳалкунандаҳои системаи шумо берун аз нақб истифода мешавад.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Бастани шабакаро фаъол кунед, то трафики DNS дар нақб бимонад.';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'DNS-и рамзгузоришудаи система';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'Ҷавобҳои қалбакӣ DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Санҷед, ки кадом нуқтаи ниҳоии рамзгузоришудаи DNS системаи шумо берун аз нақб истифода мебарад.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Дар нақб DNS-и рамзгузоришуда (DoT ё DoH) истифода баред, то ҳалкунандаҳои ном ҷавобҳоро сохта натавонанд.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Аввал ба VPN пайваст шавед, сипас ихроҷро тафтиш кунед.';
+
+  @override
+  String get dnsExpected => 'Дар назар аст';
+
+  @override
+  String get dnsActual => 'мушохида карда шуд';
+
+  @override
+  String get sortBy => 'Мураттабсозӣ аз рӯйи';
+
+  @override
+  String get sortPing => 'Пинг';
+
+  @override
+  String get sortSpeed => 'Суръат';
+
+  @override
+  String get sortName => 'Ном';
+
+  @override
+  String get measureSpeed => 'Суръатро чен кунед';
+
+  @override
+  String get benchmarkStale => 'кӯҳна шудааст';
+
+  @override
+  String get autoSelectMode => 'Сервери худкори интихоб';
+
+  @override
+  String get autoSelectPing => 'Пинги зудтарин';
+
+  @override
+  String get autoSelectSpeed => 'Суръати баландтарин';
+
+  @override
+  String get autoSelectSmart => 'Интихоби оқилона';
+
+  @override
+  String get coreWatchUnstable => 'Пайвастшавӣ ба ядрои Sora ноустувор аст';
+
+  @override
+  String get watchReconnect => 'Аз нав пайваст кунед';
+
+  @override
+  String get coreRestoringLink => 'Барқарор кардани пайвастшавӣ ба ядрои Sora…';
+
+  @override
+  String get crashRestoreTitle => 'Сеанси охирин катъ гардид';
+
+  @override
+  String get restoreOnCrash => 'Сеансро пас аз садама барқарор кунед';
+
+  @override
+  String get crashRestore => 'Барқарор кардан';
+
+  @override
+  String get crashDismiss => 'Ҳоло не';
+
+  @override
+  String get overrideTitle => 'Таҳрири ман';
+
+  @override
+  String get overrideEdit => 'Серверҳоро таҳрир кунед';
+
+  @override
+  String get overrideHide => 'Пинҳон кардан';
+
+  @override
+  String get overrideUnhide => 'Намоиш';
+
+  @override
+  String get overrideClear => 'Таҳрирҳоро аз нав танзим кунед';
+
+  @override
+  String get overrideEmpty => 'Ҳанӯз таҳрир нашудааст';
+
+  @override
+  String get overrideCustomRules => 'Қоидаҳои худ';
+
+  @override
+  String get errBenchmarkUnsupported => 'Андозагирии суръат ба ядрои навтар ниёз дорад';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return 'Андозаи $done аз $total…';
+  }
+
+  @override
+  String get profiles => 'Профилҳои шабакавӣ';
+
+  @override
+  String get profilesEmpty =>
+      'Ҳоло профилҳо нест. Барои ба таври худкор татбиқ кардани танзимот дар шабакаҳои маълум якеро эҷод кунед.';
+
+  @override
+  String get profileAdd => 'Профил илова кунед';
+
+  @override
+  String get profileName => 'Номи профил';
+
+  @override
+  String get profileSsids => 'Wi-Fi шабакаҳо (SSID)';
+
+  @override
+  String get profileSsidsHint => 'Хона, Офис бо вергул ҷудо карда шудааст';
+
+  @override
+  String get profileGateways => 'Шлюзҳои шабакавӣ';
+
+  @override
+  String get profileAsns => 'AS рақамҳо';
+
+  @override
+  String get profileAutoApply => 'Ба таври худкор татбиқ кардан';
+
+  @override
+  String get profileAutoApplyHint => 'Агар хомӯш бошад, пеш аз татбиқи профил тасдиқ пурсида мешавад.';
+
+  @override
+  String get profileSnapshot => 'Танзимоти ҷориро дар хотир доред';
+
+  @override
+  String get profileSnapshotDone => 'Танзимоти ҷорӣ дар профил захира карда шудаанд';
+
+  @override
+  String get profileDelete => 'Профилро нест кунед';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return 'Профили \"$name\" нест карда шавад?';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return 'Профили \"$name\"-ро татбиқ кунед?';
+  }
+
+  @override
+  String get profileApply => 'Татбиқ кардан';
+
+  @override
+  String profileApplied(Object name) {
+    return 'Профили \"$name\" татбиқ карда шуд';
+  }
+
+  @override
+  String get profileUndo => 'Бекор кардан';
+
+  @override
+  String get profileActive => 'Фаъол';
+
+  @override
+  String networkNow(Object info) {
+    return 'Ҳоло: $info';
+  }
+
+  @override
+  String get networkUnknown => 'Маълумот дар бораи шабака дастрас нест';
+
+  @override
+  String get profileNoTriggers => 'Ҳадди ақал як триггер илова кунед: SSID, дарвоза ё ASN';
+
+  @override
+  String get chains => 'Занҷирҳои прокси';
+
+  @override
+  String get chainsEmpty => 'Ҳанӯз занҷир нест. 2–3 серверро пайваст кунед, то трафик тавассути ҳар яки онҳо гузаред.';
+
+  @override
+  String get chainAdd => 'занҷири нав';
+
+  @override
+  String get chainName => 'Номи занҷир';
+
+  @override
+  String get chainPickServers => '2–3 серверро интихоб кунед';
+
+  @override
+  String get chainOrderHint =>
+      'Барои аз нав тартиб додан кашола кунед: трафик аз боло ворид мешавад ва аз поён мебарояд.';
+
+  @override
+  String get chainTooFew => 'Ақаллан 2 серверро интихоб кунед';
+
+  @override
+  String get chainTooMany => 'Як занҷир ҳадди аксар 3 серверро дар бар мегирад';
+
+  @override
+  String get chainEstimate => 'Вақти тахминии';
+
+  @override
+  String get chainSave => 'Занҷираи захира кунед';
+
+  @override
+  String get chainDelete => 'Занҷирро нест кунед';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return 'Занҷираи \"$name\" нест карда шавад?';
+  }
+
+  @override
+  String get chainUnsupported => 'Мотори ҷорӣ занҷир сохта наметавонад';
+
+  @override
+  String get chainHopMissing => 'Яке аз серверҳои занҷир дигар дастрас нест';
+
+  @override
+  String chainHop(Object n) {
+    return 'Гузариш $n';
+  }
+
+  @override
+  String get chainEntry => 'Вуруд';
+
+  @override
+  String get chainExit => 'Баромад';
+
+  @override
+  String get sync => 'Синхронизатсияи дастгоҳ';
+
+  @override
+  String get syncDevices => 'Дастгоҳҳои ман';
+
+  @override
+  String get syncEmpty => 'Ягон дастгоҳҳои ҷуфтшуда. Дастгоҳи дигарро тавассути шабакаи маҳаллӣ пайваст кунед.';
+
+  @override
+  String get syncPair => 'Дастгоҳро ҷуфт кунед';
+
+  @override
+  String get syncShowCode => 'Рамзи маро нишон диҳед';
+
+  @override
+  String get syncScanCode => 'Рамзи скан';
+
+  @override
+  String get syncRevoke => 'Бозхонд';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return '\"$name\" бекор карда шавад?';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'Синхронизатсияи охирин: $time';
+  }
+
+  @override
+  String get syncNever => 'Ҳеҷ гоҳ';
+
+  @override
+  String get syncNoLan => 'Дастгоҳҳо бояд дар як шабакаи маҳаллӣ бошанд';
+
+  @override
+  String get syncPaired => 'Дастгоҳ ҷуфт карда шуд';
+
+  @override
+  String get syncPairingTitle => 'Бо ин дастгоҳ ҷуфт кунед';
+
+  @override
+  String get syncWaiting => 'Дастгоҳи дигар интизор аст…';
+
+  @override
+  String get syncSecureNote => 'Канали рамзгузоришуда. Не ҳисобҳо, на серверҳои абрӣ.';
+
+  @override
+  String get zapretWithVpn => 'Гузаронидани DPI филтр барои трафики мустақими шабака';
+
+  @override
+  String get zapretWithVpnHint =>
+      'zapret-ро ҳамроҳи нақби VPN иҷро мекунад: трафики нақб аз VPN ва трафики мустақим аз воситаи давр задани маҳдудият мегузарад.';
+
+  @override
+  String get chainDuplicate => 'Ҳар як сервер метавонад танҳо як маротиба пайдо шавад';
+
+  @override
+  String get edit => 'Таҳрир';
+
+  @override
+  String get remove => 'Хориҷ кунед';
+
+  @override
+  String get autoSwitchOnDegrade => 'Гузариши худкор дар таназзул';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'Агар сервери интихобшуда хеле суст шавад ё ҷавоб надиҳад, Sora ба сервери беҳтарин аз рӯйи ченкунӣ мегузарад, вале на бештар аз як бор дар ҳар 10 дақиқа.';
+
+  @override
+  String get tunStackMixed => 'Омехта';
+
+  @override
+  String get tunStackSystem => 'Система';
+
+  @override
+  String get customServerAdd => 'Илова кардани сервери фармоишӣ';
+
+  @override
+  String get customServers => 'Серверҳои ман';
+
+  @override
+  String get customServerName => 'Ном';
+
+  @override
+  String get customServerNameHint => 'Масалан: VPS-и ман';
+
+  @override
+  String get customServerNameRequired => 'Номро ворид кунед';
+
+  @override
+  String get customServerAddress => 'Суроға';
+
+  @override
+  String get customServerAddressHint => 'example.com ё 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'Суроғаи серверро ворид кунед';
+
+  @override
+  String get customServerAddressInvalid => 'Суроғаи нодуруст';
+
+  @override
+  String get customServerPort => 'Порт';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'Порт бояд аз 1 то 65535 бошад';
+
+  @override
+  String get customServerProtocol => 'Протокол';
+
+  @override
+  String get customServerCredentials => 'Маълумоти воридшавӣ';
+
+  @override
+  String get customServerOptional => 'Ихтиёрӣ';
+
+  @override
+  String get customServerShowSecret => 'Сиррро нишон диҳед';
+
+  @override
+  String get customServerHideSecret => 'Пинҳон кардани асрор';
+
+  @override
+  String get customServerBadge => 'шахсӣ';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'Сервери \"$name\" нест карда шавад?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'Серверро дастӣ илова кунед: суроға, порт ва протокол';
+
+  @override
+  String get customServerTest => 'Санҷиш';
+
+  @override
+  String get leakTestTitle => 'Санҷиши ихроҷи маълумот';
+
+  @override
+  String get leakTestIntro =>
+      'Месанҷад, ки трафик метавонад аз дастгоҳ берун аз нақб барояд ё не: дархостҳои мустақими DNS ва ICMP, баромади IPv6 ва ҳалкунандаҳои номи система. Ҳангоми пайвасти фаъол иҷро кунед.';
+
+  @override
+  String get leakTestRun => 'Санҷед';
+
+  @override
+  String get leakTestCancel => 'Бекор кардан';
+
+  @override
+  String get leakTestNeedsConnection => 'Барои санҷидани ихроҷи маълумот ба VPN пайваст шавед.';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'Санҷишҳо анҷом ёфтанд: $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'Ягон ихроҷ ёфт нашуд';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ихроҷ ёфт шуд');
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
+
+  @override
+  String get leakTestFix => 'Ислоҳ';
+
+  @override
+  String get leakTestFixedNote => 'Бастани шабака фаъол аст. Барои санҷидан озмоишро такрор кунед.';
+
+  @override
+  String get leakTestCheckDirectDns => 'мустақим DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP акси садо';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'Ҳалкунандаҳои номи система';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Пайвасти нақб';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS тавассути нақб';
+
+  @override
+  String get noticeDegraded => 'Сервер суст шуд. Sora ба беҳтарин сервере, ки ҳангоми андозагирӣ ёфт шуд, гузашт.';
+
+  @override
+  String get obfs => 'Пинҳонкунии трафик';
+
+  @override
+  String get syncCodeExpired => 'Рамз ба охир расид';
+
+  @override
+  String get syncDaemonFailed => 'Хидмати ҳамоҳангсозиро оғоз карда натавонист';
+
+  @override
+  String get syncDaemonMissing =>
+      'Ҷузъи sora-sync ёфт нашуд. Барои фаъол кардани ҳамоҳангсозии дастгоҳ барномаро аз нав насб кунед.';
+
+  @override
+  String get syncDaemonStarting => 'Оғози хидмати ҳамоҳангсозӣ…';
+
+  @override
+  String get syncErrAuth =>
+      'Хидмати ҳамоҳангсозӣ аломати дастрасиро рад кард. Барномаро аз нав оғоз кунед ва бори дигар кӯшиш кунед.';
+
+  @override
+  String get syncErrNotFound => 'Дастгоҳ дигар ҷуфт карда нашудааст';
+
+  @override
+  String get syncErrPairingActive => 'Сеанси ҷуфткунӣ аллакай кушода аст';
+
+  @override
+  String get syncErrUnreachable =>
+      'Дастгоҳи дигар ҷавоб надод. Боварӣ ҳосил кунед, ки он дар ҳамон шабака аст ва рамзи онро нишон медиҳад.';
+
+  @override
+  String get syncError => 'Хатои синхронизатсия';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'Рамз пас аз $duration беэътибор мешавад';
+  }
+
+  @override
+  String get syncJoining => 'Ҷуфткунӣ бо дастгоҳ…';
+
+  @override
+  String get syncLegacyCleared =>
+      'Рӯйхати дастгоҳҳои кӯҳна ҳеҷ гоҳ воқеан ҷуфт карда нашудааст, аз ин рӯ тоза карда шуд. Дастгоҳҳои худро дубора ҷуфт кунед, ин дафъа воқеӣ.';
+
+  @override
+  String get syncNewCode => 'Рамзи нав';
+
+  @override
+  String syncPairedWith(String name) {
+    return '$name ҷуфт шуд';
+  }
+
+  @override
+  String get syncRetry => 'Такрор кунед';
+
+  @override
+  String get syncStopShowing => 'Пинҳон кардани рамз';
+
+  @override
+  String get syncSyncNow => 'Ҳозир ҳамоҳанг кардан';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Қабул карда шуд $pulled, фиристодашуда $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'Натиҷаи ҳамоҳангсозӣ';
+
+  @override
+  String get syncPulled => 'гирифта шудааст';
+
+  @override
+  String get syncPushed => 'Фиристода шуд';
+
+  @override
+  String get syncNoChanges => 'Ягон тағирот ошкор нашудааст';
+
+  @override
+  String get syncDocKindSubscriptions => 'Обунаҳо';
+
+  @override
+  String get syncDocKindSettings => 'Танзимоти барнома';
+
+  @override
+  String get syncDocKindOverrides => 'Тағйироти шахсии обунаҳо';
+
+  @override
+  String get syncDocKindProfiles => 'Профилҳои шабакавӣ';
+
+  @override
+  String get syncDocKindChains => 'Занҷирҳои прокси';
+
+  @override
+  String syncFrom(String name) {
+    return 'аз $name';
+  }
+
+  @override
+  String get syncThisDevice => 'Ин дастгоҳ';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password';
 
   @override
   String get diagnosticPackets => 'Гирифтани пакет';
@@ -922,11 +2003,60 @@ class STg extends S {
   String get diagnosticCapture => 'Барои 10 сония сабт кунед';
 
   @override
-  String get diagnosticNoData => 'Ҳанӯз ягон дархост сабт нашудааст. Аввал вебсайти санҷиши суръатро кушоед.';
-
-  @override
   String get diagnosticRequiresTun => 'Забти баста ба пайвасти фаъоли Sora TUN ниёз дорад.';
 
   @override
   String get diagnosticUnavailable => 'Ин ташхис дар ин платформа дастрас нест.';
+
+  @override
+  String get extErrRevoked => 'Дастаи Sora ин версияи васеъкуниро бозхонд, зеро он хатарнок ё вайрон аст.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Рӯйхати васеъкуниҳои бозхондашуда нав нашуд. То навшавӣ насб баста аст: шабакаро санҷед ва боз кӯшиш кунед.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Васеъкуниҳои бозхондашуда хомӯш шуданд: $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'Калиди махфӣ';
+
+  @override
+  String get customServerWgAddresses => 'Суроғаҳои интерфейс';
+
+  @override
+  String get customServerWgPeerKey => 'Калиди ошкори сервер';
+
+  @override
+  String get customServerWgPresharedKey => 'Калиди умумӣ';
+
+  @override
+  String get customServerWgAllowedIps => 'IP-ҳои иҷозатдодашуда';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, сония';
+
+  @override
+  String get customServerWgKeyInvalid => 'Калид бояд 32 байт дар base64 бошад, мисли он ки wg genkey чоп мекунад.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Префиксҳоро бо вергул ворид кунед, масалан 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => 'Шумораи сонияҳоро аз 0 то 65535 ворид кунед.';
+
+  @override
+  String get strictKillSwitch => 'Бастани қатъии шабака';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Пас аз пайвастшавӣ трафики берун аз VPN-ро ҳатто ҳангоми хато, оғози дубора ё баромадан аз барнома мебандад. Дастрасӣ танҳо пас аз қатъи пайваст ё хомӯш кардани ин танзим барқарор мешавад. Пас аз оғози дубораи дастгоҳ бастан танҳо бо фаъол будани пайвастшавӣ ҳангоми оғоз идома меёбад.';
+
+  @override
+  String get extWorkerFailed => 'Вазифаи пасзаминаи васеъкунанда иҷро нашуд. Сабтҳои васеъкунандаро санҷед.';
+
+  @override
+  String get extAssetRejected => 'Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст.';
 }

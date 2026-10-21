@@ -43,8 +43,7 @@ func route(ctx context.Context, tun engine.Tun, uid int) error {
 	for _, step := range routeSteps(tun, families()) {
 		if err := ip(ctx, step); err != nil {
 			// Keep the rollback failure visible: a half-applied ruleset
-			// with a silent cleanup error is worse than a noisy one
-			// (SORA-M9).
+			// with a silent cleanup error is worse than a noisy one.
 			return errors.Join(err, unroute(ctx))
 		}
 	}
@@ -347,7 +346,7 @@ func families() []string {
 
 func ip(ctx context.Context, args []string) error {
 	// Tag our rules with the owner protocol, as before; the vector form
-	// keeps every element a single argument (SORA-M2).
+	// keeps every element a single argument.
 	full := args
 	for i := 0; i+1 < len(args); i++ {
 		if args[i] == "rule" && args[i+1] == "add" {

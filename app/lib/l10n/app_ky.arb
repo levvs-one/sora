@@ -5,7 +5,6 @@
   "stateConnected": "Туташкан",
   "stateReconnecting": "Кайра туташуу",
   "stateDisconnecting": "Ажыратууда",
-  "stateFailed": "Туташкан эмес",
   "coreMissing": "Sora кызматы жооп бербей жатат",
   "serverAuto": "Эң тез",
   "serverBypass": "Сервер жок",
@@ -41,6 +40,7 @@
   "export": "Файлга сактоо",
   "clear": "Таза",
   "logsEmpty": "Бул жерде эч нерсе",
+  "connEmpty": "Туташуулар жок",
   "appVersion": "Версия {version}",
   "notInstalled": "Орнотулган эмес",
   "sourceCode": "Булак коду",
@@ -75,17 +75,16 @@
   "errSubScheme": "Шилтеме https:// менен башталышы керек",
   "errSecretStore": "Sora сактагычы бузулган же жеткиликсиз",
   "errNoServers": "Туташуу үчүн жазылууну кошуңуз",
-  "exportText": "Текст",
   "connections": "Байланыштар",
   "close": "Жабуу",
   "chainDirect": "Түз",
   "chainBlocked": "Бөгөттөлгөн",
   "theme": "Тема",
-  "themeSystem": "System",
+  "themeSystem": "Системадагыдай",
   "themeLight": "Жарык",
   "themeDark": "Караңгы",
   "language": "Тил",
-  "languageSystem": "System",
+  "languageSystem": "Системадагыдай",
   "sectionConnection": "Байланыш",
   "sectionNoServer": "Сервер жок",
   "sectionPing": "Ping",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} калды",
   "ruleInvalid": "Бул сайтка, IP же программага окшош эмес",
   "tunnelMode": "Mode",
-  "tunnelTun": "Бардык трафик",
   "tunnelProxy": "System прокси",
   "proxyAddress": "Прокси дареги",
   "copied": "Көчүрүлгөн",
   "launchAtLogin": "Системадан баштаңыз",
+  "launchAtLoginDetail": "Системага киргенде Sora автоматтык түрдө ишке кирип, лотокто калат.",
   "closeToTray": "Жабык болгондо лотокто сактаңыз",
   "notifications": "Эскертмелер",
   "trayOpen": "Sora ачыңыз",
@@ -185,12 +184,6 @@
   "sidebarToggle": "Каптал тилкесин которуштуруу",
   "more": "Дагы",
   "less": "Азыраак",
-  "currentServer": "Учурдагы сервер",
-  "trafficDown": "Жүктөлүп алынды",
-  "trafficUp": "Жүктөлгөн",
-  "perSecond": "{value}/s",
-  "activeRules": "Активдүү эрежелер: {count}",
-  "recentNotifications": "Акыркы эскертмелер",
   "notificationsEmpty": "Туташуу жана жазылуу окуялары бул жерде көрүнөт",
   "retryConnect": "Кайталануу",
   "openLogs": "Ачык журналдар",
@@ -208,12 +201,9 @@
   "chooseProgram": "Программаны тандаңыз",
   "installedApps": "Орнотулган колдонмолор",
   "runningProcesses": "Иштеп жаткан процесстер",
-  "programsFailed": "Тиркемелер жүктөлгөн жок",
   "programsEmpty": "Тиркемелер табылган жок. Башка ат колдонуп көрүңүз.",
   "selectExe": ".exe файлын тандаңыз",
-  "trafficUnavailable": "Эсептегичтер азырынча жеткиликтүү эмес",
   "speedtest": "Ылдамдык",
-  "speedtestCheck": "Ылдамдыкты текшерүү",
   "speedtestSearch": "Кызматты табыңыз",
   "speedtestEmpty": "Дал келгендер жок. Издөөнү өзгөртүү.",
   "speedtestBackToList": "Кызматтарга кайтуу",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "Көчүрүү буйругу",
   "updateChecksDisabled": "Автоматтык текшерүүлөр Жөндөөлөрдөн өчүрүлгөн.",
   "updateInstalled": "Жаңыртуу орнотулду. Sora кайра ачыңыз.",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "Долбоор",
   "githubReleases": "Чыгуулар жана жүктөөлөр",
   "telegramChannel": "Telegram каналы",
   "licenses": "Лицензиялар",
   "componentLicenses": "Компоненттик лицензиялар",
-  "appCopyright": "© 2026 levvs-one жана салым кошкондор",
   "collapseServers": "Серверлерди жыйыштыруу",
   "expandServers": "Серверлерди кеңейтүү",
   "hideDescription": "Сүрөттөмөлөрдү жашыруу",
   "showDescription": "Сүрөттөмөлөрдү көрсөтүү",
   "pendingConnectionChanges": "Бул өзгөртүүлөрдү колдонуу үчүн кайра туташыңыз.",
   "reconnectNow": "Колдонуу жана кайра туташтыруу",
-  "bypassLimitations": "Бул режим DPI'ди HTTP жана TLS үчүн гана айланып өтөт, UDP'ди колдобойт же IPиңизди өзгөртпөйт. Discord үн, чалуулар жана бөгөттөлгөн Telegram даректери үчүн VPN серверин колдонуңуз.",
   "errEngineUnsupported": "Тандалган кыймылдаткыч бул профилди же жөндөөлөрдү колдоого албайт. Авто же туура келген кыймылдаткычты тандаңыз.",
   "errRestore": "Туташуу тазаланбай калды. Кайра ажыратып көрүңүз; чоо-жайын билүү үчүн журналды карагыла.",
   "errSessionEnded": "Бул сессия эбак эле аяктаган. Туташуу абалын жаңыртуу.",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "Режимдер жана кыймылдаткычтар",
   "probeServers": "Серверлерди текшерүү",
   "expiresIn": "{name}: {days, plural, =0{жазылуу бир нече саатта аяктайт} one{жазылуу # күнү аяктайт} other{жазылуу # күндөрү аяктайт}}",
-  "groupOrdered": "{count, plural, one{# сервери өз кезегинде} other{# серверлери, өз кезегинде}}",
   "groupBest": "{count, plural, one{# сервери, эң ылдам} other{# серверлери, эң ылдам}}",
-  "modesGuide": "Сервериңизге кайсы кыймылдаткыч керек экенин билбей жатсаңыз, Auto тандаңыз. Sora туташуудан мурун профилди жана орнотууларды текшерет. Кыймылдаткыч планыңыздын өткөрүү жөндөмдүүлүгүн жогорулата албайт: аткаруу серверге, маршрутка, протоколго жана тармакка жараша болот.\n\n## Режимдер\n\n### Бардык трафик (TUN)\n\nSora виртуалдык тармак интерфейсин түзөт жана ал аркылуу тиркеме трафигин, анын ичинде TCP жана UDP багыттарын түзөт. Бул режимди Telegram, оюндар жана Discord үнү үчүн колдонуңуз. Эрежелер конкреттүү сайттарды же программаларды түз жөнөтө алат же аларды бөгөттөй алат. Тармак кызматына уруксат жана талап кылынган протоколду колдогон сервер керек.\n\n### System прокси\n\nSora жергиликтүү HTTP/SOCKS проксисин конфигурациялайт. Системанын прокси жөндөөлөрүн сыйлаган колдонмолор аны колдонушат. Өзүнүн тармактык стеки бар тиркемелер түздөн-түз туташа алат; UDP жана үн чалуулар көбүнчө TUN керек. Бул режим прокси колдоосу менен браузерлерге жана тиркемелерге ылайыктуу.\n\n### Сервер жок\n\nLinuxде Sora [zapret](https://github.com/bol-van/zapret) HTTP/TLS сурамдарын бөлүү жана формасын өзгөртүү жана кээ бир DPI текшерүүлөрүн айланып өтүү үчүн колдонот. Сиздин IP ошол эле бойдон калат жана байланыштар түздөн-түз веб-сайтка кирет. Натыйжалар провайдериңизге жана бөгөттөө ыкмасына жараша болот.\n\nУчурдагы интеграция TCP аркылуу HTTP жана TLS үчүн tpws колдонот. Ал IP бөгөттөөнү кыйгап өтпөйт же UDP релесин өткөрбөйт жана Telegramтин MTProto туташууларына кепилдик бере албайт. Discord үн, Telegram чалуулары жана ушул сыяктуу чектөөлөр үчүн TUN менен VPN серверин колдонуңуз.\n\n## Моторлор\n\n### Авто\n\nSora бүт туташуунун планын колдогон орнотулган кыймылдаткычты тандайт: сервердик протоколдор, транспорттор, топтор, фрагментация жана режим. Учурдагы туташууну токтотуунун алдында кол менен шайкеш келбеген тандоо четке кагылат. Авто же башка кыймылдаткычты тандап, орнотууларды кайра колдонуңуз.\n\n### sing-box\n\nЖаңы Sora топтомдору [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) айрысын камтыйт, ага кардар тараптагы XHTTP жана VLESS Encryption кошулат. Sora курууну жана анын мүмкүнчүлүктөрүн тааныйт. XHTTP жок жогорудагы курулуш бул мүмкүнчүлүктү өзүнүн атынан эле ала албайт.\n\nVLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard протоколдору жана Sora импорттой алган AmneziaWG 1.x/2.x параметрлери колдоого алынат. Толук Xray JSON профилдери үчүн Xray керек. Жаңы AWG 3.x талааларын азырынча импорттоо мүмкүн эмес. sing-box сырсөз менен корголгон жергиликтүү башкаруу портун колдонот; компьютердеги башка колдонмолор ал портту аныктай алат.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption жана TLS фрагментациясын колдойт. Ал ошондой эле Xray провайдеринин толук профилдерин иштетип, алардын маршруттарын жана топторун сактап калат. Мындай профилдерди алардын жүрүм-турумун өзгөртпөстөн автоматтык түрдө башка кыймылдаткычка айландыруу мүмкүн эмес.\n\nТоптолгон Xray TLS тастыктамасын текшерүүнү (`allowInsecure`) өчүргөн жөндөөнү алып салды. Бул жөндөөнү талап кылган жөнөкөй серверлер үчүн автоматтык түрдө sing-box же mihomo тандайт. Xray тандалса, учурдагы туташууну токтотуудан мурун дал келбестикти кол менен кабарлайт. Эски толук JSON профилдерине текшерилүүчү тастыктама же тастыктама пин коду менен жаңыртылган провайдер профили керек.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) буйрутмаланган кайра кайтаруу жана жүктү тең салмактоо топторун, XHTTP жана AmneziaWG колдойт. Камдык серверге автоматтык түрдө өтүү маанилүү болгондо аны тандаңыз. Sora анын TLS фрагментация жөндөөсү бул кыймылдаткычта жеткиликсиз.\n\n## Sora ичинде шайкештик\n\n| Feature | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN жана TCP/UDP | Ооба | Ооба | Ооба |\n| XHTTP | Ооба | Ооба | Ооба |\n| VLESS Encryption | Ооба | Ооба | Ооба |\n| Толук Xray профили | Жок | Ооба | Жок |\n| TUIC / AnyTLS | экөө | Жок | TUIC |\n| TLS фрагментация | Ооба | Ооба | Жок |\n| AmneziaWG 1.x/2.x | Ооба¹ | Жок | Ооба |\n| Заказ кылынган кайра топ | Жок | No² | Ооба |\n\n¹ J1/J2/J3/Itime менен профилдер mihomo колдонот; бул талаалар эч качан унчукпай ташталбашы керек. ² Толук Xray профилдер тобу үчүн колдонмо камдык профилди тандайт. Колдоо орнотулган курууга көз каранды; жөнүндө анын версиясын текшерүү.\n\n## TUN стек\n\nСтек виртуалдык интерфейстин ичинде TCP жана UDP иштетет. Режимдер панелинде Xray жана mihomo gVisor, System, Mixed жана MIPS сунуштайт. Ар бир кыймылдаткыч өзүнүн артыкчылыктарын сактайт. System прокси жана серверсиз режимдер бул артыкчылыкты колдонушпайт.\n\n- **Mixed** — TCP тутум стекин колдонот, ал эми gVisor UDP менен иштейт. Бул Linux системасында mihomo үчүн демейки вариант. Windows системасында Xray жана mihomo демейки боюнча MIPS колдонот.\n- **System** — система стекин колдонот. Тармак колдонмолору көйгөйлөргө туш болсо, башка жолду байкап көрүңүз.\n- **gVisor** — колдонуучулар мейкиндигинде трафикти башкарат.\n- **MIPS** — mihomoдин өзүнүн IP стеки, топтомдогу 1.19.32 версиясында жеткиликтүү.\n\nLinuxде, Xray демейки боюнча орнотулган gVisor колдонот. Linuxдеги System, Mixed жана MIPS mihomoди TUN кыймылдаткычы катары колдонушат, TCP жана UDP аныктыгын текшерилген жергиликтүү SOCKS шилтемеси аркылуу Xrayга жөнөтөт. Xray протоколду, провайдердин профилин жана маршрутту сактайт. Бул үч параметр орнотулган mihomo талап кылат. Windows боюнча Xray төрт TUN стегинин баары үчүн mihomo 1.19.32 же жаңы версиясын колдонот. Протоколдор жана маршруттоо Xray ичинде калат. Бул айкалышта колдонмо эрежелери түз туташууну жана бөгөттөөнү гана колдойт; Linux ичинде бул эрежелер Xray камтылган gVisor стегин талап кылат.\n\nКөпүрө экинчи процессти жүргүзөт. Linux боюнча үч ишсиз өлчөөдө ал жергиликтүү Xray TUNга караганда 32–36 МБ көбүрөөк физикалык эстутумду колдонду. Бул жүктөө жүгүн өлчөбөйт: CPU жана эстутум баалары туташуулардан көз каранды. sing-box стек селектору жок. Эч кандай стек ар бир тармакта жакшыраак иштөөгө кепилдик бербейт. Стекти тандап, аны тармагыңызда сынап көрүү үчүн Колдонуу жана кайра туташууну тандаңыз.\n\n## Орнотуулар колдонулууда\n\nСерверди тандоо автоматтык түрдө кайра туташат. Режим, кыймылдаткыч, DNS жана эреже жөндөөлөрү дароо сакталат; активдүү туташуу учурунда Колдонуу баскычын чыкылдатып, аларды колдонуу үчүн кайра туташуу. Кыймылдаткычты кайра иштетүү жүктөп алууларды жана чалууларды үзгүлтүккө учуратышы мүмкүн. Кайталанган чыкылдатуулар параллелдүү байланыштарды баштабайт; ажыратуу өтүүнү аяктайт жана байланышты бошотот.\n\nVPN аркылуу гана Интернет туннель кулаганда түз трафикти бөгөттөйт. Бул бүт машинага таасир этет. Ачык ажыратуу Sora эрежелерин алып салат. Тазалоо бүтпөсө, кайра ажыратып көрүңүз жана журналды ачыңыз.\n\n## Долбоордук документтер\n\n- [sing-box-lx: конфигурация жана колдоо](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box документтери](https://sing-box.sagernet.org/)\n- [Xray документтери](https://xtls.github.io/)\n- [mihomo документтери](https://wiki.metacubex.one/)\n- [zapret: операция жана чектөөлөр](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Сервериңизге кайсы кыймылдаткыч керек экенин билбей жатсаңыз, Auto тандаңыз. Sora туташуудан мурун профилди жана орнотууларды текшерет. Кыймылдаткыч планыңыздын өткөрүү жөндөмдүүлүгүн жогорулата албайт: аткаруу серверге, маршрутка, протоколго жана тармакка жараша болот.\n\n## Режимдер\n\n### Бардык трафик (TUN)\n\nSora виртуалдык тармак интерфейсин түзөт жана ал аркылуу тиркеме трафигин, анын ичинде TCP жана UDP багыттарын түзөт. Бул режимди Telegram, оюндар жана Discord үнү үчүн колдонуңуз. Эрежелер конкреттүү сайттарды же программаларды түз жөнөтө алат же аларды бөгөттөй алат. Тармак кызматына уруксат жана талап кылынган протоколду колдогон сервер керек.\n\n### System прокси\n\nSora жергиликтүү HTTP/SOCKS проксисин конфигурациялайт. Системанын прокси жөндөөлөрүн сыйлаган колдонмолор аны колдонушат. Өзүнүн тармактык стеки бар тиркемелер түздөн-түз туташа алат; UDP жана үн чалуулар көбүнчө TUN керек. Бул режим прокси колдоосу менен браузерлерге жана тиркемелерге ылайыктуу.\n\n### Сервер жок\n\nLinuxде Sora [zapret](https://github.com/bol-van/zapret) HTTP/TLS сурамдарын бөлүү жана формасын өзгөртүү жана кээ бир DPI текшерүүлөрүн айланып өтүү үчүн колдонот. Сиздин IP ошол эле бойдон калат жана байланыштар түздөн-түз веб-сайтка кирет. Натыйжалар провайдериңизге жана бөгөттөө ыкмасына жараша болот.\n\nУчурдагы интеграция TCP аркылуу HTTP жана TLS үчүн tpws колдонот. Ал IP бөгөттөөнү кыйгап өтпөйт же UDP релесин өткөрбөйт жана Telegramтин MTProto туташууларына кепилдик бере албайт. Discord үн, Telegram чалуулары жана ушул сыяктуу чектөөлөр үчүн TUN менен VPN серверин колдонуңуз.\n\n## Моторлор\n\n### Авто\n\nSora бүт туташуунун планын колдогон орнотулган кыймылдаткычты тандайт: сервердик протоколдор, транспорттор, топтор, фрагментация жана режим. Учурдагы туташууну токтотуунун алдында кол менен шайкеш келбеген тандоо четке кагылат. Авто же башка кыймылдаткычты тандап, орнотууларды кайра колдонуңуз.\n\n### sing-box\n\nЖаңы Sora топтомдору [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) айрысын камтыйт, ага кардар тараптагы XHTTP жана VLESS Encryption кошулат. Sora курууну жана анын мүмкүнчүлүктөрүн тааныйт. XHTTP жок жогорудагы курулуш бул мүмкүнчүлүктү өзүнүн атынан эле ала албайт.\n\nVLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard протоколдору жана Sora импорттой алган AmneziaWG 1.x/2.x параметрлери колдоого алынат. Толук Xray JSON профилдери үчүн Xray керек. Жаңы AWG 3.x талааларын азырынча импорттоо мүмкүн эмес. sing-box сырсөз менен корголгон жергиликтүү башкаруу портун колдонот; компьютердеги башка колдонмолор ал портту аныктай алат.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption жана TLS фрагментациясын колдойт. Ал ошондой эле Xray провайдеринин толук профилдерин иштетип, алардын маршруттарын жана топторун сактап калат. Мындай профилдерди алардын жүрүм-турумун өзгөртпөстөн автоматтык түрдө башка кыймылдаткычка айландыруу мүмкүн эмес.\n\nТоптолгон Xray TLS тастыктамасын текшерүүнү (`allowInsecure`) өчүргөн жөндөөнү алып салды. Бул жөндөөнү талап кылган жөнөкөй серверлер үчүн автоматтык түрдө sing-box же mihomo тандайт. Xray тандалса, учурдагы туташууну токтотуудан мурун дал келбестикти кол менен кабарлайт. Эски толук JSON профилдерине текшерилүүчү тастыктама же тастыктама пин коду менен жаңыртылган провайдер профили керек.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) буйрутмаланган кайра кайтаруу жана жүктү тең салмактоо топторун, XHTTP жана AmneziaWG колдойт. Камдык серверге автоматтык түрдө өтүү маанилүү болгондо аны тандаңыз. Sora анын TLS фрагментация жөндөөсү бул кыймылдаткычта жеткиликсиз.\n\n## Sora ичинде шайкештик\n\n| Feature | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN жана TCP/UDP | Ооба | Ооба | Ооба |\n| XHTTP | Ооба | Ооба | Ооба |\n| VLESS Encryption | Ооба | Ооба | Ооба |\n| Толук Xray профили | Жок | Ооба | Жок |\n| TUIC / AnyTLS | экөө | Жок | TUIC |\n| TLS фрагментация | Ооба | Ооба | Жок |\n| AmneziaWG 1.x/2.x | Ооба¹ | Жок | Ооба |\n| Заказ кылынган кайра топ | Жок | No² | Ооба |\n\n¹ J1/J2/J3/Itime менен профилдер mihomo колдонот; бул талаалар эч качан унчукпай ташталбашы керек. ² Толук Xray профилдер тобу үчүн колдонмо камдык профилди тандайт. Колдоо орнотулган курууга көз каранды; жөнүндө анын версиясын текшерүү.\n\n## TUN стек\n\nСтек виртуалдык интерфейстин ичинде TCP жана UDP иштетет. Режимдер панелинде Xray жана mihomo gVisor, System, Mixed жана MIPS сунуштайт. Ар бир кыймылдаткыч өзүнүн артыкчылыктарын сактайт. System прокси жана серверсиз режимдер бул артыкчылыкты колдонушпайт.\n\n- **Mixed**: TCP тутум стекин колдонот, ал эми gVisor UDP менен иштейт. Бул Linux системасында mihomo үчүн демейки вариант. Windows системасында Xray жана mihomo демейки боюнча MIPS колдонот.\n- **System**: система стекин колдонот. Тармак колдонмолору көйгөйлөргө туш болсо, башка жолду байкап көрүңүз.\n- **gVisor**: колдонуучулар мейкиндигинде трафикти башкарат.\n- **MIPS**: mihomoдин өзүнүн IP стеки, топтомдогу 1.19.32 версиясында жеткиликтүү.\n\nLinuxде, Xray демейки боюнча орнотулган gVisor колдонот. Linuxдеги System, Mixed жана MIPS mihomoди TUN кыймылдаткычы катары колдонушат, TCP жана UDP аныктыгын текшерилген жергиликтүү SOCKS шилтемеси аркылуу Xrayга жөнөтөт. Xray протоколду, провайдердин профилин жана маршрутту сактайт. Бул үч параметр орнотулган mihomo талап кылат. Windows боюнча Xray төрт TUN стегинин баары үчүн mihomo 1.19.32 же жаңы версиясын колдонот. Протоколдор жана маршруттоо Xray ичинде калат. Бул айкалышта колдонмо эрежелери түз туташууну жана бөгөттөөнү гана колдойт; Linux ичинде бул эрежелер Xray камтылган gVisor стегин талап кылат.\n\nКөпүрө экинчи процессти жүргүзөт. Linux боюнча үч ишсиз өлчөөдө ал жергиликтүү Xray TUNга караганда 32–36 МБ көбүрөөк физикалык эстутумду колдонду. Бул жүктөө жүгүн өлчөбөйт: CPU жана эстутум баалары туташуулардан көз каранды. sing-box стек селектору жок. Эч кандай стек ар бир тармакта жакшыраак иштөөгө кепилдик бербейт. Стекти тандап, аны тармагыңызда сынап көрүү үчүн Колдонуу жана кайра туташууну тандаңыз.\n\n## Орнотуулар колдонулууда\n\nСерверди тандоо автоматтык түрдө кайра туташат. Режим, кыймылдаткыч, DNS жана эреже жөндөөлөрү дароо сакталат; активдүү туташуу учурунда Колдонуу баскычын чыкылдатып, аларды колдонуу үчүн кайра туташуу. Кыймылдаткычты кайра иштетүү жүктөп алууларды жана чалууларды үзгүлтүккө учуратышы мүмкүн. Кайталанган чыкылдатуулар параллелдүү байланыштарды баштабайт; ажыратуу өтүүнү аяктайт жана байланышты бошотот.\n\nVPN аркылуу гана Интернет туннель кулаганда түз трафикти бөгөттөйт. Бул бүт машинага таасир этет. Ачык ажыратуу Sora эрежелерин алып салат. Тазалоо бүтпөсө, кайра ажыратып көрүңүз жана журналды ачыңыз.\n\n## Долбоордук документтер\n\n- [sing-box-lx: конфигурация жана колдоо](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box документтери](https://sing-box.sagernet.org/)\n- [Xray документтери](https://xtls.github.io/)\n- [mihomo документтери](https://wiki.metacubex.one/)\n- [zapret: операция жана чектөөлөр](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -460,12 +443,6 @@
   "extensions": "Кеңейтүүлөр",
   "exportLogFile": "Файлга {name}",
   "diagnosticHttp": "HTTP диагностикасы",
-  "diagnosticUnavailable": "Бул диагностика бул платформада жеткиликсиз.",
-  "extensionsSoon": "Жакында келмекчи",
-  "diagnosticEvents": "Windows окуялары",
-  "diagnosticPackets": "Пакетти басып алуу",
-  "diagnosticCapture": "10 секундга тартыңыз",
-  "diagnosticRequiresTun": "Пакетти тартууга активдүү Sora TUN байланышы керек.",
   "diagnosticNoData": "Жазылган сурамдар азырынча жок. Адегенде ылдамдыкты текшерүү вебсайтын ачыңыз.",
   "@exportLogFile": {
     "placeholders": {
@@ -473,5 +450,572 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "Ыңгайлаштырылган серверди кошуңуз",
+  "customServers": "Менин серверлерим",
+  "customServerName": "Аты-жөнү",
+  "customServerNameHint": "Мисалы: менин VPS",
+  "customServerNameRequired": "Атын киргизиңиз",
+  "customServerAddress": "Дарек",
+  "customServerAddressHint": "example.com же 192.0.2.1",
+  "customServerAddressRequired": "Сервердин дарегин киргизиңиз",
+  "customServerAddressInvalid": "Дарек жараксыз",
+  "customServerPort": "Порт",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "Порт 1ден 65535ке чейинки сан болушу керек",
+  "customServerProtocol": "Протокол",
+  "customServerCredentials": "Кирүү маалыматы",
+  "customServerOptional": "Кошумча",
+  "customServerShowSecret": "Сырды көрсөтүү",
+  "customServerHideSecret": "Жашыруун",
+  "customServerBadge": "жеке",
+  "customServerDeleteConfirm": "“{name}” сервери жок кылынсынбы?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "Серверди кол менен кошуңуз: дарек, порт жана протокол",
+  "customServerTest": "Сыноо",
+  "leakTestTitle": "Маалыматтын агып кетишин текшерүү",
+  "leakTestIntro": "Трафик түзмөктөн туннелден тышкары чыга аларын текшерет: түз DNS жана ICMP сурамдары, IPv6 чыгышы жана системалык резолверлер. Туташуу активдүү кезде иштетиңиз.",
+  "leakTestRun": "Текшерүү",
+  "leakTestCancel": "Жокко чыгаруу",
+  "leakTestNeedsConnection": "Дайындардын агып кетишин текшерүү үчүн VPN менен туташыңыз.",
+  "leakTestProgress": "Сыноолор аяктады: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "Агышуу табылган жок",
+  "leakTestFound": "{count, plural, one{# маалымат агып кетүүсү табылды} other{# маалымат агып кетүүсү табылды}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "Оңдоо",
+  "leakTestFixedNote": "Тармак бөгөтү күйүк. Текшерүү үчүн сыноону кайра иштетиңиз.",
+  "leakTestCheckDirectDns": "Түз DNS",
+  "leakTestCheckIcmpEcho": "ICMP echo",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "Системалык резолверлер",
+  "leakTestCheckTunnelConnectivity": "Туннелдик байланыш",
+  "leakTestCheckTunnelDns": "DNS туннель аркылуу",
+  "noticeDegraded": "Сервер жайлады. Sora өлчөө учурунда табылган мыкты серверге которулду.",
+  "obfs": "Трафикти жашыруу",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "Жаңыртуу файлдары чыгарылыш менен кошо жарыяланган текшерүү суммалары менен салыштырылат.",
+  "updateManualSigWarning": "Төмөнкү файлдар чыгарылыштын текшерүү суммаларына дал келет. Аларды расмий чыгарылыштан жүктөсөңүз, буйрукту аткарыңыз.",
+  "updateVersionRevoked": "Иштеп чыгуучу бул версияны алып салды. Сураныч, оңдолгон чыгарууну күтүңүз.",
+  "updateRolloutPending": "Жаңыраак версия акырындык менен чыгарылып жатат жана сизге автоматтык түрдө сунушталат.",
+  "updateRollbacking": "{version} версиясына кайтуу...",
+  "updateRolledBack": "{version} жаңыртуусу ден соолук текшерүүсүнөн өткөн жок, андыктан Sora кайра {fromVersion} га жылдырылды.",
+  "updateRollbackError": "Автоматтык артка кайтаруу ишке ашкан жок. Жаңы версия иштебесе, мурунку версияны кол менен кайра орнотуңуз.",
+  "updateRollbackCacheError": "Учурдагы версиянын текшерилген артка кайтарылган көчүрмөсүн даярдай алган жок, андыктан жаңыртуу орнотулган эмес.",
+  "extRatingLabel": "Рейтинг {rating} ичинен 5",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "{author} тарабынан",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "Орнотуулар: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "1 орнотуу",
+  "extBadgeVerified": "Текшерилди",
+  "extBadgeTop": "Бул аптада эң популярдуу",
+  "extBadgeNew": "Жаңы",
+  "extBadgeStaff": "Sora командасы",
+  "extSideloadShort": "Каталогдон эмес",
+  "extSideloadWarning": "Бул кеңейтүү команда каталогунан эмес. Алардын ачкычына автор гана кепилдик берди: аны авторго ишенсеңиз гана орнотуңуз.",
+  "extInstallTitle": "«{name}» орнотуу",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "«{name}» жаңыртуу",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "Бул кеңейтүү төмөнкүлөрдү жасай алат:",
+  "extPermissionsWidened": "Жаңыртуу жаңы уруксаттарды сурайт:",
+  "extDangerousAck": "Бул уруксаттар олуттуу экенин түшүнөм",
+  "extInstall": "Орнотуу",
+  "extUpdate": "Жаңыртуу",
+  "extCancel": "Жокко чыгаруу",
+  "extConfirm": "Ырастоо",
+  "extOk": "OK",
+  "extCatalog": "Каталог",
+  "extInstalled": "Орнотулган кеңейтүүлөр",
+  "extSearchHint": "Кеңейтүүлөрдү издөө",
+  "extCatAll": "Баары",
+  "extCatTools": "Куралдар",
+  "extCatThemes": "Темалар",
+  "extCatAutomation": "Автоматташтыруу",
+  "extCatStats": "Статистика",
+  "extCatNetwork": "Тармак",
+  "extSortBy": "Сорттоо боюнча",
+  "extSortPopular": "Эң популярдуу",
+  "extSortRating": "Эң жогорку баа",
+  "extSortName": "Аты-жөнү",
+  "extCatalogError": "Каталог жүктөлгөн жок",
+  "extRetry": "Кайталап көрүңүз",
+  "extEmptySearch": "Эч нерсе табылган жок",
+  "extEmptyInstalled": "Азырынча кеңейтүүлөр орнотулган эмес.\nКаталогдон бирөөнү табыңыз же файлдан орнотуңуз.",
+  "extInstallFromFile": "Файлдан орнотуу",
+  "extInstallFromUrl": "URL баштап орнотуу",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "Жүктөп алуу",
+  "extDownloading": "Жүктөлүүдө…",
+  "extVerifying": "Текшерилүүдө…",
+  "extInstalling": "Орнотулууда…",
+  "extInstallFailed": "Орнотуу ишке ашкан жок",
+  "extErrSignature": "Кол коюу текшерилбей калды. Файл бузулган же бурмаланган болушу мүмкүн.",
+  "extErrManifest": "Кеңейтүү манифести жараксыз.",
+  "extErrNetwork": "Тармак катасы. Туташууңузду текшерип, кайра аракет кылыңыз.",
+  "extErrHash": "Жүктөө каталогго дал келбейт. Ал бурмаланган болушу мүмкүн.",
+  "extErrMinApp": "Бул кеңейтүү колдонмонун {version} же андан жаңыраак версиясын талап кылат.",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "https:// шилтемелерге гана уруксат берилет",
+  "extErrGeneric": "Бир жерден ката кетти. Сураныч, кайра аракет кылыңыз.",
+  "extErrAuthorKeyChanged": "Бул жаңыртууга орнотулган версияга караганда башка автор ачкычы менен кол коюлган, андыктан ал бөгөттөлгөн. Эгер жаңы ачкычка ишенсеңиз, кеңейтүүнү чыгарып салып, аны кайра орнотуңуз.",
+  "extUpdateAvailable": "Жаңыртуу жеткиликтүү",
+  "extDisabled": "Өчүк",
+  "extToggleEnabled": "Иштетүү {name}",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "Орнотулган кеңейтүүлөрдү издөө",
+  "extUpdateAll": "Баарын жаңыртуу",
+  "extUpdatesAvailable": "{count} жаңыртуулар жеткиликтүү",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count} жаңыртылды",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "Кадимки",
+  "extRiskSensitive": "Сезимтал",
+  "extRiskDangerous": "Жогорку тобокелдик",
+  "extPermissionsRemoved": "Мындан ары суралбайт:",
+  "extUpdateFailedKept": "Мурунку версия дагы эле орнотулган.",
+  "extConflictsTitle": "Кеңейтүү боюнча карама-каршылыктар",
+  "extConflictsIntro": "Бул кеңейтүүлөр бир эле нерсени каалайт. Кайсынысы иштей турганын тандаңыз, экинчиси орнотулган бойдон калат.",
+  "extConflictTheme": "Колдонмо темасы",
+  "extConflictNetHooks": "Тармак илгичтери",
+  "extConflictWinner": "Артыкчылык: {name}",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} чыр-чатактар сиздин чечимиңизди талап кылат",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "Конфликттерди чечүү",
+  "extConflictNote": "Тандооңуз ушул түзмөктө сакталат. Тема дароо которулат, тармактык хуктар бул версияда иштебейт.",
+  "extVersionLabel": "Версия {version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "Автор",
+  "extRating": "Рейтинг",
+  "extInstalls": "Орнотуулар",
+  "extVersion": "Версия",
+  "extAbout": "Бул кеңейтүү жөнүндө",
+  "extPermissionsTitle": "Уруксаттар",
+  "extNoPermissions": "Атайын уруксаттар жок.",
+  "extSettings": "Орнотуулар",
+  "extSaveSettings": "Орнотууларды сактоо",
+  "extSaving": "Сактоо…",
+  "extUpdateTo": "{version} чейин жаңыртуу",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "Күйүк",
+  "extRollbackTo": "Артка {version}",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "{version} версиясына кайтуубу?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "Uninstall",
+  "extUninstallConfirm": "“{name}” жана анын жөндөөлөрү алынып салынсынбы?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "Панел жеткиликсиз. Кеңейтүү өчүрүлгөн же өчүрүлгөн болушу мүмкүн.",
+  "extPermConnectionsRead": "Жигердүү байланыштардын тизмесин караңыз",
+  "extPermServersRead": "Серверлериңиздин тизмесин караңыз",
+  "extPermSettingsRead": "Колдонмонун жөндөөлөрүн окуу",
+  "extPermSettingsWrite": "Колдонмонун жөндөөлөрүн өзгөртүү",
+  "extPermNotifications": "Эскертмелерди көрсөтүү",
+  "extPermTray": "Науалар менюсуна нерселерди кошуңуз",
+  "extPermUiPanel": "Колдонмонун ичиндеги панелдерди көрсөтүү",
+  "extPermThemeApply": "Темаларды колдонуңуз",
+  "extPermRoutingRules": "Маршрутизация эрежелерин кошуу (тармак трафигинин кеткен жерине таасир этет)",
+  "extPermNetHooks": "Тармак жолуна интеграциялоо (DPI айланып өтүү модулдары)",
+  "extPermNetFetch": "Уруксат берилген тизмеден URL сураңыз",
+  "extPermBackground": "Фондук тапшырмаларды иштетүү",
+  "extPermBackgroundDetail": "Панел жабык болгондо да пландаштырылган тапшырмаларды аткарат. Сиз аны тындыра аласыз же кеңейтүү жөндөөлөрүнөн анын канчалык көп иштешин өзгөртө аласыз.",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "Фондо иштейт",
+  "extCapNetHook": "Бөгөттөрдү айланып өтүү жана тармак илгичтери",
+  "extCapPanel": "Интерфейс панелдери",
+  "extCapRouting": "Маршрутизация эрежелери",
+  "extCapTheme": "Темалар",
+  "extCapWidget": "Виджеттер",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "Өзгөртүү журналы",
+  "extImageFailed": "Сүрөт жүктөлгөн жок",
+  "extRatingHow": "Рейтингдер кантип иштейт",
+  "extRatingHowBody": "Рейтингдер Байесиялык орточо көрсөткүчтү колдонушат: бир нече рейтинги бар кеңейтүү көбүрөөк адам добуш бергенге чейин ортого жакын калат, андыктан бир 5 жылдыздуу карап чыгуу жаңы кеңейтүүнү эң жогору көтөрө албайт. Акыркы рейтингдер эскилерге караганда көбүрөөк жана ар бир эсепке бир гана рейтинг эсептелет.",
+  "extScreenshots": "Скриншоттор",
+  "extSortRelevance": "актуалдуулугу",
+  "extPermNetworkDetail": "Интернеттен маалыматты VPN аркылуу жүктөйт. Төмөнкү тизмедеги хосттор гана уруксат, калганы бөгөттөлгөн.",
+  "extBgTitle": "Фондук тапшырма",
+  "extBgEnabled": "Фондо иштетүү",
+  "extBgInterval": "Иштетүү аралыгы",
+  "extBgMinutes": "{count, plural, one{# мүнөт} other{# мүнөт}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, one{# саат} other{# саат}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Тапшырма Sora ачык турганда, анын ичинде трейде турганда да, график боюнча иштейт. Эң кыска аралык 15 мүнөт.",
+  "extBgDisabledNote": "Фондук тапшырманы башкаруу үчүн кеңейтүүнү иштетиңиз.",
+  "extCapNetwork": "Тармакка кирүү",
+  "extCapNetworkHosts": "Тармак: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "QR кодун бөлүшүү",
+  "qrScanTitle": "QR кодун сканерлеңиз",
+  "qrCopyLink": "Шилтемени көчүрүү",
+  "qrShowLink": "Шилтемени көрсөтүү",
+  "qrHideLink": "Шилтемени жашыруу",
+  "qrWarning": "Бул QR код туташуу чоо-жайын камтыйт. Бейтааныш адамдарга көрсөтпөңүз.",
+  "qrScanHint": "QR коду бар скриншотту же сүрөттү тандаңыз, же шилтемени коюңуз",
+  "qrFromClipboard": "Алмашуу буферинен чаптоо",
+  "qrNoCode": "Бул сүрөттөн QR код табылган жок.",
+  "qrInvalid": "Бул QR кодунда жарактуу шилтеме жок.",
+  "qrScan": "Скандоо QR",
+  "qrFromImage": "Сүрөттү ачуу",
+  "connGroupByProcess": "Процесс боюнча топтоо",
+  "connListView": "Тизме",
+  "connCopyHost": "Хостту көчүрүү",
+  "connAddRule": "Эреже кошуу",
+  "connConnectionsCount": "{count, plural, one{# туташуу} other{# туташуу}}",
+  "dnsPreset": "Алдын ала коюлган",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "Жеке",
+  "dnsCheck": "Маалыматтын агып кетишин текшериңиз",
+  "dnsChecking": "Текшерилүүдө...",
+  "dnsNoLeak": "Агышуу табылган жок",
+  "dnsLeakFound": "агып кетүү аныкталды",
+  "dnsLastCheck": "Акыркы текшерүү",
+  "dnsNeverChecked": "Азырынча текшериле элек",
+  "dnsLeakCheckTunnelDns": "Туннелдин DNS резолверлери",
+  "dnsLeakCheckSystemResolvers": "Системалык резолверлер",
+  "dnsLeakCheckKillSwitchDns": "Тармак бөгөтүнүн DNS коргоосу",
+  "dnsLeakFixConfigureTunnelDns": "Туннелдин DNS конфигурациясын жогорудагы DNS жөндөөлөрүндө.",
+  "dnsLeakFixReviewSystemResolvers": "Туннелдин сыртында тутумуңуз кайсы чечүүчүлөрдү колдоноорун текшериңиз.",
+  "dnsLeakFixEnableKillSwitch": "DNS трафиги туннелде калышы үчүн тармак бөгөтүн күйгүзүңүз.",
+  "dnsLeakCheckEncryptedDns": "Системанын шифрленген DNS кызматы",
+  "dnsLeakCheckDnsSpoof": "Жасалма DNS жооптор",
+  "dnsLeakFixReviewEncryptedDns": "Туннелдин сыртында тутумуңуз кайсы шифрленген DNS акыркы чекиттерин колдоноорун текшериңиз.",
+  "dnsLeakFixUseEncryptedDns": "Резолверлер жоопторду жасалмалай албашы үчүн туннелде шифрленген DNS (DoT же DoH) колдонуңуз.",
+  "dnsCheckNeedsConnection": "Адегенде VPN менен туташып, андан кийин агып кеткендигин текшериңиз.",
+  "dnsExpected": "Күтүлгөн",
+  "dnsActual": "байкалган",
+  "sortBy": "Сорттоо боюнча",
+  "sortPing": "Пинг",
+  "sortSpeed": "Ылдамдык",
+  "sortName": "Аты-жөнү",
+  "measureSpeed": "Ылдамдыкты өлчөө",
+  "benchmarkStale": "эскирген",
+  "autoSelectMode": "Серверди автоматтык түрдө тандоо",
+  "autoSelectPing": "Эң ылдам пинг",
+  "autoSelectSpeed": "Эң ылдам ылдамдык",
+  "autoSelectSmart": "Акылдуу тандоо",
+  "coreWatchUnstable": "Sora өзөгүнө туташуу туруксуз",
+  "watchReconnect": "Кайра туташтыруу",
+  "coreRestoringLink": "Sora өзөгү менен байланыш калыбына келтирилүүдө…",
+  "crashRestoreTitle": "Акыркы сессия үзгүлтүккө учурады",
+  "restoreOnCrash": "Кырсыктан кийин сессияны калыбына келтирүү",
+  "crashRestore": "Калыбына келтирүү",
+  "crashDismiss": "Азыр эмес",
+  "overrideTitle": "Менин түзөтүүлөрүм",
+  "overrideEdit": "Серверлерди түзөтүү",
+  "overrideHide": "Жашыруу",
+  "overrideUnhide": "Көрсөтүү",
+  "overrideClear": "Түзөтүүлөрдү баштапкы абалга келтирүү",
+  "overrideEmpty": "Азырынча түзөтүүлөр жок",
+  "overrideCustomRules": "Өз эрежелери",
+  "errBenchmarkUnsupported": "Ылдамдыкты өлчөө үчүн жаңы өзөк керек",
+  "benchmarkProgress": "{total} тартып {done} өлчөө…",
+  "profiles": "Тармак профилдери",
+  "profilesEmpty": "Азырынча профилдер жок. Белгилүү тармактарда автоматтык түрдө орнотууларды колдонуу үчүн бирөөсүн түзүңүз.",
+  "profileAdd": "Профиль кошуу",
+  "profileName": "Профилдин аты",
+  "profileSsids": "Wi-Fi тармактар (SSID)",
+  "profileSsidsHint": "Үй, Кеңсе үтүр менен бөлүнгөн",
+  "profileGateways": "Тармак шлюздары",
+  "profileAsns": "AS номерлери",
+  "profileAutoApply": "Автоматтык түрдө колдонуу",
+  "profileAutoApplyHint": "Өчүк болсо, профилди колдонуудан мурун ырастоо суралат.",
+  "profileSnapshot": "Учурдагы орнотууларды эстеп көрүңүз",
+  "profileSnapshotDone": "Учурдагы орнотуулар профилде сакталган",
+  "profileDelete": "Профильди жок кылуу",
+  "profileDeleteConfirm": "\"{name}\" профили жок кылынсынбы?",
+  "profileApplyAsk": "\"{name}\" профили колдонулсунбу?",
+  "profileApply": "Колдонуу",
+  "profileApplied": "\"{name}\" профили колдонулду",
+  "profileUndo": "Жокко чыгаруу",
+  "profileActive": "Активдүү",
+  "networkNow": "Азыр: {info}",
+  "networkUnknown": "Тармак маалыматы жеткиликсиз",
+  "profileNoTriggers": "Кеминде бир триггерди кошуңуз: SSID, шлюз же ASN",
+  "chains": "Прокси чынжырлар",
+  "chainsEmpty": "Азырынча чынжыр жок. Трафик алардын ар бири аркылуу өтүшү үчүн 2–3 серверди байланыштырыңыз.",
+  "chainAdd": "Жаңы чынжыр",
+  "chainName": "чынжырдын аталышы",
+  "chainPickServers": "2–3 серверди тандаңыз",
+  "chainOrderHint": "Кайра иреттөө үчүн сүйрөңүз: трафик жогору жактан кирип, ылдый жактан чыгат.",
+  "chainTooFew": "Кеминде 2 серверди тандаңыз",
+  "chainTooMany": "Чынжыр эң көп дегенде 3 серверди камтыйт",
+  "chainEstimate": "Болжолдуу кечигүү",
+  "chainSave": "чынжырды сактоо",
+  "chainDelete": "Чынжырды жок кылуу",
+  "chainDeleteConfirm": "\"{name}\" чынжыр жок кылынсынбы?",
+  "chainUnsupported": "Учурдагы мотор чынжырларды түзө албайт",
+  "chainHopMissing": "чынжыр серверлеринин бири мындан ары жеткиликтүү эмес",
+  "chainHop": "Аралык түйүн {n}",
+  "chainEntry": "Кирүү",
+  "chainExit": "Чыгуу",
+  "sync": "Түзмөктү синхрондоштуруу",
+  "syncDevices": "Менин түзмөктөрүм",
+  "syncEmpty": "Жупташтырылган түзмөктөр жок. Жергиликтүү тармак аркылуу башка түзмөктү жупташтырыңыз.",
+  "syncPair": "Түзмөктү жуптаңыз",
+  "syncShowCode": "Менин кодумду көрсөт",
+  "syncScanCode": "Скандоочу код",
+  "syncRevoke": "Алып салуу",
+  "syncRevokeConfirm": "\"{name}\" жокко чыгарылсынбы?",
+  "syncLastSync": "Акыркы синхрондоштуруу: {time}",
+  "syncNever": "Эч качан",
+  "syncNoLan": "Түзмөктөр бир локалдык тармакта болушу керек",
+  "syncPaired": "Түзмөк жупташтырылган",
+  "syncPairingTitle": "Бул түзмөк менен жупташтыруу",
+  "syncWaiting": "Башка түзмөк күтүлүүдө…",
+  "syncSecureNote": "Ичтен аягына чейин шифрленген канал. Эч кандай аккаунттар, булут серверлери жок.",
+  "zapretWithVpn": "Түз тармак трафиги үчүн DPI чыпкалоодон өтүңүз",
+  "zapretWithVpnHint": "zapret VPN туннели менен катар иштейт: туннель трафиги VPN аркылуу, түз трафик бөгөттү айланып өтүү каражаты аркылуу өтөт.",
+  "chainDuplicate": "Ар бир сервер бир гана жолу пайда болот",
+  "edit": "Түзөтүү",
+  "remove": "Алып салуу",
+  "autoSwitchOnDegrade": "Деградацияны автоматтык түрдө которуу",
+  "autoSwitchOnDegradeDetail": "Тандалган сервер катуу жайласа же жооп бербей калса, Sora өлчөө жыйынтыгы эң жакшы серверге которулат, бирок 10 мүнөттө бир жолудан көп эмес.",
+  "tunStackMixed": "Аралаш",
+  "tunStackSystem": "системасы",
+  "syncCodeExpired": "Коддун мөөнөтү бүттү",
+  "syncDaemonFailed": "Шайкештештирүү кызматы башталбай койду",
+  "syncDaemonMissing": "sora-sync компоненти табылган жок. Түзмөктү синхрондоштурууну иштетүү үчүн колдонмону кайра орнотуңуз.",
+  "syncDaemonStarting": "Шайкештештирүү кызматы башталууда…",
+  "syncErrAuth": "Шайкештештирүү кызматы кирүү белгисин четке какты. Колдонмону өчүрүп күйгүзүп, кайра аракет кылыңыз.",
+  "syncErrNotFound": "Түзмөк мындан ары жупташкан жок",
+  "syncErrPairingActive": "Жупташуу сеансы мурунтан эле ачык",
+  "syncErrUnreachable": "Башка түзмөк жооп берген жок. Анын бир тармакта экенин жана анын кодун көрсөтүп жатканын текшериңиз.",
+  "syncError": "Синхрондоштуруу катасы",
+  "syncExpiresIn": "Коддун мөөнөтү {duration} кийин бүтөт",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "Түзмөк менен жупташуу…",
+  "syncLegacyCleared": "Эски түзмөк тизмеси эч качан жупташкан эмес, андыктан ал тазаланган. Түзмөктөрүңүздү бул жолу чындап кайра жупташтырыңыз.",
+  "syncNewCode": "Жаңы код",
+  "syncPairedWith": "{name} менен жупташкан",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "Кайталоо",
+  "syncStopShowing": "Кодду жашыруу",
+  "syncSyncNow": "Азыр шайкештирүү",
+  "syncSyncResult": "Кабыл алынган {pulled}, жөнөтүлгөн {pushed}",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "Синхрондоштуруу натыйжасы",
+  "syncPulled": "Кабыл алынган",
+  "syncPushed": "Жөнөтүлдү",
+  "syncNoChanges": "Эч кандай өзгөртүүлөр табылган жок",
+  "syncDocKindSubscriptions": "Жазылуулар",
+  "syncDocKindSettings": "Колдонмонун жөндөөлөрү",
+  "syncDocKindOverrides": "Жазылуулардын жеке өзгөртүүлөрү",
+  "syncDocKindProfiles": "Тармак профилдери",
+  "syncDocKindChains": "Прокси чынжырлар",
+  "syncFrom": "{name} түзмөгүнөн",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "Бул аппарат",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Shadowsocks үчүн: ыкма:сырсөз, мисалы chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "Пакетти басып алуу",
+  "diagnosticEvents": "Windows окуялары",
+  "diagnosticCapture": "10 секундга тартыңыз",
+  "diagnosticRequiresTun": "Пакетти тартууга активдүү Sora TUN байланышы керек.",
+  "diagnosticUnavailable": "Бул диагностика бул платформада жеткиликсиз.",
+  "extErrRevoked": "Sora командасы кеңейтүүнүн бул версиясын коопсуз эмес же бузук деп кайтарып алды.",
+  "extErrRevocationsExpired": "Кайтарылган кеңейтүүлөрдүн тизмесин жаңыртуу мүмкүн болгон жок. Жаңыртылганча орнотуу бөгөттөлгөн: тармакты текшерип, кайра аракет кылыңыз.",
+  "extRevokedDisabled": "Кайтарылган кеңейтүүлөр өчүрүлдү: {names}",
+  "customServerWgPrivateKey": "Жеке ачкыч",
+  "customServerWgAddresses": "Интерфейс даректери",
+  "customServerWgPeerKey": "Сервердин ачык ачкычы",
+  "customServerWgPresharedKey": "Жалпы ачкыч",
+  "customServerWgAllowedIps": "Уруксат берилген IP",
+  "customServerWgKeepalive": "Keepalive, секунд",
+  "customServerWgKeyInvalid": "Ачкыч wg genkey чыгаргандай base64 түрүндөгү 32 байт болушу керек.",
+  "customServerWgCidrInvalid": "Үтүр менен бөлүнгөн префикстерди киргизиңиз, мисалы 10.0.0.2/32.",
+  "customServerWgKeepaliveInvalid": "0дөн 65535ке чейинки секунд санын киргизиңиз.",
+  "strictKillSwitch": "Катуу тармак бөгөтү",
+  "strictKillSwitchWarning": "Туташкандан кийин ката, кайра иштетүү же колдонмодон чыгуу учурунда да VPN тышындагы трафикти бөгөттөйт. Жеткиликтүүлүк байланышты үзгөндө же бул жөндөөнү өчүргөндө гана калыбына келет. Түзмөк кайра жүктөлгөндө бөгөттөө ишке киргенде туташуу күйгүзүлгөн болсо гана уланат.",
+  "extWorkerFailed": "Кеңейтменин фондогу тапшырмасы аткарылган жок. Кеңейтменин журналын текшериңиз.",
+  "extAssetRejected": "Кеңейтменин файлы четке кагылды: окулбаган түстөр же жараксыз эрежелер."
 }

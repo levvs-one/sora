@@ -1,0 +1,41 @@
+{
+  "manifest_version": 1,
+  "id": "org.sora.hello-panel",
+  "name": "Hello Panel",
+  "version": "1.0.0",
+  "min_app_version": "1.1.0",
+  "description": "The official example extension: a panel with live connection statistics.",
+  "author": {
+    "name": "Sora",
+    "identity": "github:levvs-one",
+    "public_key": "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+"
+  },
+  "permissions": [
+    "connections.read",
+    "notifications",
+    "ui.panel"
+  ],
+  "capabilities": [
+    "ui-panel"
+  ],
+  "ui": {
+    "panels": [
+      {
+        "id": "main",
+        "title": "Hello",
+        "entry": "panel.html"
+      }
+    ]
+  },
+  "settings_schema": {
+    "type": "object",
+    "properties": {
+      "refresh_seconds": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 60,
+        "default": 5
+      }
+    }
+  }
+}

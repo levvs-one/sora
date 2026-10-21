@@ -25,9 +25,6 @@ class STk extends S {
   String get stateDisconnecting => 'Aýyrmak';
 
   @override
-  String get stateFailed => 'Baglanmadyk';
-
-  @override
   String get coreMissing => 'Sora hyzmaty jogap bermeýär';
 
   @override
@@ -135,6 +132,9 @@ class STk extends S {
   String get logsEmpty => 'Bu ýerde hiç zat ýok';
 
   @override
+  String get connEmpty => 'Baglanyşyk ýok';
+
+  @override
   String appVersion(String version) {
     return '$version wersiýasy';
   }
@@ -164,6 +164,16 @@ class STk extends S {
   @override
   String milliseconds(int n) {
     return '$n ms';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Mbps';
   }
 
   @override
@@ -255,9 +265,6 @@ class STk extends S {
   String get errNoServers => 'Birikdirmek üçin abuna ýazyň';
 
   @override
-  String get exportText => 'Tekst';
-
-  @override
   String get connections => 'Baglanyşyklar';
 
   @override
@@ -273,7 +280,7 @@ class STk extends S {
   String get theme => 'Mowzuk';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'Ulgamdaky ýaly';
 
   @override
   String get themeLight => 'Lightagtylyk';
@@ -285,7 +292,7 @@ class STk extends S {
   String get language => 'Dil';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'Ulgamdaky ýaly';
 
   @override
   String get sectionConnection => 'Baglanyşyk';
@@ -496,17 +503,6 @@ class STk extends S {
   String get ruleInvalid => 'Bu sahypa, IP ýa-da programma ýaly däl';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '# serwerleri hem öz gezeginde',
-      one: '# serweri hem öz gezeginde',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -521,9 +517,6 @@ class STk extends S {
   String get tunnelMode => 'Reodeim';
 
   @override
-  String get tunnelTun => 'Traffichli traffik';
-
-  @override
   String get tunnelProxy => 'System proksi';
 
   @override
@@ -534,6 +527,9 @@ class STk extends S {
 
   @override
   String get launchAtLogin => 'Ulgamdan başlaň';
+
+  @override
+  String get launchAtLoginDetail => 'Ulgama gireniňizde Sora awtomatiki işe girizer we lotoqda galar.';
 
   @override
   String get closeToTray => 'Closedapylanda tarelde saklaň';
@@ -634,28 +630,6 @@ class STk extends S {
   String get less => 'Az';
 
   @override
-  String get currentServer => 'Häzirki serwer';
-
-  @override
-  String get trafficDown => 'Göçürildi';
-
-  @override
-  String get trafficUp => 'Edüklendi';
-
-  @override
-  String perSecond(String value) {
-    return '$value / s';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'Işjeň düzgünler: $count';
-  }
-
-  @override
-  String get recentNotifications => 'Soňky bildirişler';
-
-  @override
   String get notificationsEmpty => 'Baglanyşyk we abuna wakalary şu ýerde peýda bolar';
 
   @override
@@ -709,22 +683,13 @@ class STk extends S {
   String get runningProcesses => 'Işleýiş amallary';
 
   @override
-  String get programsFailed => 'Goýmalary ýükläp bolmady';
-
-  @override
   String get programsEmpty => 'Programmalar tapylmady Başga bir at synap görüň.';
 
   @override
   String get selectExe => '.Exe faýly saýlaň';
 
   @override
-  String get trafficUnavailable => 'Hasaplaýjylar entek elýeterli däl';
-
-  @override
   String get speedtest => 'Tizlik';
-
-  @override
-  String get speedtestCheck => 'Tizligi barlaň';
 
   @override
   String get speedtestSearch => 'Hyzmat tapyň';
@@ -818,6 +783,39 @@ class STk extends S {
       'Barlanylan paketleri gurmak üçin bu buýrugy terminalda işlediň, soňra Sora açyň. Faýllar göçürip almak katalogynda galýarlar. VPN birikmesi peseler.';
 
   @override
+  String get updateSignaturePending =>
+      'Täzelenme faýllary goýberiliş bilen çap edilen barlag jemleri bilen deňeşdirilýär.';
+
+  @override
+  String get updateManualSigWarning =>
+      'Aşakdaky faýllar goýberilişiň barlag jemlerine laýyk gelýär. Olary resmi goýberilişden ýükläp alan bolsaňyz, buýrugy ýerine ýetiriň.';
+
+  @override
+  String get updateVersionRevoked =>
+      'Dörediji bu wersiýany yzyna aldy. Düzedilen goýberilişine garaşmagyňyzy haýyş edýäris.';
+
+  @override
+  String get updateRolloutPending => 'Täze wersiýa kem-kemden çykýar we size awtomatiki usulda hödürlener.';
+
+  @override
+  String updateRollbacking(String version) {
+    return '$version wersiýasyna gaýtarylýar...';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return '$version täzelenmesi işleýiş barlagyndan geçmedi, şonuň üçin Sora $fromVersion wersiýasyna gaýtaryldy.';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'Awtomatiki yza gaýtmak şowsuz. Täze wersiýa işlemese, öňki goýberilişi el bilen täzeden guruň.';
+
+  @override
+  String get updateRollbackCacheError =>
+      'Häzirki wersiýanyň tassyklanan yzyna gaýtarylan nusgasyny taýýarlap bolmady, şonuň üçin täzelenme gurulmady.';
+
+  @override
   String get updateCopyCommand => 'Buýrugy göçüriň';
 
   @override
@@ -842,9 +840,6 @@ class STk extends S {
   String get componentLicenses => 'Komponent ygtyýarnamalary';
 
   @override
-  String get appCopyright => '© 2026 levvs-one we goşant goşanlar';
-
-  @override
   String get collapseServers => 'Serwerleri ýykyň';
 
   @override
@@ -861,10 +856,6 @@ class STk extends S {
 
   @override
   String get reconnectNow => 'Goşuň we gaýtadan birikdiriň';
-
-  @override
-  String get bypassLimitations =>
-      'Bu re DPim diňe HTTP we TLS üçin DPI-den geçýär, UDP-ni goldamaýar ýa-da IP-ni üýtgetmeýär. Discord sesi, jaňlary we bloklanan Telegram salgylary üçin VPN serwerini ulanyň.';
 
   @override
   String get errEngineUnsupported =>
@@ -900,7 +891,438 @@ class STk extends S {
   String get extensions => 'Giňeldişler';
 
   @override
-  String get extensionsSoon => 'Soonakynda';
+  String extRatingLabel(String rating) {
+    return '5-den baha $rating';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return '$author';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'Gurnamalar: $count';
+  }
+
+  @override
+  String get extInstallOne => '1 gurmak';
+
+  @override
+  String get extBadgeVerified => 'Barlandy';
+
+  @override
+  String get extBadgeTop => 'Şu hepde iň meşhur';
+
+  @override
+  String get extBadgeNew => 'Täze';
+
+  @override
+  String get extBadgeStaff => 'Sora topary';
+
+  @override
+  String get extSideloadShort => 'Katalogdan däl';
+
+  @override
+  String get extSideloadWarning =>
+      'Bu giňeldiş toparyň katalogyndan däl. Awtor öz açaryny diňe özi tassyklaýar: diňe awtora ynanýan bolsaňyz gurnaň.';
+
+  @override
+  String extInstallTitle(String name) {
+    return '«$name» gurna';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return '«$name» täzele';
+  }
+
+  @override
+  String get extPermissionsIntro => 'Bu giňeldiş aşakdakylary edip biler:';
+
+  @override
+  String get extPermissionsWidened => 'Täzelenme täze rugsatlar soraýar:';
+
+  @override
+  String get extDangerousAck => 'Bu rugsatlaryň çynlakaýdygyna düşünýärin';
+
+  @override
+  String get extInstall => 'Gurna';
+
+  @override
+  String get extUpdate => 'Täzele';
+
+  @override
+  String get extCancel => 'Ýatyr';
+
+  @override
+  String get extConfirm => 'Tassykla';
+
+  @override
+  String get extOk => 'OK';
+
+  @override
+  String get extCatalog => 'Katalog';
+
+  @override
+  String get extInstalled => 'Gurlan giňeltmeler';
+
+  @override
+  String get extSearchHint => 'Giňeldişleri gözle';
+
+  @override
+  String get extCatAll => 'Hemmesi';
+
+  @override
+  String get extCatTools => 'Gurallar';
+
+  @override
+  String get extCatThemes => 'Temalar';
+
+  @override
+  String get extCatAutomation => 'Awtomatlaşdyryş';
+
+  @override
+  String get extCatStats => 'Statistika';
+
+  @override
+  String get extCatNetwork => 'Tor';
+
+  @override
+  String get extSortBy => 'tertipläň';
+
+  @override
+  String get extSortPopular => 'Iň meşhur';
+
+  @override
+  String get extSortRating => 'Iň ýokary baha';
+
+  @override
+  String get extSortName => 'Ady';
+
+  @override
+  String get extCatalogError => 'Katalogy ýükläp bolmady';
+
+  @override
+  String get extRetry => 'Gaýtadan synanyş';
+
+  @override
+  String get extEmptySearch => 'Hiç zat tapylmady';
+
+  @override
+  String get extEmptyInstalled => 'Entek giňeltmeler ýok.\nKatalogdan birini tapyň ýa-da bir faýldan guruň.';
+
+  @override
+  String get extInstallFromFile => 'Faýldan guruň';
+
+  @override
+  String get extInstallFromUrl => 'URL-dan guruň';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'Göçürip al';
+
+  @override
+  String get extDownloading => 'Göçürilip alynýar…';
+
+  @override
+  String get extVerifying => 'Barlanylýar…';
+
+  @override
+  String get extInstalling => 'Gurnalýar…';
+
+  @override
+  String get extInstallFailed => 'Gurmak şowsuz';
+
+  @override
+  String get extErrSignature => 'Gol barlagy şowsuz boldy. Faýl zaýalanan ýa-da üýtgedilen bolup biler.';
+
+  @override
+  String get extErrManifest => 'Giňeldiş manifesti nädogry.';
+
+  @override
+  String get extErrNetwork => 'Tor ýalňyşlygy. Baglanyşygyňyzy barlaň we gaýtadan synanyşyň.';
+
+  @override
+  String get extErrHash => 'Göçürilen faýl katalogdakysyna gabat gelmeýär. Ol üýtgedilen bolup biler.';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'Bu giňeltme $version ýa-da has täze programma wersiýasy gerek.';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'Diňe https:// baglanyşyklara rugsat berilýär';
+
+  @override
+  String get extErrGeneric => 'Bir zat nädogry boldy. Gaýtadan synanyşmagyňyzy haýyş edýäris.';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'Bu täzelenme, gurnalan wersiýadan başga awtor açary bilen gol çekildi, şonuň üçin ol petiklendi. Täze açara ynanýan bolsaňyz, giňeltmäni aýyryň we aç-açan guruň.';
+
+  @override
+  String get extUpdateAvailable => 'Täzelenme elýeterli';
+
+  @override
+  String get extDisabled => 'Öçürilen';
+
+  @override
+  String extToggleEnabled(String name) {
+    return '$name işlediň';
+  }
+
+  @override
+  String get extSearchInstalled => 'Gurnalan giňeldişleri gözle';
+
+  @override
+  String get extUpdateAll => 'Hemmesini täzeläň';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return '$count täzelenmeler bar';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return '$count täzelendi';
+  }
+
+  @override
+  String get extRiskNormal => 'Adaty';
+
+  @override
+  String get extRiskSensitive => 'Duýgur';
+
+  @override
+  String get extRiskDangerous => 'Ýokary töwekgelçilik';
+
+  @override
+  String get extPermissionsRemoved => 'Indi soralmaýar:';
+
+  @override
+  String get extUpdateFailedKept => 'Öňki wersiýasy henizem gurnalan.';
+
+  @override
+  String get extConflictsTitle => 'Giňeldiş gapma-garşylyklary';
+
+  @override
+  String get extConflictsIntro =>
+      'Bu giňeltmeler şol bir zady isleýär. Haýsysynyň işlejegini saýlaň, beýlekisi gurnalgy galar.';
+
+  @override
+  String get extConflictTheme => 'Programma mowzugy';
+
+  @override
+  String get extConflictNetHooks => 'Tor çeňňekleri';
+
+  @override
+  String extConflictWinner(String name) {
+    return 'Ileri tutulýar: $name';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return '$count dawalary siziň kararyňyza mätäç';
+  }
+
+  @override
+  String get extConflictsResolve => 'Dawa-jenjelleri çözüň';
+
+  @override
+  String get extConflictNote =>
+      'Saýlawyňyz şu enjamda saklanýar. Tema derrew çalşýar, tor hook-lary bu wersiýada işlemeýär.';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'Wersiýa $version';
+  }
+
+  @override
+  String get extAuthor => 'Awtory';
+
+  @override
+  String get extRating => 'Reýting';
+
+  @override
+  String get extInstalls => 'Gurnamalar';
+
+  @override
+  String get extVersion => 'Wersiýa';
+
+  @override
+  String get extAbout => 'Bu giňeltme hakda';
+
+  @override
+  String get extPermissionsTitle => 'Rugsatlar';
+
+  @override
+  String get extNoPermissions => 'Ýörite rugsatlar gerek däl.';
+
+  @override
+  String get extSettings => 'Sazlamalar';
+
+  @override
+  String get extSaveSettings => 'Sazlamalary ýazdyryň';
+
+  @override
+  String get extSaving => 'Saklanylýar…';
+
+  @override
+  String extUpdateTo(String version) {
+    return '$version wersiýasyna täzele';
+  }
+
+  @override
+  String get extEnabled => 'Işjeň';
+
+  @override
+  String extRollbackTo(String version) {
+    return '$version wersiýasyna gaýtar';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return '$version wersiýasyna gaýdyp gelmek?';
+  }
+
+  @override
+  String get extUninstall => 'Aýyr';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return '“$name” we onuň sazlamalaryny aýyryň?';
+  }
+
+  @override
+  String get extPanelUnavailable => 'Panel elýeterli däl. Giňeldiş öçürilen ýa-da aýrylan bolmagy mümkin.';
+
+  @override
+  String get extPermConnectionsRead => 'Işjeň birikmeleriň sanawyna serediň';
+
+  @override
+  String get extPermServersRead => 'Serwerleriňiziň sanawyna serediň';
+
+  @override
+  String get extPermSettingsRead => 'Programma sazlamalaryny okaň';
+
+  @override
+  String get extPermSettingsWrite => 'Programma sazlamalaryny üýtgediň';
+
+  @override
+  String get extPermNotifications => 'Duýduryşlary görkeziň';
+
+  @override
+  String get extPermTray => 'Ulgam treýiniň menýusyna element goşmak';
+
+  @override
+  String get extPermUiPanel => 'Programmanyň içinde panelleri görkeziň';
+
+  @override
+  String get extPermThemeApply => 'Mowzuklary ulanyň';
+
+  @override
+  String get extPermRoutingRules => 'Ugurlandyryş düzgünlerini goşmak (tor trafiginiň ugruna täsir edýär)';
+
+  @override
+  String get extPermNetHooks => 'Tor ýoluna goşulyň (DPI aýlaw modullary)';
+
+  @override
+  String get extPermNetFetch => 'Rugsat berlen sanawdan URL haýyş';
+
+  @override
+  String get extPermBackground => 'Fon meselelerini işlediň';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'Panel ýapylanda-da meýilleşdirilen işleri ýerine ýetirýär. Ony duruzyp ýa-da giňeltme sazlamalarynda näçe gezek işleýändigini üýtgedip bilersiňiz.';
+
+  @override
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+
+  @override
+  String get extCapBackground => 'Fonda işleýär';
+
+  @override
+  String get extCapNetHook => 'Böwetden aýlanyp geçiş we tor hook-lary';
+
+  @override
+  String get extCapPanel => 'Interfeýs panelleri';
+
+  @override
+  String get extCapRouting => 'Ugurlandyryş düzgünleri';
+
+  @override
+  String get extCapTheme => 'Temalar';
+
+  @override
+  String get extCapWidget => 'Widjetler';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Cached catalog, $date';
+  }
+
+  @override
+  String get extChangelog => 'Üýtgeşmeleriň taryhy';
+
+  @override
+  String get extImageFailed => 'Suraty ýükläp bolmady';
+
+  @override
+  String get extRatingHow => 'Reýtingleriň nähili işleýändigi';
+
+  @override
+  String get extRatingHowBody =>
+      'Reýtingler Baýziýanyň ortaça derejesini ulanýar: az bahaly giňeltme, köp adam ses berýänçä ortada galar, şonuň üçin 5 ýyldyzly ýekeje syn täze uzaldyşy ýokarsyna çykaryp bilmez. Soňky reýtingleriň agramy köne bahalardan has köp we hasap üçin diňe bir reýting hasaplanýar.';
+
+  @override
+  String get extScreenshots => 'Ekran suratlary';
+
+  @override
+  String get extSortRelevance => 'Degişlilik';
+
+  @override
+  String get extPermNetworkDetail =>
+      'Internetden VPN arkaly maglumat alýar. Diňe aşakdaky sanawdaky hostlara rugsat berilýär, galanlary bloklanýar.';
+
+  @override
+  String get extBgTitle => 'Fon işi';
+
+  @override
+  String get extBgEnabled => 'Fonda işletmek';
+
+  @override
+  String get extBgInterval => 'Işletmek aralygy';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minut', one: '# minut');
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# sagat', one: '# sagat');
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote =>
+      'Sora açyk wagty, şol sanda traýda wagty hem, tabşyryk meýilnama boýunça işleýär. Iň gysga aralyk 15 minut.';
+
+  @override
+  String get extBgDisabledNote => 'Fon işini dolandyrmak üçin giňeldişi işjeňleşdiriň.';
+
+  @override
+  String get extCapNetwork => 'Tora giriş';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'Tor: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -909,6 +1331,659 @@ class STk extends S {
 
   @override
   String get diagnosticHttp => 'HTTP anyklaýyş';
+
+  @override
+  String get diagnosticNoData => 'Entek ýazylan haýyş ýok. Ilki bilen tizlik synag web sahypasyny açyň.';
+
+  @override
+  String get qrShareTitle => 'QR kody paýlaşyň';
+
+  @override
+  String get qrScanTitle => 'QR kody skanirläň';
+
+  @override
+  String get qrCopyLink => 'Baglanyşygy göçüriň';
+
+  @override
+  String get qrShowLink => 'Baglanyşyk görkeziň';
+
+  @override
+  String get qrHideLink => 'Baglanyşygy gizläň';
+
+  @override
+  String get qrWarning => 'Bu QR kody birikme maglumatlaryny öz içine alýar. Nätanyş adamlara görkezmäň.';
+
+  @override
+  String get qrScanHint => 'QR kodly ekran suratyny ýa-da suraty saýlaň, ýa-da salgyny goýuň';
+
+  @override
+  String get qrFromClipboard => 'Buferden goýuň';
+
+  @override
+  String get qrNoCode => 'Bu suratda QR kod tapylmady.';
+
+  @override
+  String get qrInvalid => 'Bu QR kody dogry baglanyşyk ýok.';
+
+  @override
+  String get qrScan => 'Skaner QR';
+
+  @override
+  String get qrFromImage => 'Suraty aç';
+
+  @override
+  String get connGroupByProcess => 'Amal boýunça topar';
+
+  @override
+  String get connListView => 'Sanaw görnüşinde';
+
+  @override
+  String get connCopyHost => 'Host adyny göçür';
+
+  @override
+  String get connAddRule => 'Düzgün goşuň';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# birikme', one: '# birikme');
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'Öňünden bellemek';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'Şahsy';
+
+  @override
+  String get dnsCheck => 'Maglumatlaryň syzýandygyny barlaň';
+
+  @override
+  String get dnsChecking => 'Barlamak ...';
+
+  @override
+  String get dnsNoLeak => 'Syzdyrmalar tapylmady';
+
+  @override
+  String get dnsLeakFound => 'Syzma tapyldy';
+
+  @override
+  String get dnsLastCheck => 'Soňky barlag';
+
+  @override
+  String get dnsNeverChecked => 'Entek synagdan geçirilmedi';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'Tuneliň DNS çözüjileri';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'Ulgamyň at çözüjileri';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'Tor gulpynyň DNS goragy';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'Ýokardaky DNS sazlamalarynda tuneliň DNS-ini belläň.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Ulgamyňyzyň tunelden daşarda haýsy çözgütleri ulanjakdygyny barlaň.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS trafiginiň tunelde galmagy üçin tor gulpyny açyň.';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'Ulgamyň şifrlenen DNS-i';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'Galp DNS jogaplar';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => 'Ulgamyň tuneliň daşynda ulanýan haýsy kodlanan DNS nokatlaryny barlaň.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'At çözüjiler jogaplary galplaşdyryp bilmez ýaly, tunelde şifrlenen DNS (DoT ýa-da DoH) ulanyň.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Ilki VPN birikdiriň, soňra syzyşlary barlaň.';
+
+  @override
+  String get dnsExpected => 'Garaşylýar';
+
+  @override
+  String get dnsActual => 'Syn edildi';
+
+  @override
+  String get sortBy => 'tertipläň';
+
+  @override
+  String get sortPing => 'Ping';
+
+  @override
+  String get sortSpeed => 'Tizlik';
+
+  @override
+  String get sortName => 'Ady';
+
+  @override
+  String get measureSpeed => 'Tizligi ölçäň';
+
+  @override
+  String get benchmarkStale => 'köne';
+
+  @override
+  String get autoSelectMode => 'Serweri awtomatiki saýlaň';
+
+  @override
+  String get autoSelectPing => 'Iň çalt ping';
+
+  @override
+  String get autoSelectSpeed => 'Iň çalt tizlik';
+
+  @override
+  String get autoSelectSmart => 'Akylly saýlaw';
+
+  @override
+  String get coreWatchUnstable => 'Sora ýadrosyna birikmek durnuksyz';
+
+  @override
+  String get watchReconnect => 'Täzeden birik';
+
+  @override
+  String get coreRestoringLink => 'Sora ýadrosyna birikmäni dikeltmek…';
+
+  @override
+  String get crashRestoreTitle => 'Soňky sessiýa kesildi';
+
+  @override
+  String get restoreOnCrash => 'Näsazlykdan soň sessiýany dikeltmek';
+
+  @override
+  String get crashRestore => 'Dikelt';
+
+  @override
+  String get crashDismiss => 'Häzir däl';
+
+  @override
+  String get overrideTitle => 'Düzedişlerim';
+
+  @override
+  String get overrideEdit => 'Serwerleri redaktirläň';
+
+  @override
+  String get overrideHide => 'Gizle';
+
+  @override
+  String get overrideUnhide => 'Görkez';
+
+  @override
+  String get overrideClear => 'Üýtgetmeleri täzeden düzüň';
+
+  @override
+  String get overrideEmpty => 'Entek redaktirleme ýok';
+
+  @override
+  String get overrideCustomRules => 'Öz düzgünleriňiz';
+
+  @override
+  String get errBenchmarkUnsupported => 'Tizligi ölçemek has täze ýadro gerek';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return '$total-den $done ölçemek…';
+  }
+
+  @override
+  String get profiles => 'Tor profilleri';
+
+  @override
+  String get profilesEmpty => 'Entek profil ýok. Belli ulgamlarda sazlamalary awtomatiki ulanmak üçin birini dörediň.';
+
+  @override
+  String get profileAdd => 'Profil goşuň';
+
+  @override
+  String get profileName => 'Profiliň ady';
+
+  @override
+  String get profileSsids => 'Wi-Fi torlary (SSID)';
+
+  @override
+  String get profileSsidsHint => 'Öý, ofis vergul bilen bölünýär';
+
+  @override
+  String get profileGateways => 'Tor şlýuzalary';
+
+  @override
+  String get profileAsns => 'AS sanlar';
+
+  @override
+  String get profileAutoApply => 'Awtomatiki ulanmak';
+
+  @override
+  String get profileAutoApplyHint => 'Öçürilen bolsa, profili ulanmazdan öň tassyklama soralýar.';
+
+  @override
+  String get profileSnapshot => 'Häzirki sazlamalary ýadyňyzda saklaň';
+
+  @override
+  String get profileSnapshotDone => 'Häzirki sazlamalar profilde saklanýar';
+
+  @override
+  String get profileDelete => 'Profili pozuň';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return '\"$name\" profilini pozuň?';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return '\"$name\" profilini ulanyň?';
+  }
+
+  @override
+  String get profileApply => 'Ulan';
+
+  @override
+  String profileApplied(Object name) {
+    return '“$name” profil ulanylýar';
+  }
+
+  @override
+  String get profileUndo => 'Yza al';
+
+  @override
+  String get profileActive => 'Işjeň';
+
+  @override
+  String networkNow(Object info) {
+    return 'Indi: $info';
+  }
+
+  @override
+  String get networkUnknown => 'Ulgam maglumatlary elýeterli däl';
+
+  @override
+  String get profileNoTriggers => 'Iň azyndan bir trigger goşuň: SSID, şlýuz ýa-da ASN';
+
+  @override
+  String get chains => 'Proksi zynjyrlary';
+
+  @override
+  String get chainsEmpty => 'Entek zynjyr ýok. 2-3 serweri baglanyşdyryň, şonuň üçin olaryň hersinden trafik çykýar.';
+
+  @override
+  String get chainAdd => 'Täze zynjyr';
+
+  @override
+  String get chainName => 'Zynjyryň ady';
+
+  @override
+  String get chainPickServers => '2-3 serwer saýlaň';
+
+  @override
+  String get chainOrderHint => 'Tertibe salmak üçin süýräň: traffik ýokarsyna girýär we aşagyndan çykýar.';
+
+  @override
+  String get chainTooFew => 'Iň azyndan 2 serwer saýlaň';
+
+  @override
+  String get chainTooMany => 'Zynjyr iň köp 3 serwerde saklanýar';
+
+  @override
+  String get chainEstimate => 'Takmynan gijä galmak';
+
+  @override
+  String get chainSave => 'Zynjyry sakla';
+
+  @override
+  String get chainDelete => 'Zynjyry pozuň';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return '\"$name\" zynjyry pozuň?';
+  }
+
+  @override
+  String get chainUnsupported => 'Häzirki motor zynjyr gurup bilmeýär';
+
+  @override
+  String get chainHopMissing => 'Zynjyr serwerlerinden biri indi elýeterli däl';
+
+  @override
+  String chainHop(Object n) {
+    return 'Geçiş $n';
+  }
+
+  @override
+  String get chainEntry => 'Giriş';
+
+  @override
+  String get chainExit => 'Çykyş';
+
+  @override
+  String get sync => 'Enjamyň sinhronizasiýasy';
+
+  @override
+  String get syncDevices => 'Enjamlarym';
+
+  @override
+  String get syncEmpty => 'Jübütlenen enjam ýok. Ýerli tor arkaly başga enjamy jübütläň.';
+
+  @override
+  String get syncPair => 'Enjamy jübütle';
+
+  @override
+  String get syncShowCode => 'Kody görkez';
+
+  @override
+  String get syncScanCode => 'Kody skanirle';
+
+  @override
+  String get syncRevoke => 'Ygtyýaryny ýatyr';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return '\"$name\" ýatyryň?';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'Soňky sinhronlamak: $time';
+  }
+
+  @override
+  String get syncNever => 'Hiç haçan';
+
+  @override
+  String get syncNoLan => 'Enjamlar şol bir ýerli ulgamda bolmaly';
+
+  @override
+  String get syncPaired => 'Enjam jübütlendi';
+
+  @override
+  String get syncPairingTitle => 'Bu enjam bilen jübütläň';
+
+  @override
+  String get syncWaiting => 'Beýleki enjama garaşmak…';
+
+  @override
+  String get syncSecureNote => 'Kanal uçdan-uja şifrlenen. Hasap we bulut serwerleri gerek däl.';
+
+  @override
+  String get zapretWithVpn => 'Göni tor trafigi üçin süzgüçden DPI aýlaň';
+
+  @override
+  String get zapretWithVpnHint =>
+      'zapret VPN tuneli bilen bir wagtda işleýär: tuneliň trafigi VPN arkaly, göni trafik bolsa böwetden aýlanyp geçiş serişdesi arkaly geçýär.';
+
+  @override
+  String get chainDuplicate => 'Her serwer diňe bir gezek peýda bolup biler';
+
+  @override
+  String get edit => 'Redaktirläň';
+
+  @override
+  String get remove => 'Aýyr';
+
+  @override
+  String get autoSwitchOnDegrade => 'Hil pese düşende awtomatiki geçmek';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'Saýlanan serwer ep-esli haýallasa ýa-da jogap bermese, Sora ölçeg boýunça iň gowy serwere geçýär, ýöne her 10 minutda bir gezekden köp däl.';
+
+  @override
+  String get tunStackMixed => 'Garyşyk';
+
+  @override
+  String get tunStackSystem => 'Ulgam';
+
+  @override
+  String get customServerAdd => 'Şahsy serwer goş';
+
+  @override
+  String get customServers => 'Serwerlerim';
+
+  @override
+  String get customServerName => 'Ady';
+
+  @override
+  String get customServerNameHint => 'Mysal üçin: meniň VPS';
+
+  @override
+  String get customServerNameRequired => 'Adyny giriziň';
+
+  @override
+  String get customServerAddress => 'Salgysy';
+
+  @override
+  String get customServerAddressHint => 'example.com ýa-da 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'Serweriň salgysyny giriziň';
+
+  @override
+  String get customServerAddressInvalid => 'Nädogry salgy';
+
+  @override
+  String get customServerPort => 'Port';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'Port 1-den 65535-e çenli san bolmaly';
+
+  @override
+  String get customServerProtocol => 'Protokol';
+
+  @override
+  String get customServerCredentials => 'Giriş maglumatlary';
+
+  @override
+  String get customServerOptional => 'Hökmany däl';
+
+  @override
+  String get customServerShowSecret => 'Gizlin maglumaty görkez';
+
+  @override
+  String get customServerHideSecret => 'Gizlin maglumaty gizle';
+
+  @override
+  String get customServerBadge => 'şahsy';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return '“$name” serwerini pozuň?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'Serweri el bilen goşuň: salgy, port we protokol';
+
+  @override
+  String get customServerTest => 'Synag';
+
+  @override
+  String get leakTestTitle => 'Maglumatlaryň syzmagy üçin synag';
+
+  @override
+  String get leakTestIntro =>
+      'Trafigiň enjamdan tuneliň daşyndan çykyp bilýändigini barlaýar: göni DNS we ICMP talaplary, IPv6 çykyşy we ulgamyň at çözüjileri. Birikme işjeň wagty işlediň.';
+
+  @override
+  String get leakTestRun => 'Barlaň';
+
+  @override
+  String get leakTestCancel => 'Ýatyr';
+
+  @override
+  String get leakTestNeedsConnection => 'Maglumatlaryň syzmagyny barlamak üçin VPN birikdiriň.';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'Synaglar tamamlandy: $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'Syzdyrmalar tapylmady';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# syzma tapyldy', one: '# syzma tapyldy');
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
+
+  @override
+  String get leakTestFix => 'düzediň';
+
+  @override
+  String get leakTestFixedNote => 'Tor gulpy açyk. Barlamak üçin synagy gaýtadan işlediň.';
+
+  @override
+  String get leakTestCheckDirectDns => 'Göni DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP ýaňlanýar';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'Ulgamyň at çözüjileri';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'Tuneliň birikmesi';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS tuneliň üsti bilen';
+
+  @override
+  String get noticeDegraded => 'Serwer haýal boldy. Sora ölçeg wagtynda tapylan iň gowy serwere geçdi.';
+
+  @override
+  String get obfs => 'Trafigi gizlemek';
+
+  @override
+  String get syncCodeExpired => 'Kodyň möhleti gutardy';
+
+  @override
+  String get syncDaemonFailed => 'Sinhronlamak hyzmatyny başlap bolmady';
+
+  @override
+  String get syncDaemonMissing => 'sora-sync komponenti tapylmady. Enjamy sinhronlamak üçin programmany täzeden guruň.';
+
+  @override
+  String get syncDaemonStarting => 'Sinhronlamak hyzmatyna başlamak…';
+
+  @override
+  String get syncErrAuth =>
+      'Sinhronlamak hyzmaty giriş belligini ret etdi. Programmany täzeden açyň we gaýtadan synanyşyň.';
+
+  @override
+  String get syncErrNotFound => 'Enjam indi jübütlenenok';
+
+  @override
+  String get syncErrPairingActive => 'Jübütlemek sessiýasy eýýäm açyk';
+
+  @override
+  String get syncErrUnreachable => 'Beýleki enjam jogap bermedi. Şol bir torda we koduny görkezýändigine göz ýetiriň.';
+
+  @override
+  String get syncError => 'Sinhronizasiýa säwligi';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'Kodyň möhleti $duration soň gutarýar';
+  }
+
+  @override
+  String get syncJoining => 'Enjam bilen jübütlemek…';
+
+  @override
+  String get syncLegacyCleared =>
+      'Köne enjamlaryň sanawy aslynda jübütlenmedi, şonuň üçin arassalandy. Enjamlaryňyzy täzeden jübütläň, bu gezek hakyky.';
+
+  @override
+  String get syncNewCode => 'Täze kod';
+
+  @override
+  String syncPairedWith(String name) {
+    return '$name bilen jübüt';
+  }
+
+  @override
+  String get syncRetry => 'Gaýtadan synanyş';
+
+  @override
+  String get syncStopShowing => 'Kody gizle';
+
+  @override
+  String get syncSyncNow => 'Häzir sinhronla';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return 'Alyndy: $pulled, iberildi: $pushed';
+  }
+
+  @override
+  String get syncResultTitle => 'Sinhronizasiýa netijesi';
+
+  @override
+  String get syncPulled => 'Alyndy';
+
+  @override
+  String get syncPushed => 'Iberildi';
+
+  @override
+  String get syncNoChanges => 'Hiç hili üýtgeşme tapylmady';
+
+  @override
+  String get syncDocKindSubscriptions => 'Abunalar';
+
+  @override
+  String get syncDocKindSettings => 'Programma sazlamalary';
+
+  @override
+  String get syncDocKindOverrides => 'Abunalaryň şahsy üýtgetmeleri';
+
+  @override
+  String get syncDocKindProfiles => 'Tor profilleri';
+
+  @override
+  String get syncDocKindChains => 'Proksi zynjyrlary';
+
+  @override
+  String syncFrom(String name) {
+    return '$name enjamyndan';
+  }
+
+  @override
+  String get syncThisDevice => 'Bu enjam';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Shadowsocks üçin: usul:açar sözi, mysal üçin chacha20-ietf-poly1305:password';
 
   @override
   String get diagnosticPackets => 'Paket almak';
@@ -920,11 +1995,60 @@ class STk extends S {
   String get diagnosticCapture => '10 sekuntlap ​​surata düşüriň';
 
   @override
-  String get diagnosticNoData => 'Entek ýazylan haýyş ýok. Ilki bilen tizlik synag web sahypasyny açyň.';
-
-  @override
   String get diagnosticRequiresTun => 'Paket almak üçin işjeň Sora TUN birikmesi gerek.';
 
   @override
   String get diagnosticUnavailable => 'Bu anyklaýyş bu platformada elýeterli däl.';
+
+  @override
+  String get extErrRevoked => 'Sora topary bu giňeltmäniň wersiýasyny howply ýa-da bozuk bolany üçin yzyna aldy.';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'Yzyna alnan giňeltmeleriň sanawyny täzeläp bolmady. Täzelenýänçä gurnamak ýapyk: tory barlaň we täzeden synanyşyň.';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'Yzyna alnan giňeltmeler öçürildi: $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'Gizlin açar';
+
+  @override
+  String get customServerWgAddresses => 'Interfeýs salgylary';
+
+  @override
+  String get customServerWgPeerKey => 'Serweriň açyk açary';
+
+  @override
+  String get customServerWgPresharedKey => 'Umumy açar';
+
+  @override
+  String get customServerWgAllowedIps => 'Rugsat berlen IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, sekunt';
+
+  @override
+  String get customServerWgKeyInvalid => 'Açar wg genkey çykarşy ýaly base64-de 32 baýt bolmaly.';
+
+  @override
+  String get customServerWgCidrInvalid => 'Otur bilen bölünen prefiksleri giriziň, meselem 10.0.0.2/32.';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0-dan 65535-e çenli sekunt sanyny giriziň.';
+
+  @override
+  String get strictKillSwitch => 'Berk tor gulpy';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'Birikdirilenden soň näsazlyk, gaýtadan başlatmak ýa-da programmadan çykmak wagtynda hem VPN-den daşarky traffigi petikleýär. Giriş diňe baglanyşyk kesilende ýa-da bu sazlama öçürilende dikeldilýär. Enjam gaýtadan açylanda petikleme diňe başlangyçda birikmek işjeň bolsa dowam edýär.';
+
+  @override
+  String get extWorkerFailed => 'Giňeltmäniň fon işi şowsuz boldy. Giňeltmäniň ýazgylaryny barlaň.';
+
+  @override
+  String get extAssetRejected => 'Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler.';
 }

@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package sora.censor.v1;
+
+
+option go_package = "github.com/levvs-one/sora-client/core/gen/sora/censor/v1;censorv1";
+
+
+// Reserved RPC name (censor): /sora.censor.v1.CensorControl/DetectCensorship.
+
+// These wire identities belong to the excluded censor subsystem.
+
+enum CensorshipKind {
+  // Reserved for censor.
+  CENSORSHIP_KIND_UNSPECIFIED = 0;
+  reserved 1, 2, 3, 4, 5, 6, 7, 8;
+  reserved "CENSORSHIP_KIND_UNKNOWN", "CENSORSHIP_KIND_NO_INTERFERENCE", "CENSORSHIP_KIND_RST_INJECTION", "CENSORSHIP_KIND_HANDSHAKE_TIMEOUT", "CENSORSHIP_KIND_DNS_POISONING", "CENSORSHIP_KIND_SNI_BLOCKING", "CENSORSHIP_KIND_IP_BLOCKING", "CENSORSHIP_KIND_DATA_STALL";
+}
+
+enum AttemptStage {
+  // Reserved for censor.
+  ATTEMPT_STAGE_UNSPECIFIED = 0;
+  reserved 1, 2, 3, 4, 5;
+  reserved "ATTEMPT_STAGE_DNS", "ATTEMPT_STAGE_TCP", "ATTEMPT_STAGE_TLS", "ATTEMPT_STAGE_APP", "ATTEMPT_STAGE_DATA";
+}
+
+enum AttemptEventKind {
+  // Reserved for censor.
+  ATTEMPT_EVENT_KIND_UNSPECIFIED = 0;
+  reserved 1, 2, 3, 4, 5, 6, 7, 8, 9;
+  reserved "ATTEMPT_EVENT_KIND_RESOLVED", "ATTEMPT_EVENT_KIND_CONNECTED", "ATTEMPT_EVENT_KIND_SENT", "ATTEMPT_EVENT_KIND_RECEIVED", "ATTEMPT_EVENT_KIND_REMOTE_RESET", "ATTEMPT_EVENT_KIND_REMOTE_CLOSE", "ATTEMPT_EVENT_KIND_LOCAL_TIMEOUT", "ATTEMPT_EVENT_KIND_TLS_ALERT", "ATTEMPT_EVENT_KIND_ERROR";
+}
+
+message AttemptEvent {
+  // Reserved for censor.
+  reserved 1, 2, 3, 4;
+  reserved "stage", "kind", "offset_ms", "detail";
+}
+
+message ObfuscationProfileRef {
+  // Reserved for censor.
+  reserved 1, 2, 3;
+  reserved "preset", "display_name", "why";
+}
+
+message CensorshipVerdict {
+  // Reserved for censor.
+  reserved 1, 2, 3, 4, 5;
+  reserved "kind", "confidence", "suggested_profile", "explanation", "evidence";
+}
+
+message DetectCensorshipRequest {
+  // Reserved for censor.
+  reserved 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
+  reserved "api_version", "control_authenticator", "request_id", "session_id", "server_id", "target_host", "target_port", "sni", "protocol", "known_good_host", "events", "run_active_probe";
+}
+
+message DetectCensorshipResponse {
+  // Reserved for censor.
+  reserved 1, 2, 3;
+  reserved "verdict", "probe_ran", "error";
+}

@@ -5,7 +5,6 @@
   "stateConnected": "接続済み",
   "stateReconnecting": "再接続中",
   "stateDisconnecting": "切断中",
-  "stateFailed": "接続されていません",
   "coreMissing": "Sora サービスが応答していません",
   "serverAuto": "最速",
   "serverBypass": "サーバーがありません",
@@ -41,6 +40,7 @@
   "export": "ファイルに保存",
   "clear": "クリア",
   "logsEmpty": "ここには何もありません",
+  "connEmpty": "接続がありません",
   "appVersion": "バージョン {version}",
   "notInstalled": "インストールされていません",
   "sourceCode": "ソースコード",
@@ -75,17 +75,16 @@
   "errSubScheme": "リンクは https:// で始まる必要があります",
   "errSecretStore": "Sora ストレージが破損しているか使用できません",
   "errNoServers": "接続するサブスクリプションを追加する",
-  "exportText": "文章",
   "connections": "接続",
   "close": "近い",
   "chainDirect": "直接",
   "chainBlocked": "ブロックされました",
   "theme": "テーマ",
-  "themeSystem": "System",
+  "themeSystem": "システムに合わせる",
   "themeLight": "ライト",
   "themeDark": "暗い",
   "language": "言語",
-  "languageSystem": "System",
+  "languageSystem": "システムに合わせる",
   "sectionConnection": "繋がり",
   "sectionNoServer": "サーバーがありません",
   "sectionPing": "ピン",
@@ -149,11 +148,11 @@
   "trafficLow": "{name}: {left} 左",
   "ruleInvalid": "これはサイト、IP、プログラムのようには見えません",
   "tunnelMode": "モード",
-  "tunnelTun": "すべてのトラフィック",
   "tunnelProxy": "System プロキシ",
   "proxyAddress": "プロキシアドレス",
   "copied": "コピーされました",
   "launchAtLogin": "システムから始める",
+  "launchAtLoginDetail": "サインイン時に Sora が自動的に起動し、トレイに常駐します。",
   "closeToTray": "閉じた状態でトレイに保管してください",
   "notifications": "通知",
   "trayOpen": "Soraを開く",
@@ -185,12 +184,6 @@
   "sidebarToggle": "サイドバーの切り替え",
   "more": "もっと",
   "less": "少ない",
-  "currentServer": "現在のサーバー",
-  "trafficDown": "ダウンロード済み",
-  "trafficUp": "アップロードされました",
-  "perSecond": "{value}/秒",
-  "activeRules": "アクティブなルール: {count}",
-  "recentNotifications": "最近のお知らせ",
   "notificationsEmpty": "接続イベントとサブスクリプション イベントがここに表示されます",
   "retryConnect": "接続を再試行します",
   "openLogs": "ログを開く",
@@ -208,12 +201,9 @@
   "chooseProgram": "プログラムを選択してください",
   "installedApps": "インストールされているアプリケーション",
   "runningProcesses": "実行中のプロセス",
-  "programsFailed": "アプリケーションをロードできませんでした",
   "programsEmpty": "アプリケーションが見つかりませんでした。 別の名前を試してください。",
   "selectExe": ".exe ファイルを選択してください",
-  "trafficUnavailable": "カウンターはまだ利用できません",
   "speedtest": "スピード",
-  "speedtestCheck": "速度をチェックする",
   "speedtestSearch": "サービスを探す",
   "speedtestEmpty": "一致はありません。 検索を変更します。",
   "speedtestBackToList": "サービスに戻る",
@@ -245,19 +235,34 @@
   "updateCopyCommand": "コピーコマンド",
   "updateChecksDisabled": "自動チェックは設定で無効になっています。",
   "updateInstalled": "アップデートがインストールされました。 Soraを再度開きます。",
+  "@updateRollbacking": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateRolledBack": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "fromVersion": {
+        "type": "String"
+      }
+    }
+  },
   "projectLinks": "プロジェクト",
   "githubReleases": "リリースとダウンロード",
   "telegramChannel": "Telegram チャンネル",
   "licenses": "ライセンス",
   "componentLicenses": "コンポーネントライセンス",
-  "appCopyright": "© 2026 levvs-one および貢献者",
   "collapseServers": "サーバーを折りたたむ",
   "expandServers": "サーバーを拡張する",
   "hideDescription": "説明を隠す",
   "showDescription": "説明を表示",
   "pendingConnectionChanges": "これらの変更を適用するには、再接続してください。",
   "reconnectNow": "適用して再接続する",
-  "bypassLimitations": "このモードは HTTP と TLS に対してのみ DPI をバイパスし、UDP をサポートしたり、IP を変更したりすることはありません。 Discord 音声、通話、およびブロックされた Telegram アドレスには VPN サーバーを使用します。",
   "errEngineUnsupported": "選択したエンジンは、このプロファイルまたは設定をサポートしていません。 自動または互換性のあるエンジンを選択します。",
   "errRestore": "接続のクリーンアップが不完全でした。 切断を再試行してください。 詳細についてはログを参照してください。",
   "errSessionEnded": "このセッションはすでに終了しています。 接続状態を更新します。",
@@ -267,9 +272,8 @@
   "modesGuideTitle": "モードとエンジン",
   "probeServers": "サーバーを確認する",
   "expiresIn": "{name}: {days, plural, =0{サブスクリプションは数時間後に終了します} one{サブスクリプションは # 日に終了します} other{サブスクリプションはあと # 日で終了します}}",
-  "groupOrdered": "{count, plural, one{# サーバー、順番に} other{# サーバー、順番に}}",
   "groupBest": "{count, plural, one{# サーバー、最速} other{# サーバー、最速}}",
-  "modesGuide": "サーバーにどのエンジンが必要かわからない場合は、「自動」を選択してください。 Sora は接続前にプロファイルと設定を確認します。 エンジンはプランの帯域幅を増やすことはできません。パフォーマンスはサーバー、ルート、プロトコル、ネットワークに依存します。\n\n## モード\n\n### すべてのトラフィック (TUN)\n\nSora は、仮想ネットワーク インターフェイスを作成し、TCP や UDP などのアプリケーション トラフィックをそのインターフェイス経由でルーティングします。 このモードは、Telegram、ゲーム、および Discord 音声に使用します。 ルールでは、特定のサイトやプログラムを直接送信したり、ブロックしたりできます。 ネットワーク サービスには、許可と、必要なプロトコルをサポートするサーバーが必要です。\n\n### System プロキシ\n\nSora は、ローカル HTTP/SOCKS プロキシを構成します。 システムのプロキシ設定を尊重するアプリケーションはこれを使用します。 独自のネットワーク スタックを持つアプリケーションは直接接続できます。 UDP および音声通話には通常、TUN が必要です。 このモードは、プロキシをサポートするブラウザとアプリケーションに適しています。\n\n### サーバーがありません\n\nLinux では、Sora は [zapret](https://github.com/bol-van/zapret) を使用して HTTP/TLS リクエストを分割および再形成し、一部の DPI チェックをバイパスします。 IP は変更されず、接続は Web サイトに直接接続されます。 結果はプロバイダーとブロック方法によって異なります。\n\n現在の統合では、HTTP および TLS over TCP に tpws を使用します。 IP ブロッキングや UDP の中継はバイパスせず、Telegram の MTProto 接続を保証することはできません。 Discord 音声、Telegram 通話、およびこれらの種類の制限には、TUN を備えた VPN サーバーを使用します。\n\n## エンジン\n\n### 自動\n\nSora は、接続プラン全体 (サーバー プロトコル、トランスポート、グループ、フラグメンテーション、モード) をサポートする、インストールされているエンジンを選択します。 互換性のない手動選択は、現在の接続を停止する前に拒否されます。 [自動] または別のエンジンを選択し、設定を再度適用します。\n\n### sing-box\n\n新しい Sora パッケージには、[sing-box](https://github.com/SagerNet/sing-box) のフォークである [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) が含まれており、クライアント側 XHTTP および VLESS Encryption が追加されています。 Sora は、ビルドとその機能を認識します。 XHTTP のないアップストリーム ビルドでは、名前だけではこの機能が得られません。\n\n対応するプロトコルは VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard、および Sora が読み込める AmneziaWG 1.x/2.x のパラメーターです。完全な Xray JSON プロファイルには Xray が必要です。新しい AWG 3.x のフィールドはまだ読み込めません。sing-box はパスワードで保護されたローカル制御ポートを使用し、このポートは同じコンピューターの他のアプリから検出できます。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) は、VLESS、REALITY、XHTTP、VLESS Encryption、および TLS フラグメンテーションをサポートします。 また、ルーティングとグループを維持しながら、完全なプロバイダー Xray プロファイルを実行します。 このようなプロファイルは、動作を変更せずに別のエンジンに自動的に変換できません。\n\nバンドルされている Xray では、TLS 証明書の検証を無効にする設定 (`allowInsecure`) が削除されました。 この設定が必要な通常のサーバーでは、sing-box または mihomo が自動的に選択されます。 Xray を選択すると、現在の接続を停止する前に非互換性が手動で報告されます。 古い完全な JSON プロファイルには、検証可能な証明書または証明書 PIN を含む更新されたプロバイダー プロファイルが必要です。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) は、順序付けされたフォールバックおよび負荷分散グループ、XHTTP および AmneziaWG をサポートします。 バックアップ サーバーへの自動フェイルオーバーが重要な場合に選択してください。 Sora の TLS フラグメンテーション設定は、このエンジンでは使用できません。\n\n## Sora の互換性\n\n| 特集 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN と TCP/UDP | はい | はい | はい |\n| XHTTP | はい | はい | はい |\n| VLESS Encryption | はい | はい | はい |\n| Xray の全プロフィール | いいえ | はい | いいえ |\n| TUIC / AnyTLS | 両方 | いいえ | TUIC |\n| TLS フラグメンテーション | はい | はい | いいえ |\n| AmneziaWG 1.x/2.x | はい¹ | いいえ | はい |\n| 順序付けされたフォールバック グループ | いいえ | いいえ² | はい |\n\n¹ J1/J2/J3/Itime のプロファイルは mihomo を使用します。 これらのフィールドは決して黙って破棄してはなりません。 ² 完全な Xray プロファイルのグループの場合、アプリはバックアップ プロファイルを選択します。 サポートはインストールされているビルドによって異なります。 「バージョン情報」でバージョンを確認してください。\n\n## TUN スタック\n\nスタックは仮想インターフェイス内で TCP と UDP を処理します。 モード パネルでは、Xray および mihomo は、gVisor、System、Mixed、および MIPS を提供します。 各エンジンは独自の設定を保存します。 System プロキシ モードとサーバーレス モードでは、この設定は使用されません。\n\n- **Mixed** - TCP はシステム スタックを使用し、gVisor は UDP を処理します。 Linux では mihomo のデフォルトです。Windows では Xray と mihomo のデフォルトは MIPS です。\n- **System** — システム スタックを使用します。 ネットワーク アプリケーションに問題が発生した場合は、別のオプションを試してください。\n- **gVisor** — ユーザー空間のトラフィックを処理します。\n- **MIPS** — mihomo 独自の IP スタック。バンドルされたバージョン 1.19.32 で利用可能。\n\nLinux では、Xray はデフォルトで組み込みの gVisor を使用します。 Linux の System、Mixed、および MIPS は、TUN エンジンとして mihomo を使用し、認証されたローカル SOCKS リンク経由で TCP と UDP を Xray に転送します。 Xray は、プロトコル、プロバイダー プロファイル、およびルーティングを保持します。 これら 3 つのオプションには、mihomo がインストールされている必要があります。 Windows では、Xray は4種類すべてのTUNスタックに mihomo 1.19.32 以降を使用します。プロトコルとルーティングは Xray が処理します。この構成のアプリケーションルールは直接接続とブロックのみ対応します。Linux では、これらのルールには Xray 内蔵の gVisor が必要です。\n\nブリッジは 2 番目のプロセスを実行します。 Linux での 3 つのアイドル状態の測定では、ネイティブ Xray TUN よりも約 32 ～ 36 MiB 多くの物理メモリを使用しました。 これはダウンロードの負荷を測定するものではありません。CPU とメモリのコストは接続によって異なります。 sing-box にはスタック セレクターがありません。 すべてのネットワークでより優れたパフォーマンスを保証するスタックはありません。 スタックを選択し、[適用して再接続] を選択して、ネットワーク内で試してください。\n\n## 設定を適用する\n\nサーバーを選択すると、自動的に再接続されます。 モード、エンジン、DNS、ルールの設定はすぐに保存されます。 アクティブな接続中に、[適用] をクリックして再接続し、それらを使用します。 エンジンを再起動すると、ダウンロードと通話が中断される場合があります。 クリックを繰り返しても並列接続は開始されません。 切断すると遷移が終了し、接続が解放されます。\n\nVPN 経由のみのインターネットは、トンネルが切断されたときに直接トラフィックをブロックします。 マシン全体に影響します。 明示的に切断すると、Sora のルールが削除されます。 クリーンアップが完了しない場合は、切断を再試行してログを開きます。\n\n## プロジェクトのドキュメント\n\n- [sing-box-lx: 構成とサポート](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ドキュメント](https://sing-box.sagernet.org/)\n- [Xray ドキュメント](https://xtls.github.io/)\n- [mihomo ドキュメント](https://wiki.metacubex.one/)\n- [zapret: 操作と制限事項](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "サーバーにどのエンジンが必要かわからない場合は、「自動」を選択してください。 Sora は接続前にプロファイルと設定を確認します。 エンジンはプランの帯域幅を増やすことはできません。パフォーマンスはサーバー、ルート、プロトコル、ネットワークに依存します。\n\n## モード\n\n### すべてのトラフィック (TUN)\n\nSora は、仮想ネットワーク インターフェイスを作成し、TCP や UDP などのアプリケーション トラフィックをそのインターフェイス経由でルーティングします。 このモードは、Telegram、ゲーム、および Discord 音声に使用します。 ルールでは、特定のサイトやプログラムを直接送信したり、ブロックしたりできます。 ネットワーク サービスには、許可と、必要なプロトコルをサポートするサーバーが必要です。\n\n### System プロキシ\n\nSora は、ローカル HTTP/SOCKS プロキシを構成します。 システムのプロキシ設定を尊重するアプリケーションはこれを使用します。 独自のネットワーク スタックを持つアプリケーションは直接接続できます。 UDP および音声通話には通常、TUN が必要です。 このモードは、プロキシをサポートするブラウザとアプリケーションに適しています。\n\n### サーバーがありません\n\nLinux では、Sora は [zapret](https://github.com/bol-van/zapret) を使用して HTTP/TLS リクエストを分割および再形成し、一部の DPI チェックをバイパスします。 IP は変更されず、接続は Web サイトに直接接続されます。 結果はプロバイダーとブロック方法によって異なります。\n\n現在の統合では、HTTP および TLS over TCP に tpws を使用します。 IP ブロッキングや UDP の中継はバイパスせず、Telegram の MTProto 接続を保証することはできません。 Discord 音声、Telegram 通話、およびこれらの種類の制限には、TUN を備えた VPN サーバーを使用します。\n\n## エンジン\n\n### 自動\n\nSora は、接続プラン全体 (サーバー プロトコル、トランスポート、グループ、フラグメンテーション、モード) をサポートする、インストールされているエンジンを選択します。 互換性のない手動選択は、現在の接続を停止する前に拒否されます。 [自動] または別のエンジンを選択し、設定を再度適用します。\n\n### sing-box\n\n新しい Sora パッケージには、[sing-box](https://github.com/SagerNet/sing-box) のフォークである [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) が含まれており、クライアント側 XHTTP および VLESS Encryption が追加されています。 Sora は、ビルドとその機能を認識します。 XHTTP のないアップストリーム ビルドでは、名前だけではこの機能が得られません。\n\n対応するプロトコルは VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard、および Sora が読み込める AmneziaWG 1.x/2.x のパラメーターです。完全な Xray JSON プロファイルには Xray が必要です。新しい AWG 3.x のフィールドはまだ読み込めません。sing-box はパスワードで保護されたローカル制御ポートを使用し、このポートは同じコンピューターの他のアプリから検出できます。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) は、VLESS、REALITY、XHTTP、VLESS Encryption、および TLS フラグメンテーションをサポートします。 また、ルーティングとグループを維持しながら、完全なプロバイダー Xray プロファイルを実行します。 このようなプロファイルは、動作を変更せずに別のエンジンに自動的に変換できません。\n\nバンドルされている Xray では、TLS 証明書の検証を無効にする設定 (`allowInsecure`) が削除されました。 この設定が必要な通常のサーバーでは、sing-box または mihomo が自動的に選択されます。 Xray を選択すると、現在の接続を停止する前に非互換性が手動で報告されます。 古い完全な JSON プロファイルには、検証可能な証明書または証明書 PIN を含む更新されたプロバイダー プロファイルが必要です。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) は、順序付けされたフォールバックおよび負荷分散グループ、XHTTP および AmneziaWG をサポートします。 バックアップ サーバーへの自動フェイルオーバーが重要な場合に選択してください。 Sora の TLS フラグメンテーション設定は、このエンジンでは使用できません。\n\n## Sora の互換性\n\n| 特集 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN と TCP/UDP | はい | はい | はい |\n| XHTTP | はい | はい | はい |\n| VLESS Encryption | はい | はい | はい |\n| Xray の全プロフィール | いいえ | はい | いいえ |\n| TUIC / AnyTLS | 両方 | いいえ | TUIC |\n| TLS フラグメンテーション | はい | はい | いいえ |\n| AmneziaWG 1.x/2.x | はい¹ | いいえ | はい |\n| 順序付けされたフォールバック グループ | いいえ | いいえ² | はい |\n\n¹ J1/J2/J3/Itime のプロファイルは mihomo を使用します。 これらのフィールドは決して黙って破棄してはなりません。 ² 完全な Xray プロファイルのグループの場合、アプリはバックアップ プロファイルを選択します。 サポートはインストールされているビルドによって異なります。 「バージョン情報」でバージョンを確認してください。\n\n## TUN スタック\n\nスタックは仮想インターフェイス内で TCP と UDP を処理します。 モード パネルでは、Xray および mihomo は、gVisor、System、Mixed、および MIPS を提供します。 各エンジンは独自の設定を保存します。 System プロキシ モードとサーバーレス モードでは、この設定は使用されません。\n\n- **Mixed** - TCP はシステム スタックを使用し、gVisor は UDP を処理します。 Linux では mihomo のデフォルトです。Windows では Xray と mihomo のデフォルトは MIPS です。\n- **System**: システム スタックを使用します。 ネットワーク アプリケーションに問題が発生した場合は、別のオプションを試してください。\n- **gVisor**: ユーザー空間のトラフィックを処理します。\n- **MIPS**: mihomo 独自の IP スタック。バンドルされたバージョン 1.19.32 で利用可能。\n\nLinux では、Xray はデフォルトで組み込みの gVisor を使用します。 Linux の System、Mixed、および MIPS は、TUN エンジンとして mihomo を使用し、認証されたローカル SOCKS リンク経由で TCP と UDP を Xray に転送します。 Xray は、プロトコル、プロバイダー プロファイル、およびルーティングを保持します。 これら 3 つのオプションには、mihomo がインストールされている必要があります。 Windows では、Xray は4種類すべてのTUNスタックに mihomo 1.19.32 以降を使用します。プロトコルとルーティングは Xray が処理します。この構成のアプリケーションルールは直接接続とブロックのみ対応します。Linux では、これらのルールには Xray 内蔵の gVisor が必要です。\n\nブリッジは 2 番目のプロセスを実行します。 Linux での 3 つのアイドル状態の測定では、ネイティブ Xray TUN よりも約 32 ～ 36 MiB 多くの物理メモリを使用しました。 これはダウンロードの負荷を測定するものではありません。CPU とメモリのコストは接続によって異なります。 sing-box にはスタック セレクターがありません。 すべてのネットワークでより優れたパフォーマンスを保証するスタックはありません。 スタックを選択し、[適用して再接続] を選択して、ネットワーク内で試してください。\n\n## 設定を適用する\n\nサーバーを選択すると、自動的に再接続されます。 モード、エンジン、DNS、ルールの設定はすぐに保存されます。 アクティブな接続中に、[適用] をクリックして再接続し、それらを使用します。 エンジンを再起動すると、ダウンロードと通話が中断される場合があります。 クリックを繰り返しても並列接続は開始されません。 切断すると遷移が終了し、接続が解放されます。\n\nVPN 経由のみのインターネットは、トンネルが切断されたときに直接トラフィックをブロックします。 マシン全体に影響します。 明示的に切断すると、Sora のルールが削除されます。 クリーンアップが完了しない場合は、切断を再試行してログを開きます。\n\n## プロジェクトのドキュメント\n\n- [sing-box-lx: 構成とサポート](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ドキュメント](https://sing-box.sagernet.org/)\n- [Xray ドキュメント](https://xtls.github.io/)\n- [mihomo ドキュメント](https://wiki.metacubex.one/)\n- [zapret: 操作と制限事項](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -391,13 +395,6 @@
       }
     }
   },
-  "@groupOrdered": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -429,20 +426,6 @@
       }
     }
   },
-  "@activeRules": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "@perSecond": {
-    "placeholders": {
-      "value": {
-        "type": "String"
-      }
-    }
-  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -457,15 +440,9 @@
       }
     }
   },
-  "extensionsSoon": "近日公開",
-  "diagnosticRequiresTun": "パケット キャプチャには、アクティブな Sora TUN 接続が必要です。",
   "extensions": "拡張機能",
   "diagnosticHttp": "HTTP 診断",
-  "diagnosticCapture": "10秒間のキャプチャ",
-  "diagnosticEvents": "Windowsイベント",
-  "diagnosticPackets": "パケットキャプチャ",
   "exportLogFile": "保存先: {name}",
-  "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。",
   "diagnosticNoData": "記録されたリクエストはまだありません。 まずスピードテストのWebサイトを開きます。",
   "@exportLogFile": {
     "placeholders": {
@@ -473,5 +450,572 @@
         "type": "String"
       }
     }
-  }
+  },
+  "customServerAdd": "カスタムサーバーの追加",
+  "customServers": "私のサーバー",
+  "customServerName": "名前",
+  "customServerNameHint": "例: 私の VPS",
+  "customServerNameRequired": "名前を入力してください",
+  "customServerAddress": "住所",
+  "customServerAddressHint": "example.com または 192.0.2.1",
+  "customServerAddressRequired": "サーバーアドレスを入力してください",
+  "customServerAddressInvalid": "無効なアドレスです",
+  "customServerPort": "ポート",
+  "customServerPortHint": "443",
+  "customServerPortInvalid": "ポートは 1 ～ 65535 の番号でなければなりません",
+  "customServerProtocol": "プロトコル",
+  "customServerCredentials": "ログイン情報",
+  "customServerOptional": "オプション",
+  "customServerShowSecret": "シークレットを表示",
+  "customServerHideSecret": "秘密を隠す",
+  "customServerBadge": "カスタム",
+  "customServerDeleteConfirm": "サーバー「{name}」を削除しますか?",
+  "@customServerDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customServerEmptyHint": "サーバーを手動で追加します: アドレス、ポート、プロトコル",
+  "customServerTest": "テスト",
+  "leakTestTitle": "データ漏洩のテスト",
+  "leakTestIntro": "通信がトンネルを通らずにデバイスから出られるか確認します。直接の DNS・ICMP 通信、IPv6 の外部通信、システムのリゾルバーを調べます。接続中に実行してください。",
+  "leakTestRun": "チェック",
+  "leakTestCancel": "キャンセル",
+  "leakTestNeedsConnection": "VPN に接続してデータ漏洩をテストします。",
+  "leakTestProgress": "完了したテスト: {count}",
+  "@leakTestProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestAllClear": "漏れは見つかりませんでした",
+  "leakTestFound": "{count, plural, other{# 件の漏えいを検出}}",
+  "@leakTestFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leakTestSkipped": "Skipped, not applicable in this session",
+  "leakTestFix": "修正",
+  "leakTestFixedNote": "ネットワーク遮断は有効です。もう一度テストして確認してください。",
+  "leakTestCheckDirectDns": "直接 DNS",
+  "leakTestCheckIcmpEcho": "ICMP エコー",
+  "leakTestCheckIpv6": "IPv6",
+  "leakTestCheckSystemResolvers": "システムリゾルバー",
+  "leakTestCheckTunnelConnectivity": "トンネル接続",
+  "leakTestCheckTunnelDns": "DNS トンネルを通過",
+  "noticeDegraded": "サーバーが遅くなりました。 Sora は、測定中に見つかった最適なサーバーに切り替えました。",
+  "obfs": "通信の難読化",
+  "latencyMs": "{value} ms",
+  "@latencyMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "speedMbps": "{value} Mbps",
+  "@speedMbps": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "updateSignaturePending": "更新ファイルはリリースと一緒に公開されたチェックサムと照合されます。",
+  "updateManualSigWarning": "以下のファイルはリリースのチェックサムと一致しています。公式リリースからダウンロードした場合はコマンドを実行してください。",
+  "updateVersionRevoked": "開発者はこのバージョンを取り下げました。修正後のリリースをお待ちください。",
+  "updateRolloutPending": "新しいバージョンは段階的に公開されており、自動的に提供されます。",
+  "updateRollbacking": "バージョン {version} にロールバックしています...",
+  "updateRolledBack": "{version} への更新はヘルスチェックに合格しなかったため、Sora は {fromVersion} にロールバックされました。",
+  "updateRollbackError": "自動ロールバックに失敗しました。新しいバージョンが動作しない場合は、以前のリリースを手動で再インストールしてください。",
+  "updateRollbackCacheError": "現在のバージョンの検証済みロールバック コピーを準備できなかったため、アップデートはインストールされませんでした。",
+  "extRatingLabel": "{rating} の評価 (5 点中)",
+  "@extRatingLabel": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "extByAuthor": "作者: {author}",
+  "@extByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallsCount": "インストール数: {count}",
+  "@extInstallsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extInstallOne": "インストール数: 1",
+  "extBadgeVerified": "確認済み",
+  "extBadgeTop": "今週の一番人気",
+  "extBadgeNew": "新しい",
+  "extBadgeStaff": "Soraチーム",
+  "extSideloadShort": "カタログ外",
+  "extSideloadWarning": "この拡張子はチームカタログからのものではありません。作成者だけがキーを保証しています。作成者を信頼できる場合にのみインストールしてください。",
+  "extInstallTitle": "「{name}」をインストール",
+  "@extInstallTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extUpdateTitle": "「{name}」を更新",
+  "@extUpdateTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPermissionsIntro": "この拡張機能では次のことが可能になります。",
+  "extPermissionsWidened": "アップデートでは新しい権限が求められます。",
+  "extDangerousAck": "これらの権限が重要であることを理解しています",
+  "extInstall": "インストール",
+  "extUpdate": "更新",
+  "extCancel": "キャンセル",
+  "extConfirm": "確認",
+  "extOk": "OK",
+  "extCatalog": "カタログ",
+  "extInstalled": "インストールされている拡張機能",
+  "extSearchHint": "拡張機能を検索",
+  "extCatAll": "すべて",
+  "extCatTools": "ツール",
+  "extCatThemes": "テーマ",
+  "extCatAutomation": "自動化",
+  "extCatStats": "統計",
+  "extCatNetwork": "ネットワーク",
+  "extSortBy": "並べ替え",
+  "extSortPopular": "一番人気",
+  "extSortRating": "最高評価",
+  "extSortName": "名前",
+  "extCatalogError": "カタログを読み込めませんでした",
+  "extRetry": "リトライ",
+  "extEmptySearch": "何も見つかりませんでした",
+  "extEmptyInstalled": "拡張機能はまだインストールされていません。\nカタログから見つけるか、ファイルからインストールします。",
+  "extInstallFromFile": "ファイルからインストールする",
+  "extInstallFromUrl": "URLからインストール",
+  "extUrlHint": "https://…/extension.soraext",
+  "extDownload": "ダウンロード",
+  "extDownloading": "ダウンロード中…",
+  "extVerifying": "検証中…",
+  "extInstalling": "インストール中…",
+  "extInstallFailed": "インストールに失敗しました",
+  "extErrSignature": "署名チェックに失敗しました。ファイルが破損しているか改ざんされている可能性があります。",
+  "extErrManifest": "拡張マニフェストが無効です。",
+  "extErrNetwork": "ネットワークエラー。接続を確認して、もう一度試してください。",
+  "extErrHash": "ダウンロードがカタログと一致しません。改ざんされている可能性があります。",
+  "extErrMinApp": "この拡張機能にはアプリのバージョン {version} 以降が必要です。",
+  "@extErrMinApp": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extErrHttpsOnly": "https:// リンクのみが許可されます",
+  "extErrGeneric": "何か問題が発生しました。もう一度試してください。",
+  "extErrAuthorKeyChanged": "このアップデートは、インストールされているバージョンとは異なる作成者キーで署名されているため、ブロックされました。新しいキーを信頼する場合は、拡張機能をアンインストールし、明示的に再度インストールしてください。",
+  "extUpdateAvailable": "アップデートあり",
+  "extDisabled": "無効",
+  "extToggleEnabled": "{name}を有効にする",
+  "@extToggleEnabled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extSearchInstalled": "インストール済みの拡張機能を検索",
+  "extUpdateAll": "全て更新",
+  "extUpdatesAvailable": "{count} アップデートが利用可能",
+  "@extUpdatesAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extUpdatedCount": "{count}更新",
+  "@extUpdatedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extRiskNormal": "通常",
+  "extRiskSensitive": "機密",
+  "extRiskDangerous": "高リスク",
+  "extPermissionsRemoved": "要求されなくなりました:",
+  "extUpdateFailedKept": "以前のバージョンがまだインストールされています。",
+  "extConflictsTitle": "拡張子の競合",
+  "extConflictsIntro": "これらの拡張機能は同じものを使おうとしています。動かす方を選んでください。もう一方はインストールされたままです。",
+  "extConflictTheme": "アプリテーマ",
+  "extConflictNetHooks": "ネットワークフック",
+  "extConflictWinner": "{name}が勝利",
+  "@extConflictWinner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extConflictsCount": "{count} 紛争にはあなたの決定が必要です",
+  "@extConflictsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extConflictsResolve": "競合を解決する",
+  "extConflictNote": "選択はこのデバイスに保存されます。テーマはすぐに切り替わります。ネットワークフックはこのバージョンでは実行されません。",
+  "extVersionLabel": "バージョン{version}",
+  "@extVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extAuthor": "作者",
+  "extRating": "評価",
+  "extInstalls": "インストール数",
+  "extVersion": "バージョン",
+  "extAbout": "この拡張機能について",
+  "extPermissionsTitle": "権限",
+  "extNoPermissions": "特別な権限はありません。",
+  "extSettings": "設定",
+  "extSaveSettings": "設定の保存",
+  "extSaving": "保存中…",
+  "extUpdateTo": "{version} に更新",
+  "@extUpdateTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extEnabled": "有効",
+  "extRollbackTo": "{version} に戻す",
+  "@extRollbackTo": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extRollbackConfirm": "バージョン {version} にロールバックしますか?",
+  "@extRollbackConfirm": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "extUninstall": "アンインストール",
+  "extUninstallConfirm": "「{name}」とその設定を削除しますか?",
+  "@extUninstallConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extPanelUnavailable": "パネルが使用できません。拡張機能が無効になっているか、削除されている可能性があります。",
+  "extPermConnectionsRead": "アクティブな接続のリストを参照",
+  "extPermServersRead": "サーバーのリストを参照してください",
+  "extPermSettingsRead": "アプリ設定の読み取り",
+  "extPermSettingsWrite": "アプリの設定を変更する",
+  "extPermNotifications": "通知を表示する",
+  "extPermTray": "トレイ メニューに項目を追加します",
+  "extPermUiPanel": "アプリ内のパネルを表示する",
+  "extPermThemeApply": "テーマを適用する",
+  "extPermRoutingRules": "ルーティング ルールを追加します (ネットワーク トラフィックの送信先に影響します)",
+  "extPermNetHooks": "ネットワーク パスへの統合 (DPI バイパス モジュール)",
+  "extPermNetFetch": "許可リストから URL をリクエストします",
+  "extPermBackground": "バックグラウンドタスクを実行する",
+  "extPermBackgroundDetail": "パネルが閉じている場合でも、スケジュールされたタスクを実行します。拡張機能の設定で一時停止したり、実行頻度を変更したりできます。",
+  "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
+  "extCapBackground": "バックグラウンドで実行",
+  "extCapNetHook": "回避機能とネットワークフック",
+  "extCapPanel": "パネル",
+  "extCapRouting": "ルーティングルール",
+  "extCapTheme": "テーマ",
+  "extCapWidget": "ウィジェット",
+  "extCatalogCached": "Cached catalog, {date}",
+  "@extCatalogCached": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "extChangelog": "変更履歴",
+  "extImageFailed": "画像を読み込めませんでした",
+  "extRatingHow": "評価の仕組み",
+  "extRatingHowBody": "評価にはベイズ平均が使用されます。評価の少ない拡張機能は、より多くの人が投票するまで中央付近に留まるため、1 つの 5 つ星のレビューによって新しい拡張機能を上位に押し上げることはできません。最近の評価は古い評価よりも重みがあり、アカウントごとに 1 つの評価のみがカウントされます。",
+  "extScreenshots": "スクリーンショット",
+  "extSortRelevance": "関連性",
+  "extPermNetworkDetail": "VPN 経由でインターネットからデータを取得します。許可されるのは下のホストだけで、それ以外はブロックされます。",
+  "extBgTitle": "バックグラウンドタスク",
+  "extBgEnabled": "バックグラウンドで実行",
+  "extBgInterval": "実行間隔",
+  "extBgMinutes": "{count, plural, other{# 分}}",
+  "@extBgMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgHours": "{count, plural, other{# 時間}}",
+  "@extBgHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "extBgNote": "Sora を開いている間はトレイにある場合も含め、タスクがスケジュールどおり実行されます。最短間隔は 15 分です。",
+  "extBgDisabledNote": "拡張機能がバックグラウンド タスクを管理できるようにします。",
+  "extCapNetwork": "ネットワークアクセス",
+  "extCapNetworkHosts": "ネットワーク: {hosts}",
+  "@extCapNetworkHosts": {
+    "placeholders": {
+      "hosts": {
+        "type": "String"
+      }
+    }
+  },
+  "qrShareTitle": "QR コードを共有",
+  "qrScanTitle": "QR コードをスキャンします",
+  "qrCopyLink": "リンクをコピー",
+  "qrShowLink": "リンクを表示",
+  "qrHideLink": "リンクを隠す",
+  "qrWarning": "この QR コードには接続の詳細が含まれています。見知らぬ人に見せないでください。",
+  "qrScanHint": "QR コードを含むスクリーンショットや写真を選ぶか、リンクを貼り付けてください",
+  "qrFromClipboard": "クリップボードから貼り付け",
+  "qrNoCode": "この画像に QR コードが見つかりません。",
+  "qrInvalid": "この QR コードには有効なリンクが含まれていません。",
+  "qrScan": "スキャン QR",
+  "qrFromImage": "画像を開く",
+  "connGroupByProcess": "プロセスごとにグループ化する",
+  "connListView": "リスト",
+  "connCopyHost": "ホストのコピー",
+  "connAddRule": "ルールの追加",
+  "connConnectionsCount": "{count, plural, other{# 件の接続}}",
+  "dnsPreset": "プリセット",
+  "dnsPresetCloudflare": "Cloudflare",
+  "dnsPresetGoogle": "Google",
+  "dnsPresetQuad9": "Quad9",
+  "dnsPresetAdGuard": "AdGuard",
+  "dnsPresetCustom": "カスタム",
+  "dnsCheck": "データ漏洩のチェック",
+  "dnsChecking": "確認中...",
+  "dnsNoLeak": "漏れは見つかりませんでした",
+  "dnsLeakFound": "漏れを検出しました",
+  "dnsLastCheck": "最終チェック",
+  "dnsNeverChecked": "まだテストされていません",
+  "dnsLeakCheckTunnelDns": "トンネルの DNS リゾルバー",
+  "dnsLeakCheckSystemResolvers": "システムリゾルバー",
+  "dnsLeakCheckKillSwitchDns": "ネットワーク遮断による DNS 保護",
+  "dnsLeakFixConfigureTunnelDns": "上記の DNS 設定でトンネルの DNS を構成します。",
+  "dnsLeakFixReviewSystemResolvers": "システムがトンネルの外側でどのリゾルバーを使用するかを確認してください。",
+  "dnsLeakFixEnableKillSwitch": "ネットワーク遮断を有効にして、DNS 通信をトンネル内に留めてください。",
+  "dnsLeakCheckEncryptedDns": "OS の暗号化 DNS",
+  "dnsLeakCheckDnsSpoof": "偽造されたDNS応答",
+  "dnsLeakFixReviewEncryptedDns": "システムがトンネルの外でどの暗号化された DNS エンドポイントを使用しているかを確認してください。",
+  "dnsLeakFixUseEncryptedDns": "リゾルバーが応答を偽造できないように、トンネルには暗号化された DNS (DoT または DoH) を使用します。",
+  "dnsCheckNeedsConnection": "まずVPNに接続してから、漏れがないか確認してください。",
+  "dnsExpected": "予想される",
+  "dnsActual": "観察された",
+  "sortBy": "並べ替え順",
+  "sortPing": "ピン",
+  "sortSpeed": "スピード",
+  "sortName": "名前",
+  "measureSpeed": "速度を測定する",
+  "benchmarkStale": "時代遅れ",
+  "autoSelectMode": "サーバーの自動選択",
+  "autoSelectPing": "最速の ping",
+  "autoSelectSpeed": "最速スピード",
+  "autoSelectSmart": "賢い選択",
+  "coreWatchUnstable": "Sora コアへの接続が不安定です",
+  "watchReconnect": "再接続",
+  "coreRestoringLink": "Sora コアへの接続を復元しています…",
+  "crashRestoreTitle": "最後のセッションが中断されました",
+  "restoreOnCrash": "クラッシュ後のセッションの復元",
+  "crashRestore": "復元",
+  "crashDismiss": "今はだめ",
+  "overrideTitle": "私の編集",
+  "overrideEdit": "サーバーの編集",
+  "overrideHide": "隠す",
+  "overrideUnhide": "ショー",
+  "overrideClear": "編集内容をリセット",
+  "overrideEmpty": "まだ編集はありません",
+  "overrideCustomRules": "独自のルール",
+  "errBenchmarkUnsupported": "速度測定には新しいコアが必要です",
+  "benchmarkProgress": "{total} からの {done} の測定…",
+  "profiles": "ネットワークプロファイル",
+  "profilesEmpty": "プロフィールはまだありません。既知のネットワークに設定を自動的に適用するために作成します。",
+  "profileAdd": "プロフィールを追加",
+  "profileName": "プロファイル名",
+  "profileSsids": "Wi-Fi ネットワーク (SSID)",
+  "profileSsidsHint": "自宅、オフィスをカンマで区切って指定",
+  "profileGateways": "ネットワークゲートウェイ",
+  "profileAsns": "AS 番号",
+  "profileAutoApply": "自動適用",
+  "profileAutoApplyHint": "オフの場合、プロファイルを適用する前に確認します。",
+  "profileSnapshot": "現在の設定を記憶する",
+  "profileSnapshotDone": "現在の設定をプロファイルに保存",
+  "profileDelete": "プロフィールの削除",
+  "profileDeleteConfirm": "プロフィール「{name}」を削除しますか?",
+  "profileApplyAsk": "プロファイル「{name}」を適用しますか?",
+  "profileApply": "適用",
+  "profileApplied": "プロファイル「{name}」が適用されました",
+  "profileUndo": "キャンセル",
+  "profileActive": "アクティブ",
+  "networkNow": "現在: {info}",
+  "networkUnknown": "ネットワーク情報が利用できません",
+  "profileNoTriggers": "少なくとも 1 つのトリガーを追加します: SSID、ゲートウェイ、または ASN",
+  "chains": "プロキシ チェーン",
+  "chainsEmpty": "チェーンはまだありません。 2 ～ 3 台のサーバーをリンクし、トラフィックが各サーバーを経由するようにします。",
+  "chainAdd": "新しいチェーン",
+  "chainName": "チェーン名",
+  "chainPickServers": "2 ～ 3 台のサーバーを選択します",
+  "chainOrderHint": "ドラッグして順序を変更します。トラフィックは上部から入り、下部から出ます。",
+  "chainTooFew": "少なくとも 2 つのサーバーを選択してください",
+  "chainTooMany": "チェーンには最大 3 台のサーバーを保持します",
+  "chainEstimate": "推定遅延時間",
+  "chainSave": "チェーンの保存",
+  "chainDelete": "チェーンの削除",
+  "chainDeleteConfirm": "チェーン「{name}」を削除しますか?",
+  "chainUnsupported": "現在のエンジンはチェーンを構築できません",
+  "chainHopMissing": "チェーン サーバーの 1 つが利用できなくなりました",
+  "chainHop": "ホップ {n}",
+  "chainEntry": "入口",
+  "chainExit": "出口",
+  "sync": "デバイスの同期",
+  "syncDevices": "私のデバイス",
+  "syncEmpty": "ペアリングされたデバイスがありません。ローカル ネットワーク経由で別のデバイスをペアリングします。",
+  "syncPair": "デバイスのペアリング",
+  "syncShowCode": "コードを表示",
+  "syncScanCode": "コードをスキャンします",
+  "syncRevoke": "撤退",
+  "syncRevokeConfirm": "「{name}」を取り消しますか?",
+  "syncLastSync": "最終同期: {time}",
+  "syncNever": "決してしない",
+  "syncNoLan": "デバイスは同じローカル ネットワーク上に存在する必要があります",
+  "syncPaired": "デバイスがペアリングされました",
+  "syncPairingTitle": "このデバイスとペアリングします",
+  "syncWaiting": "他のデバイスを待っています…",
+  "syncSecureNote": "エンドツーエンドの暗号化チャネル。アカウントもクラウドサーバーもありません。",
+  "zapretWithVpn": "直接ネットワーク トラフィックの DPI フィルタリングをバイパスする",
+  "zapretWithVpnHint": "VPN トンネルと並行して zapret を実行します。トンネル内の通信は VPN を、直接通信は回避機能を使用します。",
+  "chainDuplicate": "各サーバーは 1 回だけ出現できます",
+  "edit": "編集",
+  "remove": "削除する",
+  "autoSwitchOnDegrade": "自動スイッチオンの劣化",
+  "autoSwitchOnDegradeDetail": "選択したサーバーが大幅に遅くなったり応答しなくなったりすると、Sora は測定結果が最も良いサーバーに切り替えます。切り替えは 10 分に 1 回までです。",
+  "tunStackMixed": "ミックス",
+  "tunStackSystem": "システム",
+  "syncCodeExpired": "コードの有効期限が切れています",
+  "syncDaemonFailed": "同期サービスを開始できませんでした",
+  "syncDaemonMissing": "sora-sync コンポーネントが見つかりませんでした。アプリを再インストールしてデバイスの同期を有​​効にします。",
+  "syncDaemonStarting": "同期サービスを開始しています…",
+  "syncErrAuth": "同期サービスがアクセス トークンを拒否しました。アプリを再起動して、もう一度試してください。",
+  "syncErrNotFound": "デバイスはペアリングされていません",
+  "syncErrPairingActive": "ペアリングセッションはすでに開いています",
+  "syncErrUnreachable": "他のデバイスが応答しませんでした。同じネットワーク上にあり、そのコードが表示されていることを確認してください。",
+  "syncError": "同期エラー",
+  "syncExpiresIn": "コードは {duration} 後に失効します",
+  "@syncExpiresIn": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "syncJoining": "デバイスとペアリング中…",
+  "syncLegacyCleared": "古いデバイスリストは実際にはペアリングされていなかったため、クリアされました。デバイスを再度ペアリングします。今度は実際にペアリングします。",
+  "syncNewCode": "新しいコード",
+  "syncPairedWith": "{name}と組み合わせる",
+  "@syncPairedWith": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncRetry": "繰り返し",
+  "syncStopShowing": "コードを非表示",
+  "syncSyncNow": "今すぐ同期",
+  "syncSyncResult": "{pulled} を受信、{pushed} を送信",
+  "@syncSyncResult": {
+    "placeholders": {
+      "pulled": {
+        "type": "int"
+      },
+      "pushed": {
+        "type": "int"
+      }
+    }
+  },
+  "syncResultTitle": "同期結果",
+  "syncPulled": "受信しました",
+  "syncPushed": "送信済み",
+  "syncNoChanges": "変更なし",
+  "syncDocKindSubscriptions": "サブスクリプション",
+  "syncDocKindSettings": "アプリ設定",
+  "syncDocKindOverrides": "サブスクリプションの上書き設定",
+  "syncDocKindProfiles": "ネットワークプロファイル",
+  "syncDocKindChains": "プロキシ チェーン",
+  "syncFrom": "{name} から",
+  "@syncFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncThisDevice": "この装置",
+  "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
+  "customServerShadowsocksCredentials": "Shadowsocks の場合: 方式:パスワード (例: chacha20-ietf-poly1305:password)",
+  "diagnosticPackets": "パケットキャプチャ",
+  "diagnosticEvents": "Windowsイベント",
+  "diagnosticCapture": "10秒間のキャプチャ",
+  "diagnosticRequiresTun": "パケット キャプチャには、アクティブな Sora TUN 接続が必要です。",
+  "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。",
+  "extErrRevoked": "この拡張機能のバージョンは安全でないか壊れているため、Sora チームが取り消しました。",
+  "extErrRevocationsExpired": "取り消された拡張機能のリストを更新できませんでした。更新されるまでインストールできません。ネットワークを確認して再試行してください。",
+  "extRevokedDisabled": "取り消された拡張機能をオフにしました: {names}",
+  "customServerWgPrivateKey": "秘密鍵",
+  "customServerWgAddresses": "インターフェイスのアドレス",
+  "customServerWgPeerKey": "サーバーの公開鍵",
+  "customServerWgPresharedKey": "事前共有鍵",
+  "customServerWgAllowedIps": "許可する IP",
+  "customServerWgKeepalive": "Keepalive (秒)",
+  "customServerWgKeyInvalid": "鍵は wg genkey が出力するような base64 の 32 バイトにしてください。",
+  "customServerWgCidrInvalid": "10.0.0.2/32 のようなプレフィックスをカンマ区切りで入力してください。",
+  "customServerWgKeepaliveInvalid": "0 から 65535 までの秒数を入力してください。",
+  "strictKillSwitch": "厳格なネットワーク遮断",
+  "strictKillSwitchWarning": "接続後は、クラッシュ、再起動、アプリ終了後も VPN 外の通信を遮断します。接続を切るか、この設定をオフにした場合のみアクセスが戻ります。端末の再起動後は、起動時の接続が有効な場合のみ遮断を再開します。",
+  "extWorkerFailed": "拡張機能のバックグラウンドタスクに失敗しました。拡張機能のログを確認してください。",
+  "extAssetRejected": "拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。"
 }

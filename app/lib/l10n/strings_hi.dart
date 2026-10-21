@@ -25,9 +25,6 @@ class SHi extends S {
   String get stateDisconnecting => 'डिस्कनेक्ट कर रहा है';
 
   @override
-  String get stateFailed => 'जुड़े नहीं हैं';
-
-  @override
   String get coreMissing => 'Sora सेवा प्रतिसाद नहीं दे रही है';
 
   @override
@@ -135,6 +132,9 @@ class SHi extends S {
   String get logsEmpty => 'यहाँ कुछ भी नहीं है';
 
   @override
+  String get connEmpty => 'कोई कनेक्शन नहीं';
+
+  @override
   String appVersion(String version) {
     return 'संस्करण $version';
   }
@@ -164,6 +164,16 @@ class SHi extends S {
   @override
   String milliseconds(int n) {
     return '$n एमएस';
+  }
+
+  @override
+  String latencyMs(int value) {
+    return '$value ms';
+  }
+
+  @override
+  String speedMbps(double value) {
+    return '$value Mbps';
   }
 
   @override
@@ -255,9 +265,6 @@ class SHi extends S {
   String get errNoServers => 'कनेक्ट करने के लिए सदस्यता जोड़ें';
 
   @override
-  String get exportText => 'मूलपाठ';
-
-  @override
   String get connections => 'कनेक्शन';
 
   @override
@@ -273,7 +280,7 @@ class SHi extends S {
   String get theme => 'विषय';
 
   @override
-  String get themeSystem => 'System';
+  String get themeSystem => 'सिस्टम के अनुसार';
 
   @override
   String get themeLight => 'रोशनी';
@@ -285,7 +292,7 @@ class SHi extends S {
   String get language => 'भाषा';
 
   @override
-  String get languageSystem => 'System';
+  String get languageSystem => 'सिस्टम के अनुसार';
 
   @override
   String get sectionConnection => 'संबंध';
@@ -496,17 +503,6 @@ class SHi extends S {
   String get ruleInvalid => 'यह किसी साइट, आईपी या प्रोग्राम जैसा नहीं दिखता है';
 
   @override
-  String groupOrdered(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '# सर्वर, बदले में',
-      one: '# सर्वर, बदले में',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String groupBest(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -521,9 +517,6 @@ class SHi extends S {
   String get tunnelMode => 'तरीका';
 
   @override
-  String get tunnelTun => 'सारा यातायात';
-
-  @override
   String get tunnelProxy => 'System प्रॉक्सी';
 
   @override
@@ -534,6 +527,9 @@ class SHi extends S {
 
   @override
   String get launchAtLogin => 'सिस्टम से शुरुआत करें';
+
+  @override
+  String get launchAtLoginDetail => 'साइन इन करने पर Sora अपने आप शुरू होगा और ट्रे में रहेगा।';
 
   @override
   String get closeToTray => 'बंद होने पर ट्रे में रखें';
@@ -634,28 +630,6 @@ class SHi extends S {
   String get less => 'कम';
 
   @override
-  String get currentServer => 'वर्तमान सर्वर';
-
-  @override
-  String get trafficDown => 'डाउनलोड';
-
-  @override
-  String get trafficUp => 'अपलोड किए गए';
-
-  @override
-  String perSecond(String value) {
-    return '$value/s';
-  }
-
-  @override
-  String activeRules(int count) {
-    return 'सक्रिय नियम: $count';
-  }
-
-  @override
-  String get recentNotifications => 'हाल की सूचनाएं';
-
-  @override
   String get notificationsEmpty => 'कनेक्शन और सदस्यता ईवेंट यहां दिखाई देंगे';
 
   @override
@@ -709,22 +683,13 @@ class SHi extends S {
   String get runningProcesses => 'चल रही प्रक्रियाएँ';
 
   @override
-  String get programsFailed => 'एप्लिकेशन लोड नहीं हो सके';
-
-  @override
   String get programsEmpty => 'कोई एप्लिकेशन नहीं मिला. कोई दूसरा नाम आज़माएं.';
 
   @override
   String get selectExe => 'कोई .exe फ़ाइल चुनें';
 
   @override
-  String get trafficUnavailable => 'अभी तक काउंटर उपलब्ध नहीं हैं';
-
-  @override
   String get speedtest => 'रफ़्तार';
-
-  @override
-  String get speedtestCheck => 'गति की जाँच करें';
 
   @override
   String get speedtestSearch => 'एक सेवा खोजें';
@@ -818,6 +783,38 @@ class SHi extends S {
       'दोनों सत्यापित पैकेजों को स्थापित करने के लिए इस कमांड को टर्मिनल में चलाएँ, फिर Sora को फिर से खोलें। फ़ाइलें डाउनलोड निर्देशिका में रहती हैं। वीपीएन कनेक्शन बंद हो जाएगा.';
 
   @override
+  String get updateSignaturePending => 'अपडेट फ़ाइलों का मिलान रिलीज़ के साथ प्रकाशित चेकसम से किया जाता है।';
+
+  @override
+  String get updateManualSigWarning =>
+      'नीचे की फ़ाइलें रिलीज़ के चेकसम से मेल खाती हैं। अगर आपने इन्हें आधिकारिक रिलीज़ से डाउनलोड किया है, तो कमांड चलाएँ।';
+
+  @override
+  String get updateVersionRevoked => 'डेवलपर ने इस संस्करण को वापस ले लिया है। कृपया संशोधित रिलीज़ की प्रतीक्षा करें।';
+
+  @override
+  String get updateRolloutPending =>
+      'एक नया संस्करण धीरे-धीरे जारी किया जा रहा है और आपको स्वचालित रूप से पेश किया जाएगा।';
+
+  @override
+  String updateRollbacking(String version) {
+    return 'संस्करण $version... पर वापस जा रहा हूं';
+  }
+
+  @override
+  String updateRolledBack(String version, String fromVersion) {
+    return '$version का अपडेट स्वास्थ्य जांच में खरा नहीं उतरा, इसलिए Sora को वापस $fromVersion पर रोल कर दिया गया।';
+  }
+
+  @override
+  String get updateRollbackError =>
+      'स्वचालित रोलबैक विफल रहा। यदि नया संस्करण काम नहीं करता है, तो पिछली रिलीज़ को मैन्युअल रूप से पुनः स्थापित करें।';
+
+  @override
+  String get updateRollbackCacheError =>
+      'वर्तमान संस्करण की सत्यापित रोलबैक प्रतिलिपि तैयार नहीं की जा सकी, इसलिए अद्यतन स्थापित नहीं किया गया।';
+
+  @override
   String get updateCopyCommand => 'आदेश कॉपी करें';
 
   @override
@@ -842,9 +839,6 @@ class SHi extends S {
   String get componentLicenses => 'घटक लाइसेंस';
 
   @override
-  String get appCopyright => '© 2026 लेव्स-वन और योगदानकर्ता';
-
-  @override
   String get collapseServers => 'सर्वर संक्षिप्त करें';
 
   @override
@@ -861,10 +855,6 @@ class SHi extends S {
 
   @override
   String get reconnectNow => 'आवेदन करें और पुनः कनेक्ट करें';
-
-  @override
-  String get bypassLimitations =>
-      'यह मोड केवल HTTP और TLS के लिए DPI को बायपास करता है, UDP का समर्थन नहीं करता है या आपके IP को नहीं बदलता है। Discord आवाज, कॉल और अवरुद्ध Telegram पतों के लिए वीपीएन सर्वर का उपयोग करें।';
 
   @override
   String get errEngineUnsupported =>
@@ -899,7 +889,440 @@ class SHi extends S {
   String get extensions => 'एक्सटेंशन';
 
   @override
-  String get extensionsSoon => 'जल्द आ रहा है';
+  String extRatingLabel(String rating) {
+    return 'रेटिंग 5 में से $rating';
+  }
+
+  @override
+  String extByAuthor(String author) {
+    return '$author द्वारा';
+  }
+
+  @override
+  String extInstallsCount(String count) {
+    return 'इंस्टालेशन: $count';
+  }
+
+  @override
+  String get extInstallOne => '1 इंस्टॉल';
+
+  @override
+  String get extBadgeVerified => 'सत्यापित';
+
+  @override
+  String get extBadgeTop => 'इस सप्ताह सबसे लोकप्रिय';
+
+  @override
+  String get extBadgeNew => 'नया';
+
+  @override
+  String get extBadgeStaff => 'Sora टीम';
+
+  @override
+  String get extSideloadShort => 'कैटलॉग से नहीं';
+
+  @override
+  String get extSideloadWarning =>
+      'यह एक्सटेंशन टीम कैटलॉग से नहीं है। केवल लेखक ने ही उनकी कुंजी की गारंटी दी है: इसे केवल तभी स्थापित करें जब आपको लेखक पर भरोसा हो।';
+
+  @override
+  String extInstallTitle(String name) {
+    return '«$name» इंस्टॉल करें';
+  }
+
+  @override
+  String extUpdateTitle(String name) {
+    return '«$name» अपडेट करें';
+  }
+
+  @override
+  String get extPermissionsIntro => 'यह एक्सटेंशन निम्न में सक्षम होगा:';
+
+  @override
+  String get extPermissionsWidened => 'अपडेट नई अनुमतियां मांगता है:';
+
+  @override
+  String get extDangerousAck => 'मैं समझता हूं कि ये अनुमतियां गंभीर हैं';
+
+  @override
+  String get extInstall => 'इंस्टॉल करें';
+
+  @override
+  String get extUpdate => 'अपडेट करें';
+
+  @override
+  String get extCancel => 'रद्द करें';
+
+  @override
+  String get extConfirm => 'पुष्टि करें';
+
+  @override
+  String get extOk => 'OK';
+
+  @override
+  String get extCatalog => 'कैटलॉग';
+
+  @override
+  String get extInstalled => 'इंस्टॉल किए गए एक्सटेंशन';
+
+  @override
+  String get extSearchHint => 'एक्सटेंशन खोजें';
+
+  @override
+  String get extCatAll => 'सभी';
+
+  @override
+  String get extCatTools => 'उपकरण';
+
+  @override
+  String get extCatThemes => 'थीम';
+
+  @override
+  String get extCatAutomation => 'स्वचालन';
+
+  @override
+  String get extCatStats => 'सांख्यिकी';
+
+  @override
+  String get extCatNetwork => 'नेटवर्क';
+
+  @override
+  String get extSortBy => 'क्रमबद्ध करें';
+
+  @override
+  String get extSortPopular => 'सर्वाधिक लोकप्रिय';
+
+  @override
+  String get extSortRating => 'उच्चतम रेटिंग';
+
+  @override
+  String get extSortName => 'नाम';
+
+  @override
+  String get extCatalogError => 'कैटलॉग लोड नहीं हो सका';
+
+  @override
+  String get extRetry => 'पुनः प्रयास करें';
+
+  @override
+  String get extEmptySearch => 'कुछ नहीं मिला';
+
+  @override
+  String get extEmptyInstalled =>
+      'अभी तक कोई एक्सटेंशन इंस्टॉल नहीं हुआ है।\nकैटलॉग में से किसी एक को ढूंढें या किसी फ़ाइल से इंस्टॉल करें।';
+
+  @override
+  String get extInstallFromFile => 'फ़ाइल से इंस्टॉल करें';
+
+  @override
+  String get extInstallFromUrl => 'URL से इंस्टॉल करें';
+
+  @override
+  String get extUrlHint => 'https://…/extension.soraext';
+
+  @override
+  String get extDownload => 'डाउनलोड करें';
+
+  @override
+  String get extDownloading => 'डाउनलोड हो रहा है...';
+
+  @override
+  String get extVerifying => 'सत्यापन किया जा रहा है...';
+
+  @override
+  String get extInstalling => 'स्थापित किया जा रहा है…';
+
+  @override
+  String get extInstallFailed => 'इंस्टालेशन विफल';
+
+  @override
+  String get extErrSignature =>
+      'हस्ताक्षर जांच विफल रही। फ़ाइल क्षतिग्रस्त हो सकती है या उसके साथ छेड़छाड़ की जा सकती है.';
+
+  @override
+  String get extErrManifest => 'एक्सटेंशन मेनिफ़ेस्ट अमान्य है।';
+
+  @override
+  String get extErrNetwork => 'नेटवर्क त्रुटि। अपना कनेक्शन जांचें और पुनः प्रयास करें।';
+
+  @override
+  String get extErrHash => 'डाउनलोड कैटलॉग से मेल नहीं खाता। हो सकता है कि इसके साथ छेड़छाड़ की गई हो.';
+
+  @override
+  String extErrMinApp(String version) {
+    return 'इस एक्सटेंशन के लिए ऐप संस्करण $version या नया चाहिए।';
+  }
+
+  @override
+  String get extErrHttpsOnly => 'केवल https:// लिंक की अनुमति है';
+
+  @override
+  String get extErrGeneric => 'कुछ गलत हो गया। कृपया पुन: प्रयास करें।';
+
+  @override
+  String get extErrAuthorKeyChanged =>
+      'यह अद्यतन स्थापित संस्करण की तुलना में एक अलग लेखक कुंजी के साथ हस्ताक्षरित है, इसलिए इसे अवरुद्ध कर दिया गया था। यदि आप नई कुंजी पर भरोसा करते हैं, तो एक्सटेंशन को अनइंस्टॉल करें और इसे स्पष्ट रूप से फिर से इंस्टॉल करें।';
+
+  @override
+  String get extUpdateAvailable => 'अपडेट उपलब्ध है';
+
+  @override
+  String get extDisabled => 'बंद';
+
+  @override
+  String extToggleEnabled(String name) {
+    return '$name सक्षम करें';
+  }
+
+  @override
+  String get extSearchInstalled => 'इंस्टॉल किए गए एक्सटेंशन खोजें';
+
+  @override
+  String get extUpdateAll => 'सभी को अपडेट करें';
+
+  @override
+  String extUpdatesAvailable(int count) {
+    return '$count अपडेट उपलब्ध हैं';
+  }
+
+  @override
+  String extUpdatedCount(int count) {
+    return '$count अपडेट किया गया';
+  }
+
+  @override
+  String get extRiskNormal => 'सामान्य';
+
+  @override
+  String get extRiskSensitive => 'संवेदनशील';
+
+  @override
+  String get extRiskDangerous => 'उच्च जोखिम';
+
+  @override
+  String get extPermissionsRemoved => 'अब नहीं माँगी जातीं:';
+
+  @override
+  String get extUpdateFailedKept => 'पिछला संस्करण अभी भी स्थापित है।';
+
+  @override
+  String get extConflictsTitle => 'विस्तार संघर्ष';
+
+  @override
+  String get extConflictsIntro => 'ये एक्सटेंशन एक ही चीज़ चाहते हैं। चुनें कि कौन-सा चलेगा, दूसरा इंस्टॉल रहेगा।';
+
+  @override
+  String get extConflictTheme => 'ऐप थीम';
+
+  @override
+  String get extConflictNetHooks => 'नेटवर्क हुक';
+
+  @override
+  String extConflictWinner(String name) {
+    return 'प्राथमिकता: $name';
+  }
+
+  @override
+  String extConflictsCount(int count) {
+    return '$count विवादों के लिए आपके निर्णय की आवश्यकता होती है';
+  }
+
+  @override
+  String get extConflictsResolve => 'विवादों का समाधान करें';
+
+  @override
+  String get extConflictNote =>
+      'आपका चुनाव इस डिवाइस पर सहेजा जाता है। थीम तुरंत बदलती है, नेटवर्क हुक इस संस्करण में नहीं चलते।';
+
+  @override
+  String extVersionLabel(String version) {
+    return 'संस्करण $version';
+  }
+
+  @override
+  String get extAuthor => 'लेखक';
+
+  @override
+  String get extRating => 'रेटिंग';
+
+  @override
+  String get extInstalls => 'इंस्टॉल संख्या';
+
+  @override
+  String get extVersion => 'संस्करण';
+
+  @override
+  String get extAbout => 'इस एक्सटेंशन के बारे में';
+
+  @override
+  String get extPermissionsTitle => 'अनुमतियाँ';
+
+  @override
+  String get extNoPermissions => 'कोई विशेष अनुमति नहीं।';
+
+  @override
+  String get extSettings => 'सेटिंग्स';
+
+  @override
+  String get extSaveSettings => 'सेटिंग्स सहेजें';
+
+  @override
+  String get extSaving => 'सहेजा जा रहा है...';
+
+  @override
+  String extUpdateTo(String version) {
+    return '$version में अपग्रेड करें';
+  }
+
+  @override
+  String get extEnabled => 'चालू';
+
+  @override
+  String extRollbackTo(String version) {
+    return '$version पर रोलबैक';
+  }
+
+  @override
+  String extRollbackConfirm(String version) {
+    return 'संस्करण $version पर रोलबैक?';
+  }
+
+  @override
+  String get extUninstall => 'अनइंस्टॉल करें';
+
+  @override
+  String extUninstallConfirm(String name) {
+    return '\"$name\" और इसकी सेटिंग्स हटाएं?';
+  }
+
+  @override
+  String get extPanelUnavailable =>
+      'पैनल अनुपलब्ध है। हो सकता है कि एक्सटेंशन अक्षम कर दिया गया हो या हटा दिया गया हो.';
+
+  @override
+  String get extPermConnectionsRead => 'सक्रिय कनेक्शनों की सूची देखें';
+
+  @override
+  String get extPermServersRead => 'अपने सर्वर की सूची देखें';
+
+  @override
+  String get extPermSettingsRead => 'ऐप सेटिंग पढ़ें';
+
+  @override
+  String get extPermSettingsWrite => 'ऐप सेटिंग बदलें';
+
+  @override
+  String get extPermNotifications => 'सूचनाएं दिखाएं';
+
+  @override
+  String get extPermTray => 'ट्रे मेनू में आइटम जोड़ें';
+
+  @override
+  String get extPermUiPanel => 'ऐप के अंदर पैनल दिखाएं';
+
+  @override
+  String get extPermThemeApply => 'थीम लागू करें';
+
+  @override
+  String get extPermRoutingRules => 'रूटिंग नियम जोड़ें (जहां नेटवर्क ट्रैफ़िक जाता है उसे प्रभावित करता है)';
+
+  @override
+  String get extPermNetHooks => 'नेटवर्क पथ में एकीकृत करें (DPI बायपास मॉड्यूल)';
+
+  @override
+  String get extPermNetFetch => 'अनुमत सूची से URL का अनुरोध करें';
+
+  @override
+  String get extPermBackground => 'पृष्ठभूमि कार्य चलाएँ';
+
+  @override
+  String get extPermBackgroundDetail =>
+      'पैनल बंद होने पर भी निर्धारित कार्य चलाता है। आप इसे रोक सकते हैं या एक्सटेंशन सेटिंग में यह बदल सकते हैं कि यह कितनी बार चलता है।';
+
+  @override
+  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+
+  @override
+  String get extCapBackground => 'पृष्ठभूमि में चलता है';
+
+  @override
+  String get extCapNetHook => 'ब्लॉक से बचाव और नेटवर्क हुक';
+
+  @override
+  String get extCapPanel => 'इंटरफ़ेस पैनल';
+
+  @override
+  String get extCapRouting => 'रूटिंग नियम';
+
+  @override
+  String get extCapTheme => 'थीम';
+
+  @override
+  String get extCapWidget => 'विजेट';
+
+  @override
+  String extCatalogCached(String date) {
+    return 'Cached catalog, $date';
+  }
+
+  @override
+  String get extChangelog => 'चेंजलॉग';
+
+  @override
+  String get extImageFailed => 'छवि लोड नहीं हो सकी';
+
+  @override
+  String get extRatingHow => 'रेटिंग्स कैसे काम करती हैं';
+
+  @override
+  String get extRatingHowBody =>
+      'रेटिंग बायेसियन औसत का उपयोग करती है: कुछ रेटिंग वाला एक्सटेंशन तब तक मध्य के पास रहता है जब तक कि अधिक लोग वोट नहीं करते हैं, इसलिए एक 5-सितारा समीक्षा एक नए एक्सटेंशन को शीर्ष पर नहीं धकेल सकती है। हाल की रेटिंग का महत्व पुरानी रेटिंग से अधिक है और प्रति खाता केवल एक रेटिंग ही मायने रखती है।';
+
+  @override
+  String get extScreenshots => 'स्क्रीनशॉट';
+
+  @override
+  String get extSortRelevance => 'प्रासंगिकता';
+
+  @override
+  String get extPermNetworkDetail =>
+      'VPN के ज़रिए इंटरनेट से डेटा लाता है। केवल नीचे दिए होस्ट की अनुमति है, बाकी सब ब्लॉक है।';
+
+  @override
+  String get extBgTitle => 'पृष्ठभूमि कार्य';
+
+  @override
+  String get extBgEnabled => 'पृष्ठभूमि में चलाएँ';
+
+  @override
+  String get extBgInterval => 'चलाने का अंतराल';
+
+  @override
+  String extBgMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# मिनट', one: '# मिनट');
+    return '$_temp0';
+  }
+
+  @override
+  String extBgHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# घंटे', one: '# घंटा');
+    return '$_temp0';
+  }
+
+  @override
+  String get extBgNote =>
+      'Sora खुला रहने तक, ट्रे में होने पर भी, कार्य शेड्यूल के अनुसार चलता है। सबसे छोटा अंतराल 15 मिनट है।';
+
+  @override
+  String get extBgDisabledNote => 'इसके पृष्ठभूमि कार्य को प्रबंधित करने के लिए एक्सटेंशन को सक्षम करें।';
+
+  @override
+  String get extCapNetwork => 'नेटवर्क पहुंच';
+
+  @override
+  String extCapNetworkHosts(String hosts) {
+    return 'नेटवर्क: $hosts';
+  }
 
   @override
   String exportLogFile(String name) {
@@ -908,6 +1331,663 @@ class SHi extends S {
 
   @override
   String get diagnosticHttp => 'HTTP डायग्नोस्टिक्स';
+
+  @override
+  String get diagnosticNoData => 'अभी तक कोई रिकॉर्डेड अनुरोध नहीं. सबसे पहले एक स्पीड टेस्ट वेबसाइट खोलें।';
+
+  @override
+  String get qrShareTitle => 'QR कोड साझा करें';
+
+  @override
+  String get qrScanTitle => 'QR कोड स्कैन करें';
+
+  @override
+  String get qrCopyLink => 'लिंक कॉपी करें';
+
+  @override
+  String get qrShowLink => 'लिंक दिखाएँ';
+
+  @override
+  String get qrHideLink => 'लिंक छुपाएं';
+
+  @override
+  String get qrWarning => 'इस QR कोड में कनेक्शन विवरण शामिल है। इसे अजनबियों को न दिखाएं.';
+
+  @override
+  String get qrScanHint => 'QR कोड वाला स्क्रीनशॉट या फ़ोटो चुनें, या लिंक पेस्ट करें';
+
+  @override
+  String get qrFromClipboard => 'क्लिपबोर्ड से चिपकाएँ';
+
+  @override
+  String get qrNoCode => 'इस छवि में कोई QR कोड नहीं मिला।';
+
+  @override
+  String get qrInvalid => 'इस QR कोड में कोई वैध लिंक नहीं है।';
+
+  @override
+  String get qrScan => 'स्कैन QR';
+
+  @override
+  String get qrFromImage => 'छवि खोलें';
+
+  @override
+  String get connGroupByProcess => 'प्रक्रिया के अनुसार समूह बनाएं';
+
+  @override
+  String get connListView => 'सूची';
+
+  @override
+  String get connCopyHost => 'कॉपी होस्ट';
+
+  @override
+  String get connAddRule => 'नियम जोड़ें';
+
+  @override
+  String connConnectionsCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# कनेक्शन', one: '# कनेक्शन');
+    return '$_temp0';
+  }
+
+  @override
+  String get dnsPreset => 'प्रीसेट';
+
+  @override
+  String get dnsPresetCloudflare => 'Cloudflare';
+
+  @override
+  String get dnsPresetGoogle => 'Google';
+
+  @override
+  String get dnsPresetQuad9 => 'Quad9';
+
+  @override
+  String get dnsPresetAdGuard => 'AdGuard';
+
+  @override
+  String get dnsPresetCustom => 'कस्टम';
+
+  @override
+  String get dnsCheck => 'डेटा लीक की जांच करें';
+
+  @override
+  String get dnsChecking => 'जाँच हो रही है...';
+
+  @override
+  String get dnsNoLeak => 'कोई लीक नहीं मिला';
+
+  @override
+  String get dnsLeakFound => 'रिसाव का पता चला';
+
+  @override
+  String get dnsLastCheck => 'अंतिम जांच';
+
+  @override
+  String get dnsNeverChecked => 'अभी तक परीक्षण नहीं किया गया';
+
+  @override
+  String get dnsLeakCheckTunnelDns => 'टनल के DNS रिज़ॉल्वर';
+
+  @override
+  String get dnsLeakCheckSystemResolvers => 'सिस्टम रिज़ॉल्वर';
+
+  @override
+  String get dnsLeakCheckKillSwitchDns => 'नेटवर्क अवरोध से DNS सुरक्षा';
+
+  @override
+  String get dnsLeakFixConfigureTunnelDns => 'उपरोक्त DNS सेटिंग्स में सुरंग के लिए DNS कॉन्फ़िगर करें।';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'जांचें कि आपका सिस्टम सुरंग के बाहर कौन से रिज़ॉल्वर का उपयोग करेगा।';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS ट्रैफ़िक को टनल के अंदर रखने के लिए नेटवर्क अवरोध चालू करें।';
+
+  @override
+  String get dnsLeakCheckEncryptedDns => 'सिस्टम का एन्क्रिप्टेड DNS';
+
+  @override
+  String get dnsLeakCheckDnsSpoof => 'DNS जवाबों की जालसाज़ी';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'जांचें कि आपका सिस्टम सुरंग के बाहर किस एन्क्रिप्टेड DNS एंडपॉइंट का उपयोग करता है।';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'सुरंग के लिए एन्क्रिप्टेड DNS (DoT या DoH) का उपयोग करें ताकि रिज़ॉल्वर नकली उत्तर न दे सकें।';
+
+  @override
+  String get dnsCheckNeedsConnection => 'पहले VPN से कनेक्ट करें, फिर लीक की जांच करें।';
+
+  @override
+  String get dnsExpected => 'अपेक्षित';
+
+  @override
+  String get dnsActual => 'अवलोकन किया गया';
+
+  @override
+  String get sortBy => 'क्रमबद्ध करें';
+
+  @override
+  String get sortPing => 'पिंग';
+
+  @override
+  String get sortSpeed => 'गति';
+
+  @override
+  String get sortName => 'नाम';
+
+  @override
+  String get measureSpeed => 'गति मापें';
+
+  @override
+  String get benchmarkStale => 'पुराना';
+
+  @override
+  String get autoSelectMode => 'स्वतः-चयन सर्वर';
+
+  @override
+  String get autoSelectPing => 'सबसे तेज़ पिंग';
+
+  @override
+  String get autoSelectSpeed => 'सबसे तेज़ गति';
+
+  @override
+  String get autoSelectSmart => 'स्मार्ट विकल्प';
+
+  @override
+  String get coreWatchUnstable => 'Sora कोर से कनेक्शन अस्थिर है';
+
+  @override
+  String get watchReconnect => 'पुनः कनेक्ट करें';
+
+  @override
+  String get coreRestoringLink => 'Sora कोर से कनेक्शन बहाल किया जा रहा है…';
+
+  @override
+  String get crashRestoreTitle => 'पिछला सत्र बाधित हुआ था';
+
+  @override
+  String get restoreOnCrash => 'दुर्घटना के बाद सत्र बहाल करें';
+
+  @override
+  String get crashRestore => 'पुनर्स्थापित करें';
+
+  @override
+  String get crashDismiss => 'अभी नहीं';
+
+  @override
+  String get overrideTitle => 'मेरे संपादन';
+
+  @override
+  String get overrideEdit => 'सर्वर संपादित करें';
+
+  @override
+  String get overrideHide => 'छुपाएं';
+
+  @override
+  String get overrideUnhide => 'दिखाएँ';
+
+  @override
+  String get overrideClear => 'संपादन रीसेट करें';
+
+  @override
+  String get overrideEmpty => 'अभी तक कोई संपादन नहीं';
+
+  @override
+  String get overrideCustomRules => 'अपने नियम';
+
+  @override
+  String get errBenchmarkUnsupported => 'गति मापन के लिए एक नए कोर की आवश्यकता होती है';
+
+  @override
+  String benchmarkProgress(Object done, Object total) {
+    return '$total से $done का माप…';
+  }
+
+  @override
+  String get profiles => 'नेटवर्क प्रोफाइल';
+
+  @override
+  String get profilesEmpty =>
+      'अभी तक कोई प्रोफ़ाइल नहीं। ज्ञात नेटवर्क पर स्वचालित रूप से सेटिंग्स लागू करने के लिए एक बनाएं।';
+
+  @override
+  String get profileAdd => 'प्रोफ़ाइल जोड़ें';
+
+  @override
+  String get profileName => 'प्रोफ़ाइल नाम';
+
+  @override
+  String get profileSsids => 'Wi-Fi नेटवर्क (SSID)';
+
+  @override
+  String get profileSsidsHint => 'घर, कार्यालय को अल्पविराम से अलग किया गया';
+
+  @override
+  String get profileGateways => 'नेटवर्क गेटवे';
+
+  @override
+  String get profileAsns => 'AS संख्याएँ';
+
+  @override
+  String get profileAutoApply => 'अपने आप लागू करें';
+
+  @override
+  String get profileAutoApplyHint => 'बंद होने पर प्रोफ़ाइल लागू करने से पहले पुष्टि माँगी जाएगी।';
+
+  @override
+  String get profileSnapshot => 'वर्तमान सेटिंग्स याद रखें';
+
+  @override
+  String get profileSnapshotDone => 'वर्तमान सेटिंग्स प्रोफ़ाइल में सहेजी गईं';
+
+  @override
+  String get profileDelete => 'प्रोफ़ाइल हटाएं';
+
+  @override
+  String profileDeleteConfirm(Object name) {
+    return 'प्रोफ़ाइल \"$name\" हटाएं?';
+  }
+
+  @override
+  String profileApplyAsk(Object name) {
+    return 'प्रोफ़ाइल \"$name\" लागू करें?';
+  }
+
+  @override
+  String get profileApply => 'लागू करें';
+
+  @override
+  String profileApplied(Object name) {
+    return 'प्रोफ़ाइल \"$name\" लागू की गई';
+  }
+
+  @override
+  String get profileUndo => 'रद्द करें';
+
+  @override
+  String get profileActive => 'सक्रिय';
+
+  @override
+  String networkNow(Object info) {
+    return 'अब: $info';
+  }
+
+  @override
+  String get networkUnknown => 'नेटवर्क जानकारी अनुपलब्ध है';
+
+  @override
+  String get profileNoTriggers => 'कम से कम एक ट्रिगर जोड़ें: SSID, गेटवे या ASN';
+
+  @override
+  String get chains => 'प्रॉक्सी चेन';
+
+  @override
+  String get chainsEmpty =>
+      'अभी तक कोई जंजीर नहीं। 2-3 सर्वरों को लिंक करें ताकि ट्रैफ़िक उनमें से प्रत्येक के माध्यम से हो।';
+
+  @override
+  String get chainAdd => 'नई श्रृंखला';
+
+  @override
+  String get chainName => 'श्रृंखला का नाम';
+
+  @override
+  String get chainPickServers => '2-3 सर्वर चुनें';
+
+  @override
+  String get chainOrderHint =>
+      'पुन: व्यवस्थित करने के लिए खींचें: ट्रैफ़िक शीर्ष पर प्रवेश करता है और नीचे से बाहर निकलता है।';
+
+  @override
+  String get chainTooFew => 'कम से कम 2 सर्वर चुनें';
+
+  @override
+  String get chainTooMany => 'एक श्रृंखला में अधिकतम 3 सर्वर होते हैं';
+
+  @override
+  String get chainEstimate => 'अनुमानित विलंबता';
+
+  @override
+  String get chainSave => 'श्रृंखला सहेजें';
+
+  @override
+  String get chainDelete => 'श्रृंखला हटाएं';
+
+  @override
+  String chainDeleteConfirm(Object name) {
+    return 'श्रृंखला \"$name\" हटाएं?';
+  }
+
+  @override
+  String get chainUnsupported => 'वर्तमान इंजन चेन नहीं बना सकता';
+
+  @override
+  String get chainHopMissing => 'चेन सर्वरों में से एक अब उपलब्ध नहीं है';
+
+  @override
+  String chainHop(Object n) {
+    return 'हॉप $n';
+  }
+
+  @override
+  String get chainEntry => 'प्रवेश';
+
+  @override
+  String get chainExit => 'निकास';
+
+  @override
+  String get sync => 'डिवाइस सिंक्रनाइज़ेशन';
+
+  @override
+  String get syncDevices => 'मेरे उपकरण';
+
+  @override
+  String get syncEmpty => 'कोई युग्मित डिवाइस नहीं। स्थानीय नेटवर्क पर किसी अन्य डिवाइस को जोड़ें।';
+
+  @override
+  String get syncPair => 'डिवाइस पेयर करें';
+
+  @override
+  String get syncShowCode => 'मेरा कोड दिखाएँ';
+
+  @override
+  String get syncScanCode => 'कोड स्कैन करें';
+
+  @override
+  String get syncRevoke => 'वापस लें';
+
+  @override
+  String syncRevokeConfirm(Object name) {
+    return '\"$name\" को रद्द करें?';
+  }
+
+  @override
+  String syncLastSync(Object time) {
+    return 'अंतिम सिंक: $time';
+  }
+
+  @override
+  String get syncNever => 'कभी नहीं';
+
+  @override
+  String get syncNoLan => 'डिवाइस एक ही स्थानीय नेटवर्क पर होने चाहिए';
+
+  @override
+  String get syncPaired => 'डिवाइस युग्मित';
+
+  @override
+  String get syncPairingTitle => 'इस डिवाइस के साथ युग्मित करें';
+
+  @override
+  String get syncWaiting => 'दूसरे डिवाइस की प्रतीक्षा है...';
+
+  @override
+  String get syncSecureNote => 'एंड-टू-एंड एन्क्रिप्टेड चैनल। कोई खाता नहीं, कोई क्लाउड सर्वर नहीं।';
+
+  @override
+  String get zapretWithVpn => 'सीधे नेटवर्क ट्रैफ़िक के लिए बाईपास DPI फ़िल्टरिंग';
+
+  @override
+  String get zapretWithVpnHint =>
+      'VPN टनल के साथ zapret चलाता है: टनल का ट्रैफ़िक VPN से और सीधा ट्रैफ़िक बायपास से जाता है।';
+
+  @override
+  String get chainDuplicate => 'प्रत्येक सर्वर केवल एक बार ही प्रदर्शित हो सकता है';
+
+  @override
+  String get edit => 'संपादित करें';
+
+  @override
+  String get remove => 'हटाओ';
+
+  @override
+  String get autoSwitchOnDegrade => 'गिरावट पर ऑटो-स्विच';
+
+  @override
+  String get autoSwitchOnDegradeDetail =>
+      'चुना गया सर्वर बहुत धीमा हो जाए या जवाब देना बंद कर दे, तो Sora माप के अनुसार सबसे अच्छे सर्वर पर स्विच करता है, लेकिन हर 10 मिनट में अधिकतम एक बार।';
+
+  @override
+  String get tunStackMixed => 'मिश्रित';
+
+  @override
+  String get tunStackSystem => 'सिस्टम';
+
+  @override
+  String get customServerAdd => 'कस्टम सर्वर जोड़ें';
+
+  @override
+  String get customServers => 'मेरे सर्वर';
+
+  @override
+  String get customServerName => 'नाम';
+
+  @override
+  String get customServerNameHint => 'उदाहरण के लिए: मेरा वी.पी.एस';
+
+  @override
+  String get customServerNameRequired => 'नाम दर्ज करें';
+
+  @override
+  String get customServerAddress => 'पता';
+
+  @override
+  String get customServerAddressHint => 'example.com या 192.0.2.1';
+
+  @override
+  String get customServerAddressRequired => 'सर्वर पता दर्ज करें';
+
+  @override
+  String get customServerAddressInvalid => 'अमान्य पता';
+
+  @override
+  String get customServerPort => 'पोर्ट';
+
+  @override
+  String get customServerPortHint => '443';
+
+  @override
+  String get customServerPortInvalid => 'पोर्ट 1 से 65535 तक की संख्या होनी चाहिए';
+
+  @override
+  String get customServerProtocol => 'प्रोटोकॉल';
+
+  @override
+  String get customServerCredentials => 'लॉगिन जानकारी';
+
+  @override
+  String get customServerOptional => 'वैकल्पिक';
+
+  @override
+  String get customServerShowSecret => 'रहस्य दिखाएँ';
+
+  @override
+  String get customServerHideSecret => 'रहस्य छुपाएं';
+
+  @override
+  String get customServerBadge => 'कस्टम';
+
+  @override
+  String customServerDeleteConfirm(String name) {
+    return 'सर्वर \"$name\" हटाएं?';
+  }
+
+  @override
+  String get customServerEmptyHint => 'मैन्युअल रूप से एक सर्वर जोड़ें: पता, पोर्ट और प्रोटोकॉल';
+
+  @override
+  String get customServerTest => 'परीक्षण';
+
+  @override
+  String get leakTestTitle => 'डेटा लीक के लिए परीक्षण';
+
+  @override
+  String get leakTestIntro =>
+      'जाँचता है कि ट्रैफ़िक टनल से बाहर होकर डिवाइस से निकल सकता है या नहीं: सीधे DNS और ICMP अनुरोध, IPv6 निकास और सिस्टम रिज़ॉल्वर। कनेक्शन चालू होने पर चलाएँ।';
+
+  @override
+  String get leakTestRun => 'जांचें';
+
+  @override
+  String get leakTestCancel => 'रद्द करें';
+
+  @override
+  String get leakTestNeedsConnection => 'डेटा लीक की जांच के लिए VPN से कनेक्ट करें।';
+
+  @override
+  String leakTestProgress(int count) {
+    return 'परीक्षण पूर्ण: $count';
+  }
+
+  @override
+  String get leakTestAllClear => 'कोई लीक नहीं मिला';
+
+  @override
+  String leakTestFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# लीक मिले', one: '# लीक मिला');
+    return '$_temp0';
+  }
+
+  @override
+  String get leakTestSkipped => 'Skipped, not applicable in this session';
+
+  @override
+  String get leakTestFix => 'ठीक करें';
+
+  @override
+  String get leakTestFixedNote => 'नेटवर्क अवरोध चालू है। पुष्टि के लिए दोबारा जाँचें।';
+
+  @override
+  String get leakTestCheckDirectDns => 'प्रत्यक्ष DNS';
+
+  @override
+  String get leakTestCheckIcmpEcho => 'ICMP प्रतिध्वनि';
+
+  @override
+  String get leakTestCheckIpv6 => 'IPv6';
+
+  @override
+  String get leakTestCheckSystemResolvers => 'सिस्टम रिज़ॉल्वर';
+
+  @override
+  String get leakTestCheckTunnelConnectivity => 'सुरंग कनेक्टिविटी';
+
+  @override
+  String get leakTestCheckTunnelDns => 'DNS सुरंग के माध्यम से';
+
+  @override
+  String get noticeDegraded => 'सर्वर धीमा हो गया। Sora माप के दौरान पाए गए सर्वोत्तम सर्वर पर स्विच किया गया।';
+
+  @override
+  String get obfs => 'ट्रैफ़िक छिपाना';
+
+  @override
+  String get syncCodeExpired => 'कोड समाप्त हो गया है';
+
+  @override
+  String get syncDaemonFailed => 'सिंक सेवा प्रारंभ नहीं हो सकी';
+
+  @override
+  String get syncDaemonMissing => 'sora-sync घटक नहीं मिला। डिवाइस सिंक सक्षम करने के लिए ऐप को पुनः इंस्टॉल करें।';
+
+  @override
+  String get syncDaemonStarting => 'सिंक सेवा शुरू हो रही है...';
+
+  @override
+  String get syncErrAuth => 'सिंक सेवा ने एक्सेस टोकन को अस्वीकार कर दिया। ऐप को पुनरारंभ करें और पुनः प्रयास करें।';
+
+  @override
+  String get syncErrNotFound => 'डिवाइस अब युग्मित नहीं है';
+
+  @override
+  String get syncErrPairingActive => 'एक युग्मन सत्र पहले से ही खुला है';
+
+  @override
+  String get syncErrUnreachable =>
+      'दूसरे उपकरण ने उत्तर नहीं दिया। सुनिश्चित करें कि यह एक ही नेटवर्क पर है और अपना कोड दिखा रहा है।';
+
+  @override
+  String get syncError => 'तुल्यकालन त्रुटि';
+
+  @override
+  String syncExpiresIn(String duration) {
+    return 'कोड $duration बाद समाप्त होगा';
+  }
+
+  @override
+  String get syncJoining => 'डिवाइस के साथ युग्मित करना...';
+
+  @override
+  String get syncLegacyCleared =>
+      'पुरानी डिवाइस सूची वास्तव में कभी जोड़ी नहीं गई थी, इसलिए इसे साफ़ कर दिया गया था। इस बार वास्तव में अपने डिवाइस को फिर से जोड़ें।';
+
+  @override
+  String get syncNewCode => 'नया कोड';
+
+  @override
+  String syncPairedWith(String name) {
+    return '$name के साथ युग्मित';
+  }
+
+  @override
+  String get syncRetry => 'दोहराएँ';
+
+  @override
+  String get syncStopShowing => 'कोड छिपाएँ';
+
+  @override
+  String get syncSyncNow => 'अभी सिंक करें';
+
+  @override
+  String syncSyncResult(int pulled, int pushed) {
+    return '$pulled प्राप्त हुआ, $pushed भेजा गया';
+  }
+
+  @override
+  String get syncResultTitle => 'तुल्यकालन परिणाम';
+
+  @override
+  String get syncPulled => 'प्राप्त हुआ';
+
+  @override
+  String get syncPushed => 'भेजा गया';
+
+  @override
+  String get syncNoChanges => 'कोई बदलाव नहीं';
+
+  @override
+  String get syncDocKindSubscriptions => 'सदस्यताएँ';
+
+  @override
+  String get syncDocKindSettings => 'ऐप सेटिंग्स';
+
+  @override
+  String get syncDocKindOverrides => 'सदस्यता के कस्टम बदलाव';
+
+  @override
+  String get syncDocKindProfiles => 'नेटवर्क प्रोफाइल';
+
+  @override
+  String get syncDocKindChains => 'प्रॉक्सी चेन';
+
+  @override
+  String syncFrom(String name) {
+    return '$name से';
+  }
+
+  @override
+  String get syncThisDevice => 'यह उपकरण';
+
+  @override
+  String get syncUnavailableAndroid =>
+      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+
+  @override
+  String get customServerShadowsocksCredentials =>
+      'Shadowsocks के लिए: method:password, जैसे chacha20-ietf-poly1305:password';
 
   @override
   String get diagnosticPackets => 'पैकेट पर कब्जा';
@@ -919,11 +1999,60 @@ class SHi extends S {
   String get diagnosticCapture => '10 सेकंड के लिए कैप्चर करें';
 
   @override
-  String get diagnosticNoData => 'अभी तक कोई रिकॉर्डेड अनुरोध नहीं. सबसे पहले एक स्पीड टेस्ट वेबसाइट खोलें।';
-
-  @override
   String get diagnosticRequiresTun => 'पैकेट कैप्चर के लिए एक सक्रिय सोरा ट्यून कनेक्शन की आवश्यकता होती है।';
 
   @override
   String get diagnosticUnavailable => 'यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.';
+
+  @override
+  String get extErrRevoked => 'Sora टीम ने इस एक्सटेंशन संस्करण को वापस ले लिया है, क्योंकि यह असुरक्षित या खराब है।';
+
+  @override
+  String get extErrRevocationsExpired =>
+      'वापस लिए गए एक्सटेंशन की सूची नवीनीकृत नहीं हो सकी। नवीनीकरण तक इंस्टॉल बंद है: नेटवर्क जांचें और फिर कोशिश करें।';
+
+  @override
+  String extRevokedDisabled(String names) {
+    return 'वापस लिए गए एक्सटेंशन बंद किए गए: $names';
+  }
+
+  @override
+  String get customServerWgPrivateKey => 'प्राइवेट की';
+
+  @override
+  String get customServerWgAddresses => 'इंटरफ़ेस पते';
+
+  @override
+  String get customServerWgPeerKey => 'सर्वर की पब्लिक की';
+
+  @override
+  String get customServerWgPresharedKey => 'प्री-शेयर्ड की';
+
+  @override
+  String get customServerWgAllowedIps => 'अनुमत IP';
+
+  @override
+  String get customServerWgKeepalive => 'Keepalive, सेकंड';
+
+  @override
+  String get customServerWgKeyInvalid => 'की wg genkey की तरह base64 में 32 बाइट होनी चाहिए।';
+
+  @override
+  String get customServerWgCidrInvalid => 'कॉमा से अलग प्रीफ़िक्स दें, जैसे 10.0.0.2/32।';
+
+  @override
+  String get customServerWgKeepaliveInvalid => '0 से 65535 तक सेकंड की संख्या दें।';
+
+  @override
+  String get strictKillSwitch => 'सख्त नेटवर्क अवरोध';
+
+  @override
+  String get strictKillSwitchWarning =>
+      'कनेक्ट होने के बाद, क्रैश, पुनः आरंभ या ऐप बंद होने पर भी VPN के बाहर का ट्रैफ़िक रोकता है। केवल डिस्कनेक्ट करने या यह विकल्प बंद करने से पहुँच लौटती है। डिवाइस पुनः आरंभ होने पर अवरोध तभी फिर लागू होगा जब शुरू होते समय कनेक्ट करने का विकल्प चालू हो।';
+
+  @override
+  String get extWorkerFailed => 'एक्सटेंशन का बैकग्राउंड कार्य विफल हुआ। एक्सटेंशन का लॉग देखें।';
+
+  @override
+  String get extAssetRejected => 'एक्सटेंशन फ़ाइल अस्वीकृत: अपठनीय रंग या अमान्य नियम।';
 }

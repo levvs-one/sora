@@ -62,6 +62,10 @@ type networkWatch struct {
 	probe    func() string
 	interval time.Duration
 	last     string
+	// pending holds a fingerprint change until a second consecutive
+	// measurement confirms it, so flapping interfaces do not renew
+	// connections on every poll.
+	pending string
 	// Keep wall and monotonic observations separately to detect suspend
 	// gaps.
 	lastWall, lastMono time.Time
@@ -77,6 +81,9 @@ func newNetworkWatch(probe func() string, interval time.Duration) *networkWatch 
 }
 
 // changed reports why the session should renew its connections, or "".
+// A network move is reported only after two consecutive polls agree on the
+// new fingerprint, debouncing flapping interfaces. Waking from
+// sleep is reported immediately: the old path is certainly dead.
 func (w *networkWatch) changed() string {
 	now := time.Now()
 	// The monotonic clock stops while the machine sleeps and the wall clock
@@ -85,24 +92,41 @@ func (w *networkWatch) changed() string {
 	w.lastWall, w.lastMono = now.Round(0), now
 	current := w.probe()
 	moved := current != w.last && current != ""
-	w.last = current
 	switch {
 	case slept:
+		w.last, w.pending = current, ""
 		return "the machine woke from sleep"
 	case moved:
-		return "the network changed"
+		if w.pending == current {
+			w.last, w.pending = current, ""
+			return "the network changed"
+		}
+		w.pending = current
+		return ""
+	default:
+		w.pending = ""
+		w.last = current
+		return ""
 	}
-	return ""
 }
 
 // renewConnections closes stale network flows so applications reconnect
-// promptly. Engines without bulk close, including Xray, reapply the plan by
-// restarting.
+// promptly.
 func (s *Session) renewConnections(ctx context.Context, why string) {
 	if s.State() != StateConnected {
 		return
 	}
+	// Surface the network move itself, not just the renewal, so the
+	// client can show the connection state while flows re-establish.
+	s.log.Append(Event{Kind: EventNetwork, Detail: why})
 	s.log.Append(Event{Kind: EventLog, Detail: why + "; connections reopen"})
+	s.reopenFlows(ctx)
+}
+
+// reopenFlows drops every live connection so applications reconnect on a
+// fresh path. Engines without bulk close, including Xray, reapply the plan
+// by restarting instead.
+func (s *Session) reopenFlows(ctx context.Context) {
 	if tracker, ok := s.eng.(engine.ConnectionTracker); ok {
 		if err := tracker.CloseConnections(ctx); err == nil {
 			return
