@@ -105,7 +105,7 @@ bool isEnforced(String id) {
   return row != null && (row.status == ExtEnforcementStatus.enforced || row.status == ExtEnforcementStatus.installTime);
 }
 
-/// True for permissions that are honestly "granted but doing nothing yet":
+/// True for permissions that are "granted but doing nothing yet":
 /// inert or unimplemented. The prompt should say so in plain language.
 bool isNotYetActive(String id) {
   final row = enforcementOf(id);

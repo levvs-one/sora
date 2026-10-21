@@ -557,7 +557,7 @@ func (s *Session) supervise(events <-chan engine.Event) {
 			case engine.EventFatal:
 				// Keep the supervisor's reason (restart budget exhausted,
 				// restart failure) in the failure status: a generic line
-				// here hides the actual cause from the client (F7 honesty).
+				// here hides the actual cause from the client.
 				fatal := ev.Err
 				if ev.Message != "" {
 					// The budget message ("more than 5 restarts within

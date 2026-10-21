@@ -36,7 +36,7 @@ func newServer(t *testing.T, handler http.HandlerFunc) (*subscription.Fetcher, s
 func TestFetchReturnsTheBody(t *testing.T) {
 	fetcher, url := newServer(t, func(w http.ResponseWriter, r *http.Request) {
 		if got := r.Header.Get("User-Agent"); !strings.HasPrefix(got, "sora-core/") {
-			t.Errorf("user agent = %q, want one that identifies the client honestly", got)
+			t.Errorf("user agent = %q, want one that identifies the client", got)
 		}
 		if got := r.Header.Get("Accept-Encoding"); got != "identity" {
 			t.Errorf("accept-encoding = %q, want identity so a body cannot be expanded past the limit", got)

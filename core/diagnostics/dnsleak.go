@@ -199,7 +199,7 @@ func CheckDNSLeaks(ctx context.Context, in DNSLeakInput) []DNSLeakCheck {
 }
 
 // canaryTarget maps a tunnel resolver to the probe that can exercise it.
-// A non-empty skip explains honestly why the resolver cannot be probed
+// A non-empty skip explains why the resolver cannot be probed
 // instead of silently passing it.
 func canaryTarget(r TunnelResolver) (network, addr, skip string) {
 	switch t := strings.ToLower(strings.TrimSpace(r.Transport)); t {
@@ -314,7 +314,7 @@ func checkTunnelDNS(ctx context.Context, in DNSLeakInput, tunnel []string, probe
 			ips, err := probe(qctx, tg.network, tg.addr, in.CanaryHost)
 			if err != nil {
 				// A failing tunnel resolver is an outage, not a leak:
-				// report it honestly without raising the leak flag.
+				// report it without raising the leak flag.
 				results[i] = tg.name + ": unreachable"
 				return
 			}

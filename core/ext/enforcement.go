@@ -12,7 +12,7 @@ package ext
 // must say so in exactly these words, so nobody (including a future
 // contributor) can quietly upgrade the claim.
 //
-// Honest statuses (2026-10-20, pass-1 audit):
+// Statuses:
 //
 //   - Enforced: a real check runs on every call path.
 //   - InstallTime: validated at install/load; there is no runtime call
@@ -41,7 +41,7 @@ const (
 type EnforcementRow struct {
 	// ID is the registry permission id.
 	ID string
-	// Status is the honest classification.
+	// Status is what the code actually enforces.
 	Status EnforcementStatus
 	// Where names the code that performs the check. It is set exactly
 	// when Status is Enforced or InstallTime; an unenforced row must not

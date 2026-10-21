@@ -213,7 +213,7 @@ func ValidatePackage(path string) *Result {
 	return r
 }
 
-// warnUnenforced tells the author the honest enforcement state of the
+// warnUnenforced tells the author the real enforcement state of the
 // permissions they request: a permission that is inert or unimplemented in
 // the current runtime grants nothing, and shipping an extension that
 // depends on it today silently does nothing. It is a warning, not an

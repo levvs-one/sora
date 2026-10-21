@@ -12,7 +12,7 @@ import (
 // enforcement matrix (app/lib/src/ext/enforcement.dart) to this Go
 // table. The install prompt and the detail screen read the Dart table:
 // if it drifted - above all if it upgraded one of the two RiskDangerous
-// rows the Go side honestly reports as unimplemented - the user would
+// rows the Go side reports as unimplemented - the user would
 // be told a protection exists that no code performs. The Go test pins
 // the Go claims against the gates; this test pins the mirror against
 // the Go table, row for row, in registry order.
@@ -53,7 +53,7 @@ func TestEnforcementDartMirrorMatches(t *testing.T) {
 	}
 	// The net.hooks row must stay unimplemented in the mirror
 	// too - said explicitly, not only via the table walk above, because
-	// this is the load-bearing honesty claim of the whole matrix.
+	// this is the claim the whole matrix exists for.
 	for _, id := range []string{"net.hooks"} {
 		re := regexp.MustCompile(`ExtEnforcementRow\(\s*'` + regexp.QuoteMeta(id) + `',\s*ExtEnforcementStatus\.unimplemented`)
 		if !re.MatchString(string(raw)) {

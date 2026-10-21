@@ -6,7 +6,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine"
 )
 
-// TestHijacksDNSHonorsTheRealRenderConditions locks the honest hijack
+// TestHijacksDNSHonorsTheRealRenderConditions pins the hijack
 // signal: sing-box renders hijack-dns unconditionally and mihomo's TUN
 // renders dns-hijack by default, both only when the plan runs a TUN
 // (system mode). DNS.HijackTun is nothing in production ever fills, so

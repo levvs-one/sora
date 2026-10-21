@@ -14,7 +14,7 @@ var resolvConfPath = "/etc/resolv.conf"
 
 // SystemResolvers returns the DNS resolvers the OS is configured to use.
 // It never fails: undetectable resolvers yield an empty list, and callers
-// report that honestly instead of guessing.
+// report that instead of guessing.
 func SystemResolvers() []string {
 	return systemResolversFromFile(resolvConfPath)
 }

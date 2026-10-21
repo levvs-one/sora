@@ -80,8 +80,8 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 		// The header-declared UncompressedSize64 above is a fast path, and the
 		// stdlib itself refuses to decompress past the declared size (fail
 		// closed on a lying header). The accounting below still counts the
-		// bytes that actually came out of the decompressor - the honest
-		// memory metric - so the total limit bounds real allocations no
+		// bytes that actually came out of the decompressor (the real
+		// memory metric), so the total limit bounds real allocations no
 		// matter which layer stops a bomb first.
 		rc, err := f.Open()
 		if err != nil {

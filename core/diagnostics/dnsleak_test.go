@@ -139,7 +139,7 @@ func TestCheckDNSLeaks_CanaryFailureIsNotALeak(t *testing.T) {
 		t.Errorf("canary failure is an outage, not a leak: %+v", tunnel)
 	}
 	if !strings.Contains(tunnel.Actual, "unreachable") {
-		t.Errorf("canary failure should be reported honestly, got %q", tunnel.Actual)
+		t.Errorf("canary failure should be reported as such, got %q", tunnel.Actual)
 	}
 }
 
@@ -268,7 +268,7 @@ func TestCheckDNSLeaks_BrokenDoHIsOutageNotLeak(t *testing.T) {
 		t.Errorf("broken DoH is an outage, not a leak: %+v", tunnel)
 	}
 	if !strings.Contains(tunnel.Actual, "unreachable") {
-		t.Errorf("broken DoH should be reported honestly, got %q", tunnel.Actual)
+		t.Errorf("broken DoH should be reported as such, got %q", tunnel.Actual)
 	}
 }
 

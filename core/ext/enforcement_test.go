@@ -23,10 +23,10 @@ func TestEnforcementTableCoversRegistry(t *testing.T) {
 	}
 }
 
-// TestEnforcementRowsAreHonestShape pins the honesty rules of the matrix
+// TestEnforcementRowsAreTruthful pins the wording rules of the matrix
 // itself: a row that claims enforcement must name the check; a row that
 // admits none must not point at code as if it did.
-func TestEnforcementRowsAreHonestShape(t *testing.T) {
+func TestEnforcementRowsAreTruthful(t *testing.T) {
 	for _, row := range enforcementTable {
 		switch row.Status {
 		case EnforcementEnforced, EnforcementInstallTime:
@@ -61,7 +61,7 @@ func TestEnforcementBackgroundGateIsReal(t *testing.T) {
 }
 
 // TestEnforcementDangerousAreNotClaimedEnforced is the load-bearing
-// honesty pin: net.hooks has zero enforcement code today, and the matrix
+// pin: net.hooks has zero enforcement code today, and the matrix
 // must say so. Flipping it to Enforced
 // requires a behavior pin in this test proving a real gate exists -
 // a docs edit must never be able to upgrade the claim on its own.

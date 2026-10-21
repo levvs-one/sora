@@ -12,7 +12,7 @@ import (
 
 // SystemResolvers returns the DNS servers Windows reports for its adapters.
 // It never fails: undetectable resolvers yield an empty list, and callers
-// report that honestly instead of guessing.
+// report that instead of guessing.
 func SystemResolvers() []string {
 	var out []string
 	adapterSize := uint32(15000)

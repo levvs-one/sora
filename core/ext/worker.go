@@ -285,7 +285,7 @@ func (s *Scheduler) Task(extID string) (*WorkerTask, bool) {
 	return t, ok
 }
 
-// WorkerStatus is an honest snapshot of one registered background task:
+// WorkerStatus is a snapshot of one registered background task:
 // what the scheduler actually knows, nothing more. It exists so the host
 // (and one day the UI) can say "disabled by the user", "paused by the kill
 // switch" or "last run failed" instead of guessing from the install state.
