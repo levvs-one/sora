@@ -61,7 +61,7 @@ static void deep_link_method_call_handler(FlMethodChannel* channel,
         : fl_value_new_null();
     g_clear_pointer(&self->pending_link, g_free);
     g_autoptr(GError) error = nullptr;
-    if (!fl_method_call_respond(method_call, result, &error)) {
+    if (!fl_method_call_respond_success(method_call, result, &error)) {
       g_warning("Failed to respond to getPendingLink: %s", error->message);
     }
     return;
