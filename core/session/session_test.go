@@ -3,6 +3,7 @@ package session
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -558,5 +559,115 @@ func TestSessionRefusesAnEngineThatRunsWithoutItsAdapter(t *testing.T) {
 	}
 	if _, restored := guard.snapshot(); restored == 0 {
 		t.Error("the guard was not restored")
+	}
+}
+
+// hangingEngine blocks in Stop until the passed context ends, simulating a
+// wedged engine binary that never shuts down on its own.
+type hangingEngine struct {
+	*fakeEngine
+}
+
+func (e *hangingEngine) Stop(ctx context.Context) error {
+	<-ctx.Done()
+	return ctx.Err()
+}
+
+// TestStopBoundsAHungEngine locks SORA-H7: a running engine that never
+// completes Stop must exhaust the shutdown budget without wedging the manager.
+func TestStopBoundsAHungEngine(t *testing.T) {
+	eng := &hangingEngine{fakeEngine: newFakeEngine()}
+	cfg := testConfig(eng, &fakeGuard{})
+	cfg.StopGrace = 20 * time.Millisecond
+	s, err := New(cfg)
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := s.Start(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	started := time.Now()
+	done := make(chan error, 1)
+	go func() { done <- s.Stop(ctx) }()
+	budget := cfg.StopGrace + stopCleanupTimeout
+	select {
+	case err := <-done:
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatalf("Stop() = %v, want shutdown deadline", err)
+		}
+		if elapsed := time.Since(started); elapsed < budget {
+			t.Fatalf("cancelled caller shortened shutdown budget: %s < %s", elapsed, budget)
+		}
+	case <-time.After(budget + 2*time.Second):
+		t.Fatal("Stop() exceeded the bounded shutdown budget")
+	}
+}
+
+// TestSessionRefusesASecondStartAfterStop locks SORA-M12: the supervise
+// loop, the done channel, and the engine subscription are single-use, so a
+// Start after Stop must fail instead of corrupting them.
+func TestSessionRefusesASecondStartAfterStop(t *testing.T) {
+	s, err := New(testConfig(newFakeEngine(), &fakeGuard{}))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := s.Start(context.Background()); err != nil {
+		t.Fatalf("first Start() error = %v", err)
+	}
+	if err := s.Stop(context.Background()); err != nil {
+		t.Fatalf("Stop() error = %v", err)
+	}
+	if err := s.Start(context.Background()); err == nil {
+		t.Fatal("second Start() succeeded after Stop; the session is single-use")
+	} else if errs.CodeOf(err) != errs.CodeFailedPrecondition {
+		t.Fatalf("second Start() = %v, want FailedPrecondition", err)
+	}
+}
+
+// TestStopOnAFreshSessionLeavesItUsable ensures stopping a session that
+// never started does not poison it.
+func TestStopOnAFreshSessionLeavesItUsable(t *testing.T) {
+	s, err := New(testConfig(newFakeEngine(), &fakeGuard{}))
+	if err != nil {
+		t.Fatalf("New() error = %v", err)
+	}
+	if err := s.Stop(context.Background()); err != nil {
+		t.Fatalf("Stop() on a fresh session error = %v", err)
+	}
+	if err := s.Start(context.Background()); err != nil {
+		t.Fatalf("Start() after a no-op Stop error = %v", err)
+	}
+	t.Cleanup(func() { _ = s.Stop(context.Background()) })
+}
+
+// TestSessionLogsTheTeardownStopFailure locks SORA-M16: when the tunnel
+// never comes up, the engine is torn down and a failing Stop must be
+// visible in the journal instead of swallowed.
+func TestSessionLogsTheTeardownStopFailure(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	eng.stopErr = errs.Newf(errs.CodeInternal, errs.KeyEngineStopped, "stop exploded")
+	cfg := testConfig(eng, guard)
+	cfg.Plan.Tun = engine.Tun{Enabled: true, DeviceName: engine.TunDevice}
+	cfg.TunUp = func(_ context.Context, _ string) error {
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanTunnel, "no adapter")
+	}
+	s, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Start(context.Background()); err == nil {
+		t.Fatal("Start() succeeded without the tunnel adapter")
+	}
+	found := false
+	for _, event := range s.Journal().Since(0, 50) {
+		if event.Kind == EventError && event.Key == errs.KeyEngineStopped &&
+			strings.Contains(event.Detail, "stop exploded") {
+			found = true
+		}
+	}
+	if !found {
+		t.Error("the journal has no entry for the failed teardown Stop")
 	}
 }

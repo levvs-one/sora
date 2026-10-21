@@ -5,6 +5,7 @@ package diagnostics
 import (
 	"bytes"
 	"context"
+	"sync"
 	"time"
 
 	"github.com/gopacket/gopacket/layers"
@@ -20,13 +21,19 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	if err != nil {
 		return nil, errs.Wrap(err, errs.CodeUnavailable, errs.KeyDiagnosticsFailed)
 	}
-	defer func() { _ = handle.Close() }()
+	// The handle is closed exactly once: context.AfterFunc closes it from
+	// its own goroutine to unblock the packet read below, and the deferred
+	// call covers every other exit. A second close could release an fd
+	// number already reused by another goroutine (SORA-M15).
+	var closeOnce sync.Once
+	closeHandle := func() { closeOnce.Do(func() { _ = handle.Close() }) }
+	defer closeHandle()
 	if err := handle.SetCaptureLength(256); err != nil {
 		return nil, err
 	}
 	capture, cancel := context.WithTimeout(ctx, duration)
 	defer cancel()
-	stop := context.AfterFunc(capture, func() { _ = handle.Close() })
+	stop := context.AfterFunc(capture, closeHandle)
 	defer stop()
 	var output bytes.Buffer
 	writer, err := pcapgo.NewNgWriterInterface(&output,

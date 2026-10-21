@@ -30,12 +30,16 @@ func TestRouteUsesSelectedAddressesAndLocalTraffic(t *testing.T) {
 		"-6 addr replace fdfe:dcba:9877::1/126 dev sora0",
 		"-6 rule add from fdfe:dcba:9877::1 lookup 5340 priority 5333",
 	}
+	joined := make([]string, 0, len(steps))
+	for _, step := range steps {
+		joined = append(joined, strings.Join(step, " "))
+	}
 	for _, rule := range want {
-		if !slices.Contains(steps, rule) {
+		if !slices.Contains(joined, rule) {
 			t.Errorf("missing %s", rule)
 		}
 	}
-	for _, step := range steps {
+	for _, step := range joined {
 		if strings.Contains(step, "172.19.") {
 			t.Errorf("static address retained: %s", step)
 		}
@@ -68,7 +72,7 @@ func TestCleanupIdentifiesOwnersAndLegacyRules(t *testing.T) {
 			if err := json.Unmarshal([]byte(tc.data), &rule); err != nil {
 				t.Fatal(err)
 			}
-			if got := ownedRule(rule); (got != "") != tc.owned {
+			if got := ownedRule(rule); (len(got) != 0) != tc.owned {
 				t.Fatalf("cleanup selector = %q, owned = %v", got, tc.owned)
 			}
 		})
@@ -83,14 +87,18 @@ func TestBypassKeepsBoundSocketsAndForeignTunnelSources(t *testing.T) {
 		"-6 rule add oif happ-xray lookup main priority 5337",
 		"-6 rule add from fd00::1 lookup main priority 5337",
 	}
-	if !slices.Equal(steps, want) {
-		t.Fatalf("steps = %v, want %v", steps, want)
+	joined := make([]string, 0, len(steps))
+	for _, step := range steps {
+		joined = append(joined, strings.Join(step, " "))
+	}
+	if !slices.Equal(joined, want) {
+		t.Fatalf("steps = %v, want %v", joined, want)
 	}
 	if priorityDNS >= priorityBound || priorityDNS >= priorityForeign || priorityEngine >= priorityDNS || priorityReturn >= priorityEngine {
 		t.Fatal("return and engine rules must precede DNS; foreign exemptions must follow DNS")
 	}
 	physical := bypassSteps("uplink", nil, []string{"-4"})
-	if len(physical) != 1 || strings.Contains(strings.Join(physical, "\n"), "from ") {
+	if len(physical) != 1 || strings.Contains(strings.Join(physical[0], " "), "from ") {
 		t.Fatal("ordinary uplink sources must not bypass the tunnel")
 	}
 }
@@ -123,17 +131,17 @@ func TestDeletionIncludesSelectorsAndPreservesAmbiguousLegacy(t *testing.T) {
 	if deleteMatches(legacy, foreign) {
 		t.Fatal("protocol 2 must exclude protocol 99")
 	}
-	if got := ownedRule(legacy); got != "priority 5333 protocol 2 from all oif uplink table 254" {
+	if got := strings.Join(ownedRule(legacy), " "); got != "priority 5333 protocol 2 from all oif uplink table 254" {
 		t.Fatalf("selectors = %q", got)
 	}
 	tagged := decode(`{"priority":5335,"src":"all","iif":"lo","ipproto":"ipproto-17","dport":53,"dport_mask":"0xffff","table":"5340","protocol":"242"}`)
 	for _, selector := range []string{"protocol 242", "from all", "iif lo", "table 5340", "ipproto 17", "dport 53/0xffff"} {
-		if got := ownedRule(tagged); !strings.Contains(got, selector) {
+		if got := strings.Join(ownedRule(tagged), " "); !strings.Contains(got, selector) {
 			t.Fatalf("missing %s in %q", selector, got)
 		}
 	}
 	tagged["fwmark"] = json.RawMessage(`"0x7000"`)
-	if got := ownedRule(tagged); got != "" {
+	if got := ownedRule(tagged); len(got) != 0 {
 		t.Fatalf("unknown selectors must be preserved: %s", got)
 	}
 }

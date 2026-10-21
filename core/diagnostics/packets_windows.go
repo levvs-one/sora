@@ -5,6 +5,7 @@ package diagnostics
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -101,7 +102,7 @@ var packetEventCallback = windows.NewCallback(func(owner uintptr, info unsafe.Po
 	if value, ok := packetStreams.Load(owner); ok {
 		reason := *(*uint32)(unsafe.Add(info, 4))
 		select {
-		case value.(*packetStream).failures <- fmt.Errorf("Pktmon stream failed: %d", reason):
+		case value.(*packetStream).failures <- fmt.Errorf("pktmon stream failed: %d", reason):
 		default:
 		}
 	}
@@ -128,7 +129,7 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 		adapters := make([]byte, adapterSize)
 		first := (*windows.IpAdapterAddresses)(unsafe.Pointer(&adapters[0]))
 		err := windows.GetAdaptersAddresses(windows.AF_UNSPEC, windows.GAA_FLAG_INCLUDE_ALL_INTERFACES, 0, first, &adapterSize)
-		if err == windows.ERROR_BUFFER_OVERFLOW {
+		if errors.Is(err, windows.ERROR_BUFFER_OVERFLOW) {
 			continue
 		}
 		if err != nil {
@@ -136,7 +137,7 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 		}
 		found := false
 		for current := first; current != nil; current = current.Next {
-			if current.IfIndex != uint32(adapter.Index) || !strings.EqualFold(windows.UTF16PtrToString(current.FriendlyName), device) {
+			if int64(current.IfIndex) != int64(adapter.Index) || !strings.EqualFold(windows.UTF16PtrToString(current.FriendlyName), device) {
 				continue
 			}
 			guid, err = windows.GUIDFromString("{" + strings.Trim(windows.BytePtrToString(current.AdapterName), "{}") + "}")
@@ -166,8 +167,9 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	}
 	call := func(name string, args ...uintptr) error {
 		result, _, _ := procedures[name].Call(args...)
-		if int32(result) < 0 {
-			return errs.Newf(errs.CodeUnavailable, errs.KeyDiagnosticsFailed, "%s failed: HRESULT 0x%08x", name, uint32(result))
+		// HRESULT is a 32-bit value even when Call returns a 64-bit uintptr.
+		if result&0x80000000 != 0 {
+			return errs.Newf(errs.CodeUnavailable, errs.KeyDiagnosticsFailed, "%s failed: HRESULT 0x%08x", name, result&0xffffffff)
 		}
 		return nil
 	}
@@ -175,7 +177,8 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	if err := call("PacketMonitorInitialize", 0x00010000, 0, uintptr(unsafe.Pointer(&monitor))); err != nil {
 		return nil, err
 	}
-	defer procedures["PacketMonitorUninitialize"].Call(uintptr(monitor))
+	// The three Pktmon handle-closing functions return void, not HRESULT.
+	defer func() { _, _, _ = procedures["PacketMonitorUninitialize"].Call(uintptr(monitor)) }()
 	owner := packetStreamID.Add(1)
 	stream := &packetStream{packets: make(chan capturedPacket, 128), failures: make(chan error, 1)}
 	packetStreams.Store(owner, stream)
@@ -184,7 +187,7 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	if err := call("PacketMonitorCreateLiveSession", uintptr(monitor), uintptr(unsafe.Pointer(name)), uintptr(unsafe.Pointer(&session))); err != nil {
 		return nil, err
 	}
-	defer procedures["PacketMonitorCloseSessionHandle"].Call(uintptr(session))
+	defer func() { _, _, _ = procedures["PacketMonitorCloseSessionHandle"].Call(uintptr(session)) }()
 	var needed uintptr
 	// The first call reports required bytes with ERROR_INSUFFICIENT_BUFFER.
 	_, _, _ = procedures["PacketMonitorEnumDataSources"].Call(uintptr(monitor), 1, 0, 0, uintptr(unsafe.Pointer(&needed)), 0)
@@ -225,14 +228,16 @@ func CapturePackets(ctx context.Context, device string, duration time.Duration) 
 	if err := call("PacketMonitorCreateRealtimeStream", uintptr(monitor), uintptr(unsafe.Pointer(&config)), uintptr(unsafe.Pointer(&streamHandle))); err != nil {
 		return nil, err
 	}
-	defer procedures["PacketMonitorCloseRealtimeStream"].Call(uintptr(streamHandle))
+	defer func() { _, _, _ = procedures["PacketMonitorCloseRealtimeStream"].Call(uintptr(streamHandle)) }()
 	if err := call("PacketMonitorAttachOutputToSession", uintptr(session), uintptr(streamHandle)); err != nil {
 		return nil, err
 	}
 	if err := call("PacketMonitorSetSessionActive", uintptr(session), 1); err != nil {
 		return nil, err
 	}
-	defer procedures["PacketMonitorSetSessionActive"].Call(uintptr(session), 0)
+	// The normal path checks deactivation below; early failures still need
+	// a best-effort stop before the session handle is closed.
+	defer func() { _ = call("PacketMonitorSetSessionActive", uintptr(session), 0) }()
 	var output bytes.Buffer
 	writer, err := pcapgo.NewNgWriterInterface(&output, pcapgo.NgInterface{Name: device, Description: "Sora TUN", LinkType: layers.LinkTypeRaw, SnapLength: 256},
 		pcapgo.NgWriterOptions{SectionInfo: pcapgo.NgSectionInfo{Application: "Sora " + coreVersion}})

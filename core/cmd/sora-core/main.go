@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/levvs-one/sora-client/core/control"
@@ -261,6 +262,10 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		// limit before allocating their payload.
 		grpc.MaxRecvMsgSize(control.MaxRecvMsgBytes),
 		grpc.MaxSendMsgSize(control.MaxSendMsgBytes),
+		// Reap connections that never do anything: together with the
+		// listener's connection cap this bounds silent-connection FD
+		// exhaustion. Active streams are not idle.
+		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 10 * time.Minute}),
 	)
 	corev1.RegisterCoreControlServer(app.server, plane)
 	built = true

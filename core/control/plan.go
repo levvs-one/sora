@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/netip"
 	"net/url"
 	"runtime"
 	"strconv"
@@ -43,15 +44,21 @@ type resolver interface {
 	Get(reference string) ([]byte, error)
 }
 
-// parseCredential reads the import pipeline's flat credential map. Invalid
-// documents are rejected in full to avoid partially configured connections.
-func parseCredential(material []byte) map[string]string {
-	out := make(map[string]string, 12)
-	if len(material) == 0 {
-		return out
+// parseCredential reads the import pipeline's flat credential map. Only the
+// JSON document produced by credentialDocument is accepted; anything else
+// (a raw proxy URL, truncated or foreign bytes) fails closed instead of
+// yielding an empty, partially configured credential (SORA-M8).
+func parseCredential(material []byte) (map[string]string, error) {
+	if len(bytes.TrimSpace(material)) == 0 {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+			"control: credential material is empty")
 	}
-	_ = json.Unmarshal(material, &out)
-	return out
+	out := make(map[string]string, 12)
+	if err := json.Unmarshal(material, &out); err != nil {
+		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
+			"control: credential material is not a credential document: %v", err)
+	}
+	return out, nil
 }
 
 // credentialDocument serializes only supported credential fields for storage.
@@ -391,7 +398,11 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 		if err != nil {
 			return engine.Outbound{}, errs.Wrap(err, errs.CodeNotFound, errs.KeySecretNotFound)
 		}
-		if err := applyCredential(&outbound, parseCredential(material)); err != nil {
+		values, err := parseCredential(material)
+		if err != nil {
+			return engine.Outbound{}, err
+		}
+		if err := applyCredential(&outbound, values); err != nil {
 			return engine.Outbound{}, errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
 				"control: outbound %q: %v", id, err)
 		}
@@ -438,9 +449,11 @@ func applyCredential(outbound *engine.Outbound, values map[string]string) error 
 		outbound.Addresses = strings.Split(addresses, ",")
 	}
 	if peers := values["peers"]; peers != "" {
-		// Invalid peer documents leave no peers; plan validation
-		// identifies the failing outbound.
-		_ = json.Unmarshal([]byte(peers), &outbound.Peers)
+		// Fail closed: a broken peer document must not silently become a
+		// peerless outbound (SORA-L17).
+		if err := json.Unmarshal([]byte(peers), &outbound.Peers); err != nil {
+			return fmt.Errorf("invalid WireGuard peers: %w", err)
+		}
 	}
 	if packed := values["xray_profile"]; packed != "" {
 		profile, err := unpackProfile(packed)
@@ -576,8 +589,14 @@ func ruleFromProto(route *corev1.RoutingRule) (engine.Rule, error) {
 // Convert only exact and suffix domains, preserving process names and patterns.
 var ruleIDNA = idna.New(idna.MapForLookup(), idna.StrictDomainName(true), idna.ValidateLabels(true), idna.VerifyDNSLength(true), idna.BidiRule())
 
-// ruleValue strips the type prefix: the engines add their own.
+// ruleValue strips type prefixes and expands single IPs to host routes
+// because every engine consumes IP rules as CIDRs.
 func ruleValue(kind engine.RuleType, destination string) string {
+	if kind == engine.RuleIPCIDR {
+		if addr, err := netip.ParseAddr(destination); err == nil && addr.Zone() == "" {
+			return netip.PrefixFrom(addr, addr.BitLen()).String()
+		}
+	}
 	if prefix, ok := rulePrefixes[kind]; ok {
 		return strings.TrimPrefix(destination, prefix)
 	}
@@ -612,9 +631,15 @@ func ruleTypeOf(destination string) engine.RuleType {
 		return engine.RuleProcess
 	case strings.Contains(destination, "/"):
 		return engine.RuleIPCIDR
-	case strings.Contains(destination, ":"):
-		return engine.RulePort
 	default:
+		// An IP literal is an IP rule even though IPv6 literals contain
+		// colons; only a bare number is a port (SORA-M14).
+		if addr, err := netip.ParseAddr(destination); err == nil && addr.IsValid() {
+			return engine.RuleIPCIDR
+		}
+		if _, err := strconv.Atoi(destination); err == nil {
+			return engine.RulePort
+		}
 		return engine.RuleDomainKeyword
 	}
 }
@@ -675,9 +700,19 @@ func splitDNSServer(address string) (host string, port uint16, transport engine.
 		}
 	}
 	rest = strings.TrimSuffix(rest, "/dns-query")
-	if head, tail, found := strings.Cut(rest, ":"); found {
-		if parsed, err := strconv.ParseUint(tail, 10, 16); err == nil {
-			return head, uint16(parsed), transport
+	// Prefer net.SplitHostPort for host:port and [ipv6]:port; a naive cut
+	// on the first colon mangles IPv6 literals (SORA-M13).
+	if host, portStr, err := net.SplitHostPort(rest); err == nil {
+		if parsed, err := strconv.ParseUint(portStr, 10, 16); err == nil {
+			return host, uint16(parsed), transport
+		}
+		return rest, 0, transport
+	}
+	// Fall back to a trailing :port for bare names and addresses. A bare
+	// IPv6 literal holds more than one colon and must stay whole.
+	if i := strings.LastIndexByte(rest, ':'); i >= 0 && !strings.Contains(rest[:i], ":") {
+		if parsed, err := strconv.ParseUint(rest[i+1:], 10, 16); err == nil {
+			return rest[:i], uint16(parsed), transport
 		}
 	}
 	return rest, 0, transport

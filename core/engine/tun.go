@@ -21,17 +21,38 @@ func PrepareTun(p *Plan) error {
 	if !p.Tun.Enabled {
 		return nil
 	}
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return fmt.Errorf("tun: read interface addresses: %w", err)
+	if p.Tun.DeviceName == "" {
+		p.Tun.DeviceName = TunDevice
 	}
-	used := make([]netip.Prefix, 0, len(addrs))
-	for _, addr := range addrs {
-		prefix, err := netip.ParsePrefix(addr.String())
-		if err != nil {
-			return fmt.Errorf("tun: read interface prefix: %w", err)
+	// The device name reaches privileged `ip` invocations; reject anything
+	// but a plain kernel interface name here as well as in Tun.validate
+	// (SORA-M2).
+	if err := validateInterfaceName("tun", p.Tun.DeviceName); err != nil {
+		return err
+	}
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return fmt.Errorf("tun: read interfaces: %w", err)
+	}
+	var used []netip.Prefix
+	for _, iface := range interfaces {
+		// Apply prepares the replacement before stopping the old engine.
+		// Its adapter may still own these addresses; other devices must
+		// remain in the overlap check even when their prefixes match.
+		if iface.Name == p.Tun.DeviceName {
+			continue
 		}
-		used = append(used, prefix)
+		addrs, err := iface.Addrs()
+		if err != nil {
+			return fmt.Errorf("tun: read interface %s addresses: %w", iface.Name, err)
+		}
+		for _, addr := range addrs {
+			prefix, err := netip.ParsePrefix(addr.String())
+			if err != nil {
+				return fmt.Errorf("tun: read interface prefix: %w", err)
+			}
+			used = append(used, prefix)
+		}
 	}
 	// The benchmark range is reserved for synthesized addresses. Reject
 	// custom LAN pools rather than allowing cached fake addresses onto LAN.
@@ -65,13 +86,17 @@ func PrepareTun(p *Plan) error {
 	if p.Tun.IPv4.Overlaps(fakePrefix) || !p.Tun.IPv4.Addr().Is4() || !p.Tun.IPv6.Addr().Is6() || p.Tun.IPv4.Bits() != 30 || p.Tun.IPv6.Bits() != 126 {
 		return fmt.Errorf("tun: adapters must use separate IPv4 /30 and IPv6 /126 subnets")
 	}
+	// Caller-provided prefixes skip chooseTunPrefix, so they must be checked
+	// against LAN interfaces here as well.
+	for _, prefix := range []netip.Prefix{p.Tun.IPv4, p.Tun.IPv6} {
+		if slices.ContainsFunc(used, prefix.Overlaps) {
+			return fmt.Errorf("tun: adapter subnet %s overlaps an existing interface", prefix)
+		}
+	}
 	for _, address := range []netip.Addr{p.Tun.IPv4.Addr(), p.Tun.IPv6.Addr()} {
 		if !address.IsGlobalUnicast() || address.IsPrivate() {
 			return fmt.Errorf("tun: adapter subnets must be outside private and link-local networks")
 		}
-	}
-	if p.Tun.DeviceName == "" {
-		p.Tun.DeviceName = TunDevice
 	}
 	p.DNS.FakeIPRange = fakePrefix.Masked().String()
 	return nil

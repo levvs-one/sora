@@ -30,7 +30,11 @@ func TestRealityAndTransportSurviveTheVault(t *testing.T) {
 		t.Fatal(err)
 	}
 	var o engine.Outbound
-	if err := applyCredential(&o, parseCredential(document)); err != nil {
+	values, err := parseCredential(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := applyCredential(&o, values); err != nil {
 		t.Fatal(err)
 	}
 
@@ -76,7 +80,11 @@ func TestWireGuardSurvivesTheVault(t *testing.T) {
 				t.Fatal(err)
 			}
 			var o engine.Outbound
-			if err := applyCredential(&o, parseCredential(document)); err != nil {
+			values, err := parseCredential(document)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := applyCredential(&o, values); err != nil {
 				t.Fatal(err)
 			}
 			if o.PrivateKey != "cKE7LmCF61IhqqABGhvJ44jWXp8fKymcMAEVAzLDYVk=" {
@@ -121,7 +129,11 @@ func TestAmneziaWGSurvivesTheVault(t *testing.T) {
 		t.Fatal(err)
 	}
 	var o engine.Outbound
-	if err := applyCredential(&o, parseCredential(document)); err != nil {
+	values, err := parseCredential(document)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := applyCredential(&o, values); err != nil {
 		t.Fatal(err)
 	}
 	want := engine.AmneziaWG{Jc: 4, Jmin: 40, Jmax: 70, S1: 15, S2: 25, S3: 10, S4: 5,
@@ -403,5 +415,96 @@ func TestProfileDisplayMetadataKeepsAdapterAndCredentialsPrivate(t *testing.T) {
 	var decoded corev1.OutboundSpec
 	if err := proto.Unmarshal(encoded, &decoded); err != nil || !proto.Equal(wire, &decoded) {
 		t.Fatalf("display metadata round trip: %v, %v", &decoded, err)
+	}
+}
+
+// TestParseCredentialRejectsForeignMaterial locks SORA-M8: only the JSON
+// credential document is accepted; raw proxy URLs, empty or truncated
+// bytes fail closed instead of producing an empty credential.
+func TestParseCredentialRejectsForeignMaterial(t *testing.T) {
+	for name, material := range map[string][]byte{
+		"empty":         {},
+		"whitespace":    []byte("  \n "),
+		"proxy URL":     []byte("vless://11111111-1111-1111-1111-111111111111@example.com:443?security=reality#x"),
+		"truncated":     []byte(`{"uuid": "11111111-`),
+		"not an object": []byte(`["uuid"]`),
+	} {
+		t.Run(name, func(t *testing.T) {
+			if _, err := parseCredential(material); err == nil {
+				t.Fatalf("parseCredential(%q) = nil, want an error", material)
+			}
+		})
+	}
+	if _, err := parseCredential([]byte(`{"uuid":"ok"}`)); err != nil {
+		t.Fatalf("parseCredential(valid document) = %v, want nil", err)
+	}
+}
+
+// TestSplitDNSServerParsesPortsSafely locks SORA-M13: host:port and
+// [ipv6]:port go through net.SplitHostPort, and bare IPv6 literals are
+// never split on a colon.
+func TestSplitDNSServerParsesPortsSafely(t *testing.T) {
+	for _, tc := range []struct {
+		in        string
+		host      string
+		port      uint16
+		transport engine.DNSTransport
+	}{
+		{"1.1.1.1", "1.1.1.1", 0, engine.DNSPlain},
+		{"1.1.1.1:53", "1.1.1.1", 53, engine.DNSPlain},
+		{"tls://dns.example.com:853", "dns.example.com", 853, engine.DNSTLS},
+		{"https://1.1.1.1/dns-query", "1.1.1.1", 0, engine.DNSHTTPS},
+		{"[2001:db8::1]:853", "2001:db8::1", 853, engine.DNSPlain},
+		{"tls://[2001:db8::1]:853", "2001:db8::1", 853, engine.DNSTLS},
+		{"2001:db8::1", "2001:db8::1", 0, engine.DNSPlain},
+		{"2001:db8::53", "2001:db8::53", 0, engine.DNSPlain},
+		{"dns.example.com:notaport", "dns.example.com:notaport", 0, engine.DNSPlain},
+	} {
+		t.Run(tc.in, func(t *testing.T) {
+			host, port, transport := splitDNSServer(tc.in)
+			if host != tc.host || port != tc.port || transport != tc.transport {
+				t.Errorf("splitDNSServer(%q) = %q, %d, %q; want %q, %d, %q",
+					tc.in, host, port, transport, tc.host, tc.port, tc.transport)
+			}
+		})
+	}
+}
+
+// TestRuleTypeOfDetectsIPAddresses locks SORA-M14: IPv6 literals contain
+// colons but are IP rules, not ports.
+func TestRuleTypeOfDetectsIPAddresses(t *testing.T) {
+	for destination, want := range map[string]engine.RuleType{
+		"2001:db8::1":        engine.RuleIPCIDR,
+		"::1":                engine.RuleIPCIDR,
+		"1.2.3.4":            engine.RuleIPCIDR,
+		"10.0.0.0/8":         engine.RuleIPCIDR,
+		"2001:db8::/32":      engine.RuleIPCIDR,
+		"443":                engine.RulePort,
+		"example.com":        engine.RuleDomainKeyword,
+		"domain:example.com": engine.RuleDomainSuffix,
+		"geosite:google":     engine.RuleGeoSite,
+	} {
+		t.Run(destination, func(t *testing.T) {
+			if got := ruleTypeOf(destination); got != want {
+				t.Errorf("ruleTypeOf(%q) = %q, want %q", destination, got, want)
+			}
+		})
+	}
+}
+
+// TestApplyCredentialRejectsBrokenPeerJSON locks SORA-L17: a broken
+// WireGuard peer document must fail plan building, not silently produce a
+// peerless outbound.
+func TestApplyCredentialRejectsBrokenPeerJSON(t *testing.T) {
+	var o engine.Outbound
+	if err := applyCredential(&o, map[string]string{"peers": `[{broken`}); err == nil {
+		t.Fatal("broken peer JSON must fail the plan")
+	}
+	var ok engine.Outbound
+	if err := applyCredential(&ok, map[string]string{"peers": `[{"public_key":"abc=","allowed_ips":["0.0.0.0/0"]}]`}); err != nil {
+		t.Fatalf("valid peer JSON was rejected: %v", err)
+	}
+	if len(ok.Peers) != 1 {
+		t.Fatalf("got %d peers, want 1", len(ok.Peers))
 	}
 }

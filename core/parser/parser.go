@@ -362,6 +362,13 @@ func parseLink(raw string) (OutboundSpec, error) {
 			o.Options[k] = v[0]
 		}
 	}
+	// Fail closed on Hysteria2 certificate pinning: pinSHA256 never
+	// reaches any engine (no plan field, no renderer), so importing a
+	// pinned link today would silently unpin it. The link is skipped
+	// and counted as unsupported instead.
+	if (proto == "hysteria2" || proto == "hy2") && getq(u, "pinSHA256", "pin_sha256") != "" {
+		return OutboundSpec{}, fmt.Errorf("%w: hy2 pinSHA256 certificate pinning is not implemented", ErrUnsupported)
+	}
 	switch proto {
 	case "ss":
 		o.Cipher = o.User

@@ -2,32 +2,41 @@ package parser
 
 import (
 	"encoding/base64"
+	"encoding/json"
+	"os"
 	"strings"
 	"testing"
 )
 
 func TestParseLinks(t *testing.T) {
 	// Normalize schemes and apply protocol-specific security defaults.
-	tests := []struct{ name, input, protocol, security string }{
-		{"vless", "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?security=tls&type=ws&path=%2F#🇩🇪%20Berlin", "vless", "tls"},
-		{"vless plain", "vless://123e4567-e89b-12d3-a456-426614174000@example.com:443", "vless", "none"},
-		{"trojan", "trojan://secret@example.com:443?sni=example.com#Trojan", "trojan", "tls"},
-		{"shadowsocks", "ss://YWVzLTI1Ni1nY206cGFzcw@example.com:8388#SS", "shadowsocks", "none"},
-		{"hysteria2", "hysteria2://secret@example.com:443?sni=example.com#H2", "hysteria2", "tls"},
-		{"hy2", "hy2://secret@example.com:443#H2", "hysteria2", "tls"},
-		{"tuic", "tuic://123e4567-e89b-12d3-a456-426614174000:pass@example.com:443", "tuic", "tls"},
-		{"socks", "socks://user:pass@example.com:1080", "socks5", "none"},
-		{"socks5", "socks5://example.com:1080", "socks5", "none"},
-		{"https", "https://user:pass@example.com:443", "http", "tls"},
+	raw, err := os.ReadFile("testdata/imports.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var tests []struct {
+		Name, Input, Protocol, Security string
+		Count                           int
+	}
+	if err := json.Unmarshal(raw, &tests); err != nil {
+		t.Fatal(err)
+	}
+	if len(tests) == 0 {
+		t.Fatal("no import fixtures")
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r, err := (LinkParser{}).Parse([]byte(tt.input))
+		t.Run(tt.Name, func(t *testing.T) {
+			r, err := (LinkParser{}).Parse([]byte(tt.Input))
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(r.Servers) != 1 || r.Servers[0].Protocol != tt.protocol || r.Servers[0].Security != tt.security {
-				t.Fatalf("unexpected result: %#v", r)
+			if len(r.Servers) != tt.Count {
+				t.Fatalf("imported %d, want %d: %+v", len(r.Servers), tt.Count, r.Report)
+			}
+			for _, server := range r.Servers {
+				if server.Protocol != tt.Protocol || server.Security != tt.Security {
+					t.Fatalf("unexpected result: %#v", server)
+				}
 			}
 		})
 	}
@@ -106,5 +115,27 @@ func TestXrayConfigurationsBecomeProfiles(t *testing.T) {
 	}
 	if a.StableKey() == b.StableKey() {
 		t.Fatal("two profiles on one server must keep two identities")
+	}
+}
+
+func TestHysteria2PinSHA256IsRejected(t *testing.T) {
+	// A pinned link must fail closed: pinSHA256 reaches no engine, so a
+	// silent import would drop the pin. The link is skipped, not imported.
+	for _, link := range []string{
+		"hysteria2://secret@example.com:443?pinSHA256=deadbeef#H2",
+		"hy2://secret@example.com:443?pin_sha256=deadbeef#H2",
+	} {
+		r, err := (LinkParser{}).Parse([]byte(link))
+		if err != nil {
+			t.Errorf("Parse(%q) error = %v", link, err)
+		}
+		if len(r.Servers) != 0 {
+			t.Errorf("Parse(%q) imported %d servers, want the pinned link skipped", link, len(r.Servers))
+		}
+	}
+	// Without a pin the same link still imports.
+	r, err := (LinkParser{}).Parse([]byte("hysteria2://secret@example.com:443#H2"))
+	if err != nil || len(r.Servers) != 1 {
+		t.Errorf("unpinned hy2 link must still import: servers=%d err=%v", len(r.Servers), err)
 	}
 }

@@ -22,12 +22,17 @@ const TokenLen = 32
 // read access for client authentication.
 const tokenFile = "control.token"
 
-// Authenticator checks tokens in constant time. The OS-generated token protects
-// the local endpoint from unauthenticated same-account processes and stale
-// clients.
+// Authenticator checks tokens in constant time. The token file's owner-only
+// mode is a cross-user barrier only: it does not stop processes running as
+// the same user. Same-account callers are distinguished by the transport
+// peer credentials (see core/ipc/authlevel.go), not by this file's mode.
 type Authenticator struct {
 	mu    sync.RWMutex
 	token []byte
+	// path is the token file Rotate persists to. It is empty for
+	// authenticators built directly from a token (tests); rotation then
+	// fails closed instead of splitting memory and disk.
+	path string
 }
 
 // NewAuthenticator returns an authenticator for an existing token. The token is
@@ -57,7 +62,7 @@ func LoadOrCreateToken(dir string) (*Authenticator, error) {
 			return nil, errs.Newf(errs.CodeInternal, errs.KeyUnauthenticated,
 				"control: the stored authenticator is not readable")
 		}
-		return NewAuthenticator(token)
+		return &Authenticator{token: append([]byte(nil), token...), path: path}, nil
 	case !errors.Is(err, fs.ErrNotExist):
 		return nil, errs.Wrap(err, errs.CodeInternal, errs.KeyUnauthenticated)
 	}
@@ -69,7 +74,7 @@ func LoadOrCreateToken(dir string) (*Authenticator, error) {
 	if err := writeOwnerOnly(path, encoded); err != nil {
 		return nil, err
 	}
-	return NewAuthenticator(token)
+	return &Authenticator{token: append([]byte(nil), token...), path: path}, nil
 }
 
 // Verify checks a token in constant time after rejecting an invalid length.
@@ -103,23 +108,61 @@ func (a *Authenticator) Token() []byte {
 	return append([]byte(nil), a.token...)
 }
 
-// Rotate replaces and returns the token without restarting the core. All
-// existing client tokens become invalid.
+// Rotate replaces and returns the token without restarting the core. The new
+// token is persisted atomically before it takes effect, so a restart keeps
+// the rotation and the old token stays invalid. All existing client tokens
+// become invalid.
 func (a *Authenticator) Rotate() ([]byte, error) {
 	fresh := make([]byte, TokenLen)
 	if _, err := rand.Read(fresh); err != nil {
 		return nil, errs.Wrap(err, errs.CodeInternal, errs.KeyUnauthenticated)
 	}
 	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.path == "" {
+		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyUnauthenticated,
+			"control: the authenticator has no token file to persist the rotation")
+	}
+	encoded := []byte(base64.StdEncoding.EncodeToString(fresh))
+	// Persist before swapping: a failed write leaves the old token valid on
+	// disk and in memory, never a split between the two.
+	if err := writeOwnerOnly(a.path, encoded); err != nil {
+		return nil, err
+	}
 	a.token = append([]byte(nil), fresh...)
-	a.mu.Unlock()
-	return fresh, nil
+	return append([]byte(nil), fresh...), nil
 }
 
-// writeOwnerOnly stores a file that only the owner may read.
+// writeOwnerOnly stores a file that only the owner may read, replacing it
+// atomically (temp file, fsync, rename) so a torn write never leaves a
+// half-written secret behind.
 func writeOwnerOnly(path string, data []byte) error {
-	if err := os.WriteFile(path, data, 0o600); err != nil {
+	wrap := func(err error) error {
 		return errs.Wrap(err, errs.CodeInternal, errs.KeyUnauthenticated)
+	}
+	tmp, err := os.CreateTemp(filepath.Dir(path), filepath.Base(path)+".tmp-*")
+	if err != nil {
+		return wrap(err)
+	}
+	tmpName := tmp.Name()
+	defer func() { _ = os.Remove(tmpName) }()
+	if err := tmp.Chmod(0o600); err != nil {
+		_ = tmp.Close()
+		return wrap(err)
+	}
+	if _, err := tmp.Write(data); err != nil {
+		_ = tmp.Close()
+		return wrap(err)
+	}
+	if err := tmp.Sync(); err != nil {
+		_ = tmp.Close()
+		return wrap(err)
+	}
+	if err := tmp.Close(); err != nil {
+		return wrap(err)
+	}
+	if err := os.Rename(tmpName, path); err != nil {
+		return wrap(err)
 	}
 	return nil
 }

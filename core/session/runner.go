@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/errs"
 )
 
@@ -42,7 +43,7 @@ type Config struct {
 	JournalCapacity int
 	// StatsInterval samples the engine counters.
 	StatsInterval time.Duration
-	// StopGrace bounds the engine shutdown.
+	// StopGrace allows graceful shutdown before kill and cleanup.
 	StopGrace time.Duration
 	// Network supplies fingerprints for connection renewal on change. Nil
 	// disables watching.
@@ -69,9 +70,17 @@ type Config struct {
 // tunWait bounds how long an engine may take to bring its adapter up.
 const tunWait = 5 * time.Second
 
+// A child can consume the full grace before Kill. Reserve its complete reap
+// wait plus time for the supervisor to remove routes with a live context.
+const stopCleanupTimeout = supervise.KillWait + 5*time.Second
+
 func interfaceUp(ctx context.Context, device string) error {
 	ctx, cancel := context.WithTimeout(ctx, tunWait)
 	defer cancel()
+	// One ticker for the whole wait instead of a fresh time.After per
+	// iteration (SORA-L21).
+	ticker := time.NewTicker(50 * time.Millisecond)
+	defer ticker.Stop()
 	for {
 		if iface, err := net.InterfaceByName(device); err == nil && iface.Flags&net.FlagUp != 0 {
 			return nil
@@ -80,7 +89,7 @@ func interfaceUp(ctx context.Context, device string) error {
 		case <-ctx.Done():
 			return errs.Newf(errs.CodeFailedPrecondition, errs.KeyPlanTunnel,
 				"session: the engine is running but the adapter %s is not up; the core may lack CAP_NET_ADMIN", device)
-		case <-time.After(50 * time.Millisecond):
+		case <-ticker.C:
 		}
 	}
 }
@@ -192,6 +201,14 @@ func (s *Session) Start(ctx context.Context) error {
 		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
 			"session: already %s", state)
 	}
+	// The supervise loop, the done channel, and the engine subscription are
+	// single-use. A stop in flight (or finished) poisons the session, so a
+	// second Start is refused instead of corrupting them (SORA-M12).
+	if s.stopping {
+		s.mu.Unlock()
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySessionBusy,
+			"session: a stop is in progress or has completed")
+	}
 	s.ctx, s.cancel = context.WithCancel(context.WithoutCancel(ctx))
 	s.status.SessionID = s.ID()
 	s.setStateLocked(StateConnecting, errs.Code(""), errs.Key(""), "")
@@ -215,7 +232,17 @@ func (s *Session) Start(ctx context.Context) error {
 		err = errs.Wrap(err, errs.CodeUnavailable, errs.KeyEngineStartFailed)
 	} else if tun := s.cfg.Plan.Tun; tun.Enabled && tun.DeviceName != "" {
 		if err = s.cfg.TunUp(ctx, tun.DeviceName); err != nil {
-			_ = s.eng.Stop(context.WithoutCancel(ctx))
+			// The engine is torn down because the tunnel never came up;
+			// keep the stop failure visible instead of swallowing it
+			// (SORA-M16).
+			if stopErr := s.eng.Stop(context.WithoutCancel(ctx)); stopErr != nil {
+				s.log.Append(Event{
+					Kind:   EventError,
+					Reason: errs.CodeOf(stopErr),
+					Key:    errs.KeyEngineStopped,
+					Detail: s.mask(stopErr.Error()),
+				})
+			}
 		}
 	}
 	if err != nil {
@@ -250,18 +277,31 @@ func (s *Session) Done() <-chan struct{} { return s.done }
 
 // Stop shuts down the engine, restores the guard, and transitions to
 // disconnected. Repeated calls are safe from user, shutdown, and failure paths.
+// The engine shutdown has a bounded budget detached from the caller's
+// context: a cancelled Disconnect must not strand a half-stopped engine and
+// wedge the manager busy forever (SORA-H7).
 func (s *Session) Stop(ctx context.Context) error {
+	// Detach the shutdown budget from the caller: eng.Stop must run to
+	// completion (or the shutdown timeout) even if the Disconnect RPC that
+	// triggered it is cancelled.
+	stopCtx, stopCancel := context.WithTimeout(context.WithoutCancel(ctx), s.cfg.StopGrace+stopCleanupTimeout)
+	defer stopCancel()
 	s.mu.Lock()
 	if s.stopping {
 		s.mu.Unlock()
 		if s.eng.State() != engine.StateStopped {
-			if err := s.eng.Stop(ctx); err != nil {
+			if err := s.eng.Stop(stopCtx); err != nil {
 				return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
 			}
 		}
 		if err := s.restoreGuard(context.WithoutCancel(ctx)); err != nil {
 			return errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
 		}
+		return nil
+	}
+	// A session that never started owns nothing; leave it usable.
+	if s.cancel == nil {
+		s.mu.Unlock()
 		return nil
 	}
 	s.stopping = true
@@ -273,7 +313,7 @@ func (s *Session) Stop(ctx context.Context) error {
 	}
 	// Stop the engine before restoring the guard to prevent packets using
 	// settings being removed.
-	stopErr := s.eng.Stop(ctx)
+	stopErr := s.eng.Stop(stopCtx)
 	if err := s.restoreGuard(context.WithoutCancel(ctx)); err != nil && stopErr == nil {
 		stopErr = errs.Wrap(err, errs.CodeInternal, errs.KeyGuardRestoreFailed)
 	}
@@ -283,7 +323,16 @@ func (s *Session) Stop(ctx context.Context) error {
 		s.engineSub()
 		s.engineSub = nil
 	}
-	_ = s.eng.Close()
+	// A failing Close can leak descriptors; keep it visible in the journal
+	// instead of swallowing it (SORA-L13).
+	if closeErr := s.eng.Close(); closeErr != nil {
+		s.log.Append(Event{
+			Kind:   EventError,
+			Reason: errs.CodeOf(closeErr),
+			Key:    errs.KeyOf(closeErr),
+			Detail: s.mask(closeErr.Error()),
+		})
+	}
 	s.mu.Unlock()
 	if stopErr != nil {
 		return errs.Wrap(stopErr, errs.CodeInternal, errs.KeyGuardRestoreFailed)

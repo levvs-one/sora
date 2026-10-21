@@ -3,6 +3,7 @@ package engine
 import (
 	"net/netip"
 	"slices"
+	"strings"
 	"testing"
 )
 
@@ -97,5 +98,51 @@ func TestTunAndFakeIPAvoidLANAndEachOther(t *testing.T) {
 		if err := PrepareTun(p); err == nil {
 			t.Fatalf("unsafe adapter accepted: %s", address)
 		}
+	}
+}
+
+// TestDeviceNameValidation locks SORA-M2: the TUN device name reaches
+// privileged `ip` invocations, so only plain kernel interface names pass.
+func TestDeviceNameValidation(t *testing.T) {
+	for _, name := range []string{"sora0", "tun0", "sora-1", "sora_2", "sora.3", "a12345678901234"} {
+		if err := validateInterfaceName("tun", name); err != nil {
+			t.Errorf("validateInterfaceName(%q) = %v, want nil", name, err)
+		}
+	}
+	for _, name := range []string{
+		"", "sora0 xfrm", "-sora0", " sora0", "sora0 ", "sora0;reboot",
+		"sora0|id", "sora0$(id)", "sora0`id`", "../etc", "a123456789012345",
+		"sora\x00x",
+	} {
+		if err := validateInterfaceName("tun", name); err == nil {
+			t.Errorf("validateInterfaceName(%q) = nil, want an error", name)
+		}
+	}
+}
+
+// TestTunValidateRejectsEvilDeviceName ensures a hostile device name fails
+// plan validation instead of reaching the privileged routing layer.
+func TestTunValidateRejectsEvilDeviceName(t *testing.T) {
+	tun := Tun{Enabled: true, DeviceName: "sora0 evil"}
+	if err := tun.validate(); err == nil {
+		t.Fatal("Tun.validate() accepted a device name with a space")
+	}
+	tun.DeviceName = "sora0"
+	if err := tun.validate(); err != nil {
+		t.Fatalf("Tun.validate() = %v, want nil", err)
+	}
+}
+
+// TestPrepareTunRejectsExplicitPrefixOverlappingLAN locks SORA-L19:
+// caller-provided adapter prefixes must be checked against LAN interfaces,
+// not just auto-selected ones. 127.0.0.0/8 is always present via loopback.
+func TestPrepareTunRejectsExplicitPrefixOverlappingLAN(t *testing.T) {
+	p := &Plan{Tun: Tun{Enabled: true, IPv4: netip.MustParsePrefix("127.0.0.1/30")}}
+	err := PrepareTun(p)
+	if err == nil {
+		t.Fatal("an explicit adapter prefix overlapping LAN was accepted")
+	}
+	if !strings.Contains(err.Error(), "overlaps an existing interface") {
+		t.Errorf("unexpected error: %v", err)
 	}
 }

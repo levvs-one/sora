@@ -88,19 +88,22 @@ func fromPathError(err *fs.PathError) *Error {
 // netDetail retains network operations and causes while excluding endpoints and
 // queried names that identify users or providers.
 func netDetail(err error) error {
-	var opErr *net.OpError
-	if errors.As(err, &opErr) {
-		if opErr.Err == nil {
-			return errors.New(opErr.Op)
-		}
-		return &opErrCause{op: opErr.Op, err: opErr.Err}
-	}
+	// DNS errors carry the queried name, and a *net.OpError often wraps the
+	// *net.DNSError. Classify DNS first so the hostname never leaks through
+	// opErrCause rendering (SORA-M7).
 	var dnsErr *net.DNSError
 	if errors.As(err, &dnsErr) {
 		if dnsErr.Err == "" {
 			return errors.New("lookup")
 		}
 		return errors.New("lookup: " + dnsErr.Err)
+	}
+	var opErr *net.OpError
+	if errors.As(err, &opErr) {
+		if opErr.Err == nil {
+			return errors.New(opErr.Op)
+		}
+		return &opErrCause{op: opErr.Op, err: opErr.Err}
 	}
 	return err
 }

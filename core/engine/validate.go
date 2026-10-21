@@ -50,7 +50,7 @@ func (o Outbound) Secrets() []string {
 // Identifiers returns the server host and host:port for privacy redaction.
 // These are not credentials but identify user connections and providers.
 func (o Outbound) Identifiers() []string {
-	out := make([]string, 0, 3)
+	out := make([]string, 0, 6)
 	if o.Server != "" {
 		out = append(out, o.Server)
 		if o.Port != 0 {
@@ -59,6 +59,12 @@ func (o Outbound) Identifiers() []string {
 	}
 	if o.TLS.ServerName != "" {
 		out = append(out, o.TLS.ServerName)
+	}
+	// REALITY parameters are public but identify the server (SORA-L9).
+	for _, id := range []string{o.TLS.RealityPublicKey, o.TLS.RealityShortID, o.TLS.SpiderX} {
+		if id != "" {
+			out = append(out, id)
+		}
 	}
 	out = append(out, o.Name)
 	return out
@@ -92,6 +98,25 @@ func (o Outbound) Warnings() []string {
 	return out
 }
 
+// validProtocols whitelists the protocols a plan may hold, so an unknown
+// protocol fails validation with a clear error instead of surfacing late at
+// eng.Apply (SORA-L16).
+var validProtocols = map[Protocol]bool{
+	ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
+	ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
+	ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
+	ProtocolAnyTLS: true, ProtocolBypass: true, ProtocolXrayProfile: true,
+	ProtocolDirect: true,
+}
+
+// validTransports includes parser outputs and renderer transport names:
+// WireGuard uses udp, mihomo accepts raw, and Xray profiles carry hysteria.
+// Each renderer still rejects transports it cannot use for that outbound.
+var validTransports = map[string]bool{
+	"": true, "tcp": true, "udp": true, "raw": true, "ws": true, "grpc": true,
+	"h2": true, "httpupgrade": true, "xhttp": true, "hysteria": true,
+}
+
 // Validate checks one outbound on its own, without engine capabilities.
 func (o Outbound) Validate() error {
 	var errs []error
@@ -103,8 +128,11 @@ func (o Outbound) Validate() error {
 	if err := validateDisplayName("outbound "+o.ID, o.Name); err != nil {
 		errs = append(errs, err)
 	}
-	if o.Protocol == "" {
-		errs = append(errs, fmt.Errorf("outbound %s: empty protocol", o.ID))
+	if !validProtocols[o.Protocol] {
+		errs = append(errs, fmt.Errorf("outbound %s: unknown protocol %q", o.ID, o.Protocol))
+	}
+	if !validTransports[o.Transport.Type] {
+		errs = append(errs, fmt.Errorf("outbound %s: unknown transport %q", o.ID, o.Transport.Type))
 	}
 	serverless := o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass
 	if !serverless && o.Port == 0 {

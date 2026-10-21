@@ -124,7 +124,7 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 	}
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
-	ctx = context.WithValue(ctx, privateKey{}, isPrivateHost(ctx, target.Hostname()))
+	ctx = context.WithValue(ctx, privateKey{}, isPrivateHost(target.Hostname()))
 
 	for hop := 0; ; hop++ {
 		if hop > f.maxRedirects {
@@ -287,22 +287,17 @@ func UserAgentFor(asked string) (string, error) {
 // networks.
 type privateKey struct{}
 
-// isPrivateHost reports whether host is, or resolves to, an address that is
-// not on the internet.
-func isPrivateHost(ctx context.Context, host string) bool {
-	if addr, err := netip.ParseAddr(host); err == nil {
-		return !publicAddr(addr)
-	}
-	addrs, err := net.DefaultResolver.LookupNetIP(ctx, "ip", host)
+// isPrivateHost reports whether host is a private IP literal or localhost.
+// DNS answers are deliberately ignored: an attacker controlling DNS could
+// otherwise flip a hostname into the private range and permit dials to
+// internal addresses (SORA-L11). Hostnames resolving to private addresses
+// are not trusted; use an IP literal for local subscriptions.
+func isPrivateHost(host string) bool {
+	addr, err := netip.ParseAddr(host)
 	if err != nil {
 		return false
 	}
-	for _, addr := range addrs {
-		if !publicAddr(addr) {
-			return true
-		}
-	}
-	return false
+	return !publicAddr(addr)
 }
 
 func publicAddr(addr netip.Addr) bool {

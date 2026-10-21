@@ -42,15 +42,17 @@ func route(ctx context.Context, tun engine.Tun, uid int) error {
 	}
 	for _, step := range routeSteps(tun, families()) {
 		if err := ip(ctx, step); err != nil {
-			_ = unroute(ctx)
-			return err
+			// Keep the rollback failure visible: a half-applied ruleset
+			// with a silent cleanup error is worse than a noisy one
+			// (SORA-M9).
+			return errors.Join(err, unroute(ctx))
 		}
 	}
 	return nil
 }
 
-func routeSteps(tun engine.Tun, families []string) []string {
-	steps := []string{}
+func routeSteps(tun engine.Tun, families []string) [][]string {
+	steps := [][]string{}
 	addresses := tun.Addresses()
 	for _, family := range families {
 		address := addresses[0]
@@ -60,18 +62,18 @@ func routeSteps(tun engine.Tun, families []string) []string {
 		prefix := netip.MustParsePrefix(address)
 		source := prefix.Addr().String()
 		steps = append(steps,
-			family+" addr replace "+address+" dev "+tun.DeviceName,
-			family+" route replace default dev "+tun.DeviceName+" src "+source+" table "+table,
+			[]string{family, "addr", "replace", address, "dev", tun.DeviceName},
+			[]string{family, "route", "replace", "default", "dev", tun.DeviceName, "src", source, "table", table},
 			// The return rule serves reverse-path validation of TUN replies, which
 			// the kernel looks up with root's UID rather than the engine's.
-			family+" rule add from "+source+" lookup "+table+" priority "+priorityReturn,
-			family+" rule add iif lo ipproto udp dport 53 lookup "+table+" priority "+priorityDNS,
-			family+" rule add iif lo ipproto tcp dport 53 lookup "+table+" priority "+priorityDNS,
+			[]string{family, "rule", "add", "from", source, "lookup", table, "priority", priorityReturn},
+			[]string{family, "rule", "add", "iif", "lo", "ipproto", "udp", "dport", "53", "lookup", table, "priority", priorityDNS},
+			[]string{family, "rule", "add", "iif", "lo", "ipproto", "tcp", "dport", "53", "lookup", table, "priority", priorityDNS},
 			// If the TUN lookup fails, DNS still must skip foreign bypasses.
-			family+" rule add iif lo ipproto udp dport 53 goto "+priorityMain+" priority "+priorityDNSBypass,
-			family+" rule add iif lo ipproto tcp dport 53 goto "+priorityMain+" priority "+priorityDNSBypass,
-			family+" rule add iif lo lookup main suppress_prefixlength 1 priority "+priorityMain,
-			family+" rule add iif lo lookup "+table+" priority "+priorityTunnel,
+			[]string{family, "rule", "add", "iif", "lo", "ipproto", "udp", "dport", "53", "goto", priorityMain, "priority", priorityDNSBypass},
+			[]string{family, "rule", "add", "iif", "lo", "ipproto", "tcp", "dport", "53", "goto", priorityMain, "priority", priorityDNSBypass},
+			[]string{family, "rule", "add", "iif", "lo", "lookup", "main", "suppress_prefixlength", "1", "priority", priorityMain},
+			[]string{family, "rule", "add", "iif", "lo", "lookup", table, "priority", priorityTunnel},
 		)
 	}
 	return steps
@@ -90,46 +92,42 @@ func bypass(ctx context.Context, device string, uid int) error {
 		if iface.Flags&net.FlagPointToPoint != 0 {
 			addrs, err := iface.Addrs()
 			if err != nil {
-				_ = unroute(ctx)
-				return fmt.Errorf("tunroute: interface addresses: %w", err)
+				return errors.Join(fmt.Errorf("tunroute: interface addresses: %w", err), unroute(ctx))
 			}
 			for _, addr := range addrs {
 				prefix, err := netip.ParsePrefix(addr.String())
 				if err != nil {
-					_ = unroute(ctx)
-					return err
+					return errors.Join(err, unroute(ctx))
 				}
 				addresses = append(addresses, prefix)
 			}
 		}
 		for _, step := range bypassSteps(iface.Name, addresses, families()) {
 			if err := ip(ctx, step); err != nil {
-				_ = unroute(ctx)
-				return err
+				return errors.Join(err, unroute(ctx))
 			}
 		}
 	}
 	for _, family := range families() {
 		owner := strconv.Itoa(uid)
-		if err := ip(ctx, family+" rule add uidrange "+owner+"-"+owner+" lookup main priority "+priorityEngine); err != nil {
-			_ = unroute(ctx)
-			return err
+		if err := ip(ctx, []string{family, "rule", "add", "uidrange", owner + "-" + owner, "lookup", "main", "priority", priorityEngine}); err != nil {
+			return errors.Join(err, unroute(ctx))
 		}
 	}
 	return nil
 }
 
-func bypassSteps(device string, addresses []netip.Prefix, families []string) []string {
-	var steps []string
+func bypassSteps(device string, addresses []netip.Prefix, families []string) [][]string {
+	var steps [][]string
 	for _, family := range families {
 		// DNS skips these rules via priorityDNSBypass; other protocols retain
 		// the foreign VPN's bound sockets and point-to-point source addresses.
-		steps = append(steps, family+" rule add oif "+device+" lookup main priority "+priorityBound)
+		steps = append(steps, []string{family, "rule", "add", "oif", device, "lookup", "main", "priority", priorityBound})
 		for _, prefix := range addresses {
 			if prefix.Addr().Is4() != (family == "-4") {
 				continue
 			}
-			steps = append(steps, family+" rule add from "+prefix.Addr().String()+" lookup main priority "+priorityForeign)
+			steps = append(steps, []string{family, "rule", "add", "from", prefix.Addr().String(), "lookup", "main", "priority", priorityForeign})
 		}
 	}
 	return steps
@@ -151,11 +149,11 @@ func unroute(ctx context.Context) error {
 			args := ownedRule(rule)
 			// Zero-valued selectors (including protocol 0) are wildcards in
 			// Linux rule_find. Never let deletion select an earlier foreign rule.
-			if args == "" || slices.ContainsFunc(kept, func(older map[string]json.RawMessage) bool { return deleteMatches(rule, older) }) {
+			if len(args) == 0 || slices.ContainsFunc(kept, func(older map[string]json.RawMessage) bool { return deleteMatches(rule, older) }) {
 				kept = append(kept, rule)
 				continue
 			}
-			if err := ip(ctx, family+" rule del "+args); err != nil {
+			if err := ip(ctx, append([]string{family, "rule", "del"}, args...)); err != nil {
 				errs = append(errs, err)
 				kept = append(kept, rule)
 			}
@@ -166,7 +164,7 @@ func unroute(ctx context.Context) error {
 		if err != nil && !strings.Contains(string(out), "FIB table does not exist") {
 			errs = append(errs, fmt.Errorf("tunroute: read table: %w: %s", err, out))
 		} else if err == nil && len(out) != 0 {
-			errs = append(errs, ip(ctx, family+" route flush table "+table))
+			errs = append(errs, ip(ctx, []string{family, "route", "flush", "table", table}))
 		}
 	}
 	return errors.Join(errs...)
@@ -174,15 +172,15 @@ func unroute(ctx context.Context) error {
 
 // New rules carry an owner protocol. For pre-upgrade crashes, recognize only
 // the exact legacy selectors and table at their original reserved priorities.
-func ownedRule(rule map[string]json.RawMessage) string {
+func ownedRule(rule map[string]json.RawMessage) []string {
 	value := func(key string) string { return strings.Trim(string(rule[key]), "\"") }
 	priority, err := strconv.Atoi(value("priority"))
 	if err != nil {
-		return ""
+		return nil
 	}
 	args := ruleSelectors(rule)
-	if args == "" {
-		return ""
+	if len(args) == 0 {
+		return nil
 	}
 	// mihomo's IPv6 bound-interface rules use dynamically chosen priorities.
 	// Older builds used table 2022; never flush that shared engine table.
@@ -191,7 +189,7 @@ func ownedRule(rule map[string]json.RawMessage) string {
 		return args
 	}
 	if priority < 5333 || priority > 5339 {
-		return ""
+		return nil
 	}
 	if value("protocol") == protocol && value("goto") == priorityMain && value("table") == "" {
 		return args
@@ -200,7 +198,7 @@ func ownedRule(rule map[string]json.RawMessage) string {
 		return args
 	}
 	if value("protocol") != "" && value("protocol") != "0" && value("protocol") != "2" {
-		return ""
+		return nil
 	}
 	// Extra selectors indicate a different owner's rule even at our priority.
 	allowed := []string{"priority", "src", "table", "protocol"}
@@ -226,47 +224,48 @@ func ownedRule(rule map[string]json.RawMessage) string {
 		allowed = append(allowed, "iif")
 
 	default:
-		return ""
+		return nil
 	}
 	for key := range rule {
 		if !slices.Contains(allowed, key) {
-			return ""
+			return nil
 		}
 	}
 	return args
 }
 
-// ruleSelectors serializes every selector Sora installs. Unknown attributes
-// are left alone instead of being silently dropped from a delete command.
-func ruleSelectors(rule map[string]json.RawMessage) string {
+// ruleSelectors serializes every selector Sora installs as an argument
+// vector. Unknown attributes are left alone instead of being silently
+// dropped from a delete command.
+func ruleSelectors(rule map[string]json.RawMessage) []string {
 	value := func(key string) string { return strings.Trim(string(rule[key]), "\"") }
 	known := []string{"priority", "src", "dst", "table", "protocol", "goto", "oif", "iif", "oif_detached", "iif_detached", "uid_start", "uid_end", "ipproto", "dport", "dport_mask", "suppress_prefixlen"}
 	for key := range rule {
 		if !slices.Contains(known, key) {
-			return ""
+			return nil
 		}
 	}
 	proto := value("protocol")
 	if proto == "" {
 		proto = "0"
 	}
-	args := "priority " + value("priority") + " protocol " + proto
+	args := []string{"priority", value("priority"), "protocol", proto}
 	for _, pair := range [][2]string{{"src", "from"}, {"dst", "to"}, {"oif", "oif"}, {"iif", "iif"}, {"table", "table"}, {"goto", "goto"}, {"suppress_prefixlen", "suppress_prefixlength"}} {
 		if v := value(pair[0]); v != "" {
-			args += " " + pair[1] + " " + v
+			args = append(args, pair[1], v)
 		}
 	}
 	if value("uid_start") != "" {
-		args += " uidrange " + value("uid_start") + "-" + value("uid_end")
+		args = append(args, "uidrange", value("uid_start")+"-"+value("uid_end"))
 	}
 	if v := value("ipproto"); v != "" {
-		args += " ipproto " + strings.TrimPrefix(v, "ipproto-")
+		args = append(args, "ipproto", strings.TrimPrefix(v, "ipproto-"))
 	}
 	if v := value("dport"); v != "" {
 		if mask := value("dport_mask"); mask != "" {
 			v += "/" + mask
 		}
-		args += " dport " + v
+		args = append(args, "dport", v)
 	}
 	return args
 }
@@ -329,7 +328,7 @@ func cleanup(ctx context.Context, tun engine.Tun) error {
 			if prefix.Addr().Is6() {
 				family = "-6"
 			}
-			if err := ip(ctx, family+" addr del "+address.String()+" dev "+tun.DeviceName); err != nil {
+			if err := ip(ctx, []string{family, "addr", "del", address.String(), "dev", tun.DeviceName}); err != nil {
 				return err
 			}
 		}
@@ -346,13 +345,19 @@ func families() []string {
 	return []string{"-4", "-6"}
 }
 
-func ip(ctx context.Context, args string) error {
-	if strings.Contains(args, " rule add ") {
-		args += " protocol " + protocol
+func ip(ctx context.Context, args []string) error {
+	// Tag our rules with the owner protocol, as before; the vector form
+	// keeps every element a single argument (SORA-M2).
+	full := args
+	for i := 0; i+1 < len(args); i++ {
+		if args[i] == "rule" && args[i+1] == "add" {
+			full = append(slices.Clone(args), "protocol", protocol)
+			break
+		}
 	}
-	out, err := exec.CommandContext(ctx, "ip", strings.Fields(args)...).CombinedOutput() //nolint:gosec // fixed arguments built above
+	out, err := exec.CommandContext(ctx, "ip", full...).CombinedOutput() //nolint:gosec // fixed argument vector built above; no shell
 	if err != nil {
-		return fmt.Errorf("tunroute: ip %s: %w: %s", args, err, strings.TrimSpace(string(out)))
+		return fmt.Errorf("tunroute: ip %s: %w: %s", strings.Join(full, " "), err, strings.TrimSpace(string(out)))
 	}
 	return nil
 }
