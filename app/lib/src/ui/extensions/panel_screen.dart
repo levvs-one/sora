@@ -22,11 +22,15 @@ import '../../design/theme.dart';
 import '../kit.dart';
 import '../../sora.dart';
 import '../../ext/bridge.dart';
+import '../../ext/bypass.dart';
+import '../../ext/bypass_host.dart';
 import '../../ext/manifest.dart';
+import '../../ext/permissions.dart';
 import '../../ext/store.dart';
 import '../../notifications.dart';
 import '../../core/link.dart';
 import '../../generated/sora/core/v1/core_control.pbgrpc.dart';
+import '../../generated/sora/ext/v1/ext_host.pbgrpc.dart';
 
 /// The lockdown policy for extension panels. Panels are embedded WebViews
 /// whose only sanctioned way out is the host API (the soraExt JS channel to
@@ -209,6 +213,17 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   bool _depsReady = false;
   ExtensionStore? _storeRef;
 
+  // Anti-DPI bypass seam: the per-extension ExtensionHost token minted
+  // when this panel opened (only for extensions granted a bypass.*
+  // permission) and the API riding it. All three are dropped — and the
+  // token revoked best-effort — when the panel closes.
+  BypassHostApi? _bypassApi;
+  ExtensionHostClient? _extClient;
+  List<int>? _controlToken;
+  List<int>? _extToken;
+  StreamSubscription<BypassCensorshipEvent>? _bypassSub;
+  bool _bypassMinting = false;
+
   @override
   void initState() {
     super.initState();
@@ -259,7 +274,19 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
           throw BridgeError('invalid-argument', e.message);
         }
       },
+      getBypassCapabilities: _getBypassCapabilities,
+      getBypassState: _getBypassState,
+      getBypassLayer: _getBypassLayer,
+      applyBypassLayer: _applyBypassLayer,
+      tuneDesync: _tuneDesync,
     );
+    // Only an extension granted a bypass.* permission gets a token: the
+    // mint is scoped to granted ∩ registry, and extensions without a
+    // bypass grant never hold one (the bridge gates their calls on the
+    // permission before any callback runs anyway).
+    if (inst.granted.any((p) => p.startsWith('bypass.'))) {
+      unawaited(_mintBypassToken(inst.granted));
+    }
     // Tear the panel down the moment the extension is disabled/removed.
     store.addListener(_onStoreChanged);
     _start();
@@ -280,9 +307,137 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     try {
       SoraScope.read(context).removeListener(_onSoraPhase);
     } catch (_) {}
+    unawaited(_bypassSub?.cancel() ?? Future<void>.value());
+    // Revoke the minted bypass token best-effort: the references were
+    // captured at mint time so this works without a live context or
+    // link (the core may already be gone — that is fine, its tokens die
+    // with it).
+    final client = _extClient, control = _controlToken, token = _extToken;
+    if (client != null && control != null && token != null) {
+      unawaited(_revokeToken(client, control, token));
+    }
     _controller?.clearCache();
     unawaited(_server?.stop());
     super.dispose();
+  }
+
+  static Future<void> _revokeToken(
+      ExtensionHostClient client, List<int> control, List<int> token) async {
+    try {
+      await client.revokeToken(RevokeTokenRequest(controlToken: control, extensionToken: token));
+    } catch (_) {
+      // Best effort by contract: a failed revoke leaves a token that
+      // expires with the core process and is useless without the panel.
+    }
+  }
+
+  /// Mints the per-extension ExtensionHost token for this panel and
+  /// starts the bypass event watch. A core without ExtensionHost (or a
+  /// refused mint) leaves [_bypassApi] null: bypass bridge callbacks
+  /// then answer 'internal' and the rest of the panel keeps working.
+  Future<void> _mintBypassToken(List<String> granted) async {
+    if (_bypassMinting) return;
+    _bypassMinting = true;
+    try {
+      final link = SoraScope.read(context).link;
+      if (link == null) return;
+      final answer = await link.ext.mintToken(MintTokenRequest(
+        controlToken: link.token,
+        extensionId: widget.extensionId,
+        permissions: [for (final p in granted) if (isKnownPermission(p)) p],
+      ));
+      if (!mounted) {
+        // The panel closed while the mint was in flight: do not leak
+        // the freshly minted token.
+        unawaited(_revokeToken(link.ext, link.token, answer.extensionToken));
+        return;
+      }
+      _extClient = link.ext;
+      _controlToken = link.token;
+      _extToken = answer.extensionToken;
+      _bypassApi = GrpcBypassHostApi(link.ext, answer.extensionToken);
+      _watchBypassEvents();
+    } catch (_) {
+      // See the doc above: a missing host is a degraded panel, not a
+      // failed one.
+    } finally {
+      _bypassMinting = false;
+    }
+  }
+
+  void _watchBypassEvents() {
+    final api = _bypassApi;
+    if (api == null) return;
+    _bypassSub = api.watchEvents().listen(
+      (ev) => unawaited(_pushEvent('bypass.event', jsonEncode(ev.toJson()))),
+      onError: (_) {
+        // A failed watch (core without the bypass API, dropped stream)
+        // simply means no events for this panel.
+      },
+    );
+  }
+
+  Future<BypassHostApi> _bypass() async {
+    final api = _bypassApi;
+    if (api == null) throw BridgeError('internal', 'bypass host unavailable');
+    return api;
+  }
+
+  Future<Map<String, dynamic>> _getBypassCapabilities() async {
+    try {
+      return await (await _bypass()).getCapabilities();
+    } catch (e) {
+      throw mapBypassHostError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> _getBypassState() async {
+    try {
+      return await (await _bypass()).getState();
+    } catch (e) {
+      throw mapBypassHostError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> _getBypassLayer() async {
+    try {
+      return await (await _bypass()).getLayer();
+    } catch (e) {
+      throw mapBypassHostError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> _applyBypassLayer(Map<String, dynamic> args) async {
+    try {
+      // Validate before the core call, so a malformed layer is
+      // 'invalid-argument' even against a core without the bypass API.
+      final layer = bypassLayerFromJson(args);
+      final result = await (await _bypass()).applyLayer(args);
+      // Write-through: the applied global strategy becomes the app's
+      // own, so the next connect's plan (buildPlan) carries the full
+      // strategy — the core-side layer alone would not reach the
+      // zapret outbounds the app builds. The user still wins: editing
+      // a legacy zapret field clears the slot (settings.dart), as does
+      // disabling or removing this extension (store.dart hook).
+      final settings = SoraScope.read(context).settings;
+      if (layer.global != null) {
+        settings.antidpiStrategyJson = jsonEncode(bypassStrategyToJson(layer.global!));
+        settings.antidpiStrategySource = widget.extensionId;
+      } else if (settings.antidpiStrategySource == widget.extensionId) {
+        settings.clearAntidpiStrategy();
+      }
+      return result;
+    } catch (e) {
+      throw mapBypassHostError(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> _tuneDesync(String engine) async {
+    try {
+      return await (await _bypass()).tuneDesync(engine);
+    } catch (e) {
+      throw mapBypassHostError(e);
+    }
   }
 
   Future<List<Map<String, dynamic>>> _getConnections() async {

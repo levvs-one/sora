@@ -6,6 +6,7 @@ import 'package:retry/retry.dart';
 
 import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../generated/sora/custom/v1/custom.pbgrpc.dart';
+import '../generated/sora/ext/v1/ext_host.pbgrpc.dart';
 import '../generated/sora/leak/v1/leak.pbgrpc.dart';
 import '../obfs.dart';
 import 'pipe.dart';
@@ -26,7 +27,7 @@ final apiVersion = ApiVersion(major: 1, minor: 13, minSupportedMinor: 6);
 /// A gRPC channel to the core over a Unix socket or Windows named pipe, with
 /// the Handshake authentication token.
 class CoreLink {
-  CoreLink._(this._channel, this.stub, this.custom, this.leak, this.obfs, this.token, this.minor);
+  CoreLink._(this._channel, this.stub, this.custom, this.leak, this.obfs, this.ext, this.token, this.minor);
 
   final api.ClientChannel _channel;
   final CoreControlClient stub;
@@ -40,6 +41,11 @@ class CoreLink {
   /// Traffic obfuscation (sora.obfs.v1, API 1.11); the core may not
   /// implement it yet.
   final ObfsControlClient obfs;
+
+  /// Extension host (sora.ext.v1, API 1.10): the app mints per-extension
+  /// tokens here and extension panels reach the core through it. Older
+  /// cores may not serve it; callers map Unimplemented to 'internal'.
+  final ExtensionHostClient ext;
   final List<int> token;
   final int minor;
 
@@ -76,7 +82,8 @@ class CoreLink {
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
       return CoreLink._(channel, stub, CustomServersClient(channel), LeakServiceClient(channel),
-          ObfsControlClient(channel), answer.controlAuthenticator, answer.negotiatedVersion.minor);
+          ObfsControlClient(channel), ExtensionHostClient(channel), answer.controlAuthenticator,
+          answer.negotiatedVersion.minor);
     } catch (_) {
       await channel.shutdown();
       rethrow;

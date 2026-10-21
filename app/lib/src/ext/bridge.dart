@@ -16,6 +16,11 @@ const Map<String, String> _methodPermission = {
   'getConnections': 'connections.read',
   'getServers': 'servers.read',
   'notify': 'notifications',
+  'getBypassCapabilities': 'bypass.read',
+  'getBypassState': 'bypass.read',
+  'getBypassLayer': 'bypass.read',
+  'applyBypassLayer': 'bypass.write',
+  'tuneDesync': 'bypass.tune',
 };
 
 class BridgeError implements Exception {
@@ -35,6 +40,11 @@ class PanelBridge {
     required this.notify,
     required this.getSettings,
     required this.setSettings,
+    required this.getBypassCapabilities,
+    required this.getBypassState,
+    required this.getBypassLayer,
+    required this.applyBypassLayer,
+    required this.tuneDesync,
   });
 
   final String extensionId;
@@ -59,6 +69,30 @@ class PanelBridge {
   /// contract — not as a bare store error, which [handle] would report
   /// to the panel as 'internal'.
   final Future<void> Function(Map<String, dynamic>) setSettings;
+
+  /// Anti-DPI bypass surface (ExtensionHost, token-scoped). Shapes are
+  /// the JSON contract in docs/extensions-api.md; strategy conversion
+  /// lives in ext/bypass.dart. Implementations must surface core
+  /// rejections as [BridgeError] with the documented codes
+  /// ('permission-denied' / 'invalid-argument' / 'internal').
+  ///
+  /// () -> {platform, backends: [{kind, available, reason}]}
+  final Future<Map<String, dynamic>> Function() getBypassCapabilities;
+
+  /// () -> {platform, global_source, global_from, session_active,
+  /// pending_apply, bindings_count}
+  final Future<Map<String, dynamic>> Function() getBypassState;
+
+  /// () -> {global: strategy|null, bindings: [{match, strategy}],
+  /// updated_at}
+  final Future<Map<String, dynamic>> Function() getBypassLayer;
+
+  /// ({global: strategy|null, bindings: [...]}) -> {updated_at}
+  final Future<Map<String, dynamic>> Function(Map<String, dynamic> layer) applyBypassLayer;
+
+  /// (engine) -> {winner_id, winner_describe, score, attempts,
+  /// strategy: strategy|null}
+  final Future<Map<String, dynamic>> Function(String engine) tuneDesync;
 
   /// Handles one JSON message posted to the `soraExt` JavaScript channel.
   /// Always returns a JSON reply: {id, ok, result?} or {id, ok, error}.
@@ -108,6 +142,20 @@ class PanelBridge {
         final values = (args['settings'] as Map<String, dynamic>?) ?? args;
         await setSettings(values);
         return null;
+      case 'getBypassCapabilities':
+        return await getBypassCapabilities();
+      case 'getBypassState':
+        return await getBypassState();
+      case 'getBypassLayer':
+        return await getBypassLayer();
+      case 'applyBypassLayer':
+        return await applyBypassLayer(args);
+      case 'tuneDesync':
+        final engine = args['engine'];
+        if (engine != null && engine is! String) {
+          throw BridgeError('invalid-argument', 'tuneDesync engine must be a string');
+        }
+        return await tuneDesync(engine as String? ?? '');
       default:
         throw BridgeError('invalid-argument', 'unknown method $method');
     }
@@ -122,12 +170,7 @@ class PanelBridge {
   /// `.code`, so `catch (e) { e.code }` works identically against the real
   /// host and the mock.
   String _reply(dynamic id, bool ok, String? error, [dynamic result]) {
-    return jsonEncode({
-      'id': id,
-      'ok': ok,
-      if (error != null) 'error': error,
-      if (ok) 'result': result,
-    });
+    return jsonEncode({'id': id, 'ok': ok, if (error != null) 'error': error, if (ok) 'result': result});
   }
 
   /// Injected into the panel before any page script runs. `soraExt` here is
