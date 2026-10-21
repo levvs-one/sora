@@ -163,6 +163,9 @@ void main() {
         } finally {
           await tester.runAsync(sora.disconnect);
           await tester.pumpWidget(const SizedBox());
+          // Unmounting dismisses visible toasts; toastification always
+          // schedules its overlay cleanup, which must elapse before the test ends.
+          await tester.pump(const Duration(seconds: 1));
           sora.dispose();
           await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
         }
