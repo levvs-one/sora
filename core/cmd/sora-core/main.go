@@ -168,7 +168,7 @@ func New(ctx context.Context, opts Options) (*App, error) {
 	}
 
 	firewall, err := guard.PlatformFirewall(guard.FirewallOptions{
-		EngineUID: os.Getuid(), EnginesDir: opts.EnginesDir, Bypass: opts.Bypass,
+		EngineUID: os.Getuid(), EnginesDir: opts.EnginesDir, Bypass: opts.Bypass, StateDir: opts.DataDir,
 	})
 	if err != nil {
 		return nil, err

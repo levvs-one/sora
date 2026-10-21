@@ -373,6 +373,17 @@ jobs:
             Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
             Get-Content $log -Tail 20 -ErrorAction SilentlyContinue
           }
+      - name: Core events after a failure
+        # The service logs to the Application event log, so a crash or a
+        # refused firewall change is only visible there.
+        if: failure()
+        shell: pwsh
+        run: |
+          sc.exe query SoraCore
+          Get-WinEvent -FilterHashtable @{ LogName = 'Application'; ProviderName = 'SoraCore' } -MaxEvents 60 -ErrorAction SilentlyContinue |
+            Sort-Object TimeCreated | Format-List TimeCreated, LevelDisplayName, Message
+          Get-WinEvent -FilterHashtable @{ LogName = 'System'; ProviderName = 'Service Control Manager' } -MaxEvents 20 -ErrorAction SilentlyContinue |
+            Where-Object { $_.Message -match 'Sora' } | Format-List TimeCreated, Message
       - name: Screenshot of the app
         shell: pwsh
         run: |

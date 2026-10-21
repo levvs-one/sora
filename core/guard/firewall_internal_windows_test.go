@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/tailscale/wf"
+	"golang.org/x/sys/windows"
 
 	"github.com/levvs-one/sora-client/core/session"
 )
@@ -142,5 +143,32 @@ func TestWFPStrictRulesRequireExplicitExemptions(t *testing.T) {
 		if lan != len(DefaultBypassNetworks()) {
 			t.Fatal("explicit LAN permission lost")
 		}
+	}
+}
+
+// TestStrictFilterRecordRoundTrips pins the record Disarm relies on: the
+// IDs written after installing strict filters are read back unchanged and
+// clearing the record leaves nothing to delete.
+func TestStrictFilterRecordRoundTrips(t *testing.T) {
+	w := &WFP{stateDir: t.TempDir()}
+	if ids, err := w.strictIDs(); err != nil || len(ids) != 0 {
+		t.Fatalf("empty record = %v, %v", ids, err)
+	}
+	want := []wf.RuleID{
+		wf.RuleID(windows.GUID{Data1: 1, Data2: 2, Data3: 3, Data4: [8]byte{4, 5, 6, 7, 8, 9, 10, 11}}),
+		wf.RuleID(windows.GUID{Data1: 12}),
+	}
+	if err := w.saveStrictIDs(want); err != nil {
+		t.Fatal(err)
+	}
+	got, err := w.strictIDs()
+	if err != nil || len(got) != len(want) || got[0] != want[0] || got[1] != want[1] {
+		t.Fatalf("record = %v, %v; want %v", got, err, want)
+	}
+	if err := w.saveStrictIDs(nil); err != nil {
+		t.Fatal(err)
+	}
+	if ids, _ := w.strictIDs(); len(ids) != 0 {
+		t.Fatalf("cleared record still lists %v", ids)
 	}
 }

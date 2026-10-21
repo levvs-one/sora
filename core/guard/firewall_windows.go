@@ -4,7 +4,9 @@ package guard
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/netip"
 	"os"
 	"path/filepath"
@@ -27,6 +29,10 @@ type WFP struct {
 	blockedNetworks []netip.Prefix
 	session         *wf.Session
 	policy          session.Settings
+	// stateDir records the IDs of the strict filters, which outlive the
+	// process; Disarm deletes exactly those instead of enumerating every
+	// filter on the system, whose foreign entries wf cannot always parse.
+	stateDir string
 }
 
 // PlatformFirewall returns Windows WFP, matching engines by executable because
@@ -45,7 +51,7 @@ func PlatformFirewall(opts FirewallOptions) (Firewall, error) {
 		}
 		prefixes = append(prefixes, prefix.Masked())
 	}
-	return &WFP{enginesDir: opts.EnginesDir, bypass: prefixes}, nil
+	return &WFP{enginesDir: opts.EnginesDir, bypass: prefixes, stateDir: opts.StateDir}, nil
 }
 
 // SetTunNetworks receives the selected session subnets before arming.
@@ -114,27 +120,28 @@ func (w *WFP) Arm(context.Context, []uint16) error {
 func (w *WFP) Disarm(context.Context) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	// Non-dynamic rules remain accessible even after the original owner died.
-	connection, err := wf.New(nil)
-	if err != nil {
-		return refused(err)
-	}
-	defer func() { _ = connection.Close() }()
-	rules, err := connection.Rules()
-	if err != nil {
-		return refused(err)
-	}
 	var failures error
-	for _, rule := range rules {
-		if rule.Sublayer == strictSublayer {
-			failures = errors.Join(failures, connection.DeleteRule(rule.ID))
+	if ids, err := w.strictIDs(); err != nil {
+		failures = err
+	} else if len(ids) > 0 {
+		// Non-dynamic rules remain after the original owner died.
+		connection, err := wf.New(nil)
+		if err != nil {
+			return refused(err)
 		}
-	}
-	layers, layerErr := connection.Sublayers()
-	failures = errors.Join(failures, layerErr)
-	for _, layer := range layers {
-		if layer.ID == strictSublayer {
-			failures = errors.Join(failures, connection.DeleteSublayer(strictSublayer))
+		defer func() { _ = connection.Close() }()
+		for _, id := range ids {
+			if err := connection.DeleteRule(id); err != nil && !errors.Is(err, errFilterNotFound) {
+				failures = errors.Join(failures, err)
+			}
+		}
+		if failures == nil {
+			if err := connection.DeleteSublayer(strictSublayer); err != nil && !errors.Is(err, errSublayerNotFound) {
+				failures = err
+			}
+		}
+		if failures == nil {
+			failures = w.saveStrictIDs(nil)
 		}
 	}
 	if w.session != nil {
@@ -147,25 +154,80 @@ func (w *WFP) Disarm(context.Context) error {
 	return failures
 }
 
-// Armed includes strict filters held by earlier processes.
+// Armed includes strict filters recorded by earlier processes.
 func (w *WFP) Armed(context.Context) (bool, error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	connection, err := wf.New(nil)
+	ids, err := w.strictIDs()
 	if err != nil {
 		return false, err
 	}
-	defer func() { _ = connection.Close() }()
-	rules, err := connection.Rules()
-	if err != nil {
-		return false, err
+	return len(ids) > 0 || w.session != nil, nil
+}
+
+// WFP status codes for objects that are already gone.
+var (
+	errFilterNotFound   = windows.Errno(0x80320003)
+	errSublayerNotFound = windows.Errno(0x80320007)
+)
+
+func (w *WFP) strictFile() string { return filepath.Join(w.stateDir, "strict-wfp.json") }
+
+// strictIDs reads the recorded strict filter IDs; no record means none.
+func (w *WFP) strictIDs() ([]wf.RuleID, error) {
+	if w.stateDir == "" {
+		return nil, nil
 	}
-	for _, rule := range rules {
-		if rule.Sublayer == strictSublayer {
-			return true, nil
+	data, err := os.ReadFile(w.strictFile())
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	var text []string
+	if err := json.Unmarshal(data, &text); err != nil {
+		return nil, fmt.Errorf("guard: invalid strict filter record: %w", err)
+	}
+	ids := make([]wf.RuleID, 0, len(text))
+	for _, t := range text {
+		guid, err := windows.GUIDFromString(t)
+		if err != nil {
+			return nil, fmt.Errorf("guard: invalid strict filter id %q: %w", t, err)
 		}
+		ids = append(ids, wf.RuleID(guid))
 	}
-	return w.session != nil, nil
+	return ids, nil
+}
+
+// saveStrictIDs replaces the record atomically; nil removes it.
+func (w *WFP) saveStrictIDs(ids []wf.RuleID) error {
+	if len(ids) == 0 {
+		if err := os.Remove(w.strictFile()); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+		return nil
+	}
+	text := make([]string, len(ids))
+	for i, id := range ids {
+		text[i] = windows.GUID(id).String()
+	}
+	data, err := json.Marshal(text)
+	if err != nil {
+		return err
+	}
+	file, err := os.CreateTemp(w.stateDir, ".strict-wfp-*")
+	if err != nil {
+		return err
+	}
+	defer func() { _ = os.Remove(file.Name()) }()
+	_, writeErr := file.Write(data)
+	syncErr := file.Sync()
+	closeErr := file.Close()
+	if err := errors.Join(writeErr, syncErr, closeErr); err != nil {
+		return err
+	}
+	return os.Rename(file.Name(), w.strictFile())
 }
 
 // SetPolicy is applied before replacing the rules.
@@ -174,23 +236,14 @@ func (w *WFP) SetPolicy(s session.Settings) { w.mu.Lock(); defer w.mu.Unlock(); 
 var strictSublayer = wf.SublayerID{Data1: 0x18ce701b, Data2: 0x251c, Data3: 0x4bc8, Data4: [8]byte{0x8f, 0x3b, 0x13, 0x23, 0x7b, 0x0e, 0x74, 0x91}}
 
 func (w *WFP) installStrict(connection *wf.Session) error {
-	layers, err := connection.Sublayers()
+	if w.stateDir == "" {
+		return errors.New("guard: strict mode needs a data directory")
+	}
+	old, err := w.strictIDs()
 	if err != nil {
 		return err
 	}
-	found := false
-	for _, layer := range layers {
-		if layer.ID == strictSublayer {
-			found = true
-		}
-	}
-	if !found {
-		if err := connection.AddSublayer(&wf.Sublayer{ID: strictSublayer, Name: "Sora strict kill switch", Weight: 0xffff, Persistent: true}); err != nil {
-			return err
-		}
-	}
-	old, err := connection.Rules()
-	if err != nil {
+	if err := connection.AddSublayer(&wf.Sublayer{ID: strictSublayer, Name: "Sora strict kill switch", Weight: 0xffff, Persistent: true}); err != nil && !errors.Is(err, windows.ERROR_ALREADY_EXISTS) && !errors.Is(err, errAlreadyExists) {
 		return err
 	}
 	// Install the replacement before deleting the old block, including during recovery.
@@ -208,15 +261,21 @@ func (w *WFP) installStrict(connection *wf.Session) error {
 		}
 		return err
 	}
-	for _, rule := range old {
-		if rule.Sublayer == strictSublayer {
-			if err := connection.DeleteRule(rule.ID); err != nil {
-				return err
-			}
+	// Record old and new together first, so a crash before the old rules
+	// are gone still leaves every strict filter findable.
+	if err := w.saveStrictIDs(append(append([]wf.RuleID(nil), added...), old...)); err != nil {
+		return err
+	}
+	for _, id := range old {
+		if err := connection.DeleteRule(id); err != nil && !errors.Is(err, errFilterNotFound) {
+			return err
 		}
 	}
-	return nil
+	return w.saveStrictIDs(added)
 }
+
+// errAlreadyExists is FWP_E_ALREADY_EXISTS for a sublayer added twice.
+var errAlreadyExists = windows.Errno(0x80320009)
 
 // Name identifies the implementation in a diagnostics line.
 func (w *WFP) Name() string { return "wfp" }

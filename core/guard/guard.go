@@ -49,6 +49,9 @@ type FirewallOptions struct {
 	// Bypass are the networks that stay reachable; empty means private
 	// space.
 	Bypass []string
+	// StateDir keeps firewall state that must outlive the process, such
+	// as the IDs of Windows strict filters.
+	StateDir string
 }
 
 // Options identifies engine listener ports that must stay reachable for tunnel
