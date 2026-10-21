@@ -39,6 +39,11 @@ The scripts download the latest release, verify checksums and install the app an
 - On Linux, bypasses some blocks without a server using zapret. This mode does not hide your IP address or replace a VPN.
 - Opens speed test services inside the app, keeps notification history and shows categorized logs with export.
 - Runs in the tray, starts at login and installs updates from the app. Includes 31 interface languages, light and dark themes.
+- Measures real server throughput and uses it for automatic selection. Chains of two or three servers, servers you add by hand, and edits on top of a subscription that survive its refresh.
+- Network profiles: settings bound to a Wi-Fi network, gateway or provider, applied on request or automatically when you turn that on.
+- DNS, IPv6 and tunnel leak checks, a connections screen grouped by app, a subscription QR code and reading a QR code from an image.
+- Sync of subscriptions, rules and settings between your computers on the local network without a cloud, over an encrypted channel.
+- Extensions: signed `.soraext` packages with panels and settings, installed from a file, with permissions confirmed at install. See [docs/extensions.md](docs/extensions.md).
 
 The legacy client for older Windows is developed separately in [sora-legacy](https://github.com/levvs-one/sora-legacy).
 

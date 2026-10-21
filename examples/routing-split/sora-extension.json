@@ -1,0 +1,22 @@
+{
+  "author": {
+    "identity": "github:levvs-one",
+    "name": "Sora Team",
+    "public_key": "RWRVVKTHmSQ7svGhis3W50BAp84r2hdagXqRzU4YUTn1Y0usXvpfaz1R"
+  },
+  "capabilities": [
+    "routing"
+  ],
+  "description": "Example split-routing rules: proxy some domains, keep local traffic direct.",
+  "id": "org.sora.split-routing",
+  "manifest_version": 1,
+  "min_app_version": "1.9.0",
+  "name": "Split Routing Example",
+  "permissions": [
+    "routing.rules"
+  ],
+  "routing": {
+    "entry": "routing.json"
+  },
+  "version": "0.1.0"
+}

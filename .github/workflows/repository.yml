@@ -109,6 +109,36 @@ jobs:
           version: v2.14.0
           working-directory: core
 
+  modules:
+    name: Go modules
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [service/sync, tools/sora-ext]
+    defaults:
+      run:
+        working-directory: ${{ matrix.module }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: core/go.mod
+          cache: false
+      - name: Check formatting
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then echo "$unformatted"; exit 1; fi
+      - name: Vet
+        run: go vet ./... && GOOS=windows go vet ./...
+      - name: Test
+        run: go test -race ./...
+      - name: Lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.14.0
+          working-directory: ${{ matrix.module }}
+
   app:
     name: App
     runs-on: ubuntu-latest
@@ -169,6 +199,10 @@ jobs:
         working-directory: core
         shell: bash
         run: CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.buildVersion=$SORA_VERSION" -o ../dist/windows/sora-core.exe ./cmd/sora-core
+      - name: Build device sync
+        working-directory: service/sync
+        shell: bash
+        run: CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o ../../dist/windows/sora-sync.exe ./cmd/sora-sync
       - name: Fetch and verify the engines
         shell: bash
         run: packaging/engines/fetch.sh windows-amd64 dist/windows/engines
@@ -391,6 +425,9 @@ jobs:
       - name: Build the core
         working-directory: core
         run: CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.buildVersion=$SORA_VERSION" -o ../dist/sora-core ./cmd/sora-core
+      - name: Build device sync
+        working-directory: service/sync
+        run: CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o ../../dist/sora-sync ./cmd/sora-sync
       - name: Fetch and verify the engines
         run: packaging/engines/fetch.sh ${{ matrix.arch }} dist/engines
       - name: Xray TUN replacement and TCP/UDP DNS through every engine

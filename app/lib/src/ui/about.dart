@@ -255,7 +255,6 @@ class _AboutScreenState extends State<AboutScreen> {
                   UpdateError.installation => s.updateInstallError,
                   UpdateError.connecting => s.updateWaitConnection,
                   UpdateError.unsupported => s.updateUnsupported,
-                  UpdateError.signatureRequired => s.updateWindowsSigBlocked,
                   UpdateError.rollback => s.updateRollbackError,
                   UpdateError.rollbackCache => s.updateRollbackCacheError,
                 }, style: Styles.dangerSecondary(context)),

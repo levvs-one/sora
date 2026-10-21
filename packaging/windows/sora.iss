@@ -99,6 +99,8 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 [Files]
 Source: "..\..\app\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 Source: "..\..\dist\windows\sora-core.exe"; DestDir: "{app}\core"; Flags: ignoreversion
+; Device sync runs per user next to sora.exe, where the app looks for it.
+Source: "..\..\dist\windows\sora-sync.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\dist\windows\engines\*"; DestDir: "{app}\core\engines"; Flags: ignoreversion
 Source: "..\..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\THIRD-PARTY-NOTICES.md"; DestDir: "{app}"; Flags: ignoreversion

@@ -23,6 +23,7 @@ import '../../ext/package.dart';
 import '../../ext/permissions.dart';
 import '../../ext/store.dart';
 import '../../ext/verifier.dart';
+import '../../updates.dart';
 import 'conflicts_sheet.dart';
 import 'detail_screen.dart';
 import 'permissions_sheet.dart';
@@ -375,11 +376,11 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   static String _sha256Hex(Uint8List data) => crypto.sha256.convert(data).toString();
 }
 
-/// The running app version for the min_app_version gate, injected at build
-/// time with --dart-define=APP_VERSION=x.y.z (see docs/extensions.md).
-/// Empty in dev builds: the gate is skipped rather than enforced against a
-/// hardcoded guess.
-const String _appVersion = String.fromEnvironment('APP_VERSION');
+/// The running app version for the min_app_version gate. Release builds
+/// carry x.y.z in SORA_VERSION; dev and untagged CI builds (dev, 0.0.0.N)
+/// have no comparable version, so the gate is skipped there rather than
+/// enforced against a guess.
+final String _appVersion = RegExp(r'^\d+\.\d+\.\d+$').hasMatch(appVersion) ? appVersion : '';
 
 class _ExtensionsBody extends StatefulWidget {
   const _ExtensionsBody();

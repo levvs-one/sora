@@ -828,10 +828,6 @@ class SKo extends S {
       'Warning: the manifest signature was not verified — the files below are hash-checked only. Run the command only if you trust the release channel.';
 
   @override
-  String get updateWindowsSigBlocked =>
-      'Automatic installation is disabled on Windows until release-signature verification is implemented. Download the installer from the release page and verify it manually.';
-
-  @override
   String get updateVersionRevoked =>
       'This version has been recalled by the developer. Please wait for a fixed release.';
 

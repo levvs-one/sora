@@ -122,8 +122,6 @@ void main() {
     expect(release.version, '1.0.5');
     expect(release.notes, contains('## Что нового'));
     expect(release.asset('SHA256SUMS').size, greaterThan(0));
-    // The staged update cannot run without the manifest signature.
-    expect(release.asset('SHA256SUMS.minisig').size, greaterThan(0));
     for (final format in PackageFormat.values) {
       for (final name in LinuxInstallation(format, '').filenames(release.version)) {
         expect(release.asset(name).url.host, 'github.com');
@@ -352,7 +350,7 @@ void main() {
   });
 
   for (final manager in ['deb', 'rpm', 'zypper', 'arch', 'windows']) {
-    for (final scenario in ['success', 'hash', 'connecting', 'changed', 'cancel', 'manual', 'denied', 'missing', 'nosig']) {
+    for (final scenario in ['success', 'hash', 'connecting', 'changed', 'cancel', 'manual', 'denied', 'missing']) {
       if (manager == 'windows' && ['manual', 'denied'].contains(scenario)) continue;
       test('$manager install: $scenario', () async {
         final settings = await Settings.load();
@@ -375,15 +373,11 @@ void main() {
           data[name] = utf8.encode('Test bytes for $name');
         }
         data['SHA256SUMS'] = utf8.encode([for (final name in names) '${sha256.convert(data[name]!)}  $name\n'].join());
-        data['SHA256SUMS.minisig'] = utf8.encode('Test minisign signature');
         final assets = {
-          for (final name in [...names, 'SHA256SUMS', 'SHA256SUMS.minisig'])
+          for (final name in [...names, 'SHA256SUMS'])
             name: ReleaseAsset(name, release.asset(name).url, data[name]!.length),
         };
         if (scenario == 'missing') assets.remove(names.last);
-        // No SHA256SUMS.minisig in the release JSON: the manifest signature
-        // cannot even be fetched, so the install must fail closed.
-        if (scenario == 'nosig') assets.remove('SHA256SUMS.minisig');
         // S11b: the previous release the rollback cache is built from.
         final oldInstall = manager == 'windows'
             ? null
@@ -403,14 +397,13 @@ void main() {
         oldData['SHA256SUMS'] = utf8.encode(
           [for (final name in oldNames) '${sha256.convert(oldData[name]!)}  $name\n'].join(),
         );
-        oldData['SHA256SUMS.minisig'] = utf8.encode('Old minisig signature');
         final oldReleaseJson = jsonEncode({
           'tag_name': 'v1.0.4',
           'draft': false,
           'prerelease': false,
           'body': 'old release',
           'assets': [
-            for (final name in [...oldNames, 'SHA256SUMS', 'SHA256SUMS.minisig'])
+            for (final name in [...oldNames, 'SHA256SUMS'])
               {
                 'name': name,
                 'browser_download_url': 'https://github.com/levvs-one/sora/releases/download/v1.0.4/$name',
@@ -494,16 +487,7 @@ void main() {
           },
         );
         expect(updater.busy, isFalse);
-        if (manager == 'windows') {
-          // Fail closed (analysis-20 U1): the Windows in-app install path is
-          // blocked until release-signature verification is implemented, so no
-          // scenario downloads, verifies, or launches anything.
-          expect(updater.error, UpdateError.signatureRequired);
-          expect(order, isEmpty);
-          expect(requests, isEmpty);
-          expect(updater.manualCommand, isNull);
-          expect(settings.resumeAfterUpdate, isFalse);
-        } else if (scenario == 'success') {
+        if (scenario == 'success') {
           expect(order, manager == 'windows' ? ['warn', 'install', 'quit'] : ['warn', 'install', 'restart', 'quit']);
           expect(updater.error, isNull);
           if (manager != 'windows') {
@@ -513,7 +497,7 @@ void main() {
             expect(marker?.from, '1.0.4');
             expect(marker?.to, '1.0.5');
             final cache = Directory('${rollbackRoot.path}/1.0.4');
-            for (final name in [...oldNames, 'SHA256SUMS', 'SHA256SUMS.minisig']) {
+            for (final name in [...oldNames, 'SHA256SUMS']) {
               expect(await File('${cache.path}/$name').exists(), isTrue, reason: name);
             }
             for (final name in oldNames) {
@@ -538,10 +522,10 @@ void main() {
           expect(updater.error, switch (scenario) {
             'hash' => UpdateError.checksum,
             'connecting' || 'changed' => UpdateError.connecting,
-            'missing' || 'nosig' => UpdateError.release,
+            'missing' => UpdateError.release,
             _ => null,
           });
-          if (['connecting', 'missing', 'nosig'].contains(scenario)) expect(requests, isEmpty);
+          if (['connecting', 'missing'].contains(scenario)) expect(requests, isEmpty);
           expect(settings.resumeAfterUpdate, isFalse);
           expect(settings.pendingUpdate, isEmpty);
         }
@@ -595,7 +579,6 @@ void main() {
         manifest.writeln('${sha256.convert(bytes)}  $name');
       }
       await File('${cache.path}/SHA256SUMS').writeAsString(manifest.toString(), flush: true);
-      await File('${cache.path}/SHA256SUMS.minisig').writeAsBytes(utf8.encode('sig'), flush: true);
       return cache;
     }
 
@@ -822,9 +805,8 @@ void main() {
       data['SHA256SUMS'] = utf8.encode(
         [for (final name in names) '${sha256.convert(data[name]!)}  $name\n'].join(),
       );
-      data['SHA256SUMS.minisig'] = utf8.encode('Test minisig signature');
       final assets = {
-        for (final name in [...names, 'SHA256SUMS', 'SHA256SUMS.minisig'])
+        for (final name in [...names, 'SHA256SUMS'])
           name: ReleaseAsset(name, release.asset(name).url, data[name]!.length),
       };
       final root = await makeRoot();

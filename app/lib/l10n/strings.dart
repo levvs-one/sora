@@ -1659,12 +1659,6 @@ abstract class S {
   /// **'Внимание: подпись манифеста не проверена — файлы ниже сверены только по хэшам. Выполняйте команду, только если доверяете каналу релиза.'**
   String get updateManualSigWarning;
 
-  /// No description provided for @updateWindowsSigBlocked.
-  ///
-  /// In ru, this message translates to:
-  /// **'Автоматическая установка отключена в Windows, пока не реализована проверка подписи релиза. Скачайте установщик со страницы релиза и проверьте его вручную.'**
-  String get updateWindowsSigBlocked;
-
   /// No description provided for @updateVersionRevoked.
   ///
   /// In ru, this message translates to:

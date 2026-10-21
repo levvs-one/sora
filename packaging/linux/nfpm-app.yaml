@@ -38,6 +38,11 @@ contents:
   - src: /usr/lib/sora/app/sora
     dst: /usr/bin/sora
     type: symlink
+  # Device sync runs per user, started by the app (app/lib/src/sync_daemon.dart
+  # looks for it here), so it ships with the app and not as a system service.
+  - src: ./dist/sora-sync
+    dst: /usr/bin/sora-sync
+    file_info: {mode: 0755}
   - src: ./packaging/linux/io.github.levvs_one.sora.desktop
     dst: /usr/share/applications/io.github.levvs_one.sora.desktop
   - src: ./packaging/linux/io.github.levvs_one.sora.svg

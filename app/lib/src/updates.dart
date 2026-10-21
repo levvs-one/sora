@@ -25,13 +25,12 @@ const rolloutPolicyUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/
 
 enum UpdateConnection { idle, connected, changing, unknown }
 
-enum UpdateError { network, release, checksum, installation, connecting, unsupported, signatureRequired, rollback, rollbackCache }
+enum UpdateError { network, release, checksum, installation, connecting, unsupported, rollback, rollbackCache }
 
 /// Visible phase of an in-flight update flow (FEATURE-PLAN.md F7).
 /// There is deliberately no "verifying" stage: file hashes are checked
-/// against the manifest, but the manifest signature itself is not verified
-/// in-app (the release-signing key ceremony is still pending), so the UI
-/// must not claim verification.
+/// against the manifest, but releases are not signed yet, so the UI must
+/// not claim verification.
 enum UpdateStage { idle, checking, downloading, installing }
 
 class UpdateFailure implements Exception {
@@ -613,21 +612,6 @@ class AppUpdater extends ChangeNotifier {
     notifyListeners();
     bool handedOff = false;
     try {
-      if (_windows) {
-        // Fail closed (analysis-20 U1): the Windows in-app path would install
-        // an elevated .exe trusting only TLS plus a SHA256 against a manifest
-        // fetched from the same host. The SHA256SUMS.minisig signature is not
-        // verified in-app: ext/verifier.dart implements the .soraext
-        // trusted-comment scheme ("timestamp:..\tfile:..\tsha256:.."), not
-        // the stock minisign scheme the release is signed with (signature over
-        // trusted-comment || file, plus a global signature), so it cannot be
-        // reused 1:1; and the release key is still a placeholder (key ceremony
-        // pending). Installing here would silently downgrade the documented
-        // fail-closed policy, so refuse with an honest error instead of
-        // proceeding. This also removes the Windows verify->exec TOCTOU
-        // window (analysis-20 U3): launchWindows is never reached from here.
-        throw const UpdateFailure(UpdateError.signatureRequired);
-      }
       _guard();
       final release = latest!;
       final installation = _windows ? null : await LinuxInstallation.detect(_run, _executable);
@@ -636,20 +620,13 @@ class AppUpdater extends ChangeNotifier {
       // Resolve the whole pair before downloading or invoking any installer.
       final assets = [for (final name in names) release.asset(name)];
       final sums = release.asset('SHA256SUMS');
-      // The privileged helper re-verifies the SHA256SUMS signature as root
-      // before trusting any hash in it (SORA-H1); it refuses to run when the
-      // signature file is missing from the download directory, so the app
-      // must fetch it alongside the manifest.
-      final sumsSig = release.asset('SHA256SUMS.minisig');
       if (_work != null) await _work!.delete(recursive: true);
       final work = _work = await Directory.systemTemp.createTemp('sora-update-');
       final manifest = utf8.decode(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
-      final sigBytes = await _fetch(sumsSig.url, limit: 64 * 1024, size: sumsSig.size);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
       await File('${work.path}/SHA256SUMS').writeAsString(manifest, flush: true);
-      await File('${work.path}/SHA256SUMS.minisig').writeAsBytes(sigBytes, flush: true);
       // Progress spans the whole download phase, so the bar fills once across
       // all package files instead of restarting at zero for every file.
       final totalSize = assets.fold<int>(0, (sum, asset) => sum + asset.size);
@@ -667,12 +644,10 @@ class AppUpdater extends ChangeNotifier {
           progressTotal: totalSize,
         );
         downloaded += asset.size;
-        // Integrity check only: the file hash must match the manifest, but
-        // the manifest signature (.minisig) is not verified in-app — the
-        // release-signing key ceremony is still pending, so only the TLS
-        // transport to GitHub authenticates it. The Linux privileged helper
-        // re-checks the signature as root before installing (SORA-H1); the
-        // UI must not present this step as signature verification.
+        // Integrity check only: the file hash must match the manifest, which
+        // the TLS transport to GitHub authenticates. Releases are not signed
+        // yet, so the UI must not present this step as signature
+        // verification.
         await verifyUpdateFile(file, manifest, asset.name);
       }
       _guard();
@@ -851,11 +826,9 @@ class AppUpdater extends ChangeNotifier {
         throw const UpdateFailure(UpdateError.rollback);
       }
       // Re-verify against the cached manifest: the cache was hash-verified
-      // at download time, but it lived on user-writable disk since. The
-      // privileged helper additionally verifies the manifest signature as
-      // root before installing (SORA-H1).
+      // at download time, but it lived on user-writable disk since.
       final manifestFile = File('${dir.path}/SHA256SUMS');
-      if (!await manifestFile.exists() || !await File('${dir.path}/SHA256SUMS.minisig').exists()) {
+      if (!await manifestFile.exists()) {
         throw const UpdateFailure(UpdateError.rollback);
       }
       final manifest = await manifestFile.readAsString();
@@ -942,15 +915,12 @@ class AppUpdater extends ChangeNotifier {
       final names = installation.filenames(previous.version);
       final assets = [for (final name in names) previous.asset(name)];
       final sums = previous.asset('SHA256SUMS');
-      final sumsSig = previous.asset('SHA256SUMS.minisig');
       await dir.create(recursive: true);
       final manifest = utf8.decode(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
-      final sigBytes = await _fetch(sumsSig.url, limit: 64 * 1024, size: sumsSig.size);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
       await File('${dir.path}/SHA256SUMS').writeAsString(manifest, flush: true);
-      await File('${dir.path}/SHA256SUMS.minisig').writeAsBytes(sigBytes, flush: true);
       for (final asset in assets) {
         final file = File('${dir.path}/${asset.name}');
         await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);

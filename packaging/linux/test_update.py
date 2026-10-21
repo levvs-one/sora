@@ -37,13 +37,25 @@ class UpdateHelperTest(unittest.TestCase):
         (self.downloads / "SHA256SUMS").write_text("".join(checksums))
         return files
 
-    def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False):
+    def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
+                   installed="1.0.4", extra=()):
         recorder = 'printf "%s\\n" "$@" > /tmp/test/calls'
+        # The query fakes also report the installed sora-core version
+        # (TEST_INSTALLED) for the helper's downgrade protection.
         scripts = {
-            "dpkg-query": 'case "$1" in -S) echo "sora: /usr/lib/sora/app/sora";; -W) echo installed;; *) exit 1;; esac',
+            "dpkg-query": 'case "$1" in -S) echo "sora: /usr/lib/sora/app/sora";; -W) case "$2" in'
+                          " -f='${Version}') echo \"$TEST_INSTALLED\";; *) echo installed;; esac;;"
+                          " *) exit 1;; esac",
             "dpkg-deb": 'case "$3" in Package) name=${2##*/}; echo "${name%%_*}";; Version) echo "${TEST_VERSION:-1.0.5}";; Architecture) echo amd64;; esac',
-            "rpm": 'case "$1" in -qf) echo sora;; -q) printf "sora\\nsora-core\\n";; -qp) name=${4##*/}; printf "%s %s-1 x86_64\\n" "${name%-1.0.5-1.x86_64.rpm}" "${TEST_VERSION:-1.0.5}";; *) exit 1;; esac',
-            "pacman": 'case "$1" in -Qoq) echo sora;; -Q) printf "sora\\nsora-core\\n";; -Qp) name=${2##*/}; printf "%s %s-1\\n" "${name%-1.0.5-1-x86_64.pkg.tar.zst}" "${TEST_VERSION:-1.0.5}";; -S) printf "%s\\n" "$@" > /tmp/test/dependencies; [ "${TEST_DEPENDENCY_FAILURE:-0}" = 0 ];; -U) ' + recorder + ';; *) exit 1;; esac',
+            "rpm": 'case "$1" in -qf) echo sora;; -q) case "$2" in --qf) echo "$TEST_INSTALLED";;'
+                   ' *) printf "sora\\nsora-core\\n";; esac;; -qp) name=${4##*/};'
+                   ' printf "%s %s-1 x86_64\\n" "${name%-1.0.5-1.x86_64.rpm}" "${TEST_VERSION:-1.0.5}";;'
+                   " *) exit 1;; esac",
+            "pacman": 'case "$1" in -Qoq) echo sora;; -Q) if [ "$#" = 2 ]; then echo "sora-core ${TEST_INSTALLED}-1";'
+                      ' else printf "sora\\nsora-core\\n"; fi;; -Qp) name=${2##*/};'
+                      ' printf "%s %s-1\\n" "${name%-1.0.5-1-x86_64.pkg.tar.zst}" "${TEST_VERSION:-1.0.5}";;'
+                      ' -S) printf "%s\\n" "$@" > /tmp/test/dependencies; [ "${TEST_DEPENDENCY_FAILURE:-0}" = 0 ];;'
+                      " -U) " + recorder + ";; *) exit 1;; esac",
             "apt-get": recorder,
             "zypper" if zypper else "dnf": recorder,
         }
@@ -53,7 +65,8 @@ class UpdateHelperTest(unittest.TestCase):
             "--dev", "/dev",
             "--tmpfs", "/var/tmp", "--tmpfs", "/usr/bin", "--bind", str(self.root), "/tmp/test",
         ]
-        for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum"]:
+        command += ["--setenv", "TEST_INSTALLED", installed]
+        for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum", "sed", "cut"]:
             command += ["--ro-bind", str(pathlib.Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
         for name, body in scripts.items():
             command += ["--ro-bind", str(self.script(name, body)), "/usr/bin/" + name]
@@ -61,8 +74,30 @@ class UpdateHelperTest(unittest.TestCase):
             command += ["--setenv", "TEST_VERSION", "1.0.4"]
         if dependency_failure:
             command += ["--setenv", "TEST_DEPENDENCY_FAILURE", "1"]
-        command += ["--", "/bin/sh", "/tmp/test/sora-update", format, version, "/tmp/test/downloads"]
+        command += ["--", "/bin/sh", "/tmp/test/sora-update", format, version, "/tmp/test/downloads", *extra]
         return subprocess.run(command, capture_output=True, text=True, timeout=10)
+
+    def test_downgrade_needs_the_explicit_flag(self):
+        for format, zypper, flag in [("deb", False, "--allow-downgrades"), ("rpm", False, "downgrade"),
+                                     ("rpm", True, "--oldpackage"), ("arch", False, "-U")]:
+            with self.subTest(format=format, zypper=zypper):
+                self.prepare(format)
+                refused = self.run_helper(format, zypper=zypper, installed="1.0.6")
+                self.assertNotEqual(refused.returncode, 0)
+                self.assertIn("downgrade from 1.0.6 to 1.0.5 refused", refused.stderr)
+                self.assertFalse((self.root / "calls").exists())
+                allowed = self.run_helper(format, zypper=zypper, installed="1.0.6", extra=("--allow-downgrade",))
+                self.assertEqual(allowed.returncode, 0, allowed.stderr)
+                self.assertIn(flag, (self.root / "calls").read_text().splitlines())
+                (self.root / "calls").unlink()
+                for item in self.downloads.iterdir():
+                    item.unlink()
+
+    def test_unknown_fourth_argument_is_refused(self):
+        self.prepare("deb")
+        result = self.run_helper("deb", extra=("--force",))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.root / "calls").exists())
 
     def test_pair_in_one_transaction_for_every_manager(self):
         for format, zypper in [("deb", False), ("rpm", False), ("rpm", True), ("arch", False)]:
