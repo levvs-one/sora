@@ -267,7 +267,14 @@ func (e *Engine) Validate(ctx context.Context, p *engine.Plan) error {
 // Apply starts the sidecars the plan needs, stops the ones it no
 // longer needs, and applies the rewritten plan. Every gate runs
 // before any state changes: a plan that cannot connect fails closed
-// with the engine untouched, like bypass.Apply.
+// with the engine untouched, like bypass.Apply. If starting a later
+// sidecar or the inner Apply fails, the sidecars this call started
+// are stopped again (and their configs deleted) before the error
+// returns: a sidecar holds the user's key inside a live provider
+// room, so it must not outlive a session the caller was told never
+// started. Sidecars an earlier successful Apply started are not
+// touched by the rollback — they belong to the running session and
+// keep its keep/restart semantics.
 func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 	if !Has(p) {
 		// A later plan of the same session may drop olcrtc
@@ -307,17 +314,45 @@ func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 	}
 	e.mu.Unlock()
 	listeners := make(map[string]Listener, len(needed))
+	// started tracks exactly the sidecars this call raised, so a
+	// failure below can roll them back without touching sidecars a
+	// previous successful Apply left running.
+	var started []*sidecar
+	rollbackStarted := func() {
+		e.mu.Lock()
+		for _, sc := range started {
+			if cur, ok := e.procs[sc.key]; ok && cur == sc {
+				delete(e.procs, sc.key)
+			}
+		}
+		e.mu.Unlock()
+		for _, sc := range started {
+			sc.stop(e.home)
+		}
+	}
 	for k, cfg := range needed {
 		sc := e.current(k)
 		if sc == nil {
 			if sc, err = e.start(ctx, cfg); err != nil {
+				rollbackStarted()
 				return err
 			}
-			sc = e.publish(k, sc)
+			if published := e.publish(k, sc); published == sc {
+				started = append(started, sc)
+			} else {
+				// A concurrent Apply won the race for this key:
+				// publish already stopped our duplicate, and the
+				// winner's sidecar is not ours to roll back.
+				sc = published
+			}
 		}
 		listeners[k] = sc.listener
 	}
-	return e.Engine.Apply(ctx, Rewrite(p, dns, listeners))
+	if err := e.Engine.Apply(ctx, Rewrite(p, dns, listeners)); err != nil {
+		rollbackStarted()
+		return err
+	}
+	return nil
 }
 
 func (e *Engine) current(k string) *sidecar {

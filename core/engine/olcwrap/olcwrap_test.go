@@ -21,6 +21,7 @@ import (
 type stubEngine struct {
 	applied   *engine.Plan
 	validated *engine.Plan
+	applyErr  error
 }
 
 func (s *stubEngine) Kind() engine.Kind                 { return engine.KindSingBox }
@@ -42,9 +43,15 @@ func (s *stubEngine) Validate(_ context.Context, p *engine.Plan) error {
 	s.validated = p
 	return nil
 }
-func (s *stubEngine) Apply(_ context.Context, p *engine.Plan) error { s.applied = p; return nil }
-func (s *stubEngine) Stop(context.Context) error                    { return nil }
-func (s *stubEngine) Close() error                                  { return nil }
+func (s *stubEngine) Apply(_ context.Context, p *engine.Plan) error {
+	if s.applyErr != nil {
+		return s.applyErr
+	}
+	s.applied = p
+	return nil
+}
+func (s *stubEngine) Stop(context.Context) error { return nil }
+func (s *stubEngine) Close() error               { return nil }
 
 func olcOutbound(id, provider, transport string) engine.Outbound {
 	return engine.Outbound{
@@ -136,7 +143,11 @@ func TestValidateConnectMatrix(t *testing.T) {
 		{"wbstream datachannel with token", func(c *Config) { c.Provider, c.AuthToken = "wbstream", "tok" }, ""},
 		{"wbstream seichannel guest", func(c *Config) { c.Provider, c.Transport = "wbstream", "seichannel" }, ""},
 		{"wbstream vp8channel guest", func(c *Config) { c.Provider, c.Transport = "wbstream", "vp8channel" }, ""},
-		{"none is not connectable", func(c *Config) { c.Provider, c.Room = "none", "" }, errs.KeyOlcrtcNotConnectable},
+		{"wbstream videochannel guest", func(c *Config) { c.Provider, c.Transport = "wbstream", "videochannel" }, ""},
+		{"none datachannel is not connectable", func(c *Config) { c.Provider, c.Room = "none", "" }, errs.KeyOlcrtcNotConnectable},
+		{"none seichannel is not connectable", func(c *Config) { c.Provider, c.Room, c.Transport = "none", "", "seichannel" }, errs.KeyOlcrtcNotConnectable},
+		{"none vp8channel is not connectable", func(c *Config) { c.Provider, c.Room, c.Transport = "none", "", "vp8channel" }, errs.KeyOlcrtcNotConnectable},
+		{"none videochannel is not connectable", func(c *Config) { c.Provider, c.Room, c.Transport = "none", "", "videochannel" }, errs.KeyOlcrtcNotConnectable},
 		{"server mode always refused", func(c *Config) { c.Mode = "srv" }, errs.KeyOlcrtcServerMode},
 		{"bad key", func(c *Config) { c.KeyHex = "abc" }, errs.KeyOlcrtcInvalid},
 		{"unknown provider", func(c *Config) { c.Provider = "zoom" }, errs.KeyOlcrtcInvalid},
@@ -260,6 +271,82 @@ func TestSidecarDeathAtStartFailsClosed(t *testing.T) {
 	}
 	if inner.applied != nil {
 		t.Fatal("inner engine was applied behind a dead sidecar")
+	}
+}
+
+// TestInnerApplyFailureCleansUpStartedSidecars is the regression
+// test for review remark Z-1: when the inner engine refuses the
+// rewritten plan, a sidecar started by this very Apply call must not
+// be left sitting in the provider room with the user's key until
+// somebody calls Stop — it is stopped and its config deleted as
+// part of the failed Apply itself.
+func TestInnerApplyFailureCleansUpStartedSidecars(t *testing.T) {
+	home := filepath.Join(t.TempDir(), "olcrtc-home")
+	inner := &stubEngine{applyErr: errors.New("inner engine refused the plan")}
+	e := Wrap(inner, fakeSidecar(t), home, nil)
+	err := e.Apply(context.Background(), planWith(olcOutbound("a", "jitsi", "datachannel")))
+	if err == nil || err.Error() != "inner engine refused the plan" {
+		t.Fatalf("apply = %v, want the inner engine's error", err)
+	}
+	e.mu.Lock()
+	n := len(e.procs)
+	e.mu.Unlock()
+	if n != 0 {
+		t.Fatalf("sidecars after failed inner Apply = %d, want 0", n)
+	}
+	entries, rerr := os.ReadDir(home)
+	if rerr != nil && !os.IsNotExist(rerr) {
+		t.Fatal(rerr)
+	}
+	if len(entries) != 0 {
+		t.Fatalf("home holds %d files after failed inner Apply, want no configs left", len(entries))
+	}
+}
+
+// TestInnerApplyFailureKeepsEarlierSidecars: the Z-1 rollback is
+// scoped to the failing call. A sidecar an earlier successful Apply
+// started belongs to the running session and must survive a later
+// failed Apply untouched — process, config and listener alike —
+// while the sidecar the failing call added is rolled back.
+func TestInnerApplyFailureKeepsEarlierSidecars(t *testing.T) {
+	home := filepath.Join(t.TempDir(), "olcrtc-home")
+	inner := &stubEngine{}
+	e := Wrap(inner, fakeSidecar(t), home, nil)
+	first := planWith(olcOutbound("a", "jitsi", "datachannel"))
+	if err := e.Apply(context.Background(), first); err != nil {
+		t.Fatalf("first apply: %v", err)
+	}
+	firstPort := inner.applied.Outbounds[0].Port
+
+	extra := olcOutbound("b", "jitsi", "seichannel")
+	extra.Server = "room-02"
+	extra.Olcrtc.Room = "room-02"
+	inner.applyErr = errors.New("inner engine refused the plan")
+	err := e.Apply(context.Background(), planWith(olcOutbound("a", "jitsi", "datachannel"), extra))
+	if err == nil {
+		t.Fatal("second apply must fail with the inner engine")
+	}
+	e.mu.Lock()
+	n := len(e.procs)
+	e.mu.Unlock()
+	if n != 1 {
+		t.Fatalf("sidecars after failed second Apply = %d, want the first session's 1", n)
+	}
+	entries, rerr := os.ReadDir(home)
+	if rerr != nil {
+		t.Fatal(rerr)
+	}
+	if len(entries) != 1 {
+		t.Fatalf("home holds %d configs, want only the surviving sidecar's", len(entries))
+	}
+	conn, derr := net.DialTimeout("tcp", "127.0.0.1:"+strconv.Itoa(int(firstPort)), 2*time.Second)
+	if derr != nil {
+		t.Fatalf("earlier sidecar's listener died with the failed Apply: %v", derr)
+	}
+	_ = conn.Close()
+	inner.applyErr = nil
+	if err := e.Stop(context.Background()); err != nil {
+		t.Fatalf("stop: %v", err)
 	}
 }
 
