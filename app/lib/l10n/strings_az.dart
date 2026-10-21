@@ -2207,4 +2207,19 @@ class SAz extends S {
 
   @override
   String get customServerShadowsocksCredentials => 'Shadowsocks üçün: üsul:parol, məsələn chacha20-ietf-poly1305:parol';
+
+  @override
+  String get diagnosticPackets => 'Paket tutma';
+
+  @override
+  String get diagnosticEvents => 'Windows hadisələri';
+
+  @override
+  String get diagnosticCapture => '10 saniyə çəkin';
+
+  @override
+  String get diagnosticRequiresTun => 'Paket ələ keçirmək üçün aktiv Sora TUN bağlantısı lazımdır.';
+
+  @override
+  String get diagnosticUnavailable => 'Bu diaqnostika bu platformada əlçatan deyil.';
 }

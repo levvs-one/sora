@@ -2207,4 +2207,19 @@ class SKk extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks үшін: әдіс:құпиясөз, мысалы chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'Пакетті түсіру';
+
+  @override
+  String get diagnosticEvents => 'Windows оқиғалары';
+
+  @override
+  String get diagnosticCapture => '10 секундқа түсіріңіз';
+
+  @override
+  String get diagnosticRequiresTun => 'Пакеттерді түсіру үшін белсенді Sora TUN қосылымы қажет.';
+
+  @override
+  String get diagnosticUnavailable => 'Бұл диагностика бұл платформада қолжетімді емес.';
 }

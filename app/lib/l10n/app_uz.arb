@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Shadowsocks uchun: usul:parol, masalan chacha20-ietf-poly1305:parol"
+  "customServerShadowsocksCredentials": "Shadowsocks uchun: usul:parol, masalan chacha20-ietf-poly1305:parol",
+  "diagnosticPackets": "Paketni suratga olish",
+  "diagnosticEvents": "Windows voqealari",
+  "diagnosticCapture": "10 soniya davomida suratga oling",
+  "diagnosticRequiresTun": "Paketlarni yozib olish uchun faol Sora TUN ulanishi kerak.",
+  "diagnosticUnavailable": "Ushbu diagnostika ushbu platformada mavjud emas."
 }

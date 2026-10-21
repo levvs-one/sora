@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Shadowsocks üçin: usul:açar sözi, mysal üçin chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "Shadowsocks üçin: usul:açar sözi, mysal üçin chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "Paket almak",
+  "diagnosticEvents": "Windows wakalary",
+  "diagnosticCapture": "10 sekuntlap ​​surata düşüriň",
+  "diagnosticRequiresTun": "Paket almak üçin işjeň Sora TUN birikmesi gerek.",
+  "diagnosticUnavailable": "Bu anyklaýyş bu platformada elýeterli däl."
 }

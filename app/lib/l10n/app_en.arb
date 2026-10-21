@@ -968,5 +968,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "For Shadowsocks: method:password, for example chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "For Shadowsocks: method:password, for example chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "Packet capture",
+  "diagnosticEvents": "Windows events",
+  "diagnosticCapture": "Capture for 10 seconds",
+  "diagnosticRequiresTun": "Packet capture needs an active Sora TUN connection.",
+  "diagnosticUnavailable": "This diagnostic is unavailable on this platform."
 }

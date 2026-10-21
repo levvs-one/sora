@@ -2207,4 +2207,19 @@ class SBe extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Для Shadowsocks: метад:пароль, напрыклад chacha20-ietf-poly1305:пароль';
+
+  @override
+  String get diagnosticPackets => 'Захоп пакета';
+
+  @override
+  String get diagnosticEvents => 'Windows падзеі';
+
+  @override
+  String get diagnosticCapture => 'Захоп на 10 секунд';
+
+  @override
+  String get diagnosticRequiresTun => 'Для захопу пакетаў патрабуецца актыўнае злучэнне Sora TUN.';
+
+  @override
+  String get diagnosticUnavailable => 'Гэтая дыягностыка недаступная на гэтай платформе.';
 }

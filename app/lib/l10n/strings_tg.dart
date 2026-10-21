@@ -2209,4 +2209,19 @@ class STg extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'Гирифтани пакет';
+
+  @override
+  String get diagnosticEvents => 'Ҳодисаҳои Windows';
+
+  @override
+  String get diagnosticCapture => 'Барои 10 сония сабт кунед';
+
+  @override
+  String get diagnosticRequiresTun => 'Забти баста ба пайвасти фаъоли Sora TUN ниёз дорад.';
+
+  @override
+  String get diagnosticUnavailable => 'Ин ташхис дар ин платформа дастрас нест.';
 }

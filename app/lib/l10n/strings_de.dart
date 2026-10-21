@@ -2211,4 +2211,19 @@ class SDe extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Für Shadowsocks: Methode:Passwort, zum Beispiel chacha20-ietf-poly1305:passwort';
+
+  @override
+  String get diagnosticPackets => 'Paketerfassung';
+
+  @override
+  String get diagnosticEvents => 'Windows-Ereignisse';
+
+  @override
+  String get diagnosticCapture => '10 Sekunden lang einfangen';
+
+  @override
+  String get diagnosticRequiresTun => 'Für die Paketerfassung ist eine aktive Sora TUN-Verbindung erforderlich.';
+
+  @override
+  String get diagnosticUnavailable => 'Diese Diagnose ist auf dieser Plattform nicht verfügbar.';
 }

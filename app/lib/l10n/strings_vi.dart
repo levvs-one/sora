@@ -2208,4 +2208,19 @@ class SVi extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Với Shadowsocks: phương thức:mật khẩu, ví dụ chacha20-ietf-poly1305:matkhau';
+
+  @override
+  String get diagnosticPackets => 'Chụp gói';
+
+  @override
+  String get diagnosticEvents => 'Sự kiện Windows';
+
+  @override
+  String get diagnosticCapture => 'Chụp trong 10 giây';
+
+  @override
+  String get diagnosticRequiresTun => 'Việc chụp gói cần có kết nối Sora TUN đang hoạt động.';
+
+  @override
+  String get diagnosticUnavailable => 'Chẩn đoán này không có sẵn trên nền tảng này.';
 }

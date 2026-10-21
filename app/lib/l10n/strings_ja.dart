@@ -2191,4 +2191,19 @@ class SJa extends S {
 
   @override
   String get customServerShadowsocksCredentials => 'Shadowsocks の場合: 方式:パスワード (例: chacha20-ietf-poly1305:password)';
+
+  @override
+  String get diagnosticPackets => 'パケットキャプチャ';
+
+  @override
+  String get diagnosticEvents => 'Windowsイベント';
+
+  @override
+  String get diagnosticCapture => '10秒間のキャプチャ';
+
+  @override
+  String get diagnosticRequiresTun => 'パケット キャプチャには、アクティブな Sora TUN 接続が必要です。';
+
+  @override
+  String get diagnosticUnavailable => 'この診断は、このプラットフォームでは使用できません。';
 }

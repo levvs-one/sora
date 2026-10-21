@@ -2190,4 +2190,19 @@ class SKo extends S {
 
   @override
   String get customServerShadowsocksCredentials => 'Shadowsocks의 경우: 방식:비밀번호 (예: chacha20-ietf-poly1305:password)';
+
+  @override
+  String get diagnosticPackets => '패킷 캡처';
+
+  @override
+  String get diagnosticEvents => '윈도우 이벤트';
+
+  @override
+  String get diagnosticCapture => '10초 동안 캡처';
+
+  @override
+  String get diagnosticRequiresTun => '패킷 캡처에는 활성 Sora TUN 연결이 필요합니다.';
+
+  @override
+  String get diagnosticUnavailable => '이 플랫폼에서는 이 진단을 사용할 수 없습니다.';
 }

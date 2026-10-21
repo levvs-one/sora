@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль"
+  "customServerShadowsocksCredentials": "Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль",
+  "diagnosticPackets": "Захват пакетов",
+  "diagnosticEvents": "События Windows",
+  "diagnosticCapture": "Записать 10 секунд",
+  "diagnosticRequiresTun": "Для захвата пакетов нужно активное TUN-подключение Sora.",
+  "diagnosticUnavailable": "Эта диагностика недоступна на данной платформе."
 }

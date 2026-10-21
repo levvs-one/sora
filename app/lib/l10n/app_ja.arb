@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Shadowsocks の場合: 方式:パスワード (例: chacha20-ietf-poly1305:password)"
+  "customServerShadowsocksCredentials": "Shadowsocks の場合: 方式:パスワード (例: chacha20-ietf-poly1305:password)",
+  "diagnosticPackets": "パケットキャプチャ",
+  "diagnosticEvents": "Windowsイベント",
+  "diagnosticCapture": "10秒間のキャプチャ",
+  "diagnosticRequiresTun": "パケット キャプチャには、アクティブな Sora TUN 接続が必要です。",
+  "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。"
 }

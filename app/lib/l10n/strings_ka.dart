@@ -2208,4 +2208,19 @@ class SKa extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks-ისთვის: მეთოდი:პაროლი, მაგალითად chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'პაკეტის დაჭერა';
+
+  @override
+  String get diagnosticEvents => 'Windows-ის მოვლენები';
+
+  @override
+  String get diagnosticCapture => 'გადაიღეთ 10 წამის განმავლობაში';
+
+  @override
+  String get diagnosticRequiresTun => 'პაკეტის დაჭერას სჭირდება აქტიური Sora TUN კავშირი.';
+
+  @override
+  String get diagnosticUnavailable => 'ეს დიაგნოსტიკა მიუწვდომელია ამ პლატფორმაზე.';
 }

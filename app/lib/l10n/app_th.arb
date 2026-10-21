@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "สำหรับ Shadowsocks: วิธี:รหัสผ่าน เช่น chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "สำหรับ Shadowsocks: วิธี:รหัสผ่าน เช่น chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "การจับแพ็คเก็ต",
+  "diagnosticEvents": "เหตุการณ์ของวินโดวส์",
+  "diagnosticCapture": "จับภาพเป็นเวลา 10 วินาที",
+  "diagnosticRequiresTun": "การจับแพ็คเก็ตจำเป็นต้องมีการเชื่อมต่อ Sora TUN ที่ใช้งานอยู่",
+  "diagnosticUnavailable": "การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้"
 }

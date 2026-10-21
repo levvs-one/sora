@@ -2194,4 +2194,19 @@ class SAr extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'لـ Shadowsocks: الطريقة:كلمة المرور، مثل chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'التقاط الحزمة';
+
+  @override
+  String get diagnosticEvents => 'أحداث ويندوز';
+
+  @override
+  String get diagnosticCapture => 'التقاط لمدة 10 ثانية';
+
+  @override
+  String get diagnosticRequiresTun => 'يحتاج التقاط الحزم إلى اتصال Sora TUN نشط.';
+
+  @override
+  String get diagnosticUnavailable => 'هذا التشخيص غير متوفر على هذا النظام الأساسي.';
 }

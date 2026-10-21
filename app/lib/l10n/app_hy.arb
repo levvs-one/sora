@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Shadowsocks-ի համար՝ մեթոդ:գաղտնաբառ, օրինակ chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "Shadowsocks-ի համար՝ մեթոդ:գաղտնաբառ, օրինակ chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "Փաթեթի գրավում",
+  "diagnosticEvents": "Windows-ի իրադարձություններ",
+  "diagnosticCapture": "Լուսանկարեք 10 վայրկյան",
+  "diagnosticRequiresTun": "Փաթեթների գրավման համար անհրաժեշտ է ակտիվ Sora TUN կապ:",
+  "diagnosticUnavailable": "Այս ախտորոշումն անհասանելի է այս հարթակում:"
 }

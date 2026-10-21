@@ -2190,6 +2190,21 @@ class SZh extends S {
 
   @override
   String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => '抓包';
+
+  @override
+  String get diagnosticEvents => 'Windows 事件';
+
+  @override
+  String get diagnosticCapture => '捕捉10秒';
+
+  @override
+  String get diagnosticRequiresTun => '数据包捕获需要活动的 Sora TUN 连接。';
+
+  @override
+  String get diagnosticUnavailable => '此诊断在此平台上不可用。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4377,6 +4392,21 @@ class SZhHans extends SZh {
 
   @override
   String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => '抓包';
+
+  @override
+  String get diagnosticEvents => 'Windows 事件';
+
+  @override
+  String get diagnosticCapture => '捕捉10秒';
+
+  @override
+  String get diagnosticRequiresTun => '数据包捕获需要活动的 Sora TUN 连接。';
+
+  @override
+  String get diagnosticUnavailable => '此诊断在此平台上不可用。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6564,4 +6594,19 @@ class SZhHant extends SZh {
 
   @override
   String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密碼，例如 chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => '抓包';
+
+  @override
+  String get diagnosticEvents => 'Windows 事件';
+
+  @override
+  String get diagnosticCapture => '捕捉10秒';
+
+  @override
+  String get diagnosticRequiresTun => '封包擷取需要活動的 Sora TUN 連線。';
+
+  @override
+  String get diagnosticUnavailable => '此診斷在此平台上不可用。';
 }

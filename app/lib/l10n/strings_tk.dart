@@ -2207,4 +2207,19 @@ class STk extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks üçin: usul:açar sözi, mysal üçin chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'Paket almak';
+
+  @override
+  String get diagnosticEvents => 'Windows wakalary';
+
+  @override
+  String get diagnosticCapture => '10 sekuntlap ​​surata düşüriň';
+
+  @override
+  String get diagnosticRequiresTun => 'Paket almak üçin işjeň Sora TUN birikmesi gerek.';
+
+  @override
+  String get diagnosticUnavailable => 'Bu anyklaýyş bu platformada elýeterli däl.';
 }

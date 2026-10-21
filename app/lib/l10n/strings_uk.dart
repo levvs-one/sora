@@ -2207,4 +2207,19 @@ class SUk extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Для Shadowsocks: метод:пароль, наприклад chacha20-ietf-poly1305:пароль';
+
+  @override
+  String get diagnosticPackets => 'Перехоплення пакетів';
+
+  @override
+  String get diagnosticEvents => 'Події Windows';
+
+  @override
+  String get diagnosticCapture => 'Зробіть знімок на 10 секунд';
+
+  @override
+  String get diagnosticRequiresTun => 'Для захоплення пакетів потрібне активне з’єднання Sora TUN.';
+
+  @override
+  String get diagnosticUnavailable => 'Ця діагностика недоступна на цій платформі.';
 }

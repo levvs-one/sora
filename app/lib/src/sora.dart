@@ -1556,7 +1556,8 @@ class Sora extends ChangeNotifier {
   /// the core update; until then the section simply stays empty.
   Future<void> loadCustomServers() async {
     final link = _link;
-    if (link == null) return;
+    // CustomServers exists since API 1.11; an older core has nothing to list.
+    if (link == null || link.minor < 11) return;
     try {
       final answer = await link.custom.listCustomServers(
         ListCustomServersRequest(apiVersion: apiVersion, controlAuthenticator: link.token),

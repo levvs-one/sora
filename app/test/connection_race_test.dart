@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/material.dart' show SizedBox, Text, EditableText, Scrollable, ScrollableState, ValueKey;
+import 'package:flutter/material.dart'
+    show SizedBox, Text, EditableText, Scrollable, ScrollableState, ValueKey, Semantics;
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart' show Server, ServiceCall;
 import 'package:sora/main.dart';
@@ -80,7 +81,9 @@ class _Core extends CoreControlServiceBase {
 
   @override
   Future<GetAboutResponse> getAbout(ServiceCall call, GetAboutRequest request) async => GetAboutResponse(
-    about: About(contract: apiVersion.deepCopy()..capabilities.addAll(['serverless', 'log-export-formats'])),
+    about: About(
+      contract: apiVersion.deepCopy()..capabilities.addAll(['serverless', 'log-export-formats', 'native-diagnostics']),
+    ),
   );
 
   @override
@@ -295,7 +298,7 @@ void main() {
           await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
         }
         expect(saves, hasLength(8), reason: 'Leaving logs must suppress the late save dialog');
-        for (final extension in ['json', 'har']) {
+        for (final extension in ['json', 'har', 'pcapng']) {
           await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
           await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
           await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
@@ -332,14 +335,14 @@ void main() {
       }
     });
 
-    testWidgets('core archive export: cancel and leaving logs suppress late replies', (tester) async {
+    testWidgets('packet capture requires TUN; cancel and leaving logs suppress late replies', (tester) async {
       await sora.settings.completeTour();
       sora.settings.animations = false;
       core.diagnosticGate = Completer<void>();
-      Future<void> archiveMenu() async {
+      Future<void> packetMenu() async {
         await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.export));
         await tester.pump(const Duration(milliseconds: 250));
-        await tester.tap(find.byWidgetPredicate((w) => w is Text && (w.data?.contains('sora-log_core_') ?? false)));
+        await tester.tap(find.byWidgetPredicate((w) => w is Text && (w.data?.endsWith('.pcapng') ?? false)));
         await tester.pump();
       }
 
@@ -357,17 +360,25 @@ void main() {
         await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
+        await packetMenu();
+        expect(core.diagnosticRequests, isEmpty);
+        expect(sora.history.single.body, sora.strings.diagnosticRequiresTun);
+        await tester.runAsync(sora.clearNotifications);
+        final close = find.byWidgetPredicate((w) => w is Semantics && w.properties.label == sora.strings.close);
+        await waitFor(() => close.evaluate().isNotEmpty);
+        await tester.tap(close);
+        await tester.pump();
         await tester.runAsync(sora.connect);
         await tester.pump();
-        await archiveMenu();
+        await packetMenu();
         await waitFor(() => core.diagnosticRequests.length == 1);
         expect(core.diagnosticRequests.single.sessionId, sora.sessionId);
         expect(core.diagnosticRequests.single.controlAuthenticator, isNotEmpty);
-        expect(core.diagnosticRequests.single.format, DiagnosticFormat.DIAGNOSTIC_FORMAT_UNSPECIFIED);
+        expect(core.diagnosticRequests.single.format, DiagnosticFormat.DIAGNOSTIC_FORMAT_PCAPNG);
         await tester.pump(const Duration(milliseconds: 100));
         await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.cancel));
         await waitFor(() => core.diagnosticCalls.single.isCanceled);
-        await archiveMenu();
+        await packetMenu();
         await waitFor(() => core.diagnosticRequests.length == 2);
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
         await tester.sendKeyEvent(LogicalKeyboardKey.digit1);

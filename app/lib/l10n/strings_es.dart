@@ -2211,4 +2211,19 @@ class SEs extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Para Shadowsocks: método:contraseña, por ejemplo chacha20-ietf-poly1305:contraseña';
+
+  @override
+  String get diagnosticPackets => 'captura de paquetes';
+
+  @override
+  String get diagnosticEvents => 'Eventos de Windows';
+
+  @override
+  String get diagnosticCapture => 'Captura durante 10 segundos';
+
+  @override
+  String get diagnosticRequiresTun => 'La captura de paquetes necesita una conexión Sora TUN activa.';
+
+  @override
+  String get diagnosticUnavailable => 'Este diagnóstico no está disponible en esta plataforma.';
 }

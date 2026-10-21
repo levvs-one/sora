@@ -3,6 +3,7 @@ package profiles
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -105,9 +106,13 @@ func TestTrustRoundTrip(t *testing.T) {
 	if got := ts2.Effective("Unknown_Net"); got != TrustUntrusted {
 		t.Fatalf("unknown network must still default to untrusted after reload, got %v", got)
 	}
-	// The file must be owner-only.
-	if fi, err := os.Stat(filepath.Join(dir, trustFileName)); err != nil || fi.Mode().Perm() != 0o600 {
-		t.Fatalf("trust file must be 0600, stat=%v mode=%v", err, fi.Mode())
+	// The file must be owner-only. Windows has no POSIX mode bits to check.
+	fi, err := os.Stat(filepath.Join(dir, trustFileName))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if runtime.GOOS != "windows" && fi.Mode().Perm() != 0o600 {
+		t.Fatalf("trust file must be 0600, mode=%v", fi.Mode())
 	}
 }
 

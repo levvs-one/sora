@@ -2208,4 +2208,19 @@ class SFa extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'برای Shadowsocks: روش:گذرواژه، مثلاً chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'ضبط بسته';
+
+  @override
+  String get diagnosticEvents => 'رویدادهای ویندوز';
+
+  @override
+  String get diagnosticCapture => 'به مدت 10 ثانیه عکس بگیرید';
+
+  @override
+  String get diagnosticRequiresTun => 'ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.';
+
+  @override
+  String get diagnosticUnavailable => 'این تشخیص در این پلتفرم در دسترس نیست.';
 }

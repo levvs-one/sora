@@ -2206,4 +2206,19 @@ class STh extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'สำหรับ Shadowsocks: วิธี:รหัสผ่าน เช่น chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'การจับแพ็คเก็ต';
+
+  @override
+  String get diagnosticEvents => 'เหตุการณ์ของวินโดวส์';
+
+  @override
+  String get diagnosticCapture => 'จับภาพเป็นเวลา 10 วินาที';
+
+  @override
+  String get diagnosticRequiresTun => 'การจับแพ็คเก็ตจำเป็นต้องมีการเชื่อมต่อ Sora TUN ที่ใช้งานอยู่';
+
+  @override
+  String get diagnosticUnavailable => 'การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้';
 }

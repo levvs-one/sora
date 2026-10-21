@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Shadowsocks үчүн: ыкма:сырсөз, мисалы chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "Shadowsocks үчүн: ыкма:сырсөз, мисалы chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "Пакетти басып алуу",
+  "diagnosticEvents": "Windows окуялары",
+  "diagnosticCapture": "10 секундга тартыңыз",
+  "diagnosticRequiresTun": "Пакетти тартууга активдүү Sora TUN байланышы керек.",
+  "diagnosticUnavailable": "Бул диагностика бул платформада жеткиликсиз."
 }

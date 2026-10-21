@@ -2209,4 +2209,19 @@ class SPt extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Para Shadowsocks: método:senha, por exemplo chacha20-ietf-poly1305:senha';
+
+  @override
+  String get diagnosticPackets => 'Captura de pacotes';
+
+  @override
+  String get diagnosticEvents => 'Eventos do Windows';
+
+  @override
+  String get diagnosticCapture => 'Capture por 10 segundos';
+
+  @override
+  String get diagnosticRequiresTun => 'A captura de pacotes precisa de uma conexão Sora TUN ativa.';
+
+  @override
+  String get diagnosticUnavailable => 'Este diagnóstico não está disponível nesta plataforma.';
 }

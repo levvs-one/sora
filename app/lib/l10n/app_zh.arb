@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "抓包",
+  "diagnosticEvents": "Windows 事件",
+  "diagnosticCapture": "捕捉10秒",
+  "diagnosticRequiresTun": "数据包捕获需要活动的 Sora TUN 连接。",
+  "diagnosticUnavailable": "此诊断在此平台上不可用。"
 }

@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -328,7 +329,8 @@ func TestMetadataFileIsOwnerOnlyAndHoldsNoSecrets(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if info.Mode().Perm() != 0o600 {
+	// Windows has no POSIX mode bits; Go reports 0666 for any writable file.
+	if runtime.GOOS != "windows" && info.Mode().Perm() != 0o600 {
 		t.Errorf("servers.json mode = %o, want 600", info.Mode().Perm())
 	}
 	raw, err := os.ReadFile(path)

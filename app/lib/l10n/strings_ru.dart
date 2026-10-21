@@ -2230,4 +2230,19 @@ class SRu extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль';
+
+  @override
+  String get diagnosticPackets => 'Захват пакетов';
+
+  @override
+  String get diagnosticEvents => 'События Windows';
+
+  @override
+  String get diagnosticCapture => 'Записать 10 секунд';
+
+  @override
+  String get diagnosticRequiresTun => 'Для захвата пакетов нужно активное TUN-подключение Sora.';
+
+  @override
+  String get diagnosticUnavailable => 'Эта диагностика недоступна на данной платформе.';
 }

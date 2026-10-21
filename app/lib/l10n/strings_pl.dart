@@ -2210,4 +2210,19 @@ class SPl extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Dla Shadowsocks: metoda:hasło, na przykład chacha20-ietf-poly1305:haslo';
+
+  @override
+  String get diagnosticPackets => 'Przechwytywanie pakietów';
+
+  @override
+  String get diagnosticEvents => 'Zdarzenia Windowsa';
+
+  @override
+  String get diagnosticCapture => 'Przechwytuj przez 10 sekund';
+
+  @override
+  String get diagnosticRequiresTun => 'Przechwytywanie pakietów wymaga aktywnego połączenia Sora TUN.';
+
+  @override
+  String get diagnosticUnavailable => 'Ta diagnostyka jest niedostępna na tej platformie.';
 }

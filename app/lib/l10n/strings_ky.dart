@@ -2207,4 +2207,19 @@ class SKy extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks үчүн: ыкма:сырсөз, мисалы chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'Пакетти басып алуу';
+
+  @override
+  String get diagnosticEvents => 'Windows окуялары';
+
+  @override
+  String get diagnosticCapture => '10 секундга тартыңыз';
+
+  @override
+  String get diagnosticRequiresTun => 'Пакетти тартууга активдүү Sora TUN байланышы керек.';
+
+  @override
+  String get diagnosticUnavailable => 'Бул диагностика бул платформада жеткиликсиз.';
 }

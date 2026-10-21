@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "Гирифтани пакет",
+  "diagnosticEvents": "Ҳодисаҳои Windows",
+  "diagnosticCapture": "Барои 10 сония сабт кунед",
+  "diagnosticRequiresTun": "Забти баста ба пайвасти фаъоли Sora TUN ниёз дорад.",
+  "diagnosticUnavailable": "Ин ташхис дар ин платформа дастрас нест."
 }

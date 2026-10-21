@@ -2206,4 +2206,19 @@ class SUr extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks کے لیے: method:password، مثلاً chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'پیکٹ کی گرفتاری';
+
+  @override
+  String get diagnosticEvents => 'ونڈوز کے واقعات';
+
+  @override
+  String get diagnosticCapture => '10 سیکنڈ کے لیے کیپچر کریں۔';
+
+  @override
+  String get diagnosticRequiresTun => 'پیکٹ کیپچر کو ایک فعال Sora TUN کنکشن کی ضرورت ہے۔';
+
+  @override
+  String get diagnosticUnavailable => 'یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔';
 }

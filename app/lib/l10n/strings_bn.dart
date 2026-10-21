@@ -2203,4 +2203,19 @@ class SBn extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks-এর জন্য: method:password, যেমন chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'প্যাকেট ক্যাপচার';
+
+  @override
+  String get diagnosticEvents => 'উইন্ডোজ ইভেন্ট';
+
+  @override
+  String get diagnosticCapture => '10 সেকেন্ডের জন্য ক্যাপচার করুন';
+
+  @override
+  String get diagnosticRequiresTun => 'প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।';
+
+  @override
+  String get diagnosticUnavailable => 'এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.';
 }

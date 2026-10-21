@@ -2211,4 +2211,19 @@ class SIt extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Per Shadowsocks: metodo:password, ad esempio chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'Cattura dei pacchetti';
+
+  @override
+  String get diagnosticEvents => 'Eventi di Windows';
+
+  @override
+  String get diagnosticCapture => 'Cattura per 10 secondi';
+
+  @override
+  String get diagnosticRequiresTun => 'L\'acquisizione dei pacchetti richiede una connessione Sora TUN attiva.';
+
+  @override
+  String get diagnosticUnavailable => 'Questa diagnostica non è disponibile su questa piattaforma.';
 }

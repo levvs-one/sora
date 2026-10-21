@@ -4148,6 +4148,36 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль'**
   String get customServerShadowsocksCredentials;
+
+  /// No description provided for @diagnosticPackets.
+  ///
+  /// In ru, this message translates to:
+  /// **'Захват пакетов'**
+  String get diagnosticPackets;
+
+  /// No description provided for @diagnosticEvents.
+  ///
+  /// In ru, this message translates to:
+  /// **'События Windows'**
+  String get diagnosticEvents;
+
+  /// No description provided for @diagnosticCapture.
+  ///
+  /// In ru, this message translates to:
+  /// **'Записать 10 секунд'**
+  String get diagnosticCapture;
+
+  /// No description provided for @diagnosticRequiresTun.
+  ///
+  /// In ru, this message translates to:
+  /// **'Для захвата пакетов нужно активное TUN-подключение Sora.'**
+  String get diagnosticRequiresTun;
+
+  /// No description provided for @diagnosticUnavailable.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эта диагностика недоступна на данной платформе.'**
+  String get diagnosticUnavailable;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

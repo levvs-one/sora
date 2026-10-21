@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "برای Shadowsocks: روش:گذرواژه، مثلاً chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "برای Shadowsocks: روش:گذرواژه، مثلاً chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "ضبط بسته",
+  "diagnosticEvents": "رویدادهای ویندوز",
+  "diagnosticCapture": "به مدت 10 ثانیه عکس بگیرید",
+  "diagnosticRequiresTun": "ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.",
+  "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست."
 }

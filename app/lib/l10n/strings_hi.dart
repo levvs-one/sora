@@ -2206,4 +2206,19 @@ class SHi extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks के लिए: method:password, जैसे chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'पैकेट पर कब्जा';
+
+  @override
+  String get diagnosticEvents => 'विंडोज़ घटनाएँ';
+
+  @override
+  String get diagnosticCapture => '10 सेकंड के लिए कैप्चर करें';
+
+  @override
+  String get diagnosticRequiresTun => 'पैकेट कैप्चर के लिए एक सक्रिय सोरा ट्यून कनेक्शन की आवश्यकता होती है।';
+
+  @override
+  String get diagnosticUnavailable => 'यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.';
 }

@@ -2190,4 +2190,19 @@ class SEn extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'For Shadowsocks: method:password, for example chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'Packet capture';
+
+  @override
+  String get diagnosticEvents => 'Windows events';
+
+  @override
+  String get diagnosticCapture => 'Capture for 10 seconds';
+
+  @override
+  String get diagnosticRequiresTun => 'Packet capture needs an active Sora TUN connection.';
+
+  @override
+  String get diagnosticUnavailable => 'This diagnostic is unavailable on this platform.';
 }

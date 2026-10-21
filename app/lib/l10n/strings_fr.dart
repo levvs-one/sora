@@ -2212,4 +2212,19 @@ class SFr extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Pour Shadowsocks : méthode:mot de passe, par exemple chacha20-ietf-poly1305:motdepasse';
+
+  @override
+  String get diagnosticPackets => 'Capture de paquets';
+
+  @override
+  String get diagnosticEvents => 'Événements Windows';
+
+  @override
+  String get diagnosticCapture => 'Capturez pendant 10 secondes';
+
+  @override
+  String get diagnosticRequiresTun => 'La capture de paquets nécessite une connexion Sora TUN active.';
+
+  @override
+  String get diagnosticUnavailable => 'Ce diagnostic n\'est pas disponible sur cette plateforme.';
 }

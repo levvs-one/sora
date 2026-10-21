@@ -2208,4 +2208,19 @@ class SId extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Untuk Shadowsocks: metode:kata sandi, misalnya chacha20-ietf-poly1305:sandi';
+
+  @override
+  String get diagnosticPackets => 'Penangkapan paket';
+
+  @override
+  String get diagnosticEvents => 'Acara Windows';
+
+  @override
+  String get diagnosticCapture => 'Tangkap selama 10 detik';
+
+  @override
+  String get diagnosticRequiresTun => 'Pengambilan paket memerlukan koneksi Sora TUN yang aktif.';
+
+  @override
+  String get diagnosticUnavailable => 'Diagnostik ini tidak tersedia pada platform ini.';
 }

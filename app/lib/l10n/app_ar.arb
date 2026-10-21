@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "لـ Shadowsocks: الطريقة:كلمة المرور، مثل chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "لـ Shadowsocks: الطريقة:كلمة المرور، مثل chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "التقاط الحزمة",
+  "diagnosticEvents": "أحداث ويندوز",
+  "diagnosticCapture": "التقاط لمدة 10 ثانية",
+  "diagnosticRequiresTun": "يحتاج التقاط الحزم إلى اتصال Sora TUN نشط.",
+  "diagnosticUnavailable": "هذا التشخيص غير متوفر على هذا النظام الأساسي."
 }

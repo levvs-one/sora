@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Shadowsocks için: yöntem:parola, örneğin chacha20-ietf-poly1305:parola"
+  "customServerShadowsocksCredentials": "Shadowsocks için: yöntem:parola, örneğin chacha20-ietf-poly1305:parola",
+  "diagnosticPackets": "Paket yakalama",
+  "diagnosticEvents": "Windows etkinlikleri",
+  "diagnosticCapture": "10 saniye boyunca çekim yapın",
+  "diagnosticRequiresTun": "Paket yakalama, etkin bir Sora TUN bağlantısına ihtiyaç duyar.",
+  "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor."
 }

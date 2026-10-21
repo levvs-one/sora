@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Dla Shadowsocks: metoda:hasło, na przykład chacha20-ietf-poly1305:haslo"
+  "customServerShadowsocksCredentials": "Dla Shadowsocks: metoda:hasło, na przykład chacha20-ietf-poly1305:haslo",
+  "diagnosticPackets": "Przechwytywanie pakietów",
+  "diagnosticEvents": "Zdarzenia Windowsa",
+  "diagnosticCapture": "Przechwytuj przez 10 sekund",
+  "diagnosticRequiresTun": "Przechwytywanie pakietów wymaga aktywnego połączenia Sora TUN.",
+  "diagnosticUnavailable": "Ta diagnostyka jest niedostępna na tej platformie."
 }

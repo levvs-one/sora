@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Với Shadowsocks: phương thức:mật khẩu, ví dụ chacha20-ietf-poly1305:matkhau"
+  "customServerShadowsocksCredentials": "Với Shadowsocks: phương thức:mật khẩu, ví dụ chacha20-ietf-poly1305:matkhau",
+  "diagnosticPackets": "Chụp gói",
+  "diagnosticEvents": "Sự kiện Windows",
+  "diagnosticCapture": "Chụp trong 10 giây",
+  "diagnosticRequiresTun": "Việc chụp gói cần có kết nối Sora TUN đang hoạt động.",
+  "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này."
 }

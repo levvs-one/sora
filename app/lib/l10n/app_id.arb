@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Untuk Shadowsocks: metode:kata sandi, misalnya chacha20-ietf-poly1305:sandi"
+  "customServerShadowsocksCredentials": "Untuk Shadowsocks: metode:kata sandi, misalnya chacha20-ietf-poly1305:sandi",
+  "diagnosticPackets": "Penangkapan paket",
+  "diagnosticEvents": "Acara Windows",
+  "diagnosticCapture": "Tangkap selama 10 detik",
+  "diagnosticRequiresTun": "Pengambilan paket memerlukan koneksi Sora TUN yang aktif.",
+  "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini."
 }

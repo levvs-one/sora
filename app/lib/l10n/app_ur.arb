@@ -1120,5 +1120,10 @@
       }
     }
   },
-  "customServerShadowsocksCredentials": "Shadowsocks کے لیے: method:password، مثلاً chacha20-ietf-poly1305:password"
+  "customServerShadowsocksCredentials": "Shadowsocks کے لیے: method:password، مثلاً chacha20-ietf-poly1305:password",
+  "diagnosticPackets": "پیکٹ کی گرفتاری",
+  "diagnosticEvents": "ونڈوز کے واقعات",
+  "diagnosticCapture": "10 سیکنڈ کے لیے کیپچر کریں۔",
+  "diagnosticRequiresTun": "پیکٹ کیپچر کو ایک فعال Sora TUN کنکشن کی ضرورت ہے۔",
+  "diagnosticUnavailable": "یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔"
 }

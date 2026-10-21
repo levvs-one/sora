@@ -2208,4 +2208,19 @@ class SUz extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks uchun: usul:parol, masalan chacha20-ietf-poly1305:parol';
+
+  @override
+  String get diagnosticPackets => 'Paketni suratga olish';
+
+  @override
+  String get diagnosticEvents => 'Windows voqealari';
+
+  @override
+  String get diagnosticCapture => '10 soniya davomida suratga oling';
+
+  @override
+  String get diagnosticRequiresTun => 'Paketlarni yozib olish uchun faol Sora TUN ulanishi kerak.';
+
+  @override
+  String get diagnosticUnavailable => 'Ushbu diagnostika ushbu platformada mavjud emas.';
 }

@@ -2208,4 +2208,19 @@ class SHy extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks-ի համար՝ մեթոդ:գաղտնաբառ, օրինակ chacha20-ietf-poly1305:password';
+
+  @override
+  String get diagnosticPackets => 'Փաթեթի գրավում';
+
+  @override
+  String get diagnosticEvents => 'Windows-ի իրադարձություններ';
+
+  @override
+  String get diagnosticCapture => 'Լուսանկարեք 10 վայրկյան';
+
+  @override
+  String get diagnosticRequiresTun => 'Փաթեթների գրավման համար անհրաժեշտ է ակտիվ Sora TUN կապ:';
+
+  @override
+  String get diagnosticUnavailable => 'Այս ախտորոշումն անհասանելի է այս հարթակում:';
 }

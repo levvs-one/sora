@@ -2207,4 +2207,19 @@ class STr extends S {
   @override
   String get customServerShadowsocksCredentials =>
       'Shadowsocks için: yöntem:parola, örneğin chacha20-ietf-poly1305:parola';
+
+  @override
+  String get diagnosticPackets => 'Paket yakalama';
+
+  @override
+  String get diagnosticEvents => 'Windows etkinlikleri';
+
+  @override
+  String get diagnosticCapture => '10 saniye boyunca çekim yapın';
+
+  @override
+  String get diagnosticRequiresTun => 'Paket yakalama, etkin bir Sora TUN bağlantısına ihtiyaç duyar.';
+
+  @override
+  String get diagnosticUnavailable => 'Bu teşhis bu platformda kullanılamıyor.';
 }
