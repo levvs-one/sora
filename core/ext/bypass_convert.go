@@ -101,13 +101,82 @@ func ValidateBypassStrategy(p *corev1.BypassStrategy) error {
 		return errs.Newf(errs.CodeInvalidArgument, KeyBypassLayerInvalid,
 			"ext: a bypass layer entry carries no strategy")
 	}
-	s := ProtoToEngineStrategy(p)
+	return validateEngineStrategy(ProtoToEngineStrategy(p))
+}
+
+// validateEngineStrategy runs the probe-outbound validation over an
+// engine-form strategy (see ValidateBypassStrategy).
+func validateEngineStrategy(s engine.BypassStrategy) error {
 	probe := engine.Outbound{ID: "bypass-layer", Protocol: engine.ProtocolBypass, Bypass: &s}
 	if err := probe.Validate(); err != nil {
 		return errs.Newf(errs.CodeInvalidArgument, KeyBypassLayerInvalid,
 			"ext: the bypass strategy is invalid: %v", err)
 	}
 	return nil
+}
+
+// midSNIMarker spells core/engine/bypass.MidSNIMarker ("midsni"), the
+// registry-level split position meaning "the middle of the actual SNI
+// hostname". It is deliberately NOT a native executor position:
+// parse_posmarker in the vendored zapret sources (tpws.c and nfqws.c
+// alike) accepts exactly method/host/endhost/sld/midsld/endsld/
+// sniext, and the shipped tpws binary refuses --split-pos=midsni at
+// parse time (probed on the Wave-B dist binary) — midsld is a
+// different position (the middle of the second-level domain only),
+// so the marker is never translated to it. A strategy carrying the
+// marker is only ever valid where a concrete target domain exists to
+// resolve it against (bypass.ResolveStrategy), which for layers
+// means a binding to a plain domain: the plan merge resolves it
+// against the binding's domain (core/control mergeBypassBindings).
+const midSNIMarker = "midsni"
+
+// strategyHasMidSNI reports whether a contract strategy carries the
+// mid-SNI marker in a split position or the TLS-record position —
+// the two slots ResolveStrategy resolves.
+func strategyHasMidSNI(p *corev1.BypassStrategy) bool {
+	for _, pos := range p.GetSplitPos() {
+		if pos == midSNIMarker {
+			return true
+		}
+	}
+	return p.GetTlsRecord() == midSNIMarker
+}
+
+// ValidateBypassBindingStrategy validates one binding's strategy in
+// the scope of its match. It is ValidateBypassStrategy plus the
+// mid-SNI marker rule: a strategy carrying the marker is accepted
+// only when the match names a concrete domain the plan merge can
+// resolve the marker against (see matchResolvesMidSNI in
+// bypass_layer.go); in that case every other rule is still checked,
+// with the marker provisionally replaced by a concrete position —
+// the real resolution happens at merge time, against the binding's
+// canonical domain. A marker strategy on any other match (and in a
+// layer's global, which uses ValidateBypassStrategy) is refused:
+// there is no honest target to resolve it against.
+func ValidateBypassBindingStrategy(match string, p *corev1.BypassStrategy) error {
+	if p == nil {
+		return errs.Newf(errs.CodeInvalidArgument, KeyBypassLayerInvalid,
+			"ext: a bypass layer entry carries no strategy")
+	}
+	if !strategyHasMidSNI(p) {
+		return ValidateBypassStrategy(p)
+	}
+	if !matchResolvesMidSNI(match) {
+		return errs.Newf(errs.CodeInvalidArgument, KeyBypassLayerInvalid,
+			"ext: the bypass strategy uses the %q split marker, which resolves against a concrete domain: "+
+				"it is only valid on a binding to a plain domain (domain:/full:/bare), not on %q",
+			midSNIMarker, match)
+	}
+	s := ProtoToEngineStrategy(p)
+	for i, pos := range s.SplitPos {
+		if pos == midSNIMarker {
+			s.SplitPos[i] = "1"
+		}
+	}
+	if s.TLSRecord == midSNIMarker {
+		s.TLSRecord = "1"
+	}
+	return validateEngineStrategy(s)
 }
 
 // IsEmptyBypassStrategy reports whether a contract strategy carries no

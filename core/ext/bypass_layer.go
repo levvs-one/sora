@@ -10,8 +10,10 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/net/idna"
 	"google.golang.org/protobuf/encoding/protojson"
 
+	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 )
@@ -40,6 +42,111 @@ const (
 	bypassLayersFile    = "bypass-layers.json"
 	bypassLayersVersion = 1
 )
+
+// MaxBypassMatchBytes caps one binding's match so the plan merge's
+// synthetic outbound name ("ext: " + match) can always fit the plan's
+// name limit (engine.MaxNameBytes): a match past the cap is refused
+// here, honestly at Apply time, instead of producing a plan whose
+// outbound name fails plan validation at Connect time (M1). The merge
+// additionally shortens over-long names deterministically, so a layer
+// that never passed through this store still cannot invalidate a plan.
+const MaxBypassMatchBytes = engine.MaxNameBytes - len("ext: ")
+
+// bypassIDNA is the exact IDNA profile core/control's ruleFromProto
+// applies to user routing rules (L2): binding matches are
+// canonicalized with it at storage time, so a layer match and a user
+// rule naming the same host in different case or encoding forms
+// compare equal everywhere downstream.
+var bypassIDNA = idna.New(idna.MapForLookup(), idna.StrictDomainName(true), idna.ValidateLabels(true), idna.VerifyDNSLength(true), idna.BidiRule())
+
+// layerWriteFile is the write seam of the layer store's persistence
+// (the same variable-function pattern the package uses elsewhere for
+// test substitution): tests replace it with a failing write to prove
+// Set/Delete never let memory diverge from disk (L3).
+var layerWriteFile = func(name string, data []byte) error {
+	return os.WriteFile(name, data, 0o600) //nolint:gosec // name is the store's own tmp path
+}
+
+// CanonicalBypassMatch renders a binding match in the canonical form
+// it is stored and compared in: the domain part of a
+// domain:/full:/bare-domain match is IDNA-converted exactly as
+// ruleFromProto converts user rule destinations (lower-case ASCII /
+// punycode). Other forms (tags, addresses, networks) are returned
+// unchanged. A match whose domain part does not convert is returned
+// unchanged, so ValidateBypassMatch stays the one place that refuses
+// it.
+func CanonicalBypassMatch(match string) string {
+	m := strings.TrimSpace(match)
+	for _, prefix := range []string{"domain:", "full:"} {
+		if strings.HasPrefix(m, prefix) {
+			if ascii, err := bypassIDNA.ToASCII(strings.TrimPrefix(m, prefix)); err == nil {
+				return prefix + ascii
+			}
+			return m
+		}
+	}
+	for _, prefix := range []string{"geosite:", "geoip:", "ruleset:", "process:"} {
+		if strings.HasPrefix(m, prefix) {
+			return m
+		}
+	}
+	if _, err := netip.ParseAddr(m); err == nil {
+		return m
+	}
+	if _, err := netip.ParsePrefix(m); err == nil {
+		return m
+	}
+	if strings.Contains(m, ":") {
+		return m
+	}
+	if ascii, err := bypassIDNA.ToASCII(m); err == nil {
+		return ascii
+	}
+	return m
+}
+
+// matchResolvesMidSNI reports whether a binding match names a
+// concrete domain a mid-SNI marker strategy can be resolved against
+// at plan merge: a domain:/full: destination or a bare domain (which
+// the merge canonicalizes to domain:). Tag destinations
+// (geosite:/geoip:/ruleset:), addresses and networks name no single
+// SNI hostname, so a marker strategy on them stays refused.
+func matchResolvesMidSNI(match string) bool {
+	m := CanonicalBypassMatch(match)
+	if _, ok := strings.CutPrefix(m, "domain:"); ok {
+		return true
+	}
+	if _, ok := strings.CutPrefix(m, "full:"); ok {
+		return true
+	}
+	for _, prefix := range []string{"geosite:", "geoip:", "ruleset:", "process:"} {
+		if strings.HasPrefix(m, prefix) {
+			return false
+		}
+	}
+	if _, err := netip.ParseAddr(m); err == nil {
+		return false
+	}
+	if _, err := netip.ParsePrefix(m); err == nil {
+		return false
+	}
+	if strings.Contains(m, ":") {
+		return false
+	}
+	return true
+}
+
+// canonicalLayer returns a copy of the layer whose binding matches
+// are canonical (see CanonicalBypassMatch): what Set stores is the
+// canonical form, never the caller's raw spelling (L2).
+func canonicalLayer(layer Layer) Layer {
+	out := cloneLayer(layer)
+	out.UpdatedAt = layer.UpdatedAt
+	for i := range out.Bindings {
+		out.Bindings[i].Match = CanonicalBypassMatch(out.Bindings[i].Match)
+	}
+	return out
+}
 
 // Binding binds one destination to a bypass strategy. Match is a
 // plan-rule destination (see ValidateBypassMatch).
@@ -167,6 +274,9 @@ func (s *LayerStore) Set(id string, layer Layer) error {
 		return errs.Newf(errs.CodeInvalidArgument, KeyBypassLayerInvalid,
 			"ext: a bypass layer needs an extension id")
 	}
+	// Bindings are stored in canonical form (L2), so validation, the
+	// duplicate check and the size accounting all see the stored form.
+	layer = canonicalLayer(layer)
 	if err := validateLayer(layer); err != nil {
 		return err
 	}
@@ -186,9 +296,20 @@ func (s *LayerStore) Set(id string, layer Layer) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	layer.UpdatedAt = s.now().UTC()
+	// Atomicity (L3): mutate a copy of the map, persist THAT, and swap
+	// the live state only once the save succeeded — a failed save
+	// leaves memory exactly as it was, in step with the disk.
+	next := make(map[string]Layer, len(s.layers)+1)
+	for k, v := range s.layers {
+		next[k] = v
+	}
 	// Keep the in-memory copy detached from the caller's slices.
-	s.layers[id] = cloneLayer(layer)
-	return s.saveLocked()
+	next[id] = cloneLayer(layer)
+	if err := s.saveLayersLocked(next); err != nil {
+		return err
+	}
+	s.layers = next
+	return nil
 }
 
 // Get returns the layer of extension id, if one is stored.
@@ -210,8 +331,19 @@ func (s *LayerStore) Delete(id string) error {
 	if _, ok := s.layers[id]; !ok {
 		return nil
 	}
-	delete(s.layers, id)
-	return s.saveLocked()
+	// Same atomicity discipline as Set (L3): persist the copy first,
+	// swap only on success.
+	next := make(map[string]Layer, len(s.layers)-1)
+	for k, v := range s.layers {
+		if k != id {
+			next[k] = v
+		}
+	}
+	if err := s.saveLayersLocked(next); err != nil {
+		return err
+	}
+	s.layers = next
+	return nil
 }
 
 // List returns every stored layer in a deterministic order: most
@@ -234,13 +366,20 @@ func (s *LayerStore) List() []LayerEntry {
 	return out
 }
 
-// saveLocked persists the store atomically. Callers must hold s.mu.
-func (s *LayerStore) saveLocked() error {
+// saveLocked persists the current store state atomically. Callers
+// must hold s.mu.
+func (s *LayerStore) saveLocked() error { return s.saveLayersLocked(s.layers) }
+
+// saveLayersLocked persists the given layer set atomically, without
+// touching s.layers: Set/Delete persist their candidate map through
+// here and adopt it only when this returns nil (L3). Callers must
+// hold s.mu.
+func (s *LayerStore) saveLayersLocked(layers map[string]Layer) error {
 	if s.path == "" {
 		return nil
 	}
-	f := storedLayersFile{Version: bypassLayersVersion, Layers: make(map[string]storedLayer, len(s.layers))}
-	for id, layer := range s.layers {
+	f := storedLayersFile{Version: bypassLayersVersion, Layers: make(map[string]storedLayer, len(layers))}
+	for id, layer := range layers {
 		stored, err := layerToStored(layer)
 		if err != nil {
 			return err
@@ -253,7 +392,7 @@ func (s *LayerStore) saveLocked() error {
 			"ext: cannot encode the bypass layers file: %v", err)
 	}
 	tmp := s.path + ".tmp"
-	if err := os.WriteFile(tmp, raw, 0o600); err != nil {
+	if err := layerWriteFile(tmp, raw); err != nil {
 		return errs.Newf(errs.CodeInternal, KeyBypassLayerStore,
 			"ext: cannot write the bypass layers file: %v", err)
 	}
@@ -282,12 +421,19 @@ func validateLayer(layer Layer) error {
 		if err := ValidateBypassMatch(b.Match); err != nil {
 			return err
 		}
-		if seen[b.Match] {
+		// Duplicates are judged on the canonical form (L2): two
+		// spellings of the same host are one binding.
+		canon := CanonicalBypassMatch(b.Match)
+		if seen[canon] {
 			return errs.Newf(errs.CodeInvalidArgument, KeyBypassLayerInvalid,
 				"ext: the bypass layer repeats the match %q", b.Match)
 		}
-		seen[b.Match] = true
-		if err := ValidateBypassStrategy(b.Strategy); err != nil {
+		seen[canon] = true
+		// Binding strategies validate in the scope of their match:
+		// the mid-SNI marker is allowed exactly on plain-domain
+		// bindings (the global above keeps the plain validation, so
+		// a marker global stays refused).
+		if err := ValidateBypassBindingStrategy(b.Match, b.Strategy); err != nil {
 			return err
 		}
 	}
@@ -315,9 +461,26 @@ func ValidateBypassMatch(match string) error {
 	if strings.ContainsAny(m, " \t\r\n") {
 		return invalid("ext: a bypass match %q holds whitespace", match)
 	}
+	// Length cap (M1): the merge names the binding's outbound
+	// "ext: "+match, and plan names are capped at engine.MaxNameBytes.
+	// Refusing an over-long match here keeps Apply honest — the layer
+	// is rejected whole — instead of letting the merge build a plan
+	// that fails validation at Connect.
+	if len(m) > MaxBypassMatchBytes {
+		return invalid("ext: a bypass match is %d bytes, the limit is %d (the merged outbound name must fit %d bytes)",
+			len(m), MaxBypassMatchBytes, engine.MaxNameBytes)
+	}
 	for _, prefix := range []string{"domain:", "full:"} {
 		if strings.HasPrefix(m, prefix) {
-			if err := validDomainName(strings.TrimPrefix(m, prefix)); err != nil {
+			// The domain part is judged in its IDNA-canonical form,
+			// the same conversion ruleFromProto applies to user
+			// rules (L2): a Unicode or upper-case spelling is valid
+			// exactly when its canonical form is.
+			ascii, err := bypassIDNA.ToASCII(strings.TrimPrefix(m, prefix))
+			if err != nil {
+				return invalid("ext: a bypass match %q: %v", match, err)
+			}
+			if err := validDomainName(ascii); err != nil {
 				return invalid("ext: a bypass match %q: %v", match, err)
 			}
 			return nil
@@ -360,7 +523,11 @@ func ValidateBypassMatch(match string) error {
 	if allNumeric {
 		return invalid("ext: a bypass match %q is not a domain, an address or a network", match)
 	}
-	if err := validDomainName(m); err != nil {
+	ascii, err := bypassIDNA.ToASCII(m)
+	if err != nil {
+		return invalid("ext: a bypass match %q is not a domain, an address or a network", match)
+	}
+	if err := validDomainName(ascii); err != nil {
 		return invalid("ext: a bypass match %q is not a domain, an address or a network", match)
 	}
 	return nil
