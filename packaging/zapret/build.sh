@@ -2,8 +2,9 @@
 # Builds tpws and nfqws of the zapret copy in third_party/zapret (bol-van,
 # MIT, vendored unchanged) and lays them out next to the engines, with the
 # fake handshakes nfqws sends. The build runs in a scratch copy, so the vendored
-# tree is never modified. Needs a C compiler, zlib and, for nfqws,
-# libnetfilter_queue, libnfnetlink and libmnl headers.
+# tree is never modified. Needs a C compiler, zlib, libcap headers (tpws
+# includes <sys/capability.h>) and, for nfqws, libnetfilter_queue,
+# libnfnetlink and libmnl headers.
 #
 #   packaging/zapret/build.sh <engines directory>
 set -euo pipefail
