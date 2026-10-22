@@ -586,6 +586,9 @@ message SubscriptionState {
   // What the list shows: the user's name, else the provider's title, else the
   // file name the provider sent, else the host of the link. Never empty.
   string display_name = 9;
+  // Since 1.13. Beginning of the uninterrupted failure streak, including
+  // updates while the UI is closed; unset after recovery.
+  google.protobuf.Timestamp failure_since = 10;
 }
 
 message SaveSubscriptionRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; SubscriptionSettings settings = 3; }

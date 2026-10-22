@@ -1538,6 +1538,7 @@ const SubscriptionState$json = {
     {'1': 'updating', '3': 7, '4': 1, '5': 8, '10': 'updating'},
     {'1': 'deleted', '3': 8, '4': 1, '5': 8, '10': 'deleted'},
     {'1': 'display_name', '3': 9, '4': 1, '5': 9, '10': 'displayName'},
+    {'1': 'failure_since', '3': 10, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'failureSince'},
   ],
 };
 
@@ -1551,7 +1552,8 @@ final $typed_data.Uint8List subscriptionStateDescriptor =
         '5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgpuZXh0VXBkYXRlEjYKCmxhc3RfZXJyb3IYBiAB'
         'KAsyFy5zb3JhLmNvcmUudjEuU29yYUVycm9yUglsYXN0RXJyb3ISGgoIdXBkYXRpbmcYByABKA'
         'hSCHVwZGF0aW5nEhgKB2RlbGV0ZWQYCCABKAhSB2RlbGV0ZWQSIQoMZGlzcGxheV9uYW1lGAkg'
-        'ASgJUgtkaXNwbGF5TmFtZQ==');
+        'ASgJUgtkaXNwbGF5TmFtZRI/Cg1mYWlsdXJlX3NpbmNlGAogASgLMhouZ29vZ2xlLnByb3RvYn'
+        'VmLlRpbWVzdGFtcFIMZmFpbHVyZVNpbmNl');
 
 @$core.Deprecated('Use saveSubscriptionRequestDescriptor instead')
 const SaveSubscriptionRequest$json = {

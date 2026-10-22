@@ -430,6 +430,9 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 			}
 		}
 	}
+	if err := outbound.Validate(); err != nil {
+		return engine.Outbound{}, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+	}
 	return outbound, nil
 }
 

@@ -76,21 +76,22 @@ type storedError struct {
 }
 
 type subscriptionRecord struct {
-	Version     int               `json:"v"`
-	ID          string            `json:"id"`
-	URL         string            `json:"url"`
-	Name        string            `json:"name,omitempty"`
-	UserAgent   string            `json:"ua,omitempty"`
-	AutoUpdate  bool              `json:"auto"`
-	Interval    time.Duration     `json:"interval,omitempty"`
-	Created     time.Time         `json:"created"`
-	LastAttempt time.Time         `json:"last_attempt,omitzero"`
-	LastSuccess time.Time         `json:"last_success,omitzero"`
-	Failures    int               `json:"failures,omitempty"`
-	LastError   *storedError      `json:"last_error,omitempty"`
-	Info        subscription.Info `json:"info"`
-	Servers     []string          `json:"servers,omitempty"`
-	ListParts   int               `json:"list_parts,omitempty"`
+	Version      int               `json:"v"`
+	ID           string            `json:"id"`
+	URL          string            `json:"url"`
+	Name         string            `json:"name,omitempty"`
+	UserAgent    string            `json:"ua,omitempty"`
+	AutoUpdate   bool              `json:"auto"`
+	Interval     time.Duration     `json:"interval,omitempty"`
+	Created      time.Time         `json:"created"`
+	LastAttempt  time.Time         `json:"last_attempt,omitzero"`
+	LastSuccess  time.Time         `json:"last_success,omitzero"`
+	FailureSince time.Time         `json:"failure_since,omitzero"`
+	Failures     int               `json:"failures,omitempty"`
+	LastError    *storedError      `json:"last_error,omitempty"`
+	Info         subscription.Info `json:"info"`
+	Servers      []string          `json:"servers,omitempty"`
+	ListParts    int               `json:"list_parts,omitempty"`
 }
 
 // decodeRecord reads a stored record of any format this core knows.
@@ -304,7 +305,7 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 		}
 		rec = *existing
 		if link != "" && link != rec.URL {
-			rec.URL, rec.Failures, rec.LastError = link, 0, nil
+			rec.URL, rec.Failures, rec.LastError, rec.FailureSince = link, 0, nil, time.Time{}
 			fetchNow = true
 		}
 	}
@@ -417,6 +418,9 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	}
 	if err != nil {
 		// Failed updates must preserve the last successful server list.
+		if next.FailureSince.IsZero() {
+			next.FailureSince = next.LastAttempt
+		}
 		next.Failures++
 		// Keep provider metadata even when the response body cannot be
 		// parsed.
@@ -475,6 +479,7 @@ func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subsc
 	updated.Servers, updated.ListParts = refs, parts
 	updated.Info = info
 	updated.LastSuccess, updated.Failures, updated.LastError = updated.LastAttempt, 0, nil
+	updated.FailureSince = time.Time{}
 	if err := b.persistLocked(&updated, puts, deletes); err != nil {
 		return err
 	}
@@ -660,6 +665,7 @@ func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 		state.NextUpdate = timestamppb.New(at)
 	}
 	if rec.LastError != nil {
+		state.FailureSince = timestampOrNil(rec.FailureSince)
 		state.LastError = toWire(errs.Newf(rec.LastError.Code, rec.LastError.Key, "%s", rec.LastError.Detail), nil, "")
 	}
 	return state

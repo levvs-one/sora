@@ -45,7 +45,7 @@ import (
 
 // Version defines the API contract served by this build. Contract changes must
 // update this value and the generated code together.
-var Version = control.Version{Major: 1, Minor: 12, MinSupportedMinor: 1}
+var Version = control.Version{Major: 1, Minor: 13, MinSupportedMinor: 1}
 
 // Options configures a core instance.
 type Options struct {
@@ -448,7 +448,11 @@ func (a *App) Close() error {
 		problems = append(problems, err)
 	}
 	if a.server != nil {
+		// Watches are intentionally unbounded; they must not hold an update
+		// or service restart open after session cleanup has finished.
+		force := time.AfterFunc(2*time.Second, a.server.Stop)
 		a.server.GracefulStop()
+		force.Stop()
 	}
 	if a.listener != nil {
 		if err := a.listener.Close(); err != nil && !errors.Is(err, net.ErrClosed) {
