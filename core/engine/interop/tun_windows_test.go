@@ -197,16 +197,23 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 				}
 				transport := &http.Transport{DisableKeepAlives: true}
 				defer transport.CloseIdleConnections()
-				// The first request brings the freshly applied TUN route up;
-				// sing-box and mihomo cold start slower than Xray on the runner.
-				client := &http.Client{Transport: transport, Timeout: 20 * time.Second}
-				request, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+destination, nil)
-				if err != nil {
-					t.Fatal(err)
-				}
-				response, err := client.Do(request)
-				if err != nil {
-					t.Fatalf("TCP packet through TUN: %v", err)
+				// sing-box and mihomo cold start slower than Xray on the runner, and
+				// a SYN sent while an engine switch replaces the route can keep
+				// retransmitting on the stale path. Each attempt opens a fresh
+				// connection, as applications do; a dead tunnel still fails.
+				client := &http.Client{Transport: transport, Timeout: 5 * time.Second}
+				var response *http.Response
+				for deadline := time.Now().Add(60 * time.Second); ; {
+					request, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+destination, nil)
+					if err != nil {
+						t.Fatal(err)
+					}
+					if response, err = client.Do(request); err == nil {
+						break
+					}
+					if time.Now().After(deadline) {
+						t.Fatalf("TCP packet through TUN: %v", err)
+					}
 				}
 				body, err := io.ReadAll(response.Body)
 				_ = response.Body.Close()
