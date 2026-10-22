@@ -119,6 +119,13 @@
     "count": 1
   },
   {
+    "name": "vmess base64",
+    "input": "vmess://eyJ2IjoiMiIsInBzIjoiVk1lc3MgV1MiLCJhZGQiOiJleGFtcGxlLmNvbSIsInBvcnQiOiI0NDMiLCJpZCI6IjEyM2U0NTY3LWU4OWItMTJkMy1hNDU2LTQyNjYxNDE3NDAwMCIsImFpZCI6IjAiLCJzY3kiOiJhdXRvIiwibmV0Ijoid3MiLCJ0eXBlIjoibm9uZSIsImhvc3QiOiJjZG4uZXhhbXBsZS5jb20iLCJwYXRoIjoiL3ZwbiIsInRscyI6InRscyIsInNuaSI6ImV4YW1wbGUuY29tIiwiYWxwbiI6ImgyLGh0dHAvMS4xIiwiZnAiOiJjaHJvbWUifQ==",
+    "protocol": "vmess",
+    "security": "tls",
+    "count": 1
+  },
+  {
     "name": "wrapped list",
     "input": "dmxlc3M6Ly8xMjNlNDU2Ny1lODliLTEyZDMtYTQ1Ni00MjY2MTQxNzQwMDBAZXhhbXBsZS5jb206NDQzCg==",
     "protocol": "vless",

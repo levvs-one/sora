@@ -464,12 +464,38 @@ func countryCode(s string) string {
 func parseVMess(u *url.URL) (OutboundSpec, error) {
 	raw := strings.TrimPrefix(u.Opaque, "//")
 	if raw == "" {
-		raw = strings.TrimPrefix(u.Path, "/")
+		raw = u.Host + u.Path
 	}
 	if b, ok := decodeBase64(raw); ok {
 		var v map[string]any
 		if json.Unmarshal(b, &v) == nil {
-			return mapJSONSpec(v, "vmess")
+			if _, standard := v["add"]; standard {
+				// v2rayN share JSON uses different keys from engine configurations.
+				if number(v["aid"]) != 0 || stringValue(v["pcs"]) != "" || stringValue(v["vcn"]) != "" {
+					return OutboundSpec{}, ErrUnsupported
+				}
+				for target, source := range map[string]string{"server": "add", "uuid": "id", "network": "net", "tag": "ps", "security": "tls", "method": "scy"} {
+					v[target] = v[source]
+				}
+				delete(v, "type")
+			}
+			o, err := mapJSONSpec(v, "vmess")
+			o.Path, o.HostHeader = stringValue(v["path"]), stringValue(v["host"])
+			o.ServerName, o.Fingerprint = stringValue(v["sni"]), stringValue(v["fp"])
+			o.AllowInsecure = parseBool(stringValue(v["insecure"]))
+			if alpn := stringValue(v["alpn"]); alpn != "" {
+				o.ALPN = strings.Split(alpn, ",")
+			}
+			if o.Transport == "grpc" {
+				o.ServiceName = o.Path
+			}
+			if o.Security == "" {
+				o.Security = "none"
+			}
+			if o.Cipher == "" {
+				o.Cipher = "auto"
+			}
+			return o, err
 		}
 	}
 	if u.Hostname() == "" {
