@@ -516,7 +516,7 @@ class Desktop with WindowListener {
 
   void _warnAboutSubscriptions() {
     final s = _s;
-    final locale = Platform.localeName.replaceAll('_', '-');
+    final locale = sora.locale.toLanguageTag();
     for (final sub in sora.subscriptions) {
       final warning = subscriptionWarning(s, sub, locale);
       final id = sub.settings.id;

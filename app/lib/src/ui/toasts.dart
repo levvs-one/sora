@@ -49,8 +49,10 @@ class _ToastTitle extends StatelessWidget {
         ],
       ],
     );
-    if (notice.action.isEmpty) return body;
-    return Semantics(button: true, onTap: () => runNotificationAction(context, notice), child: body);
+    // Toastification limits titles to two lines, which would hide recovery steps.
+    final content = DefaultTextStyle(style: DefaultTextStyle.of(context).style, child: body);
+    if (notice.action.isEmpty) return content;
+    return Semantics(button: true, onTap: () => runNotificationAction(context, notice), child: content);
   }
 }
 
@@ -66,13 +68,16 @@ class NotificationToasts extends StatefulWidget {
 
 class _NotificationToastsState extends State<NotificationToasts> {
   StreamSubscription<AppNotification>? _watch;
-  final _active = <ToastificationItem, VoidCallback>{};
+  final _active = <ToastificationItem, ({VoidCallback changed, AppNotification notice})>{};
   final _pending = Queue<AppNotification>();
 
   @override
   void initState() {
     super.initState();
     _watch = widget.sora.messages.listen((notice) {
+      bool sameFailure(AppNotification other) =>
+          notice.failureKey.isNotEmpty && other.failureKey == notice.failureKey && other.argument == notice.argument;
+      if (_pending.any(sameFailure) || _active.values.any((entry) => sameFailure(entry.notice))) return;
       _pending.add(notice);
       if (_pending.length == 1) _show();
     });
@@ -136,7 +141,7 @@ class _NotificationToastsState extends State<NotificationToasts> {
       }
 
       item.addListenerOnTimeStatus(changed);
-      setState(() => _active[item] = changed);
+      setState(() => _active[item] = (changed: changed, notice: notice));
       // AnimatedList must finish inserting before a burst can evict that item.
       if (_pending.isNotEmpty) _show();
     });
@@ -147,7 +152,7 @@ class _NotificationToastsState extends State<NotificationToasts> {
   void dispose() {
     unawaited(_watch?.cancel());
     for (final entry in _active.entries) {
-      entry.key.removeListenerOnTimeStatus(entry.value);
+      entry.key.removeListenerOnTimeStatus(entry.value.changed);
     }
     toastification.dismissAll(delayForAnimation: false);
     super.dispose();

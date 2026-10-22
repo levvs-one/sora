@@ -205,64 +205,64 @@ class SUz extends S {
   String get errGeneric => 'Nimadir xato ketdi';
 
   @override
-  String get errCore => 'Sora xizmati javob bermayapti';
+  String get errCore => 'Sora xizmati javob bermayapti. Biroz kutib, qayta urinib koʻring.';
 
   @override
-  String get errAuth => 'Sora xizmatiga kirish imkoni yo\'q';
+  String get errAuth => 'Sora xizmatiga kirish rad etildi. Ilovani qayta ishga tushirib, yana urinib koʻring.';
 
   @override
-  String get errVersion => 'Sora-ni yangilang: ilova va xizmat turli versiyalardir';
+  String get errVersion => 'Sora ilovasi va xizmati turli versiyalarda. Sora’ni yangilang.';
 
   @override
-  String get errBusy => 'Kutib turing, oldingi buyruq hali ham ishlamoqda';
+  String get errBusy => 'Oldingi buyruq hali bajarilmoqda. Uning tugashini kuting.';
 
   @override
-  String get errEngineMissing => 'Bu server uchun vosita topilmadi';
+  String get errEngineMissing => 'Bu server uchun kerakli yadro topilmadi. Sora yangilanishlarini tekshiring.';
 
   @override
-  String get errEngineStart => 'Dvigatel ishga tushmadi';
+  String get errEngineStart => 'Yadro ishga tushmadi. Sababini ulanish jurnalidan koʻring.';
 
   @override
-  String get errEngineStopped => 'Dvigatel to\'xtadi';
+  String get errEngineStopped => 'Yadro toʻxtadi. Qayta ulanishga urinib koʻring.';
 
   @override
-  String get errTunnel => 'VPN ulanishini yaratishga ruxsat yo\'q';
-
-  @override
-  String get errServers => 'Server xato bilan sozlangan';
+  String get errTunnel => 'Bu VPN rejimi mavjud emas. Boshqa rejimni tanlang yoki xizmat ruxsatlarini tekshiring.';
 
   @override
   String get errNetwork => 'Serverga ulanib boʻlmadi';
 
   @override
-  String get errTimeout => 'Server o\'z vaqtida javob bermadi';
+  String get errTimeout => 'Server vaqtida javob bermadi. Bir daqiqadan keyin qayta urinib koʻring.';
 
   @override
-  String get errFirewall => 'VPNdan tashqarida internetni bloklab bo‘lmadi';
+  String get errFirewall =>
+      'VPN tashqarisidagi internetga kirishni bloklab boʻlmadi. Sababini ulanish jurnalidan koʻring.';
 
   @override
-  String get errSubFetch => 'Obunani yuklab bo‘lmadi';
+  String get errSubFetch => 'Obunani yuklab boʻlmadi. Internetni tekshirib, bir daqiqadan keyin qayta urinib koʻring.';
 
   @override
-  String get errSubFormat => 'Bu obuna havolasi emas';
+  String get errSubFormat => 'Obuna formati tanilmadi. Provayderdan mos obuna havolasini soʻrang.';
 
   @override
-  String get errSubEmpty => 'Obunada serverlar yo\'q';
+  String get errSubEmpty => 'Obunada serverlar yoʻq. Obuna provayderiga murojaat qiling.';
 
   @override
-  String get errSubDuplicate => 'Bu obuna allaqachon qo‘shilgan';
+  String get errSubDuplicate => 'Bu obuna allaqachon qoʻshilgan. Eng soʻnggi serverlarni olish uchun uni yangilang.';
 
   @override
-  String get errSubLimit => 'Juda koʻp obuna';
+  String get errSubLimit =>
+      'Obunalar soni chegarasiga yetildi. Yangisini qoʻshishdan oldin keraksiz obunani oʻchiring.';
 
   @override
-  String get errSubScheme => 'Havola https:// bilan boshlanishi kerak';
+  String get errSubScheme => 'Obuna havolasi https:// bilan boshlanishi kerak. Provayderdan xavfsiz havola soʻrang.';
 
   @override
-  String get errSecretStore => 'Sora xotirasi shikastlangan yoki mavjud emas';
+  String get errSecretStore =>
+      'Sora xotirasi buzilgan yoki unga kirib boʻlmayapti. Kirish ruxsatlari va jurnaldagi tafsilotlarni tekshiring.';
 
   @override
-  String get errNoServers => 'Ulanish uchun obuna qo\'shing';
+  String get errNoServers => 'Ulanish uchun serverlar yoʻq. Obuna yoki oʻz serveringizni qoʻshing.';
 
   @override
   String get connections => 'Ulanishlar';
@@ -487,8 +487,8 @@ class SUz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'obuna # kunlarda tugaydi',
-      one: 'obuna # kunida tugaydi',
+      other: 'obuna $days kunlarda tugaydi',
+      one: 'obuna $days kunida tugaydi',
       zero: 'obuna bir necha soat ichida tugaydi',
     );
     return '$name: $_temp0';
@@ -507,8 +507,8 @@ class SUz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# serverlari, eng tez',
-      one: '# server, eng tezkor',
+      other: '$count serverlari, eng tez',
+      one: '$count server, eng tezkor',
     );
     return '$_temp0';
   }
@@ -630,7 +630,7 @@ class SUz extends S {
   String get less => 'Ozroq';
 
   @override
-  String get notificationsEmpty => 'Ulanish va obuna hodisalari shu yerda paydo bo‘ladi';
+  String get notificationsEmpty => 'Bildirishnomalar yoʻq';
 
   @override
   String get retryConnect => 'Qayta ulanishni sinab ko\'ring';
@@ -1232,13 +1232,13 @@ class SUz extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# daqiqa', one: '# daqiqa');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count daqiqa', one: '$count daqiqa');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# soat', one: '# soat');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count soat', one: '$count soat');
     return '$_temp0';
   }
 
@@ -1309,7 +1309,7 @@ class SUz extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ulanish', one: '# ulanish');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ulanish', one: '$count ulanish');
     return '$_temp0';
   }
 
@@ -1392,21 +1392,6 @@ class SUz extends S {
   String get dnsActual => 'Kuzatilgan';
 
   @override
-  String get sortBy => 'Saralash';
-
-  @override
-  String get sortSubscription => 'Obunadagi tartibda';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Tezlik';
-
-  @override
-  String get sortName => 'Nomi';
-
-  @override
   String get measureSpeed => 'Tezlikni o\'lchash';
 
   @override
@@ -1425,13 +1410,10 @@ class SUz extends S {
   String get autoSelectSmart => 'Aqlli tanlov';
 
   @override
-  String get coreWatchUnstable => 'Sora yadrosiga ulanish barqaror emas';
+  String get coreWatchUnstable => 'Yadro bilan aloqa beqaror. Biroz kutib, qayta ulanishga urinib koʻring.';
 
   @override
   String get watchReconnect => 'Qayta ulaning';
-
-  @override
-  String get coreRestoringLink => 'Sora yadrosiga ulanish tiklanmoqda…';
 
   @override
   String get crashRestoreTitle => 'Oxirgi seans uzildi';
@@ -1467,7 +1449,7 @@ class SUz extends S {
   String get overrideCustomRules => 'O\'z qoidalari';
 
   @override
-  String get errBenchmarkUnsupported => 'Tezlikni o\'lchash uchun yangi yadro kerak';
+  String get errBenchmarkUnsupported => 'Tezlikni oʻlchash uchun yangiroq yadro kerak. Sora’ni yangilang.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1569,10 +1551,10 @@ class SUz extends S {
   String get chainOrderHint => 'Qayta tartiblash uchun torting: trafik tepadan kiradi va pastdan chiqadi.';
 
   @override
-  String get chainTooFew => 'Kamida 2 ta serverni tanlang';
+  String get chainTooFew => 'Zanjirga kamida ikkita server kerak. Yana bir server qoʻshing.';
 
   @override
-  String get chainTooMany => 'Zanjir ko\'pi bilan 3 ta serverni o\'z ichiga oladi';
+  String get chainTooMany => 'Zanjirda koʻpi bilan uchta server boʻlishi mumkin. Ortiqcha serverlarni olib tashlang.';
 
   @override
   String get chainEstimate => 'Taxminiy kechikish';
@@ -1589,10 +1571,11 @@ class SUz extends S {
   }
 
   @override
-  String get chainUnsupported => 'Joriy dvigatel zanjir tuza olmaydi';
+  String get chainUnsupported => 'Tanlangan yadro zanjirlarni qoʻllamaydi. Mos yadroni tanlang.';
 
   @override
-  String get chainHopMissing => 'Zanjir serverlaridan biri endi mavjud emas';
+  String get chainHopMissing =>
+      'Zanjirdagi serverlardan biri endi mavjud emas. Shu bosqich uchun boshqa server tanlang.';
 
   @override
   String chainHop(Object n) {
@@ -1662,7 +1645,7 @@ class SUz extends S {
       'zapret VPN tunneli bilan birga ishlaydi: tunnel trafigi VPN orqali, toʻgʻridan-toʻgʻri trafik esa cheklovni chetlab oʻtish vositasi orqali oʻtadi.';
 
   @override
-  String get chainDuplicate => 'Har bir server faqat bir marta paydo bo\'lishi mumkin';
+  String get chainDuplicate => 'Zanjirda bir server takrorlangan. Har bir bosqich uchun boshqa server tanlang.';
 
   @override
   String get edit => 'Tahrirlash';
@@ -1771,8 +1754,8 @@ class SUz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# ta sizib chiqish aniqlandi',
-      one: '# ta sizib chiqish aniqlandi',
+      other: '$count ta sizib chiqish aniqlandi',
+      one: '$count ta sizib chiqish aniqlandi',
     );
     return '$_temp0';
   }
@@ -1977,7 +1960,8 @@ class SUz extends S {
   String get extWorkerFailed => 'Kengaytmaning fon vazifasi bajarilmadi. Kengaytma jurnalini tekshiring.';
 
   @override
-  String get extAssetRejected => 'Kengaytma fayli rad etildi: o‘qib bo‘lmaydigan ranglar yoki noto‘g‘ri qoidalar.';
+  String get extAssetRejected =>
+      'Kengaytma faylida oʻqishni qiyinlashtiradigan ranglar yoki notoʻgʻri qoidalar bor. Kengaytma muallifidan faylni tuzatishni soʻrang.';
 
   @override
   String get extVerifiedSora => 'Sora tomonidan tasdiqlangan';
@@ -2013,4 +1997,115 @@ class SUz extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora ichki xatosi. Jurnalni saqlang va muammo haqida xabar bering.';
+
+  @override
+  String get errTls => 'Server sertifikati rad etildi. Soatni tekshiring yoki provayderga murojaat qiling.';
+
+  @override
+  String get errFileAccess => 'Faylga kirib bo‘lmaydi. Ruxsatlar va bo‘sh joyni tekshiring.';
+
+  @override
+  String get errDataLimit => 'Ma’lumot juda ko‘p. Kamroq element tanlab, qayta urinib ko‘ring.';
+
+  @override
+  String get errCredentials => 'Saqlangan kirish ma’lumotlari yo‘q. Serverni qayta import qiling.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Yangilangan vaqt: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Hali yangilanmagan. Qayta urinib ko‘ring.';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Server HTTP $status kodini qaytardi. Havolani tekshiring yoki provayderga murojaat qiling.',
+      zero: 'Server soʻrovni rad etdi. Havolani tekshiring yoki provayderga murojaat qiling.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'Server sozlamalari to‘liq emas yoki qo‘llanmaydi. Obunani yangilang.';
+
+  @override
+  String get errServerIds => 'Ikki server bir xil identifikatorga ega. Ularni qayta import qiling.';
+
+  @override
+  String get errRoutingGroup => 'Yo‘nalish yo‘q serverlarga yoki buzilgan guruhga ishora qilmoqda. Obunani yangilang.';
+
+  @override
+  String get errConnections => 'Ulanishlar ro‘yxati mavjud emas. Ulaning yoki boshqa mexanizmni tanlang.';
+
+  @override
+  String get errLogs => 'Bu xizmat jurnal yuritmaydi. Sora’ni yangilang.';
+
+  @override
+  String get errDiagnostics => 'Diagnostika yig‘ilmadi. Qayta urining yoki jurnalni saqlang.';
+
+  @override
+  String get errMissingItem => 'So‘ralgan element endi mavjud emas. Ro‘yxatni yangilang.';
+
+  @override
+  String get errInvalidRequest =>
+      'So‘rovda noto‘g‘ri qiymatlar bor. Kiritilgan ma’lumotlarni tekshirib, qayta urining.';
+
+  @override
+  String get errProxyLogin =>
+      'Tizim proksisi bu kirishni qo‘llamaydi. Mahalliy proksi foydalanuvchi nomi va parolini o‘chiring.';
+
+  @override
+  String get errLogFilter => 'Jurnal filtri noto‘g‘ri. Qidiruvni tozalab, qayta urining.';
+
+  @override
+  String get errSubRedirect => 'Server xavfli manzilga yo‘naltirdi. Provayderdan yangi havola so‘rang.';
+
+  @override
+  String get errProxySetup => 'Tizim proksisi sozlanmadi. Qayta ulaning yoki jurnalni oching.';
+
+  @override
+  String get notificationsToday => 'Bugun';
+
+  @override
+  String get notificationsYesterday => 'Kecha';
+
+  @override
+  String get notificationsMarkRead => 'Barchasini oʻqilgan deb belgilash';
+
+  @override
+  String get notificationsUnread => 'Oʻqilmagan';
+
+  @override
+  String get desktopNotifications => 'Ish stoli bildirishnomalari';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval => 'Obunani yangilash oraligʻi notoʻgʻri. Provayder tavsiya qilgan oraliqni tanlang.';
+
+  @override
+  String get errRule =>
+      'Yoʻnaltirish qoidasida xato bor. Qoidada koʻrsatilgan domen, IP manzil yoki ilovani tekshiring.';
+
+  @override
+  String get errDns => 'DNS sozlamalari notoʻgʻri. DNS serverining manzilini tekshiring.';
+
+  @override
+  String get errEndpoint => 'Tekshiriladigan server manzili notoʻgʻri. Xost nomi va portini tekshiring.';
+
+  @override
+  String get errCancelled => 'Soʻrov bekor qilindi. Kerak boʻlsa, amalni takrorlang.';
 }

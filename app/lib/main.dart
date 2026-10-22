@@ -129,6 +129,7 @@ class _SoraAppState extends State<SoraApp> {
                       }
                     : (extensionTheme.brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light),
                 locale: sora.settings.locale,
+                localeListResolutionCallback: (locales, supported) => sora.locale,
                 themeAnimationDuration: Duration.zero,
                 localizationsDelegates: const [
                   S.delegate,

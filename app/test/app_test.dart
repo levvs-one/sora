@@ -136,6 +136,21 @@ void main() {
       );
     });
 
+    test('a pinned server excludes unused incompatible subscription entries', () {
+      settings
+        ..engine = 'xray'
+        ..failover = false;
+      final plan = buildPlan(
+        servers: [
+          servers.first,
+          OutboundSpec(id: 'unused', protocol: 'unknown'),
+        ],
+        choice: 'a',
+        settings: settings,
+      );
+      expect(plan.outbounds.map((o) => o.id), ['a']);
+    });
+
     test('group names never collide with server ids', () {
       expect(Sora.autoGroup, isNot(anyOf('a', 'b')));
       expect(Sora.autoGroup.startsWith('sora:'), isTrue);
@@ -251,7 +266,7 @@ void main() {
       expect(text, isNot(contains('core.')), reason: key);
       expect(text, isNotEmpty, reason: key);
     }
-    expect(describe(s, const CoreFailure('core.plan.tunnel_unsupported')), s.errTunnel);
+    expect(describe(s, const CoreFailure('core.plan.tunnel_unsupported')), contains(s.errTunnel));
   });
 
   testWidgets('without a core the home screen says so and stays still', (tester) async {

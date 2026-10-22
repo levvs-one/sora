@@ -498,56 +498,50 @@ abstract class S {
   /// No description provided for @errCore.
   ///
   /// In ru, this message translates to:
-  /// **'Служба Sora не отвечает'**
+  /// **'Служба Sora не отвечает. Подождите немного и попробуйте снова.'**
   String get errCore;
 
   /// No description provided for @errAuth.
   ///
   /// In ru, this message translates to:
-  /// **'Нет доступа к службе Sora'**
+  /// **'Нет доступа к службе Sora. Перезапустите приложение и попробуйте снова.'**
   String get errAuth;
 
   /// No description provided for @errVersion.
   ///
   /// In ru, this message translates to:
-  /// **'Обновите Sora: приложение и служба разных версий'**
+  /// **'Приложение и служба Sora разных версий. Обновите Sora.'**
   String get errVersion;
 
   /// No description provided for @errBusy.
   ///
   /// In ru, this message translates to:
-  /// **'Подождите, предыдущая команда ещё выполняется'**
+  /// **'Предыдущая команда ещё выполняется. Дождитесь её завершения.'**
   String get errBusy;
 
   /// No description provided for @errEngineMissing.
   ///
   /// In ru, this message translates to:
-  /// **'Не найдено ядро для этого сервера'**
+  /// **'Не найдено ядро для этого сервера. Проверьте наличие обновлений Sora.'**
   String get errEngineMissing;
 
   /// No description provided for @errEngineStart.
   ///
   /// In ru, this message translates to:
-  /// **'Ядро не запустилось'**
+  /// **'Ядро не запустилось. Посмотрите причину в журнале подключения.'**
   String get errEngineStart;
 
   /// No description provided for @errEngineStopped.
   ///
   /// In ru, this message translates to:
-  /// **'Ядро остановилось'**
+  /// **'Ядро остановилось. Попробуйте подключиться снова.'**
   String get errEngineStopped;
 
   /// No description provided for @errTunnel.
   ///
   /// In ru, this message translates to:
-  /// **'Нет прав на создание VPN-подключения'**
+  /// **'Этот режим VPN недоступен. Выберите другой режим или проверьте права службы.'**
   String get errTunnel;
-
-  /// No description provided for @errServers.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сервер настроен с ошибкой'**
-  String get errServers;
 
   /// No description provided for @errNetwork.
   ///
@@ -558,61 +552,61 @@ abstract class S {
   /// No description provided for @errTimeout.
   ///
   /// In ru, this message translates to:
-  /// **'Сервер не ответил вовремя'**
+  /// **'Сервер не ответил вовремя. Попробуйте ещё раз через минуту.'**
   String get errTimeout;
 
   /// No description provided for @errFirewall.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось включить блокировку интернета без VPN'**
+  /// **'Не удалось включить блокировку интернета без VPN. Посмотрите причину в журнале подключения.'**
   String get errFirewall;
 
   /// No description provided for @errSubFetch.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось загрузить подписку'**
+  /// **'Не удалось загрузить подписку. Проверьте интернет и попробуйте ещё раз через минуту.'**
   String get errSubFetch;
 
   /// No description provided for @errSubFormat.
   ///
   /// In ru, this message translates to:
-  /// **'Это не ссылка на подписку'**
+  /// **'Формат подписки не распознан. Запросите совместимую ссылку у провайдера подписки.'**
   String get errSubFormat;
 
   /// No description provided for @errSubEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'В подписке нет серверов'**
+  /// **'В подписке нет серверов. Обратитесь к провайдеру подписки.'**
   String get errSubEmpty;
 
   /// No description provided for @errSubDuplicate.
   ///
   /// In ru, this message translates to:
-  /// **'Эта подписка уже добавлена'**
+  /// **'Эта подписка уже добавлена. Обновите её, чтобы получить актуальные серверы.'**
   String get errSubDuplicate;
 
   /// No description provided for @errSubLimit.
   ///
   /// In ru, this message translates to:
-  /// **'Слишком много подписок'**
+  /// **'Достигнут предел числа подписок. Удалите ненужную подписку перед добавлением новой.'**
   String get errSubLimit;
 
   /// No description provided for @errSubScheme.
   ///
   /// In ru, this message translates to:
-  /// **'Нужна ссылка, начинающаяся с https://'**
+  /// **'Ссылка на подписку должна начинаться с https://. Запросите защищённую ссылку у провайдера.'**
   String get errSubScheme;
 
   /// No description provided for @errSecretStore.
   ///
   /// In ru, this message translates to:
-  /// **'Хранилище Sora повреждено или недоступно'**
+  /// **'Хранилище Sora повреждено или недоступно. Проверьте права доступа и подробности в журнале.'**
   String get errSecretStore;
 
   /// No description provided for @errNoServers.
   ///
   /// In ru, this message translates to:
-  /// **'Добавьте подписку, чтобы подключиться'**
+  /// **'Нет серверов для подключения. Добавьте подписку или свой сервер.'**
   String get errNoServers;
 
   /// No description provided for @connections.
@@ -1038,7 +1032,7 @@ abstract class S {
   /// No description provided for @expiresIn.
   ///
   /// In ru, this message translates to:
-  /// **'{name}: подписка закончится через {days, plural, =0{несколько часов} one{# день} few{# дня} other{# дней}}'**
+  /// **'{name}: подписка закончится через {days, plural, =0{несколько часов} one{{days} день} few{{days} дня} other{{days} дней}}'**
   String expiresIn(String name, int days);
 
   /// No description provided for @trafficLow.
@@ -1056,7 +1050,7 @@ abstract class S {
   /// No description provided for @groupBest.
   ///
   /// In ru, this message translates to:
-  /// **'{count, plural, one{# сервер} few{# сервера} other{# серверов}}, самый быстрый'**
+  /// **'{count, plural, one{{count} сервер} few{{count} сервера} other{{count} серверов}}, самый быстрый'**
   String groupBest(int count);
 
   /// No description provided for @tunnelMode.
@@ -1284,7 +1278,7 @@ abstract class S {
   /// No description provided for @notificationsEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'Здесь появятся события подключения и подписок'**
+  /// **'Нет уведомлений'**
   String get notificationsEmpty;
 
   /// No description provided for @retryConnect.
@@ -2376,13 +2370,13 @@ abstract class S {
   /// No description provided for @extBgMinutes.
   ///
   /// In ru, this message translates to:
-  /// **'{count, plural, one{# минуту} few{# минуты} other{# минут}}'**
+  /// **'{count, plural, one{{count} минуту} few{{count} минуты} other{{count} минут}}'**
   String extBgMinutes(int count);
 
   /// No description provided for @extBgHours.
   ///
   /// In ru, this message translates to:
-  /// **'{count, plural, one{# час} few{# часа} other{# часов}}'**
+  /// **'{count, plural, one{{count} час} few{{count} часа} other{{count} часов}}'**
   String extBgHours(int count);
 
   /// No description provided for @extBgDisabledNote.
@@ -2508,7 +2502,7 @@ abstract class S {
   /// No description provided for @connConnectionsCount.
   ///
   /// In ru, this message translates to:
-  /// **'{count, plural, one{# соединение} few{# соединения} other{# соединений}}'**
+  /// **'{count, plural, one{{count} соединение} few{{count} соединения} other{{count} соединений}}'**
   String connConnectionsCount(num count);
 
   /// No description provided for @dnsPreset.
@@ -2661,36 +2655,6 @@ abstract class S {
   /// **'Обнаружено'**
   String get dnsActual;
 
-  /// No description provided for @sortBy.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сортировать'**
-  String get sortBy;
-
-  /// No description provided for @sortSubscription.
-  ///
-  /// In ru, this message translates to:
-  /// **'Как в подписке'**
-  String get sortSubscription;
-
-  /// No description provided for @sortPing.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пинг'**
-  String get sortPing;
-
-  /// No description provided for @sortSpeed.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скорость'**
-  String get sortSpeed;
-
-  /// No description provided for @sortName.
-  ///
-  /// In ru, this message translates to:
-  /// **'Имя'**
-  String get sortName;
-
   /// No description provided for @measureSpeed.
   ///
   /// In ru, this message translates to:
@@ -2730,7 +2694,7 @@ abstract class S {
   /// No description provided for @coreWatchUnstable.
   ///
   /// In ru, this message translates to:
-  /// **'Связь с ядром нестабильна'**
+  /// **'Связь с ядром нестабильна. Подождите немного и попробуйте подключиться снова.'**
   String get coreWatchUnstable;
 
   /// No description provided for @watchReconnect.
@@ -2738,12 +2702,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Переподключить'**
   String get watchReconnect;
-
-  /// No description provided for @coreRestoringLink.
-  ///
-  /// In ru, this message translates to:
-  /// **'Восстанавливаю связь с ядром…'**
-  String get coreRestoringLink;
 
   /// No description provided for @crashRestoreTitle.
   ///
@@ -2814,7 +2772,7 @@ abstract class S {
   /// No description provided for @errBenchmarkUnsupported.
   ///
   /// In ru, this message translates to:
-  /// **'Для замера скорости нужна новая версия ядра'**
+  /// **'Для замера скорости нужна новая версия ядра. Обновите Sora.'**
   String get errBenchmarkUnsupported;
 
   /// No description provided for @benchmarkProgress.
@@ -2994,13 +2952,13 @@ abstract class S {
   /// No description provided for @chainTooFew.
   ///
   /// In ru, this message translates to:
-  /// **'Выберите минимум 2 сервера'**
+  /// **'Для цепочки нужны хотя бы два сервера. Добавьте ещё один сервер.'**
   String get chainTooFew;
 
   /// No description provided for @chainTooMany.
   ///
   /// In ru, this message translates to:
-  /// **'В цепочке максимум 3 сервера'**
+  /// **'В цепочке может быть не больше трёх серверов. Уберите лишние серверы.'**
   String get chainTooMany;
 
   /// No description provided for @chainEstimate.
@@ -3030,13 +2988,13 @@ abstract class S {
   /// No description provided for @chainUnsupported.
   ///
   /// In ru, this message translates to:
-  /// **'Текущий движок не умеет строить цепочки'**
+  /// **'Выбранное ядро не поддерживает цепочки. Выберите совместимое ядро.'**
   String get chainUnsupported;
 
   /// No description provided for @chainHopMissing.
   ///
   /// In ru, this message translates to:
-  /// **'Один из серверов цепочки больше недоступен'**
+  /// **'Один из серверов цепочки больше недоступен. Выберите другой сервер для этого звена.'**
   String get chainHopMissing;
 
   /// No description provided for @chainHop.
@@ -3162,7 +3120,7 @@ abstract class S {
   /// No description provided for @chainDuplicate.
   ///
   /// In ru, this message translates to:
-  /// **'Каждый сервер можно выбрать только один раз'**
+  /// **'В цепочке повторяется сервер. Выберите разные серверы для каждого звена.'**
   String get chainDuplicate;
 
   /// No description provided for @edit.
@@ -3360,7 +3318,7 @@ abstract class S {
   /// No description provided for @leakTestFound.
   ///
   /// In ru, this message translates to:
-  /// **'{count, plural, one{Найдена # утечка} few{Найдены # утечки} other{Найдено # утечек}}'**
+  /// **'{count, plural, one{Найдена {count} утечка} few{Найдены {count} утечки} other{Найдено {count} утечек}}'**
   String leakTestFound(int count);
 
   /// No description provided for @leakTestSkipped.
@@ -3732,7 +3690,7 @@ abstract class S {
   /// No description provided for @extAssetRejected.
   ///
   /// In ru, this message translates to:
-  /// **'Файл расширения отклонён: нечитаемые цвета или неверные правила.'**
+  /// **'В файле расширения нечитаемые цвета или неверные правила. Попросите автора расширения исправить файл.'**
   String get extAssetRejected;
 
   /// No description provided for @extVerifiedSora.
@@ -3800,6 +3758,192 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'10.0.0.2/32'**
   String get customServerWgAddressesHint;
+
+  /// No description provided for @errInternal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Внутренняя ошибка Sora. Сохраните журнал и сообщите о сбое.'**
+  String get errInternal;
+
+  /// No description provided for @errTls.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сертификат сервера отклонён. Проверьте часы или обратитесь к провайдеру.'**
+  String get errTls;
+
+  /// No description provided for @errFileAccess.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступа к файлу. Проверьте права и свободное место.'**
+  String get errFileAccess;
+
+  /// No description provided for @errDataLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Слишком много данных. Выберите меньше элементов и повторите.'**
+  String get errDataLimit;
+
+  /// No description provided for @errCredentials.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранённые данные доступа потеряны. Импортируйте сервер заново.'**
+  String get errCredentials;
+
+  /// No description provided for @subscriptionStale.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновлено: {time}'**
+  String subscriptionStale(String time);
+
+  /// No description provided for @subscriptionNeverUpdated.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё не обновлялась. Повторите.'**
+  String get subscriptionNeverUpdated;
+
+  /// Complete HTTP failure message; status 0 means the response code is unknown.
+  ///
+  /// In ru, this message translates to:
+  /// **'{status, plural, =0 {Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.} other {Сервер вернул код HTTP {status}. Проверьте ссылку или обратитесь к провайдеру.}}'**
+  String errHttpStatus(int status);
+
+  /// No description provided for @errInvalidServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки сервера неполные или не поддерживаются. Обновите подписку.'**
+  String get errInvalidServer;
+
+  /// No description provided for @errServerIds.
+  ///
+  /// In ru, this message translates to:
+  /// **'У двух серверов одинаковый идентификатор. Импортируйте их заново.'**
+  String get errServerIds;
+
+  /// No description provided for @errRoutingGroup.
+  ///
+  /// In ru, this message translates to:
+  /// **'Маршрут ссылается на удалённые серверы или повреждённую группу. Обновите подписку.'**
+  String get errRoutingGroup;
+
+  /// No description provided for @errConnections.
+  ///
+  /// In ru, this message translates to:
+  /// **'Список подключений недоступен. Подключитесь или выберите другое ядро.'**
+  String get errConnections;
+
+  /// No description provided for @errLogs.
+  ///
+  /// In ru, this message translates to:
+  /// **'Эта служба не ведёт журнал. Обновите Sora.'**
+  String get errLogs;
+
+  /// No description provided for @errDiagnostics.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось собрать диагностику. Повторите или сохраните журнал.'**
+  String get errDiagnostics;
+
+  /// No description provided for @errMissingItem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрошенный элемент больше не существует. Обновите список.'**
+  String get errMissingItem;
+
+  /// No description provided for @errInvalidRequest.
+  ///
+  /// In ru, this message translates to:
+  /// **'В запросе неверные значения. Проверьте введённые данные и повторите.'**
+  String get errInvalidRequest;
+
+  /// No description provided for @errProxyLogin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Системный прокси не поддерживает этот вход. Уберите логин и пароль локального прокси.'**
+  String get errProxyLogin;
+
+  /// No description provided for @errLogFilter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неверный фильтр журнала. Очистите поиск и повторите.'**
+  String get errLogFilter;
+
+  /// No description provided for @errSubRedirect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сервер перенаправил на небезопасный адрес. Запросите новую ссылку у провайдера.'**
+  String get errSubRedirect;
+
+  /// No description provided for @errProxySetup.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось настроить системный прокси. Переподключитесь или откройте журнал.'**
+  String get errProxySetup;
+
+  /// No description provided for @notificationsToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня'**
+  String get notificationsToday;
+
+  /// No description provided for @notificationsYesterday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вчера'**
+  String get notificationsYesterday;
+
+  /// No description provided for @notificationsMarkRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прочитать все'**
+  String get notificationsMarkRead;
+
+  /// No description provided for @notificationsUnread.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не прочитано'**
+  String get notificationsUnread;
+
+  /// No description provided for @desktopNotifications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Системные уведомления'**
+  String get desktopNotifications;
+
+  /// No description provided for @notificationRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'x{count}'**
+  String notificationRepeat(int count);
+
+  /// No description provided for @errSubInterval.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недопустимый интервал обновления подписки. Выберите интервал, рекомендованный провайдером.'**
+  String get errSubInterval;
+
+  /// No description provided for @errRule.
+  ///
+  /// In ru, this message translates to:
+  /// **'В правиле маршрутизации ошибка. Проверьте указанный домен, IP-адрес или программу.'**
+  String get errRule;
+
+  /// No description provided for @errDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Некорректные настройки DNS. Проверьте адрес DNS-сервера.'**
+  String get errDns;
+
+  /// No description provided for @errEndpoint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Некорректный адрес сервера для проверки. Проверьте имя хоста и порт.'**
+  String get errEndpoint;
+
+  /// No description provided for @errCancelled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрос отменён. При необходимости выполните действие снова.'**
+  String get errCancelled;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

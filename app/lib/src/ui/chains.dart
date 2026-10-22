@@ -28,7 +28,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
       // failure pipeline would suppress it as a duplicate forever.
       sora.recovered('chain-connect');
     } catch (error) {
-      sora.reportFailure(error, source: 'chain-connect');
+      sora.reportFailure(error, source: 'chain-connect', mode: FailureMode.action);
     }
   }
 

@@ -205,64 +205,65 @@ class SBn extends S {
   String get errGeneric => 'কিছু ভুল হয়েছে';
 
   @override
-  String get errCore => 'Sora পরিষেবা সাড়া দিচ্ছে না৷';
+  String get errCore => 'Sora পরিষেবা সাড়া দিচ্ছে না। একটু অপেক্ষা করে আবার চেষ্টা করুন।';
 
   @override
-  String get errAuth => 'Sora পরিষেবাতে কোনও অ্যাক্সেস নেই৷';
+  String get errAuth => 'Sora পরিষেবায় প্রবেশের অনুমতি মেলেনি। অ্যাপ আবার চালু করে চেষ্টা করুন।';
 
   @override
-  String get errVersion => 'Sora আপডেট করুন: অ্যাপ এবং পরিষেবাটি ভিন্ন সংস্করণ';
+  String get errVersion => 'Sora অ্যাপ ও পরিষেবার সংস্করণ আলাদা। Sora আপডেট করুন।';
 
   @override
-  String get errBusy => 'অপেক্ষা করুন, আগের কমান্ডটি এখনও চলছে';
+  String get errBusy => 'আগের নির্দেশটি এখনও চলছে। সেটি শেষ হওয়া পর্যন্ত অপেক্ষা করুন।';
 
   @override
-  String get errEngineMissing => 'এই সার্ভারের জন্য কোনো ইঞ্জিন পাওয়া যায়নি';
+  String get errEngineMissing => 'এই সার্ভারের জন্য প্রয়োজনীয় ইঞ্জিন পাওয়া যায়নি। Sora-এর আপডেট আছে কি না দেখুন।';
 
   @override
-  String get errEngineStart => 'ইঞ্জিন চালু হয়নি';
+  String get errEngineStart => 'ইঞ্জিন চালু করা যায়নি। কারণ জানতে সংযোগের লগ দেখুন।';
 
   @override
-  String get errEngineStopped => 'ইঞ্জিন থেমে গেল';
+  String get errEngineStopped => 'ইঞ্জিন বন্ধ হয়ে গেছে। আবার সংযোগ করার চেষ্টা করুন।';
 
   @override
-  String get errTunnel => 'ভিপিএন সংযোগ তৈরি করার অনুমতি নেই';
-
-  @override
-  String get errServers => 'সার্ভারটি একটি ত্রুটির সাথে কনফিগার করা হয়েছে৷';
+  String get errTunnel => 'এই VPN মোড উপলব্ধ নয়। অন্য মোড বেছে নিন বা পরিষেবার অনুমতি পরীক্ষা করুন।';
 
   @override
   String get errNetwork => 'সার্ভারে পৌঁছানো যাচ্ছে না';
 
   @override
-  String get errTimeout => 'সার্ভার সময়মত উত্তর দেয়নি';
+  String get errTimeout => 'সার্ভার সময়মতো সাড়া দেয়নি। এক মিনিট পরে আবার চেষ্টা করুন।';
 
   @override
-  String get errFirewall => 'VPN এর বাইরে ইন্টারনেট ব্লক করা যায়নি';
+  String get errFirewall => 'VPN-এর বাইরে ইন্টারনেট ব্যবহার বন্ধ করা যায়নি। কারণ জানতে সংযোগের লগ দেখুন।';
 
   @override
-  String get errSubFetch => 'সদস্যতা লোড করা যায়নি';
+  String get errSubFetch =>
+      'সাবস্ক্রিপশন ডাউনলোড করা যায়নি। ইন্টারনেট সংযোগ পরীক্ষা করে এক মিনিট পরে আবার চেষ্টা করুন।';
 
   @override
-  String get errSubFormat => 'এটি একটি সাবস্ক্রিপশন লিঙ্ক নয়';
+  String get errSubFormat =>
+      'সাবস্ক্রিপশনের ফরম্যাট চেনা যায়নি। প্রদানকারীর কাছে সামঞ্জস্যপূর্ণ সাবস্ক্রিপশন লিঙ্ক চান।';
 
   @override
-  String get errSubEmpty => 'সাবস্ক্রিপশনের কোনো সার্ভার নেই';
+  String get errSubEmpty => 'সাবস্ক্রিপশনে কোনো সার্ভার নেই। সাবস্ক্রিপশন প্রদানকারীর সঙ্গে যোগাযোগ করুন।';
 
   @override
-  String get errSubDuplicate => 'এই সদস্যতা ইতিমধ্যে যোগ করা হয়েছে';
+  String get errSubDuplicate => 'এই সাবস্ক্রিপশন আগে থেকেই যোগ করা আছে। সার্ভারের হালনাগাদ তালিকা পেতে এটি আপডেট করুন।';
 
   @override
-  String get errSubLimit => 'অনেক বেশি সদস্যতা';
+  String get errSubLimit =>
+      'সাবস্ক্রিপশনের সংখ্যার সীমায় পৌঁছেছেন। নতুনটি যোগ করার আগে অব্যবহৃত কোনো সাবস্ক্রিপশন সরিয়ে দিন।';
 
   @override
-  String get errSubScheme => 'লিঙ্কটি অবশ্যই https:// দিয়ে শুরু হবে';
+  String get errSubScheme => 'সাবস্ক্রিপশন লিঙ্ক https:// দিয়ে শুরু হতে হবে। প্রদানকারীর কাছে নিরাপদ লিঙ্ক চান।';
 
   @override
-  String get errSecretStore => 'Sora স্টোরেজ ক্ষতিগ্রস্ত বা অনুপলব্ধ';
+  String get errSecretStore =>
+      'Sora-এর স্টোরেজ ক্ষতিগ্রস্ত বা ব্যবহার করা যাচ্ছে না। প্রবেশের অনুমতি এবং লগের বিস্তারিত দেখুন।';
 
   @override
-  String get errNoServers => 'সংযোগ করতে একটি সদস্যতা যোগ করুন';
+  String get errNoServers => 'সংযোগ করার মতো কোনো সার্ভার নেই। সাবস্ক্রিপশন বা নিজের সার্ভার যোগ করুন।';
 
   @override
   String get connections => 'সংযোগ';
@@ -487,8 +488,8 @@ class SBn extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'সদস্যতা # দিনের মধ্যে শেষ হয়',
-      one: 'সদস্যতা # দিনে শেষ হয়',
+      other: 'সদস্যতা $days দিনের মধ্যে শেষ হয়',
+      one: 'সদস্যতা $days দিনে শেষ হয়',
       zero: 'সাবস্ক্রিপশন কয়েক ঘন্টার মধ্যে শেষ হয়',
     );
     return '$name: $_temp0';
@@ -507,8 +508,8 @@ class SBn extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# সার্ভার, দ্রুততম',
-      one: '# সার্ভার, দ্রুততম',
+      other: '$count সার্ভার, দ্রুততম',
+      one: '$count সার্ভার, দ্রুততম',
     );
     return '$_temp0';
   }
@@ -630,7 +631,7 @@ class SBn extends S {
   String get less => 'কম';
 
   @override
-  String get notificationsEmpty => 'সংযোগ এবং সদস্যতা ইভেন্ট এখানে প্রদর্শিত হবে';
+  String get notificationsEmpty => 'কোনো বিজ্ঞপ্তি নেই';
 
   @override
   String get retryConnect => 'সংযোগ পুনরায় চেষ্টা করুন';
@@ -1229,13 +1230,13 @@ class SBn extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# মিনিট', one: '# মিনিট');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count মিনিট', one: '$count মিনিট');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ঘণ্টা', one: '# ঘণ্টা');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ঘণ্টা', one: '$count ঘণ্টা');
     return '$_temp0';
   }
 
@@ -1305,7 +1306,7 @@ class SBn extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# সংযোগ', one: '# সংযোগ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count সংযোগ', one: '$count সংযোগ');
     return '$_temp0';
   }
 
@@ -1387,21 +1388,6 @@ class SBn extends S {
   String get dnsActual => 'পালন করা হয়েছে';
 
   @override
-  String get sortBy => 'দ্বারা সাজান';
-
-  @override
-  String get sortSubscription => 'সাবস্ক্রিপশনের ক্রমে';
-
-  @override
-  String get sortPing => 'পিং';
-
-  @override
-  String get sortSpeed => 'গতি';
-
-  @override
-  String get sortName => 'নাম';
-
-  @override
   String get measureSpeed => 'গতি পরিমাপ';
 
   @override
@@ -1420,13 +1406,10 @@ class SBn extends S {
   String get autoSelectSmart => 'স্মার্ট পছন্দ';
 
   @override
-  String get coreWatchUnstable => 'Sora কোরের সাথে সংযোগটি অস্থির';
+  String get coreWatchUnstable => 'কোরের সঙ্গে সংযোগ অস্থির। একটু অপেক্ষা করে আবার সংযোগ করার চেষ্টা করুন।';
 
   @override
   String get watchReconnect => 'পুনরায় সংযোগ করুন';
-
-  @override
-  String get coreRestoringLink => 'Sora কোরে সংযোগ পুনরুদ্ধার করা হচ্ছে...';
 
   @override
   String get crashRestoreTitle => 'শেষ অধিবেশন বিঘ্নিত হয়';
@@ -1462,7 +1445,7 @@ class SBn extends S {
   String get overrideCustomRules => 'নিজস্ব নিয়ম';
 
   @override
-  String get errBenchmarkUnsupported => 'গতি পরিমাপ একটি নতুন কোর প্রয়োজন';
+  String get errBenchmarkUnsupported => 'গতি মাপার জন্য কোরের নতুন সংস্করণ প্রয়োজন। Sora আপডেট করুন।';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1564,10 +1547,10 @@ class SBn extends S {
   String get chainOrderHint => 'পুনরায় সাজাতে টেনে আনুন: ট্র্যাফিক উপরে প্রবেশ করে এবং নীচে প্রস্থান করে।';
 
   @override
-  String get chainTooFew => 'অন্তত 2 সার্ভার চয়ন করুন';
+  String get chainTooFew => 'চেইনের জন্য অন্তত দুটি সার্ভার প্রয়োজন। আরও একটি সার্ভার যোগ করুন।';
 
   @override
-  String get chainTooMany => 'একটি চেইন সর্বাধিক 3 সার্ভার ধারণ করে';
+  String get chainTooMany => 'চেইনে সর্বোচ্চ তিনটি সার্ভার থাকতে পারে। অতিরিক্ত সার্ভার সরিয়ে দিন।';
 
   @override
   String get chainEstimate => 'আনুমানিক লেটেন্সি';
@@ -1584,10 +1567,10 @@ class SBn extends S {
   }
 
   @override
-  String get chainUnsupported => 'বর্তমান ইঞ্জিন চেইন তৈরি করতে পারে না';
+  String get chainUnsupported => 'বেছে নেওয়া ইঞ্জিন সার্ভার চেইন সমর্থন করে না। সামঞ্জস্যপূর্ণ ইঞ্জিন বেছে নিন।';
 
   @override
-  String get chainHopMissing => 'চেইন সার্ভারের একটি আর উপলব্ধ নেই';
+  String get chainHopMissing => 'চেইনের কোনো সার্ভার আর উপলব্ধ নেই। সেই ধাপের জন্য অন্য সার্ভার বেছে নিন।';
 
   @override
   String chainHop(Object n) {
@@ -1657,7 +1640,7 @@ class SBn extends S {
       'VPN টানেলের পাশাপাশি zapret চালায়: টানেলের ট্রাফিক VPN দিয়ে যায়, সরাসরি ট্রাফিক ব্লক এড়ানোর ব্যবস্থা দিয়ে যায়।';
 
   @override
-  String get chainDuplicate => 'প্রতিটি সার্ভার শুধুমাত্র একবার প্রদর্শিত হতে পারে';
+  String get chainDuplicate => 'চেইনে একই সার্ভার একাধিকবার আছে। প্রতিটি ধাপের জন্য আলাদা সার্ভার বেছে নিন।';
 
   @override
   String get edit => 'সম্পাদনা';
@@ -1766,8 +1749,8 @@ class SBn extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '#টি লিক পাওয়া গেছে',
-      one: '#টি লিক পাওয়া গেছে',
+      other: '$countটি লিক পাওয়া গেছে',
+      one: '$countটি লিক পাওয়া গেছে',
     );
     return '$_temp0';
   }
@@ -1972,7 +1955,8 @@ class SBn extends S {
   String get extWorkerFailed => 'এক্সটেনশনের পটভূমির কাজ ব্যর্থ হয়েছে। এক্সটেনশনের লগ দেখুন।';
 
   @override
-  String get extAssetRejected => 'এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।';
+  String get extAssetRejected =>
+      'এক্সটেনশনের ফাইলে অপাঠ্য রং বা ভুল নিয়ম রয়েছে। ফাইলটি ঠিক করতে এক্সটেনশনের লেখককে বলুন।';
 
   @override
   String get extVerifiedSora => 'Sora দ্বারা যাচাইকৃত';
@@ -2008,4 +1992,113 @@ class SBn extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora-তে অভ্যন্তরীণ ত্রুটি। লগ সংরক্ষণ করে সমস্যাটি জানান।';
+
+  @override
+  String get errTls => 'সার্ভারের সার্টিফিকেট প্রত্যাখ্যাত। ঘড়ি পরীক্ষা করুন বা প্রদানকারীর সাথে যোগাযোগ করুন।';
+
+  @override
+  String get errFileAccess => 'ফাইল অ্যাক্সেস করা যাচ্ছে না। অনুমতি ও খালি জায়গা পরীক্ষা করুন।';
+
+  @override
+  String get errDataLimit => 'ডেটা অনেক বেশি। কম আইটেম বেছে নিয়ে আবার চেষ্টা করুন।';
+
+  @override
+  String get errCredentials => 'সংরক্ষিত লগইন তথ্য নেই। সার্ভারটি আবার আমদানি করুন।';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'সর্বশেষ আপডেট: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'এখনও আপডেট হয়নি। আবার চেষ্টা করুন।';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'সার্ভার HTTP $status কোড দিয়েছে। লিঙ্ক পরীক্ষা করুন বা প্রদানকারীর সঙ্গে যোগাযোগ করুন।',
+      zero: 'সার্ভার অনুরোধ প্রত্যাখ্যান করেছে। লিঙ্ক পরীক্ষা করুন বা প্রদানকারীর সঙ্গে যোগাযোগ করুন।',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'সার্ভারের সেটিংস অসম্পূর্ণ বা সমর্থিত নয়। সাবস্ক্রিপশন আপডেট করুন।';
+
+  @override
+  String get errServerIds => 'দুটি সার্ভারের শনাক্তকারী একই। সেগুলো আবার আমদানি করুন।';
+
+  @override
+  String get errRoutingGroup => 'রুটটি অনুপস্থিত সার্ভার বা ক্ষতিগ্রস্ত গ্রুপে নির্দেশ করে। সাবস্ক্রিপশন আপডেট করুন।';
+
+  @override
+  String get errConnections => 'সংযোগের তালিকা পাওয়া যাচ্ছে না। সংযোগ করুন বা অন্য ইঞ্জিন বেছে নিন।';
+
+  @override
+  String get errLogs => 'এই পরিষেবা লগ রাখে না। Sora আপডেট করুন।';
+
+  @override
+  String get errDiagnostics => 'ডায়াগনস্টিক সংগ্রহ করা যায়নি। আবার চেষ্টা করুন বা লগ সংরক্ষণ করুন।';
+
+  @override
+  String get errMissingItem => 'অনুরোধ করা আইটেম আর নেই। তালিকা রিফ্রেশ করুন।';
+
+  @override
+  String get errInvalidRequest => 'অনুরোধে অবৈধ মান রয়েছে। ইনপুট পরীক্ষা করে আবার চেষ্টা করুন।';
+
+  @override
+  String get errProxyLogin =>
+      'সিস্টেম প্রক্সি এই লগইন সমর্থন করে না। স্থানীয় প্রক্সির ব্যবহারকারীর নাম ও পাসওয়ার্ড সরান।';
+
+  @override
+  String get errLogFilter => 'লগ ফিল্টার অবৈধ। অনুসন্ধান মুছে আবার চেষ্টা করুন।';
+
+  @override
+  String get errSubRedirect => 'সার্ভার একটি অনিরাপদ ঠিকানায় পাঠিয়েছে। প্রদানকারীর কাছে নতুন লিংক চান।';
+
+  @override
+  String get errProxySetup => 'সিস্টেম প্রক্সি সেট করা যায়নি। আবার সংযোগ করুন বা লগ খুলুন।';
+
+  @override
+  String get notificationsToday => 'আজ';
+
+  @override
+  String get notificationsYesterday => 'গতকাল';
+
+  @override
+  String get notificationsMarkRead => 'সব পঠিত হিসেবে চিহ্নিত করুন';
+
+  @override
+  String get notificationsUnread => 'অপঠিত';
+
+  @override
+  String get desktopNotifications => 'ডেস্কটপ বিজ্ঞপ্তি';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval => 'সাবস্ক্রিপশন আপডেটের ব্যবধান সঠিক নয়। প্রদানকারীর প্রস্তাবিত ব্যবধান বেছে নিন।';
+
+  @override
+  String get errRule => 'রাউটিংয়ের কোনো নিয়ম সঠিক নয়। নিয়মের ডোমেন, IP ঠিকানা বা অ্যাপ পরীক্ষা করুন।';
+
+  @override
+  String get errDns => 'DNS সেটিংস সঠিক নয়। DNS সার্ভারের ঠিকানা পরীক্ষা করুন।';
+
+  @override
+  String get errEndpoint => 'পরীক্ষার জন্য সার্ভারের ঠিকানা সঠিক নয়। হোস্টের নাম ও পোর্ট পরীক্ষা করুন।';
+
+  @override
+  String get errCancelled => 'অনুরোধ বাতিল হয়েছে। প্রয়োজন হলে কাজটি আবার করুন।';
 }

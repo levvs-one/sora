@@ -205,64 +205,64 @@ class SBe extends S {
   String get errGeneric => 'Нешта пайшло не так';
 
   @override
-  String get errCore => 'Служба Sora не адказвае';
+  String get errCore => 'Служба Sora не адказвае. Крыху пачакайце і паспрабуйце зноў.';
 
   @override
-  String get errAuth => 'Няма доступу да службы Sora';
+  String get errAuth => 'Няма доступу да службы Sora. Перазапусціце праграму і паспрабуйце зноў.';
 
   @override
-  String get errVersion => 'Абнаўленне Sora: праграма і сэрвіс маюць розныя версіі';
+  String get errVersion => 'Праграма і служба Sora маюць розныя версіі. Абнавіце Sora.';
 
   @override
-  String get errBusy => 'Пачакайце, папярэдняя каманда ўсё яшчэ выконваецца';
+  String get errBusy => 'Папярэдняя каманда яшчэ выконваецца. Дачакайцеся яе завяршэння.';
 
   @override
-  String get errEngineMissing => 'Для гэтага сервера не знойдзены механізм';
+  String get errEngineMissing => 'Не знойдзена ядро для гэтага сервера. Праверце наяўнасць абнаўленняў Sora.';
 
   @override
-  String get errEngineStart => 'Рухавік не завёўся';
+  String get errEngineStart => 'Ядро не запусцілася. Паглядзіце прычыну ў журнале злучэння.';
 
   @override
-  String get errEngineStopped => 'Рухавік спыніўся';
+  String get errEngineStopped => 'Ядро спынілася. Паспрабуйце злучыцца зноў.';
 
   @override
-  String get errTunnel => 'Няма дазволу на стварэнне злучэння VPN';
-
-  @override
-  String get errServers => 'Сервер наладжаны з памылкай';
+  String get errTunnel => 'Гэты рэжым VPN недаступны. Выберыце іншы рэжым або праверце правы службы.';
 
   @override
   String get errNetwork => 'Немагчыма падключыцца да сервера';
 
   @override
-  String get errTimeout => 'Сервер не адказаў своечасова';
+  String get errTimeout => 'Сервер не адказаў своечасова. Паспрабуйце яшчэ раз праз хвіліну.';
 
   @override
-  String get errFirewall => 'Немагчыма заблакіраваць інтэрнэт па-за VPN';
+  String get errFirewall =>
+      'Не ўдалося заблакаваць доступ да інтэрнэту па-за VPN. Паглядзіце прычыну ў журнале злучэння.';
 
   @override
-  String get errSubFetch => 'Не атрымалася загрузіць падпіску';
+  String get errSubFetch => 'Не ўдалося спампаваць падпіску. Праверце інтэрнэт і паспрабуйце яшчэ раз праз хвіліну.';
 
   @override
-  String get errSubFormat => 'Гэта не спасылка для падпіскі';
+  String get errSubFormat => 'Фармат падпіскі не распазнаны. Папрасіце сумяшчальную спасылку ў пастаўшчыка падпіскі.';
 
   @override
-  String get errSubEmpty => 'Падпіска не мае сервераў';
+  String get errSubEmpty => 'У падпісцы няма сервераў. Звярніцеся да пастаўшчыка падпіскі.';
 
   @override
-  String get errSubDuplicate => 'Гэта падпіска ўжо дададзена';
+  String get errSubDuplicate => 'Гэтая падпіска ўжо дададзеная. Абнавіце яе, каб атрымаць актуальныя серверы.';
 
   @override
-  String get errSubLimit => 'Занадта шмат падпісак';
+  String get errSubLimit => 'Дасягнута мяжа колькасці падпісак. Выдаліце непатрэбную падпіску перад даданнем новай.';
 
   @override
-  String get errSubScheme => 'Спасылка павінна пачынацца з https://';
+  String get errSubScheme =>
+      'Спасылка на падпіску мусіць пачынацца з https://. Папрасіце бяспечную спасылку ў пастаўшчыка.';
 
   @override
-  String get errSecretStore => 'Назапашвальнік Sora пашкоджаны або недаступны';
+  String get errSecretStore =>
+      'Сховішча Sora пашкоджанае або недаступнае. Праверце правы доступу і падрабязнасці ў журнале.';
 
   @override
-  String get errNoServers => 'Каб падключыцца, дадайце падпіску';
+  String get errNoServers => 'Няма сервераў для злучэння. Дадайце падпіску або ўласны сервер.';
 
   @override
   String get connections => 'Сувязі';
@@ -487,8 +487,8 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'падпіска заканчваецца праз # дзён',
-      one: 'падпіска заканчваецца праз дзень #',
+      other: 'падпіска заканчваецца праз $days дзён',
+      one: 'падпіска заканчваецца праз дзень $days',
       zero: 'падпіска заканчваецца праз некалькі гадзін',
     );
     return '$name: $_temp0';
@@ -507,8 +507,8 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Серверы #, самыя хуткія',
-      one: 'Сервер #, самы хуткі',
+      other: 'Серверы $count, самыя хуткія',
+      one: 'Сервер $count, самы хуткі',
     );
     return '$_temp0';
   }
@@ -630,7 +630,7 @@ class SBe extends S {
   String get less => 'менш';
 
   @override
-  String get notificationsEmpty => 'Тут з\'явяцца падзеі падключэння і падпіскі';
+  String get notificationsEmpty => 'Няма апавяшчэнняў';
 
   @override
   String get retryConnect => 'Паўтарыце падключэнне';
@@ -1231,10 +1231,10 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# хвіліны',
-      many: '# хвілін',
-      few: '# хвіліны',
-      one: '# хвіліна',
+      other: '$count хвіліны',
+      many: '$count хвілін',
+      few: '$count хвіліны',
+      one: '$count хвіліна',
     );
     return '$_temp0';
   }
@@ -1244,10 +1244,10 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# гадзіны',
-      many: '# гадзін',
-      few: '# гадзіны',
-      one: '# гадзіна',
+      other: '$count гадзіны',
+      many: '$count гадзін',
+      few: '$count гадзіны',
+      one: '$count гадзіна',
     );
     return '$_temp0';
   }
@@ -1321,10 +1321,10 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# злучэння',
-      many: '# злучэнняў',
-      few: '# злучэнні',
-      one: '# злучэнне',
+      other: '$count злучэння',
+      many: '$count злучэнняў',
+      few: '$count злучэнні',
+      one: '$count злучэнне',
     );
     return '$_temp0';
   }
@@ -1408,21 +1408,6 @@ class SBe extends S {
   String get dnsActual => 'Назіраецца';
 
   @override
-  String get sortBy => 'Сартаваць па';
-
-  @override
-  String get sortSubscription => 'Як у падпісцы';
-
-  @override
-  String get sortPing => 'Пінг';
-
-  @override
-  String get sortSpeed => 'Хуткасць';
-
-  @override
-  String get sortName => 'Імя';
-
-  @override
   String get measureSpeed => 'Вымераць хуткасць';
 
   @override
@@ -1441,13 +1426,10 @@ class SBe extends S {
   String get autoSelectSmart => 'Разумны выбар';
 
   @override
-  String get coreWatchUnstable => 'Злучэнне з ядром Sora нестабільнае';
+  String get coreWatchUnstable => 'Сувязь з ядром нестабільная. Крыху пачакайце і паспрабуйце злучыцца зноў.';
 
   @override
   String get watchReconnect => 'Перападключыць';
-
-  @override
-  String get coreRestoringLink => 'Аднаўленне злучэння з ядром Sora…';
 
   @override
   String get crashRestoreTitle => 'Апошні сеанс быў перапынены';
@@ -1483,7 +1465,7 @@ class SBe extends S {
   String get overrideCustomRules => 'Свае правілы';
 
   @override
-  String get errBenchmarkUnsupported => 'Вымярэнне хуткасці патрабуе больш новага ядра';
+  String get errBenchmarkUnsupported => 'Для вымярэння хуткасці патрэбная навейшая версія ядра. Абнавіце Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1583,10 +1565,10 @@ class SBe extends S {
   String get chainOrderHint => 'Перацягніце, каб змяніць парадак: трафік уваходзіць зверху і выходзіць знізу.';
 
   @override
-  String get chainTooFew => 'Выберыце як мінімум 2 серверы';
+  String get chainTooFew => 'Для ланцужка патрэбныя прынамсі два серверы. Дадайце яшчэ адзін сервер.';
 
   @override
-  String get chainTooMany => 'Ланцужок змяшчае не больш за 3 серверы';
+  String get chainTooMany => 'У ланцужку можа быць не больш за тры серверы. Прыбярыце лішнія серверы.';
 
   @override
   String get chainEstimate => 'Разліковая затрымка';
@@ -1603,10 +1585,10 @@ class SBe extends S {
   }
 
   @override
-  String get chainUnsupported => 'Цяперашні рухавік не можа будаваць ланцугі';
+  String get chainUnsupported => 'Выбранае ядро не падтрымлівае ланцужкі. Выберыце сумяшчальнае ядро.';
 
   @override
-  String get chainHopMissing => 'Адзін з сервераў ланцужка больш не даступны';
+  String get chainHopMissing => 'Адзін з сервераў ланцужка больш недаступны. Выберыце іншы сервер для гэтага звяна.';
 
   @override
   String chainHop(Object n) {
@@ -1676,7 +1658,7 @@ class SBe extends S {
       'Запускае zapret разам з VPN-тунэлем: трафік тунэля ідзе праз VPN, а прамы трафік праз сродак абыходу блакаванняў.';
 
   @override
-  String get chainDuplicate => 'Кожны сервер можа з\'явіцца толькі адзін раз';
+  String get chainDuplicate => 'У ланцужку паўтараецца сервер. Выберыце розныя серверы для кожнага звяна.';
 
   @override
   String get edit => 'Рэдагаваць';
@@ -1785,10 +1767,10 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Знойдзена # уцечкі',
-      many: 'Знойдзена # уцечак',
-      few: 'Знойдзены # уцечкі',
-      one: 'Знойдзена # уцечка',
+      other: 'Знойдзена $count уцечкі',
+      many: 'Знойдзена $count уцечак',
+      few: 'Знойдзены $count уцечкі',
+      one: 'Знойдзена $count уцечка',
     );
     return '$_temp0';
   }
@@ -1992,7 +1974,8 @@ class SBe extends S {
   String get extWorkerFailed => 'Фонавае заданне пашырэння не выканана. Праверце журнал пашырэння.';
 
   @override
-  String get extAssetRejected => 'Файл пашырэння адхілены: неразборлівыя колеры або няправільныя правілы.';
+  String get extAssetRejected =>
+      'Файл пашырэння змяшчае нечытэльныя колеры або няправільныя правілы. Папрасіце аўтара пашырэння выправіць файл.';
 
   @override
   String get extVerifiedSora => 'Праверана Sora';
@@ -2028,4 +2011,114 @@ class SBe extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Унутраная памылка Sora. Захавайце журнал і паведаміце пра збой.';
+
+  @override
+  String get errTls => 'Сертыфікат сервера адхілены. Праверце гадзіннік або звярніцеся да правайдара.';
+
+  @override
+  String get errFileAccess => 'Няма доступу да файла. Праверце правы і вольнае месца.';
+
+  @override
+  String get errDataLimit => 'Занадта шмат даных. Выберыце менш элементаў і паўтарыце.';
+
+  @override
+  String get errCredentials => 'Захаваныя даныя доступу страчаныя. Імпартуйце сервер зноў.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Абноўлена: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Яшчэ не абнаўлялася. Паўтарыце.';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Сервер вярнуў код HTTP $status. Праверце спасылку або звярніцеся да пастаўшчыка.',
+      zero: 'Сервер адхіліў запыт. Праверце спасылку або звярніцеся да пастаўшчыка.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'Налады сервера няпоўныя або не падтрымліваюцца. Абнавіце падпіску.';
+
+  @override
+  String get errServerIds => 'Два серверы маюць аднолькавы ідэнтыфікатар. Імпартуйце іх зноў.';
+
+  @override
+  String get errRoutingGroup => 'Маршрут спасылаецца на выдаленыя серверы або пашкоджаную групу. Абнавіце падпіску.';
+
+  @override
+  String get errConnections => 'Спіс падключэнняў недаступны. Падключыцеся або выберыце іншае ядро.';
+
+  @override
+  String get errLogs => 'Гэта служба не вядзе журнал. Абнавіце Sora.';
+
+  @override
+  String get errDiagnostics => 'Не ўдалося сабраць дыягностыку. Паўтарыце або захавайце журнал.';
+
+  @override
+  String get errMissingItem => 'Запытаны элемент больш не існуе. Абнавіце спіс.';
+
+  @override
+  String get errInvalidRequest => 'У запыце няправільныя значэнні. Праверце ўведзеныя даныя і паўтарыце.';
+
+  @override
+  String get errProxyLogin =>
+      'Сістэмны проксі не падтрымлівае гэты ўваход. Прыбярыце лагін і пароль лакальнага проксі.';
+
+  @override
+  String get errLogFilter => 'Няправільны фільтр журнала. Ачысціце пошук і паўтарыце.';
+
+  @override
+  String get errSubRedirect => 'Сервер перанакіраваў на небяспечны адрас. Запытайце новую спасылку ў правайдара.';
+
+  @override
+  String get errProxySetup => 'Не ўдалося наладзіць сістэмны проксі. Перападключыцеся або адкрыйце журнал.';
+
+  @override
+  String get notificationsToday => 'Сёння';
+
+  @override
+  String get notificationsYesterday => 'Учора';
+
+  @override
+  String get notificationsMarkRead => 'Прачытаць усе';
+
+  @override
+  String get notificationsUnread => 'Не прачытана';
+
+  @override
+  String get desktopNotifications => 'Сістэмныя апавяшчэнні';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval =>
+      'Недапушчальны інтэрвал абнаўлення падпіскі. Выберыце інтэрвал, рэкамендаваны пастаўшчыком.';
+
+  @override
+  String get errRule => 'У правіле маршрутызацыі ёсць памылка. Праверце пазначаны дамен, IP-адрас або праграму.';
+
+  @override
+  String get errDns => 'Няправільныя налады DNS. Праверце адрас DNS-сервера.';
+
+  @override
+  String get errEndpoint => 'Няправільны адрас сервера для праверкі. Праверце імя хоста і порт.';
+
+  @override
+  String get errCancelled => 'Запыт скасаваны. Пры патрэбе выканайце дзеянне зноў.';
 }

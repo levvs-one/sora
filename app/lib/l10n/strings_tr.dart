@@ -205,64 +205,65 @@ class STr extends S {
   String get errGeneric => 'Bir şeyler ters gitti';
 
   @override
-  String get errCore => 'Sora hizmeti yanıt vermiyor';
+  String get errCore => 'Sora hizmeti yanıt vermiyor. Biraz bekleyip yeniden deneyin.';
 
   @override
-  String get errAuth => 'Sora hizmetine erişim yok';
+  String get errAuth => 'Sora hizmetine erişim reddedildi. Uygulamayı yeniden başlatıp tekrar deneyin.';
 
   @override
-  String get errVersion => 'Sora\'yi güncelleyin: uygulama ve hizmet farklı sürümlerdir';
+  String get errVersion => 'Sora uygulamasının ve hizmetinin sürümleri farklı. Sora’yı güncelleyin.';
 
   @override
-  String get errBusy => 'Bekle, önceki komut hala çalışıyor';
+  String get errBusy => 'Önceki komut hâlâ çalışıyor. Tamamlanmasını bekleyin.';
 
   @override
-  String get errEngineMissing => 'Bu sunucu için motor bulunamadı';
+  String get errEngineMissing => 'Bu sunucu için gereken motor bulunamadı. Sora güncellemelerini kontrol edin.';
 
   @override
-  String get errEngineStart => 'Motor çalışmadı';
+  String get errEngineStart => 'Motor başlatılamadı. Nedeni için bağlantı günlüğüne bakın.';
 
   @override
-  String get errEngineStopped => 'Motor durdu';
+  String get errEngineStopped => 'Motor durdu. Yeniden bağlanmayı deneyin.';
 
   @override
-  String get errTunnel => 'VPN bağlantısı oluşturma izni yok';
-
-  @override
-  String get errServers => 'Sunucu bir hatayla yapılandırıldı';
+  String get errTunnel => 'Bu VPN modu kullanılamıyor. Başka bir mod seçin veya hizmet izinlerini kontrol edin.';
 
   @override
   String get errNetwork => 'Sunucuya ulaşılamıyor';
 
   @override
-  String get errTimeout => 'Sunucu zamanında yanıt vermedi';
+  String get errTimeout => 'Sunucu zamanında yanıt vermedi. Bir dakika sonra tekrar deneyin.';
 
   @override
-  String get errFirewall => 'VPN dışında internet engellenemedi';
+  String get errFirewall => 'VPN dışındaki internet erişimi engellenemedi. Nedeni için bağlantı günlüğüne bakın.';
 
   @override
-  String get errSubFetch => 'Abonelik yüklenemedi';
+  String get errSubFetch =>
+      'Abonelik indirilemedi. İnternet bağlantınızı kontrol edip bir dakika sonra tekrar deneyin.';
 
   @override
-  String get errSubFormat => 'Bu bir abonelik bağlantısı değil';
+  String get errSubFormat => 'Abonelik biçimi tanınmadı. Sağlayıcınızdan uyumlu bir abonelik bağlantısı isteyin.';
 
   @override
-  String get errSubEmpty => 'Aboneliğin sunucusu yok';
+  String get errSubEmpty => 'Abonelikte sunucu yok. Abonelik sağlayıcınıza başvurun.';
 
   @override
-  String get errSubDuplicate => 'Bu abonelik zaten eklenmiş';
+  String get errSubDuplicate => 'Bu abonelik zaten eklenmiş. Güncel sunucuları almak için aboneliği yenileyin.';
 
   @override
-  String get errSubLimit => 'Çok fazla abonelik';
+  String get errSubLimit =>
+      'Abonelik sınırına ulaşıldı. Yeni bir abonelik eklemeden önce kullanmadığınız birini kaldırın.';
 
   @override
-  String get errSubScheme => 'Bağlantı https:// ile başlamalıdır';
+  String get errSubScheme =>
+      'Abonelik bağlantısı https:// ile başlamalıdır. Sağlayıcınızdan güvenli bir bağlantı isteyin.';
 
   @override
-  String get errSecretStore => 'Sora depolama alanı hasarlı veya kullanılamıyor';
+  String get errSecretStore =>
+      'Sora depolama alanı hasarlı veya erişilemiyor. Erişim izinlerini ve günlükteki ayrıntıları kontrol edin.';
 
   @override
-  String get errNoServers => 'Bağlanmak için bir abonelik ekleyin';
+  String get errNoServers => 'Bağlanılabilecek sunucu yok. Bir abonelik veya kendi sunucunuzu ekleyin.';
 
   @override
   String get connections => 'Bağlantılar';
@@ -487,8 +488,8 @@ class STr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'abonelik # gün içinde sona eriyor',
-      one: 'abonelik # gününde sona eriyor',
+      other: 'abonelik $days gün içinde sona eriyor',
+      one: 'abonelik $days gününde sona eriyor',
       zero: 'abonelik birkaç saat içinde bitiyor',
     );
     return '$name: $_temp0';
@@ -507,8 +508,8 @@ class STr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# sunucuları, en hızlısı',
-      one: '# sunucusu, en hızlısı',
+      other: '$count sunucuları, en hızlısı',
+      one: '$count sunucusu, en hızlısı',
     );
     return '$_temp0';
   }
@@ -630,7 +631,7 @@ class STr extends S {
   String get less => 'Az';
 
   @override
-  String get notificationsEmpty => 'Bağlantı ve abonelik etkinlikleri burada görünecek';
+  String get notificationsEmpty => 'Bildirim yok';
 
   @override
   String get retryConnect => 'Bağlantıyı yeniden dene';
@@ -1229,13 +1230,13 @@ class STr extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# dakika', one: '# dakika');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count dakika', one: '$count dakika');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# saat', one: '# saat');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count saat', one: '$count saat');
     return '$_temp0';
   }
 
@@ -1305,7 +1306,7 @@ class STr extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# bağlantı', one: '# bağlantı');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count bağlantı', one: '$count bağlantı');
     return '$_temp0';
   }
 
@@ -1388,21 +1389,6 @@ class STr extends S {
   String get dnsActual => 'Gözlemlendi';
 
   @override
-  String get sortBy => 'Sıralama ölçütü';
-
-  @override
-  String get sortSubscription => 'Abonelikteki sırayla';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Hız';
-
-  @override
-  String get sortName => 'Ad';
-
-  @override
   String get measureSpeed => 'Hızı ölç';
 
   @override
@@ -1421,13 +1407,10 @@ class STr extends S {
   String get autoSelectSmart => 'Akıllı seçim';
 
   @override
-  String get coreWatchUnstable => 'Sora çekirdeğine olan bağlantı kararsız';
+  String get coreWatchUnstable => 'Çekirdekle bağlantı kararsız. Biraz bekleyip yeniden bağlanmayı deneyin.';
 
   @override
   String get watchReconnect => 'Yeniden bağlan';
-
-  @override
-  String get coreRestoringLink => 'Sora çekirdeğiyle bağlantı geri yükleniyor…';
 
   @override
   String get crashRestoreTitle => 'Son oturum kesintiye uğradı';
@@ -1463,7 +1446,7 @@ class STr extends S {
   String get overrideCustomRules => 'Kendi kuralları';
 
   @override
-  String get errBenchmarkUnsupported => 'Hız ölçümü için daha yeni bir çekirdek gerekiyor';
+  String get errBenchmarkUnsupported => 'Hız ölçümü daha yeni bir çekirdek gerektiriyor. Sora’yı güncelleyin.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1564,10 +1547,10 @@ class STr extends S {
   String get chainOrderHint => 'Yeniden sıralamak için sürükleyin: trafik üstten girer ve alttan çıkar.';
 
   @override
-  String get chainTooFew => 'En az 2 sunucu seçin';
+  String get chainTooFew => 'Bir zincir için en az iki sunucu gerekir. Bir sunucu daha ekleyin.';
 
   @override
-  String get chainTooMany => 'Bir zincirde en fazla 3 sunucu bulunur';
+  String get chainTooMany => 'Bir zincirde en fazla üç sunucu olabilir. Fazla sunucuları kaldırın.';
 
   @override
   String get chainEstimate => 'Tahmini gecikme';
@@ -1584,10 +1567,10 @@ class STr extends S {
   }
 
   @override
-  String get chainUnsupported => 'Mevcut motor zincir oluşturamıyor';
+  String get chainUnsupported => 'Seçilen motor zincirleri desteklemiyor. Uyumlu bir motor seçin.';
 
   @override
-  String get chainHopMissing => 'Zincir sunuculardan biri artık kullanılamıyor';
+  String get chainHopMissing => 'Zincirdeki bir sunucu artık kullanılamıyor. O adım için başka bir sunucu seçin.';
 
   @override
   String chainHop(Object n) {
@@ -1657,7 +1640,8 @@ class STr extends S {
       'zapret\'i VPN tüneliyle birlikte çalıştırır: tünel trafiği VPN üzerinden, doğrudan trafik ise engel aşma mekanizması üzerinden gider.';
 
   @override
-  String get chainDuplicate => 'Her sunucu yalnızca bir kez görünebilir';
+  String get chainDuplicate =>
+      'Zincirde aynı sunucu birden fazla kez kullanılıyor. Her adım için farklı bir sunucu seçin.';
 
   @override
   String get edit => 'Düzenle';
@@ -1766,8 +1750,8 @@ class STr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# sızıntı bulundu',
-      one: '# sızıntı bulundu',
+      other: '$count sızıntı bulundu',
+      one: '$count sızıntı bulundu',
     );
     return '$_temp0';
   }
@@ -1972,7 +1956,8 @@ class STr extends S {
   String get extWorkerFailed => 'Uzantının arka plan görevi başarısız oldu. Uzantı günlüğünü kontrol edin.';
 
   @override
-  String get extAssetRejected => 'Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar.';
+  String get extAssetRejected =>
+      'Uzantı dosyası okunması zor renkler veya geçersiz kurallar içeriyor. Uzantının yazarından dosyayı düzeltmesini isteyin.';
 
   @override
   String get extVerifiedSora => 'Sora tarafından doğrulandı';
@@ -2008,4 +1993,116 @@ class STr extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora iç hatası. Günlüğü kaydedip sorunu bildirin.';
+
+  @override
+  String get errTls => 'Sunucu sertifikası reddedildi. Saati kontrol edin veya sağlayıcıya başvurun.';
+
+  @override
+  String get errFileAccess => 'Dosyaya erişilemiyor. İzinleri ve boş alanı kontrol edin.';
+
+  @override
+  String get errDataLimit => 'Çok fazla veri. Daha az öğe seçip yeniden deneyin.';
+
+  @override
+  String get errCredentials => 'Kayıtlı kimlik bilgileri eksik. Sunucuyu yeniden içe aktarın.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Son güncelleme: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Henüz güncellenmedi. Yeniden deneyin.';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Sunucu HTTP $status kodunu döndürdü. Bağlantıyı kontrol edin veya sağlayıcınıza başvurun.',
+      zero: 'Sunucu isteği reddetti. Bağlantıyı kontrol edin veya sağlayıcınıza başvurun.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'Sunucu ayarları eksik veya desteklenmiyor. Aboneliği yenileyin.';
+
+  @override
+  String get errServerIds => 'İki sunucu aynı kimliği kullanıyor. Yeniden içe aktarın.';
+
+  @override
+  String get errRoutingGroup => 'Yönlendirme eksik sunuculara veya bozuk bir gruba başvuruyor. Aboneliği yenileyin.';
+
+  @override
+  String get errConnections => 'Bağlantı listesi kullanılamıyor. Bağlanın veya başka bir motor seçin.';
+
+  @override
+  String get errLogs => 'Bu hizmet günlük tutmuyor. Sora’yı güncelleyin.';
+
+  @override
+  String get errDiagnostics => 'Tanılama toplanamadı. Yeniden deneyin veya günlüğü kaydedin.';
+
+  @override
+  String get errMissingItem => 'İstenen öğe artık yok. Listeyi yenileyin.';
+
+  @override
+  String get errInvalidRequest => 'İstek geçersiz değerler içeriyor. Girdinizi kontrol edip yeniden deneyin.';
+
+  @override
+  String get errProxyLogin =>
+      'Sistem vekili bu girişi desteklemiyor. Yerel vekilin kullanıcı adını ve parolasını kaldırın.';
+
+  @override
+  String get errLogFilter => 'Günlük filtresi geçersiz. Aramayı temizleyip yeniden deneyin.';
+
+  @override
+  String get errSubRedirect =>
+      'Sunucu güvenli olmayan bir adrese yönlendirdi. Sağlayıcınızdan yeni bir bağlantı isteyin.';
+
+  @override
+  String get errProxySetup => 'Sistem vekili yapılandırılamadı. Yeniden bağlanın veya günlüğü açın.';
+
+  @override
+  String get notificationsToday => 'Bugün';
+
+  @override
+  String get notificationsYesterday => 'Dün';
+
+  @override
+  String get notificationsMarkRead => 'Tümünü okundu işaretle';
+
+  @override
+  String get notificationsUnread => 'Okunmadı';
+
+  @override
+  String get desktopNotifications => 'Masaüstü bildirimleri';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval => 'Abonelik güncelleme aralığı geçersiz. Sağlayıcınızın önerdiği aralığı seçin.';
+
+  @override
+  String get errRule =>
+      'Bir yönlendirme kuralı geçersiz. Kuraldaki alan adını, IP adresini veya uygulamayı kontrol edin.';
+
+  @override
+  String get errDns => 'DNS ayarları geçersiz. DNS sunucusunun adresini kontrol edin.';
+
+  @override
+  String get errEndpoint =>
+      'Test edilecek sunucunun adresi geçersiz. Ana bilgisayar adını ve bağlantı noktasını kontrol edin.';
+
+  @override
+  String get errCancelled => 'İstek iptal edildi. Gerekirse işlemi tekrarlayın.';
 }

@@ -205,64 +205,68 @@ class SEs extends S {
   String get errGeneric => 'algo salió mal';
 
   @override
-  String get errCore => 'El servicio Sora no responde';
+  String get errCore => 'El servicio de Sora no responde. Espera un momento y vuelve a intentarlo.';
 
   @override
-  String get errAuth => 'Sin acceso al servicio Sora';
+  String get errAuth => 'Se ha denegado el acceso al servicio de Sora. Reinicia la aplicación y vuelve a intentarlo.';
 
   @override
-  String get errVersion => 'Actualización Sora: la aplicación y el servicio son versiones diferentes';
+  String get errVersion => 'La aplicación y el servicio de Sora tienen versiones distintas. Actualiza Sora.';
 
   @override
-  String get errBusy => 'Espera, el comando anterior todavía se está ejecutando.';
+  String get errBusy => 'El comando anterior sigue ejecutándose. Espera a que termine.';
 
   @override
-  String get errEngineMissing => 'No se encontró ningún motor para este servidor';
+  String get errEngineMissing =>
+      'Falta el motor necesario para este servidor. Comprueba si hay actualizaciones de Sora.';
 
   @override
-  String get errEngineStart => 'El motor no arrancó';
+  String get errEngineStart => 'El motor no pudo iniciarse. Consulta el registro de conexión para ver la causa.';
 
   @override
-  String get errEngineStopped => 'El motor se detuvo';
+  String get errEngineStopped => 'El motor se ha detenido. Intenta conectarte de nuevo.';
 
   @override
-  String get errTunnel => 'Sin permiso para crear la conexión VPN';
-
-  @override
-  String get errServers => 'El servidor está configurado con un error.';
+  String get errTunnel => 'Este modo VPN no está disponible. Elija otro modo o revise los permisos del servicio.';
 
   @override
   String get errNetwork => 'No se puede llegar al servidor';
 
   @override
-  String get errTimeout => 'El servidor no respondió a tiempo.';
+  String get errTimeout => 'El servidor no respondió a tiempo. Vuelve a intentarlo dentro de un minuto.';
 
   @override
-  String get errFirewall => 'No se pudo bloquear Internet fuera de la VPN';
+  String get errFirewall =>
+      'No se pudo bloquear el acceso a Internet fuera de la VPN. Consulta el registro de conexión para ver la causa.';
 
   @override
-  String get errSubFetch => 'No se pudo cargar la suscripción';
+  String get errSubFetch =>
+      'No se pudo descargar la suscripción. Comprueba tu conexión a Internet y vuelve a intentarlo en un minuto.';
 
   @override
-  String get errSubFormat => 'Este no es un enlace de suscripción.';
+  String get errSubFormat =>
+      'No se reconoce el formato de la suscripción. Pide a tu proveedor un enlace de suscripción compatible.';
 
   @override
-  String get errSubEmpty => 'La suscripción no tiene servidores.';
+  String get errSubEmpty => 'La suscripción no contiene servidores. Contacta con el proveedor de la suscripción.';
 
   @override
-  String get errSubDuplicate => 'Esta suscripción ya está agregada.';
+  String get errSubDuplicate =>
+      'Esta suscripción ya está añadida. Actualízala para obtener los servidores más recientes.';
 
   @override
-  String get errSubLimit => 'Demasiadas suscripciones';
+  String get errSubLimit => 'Se ha alcanzado el límite de suscripciones. Elimina una que no uses antes de añadir otra.';
 
   @override
-  String get errSubScheme => 'El enlace debe comenzar con https://';
+  String get errSubScheme =>
+      'El enlace de suscripción debe empezar por https://. Pide un enlace seguro a tu proveedor.';
 
   @override
-  String get errSecretStore => 'El almacenamiento Sora está dañado o no está disponible';
+  String get errSecretStore =>
+      'El almacenamiento de Sora está dañado o no es accesible. Comprueba los permisos de acceso y consulta el registro.';
 
   @override
-  String get errNoServers => 'Añade una suscripción para conectarte';
+  String get errNoServers => 'No hay servidores a los que conectarse. Añade una suscripción o tu propio servidor.';
 
   @override
   String get connections => 'Conexiones';
@@ -487,8 +491,8 @@ class SEs extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'la suscripción finaliza en días #',
-      one: 'la suscripción finaliza el día #',
+      other: 'la suscripción finaliza en días $days',
+      one: 'la suscripción finaliza el día $days',
       zero: 'la suscripción finaliza en unas horas',
     );
     return '$name: $_temp0';
@@ -507,8 +511,8 @@ class SEs extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Servidores #, la más rápida',
-      one: 'Servidor #, la más rápida',
+      other: 'Servidores $count, la más rápida',
+      one: 'Servidor $count, la más rápida',
     );
     return '$_temp0';
   }
@@ -631,7 +635,7 @@ class SEs extends S {
   String get less => 'Menos';
 
   @override
-  String get notificationsEmpty => 'Los eventos de conexión y suscripción aparecerán aquí';
+  String get notificationsEmpty => 'No hay notificaciones';
 
   @override
   String get retryConnect => 'Reintentar conexión';
@@ -1233,13 +1237,13 @@ class SEs extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutos', one: '# minuto');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count minutos', one: '$count minuto');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# horas', one: '# hora');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count horas', one: '$count hora');
     return '$_temp0';
   }
 
@@ -1310,7 +1314,12 @@ class SEs extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# conexiones', one: '# conexión');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count conexiones',
+      one: '$count conexión',
+    );
     return '$_temp0';
   }
 
@@ -1392,21 +1401,6 @@ class SEs extends S {
   String get dnsActual => 'Observado';
 
   @override
-  String get sortBy => 'Ordenar por';
-
-  @override
-  String get sortSubscription => 'Como en la suscripción';
-
-  @override
-  String get sortPing => 'Hacer ping';
-
-  @override
-  String get sortSpeed => 'Velocidad';
-
-  @override
-  String get sortName => 'Nombre';
-
-  @override
   String get measureSpeed => 'Medir velocidad';
 
   @override
@@ -1425,13 +1419,11 @@ class SEs extends S {
   String get autoSelectSmart => 'Elección inteligente';
 
   @override
-  String get coreWatchUnstable => 'La conexión al núcleo Sora es inestable';
+  String get coreWatchUnstable =>
+      'La conexión con el núcleo es inestable. Espera un momento e intenta conectarte de nuevo.';
 
   @override
   String get watchReconnect => 'Reconectar';
-
-  @override
-  String get coreRestoringLink => 'Restaurando la conexión al núcleo Sora…';
 
   @override
   String get crashRestoreTitle => 'La última sesión fue interrumpida';
@@ -1467,7 +1459,7 @@ class SEs extends S {
   String get overrideCustomRules => 'Reglas propias';
 
   @override
-  String get errBenchmarkUnsupported => 'La medición de velocidad necesita un núcleo más nuevo';
+  String get errBenchmarkUnsupported => 'La medición de velocidad requiere un núcleo más reciente. Actualiza Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1570,10 +1562,10 @@ class SEs extends S {
       'Arrastrar para reordenar: el tráfico entra por la parte superior y sale por la parte inferior.';
 
   @override
-  String get chainTooFew => 'Elige al menos 2 servidores';
+  String get chainTooFew => 'Una cadena necesita al menos dos servidores. Añade otro servidor.';
 
   @override
-  String get chainTooMany => 'Una cadena tiene como máximo 3 servidores';
+  String get chainTooMany => 'Una cadena puede tener un máximo de tres servidores. Quita los servidores que sobren.';
 
   @override
   String get chainEstimate => 'Latencia estimada';
@@ -1590,10 +1582,10 @@ class SEs extends S {
   }
 
   @override
-  String get chainUnsupported => 'El motor actual no puede construir cadenas.';
+  String get chainUnsupported => 'El motor seleccionado no admite cadenas. Elige un motor compatible.';
 
   @override
-  String get chainHopMissing => 'Uno de los servidores de la cadena ya no está disponible';
+  String get chainHopMissing => 'Un servidor de la cadena ya no está disponible. Elige otro servidor para ese salto.';
 
   @override
   String chainHop(Object n) {
@@ -1663,7 +1655,8 @@ class SEs extends S {
       'Ejecuta zapret junto al túnel VPN: el tráfico del túnel usa la VPN y el tráfico directo pasa por el mecanismo de evasión.';
 
   @override
-  String get chainDuplicate => 'Cada servidor puede aparecer solo una vez';
+  String get chainDuplicate =>
+      'Un servidor aparece varias veces en la cadena. Elige un servidor diferente para cada salto.';
 
   @override
   String get edit => 'Editar';
@@ -1772,8 +1765,8 @@ class SEs extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# fugas encontradas',
-      one: '# fuga encontrada',
+      other: '$count fugas encontradas',
+      one: '$count fuga encontrada',
     );
     return '$_temp0';
   }
@@ -1979,7 +1972,8 @@ class SEs extends S {
   String get extWorkerFailed => 'Falló la tarea en segundo plano de la extensión. Revisa su registro.';
 
   @override
-  String get extAssetRejected => 'Archivo de extensión rechazado: colores ilegibles o reglas no válidas.';
+  String get extAssetRejected =>
+      'El archivo de la extensión contiene colores ilegibles o reglas no válidas. Pide al autor de la extensión que lo corrija.';
 
   @override
   String get extVerifiedSora => 'Verificado por Sora';
@@ -2015,4 +2009,117 @@ class SEs extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Error interno de Sora. Guarde el registro e informe del fallo.';
+
+  @override
+  String get errTls => 'Certificado del servidor rechazado. Revise el reloj o contacte al proveedor.';
+
+  @override
+  String get errFileAccess => 'No se puede acceder al archivo. Revise los permisos y el espacio libre.';
+
+  @override
+  String get errDataLimit => 'Demasiados datos. Seleccione menos elementos y reintente.';
+
+  @override
+  String get errCredentials => 'Faltan las credenciales guardadas. Importe el servidor de nuevo.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Última actualización: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Aún sin actualizar. Reintente.';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'El servidor devolvió el código HTTP $status. Revisa el enlace o contacta con tu proveedor.',
+      zero: 'El servidor rechazó la solicitud. Revisa el enlace o contacta con tu proveedor.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer =>
+      'La configuración del servidor está incompleta o no es compatible. Actualice la suscripción.';
+
+  @override
+  String get errServerIds => 'Dos servidores comparten un identificador. Impórtelos de nuevo.';
+
+  @override
+  String get errRoutingGroup => 'La ruta apunta a servidores ausentes o a un grupo dañado. Actualice la suscripción.';
+
+  @override
+  String get errConnections => 'Lista de conexiones no disponible. Conéctese o elija otro motor.';
+
+  @override
+  String get errLogs => 'Este servicio no guarda registros. Actualice Sora.';
+
+  @override
+  String get errDiagnostics => 'No se pudo recopilar el diagnóstico. Reintente o guarde el registro.';
+
+  @override
+  String get errMissingItem => 'El elemento solicitado ya no existe. Actualice la lista.';
+
+  @override
+  String get errInvalidRequest => 'La solicitud contiene valores inválidos. Revise los datos e inténtelo de nuevo.';
+
+  @override
+  String get errProxyLogin =>
+      'El proxy del sistema no admite este acceso. Quite el usuario y la contraseña del proxy local.';
+
+  @override
+  String get errLogFilter => 'Filtro de registro inválido. Borre la búsqueda y reintente.';
+
+  @override
+  String get errSubRedirect => 'El servidor redirigió a una dirección insegura. Pida un enlace nuevo al proveedor.';
+
+  @override
+  String get errProxySetup => 'No se pudo configurar el proxy del sistema. Reconecte o abra el registro.';
+
+  @override
+  String get notificationsToday => 'Hoy';
+
+  @override
+  String get notificationsYesterday => 'Ayer';
+
+  @override
+  String get notificationsMarkRead => 'Marcar todo como leído';
+
+  @override
+  String get notificationsUnread => 'Sin leer';
+
+  @override
+  String get desktopNotifications => 'Notificaciones del escritorio';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval =>
+      'El intervalo de actualización de la suscripción no es válido. Elige el que recomiende tu proveedor.';
+
+  @override
+  String get errRule =>
+      'Una regla de enrutamiento no es válida. Revisa el dominio, la dirección IP o la aplicación de la regla.';
+
+  @override
+  String get errDns => 'La configuración DNS no es válida. Revisa la dirección del servidor DNS.';
+
+  @override
+  String get errEndpoint =>
+      'La dirección del servidor que se va a comprobar no es válida. Revisa el nombre del host y el puerto.';
+
+  @override
+  String get errCancelled => 'Se ha cancelado la solicitud. Repite la acción si lo necesitas.';
 }

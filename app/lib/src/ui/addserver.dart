@@ -277,7 +277,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
       if (failure.key.startsWith('core.subscription.') || failure.key == 'core.request.invalid') {
         _pasteError = S.of(context).customServerLinkInvalid;
       } else {
-        sora.reportFailure(error, source: 'custom-paste');
+        sora.reportFailure(error, source: 'custom-paste', mode: FailureMode.action);
       }
     } finally {
       _filling = false;

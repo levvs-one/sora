@@ -205,64 +205,64 @@ class SRu extends S {
   String get errGeneric => 'Что-то пошло не так';
 
   @override
-  String get errCore => 'Служба Sora не отвечает';
+  String get errCore => 'Служба Sora не отвечает. Подождите немного и попробуйте снова.';
 
   @override
-  String get errAuth => 'Нет доступа к службе Sora';
+  String get errAuth => 'Нет доступа к службе Sora. Перезапустите приложение и попробуйте снова.';
 
   @override
-  String get errVersion => 'Обновите Sora: приложение и служба разных версий';
+  String get errVersion => 'Приложение и служба Sora разных версий. Обновите Sora.';
 
   @override
-  String get errBusy => 'Подождите, предыдущая команда ещё выполняется';
+  String get errBusy => 'Предыдущая команда ещё выполняется. Дождитесь её завершения.';
 
   @override
-  String get errEngineMissing => 'Не найдено ядро для этого сервера';
+  String get errEngineMissing => 'Не найдено ядро для этого сервера. Проверьте наличие обновлений Sora.';
 
   @override
-  String get errEngineStart => 'Ядро не запустилось';
+  String get errEngineStart => 'Ядро не запустилось. Посмотрите причину в журнале подключения.';
 
   @override
-  String get errEngineStopped => 'Ядро остановилось';
+  String get errEngineStopped => 'Ядро остановилось. Попробуйте подключиться снова.';
 
   @override
-  String get errTunnel => 'Нет прав на создание VPN-подключения';
-
-  @override
-  String get errServers => 'Сервер настроен с ошибкой';
+  String get errTunnel => 'Этот режим VPN недоступен. Выберите другой режим или проверьте права службы.';
 
   @override
   String get errNetwork => 'Нет связи с сервером';
 
   @override
-  String get errTimeout => 'Сервер не ответил вовремя';
+  String get errTimeout => 'Сервер не ответил вовремя. Попробуйте ещё раз через минуту.';
 
   @override
-  String get errFirewall => 'Не удалось включить блокировку интернета без VPN';
+  String get errFirewall =>
+      'Не удалось включить блокировку интернета без VPN. Посмотрите причину в журнале подключения.';
 
   @override
-  String get errSubFetch => 'Не удалось загрузить подписку';
+  String get errSubFetch => 'Не удалось загрузить подписку. Проверьте интернет и попробуйте ещё раз через минуту.';
 
   @override
-  String get errSubFormat => 'Это не ссылка на подписку';
+  String get errSubFormat => 'Формат подписки не распознан. Запросите совместимую ссылку у провайдера подписки.';
 
   @override
-  String get errSubEmpty => 'В подписке нет серверов';
+  String get errSubEmpty => 'В подписке нет серверов. Обратитесь к провайдеру подписки.';
 
   @override
-  String get errSubDuplicate => 'Эта подписка уже добавлена';
+  String get errSubDuplicate => 'Эта подписка уже добавлена. Обновите её, чтобы получить актуальные серверы.';
 
   @override
-  String get errSubLimit => 'Слишком много подписок';
+  String get errSubLimit => 'Достигнут предел числа подписок. Удалите ненужную подписку перед добавлением новой.';
 
   @override
-  String get errSubScheme => 'Нужна ссылка, начинающаяся с https://';
+  String get errSubScheme =>
+      'Ссылка на подписку должна начинаться с https://. Запросите защищённую ссылку у провайдера.';
 
   @override
-  String get errSecretStore => 'Хранилище Sora повреждено или недоступно';
+  String get errSecretStore =>
+      'Хранилище Sora повреждено или недоступно. Проверьте права доступа и подробности в журнале.';
 
   @override
-  String get errNoServers => 'Добавьте подписку, чтобы подключиться';
+  String get errNoServers => 'Нет серверов для подключения. Добавьте подписку или свой сервер.';
 
   @override
   String get connections => 'Соединения';
@@ -487,9 +487,9 @@ class SRu extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '# дней',
-      few: '# дня',
-      one: '# день',
+      other: '$days дней',
+      few: '$days дня',
+      one: '$days день',
       zero: 'несколько часов',
     );
     return '$name: подписка закончится через $_temp0';
@@ -508,9 +508,9 @@ class SRu extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# серверов',
-      few: '# сервера',
-      one: '# сервер',
+      other: '$count серверов',
+      few: '$count сервера',
+      one: '$count сервер',
     );
     return '$_temp0, самый быстрый';
   }
@@ -632,7 +632,7 @@ class SRu extends S {
   String get less => 'Свернуть';
 
   @override
-  String get notificationsEmpty => 'Здесь появятся события подключения и подписок';
+  String get notificationsEmpty => 'Нет уведомлений';
 
   @override
   String get retryConnect => 'Подключиться снова';
@@ -1231,16 +1231,22 @@ class SRu extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# минут',
-      few: '# минуты',
-      one: '# минуту',
+      other: '$count минут',
+      few: '$count минуты',
+      one: '$count минуту',
     );
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# часов', few: '# часа', one: '# час');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count часов',
+      few: '$count часа',
+      one: '$count час',
+    );
     return '$_temp0';
   }
 
@@ -1313,9 +1319,9 @@ class SRu extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# соединений',
-      few: '# соединения',
-      one: '# соединение',
+      other: '$count соединений',
+      few: '$count соединения',
+      one: '$count соединение',
     );
     return '$_temp0';
   }
@@ -1398,21 +1404,6 @@ class SRu extends S {
   String get dnsActual => 'Обнаружено';
 
   @override
-  String get sortBy => 'Сортировать';
-
-  @override
-  String get sortSubscription => 'Как в подписке';
-
-  @override
-  String get sortPing => 'Пинг';
-
-  @override
-  String get sortSpeed => 'Скорость';
-
-  @override
-  String get sortName => 'Имя';
-
-  @override
   String get measureSpeed => 'Замерить скорость';
 
   @override
@@ -1431,13 +1422,10 @@ class SRu extends S {
   String get autoSelectSmart => 'Умный выбор';
 
   @override
-  String get coreWatchUnstable => 'Связь с ядром нестабильна';
+  String get coreWatchUnstable => 'Связь с ядром нестабильна. Подождите немного и попробуйте подключиться снова.';
 
   @override
   String get watchReconnect => 'Переподключить';
-
-  @override
-  String get coreRestoringLink => 'Восстанавливаю связь с ядром…';
 
   @override
   String get crashRestoreTitle => 'Прошлое соединение оборвалось';
@@ -1473,7 +1461,7 @@ class SRu extends S {
   String get overrideCustomRules => 'Свои правила';
 
   @override
-  String get errBenchmarkUnsupported => 'Для замера скорости нужна новая версия ядра';
+  String get errBenchmarkUnsupported => 'Для замера скорости нужна новая версия ядра. Обновите Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1574,10 +1562,10 @@ class SRu extends S {
   String get chainOrderHint => 'Перетащите, чтобы изменить порядок: трафик входит сверху, выходит снизу.';
 
   @override
-  String get chainTooFew => 'Выберите минимум 2 сервера';
+  String get chainTooFew => 'Для цепочки нужны хотя бы два сервера. Добавьте ещё один сервер.';
 
   @override
-  String get chainTooMany => 'В цепочке максимум 3 сервера';
+  String get chainTooMany => 'В цепочке может быть не больше трёх серверов. Уберите лишние серверы.';
 
   @override
   String get chainEstimate => 'Примерная задержка';
@@ -1594,10 +1582,10 @@ class SRu extends S {
   }
 
   @override
-  String get chainUnsupported => 'Текущий движок не умеет строить цепочки';
+  String get chainUnsupported => 'Выбранное ядро не поддерживает цепочки. Выберите совместимое ядро.';
 
   @override
-  String get chainHopMissing => 'Один из серверов цепочки больше недоступен';
+  String get chainHopMissing => 'Один из серверов цепочки больше недоступен. Выберите другой сервер для этого звена.';
 
   @override
   String chainHop(Object n) {
@@ -1667,7 +1655,7 @@ class SRu extends S {
       'Запускает zapret рядом с VPN-туннелем: трафик туннеля идёт через VPN, прямой трафик через обход.';
 
   @override
-  String get chainDuplicate => 'Каждый сервер можно выбрать только один раз';
+  String get chainDuplicate => 'В цепочке повторяется сервер. Выберите разные серверы для каждого звена.';
 
   @override
   String get edit => 'Изменить';
@@ -1776,9 +1764,9 @@ class SRu extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Найдено # утечек',
-      few: 'Найдены # утечки',
-      one: 'Найдена # утечка',
+      other: 'Найдено $count утечек',
+      few: 'Найдены $count утечки',
+      one: 'Найдена $count утечка',
     );
     return '$_temp0';
   }
@@ -1983,7 +1971,8 @@ class SRu extends S {
   String get extWorkerFailed => 'Фоновая задача расширения завершилась с ошибкой. Проверьте журнал расширения.';
 
   @override
-  String get extAssetRejected => 'Файл расширения отклонён: нечитаемые цвета или неверные правила.';
+  String get extAssetRejected =>
+      'В файле расширения нечитаемые цвета или неверные правила. Попросите автора расширения исправить файл.';
 
   @override
   String get extVerifiedSora => 'Проверено Sora';
@@ -2019,4 +2008,113 @@ class SRu extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Внутренняя ошибка Sora. Сохраните журнал и сообщите о сбое.';
+
+  @override
+  String get errTls => 'Сертификат сервера отклонён. Проверьте часы или обратитесь к провайдеру.';
+
+  @override
+  String get errFileAccess => 'Нет доступа к файлу. Проверьте права и свободное место.';
+
+  @override
+  String get errDataLimit => 'Слишком много данных. Выберите меньше элементов и повторите.';
+
+  @override
+  String get errCredentials => 'Сохранённые данные доступа потеряны. Импортируйте сервер заново.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Обновлено: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Ещё не обновлялась. Повторите.';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Сервер вернул код HTTP $status. Проверьте ссылку или обратитесь к провайдеру.',
+      zero: 'Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'Настройки сервера неполные или не поддерживаются. Обновите подписку.';
+
+  @override
+  String get errServerIds => 'У двух серверов одинаковый идентификатор. Импортируйте их заново.';
+
+  @override
+  String get errRoutingGroup => 'Маршрут ссылается на удалённые серверы или повреждённую группу. Обновите подписку.';
+
+  @override
+  String get errConnections => 'Список подключений недоступен. Подключитесь или выберите другое ядро.';
+
+  @override
+  String get errLogs => 'Эта служба не ведёт журнал. Обновите Sora.';
+
+  @override
+  String get errDiagnostics => 'Не удалось собрать диагностику. Повторите или сохраните журнал.';
+
+  @override
+  String get errMissingItem => 'Запрошенный элемент больше не существует. Обновите список.';
+
+  @override
+  String get errInvalidRequest => 'В запросе неверные значения. Проверьте введённые данные и повторите.';
+
+  @override
+  String get errProxyLogin => 'Системный прокси не поддерживает этот вход. Уберите логин и пароль локального прокси.';
+
+  @override
+  String get errLogFilter => 'Неверный фильтр журнала. Очистите поиск и повторите.';
+
+  @override
+  String get errSubRedirect => 'Сервер перенаправил на небезопасный адрес. Запросите новую ссылку у провайдера.';
+
+  @override
+  String get errProxySetup => 'Не удалось настроить системный прокси. Переподключитесь или откройте журнал.';
+
+  @override
+  String get notificationsToday => 'Сегодня';
+
+  @override
+  String get notificationsYesterday => 'Вчера';
+
+  @override
+  String get notificationsMarkRead => 'Прочитать все';
+
+  @override
+  String get notificationsUnread => 'Не прочитано';
+
+  @override
+  String get desktopNotifications => 'Системные уведомления';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval =>
+      'Недопустимый интервал обновления подписки. Выберите интервал, рекомендованный провайдером.';
+
+  @override
+  String get errRule => 'В правиле маршрутизации ошибка. Проверьте указанный домен, IP-адрес или программу.';
+
+  @override
+  String get errDns => 'Некорректные настройки DNS. Проверьте адрес DNS-сервера.';
+
+  @override
+  String get errEndpoint => 'Некорректный адрес сервера для проверки. Проверьте имя хоста и порт.';
+
+  @override
+  String get errCancelled => 'Запрос отменён. При необходимости выполните действие снова.';
 }

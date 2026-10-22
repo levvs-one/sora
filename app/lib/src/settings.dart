@@ -54,6 +54,7 @@ class Settings {
     'sidebarExpanded',
     'tourDone',
     'notificationHistory',
+    'subscriptionFailures',
     'speedtestService',
     'checkUpdates',
     'notifiedUpdate',
@@ -61,7 +62,6 @@ class Settings {
     'pendingUpdate',
     'lastRollback',
     'installUuid',
-    'serverSortMode',
     'autoSelectMode',
     'autoSwitchOnDegrade',
     'restoreOnCrash',
@@ -288,10 +288,6 @@ class Settings {
   /// cannot re-roll the cohort to dodge a rollout or a kill-switch.
   String get installUuid => _store.getString('installUuid') ?? '';
 
-  /// Server list sort: subscription, ping, speed or name.
-  String get serverSortMode => _store.getString('serverSortMode') ?? 'subscription';
-  set serverSortMode(String value) => _store.setString('serverSortMode', value);
-
   /// Automatic server choice: ping, speed or smart (ping 40% + speed 40% +
   /// measurement freshness 20%, scaled by probe reliability when known).
   String get autoSelectMode => _store.getString('autoSelectMode') ?? 'ping';
@@ -351,6 +347,10 @@ class Settings {
   bool get tourDone => _store.getBool('tourDone') ?? false;
   Future<void> completeTour() => _store.setBool('tourDone', true);
 
+  /// Failure timestamps and keys only, never provider links or error details.
+  String get subscriptionFailures => _store.getString('subscriptionFailures') ?? '{}';
+  set subscriptionFailures(String value) => _store.setString('subscriptionFailures', value);
+
   List<AppNotification> get notificationHistory => (_store.getStringList('notificationHistory') ?? const <String>[])
       .map(AppNotification.parse)
       .nonNulls
@@ -386,7 +386,6 @@ class Settings {
     'tunnel': 's',
     'mihomoTunStack': 's',
     'xrayTunStack': 's',
-    'serverSortMode': 's',
     'autoSelectMode': 's',
     'blockAds': 'b',
     'killSwitch': 'b',
@@ -469,6 +468,7 @@ class Settings {
     // settings.
     final snapshot = proxySnapshot;
     final history = notificationHistory;
+    final failures = subscriptionFailures;
     final notified = notifiedUpdate;
     final uuid = installUuid;
     final pending = pendingUpdate;
@@ -476,6 +476,7 @@ class Settings {
     await _store.clear();
     await completeTour();
     await saveNotificationHistory(history);
+    subscriptionFailures = failures;
     if (notified.isNotEmpty) await saveNotifiedUpdate(notified);
     // Keep the rollout cohort stable: re-rolling the install UUID on reset
     // would let a settings reset dodge a staged rollout or a kill-switch.

@@ -205,64 +205,67 @@ class SId extends S {
   String get errGeneric => 'Ada yang tidak beres';
 
   @override
-  String get errCore => 'Layanan Sora tidak merespons';
+  String get errCore => 'Layanan Sora tidak merespons. Tunggu sebentar lalu coba lagi.';
 
   @override
-  String get errAuth => 'Tidak ada akses ke layanan Sora';
+  String get errAuth => 'Akses ke layanan Sora ditolak. Mulai ulang aplikasi lalu coba lagi.';
 
   @override
-  String get errVersion => 'Perbarui Sora: aplikasi dan layanan memiliki versi yang berbeda';
+  String get errVersion => 'Versi aplikasi dan layanan Sora berbeda. Perbarui Sora.';
 
   @override
-  String get errBusy => 'Tunggu, perintah sebelumnya masih berjalan';
+  String get errBusy => 'Perintah sebelumnya masih berjalan. Tunggu hingga selesai.';
 
   @override
-  String get errEngineMissing => 'Tidak ada mesin yang ditemukan untuk server ini';
+  String get errEngineMissing => 'Mesin yang diperlukan untuk server ini tidak ditemukan. Periksa pembaruan Sora.';
 
   @override
-  String get errEngineStart => 'Mesinnya tidak menyala';
+  String get errEngineStart => 'Mesin tidak dapat dimulai. Lihat log koneksi untuk mengetahui penyebabnya.';
 
   @override
-  String get errEngineStopped => 'Mesinnya berhenti';
+  String get errEngineStopped => 'Mesin berhenti. Coba hubungkan kembali.';
 
   @override
-  String get errTunnel => 'Tidak ada izin untuk membuat koneksi VPN';
-
-  @override
-  String get errServers => 'Server dikonfigurasi dengan kesalahan';
+  String get errTunnel => 'Mode VPN ini tidak tersedia. Pilih mode lain atau periksa izin layanan.';
 
   @override
   String get errNetwork => 'Tidak dapat menjangkau server';
 
   @override
-  String get errTimeout => 'Server tidak menjawab tepat waktu';
+  String get errTimeout => 'Server tidak merespons tepat waktu. Coba lagi dalam satu menit.';
 
   @override
-  String get errFirewall => 'Tidak dapat memblokir internet di luar VPN';
+  String get errFirewall =>
+      'Akses internet di luar VPN tidak dapat diblokir. Lihat log koneksi untuk mengetahui penyebabnya.';
 
   @override
-  String get errSubFetch => 'Tidak dapat memuat langganan';
+  String get errSubFetch =>
+      'Langganan tidak dapat diunduh. Periksa koneksi internet Anda dan coba lagi dalam satu menit.';
 
   @override
-  String get errSubFormat => 'Ini bukan tautan berlangganan';
+  String get errSubFormat =>
+      'Format langganan tidak dikenali. Minta tautan langganan yang kompatibel dari penyedia Anda.';
 
   @override
-  String get errSubEmpty => 'Langganan tidak memiliki server';
+  String get errSubEmpty => 'Langganan ini tidak berisi server. Hubungi penyedia langganan Anda.';
 
   @override
-  String get errSubDuplicate => 'Langganan ini sudah ditambahkan';
+  String get errSubDuplicate => 'Langganan ini sudah ditambahkan. Perbarui untuk mendapatkan daftar server terbaru.';
 
   @override
-  String get errSubLimit => 'Terlalu banyak langganan';
+  String get errSubLimit =>
+      'Batas jumlah langganan telah tercapai. Hapus langganan yang tidak digunakan sebelum menambahkan yang baru.';
 
   @override
-  String get errSubScheme => 'Tautan harus dimulai dengan https://';
+  String get errSubScheme =>
+      'Tautan langganan harus diawali dengan https://. Minta tautan yang aman dari penyedia Anda.';
 
   @override
-  String get errSecretStore => 'Penyimpanan Sora rusak atau tidak tersedia';
+  String get errSecretStore =>
+      'Penyimpanan Sora rusak atau tidak dapat diakses. Periksa izin akses dan lihat detailnya di log.';
 
   @override
-  String get errNoServers => 'Tambahkan langganan untuk terhubung';
+  String get errNoServers => 'Tidak ada server untuk dihubungkan. Tambahkan langganan atau server Anda sendiri.';
 
   @override
   String get connections => 'Koneksi';
@@ -487,8 +490,8 @@ class SId extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'langganan berakhir dalam # hari',
-      one: 'langganan berakhir pada hari #',
+      other: 'langganan berakhir dalam $days hari',
+      one: 'langganan berakhir pada hari $days',
       zero: 'langganan berakhir dalam beberapa jam',
     );
     return '$name: $_temp0';
@@ -507,8 +510,8 @@ class SId extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Server #, tercepat',
-      one: 'Server #, tercepat',
+      other: 'Server $count, tercepat',
+      one: 'Server $count, tercepat',
     );
     return '$_temp0';
   }
@@ -630,7 +633,7 @@ class SId extends S {
   String get less => 'Lebih sedikit';
 
   @override
-  String get notificationsEmpty => 'Peristiwa koneksi dan langganan akan muncul di sini';
+  String get notificationsEmpty => 'Tidak ada notifikasi';
 
   @override
   String get retryConnect => 'Coba lagi koneksi';
@@ -1230,13 +1233,13 @@ class SId extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# menit');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count menit');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# jam');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count jam');
     return '$_temp0';
   }
 
@@ -1306,7 +1309,7 @@ class SId extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# koneksi');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count koneksi');
     return '$_temp0';
   }
 
@@ -1389,21 +1392,6 @@ class SId extends S {
   String get dnsActual => 'Diamati';
 
   @override
-  String get sortBy => 'Urutkan berdasarkan';
-
-  @override
-  String get sortSubscription => 'Sesuai urutan langganan';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Kecepatan';
-
-  @override
-  String get sortName => 'Nama';
-
-  @override
   String get measureSpeed => 'Ukur kecepatan';
 
   @override
@@ -1422,13 +1410,10 @@ class SId extends S {
   String get autoSelectSmart => 'Pilihan cerdas';
 
   @override
-  String get coreWatchUnstable => 'Koneksi ke inti Sora tidak stabil';
+  String get coreWatchUnstable => 'Koneksi ke inti tidak stabil. Tunggu sebentar lalu coba hubungkan kembali.';
 
   @override
   String get watchReconnect => 'Sambungkan kembali';
-
-  @override
-  String get coreRestoringLink => 'Memulihkan koneksi ke inti Sora…';
 
   @override
   String get crashRestoreTitle => 'Sesi terakhir diinterupsi';
@@ -1464,7 +1449,7 @@ class SId extends S {
   String get overrideCustomRules => 'Aturan sendiri';
 
   @override
-  String get errBenchmarkUnsupported => 'Pengukuran kecepatan membutuhkan inti yang lebih baru';
+  String get errBenchmarkUnsupported => 'Pengukuran kecepatan memerlukan versi inti yang lebih baru. Perbarui Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1565,10 +1550,10 @@ class SId extends S {
   String get chainOrderHint => 'Seret untuk menyusun ulang: lalu lintas masuk di atas dan keluar di bawah.';
 
   @override
-  String get chainTooFew => 'Pilih setidaknya 2 server';
+  String get chainTooFew => 'Rantai memerlukan setidaknya dua server. Tambahkan satu server lagi.';
 
   @override
-  String get chainTooMany => 'Sebuah rantai menampung paling banyak 3 server';
+  String get chainTooMany => 'Rantai hanya dapat berisi hingga tiga server. Hapus server yang berlebih.';
 
   @override
   String get chainEstimate => 'Perkiraan latensi';
@@ -1585,10 +1570,11 @@ class SId extends S {
   }
 
   @override
-  String get chainUnsupported => 'Mesin yang ada saat ini tidak dapat membuat rantai';
+  String get chainUnsupported => 'Mesin yang dipilih tidak mendukung rantai server. Pilih mesin yang kompatibel.';
 
   @override
-  String get chainHopMissing => 'Salah satu server rantai tidak lagi tersedia';
+  String get chainHopMissing =>
+      'Salah satu server dalam rantai tidak lagi tersedia. Pilih server lain untuk tahap tersebut.';
 
   @override
   String chainHop(Object n) {
@@ -1658,7 +1644,8 @@ class SId extends S {
       'Menjalankan zapret bersama terowongan VPN: lalu lintas terowongan memakai VPN, lalu lintas langsung melewati mekanisme pengelakan.';
 
   @override
-  String get chainDuplicate => 'Setiap server hanya dapat muncul satu kali';
+  String get chainDuplicate =>
+      'Ada server yang digunakan lebih dari sekali dalam rantai. Pilih server berbeda untuk setiap tahap.';
 
   @override
   String get edit => 'Sunting';
@@ -1764,7 +1751,7 @@ class SId extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# kebocoran ditemukan');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count kebocoran ditemukan');
     return '$_temp0';
   }
 
@@ -1968,7 +1955,8 @@ class SId extends S {
   String get extWorkerFailed => 'Tugas latar belakang ekstensi gagal. Periksa log ekstensi.';
 
   @override
-  String get extAssetRejected => 'Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.';
+  String get extAssetRejected =>
+      'File ekstensi berisi warna yang sulit dibaca atau aturan yang tidak valid. Minta pembuat ekstensi untuk memperbaiki file tersebut.';
 
   @override
   String get extVerifiedSora => 'Diverifikasi oleh Sora';
@@ -2004,4 +1992,114 @@ class SId extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Kesalahan internal Sora. Simpan log dan laporkan masalahnya.';
+
+  @override
+  String get errTls => 'Sertifikat server ditolak. Periksa jam atau hubungi penyedia.';
+
+  @override
+  String get errFileAccess => 'Tidak dapat mengakses berkas. Periksa izin dan ruang kosong.';
+
+  @override
+  String get errDataLimit => 'Terlalu banyak data. Pilih lebih sedikit item dan coba lagi.';
+
+  @override
+  String get errCredentials => 'Kredensial tersimpan tidak ditemukan. Impor server lagi.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Terakhir diperbarui: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Belum diperbarui. Coba lagi.';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Server mengembalikan kode HTTP $status. Periksa tautan atau hubungi penyedia Anda.',
+      zero: 'Server menolak permintaan. Periksa tautan atau hubungi penyedia Anda.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'Pengaturan server tidak lengkap atau tidak didukung. Perbarui langganan.';
+
+  @override
+  String get errServerIds => 'Dua server memiliki pengenal yang sama. Impor ulang keduanya.';
+
+  @override
+  String get errRoutingGroup => 'Rute mengarah ke server yang hilang atau grup rusak. Perbarui langganan.';
+
+  @override
+  String get errConnections => 'Daftar koneksi tidak tersedia. Hubungkan atau pilih mesin lain.';
+
+  @override
+  String get errLogs => 'Layanan ini tidak menyimpan log. Perbarui Sora.';
+
+  @override
+  String get errDiagnostics => 'Tidak dapat mengumpulkan diagnostik. Coba lagi atau simpan log.';
+
+  @override
+  String get errMissingItem => 'Item yang diminta sudah tidak ada. Segarkan daftar.';
+
+  @override
+  String get errInvalidRequest => 'Permintaan berisi nilai yang tidak valid. Periksa masukan dan coba lagi.';
+
+  @override
+  String get errProxyLogin =>
+      'Proksi sistem tidak mendukung login ini. Hapus nama pengguna dan kata sandi proksi lokal.';
+
+  @override
+  String get errLogFilter => 'Filter log tidak valid. Hapus pencarian dan coba lagi.';
+
+  @override
+  String get errSubRedirect => 'Server mengalihkan ke alamat tidak aman. Minta tautan baru dari penyedia.';
+
+  @override
+  String get errProxySetup => 'Tidak dapat mengatur proksi sistem. Hubungkan ulang atau buka log.';
+
+  @override
+  String get notificationsToday => 'Hari ini';
+
+  @override
+  String get notificationsYesterday => 'Kemarin';
+
+  @override
+  String get notificationsMarkRead => 'Tandai semua sudah dibaca';
+
+  @override
+  String get notificationsUnread => 'Belum dibaca';
+
+  @override
+  String get desktopNotifications => 'Notifikasi desktop';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval =>
+      'Interval pembaruan langganan tidak valid. Pilih interval yang disarankan penyedia Anda.';
+
+  @override
+  String get errRule => 'Aturan perutean tidak valid. Periksa domain, alamat IP, atau aplikasi dalam aturan tersebut.';
+
+  @override
+  String get errDns => 'Pengaturan DNS tidak valid. Periksa alamat server DNS.';
+
+  @override
+  String get errEndpoint => 'Alamat server yang akan diuji tidak valid. Periksa nama host dan port.';
+
+  @override
+  String get errCancelled => 'Permintaan dibatalkan. Ulangi tindakan jika diperlukan.';
 }

@@ -205,64 +205,65 @@ class SAz extends S {
   String get errGeneric => 'Nəsə xəta baş verdi';
 
   @override
-  String get errCore => 'Sora xidməti cavab vermir';
+  String get errCore => 'Sora xidməti cavab vermir. Bir az gözləyib yenidən cəhd edin.';
 
   @override
-  String get errAuth => 'Sora xidmətinə giriş yoxdur';
+  String get errAuth => 'Sora xidmətinə giriş rədd edildi. Tətbiqi yenidən başladıb təkrar cəhd edin.';
 
   @override
-  String get errVersion => 'Sora-ni yeniləyin: proqram və xidmət fərqli versiyalardır';
+  String get errVersion => 'Sora tətbiqi və xidməti fərqli versiyalardadır. Sora-nı yeniləyin.';
 
   @override
-  String get errBusy => 'Gözləyin, əvvəlki əmr hələ də işləyir';
+  String get errBusy => 'Əvvəlki əmr hələ icra olunur. Onun tamamlanmasını gözləyin.';
 
   @override
-  String get errEngineMissing => 'Bu server üçün heç bir mühərrik tapılmadı';
+  String get errEngineMissing => 'Bu server üçün lazım olan mühərrik tapılmadı. Sora yeniləmələrini yoxlayın.';
 
   @override
-  String get errEngineStart => 'Mühərrik işə düşmədi';
+  String get errEngineStart => 'Mühərrik işə düşmədi. Səbəbi öyrənmək üçün bağlantı jurnalına baxın.';
 
   @override
-  String get errEngineStopped => 'Mühərrik dayandı';
+  String get errEngineStopped => 'Mühərrik dayandı. Yenidən qoşulmağa cəhd edin.';
 
   @override
-  String get errTunnel => 'VPN bağlantısı yaratmaq icazəsi yoxdur';
-
-  @override
-  String get errServers => 'Server xəta ilə konfiqurasiya edilib';
+  String get errTunnel => 'Bu VPN rejimi əlçatan deyil. Başqa rejim seçin və ya xidmət icazələrini yoxlayın.';
 
   @override
   String get errNetwork => 'Serverə daxil olmaq mümkün deyil';
 
   @override
-  String get errTimeout => 'Server vaxtında cavab vermədi';
+  String get errTimeout => 'Server vaxtında cavab vermədi. Bir dəqiqə sonra yenidən cəhd edin.';
 
   @override
-  String get errFirewall => 'VPN xaricində interneti bloklamaq mümkün olmadı';
+  String get errFirewall =>
+      'VPN xaricində internetə girişi bloklamaq mümkün olmadı. Səbəbi öyrənmək üçün bağlantı jurnalına baxın.';
 
   @override
-  String get errSubFetch => 'Abunəliyi yükləmək mümkün olmadı';
+  String get errSubFetch =>
+      'Abunəliyi endirmək mümkün olmadı. İnternet bağlantınızı yoxlayıb bir dəqiqə sonra yenidən cəhd edin.';
 
   @override
-  String get errSubFormat => 'Bu abunə keçidi deyil';
+  String get errSubFormat => 'Abunəliyin formatı tanınmadı. Provayderinizdən uyğun abunəlik keçidi istəyin.';
 
   @override
-  String get errSubEmpty => 'Abunəliyin serverləri yoxdur';
+  String get errSubEmpty => 'Abunəlikdə server yoxdur. Abunəlik provayderinizə müraciət edin.';
 
   @override
-  String get errSubDuplicate => 'Bu abunəlik artıq əlavə olunub';
+  String get errSubDuplicate => 'Bu abunəlik artıq əlavə edilib. Aktual serverləri almaq üçün onu yeniləyin.';
 
   @override
-  String get errSubLimit => 'Həddindən artıq abunəlik';
+  String get errSubLimit =>
+      'Abunəlik sayının həddinə çatılıb. Yenisini əlavə etməzdən əvvəl istifadə etmədiyiniz abunəliyi silin.';
 
   @override
-  String get errSubScheme => 'Link https:// ilə başlamalıdır';
+  String get errSubScheme => 'Abunəlik keçidi https:// ilə başlamalıdır. Provayderinizdən təhlükəsiz keçid istəyin.';
 
   @override
-  String get errSecretStore => 'Sora yaddaşı zədələnib və ya əlçatan deyil';
+  String get errSecretStore =>
+      'Sora yaddaşı zədələnib və ya əlçatan deyil. Giriş icazələrini və jurnaldakı təfərrüatları yoxlayın.';
 
   @override
-  String get errNoServers => 'Qoşulmaq üçün abunə əlavə edin';
+  String get errNoServers => 'Qoşulmaq üçün server yoxdur. Abunəlik və ya öz serverinizi əlavə edin.';
 
   @override
   String get connections => 'Əlaqələr';
@@ -487,8 +488,8 @@ class SAz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'abunə # günlərində başa çatır',
-      one: 'abunə # günündə başa çatır',
+      other: 'abunə $days günlərində başa çatır',
+      one: 'abunə $days günündə başa çatır',
       zero: 'abunə bir neçə saat ərzində başa çatır',
     );
     return '$name: $_temp0';
@@ -507,8 +508,8 @@ class SAz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# serverləri, ən sürətli',
-      one: '# server, ən sürətli',
+      other: '$count serverləri, ən sürətli',
+      one: '$count server, ən sürətli',
     );
     return '$_temp0';
   }
@@ -630,7 +631,7 @@ class SAz extends S {
   String get less => 'Daha az';
 
   @override
-  String get notificationsEmpty => 'Bağlantı və abunə hadisələri burada görünəcək';
+  String get notificationsEmpty => 'Bildiriş yoxdur';
 
   @override
   String get retryConnect => 'Bağlantıya yenidən cəhd edin';
@@ -1229,13 +1230,13 @@ class SAz extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# dəqiqə', one: '# dəqiqə');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count dəqiqə', one: '$count dəqiqə');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# saat', one: '# saat');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count saat', one: '$count saat');
     return '$_temp0';
   }
 
@@ -1305,7 +1306,7 @@ class SAz extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# bağlantı', one: '# bağlantı');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count bağlantı', one: '$count bağlantı');
     return '$_temp0';
   }
 
@@ -1388,21 +1389,6 @@ class SAz extends S {
   String get dnsActual => 'Müşahidə edilmişdir';
 
   @override
-  String get sortBy => 'Sırala';
-
-  @override
-  String get sortSubscription => 'Abunəlikdəki ardıcıllıqla';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Sürət';
-
-  @override
-  String get sortName => 'Adı';
-
-  @override
   String get measureSpeed => 'Sürəti ölçün';
 
   @override
@@ -1421,13 +1407,10 @@ class SAz extends S {
   String get autoSelectSmart => 'Ağıllı seçim';
 
   @override
-  String get coreWatchUnstable => 'Sora nüvəsi ilə əlaqə qeyri-sabitdir';
+  String get coreWatchUnstable => 'Nüvə ilə əlaqə qeyri-sabitdir. Bir az gözləyib yenidən qoşulmağa cəhd edin.';
 
   @override
   String get watchReconnect => 'Yenidən qoşun';
-
-  @override
-  String get coreRestoringLink => 'Sora nüvəsi ilə əlaqə bərpa edilir...';
 
   @override
   String get crashRestoreTitle => 'Son seans yarımçıq kəsildi';
@@ -1463,7 +1446,7 @@ class SAz extends S {
   String get overrideCustomRules => 'Öz qaydaları';
 
   @override
-  String get errBenchmarkUnsupported => 'Sürətin ölçülməsi daha yeni bir nüvəyə ehtiyac duyur';
+  String get errBenchmarkUnsupported => 'Sürəti ölçmək üçün daha yeni nüvə lazımdır. Sora-nı yeniləyin.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1564,10 +1547,10 @@ class SAz extends S {
   String get chainOrderHint => 'Yenidən sıralamaq üçün sürükləyin: trafik yuxarıdan daxil olur və aşağıdan çıxır.';
 
   @override
-  String get chainTooFew => 'Ən azı 2 server seçin';
+  String get chainTooFew => 'Zəncir üçün ən azı iki server lazımdır. Daha bir server əlavə edin.';
 
   @override
-  String get chainTooMany => 'Zəncir ən çox 3 serverə malikdir';
+  String get chainTooMany => 'Zəncirdə ən çox üç server ola bilər. Artıq serverləri çıxarın.';
 
   @override
   String get chainEstimate => 'Təxmini gecikmə';
@@ -1584,10 +1567,11 @@ class SAz extends S {
   }
 
   @override
-  String get chainUnsupported => 'Cari mühərrik zəncir qura bilməz';
+  String get chainUnsupported => 'Seçilmiş mühərrik zəncirləri dəstəkləmir. Uyğun mühərrik seçin.';
 
   @override
-  String get chainHopMissing => 'Zəncir serverlərindən biri artıq mövcud deyil';
+  String get chainHopMissing =>
+      'Zəncirdəki serverlərdən biri artıq əlçatan deyil. Həmin mərhələ üçün başqa server seçin.';
 
   @override
   String chainHop(Object n) {
@@ -1657,7 +1641,7 @@ class SAz extends S {
       'zapret VPN tuneli ilə yanaşı işləyir: tunel trafiki VPN-dən, birbaşa trafik isə bloklamadan yan keçid vasitəsindən keçir.';
 
   @override
-  String get chainDuplicate => 'Hər bir server yalnız bir dəfə görünə bilər';
+  String get chainDuplicate => 'Zəncirdə eyni server təkrarlanır. Hər mərhələ üçün fərqli server seçin.';
 
   @override
   String get edit => 'Redaktə et';
@@ -1763,7 +1747,12 @@ class SAz extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# sızma tapıldı', one: '# sızma tapıldı');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sızma tapıldı',
+      one: '$count sızma tapıldı',
+    );
     return '$_temp0';
   }
 
@@ -1968,7 +1957,8 @@ class SAz extends S {
   String get extWorkerFailed => 'Əlavənin fon tapşırığı uğursuz oldu. Əlavənin jurnalını yoxlayın.';
 
   @override
-  String get extAssetRejected => 'Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar.';
+  String get extAssetRejected =>
+      'Genişlənmə faylında oxunmayan rənglər və ya yanlış qaydalar var. Müəllifdən faylı düzəltməsini istəyin.';
 
   @override
   String get extVerifiedSora => 'Sora tərəfindən təsdiqlənib';
@@ -2004,4 +1994,114 @@ class SAz extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora daxili xətası. Jurnalı saxlayın və problemi bildirin.';
+
+  @override
+  String get errTls => 'Server sertifikatı rədd edildi. Saatı yoxlayın və ya provayderlə əlaqə saxlayın.';
+
+  @override
+  String get errFileAccess => 'Fayla giriş yoxdur. İcazələri və boş yeri yoxlayın.';
+
+  @override
+  String get errDataLimit => 'Həddindən çox məlumat. Daha az element seçib yenidən cəhd edin.';
+
+  @override
+  String get errCredentials => 'Saxlanmış giriş məlumatları yoxdur. Serveri yenidən idxal edin.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Son yenilənmə: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Hələ yenilənməyib. Yenidən cəhd edin.';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Server HTTP $status kodunu qaytardı. Keçidi yoxlayın və ya provayderinizə müraciət edin.',
+      zero: 'Server sorğunu rədd etdi. Keçidi yoxlayın və ya provayderinizə müraciət edin.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'Server ayarları natamamdır və ya dəstəklənmir. Abunəliyi yeniləyin.';
+
+  @override
+  String get errServerIds => 'İki server eyni identifikatordan istifadə edir. Onları yenidən idxal edin.';
+
+  @override
+  String get errRoutingGroup =>
+      'Marşrut mövcud olmayan serverlərə və ya zədələnmiş qrupa istinad edir. Abunəliyi yeniləyin.';
+
+  @override
+  String get errConnections => 'Bağlantı siyahısı əlçatan deyil. Qoşulun və ya başqa mühərrik seçin.';
+
+  @override
+  String get errLogs => 'Bu xidmət jurnal saxlamır. Sora-nı yeniləyin.';
+
+  @override
+  String get errDiagnostics => 'Diaqnostika toplana bilmədi. Yenidən cəhd edin və ya jurnalı saxlayın.';
+
+  @override
+  String get errMissingItem => 'Sorğulanan element artıq mövcud deyil. Siyahını yeniləyin.';
+
+  @override
+  String get errInvalidRequest => 'Sorğuda etibarsız dəyərlər var. Daxil etdiklərinizi yoxlayıb yenidən cəhd edin.';
+
+  @override
+  String get errProxyLogin =>
+      'Sistem proksisi bu girişi dəstəkləmir. Yerli proksinin istifadəçi adını və parolunu silin.';
+
+  @override
+  String get errLogFilter => 'Jurnal filtri etibarsızdır. Axtarışı təmizləyib yenidən cəhd edin.';
+
+  @override
+  String get errSubRedirect => 'Server təhlükəli ünvana yönləndirdi. Provayderdən yeni keçid istəyin.';
+
+  @override
+  String get errProxySetup => 'Sistem proksisi qurula bilmədi. Yenidən qoşulun və ya jurnalı açın.';
+
+  @override
+  String get notificationsToday => 'Bu gün';
+
+  @override
+  String get notificationsYesterday => 'Dünən';
+
+  @override
+  String get notificationsMarkRead => 'Hamısını oxunmuş say';
+
+  @override
+  String get notificationsUnread => 'Oxunmayıb';
+
+  @override
+  String get desktopNotifications => 'Masaüstü bildirişləri';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval => 'Abunəliyin yenilənmə intervalı yanlışdır. Provayderin tövsiyə etdiyi intervalı seçin.';
+
+  @override
+  String get errRule => 'Marşrutlaşdırma qaydası yanlışdır. Qaydadakı domeni, IP ünvanını və ya tətbiqi yoxlayın.';
+
+  @override
+  String get errDns => 'DNS parametrləri yanlışdır. DNS serverinin ünvanını yoxlayın.';
+
+  @override
+  String get errEndpoint => 'Yoxlanacaq serverin ünvanı yanlışdır. Host adını və portu yoxlayın.';
+
+  @override
+  String get errCancelled => 'Sorğu ləğv edildi. Lazım gələrsə, əməliyyatı təkrarlayın.';
 }

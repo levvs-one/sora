@@ -55,7 +55,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     super.dispose();
   }
 
-  Future<void> _read() async {
+  Future<void> _read({FailureMode mode = FailureMode.background}) async {
     if (!mounted) return;
     final sora = SoraScope.read(context);
     // Speed counters are polled on demand only while this screen is open;
@@ -73,7 +73,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
       final answer = await link.stub.listConnections(
         ListConnectionsRequest(apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: session),
       );
-      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
       if (!mounted) return;
       setState(() {
         // Show recent connections first to help locate newly opened traffic.
@@ -83,7 +83,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
       });
     } catch (error) {
       if (!mounted) return;
-      SoraScope.read(context).reportFailure(error, source: 'connections');
+      SoraScope.read(context).reportFailure(error, source: 'connections', mode: mode);
       // Never leave a permanent blank screen: the error itself is reported
       // through the notification stream, so surface the empty state here
       // (e.g. the xray engine cannot list connections at all).
@@ -110,9 +110,9 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
           connectionId: c.id,
         ),
       );
-      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
     } catch (error) {
-      if (mounted) SoraScope.read(context).reportFailure(error, source: 'connections');
+      if (mounted) SoraScope.read(context).reportFailure(error, source: 'connections', mode: FailureMode.action);
     }
   }
 
@@ -157,6 +157,11 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         },
       ),
       children: [
+        BackgroundFailureState(
+          source: 'connections',
+          retry: () => unawaited(_read(mode: FailureMode.action)),
+        ),
+        const BackgroundFailureState(source: 'stats'),
         _statsBar(context),
         CupertinoSearchTextField(
           controller: _search,
