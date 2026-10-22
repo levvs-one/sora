@@ -13,6 +13,7 @@ func TestCommunityImportsLinksListsAndStructuredSubscriptions(t *testing.T) {
 	naive := "naive+quic://alice:p%40ss%2Bword@example.com/?sni=front.example&extra-headers=X-Test%3A%20secret%0D%0AX-Other%3A%20value#Community"
 	for name, input := range map[string]string{
 		"mierus":             mieru,
+		"mierus-default-mtu": mieru + "&mtu=1400",
 		"naive":              naive,
 		"naive-default-port": "naive+https://alice:password@example.com#Name",
 		"list":               mieru + "\n" + naive,
@@ -41,7 +42,7 @@ func TestCommunityImportsLinksListsAndStructuredSubscriptions(t *testing.T) {
 }
 
 func TestMieruStandardLinkAndMultipleBindingsRemainDistinct(t *testing.T) {
-	profile := &pb.ClientProfile{ProfileName: proto.String("Community"), User: &pb.User{Name: proto.String("alice"), Password: proto.String("password")},
+	profile := &pb.ClientProfile{ProfileName: proto.String("Community"), Mtu: proto.Int32(1400), User: &pb.User{Name: proto.String("alice"), Password: proto.String("password")},
 		Servers: []*pb.ServerEndpoint{{DomainName: proto.String("example.com"), PortBindings: []*pb.PortBinding{
 			{Port: proto.Int32(443), Protocol: pb.TransportProtocol_TCP.Enum()},
 			{Port: proto.Int32(443), Protocol: pb.TransportProtocol_UDP.Enum()},
@@ -77,7 +78,7 @@ func TestCommunityRejectsMalformedAndUnsupportedOptions(t *testing.T) {
 		"mierus://alice:@example.com?profile=A&port=443&protocol=TCP",
 		"mierus://alice:password@example.com?profile=A&port=443&protocol=TCP&multiplexing=invalid",
 		"mierus://alice:password@example.com?profile=A&port=443&protocol=TCP&traffic-pattern=invalid",
-		"mierus://alice:password@example.com?profile=A&port=443&protocol=TCP&mtu=1400",
+		"mierus://alice:password@example.com?profile=A&port=443&protocol=TCP&mtu=1280",
 		"mieru://invalid",
 		"naive+https://alice:password@/",
 		"naive+quic://alice:password@example.com:65536/",

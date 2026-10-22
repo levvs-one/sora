@@ -119,8 +119,9 @@ func mieruProfile(p *pb.ClientProfile, limit int) ([]OutboundSpec, error) {
 	if p.GetProfileName() == "" || len(p.GetServers()) == 0 || p.GetUser().GetName() == "" || p.GetUser().GetPassword() == "" {
 		return nil, ErrInvalid
 	}
-	// mihomo does not expose a profile MTU or an upstream dialer.
-	if p.GetMtu() != 0 || p.GetDialer() != nil {
+	// mihomo fixes the profile MTU at mieru's default, 1400. Explicitly
+	// exporting that default must not make an otherwise compatible link fail.
+	if (p.GetMtu() != 0 && p.GetMtu() != 1400) || p.GetDialer() != nil {
 		return nil, ErrUnsupported
 	}
 	var out []OutboundSpec
