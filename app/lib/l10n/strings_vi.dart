@@ -1730,15 +1730,9 @@ class SVi extends S {
   String get customServerHideSecret => 'Ẩn bí mật';
 
   @override
-  String get customServerBadge => 'tùy chỉnh';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Xóa máy chủ “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Thêm máy chủ theo cách thủ công: địa chỉ, cổng và giao thức';
 
   @override
   String get customServerTest => 'Kiểm tra';
@@ -1910,10 +1904,6 @@ class SVi extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Với Shadowsocks: phương thức:mật khẩu, ví dụ chacha20-ietf-poly1305:matkhau';
-
-  @override
   String get diagnosticPackets => 'Chụp gói';
 
   @override
@@ -1989,4 +1979,28 @@ class SVi extends S {
 
   @override
   String get extOpen => 'Mở';
+
+  @override
+  String get customServerOwn => 'Máy chủ riêng';
+
+  @override
+  String get customServerPaste => 'Dán liên kết';
+
+  @override
+  String get customServerUser => 'Tên người dùng';
+
+  @override
+  String get customServerPassword => 'Mật khẩu';
+
+  @override
+  String get customServerSecretRequired => 'Nhập một giá trị';
+
+  @override
+  String get customServerLinkInvalid => 'Liên kết máy chủ không hợp lệ';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

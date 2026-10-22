@@ -468,7 +468,6 @@
   "customServerOptional": "اختياري",
   "customServerShowSecret": "إظهار السر",
   "customServerHideSecret": "إخفاء السر",
-  "customServerBadge": "مخصص",
   "customServerDeleteConfirm": "حذف الخادم \"{name}\"؟",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "إضافة خادم يدويًا: العنوان والمنفذ والبروتوكول",
   "customServerTest": "الاختبار",
   "leakTestTitle": "اختبار تسرب البيانات",
   "leakTestIntro": "يتحقق مما إذا كانت حركة البيانات قد تغادر الجهاز خارج النفق: طلبات DNS وICMP المباشرة، وخروج IPv6، ومحللات النظام. شغّل الاختبار أثناء الاتصال.",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "هذا الجهاز",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "لـ Shadowsocks: الطريقة:كلمة المرور، مثل chacha20-ietf-poly1305:password",
   "diagnosticPackets": "التقاط الحزمة",
   "diagnosticEvents": "أحداث ويندوز",
   "diagnosticCapture": "التقاط لمدة 10 ثانية",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "فتح"
+  "extOpen": "فتح",
+  "customServerOwn": "خادم خاص",
+  "customServerPaste": "لصق رابط",
+  "customServerUser": "اسم المستخدم",
+  "customServerPassword": "كلمة المرور",
+  "customServerSecretRequired": "أدخل قيمة",
+  "customServerLinkInvalid": "رابط الخادم غير صالح",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

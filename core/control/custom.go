@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"maps"
 	"net/netip"
 	"path/filepath"
 	"strconv"
@@ -18,14 +19,15 @@ import (
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	customv1 "github.com/levvs-one/sora-client/core/gen/sora/custom/v1"
+	"github.com/levvs-one/sora-client/core/parser"
 )
 
 // Custom servers live behind the same control-only authorization as the
 // rest of the control plane: the shared gRPC interceptors admit only
 // control peers (unknown methods default to control-only in checkMethodAuth),
 // and every RPC additionally runs s.authorize over the in-request API
-// version and control authenticator. Responses never carry credential
-// material: the wire form marks secrets write-only.
+// version and control authenticator. Stored credentials never leave the core. Preview derives
+// draft material exclusively from the supplied link.
 
 // customStoreState lazily opens the custom-server store once per control
 // Server, so MountCustomServices and CustomOutbounds share one instance
@@ -104,36 +106,64 @@ func (c *customServer) SaveCustomServer(_ context.Context, req *customv1.SaveCus
 			"control: the custom server is missing")
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
-	protocol, err := customProtocolFromWire(in.GetProtocol())
+	protocol := custom.Protocol(in.GetProtocolName())
+	if protocol == "" {
+		protocol, err = customProtocolFromWire(in.GetProtocol())
+	}
+	if err == nil {
+		err = custom.ValidateProtocol(protocol)
+	}
 	if err != nil {
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
 	if err := custom.ValidatePort(in.GetPort()); err != nil {
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
-	// The vault material is read back by applyCredential at connect time;
-	// refuse anything that is not a credential document now instead of
-	// failing every later connect.
-	if material := in.GetCredentials(); material != "" {
+	// Updating a secret must retain the imported TLS and transport options
+	// that the compact editor does not expose. Switching protocol starts fresh.
+	material := in.GetCredentials()
+	var current custom.Server
+	if in.GetId() != "" {
+		current, _ = st.Get(in.GetId())
+	}
+	if material != "" {
 		values, err := parseCredential([]byte(material))
+		if err == nil && current.SecretRef != "" && current.Protocol == protocol && !req.GetReplaceCredentials() {
+			var previous []byte
+			previous, err = c.srv.secrets.Get(current.SecretRef)
+			if err == nil {
+				var merged map[string]string
+				merged, err = parseCredential(previous)
+				if err == nil {
+					maps.Copy(merged, values)
+					values = merged
+				}
+			}
+		}
 		if err == nil && protocol == custom.ProtocolWireGuard {
 			err = checkWireGuardCredential(values)
 		}
 		if err != nil {
 			return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 		}
-	} else if protocol == custom.ProtocolWireGuard {
-		err := errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds,
-			"control: a WireGuard server needs its private key, addresses and peer")
+		raw, err := json.Marshal(values)
+		if err != nil {
+			return nil, err
+		}
+		material = string(raw)
+	} else if current.SecretRef == "" || current.Protocol != protocol {
+		err := errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanOutbounds, "control: a new protocol needs credentials")
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
 	stored, err := st.Save(custom.Server{
-		ID:       in.GetId(),
-		Name:     in.GetName(),
-		Protocol: protocol,
-		Address:  in.GetAddress(),
-		Port:     uint16(in.GetPort()), //nolint:gosec // ValidatePort bounded this value to 1..65535.
-	}, []byte(in.GetCredentials()))
+		ID:        in.GetId(),
+		Name:      in.GetName(),
+		Protocol:  protocol,
+		Transport: in.GetTransport(),
+		Security:  in.GetSecurity(),
+		Address:   in.GetAddress(),
+		Port:      uint16(in.GetPort()), //nolint:gosec // ValidatePort bounded this value to 1..65535.
+	}, []byte(material))
 	if err != nil {
 		return &customv1.SaveCustomServerResponse{Error: toWire(err, nil, "")}, nil
 	}
@@ -156,7 +186,7 @@ func (c *customServer) ListCustomServers(_ context.Context, req *customv1.ListCu
 	for _, s := range servers {
 		out = append(out, customServerToWire(s))
 	}
-	return &customv1.ListCustomServersResponse{Servers: out}, nil
+	return &customv1.ListCustomServersResponse{Servers: out, Protocols: custom.Protocols()}, nil
 }
 
 // DeleteCustomServer removes a server together with its vault credentials.
@@ -220,6 +250,10 @@ func customServerToWire(s custom.Server) *customv1.CustomServer {
 		Address:        s.Address,
 		Port:           uint32(s.Port),
 		HasCredentials: s.SecretRef != "",
+		ProtocolName:   string(s.Protocol),
+		Transport:      s.Transport,
+		Security:       s.Security,
+		Outbound:       customOutbound(s),
 	}
 }
 
@@ -272,24 +306,7 @@ func (s *Server) CustomOutbounds() []*corev1.OutboundSpec {
 	}
 	var out []*corev1.OutboundSpec
 	for _, srv := range st.store.List() {
-		spec := &corev1.OutboundSpec{
-			Id:          "custom/" + srv.ID,
-			DisplayName: srv.Name,
-			Protocol:    string(srv.Protocol),
-			Endpoint:    &corev1.Endpoint{Host: srv.Address, Port: uint32(srv.Port)},
-		}
-		// Shadowsocks and WireGuard carry their own encryption;
-		// outboundFromProto turns TLS on for every other security value.
-		switch srv.Protocol {
-		case custom.ProtocolShadowsocks:
-			spec.Security = "none"
-		case custom.ProtocolWireGuard:
-			spec.Security = "none"
-			spec.Transport = "udp"
-		}
-		if srv.SecretRef != "" {
-			spec.Credentials = &corev1.CredentialsRef{Reference: srv.SecretRef}
-		}
+		spec := customOutbound(srv)
 		out = append(out, spec)
 	}
 	return out
@@ -341,4 +358,64 @@ func checkWireGuardCredential(values map[string]string) error {
 func isWireGuardKey(key string) bool {
 	raw, err := base64.StdEncoding.DecodeString(key)
 	return err == nil && len(raw) == 32
+}
+
+// customOutbound is shared by List and subscription broadcasts so a server
+// is also connectable when the user has no subscriptions.
+func customOutbound(srv custom.Server) *corev1.OutboundSpec {
+	spec := &corev1.OutboundSpec{
+		Id: "custom/" + srv.ID, DisplayName: srv.Name, Protocol: string(srv.Protocol),
+		Endpoint:  &corev1.Endpoint{Host: srv.Address, Port: uint32(srv.Port)},
+		Transport: srv.Transport, Security: srv.Security,
+	}
+	if spec.Security == "" {
+		switch srv.Protocol {
+		case custom.ProtocolShadowsocks, custom.ProtocolWireGuard, "socks5", "http":
+			spec.Security = "none"
+		}
+	}
+	if srv.Protocol == custom.ProtocolWireGuard && spec.Transport == "" {
+		spec.Transport = "udp"
+	}
+	if srv.SecretRef != "" {
+		spec.Credentials = &corev1.CredentialsRef{Reference: srv.SecretRef}
+	}
+	return spec
+}
+
+func (c *customServer) PreviewCustomServer(_ context.Context, req *customv1.PreviewCustomServerRequest) (*customv1.PreviewCustomServerResponse, error) {
+	if err := c.srv.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
+		return nil, err
+	}
+	// This is a pure preview of user-supplied input. It never resolves a vault
+	// reference and cancelling the dialog leaves no imported secrets behind.
+	result, err := (parser.LinkParser{MaxItems: 2}).Parse([]byte(req.GetLink()))
+	if err == nil && (len(result.Servers) != 1 || result.Report.Invalid > 0 || result.Report.Unsupported > 0) {
+		err = parser.ErrInvalid
+	}
+	if err != nil {
+		return &customv1.PreviewCustomServerResponse{Error: toWire(importError(err), nil, "")}, nil
+	}
+	spec := result.Servers[0]
+	// Password-only links carry the token in user info, whereas username and
+	// password protocols keep those fields separate.
+	if (spec.Protocol == "trojan" || spec.Protocol == "hysteria2") && spec.Password == "" {
+		spec.Password = spec.User
+	}
+	if err := custom.ValidateProtocol(custom.Protocol(spec.Protocol)); err != nil {
+		return &customv1.PreviewCustomServerResponse{Error: toWire(err, nil, "")}, nil
+	}
+	document, err := credentialDocument(spec)
+	if err != nil {
+		return &customv1.PreviewCustomServerResponse{Error: toWire(err, nil, "")}, nil
+	}
+	name := spec.DisplayName
+	if name == "" {
+		name = spec.Host
+	}
+	return &customv1.PreviewCustomServerResponse{
+		Server: &customv1.CustomServer{Name: name, Protocol: customProtocolToWire(custom.Protocol(spec.Protocol)),
+			ProtocolName: spec.Protocol, Address: spec.Host, Port: uint32(spec.Port), Transport: spec.Transport, Security: spec.Security},
+		CredentialDocument: string(document),
+	}, nil
 }

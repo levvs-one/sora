@@ -468,7 +468,6 @@
   "customServerOptional": "可选",
   "customServerShowSecret": "显示密钥",
   "customServerHideSecret": "隐藏密钥",
-  "customServerBadge": "自订",
   "customServerDeleteConfirm": "要删除服务器「{name}」吗？",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "手动添加服务器：地址、端口和协议",
   "customServerTest": "测试",
   "leakTestTitle": "泄漏测试",
   "leakTestIntro": "检查流量能否不经隧道离开设备：包括直接 DNS 和 ICMP 请求、IPv6 对外流量以及系统解析器。请在连接时执行。",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "此设备",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password",
   "diagnosticPackets": "抓包",
   "diagnosticEvents": "Windows 事件",
   "diagnosticCapture": "捕捉10秒",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "打开"
+  "extOpen": "打开",
+  "customServerOwn": "自有服务器",
+  "customServerPaste": "粘贴链接",
+  "customServerUser": "用户名",
+  "customServerPassword": "密码",
+  "customServerSecretRequired": "请输入一个值",
+  "customServerLinkInvalid": "服务器链接无效",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -1727,15 +1727,9 @@ class STk extends S {
   String get customServerHideSecret => 'Gizlin maglumaty gizle';
 
   @override
-  String get customServerBadge => 'şahsy';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '“$name” serwerini pozuň?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Serweri el bilen goşuň: salgy, port we protokol';
 
   @override
   String get customServerTest => 'Synag';
@@ -1905,10 +1899,6 @@ class STk extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks üçin: usul:açar sözi, mysal üçin chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Paket almak';
 
   @override
@@ -1984,4 +1974,28 @@ class STk extends S {
 
   @override
   String get extOpen => 'Aç';
+
+  @override
+  String get customServerOwn => 'Şahsy serwer';
+
+  @override
+  String get customServerPaste => 'Salgyny goý';
+
+  @override
+  String get customServerUser => 'Ulanyjy ady';
+
+  @override
+  String get customServerPassword => 'Açar sözi';
+
+  @override
+  String get customServerSecretRequired => 'Baha giriziň';
+
+  @override
+  String get customServerLinkInvalid => 'Serwer salgysy nädogry';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

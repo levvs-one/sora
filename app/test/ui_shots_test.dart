@@ -12,6 +12,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 import 'package:sora/main.dart';
 import 'package:sora/l10n/strings.dart';
 import 'package:sora/src/ui/kit.dart';
+import 'package:sora/src/ui/addserver.dart';
 import 'package:sora/src/ui/qr.dart';
 import 'package:sora/src/ui/subscription.dart';
 import 'package:sora/src/ext/store.dart';
@@ -264,6 +265,11 @@ void main() {
       final output = '${Platform.environment['HOME']!}/.local/share/sora-dev/shots';
       final binary = Platform.environment['SORA_CORE_BIN']!;
       final socket = Platform.environment['SORA_CORE_SOCKET']!;
+      var clipboard = '';
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async => call.method == 'Clipboard.getData' ? {'text': clipboard} : null,
+      );
       final dir = await tester.runAsync(() => Directory.systemTemp.createTemp('sora-share-'));
       final work = dir!;
       addTearDown(tester.view.reset);
@@ -403,8 +409,36 @@ void main() {
             final s = S.of(tester.element(find.byType(ServersScreen)));
             final share = find.byKey(ValueKey('share-subscription-$id'));
             expect(share, findsOneWidget);
-            final last = find.byKey(ValueKey(sora.subscriptions.single.outbounds.last.id));
+            expect(find.byKey(const ValueKey('own-servers-group')), findsNothing);
+            expect(find.byKey(const ValueKey('add-own-server')), findsOneWidget);
+            await save('ownserver-list-empty', language, theme);
+            await tester.tap(find.byKey(const ValueKey('add-own-server')));
+            await tester.pumpAndSettle();
+            expect(find.byType(AddServerScreen), findsOneWidget);
+            await save('ownserver-form-empty', language, theme);
+            clipboard = '$template#Home';
+            await tester.tap(find.byKey(const ValueKey('custom-paste')));
+            await settleLive();
+            expect(tester.widget<TextField>(find.byKey(const ValueKey('custom-name'))).controller!.text, 'Home');
+            await save('ownserver-form-pasted', language, theme);
+            clipboard =
+                fixtures.cast<Map<String, dynamic>>().firstWhere((f) => f['name'] == 'wireguard url')['input']
+                    as String;
+            await tester.tap(find.byKey(const ValueKey('custom-paste')));
+            await settleLive();
+            expect(find.byKey(const ValueKey('custom-peerKey')), findsOneWidget);
+            await save('ownserver-form-wireguard', language, theme);
+            await tester.tap(find.byKey(const ValueKey('custom-save')));
+            await settleLive();
+            expect(find.byType(AddServerScreen), findsNothing);
+            expect(sora.customServers.length, 1);
+            final last = find.byKey(
+              ValueKey(sora.subscriptions.single.outbounds.where((o) => !o.id.startsWith('custom/')).last.id),
+            );
             expect(tester.getTopLeft(find.text(s.customServers)).dy, greaterThan(tester.getBottomLeft(last).dy));
+            await save('ownserver-list-filled', language, theme);
+            await tester.runAsync(() => sora.deleteCustomServer(sora.customServers.single.id));
+            await settleLive();
             await tester.ensureVisible(share);
             await save('subscription-share-header', language, theme);
             await tester.tap(

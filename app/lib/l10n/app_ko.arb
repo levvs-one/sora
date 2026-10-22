@@ -468,7 +468,6 @@
   "customServerOptional": "선택사항",
   "customServerShowSecret": "비밀 표시",
   "customServerHideSecret": "비밀 숨기기",
-  "customServerBadge": "사용자 지정",
   "customServerDeleteConfirm": "서버 \"{name}\"을 삭제하시겠습니까?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "수동으로 서버 추가: 주소, 포트 및 프로토콜",
   "customServerTest": "테스트",
   "leakTestTitle": "데이터 유출 테스트",
   "leakTestIntro": "트래픽이 터널 밖으로 기기를 빠져나갈 수 있는지 확인합니다. 직접 DNS 및 ICMP 요청, IPv6 외부 통신, 시스템 리졸버를 검사합니다. 연결된 상태에서 실행하세요.",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "이 장치",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks의 경우: 방식:비밀번호 (예: chacha20-ietf-poly1305:password)",
   "diagnosticPackets": "패킷 캡처",
   "diagnosticEvents": "윈도우 이벤트",
   "diagnosticCapture": "10초 동안 캡처",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "열기"
+  "extOpen": "열기",
+  "customServerOwn": "개인 서버",
+  "customServerPaste": "링크 붙여넣기",
+  "customServerUser": "사용자 이름",
+  "customServerPassword": "비밀번호",
+  "customServerSecretRequired": "값을 입력하세요",
+  "customServerLinkInvalid": "잘못된 서버 링크입니다",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

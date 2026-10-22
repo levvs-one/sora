@@ -468,7 +468,6 @@
   "customServerOptional": "選填",
   "customServerShowSecret": "顯示機密資訊",
   "customServerHideSecret": "隱藏機密資訊",
-  "customServerBadge": "自訂",
   "customServerDeleteConfirm": "要刪除伺服器「{name}」嗎？",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "手動新增伺服器：位址、連接埠和協定",
   "customServerTest": "測試",
   "leakTestTitle": "洩漏測試",
   "leakTestIntro": "檢查流量能否不經通道離開裝置：包括直接 DNS 和 ICMP 請求、IPv6 對外流量以及系統解析器。請在連接時執行。",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "此裝置",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks：方法:密碼，例如 chacha20-ietf-poly1305:password",
   "diagnosticPackets": "抓包",
   "diagnosticEvents": "Windows 事件",
   "diagnosticCapture": "捕捉10秒",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "開啟"
+  "extOpen": "開啟",
+  "customServerOwn": "自有伺服器",
+  "customServerPaste": "貼上連結",
+  "customServerUser": "使用者名稱",
+  "customServerPassword": "密碼",
+  "customServerSecretRequired": "請輸入一個值",
+  "customServerLinkInvalid": "伺服器連結無效",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

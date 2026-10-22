@@ -1731,15 +1731,9 @@ class SHi extends S {
   String get customServerHideSecret => 'रहस्य छुपाएं';
 
   @override
-  String get customServerBadge => 'कस्टम';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'सर्वर \"$name\" हटाएं?';
   }
-
-  @override
-  String get customServerEmptyHint => 'मैन्युअल रूप से एक सर्वर जोड़ें: पता, पोर्ट और प्रोटोकॉल';
 
   @override
   String get customServerTest => 'परीक्षण';
@@ -1909,10 +1903,6 @@ class SHi extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks के लिए: method:password, जैसे chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'पैकेट पर कब्जा';
 
   @override
@@ -1988,4 +1978,28 @@ class SHi extends S {
 
   @override
   String get extOpen => 'खोलें';
+
+  @override
+  String get customServerOwn => 'अपना सर्वर';
+
+  @override
+  String get customServerPaste => 'लिंक पेस्ट करें';
+
+  @override
+  String get customServerUser => 'उपयोगकर्ता नाम';
+
+  @override
+  String get customServerPassword => 'पासवर्ड';
+
+  @override
+  String get customServerSecretRequired => 'कोई मान दर्ज करें';
+
+  @override
+  String get customServerLinkInvalid => 'सर्वर लिंक अमान्य है';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

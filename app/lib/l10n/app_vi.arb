@@ -468,7 +468,6 @@
   "customServerOptional": "Tùy chọn",
   "customServerShowSecret": "Hiển thị bí mật",
   "customServerHideSecret": "Ẩn bí mật",
-  "customServerBadge": "tùy chỉnh",
   "customServerDeleteConfirm": "Xóa máy chủ “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Thêm máy chủ theo cách thủ công: địa chỉ, cổng và giao thức",
   "customServerTest": "Kiểm tra",
   "leakTestTitle": "Kiểm tra rò rỉ dữ liệu",
   "leakTestIntro": "Kiểm tra xem lưu lượng có thể rời thiết bị ngoài đường hầm hay không: DNS và ICMP trực tiếp, lưu lượng IPv6 đi ra và trình phân giải của hệ thống. Chạy khi đang kết nối.",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "Thiết bị này",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Với Shadowsocks: phương thức:mật khẩu, ví dụ chacha20-ietf-poly1305:matkhau",
   "diagnosticPackets": "Chụp gói",
   "diagnosticEvents": "Sự kiện Windows",
   "diagnosticCapture": "Chụp trong 10 giây",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "Mở"
+  "extOpen": "Mở",
+  "customServerOwn": "Máy chủ riêng",
+  "customServerPaste": "Dán liên kết",
+  "customServerUser": "Tên người dùng",
+  "customServerPassword": "Mật khẩu",
+  "customServerSecretRequired": "Nhập một giá trị",
+  "customServerLinkInvalid": "Liên kết máy chủ không hợp lệ",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -710,7 +710,6 @@
   "customServerOptional": "Optional",
   "customServerShowSecret": "Show secret",
   "customServerHideSecret": "Hide secret",
-  "customServerBadge": "custom",
   "customServerDeleteConfirm": "Delete server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -719,7 +718,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Add a server manually: address, port and protocol",
   "customServerTest": "Test",
   "leakTestTitle": "Leak test",
   "leakTestIntro": "Probes whether traffic can leave the device outside the tunnel: direct DNS and ICMP, IPv6 egress, and the system resolvers. Run it while connected.",
@@ -815,7 +813,6 @@
   },
   "syncThisDevice": "This device",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet: the sync service can't run there.",
-  "customServerShadowsocksCredentials": "For Shadowsocks: method:password, for example chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Packet capture",
   "diagnosticEvents": "Windows events",
   "diagnosticCapture": "Capture for 10 seconds",
@@ -846,5 +843,13 @@
       }
     }
   },
-  "extOpen": "Open"
+  "extOpen": "Open",
+  "customServerOwn": "Own server",
+  "customServerPaste": "Paste a link",
+  "customServerUser": "Username",
+  "customServerPassword": "Password",
+  "customServerSecretRequired": "Enter a value",
+  "customServerLinkInvalid": "Invalid server link",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

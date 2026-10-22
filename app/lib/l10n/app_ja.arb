@@ -468,7 +468,6 @@
   "customServerOptional": "オプション",
   "customServerShowSecret": "シークレットを表示",
   "customServerHideSecret": "秘密を隠す",
-  "customServerBadge": "カスタム",
   "customServerDeleteConfirm": "サーバー「{name}」を削除しますか?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "サーバーを手動で追加します: アドレス、ポート、プロトコル",
   "customServerTest": "テスト",
   "leakTestTitle": "データ漏洩のテスト",
   "leakTestIntro": "通信がトンネルを通らずにデバイスから出られるか確認します。直接の DNS・ICMP 通信、IPv6 の外部通信、システムのリゾルバーを調べます。接続中に実行してください。",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "この装置",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks の場合: 方式:パスワード (例: chacha20-ietf-poly1305:password)",
   "diagnosticPackets": "パケットキャプチャ",
   "diagnosticEvents": "Windowsイベント",
   "diagnosticCapture": "10秒間のキャプチャ",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "開く"
+  "extOpen": "開く",
+  "customServerOwn": "自分のサーバー",
+  "customServerPaste": "リンクを貼り付け",
+  "customServerUser": "ユーザー名",
+  "customServerPassword": "パスワード",
+  "customServerSecretRequired": "値を入力してください",
+  "customServerLinkInvalid": "サーバーリンクが無効です",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -11,14 +13,6 @@ import '../design/theme.dart';
 import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../sora.dart';
 import 'kit.dart';
-
-const _protocols = [
-  CustomProtocol.CUSTOM_PROTOCOL_VLESS,
-  CustomProtocol.CUSTOM_PROTOCOL_VMESS,
-  CustomProtocol.CUSTOM_PROTOCOL_TROJAN,
-  CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS,
-  CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD,
-];
 
 /// A WireGuard key: 32 bytes in standard base64, as `wg genkey` prints.
 bool isWireGuardKey(String key) {
@@ -112,385 +106,571 @@ String customProtocolLabel(CustomProtocol protocol) => protocol.name.replaceFirs
 /// Hostnames, IPv4 and bracketed IPv6: letters, digits and . : - _ [ ].
 final _addressPattern = RegExp(r'^[A-Za-z0-9][A-Za-z0-9.:\-_\[\]]*$');
 
-/// Adds a user-owned server: name, protocol, address, port and an optional
-/// write-only secret (UUID, password or key; the core never returns it).
-/// Reachability is tested from the servers list after saving: the core API
-/// tests only saved servers, by id, so there is no pre-save test here.
+String customServerProtocol(CustomServer server) =>
+    server.protocolName.isNotEmpty ? server.protocolName : customProtocolLabel(server.protocol).toLowerCase();
+
+Future<void> showAddServerSheet(BuildContext context, {CustomServer? server}) => showGeneralDialog<void>(
+  context: context,
+  barrierDismissible: true,
+  barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+  barrierColor: Palette.of(context).scrim,
+  transitionDuration: Duration.zero,
+  pageBuilder: (_, _, _) => AddServerScreen(server: server),
+);
+
 class AddServerScreen extends StatefulWidget {
-  const AddServerScreen({super.key});
+  const AddServerScreen({super.key, this.server});
+
+  final CustomServer? server;
 
   @override
   State<AddServerScreen> createState() => _AddServerScreenState();
 }
 
 class _AddServerScreenState extends State<AddServerScreen> {
-  final _name = TextEditingController();
-  final _address = TextEditingController();
-  final _port = TextEditingController();
-  final _credentials = TextEditingController();
-  final _wgAddresses = TextEditingController();
-  final _wgPeerKey = TextEditingController();
-  final _wgPresharedKey = TextEditingController();
-  final _wgAllowedIps = TextEditingController(text: '0.0.0.0/0, ::/0');
-  final _wgKeepalive = TextEditingController();
-
-  bool get _wireGuard => _protocol == CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD;
-
+  final _fields = <String, TextEditingController>{
+    for (final key in [
+      'name',
+      'address',
+      'port',
+      'credentials',
+      'method',
+      'user',
+      'password',
+      'addresses',
+      'peerKey',
+      'presharedKey',
+      'allowedIps',
+      'keepalive',
+    ])
+      key: TextEditingController(),
+  };
+  final _touched = <String>{};
+  final _revealed = <String>{};
+  Map<String, String> _material = {};
+  late String _protocol;
+  String _transport = '', _security = '';
+  String? _pasteError;
+  bool _saving = false, _pasting = false, _filling = false;
+  bool get _wireGuard => _protocol == 'wireguard';
+  bool get _keepStored =>
+      widget.server != null && _protocol == customServerProtocol(widget.server!) && _material.isEmpty;
+  bool get _busy => _saving || _pasting;
+  String _text(String key) => _fields[key]!.text;
   WireGuardInput get _wg => (
-    addresses: _wgAddresses.text,
-    peerKey: _wgPeerKey.text,
-    presharedKey: _wgPresharedKey.text,
-    allowedIps: _wgAllowedIps.text,
-    keepalive: _wgKeepalive.text,
+    addresses: _text('addresses'),
+    peerKey: _text('peerKey'),
+    presharedKey: _text('presharedKey'),
+    allowedIps: _text('allowedIps'),
+    keepalive: _text('keepalive'),
   );
-
-  CustomProtocol _protocol = _protocols.first;
-  final _errors = <String, String>{};
-
-  bool _saving = false;
-  CoreFailure? _saveFailure;
 
   @override
   void initState() {
     super.initState();
-    for (final entry in {
-      'name': _name,
-      'address': _address,
-      'port': _port,
-      'credentials': _credentials,
-      'addresses': _wgAddresses,
-      'peerKey': _wgPeerKey,
-      'presharedKey': _wgPresharedKey,
-      'allowedIps': _wgAllowedIps,
-      'keepalive': _wgKeepalive,
-    }.entries) {
+    final server = widget.server;
+    _protocol = server == null ? 'vless' : customServerProtocol(server);
+    _fields['name']!.text = server?.name ?? '';
+    _fields['address']!.text = server?.address ?? '';
+    _fields['port']!.text = server == null ? '' : '${server.port}';
+    _transport = server?.transport ?? '';
+    _security = server?.security ?? '';
+    _fields['allowedIps']!.text = '0.0.0.0/0, ::/0';
+    for (final entry in _fields.entries) {
       entry.value.addListener(() {
-        if (_errors.remove(entry.key) != null && mounted) setState(() {});
+        if (_filling) return;
+        setState(() => _touched.add(entry.key));
       });
     }
   }
 
   @override
   void dispose() {
-    _name.dispose();
-    _address.dispose();
-    _port.dispose();
-    _credentials.dispose();
-    for (final c in [_wgAddresses, _wgPeerKey, _wgPresharedKey, _wgAllowedIps, _wgKeepalive]) {
-      c.dispose();
+    for (final field in _fields.values) {
+      field.dispose();
     }
     super.dispose();
   }
 
-  /// Client-side validation; returns true when the draft is sendable.
-  bool _validate() {
+  Map<String, String> _problems() {
     final s = S.of(context);
     final errors = <String, String>{};
-    if (_name.text.trim().isEmpty) errors['name'] = s.customServerNameRequired;
-    final address = _address.text.trim();
+    if (_text('name').trim().isEmpty) errors['name'] = s.customServerNameRequired;
+    final address = _text('address').trim();
     if (address.isEmpty) {
       errors['address'] = s.customServerAddressRequired;
-    } else if (!_addressPattern.hasMatch(address)) {
+    } else if (!_addressPattern.hasMatch(address) && InternetAddress.tryParse(address) == null) {
       errors['address'] = s.customServerAddressInvalid;
     }
-    final port = int.tryParse(_port.text.trim());
+    final port = int.tryParse(_text('port').trim());
     if (port == null || port < 1 || port > 65535) errors['port'] = s.customServerPortInvalid;
     if (_wireGuard) {
-      final field = wireGuardProblem(_credentials.text, _wg);
-      if (field != null) {
-        errors[field] = switch (field) {
-          'addresses' || 'allowedIps' => s.customServerWgCidrInvalid,
-          'keepalive' => s.customServerWgKeepaliveInvalid,
-          _ => s.customServerWgKeyInvalid,
-        };
+      final replacing =
+          !_keepStored ||
+          ['credentials', 'addresses', 'peerKey', 'presharedKey', 'allowedIps', 'keepalive'].any(_touched.contains);
+      if (replacing) {
+        final field = wireGuardProblem(_text('credentials'), _wg);
+        if (field != null) {
+          errors[field] = switch (field) {
+            'addresses' || 'allowedIps' => s.customServerWgCidrInvalid,
+            'keepalive' => s.customServerWgKeepaliveInvalid,
+            _ => s.customServerWgKeyInvalid,
+          };
+        }
       }
-    } else if (customCredentialDocument(_protocol, _credentials.text) == null) {
-      errors['credentials'] = s.customServerShadowsocksCredentials;
+    } else if (!_keepStored) {
+      if (_text('credentials').isEmpty && !['http', 'socks5'].contains(_protocol)) {
+        errors['credentials'] = s.customServerSecretRequired;
+      }
+      if (_protocol == 'shadowsocks' && _text('method').trim().isEmpty) errors['method'] = s.customServerSecretRequired;
+      if (_protocol == 'tuic' && _text('password').isEmpty) errors['password'] = s.customServerSecretRequired;
     }
-    setState(() {
-      _errors
-        ..clear()
-        ..addAll(errors);
-      _saveFailure = null;
-    });
-    return errors.isEmpty;
+    return errors;
   }
 
-  CustomServer _draft() => CustomServer(
-    name: _name.text.trim(),
-    protocol: _protocol,
-    address: _address.text.trim(),
-    port: int.parse(_port.text.trim()),
-    // Secrets are verbatim: never trim the credentials.
-    credentials: customCredentialDocument(_protocol, _credentials.text, wg: _wg)!,
-  );
+  Future<void> _paste() async {
+    if (_busy) return;
+    setState(() {
+      _pasting = true;
+      _pasteError = null;
+    });
+    final sora = SoraScope.read(context);
+    sora.recovered('custom-paste');
+    try {
+      final clipboard = await Clipboard.getData(Clipboard.kTextPlain);
+      final answer = await sora.previewCustomServer(clipboard?.text ?? '');
+      if (!mounted) return;
+      final server = answer.server;
+      final material = (jsonDecode(answer.credentialDocument) as Map<String, dynamic>).cast<String, String>();
+      final peers = material['peers'] == null ? <dynamic>[] : jsonDecode(material['peers']!) as List;
+      final peer = peers.isEmpty ? <String, dynamic>{} : peers.first as Map<String, dynamic>;
+      _filling = true;
+      for (final field in _fields.values) {
+        field.clear();
+      }
+      _fields['name']!.text = server.name;
+      _fields['address']!.text = server.address;
+      _fields['port']!.text = '${server.port}';
+      _protocol = customServerProtocol(server);
+      _transport = server.transport;
+      _security = server.security;
+      _material = material;
+      _fields['credentials']!.text =
+          material[_wireGuard
+              ? 'private_key'
+              : ['vless', 'vmess', 'tuic'].contains(_protocol)
+              ? 'uuid'
+              : 'password'] ??
+          '';
+      for (final key in ['method', 'user', 'password', 'addresses']) {
+        _fields[key]!.text = material[key] ?? '';
+      }
+      _fields['peerKey']!.text = peer['PublicKey'] as String? ?? '';
+      _fields['presharedKey']!.text = peer['PreSharedKey'] as String? ?? '';
+      _fields['allowedIps']!.text = (peer['AllowedIPs'] as List? ?? ['0.0.0.0/0', '::/0']).join(', ');
+      _fields['keepalive']!.text = peer['PersistentKeepalive']?.toString() ?? '';
+      _touched.clear();
+      _revealed.clear();
+    } catch (error) {
+      if (!mounted) return;
+      final failure = CoreFailure.from(error);
+      if (failure.key.startsWith('core.subscription.') || failure.key == 'core.request.invalid') {
+        _pasteError = S.of(context).customServerLinkInvalid;
+      } else {
+        sora.reportFailure(error, source: 'custom-paste');
+      }
+    } finally {
+      _filling = false;
+      if (mounted) setState(() => _pasting = false);
+    }
+  }
+
+  String _document() {
+    if (_keepStored && !_touched.any((key) => !['name', 'address', 'port'].contains(key))) return '';
+    final values = {..._material};
+    void put(String field, String key) {
+      if (!_keepStored || (_touched.contains(field) && _text(field).isNotEmpty)) values[key] = _text(field);
+    }
+
+    if (_wireGuard) {
+      final wg = jsonDecode(
+        customCredentialDocument(CustomProtocol.CUSTOM_PROTOCOL_WIREGUARD, _text('credentials'), wg: _wg)!,
+      ) as Map<String, dynamic>;
+      // Preserve additional imported peers and Amnezia options while editing
+      // the first peer exposed by this form.
+      final peers = values['peers'] == null ? <dynamic>[] : jsonDecode(values['peers']!) as List;
+      final first = (jsonDecode(wg['peers'] as String) as List).single as Map<String, dynamic>;
+      if (peers.isEmpty) {
+        peers.add(first);
+      } else {
+        peers[0] = {...peers.first as Map, ...first};
+      }
+      final peer = peers.first as Map;
+      peer.remove('Endpoint');
+      if (_text('presharedKey').trim().isEmpty) peer.remove('PreSharedKey');
+      if ((int.tryParse(_text('keepalive').trim()) ?? 0) == 0) peer.remove('PersistentKeepalive');
+      values.addAll({
+        'private_key': wg['private_key'] as String,
+        'addresses': wg['addresses'] as String,
+        'peers': jsonEncode(peers),
+      });
+    } else {
+      put('credentials', ['vless', 'vmess', 'tuic'].contains(_protocol) ? 'uuid' : 'password');
+      if (_protocol == 'shadowsocks') put('method', 'method');
+      if (['socks5', 'http'].contains(_protocol)) put('user', 'user');
+      if (_protocol == 'tuic') put('password', 'password');
+    }
+    return jsonEncode(values);
+  }
 
   Future<void> _save() async {
-    if (_saving || !_validate()) return;
-    final sora = SoraScope.read(context);
-    setState(() {
-      _saving = true;
-      _saveFailure = null;
-    });
-    final failure = await sora.addCustomServer(_draft());
+    if (_busy || _problems().isNotEmpty) return;
+    setState(() => _saving = true);
+    final draft = CustomServer(
+      id: widget.server?.id,
+      name: _text('name').trim(),
+      protocolName: _protocol,
+      protocol: CustomProtocol.values.firstWhere(
+        (p) => customProtocolLabel(p).toLowerCase() == _protocol,
+        orElse: () => CustomProtocol.CUSTOM_PROTOCOL_UNSPECIFIED,
+      ),
+      address: _text('address').trim(),
+      port: int.parse(_text('port').trim()),
+      transport: _transport,
+      security: _security,
+      credentials: _document(),
+    );
+    final failure = await SoraScope.read(context).addCustomServer(draft, replaceCredentials: _material.isNotEmpty);
     if (!mounted) return;
     if (failure == null) {
       Navigator.of(context).pop();
     } else {
-      setState(() {
-        _saving = false;
-        _saveFailure = failure;
-      });
+      setState(() => _saving = false);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final s = S.of(context);
-    final palette = Palette.of(context);
-    return Screen(
-      title: s.customServerAdd,
-      children: [
-        Group(
-          children: [
-            _LabeledField(
-              label: s.customServerName,
-              error: _errors['name'],
-              child: TextField(
-                controller: _name,
-                textInputAction: TextInputAction.next,
-                style: Styles.secondary.copyWith(color: palette.ink),
-                decoration: _decoration(s.customServerNameHint, palette),
-              ),
-            ),
-            ChoiceTile<CustomProtocol>(
-              title: s.customServerProtocol,
-              value: _protocol,
-              choices: {for (final p in _protocols) p: customProtocolLabel(p)},
-              onChanged: (p) => setState(() => _protocol = p),
-            ),
-            _LabeledField(
-              label: s.customServerAddress,
-              error: _errors['address'],
-              child: TextField(
-                controller: _address,
-                keyboardType: TextInputType.url,
-                textInputAction: TextInputAction.next,
-                autocorrect: false,
-                style: Styles.secondary.copyWith(color: palette.ink),
-                decoration: _decoration(s.customServerAddressHint, palette),
-              ),
-            ),
-            _LabeledField(
-              label: s.customServerPort,
-              error: _errors['port'],
-              child: TextField(
-                controller: _port,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.next,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                style: Styles.secondary.copyWith(color: palette.ink),
-                decoration: _decoration(s.customServerPortHint, palette),
-              ),
-            ),
-          ],
-        ),
-        Group(
-          children: [
-            _SecretField(
-              controller: _credentials,
-              label: _wireGuard ? s.customServerWgPrivateKey : s.customServerCredentials,
-              hint: _wireGuard
-                  ? ''
-                  : _protocol == CustomProtocol.CUSTOM_PROTOCOL_SHADOWSOCKS
-                  ? s.customServerShadowsocksCredentials
-                  : s.customServerOptional,
-              error: _errors['credentials'],
-            ),
-          ],
-        ),
-        if (_wireGuard)
-          Group(
-            children: [
-              _plainField(s.customServerWgAddresses, _wgAddresses, 'addresses', hint: '10.0.0.2/32, fd00::2/128'),
-              _plainField(s.customServerWgPeerKey, _wgPeerKey, 'peerKey'),
-              _SecretField(
-                controller: _wgPresharedKey,
-                label: s.customServerWgPresharedKey,
-                hint: s.customServerOptional,
-                error: _errors['presharedKey'],
-              ),
-              _plainField(s.customServerWgAllowedIps, _wgAllowedIps, 'allowedIps'),
-              _plainField(
-                s.customServerWgKeepalive,
-                _wgKeepalive,
-                'keepalive',
-                hint: '25',
-                label2: s.customServerOptional,
-                digits: true,
-              ),
-            ],
-          ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: PrimaryButton(label: s.save, busy: _saving, onTap: _saving ? null : _save),
-        ),
-        if (_saveFailure != null) _note(context, Symbols.info_rounded, describe(s, _saveFailure!)),
-      ],
-    );
+  void _changeProtocol(String value) {
+    if (value == _protocol) return;
+    _filling = true;
+    for (final entry in _fields.entries) {
+      if (!['name', 'address', 'port'].contains(entry.key)) entry.value.clear();
+    }
+    _fields['allowedIps']!.text = '0.0.0.0/0, ::/0';
+    _filling = false;
+    setState(() {
+      _protocol = value;
+      _material = {};
+      final original = widget.server;
+      final restoring = original != null && customServerProtocol(original) == value;
+      _transport = restoring ? original.transport : '';
+      _security = restoring ? original.security : '';
+      _touched.removeWhere((key) => !['name', 'address', 'port'].contains(key));
+    });
   }
-
-  /// A neutral note: info, not an error. Failures are localized through
-  /// [describe] and never shown raw or in red.
-  Widget _note(BuildContext context, IconData icon, String text) {
-    final palette = Palette.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 18, color: palette.ink2),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _plainField(
-    String label,
-    TextEditingController controller,
-    String key, {
-    String? hint,
-    String? label2,
-    bool digits = false,
-  }) {
-    final palette = Palette.of(context);
-    return _LabeledField(
-      label: label,
-      hint: label2,
-      error: _errors[key],
-      child: TextField(
-        controller: controller,
-        autocorrect: false,
-        enableSuggestions: false,
-        keyboardType: digits ? TextInputType.number : TextInputType.text,
-        inputFormatters: digits ? [FilteringTextInputFormatter.digitsOnly] : null,
-        textInputAction: TextInputAction.next,
-        style: Styles.secondary.copyWith(color: palette.ink),
-        decoration: _decoration(hint, palette),
-      ),
-    );
-  }
-
-  InputDecoration _decoration(String? hint, Palette palette) => InputDecoration(
-    hintText: hint,
-    hintStyle: Styles.secondary.copyWith(color: palette.ink3),
-    isDense: true,
-    filled: true,
-    fillColor: palette.field,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-  );
-}
-
-/// A text field with a caption label above and an optional validation error
-/// below it.
-class _LabeledField extends StatelessWidget {
-  const _LabeledField({required this.label, required this.child, this.error, this.hint});
-
-  final String label;
-  final Widget child;
-  final String? error;
-  final String? hint;
 
   @override
   Widget build(BuildContext context) {
-    final palette = Palette.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Text(label, style: Styles.caption.copyWith(color: palette.ink2)),
-              if (hint != null && hint!.isNotEmpty) ...[
-                const SizedBox(width: 6),
-                Text(hint!, style: Styles.caption.copyWith(color: palette.ink3)),
-              ],
-            ],
-          ),
-          const SizedBox(height: 6),
-          child,
-          if (error != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Text(error!, style: Styles.dangerCaption(context)),
+    final s = S.of(context), palette = Palette.of(context);
+    final problems = _problems();
+    final protocols = {...SoraScope.of(context).customProtocols, _protocol};
+    final compact = MediaQuery.sizeOf(context).width < 600;
+    final style = Styles.body.copyWith(fontSize: 14, color: palette.ink);
+    return CallbackShortcuts(
+      bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.of(context).pop()},
+      child: Focus(
+        autofocus: true,
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              compact ? 0 : 24,
+              16,
+              compact ? 0 : 24,
+              16 + MediaQuery.viewInsetsOf(context).bottom,
             ),
-        ],
-      ),
-    );
-  }
-}
-
-/// A password field that stays obscured until the user reveals it, like the
-/// hidden link in QR sharing.
-class _SecretField extends StatefulWidget {
-  const _SecretField({required this.controller, required this.label, required this.hint, this.error});
-
-  final TextEditingController controller;
-  final String label;
-  final String hint;
-  final String? error;
-
-  @override
-  State<_SecretField> createState() => _SecretFieldState();
-}
-
-class _SecretFieldState extends State<_SecretField> {
-  bool _hidden = true;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = S.of(context);
-    final palette = Palette.of(context);
-    return _LabeledField(
-      label: widget.label,
-      hint: widget.hint,
-      error: widget.error,
-      child: TextField(
-        controller: widget.controller,
-        obscureText: _hidden,
-        enableSuggestions: false,
-        autocorrect: false,
-        textInputAction: TextInputAction.done,
-        style: Styles.secondary.copyWith(color: palette.ink),
-        decoration: InputDecoration(
-          isDense: true,
-          filled: true,
-          fillColor: palette.field,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-          suffixIcon: Tooltip(
-            message: _hidden ? s.customServerShowSecret : s.customServerHideSecret,
-            child: Pressable(
-              onTap: () => setState(() => _hidden = !_hidden),
-              radius: 8,
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Icon(
-                  _hidden ? Symbols.visibility_rounded : Symbols.visibility_off_rounded,
-                  size: 18,
-                  color: palette.ink2,
+            child: Center(
+              child: SizedBox(
+                width: compact ? double.infinity : 440,
+                child: Material(
+                  key: const ValueKey('custom-server-sheet'),
+                  color: palette.background,
+                  borderRadius: BorderRadius.circular(20),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+                        child: Row(
+                          children: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text(s.cancel, style: style),
+                            ),
+                            Expanded(
+                              child: Text(
+                                widget.server == null ? s.customServerOwn : s.edit,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Styles.bodyStrong.copyWith(fontSize: 17, color: palette.ink),
+                              ),
+                            ),
+                            TextButton(
+                              key: const ValueKey('custom-save'),
+                              onPressed: _busy || problems.isNotEmpty ? null : _save,
+                              child: _saving
+                                  ? const SizedBox.square(dimension: 16, child: CupertinoActivityIndicator(radius: 8))
+                                  : Text(
+                                      s.save,
+                                      style: style.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                        color: _busy || problems.isNotEmpty ? palette.ink3 : palette.ink,
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Flexible(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Group(
+                                  children: [
+                                    TextButton(
+                                      key: const ValueKey('custom-paste'),
+                                      onPressed: _busy ? null : _paste,
+                                      style: TextButton.styleFrom(
+                                        minimumSize: const Size(double.infinity, 44),
+                                        alignment: AlignmentDirectional.centerStart,
+                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Symbols.content_paste_rounded, size: 18, color: palette.ink),
+                                          const SizedBox(width: 12),
+                                          Expanded(child: Text(s.customServerPaste, style: style)),
+                                          if (_pasting) const CupertinoActivityIndicator(radius: 8),
+                                        ],
+                                      ),
+                                    ),
+                                    if (_pasteError != null)
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                                        child: Text(_pasteError!, style: Styles.dangerCaption(context)),
+                                      ),
+                                  ],
+                                ),
+                                Group(
+                                  children: [
+                                    _field('name', s.customServerName, hint: s.customServerNameHint),
+                                    MenuAnchor(
+                                      menuChildren: [
+                                        for (final p in protocols)
+                                          MenuItemButton(
+                                            onPressed: () => _changeProtocol(p),
+                                            child: Text(p.toUpperCase(), style: style),
+                                          ),
+                                      ],
+                                      builder: (context, controller, _) => TextButton(
+                                        key: const ValueKey('custom-protocol'),
+                                        onPressed: _busy
+                                            ? null
+                                            : () => controller.isOpen ? controller.close() : controller.open(),
+                                        style: TextButton.styleFrom(
+                                          minimumSize: const Size(double.infinity, 44),
+                                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Text(s.customServerProtocol, style: style),
+                                            const Spacer(),
+                                            Text(_protocol.toUpperCase(), style: style),
+                                            const SizedBox(width: 4),
+                                            Icon(Symbols.unfold_more_rounded, size: 16, color: palette.ink3),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: _field(
+                                            'address',
+                                            s.customServerAddress,
+                                            hint: s.customServerAddressHint,
+                                            labelWidth: 64,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: _field(
+                                            'port',
+                                            s.customServerPort,
+                                            hint: s.customServerPortHint,
+                                            digits: true,
+                                            labelWidth: 40,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Group(
+                                  children: [
+                                    _field(
+                                      'credentials',
+                                      _wireGuard ? s.customServerWgPrivateKey : s.customServerCredentials,
+                                      secret: true,
+                                      hint: _keepStored ? s.customServerOptional : null,
+                                    ),
+                                    AnimatedSwitcher(
+                                      duration: Motion.of(context, Motion.fast),
+                                      switchInCurve: Motion.curve,
+                                      switchOutCurve: Motion.curve,
+                                      transitionBuilder: (child, animation) => SizeTransition(
+                                        sizeFactor: animation,
+                                        alignment: Alignment.topCenter,
+                                        child: FadeTransition(opacity: animation, child: child),
+                                      ),
+                                      layoutBuilder: (current, previous) =>
+                                          Column(mainAxisSize: MainAxisSize.min, children: [...previous, ?current]),
+                                      child: Column(
+                                        key: ValueKey(_protocol),
+                                        children: [
+                                          if (_protocol == 'shadowsocks')
+                                            _field('method', s.probeMethod, hint: s.customServerMethodHint),
+                                          if (['socks5', 'http'].contains(_protocol))
+                                            _field('user', s.customServerUser, hint: s.customServerOptional),
+                                          if (_protocol == 'tuic')
+                                            _field('password', s.customServerPassword, secret: true),
+                                          if (_wireGuard) ...[
+                                            _field(
+                                              'addresses',
+                                              s.customServerWgAddresses,
+                                              hint: s.customServerWgAddressesHint,
+                                            ),
+                                            _field('peerKey', s.customServerWgPeerKey),
+                                            _field(
+                                              'presharedKey',
+                                              s.customServerWgPresharedKey,
+                                              secret: true,
+                                              hint: s.customServerOptional,
+                                            ),
+                                            _field('allowedIps', s.customServerWgAllowedIps),
+                                            _field(
+                                              'keepalive',
+                                              s.customServerWgKeepalive,
+                                              digits: true,
+                                              hint: s.customServerOptional,
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _field(
+    String key,
+    String label, {
+    String? hint,
+    bool digits = false,
+    bool secret = false,
+    double labelWidth = 148,
+  }) {
+    final s = S.of(context), palette = Palette.of(context);
+    final editingWireGuard =
+        _wireGuard &&
+        ['credentials', 'addresses', 'peerKey', 'presharedKey', 'allowedIps', 'keepalive'].any(_touched.contains);
+    final error = _touched.contains(key) || editingWireGuard ? _problems()[key] : null;
+    final style = Styles.body.copyWith(fontSize: 14, color: palette.ink);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Row(
+            children: [
+              const SizedBox(width: 12),
+              SizedBox(
+                width: labelWidth,
+                child: Text(label, style: style),
+              ),
+              Expanded(
+                child: Semantics(
+                  label: label,
+                  child: TextField(
+                    key: ValueKey('custom-$key'),
+                    controller: _fields[key],
+                    enabled: !_busy,
+                    obscureText: secret && !_revealed.contains(key),
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    textAlign: TextAlign.end,
+                    keyboardType: digits ? TextInputType.number : TextInputType.text,
+                    inputFormatters: digits ? [FilteringTextInputFormatter.digitsOnly] : null,
+                    textInputAction: TextInputAction.next,
+                    style: style,
+                    decoration: InputDecoration(
+                      hintText: hint,
+                      hintStyle: style.copyWith(color: palette.ink3),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ),
+              if (secret)
+                IconButton(
+                  tooltip: _revealed.contains(key) ? s.customServerHideSecret : s.customServerShowSecret,
+                  onPressed: _busy
+                      ? null
+                      : () => setState(() {
+                          if (!_revealed.remove(key)) _revealed.add(key);
+                        }),
+                  style: IconButton.styleFrom(minimumSize: const Size(32, 40), padding: const EdgeInsets.all(8)),
+                  icon: Icon(
+                    _revealed.contains(key) ? Symbols.visibility_off_rounded : Symbols.visibility_rounded,
+                    size: 16,
+                    color: palette.ink3,
+                  ),
+                )
+              else
+                const SizedBox(width: 12),
+            ],
+          ),
+        ),
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            child: Text(error, style: Styles.dangerCaption(context)),
+          ),
+      ],
     );
   }
 }

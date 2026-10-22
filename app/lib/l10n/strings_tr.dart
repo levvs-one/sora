@@ -1730,15 +1730,9 @@ class STr extends S {
   String get customServerHideSecret => 'Sırrı gizle';
 
   @override
-  String get customServerBadge => 'özel';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '“$name” sunucusu silinsin mi?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Sunucuyu manuel olarak ekleyin: adres, bağlantı noktası ve protokol';
 
   @override
   String get customServerTest => 'Testi';
@@ -1915,10 +1909,6 @@ class STr extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks için: yöntem:parola, örneğin chacha20-ietf-poly1305:parola';
-
-  @override
   String get diagnosticPackets => 'Paket yakalama';
 
   @override
@@ -1994,4 +1984,28 @@ class STr extends S {
 
   @override
   String get extOpen => 'Aç';
+
+  @override
+  String get customServerOwn => 'Kendi sunucun';
+
+  @override
+  String get customServerPaste => 'Bağlantı yapıştır';
+
+  @override
+  String get customServerUser => 'Kullanıcı adı';
+
+  @override
+  String get customServerPassword => 'Parola';
+
+  @override
+  String get customServerSecretRequired => 'Bir değer girin';
+
+  @override
+  String get customServerLinkInvalid => 'Geçersiz sunucu bağlantısı';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

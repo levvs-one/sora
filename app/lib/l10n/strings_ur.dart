@@ -1730,15 +1730,9 @@ class SUr extends S {
   String get customServerHideSecret => 'راز چھپائیں۔';
 
   @override
-  String get customServerBadge => 'ذاتی';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'سرور \"$name\" کو حذف کریں؟';
   }
-
-  @override
-  String get customServerEmptyHint => 'دستی طور پر سرور شامل کریں: ایڈریس، پورٹ اور پروٹوکول';
 
   @override
   String get customServerTest => 'ٹیسٹ';
@@ -1910,10 +1904,6 @@ class SUr extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks کے لیے: method:password، مثلاً chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'پیکٹ کی گرفتاری';
 
   @override
@@ -1989,4 +1979,28 @@ class SUr extends S {
 
   @override
   String get extOpen => 'کھولیں';
+
+  @override
+  String get customServerOwn => 'ذاتی سرور';
+
+  @override
+  String get customServerPaste => 'لنک پیسٹ کریں';
+
+  @override
+  String get customServerUser => 'صارف کا نام';
+
+  @override
+  String get customServerPassword => 'پاس ورڈ';
+
+  @override
+  String get customServerSecretRequired => 'ایک قدر درج کریں';
+
+  @override
+  String get customServerLinkInvalid => 'سرور کا لنک درست نہیں';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

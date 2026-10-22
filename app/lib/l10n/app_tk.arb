@@ -468,7 +468,6 @@
   "customServerOptional": "Hökmany däl",
   "customServerShowSecret": "Gizlin maglumaty görkez",
   "customServerHideSecret": "Gizlin maglumaty gizle",
-  "customServerBadge": "şahsy",
   "customServerDeleteConfirm": "“{name}” serwerini pozuň?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Serweri el bilen goşuň: salgy, port we protokol",
   "customServerTest": "Synag",
   "leakTestTitle": "Maglumatlaryň syzmagy üçin synag",
   "leakTestIntro": "Trafigiň enjamdan tuneliň daşyndan çykyp bilýändigini barlaýar: göni DNS we ICMP talaplary, IPv6 çykyşy we ulgamyň at çözüjileri. Birikme işjeň wagty işlediň.",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "Bu enjam",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks üçin: usul:açar sözi, mysal üçin chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Paket almak",
   "diagnosticEvents": "Windows wakalary",
   "diagnosticCapture": "10 sekuntlap ​​surata düşüriň",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "Aç"
+  "extOpen": "Aç",
+  "customServerOwn": "Şahsy serwer",
+  "customServerPaste": "Salgyny goý",
+  "customServerUser": "Ulanyjy ady",
+  "customServerPassword": "Açar sözi",
+  "customServerSecretRequired": "Baha giriziň",
+  "customServerLinkInvalid": "Serwer salgysy nädogry",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

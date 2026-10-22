@@ -1749,15 +1749,9 @@ class SUk extends S {
   String get customServerHideSecret => 'Сховати секрет';
 
   @override
-  String get customServerBadge => 'власний';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Видалити сервер “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Додайте сервер вручну: адреса, порт і протокол';
 
   @override
   String get customServerTest => 'Тест';
@@ -1937,10 +1931,6 @@ class SUk extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Для Shadowsocks: метод:пароль, наприклад chacha20-ietf-poly1305:пароль';
-
-  @override
   String get diagnosticPackets => 'Перехоплення пакетів';
 
   @override
@@ -2016,4 +2006,28 @@ class SUk extends S {
 
   @override
   String get extOpen => 'Відкрити';
+
+  @override
+  String get customServerOwn => 'Власний сервер';
+
+  @override
+  String get customServerPaste => 'Вставити посилання';
+
+  @override
+  String get customServerUser => 'Користувач';
+
+  @override
+  String get customServerPassword => 'Пароль';
+
+  @override
+  String get customServerSecretRequired => 'Введіть значення';
+
+  @override
+  String get customServerLinkInvalid => 'Неправильне посилання на сервер';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

@@ -18,6 +18,8 @@ option go_package = "github.com/levvs-one/sora-client/core/gen/sora/custom/v1;cu
 // Credentials are write-only: SaveCustomServer accepts them, List and the
 // other RPCs never return them, and TestCustomServer never sends them.
 service CustomServers {
+  // Previews only the supplied link, without reading or writing the vault.
+  rpc PreviewCustomServer(PreviewCustomServerRequest) returns (PreviewCustomServerResponse);
   // SaveCustomServer creates a server (empty id) or updates an existing one.
   rpc SaveCustomServer(SaveCustomServerRequest) returns (SaveCustomServerResponse);
   // ListCustomServers returns every stored custom server without credentials.
@@ -61,12 +63,20 @@ message CustomServer {
   // True when the core holds credentials for this server. Read-only: the
   // value sent on SaveCustomServer is ignored.
   bool has_credentials = 7;
+  // Canonical engine protocol. Takes precedence over the legacy enum.
+  string protocol_name = 8;
+  string transport = 9;
+  string security = 10;
+  // Read-only planner entry, including a vault reference, never its material.
+  sora.core.v1.OutboundSpec outbound = 11;
 }
 
 message SaveCustomServerRequest {
   sora.core.v1.ApiVersion api_version = 1;
   bytes control_authenticator = 2;
   CustomServer server = 3;
+  // A pasted link replaces all previous options rather than patching secrets.
+  bool replace_credentials = 4;
 }
 
 message SaveCustomServerResponse {
@@ -82,6 +92,7 @@ message ListCustomServersRequest {
 message ListCustomServersResponse {
   repeated CustomServer servers = 1;
   sora.core.v1.SoraError error = 2;
+  repeated string protocols = 3;
 }
 
 message DeleteCustomServerRequest {
@@ -110,5 +121,19 @@ message TestCustomServerResponse {
   // Handshake round-trip in milliseconds, rounded down. Zero when
   // unreachable or when the handshake took under a millisecond.
   uint64 latency_ms = 2;
+  sora.core.v1.SoraError error = 3;
+}
+
+message PreviewCustomServerRequest {
+  sora.core.v1.ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  string link = 3;
+}
+
+message PreviewCustomServerResponse {
+  CustomServer server = 1;
+  // Derived exclusively from the request, for filling the local draft.
+  // Stored credentials remain write-only on every RPC.
+  string credential_document = 2;
   sora.core.v1.SoraError error = 3;
 }

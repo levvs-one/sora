@@ -468,7 +468,6 @@
   "customServerOptional": "Ըստ ցանկության",
   "customServerShowSecret": "Ցույց տալ գաղտնիքը",
   "customServerHideSecret": "Թաքցնել գաղտնիքը",
-  "customServerBadge": "սեփական",
   "customServerDeleteConfirm": "Ջնջե՞լ «{name}» սերվերը:",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Ձեռքով ավելացրեք սերվեր՝ հասցե, նավահանգիստ և արձանագրություն",
   "customServerTest": "Թեստ",
   "leakTestTitle": "Տվյալների արտահոսքի ստուգում",
   "leakTestIntro": "Ստուգում է՝ արդյոք տրաֆիկը կարող է սարքից դուրս գալ թունելից դուրս ուղով․ ուղիղ DNS և ICMP հարցումներ, IPv6 ելք և համակարգային անվան լուծիչներ։ Գործարկեք ակտիվ կապի ժամանակ։",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "Այս սարքը",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks-ի համար՝ մեթոդ:գաղտնաբառ, օրինակ chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Փաթեթի գրավում",
   "diagnosticEvents": "Windows-ի իրադարձություններ",
   "diagnosticCapture": "Լուսանկարեք 10 վայրկյան",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "Բացել"
+  "extOpen": "Բացել",
+  "customServerOwn": "Սեփական սերվեր",
+  "customServerPaste": "Տեղադրել հղում",
+  "customServerUser": "Օգտանուն",
+  "customServerPassword": "Գաղտնաբառ",
+  "customServerSecretRequired": "Մուտքագրեք արժեք",
+  "customServerLinkInvalid": "Սերվերի հղումը սխալ է",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

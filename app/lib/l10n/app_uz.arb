@@ -468,7 +468,6 @@
   "customServerOptional": "Majburiy emas",
   "customServerShowSecret": "Sirni ko'rsatish",
   "customServerHideSecret": "Sirni yashirish",
-  "customServerBadge": "shaxsiy",
   "customServerDeleteConfirm": "“{name}” serveri o‘chirilsinmi?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Serverni qo'lda qo'shing: manzil, port va protokol",
   "customServerTest": "Sinov",
   "leakTestTitle": "Ma'lumotlar sizib chiqishi uchun sinov",
   "leakTestIntro": "Trafik qurilmadan tunnel tashqarisida chiqa olishini tekshiradi: bevosita DNS va ICMP soʻrovlari, IPv6 chiqishi va tizim nom yechuvchilari. Ulanish faol boʻlganda ishga tushiring.",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "Ushbu qurilma",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks uchun: usul:parol, masalan chacha20-ietf-poly1305:parol",
   "diagnosticPackets": "Paketni suratga olish",
   "diagnosticEvents": "Windows voqealari",
   "diagnosticCapture": "10 soniya davomida suratga oling",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "Ochish"
+  "extOpen": "Ochish",
+  "customServerOwn": "Shaxsiy server",
+  "customServerPaste": "Havolani joylash",
+  "customServerUser": "Foydalanuvchi",
+  "customServerPassword": "Parol",
+  "customServerSecretRequired": "Qiymat kiriting",
+  "customServerLinkInvalid": "Server havolasi noto‘g‘ri",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

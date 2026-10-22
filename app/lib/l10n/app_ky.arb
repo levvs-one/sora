@@ -468,7 +468,6 @@
   "customServerOptional": "Кошумча",
   "customServerShowSecret": "Сырды көрсөтүү",
   "customServerHideSecret": "Жашыруун",
-  "customServerBadge": "жеке",
   "customServerDeleteConfirm": "“{name}” сервери жок кылынсынбы?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Серверди кол менен кошуңуз: дарек, порт жана протокол",
   "customServerTest": "Сыноо",
   "leakTestTitle": "Маалыматтын агып кетишин текшерүү",
   "leakTestIntro": "Трафик түзмөктөн туннелден тышкары чыга аларын текшерет: түз DNS жана ICMP сурамдары, IPv6 чыгышы жана системалык резолверлер. Туташуу активдүү кезде иштетиңиз.",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "Бул аппарат",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks үчүн: ыкма:сырсөз, мисалы chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Пакетти басып алуу",
   "diagnosticEvents": "Windows окуялары",
   "diagnosticCapture": "10 секундга тартыңыз",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "Ачуу"
+  "extOpen": "Ачуу",
+  "customServerOwn": "Жеке сервер",
+  "customServerPaste": "Шилтемени чаптоо",
+  "customServerUser": "Колдонуучу",
+  "customServerPassword": "Сырсөз",
+  "customServerSecretRequired": "Маани киргизиңиз",
+  "customServerLinkInvalid": "Сервердин шилтемеси туура эмес",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

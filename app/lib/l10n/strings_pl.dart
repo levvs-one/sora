@@ -1754,15 +1754,9 @@ class SPl extends S {
   String get customServerHideSecret => 'Ukryj sekret';
 
   @override
-  String get customServerBadge => 'własny';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Usunąć serwer „$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Dodaj serwer ręcznie: adres, port i protokół';
 
   @override
   String get customServerTest => 'Test';
@@ -1942,10 +1936,6 @@ class SPl extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Dla Shadowsocks: metoda:hasło, na przykład chacha20-ietf-poly1305:haslo';
-
-  @override
   String get diagnosticPackets => 'Przechwytywanie pakietów';
 
   @override
@@ -2021,4 +2011,28 @@ class SPl extends S {
 
   @override
   String get extOpen => 'Otwórz';
+
+  @override
+  String get customServerOwn => 'Własny serwer';
+
+  @override
+  String get customServerPaste => 'Wklej link';
+
+  @override
+  String get customServerUser => 'Użytkownik';
+
+  @override
+  String get customServerPassword => 'Hasło';
+
+  @override
+  String get customServerSecretRequired => 'Wpisz wartość';
+
+  @override
+  String get customServerLinkInvalid => 'Nieprawidłowy link serwera';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

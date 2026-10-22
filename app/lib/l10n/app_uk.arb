@@ -468,7 +468,6 @@
   "customServerOptional": "Необов'язково",
   "customServerShowSecret": "Показати секрет",
   "customServerHideSecret": "Сховати секрет",
-  "customServerBadge": "власний",
   "customServerDeleteConfirm": "Видалити сервер “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Додайте сервер вручну: адреса, порт і протокол",
   "customServerTest": "Тест",
   "leakTestTitle": "Перевірка на витік даних",
   "leakTestIntro": "Перевіряє, чи може трафік залишити пристрій поза тунелем: прямі запити DNS та ICMP, вихід IPv6 і системні резолвери. Запускайте під час активного підключення.",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "Цей пристрій",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Для Shadowsocks: метод:пароль, наприклад chacha20-ietf-poly1305:пароль",
   "diagnosticPackets": "Перехоплення пакетів",
   "diagnosticEvents": "Події Windows",
   "diagnosticCapture": "Зробіть знімок на 10 секунд",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "Відкрити"
+  "extOpen": "Відкрити",
+  "customServerOwn": "Власний сервер",
+  "customServerPaste": "Вставити посилання",
+  "customServerUser": "Користувач",
+  "customServerPassword": "Пароль",
+  "customServerSecretRequired": "Введіть значення",
+  "customServerLinkInvalid": "Неправильне посилання на сервер",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

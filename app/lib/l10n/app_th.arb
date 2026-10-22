@@ -468,7 +468,6 @@
   "customServerOptional": "ไม่บังคับ",
   "customServerShowSecret": "แสดงความลับ",
   "customServerHideSecret": "ซ่อนความลับ",
-  "customServerBadge": "กำหนดเอง",
   "customServerDeleteConfirm": "ลบเซิร์ฟเวอร์ “{name}” หรือไม่",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "เพิ่มเซิร์ฟเวอร์ด้วยตนเอง: ที่อยู่ พอร์ต และโปรโตคอล",
   "customServerTest": "ทดสอบ",
   "leakTestTitle": "ทดสอบการรั่วไหลของข้อมูล",
   "leakTestIntro": "ตรวจสอบว่าข้อมูลออกจากอุปกรณ์โดยไม่ผ่านอุโมงค์ได้หรือไม่ โดยทดสอบ DNS และ ICMP โดยตรง การเชื่อมต่อขาออก IPv6 และตัวแปลงชื่อของระบบ ให้เรียกใช้ขณะเชื่อมต่ออยู่",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "อุปกรณ์นี้",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "สำหรับ Shadowsocks: วิธี:รหัสผ่าน เช่น chacha20-ietf-poly1305:password",
   "diagnosticPackets": "การจับแพ็คเก็ต",
   "diagnosticEvents": "เหตุการณ์ของวินโดวส์",
   "diagnosticCapture": "จับภาพเป็นเวลา 10 วินาที",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "เปิด"
+  "extOpen": "เปิด",
+  "customServerOwn": "เซิร์ฟเวอร์ส่วนตัว",
+  "customServerPaste": "วางลิงก์",
+  "customServerUser": "ชื่อผู้ใช้",
+  "customServerPassword": "รหัสผ่าน",
+  "customServerSecretRequired": "ป้อนค่า",
+  "customServerLinkInvalid": "ลิงก์เซิร์ฟเวอร์ไม่ถูกต้อง",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -1735,15 +1735,9 @@ class SUz extends S {
   String get customServerHideSecret => 'Sirni yashirish';
 
   @override
-  String get customServerBadge => 'shaxsiy';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '“$name” serveri o‘chirilsinmi?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Serverni qo\'lda qo\'shing: manzil, port va protokol';
 
   @override
   String get customServerTest => 'Sinov';
@@ -1920,10 +1914,6 @@ class SUz extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks uchun: usul:parol, masalan chacha20-ietf-poly1305:parol';
-
-  @override
   String get diagnosticPackets => 'Paketni suratga olish';
 
   @override
@@ -1999,4 +1989,28 @@ class SUz extends S {
 
   @override
   String get extOpen => 'Ochish';
+
+  @override
+  String get customServerOwn => 'Shaxsiy server';
+
+  @override
+  String get customServerPaste => 'Havolani joylash';
+
+  @override
+  String get customServerUser => 'Foydalanuvchi';
+
+  @override
+  String get customServerPassword => 'Parol';
+
+  @override
+  String get customServerSecretRequired => 'Qiymat kiriting';
+
+  @override
+  String get customServerLinkInvalid => 'Server havolasi noto‘g‘ri';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

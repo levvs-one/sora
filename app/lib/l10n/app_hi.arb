@@ -468,7 +468,6 @@
   "customServerOptional": "वैकल्पिक",
   "customServerShowSecret": "रहस्य दिखाएँ",
   "customServerHideSecret": "रहस्य छुपाएं",
-  "customServerBadge": "कस्टम",
   "customServerDeleteConfirm": "सर्वर \"{name}\" हटाएं?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "मैन्युअल रूप से एक सर्वर जोड़ें: पता, पोर्ट और प्रोटोकॉल",
   "customServerTest": "परीक्षण",
   "leakTestTitle": "डेटा लीक के लिए परीक्षण",
   "leakTestIntro": "जाँचता है कि ट्रैफ़िक टनल से बाहर होकर डिवाइस से निकल सकता है या नहीं: सीधे DNS और ICMP अनुरोध, IPv6 निकास और सिस्टम रिज़ॉल्वर। कनेक्शन चालू होने पर चलाएँ।",
@@ -960,7 +958,6 @@
   },
   "syncThisDevice": "यह उपकरण",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks के लिए: method:password, जैसे chacha20-ietf-poly1305:password",
   "diagnosticPackets": "पैकेट पर कब्जा",
   "diagnosticEvents": "विंडोज़ घटनाएँ",
   "diagnosticCapture": "10 सेकंड के लिए कैप्चर करें",
@@ -991,5 +988,13 @@
       }
     }
   },
-  "extOpen": "खोलें"
+  "extOpen": "खोलें",
+  "customServerOwn": "अपना सर्वर",
+  "customServerPaste": "लिंक पेस्ट करें",
+  "customServerUser": "उपयोगकर्ता नाम",
+  "customServerPassword": "पासवर्ड",
+  "customServerSecretRequired": "कोई मान दर्ज करें",
+  "customServerLinkInvalid": "सर्वर लिंक अमान्य है",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }
