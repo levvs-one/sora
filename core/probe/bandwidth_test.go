@@ -192,8 +192,10 @@ func TestBenchmarkBuildsFreshEnginePerServer(t *testing.T) {
 	ch, err := b.Benchmark(context.Background(),
 		[]engine.Outbound{testOutbound("s1"), testOutbound("s2")},
 		engine.BandwidthOptions{
-			URL:         stub.URL,
-			Duration:    300 * time.Millisecond,
+			URL: stub.URL,
+			// The stub ends each stream after 1 MiB, so the run still finishes in
+			// milliseconds; a short window starved loaded Windows runners of any byte.
+			Duration:    5 * time.Second,
 			Timeout:     10 * time.Second,
 			Concurrency: 2,
 		})
