@@ -33,10 +33,11 @@ class ExtensionWorkers {
     for (final id in _running.keys.toList()) {
       if (!sora.extensions.isEnabled(id) || sora.link != _link) {
         unawaited(_running.remove(id)!.stop());
+        sora.recovered('extension-worker:$id');
       }
     }
     _work = _work.then((_) => _sync()).catchError((Object error) {
-      if (!_disposed) sora.reportFailure(error, source: 'extension-workers');
+      if (!_disposed) sora.reportFailure(error, source: 'extension-workers', mode: FailureMode.background);
     });
   }
 
@@ -109,7 +110,11 @@ class ExtensionWorkers {
           (message) async {
             if (_disposed || !store.isEnabled(inst.id) || _running[inst.id] != worker) return;
             if (message.log.isNotEmpty) store.appendLog(inst.id, message.log);
-            if (message.failed) await _failed(inst);
+            if (message.failed) {
+              await _failed(inst);
+            } else if (message.log.isNotEmpty) {
+              sora.recovered('extension-worker:${inst.id}');
+            }
             if (message.callJson.isNotEmpty) {
               final reply = await bridge.handle(message.callJson);
               if (!worker.stopped && store.isEnabled(inst.id)) worker.input.add(WorkerClientMessage(replyJson: reply));
@@ -128,11 +133,17 @@ class ExtensionWorkers {
         await _failed(inst);
       }
     }
+    sora.recovered('extension-workers');
   }
 
-  Future<void> _failed(InstalledExtension inst) => sora.recordNotification(
-    AppNotification(time: DateTime.now(), title: inst.manifest.name, body: sora.strings.extWorkerFailed),
-  );
+  Future<void> _failed(InstalledExtension inst) async {
+    sora.reportFailure(
+      const CoreFailure('app.extension_worker'),
+      mode: FailureMode.background,
+      source: 'extension-worker:${inst.id}',
+      action: '',
+    );
+  }
 
   void dispose() {
     _disposed = true;

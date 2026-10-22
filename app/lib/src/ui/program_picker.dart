@@ -11,6 +11,7 @@ import '../desktop/programs.dart';
 import '../design/theme.dart';
 import 'kit.dart';
 import '../sora.dart';
+import '../core/link.dart';
 
 Future<String?> chooseProgram(BuildContext context) =>
     showDialog<String>(context: context, builder: (_) => const _ProgramPicker());
@@ -24,7 +25,7 @@ class _ProgramPicker extends StatefulWidget {
 class _ProgramPickerState extends State<_ProgramPicker> {
   final _search = TextEditingController();
   List<Program>? _programs;
-  bool _failed = false;
+  CoreFailure? _failure;
   bool _running = Platform.isWindows;
   int _request = 0;
 
@@ -37,20 +38,20 @@ class _ProgramPickerState extends State<_ProgramPicker> {
     _load();
   }
 
-  Future<void> _load() async {
+  Future<void> _load({FailureMode mode = FailureMode.background}) async {
     SoraScope.read(context).recovered('programs');
     final request = ++_request;
     setState(() {
       _programs = null;
-      _failed = false;
+      _failure = null;
     });
     try {
       final programs = _running ? await runningPrograms() : await installedPrograms();
       if (mounted && request == _request) setState(() => _programs = programs);
     } catch (error) {
       if (mounted && request == _request) {
-        setState(() => _failed = true);
-        SoraScope.read(context).reportFailure(error, source: 'programs');
+        setState(() => _failure = CoreFailure.from(error));
+        SoraScope.read(context).reportFailure(error, source: 'programs', mode: mode);
       }
     }
   }
@@ -144,14 +145,17 @@ class _ProgramPickerState extends State<_ProgramPicker> {
                     final shown = _programs
                         ?.where((p) => '${p.name} ${p.binary} ${p.icon}'.toLowerCase().contains(query))
                         .toList();
-                    return _failed
+                    return _failure != null
                         ? Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(s.errGeneric, style: Styles.secondary.copyWith(color: palette.ink2)),
+                                Text(describe(s, _failure!), style: Styles.secondary.copyWith(color: palette.ink2)),
                                 const SizedBox(height: 8),
-                                TextButton(onPressed: _load, child: Text(s.refresh)),
+                                TextButton(
+                                  onPressed: () => _load(mode: FailureMode.action),
+                                  child: Text(s.refresh),
+                                ),
                               ],
                             ),
                           )

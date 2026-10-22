@@ -11,7 +11,7 @@ import 'package:webview_all_windows/webview_all_windows.dart';
 
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
-import '../notifications.dart';
+import '../core/link.dart';
 import '../sora.dart';
 import '../speedtest_services.dart';
 import 'kit.dart';
@@ -217,7 +217,7 @@ class SpeedtestBrowser extends StatefulWidget {
 class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
   WebViewController? _controller;
   bool _ready = false;
-  String? _failure;
+  CoreFailure? _failure;
   String? _mainUrl;
   String? _language;
   // _release awaits cancellation after taking ownership of this field.
@@ -273,6 +273,7 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
       _generation++;
       _failure = null;
       _mainUrl = null;
+      _sora?.recovered('speedtest:${oldWidget.service.url}', notify: false);
       unawaited(_start());
     }
   }
@@ -314,17 +315,18 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
     _generation++;
     _deadline?.cancel();
     _retryDelay?.cancel();
+    _sora?.recovered('speedtest:$_url', notify: false);
     unawaited(_release());
     super.dispose();
   }
 
-  void _failed(String message, {bool retry = true}) {
+  void _failed(CoreFailure failure, {bool retry = true}) {
     if (!mounted || _failure != null) return;
     _deadline?.cancel();
     _generation++;
     setState(() {
       _ready = false;
-      _failure = retry && _automaticRetries < 2 ? null : message;
+      _failure = retry && _automaticRetries < 2 ? null : failure;
     });
     unawaited(_release());
     if (_failure == null) {
@@ -335,16 +337,12 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
       });
       return;
     }
-    unawaited(
-      SoraScope.read(context).recordNotification(
-        AppNotification(
-          time: DateTime.now(),
-          title: widget.service.name,
-          body: message,
-          action: 'speedtest',
-          argument: _url,
-        ),
-      ),
+    SoraScope.read(context).reportFailure(
+      failure,
+      mode: FailureMode.background,
+      source: 'speedtest:$_url',
+      action: 'speedtest',
+      argument: _url,
     );
   }
 
@@ -352,7 +350,6 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
     if (_starting || !mounted) return;
     _starting = true;
     final generation = _generation;
-    final s = S.of(context);
     _watchLoad();
     try {
       await _releaseWork?.timeout(const Duration(seconds: 10));
@@ -404,6 +401,7 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
             if (mounted && generation == _generation && url == _mainUrl) {
               _deadline?.cancel();
               _automaticRetries = 0;
+              _sora?.recovered('speedtest:$_url');
             }
           },
           onWebResourceError: (error) {
@@ -420,7 +418,10 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
                   error: error.description,
                 );
               }
-              _failed(s.speedtestPageFailed, retry: error.errorType != WebResourceErrorType.failedSslHandshake);
+              _failed(
+                const CoreFailure('app.speedtest_page'),
+                retry: error.errorType != WebResourceErrorType.failedSslHandshake,
+              );
             }
           },
           onHttpError: (error) {
@@ -432,7 +433,7 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
                   response: {'status': error.response?.statusCode, 'headers': error.response?.headers},
                 );
               }
-              _failed(s.speedtestPageFailed);
+              _failed(const CoreFailure('app.speedtest_page'));
             }
           },
         ),
@@ -448,7 +449,7 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
             (error is TimeoutException && _controller == null) ||
             (error is PlatformException &&
                 const {'webkit_unavailable', 'webview2_runtime_unavailable'}.contains(error.code));
-        _failed(s.speedtestUnavailable, retry: !missingRuntime);
+        _failed(const CoreFailure('app.speedtest_runtime'), retry: !missingRuntime);
       }
     } finally {
       _starting = false;
@@ -458,7 +459,7 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
 
   void _watchLoad() {
     _deadline?.cancel();
-    _deadline = Timer(const Duration(seconds: 45), () => _failed(S.of(context).speedtestPageFailed));
+    _deadline = Timer(const Duration(seconds: 45), () => _failed(const CoreFailure('app.speedtest_page')));
   }
 
   Future<void> _retry() async {
@@ -477,12 +478,11 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
     try {
       if (await controller.canGoBack() && mounted && controller == _controller) await controller.goBack();
     } catch (_) {
-      if (mounted) _failed(S.of(context).speedtestPageFailed);
+      if (mounted) _failed(const CoreFailure('app.speedtest_page'));
     }
   }
 
   Future<void> _open() async {
-    final message = S.of(context).speedtestExternalFailed;
     try {
       final current = await _controller?.currentUrl() ?? _url;
       final uri = Uri.tryParse(current);
@@ -493,9 +493,11 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
       }
     } catch (_) {
       if (mounted) {
-        unawaited(
-          SoraScope.read(context)
-              .recordNotification(AppNotification(time: DateTime.now(), title: widget.service.name, body: message)),
+        SoraScope.read(context).reportFailure(
+          const CoreFailure('app.browser_unavailable'),
+          mode: FailureMode.action,
+          source: 'browser',
+          action: '',
         );
       }
     }
@@ -535,7 +537,7 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          _failure!,
+                          describe(s, _failure!),
                           textAlign: TextAlign.center,
                           style: Styles.secondary.copyWith(color: palette.ink2),
                         ),

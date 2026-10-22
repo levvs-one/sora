@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:io';
+
+import 'package:http/http.dart' show ClientException;
 
 import 'package:grpc/grpc.dart';
 import 'package:grpc/service_api.dart' as api;
@@ -10,13 +13,13 @@ import '../generated/sora/leak/v1/leak.pbgrpc.dart';
 import '../generated/sora/ext/v1/ext_host.pbgrpc.dart';
 import 'pipe.dart';
 
-/// API 1.12 adds strict kill-switch intent; 1.11 adds the leak-test suite; 1.10 exposes proxy chains and
+/// API 1.13 adds subscription failure age; 1.12 adds strict kill-switch intent; 1.11 adds the leak-test suite; 1.10 exposes proxy chains and
 /// zapret-with-VPN in SessionPlan, network profiles and chain probing; 1.9
 /// adds throughput benchmarks, 1.8 DNS leak diagnostics. 1.6 is required to
 /// open subscription pages without exposing links in states. The client offers
 /// the newest minor it speaks and the core negotiates down, so older cores
 /// keep working for the fields they know.
-final apiVersion = ApiVersion(major: 1, minor: 12, minSupportedMinor: 6);
+final apiVersion = ApiVersion(major: 1, minor: 13, minSupportedMinor: 6);
 
 /// A gRPC channel to the core over a Unix socket or Windows named pipe, with
 /// the Handshake authentication token.
@@ -88,7 +91,18 @@ class CoreLink {
 
 /// A core or app failure identified by a message catalog key.
 class CoreFailure implements Exception {
-  const CoreFailure(this.key);
+  const CoreFailure(this.key, {this.httpStatus});
+
+  final int? httpStatus;
+  String get identity => httpStatus == null ? key : '$key:$httpStatus';
+
+  factory CoreFailure.fromWire(SoraError error) {
+    // Only an HTTP status is copied from the redacted detail, never its text.
+    final status = error.userMessageKey == 'core.subscription.status'
+        ? int.tryParse(RegExp(r'\b([1-5][0-9]{2})\b').firstMatch(error.detailRedacted)?.group(1) ?? '')
+        : null;
+    return CoreFailure(error.userMessageKey, httpStatus: status);
+  }
 
   /// A core catalog key, such as "core.engine.start_failed", or an app key
   /// under "app.".
@@ -104,12 +118,27 @@ class CoreFailure implements Exception {
       final key = (error.message ?? '').split(' ').last;
       if (key.startsWith('core.')) return CoreFailure(key);
       return switch (error.code) {
-        StatusCode.unavailable || StatusCode.deadlineExceeded || StatusCode.cancelled => unavailable,
+        StatusCode.unavailable => unavailable,
+        StatusCode.deadlineExceeded => const CoreFailure('core.request.deadline_exceeded'),
+        StatusCode.cancelled => const CoreFailure('core.request.cancelled'),
+        StatusCode.unimplemented => const CoreFailure('core.api.version_mismatch'),
+        StatusCode.invalidArgument => const CoreFailure('core.request.invalid'),
+        StatusCode.resourceExhausted => const CoreFailure('core.request.too_large'),
+        StatusCode.notFound => const CoreFailure('core.generic.not_found'),
         StatusCode.unauthenticated || StatusCode.permissionDenied => const CoreFailure('core.auth.unauthenticated'),
         _ => const CoreFailure('core.internal.unexpected'),
       };
     }
-    return const CoreFailure('core.internal.unexpected');
+    return switch (error) {
+      TimeoutException() => const CoreFailure('core.network.timeout'),
+      TlsException() => const CoreFailure('core.tls.certificate'),
+      SocketException(:final address) when address?.type == InternetAddressType.unix => unavailable,
+      SocketException() || ClientException() => const CoreFailure('core.network.failed'),
+      HttpException() => const CoreFailure('app.http_status'),
+      FileSystemException() => const CoreFailure('app.file_access'),
+      FormatException() => const CoreFailure('core.request.invalid'),
+      _ => const CoreFailure('core.internal.unexpected'),
+    };
   }
 
   @override

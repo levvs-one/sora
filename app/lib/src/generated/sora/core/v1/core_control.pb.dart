@@ -6759,6 +6759,7 @@ class SubscriptionState extends $pb.GeneratedMessage {
     $core.bool? updating,
     $core.bool? deleted,
     $core.String? displayName,
+    $2.Timestamp? failureSince,
   }) {
     final result = SubscriptionState._();
     if (settings != null) result.settings = settings;
@@ -6770,6 +6771,7 @@ class SubscriptionState extends $pb.GeneratedMessage {
     if (updating != null) result.updating = updating;
     if (deleted != null) result.deleted = deleted;
     if (displayName != null) result.displayName = displayName;
+    if (failureSince != null) result.failureSince = failureSince;
     return result;
   }
 
@@ -6794,6 +6796,7 @@ class SubscriptionState extends $pb.GeneratedMessage {
     ..aOB(7, _omitFieldNames ? '' : 'updating')
     ..aOB(8, _omitFieldNames ? '' : 'deleted')
     ..aOS(9, _omitFieldNames ? '' : 'displayName')
+    ..aOM<$2.Timestamp>(10, _omitFieldNames ? '' : 'failureSince', subBuilder: $2.Timestamp.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6905,6 +6908,19 @@ class SubscriptionState extends $pb.GeneratedMessage {
   $core.bool hasDisplayName() => $_has(8);
   @$pb.TagNumber(9)
   void clearDisplayName() => $_clearField(9);
+
+  /// Since 1.13. Beginning of the uninterrupted failure streak, including
+  /// updates while the UI is closed; unset after recovery.
+  @$pb.TagNumber(10)
+  $2.Timestamp get failureSince => $_getN(9);
+  @$pb.TagNumber(10)
+  set failureSince($2.Timestamp value) => $_setField(10, value);
+  @$pb.TagNumber(10)
+  $core.bool hasFailureSince() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearFailureSince() => $_clearField(10);
+  @$pb.TagNumber(10)
+  $2.Timestamp ensureFailureSince() => $_ensure(9);
 }
 
 class SaveSubscriptionRequest extends $pb.GeneratedMessage {

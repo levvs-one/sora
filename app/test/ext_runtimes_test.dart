@@ -294,7 +294,7 @@ void main() {
     await tester.scrollUntilVisible(find.byType(SwitchTile), 250, scrollable: find.byType(Scrollable).first);
     await tester.tap(find.byType(SwitchTile));
     await tester.pump();
-    expect(find.text('Extension asset rejected: unreadable colors or invalid rules.'), findsOneWidget);
+    expect(find.text(lookupS(const Locale('en')).extAssetRejected), findsOneWidget);
     expect(store.isEnabled(inst.id), isFalse);
     expect(store.activeTheme, isNull);
     expect(tester.takeException(), isNull);

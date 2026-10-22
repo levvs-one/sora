@@ -205,64 +205,63 @@ class SUr extends S {
   String get errGeneric => 'کچھ غلط ہو گیا۔';
 
   @override
-  String get errCore => 'Sora سروس جواب نہیں دے رہی ہے۔';
+  String get errCore => 'Sora سروس جواب نہیں دے رہی۔ کچھ دیر انتظار کر کے دوبارہ کوشش کریں۔';
 
   @override
-  String get errAuth => 'Sora سروس تک رسائی نہیں ہے۔';
+  String get errAuth => 'Sora سروس تک رسائی مسترد ہو گئی۔ ایپ دوبارہ شروع کر کے پھر کوشش کریں۔';
 
   @override
-  String get errVersion => 'Sora اپ ڈیٹ کریں: ایپ اور سروس مختلف ورژن ہیں۔';
+  String get errVersion => 'Sora ایپ اور سروس کے ورژن مختلف ہیں۔ Sora کو اپ ڈیٹ کریں۔';
 
   @override
-  String get errBusy => 'انتظار کرو، پچھلی کمانڈ اب بھی چل رہی ہے۔';
+  String get errBusy => 'پچھلی کمانڈ ابھی چل رہی ہے۔ اس کے مکمل ہونے کا انتظار کریں۔';
 
   @override
-  String get errEngineMissing => 'اس سرور کے لیے کوئی انجن نہیں ملا';
+  String get errEngineMissing => 'اس سرور کے لیے درکار انجن نہیں ملا۔ Sora کی اپ ڈیٹس چیک کریں۔';
 
   @override
-  String get errEngineStart => 'انجن اسٹارٹ نہیں ہوا۔';
+  String get errEngineStart => 'انجن شروع نہیں ہو سکا۔ وجہ جاننے کے لیے کنکشن کا لاگ دیکھیں۔';
 
   @override
-  String get errEngineStopped => 'انجن رک گیا۔';
+  String get errEngineStopped => 'انجن بند ہو گیا۔ دوبارہ کنکٹ کرنے کی کوشش کریں۔';
 
   @override
-  String get errTunnel => 'VPN کنکشن بنانے کی اجازت نہیں ہے۔';
-
-  @override
-  String get errServers => 'سرور ایک خرابی کے ساتھ ترتیب دیا گیا ہے۔';
+  String get errTunnel => 'یہ VPN موڈ دستیاب نہیں۔ دوسرا موڈ منتخب کریں یا سروس کی اجازتیں چیک کریں۔';
 
   @override
   String get errNetwork => 'سرور تک نہیں پہنچ سکتا';
 
   @override
-  String get errTimeout => 'سرور نے بروقت جواب نہیں دیا۔';
+  String get errTimeout => 'سرور نے وقت پر جواب نہیں دیا۔ ایک منٹ بعد دوبارہ کوشش کریں۔';
 
   @override
-  String get errFirewall => 'VPN کے باہر انٹرنیٹ کو بلاک نہیں کیا جا سکا';
+  String get errFirewall => 'VPN سے باہر انٹرنیٹ تک رسائی بند نہیں کی جا سکی۔ وجہ جاننے کے لیے کنکشن کا لاگ دیکھیں۔';
 
   @override
-  String get errSubFetch => 'سبسکرپشن لوڈ نہیں ہو سکی';
+  String get errSubFetch => 'سبسکرپشن ڈاؤن لوڈ نہیں ہو سکی۔ انٹرنیٹ کنکشن چیک کر کے ایک منٹ بعد دوبارہ کوشش کریں۔';
 
   @override
-  String get errSubFormat => 'یہ سبسکرپشن لنک نہیں ہے۔';
+  String get errSubFormat => 'سبسکرپشن کا فارمیٹ پہچانا نہیں جا سکا۔ فراہم کنندہ سے موافق سبسکرپشن لنک مانگیں۔';
 
   @override
-  String get errSubEmpty => 'سبسکرپشن میں کوئی سرور نہیں ہے۔';
+  String get errSubEmpty => 'سبسکرپشن میں کوئی سرور نہیں ہے۔ سبسکرپشن فراہم کنندہ سے رابطہ کریں۔';
 
   @override
-  String get errSubDuplicate => 'یہ رکنیت پہلے ہی شامل ہے۔';
+  String get errSubDuplicate => 'یہ سبسکرپشن پہلے سے شامل ہے۔ تازہ سرور حاصل کرنے کے لیے اسے اپ ڈیٹ کریں۔';
 
   @override
-  String get errSubLimit => 'بہت زیادہ سبسکرپشنز';
+  String get errSubLimit =>
+      'سبسکرپشنز کی حد پوری ہو گئی ہے۔ نئی سبسکرپشن شامل کرنے سے پہلے کوئی غیر ضروری سبسکرپشن ہٹا دیں۔';
 
   @override
-  String get errSubScheme => 'لنک https:// سے شروع ہونا چاہیے';
+  String get errSubScheme => 'سبسکرپشن لنک https:// سے شروع ہونا چاہیے۔ فراہم کنندہ سے محفوظ لنک مانگیں۔';
 
   @override
-  String get errSecretStore => 'Sora اسٹوریج خراب ہے یا دستیاب نہیں ہے۔';
+  String get errSecretStore =>
+      'Sora کا ذخیرہ خراب ہے یا اس تک رسائی ممکن نہیں۔ رسائی کی اجازتیں اور لاگ میں تفصیلات چیک کریں۔';
 
   @override
-  String get errNoServers => 'جڑنے کے لیے سبسکرپشن شامل کریں۔';
+  String get errNoServers => 'کنکٹ کرنے کے لیے کوئی سرور نہیں ہے۔ سبسکرپشن یا اپنا سرور شامل کریں۔';
 
   @override
   String get connections => 'کنکشنز';
@@ -487,8 +486,8 @@ class SUr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'سبسکرپشن # دنوں میں ختم ہو جاتی ہے۔',
-      one: 'رکنیت # دن میں ختم ہو جاتی ہے۔',
+      other: 'سبسکرپشن $days دنوں میں ختم ہو جاتی ہے۔',
+      one: 'رکنیت $days دن میں ختم ہو جاتی ہے۔',
       zero: 'رکنیت چند گھنٹوں میں ختم ہو جاتی ہے۔',
     );
     return '$name: $_temp0';
@@ -507,8 +506,8 @@ class SUr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# سرورز، تیز ترین',
-      one: '# سرور، تیز ترین',
+      other: '$count سرورز، تیز ترین',
+      one: '$count سرور، تیز ترین',
     );
     return '$_temp0';
   }
@@ -630,7 +629,7 @@ class SUr extends S {
   String get less => 'کم';
 
   @override
-  String get notificationsEmpty => 'کنکشن اور سبسکرپشن ایونٹس یہاں ظاہر ہوں گے۔';
+  String get notificationsEmpty => 'کوئی اطلاع نہیں';
 
   @override
   String get retryConnect => 'کنکشن کی دوبارہ کوشش کریں۔';
@@ -1227,13 +1226,13 @@ class SUr extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# منٹ', one: '# منٹ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count منٹ', one: '$count منٹ');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# گھنٹے', one: '# گھنٹہ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count گھنٹے', one: '$count گھنٹہ');
     return '$_temp0';
   }
 
@@ -1303,7 +1302,7 @@ class SUr extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# کنکشن', one: '# کنکشن');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count کنکشن', one: '$count کنکشن');
     return '$_temp0';
   }
 
@@ -1385,21 +1384,6 @@ class SUr extends S {
   String get dnsActual => 'مشاہدہ کیا گیا۔';
 
   @override
-  String get sortBy => 'ترتیب دیں۔';
-
-  @override
-  String get sortSubscription => 'سبسکرپشن کی ترتیب میں';
-
-  @override
-  String get sortPing => 'پنگ';
-
-  @override
-  String get sortSpeed => 'رفتار';
-
-  @override
-  String get sortName => 'نام';
-
-  @override
   String get measureSpeed => 'رفتار کی پیمائش کریں۔';
 
   @override
@@ -1418,13 +1402,10 @@ class SUr extends S {
   String get autoSelectSmart => 'سمارٹ انتخاب';
 
   @override
-  String get coreWatchUnstable => 'Sora کور سے کنکشن غیر مستحکم ہے۔';
+  String get coreWatchUnstable => 'کور سے رابطہ غیر مستحکم ہے۔ کچھ دیر انتظار کر کے دوبارہ کنکٹ کرنے کی کوشش کریں۔';
 
   @override
   String get watchReconnect => 'دوبارہ جڑیں۔';
-
-  @override
-  String get coreRestoringLink => 'Sora کور سے کنکشن بحال ہو رہا ہے…';
 
   @override
   String get crashRestoreTitle => 'آخری سیشن میں خلل پڑا تھا۔';
@@ -1460,7 +1441,7 @@ class SUr extends S {
   String get overrideCustomRules => 'اپنے اصول';
 
   @override
-  String get errBenchmarkUnsupported => 'رفتار کی پیمائش کو ایک نئے کور کی ضرورت ہے۔';
+  String get errBenchmarkUnsupported => 'رفتار کی پیمائش کے لیے کور کا نیا ورژن درکار ہے۔ Sora کو اپ ڈیٹ کریں۔';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1563,10 +1544,10 @@ class SUr extends S {
       'دوبارہ ترتیب دینے کے لیے گھسیٹیں: ٹریفک اوپر سے داخل ہوتا ہے اور نیچے سے باہر نکلتا ہے۔';
 
   @override
-  String get chainTooFew => 'کم از کم 2 سرور چنیں۔';
+  String get chainTooFew => 'چین کے لیے کم از کم دو سرور درکار ہیں۔ ایک اور سرور شامل کریں۔';
 
   @override
-  String get chainTooMany => 'ایک سلسلہ زیادہ سے زیادہ 3 سرور رکھتا ہے۔';
+  String get chainTooMany => 'چین میں زیادہ سے زیادہ تین سرور ہو سکتے ہیں۔ اضافی سرور ہٹا دیں۔';
 
   @override
   String get chainEstimate => 'تخمینی تاخیر';
@@ -1583,10 +1564,10 @@ class SUr extends S {
   }
 
   @override
-  String get chainUnsupported => 'موجودہ انجن زنجیریں نہیں بنا سکتا';
+  String get chainUnsupported => 'منتخب انجن سرور چین کی سہولت نہیں دیتا۔ موافق انجن منتخب کریں۔';
 
   @override
-  String get chainHopMissing => 'سلسلہ سرورز میں سے ایک اب دستیاب نہیں ہے۔';
+  String get chainHopMissing => 'چین کا ایک سرور اب دستیاب نہیں۔ اس مرحلے کے لیے دوسرا سرور منتخب کریں۔';
 
   @override
   String chainHop(Object n) {
@@ -1657,7 +1638,7 @@ class SUr extends S {
       'VPN ٹنل کے ساتھ zapret چلاتا ہے: ٹنل کی ٹریفک VPN سے اور براہ راست ٹریفک پابندی سے بچنے کے طریقے سے گزرتی ہے۔';
 
   @override
-  String get chainDuplicate => 'ہر سرور صرف ایک بار ظاہر ہو سکتا ہے۔';
+  String get chainDuplicate => 'چین میں ایک سرور دہرایا گیا ہے۔ ہر مرحلے کے لیے الگ سرور منتخب کریں۔';
 
   @override
   String get edit => 'ترمیم کریں۔';
@@ -1763,7 +1744,7 @@ class SUr extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# لیک ملے', one: '# لیک ملا');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count لیک ملے', one: '$count لیک ملا');
     return '$_temp0';
   }
 
@@ -1967,7 +1948,8 @@ class SUr extends S {
   String get extWorkerFailed => 'ایکسٹینشن کا پس منظر کا کام ناکام ہوگیا۔ ایکسٹینشن کا لاگ دیکھیں۔';
 
   @override
-  String get extAssetRejected => 'ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔';
+  String get extAssetRejected =>
+      'ایکسٹینشن کی فائل میں ایسے رنگ ہیں جن سے پڑھنا مشکل ہے یا اصول درست نہیں۔ ایکسٹینشن کے مصنف سے فائل درست کرنے کو کہیں۔';
 
   @override
   String get extVerifiedSora => 'Sora سے تصدیق شدہ';
@@ -2003,4 +1985,112 @@ class SUr extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora میں اندرونی خرابی۔ لاگ محفوظ کریں اور مسئلے کی اطلاع دیں۔';
+
+  @override
+  String get errTls => 'سرور کا سرٹیفکیٹ مسترد ہو گیا۔ گھڑی چیک کریں یا فراہم کنندہ سے رابطہ کریں۔';
+
+  @override
+  String get errFileAccess => 'فائل تک رسائی نہیں۔ اجازتیں اور خالی جگہ چیک کریں۔';
+
+  @override
+  String get errDataLimit => 'ڈیٹا بہت زیادہ ہے۔ کم آئٹمز منتخب کریں اور دوبارہ کوشش کریں۔';
+
+  @override
+  String get errCredentials => 'محفوظ لاگ ان معلومات موجود نہیں۔ سرور دوبارہ درآمد کریں۔';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'آخری اپ ڈیٹ: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'ابھی اپ ڈیٹ نہیں ہوا۔ دوبارہ کوشش کریں۔';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'سرور نے HTTP $status کوڈ واپس کیا۔ لنک چیک کریں یا فراہم کنندہ سے رابطہ کریں۔',
+      zero: 'سرور نے درخواست مسترد کر دی۔ لنک چیک کریں یا فراہم کنندہ سے رابطہ کریں۔',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'سرور کی ترتیبات نامکمل یا غیر معاون ہیں۔ سبسکرپشن اپ ڈیٹ کریں۔';
+
+  @override
+  String get errServerIds => 'دو سروروں کا شناخت کنندہ ایک ہے۔ انہیں دوبارہ درآمد کریں۔';
+
+  @override
+  String get errRoutingGroup => 'راستہ غیر موجود سروروں یا خراب گروپ کی طرف ہے۔ سبسکرپشن اپ ڈیٹ کریں۔';
+
+  @override
+  String get errConnections => 'کنکشن کی فہرست دستیاب نہیں۔ جڑیں یا دوسرا انجن منتخب کریں۔';
+
+  @override
+  String get errLogs => 'یہ سروس لاگ نہیں رکھتی۔ Sora اپ ڈیٹ کریں۔';
+
+  @override
+  String get errDiagnostics => 'تشخیص جمع نہیں ہو سکی۔ دوبارہ کوشش کریں یا لاگ محفوظ کریں۔';
+
+  @override
+  String get errMissingItem => 'مطلوبہ آئٹم اب موجود نہیں۔ فہرست تازہ کریں۔';
+
+  @override
+  String get errInvalidRequest => 'درخواست میں غلط قدریں ہیں۔ درج کردہ معلومات چیک کریں اور دوبارہ کوشش کریں۔';
+
+  @override
+  String get errProxyLogin => 'سسٹم پراکسی اس لاگ ان کی معاونت نہیں کرتی۔ مقامی پراکسی کا صارف نام اور پاس ورڈ ہٹائیں۔';
+
+  @override
+  String get errLogFilter => 'لاگ فلٹر غلط ہے۔ تلاش صاف کریں اور دوبارہ کوشش کریں۔';
+
+  @override
+  String get errSubRedirect => 'سرور نے غیر محفوظ پتے پر بھیج دیا۔ فراہم کنندہ سے نیا لنک مانگیں۔';
+
+  @override
+  String get errProxySetup => 'سسٹم پراکسی ترتیب نہیں دی جا سکی۔ دوبارہ جڑیں یا لاگ کھولیں۔';
+
+  @override
+  String get notificationsToday => 'آج';
+
+  @override
+  String get notificationsYesterday => 'کل';
+
+  @override
+  String get notificationsMarkRead => 'سب کو پڑھا ہوا نشان لگائیں';
+
+  @override
+  String get notificationsUnread => 'بغیر پڑھا ہوا';
+
+  @override
+  String get desktopNotifications => 'ڈیسک ٹاپ اطلاعات';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval => 'سبسکرپشن اپ ڈیٹ کرنے کا وقفہ درست نہیں۔ فراہم کنندہ کا تجویز کردہ وقفہ منتخب کریں۔';
+
+  @override
+  String get errRule => 'روٹنگ کا ایک اصول درست نہیں۔ اصول میں دیا گیا ڈومین، IP پتہ یا ایپ چیک کریں۔';
+
+  @override
+  String get errDns => 'DNS کی ترتیبات درست نہیں۔ DNS سرور کا پتہ چیک کریں۔';
+
+  @override
+  String get errEndpoint => 'جانچ کے لیے سرور کا پتہ درست نہیں۔ ہوسٹ کا نام اور پورٹ چیک کریں۔';
+
+  @override
+  String get errCancelled => 'درخواست منسوخ ہو گئی۔ ضرورت ہو تو عمل دوبارہ کریں۔';
 }

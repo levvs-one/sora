@@ -31,7 +31,7 @@ class _EmptySora extends Sora {
   }
   int connects = 0;
   @override
-  Future<void> connect({bool retry = false, ProxyChain? via}) async {
+  Future<void> connect({bool retry = false, ProxyChain? via, FailureMode mode = FailureMode.action}) async {
     connects++;
   }
 }
@@ -125,10 +125,10 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('notification dates use bold Inter on uniform cards', (tester) async {
+  testWidgets('notification rows use compact Inter titles and regular tabular timestamps', (tester) async {
     final sora = await start(tester);
     await section(tester, 5);
-    expect(find.byIcon(Symbols.done_all_rounded), findsNothing);
+    expect(find.byKey(const ValueKey('notifications-read-all')), findsOneWidget);
     final rows = find.byType(NotificationRow);
     expect(rows, findsNWidgets(3));
     final dates = find.descendant(
@@ -137,8 +137,9 @@ void main() {
         (w) =>
             w is Text &&
             w.style?.fontFamily == 'Inter' &&
-            w.style?.fontWeight == FontWeight.w600 &&
-            w.style?.fontSize == 12,
+            w.style?.fontWeight == FontWeight.w400 &&
+            w.style?.fontSize == 12 &&
+            (w.data?.contains(':') ?? false),
       ),
     );
     expect(dates, findsNWidgets(3));
@@ -148,6 +149,11 @@ void main() {
         .map((w) => w.style)
         .toSet();
     expect(styles, hasLength(1));
+    expect(styles.single!.fontSize, 14);
+    expect(styles.single!.fontWeight, FontWeight.w600);
+    for (final row in rows.evaluate()) {
+      expect(tester.getSize(find.byWidget(row.widget)).height, inInclusiveRange(52, 64));
+    }
   });
 
   testWidgets('first launch has one subscription action and no premature service failure', (tester) async {
@@ -164,12 +170,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Добавить подписку'), findsOneWidget);
     expect(find.byKey(const ValueKey('wide-layout')), findsNothing);
-    expect(find.text('Служба Sora не отвечает'), findsNothing);
+    expect(find.text(sora.strings.coreMissing), findsNothing);
     expect(find.text('Не подключено'), findsOneWidget);
     sora.failure = CoreFailure.unavailable;
     sora.notifyListeners();
     await tester.pumpAndSettle();
-    expect(find.text('Служба Sora не отвечает'), findsOneWidget);
+    expect(find.text(sora.strings.coreMissing), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -219,7 +225,7 @@ void main() {
     final sora = await start(tester);
     final before = tester.getRect(find.byKey(const ValueKey('current-server')));
     sora.failure = const CoreFailure('core.engine.start_failed');
-    sora.reportFailure(sora.failure!);
+    sora.reportFailure(sora.failure!, mode: FailureMode.action);
     await tester.pumpAndSettle();
     final home = find.descendant(of: find.byType(HomeScreen), matching: find.byType(Text));
     expect(

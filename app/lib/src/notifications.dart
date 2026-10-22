@@ -8,6 +8,7 @@ class AppNotification {
     this.action = '',
     this.argument = '',
     this.read = false,
+    this.failureKey = '',
   });
 
   final DateTime time;
@@ -16,9 +17,17 @@ class AppNotification {
   final String action;
   final String argument;
   final bool read;
+  final String failureKey;
 
-  AppNotification markRead() =>
-      AppNotification(time: time, title: title, body: body, action: action, argument: argument, read: true);
+  AppNotification markRead() => AppNotification(
+    time: time,
+    title: title,
+    body: body,
+    action: action,
+    argument: argument,
+    read: true,
+    failureKey: failureKey,
+  );
 
   String get stored => jsonEncode({
     'time': time.toIso8601String(),
@@ -27,6 +36,7 @@ class AppNotification {
     'action': action,
     'argument': argument,
     'read': read,
+    if (failureKey.isNotEmpty) 'failureKey': failureKey,
   });
 
   static AppNotification? parse(String value) {
@@ -39,6 +49,7 @@ class AppNotification {
         action: json['action'] as String? ?? '',
         argument: json['argument'] as String? ?? '',
         read: json['read'] as bool? ?? false,
+        failureKey: json['failureKey'] as String? ?? '',
       );
     } on FormatException {
       return null;

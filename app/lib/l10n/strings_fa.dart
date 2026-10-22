@@ -205,64 +205,63 @@ class SFa extends S {
   String get errGeneric => 'مشکلی پیش آمد';
 
   @override
-  String get errCore => 'سرویس Sora پاسخ نمی دهد';
+  String get errCore => 'سرویس Sora پاسخ نمی‌دهد. کمی صبر کنید و دوباره تلاش کنید.';
 
   @override
-  String get errAuth => 'دسترسی به سرویس Sora وجود ندارد';
+  String get errAuth => 'دسترسی به سرویس Sora رد شد. برنامه را دوباره اجرا کنید و باز تلاش کنید.';
 
   @override
-  String get errVersion => 'به روز رسانی Sora: برنامه و سرویس نسخه های مختلف هستند';
+  String get errVersion => 'نسخه برنامه و سرویس Sora یکسان نیست. Sora را به‌روزرسانی کنید.';
 
   @override
-  String get errBusy => 'صبر کنید، دستور قبلی همچنان در حال اجرا است';
+  String get errBusy => 'دستور قبلی هنوز در حال اجراست. منتظر پایان آن بمانید.';
 
   @override
-  String get errEngineMissing => 'هیچ موتوری برای این سرور پیدا نشد';
+  String get errEngineMissing => 'موتور لازم برای این سرور پیدا نشد. به‌روزرسانی‌های Sora را بررسی کنید.';
 
   @override
-  String get errEngineStart => 'موتور روشن نشد';
+  String get errEngineStart => 'موتور راه‌اندازی نشد. دلیل را در گزارش اتصال بررسی کنید.';
 
   @override
-  String get errEngineStopped => 'موتور خاموش شد';
+  String get errEngineStopped => 'موتور متوقف شد. دوباره برای اتصال تلاش کنید.';
 
   @override
-  String get errTunnel => 'هیچ مجوزی برای ایجاد اتصال VPN وجود ندارد';
-
-  @override
-  String get errServers => 'سرور با یک خطا پیکربندی شده است';
+  String get errTunnel => 'این حالت VPN در دسترس نیست. حالت دیگری انتخاب کنید یا مجوزهای سرویس را بررسی کنید.';
 
   @override
   String get errNetwork => 'دسترسی به سرور امکان پذیر نیست';
 
   @override
-  String get errTimeout => 'سرور به موقع جواب نداد';
+  String get errTimeout => 'سرور به‌موقع پاسخ نداد. یک دقیقه دیگر دوباره تلاش کنید.';
 
   @override
-  String get errFirewall => 'اینترنت خارج از VPN مسدود نشد';
+  String get errFirewall => 'مسدود کردن دسترسی به اینترنت خارج از VPN ممکن نشد. دلیل را در گزارش اتصال بررسی کنید.';
 
   @override
-  String get errSubFetch => 'اشتراک بارگیری نشد';
+  String get errSubFetch => 'اشتراک دریافت نشد. اتصال اینترنت را بررسی کنید و یک دقیقه دیگر دوباره تلاش کنید.';
 
   @override
-  String get errSubFormat => 'این لینک اشتراک نیست';
+  String get errSubFormat => 'قالب اشتراک شناسایی نشد. از ارائه‌دهنده پیوند اشتراک سازگار بخواهید.';
 
   @override
-  String get errSubEmpty => 'اشتراک هیچ سروری ندارد';
+  String get errSubEmpty => 'اشتراک هیچ سروری ندارد. با ارائه‌دهنده اشتراک تماس بگیرید.';
 
   @override
-  String get errSubDuplicate => 'این اشتراک قبلاً اضافه شده است';
+  String get errSubDuplicate => 'این اشتراک قبلاً اضافه شده است. برای دریافت فهرست جدید سرورها آن را به‌روزرسانی کنید.';
 
   @override
-  String get errSubLimit => 'اشتراک های بسیار زیاد';
+  String get errSubLimit =>
+      'به سقف تعداد اشتراک‌ها رسیده‌اید. پیش از افزودن اشتراک جدید، اشتراکی را که استفاده نمی‌کنید حذف کنید.';
 
   @override
-  String get errSubScheme => 'پیوند باید با https:// شروع شود';
+  String get errSubScheme => 'پیوند اشتراک باید با https:// شروع شود. از ارائه‌دهنده پیوند امن بخواهید.';
 
   @override
-  String get errSecretStore => 'فضای ذخیره سازی Sora آسیب دیده یا در دسترس نیست';
+  String get errSecretStore =>
+      'فضای ذخیره‌سازی Sora آسیب دیده یا در دسترس نیست. مجوزهای دسترسی و جزئیات گزارش را بررسی کنید.';
 
   @override
-  String get errNoServers => 'برای اتصال اشتراکی اضافه کنید';
+  String get errNoServers => 'سروری برای اتصال وجود ندارد. اشتراک یا سرور شخصی خود را اضافه کنید.';
 
   @override
   String get connections => 'اتصالات';
@@ -487,8 +486,8 @@ class SFa extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'اشتراک در روزهای # به پایان می رسد',
-      one: 'اشتراک در روز # به پایان می رسد',
+      other: 'اشتراک در روزهای $days به پایان می رسد',
+      one: 'اشتراک در روز $days به پایان می رسد',
       zero: 'اشتراک در چند ساعت به پایان می رسد',
     );
     return '$name: $_temp0';
@@ -507,8 +506,8 @@ class SFa extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'سرورهای #، سریعترین',
-      one: 'سرور #، سریعترین',
+      other: 'سرورهای $count، سریعترین',
+      one: 'سرور $count، سریعترین',
     );
     return '$_temp0';
   }
@@ -630,7 +629,7 @@ class SFa extends S {
   String get less => 'کمتر';
 
   @override
-  String get notificationsEmpty => 'رویدادهای اتصال و اشتراک در اینجا ظاهر می شوند';
+  String get notificationsEmpty => 'اعلانی وجود ندارد';
 
   @override
   String get retryConnect => 'اتصال را دوباره امتحان کنید';
@@ -1229,13 +1228,13 @@ class SFa extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# دقیقه', one: '# دقیقه');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count دقیقه', one: '$count دقیقه');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ساعت', one: '# ساعت');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ساعت', one: '$count ساعت');
     return '$_temp0';
   }
 
@@ -1305,7 +1304,7 @@ class SFa extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# اتصال', one: '# اتصال');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count اتصال', one: '$count اتصال');
     return '$_temp0';
   }
 
@@ -1388,21 +1387,6 @@ class SFa extends S {
   String get dnsActual => 'مشاهده شد';
 
   @override
-  String get sortBy => 'مرتب سازی بر اساس';
-
-  @override
-  String get sortSubscription => 'به ترتیب اشتراک';
-
-  @override
-  String get sortPing => 'پینگ';
-
-  @override
-  String get sortSpeed => 'سرعت';
-
-  @override
-  String get sortName => 'نام';
-
-  @override
   String get measureSpeed => 'اندازه گیری سرعت';
 
   @override
@@ -1421,13 +1405,10 @@ class SFa extends S {
   String get autoSelectSmart => 'انتخاب هوشمندانه';
 
   @override
-  String get coreWatchUnstable => 'اتصال به هسته Sora ناپایدار است';
+  String get coreWatchUnstable => 'ارتباط با هسته ناپایدار است. کمی صبر کنید و دوباره برای اتصال تلاش کنید.';
 
   @override
   String get watchReconnect => 'دوباره وصل شوید';
-
-  @override
-  String get coreRestoringLink => 'در حال بازیابی اتصال به هسته Sora…';
 
   @override
   String get crashRestoreTitle => 'آخرین جلسه قطع شد';
@@ -1463,7 +1444,7 @@ class SFa extends S {
   String get overrideCustomRules => 'قوانین خود را';
 
   @override
-  String get errBenchmarkUnsupported => 'اندازه گیری سرعت به هسته جدیدتری نیاز دارد';
+  String get errBenchmarkUnsupported => 'سنجش سرعت به نسخه جدیدتری از هسته نیاز دارد. Sora را به‌روزرسانی کنید.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1565,10 +1546,10 @@ class SFa extends S {
   String get chainOrderHint => 'برای ترتیب مجدد بکشید: ترافیک در بالا وارد می شود و در پایین خارج می شود.';
 
   @override
-  String get chainTooFew => 'حداقل 2 سرور انتخاب کنید';
+  String get chainTooFew => 'زنجیره به دست‌کم دو سرور نیاز دارد. سرور دیگری اضافه کنید.';
 
   @override
-  String get chainTooMany => 'یک زنجیره حداکثر 3 سرور را در خود جای می دهد';
+  String get chainTooMany => 'زنجیره می‌تواند حداکثر سه سرور داشته باشد. سرورهای اضافی را حذف کنید.';
 
   @override
   String get chainEstimate => 'تأخیر تخمینی';
@@ -1585,10 +1566,10 @@ class SFa extends S {
   }
 
   @override
-  String get chainUnsupported => 'موتور فعلی نمی تواند زنجیر بسازد';
+  String get chainUnsupported => 'موتور انتخاب‌شده از زنجیره پشتیبانی نمی‌کند. موتور سازگاری انتخاب کنید.';
 
   @override
-  String get chainHopMissing => 'یکی از سرورهای زنجیره ای دیگر در دسترس نیست';
+  String get chainHopMissing => 'یکی از سرورهای زنجیره دیگر در دسترس نیست. برای آن بخش سرور دیگری انتخاب کنید.';
 
   @override
   String chainHop(Object n) {
@@ -1658,7 +1639,7 @@ class SFa extends S {
       'zapret را در کنار تونل VPN اجرا می‌کند: ترافیک تونل از VPN و ترافیک مستقیم از مسیر دور زدن محدودیت عبور می‌کند.';
 
   @override
-  String get chainDuplicate => 'هر سرور فقط یک بار می تواند ظاهر شود';
+  String get chainDuplicate => 'یک سرور در زنجیره تکرار شده است. برای هر بخش سرور متفاوتی انتخاب کنید.';
 
   @override
   String get edit => 'ویرایش';
@@ -1764,7 +1745,12 @@ class SFa extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# نشت پیدا شد', one: '# نشت پیدا شد');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نشت پیدا شد',
+      one: '$count نشت پیدا شد',
+    );
     return '$_temp0';
   }
 
@@ -1967,7 +1953,8 @@ class SFa extends S {
   String get extWorkerFailed => 'وظیفه پس‌زمینه افزونه ناموفق بود. گزارش افزونه را بررسی کنید.';
 
   @override
-  String get extAssetRejected => 'فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر.';
+  String get extAssetRejected =>
+      'فایل افزونه دارای رنگ‌های ناخوانا یا قوانین نامعتبر است. از سازنده افزونه بخواهید فایل را اصلاح کند.';
 
   @override
   String get extVerifiedSora => 'تأییدشده توسط Sora';
@@ -2003,4 +1990,114 @@ class SFa extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'خطای داخلی Sora. گزارش را ذخیره کنید و مشکل را اطلاع دهید.';
+
+  @override
+  String get errTls => 'گواهی سرور رد شد. ساعت را بررسی کنید یا با ارائه‌دهنده تماس بگیرید.';
+
+  @override
+  String get errFileAccess => 'دسترسی به فایل ممکن نیست. مجوزها و فضای خالی را بررسی کنید.';
+
+  @override
+  String get errDataLimit => 'داده‌ها بیش از حد هستند. موارد کمتری انتخاب کنید و دوباره تلاش کنید.';
+
+  @override
+  String get errCredentials => 'اطلاعات ورود ذخیره‌شده موجود نیست. سرور را دوباره وارد کنید.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'آخرین به‌روزرسانی: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'هنوز به‌روزرسانی نشده است. دوباره تلاش کنید.';
+
+  @override
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'سرور کد HTTP $status را برگرداند. پیوند را بررسی کنید یا با ارائه‌دهنده تماس بگیرید.',
+      zero: 'سرور درخواست را رد کرد. پیوند را بررسی کنید یا با ارائه‌دهنده تماس بگیرید.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errInvalidServer => 'تنظیمات سرور ناقص است یا پشتیبانی نمی‌شود. اشتراک را به‌روز کنید.';
+
+  @override
+  String get errServerIds => 'دو سرور شناسه یکسان دارند. آن‌ها را دوباره وارد کنید.';
+
+  @override
+  String get errRoutingGroup => 'مسیر به سرورهای ناموجود یا گروه خراب اشاره می‌کند. اشتراک را به‌روز کنید.';
+
+  @override
+  String get errConnections => 'فهرست اتصال‌ها در دسترس نیست. متصل شوید یا موتور دیگری انتخاب کنید.';
+
+  @override
+  String get errLogs => 'این سرویس گزارش نگه نمی‌دارد. Sora را به‌روز کنید.';
+
+  @override
+  String get errDiagnostics => 'جمع‌آوری عیب‌یابی ممکن نشد. دوباره تلاش کنید یا گزارش را ذخیره کنید.';
+
+  @override
+  String get errMissingItem => 'مورد درخواستی دیگر وجود ندارد. فهرست را تازه‌سازی کنید.';
+
+  @override
+  String get errInvalidRequest => 'درخواست شامل مقادیر نامعتبر است. ورودی را بررسی کرده و دوباره تلاش کنید.';
+
+  @override
+  String get errProxyLogin =>
+      'پروکسی سیستم از این ورود پشتیبانی نمی‌کند. نام کاربری و گذرواژه پروکسی محلی را حذف کنید.';
+
+  @override
+  String get errLogFilter => 'فیلتر گزارش نامعتبر است. جستجو را پاک کرده و دوباره تلاش کنید.';
+
+  @override
+  String get errSubRedirect => 'سرور به نشانی ناامن هدایت کرد. از ارائه‌دهنده پیوند جدید بخواهید.';
+
+  @override
+  String get errProxySetup => 'تنظیم پروکسی سیستم ممکن نشد. دوباره متصل شوید یا گزارش را باز کنید.';
+
+  @override
+  String get notificationsToday => 'امروز';
+
+  @override
+  String get notificationsYesterday => 'دیروز';
+
+  @override
+  String get notificationsMarkRead => 'علامت‌گذاری همه به‌عنوان خوانده‌شده';
+
+  @override
+  String get notificationsUnread => 'خوانده‌نشده';
+
+  @override
+  String get desktopNotifications => 'اعلان‌های دسکتاپ';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
+
+  @override
+  String get errSubInterval => 'فاصله زمانی به‌روزرسانی اشتراک نامعتبر است. فاصله پیشنهادی ارائه‌دهنده را انتخاب کنید.';
+
+  @override
+  String get errRule =>
+      'یکی از قوانین مسیریابی نامعتبر است. دامنه، نشانی IP یا برنامه مشخص‌شده در قانون را بررسی کنید.';
+
+  @override
+  String get errDns => 'تنظیمات DNS نامعتبر است. نشانی سرور DNS را بررسی کنید.';
+
+  @override
+  String get errEndpoint => 'نشانی سرور مورد آزمایش نامعتبر است. نام میزبان و درگاه را بررسی کنید.';
+
+  @override
+  String get errCancelled => 'درخواست لغو شد. در صورت نیاز دوباره اقدام کنید.';
 }

@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart'
     show SizedBox, Text, EditableText, Scrollable, ScrollableState, ValueKey, Semantics;
 import 'package:fixnum/fixnum.dart';
-import 'package:grpc/grpc.dart' show Server, ServiceCall;
+import 'package:grpc/grpc.dart' show Server, ServiceCall, GrpcError;
 import 'package:sora/main.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
@@ -47,6 +47,7 @@ class _Core extends CoreControlServiceBase {
     ),
   ];
   SessionPlan? plan;
+  final subscriptionChanges = StreamController<SubscriptionState>.broadcast();
   final events = StreamController<CoreEvent>.broadcast();
   final logs = StreamController<LogEntry>.broadcast();
   final logQueries = <LogFilter>[];
@@ -62,6 +63,7 @@ class _Core extends CoreControlServiceBase {
   ];
 
   Future<void> close() async {
+    await subscriptionChanges.close();
     await events.close();
     await logs.close();
   }
@@ -110,8 +112,10 @@ class _Core extends CoreControlServiceBase {
       GetStatsResponse(stats: StatsTick());
 
   @override
-  Stream<SubscriptionState> watchSubscriptions(ServiceCall call, WatchSubscriptionsRequest request) =>
-      Stream.fromIterable(subscriptions);
+  Stream<SubscriptionState> watchSubscriptions(ServiceCall call, WatchSubscriptionsRequest request) async* {
+    yield* Stream.fromIterable(subscriptions);
+    yield* subscriptionChanges.stream;
+  }
 
   @override
   Stream<ProbeResult> probeServers(ServiceCall call, ProbeServersRequest request) async* {
@@ -491,6 +495,47 @@ void main() {
         expect(filter.contains, 'adapter');
         expect(filter.minLevel, LogLevel.LOG_LEVEL_ERROR);
         expect(filter.pattern, contains('tun'));
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        disposed = true;
+        await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
+      }
+    });
+
+    testWidgets('manual log retry does not turn later tail failures into action errors', (tester) async {
+      await sora.settings.completeTour();
+      sora.settings.animations = false;
+      Future<void> waitForTail() async {
+        for (var i = 0; i < 30 && !core.logs.hasListener; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        expect(core.logs.hasListener, isTrue);
+      }
+
+      try {
+        await tester.pumpWidget(SoraApp(sora: sora));
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+        await tester.pump();
+        await waitForTail();
+        sora.reportFailure(const CoreFailure('core.network.timeout'), mode: FailureMode.background, source: 'logs');
+        await tester.pump();
+        final count = core.logQueries.length;
+        await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.refresh));
+        for (var i = 0; i < 30 && core.logQueries.length == count; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        expect(core.logQueries.length, count + 1);
+        await waitForTail();
+        core.logs.addError(const GrpcError.internal('transient tail failure'));
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+        await tester.pump();
+        expect(sora.history, isEmpty);
+        expect(sora.backgroundFailure('logs'), isNotNull);
       } finally {
         await tester.pumpWidget(const SizedBox());
         sora.dispose();
@@ -913,6 +958,36 @@ void main() {
       await sora.disconnect();
       expect(sora.phase, Phase.off);
     });
+
+    for (final startup in [true, false]) {
+      test('${startup ? 'startup' : 'post-update'} connection failures stay silent until a manual retry', () async {
+        core.reject = true;
+        if (startup) {
+          sora.settings.connectOnStart = true;
+        } else {
+          await sora.settings.saveResumeAfterUpdate(true);
+        }
+        final automatic = Sora(sora.settings);
+        final work = automatic.run();
+        try {
+          await until(() => core.connects == 1 && !automatic.busy && automatic.failure != null);
+          expect(automatic.history, isEmpty);
+          expect(automatic.backgroundFailure('session')?.key, 'core.engine.binary_missing');
+          await automatic.connect();
+          expect(automatic.history, hasLength(1));
+          expect(automatic.history.single.failureKey, 'core.engine.binary_missing');
+          expect(automatic.backgroundFailure('session'), isNull);
+          core.reject = false;
+          await automatic.connect();
+          expect(automatic.phase, Phase.connected);
+          expect(automatic.backgroundFailure('session'), isNull);
+          expect(automatic.backgroundFailure('connect'), isNull);
+        } finally {
+          automatic.dispose();
+          await work.timeout(const Duration(seconds: 10));
+        }
+      });
+    }
 
     test('disconnect retries a busy core without duplicate notices', () async {
       await sora.connect();

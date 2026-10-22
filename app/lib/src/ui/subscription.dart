@@ -3,6 +3,10 @@ import 'dart:async';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../core/link.dart';
+
 import 'package:protobuf/well_known_types/google/protobuf/duration.pb.dart' as pb;
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -31,9 +35,15 @@ class SubscriptionsScreen extends StatelessWidget {
         Group(
           children: [
             for (final state in sora.subscriptions)
-              LinkTile(
-                title: state.displayName,
-                onTap: () => push<void>(context, SubscriptionScreen(id: state.settings.id)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  LinkTile(
+                    title: state.displayName,
+                    onTap: () => push<void>(context, SubscriptionScreen(id: state.settings.id)),
+                  ),
+                  if (state.hasLastError()) SubscriptionUpdateState(state: state),
+                ],
               ),
             Tile(
               title: s.addSubscription,
@@ -88,6 +98,7 @@ class SubscriptionScreen extends StatelessWidget {
         ),
       ],
       children: [
+        if (state.hasLastError()) SubscriptionUpdateState(state: state),
         Group(
           children: [
             LinkTile(
@@ -197,8 +208,10 @@ class _OverrideSection extends StatelessWidget {
     if (state == null) return const SizedBox.shrink();
     final override = sora.overrides.of(subscriptionId);
     final names = {for (final o in state.outbounds) o.id: o.displayName};
-    final edited = {...override.renames.keys, ...override.hidden}.where(names.containsKey).toList()
-      ..sort((a, b) => names[a]!.toLowerCase().compareTo(names[b]!.toLowerCase()));
+    final edited = [
+      for (final server in state.outbounds)
+        if (override.renames.containsKey(server.id) || override.hidden.contains(server.id)) server.id,
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -433,6 +446,51 @@ class _ServerPickerState extends State<_ServerPicker> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The previous server list remains usable while a provider is unreachable.
+class SubscriptionUpdateState extends StatelessWidget {
+  const SubscriptionUpdateState({super.key, required this.state});
+  final SubscriptionState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context), palette = Palette.of(context);
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final dateLocale = Intl.verifiedLocale(locale, DateFormat.localeExists, onFailure: (_) => 'en');
+    final updated = state.hasLastUpdate()
+        ? s.subscriptionStale(DateFormat.yMd(dateLocale).add_Hm().format(state.lastUpdate.toDateTime().toLocal()))
+        : s.subscriptionNeverUpdated;
+    return Padding(
+      key: ValueKey('subscription-failure-${state.settings.id}'),
+      padding: const EdgeInsets.fromLTRB(12, 4, 8, 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  describe(s, CoreFailure.fromWire(state.lastError)),
+                  style: Styles.caption.copyWith(color: palette.ink),
+                ),
+                const SizedBox(height: 4),
+                Text(updated, style: Styles.caption.copyWith(color: palette.ink2)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          RoundButton(
+            icon: Symbols.refresh_rounded,
+            label: s.updateNow,
+            onTap: state.updating
+                ? null
+                : () => unawaited(SoraScope.read(context).refreshSubscription(state.settings.id)),
+          ),
+        ],
       ),
     );
   }
