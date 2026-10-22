@@ -13,19 +13,25 @@ import 'package:sora/src/design/theme.dart';
 /// the same code back from a screenshot of it.
 void main() {
   testWidgets('a shared QR code reads back from a PNG', (tester) async {
-    const link = 'https://sub.example.com/s/3f9a?name=Travel';
-    final text = await tester.runAsync(() async {
-      final painter = QrPainter(data: link, version: QrVersions.auto, gapless: true);
-      final recorder = ui.PictureRecorder();
-      final canvas = Canvas(recorder)..drawRect(const Rect.fromLTWH(0, 0, 360, 360), Paint()..color = Colors.white);
-      canvas.translate(30, 30);
-      painter.paint(canvas, const Size(300, 300));
-      final image = await recorder.endRecording().toImage(360, 360);
-      final png = (await image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
-      image.dispose();
-      return decodeQrImage(png);
-    });
-    expect(text, link);
+    for (final link in [
+      'https://sub.example.com/s/3f9a?name=Travel',
+      'olcrtc://jitsi?datachannel@https://meet.example.org/myroom#'
+          'd823fa01cb3e0609b67322f7cf984c4ee2e4ce2e294936fc24ef38c9e59f4799'
+          r'$RU / olc free sub',
+    ]) {
+      final text = await tester.runAsync(() async {
+        final painter = QrPainter(data: link, version: QrVersions.auto, gapless: true);
+        final recorder = ui.PictureRecorder();
+        final canvas = Canvas(recorder)..drawRect(const Rect.fromLTWH(0, 0, 360, 360), Paint()..color = Colors.white);
+        canvas.translate(30, 30);
+        painter.paint(canvas, const Size(300, 300));
+        final image = await recorder.endRecording().toImage(360, 360);
+        final png = (await image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+        image.dispose();
+        return decodeQrImage(png);
+      });
+      expect(text, link);
+    }
   });
 
   for (final brightness in Brightness.values) {

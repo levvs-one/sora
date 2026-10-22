@@ -25,7 +25,7 @@ Future<void> showSubscriptionSheet(BuildContext context, {String? link, String n
     if (parsed is AddSubscription) {
       initial = parsed.url.toString();
       if (presetName.isEmpty) presetName = parsed.name;
-    } else if (text.startsWith('https://') && !text.contains('\n')) {
+    } else if ((text.startsWith('https://') || text.toLowerCase().startsWith('olcrtc://')) && !text.contains('\n')) {
       initial = text;
     }
   }

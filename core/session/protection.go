@@ -15,6 +15,9 @@ import (
 func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
 	var endpoints []Endpoint
 	for _, outbound := range plan.Outbounds {
+		if outbound.Protocol == engine.ProtocolOLCRTC {
+			continue
+		}
 		type peerEndpoint struct {
 			endpoint  string
 			protocols []string
@@ -76,7 +79,7 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
 			}
 		}
 	}
-	if len(endpoints) == 0 {
+	if len(endpoints) == 0 && !plan.Protocols()[engine.ProtocolOLCRTC] {
 		return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyGuardFirewallFail, "session: strict mode needs VPN server endpoints")
 	}
 	return endpoints, nil

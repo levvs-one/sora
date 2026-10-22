@@ -21,6 +21,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	"github.com/levvs-one/sora-client/core/engine"
+
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 )
 
@@ -111,7 +113,7 @@ func (d ImportDetector) Detect(src []byte) (Detection, error) {
 func hasScheme(s string) bool {
 	for _, l := range strings.Fields(s) {
 		p := strings.ToLower(strings.TrimSpace(l))
-		for _, x := range []string{"vless://", "vmess://", "trojan://", "ss://", "socks://", "socks5://", "http://", "https://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://"} {
+		for _, x := range []string{"olcrtc://", "vless://", "vmess://", "trojan://", "ss://", "socks://", "socks5://", "http://", "https://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://"} {
 			if strings.HasPrefix(p, x) {
 				return true
 			}
@@ -175,6 +177,7 @@ func decodeBase64(s string) ([]byte, bool) {
 // retains additional fields to avoid silently losing unsupported settings
 // during import.
 type OutboundSpec struct {
+	OLCRTC                                                                                          *engine.OLCRTC
 	DisplayProtocol                                                                                 string
 	ID, DisplayName, Protocol, Transport, Security                                                  string
 	Host                                                                                            string
@@ -203,6 +206,9 @@ func (o OutboundSpec) StableKey() string {
 	material := o.Protocol + "\x00" + o.Host + "\x00" + strconv.Itoa(int(o.Port)) + "\x00" + o.UUID + "\x00" + o.User
 	// Names distinguish profiles sharing an endpoint. Exclude mutable
 	// provider rules so updates preserve saved selections.
+	if o.OLCRTC != nil {
+		material += "\x00" + o.OLCRTC.Provider + "\x00" + o.OLCRTC.Room + "\x00" + o.OLCRTC.Transport
+	}
 	if o.Protocol == "xray-profile" {
 		material += "\x00" + o.DisplayName
 	}
@@ -297,6 +303,7 @@ func (p LinkParser) Parse(src []byte) (ImportResult, error) {
 func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 	r := ImportResult{Format: f}
 	seen := map[string]struct{}{}
+	last := -1
 	for i, l := range strings.Split(s, "\n") {
 		if len(r.Servers) >= p.limit() {
 			r.Report.Unsupported++
@@ -307,6 +314,21 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 		if l == "" {
 			continue
 		}
+		if strings.HasPrefix(l, "#") {
+			if strings.HasPrefix(l, "##") && last >= 0 && r.Servers[last].OLCRTC != nil {
+				k, v, ok := strings.Cut(strings.TrimPrefix(l, "##"), ":")
+				if ok {
+					k, v = strings.TrimSpace(k), strings.TrimSpace(v)
+					r.Servers[last].Options["olcrtc-meta-"+k] = v
+					if k == "name" && v != "" && len(v) <= engine.MaxNameBytes {
+						r.Servers[last].DisplayName = v
+						r.Servers[last].CountryCode = countryCode(v)
+					}
+				}
+			}
+			continue
+		}
+		last = -1
 		o, e := parseLink(l)
 		if e != nil {
 			if errors.Is(e, ErrUnsupported) {
@@ -326,6 +348,7 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 		}
 		seen[k] = struct{}{}
 		r.Servers = append(r.Servers, o)
+		last = len(r.Servers) - 1
 		r.Report.Imported++
 	}
 	if len(r.Servers) == 0 && r.Report.Unsupported == 0 && r.Report.Invalid == 0 {
@@ -334,6 +357,9 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 	return r, nil
 }
 func parseLink(raw string) (OutboundSpec, error) {
+	if strings.HasPrefix(strings.ToLower(raw), "olcrtc://") {
+		return parseOLCRTC(raw)
+	}
 	u, e := url.Parse(strings.TrimSpace(raw))
 	if e != nil {
 		return OutboundSpec{}, ErrInvalid

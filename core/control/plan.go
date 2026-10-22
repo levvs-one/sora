@@ -83,6 +83,13 @@ func credentialDocument(spec parser.OutboundSpec) ([]byte, error) {
 		"security":     spec.Security,
 		"encryption":   spec.Options["encryption"],
 	}
+	if spec.OLCRTC != nil {
+		raw, err := json.Marshal(spec.OLCRTC)
+		if err != nil {
+			return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds)
+		}
+		values["olcrtc"] = string(raw)
+	}
 	// Copy only known obfuscation options from untrusted links. Normalize
 	// the three password aliases to one vault key.
 	values["obfs"] = spec.Options["obfs"]
@@ -420,6 +427,13 @@ func outboundFromProto(index int, spec *corev1.OutboundSpec, secrets resolver) (
 // applyCredential restores only fields written by credentialDocument from
 // stored material.
 func applyCredential(outbound *engine.Outbound, values map[string]string) error {
+	if raw := values["olcrtc"]; raw != "" {
+		var c engine.OLCRTC
+		if err := json.Unmarshal([]byte(raw), &c); err != nil {
+			return fmt.Errorf("invalid olcrtc credential document")
+		}
+		outbound.OLCRTC = &c
+	}
 	outbound.UUID = values["uuid"]
 	outbound.Password = values["password"]
 	outbound.Cipher = values["method"]

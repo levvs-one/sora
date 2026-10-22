@@ -234,7 +234,9 @@ class _QrScanScreenState extends State<QrScanScreen> {
     if (link == null) {
       // The share screen encodes the bare subscription URL, so a plain
       // single-line https link is a subscription too.
-      if (raw.startsWith('https://') && !raw.contains('\n') && Uri.tryParse(raw)?.host.isNotEmpty == true) {
+      if (!raw.contains('\n') &&
+          (raw.toLowerCase().startsWith('olcrtc://') ||
+              raw.startsWith('https://') && Uri.tryParse(raw)?.host.isNotEmpty == true)) {
         navigator.pop();
         await showSubscriptionSheet(navigator.context, link: raw);
         return;

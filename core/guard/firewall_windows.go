@@ -368,7 +368,7 @@ func (w *WFP) rules(addRule func(*wf.Rule) error, sublayer wf.SublayerID) error 
 			{Field: wf.FieldALEAppID, Op: wf.MatchTypeEqual, Value: id},
 			{Field: wf.FieldALEUserID, Op: wf.MatchTypeEqual, Value: owner},
 		}
-		if w.policy.StrictKillSwitch {
+		if w.policy.StrictKillSwitch && (!w.policy.OLCRTC || !strings.EqualFold(filepath.Base(file), "olcrtc.exe")) {
 			if index != 0 {
 				for _, ep := range w.policy.Endpoints {
 					protocol := wf.IPProtoTCP

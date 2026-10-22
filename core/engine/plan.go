@@ -33,6 +33,7 @@ const (
 	ProtocolSOCKS5      Protocol = "socks5"
 	ProtocolHTTP        Protocol = "http"
 	ProtocolAnyTLS      Protocol = "anytls"
+	ProtocolOLCRTC      Protocol = "olcrtc"
 	// ProtocolBypass reshapes direct TLS and HTTP handshakes with zapret to
 	// evade DPI. It requires no server.
 	ProtocolBypass Protocol = "bypass"
@@ -104,6 +105,7 @@ type Outbound struct {
 	TLS       TLS
 	// SOCKSUDP enables UDP on a SOCKS5 peer known to support associations.
 	SOCKSUDP bool
+	OLCRTC   *OLCRTC
 
 	Server string
 	Port   uint16
