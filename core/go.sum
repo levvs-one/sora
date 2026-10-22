@@ -12,6 +12,8 @@ github.com/dlclark/regexp2/v2 v2.8.1 h1:I1jbaCbXeOxdVN8z3fb55Mvtgb94/6+Dh0zjmXjK
 github.com/dlclark/regexp2/v2 v2.8.1/go.mod h1:avUrQvPaLz2DrFNHJF0taWAFFX2C1GMSSoeiqFjcBmU=
 github.com/dop251/goja v0.0.0-20261020172427-7b1a02208696 h1:Svrcx13UGMfaCGZuMlohLfb5Qel2RO0T2ON31rcZp5Q=
 github.com/dop251/goja v0.0.0-20261020172427-7b1a02208696/go.mod h1:Cp9NYOLrEKg/ypIRkUWYXWLuKAyyFGkDmGeJ95Sw0zI=
+github.com/enfein/mieru/v3 v3.38.1 h1:UZ5zAJi0caSmaOniVy33pyY7ANxyf4PmPeLSuYZpDro=
+github.com/enfein/mieru/v3 v3.38.1/go.mod h1:zJBUCsi5rxyvHM8fjFf+GLaEl4OEjjBXr1s5F6Qd3hM=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
 github.com/go-logr/stdr v1.2.2 h1:hSWxHoqTgW2S2qGc0LTAI563KZ5YKYRhT3MFKZMbjag=

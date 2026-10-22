@@ -21,10 +21,18 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
 		type peerEndpoint struct {
 			endpoint  string
 			protocols []string
+			last      uint16
 		}
-		peers := []peerEndpoint{{net.JoinHostPort(outbound.Server, strconv.Itoa(int(outbound.Port))), endpointProtocols(outbound)}}
+		peers := []peerEndpoint{{endpoint: net.JoinHostPort(outbound.Server, strconv.Itoa(int(outbound.Port))), protocols: endpointProtocols(outbound)}}
+		if outbound.Mieru != nil && outbound.Mieru.PortRange != "" {
+			_, last, err := engine.MieruPorts(outbound.Mieru.PortRange)
+			if err != nil {
+				return nil, errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyGuardFirewallFail)
+			}
+			peers[0].last = last
+		}
 		for _, peer := range outbound.Peers {
-			peers = append(peers, peerEndpoint{peer.Endpoint, []string{"udp"}})
+			peers = append(peers, peerEndpoint{endpoint: peer.Endpoint, protocols: []string{"udp"}})
 		}
 		if len(outbound.Profile) > 0 {
 			var profile struct {
@@ -52,10 +60,10 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
 			}
 			for _, ob := range profile.Outbounds {
 				for _, server := range append(ob.Settings.Vnext, ob.Settings.Servers...) {
-					peers = append(peers, peerEndpoint{net.JoinHostPort(server.Address, strconv.Itoa(int(server.Port))), endpointProtocols(engine.Outbound{Protocol: ob.Protocol, Transport: engine.Transport{Type: ob.StreamSettings.Network}, TLS: engine.TLS{ALPN: ob.StreamSettings.TLSSettings.ALPN}})})
+					peers = append(peers, peerEndpoint{endpoint: net.JoinHostPort(server.Address, strconv.Itoa(int(server.Port))), protocols: endpointProtocols(engine.Outbound{Protocol: ob.Protocol, Transport: engine.Transport{Type: ob.StreamSettings.Network}, TLS: engine.TLS{ALPN: ob.StreamSettings.TLSSettings.ALPN}})})
 				}
 				for _, peer := range ob.Settings.Peers {
-					peers = append(peers, peerEndpoint{peer.Endpoint, []string{"udp"}})
+					peers = append(peers, peerEndpoint{endpoint: peer.Endpoint, protocols: []string{"udp"}})
 				}
 			}
 		}
@@ -72,9 +80,21 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
 			if err != nil {
 				return nil, errs.Wrap(err, errs.CodeUnavailable, errs.KeyGuardFirewallFail)
 			}
-			for _, addr := range addresses {
-				for _, protocol := range peer.protocols {
-					endpoints = append(endpoints, Endpoint{Address: netip.AddrPortFrom(addr.Unmap(), uint16(number)), Protocol: protocol})
+			last := uint16(number)
+			if peer.last != 0 {
+				last = peer.last
+			}
+			for value := uint16(number); ; value++ {
+				for _, addr := range addresses {
+					for _, protocol := range peer.protocols {
+						if len(endpoints) >= 65536 {
+							return nil, errs.Newf(errs.CodeResourceExhausted, errs.KeyGuardFirewallFail, "session: too many recovery endpoints")
+						}
+						endpoints = append(endpoints, Endpoint{Address: netip.AddrPortFrom(addr.Unmap(), value), Protocol: protocol})
+					}
+				}
+				if value == last {
+					break
 				}
 			}
 		}
@@ -88,6 +108,16 @@ func planEndpoints(ctx context.Context, plan *engine.Plan) ([]Endpoint, error) {
 // UDP payloads inside stream protocols still use TCP on the physical link.
 func endpointProtocols(outbound engine.Outbound) []string {
 	switch outbound.Protocol {
+	case engine.ProtocolMieru:
+		if outbound.Transport.Type == "udp" {
+			return []string{"udp"}
+		}
+		return []string{"tcp"}
+	case engine.ProtocolNaive:
+		if outbound.Naive != nil && outbound.Naive.QUIC {
+			return []string{"udp"}
+		}
+		return []string{"tcp"}
 	case engine.ProtocolHysteria2, engine.ProtocolTUIC, engine.ProtocolWireGuard:
 		return []string{"udp"}
 	case engine.ProtocolShadowsocks:

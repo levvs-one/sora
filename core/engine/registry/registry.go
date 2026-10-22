@@ -86,7 +86,8 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 			continue
 		}
 		r.binaries[kind] = b
-		r.availability = append(r.availability, engine.Availability{Kind: kind, Path: b.Path, Version: b.Version, BuildTags: b.BuildTags, Usable: true})
+		naiveReady := kind == engine.KindSingBox && singbox.NaiveReady(ctx, b)
+		r.availability = append(r.availability, engine.Availability{Kind: kind, Path: b.Path, Version: b.Version, BuildTags: b.BuildTags, Usable: true, NaiveReady: naiveReady})
 	}
 	auxiliary := engine.Availability{Kind: engine.Kind("olcrtc"), Reason: "not installed"}
 	if r.olcrtc.Path != "" {

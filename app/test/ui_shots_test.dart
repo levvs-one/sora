@@ -180,6 +180,8 @@ void main() {
           await tester.ensureVisible(find.byKey(const ValueKey('modes-info')));
           await tester.tap(find.byKey(const ValueKey('modes-info')));
           await tester.pumpAndSettle();
+          await Scrollable.ensureVisible(tester.element(find.text('mieru').first), alignment: 0.4);
+          await save('$output/community-guide-${width.toInt()}x${height.toInt()}-$theme.png');
           await tester.ensureVisible(find.text('OLCRTC').last);
           await save('$output/olcrtc-guide-${width.toInt()}x${height.toInt()}-$theme.png');
           Navigator.of(tester.element(find.byKey(const ValueKey('modes-guide')))).pop();

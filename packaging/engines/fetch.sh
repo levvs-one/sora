@@ -29,6 +29,12 @@ while read -r engine line_arch digest url; do
 		exe=$(find "$work/$engine" -iname "${engine}*.exe" ! -iname 'wxray.exe' | head -1)
 		[[ -n "$exe" ]] || { echo "engines.lock: no executable in $(basename "$url")" >&2; exit 1; }
 		install -m 0755 "$exe" "$dest/$engine.exe"
+		if [[ "$engine" == sing-box && "$arch" == windows-amd64 ]]; then
+			# The DLL is version-coupled to the engine and covered by the archive checksum.
+			cronet=$(find "$work/$engine" -name libcronet.dll -type f)
+			[[ -n "$cronet" ]] || { echo "sing-box archive has no libcronet.dll" >&2; exit 1; }
+			install -m 0644 "$cronet" "$dest/libcronet.dll"
+		fi
 		if [[ "$engine" == xray ]]; then
 			install -m 0644 "$work/xray/geoip.dat" "$work/xray/geosite.dat" "$dest/"
 		fi

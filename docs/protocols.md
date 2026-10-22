@@ -1,3 +1,52 @@
+# Протоколы сообщества
+
+| Протокол | sing-box-lx | Xray | mihomo |
+| --- | --- | --- | --- |
+| mieru | Нет | Нет | Да, 1.19.32 |
+| NaiveProxy HTTPS / QUIC | Да, 1.14.3-lx.14 | Нет | Нет |
+| olcrtc | Да, через olcrtc | Да, через olcrtc | Да, через olcrtc |
+
+## mieru
+
+Импортируются [официальные ссылки mieru](https://github.com/enfein/mieru/blob/v3.38.1/docs/client-install.md): `mierus://user:password@host?profile=Name&port=443&protocol=TCP` и полный protobuf-конфиг `mieru://base64`. Обе ссылки можно вставить в добавление подписки или прочитать из QR. Приложение сохраняет регистр base64 полного конфига. HTTPS-подписки принимают обычные и base64-списки, а Clash YAML принимает `type: mieru`.
+
+Поддерживаются TCP и UDP, `port` или `port-range`, `username`, `password`, `multiplexing`, `handshake-mode`, `traffic-pattern` и отдельный Clash-флаг пересылки `udp`. Параметры сверены с [адаптером mihomo 1.19.32](https://github.com/MetaCubeX/mihomo/blob/v1.19.32/adapter/outbound/mieru.go). Пары `port` и `protocol` в `mierus://` могут повторяться. Каждый binding и сервер полного конфига становится отдельным выбираемым сервером Sora; TCP и UDP на одном порту не считаются дубликатами. Настройки локальных слушателей и управления полного клиентского конфига не импортируются.
+
+Закреплённый адаптер mihomo использует штатный MTU 1400. Ссылки с явным `mtu=1400` и полные профили с этим значением импортируются; другой MTU и встроенный dialer официального клиента не доступны в адаптере и отклоняются. Неизвестные параметры, неверные диапазоны, несовпадающее число портов и транспортов и неверные значения multiplexing отклоняются. Имена и пароли URL-декодируются один раз. Дополнительный процесс mieru в Sora не запускается.
+
+## NaiveProxy
+
+Принимаются `naive+https://user:password@host:443/#Name`, `naive+quic://user:password@host:443/#Name` и sing-box JSON с `type: naive`. Формат учётных данных соответствует [v2rayN NaiveFmt](https://github.com/2dust/v2rayN/blob/master/v2rayN/ServiceLib/Handler/Fmt/NaiveFmt.cs), заголовки CRLF соответствуют [NaiveProxy USAGE](https://github.com/klzgrad/naiveproxy/blob/master/USAGE.txt). Поддерживаются вставка одиночной ссылки, QR и обычные/base64-подписки. Порт по умолчанию 443. `pass@host` задаёт только пароль, `user:@host` задаёт только имя.
+
+Сохраняются username/password, SNI, QUIC, `extra-headers` и `insecure-concurrency`. В JSON используются `extra_headers`, `insecure_concurrency`, `tls.enabled`, `tls.server_name`, `tls.certificate`. Дополнительные заголовки сохраняются в хранилище секретов и маскируются в журналах. TLS проверяется Cronet. `insecure`, произвольный ALPN, uTLS, REALITY и TLS fragmentation этим outbound не поддерживаются и отклоняются. Параметр ссылки `padding` не имеет соответствия в sing-box и тоже отклоняется; padding wire protocol согласуется самим Cronet. Прочие расширенные параметры sing-box, не представленные в плане Sora, не игнорируются при импорте.
+
+Используется [закреплённый sing-box-lx 1.14.3-lx.14](https://github.com/Leadaxe/sing-box-lx/releases/tag/v1.14.3-lx.14). В Linux amd64/arm64 Cronet уже связан статически с musl. Windows amd64 получает `libcronet.dll` из того же архива, проверенного по SHA-256 в `engines.lock`; библиотека ставится рядом с `sing-box.exe`. Версии движка и библиотеки обновляются вместе. Purego-сборки sing-box Linux ищут `libcronet.so` рядом с executable, в `LD_LIBRARY_PATH`, `/usr/local/lib` и `/usr/lib`; Sora не наследует `LD_LIBRARY_PATH` в дочерний движок. Windows ищет DLL рядом с executable и в `PATH`. Предварительная проверка реальной конфигурации Naive удостоверяет загрузку библиотеки при обнаружении движков. Windows 7/386 не имеет Cronet и не получает эту возможность.
+
+### Обновление Cronet в пакетах
+
+Исходный sing-box 1.14.2 и поставляемый форк закрепляют bindings `cronet-go` на `0d28acc44093`, а платформенные библиотеки на `c10c03c318db`. Это проверяется по [go.mod sing-box 1.14.2](https://github.com/SagerNet/sing-box/blob/v1.14.2/go.mod) и [go.mod sing-box-lx](https://github.com/Leadaxe/sing-box-lx/blob/v1.14.3-lx.14/go.mod). Совпадения имени файла недостаточно для совместимости: загрузчик регистрирует конкретный набор символов Cronet и NaiveProxy. При обновлении нужно брать библиотеку из того же проверенного архива движка, а затем повторять native-проверку и межпротокольные тесты.
+
+В закреплённом Windows-пакете `libcronet.dll` занимает 9529344 байта, SHA-256 `3217c6260fbca5f16072e0b79735742f40109a63bb0ff88fd6b96dd6b54a2928`. Установщик уже включает все файлы каталога движков. В Linux дополнительных библиотек и записей пакета не требуется: обе поставляемые архитектуры используют статический ELF. Это сохраняет существующие XHTTP и AmneziaWG без второго бинарника NaiveProxy.
+
+## Выбор движка и защита
+
+Auto выбирает mihomo для mieru и sing-box с работающим Cronet для NaiveProxy. Ручной несовместимый выбор отклоняется до остановки текущего соединения. Один план со смесью mieru и NaiveProxy отклоняется: общего поддерживающего движка нет. Ошибки используют существующие ключи `core.plan.*` и `core.subscription.*`. Протокол и транспорт передаются существующими protobuf-полями, остальные параметры остаются за credential reference в core.
+
+Бинарники firewall guard не меняются. Трафик mieru создаёт mihomo, а NaiveProxy и Cronet работают внутри sing-box. Для строгого восстановления учитываются все порты диапазона mieru и реальный внешний транспорт: TCP/UDP для mieru, TCP для Naive HTTPS и UDP для Naive QUIC. Разрешения остальных процессов не расширяются. Политика ограничена 65536 endpoint-записями; превышение отклоняется до применения защиты.
+
+## Локальная проверка новых протоколов
+
+`core/engine/interop/community-servers.sh <каталог>` скачивает только тестовые Linux amd64 серверы: официальный mita 3.38.1 и Caddy 2.11.7-naive из релизов автора NaiveProxy. SHA-256 закреплены в скрипте. Они не входят в поставку приложения.
+
+```sh
+cd core
+bash engine/interop/community-servers.sh /tmp/sora-community-servers
+SORA_ENGINES_DIR=/path/to/packaged/engines SORA_COMMUNITY_SERVERS_DIR=/tmp/sora-community-servers \
+  unshare -Urn bash -c 'ip link set lo up; go test -v ./engine/interop -run TestCommunityServersCarryRealTraffic -count=1'
+```
+
+Проверяются HTTP через настоящий mieru TCP/UDP и Naive HTTPS/QUIC, отказ неверных паролей и отсутствие секретов в логах. TLS-сертификат тестового Caddy создан на время теста и явно доверен Cronet; проверка сертификата не отключается. Это проверка proxy path, не захвата пакетов через TUN. Реальная Windows и Linux arm64 здесь не исполнялись.
+
 # olcrtc
 
 Sora поддерживает клиентские URI v1 из [документации upstream](https://github.com/openlibrecommunity/olcrtc/blob/f3ad8fb7c0d0fa981423f83269526fa94077c23d/docs/uri.md). Вставьте одиночную ссылку в поле добавления подписки или импортируйте QR. HTTPS-подписки принимают обычный и base64-кодированный текст. Комментарий после `$` становится именем сервера, `##name:` из [формата подписок v1](https://github.com/openlibrecommunity/olcrtc/blob/f3ad8fb7c0d0fa981423f83269526fa94077c23d/docs/sub.md) переопределяет его.
