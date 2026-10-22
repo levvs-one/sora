@@ -1271,13 +1271,7 @@ class SAz extends S {
   String get qrCopyLink => 'Linki kopyalayın';
 
   @override
-  String get qrShowLink => 'Linki göstər';
-
-  @override
-  String get qrHideLink => 'Linki gizlədin';
-
-  @override
-  String get qrWarning => 'Bu QR kodu əlaqə detallarını ehtiva edir. Yad adamlara göstərməyin.';
+  String get qrWarning => 'Kodu yalnız etibar etdiyiniz şəxslərlə paylaşın.';
 
   @override
   String get qrScanHint => 'QR kodlu ekran görüntüsü və ya foto seçin, ya da keçid yapışdırın';
@@ -1395,6 +1389,9 @@ class SAz extends S {
 
   @override
   String get sortBy => 'Sırala';
+
+  @override
+  String get sortSubscription => 'Abunəlikdəki ardıcıllıqla';
 
   @override
   String get sortPing => 'Ping';

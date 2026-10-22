@@ -1269,13 +1269,7 @@ class SUr extends S {
   String get qrCopyLink => 'لنک کاپی کریں۔';
 
   @override
-  String get qrShowLink => 'لنک دکھائیں۔';
-
-  @override
-  String get qrHideLink => 'لنک چھپائیں۔';
-
-  @override
-  String get qrWarning => 'یہ QR کوڈ کنکشن کی تفصیلات پر مشتمل ہے۔ اسے اجنبیوں کو نہ دکھائیں۔';
+  String get qrWarning => 'یہ کوڈ صرف قابل اعتماد لوگوں کو دکھائیں۔';
 
   @override
   String get qrScanHint => 'QR کوڈ والا اسکرین شاٹ یا تصویر منتخب کریں، یا لنک پیسٹ کریں';
@@ -1392,6 +1386,9 @@ class SUr extends S {
 
   @override
   String get sortBy => 'ترتیب دیں۔';
+
+  @override
+  String get sortSubscription => 'سبسکرپشن کی ترتیب میں';
 
   @override
   String get sortPing => 'پنگ';

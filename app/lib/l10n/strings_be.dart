@@ -1284,13 +1284,7 @@ class SBe extends S {
   String get qrCopyLink => 'Скапіраваць спасылку';
 
   @override
-  String get qrShowLink => 'Паказаць спасылку';
-
-  @override
-  String get qrHideLink => 'Схаваць спасылку';
-
-  @override
-  String get qrWarning => 'Гэты код QR змяшчае падрабязнасці злучэння. Не паказвайце староннім.';
+  String get qrWarning => 'Паказвайце код толькі тым, каму давяраеце.';
 
   @override
   String get qrScanHint => 'Выберыце здымак экрана або фота з QR-кодам ці ўстаўце спасылку';
@@ -1415,6 +1409,9 @@ class SBe extends S {
 
   @override
   String get sortBy => 'Сартаваць па';
+
+  @override
+  String get sortSubscription => 'Як у падпісцы';
 
   @override
   String get sortPing => 'Пінг';

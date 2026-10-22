@@ -455,7 +455,6 @@ func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subsc
 	for part := parts; part < rec.ListParts; part++ {
 		deletes = append(deletes, listRef(rec.ID, part))
 	}
-	sort.Strings(refs)
 	updated := *rec
 	updated.Servers, updated.ListParts = refs, parts
 	updated.Info = info

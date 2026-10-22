@@ -1272,13 +1272,7 @@ class SKy extends S {
   String get qrCopyLink => 'Шилтемени көчүрүү';
 
   @override
-  String get qrShowLink => 'Шилтемени көрсөтүү';
-
-  @override
-  String get qrHideLink => 'Шилтемени жашыруу';
-
-  @override
-  String get qrWarning => 'Бул QR код туташуу чоо-жайын камтыйт. Бейтааныш адамдарга көрсөтпөңүз.';
+  String get qrWarning => 'Кодду ишенген адамдарга гана көрсөтүңүз.';
 
   @override
   String get qrScanHint => 'QR коду бар скриншотту же сүрөттү тандаңыз, же шилтемени коюңуз';
@@ -1396,6 +1390,9 @@ class SKy extends S {
 
   @override
   String get sortBy => 'Сорттоо боюнча';
+
+  @override
+  String get sortSubscription => 'Жазылуудагы тартипте';
 
   @override
   String get sortPing => 'Пинг';

@@ -1271,13 +1271,7 @@ class SHi extends S {
   String get qrCopyLink => 'लिंक कॉपी करें';
 
   @override
-  String get qrShowLink => 'लिंक दिखाएँ';
-
-  @override
-  String get qrHideLink => 'लिंक छुपाएं';
-
-  @override
-  String get qrWarning => 'इस QR कोड में कनेक्शन विवरण शामिल है। इसे अजनबियों को न दिखाएं.';
+  String get qrWarning => 'यह कोड केवल भरोसेमंद लोगों को दिखाएँ।';
 
   @override
   String get qrScanHint => 'QR कोड वाला स्क्रीनशॉट या फ़ोटो चुनें, या लिंक पेस्ट करें';
@@ -1394,6 +1388,9 @@ class SHi extends S {
 
   @override
   String get sortBy => 'क्रमबद्ध करें';
+
+  @override
+  String get sortSubscription => 'सदस्यता के क्रम में';
 
   @override
   String get sortPing => 'पिंग';

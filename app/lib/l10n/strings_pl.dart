@@ -1288,13 +1288,7 @@ class SPl extends S {
   String get qrCopyLink => 'Skopiuj link';
 
   @override
-  String get qrShowLink => 'Pokaż link';
-
-  @override
-  String get qrHideLink => 'Ukryj link';
-
-  @override
-  String get qrWarning => 'Ten kod QR zawiera szczegóły połączenia. Nie pokazuj go nieznajomym.';
+  String get qrWarning => 'Udostępniaj kod tylko zaufanym osobom.';
 
   @override
   String get qrScanHint => 'Wybierz zrzut ekranu lub zdjęcie z kodem QR albo wklej link';
@@ -1419,6 +1413,9 @@ class SPl extends S {
 
   @override
   String get sortBy => 'Sortuj według';
+
+  @override
+  String get sortSubscription => 'Jak w subskrypcji';
 
   @override
   String get sortPing => 'Ping';

@@ -1275,13 +1275,7 @@ class SUz extends S {
   String get qrCopyLink => 'Havolani nusxalash';
 
   @override
-  String get qrShowLink => 'Havolani ko\'rsatish';
-
-  @override
-  String get qrHideLink => 'Havolani yashirish';
-
-  @override
-  String get qrWarning => 'Ushbu QR kodida ulanish tafsilotlari mavjud. Uni begonalarga ko\'rsatmang.';
+  String get qrWarning => 'Kodni faqat ishonchli odamlarga ko‘rsating.';
 
   @override
   String get qrScanHint => 'QR kodli skrinshot yoki rasmni tanlang yoki havolani joylang';
@@ -1399,6 +1393,9 @@ class SUz extends S {
 
   @override
   String get sortBy => 'Saralash';
+
+  @override
+  String get sortSubscription => 'Obunadagi tartibda';
 
   @override
   String get sortPing => 'Ping';

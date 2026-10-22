@@ -1273,13 +1273,7 @@ class STg extends S {
   String get qrCopyLink => 'Истиноди нусхабардорӣ';
 
   @override
-  String get qrShowLink => 'Истинодро нишон диҳед';
-
-  @override
-  String get qrHideLink => 'Пинҳон кардани пайванд';
-
-  @override
-  String get qrWarning => 'Ин рамзи QR дорои тафсилоти пайвастшавӣ мебошад. Онро ба бегонагон нишон надиҳед.';
+  String get qrWarning => 'Рамзро танҳо ба шахсони боэътимод нишон диҳед.';
 
   @override
   String get qrScanHint => 'Скриншот ё акси дорои рамзи QR-ро интихоб кунед ё истинодро гузоред';
@@ -1397,6 +1391,9 @@ class STg extends S {
 
   @override
   String get sortBy => 'Мураттабсозӣ аз рӯйи';
+
+  @override
+  String get sortSubscription => 'Бо тартиби обуна';
 
   @override
   String get sortPing => 'Пинг';

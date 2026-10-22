@@ -1276,13 +1276,7 @@ class SEs extends S {
   String get qrCopyLink => 'Copiar enlace';
 
   @override
-  String get qrShowLink => 'Mostrar enlace';
-
-  @override
-  String get qrHideLink => 'Ocultar enlace';
-
-  @override
-  String get qrWarning => 'Este código QR contiene detalles de conexión. No se lo muestres a extraños.';
+  String get qrWarning => 'Comparte este código solo con personas de confianza.';
 
   @override
   String get qrScanHint => 'Elige una captura o foto con un código QR, o pega un enlace';
@@ -1399,6 +1393,9 @@ class SEs extends S {
 
   @override
   String get sortBy => 'Ordenar por';
+
+  @override
+  String get sortSubscription => 'Como en la suscripción';
 
   @override
   String get sortPing => 'Hacer ping';

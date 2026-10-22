@@ -1272,13 +1272,7 @@ class SKa extends S {
   String get qrCopyLink => 'დააკოპირეთ ბმული';
 
   @override
-  String get qrShowLink => 'ბმული ჩვენება';
-
-  @override
-  String get qrHideLink => 'ბმულის დამალვა';
-
-  @override
-  String get qrWarning => 'ეს QR კოდი შეიცავს კავშირის დეტალებს. არ აჩვენო ის უცნობებს.';
+  String get qrWarning => 'კოდი მხოლოდ სანდო ადამიანებს გაუზიარეთ.';
 
   @override
   String get qrScanHint => 'აირჩიეთ ეკრანის სურათი ან ფოტო QR კოდით, ან ჩასვით ბმული';
@@ -1396,6 +1390,9 @@ class SKa extends S {
 
   @override
   String get sortBy => 'დალაგება';
+
+  @override
+  String get sortSubscription => 'გამოწერის თანმიმდევრობით';
 
   @override
   String get sortPing => 'პინგი';

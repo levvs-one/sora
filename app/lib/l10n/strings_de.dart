@@ -1279,13 +1279,7 @@ class SDe extends S {
   String get qrCopyLink => 'Link kopieren';
 
   @override
-  String get qrShowLink => 'Link anzeigen';
-
-  @override
-  String get qrHideLink => 'Link ausblenden';
-
-  @override
-  String get qrWarning => 'Dieser QR-Code enthält Verbindungsdaten. Zeigen Sie ihn keinen Fremden.';
+  String get qrWarning => 'Teile den Code nur mit Personen, denen du vertraust.';
 
   @override
   String get qrScanHint => 'Wähle einen Screenshot oder ein Foto mit QR-Code oder füge einen Link ein';
@@ -1403,6 +1397,9 @@ class SDe extends S {
 
   @override
   String get sortBy => 'Sortieren nach';
+
+  @override
+  String get sortSubscription => 'Wie im Abonnement';
 
   @override
   String get sortPing => 'Ping';

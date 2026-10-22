@@ -1254,13 +1254,7 @@ class SZh extends S {
   String get qrCopyLink => '复制链接';
 
   @override
-  String get qrShowLink => '显示链接';
-
-  @override
-  String get qrHideLink => '隐藏链接';
-
-  @override
-  String get qrWarning => '此 QR 码含有连接信息，请勿向陌生人展示。';
+  String get qrWarning => '仅与信任的人分享此二维码。';
 
   @override
   String get qrScanHint => '选择包含二维码的截图或照片，或粘贴链接';
@@ -1375,6 +1369,9 @@ class SZh extends S {
 
   @override
   String get sortBy => '排序方式';
+
+  @override
+  String get sortSubscription => '按订阅顺序';
 
   @override
   String get sortPing => '延迟';
@@ -3213,13 +3210,7 @@ class SZhHans extends SZh {
   String get qrCopyLink => '复制链接';
 
   @override
-  String get qrShowLink => '显示链接';
-
-  @override
-  String get qrHideLink => '隐藏链接';
-
-  @override
-  String get qrWarning => '此 QR 码含有连接信息，请勿向陌生人展示。';
+  String get qrWarning => '仅与信任的人分享此二维码。';
 
   @override
   String get qrScanHint => '选择包含二维码的截图或照片，或粘贴链接';
@@ -3334,6 +3325,9 @@ class SZhHans extends SZh {
 
   @override
   String get sortBy => '排序方式';
+
+  @override
+  String get sortSubscription => '按订阅顺序';
 
   @override
   String get sortPing => '延迟';
@@ -5172,13 +5166,7 @@ class SZhHant extends SZh {
   String get qrCopyLink => '複製連結';
 
   @override
-  String get qrShowLink => '顯示連結';
-
-  @override
-  String get qrHideLink => '隱藏連結';
-
-  @override
-  String get qrWarning => '此 QR 碼含有連接資訊，請勿向陌生人展示。';
+  String get qrWarning => '僅與信任的人分享此 QR 碼。';
 
   @override
   String get qrScanHint => '選擇包含 QR 碼的截圖或相片，或貼上連結';
@@ -5293,6 +5281,9 @@ class SZhHant extends SZh {
 
   @override
   String get sortBy => '排序方式';
+
+  @override
+  String get sortSubscription => '依訂閱順序';
 
   @override
   String get sortPing => '延遲';

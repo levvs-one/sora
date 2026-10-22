@@ -1256,13 +1256,7 @@ class SJa extends S {
   String get qrCopyLink => 'リンクをコピー';
 
   @override
-  String get qrShowLink => 'リンクを表示';
-
-  @override
-  String get qrHideLink => 'リンクを隠す';
-
-  @override
-  String get qrWarning => 'この QR コードには接続の詳細が含まれています。見知らぬ人に見せないでください。';
+  String get qrWarning => '信頼できる人にだけコードを共有してください。';
 
   @override
   String get qrScanHint => 'QR コードを含むスクリーンショットや写真を選ぶか、リンクを貼り付けてください';
@@ -1377,6 +1371,9 @@ class SJa extends S {
 
   @override
   String get sortBy => '並べ替え順';
+
+  @override
+  String get sortSubscription => 'サブスクリプションの順序';
 
   @override
   String get sortPing => 'ピン';

@@ -1268,13 +1268,7 @@ class STh extends S {
   String get qrCopyLink => 'คัดลอกลิงค์';
 
   @override
-  String get qrShowLink => 'แสดงลิงค์';
-
-  @override
-  String get qrHideLink => 'ซ่อนลิงก์';
-
-  @override
-  String get qrWarning => 'รหัส QR นี้มีรายละเอียดการเชื่อมต่อ อย่าแสดงให้คนแปลกหน้าเห็น';
+  String get qrWarning => 'แชร์รหัสนี้กับคนที่คุณไว้ใจเท่านั้น';
 
   @override
   String get qrScanHint => 'เลือกภาพหน้าจอหรือรูปภาพที่มีคิวอาร์โค้ด หรือวางลิงก์';
@@ -1390,6 +1384,9 @@ class STh extends S {
 
   @override
   String get sortBy => 'เรียงตาม';
+
+  @override
+  String get sortSubscription => 'ตามลำดับในรายการสมัครรับ';
 
   @override
   String get sortPing => 'ปิง';

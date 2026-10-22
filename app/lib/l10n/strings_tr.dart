@@ -1271,13 +1271,7 @@ class STr extends S {
   String get qrCopyLink => 'Bağlantıyı kopyala';
 
   @override
-  String get qrShowLink => 'Bağlantıyı göster';
-
-  @override
-  String get qrHideLink => 'Bağlantıyı gizle';
-
-  @override
-  String get qrWarning => 'Bu QR kodu bağlantı ayrıntılarını içerir. Yabancılara göstermeyin.';
+  String get qrWarning => 'Kodu yalnızca güvendiğiniz kişilerle paylaşın.';
 
   @override
   String get qrScanHint => 'QR kodlu bir ekran görüntüsü veya fotoğraf seçin ya da bağlantı yapıştırın';
@@ -1395,6 +1389,9 @@ class STr extends S {
 
   @override
   String get sortBy => 'Sıralama ölçütü';
+
+  @override
+  String get sortSubscription => 'Abonelikteki sırayla';
 
   @override
   String get sortPing => 'Ping';

@@ -1271,13 +1271,7 @@ class SHy extends S {
   String get qrCopyLink => 'Պատճենել հղումը';
 
   @override
-  String get qrShowLink => 'Ցույց տալ հղումը';
-
-  @override
-  String get qrHideLink => 'Թաքցնել հղումը';
-
-  @override
-  String get qrWarning => 'Այս QR կոդը պարունակում է կապի մանրամասներ: Մի ցուցադրեք այն անծանոթներին:';
+  String get qrWarning => 'Կոդը ցույց տվեք միայն վստահելի մարդկանց։';
 
   @override
   String get qrScanHint => 'Ընտրեք QR կոդով էկրանի պատկեր կամ լուսանկար, կամ տեղադրեք հղում';
@@ -1394,6 +1388,9 @@ class SHy extends S {
 
   @override
   String get sortBy => 'Դասավորել ըստ';
+
+  @override
+  String get sortSubscription => 'Բաժանորդագրության հերթականությամբ';
 
   @override
   String get sortPing => 'Ping';
