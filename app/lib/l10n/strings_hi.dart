@@ -205,25 +205,25 @@ class SHi extends S {
   String get errGeneric => 'कुछ गलत हो गया';
 
   @override
-  String get errCore => 'Sora सेवा प्रतिसाद नहीं दे रही है';
+  String get errCore => 'Sora सेवा जवाब नहीं दे रही है। थोड़ी देर रुककर फिर कोशिश करें।';
 
   @override
-  String get errAuth => 'Sora सेवा तक पहुंच नहीं है';
+  String get errAuth => 'Sora सेवा का ऐक्सेस नहीं मिला। ऐप दोबारा शुरू करके फिर कोशिश करें।';
 
   @override
-  String get errVersion => 'अद्यतन Sora: ऐप और सेवा अलग-अलग संस्करण हैं';
+  String get errVersion => 'Sora ऐप और सेवा के वर्शन अलग हैं। Sora को अपडेट करें।';
 
   @override
-  String get errBusy => 'रुको, पिछला आदेश अभी भी चल रहा है';
+  String get errBusy => 'पिछला निर्देश अभी चल रहा है। उसके पूरा होने का इंतज़ार करें।';
 
   @override
-  String get errEngineMissing => 'इस सर्वर के लिए कोई इंजन नहीं मिला';
+  String get errEngineMissing => 'इस सर्वर के लिए ज़रूरी इंजन नहीं मिला। Sora के अपडेट देखें।';
 
   @override
-  String get errEngineStart => 'इंजन चालू नहीं हुआ';
+  String get errEngineStart => 'इंजन शुरू नहीं हो सका। वजह जानने के लिए कनेक्शन लॉग देखें।';
 
   @override
-  String get errEngineStopped => 'इंजन बंद हो गया';
+  String get errEngineStopped => 'इंजन बंद हो गया। फिर से कनेक्ट करने की कोशिश करें।';
 
   @override
   String get errTunnel => 'यह VPN मोड उपलब्ध नहीं है। दूसरा मोड चुनें या सेवा की अनुमतियाँ जाँचें।';
@@ -232,34 +232,36 @@ class SHi extends S {
   String get errNetwork => 'सर्वर तक नहीं पहुंच सकता';
 
   @override
-  String get errTimeout => 'सर्वर ने समय पर जवाब नहीं दिया';
+  String get errTimeout => 'सर्वर ने समय पर जवाब नहीं दिया। एक मिनट बाद फिर कोशिश करें।';
 
   @override
-  String get errFirewall => 'वीपीएन के बाहर इंटरनेट को ब्लॉक नहीं किया जा सका';
+  String get errFirewall => 'VPN के बाहर इंटरनेट ऐक्सेस बंद नहीं किया जा सका। वजह जानने के लिए कनेक्शन लॉग देखें।';
 
   @override
-  String get errSubFetch => 'सदस्यता लोड नहीं हो सकी';
+  String get errSubFetch => 'सदस्यता डाउनलोड नहीं हो सकी। इंटरनेट कनेक्शन जाँचें और एक मिनट बाद फिर कोशिश करें।';
 
   @override
-  String get errSubFormat => 'यह कोई सदस्यता लिंक नहीं है';
+  String get errSubFormat => 'सदस्यता का फ़ॉर्मैट पहचाना नहीं जा सका। अपने प्रदाता से संगत सदस्यता लिंक माँगें।';
 
   @override
-  String get errSubEmpty => 'सदस्यता में कोई सर्वर नहीं है';
+  String get errSubEmpty => 'सदस्यता में कोई सर्वर नहीं है। सदस्यता प्रदाता से संपर्क करें।';
 
   @override
-  String get errSubDuplicate => 'यह सदस्यता पहले ही जोड़ी जा चुकी है';
+  String get errSubDuplicate => 'यह सदस्यता पहले से जुड़ी है। सर्वर की ताज़ा सूची पाने के लिए इसे अपडेट करें।';
 
   @override
-  String get errSubLimit => 'बहुत अधिक सदस्यताएँ';
+  String get errSubLimit =>
+      'सदस्यताओं की अधिकतम संख्या पूरी हो गई है। नई सदस्यता जोड़ने से पहले कोई अनचाही सदस्यता हटाएँ।';
 
   @override
-  String get errSubScheme => 'लिंक https:// से शुरू होना चाहिए';
+  String get errSubScheme => 'सदस्यता लिंक https:// से शुरू होना चाहिए। प्रदाता से सुरक्षित लिंक माँगें।';
 
   @override
-  String get errSecretStore => 'Sora भंडारण क्षतिग्रस्त या अनुपलब्ध है';
+  String get errSecretStore =>
+      'Sora का स्टोरेज खराब है या उस तक पहुँच नहीं है। ऐक्सेस अनुमतियाँ और लॉग में जानकारी जाँचें।';
 
   @override
-  String get errNoServers => 'कनेक्ट करने के लिए सदस्यता जोड़ें';
+  String get errNoServers => 'कनेक्ट करने के लिए कोई सर्वर नहीं है। सदस्यता या अपना सर्वर जोड़ें।';
 
   @override
   String get connections => 'कनेक्शन';
@@ -1402,7 +1404,7 @@ class SHi extends S {
   String get autoSelectSmart => 'स्मार्ट विकल्प';
 
   @override
-  String get coreWatchUnstable => 'Sora कोर से कनेक्शन अस्थिर है';
+  String get coreWatchUnstable => 'कोर से कनेक्शन अस्थिर है। थोड़ी देर रुककर फिर से कनेक्ट करने की कोशिश करें।';
 
   @override
   String get watchReconnect => 'पुनः कनेक्ट करें';
@@ -1441,7 +1443,7 @@ class SHi extends S {
   String get overrideCustomRules => 'अपने नियम';
 
   @override
-  String get errBenchmarkUnsupported => 'गति मापन के लिए एक नए कोर की आवश्यकता होती है';
+  String get errBenchmarkUnsupported => 'गति मापने के लिए कोर का नया वर्शन चाहिए। Sora को अपडेट करें।';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1544,10 +1546,10 @@ class SHi extends S {
       'पुन: व्यवस्थित करने के लिए खींचें: ट्रैफ़िक शीर्ष पर प्रवेश करता है और नीचे से बाहर निकलता है।';
 
   @override
-  String get chainTooFew => 'कम से कम 2 सर्वर चुनें';
+  String get chainTooFew => 'चेन के लिए कम से कम दो सर्वर चाहिए। एक और सर्वर जोड़ें।';
 
   @override
-  String get chainTooMany => 'एक श्रृंखला में अधिकतम 3 सर्वर होते हैं';
+  String get chainTooMany => 'चेन में अधिकतम तीन सर्वर हो सकते हैं। अतिरिक्त सर्वर हटाएँ।';
 
   @override
   String get chainEstimate => 'अनुमानित विलंबता';
@@ -1564,10 +1566,10 @@ class SHi extends S {
   }
 
   @override
-  String get chainUnsupported => 'वर्तमान इंजन चेन नहीं बना सकता';
+  String get chainUnsupported => 'चुना गया इंजन सर्वर चेन का समर्थन नहीं करता। संगत इंजन चुनें।';
 
   @override
-  String get chainHopMissing => 'चेन सर्वरों में से एक अब उपलब्ध नहीं है';
+  String get chainHopMissing => 'चेन का एक सर्वर अब उपलब्ध नहीं है। उस चरण के लिए दूसरा सर्वर चुनें।';
 
   @override
   String chainHop(Object n) {
@@ -1637,7 +1639,7 @@ class SHi extends S {
       'VPN टनल के साथ zapret चलाता है: टनल का ट्रैफ़िक VPN से और सीधा ट्रैफ़िक बायपास से जाता है।';
 
   @override
-  String get chainDuplicate => 'प्रत्येक सर्वर केवल एक बार ही प्रदर्शित हो सकता है';
+  String get chainDuplicate => 'चेन में कोई सर्वर एक से ज़्यादा बार है। हर चरण के लिए अलग सर्वर चुनें।';
 
   @override
   String get edit => 'संपादित करें';
@@ -1945,7 +1947,8 @@ class SHi extends S {
   String get extWorkerFailed => 'एक्सटेंशन का बैकग्राउंड कार्य विफल हुआ। एक्सटेंशन का लॉग देखें।';
 
   @override
-  String get extAssetRejected => 'एक्सटेंशन फ़ाइल अस्वीकृत: अपठनीय रंग या अमान्य नियम।';
+  String get extAssetRejected =>
+      'एक्सटेंशन की फ़ाइल में अपठनीय रंग या अमान्य नियम हैं। एक्सटेंशन के लेखक से फ़ाइल ठीक करने को कहें।';
 
   @override
   String get extVerifiedSora => 'Sora द्वारा सत्यापित';
@@ -2006,7 +2009,15 @@ class SHi extends S {
   String get subscriptionNeverUpdated => 'अभी अपडेट नहीं हुआ। फिर कोशिश करें।';
 
   @override
-  String get errHttpStatus => 'सर्वर ने अनुरोध अस्वीकार किया। लिंक जाँचें या प्रदाता से संपर्क करें।';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'सर्वर ने HTTP $status कोड लौटाया। लिंक जाँचें या अपने प्रदाता से संपर्क करें।',
+      zero: 'सर्वर ने अनुरोध अस्वीकार कर दिया। लिंक जाँचें या अपने प्रदाता से संपर्क करें।',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => 'सर्वर की सेटिंग अधूरी या असमर्थित हैं। सदस्यता अपडेट करें।';
@@ -2067,4 +2078,19 @@ class SHi extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => 'सदस्यता अपडेट करने का अंतराल अमान्य है। प्रदाता का सुझाया अंतराल चुनें।';
+
+  @override
+  String get errRule => 'रूटिंग के किसी नियम में गलती है। नियम में दिया डोमेन, IP पता या ऐप जाँचें।';
+
+  @override
+  String get errDns => 'DNS सेटिंग अमान्य हैं। DNS सर्वर का पता जाँचें।';
+
+  @override
+  String get errEndpoint => 'जाँच के लिए सर्वर का पता अमान्य है। होस्ट का नाम और पोर्ट जाँचें।';
+
+  @override
+  String get errCancelled => 'अनुरोध रद्द कर दिया गया। ज़रूरत हो तो कार्रवाई दोहराएँ।';
 }

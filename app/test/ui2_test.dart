@@ -170,12 +170,12 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Добавить подписку'), findsOneWidget);
     expect(find.byKey(const ValueKey('wide-layout')), findsNothing);
-    expect(find.text('Служба Sora не отвечает'), findsNothing);
+    expect(find.text(sora.strings.coreMissing), findsNothing);
     expect(find.text('Не подключено'), findsOneWidget);
     sora.failure = CoreFailure.unavailable;
     sora.notifyListeners();
     await tester.pumpAndSettle();
-    expect(find.text('Служба Sora не отвечает'), findsOneWidget);
+    expect(find.text(sora.strings.coreMissing), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
   });
 

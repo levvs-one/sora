@@ -205,25 +205,25 @@ class SEn extends S {
   String get errGeneric => 'Something went wrong';
 
   @override
-  String get errCore => 'The Sora service is not responding';
+  String get errCore => 'The Sora service is not responding. Wait a moment and try again.';
 
   @override
-  String get errAuth => 'No access to the Sora service';
+  String get errAuth => 'Access to the Sora service was denied. Restart the app and try again.';
 
   @override
-  String get errVersion => 'Update Sora: the app and the service are different versions';
+  String get errVersion => 'The Sora app and service have different versions. Update Sora.';
 
   @override
-  String get errBusy => 'Wait, the previous command is still running';
+  String get errBusy => 'The previous command is still running. Wait for it to finish.';
 
   @override
-  String get errEngineMissing => 'No engine found for this server';
+  String get errEngineMissing => 'The engine for this server is missing. Check for Sora updates.';
 
   @override
-  String get errEngineStart => 'The engine did not start';
+  String get errEngineStart => 'The engine could not start. Check the connection log for the cause.';
 
   @override
-  String get errEngineStopped => 'The engine stopped';
+  String get errEngineStopped => 'The engine stopped. Try connecting again.';
 
   @override
   String get errTunnel => 'This VPN mode is unavailable. Choose another mode or check service permissions.';
@@ -232,34 +232,39 @@ class SEn extends S {
   String get errNetwork => 'Cannot reach the server';
 
   @override
-  String get errTimeout => 'The server did not answer in time';
+  String get errTimeout => 'The server did not respond in time. Try again in a minute.';
 
   @override
-  String get errFirewall => 'Could not block the internet outside the VPN';
+  String get errFirewall =>
+      'Internet access outside the VPN could not be blocked. Check the connection log for the cause.';
 
   @override
-  String get errSubFetch => 'Could not load the subscription';
+  String get errSubFetch =>
+      'The subscription could not be downloaded. Check your internet connection and try again in a minute.';
 
   @override
-  String get errSubFormat => 'This is not a subscription link';
+  String get errSubFormat =>
+      'The subscription format was not recognized. Ask your provider for a compatible subscription link.';
 
   @override
-  String get errSubEmpty => 'The subscription has no servers';
+  String get errSubEmpty => 'The subscription has no servers. Contact your subscription provider.';
 
   @override
-  String get errSubDuplicate => 'This subscription is already added';
+  String get errSubDuplicate => 'This subscription has already been added. Refresh it to get the latest servers.';
 
   @override
-  String get errSubLimit => 'Too many subscriptions';
+  String get errSubLimit =>
+      'The subscription limit has been reached. Remove an unused subscription before adding another.';
 
   @override
-  String get errSubScheme => 'The link must start with https://';
+  String get errSubScheme => 'Subscription links must start with https://. Ask your provider for a secure link.';
 
   @override
-  String get errSecretStore => 'Sora storage is damaged or unavailable';
+  String get errSecretStore =>
+      'Sora storage is damaged or inaccessible. Check access permissions and the log for details.';
 
   @override
-  String get errNoServers => 'Add a subscription to connect';
+  String get errNoServers => 'There are no servers to connect to. Add a subscription or your own server.';
 
   @override
   String get connections => 'Connections';
@@ -1400,7 +1405,7 @@ class SEn extends S {
   String get autoSelectSmart => 'Smart choice';
 
   @override
-  String get coreWatchUnstable => 'The link to the core is unstable';
+  String get coreWatchUnstable => 'The connection to the core is unstable. Wait a moment and try connecting again.';
 
   @override
   String get watchReconnect => 'Reconnect';
@@ -1439,7 +1444,7 @@ class SEn extends S {
   String get overrideCustomRules => 'Custom rules';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement needs a newer core';
+  String get errBenchmarkUnsupported => 'Speed measurement requires a newer core. Update Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1539,10 +1544,10 @@ class SEn extends S {
   String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
 
   @override
-  String get chainTooFew => 'Pick at least 2 servers';
+  String get chainTooFew => 'A chain needs at least two servers. Add another server.';
 
   @override
-  String get chainTooMany => 'A chain holds at most 3 servers';
+  String get chainTooMany => 'A chain can have at most three servers. Remove the extra servers.';
 
   @override
   String get chainEstimate => 'Estimated latency';
@@ -1559,10 +1564,10 @@ class SEn extends S {
   }
 
   @override
-  String get chainUnsupported => 'The current engine cannot build chains';
+  String get chainUnsupported => 'The selected engine does not support chains. Choose a compatible engine.';
 
   @override
-  String get chainHopMissing => 'One of the chain servers is no longer available';
+  String get chainHopMissing => 'A server in the chain is no longer available. Choose another server for that hop.';
 
   @override
   String chainHop(Object n) {
@@ -1632,7 +1637,7 @@ class SEn extends S {
       'Runs zapret next to the VPN tunnel: tunneled traffic uses the VPN, direct traffic goes through the bypass.';
 
   @override
-  String get chainDuplicate => 'Each server can appear only once';
+  String get chainDuplicate => 'A server appears more than once in the chain. Choose a different server for each hop.';
 
   @override
   String get edit => 'Edit';
@@ -1945,7 +1950,8 @@ class SEn extends S {
   String get extWorkerFailed => 'The extension background task failed. Check the extension log.';
 
   @override
-  String get extAssetRejected => 'Extension asset rejected: unreadable colors or invalid rules.';
+  String get extAssetRejected =>
+      'The extension file contains unreadable colors or invalid rules. Ask the extension author to correct the file.';
 
   @override
   String get extVerifiedSora => 'Verified by Sora';
@@ -2006,7 +2012,15 @@ class SEn extends S {
   String get subscriptionNeverUpdated => 'Not updated yet. Retry.';
 
   @override
-  String get errHttpStatus => 'The server rejected the request. Check the link or contact your provider.';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'The server returned HTTP $status. Check the link or contact your provider.',
+      zero: 'The server rejected the request. Check the link or contact your provider.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => 'Server settings are incomplete or unsupported. Refresh the subscription.';
@@ -2066,4 +2080,20 @@ class SEn extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval =>
+      'The subscription update interval is invalid. Choose the interval recommended by your provider.';
+
+  @override
+  String get errRule => 'A routing rule is invalid. Check the domain, IP address or application in the rule.';
+
+  @override
+  String get errDns => 'The DNS settings are invalid. Check the DNS server address.';
+
+  @override
+  String get errEndpoint => 'The server address for the check is invalid. Check the hostname and port.';
+
+  @override
+  String get errCancelled => 'The request was cancelled. Repeat the action if needed.';
 }

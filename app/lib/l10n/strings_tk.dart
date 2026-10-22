@@ -205,25 +205,25 @@ class STk extends S {
   String get errGeneric => 'Bir zat nädogry boldy';
 
   @override
-  String get errCore => 'Sora hyzmaty jogap bermeýär';
+  String get errCore => 'Sora hyzmaty jogap bermeýär. Biraz garaşyp, täzeden synanyşyň.';
 
   @override
-  String get errAuth => 'Sora hyzmatyna girip bolmaýar';
+  String get errAuth => 'Sora hyzmatyna giriş ret edildi. Programmany täzeden açyp, ýene synanyşyň.';
 
   @override
-  String get errVersion => 'Sora täzeläň: programma we hyzmat dürli wersiýalar';
+  String get errVersion => 'Sora programmasynyň we hyzmatynyň wersiýalary tapawutly. Sora-ny täzeläň.';
 
   @override
-  String get errBusy => 'Duruň, öňki buýruk henizem işleýär';
+  String get errBusy => 'Öňki buýruk henizem ýerine ýetirilýär. Onuň tamamlanmagyna garaşyň.';
 
   @override
-  String get errEngineMissing => 'Bu serwer üçin motor tapylmady';
+  String get errEngineMissing => 'Bu serwer üçin zerur hereketlendiriji tapylmady. Sora täzelenmelerini barlaň.';
 
   @override
-  String get errEngineStart => 'Motor başlamady';
+  String get errEngineStart => 'Hereketlendiriji işe başlamady. Sebäbini birikme žurnalyndan görüň.';
 
   @override
-  String get errEngineStopped => 'Motor saklandy';
+  String get errEngineStopped => 'Hereketlendiriji togtady. Täzeden birikmäge synanyşyň.';
 
   @override
   String get errTunnel => 'Bu VPN tertibi elýeterli däl. Başga tertip saýlaň ýa-da hyzmatyň rugsatlaryny barlaň.';
@@ -232,34 +232,35 @@ class STk extends S {
   String get errNetwork => 'Serwere baryp bolmaýar';
 
   @override
-  String get errTimeout => 'Serwer wagtynda jogap bermedi';
+  String get errTimeout => 'Serwer wagtynda jogap bermedi. Bir minutdan täzeden synanyşyň.';
 
   @override
-  String get errFirewall => 'VPN-den başga internedi ýapyp bolmady';
+  String get errFirewall => 'VPN-den daşarda internete girişi petikläp bolmady. Sebäbini birikme žurnalyndan görüň.';
 
   @override
-  String get errSubFetch => 'Abuna ýazylmady';
+  String get errSubFetch => 'Abunalygy ýükläp bolmady. Internet birikmesini barlap, bir minutdan täzeden synanyşyň.';
 
   @override
-  String get errSubFormat => 'Bu abuna ýazgy däl';
+  String get errSubFormat => 'Abunalygyň formaty tanalmady. Üpjün edijiden gabat gelýän abunalyk salgysyny soraň.';
 
   @override
-  String get errSubEmpty => 'Abuna ýazylanda serwer ýok';
+  String get errSubEmpty => 'Abunalykda serwer ýok. Abunalyk üpjün edijisine ýüz tutuň.';
 
   @override
-  String get errSubDuplicate => 'Bu abuna ýazyldy';
+  String get errSubDuplicate => 'Bu abunalyk eýýäm goşulan. Iň soňky serwerleri almak üçin ony täzeläň.';
 
   @override
-  String get errSubLimit => 'Abunalar gaty köp';
+  String get errSubLimit => 'Abunalyklaryň sany çägine ýetdi. Täzesini goşmazdan öň ulanmaýan abunalygyňyzy aýyryň.';
 
   @override
-  String get errSubScheme => 'Baglanyşyk https: // bilen başlamaly';
+  String get errSubScheme => 'Abunalyk salgysy https:// bilen başlamaly. Üpjün edijiden howpsuz salgy soraň.';
 
   @override
-  String get errSecretStore => 'Sora ammary zaýalanýar ýa-da elýeterli däl';
+  String get errSecretStore =>
+      'Sora ammary zaýalanan ýa-da elýeterli däl. Giriş rugsatlaryny we žurnaldaky maglumatlary barlaň.';
 
   @override
-  String get errNoServers => 'Birikdirmek üçin abuna ýazyň';
+  String get errNoServers => 'Birikmek üçin serwer ýok. Abunalyk ýa-da öz serweriňizi goşuň.';
 
   @override
   String get connections => 'Baglanyşyklar';
@@ -1401,7 +1402,7 @@ class STk extends S {
   String get autoSelectSmart => 'Akylly saýlaw';
 
   @override
-  String get coreWatchUnstable => 'Sora ýadrosyna birikmek durnuksyz';
+  String get coreWatchUnstable => 'Ýadro bilen aragatnaşyk durnuksyz. Biraz garaşyp, täzeden birikmäge synanyşyň.';
 
   @override
   String get watchReconnect => 'Täzeden birik';
@@ -1440,7 +1441,7 @@ class STk extends S {
   String get overrideCustomRules => 'Öz düzgünleriňiz';
 
   @override
-  String get errBenchmarkUnsupported => 'Tizligi ölçemek has täze ýadro gerek';
+  String get errBenchmarkUnsupported => 'Tizligi ölçemek üçin ýadronyň has täze wersiýasy gerek. Sora-ny täzeläň.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1540,10 +1541,10 @@ class STk extends S {
   String get chainOrderHint => 'Tertibe salmak üçin süýräň: traffik ýokarsyna girýär we aşagyndan çykýar.';
 
   @override
-  String get chainTooFew => 'Iň azyndan 2 serwer saýlaň';
+  String get chainTooFew => 'Zynjyr üçin azyndan iki serwer gerek. Ýene bir serwer goşuň.';
 
   @override
-  String get chainTooMany => 'Zynjyr iň köp 3 serwerde saklanýar';
+  String get chainTooMany => 'Zynjyrda iň köp üç serwer bolup biler. Artykmaç serwerleri aýyryň.';
 
   @override
   String get chainEstimate => 'Takmynan gijä galmak';
@@ -1560,10 +1561,12 @@ class STk extends S {
   }
 
   @override
-  String get chainUnsupported => 'Häzirki motor zynjyr gurup bilmeýär';
+  String get chainUnsupported =>
+      'Saýlanan hereketlendiriji zynjyrlary goldamaýar. Gabat gelýän hereketlendirijini saýlaň.';
 
   @override
-  String get chainHopMissing => 'Zynjyr serwerlerinden biri indi elýeterli däl';
+  String get chainHopMissing =>
+      'Zynjyrdaky serwerleriň biri indi elýeterli däl. Şol basgançak üçin başga serwer saýlaň.';
 
   @override
   String chainHop(Object n) {
@@ -1633,7 +1636,7 @@ class STk extends S {
       'zapret VPN tuneli bilen bir wagtda işleýär: tuneliň trafigi VPN arkaly, göni trafik bolsa böwetden aýlanyp geçiş serişdesi arkaly geçýär.';
 
   @override
-  String get chainDuplicate => 'Her serwer diňe bir gezek peýda bolup biler';
+  String get chainDuplicate => 'Zynjyrda şol bir serwer gaýtalanýar. Her basgançak üçin başga serwer saýlaň.';
 
   @override
   String get edit => 'Redaktirläň';
@@ -1946,7 +1949,8 @@ class STk extends S {
   String get extWorkerFailed => 'Giňeltmäniň fon işi şowsuz boldy. Giňeltmäniň ýazgylaryny barlaň.';
 
   @override
-  String get extAssetRejected => 'Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler.';
+  String get extAssetRejected =>
+      'Giňeltme faýlynda okamagy kynlaşdyrýan reňkler ýa-da nädogry düzgünler bar. Giňeltmäniň awtoryndan faýly düzetmegini soraň.';
 
   @override
   String get extVerifiedSora => 'Sora tarapyndan barlanan';
@@ -2007,7 +2011,15 @@ class STk extends S {
   String get subscriptionNeverUpdated => 'Entek täzelenmedi. Gaýtadan synanyşyň.';
 
   @override
-  String get errHttpStatus => 'Serwer haýyşy ret etdi. Salgyny barlaň ýa-da üpjün edijä ýüz tutuň.';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Serwer HTTP $status koduny gaýtardy. Salgyny barlaň ýa-da üpjün edijä ýüz tutuň.',
+      zero: 'Serwer talaby ret etdi. Salgyny barlaň ýa-da üpjün edijä ýüz tutuň.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => 'Serwer sazlamalary doly däl ýa-da goldanylmaýar. Abunalygy täzeläň.';
@@ -2067,4 +2079,19 @@ class STk extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => 'Abunalygyň täzelenme aralygy nädogry. Üpjün edijiniň maslahat berýän aralygyny saýlaň.';
+
+  @override
+  String get errRule => 'Ugurlama düzgüninde ýalňyşlyk bar. Düzgündäki domeni, IP salgysyny ýa-da programmany barlaň.';
+
+  @override
+  String get errDns => 'DNS sazlamalary nädogry. DNS serweriniň salgysyny barlaň.';
+
+  @override
+  String get errEndpoint => 'Barlanjak serweriň salgysy nädogry. Host adyny we porty barlaň.';
+
+  @override
+  String get errCancelled => 'Talap ýatyryldy. Zerur bolsa, amaly gaýtalaň.';
 }

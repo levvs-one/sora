@@ -205,25 +205,25 @@ class SKo extends S {
   String get errGeneric => '문제가 발생했습니다.';
 
   @override
-  String get errCore => 'Sora 서비스가 응답하지 않습니다.';
+  String get errCore => 'Sora 서비스가 응답하지 않습니다. 잠시 기다린 후 다시 시도하세요.';
 
   @override
-  String get errAuth => 'Sora 서비스에 액세스할 수 없습니다.';
+  String get errAuth => 'Sora 서비스에 대한 접근이 거부되었습니다. 앱을 다시 시작한 후 재시도하세요.';
 
   @override
-  String get errVersion => 'Sora 업데이트: 앱과 서비스의 버전이 다릅니다.';
+  String get errVersion => 'Sora 앱과 서비스의 버전이 다릅니다. Sora를 업데이트하세요.';
 
   @override
-  String get errBusy => '잠깐, 이전 명령이 아직 실행 중입니다.';
+  String get errBusy => '이전 명령이 아직 실행 중입니다. 완료될 때까지 기다리세요.';
 
   @override
-  String get errEngineMissing => '이 서버에 대한 엔진을 찾을 수 없습니다.';
+  String get errEngineMissing => '이 서버에 필요한 엔진을 찾을 수 없습니다. Sora 업데이트를 확인하세요.';
 
   @override
-  String get errEngineStart => '엔진이 시동되지 않았습니다';
+  String get errEngineStart => '엔진을 시작하지 못했습니다. 연결 로그에서 원인을 확인하세요.';
 
   @override
-  String get errEngineStopped => '엔진이 멈췄다';
+  String get errEngineStopped => '엔진이 중지되었습니다. 다시 연결해 보세요.';
 
   @override
   String get errTunnel => '이 VPN 모드는 사용할 수 없습니다. 다른 모드를 선택하거나 서비스 권한을 확인하세요.';
@@ -232,34 +232,34 @@ class SKo extends S {
   String get errNetwork => '서버에 연결할 수 없습니다';
 
   @override
-  String get errTimeout => '서버가 제 시간에 응답하지 않았습니다';
+  String get errTimeout => '서버가 제시간에 응답하지 않았습니다. 1분 후에 다시 시도하세요.';
 
   @override
-  String get errFirewall => 'VPN 외부의 인터넷을 차단할 수 없습니다';
+  String get errFirewall => 'VPN 외부의 인터넷 접근을 차단하지 못했습니다. 연결 로그에서 원인을 확인하세요.';
 
   @override
-  String get errSubFetch => '구독을 로드할 수 없습니다.';
+  String get errSubFetch => '구독을 다운로드하지 못했습니다. 인터넷 연결을 확인하고 1분 후에 다시 시도하세요.';
 
   @override
-  String get errSubFormat => '구독링크가 아닙니다';
+  String get errSubFormat => '구독 형식을 인식하지 못했습니다. 제공업체에 호환되는 구독 링크를 요청하세요.';
 
   @override
-  String get errSubEmpty => '구독에 서버가 없습니다.';
+  String get errSubEmpty => '구독에 서버가 없습니다. 구독 제공업체에 문의하세요.';
 
   @override
-  String get errSubDuplicate => '이 구독은 이미 추가되었습니다.';
+  String get errSubDuplicate => '이미 추가된 구독입니다. 최신 서버 목록을 받으려면 구독을 업데이트하세요.';
 
   @override
-  String get errSubLimit => '구독이 너무 많습니다.';
+  String get errSubLimit => '구독 수가 한도에 도달했습니다. 새 구독을 추가하기 전에 사용하지 않는 구독을 삭제하세요.';
 
   @override
-  String get errSubScheme => '링크는 https://로 시작해야 합니다.';
+  String get errSubScheme => '구독 링크는 https://로 시작해야 합니다. 제공업체에 보안 링크를 요청하세요.';
 
   @override
-  String get errSecretStore => 'Sora 스토리지가 손상되었거나 사용할 수 없습니다.';
+  String get errSecretStore => 'Sora 저장소가 손상되었거나 접근할 수 없습니다. 접근 권한과 로그의 세부 내용을 확인하세요.';
 
   @override
-  String get errNoServers => '연결하려면 구독을 추가하세요.';
+  String get errNoServers => '연결할 서버가 없습니다. 구독이나 개인 서버를 추가하세요.';
 
   @override
   String get connections => '사이';
@@ -1384,7 +1384,7 @@ class SKo extends S {
   String get autoSelectSmart => '현명한 선택';
 
   @override
-  String get coreWatchUnstable => 'Sora 코어에 대한 연결이 불안정합니다.';
+  String get coreWatchUnstable => '코어와의 연결이 불안정합니다. 잠시 기다린 후 다시 연결해 보세요.';
 
   @override
   String get watchReconnect => '다시 연결';
@@ -1423,7 +1423,7 @@ class SKo extends S {
   String get overrideCustomRules => '자체 규칙';
 
   @override
-  String get errBenchmarkUnsupported => '속도 측정에는 최신 코어가 필요합니다.';
+  String get errBenchmarkUnsupported => '속도를 측정하려면 더 최신 버전의 코어가 필요합니다. Sora를 업데이트하세요.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1523,10 +1523,10 @@ class SKo extends S {
   String get chainOrderHint => '드래그하여 재정렬: 트래픽이 위쪽으로 들어오고 아래쪽으로 나갑니다.';
 
   @override
-  String get chainTooFew => '서버를 2개 이상 선택하세요.';
+  String get chainTooFew => '체인에는 최소 두 개의 서버가 필요합니다. 서버를 하나 더 추가하세요.';
 
   @override
-  String get chainTooMany => '체인은 최대 3개의 서버를 보유합니다.';
+  String get chainTooMany => '체인에는 최대 세 개의 서버만 사용할 수 있습니다. 초과한 서버를 삭제하세요.';
 
   @override
   String get chainEstimate => '예상 대기 시간';
@@ -1543,10 +1543,10 @@ class SKo extends S {
   }
 
   @override
-  String get chainUnsupported => '현재 엔진은 체인을 구축할 수 없습니다.';
+  String get chainUnsupported => '선택한 엔진은 체인을 지원하지 않습니다. 호환되는 엔진을 선택하세요.';
 
   @override
-  String get chainHopMissing => '체인 서버 중 하나를 더 이상 사용할 수 없습니다.';
+  String get chainHopMissing => '체인의 서버 중 하나를 더 이상 사용할 수 없습니다. 해당 구간에 다른 서버를 선택하세요.';
 
   @override
   String chainHop(Object n) {
@@ -1615,7 +1615,7 @@ class SKo extends S {
   String get zapretWithVpnHint => 'VPN 터널과 함께 zapret을 실행합니다. 터널 트래픽은 VPN을 사용하고 직접 트래픽은 우회 기능을 사용합니다.';
 
   @override
-  String get chainDuplicate => '각 서버는 한 번만 나타날 수 있습니다.';
+  String get chainDuplicate => '체인에 같은 서버가 두 번 이상 사용되었습니다. 구간마다 다른 서버를 선택하세요.';
 
   @override
   String get edit => '편집';
@@ -1921,7 +1921,7 @@ class SKo extends S {
   String get extWorkerFailed => '확장 기능의 백그라운드 작업이 실패했습니다. 확장 기능 로그를 확인하세요.';
 
   @override
-  String get extAssetRejected => '확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다.';
+  String get extAssetRejected => '확장 프로그램 파일에 읽기 어려운 색상이나 잘못된 규칙이 있습니다. 확장 프로그램 제작자에게 파일 수정을 요청하세요.';
 
   @override
   String get extVerifiedSora => 'Sora 인증됨';
@@ -1982,7 +1982,15 @@ class SKo extends S {
   String get subscriptionNeverUpdated => '아직 업데이트되지 않았습니다. 다시 시도하세요.';
 
   @override
-  String get errHttpStatus => '서버가 요청을 거부했습니다. 링크를 확인하거나 제공업체에 문의하세요.';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: '서버가 HTTP $status 코드를 반환했습니다. 링크를 확인하거나 제공업체에 문의하세요.',
+      zero: '서버가 요청을 거부했습니다. 링크를 확인하거나 제공업체에 문의하세요.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => '서버 설정이 불완전하거나 지원되지 않습니다. 구독을 업데이트하세요.';
@@ -2042,4 +2050,19 @@ class SKo extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => '구독 업데이트 간격이 올바르지 않습니다. 제공업체에서 권장하는 간격을 선택하세요.';
+
+  @override
+  String get errRule => '라우팅 규칙이 올바르지 않습니다. 규칙의 도메인, IP 주소 또는 앱을 확인하세요.';
+
+  @override
+  String get errDns => 'DNS 설정이 올바르지 않습니다. DNS 서버 주소를 확인하세요.';
+
+  @override
+  String get errEndpoint => '테스트할 서버 주소가 올바르지 않습니다. 호스트 이름과 포트를 확인하세요.';
+
+  @override
+  String get errCancelled => '요청이 취소되었습니다. 필요한 경우 작업을 다시 수행하세요.';
 }

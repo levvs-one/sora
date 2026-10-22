@@ -49,8 +49,10 @@ class _ToastTitle extends StatelessWidget {
         ],
       ],
     );
-    if (notice.action.isEmpty) return body;
-    return Semantics(button: true, onTap: () => runNotificationAction(context, notice), child: body);
+    // Toastification limits titles to two lines, which would hide recovery steps.
+    final content = DefaultTextStyle(style: DefaultTextStyle.of(context).style, child: body);
+    if (notice.action.isEmpty) return content;
+    return Semantics(button: true, onTap: () => runNotificationAction(context, notice), child: content);
   }
 }
 

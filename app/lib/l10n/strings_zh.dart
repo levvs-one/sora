@@ -205,25 +205,25 @@ class SZh extends S {
   String get errGeneric => '出了点问题';
 
   @override
-  String get errCore => 'Sora 服务没有响应';
+  String get errCore => 'Sora 服务没有响应。请稍等片刻后重试。';
 
   @override
-  String get errAuth => '无法访问Sora服务';
+  String get errAuth => '无法访问 Sora 服务。请重启应用后重试。';
 
   @override
-  String get errVersion => '更新Sora：应用程序和服务是不同版本';
+  String get errVersion => 'Sora 应用与服务的版本不一致。请更新 Sora。';
 
   @override
-  String get errBusy => '等待，之前的命令仍在运行';
+  String get errBusy => '上一条命令仍在执行。请等待其完成。';
 
   @override
-  String get errEngineMissing => '找不到该服务器的引擎';
+  String get errEngineMissing => '找不到此服务器所需的内核。请检查 Sora 更新。';
 
   @override
-  String get errEngineStart => '发动机没有启动';
+  String get errEngineStart => '内核未能启动。请查看连接日志以了解原因。';
 
   @override
-  String get errEngineStopped => '发动机停了';
+  String get errEngineStopped => '内核已停止。请尝试重新连接。';
 
   @override
   String get errTunnel => '此 VPN 模式不可用。请选择其他模式或检查服务权限。';
@@ -232,34 +232,34 @@ class SZh extends S {
   String get errNetwork => '无法到达服务器';
 
   @override
-  String get errTimeout => '服务器没有及时回复';
+  String get errTimeout => '服务器响应超时。请一分钟后重试。';
 
   @override
-  String get errFirewall => '无法阻止 VPN 之外的互联网';
+  String get errFirewall => '无法阻止 VPN 以外的互联网访问。请查看连接日志以了解原因。';
 
   @override
-  String get errSubFetch => '无法加载订阅';
+  String get errSubFetch => '无法下载订阅。请检查网络连接，一分钟后重试。';
 
   @override
-  String get errSubFormat => '这不是订阅链接';
+  String get errSubFormat => '无法识别订阅格式。请向订阅提供商索取兼容的订阅链接。';
 
   @override
-  String get errSubEmpty => '订阅没有服务器';
+  String get errSubEmpty => '订阅中没有服务器。请联系订阅提供商。';
 
   @override
-  String get errSubDuplicate => '此订阅已添加';
+  String get errSubDuplicate => '此订阅已添加。请更新该订阅以获取最新服务器列表。';
 
   @override
-  String get errSubLimit => '订阅数量过多';
+  String get errSubLimit => '订阅数量已达上限。请先删除不再使用的订阅，再添加新订阅。';
 
   @override
-  String get errSubScheme => '链接必须以 https:// 开头';
+  String get errSubScheme => '订阅链接必须以 https:// 开头。请向提供商索取安全链接。';
 
   @override
-  String get errSecretStore => 'Sora 存储损坏或不可用';
+  String get errSecretStore => 'Sora 存储已损坏或无法访问。请检查访问权限，并查看日志中的详细信息。';
 
   @override
-  String get errNoServers => '添加订阅以连接';
+  String get errNoServers => '没有可连接的服务器。请添加订阅或自己的服务器。';
 
   @override
   String get connections => '连接';
@@ -1383,7 +1383,7 @@ class SZh extends S {
   String get autoSelectSmart => '智能选择';
 
   @override
-  String get coreWatchUnstable => '与核心的连接不稳定';
+  String get coreWatchUnstable => '与内核的连接不稳定。请稍等片刻后尝试重新连接。';
 
   @override
   String get watchReconnect => '重新连接';
@@ -1422,7 +1422,7 @@ class SZh extends S {
   String get overrideCustomRules => '自订规则';
 
   @override
-  String get errBenchmarkUnsupported => '测速需要更新版本的核心';
+  String get errBenchmarkUnsupported => '测速需要更新版本的内核。请更新 Sora。';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1522,10 +1522,10 @@ class SZh extends S {
   String get chainOrderHint => '拖动以调整顺序：流量从上方进入，从下方离开。';
 
   @override
-  String get chainTooFew => '请至少选择 2 台服务器';
+  String get chainTooFew => '连接链至少需要两个服务器。请再添加一个服务器。';
 
   @override
-  String get chainTooMany => '代理链最多包含 3 台服务器';
+  String get chainTooMany => '连接链最多支持三个服务器。请移除多余的服务器。';
 
   @override
   String get chainEstimate => '预估延迟';
@@ -1542,10 +1542,10 @@ class SZh extends S {
   }
 
   @override
-  String get chainUnsupported => '目前的引擎无法建立代理链';
+  String get chainUnsupported => '所选内核不支持链式连接。请选择兼容的内核。';
 
   @override
-  String get chainHopMissing => '代理链中的一台服务器已无法使用';
+  String get chainHopMissing => '连接链中的某个服务器已不可用。请为该节点选择其他服务器。';
 
   @override
   String chainHop(Object n) {
@@ -1614,7 +1614,7 @@ class SZh extends S {
   String get zapretWithVpnHint => '与 VPN 隧道并行执行 zapret：隧道流量使用 VPN，直接连接流量则透过绕过机制。';
 
   @override
-  String get chainDuplicate => '每台服务器只能选择一次';
+  String get chainDuplicate => '连接链中有重复的服务器。请为每个节点选择不同的服务器。';
 
   @override
   String get edit => '编辑';
@@ -1917,7 +1917,7 @@ class SZh extends S {
   String get extWorkerFailed => '扩展的后台任务失败。请查看扩展日志。';
 
   @override
-  String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
+  String get extAssetRejected => '扩展文件包含难以辨认的配色或无效规则。请联系扩展作者修正文件。';
 
   @override
   String get extVerifiedSora => '经 Sora 验证';
@@ -1978,7 +1978,15 @@ class SZh extends S {
   String get subscriptionNeverUpdated => '尚未更新。请重试。';
 
   @override
-  String get errHttpStatus => '服务器拒绝了请求。请检查链接或联系服务提供商。';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: '服务器返回了 HTTP $status。请检查链接或联系提供商。',
+      zero: '服务器拒绝了请求。请检查链接或联系提供商。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => '服务器设置不完整或不受支持。请更新订阅。';
@@ -2038,6 +2046,21 @@ class SZh extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => '订阅更新间隔无效。请选择提供商建议的间隔。';
+
+  @override
+  String get errRule => '路由规则无效。请检查规则中的域名、IP 地址或应用。';
+
+  @override
+  String get errDns => 'DNS 设置无效。请检查 DNS 服务器地址。';
+
+  @override
+  String get errEndpoint => '待检测的服务器地址无效。请检查主机名和端口。';
+
+  @override
+  String get errCancelled => '请求已取消。如有需要，请重新执行操作。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2240,25 +2263,25 @@ class SZhHans extends SZh {
   String get errGeneric => '出了点问题';
 
   @override
-  String get errCore => 'Sora 服务没有响应';
+  String get errCore => 'Sora 服务没有响应。请稍等片刻后重试。';
 
   @override
-  String get errAuth => '无法访问Sora服务';
+  String get errAuth => '无法访问 Sora 服务。请重启应用后重试。';
 
   @override
-  String get errVersion => '更新Sora：应用程序和服务是不同版本';
+  String get errVersion => 'Sora 应用与服务的版本不一致。请更新 Sora。';
 
   @override
-  String get errBusy => '等待，之前的命令仍在运行';
+  String get errBusy => '上一条命令仍在执行。请等待其完成。';
 
   @override
-  String get errEngineMissing => '找不到该服务器的引擎';
+  String get errEngineMissing => '找不到此服务器所需的内核。请检查 Sora 更新。';
 
   @override
-  String get errEngineStart => '发动机没有启动';
+  String get errEngineStart => '内核未能启动。请查看连接日志以了解原因。';
 
   @override
-  String get errEngineStopped => '发动机停了';
+  String get errEngineStopped => '内核已停止。请尝试重新连接。';
 
   @override
   String get errTunnel => '此 VPN 模式不可用。请选择其他模式或检查服务权限。';
@@ -2267,34 +2290,34 @@ class SZhHans extends SZh {
   String get errNetwork => '无法到达服务器';
 
   @override
-  String get errTimeout => '服务器没有及时回复';
+  String get errTimeout => '服务器响应超时。请一分钟后重试。';
 
   @override
-  String get errFirewall => '无法阻止 VPN 之外的互联网';
+  String get errFirewall => '无法阻止 VPN 以外的互联网访问。请查看连接日志以了解原因。';
 
   @override
-  String get errSubFetch => '无法加载订阅';
+  String get errSubFetch => '无法下载订阅。请检查网络连接，一分钟后重试。';
 
   @override
-  String get errSubFormat => '这不是订阅链接';
+  String get errSubFormat => '无法识别订阅格式。请向订阅提供商索取兼容的订阅链接。';
 
   @override
-  String get errSubEmpty => '订阅没有服务器';
+  String get errSubEmpty => '订阅中没有服务器。请联系订阅提供商。';
 
   @override
-  String get errSubDuplicate => '此订阅已添加';
+  String get errSubDuplicate => '此订阅已添加。请更新该订阅以获取最新服务器列表。';
 
   @override
-  String get errSubLimit => '订阅数量过多';
+  String get errSubLimit => '订阅数量已达上限。请先删除不再使用的订阅，再添加新订阅。';
 
   @override
-  String get errSubScheme => '链接必须以 https:// 开头';
+  String get errSubScheme => '订阅链接必须以 https:// 开头。请向提供商索取安全链接。';
 
   @override
-  String get errSecretStore => 'Sora 存储损坏或不可用';
+  String get errSecretStore => 'Sora 存储已损坏或无法访问。请检查访问权限，并查看日志中的详细信息。';
 
   @override
-  String get errNoServers => '添加订阅以连接';
+  String get errNoServers => '没有可连接的服务器。请添加订阅或自己的服务器。';
 
   @override
   String get connections => '连接';
@@ -3418,7 +3441,7 @@ class SZhHans extends SZh {
   String get autoSelectSmart => '智能选择';
 
   @override
-  String get coreWatchUnstable => '与核心的连接不稳定';
+  String get coreWatchUnstable => '与内核的连接不稳定。请稍等片刻后尝试重新连接。';
 
   @override
   String get watchReconnect => '重新连接';
@@ -3457,7 +3480,7 @@ class SZhHans extends SZh {
   String get overrideCustomRules => '自订规则';
 
   @override
-  String get errBenchmarkUnsupported => '测速需要更新版本的核心';
+  String get errBenchmarkUnsupported => '测速需要更新版本的内核。请更新 Sora。';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -3557,10 +3580,10 @@ class SZhHans extends SZh {
   String get chainOrderHint => '拖动以调整顺序：流量从上方进入，从下方离开。';
 
   @override
-  String get chainTooFew => '请至少选择 2 台服务器';
+  String get chainTooFew => '连接链至少需要两个服务器。请再添加一个服务器。';
 
   @override
-  String get chainTooMany => '代理链最多包含 3 台服务器';
+  String get chainTooMany => '连接链最多支持三个服务器。请移除多余的服务器。';
 
   @override
   String get chainEstimate => '预估延迟';
@@ -3577,10 +3600,10 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get chainUnsupported => '目前的引擎无法建立代理链';
+  String get chainUnsupported => '所选内核不支持链式连接。请选择兼容的内核。';
 
   @override
-  String get chainHopMissing => '代理链中的一台服务器已无法使用';
+  String get chainHopMissing => '连接链中的某个服务器已不可用。请为该节点选择其他服务器。';
 
   @override
   String chainHop(Object n) {
@@ -3649,7 +3672,7 @@ class SZhHans extends SZh {
   String get zapretWithVpnHint => '与 VPN 隧道并行执行 zapret：隧道流量使用 VPN，直接连接流量则透过绕过机制。';
 
   @override
-  String get chainDuplicate => '每台服务器只能选择一次';
+  String get chainDuplicate => '连接链中有重复的服务器。请为每个节点选择不同的服务器。';
 
   @override
   String get edit => '编辑';
@@ -3952,7 +3975,7 @@ class SZhHans extends SZh {
   String get extWorkerFailed => '扩展的后台任务失败。请查看扩展日志。';
 
   @override
-  String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
+  String get extAssetRejected => '扩展文件包含难以辨认的配色或无效规则。请联系扩展作者修正文件。';
 
   @override
   String get extVerifiedSora => '经 Sora 验证';
@@ -4013,7 +4036,15 @@ class SZhHans extends SZh {
   String get subscriptionNeverUpdated => '尚未更新。请重试。';
 
   @override
-  String get errHttpStatus => '服务器拒绝了请求。请检查链接或联系服务提供商。';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: '服务器返回了 HTTP $status。请检查链接或联系提供商。',
+      zero: '服务器拒绝了请求。请检查链接或联系提供商。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => '服务器设置不完整或不受支持。请更新订阅。';
@@ -4073,6 +4104,21 @@ class SZhHans extends SZh {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => '订阅更新间隔无效。请选择提供商建议的间隔。';
+
+  @override
+  String get errRule => '路由规则无效。请检查规则中的域名、IP 地址或应用。';
+
+  @override
+  String get errDns => 'DNS 设置无效。请检查 DNS 服务器地址。';
+
+  @override
+  String get errEndpoint => '待检测的服务器地址无效。请检查主机名和端口。';
+
+  @override
+  String get errCancelled => '请求已取消。如有需要，请重新执行操作。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4275,25 +4321,25 @@ class SZhHant extends SZh {
   String get errGeneric => '出了點問題';
 
   @override
-  String get errCore => 'Sora 服務沒有回應';
+  String get errCore => 'Sora 服務沒有回應。請稍候片刻再試。';
 
   @override
-  String get errAuth => '無法存取Sora服務';
+  String get errAuth => '無法存取 Sora 服務。請重新啟動應用程式後再試。';
 
   @override
-  String get errVersion => '更新Sora：應用程式和服務是不同版本';
+  String get errVersion => 'Sora 應用程式與服務的版本不一致。請更新 Sora。';
 
   @override
-  String get errBusy => '等待，先前的命令仍在運行';
+  String get errBusy => '上一個命令仍在執行。請等待執行完成。';
 
   @override
-  String get errEngineMissing => '找不到該伺服器的引擎';
+  String get errEngineMissing => '找不到此伺服器所需的核心。請檢查 Sora 更新。';
 
   @override
-  String get errEngineStart => '引擎沒有啟動';
+  String get errEngineStart => '核心無法啟動。請查看連線記錄以瞭解原因。';
 
   @override
-  String get errEngineStopped => '引擎停了';
+  String get errEngineStopped => '核心已停止。請嘗試重新連線。';
 
   @override
   String get errTunnel => '此 VPN 模式無法使用。請選擇其他模式或檢查服務權限。';
@@ -4302,34 +4348,34 @@ class SZhHant extends SZh {
   String get errNetwork => '無法到達伺服器';
 
   @override
-  String get errTimeout => '伺服器沒有及時回复';
+  String get errTimeout => '伺服器回應逾時。請一分鐘後再試。';
 
   @override
-  String get errFirewall => '無法阻止 VPN 以外的互聯網';
+  String get errFirewall => '無法封鎖 VPN 以外的網際網路存取。請查看連線記錄以瞭解原因。';
 
   @override
-  String get errSubFetch => '無法加載訂閱';
+  String get errSubFetch => '無法下載訂閱。請檢查網路連線，一分鐘後再試。';
 
   @override
-  String get errSubFormat => '這不是訂閱鏈接';
+  String get errSubFormat => '無法辨識訂閱格式。請向訂閱供應商索取相容的訂閱連結。';
 
   @override
-  String get errSubEmpty => '訂閱沒有伺服器';
+  String get errSubEmpty => '訂閱中沒有伺服器。請聯絡訂閱供應商。';
 
   @override
-  String get errSubDuplicate => '此訂閱已新增';
+  String get errSubDuplicate => '已新增此訂閱。請更新該訂閱以取得最新的伺服器清單。';
 
   @override
-  String get errSubLimit => '訂閱數量太多';
+  String get errSubLimit => '訂閱數量已達上限。請先刪除不再使用的訂閱，再新增訂閱。';
 
   @override
-  String get errSubScheme => '連結必須以 https:// 開頭';
+  String get errSubScheme => '訂閱連結必須以 https:// 開頭。請向供應商索取安全連結。';
 
   @override
-  String get errSecretStore => 'Sora 儲存損壞或無法使用';
+  String get errSecretStore => 'Sora 儲存空間已損壞或無法存取。請檢查存取權限，並查看記錄中的詳細資訊。';
 
   @override
-  String get errNoServers => '新增訂閱以連接';
+  String get errNoServers => '沒有可連線的伺服器。請新增訂閱或自己的伺服器。';
 
   @override
   String get connections => '連接';
@@ -5453,7 +5499,7 @@ class SZhHant extends SZh {
   String get autoSelectSmart => '智慧選擇';
 
   @override
-  String get coreWatchUnstable => '與核心的連接不穩定';
+  String get coreWatchUnstable => '與核心的連線不穩定。請稍候片刻再嘗試重新連線。';
 
   @override
   String get watchReconnect => '重新連接';
@@ -5492,7 +5538,7 @@ class SZhHant extends SZh {
   String get overrideCustomRules => '自訂規則';
 
   @override
-  String get errBenchmarkUnsupported => '測速需要更新版本的核心';
+  String get errBenchmarkUnsupported => '測速需要較新版本的核心。請更新 Sora。';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -5592,10 +5638,10 @@ class SZhHant extends SZh {
   String get chainOrderHint => '拖曳以調整順序：流量從上方進入，從下方離開。';
 
   @override
-  String get chainTooFew => '請至少選擇 2 台伺服器';
+  String get chainTooFew => '連線鏈至少需要兩個伺服器。請再新增一個伺服器。';
 
   @override
-  String get chainTooMany => '代理鏈最多包含 3 台伺服器';
+  String get chainTooMany => '連線鏈最多支援三個伺服器。請移除多餘的伺服器。';
 
   @override
   String get chainEstimate => '預估延遲';
@@ -5612,10 +5658,10 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get chainUnsupported => '目前的引擎無法建立代理鏈';
+  String get chainUnsupported => '所選核心不支援鏈式連線。請選擇相容的核心。';
 
   @override
-  String get chainHopMissing => '代理鏈中的一台伺服器已無法使用';
+  String get chainHopMissing => '連線鏈中的某個伺服器已無法使用。請為該節點選擇其他伺服器。';
 
   @override
   String chainHop(Object n) {
@@ -5684,7 +5730,7 @@ class SZhHant extends SZh {
   String get zapretWithVpnHint => '與 VPN 通道並行執行 zapret：通道流量使用 VPN，直接連線流量則透過繞過機制。';
 
   @override
-  String get chainDuplicate => '每台伺服器只能選擇一次';
+  String get chainDuplicate => '連線鏈中有重複的伺服器。請為每個節點選擇不同的伺服器。';
 
   @override
   String get edit => '編輯';
@@ -5988,7 +6034,7 @@ class SZhHant extends SZh {
   String get extWorkerFailed => '擴充功能的背景工作失敗。請查看擴充功能記錄。';
 
   @override
-  String get extAssetRejected => '擴充功能檔案遭拒：顏色難以辨認或規則無效。';
+  String get extAssetRejected => '擴充功能檔案包含難以辨識的配色或無效規則。請聯絡擴充功能作者修正檔案。';
 
   @override
   String get extVerifiedSora => '經 Sora 驗證';
@@ -6049,7 +6095,15 @@ class SZhHant extends SZh {
   String get subscriptionNeverUpdated => '尚未更新。請重試。';
 
   @override
-  String get errHttpStatus => '伺服器拒絕了請求。請檢查連結或聯絡服務供應商。';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: '伺服器傳回了 HTTP $status。請檢查連結或聯絡供應商。',
+      zero: '伺服器拒絕了要求。請檢查連結或聯絡供應商。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => '伺服器設定不完整或不受支援。請更新訂閱。';
@@ -6109,4 +6163,19 @@ class SZhHant extends SZh {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => '訂閱更新間隔無效。請選擇供應商建議的間隔。';
+
+  @override
+  String get errRule => '路由規則無效。請檢查規則中的網域、IP 位址或應用程式。';
+
+  @override
+  String get errDns => 'DNS 設定無效。請檢查 DNS 伺服器位址。';
+
+  @override
+  String get errEndpoint => '待測試的伺服器位址無效。請檢查主機名稱和連接埠。';
+
+  @override
+  String get errCancelled => '要求已取消。如有需要，請重新執行操作。';
 }

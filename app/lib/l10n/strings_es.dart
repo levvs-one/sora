@@ -205,25 +205,26 @@ class SEs extends S {
   String get errGeneric => 'algo salió mal';
 
   @override
-  String get errCore => 'El servicio Sora no responde';
+  String get errCore => 'El servicio de Sora no responde. Espera un momento y vuelve a intentarlo.';
 
   @override
-  String get errAuth => 'Sin acceso al servicio Sora';
+  String get errAuth => 'Se ha denegado el acceso al servicio de Sora. Reinicia la aplicación y vuelve a intentarlo.';
 
   @override
-  String get errVersion => 'Actualización Sora: la aplicación y el servicio son versiones diferentes';
+  String get errVersion => 'La aplicación y el servicio de Sora tienen versiones distintas. Actualiza Sora.';
 
   @override
-  String get errBusy => 'Espera, el comando anterior todavía se está ejecutando.';
+  String get errBusy => 'El comando anterior sigue ejecutándose. Espera a que termine.';
 
   @override
-  String get errEngineMissing => 'No se encontró ningún motor para este servidor';
+  String get errEngineMissing =>
+      'Falta el motor necesario para este servidor. Comprueba si hay actualizaciones de Sora.';
 
   @override
-  String get errEngineStart => 'El motor no arrancó';
+  String get errEngineStart => 'El motor no pudo iniciarse. Consulta el registro de conexión para ver la causa.';
 
   @override
-  String get errEngineStopped => 'El motor se detuvo';
+  String get errEngineStopped => 'El motor se ha detenido. Intenta conectarte de nuevo.';
 
   @override
   String get errTunnel => 'Este modo VPN no está disponible. Elija otro modo o revise los permisos del servicio.';
@@ -232,34 +233,40 @@ class SEs extends S {
   String get errNetwork => 'No se puede llegar al servidor';
 
   @override
-  String get errTimeout => 'El servidor no respondió a tiempo.';
+  String get errTimeout => 'El servidor no respondió a tiempo. Vuelve a intentarlo dentro de un minuto.';
 
   @override
-  String get errFirewall => 'No se pudo bloquear Internet fuera de la VPN';
+  String get errFirewall =>
+      'No se pudo bloquear el acceso a Internet fuera de la VPN. Consulta el registro de conexión para ver la causa.';
 
   @override
-  String get errSubFetch => 'No se pudo cargar la suscripción';
+  String get errSubFetch =>
+      'No se pudo descargar la suscripción. Comprueba tu conexión a Internet y vuelve a intentarlo en un minuto.';
 
   @override
-  String get errSubFormat => 'Este no es un enlace de suscripción.';
+  String get errSubFormat =>
+      'No se reconoce el formato de la suscripción. Pide a tu proveedor un enlace de suscripción compatible.';
 
   @override
-  String get errSubEmpty => 'La suscripción no tiene servidores.';
+  String get errSubEmpty => 'La suscripción no contiene servidores. Contacta con el proveedor de la suscripción.';
 
   @override
-  String get errSubDuplicate => 'Esta suscripción ya está agregada.';
+  String get errSubDuplicate =>
+      'Esta suscripción ya está añadida. Actualízala para obtener los servidores más recientes.';
 
   @override
-  String get errSubLimit => 'Demasiadas suscripciones';
+  String get errSubLimit => 'Se ha alcanzado el límite de suscripciones. Elimina una que no uses antes de añadir otra.';
 
   @override
-  String get errSubScheme => 'El enlace debe comenzar con https://';
+  String get errSubScheme =>
+      'El enlace de suscripción debe empezar por https://. Pide un enlace seguro a tu proveedor.';
 
   @override
-  String get errSecretStore => 'El almacenamiento Sora está dañado o no está disponible';
+  String get errSecretStore =>
+      'El almacenamiento de Sora está dañado o no es accesible. Comprueba los permisos de acceso y consulta el registro.';
 
   @override
-  String get errNoServers => 'Añade una suscripción para conectarte';
+  String get errNoServers => 'No hay servidores a los que conectarse. Añade una suscripción o tu propio servidor.';
 
   @override
   String get connections => 'Conexiones';
@@ -1412,7 +1419,8 @@ class SEs extends S {
   String get autoSelectSmart => 'Elección inteligente';
 
   @override
-  String get coreWatchUnstable => 'La conexión al núcleo Sora es inestable';
+  String get coreWatchUnstable =>
+      'La conexión con el núcleo es inestable. Espera un momento e intenta conectarte de nuevo.';
 
   @override
   String get watchReconnect => 'Reconectar';
@@ -1451,7 +1459,7 @@ class SEs extends S {
   String get overrideCustomRules => 'Reglas propias';
 
   @override
-  String get errBenchmarkUnsupported => 'La medición de velocidad necesita un núcleo más nuevo';
+  String get errBenchmarkUnsupported => 'La medición de velocidad requiere un núcleo más reciente. Actualiza Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1554,10 +1562,10 @@ class SEs extends S {
       'Arrastrar para reordenar: el tráfico entra por la parte superior y sale por la parte inferior.';
 
   @override
-  String get chainTooFew => 'Elige al menos 2 servidores';
+  String get chainTooFew => 'Una cadena necesita al menos dos servidores. Añade otro servidor.';
 
   @override
-  String get chainTooMany => 'Una cadena tiene como máximo 3 servidores';
+  String get chainTooMany => 'Una cadena puede tener un máximo de tres servidores. Quita los servidores que sobren.';
 
   @override
   String get chainEstimate => 'Latencia estimada';
@@ -1574,10 +1582,10 @@ class SEs extends S {
   }
 
   @override
-  String get chainUnsupported => 'El motor actual no puede construir cadenas.';
+  String get chainUnsupported => 'El motor seleccionado no admite cadenas. Elige un motor compatible.';
 
   @override
-  String get chainHopMissing => 'Uno de los servidores de la cadena ya no está disponible';
+  String get chainHopMissing => 'Un servidor de la cadena ya no está disponible. Elige otro servidor para ese salto.';
 
   @override
   String chainHop(Object n) {
@@ -1647,7 +1655,8 @@ class SEs extends S {
       'Ejecuta zapret junto al túnel VPN: el tráfico del túnel usa la VPN y el tráfico directo pasa por el mecanismo de evasión.';
 
   @override
-  String get chainDuplicate => 'Cada servidor puede aparecer solo una vez';
+  String get chainDuplicate =>
+      'Un servidor aparece varias veces en la cadena. Elige un servidor diferente para cada salto.';
 
   @override
   String get edit => 'Editar';
@@ -1963,7 +1972,8 @@ class SEs extends S {
   String get extWorkerFailed => 'Falló la tarea en segundo plano de la extensión. Revisa su registro.';
 
   @override
-  String get extAssetRejected => 'Archivo de extensión rechazado: colores ilegibles o reglas no válidas.';
+  String get extAssetRejected =>
+      'El archivo de la extensión contiene colores ilegibles o reglas no válidas. Pide al autor de la extensión que lo corrija.';
 
   @override
   String get extVerifiedSora => 'Verificado por Sora';
@@ -2024,7 +2034,15 @@ class SEs extends S {
   String get subscriptionNeverUpdated => 'Aún sin actualizar. Reintente.';
 
   @override
-  String get errHttpStatus => 'El servidor rechazó la solicitud. Revise el enlace o contacte al proveedor.';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'El servidor devolvió el código HTTP $status. Revisa el enlace o contacta con tu proveedor.',
+      zero: 'El servidor rechazó la solicitud. Revisa el enlace o contacta con tu proveedor.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer =>
@@ -2086,4 +2104,22 @@ class SEs extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval =>
+      'El intervalo de actualización de la suscripción no es válido. Elige el que recomiende tu proveedor.';
+
+  @override
+  String get errRule =>
+      'Una regla de enrutamiento no es válida. Revisa el dominio, la dirección IP o la aplicación de la regla.';
+
+  @override
+  String get errDns => 'La configuración DNS no es válida. Revisa la dirección del servidor DNS.';
+
+  @override
+  String get errEndpoint =>
+      'La dirección del servidor que se va a comprobar no es válida. Revisa el nombre del host y el puerto.';
+
+  @override
+  String get errCancelled => 'Se ha cancelado la solicitud. Repite la acción si lo necesitas.';
 }

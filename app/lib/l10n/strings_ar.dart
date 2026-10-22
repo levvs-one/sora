@@ -205,25 +205,25 @@ class SAr extends S {
   String get errGeneric => 'حدث خطأ ما';
 
   @override
-  String get errCore => 'خدمة Sora لا تستجيب';
+  String get errCore => 'خدمة Sora لا تستجيب. انتظر قليلًا ثم حاول مجددًا.';
 
   @override
-  String get errAuth => 'لا يمكن الوصول إلى خدمة Sora';
+  String get errAuth => 'رُفض الوصول إلى خدمة Sora. أعد تشغيل التطبيق ثم حاول مجددًا.';
 
   @override
-  String get errVersion => 'تحديث Sora: التطبيق والخدمة إصداران مختلفان';
+  String get errVersion => 'إصدار تطبيق Sora يختلف عن إصدار الخدمة. حدّث Sora.';
 
   @override
-  String get errBusy => 'انتظر، الأمر السابق لا يزال قيد التشغيل';
+  String get errBusy => 'لا يزال الأمر السابق قيد التنفيذ. انتظر حتى ينتهي.';
 
   @override
-  String get errEngineMissing => 'لم يتم العثور على محرك لهذا الخادم';
+  String get errEngineMissing => 'لم يُعثر على المحرك المطلوب لهذا الخادم. تحقق من تحديثات Sora.';
 
   @override
-  String get errEngineStart => 'المحرك لم يبدأ';
+  String get errEngineStart => 'تعذّر تشغيل المحرك. راجع سجل الاتصال لمعرفة السبب.';
 
   @override
-  String get errEngineStopped => 'توقف المحرك';
+  String get errEngineStopped => 'توقف المحرك. حاول الاتصال مجددًا.';
 
   @override
   String get errTunnel => 'وضع VPN هذا غير متاح. اختر وضعًا آخر أو تحقق من أذونات الخدمة.';
@@ -232,34 +232,35 @@ class SAr extends S {
   String get errNetwork => 'لا يمكن الوصول إلى الخادم';
 
   @override
-  String get errTimeout => 'الخادم لم يرد في الوقت المناسب';
+  String get errTimeout => 'لم يستجب الخادم في الوقت المحدد. حاول مجددًا بعد دقيقة.';
 
   @override
-  String get errFirewall => 'لا يمكن حظر الإنترنت خارج VPN';
+  String get errFirewall => 'تعذّر حظر الوصول إلى الإنترنت خارج VPN. راجع سجل الاتصال لمعرفة السبب.';
 
   @override
-  String get errSubFetch => 'تعذر تحميل الاشتراك';
+  String get errSubFetch => 'تعذّر تنزيل الاشتراك. تحقق من اتصالك بالإنترنت وحاول مجددًا بعد دقيقة.';
 
   @override
-  String get errSubFormat => 'هذا ليس رابط الاشتراك';
+  String get errSubFormat => 'تعذّر التعرّف على تنسيق الاشتراك. اطلب من المزوّد رابط اشتراك متوافقًا.';
 
   @override
-  String get errSubEmpty => 'الاشتراك ليس لديه خوادم';
+  String get errSubEmpty => 'لا يحتوي الاشتراك على خوادم. تواصل مع مزوّد الاشتراك.';
 
   @override
-  String get errSubDuplicate => 'تمت إضافة هذا الاشتراك بالفعل';
+  String get errSubDuplicate => 'أُضيف هذا الاشتراك من قبل. حدّثه للحصول على أحدث قائمة بالخوادم.';
 
   @override
-  String get errSubLimit => 'عدد كبير جدًا من الاشتراكات';
+  String get errSubLimit => 'بلغت الحد الأقصى للاشتراكات. احذف اشتراكًا لا تستخدمه قبل إضافة آخر.';
 
   @override
-  String get errSubScheme => 'الرابط يجب أن يبدأ ب https://';
+  String get errSubScheme => 'يجب أن يبدأ رابط الاشتراك بـ https://. اطلب رابطًا آمنًا من المزوّد.';
 
   @override
-  String get errSecretStore => 'وحدة تخزين Sora تالفة أو غير متوفرة';
+  String get errSecretStore =>
+      'مساحة تخزين Sora تالفة أو يتعذّر الوصول إليها. تحقق من أذونات الوصول وراجع التفاصيل في السجل.';
 
   @override
-  String get errNoServers => 'إضافة اشتراك للاتصال';
+  String get errNoServers => 'لا توجد خوادم للاتصال بها. أضف اشتراكًا أو خادمك الخاص.';
 
   @override
   String get connections => 'اتصالات';
@@ -1423,7 +1424,7 @@ class SAr extends S {
   String get autoSelectSmart => 'الاختيار الذكي';
 
   @override
-  String get coreWatchUnstable => 'الاتصال بالنواة غير مستقر';
+  String get coreWatchUnstable => 'الاتصال بالنواة غير مستقر. انتظر قليلًا ثم حاول الاتصال مجددًا.';
 
   @override
   String get watchReconnect => 'أعد الاتصال';
@@ -1462,7 +1463,7 @@ class SAr extends S {
   String get overrideCustomRules => 'القواعد الخاصة';
 
   @override
-  String get errBenchmarkUnsupported => 'يحتاج قياس السرعة إلى نواة أحدث';
+  String get errBenchmarkUnsupported => 'يتطلب قياس السرعة إصدارًا أحدث من النواة. حدّث Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1563,10 +1564,10 @@ class SAr extends S {
   String get chainOrderHint => 'اسحب لإعادة الترتيب: تدخل حركة المرور من الأعلى وتخرج من الأسفل.';
 
   @override
-  String get chainTooFew => 'اختر خادمين على الأقل';
+  String get chainTooFew => 'تحتاج السلسلة إلى خادمين على الأقل. أضف خادمًا آخر.';
 
   @override
-  String get chainTooMany => 'تحتوي السلسلة على 3 خوادم على الأكثر';
+  String get chainTooMany => 'لا يمكن أن تتجاوز السلسلة ثلاثة خوادم. أزل الخوادم الزائدة.';
 
   @override
   String get chainEstimate => 'الكمون المقدر';
@@ -1583,10 +1584,10 @@ class SAr extends S {
   }
 
   @override
-  String get chainUnsupported => 'لا يستطيع المحرك الحالي بناء السلاسل';
+  String get chainUnsupported => 'المحرك المحدد لا يدعم سلاسل الخوادم. اختر محركًا متوافقًا.';
 
   @override
-  String get chainHopMissing => 'أحد خوادم السلسلة لم يعد متاحًا';
+  String get chainHopMissing => 'أحد خوادم السلسلة لم يعد متاحًا. اختر خادمًا آخر لهذه الحلقة.';
 
   @override
   String chainHop(Object n) {
@@ -1656,7 +1657,7 @@ class SAr extends S {
       'يشغّل zapret إلى جانب نفق VPN: تمر حركة النفق عبر VPN، وتمر الحركة المباشرة عبر مسار تجاوز الحجب.';
 
   @override
-  String get chainDuplicate => 'يمكن لكل خادم أن يظهر مرة واحدة فقط';
+  String get chainDuplicate => 'يتكرر أحد الخوادم في السلسلة. اختر خادمًا مختلفًا لكل حلقة.';
 
   @override
   String get edit => 'تحرير';
@@ -1972,7 +1973,8 @@ class SAr extends S {
   String get extWorkerFailed => 'فشلت المهمة الخلفية للإضافة. راجع سجل الإضافة.';
 
   @override
-  String get extAssetRejected => 'تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة.';
+  String get extAssetRejected =>
+      'يحتوي ملف الإضافة على ألوان غير مقروءة أو قواعد غير صالحة. اطلب من مؤلف الإضافة تصحيح الملف.';
 
   @override
   String get extVerifiedSora => 'تم التحقق بواسطة Sora';
@@ -2033,7 +2035,15 @@ class SAr extends S {
   String get subscriptionNeverUpdated => 'لم يتم التحديث بعد. حاول مجددًا.';
 
   @override
-  String get errHttpStatus => 'رفض الخادم الطلب. تحقق من الرابط أو اتصل بالمزود.';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'أعاد الخادم رمز HTTP $status. تحقق من الرابط أو تواصل مع المزوّد.',
+      zero: 'رفض الخادم الطلب. تحقق من الرابط أو تواصل مع المزوّد.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => 'إعدادات الخادم ناقصة أو غير مدعومة. حدّث الاشتراك.';
@@ -2093,4 +2103,19 @@ class SAr extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => 'الفاصل الزمني لتحديث الاشتراك غير صالح. اختر الفاصل الذي يوصي به المزوّد.';
+
+  @override
+  String get errRule => 'إحدى قواعد التوجيه غير صالحة. تحقق من النطاق أو عنوان IP أو التطبيق المحدد فيها.';
+
+  @override
+  String get errDns => 'إعدادات DNS غير صالحة. تحقق من عنوان خادم DNS.';
+
+  @override
+  String get errEndpoint => 'عنوان الخادم المراد اختباره غير صالح. تحقق من اسم المضيف والمنفذ.';
+
+  @override
+  String get errCancelled => 'أُلغي الطلب. كرّر الإجراء عند الحاجة.';
 }

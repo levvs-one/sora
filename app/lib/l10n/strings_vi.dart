@@ -205,25 +205,25 @@ class SVi extends S {
   String get errGeneric => 'Đã xảy ra lỗi';
 
   @override
-  String get errCore => 'Dịch vụ Sora không phản hồi';
+  String get errCore => 'Dịch vụ Sora không phản hồi. Hãy đợi một lát rồi thử lại.';
 
   @override
-  String get errAuth => 'Không có quyền truy cập vào dịch vụ Sora';
+  String get errAuth => 'Quyền truy cập dịch vụ Sora bị từ chối. Hãy khởi động lại ứng dụng rồi thử lại.';
 
   @override
-  String get errVersion => 'Cập nhật Sora: ứng dụng và dịch vụ là phiên bản khác nhau';
+  String get errVersion => 'Ứng dụng và dịch vụ Sora có phiên bản khác nhau. Hãy cập nhật Sora.';
 
   @override
-  String get errBusy => 'Đợi đã, lệnh trước vẫn đang chạy';
+  String get errBusy => 'Lệnh trước vẫn đang chạy. Hãy đợi lệnh hoàn tất.';
 
   @override
-  String get errEngineMissing => 'Không tìm thấy công cụ nào cho máy chủ này';
+  String get errEngineMissing => 'Không tìm thấy lõi cần thiết cho máy chủ này. Hãy kiểm tra bản cập nhật Sora.';
 
   @override
-  String get errEngineStart => 'Động cơ không khởi động';
+  String get errEngineStart => 'Không thể khởi động lõi. Hãy xem nguyên nhân trong nhật ký kết nối.';
 
   @override
-  String get errEngineStopped => 'Động cơ dừng lại';
+  String get errEngineStopped => 'Lõi đã dừng. Hãy thử kết nối lại.';
 
   @override
   String get errTunnel => 'Chế độ VPN này không khả dụng. Chọn chế độ khác hoặc kiểm tra quyền của dịch vụ.';
@@ -232,34 +232,38 @@ class SVi extends S {
   String get errNetwork => 'Không thể truy cập máy chủ';
 
   @override
-  String get errTimeout => 'Máy chủ không trả lời kịp thời';
+  String get errTimeout => 'Máy chủ không phản hồi kịp thời. Hãy thử lại sau một phút.';
 
   @override
-  String get errFirewall => 'Không thể chặn internet bên ngoài VPN';
+  String get errFirewall =>
+      'Không thể chặn truy cập Internet bên ngoài VPN. Hãy xem nguyên nhân trong nhật ký kết nối.';
 
   @override
-  String get errSubFetch => 'Không thể tải đăng ký';
+  String get errSubFetch => 'Không thể tải gói đăng ký. Hãy kiểm tra kết nối Internet và thử lại sau một phút.';
 
   @override
-  String get errSubFormat => 'Đây không phải là liên kết đăng ký';
+  String get errSubFormat =>
+      'Không nhận dạng được định dạng gói đăng ký. Hãy yêu cầu nhà cung cấp gửi liên kết đăng ký tương thích.';
 
   @override
-  String get errSubEmpty => 'Đăng ký không có máy chủ';
+  String get errSubEmpty => 'Gói đăng ký không có máy chủ nào. Hãy liên hệ nhà cung cấp gói đăng ký.';
 
   @override
-  String get errSubDuplicate => 'Đăng ký này đã được thêm';
+  String get errSubDuplicate => 'Gói đăng ký này đã được thêm. Hãy cập nhật gói để lấy danh sách máy chủ mới nhất.';
 
   @override
-  String get errSubLimit => 'Quá nhiều đăng ký';
+  String get errSubLimit => 'Đã đạt giới hạn số gói đăng ký. Hãy xóa một gói không dùng trước khi thêm gói mới.';
 
   @override
-  String get errSubScheme => 'Liên kết phải bắt đầu bằng https://';
+  String get errSubScheme =>
+      'Liên kết đăng ký phải bắt đầu bằng https://. Hãy yêu cầu nhà cung cấp gửi liên kết an toàn.';
 
   @override
-  String get errSecretStore => 'Bộ lưu trữ Sora bị hỏng hoặc không khả dụng';
+  String get errSecretStore =>
+      'Bộ nhớ Sora bị hỏng hoặc không thể truy cập. Hãy kiểm tra quyền truy cập và xem chi tiết trong nhật ký.';
 
   @override
-  String get errNoServers => 'Thêm đăng ký để kết nối';
+  String get errNoServers => 'Không có máy chủ để kết nối. Hãy thêm gói đăng ký hoặc máy chủ riêng.';
 
   @override
   String get connections => 'Kết nối';
@@ -1404,7 +1408,7 @@ class SVi extends S {
   String get autoSelectSmart => 'Lựa chọn thông minh';
 
   @override
-  String get coreWatchUnstable => 'Kết nối tới lõi Sora không ổn định';
+  String get coreWatchUnstable => 'Kết nối với lõi không ổn định. Hãy đợi một lát rồi thử kết nối lại.';
 
   @override
   String get watchReconnect => 'Kết nối lại';
@@ -1443,7 +1447,7 @@ class SVi extends S {
   String get overrideCustomRules => 'Quy tắc riêng';
 
   @override
-  String get errBenchmarkUnsupported => 'Đo tốc độ cần lõi mới hơn';
+  String get errBenchmarkUnsupported => 'Đo tốc độ cần phiên bản lõi mới hơn. Hãy cập nhật Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1543,10 +1547,10 @@ class SVi extends S {
   String get chainOrderHint => 'Kéo để sắp xếp lại: lưu lượng vào ở trên cùng và thoát ra ở dưới cùng.';
 
   @override
-  String get chainTooFew => 'Chọn ít nhất 2 máy chủ';
+  String get chainTooFew => 'Chuỗi cần ít nhất hai máy chủ. Hãy thêm một máy chủ nữa.';
 
   @override
-  String get chainTooMany => 'Một chuỗi chứa tối đa 3 máy chủ';
+  String get chainTooMany => 'Chuỗi chỉ có thể chứa tối đa ba máy chủ. Hãy bỏ các máy chủ thừa.';
 
   @override
   String get chainEstimate => 'Độ trễ ước tính';
@@ -1563,10 +1567,10 @@ class SVi extends S {
   }
 
   @override
-  String get chainUnsupported => 'Động cơ hiện tại không hỗ trợ tạo chuỗi';
+  String get chainUnsupported => 'Lõi đã chọn không hỗ trợ chuỗi máy chủ. Hãy chọn một lõi tương thích.';
 
   @override
-  String get chainHopMissing => 'Một trong các máy chủ của chuỗi không còn khả dụng';
+  String get chainHopMissing => 'Một máy chủ trong chuỗi không còn khả dụng. Hãy chọn máy chủ khác cho chặng đó.';
 
   @override
   String chainHop(Object n) {
@@ -1636,7 +1640,8 @@ class SVi extends S {
       'Chạy zapret song song với đường hầm VPN: lưu lượng trong đường hầm dùng VPN, lưu lượng trực tiếp đi qua cơ chế vượt chặn.';
 
   @override
-  String get chainDuplicate => 'Mỗi máy chủ chỉ có thể xuất hiện một lần';
+  String get chainDuplicate =>
+      'Một máy chủ xuất hiện nhiều lần trong chuỗi. Hãy chọn máy chủ khác nhau cho từng chặng.';
 
   @override
   String get edit => 'Chỉnh sửa';
@@ -1946,7 +1951,8 @@ class SVi extends S {
   String get extWorkerFailed => 'Tác vụ nền của tiện ích mở rộng thất bại. Kiểm tra nhật ký tiện ích.';
 
   @override
-  String get extAssetRejected => 'Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ.';
+  String get extAssetRejected =>
+      'Tệp tiện ích có màu khó đọc hoặc quy tắc không hợp lệ. Hãy yêu cầu tác giả tiện ích sửa tệp.';
 
   @override
   String get extVerifiedSora => 'Được Sora xác minh';
@@ -2007,7 +2013,15 @@ class SVi extends S {
   String get subscriptionNeverUpdated => 'Chưa cập nhật. Thử lại.';
 
   @override
-  String get errHttpStatus => 'Máy chủ từ chối yêu cầu. Kiểm tra liên kết hoặc liên hệ nhà cung cấp.';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Máy chủ trả về mã HTTP $status. Hãy kiểm tra liên kết hoặc liên hệ nhà cung cấp.',
+      zero: 'Máy chủ đã từ chối yêu cầu. Hãy kiểm tra liên kết hoặc liên hệ nhà cung cấp.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => 'Cài đặt máy chủ chưa đầy đủ hoặc không được hỗ trợ. Cập nhật gói đăng ký.';
@@ -2067,4 +2081,21 @@ class SVi extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval =>
+      'Khoảng thời gian cập nhật gói đăng ký không hợp lệ. Hãy chọn khoảng thời gian do nhà cung cấp đề xuất.';
+
+  @override
+  String get errRule =>
+      'Quy tắc định tuyến không hợp lệ. Hãy kiểm tra tên miền, địa chỉ IP hoặc ứng dụng trong quy tắc.';
+
+  @override
+  String get errDns => 'Cài đặt DNS không hợp lệ. Hãy kiểm tra địa chỉ máy chủ DNS.';
+
+  @override
+  String get errEndpoint => 'Địa chỉ máy chủ cần kiểm tra không hợp lệ. Hãy kiểm tra tên máy chủ và cổng.';
+
+  @override
+  String get errCancelled => 'Yêu cầu đã bị hủy. Hãy thực hiện lại thao tác nếu cần.';
 }

@@ -205,25 +205,25 @@ class STg extends S {
   String get errGeneric => 'Чизе хато рафт';
 
   @override
-  String get errCore => 'Хидмати Sora ҷавоб намедиҳад';
+  String get errCore => 'Хидмати Sora ҷавоб намедиҳад. Каме интизор шавед ва дубора кӯшиш кунед.';
 
   @override
-  String get errAuth => 'Дастрасӣ ба хидмати Sora нест';
+  String get errAuth => 'Дастрасӣ ба хидмати Sora рад шуд. Барномаро аз нав оғоз карда, дубора кӯшиш кунед.';
 
   @override
-  String get errVersion => 'Навсозии Sora: барнома ва хидмат версияҳои гуногун мебошанд';
+  String get errVersion => 'Версияҳои барнома ва хидмати Sora гуногунанд. Sora-ро навсозӣ кунед.';
 
   @override
-  String get errBusy => 'Интизор шавед, фармони қаблӣ ҳоло ҳам иҷро мешавад';
+  String get errBusy => 'Фармони қаблӣ ҳанӯз иҷро шуда истодааст. То анҷоми он интизор шавед.';
 
   @override
-  String get errEngineMissing => 'Барои ин сервер ягон муҳаррик ёфт нашуд';
+  String get errEngineMissing => 'Муҳаррики лозим барои ин сервер ёфт нашуд. Навсозиҳои Sora-ро санҷед.';
 
   @override
-  String get errEngineStart => 'Мотор ба кор надаромад';
+  String get errEngineStart => 'Муҳаррик оғоз нашуд. Сабабашро дар сабти пайвастшавӣ бинед.';
 
   @override
-  String get errEngineStopped => 'Мотор аз кор монд';
+  String get errEngineStopped => 'Муҳаррик қатъ шуд. Дубора пайваст шуданро санҷед.';
 
   @override
   String get errTunnel => 'Ин реҷаи VPN дастнорас аст. Реҷаи дигарро интихоб кунед ё иҷозатҳои хидматро санҷед.';
@@ -232,34 +232,35 @@ class STg extends S {
   String get errNetwork => 'Ба сервер расида наметавонад';
 
   @override
-  String get errTimeout => 'Сервер сари вақт ҷавоб надод';
+  String get errTimeout => 'Сервер сари вақт ҷавоб надод. Пас аз як дақиқа дубора кӯшиш кунед.';
 
   @override
-  String get errFirewall => 'Интернетро берун аз VPN манъ карда натавонист';
+  String get errFirewall => 'Дастрасӣ ба интернет берун аз VPN баста нашуд. Сабабашро дар сабти пайвастшавӣ бинед.';
 
   @override
-  String get errSubFetch => 'Обунаро бор карда натавонист';
+  String get errSubFetch => 'Обуна боргирӣ нашуд. Интернетро санҷида, пас аз як дақиқа дубора кӯшиш кунед.';
 
   @override
-  String get errSubFormat => 'Ин пайванди обуна нест';
+  String get errSubFormat => 'Формати обуна шинохта нашуд. Аз провайдер пайванди обунаи мувофиқ пурсед.';
 
   @override
-  String get errSubEmpty => 'Обуна сервер надорад';
+  String get errSubEmpty => 'Дар обуна сервер нест. Ба провайдери обуна муроҷиат кунед.';
 
   @override
-  String get errSubDuplicate => 'Ин обуна аллакай илова карда шудааст';
+  String get errSubDuplicate => 'Ин обуна аллакай илова шудааст. Барои гирифтани серверҳои ҷорӣ онро навсозӣ кунед.';
 
   @override
-  String get errSubLimit => 'Обунаҳо аз ҳад зиёд';
+  String get errSubLimit => 'Шумораи обунаҳо ба ҳад расид. Пеш аз иловаи обунаи нав, обунаи нолозимро нест кунед.';
 
   @override
-  String get errSubScheme => 'Истинод бояд бо https:// оғоз шавад';
+  String get errSubScheme => 'Пайванди обуна бояд бо https:// оғоз шавад. Аз провайдер пайванди бехатар пурсед.';
 
   @override
-  String get errSecretStore => 'Захираи Sora осеб дидааст ё дастнорас аст';
+  String get errSecretStore =>
+      'Захирагоҳи Sora осеб дидааст ё дастнорас аст. Иҷозатҳои дастрасӣ ва тафсилоти сабтро санҷед.';
 
   @override
-  String get errNoServers => 'Барои пайваст шудан обуна илова кунед';
+  String get errNoServers => 'Барои пайвастшавӣ сервер нест. Обуна ё сервери худро илова кунед.';
 
   @override
   String get connections => 'Пайвастшавӣ';
@@ -1405,7 +1406,7 @@ class STg extends S {
   String get autoSelectSmart => 'Интихоби оқилона';
 
   @override
-  String get coreWatchUnstable => 'Пайвастшавӣ ба ядрои Sora ноустувор аст';
+  String get coreWatchUnstable => 'Алоқа бо ядро ноустувор аст. Каме интизор шавед ва дубора пайваст шуданро санҷед.';
 
   @override
   String get watchReconnect => 'Аз нав пайваст кунед';
@@ -1444,7 +1445,8 @@ class STg extends S {
   String get overrideCustomRules => 'Қоидаҳои худ';
 
   @override
-  String get errBenchmarkUnsupported => 'Андозагирии суръат ба ядрои навтар ниёз дорад';
+  String get errBenchmarkUnsupported =>
+      'Барои чен кардани суръат версияи навтари ядро лозим аст. Sora-ро навсозӣ кунед.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1546,10 +1548,10 @@ class STg extends S {
       'Барои аз нав тартиб додан кашола кунед: трафик аз боло ворид мешавад ва аз поён мебарояд.';
 
   @override
-  String get chainTooFew => 'Ақаллан 2 серверро интихоб кунед';
+  String get chainTooFew => 'Барои занҷир ҳадди ақал ду сервер лозим аст. Боз як сервер илова кунед.';
 
   @override
-  String get chainTooMany => 'Як занҷир ҳадди аксар 3 серверро дар бар мегирад';
+  String get chainTooMany => 'Дар занҷир на бештар аз се сервер буда метавонад. Серверҳои зиёдатиро хориҷ кунед.';
 
   @override
   String get chainEstimate => 'Вақти тахминии';
@@ -1566,10 +1568,12 @@ class STg extends S {
   }
 
   @override
-  String get chainUnsupported => 'Мотори ҷорӣ занҷир сохта наметавонад';
+  String get chainUnsupported =>
+      'Муҳаррики интихобшуда занҷирҳоро дастгирӣ намекунад. Муҳаррики мувофиқро интихоб кунед.';
 
   @override
-  String get chainHopMissing => 'Яке аз серверҳои занҷир дигар дастрас нест';
+  String get chainHopMissing =>
+      'Яке аз серверҳои занҷир дигар дастрас нест. Барои ин ҳалқа сервери дигар интихоб кунед.';
 
   @override
   String chainHop(Object n) {
@@ -1639,7 +1643,7 @@ class STg extends S {
       'zapret-ро ҳамроҳи нақби VPN иҷро мекунад: трафики нақб аз VPN ва трафики мустақим аз воситаи давр задани маҳдудият мегузарад.';
 
   @override
-  String get chainDuplicate => 'Ҳар як сервер метавонад танҳо як маротиба пайдо шавад';
+  String get chainDuplicate => 'Дар занҷир як сервер такрор шудааст. Барои ҳар ҳалқа сервери дигар интихоб кунед.';
 
   @override
   String get edit => 'Таҳрир';
@@ -1949,7 +1953,8 @@ class STg extends S {
   String get extWorkerFailed => 'Вазифаи пасзаминаи васеъкунанда иҷро нашуд. Сабтҳои васеъкунандаро санҷед.';
 
   @override
-  String get extAssetRejected => 'Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст.';
+  String get extAssetRejected =>
+      'Дар файли васеъшавӣ рангҳои нохоно ё қоидаҳои нодуруст ҳастанд. Аз муаллифи васеъшавӣ ислоҳи файлро хоҳиш кунед.';
 
   @override
   String get extVerifiedSora => 'Аз ҷониби Sora санҷида шудааст';
@@ -2010,7 +2015,15 @@ class STg extends S {
   String get subscriptionNeverUpdated => 'Ҳанӯз навсозӣ нашудааст. Такрор кунед.';
 
   @override
-  String get errHttpStatus => 'Сервер дархостро рад кард. Пайвандро санҷед ё ба провайдер муроҷиат кунед.';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Сервер рамзи HTTP $status-ро баргардонд. Пайвандро санҷед ё ба провайдер муроҷиат кунед.',
+      zero: 'Сервер дархостро рад кард. Пайвандро санҷед ё ба провайдер муроҷиат кунед.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => 'Танзимоти сервер нопурра аст ё дастгирӣ намешавад. Обунаро навсозӣ кунед.';
@@ -2071,4 +2084,19 @@ class STg extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => 'Фосилаи навсозии обуна нодуруст аст. Фосилаи тавсиякардаи провайдерро интихоб кунед.';
+
+  @override
+  String get errRule => 'Дар қоидаи масир хато ҳаст. Домен, суроғаи IP ё барномаи дар қоида бударо санҷед.';
+
+  @override
+  String get errDns => 'Танзимоти DNS нодуруст аст. Суроғаи сервери DNS-ро санҷед.';
+
+  @override
+  String get errEndpoint => 'Суроғаи сервер барои санҷиш нодуруст аст. Номи ҳост ва портро санҷед.';
+
+  @override
+  String get errCancelled => 'Дархост бекор шуд. Агар лозим бошад, амалро такрор кунед.';
 }

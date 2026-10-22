@@ -168,7 +168,7 @@ void main() {
           expect(sora.history.first.action, 'subscription');
           expect(sora.history.first.failureKey, pair.$2);
           debugPrint('live: ${pair.$1} => ${pair.$2}, one notification, previous servers kept');
-          if (pair.$1 == 'status') expect(sora.history.first.title, startsWith('HTTP 403:'));
+          if (pair.$1 == 'status') expect(sora.history.first.title, sora.strings.errHttpStatus(403));
           expect(sora.subscriptions.single.outbounds.single, original);
           if (pair.$1 == 'timeout') stalled.complete();
           mode = 'good';

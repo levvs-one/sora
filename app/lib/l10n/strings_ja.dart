@@ -205,25 +205,25 @@ class SJa extends S {
   String get errGeneric => '何か問題が発生しました';
 
   @override
-  String get errCore => 'Sora サービスが応答していません';
+  String get errCore => 'Soraサービスが応答していません。少し待ってから、もう一度お試しください。';
 
   @override
-  String get errAuth => 'Sora サービスにアクセスできません';
+  String get errAuth => 'Soraサービスへのアクセスが拒否されました。アプリを再起動して、もう一度お試しください。';
 
   @override
-  String get errVersion => 'Sora を更新: アプリとサービスのバージョンが異なります';
+  String get errVersion => 'Soraアプリとサービスのバージョンが異なります。Soraを更新してください。';
 
   @override
-  String get errBusy => '待ってください、前のコマンドはまだ実行中です';
+  String get errBusy => '前のコマンドを実行中です。完了するまでお待ちください。';
 
   @override
-  String get errEngineMissing => 'このサーバー用のエンジンが見つかりません';
+  String get errEngineMissing => 'このサーバーに必要なエンジンが見つかりません。Soraの更新を確認してください。';
 
   @override
-  String get errEngineStart => 'エンジンが始動しなかった';
+  String get errEngineStart => 'エンジンを起動できませんでした。接続ログで原因を確認してください。';
 
   @override
-  String get errEngineStopped => 'エンジンが止まってしまった';
+  String get errEngineStopped => 'エンジンが停止しました。もう一度接続してみてください。';
 
   @override
   String get errTunnel => 'このVPNモードは利用できません。別のモードを選ぶかサービスの権限を確認してください。';
@@ -232,34 +232,34 @@ class SJa extends S {
   String get errNetwork => 'サーバーにアクセスできません';
 
   @override
-  String get errTimeout => 'サーバーは時間内に応答しませんでした';
+  String get errTimeout => 'サーバーからの応答がタイムアウトしました。1分後にもう一度お試しください。';
 
   @override
-  String get errFirewall => 'VPN の外部でインターネットをブロックできませんでした';
+  String get errFirewall => 'VPNを経由しないインターネット接続を遮断できませんでした。接続ログで原因を確認してください。';
 
   @override
-  String get errSubFetch => 'サブスクリプションを読み込めませんでした';
+  String get errSubFetch => 'サブスクリプションをダウンロードできませんでした。インターネット接続を確認し、1分後にもう一度お試しください。';
 
   @override
-  String get errSubFormat => 'これは購読リンクではありません';
+  String get errSubFormat => 'サブスクリプションの形式を認識できませんでした。対応するリンクを提供元に依頼してください。';
 
   @override
-  String get errSubEmpty => 'サブスクリプションにはサーバーがありません';
+  String get errSubEmpty => 'サブスクリプションにサーバーがありません。サブスクリプションの提供元にお問い合わせください。';
 
   @override
-  String get errSubDuplicate => 'このサブスクリプションはすでに追加されています';
+  String get errSubDuplicate => 'このサブスクリプションは追加済みです。最新のサーバー一覧を取得するには更新してください。';
 
   @override
-  String get errSubLimit => 'サブスクリプションが多すぎます';
+  String get errSubLimit => 'サブスクリプション数が上限に達しました。使っていないサブスクリプションを削除してから追加してください。';
 
   @override
-  String get errSubScheme => 'リンクは https:// で始まる必要があります';
+  String get errSubScheme => 'サブスクリプションのリンクはhttps://で始まる必要があります。安全なリンクを提供元に依頼してください。';
 
   @override
-  String get errSecretStore => 'Sora ストレージが破損しているか使用できません';
+  String get errSecretStore => 'Soraのストレージが破損しているか、アクセスできません。アクセス権限とログの詳細を確認してください。';
 
   @override
-  String get errNoServers => '接続するサブスクリプションを追加する';
+  String get errNoServers => '接続先のサーバーがありません。サブスクリプションか自分のサーバーを追加してください。';
 
   @override
   String get connections => '接続';
@@ -1385,7 +1385,7 @@ class SJa extends S {
   String get autoSelectSmart => '賢い選択';
 
   @override
-  String get coreWatchUnstable => 'Sora コアへの接続が不安定です';
+  String get coreWatchUnstable => 'コアとの接続が不安定です。少し待ってから、もう一度接続してみてください。';
 
   @override
   String get watchReconnect => '再接続';
@@ -1424,7 +1424,7 @@ class SJa extends S {
   String get overrideCustomRules => '独自のルール';
 
   @override
-  String get errBenchmarkUnsupported => '速度測定には新しいコアが必要です';
+  String get errBenchmarkUnsupported => '速度測定には新しいバージョンのコアが必要です。Soraを更新してください。';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1524,10 +1524,10 @@ class SJa extends S {
   String get chainOrderHint => 'ドラッグして順序を変更します。トラフィックは上部から入り、下部から出ます。';
 
   @override
-  String get chainTooFew => '少なくとも 2 つのサーバーを選択してください';
+  String get chainTooFew => 'チェーンには2台以上のサーバーが必要です。サーバーを追加してください。';
 
   @override
-  String get chainTooMany => 'チェーンには最大 3 台のサーバーを保持します';
+  String get chainTooMany => 'チェーンに設定できるサーバーは3台までです。余分なサーバーを削除してください。';
 
   @override
   String get chainEstimate => '推定遅延時間';
@@ -1544,10 +1544,10 @@ class SJa extends S {
   }
 
   @override
-  String get chainUnsupported => '現在のエンジンはチェーンを構築できません';
+  String get chainUnsupported => '選択したエンジンはチェーン接続に対応していません。対応するエンジンを選んでください。';
 
   @override
-  String get chainHopMissing => 'チェーン サーバーの 1 つが利用できなくなりました';
+  String get chainHopMissing => 'チェーン内のサーバーが利用できなくなりました。その区間に別のサーバーを選んでください。';
 
   @override
   String chainHop(Object n) {
@@ -1616,7 +1616,7 @@ class SJa extends S {
   String get zapretWithVpnHint => 'VPN トンネルと並行して zapret を実行します。トンネル内の通信は VPN を、直接通信は回避機能を使用します。';
 
   @override
-  String get chainDuplicate => '各サーバーは 1 回だけ出現できます';
+  String get chainDuplicate => 'チェーン内でサーバーが重複しています。区間ごとに異なるサーバーを選んでください。';
 
   @override
   String get edit => '編集';
@@ -1921,7 +1921,7 @@ class SJa extends S {
   String get extWorkerFailed => '拡張機能のバックグラウンドタスクに失敗しました。拡張機能のログを確認してください。';
 
   @override
-  String get extAssetRejected => '拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。';
+  String get extAssetRejected => '拡張機能のファイルに読みづらい配色または無効なルールが含まれています。拡張機能の作者にファイルの修正を依頼してください。';
 
   @override
   String get extVerifiedSora => 'Sora 認証済み';
@@ -1982,7 +1982,15 @@ class SJa extends S {
   String get subscriptionNeverUpdated => 'まだ更新されていません。再試行してください。';
 
   @override
-  String get errHttpStatus => 'サーバーがリクエストを拒否しました。リンクを確認するか提供元に連絡してください。';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'サーバーがHTTP $statusを返しました。リンクを確認するか、提供元にお問い合わせください。',
+      zero: 'サーバーがリクエストを拒否しました。リンクを確認するか、提供元にお問い合わせください。',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => 'サーバー設定が不完全か未対応です。サブスクリプションを更新してください。';
@@ -2042,4 +2050,19 @@ class SJa extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval => 'サブスクリプションの更新間隔が無効です。提供元が推奨する間隔を選んでください。';
+
+  @override
+  String get errRule => 'ルーティングルールが無効です。ルール内のドメイン、IPアドレス、アプリを確認してください。';
+
+  @override
+  String get errDns => 'DNS設定が無効です。DNSサーバーのアドレスを確認してください。';
+
+  @override
+  String get errEndpoint => 'テスト対象のサーバーアドレスが無効です。ホスト名とポートを確認してください。';
+
+  @override
+  String get errCancelled => 'リクエストがキャンセルされました。必要に応じて操作をやり直してください。';
 }

@@ -205,25 +205,25 @@ class SRu extends S {
   String get errGeneric => 'Что-то пошло не так';
 
   @override
-  String get errCore => 'Служба Sora не отвечает';
+  String get errCore => 'Служба Sora не отвечает. Подождите немного и попробуйте снова.';
 
   @override
-  String get errAuth => 'Нет доступа к службе Sora';
+  String get errAuth => 'Нет доступа к службе Sora. Перезапустите приложение и попробуйте снова.';
 
   @override
-  String get errVersion => 'Обновите Sora: приложение и служба разных версий';
+  String get errVersion => 'Приложение и служба Sora разных версий. Обновите Sora.';
 
   @override
-  String get errBusy => 'Подождите, предыдущая команда ещё выполняется';
+  String get errBusy => 'Предыдущая команда ещё выполняется. Дождитесь её завершения.';
 
   @override
-  String get errEngineMissing => 'Не найдено ядро для этого сервера';
+  String get errEngineMissing => 'Не найдено ядро для этого сервера. Проверьте наличие обновлений Sora.';
 
   @override
-  String get errEngineStart => 'Ядро не запустилось';
+  String get errEngineStart => 'Ядро не запустилось. Посмотрите причину в журнале подключения.';
 
   @override
-  String get errEngineStopped => 'Ядро остановилось';
+  String get errEngineStopped => 'Ядро остановилось. Попробуйте подключиться снова.';
 
   @override
   String get errTunnel => 'Этот режим VPN недоступен. Выберите другой режим или проверьте права службы.';
@@ -232,34 +232,37 @@ class SRu extends S {
   String get errNetwork => 'Нет связи с сервером';
 
   @override
-  String get errTimeout => 'Сервер не ответил вовремя';
+  String get errTimeout => 'Сервер не ответил вовремя. Попробуйте ещё раз через минуту.';
 
   @override
-  String get errFirewall => 'Не удалось включить блокировку интернета без VPN';
+  String get errFirewall =>
+      'Не удалось включить блокировку интернета без VPN. Посмотрите причину в журнале подключения.';
 
   @override
-  String get errSubFetch => 'Не удалось загрузить подписку';
+  String get errSubFetch => 'Не удалось загрузить подписку. Проверьте интернет и попробуйте ещё раз через минуту.';
 
   @override
-  String get errSubFormat => 'Это не ссылка на подписку';
+  String get errSubFormat => 'Формат подписки не распознан. Запросите совместимую ссылку у провайдера подписки.';
 
   @override
-  String get errSubEmpty => 'В подписке нет серверов';
+  String get errSubEmpty => 'В подписке нет серверов. Обратитесь к провайдеру подписки.';
 
   @override
-  String get errSubDuplicate => 'Эта подписка уже добавлена';
+  String get errSubDuplicate => 'Эта подписка уже добавлена. Обновите её, чтобы получить актуальные серверы.';
 
   @override
-  String get errSubLimit => 'Слишком много подписок';
+  String get errSubLimit => 'Достигнут предел числа подписок. Удалите ненужную подписку перед добавлением новой.';
 
   @override
-  String get errSubScheme => 'Нужна ссылка, начинающаяся с https://';
+  String get errSubScheme =>
+      'Ссылка на подписку должна начинаться с https://. Запросите защищённую ссылку у провайдера.';
 
   @override
-  String get errSecretStore => 'Хранилище Sora повреждено или недоступно';
+  String get errSecretStore =>
+      'Хранилище Sora повреждено или недоступно. Проверьте права доступа и подробности в журнале.';
 
   @override
-  String get errNoServers => 'Добавьте подписку, чтобы подключиться';
+  String get errNoServers => 'Нет серверов для подключения. Добавьте подписку или свой сервер.';
 
   @override
   String get connections => 'Соединения';
@@ -1419,7 +1422,7 @@ class SRu extends S {
   String get autoSelectSmart => 'Умный выбор';
 
   @override
-  String get coreWatchUnstable => 'Связь с ядром нестабильна';
+  String get coreWatchUnstable => 'Связь с ядром нестабильна. Подождите немного и попробуйте подключиться снова.';
 
   @override
   String get watchReconnect => 'Переподключить';
@@ -1458,7 +1461,7 @@ class SRu extends S {
   String get overrideCustomRules => 'Свои правила';
 
   @override
-  String get errBenchmarkUnsupported => 'Для замера скорости нужна новая версия ядра';
+  String get errBenchmarkUnsupported => 'Для замера скорости нужна новая версия ядра. Обновите Sora.';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1559,10 +1562,10 @@ class SRu extends S {
   String get chainOrderHint => 'Перетащите, чтобы изменить порядок: трафик входит сверху, выходит снизу.';
 
   @override
-  String get chainTooFew => 'Выберите минимум 2 сервера';
+  String get chainTooFew => 'Для цепочки нужны хотя бы два сервера. Добавьте ещё один сервер.';
 
   @override
-  String get chainTooMany => 'В цепочке максимум 3 сервера';
+  String get chainTooMany => 'В цепочке может быть не больше трёх серверов. Уберите лишние серверы.';
 
   @override
   String get chainEstimate => 'Примерная задержка';
@@ -1579,10 +1582,10 @@ class SRu extends S {
   }
 
   @override
-  String get chainUnsupported => 'Текущий движок не умеет строить цепочки';
+  String get chainUnsupported => 'Выбранное ядро не поддерживает цепочки. Выберите совместимое ядро.';
 
   @override
-  String get chainHopMissing => 'Один из серверов цепочки больше недоступен';
+  String get chainHopMissing => 'Один из серверов цепочки больше недоступен. Выберите другой сервер для этого звена.';
 
   @override
   String chainHop(Object n) {
@@ -1652,7 +1655,7 @@ class SRu extends S {
       'Запускает zapret рядом с VPN-туннелем: трафик туннеля идёт через VPN, прямой трафик через обход.';
 
   @override
-  String get chainDuplicate => 'Каждый сервер можно выбрать только один раз';
+  String get chainDuplicate => 'В цепочке повторяется сервер. Выберите разные серверы для каждого звена.';
 
   @override
   String get edit => 'Изменить';
@@ -1968,7 +1971,8 @@ class SRu extends S {
   String get extWorkerFailed => 'Фоновая задача расширения завершилась с ошибкой. Проверьте журнал расширения.';
 
   @override
-  String get extAssetRejected => 'Файл расширения отклонён: нечитаемые цвета или неверные правила.';
+  String get extAssetRejected =>
+      'В файле расширения нечитаемые цвета или неверные правила. Попросите автора расширения исправить файл.';
 
   @override
   String get extVerifiedSora => 'Проверено Sora';
@@ -2029,7 +2033,15 @@ class SRu extends S {
   String get subscriptionNeverUpdated => 'Ещё не обновлялась. Повторите.';
 
   @override
-  String get errHttpStatus => 'Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.';
+  String errHttpStatus(int status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      status,
+      locale: localeName,
+      other: 'Сервер вернул код HTTP $status. Проверьте ссылку или обратитесь к провайдеру.',
+      zero: 'Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get errInvalidServer => 'Настройки сервера неполные или не поддерживаются. Обновите подписку.';
@@ -2089,4 +2101,20 @@ class SRu extends S {
 
     return 'x$countString';
   }
+
+  @override
+  String get errSubInterval =>
+      'Недопустимый интервал обновления подписки. Выберите интервал, рекомендованный провайдером.';
+
+  @override
+  String get errRule => 'В правиле маршрутизации ошибка. Проверьте указанный домен, IP-адрес или программу.';
+
+  @override
+  String get errDns => 'Некорректные настройки DNS. Проверьте адрес DNS-сервера.';
+
+  @override
+  String get errEndpoint => 'Некорректный адрес сервера для проверки. Проверьте имя хоста и порт.';
+
+  @override
+  String get errCancelled => 'Запрос отменён. При необходимости выполните действие снова.';
 }

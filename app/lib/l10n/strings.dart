@@ -498,43 +498,43 @@ abstract class S {
   /// No description provided for @errCore.
   ///
   /// In ru, this message translates to:
-  /// **'Служба Sora не отвечает'**
+  /// **'Служба Sora не отвечает. Подождите немного и попробуйте снова.'**
   String get errCore;
 
   /// No description provided for @errAuth.
   ///
   /// In ru, this message translates to:
-  /// **'Нет доступа к службе Sora'**
+  /// **'Нет доступа к службе Sora. Перезапустите приложение и попробуйте снова.'**
   String get errAuth;
 
   /// No description provided for @errVersion.
   ///
   /// In ru, this message translates to:
-  /// **'Обновите Sora: приложение и служба разных версий'**
+  /// **'Приложение и служба Sora разных версий. Обновите Sora.'**
   String get errVersion;
 
   /// No description provided for @errBusy.
   ///
   /// In ru, this message translates to:
-  /// **'Подождите, предыдущая команда ещё выполняется'**
+  /// **'Предыдущая команда ещё выполняется. Дождитесь её завершения.'**
   String get errBusy;
 
   /// No description provided for @errEngineMissing.
   ///
   /// In ru, this message translates to:
-  /// **'Не найдено ядро для этого сервера'**
+  /// **'Не найдено ядро для этого сервера. Проверьте наличие обновлений Sora.'**
   String get errEngineMissing;
 
   /// No description provided for @errEngineStart.
   ///
   /// In ru, this message translates to:
-  /// **'Ядро не запустилось'**
+  /// **'Ядро не запустилось. Посмотрите причину в журнале подключения.'**
   String get errEngineStart;
 
   /// No description provided for @errEngineStopped.
   ///
   /// In ru, this message translates to:
-  /// **'Ядро остановилось'**
+  /// **'Ядро остановилось. Попробуйте подключиться снова.'**
   String get errEngineStopped;
 
   /// No description provided for @errTunnel.
@@ -552,61 +552,61 @@ abstract class S {
   /// No description provided for @errTimeout.
   ///
   /// In ru, this message translates to:
-  /// **'Сервер не ответил вовремя'**
+  /// **'Сервер не ответил вовремя. Попробуйте ещё раз через минуту.'**
   String get errTimeout;
 
   /// No description provided for @errFirewall.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось включить блокировку интернета без VPN'**
+  /// **'Не удалось включить блокировку интернета без VPN. Посмотрите причину в журнале подключения.'**
   String get errFirewall;
 
   /// No description provided for @errSubFetch.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось загрузить подписку'**
+  /// **'Не удалось загрузить подписку. Проверьте интернет и попробуйте ещё раз через минуту.'**
   String get errSubFetch;
 
   /// No description provided for @errSubFormat.
   ///
   /// In ru, this message translates to:
-  /// **'Это не ссылка на подписку'**
+  /// **'Формат подписки не распознан. Запросите совместимую ссылку у провайдера подписки.'**
   String get errSubFormat;
 
   /// No description provided for @errSubEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'В подписке нет серверов'**
+  /// **'В подписке нет серверов. Обратитесь к провайдеру подписки.'**
   String get errSubEmpty;
 
   /// No description provided for @errSubDuplicate.
   ///
   /// In ru, this message translates to:
-  /// **'Эта подписка уже добавлена'**
+  /// **'Эта подписка уже добавлена. Обновите её, чтобы получить актуальные серверы.'**
   String get errSubDuplicate;
 
   /// No description provided for @errSubLimit.
   ///
   /// In ru, this message translates to:
-  /// **'Слишком много подписок'**
+  /// **'Достигнут предел числа подписок. Удалите ненужную подписку перед добавлением новой.'**
   String get errSubLimit;
 
   /// No description provided for @errSubScheme.
   ///
   /// In ru, this message translates to:
-  /// **'Нужна ссылка, начинающаяся с https://'**
+  /// **'Ссылка на подписку должна начинаться с https://. Запросите защищённую ссылку у провайдера.'**
   String get errSubScheme;
 
   /// No description provided for @errSecretStore.
   ///
   /// In ru, this message translates to:
-  /// **'Хранилище Sora повреждено или недоступно'**
+  /// **'Хранилище Sora повреждено или недоступно. Проверьте права доступа и подробности в журнале.'**
   String get errSecretStore;
 
   /// No description provided for @errNoServers.
   ///
   /// In ru, this message translates to:
-  /// **'Добавьте подписку, чтобы подключиться'**
+  /// **'Нет серверов для подключения. Добавьте подписку или свой сервер.'**
   String get errNoServers;
 
   /// No description provided for @connections.
@@ -2694,7 +2694,7 @@ abstract class S {
   /// No description provided for @coreWatchUnstable.
   ///
   /// In ru, this message translates to:
-  /// **'Связь с ядром нестабильна'**
+  /// **'Связь с ядром нестабильна. Подождите немного и попробуйте подключиться снова.'**
   String get coreWatchUnstable;
 
   /// No description provided for @watchReconnect.
@@ -2772,7 +2772,7 @@ abstract class S {
   /// No description provided for @errBenchmarkUnsupported.
   ///
   /// In ru, this message translates to:
-  /// **'Для замера скорости нужна новая версия ядра'**
+  /// **'Для замера скорости нужна новая версия ядра. Обновите Sora.'**
   String get errBenchmarkUnsupported;
 
   /// No description provided for @benchmarkProgress.
@@ -2952,13 +2952,13 @@ abstract class S {
   /// No description provided for @chainTooFew.
   ///
   /// In ru, this message translates to:
-  /// **'Выберите минимум 2 сервера'**
+  /// **'Для цепочки нужны хотя бы два сервера. Добавьте ещё один сервер.'**
   String get chainTooFew;
 
   /// No description provided for @chainTooMany.
   ///
   /// In ru, this message translates to:
-  /// **'В цепочке максимум 3 сервера'**
+  /// **'В цепочке может быть не больше трёх серверов. Уберите лишние серверы.'**
   String get chainTooMany;
 
   /// No description provided for @chainEstimate.
@@ -2988,13 +2988,13 @@ abstract class S {
   /// No description provided for @chainUnsupported.
   ///
   /// In ru, this message translates to:
-  /// **'Текущий движок не умеет строить цепочки'**
+  /// **'Выбранное ядро не поддерживает цепочки. Выберите совместимое ядро.'**
   String get chainUnsupported;
 
   /// No description provided for @chainHopMissing.
   ///
   /// In ru, this message translates to:
-  /// **'Один из серверов цепочки больше недоступен'**
+  /// **'Один из серверов цепочки больше недоступен. Выберите другой сервер для этого звена.'**
   String get chainHopMissing;
 
   /// No description provided for @chainHop.
@@ -3120,7 +3120,7 @@ abstract class S {
   /// No description provided for @chainDuplicate.
   ///
   /// In ru, this message translates to:
-  /// **'Каждый сервер можно выбрать только один раз'**
+  /// **'В цепочке повторяется сервер. Выберите разные серверы для каждого звена.'**
   String get chainDuplicate;
 
   /// No description provided for @edit.
@@ -3690,7 +3690,7 @@ abstract class S {
   /// No description provided for @extAssetRejected.
   ///
   /// In ru, this message translates to:
-  /// **'Файл расширения отклонён: нечитаемые цвета или неверные правила.'**
+  /// **'В файле расширения нечитаемые цвета или неверные правила. Попросите автора расширения исправить файл.'**
   String get extAssetRejected;
 
   /// No description provided for @extVerifiedSora.
@@ -3801,11 +3801,11 @@ abstract class S {
   /// **'Ещё не обновлялась. Повторите.'**
   String get subscriptionNeverUpdated;
 
-  /// No description provided for @errHttpStatus.
+  /// Complete HTTP failure message; status 0 means the response code is unknown.
   ///
   /// In ru, this message translates to:
-  /// **'Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.'**
-  String get errHttpStatus;
+  /// **'{status, plural, =0 {Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.} other {Сервер вернул код HTTP {status}. Проверьте ссылку или обратитесь к провайдеру.}}'**
+  String errHttpStatus(int status);
 
   /// No description provided for @errInvalidServer.
   ///
@@ -3914,6 +3914,36 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'x{count}'**
   String notificationRepeat(int count);
+
+  /// No description provided for @errSubInterval.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недопустимый интервал обновления подписки. Выберите интервал, рекомендованный провайдером.'**
+  String get errSubInterval;
+
+  /// No description provided for @errRule.
+  ///
+  /// In ru, this message translates to:
+  /// **'В правиле маршрутизации ошибка. Проверьте указанный домен, IP-адрес или программу.'**
+  String get errRule;
+
+  /// No description provided for @errDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Некорректные настройки DNS. Проверьте адрес DNS-сервера.'**
+  String get errDns;
+
+  /// No description provided for @errEndpoint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Некорректный адрес сервера для проверки. Проверьте имя хоста и порт.'**
+  String get errEndpoint;
+
+  /// No description provided for @errCancelled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Запрос отменён. При необходимости выполните действие снова.'**
+  String get errCancelled;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

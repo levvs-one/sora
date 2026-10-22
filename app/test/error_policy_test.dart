@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart';
 import 'package:http/http.dart' show ClientException;
@@ -55,6 +56,44 @@ void main() {
     }
   });
 
+  test('every describe arm returns exactly one complete localization message', () {
+    final source = File('lib/src/ui/kit.dart').readAsStringSync().split('String describe(').last;
+    final body = source.split('return switch (key) {').last.split('};').first;
+    final arms = body.split('=>').skip(1).map((arm) => arm.split(',').first.trim());
+    expect(arms.length, greaterThan(50));
+    final message = RegExp(r'^s\.[a-zA-Z]\w*(?:\(failure\.httpStatus \?\? 0\))?$');
+    for (final arm in arms) {
+      expect(message.hasMatch(arm), isTrue, reason: 'Use one l10n message, without concatenation: $arm');
+    }
+    final getters = arms.map((arm) => RegExp(r'^s\.(\w+)').firstMatch(arm)![1]!).toSet();
+    final locales = Directory('lib/l10n').listSync().whereType<File>().where((f) => f.path.endsWith('.arb'));
+    expect(locales.length, 32);
+    for (final file in locales) {
+      final arb = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+      for (final key in getters) {
+        expect(arb[key], isA<String>().having((s) => s.trim(), 'translation', isNotEmpty), reason: '${file.path} $key');
+      }
+    }
+  });
+
+  test('HTTP messages localize known and unknown status without a fabricated code', () {
+    for (final locale in S.supportedLocales) {
+      final s = lookupS(locale);
+      for (final key in ['app.http_status', 'core.subscription.status']) {
+        for (final status in [null, 400, 403, 429, 503]) {
+          final text = describe(s, CoreFailure(key, httpStatus: status));
+          expect(text, s.errHttpStatus(status ?? 0), reason: '$locale $key $status');
+          expect(text, isNot(contains('{status}')));
+          if (status == null) {
+            expect(text, isNot(contains('HTTP 0')));
+          } else {
+            expect(text, contains('$status'));
+          }
+        }
+      }
+    }
+  });
+
   test('native exceptions retain their class without exposing error details', () {
     final samples = <Object, String>{
       TimeoutException('private'): 'core.network.timeout',
@@ -83,7 +122,7 @@ void main() {
       SoraError(userMessageKey: 'core.subscription.status', detailRedacted: 'subscription: the provider answered 403'),
     );
     expect(failure.httpStatus, 403);
-    expect(describe(lookupS(const Locale('ru')), failure), startsWith('HTTP 403:'));
+    expect(describe(lookupS(const Locale('ru')), failure), lookupS(const Locale('ru')).errHttpStatus(403));
   });
 
   testWidgets('transient background failures show state, stay silent and clear on recovery', (tester) async {
@@ -243,6 +282,39 @@ void main() {
     sora.recovered('save');
     await tester.pumpWidget(const SizedBox());
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('action toasts show complete recovery steps in every locale', (tester) async {
+    addTearDown(tester.view.reset);
+    tester.view
+      ..devicePixelRatio = 1
+      ..physicalSize = const Size(420, 900);
+    for (final locale in S.supportedLocales) {
+      final sora = await start();
+      await sora.settings.completeTour();
+      sora.settings
+        ..language = locale.toString()
+        ..animations = false;
+      await tester.pumpWidget(SoraApp(sora: sora));
+      await tester.pumpAndSettle();
+      sora.reportFailure(
+        const CoreFailure('core.subscription.status', httpStatus: 403),
+        mode: FailureMode.action,
+        source: 'subscription:test',
+      );
+      await tester.pumpAndSettle();
+      final text = find.text(sora.strings.errHttpStatus(403));
+      expect(text, findsOneWidget, reason: '$locale');
+      final paragraph = tester.renderObject<RenderParagraph>(
+        find.descendant(of: text, matching: find.byType(RichText)),
+      );
+      expect(paragraph.maxLines, isNull, reason: '$locale');
+      expect(paragraph.didExceedMaxLines, isFalse, reason: '$locale');
+      final frame = tester.getRect(find.byType(Dismissible));
+      expect(tester.getRect(text).bottom, lessThanOrEqualTo(frame.bottom));
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
+    }
   });
 
   testWidgets('a persisted subscription failure older than a day reports once and reports a changed cause', (
