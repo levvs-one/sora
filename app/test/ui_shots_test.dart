@@ -18,8 +18,10 @@ import 'package:sora/src/ui/shell.dart';
 
 import 'desktop_shell_test.dart' show section, size;
 import 'fixtures/desktop_state.dart';
+import 'extension_ui_test.dart' show extensionScreenshots;
 
 void main() {
+  extensionScreenshots();
   testWidgets('desktop section screenshots', (tester) async {
     final previousShadows = debugDisableShadows;
     debugDisableShadows = false;
