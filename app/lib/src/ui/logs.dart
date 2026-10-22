@@ -136,7 +136,7 @@ class _LogsScreenState extends State<LogsScreen> {
             },
             onError: (Object e) {
               if (mounted && revision == _revision) {
-                SoraScope.read(context).reportFailure(e, source: 'logs', mode: mode);
+                SoraScope.read(context).reportFailure(e, source: 'logs', mode: FailureMode.background);
               }
             },
           );

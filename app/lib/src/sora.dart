@@ -389,6 +389,7 @@ class Sora extends ChangeNotifier {
   /// Suppresses failure notices during an explicit disconnect.
   bool _stopping = false;
   Completer<void>? _connectionWork;
+  FailureMode _connectionMode = FailureMode.action;
   SessionPlan? _activePlan;
 
   /// Chain the active session runs through; null for a direct session.
@@ -434,6 +435,7 @@ class Sora extends ChangeNotifier {
       if (!announced) return;
     }
     if (notice is ConnectionFailed) {
+      if (mode == FailureMode.action) recovered('session', notify: false);
       reportFailure(
         notice.failure,
         mode: mode,
@@ -769,7 +771,7 @@ class Sora extends ChangeNotifier {
           }
           if (phase == Phase.off && _pendingRestore == null && !_restoreDeclined) {
             await settings.saveResumeAfterUpdate(false);
-            unawaited(connect());
+            unawaited(connect(mode: FailureMode.background));
           }
         }
         if (phase == Phase.connected && settings.resumeAfterUpdate) await settings.saveResumeAfterUpdate(false);
@@ -858,7 +860,8 @@ class Sora extends ChangeNotifier {
       _memberSpare--;
       final entry = entryOf(settings.server, _subscriptions.values);
       if (entry != null) _emit(ServerSwitched(entry.name, backup: entry.ordered));
-      unawaited((_connectionWork?.future ?? Future.value()).then((_) => connect(retry: true)));
+      final mode = _connectionWork == null ? FailureMode.background : _connectionMode;
+      unawaited((_connectionWork?.future ?? Future.value()).then((_) => connect(retry: true, mode: mode)));
       return;
     }
     if (report &&
@@ -886,7 +889,7 @@ class Sora extends ChangeNotifier {
       _lostAnnounced = false;
       _emit(
         ConnectionFailed(failure ?? CoreFailure(_keyOfCode(state.reason))),
-        mode: _connectionWork == null ? FailureMode.background : FailureMode.action,
+        mode: _connectionWork == null ? FailureMode.background : _connectionMode,
       );
     }
   }
@@ -1380,7 +1383,7 @@ class Sora extends ChangeNotifier {
 
   /// Connects using the current selection and settings. [retry] preserves the
   /// remaining attempt count during profile-group failover.
-  Future<void> connect({bool retry = false, ProxyChain? via}) async {
+  Future<void> connect({bool retry = false, ProxyChain? via, FailureMode mode = FailureMode.action}) async {
     if (_disposed || updateBlocked || busy || _stopping) return;
     if (cleanupPending && !strictBlocked) {
       await disconnect();
@@ -1391,14 +1394,14 @@ class Sora extends ChangeNotifier {
       // The core is not up (e.g. "retry" tapped in a notification): say so
       // instead of silently doing nothing (audit L23).
       failure = CoreFailure.unavailable;
-      reportFailure(failure!, mode: FailureMode.action, source: 'connect', action: 'connect');
+      reportFailure(failure!, mode: mode, source: 'connect', action: 'connect');
       notifyListeners();
       return;
     }
     failure = null;
     if (selected != 'bypass' && servers.isEmpty) {
       failure = const CoreFailure('app.no_servers');
-      _emit(ConnectionFailed(failure!));
+      _emit(ConnectionFailed(failure!), mode: mode);
       notifyListeners();
       return;
     }
@@ -1417,7 +1420,7 @@ class Sora extends ChangeNotifier {
           keepChain.hops.any((id) => !servers.any((o) => o.id == id));
       if (broken) {
         failure = const CoreFailure('chainHopMissing');
-        _emit(ConnectionFailed(failure!));
+        _emit(ConnectionFailed(failure!), mode: mode);
         notifyListeners();
         return;
       }
@@ -1437,7 +1440,7 @@ class Sora extends ChangeNotifier {
           );
     if (plan.tunStack.isNotEmpty && link.minor < 7) {
       failure = const CoreFailure('core.api.version_mismatch');
-      _emit(ConnectionFailed(failure!));
+      _emit(ConnectionFailed(failure!), mode: mode);
       notifyListeners();
       return;
     }
@@ -1445,7 +1448,7 @@ class Sora extends ChangeNotifier {
     // silently ignore the fields and connect without them.
     if ((plan.chain.isNotEmpty || plan.zapretWithVpn) && link.minor < 10) {
       failure = const CoreFailure('core.api.version_mismatch');
-      _emit(ConnectionFailed(failure!));
+      _emit(ConnectionFailed(failure!), mode: mode);
       notifyListeners();
       return;
     }
@@ -1462,7 +1465,7 @@ class Sora extends ChangeNotifier {
     final strict = settings.strictKillSwitch;
     if (strict && (link.minor < 12 || !coreCapabilities.contains('strict-kill-switch'))) {
       failure = const CoreFailure('core.api.version_mismatch');
-      _emit(ConnectionFailed(failure!));
+      _emit(ConnectionFailed(failure!), mode: mode);
       notifyListeners();
       return;
     }
@@ -1471,6 +1474,7 @@ class Sora extends ChangeNotifier {
     _member = entry != null && entry.members.any(isProfile) ? plan.outbounds.single.id : null;
     if (!retry) _memberSpare = entry == null ? 0 : entry.members.length - 1;
     final work = _connectionWork = Completer<void>();
+    _connectionMode = mode;
     phase = Phase.connecting;
     notifyListeners();
     // Include events emitted during these requests, before the watch opens.
@@ -1522,7 +1526,7 @@ class Sora extends ChangeNotifier {
       final before = _emitted;
       await _readStatus().catchError((Object _) {});
       if (phase == Phase.connecting) phase = Phase.off;
-      if (!_stopping && _emitted == before) _emit(ConnectionFailed(failure!));
+      if (!_stopping && _emitted == before) _emit(ConnectionFailed(failure!), mode: mode);
       // The session never came up: this was a failed connect, not a crash,
       // so no restore intent may linger for the next startup.
       // Profile-group failover re-runs connect() and re-writes its intent.

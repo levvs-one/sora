@@ -31,7 +31,7 @@ class _EmptySora extends Sora {
   }
   int connects = 0;
   @override
-  Future<void> connect({bool retry = false, ProxyChain? via}) async {
+  Future<void> connect({bool retry = false, ProxyChain? via, FailureMode mode = FailureMode.action}) async {
     connects++;
   }
 }
