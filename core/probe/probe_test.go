@@ -19,7 +19,7 @@ func TestTheEndpointBudgetBelongsToTheProberNotToTheRequest(t *testing.T) {
 	// so the first measurement keeps its socket slot and the others wait for
 	// it. A closed port refuses instantly and let the measurements finish
 	// before the fifth request on a loaded machine.
-	silent, err := net.Listen("tcp", "127.0.0.1:0")
+	silent, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
 	}
