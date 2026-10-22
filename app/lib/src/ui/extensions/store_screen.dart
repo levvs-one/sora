@@ -185,12 +185,12 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     controller.dispose();
     if (url == null || url.isEmpty || !context.mounted) return;
     if (!url.startsWith('https://')) {
-      _showError(context, s.extErrHttpsOnly);
+      await _showError(context, s.extErrHttpsOnly);
       return;
     }
     final uri = Uri.tryParse(url);
     if (uri == null || uri.host.isEmpty) {
-      _showError(context, s.extErrNetwork);
+      await _showError(context, s.extErrNetwork);
       return;
     }
     await _downloadAndInstall(context, uri, source: 'url');
@@ -242,8 +242,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         verified: entry?.badges.contains('staff') ?? false,
       );
     } catch (_) {
+      client.close();
       await window.close();
-      if (!cancelled && context.mounted) _showError(context, s.extErrNetwork);
+      if (!cancelled && context.mounted) await _showError(context, s.extErrNetwork);
       return false;
     } finally {
       client.close();
@@ -295,7 +296,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     Future<void> showFailure(String message) async {
       await progress.close();
       if (context.mounted) {
-        _showError(context, isUpdate ? '$message\n\n${s.extUpdateFailedKept}' : message);
+        await _showError(context, isUpdate ? '$message\n\n${s.extUpdateFailedKept}' : message);
       }
     }
 
@@ -375,10 +376,11 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     return s.extErrGeneric;
   }
 
-  void _showError(BuildContext context, String message) {
+  Future<void> _showError(BuildContext context, String message) async {
     final palette = Palette.of(context);
     final s = S.of(context);
-    showDialog<void>(
+    final navigator = Navigator.of(context, rootNavigator: true);
+    final route = DialogRoute<void>(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: palette.raised,
@@ -411,6 +413,10 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         ),
       ),
     );
+    await navigator.push(route);
+    // A batch must wait for the scrim's exit transition before starting
+    // the next download, otherwise the two dialog routes overlap.
+    await route.completed;
   }
 
   static String _sha256Hex(Uint8List data) => crypto.sha256.convert(data).toString();

@@ -23,6 +23,7 @@ import 'package:sora/src/sora.dart';
 import 'package:sora/src/ui/extensions/detail_screen.dart';
 import 'package:sora/src/ui/extensions/conflicts_sheet.dart';
 import 'package:sora/src/ui/extensions/permissions_sheet.dart';
+import 'package:sora/src/ui/extensions/panel_screen.dart';
 import 'package:sora/src/ui/extensions/progress_window.dart';
 import 'package:sora/src/ui/extensions/store_screen.dart';
 import 'package:sora/src/ui/extensions/widgets.dart';
@@ -319,6 +320,46 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('update all waits for the failure dialog and keeps the installed version', (tester) async {
+    final store = await _store(tester, installed: true);
+    final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
+    ((catalog['extensions'] as List).single as Map<String, dynamic>)['version'] = '1.0.1';
+    await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
+    final sora = Sora(await Settings.load(), extensions: store);
+    addTearDown(sora.dispose);
+    final observer = _Routes();
+    await tester.pumpWidget(
+      SoraScope(
+        sora: sora,
+        child: _app(const ExtensionsScreen(), store: store, observer: observer),
+      ),
+    );
+    await _ready(tester);
+    await tester.tap(find.text('Installed'));
+    await tester.pumpAndSettle();
+    final updateAll = find.byWidgetPredicate((w) => w is PrimaryButton && w.label == 'Update all');
+    final client = _DownloadClient();
+    await http.runWithClient(() async {
+      await tester.tap(updateAll);
+      await tester.pump();
+      client.chunks.addError(http.ClientException('connection lost'));
+      for (var i = 0; i < 100 && find.text('Install failed').evaluate().isEmpty; i++) {
+        await _io(tester);
+      }
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Install failed'), findsOneWidget);
+      expect(tester.widget<PrimaryButton>(updateAll).busy, isTrue);
+      expect(client.closed, isTrue);
+      expect(store.get(_entry.id)?.version, _entry.version);
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+    }, () => client);
+    expect(tester.widget<PrimaryButton>(updateAll).busy, isFalse);
+    expect(find.byType(Dialog), findsNothing);
+    expect(observer.maximum, 1);
+    expect(tester.takeException(), isNull);
+  });
+
   for (final corrupt in [false, true]) {
     testWidgets('catalog flow keeps one route through approval or error, corrupt=$corrupt', (tester) async {
       final store = await _store(tester);
@@ -494,6 +535,10 @@ void extensionScreenshots() {
         await tester.pumpAndSettle();
         await conflicts;
         conflictStore.dispose();
+        await tester.runAsync(() => store.setEnabled(_entry.id, false));
+        unawaited(push<void>(sheetContext, ExtensionPanelScreen(extensionId: _entry.id)));
+        await tester.pumpAndSettle();
+        await save('panel-unavailable', theme);
         await tester.pumpWidget(const SizedBox());
         await tester.pumpAndSettle();
         sora.dispose();
